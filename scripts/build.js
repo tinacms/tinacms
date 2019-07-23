@@ -42,7 +42,7 @@ function createBuildOptions(name) {
     external: targetId => {
       return !!externalKeys.find(extId => {
         console.log(extId, targetId)
-        return new RegExp(extId).test(targetId)
+        return new RegExp(/^extId$/i).test(targetId)
       })
     },
     plugins: [
