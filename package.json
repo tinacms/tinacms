@@ -2,8 +2,8 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap",
-    "bs": "lerna bootstrap",
+    "bootstrap": "lerna bootstrap --hoist",
+    "bs": "yarn bootstrap",
     "link": "lerna link",
     "test": "lerna run test",
     "build": "node scripts/build"

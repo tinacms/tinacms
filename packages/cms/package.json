@@ -11,9 +11,14 @@
     "test": "jest"
   },
   "devDependencies": {
+    "@types/react": "^16.8.23",
     "@types/jest": "^24.0.15",
+    "react": "^16.8.6",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
+  },
+  "peerDependencies": {
+    "react": "^16.8.6"
   },
   "dependencies": {}
 }
