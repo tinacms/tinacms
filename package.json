@@ -1,0 +1,19 @@
+{
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "bootstrap": "lerna bootstrap",
+    "link": "lerna link",
+    "test": "lerna run test",
+    "build": "node scripts/build"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "commander": "^2.20.0",
+    "lerna": "^3.15.0",
+    "rollup": "^1.16.7",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-typescript2": "^0.22.0",
+    "typescript": "^3.5.3"
+  }
+}

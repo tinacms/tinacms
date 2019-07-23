@@ -1,0 +1,4 @@
+**/node_modules/
+**/build/
+**/.rpt2_cache
+**/.rts2_cache
