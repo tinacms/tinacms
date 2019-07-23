@@ -1,8 +1,5 @@
 import * as React from 'react'
-
-export class CMS {
-  //
-}
+import { CMS } from './cms'
 
 export const CMSContext = React.createContext<CMS | null>(null)
 
