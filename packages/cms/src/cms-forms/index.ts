@@ -1,7 +1,19 @@
+import * as React from 'react'
+
 export class FormManager {
   private __forms: any = {}
+  private __fields: any = {}
+
   createForm(options: FormOptions) {
     this.__forms[options.name] = new Form(options)
+  }
+
+  addFieldPlugin(plugin: FieldPlugin) {
+    this.__fields[plugin.name] = plugin
+  }
+
+  getFieldPlugin(name: string): FieldPlugin | null {
+    return this.__fields[name]
   }
 }
 
@@ -28,5 +40,10 @@ export interface FormOptions {
 
 export interface Field {
   name: string
-  component: any
+  component: React.FC<any> | string
+}
+
+export interface FieldPlugin {
+  name: string
+  Component: React.FC<any>
 }

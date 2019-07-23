@@ -11,14 +11,17 @@
     "test": "jest"
   },
   "devDependencies": {
-    "@types/react": "^16.8.23",
     "@types/jest": "^24.0.15",
-    "react": "^16.8.6",
+    "@types/react": "^16.8.23",
     "jest": "^24.8.0",
+    "react": "^16.8.6",
     "ts-jest": "^24.0.2"
   },
   "peerDependencies": {
     "react": "^16.8.6"
   },
-  "dependencies": {}
+  "dependencies": {
+    "final-form": "^4.18.2",
+    "react-final-form": "^6.3.0"
+  }
 }
