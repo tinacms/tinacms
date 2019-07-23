@@ -3,6 +3,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap",
+    "bs": "lerna bootstrap",
     "link": "lerna link",
     "test": "lerna run test",
     "build": "node scripts/build"
