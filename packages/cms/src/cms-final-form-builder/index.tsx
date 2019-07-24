@@ -11,23 +11,26 @@ export function FormBuilder({ form }: FormBuilderProps) {
   let cms = useCMS()
   return (
     <FinalForm onSubmit={form.onSubmit as any}>
-      {form.fields.map(field => {
-        return (
-          <FinalField name={field.name}>
-            {props => {
-              let plugin: FieldPlugin | null = null
-              if (typeof field.component === 'function') {
-                let C = field.component
-                return <C {...props} field={field} />
-              } else {
-                plugin = cms.forms.getFieldPlugin(field.name)
-                if (!plugin) return
-              }
-              return <plugin.Component {...props} field={field} />
-            }}
-          </FinalField>
-        )
-      })}
+      {formProps => {
+        return form.fields.map(field => {
+          return (
+            <FinalField name={field.name} key={field.name}>
+              {fieldProps => {
+                if (typeof field.component !== 'string') {
+                  return <field.component {...fieldProps} field={field} />
+                }
+
+                let plugin = cms.forms.getFieldPlugin(field.component)
+                if (plugin) {
+                  return <plugin.Component {...fieldProps} field={field} />
+                }
+
+                return <p>Unrecognized field type</p>
+              }}
+            </FinalField>
+          )
+        })
+      }}
     </FinalForm>
   )
 }
