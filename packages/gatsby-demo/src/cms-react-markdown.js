@@ -4,12 +4,18 @@ export function useMarkdownRemarkForm(markdownRemark) {
   return useCMSForm({
     name: `markdownRemark:${markdownRemark.slug}`,
     initialValues: markdownRemark,
-    fields: [
-      { name: "frontmatter.title", component: "text" },
-      { name: "frontmatter.date", component: "text" },
-    ],
+    fields: generateFields(markdownRemark),
     onSubmit() {
       console.log("Test")
     },
   })
+}
+
+function generateFields(post) {
+  let frontmatterFields = Object.keys(post.frontmatter).map(key => ({
+    component: "text",
+    name: `frontmatter.${key}`,
+  }))
+
+  return [...frontmatterFields, { component: "text", name: "html" }]
 }
