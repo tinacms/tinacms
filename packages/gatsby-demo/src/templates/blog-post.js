@@ -29,19 +29,20 @@ function useCMSForm(options) {
 }
 
 function BlogPostTemplate(props) {
+  const post = props.data.markdownRemark
+  const siteTitle = props.data.site.siteMetadata.title
+  const { previous, next } = props.pageContext
   const form = useCMSForm({
-    name: "hello",
-    initialValues: {},
-    fields: [{ name: "foo", component: "text" }],
+    name: `markdownRemark:${post.slug}`,
+    initialValues: post,
+    fields: [
+      { name: "frontmatter.title", component: "text" },
+      { name: "frontmatter.date", component: "text" },
+    ],
     onSubmit() {
       console.log("Test")
     },
   })
-
-  const post = props.data.markdownRemark
-  const siteTitle = props.data.site.siteMetadata.title
-  const { previous, next } = props.pageContext
-
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO
