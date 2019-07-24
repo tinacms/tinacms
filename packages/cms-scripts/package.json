@@ -1,0 +1,7 @@
+{
+  "name": "cms-scripts",
+  "version": "0.1.0",
+  "bin": {
+    "cms-scripts": "./bin/cms-scripts.js"
+  }
+}
