@@ -1,12 +1,9 @@
 import React from 'react'
 import logo from './logo.svg'
 import './App.css'
-import { useCMS, CMSContext } from '@forestryio/cms'
+import { useCMS } from '@forestryio/cms'
 
 const App: React.FC = () => {
-  // const cms = React.useContext(CMSContext)
-  const cms = useCMS()
-  console.log(cms)
   return (
     <div className="App">
       <header className="App-header">
