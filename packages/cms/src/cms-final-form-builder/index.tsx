@@ -10,7 +10,10 @@ export interface FormBuilderProps {
 export function FormBuilder({ form }: FormBuilderProps) {
   let cms = useCMS()
   return (
-    <FinalForm onSubmit={form.onSubmit as any}>
+    <FinalForm
+      onSubmit={form.onSubmit as any}
+      initialValues={form.initialValues}
+    >
       {formProps => {
         return form.fields.map(field => {
           return (
