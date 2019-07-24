@@ -24,16 +24,13 @@ function useCMSForm(options) {
     return () => form.unsubscribe(reloadValues)
   }, [])
 
-  return [form, values]
+  return [form, form ? form.values : options.initialValues]
 }
 
-function BlogPostTemplate(props) {
-  const post = props.data.markdownRemark
-  const siteTitle = props.data.site.siteMetadata.title
-  const { previous, next } = props.pageContext
-  const [form, values] = useCMSForm({
-    name: `markdownRemark:${post.slug}`,
-    initialValues: post,
+function useMarkdownRemarkForm(markdownRemark) {
+  return useCMSForm({
+    name: `markdownRemark:${markdownRemark.slug}`,
+    initialValues: markdownRemark,
     fields: [
       { name: "frontmatter.title", component: "text" },
       { name: "frontmatter.date", component: "text" },
@@ -42,10 +39,19 @@ function BlogPostTemplate(props) {
       console.log("Test")
     },
   })
+}
+
+function BlogPostTemplate(props) {
+  const staticPost = props.data.markdownRemark
+  const siteTitle = props.data.site.siteMetadata.title
+  const { previous, next } = props.pageContext
+
+  const [form, post] = useMarkdownRemarkForm(staticPost)
+
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO
-        title={values.frontmatter.title}
+        title={post.frontmatter.title}
         description={post.frontmatter.description || post.excerpt}
       />
       <h1
@@ -54,7 +60,7 @@ function BlogPostTemplate(props) {
           marginBottom: 0,
         }}
       >
-        {values.frontmatter.title}
+        {post.frontmatter.title}
       </h1>
       <hr />
       {form && <FormBuilder form={form} />}
@@ -66,7 +72,7 @@ function BlogPostTemplate(props) {
           marginBottom: rhythm(1),
         }}
       >
-        {values.frontmatter.date}
+        {post.frontmatter.date}
       </p>
       <div dangerouslySetInnerHTML={{ __html: post.html }} />
       <hr
