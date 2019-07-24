@@ -4,7 +4,6 @@ class Subscribeable {
   protected __subscribers: Function[] = []
 
   subscribe(listener: Function) {
-    console.log(this.__subscribers)
     this.__subscribers.push(listener)
   }
 
@@ -25,6 +24,7 @@ export class FormManager extends Subscribeable {
   createForm(options: FormOptions) {
     this.__forms[options.name] = new Form(options)
     this.notifiySubscribers()
+    return this.findForm(options.name)
   }
 
   findForm(name: string): Form | null {
@@ -41,17 +41,29 @@ export class FormManager extends Subscribeable {
   }
 }
 
-export class Form {
+export class Form extends Subscribeable {
+  private __values = null
+
   name: string
   initialValues: string
   fields: Field[]
   onSubmit: () => Promise<object | null> | object | null
 
   constructor(options: FormOptions) {
+    super()
     this.name = options.name
     this.initialValues = options.initialValues
     this.fields = options.fields
     this.onSubmit = options.onSubmit
+  }
+
+  onChange(values: any) {
+    this.__values = values
+    this.notifiySubscribers()
+  }
+
+  get values() {
+    return this.__values || this.initialValues
   }
 }
 
