@@ -5,11 +5,21 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { useCMS } from "@forestryio/cms"
+import { useCMS, FormBuilder } from "@forestryio/cms"
 
 function BlogPostTemplate(props) {
   let cms = useCMS()
-  console.log("cms", cms)
+
+  cms.forms.createForm({
+    name: "hello",
+    initialValues: {},
+    fields: [{ name: "foo", component: "text" }],
+    onSubmit() {
+      console.log("Test")
+    },
+  })
+
+  let form = cms.forms.findForm("hello")
 
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
@@ -29,6 +39,9 @@ function BlogPostTemplate(props) {
       >
         {post.frontmatter.title}
       </h1>
+      <hr />
+      {form && <FormBuilder form={form} />}
+      <hr />
       <p
         style={{
           ...scale(-1 / 5),
