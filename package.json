@@ -6,7 +6,7 @@
     "bs": "yarn bootstrap",
     "link": "lerna link",
     "test": "lerna run test",
-    "build": "node scripts/build"
+    "build": "lerna run build"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
