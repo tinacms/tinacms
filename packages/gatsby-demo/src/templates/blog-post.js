@@ -5,7 +5,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { useCMS, FormBuilder } from "@forestryio/cms"
+import { useCMS, FormBuilder, CMSFrame } from "@forestryio/cms"
 
 function useCMSForm(options) {
   let cms = useCMS()
@@ -63,7 +63,11 @@ function BlogPostTemplate(props) {
         {post.frontmatter.title}
       </h1>
       <hr />
-      {form && <FormBuilder form={form} />}
+      {form && (
+        <CMSFrame>
+          <FormBuilder form={form} />
+        </CMSFrame>
+      )}
       <hr />
       <p
         style={{
