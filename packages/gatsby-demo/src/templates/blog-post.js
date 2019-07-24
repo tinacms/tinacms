@@ -7,10 +7,29 @@ import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
 import { useCMS, FormBuilder } from "@forestryio/cms"
 
-function BlogPostTemplate(props) {
+function useCMSForm(options) {
   let cms = useCMS()
+  let [form, setForm] = React.useState(null)
 
-  cms.forms.createForm({
+  let reloadForm = React.useCallback(() => {
+    setForm(cms.forms.findForm(options.name))
+  }, [setForm, cms])
+
+  React.useEffect(function subscribeToForm() {
+    cms.forms.subscribe(reloadForm)
+    return () => cms.forms.unsubscribe(reloadForm)
+  }, [])
+
+  React.useEffect(function createForm() {
+    cms.forms.createForm(options)
+    // TODO: Remove on unmount
+  }, [])
+
+  return form
+}
+
+function BlogPostTemplate(props) {
+  const form = useCMSForm({
     name: "hello",
     initialValues: {},
     fields: [{ name: "foo", component: "text" }],
@@ -18,8 +37,6 @@ function BlogPostTemplate(props) {
       console.log("Test")
     },
   })
-
-  let form = cms.forms.findForm("hello")
 
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
