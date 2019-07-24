@@ -1,4 +1,4 @@
-import { useCMSForm } from "@forestryio/cms"
+import { useCMSForm } from "@forestryio/cms-react"
 
 export function useMarkdownRemarkForm(markdownRemark) {
   return useCMSForm({

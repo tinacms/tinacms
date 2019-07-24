@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { CMSContext, CMS } from '@forestryio/cms'
+import { CMS } from '@forestryio/cms'
+import { CMSContext } from '@forestryio/cms-react'
 
 let cms = new CMS()
 cms.forms.addFieldPlugin({
