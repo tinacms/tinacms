@@ -1,11 +1,30 @@
 import * as React from 'react'
 
-export class FormManager {
+class Subscribeable {
+  protected __subscribers: Function[] = []
+
+  subscribe(listener: Function) {
+    console.log(this.__subscribers)
+    this.__subscribers.push(listener)
+  }
+
+  unsubscribe(listener: Function) {
+    let index = this.__subscribers.indexOf(listener)
+    this.__subscribers.splice(index)
+  }
+
+  protected notifiySubscribers() {
+    this.__subscribers.forEach(cb => cb())
+  }
+}
+
+export class FormManager extends Subscribeable {
   private __forms: { [key: string]: Form } = {}
   private __fields: any = {}
 
   createForm(options: FormOptions) {
     this.__forms[options.name] = new Form(options)
+    this.notifiySubscribers()
   }
 
   findForm(name: string): Form | null {
@@ -14,6 +33,7 @@ export class FormManager {
 
   addFieldPlugin(plugin: FieldPlugin) {
     this.__fields[plugin.name] = plugin
+    this.notifiySubscribers()
   }
 
   getFieldPlugin(name: string): FieldPlugin | null {
