@@ -1,12 +1,10 @@
 import * as React from 'react'
-import { Form } from '../cms-forms'
+import { Form, useCMS, CMS } from '@forestryio/cms'
 import {
   Form as FinalForm,
   Field as FinalField,
   FormSpy,
 } from 'react-final-form'
-import { useCMS } from '../cms-react'
-import { CMS } from '../cms'
 
 export interface FormBuilderProps {
   form: Form
