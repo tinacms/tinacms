@@ -5,7 +5,6 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { CMSFrame } from "@forestryio/cms"
 import { FormBuilder } from "@forestryio/cms-final-form-builder"
 import { useMarkdownRemarkForm } from "../cms-react-markdown"
 
@@ -31,11 +30,7 @@ function BlogPostTemplate(props) {
         {post.frontmatter.title}
       </h1>
       <hr />
-      {form && (
-        <CMSFrame>
-          <FormBuilder form={form} />
-        </CMSFrame>
-      )}
+      {form && <FormBuilder form={form} />}
       <hr />
       <p
         style={{
