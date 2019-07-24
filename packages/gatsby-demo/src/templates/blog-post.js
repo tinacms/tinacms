@@ -10,29 +10,28 @@ import { useCMS, FormBuilder } from "@forestryio/cms"
 function useCMSForm(options) {
   let cms = useCMS()
   let [form, setForm] = React.useState(null)
+  let [values, setValues] = React.useState(options.initialValues)
 
-  let reloadForm = React.useCallback(() => {
-    setForm(cms.forms.findForm(options.name))
-  }, [setForm, cms])
-
-  React.useEffect(function subscribeToForm() {
-    cms.forms.subscribe(reloadForm)
-    return () => cms.forms.unsubscribe(reloadForm)
-  }, [])
+  let reloadValues = React.useCallback(() => {
+    setValues(cms.forms.findForm(options.name).values)
+  }, [setValues, cms])
 
   React.useEffect(function createForm() {
-    cms.forms.createForm(options)
-    // TODO: Remove on unmount
+    let form = cms.forms.createForm(options)
+    form.subscribe(reloadValues)
+    setForm(form)
+    setValues(form.values)
+    return () => form.unsubscribe(reloadValues)
   }, [])
 
-  return form
+  return [form, values]
 }
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
-  const form = useCMSForm({
+  const [form, values] = useCMSForm({
     name: `markdownRemark:${post.slug}`,
     initialValues: post,
     fields: [
@@ -46,7 +45,7 @@ function BlogPostTemplate(props) {
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO
-        title={post.frontmatter.title}
+        title={values.frontmatter.title}
         description={post.frontmatter.description || post.excerpt}
       />
       <h1
@@ -55,7 +54,7 @@ function BlogPostTemplate(props) {
           marginBottom: 0,
         }}
       >
-        {post.frontmatter.title}
+        {values.frontmatter.title}
       </h1>
       <hr />
       {form && <FormBuilder form={form} />}
@@ -67,7 +66,7 @@ function BlogPostTemplate(props) {
           marginBottom: rhythm(1),
         }}
       >
-        {post.frontmatter.date}
+        {values.frontmatter.date}
       </p>
       <div dangerouslySetInnerHTML={{ __html: post.html }} />
       <hr
