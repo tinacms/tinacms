@@ -19,15 +19,11 @@ export function useCMSForm(options: Form) {
   let [form, setForm] = React.useState<Form | null>(null)
   let [values, setValues] = React.useState(options.initialValues)
 
-  let reloadValues = React.useCallback(() => {
-    if (form) setValues(form.values)
-  }, [setValues, cms])
-
   React.useEffect(function createForm() {
     let form = cms.forms.createForm(options)
+    let reloadValues = () => setValues(form.values)
     form.subscribe(reloadValues)
     setForm(form)
-    setValues(form.values)
     return () => form.unsubscribe(reloadValues)
   }, [])
 
