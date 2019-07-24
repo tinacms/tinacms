@@ -9,6 +9,7 @@ module.exports = {
     },
   },
   plugins: [
+    "gatsby-plugin-cms",
     {
       resolve: `gatsby-source-filesystem`,
       options: {
