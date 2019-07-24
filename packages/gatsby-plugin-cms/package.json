@@ -1,0 +1,8 @@
+{
+  "name": "gatsby-plugin-cms",
+  "main": "index.js",
+  "version": "0.1.0",
+  "dependencies": {
+    "@forestryio/cms": "^1.0.0"
+  }
+}
