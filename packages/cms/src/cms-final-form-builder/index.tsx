@@ -1,6 +1,10 @@
 import * as React from 'react'
 import { FieldPlugin, Form } from '../cms-forms'
-import { Form as FinalForm, Field as FinalField, Field } from 'react-final-form'
+import {
+  Form as FinalForm,
+  Field as FinalField,
+  FormSpy,
+} from 'react-final-form'
 import { useCMS } from '../cms-react'
 
 export interface FormBuilderProps {
@@ -15,24 +19,32 @@ export function FormBuilder({ form }: FormBuilderProps) {
       initialValues={form.initialValues}
     >
       {formProps => {
-        return form.fields.map(field => {
-          return (
-            <FinalField name={field.name} key={field.name}>
-              {fieldProps => {
-                if (typeof field.component !== 'string') {
-                  return <field.component {...fieldProps} field={field} />
-                }
+        return (
+          <>
+            <FormSpy
+              subscription={{ values: true }}
+              onChange={({ values }) => form.onChange(values)}
+            />
+            {form.fields.map(field => {
+              return (
+                <FinalField name={field.name} key={field.name}>
+                  {fieldProps => {
+                    if (typeof field.component !== 'string') {
+                      return <field.component {...fieldProps} field={field} />
+                    }
 
-                let plugin = cms.forms.getFieldPlugin(field.component)
-                if (plugin) {
-                  return <plugin.Component {...fieldProps} field={field} />
-                }
+                    let plugin = cms.forms.getFieldPlugin(field.component)
+                    if (plugin) {
+                      return <plugin.Component {...fieldProps} field={field} />
+                    }
 
-                return <p>Unrecognized field type</p>
-              }}
-            </FinalField>
-          )
-        })
+                    return <p>Unrecognized field type</p>
+                  }}
+                </FinalField>
+              )
+            })}
+          </>
+        )
       }}
     </FinalForm>
   )
