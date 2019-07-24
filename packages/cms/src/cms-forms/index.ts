@@ -1,11 +1,15 @@
 import * as React from 'react'
 
 export class FormManager {
-  private __forms: any = {}
+  private __forms: { [key: string]: Form } = {}
   private __fields: any = {}
 
   createForm(options: FormOptions) {
     this.__forms[options.name] = new Form(options)
+  }
+
+  findForm(name: string): Form | null {
+    return this.__forms[name]
   }
 
   addFieldPlugin(plugin: FieldPlugin) {
