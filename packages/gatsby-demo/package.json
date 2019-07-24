@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@forestryio/cms": "^1.0.0",
+    "@forestryio/cms-react": "^0.1.0",
     "@forestryio/cms-final-form-builder": "^1.0.0",
     "@types/react": "^16.8.23",
     "gatsby": "^2.13.34",
