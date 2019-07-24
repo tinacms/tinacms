@@ -5,41 +5,8 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { useCMS, FormBuilder, CMSFrame } from "@forestryio/cms"
-
-function useCMSForm(options) {
-  let cms = useCMS()
-  let [form, setForm] = React.useState(null)
-  let [values, setValues] = React.useState(options.initialValues)
-
-  let reloadValues = React.useCallback(() => {
-    setValues(cms.forms.findForm(options.name).values)
-  }, [setValues, cms])
-
-  React.useEffect(function createForm() {
-    let form = cms.forms.createForm(options)
-    form.subscribe(reloadValues)
-    setForm(form)
-    setValues(form.values)
-    return () => form.unsubscribe(reloadValues)
-  }, [])
-
-  return [form, form ? form.values : options.initialValues]
-}
-
-function useMarkdownRemarkForm(markdownRemark) {
-  return useCMSForm({
-    name: `markdownRemark:${markdownRemark.slug}`,
-    initialValues: markdownRemark,
-    fields: [
-      { name: "frontmatter.title", component: "text" },
-      { name: "frontmatter.date", component: "text" },
-    ],
-    onSubmit() {
-      console.log("Test")
-    },
-  })
-}
+import { FormBuilder, CMSFrame } from "@forestryio/cms"
+import { useMarkdownRemarkForm } from "../cms-react-markdown"
 
 function BlogPostTemplate(props) {
   const staticPost = props.data.markdownRemark

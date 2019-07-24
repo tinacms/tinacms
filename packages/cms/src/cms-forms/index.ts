@@ -21,10 +21,11 @@ export class FormManager extends Subscribeable {
   private __forms: { [key: string]: Form } = {}
   private __fields: any = {}
 
-  createForm(options: FormOptions) {
-    this.__forms[options.name] = new Form(options)
+  createForm(options: FormOptions): Form {
+    let form = new Form(options)
+    this.__forms[options.name] = form
     this.notifiySubscribers()
-    return this.findForm(options.name)
+    return form
   }
 
   findForm(name: string): Form | null {
