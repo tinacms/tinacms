@@ -1,11 +1,12 @@
 import * as React from 'react'
-import { FieldPlugin, Form } from '../cms-forms'
+import { Form } from '../cms-forms'
 import {
   Form as FinalForm,
   Field as FinalField,
   FormSpy,
 } from 'react-final-form'
 import { useCMS } from '../cms-react'
+import { CMS } from '../cms'
 
 export interface FormBuilderProps {
   form: Form
@@ -25,27 +26,39 @@ export function FormBuilder({ form }: FormBuilderProps) {
               subscription={{ values: true }}
               onChange={({ values }) => form.onChange(values)}
             />
-            {form.fields.map(field => {
-              return (
-                <FinalField name={field.name} key={field.name}>
-                  {fieldProps => {
-                    if (typeof field.component !== 'string') {
-                      return <field.component {...fieldProps} field={field} />
-                    }
-
-                    let plugin = cms.forms.getFieldPlugin(field.component)
-                    if (plugin) {
-                      return <plugin.Component {...fieldProps} field={field} />
-                    }
-
-                    return <p>Unrecognized field type</p>
-                  }}
-                </FinalField>
-              )
-            })}
+            <FieldsBuilder cms={cms} form={form} />
           </>
         )
       }}
     </FinalForm>
+  )
+}
+
+export interface FieldsBuilderProps {
+  cms: CMS
+  form: Form
+}
+export function FieldsBuilder({ cms, form }: FieldsBuilderProps) {
+  return (
+    <>
+      {form.fields.map(field => {
+        return (
+          <FinalField name={field.name} key={field.name}>
+            {fieldProps => {
+              if (typeof field.component !== 'string') {
+                return <field.component {...fieldProps} field={field} />
+              }
+
+              let plugin = cms.forms.getFieldPlugin(field.component)
+              if (plugin) {
+                return <plugin.Component {...fieldProps} field={field} />
+              }
+
+              return <p>Unrecognized field type</p>
+            }}
+          </FinalField>
+        )
+      })}
+    </>
   )
 }
