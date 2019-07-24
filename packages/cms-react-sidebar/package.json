@@ -1,6 +1,6 @@
 {
-  "name": "@forestryio/template",
-  "version": "0.1.0",
+  "name": "@forestryio/cms-react-sidebar",
+  "version": "1.0.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -13,9 +13,13 @@
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^24.0.2",
+    "react": "^16.8.6"
   },
   "dependencies": {
     "react-frame-component": "^4.1.1"
+  },
+  "peerDependencies": {
+    "react": "^16.8.6"
   }
 }
