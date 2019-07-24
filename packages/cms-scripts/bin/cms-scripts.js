@@ -1,47 +1,58 @@
-const fs = require('fs')
+#!/usr/bin/env node
 const path = require('path')
 const rollup = require('rollup')
 const rollupTypescript = require('rollup-plugin-typescript2')
 const rollupCommonJs = require('rollup-plugin-commonjs')
 const typescript = require('typescript')
 
+// Source https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/bin/react-scripts.js#L11-L16
+// Makes the script crash on unhandled rejections instead of silently
+// ignoring them. In the future, promise rejections that are not handled will
+// terminate the Node.js process with a non-zero exit code.
+process.on('unhandledRejection', err => {
+  throw err
+})
+
 /**
  * Commandline Parsing
  */
-const commander = require('commander')
-commander.option('-p, --package <name>', 'the package to build')
-commander.parse(process.argv)
+const program = require('commander')
+const { version } = require('../package.json')
 
-/**
- * Gater Packages to Build
- */
-let packageNames = []
+let command
 
-if (commander.package) {
-  packageNames = [commander.package]
-  console.log(`Building ${commander.package}`)
-} else {
-  packageNames = fs.readdirSync('packages')
-  console.log('Building all packages.')
+program
+  .version(version)
+  .arguments('<cmd>')
+  .action(cmd => (command = cmd))
+  .parse(process.argv)
+
+if (typeof command === 'undefined') {
+  console.error('no command given!')
+  process.exit(1)
 }
 
+if (command !== 'build') {
+  console.error(`unrecognized command: ${command}`)
+  process.exit(1)
+}
+
+build(createBuildOptions())
 /**
  * Build Packages
  */
-packageNames.map(createBuildOptions).forEach(build)
-
-function createBuildOptions(name) {
-  const absolutePath = path.join(__dirname, '..', 'packages', name)
+function createBuildOptions() {
+  const absolutePath = process.cwd()
 
   const package = require(path.join(absolutePath, 'package.json'))
+  console.log(`Building Package: ${package.name}@${package.version}`)
 
   const externalKeys = Object.keys(package.peerDependencies || {})
 
   const inputOptions = {
-    input: path.join(absolutePath, 'src/index.ts'),
+    input: path.join(absolutePath, package.main),
     external: targetId => {
       return !!externalKeys.find(extId => {
-        console.log(extId, targetId)
         return new RegExp(/^extId$/i).test(targetId)
       })
     },
@@ -63,7 +74,7 @@ function createBuildOptions(name) {
 
   const outputOptions = {
     file: path.join(absolutePath, package.main),
-    name: package.browserName || name,
+    name: package.browserName || package.name,
     format: 'umd',
   }
 
