@@ -22,7 +22,7 @@ export class FormManager extends Subscribeable {
   private __forms: { [key: string]: Form } = {}
   private __fields: any = {}
 
-  createForm<S = any>(options: FormOptions<S>): Form<S> {
+  createForm = <S>(options: FormOptions<S>): Form<S> => {
     let form = new Form<S>(options)
     this.__forms[options.name] = form
     this.notifiySubscribers()
@@ -33,8 +33,9 @@ export class FormManager extends Subscribeable {
     return this.__forms[name]
   }
 
-  removeForm(name: string) {
+  removeForm = (name: string) => {
     delete this.__forms[name]
+    this.notifiySubscribers()
   }
 
   all() {
