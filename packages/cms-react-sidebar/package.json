@@ -13,13 +13,15 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
+    "@types/styled-components": "^4.1.18",
     "jest": "^24.8.0",
-    "ts-jest": "^24.0.2",
-    "react": "^16.8.6"
+    "react": "^16.8.6",
+    "ts-jest": "^24.0.2"
   },
   "dependencies": {
+    "cms-scripts": "0.1.0",
     "react-frame-component": "^4.1.1",
-    "cms-scripts": "0.1.0"
+    "styled-components": "^4.3.2"
   },
   "peerDependencies": {
     "react": "^16.8.6"
