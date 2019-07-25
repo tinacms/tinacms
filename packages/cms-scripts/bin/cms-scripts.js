@@ -50,7 +50,7 @@ function createBuildOptions() {
   const externalKeys = Object.keys(package.peerDependencies || {})
 
   const inputOptions = {
-    input: path.join(absolutePath, package.main),
+    input: path.join(absolutePath, 'src', 'index.ts'),
     external: targetId => {
       return !!externalKeys.find(extId => {
         return new RegExp(/^extId$/i).test(targetId)

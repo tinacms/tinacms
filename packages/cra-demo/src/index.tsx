@@ -3,7 +3,8 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import { CMSContext, CMS } from '@forestryio/cms'
+import { CMS } from '@forestryio/cms'
+import { CMSContext, CMS } from '@forestryio/cms-react'
 
 let cms = new CMS()
 

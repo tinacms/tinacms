@@ -1,6 +1,5 @@
 import * as React from 'react'
-import { CMS } from './cms'
-import { Form } from './cms-forms'
+import { CMS, Form } from '@forestryio/cms'
 
 export const CMSContext = React.createContext<CMS | null>(null)
 
