@@ -1,5 +1,6 @@
 import * as React from 'react'
-import { Form, useCMS, CMS } from '@forestryio/cms'
+import { Form, CMS } from '@forestryio/cms'
+import { useCMS } from '@forestryio/cms-react'
 import {
   Form as FinalForm,
   Field as FinalField,
