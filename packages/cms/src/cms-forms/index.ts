@@ -1,22 +1,6 @@
 import * as React from 'react'
 import { createForm, FormApi, Config } from 'final-form'
-
-export class Subscribeable {
-  protected __subscribers: Function[] = []
-
-  subscribe(listener: Function) {
-    this.__subscribers.push(listener)
-  }
-
-  unsubscribe(listener: Function) {
-    let index = this.__subscribers.indexOf(listener)
-    this.__subscribers.splice(index)
-  }
-
-  protected notifiySubscribers() {
-    this.__subscribers.forEach(cb => cb())
-  }
-}
+import { Subscribeable } from '../subscribable'
 
 export class FormManager extends Subscribeable {
   private __forms: { [key: string]: Form } = {}
@@ -51,7 +35,6 @@ export class FormManager extends Subscribeable {
     return this.__fields[name]
   }
 }
-
 export class Form<S = any> {
   name: string
   fields: Field[]
