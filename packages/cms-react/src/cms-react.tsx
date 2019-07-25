@@ -43,10 +43,13 @@ export function useCMSForm(options: FormOptions<any>) {
  * TODO: Is there a better approach?
  * TODO: move to cms-react
  */
-export function useSubscribable(subscribable: Subscribeable) {
+export function useSubscribable(subscribable: Subscribeable, cb: Function) {
   let [_, s] = React.useState(0)
   React.useEffect(() => {
-    let forceUpdate = () => s(x => x + 1)
+    let forceUpdate = () => {
+      s(x => x + 1)
+      cb()
+    }
     subscribable.subscribe(forceUpdate)
     return () => subscribable.unsubscribe(forceUpdate)
   })
