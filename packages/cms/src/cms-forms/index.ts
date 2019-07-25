@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { createForm, FormApi, Config } from 'final-form'
 import { Subscribable } from '../subscribable'
+import { Form, FormOptions } from './form'
 
 export class FormManager extends Subscribable {
   private __forms: { [key: string]: Form } = {}
@@ -34,35 +34,6 @@ export class FormManager extends Subscribable {
   getFieldPlugin(name: string): FieldPlugin | null {
     return this.__fields[name]
   }
-}
-export class Form<S = any> {
-  name: string
-  fields: Field[]
-  finalForm: FormApi<S>
-
-  constructor({ name, fields, ...options }: FormOptions<S>) {
-    this.name = name
-    this.fields = fields
-    this.finalForm = createForm<S>(options)
-  }
-
-  subscribe: FormApi<S>['subscribe'] = (cb, options) => {
-    return this.finalForm.subscribe(cb, options)
-  }
-
-  get values() {
-    return this.finalForm.getState().values
-  }
-}
-
-export interface FormOptions<S> extends Config<S> {
-  name: string
-  fields: Field[]
-}
-
-export interface Field {
-  name: string
-  component: React.FC<any> | string
 }
 
 export interface FieldPlugin {
