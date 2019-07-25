@@ -2,16 +2,20 @@ import * as React from 'react'
 import { Form, CMS } from '@forestryio/cms'
 import { useCMS } from '@forestryio/cms-react'
 import {
+  FormProps,
   Form as FinalForm,
   Field as FinalField,
   FormSpy,
+  FormRenderProps,
 } from 'react-final-form'
+import { FC } from 'react'
 
 export interface FormBuilderProps {
   form: Form
+  children(props: FormRenderProps<string>): any
 }
 
-export function FormBuilder({ form }: FormBuilderProps) {
+export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
   let cms = useCMS()
   return (
     <FinalForm
@@ -25,7 +29,7 @@ export function FormBuilder({ form }: FormBuilderProps) {
               subscription={{ values: true }}
               onChange={({ values }) => form.onChange(values)}
             />
-            <FieldsBuilder cms={cms} form={form} />
+            {children(formProps)}
           </>
         )
       }}
