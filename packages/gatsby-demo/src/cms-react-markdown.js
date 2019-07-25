@@ -1,8 +1,8 @@
-import { useCMSForm } from "@forestryio/cms-react"
+import { useCMSForm, useCMS } from "@forestryio/cms-react"
 
 export function useMarkdownRemarkForm(markdownRemark) {
   return useCMSForm({
-    name: `markdownRemark:${markdownRemark.slug}`,
+    name: `markdownRemark:${markdownRemark.id}`,
     initialValues: markdownRemark,
     fields: generateFields(markdownRemark),
     onSubmit() {
