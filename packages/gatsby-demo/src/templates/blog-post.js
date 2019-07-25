@@ -17,9 +17,6 @@ function BlogPostTemplate(props) {
 
   const cms = useCMS()
   const [form, post] = useMarkdownRemarkForm(staticPost)
-  React.useEffect(() => {
-    return () => form && cms.forms.removeForm(form.name)
-  }, [form && form.name])
 
   const { isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen } = useSidebar()
 
