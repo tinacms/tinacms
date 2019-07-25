@@ -1,7 +1,7 @@
 import * as React from 'react'
 import Frame from 'react-frame-component'
 
-export const Sidebar = () => {
+export const Sidebar = ({ children }: { children: any }) => {
   return (
     <Frame
       style={{
@@ -10,7 +10,7 @@ export const Sidebar = () => {
         cursor: 'pointer',
       }}
     >
-      Sidebar
+      {children}
     </Frame>
   )
 }

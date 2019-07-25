@@ -1,1 +1,1 @@
-export * from './sidebarManager'
+export * from './sidebarProvider'
