@@ -15,33 +15,34 @@ export interface FormBuilderProps {
   children(props: FormRenderProps<string>): any
 }
 
+const FF: any = FinalForm
+
 export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
-  let cms = useCMS()
+  /**
+   * > Why is a `key` being set when this isn't an array?
+   *
+   * `FinalForm` does not update when given a new `form` prop.
+   *
+   * We can force `FinalForm` to update by setting the `key` to
+   * the name of the form. When the name changes React will
+   * treat it as a new instance of `FinalForm`, destroying the
+   * old `FinalForm` componentt and create a new one.
+   *
+   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
+   */
   return (
-    <FinalForm
-      onSubmit={form.onSubmit as any}
-      initialValues={form.initialValues}
-    >
-      {formProps => {
-        return (
-          <>
-            <FormSpy
-              subscription={{ values: true }}
-              onChange={({ values }) => form.onChange(values)}
-            />
-            {children(formProps)}
-          </>
-        )
-      }}
-    </FinalForm>
+    <FF form={form.finalForm} key={form.name}>
+      {children}
+    </FF>
   )
 }
 
 export interface FieldsBuilderProps {
-  cms: CMS
   form: Form
 }
-export function FieldsBuilder({ cms, form }: FieldsBuilderProps) {
+
+export function FieldsBuilder({ form }: FieldsBuilderProps) {
+  let cms = useCMS()
   return (
     <>
       {form.fields.map(field => {

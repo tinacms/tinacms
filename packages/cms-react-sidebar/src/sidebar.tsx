@@ -9,6 +9,7 @@ export const Sidebar = () => {
   useSubscribable(cms.forms)
 
   const form = cms.forms.all()[0]
+  console.log('forms', cms.forms.all().length)
   return (
     <Frame
       style={{
@@ -21,7 +22,7 @@ export const Sidebar = () => {
       {form && (
         <FormBuilder form={form}>
           {() => {
-            return <FieldsBuilder cms={cms} form={form} />
+            return <FieldsBuilder form={form} />
           }}
         </FormBuilder>
       )}
