@@ -22,12 +22,16 @@ export function useCMSForm(options: FormOptions<any>) {
     function createForm() {
       let form = cms.forms.createForm(options)
       setForm(form)
-      return form.subscribe(
+      form.subscribe(
         form => {
           setValues(form.values)
         },
         { values: true }
       )
+
+      return () => {
+        form && cms.forms.removeForm(form.name)
+      }
     },
     [options.name]
   )
