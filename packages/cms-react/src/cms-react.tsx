@@ -46,11 +46,9 @@ export function useCMSForm(options: FormOptions<any>) {
 export function useSubscribable(subscribable: Subscribeable, cb: Function) {
   let [_, s] = React.useState(0)
   React.useEffect(() => {
-    let forceUpdate = () => {
+    return subscribable.subscribe(() => {
       s(x => x + 1)
       cb()
-    }
-    subscribable.subscribe(forceUpdate)
-    return () => subscribable.unsubscribe(forceUpdate)
+    })
   })
 }
