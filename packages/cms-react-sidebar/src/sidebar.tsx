@@ -1,7 +1,11 @@
 import * as React from 'react'
 import Frame from 'react-frame-component'
+import { FormBuilder } from '@forestryio/cms-final-form-builder'
+import { useCMS } from '@forestryio/cms-react'
 
-export const Sidebar = ({ children }: { children: any }) => {
+export const Sidebar = () => {
+  const cms = useCMS()
+  const form = cms.forms.all()[0]
   return (
     <Frame
       style={{
@@ -11,7 +15,7 @@ export const Sidebar = ({ children }: { children: any }) => {
         cursor: 'pointer',
       }}
     >
-      {children}
+      {form && <FormBuilder form={form} />}
     </Frame>
   )
 }
