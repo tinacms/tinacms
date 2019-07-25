@@ -27,9 +27,9 @@ jobs:
             # fallback to using the latest cache if no exact match is found
             - v1-dependencies-
 
-      - run: yarn install
-      - run: yarn bootstrap
-      - run: yarn build
+      - run: npm install
+      - run: npm run bootstrap
+      - run: npm run build
 
       - save_cache:
           # TODO: cache the `node_modules` of each package
@@ -38,4 +38,4 @@ jobs:
           key: v1-dependencies-{{ checksum "package.json" }}
 
       # run tests!
-      - run: yarn test
+      - run: npm run test
