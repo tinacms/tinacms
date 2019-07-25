@@ -8,6 +8,7 @@
     "build"
   ],
   "scripts": {
+    "build": "npm run cms-scripst build",
     "test": "jest"
   },
   "devDependencies": {
@@ -15,5 +16,7 @@
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
-  "dependencies": {}
+  "dependencies": {
+    "cms-scripts": "0.1.0"
+  }
 }
