@@ -1,6 +1,6 @@
 export type Unsubscribe = () => void
 
-export class Subscribeable {
+export class Subscribable {
   protected __subscribers: Function[] = []
 
   subscribe(listener: Function): Unsubscribe {

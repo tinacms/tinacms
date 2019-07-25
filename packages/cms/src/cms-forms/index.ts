@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { createForm, FormApi, Config } from 'final-form'
-import { Subscribeable } from '../subscribable'
+import { Subscribable } from '../subscribable'
 
-export class FormManager extends Subscribeable {
+export class FormManager extends Subscribable {
   private __forms: { [key: string]: Form } = {}
   private __fields: any = {}
 
