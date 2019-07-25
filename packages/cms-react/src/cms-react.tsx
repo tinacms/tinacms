@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { CMS, Form } from '@forestryio/cms'
+import { CMS, Form, Subscribeable } from '@forestryio/cms'
 
 export const CMSContext = React.createContext<CMS | null>(null)
 
@@ -27,4 +27,17 @@ export function useCMSForm(options: Form) {
   }, [])
 
   return [form, form ? form.values : options.initialValues]
+}
+
+/**
+ * TODO: Is there a better approach?
+ * TODO: move to cms-react
+ */
+export function useSubscribable(subscribable: Subscribeable) {
+  let [_, s] = React.useState(0)
+  React.useEffect(() => {
+    let forceUpdate = () => s(x => x + 1)
+    subscribable.subscribe(forceUpdate)
+    return () => subscribable.unsubscribe(forceUpdate)
+  })
 }

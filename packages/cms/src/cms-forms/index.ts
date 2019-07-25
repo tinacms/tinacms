@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-class Subscribeable {
+export class Subscribeable {
   protected __subscribers: Function[] = []
 
   subscribe(listener: Function) {
