@@ -1,10 +1,11 @@
-import { Subscribeable } from './subscribable'
+import { Subscribable } from './subscribable'
 
-class Example extends Subscribeable {
+class Example extends Subscribable {
   notify() {
     this.notifiySubscribers()
   }
 }
+
 describe('Subscribable', () => {
   describe('#subscribe', () => {
     it('does not callback initially', () => {
