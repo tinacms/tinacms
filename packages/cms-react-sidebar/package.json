@@ -19,6 +19,9 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
+    "@forestryio/cms": "^1.0.0",
+    "@forestryio/cms-final-form-builder": "^1.0.0",
+    "@forestryio/cms-react": "^0.1.0",
     "cms-scripts": "0.1.0",
     "react-frame-component": "^4.1.1",
     "styled-components": "^4.3.2"
