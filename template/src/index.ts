@@ -1,1 +1,3 @@
-export * from "./foo";
+export function foo() {
+  return 'bar'
+}
