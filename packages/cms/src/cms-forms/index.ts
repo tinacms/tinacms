@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { createForm, FormApi, Config } from 'final-form'
 
 export class Subscribeable {
   protected __subscribers: Function[] = []
@@ -21,8 +22,8 @@ export class FormManager extends Subscribeable {
   private __forms: { [key: string]: Form } = {}
   private __fields: any = {}
 
-  createForm(options: FormOptions): Form {
-    let form = new Form(options)
+  createForm<S = any>(options: FormOptions<S>): Form<S> {
+    let form = new Form<S>(options)
     this.__forms[options.name] = form
     this.notifiySubscribers()
     return form
@@ -50,37 +51,29 @@ export class FormManager extends Subscribeable {
   }
 }
 
-export class Form extends Subscribeable {
-  private __values = null
-
+export class Form<S = any> {
   name: string
-  initialValues: string
   fields: Field[]
-  onSubmit: () => Promise<object | null> | object | null
+  finalForm: FormApi<S>
 
-  constructor(options: FormOptions) {
-    super()
-    this.name = options.name
-    this.initialValues = options.initialValues
-    this.fields = options.fields
-    this.onSubmit = options.onSubmit
+  constructor({ name, fields, ...options }: FormOptions<S>) {
+    this.name = name
+    this.fields = fields
+    this.finalForm = createForm<S>(options)
   }
 
-  onChange(values: any) {
-    this.__values = values
-    this.notifiySubscribers()
+  subscribe: FormApi<S>['subscribe'] = (cb, options) => {
+    return this.finalForm.subscribe(cb, options)
   }
 
   get values() {
-    return this.__values || this.initialValues
+    return this.finalForm.getState().values
   }
 }
 
-export interface FormOptions {
+export interface FormOptions<S> extends Config<S> {
   name: string
-  initialValues: string
   fields: Field[]
-  onSubmit(): Promise<object | null> | object | null
 }
 
 export interface Field {

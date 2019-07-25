@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { CMS, Form, Subscribeable } from '@forestryio/cms'
+import { CMS, Form, Subscribeable, FormOptions } from '@forestryio/cms'
 
 export const CMSContext = React.createContext<CMS | null>(null)
 
@@ -13,18 +13,24 @@ export function useCMS(): CMS {
   return cms
 }
 
-export function useCMSForm(options: Form) {
+export function useCMSForm(options: FormOptions<any>) {
   let cms = useCMS()
   let [form, setForm] = React.useState<Form | null>(null)
-  let [values, setValues] = React.useState(options.initialValues)
+  let [_, setValues] = React.useState(options.initialValues)
 
-  React.useEffect(function createForm() {
-    let form = cms.forms.createForm(options)
-    let reloadValues = () => setValues(form.values)
-    form.subscribe(reloadValues)
-    setForm(form)
-    return () => form.unsubscribe(reloadValues)
-  }, [])
+  React.useEffect(
+    function createForm() {
+      let form = cms.forms.createForm(options)
+      setForm(form)
+      return form.subscribe(
+        form => {
+          setValues(form.values)
+        },
+        { values: true }
+      )
+    },
+    [options.name]
+  )
 
   return [form, form ? form.values : options.initialValues]
 }
