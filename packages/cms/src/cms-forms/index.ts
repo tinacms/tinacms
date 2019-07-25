@@ -32,6 +32,10 @@ export class FormManager extends Subscribeable {
     return this.__forms[name]
   }
 
+  all() {
+    return Object.keys(this.__forms).map(name => this.__forms[name])
+  }
+
   addFieldPlugin(plugin: FieldPlugin) {
     this.__fields[plugin.name] = plugin
     this.notifiySubscribers()
