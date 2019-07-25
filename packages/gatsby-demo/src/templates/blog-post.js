@@ -5,8 +5,8 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { CMSFrame } from "@forestryio/cms"
 import { FormBuilder } from "@forestryio/cms-final-form-builder"
+import { useSidebar } from "@forestryio/cms-react-sidebar"
 import { useMarkdownRemarkForm } from "../cms-react-markdown"
 
 function BlogPostTemplate(props) {
@@ -15,6 +15,8 @@ function BlogPostTemplate(props) {
   const { previous, next } = props.pageContext
 
   const [form, post] = useMarkdownRemarkForm(staticPost)
+
+  const { isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen } = useSidebar()
 
   return (
     <Layout location={props.location} title={siteTitle}>
@@ -31,11 +33,10 @@ function BlogPostTemplate(props) {
         {post.frontmatter.title}
       </h1>
       <hr />
-      {form && (
-        <CMSFrame>
-          <FormBuilder form={form} />
-        </CMSFrame>
-      )}
+      <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
+        Toggle Sidebar
+      </button>
+      {form && <FormBuilder form={form} />}
       <hr />
       <p
         style={{
