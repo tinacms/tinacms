@@ -12,7 +12,7 @@ function BlogPostTemplate(props) {
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
 
-  const [_, post] = useRemarkForm(staticPost)
+  const [post] = useRemarkForm(staticPost)
 
   return (
     <Layout location={props.location} title={siteTitle}>

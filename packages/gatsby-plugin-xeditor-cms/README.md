@@ -55,7 +55,7 @@ Use the `useRemarkForm` hook to make your `markdownRemark` node editable. This i
 import { useRemarkForm } from "@forestryio/gatsby-plugin-xeditor-cms"
 
 function BlogPostTemplate(props) {
-  const [form, post] = useRemarkForm(props.data.markdownRemark)
+  const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
 
   return (
     // ...
