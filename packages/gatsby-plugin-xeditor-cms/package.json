@@ -1,13 +1,13 @@
 {
   "name": "@forestryio/gatsby-plugin-xeditor-cms",
   "main": "index.js",
-  "version": "0.1.1-alpha.1",
+  "version": "0.1.1-alpha.2",
   "scripts": {
     "build": "tsc"
   },
   "dependencies": {
     "@forestryio/cms": "^1.0.1-alpha.1",
     "@forestryio/cms-react": "^0.1.1-alpha.1",
-    "@forestryio/xeditor-react": "^1.0.1-alpha.1"
+    "@forestryio/xeditor-react": "^1.0.1-alpha.2"
   }
 }
