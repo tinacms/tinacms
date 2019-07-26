@@ -1,3 +1,4 @@
+import { Form } from '@forestryio/cms'
 import { useCMSForm } from '@forestryio/cms-react'
 import { ERROR_MISSING_CMS_GATSBY, ERROR_MISSING_REMARK_ID } from './errors'
 
@@ -33,4 +34,15 @@ function generateFields(post: RemarkNode) {
   }))
 
   return [...frontmatterFields, { component: 'text', name: 'html' }]
+}
+
+interface RemarkFormProps {
+  remark: RemarkNode
+  children(renderProps: { form: Form; values: any }): JSX.Element
+}
+
+export function RemarkForm({ remark, children }: RemarkFormProps) {
+  let [form, values] = useRemarkForm(remark)
+
+  return children({ form, values })
 }
