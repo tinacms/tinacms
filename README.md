@@ -24,7 +24,7 @@ yarn bootstrap
 yarn build
 
 # Start the Gatsby demo
-cd packages/gatsby-demo
+cd packages/demo-gatsby
 yarn start
 ```
 
@@ -42,4 +42,4 @@ yarn start
 There are two demo projects:
 
 - `packages/demo-cra`
-- `packages/gatsby-demo`
+- `packages/demo-gatsby`
