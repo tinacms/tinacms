@@ -1,18 +1,17 @@
 import * as React from 'react'
 import { CMS } from '@forestryio/cms'
 import { CMSContext } from '@forestryio/cms-react'
-import { SidebarProvider, useSidebar } from '@forestryio/xeditor-react'
+import {
+  SidebarProvider,
+  useSidebar,
+  TextInput,
+} from '@forestryio/xeditor-react'
 
 let cms = new CMS()
 cms.forms.addFieldPlugin({
   name: 'text',
-  Component: ({ field, input, meta }: any) => {
-    return (
-      <label htmlFor={input.name}>
-        {field.name}
-        <input {...input} />
-      </label>
-    )
+  Component: (props: any) => {
+    return <TextInput {...props} />
   },
 })
 
