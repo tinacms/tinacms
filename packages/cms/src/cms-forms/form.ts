@@ -15,6 +15,10 @@ export class Form<S = any> {
     return this.finalForm.subscribe(cb, options)
   }
 
+  submit: FormApi<S>['submit'] = () => {
+    return this.finalForm.submit()
+  }
+
   get values() {
     return this.finalForm.getState().values
   }
