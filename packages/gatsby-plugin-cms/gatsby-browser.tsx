@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { CMS } from '@forestryio/cms'
 import { CMSContext } from '@forestryio/cms-react'
-import { SidebarProvider } from '@forestryio/cms-react-sidebar'
+import { SidebarProvider } from '@forestryio/xeditor-react'
 
 let cms = new CMS()
 cms.forms.addFieldPlugin({
