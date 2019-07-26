@@ -2,6 +2,10 @@
   "name": "@forestryio/gatsby-plugin-xeditor-cms",
   "main": "index.js",
   "version": "0.1.1-alpha.2",
+  "files": [
+    "index.js",
+    "gatsby-browser.js"
+  ],
   "scripts": {
     "build": "tsc"
   },
