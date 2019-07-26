@@ -4,14 +4,14 @@
 
 ## Packages
 
-| Package                  | Description                                                       |
-| ------------------------ | ----------------------------------------------------------------- |
-| `cms`                    | The base package for creating a cms.                              |
-| `cms-react`              | A set of hooks and components for using the `cms` in a React app. |
-| `cms-final-form-builder` | A `react-final-form` based form builder for creating `cms` forms. |
-| `cms-react-sidebar`      | A CMS UI that shows up in a sidebar on your site.                 |
-| `cms-scripts`            | Contains the script for building `typescript` packages.           |
-| `gatsby-plugin-cms`      | A Gatsby plugin for connecting to `cms`.                          |
+| Package                     | Description                                                       |
+| --------------------------- | ----------------------------------------------------------------- |
+| `cms`                       | The base package for creating a cms.                              |
+| `cms-react`                 | A set of hooks and components for using the `cms` in a React app. |
+| `cms-final-form-builder`    | A `react-final-form` based form builder for creating `cms` forms. |
+| `xeditor-react`             | A CMS UI that shows up in a sidebar on your site.                 |
+| `cms-scripts`               | Contains the script for building `typescript` packages.           |
+| `gatsby-plugin-xeditor-cms` | A Gatsby plugin for connecting to `cms`.                          |
 
 ## Contributing
 
@@ -24,7 +24,7 @@ yarn bootstrap
 yarn build
 
 # Start the Gatsby demo
-cd packages/gatsby-demo
+cd packages/demo-gatsby
 yarn start
 ```
 
@@ -41,5 +41,5 @@ yarn start
 
 There are two demo projects:
 
-- `packages/cra-demo`
-- `packages/gatsby-demo`
+- `packages/demo-cra`
+- `packages/demo-gatsby`

@@ -7,7 +7,7 @@ import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
 import { useCMS } from "@forestryio/cms-react"
 import { FormBuilder } from "@forestryio/cms-final-form-builder"
-import { useSidebar } from "@forestryio/cms-react-sidebar"
+import { useSidebar } from "../../../xeditor-react"
 import { useMarkdownRemarkForm } from "../cms-react-markdown"
 
 function BlogPostTemplate(props) {
