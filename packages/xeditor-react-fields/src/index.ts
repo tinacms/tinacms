@@ -1,3 +1,1 @@
-export function foo() {
-  return 'bar'
-}
+export * from './fields/TextField'
