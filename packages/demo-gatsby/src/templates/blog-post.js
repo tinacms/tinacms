@@ -5,7 +5,6 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { useSidebar } from "../../../xeditor-react"
 import { useRemarkForm } from "@forestryio/gatsby-plugin-xeditor-cms"
 
 function BlogPostTemplate(props) {
@@ -14,8 +13,6 @@ function BlogPostTemplate(props) {
   const { previous, next } = props.pageContext
 
   const [_, post] = useRemarkForm(staticPost)
-
-  const { isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen } = useSidebar()
 
   return (
     <Layout location={props.location} title={siteTitle}>
@@ -31,11 +28,6 @@ function BlogPostTemplate(props) {
       >
         {post.frontmatter.title}
       </h1>
-      <hr />
-      <button onClick={() => setIsSidebarOpen(!isSidebarOpen)}>
-        Toggle Sidebar
-      </button>
-      <hr />
       <p
         style={{
           ...scale(-1 / 5),
