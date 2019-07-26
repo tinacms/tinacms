@@ -1,4 +1,5 @@
 import { useCMSForm } from '@forestryio/cms-react'
+import { ERROR_MISSING_CMS_GATSBY, ERROR_MISSING_REMARK_ID } from './errors'
 
 interface RemarkNode {
   id: string
@@ -8,14 +9,21 @@ interface RemarkNode {
 }
 
 export function useRemarkForm(markdownRemark: RemarkNode) {
-  return useCMSForm({
-    name: `markdownRemark:${markdownRemark.id}`,
-    initialValues: markdownRemark,
-    fields: generateFields(markdownRemark),
-    onSubmit() {
-      console.log('Test')
-    },
-  })
+  if (typeof markdownRemark.id == 'undefined') {
+    throw new Error(ERROR_MISSING_REMARK_ID)
+  }
+  try {
+    return useCMSForm({
+      name: `markdownRemark:${markdownRemark.id}`,
+      initialValues: markdownRemark,
+      fields: generateFields(markdownRemark),
+      onSubmit() {
+        console.log('Test')
+      },
+    })
+  } catch (e) {
+    throw new Error(ERROR_MISSING_CMS_GATSBY)
+  }
 }
 
 function generateFields(post: RemarkNode) {
