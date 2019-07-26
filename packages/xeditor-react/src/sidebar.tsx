@@ -1,10 +1,11 @@
 import * as React from 'react'
-import Frame from 'react-frame-component'
+import Frame, { FrameContextConsumer } from 'react-frame-component'
 import { FormBuilder, FieldsBuilder } from '@forestryio/cms-final-form-builder'
 import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { CMS } from '@forestryio/cms/src'
 import { useState } from 'react'
 import { Form } from '@forestryio/cms'
+import styled, { StyleSheetManager } from 'styled-components'
 
 export const Sidebar = () => {
   const cms = useCMS()
@@ -40,27 +41,35 @@ export const Sidebar = () => {
         cursor: 'pointer',
       }}
     >
-      <ul>
-        {cms.forms.all().map(form => (
-          <li
-            key={form.name}
-            onClick={() => {
-              setEditingForm(form)
-            }}
-          >
-            {form.name}
-          </li>
-        ))}
-      </ul>
-      <button onClick={saveForms}>Save</button>
-      <h3>Editing form {editingForm && editingForm.name}</h3>
-      {editingForm && (
-        <FormBuilder form={editingForm}>
-          {() => {
-            return <FieldsBuilder form={editingForm} />
-          }}
-        </FormBuilder>
-      )}
+      <FrameContextConsumer>
+        {(frameProps: any) => (
+          <StyleSheetManager target={frameProps.document.head}>
+            <>
+              <ul>
+                {cms.forms.all().map(form => (
+                  <li
+                    key={form.name}
+                    onClick={() => {
+                      setEditingForm(form)
+                    }}
+                  >
+                    {form.name}
+                  </li>
+                ))}
+              </ul>
+              <button onClick={saveForms}>Save</button>
+              <h3>Editing form {editingForm && editingForm.name}</h3>
+              {editingForm && (
+                <FormBuilder form={editingForm}>
+                  {() => {
+                    return <FieldsBuilder form={editingForm} />
+                  }}
+                </FormBuilder>
+              )}
+            </>
+          </StyleSheetManager>
+        )}
+      </FrameContextConsumer>
     </Frame>
   )
 }
