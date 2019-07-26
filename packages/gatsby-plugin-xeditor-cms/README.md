@@ -44,7 +44,7 @@ Next need to register content so it can be edited.
 
 ## Making Content Editable
 
-`@forestryio/gatsby-plugin-xeditor-cms` supports editing content added by the `gatsby-transformer-remark` plugin.
+`@forestryio/gatsby-plugin-xeditor-cms` supports editing content added by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin.
 
 In order to make content editable, it must be registered with the CMS. There are two ways to do this
 with `@forestryio/gatsby-plugin-xeditor-cms` depending on how your templates are setup.
