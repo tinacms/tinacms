@@ -1,16 +1,22 @@
-# @forestrtyio/gatsby-plugin-xeditor-cms
+# @forestryio/gatsby-plugin-xeditor-cms
 
 A Gatsby plugin for the XEditor CMS.
 
-## Setup
+## Installation
 
-Add the plugin to your project:
-
-```sh
-yarn add @forestryio/@forestrtyio/gatsby-plugin-xeditor-cms
+```
+npm install --save @forestryio/gatsby-plugin-xeditor-cms
 ```
 
-Include it in the list of plugins:
+or
+
+```sh
+yarn add @forestryio/gatsby-plugin-xeditor-cms
+```
+
+## Setup
+
+Include `@forestryio/gatsby-plugin-xeditor-cms` in the list of gatsby plugins:
 
 _gatsby.config.js_
 
@@ -19,7 +25,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@forestryio/@forestrtyio/gatsby-plugin-xeditor-cms',
+    '@forestryio/gatsby-plugin-xeditor-cms',
   ],
 }
 ```
@@ -30,16 +36,23 @@ Start the gatsby development server:
 gatsby develop
 ```
 
-## Editing Markdown Files
+Open a browser to http://localhost:8000 and click the "Open CMS" button in the top bar.
 
-`@forestrtyio/gatsby-plugin-xeditor-cms` supports editing nodes created by the `gatsby-transformer-remark` plugin.
+A sidebar will open up, but there won't be much to see.
 
-Use the `useRemarkForm` hook to make your `markdownRemark` node editable. For example:
+Next need to register content to be editable
+
+## Making Content Editable
+
+`@forestryio/gatsby-plugin-xeditor-cms` supports editing nodes created by the `gatsby-transformer-remark` plugin.
+
+Use the `useRemarkForm` hook to make your `markdownRemark` node editable. This is implemented using
+[React hooks](https://reactjs.org/docs/hooks-intro.html) so make sure you're template is a Function Component rather then a Class Component.
 
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from "@forestrtyio/gatsby-plugin-xeditor-cms"
+import { useRemarkForm } from "@forestryio/gatsby-plugin-xeditor-cms"
 
 function BlogPostTemplate(props) {
   const [form, post] = useRemarkForm(props.data.markdownRemark)

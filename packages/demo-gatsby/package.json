@@ -2,17 +2,17 @@
   "name": "demo-gatsby",
   "private": true,
   "description": "A starter for a blog powered by Gatsby and Markdown",
-  "version": "0.1.1-alpha.0",
+  "version": "0.1.1-alpha.4",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "bugs": {
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "dependencies": {
-    "@forestrtyio/gatsby-plugin-xeditor-cms": "^0.1.1-alpha.0",
-    "@forestryio/cms": "^1.0.1-alpha.0",
-    "@forestryio/cms-final-form-builder": "^1.0.1-alpha.0",
-    "@forestryio/cms-react": "^0.1.1-alpha.0",
-    "@forestryio/xeditor-react": "^1.0.1-alpha.0",
+    "@forestryio/cms": "^1.0.1-alpha.2",
+    "@forestryio/cms-final-form-builder": "^1.0.1-alpha.3",
+    "@forestryio/cms-react": "^0.1.1-alpha.2",
+    "@forestryio/gatsby-plugin-xeditor-cms": "^0.1.1-alpha.4",
+    "@forestryio/xeditor-react": "^1.0.1-alpha.3",
     "@types/react": "^16.8.23",
     "gatsby": "^2.13.34",
     "gatsby-image": "^2.2.6",
