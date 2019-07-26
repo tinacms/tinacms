@@ -1,4 +1,4 @@
-# gatsby-plugin-xeditor-cms
+# @forestrtyio/gatsby-plugin-xeditor-cms
 
 A Gatsby plugin for the XEditor CMS.
 
@@ -7,7 +7,7 @@ A Gatsby plugin for the XEditor CMS.
 Add the plugin to your project:
 
 ```sh
-yarn add @forestryio/gatsby-plugin-xeditor-cms
+yarn add @forestryio/@forestrtyio/gatsby-plugin-xeditor-cms
 ```
 
 Include it in the list of plugins:
@@ -19,7 +19,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@forestryio/gatsby-plugin-xeditor-cms',
+    '@forestryio/@forestrtyio/gatsby-plugin-xeditor-cms',
   ],
 }
 ```
@@ -32,14 +32,14 @@ gatsby develop
 
 ## Editing Markdown Files
 
-`gatsby-plugin-xeditor-cms` supports editing nodes created by the `gatsby-transformer-remark` plugin.
+`@forestrtyio/gatsby-plugin-xeditor-cms` supports editing nodes created by the `gatsby-transformer-remark` plugin.
 
 Use the `useRemarkForm` hook to make your `markdownRemark` node editable. For example:
 
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from "gatsby-plugin-xeditor-cms"
+import { useRemarkForm } from "@forestrtyio/gatsby-plugin-xeditor-cms"
 
 function BlogPostTemplate(props) {
   const [form, post] = useRemarkForm(props.data.markdownRemark)

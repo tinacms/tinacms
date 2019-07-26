@@ -6,7 +6,7 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
 import { useSidebar } from "../../../xeditor-react"
-import { useRemarkForm } from "gatsby-plugin-xeditor-cms"
+import { useRemarkForm } from "@forestrtyio/gatsby-plugin-xeditor-cms"
 
 function BlogPostTemplate(props) {
   const staticPost = props.data.markdownRemark
