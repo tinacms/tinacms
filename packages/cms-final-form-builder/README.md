@@ -1,30 +1,21 @@
-# `@forestryio/template`
+# `@forestryio/cms-final-form-builder`
 
-This directory contains a template for creating new Typescript packages.
+A React component for building forms registered with `@forestryio/cms`.
 
-## Creating a Typescript Package
-
-Let's create a package called `foobar`
-
-### Step 1: Copy the Template into `packages`.
+## Installation
 
 ```
-cd forestryio
-cp -R template packages/foobar
+npm install --save @forestryio/cms-final-form-builder
 ```
 
-### Step 2: Replace `example` with `foobar` in the `package.json`.
+or
 
-**packages/foobar/package.json**
+```
+yarn add @forestryio/cms-final-form-builder
+```
 
-```git
-{
-  - "name": "@forestryio/example",
-  + "name": "@forestryio/foobar",,
+## Getting Started
 
-  ...
-
-  - "types": "build/example/src/index.d.ts",
-  + "types": "build/foobar/src/index.d.ts",,
-}
+```javascript
+import {} from '@forestryio/cms-react'
 ```
