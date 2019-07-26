@@ -38,7 +38,7 @@ export function useCMSForm(options: FormOptions<any>) {
     [options.name]
   )
 
-  return [form, form ? form.values : options.initialValues]
+  return [form ? form.values : options.initialValues, form]
 }
 
 /**
