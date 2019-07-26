@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/cms-react-sidebar",
+  "name": "@forestryio/xeditor-react",
   "version": "1.0.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",

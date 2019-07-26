@@ -8,6 +8,6 @@
   "dependencies": {
     "@forestryio/cms": "^1.0.0",
     "@forestryio/cms-react": "^0.1.0",
-    "@forestryio/cms-react-sidebar": "^1.0.0"
+    "@forestryio/xeditor-react": "^1.0.0"
   }
 }
