@@ -8,7 +8,7 @@
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "dependencies": {
-    "@forestrtyio/gatsby-plugin-xeditor-cms": "^0.1.1-alpha.0",
+    "@forestryio/gatsby-plugin-xeditor-cms": "^0.1.1-alpha.0",
     "@forestryio/cms": "^1.0.1-alpha.0",
     "@forestryio/cms-final-form-builder": "^1.0.1-alpha.0",
     "@forestryio/cms-react": "^0.1.1-alpha.0",

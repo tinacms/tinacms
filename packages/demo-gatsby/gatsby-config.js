@@ -9,7 +9,7 @@ module.exports = {
     },
   },
   plugins: [
-    "@forestrtyio/gatsby-plugin-xeditor-cms",
+    "@forestryio/gatsby-plugin-xeditor-cms",
     {
       resolve: `gatsby-source-filesystem`,
       options: {
