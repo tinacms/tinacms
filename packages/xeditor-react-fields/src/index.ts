@@ -1,1 +1,1 @@
-export * from './fields/TextField'
+export * from './TextField'

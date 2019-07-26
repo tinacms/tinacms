@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { TextField } from '../src/fields/TextField'
+import { TextField } from '../src/TextField'
 
 storiesOf('Button', module)
   .add('with text', () => <button>Hello Button</button>)
