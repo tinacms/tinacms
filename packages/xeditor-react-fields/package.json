@@ -10,23 +10,29 @@
   "scripts": {
     "build": "cms-scripts build",
     "test": "jest --passWithNoTests",
-    "storybook": "start-storybook"
+    "storybook": "start-storybook -p 9001 -c .storybook"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@types/styled-components": "4.1.8",
     "@types/react-dom": "^16.8.5",
+    "@types/storybook__react": "^4.0.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2",
     "react": "^16.8.6",
     "@storybook/react": "^5.1.9",
     "react-dom": "^16.8.6",
     "babel-loader": "^8.0.6",
-    "@babel/core": "^7.5.5"
+    "@babel/core": "^7.5.5",
+    "cms-scripts": "^0.1.1-alpha.0",
+    "@storybook/addon-info": "^5.1.9",
+    "react-docgen-typescript-loader": "^3.1.0",
+    "awesome-typescript-loader": "^5.2.1",
+    "react-docgen-typescript-loader": "^3.1.0",
+    "react-docgen-typescript-webpack-plugin": "^1.1.0"
   },
   "dependencies": {
-    "styled-components": "^4.3.2",
-    "cms-scripts": "^0.1.1-alpha.0"
+    "styled-components": "^4.3.2"
   },
   "peerDependencies": {
     "react": "^16.8.6",

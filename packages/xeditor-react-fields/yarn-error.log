@@ -1,5 +1,5 @@
 Arguments: 
-  /usr/local/Cellar/node/12.6.0/bin/node /usr/local/Cellar/yarn/1.17.3/libexec/bin/yarn.js add @storybook/react --dev
+  /usr/local/Cellar/node/12.6.0/bin/node /usr/local/Cellar/yarn/1.17.3/libexec/bin/yarn.js add @types/storybook__react --dev
 
 PATH: 
   /Users/jamesohalloran/.ebcli-virtual-env/executables:/Users/jamesohalloran/.ebcli-virtual-env/executables:/Users/jamesohalloran/.rvm/gems/ruby-2.6.3/bin:/Users/jamesohalloran/.rvm/gems/ruby-2.6.3@global/bin:/Users/jamesohalloran/.rvm/rubies/ruby-2.6.3/bin:/usr/local/bin:/usr/bin:/bin:/usr/sbin:/sbin:/Users/jamesohalloran/.rvm/bin
@@ -38,21 +38,28 @@ npm manifest:
     ],
     "scripts": {
       "build": "cms-scripts build",
-      "test": "jest --passWithNoTests"
+      "test": "jest --passWithNoTests",
+      "storybook": "start-storybook"
     },
     "devDependencies": {
       "@types/jest": "^24.0.15",
       "@types/styled-components": "4.1.8",
+      "@types/react-dom": "^16.8.5",
       "jest": "^24.8.0",
       "ts-jest": "^24.0.2",
-      "react": "^16.8.6"
+      "react": "^16.8.6",
+      "@storybook/react": "^5.1.9",
+      "react-dom": "^16.8.6",
+      "babel-loader": "^8.0.6",
+      "@babel/core": "^7.5.5"
     },
     "dependencies": {
-      "cms-scripts": "0.1.0",
-      "styled-components": "^4.3.2"
+      "styled-components": "^4.3.2",
+      "cms-scripts": "^0.1.1-alpha.0"
     },
     "peerDependencies": {
-      "react": "^16.8.6"
+      "react": "^16.8.6",
+      "react-dom": "^16.8.6"
     }
   }
 
