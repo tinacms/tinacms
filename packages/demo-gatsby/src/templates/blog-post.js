@@ -5,18 +5,15 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { useCMS } from "@forestryio/cms-react"
-import { FormBuilder } from "@forestryio/cms-final-form-builder"
 import { useSidebar } from "../../../xeditor-react"
-import { useMarkdownRemarkForm } from "../cms-react-markdown"
+import { useRemarkForm } from "@forestrtyio/gatsby-plugin-xeditor-cms"
 
 function BlogPostTemplate(props) {
   const staticPost = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
 
-  const cms = useCMS()
-  const [form, post] = useMarkdownRemarkForm(staticPost)
+  const [_, post] = useRemarkForm(staticPost)
 
   const { isOpen: isSidebarOpen, setIsOpen: setIsSidebarOpen } = useSidebar()
 
