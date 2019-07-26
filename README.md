@@ -41,5 +41,5 @@ yarn start
 
 There are two demo projects:
 
-- `packages/cra-demo`
+- `packages/demo-cra`
 - `packages/gatsby-demo`
