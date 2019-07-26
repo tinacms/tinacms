@@ -25,6 +25,12 @@ export const Sidebar = () => {
     }
   })
 
+  const saveForms = () => {
+    cms.forms.all().forEach(form => {
+      form.finalForm.submit()
+    })
+  }
+
   return (
     <Frame
       style={{
@@ -46,6 +52,7 @@ export const Sidebar = () => {
           </li>
         ))}
       </ul>
+      <button onClick={saveForms}>Save</button>
       <h3>Editing form {editingForm && editingForm.name}</h3>
       {editingForm && (
         <FormBuilder form={editingForm}>
