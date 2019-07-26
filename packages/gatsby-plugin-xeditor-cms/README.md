@@ -2,15 +2,21 @@
 
 A Gatsby plugin for the XEditor CMS.
 
-## Setup
+## Installation
 
-Add the plugin to your project:
-
-```sh
-yarn add @forestryio/@forestryio/gatsby-plugin-xeditor-cms
+```
+npm install --save @forestryio/gatsby-plugin-xeditor-cms
 ```
 
-Include it in the list of plugins:
+or
+
+```sh
+yarn add @forestryio/gatsby-plugin-xeditor-cms
+```
+
+## Setup
+
+Include `@forestryio/gatsby-plugin-xeditor-cms` in the list of gatsby plugins:
 
 _gatsby.config.js_
 
