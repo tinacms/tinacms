@@ -8,7 +8,7 @@
     "build"
   ],
   "scripts": {
-    "build": "npm run cms-scripst build",
+    "build": "npm run cms-scripts build",
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
