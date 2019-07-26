@@ -19,7 +19,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@forestryio/@forestryio/gatsby-plugin-xeditor-cms',
+    '@forestryio/gatsby-plugin-xeditor-cms',
   ],
 }
 ```
@@ -30,11 +30,18 @@ Start the gatsby development server:
 gatsby develop
 ```
 
-## Editing Markdown Files
+Open a browser to http://localhost:8000 and click the "Open CMS" button in the top bar.
+
+A sidebar will open up, but there won't be much to see.
+
+Next need to register content to be editable
+
+## Making Content Editable
 
 `@forestryio/gatsby-plugin-xeditor-cms` supports editing nodes created by the `gatsby-transformer-remark` plugin.
 
-Use the `useRemarkForm` hook to make your `markdownRemark` node editable. For example:
+Use the `useRemarkForm` hook to make your `markdownRemark` node editable. This is implemented using
+[React hooks](https://reactjs.org/docs/hooks-intro.html) so make sure you're template is a Function Component rather then a Class Component.
 
 **src/templates/blog-post.js**
 
