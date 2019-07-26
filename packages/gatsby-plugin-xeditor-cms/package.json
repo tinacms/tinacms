@@ -1,5 +1,5 @@
 {
-  "name": "gatsby-plugin-cms",
+  "name": "gatsby-plugin-xeditor-cms",
   "main": "index.js",
   "version": "0.1.0",
   "scripts": {
