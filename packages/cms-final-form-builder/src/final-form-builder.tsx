@@ -1,11 +1,9 @@
 import * as React from 'react'
-import { Form, CMS } from '@forestryio/cms'
+import { Form, Field } from '@forestryio/cms'
 import { useCMS } from '@forestryio/cms-react'
 import {
-  FormProps,
   Form as FinalForm,
   Field as FinalField,
-  FormSpy,
   FormRenderProps,
 } from 'react-final-form'
 import { FC } from 'react'
@@ -38,14 +36,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
 }
 
 export interface FieldsBuilderProps {
-  form: Form
+  fields: Field[]
 }
 
-export function FieldsBuilder({ form }: FieldsBuilderProps) {
+export function FieldsBuilder({ fields }: FieldsBuilderProps) {
   let cms = useCMS()
   return (
     <>
-      {form.fields.map(field => {
+      {fields.map(field => {
         return (
           <FinalField name={field.name} key={field.name}>
             {fieldProps => {

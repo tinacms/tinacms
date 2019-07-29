@@ -63,7 +63,7 @@ export const Sidebar = () => {
               (editingForm.fields.length ? (
                 <FormBuilder form={editingForm}>
                   {() => {
-                    return <FieldsBuilder form={editingForm} />
+                    return <FieldsBuilder fields={editingForm.fields} />
                   }}
                 </FormBuilder>
               ) : (
