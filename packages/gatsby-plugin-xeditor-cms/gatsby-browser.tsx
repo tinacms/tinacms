@@ -5,6 +5,7 @@ import {
   SidebarProvider,
   useSidebar,
   TextInput,
+  Group,
 } from '@forestryio/xeditor-react'
 
 let cms = new CMS()
@@ -13,6 +14,10 @@ cms.forms.addFieldPlugin({
   Component: (props: any) => {
     return <TextInput {...props} />
   },
+})
+cms.forms.addFieldPlugin({
+  name: 'group',
+  Component: Group,
 })
 
 export const wrapRootElement = ({ element }: any) => {
