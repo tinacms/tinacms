@@ -67,14 +67,12 @@ with `@forestryio/gatsby-plugin-xeditor-cms` depending on how your templates are
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from "@forestryio/gatsby-plugin-xeditor-cms"
+import { useRemarkForm } from '@forestryio/gatsby-plugin-xeditor-cms'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
 
-  return (
-    // ...
-  )
+  return <h1>{markdownRemark.frontmatter.title}</h1>
 }
 ```
 
@@ -88,23 +86,20 @@ This is a thin wrapper around `useRemarkForm`. Since React Hooks are only availa
 
 - `remark`: the data returned from a Gatsby `markdownRemark` query.
 - `children(renderProps): JSX.Element`: A render-child function.
-  - `renderProps.data`: The current values to be display. This has the same shape as the `markdownRemark` data.
+  - `renderProps.markdownRemark`: The current values to be displayed. This has the same shape as the `markdownRemark` data that was passed in.
   - `renderProps.form`: A reference to the `Form`. See `@forestryio/cms` for more details.
 
 **src/templates/blog-post.js**
 
 ```javascript
-import { RemarkForm } from "@forestryio/gatsby-plugin-xeditor-cms"
+import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor-cms'
 
 class BlogPostTemplate extends React.Component {
   render() {
-
     return (
       <RemarkForm remark={this.props.data.markdownRemark}>
-        {({ values, form }) => {
-          return (
-            // ...
-          )
+        {({ markdownRemark }) => {
+          return <h1>{markdownRemark.frontmatter.title}</h1>
         }}
       </RemarkForm>
     )
