@@ -22,20 +22,11 @@ export function useRemarkForm(
       initialValues: markdownRemark,
       fields: generateFields(markdownRemark),
       onSubmit(data) {
-        // @ts-ignore
-        fetch('http://localhost:4567/markdownRemark', {
-          method: 'PUT',
-          headers: {
-            'Content-Type': 'application/json; charset=utf-8',
-          },
-          body: JSON.stringify(data),
-        })
-          .then(response => {
-            console.log(response.json())
-          })
-          .catch(e => {
-            console.error(e)
-          })
+        if (process.env.NODE_ENV === 'development') {
+          return writeToDisk(data)
+        } else {
+          console.log('Not supported')
+        }
       },
       ...formOverrrides,
     })
@@ -62,4 +53,21 @@ export function RemarkForm({ remark, children }: RemarkFormProps) {
   let [form, values] = useRemarkForm(remark)
 
   return children({ form, values })
+}
+
+function writeToDisk(data: any) {
+  // @ts-ignore
+  return fetch('http://localhost:4567/markdownRemark', {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => {
+      console.log(response.json())
+    })
+    .catch(e => {
+      console.error(e)
+    })
 }
