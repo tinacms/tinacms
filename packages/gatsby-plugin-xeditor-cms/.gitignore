@@ -1,3 +1,4 @@
-*.js
-*.js
+gatsby-browser.js
+errors.js
+index.js
 *.d.ts
