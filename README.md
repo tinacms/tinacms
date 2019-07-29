@@ -57,9 +57,3 @@ There are two demo projects:
 | ------------- | -------------------------------------------------------- |
 | `demo-cra`    | A React application bootstrapped with `create-react-app` |
 | `demo-gatsby` | Gatsby starter blog.                                     |
-
-## xeditor-react-fields
-
-`xeditor-react-fields` is a react component library providing some base styling for simple elements in the XEditor package
-
-To view documentation on the fields, from inside the `/xeditor-react-fields` directory, run `yarn storybook`
