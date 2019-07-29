@@ -54,13 +54,13 @@ function generateFields(post: RemarkNode) {
 
 interface RemarkFormProps {
   remark: RemarkNode
-  children(renderProps: { form: Form; values: any }): JSX.Element
+  children(renderProps: { form: Form; markdownRemark: any }): JSX.Element
 }
 
 export function RemarkForm({ remark, children }: RemarkFormProps) {
-  let [form, values] = useRemarkForm(remark)
+  let [markdownRemark, form] = useRemarkForm(remark)
 
-  return children({ form, values })
+  return children({ form, markdownRemark })
 }
 
 function writeToDisk(data: any) {
