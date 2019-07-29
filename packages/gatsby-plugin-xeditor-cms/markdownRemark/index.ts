@@ -1,6 +1,10 @@
 import { Form, FormOptions } from '@forestryio/cms'
 import { useCMSForm } from '@forestryio/cms-react'
-import { ERROR_MISSING_CMS_GATSBY, ERROR_MISSING_REMARK_ID } from '../errors'
+import {
+  ERROR_MISSING_CMS_GATSBY,
+  ERROR_MISSING_REMARK_ID,
+  ERROR_MISSING_REMARK_PATH,
+} from '../errors'
 
 interface RemarkNode {
   id: string
@@ -13,8 +17,12 @@ export function useRemarkForm(
   markdownRemark: RemarkNode,
   formOverrrides: Partial<FormOptions<any>> = {}
 ) {
-  if (typeof markdownRemark.id == 'undefined') {
+  if (typeof markdownRemark.id === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_ID)
+  }
+  // TODO: Only required when saving to local filesystem.
+  if (typeof markdownRemark.fileAbsolutePath === 'undefined') {
+    throw new Error(ERROR_MISSING_REMARK_PATH)
   }
   try {
     return useCMSForm({
