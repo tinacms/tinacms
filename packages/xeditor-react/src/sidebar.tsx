@@ -30,6 +30,7 @@ export const Sidebar = () => {
     })
   }
 
+  const forms = cms.forms.all()
   return (
     <StyledFrame
       frameStyles={{
@@ -40,28 +41,43 @@ export const Sidebar = () => {
       }}
     >
       <>
-        <ul>
-          {cms.forms.all().map(form => (
-            <li
-              key={form.name}
-              onClick={() => {
-                setEditingForm(form)
-              }}
-            >
-              {form.name}
-            </li>
-          ))}
-        </ul>
-        <button onClick={saveForms}>Save</button>
-        <h3>Editing form {editingForm && editingForm.name}</h3>
-        {editingForm && (
-          <FormBuilder form={editingForm}>
-            {() => {
-              return <FieldsBuilder form={editingForm} />
-            }}
-          </FormBuilder>
+        {!forms.length ? (
+          <NoFormsPlaceholder />
+        ) : (
+          <>
+            <ul>
+              {forms.map(form => (
+                <li
+                  key={form.name}
+                  onClick={() => {
+                    setEditingForm(form)
+                  }}
+                >
+                  {form.name}
+                </li>
+              ))}
+            </ul>
+            <button onClick={saveForms}>Save</button>
+            <h3>Editing form {editingForm && editingForm.name}</h3>
+            {editingForm &&
+              (editingForm.fields.length ? (
+                <FormBuilder form={editingForm}>
+                  {() => {
+                    return <FieldsBuilder form={editingForm} />
+                  }}
+                </FormBuilder>
+              ) : (
+                <NoFieldsPlaceholder />
+              ))}
+          </>
         )}
       </>
     </StyledFrame>
   )
 }
+
+const NoFormsPlaceholder = () => <p>There is nothing to edit on this page</p>
+
+const NoFieldsPlaceholder = () => (
+  <p>There are no fields registered with this form</p>
+)
