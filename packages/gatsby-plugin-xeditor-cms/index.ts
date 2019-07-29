@@ -21,8 +21,21 @@ export function useRemarkForm(
       name: `markdownRemark:${markdownRemark.id}`,
       initialValues: markdownRemark,
       fields: generateFields(markdownRemark),
-      onSubmit() {
-        console.log('Test')
+      onSubmit(data) {
+        // @ts-ignore
+        fetch('http://localhost:4567/markdownRemark', {
+          method: 'PUT',
+          headers: {
+            'Content-Type': 'application/json; charset=utf-8',
+          },
+          body: JSON.stringify(data),
+        })
+          .then(response => {
+            console.log(response.json())
+          })
+          .catch(e => {
+            console.error(e)
+          })
       },
       ...formOverrrides,
     })
