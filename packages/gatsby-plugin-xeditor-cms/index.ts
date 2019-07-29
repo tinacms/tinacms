@@ -1,4 +1,4 @@
-import { Form } from '@forestryio/cms'
+import { Form, FormOptions } from '@forestryio/cms'
 import { useCMSForm } from '@forestryio/cms-react'
 import { ERROR_MISSING_CMS_GATSBY, ERROR_MISSING_REMARK_ID } from './errors'
 
@@ -9,7 +9,10 @@ interface RemarkNode {
   [key: string]: any
 }
 
-export function useRemarkForm(markdownRemark: RemarkNode) {
+export function useRemarkForm(
+  markdownRemark: RemarkNode,
+  formOverrrides: Partial<FormOptions<any>> = {}
+) {
   if (typeof markdownRemark.id == 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_ID)
   }
@@ -21,6 +24,7 @@ export function useRemarkForm(markdownRemark: RemarkNode) {
       onSubmit() {
         console.log('Test')
       },
+      ...formOverrrides,
     })
   } catch (e) {
     throw new Error(ERROR_MISSING_CMS_GATSBY)
