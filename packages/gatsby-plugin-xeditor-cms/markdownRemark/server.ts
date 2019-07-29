@@ -23,9 +23,11 @@ export function markdownRemarkServer() {
     fs.writeFileSync(req.body.fileAbsolutePath, contents)
   })
 
-  app.listen(4567, () =>
+  app.listen(4567, () => {
+    console.log('------------------------------------------')
     console.log('xeditor local backend running on port 4567')
-  )
+    console.log('------------------------------------------')
+  })
 }
 
 /**

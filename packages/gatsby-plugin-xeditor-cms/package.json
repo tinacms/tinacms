@@ -5,6 +5,7 @@
   "files": [
     "index.js",
     "gatsby-browser.js",
+    "gatsby-node.js",
     "errors.js",
     "markdownRemark"
   ],
