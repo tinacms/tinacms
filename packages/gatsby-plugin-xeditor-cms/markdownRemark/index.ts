@@ -49,7 +49,7 @@ function generateFields(post: RemarkNode) {
     name: `frontmatter.${key}`,
   }))
 
-  return [...frontmatterFields, { component: 'text', name: 'html' }]
+  return [...frontmatterFields, { component: 'text', name: 'rawMarkdownBody' }]
 }
 
 interface RemarkFormProps {
