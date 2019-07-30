@@ -14,6 +14,12 @@ cms.forms.addFieldPlugin({
     return <TextInput {...props} />
   },
 })
+cms.forms.addFieldPlugin({
+  name: 'textarea',
+  Component: (props: any) => {
+    return <textarea {...props.input} />
+  },
+})
 
 export const wrapRootElement = ({ element }: any) => {
   return (
