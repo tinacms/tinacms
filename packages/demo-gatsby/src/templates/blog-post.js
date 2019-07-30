@@ -40,7 +40,11 @@ function BlogPostTemplate(props) {
             >
               {post.frontmatter.date}
             </p>
-            <div dangerouslySetInnerHTML={{ __html: post.html }} />
+            <div
+              dangerouslySetInnerHTML={{
+                __html: props.data.markdownRemark.html,
+              }}
+            />
             <hr
               style={{
                 marginBottom: rhythm(1),
@@ -94,9 +98,10 @@ export const pageQuery = graphql`
       excerpt(pruneLength: 160)
       html
       fileAbsolutePath
+      rawMarkdownBody
       frontmatter {
         title
-        date(formatString: "MMMM DD, YYYY")
+        date
         description
       }
     }
