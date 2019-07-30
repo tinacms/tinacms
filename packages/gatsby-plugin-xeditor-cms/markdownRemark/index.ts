@@ -5,7 +5,9 @@ import {
   ERROR_MISSING_REMARK_ID,
   ERROR_MISSING_REMARK_PATH,
 } from '../errors'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
+
+let throttle = require('lodash.throttle')
 
 interface RemarkNode {
   id: string
@@ -17,7 +19,8 @@ interface RemarkNode {
 
 export function useRemarkForm(
   markdownRemark: RemarkNode,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrrides: Partial<FormOptions<any>> = {},
+  timeout: Number = 100
 ) {
   if (!markdownRemark) {
     return [markdownRemark, null]
@@ -30,6 +33,10 @@ export function useRemarkForm(
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
   try {
+    let throttledWriteToDisk = useMemo(() => {
+      return throttle(writeToDisk, timeout)
+    }, [timeout])
+
     let [values, form] = useCMSForm({
       name: `markdownRemark:${markdownRemark.id}`,
       initialValues: markdownRemark,
@@ -48,7 +55,7 @@ export function useRemarkForm(
       if (!form) return
       return form.subscribe(
         (formState: any) => {
-          writeToDisk(formState.values)
+          throttledWriteToDisk(formState.values)
         },
         { values: true }
       )
@@ -72,13 +79,19 @@ function generateFields(post: RemarkNode) {
   ]
 }
 
-interface RemarkFormProps {
+interface RemarkFormProps extends Partial<FormOptions<any>> {
   remark: RemarkNode
   render(renderProps: { form: Form; markdownRemark: any }): JSX.Element
+  timeout?: number
 }
 
-export function RemarkForm({ remark, render }: RemarkFormProps) {
-  let [markdownRemark, form] = useRemarkForm(remark)
+export function RemarkForm({
+  remark,
+  render,
+  timeout,
+  ...options
+}: RemarkFormProps) {
+  let [markdownRemark, form] = useRemarkForm(remark, options, timeout)
 
   return render({ form, markdownRemark })
 }
