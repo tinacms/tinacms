@@ -57,3 +57,16 @@ There are two demo projects:
 | ------------- | -------------------------------------------------------- |
 | `demo-cra`    | A React application bootstrapped with `create-react-app` |
 | `demo-gatsby` | Gatsby starter blog.                                     |
+
+## Contributing
+
+### Troubleshooting in Development
+
+#### I pulled down changes and now my packages won't build
+
+The links between the local packages may have been broken. If this is the problem, then
+running `npm run bootstrap` shoudl fix the issue.
+
+## Links
+
+- [Circle CI](https://circleci.com/gh/forestryio/cms): Continuous Integration
