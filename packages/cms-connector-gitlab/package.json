@@ -1,0 +1,23 @@
+{
+  "name": "@forestryio/cms-connector-gitlab",
+  "version": "0.1.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "build": "cms-scripts build",
+    "test": "jest --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
+  },
+  "dependencies": {
+    "@forestryio/persistent-session-storage": "^0.1.0",
+    "cms-scripts": "0.1.0"
+  }
+}
