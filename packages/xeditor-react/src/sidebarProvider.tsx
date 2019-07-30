@@ -41,7 +41,7 @@ interface SidebarLayoutContainerProps {
   isSidebarOpen: boolean
 }
 
-const sidebarWidth = 300
+const sidebarWidth = 340
 const SidebarLayoutContainer = styled.div`
   display: grid;
   height: 100vh;
