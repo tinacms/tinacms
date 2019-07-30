@@ -18,7 +18,10 @@ export function markdownRemarkServer() {
 
   app.put('/markdownRemark', (req, res) => {
     let contents =
-      '---\n' + yaml.dump(req.body.frontmatter) + '---\n' + req.body.html
+      '---\n' +
+      yaml.dump(req.body.frontmatter) +
+      '---\n' +
+      req.body.rawMarkdownBody
     res.send(contents)
     fs.writeFileSync(req.body.fileAbsolutePath, contents)
   })
