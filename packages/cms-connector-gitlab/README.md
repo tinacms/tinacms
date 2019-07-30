@@ -17,6 +17,9 @@ let gitlab = new GitlabConnector({
 // bootstrap the connector (listen for oauth callback):
 gitlab.bootstrap()
 
+// retrieve an auth token
+gitlab.login()
+
 // create a commit
 gitlab.save(path, contents)
 ```
