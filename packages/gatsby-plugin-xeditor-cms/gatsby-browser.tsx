@@ -1,13 +1,11 @@
 import * as React from 'react'
-import { CMS } from '@forestryio/cms'
 import { CMSContext } from '@forestryio/cms-react'
 import {
   SidebarProvider,
   useSidebar,
   TextInput,
 } from '@forestryio/xeditor-react'
-
-let cms = new CMS()
+import { cms } from './index'
 
 export const wrapRootElement = ({ element }: any) => {
   return (
