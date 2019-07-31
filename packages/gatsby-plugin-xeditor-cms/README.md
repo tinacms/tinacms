@@ -107,11 +107,42 @@ class BlogPostTemplate extends React.Component {
 }
 ```
 
+### Creating custom field plugins
+
+Additional custom fields can be added to customize how fields are displayed in the sidebar.
+
+**Props**
+
+- [input](https://github.com/final-form/react-final-form#inputname-string) : t data and events regarding the field's state
+- [meta](https://github.com/final-form/react-final-form#metaactive-boolean) : data about the field's form state
+- field
+  - `name: string;`
+  - `component: React.FC<any> | string;`
+
+**Example**
+
+```javascript
+//a basic TextInput field plugin
+export const TextInput = ({ field, input, meta, ...props }: any) => {
+  return (
+    <div {...props}>
+      <div>
+        <label htmlFor={name}>{field.name}</label>
+      </div>
+      <input {...input} />
+      {meta.error && <p>{meta.error}</p>}
+    </div>
+  )
+}
+```
+
 ### Registering custom field plugins:
 
-Additional custom fields can be registered to customize how fields are displayed in the sidebar. This can be done anywhere in your layout.
+Field plugins can be registered to define how all fields of a certain component id will look in the sidebar.
 
 You may want to register your fields inside wrapPageElement to ensure they are registered for all pages on your site.
+
+**/gatsby-browser.js**
 
 ```javascript
 //gatsby-browser.js
@@ -146,7 +177,7 @@ Any fields with an unspecified field type will default to the 'text' component.
 
 To customize the component type of your fields using `RemarkForm`, you can pass in `formOverrrides`.
 
-Using the useRemark hook:
+**Using the useRemark hook:**
 
 ```javascript
 function BlogPostTemplate(props) {
@@ -158,7 +189,7 @@ function BlogPostTemplate(props) {
 }
 ```
 
-Using the RemarkForm renderProps approach:
+**Using the RemarkForm renderProps approach:**
 
 ```javascript
 import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor-cms'
