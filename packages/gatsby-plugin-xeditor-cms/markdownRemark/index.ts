@@ -5,18 +5,26 @@ import {
   ERROR_MISSING_REMARK_ID,
   ERROR_MISSING_REMARK_PATH,
 } from '../errors'
+import { useEffect, useMemo } from 'react'
+
+let throttle = require('lodash.throttle')
 
 interface RemarkNode {
   id: string
   frontmatter: any
   html: string
+  rawMarkdownBody: string
   [key: string]: any
 }
 
 export function useRemarkForm(
   markdownRemark: RemarkNode,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrrides: Partial<FormOptions<any>> = {},
+  timeout: Number = 100
 ) {
+  if (!markdownRemark) {
+    return [markdownRemark, null]
+  }
   if (typeof markdownRemark.id === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_ID)
   }
@@ -25,19 +33,35 @@ export function useRemarkForm(
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
   try {
-    return useCMSForm({
+    let throttledWriteToDisk = useMemo(() => {
+      return throttle(writeToDisk, timeout)
+    }, [timeout])
+
+    let [values, form] = useCMSForm({
       name: `markdownRemark:${markdownRemark.id}`,
       initialValues: markdownRemark,
       fields: generateFields(markdownRemark),
       onSubmit(data) {
         if (process.env.NODE_ENV === 'development') {
-          return writeToDisk(data)
+          // return writeToDisk(data)
         } else {
           console.log('Not supported')
         }
       },
       ...formOverrrides,
     })
+
+    useEffect(() => {
+      if (!form) return
+      return form.subscribe(
+        (formState: any) => {
+          throttledWriteToDisk(formState.values)
+        },
+        { values: true }
+      )
+    }, [form])
+
+    return [markdownRemark, form]
   } catch (e) {
     throw new Error(ERROR_MISSING_CMS_GATSBY)
   }
@@ -49,23 +73,27 @@ function generateFields(post: RemarkNode) {
     name: `frontmatter.${key}`,
   }))
 
-  return [...frontmatterFields, { component: 'text', name: 'html' }]
+  return [
+    ...frontmatterFields,
+    { component: 'textarea', name: 'rawMarkdownBody' },
+  ]
 }
 
-interface RemarkFormProps {
+interface RemarkFormProps extends Partial<FormOptions<any>> {
   remark: RemarkNode
-  formOverrrides: Partial<FormOptions<any>>
-  children(renderProps: { form: Form; markdownRemark: any }): JSX.Element
+  render(renderProps: { form: Form; markdownRemark: any }): JSX.Element
+  timeout?: number
 }
 
 export function RemarkForm({
   remark,
-  children,
-  formOverrrides = {},
+  render,
+  timeout,
+  ...options
 }: RemarkFormProps) {
-  let [markdownRemark, form] = useRemarkForm(remark, formOverrrides)
+  let [markdownRemark, form] = useRemarkForm(remark, options, timeout)
 
-  return children({ form, markdownRemark })
+  return render({ form, markdownRemark })
 }
 
 function writeToDisk(data: any) {
