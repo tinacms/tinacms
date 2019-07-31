@@ -54,14 +54,14 @@ function generateFields(post: RemarkNode) {
 
 interface RemarkFormProps {
   remark: RemarkNode
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrrides: Partial<FormOptions<any>>
   children(renderProps: { form: Form; markdownRemark: any }): JSX.Element
 }
 
 export function RemarkForm({
   remark,
-  formOverrrides,
   children,
+  formOverrrides = {},
 }: RemarkFormProps) {
   let [markdownRemark, form] = useRemarkForm(remark, formOverrrides)
 
