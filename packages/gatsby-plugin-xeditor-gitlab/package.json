@@ -1,0 +1,18 @@
+{
+  "name": "@forestryio/gatsby-xeditor-gitlab",
+  "main": "index.js",
+  "version": "0.0.0",
+  "files": [
+    "index.js",
+    "gatsby-browser.js",
+    "gatsby-node.js",
+    "errors.js",
+    "markdownRemark"
+  ],
+  "scripts": {
+    "build": "tsc"
+  },
+  "dependencies": {
+    "@forestryio/cms-connector-gitlab": "0.1.0"
+  }
+}
