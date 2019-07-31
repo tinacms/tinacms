@@ -1,30 +1,108 @@
-# `@forestryio/template`
+# @forestryio/cms
 
-This directory contains a template for creating new Typescript packages.
+A CMS Toolkit
 
-## Creating a Typescript Package
+## Installation
 
-Let's create a package called `foobar`
-
-### Step 1: Copy the Template into `packages`.
+Install the package
 
 ```
-cd forestryio
-cp -R template packages/foobar
+npm install --save @forestryio/cms
 ```
 
-### Step 2: Replace `example` with `foobar` in the `package.json`.
+or
 
-**packages/foobar/package.json**
-
-```git
-{
-  - "name": "@forestryio/example",
-  + "name": "@forestryio/foobar",,
-
-  ...
-
-  - "types": "build/example/src/index.d.ts",
-  + "types": "build/foobar/src/index.d.ts",,
-}
 ```
+yarn add @forestryio/cms
+```
+
+## Getting Started
+
+`@forestry/cms` is the core for building content management systems.
+
+```javascript
+import { CMS } from '@forestryio/cms'
+
+let cms = new CMS()
+```
+
+### Add fields plugins:
+
+```javascript
+cms.forms.addFieldPlugin({
+  name: "text",
+  Component({ input, field }) {
+    return (
+      <label name={input.name}>
+        {field.name}
+        <input {...} />
+      </label>
+    )
+  }
+})
+
+```
+
+### Field Plugin Props
+
+```
+- input: [See Input Props here](https://github.com/final-form/react-final-form#fieldrenderprops)
+- meta: [See Meta Props here](https://github.com/final-form/react-final-form#fieldrenderprops)
+- field:
+  - name: string;
+  - component: React.FC<any> | string;
+```
+
+### Register a new form:
+
+```javascript
+let form = cms.forms.createForm({
+  name: 'hello-world',
+  initialValues: {
+    title: 'Hello World',
+    description: 'A fun time can be head with programming.',
+  },
+  fields: [
+    { name: 'title', component: 'text' },
+    { name: 'description', component: 'text' },
+  ],
+})
+```
+
+## API
+
+The following can be imported from `@forestryio/cms`
+
+### `CMS`
+
+The base CMS class.
+
+#### `forms: FormManager`
+
+TODO
+
+### `Subscribable`
+
+TODO
+
+## Types
+
+### `Form`
+
+### `FormManager`
+
+#### `create<S>(options: FormOptions<S>): Form<S>`
+
+#### `findForm(name: string): Form`
+
+#### `removeForm(): void`
+
+#### `all(): Form[]`
+
+#### `addFieldPlugin(): void`
+
+#### `getFieldPlugin(name: string): FieldPlugin | null`
+
+### `FormOptions<S>`
+
+### `FieldPlugin`
