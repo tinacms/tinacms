@@ -6,6 +6,7 @@ import {
   ERROR_MISSING_REMARK_PATH,
 } from '../errors'
 import { useEffect, useMemo } from 'react'
+import * as yaml from 'js-yaml'
 
 let throttle = require('lodash.throttle')
 
@@ -67,7 +68,7 @@ export function useRemarkForm(
   }
 }
 
-function generateFields(post: RemarkNode) {
+export function generateFields(post: RemarkNode) {
   let frontmatterFields = Object.keys(post.frontmatter).map(key => ({
     component: 'text',
     name: `frontmatter.${key}`,
@@ -111,4 +112,10 @@ function writeToDisk(data: any) {
     .catch(e => {
       console.error(e)
     })
+}
+
+export function toMarkdownString(remark: RemarkNode) {
+  return (
+    '---\n' + yaml.dump(remark.frontmatter) + '---\n' + remark.rawMarkdownBody
+  )
 }
