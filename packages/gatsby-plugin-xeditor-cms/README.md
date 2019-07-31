@@ -109,12 +109,12 @@ class BlogPostTemplate extends React.Component {
 
 ### Creating custom field plugins
 
-Additional custom fields can be added to customize how fields are displayed in the sidebar.
+Custom fields can be added to customize how fields can be edited.
 
 **Props**
 
-- [input](https://github.com/final-form/react-final-form#inputname-string) : t data and events regarding the field's state
-- [meta](https://github.com/final-form/react-final-form#metaactive-boolean) : data about the field's form state
+- [input](https://github.com/final-form/react-final-form#inputname-string) : data and events around the field's state
+- [meta](https://github.com/final-form/react-final-form#metaactive-boolean) : data describing the field's form state
 - field
   - `name: string;`
   - `component: React.FC<any> | string;`
@@ -140,7 +140,7 @@ export const TextInput = ({ field, input, meta, ...props }: any) => {
 
 Field plugins can be registered to define how all fields of a certain component id will look in the sidebar.
 
-You may want to register your fields inside wrapPageElement to ensure they are registered for all pages on your site.
+You may want to register your fields inside `wrapPageElement` to ensure that they are registered for all pages on your site.
 
 **/gatsby-browser.js**
 
@@ -148,6 +148,7 @@ You may want to register your fields inside wrapPageElement to ensure they are r
 //gatsby-browser.js
 import * as React from 'react'
 import { useCMS } from '@forestryio/cms-react'
+import { ShortTextField } from './your-custom-field'
 
 export const wrapPageElement = ({ element }) => {
   return <FieldRegistrar>{element}</FieldRegistrar>
@@ -159,6 +160,7 @@ const FieldRegistrar = ({ children }) => {
 
   React.useEffect(() => {
     if (firstRender) {
+      //make sure to only register the field plugin once
       cms.forms.addFieldPlugin({
         name: 'short-text',
         Component: ShortTextField,
@@ -199,9 +201,9 @@ class BlogPostTemplate extends React.Component {
     return (
       <RemarkForm
         remark={this.props.data.markdownRemark}
-        formOverrrides={[
-          { name: 'frontmatter.title', component: 'short-text' },
-        ]}
+        formOverrrides={{
+          fields: [{ name: 'frontmatter.title', component: 'short-text' }],
+        }}
       >
         {({ markdownRemark }) => {
           return <h1>{markdownRemark.frontmatter.title}</h1>
@@ -215,9 +217,11 @@ class BlogPostTemplate extends React.Component {
 Additionally, you can also just pass in the component itself instead of its id
 
 ```javascript
+import { ShortTextField } from './your-custom-field'
+
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
-    fields: [{ name: 'frontmatter.title', component: ShortText }],
+    fields: [{ name: 'frontmatter.title', component: ShortTextField }],
   })
 
   return <h1>{markdownRemark.frontmatter.title}</h1>
