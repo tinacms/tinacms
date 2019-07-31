@@ -3,7 +3,13 @@ import { GitlabConnector } from '@forestryio/cms-connector-gitlab'
 import { GitlabContext } from './index'
 
 let gitlab: GitlabConnector
-export const wrapRootElement = ({ element }: any, pluginOptions: any) => {
+export const wrapRootElement = ({ element }: any) => {
+  return (
+    <GitlabContext.Provider value={gitlab}>{element}</GitlabContext.Provider>
+  )
+}
+
+export const onClientEntry = (_: any, pluginOptions: any) => {
   gitlab = new GitlabConnector({
     apiBaseURI: 'https://gitlab.com/',
     ...pluginOptions,
@@ -11,14 +17,5 @@ export const wrapRootElement = ({ element }: any, pluginOptions: any) => {
     //   redirectURI: 'http://localhost:8000/?auth-gitlab',
     //   repositoryID: 'USER/REPO',
   })
-
-  return (
-    <GitlabContext.Provider value={gitlab}>{element}</GitlabContext.Provider>
-  )
-}
-
-export const onClientEntry = () => {
-  if (gitlab) {
-    gitlab.bootstrap()
-  }
+  gitlab.bootstrap()
 }
