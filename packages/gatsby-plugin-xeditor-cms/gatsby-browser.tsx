@@ -8,12 +8,6 @@ import {
 } from '@forestryio/xeditor-react'
 
 let cms = new CMS()
-cms.forms.addFieldPlugin({
-  name: 'text',
-  Component: (props: any) => {
-    return <TextInput {...props} />
-  },
-})
 
 export const wrapRootElement = ({ element }: any) => {
   return (
