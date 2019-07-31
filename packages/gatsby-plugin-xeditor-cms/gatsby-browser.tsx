@@ -5,9 +5,18 @@ import {
   SidebarProvider,
   useSidebar,
   TextInput,
+  TextAreaInput,
 } from '@forestryio/xeditor-react'
 
 let cms = new CMS()
+cms.forms.addFieldPlugin({
+  name: 'text',
+  Component: TextInput,
+})
+cms.forms.addFieldPlugin({
+  name: 'textarea',
+  Component: TextAreaInput,
+})
 
 export const wrapRootElement = ({ element }: any) => {
   return (
