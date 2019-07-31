@@ -45,7 +45,11 @@ export const Sidebar = () => {
     >
       <>
         <RootElement />
-        <SidebarHeader>Header</SidebarHeader>
+        <SidebarHeader>
+          <ForestryLogo />
+          {/* TODO: Set site name dynamically */}
+          <SiteName>Gatsby Starter Blog</SiteName>
+        </SidebarHeader>
         <FieldsWrapper>
           {!forms.length ? (
             <NoFormsPlaceholder />
@@ -92,16 +96,35 @@ const NoFieldsPlaceholder = () => (
 )
 
 // Styling
+const ForestryLogoFile = require('../assets/forestry-logo.svg')
 const HeaderHeight = 4
 const FooterHeight = 3
 
 const SidebarHeader = styled.div`
+  display: flex;
+  align-items: center;
   position: absolute;
   left: 0;
   top: 0;
   width: 100%;
   height: ${HeaderHeight}rem;
   border-bottom: 1px solid #efefef;
+`
+
+const ForestryLogo = styled.div`
+  height: ${HeaderHeight}rem;
+  width: ${HeaderHeight}rem;
+  border-right: 1px solid #efefef;
+  background-image: url(${ForestryLogoFile});
+  background-size: 40%;
+  background-repeat: no-repeat;
+  background-position: center;
+  margin-right: 1rem;
+`
+
+const SiteName = styled.h3`
+  font-size: 0.8rem;
+  font-weight: 500;
 `
 
 const FieldsWrapper = styled.div`
@@ -111,7 +134,8 @@ const FieldsWrapper = styled.div`
   height: calc(100vh - (${HeaderHeight + FooterHeight}rem));
   overflow-y: auto;
   padding: 1rem;
-  ul, li {
+  ul,
+  li {
     margin: 0;
     padding: 0;
     list-style: none;
