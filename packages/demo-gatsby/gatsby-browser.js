@@ -15,14 +15,15 @@ const FieldRegistrar = ({ children }) => {
 
   React.useEffect(() => {
     if (firstRender) {
-      cms.forms.addFieldPlugin({
-        name: "text",
-        Component: TextInput,
-      })
-      cms.forms.addFieldPlugin({
-        name: "textarea",
-        Component: TextAreaInput,
-      })
+      //override any fields here
+      // cms.forms.addFieldPlugin({
+      //   name: "text",
+      //   Component: TextInput,
+      // })
+      // cms.forms.addFieldPlugin({
+      //   name: "textarea",
+      //   Component: TextAreaInput,
+      // })
     }
     firstRender = false
   }, [])
