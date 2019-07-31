@@ -26,7 +26,7 @@ import { CMS } from '@forestryio/cms'
 let cms = new CMS()
 ```
 
-Add fields plugins:
+### Add fields plugins:
 
 ```javascript
 cms.forms.addFieldPlugin({
@@ -43,7 +43,17 @@ cms.forms.addFieldPlugin({
 
 ```
 
-Register a new form:
+### Field Plugin Props
+
+```
+- input: [See Input Props here](https://github.com/final-form/react-final-form#fieldrenderprops)
+- meta: [See Meta Props here](https://github.com/final-form/react-final-form#fieldrenderprops)
+- field:
+  - name: string;
+  - component: React.FC<any> | string;
+```
+
+### Register a new form:
 
 ```javascript
 let form = cms.forms.createForm({
