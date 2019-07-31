@@ -5,7 +5,6 @@ export type a = React.DetailedHTMLProps<
   HTMLInputElement
 >
 export interface InputProps extends a {
-  fluid?: boolean
   error?: boolean
   ref?: any
 }
@@ -14,6 +13,7 @@ export const TextField = styled.input`
   border: 1px solid #eaeaea;
   border-radius: 0.3rem;
   height: 2rem;
+  width: 100%;
   font-size: 0.9rem;
   padding: 0 0.5rem;
   margin: 0;
