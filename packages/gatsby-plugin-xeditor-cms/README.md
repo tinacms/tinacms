@@ -106,3 +106,89 @@ class BlogPostTemplate extends React.Component {
   }
 }
 ```
+
+### Registering custom field plugins:
+
+Additional custom fields can be registered to customize how fields are displayed in the sidebar. This can be done anywhere in your layout.
+
+You may want to register your fields inside wrapPageElement to ensure they are registered for all pages on your site.
+
+```javascript
+//gatsby-browser.js
+import * as React from 'react'
+import { useCMS } from '@forestryio/cms-react'
+
+export const wrapPageElement = ({ element }) => {
+  return <FieldRegistrar>{element}</FieldRegistrar>
+}
+
+let firstRender = true
+const FieldRegistrar = ({ children }) => {
+  const cms = useCMS()
+
+  React.useEffect(() => {
+    if (firstRender) {
+      cms.forms.addFieldPlugin({
+        name: 'short-text',
+        Component: ShortTextField,
+      })
+    }
+    firstRender = false
+  }, [])
+
+  return children
+}
+```
+
+### Using your custom field plugins:
+
+Any fields with an unspecified field type will default to the 'text' component.
+
+To customize the component type of your fields using `RemarkForm`, you can pass in `formOverrrides`.
+
+Using the useRemark hook:
+
+```javascript
+function BlogPostTemplate(props) {
+  const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
+    fields: [{ name: 'frontmatter.title', component: 'short-text' }],
+  })
+
+  return <h1>{markdownRemark.frontmatter.title}</h1>
+}
+```
+
+Using the RemarkForm renderProps approach:
+
+```javascript
+import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor-cms'
+
+class BlogPostTemplate extends React.Component {
+  render() {
+    return (
+      <RemarkForm
+        remark={this.props.data.markdownRemark}
+        formOverrrides={[
+          { name: 'frontmatter.title', component: 'short-text' },
+        ]}
+      >
+        {({ markdownRemark }) => {
+          return <h1>{markdownRemark.frontmatter.title}</h1>
+        }}
+      </RemarkForm>
+    )
+  }
+}
+```
+
+Additionally, you can also just pass in the component itself instead of its id
+
+```javascript
+function BlogPostTemplate(props) {
+  const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
+    fields: [{ name: 'frontmatter.title', component: ShortText }],
+  })
+
+  return <h1>{markdownRemark.frontmatter.title}</h1>
+}
+```
