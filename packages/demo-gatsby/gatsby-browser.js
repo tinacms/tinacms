@@ -1,7 +1,7 @@
 // custom typefaces
 import "typeface-montserrat"
 import "typeface-merriweather"
-import { TextInput } from "@forestryio/xeditor-react"
+import { TextInput, TextAreaInput } from "@forestryio/xeditor-react"
 import * as React from "react"
 import { useCMS } from "@forestryio/cms-react"
 
@@ -21,9 +21,7 @@ const FieldRegistrar = ({ children }) => {
       })
       cms.forms.addFieldPlugin({
         name: "textarea",
-        Component: props => {
-          return <textarea {...props.input} />
-        },
+        Component: TextAreaInput,
       })
     }
     firstRender = false
