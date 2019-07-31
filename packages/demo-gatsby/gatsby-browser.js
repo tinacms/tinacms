@@ -19,6 +19,12 @@ const FieldRegistrar = ({ children }) => {
         name: "text",
         Component: TextInput,
       })
+      cms.forms.addFieldPlugin({
+        name: "textarea",
+        Component: props => {
+          return <textarea {...props.input} />
+        },
+      })
     }
     firstRender = false
   }, [])
