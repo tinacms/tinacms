@@ -4,8 +4,10 @@ import {
   SidebarProvider,
   useSidebar,
   TextInput,
+  TextAreaInput,
 } from '@forestryio/xeditor-react'
 import { cms } from './index'
+
 
 export const wrapRootElement = ({ element }: any) => {
   return (
