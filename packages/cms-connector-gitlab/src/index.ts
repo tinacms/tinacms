@@ -1,4 +1,6 @@
 import { GitlabAuth } from './auth'
+import { GitlabAPI } from './api'
+import { API } from '@forestryio/cms'
 
 type GitlabConnectorConfig = {
   apiBaseURI?: string
@@ -7,10 +9,10 @@ type GitlabConnectorConfig = {
   repositoryID: string
 }
 
-export class GitlabConnector {
+export class GitlabConnector implements API {
   apiBaseURI: string
   auth: GitlabAuth
-  repositoryID: string
+  api: GitlabAPI
 
   constructor(config: GitlabConnectorConfig) {
     this.apiBaseURI = config.apiBaseURI
@@ -21,78 +23,30 @@ export class GitlabConnector {
       appID: config.appID,
       redirectURI: config.redirectURI,
     })
-    this.repositoryID = encodeURIComponent(config.repositoryID)
+    this.api = new GitlabAPI({
+      apiBaseURI: this.apiBaseURI,
+      repositoryID: encodeURIComponent(config.repositoryID),
+      auth: this.auth,
+    })
   }
 
   bootstrap() {
     this.auth.listenForCallback()
   }
 
-  login() {
-    this.auth.login()
+  isAuthorized() {
+    return this.auth.isLoggedIn()
   }
 
-  getContents(file: string) {
-    return new Promise((resolve, reject) => {
-      fetch(
-        `${this.apiBaseURI}api/v4/projects/${
-          this.repositoryID
-        }/repository/files/${encodeURIComponent(file)}`,
-        {
-          redirect: 'follow',
-          method: 'GET',
-          headers: this.auth.authHeaders(),
-        }
-      )
-        .then((response: any) => {
-          if (!response.ok) {
-            reject(new Error('API Error'))
-          }
-          let data = response.json()
-          resolve(data.content)
-        })
-        .catch((err: any) => {
-          reject(err)
-        })
-    })
+  authorize() {
+    return this.auth.login()
   }
 
-  save(filePath: string, contents: string) {
-    return new Promise((resolve, reject) => {
-      fetch(
-        `${this.apiBaseURI}api/v4/projects/${
-          this.repositoryID
-        }/repository/commits`,
-        {
-          redirect: 'follow',
-          method: 'POST',
-          headers: {
-            'Content-Type': 'application/json',
-            ...this.auth.authHeaders(),
-          },
-          body: JSON.stringify({
-            branch: 'master',
-            commit_message: 'Update from xeditor',
-            actions: [
-              {
-                action: 'update',
-                file_path: filePath,
-                content: contents,
-              },
-            ],
-          }),
-        }
-      )
-        .then((response: any) => {
-          if (!response.ok) {
-            reject(new Error('Api Error'))
-          }
-          let data = response.json()
-          resolve(data.id)
-        })
-        .catch((err: any) => {
-          reject(err)
-        })
-    })
+  removeAuthorization() {
+    this.auth.logout()
+  }
+
+  onSubmit(data: { filepath: string; contents: string }) {
+    return this.api.save(data.filepath, data.contents)
   }
 }

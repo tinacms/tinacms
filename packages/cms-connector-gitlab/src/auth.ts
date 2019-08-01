@@ -32,7 +32,7 @@ export class GitlabAuth {
 
   isLoggedIn() {
     let token = this.tokenStore.getValue()
-    return token && token.length > 0
+    return !!token && token.length > 0
   }
 
   login() {
@@ -43,7 +43,11 @@ export class GitlabAuth {
     window.open(authUrl, '_blank')
   }
 
-  authHeaders() {
+  logout() {
+    this.tokenStore.setValue('')
+  }
+
+  headers() {
     return {
       Authorization: `Bearer ${this.tokenStore.getValue()}`,
     }

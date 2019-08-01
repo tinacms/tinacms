@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { GitlabConnector } from '@forestryio/cms-connector-gitlab'
 import { GitlabContext } from './index'
+import { cms } from '@forestryio/gatsby-plugin-xeditor-cms'
 
 let gitlab: GitlabConnector
 export const wrapRootElement = ({ element }: any) => {
@@ -17,5 +18,7 @@ export const onClientEntry = (_: any, pluginOptions: any) => {
     //   redirectURI: 'http://localhost:8000/?auth-gitlab',
     //   repositoryID: 'USER/REPO',
   })
+
   gitlab.bootstrap()
+  cms.registerApi('gitlab', gitlab)
 }

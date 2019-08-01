@@ -18,6 +18,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
+    "@forestryio/cms": "^1.0.1-alpha.4",
     "@forestryio/persistent-session-storage": "^0.1.0"
   }
 }
