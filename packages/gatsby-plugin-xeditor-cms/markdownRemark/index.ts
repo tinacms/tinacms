@@ -1,5 +1,5 @@
 import { Form, FormOptions } from '@forestryio/cms'
-import { useCMSForm } from '@forestryio/cms-react'
+import { useCMSForm, useCMS } from '@forestryio/cms-react'
 import {
   ERROR_MISSING_CMS_GATSBY,
   ERROR_MISSING_REMARK_ID,
@@ -34,8 +34,10 @@ export function useRemarkForm(
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
   try {
-    let throttledWriteToDisk = useMemo(() => {
-      return throttle(writeToDisk, timeout)
+    let cms = useCMS()
+
+    let throttledOnChange = useMemo(() => {
+      return throttle(cms.api.git.onChange, timeout)
     }, [timeout])
 
     let [values, form] = useCMSForm({
@@ -56,7 +58,7 @@ export function useRemarkForm(
       if (!form) return
       return form.subscribe(
         (formState: any) => {
-          throttledWriteToDisk(formState.values)
+          throttledOnChange(formState.values)
         },
         { values: true }
       )
@@ -95,23 +97,6 @@ export function RemarkForm({
   let [markdownRemark, form] = useRemarkForm(remark, options, timeout)
 
   return render({ form, markdownRemark })
-}
-
-function writeToDisk(data: any) {
-  // @ts-ignore
-  return fetch('http://localhost:4567/markdownRemark', {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    body: JSON.stringify(data),
-  })
-    .then(response => {
-      console.log(response.json())
-    })
-    .catch(e => {
-      console.error(e)
-    })
 }
 
 export function toMarkdownString(remark: RemarkNode) {
