@@ -11,6 +11,15 @@ module.exports = {
   plugins: [
     "@forestryio/gatsby-plugin-xeditor-cms",
     {
+      resolve: "@forestryio/gatsby-xeditor-gitlab",
+      options: {
+        appID:
+          "5eaf309d8dac09519bdcd2f9ce0fec494cfac21b7c7d2568553538696f15ba61",
+        redirectURI: "http://localhost:8000/?auth-gitlab",
+        repositoryID: "dwalkr/xtest",
+      },
+    },
+    {
       resolve: `gatsby-source-filesystem`,
       options: {
         path: `${__dirname}/content/blog`,
