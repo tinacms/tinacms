@@ -15,6 +15,6 @@ export interface API {
   onSubmit?(data: any): any
   onChange?(data: any): any
   isAuthorized(): boolean
-  authorize(): any
+  authorize(): Promise<any>
   removeAuthorization(): any
 }
