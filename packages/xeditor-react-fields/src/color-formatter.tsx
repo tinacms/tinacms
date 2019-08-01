@@ -8,8 +8,8 @@ export interface ColorRGBA {
 }
 
 export enum ColorFormat {
-  Hex = 'Hex',
-  RGB = 'RGB',
+  Hex = 'hex',
+  RGB = 'rgb',
 }
 
 interface ColorFormatHandler {

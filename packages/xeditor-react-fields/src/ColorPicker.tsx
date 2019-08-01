@@ -89,6 +89,9 @@ interface State {
 const nullColor = 'transparent'
 
 export class ColorPicker extends React.Component<Props, State> {
+  static defaultProps = {
+    colorFormat: ColorFormat.Hex,
+  }
   presetColors = [
     '#D0021B',
     '#F5A623',
@@ -111,6 +114,10 @@ export class ColorPicker extends React.Component<Props, State> {
     displayColorPicker: false,
   }
 
+  get colorFormat() {
+    return (this.props.colorFormat || ColorFormat.Hex).toLowerCase()
+  }
+
   handleClick = () => {
     this.setState({ displayColorPicker: !this.state.displayColorPicker })
   }
@@ -124,13 +131,13 @@ export class ColorPicker extends React.Component<Props, State> {
       ? null
       : { ...pickerColor.rgb, a: 1 }) as ColorRGBA | null
     this.props.input.onChange(
-      color ? ColorFormatter[this.props.colorFormat].getValue(color) : null
+      color ? ColorFormatter[this.colorFormat].getValue(color) : null
     )
   }
 
   get colorRGBA() {
     return this.props.input.value
-      ? ColorFormatter[this.props.colorFormat].parse(this.props.input.value)
+      ? ColorFormatter[this.colorFormat].parse(this.props.input.value)
       : null
   }
 
@@ -140,7 +147,7 @@ export class ColorPicker extends React.Component<Props, State> {
         <Swatch
           onClick={this.handleClick}
           colorRGBA={this.colorRGBA}
-          colorFormat={this.props.colorFormat}
+          colorFormat={this.colorFormat}
         />
         {this.state.displayColorPicker ? (
           <Popover>
