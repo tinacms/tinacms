@@ -36,11 +36,23 @@ export class GitlabAuth {
   }
 
   login() {
-    const authUrl = `${this.apiBaseURI}/oauth/authorize?client_id=${
-      this.appID
-    }&redirect_uri=${encodeURIComponent(this.redirectURI)}&response_type=token`
+    return new Promise((resolve, reject) => {
+      const authUrl = `${this.apiBaseURI}/oauth/authorize?client_id=${
+        this.appID
+      }&redirect_uri=${encodeURIComponent(
+        this.redirectURI
+      )}&response_type=token`
 
-    window.open(authUrl, '_blank')
+      let authWindow = window.open(authUrl, '_blank')
+      console.log(authWindow)
+      if (!authWindow) {
+        reject()
+      } else {
+        authWindow.onbeforeunload = () => {
+          resolve()
+        }
+      }
+    })
   }
 
   logout() {
