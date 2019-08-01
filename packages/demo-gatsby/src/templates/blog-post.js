@@ -5,12 +5,23 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { RemarkForm } from "@forestryio/gatsby-plugin-xeditor-cms"
+import {
+  RemarkForm,
+  toMarkdownString,
+} from "@forestryio/gatsby-plugin-xeditor-cms"
+import { useCMS } from "@forestryio/cms-react"
+import { relative } from "path"
 
 function BlogPostTemplate(props) {
   const staticPost = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
+
+  let cms = useCMS()
+  let filepath = relative(
+    "/home/dj/Forestry/cms/packages/demo-gatsby/",
+    staticPost.fileAbsolutePath
+  )
 
   return (
     <RemarkForm
@@ -31,6 +42,17 @@ function BlogPostTemplate(props) {
             >
               {post.frontmatter.title}
             </h1>
+            <button onClick={() => cms.api.gitlab.authorize()}>Login</button>
+            <button
+              onClick={() =>
+                cms.api.gitlab.onSubmit({
+                  path: filepath,
+                  contents: toMarkdownString(post),
+                })
+              }
+            >
+              Save
+            </button>
             <p
               style={{
                 ...scale(-1 / 5),
