@@ -46,7 +46,7 @@ export class GitlabConnector implements API {
     this.auth.logout()
   }
 
-  onSubmit(data: { filepath: string; contents: string }) {
-    return this.api.save(data.filepath, data.contents)
+  onSubmit(data: { path: string; contents: string }) {
+    return this.api.save(data.path, data.contents)
   }
 }
