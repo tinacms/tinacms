@@ -43,11 +43,12 @@ The core packages are a set of generally used for building CMSs.
 
 XEditor is a CMS for React with an emphasis on Gatsby support.
 
-| XEditor Package                         | Description                                       |
-| --------------------------------------- | ------------------------------------------------- |
-| `@forestryio/xeditor-react`             | A CMS UI that shows up in a sidebar on your site. |
-| `@forestryio/xeditor-react-fields`      | A collection of Field Plugins for `xeditor`       |
-| `@forestryio/gatsby-plugin-xeditor-cms` | A Gatsby plugin for setting up a `xeditor`        |
+| XEditor Package                         | Description                                                     |
+| --------------------------------------- | --------------------------------------------------------------- |
+| `@forestryio/xeditor-react`             | A CMS UI that shows up in a sidebar on your site.               |
+| `@forestryio/xeditor-react-fields`      | A collection of Field Plugins for `xeditor`                     |
+| `@forestryio/gatsby-plugin-xeditor-cms` | A Gatsby plugin for setting up a `xeditor`                      |
+| `@forestryio/gatsby-xeditor-git`        | A `gatsby-xeditor` plugin for saving changes to the local repo. |
 
 ### Demo Projects
 
