@@ -6,6 +6,7 @@ import {
   useSidebar,
   TextInput,
   TextAreaInput,
+  ColorPickerField,
 } from '@forestryio/xeditor-react'
 
 let cms = new CMS()
@@ -16,6 +17,10 @@ cms.forms.addFieldPlugin({
 cms.forms.addFieldPlugin({
   name: 'textarea',
   Component: TextAreaInput,
+})
+cms.forms.addFieldPlugin({
+  name: 'color',
+  Component: ColorPickerField,
 })
 
 export const wrapRootElement = ({ element }: any) => {
