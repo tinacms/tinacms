@@ -110,7 +110,7 @@ const SidebarHeader = styled.div`
   top: 0;
   width: 100%;
   height: ${HeaderHeight}rem;
-  padding: 0 1rem;
+  padding: 1rem 1rem 0 1rem;
   /* border-bottom: 1px solid #efefef; */
 `
 
