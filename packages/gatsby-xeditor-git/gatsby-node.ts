@@ -3,7 +3,7 @@ import * as cors from 'cors'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 
-export function markdownRemarkServer() {
+exports.onPreBootstrap = () => {
   let app = express()
 
   app.use(
@@ -32,10 +32,3 @@ export function markdownRemarkServer() {
     console.log('------------------------------------------')
   })
 }
-
-/**
-
-/git/push
-/git/pull
-
-*/
