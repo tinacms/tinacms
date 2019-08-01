@@ -58,7 +58,10 @@ export function useRemarkForm(
       if (!form) return
       return form.subscribe(
         (formState: any) => {
-          throttledOnChange(formState.values)
+          throttledOnChange({
+            fileAbsolutePath: formState.values.fileAbsolutePath,
+            content: toMarkdownString(formState.values),
+          })
         },
         { values: true }
       )

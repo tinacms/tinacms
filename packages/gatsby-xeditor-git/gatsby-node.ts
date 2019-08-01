@@ -17,13 +17,8 @@ exports.onPreBootstrap = () => {
   app.use(express.json())
 
   app.put('/markdownRemark', (req, res) => {
-    let contents =
-      '---\n' +
-      yaml.dump(req.body.frontmatter) +
-      '---\n' +
-      req.body.rawMarkdownBody
-    res.send(contents)
-    fs.writeFileSync(req.body.fileAbsolutePath, contents)
+    fs.writeFileSync(req.body.fileAbsolutePath, req.body.content)
+    res.send(req.body.content)
   })
 
   app.listen(4567, () => {
