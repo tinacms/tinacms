@@ -10,6 +10,7 @@ module.exports = {
   },
   plugins: [
     "@forestryio/gatsby-plugin-xeditor-cms",
+    "@forestryio/gatsby-xeditor-git",
     {
       resolve: "@forestryio/gatsby-xeditor-gitlab",
       options: {
