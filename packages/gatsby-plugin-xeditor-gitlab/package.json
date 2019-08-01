@@ -13,6 +13,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@forestryio/cms-connector-gitlab": "0.1.0"
+    "@forestryio/cms-connector-gitlab": "0.1.0",
+    "@forestryio/gatsby-plugin-xeditor-cms": "^0.1.1-alpha.13"
   }
 }
