@@ -1,6 +1,6 @@
 import styled, { css } from 'styled-components'
 
-export type a = React.DetailedHTMLProps<
+type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
   HTMLInputElement
 >
