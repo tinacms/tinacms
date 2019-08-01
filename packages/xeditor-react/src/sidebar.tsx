@@ -40,7 +40,7 @@ export const Sidebar = () => {
         margin: '0',
         padding: '0',
         border: '0',
-        borderRight: '2px solid #efefef',
+        borderRight: '1px solid #efefef',
       }}
     >
       <>
@@ -49,6 +49,7 @@ export const Sidebar = () => {
           <ForestryLogo />
           {/* TODO: Set site name dynamically */}
           <SiteName>Gatsby Starter Blog</SiteName>
+          <ActionsToggle />
         </SidebarHeader>
         <FieldsWrapper>
           {!forms.length ? (
@@ -97,7 +98,8 @@ const NoFieldsPlaceholder = () => (
 
 // Styling
 const ForestryLogoFile = require('../assets/forestry-logo.svg')
-const HeaderHeight = 4
+const EllipsisVertical = require('../assets/ellipsis-v.svg')
+const HeaderHeight = 6
 const FooterHeight = 3
 
 const SidebarHeader = styled.div`
@@ -108,15 +110,16 @@ const SidebarHeader = styled.div`
   top: 0;
   width: 100%;
   height: ${HeaderHeight}rem;
-  border-bottom: 1px solid #efefef;
+  padding: 0 1rem;
+  /* border-bottom: 1px solid #efefef; */
 `
 
 const ForestryLogo = styled.div`
   height: ${HeaderHeight}rem;
-  width: ${HeaderHeight}rem;
-  border-right: 1px solid #efefef;
+  width: 2rem;
+  /* border-right: 1px solid #efefef; */
   background-image: url(${ForestryLogoFile});
-  background-size: 40%;
+  background-size: 2rem;
   background-repeat: no-repeat;
   background-position: center;
   margin-right: 1rem;
@@ -125,6 +128,23 @@ const ForestryLogo = styled.div`
 const SiteName = styled.h3`
   font-size: 0.8rem;
   font-weight: 500;
+`
+
+const ActionsToggle = styled.button`
+  background: transparent;
+  outline: none;
+  border: 0;
+  width: 2rem;
+  height: ${HeaderHeight}rem;
+  margin-left: auto;
+  background-image: url(${EllipsisVertical});
+  background-position: center;
+  background-repeat: no-repeat;
+  background-size: 0.3rem;
+  transition: opacity 0.15s;
+  &:hover {
+    opacity: 0.6;
+  }
 `
 
 const FieldsWrapper = styled.div`
@@ -161,6 +181,10 @@ const SaveButton = styled.button`
   color: white;
   font-weight: 500;
   cursor: pointer;
+  transition: opacity 0.15s;
+  &:hover {
+    opacity: 0.6;
+  }
 `
 
 const RootElement = createGlobalStyle`
