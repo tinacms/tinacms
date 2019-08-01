@@ -13,6 +13,7 @@
     "@forestryio/cms-react": "^0.1.1-alpha.4",
     "@forestryio/gatsby-plugin-xeditor-cms": "^0.1.1-alpha.12",
     "@forestryio/xeditor-react": "^1.0.1-alpha.7",
+    "@forestryio/gatsby-xeditor-gitlab": "^0.0.0",
     "@types/react": "^16.8.23",
     "gatsby": "^2.13.34",
     "gatsby-image": "^2.2.6",
