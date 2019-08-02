@@ -2,14 +2,14 @@
 
 Creating forms for editing content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by two plugins:
 
-- `gatsby-xeditor-remark`: Provides hooks and components for creating forms for Remark nodes.
-- `gatsby-xeditor-git`: Creates a node server that writes can write to the local filesystem,
+- `gatsby-xeditor-remark`: Provides hooks and components for creating Remark forms.
+- `gatsby-xeditor-git`: Creates a node server that writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
 ## Installation
 
 ```
-npm install -g @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
+npm install --save @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
 ```
 
 or
@@ -35,14 +35,15 @@ module.exports = {
 
 ## Creating Remark Forms
 
-In order to edit a markdown file, you must register a form with the CMS. There are two ways to register remark forms with the CMS, depending on how your React template is setup.
+In order to edit a markdown file, you must register a form with the CMS. There are two approachs to registering Remark Forms with the XEditor. The approach you choose depends on whether the React template is class or function.
 
-1. [`useRemarkForm`](#useRemarkForm): A [Hook](https://reactjs.org/docs/hooks-intro.html). Used when the page template is a function component.
-1. [`RemarkForm`](#RemarkForm): A [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) component. Used when the page template is a class component.
+1. [`useRemarkForm`](#useRemarkForm): A [Hook](https://reactjs.org/docs/hooks-intro.html) used when the template is a function.
+1. [`RemarkForm`](#RemarkForm): A [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) component to use when the template is a class component.
 
 ### useRemarkForm
 
-This is a React hook for registering Remark forms with the CMS. This is the recommended approach if your template is Function Components
+This is a [React Hook](https://reactjs.org/docs/hooks-intro.html) for registering Remark Forms with the CMS.
+This is the recommended approach if your template is a Function Component.
 
 **Interface**
 
@@ -52,13 +53,13 @@ useRemarkForm(remark): [values, form]
 
 **Arguments**
 
-- `remark`: the data returned from a Gatsby `markdownRemark` query.
+- `remark`: The data returned from a Gatsby `markdownRemark` query.
 
 **Return**
 
 - `[values, form]`
-  - `values`: The current values to be displayed. This has the same shape as the `markdownRemark` data.
-  - `form`: A reference to the `Form`. See `@forestryio/cms` for more details.
+  - `values`: The current values to be displayed. This has the same shape as the `remark` argument.
+  - `form`: A reference to the [CMS Form](../concepts/forms.md) object. The `form` is rarely needed in the template.
 
 **src/templates/blog-post.js**
 
@@ -74,16 +75,18 @@ function BlogPostTemplate(props) {
 
 ### RemarkForm
 
-`RemarkForm` is a [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) based component for accessing CMS Forms.
+`RemarkForm` is a [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns)
+based component for accessing [CMS Forms](../concepts/forms.md).
 
-This is a thin wrapper around `useRemarkForm`. Since React [Hooks](https://reactjs.org/docs/hooks-intro.html) are only available within Function Components you may need to use `RemarkForm` instead of calling `useRemarkForm` directly.
+This Component is a thin wrapper of `useRemarkForm`. Since React[Hooks](https://reactjs.org/docs/hooks-intro.html) are
+only available within Function Components you will wneed to use `RemarkForm` if your template is Class Component.
 
 **Props**
 
-- `remark`: the data returned from a Gatsby `markdownRemark` query.
-- `render({ markdownRemark, form}): JSX.Element`: A function that returns JSX elements
+- `remark`: The data returned from a Gatsby `markdownRemark` query.
+- `render({ markdownRemark, form }): JSX.Element`: A function that returns JSX elements
   - `markdownRemark`: The current values to be displayed. This has the same shape as the data in the `remark` prop.
-  - `form`: A reference to the `Form`. See `@forestryio/cms` for more details.
+  - `form`: A reference to the [CMS Form](../concepts/forms.md) object. The `form` is rarely needed in the template.
 
 **src/templates/blog-post.js**
 

@@ -5,7 +5,7 @@ This is a guide on how to setup the XEditor CMS on an existing Gatsby site.
 ## Installation
 
 ```
-npm install -g @forestryio/gatsby-plugin-xeditor
+npm install --save @forestryio/gatsby-plugin-xeditor
 ```
 
 or
