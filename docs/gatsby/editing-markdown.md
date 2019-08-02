@@ -1,6 +1,10 @@
 # Editing Markdown in Gatsby
 
-The `gatsby-xeditor-remark` plugin makes it easy to create forms for editing content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin.
+Creating forms for editing content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by two plugins:
+
+- `gatsby-xeditor-remark`: Provides hooks and components for creating forms for Remark nodes.
+- `gatsby-xeditor-git`: Creates a node server that writes can write to the local filesystem,
+  and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
 ## Installation
 
@@ -99,6 +103,19 @@ class BlogPostTemplate extends React.Component {
   }
 }
 ```
+
+## Editing Content
+
+With the Remark Form created, you can now edit the files in the XEditor sidebar. Changes to the form
+will be written back to the markdown files in real time.
+
+**Why write to disk "on change"?**
+
+This allows any `gatsby-remark-*` plugins to properly transform the data in to a remark node and
+provide a true-fidelity preview of the changes.
+
+Without this behaviour, producing a true-fidelity preview of the changes would require the frontend
+to replicate all transformations applied to the Markdown files by the gatsby transformers.
 
 ## Customizing Remark Forms
 
