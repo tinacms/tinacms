@@ -125,7 +125,7 @@ The `config` is an optional object for overriding the default configuration of a
 
 - `name`: The path to some value in the data being edited. (e.g. `frontmatter.tittle`)
 - `component`: The name of the React component that should be used to edit this field.
-  The default options are `text`, `textarea`, `color`.
+  The default options are: `"text"`, `"textarea"`, `"color"`.
 - `label`: A human readable label for the field.
 
 ```javascript
@@ -172,6 +172,7 @@ function BlogPostTemplate(props) {
   })
 
   return (
+
   <h1>{markdownRemark.frontmatter.title}</h1>
   <p>{markdownRemark.frontmatter.description}</p>
   )
