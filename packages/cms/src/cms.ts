@@ -14,7 +14,7 @@ export class CMS {
 export interface API {
   onSubmit?(data: any): any
   onChange?(data: any): any
-  isAuthorized(): boolean
-  authorize(): any
-  removeAuthorization(): any
+  isAuthenticated(): boolean
+  authenticate(): Promise<any>
+  removeAuthentication(): any
 }
