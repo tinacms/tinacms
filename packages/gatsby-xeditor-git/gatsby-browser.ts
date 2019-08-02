@@ -4,11 +4,9 @@ cms.registerApi('git', {
   onChange(data: any) {
     writeToDisk(data)
   },
-  isAuthorized() {
+  isAuthenticated() {
     return true
   },
-  async authorize() {},
-  async removeAuthorization() {},
 })
 
 function writeToDisk(data: any) {
