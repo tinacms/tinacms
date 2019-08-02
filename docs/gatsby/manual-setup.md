@@ -1,6 +1,6 @@
 # Manual Setup
 
-TODO: This doc will describe how to setup the CMS in an existing Gatsby site.
+This is a guide on how to setup the XEditor CMS on an existing Gatsby site.
 
 ## Installation
 
