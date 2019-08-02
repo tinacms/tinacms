@@ -34,15 +34,15 @@ export class GitlabConnector implements API {
     this.auth.listenForCallback()
   }
 
-  isAuthorized() {
+  isAuthenticated() {
     return this.auth.isLoggedIn()
   }
 
-  authorize() {
+  authenticate() {
     return this.auth.login()
   }
 
-  removeAuthorization() {
+  removeAuthentication() {
     this.auth.logout()
   }
 
