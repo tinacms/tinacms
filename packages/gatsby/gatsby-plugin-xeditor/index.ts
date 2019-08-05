@@ -3,7 +3,7 @@ import {
   TextInput,
   TextAreaInput,
   ColorPickerField,
-} from '@forestryio/xeditor-react'
+} from '@forestryio/xeditor'
 
 export let cms = new CMS()
 

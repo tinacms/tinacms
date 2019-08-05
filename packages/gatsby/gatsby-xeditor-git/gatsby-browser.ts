@@ -1,4 +1,4 @@
-import { cms } from '@forestryio/gatsby-plugin-xeditor-cms'
+import { cms } from '@forestryio/gatsby-plugin-xeditor'
 
 cms.registerApi('git', {
   onChange(data: any) {
