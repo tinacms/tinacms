@@ -33,6 +33,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
+    "@sambego/storybook-styles": "^1.0.0",
     "color-string": "^1.5.3",
     "react-color": "^2.17.3",
     "styled-components": "^4.3.2"
