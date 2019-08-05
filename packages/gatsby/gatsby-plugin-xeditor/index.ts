@@ -5,8 +5,6 @@ import {
   ColorPickerField,
 } from '@forestryio/xeditor'
 
-export * from './markdownRemark'
-
 export let cms = new CMS()
 
 cms.forms.addFieldPlugin({ name: 'text', Component: TextInput })

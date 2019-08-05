@@ -5,9 +5,10 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { RemarkForm, toMarkdownString } from "@forestryio/gatsby-plugin-xeditor"
+import { toMarkdownString } from "@forestryio/gatsby-plugin-xeditor"
 import { useCMS } from "@forestryio/cms-react"
 import { relative } from "path"
+import { RemarkForm } from "@forestryio/gatsby-xeditor-remark"
 
 function BlogPostTemplate(props) {
   const staticPost = props.data.markdownRemark
@@ -16,7 +17,7 @@ function BlogPostTemplate(props) {
 
   let cms = useCMS()
   let filepath = relative(
-    "/home/dj/Forestry/cms/packages/demo-gatsby/",
+    "/home/dj/Forestry/cms/packages/demo/demo-gatsby/",
     staticPost.fileAbsolutePath
   )
 
