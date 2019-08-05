@@ -21,15 +21,16 @@ import { CMS } from '@forestryio/cms'
 
 let cms = new CMS()
 
-cms.fields.register({
+cms.forms.addFieldPlugin({
   name: 'text',
   Component({ input, meta, field }) {
     return (
-      <>
-        <label htmlFor={field.name}>{field.label | field.name}</label>
-        <input type="text" {...input} />
+      <div>
+        <label htmFor={input.name}>{field.label || field.name}</label>
+        <div>{field.description}</div>
+        <input type="email" {...input} />
         <div class="field-error">{meta.error}</div>
-      </>
+      </div>
     )
   },
 })
@@ -37,4 +38,5 @@ cms.fields.register({
 
 ## Further Reading
 
-- [Adding Fields in Gatsby](../gatsby/custom-field-plugins.md)
+- [Field Plugin](../concepts/field-plugins.md)
+- [Registering Fields in Gatsby](../gatsby/custom-field-plugins.md)
