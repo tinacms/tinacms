@@ -4,7 +4,7 @@ import {
   ERROR_MISSING_CMS_GATSBY,
   ERROR_MISSING_REMARK_ID,
   ERROR_MISSING_REMARK_PATH,
-} from '../errors'
+} from './errors'
 import { useEffect, useMemo } from 'react'
 import * as yaml from 'js-yaml'
 
