@@ -13,12 +13,12 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
+    "cms-scripts": "^0.1.1-alpha.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
     "@forestryio/cms": "^1.0.1-alpha.5",
-    "@forestryio/cms-react": "^0.1.1-alpha.5",
-    "cms-scripts": "^0.1.1-alpha.2"
+    "@forestryio/cms-react": "^0.1.1-alpha.5"
   }
 }
