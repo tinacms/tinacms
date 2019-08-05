@@ -2,6 +2,13 @@
 
 The following is a set of guidelines and tips for contributingto the Forestryio CMS and its packages.
 
+## How to Contribute
+
+- **Reporting Bugs**
+- **Suggesting Enhancements**
+- **Writing Docs, Guides, or Blog Posts**
+- **Voluntering for User Testing**
+
 ## Troubleshooting
 
 This section contains solutions to various problems you may run into when developing for the Forestryio CMS.
