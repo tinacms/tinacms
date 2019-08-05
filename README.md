@@ -4,6 +4,13 @@
 
 ## Getting Started
 
+- [Documentation](./docs/README.md)
+  - [Gatsby Starter](./gatsby/starter-setup.md)
+  - [Manual Setup](./gatsby/manual-setup.md)
+- [Contributing](./CONTRIBUTING.md)
+
+## Development
+
 To get started:
 
 ```bash
@@ -58,33 +65,6 @@ There are two demo projects:
 | ------------- | -------------------------------------------------------- |
 | `demo-cra`    | A React application bootstrapped with `create-react-app` |
 | `demo-gatsby` | Gatsby starter blog.                                     |
-
-## Contributing
-
-### Troubleshooting in Development
-
-#### I pulled down changes and now my packages won't build
-
-The links between the local packages may have been broken. If this is the problem, then
-running `npm run bootstrap` shoudl fix the issue.
-
-#### I can't add dependencies to a package
-
-Linking prevents running `npm install` from directly inside a package from working. There are two ways to get around this issue.
-
-1. **Add the package with lerna**
-
-   You can use lerna to add new dependencies to a package from the root of the repository:
-
-   ```
-   lerna add react --scope @forestryio/react-cms
-   ```
-
-   The downside of this approach is you can only add one dependency at a time. If you need to add many packages, you can use the next method.
-
-2. **Add dependencies manually, then bootstrap**
-
-   The other approach is to manually add the dependencies to the `package.json` and then run `npm run bootstrap` from the root of the repository.
 
 ## Links
 
