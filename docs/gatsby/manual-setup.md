@@ -21,7 +21,7 @@ Open your `gatsby-config.js` file and add `'@forestryio/gatsby-plugin-xeditor'` 
 ```javascript
 module.exports = {
   // ...
-  plugin: [
+  plugins: [
     '@forestryio/gatsby-plugin-xeditor',
     // ...
   ],
