@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ColorPicker } from '@forestryio/xeditor-react-fields'
+import { ColorPicker } from '@forestryio/xeditor-fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
 // TODO: `field` needs to be extensible

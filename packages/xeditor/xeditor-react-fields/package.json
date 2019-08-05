@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/xeditor-react-fields",
+  "name": "@forestryio/xeditor-fields",
   "version": "0.1.1-alpha.2",
   "main": "build/index.js",
   "types": "build/index.d.ts",
