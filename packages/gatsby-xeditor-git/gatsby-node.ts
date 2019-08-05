@@ -3,7 +3,7 @@ import * as cors from 'cors'
 import * as fs from 'fs'
 import * as yaml from 'js-yaml'
 
-export function markdownRemarkServer() {
+exports.onPreBootstrap = () => {
   let app = express()
 
   app.use(
@@ -17,13 +17,8 @@ export function markdownRemarkServer() {
   app.use(express.json())
 
   app.put('/markdownRemark', (req, res) => {
-    let contents =
-      '---\n' +
-      yaml.dump(req.body.frontmatter) +
-      '---\n' +
-      req.body.rawMarkdownBody
-    res.send(contents)
-    fs.writeFileSync(req.body.fileAbsolutePath, contents)
+    fs.writeFileSync(req.body.fileAbsolutePath, req.body.content)
+    res.send(req.body.content)
   })
 
   app.listen(4567, () => {
@@ -32,10 +27,3 @@ export function markdownRemarkServer() {
     console.log('------------------------------------------')
   })
 }
-
-/**
-
-/git/push
-/git/pull
-
-*/

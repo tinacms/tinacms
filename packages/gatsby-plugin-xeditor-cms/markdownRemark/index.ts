@@ -1,11 +1,12 @@
 import { Form, FormOptions } from '@forestryio/cms'
-import { useCMSForm } from '@forestryio/cms-react'
+import { useCMSForm, useCMS } from '@forestryio/cms-react'
 import {
   ERROR_MISSING_CMS_GATSBY,
   ERROR_MISSING_REMARK_ID,
   ERROR_MISSING_REMARK_PATH,
 } from '../errors'
 import { useEffect, useMemo } from 'react'
+import * as yaml from 'js-yaml'
 
 let throttle = require('lodash.throttle')
 
@@ -33,8 +34,10 @@ export function useRemarkForm(
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
   try {
-    let throttledWriteToDisk = useMemo(() => {
-      return throttle(writeToDisk, timeout)
+    let cms = useCMS()
+
+    let throttledOnChange = useMemo(() => {
+      return throttle(cms.api.git.onChange, timeout)
     }, [timeout])
 
     let [values, form] = useCMSForm({
@@ -55,7 +58,10 @@ export function useRemarkForm(
       if (!form) return
       return form.subscribe(
         (formState: any) => {
-          throttledWriteToDisk(formState.values)
+          throttledOnChange({
+            fileAbsolutePath: formState.values.fileAbsolutePath,
+            content: toMarkdownString(formState.values),
+          })
         },
         { values: true }
       )
@@ -67,7 +73,7 @@ export function useRemarkForm(
   }
 }
 
-function generateFields(post: RemarkNode) {
+export function generateFields(post: RemarkNode) {
   let frontmatterFields = Object.keys(post.frontmatter).map(key => ({
     component: 'text',
     name: `frontmatter.${key}`,
@@ -96,19 +102,8 @@ export function RemarkForm({
   return render({ form, markdownRemark })
 }
 
-function writeToDisk(data: any) {
-  // @ts-ignore
-  return fetch('http://localhost:4567/markdownRemark', {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    body: JSON.stringify(data),
-  })
-    .then(response => {
-      console.log(response.json())
-    })
-    .catch(e => {
-      console.error(e)
-    })
+export function toMarkdownString(remark: RemarkNode) {
+  return (
+    '---\n' + yaml.dump(remark.frontmatter) + '---\n' + remark.rawMarkdownBody
+  )
 }
