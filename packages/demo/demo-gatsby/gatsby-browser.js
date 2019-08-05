@@ -1,7 +1,7 @@
 // custom typefaces
 import "typeface-montserrat"
 import "typeface-merriweather"
-import { TextInput, TextAreaInput } from "@forestryio/xeditor-react"
+import { TextInput, TextAreaInput } from "@forestryio/xeditor"
 import * as React from "react"
 import { useCMS } from "@forestryio/cms-react"
 

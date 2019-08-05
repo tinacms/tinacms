@@ -14,6 +14,6 @@
   },
   "dependencies": {
     "@forestryio/cms-connector-gitlab": "0.1.0",
-    "@forestryio/gatsby-plugin-xeditor-cms": "^0.1.1-alpha.13"
+    "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.13"
   }
 }
