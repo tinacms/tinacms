@@ -119,6 +119,9 @@ export const pageQuery = graphql`
       html
       fileAbsolutePath
       rawMarkdownBody
+      fields {
+        fileRelativePath
+      }
       frontmatter {
         title
         date

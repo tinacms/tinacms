@@ -37,7 +37,9 @@ export const ERROR_MISSING_REMARK_PATH =
 export const pageQuery = graphql\`
   query BlogPostBySlug($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
-      fileAbsolutePath
+      fields {
+        fileRelativePath
+      }
       // etc...
     }
  }

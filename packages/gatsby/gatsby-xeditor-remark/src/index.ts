@@ -30,7 +30,10 @@ export function useRemarkForm(
     throw new Error(ERROR_MISSING_REMARK_ID)
   }
   // TODO: Only required when saving to local filesystem.
-  if (typeof markdownRemark.fileAbsolutePath === 'undefined') {
+  if (
+    typeof markdownRemark.fields === 'undefined' ||
+    typeof markdownRemark.fields.fileRelativePath === 'undefined'
+  ) {
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
   try {
@@ -59,7 +62,7 @@ export function useRemarkForm(
       return form.subscribe(
         (formState: any) => {
           throttledOnChange({
-            fileAbsolutePath: formState.values.fileAbsolutePath,
+            fileRelativePath: formState.values.fields.fileRelativePath,
             content: toMarkdownString(formState.values),
           })
         },
