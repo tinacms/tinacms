@@ -1,10 +1,16 @@
-# Custom Field Plugins
+# Custom Field Plugins in Gatsby
 
-This doc explains describes how to add fields plugins to a Gatsby site.
+This doc explains how to add custom field plugins to a Gatsby site.
 
 ## Example: An Email Field
 
-This example will contain a simple email field. Besides the required `name`, the email field definitions will also accept a `label` and a `description`.
+In this example we'll create a simple email field for our Gatsby site. Besides the required `name`, we also want the email field definition to accept a `label` and a `description`.
+
+First create the React component that accepts three props:
+
+- `input`: The data and callbacks necessary to make an input.
+- `meta`: Metadata about the field in the form. (e.g. `dirty`, `valid`)
+- `field`: The [field definition](../concepts/forms.md#field-definitions) for the current field.
 
 **src/components/EmailField.js**
 
@@ -21,7 +27,7 @@ export function EmailField({ input, meta, field }) {
 }
 ```
 
-In order to add `EmailField` as a plugin to the CMS, open your `gatsby-browser.js` and in the `onClientEntry` add the field to the `cms`.
+Open your `gatsby-browser.js` and create an `onClientEntry`. In this function, we'll use the `cms.forms.addFieldPlugin` method to register the `EmailField`.
 
 **gatsby-browser.js**
 
@@ -35,6 +41,22 @@ export const onClientEntry = () => {
     Component: EmailField,
   })
 }
+```
+
+Your field plugin can now be used in your forms!
+
+```javascript
+useRemarkForm(remark, {
+  fields: [
+    // ...
+    {
+      name: 'frontmatter.author.email',
+      component: 'email',
+      label: 'Email',
+      description: 'The email address of the author',
+    },
+  ],
+})
 ```
 
 ## Further Reading
