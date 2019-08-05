@@ -1,22 +1,22 @@
-# @forestryio/gatsby-plugin-xeditor-cms
+# @forestryio/gatsby-plugin-xeditor
 
 A Gatsby plugin for the XEditor CMS.
 
 ## Installation
 
 ```
-npm install --save @forestryio/gatsby-plugin-xeditor-cms
+npm install --save @forestryio/gatsby-plugin-xeditor
 ```
 
 or
 
 ```sh
-yarn add @forestryio/gatsby-plugin-xeditor-cms
+yarn add @forestryio/gatsby-plugin-xeditor
 ```
 
 ## Setup
 
-Include `@forestryio/gatsby-plugin-xeditor-cms` in the list of gatsby plugins:
+Include `@forestryio/gatsby-plugin-xeditor` in the list of gatsby plugins:
 
 _gatsby.config.js_
 
@@ -25,7 +25,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@forestryio/gatsby-plugin-xeditor-cms',
+    '@forestryio/gatsby-plugin-xeditor',
   ],
 }
 ```
@@ -66,7 +66,7 @@ This plugin makes it easy to edit content provided by the [`gatsby-transformer-r
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from '@forestryio/gatsby-plugin-xeditor-cms'
+import { useRemarkForm } from '@forestryio/gatsby-plugin-xeditor'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
@@ -91,7 +91,7 @@ This is a thin wrapper around `useRemarkForm`. Since React [Hooks](https://react
 **src/templates/blog-post.js**
 
 ```javascript
-import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor-cms'
+import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor'
 
 class BlogPostTemplate extends React.Component {
   render() {
@@ -194,7 +194,7 @@ function BlogPostTemplate(props) {
 **Using the RemarkForm renderProps approach:**
 
 ```javascript
-import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor-cms'
+import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor'
 
 class BlogPostTemplate extends React.Component {
   render() {
