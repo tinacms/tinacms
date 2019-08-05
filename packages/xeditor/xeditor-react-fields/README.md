@@ -1,6 +1,6 @@
-# xeditor-react-fields
+# xeditor-fields
 
-`xeditor-react-fields` is a react component library providing some base styling for simple elements in the XEditor package
+`xeditor-fields` is a react component library providing some base styling for simple elements in the XEditor package
 
 # Getting Started
 
@@ -8,4 +8,4 @@ Components should be added to the `/src` directory. To add the field to the [Sto
 
 ## Usage
 
-To view documentation on the fields, from inside the `/xeditor-react-fields` directory, run `yarn storybook`
+To view documentation on the fields, from inside the `/xeditor-fields` directory, run `yarn storybook`
