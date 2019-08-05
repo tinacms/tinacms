@@ -5,10 +5,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import {
-  RemarkForm,
-  toMarkdownString,
-} from "@forestryio/gatsby-plugin-xeditor-cms"
+import { RemarkForm, toMarkdownString } from "@forestryio/gatsby-plugin-xeditor"
 import { useCMS } from "@forestryio/cms-react"
 import { relative } from "path"
 

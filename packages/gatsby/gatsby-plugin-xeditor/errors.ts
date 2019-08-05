@@ -8,7 +8,7 @@ export const ERROR_MISSING_CMS_GATSBY =
 
 module.exports = {
   plugins: [
-    "@forestryio/gatsby-plugin-xeditor-cms"
+    "@forestryio/gatsby-plugin-xeditor"
   ]
 }
 `
