@@ -1,6 +1,6 @@
 {
   "name": "@forestryio/cms-react",
-  "version": "0.1.1-alpha.4",
+  "version": "0.1.1-alpha.5",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -13,11 +13,11 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
-    "cms-scripts": "^0.1.1-alpha.1",
+    "cms-scripts": "^0.1.1-alpha.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@forestryio/cms": "^1.0.1-alpha.4"
+    "@forestryio/cms": "^1.0.1-alpha.5"
   }
 }
