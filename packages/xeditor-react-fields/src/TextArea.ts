@@ -12,13 +12,15 @@ export interface TextAreaProps extends a {
 export const TextArea = styled.textarea`
   border: 1px solid #eaeaea;
   border-radius: 0.3rem;
-  height: 2rem;
+  height: 10rem;
   width: 100%;
   font-size: 0.9rem;
   padding: 0 0.5rem;
   margin: 0;
   outline: none;
   transition: border 0.2s ease;
+  resize: none;
+  line-height: 1.35;
 
   &:focus {
     border-color: #666666;
