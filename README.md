@@ -26,12 +26,12 @@ yarn start
 
 ## Commands
 
-| Commands                     | Descriptiton                                  |
-| ---------------------------- | --------------------------------------------- |
-| yarn bootstrap               | Install dependencies and link local packages. |
-| yarn build                   | Build all packages                            |
-| yarn build --scope <package> | Build only <package>.                         |
-| yarn test                    | Run tests for all packages                    |
+| Commands                      | Descriptiton                                  |
+| ----------------------------- | --------------------------------------------- |
+| yarn bootstrap                | Install dependencies and link local packages. |
+| yarn build                    | Build all packages                            |
+| yarn build --scope \<package> | Build only \<package>.                        |
+| yarn test                     | Run tests for all packages                    |
 
 ## Packages
 
