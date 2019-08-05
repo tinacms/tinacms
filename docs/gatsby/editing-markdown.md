@@ -128,9 +128,10 @@ your data. This is convenient for getting started but you will probably want to 
 1. Every field is rendered with a `text` component.
 1. The order of fields might not be consistent.
 
-In the [`useRemarkForm`](#useRemarkForm) section above, we lied a little bit about that interface of that function. The `useRemarkForm` function actually has a second arguments:
+We lied about the interface of [`useRemarkForm`](#useRemarkForm) earlier, it actually has a second arguments:
 
 ```typescript
+//                               👇
 function useRemarkForm(remark, config): [values, form]
 ```
 

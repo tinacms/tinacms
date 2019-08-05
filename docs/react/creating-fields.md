@@ -34,3 +34,7 @@ cms.fields.register({
   },
 })
 ```
+
+## Further Reading
+
+- [Adding Fields in Gatsby](../gatsby/custom-field-plugins.md)
