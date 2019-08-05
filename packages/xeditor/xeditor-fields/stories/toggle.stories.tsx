@@ -5,8 +5,13 @@ import { Toggle } from '../src/Toggle'
 storiesOf('Toggle', module).add('Default', () => <BasicExample />)
 
 function BasicExample() {
-  let [value, setValue] = React.useState()
   return (
-    <Toggle onClick={() => {}} />
+    <Toggle
+      name=""
+      onBlur={() => {}}
+      onChange={() => {}}
+      onFocus={() => {}}
+      value=""
+    />
   )
 }
