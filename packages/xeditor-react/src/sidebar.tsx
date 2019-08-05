@@ -99,7 +99,7 @@ const NoFieldsPlaceholder = () => (
 // Styling
 const ForestryLogoFile = require('../assets/forestry-logo.svg')
 const EllipsisVertical = require('../assets/ellipsis-v.svg')
-const HeaderHeight = 6
+const HeaderHeight = 5
 const FooterHeight = 3
 
 const SidebarHeader = styled.div`
