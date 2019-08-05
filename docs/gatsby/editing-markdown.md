@@ -63,7 +63,7 @@ useRemarkForm(remark): [values, form]
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from '@forestryio/gatsby-plugin-xeditor'
+import { useRemarkForm } from '@forestryio/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
@@ -90,7 +90,7 @@ only available within Function Components you will wneed to use `RemarkForm` if 
 **src/templates/blog-post.js**
 
 ```javascript
-import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor'
+import { RemarkForm } from '@forestryio/gatsby-xeditor-remark'
 
 class BlogPostTemplate extends React.Component {
   render() {
@@ -148,7 +148,7 @@ The `config` is an optional object for overriding the default configuration of a
 - `label`: A human readable label for the field.
 
 ```javascript
-import { useRemarkForm } from '@forestryio/gatsby-plugin-xeditor'
+import { useRemarkForm } from '@forestryio/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
