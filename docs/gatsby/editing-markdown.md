@@ -1,6 +1,6 @@
 # Editing Markdown in Gatsby
 
-Creating forms for editing content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by two plugins:
+Creating forms for content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by two plugins:
 
 - `gatsby-xeditor-remark`: Provides hooks and components for creating Remark forms.
 - `gatsby-xeditor-git`: Creates a node server that writes changes to the local filesystem;
@@ -26,7 +26,6 @@ Open the `gatsby-config.js` file and add make sure the following plugins are lis
 module.exports = {
   plugins: [
     "@forestryio/gatsby-plugin-xeditor",
-    "@forestryio/gatsby-xeditor-remark",
     "@forestryio/gatsby-xeditor-git",
     // ...
   ]
