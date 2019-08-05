@@ -34,10 +34,42 @@ module.exports = {
 
 ## Creating Remark Forms
 
-In order to edit a markdown file, you must register a form with the CMS. There are two approachs to registering Remark Forms with the XEditor. The approach you choose depends on whether the React template is class or function.
+In order to edit a markdown file, you must register a form with the CMS. There are two approaches to registering Remark Forms with the XEditor. The approach you choose depends on whether the React template is class or function.
 
 1. [`useRemarkForm`](#useRemarkForm): A [Hook](https://reactjs.org/docs/hooks-intro.html) used when the template is a function.
 1. [`RemarkForm`](#RemarkForm): A [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) component to use when the template is a class component.
+
+### Note: required query data
+
+In order for the remark forms to work, you must include the following fields in your `markdownRemark` query:
+
+- `fileAbsolutePath`
+- `rawMarkdownBody`
+
+An example `pageQuery` in your template might look like this:
+
+```
+query BlogPostBySlug($slug: String!) {
+  site {
+    siteMetadata {
+      title
+    }
+  }
+  markdownRemark(fields: { slug: { eq: $slug } }) {
+    id
+    fileAbsolutePath
+    rawMarkdownBody
+    html
+    frontmatter {
+      title
+      date(formatString: "MMMM DD, YYYY")
+      description
+    }
+  }
+}
+```
+
+Additionally, any front matter fields that are **not** queried will be deleted when saving content via the CMS.
 
 ### useRemarkForm
 
