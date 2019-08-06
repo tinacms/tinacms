@@ -56,6 +56,7 @@ XEditor is a CMS for React with an emphasis on Gatsby support.
 | `@forestryio/xeditor-fields`        | A collection of Field Plugins for `xeditor`                     |
 | `@forestryio/gatsby-plugin-xeditor` | A Gatsby plugin for setting up a `xeditor`                      |
 | `@forestryio/gatsby-xeditor-git`    | A `gatsby-xeditor` plugin for saving changes to the local repo. |
+| `@forestryio/gatsby-xeditor-json`   | A `gatsby-xeditor` plugin for editing JSON files.               |
 
 ### Demo Projects
 
