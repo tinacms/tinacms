@@ -11,6 +11,7 @@ module.exports = {
   plugins: [
     "@forestryio/gatsby-plugin-xeditor",
     "@forestryio/gatsby-xeditor-git",
+    "@forestryio/gatsby-xeditor-json",
     {
       resolve: "@forestryio/gatsby-xeditor-gitlab",
       options: {
@@ -27,6 +28,14 @@ module.exports = {
         name: `blog`,
       },
     },
+    {
+      resolve: `gatsby-source-filesystem`,
+      options: {
+        path: `${__dirname}/data`,
+        name: `data`,
+      },
+    },
+    "gatsby-transformer-json",
     {
       resolve: `gatsby-source-filesystem`,
       options: {

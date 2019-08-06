@@ -1,0 +1,1 @@
+# Gatsby Xeditor JSON
