@@ -1,0 +1,38 @@
+.Select-control {
+    border-radius: 0.3rem;
+    border: 1px solid #dee2e6;
+    transition: border 0.2s ease;
+    font-size: 0.9rem;
+    height: 30px;
+}
+
+.Select-input {
+  height: 30px;
+}
+
+.Select-option {
+    color: #343A40;
+}
+
+.Select.is-open > .Select-control {
+    border: 1px solid #adb5bd;
+}
+
+.Select-menu-outer {
+    border: 1px solid #adb5bd;
+    font-size: 0.9rem;
+}
+
+.Select-option.is-selected {
+    background-color: #E9ECEF;
+    /* Fallback color for IE 8 */
+    background-color: rgba(0, 126, 255, 0.04);
+    color: #343A40;
+}
+.Select-option.is-focused {
+    background-color: #E9ECEF;
+}
+.Select-option.is-disabled {
+    color: #cccccc;
+    cursor: default;
+}
