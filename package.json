@@ -3,7 +3,7 @@
   "private": true,
   "scripts": {
     "bootstrap": "lerna bootstrap --hoist",
-    "bs": "yarn bootstrap",
+    "bs": "npm run bootstrap",
     "link": "lerna link",
     "test": "lerna run test",
     "build": "lerna run build"
