@@ -18,7 +18,7 @@ function BlogPostTemplate(props) {
   let cms = useCMS()
   let filepath = relative(
     "/home/dj/Forestry/cms/packages/demo/demo-gatsby/",
-    staticPost.fileAbsolutePath
+    staticPost.fields.fileRelativePath
   )
 
   return (
@@ -117,7 +117,6 @@ export const pageQuery = graphql`
       id
       excerpt(pruneLength: 160)
       html
-      fileAbsolutePath
       rawMarkdownBody
       fields {
         fileRelativePath
