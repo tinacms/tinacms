@@ -1,98 +1,101 @@
-import * as React from "react"
-import { useMemo, useCallback, useEffect, useState } from "react"
-import SelectBase, { components } from "react-select"
-import { Async } from "react-select"
-import { Props as ReactSelectProps } from "react-select/lib/Select"
-import { Props as AsyncProps } from "react-select/lib/Async"
-import { Icon } from "@forestryio/icons"
+import * as React from 'react'
+import { useMemo, useCallback, useEffect, useState } from 'react'
+import SelectBase, { components, Async } from 'react-select'
+import { Props as ReactSelectProps } from 'react-select/lib/Select'
+import { Props as AsyncProps } from 'react-select/lib/Async'
+import { Icon } from '@forestryio/icons'
 
+type Styles = {
+  [key: string]: (provided: any, state: any) => object
+}
 // https://react-select.com/styles
-const customStyles = {
+const customStyles: Styles = {
   // The main container
   control: (provided, state) => ({
     ...provided,
-    fontSize: "0.9rem",
+    fontSize: '0.9rem',
     minHeight: 32,
-    borderWidth: "1px",
-    borderColor: state.isFocused ? "#333" : "#dedede",
+    borderWidth: '1px',
+    borderColor: state.isFocused ? '#333' : '#dedede',
     boxShadow: null,
   }),
   // The dropdown list items
   option: (provided, state) => ({
     ...provided,
-    display: "flex",
-    alignItems: "center",
+    display: 'flex',
+    alignItems: 'center',
     height: 26,
-    fontSize: "0.9rem",
-    color: state.isSelected ? "black" : "#666",
+    fontSize: '0.9rem',
+    color: state.isSelected ? 'black' : '#666',
     backgroundColor: state.isDisabled
       ? null
       : state.isSelected
-      ? "#f3f3f3"
+      ? '#f3f3f3'
       : state.isFocused
-      ? "#fafafa"
+      ? '#fafafa'
       : null,
   }),
   // The selected value placed in the container
   singleValue: (provided, state) => ({
     ...provided,
     opacity: state.isDisabled ? 0.4 : 1,
-    transition: "opacity 300ms",
-    color: "black",
+    transition: 'opacity 300ms',
+    color: 'black',
   }),
   dropdownIndicator: provided => ({
     ...provided,
-    cursor: "pointer",
+    cursor: 'pointer',
   }),
   multiValue: (provided, state) => ({
     ...provided,
     borderRadius: 4.8,
-    backgroundColor: "#f3f3f3",
+    backgroundColor: '#f3f3f3',
   }),
   multiValueLabel: provided => ({
     ...provided,
   }),
   multiValueRemove: (provided, state) => ({
     ...provided,
-    borderRadius: "0 0.3rem 0.3rem 0",
-    backgroundColor: state.isFocused ? "#333" : null,
-    padding: "0 0.4rem",
-    cursor: "pointer",
+    borderRadius: '0 0.3rem 0.3rem 0',
+    backgroundColor: state.isFocused ? '#333' : null,
+    padding: '0 0.4rem',
+    cursor: 'pointer',
   }),
   noOptionsMessage: provided => ({
     ...provided,
-    fontSize: "0.8rem",
-    padding: "1rem 0",
+    fontSize: '0.8rem',
+    padding: '1rem 0',
   }),
 }
 
 const indicatorSeparatorStyle = {
-  alignSelf: "stretch",
-  backgroundColor: "#dedede",
+  alignSelf: 'stretch',
+  backgroundColor: '#dedede',
   marginBottom: 4,
   marginTop: 4,
   width: 1,
 }
 
 const clearIndicatorStyle = {
-  fontSize: "0.8rem",
-  cursor: "pointer",
-  padding: "0.5rem",
+  fontSize: '0.8rem',
+  cursor: 'pointer',
+  padding: '0.5rem',
 }
 
-const DropdownIndicator = props => {
+const DropdownIndicator = (props: any) => {
   return (
+    // @ts-ignore
     <components.DropdownIndicator {...props}>
       <Icon name="ChevronDown" width={12} height={12} />
     </components.DropdownIndicator>
   )
 }
 
-const IndicatorSeparator = ({ innerProps }) => {
+const IndicatorSeparator = ({ innerProps }: any) => {
   return <span style={indicatorSeparatorStyle} {...innerProps} />
 }
 
-const MultiValueRemove = props => {
+const MultiValueRemove = (props: any) => {
   return (
     <components.MultiValueRemove {...props}>
       <Icon name="X" width={8} height={8} />
@@ -100,7 +103,7 @@ const MultiValueRemove = props => {
   )
 }
 
-const ClearIndicator = props => {
+const ClearIndicator = (props: any) => {
   const {
     innerProps: { ref, ...restInnerProps },
   } = props
@@ -119,7 +122,7 @@ interface Option {
 }
 
 interface SelectProps
-  extends Omit<ReactSelectProps, "onChange" | "options" | "value"> {
+  extends Omit<ReactSelectProps, 'onChange' | 'options' | 'value'> {
   value: string | number
   options: (Option | string | number)[]
   onChange(value: string): any
@@ -144,7 +147,7 @@ export function Select(props: SelectProps) {
     let o: any[] = props.options || []
 
     return o.map((o: any) => {
-      if (["string", "number"].indexOf(typeof o) >= 0) {
+      if (['string', 'number'].indexOf(typeof o) >= 0) {
         return { label: o, value: o }
       }
       return o
@@ -163,7 +166,7 @@ export function Select(props: SelectProps) {
    */
   let onChange = useCallback(
     (option?: Option) => {
-      if (!option) return props.onChange("")
+      if (!option) return props.onChange('')
       return (props.onChange as any)(option.value as any)
     },
     [props.onChange]
@@ -199,13 +202,14 @@ export function Select(props: SelectProps) {
         borderRadius: 4.8,
         colors: {
           ...theme.colors,
-          primary: "#333",
-          primary50: "#dedede",
+          primary: '#333',
+          primary50: '#dedede',
         },
       })}
       {...props}
       options={options}
       value={selectedOption}
+      // @ts-ignore
       onChange={onChange}
       components={{
         ClearIndicator,
@@ -225,21 +229,19 @@ interface AsyncFieldProps<O> extends AsyncProps<O> {
   dynamicOptions?: boolean
 }
 
-export function AsyncSelect<O = any>({dynamicOptions = false, ...props}: AsyncFieldProps<O>) {
+export function AsyncSelect<O = any>({
+  dynamicOptions = false,
+  ...props
+}: AsyncFieldProps<O>) {
+  // hack to force refresh of data whenever loadOptions changes
+  // see react select issue: https://github.com/JedWatson/react-select/issues/1581
+  const [loadedOptionsChangedCount, setLoadedOptionsChangedCount] = useState(0)
+  React.useEffect(() => {
+    if (dynamicOptions) {
+      setLoadedOptionsChangedCount(loadedOptionsChangedCount + 1)
+    }
+  }, [props.loadOptions, dynamicOptions])
 
-    // hack to force refresh of data whenever loadOptions changes
-    // see react select issue: https://github.com/JedWatson/react-select/issues/1581
-    const [loadedOptionsChangedCount, setLoadedOptionsChangedCount] = useState(0)
-    React.useEffect(
-      () => {
-        if(dynamicOptions)
-        {
-          setLoadedOptionsChangedCount(loadedOptionsChangedCount + 1)
-        }
-      },
-      [props.loadOptions, dynamicOptions]
-    )
-    
   return (
     <Async
       styles={customStyles}
@@ -248,8 +250,8 @@ export function AsyncSelect<O = any>({dynamicOptions = false, ...props}: AsyncFi
         borderRadius: 4.8,
         colors: {
           ...theme.colors,
-          primary: "#333",
-          primary50: "#dedede",
+          primary: '#333',
+          primary50: '#dedede',
         },
       })}
       {...props}

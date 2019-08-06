@@ -1,3 +1,4 @@
+import * as React from 'react'
 import styled, { css } from 'styled-components'
 
 type a = React.DetailedHTMLProps<
@@ -9,7 +10,7 @@ export interface InputProps extends a {
   ref?: any
 }
 
-export const TextField = styled.input`
+export const TextField = styled.input<{ error?: boolean }>`
   border: 1px solid #eaeaea;
   border-radius: 0.3rem;
   height: 2rem;
@@ -28,7 +29,7 @@ export const TextField = styled.input`
     font-size: 0.9rem;
     color: #cfd3d7;
   }
-  ${(props: InputProps) =>
+  ${props =>
     props.error &&
     css`
       border-color: red;

@@ -45,7 +45,7 @@ const ToggleElement = styled.div`
   height: 20px;
 `
 
-const ToggleLabel = styled.label`
+const ToggleLabel = styled.label<{ disabled?: boolean }>`
   background: none;
   color: inherit;
   padding: 0;
