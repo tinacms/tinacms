@@ -1,5 +1,6 @@
 import { Form, FormOptions } from '@forestryio/cms'
 import { useCMSForm, useCMS } from '@forestryio/cms-react'
+import { useEffect } from 'react'
 
 interface JsonNode {
   fields: {
@@ -13,7 +14,7 @@ export function useJsonForm(
   formOptions: Partial<FormOptions<any>> = {}
 ) {
   if (!jsonNode) {
-    return [jsonNode, null]
+    return [{}, null]
   }
   // TODO: Only required when saving to local filesystem.
   if (
@@ -32,16 +33,27 @@ export function useJsonForm(
       fields: generateFields(jsonNode),
       onSubmit(data) {
         if (process.env.NODE_ENV === 'development') {
-          cms.api.git!.onSubmit!({
-            fileRelativePath: data.fields.fileRelativePath,
-            content: JSON.stringify(data),
-          })
+          //
         } else {
           console.log('Not supported')
         }
       },
       ...formOptions,
     })
+
+    useEffect(() => {
+      if (!form) return
+      return form.subscribe(
+        (formState: any) => {
+          let { fields, ...data } = formState.values
+          cms.api.git!.onChange!({
+            fileRelativePath: fields.fileRelativePath,
+            content: JSON.stringify(data, null, 2),
+          })
+        },
+        { values: true }
+      )
+    }, [form])
 
     return [jsonNode, form]
   } catch (e) {
