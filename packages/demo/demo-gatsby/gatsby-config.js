@@ -9,16 +9,22 @@ module.exports = {
     },
   },
   plugins: [
-    "@forestryio/gatsby-plugin-xeditor",
-    "@forestryio/gatsby-xeditor-git",
-    "@forestryio/gatsby-xeditor-json",
     {
-      resolve: "@forestryio/gatsby-xeditor-gitlab",
+      resolve: "@forestryio/gatsby-plugin-xeditor",
       options: {
-        appID:
-          "5eaf309d8dac09519bdcd2f9ce0fec494cfac21b7c7d2568553538696f15ba61",
-        redirectURI: "http://localhost:8000/?auth-gitlab",
-        repositoryID: "dwalkr/xtest",
+        plugins: [
+          "@forestryio/gatsby-xeditor-git",
+          "@forestryio/gatsby-xeditor-json",
+          {
+            resolve: "@forestryio/gatsby-xeditor-gitlab",
+            options: {
+              appID:
+                "5eaf309d8dac09519bdcd2f9ce0fec494cfac21b7c7d2568553538696f15ba61",
+              redirectURI: "http://localhost:8000/?auth-gitlab",
+              repositoryID: "dwalkr/xtest",
+            },
+          },
+        ],
       },
     },
     {
