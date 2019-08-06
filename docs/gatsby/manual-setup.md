@@ -47,4 +47,5 @@ module.exports = {
 ## Next Steps
 
 - [Editing Markdown Files](./editing-markdown.md)
+- [Editing JSON Files](./editing-json.md)
 - [Creating Custom Fields](./custom-field-plugins.md)
