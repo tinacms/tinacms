@@ -1,6 +1,6 @@
 {
   "name": "@forestryio/cms-connector-gitlab",
-  "version": "0.1.1-alpha.0",
+  "version": "0.1.1-alpha.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -18,7 +18,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@forestryio/cms": "^1.0.1-alpha.5",
-    "@forestryio/persistent-session-storage": "^0.1.1-alpha.0"
+    "@forestryio/cms": "^1.0.1-alpha.6",
+    "@forestryio/persistent-session-storage": "^0.1.1-alpha.1"
   }
 }
