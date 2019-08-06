@@ -25,13 +25,8 @@ export const Sidebar = () => {
     }
   })
 
-  const saveForms = () => {
-    cms.forms.all().forEach(form => {
-      form.finalForm.submit()
-    })
-  }
-
   const forms = cms.forms.all()
+
   return (
     <StyledFrame
       frameStyles={{
@@ -60,6 +55,12 @@ export const Sidebar = () => {
                 {forms.map(form => (
                   <li
                     key={form.name}
+                    style={{
+                      textDecoration:
+                        editingForm && editingForm.name === form.name
+                          ? 'underline'
+                          : 'none',
+                    }}
                     onClick={() => {
                       setEditingForm(form)
                     }}
@@ -83,7 +84,9 @@ export const Sidebar = () => {
           )}
         </FieldsWrapper>
         <SidebarFooter>
-          <SaveButton onClick={saveForms}>Save document</SaveButton>
+          {editingForm && (
+            <SaveButton onClick={() => editingForm.submit()}>Save</SaveButton>
+          )}
         </SidebarFooter>
       </>
     </StyledFrame>
