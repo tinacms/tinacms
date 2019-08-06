@@ -8,4 +8,4 @@ Components should be added to the `/src` directory. To add the field to the [Sto
 
 ## Usage
 
-To view documentation on the fields, from inside the `/xeditor-fields` directory, run `yarn storybook`
+To view documentation on the fields, from inside the `/xeditor-fields` directory, run `npm run storybook`

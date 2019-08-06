@@ -16,22 +16,22 @@ To get started:
 ```bash
 git clone git@github.com:forestryio/cms.git
 cd cms
-yarn bootstrap
-yarn build
+npm run bootstrap
+npm run build
 
 # Start the Gatsby demo
 cd packages/demo/demo-gatsby
-yarn start
+npm run start
 ```
 
 ## Commands
 
-| Commands                      | Descriptiton                                  |
-| ----------------------------- | --------------------------------------------- |
-| yarn bootstrap                | Install dependencies and link local packages. |
-| yarn build                    | Build all packages                            |
-| yarn build --scope \<package> | Build only \<package>.                        |
-| yarn test                     | Run tests for all packages                    |
+| Commands                         | Descriptiton                                  |
+| -------------------------------- | --------------------------------------------- |
+| npm run bootstrap                | Install dependencies and link local packages. |
+| npm run build                    | Build all packages                            |
+| npm run build --scope \<package> | Build only \<package>.                        |
+| npm run test                     | Run tests for all packages                    |
 
 ## Packages
 
