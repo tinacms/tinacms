@@ -9,13 +9,13 @@ Creating forms for content provided by the [`gatsby-transformer-json`](https://g
 ## Installation
 
 ```
-npm install --save gatstby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
+npm install --save gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
 ```
 
 or
 
 ```
-yarn add gatstby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
+yarn add gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
 ```
 
 ## Configuring Gatsby
@@ -25,6 +25,8 @@ yarn add gatstby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xe
 ```javascript
 module.exports = {
   plugins: [
+    // ...
+    '@forestryio/gatsby-xeditor-json',
     {
       resolve: `gatsby-source-filesystem`,
       options: {
