@@ -1,3 +1,4 @@
+import * as React from 'react'
 import styled, { css } from 'styled-components'
 
 type a = React.DetailedHTMLProps<
@@ -9,7 +10,7 @@ export interface TextAreaProps extends a {
   ref?: any
 }
 
-export const TextArea = styled.textarea`
+export const TextArea = styled.textarea<{ error?: boolean }>`
   border: 1px solid #eaeaea;
   border-radius: 0.3rem;
   height: 10rem;
@@ -30,7 +31,7 @@ export const TextArea = styled.textarea`
     font-size: 0.9rem;
     color: #cfd3d7;
   }
-  ${(props: TextAreaProps) =>
+  ${props =>
     props.error &&
     css`
       border-color: red;
