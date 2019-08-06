@@ -22,26 +22,28 @@ const Bio = () => {
           }
         }
       }
-      dataJson(firstName: { eq: "Nolan" }) {
+      dataJson(fields: { fileRelativePath: { eq: "/data/author.json" } }) {
         firstName
         lastName
+        location
+        social {
+          twitter
+        }
         fields {
           fileRelativePath
-        }
-      }
-      site {
-        siteMetadata {
-          author
-          social {
-            twitter
-          }
         }
       }
     }
   `)
 
-  const { author, social } = data.site.siteMetadata
-  const [nolan] = useJsonForm(data.dataJson)
+  const [author] = useJsonForm(data.dataJson, {
+    fields: [
+      { name: "firstName", component: "text" },
+      { name: "lastName", component: "text" },
+      { name: "location", component: "text" },
+      { name: "social.twitter", component: "text" },
+    ],
+  })
   return (
     <div
       style={{
@@ -65,11 +67,11 @@ const Bio = () => {
       <p>
         Written by{" "}
         <strong>
-          {nolan.firstName} {nolan.lastName}
+          {author.firstName} {author.lastName}
         </strong>{" "}
-        who lives and works in San Francisco building useful things.
+        who lives and works in {author.location} building useful things.
         {` `}
-        <a href={`https://twitter.com/${social.twitter}`}>
+        <a href={`https://twitter.com/${author.twitter}`}>
           You should follow him on Twitter
         </a>
       </p>
