@@ -10,6 +10,7 @@ import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
 
 import { rhythm } from "../utils/typography"
+import { useJsonForm } from "@forestryio/gatsby-xeditor-json"
 
 const Bio = () => {
   const data = useStaticQuery(graphql`
@@ -19,6 +20,13 @@ const Bio = () => {
           fixed(width: 50, height: 50) {
             ...GatsbyImageSharpFixed
           }
+        }
+      }
+      dataJson(firstName: { eq: "Nolan" }) {
+        firstName
+        lastName
+        fields {
+          fileRelativePath
         }
       }
       site {
@@ -33,6 +41,7 @@ const Bio = () => {
   `)
 
   const { author, social } = data.site.siteMetadata
+  const [nolan] = useJsonForm(data.dataJson)
   return (
     <div
       style={{
