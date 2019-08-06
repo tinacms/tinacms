@@ -70,13 +70,13 @@ function generateFields(post: JsonNode) {
   }))
 }
 
-interface RemarkFormProps extends Partial<FormOptions<any>> {
-  jsonNode: JsonNode
+interface JsonFormProps extends Partial<FormOptions<any>> {
+  data: JsonNode
   render(renderProps: { form: Form; data: any }): JSX.Element
 }
 
-export function RemarkForm({ jsonNode, render, ...options }: RemarkFormProps) {
-  let [data, form] = useJsonForm(jsonNode, options)
+export function JsonForm({ data, render, ...options }: JsonFormProps) {
+  let [currentData, form] = useJsonForm(data, options)
 
-  return render({ form, data })
+  return render({ form, data: currentData })
 }
