@@ -29,10 +29,10 @@ export const pageQuery = graphql\`
 \`
   `
 export const ERROR_MISSING_REMARK_PATH =
-  'useRemarkForm(remark) Required attribute `fileAbsolutePath` was not found on `remark` argument' +
+  'useRemarkForm(remark) Required attribute `fileRelativePath` was not found on `remark` argument' +
   `
 
-1. Check if the \`fileAbsolutePath\` attribute is included in the GraphQL query. For example:
+1. Check if the \`fileRelativePath\` attribute is included in the GraphQL query. For example:
 
 export const pageQuery = graphql\`
   query BlogPostBySlug($slug: String!) {
