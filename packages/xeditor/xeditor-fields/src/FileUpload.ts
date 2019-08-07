@@ -3,9 +3,11 @@ import styled from 'styled-components'
 
 // TODO: Copy from old app?
 
-export const FileUpload = styled.div`
+export const FileUpload = styled.div<{ error?: boolean }>`
   width: 100%;
   height: 80px;
-  background-color: #ededed;
-  margin: 0 0 2rem 0;
+  margin: 0;
+  border-width: 1px;
+  border-style: solid;
+  border-color: ${p => (p.error ? 'red' : '#eaeaea')};
 `
