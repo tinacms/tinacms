@@ -40,7 +40,7 @@ export const Swatch = styled(
   box-shadow: 0 0 0 1px #dedede;
   cursor: pointer;
   width: 100%;
-  margin: 0 0 2rem 0;
+  margin: 0;
 
   > div {
     display: flex;

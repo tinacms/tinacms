@@ -13,21 +13,37 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}>(
 ) {
   return (props: InputFieldType<ExtraFieldProps>) => (
     <>
-      <div>
-        <FieldLabel htmlFor={name}>{props.field.label || props.field.name}</FieldLabel>
-      </div>
-      <Field {...props} />
-      {props.meta.error && <p>{props.meta.error}</p>}
+      <FieldWrapper>
+        <FieldLabel htmlFor={name}>
+          {props.field.label || props.field.name}
+        </FieldLabel>
+        <Field {...props} />
+        {props.meta.error && 
+          <FieldError>{props.meta.error}</FieldError>
+        }
+      </FieldWrapper>
     </>
   )
 }
 
 // Styling
+const FieldWrapper = styled.div`
+  margin-bottom: 1.5rem;
+`
+
 const FieldLabel = styled.label`
   display: block;
   font-size: 0.8rem;
-  font-weight: 500;
+  font-weight: 600;
   letter-spacing: 0.01em;
   color: #333;
   margin-bottom: 0.5rem;
+`
+
+const FieldError = styled.span`
+  display: block;
+  color: red;
+  font-size: 0.8rem;
+  margin-top: 0.5rem;
+  font-weight: 500;
 `
