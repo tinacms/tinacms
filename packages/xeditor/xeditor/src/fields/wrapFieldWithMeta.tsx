@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
+import styled from 'styled-components'
 
 type InputFieldType<ExtraFieldProps> = FieldProps & ExtraFieldProps
 
@@ -13,10 +14,20 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}>(
   return (props: InputFieldType<ExtraFieldProps>) => (
     <>
       <div>
-        <label htmlFor={name}>{props.field.label || props.field.name}</label>
+        <FieldLabel htmlFor={name}>{props.field.label || props.field.name}</FieldLabel>
       </div>
       <Field {...props} />
       {props.meta.error && <p>{props.meta.error}</p>}
     </>
   )
 }
+
+// Styling
+const FieldLabel = styled.label`
+  display: block;
+  font-size: 0.8rem;
+  font-weight: 500;
+  letter-spacing: 0.01em;
+  color: #333;
+  margin-bottom: 0.5rem;
+`
