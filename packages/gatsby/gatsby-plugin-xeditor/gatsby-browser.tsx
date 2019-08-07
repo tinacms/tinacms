@@ -6,7 +6,7 @@ import { cms } from './index'
 export const wrapRootElement = ({ element }: any, options: any) => {
   return (
     <CMSContext.Provider value={cms}>
-      <SidebarProvider title={options.title}>
+      <SidebarProvider title={options.title} logo={options.logo}>
         {element}
         <SidebarToggle />
       </SidebarProvider>

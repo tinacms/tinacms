@@ -6,7 +6,13 @@ import { Form } from '@forestryio/cms'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
 
-export const Sidebar = ({ title = 'XEditor' }: { title?: string }) => {
+export const Sidebar = ({
+  title = 'XEditor',
+  logo = ForestryLogo,
+}: {
+  title?: string
+  logo?: string
+}) => {
   const cms = useCMS()
 
   const [editingForm, setEditingForm] = useState(() => {
@@ -41,7 +47,7 @@ export const Sidebar = ({ title = 'XEditor' }: { title?: string }) => {
       <>
         <RootElement />
         <SidebarHeader>
-          <ForestryLogo />
+          <ForestryLogo url={logo} />
           {/* TODO: Set site name dynamically */}
           <SiteName>{title}</SiteName>
           <ActionsToggle />
@@ -117,11 +123,11 @@ const SidebarHeader = styled.div`
   /* border-bottom: 1px solid #efefef; */
 `
 
-const ForestryLogo = styled.div`
+const ForestryLogo = styled.div<{ url: string }>`
   height: ${HeaderHeight}rem;
   width: 2rem;
   /* border-right: 1px solid #efefef; */
-  background-image: url(${ForestryLogoFile});
+  background-image: url(${props => props.url});
   background-size: 2rem;
   background-repeat: no-repeat;
   background-position: center;
