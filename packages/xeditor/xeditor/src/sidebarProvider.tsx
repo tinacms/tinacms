@@ -9,7 +9,10 @@ interface SidebarProps {
 
 const SidebarContext = React.createContext<SidebarProps | null>(null)
 
-export const SidebarProvider = ({ children }: { children: any }) => {
+export const SidebarProvider: React.FC<{ title: string }> = ({
+  children,
+  title,
+}) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
   const props = {
@@ -20,7 +23,7 @@ export const SidebarProvider = ({ children }: { children: any }) => {
   return (
     <SidebarContext.Provider value={props}>
       <SidebarLayoutContainer isSidebarOpen={isOpen}>
-        {isOpen ? <Sidebar /> : <div />}
+        {isOpen ? <Sidebar title={title} /> : <div />}
         <SiteContainer>{children}</SiteContainer>
       </SidebarLayoutContainer>
     </SidebarContext.Provider>
