@@ -13,8 +13,8 @@ The following is a set of guidelines and tips for contributingto the Forestryio 
 
 This section contains solutions to various problems you may run into when developing for the Forestryio CMS.
 
---[I-pulled-down-changes-and-now-my-packages-won't-build](#I-pulled-down-changes-and-now-my-packages-won't-build)
---[I-can't-add-dependencies-to-a-package](#I-can't-add-dependencies-to-a-package)
+- [I pulled down changes and now the packages won't build](#I-pulled-down-changes-and-now-my-packages-won't-build)
+- [I can't add dependencies to a package](#I-can't-add-dependencies-to-a-package)
 
 ### I pulled down changes and now my packages won't build
 
