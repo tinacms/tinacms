@@ -13,7 +13,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}>(
   return (props: InputFieldType<ExtraFieldProps>) => (
     <>
       <div>
-        <label htmlFor={name}>{props.field.name}</label>
+        <label htmlFor={name}>{props.field.label || props.field.name}</label>
       </div>
       <Field {...props} />
       {props.meta.error && <p>{props.meta.error}</p>}

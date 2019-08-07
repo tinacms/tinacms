@@ -1,6 +1,6 @@
 import * as React from 'react'
 import Frame, { FrameContextConsumer } from 'react-frame-component'
-import styled, { StyleSheetManager } from 'styled-components'
+import { StyleSheetManager } from 'styled-components'
 
 interface Props {
   children: any
