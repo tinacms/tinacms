@@ -28,7 +28,7 @@ export function useJsonForm(
     let cms = useCMS()
 
     let [values, form] = useCMSForm({
-      name: `markdownRemark:${jsonNode.id}`,
+      name: jsonNode.fields.fileRelativePath,
       initialValues: jsonNode,
       fields: generateFields(jsonNode),
       onSubmit(data) {

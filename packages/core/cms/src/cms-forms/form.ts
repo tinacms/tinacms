@@ -31,5 +31,6 @@ export interface FormOptions<S> extends Config<S> {
 
 export interface Field {
   name: string
+  label?: string
   component: React.FC<any> | string
 }
