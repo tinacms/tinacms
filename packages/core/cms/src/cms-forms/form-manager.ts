@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Subscribable } from '../subscribable'
-import { Form, FormOptions } from './form'
+import { Form, Field, FormOptions } from './form'
 
 export class FormManager extends Subscribable {
   private __forms: { [key: string]: Form } = {}
@@ -39,4 +39,10 @@ export class FormManager extends Subscribable {
 export interface FieldPlugin {
   name: string
   Component: React.FC<any>
+  validate?(
+    value: any,
+    allValues: any,
+    meta: any,
+    field: Field
+  ): string | object | undefined
 }

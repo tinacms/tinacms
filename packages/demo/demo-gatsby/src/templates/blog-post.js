@@ -25,7 +25,12 @@ function BlogPostTemplate(props) {
     <RemarkForm
       remark={staticPost}
       fields={[
-        { label: "Title", name: "frontmatter.title", component: "text" },
+        {
+          label: "Title",
+          name: "frontmatter.title",
+          component: "text",
+          required: true,
+        },
         { label: "Date", name: "frontmatter.date", component: "text" },
         {
           label: "Description",
