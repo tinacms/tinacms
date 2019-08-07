@@ -2,7 +2,7 @@
 
 This doc explains how to add custom field plugins to a Gatsby site.
 
-## Example: An Email Field
+## Registering an Email Field
 
 In this example we'll create a simple email field for our Gatsby site. Besides the required `name`, we also want the email field definition to accept a `label` and a `description`.
 
@@ -57,6 +57,40 @@ useRemarkForm(remark, {
     },
   ],
 })
+```
+
+## Validating the Email Field
+
+An optional `validate` function can also be added to your Field Plugin.
+
+**Arguments**
+
+- `value`: The field's current value
+- `allValues`: The current state of the entire form
+- `meta`: The form metadata for this field
+- `field`: The field's configuration
+
+**Return: string | null | undefined**
+
+If the value is invalid, then return the error message to be displayed.
+
+**gatsby-browser.js**
+
+```javascript
+import { cms } from '@forestryio/gatsby-plugin-xeditor'
+import { EmailField } from './src/components/EmailField'
+
+export const onClientEntry = () => {
+  cms.forms.addFieldPlugin({
+    name: 'email',
+    Component: EmailField,
+    validate(value, allValues, meta, field) {
+      let isValidEmail = /.*@.*\..*/.test(email)
+
+      if (!isValidEmail) return 'Invalid email address'
+    },
+  })
+}
 ```
 
 ## Further Reading
