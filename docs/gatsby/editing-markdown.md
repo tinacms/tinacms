@@ -188,6 +188,35 @@ function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
     fields: [
       {
+        label: 'Title',
+        name: 'frontmatter.title',
+        component: 'text',
+      },
+      {
+        label: 'Description',
+        name: 'frontmatter.description',
+        component: 'textarea',
+      },
+    ],
+  })
+
+  return (
+    <>
+      <h1>{markdownRemark.frontmatter.title}</h1>
+      <p>{markdownRemark.frontmatter.description}</p>
+    </>
+  )
+}
+```
+
+**Customizing `RemarkForm` fields**
+
+When using the `RemarkForm` component, additional form configuration can be added via properties on the component. So, to customize the form's fields, add a `fields` prop:
+
+```javascript
+render() {
+  const fields = [
+    {
         label: "Title",
         name: "frontmatter.title",
         component: "text",
@@ -197,12 +226,14 @@ function BlogPostTemplate(props) {
         name: "frontmatter.description",
         component: "textarea",
       },
-    ]
-  })
-
+  ]
   return (
-    <h1>{markdownRemark.frontmatter.title}</h1>
-    <p>{markdownRemark.frontmatter.description}</p>
+  <RemarkForm remark={markdownRemark} fields={fields} render={({markdownRemark}) => {
+    <>
+      <h1>{markdownRemark.frontmatter.title}</h1>
+      <p>{markdownRemark.frontmatter.description}</p>
+    </>
+  })} />
   )
 }
 ```
