@@ -24,6 +24,16 @@ function BlogPostTemplate(props) {
   return (
     <RemarkForm
       remark={staticPost}
+      fields={[
+        { label: "Title", name: "frontmatter.title", component: "text" },
+        { label: "Date", name: "frontmatter.date", component: "text" },
+        {
+          label: "Description",
+          name: "frontmatter.description",
+          component: "textarea",
+        },
+        { label: "Body", name: "rawMarkdownBody", component: "textarea" },
+      ]}
       render={({ markdownRemark }) => {
         let post = markdownRemark
         return (
