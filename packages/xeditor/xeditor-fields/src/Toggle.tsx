@@ -43,6 +43,7 @@ const ToggleElement = styled.div`
   position: relative;
   width: 40px;
   height: 20px;
+  margin: 0 0 2rem 0;
 `
 
 const ToggleLabel = styled.label<{ disabled?: boolean }>`
