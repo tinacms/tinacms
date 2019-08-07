@@ -130,7 +130,7 @@ only available within Function Components you will wneed to use `JsonForm` if yo
 **src/templates/blog-post.js**
 
 ```javascript
-import { JsonForm } from '@forestryio/gatsby-xeditor-Json'
+import { JsonForm } from '@forestryio/gatsby-xeditor-json'
 
 class DataTemplate extends React.Component {
   render() {
@@ -138,7 +138,7 @@ class DataTemplate extends React.Component {
       <JsonForm
         data={this.props.data.dataJson}
         render={({ data }) => {
-          return <h1>{data.frontmatter.title}</h1>
+          return <h1>{data.firstName}</h1>
         }}
       />
     )
