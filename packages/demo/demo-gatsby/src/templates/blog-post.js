@@ -31,7 +31,13 @@ function BlogPostTemplate(props) {
           component: "text",
           required: true,
         },
-        { label: "Date", name: "frontmatter.date", component: "text" },
+        {
+          label: "Date",
+          name: "frontmatter.date",
+          component: function ReadOnly({ input }) {
+            return <div>{input.value}</div>
+          },
+        },
         {
           label: "Description",
           name: "frontmatter.description",
