@@ -200,6 +200,7 @@ export function Select(props: SelectProps) {
       theme={theme => ({
         ...theme,
         borderRadius: 4.8,
+        marginBottom: '2rem',
         colors: {
           ...theme.colors,
           primary: '#333',
