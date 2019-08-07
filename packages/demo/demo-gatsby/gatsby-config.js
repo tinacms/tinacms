@@ -12,6 +12,7 @@ module.exports = {
     {
       resolve: "@forestryio/gatsby-plugin-xeditor",
       options: {
+        title: "XEditor Gatsby Demo",
         plugins: [
           "@forestryio/gatsby-xeditor-git",
           "@forestryio/gatsby-xeditor-json",

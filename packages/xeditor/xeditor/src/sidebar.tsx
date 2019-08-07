@@ -6,7 +6,7 @@ import { Form } from '@forestryio/cms'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
 
-export const Sidebar = () => {
+export const Sidebar = ({ title = 'XEditor' }: { title?: string }) => {
   const cms = useCMS()
 
   const [editingForm, setEditingForm] = useState(() => {
@@ -43,7 +43,7 @@ export const Sidebar = () => {
         <SidebarHeader>
           <ForestryLogo />
           {/* TODO: Set site name dynamically */}
-          <SiteName>Gatsby Starter Blog</SiteName>
+          <SiteName>{title}</SiteName>
           <ActionsToggle />
         </SidebarHeader>
         <FieldsWrapper>

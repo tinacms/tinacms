@@ -3,10 +3,10 @@ import { CMSContext } from '@forestryio/cms-react'
 import { SidebarProvider, useSidebar } from '@forestryio/xeditor'
 import { cms } from './index'
 
-export const wrapRootElement = ({ element }: any) => {
+export const wrapRootElement = ({ element }: any, options: any) => {
   return (
     <CMSContext.Provider value={cms}>
-      <SidebarProvider>
+      <SidebarProvider title={options.title}>
         {element}
         <SidebarToggle />
       </SidebarProvider>
