@@ -42,6 +42,7 @@ In order to edit a markdown file, you must register a form with the CMS. There a
 
 In order for the remark forms to work, you must include the following fields in your `markdownRemark` query:
 
+- `id`
 - `fields.fileRelativePath`
 - `rawMarkdownBody`
 
