@@ -44,7 +44,7 @@ export function useRemarkForm(
     }, [timeout])
 
     let [values, form] = useCMSForm({
-      name: `markdownRemark:${markdownRemark.id}`,
+      name: markdownRemark.fields.fileRelativePath,
       initialValues: markdownRemark,
       fields: generateFields(markdownRemark),
       onSubmit(data) {
