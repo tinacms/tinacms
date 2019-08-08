@@ -47,10 +47,15 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
     <>
       {form.fields.map(field => {
         let plugin = cms.forms.getFieldPlugin(field.component as string)
+        let type: string | undefined
+        if (plugin && plugin.type) {
+          type = plugin.type
+        }
         return (
           <FinalField
             name={field.name}
             key={field.name}
+            type={type}
             validate={(value, values, meta) => {
               if (plugin && plugin.validate) {
                 return plugin.validate(value, values, meta, field)
