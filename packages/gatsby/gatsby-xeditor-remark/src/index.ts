@@ -49,7 +49,10 @@ export function useRemarkForm(
       fields: generateFields(markdownRemark),
       onSubmit(data) {
         if (process.env.NODE_ENV === 'development') {
-          // return writeToDisk(data)
+          return cms.api.git.onSubmit!({
+            files: [data.fields.fileRelativePath],
+            message: 'xeditor commit',
+          })
         } else {
           console.log('Not supported')
         }
