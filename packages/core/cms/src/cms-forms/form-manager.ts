@@ -39,6 +39,7 @@ export class FormManager extends Subscribable {
 export interface FieldPlugin {
   name: string
   Component: React.FC<any>
+  type?: string
   validate?(
     value: any,
     allValues: any,
