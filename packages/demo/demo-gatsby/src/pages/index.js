@@ -18,7 +18,13 @@ function BlogIndex(props) {
       backgroundColor: "",
     },
     fields: [
-      { name: "backgroundColor", component: "color", colorFormat: "HeX" },
+      {
+        name: "backgroundColor",
+        label: "Heading Color",
+        component: "color",
+        colorFormat: "HeX",
+      },
+      { name: "hideBio", label: "Hide Bio", component: "toggle" },
     ],
     onSubmit() {
       alert("Saving doesn't do anything.")
@@ -28,7 +34,7 @@ function BlogIndex(props) {
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO title="All posts" />
-      <Bio />
+      {!styles.hideBio && <Bio />}
       {posts.map(({ node }) => {
         const title = node.frontmatter.title || node.fields.slug
         return (
