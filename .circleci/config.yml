@@ -19,6 +19,7 @@ jobs:
     steps:
       - checkout
 
+      - run: echo "//registry.npmjs.org/:_authToken=${NPM_TOKEN}" > ~/.npmrc
       # TODO: this caching strategy might not work for the monorepo
       # Download and cache dependencies
       - restore_cache:
