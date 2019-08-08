@@ -22,5 +22,6 @@ cms.forms.addFieldPlugin({
 })
 cms.forms.addFieldPlugin({
   name: 'toggle',
+  type: 'checkbox',
   Component: ToggleField,
 })

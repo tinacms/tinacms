@@ -19,7 +19,7 @@ export const Toggle: FC<ToggleProps> = props => (
       htmlFor={props.name}
       role="switch"
       disabled={props.disabled}
-      {...props}
+      // {...props}
     >
       <ToggleSwitch xmlns="http://www.w3.org/2000/svg">
         <g>
