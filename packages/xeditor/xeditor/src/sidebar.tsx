@@ -16,7 +16,15 @@ export const Sidebar = ({
   const cms = useCMS()
 
   useSubscribable(cms.plugins, () => {})
-  React.useEffect(() => cms.plugins.add(FormsView), [])
+  React.useEffect(() => {
+    cms.plugins.add(FormsView)
+    cms.plugins.add(DummyView)
+    setActiveView(FormsView)
+  }, [])
+
+  let [ActiveView, setActiveView] = useState({
+    Component: () => null,
+  } as any)
 
   return (
     <StyledFrame
@@ -35,11 +43,17 @@ export const Sidebar = ({
           <ForestryLogo url={logo} />
           {/* TODO: Set site name dynamically */}
           <SiteName>{title}</SiteName>
+          <select style={{ zIndex: 10000 }}>
+            {cms.plugins.all('view').map(view => (
+              <option value={view.name} onClick={() => setActiveView(view)}>
+                {view.name}
+              </option>
+            ))}
+          </select>
           <ActionsToggle />
         </SidebarHeader>
-        {cms.plugins.all<ViewPlugin>('view').map(view => (
-          <view.Component key={view.name} />
-        ))}
+
+        <ActiveView.Component />
       </>
     </StyledFrame>
   )
@@ -117,6 +131,18 @@ const FormsView: ViewPlugin = {
           )}
         </SidebarFooter>
       </>
+    )
+  },
+}
+
+const DummyView: ViewPlugin = {
+  type: 'view',
+  name: 'Dummy',
+  Component: () => {
+    return (
+      <FieldsWrapper>
+        <h2>Hello World</h2>
+      </FieldsWrapper>
     )
   },
 }
