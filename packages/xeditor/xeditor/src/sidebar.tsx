@@ -2,7 +2,7 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@forestryio/cms-final-form-builder'
 import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
-import { Form } from '@forestryio/cms'
+import { Form, Plugin } from '@forestryio/cms'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
 
@@ -15,23 +15,8 @@ export const Sidebar = ({
 }) => {
   const cms = useCMS()
 
-  const [editingForm, setEditingForm] = useState(() => {
-    return cms.forms.all()[0] as Form | null
-  })
-
-  useSubscribable(cms.forms, () => {
-    const forms = cms.forms.all()
-    if (forms.length == 1) {
-      setEditingForm(forms[0])
-      return
-    }
-
-    if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
-      setEditingForm(null)
-    }
-  })
-
-  const forms = cms.forms.all()
+  useSubscribable(cms.plugins, () => {})
+  React.useEffect(() => cms.plugins.add(FormsView), [])
 
   return (
     <StyledFrame
@@ -52,6 +37,43 @@ export const Sidebar = ({
           <SiteName>{title}</SiteName>
           <ActionsToggle />
         </SidebarHeader>
+        {cms.plugins.all<ViewPlugin>('view').map(view => (
+          <view.Component key={view.name} />
+        ))}
+      </>
+    </StyledFrame>
+  )
+}
+
+interface ViewPlugin extends Plugin {
+  type: 'view'
+  Component: any
+}
+
+const FormsView: ViewPlugin = {
+  type: 'view',
+  name: 'Content',
+  Component: () => {
+    const cms = useCMS()
+    const forms = cms.forms.all()
+
+    const [editingForm, setEditingForm] = useState(() => {
+      return cms.forms.all()[0] as Form | null
+    })
+
+    useSubscribable(cms.forms, () => {
+      const forms = cms.forms.all()
+      if (forms.length == 1) {
+        setEditingForm(forms[0])
+        return
+      }
+
+      if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
+        setEditingForm(null)
+      }
+    })
+    return (
+      <>
         <FieldsWrapper>
           {!forms.length ? (
             <NoFormsPlaceholder />
@@ -95,8 +117,8 @@ export const Sidebar = ({
           )}
         </SidebarFooter>
       </>
-    </StyledFrame>
-  )
+    )
+  },
 }
 
 const NoFormsPlaceholder = () => <p>There is nothing to edit on this page</p>
