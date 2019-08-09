@@ -115,7 +115,7 @@ export function toMarkdownString(remark: RemarkNode) {
   )
 }
 
-export function remarkForm(options: any) {
+export function remarkForm(options: Partial<FormOptions<any>> = {}) {
   return (Component: any) =>
     function RemarkForm(props: any) {
       let [markdownRemark] = useRemarkForm(props.data.markdownRemark, options)
