@@ -1,0 +1,32 @@
+{
+  "name": "@forestryio/forestry",
+  "version": "0.1.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "start": "nodemon --watch 'src/**/*.ts' --exec 'ts-node' src/index.ts",
+    "create": "npm run build && npm run test",
+    "refresh": "rm -rf ./node_modules ./package-lock.json && npm install",
+    "build": "tsc -p .",
+    "test": "jest --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2",
+    "@types/node": "^12.7.1",
+    "nodemon": "^1.19.1",
+    "ts-node": "^8.3.0"
+  },
+  "dependencies": {
+    "cms-scripts": "^0.1.1-alpha.1",
+    "chalk": "^2.4.2",
+    "clear": "^0.1.0",
+    "figlet": "^1.2.3",
+    "path": "^0.12.7"
+  }
+}
