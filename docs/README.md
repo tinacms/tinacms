@@ -4,8 +4,10 @@ XEditor is a CMS built by Forestry.io
 
 ## Getting Started
 
-- [Gatsby Starter](./gatsby/starter-setup.md)
-- [Manual Setup](./gatsby/manual-setup.md)
+### Gatsby
+
+- [Start from sratch](./gatsby/starter-setup.md)
+- [Add to an existing site](./gatsby/manual-setup.md)
 
 ## Concepts
 
