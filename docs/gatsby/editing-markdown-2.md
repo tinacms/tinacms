@@ -70,6 +70,8 @@ query BlogPostBySlug($slug: String!) {
 ### Registering Forms
 
 ```javascript
+import { remarkForm } from '@forestryio/gatsby-xeditor-remark'
+
 function BlogPostTemplate(props) {
   return <h1>{props.data.markdownRemark.frontmatter.title}</h1>
 }
