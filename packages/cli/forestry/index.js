@@ -27,13 +27,23 @@ const questions = [
   },
 ]
 
-inquirer.prompt(questions).then(() => {
-  const baseUrl = 'https://github.com'
-  const appID = process.env.GITHUB_CLIENT_ID
+const providerDetails = {
+  ['github']: {
+    baseUrl: 'https://github.com',
+    clientId: process.env.GITHUB_CLIENT_ID,
+  },
+  ['gitlab']: {
+    baseUrl: 'https://github.com',
+    clientId: process.env.GITLAB_CLIENT_ID,
+  },
+}
 
-  const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${appID}&redirect_uri=${encodeURIComponent(
+inquirer.prompt(questions).then(answers => {
+  const { clientId, baseUrl } = providerDetails[answers.gitProvider]
+
+  const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
     'https://forestry.io'
-  )}&response_type=token`
+  )}&response_type=token&scope=${answers.private ? 'private' : 'public'}`
 
   open(authUrl)
 })
