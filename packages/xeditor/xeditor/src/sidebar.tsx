@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { FormBuilder, FieldsBuilder } from '@forestryio/cms-final-form-builder'
 import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
-import { Form, Plugin } from '@forestryio/cms'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
+import { ViewPlugin } from './plugins/FormView'
 
 export const Sidebar = ({
   title = 'XEditor',
@@ -14,17 +13,15 @@ export const Sidebar = ({
   logo?: string
 }) => {
   const cms = useCMS()
+  useSubscribable(cms.plugins)
 
-  useSubscribable(cms.plugins, () => {})
-  React.useEffect(() => {
-    cms.plugins.add(FormsView)
-    cms.plugins.add(DummyView)
-    setActiveView(FormsView)
-  }, [])
-
-  let [ActiveView, setActiveView] = useState({
-    Component: () => null,
-  } as any)
+  let [ActiveView, setActiveView] = useState(() => {
+    let firstView = cms.plugins.all<ViewPlugin>('view')[0]
+    if (firstView) return firstView
+    return {
+      Component: (): any => null,
+    }
+  })
 
   return (
     <StyledFrame
@@ -44,7 +41,7 @@ export const Sidebar = ({
           {/* TODO: Set site name dynamically */}
           <SiteName>{title}</SiteName>
           <select style={{ zIndex: 10000 }}>
-            {cms.plugins.all('view').map(view => (
+            {cms.plugins.all<ViewPlugin>('view').map(view => (
               <option value={view.name} onClick={() => setActiveView(view)}>
                 {view.name}
               </option>
@@ -59,102 +56,6 @@ export const Sidebar = ({
   )
 }
 
-interface ViewPlugin extends Plugin {
-  type: 'view'
-  Component: any
-}
-
-const FormsView: ViewPlugin = {
-  type: 'view',
-  name: 'Content',
-  Component: () => {
-    const cms = useCMS()
-    const forms = cms.forms.all()
-
-    const [editingForm, setEditingForm] = useState(() => {
-      return cms.forms.all()[0] as Form | null
-    })
-
-    useSubscribable(cms.forms, () => {
-      const forms = cms.forms.all()
-      if (forms.length == 1) {
-        setEditingForm(forms[0])
-        return
-      }
-
-      if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
-        setEditingForm(null)
-      }
-    })
-    return (
-      <>
-        <FieldsWrapper>
-          {!forms.length ? (
-            <NoFormsPlaceholder />
-          ) : (
-            <>
-              <ul>
-                {forms.map(form => (
-                  <li
-                    key={form.name}
-                    style={{
-                      textDecoration:
-                        editingForm && editingForm.name === form.name
-                          ? 'underline'
-                          : 'none',
-                    }}
-                    onClick={() => {
-                      setEditingForm(form)
-                    }}
-                  >
-                    {form.name}
-                  </li>
-                ))}
-              </ul>
-              <h3>Editing form {editingForm && editingForm.name}</h3>
-              {editingForm &&
-                (editingForm.fields.length ? (
-                  <FormBuilder form={editingForm}>
-                    {() => {
-                      return <FieldsBuilder form={editingForm} />
-                    }}
-                  </FormBuilder>
-                ) : (
-                  <NoFieldsPlaceholder />
-                ))}
-            </>
-          )}
-        </FieldsWrapper>
-        <SidebarFooter>
-          {editingForm && (
-            <SaveButton onClick={() => editingForm.submit()}>Save</SaveButton>
-          )}
-        </SidebarFooter>
-      </>
-    )
-  },
-}
-
-const DummyView: ViewPlugin = {
-  type: 'view',
-  name: 'Dummy',
-  Component: () => {
-    return (
-      <FieldsWrapper>
-        <h2>Hello World</h2>
-      </FieldsWrapper>
-    )
-  },
-}
-
-const NoFormsPlaceholder = () => <p>There is nothing to edit on this page</p>
-
-const NoFieldsPlaceholder = () => (
-  <p>There are no fields registered with this form</p>
-)
-
-// Styling
-const ForestryLogoFile = require('../assets/forestry-logo.svg')
 const EllipsisVertical = require('../assets/ellipsis-v.svg')
 const HeaderHeight = 5
 const FooterHeight = 3
@@ -203,47 +104,6 @@ const ActionsToggle = styled.button`
     opacity: 0.6;
   }
 `
-
-const FieldsWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: ${HeaderHeight}rem;
-  height: calc(100vh - (${HeaderHeight + FooterHeight}rem));
-  overflow-y: auto;
-  padding: 1rem;
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
-`
-
-const SidebarFooter = styled.div`
-  position: absolute;
-  left: 0;
-  bottom: 0;
-  width: 100%;
-`
-
-const SaveButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-  text-align: center;
-  width: 100%;
-  height: ${FooterHeight}rem;
-  border: 0;
-  background-color: #0085ff;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 0.15s;
-  &:hover {
-    opacity: 0.6;
-  }
-`
-
 const RootElement = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
   html {
