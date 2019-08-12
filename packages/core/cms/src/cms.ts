@@ -1,9 +1,13 @@
 import { FormManager } from './cms-forms'
+import { PluginManager } from './plugins'
+
 export class CMS {
   forms: FormManager
+  plugins: PluginManager
   api: { [key: string]: API } = {}
   constructor() {
     this.forms = new FormManager()
+    this.plugins = new PluginManager()
   }
   registerApi(name: string, api: API): void {
     // TODO: Make sure we're not overwriting an existing API.
