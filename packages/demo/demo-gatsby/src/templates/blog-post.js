@@ -95,7 +95,7 @@ function BlogPostTemplate(props) {
   )
 }
 
-const EditableBlogPostTemplate = remarkForm({
+export default remarkForm({
   fields: [
     {
       label: "Title",
@@ -118,8 +118,6 @@ const EditableBlogPostTemplate = remarkForm({
     { label: "Body", name: "rawMarkdownBody", component: "textarea" },
   ],
 })(BlogPostTemplate)
-
-export default EditableBlogPostTemplate
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
