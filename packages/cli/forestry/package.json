@@ -1,24 +1,17 @@
 {
-  "name": "@forestryio/forestry",
+  "name": "@forestryio/forestry-cli",
   "version": "0.1.0",
-  "main": "build/index.js",
   "license": "MIT",
-  "files": [
-    "build"
-  ],
   "devDependencies": {
     "jest": "^24.8.0",
-    "ts-jest": "^24.0.2",
-    "nodemon": "^1.19.1",
-    "ts-node": "^8.3.0"
+    "ts-jest": "^24.0.2"
   },
-  "scripts": {
-    "start": "node index.js"
+  "bin": {
+    "forestry": "bin/forestry"
   },
   "dependencies": {
     "chalk": "^2.4.2",
     "clear": "^0.1.0",
-    "cms-scripts": "^0.1.1-alpha.1",
     "figlet": "^1.2.3",
     "inquirer": "^6.5.1",
     "path": "^0.12.7",
