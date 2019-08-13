@@ -10,6 +10,8 @@ exports.onPreBootstrap = () => {
   let pathRoot = process.cwd()
 
   const repo = openRepo(pathRoot)
+  repo.addConfig('user.name', "Nolan's Preview Server")
+  repo.addConfig('user.email', 'nolan@forestry.io')
 
   app.use(
     cors({
