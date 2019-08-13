@@ -22,13 +22,13 @@ exports.onPreBootstrap = () => {
   )
   app.use(express.json())
 
-  app.post('/commit', (req, res) => {
+  app.post('/x-editor/commit', (req, res) => {
     let files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
     simpleGit.commit('gatsby-xeditor-git change', ...files)
     res.send('okay')
   })
 
-  app.put('/markdownRemark', (req, res) => {
+  app.put('/x-editor/markdownRemark', (req, res) => {
     let filePath = path.join(pathRoot, req.body.fileRelativePath)
     fs.writeFileSync(filePath, req.body.content)
     res.send(req.body.content)

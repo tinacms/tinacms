@@ -12,10 +12,10 @@ cms.registerApi('git', {
   },
 })
 
+let base = window.location.origin
 function commit(data: any) {
   // @ts-ignore
-  console.log(data, JSON.stringify(data))
-  return fetch('http://localhost:4567/commit', {
+  return fetch(`${base}:4567/x-editor/commit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
@@ -32,7 +32,7 @@ function commit(data: any) {
 
 function writeToDisk(data: any) {
   // @ts-ignore
-  return fetch('http://localhost:4567/markdownRemark', {
+  return fetch(`${base}:4567/x-editor/markdownRemark`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
