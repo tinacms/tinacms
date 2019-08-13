@@ -2,10 +2,12 @@ import { initServer } from './cmds/initServer'
 import { createAccount } from './cmds/createAccount'
 import { login } from './cmds/login'
 import commander from 'commander'
+import { version } from '../package.json'
 
 export function init(args) {
   const program = new commander.Command()
 
+  program.version(version)
   program
     .command('create-account')
     .description('create a forestry account')
