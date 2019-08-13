@@ -12,7 +12,7 @@ const cors = require('cors')
 
 clear()
 console.log(
-  chalk.red(figlet.textSync('Forestry', { horizontalLayout: 'full' }))
+  chalk.green(figlet.textSync('Forestry', { horizontalLayout: 'full' }))
 )
 
 const questions = [
@@ -35,7 +35,7 @@ const providerDetails = {
     clientId: process.env.GITHUB_CLIENT_ID,
   },
   ['gitlab']: {
-    baseUrl: 'https://github.com',
+    baseUrl: 'https://gitlab.com',
     clientId: process.env.GITLAB_CLIENT_ID,
   },
 }
@@ -52,10 +52,10 @@ inquirer.prompt(questions).then(answers => {
       },
     })
   )
-  app.get('/github/callback', (req, res) => {
+  app.get(`/${answers.gitProvider}/callback`, (req, res) => {
     console.log('receieved my auth callback')
     console.log(`code: ${req.query.code}`)
-    res.send('<p>Authorizing with Github</p>')
+    res.send(`<p>Authorizing with ${answers.gitProvider}</p>`)
   })
   app.listen(4568, () => {
     console.log('------------------------------------------')
@@ -63,9 +63,17 @@ inquirer.prompt(questions).then(answers => {
     console.log('------------------------------------------')
   })
 
+  let query = '&response_type=token'
+  if (answers.gitProvider === 'github') {
+    query += '&scope=public_repo,write:repo_hook,user:email'
+    if (answers.private) {
+      query += '&scope=repo,write:repo_hook,user:email'
+    }
+  }
+
   const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
     `http://localhost:4568/${answers.gitProvider}/callback`
-  )}&response_type=token&scope=${answers.private ? 'private' : 'public'}`
+  )}${query}`
 
   open(authUrl)
 })
