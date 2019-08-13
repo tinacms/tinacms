@@ -1,24 +1,40 @@
-import minimist from 'minimist'
 import { initServer } from './cmds/initServer'
 import { createAccount } from './cmds/createAccount'
 import { login } from './cmds/login'
+import commander from 'commander'
 
-export function init() {
-  const args = minimist(process.argv.slice(2))
-  const cmd = args._[0]
+export function init(args) {
+  const program = new commander.Command()
 
-  switch (cmd) {
-    case 'create-account':
-      createAccount(args)
-      break
-    case 'login':
-      login(args)
-      break
-    case 'init-server':
-      initServer(args)
-      break
-    default:
-      console.error(`"${cmd}" is not a valid command!`)
-      break
-  }
+  program
+    .command('create-account')
+    .description('create a forestry account')
+    .action(() => {
+      createAccount()
+    })
+
+  program
+    .command('login')
+    .description('log in to forestry account')
+    .action(() => {
+      login()
+    })
+
+  program
+    .command('init-server')
+    .description('Set up thee cloud development server')
+    .action(() => {
+      initServer()
+    })
+
+  // error on unknown commands
+  program.on('command:*', function() {
+    console.error(
+      'Invalid command: %s\nSee --help for a list of available commands.',
+      program.args.join(' ')
+    )
+    process.exit(1)
+  })
+
+  program.parse(args)
 }
