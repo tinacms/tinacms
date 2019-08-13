@@ -17,7 +17,7 @@ let base = `${protocol}//${hostname}`
 
 function commit(data: any) {
   // @ts-ignore
-  return fetch(`${base}:4567/x-editor/commit`, {
+  return fetch(`${base}:4567/x-server/commit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
@@ -34,7 +34,7 @@ function commit(data: any) {
 
 function writeToDisk(data: any) {
   // @ts-ignore
-  return fetch(`${base}:4567/x-editor/markdownRemark`, {
+  return fetch(`${base}:4567/x-server/markdownRemark`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
