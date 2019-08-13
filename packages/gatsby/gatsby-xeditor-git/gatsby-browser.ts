@@ -12,7 +12,9 @@ cms.registerApi('git', {
   },
 })
 
-let base = window.location.origin
+let { protocol, hostname } = window.location
+let base = `${protocol}//${hostname}`
+
 function commit(data: any) {
   // @ts-ignore
   return fetch(`${base}:4567/x-editor/commit`, {
