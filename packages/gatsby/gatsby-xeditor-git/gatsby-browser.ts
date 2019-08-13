@@ -13,11 +13,12 @@ cms.registerApi('git', {
 })
 
 let { protocol, hostname } = window.location
-let base = `${protocol}//${hostname}`
+let port = hostname.endsWith('instant.dev.forestry.io') ? '' : ':4567'
+let base = `${protocol}//${hostname}${port}`
 
 function commit(data: any) {
   // @ts-ignore
-  return fetch(`${base}:4567/x-server/commit`, {
+  return fetch(`${base}/x-server/commit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
@@ -34,7 +35,7 @@ function commit(data: any) {
 
 function writeToDisk(data: any) {
   // @ts-ignore
-  return fetch(`${base}:4567/x-server/markdownRemark`, {
+  return fetch(`${base}/x-server/markdownRemark`, {
     method: 'PUT',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
