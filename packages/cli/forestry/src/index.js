@@ -1,15 +1,13 @@
 require('dotenv').config()
-const clear = require('clear')
-const chalk = require('chalk')
-const figlet = require('figlet')
-const path = require('path')
-const program = require('commander')
-const open = require('open')
-const inquirer = require('inquirer')
-const express = require('express')
-const cors = require('cors')
+import clear from 'clear'
+import figlet from 'figlet'
+import open from 'open'
+import inquirer from 'inquirer'
+import express from 'express'
+import cors from 'cors'
+import chalk from 'chalk'
 
-module.exports = () => {
+export async function initServer(options) {
   clear()
   console.log(
     chalk.green(figlet.textSync('Forestry', { horizontalLayout: 'full' }))
