@@ -1,2 +1,4 @@
 #!/usr/bin/env node
-require('../src/')()
+
+require = require('esm')(module)
+require('../src/').initServer(process.argv)
