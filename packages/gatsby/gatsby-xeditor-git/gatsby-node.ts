@@ -4,12 +4,17 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as openRepo from 'simple-git/promise'
 
+const GIT_SSH_COMMAND =
+  'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+
 exports.onPreBootstrap = () => {
   let app = express()
 
   let pathRoot = process.cwd()
 
   const repo = openRepo(pathRoot)
+  // TODO: Don't do this
+  repo.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND)
   repo.addConfig('user.name', "Nolan's Preview Server")
   repo.addConfig('user.email', 'nolan@forestry.io')
 
