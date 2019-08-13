@@ -6,7 +6,8 @@
     "bs": "npm run bootstrap",
     "link": "lerna link",
     "test": "lerna run test",
-    "build": "lerna run build"
+    "build": "lerna run build",
+    "publish": "npm run build && lerna publish"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
