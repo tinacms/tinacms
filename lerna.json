@@ -1,4 +1,9 @@
 {
   "packages": ["packages/**"],
-  "version": "independent"
+  "version": "independent",
+  "command": {
+    "publish": {
+      "ignoreChanges": ["packages/demo/**/*"]
+    }
+  }
 }
