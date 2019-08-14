@@ -32,6 +32,15 @@ const createAuthServer = gitProvider => {
     console.log('receieved my auth callback')
     console.log(`code: ${req.query.code}`)
     res.send(`<p>Authorizing with ${gitProvider}</p>`)
+
+    if (gitProvider == 'github') {
+      open(
+        `https://github.com/apps/${process.env.GITHUB_APP_ID}/installations/new`
+      )
+    }
+  })
+  app.get('/github/installation-callback', (req, res) => {
+    console.log('all verified!')
   })
   app.listen(4568, () => {
     console.log('------------------------------------------')
