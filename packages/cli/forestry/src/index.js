@@ -24,7 +24,7 @@ export function init(args) {
 
   program
     .command('init-server')
-    .description('Set up thee cloud development server')
+    .description('Set up the cloud development server')
     .action(() => {
       initServer()
     })
