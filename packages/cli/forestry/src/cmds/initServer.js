@@ -6,9 +6,7 @@ import inquirer from 'inquirer'
 import express from 'express'
 import cors from 'cors'
 import chalk from 'chalk'
-import path from 'path'
-import os from 'os'
-import * as fs from 'fs'
+import { isAuthenticated } from '../config'
 
 const providerDetails = {
   ['github']: {
@@ -44,7 +42,7 @@ const createAuthServer = gitProvider => {
 }
 
 export async function initServer(options) {
-  if (!getToken()) {
+  if (!isAuthenticated()) {
     console.log('you must be logged in to perform this action')
     return
   }
@@ -85,19 +83,4 @@ export async function initServer(options) {
   )}${query}`
 
   open(authUrl)
-}
-
-const readConfig = () => {
-  const tokenPath = path.join(os.homedir(), '.forestry-config')
-  try {
-    let rawConfig = fs.readFileSync(tokenPath)
-    return JSON.parse(rawConfig)
-  } catch (e) {
-    return {}
-  }
-}
-
-const getToken = () => {
-  const config = readConfig()
-  return config.token
 }

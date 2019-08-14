@@ -1,7 +1,5 @@
 import inquirer from 'inquirer'
-import * as fs from 'fs'
-import os from 'os'
-import path from 'path'
+import { writeConfig } from '../config'
 
 export async function login(options) {
   const fields = [
@@ -19,9 +17,7 @@ export async function login(options) {
 
   const fieldValues = await inquirer.prompt(fields)
 
-  const tokenPath = path.join(os.homedir(), '.forestry-config')
-
-  fs.writeFileSync(tokenPath, JSON.stringify({ token: 'abc123' }))
+  writeConfig({ token: 'abc123' })
 
   // TODO - Post to forestry and grab token
   // TODO - Store token in ~/.forestry credentials file
