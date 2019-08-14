@@ -1,38 +1,53 @@
-import { PluginManager, Plugin } from '@forestryio/cms'
 const express = require('express')
+const cors = require('cors')
 
-interface XServerPlugin extends Plugin {
-  apply(server: any, config: XServerConfig): void
-}
-
-interface XServerConfig {
+export interface XServerConfig {
   routePrefix?: string
   envPrefix?: string
 }
 
+export type XServerPlugin = (server: XServer, config: XServerConfig) => void
+
 export class XServer {
   server: any
-  plugins: PluginManager
   config: XServerConfig
-  routePrefix: string
-  envPrefix: string
 
   constructor(config: XServerConfig) {
     this.server = express()
-    this.plugins = new PluginManager()
-    this.config = config
-    this.routePrefix = config.routePrefix || '/__xeditor'
-    this.envPrefix = config.envPrefix || 'XEDITOR_'
+    this.config = {
+      routePrefix: '/__xeditor',
+      envPrefix: 'XEDITOR_',
+      ...config,
+    }
 
-    this.server.get(`${this.routePrefix}`, (_: any, res: any) => res.send("Xserver running"))
+    this.server.use(
+      cors({
+        origin: function(origin: any, callback: any) {
+          // TODO: Only accept from same host.
+          callback(null, true)
+        },
+      })
+    )
+    this.server.get(`${this.config.routePrefix}`, (_: any, res: any) =>
+      res.send('Xserver running')
+    )
   }
 
-  start(port: any = 4567) {
-    this.plugins.all('server').map((plugin: any) => plugin.apply(this.server, this.config))
+  extend(plugin: XServerPlugin) {
+    plugin(this.server, this.config)
+  }
+
+  start(port: Number = 4567) {
     this.server.listen(port, () => {
-      console.log(`\x1b[35m┌─────────────────────────────────────────────┐\x1b[0m`)
-      console.log(`\x1b[35m│ Xserver (not that one) running on port ${port} │\x1b[0m`)
-      console.log(`\x1b[35m└─────────────────────────────────────────────┘\x1b[0m`)
+      console.log(
+        `\x1b[35m┌─────────────────────────────────────────────┐\x1b[0m`
+      )
+      console.log(
+        `\x1b[35m│ Xserver (not that one) running on port ${port} │\x1b[0m`
+      )
+      console.log(
+        `\x1b[35m└─────────────────────────────────────────────┘\x1b[0m`
+      )
     })
   }
 }
