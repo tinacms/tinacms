@@ -13,8 +13,8 @@ interface PluginOptions {
 
 exports.onPreBootstrap = (_: any, pluginOptions: PluginOptions) => {
   const xserver = new XServer(pluginOptions)
-  if (pluginOptions.plugins && pluginOptions.plugins.length > 0) {
-    pluginOptions.plugins.map((pluginConfig: PluginConfig) => {
+  if (pluginOptions.plugins) {
+    pluginOptions.plugins.forEach((pluginConfig: PluginConfig) => {
       let plugin = require(pluginConfig.resolve)
       xserver.extend(plugin.extendXserver as any)
     })
