@@ -1,6 +1,6 @@
 {
   "name": "@forestryio/cms",
-  "version": "1.0.1-alpha.7",
+  "version": "1.0.1-alpha.8",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
