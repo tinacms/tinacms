@@ -12,13 +12,13 @@
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
+    "cms-scripts": "^0.1.1-alpha.1",
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
     "@forestryio/cms": "^1.0.1-alpha.7",
-    "cms-scripts": "^0.1.1-alpha.1",
     "express": "^4.17.1"
   }
 }
