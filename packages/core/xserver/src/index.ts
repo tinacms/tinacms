@@ -15,7 +15,7 @@ export class XServer {
   constructor(config: XServerConfig) {
     this.server = express()
     this.config = {
-      routePrefix: '/__xeditor',
+      routePrefix: '/x-server',
       envPrefix: 'XEDITOR_',
       ...config,
     }
