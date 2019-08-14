@@ -7,21 +7,9 @@ import express from 'express'
 import cors from 'cors'
 import chalk from 'chalk'
 
-const providerDetails = {
-  ['github']: {
-    baseUrl: 'https://github.com',
-    clientId: process.env.GITHUB_CLIENT_ID,
-  },
-  ['gitlab']: {
-    baseUrl: 'https://gitlab.com',
-    clientId: process.env.GITLAB_CLIENT_ID,
-  },
-}
-
-const createAuthServer = gitProvider => {
+const createExpressServer = () => {
   let app = express()
 
-  let gitProviderToken = ''
   app.use(
     cors({
       origin: function(origin, callback) {
@@ -30,69 +18,103 @@ const createAuthServer = gitProvider => {
       },
     })
   )
-  app.get(`/${gitProvider}/callback`, (req, res) => {
-    gitProviderToken = req.query.code
-    console.log(`code: ${gitProviderToken}`)
-    res.send(`<p>Authorizing with ${gitProvider}</p>`)
 
-    if (gitProvider == 'github') {
-      open(
-        `https://github.com/apps/${process.env.GITHUB_APP_ID}/installations/new`
-      )
-    }
-  })
-  app.get('/github/installation-callback', async (req, res) => {
-    console.log('github app installation completee ')
-
-    res.send(
-      `<p>Installed Github app, installation id:${
-        req.query.installation_id
-      }</p>`
-    )
-  })
-
-  app.listen(4568, () => {
-    console.log('------------------------------------------')
-    console.log('wait for the auth response')
-    console.log('------------------------------------------')
-  })
+  return app
 }
 
-export async function initServer(options) {
+const providerDetails = {
+  ['github']: {
+    baseUrl: 'https://github.com',
+    clientId: process.env.GITHUB_CLIENT_ID,
+    createCallbackServer: app => {
+      return new Promise(resolve => {
+        let gitProviderToken = ''
+
+        app.get(`/github/callback`, async (req, res) => {
+          gitProviderToken = req.query.code
+          console.log(`code: ${gitProviderToken}`)
+          res.send(`<p>Authorizing with Github</p>`)
+
+          open(
+            `https://github.com/apps/${
+              process.env.GITHUB_APP_ID
+            }/installations/new`
+          )
+
+          //The user may not have to confirm additional permissions, so give them a way out early
+          await inquirer.prompt([
+            {
+              name: 'confirmPermissions',
+              type: 'confirm',
+              message: 'Once you have granted access to your rpeo, hit enter:',
+            },
+          ])
+          resolve(gitProviderToken)
+        })
+        app.get('/github/installation-callback', async (req, res) => {
+          console.log('github app installation complete ')
+
+          res.send(
+            `<p>Installed Github app, installation id:${
+              req.query.installation_id
+            }</p>`
+          )
+
+          resolve(gitProviderToken)
+        })
+      })
+    },
+  },
+  ['gitlab']: {
+    baseUrl: 'https://gitlab.com',
+    clientId: process.env.GITLAB_CLIENT_ID,
+    createCallbackServer: () => {
+      console.log('todo - gitlab callback')
+      return Promise.resolve()
+    },
+  },
+}
+
+export async function initServer() {
   clear()
   console.log(
     chalk.green(figlet.textSync('Forestry', { horizontalLayout: 'full' }))
   )
 
-  const questions = [
+  const answers = await inquirer.prompt([
     {
       name: 'gitProvider',
       type: 'list',
       message: 'Choose a git provider:',
       choices: ['github', new inquirer.Separator(), 'gitlab'],
     },
-    {
-      name: 'private',
-      type: 'confirm',
-      message: 'Is your repo private?:',
-    },
-  ]
+  ])
 
-  const answers = await inquirer.prompt(questions)
-
-  createAuthServer(answers.gitProvider)
-
-  let query = '&response_type=token'
-  if (answers.gitProvider === 'github') {
-    query += '&scope=public_repo,write:repo_hook,user:email'
-    if (answers.private) {
-      query += '&scope=repo,write:repo_hook,user:email'
-    }
-  }
   const { clientId, baseUrl } = providerDetails[answers.gitProvider]
   const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
     `http://localhost:4568/${answers.gitProvider}/callback`
-  )}${query}`
+  )}&response_type=token`
 
+  let app = createExpressServer()
+  let server = app.listen(4568, () => {
+    console.log('------------------------------------------')
+    console.log('wait for the auth response')
+    console.log('------------------------------------------')
+  })
+
+  //TODO - potential race condition with the line below?
   open(authUrl)
+  const token = await providerDetails[answers.gitProvider].createCallbackServer(
+    app
+  )
+  console.log(
+    'TODO - send this to our dev-server starter: ' +
+      JSON.stringify({
+        token,
+        repo: 'TODO',
+        branch: 'TODO',
+        secrets: 'TODO',
+      })
+  )
+  server.close()
 }
