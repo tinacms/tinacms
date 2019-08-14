@@ -1,6 +1,6 @@
 {
   "name": "@forestryio/gatsby-plugin-xserver",
-  "version": "0.1.0",
+  "version": "0.1.1-alpha.0",
   "main": "gatsby-node.js",
   "license": "MIT",
   "files": [
@@ -16,7 +16,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@forestryio/xserver": "^0.1.0",
+    "@forestryio/xserver": "^0.1.1-alpha.0",
     "cms-scripts": "^0.1.1-alpha.1"
   }
 }
