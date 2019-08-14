@@ -1,9 +1,10 @@
 # Editing JSON in Gatsby
 
-Creating forms for content provided by the [`gatsby-transformer-json`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-json) plugin is made possible by two plugins:
+Creating forms for content provided by the [`gatsby-transformer-json`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-json) plugin is made possible by three plugins:
 
+- `gatsby-plugin-xserver`: Provides a node backend that backend plugins can extend.
 - `gatsby-xeditor-json`: Provides hooks and components for creating Remark forms.
-- `gatsby-xeditor-git`: Creates a node server that writes changes to the local filesystem;
+- `gatsby-xeditor-git`: Extends `gatsby-plugin-xserver` to writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
 ## Installation
