@@ -148,7 +148,7 @@ class DataTemplate extends React.Component {
 
 ## Next Steps
 
-- [Editing Markdown](./editing-markdown.md)
+- [Editing Markdown](./editing-markdown-2.md)
 
 ## References
 
