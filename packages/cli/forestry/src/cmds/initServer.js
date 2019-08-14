@@ -6,6 +6,9 @@ import inquirer from 'inquirer'
 import express from 'express'
 import cors from 'cors'
 import chalk from 'chalk'
+import path from 'path'
+import os from 'os'
+import * as fs from 'fs'
 
 const providerDetails = {
   ['github']: {
@@ -41,6 +44,11 @@ const createAuthServer = gitProvider => {
 }
 
 export async function initServer(options) {
+  if (!getToken()) {
+    console.log('you must be logged in to perform this action')
+    return
+  }
+
   clear()
   console.log(
     chalk.green(figlet.textSync('Forestry', { horizontalLayout: 'full' }))
@@ -77,4 +85,19 @@ export async function initServer(options) {
   )}${query}`
 
   open(authUrl)
+}
+
+const readConfig = () => {
+  const tokenPath = path.join(os.homedir(), '.forestry-config')
+  try {
+    let rawConfig = fs.readFileSync(tokenPath)
+    return JSON.parse(rawConfig)
+  } catch (e) {
+    return {}
+  }
+}
+
+const getToken = () => {
+  const config = readConfig()
+  return config.token
 }
