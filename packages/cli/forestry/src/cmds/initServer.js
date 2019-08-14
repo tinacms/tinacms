@@ -20,6 +20,8 @@ const providerDetails = {
 
 const createAuthServer = gitProvider => {
   let app = express()
+
+  let gitProviderToken = ''
   app.use(
     cors({
       origin: function(origin, callback) {
@@ -29,8 +31,8 @@ const createAuthServer = gitProvider => {
     })
   )
   app.get(`/${gitProvider}/callback`, (req, res) => {
-    console.log('receieved my auth callback')
-    console.log(`code: ${req.query.code}`)
+    gitProviderToken = req.query.code
+    console.log(`code: ${gitProviderToken}`)
     res.send(`<p>Authorizing with ${gitProvider}</p>`)
 
     if (gitProvider == 'github') {
@@ -39,9 +41,16 @@ const createAuthServer = gitProvider => {
       )
     }
   })
-  app.get('/github/installation-callback', (req, res) => {
-    console.log('all verified!')
+  app.get('/github/installation-callback', async (req, res) => {
+    console.log('github app installation completee ')
+
+    res.send(
+      `<p>Installed Github app, installation id:${
+        req.query.installation_id
+      }</p>`
+    )
   })
+
   app.listen(4568, () => {
     console.log('------------------------------------------')
     console.log('wait for the auth response')
