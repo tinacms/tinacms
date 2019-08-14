@@ -5,7 +5,7 @@ interface PluginConfig {
 }
 
 interface PluginOptions {
-  pathPrefix?: string
+  routePrefix?: string
   envPrefix?: string
   port?: Number
   plugins?: Array<PluginConfig>
