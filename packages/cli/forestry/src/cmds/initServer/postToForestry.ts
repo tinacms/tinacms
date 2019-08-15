@@ -23,13 +23,13 @@ export const postToForestry = async (
     },
   ])
 
-  await tasks.run().catch((err: any) => {
+  await tasks.run().catch(err => {
     console.error(err)
   })
   console.log(`\nyour dev server is live at: ${chalk.green(devServer)}`)
 }
 
-const wait2 = async (result: any) => {
+const wait2 = async (result: string) => {
   return new Promise(resolve => {
     setTimeout(() => {
       resolve(result)

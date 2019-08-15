@@ -8,8 +8,7 @@ const configPath = path.join(os.homedir(), '.forestry-config')
 export const readConfig = () => {
   try {
     let rawConfig = fs.readFileSync(configPath)
-    //@ts-ignore
-    return JSON.parse(rawConfig)
+    return JSON.parse(rawConfig as any)
   } catch (e) {
     return {}
   }
