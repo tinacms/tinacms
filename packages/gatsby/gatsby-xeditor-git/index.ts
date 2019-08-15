@@ -8,28 +8,52 @@ import { writeFile } from './file-writer'
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
+const DEFAULT_NAME = 'Forestry'
+const DEFAULT_EMAIL = 'nolan@forestry.io'
+const DEFAULT_MESSAGE = 'Update from XEditor'
+
 exports.extendXserver = (server: any, config: any) => {
   let pathRoot = process.cwd()
 
   const repo = openRepo(pathRoot)
   // TODO: Don't do this
   repo.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND)
-  repo.addConfig('user.name', 'Update from Forestry.io')
-  // TODO: This should be set on-commit, and given to us by the client.
-  repo.addConfig('user.email', 'nolan@forestry.io')
-
   server.use(express.json())
 
   server.post(`${config.routePrefix}/commit`, (req: any, res: any) => {
     let message = req.body.message
     let files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
-    // TODO: Allow request to send the message
-    repo.commit(message, ...files)
-    // TODO: Wait for push to finishe
     // TODO: Separate commit and push???
-    repo.push()
-    res.send('okay')
+    commit({
+      name: req.body.name,
+      email: req.body.email,
+      message,
+      files,
+    })
+      .then(() => {
+        res.json({ status: 'success' })
+      })
+      .catch(e => {
+        // TODO: More intelligently respond
+        res.status(412)
+        res.send(e.message)
+      })
   })
+
+  interface CommitOptions {
+    files: string[]
+    message?: string
+    name?: string
+    email?: string
+  }
+  async function commit({ files, message, name, email }: CommitOptions) {
+    let options = {
+      '--author': `"${name || DEFAULT_NAME} <${email || DEFAULT_EMAIL}>"`,
+    }
+
+    await repo.commit(message || DEFAULT_MESSAGE, ...files, options)
+    await repo.push()
+  }
 
   server.put(`${config.routePrefix}/markdownRemark`, (req: any, res: any) => {
     writeFile(pathRoot, req.body)
