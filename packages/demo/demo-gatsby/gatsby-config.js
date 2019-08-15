@@ -10,13 +10,18 @@ module.exports = {
   },
   plugins: [
     {
+      resolve: "@forestryio/gatsby-plugin-xserver",
+      options: {
+        plugins: ["@forestryio/gatsby-xeditor-git"],
+      },
+    },
+    {
       resolve: "@forestryio/gatsby-plugin-xeditor",
       options: {
         title: "XEditor Gatsby Demo",
         logo:
           "https://seeklogo.com/images/G/gatsby-logo-1A245AD37F-seeklogo.com.png",
         plugins: [
-          "@forestryio/gatsby-xeditor-git",
           "@forestryio/gatsby-xeditor-json",
           {
             resolve: "@forestryio/gatsby-xeditor-gitlab",
