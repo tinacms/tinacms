@@ -4,8 +4,7 @@ import { requestGitProvider } from './requestGitProvider'
 import { retrieveAuthToken } from './retrieveAuthToken'
 import { requestRepoBranch } from './requestRepoBranch'
 import { postToForestry } from './postToForestry'
-//@ts-ignore
-import clear from 'clear'
+const clear = require('clear')
 
 export async function initServer() {
   clear()
