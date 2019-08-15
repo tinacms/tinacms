@@ -1,4 +1,6 @@
+//@ts-ignore
 import path from 'path'
+//@ts-ignore
 import os from 'os'
 import * as fs from 'fs'
 
@@ -7,13 +9,14 @@ const configPath = path.join(os.homedir(), '.forestry-config')
 export const readConfig = () => {
   try {
     let rawConfig = fs.readFileSync(configPath)
+    //@ts-ignore
     return JSON.parse(rawConfig)
   } catch (e) {
     return {}
   }
 }
 
-export const writeConfig = newConfig => {
+export const writeConfig = (newConfig: any) => {
   fs.writeFileSync(configPath, JSON.stringify({ ...readConfig(), newConfig }))
 }
 

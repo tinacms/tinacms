@@ -1,6 +1,6 @@
 import inquirer from 'inquirer'
 
-export const requestGitProvider = async remote => {
+export const requestGitProvider = async (remote: string) => {
   //todo - repelace this with a smarter regex. (Incase your gitlab repo was called 'github.com' :/ )
   if (remote.includes('github.com')) {
     return 'github'
