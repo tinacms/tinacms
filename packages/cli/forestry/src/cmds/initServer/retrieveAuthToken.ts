@@ -10,7 +10,7 @@ const createExpressServer = () => {
 
   app.use(
     cors({
-      origin: function(origin: any, callback: any) {
+      origin: function(origin, callback) {
         // TODO: Only accept from localhost.
         callback(null, true)
       },
@@ -24,11 +24,11 @@ const providerDetails = {
   ['github']: {
     baseUrl: 'https://github.com',
     clientId: process.env.GITHUB_CLIENT_ID,
-    createCallbackServer: (app: any) => {
+    createCallbackServer: (app: express.Express) => {
       return new Promise(resolve => {
         let gitProviderToken = ''
 
-        app.get(`/github/callback`, async (req: any, res: any) => {
+        app.get(`/github/callback`, async (req, res) => {
           gitProviderToken = req.query.code
           res.send(`<p>Authorizing with Github</p>`)
 
@@ -48,7 +48,7 @@ const providerDetails = {
           ])
           resolve(gitProviderToken)
         })
-        app.get('/github/installation-callback', async (req: any, res: any) => {
+        app.get('/github/installation-callback', async (req, res) => {
           console.log('github app installation complete ')
 
           res.send(
@@ -72,7 +72,7 @@ const providerDetails = {
   },
 }
 
-export const retrieveAuthToken = async (gitProvider: any) => {
+export const retrieveAuthToken = async (gitProvider: string) => {
   //@ts-ignore
   const { clientId, baseUrl } = providerDetails[gitProvider]
   const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
