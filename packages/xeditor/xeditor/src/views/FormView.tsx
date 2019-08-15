@@ -37,6 +37,14 @@ export const FormsView: ViewPlugin = {
      * No Forms
      */
     if (!forms.length) return <NoFormsPlaceholder />
+    if (!editingForm)
+      return (
+        <FormsList
+          forms={forms}
+          activeForm={editingForm}
+          setActiveForm={setEditingForm}
+        />
+      )
 
     return (
       <>
@@ -49,7 +57,7 @@ export const FormsView: ViewPlugin = {
           {({ handleSubmit, pristine }) => {
             return (
               <>
-                <h3>Editing form {editingForm && editingForm.name}</h3>
+                <h3>Editing form {editingForm.name}</h3>
                 {editingForm &&
                   (editingForm.fields.length ? (
                     <FieldsBuilder form={editingForm} />
@@ -57,14 +65,12 @@ export const FormsView: ViewPlugin = {
                     <NoFieldsPlaceholder />
                   ))}
                 <FormsFooter>
-                  {editingForm && (
-                    <SaveButton
-                      onClick={() => handleSubmit()}
-                      disabled={pristine}
-                    >
-                      Save
-                    </SaveButton>
-                  )}
+                  <SaveButton
+                    onClick={() => handleSubmit()}
+                    disabled={pristine}
+                  >
+                    Save
+                  </SaveButton>
                 </FormsFooter>
               </>
             )
