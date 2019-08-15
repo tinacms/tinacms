@@ -3,6 +3,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as openRepo from 'simple-git/promise'
 import { audit } from './audit'
+import { writeFile } from './file-writer'
 
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
@@ -28,18 +29,18 @@ exports.extendXserver = (server: any, config: any) => {
     res.send('okay')
   })
 
-  let writeFile = audit((body: any) => {
-    let filePath = path.join(pathRoot, body.fileRelativePath)
-    return new Promise((resolve, reject) => {
-      fs.writeFile(filePath, body.content, err => {
-        if (err) reject(err)
-        else resolve()
-      })
-    })
-  })
-
   server.put(`${config.routePrefix}/markdownRemark`, (req: any, res: any) => {
-    writeFile(req.body)
+    writeFile(pathRoot, req.body)
     res.send(req.body.content)
   })
 }
+
+let writeFileAudit = audit((pathRoot: string, body: any) => {
+  let filePath = path.join(pathRoot, body.fileRelativePath)
+  return new Promise((resolve, reject) => {
+    fs.writeFile(filePath, body.content, err => {
+      if (err) reject(err)
+      else resolve()
+    })
+  })
+})

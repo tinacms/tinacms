@@ -8,7 +8,8 @@
     "gatsby-browser.js",
     "gatsby-node.js",
     "errors.js",
-    "markdownRemark"
+    "markdownRemark",
+    "file-writer.js"
   ],
   "scripts": {
     "build": "tsc"
