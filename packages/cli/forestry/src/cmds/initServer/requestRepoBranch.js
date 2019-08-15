@@ -4,18 +4,24 @@ import inquirer from 'inquirer'
 export async function requestRepoBranch() {
   const git = simplegit()
   const branch = (await git.branchLocal()).current
-  const repo = (await git.getRemotes(true))[0].refs.fetch
 
-  await inquirer.prompt([
+  const remotes = await git.getRemotes(true)
+  if (!remotes) {
+    console.error('There are no git remotes setup within this directory')
+    process.exit(1)
+  }
+
+  const remoteConfirmation = await inquirer.prompt([
     {
-      name: 'repositoryConfirmed',
-      type: 'confirm',
-      message: `Is this the repository you are looking to setup? \nRepository:${repo}\nBranch:${branch}`,
+      name: 'remote',
+      type: 'list',
+      message: `Choose the remote you're looking to setup`,
+      choices: remotes.map(r => `${r.refs.fetch} (${branch})`),
     },
   ])
 
   return {
-    repo,
+    repo: remoteConfirmation.remote,
     branch,
   }
 }
