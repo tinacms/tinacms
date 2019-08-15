@@ -3,7 +3,7 @@ import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
-import { ViewPlugin } from './plugins/FormView'
+import { ViewPlugin } from './views/FormView'
 
 export const Sidebar = ({
   title = 'XEditor',
@@ -50,7 +50,9 @@ export const Sidebar = ({
           <ActionsToggle />
         </SidebarHeader>
 
-        <ActiveView.Component />
+        <FieldsWrapper>
+          <ActiveView.Component />
+        </FieldsWrapper>
       </>
     </StyledFrame>
   )
@@ -120,5 +122,21 @@ const RootElement = createGlobalStyle`
   }
   *, *:before, *:after {
     box-sizing: inherit;
+  }
+`
+
+const FieldsWrapper = styled.div`
+  position: absolute;
+  left: 0;
+  top: ${HeaderHeight}rem;
+  height: calc(100vh - (${HeaderHeight}rem));
+  width: 100%;
+  overflow-y: auto;
+  padding: 1rem;
+  ul,
+  li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
   }
 `

@@ -7,7 +7,7 @@ import {
   ToggleField,
 } from './fields'
 import { CMS } from '@forestryio/cms'
-import { FormsView, DummyView } from './plugins/FormView'
+import { FormsView, DummyView } from './views/FormView'
 
 export const cms = new CMS()
 
