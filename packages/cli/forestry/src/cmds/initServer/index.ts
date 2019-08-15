@@ -1,10 +1,11 @@
-import clear from 'clear'
-import figlet from 'figlet'
+import * as figlet from 'figlet'
 import chalk from 'chalk'
 import { requestGitProvider } from './requestGitProvider'
 import { retrieveAuthToken } from './retrieveAuthToken'
 import { requestRepoBranch } from './requestRepoBranch'
 import { postToForestry } from './postToForestry'
+//@ts-ignore
+import clear from 'clear'
 
 export async function initServer() {
   clear()

@@ -1,3 +1,4 @@
+//@ts-ignore
 import open from 'open'
 
 const signupUrl = 'https://app.forestry.io/signup'

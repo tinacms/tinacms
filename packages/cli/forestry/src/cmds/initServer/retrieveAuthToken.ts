@@ -1,8 +1,8 @@
 require('dotenv').config()
-import express from 'express'
-import cors from 'cors'
-import open from 'open'
-import inquirer from 'inquirer'
+import * as express from 'express'
+import * as cors from 'cors'
+import * as open from 'open'
+import * as inquirer from 'inquirer'
 
 const AUTH_CALLBACK_PORT = 4568
 const createExpressServer = () => {

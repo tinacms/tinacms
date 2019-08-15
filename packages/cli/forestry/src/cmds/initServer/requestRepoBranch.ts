@@ -1,5 +1,5 @@
-import simplegit from 'simple-git/promise'
-import inquirer from 'inquirer'
+import * as simplegit from 'simple-git/promise'
+import * as inquirer from 'inquirer'
 
 export async function requestRepoBranch() {
   const git = simplegit()

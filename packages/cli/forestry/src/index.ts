@@ -1,9 +1,8 @@
-//@ts-ignore
 import { initServer } from './cmds/initServer'
 import { createAccount } from './cmds/createAccount'
 import { login } from './cmds/login'
-//@ts-ignore
-import commander from 'commander'
+
+import * as commander from 'commander'
 //@ts-ignore
 import { version } from '../package.json'
 import { isAuthenticated } from './config'
