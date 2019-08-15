@@ -16,7 +16,7 @@ export async function requestRepoBranch() {
       name: 'remote',
       type: 'list',
       message: `Choose the remote you're looking to setup`,
-      choices: remotes.map(r => `${r.refs.fetch} (${branch})`),
+      choices: remotes.map((r: { refs: any }) => `${r.refs.fetch} (${branch})`),
     },
   ])
 
