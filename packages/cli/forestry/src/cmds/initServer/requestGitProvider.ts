@@ -1,4 +1,4 @@
-import inquirer from 'inquirer'
+import * as inquirer from 'inquirer'
 
 export const requestGitProvider = async (remote: string) => {
   //todo - repelace this with a smarter regex. (Incase your gitlab repo was called 'github.com' :/ )

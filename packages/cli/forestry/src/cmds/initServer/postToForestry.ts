@@ -1,5 +1,5 @@
 import chalk from 'chalk'
-import listr from 'listr'
+import * as listr from 'listr'
 
 export const postToForestry = async (
   authToken: string,
