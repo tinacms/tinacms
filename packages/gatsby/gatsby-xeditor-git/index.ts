@@ -14,7 +14,8 @@ exports.extendXserver = (server: any, config: any) => {
   const repo = openRepo(pathRoot)
   // TODO: Don't do this
   repo.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND)
-  repo.addConfig('user.name', "Nolan's Preview Server")
+  repo.addConfig('user.name', 'Update from Forestry.io')
+  // TODO: This should be set on-commit, and given to us by the client.
   repo.addConfig('user.email', 'nolan@forestry.io')
 
   server.use(express.json())
