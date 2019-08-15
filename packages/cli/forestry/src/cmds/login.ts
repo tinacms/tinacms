@@ -1,7 +1,7 @@
-import inquirer from 'inquirer'
+import * as inquirer from 'inquirer'
 import { writeConfig } from '../config'
 
-export async function login(options) {
+export async function login() {
   const fields = [
     {
       name: 'email',

@@ -1,0 +1,10 @@
+{
+  "extends": "../../../tsconfig.json",
+  "include": ["src/**/*"],
+  "exclude": ["node_modules", "build"],
+  "esModuleInterop": true,
+  "allowSyntheticDefaultImports": true,
+  "compilerOptions": {
+    "outDir": "build"
+  }
+}
