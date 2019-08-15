@@ -116,6 +116,11 @@ export default remarkForm({
       component: "textarea",
     },
     { label: "Body", name: "rawMarkdownBody", component: "textarea" },
+    {
+      label: "Commit Message (Optional)",
+      name: "__commit_message",
+      component: "textarea",
+    },
   ],
 })(BlogPostTemplate)
 
