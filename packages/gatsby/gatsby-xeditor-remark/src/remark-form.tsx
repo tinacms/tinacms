@@ -53,6 +53,8 @@ export function useRemarkForm(
           return cms.api.git.onSubmit!({
             files: [data.fields.fileRelativePath],
             message: data.__commit_message || 'xeditor commit',
+            name: data.__commit_name,
+            email: data.__commit_email,
           })
         } else {
           console.log('Not supported')

@@ -116,6 +116,17 @@ export default remarkForm({
       component: "textarea",
     },
     { label: "Body", name: "rawMarkdownBody", component: "textarea" },
+    { name: "hr", component: () => <hr /> },
+    {
+      label: "Commit Name",
+      name: "__commit_name",
+      component: "text",
+    },
+    {
+      label: "Commit Email",
+      name: "__commit_email",
+      component: "text",
+    },
     {
       label: "Commit Message (Optional)",
       name: "__commit_message",
