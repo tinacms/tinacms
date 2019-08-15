@@ -20,9 +20,10 @@ exports.extendXserver = (server: any, config: any) => {
   server.use(express.json())
 
   server.post(`${config.routePrefix}/commit`, (req: any, res: any) => {
+    let message = req.body.message
     let files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
     // TODO: Allow request to send the message
-    repo.commit('gatsby-xeditor-git change', ...files)
+    repo.commit(message, ...files)
     // TODO: Wait for push to finishe
     // TODO: Separate commit and push???
     repo.push()
