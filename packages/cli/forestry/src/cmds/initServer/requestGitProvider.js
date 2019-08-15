@@ -5,7 +5,7 @@ export const requestGitProvider = async () => {
     {
       name: 'gitProvider',
       type: 'list',
-      message: 'Choose a git provider:',
+      message: 'Which git provider do you use?',
       choices: ['github', new inquirer.Separator(), 'gitlab'],
     },
   ])
