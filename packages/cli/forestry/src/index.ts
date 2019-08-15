@@ -34,7 +34,7 @@ export function init(args: any) {
   program.on('command:*', function() {
     console.error(
       'Invalid command: %s\nSee --help for a list of available commands.',
-      program.args.join(' ')
+      args.join(' ')
     )
     process.exit(1)
   })
