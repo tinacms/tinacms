@@ -30,7 +30,6 @@ const providerDetails = {
 
         app.get(`/github/callback`, async (req, res) => {
           gitProviderToken = req.query.code
-          console.log(`code: ${gitProviderToken}`)
           res.send(`<p>Authorizing with Github</p>`)
 
           open(
@@ -82,7 +81,7 @@ export const retrieveAuthToken = async gitProvider => {
   let app = createExpressServer()
   let server = app.listen(AUTH_CALLBACK_PORT, () => {
     console.log('------------------------------------------')
-    console.log('wait for the auth response')
+    console.log('waiting for the auth response')
     console.log('------------------------------------------')
   })
 
