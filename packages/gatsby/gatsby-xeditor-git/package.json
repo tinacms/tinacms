@@ -1,9 +1,10 @@
 {
   "name": "@forestryio/gatsby-xeditor-git",
   "main": "index.js",
-  "version": "0.0.1-alpha.13",
+  "version": "0.0.1-alpha.15",
   "files": [
     "index.js",
+    "audit.js",
     "gatsby-browser.js",
     "gatsby-node.js",
     "errors.js",
