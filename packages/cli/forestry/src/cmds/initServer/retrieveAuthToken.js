@@ -1,12 +1,10 @@
 require('dotenv').config()
-import clear from 'clear'
-import figlet from 'figlet'
-import open from 'open'
-import inquirer from 'inquirer'
 import express from 'express'
 import cors from 'cors'
-import chalk from 'chalk'
+import open from 'open'
+import inquirer from 'inquirer'
 
+const AUTH_CALLBACK_PORT = 4568
 const createExpressServer = () => {
   let app = express()
 
@@ -46,7 +44,7 @@ const providerDetails = {
             {
               name: 'confirmPermissions',
               type: 'confirm',
-              message: 'Once you have granted access to your rpeo, hit enter:',
+              message: 'Once you have granted access to your repo, enter y',
             },
           ])
           resolve(gitProviderToken)
@@ -75,28 +73,14 @@ const providerDetails = {
   },
 }
 
-export async function initServer() {
-  clear()
-  console.log(
-    chalk.green(figlet.textSync('Forestry', { horizontalLayout: 'full' }))
-  )
-
-  const answers = await inquirer.prompt([
-    {
-      name: 'gitProvider',
-      type: 'list',
-      message: 'Choose a git provider:',
-      choices: ['github', new inquirer.Separator(), 'gitlab'],
-    },
-  ])
-
-  const { clientId, baseUrl } = providerDetails[answers.gitProvider]
+export const retrieveAuthToken = async gitProvider => {
+  const { clientId, baseUrl } = providerDetails[gitProvider]
   const authUrl = `${baseUrl}/login/oauth/authorize?client_id=${clientId}&redirect_uri=${encodeURIComponent(
-    `http://localhost:4568/${answers.gitProvider}/callback`
+    `http://localhost:${AUTH_CALLBACK_PORT}/${gitProvider}/callback`
   )}&response_type=token`
 
   let app = createExpressServer()
-  let server = app.listen(4568, () => {
+  let server = app.listen(AUTH_CALLBACK_PORT, () => {
     console.log('------------------------------------------')
     console.log('wait for the auth response')
     console.log('------------------------------------------')
@@ -104,17 +88,9 @@ export async function initServer() {
 
   //TODO - potential race condition with the line below?
   open(authUrl)
-  const token = await providerDetails[answers.gitProvider].createCallbackServer(
-    app
-  )
-  console.log(
-    'TODO - send this to our dev-server starter: ' +
-      JSON.stringify({
-        token,
-        repo: 'TODO',
-        branch: 'TODO',
-        secrets: 'TODO',
-      })
-  )
+  const token = await providerDetails[gitProvider].createCallbackServer(app)
+
   server.close()
+
+  return token
 }
