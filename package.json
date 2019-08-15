@@ -15,7 +15,6 @@
     "rollup": "^1.16.7",
     "rollup-plugin-commonjs": "^10.0.1",
     "rollup-plugin-typescript2": "^0.22.0",
-    "rollup-plugin-json": "4.0.0",
     "typescript": "^3.5.3"
   },
   "dependencies": {
