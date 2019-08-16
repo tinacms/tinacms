@@ -8,13 +8,22 @@ export interface ToggleProps {
   onChange: <T>(event: React.ChangeEvent<T> | any) => void
   onFocus: <T>(event?: React.FocusEvent<T>) => void
   value: any
+  input: any
   checked?: boolean
   disabled?: boolean
 }
 
-export const Toggle: FC<ToggleProps> = props => (
+export const Toggle: FC<ToggleProps> = props => {
+
+  function handleToggleChange() {
+    props.input.onChange(
+      props.input.value = !props.input.value
+    )
+  }
+  
+  return (
   <ToggleElement>
-    <ToggleInput id={props.name} type="checkbox" {...props} />
+    <ToggleInput id={props.name} type="checkbox" {...props} onChange={handleToggleChange} />
     <ToggleLabel
       htmlFor={props.name}
       role="switch"
@@ -29,14 +38,14 @@ export const Toggle: FC<ToggleProps> = props => (
             rx="8"
             id="dot"
             cy="10"
-            cx={props.value ? '30' : '10'}
-            fill={props.value ? '#000' : '#999'}
+            cx={props.input.value ? '30' : '10'}
+            fill={props.input.value ? '#000' : '#999'}
           />
         </g>
       </ToggleSwitch>
     </ToggleLabel>
   </ToggleElement>
-)
+)}
 
 const ToggleElement = styled.div`
   display: inline-block;
