@@ -12,10 +12,11 @@ function BlogIndex(props) {
   const siteTitle = data.site.siteMetadata.title
   const posts = data.allMarkdownRemark.edges
 
-  const [styles] = useCMSForm({
+  const [ styles ] = useCMSForm( {
     name: "blog-index-styles",
     initialValues: {
       backgroundColor: "",
+      hideBio: false
     },
     fields: [
       {
@@ -24,13 +25,16 @@ function BlogIndex(props) {
         component: "color",
         colorFormat: "HeX",
       },
-      { name: "hideBio", label: "Hide Bio", component: "toggle" },
+      { 
+        name: "hideBio", 
+        label: "Hide Bio", 
+        component: "toggle", 
+      },
     ],
     onSubmit() {
       alert("Saving doesn't do anything.")
     },
   })
-
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO title="All posts" />
