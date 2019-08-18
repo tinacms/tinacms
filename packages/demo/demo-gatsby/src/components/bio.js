@@ -48,7 +48,6 @@ const Bio = () => {
     <div
       style={{
         display: `flex`,
-        marginBottom: rhythm(2.5),
       }}
     >
       <JsonForm
@@ -71,17 +70,17 @@ const Bio = () => {
           borderRadius: `50%`,
         }}
       />
-      <p>
-        Written by{" "}
-        <strong>
+      <div style={{ display: "flex", flexDirection: "column" }}>
+        <span style={{ fontWeight: "600" }}>Author</span>
+        <a
+          href={`https://twitter.com/${author.twitter}`}
+          style={{
+            color: "inherit",
+          }}
+        >
           {author.firstName} {author.lastName}
-        </strong>{" "}
-        who lives and works in {author.location} building useful things.
-        {` `}
-        <a href={`https://twitter.com/${author.twitter}`}>
-          You should follow him on Twitter
         </a>
-      </p>
+      </div>
     </div>
   )
 }

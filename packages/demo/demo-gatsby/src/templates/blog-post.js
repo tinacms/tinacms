@@ -27,14 +27,45 @@ function BlogPostTemplate(props) {
         title={post.frontmatter.title}
         description={post.frontmatter.description || post.excerpt}
       />
-      <h1
+
+      <div
         style={{
-          marginTop: rhythm(1),
-          marginBottom: 0,
+          backgroundColor: post.frontmatter.heading_color || "#ffffff",
         }}
       >
-        {post.frontmatter.title}
-      </h1>
+        <div
+          style={{
+            marginLeft: `auto`,
+            marginRight: `auto`,
+            maxWidth: rhythm(24),
+            padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
+          }}
+        >
+          <h1
+            style={{
+              margin: 0,
+              marginTop: rhythm(2),
+            }}
+          >
+            {post.frontmatter.title}
+          </h1>
+          <div
+            style={{
+              display: "flex",
+              justifyContent: "space-between",
+              marginTop: rhythm(2),
+              marginBottom: rhythm(1),
+            }}
+          >
+            <Bio />
+            <div style={{ display: "flex", flexDirection: "column" }}>
+              <span style={{ fontWeight: "600" }}>Date</span>
+              <p>{Date(post.frontmatter.date)}</p>
+            </div>
+          </div>
+        </div>
+      </div>
+
       <button onClick={() => cms.api.gitlab.authorize()}>Login</button>
       <button
         onClick={() =>
@@ -46,29 +77,31 @@ function BlogPostTemplate(props) {
       >
         Save
       </button>
-      <p
-        style={{
-          ...scale(-1 / 5),
-          display: `block`,
-          marginBottom: rhythm(1),
-        }}
-      >
-        {post.frontmatter.date}
-      </p>
+
       <div
         dangerouslySetInnerHTML={{
           __html: props.data.markdownRemark.html,
         }}
-      />
-      <hr
         style={{
-          marginBottom: rhythm(1),
+          marginLeft: `auto`,
+          marginRight: `auto`,
+          maxWidth: rhythm(24),
+          padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
         }}
       />
-      <Bio />
-
+      <div
+        style={{
+          marginBottom: rhythm(1),
+          width: "100%",
+          height: "1px",
+          backgroundColor: "#eaeaea",
+        }}
+      />
       <ul
         style={{
+          marginLeft: `auto`,
+          marginRight: `auto`,
+          maxWidth: rhythm(24),
           display: `flex`,
           flexWrap: `wrap`,
           justifyContent: `space-between`,
@@ -115,6 +148,11 @@ export default remarkForm({
       name: "frontmatter.description",
       component: "textarea",
     },
+    {
+      label: "Heading color",
+      name: "frontmatter.heading_color",
+      component: "color",
+    },
     { label: "Body", name: "rawMarkdownBody", component: "textarea" },
     { name: "hr", component: () => <hr /> },
     {
@@ -155,6 +193,7 @@ export const pageQuery = graphql`
         title
         date
         description
+        heading_color
       }
     }
   }

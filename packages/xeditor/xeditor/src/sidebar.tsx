@@ -38,16 +38,15 @@ export const Sidebar = ({
         <RootElement />
         <SidebarHeader>
           <ForestryLogo url={logo} />
-          {/* TODO: Set site name dynamically */}
           <SiteName>{title}</SiteName>
-          <select style={{ zIndex: 10000 }}>
+          {/* <select style={{ zIndex: 10000 }}>
             {cms.plugins.all<ViewPlugin>('view').map(view => (
               <option value={view.name} onClick={() => setActiveView(view)}>
                 {view.name}
               </option>
             ))}
-          </select>
-          <ActionsToggle />
+          </select> */}
+          {/* <ActionsToggle /> */}
         </SidebarHeader>
 
         <FieldsWrapper>
@@ -60,7 +59,6 @@ export const Sidebar = ({
 
 const EllipsisVertical = require('../assets/ellipsis-v.svg')
 const HeaderHeight = 5
-const FooterHeight = 3
 
 const SidebarHeader = styled.div`
   display: flex;
@@ -131,7 +129,7 @@ const FieldsWrapper = styled.div`
   top: ${HeaderHeight}rem;
   height: calc(100vh - (${HeaderHeight}rem));
   width: 100%;
-  overflow-y: auto;
+  overflow: hidden;
   padding: 1rem;
   ul,
   li {
