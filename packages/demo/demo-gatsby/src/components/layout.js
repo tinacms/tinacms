@@ -36,6 +36,7 @@ class Layout extends React.Component {
           style={{
             fontFamily: `Montserrat, sans-serif`,
             marginTop: 0,
+            marginBottom: 0,
           }}
         >
           <Link
@@ -53,7 +54,16 @@ class Layout extends React.Component {
     }
     return (
       <div>
-        <header>{header}</header>
+        <header
+          style={{
+            marginLeft: `auto`,
+            marginRight: `auto`,
+            maxWidth: rhythm(24),
+            padding: `${rhythm(1)} ${rhythm(3 / 4)}`,
+          }}
+        >
+          {header}
+        </header>
         <main>{children}</main>
         <footer
           style={{
