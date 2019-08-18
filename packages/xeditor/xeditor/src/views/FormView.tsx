@@ -48,22 +48,24 @@ export const FormsView: ViewPlugin = {
 
     return (
       <>
-        <FormsList
+        {/* <FormsList
           forms={forms}
           activeForm={editingForm}
           setActiveForm={setEditingForm}
-        />
+        /> */}
         <FormBuilder form={editingForm as any}>
           {({ handleSubmit, pristine }) => {
             return (
               <>
-                <h3>Editing form {editingForm.name}</h3>
-                {editingForm &&
-                  (editingForm.fields.length ? (
-                    <FieldsBuilder form={editingForm} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  ))}
+                {/* <h3>Editing form {editingForm.name}</h3> */}
+                <FieldsWrapper>
+                  {editingForm &&
+                    (editingForm.fields.length ? (
+                      <FieldsBuilder form={editingForm} />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    ))}
+                </FieldsWrapper>
                 <FormsFooter>
                   <SaveButton
                     onClick={() => handleSubmit()}
@@ -123,12 +125,30 @@ const NoFieldsPlaceholder = () => (
 
 // Styling
 const FormsFooterHeight = 3
+const HeaderHeight = 5
+
+const FieldsWrapper = styled.div`
+  position: absolute;
+  left: 0;
+  top: 0;
+  height: calc(100vh - (${FormsFooterHeight + HeaderHeight}rem));
+  width: 100%;
+  padding: 1rem;
+  overflow-y: auto;
+`
 
 const FormsFooter = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: absolute;
   left: 0;
   bottom: 0;
   width: 100%;
+  height: ${FormsFooterHeight}rem;
+  background-color: white;
+  border-top: 1px solid #efefef;
+  padding: 0.5rem 1rem;
 `
 
 const SaveButton = styled.button`
@@ -137,8 +157,9 @@ const SaveButton = styled.button`
   justify-content: center;
   text-align: center;
   width: 100%;
-  height: ${FormsFooterHeight}rem;
+  height: 100%;
   border: 0;
+  border-radius: 0.3rem;
   background-color: #0085ff;
   color: white;
   font-weight: 500;
