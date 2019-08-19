@@ -20,7 +20,8 @@
   },
   "scripts": {
     "build": "tsc",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "watch": "tsc -w"
   },
   "files": [
     "build"
