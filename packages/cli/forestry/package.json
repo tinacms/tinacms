@@ -19,6 +19,7 @@
     "forestry": "bin/forestry"
   },
   "scripts": {
+    "watch": "tsc -w",
     "build": "tsc"
   },
   "files": [
