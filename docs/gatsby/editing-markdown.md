@@ -40,140 +40,64 @@ Note that `@forestryio/gatsby-xeditor-git` is a sub-plugin of `@forestryio/gatsb
 
 ## Creating Remark Forms
 
-In order to edit a markdown file, you must register a form with the CMS. There are two approaches to registering Remark Forms with the XEditor. The approach you choose depends on whether the React template is class or function.
-
-1. [`useRemarkForm`](#useRemarkForm): A [Hook](https://reactjs.org/docs/hooks-intro.html) used when the template is a function.
-1. [`RemarkForm`](#RemarkForm): A [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) component to use when the template is a class component.
-
-### Note: required query data
-
-In order for the remark forms to work, you must include the following fields in your `markdownRemark` query:
+The `remarkForm` [higher-order component](https://reactjs.org/docs/higher-order-components.html) (HOC) let's us register forms with `xeditor`. In order for it to work with your template, 3 fields must be included in the `markdownRemark` query:
 
 - `id`
 - `fields.fileRelativePath`
 - `rawMarkdownBody`
 
-An example `pageQuery` in your template might look like this:
+**Example: src/templates/blog-post.js**
 
-```
-query BlogPostBySlug($slug: String!) {
-  site {
-    siteMetadata {
-      title
-    }
-  }
-  markdownRemark(fields: { slug: { eq: $slug } }) {
-    id
-    fields {
-      fileRelativePath
-    }
-    rawMarkdownBody
-    html
-    frontmatter {
-      title
-      date(formatString: "MMMM DD, YYYY")
-      description
-    }
-  }
-}
-```
-
-Additionally, any front matter fields that are **not** queried will be deleted when saving content via the CMS.
-
-### useRemarkForm
-
-This is a [React Hook](https://reactjs.org/docs/hooks-intro.html) for registering Remark Forms with the CMS.
-This is the recommended approach if your template is a Function Component.
-
-**Interface**
-
-```typescript
-useRemarkForm(remark): [values, form]
-```
-
-**Arguments**
-
-- `remark`: The data returned from a Gatsby `markdownRemark` query.
-
-**Return**
-
-- `[values, form]`
-  - `values`: The current values to be displayed. This has the same shape as the `remark` argument.
-  - `form`: A reference to the [CMS Form](../concepts/forms.md) object. The `form` is rarely needed in the template.
-
-**src/templates/blog-post.js**
-
-```javascript
-import { useRemarkForm } from '@forestryio/gatsby-xeditor-remark'
+```jsx
+import { remarkForm } from '@forestryio/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
-  const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
-
-  return <h1>{markdownRemark.frontmatter.title}</h1>
+  return <h1>{props.data.markdownRemark.frontmatter.title}</h1>
 }
-```
 
-### RemarkForm
+// Wrap the export with `remarkForm`
+export default remarkForm()(BlogPostTemplate)
 
-`RemarkForm` is a [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns)
-based component for accessing [CMS Forms](../concepts/forms.md).
+// Include the required fields in the query
+export const pageQuery = graphql`
+  query BlogPostBySlug($slug: String!) {
+    markdownRemark(fields: { slug: { eq: $slug } }) {
+      id
+      fields {
+        fileRelativePath
+      }
+      rawMarkdownBody
 
-This Component is a thin wrapper of `useRemarkForm`. Since React[Hooks](https://reactjs.org/docs/hooks-intro.html) are
-only available within Function Components you will wneed to use `RemarkForm` if your template is Class Component.
-
-**Props**
-
-- `remark`: The data returned from a Gatsby `markdownRemark` query.
-- `render({ markdownRemark, form }): JSX.Element`: A function that returns JSX elements
-  - `markdownRemark`: The current values to be displayed. This has the same shape as the data in the `remark` prop.
-  - `form`: A reference to the [CMS Form](../concepts/forms.md) object. The `form` is rarely needed in the template.
-
-**src/templates/blog-post.js**
-
-```javascript
-import { RemarkForm } from '@forestryio/gatsby-xeditor-remark'
-
-class BlogPostTemplate extends React.Component {
-  render() {
-    return (
-      <RemarkForm
-        remark={this.props.data.markdownRemark}
-        render={({ markdownRemark }) => {
-          return <h1>{markdownRemark.frontmatter.title}</h1>
-        }}
-      />
-    )
+      html
+      frontmatter {
+        title
+        date
+        description
+      }
+    }
   }
-}
+`
 ```
 
-## Editing Content
+_IMPORTANT:_ Any front matter fields that are **not** queried will be deleted when saving content via the CMS.
 
-With the Remark Form created, you can now edit the files in the XEditor sidebar. Changes to the form
-will be written back to the markdown files in real time.
+## Customizing Forms
 
-**Why write to disk "on change"?**
+The `remarkForm` HOC automatically creates a list of form fields based on the shape of your data. This is convenient for getting started but you will probably want to customize the form's list of fields.
 
-This allows any `gatsby-remark-*` plugins to properly transform the data in to a remark node and
-provide a true-fidelity preview of the changes.
+**Why customize the form?**
 
-Without this behaviour, producing a true-fidelity preview of the changes would require the frontend
-to replicate all transformations applied to the Markdown files by the gatsby transformers.
-
-## Customizing Remark Forms
-
-The `useRemarkForm` automatically creates a list of form fields based on the shape of
-your data. This is convenient for getting started but you will probably want to customize the form's list of fields. Here's a couple reason's why:
-
-1. The field's `label` defaults to it's `name`.
-1. Every field is rendered with a `text` component.
+1. The default `label` for a field is it's `name`.
+1. Every field is made a `text` component.
 1. The order of fields might not be consistent.
 
-We lied about the interface of [`useRemarkForm`](#useRemarkForm) earlier, it actually has a second arguments:
+The `remarkForm` function accepts some options.
+
+**Example: src/templates/blog-post.js**
 
 ```typescript
-//                               👇
-function useRemarkForm(remark, config): [values, form]
+//                          👇
+export default remarkForm(config)(BlogPostTemplate)
 ```
 
 **Config**
@@ -189,62 +113,48 @@ The `config` is an optional object for overriding the default configuration of a
   The default options are: `"text"`, `"textarea"`, `"color"`.
 - `label`: A human readable label for the field.
 
-```javascript
+#### Example: src/templates/blog-post.js
+
+```jsx
 import { useRemarkForm } from '@forestryio/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
-  const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
-    fields: [
-      {
-        label: 'Title',
-        name: 'frontmatter.title',
-        component: 'text',
-      },
-      {
-        label: 'Description',
-        name: 'frontmatter.description',
-        component: 'textarea',
-      },
-    ],
-  })
-
   return (
     <>
-      <h1>{markdownRemark.frontmatter.title}</h1>
-      <p>{markdownRemark.frontmatter.description}</p>
+      <h1>{props.markdownRemark.frontmatter.title}</h1>
+      <p>{props.markdownRemark.frontmatter.description}</p>
     </>
   )
 }
+
+let BlogFields = [
+  {
+    label: 'Title',
+    name: 'frontmatter.title',
+    component: 'text',
+  },
+  {
+    label: 'Description',
+    name: 'frontmatter.description',
+    component: 'textarea',
+  },
+]
+
+export default remarkForm({ fields })(BlogPostTemplate)
 ```
 
-**Customizing `RemarkForm` fields**
+## Editing Content
 
-When using the `RemarkForm` component, additional form configuration can be added via properties on the component. So, to customize the form's fields, add a `fields` prop:
+With the Remark Form created, you can now edit the files in the XEditor sidebar. Changes to the form
+will be written back to the markdown files in real time.
 
-```javascript
-render() {
-  const fields = [
-    {
-        label: "Title",
-        name: "frontmatter.title",
-        component: "text",
-      },
-      {
-        label: "Description",
-        name: "frontmatter.description",
-        component: "textarea",
-      },
-  ]
-  return (
-  <RemarkForm remark={markdownRemark} fields={fields} render={({markdownRemark}) => {
-    <>
-      <h1>{markdownRemark.frontmatter.title}</h1>
-      <p>{markdownRemark.frontmatter.description}</p>
-    </>
-  })} />
-  )
-}
-```
+**Why write to disk "on change"?**
+
+This allows any `gatsby-remark-*` plugins to properly transform the data in to a remark node and
+provide a true-fidelity preview of the changes.
+
+Without this behaviour, producing a true-fidelity preview of the changes would require the frontend
+to replicate all transformations applied to the Markdown files by the gatsby transformers.
 
 ## Next Steps
 

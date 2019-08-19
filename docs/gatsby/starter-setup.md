@@ -23,5 +23,5 @@ In the top right corner of the page "Open CMS" button.
 
 ## Next Steps
 
-- [Customize the Forms](./editing-markdown.md#customizing-remark-forms)
+- [Customize the Forms](./editing-markdown.md#customizing-forms)
 - [Connecting to Gitlab](../backends/gitlab.md)
