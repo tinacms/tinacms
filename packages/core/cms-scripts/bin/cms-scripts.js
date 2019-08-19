@@ -19,25 +19,36 @@ process.on('unhandledRejection', err => {
 const program = require('commander')
 const { version } = require('../package.json')
 
-let command
+let commandName
 
 program
   .version(version)
   .arguments('<cmd>')
-  .action(cmd => (command = cmd))
+  .action(cmd => (commandName = cmd))
   .parse(process.argv)
 
-if (typeof command === 'undefined') {
+const COMMANDS = {
+  build() {
+    build(createBuildOptions())
+  },
+  watch() {
+    watch(createBuildOptions())
+  },
+}
+
+if (!commandName) {
   console.error('no command given!')
   process.exit(1)
 }
 
-if (command !== 'build') {
-  console.error(`unrecognized command: ${command}`)
+const command = COMMANDS[commandName]
+if (!command) {
+  console.error(`unrecognized command: ${commandName}`)
   process.exit(1)
 }
 
-build(createBuildOptions())
+command()
+
 /**
  * Build Packages
  */
@@ -90,4 +101,14 @@ async function build({ inputOptions, outputOptions }) {
   await bundle.generate(outputOptions)
 
   await bundle.write(outputOptions)
+}
+
+async function watch({ inputOptions, outputOptions }) {
+  const watchOptions = {
+    ...inputOptions,
+    output: [outputOptions],
+    watch: {},
+  }
+
+  rollup.watch(watchOptions)
 }

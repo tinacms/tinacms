@@ -7,6 +7,7 @@
     "gatsby-node.js"
   ],
   "scripts": {
+    "watch": "tsc -w",
     "build": "tsc",
     "test": "jest --passWithNoTests"
   },
