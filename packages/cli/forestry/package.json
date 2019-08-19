@@ -19,8 +19,9 @@
     "forestry": "bin/forestry"
   },
   "scripts": {
-    "watch": "tsc -w",
-    "build": "tsc"
+    "build": "tsc",
+    "test": "jest --passWithNoTests",
+    "watch": "tsc -w"
   },
   "files": [
     "build"
