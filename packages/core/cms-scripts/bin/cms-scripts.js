@@ -31,6 +31,9 @@ const COMMANDS = {
   build() {
     build(createBuildOptions())
   },
+  watch() {
+    console.log('hello world')
+  },
 }
 
 if (!commandName) {
@@ -43,6 +46,8 @@ if (!command) {
   console.error(`unrecognized command: ${commandName}`)
   process.exit(1)
 }
+
+command()
 
 /**
  * Build Packages
