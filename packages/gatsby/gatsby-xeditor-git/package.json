@@ -12,6 +12,7 @@
     "file-writer.js"
   ],
   "scripts": {
+    "watch": "tsc -w",
     "build": "tsc"
   },
   "dependencies": {
