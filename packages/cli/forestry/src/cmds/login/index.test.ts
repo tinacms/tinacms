@@ -19,13 +19,8 @@ describe('login', () => {
     axios.post.mockImplementation(() => Promise.resolve({ token: '12321' }))
   })
 
-  it('posts credentials to server', async () => {
-    await login()
-    expect(axios.post).toHaveBeenCalledTimes(1)
-    expect(axios.post).toHaveBeenCalledWith(expect.any(String), {
-      email: 'test@blah.ca',
-      password: 'pass',
-    })
+  afterEach(() => {
+    axios.post.mockReset()
   })
 
   it('write token to config', async () => {
@@ -34,5 +29,14 @@ describe('login', () => {
     await login()
     expect(config.writeConfig).toHaveBeenCalledTimes(1)
     expect(config.writeConfig).toHaveBeenLastCalledWith({ token: '12321' })
+  })
+
+  it('posts credentials to server', async () => {
+    await login()
+    expect(axios.post).toHaveBeenCalledTimes(1)
+    expect(axios.post).toHaveBeenCalledWith(expect.any(String), {
+      email: 'test@blah.ca',
+      password: 'pass',
+    })
   })
 })
