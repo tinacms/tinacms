@@ -32,7 +32,7 @@ const COMMANDS = {
     build(createBuildOptions())
   },
   watch() {
-    console.log('hello world')
+    watch(createBuildOptions())
   },
 }
 
@@ -101,4 +101,14 @@ async function build({ inputOptions, outputOptions }) {
   await bundle.generate(outputOptions)
 
   await bundle.write(outputOptions)
+}
+
+async function watch({ inputOptions, outputOptions }) {
+  const watchOptions = {
+    ...inputOptions,
+    output: [outputOptions],
+    watch: {},
+  }
+
+  rollup.watch(watchOptions)
 }
