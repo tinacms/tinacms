@@ -103,7 +103,7 @@ useJsonForm(data): [values, form]
 
 **src/templates/blog-post.js**
 
-```javascript
+```jsx
 import { useJsonForm } from '@forestryio/gatsby-xeditor-json'
 
 function DataTemplate(props) {
@@ -130,7 +130,7 @@ only available within Function Components you will wneed to use `JsonForm` if yo
 
 **src/templates/blog-post.js**
 
-```javascript
+```jsx
 import { JsonForm } from '@forestryio/gatsby-xeditor-json'
 
 class DataTemplate extends React.Component {
@@ -149,7 +149,7 @@ class DataTemplate extends React.Component {
 
 ## Next Steps
 
-- [Editing Markdown](./editing-markdown-2.md)
+- [Editing Markdown](./editing-markdown.md)
 
 ## References
 
