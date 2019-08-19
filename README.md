@@ -26,12 +26,13 @@ npm run start
 
 ## Commands
 
-| Commands                         | Descriptiton                                  |
-| -------------------------------- | --------------------------------------------- |
-| npm run bootstrap                | Install dependencies and link local packages. |
-| npm run build                    | Build all packages                            |
-| npm run build --scope \<package> | Build only \<package>.                        |
-| npm run test                     | Run tests for all packages                    |
+| Commands                           | Descriptiton                                  |
+| ---------------------------------- | --------------------------------------------- |
+| npm run bootstrap                  | Install dependencies and link local packages. |
+| npm run build                      | Build all packages                            |
+| npm run test                       | Run tests for all packages                    |
+| lerna run build --scope \<package> | Build only \<package>.                        |
+| lerna run watch --parallel         | Watch all packages for rebuilds.              |
 
 ## Packages
 
