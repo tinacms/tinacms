@@ -16,8 +16,6 @@ export async function requestRepoBranch() {
   console.log('\n')
 
   const branches = await git.branch([])
-  const currentBranch = branches.current
-
   const branchConfirmation = await inquirer.prompt([
     {
       name: 'branch',
