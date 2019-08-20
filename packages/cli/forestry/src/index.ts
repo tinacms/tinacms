@@ -6,6 +6,7 @@ import * as commander from 'commander'
 //@ts-ignore
 import { version } from '../package.json'
 import { isAuthenticated } from './config'
+import { initConfig } from './cmds/initConfig'
 
 export function init(args: any) {
   const program = new commander.Command()
@@ -21,15 +22,15 @@ export function init(args: any) {
   program
     .command('auth:login')
     .description('log in to forestry account')
-    .action(() => {
-      login()
+    .action(async () => {
+      await login()
     })
 
   program
     .command('config:init')
     .description('initialize the local project with a forestry config')
-    .action(() => {
-      console.log('TODO - INITIALIZE LOCAL APP CONFIG HERE')
+    .action(async () => {
+      await initConfig()
       process.exit(1)
     })
 
@@ -60,7 +61,7 @@ export function init(args: any) {
   program
     .command('apps:create')
     .description('Set up the cloud development server')
-    .action(() => verifyAuthorized(initServer))
+    .action(async () => await verifyAuthorized(initServer))
 
   // error on unknown commands
   program.on('command:*', function() {
