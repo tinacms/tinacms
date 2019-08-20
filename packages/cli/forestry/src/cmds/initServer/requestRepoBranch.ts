@@ -28,6 +28,6 @@ export async function requestRepoBranch() {
 
   return {
     repo: repoUrl,
-    branch: branchConfirmation.branch.value,
+    branch: branchConfirmation.branch,
   }
 }

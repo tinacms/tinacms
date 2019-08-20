@@ -11,7 +11,7 @@ describe('requestRepoBranch', () => {
   beforeEach(() => {
     inquirer = require('inquirer')
     inquirer.prompt.mockImplementation(() =>
-      Promise.resolve({ branch: 'master' })
+      Promise.resolve({ branch: 'test1' })
     )
 
     simpleGit = require('simple-git/promise')
@@ -44,7 +44,7 @@ describe('requestRepoBranch', () => {
           ]),
         branch: (options: string[]) =>
           Promise.resolve({
-            all: ['master'],
+            all: ['master', 'test1', 'test2'],
             current: 'master',
           }),
       }
@@ -54,5 +54,10 @@ describe('requestRepoBranch', () => {
   it('returns origin remote', async () => {
     const result = await requestRepoBranch()
     expect(result.repo).toEqual(repoUrl)
+  })
+
+  it('returns selected branch', async () => {
+    const result = await requestRepoBranch()
+    expect(result.branch).toEqual('test1')
   })
 })
