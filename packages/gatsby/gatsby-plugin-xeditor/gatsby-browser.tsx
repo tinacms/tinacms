@@ -47,6 +47,7 @@ const EditorToggle = styled.button<{ open: Boolean }>`
   background-repeat: no-repeat;
   background-position: center;
   transition: background 0.35s ease;
+  cursor: pointer;
   &:hover {
     background-color: #4ea9ff;
   }
