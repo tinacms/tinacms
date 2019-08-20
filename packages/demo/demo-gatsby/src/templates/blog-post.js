@@ -66,18 +66,6 @@ function BlogPostTemplate(props) {
         </div>
       </div>
 
-      <button onClick={() => cms.api.gitlab.authorize()}>Login</button>
-      <button
-        onClick={() =>
-          cms.api.gitlab.onSubmit({
-            path: filepath,
-            contents: toMarkdownString(post),
-          })
-        }
-      >
-        Save
-      </button>
-
       <div
         dangerouslySetInnerHTML={{
           __html: props.data.markdownRemark.html,
