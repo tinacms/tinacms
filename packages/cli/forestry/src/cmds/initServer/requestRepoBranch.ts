@@ -1,27 +1,33 @@
 import * as simplegit from 'simple-git/promise'
 import * as inquirer from 'inquirer'
+import chalk from 'chalk'
 
 export async function requestRepoBranch() {
   const git = simplegit()
-  const branch = (await git.branchLocal()).current
 
   const remotes = await git.getRemotes(true)
-  if (!remotes) {
+  const repo = (remotes || []).find(remote => remote.name == 'origin')
+  if (!repo) {
     console.error('There are no git remotes setup within this directory')
     process.exit(1)
   }
+  const repoUrl = repo!.refs.fetch
+  console.log(`${chalk.bold('Repo:')} ${repoUrl} (origin)`)
+  console.log('\n')
 
-  const remoteConfirmation = await inquirer.prompt([
+  const branches = await git.branch([])
+  const branchConfirmation = await inquirer.prompt([
     {
-      name: 'remote',
+      name: 'branch',
       type: 'list',
-      message: `Choose the remote you're looking to setup`,
-      choices: remotes.map((r: { refs: any }) => `${r.refs.fetch} (${branch})`),
+      message: `Choose the branch you're looking to setup`,
+      choices: branches.all,
+      default: branches.current,
     },
   ])
 
   return {
-    repo: remoteConfirmation.remote,
-    branch,
+    repo: repoUrl,
+    branch: branchConfirmation.branch,
   }
 }
