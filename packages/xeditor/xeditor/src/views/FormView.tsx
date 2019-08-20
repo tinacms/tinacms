@@ -124,7 +124,7 @@ const NoFieldsPlaceholder = () => (
 )
 
 // Styling
-const FormsFooterHeight = 3
+const FormsFooterHeight = 4
 const HeaderHeight = 5
 
 const FieldsWrapper = styled.div`
