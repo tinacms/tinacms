@@ -47,6 +47,17 @@ export async function initConfig() {
 
   const config = await promptConfig(engineDefaults)
 
-  const configPath = './forestry-config.json'
-  fs.writeFileSync(configPath, JSON.stringify(config))
+  const configFileName = 'forestry-config.json'
+  fs.writeFileSync(`./${configFileName}`, JSON.stringify(config))
+
+  console.log(
+    `${chalk.green(
+      '\nSuccess!'
+    )} Your config has beeen created!\nYou can edit these values any time within ${chalk.bold(
+      configFileName
+    )}\n\n` +
+      `If you are looking to deploy a dev server to forestry, you will first need to ${chalk.bold(
+        'push this file to git.\n'
+      )}`
+  )
 }
