@@ -23,7 +23,7 @@ export const Toggle: FC<ToggleProps> = props => {
   
   return (
   <ToggleElement>
-    <ToggleInput id={props.name} type="checkbox" {...props} onChange={handleToggleChange} />
+    <ToggleInput id={props.name} type="checkbox" {...props.input} />
     <ToggleLabel
       htmlFor={props.name}
       role="switch"
