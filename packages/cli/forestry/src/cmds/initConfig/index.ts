@@ -35,19 +35,34 @@ export async function initConfig() {
   console.log(
     `\nHere is the default config for ${chalk.green(engineOptions.engine)}\n`
   )
-  const defaultConfig = DEFAULT_CONFIG[engineOptions.engine as 'gatsby']
-  const configValues = [...Object.keys(defaultConfig)].forEach(function(
-    key: string
-  ) {
-    console.log(`${chalk.bold(key)}: ${(defaultConfig as any)[key]}`)
+  const engineDefaults = DEFAULT_CONFIG[engineOptions.engine as 'gatsby']
+
+  const configKeys = [...Object.keys(engineDefaults as any)]
+  configKeys.forEach(function(key: string) {
+    console.log(`${chalk.bold(key)}: ${(engineDefaults as any)[key]}`)
   })
   console.log(``)
 
-  await inquirer.prompt([
+  const useDefaultsConfirmation = await inquirer.prompt([
     {
       name: 'confirmDefault',
       type: 'confirm',
       message: 'Do you want to use these defaults?',
     },
   ])
+
+  if (useDefaultsConfirmation.confirmDefault) {
+    return engineDefaults
+  } else {
+    var questions = configKeys.map(key => {
+      return {
+        message: `${key}`,
+        type: 'input',
+        name: key,
+        default: (engineDefaults as any)[key],
+      }
+    })
+    const result = await inquirer.prompt(questions)
+    return result
+  }
 }
