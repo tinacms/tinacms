@@ -28,7 +28,7 @@ describe('login', () => {
 
     await login()
     expect(config.writeConfig).toHaveBeenCalledTimes(1)
-    expect(config.writeConfig).toHaveBeenLastCalledWith({ token: '12321' })
+    expect(config.writeConfig).toHaveBeenCalledWith({ token: '12321' })
   })
 
   it('posts credentials to server', async () => {
