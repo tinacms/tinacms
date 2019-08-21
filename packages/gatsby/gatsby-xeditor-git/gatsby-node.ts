@@ -1,3 +1,5 @@
+import { router as gitRouter } from '@forestryio/cms-backend-git'
+
 exports.onCreateNode = ({ node, actions }: any) => {
   let pathRoot = process.cwd()
 
@@ -8,4 +10,8 @@ exports.onCreateNode = ({ node, actions }: any) => {
       value: node.fileAbsolutePath.replace(pathRoot, ''),
     })
   }
+}
+
+exports.onCreateDevServer = ({ app }: { app: any }) => {
+  app.use('/x-server', gitRouter())
 }

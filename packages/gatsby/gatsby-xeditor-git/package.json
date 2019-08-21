@@ -17,6 +17,7 @@
   },
   "dependencies": {
     "@forestryio/cms": "^1.0.1-alpha.8",
+    "@forestryio/cms-backend-git": "^0.1.0",
     "@forestryio/cms-react": "^0.1.1-alpha.8",
     "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.19",
     "@forestryio/xeditor": "^1.0.1-alpha.13",

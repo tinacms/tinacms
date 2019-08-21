@@ -1,5 +1,5 @@
-import * as path from 'path'
-import * as fs from 'fs'
+const fs = require('fs')
+const path = require('path')
 
 let waitingForBuild = false
 let nextArgs: any = null
@@ -39,7 +39,7 @@ function tryToWrite() {
   nextArgs = null
 
   let filePath = path.join(pathRoot, data.fileRelativePath)
-  fs.writeFile(filePath, data.content, err => {
+  fs.writeFile(filePath, data.content, (err: any) => {
     if (err) {
       console.info(`write ${curr}: end; failure`)
       waitingForBuild = false
