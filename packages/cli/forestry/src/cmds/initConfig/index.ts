@@ -1,21 +1,8 @@
-import inquirer = require('inquirer')
 import chalk from 'chalk'
 import * as fs from 'fs'
-import { promptConfig } from './promptConfig'
-
+import { promptConfig, DEFAULT_CONFIG } from './promptConfig'
+import { promptEngine } from './promptEngine'
 const clear = require('clear')
-
-const DEFAULT_CONFIG = {
-  ['gatsby']: {
-    install_dependencies_command: 'yarn install',
-    build: 'npm run gatsby develop -p 8080 --host 0.0.0.0',
-    output_directory: 'public',
-    env: 'staging',
-    build_image: 'node:10',
-    mount_path: '/srv',
-    working_dir: '/srv',
-  },
-}
 
 export async function initConfig() {
   clear()
@@ -25,27 +12,11 @@ export async function initConfig() {
       'To create an advanced configuration, see our docs\n'
   )
 
-  const engineOptions = await inquirer.prompt([
-    {
-      name: 'engine',
-      type: 'list',
-      message: 'Which engine do you use?',
-      choices: ['gatsby', 'create-react-app', 'other'],
-    },
-  ])
+  const engine = await promptEngine()
 
-  console.log(
-    `\nHere is the default config for ${chalk.green(engineOptions.engine)}\n`
-  )
-  const engineDefaults = DEFAULT_CONFIG[engineOptions.engine as 'gatsby']
+  logDefaults(engine)
 
-  const configKeys = [...Object.keys(engineDefaults as any)]
-  configKeys.forEach(function(key: string) {
-    console.log(`${chalk.bold(key)}: ${(engineDefaults as any)[key]}`)
-  })
-  console.log(``)
-
-  const config = await promptConfig(engineDefaults)
+  const config = await promptConfig(DEFAULT_CONFIG[engine])
 
   const configFileName = 'forestry-config.json'
   fs.writeFileSync(`./${configFileName}`, JSON.stringify(config))
@@ -60,4 +31,15 @@ export async function initConfig() {
         'push this file to git.\n'
       )}`
   )
+}
+
+const logDefaults = (engine: string) => {
+  console.log(`\nHere is the default config for ${chalk.green(engine)}\n`)
+  const engineDefaults = DEFAULT_CONFIG[engine]
+
+  const configKeys = [...Object.keys(engineDefaults as any)]
+  configKeys.forEach(function(key: string) {
+    console.log(`${chalk.bold(key)}: ${(engineDefaults as any)[key]}`)
+  })
+  console.log(``)
 }
