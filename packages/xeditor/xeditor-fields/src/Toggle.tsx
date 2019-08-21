@@ -8,18 +8,20 @@ export interface ToggleProps {
   onChange: <T>(event: React.ChangeEvent<T> | any) => void
   onFocus: <T>(event?: React.FocusEvent<T>) => void
   value: any
+  input: any
   checked?: boolean
   disabled?: boolean
 }
 
-export const Toggle: FC<ToggleProps> = props => (
+export const Toggle: FC<ToggleProps> = props => {
+  
+  return (
   <ToggleElement>
-    <ToggleInput id={props.name} type="checkbox" {...props} />
+    <ToggleInput id={props.name} type="checkbox" {...props.input} />
     <ToggleLabel
       htmlFor={props.name}
       role="switch"
       disabled={props.disabled}
-      // {...props}
     >
       <ToggleSwitch xmlns="http://www.w3.org/2000/svg">
         <g>
@@ -29,14 +31,14 @@ export const Toggle: FC<ToggleProps> = props => (
             rx="8"
             id="dot"
             cy="10"
-            cx={props.value ? '30' : '10'}
-            fill={props.value ? '#000' : '#999'}
+            cx={props.input.value ? '30' : '10'}
+            fill={props.input.value ? '#000' : '#999'}
           />
         </g>
       </ToggleSwitch>
     </ToggleLabel>
   </ToggleElement>
-)
+)}
 
 const ToggleElement = styled.div`
   display: inline-block;
