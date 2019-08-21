@@ -2,7 +2,6 @@
 
 Creating forms for content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by three plugins:
 
-- `gatsby-plugin-xserver`: Provides a node backend that backend plugins can extend.
 - `gatsby-xeditor-remark`: Provides hooks and components for creating Remark forms.
 - `gatsby-xeditor-git`: Extends `gatsby-plugin-xserver` to writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
@@ -10,13 +9,13 @@ Creating forms for content provided by the [`gatsby-transformer-remark`](https:/
 ## Installation
 
 ```
-npm install --save @forestryio/gatsby-plugin-xserver @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
+npm install --save @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
 ```
 
 or
 
 ```
-yarn add @forestryio/gatsby-plugin-xserver @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
+yarn add @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
 ```
 
 ## Adding the Plugin
@@ -26,17 +25,12 @@ Open the `gatsby-config.js` file and add make sure the following plugins are lis
 ```JavaScript
 module.exports = {
   plugins: [
-    {
-      resolve: "@forestryio/gatsby-plugin-xserver",
-      plugins: [ "@forestryio/gatsby-xeditor-git" ]
-    },
+    "@forestryio/gatsby-xeditor-git",
     "@forestryio/gatsby-xeditor-remark",
     // ...
   ]
 }
 ```
-
-Note that `@forestryio/gatsby-xeditor-git` is a sub-plugin of `@forestryio/gatsby-plugin-xserver`.
 
 ## Creating Remark Forms
 
