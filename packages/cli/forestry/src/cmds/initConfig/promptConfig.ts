@@ -34,11 +34,10 @@ export const promptConfig = async (defaults: Config) => {
       message: 'Do you want to use these defaults?',
     },
   ])
-
   if (useDefaultsConfirmation.confirmDefault) {
     return defaults
   } else {
-    const configKeys = [...Object.keys({} as Config)]
+    const configKeys = [...Object.keys(defaults)]
     var questions = configKeys.map(key => {
       return {
         message: `${key}`,
@@ -48,6 +47,7 @@ export const promptConfig = async (defaults: Config) => {
       }
     })
     const result = await inquirer.prompt(questions)
+
     return result
   }
 }
