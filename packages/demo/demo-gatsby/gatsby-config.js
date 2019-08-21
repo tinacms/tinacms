@@ -9,12 +9,7 @@ module.exports = {
     },
   },
   plugins: [
-    {
-      resolve: "@forestryio/gatsby-plugin-xserver",
-      options: {
-        plugins: ["@forestryio/gatsby-xeditor-git"],
-      },
-    },
+    "@forestryio/gatsby-xeditor-git",
     {
       resolve: "@forestryio/gatsby-plugin-xeditor",
       options: {
