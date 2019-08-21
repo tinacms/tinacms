@@ -10,6 +10,22 @@ interface Config {
   working_dir: string
 }
 
+interface EngineDefaults {
+  [key: string]: Config
+}
+
+export const DEFAULT_CONFIG: EngineDefaults = {
+  ['gatsby']: {
+    install_dependencies_command: 'yarn install',
+    build: 'npm run gatsby develop -p 8080 --host 0.0.0.0',
+    output_directory: 'public',
+    env: 'staging',
+    build_image: 'node:10',
+    mount_path: '/srv',
+    working_dir: '/srv',
+  },
+}
+
 export const promptConfig = async (defaults: Config) => {
   const useDefaultsConfirmation = await inquirer.prompt([
     {
