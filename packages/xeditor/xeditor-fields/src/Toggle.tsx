@@ -14,12 +14,6 @@ export interface ToggleProps {
 }
 
 export const Toggle: FC<ToggleProps> = props => {
-
-  function handleToggleChange() {
-    props.input.onChange(
-      props.input.value = !props.input.value
-    )
-  }
   
   return (
   <ToggleElement>
@@ -28,7 +22,6 @@ export const Toggle: FC<ToggleProps> = props => {
       htmlFor={props.name}
       role="switch"
       disabled={props.disabled}
-      // {...props}
     >
       <ToggleSwitch xmlns="http://www.w3.org/2000/svg">
         <g>
