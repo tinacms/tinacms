@@ -23,12 +23,12 @@ export function router() {
   let router = express.Router()
   router.use(express.json())
 
-  router.put('/commit', (req: any, res: any) => {
+  router.put('/writeFile', (req: any, res: any) => {
     writeFile(pathRoot, req.body)
     res.send(req.body.content)
   })
 
-  router.post('/writeFile', (req: any, res: any) => {
+  router.post('/commit', (req: any, res: any) => {
     let message = req.body.message
     let files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
     // TODO: Separate commit and push???
