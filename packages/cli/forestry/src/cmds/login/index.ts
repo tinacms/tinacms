@@ -21,11 +21,15 @@ export async function login() {
 
   const authUrl =
     `${baseUrl}/authorize?client_id=${clientId}&redirect_uri=${callback}&response_type=code&code_challenge_method=S256&code_challenge=${challenge}` +
-    `&scope=offline_access`
+    `&scope=offline_access&audience=${encodeURIComponent(
+      'https://api.forestry.io'
+    )}`
 
   let app = createExpressServer()
   app.get('/auth/callback', async (req, res) => {
     console.log('reached callback ' + callback)
+
+    console.log('response: ' + JSON.stringify(req.query))
     const code = req.query.code
 
     var options = {
@@ -41,13 +45,17 @@ export async function login() {
       },
     }
 
-    console.log(JSON.stringify(options))
-
     request(options, function(error: any, response: any, body: any) {
       if (error) throw new Error(error)
 
       console.log(body)
     })
+
+    res.writeHead(200, { 'Content-Type': 'text/html' })
+    res.write(
+      '<html><body>You are now authorized! You can now close this window.</body></html>'
+    )
+    res.end()
   })
   let server = app.listen(AUTH_CALLBACK_PORT, () => {
     console.log('------------------------------------------')
