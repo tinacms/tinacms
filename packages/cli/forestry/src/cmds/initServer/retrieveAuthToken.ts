@@ -5,7 +5,7 @@ import * as open from 'open'
 import * as inquirer from 'inquirer'
 
 const AUTH_CALLBACK_PORT = 4568
-const createExpressServer = () => {
+export const createExpressServer = () => {
   let app = express()
 
   app.use(
