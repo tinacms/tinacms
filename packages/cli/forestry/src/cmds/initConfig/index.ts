@@ -1,5 +1,6 @@
 import inquirer = require('inquirer')
 import chalk from 'chalk'
+import * as fs from 'fs'
 
 const clear = require('clear')
 
@@ -63,6 +64,8 @@ export async function initConfig() {
       }
     })
     const result = await inquirer.prompt(questions)
-    return result
+
+    const configPath = './.forestry-config'
+    fs.writeFileSync(configPath, JSON.stringify(result))
   }
 }
