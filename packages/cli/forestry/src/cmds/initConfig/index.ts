@@ -1,6 +1,7 @@
 import inquirer = require('inquirer')
 import chalk from 'chalk'
 import * as fs from 'fs'
+import { promptConfig } from './promptConfig'
 
 const clear = require('clear')
 
@@ -44,28 +45,8 @@ export async function initConfig() {
   })
   console.log(``)
 
-  const useDefaultsConfirmation = await inquirer.prompt([
-    {
-      name: 'confirmDefault',
-      type: 'confirm',
-      message: 'Do you want to use these defaults?',
-    },
-  ])
+  const config = await promptConfig(engineDefaults)
 
-  if (useDefaultsConfirmation.confirmDefault) {
-    return engineDefaults
-  } else {
-    var questions = configKeys.map(key => {
-      return {
-        message: `${key}`,
-        type: 'input',
-        name: key,
-        default: (engineDefaults as any)[key],
-      }
-    })
-    const result = await inquirer.prompt(questions)
-
-    const configPath = './.forestry-config'
-    fs.writeFileSync(configPath, JSON.stringify(result))
-  }
+  const configPath = './forestry-config.json'
+  fs.writeFileSync(configPath, JSON.stringify(config))
 }
