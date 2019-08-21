@@ -2,70 +2,47 @@
 
 A **backend** for the CMS will specify where content is stored, as well as where the latest version of content is sourced from.
 
-## Backend Modes(?)
-
-### Browser-only
-
-Only needs to run in browser. Can deploy statically and use the CMS.
-
-### Hybrid
-
-Runs browser and server-side code. Need to be running server code (e.g. gatsby devserver) wherever CMS is used
-
-### Server-only (???)
-
-Hooks into local backend to persist changes on save (??? is this a dumb idea)
+Backend should be implemented as an [express router](https://expressjs.com/en/guide/routing.html#express-router), which can be plugged into the website's development server to expose a content storage API.
 
 ## Available Backends
 
-- Local
-- GitLab
+- Git
 
 ## Creating a Custom Backend
 
-TODO make this interface better or provide multiple interfaces
+We recommend tht backends that intend to support multiple platforms be broken into two parts:
 
-```typescript
-interface Backend {
-  onSubmit?(data: any): any
-  onChange?(data: any): any
-  isAuthenticated?(): any
-  authenticate?(): Promise<any>
-  removeAuthentication?(): any
+1. a core package that provides an Express router
+2. an adapter package that plugs this router into an express server running on the website
+
+The following example creates an arbitrary backend API and hooks it up to Gatsby's dev server. We can create a standalone package called `custom-backend` that returns an express router:
+
+```javascript
+// custom-backend/index.js
+
+const express = require('express')
+
+function customBackend() {
+  let router = express.Router()
+
+  router.put('/update-content', (req, res) => {
+    //update the content
+  })
+
+  return router
 }
 ```
 
-### WIP: Multiple interface types?
+Then, create a Gatsby plugin that leverages its `onCreateDevServer` hook to plugin this backend's router into the Gatsby dev server:
 
-```typescript
-interface SimpleBackend {
-  read(contentPath): Promise<any>
-  onChange(contentPath, content): Promise<any>
-  onSubmit(contentPath, content): Promise<any> // todo standardize on result format?
-  delete(contentPath): Promise<any>
-}
+```javascript
+// gatsby-plugin-custombackend/gatsby-node.js
 
-interface AuthenticatingBackend extends SimpleBackend {
-  isAuthenticated(): boolean
-  authenticate(): Promise<any>
-  deAuthenticate(): Promise<any>
-}
+import { customBackend } from 'custom-backend'
 
-interface HybridBackend extends SimpleBackend {
-  start(): Promise<any>
+exports.onCreateDevServer = ({ app }) => {
+  app.use('/my-route-prefix', customBackend())
 }
 ```
 
-```typescript
-import { AuthenticatingBackend } from '@forestryio/cms'
-
-export class CustomBackend implements AuthenticatingBackend {
-  authenticate() {}
-  deAuthenticate() {}
-  isAuthenticated() {}
-  read(contentPath) {}
-  onInput(contentPath, content) {}
-  persist(contentPath, content) {}
-  delete(contentPath) {}
-}
-```
+In our client-side code, this backend API can now be accessed by making a PUT request to `/my-route-prefix/update-content`. Including a route prefix is optional, but highly recommended to prevent collisions with pages on the user's website.
