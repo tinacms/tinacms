@@ -20,5 +20,5 @@ export const writeConfig = (newConfig: any) => {
 
 export const isAuthenticated = () => {
   const config = readConfig()
-  return !!config.token
+  return !!config.auth
 }
