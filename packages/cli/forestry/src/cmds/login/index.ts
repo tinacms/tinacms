@@ -1,10 +1,10 @@
 require('dotenv').config()
 import { writeConfig } from '../../config'
 import { waitForAuth } from './waitForAuth'
-import { createExpressServer } from './createExpressServer'
+import { createExpressApp } from './createExpressApp'
 
 export async function login() {
-  let app = createExpressServer()
+  let app = createExpressApp()
 
   let server = app.listen(process.env.AUTH_CALLBACK_PORT, () => {
     console.log('------------------------------------------')
