@@ -22,7 +22,9 @@ interface RemarkNode {
 interface CreateRemarkButtonOptions {
   filename(value: string): string
   frontmatter(value: string): object
+  body(value: string): string
 }
+
 export function createRemarkButton(options: CreateRemarkButtonOptions) {
   return {
     type: 'create-button',
@@ -30,13 +32,14 @@ export function createRemarkButton(options: CreateRemarkButtonOptions) {
     onSubmit: (value: string, cms: CMS) => {
       let filename = options.filename(value)
       let frontmatter = options.frontmatter(value)
+      let rawMarkdownBody = options.body(value)
 
       let fileRelativePath = filename
       cms.api.git!.onChange!({
         fileRelativePath,
         content: toMarkdownString({
           frontmatter,
-          rawMarkdownBody: '',
+          rawMarkdownBody,
           // unnecessary
           id: '',
           html: '',
