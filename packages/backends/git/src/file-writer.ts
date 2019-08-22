@@ -39,9 +39,11 @@ function tryToWrite() {
   nextArgs = null
 
   let filePath = path.join(pathRoot, data.fileRelativePath)
+  fs.mkdirSync(path.dirname(filePath), { recursive: true })
   fs.writeFile(filePath, data.content, (err: any) => {
     if (err) {
       console.info(`write ${curr}: end; failure`)
+      console.error(err)
       waitingForBuild = false
     } else {
       console.info(`write ${curr}: end; success`)
