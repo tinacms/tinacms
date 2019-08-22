@@ -60,7 +60,7 @@ export const FormsView: ViewPlugin = {
               <>
                 {/* <h3>Editing form {editingForm.name}</h3> */}
                 <FieldsWrapper>
-                  {cms.plugins.all('create-button').map(plugin => (
+                  {cms.plugins.all('content-button').map(plugin => (
                     <CreateContentButton plugin={plugin} />
                   ))}
                   {editingForm &&

@@ -1,6 +1,6 @@
 # Editing Markdown in Gatsby
 
-Creating forms for content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by three plugins:
+Creating forms for content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by two plugins:
 
 - `gatsby-xeditor-remark`: Provides hooks and components for creating Remark forms.
 - `gatsby-xeditor-git`: Extends the gatsby development server to writes changes to the local filesystem;
@@ -152,6 +152,7 @@ to replicate all transformations applied to the Markdown files by the gatsby tra
 
 ## Next Steps
 
+- [Creating Markdown](./creating-markdown.md)
 - [Editing Json](./editing-json.md)
 
 ## References
