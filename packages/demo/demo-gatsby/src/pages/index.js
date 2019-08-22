@@ -5,18 +5,37 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useCMSForm } from "@forestryio/cms-react"
+import { useCMS, useCMSForm } from "@forestryio/cms-react"
+import { createRemarkButton } from "@forestryio/gatsby-xeditor-remark"
 
+const CreatePostPlugin = createRemarkButton({
+  filename: value => `content/blog/${value}/index.md`,
+  frontmatter: value => ({ title: value }),
+})
+
+// TODO: Move to `cms-react`
+function usePlugin(plugin) {
+  let cms = useCMS()
+  React.useEffect(() => {
+    cms.plugins.add(plugin)
+    return () => {
+      // TODO: Remove plugin.
+      // cms.plugins.remove(plugin)
+    }
+  }, [plugin])
+}
 function BlogIndex(props) {
   const { data } = props
   const siteTitle = data.site.siteMetadata.title
   const posts = data.allMarkdownRemark.edges
 
-  const [ styles ] = useCMSForm( {
+  usePlugin(CreatePostPlugin)
+
+  const [styles] = useCMSForm({
     name: "blog-index-styles",
     initialValues: {
       backgroundColor: "",
-      hideBio: false
+      hideBio: false,
     },
     fields: [
       {

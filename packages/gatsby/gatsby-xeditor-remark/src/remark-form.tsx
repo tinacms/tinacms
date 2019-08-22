@@ -1,4 +1,4 @@
-import { Form, FormOptions } from '@forestryio/cms'
+import { Form, FormOptions, CMS } from '@forestryio/cms'
 import { useCMSForm, useCMS } from '@forestryio/cms-react'
 import {
   ERROR_MISSING_CMS_GATSBY,
@@ -17,6 +17,34 @@ interface RemarkNode {
   html: string
   rawMarkdownBody: string
   [key: string]: any
+}
+
+interface CreateRemarkButtonOptions {
+  filename(value: string): string
+  frontmatter(value: string): object
+}
+export function createRemarkButton(options: CreateRemarkButtonOptions) {
+  return {
+    type: 'create-button',
+    name: 'Create Post',
+    onSubmit: (value: string, cms: CMS) => {
+      let filename = options.filename(value)
+      let frontmatter = options.frontmatter(value)
+
+      let fileRelativePath = filename
+      cms.api.git!.onChange!({
+        fileRelativePath,
+        content: toMarkdownString({
+          frontmatter,
+          rawMarkdownBody: '',
+          // unnecessary
+          id: '',
+          html: '',
+          fields: { fileRelativePath },
+        }),
+      })
+    },
+  }
 }
 
 export function useRemarkForm(
