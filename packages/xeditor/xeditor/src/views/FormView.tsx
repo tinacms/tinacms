@@ -3,7 +3,8 @@ import { FormBuilder, FieldsBuilder } from '@forestryio/cms-final-form-builder'
 import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
 import { Form, Plugin } from '@forestryio/cms'
-import styled, { createGlobalStyle, css } from 'styled-components'
+import styled, { css } from 'styled-components'
+import { TextField } from '@forestryio/xeditor-fields'
 
 export interface ViewPlugin extends Plugin {
   type: 'view'
@@ -59,6 +60,9 @@ export const FormsView: ViewPlugin = {
               <>
                 {/* <h3>Editing form {editingForm.name}</h3> */}
                 <FieldsWrapper>
+                  {cms.plugins.all('create-button').map(plugin => (
+                    <CreateContentButton plugin={plugin} />
+                  ))}
                   {editingForm &&
                     (editingForm.fields.length ? (
                       <FieldsBuilder form={editingForm} />
@@ -81,6 +85,27 @@ export const FormsView: ViewPlugin = {
       </>
     )
   },
+}
+
+const CreateContentButton = ({ plugin }: any) => {
+  let cms = useCMS()
+  let [postName, setPostName] = React.useState('')
+  let [open, setOpen] = React.useState(false)
+  return (
+    <div>
+      <button onClick={() => setOpen(p => !p)}>{plugin.name}</button>
+      {open && (
+        <>
+          <TextField
+            onChange={e => setPostName(e.target.value)}
+            value={postName}
+          />
+
+          <button onClick={() => plugin.onSubmit(postName, cms)}>Save</button>
+        </>
+      )}
+    </div>
+  )
 }
 
 interface FormsListProps {
