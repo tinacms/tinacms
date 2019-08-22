@@ -1,4 +1,8 @@
-# Xeditor GitLab Backend
+# Deprecated
+
+This information is deprecated (that was fast) since we have decided that xeditor will require a backend server, and can implement backends much more gracefully and usefully that way.
+
+## Xeditor GitLab Backend
 
 The GitLab backend persists your content changes to GitLab using the GitLab v4 API.
 
