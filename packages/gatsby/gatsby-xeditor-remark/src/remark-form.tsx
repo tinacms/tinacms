@@ -20,19 +20,19 @@ interface RemarkNode {
 }
 
 interface CreateRemarkButtonOptions {
-  filename(value: string): string
-  frontmatter(value: string): object
-  body(value: string): string
+  filename(value: string): Promise<string> | string
+  frontmatter(value: string): Promise<object> | object
+  body(value: string): Promise<string> | string
 }
 
 export function createRemarkButton(options: CreateRemarkButtonOptions) {
   return {
     type: 'create-button',
     name: 'Create Post',
-    onSubmit: (value: string, cms: CMS) => {
-      let filename = options.filename(value)
-      let frontmatter = options.frontmatter(value)
-      let rawMarkdownBody = options.body(value)
+    onSubmit: async (value: string, cms: CMS) => {
+      let filename = await options.filename(value)
+      let frontmatter = await options.frontmatter(value)
+      let rawMarkdownBody = await options.body(value)
 
       let fileRelativePath = filename
       cms.api.git!.onChange!({
