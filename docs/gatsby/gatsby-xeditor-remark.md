@@ -3,7 +3,7 @@
 Creating forms for content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by three plugins:
 
 - `gatsby-xeditor-remark`: Provides hooks and components for creating Remark forms.
-- `gatsby-xeditor-git`: Extends `gatsby-plugin-xserver` to writes changes to the local filesystem;
+- `gatsby-xeditor-git`: Extends gatsby dev server to writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
 ## Installation
