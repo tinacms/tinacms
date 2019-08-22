@@ -24,7 +24,9 @@ export function router() {
   router.use(express.json())
 
   router.post('/delete', (req: any, res: any) => {
-    deleteFile(path.join(pathRoot, req.body.fileRelativePath))
+    req.body.files.map((relPath: string) => {
+      deleteFile(path.join(pathRoot, relPath))
+    })
     res.send(200)
   })
 
