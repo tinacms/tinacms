@@ -9,8 +9,10 @@ import { useCMS, useCMSForm } from "@forestryio/cms-react"
 import { createRemarkButton } from "@forestryio/gatsby-xeditor-remark"
 
 const CreatePostPlugin = createRemarkButton({
-  filename: value => `content/blog/${value}/index.md`,
-  frontmatter: value => ({ title: value }),
+  filename: title =>
+    `content/blog/${title.replace(/\s+/g, "-").toLowerCase()}/index.md`,
+  frontmatter: title => ({ title }),
+  body: title => `# ${title}`,
 })
 
 // TODO: Move to `cms-react`
