@@ -1,26 +1,36 @@
 import { login } from '.'
 
-jest.mock('./prompt-credentials')
 jest.mock('../../config')
-jest.mock('axios')
+jest.mock('./waitForAuth')
+jest.mock('./createExpressServer')
 
 describe('login', () => {
-  let prompt: any
+  let createExpressServer: any
   let config: any
-  let axios: any
-  beforeEach(() => {
-    prompt = require('./prompt-credentials')
-    prompt.promptCredentials.mockImplementation(() =>
-      Promise.resolve({ email: 'test@blah.ca', password: 'pass' })
-    )
-    config = require('../../config')
-    axios = require('axios')
+  let waitForAuth: any
 
-    axios.post.mockImplementation(() => Promise.resolve({ token: '12321' }))
+  const closeFn = jest.fn()
+  beforeEach(() => {
+    config = require('../../config')
+    waitForAuth = require('./waitForAuth').waitForAuth
+    createExpressServer = require('./createExpressServer').createExpressServer
+
+    createExpressServer.mockImplementation(() => {
+      return {
+        listen: () => {
+          return {
+            close: closeFn,
+          }
+        },
+      }
+    })
+
+    waitForAuth.mockImplementation(() => Promise.resolve({ token: '12321' }))
   })
 
   afterEach(() => {
-    axios.post.mockReset()
+    waitForAuth.mockReset()
+    closeFn.mockReset()
   })
 
   it('write token to config', async () => {
@@ -28,15 +38,13 @@ describe('login', () => {
 
     await login()
     expect(config.writeConfig).toHaveBeenCalledTimes(1)
-    expect(config.writeConfig).toHaveBeenCalledWith({ token: '12321' })
+    expect(config.writeConfig).toHaveBeenCalledWith({
+      auth: { token: '12321' },
+    })
   })
 
-  it('posts credentials to server', async () => {
+  it('closes server when done', async () => {
     await login()
-    expect(axios.post).toHaveBeenCalledTimes(1)
-    expect(axios.post).toHaveBeenCalledWith(expect.any(String), {
-      email: 'test@blah.ca',
-      password: 'pass',
-    })
+    expect(closeFn).toHaveBeenCalledTimes(1)
   })
 })
