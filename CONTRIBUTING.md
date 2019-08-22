@@ -38,3 +38,7 @@ Linking prevents running `npm install` from directly inside a package from worki
 2. **Add dependencies manually, then bootstrap**
 
    The other approach is to manually add the dependencies to the `package.json` and then run `npm run bootstrap` from the root of the repository.
+
+3. **When I run `npm run bs` it deletes the contents of a package?**
+
+   This sucks. Try running `lerna clean` and then running `npm run bs` again.
