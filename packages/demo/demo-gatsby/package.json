@@ -12,7 +12,7 @@
     "@forestryio/cms-final-form-builder": "^1.0.1-alpha.9",
     "@forestryio/cms-react": "^0.1.1-alpha.8",
     "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.19",
-    "@forestryio/gatsby-xeditor-git": "*",
+    "@forestryio/gatsby-xeditor-git": "^0.0.1-alpha.17",
     "@forestryio/gatsby-xeditor-gitlab": "^0.0.1-alpha.5",
     "@forestryio/gatsby-xeditor-json": "^0.0.1-alpha.4",
     "@forestryio/gatsby-xeditor-remark": "^0.1.1-alpha.6",
