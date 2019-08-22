@@ -54,7 +54,16 @@ export const FormsView: ViewPlugin = {
           setActiveForm={setEditingForm}
         /> */}
         <FormBuilder form={editingForm as any}>
-          {({ handleSubmit, pristine }) => {
+          {({ handleSubmit, pristine, form }) => {
+            let isFile, fileRelativePath: any
+            try {
+              //@ts-ignore
+              fileRelativePath = form.getState().values!.fields!
+                .fileRelativePath
+              isFile = true
+            } catch (e) {
+              isFile = false
+            }
             return (
               <>
                 {/* <h3>Editing form {editingForm.name}</h3> */}
@@ -73,6 +82,25 @@ export const FormsView: ViewPlugin = {
                   >
                     Save
                   </SaveButton>
+                  {isFile && (
+                    <DeleteButton
+                      onClick={() => {
+                        if (
+                          !confirm(
+                            `Are you sure you want to delete ${fileRelativePath}?`
+                          )
+                        ) {
+                          return
+                        }
+                        // @ts-ignore
+                        cms.api.git.onDelete!({
+                          files: [fileRelativePath],
+                        })
+                      }}
+                    >
+                      Delete
+                    </DeleteButton>
+                  )}
                 </FormsFooter>
               </>
             )
@@ -175,4 +203,8 @@ const SaveButton = styled.button`
       pointer: not-allowed;
       pointer-events: none;
     `};
+`
+
+const DeleteButton = styled(SaveButton)`
+  background-color: red;
 `

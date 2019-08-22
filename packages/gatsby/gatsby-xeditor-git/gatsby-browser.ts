@@ -61,7 +61,7 @@ function deleteFromDisk(data: any) {
     body: JSON.stringify(data),
   })
     .then(response => {
-      console.log(response.json())
+      window.history.back()
     })
     .catch(e => {
       console.error(e)
