@@ -2,7 +2,7 @@ import inquirer = require('inquirer')
 
 interface Config {
   install_dependencies_command: string
-  build: string
+  build_command: string
   output_directory: string
   env: string
   build_image: string
@@ -17,7 +17,7 @@ interface EngineDefaults {
 export const DEFAULT_CONFIG: EngineDefaults = {
   ['gatsby']: {
     install_dependencies_command: 'yarn install',
-    build: 'npm run gatsby develop -p 8080 --host 0.0.0.0',
+    build_command: 'npm run gatsby develop -p 8080 --host 0.0.0.0',
     output_directory: 'public',
     env: 'staging',
     build_image: 'node:10',

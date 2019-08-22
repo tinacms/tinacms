@@ -6,7 +6,7 @@ describe('promptConfig', () => {
 
   const defaults = {
     install_dependencies_command: 'yarn install',
-    build: 'npm run gatsby develop -p 8080 --host 0.0.0.0',
+    build_command: 'npm run gatsby develop -p 8080 --host 0.0.0.0',
     output_directory: 'public',
     env: 'staging',
     build_image: 'node:10',
@@ -46,7 +46,7 @@ describe('promptConfig', () => {
         } else {
           return Promise.resolve({
             install_dependencies_command: 'bloop',
-            build: 'bleep',
+            build_command: 'bleep',
             output_directory: 'blip',
             env: 'blop',
             build_image: 'blup',
@@ -63,7 +63,7 @@ describe('promptConfig', () => {
       expect(inquirer.prompt).toHaveBeenCalledWith(
         expect.arrayContaining([
           expect.objectContaining({ name: 'install_dependencies_command' }),
-          expect.objectContaining({ name: 'build' }),
+          expect.objectContaining({ name: 'build_command' }),
           expect.objectContaining({ name: 'output_directory' }),
           expect.objectContaining({ name: 'env' }),
           expect.objectContaining({ name: 'build_image' }),
