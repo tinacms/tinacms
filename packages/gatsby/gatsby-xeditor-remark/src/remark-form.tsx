@@ -149,7 +149,10 @@ export function RemarkForm({
 
 export function toMarkdownString(remark: RemarkNode) {
   return (
-    '---\n' + yaml.dump(remark.frontmatter) + '---\n' + remark.rawMarkdownBody
+    '---\n' +
+    yaml.dump(remark.frontmatter) +
+    '---\n' +
+    (remark.rawMarkdownBody || '')
   )
 }
 
