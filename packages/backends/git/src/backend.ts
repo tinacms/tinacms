@@ -1,5 +1,5 @@
 import { audit } from './audit'
-import { writeFile } from './file-writer'
+import { writeFile, deleteFile } from './file-writer'
 
 const fs = require('fs')
 const path = require('path')
@@ -22,6 +22,11 @@ export function router() {
 
   let router = express.Router()
   router.use(express.json())
+
+  router.post('/delete', (req: any, res: any) => {
+    deleteFile(path.join(pathRoot, req.body.fileRelativePath))
+    res.send(200)
+  })
 
   router.put('/writeFile', (req: any, res: any) => {
     writeFile(pathRoot, req.body)

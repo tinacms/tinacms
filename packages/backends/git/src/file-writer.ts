@@ -14,6 +14,10 @@ export function writeFile(pathRoot: string, data: any) {
   tryToWrite()
 }
 
+export function deleteFile(path: string) {
+  fs.unlinkSync(path)
+}
+
 function cacheCommand(pathRoot: string, data: any) {
   let prevCacheNumber = count - 1
   console.info(`caching ${count}: start`)
