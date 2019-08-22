@@ -7,6 +7,9 @@ cms.registerApi('git', {
   onChange(data: any) {
     writeToDisk(data)
   },
+  onDelete(data: any) {
+    deleteFromDisk(data)
+  },
   isAuthenticated() {
     return true
   },
@@ -36,6 +39,22 @@ function writeToDisk(data: any) {
   // @ts-ignore
   return fetch(`${base}/x-server/writeFile`, {
     method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => {
+      console.log(response.json())
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
+
+function deleteFromDisk(data: any) {
+  return fetch(`${base}/x-server/delete`, {
+    method: 'POST',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
     },
