@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { CMS, Form, Subscribable, FormOptions } from '@forestryio/cms'
+import { CMS, Plugin, Form, Subscribable, FormOptions } from '@forestryio/cms'
 
 export const ERROR_MISSING_CMS = `useCMS could not find an instance of CMS`
 
@@ -53,4 +53,12 @@ export function useSubscribable(subscribable: Subscribable, cb?: Function) {
       if (cb) cb()
     })
   })
+}
+
+export function usePlugin(plugin: Plugin) {
+  let cms = useCMS()
+  React.useEffect(() => {
+    cms.plugins.add(plugin)
+    return () => cms.plugins.remove(plugin)
+  }, [plugin])
 }
