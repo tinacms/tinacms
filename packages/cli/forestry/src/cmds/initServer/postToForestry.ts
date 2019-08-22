@@ -1,4 +1,3 @@
-require('dotenv').config()
 import chalk from 'chalk'
 import axios from 'axios'
 import * as listr from 'listr'

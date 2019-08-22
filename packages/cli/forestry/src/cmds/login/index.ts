@@ -1,4 +1,3 @@
-require('dotenv').config()
 import { writeConfig } from '../../config'
 import { waitForAuth } from './waitForAuth'
 import { createExpressApp } from './createExpressApp'
