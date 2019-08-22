@@ -78,6 +78,7 @@ export function useRemarkForm(
 
     return [markdownRemark, form]
   } catch (e) {
+    // TODO: this swallows too many errors
     throw new Error(ERROR_MISSING_CMS_GATSBY)
   }
 }
