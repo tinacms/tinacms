@@ -1,7 +1,7 @@
 import * as express from 'express'
 import * as cors from 'cors'
 
-export const createExpressApp = () => {
+export const createExpressApp = (): express.Express => {
   let app = express()
 
   app.use(
