@@ -1,19 +1,20 @@
+require('dotenv').config()
 import { writeConfig } from '../../config'
-import { promptCredentials } from './prompt-credentials'
-import axios from 'axios'
-import { any } from 'prop-types'
+import { waitForAuth } from './waitForAuth'
+import { createExpressApp } from './createExpressApp'
 
-const FORESTRY_API = ''
 export async function login() {
-  const fieldValues = await promptCredentials()
-  const { token } = await axios.post<any, { token: string }>(
-    `${FORESTRY_API}/login`,
-    fieldValues
-  )
-  writeConfig({ token })
+  let app = createExpressApp()
 
-  // TODO - Post to forestry and grab token
-  // TODO - Store token in ~/.forestry credentials file
-  // TODO - Display the below warning when login fails
-  console.log(`Failed to log in ${fieldValues.email} - Not yet implemented`)
+  let server = app.listen(process.env.AUTH_CALLBACK_PORT, () => {
+    console.log('------------------------------------------')
+    console.log('waiting for the auth response')
+    console.log('------------------------------------------')
+  })
+
+  const auth = await waitForAuth(app)
+  server.close()
+  writeConfig({ auth })
+
+  console.log('You are now authenticated')
 }
