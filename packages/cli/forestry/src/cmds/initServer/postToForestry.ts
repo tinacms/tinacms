@@ -1,13 +1,32 @@
 import chalk from 'chalk'
+import axios from 'axios'
 import * as listr from 'listr'
+import { readConfig } from '../../config'
 
 export const postToForestry = async (
   authToken: string,
   repo: string,
   branch: string
 ) => {
-  const devServer = 'https://hamburger.forestry.dev'
+  const devServer = 'http://localhost:3000/app/create'
+
   console.log(`\nyour site will available at: ${chalk.green(devServer)}`)
+
+  const token = readConfig().auth.access_token
+  const body = await axios({
+    method: 'POST',
+    headers: { Authorization: 'Bearer ' + token },
+    data: {
+      provider: '123',
+      token: '321',
+      repo: 'repo',
+      branch: '12',
+    },
+    url: devServer,
+  })
+
+  console.log(body)
+
   const tasks = new listr([
     {
       title: 'Posting to Forestry',
