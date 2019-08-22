@@ -18,10 +18,7 @@ function usePlugin(plugin) {
   let cms = useCMS()
   React.useEffect(() => {
     cms.plugins.add(plugin)
-    return () => {
-      // TODO: Remove plugin.
-      // cms.plugins.remove(plugin)
-    }
+    return () => cms.plugins.remove(plugin)
   }, [plugin])
 }
 function BlogIndex(props) {
