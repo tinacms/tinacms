@@ -1,5 +1,4 @@
 import { initServer } from './cmds/initServer'
-import { createAccount } from './cmds/createAccount'
 import { login } from './cmds/login'
 
 import * as commander from 'commander'
@@ -12,12 +11,6 @@ export function init(args: any) {
   const program = new commander.Command()
 
   program.version(version)
-  program
-    .command('auth:signup')
-    .description('create a forestry account')
-    .action(() => {
-      createAccount()
-    })
 
   program
     .command('auth:login')
