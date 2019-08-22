@@ -1,12 +1,9 @@
 import { writeConfig } from '../../config'
-import { promptCredentials } from './prompt-credentials'
 import axios from 'axios'
 import * as open from 'open'
 import { randomBytes, createHash } from 'crypto'
 import { createExpressServer } from '../initServer/retrieveAuthToken'
-var request = require('request')
 
-const FORESTRY_API = ''
 const AUTH_CALLBACK_PORT = 4568
 export async function login() {
   const clientId = 'IgXPpOyz7U6fLPUwChRYIbEY2dmO2ppU'
@@ -27,29 +24,15 @@ export async function login() {
 
   let app = createExpressServer()
   app.get('/auth/callback', async (req, res) => {
-    console.log('reached callback ' + callback)
-
-    console.log('response: ' + JSON.stringify(req.query))
-    const code = req.query.code
-
-    var options = {
-      method: 'POST',
-      url: `${baseUrl}/oauth/token`,
-      headers: { 'content-type': 'application/x-www-form-urlencoded' },
-      form: {
-        grant_type: 'authorization_code',
-        client_id: clientId,
-        code_verifier: verifier,
-        code: code,
-        redirect_uri: `http://localhost:${AUTH_CALLBACK_PORT}/auth/callback`,
-      },
-    }
-
-    request(options, function(error: any, response: any, body: any) {
-      if (error) throw new Error(error)
-
-      console.log(body)
+    const body = await axios.post(`${baseUrl}/oauth/token`, {
+      grant_type: 'authorization_code',
+      client_id: clientId,
+      code_verifier: verifier,
+      code: req.query.code,
+      redirect_uri: `http://localhost:${AUTH_CALLBACK_PORT}/auth/callback`,
     })
+
+    writeConfig(JSON.stringify({ auth: body.data }))
 
     res.writeHead(200, { 'Content-Type': 'text/html' })
     res.write(
@@ -64,18 +47,6 @@ export async function login() {
   })
 
   open(authUrl)
-
-  const fieldValues = await promptCredentials()
-  const { token } = await axios.post<any, { token: string }>(
-    `${FORESTRY_API}/login`,
-    fieldValues
-  )
-  writeConfig({ token })
-
-  // TODO - Post to forestry and grab token
-  // TODO - Store token in ~/.forestry credentials file
-  // TODO - Display the below warning when login fails
-  console.log(`Failed to log in ${fieldValues.email} - Not yet implemented`)
 }
 
 function base64URLEncode(str: Buffer) {
