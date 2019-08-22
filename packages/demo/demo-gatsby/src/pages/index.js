@@ -9,10 +9,25 @@ import { useCMS, useCMSForm, usePlugin } from "@forestryio/cms-react"
 import { createRemarkButton } from "@forestryio/gatsby-xeditor-remark"
 
 const CreatePostPlugin = createRemarkButton({
-  filename: title =>
-    `content/blog/${title.replace(/\s+/g, "-").toLowerCase()}/index.md`,
-  frontmatter: title => ({ title }),
-  body: title => `# ${title}`,
+  filename(title) {
+    return `content/blog/${title.replace(/\s+/g, "-").toLowerCase()}/index.md`
+  },
+  frontmatter(title) {
+    // Asynchronously generate front matter by fetching data from some server.
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve({
+          title,
+          date: new Date(),
+          heading_color: "pink",
+          description: "My new post. ",
+        })
+      }, 1000)
+    })
+  },
+  body(title) {
+    return `# ${title}`
+  },
 })
 
 function BlogIndex(props) {
