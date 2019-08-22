@@ -43,7 +43,7 @@ export const postToForestry = async (
   ])
 
   await tasks.run().catch(err => {
-    console.error(err)
+    process.exit(1)
   })
   console.log(
     `\nyour dev server is live at: ${chalk.green('dev.hamburger.com')}`
