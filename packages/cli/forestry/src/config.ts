@@ -15,7 +15,7 @@ export const readConfig = () => {
 }
 
 export const writeConfig = (newConfig: any) => {
-  fs.writeFileSync(configPath, JSON.stringify({ ...readConfig(), newConfig }))
+  fs.writeFileSync(configPath, JSON.stringify(newConfig))
 }
 
 export const isAuthenticated = () => {

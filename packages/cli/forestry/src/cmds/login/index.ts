@@ -1,7 +1,8 @@
 require('dotenv').config()
 import { writeConfig } from '../../config'
 import { waitForAuth } from './waitForAuth'
-import { createExpressServer } from '../initServer/retrieveAuthToken'
+import * as express from 'express'
+import * as cors from 'cors'
 
 export async function login() {
   let app = createExpressServer()
@@ -14,7 +15,22 @@ export async function login() {
 
   const auth = await waitForAuth(app)
   server.close()
-  writeConfig(JSON.stringify({ auth }))
+  writeConfig({ auth })
 
   console.log('You are now authenticated')
+}
+
+const createExpressServer = () => {
+  let app = express()
+
+  app.use(
+    cors({
+      origin: function(origin, callback) {
+        // TODO: Only accept from localhost.
+        callback(null, true)
+      },
+    })
+  )
+
+  return app
 }
