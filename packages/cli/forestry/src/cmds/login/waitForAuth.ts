@@ -1,4 +1,3 @@
-require('dotenv').config()
 import * as express from 'express'
 import axios from 'axios'
 import { createHash, randomBytes } from 'crypto'
