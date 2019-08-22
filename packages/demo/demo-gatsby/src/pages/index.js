@@ -5,7 +5,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useCMS, useCMSForm } from "@forestryio/cms-react"
+import { useCMS, useCMSForm, usePlugin } from "@forestryio/cms-react"
 import { createRemarkButton } from "@forestryio/gatsby-xeditor-remark"
 
 const CreatePostPlugin = createRemarkButton({
@@ -15,14 +15,6 @@ const CreatePostPlugin = createRemarkButton({
   body: title => `# ${title}`,
 })
 
-// TODO: Move to `cms-react`
-function usePlugin(plugin) {
-  let cms = useCMS()
-  React.useEffect(() => {
-    cms.plugins.add(plugin)
-    return () => cms.plugins.remove(plugin)
-  }, [plugin])
-}
 function BlogIndex(props) {
   const { data } = props
   const siteTitle = data.site.siteMetadata.title
