@@ -17,5 +17,10 @@ export async function initServer() {
   const gitProvider = await requestGitProvider(repoBranch.repo)
   const authToken = await retrieveAuthToken(gitProvider)
 
-  await postToForestry(authToken, repoBranch.repo, repoBranch.branch)
+  await postToForestry(
+    gitProvider,
+    authToken,
+    repoBranch.repo,
+    repoBranch.branch
+  )
 }
