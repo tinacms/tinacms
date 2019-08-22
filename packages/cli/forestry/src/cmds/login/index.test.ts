@@ -2,10 +2,10 @@ import { login } from '.'
 
 jest.mock('../../config')
 jest.mock('./waitForAuth')
-jest.mock('./createExpressServer')
+jest.mock('./createExpressApp')
 
 describe('login', () => {
-  let createExpressServer: any
+  let createExpressApp: any
   let config: any
   let waitForAuth: any
 
@@ -13,9 +13,9 @@ describe('login', () => {
   beforeEach(() => {
     config = require('../../config')
     waitForAuth = require('./waitForAuth').waitForAuth
-    createExpressServer = require('./createExpressServer').createExpressServer
+    createExpressApp = require('./createExpressApp').createExpressApp
 
-    createExpressServer.mockImplementation(() => {
+    createExpressApp.mockImplementation(() => {
       return {
         listen: () => {
           return {
