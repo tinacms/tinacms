@@ -37,13 +37,16 @@ function commit(data: any) {
 
 function writeToDisk(data: any) {
   // @ts-ignore
-  return fetch(`${base}/x-server/writeFile`, {
-    method: 'PUT',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    body: JSON.stringify(data),
-  })
+  return fetch(
+    `${base}/x-server/${encodeURIComponent(data.fileRelativePath)}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(data),
+    }
+  )
     .then(response => {
       console.log(response.json())
     })
