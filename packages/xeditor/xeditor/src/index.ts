@@ -16,7 +16,7 @@ cms.plugins.add(FormsView)
 cms.plugins.add(DummyView)
 
 // Field Plugins
-cms.forms.addFieldPlugin({
+cms.fields.add({
   name: 'text',
   Component: TextInput,
   validate(value: any, values: any, meta: any, field: any) {
@@ -24,14 +24,17 @@ cms.forms.addFieldPlugin({
   },
 })
 
-cms.forms.addFieldPlugin({ name: 'textarea', Component: TextAreaInput })
+cms.fields.add({
+  name: 'textarea',
+  Component: TextAreaInput,
+})
 
-cms.forms.addFieldPlugin({
+cms.fields.add({
   name: 'color',
   Component: ColorPickerField,
 })
 
-cms.forms.addFieldPlugin({
+cms.fields.add({
   name: 'toggle',
   type: 'checkbox',
   Component: ToggleField,

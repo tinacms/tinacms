@@ -7,12 +7,12 @@ import styled, { css } from 'styled-components'
 import { TextField } from '@forestryio/xeditor-fields'
 
 export interface ViewPlugin extends Plugin {
-  type: 'view'
+  __type: 'view'
   Component: any
 }
 
 export const FormsView: ViewPlugin = {
-  type: 'view',
+  __type: 'view',
   name: 'Content',
   Component: () => {
     const cms = useCMS()
@@ -135,7 +135,7 @@ const FormsList = ({ forms, activeForm, setActiveForm }: FormsListProps) => {
 }
 
 export const DummyView: ViewPlugin = {
-  type: 'view',
+  __type: 'view',
   name: 'Dummy',
   Component: () => {
     return <h2>Hello World</h2>

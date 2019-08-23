@@ -25,18 +25,10 @@ export class FormManager extends Subscribable {
   all() {
     return Object.keys(this.__forms).map(name => this.__forms[name])
   }
-
-  addFieldPlugin(plugin: FieldPlugin) {
-    this.__fields[plugin.name] = plugin
-    this.notifiySubscribers()
-  }
-
-  getFieldPlugin(name: string): FieldPlugin | null {
-    return this.__fields[name]
-  }
 }
 
 export interface FieldPlugin {
+  __type: 'field'
   name: string
   Component: React.FC<any>
   type?: string
