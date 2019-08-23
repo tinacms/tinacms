@@ -24,10 +24,14 @@ export function router() {
   router.use(express.json())
 
   router.post('/delete', (req: any, res: any) => {
-    req.body.files.map((relPath: string) => {
-      deleteFile(path.join(pathRoot, relPath))
-    })
-    res.send(200)
+    try {
+      req.body.files.map((relPath: string) => {
+        deleteFile(path.join(pathRoot, relPath))
+      })
+      res.json({ status: 'success' })
+    } catch (e) {
+      res.status(500).json({ status: 'error', message: e.message })
+    }
   })
 
   router.put('/writeFile', (req: any, res: any) => {
