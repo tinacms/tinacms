@@ -1,5 +1,5 @@
 import { FormManager, FieldPlugin } from './cms-forms'
-import { PluginManager, PluginType } from './plugins'
+import { PluginManager, PluginType, Plugin } from './plugins'
 
 export class CMS {
   forms: FormManager
@@ -14,6 +14,10 @@ export class CMS {
     return this.plugins.findOrCreateMap('field')
   }
 
+  get screens(): PluginType<ScreenPlugin> {
+    return this.plugins.findOrCreateMap('screen')
+  }
+
   registerApi(name: string, api: API): void {
     // TODO: Make sure we're not overwriting an existing API.
     this.api[name] = api
@@ -26,4 +30,9 @@ export interface API {
   isAuthenticated?(): any
   authenticate?(): Promise<any>
   removeAuthentication?(): any
+}
+
+export interface ScreenPlugin extends Plugin {
+  __type: 'screen'
+  Component: any
 }
