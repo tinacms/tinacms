@@ -5,23 +5,18 @@ export interface Plugin {
   name: string
 }
 
-export class PluginManager extends Subscribable {
+export class PluginManager {
   private plugins: Map<PluginType> = {}
 
-  constructor() {
-    super()
-  }
   findOrCreateMap<T extends Plugin = Plugin>(type: string): PluginType<T> {
     return (this.plugins[type] =
       this.plugins[type] || new PluginType(type)) as PluginType<T>
   }
   add(view: Plugin) {
     this.findOrCreateMap(view.__type).add(view)
-    this.notifiySubscribers()
   }
   remove(view: Plugin) {
     this.findOrCreateMap(view.__type).remove(view)
-    this.notifiySubscribers()
   }
   all<T extends Plugin = Plugin>(type: string): T[] {
     return this.findOrCreateMap<T>(type).all()
@@ -34,9 +29,11 @@ interface Map<T> {
 
 type PluginMap<T extends Plugin = Plugin> = Map<T>
 
-export class PluginType<T extends Plugin = Plugin> {
+export class PluginType<T extends Plugin = Plugin> extends Subscribable {
   __plugins: PluginMap<T> = {}
-  constructor(private __type: string) {}
+  constructor(private __type: string) {
+    super()
+  }
 
   add(plugin: T | Omit<T, '__type'>) {
     let p = plugin as T
@@ -46,6 +43,7 @@ export class PluginType<T extends Plugin = Plugin> {
     }
 
     this.__plugins[p.name] = p
+    this.notifiySubscribers()
   }
 
   all(): T[] {
@@ -63,6 +61,7 @@ export class PluginType<T extends Plugin = Plugin> {
     let plugin = this.__plugins[name]
 
     delete this.__plugins[name]
+    this.notifiySubscribers()
 
     return plugin
   }
