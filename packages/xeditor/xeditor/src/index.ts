@@ -1,4 +1,5 @@
 export * from './sidebarProvider'
+export * from './modalProvider'
 export * from './fields'
 import {
   TextInput,

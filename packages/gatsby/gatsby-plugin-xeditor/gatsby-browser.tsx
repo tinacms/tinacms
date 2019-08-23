@@ -1,16 +1,24 @@
 import * as React from 'react'
 import { CMSContext } from '@forestryio/cms-react'
-import { SidebarProvider, useSidebar } from '@forestryio/xeditor'
+import {
+  SidebarProvider,
+  Modal,
+  ModalProvider,
+  useSidebar,
+} from '@forestryio/xeditor'
 import { cms } from './index'
 import styled from 'styled-components'
 
 export const wrapRootElement = ({ element }: any, options: any) => {
   return (
     <CMSContext.Provider value={cms}>
-      <SidebarProvider title={options.title} logo={options.logo}>
-        {element}
-        <SidebarToggle />
-      </SidebarProvider>
+      <ModalProvider>
+        <SidebarProvider title={options.title} logo={options.logo}>
+          {element}
+          <SidebarToggle />
+          <Modal>What up what up?</Modal>
+        </SidebarProvider>
+      </ModalProvider>
     </CMSContext.Provider>
   )
 }
