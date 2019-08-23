@@ -19,7 +19,7 @@ export class PluginManager extends Subscribable {
     this.findOrCreateMap(view.__type).add(view)
     this.notifiySubscribers()
   }
-  remove(type: string, view: Plugin) {
+  remove(view: Plugin) {
     this.findOrCreateMap(view.__type).remove(view)
     this.notifiySubscribers()
   }

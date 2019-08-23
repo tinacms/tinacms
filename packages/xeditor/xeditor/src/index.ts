@@ -6,7 +6,7 @@ import {
   ColorPickerField,
   ToggleField,
 } from './fields'
-import { CMS } from '@forestryio/cms'
+import { CMS, Plugin } from '@forestryio/cms'
 import { FormsView, DummyView } from './views/FormView'
 
 export const cms = new CMS()
@@ -39,3 +39,8 @@ cms.fields.add({
   type: 'checkbox',
   Component: ToggleField,
 })
+
+export interface AddContentPlugin extends Plugin {
+  __type: 'content-button'
+  onSubmit(value: string, cms: CMS): Promise<void> | void
+}
