@@ -6,17 +6,17 @@ import {
   ColorPickerField,
   ToggleField,
 } from './fields'
-import { CMS } from '@forestryio/cms'
+import { CMS, Plugin } from '@forestryio/cms'
 import { FormsView, DummyView } from './views/FormView'
 
 export const cms = new CMS()
 
 // View Plugins
-cms.plugins.add(FormsView)
-cms.plugins.add(DummyView)
+cms.screens.add(FormsView)
+cms.screens.add(DummyView)
 
 // Field Plugins
-cms.forms.addFieldPlugin({
+cms.fields.add({
   name: 'text',
   Component: TextInput,
   validate(value: any, values: any, meta: any, field: any) {
@@ -24,15 +24,23 @@ cms.forms.addFieldPlugin({
   },
 })
 
-cms.forms.addFieldPlugin({ name: 'textarea', Component: TextAreaInput })
+cms.fields.add({
+  name: 'textarea',
+  Component: TextAreaInput,
+})
 
-cms.forms.addFieldPlugin({
+cms.fields.add({
   name: 'color',
   Component: ColorPickerField,
 })
 
-cms.forms.addFieldPlugin({
+cms.fields.add({
   name: 'toggle',
   type: 'checkbox',
   Component: ToggleField,
 })
+
+export interface AddContentPlugin extends Plugin {
+  __type: 'content-button'
+  onSubmit(value: string, cms: CMS): Promise<void> | void
+}
