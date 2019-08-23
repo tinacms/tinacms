@@ -2,17 +2,12 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@forestryio/cms-final-form-builder'
 import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
-import { Form, Plugin } from '@forestryio/cms'
+import { Form, ScreenPlugin } from '@forestryio/cms'
 import styled, { css } from 'styled-components'
 import { TextField } from '@forestryio/xeditor-fields'
 
-export interface ViewPlugin extends Plugin {
-  type: 'view'
-  Component: any
-}
-
-export const FormsView: ViewPlugin = {
-  type: 'view',
+export const FormsView: ScreenPlugin = {
+  __type: 'screen',
   name: 'Content',
   Component: () => {
     const cms = useCMS()
@@ -162,8 +157,8 @@ const FormsList = ({ forms, activeForm, setActiveForm }: FormsListProps) => {
   )
 }
 
-export const DummyView: ViewPlugin = {
-  type: 'view',
+export const DummyView: ScreenPlugin = {
+  __type: 'screen',
   name: 'Dummy',
   Component: () => {
     return <h2>Hello World</h2>

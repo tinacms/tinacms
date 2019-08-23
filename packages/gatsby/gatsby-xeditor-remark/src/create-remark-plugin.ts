@@ -1,5 +1,6 @@
-import { toMarkdownString } from './to-markdown'
-import { CMS } from '@forestryio/cms'
+import { toMarkdownString } from "./to-markdown"
+import { CMS } from "@forestryio/cms"
+import { AddContentPlugin } from "@forestryio/xeditor"
 
 interface CreateRemarkButtonOptions {
   label: string
@@ -8,12 +9,14 @@ interface CreateRemarkButtonOptions {
   body(value: string): Promise<string> | string
 }
 
-export function createRemarkButton(options: CreateRemarkButtonOptions) {
+export function createRemarkButton(
+  options: CreateRemarkButtonOptions
+): AddContentPlugin {
   let formatFilename = options.filename || ((value: string) => value)
   let createFrontmatter = options.frontmatter || (() => ({}))
-  let createBody = options.body || (() => '')
+  let createBody = options.body || (() => "")
   return {
-    type: 'content-button',
+    __type: "content-button",
     name: options.label,
     onSubmit: async (value: string, cms: CMS) => {
       let filename = await formatFilename(value)
@@ -27,8 +30,8 @@ export function createRemarkButton(options: CreateRemarkButtonOptions) {
           frontmatter,
           rawMarkdownBody,
           // unnecessary
-          id: '',
-          html: '',
+          id: "",
+          html: "",
           fields: { fileRelativePath },
         }),
       })
