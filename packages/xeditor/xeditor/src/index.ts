@@ -12,8 +12,8 @@ import { FormsView, DummyView } from './views/FormView'
 export const cms = new CMS()
 
 // View Plugins
-cms.plugins.add(FormsView)
-cms.plugins.add(DummyView)
+cms.screens.add(FormsView)
+cms.screens.add(DummyView)
 
 // Field Plugins
 cms.fields.add({

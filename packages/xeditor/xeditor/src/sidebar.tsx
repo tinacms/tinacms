@@ -3,7 +3,6 @@ import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
-import { ViewPlugin } from './views/FormView'
 
 export const Sidebar = ({
   title = 'XEditor',
@@ -16,7 +15,7 @@ export const Sidebar = ({
   useSubscribable(cms.plugins)
 
   let [ActiveView, setActiveView] = useState(() => {
-    let firstView = cms.plugins.all<ViewPlugin>('view')[0]
+    let firstView = cms.screens.all()[0]
     if (firstView) return firstView
     return {
       Component: (): any => null,
