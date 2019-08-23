@@ -12,7 +12,7 @@ export const Sidebar = ({
   logo?: string
 }) => {
   const cms = useCMS()
-  useSubscribable(cms.plugins)
+  useSubscribable(cms.screens)
 
   let [ActiveView, setActiveView] = useState(() => {
     let firstView = cms.screens.all()[0]
