@@ -7,10 +7,10 @@ let count = 0
 
 const MAX_BUILD_TIME = 1000
 
-export function writeFile(pathRoot: string, data: any) {
+export function writeFile(filepath: string, content: string) {
   count++
   console.info(`request ${count} received`)
-  cacheCommand(pathRoot, data)
+  cacheCommand(filepath, content)
   tryToWrite()
 }
 
@@ -18,13 +18,13 @@ export function deleteFile(path: string) {
   fs.unlinkSync(path)
 }
 
-function cacheCommand(pathRoot: string, data: any) {
+function cacheCommand(filepath: string, data: any) {
   let prevCacheNumber = count - 1
   console.info(`caching ${count}: start`)
   if (nextArgs) {
     console.info(`caching ${count}: discarding ${prevCacheNumber}`)
   }
-  nextArgs = [pathRoot, data]
+  nextArgs = [filepath, data]
   console.info(`caching ${count}: end`)
 }
 
@@ -38,13 +38,15 @@ function tryToWrite() {
     return
   }
 
-  let [pathRoot, data] = nextArgs
+  let [filepath, content] = nextArgs
   waitingForBuild = true
   nextArgs = null
 
-  let filePath = path.join(pathRoot, data.fileRelativePath)
-  fs.mkdirSync(path.dirname(filePath), { recursive: true })
-  fs.writeFile(filePath, data.content, (err: any) => {
+  let parentDir = path.dirname(filepath)
+  if (!fs.existsSync(parentDir)) {
+    fs.mkdirSync(parentDir, { recursive: true })
+  }
+  fs.writeFile(filepath, content, (err: any) => {
     if (err) {
       console.info(`write ${curr}: end; failure`)
       console.error(err)
