@@ -23,11 +23,9 @@ export function router() {
   let router = express.Router()
   router.use(express.json())
 
-  router.post('/delete', (req: any, res: any) => {
+  router.delete('/:relPath', (req: any, res: any) => {
     try {
-      req.body.files.map((relPath: string) => {
-        deleteFile(path.join(pathRoot, relPath))
-      })
+      deleteFile(path.join(pathRoot, decodeURIComponent(req.params.relPath)))
       res.json({ status: 'success' })
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
