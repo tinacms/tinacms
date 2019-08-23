@@ -94,7 +94,7 @@ export const FormsView: ViewPlugin = {
                         }
                         // @ts-ignore
                         cms.api.git.onDelete!({
-                          files: [fileRelativePath],
+                          relPath: fileRelativePath,
                         })
                       }}
                     >

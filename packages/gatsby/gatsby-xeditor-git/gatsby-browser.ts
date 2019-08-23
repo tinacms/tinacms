@@ -53,12 +53,11 @@ function writeToDisk(data: any) {
 }
 
 function deleteFromDisk(data: any) {
-  return fetch(`${base}/x-server/delete`, {
-    method: 'POST',
+  return fetch(`${base}/x-server/${encodeURIComponent(data.relPath)}`, {
+    method: 'DELETE',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
     },
-    body: JSON.stringify(data),
   })
     .then(response => {
       window.history.back()
