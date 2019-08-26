@@ -32,7 +32,15 @@ export const FormsView: ScreenPlugin = {
     /**
      * No Forms
      */
-    if (!forms.length) return <NoFormsPlaceholder />
+    if (!forms.length)
+      return (
+        <>
+          {cms.plugins.all('content-button').map(plugin => (
+            <CreateContentButton plugin={plugin} />
+          ))}
+          <NoFormsPlaceholder />
+        </>
+      )
     if (!editingForm)
       return (
         <FormsList
