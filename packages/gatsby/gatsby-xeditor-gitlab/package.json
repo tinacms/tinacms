@@ -1,7 +1,7 @@
 {
   "name": "@forestryio/gatsby-xeditor-gitlab",
   "main": "index.js",
-  "version": "0.0.1-alpha.7",
+  "version": "0.0.1-alpha.8",
   "files": [
     "index.js",
     "gatsby-browser.js",
@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@forestryio/cms-connector-gitlab": "^0.1.1-alpha.4",
-    "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.21"
+    "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.22"
   }
 }

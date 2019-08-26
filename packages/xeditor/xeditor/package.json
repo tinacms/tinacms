@@ -1,6 +1,6 @@
 {
   "name": "@forestryio/xeditor",
-  "version": "1.0.1-alpha.14",
+  "version": "1.0.1-alpha.15",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
