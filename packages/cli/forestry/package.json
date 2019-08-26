@@ -1,17 +1,17 @@
 {
   "name": "@forestryio/forestry-cli",
-  "version": "0.1.1-alpha.2",
+  "version": "0.1.1-alpha.3",
   "license": "MIT",
   "devDependencies": {
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2",
-    "cms-scripts": "^0.1.1-alpha.2",
     "@types/clear": "0.1.0",
-    "@types/figlet": "1.2.0",
-    "@types/inquirer": "^6.5.0",
     "@types/cors": "2.8.5",
     "@types/express": "4.17.0",
-    "@types/listr": "0.14.2"
+    "@types/figlet": "1.2.0",
+    "@types/inquirer": "^6.5.0",
+    "@types/listr": "0.14.2",
+    "cms-scripts": "^0.1.1-alpha.3",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts",
