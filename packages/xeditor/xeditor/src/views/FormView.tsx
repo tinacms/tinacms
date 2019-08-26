@@ -2,17 +2,12 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@forestryio/cms-final-form-builder'
 import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
-import { Form, Plugin } from '@forestryio/cms'
+import { Form, ScreenPlugin } from '@forestryio/cms'
 import styled, { css } from 'styled-components'
 import { TextField } from '@forestryio/xeditor-fields'
 
-export interface ViewPlugin extends Plugin {
-  type: 'view'
-  Component: any
-}
-
-export const FormsView: ViewPlugin = {
-  type: 'view',
+export const FormsView: ScreenPlugin = {
+  __type: 'screen',
   name: 'Content',
   Component: () => {
     const cms = useCMS()
@@ -37,7 +32,15 @@ export const FormsView: ViewPlugin = {
     /**
      * No Forms
      */
-    if (!forms.length) return <NoFormsPlaceholder />
+    if (!forms.length)
+      return (
+        <>
+          {cms.plugins.all('content-button').map(plugin => (
+            <CreateContentButton plugin={plugin} />
+          ))}
+          <NoFormsPlaceholder />
+        </>
+      )
     if (!editingForm)
       return (
         <FormsList
@@ -55,7 +58,16 @@ export const FormsView: ViewPlugin = {
           setActiveForm={setEditingForm}
         /> */}
         <FormBuilder form={editingForm as any}>
-          {({ handleSubmit, pristine }) => {
+          {({ handleSubmit, pristine, form }) => {
+            let isFile, fileRelativePath: any
+            try {
+              //@ts-ignore
+              fileRelativePath = form.getState().values!.fields!
+                .fileRelativePath
+              isFile = true
+            } catch (e) {
+              isFile = false
+            }
             return (
               <>
                 {/* <h3>Editing form {editingForm.name}</h3> */}
@@ -77,6 +89,25 @@ export const FormsView: ViewPlugin = {
                   >
                     Save
                   </SaveButton>
+                  {isFile && (
+                    <DeleteButton
+                      onClick={() => {
+                        if (
+                          !confirm(
+                            `Are you sure you want to delete ${fileRelativePath}?`
+                          )
+                        ) {
+                          return
+                        }
+                        // @ts-ignore
+                        cms.api.git.onDelete!({
+                          relPath: fileRelativePath,
+                        })
+                      }}
+                    >
+                      Delete
+                    </DeleteButton>
+                  )}
                 </FormsFooter>
               </>
             )
@@ -134,8 +165,8 @@ const FormsList = ({ forms, activeForm, setActiveForm }: FormsListProps) => {
   )
 }
 
-export const DummyView: ViewPlugin = {
-  type: 'view',
+export const DummyView: ScreenPlugin = {
+  __type: 'screen',
   name: 'Dummy',
   Component: () => {
     return <h2>Hello World</h2>
@@ -200,4 +231,8 @@ const SaveButton = styled.button`
       pointer: not-allowed;
       pointer-events: none;
     `};
+`
+
+const DeleteButton = styled(SaveButton)`
+  background-color: red;
 `

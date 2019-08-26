@@ -26,7 +26,6 @@ Open the `gatsby-config.js` file and add make sure the following plugins are lis
 module.exports = {
   plugins: [
     "@forestryio/gatsby-xeditor-git",
-    "@forestryio/gatsby-xeditor-remark",
     // ...
   ]
 }
@@ -85,32 +84,18 @@ The `remarkForm` HOC automatically creates a list of form fields based on the sh
 1. Every field is made a `text` component.
 1. The order of fields might not be consistent.
 
-The `remarkForm` function accepts some options.
-
-**Example: src/templates/blog-post.js**
-
-```typescript
-//                          👇
-export default remarkForm(config)(BlogPostTemplate)
-```
-
-**Config**
-
-The `config` is an optional object for overriding the default configuration of a `RemarkForm`. The following properties are accepted:
+The `remarkForm` function accepts an optional `config` object for overriding the default configuration of a `RemarkForm`. The following properties are accepted:
 
 - `fields`: A list of field definitions
-
-**Field Definitions**
-
-- `name`: The path to some value in the data being edited. (e.g. `frontmatter.tittle`)
-- `component`: The name of the React component that should be used to edit this field.
-  The default options are: `"text"`, `"textarea"`, `"color"`.
-- `label`: A human readable label for the field.
+  - `name`: The path to some value in the data being edited. (e.g. `frontmatter.tittle`)
+  - `component`: The name of the React component that should be used to edit this field.
+    The default options are: `"text"`, `"textarea"`, `"color"`.
+  - `label`: A human readable label for the field.
 
 #### Example: src/templates/blog-post.js
 
 ```jsx
-import { useRemarkForm } from '@forestryio/gatsby-xeditor-remark'
+import { remarkForm } from '@forestryio/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
   return (
@@ -121,20 +106,22 @@ function BlogPostTemplate(props) {
   )
 }
 
-let BlogFields = [
-  {
-    label: 'Title',
-    name: 'frontmatter.title',
-    component: 'text',
-  },
-  {
-    label: 'Description',
-    name: 'frontmatter.description',
-    component: 'textarea',
-  },
-]
+let BlogTemplate = {
+  fields: [
+    {
+      label: 'Title',
+      name: 'frontmatter.title',
+      component: 'text',
+    },
+    {
+      label: 'Description',
+      name: 'frontmatter.description',
+      component: 'textarea',
+    },
+  ],
+}
 
-export default remarkForm({ fields })(BlogPostTemplate)
+export default remarkForm(BlogTemplate)(BlogPostTemplate)
 ```
 
 ## Editing Content
