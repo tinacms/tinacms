@@ -1,7 +1,7 @@
 {
   "name": "@forestryio/gatsby-xeditor-git",
   "main": "index.js",
-  "version": "0.0.1-alpha.19",
+  "version": "0.0.1-alpha.20",
   "files": [
     "index.js",
     "audit.js",
@@ -19,8 +19,8 @@
     "@forestryio/cms": "^1.0.1-alpha.9",
     "@forestryio/cms-backend-git": "^0.1.1-alpha.0",
     "@forestryio/cms-react": "^0.1.1-alpha.9",
-    "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.21",
-    "@forestryio/xeditor": "^1.0.1-alpha.14",
+    "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.22",
+    "@forestryio/xeditor": "^1.0.1-alpha.15",
     "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0",
     "@types/js-yaml": "^3.12.1",
