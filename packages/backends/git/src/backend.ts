@@ -24,12 +24,25 @@ export function router() {
   router.use(express.json())
 
   router.delete('/:relPath', (req: any, res: any) => {
+    let filepath = decodeURIComponent(req.params.relPath)
     try {
-      deleteFile(path.join(pathRoot, decodeURIComponent(req.params.relPath)))
-      res.json({ status: 'success' })
+      deleteFile(path.join(pathRoot, filepath))
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
     }
+
+    commit({
+      name: DEFAULT_NAME,
+      email: DEFAULT_EMAIL,
+      message: `Update from xeditor: delete ${filepath}`,
+      files: [filepath],
+    })
+      .then(() => {
+        res.json({ status: 'success' })
+      })
+      .catch(e => {
+        res.status(500).json({ status: 'error', message: e.message })
+      })
   })
 
   router.put('/:relPath', (req: any, res: any) => {
