@@ -32,9 +32,17 @@ export function router() {
     }
   })
 
-  router.put('/writeFile', (req: any, res: any) => {
-    writeFile(pathRoot, req.body)
-    res.send(req.body.content)
+  router.put('/:relPath', (req: any, res: any) => {
+    console.log(path.join(pathRoot, decodeURIComponent(req.params.relPath)))
+    try {
+      writeFile(
+        path.join(pathRoot, decodeURIComponent(req.params.relPath)),
+        req.body.content
+      )
+      res.send(req.body.content)
+    } catch (e) {
+      res.status(500).json({ status: 'error', message: e.message })
+    }
   })
 
   router.post('/commit', (req: any, res: any) => {
