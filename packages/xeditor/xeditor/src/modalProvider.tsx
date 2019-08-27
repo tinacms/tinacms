@@ -65,6 +65,7 @@ export const Modal = ({
             width: '100vw',
             margin: '0 auto',
             position: 'absolute',
+            zIndex: 999,
           }}
         >
           <ModalOverlay>
@@ -91,6 +92,21 @@ export const ModalOverlay = styled.div`
   display: flex;
   align-items: flex-start;
   justify-content: center;
+`
+
+export const ModalHeader = styled.div`
+  display: flex;
+  align-items: center;
+  justify-content: space-between;
+  font-size: 1.2rem;
+  font-weight: 500;
+  line-height: normal;
+  padding: 1rem 1rem 0 1rem;
+  margin: 0 0 1rem 0;
+`
+
+export const ModalBody = styled.div`
+  margin: 2rem 1rem;
 `
 
 export const ModalInner = styled.div`

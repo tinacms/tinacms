@@ -5,7 +5,7 @@ import { useState } from 'react'
 import { Form, ScreenPlugin } from '@forestryio/cms'
 import styled, { css } from 'styled-components'
 import { TextField } from '@forestryio/xeditor-fields'
-import { Modal } from '..'
+import { Modal, ModalBody, ModalHeader } from '..'
 
 export const FormsView: ScreenPlugin = {
   __type: 'screen',
@@ -128,19 +128,22 @@ const CreateContentButton = ({ plugin }: any) => {
       <button onClick={() => setOpen(p => !p)}>{plugin.name}</button>
       {open && (
         <Modal>
-          <TextField
-            onChange={e => setPostName(e.target.value)}
-            value={postName}
-          />
+          <ModalHeader>Create</ModalHeader>
+          <ModalBody>
+            <TextField
+              onChange={e => setPostName(e.target.value)}
+              value={postName}
+            />
 
-          <button
-            onClick={() => {
-              plugin.onSubmit(postName, cms)
-              setOpen(false)
-            }}
-          >
-            Save
-          </button>
+            <SaveButton
+              onClick={() => {
+                plugin.onSubmit(postName, cms)
+                setOpen(false)
+              }}
+            >
+              Save
+            </SaveButton>
+          </ModalBody>
         </Modal>
       )}
     </div>
