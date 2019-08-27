@@ -33,7 +33,7 @@ const providerDetails = {
 
           open(
             `https://github.com/apps/${
-              process.env.GITHUB_APP_ID
+              process.env.GITHUB_APP_NAME
             }/installations/new`
           )
 
