@@ -19,7 +19,7 @@ export async function initConfig() {
   const config = await promptConfig(DEFAULT_CONFIG[engine])
 
   const configFileName = 'forestry-config.json'
-  fs.writeFileSync(`./${configFileName}`, JSON.stringify(config))
+  fs.writeFileSync(`./${configFileName}`, JSON.stringify(config, null, 2))
 
   console.log(
     `${chalk.green(
