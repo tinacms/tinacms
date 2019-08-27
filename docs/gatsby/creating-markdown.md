@@ -6,11 +6,13 @@ Creating new Markdown files is made possible by two plugins:
 - `gatsby-xeditor-git`: Extends the gatsby development server to writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
-Creating Content-Button Plugins
+## Creating Content-Button Plugins
 
 XEditor uses `content-button` plugins to render buttons at the top of the xeditor sidebar. These buttons are used for creating new content in the CMS. The `createRemarkButton` function helps us constructs `content-button` plugins for creating markdown files.
 
 ```javascript
+import { createRemarkButton } from '@forestryio/gatsby-xeditor-remark'
+
 const CreatePostButton = createRemarkButton({ label: 'Create Post' })
 ```
 
