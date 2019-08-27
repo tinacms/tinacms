@@ -16,7 +16,7 @@ export const wrapRootElement = ({ element }: any, options: any) => {
         <SidebarProvider title={options.title} logo={options.logo}>
           {element}
           <SidebarToggle />
-          <Modal>What up what up?</Modal>
+          {/* <Modal>What up what up?</Modal> */}
         </SidebarProvider>
       </ModalProvider>
     </CMSContext.Provider>
