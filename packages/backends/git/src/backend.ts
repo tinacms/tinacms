@@ -33,8 +33,8 @@ export function router() {
     }
 
     commit({
-      name: DEFAULT_NAME,
-      email: DEFAULT_EMAIL,
+      name: req.body.name,
+      email: req.body.email,
       message: `Update from xeditor: delete ${rel}`,
       files: [abs],
     })
