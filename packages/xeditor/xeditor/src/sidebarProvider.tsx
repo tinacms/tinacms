@@ -59,4 +59,5 @@ const SidebarLayoutContainer = styled.div`
 
 const SiteContainer = styled.div`
   overflow: scroll;
+  z-index: 0;
 `

@@ -31,6 +31,8 @@ export const Sidebar = ({
         padding: '0',
         border: '0',
         borderRight: '1px solid #efefef',
+        zIndex: 1,
+        backgroundColor: 'white',
       }}
     >
       <>
