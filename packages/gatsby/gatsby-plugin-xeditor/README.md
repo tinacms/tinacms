@@ -166,3 +166,7 @@ function BlogPostTemplate(props) {
   return <h1>{markdownRemark.frontmatter.title}</h1>
 }
 ```
+
+## Known Issues
+
+Elements positioned relative to the window (e.g with `position: fixed`) may be hidden by the sidebar.
