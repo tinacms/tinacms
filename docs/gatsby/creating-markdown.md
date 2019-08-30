@@ -86,7 +86,7 @@ const CreatePostButton = createRemarkButton({
 
 ### Only show on the Blog index
 
-In this example, we use the `usePlugin` hook from `@forestryio/cms-react` to add the button
+In this example, we use the `withPlugin` higher order component from `@forestryio/cms-react` to add the button
 to the XEditor when visiting the blog index page.
 
 **Example: src/pages/index.js**
@@ -95,26 +95,9 @@ to the XEditor when visiting the blog index page.
 import { usePlugin } from '@forestryio/cms-react'
 import { createRemarkButton } from '@forestryio/gatsby-xeditor-remark'
 
-// Create the button plugin
-const CreatePostButton = createRemarkButton({
-  label: 'Create Post',
-  filename: name => {
-    let slug = name.replace(/\s+/, '-').toLowerCase()
-
-    return `content/blog/${slug}/index.md`
-  },
-  frontmatter: title => ({
-    title,
-    date: new Date(),
-  }),
-})
-
-export default function BlogIndex(props) {
+function BlogIndex(props) {
   const { data } = props
   const posts = data.allMarkdownRemark.edges
-
-  // Hook up the button plugin
-  usePlugin(CreatePostPlugin)
 
   return (
     <Layout location={props.location}>
@@ -139,4 +122,20 @@ export default function BlogIndex(props) {
     </Layout>
   )
 }
+
+// Create the button plugin
+const CreatePostButton = createRemarkButton({
+  label: 'Create Post',
+  filename: name => {
+    let slug = name.replace(/\s+/, '-').toLowerCase()
+
+    return `content/blog/${slug}/index.md`
+  },
+  frontmatter: title => ({
+    title,
+    date: new Date(),
+  }),
+})
+
+export default withPlugin(BlogIndex, CreatePostButton)
 ```
