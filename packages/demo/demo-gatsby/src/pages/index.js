@@ -5,7 +5,12 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useCMS, useCMSForm, usePlugin } from "@forestryio/cms-react"
+import {
+  useCMS,
+  useCMSForm,
+  withPlugin,
+  usePlugin,
+} from "@forestryio/cms-react"
 import { createRemarkButton } from "@forestryio/gatsby-xeditor-remark"
 
 const CreatePostPlugin = createRemarkButton({
@@ -35,8 +40,6 @@ function BlogIndex(props) {
   const { data } = props
   const siteTitle = data.site.siteMetadata.title
   const posts = data.allMarkdownRemark.edges
-
-  usePlugin(CreatePostPlugin)
 
   const [styles] = useCMSForm({
     name: "blog-index-styles",
@@ -101,7 +104,7 @@ function BlogIndex(props) {
   )
 }
 
-export default BlogIndex
+export default withPlugin(BlogIndex, CreatePostPlugin)
 
 export const pageQuery = graphql`
   query {
