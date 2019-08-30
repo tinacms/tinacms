@@ -5,6 +5,7 @@ import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
 import { FormsView } from './components/FormView'
 import { ScreenPlugin } from '@forestryio/cms'
+import { Modal } from './modalProvider'
 
 export const Sidebar = ({
   title = 'XEditor',
@@ -16,12 +17,7 @@ export const Sidebar = ({
   const cms = useCMS()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(true)
-
-  let [ActiveView, setActiveView] = useState<ScreenPlugin | null>(() => {
-    let firstView = cms.screens.all()[0]
-    if (firstView) return firstView
-    return null
-  })
+  const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
     <StyledFrame
@@ -39,26 +35,34 @@ export const Sidebar = ({
       <>
         <RootElement />
         <SidebarHeader>
-          <ActionsToggle
-            onClick={() => setMenuVisibility(visible => !visible)}
-          />
+          <ActionsToggle onClick={() => setMenuVisibility(true)} />
         </SidebarHeader>
 
         <FieldsWrapper>
           <FormsView />
         </FieldsWrapper>
         <MenuPanel visible={menuIsVisible}>
-          <button onClick={() => setMenuVisibility(visible => !visible)}>
-            Close
-          </button>
+          <button onClick={() => setMenuVisibility(false)}>Close</button>
           <ul>
             {cms.screens.all().map(view => (
-              <li value={view.name} onClick={() => setActiveView(view)}>
+              <li
+                value={view.name}
+                onClick={() => {
+                  setActiveView(view)
+                  setMenuVisibility(false)
+                }}
+              >
                 {view.name}
               </li>
             ))}
           </ul>
         </MenuPanel>
+        {ActiveView && (
+          <Modal>
+            <button onClick={() => setActiveView(null)}>Close Modal</button>
+            <ActiveView.Component />
+          </Modal>
+        )}
       </>
     </StyledFrame>
   )
