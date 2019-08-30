@@ -49,7 +49,7 @@ function BlogPostTemplate(props) {
 }
 
 // Wrap the export with `remarkForm`
-export default remarkForm()(BlogPostTemplate)
+export default remarkForm(BlogPostTemplate)
 
 // Include the required fields in the query
 export const pageQuery = graphql`
@@ -106,7 +106,7 @@ function BlogPostTemplate(props) {
   )
 }
 
-let BlogTemplate = {
+let BlogPostForm = {
   fields: [
     {
       label: 'Title',
@@ -121,7 +121,7 @@ let BlogTemplate = {
   ],
 }
 
-export default remarkForm(BlogTemplate)(BlogPostTemplate)
+export default remarkForm(BlogPostTemplate, BlogPostForm)
 ```
 
 ## Editing Content
