@@ -42,8 +42,9 @@ export function useCMSForm(options: FormOptions<any>) {
 }
 
 /**
- * TODO: Is there a better approach?
- * TODO: move to cms-react
+ *
+ * @param subscribable An object that can be subscribed to
+ * @param cb (Optional) A callback to be executed when an event occurs.
  */
 export function useSubscribable(subscribable: Subscribable, cb?: Function) {
   let [_, s] = React.useState(0)
@@ -55,10 +56,28 @@ export function useSubscribable(subscribable: Subscribable, cb?: Function) {
   })
 }
 
+/**
+ * A React Hook for adding Plugins to the CMS.
+ *
+ * @param plugin Plugin
+ */
 export function usePlugin(plugin: Plugin) {
   let cms = useCMS()
   React.useEffect(() => {
     cms.plugins.add(plugin)
     return () => cms.plugins.remove(plugin)
   }, [plugin])
+}
+
+/**
+ * A Higher-Order-Component for adding Plugins to the CMS.
+ *
+ * @param Component A React Component
+ * @param plugin Plugin
+ */
+export function withPlugin(Component: any, plugin: Plugin) {
+  return (props: any) => {
+    usePlugin(plugin)
+    return <Component {...props} />
+  }
 }
