@@ -7,116 +7,108 @@ import styled, { css } from 'styled-components'
 import { TextField } from '@forestryio/xeditor-fields'
 import { Modal, ModalBody, ModalHeader } from '..'
 
-export const FormsView: ScreenPlugin = {
-  __type: 'screen',
-  name: 'Content',
-  Component: () => {
-    const cms = useCMS()
+export const FormsView = () => {
+  const cms = useCMS()
+  const forms = cms.forms.all()
+
+  const [editingForm, setEditingForm] = useState(() => {
+    return cms.forms.all()[0] as Form | null
+  })
+
+  useSubscribable(cms.forms, () => {
     const forms = cms.forms.all()
+    if (forms.length == 1) {
+      setEditingForm(forms[0])
+      return
+    }
 
-    const [editingForm, setEditingForm] = useState(() => {
-      return cms.forms.all()[0] as Form | null
-    })
+    if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
+      setEditingForm(null)
+    }
+  })
 
-    useSubscribable(cms.forms, () => {
-      const forms = cms.forms.all()
-      if (forms.length == 1) {
-        setEditingForm(forms[0])
-        return
-      }
-
-      if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
-        setEditingForm(null)
-      }
-    })
-
-    /**
-     * No Forms
-     */
-    if (!forms.length)
-      return (
-        <>
-          {cms.plugins.all('content-button').map(plugin => (
-            <CreateContentButton plugin={plugin} />
-          ))}
-          <NoFormsPlaceholder />
-        </>
-      )
-    if (!editingForm)
-      return (
-        <FormsList
-          forms={forms}
-          activeForm={editingForm}
-          setActiveForm={setEditingForm}
-        />
-      )
-
+  /**
+   * No Forms
+   */
+  if (!forms.length)
     return (
       <>
-        {/* <FormsList
+        {cms.plugins.all('content-button').map(plugin => (
+          <CreateContentButton plugin={plugin} />
+        ))}
+        <NoFormsPlaceholder />
+      </>
+    )
+  if (!editingForm)
+    return (
+      <FormsList
+        forms={forms}
+        activeForm={editingForm}
+        setActiveForm={setEditingForm}
+      />
+    )
+
+  return (
+    <>
+      {/* <FormsList
           forms={forms}
           activeForm={editingForm}
           setActiveForm={setEditingForm}
         /> */}
-        <FormBuilder form={editingForm as any}>
-          {({ handleSubmit, pristine, form }) => {
-            let isFile, fileRelativePath: any
-            try {
-              //@ts-ignore
-              fileRelativePath = form.getState().values!.fields!
-                .fileRelativePath
-              isFile = true
-            } catch (e) {
-              isFile = false
-            }
-            return (
-              <>
-                {/* <h3>Editing form {editingForm.name}</h3> */}
-                <FieldsWrapper>
-                  {cms.plugins.all('content-button').map(plugin => (
-                    <CreateContentButton plugin={plugin} />
+      <FormBuilder form={editingForm as any}>
+        {({ handleSubmit, pristine, form }) => {
+          let isFile, fileRelativePath: any
+          try {
+            //@ts-ignore
+            fileRelativePath = form.getState().values!.fields!.fileRelativePath
+            isFile = true
+          } catch (e) {
+            isFile = false
+          }
+          return (
+            <>
+              {/* <h3>Editing form {editingForm.name}</h3> */}
+              <FieldsWrapper>
+                {cms.plugins.all('content-button').map(plugin => (
+                  <CreateContentButton plugin={plugin} />
+                ))}
+                {editingForm &&
+                  (editingForm.fields.length ? (
+                    <FieldsBuilder form={editingForm} />
+                  ) : (
+                    <NoFieldsPlaceholder />
                   ))}
-                  {editingForm &&
-                    (editingForm.fields.length ? (
-                      <FieldsBuilder form={editingForm} />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    ))}
-                </FieldsWrapper>
-                <FormsFooter>
-                  <SaveButton
-                    onClick={() => handleSubmit()}
-                    disabled={pristine}
+              </FieldsWrapper>
+              <FormsFooter>
+                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
+                  Save
+                </SaveButton>
+                {isFile && (
+                  <DeleteButton
+                    onClick={() => {
+                      if (
+                        !confirm(
+                          `Are you sure you want to delete ${fileRelativePath}?`
+                        )
+                      ) {
+                        return
+                      }
+                      // @ts-ignore
+                      cms.api.git.onDelete!({
+                        relPath: fileRelativePath,
+                      })
+                    }}
                   >
-                    Save
-                  </SaveButton>
-                  {isFile && (
-                    <DeleteButton
-                      onClick={() => {
-                        if (
-                          !confirm(
-                            `Are you sure you want to delete ${fileRelativePath}?`
-                          )
-                        ) {
-                          return
-                        }
-                        // @ts-ignore
-                        cms.api.git.onDelete!({
-                          relPath: fileRelativePath,
-                        })
-                      }}
-                    >
-                      Delete
-                    </DeleteButton>
-                  )}
-                </FormsFooter>
-              </>
-            )
-          }}
-        </FormBuilder>
-      </>
-    )
-  },
+                    Delete
+                  </DeleteButton>
+                )}
+              </FormsFooter>
+            </>
+          )
+        }}
+      </FormBuilder>
+    </>
+  )
 }
 
 const CreateContentButton = ({ plugin }: any) => {
