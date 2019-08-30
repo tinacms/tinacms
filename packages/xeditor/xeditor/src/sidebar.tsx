@@ -3,6 +3,8 @@ import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
+import { FormsView } from './components/FormView'
+import { ScreenPlugin } from '@forestryio/cms'
 
 export const Sidebar = ({
   title = 'XEditor',
@@ -13,13 +15,12 @@ export const Sidebar = ({
 }) => {
   const cms = useCMS()
   useSubscribable(cms.screens)
+  const [menuIsVisible, setMenuVisibility] = useState(true)
 
-  let [ActiveView, setActiveView] = useState(() => {
+  let [ActiveView, setActiveView] = useState<ScreenPlugin | null>(() => {
     let firstView = cms.screens.all()[0]
     if (firstView) return firstView
-    return {
-      Component: (): any => null,
-    }
+    return null
   })
 
   return (
@@ -38,21 +39,26 @@ export const Sidebar = ({
       <>
         <RootElement />
         <SidebarHeader>
-          <ForestryLogo url={logo} />
-          <SiteName>{title}</SiteName>
-          {/* <select style={{ zIndex: 10000 }}>
-            {cms.plugins.all<ViewPlugin>('view').map(view => (
-              <option value={view.name} onClick={() => setActiveView(view)}>
-                {view.name}
-              </option>
-            ))}
-          </select> */}
-          {/* <ActionsToggle /> */}
+          <ActionsToggle
+            onClick={() => setMenuVisibility(visible => !visible)}
+          />
         </SidebarHeader>
 
         <FieldsWrapper>
-          <ActiveView.Component />
+          <FormsView />
         </FieldsWrapper>
+        <MenuPanel visible={menuIsVisible}>
+          <button onClick={() => setMenuVisibility(visible => !visible)}>
+            Close
+          </button>
+          <ul>
+            {cms.screens.all().map(view => (
+              <li value={view.name} onClick={() => setActiveView(view)}>
+                {view.name}
+              </li>
+            ))}
+          </ul>
+        </MenuPanel>
       </>
     </StyledFrame>
   )
@@ -95,7 +101,6 @@ const ActionsToggle = styled.button`
   border: 0;
   width: 2rem;
   height: ${HeaderHeight}rem;
-  margin-left: auto;
   background-image: url(${EllipsisVertical});
   background-position: center;
   background-repeat: no-repeat;
@@ -130,6 +135,24 @@ const FieldsWrapper = styled.div`
   top: ${HeaderHeight}rem;
   height: calc(100vh - (${HeaderHeight}rem));
   width: 100%;
+  overflow: hidden;
+  padding: 1rem;
+  ul,
+  li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
+`
+
+const MenuPanel = styled.div<{ visible: boolean }>`
+  background: pink;
+  z-index: 1000;
+  position: absolute;
+  top: 0;
+  width: 100vw;
+  left: ${p => (p.visible ? '0' : '100vw')};
+  height: 100vh;
   overflow: hidden;
   padding: 1rem;
   ul,
