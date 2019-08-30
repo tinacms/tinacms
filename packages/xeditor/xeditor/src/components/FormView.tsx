@@ -30,15 +30,7 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length)
-    return (
-      <>
-        {cms.plugins.all('content-button').map(plugin => (
-          <CreateContentButton plugin={plugin} />
-        ))}
-        <NoFormsPlaceholder />
-      </>
-    )
+  if (!forms.length) return <NoFormsPlaceholder />
   if (!editingForm)
     return (
       <FormsList
@@ -69,9 +61,6 @@ export const FormsView = () => {
             <>
               {/* <h3>Editing form {editingForm.name}</h3> */}
               <FieldsWrapper>
-                {cms.plugins.all('content-button').map(plugin => (
-                  <CreateContentButton plugin={plugin} />
-                ))}
                 {editingForm &&
                   (editingForm.fields.length ? (
                     <FieldsBuilder form={editingForm} />
@@ -108,37 +97,6 @@ export const FormsView = () => {
         }}
       </FormBuilder>
     </>
-  )
-}
-
-const CreateContentButton = ({ plugin }: any) => {
-  let cms = useCMS()
-  let [postName, setPostName] = React.useState('')
-  let [open, setOpen] = React.useState(false)
-  return (
-    <div>
-      <button onClick={() => setOpen(p => !p)}>{plugin.name}</button>
-      {open && (
-        <Modal>
-          <ModalHeader>Create</ModalHeader>
-          <ModalBody>
-            <TextField
-              onChange={e => setPostName(e.target.value)}
-              value={postName}
-            />
-
-            <SaveButton
-              onClick={() => {
-                plugin.onSubmit(postName, cms)
-                setOpen(false)
-              }}
-            >
-              Save
-            </SaveButton>
-          </ModalBody>
-        </Modal>
-      )}
-    </div>
   )
 }
 
@@ -210,7 +168,8 @@ const FormsFooter = styled.div`
   padding: 0.5rem 1rem;
 `
 
-const SaveButton = styled.button`
+// TODO: make more global
+export const SaveButton = styled.button`
   display: flex;
   align-items: center;
   justify-content: center;

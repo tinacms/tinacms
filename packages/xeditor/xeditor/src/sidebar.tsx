@@ -3,9 +3,10 @@ import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
-import { FormsView } from './components/FormView'
+import { FormsView, SaveButton } from './components/FormView'
 import { ScreenPlugin } from '@forestryio/cms'
-import { Modal } from './modalProvider'
+import { Modal, ModalHeader, ModalBody } from './modalProvider'
+import { TextField } from '@forestryio/xeditor-fields'
 
 export const Sidebar = ({
   title = 'XEditor',
@@ -54,6 +55,9 @@ export const Sidebar = ({
               >
                 {view.name}
               </li>
+            ))}
+            {cms.plugins.all('content-button').map(plugin => (
+              <CreateContentButton plugin={plugin} />
             ))}
           </ul>
         </MenuPanel>
@@ -166,3 +170,34 @@ const MenuPanel = styled.div<{ visible: boolean }>`
     list-style: none;
   }
 `
+
+const CreateContentButton = ({ plugin }: any) => {
+  let cms = useCMS()
+  let [postName, setPostName] = React.useState('')
+  let [open, setOpen] = React.useState(false)
+  return (
+    <div>
+      <button onClick={() => setOpen(p => !p)}>{plugin.name}</button>
+      {open && (
+        <Modal>
+          <ModalHeader>Create</ModalHeader>
+          <ModalBody>
+            <TextField
+              onChange={e => setPostName(e.target.value)}
+              value={postName}
+            />
+
+            <SaveButton
+              onClick={() => {
+                plugin.onSubmit(postName, cms)
+                setOpen(false)
+              }}
+            >
+              Save
+            </SaveButton>
+          </ModalBody>
+        </Modal>
+      )}
+    </div>
+  )
+}
