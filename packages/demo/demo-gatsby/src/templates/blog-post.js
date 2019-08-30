@@ -116,7 +116,7 @@ function BlogPostTemplate(props) {
   )
 }
 
-export default remarkForm({
+export default remarkForm(BlogPostTemplate, {
   fields: [
     {
       label: "Title",
@@ -159,7 +159,7 @@ export default remarkForm({
       component: "textarea",
     },
   ],
-})(BlogPostTemplate)
+})
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
