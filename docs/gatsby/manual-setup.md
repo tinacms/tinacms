@@ -5,24 +5,24 @@ This is a guide on how to setup the XEditor CMS on an existing Gatsby site.
 ## Installation
 
 ```
-npm install --save @forestryio/gatsby-plugin-xeditor
+npm install --save @tinacms/gatsby-plugin-tinacms
 ```
 
 or
 
 ```
-yarn add @forestryio/gatsby-plugin-xeditor
+yarn add @tinacms/gatsby-plugin-tinacms
 ```
 
 ## Adding the Plugin
 
-Open your `gatsby-config.js` file and add `'@forestryio/gatsby-plugin-xeditor'` to the list of plugins:
+Open your `gatsby-config.js` file and add `'@tinacms/gatsby-plugin-tinacms'` to the list of plugins:
 
 ```javascript
 module.exports = {
   // ...
   plugins: [
-    '@forestryio/gatsby-plugin-xeditor',
+    '@tinacms/gatsby-plugin-tinacms',
     // ...
   ],
 }

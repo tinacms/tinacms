@@ -1,22 +1,22 @@
-# @forestryio/gatsby-xeditor-cms
+# @tinacms/gatsby-tinacms-cms
 
 A Gatsby plugin for using the Gitlab API with an Xeditor CMS
 
 ## Installation
 
 ```
-npm install --save @forestryio/gatsby-xeditor-gitlab
+npm install --save @tinacms/gatsby-tinacms-gitlab
 ```
 
 or
 
 ```sh
-yarn add @forestryio/gatsby-xeditor-gitlab
+yarn add @tinacms/gatsby-tinacms-gitlab
 ```
 
 ## Setup
 
-Include `@forestryio/gatsby-xeditor-gitlab` in the list of gatsby plugins:
+Include `@tinacms/gatsby-tinacms-gitlab` in the list of gatsby plugins:
 
 _gatsby.config.js_
 
@@ -26,7 +26,7 @@ module.exports = {
   plugins: [
     // ...
     {
-      resolve: '@forestryio/gatsby-xeditor-gitlab',
+      resolve: '@tinacms/gatsby-tinacms-gitlab',
       options: {
         appID: 'APP_ID',
         redirectURI: 'http://localhost:8000/?auth-gitlab',

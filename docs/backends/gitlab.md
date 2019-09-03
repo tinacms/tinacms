@@ -17,7 +17,7 @@ Gitlab implements the [`AuthenticatingBackend` interface](../concepts/backends.m
 ### 1. Register the backend
 
 ```typescript
-import { GitlabBackend } from '@forestryio/cms-backend-gitlab'
+import { GitlabBackend } from '@tinacms/api-gitlab'
 
 let gitlab = new GitlabBackend({
   apiBaseURI: "https://gitlab.com/" // optional

@@ -1,4 +1,4 @@
-import { PersistentSessionStorage } from '@forestryio/persistent-session-storage'
+import { PersistentSessionStorage } from '@tinacms/persistent-session-storage'
 
 export type GitlabAuthConfig = {
   apiBaseURI: string

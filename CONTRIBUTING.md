@@ -9,6 +9,17 @@ The following is a set of guidelines and tips for contributingto the Forestryio 
 - **Writing Docs, Guides, or Blog Posts**
 - **Voluntering for User Testing**
 
+## Creating Packages
+
+| Type                    | Folder   | Naming Convention  |
+| ----------------------- | -------- | ------------------ |
+| Internal packages       | `core`   | `@tinacms/*`       |
+| Node API extensions     | `api`    | `@tinacms/api-*`   |
+| React specific packages | `react`  | `react-tinacms-*`  |
+| Vue specific packages   | `vue`    | `vue-tinacms-*`    |
+| Gastby plugins          | `gatsby` | `gatsby-tinacms-*` |
+| Demo Projects           | `demo`   | `demo-*`           |
+
 ## Troubleshooting
 
 This section contains solutions to various problems you may run into when developing for the Forestryio CMS.
@@ -30,7 +41,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    You can use lerna to add new dependencies to a package from the root of the repository:
 
    ```
-   lerna add react --scope @forestryio/react-cms
+   lerna add react --scope @tinacms/react-cms
    ```
 
    The downside of this approach is you can only add one dependency at a time. If you need to add many packages, you can use the next method.

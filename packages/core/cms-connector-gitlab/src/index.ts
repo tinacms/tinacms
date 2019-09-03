@@ -1,6 +1,6 @@
 import { GitlabAuth } from './auth'
 import { GitlabAPI } from './api'
-import { API } from '@forestryio/cms'
+import { API } from '@tinacms/core'
 
 type GitlabConnectorConfig = {
   apiBaseURI?: string
