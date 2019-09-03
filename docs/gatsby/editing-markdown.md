@@ -2,20 +2,20 @@
 
 Creating forms for content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin is made possible by two plugins:
 
-- `gatsby-xeditor-remark`: Provides hooks and components for creating Remark forms.
-- `gatsby-xeditor-git`: Extends the gatsby development server to writes changes to the local filesystem;
+- `gatsby-tinacms-remark`: Provides hooks and components for creating Remark forms.
+- `gatsby-tinacms-git`: Extends the gatsby development server to writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
 ## Installation
 
 ```
-npm install --save @tinacms/gatsby-xeditor-remark @tinacms/gatsby-xeditor-git
+npm install --save @tinacms/react-tinacms-remark @tinacms/gatsby-tinacms-git
 ```
 
 or
 
 ```
-yarn add @tinacms/gatsby-xeditor-remark @tinacms/gatsby-xeditor-git
+yarn add @tinacms/react-tinacms-remark @tinacms/gatsby-tinacms-git
 ```
 
 ## Adding the Plugin
@@ -25,7 +25,7 @@ Open the `gatsby-config.js` file and add make sure the following plugins are lis
 ```JavaScript
 module.exports = {
   plugins: [
-    "@tinacms/gatsby-xeditor-git",
+    "@tinacms/gatsby-tinacms-git",
     // ...
   ]
 }
@@ -42,7 +42,7 @@ The `remarkForm` [higher-order component](https://reactjs.org/docs/higher-order-
 **Example: src/templates/blog-post.js**
 
 ```jsx
-import { remarkForm } from '@tinacms/gatsby-xeditor-remark'
+import { remarkForm } from '@tinacms/react-tinacms-remark'
 
 function BlogPostTemplate(props) {
   return <h1>{props.data.markdownRemark.frontmatter.title}</h1>
@@ -95,7 +95,7 @@ The `remarkForm` function accepts an optional `config` object for overriding the
 #### Example: src/templates/blog-post.js
 
 ```jsx
-import { remarkForm } from '@tinacms/gatsby-xeditor-remark'
+import { remarkForm } from '@tinacms/react-tinacms-remark'
 
 function BlogPostTemplate(props) {
   return (

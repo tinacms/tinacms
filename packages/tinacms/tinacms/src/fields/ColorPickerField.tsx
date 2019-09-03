@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { ColorPicker } from '@tinacms/xeditor-fields'
+import { ColorPicker } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
 // TODO: `field` needs to be extensible

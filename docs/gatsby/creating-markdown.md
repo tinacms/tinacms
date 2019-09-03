@@ -2,8 +2,8 @@
 
 Creating new Markdown files is made possible by two plugins:
 
-- `gatsby-xeditor-remark`: Provides hooks and components for creating Remark forms.
-- `gatsby-xeditor-git`: Extends the gatsby development server to writes changes to the local filesystem;
+- `gatsby-tinacms-remark`: Provides hooks and components for creating Remark forms.
+- `gatsby-tinacms-git`: Extends the gatsby development server to writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
 ## Creating Content-Button Plugins
@@ -11,7 +11,7 @@ Creating new Markdown files is made possible by two plugins:
 XEditor uses `content-button` plugins to render buttons at the top of the xeditor sidebar. These buttons are used for creating new content in the CMS. The `createRemarkButton` function helps us constructs `content-button` plugins for creating markdown files.
 
 ```javascript
-import { createRemarkButton } from '@tinacms/gatsby-xeditor-remark'
+import { createRemarkButton } from '@tinacms/react-tinacms-remark'
 
 const CreatePostButton = createRemarkButton({ label: 'Create Post' })
 ```
@@ -86,14 +86,14 @@ const CreatePostButton = createRemarkButton({
 
 ### Only show on the Blog index
 
-In this example, we use the `withPlugin` higher order component from `@tinacms/cms-react` to add the button
+In this example, we use the `withPlugin` higher order component from `@tinacms/react-tinacms` to add the button
 to the XEditor when visiting the blog index page.
 
 **Example: src/pages/index.js**
 
 ```jsx
-import { usePlugin } from '@tinacms/cms-react'
-import { createRemarkButton } from '@tinacms/gatsby-xeditor-remark'
+import { usePlugin } from '@tinacms/react-tinacms'
+import { createRemarkButton } from '@tinacms/react-tinacms-remark'
 
 function BlogIndex(props) {
   const { data } = props

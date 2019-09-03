@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/gatsby-xeditor-json",
+  "name": "@tinacms/react-tinacms-json",
   "version": "0.0.1-alpha.5",
   "main": "index.js",
   "types": "index.d.ts",
@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "@tinacms/core": "^1.0.1-alpha.9",
-    "@tinacms/cms-react": "^0.1.1-alpha.9"
+    "@tinacms/react-tinacms": "^0.1.1-alpha.9"
   }
 }

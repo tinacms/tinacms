@@ -1,4 +1,4 @@
-# @tinacms/gatsby-xeditor-git
+# @tinacms/gatsby-tinacms-git
 
 A Gatsby plugin for the XEditor CMS that provides an API for writing changes to the local filesystem. It does this by :
 
@@ -8,18 +8,18 @@ A Gatsby plugin for the XEditor CMS that provides an API for writing changes to 
 ## Installation
 
 ```
-npm install --save @tinacms/gatsby-xeditor-git
+npm install --save @tinacms/gatsby-tinacms-git
 ```
 
 or
 
 ```sh
-yarn add @tinacms/gatsby-xeditor-git
+yarn add @tinacms/gatsby-tinacms-git
 ```
 
 ## Setup
 
-Include `@tinacms/gatsby-xeditor-git` in the list of gatsby plugins:
+Include `@tinacms/gatsby-tinacms-git` in the list of gatsby plugins:
 
 _gatsby-config.js_
 
@@ -28,7 +28,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@tinacms/gatsby-xeditor-git',
+    '@tinacms/gatsby-tinacms-git',
   ],
 }
 ```

@@ -1,1 +1,1 @@
-export { cms } from '@tinacms/xeditor'
+export { cms } from '@tinacms/tinacms'
