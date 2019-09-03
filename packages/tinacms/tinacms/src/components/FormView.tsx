@@ -184,7 +184,7 @@ export const SaveButton = styled.button`
   color: white;
   font-weight: 500;
   cursor: pointer;
-  transition: opacity 0.15s;
+  transition: opacity 85ms;
   &:hover {
     opacity: 0.6;
   }

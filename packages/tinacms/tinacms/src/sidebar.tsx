@@ -102,7 +102,7 @@ const MenuLink = styled.div<{ value: string }>`
     background-color: #3E3E3E;
     opacity: 0;
     z-index: -1;
-    transition: all 150ms ease-out;
+    transition: all 75ms ease-out;
   }
   &:hover {
     &:after {
@@ -218,7 +218,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: ${Padding}rem;
-  transition: all 200ms ease-out;
+  transition: all 150ms ease-out;
   ul,
   li {
     margin: 0;
@@ -270,7 +270,7 @@ const CreateButton = styled.button`
   cursor: pointer;
   font-size: 0.75rem;
   padding: 0.75rem;
-  transition: opacity 0.15s;
+  transition: opacity 85ms;
   &:hover {
     opacity: 0.6;
   }
