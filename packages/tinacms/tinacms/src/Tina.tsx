@@ -29,9 +29,6 @@ function SidebarToggle() {
   )
 }
 
-const OpenIcon = require('../assets/pen.svg')
-const CloseIcon = require('../assets/times.svg')
-
 const EditorToggle = styled.button<{ open: Boolean }>`
   position: fixed;
   right: 2rem;
@@ -46,7 +43,6 @@ const EditorToggle = styled.button<{ open: Boolean }>`
   justify-content: center;
   text-align: center;
   background-color: #0084ff;
-  background-image: url(${p => (p.open ? CloseIcon : OpenIcon)});
   background-repeat: no-repeat;
   background-position: center;
   transition: background 0.35s ease;
