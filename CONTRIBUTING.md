@@ -20,7 +20,7 @@ The following is a set of guidelines and tips for contributingto the TinaCMS and
 | Gastby plugins          | `gatsby` | `gatsby-tinacms-*` |
 | Demo Projects           | `demo`   | `demo-*`           |
 
-## Troubleshooting
+## Troubleshooting in Development
 
 This section contains solutions to various problems you may run into when developing for the TinaCMS.
 
@@ -31,6 +31,12 @@ This section contains solutions to various problems you may run into when develo
 
 The links between the local packages may have been broken. If this is the problem, then
 running `npm run bootstrap` shoudl fix the issue.
+
+#### Example error message
+
+```
+sh: cms-scripts: command not found
+```
 
 ### I can't add dependencies to a package
 
