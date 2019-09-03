@@ -10,8 +10,8 @@ import {
   useCMSForm,
   withPlugin,
   usePlugin,
-} from "@forestryio/cms-react"
-import { createRemarkButton } from "@forestryio/gatsby-xeditor-remark"
+} from "@tinacms/react-tinacms"
+import { createRemarkButton } from "@tinacms/react-tinacms-remark"
 
 const CreatePostPlugin = createRemarkButton({
   label: "Create Blog Post",

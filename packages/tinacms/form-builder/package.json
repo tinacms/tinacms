@@ -1,0 +1,27 @@
+{
+  "name": "@tinacms/form-builder",
+  "version": "1.0.1-alpha.10",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "build"
+  ],
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "watch": "cms-scripts watch",
+    "build": "cms-scripts build"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "cms-scripts": "^0.1.1-alpha.3",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
+  },
+  "dependencies": {
+    "@tinacms/core": "^1.0.1-alpha.9",
+    "@tinacms/react-tinacms": "^0.1.1-alpha.9",
+    "final-form": "^4.18.2",
+    "react-final-form": "^6.3.0"
+  }
+}
