@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
-import styled, { createGlobalStyle } from 'styled-components'
+import styled, { createGlobalStyle, keyframes } from 'styled-components'
 import { FormsView, SaveButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
@@ -11,9 +11,13 @@ import { TextField } from '@tinacms/fields'
 export const Sidebar = ({
   title = 'XEditor',
   logo = ForestryLogo,
+  open = true,
+  width = 340
 }: {
   title?: string
   logo?: string
+  open?: boolean
+  width?: number
 }) => {
   const cms = useCMS()
   useSubscribable(cms.screens)
@@ -21,58 +25,60 @@ export const Sidebar = ({
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <StyledFrame
-      frameStyles={{
-        width: '100%',
-        height: '100%',
-        margin: '0',
-        padding: '0',
-        border: '0',
-        borderRight: '1px solid #efefef',
-        zIndex: 1,
-        backgroundColor: 'white',
-      }}
-    >
-      <>
-        <RootElement />
-        <SidebarHeader>
-          <ActionsToggle
-            onClick={() => setMenuVisibility(!menuIsVisible)}
-            open={menuIsVisible}
-          />
-        </SidebarHeader>
-        <FieldsWrapper>
-          <FormsView />
-        </FieldsWrapper>
-
-        <MenuPanel visible={menuIsVisible}>
+    <SidebarContainer open={open} width={width}>
+      <StyledFrame
+        frameStyles={{
+          width: '100%',
+          height: '100%',
+          margin: '0',
+          padding: '0',
+          border: '0',
+          borderRight: '1px solid #efefef',
+          zIndex: 1,
+          backgroundColor: 'white'
+        }}
+      >
+        <>
+          <RootElement />
+          <SidebarHeader>
+            <ActionsToggle
+              onClick={() => setMenuVisibility(!menuIsVisible)}
+              open={menuIsVisible}
+            />
+          </SidebarHeader>
           <FieldsWrapper>
-            <ul>
-              {cms.screens.all().map(view => (
-                <li
-                  value={view.name}
-                  onClick={() => {
-                    setActiveView(view)
-                    setMenuVisibility(false)
-                  }}
-                >
-                  {view.name}
-                </li>
-              ))}
-              {cms.plugins.all('content-button').map(plugin => (
-                <CreateContentButton plugin={plugin} />
-              ))}
-            </ul>
+            <FormsView />
           </FieldsWrapper>
-        </MenuPanel>
-        {ActiveView && (
-          <Modal>
-            <button onClick={() => setActiveView(null)}>Close Modal</button>
-            <ActiveView.Component />
-          </Modal>
-        )}
-      </>
-    </StyledFrame>
+
+          <MenuPanel visible={menuIsVisible}>
+            <FieldsWrapper>
+              <ul>
+                {cms.screens.all().map(view => (
+                  <li
+                    value={view.name}
+                    onClick={() => {
+                      setActiveView(view)
+                      setMenuVisibility(false)
+                    }}
+                  >
+                    {view.name}
+                  </li>
+                ))}
+                {cms.plugins.all('content-button').map(plugin => (
+                  <CreateContentButton plugin={plugin} />
+                ))}
+              </ul>
+            </FieldsWrapper>
+          </MenuPanel>
+          {ActiveView && (
+            <Modal>
+              <button onClick={() => setActiveView(null)}>Close Modal</button>
+              <ActiveView.Component />
+            </Modal>
+          )}
+        </>
+      </StyledFrame>
+    </SidebarContainer>
   )
 }
 
@@ -80,6 +86,31 @@ const EllipsisVertical = require('../assets/ellipsis-v.svg')
 const HamburgerMenu = require('../assets/hamburger.svg')
 const CloseIcon = require('../assets/close.svg')
 const HeaderHeight = 4.5
+
+const SidebarOpenAnimation = keyframes`
+  0% {
+    transform: translate3d(-100%,0,0);
+  }
+  100% {
+    transform: translate3d(0,0,0);
+  }
+`
+
+const SidebarCloseAnimation = keyframes`
+  0% {
+    transform: translate3d(0,0,0);
+  }
+  100% {
+    transform: translate3d(-100%,0,0);
+  }
+`
+
+const SidebarContainer = styled.div<{ open: boolean, width: number }>`
+  animation: ${p => (p.open ? SidebarOpenAnimation : SidebarCloseAnimation)}  150ms ease-out 1 both;
+  position: relative;
+  display: block;
+  width: ${props => props.width || 340}px;
+`
 
 const SidebarHeader = styled.div`
   display: flex;
@@ -117,9 +148,9 @@ const ActionsToggle = styled.button<{ open: boolean }>`
   width: 1.5rem;
   height: ${HeaderHeight}rem;
   background-image: url(${p => (p.open ? CloseIcon : HamburgerMenu)});
-  background-position: center;
+  background-position: center left;
   background-repeat: no-repeat;
-  background-size: ${p => (p.open ? '75%' : '100%')} auto;
+  background-size: ${p => (p.open ? '80%' : '100%')} auto;
   transition: all 0.15s ease-out;
   &:hover {
     opacity: 0.6;

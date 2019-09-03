@@ -24,7 +24,7 @@ export const SidebarProvider: React.FC<{ title?: string; logo?: string }> = ({
   return (
     <SidebarContext.Provider value={props}>
       <SidebarLayoutContainer isSidebarOpen={isOpen}>
-        {isOpen ? <Sidebar title={title} logo={logo} /> : <div />}
+        <Sidebar title={title} logo={logo} open={isOpen} width={sidebarWidth} />
         <SiteContainer>{children}</SiteContainer>
       </SidebarLayoutContainer>
     </SidebarContext.Provider>
@@ -50,14 +50,10 @@ const SidebarLayoutContainer = styled.div`
   display: grid;
   height: 100vh;
   grid-template-columns: ${(props: SidebarLayoutContainerProps) =>
-      props.isSidebarOpen ? sidebarWidth : 0}px calc(
-      100% -
-        ${(props: SidebarLayoutContainerProps) =>
-          props.isSidebarOpen ? sidebarWidth : 0}px
-    );
+      props.isSidebarOpen ? sidebarWidth : 0}px auto;
 `
 
 const SiteContainer = styled.div`
-  overflow-y: scroll;
   z-index: 0;
+  overflow-y: scroll;
 `
