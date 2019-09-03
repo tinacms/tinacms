@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/forestry-cli",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "license": "MIT",
   "devDependencies": {
     "@types/clear": "0.1.0",
@@ -9,7 +9,7 @@
     "@types/figlet": "1.2.0",
     "@types/inquirer": "^6.5.0",
     "@types/listr": "0.14.2",
-    "cms-scripts": "^0.0.0",
+    "cms-scripts": "^0.1.0-alpha.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
