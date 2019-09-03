@@ -1,6 +1,6 @@
-# Contributing to Forestryio CMS
+# Contributing to TinaCMS
 
-The following is a set of guidelines and tips for contributingto the Forestryio CMS and its packages.
+The following is a set of guidelines and tips for contributingto the TinaCMS and its packages.
 
 ## How to Contribute
 
@@ -22,7 +22,7 @@ The following is a set of guidelines and tips for contributingto the Forestryio 
 
 ## Troubleshooting
 
-This section contains solutions to various problems you may run into when developing for the Forestryio CMS.
+This section contains solutions to various problems you may run into when developing for the TinaCMS.
 
 - [I pulled down changes and now the packages won't build](#I-pulled-down-changes-and-now-my-packages-won't-build)
 - [I can't add dependencies to a package](#I-can't-add-dependencies-to-a-package)

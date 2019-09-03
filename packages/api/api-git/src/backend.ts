@@ -9,9 +9,9 @@ const openRepo = require('simple-git/promise')
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
-const DEFAULT_NAME = 'Forestry'
+const DEFAULT_NAME = 'Tina'
 const DEFAULT_EMAIL = 'nolan@forestry.io'
-const DEFAULT_MESSAGE = 'Update from XEditor'
+const DEFAULT_MESSAGE = 'Update from Tina'
 
 export function router() {
   let pathRoot = process.cwd()

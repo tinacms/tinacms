@@ -18,7 +18,7 @@ yarn add @tinacms/core
 
 ## Getting Started
 
-`@forestry/cms` is the core for building content management systems.
+`@tinacms/core` is the core for building content management systems.
 
 ```javascript
 import { CMS } from '@tinacms/core'

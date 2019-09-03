@@ -4,22 +4,13 @@ import { Link, graphql } from "gatsby"
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
-import { rhythm, scale } from "../utils/typography"
-import { toMarkdownString } from "@tinacms/gatsby-plugin-tinacms"
-import { useCMS } from "@tinacms/react-tinacms"
-import { relative } from "path"
+import { rhythm } from "../utils/typography"
 import { remarkForm } from "@tinacms/react-tinacms-remark"
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
-
-  let cms = useCMS()
-  let filepath = relative(
-    "/home/dj/Forestry/cms/packages/demo/demo-gatsby/",
-    post.fields.fileRelativePath
-  )
 
   return (
     <Layout location={props.location} title={siteTitle}>

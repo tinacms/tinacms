@@ -36,4 +36,4 @@ npm run start
 
 ## Links
 
-- [Circle CI](https://circleci.com/gh/forestryio/cms): Continuous Integration
+- [Circle CI](https://circleci.com/gh/tinacms/tinacms): Continuous Integration
