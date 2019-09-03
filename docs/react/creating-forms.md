@@ -2,7 +2,7 @@
 
 Often, the premade form helpers (e.g. [useRemarkForm](./editing-markdown.md#creating-forms))
 provide all the behaviour we need. Eventually you may need something more custom, and in that case
-you'll want to reach for the `useCMSForm` hook in `@forestryio/react-cms`.
+you'll want to reach for the `useCMSForm` hook in `@tinacms/react-cms`.
 
 ## useCMSForm
 
@@ -25,7 +25,7 @@ interface FormOptions {
 ### Example
 
 ```javascript
-import { useCMSForm } from '@forestryio/react-cms'
+import { useCMSForm } from '@tinacms/react-cms'
 
 function PageTemplate(props) {
   let [someData] = useCMSForm({

@@ -1,4 +1,4 @@
-import { cms } from '@forestryio/gatsby-plugin-xeditor'
+import { cms } from '@tinacms/gatsby-plugin-tinacms'
 
 cms.registerApi('git', {
   onSubmit(data: any) {

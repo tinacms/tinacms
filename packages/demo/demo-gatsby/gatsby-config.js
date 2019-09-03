@@ -10,16 +10,16 @@ module.exports = {
   },
   plugins: [
     {
-      resolve: "@forestryio/gatsby-plugin-xeditor",
+      resolve: "@tinacms/gatsby-plugin-tinacms",
       options: {
         title: "XEditor Gatsby Demo",
         logo:
           "https://seeklogo.com/images/G/gatsby-logo-1A245AD37F-seeklogo.com.png",
         plugins: [
-          "@forestryio/gatsby-xeditor-git",
-          "@forestryio/gatsby-xeditor-json",
+          "@tinacms/gatsby-tinacms-git",
+          "@tinacms/react-tinacms-json",
           {
-            resolve: "@forestryio/gatsby-xeditor-gitlab",
+            resolve: "@tinacms/gatsby-tinacms-gitlab",
             options: {
               appID:
                 "5eaf309d8dac09519bdcd2f9ce0fec494cfac21b7c7d2568553538696f15ba61",

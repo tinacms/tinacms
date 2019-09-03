@@ -1,0 +1,35 @@
+{
+  "name": "@tinacms/tinacms",
+  "version": "1.0.1-alpha.15",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "MIT",
+  "files": [
+    "assets",
+    "build"
+  ],
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "build": "cms-scripts build",
+    "watch": "cms-scripts watch"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "@types/styled-components": "4.1.8",
+    "cms-scripts": "^0.1.1-alpha.3",
+    "jest": "^24.8.0",
+    "react": "^16.8.6",
+    "ts-jest": "^24.0.2"
+  },
+  "dependencies": {
+    "@tinacms/core": "^1.0.1-alpha.9",
+    "@tinacms/form-builder": "^1.0.1-alpha.10",
+    "@tinacms/react-tinacms": "^0.1.1-alpha.9",
+    "@tinacms/fields": "^0.1.1-alpha.7",
+    "react-frame-component": "^4.1.1",
+    "styled-components": "^4.3.2"
+  },
+  "peerDependencies": {
+    "react": "^16.8.6"
+  }
+}
