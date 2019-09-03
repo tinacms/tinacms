@@ -1,6 +1,6 @@
-# XEditor by Forestry
+# Tina, by Forestry
 
-XEditor is a CMS built by Forestry.io
+Tina is a CMS built by Forestry.io
 
 ## Getting Started
 

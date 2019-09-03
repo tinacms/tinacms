@@ -2,20 +2,20 @@
 
 Creating forms for content provided by the [`gatsby-transformer-json`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-json) plugin is made possible by three plugins:
 
-- `gatsby-xeditor-json`: Provides hooks and components for creating Remark forms.
-- `gatsby-xeditor-git`: Extends the gatsby dev server to writes changes to the local filesystem;
+- `gatsby-tinacms-json`: Provides hooks and components for creating Remark forms.
+- `gatsby-tinacms-git`: Extends the gatsby dev server to writes changes to the local filesystem;
   and registers [CMS Backend](../concepts/backends.md) for saving changes to that backend.
 
 ## Installation
 
 ```
-npm install --save gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
+npm install --save gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-tinacms-git @tinacms/react-tinacms-json
 ```
 
 or
 
 ```
-yarn add gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
+yarn add gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-tinacms-git @tinacms/react-tinacms-json
 ```
 
 ## Configuring Gatsby
@@ -26,7 +26,7 @@ yarn add gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xed
 module.exports = {
   plugins: [
     // ...
-    '@forestryio/gatsby-xeditor-json',
+    '@tinacms/react-tinacms-json',
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -103,7 +103,7 @@ useJsonForm(data): [values, form]
 **src/templates/blog-post.js**
 
 ```jsx
-import { useJsonForm } from '@forestryio/gatsby-xeditor-json'
+import { useJsonForm } from '@tinacms/react-tinacms-json'
 
 function DataTemplate(props) {
   const [data] = useJsonForm(props.data.dataJson)
@@ -130,7 +130,7 @@ only available within Function Components you will wneed to use `JsonForm` if yo
 **src/templates/blog-post.js**
 
 ```jsx
-import { JsonForm } from '@forestryio/gatsby-xeditor-json'
+import { JsonForm } from '@tinacms/react-tinacms-json'
 
 class DataTemplate extends React.Component {
   render() {

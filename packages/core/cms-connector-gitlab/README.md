@@ -5,7 +5,7 @@ Supports GitLab v4 api
 ## Usage
 
 ```
-import { GitlabConnector } from "@forestryio/cms-connector-gitlab"
+import { GitlabConnector } from "@tinacms/cms-connector-gitlab"
 
 let gitlab = new GitlabConnector({
   apiBaseURI: "https://gitlab.com/",
