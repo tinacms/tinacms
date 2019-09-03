@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-tinacms-remark",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -21,6 +21,6 @@
   "dependencies": {
     "@tinacms/core": "^0.1.0-alpha.0",
     "@tinacms/react-tinacms": "^0.1.0-alpha.0",
-    "@tinacms/tinacms": "^0.1.0-alpha.0"
+    "@tinacms/tinacms": "^0.1.0-alpha.1"
   }
 }
