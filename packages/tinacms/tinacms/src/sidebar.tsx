@@ -58,7 +58,6 @@ export const Sidebar = ({
   )
 }
 
-const EllipsisVertical = require('../assets/ellipsis-v.svg')
 const HeaderHeight = 5
 
 const SidebarHeader = styled.div`
@@ -89,22 +88,6 @@ const SiteName = styled.h3`
   font-weight: 500;
 `
 
-const ActionsToggle = styled.button`
-  background: transparent;
-  outline: none;
-  border: 0;
-  width: 2rem;
-  height: ${HeaderHeight}rem;
-  margin-left: auto;
-  background-image: url(${EllipsisVertical});
-  background-position: center;
-  background-repeat: no-repeat;
-  background-size: 0.3rem;
-  transition: opacity 0.15s;
-  &:hover {
-    opacity: 0.6;
-  }
-`
 const RootElement = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
   html {
