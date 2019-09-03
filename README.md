@@ -40,12 +40,12 @@ npm run start
 
 The core packages are a set of generally used for building CMSs.
 
-| CMS Toolkit Package                  | Description                                                       |
-| ------------------------------------ | ----------------------------------------------------------------- |
-| `@forestryio/cms`                    | The base package for creating a cms.                              |
-| `@forestryio/cms-react`              | A set of hooks and components for using the `cms` in a React app. |
-| `@forestryio/cms-final-form-builder` | A `react-final-form` based form builder for creating `cms` forms. |
-| `cms-scripts`                        | Contains the script for building `typescript` packages.           |
+| CMS Toolkit Package     | Description                                                       |
+| ----------------------- | ----------------------------------------------------------------- |
+| `@forestryio/cms`       | The base package for creating a cms.                              |
+| `@forestryio/cms-react` | A set of hooks and components for using the `cms` in a React app. |
+| `@tinacms/form-builder` | A `react-final-form` based form builder for creating `cms` forms. |
+| `cms-scripts`           | Contains the script for building `typescript` packages.           |
 
 ### XEditor
 
