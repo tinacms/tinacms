@@ -9,13 +9,16 @@ The following is a set of guidelines and tips for contributingto the Forestryio 
 - **Writing Docs, Guides, or Blog Posts**
 - **Voluntering for User Testing**
 
-## Naming Packages
+## Creating Packages
 
-- `@tinacms/*`: Internal packages
-- `@tinacms/api-*`: Node API extensions
-- `react-tinacms-*`: React specific packages
-- `vue-tinacms-*`: Vue specific packages
-- `gatsby-tinacms-*`: Gastby plugins
+| Type                    | Folder   | Naming Convention  |
+| ----------------------- | -------- | ------------------ |
+| Internal packages       | `core`   | `@tinacms/*`       |
+| Node API extensions     | `api`    | `@tinacms/api-*`   |
+| React specific packages | `react`  | `react-tinacms-*`  |
+| Vue specific packages   | `vue`    | `vue-tinacms-*`    |
+| Gastby plugins          | `gatsby` | `gatsby-tinacms-*` |
+| Demo Projects           | `demo`   | `demo-*`           |
 
 ## Troubleshooting
 
