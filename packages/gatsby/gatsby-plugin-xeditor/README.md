@@ -1,22 +1,22 @@
-# @forestryio/gatsby-plugin-xeditor
+# @tinacms/gatsby-plugin-xeditor
 
 A Gatsby plugin for the XEditor CMS.
 
 ## Installation
 
 ```
-npm install --save @forestryio/gatsby-plugin-xeditor
+npm install --save @tinacms/gatsby-plugin-xeditor
 ```
 
 or
 
 ```sh
-yarn add @forestryio/gatsby-plugin-xeditor
+yarn add @tinacms/gatsby-plugin-xeditor
 ```
 
 ## Setup
 
-Include `@forestryio/gatsby-plugin-xeditor` in the list of gatsby plugins:
+Include `@tinacms/gatsby-plugin-xeditor` in the list of gatsby plugins:
 
 _gatsby.config.js_
 
@@ -25,7 +25,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@forestryio/gatsby-plugin-xeditor',
+    '@tinacms/gatsby-plugin-xeditor',
   ],
 }
 ```
@@ -88,7 +88,7 @@ You may want to register your fields inside `wrapPageElement` to ensure that the
 ```javascript
 //gatsby-browser.js
 import * as React from 'react'
-import { useCMS } from '@forestryio/cms-react'
+import { useCMS } from '@tinacms/cms-react'
 import { ShortTextField } from './your-custom-field'
 
 export const wrapPageElement = ({ element }) => {
@@ -135,7 +135,7 @@ function BlogPostTemplate(props) {
 **Using the RemarkForm renderProps approach:**
 
 ```javascript
-import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor'
+import { RemarkForm } from '@tinacms/gatsby-plugin-xeditor'
 
 class BlogPostTemplate extends React.Component {
   render() {

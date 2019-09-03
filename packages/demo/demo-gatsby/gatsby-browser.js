@@ -1,9 +1,9 @@
 // custom typefaces
 import "typeface-montserrat"
 import "typeface-merriweather"
-import { TextInput, TextAreaInput } from "@forestryio/xeditor"
+import { TextInput, TextAreaInput } from "@tinacms/xeditor"
 import * as React from "react"
-import { useCMS } from "@forestryio/cms-react"
+import { useCMS } from "@tinacms/cms-react"
 
 export const wrapPageElement = ({ element }) => {
   return <FieldRegistrar>{element}</FieldRegistrar>

@@ -42,8 +42,8 @@ The core packages are a set of generally used for building CMSs.
 
 | CMS Toolkit Package     | Description                                                       |
 | ----------------------- | ----------------------------------------------------------------- |
-| `@forestryio/cms`       | The base package for creating a cms.                              |
-| `@forestryio/cms-react` | A set of hooks and components for using the `cms` in a React app. |
+| `@tinacms/cms`       | The base package for creating a cms.                              |
+| `@tinacms/cms-react` | A set of hooks and components for using the `cms` in a React app. |
 | `@tinacms/form-builder` | A `react-final-form` based form builder for creating `cms` forms. |
 | `cms-scripts`           | Contains the script for building `typescript` packages.           |
 
@@ -53,11 +53,11 @@ XEditor is a CMS for React with an emphasis on Gatsby support.
 
 | XEditor Package                     | Description                                                     |
 | ----------------------------------- | --------------------------------------------------------------- |
-| `@forestryio/xeditor`               | A CMS UI that shows up in a sidebar on your site.               |
-| `@forestryio/xeditor-fields`        | A collection of Field Plugins for `xeditor`                     |
-| `@forestryio/gatsby-plugin-xeditor` | A Gatsby plugin for setting up a `xeditor`                      |
-| `@forestryio/gatsby-xeditor-git`    | A `gatsby-xeditor` plugin for saving changes to the local repo. |
-| `@forestryio/gatsby-xeditor-json`   | A `gatsby-xeditor` plugin for editing JSON files.               |
+| `@tinacms/xeditor`               | A CMS UI that shows up in a sidebar on your site.               |
+| `@tinacms/xeditor-fields`        | A collection of Field Plugins for `xeditor`                     |
+| `@tinacms/gatsby-plugin-xeditor` | A Gatsby plugin for setting up a `xeditor`                      |
+| `@tinacms/gatsby-xeditor-git`    | A `gatsby-xeditor` plugin for saving changes to the local repo. |
+| `@tinacms/gatsby-xeditor-json`   | A `gatsby-xeditor` plugin for editing JSON files.               |
 
 ### Demo Projects
 

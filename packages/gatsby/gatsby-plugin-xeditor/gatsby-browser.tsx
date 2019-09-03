@@ -1,6 +1,6 @@
 import * as React from 'react'
-import { CMSContext } from '@forestryio/cms-react'
-import { SidebarProvider, ModalProvider, useSidebar } from '@forestryio/xeditor'
+import { CMSContext } from '@tinacms/cms-react'
+import { SidebarProvider, ModalProvider, useSidebar } from '@tinacms/xeditor'
 import { cms } from './index'
 import styled from 'styled-components'
 

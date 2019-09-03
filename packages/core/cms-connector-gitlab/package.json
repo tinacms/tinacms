@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/cms-connector-gitlab",
+  "name": "@tinacms/cms-connector-gitlab",
   "version": "0.1.1-alpha.4",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -20,6 +20,6 @@
   },
   "dependencies": {
     "@tinacms/core": "^1.0.1-alpha.9",
-    "@forestryio/persistent-session-storage": "^0.1.1-alpha.2"
+    "@tinacms/persistent-session-storage": "^0.1.1-alpha.2"
   }
 }

@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/gatsby-xeditor-remark",
+  "name": "@tinacms/gatsby-xeditor-remark",
   "version": "0.1.1-alpha.8",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -20,7 +20,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^1.0.1-alpha.9",
-    "@forestryio/cms-react": "^0.1.1-alpha.9",
-    "@forestryio/xeditor": "^1.0.1-alpha.15"
+    "@tinacms/cms-react": "^0.1.1-alpha.9",
+    "@tinacms/xeditor": "^1.0.1-alpha.15"
   }
 }

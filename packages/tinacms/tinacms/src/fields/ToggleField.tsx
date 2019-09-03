@@ -1,4 +1,4 @@
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { Toggle } from '@forestryio/xeditor-fields'
+import { Toggle } from '@tinacms/xeditor-fields'
 
 export const ToggleField = wrapFieldsWithMeta(Toggle)

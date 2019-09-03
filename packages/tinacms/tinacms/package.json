@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/xeditor",
+  "name": "@tinacms/xeditor",
   "version": "1.0.1-alpha.15",
   "main": "build/index.js",
   "types": "build/index.d.ts",
@@ -24,8 +24,8 @@
   "dependencies": {
     "@tinacms/core": "^1.0.1-alpha.9",
     "@tinacms/form-builder": "^1.0.1-alpha.10",
-    "@forestryio/cms-react": "^0.1.1-alpha.9",
-    "@forestryio/xeditor-fields": "^0.1.1-alpha.7",
+    "@tinacms/cms-react": "^0.1.1-alpha.9",
+    "@tinacms/xeditor-fields": "^0.1.1-alpha.7",
     "react-frame-component": "^4.1.1",
     "styled-components": "^4.3.2"
   },

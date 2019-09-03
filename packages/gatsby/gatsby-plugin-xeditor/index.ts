@@ -1,1 +1,1 @@
-export { cms } from '@forestryio/xeditor'
+export { cms } from '@tinacms/xeditor'

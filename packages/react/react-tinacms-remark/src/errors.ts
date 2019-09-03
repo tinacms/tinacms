@@ -1,4 +1,4 @@
-import { ERROR_MISSING_CMS } from '@forestryio/cms-react'
+import { ERROR_MISSING_CMS } from '@tinacms/cms-react'
 
 export const ERROR_MISSING_CMS_GATSBY =
   ERROR_MISSING_CMS +
@@ -8,7 +8,7 @@ export const ERROR_MISSING_CMS_GATSBY =
 
 module.exports = {
   plugins: [
-    "@forestryio/gatsby-plugin-xeditor"
+    "@tinacms/gatsby-plugin-xeditor"
   ]
 }
 `

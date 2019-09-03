@@ -1,6 +1,6 @@
 # `@tinacms/form-builder`
 
-A React component for building forms registered with `@forestryio/cms`.
+A React component for building forms registered with `@tinacms/cms`.
 
 ## Installation
 
@@ -17,5 +17,5 @@ yarn add @tinacms/form-builder
 ## Getting Started
 
 ```javascript
-import {} from '@forestryio/cms-react'
+import {} from '@tinacms/cms-react'
 ```
