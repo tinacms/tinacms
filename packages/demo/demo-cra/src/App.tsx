@@ -1,7 +1,7 @@
 import React from 'react'
 import logo from './logo.svg'
 import './App.css'
-import { useCMS } from '@forestryio/cms'
+import { useCMS } from '@tinacms/core'
 
 const App: React.FC = () => {
   return (

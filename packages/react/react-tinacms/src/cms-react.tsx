@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { CMS, Plugin, Form, Subscribable, FormOptions } from '@forestryio/cms'
+import { CMS, Plugin, Form, Subscribable, FormOptions } from '@tinacms/core'
 
 export const ERROR_MISSING_CMS = `useCMS could not find an instance of CMS`
 

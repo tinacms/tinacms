@@ -3,7 +3,7 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import { CMS } from '@forestryio/cms'
+import { CMS } from '@tinacms/core'
 import { CMSContext, CMS } from '@forestryio/cms-react'
 
 let cms = new CMS()

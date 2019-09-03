@@ -1,6 +1,6 @@
-import { toMarkdownString } from "./to-markdown"
-import { CMS } from "@forestryio/cms"
-import { AddContentPlugin } from "@forestryio/xeditor"
+import { toMarkdownString } from './to-markdown'
+import { CMS } from '@tinacms/core'
+import { AddContentPlugin } from '@forestryio/xeditor'
 
 interface CreateRemarkButtonOptions {
   label: string
@@ -14,9 +14,9 @@ export function createRemarkButton(
 ): AddContentPlugin {
   let formatFilename = options.filename || ((value: string) => value)
   let createFrontmatter = options.frontmatter || (() => ({}))
-  let createBody = options.body || (() => "")
+  let createBody = options.body || (() => '')
   return {
-    __type: "content-button",
+    __type: 'content-button',
     name: options.label,
     onSubmit: async (value: string, cms: CMS) => {
       let filename = await formatFilename(value)
@@ -30,8 +30,8 @@ export function createRemarkButton(
           frontmatter,
           rawMarkdownBody,
           // unnecessary
-          id: "",
-          html: "",
+          id: '',
+          html: '',
           fields: { fileRelativePath },
         }),
       })

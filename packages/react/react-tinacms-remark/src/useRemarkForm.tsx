@@ -1,16 +1,16 @@
-import { FormOptions } from "@forestryio/cms"
-import { useCMSForm, useCMS } from "@forestryio/cms-react"
+import { FormOptions } from '@tinacms/core'
+import { useCMSForm, useCMS } from '@forestryio/cms-react'
 import {
   ERROR_MISSING_CMS_GATSBY,
   ERROR_MISSING_REMARK_ID,
   ERROR_MISSING_REMARK_PATH,
-} from "./errors"
-import { useEffect, useMemo } from "react"
-import { RemarkNode } from "./remark-node"
-import { toMarkdownString } from "./to-markdown"
-import { generateFields } from "./generate-fields"
+} from './errors'
+import { useEffect, useMemo } from 'react'
+import { RemarkNode } from './remark-node'
+import { toMarkdownString } from './to-markdown'
+import { generateFields } from './generate-fields'
 
-let throttle = require("lodash.throttle")
+let throttle = require('lodash.throttle')
 
 export function useRemarkForm(
   markdownRemark: RemarkNode,
@@ -20,13 +20,13 @@ export function useRemarkForm(
   if (!markdownRemark) {
     return [markdownRemark, null]
   }
-  if (typeof markdownRemark.id === "undefined") {
+  if (typeof markdownRemark.id === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_ID)
   }
   // TODO: Only required when saving to local filesystem.
   if (
-    typeof markdownRemark.fields === "undefined" ||
-    typeof markdownRemark.fields.fileRelativePath === "undefined"
+    typeof markdownRemark.fields === 'undefined' ||
+    typeof markdownRemark.fields.fileRelativePath === 'undefined'
   ) {
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
@@ -42,15 +42,15 @@ export function useRemarkForm(
       initialValues: markdownRemark,
       fields: generateFields(markdownRemark),
       onSubmit(data) {
-        if (process.env.NODE_ENV === "development") {
+        if (process.env.NODE_ENV === 'development') {
           return cms.api.git.onSubmit!({
             files: [data.fields.fileRelativePath],
-            message: data.__commit_message || "xeditor commit",
+            message: data.__commit_message || 'xeditor commit',
             name: data.__commit_name,
             email: data.__commit_email,
           })
         } else {
-          console.log("Not supported")
+          console.log('Not supported')
         }
       },
       ...formOverrrides,

@@ -1,4 +1,4 @@
-import { Form, FormOptions } from '@forestryio/cms'
+import { Form, FormOptions } from '@tinacms/core'
 import { useCMSForm, useCMS } from '@forestryio/cms-react'
 import { useEffect } from 'react'
 

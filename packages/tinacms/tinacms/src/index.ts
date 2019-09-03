@@ -7,7 +7,7 @@ import {
   ColorPickerField,
   ToggleField,
 } from './fields'
-import { CMS, Plugin } from '@forestryio/cms'
+import { CMS, Plugin } from '@tinacms/core'
 import { FormsView, DummyView } from './views/FormView'
 
 export const cms = new CMS()

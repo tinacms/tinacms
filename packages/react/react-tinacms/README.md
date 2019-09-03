@@ -18,7 +18,7 @@ yarn add @forestryio/cms-react
 
 ```javascript
 import * as React from 'react'
-import { CMS } from '@forestryio/cms'
+import { CMS } from '@tinacms/core'
 import { CMSContext } from '@forestryio/cms-react'
 
 let cms = new CMS()

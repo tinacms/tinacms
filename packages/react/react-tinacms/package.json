@@ -19,6 +19,6 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@forestryio/cms": "^1.0.1-alpha.9"
+    "@tinacms/core": "^1.0.1-alpha.9"
   }
 }
