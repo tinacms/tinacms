@@ -137,7 +137,7 @@ interface SelectProps
  * 2. The `onChange` prop is passed a `string` instead of the selected `Option`
  * 3. If `value` is not a valid option, it calls `onChange` to update it immediately
  * 4. The `options` prop can contain a list of strings
- * 5. It is styled specifically for Forestry.io
+ * 5. It is styled specifically for Tina
  */
 export function Select(props: SelectProps) {
   /**

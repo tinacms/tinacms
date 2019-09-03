@@ -14,7 +14,7 @@ yarn add @tinacms/react-tinacms
 
 ## Getting Started
 
-`@forestry/cms-react` is a thin wrapper around the `@forestry/cms`.
+`@tinacms/cms-react` is a thin wrapper around the `@tinacms/cms`.
 
 ```javascript
 import * as React from 'react'
