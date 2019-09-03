@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/cms-backend-git",
+  "name": "@tinacms/api-git",
   "version": "0.1.1-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
