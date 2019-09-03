@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
-import styled, { createGlobalStyle, keyframes } from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
 import { FormsView, SaveButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
@@ -32,10 +32,7 @@ export const Sidebar = ({
           height: '100%',
           margin: '0',
           padding: '0',
-          border: '0',
-          borderRight: '1px solid #efefef',
-          zIndex: 1,
-          backgroundColor: 'white'
+          border: '0'
         }}
       >
         <>
@@ -87,26 +84,17 @@ const HamburgerMenu = require('../assets/hamburger.svg')
 const CloseIcon = require('../assets/close.svg')
 const HeaderHeight = 4.5
 
-const SidebarOpenAnimation = keyframes`
-  0% {
-    transform: translate3d(-100%,0,0);
-  }
-  100% {
-    transform: translate3d(0,0,0);
-  }
-`
-
-const SidebarCloseAnimation = keyframes`
-  0% {
-    transform: translate3d(0,0,0);
-  }
-  100% {
-    transform: translate3d(-100%,0,0);
-  }
-`
-
 const SidebarContainer = styled.div<{ open: boolean, width: number }>`
-  animation: ${p => (p.open ? SidebarOpenAnimation : SidebarCloseAnimation)}  150ms ease-out 1 both;
+  width: 100%;
+  height: 100%;
+  margin: 0;
+  padding: 0;
+  border: 0;
+  border-right: 1px solid #efefef;
+  z-index: 1;
+  background-color: white;
+  transition: transform ${p => (p.open ? 150 : 200)}ms ease-out;
+  transform: translate3d(${p => (p.open ? '0' : '-100%')}, 0, 0);
   position: relative;
   display: block;
   width: ${props => props.width || 340}px;
