@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/cms-final-form-builder",
+  "name": "@tinacms/form-builder",
   "version": "1.0.1-alpha.10",
   "main": "build/index.js",
   "types": "build/index.d.ts",

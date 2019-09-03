@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FormBuilder, FieldsBuilder } from '@forestryio/cms-final-form-builder'
+import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useCMS, useSubscribable } from '@forestryio/cms-react'
 import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'

@@ -1,17 +1,17 @@
-# `@forestryio/cms-final-form-builder`
+# `@tinacms/form-builder`
 
 A React component for building forms registered with `@forestryio/cms`.
 
 ## Installation
 
 ```
-npm install --save @forestryio/cms-final-form-builder
+npm install --save @tinacms/form-builder
 ```
 
 or
 
 ```
-yarn add @forestryio/cms-final-form-builder
+yarn add @tinacms/form-builder
 ```
 
 ## Getting Started
