@@ -9,13 +9,13 @@ Creating forms for content provided by the [`gatsby-transformer-json`](https://g
 ## Installation
 
 ```
-npm install --save gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
+npm install --save gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-xeditor-git @tinacms/gatsby-xeditor-json
 ```
 
 or
 
 ```
-yarn add gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xeditor-git @forestryio/gatsby-xeditor-json
+yarn add gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-xeditor-git @tinacms/gatsby-xeditor-json
 ```
 
 ## Configuring Gatsby
@@ -26,7 +26,7 @@ yarn add gatsby-source-filesystem gatsby-transformer-json @forestryio/gatsby-xed
 module.exports = {
   plugins: [
     // ...
-    '@forestryio/gatsby-xeditor-json',
+    '@tinacms/gatsby-xeditor-json',
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -103,7 +103,7 @@ useJsonForm(data): [values, form]
 **src/templates/blog-post.js**
 
 ```jsx
-import { useJsonForm } from '@forestryio/gatsby-xeditor-json'
+import { useJsonForm } from '@tinacms/gatsby-xeditor-json'
 
 function DataTemplate(props) {
   const [data] = useJsonForm(props.data.dataJson)
@@ -130,7 +130,7 @@ only available within Function Components you will wneed to use `JsonForm` if yo
 **src/templates/blog-post.js**
 
 ```jsx
-import { JsonForm } from '@forestryio/gatsby-xeditor-json'
+import { JsonForm } from '@tinacms/gatsby-xeditor-json'
 
 class DataTemplate extends React.Component {
   render() {

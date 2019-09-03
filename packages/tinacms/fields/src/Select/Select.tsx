@@ -3,7 +3,7 @@ import { useMemo, useCallback, useEffect, useState } from 'react'
 import SelectBase, { components, Async } from 'react-select'
 import { Props as ReactSelectProps } from 'react-select/lib/Select'
 import { Props as AsyncProps } from 'react-select/lib/Async'
-import { Icon } from '@forestryio/icons'
+import { Icon } from '@tinacms/icons'
 
 type Styles = {
   [key: string]: (provided: any, state: any) => object

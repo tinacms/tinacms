@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Form, CMS } from '@tinacms/core'
-import { useCMS } from '@forestryio/cms-react'
+import { useCMS } from '@tinacms/cms-react'
 import {
   FormProps,
   Form as FinalForm,

@@ -41,7 +41,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    You can use lerna to add new dependencies to a package from the root of the repository:
 
    ```
-   lerna add react --scope @forestryio/react-cms
+   lerna add react --scope @tinacms/react-cms
    ```
 
    The downside of this approach is you can only add one dependency at a time. If you need to add many packages, you can use the next method.

@@ -32,7 +32,7 @@ Open your `gatsby-browser.js` and create an `onClientEntry`. In this function, w
 **gatsby-browser.js**
 
 ```javascript
-import { cms } from '@forestryio/gatsby-plugin-xeditor'
+import { cms } from '@tinacms/gatsby-plugin-xeditor'
 import { EmailField } from './src/components/EmailField'
 
 export const onClientEntry = () => {
@@ -77,7 +77,7 @@ If the value is invalid, then return the error message to be displayed.
 **gatsby-browser.js**
 
 ```javascript
-import { cms } from '@forestryio/gatsby-plugin-xeditor'
+import { cms } from '@tinacms/gatsby-plugin-xeditor'
 import { EmailField } from './src/components/EmailField'
 
 export const onClientEntry = () => {

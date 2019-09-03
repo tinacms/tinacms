@@ -1,6 +1,6 @@
 import { toMarkdownString } from './to-markdown'
 import { CMS } from '@tinacms/core'
-import { AddContentPlugin } from '@forestryio/xeditor'
+import { AddContentPlugin } from '@tinacms/xeditor'
 
 interface CreateRemarkButtonOptions {
   label: string

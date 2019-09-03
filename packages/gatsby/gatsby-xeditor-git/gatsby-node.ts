@@ -1,4 +1,4 @@
-import { router as gitRouter } from '@forestryio/cms-backend-git'
+import { router as gitRouter } from '@tinacms/cms-backend-git'
 
 exports.onCreateNode = ({ node, actions }: any) => {
   let pathRoot = process.cwd()

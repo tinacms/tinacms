@@ -1,7 +1,7 @@
 import * as React from 'react'
-import { GitlabConnector } from '@forestryio/cms-connector-gitlab'
+import { GitlabConnector } from '@tinacms/cms-connector-gitlab'
 import { GitlabContext } from './index'
-import { cms } from '@forestryio/gatsby-plugin-xeditor'
+import { cms } from '@tinacms/gatsby-plugin-xeditor'
 
 let gitlab: GitlabConnector
 export const wrapRootElement = ({ element }: any) => {

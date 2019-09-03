@@ -1,10 +1,10 @@
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
-import { useCMS, useSubscribable } from '@forestryio/cms-react'
+import { useCMS, useSubscribable } from '@tinacms/cms-react'
 import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
-import { TextField } from '@forestryio/xeditor-fields'
+import { TextField } from '@tinacms/xeditor-fields'
 import { Modal, ModalBody, ModalHeader } from '..'
 
 export const FormsView: ScreenPlugin = {

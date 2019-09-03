@@ -15,12 +15,12 @@ This library makes it easy to edit content provided by the [`gatsby-transformer-
 
 - `[values, form]`
   - `values`: The current values to be display. This has the same shape as the `markdownRemark` data.
-  - `form`: A reference to the `Form`. See `@forestryio/cms` for more details.
+  - `form`: A reference to the `Form`. See `@tinacms/cms` for more details.
 
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from '@forestryio/gatsby-plugin-xeditor'
+import { useRemarkForm } from '@tinacms/gatsby-plugin-xeditor'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
@@ -40,12 +40,12 @@ This is a thin wrapper around `useRemarkForm`. Since React [Hooks](https://react
 - `remark`: the data returned from a Gatsby `markdownRemark` query.
 - `render(renderProps): JSX.Element`: A function that returns JSX elements
   - `renderProps.markdownRemark`: The current values to be displayed. This has the same shape as the `markdownRemark` data that was passed in.
-  - `renderProps.form`: A reference to the `Form`. See `@forestryio/cms` for more details.
+  - `renderProps.form`: A reference to the `Form`. See `@tinacms/cms` for more details.
 
 **src/templates/blog-post.js**
 
 ```javascript
-import { RemarkForm } from '@forestryio/gatsby-plugin-xeditor'
+import { RemarkForm } from '@tinacms/gatsby-plugin-xeditor'
 
 class BlogPostTemplate extends React.Component {
   render() {

@@ -71,7 +71,7 @@ let form = cms.forms.createForm({
 
 ## API
 
-The following can be imported from `@forestryio/cms`
+The following can be imported from `@tinacms/cms`
 
 ### `CMS`
 

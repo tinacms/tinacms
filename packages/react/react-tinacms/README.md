@@ -1,15 +1,15 @@
-# `@forestryio/cms-react`
+# `@tinacms/cms-react`
 
 ## Install
 
 ```
-npm install --save @forestryio/cms-react
+npm install --save @tinacms/cms-react
 ```
 
 or
 
 ```
-yarn add @forestryio/cms-react
+yarn add @tinacms/cms-react
 ```
 
 ## Getting Started
@@ -19,7 +19,7 @@ yarn add @forestryio/cms-react
 ```javascript
 import * as React from 'react'
 import { CMS } from '@tinacms/core'
-import { CMSContext } from '@forestryio/cms-react'
+import { CMSContext } from '@tinacms/cms-react'
 
 let cms = new CMS()
 cms.forms

@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/cms-backend-git",
+  "name": "@tinacms/cms-backend-git",
   "version": "0.1.1-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",

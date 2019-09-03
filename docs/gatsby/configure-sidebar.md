@@ -12,7 +12,7 @@ module.exports = {
   // ...
   plugins: [
     {
-      resolve: '@forestryio/gatsby-plugin-xeditor',
+      resolve: '@tinacms/gatsby-plugin-xeditor',
       options: {
         title: 'My CMS',
         logo:

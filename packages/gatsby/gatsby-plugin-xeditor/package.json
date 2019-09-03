@@ -1,5 +1,5 @@
 {
-  "name": "@forestryio/gatsby-plugin-xeditor",
+  "name": "@tinacms/gatsby-plugin-xeditor",
   "main": "index.js",
   "version": "0.1.1-alpha.22",
   "files": [
@@ -16,8 +16,8 @@
   },
   "dependencies": {
     "@tinacms/core": "^1.0.1-alpha.9",
-    "@forestryio/cms-react": "^0.1.1-alpha.9",
-    "@forestryio/xeditor": "^1.0.1-alpha.15",
+    "@tinacms/cms-react": "^0.1.1-alpha.9",
+    "@tinacms/xeditor": "^1.0.1-alpha.15",
     "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0",
     "@types/js-yaml": "^3.12.1",

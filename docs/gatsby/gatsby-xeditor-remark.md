@@ -9,13 +9,13 @@ Creating forms for content provided by the [`gatsby-transformer-remark`](https:/
 ## Installation
 
 ```
-npm install --save @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
+npm install --save @tinacms/gatsby-xeditor-remark @tinacms/gatsby-xeditor-git
 ```
 
 or
 
 ```
-yarn add @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
+yarn add @tinacms/gatsby-xeditor-remark @tinacms/gatsby-xeditor-git
 ```
 
 ## Adding the Plugin
@@ -25,8 +25,8 @@ Open the `gatsby-config.js` file and add make sure the following plugins are lis
 ```JavaScript
 module.exports = {
   plugins: [
-    "@forestryio/gatsby-xeditor-git",
-    "@forestryio/gatsby-xeditor-remark",
+    "@tinacms/gatsby-xeditor-git",
+    "@tinacms/gatsby-xeditor-remark",
     // ...
   ]
 }
@@ -98,7 +98,7 @@ useRemarkForm(remark): [values, form]
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from '@forestryio/gatsby-xeditor-remark'
+import { useRemarkForm } from '@tinacms/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
@@ -125,7 +125,7 @@ only available within Function Components you will wneed to use `RemarkForm` if 
 **src/templates/blog-post.js**
 
 ```javascript
-import { RemarkForm } from '@forestryio/gatsby-xeditor-remark'
+import { RemarkForm } from '@tinacms/gatsby-xeditor-remark'
 
 class BlogPostTemplate extends React.Component {
   render() {
@@ -184,7 +184,7 @@ The `config` is an optional object for overriding the default configuration of a
 - `label`: A human readable label for the field.
 
 ```javascript
-import { useRemarkForm } from '@forestryio/gatsby-xeditor-remark'
+import { useRemarkForm } from '@tinacms/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {

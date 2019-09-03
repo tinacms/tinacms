@@ -9,13 +9,13 @@ Creating forms for content provided by the [`gatsby-transformer-remark`](https:/
 ## Installation
 
 ```
-npm install --save @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
+npm install --save @tinacms/gatsby-xeditor-remark @tinacms/gatsby-xeditor-git
 ```
 
 or
 
 ```
-yarn add @forestryio/gatsby-xeditor-remark @forestryio/gatsby-xeditor-git
+yarn add @tinacms/gatsby-xeditor-remark @tinacms/gatsby-xeditor-git
 ```
 
 ## Adding the Plugin
@@ -25,7 +25,7 @@ Open the `gatsby-config.js` file and add make sure the following plugins are lis
 ```JavaScript
 module.exports = {
   plugins: [
-    "@forestryio/gatsby-xeditor-git",
+    "@tinacms/gatsby-xeditor-git",
     // ...
   ]
 }
@@ -42,7 +42,7 @@ The `remarkForm` [higher-order component](https://reactjs.org/docs/higher-order-
 **Example: src/templates/blog-post.js**
 
 ```jsx
-import { remarkForm } from '@forestryio/gatsby-xeditor-remark'
+import { remarkForm } from '@tinacms/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
   return <h1>{props.data.markdownRemark.frontmatter.title}</h1>
@@ -95,7 +95,7 @@ The `remarkForm` function accepts an optional `config` object for overriding the
 #### Example: src/templates/blog-post.js
 
 ```jsx
-import { remarkForm } from '@forestryio/gatsby-xeditor-remark'
+import { remarkForm } from '@tinacms/gatsby-xeditor-remark'
 
 function BlogPostTemplate(props) {
   return (
