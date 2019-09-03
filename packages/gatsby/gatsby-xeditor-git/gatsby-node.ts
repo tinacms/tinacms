@@ -1,4 +1,4 @@
-import { router as gitRouter } from '@tinacms/cms-backend-git'
+import { router as gitRouter } from '@tinacms/api-git'
 
 exports.onCreateNode = ({ node, actions }: any) => {
   let pathRoot = process.cwd()
