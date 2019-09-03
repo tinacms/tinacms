@@ -1,4 +1,4 @@
-# Forestry CMS
+# TinaCMS
 
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
@@ -14,7 +14,7 @@
 To get started:
 
 ```bash
-git clone git@github.com:forestryio/cms.git
+git clone git@github.com:tinacms/tinacms.git
 cd cms
 npm run bootstrap
 npm run build
@@ -33,40 +33,6 @@ npm run start
 | npm run test                       | Run tests for all packages                    |
 | lerna run build --scope \<package> | Build only \<package>.                        |
 | lerna run watch --parallel         | Watch all packages for rebuilds.              |
-
-## Packages
-
-### CMS Toolkit
-
-The core packages are a set of generally used for building CMSs.
-
-| CMS Toolkit Package      | Description                                                       |
-| ------------------------ | ----------------------------------------------------------------- |
-| `@tinacms/cms`           | The base package for creating a cms.                              |
-| `@tinacms/react-tinacms` | A set of hooks and components for using the `cms` in a React app. |
-| `@tinacms/form-builder`  | A `react-final-form` based form builder for creating `cms` forms. |
-| `cms-scripts`            | Contains the script for building `typescript` packages.           |
-
-### XEditor
-
-XEditor is a CMS for React with an emphasis on Gatsby support.
-
-| XEditor Package                  | Description                                                     |
-| -------------------------------- | --------------------------------------------------------------- |
-| `@tinacms/tinacms`               | A CMS UI that shows up in a sidebar on your site.               |
-| `@tinacms/fields`                | A collection of Field Plugins for `xeditor`                     |
-| `@tinacms/gatsby-plugin-tinacms` | A Gatsby plugin for setting up a `xeditor`                      |
-| `@tinacms/gatsby-tinacms-git`    | A `gatsby-tinacms` plugin for saving changes to the local repo. |
-| `@tinacms/react-tinacms-json`    | A `gatsby-tinacms` plugin for editing JSON files.               |
-
-### Demo Projects
-
-There are two demo projects:
-
-| Demo Package  | Description                                              |
-| ------------- | -------------------------------------------------------- |
-| `demo-cra`    | A React application bootstrapped with `create-react-app` |
-| `demo-gatsby` | Gatsby starter blog.                                     |
 
 ## Links
 
