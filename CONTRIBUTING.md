@@ -9,6 +9,14 @@ The following is a set of guidelines and tips for contributingto the Forestryio 
 - **Writing Docs, Guides, or Blog Posts**
 - **Voluntering for User Testing**
 
+## Naming Packages
+
+- `@tinacms/*`: Internal packages
+- `@tinacms/api-*`: Node API extensions
+- `react-tinacms-*`: React specific packages
+- `vue-tinacms-*`: Vue specific packages
+- `gatsby-tinacms-*`: Gastby plugins
+
 ## Troubleshooting
 
 This section contains solutions to various problems you may run into when developing for the Forestryio CMS.
