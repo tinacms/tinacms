@@ -165,7 +165,7 @@ const FormsFooter = styled.div`
   height: ${FormsFooterHeight}rem;
   background-color: white;
   border-top: 1px solid #efefef;
-  padding: 0.5rem 1rem;
+  padding: 0.75rem 1.25rem;
 `
 
 // TODO: make more global
@@ -178,6 +178,7 @@ export const SaveButton = styled.button`
   height: 100%;
   border: 0;
   border-radius: 0.3rem;
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
   background-color: #0085ff;
   color: white;
   font-weight: 500;
