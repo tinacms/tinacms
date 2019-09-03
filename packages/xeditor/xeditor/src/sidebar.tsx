@@ -17,7 +17,7 @@ export const Sidebar = ({
 }) => {
   const cms = useCMS()
   useSubscribable(cms.screens)
-  const [menuIsVisible, setMenuVisibility] = useState(true)
+  const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
@@ -34,32 +34,33 @@ export const Sidebar = ({
       }}
     >
       <>
-        <RootElement />
+      <RootElement />
         <SidebarHeader>
-          <ActionsToggle onClick={() => setMenuVisibility(true)} />
+          <ActionsToggle onClick={() => setMenuVisibility(!menuIsVisible)} open={menuIsVisible} />
         </SidebarHeader>
-
         <FieldsWrapper>
           <FormsView />
         </FieldsWrapper>
+
         <MenuPanel visible={menuIsVisible}>
-          <button onClick={() => setMenuVisibility(false)}>Close</button>
-          <ul>
-            {cms.screens.all().map(view => (
-              <li
-                value={view.name}
-                onClick={() => {
-                  setActiveView(view)
-                  setMenuVisibility(false)
-                }}
-              >
-                {view.name}
-              </li>
-            ))}
-            {cms.plugins.all('content-button').map(plugin => (
-              <CreateContentButton plugin={plugin} />
-            ))}
-          </ul>
+          <FieldsWrapper>
+            <ul>
+              {cms.screens.all().map(view => (
+                <li
+                  value={view.name}
+                  onClick={() => {
+                    setActiveView(view)
+                    setMenuVisibility(false)
+                  }}
+                >
+                  {view.name}
+                </li>
+              ))}
+              {cms.plugins.all('content-button').map(plugin => (
+                <CreateContentButton plugin={plugin} />
+              ))}
+            </ul>
+          </FieldsWrapper>
         </MenuPanel>
         {ActiveView && (
           <Modal>
@@ -73,17 +74,20 @@ export const Sidebar = ({
 }
 
 const EllipsisVertical = require('../assets/ellipsis-v.svg')
-const HeaderHeight = 5
+const HamburgerMenu = require('../assets/hamburger.svg')
+const CloseIcon = require('../assets/close.svg')
+const HeaderHeight = 4.5
 
 const SidebarHeader = styled.div`
   display: flex;
   align-items: center;
   position: absolute;
+  z-index: 1050;
   left: 0;
   top: 0;
   width: 100%;
   height: ${HeaderHeight}rem;
-  padding: 1rem 1rem 0 1rem;
+  padding: 1.25rem;
   /* border-bottom: 1px solid #efefef; */
 `
 
@@ -103,19 +107,20 @@ const SiteName = styled.h3`
   font-weight: 500;
 `
 
-const ActionsToggle = styled.button`
+const ActionsToggle = styled.button<{ open: boolean }>`
   background: transparent;
   outline: none;
   border: 0;
-  width: 2rem;
+  width: 1.5rem;
   height: ${HeaderHeight}rem;
-  background-image: url(${EllipsisVertical});
+  background-image: url(${p => (p.open ? CloseIcon : HamburgerMenu)});
   background-position: center;
   background-repeat: no-repeat;
-  background-size: 0.3rem;
-  transition: opacity 0.15s;
+  background-size: ${p => (p.open ? '75%' : '100%')} auto;
+  transition: all 0.15s ease-out;
   &:hover {
     opacity: 0.6;
+    cursor: pointer;
   }
 `
 const RootElement = createGlobalStyle`
@@ -144,7 +149,7 @@ const FieldsWrapper = styled.div`
   height: calc(100vh - (${HeaderHeight}rem));
   width: 100%;
   overflow: hidden;
-  padding: 1rem;
+  padding: 1.25rem;
   ul,
   li {
     margin: 0;
@@ -154,15 +159,17 @@ const FieldsWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
-  background: pink;
+  background: #333333;
   z-index: 1000;
   position: absolute;
   top: 0;
-  width: 100vw;
-  left: ${p => (p.visible ? '0' : '100vw')};
+  left: 0;
   height: 100vh;
+  width: 100vw;
+  transform: translate3d(${p => (p.visible ? '0' : '-100%')},0,0);
   overflow: hidden;
-  padding: 1rem;
+  padding: 1.25rem;
+  transition: all 200ms ease-out;
   ul,
   li {
     margin: 0;
