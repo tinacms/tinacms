@@ -1,4 +1,4 @@
-# @forestryio/cms
+# @tinacms/core
 
 A CMS Toolkit
 
@@ -7,13 +7,13 @@ A CMS Toolkit
 Install the package
 
 ```
-npm install --save @forestryio/cms
+npm install --save @tinacms/core
 ```
 
 or
 
 ```
-yarn add @forestryio/cms
+yarn add @tinacms/core
 ```
 
 ## Getting Started
@@ -21,7 +21,7 @@ yarn add @forestryio/cms
 `@forestry/cms` is the core for building content management systems.
 
 ```javascript
-import { CMS } from '@forestryio/cms'
+import { CMS } from '@tinacms/core'
 
 let cms = new CMS()
 ```

@@ -16,7 +16,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@forestryio/cms": "^1.0.1-alpha.9",
+    "@tinacms/core": "^1.0.1-alpha.9",
     "@forestryio/cms-backend-git": "^0.1.1-alpha.0",
     "@forestryio/cms-react": "^0.1.1-alpha.9",
     "@forestryio/gatsby-plugin-xeditor": "^0.1.1-alpha.22",

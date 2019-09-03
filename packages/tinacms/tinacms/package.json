@@ -22,7 +22,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@forestryio/cms": "^1.0.1-alpha.9",
+    "@tinacms/core": "^1.0.1-alpha.9",
     "@forestryio/cms-final-form-builder": "^1.0.1-alpha.10",
     "@forestryio/cms-react": "^0.1.1-alpha.9",
     "@forestryio/xeditor-fields": "^0.1.1-alpha.7",

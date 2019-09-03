@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { FormOptions } from '@forestryio/cms'
+import { FormOptions } from '@tinacms/core'
 import { useRemarkForm } from './useRemarkForm'
 
 export function remarkForm(

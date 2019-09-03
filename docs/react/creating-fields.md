@@ -28,7 +28,7 @@ The optional `validate` function let's you define how you 're
 Here is an example of a simple text field plugin. The `Component` renders the label, the input, and the errors for the field.
 
 ```javascript
-import { CMS } from '@forestryio/cms'
+import { CMS } from '@tinacms/core'
 
 let cms = new CMS()
 

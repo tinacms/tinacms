@@ -1,4 +1,4 @@
-import { FormOptions, Form } from '@forestryio/cms'
+import { FormOptions, Form } from '@tinacms/core'
 import { RemarkNode } from './remark-node'
 import { useRemarkForm } from './useRemarkForm'
 
