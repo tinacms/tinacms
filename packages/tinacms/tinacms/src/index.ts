@@ -1,6 +1,8 @@
 export * from './sidebarProvider'
 export * from './modalProvider'
 export * from './fields'
+export * from './Tina'
+
 import {
   TextInput,
   TextAreaInput,
