@@ -4,9 +4,9 @@ import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
 import { FormsView, SaveButton } from './components/FormView'
-import { ScreenPlugin } from '@forestryio/cms'
+import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
-import { TextField } from '@forestryio/xeditor-fields'
+import { TextField } from '@tinacms/fields'
 
 export const Sidebar = ({
   title = 'XEditor',
@@ -34,9 +34,12 @@ export const Sidebar = ({
       }}
     >
       <>
-      <RootElement />
+        <RootElement />
         <SidebarHeader>
-          <ActionsToggle onClick={() => setMenuVisibility(!menuIsVisible)} open={menuIsVisible} />
+          <ActionsToggle
+            onClick={() => setMenuVisibility(!menuIsVisible)}
+            open={menuIsVisible}
+          />
         </SidebarHeader>
         <FieldsWrapper>
           <FormsView />
@@ -166,7 +169,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   left: 0;
   height: 100vh;
   width: 100vw;
-  transform: translate3d(${p => (p.visible ? '0' : '-100%')},0,0);
+  transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: 1.25rem;
   transition: all 200ms ease-out;
