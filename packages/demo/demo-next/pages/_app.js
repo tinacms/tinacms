@@ -1,5 +1,6 @@
 import React from 'react'
 import App from 'next/app'
+import { Tina } from '@tinacms/tinacms'
 
 class MyApp extends App {
   // Only uncomment this method if you have blocking data requirements for
@@ -16,8 +17,11 @@ class MyApp extends App {
 
   render() {
     const { Component, pageProps } = this.props
-    console.log('TINA')
-    return <Component {...pageProps} />
+    return (
+      <Tina>
+        <Component {...pageProps} />
+      </Tina>
+    )
   }
 }
 
