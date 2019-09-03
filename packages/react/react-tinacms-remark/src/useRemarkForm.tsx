@@ -1,5 +1,5 @@
 import { FormOptions } from '@tinacms/core'
-import { useCMSForm, useCMS } from '@tinacms/cms-react'
+import { useCMSForm, useCMS } from '@tinacms/react-tinacms'
 import {
   ERROR_MISSING_CMS_GATSBY,
   ERROR_MISSING_REMARK_ID,

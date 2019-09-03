@@ -1,15 +1,15 @@
-# `@tinacms/cms-react`
+# `@tinacms/react-tinacms`
 
 ## Install
 
 ```
-npm install --save @tinacms/cms-react
+npm install --save @tinacms/react-tinacms
 ```
 
 or
 
 ```
-yarn add @tinacms/cms-react
+yarn add @tinacms/react-tinacms
 ```
 
 ## Getting Started
@@ -19,7 +19,7 @@ yarn add @tinacms/cms-react
 ```javascript
 import * as React from 'react'
 import { CMS } from '@tinacms/core'
-import { CMSContext } from '@tinacms/cms-react'
+import { CMSContext } from '@tinacms/react-tinacms'
 
 let cms = new CMS()
 cms.forms

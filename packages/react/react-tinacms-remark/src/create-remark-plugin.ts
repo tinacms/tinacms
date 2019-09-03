@@ -1,6 +1,6 @@
 import { toMarkdownString } from './to-markdown'
 import { CMS } from '@tinacms/core'
-import { AddContentPlugin } from '@tinacms/xeditor'
+import { AddContentPlugin } from '@tinacms/tinacms'
 
 interface CreateRemarkButtonOptions {
   label: string

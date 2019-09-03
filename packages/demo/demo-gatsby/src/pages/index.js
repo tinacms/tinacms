@@ -10,8 +10,8 @@ import {
   useCMSForm,
   withPlugin,
   usePlugin,
-} from "@tinacms/cms-react"
-import { createRemarkButton } from "@tinacms/gatsby-xeditor-remark"
+} from "@tinacms/react-tinacms"
+import { createRemarkButton } from "@tinacms/react-tinacms-remark"
 
 const CreatePostPlugin = createRemarkButton({
   label: "Create Blog Post",

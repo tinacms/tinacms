@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useCMS, useSubscribable } from '@tinacms/cms-react'
+import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'

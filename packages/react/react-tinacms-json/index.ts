@@ -1,5 +1,5 @@
 import { Form, FormOptions } from '@tinacms/core'
-import { useCMSForm, useCMS } from '@tinacms/cms-react'
+import { useCMSForm, useCMS } from '@tinacms/react-tinacms'
 import { useEffect } from 'react'
 
 interface JsonNode {

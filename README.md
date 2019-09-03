@@ -40,24 +40,24 @@ npm run start
 
 The core packages are a set of generally used for building CMSs.
 
-| CMS Toolkit Package     | Description                                                       |
-| ----------------------- | ----------------------------------------------------------------- |
-| `@tinacms/cms`       | The base package for creating a cms.                              |
-| `@tinacms/cms-react` | A set of hooks and components for using the `cms` in a React app. |
-| `@tinacms/form-builder` | A `react-final-form` based form builder for creating `cms` forms. |
-| `cms-scripts`           | Contains the script for building `typescript` packages.           |
+| CMS Toolkit Package      | Description                                                       |
+| ------------------------ | ----------------------------------------------------------------- |
+| `@tinacms/cms`           | The base package for creating a cms.                              |
+| `@tinacms/react-tinacms` | A set of hooks and components for using the `cms` in a React app. |
+| `@tinacms/form-builder`  | A `react-final-form` based form builder for creating `cms` forms. |
+| `cms-scripts`            | Contains the script for building `typescript` packages.           |
 
 ### XEditor
 
 XEditor is a CMS for React with an emphasis on Gatsby support.
 
-| XEditor Package                     | Description                                                     |
-| ----------------------------------- | --------------------------------------------------------------- |
-| `@tinacms/xeditor`               | A CMS UI that shows up in a sidebar on your site.               |
-| `@tinacms/xeditor-fields`        | A collection of Field Plugins for `xeditor`                     |
-| `@tinacms/gatsby-plugin-xeditor` | A Gatsby plugin for setting up a `xeditor`                      |
-| `@tinacms/gatsby-xeditor-git`    | A `gatsby-xeditor` plugin for saving changes to the local repo. |
-| `@tinacms/gatsby-xeditor-json`   | A `gatsby-xeditor` plugin for editing JSON files.               |
+| XEditor Package                  | Description                                                     |
+| -------------------------------- | --------------------------------------------------------------- |
+| `@tinacms/tinacms`               | A CMS UI that shows up in a sidebar on your site.               |
+| `@tinacms/fields`                | A collection of Field Plugins for `xeditor`                     |
+| `@tinacms/gatsby-plugin-tinacms` | A Gatsby plugin for setting up a `xeditor`                      |
+| `@tinacms/gatsby-tinacms-git`    | A `gatsby-tinacms` plugin for saving changes to the local repo. |
+| `@tinacms/react-tinacms-json`    | A `gatsby-tinacms` plugin for editing JSON files.               |
 
 ### Demo Projects
 

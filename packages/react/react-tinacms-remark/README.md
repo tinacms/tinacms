@@ -20,7 +20,7 @@ This library makes it easy to edit content provided by the [`gatsby-transformer-
 **src/templates/blog-post.js**
 
 ```javascript
-import { useRemarkForm } from '@tinacms/gatsby-plugin-xeditor'
+import { useRemarkForm } from '@tinacms/gatsby-plugin-tinacms'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
@@ -45,7 +45,7 @@ This is a thin wrapper around `useRemarkForm`. Since React [Hooks](https://react
 **src/templates/blog-post.js**
 
 ```javascript
-import { RemarkForm } from '@tinacms/gatsby-plugin-xeditor'
+import { RemarkForm } from '@tinacms/gatsby-plugin-tinacms'
 
 class BlogPostTemplate extends React.Component {
   render() {

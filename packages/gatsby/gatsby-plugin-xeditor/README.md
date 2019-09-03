@@ -1,22 +1,22 @@
-# @tinacms/gatsby-plugin-xeditor
+# @tinacms/gatsby-plugin-tinacms
 
 A Gatsby plugin for the XEditor CMS.
 
 ## Installation
 
 ```
-npm install --save @tinacms/gatsby-plugin-xeditor
+npm install --save @tinacms/gatsby-plugin-tinacms
 ```
 
 or
 
 ```sh
-yarn add @tinacms/gatsby-plugin-xeditor
+yarn add @tinacms/gatsby-plugin-tinacms
 ```
 
 ## Setup
 
-Include `@tinacms/gatsby-plugin-xeditor` in the list of gatsby plugins:
+Include `@tinacms/gatsby-plugin-tinacms` in the list of gatsby plugins:
 
 _gatsby.config.js_
 
@@ -25,7 +25,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@tinacms/gatsby-plugin-xeditor',
+    '@tinacms/gatsby-plugin-tinacms',
   ],
 }
 ```
@@ -46,7 +46,7 @@ Next you will have to register some content to be editable.
 
 ### MarkdownRemark
 
-See `gatsby-xeditor-remark`.
+See `gatsby-tinacms-remark`.
 
 ### Creating custom field plugins
 
@@ -88,7 +88,7 @@ You may want to register your fields inside `wrapPageElement` to ensure that the
 ```javascript
 //gatsby-browser.js
 import * as React from 'react'
-import { useCMS } from '@tinacms/cms-react'
+import { useCMS } from '@tinacms/react-tinacms'
 import { ShortTextField } from './your-custom-field'
 
 export const wrapPageElement = ({ element }) => {
@@ -135,7 +135,7 @@ function BlogPostTemplate(props) {
 **Using the RemarkForm renderProps approach:**
 
 ```javascript
-import { RemarkForm } from '@tinacms/gatsby-plugin-xeditor'
+import { RemarkForm } from '@tinacms/gatsby-plugin-tinacms'
 
 class BlogPostTemplate extends React.Component {
   render() {

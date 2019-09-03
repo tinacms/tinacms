@@ -5,10 +5,10 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm, scale } from "../utils/typography"
-import { toMarkdownString } from "@tinacms/gatsby-plugin-xeditor"
-import { useCMS } from "@tinacms/cms-react"
+import { toMarkdownString } from "@tinacms/gatsby-plugin-tinacms"
+import { useCMS } from "@tinacms/react-tinacms"
 import { relative } from "path"
-import { remarkForm } from "@tinacms/gatsby-xeditor-remark"
+import { remarkForm } from "@tinacms/react-tinacms-remark"
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark

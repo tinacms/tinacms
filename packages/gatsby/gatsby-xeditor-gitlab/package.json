@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/gatsby-xeditor-gitlab",
+  "name": "@tinacms/gatsby-tinacms-gitlab",
   "main": "index.js",
   "version": "0.0.1-alpha.8",
   "files": [
@@ -15,6 +15,6 @@
   },
   "dependencies": {
     "@tinacms/cms-connector-gitlab": "^0.1.1-alpha.4",
-    "@tinacms/gatsby-plugin-xeditor": "^0.1.1-alpha.22"
+    "@tinacms/gatsby-plugin-tinacms": "^0.1.1-alpha.22"
   }
 }

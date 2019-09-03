@@ -12,7 +12,7 @@ module.exports = {
   // ...
   plugins: [
     {
-      resolve: '@tinacms/gatsby-plugin-xeditor',
+      resolve: '@tinacms/gatsby-plugin-tinacms',
       options: {
         title: 'My CMS',
         logo:
