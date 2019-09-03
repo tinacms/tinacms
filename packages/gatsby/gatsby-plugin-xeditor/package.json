@@ -1,7 +1,7 @@
 {
   "name": "@tinacms/gatsby-plugin-tinacms",
   "main": "index.js",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "files": [
     "index.js",
     "gatsby-browser.js",
@@ -17,7 +17,7 @@
   "dependencies": {
     "@tinacms/core": "^0.1.0-alpha.0",
     "@tinacms/react-tinacms": "^0.1.0-alpha.0",
-    "@tinacms/tinacms": "^0.1.0-alpha.0",
+    "@tinacms/tinacms": "^0.1.0-alpha.1",
     "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0",
     "@types/js-yaml": "^3.12.1",
