@@ -49,22 +49,17 @@ export const Sidebar = ({
 
           <MenuPanel visible={menuIsVisible}>
             <FieldsWrapper>
-              <ul>
+              {cms.plugins.all('content-button').map(plugin => (
+                <CreateContentButton plugin={plugin} />
+              ))}
+              <MenuList>
                 {cms.screens.all().map(view => (
-                  <li
-                    value={view.name}
-                    onClick={() => {
-                      setActiveView(view)
-                      setMenuVisibility(false)
-                    }}
-                  >
-                    {view.name}
-                  </li>
+                  <MenuLink value={view.name} onClick={() => {
+                    setActiveView(view)
+                    setMenuVisibility(false)
+                  }}>{view.name}</MenuLink>
                 ))}
-                {cms.plugins.all('content-button').map(plugin => (
-                  <CreateContentButton plugin={plugin} />
-                ))}
-              </ul>
+              </MenuList>
             </FieldsWrapper>
           </MenuPanel>
           {ActiveView && (
@@ -83,6 +78,38 @@ const EllipsisVertical = require('../assets/ellipsis-v.svg')
 const HamburgerMenu = require('../assets/hamburger.svg')
 const CloseIcon = require('../assets/close.svg')
 const HeaderHeight = 4.5
+const Padding = 1.25
+
+const MenuList = styled.div`
+  margin: 2rem -${Padding}rem 2rem -${Padding}rem;
+  display: block;
+`
+
+const MenuLink = styled.div<{ value: string }>`
+  color: #F2F2F2;
+  font-size: 1.125rem;
+  font-weight: 500;
+  padding: ${Padding}rem;
+  position: relative;
+  cursor: pointer;
+  &:after {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 0;
+    width: 100%;
+    height: 100%;
+    background-color: #3E3E3E;
+    opacity: 0;
+    z-index: -1;
+    transition: all 150ms ease-out;
+  }
+  &:hover {
+    &:after {
+      opacity: 1;
+    }
+  }
+`
 
 const SidebarContainer = styled.div<{ open: boolean, width: number }>`
   width: 100%;
@@ -109,7 +136,7 @@ const SidebarHeader = styled.div`
   top: 0;
   width: 100%;
   height: ${HeaderHeight}rem;
-  padding: 1.25rem;
+  padding: ${Padding}rem;
   /* border-bottom: 1px solid #efefef; */
 `
 
@@ -171,7 +198,7 @@ const FieldsWrapper = styled.div`
   height: calc(100vh - (${HeaderHeight}rem));
   width: 100%;
   overflow: hidden;
-  padding: 1.25rem;
+  padding: ${Padding}rem;
   ul,
   li {
     margin: 0;
@@ -190,7 +217,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   width: 100vw;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
-  padding: 1.25rem;
+  padding: ${Padding}rem;
   transition: all 200ms ease-out;
   ul,
   li {
@@ -206,7 +233,7 @@ const CreateContentButton = ({ plugin }: any) => {
   let [open, setOpen] = React.useState(false)
   return (
     <div>
-      <button onClick={() => setOpen(p => !p)}>{plugin.name}</button>
+      <CreateButton onClick={() => setOpen(p => !p)}>{plugin.name}</CreateButton>
       {open && (
         <Modal>
           <ModalHeader>Create</ModalHeader>
@@ -230,3 +257,21 @@ const CreateContentButton = ({ plugin }: any) => {
     </div>
   )
 }
+
+const CreateButton = styled.button`
+  text-align: center;
+  width: 100%;
+  border: 0;
+  border-radius: 0.3rem;
+  box-shadow: 0px 2px 3px rgba(48,48,48,0.15);
+  background-color: #0085ff;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.75rem;
+  transition: opacity 0.15s;
+  &:hover {
+    opacity: 0.6;
+  }
+`

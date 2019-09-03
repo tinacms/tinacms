@@ -224,9 +224,11 @@ const SaveButton = styled.button`
   justify-content: center;
   text-align: center;
   width: 100%;
-  height: 100%;
+  font-size: 0.75rem;
+  padding: 0.75rem;
   border: 0;
   border-radius: 0.3rem;
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
   background-color: #0085ff;
   color: white;
   font-weight: 500;
