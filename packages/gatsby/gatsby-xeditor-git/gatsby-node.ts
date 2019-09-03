@@ -13,5 +13,5 @@ exports.onCreateNode = ({ node, actions }: any) => {
 }
 
 exports.onCreateDevServer = ({ app }: { app: any }) => {
-  app.use('/x-server', gitRouter())
+  app.use('/___tina', gitRouter())
 }
