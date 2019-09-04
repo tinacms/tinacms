@@ -200,7 +200,7 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   margin: 0;
   padding: 0;
   border: 0;
-  border-right: 1px solid #efefef;
+  box-shadow: inset -1px 0 0 #efefef;
   z-index: 1;
   background-color: white;
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out;

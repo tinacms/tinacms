@@ -329,6 +329,7 @@ const FormsFooter = styled.div`
   background-color: white;
   border-top: 1px solid #efefef;
   padding: 0.75rem 1.25rem;
+  box-shadow: inset -1px 0 0 #efefef;
 `
 
 // TODO: make more global
