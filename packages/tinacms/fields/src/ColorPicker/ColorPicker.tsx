@@ -35,7 +35,7 @@ export const Swatch = styled(
   )
 )`
   background: #fff;
-  border-radius: 0.3rem;
+  border-radius: 0.25rem;
   box-shadow: 0 0 0 1px #dedede;
   cursor: pointer;
   width: 100%;

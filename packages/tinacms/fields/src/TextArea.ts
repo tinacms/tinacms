@@ -15,7 +15,7 @@ export const TextArea = styled.textarea<{ error?: boolean }>`
   border-width: 1px;
   border-style: solid;
   border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
-  border-radius: 0.3rem;
+  border-radius: 0.25rem;
   height: 10rem;
   width: 100%;
   font-size: 0.9rem;
