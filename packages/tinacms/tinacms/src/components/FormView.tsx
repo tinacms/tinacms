@@ -227,7 +227,7 @@ const FieldsWrapper = styled.div`
   top: 0;
   height: calc(100vh - (${FormsFooterHeight + HeaderHeight}rem));
   width: 100%;
-  padding: 1rem;
+  padding: ${Padding}rem ${Padding}rem 0 ${Padding}rem;
   overflow-y: auto;
 `
 

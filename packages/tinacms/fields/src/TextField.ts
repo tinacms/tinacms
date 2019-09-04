@@ -11,20 +11,20 @@ export interface InputProps extends a {
 }
 
 export const TextField = styled.input<{ error?: boolean }>`
+  background-color: #F8F8F8;
   border-width: 1px;
   border-style: solid;
-  border-color: ${p => (p.error ? 'red' : '#eaeaea')};
+  border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
   border-radius: 0.3rem;
-  height: 2rem;
   width: 100%;
   font-size: 0.9rem;
-  padding: 0 0.5rem;
+  padding: 0.75rem;
   margin: 0;
   outline: none;
   transition: border 0.2s ease;
 
   &:focus {
-    border-color: #666666;
+    border-color: #333333;
   }
 
   &::placeholder {
