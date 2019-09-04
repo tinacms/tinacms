@@ -199,6 +199,7 @@ const Padding = 1.25
 const MoreButton = styled.button`
   height: 100%;
   width: 2rem;
+  background-color: transparent;
   background-image: url(${EllipsisVertical});
   background-position: center;
   background-size: auto 1.125rem;
