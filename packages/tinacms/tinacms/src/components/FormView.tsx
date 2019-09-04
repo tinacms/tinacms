@@ -30,7 +30,15 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length) return <NoFormsPlaceholder />
+  if (!forms.length)
+    return (
+      <>
+        {cms.plugins.all('content-button').map(plugin => (
+          <CreateContentButton plugin={plugin} />
+        ))}
+        <NoFormsPlaceholder />
+      </>
+    )
   if (!editingForm)
     return (
       <FormsList
@@ -43,16 +51,17 @@ export const FormsView = () => {
   return (
     <>
       {/* <FormsList
-          forms={forms}
-          activeForm={editingForm}
-          setActiveForm={setEditingForm}
-        /> */}
+        forms={forms}
+        activeForm={editingForm}
+        setActiveForm={setEditingForm}
+      /> */}
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
           let isFile, fileRelativePath: any
           try {
             //@ts-ignore
-            fileRelativePath = form.getState().values!.fields!.fileRelativePath
+            fileRelativePath = form.getState().values!.fields!
+              .fileRelativePath
             isFile = true
           } catch (e) {
             isFile = false
@@ -61,6 +70,9 @@ export const FormsView = () => {
             <>
               {/* <h3>Editing form {editingForm.name}</h3> */}
               <FieldsWrapper>
+                {cms.plugins.all('content-button').map(plugin => (
+                  <CreateContentButton plugin={plugin} />
+                ))}
                 {editingForm &&
                   (editingForm.fields.length ? (
                     <FieldsBuilder form={editingForm} />
@@ -69,34 +81,71 @@ export const FormsView = () => {
                   ))}
               </FieldsWrapper>
               <FormsFooter>
-                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
+                <SaveButton
+                  onClick={() => handleSubmit()}
+                  disabled={pristine}
+                >
                   Save
                 </SaveButton>
-                {isFile && (
-                  <DeleteButton
-                    onClick={() => {
-                      if (
-                        !confirm(
-                          `Are you sure you want to delete ${fileRelativePath}?`
-                        )
-                      ) {
-                        return
-                      }
-                      // @ts-ignore
-                      cms.api.git.onDelete!({
-                        relPath: fileRelativePath,
-                      })
-                    }}
-                  >
-                    Delete
-                  </DeleteButton>
-                )}
+                <MoreButton></MoreButton>
+                <MoreMenu>
+                  {isFile && (
+                    <DeleteButton
+                      onClick={() => {
+                        if (
+                          !confirm(
+                            `Are you sure you want to delete ${fileRelativePath}?`
+                          )
+                        ) {
+                          return
+                        }
+                        // @ts-ignore
+                        cms.api.git.onDelete!({
+                          relPath: fileRelativePath,
+                        })
+                      }}
+                    >
+                      Delete
+                    </DeleteButton>
+                  )}
+                </MoreMenu>
               </FormsFooter>
             </>
           )
         }}
       </FormBuilder>
     </>
+  )
+}
+
+const CreateContentButton = ({ plugin }: any) => {
+  let cms = useCMS()
+  let [postName, setPostName] = React.useState('')
+  let [open, setOpen] = React.useState(false)
+  return (
+    <div>
+      <CreateButton onClick={() => setOpen(p => !p)}>{plugin.name}</CreateButton>
+      {open && (
+        <Modal>
+          <ModalHeader>Create</ModalHeader>
+          <ModalBody>
+            <TextField
+              onChange={e => setPostName(e.target.value)}
+              value={postName}
+            />
+
+            <SaveButton
+              onClick={() => {
+                plugin.onSubmit(postName, cms)
+                setOpen(false)
+              }}
+            >
+              Save
+            </SaveButton>
+          </ModalBody>
+        </Modal>
+      )}
+    </div>
   )
 }
 
@@ -142,7 +191,35 @@ const NoFieldsPlaceholder = () => (
 
 // Styling
 const FormsFooterHeight = 4
-const HeaderHeight = 5
+const HeaderHeight = 4
+const Padding = 1.25
+
+const MoreButton = styled.button`
+  display: none;
+`
+
+const MoreMenu = styled.div`
+  display: none;
+`
+
+const CreateButton = styled.button`
+  text-align: center;
+  width: 100%;
+  border: 0;
+  border-radius: 0.3rem;
+  box-shadow: 0px 2px 3px rgba(48,48,48,0.15);
+  background-color: #0085ff;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.75rem;
+  padding: 0.75rem;
+  transition: opacity 85ms;
+  margin-bottom: ${Padding}rem;
+  &:hover {
+    opacity: 0.6;
+  }
+`
 
 const FieldsWrapper = styled.div`
   position: absolute;
@@ -156,8 +233,7 @@ const FieldsWrapper = styled.div`
 
 const FormsFooter = styled.div`
   display: flex;
-  align-items: center;
-  justify-content: center;
+  justify-content: space-between;
   position: absolute;
   left: 0;
   bottom: 0;
@@ -170,11 +246,8 @@ const FormsFooter = styled.div`
 
 // TODO: make more global
 export const SaveButton = styled.button`
-  display: flex;
-  align-items: center;
-  justify-content: center;
+  flex: 1 0 auto;
   text-align: center;
-  width: 100%;
   font-size: 0.75rem;
   padding: 0.75rem;
   border: 0;

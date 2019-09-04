@@ -77,7 +77,7 @@ export const Sidebar = ({
 const EllipsisVertical = require('../assets/ellipsis-v.svg')
 const HamburgerMenu = require('../assets/hamburger.svg')
 const CloseIcon = require('../assets/close.svg')
-const HeaderHeight = 4.5
+const HeaderHeight = 4
 const Padding = 1.25
 
 const MenuList = styled.div`
@@ -136,7 +136,8 @@ const SidebarHeader = styled.div`
   top: 0;
   width: 100%;
   height: ${HeaderHeight}rem;
-  padding: ${Padding}rem;
+  padding: 0.75rem ${Padding}rem;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
   /* border-bottom: 1px solid #efefef; */
 `
 
