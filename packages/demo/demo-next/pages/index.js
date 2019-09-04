@@ -33,10 +33,7 @@ function PostLink({ document, slug, filename }) {
 
   return (
     <Link href={{ pathname: '/post', query: { id: slug } }} key={slug}>
-      <h2>
-        {post.frontmatter.title}
-        <small>{filename}</small>
-      </h2>
+      <h2>{post.frontmatter.title}</h2>
     </Link>
   )
 }
