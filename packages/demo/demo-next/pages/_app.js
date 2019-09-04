@@ -1,6 +1,8 @@
 import React from 'react'
 import App from 'next/app'
-import { Tina } from '@tinacms/tinacms'
+import { Tina, cms } from '@tinacms/tinacms'
+
+cms.registerApi('git')
 
 class MyApp extends App {
   // Only uncomment this method if you have blocking data requirements for
@@ -26,3 +28,76 @@ class MyApp extends App {
 }
 
 export default MyApp
+
+// Duplicated from gatstby-tinacms-git
+cms.registerApi('git', {
+  onSubmit(data) {
+    return commit(data)
+  },
+  onChange(data) {
+    writeToDisk(data)
+  },
+  onDelete(data) {
+    deleteFromDisk(data)
+  },
+  isAuthenticated() {
+    return true
+  },
+})
+
+let base = () => {
+  let { protocol, hostname, port } = window.location
+  return `${protocol}//${hostname}${port != '80' ? `:${port}` : ''}`
+}
+
+function commit(data) {
+  // @ts-ignore
+  return fetch(`${base()}/___tina/commit`, {
+    method: 'POST',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify(data),
+  })
+    .then(response => {
+      console.log(response.json())
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
+
+function writeToDisk(data) {
+  // @ts-ignore
+  return fetch(
+    `${base()}/___tina/${encodeURIComponent(data.fileRelativePath)}`,
+    {
+      method: 'PUT',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(data),
+    }
+  )
+    .then(response => {
+      console.log(response.json())
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
+
+function deleteFromDisk(data) {
+  return fetch(`${base()}/___tina/${encodeURIComponent(data.relPath)}`, {
+    method: 'DELETE',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+  })
+    .then(response => {
+      window.history.back()
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
