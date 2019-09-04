@@ -88,28 +88,32 @@ export const FormsView = () => {
                 >
                   Save
                 </SaveButton>
-                <MoreActions onClick={() => setActionMenuVisibility(!actionMenuVisibility)}></MoreActions>
-                <ActionMenu open={actionMenuVisibility}>
-                  {isFile && (
-                    <ActionButton
-                      onClick={() => {
-                        if (
-                          !confirm(
-                            `Are you sure you want to delete ${fileRelativePath}?`
-                          )
-                        ) {
-                          return
-                        }
-                        // @ts-ignore
-                        cms.api.git.onDelete!({
-                          relPath: fileRelativePath,
-                        })
-                      }}
-                    >
-                      Delete
-                    </ActionButton>
-                  )}
-                </ActionMenu>
+              
+                { isFile ?
+                  <>
+                  <MoreActions onClick={() => setActionMenuVisibility(!actionMenuVisibility)}></MoreActions>
+                  <ActionMenu open={actionMenuVisibility}>
+                  <ActionButton>Do Something</ActionButton>
+                  <ActionButton
+                    onClick={() => {
+                      if (
+                        !confirm(
+                          `Are you sure you want to delete ${fileRelativePath}?`
+                        )
+                      ) {
+                        return
+                      }
+                      // @ts-ignore
+                      cms.api.git.onDelete!({
+                        relPath: fileRelativePath,
+                      })
+                    }}
+                  >
+                    Delete
+                  </ActionButton>
+                  </ActionMenu>
+                  </>
+                : null }
               </FormsFooter>
             </>
           )
@@ -232,14 +236,14 @@ const ActionMenu = styled.div<{ open: boolean }>`
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  top: ${Padding}rem;
+  bottom: ${Padding}rem;
   right: ${Padding}rem;
-  transform: translate3d(0,-${Padding}rem,0) scale3d(0.5,0.5,1);
+  transform: translate3d(0,0,0) scale3d(0.5,0.5,1);
   opacity: 0;
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 100% 100%;
-  box-shadow: 0px 2px 3px rgba(48,48,48,0.15);
+  box-shadow: 0px 2px 3px rgba(48,48,48,0.15), 0px 4px 8px rgba(48,48,48,0.1);
   background-color: white;
   overflow: hidden;
   ${props =>
@@ -247,7 +251,7 @@ const ActionMenu = styled.div<{ open: boolean }>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0,-100%,0) scale3d(1,1,1);
+      transform: translate3d(0,-1.75rem,0) scale3d(1,1,1);
     `};
 `
 
