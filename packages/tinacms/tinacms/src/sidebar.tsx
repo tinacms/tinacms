@@ -58,7 +58,9 @@ export const Sidebar = ({
                   <MenuLink value={view.name} onClick={() => {
                     setActiveView(view)
                     setMenuVisibility(false)
-                  }}>{view.name}</MenuLink>
+                }}><svg width="24" height="24" viewBox="0 0 24 24" fill="none" xmlns="http://www.w3.org/2000/svg">
+                <path d="M22.7032 7.65455L18.4256 11.8839V9.32184L24 3.81029L22.7032 2.52811L18.4256 6.75748V0H16.5926V6.75522L12.3196 2.53037L11.0228 3.81029L16.5926 9.31731V11.8794L12.3196 7.65455L7.39819 2.78862V0H5.56525V2.80221L0 8.3047L1.2968 9.58688L5.56525 5.3643V7.92639L0 13.4311L1.2968 14.7111L5.56525 10.4907V24H7.39819V10.4772L11.6804 14.7111L12.9749 13.4289L7.39819 7.91506V5.35298L11.6804 9.58688V9.58461L16.5926 14.4437V24H18.4256V14.446L24 8.93673L22.7032 7.65455Z"/>
+                </svg> {view.name}</MenuLink>
                 ))}
               </MenuList>
             </FieldsWrapper>
@@ -147,10 +149,11 @@ const MenuLink = styled.div<{ value: string }>`
   color: #F2F2F2;
   font-size: 1.125rem;
   font-weight: 500;
-  padding: ${Padding}rem;
+  padding: ${Padding}rem ${Padding}rem ${Padding}rem 4rem;
   position: relative;
   cursor: pointer;
-  transition: all 75ms ease-out;
+  transition: all 85ms ease-out;
+  overflow: hidden;
   &:after {
     content: '';
     position: absolute;
@@ -159,15 +162,36 @@ const MenuLink = styled.div<{ value: string }>`
     width: 100%;
     height: 100%;
     background-color: #3E3E3E;
-    opacity: 0;
     z-index: -1;
-    transition: all 75ms ease-out;
+    transition: transform 85ms ease-out, opacity 85ms 85ms ease-out;
+    transform: translate3d(0,100%,0);
+    opacity: 0;
   }
   &:hover {
-    color: #2D9CDB;
+    color: #0084FF;
     &:after {
+      transform: translate3d(0,0,0);
+      transition: transform 85ms ease-out, opacity 0ms;
       opacity: 1;
     }
+    svg {
+      fill: #0084FF;
+    }
+    &~*{
+      &:after {
+        transform: translate3d(0,-100%,0);
+      }
+    }
+  }
+  svg {
+    position: absolute;
+    left: ${Padding}rem;
+    top: 50%;
+    transform: translate3d(0,-50%,0);
+    width: 1.75rem;
+    height: auto;
+    fill: #BDBDBD;
+    transition: all 85ms ease-out;
   }
 `
 
@@ -197,13 +221,11 @@ const SidebarHeader = styled.div`
   height: ${HeaderHeight}rem;
   padding: 0.75rem ${Padding}rem;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
-  /* border-bottom: 1px solid #efefef; */
 `
 
 const ForestryLogo = styled.div<{ url: string }>`
   height: ${HeaderHeight}rem;
   width: 2rem;
-  /* border-right: 1px solid #efefef; */
   background-image: url(${props => props.url});
   background-size: 2rem;
   background-repeat: no-repeat;
@@ -226,7 +248,7 @@ const ActionsToggle = styled.button<{ open: boolean }>`
   background-position: center left;
   background-repeat: no-repeat;
   background-size: ${p => (p.open ? '90%' : '100%')} auto;
-  transition: all 0.15s ease-out;
+  transition: all 75ms ease-out;
   &:hover {
     opacity: 0.6;
     cursor: pointer;
