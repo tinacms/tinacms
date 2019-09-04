@@ -5,20 +5,15 @@ import { loadMarkdown } from '@tinacms/next-tinacms-markdown'
 
 export default function PostIndex() {
   let posts = loadMarkdown(loadPosts())
+
   return (
     <>
       <h1>Posts</h1>
-      <HookExample />
       {posts.map(props => (
         <PostLink {...props} />
       ))}
     </>
   )
-}
-
-const HookExample = () => {
-  React.useEffect(() => console.log('test'))
-  return null
 }
 
 function PostLink({ document, slug, filename }) {
