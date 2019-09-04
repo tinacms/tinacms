@@ -161,12 +161,12 @@ const ActionsToggle = styled.button<{ open: boolean }>`
   background: transparent;
   outline: none;
   border: 0;
-  width: 1.5rem;
+  width: 1.25rem;
   height: ${HeaderHeight}rem;
   background-image: url(${p => (p.open ? CloseIcon : HamburgerMenu)});
   background-position: center left;
   background-repeat: no-repeat;
-  background-size: ${p => (p.open ? '80%' : '100%')} auto;
+  background-size: ${p => (p.open ? '90%' : '100%')} auto;
   transition: all 0.15s ease-out;
   &:hover {
     opacity: 0.6;
@@ -189,6 +189,14 @@ const RootElement = createGlobalStyle`
   }
   *, *:before, *:after {
     box-sizing: inherit;
+  }
+  hr {
+    border-color: #F2F2F2;
+    color: #F2F2F2;
+    margin-bottom: 1.5rem;
+    margin-left: -${Padding}rem;
+    margin-right: -${Padding}rem;
+    border-top: 1px solid #F2F2F2;
   }
 `
 
