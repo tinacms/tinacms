@@ -18,6 +18,8 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
+    "@tinacms/core": "^0.1.0-alpha.0",
+    "@tinacms/react-tinacms": "^0.1.0-alpha.0",
     "gray-matter": "4.0.2",
     "cms-scripts": "0.1.0-alpha.0"
   }
