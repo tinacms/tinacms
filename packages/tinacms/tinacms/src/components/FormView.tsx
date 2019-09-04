@@ -223,7 +223,7 @@ const CreateButton = styled.button`
   border: 0;
   border-radius: 0.5rem;
   box-shadow: 0px 2px 3px rgba(48,48,48,0.15);
-  background-color: #0085ff;
+  background-color: #0084FF;
   color: white;
   font-weight: 500;
   cursor: pointer;
@@ -268,7 +268,7 @@ export const SaveButton = styled.button`
   border: 0;
   border-radius: 0.5rem;
   box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
-  background-color: #0085ff;
+  background-color: #0084FF;
   color: white;
   font-weight: 500;
   cursor: pointer;
