@@ -1,28 +1,47 @@
-import React from 'react'
+import * as React from 'react'
 import matter from 'gray-matter'
 import Link from 'next/link'
+import { useCMSForm } from '@tinacms/react-tinacms'
 
-export default class PostIndex extends React.Component {
-  static async getInitialProps() {
-    return { posts: loadMarkdown(loadPosts()) }
-  }
-  render() {
-    return (
-      <>
-        <h1>Posts</h1>
-        {this.props.posts.map(({ document: { data }, slug, filename }) => (
-          <Link href={{ pathname: '/post', query: { id: slug } }} key={slug}>
-            <h2>
-              {data.title}
-              <small>{filename}</small>
-            </h2>
-          </Link>
-        ))}
-      </>
-    )
-  }
+export default function PostIndex() {
+  let posts = loadMarkdown(loadPosts())
+  return (
+    <>
+      <h1>Posts</h1>
+      <HookExample />
+      {posts.map(props => (
+        <PostLink {...props} />
+      ))}
+    </>
+  )
 }
 
+const HookExample = () => {
+  React.useEffect(() => console.log('test'))
+  return null
+}
+
+function PostLink({ document, slug, filename }) {
+  let [post] = useCMSForm({
+    initialValues: document,
+    label: 'Form',
+    fields: [
+      // TODO: Currently blows up if fields are added
+    ],
+    onSubmit() {
+      console.log('Hi')
+    },
+  })
+
+  return (
+    <Link href={{ pathname: '/post', query: { id: slug } }} key={slug}>
+      <h2>
+        {post.frontmatter.title}
+        <small>{filename}</small>
+      </h2>
+    </Link>
+  )
+}
 /**
  * Parses markdown files retrieved via webpack context.
  *
@@ -38,7 +57,10 @@ function loadMarkdown({ ctx, path }) {
     const document = matter(files[index])
     return {
       filename: `${path}/${filename.replace('./', '')}`,
-      document,
+      document: {
+        content: document.content,
+        frontmatter: document.data,
+      },
       slug,
     }
   })
