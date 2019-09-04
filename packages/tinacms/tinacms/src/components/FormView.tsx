@@ -183,6 +183,8 @@ export const DummyView: ScreenPlugin = {
   },
 }
 
+const EllipsisVertical = require('../assets/ellipsis-v.svg')
+
 const NoFormsPlaceholder = () => <p>There is nothing to edit on this page</p>
 
 const NoFieldsPlaceholder = () => (
@@ -195,7 +197,20 @@ const HeaderHeight = 4
 const Padding = 1.25
 
 const MoreButton = styled.button`
-  display: none;
+  height: 100%;
+  width: 2rem;
+  background-image: url(${EllipsisVertical});
+  background-position: center;
+  background-size: auto 1.125rem;
+  background-repeat: no-repeat;
+  margin-left: 0.75rem;
+  margin-right: -0.75rem;
+  border: none;
+  cursor: pointer;
+  transition: opacity 85ms ease-out;
+  &:hover {
+    opacity: 0.6;
+  }
 `
 
 const MoreMenu = styled.div`
@@ -206,7 +221,7 @@ const CreateButton = styled.button`
   text-align: center;
   width: 100%;
   border: 0;
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   box-shadow: 0px 2px 3px rgba(48,48,48,0.15);
   background-color: #0085ff;
   color: white;
@@ -214,7 +229,7 @@ const CreateButton = styled.button`
   cursor: pointer;
   font-size: 0.75rem;
   padding: 0.75rem;
-  transition: opacity 85ms;
+  transition: opacity 85ms ease-out;
   margin-bottom: ${Padding}rem;
   &:hover {
     opacity: 0.6;
@@ -251,7 +266,7 @@ export const SaveButton = styled.button`
   font-size: 0.75rem;
   padding: 0.75rem;
   border: 0;
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
   background-color: #0085ff;
   color: white;

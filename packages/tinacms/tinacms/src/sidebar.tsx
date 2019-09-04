@@ -75,7 +75,6 @@ export const Sidebar = ({
   )
 }
 
-const EllipsisVertical = require('../assets/ellipsis-v.svg')
 const HamburgerMenu = require('../assets/hamburger.svg')
 const CloseIcon = require('../assets/close.svg')
 const HeaderHeight = 4
@@ -274,7 +273,7 @@ const CreateButton = styled.button`
   text-align: center;
   width: 100%;
   border: 0;
-  border-radius: 0.3rem;
+  border-radius: 0.5rem;
   box-shadow: 0px 2px 3px rgba(48,48,48,0.15);
   background-color: #0085ff;
   color: white;

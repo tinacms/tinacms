@@ -48,6 +48,7 @@ const EditorToggle = styled.button<{ open: Boolean }>`
   background-image: url(${p => (p.open ? CloseIcon : OpenIcon)});
   background-repeat: no-repeat;
   background-position: center;
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
   transition: background 0.35s ease;
   cursor: pointer;
   &:hover {

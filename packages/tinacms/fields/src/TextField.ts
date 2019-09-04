@@ -15,7 +15,7 @@ export const TextField = styled.input<{ error?: boolean }>`
   border-width: 1px;
   border-style: solid;
   border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
-  border-radius: 0.3rem;
+  border-radius: 0.25rem;
   width: 100%;
   font-size: 0.9rem;
   padding: 0.75rem;
