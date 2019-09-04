@@ -71,12 +71,12 @@ export function useMarkdownForm(
         fileRelativePath: data.path,
         content: toMarkdownString(data),
       })
-      // return await cms.api.git.onSubmit!({
-      //   files: [data.path],
-      //   message: data.__commit_message || 'xeditor commit',
-      //   name: data.__commit_name,
-      //   email: data.__commit_email,
-      // })
+      return await cms.api.git.onSubmit!({
+        files: [data.path],
+        message: data.__commit_message || 'commit from tina',
+        name: data.__commit_name,
+        email: data.__commit_email || 'ncphillips.19@gmail.com',
+      })
     },
     ...formOverrrides,
   })
