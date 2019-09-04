@@ -3,6 +3,7 @@ const path = require('path')
 const rollup = require('rollup')
 const rollupTypescript = require('rollup-plugin-typescript2')
 const rollupCommonJs = require('rollup-plugin-commonjs')
+const postcss = require('rollup-plugin-postcss')
 const typescript = require('typescript')
 
 // Source https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/bin/react-scripts.js#L11-L16
@@ -68,6 +69,7 @@ function createBuildOptions() {
       })
     },
     plugins: [
+      postcss({}),
       rollupTypescript({
         typescript,
         tsconfig: path.join(absolutePath, 'tsconfig.json'),
