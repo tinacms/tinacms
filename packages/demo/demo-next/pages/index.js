@@ -25,9 +25,7 @@ function PostLink({ document, slug, filename }) {
   let [post] = useCMSForm({
     initialValues: document,
     label: 'Form',
-    fields: [
-      // TODO: Currently blows up if fields are added
-    ],
+    fields: [{ name: 'frontmatter.title', component: 'text', label: 'Title' }],
     onSubmit() {
       console.log('Hi')
     },
