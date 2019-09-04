@@ -1,7 +1,7 @@
 import * as React from 'react'
-import matter from 'gray-matter'
 import Link from 'next/link'
 import { useCMSForm } from '@tinacms/react-tinacms'
+import { loadMarkdown } from '@tinacms/next-tinacms-markdown'
 
 export default function PostIndex() {
   let posts = loadMarkdown(loadPosts())
@@ -40,29 +40,6 @@ function PostLink({ document, slug, filename }) {
     </Link>
   )
 }
-/**
- * Parses markdown files retrieved via webpack context.
- *
- * TODO: Some form of this could be generic.
- */
-function loadMarkdown({ ctx, path }) {
-  // Get posts from folder
-  const filenames = ctx.keys()
-  const files = filenames.map(ctx)
-
-  return filenames.map((filename, index) => {
-    const slug = slugify(filename)
-    const document = matter(files[index])
-    return {
-      filename: `${path}/${filename.replace('./', '')}`,
-      document: {
-        content: document.content,
-        frontmatter: document.data,
-      },
-      slug,
-    }
-  })
-}
 
 /**
  * Loads markdown files from the `posts` directory.
@@ -78,15 +55,4 @@ function loadPosts() {
     path: 'posts',
     ctx: require.context('../posts', true, /\.md$/),
   }
-}
-
-/**
- * Generates a slug based on the filename
- */
-function slugify(filename) {
-  return filename
-    .replace(/^.*[\\\/]/, '')
-    .split('.')
-    .slice(0, -1)
-    .join('.')
 }
