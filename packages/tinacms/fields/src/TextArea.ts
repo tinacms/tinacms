@@ -22,12 +22,17 @@ export const TextArea = styled.textarea<{ error?: boolean }>`
   padding: 0.75rem;
   margin: 0;
   outline: none;
-  transition: border 0.2s ease;
   resize: vertical;
   line-height: 1.35;
+  transition: all 150ms ease-out;
+
+  &:hover {
+    background-color: #F2F2F2;
+  }
 
   &:focus {
     border-color: #333333;
+    background-color: #F8F8F8;
   }
 
   &::placeholder {

@@ -11,13 +11,11 @@ import { TextField } from '@tinacms/fields'
 export const Sidebar = ({
   title = 'XEditor',
   logo = ForestryLogo,
-  open = true,
-  width = 340
+  open = true
 }: {
   title?: string
   logo?: string
   open?: boolean
-  width?: number
 }) => {
   const cms = useCMS()
   useSubscribable(cms.screens)
@@ -25,10 +23,13 @@ export const Sidebar = ({
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <SidebarContainer open={open} width={width}>
+    <SidebarContainer open={open}>
       <StyledFrame
         frameStyles={{
-          width: '100%',
+          position: 'absolute',
+          right: '0',
+          top: '0',
+          width: '340px',
           height: '100%',
           margin: '0',
           padding: '0',
@@ -80,6 +81,64 @@ const CloseIcon = require('../assets/close.svg')
 const HeaderHeight = 4
 const Padding = 1.25
 
+const RootElement = createGlobalStyle`
+  @import url('https://rsms.me/inter/inter.css');
+  html {
+    font-family: 'Inter', sans-serif;
+    font-size: 16px;
+    box-sizing: border-box;
+  }
+  @supports (font-variation-settings: normal) {
+    html { font-family: 'Inter var', sans-serif; }
+  }
+  body {
+    margin: 0;
+    padding: 0;
+  }
+  *, *:before, *:after {
+    box-sizing: inherit;
+  }
+  hr {
+    border-color: #F2F2F2;
+    color: #F2F2F2;
+    margin-bottom: 1.5rem;
+    margin-left: -${Padding}rem;
+    margin-right: -${Padding}rem;
+    border-top: 1px solid #F2F2F2;
+  }
+`
+
+const CreateContentButton = ({ plugin }: any) => {
+  let cms = useCMS()
+  let [postName, setPostName] = React.useState('')
+  let [open, setOpen] = React.useState(false)
+  return (
+    <div>
+      <CreateButton onClick={() => setOpen(p => !p)}>{plugin.name}</CreateButton>
+      {open && (
+        <Modal>
+          <ModalHeader>Create</ModalHeader>
+          <ModalBody>
+            <TextField
+              onChange={e => setPostName(e.target.value)}
+              value={postName}
+            />
+
+            <SaveButton
+              onClick={() => {
+                plugin.onSubmit(postName, cms)
+                setOpen(false)
+              }}
+            >
+              Save
+            </SaveButton>
+          </ModalBody>
+        </Modal>
+      )}
+    </div>
+  )
+}
+
 const MenuList = styled.div`
   margin: 2rem -${Padding}rem 2rem -${Padding}rem;
   display: block;
@@ -92,6 +151,7 @@ const MenuLink = styled.div<{ value: string }>`
   padding: ${Padding}rem;
   position: relative;
   cursor: pointer;
+  transition: all 75ms ease-out;
   &:after {
     content: '';
     position: absolute;
@@ -105,14 +165,14 @@ const MenuLink = styled.div<{ value: string }>`
     transition: all 75ms ease-out;
   }
   &:hover {
+    color: #2D9CDB;
     &:after {
       opacity: 1;
     }
   }
 `
 
-const SidebarContainer = styled.div<{ open: boolean, width: number }>`
-  width: 100%;
+const SidebarContainer = styled.div<{ open: boolean }>`
   height: 100%;
   margin: 0;
   padding: 0;
@@ -120,11 +180,11 @@ const SidebarContainer = styled.div<{ open: boolean, width: number }>`
   border-right: 1px solid #efefef;
   z-index: 1;
   background-color: white;
-  transition: transform ${p => (p.open ? 150 : 200)}ms ease-out;
+  transition: all ${p => (p.open ? 150 : 200)}ms ease-out;
   transform: translate3d(${p => (p.open ? '0' : '-100%')}, 0, 0);
   position: relative;
   display: block;
-  width: ${props => props.width || 340}px;
+  flex: 0 0 ${p => (p.open ? '340px' : '0')};
 `
 
 const SidebarHeader = styled.div`
@@ -173,32 +233,6 @@ const ActionsToggle = styled.button<{ open: boolean }>`
     cursor: pointer;
   }
 `
-const RootElement = createGlobalStyle`
-  @import url('https://rsms.me/inter/inter.css');
-  html {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    box-sizing: border-box;
-  }
-  @supports (font-variation-settings: normal) {
-    html { font-family: 'Inter var', sans-serif; }
-  }
-  body {
-    margin: 0;
-    padding: 0;
-  }
-  *, *:before, *:after {
-    box-sizing: inherit;
-  }
-  hr {
-    border-color: #F2F2F2;
-    color: #F2F2F2;
-    margin-bottom: 1.5rem;
-    margin-left: -${Padding}rem;
-    margin-right: -${Padding}rem;
-    border-top: 1px solid #F2F2F2;
-  }
-`
 
 const FieldsWrapper = styled.div`
   position: absolute;
@@ -235,37 +269,6 @@ const MenuPanel = styled.div<{ visible: boolean }>`
     list-style: none;
   }
 `
-
-const CreateContentButton = ({ plugin }: any) => {
-  let cms = useCMS()
-  let [postName, setPostName] = React.useState('')
-  let [open, setOpen] = React.useState(false)
-  return (
-    <div>
-      <CreateButton onClick={() => setOpen(p => !p)}>{plugin.name}</CreateButton>
-      {open && (
-        <Modal>
-          <ModalHeader>Create</ModalHeader>
-          <ModalBody>
-            <TextField
-              onChange={e => setPostName(e.target.value)}
-              value={postName}
-            />
-
-            <SaveButton
-              onClick={() => {
-                plugin.onSubmit(postName, cms)
-                setOpen(false)
-              }}
-            >
-              Save
-            </SaveButton>
-          </ModalBody>
-        </Modal>
-      )}
-    </div>
-  )
-}
 
 const CreateButton = styled.button`
   text-align: center;
