@@ -1,91 +1,72 @@
 import React from 'react'
+import matter from 'gray-matter'
 import Link from 'next/link'
-import Head from 'next/head'
-import Nav from '../components/nav'
 
-const Home = () => (
-  <div>
-    <Head>
-      <title>Home</title>
-    </Head>
+export default class PostIndex extends React.Component {
+  static async getInitialProps() {
+    return { posts: loadMarkdown(loadPosts()) }
+  }
+  render() {
+    return (
+      <>
+        <h1>Posts</h1>
+        {this.props.posts.map(({ document: { data }, slug, filename }) => (
+          <Link href={{ pathname: '/post', query: { id: slug } }} key={slug}>
+            <h2>
+              {data.title}
+              <small>{filename}</small>
+            </h2>
+          </Link>
+        ))}
+      </>
+    )
+  }
+}
 
-    <Nav />
+/**
+ * Parses markdown files retrieved via webpack context.
+ *
+ * TODO: Some form of this could be generic.
+ */
+function loadMarkdown({ ctx, path }) {
+  // Get posts from folder
+  const filenames = ctx.keys()
+  const files = filenames.map(ctx)
 
-    <div className='hero'>
-      <h1 className='title'>Welcome to Next.js!</h1>
-      <p className='description'>
-        To get started, edit <code>pages/index.js</code> and save to reload.
-      </p>
+  return filenames.map((filename, index) => {
+    const slug = slugify(filename)
+    const document = matter(files[index])
+    return {
+      filename: `${path}/${filename.replace('./', '')}`,
+      document,
+      slug,
+    }
+  })
+}
 
-      <div className='row'>
-        <Link href='https://github.com/zeit/next.js#setup'>
-          <a className='card'>
-            <h3>Getting Started &rarr;</h3>
-            <p>Learn more about Next.js on GitHub and in their examples.</p>
-          </a>
-        </Link>
-        <Link href='https://github.com/zeit/next.js/tree/master/examples'>
-          <a className='card'>
-            <h3>Examples &rarr;</h3>
-            <p>Find other example boilerplates on the Next.js GitHub.</p>
-          </a>
-        </Link>
-        <Link href='https://github.com/zeit/next.js'>
-          <a className='card'>
-            <h3>Create Next App &rarr;</h3>
-            <p>Was this tool helpful? Let us know how we can improve it!</p>
-          </a>
-        </Link>
-      </div>
-    </div>
+/**
+ * Loads markdown files from the `posts` directory.
+ *
+ * This is an example of a user-defined function. It cannot be more generic
+ * because the path _must_ be inlined in the `require.context`.
+ *
+ * The filenames are relative to `../posts`, so we have to include the root
+ * information.
+ */
+function loadPosts() {
+  return {
+    path: 'posts',
+    ctx: require.context('../posts', true, /\.md$/),
+  }
+}
 
-    <style jsx>{`
-      .hero {
-        width: 100%;
-        color: #333;
-      }
-      .title {
-        margin: 0;
-        width: 100%;
-        padding-top: 80px;
-        line-height: 1.15;
-        font-size: 48px;
-      }
-      .title,
-      .description {
-        text-align: center;
-      }
-      .row {
-        max-width: 880px;
-        margin: 80px auto 40px;
-        display: flex;
-        flex-direction: row;
-        justify-content: space-around;
-      }
-      .card {
-        padding: 18px 18px 24px;
-        width: 220px;
-        text-align: left;
-        text-decoration: none;
-        color: #434343;
-        border: 1px solid #9b9b9b;
-      }
-      .card:hover {
-        border-color: #067df7;
-      }
-      .card h3 {
-        margin: 0;
-        color: #067df7;
-        font-size: 18px;
-      }
-      .card p {
-        margin: 0;
-        padding: 12px 0 0;
-        font-size: 13px;
-        color: #333;
-      }
-    `}</style>
-  </div>
-)
-
-export default Home
+/**
+ * Generates a slug based on the filename
+ */
+function slugify(filename) {
+  return filename
+    .replace(/^.*[\\\/]/, '')
+    .split('.')
+    .slice(0, -1)
+    .join('.')
+}
