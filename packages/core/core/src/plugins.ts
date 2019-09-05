@@ -3,6 +3,7 @@ import { Subscribable } from './subscribable'
 export interface Plugin {
   __type: string
   name: string
+  icon?: string
 }
 
 export class PluginManager {
