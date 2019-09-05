@@ -5,7 +5,7 @@ export const Hamburger = () => (
     width="20"
     height="16"
     viewBox="0 0 20 16"
-    fill="#828282"
+    fill="inherit"
     xmlns="http://www.w3.org/2000/svg"
   >
     <path d="M0 2H20V0H0V2Z" />
