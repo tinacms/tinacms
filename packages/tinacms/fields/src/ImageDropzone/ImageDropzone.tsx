@@ -2,7 +2,11 @@ import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
 
-const getColor = (props: any) => {
+interface ImageDropzoneProps {
+  onDrop: (acceptedFiles: any[]) => void
+}
+
+const getBorderColor = (props: any) => {
   if (props.isDragAccept) {
     return '#00e676'
   }
@@ -23,7 +27,7 @@ const Container = styled.div`
   padding: 20px;
   border-width: 2px;
   border-radius: 2px;
-  border-color: ${props => getColor(props)};
+  border-color: ${props => getBorderColor(props)};
   border-style: dashed;
   background-color: #fafafa;
   color: #bdbdbd;
@@ -31,14 +35,14 @@ const Container = styled.div`
   transition: border 0.24s ease-in-out;
 `
 
-export const ImageDropzone = (props: any) => {
+export const ImageDropzone = ({ onDrop }: ImageDropzoneProps) => {
   const {
     getRootProps,
     getInputProps,
     isDragActive,
     isDragAccept,
     isDragReject,
-  } = useDropzone({ accept: 'image/*' })
+  } = useDropzone({ accept: 'image/*', onDrop })
 
   return (
     <div className="container">
