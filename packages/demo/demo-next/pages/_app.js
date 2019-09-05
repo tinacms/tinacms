@@ -47,7 +47,7 @@ cms.registerApi('git', {
 
 let base = () => {
   let { protocol, hostname, port } = window.location
-  return `${protocol}//${hostname}${port != '80' ? `:${port}` : ''}`
+  return `${protocol}//${hostname}${port != '80' ? `:${port}` : ''}/api`
 }
 
 function commit(data) {
