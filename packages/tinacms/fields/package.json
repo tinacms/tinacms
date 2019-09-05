@@ -39,6 +39,7 @@
     "@types/react-select": "^2.0.11",
     "color-string": "^1.5.3",
     "react-color": "^2.17.3",
+    "react-dropzone": "10.1.8",
     "react-select": "^2.3.0",
     "styled-components": "^4.3.2"
   },

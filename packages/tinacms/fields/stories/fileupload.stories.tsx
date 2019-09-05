@@ -1,6 +1,5 @@
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { FileUpload } from '../src/FileUpload'
+import { ImageDropzone } from '../src/ImageDropzone'
 
-storiesOf('Fileupload', module)
-  .add('Default', () => <FileUpload />)
+storiesOf('Fileupload', module).add('Default', () => <ImageDropzone />)
