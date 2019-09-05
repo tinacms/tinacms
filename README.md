@@ -8,6 +8,9 @@
   - [Gatsby Starter](./gatsby/starter-setup.md)
   - [Manual Setup](./gatsby/manual-setup.md)
 - [Contributing](./CONTRIBUTING.md)
+  - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
+  - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
+  - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
 
 ## Development
 

@@ -20,7 +20,7 @@ let base = `${protocol}//${hostname}${port != '80' ? `:${port}` : ''}`
 
 function commit(data: any) {
   // @ts-ignore
-  return fetch(`${base}/x-server/commit`, {
+  return fetch(`${base}/___tina/commit`, {
     method: 'POST',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',
@@ -37,16 +37,13 @@ function commit(data: any) {
 
 function writeToDisk(data: any) {
   // @ts-ignore
-  return fetch(
-    `${base}/x-server/${encodeURIComponent(data.fileRelativePath)}`,
-    {
-      method: 'PUT',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify(data),
-    }
-  )
+  return fetch(`${base}/___tina/${encodeURIComponent(data.fileRelativePath)}`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify(data),
+  })
     .then(response => {
       console.log(response.json())
     })
@@ -56,7 +53,7 @@ function writeToDisk(data: any) {
 }
 
 function deleteFromDisk(data: any) {
-  return fetch(`${base}/x-server/${encodeURIComponent(data.relPath)}`, {
+  return fetch(`${base}/___tina/${encodeURIComponent(data.relPath)}`, {
     method: 'DELETE',
     headers: {
       'Content-Type': 'application/json; charset=utf-8',

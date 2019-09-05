@@ -56,7 +56,7 @@ export class GitlabAPI {
         },
         body: JSON.stringify({
           branch: 'master',
-          commit_message: 'Update from xeditor',
+          commit_message: 'Update from Tina',
           actions: [
             {
               action: 'update',

@@ -1,20 +1,8 @@
 import * as React from 'react'
-import { CMSContext } from '@tinacms/react-tinacms'
-import { SidebarProvider, ModalProvider, useSidebar } from '@tinacms/tinacms'
-import { cms } from './index'
-import styled from 'styled-components'
+import { Tina } from '@tinacms/tinacms'
 
 export const wrapRootElement = ({ element }: any, options: any) => {
-  return (
-    <CMSContext.Provider value={cms}>
-      <ModalProvider>
-        <SidebarProvider title={options.title} logo={options.logo}>
-          {element}
-          <SidebarToggle />
-        </SidebarProvider>
-      </ModalProvider>
-    </CMSContext.Provider>
-  )
+  return <Tina>{element}</Tina>
 }
 
 function SidebarToggle() {

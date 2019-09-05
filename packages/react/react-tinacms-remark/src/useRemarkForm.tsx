@@ -45,7 +45,7 @@ export function useRemarkForm(
         if (process.env.NODE_ENV === 'development') {
           return cms.api.git.onSubmit!({
             files: [data.fields.fileRelativePath],
-            message: data.__commit_message || 'xeditor commit',
+            message: data.__commit_message || 'Tina commit',
             name: data.__commit_name,
             email: data.__commit_email,
           })

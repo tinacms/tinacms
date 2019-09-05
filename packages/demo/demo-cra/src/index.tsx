@@ -3,15 +3,12 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import { CMS } from '@tinacms/core'
-import { CMSContext, CMS } from '@tinacms/react-tinacms'
-
-let cms = new CMS()
+import { Tina } from '@tinacms/tinacms'
 
 ReactDOM.render(
-  <CMSContext.Provider value={cms}>
+  <Tina>
     <App />
-  </CMSContext.Provider>,
+  </Tina>,
   document.getElementById('root')
 )
 

@@ -9,7 +9,7 @@ import { Modal, ModalHeader, ModalBody } from './modalProvider'
 import { TextField } from '@tinacms/fields'
 
 export const Sidebar = ({
-  title = 'XEditor',
+  title = 'Tina',
   logo = ForestryLogo,
   open = true
 }: {

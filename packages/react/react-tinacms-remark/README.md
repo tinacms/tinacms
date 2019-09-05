@@ -1,4 +1,4 @@
-# Remark Adapter for Xeditor Gatsby Plugin
+# Remark Adapter for Tina Gatsby Plugin
 
 This library makes it easy to edit content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin. There are two ways to register remark forms with the CMS, depending on how your React template is setup.
 
