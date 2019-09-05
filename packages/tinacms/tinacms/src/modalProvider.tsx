@@ -64,8 +64,9 @@ export const Modal = ({
             height: '100vh',
             width: '100vw',
             margin: '0 auto',
-            position: 'absolute',
-            zIndex: 999,
+            position: 'fixed',
+            zIndex: 1001,
+            border: 0,
           }}
         >
           <ModalOverlay>
