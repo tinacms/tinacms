@@ -339,7 +339,7 @@ export const SaveButton = styled.button`
   flex: 1 0 auto;
   text-align: center;
   font-size: 0.75rem;
-  padding: 0.75rem;
+  padding: 0.75rem 1.5rem;
   border: 0;
   border-radius: 0.5rem;
   box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
