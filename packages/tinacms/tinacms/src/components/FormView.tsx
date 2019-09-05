@@ -6,6 +6,7 @@ import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { TextField } from '@tinacms/fields'
 import { Modal, ModalBody, ModalHeader } from '..'
+import { EllipsisVertical } from './icons/EllipsisVertical'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -61,8 +62,7 @@ export const FormsView = () => {
           let isFile, fileRelativePath: any
           try {
             //@ts-ignore
-            fileRelativePath = form.getState().values!.fields!
-              .fileRelativePath
+            fileRelativePath = form.getState().values!.fields!.fileRelativePath
             isFile = true
           } catch (e) {
             isFile = false
@@ -82,38 +82,39 @@ export const FormsView = () => {
                   ))}
               </FieldsWrapper>
               <FormsFooter>
-                <SaveButton
-                  onClick={() => handleSubmit()}
-                  disabled={pristine}
-                >
+                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
-              
-                { isFile ?
+
+                {isFile ? (
                   <>
-                  <MoreActions onClick={() => setActionMenuVisibility(!actionMenuVisibility)}></MoreActions>
-                  <ActionMenu open={actionMenuVisibility}>
-                  <ActionButton>Do Something</ActionButton>
-                  <ActionButton
-                    onClick={() => {
-                      if (
-                        !confirm(
-                          `Are you sure you want to delete ${fileRelativePath}?`
-                        )
-                      ) {
-                        return
+                    <MoreActions
+                      onClick={() =>
+                        setActionMenuVisibility(!actionMenuVisibility)
                       }
-                      // @ts-ignore
-                      cms.api.git.onDelete!({
-                        relPath: fileRelativePath,
-                      })
-                    }}
-                  >
-                    Delete
-                  </ActionButton>
-                  </ActionMenu>
+                    ></MoreActions>
+                    <ActionMenu open={actionMenuVisibility}>
+                      <ActionButton>Do Something</ActionButton>
+                      <ActionButton
+                        onClick={() => {
+                          if (
+                            !confirm(
+                              `Are you sure you want to delete ${fileRelativePath}?`
+                            )
+                          ) {
+                            return
+                          }
+                          // @ts-ignore
+                          cms.api.git.onDelete!({
+                            relPath: fileRelativePath,
+                          })
+                        }}
+                      >
+                        Delete
+                      </ActionButton>
+                    </ActionMenu>
                   </>
-                : null }
+                ) : null}
               </FormsFooter>
             </>
           )
@@ -129,7 +130,9 @@ const CreateContentButton = ({ plugin }: any) => {
   let [open, setOpen] = React.useState(false)
   return (
     <div>
-      <CreateButton onClick={() => setOpen(p => !p)}>{plugin.name}</CreateButton>
+      <CreateButton onClick={() => setOpen(p => !p)}>
+        {plugin.name}
+      </CreateButton>
       {open && (
         <Modal>
           <ModalHeader>Create</ModalHeader>
@@ -198,8 +201,6 @@ export const SettingsView: ScreenPlugin = {
   },
 }
 
-const EllipsisVertical = require('../assets/ellipsis-v.svg')
-
 const NoFormsPlaceholder = () => <p>There is nothing to edit on this page</p>
 
 const NoFieldsPlaceholder = () => (
@@ -211,11 +212,14 @@ const FormsFooterHeight = 4
 const HeaderHeight = 4
 const Padding = 1.25
 
-const MoreActions = styled.button`
+const MoreActions = styled(p => (
+  <button {...p}>
+    <EllipsisVertical />
+  </button>
+))`
   height: 100%;
   width: 2rem;
   background-color: transparent;
-  background-image: url(${EllipsisVertical});
   background-position: center;
   background-size: auto 1.125rem;
   background-repeat: no-repeat;
@@ -238,12 +242,13 @@ const ActionMenu = styled.div<{ open: boolean }>`
   position: absolute;
   bottom: ${Padding}rem;
   right: ${Padding}rem;
-  transform: translate3d(0,0,0) scale3d(0.5,0.5,1);
+  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 100% 100%;
-  box-shadow: 0px 2px 3px rgba(48,48,48,0.15), 0px 4px 8px rgba(48,48,48,0.1);
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
+    0px 4px 8px rgba(48, 48, 48, 0.1);
   background-color: white;
   overflow: hidden;
   ${props =>
@@ -251,7 +256,7 @@ const ActionMenu = styled.div<{ open: boolean }>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0,-1.75rem,0) scale3d(1,1,1);
+      transform: translate3d(0, -1.75rem, 0) scale3d(1, 1, 1);
     `};
 `
 
@@ -276,7 +281,7 @@ const ActionButton = styled.button`
     left: 0;
     opacity: 0;
     transition: opacity 75ms ease-out;
-    background-color: #F8F8F8;
+    background-color: #f8f8f8;
     z-index: -1;
   }
   &:hover {
@@ -294,8 +299,8 @@ const CreateButton = styled.button`
   width: 100%;
   border: 0;
   border-radius: 0.5rem;
-  box-shadow: 0px 2px 3px rgba(48,48,48,0.15);
-  background-color: #0084FF;
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  background-color: #0084ff;
   color: white;
   font-weight: 500;
   cursor: pointer;
@@ -341,7 +346,7 @@ export const SaveButton = styled.button`
   border: 0;
   border-radius: 0.5rem;
   box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
-  background-color: #0084FF;
+  background-color: #0084ff;
   color: white;
   font-weight: 500;
   cursor: pointer;
