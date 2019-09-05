@@ -244,7 +244,7 @@ const SiteName = styled.h3`
 `
 
 const ActionsToggle = styled(p => (
-  <button>{p.open ? <Close /> : <Hamburger />}</button>
+  <button {...p}>{p.open ? <Close /> : <Hamburger />}</button>
 ))`
   background: transparent;
   outline: none;
