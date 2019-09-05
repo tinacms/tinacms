@@ -34,9 +34,8 @@ export const Swatch = styled(
     </div>
   )
 )`
-  padding: 0.5rem;
   background: #fff;
-  border-radius: 0.3rem;
+  border-radius: 0.25rem;
   box-shadow: 0 0 0 1px #dedede;
   cursor: pointer;
   width: 100%;
@@ -51,7 +50,7 @@ export const Swatch = styled(
     font-weight: bold;
 
     width: 100%;
-    height: 2rem;
+    height: 2.5rem;
     border-radius: 0.15rem;
     background: ${props =>
       props.colorRGBA

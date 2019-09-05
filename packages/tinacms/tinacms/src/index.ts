@@ -9,14 +9,14 @@ import {
   ColorPickerField,
   ToggleField,
 } from './fields'
+import { MediaView, SettingsView } from './components/FormView'
 import { CMS, Plugin } from '@tinacms/core'
-import { FormsView, DummyView } from './views/FormView'
 
 export const cms = new CMS()
 
 // View Plugins
-cms.screens.add(FormsView)
-cms.screens.add(DummyView)
+cms.screens.add(MediaView)
+cms.screens.add(SettingsView)
 
 // Field Plugins
 cms.fields.add({
