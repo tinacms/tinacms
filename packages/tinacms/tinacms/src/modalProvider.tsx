@@ -114,7 +114,7 @@ export const ModalInner = styled.div`
   z-index: 1;
   overflow: visible; /* Keep this as "visible", select component needs to overflow */
   background-color: #fefefe;
-  border-radius: 0.3rem;
+  border-radius: 0.25rem;
   margin: auto;
   width: 460px;
   max-width: 90%;
