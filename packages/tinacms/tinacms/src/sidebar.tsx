@@ -246,15 +246,16 @@ const SiteName = styled.h3`
 const ActionsToggle = styled(p => (
   <button {...p}>{p.open ? <Close /> : <Hamburger />}</button>
 ))`
+  padding: 0 ${Padding}rem;
+  margin-left: -${Padding}rem;
   background: transparent;
   outline: none;
   border: 0;
-  width: 1.25rem;
+  text-align: left;
+  width: 3rem;
   height: ${HeaderHeight}rem;
-  background-position: center left;
-  background-repeat: no-repeat;
-  background-size: ${p => (p.open ? '90%' : '100%')} auto;
   transition: all 75ms ease-out;
+  fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
   &:hover {
     opacity: 0.6;
     cursor: pointer;
