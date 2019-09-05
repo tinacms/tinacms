@@ -181,7 +181,7 @@ component: 'text'
 
 ### Textarea Input
 
-component: 'text'
+component: 'textarea'
 
 ### Date Input
 
