@@ -12,7 +12,7 @@ module.exports = {
     {
       resolve: "@tinacms/gatsby-plugin-tinacms",
       options: {
-        title: "XEditor Gatsby Demo",
+        title: "Tina Gatsby Demo",
         logo:
           "https://seeklogo.com/images/G/gatsby-logo-1A245AD37F-seeklogo.com.png",
         plugins: [

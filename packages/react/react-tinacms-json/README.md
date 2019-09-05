@@ -1,1 +1,1 @@
-# Gatsby Xeditor JSON
+# Gatsby Tina JSON

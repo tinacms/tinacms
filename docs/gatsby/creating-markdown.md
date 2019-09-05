@@ -8,7 +8,7 @@ Creating new Markdown files is made possible by two plugins:
 
 ## Creating Content-Button Plugins
 
-XEditor uses `content-button` plugins to render buttons at the top of the xeditor sidebar. These buttons are used for creating new content in the CMS. The `createRemarkButton` function helps us constructs `content-button` plugins for creating markdown files.
+Tina uses `content-button` plugins to render buttons at the top of the Tina sidebar. These buttons are used for creating new content in the CMS. The `createRemarkButton` function helps us constructs `content-button` plugins for creating markdown files.
 
 ```javascript
 import { createRemarkButton } from '@tinacms/react-tinacms-remark'
@@ -87,7 +87,7 @@ const CreatePostButton = createRemarkButton({
 ### Only show on the Blog index
 
 In this example, we use the `withPlugin` higher order component from `@tinacms/react-tinacms` to add the button
-to the XEditor when visiting the blog index page.
+to the Tina when visiting the blog index page.
 
 **Example: src/pages/index.js**
 

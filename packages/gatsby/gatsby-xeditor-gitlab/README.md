@@ -1,6 +1,6 @@
 # @tinacms/gatsby-tinacms-cms
 
-A Gatsby plugin for using the Gitlab API with an Xeditor CMS
+A Gatsby plugin for using the Gitlab API with an Tina CMS
 
 ## Installation
 
