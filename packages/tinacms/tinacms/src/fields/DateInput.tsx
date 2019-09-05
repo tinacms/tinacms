@@ -48,6 +48,8 @@ export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   }
 )
 
+//TODO - this is basically a rip from our TextField styledComponents component. It would be be good
+// if we could reuse those styles instead of having a duplicate.
 const DatetimeContainer = styled.div`
   input {
     background-color: #f8f8f8;
