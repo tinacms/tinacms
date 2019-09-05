@@ -92,9 +92,10 @@ to the Tina when visiting the blog index page.
 **Example: src/pages/index.js**
 
 ```jsx
-import { usePlugin } from '@tinacms/react-tinacms'
+import { withPlugin } from '@tinacms/react-tinacms'
 import { createRemarkButton } from '@tinacms/react-tinacms-remark'
 
+// Note: this is just an example index component.
 function BlogIndex(props) {
   const { data } = props
   const posts = data.allMarkdownRemark.edges
