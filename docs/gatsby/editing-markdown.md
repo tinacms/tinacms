@@ -33,7 +33,7 @@ module.exports = {
 
 ## Creating Remark Forms
 
-The `remarkForm` [higher-order component](https://reactjs.org/docs/higher-order-components.html) (HOC) let's us register forms with `xeditor`. In order for it to work with your template, 3 fields must be included in the `markdownRemark` query:
+The `remarkForm` [higher-order component](https://reactjs.org/docs/higher-order-components.html) (HOC) let's us register forms with `Tina`. In order for it to work with your template, 3 fields must be included in the `markdownRemark` query:
 
 - `id`
 - `fields.fileRelativePath`
@@ -126,7 +126,7 @@ export default remarkForm(BlogPostTemplate, BlogPostForm)
 
 ## Editing Content
 
-With the Remark Form created, you can now edit the files in the XEditor sidebar. Changes to the form
+With the Remark Form created, you can now edit the files in the Tina sidebar. Changes to the form
 will be written back to the markdown files in real time.
 
 **Why write to disk "on change"?**

@@ -1,4 +1,4 @@
-# GitLab Connector for Xeditor CMS
+# GitLab Connector for Tina CMS
 
 Supports GitLab v4 api
 

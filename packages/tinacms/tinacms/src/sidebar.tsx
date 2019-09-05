@@ -5,7 +5,7 @@ import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
 
 export const Sidebar = ({
-  title = 'XEditor',
+  title = 'Tina',
   logo = ForestryLogo,
 }: {
   title?: string

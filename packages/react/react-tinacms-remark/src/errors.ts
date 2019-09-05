@@ -4,7 +4,7 @@ export const ERROR_MISSING_CMS_GATSBY =
   ERROR_MISSING_CMS +
   `
 
-1. The xeditor-cms may not be listed in the gatsby-config.js plugins array
+1. Tina may not be listed in the gatsby-config.js plugins array
 
 module.exports = {
   plugins: [

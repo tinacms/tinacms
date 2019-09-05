@@ -1,6 +1,6 @@
 # @tinacms/gatsby-plugin-tinacms
 
-A Gatsby plugin for the XEditor CMS.
+A Gatsby plugin for the Tina CMS.
 
 ## Installation
 

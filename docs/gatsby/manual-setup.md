@@ -1,6 +1,6 @@
 # Manual Setup
 
-This is a guide on how to setup the XEditor CMS on an existing Gatsby site.
+This is a guide on how to setup the Tina CMS on an existing Gatsby site.
 
 ## Installation
 
