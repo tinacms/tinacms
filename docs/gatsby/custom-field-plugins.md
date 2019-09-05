@@ -15,6 +15,8 @@ First create the React component that accepts three props:
 **src/components/EmailField.js**
 
 ```javascript
+import React from 'react'
+
 export function EmailField({ input, meta, field }) {
   return (
     <div>
@@ -36,7 +38,7 @@ import { cms } from '@tinacms/gatsby-plugin-tinacms'
 import { EmailField } from './src/components/EmailField'
 
 export const onClientEntry = () => {
-  cms.forms.addFieldPlugin({
+  cms.fields.add({
     name: 'email',
     Component: EmailField,
   })
@@ -85,7 +87,7 @@ export const onClientEntry = () => {
     name: 'email',
     Component: EmailField,
     validate(value, allValues, meta, field) {
-      let isValidEmail = /.*@.*\..*/.test(email)
+      let isValidEmail = /.*@.*\..+/.test(value)
 
       if (!isValidEmail) return 'Invalid email address'
     },
