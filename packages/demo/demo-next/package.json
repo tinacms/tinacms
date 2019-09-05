@@ -3,7 +3,7 @@
   "version": "0.1.0",
   "private": true,
   "scripts": {
-    "dev": "node server.js",
+    "dev": "next dev",
     "build": "next build",
     "start": "next start"
   },
@@ -12,6 +12,7 @@
     "@tinacms/react-tinacms": "^0.1.0-alpha.0",
     "@tinacms/api-git": "^0.1.0-alpha.0",
     "@tinacms/next-tinacms-markdown": "^0.0.0",
+    "@tinacms/next-tinacms-git": "^0.0.0",
     "next": "9.0.5"
   }
 }
