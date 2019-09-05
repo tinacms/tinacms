@@ -170,3 +170,33 @@ function BlogPostTemplate(props) {
 ## Known Issues
 
 Elements positioned relative to the window (e.g with `position: fixed`) may be hidden by the sidebar.
+
+## Basic Fields
+
+There are several field types available out of the box. They can be used by registering a field and setting the components' `component`
+
+### Text Input
+
+component: 'text'
+
+### Textarea Input
+
+component: 'textarea'
+
+### Date Input
+
+component: 'date'
+
+The date input uses the [react-datetime](https://github.com/YouCanBookMe/react-datetime) package. It can any of its [properties](https://github.com/YouCanBookMe/react-datetime#api) as arguments:
+
+### Color Input
+
+component: 'color'
+
+#### Properties:
+
+- colorFormat: 'hex' | 'rgb'
+
+### Toggle Input
+
+component: 'toggle'
