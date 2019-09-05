@@ -71,9 +71,6 @@ export const FormsView = () => {
             <>
               {/* <h3>Editing form {editingForm.name}</h3> */}
               <FieldsWrapper>
-                {cms.plugins.all('content-button').map(plugin => (
-                  <CreateContentButton plugin={plugin} />
-                ))}
                 {editingForm &&
                   (editingForm.fields.length ? (
                     <FieldsBuilder form={editingForm} />
