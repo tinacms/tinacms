@@ -2,25 +2,24 @@ import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import styled from 'styled-components'
 
-type InputFieldType<ExtraFieldProps> = FieldProps & ExtraFieldProps
+type InputFieldType<ExtraFieldProps, InputProps> = FieldProps<InputProps> &
+  ExtraFieldProps
 
 // Wraps the Field component in labels describing the field's meta state
 // Add any other fields that the Field component should expect onto the ExtraFieldProps generic type
-export function wrapFieldsWithMeta<ExtraFieldProps = {}>(
+export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   Field:
-    | React.StatelessComponent<InputFieldType<ExtraFieldProps>>
-    | React.ComponentClass<InputFieldType<ExtraFieldProps>>
+    | React.StatelessComponent<InputFieldType<ExtraFieldProps, InputProps>>
+    | React.ComponentClass<InputFieldType<ExtraFieldProps, InputProps>>
 ) {
-  return (props: InputFieldType<ExtraFieldProps>) => (
+  return (props: InputFieldType<ExtraFieldProps, InputProps>) => (
     <>
       <FieldWrapper>
         <FieldLabel htmlFor={name}>
           {props.field.label || props.field.name}
         </FieldLabel>
         <Field {...props} />
-        {props.meta.error && 
-          <FieldError>{props.meta.error}</FieldError>
-        }
+        {props.meta.error && <FieldError>{props.meta.error}</FieldError>}
       </FieldWrapper>
     </>
   )

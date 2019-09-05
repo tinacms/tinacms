@@ -8,6 +8,7 @@ import {
   TextAreaInput,
   ColorPickerField,
   ToggleField,
+  DateInput,
 } from './fields'
 import { MediaView, SettingsView } from './components/FormView'
 import { CMS, Plugin } from '@tinacms/core'
@@ -25,6 +26,11 @@ cms.fields.add({
   validate(value: any, values: any, meta: any, field: any) {
     if (field.required && !value) return 'Required'
   },
+})
+
+cms.fields.add({
+  name: 'date',
+  Component: DateInput,
 })
 
 cms.fields.add({
