@@ -2,6 +2,8 @@ import React from "react"
 import { Link } from "gatsby"
 
 import { rhythm, scale } from "../utils/typography"
+import { createRemarkButton } from "@tinacms/react-tinacms-remark"
+import { withPlugin } from "@tinacms/react-tinacms"
 
 class Layout extends React.Component {
   render() {
@@ -82,4 +84,27 @@ class Layout extends React.Component {
   }
 }
 
-export default Layout
+const CreatePostPlugin = createRemarkButton({
+  label: "Create Blog Post",
+  filename(title) {
+    return `content/blog/${title.replace(/\s+/g, "-").toLowerCase()}/index.md`
+  },
+  frontmatter(title) {
+    // Asynchronously generate front matter by fetching data from some server.
+    return new Promise(resolve => {
+      setTimeout(() => {
+        resolve({
+          title,
+          date: new Date(),
+          heading_color: "pink",
+          description: "My new post. ",
+        })
+      }, 1000)
+    })
+  },
+  body(title) {
+    return `# ${title}`
+  },
+})
+
+export default withPlugin(Layout, CreatePostPlugin)

@@ -5,36 +5,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import {
-  useCMS,
-  useCMSForm,
-  withPlugin,
-  usePlugin,
-} from "@tinacms/react-tinacms"
-import { createRemarkButton } from "@tinacms/react-tinacms-remark"
-
-const CreatePostPlugin = createRemarkButton({
-  label: "Create Blog Post",
-  filename(title) {
-    return `content/blog/${title.replace(/\s+/g, "-").toLowerCase()}/index.md`
-  },
-  frontmatter(title) {
-    // Asynchronously generate front matter by fetching data from some server.
-    return new Promise(resolve => {
-      setTimeout(() => {
-        resolve({
-          title,
-          date: new Date(),
-          heading_color: "pink",
-          description: "My new post. ",
-        })
-      }, 1000)
-    })
-  },
-  body(title) {
-    return `# ${title}`
-  },
-})
+import { useCMSForm } from "@tinacms/react-tinacms"
 
 function BlogIndex(props) {
   const { data } = props
@@ -112,7 +83,7 @@ function BlogIndex(props) {
   )
 }
 
-export default withPlugin(BlogIndex, CreatePostPlugin)
+export default BlogIndex
 
 export const pageQuery = graphql`
   query {
