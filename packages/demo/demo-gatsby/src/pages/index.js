@@ -46,6 +46,7 @@ function BlogIndex(props) {
     initialValues: {
       backgroundColor: "",
       hideBio: false,
+      date: "2019 03 04",
     },
     fields: [
       {
@@ -58,6 +59,13 @@ function BlogIndex(props) {
         name: "hideBio",
         label: "Hide Bio",
         component: "toggle",
+      },
+      {
+        name: "date",
+        label: "Date",
+        component: "date",
+        dateFormat: "YYYY MM DD",
+        timeFormat: null,
       },
     ],
     onSubmit() {

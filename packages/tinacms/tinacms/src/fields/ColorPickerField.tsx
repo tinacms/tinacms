@@ -1,8 +1,15 @@
 import * as React from 'react'
 import { ColorPicker } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { InputProps } from 'react-select/lib/components/Input'
 
-// TODO: `field` needs to be extensible
-export const ColorPickerField = wrapFieldsWithMeta(({ input, field }) => {
-  return <ColorPicker colorFormat={(field as any).colorFormat} input={input} />
-})
+interface ColorProps {
+  colorFormat: string
+}
+export const ColorPickerField = wrapFieldsWithMeta<InputProps, ColorProps>(
+  ({ input, field }) => {
+    return (
+      <ColorPicker colorFormat={(field as any).colorFormat} input={input} />
+    )
+  }
+)
