@@ -173,7 +173,7 @@ Elements positioned relative to the window (e.g with `position: fixed`) may be h
 
 ## Basic Fields
 
-There are several field types available out of the box. They can be used by registering a field and setting the components' `type`
+There are several field types available out of the box. They can be used by registering a field and setting the components' `component`
 
 ### Text Input
 
