@@ -50,6 +50,30 @@ export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 
 const DatetimeContainer = styled.div`
   input {
+    background-color: #f8f8f8;
+    border-width: 1px;
+    border-style: solid;
+    border-color: #f2f2f2;
+    border-radius: 0.25rem;
     width: 100%;
+    font-size: 0.9rem;
+    padding: 0.75rem;
+    margin: 0;
+    outline: none;
+    transition: all 150ms ease-out;
+
+    &:hover {
+      background-color: #f2f2f2;
+    }
+
+    &:focus {
+      border-color: #333333;
+      background-color: #f8f8f8;
+    }
+
+    &::placeholder {
+      font-size: 0.9rem;
+      color: #cfd3d7;
+    }
   }
 `
