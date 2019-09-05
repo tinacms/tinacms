@@ -70,9 +70,7 @@ export const Modal = ({
           }}
         >
           <ModalOverlay>
-            <ModalInner>
-              <div {...props} />
-            </ModalInner>
+            <div {...props} />
           </ModalOverlay>
         </StyledFrame>,
         portalNode
@@ -87,12 +85,8 @@ export const ModalOverlay = styled.div`
   bottom: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
   overflow: auto;
-  padding: 1rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  padding: 0;
 `
 
 export const ModalHeader = styled.div`
@@ -108,15 +102,4 @@ export const ModalHeader = styled.div`
 
 export const ModalBody = styled.div`
   margin: 2rem 1rem;
-`
-
-export const ModalInner = styled.div`
-  display: block;
-  z-index: 1;
-  overflow: visible; /* Keep this as "visible", select component needs to overflow */
-  background-color: #fefefe;
-  border-radius: 0.25rem;
-  margin: auto;
-  width: 460px;
-  max-width: 90%;
 `

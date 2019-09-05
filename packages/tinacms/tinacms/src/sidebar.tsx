@@ -6,6 +6,8 @@ import styled, { createGlobalStyle } from 'styled-components'
 import { FormsView, SaveButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
+import { ModalPopup } from './modalPopup'
+import { ModalFullscreen } from './modalFullscreen'
 import { TextField } from '@tinacms/fields'
 import { Close, Hamburger } from './components/icons'
 
@@ -72,8 +74,10 @@ export const Sidebar = ({
           </MenuPanel>
           {ActiveView && (
             <Modal>
-              <button onClick={() => setActiveView(null)}>Close Modal</button>
-              <ActiveView.Component />
+              <ModalFullscreen>
+                <button onClick={() => setActiveView(null)}>Close Modal</button>
+                <ActiveView.Component />
+              </ModalFullscreen>
             </Modal>
           )}
         </>
@@ -95,6 +99,7 @@ const RootElement = createGlobalStyle`
   @supports (font-variation-settings: normal) {
     html { font-family: 'Inter var', sans-serif; }
   }
+
   body {
     margin: 0;
     padding: 0;
@@ -123,22 +128,24 @@ const CreateContentButton = ({ plugin }: any) => {
       </CreateButton>
       {open && (
         <Modal>
-          <ModalHeader>Create</ModalHeader>
-          <ModalBody>
-            <TextField
-              onChange={e => setPostName(e.target.value)}
-              value={postName}
-            />
+          <ModalPopup>
+            <ModalHeader>Create</ModalHeader>
+            <ModalBody>
+              <TextField
+                onChange={e => setPostName(e.target.value)}
+                value={postName}
+              />
 
-            <SaveButton
-              onClick={() => {
-                plugin.onSubmit(postName, cms)
-                setOpen(false)
-              }}
-            >
-              Save
-            </SaveButton>
-          </ModalBody>
+              <SaveButton
+                onClick={() => {
+                  plugin.onSubmit(postName, cms)
+                  setOpen(false)
+                }}
+              >
+                Save
+              </SaveButton>
+            </ModalBody>
+          </ModalPopup>
         </Modal>
       )}
     </div>
