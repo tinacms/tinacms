@@ -18,6 +18,8 @@ yarn add @tinacms/gatsby-plugin-tinacms
 
 Open your `gatsby-config.js` file and add `'@tinacms/gatsby-plugin-tinacms'` to the list of plugins:
 
+**gatsby-config.js**
+
 ```javascript
 module.exports = {
   // ...
