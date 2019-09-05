@@ -89,7 +89,7 @@ export const Sidebar = ({
 const HeaderHeight = 4
 const Padding = 1.25
 
-const RootElement = createGlobalStyle`
+export const RootElement = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
   html {
     font-family: 'Inter', sans-serif;
@@ -114,6 +114,7 @@ const RootElement = createGlobalStyle`
     margin-left: -${Padding}rem;
     margin-right: -${Padding}rem;
     border-top: 1px solid #F2F2F2;
+    border-bottom: none;
   }
 `
 
@@ -135,7 +136,6 @@ const CreateContentButton = ({ plugin }: any) => {
                 onChange={e => setPostName(e.target.value)}
                 value={postName}
               />
-
               <SaveButton
                 onClick={() => {
                   plugin.onSubmit(postName, cms)
