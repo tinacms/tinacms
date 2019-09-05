@@ -7,6 +7,7 @@ import { FormsView, SaveButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
 import { TextField } from '@tinacms/fields'
+import { Close, Hamburger } from './components/icons'
 
 export const Sidebar = ({
   title = 'Tina',
@@ -63,16 +64,7 @@ export const Sidebar = ({
                       setMenuVisibility(false)
                     }}
                   >
-                    <svg
-                      width="24"
-                      height="24"
-                      viewBox="0 0 24 24"
-                      fill="none"
-                      xmlns="http://www.w3.org/2000/svg"
-                    >
-                      <path d="M22.7032 7.65455L18.4256 11.8839V9.32184L24 3.81029L22.7032 2.52811L18.4256 6.75748V0H16.5926V6.75522L12.3196 2.53037L11.0228 3.81029L16.5926 9.31731V11.8794L12.3196 7.65455L7.39819 2.78862V0H5.56525V2.80221L0 8.3047L1.2968 9.58688L5.56525 5.3643V7.92639L0 13.4311L1.2968 14.7111L5.56525 10.4907V24H7.39819V10.4772L11.6804 14.7111L12.9749 13.4289L7.39819 7.91506V5.35298L11.6804 9.58688V9.58461L16.5926 14.4437V24H18.4256V14.446L24 8.93673L22.7032 7.65455Z" />
-                    </svg>{' '}
-                    {view.name}
+                    <Close /> {view.name}
                   </MenuLink>
                 ))}
               </MenuList>
@@ -90,8 +82,6 @@ export const Sidebar = ({
   )
 }
 
-const HamburgerMenu = require('../assets/hamburger.svg')
-const CloseIcon = require('../assets/close.svg')
 const HeaderHeight = 4
 const Padding = 1.25
 
@@ -253,13 +243,14 @@ const SiteName = styled.h3`
   font-weight: 500;
 `
 
-const ActionsToggle = styled.button<{ open: boolean }>`
+const ActionsToggle = styled(p => (
+  <button>{p.open ? <Close /> : <Hamburger />}</button>
+))`
   background: transparent;
   outline: none;
   border: 0;
   width: 1.25rem;
   height: ${HeaderHeight}rem;
-  background-image: url(${p => (p.open ? CloseIcon : HamburgerMenu)});
   background-position: center left;
   background-repeat: no-repeat;
   background-size: ${p => (p.open ? '90%' : '100%')} auto;
