@@ -6,6 +6,7 @@
     "index.js",
     "gatsby-browser.js",
     "gatsby-node.js",
+    "gatsby-ssr.js",
     "errors.js",
     "assets",
     "markdownRemark"
