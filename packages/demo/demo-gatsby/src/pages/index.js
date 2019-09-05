@@ -66,7 +66,10 @@ function BlogIndex(props) {
                 }}
               >
                 <Link style={{ boxShadow: `none` }} to={node.fields.slug}>
-                  {title}
+                  {title}{" "}
+                  {node.frontmatter.draft && (
+                    <small style={{ color: "fuchsia" }}>Draft</small>
+                  )}
                 </Link>
               </h3>
               <small>{node.frontmatter.date}</small>
@@ -103,6 +106,8 @@ export const pageQuery = graphql`
             date
             title
             description
+            heading_color
+            draft
           }
         }
       }

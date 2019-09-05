@@ -38,7 +38,10 @@ function BlogPostTemplate(props) {
               marginTop: rhythm(2),
             }}
           >
-            {post.frontmatter.title}
+            {post.frontmatter.title}{" "}
+            {post.frontmatter.draft && (
+              <small style={{ color: "fuchsia" }}>Draft</small>
+            )}
           </h1>
           <div
             style={{
@@ -116,6 +119,11 @@ export default remarkForm(BlogPostTemplate, {
       required: true,
     },
     {
+      label: "Draft",
+      name: "frontmatter.draft",
+      component: "toggle",
+    },
+    {
       label: "Date",
       name: "frontmatter.date",
       component: function ReadOnly({ input }) {
@@ -173,6 +181,7 @@ export const pageQuery = graphql`
         date
         description
         heading_color
+        draft
       }
     }
   }
