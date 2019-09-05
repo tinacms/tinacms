@@ -1,6 +1,6 @@
 # Manual Setup
 
-This is a guide on how to setup the XEditor CMS on an existing Gatsby site.
+This is a guide on how to setup the Tina CMS on an existing Gatsby site.
 
 ## Installation
 
@@ -17,6 +17,8 @@ yarn add @tinacms/gatsby-plugin-tinacms
 ## Adding the Plugin
 
 Open your `gatsby-config.js` file and add `'@tinacms/gatsby-plugin-tinacms'` to the list of plugins:
+
+**gatsby-config.js**
 
 ```javascript
 module.exports = {

@@ -1,10 +1,10 @@
 {
   "name": "demo-cra",
-  "version": "0.1.1-alpha.9",
+  "version": "0.1.0-alpha.0",
   "private": true,
   "dependencies": {
-    "@tinacms/core": "^1.0.1-alpha.9",
-    "@tinacms/react-tinacms": "^0.1.1-alpha.9",
+    "@tinacms/tinacms": "^0.1.0-alpha.1",
+    "@tinacms/react-tinacms": "^0.1.0-alpha.0",
     "@types/jest": "^24.0.15",
     "@types/node": "12.6.8",
     "@types/react": "^16.8.23",

@@ -35,7 +35,7 @@ export function router() {
     commit({
       name: req.body.name,
       email: req.body.email,
-      message: `Update from xeditor: delete ${rel}`,
+      message: `Update from Tina: delete ${rel}`,
       files: [abs],
     })
       .then(() => {

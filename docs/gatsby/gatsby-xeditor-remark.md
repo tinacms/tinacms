@@ -34,7 +34,7 @@ module.exports = {
 
 ## Creating Remark Forms
 
-In order to edit a markdown file, you must register a form with the CMS. There are two approaches to registering Remark Forms with the XEditor. The approach you choose depends on whether the React template is class or function.
+In order to edit a markdown file, you must register a form with the CMS. There are two approaches to registering Remark Forms with the Tina. The approach you choose depends on whether the React template is class or function.
 
 1. [`useRemarkForm`](#useRemarkForm): A [Hook](https://reactjs.org/docs/hooks-intro.html) used when the template is a function.
 1. [`RemarkForm`](#RemarkForm): A [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) component to use when the template is a class component.
@@ -143,7 +143,7 @@ class BlogPostTemplate extends React.Component {
 
 ## Editing Content
 
-With the Remark Form created, you can now edit the files in the XEditor sidebar. Changes to the form
+With the Remark Form created, you can now edit the files in the Tina sidebar. Changes to the form
 will be written back to the markdown files in real time.
 
 **Why write to disk "on change"?**

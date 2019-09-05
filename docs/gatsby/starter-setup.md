@@ -1,15 +1,15 @@
 # Gatsby Starter
 
-1. **Create a Gatsby XEditor Site**
+1. **Create a Gatsby Tina Site**
 
 ```
-gatsby new my-xeditor-starter https://github.com/forestryio/gatsby-starter-xeditor
+gatsby new my-Tina-starter https://github.com/forestryio/gatsby-starter-Tina
 ```
 
 2. **Start the Server**
 
 ```
-cd my-xeditor-starter
+cd my-Tina-starter
 gatsby develop
 ```
 

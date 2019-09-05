@@ -1,6 +1,6 @@
 # Configuring the Sidebar
 
-The Xeditor sidebar has two properties that can be configured:
+The Tina sidebar has two properties that can be configured:
 
 - `logo: string`
 - `title: string`
