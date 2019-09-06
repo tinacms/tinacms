@@ -1,7 +1,7 @@
 {
   "name": "@tinacms/gatsby-tinacms-git",
   "main": "index.js",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "files": [
     "index.js",
     "audit.js",
