@@ -3,7 +3,7 @@ import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
-import { FormsView, SaveButton } from './components/FormView'
+import { FormsView, SaveButton, CancelButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
 import { ModalPopup } from './modalPopup'
@@ -130,21 +130,26 @@ const CreateContentButton = ({ plugin }: any) => {
       {open && (
         <Modal>
           <ModalPopup>
-            <ModalHeader>Create</ModalHeader>
+            <ModalHeader>{plugin.name}</ModalHeader>
             <ModalBody>
               <TextField
                 onChange={e => setPostName(e.target.value)}
                 value={postName}
               />
+            </ModalBody>
+            <ModalActions>
               <SaveButton
                 onClick={() => {
                   plugin.onSubmit(postName, cms)
                   setOpen(false)
                 }}
               >
-                Save
+                Create
               </SaveButton>
-            </ModalBody>
+              <CancelButton onClick={() => setOpen(p => !p)}>
+                Cancel
+              </CancelButton>
+            </ModalActions>
           </ModalPopup>
         </Modal>
       )}
@@ -320,5 +325,16 @@ const CreateButton = styled.button`
   transition: opacity 85ms;
   &:hover {
     opacity: 0.6;
+  }
+`
+
+const ModalActions = styled.div`
+  display: flex;
+  justify-content: space-between;
+  border-radius: 0 0 0.5rem 0.5rem;
+  overflow: hidden;
+  ${SaveButton}, ${CancelButton} {
+    border-radius: 0;
+    flex: 1 0 auto;
   }
 `

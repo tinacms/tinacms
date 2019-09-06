@@ -359,3 +359,13 @@ export const SaveButton = styled.button`
       pointer-events: none;
     `};
 `
+
+export const CancelButton = styled(SaveButton)`
+  background-color: transparent;
+  border: 1px solid #0084ff;
+  color: #0084ff;
+  &:hover {
+    background-color: #f7f7f7;
+    opacity: 1;
+  }
+`
