@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/forestry-cli",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "license": "MIT",
   "devDependencies": {
     "@types/clear": "0.1.0",

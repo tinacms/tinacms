@@ -12,6 +12,7 @@ import {
 } from './fields'
 import { MediaView, SettingsView } from './components/FormView'
 import { CMS, Plugin } from '@tinacms/core'
+import { ImageUploadInput } from './fields/ImageUploadInput'
 
 export const cms = new CMS()
 
@@ -31,6 +32,11 @@ cms.fields.add({
 cms.fields.add({
   name: 'date',
   Component: DateInput,
+})
+
+cms.fields.add({
+  name: 'image',
+  Component: ImageUploadInput,
 })
 
 cms.fields.add({
