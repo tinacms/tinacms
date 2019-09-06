@@ -13,7 +13,7 @@ const FileUploader = () => {
           'https://res.cloudinary.com/awko-sock-co/image/upload/c_scale,w_2000/v1515266726/sock-header_jgttkl.jpg'
         )
       }}
-      imageUrl={img}
+      value={img}
     />
   )
 }

@@ -18,6 +18,8 @@ function BlogIndex(props) {
       backgroundColor: "",
       hideBio: false,
       date: "2019 03 04",
+      thumbnail:
+        "https://res.cloudinary.com/awko-sock-co/image/upload/c_scale,w_2000/v1515266726/sock-header_jgttkl.jpg",
     },
     fields: [
       {
@@ -37,6 +39,11 @@ function BlogIndex(props) {
         component: "date",
         dateFormat: "YYYY MM DD",
         timeFormat: null,
+      },
+      {
+        name: "thumbnail",
+        label: "Thumbnail",
+        component: "image",
       },
     ],
     onSubmit() {

@@ -48,6 +48,9 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
       {form.fields.map(field => {
         let plugin = cms.fields.find(field.component as string)
         let type: string | undefined
+
+        console.log('plugins: ' + JSON.stringify(cms.fields))
+
         if (plugin && plugin.type) {
           type = plugin.type
         }
