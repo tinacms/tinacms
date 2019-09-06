@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/fields",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -25,7 +25,7 @@
     "@types/styled-components": "4.1.8",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
-    "cms-scripts": "^0.1.0-alpha.0",
+    "cms-scripts": "^0.1.0-alpha.1",
     "jest": "^24.8.0",
     "react": "^16.8.6",
     "react-docgen-typescript-loader": "^3.1.0",
