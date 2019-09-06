@@ -50,11 +50,11 @@ export const ImageDropzone = ({ onDrop, imageUrl }: ImageDropzoneProps) => {
 
   return (
     <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+      <input {...getInputProps()} />
       {imageUrl ? (
         <img src={imageUrl} />
       ) : (
         <ImgPlaceholder>
-          <input {...getInputProps()} />
           <p>Drag 'n' drop some files here, or click to select files</p>
         </ImgPlaceholder>
       )}
