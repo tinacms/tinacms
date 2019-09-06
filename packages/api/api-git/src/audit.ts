@@ -7,18 +7,18 @@ export function audit(cb: Function) {
     if (running) {
       count = count + 1
       nextArgs = args
-      console.log('waiting...', count)
+      if (DEBUG) console.log('waiting...', count)
     } else {
       running = true
-      console.log('running')
+      if (DEBUG) if (DEBUG) console.log('running')
       await cb(...args)
       running = false
-      console.log('done')
+      if (DEBUG) console.log('done')
       if (nextArgs) {
         args = nextArgs
         nextArgs = null
         count = 0
-        console.log('starting cached')
+        if (DEBUG) console.log('starting cached')
         await audited(...args)
       }
     }

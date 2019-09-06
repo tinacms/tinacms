@@ -4,6 +4,7 @@ const rollup = require('rollup')
 const rollupTypescript = require('rollup-plugin-typescript2')
 const rollupCommonJs = require('rollup-plugin-commonjs')
 const typescript = require('typescript')
+const { uglify } = require('rollup-plugin-uglify')
 
 // Source https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/bin/react-scripts.js#L11-L16
 // Makes the script crash on unhandled rejections instead of silently
@@ -29,6 +30,9 @@ program
 
 const COMMANDS = {
   build() {
+    build(createBuildOptions({ uglify: { debug: false } }))
+  },
+  dev() {
     build(createBuildOptions())
   },
   watch() {
@@ -52,7 +56,7 @@ command()
 /**
  * Build Packages
  */
-function createBuildOptions() {
+function createBuildOptions(options = {}) {
   const absolutePath = process.cwd()
 
   const package = require(path.join(absolutePath, 'package.json'))
@@ -81,6 +85,18 @@ function createBuildOptions() {
         sourceMap: true,
       }),
     ],
+  }
+
+  if (options.uglify) {
+    inputOptions.plugins.push(
+      uglify({
+        compress: {
+          global_defs: {
+            DEBUG: options.uglify.debug,
+          },
+        },
+      })
+    )
   }
 
   const outputOptions = {
