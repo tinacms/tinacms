@@ -4,7 +4,7 @@ import styled from 'styled-components'
 
 interface ImageDropzoneProps {
   onDrop: (acceptedFiles: any[]) => void
-  imageUrl?: string
+  value?: string
 }
 
 const getBorderColor = (props: any) => {
@@ -39,7 +39,11 @@ const ImgPlaceholder = styled.div`
   color: #bdbdbd;
 `
 
-export const ImageDropzone = ({ onDrop, imageUrl }: ImageDropzoneProps) => {
+const StyledImage = styled.img`
+  max-width: 100%;
+`
+
+export const ImageDropzone = ({ onDrop, value }: ImageDropzoneProps) => {
   const {
     getRootProps,
     getInputProps,
@@ -51,8 +55,8 @@ export const ImageDropzone = ({ onDrop, imageUrl }: ImageDropzoneProps) => {
   return (
     <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
-      {imageUrl ? (
-        <img src={imageUrl} />
+      {value ? (
+        <StyledImage src={value} />
       ) : (
         <ImgPlaceholder>
           <p>Drag 'n' drop some files here, or click to select files</p>
