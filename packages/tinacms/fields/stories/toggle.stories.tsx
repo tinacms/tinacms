@@ -12,6 +12,7 @@ function BasicExample() {
       onChange={() => {}}
       onFocus={() => {}}
       value=""
+      input={{}}
     />
   )
 }

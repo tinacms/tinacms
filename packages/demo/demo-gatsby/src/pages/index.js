@@ -18,6 +18,8 @@ function BlogIndex(props) {
       backgroundColor: "",
       hideBio: false,
       date: "2019 03 04",
+      thumbnail:
+        "https://images.unsplash.com/photo-1518259102261-b40117eabbc9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2550&q=80",
     },
     fields: [
       {
@@ -37,6 +39,11 @@ function BlogIndex(props) {
         component: "date",
         dateFormat: "YYYY MM DD",
         timeFormat: null,
+      },
+      {
+        name: "thumbnail",
+        label: "Thumbnail",
+        component: "image",
       },
     ],
     onSubmit() {
