@@ -17,23 +17,26 @@ const getBorderColor = (props: any) => {
   if (props.isDragActive) {
     return '#2196f3'
   }
-  return '#eeeeee'
+  return '#fff'
 }
 
-const Container = styled.div`
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  align-items: center;
-  padding: 20px;
+const DropArea = styled.div`
   border-width: 2px;
   border-radius: 2px;
   border-color: ${props => getBorderColor(props)};
   border-style: dashed;
+  transition: border 0.24s ease-in-out;
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+`
+
+const ImgPlaceholder = styled.div`
+  align-items: center;
+  padding: 20px;
   background-color: #fafafa;
   color: #bdbdbd;
-  outline: none;
-  transition: border 0.24s ease-in-out;
 `
 
 export const ImageDropzone = ({ onDrop, imageUrl }: ImageDropzoneProps) => {
@@ -46,17 +49,15 @@ export const ImageDropzone = ({ onDrop, imageUrl }: ImageDropzoneProps) => {
   } = useDropzone({ accept: 'image/*', onDrop })
 
   return (
-    <div className="container">
+    <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       {imageUrl ? (
         <img src={imageUrl} />
       ) : (
-        <Container
-          {...getRootProps({ isDragActive, isDragAccept, isDragReject })}
-        >
+        <ImgPlaceholder>
           <input {...getInputProps()} />
           <p>Drag 'n' drop some files here, or click to select files</p>
-        </Container>
+        </ImgPlaceholder>
       )}
-    </div>
+    </DropArea>
   )
 }
