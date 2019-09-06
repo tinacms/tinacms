@@ -19,7 +19,7 @@ function BlogIndex(props) {
       hideBio: false,
       date: "2019 03 04",
       thumbnail:
-        "https://res.cloudinary.com/awko-sock-co/image/upload/c_scale,w_2000/v1515266726/sock-header_jgttkl.jpg",
+        "https://images.unsplash.com/photo-1518259102261-b40117eabbc9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2550&q=80",
     },
     fields: [
       {

@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
 
-interface ImageDropzoneProps {
+interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
 }
@@ -43,7 +43,7 @@ const StyledImage = styled.img`
   max-width: 100%;
 `
 
-export const ImageDropzone = ({ onDrop, value }: ImageDropzoneProps) => {
+export const ImageUpload = ({ onDrop, value }: ImageUploadProps) => {
   const {
     getRootProps,
     getInputProps,

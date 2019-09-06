@@ -1,16 +1,16 @@
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { ImageDropzone } from '../src/ImageDropzone'
+import { ImageUpload } from '../src/ImageUpload'
 import { useState } from 'react'
 
-const FileUploader = () => {
+const ImageUploader = () => {
   let [img, setImg] = useState<string>()
 
   return (
-    <ImageDropzone
+    <ImageUpload
       onDrop={() => {
         setImg(
-          'https://res.cloudinary.com/awko-sock-co/image/upload/c_scale,w_2000/v1515266726/sock-header_jgttkl.jpg'
+          'https://images.unsplash.com/photo-1518259102261-b40117eabbc9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2550&q=80'
         )
       }}
       value={img}
@@ -18,4 +18,4 @@ const FileUploader = () => {
   )
 }
 
-storiesOf('Fileupload', module).add('Default', () => <FileUploader />)
+storiesOf('Fileupload', module).add('Image', () => <ImageUploader />)
