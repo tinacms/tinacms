@@ -4,6 +4,7 @@ import styled from 'styled-components'
 
 interface ImageDropzoneProps {
   onDrop: (acceptedFiles: any[]) => void
+  imageUrl?: string
 }
 
 const getBorderColor = (props: any) => {
@@ -35,7 +36,7 @@ const Container = styled.div`
   transition: border 0.24s ease-in-out;
 `
 
-export const ImageDropzone = ({ onDrop }: ImageDropzoneProps) => {
+export const ImageDropzone = ({ onDrop, imageUrl }: ImageDropzoneProps) => {
   const {
     getRootProps,
     getInputProps,
@@ -46,12 +47,16 @@ export const ImageDropzone = ({ onDrop }: ImageDropzoneProps) => {
 
   return (
     <div className="container">
-      <Container
-        {...getRootProps({ isDragActive, isDragAccept, isDragReject })}
-      >
-        <input {...getInputProps()} />
-        <p>Drag 'n' drop some files here, or click to select files</p>
-      </Container>
+      {imageUrl ? (
+        <img src={imageUrl} />
+      ) : (
+        <Container
+          {...getRootProps({ isDragActive, isDragAccept, isDragReject })}
+        >
+          <input {...getInputProps()} />
+          <p>Drag 'n' drop some files here, or click to select files</p>
+        </Container>
+      )}
     </div>
   )
 }
