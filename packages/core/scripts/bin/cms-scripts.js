@@ -30,7 +30,10 @@ program
 
 const COMMANDS = {
   build() {
-    build(createBuildOptions({ uglify: true }))
+    build(createBuildOptions({ uglify: { debug: false } }))
+  },
+  dev() {
+    build(createBuildOptions())
   },
   watch() {
     watch(createBuildOptions())
@@ -85,7 +88,15 @@ function createBuildOptions(options = {}) {
   }
 
   if (options.uglify) {
-    inputOptions.plugins.push(uglify())
+    inputOptions.plugins.push(
+      uglify({
+        compress: {
+          global_defs: {
+            DEBUG: options.uglify.debug,
+          },
+        },
+      })
+    )
   }
 
   const outputOptions = {
