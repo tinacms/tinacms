@@ -2,7 +2,7 @@
   "name": "demo-gatsby",
   "private": true,
   "description": "A starter for a blog powered by Gatsby and Markdown",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
   "bugs": {
     "url": "https://github.com/gatsbyjs/gatsby/issues"
@@ -11,7 +11,7 @@
     "@tinacms/core": "^0.1.0-alpha.1",
     "@tinacms/form-builder": "^0.1.0-alpha.1",
     "@tinacms/gatsby-plugin-tinacms": "^0.1.0-alpha.2",
-    "@tinacms/gatsby-tinacms-git": "^0.1.0-alpha.2",
+    "@tinacms/gatsby-tinacms-git": "^0.1.0-alpha.3",
     "@tinacms/gatsby-tinacms-gitlab": "^0.1.0-alpha.2",
     "@tinacms/react-tinacms": "^0.1.0-alpha.1",
     "@tinacms/react-tinacms-json": "^0.1.0-alpha.1",
