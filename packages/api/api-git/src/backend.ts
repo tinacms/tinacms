@@ -47,7 +47,9 @@ export function router() {
   })
 
   router.put('/:relPath', (req: any, res: any) => {
-    console.log(path.join(pathRoot, decodeURIComponent(req.params.relPath)))
+    if (DEBUG) {
+      console.log(path.join(pathRoot, decodeURIComponent(req.params.relPath)))
+    }
     try {
       writeFile(
         path.join(pathRoot, decodeURIComponent(req.params.relPath)),

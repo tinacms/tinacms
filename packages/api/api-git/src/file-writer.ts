@@ -9,7 +9,9 @@ const MAX_BUILD_TIME = 1000
 
 export function writeFile(filepath: string, content: string) {
   count++
-  console.info(`request ${count} received`)
+
+  if (DEBUG) console.info(`request ${count} received`)
+
   cacheCommand(filepath, content)
   tryToWrite()
 }
@@ -20,21 +22,23 @@ export function deleteFile(path: string) {
 
 function cacheCommand(filepath: string, data: any) {
   let prevCacheNumber = count - 1
-  console.info(`caching ${count}: start`)
-  if (nextArgs) {
-    console.info(`caching ${count}: discarding ${prevCacheNumber}`)
+  if (DEBUG) {
+    console.info(`caching ${count}: start`)
+    if (nextArgs) {
+      console.info(`caching ${count}: discarding ${prevCacheNumber}`)
+    }
   }
   nextArgs = [filepath, data]
-  console.info(`caching ${count}: end`)
+  if (DEBUG) console.info(`caching ${count}: end`)
 }
 
 function tryToWrite() {
   if (!nextArgs) return
 
   let curr = count
-  console.info(`write ${curr}: start`)
+  if (DEBUG) console.info(`write ${curr}: start`)
   if (waitingForBuild) {
-    console.info(`write ${curr}: waiting for gatsby`)
+    if (DEBUG) console.info(`write ${curr}: waiting for gatsby`)
     return
   }
 
@@ -48,11 +52,11 @@ function tryToWrite() {
   }
   fs.writeFile(filepath, content, (err: any) => {
     if (err) {
-      console.info(`write ${curr}: end; failure`)
+      if (DEBUG) console.info(`write ${curr}: end; failure`)
       console.error(err)
       waitingForBuild = false
     } else {
-      console.info(`write ${curr}: end; success`)
+      if (DEBUG) console.info(`write ${curr}: end; success`)
       waitingForBuild = true
       // Temp solution; we haven't figured out how to
       // call `buildFinished` when Gatsby's build actually
@@ -63,7 +67,7 @@ function tryToWrite() {
 }
 
 function buildFinished() {
-  console.info(`build finished`)
+  if (DEBUG) console.info(`build finished`)
   waitingForBuild = false
   tryToWrite()
 }
