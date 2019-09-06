@@ -6,6 +6,7 @@
     "index.js",
     "audit.js",
     "gatsby-browser.js",
+    "git-api.js",
     "gatsby-node.js",
     "errors.js",
     "markdownRemark",
