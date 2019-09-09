@@ -1,0 +1,31 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "attrs": {
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "+++"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "==="
+        }
+      ]
+    }
+  ]
+}

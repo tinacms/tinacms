@@ -1,0 +1,1 @@
+export type Token = any

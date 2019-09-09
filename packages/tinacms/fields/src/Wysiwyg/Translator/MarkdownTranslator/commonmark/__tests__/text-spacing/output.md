@@ -1,0 +1,1 @@
+Internal spaces        are kept.
