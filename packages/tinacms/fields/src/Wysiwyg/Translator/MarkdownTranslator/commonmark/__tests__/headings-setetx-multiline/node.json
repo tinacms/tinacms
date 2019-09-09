@@ -1,0 +1,32 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1,
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "First Line\nSecond Line"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Body"
+        }
+      ]
+    }
+  ]
+}
