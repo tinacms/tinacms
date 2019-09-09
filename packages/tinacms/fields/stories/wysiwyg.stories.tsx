@@ -3,7 +3,18 @@ import { storiesOf } from '@storybook/react'
 import { Wysiwyg } from '../src/Wysiwyg'
 
 const Basic = () => {
-  return <Wysiwyg input={{ value: '## Hello Everyone' }} />
+  let [value, setValue] = React.useState('')
+  return (
+    <Wysiwyg
+      input={{
+        value,
+        onChange: (val: string) => {
+          console.log(val)
+          setValue(val)
+        },
+      }}
+    />
+  )
 }
 
 storiesOf('Wysiwyg', module).add('Basic', () => <Basic />)

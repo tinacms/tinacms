@@ -1,6 +1,6 @@
-import { Schema } from "prosemirror-model"
-import { buildNodes, NodesOptions } from "./nodes"
-import { buildMarks, MarksOptions } from "./marks"
+import { Schema } from 'prosemirror-model'
+import { buildNodes, NodesOptions } from './nodes'
+import { buildMarks, MarksOptions } from './marks'
 
 interface SchemaOptions {
   blockContent: boolean
