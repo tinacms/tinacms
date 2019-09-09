@@ -4,7 +4,7 @@ import { ModalProvider } from './modalProvider'
 import { SidebarProvider, useSidebar } from './sidebarProvider'
 import { cms } from './index'
 import styled from 'styled-components'
-import { Close, Edit } from './components/icons'
+import { Close, Edit } from '@tinacms/icons'
 
 export const Tina: React.FC = ({ children }) => {
   return (

@@ -9,7 +9,7 @@ import { Modal, ModalHeader, ModalBody } from './modalProvider'
 import { ModalPopup } from './modalPopup'
 import { ModalFullscreen } from './modalFullscreen'
 import { TextField } from '@tinacms/fields'
-import { Close, Hamburger } from './components/icons'
+import { Close, Hamburger } from '@tinacms/icons'
 import {
   Theme,
   RootElement,

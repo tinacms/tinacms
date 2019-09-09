@@ -23,6 +23,7 @@
     "@types/react-dom": "^16.8.5",
     "@types/storybook__react": "^4.0.2",
     "@types/styled-components": "4.1.8",
+    "@tinacms/icons": "^0.0.0",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
     "cms-scripts": "^0.1.0-alpha.1",

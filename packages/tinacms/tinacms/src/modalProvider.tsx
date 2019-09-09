@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
-import styled, { createGlobalStyle, ThemeProvider } from 'styled-components'
+import styled, { ThemeProvider } from 'styled-components'
 import {
   Theme,
   RootElement,
