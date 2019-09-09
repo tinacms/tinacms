@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { Modal, ModalBody, ModalHeader } from '..'
-import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
+import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
 import { Button } from './Button'
 
 export const FormsView = () => {

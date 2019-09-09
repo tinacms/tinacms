@@ -3,12 +3,7 @@ import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
 import styled, { ThemeProvider } from 'styled-components'
-import {
-  Theme,
-  RootElement,
-  HEADER_HEIGHT,
-  FOOTER_HEIGHT,
-} from './components/Globals'
+import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
 
 interface Props {
   children: any
