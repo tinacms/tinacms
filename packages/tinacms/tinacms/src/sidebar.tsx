@@ -10,12 +10,7 @@ import { ModalPopup } from './modalPopup'
 import { ModalFullscreen } from './modalFullscreen'
 import { TextField } from '@tinacms/fields'
 import { Close, Hamburger } from '@tinacms/icons'
-import {
-  Theme,
-  RootElement,
-  HEADER_HEIGHT,
-  FOOTER_HEIGHT,
-} from './components/Globals'
+import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
 import { Button } from './components/Button'
 
 export const Sidebar = ({
