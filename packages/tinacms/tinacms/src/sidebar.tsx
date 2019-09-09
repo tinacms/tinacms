@@ -3,9 +3,11 @@ import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { createGlobalStyle } from 'styled-components'
-import { FormsView, SaveButton } from './components/FormView'
+import { FormsView, SaveButton, CancelButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
+import { ModalPopup } from './modalPopup'
+import { ModalFullscreen } from './modalFullscreen'
 import { TextField } from '@tinacms/fields'
 import { Close, Hamburger } from './components/icons'
 
@@ -72,8 +74,10 @@ export const Sidebar = ({
           </MenuPanel>
           {ActiveView && (
             <Modal>
-              <button onClick={() => setActiveView(null)}>Close Modal</button>
-              <ActiveView.Component />
+              <ModalFullscreen>
+                <button onClick={() => setActiveView(null)}>Close Modal</button>
+                <ActiveView.Component />
+              </ModalFullscreen>
             </Modal>
           )}
         </>
@@ -85,7 +89,7 @@ export const Sidebar = ({
 const HeaderHeight = 4
 const Padding = 1.25
 
-const RootElement = createGlobalStyle`
+export const RootElement = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
   html {
     font-family: 'Inter', sans-serif;
@@ -95,6 +99,7 @@ const RootElement = createGlobalStyle`
   @supports (font-variation-settings: normal) {
     html { font-family: 'Inter var', sans-serif; }
   }
+
   body {
     margin: 0;
     padding: 0;
@@ -109,6 +114,7 @@ const RootElement = createGlobalStyle`
     margin-left: -${Padding}rem;
     margin-right: -${Padding}rem;
     border-top: 1px solid #F2F2F2;
+    border-bottom: none;
   }
 `
 
@@ -123,22 +129,28 @@ const CreateContentButton = ({ plugin }: any) => {
       </CreateButton>
       {open && (
         <Modal>
-          <ModalHeader>Create</ModalHeader>
-          <ModalBody>
-            <TextField
-              onChange={e => setPostName(e.target.value)}
-              value={postName}
-            />
-
-            <SaveButton
-              onClick={() => {
-                plugin.onSubmit(postName, cms)
-                setOpen(false)
-              }}
-            >
-              Save
-            </SaveButton>
-          </ModalBody>
+          <ModalPopup>
+            <ModalHeader>{plugin.name}</ModalHeader>
+            <ModalBody>
+              <TextField
+                onChange={e => setPostName(e.target.value)}
+                value={postName}
+              />
+            </ModalBody>
+            <ModalActions>
+              <SaveButton
+                onClick={() => {
+                  plugin.onSubmit(postName, cms)
+                  setOpen(false)
+                }}
+              >
+                Create
+              </SaveButton>
+              <CancelButton onClick={() => setOpen(p => !p)}>
+                Cancel
+              </CancelButton>
+            </ModalActions>
+          </ModalPopup>
         </Modal>
       )}
     </div>
@@ -313,5 +325,16 @@ const CreateButton = styled.button`
   transition: opacity 85ms;
   &:hover {
     opacity: 0.6;
+  }
+`
+
+const ModalActions = styled.div`
+  display: flex;
+  justify-content: space-between;
+  border-radius: 0 0 0.5rem 0.5rem;
+  overflow: hidden;
+  ${SaveButton}, ${CancelButton} {
+    border-radius: 0;
+    flex: 1 0 auto;
   }
 `
