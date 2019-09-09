@@ -9,6 +9,11 @@ exports.onCreateNode = ({ node, actions }: any) => {
       name: 'fileRelativePath',
       value: node.fileAbsolutePath.replace(pathRoot, ''),
     })
+    actions.createNodeField({
+      node,
+      name: 'rawFrontmatter',
+      value: node.frontmatter,
+    })
   }
 }
 
