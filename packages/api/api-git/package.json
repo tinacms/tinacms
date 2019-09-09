@@ -16,7 +16,8 @@
   "dependencies": {
     "@types/express": "^4.17.0",
     "express": "^4.17.1",
-    "simple-git": "1.124.0"
+    "simple-git": "1.124.0",
+    "multer": "1.4.2"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",

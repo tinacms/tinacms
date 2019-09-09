@@ -37,6 +37,9 @@ cms.registerApi('git', {
   onChange(data) {
     writeToDisk(data)
   },
+  onUploadMedia(data) {
+    writeMediaToDisk(data)
+  },
   onDelete(data) {
     deleteFromDisk(data)
   },
@@ -79,6 +82,23 @@ function writeToDisk(data) {
       body: JSON.stringify(data),
     }
   )
+    .then(response => {
+      console.log(response.json())
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
+
+function writeMediaToDisk(data) {
+  // @ts-ignore
+  return fetch(`${base()}/___tina/upload`, {
+    method: 'PUT',
+    headers: {
+      'Content-Type': 'application/json; charset=utf-8',
+    },
+    body: JSON.stringify(data),
+  })
     .then(response => {
       console.log(response.json())
     })

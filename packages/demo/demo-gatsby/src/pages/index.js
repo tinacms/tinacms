@@ -44,6 +44,7 @@ function BlogIndex(props) {
         name: "thumbnail",
         label: "Thumbnail",
         component: "image",
+        path: "thingy.jpeg",
       },
     ],
     onSubmit() {
