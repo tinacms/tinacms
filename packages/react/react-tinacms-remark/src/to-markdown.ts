@@ -4,7 +4,7 @@ import * as yaml from 'js-yaml'
 export function toMarkdownString(remark: RemarkNode) {
   return (
     '---\n' +
-    yaml.dump(remark.frontmatter) +
+    yaml.dump(remark.fields.rawFrontmatter) +
     '---\n' +
     (remark.rawMarkdownBody || '')
   )

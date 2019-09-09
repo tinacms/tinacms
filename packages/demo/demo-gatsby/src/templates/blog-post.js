@@ -114,30 +114,30 @@ export default remarkForm(BlogPostTemplate, {
   fields: [
     {
       label: "Title",
-      name: "frontmatter.title",
+      name: "fields.rawFrontmatter.title",
       component: "text",
       required: true,
     },
     {
       label: "Draft",
-      name: "frontmatter.draft",
+      name: "fields.rawFrontmatter.draft",
       component: "toggle",
     },
     {
       label: "Date",
-      name: "frontmatter.date",
+      name: "fields.rawFrontmatter.date",
       component: function ReadOnly({ input }) {
         return <div>{input.value}</div>
       },
     },
     {
       label: "Description",
-      name: "frontmatter.description",
+      name: "fields.rawFrontmatter.description",
       component: "textarea",
     },
     {
       label: "Heading color",
-      name: "frontmatter.heading_color",
+      name: "fields.rawFrontmatter.heading_color",
       component: "color",
     },
     { label: "Body", name: "rawMarkdownBody", component: "textarea" },
@@ -175,10 +175,17 @@ export const pageQuery = graphql`
       rawMarkdownBody
       fields {
         fileRelativePath
+        frontmatter {
+          title
+          date
+          description
+          heading_color
+          draft
+        }
       }
       frontmatter {
         title
-        date
+        date(formatString: "MMMM DD, YYYY")
         description
         heading_color
         draft
