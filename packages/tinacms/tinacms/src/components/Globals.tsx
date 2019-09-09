@@ -7,6 +7,8 @@ export const FOOTER_HEIGHT = 4
 export const Theme = {
   color: {
     primary: '#0084ff',
+    light: '#F4F4F4',
+    dark: '#353232',
   },
   radius: {
     small: '0.25rem',
@@ -18,6 +20,12 @@ export const Theme = {
   timing: {
     short: '85ms',
     medium: '150ms',
+  },
+  input: {
+    padding: '0.75rem',
+    radius: '0.25rem',
+    fontSize: '0.9rem',
+    lineHeight: 1.35,
   },
   padding: 1.25,
 }

@@ -11,25 +11,27 @@ export interface InputProps extends a {
 }
 
 export const TextField = styled.input<{ error?: boolean }>`
-  background-color: #F8F8F8;
+  background-color: ${p => p.theme.color.light};
+  border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
+  border-radius: ${p => p.theme.input.radius};
+  font-size: ${p => p.theme.input.fontSize};
+  line-height: ${p => p.theme.input.lineHeight};
+  transition: all ${p => p.theme.timing.short} ease-out;
+  padding: ${p => p.theme.input.padding};
   border-width: 1px;
   border-style: solid;
   border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
-  border-radius: 0.25rem;
   width: 100%;
-  font-size: 0.9rem;
-  padding: 0.75rem;
   margin: 0;
   outline: none;
-  transition: all 150ms ease-out;
 
   &:hover {
-    background-color: #F2F2F2;
+    background-color: #f2f2f2;
   }
 
   &:focus {
     border-color: #333333;
-    background-color: #F8F8F8;
+    background-color: #f8f8f8;
   }
 
   &::placeholder {
