@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-tinacms-json",
-  "version": "0.1.0-alpha.2",
+  "version": "0.1.0-alpha.3",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "MIT",
@@ -19,7 +19,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.0-alpha.2",
-    "@tinacms/react-tinacms": "^0.1.0-alpha.2"
+    "@tinacms/core": "^0.1.0-alpha.3",
+    "@tinacms/react-tinacms": "^0.1.0-alpha.3"
   }
 }
