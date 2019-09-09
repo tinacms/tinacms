@@ -2,8 +2,7 @@ import * as React from 'react'
 import { defaultBlockSchema } from './schema'
 import { MarkdownTranslator, Translator } from './Translator'
 import { EditorView } from 'prosemirror-view'
-import { EditorState } from 'prosemirror-state'
-import { Schema } from 'prosemirror-model'
+import { createEditorState } from './state'
 
 let schema = defaultBlockSchema
 let translator = MarkdownTranslator.fromSchema(schema, {})
@@ -28,24 +27,4 @@ export function Wysiwyg({ input }: any) {
       <div ref={prosemirrorEl} />
     </div>
   )
-}
-
-export function createEditorState(
-  schema: Schema,
-  translator: Translator,
-  value: string
-) {
-  return EditorState.create({
-    schema,
-    doc: translator.nodeFromString(value),
-    plugins: [
-      // inputRules(schema),
-      // keymap(schema, blockContent),
-      // history(),
-      // links(schema),
-      // dropCursor({ width: 2, color: "rgb(33, 224, 158)" }),
-      // gapCursor(),
-      // menu(store, translator, !fullsize, format),
-    ],
-  })
 }
