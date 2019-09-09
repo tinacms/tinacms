@@ -2,7 +2,8 @@ import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
-import styled from 'styled-components'
+import styled, { createGlobalStyle } from 'styled-components'
+import { RootElement } from './sidebar'
 
 interface Props {
   children: any
@@ -38,6 +39,7 @@ interface ModalContainerProps {
 const ModalContainerContext = React.createContext<ModalContainerProps | null>(
   null
 )
+const Padding = 1.25
 
 export function useModalContainer(): ModalContainerProps {
   let modalContainer = React.useContext(ModalContainerContext)
@@ -64,14 +66,14 @@ export const Modal = ({
             height: '100vh',
             width: '100vw',
             margin: '0 auto',
-            position: 'absolute',
-            zIndex: 999,
+            position: 'fixed',
+            zIndex: 1001,
+            border: 0,
           }}
         >
+          <RootElement />
           <ModalOverlay>
-            <ModalInner>
-              <div {...props} />
-            </ModalInner>
+            <div {...props} />
           </ModalOverlay>
         </StyledFrame>,
         portalNode
@@ -86,12 +88,8 @@ export const ModalOverlay = styled.div`
   bottom: 0;
   left: 0;
   background: rgba(0, 0, 0, 0.5);
-  z-index: 1000;
   overflow: auto;
-  padding: 1rem;
-  display: flex;
-  align-items: flex-start;
-  justify-content: center;
+  padding: 0;
 `
 
 export const ModalHeader = styled.div`
@@ -101,21 +99,11 @@ export const ModalHeader = styled.div`
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: 1rem 1rem 0 1rem;
-  margin: 0 0 1rem 0;
+  padding: ${Padding}rem ${Padding}rem 0 ${Padding}rem;
+  margin: 0;
 `
 
 export const ModalBody = styled.div`
-  margin: 2rem 1rem;
-`
-
-export const ModalInner = styled.div`
-  display: block;
-  z-index: 1;
-  overflow: visible; /* Keep this as "visible", select component needs to overflow */
-  background-color: #fefefe;
-  border-radius: 0.25rem;
-  margin: auto;
-  width: 460px;
-  max-width: 90%;
+  padding: ${Padding}rem;
+  margin: 0;
 `
