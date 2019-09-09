@@ -15,19 +15,7 @@ module.exports = {
         title: "Tina Gatsby Demo",
         logo:
           "https://seeklogo.com/images/G/gatsby-logo-1A245AD37F-seeklogo.com.png",
-        plugins: [
-          "@tinacms/gatsby-tinacms-git",
-          "@tinacms/react-tinacms-json",
-          {
-            resolve: "@tinacms/gatsby-tinacms-gitlab",
-            options: {
-              appID:
-                "5eaf309d8dac09519bdcd2f9ce0fec494cfac21b7c7d2568553538696f15ba61",
-              redirectURI: "http://localhost:8000/?auth-gitlab",
-              repositoryID: "dwalkr/xtest",
-            },
-          },
-        ],
+        plugins: ["@tinacms/gatsby-tinacms-git", "@tinacms/react-tinacms-json"],
       },
     },
     {
