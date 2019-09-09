@@ -1,4 +1,3 @@
-import { audit } from './audit'
 import { writeFile, deleteFile } from './file-writer'
 
 const fs = require('fs')
@@ -96,16 +95,6 @@ export function router() {
     await repo.commit(message || DEFAULT_MESSAGE, ...files, options)
     await repo.push()
   }
-
-  audit((pathRoot: string, body: any) => {
-    let filePath = path.join(pathRoot, body.fileRelativePath)
-    return new Promise((resolve, reject) => {
-      fs.writeFile(filePath, body.content, (err: any) => {
-        if (err) reject(err)
-        else resolve()
-      })
-    })
-  })
 
   return router
 }
