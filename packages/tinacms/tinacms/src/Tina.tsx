@@ -44,6 +44,7 @@ const EditorToggle = styled(props => {
   display: flex;
   align-items: center;
   justify-content: center;
+  fill: white;
   text-align: center;
   background-color: #0084ff;
   background-repeat: no-repeat;

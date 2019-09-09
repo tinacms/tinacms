@@ -229,7 +229,7 @@ const MoreActions = styled(p => (
 `
 
 const ActionMenu = styled.div<{ open: boolean }>`
-  min-width: 14rem;
+  min-width: 12rem;
   border-radius: 0.5rem;
   border: 1px solid #efefef;
   display: block;
