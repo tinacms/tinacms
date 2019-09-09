@@ -54,6 +54,7 @@ const SidebarLayoutContainer = styled.div`
 
 const SiteContainer = styled.div`
   z-index: 0;
-  overflow-y: scroll;
+  overflow-y: auto;
+  position: relative;
   flex: 1 0 auto;
 `
