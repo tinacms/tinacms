@@ -57,7 +57,9 @@ const DatetimeContainer = styled.div`
     border-radius: ${p => p.theme.input.radius};
     font-size: ${p => p.theme.input.fontSize};
     line-height: ${p => p.theme.input.lineHeight};
-    transition: all ${p => p.theme.timing.short} ease-out;
+    transition: background-color ${p => p.theme.timing.short} ease-out,
+      border-color ${p => p.theme.timing.short} ease-out,
+      box-shadow ${p => p.theme.timing.medium} ease-out;
     padding: ${p => p.theme.input.padding};
     border-width: 1px;
     border-style: solid;

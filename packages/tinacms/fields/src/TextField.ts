@@ -16,7 +16,9 @@ export const TextField = styled.input<{ error?: boolean }>`
   border-radius: ${p => p.theme.input.radius};
   font-size: ${p => p.theme.input.fontSize};
   line-height: ${p => p.theme.input.lineHeight};
-  transition: all ${p => p.theme.timing.short} ease-out;
+  transition: background-color ${p => p.theme.timing.short} ease-out,
+    border-color ${p => p.theme.timing.short} ease-out,
+    box-shadow ${p => p.theme.timing.medium} ease-out;
   padding: ${p => p.theme.input.padding};
   border-width: 1px;
   border-style: solid;
@@ -30,7 +32,7 @@ export const TextField = styled.input<{ error?: boolean }>`
 
   &:focus {
     border-color: ${p => p.theme.color.primary};
-    box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
+    box-shadow: 0 0 2px ${p => p.theme.color.primary};
     background-color: #f8f8f8;
   }
 
