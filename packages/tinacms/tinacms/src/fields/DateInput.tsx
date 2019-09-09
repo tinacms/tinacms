@@ -7,6 +7,7 @@ import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState } from 'react'
 import { useFrameContext } from '../styled-frame'
 import styled from 'styled-components'
+import { TextField } from '@tinacms/fields'
 
 let area: any
 export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
@@ -52,24 +53,26 @@ export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 // if we could reuse those styles instead of having a duplicate.
 const DatetimeContainer = styled.div`
   input {
-    background-color: #f8f8f8;
+    background-color: ${p => p.theme.color.light};
+    border-radius: ${p => p.theme.input.radius};
+    font-size: ${p => p.theme.input.fontSize};
+    line-height: ${p => p.theme.input.lineHeight};
+    transition: all ${p => p.theme.timing.short} ease-out;
+    padding: ${p => p.theme.input.padding};
     border-width: 1px;
     border-style: solid;
     border-color: #f2f2f2;
-    border-radius: 0.25rem;
     width: 100%;
-    font-size: 0.9rem;
-    padding: 0.75rem;
     margin: 0;
     outline: none;
-    transition: all 150ms ease-out;
 
     &:hover {
-      background-color: #f2f2f2;
+      background-color: #f0f0f0;
     }
 
     &:focus {
-      border-color: #333333;
+      border-color: ${p => p.theme.color.primary};
+      box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
       background-color: #f8f8f8;
     }
 

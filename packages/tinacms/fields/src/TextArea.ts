@@ -12,26 +12,27 @@ export interface TextAreaProps extends a {
 
 export const TextArea = styled.textarea<{ error?: boolean }>`
   background-color: ${p => p.theme.color.light};
-  border-width: 1px;
-  border-style: solid;
   border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
   border-radius: ${p => p.theme.input.radius};
+  font-size: ${p => p.theme.input.fontSize};
+  line-height: ${p => p.theme.input.lineHeight};
+  transition: all ${p => p.theme.timing.short} ease-out;
+  padding: ${p => p.theme.input.padding};
+  border-width: 1px;
+  border-style: solid;
   height: 10rem;
   width: 100%;
-  font-size: ${p => p.theme.input.fontSize};
-  padding: ${p => p.theme.input.padding};
   margin: 0;
   outline: none;
   resize: vertical;
-  line-height: ${p => p.theme.input.lineHeight};
-  transition: all ${p => p.theme.timing.short} ease-out;
 
   &:hover {
-    background-color: #f2f2f2;
+    background-color: #f0f0f0;
   }
 
   &:focus {
-    border-color: #333333;
+    border-color: ${p => p.theme.color.primary};
+    box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
     background-color: #f8f8f8;
   }
 
