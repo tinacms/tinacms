@@ -54,7 +54,7 @@ function BlogPostTemplate(props) {
             <Bio />
             <div style={{ display: "flex", flexDirection: "column" }}>
               <span style={{ fontWeight: "600" }}>Date</span>
-              <p>{Date(post.frontmatter.date)}</p>
+              <p>{post.frontmatter.date}</p>
             </div>
           </div>
         </div>
@@ -175,7 +175,7 @@ export const pageQuery = graphql`
       rawMarkdownBody
       fields {
         fileRelativePath
-        frontmatter {
+        rawFrontmatter {
           title
           date
           description
@@ -185,7 +185,7 @@ export const pageQuery = graphql`
       }
       frontmatter {
         title
-        date(formatString: "MMMM DD, YYYY")
+        date(formatString: "DD MMMM, YYYY")
         description
         heading_color
         draft
