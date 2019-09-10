@@ -1,34 +1,37 @@
-import * as fs from "fs"
-import * as path from "path"
-import { defaultBlockSchema } from "../../schema"
-import { MarkdownTranslator } from "./index"
+import * as fs from 'fs'
+import * as path from 'path'
+import { defaultBlockSchema } from '../../schema'
+import { MarkdownTranslator } from './index'
 
 const pathOf = (...files: string[]) => path.resolve(__dirname, ...files)
 
 const flavours = fs.readdirSync(pathOf())
 
-const isDirectory = (...files: string[]) => fs.lstatSync(pathOf(...files)).isDirectory()
+const isDirectory = (...files: string[]) =>
+  fs.lstatSync(pathOf(...files)).isDirectory()
 
-describe("Markdown Translators", () => {
+describe('Markdown Translators', () => {
   flavours.forEach(flavour => {
-    if (flavour !== "commonmark") {
+    if (flavour !== 'commonmark') {
       return
     }
-    const translator = MarkdownTranslator.commonMarkFromSchema(defaultBlockSchema)
+    const translator = MarkdownTranslator.commonMarkFromSchema(
+      defaultBlockSchema
+    )
 
     describe(flavour, () => {
       if (!isDirectory(flavour)) {
         return
       }
 
-      const tests = fs.readdirSync(pathOf(flavour, "__tests__"))
+      const tests = fs.readdirSync(pathOf(flavour, '__tests__'))
 
       tests.forEach(test => {
-        if (test.startsWith("skip_")) {
+        if (test.startsWith('skip_')) {
           return
         }
 
-        if (isDirectory(flavour, "__tests__", test)) {
+        if (isDirectory(flavour, '__tests__', test)) {
           testDir(flavour, test)
           return
         }
@@ -38,7 +41,7 @@ describe("Markdown Translators", () => {
     })
 
     function testFile(flavour: string, file: string) {
-      const input = fs.readFileSync(pathOf(flavour, "__tests__", file), "utf8")
+      const input = fs.readFileSync(pathOf(flavour, '__tests__', file), 'utf8')
 
       it(file, () => {
         let node = translator.nodeFromString(input)!
@@ -49,35 +52,35 @@ describe("Markdown Translators", () => {
 
     function testDir(flavour: string, dir: string) {
       const readFile = (file: string) =>
-        fs.existsSync(pathOf(flavour, "__tests__", dir, file))
-          ? fs.readFileSync(pathOf(flavour, "__tests__", dir, file), "utf8")
-          : ""
+        fs.existsSync(pathOf(flavour, '__tests__', dir, file))
+          ? fs.readFileSync(pathOf(flavour, '__tests__', dir, file), 'utf8')
+          : ''
 
       const writeFile = (file: string, content: string) =>
-        fs.writeFile(pathOf(flavour, "__tests__", dir, file), content)
+        fs.writeFile(pathOf(flavour, '__tests__', dir, file), content, () => {})
 
-      const input = readFile("input.md")
-      const expectedNode = readFile("node.json")
-      const expectedOutput = readFile("output.md")
+      const input = readFile('input.md')
+      const expectedNode = readFile('node.json')
+      const expectedOutput = readFile('output.md')
 
       let node = translator.nodeFromString(input)!
       let output = translator.stringFromNode(node)
 
       describe(dir, () => {
         if (expectedNode) {
-          it("PM Node", () => {
+          it('PM Node', () => {
             expect(node.toJSON()).toEqual(JSON.parse(expectedNode))
           })
         } else {
-          writeFile("node.json", JSON.stringify(node.toJSON(), null, 2))
+          writeFile('node.json', JSON.stringify(node.toJSON(), null, 2))
         }
 
         if (expectedOutput) {
-          it("MD Output", () => {
+          it('MD Output', () => {
             expect(output).toBe(expectedOutput)
           })
         } else {
-          writeFile("output.md", output)
+          writeFile('output.md', output)
         }
       })
     }
