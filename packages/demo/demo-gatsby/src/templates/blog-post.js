@@ -153,12 +153,21 @@ export default props => {
         name: "rawFrontmatter.thumbnail",
         label: "Thumbnail",
         component: "image",
-        parse: value => `./${value}`,
-        outputDirectory: post => {
-          let filePathParts = post.fileRelativePath.split("/")
+        // Generate the frontmatter value based on the filename
+        parse: filename => `./${filename}`,
 
-          return filePathParts.splice(0, filePathParts.length - 1).join("/")
+        // Decide the file upload directory for the post
+        outputDirectory: blogPost => {
+          let postPathParts = blogPost.fileRelativePath.split("/")
+
+          let postDirectory = postPathParts
+            .splice(0, postPathParts.length - 1)
+            .join("/")
+
+          return postDirectory
         },
+
+        // Generate the src attribute for the preview image.
         previewSrc: formValues => {
           if (!formValues.frontmatter.thumbnail) return ""
           return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
