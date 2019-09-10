@@ -151,6 +151,7 @@ export default props => {
         name: "rawFrontmatter.thumbnail",
         label: "Thumbnail",
         component: "image",
+        parse: value => `./${value}`,
         outputDirectory: post => {
           let filePathParts = post.fileRelativePath.split("/")
 
