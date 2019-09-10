@@ -5,7 +5,7 @@ export interface RemarkNode {
   rawMarkdownBody: string
   fields: {
     fileRelativePath: string
-    rawFrontmatter: any
+    rawFrontmatter?: any
   }
   [key: string]: any
 }
