@@ -205,13 +205,13 @@ const SidebarContainer = styled.div<{ open: boolean; position: string }>`
     css`
       position: fixed;
       width: 340px;
-      height: calc(100% - 2.5rem);
+      height: calc(100% - 40px);
       border-radius: 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big} 0;
       border-top: 1px solid #efefef;
       border-bottom: 1px solid #efefef;
       border-right: 1px solid #efefef;
       box-shadow: ${p => p.theme.shadow.big};
-      top: 1.25rem;
+      top: 20px;
       left: 0;
 
       iframe {
