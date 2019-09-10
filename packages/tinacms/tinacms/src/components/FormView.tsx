@@ -1,12 +1,14 @@
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
+import { EllipsisVertical } from '@tinacms/icons'
+import { TextField } from '@tinacms/fields'
 import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
-import { TextField } from '@tinacms/fields'
 import { Modal, ModalBody, ModalHeader } from '..'
-import { EllipsisVertical } from './icons/EllipsisVertical'
+import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
+import { Button } from './Button'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -204,11 +206,6 @@ const NoFieldsPlaceholder = () => (
   <p>There are no fields registered with this form</p>
 )
 
-// Styling
-const FormsFooterHeight = 4
-const HeaderHeight = 4
-const Padding = 1.25
-
 const MoreActions = styled(p => (
   <button {...p}>
     <EllipsisVertical />
@@ -232,13 +229,13 @@ const MoreActions = styled(p => (
 `
 
 const ActionMenu = styled.div<{ open: boolean }>`
-  min-width: 10rem;
+  min-width: 12rem;
   border-radius: 0.5rem;
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  bottom: ${Padding}rem;
-  right: ${Padding}rem;
+  bottom: ${p => p.theme.padding}rem;
+  right: ${p => p.theme.padding}rem;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
@@ -291,32 +288,18 @@ const ActionButton = styled.button`
   }
 `
 
-const CreateButton = styled.button`
-  text-align: center;
+const CreateButton = styled(Button)`
   width: 100%;
-  border: 0;
-  border-radius: 0.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
-  background-color: #0084ff;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 0.75rem;
-  padding: 0.75rem;
-  transition: opacity 85ms ease-out;
-  margin-bottom: ${Padding}rem;
-  &:hover {
-    opacity: 0.6;
-  }
 `
 
 const FieldsWrapper = styled.div`
   position: absolute;
   left: 0;
   top: 0;
-  height: calc(100vh - (${FormsFooterHeight + HeaderHeight}rem));
+  height: calc(100vh - (${HEADER_HEIGHT + FOOTER_HEIGHT}rem));
   width: 100%;
-  padding: ${Padding}rem ${Padding}rem 0 ${Padding}rem;
+  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
+    ${p => p.theme.padding}rem;
   overflow-y: auto;
 `
 
@@ -327,37 +310,16 @@ const FormsFooter = styled.div`
   left: 0;
   bottom: 0;
   width: 100%;
-  height: ${FormsFooterHeight}rem;
+  height: ${FOOTER_HEIGHT}rem;
   background-color: white;
   border-top: 1px solid #efefef;
   padding: 0.75rem 1.25rem;
   box-shadow: inset -1px 0 0 #efefef;
 `
 
-// TODO: make more global
-export const SaveButton = styled.button`
+export const SaveButton = styled(Button)`
   flex: 1 0 auto;
-  text-align: center;
-  font-size: 0.75rem;
   padding: 0.75rem 1.5rem;
-  border: 0;
-  border-radius: 0.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
-  background-color: #0084ff;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  transition: opacity 85ms;
-  &:hover {
-    opacity: 0.6;
-  }
-  ${p =>
-    p.disabled &&
-    css`
-      opacity: 0.25;
-      pointer: not-allowed;
-      pointer-events: none;
-    `};
 `
 
 export const CancelButton = styled(SaveButton)`

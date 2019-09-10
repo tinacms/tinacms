@@ -23,6 +23,7 @@
     "@types/react-dom": "^16.8.5",
     "@types/storybook__react": "^4.0.2",
     "@types/styled-components": "4.1.8",
+    "@tinacms/icons": "^0.0.0",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
     "cms-scripts": "^0.1.0-alpha.2",
@@ -34,7 +35,6 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@forestryio/icons": "^1.98.0",
     "@sambego/storybook-styles": "^1.0.0",
     "@types/react-select": "^2.0.11",
     "color-string": "^1.5.3",
