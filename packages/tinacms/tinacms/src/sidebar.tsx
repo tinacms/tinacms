@@ -206,7 +206,7 @@ const SidebarContainer = styled.div<{ open: boolean; position: string }>`
       position: fixed;
       width: 340px;
       height: calc(100% - 40px);
-      border-radius: 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big} 0;
+      border-radius: 0 8px 8px 0;
       border-top: 1px solid #efefef;
       border-bottom: 1px solid #efefef;
       border-right: 1px solid #efefef;
@@ -215,7 +215,7 @@ const SidebarContainer = styled.div<{ open: boolean; position: string }>`
       left: 0;
 
       iframe {
-        border-radius: 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big} 0;
+        border-radius: 0 8px 8px 0;
       }
     `};
 `
