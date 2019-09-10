@@ -6,7 +6,7 @@ import { useCMS } from '@tinacms/react-tinacms'
 interface ImageProps {
   path: string
   previewSrc(form: any): string
-  outputDirectory(form: any): string
+  uploadDir(form: any): string
 }
 
 export const ImageUploadInput = wrapFieldsWithMeta<InputProps, ImageProps>(
@@ -21,7 +21,7 @@ export const ImageUploadInput = wrapFieldsWithMeta<InputProps, ImageProps>(
           acceptedFiles.forEach(async (file: any) => {
             // @ts-ignore
             await cms.api.git!.onUploadMedia!({
-              directory: field.outputDirectory(form.getState().values),
+              directory: field.uploadDir(form.getState().values),
               content: file,
             })
             input.onChange(file.name)

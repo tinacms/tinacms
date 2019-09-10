@@ -157,7 +157,7 @@ export default props => {
         parse: filename => `./${filename}`,
 
         // Decide the file upload directory for the post
-        outputDirectory: blogPost => {
+        uploadDir: blogPost => {
           let postPathParts = blogPost.fileRelativePath.split("/")
 
           let postDirectory = postPathParts
