@@ -55,10 +55,12 @@ function BlogPostTemplate(props) {
             <Bio />
 
             <div style={{ display: "flex", flexDirection: "column" }}>
-              <Img
-                fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
-                alt="Gatsby can't find me"
-              />
+              {post.frontmatter.thumbnail && (
+                <Img
+                  fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                  alt="Gatsby can't find me"
+                />
+              )}
               <span style={{ fontWeight: "600" }}>Date</span>
               <p>{post.frontmatter.date}</p>
             </div>
@@ -158,6 +160,7 @@ export default props => {
           return filePathParts.splice(0, filePathParts.length - 1).join("/")
         },
         previewSrc: formValues => {
+          if (!formValues.frontmatter.thumbnail) return ""
           return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
         },
       },
