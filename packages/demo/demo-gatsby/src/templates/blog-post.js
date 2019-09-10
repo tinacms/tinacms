@@ -6,6 +6,8 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { useRemarkForm } from "@tinacms/react-tinacms-remark"
+import Img from "gatsby-image"
+
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
@@ -51,7 +53,12 @@ function BlogPostTemplate(props) {
             }}
           >
             <Bio />
+
             <div style={{ display: "flex", flexDirection: "column" }}>
+              <Img
+                fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                alt="Gatsby can't find me"
+              />
               <span style={{ fontWeight: "600" }}>Date</span>
               <p>{post.frontmatter.date}</p>
             </div>
@@ -110,11 +117,6 @@ function BlogPostTemplate(props) {
 }
 
 export default props => {
-  const fullPath = props.data.markdownRemark.fields.fileRelativePath
-  const imagePath = fullPath
-    .split("/")
-    .slice(0, -1)
-    .join("/")
   useRemarkForm(props.data.markdownRemark, {
     fields: [
       {
@@ -149,7 +151,9 @@ export default props => {
         name: "fields.rawFrontmatter.thumbnail",
         label: "Thumbnail",
         component: "image",
-        path: imagePath,
+        previewSrc:
+          props.data.markdownRemark.frontmatter.thumbnail.childImageSharp.fluid
+            .src,
       },
       { label: "Body", name: "rawMarkdownBody", component: "textarea" },
       { name: "hr", component: () => <hr /> },
@@ -189,13 +193,7 @@ export const pageQuery = graphql`
       rawMarkdownBody
       fields {
         fileRelativePath
-        rawFrontmatter {
-          title
-          date
-          description
-          heading_color
-          draft
-        }
+        rawFrontmatter
       }
       frontmatter {
         title
@@ -203,6 +201,13 @@ export const pageQuery = graphql`
         description
         heading_color
         draft
+        thumbnail {
+          childImageSharp {
+            fluid {
+              ...GatsbyImageSharpFluid
+            }
+          }
+        }
       }
     }
   }
