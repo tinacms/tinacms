@@ -56,9 +56,6 @@ function writeMediaToDisk(data: any) {
   // @ts-ignore
   return fetch(`${base()}/___tina/upload`, {
     method: 'POST',
-    // headers: {
-    //   'Content-Type': 'multipart/form-data',
-    // },
     body: formData,
   })
     .then(response => {

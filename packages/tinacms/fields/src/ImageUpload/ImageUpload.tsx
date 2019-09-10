@@ -1,9 +1,11 @@
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
+const path = require('path')
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
+  directory: string
   value?: string
 }
 
@@ -43,7 +45,7 @@ const StyledImage = styled.img`
   max-width: 100%;
 `
 
-export const ImageUpload = ({ onDrop, value }: ImageUploadProps) => {
+export const ImageUpload = ({ onDrop, value, directory }: ImageUploadProps) => {
   const {
     getRootProps,
     getInputProps,
@@ -56,7 +58,7 @@ export const ImageUpload = ({ onDrop, value }: ImageUploadProps) => {
     <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
       {value ? (
-        <StyledImage src={value} />
+        <StyledImage src={path.join(directory, value)} />
       ) : (
         <ImgPlaceholder>
           <p>Drag 'n' drop some files here, or click to select files</p>
