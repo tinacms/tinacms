@@ -3,8 +3,8 @@ import styled from 'styled-components'
 import { useTinaProsemirror } from './useTinaProsemirror'
 
 let lightGrey = 'rgb(243, 243, 243)'
-let lightMediumGrey = `darken(${lightGrey})`
-let mediumGrey = `darken(${lightGrey}, 20);`
+let lightMediumGrey = `rgb(200, 200, 200)`
+let mediumGrey = `rgb(143, 143, 143);`
 let darkGrey = 'rgb(40, 40, 40)'
 
 export const Wysiwyg = styled(({ input, ...styleProps }: any) => {
@@ -45,7 +45,8 @@ export const Wysiwyg = styled(({ input, ...styleProps }: any) => {
   // Base styling
   color: ${darkGrey};
   background-color: #fff;
-  font-family: Avenir, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+  //Add Inter to global styles or whichever main font we use
+  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
     Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 26px;
@@ -70,7 +71,7 @@ export const Wysiwyg = styled(({ input, ...styleProps }: any) => {
   h4,
   h5,
   h6 {
-    font-family: Avenir, -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
       Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-weight: 600;
     text-transform: none;
