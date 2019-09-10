@@ -5,8 +5,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { remarkForm } from "@tinacms/react-tinacms-remark"
-
+import { useRemarkForm } from "@tinacms/react-tinacms-remark"
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
@@ -110,55 +109,71 @@ function BlogPostTemplate(props) {
   )
 }
 
-export default remarkForm(BlogPostTemplate, {
-  fields: [
-    {
-      label: "Title",
-      name: "fields.rawFrontmatter.title",
-      component: "text",
-      required: true,
-    },
-    {
-      label: "Draft",
-      name: "fields.rawFrontmatter.draft",
-      component: "toggle",
-    },
-    {
-      label: "Date",
-      name: "fields.rawFrontmatter.date",
-      component: function ReadOnly({ input }) {
-        return <div>{input.value}</div>
+export default props => {
+  const fullPath = props.data.markdownRemark.fields.fileRelativePath
+  const imagePath = fullPath
+    .split("/")
+    .slice(0, -1)
+    .join("/")
+  useRemarkForm(props.data.markdownRemark, {
+    fields: [
+      {
+        label: "Title",
+        name: "fields.rawFrontmatter.title",
+        component: "text",
+        required: true,
       },
-    },
-    {
-      label: "Description",
-      name: "fields.rawFrontmatter.description",
-      component: "textarea",
-    },
-    {
-      label: "Heading color",
-      name: "fields.rawFrontmatter.heading_color",
-      component: "color",
-    },
-    { label: "Body", name: "rawMarkdownBody", component: "textarea" },
-    { name: "hr", component: () => <hr /> },
-    {
-      label: "Commit Name",
-      name: "__commit_name",
-      component: "text",
-    },
-    {
-      label: "Commit Email",
-      name: "__commit_email",
-      component: "text",
-    },
-    {
-      label: "Commit Message (Optional)",
-      name: "__commit_message",
-      component: "textarea",
-    },
-  ],
-})
+      {
+        label: "Draft",
+        name: "fields.rawFrontmatter.draft",
+        component: "toggle",
+      },
+      {
+        label: "Date",
+        name: "fields.rawFrontmatter.date",
+        component: function ReadOnly({ input }) {
+          return <div>{input.value}</div>
+        },
+      },
+      {
+        label: "Description",
+        name: "fields.rawFrontmatter.description",
+        component: "textarea",
+      },
+      {
+        label: "Heading color",
+        name: "fields.rawFrontmatter.heading_color",
+        component: "color",
+      },
+      {
+        name: "thumbnail",
+        label: "Thumbnail",
+        component: "image",
+        path: imagePath,
+      },
+
+      { label: "Body", name: "rawMarkdownBody", component: "textarea" },
+      { name: "hr", component: () => <hr /> },
+      {
+        label: "Commit Name",
+        name: "__commit_name",
+        component: "text",
+      },
+      {
+        label: "Commit Email",
+        name: "__commit_email",
+        component: "text",
+      },
+      {
+        label: "Commit Message (Optional)",
+        name: "__commit_message",
+        component: "textarea",
+      },
+    ],
+  })
+
+  return <BlogPostTemplate {...props} />
+}
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {

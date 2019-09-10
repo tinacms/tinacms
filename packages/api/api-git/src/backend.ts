@@ -6,17 +6,6 @@ const express = require('express')
 const openRepo = require('simple-git/promise')
 var multer = require('multer')
 
-var tmpImgStorage = multer.diskStorage({
-  destination: function(req: any, file: any, cb: any) {
-    //cb(null, path.join(process.cwd(), '___tina/tmp/images/'))
-    cb(null, path.join(process.cwd(), '___tina/tmp/images/'))
-  },
-  filename: function(req: any, file: any, cb: any) {
-    cb(null, file.originalname)
-  },
-})
-const upload = multer({ storage: tmpImgStorage })
-
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
@@ -26,6 +15,17 @@ const DEFAULT_MESSAGE = 'Update from Tina'
 
 export function router() {
   let pathRoot = process.cwd()
+  const tmpImgDir = path.join(pathRoot, '___tina/tmp/images/')
+
+  var tmpImgStorage = multer.diskStorage({
+    destination: function(req: any, file: any, cb: any) {
+      cb(null, tmpImgDir)
+    },
+    filename: function(req: any, file: any, cb: any) {
+      cb(null, file.originalname)
+    },
+  })
+  const upload = multer({ storage: tmpImgStorage })
 
   const repo = openRepo(pathRoot)
   // TODO: Don't do this
@@ -74,9 +74,13 @@ export function router() {
 
   router.post('/upload', upload.single('file'), (req: any, res: any) => {
     try {
-      console.log('DO WRITE directory ' + req.directory)
+      console.log('DO WRITE directory ' + req.body.directory)
       console.log('DO WRITE FILE ' + JSON.stringify(req.file))
-      // writeFile(path.join(pathRoot, req.params.relPath), req.body.content)
+      const fileName = req.file.originalname
+      fs.rename(
+        path.join(tmpImgDir, fileName),
+        path.join(pathRoot, req.body.directory, fileName)
+      )
       res.send(req.file)
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })

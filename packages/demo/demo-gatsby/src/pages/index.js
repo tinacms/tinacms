@@ -40,12 +40,6 @@ function BlogIndex(props) {
         dateFormat: "YYYY MM DD",
         timeFormat: null,
       },
-      {
-        name: "thumbnail",
-        label: "Thumbnail",
-        component: "image",
-        path: "thingy.jpeg",
-      },
     ],
     onSubmit() {
       alert("Saving doesn't do anything.")
