@@ -30,6 +30,7 @@ export const Wysiwyg = styled(({ input, ...styleProps }: any) => {
     -webkit-overflow-scrolling: touch;
 
     &:focus {
+      //put Tina brand color here!!!!
       border-bottom: 1px solid rgb(33, 224, 158);
     }
 
@@ -123,7 +124,8 @@ export const Wysiwyg = styled(({ input, ...styleProps }: any) => {
 
   // Links
   a {
-    color: $rgb(33, 224, 158);
+    //make this a tina brand color!!
+    color: rgb(33, 224, 158);
     border: 0;
     font-weight: normal;
     text-decoration: underline;
