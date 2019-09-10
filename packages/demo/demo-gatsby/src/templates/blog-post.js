@@ -151,9 +151,9 @@ export default props => {
         name: "fields.rawFrontmatter.thumbnail",
         label: "Thumbnail",
         component: "image",
-        previewSrc:
-          props.data.markdownRemark.frontmatter.thumbnail.childImageSharp.fluid
-            .src,
+        previewSrc: formValues => {
+          return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
+        },
       },
       { label: "Body", name: "rawMarkdownBody", component: "textarea" },
       { name: "hr", component: () => <hr /> },
