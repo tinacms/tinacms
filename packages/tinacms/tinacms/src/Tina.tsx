@@ -27,11 +27,11 @@ function SidebarToggle() {
     <StyledFrame
       frameStyles={{
         position: 'fixed',
-        right: '2rem',
-        bottom: '2rem',
-        height: '3rem',
-        width: '3rem',
-        borderRadius: '0.5rem',
+        right: '32px',
+        bottom: '32px',
+        height: '48px',
+        width: '48px',
+        borderRadius: '8px',
         boxShadow: '0px 2px 3px rgba(48, 48, 48, 0.15)',
         zIndex: 999999,
         margin: 0,
