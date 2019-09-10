@@ -13,13 +13,28 @@ const DEFAULT_NAME = 'Tina'
 const DEFAULT_EMAIL = 'nolan@forestry.io'
 const DEFAULT_MESSAGE = 'Update from Tina'
 
+//If an upload path doesnt exist, create it
+function verifyUploadPath(uploadPath: string, callback: () => void) {
+  fs.exists(uploadPath, function(exists: boolean) {
+    if (exists) {
+      callback()
+    } else {
+      fs.mkdir(uploadPath, function() {
+        callback()
+      })
+    }
+  })
+}
+
 export function router() {
   let pathRoot = process.cwd()
-  const tmpImgDir = path.join(pathRoot, '___tina/tmp/images/')
+  const tmpImgDir = path.join(pathRoot, '/tmp/')
 
   var tmpImgStorage = multer.diskStorage({
     destination: function(req: any, file: any, cb: any) {
-      cb(null, tmpImgDir)
+      verifyUploadPath(tmpImgDir, () => {
+        cb(null, tmpImgDir)
+      })
     },
     filename: function(req: any, file: any, cb: any) {
       cb(null, file.originalname)
