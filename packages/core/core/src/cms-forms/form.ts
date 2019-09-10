@@ -33,4 +33,6 @@ export interface Field {
   name: string
   label?: string
   component: React.FC<any> | string
+  parse?: (value: string, name: string) => any
+  format?: (value: string, name: string) => any
 }
