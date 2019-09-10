@@ -61,6 +61,16 @@ export function useRemarkForm(
       ...formOverrrides,
     })
 
+    /**
+     * When using `rawFrontmatter` make sure the `markdownRemark.frontmatter` is kept in sync.
+     *
+     * TODO: This is a bit hacky.
+     */
+    useEffect(() => {
+      if (!form) return
+      form.finalForm.change('frontmatter', markdownRemark.frontmatter)
+    }, [markdownRemark.frontmatter])
+
     useEffect(() => {
       if (!form) return
       return form.subscribe(
