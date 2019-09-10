@@ -24,10 +24,7 @@ export function useRemarkForm(
     throw new Error(ERROR_MISSING_REMARK_ID)
   }
   // TODO: Only required when saving to local filesystem.
-  if (
-    typeof markdownRemark.fields === 'undefined' ||
-    typeof markdownRemark.fields.fileRelativePath === 'undefined'
-  ) {
+  if (typeof markdownRemark.fileRelativePath === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
   try {
@@ -40,22 +37,19 @@ export function useRemarkForm(
     const initialValues = useMemo(() => {
       let i = {
         ...markdownRemark,
-        fields: {
-          ...markdownRemark.fields,
-          rawFrontmatter: JSON.parse(markdownRemark.fields.rawFrontmatter),
-        },
+        rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
       }
       return i
     }, [])
 
     let [values, form] = useCMSForm({
-      name: markdownRemark.fields.fileRelativePath,
+      name: markdownRemark.fileRelativePath,
       initialValues,
       fields: generateFields(markdownRemark),
       onSubmit(data) {
         if (process.env.NODE_ENV === 'development') {
           return cms.api.git.onSubmit!({
-            files: [data.fields.fileRelativePath],
+            files: [data.fileRelativePath],
             message: data.__commit_message || 'Tina commit',
             name: data.__commit_name,
             email: data.__commit_email,
@@ -72,7 +66,7 @@ export function useRemarkForm(
       return form.subscribe(
         (formState: any) => {
           throttledOnChange({
-            fileRelativePath: formState.values.fields.fileRelativePath,
+            fileRelativePath: formState.values.fileRelativePath,
             content: toMarkdownString(formState.values),
           })
         },
@@ -83,6 +77,7 @@ export function useRemarkForm(
     return [markdownRemark, form]
   } catch (e) {
     // TODO: this swallows too many errors
+    console.log(e)
     throw new Error(ERROR_MISSING_CMS_GATSBY)
   }
 }

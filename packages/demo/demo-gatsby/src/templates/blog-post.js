@@ -121,34 +121,34 @@ export default props => {
     fields: [
       {
         label: "Title",
-        name: "fields.rawFrontmatter.title",
+        name: "rawFrontmatter.title",
         component: "text",
         required: true,
       },
       {
         label: "Draft",
-        name: "fields.rawFrontmatter.draft",
+        name: "rawFrontmatter.draft",
         component: "toggle",
       },
       {
         label: "Date",
-        name: "fields.rawFrontmatter.date",
+        name: "rawFrontmatter.date",
         component: function ReadOnly({ input }) {
           return <div>{input.value}</div>
         },
       },
       {
         label: "Description",
-        name: "fields.rawFrontmatter.description",
+        name: "rawFrontmatter.description",
         component: "textarea",
       },
       {
         label: "Heading color",
-        name: "fields.rawFrontmatter.heading_color",
+        name: "rawFrontmatter.heading_color",
         component: "color",
       },
       {
-        name: "fields.rawFrontmatter.thumbnail",
+        name: "rawFrontmatter.thumbnail",
         label: "Thumbnail",
         component: "image",
         previewSrc: formValues => {
@@ -190,11 +190,10 @@ export const pageQuery = graphql`
       id
       excerpt(pruneLength: 160)
       html
+      fileRelativePath
+      rawFrontmatter
       rawMarkdownBody
-      fields {
-        fileRelativePath
-        rawFrontmatter
-      }
+
       frontmatter {
         title
         date(formatString: "DD MMMM, YYYY")

@@ -61,16 +61,14 @@ In order to edit a json file, you must register a form with the CMS. There are t
 
 In order for the Json forms to work, you must include the following fields in your `dataJson` query:
 
-- `fields.fileRelativePath`
+- `fileRelativePath`
 
 An example `dataQuery` in your template might look like this:
 
 ```
 query DataQuery($slug: String!) {
   dataJson(fields: { slug: { eq: $slug } }) {
-    fields {
-      fileRelativePath
-    }
+    fileRelativePath
     firstName
     lastName
   }
