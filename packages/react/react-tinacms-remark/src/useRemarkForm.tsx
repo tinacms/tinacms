@@ -10,6 +10,7 @@ import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 
+let get = require('lodash.get')
 let throttle = require('lodash.throttle')
 
 export function useRemarkForm(
@@ -34,18 +35,20 @@ export function useRemarkForm(
       return throttle(cms.api.git.onChange, timeout)
     }, [timeout])
 
-    const initialValues = useMemo(() => {
-      let i = {
-        ...markdownRemark,
-        rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
-      }
-      return i
-    }, [])
+    /**
+     * Form Data
+     */
+    let name = markdownRemark.fileRelativePath
+    let fields = formOverrrides.fields || generateFields(markdownRemark)
+
+    let initialValues = {
+      ...markdownRemark,
+      rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
+    }
 
     let [values, form] = useCMSForm({
-      name: markdownRemark.fileRelativePath,
+      name,
       initialValues,
-      fields: generateFields(markdownRemark),
       onSubmit(data) {
         if (process.env.NODE_ENV === 'development') {
           return cms.api.git.onSubmit!({
@@ -59,6 +62,7 @@ export function useRemarkForm(
         }
       },
       ...formOverrrides,
+      fields,
     })
 
     /**
@@ -68,11 +72,26 @@ export function useRemarkForm(
      */
     useEffect(() => {
       if (!form) return
-      form.finalForm.change('frontmatter', markdownRemark.frontmatter)
-    }, [markdownRemark.frontmatter])
+      form.finalForm.batch(() => {
+        /**
+         * Only update form fields that are observed.
+         */
+        fields.forEach((field: any) => {
+          let state = form.finalForm.getFieldState(field.name)
+          if (!state.active) {
+            form.finalForm.change(field.name, get(initialValues, field.name))
+          }
+        })
+        /**
+         * Also update frontmatter incase it's being used for previewing.
+         */
+        form.finalForm.change('frontmatter', initialValues.frontmatter)
+      })
+    }, [markdownRemark])
 
     useEffect(() => {
       if (!form) return
+      // TODO: Can we _not_ call the callback on-subscribe?
       return form.subscribe(
         (formState: any) => {
           throttledOnChange({
