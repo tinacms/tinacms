@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
-import styled, { ThemeProvider } from 'styled-components'
+import styled, { css, ThemeProvider } from 'styled-components'
 import { FormsView, SaveButton, CancelButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
@@ -12,15 +12,14 @@ import { TextField } from '@tinacms/fields'
 import { Close, Hamburger } from '@tinacms/icons'
 import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
 import { Button } from './components/Button'
+import { Z_FIXED } from 'zlib'
 
 export const Sidebar = ({
-  title = 'Tina',
-  logo = ForestryLogo,
   open = true,
+  position = 'float',
 }: {
-  title?: string
-  logo?: string
   open?: boolean
+  position?: string
 }) => {
   const cms = useCMS()
   useSubscribable(cms.screens)
@@ -29,7 +28,7 @@ export const Sidebar = ({
 
   return (
     <ThemeProvider theme={Theme}>
-      <SidebarContainer open={open}>
+      <SidebarContainer open={open} position={position}>
         <StyledFrame
           id="sidebar-frame"
           frameStyles={{
@@ -188,7 +187,7 @@ const MenuLink = styled.div<{ value: string }>`
   }
 `
 
-const SidebarContainer = styled.div<{ open: boolean }>`
+const SidebarContainer = styled.div<{ open: boolean; position: string }>`
   height: 100%;
   margin: 0;
   padding: 0;
@@ -201,6 +200,25 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   position: relative;
   display: block;
   flex: 0 0 ${p => (p.open ? '340px' : '0')};
+
+  ${props =>
+    props.position === 'float' &&
+    css`
+      position: fixed;
+      width: 340px;
+      height: calc(100% - 2.5rem);
+      border-radius: 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big} 0;
+      border-top: 1px solid #efefef;
+      border-bottom: 1px solid #efefef;
+      border-right: 1px solid #efefef;
+      box-shadow: ${p => p.theme.shadow.big};
+      top: 1.25rem;
+      left: 0;
+
+      iframe {
+        border-radius: 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big} 0;
+      }
+    `};
 `
 
 const SidebarHeader = styled.div`
@@ -214,21 +232,6 @@ const SidebarHeader = styled.div`
   height: ${HEADER_HEIGHT}rem;
   padding: 0.75rem ${p => p.theme.padding}rem;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
-`
-
-const ForestryLogo = styled.div<{ url: string }>`
-  height: ${HEADER_HEIGHT}rem;
-  width: 2rem;
-  background-image: url(${props => props.url});
-  background-size: 2rem;
-  background-repeat: no-repeat;
-  background-position: center;
-  margin-right: 1rem;
-`
-
-const SiteName = styled.h3`
-  font-size: 0.8rem;
-  font-weight: 500;
 `
 
 const ActionsToggle = styled(p => (

@@ -7,11 +7,11 @@ import styled from 'styled-components'
 import { Close, Edit } from '@tinacms/icons'
 import { StyledFrame } from './styled-frame'
 
-export const Tina: React.FC = ({ children }) => {
+export const Tina: React.FC = ({ children, ...sidebar }) => {
   return (
     <CMSContext.Provider value={cms}>
       <ModalProvider>
-        <SidebarProvider>
+        <SidebarProvider {...sidebar}>
           {children}
           <SidebarToggle />
         </SidebarProvider>
