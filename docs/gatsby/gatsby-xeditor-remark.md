@@ -190,12 +190,12 @@ function BlogPostTemplate(props) {
     fields: [
       {
         label: 'Title',
-        name: 'frontmatter.title',
+        name: 'rawFrontmatter.title',
         component: 'text',
       },
       {
         label: 'Description',
-        name: 'frontmatter.description',
+        name: 'rawFrontmatter.description',
         component: 'textarea',
       },
     ],
@@ -219,12 +219,12 @@ render() {
   const fields = [
     {
         label: "Title",
-        name: "frontmatter.title",
+        name: "rawFrontmatter.title",
         component: "text",
       },
       {
         label: "Description",
-        name: "frontmatter.description",
+        name: "rawFrontmatter.description",
         component: "textarea",
       },
   ]

@@ -85,7 +85,7 @@ The `remarkForm` HOC automatically creates a list of form fields based on the sh
 The `remarkForm` function accepts an optional `config` object for overriding the default configuration of a `RemarkForm`. The following properties are accepted:
 
 - `fields`: A list of field definitions
-  - `name`: The path to some value in the data being edited. (e.g. `frontmatter.tittle`)
+  - `name`: The path to some value in the data being edited. (e.g. `rawFrontmatter.tittle`)
   - `component`: The name of the React component that should be used to edit this field.
     The default options are: `"text"`, `"textarea"`, `"color"`.
   - `label`: A human readable label for the field.
@@ -108,12 +108,12 @@ let BlogPostForm = {
   fields: [
     {
       label: 'Title',
-      name: 'frontmatter.title',
+      name: 'rawFrontmatter.title',
       component: 'text',
     },
     {
       label: 'Description',
-      name: 'frontmatter.description',
+      name: 'rawFrontmatter.description',
       component: 'textarea',
     },
   ],
