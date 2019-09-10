@@ -12,7 +12,7 @@ exports.onCreateNode = ({ node, actions }: any) => {
     actions.createNodeField({
       node,
       name: 'rawFrontmatter',
-      value: node.frontmatter,
+      value: JSON.stringify(node.frontmatter),
     })
   }
 }

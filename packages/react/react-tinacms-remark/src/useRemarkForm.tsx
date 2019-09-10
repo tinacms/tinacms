@@ -37,9 +37,20 @@ export function useRemarkForm(
       return throttle(cms.api.git.onChange, timeout)
     }, [timeout])
 
+    const initialValues = useMemo(() => {
+      let i = {
+        ...markdownRemark,
+        fields: {
+          ...markdownRemark.fields,
+          rawFrontmatter: JSON.parse(markdownRemark.fields.rawFrontmatter),
+        },
+      }
+      return i
+    }, [])
+
     let [values, form] = useCMSForm({
       name: markdownRemark.fields.fileRelativePath,
-      initialValues: markdownRemark,
+      initialValues,
       fields: generateFields(markdownRemark),
       onSubmit(data) {
         if (process.env.NODE_ENV === 'development') {
