@@ -44,12 +44,13 @@ In order to edit a markdown file, you must register a form with the CMS. There a
 In order for the remark forms to work, you must include the following fields in your `markdownRemark` query:
 
 - `id`
-- `fields.fileRelativePath`
+- `fileRelativePath`
 - `rawMarkdownBody`
+- `rawFrontmatter`
 
 An example `pageQuery` in your template might look like this:
 
-```
+```tsx
 query BlogPostBySlug($slug: String!) {
   site {
     siteMetadata {
@@ -57,11 +58,9 @@ query BlogPostBySlug($slug: String!) {
     }
   }
   markdownRemark(fields: { slug: { eq: $slug } }) {
-    id
-    fields {
-      fileRelativePath
-    }
+    fileRelativePath
     rawMarkdownBody
+    rawFrontmatter
     html
     frontmatter {
       title
@@ -191,12 +190,12 @@ function BlogPostTemplate(props) {
     fields: [
       {
         label: 'Title',
-        name: 'frontmatter.title',
+        name: 'rawFrontmatter.title',
         component: 'text',
       },
       {
         label: 'Description',
-        name: 'frontmatter.description',
+        name: 'rawFrontmatter.description',
         component: 'textarea',
       },
     ],
@@ -220,12 +219,12 @@ render() {
   const fields = [
     {
         label: "Title",
-        name: "frontmatter.title",
+        name: "rawFrontmatter.title",
         component: "text",
       },
       {
         label: "Description",
-        name: "frontmatter.description",
+        name: "rawFrontmatter.description",
         component: "textarea",
       },
   ]

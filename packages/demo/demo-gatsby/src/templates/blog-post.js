@@ -5,7 +5,8 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { remarkForm } from "@tinacms/react-tinacms-remark"
+import { useRemarkForm } from "@tinacms/react-tinacms-remark"
+import Img from "gatsby-image"
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
@@ -52,7 +53,14 @@ function BlogPostTemplate(props) {
             }}
           >
             <Bio />
+
             <div style={{ display: "flex", flexDirection: "column" }}>
+              {post.frontmatter.thumbnail && (
+                <Img
+                  fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                  alt="Gatsby can't find me"
+                />
+              )}
               <span style={{ fontWeight: "600" }}>Date</span>
               <p>{post.frontmatter.date}</p>
             </div>
@@ -110,55 +118,83 @@ function BlogPostTemplate(props) {
   )
 }
 
-export default remarkForm(BlogPostTemplate, {
-  fields: [
-    {
-      label: "Title",
-      name: "fields.rawFrontmatter.title",
-      component: "text",
-      required: true,
-    },
-    {
-      label: "Draft",
-      name: "fields.rawFrontmatter.draft",
-      component: "toggle",
-    },
-    {
-      label: "Date",
-      name: "fields.rawFrontmatter.date",
-      component: function ReadOnly({ input }) {
-        return <div>{input.value}</div>
+export default props => {
+  useRemarkForm(props.data.markdownRemark, {
+    fields: [
+      {
+        label: "Title",
+        name: "rawFrontmatter.title",
+        component: "text",
+        required: true,
       },
-    },
-    {
-      label: "Description",
-      name: "fields.rawFrontmatter.description",
-      component: "textarea",
-    },
-    {
-      label: "Heading color",
-      name: "fields.rawFrontmatter.heading_color",
-      component: "color",
-    },
-    { label: "Body", name: "rawMarkdownBody", component: "textarea" },
-    { name: "hr", component: () => <hr /> },
-    {
-      label: "Commit Name",
-      name: "__commit_name",
-      component: "text",
-    },
-    {
-      label: "Commit Email",
-      name: "__commit_email",
-      component: "text",
-    },
-    {
-      label: "Commit Message (Optional)",
-      name: "__commit_message",
-      component: "textarea",
-    },
-  ],
-})
+      {
+        label: "Draft",
+        name: "rawFrontmatter.draft",
+        component: "toggle",
+      },
+      {
+        label: "Date",
+        name: "rawFrontmatter.date",
+        component: function ReadOnly({ input }) {
+          return <div>{input.value}</div>
+        },
+      },
+      {
+        label: "Description",
+        name: "rawFrontmatter.description",
+        component: "textarea",
+      },
+      {
+        label: "Heading color",
+        name: "rawFrontmatter.heading_color",
+        component: "color",
+      },
+      {
+        name: "rawFrontmatter.thumbnail",
+        label: "Thumbnail",
+        component: "image",
+        // Generate the frontmatter value based on the filename
+        parse: filename => `./${filename}`,
+
+        // Decide the file upload directory for the post
+        uploadDir: blogPost => {
+          let postPathParts = blogPost.fileRelativePath.split("/")
+
+          let postDirectory = postPathParts
+            .splice(0, postPathParts.length - 1)
+            .join("/")
+
+          return postDirectory
+        },
+
+        // Generate the src attribute for the preview image.
+        previewSrc: formValues => {
+          if (!formValues.frontmatter.thumbnail) return ""
+          return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
+        },
+      },
+      { label: "Body", name: "rawMarkdownBody", component: "textarea" },
+      { name: "hr", component: () => <hr /> },
+      {
+        label: "Commit Name",
+        name: "__commit_name",
+        component: "text",
+      },
+      {
+        label: "Commit Email",
+        name: "__commit_email",
+        component: "text",
+      },
+      {
+        label: "Commit Message (Optional)",
+        name: "__commit_message",
+        component: "textarea",
+      },
+    ],
+  })
+
+  return <BlogPostTemplate {...props} />
+}
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
@@ -172,23 +208,23 @@ export const pageQuery = graphql`
       id
       excerpt(pruneLength: 160)
       html
+      fileRelativePath
+      rawFrontmatter
       rawMarkdownBody
-      fields {
-        fileRelativePath
-        rawFrontmatter {
-          title
-          date
-          description
-          heading_color
-          draft
-        }
-      }
+
       frontmatter {
         title
         date(formatString: "DD MMMM, YYYY")
         description
         heading_color
         draft
+        thumbnail {
+          childImageSharp {
+            fluid {
+              ...GatsbyImageSharpFluid
+            }
+          }
+        }
       }
     }
   }

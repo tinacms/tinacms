@@ -2,10 +2,8 @@ import * as React from 'react'
 import { Form, CMS } from '@tinacms/core'
 import { useCMS } from '@tinacms/react-tinacms'
 import {
-  FormProps,
   Form as FinalForm,
   Field as FinalField,
-  FormSpy,
   FormRenderProps,
 } from 'react-final-form'
 import { FC } from 'react'
@@ -56,6 +54,8 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
             name={field.name}
             key={field.name}
             type={type}
+            parse={field.parse}
+            format={field.format}
             validate={(value, values, meta) => {
               if (plugin && plugin.validate) {
                 return plugin.validate(value, values, meta, field)
@@ -64,11 +64,23 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
           >
             {fieldProps => {
               if (typeof field.component !== 'string') {
-                return <field.component {...fieldProps} field={field} />
+                return (
+                  <field.component
+                    {...fieldProps}
+                    form={form.finalForm}
+                    field={field}
+                  />
+                )
               }
 
               if (plugin) {
-                return <plugin.Component {...fieldProps} field={field} />
+                return (
+                  <plugin.Component
+                    {...fieldProps}
+                    form={form.finalForm}
+                    field={field}
+                  />
+                )
               }
 
               return <p>Unrecognized field type</p>

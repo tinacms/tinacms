@@ -36,8 +36,9 @@ module.exports = {
 The `remarkForm` [higher-order component](https://reactjs.org/docs/higher-order-components.html) (HOC) let's us register forms with `Tina`. In order for it to work with your template, 3 fields must be included in the `markdownRemark` query:
 
 - `id`
-- `fields.fileRelativePath`
+- `fileRelativePath`
 - `rawMarkdownBody`
+- `rawFrontmatter`
 
 **Example: src/templates/blog-post.js**
 
@@ -55,12 +56,9 @@ export default remarkForm(BlogPostTemplate)
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
-      id
-      fields {
-        fileRelativePath
-      }
+      fileRelativePath
       rawMarkdownBody
-
+      rawFrontmatter
       html
       frontmatter {
         title
@@ -87,7 +85,7 @@ The `remarkForm` HOC automatically creates a list of form fields based on the sh
 The `remarkForm` function accepts an optional `config` object for overriding the default configuration of a `RemarkForm`. The following properties are accepted:
 
 - `fields`: A list of field definitions
-  - `name`: The path to some value in the data being edited. (e.g. `frontmatter.tittle`)
+  - `name`: The path to some value in the data being edited. (e.g. `rawFrontmatter.tittle`)
   - `component`: The name of the React component that should be used to edit this field.
     The default options are: `"text"`, `"textarea"`, `"color"`.
   - `label`: A human readable label for the field.
@@ -110,12 +108,12 @@ let BlogPostForm = {
   fields: [
     {
       label: 'Title',
-      name: 'frontmatter.title',
+      name: 'rawFrontmatter.title',
       component: 'text',
     },
     {
       label: 'Description',
-      name: 'frontmatter.description',
+      name: 'rawFrontmatter.description',
       component: 'textarea',
     },
   ],
