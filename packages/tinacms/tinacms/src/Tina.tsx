@@ -5,6 +5,7 @@ import { SidebarProvider, useSidebar } from './sidebarProvider'
 import { cms } from './index'
 import styled from 'styled-components'
 import { Close, Edit } from '@tinacms/icons'
+import { StyledFrame } from './styled-frame'
 
 export const Tina: React.FC = ({ children }) => {
   return (
@@ -23,24 +24,38 @@ function SidebarToggle() {
   let sidebar = useSidebar()
 
   return (
-    <EditorToggle
-      open={sidebar.isOpen}
-      onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
-    />
+    <StyledFrame
+      frameStyles={{
+        position: 'fixed',
+        right: '2rem',
+        bottom: '2rem',
+        height: '3rem',
+        width: '3rem',
+        borderRadius: '0.5rem',
+        boxShadow: '0px 2px 3px rgba(48, 48, 48, 0.15)',
+        zIndex: 999999,
+        margin: 0,
+        border: 0,
+      }}
+    >
+      <EditorToggle
+        open={sidebar.isOpen}
+        onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
+      />
+    </StyledFrame>
   )
 }
 
 const EditorToggle = styled(props => {
   return <button {...props}>{props.open ? <Close /> : <Edit />}</button>
 })`
-  position: fixed;
-  right: 2rem;
-  bottom: 2rem;
-  height: 3rem;
-  width: 3rem;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: 100%;
+  height: 100%;
   border: 0;
   outline: none;
-  border-radius: 0.5rem;
   display: flex;
   align-items: center;
   justify-content: center;
