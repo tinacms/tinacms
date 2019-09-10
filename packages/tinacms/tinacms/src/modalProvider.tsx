@@ -2,8 +2,8 @@ import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
-import styled, { createGlobalStyle } from 'styled-components'
-import { RootElement } from './sidebar'
+import styled, { ThemeProvider } from 'styled-components'
+import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
 
 interface Props {
   children: any
@@ -21,14 +21,16 @@ export const ModalProvider = ({ children }: Props) => {
   }, [])
 
   return (
-    <>
-      <div id="modal-root" ref={setModalRef} />
-      <ModalContainerContext.Provider
-        value={{ portalNode: modalRootContainerRef }}
-      >
-        {...children}
-      </ModalContainerContext.Provider>
-    </>
+    <ThemeProvider theme={Theme}>
+      <>
+        <div id="modal-root" ref={setModalRef} />
+        <ModalContainerContext.Provider
+          value={{ portalNode: modalRootContainerRef }}
+        >
+          {...children}
+        </ModalContainerContext.Provider>
+      </>
+    </ThemeProvider>
   )
 }
 
@@ -39,7 +41,6 @@ interface ModalContainerProps {
 const ModalContainerContext = React.createContext<ModalContainerProps | null>(
   null
 )
-const Padding = 1.25
 
 export function useModalContainer(): ModalContainerProps {
   let modalContainer = React.useContext(ModalContainerContext)
@@ -99,11 +100,12 @@ export const ModalHeader = styled.div`
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: ${Padding}rem ${Padding}rem 0 ${Padding}rem;
+  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
+    ${p => p.theme.padding}rem;
   margin: 0;
 `
 
 export const ModalBody = styled.div`
-  padding: ${Padding}rem;
+  padding: ${p => p.theme.padding}rem;
   margin: 0;
 `

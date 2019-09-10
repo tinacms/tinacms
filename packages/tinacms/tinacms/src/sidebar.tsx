@@ -2,23 +2,23 @@ import * as React from 'react'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
-import styled, { createGlobalStyle } from 'styled-components'
+import styled, { css, ThemeProvider } from 'styled-components'
 import { FormsView, SaveButton, CancelButton } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal, ModalHeader, ModalBody } from './modalProvider'
 import { ModalPopup } from './modalPopup'
 import { ModalFullscreen } from './modalFullscreen'
 import { TextField } from '@tinacms/fields'
-import { Close, Hamburger } from './components/icons'
+import { Close, Hamburger } from '@tinacms/icons'
+import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
+import { Button } from './components/Button'
 
 export const Sidebar = ({
-  title = 'Tina',
-  logo = ForestryLogo,
   open = true,
+  position = 'float',
 }: {
-  title?: string
-  logo?: string
   open?: boolean
+  position?: string
 }) => {
   const cms = useCMS()
   useSubscribable(cms.screens)
@@ -26,97 +26,69 @@ export const Sidebar = ({
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <SidebarContainer open={open}>
-      <StyledFrame
-        id="sidebar-frame"
-        frameStyles={{
-          position: 'absolute',
-          right: '0',
-          top: '0',
-          width: '340px',
-          height: '100%',
-          margin: '0',
-          padding: '0',
-          border: '0',
-        }}
-      >
-        <>
-          <RootElement />
-          <SidebarHeader>
-            <ActionsToggle
-              onClick={() => setMenuVisibility(!menuIsVisible)}
-              open={menuIsVisible}
-            />
-          </SidebarHeader>
-          <FieldsWrapper>
-            <FormsView />
-          </FieldsWrapper>
-
-          <MenuPanel visible={menuIsVisible}>
+    <ThemeProvider theme={Theme}>
+      <SidebarContainer open={open} position={position}>
+        <StyledFrame
+          id="sidebar-frame"
+          frameStyles={{
+            position: 'absolute',
+            right: '0',
+            top: '0',
+            width: '340px',
+            height: '100%',
+            margin: '0',
+            padding: '0',
+            border: '0',
+          }}
+        >
+          <>
+            <RootElement />
+            <SidebarHeader>
+              <ActionsToggle
+                onClick={() => setMenuVisibility(!menuIsVisible)}
+                open={menuIsVisible}
+              />
+            </SidebarHeader>
             <FieldsWrapper>
-              {cms.plugins.all('content-button').map(plugin => (
-                <CreateContentButton plugin={plugin} />
-              ))}
-              <MenuList>
-                {cms.screens.all().map(view => (
-                  <MenuLink
-                    value={view.name}
-                    onClick={() => {
-                      setActiveView(view)
-                      setMenuVisibility(false)
-                    }}
-                  >
-                    <Close /> {view.name}
-                  </MenuLink>
-                ))}
-              </MenuList>
+              <FormsView />
             </FieldsWrapper>
-          </MenuPanel>
-          {ActiveView && (
-            <Modal>
-              <ModalFullscreen>
-                <button onClick={() => setActiveView(null)}>Close Modal</button>
-                <ActiveView.Component />
-              </ModalFullscreen>
-            </Modal>
-          )}
-        </>
-      </StyledFrame>
-    </SidebarContainer>
+
+            <MenuPanel visible={menuIsVisible}>
+              <FieldsWrapper>
+                {cms.plugins.all('content-button').map(plugin => (
+                  <CreateContentButton plugin={plugin} />
+                ))}
+                <MenuList>
+                  {cms.screens.all().map(view => (
+                    <MenuLink
+                      value={view.name}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuVisibility(false)
+                      }}
+                    >
+                      <Close /> {view.name}
+                    </MenuLink>
+                  ))}
+                </MenuList>
+              </FieldsWrapper>
+            </MenuPanel>
+            {ActiveView && (
+              <Modal>
+                <ModalFullscreen>
+                  <button onClick={() => setActiveView(null)}>
+                    Close Modal
+                  </button>
+                  <ActiveView.Component />
+                </ModalFullscreen>
+              </Modal>
+            )}
+          </>
+        </StyledFrame>
+      </SidebarContainer>
+    </ThemeProvider>
   )
 }
-
-const HeaderHeight = 4
-const Padding = 1.25
-
-export const RootElement = createGlobalStyle`
-  @import url('https://rsms.me/inter/inter.css');
-  html {
-    font-family: 'Inter', sans-serif;
-    font-size: 16px;
-    box-sizing: border-box;
-  }
-  @supports (font-variation-settings: normal) {
-    html { font-family: 'Inter var', sans-serif; }
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-  }
-  *, *:before, *:after {
-    box-sizing: inherit;
-  }
-  hr {
-    border-color: #F2F2F2;
-    color: #F2F2F2;
-    margin-bottom: 1.5rem;
-    margin-left: -${Padding}rem;
-    margin-right: -${Padding}rem;
-    border-top: 1px solid #F2F2F2;
-    border-bottom: none;
-  }
-`
 
 const CreateContentButton = ({ plugin }: any) => {
   let cms = useCMS()
@@ -158,7 +130,7 @@ const CreateContentButton = ({ plugin }: any) => {
 }
 
 const MenuList = styled.div`
-  margin: 2rem -${Padding}rem 2rem -${Padding}rem;
+  margin: 2rem -${p => p.theme.padding}rem 2rem -${p => p.theme.padding}rem;
   display: block;
 `
 
@@ -166,10 +138,11 @@ const MenuLink = styled.div<{ value: string }>`
   color: #f2f2f2;
   font-size: 1.125rem;
   font-weight: 500;
-  padding: ${Padding}rem ${Padding}rem ${Padding}rem 4rem;
+  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem
+    ${p => p.theme.padding}rem 4rem;
   position: relative;
   cursor: pointer;
-  transition: all 85ms ease-out;
+  transition: all ${p => p.theme.timing.short} ease-out;
   overflow: hidden;
   &:after {
     content: '';
@@ -180,19 +153,20 @@ const MenuLink = styled.div<{ value: string }>`
     height: 100%;
     background-color: #3e3e3e;
     z-index: -1;
-    transition: transform 85ms ease-out, opacity 85ms 85ms ease-out;
+    transition: transform ${p => p.theme.timing.short} ease-out,
+      opacity ${p => p.theme.timing.short} ${p => p.theme.timing.short} ease-out;
     transform: translate3d(0, 100%, 0);
     opacity: 0;
   }
   &:hover {
-    color: #0084ff;
+    color: ${p => p.theme.color.primary};
     &:after {
       transform: translate3d(0, 0, 0);
-      transition: transform 85ms ease-out, opacity 0ms;
+      transition: transform ${p => p.theme.timing.short} ease-out, opacity 0ms;
       opacity: 1;
     }
     svg {
-      fill: #0084ff;
+      fill: ${p => p.theme.color.primary};
     }
     & ~ * {
       &:after {
@@ -202,17 +176,17 @@ const MenuLink = styled.div<{ value: string }>`
   }
   svg {
     position: absolute;
-    left: ${Padding}rem;
+    left: ${p => p.theme.padding}rem;
     top: 50%;
     transform: translate3d(0, -50%, 0);
     width: 1.75rem;
     height: auto;
     fill: #bdbdbd;
-    transition: all 85ms ease-out;
+    transition: all ${p => p.theme.timing.short} ease-out;
   }
 `
 
-const SidebarContainer = styled.div<{ open: boolean }>`
+const SidebarContainer = styled.div<{ open: boolean; position: string }>`
   height: 100%;
   margin: 0;
   padding: 0;
@@ -225,6 +199,25 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   position: relative;
   display: block;
   flex: 0 0 ${p => (p.open ? '340px' : '0')};
+
+  ${props =>
+    props.position === 'float' &&
+    css`
+      position: fixed;
+      width: 340px;
+      height: calc(100% - 2.5rem);
+      border-radius: 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big} 0;
+      border-top: 1px solid #efefef;
+      border-bottom: 1px solid #efefef;
+      border-right: 1px solid #efefef;
+      box-shadow: ${p => p.theme.shadow.big};
+      top: 1.25rem;
+      left: 0;
+
+      iframe {
+        border-radius: 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big} 0;
+      }
+    `};
 `
 
 const SidebarHeader = styled.div`
@@ -235,37 +228,22 @@ const SidebarHeader = styled.div`
   left: 0;
   top: 0;
   width: 100%;
-  height: ${HeaderHeight}rem;
-  padding: 0.75rem ${Padding}rem;
+  height: ${HEADER_HEIGHT}rem;
+  padding: 0.75rem ${p => p.theme.padding}rem;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
-`
-
-const ForestryLogo = styled.div<{ url: string }>`
-  height: ${HeaderHeight}rem;
-  width: 2rem;
-  background-image: url(${props => props.url});
-  background-size: 2rem;
-  background-repeat: no-repeat;
-  background-position: center;
-  margin-right: 1rem;
-`
-
-const SiteName = styled.h3`
-  font-size: 0.8rem;
-  font-weight: 500;
 `
 
 const ActionsToggle = styled(p => (
   <button {...p}>{p.open ? <Close /> : <Hamburger />}</button>
 ))`
-  padding: 0 ${Padding}rem;
-  margin-left: -${Padding}rem;
+  padding: 0 ${p => p.theme.padding}rem;
+  margin-left: -${p => p.theme.padding}rem;
   background: transparent;
   outline: none;
   border: 0;
   text-align: left;
   width: 3rem;
-  height: ${HeaderHeight}rem;
+  height: ${HEADER_HEIGHT}rem;
   transition: all 75ms ease-out;
   fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
   &:hover {
@@ -277,11 +255,11 @@ const ActionsToggle = styled(p => (
 const FieldsWrapper = styled.div`
   position: absolute;
   left: 0;
-  top: ${HeaderHeight}rem;
-  height: calc(100vh - (${HeaderHeight}rem));
+  top: ${HEADER_HEIGHT}rem;
+  height: calc(100vh - (${HEADER_HEIGHT}rem));
   width: 100%;
   overflow: hidden;
-  padding: ${Padding}rem;
+  padding: ${p => p.theme.padding}rem;
   ul,
   li {
     margin: 0;
@@ -300,7 +278,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   width: 100vw;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
-  padding: ${Padding}rem;
+  padding: ${p => p.theme.padding}rem;
   transition: all 150ms ease-out;
   ul,
   li {
@@ -310,30 +288,16 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   }
 `
 
-const CreateButton = styled.button`
-  text-align: center;
+const CreateButton = styled(Button)`
   width: 100%;
-  border: 0;
-  border-radius: 0.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
-  background-color: #0084ff;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: 0.75rem;
-  padding: 0.75rem;
-  transition: opacity 85ms;
-  &:hover {
-    opacity: 0.6;
-  }
 `
 
 const ModalActions = styled.div`
   display: flex;
   justify-content: space-between;
-  border-radius: 0 0 0.5rem 0.5rem;
+  border-radius: 0 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big};
   overflow: hidden;
-  ${SaveButton}, ${CancelButton} {
+  ${Button} {
     border-radius: 0;
     flex: 1 0 auto;
   }
