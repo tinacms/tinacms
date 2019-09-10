@@ -146,12 +146,11 @@ export default props => {
         component: "color",
       },
       {
-        name: "thumbnail",
+        name: "fields.rawFrontmatter.thumbnail",
         label: "Thumbnail",
         component: "image",
         path: imagePath,
       },
-
       { label: "Body", name: "rawMarkdownBody", component: "textarea" },
       { name: "hr", component: () => <hr /> },
       {
