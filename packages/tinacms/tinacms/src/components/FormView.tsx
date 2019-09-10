@@ -241,8 +241,7 @@ const ActionMenu = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 100% 100%;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
-    0px 4px 8px rgba(48, 48, 48, 0.1);
+  box-shadow: ${p => p.theme.shadow.big};
   background-color: white;
   overflow: hidden;
   ${props =>

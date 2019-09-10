@@ -16,6 +16,9 @@ module.exports = {
         logo:
           "https://seeklogo.com/images/G/gatsby-logo-1A245AD37F-seeklogo.com.png",
         plugins: ["@tinacms/gatsby-tinacms-git", "@tinacms/react-tinacms-json"],
+        sidebar: {
+          position: "float",
+        },
       },
     },
     {
