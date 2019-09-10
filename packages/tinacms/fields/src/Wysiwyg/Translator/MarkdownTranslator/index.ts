@@ -28,22 +28,6 @@ export class MarkdownTranslator extends Translator {
     return MarkdownTranslator.commonMarkFromSchema(schema)
   }
 
-  static discount(schema: Schema) {
-    return MarkdownTranslator.commonMarkFromSchema(schema)
-    // let translator = new MarkdownTranslator(schema)
-    // translator.parser = DiscountParser(schema)
-    // translator.serializer = DiscountSerializer(schema)
-    // return translator
-  }
-
-  static kramdown(schema: Schema) {
-    return MarkdownTranslator.commonMarkFromSchema(schema)
-    // let translator = new MarkdownTranslator(schema)
-    // translator.parser = KramdownParser(schema)
-    // translator.serializer = KramdownSerializer(schema)
-    // return translator
-  }
-
   static commonMarkFromSchema(schema: Schema) {
     let translator = new MarkdownTranslator(schema)
     translator.parser = CommonMarkParser(schema)

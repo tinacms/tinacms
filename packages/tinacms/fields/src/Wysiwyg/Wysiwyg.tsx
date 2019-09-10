@@ -1,12 +1,6 @@
 import * as React from 'react'
-import { defaultBlockSchema } from './schema'
-import { MarkdownTranslator, Translator } from './Translator'
-import { EditorView } from 'prosemirror-view'
-import { createEditorState } from './state'
 import styled from 'styled-components'
-
-let schema = defaultBlockSchema
-let translator = MarkdownTranslator.fromSchema(schema, {})
+import { useTinaProsemirror } from './useTinaProsemirror'
 
 let lightGrey = 'rgb(243, 243, 243)'
 let lightMediumGrey = `darken(${lightGrey})`
@@ -14,30 +8,7 @@ let mediumGrey = `darken(${lightGrey}, 20);`
 let darkGrey = 'rgb(40, 40, 40)'
 
 export const Wysiwyg = styled(({ input, ...styleProps }: any) => {
-  const prosemirrorEl = React.useRef<any>(null)
-
-  React.useEffect(
-    function setupEditor() {
-      if (!prosemirrorEl.current) return
-
-      let editorView = new EditorView(prosemirrorEl.current, {
-        state: createEditorState(schema, translator, input.value),
-        dispatchTransaction(tr) {
-          const nextState: any = editorView.state.apply(tr as any)
-
-          editorView.updateState(nextState as any)
-
-          if (tr.docChanged) {
-            input.onChange(translator!.stringFromNode(tr.doc))
-          } else {
-            // forceUpdate()
-          }
-        },
-      })
-      return () => editorView.destroy()
-    },
-    [prosemirrorEl.current]
-  )
+  let prosemirrorEl = useTinaProsemirror(input)
 
   return (
     <div>
