@@ -1,12 +1,10 @@
 import { RemarkNode } from './remark-node'
 
 export function generateFields(post: RemarkNode) {
-  let usingRawFrontmatter = post.fields && post.fields.rawFrontmatter
-  let frontmatter = usingRawFrontmatter
-    ? post.fields.rawFrontmatter
-    : post.frontmatter
+  let usingRawFrontmatter = post.fields && post.rawFrontmatter
+  let frontmatter = usingRawFrontmatter ? post.rawFrontmatter : post.frontmatter
 
-  let prefix = usingRawFrontmatter ? 'fields.rawFrontmatter' : 'frontmatter'
+  let prefix = usingRawFrontmatter ? 'rawFrontmatter' : 'frontmatter'
 
   let frontmatterFields = Object.keys(frontmatter).map(key => ({
     component: 'text',

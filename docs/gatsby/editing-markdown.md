@@ -36,8 +36,9 @@ module.exports = {
 The `remarkForm` [higher-order component](https://reactjs.org/docs/higher-order-components.html) (HOC) let's us register forms with `Tina`. In order for it to work with your template, 3 fields must be included in the `markdownRemark` query:
 
 - `id`
-- `fields.fileRelativePath`
+- `fileRelativePath`
 - `rawMarkdownBody`
+- `rawFrontmatter`
 
 **Example: src/templates/blog-post.js**
 
@@ -55,12 +56,9 @@ export default remarkForm(BlogPostTemplate)
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
-      id
-      fields {
-        fileRelativePath
-      }
+      fileRelativePath
       rawMarkdownBody
-
+      rawFrontmatter
       html
       frontmatter {
         title

@@ -17,10 +17,7 @@ export function useJsonForm(
     return [{}, null]
   }
   // TODO: Only required when saving to local filesystem.
-  if (
-    typeof jsonNode.fields === 'undefined' ||
-    typeof jsonNode.fields.fileRelativePath === 'undefined'
-  ) {
+  if (typeof jsonNode.fileRelativePath === 'undefined') {
     // TODO
     // throw new Error(ERROR_MISSING_REMARK_PATH)
   }
@@ -28,7 +25,7 @@ export function useJsonForm(
     let cms = useCMS()
 
     let [values, form] = useCMSForm({
-      name: jsonNode.fields.fileRelativePath,
+      name: jsonNode.fileRelativePath,
       initialValues: jsonNode,
       fields: generateFields(jsonNode),
       onSubmit(data) {
@@ -45,9 +42,9 @@ export function useJsonForm(
       if (!form) return
       return form.subscribe(
         (formState: any) => {
-          let { fields, ...data } = formState.values
+          let { fileRelativePath, ...data } = formState.values
           cms.api.git!.onChange!({
-            fileRelativePath: fields.fileRelativePath,
+            fileRelativePath: fileRelativePath,
             content: JSON.stringify(data, null, 2),
           })
         },

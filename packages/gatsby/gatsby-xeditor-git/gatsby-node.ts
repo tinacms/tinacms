@@ -1,20 +1,38 @@
 import { router as gitRouter } from '@tinacms/api-git'
+// @ts-ignore
+import { GraphQLString } from 'gatsby/graphql'
 
-exports.onCreateNode = ({ node, actions }: any) => {
+exports.setFieldsOnGraphQLNodeType = ({ type }: any) => {
   let pathRoot = process.cwd()
-
-  if (node.internal && node.internal.type === 'MarkdownRemark') {
-    actions.createNodeField({
-      node,
-      name: 'fileRelativePath',
-      value: node.fileAbsolutePath.replace(pathRoot, ''),
-    })
-    actions.createNodeField({
-      node,
-      name: 'rawFrontmatter',
-      value: JSON.stringify(node.frontmatter),
-    })
+  if (type.name === `MarkdownRemark`) {
+    return {
+      rawFrontmatter: {
+        type: GraphQLString,
+        args: {
+          myArgument: {
+            type: GraphQLString,
+          },
+        },
+        resolve: (source: any) => {
+          return JSON.stringify(source.frontmatter)
+        },
+      },
+      fileRelativePath: {
+        type: GraphQLString,
+        args: {
+          myArgument: {
+            type: GraphQLString,
+          },
+        },
+        resolve: (source: any) => {
+          return source.fileAbsolutePath.replace(pathRoot, '')
+        },
+      },
+    }
   }
+
+  // by default return empty object
+  return {}
 }
 
 exports.onCreateDevServer = ({ app }: { app: any }) => {
