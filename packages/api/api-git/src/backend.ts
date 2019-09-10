@@ -89,13 +89,12 @@ export function router() {
 
   router.post('/upload', upload.single('file'), (req: any, res: any) => {
     try {
-      console.log('DO WRITE directory ' + req.body.directory)
-      console.log('DO WRITE FILE ' + JSON.stringify(req.file))
       const fileName = req.file.originalname
-      fs.rename(
-        path.join(tmpImgDir, fileName),
-        path.join(pathRoot, req.body.directory, fileName)
-      )
+      let tmpPath = path.join(tmpImgDir, fileName)
+      let finalPath = path.join(pathRoot, req.body.directory, fileName)
+      fs.rename(tmpPath, finalPath, (err: any) => {
+        if (err) console.error(err)
+      })
       res.send(req.file)
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })

@@ -47,11 +47,9 @@ function commit(data: any) {
 }
 
 function writeMediaToDisk(data: any) {
-  console.log('writeMediaToDisk')
   let formData = new FormData()
   formData.append('file', data.content)
-  // formData.append('filename', 'test')
-  formData.append('directory', data.fileRelativePath)
+  formData.append('directory', data.directory)
 
   // @ts-ignore
   return fetch(`${base()}/___tina/upload`, {

@@ -151,6 +151,11 @@ export default props => {
         name: "rawFrontmatter.thumbnail",
         label: "Thumbnail",
         component: "image",
+        outputDirectory: post => {
+          let filePathParts = post.fileRelativePath.split("/")
+
+          return filePathParts.splice(0, filePathParts.length - 1).join("/")
+        },
         previewSrc: formValues => {
           return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
         },
