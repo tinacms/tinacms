@@ -12,7 +12,6 @@ import { TextField } from '@tinacms/fields'
 import { Close, Hamburger } from '@tinacms/icons'
 import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
 import { Button } from './components/Button'
-import { Z_FIXED } from 'zlib'
 
 export const Sidebar = ({
   open = true,
