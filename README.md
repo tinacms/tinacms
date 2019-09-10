@@ -18,7 +18,7 @@ To get started:
 
 ```bash
 git clone git@github.com:tinacms/tinacms.git
-cd cms
+cd tinacms
 npm run bootstrap
 npm run build
 

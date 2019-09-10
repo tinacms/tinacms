@@ -23,7 +23,7 @@ const getBorderColor = (props: any) => {
 
 const DropArea = styled.div`
   border-width: 2px;
-  border-radius: 2px;
+  border-radius: ${p => p.theme.radius.small};
   border-color: ${props => getBorderColor(props)};
   border-style: dashed;
   transition: border 0.24s ease-in-out;
@@ -31,6 +31,7 @@ const DropArea = styled.div`
   display: flex;
   flex-direction: column;
   outline: none;
+  cursor: pointer;
 `
 
 const ImgPlaceholder = styled.div`
@@ -42,6 +43,11 @@ const ImgPlaceholder = styled.div`
 
 const StyledImage = styled.img`
   max-width: 100%;
+  border-radius: ${p => p.theme.radius.small};
+  transition: opacity ${p => p.theme.timing.short} ease-out;
+  ${DropArea}:hover & {
+    opacity: 0.6;
+  }
 `
 
 export const ImageUpload = ({
