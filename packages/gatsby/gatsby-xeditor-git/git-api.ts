@@ -51,10 +51,7 @@ function writeMediaToDisk(data: any) {
   let formData = new FormData()
   formData.append('file', data.content)
   // formData.append('filename', 'test')
-  formData.append(
-    'directory',
-    `${base()}/___tina/${encodeURIComponent(data.fileRelativePath)}`
-  )
+  formData.append('directory', data.fileRelativePath)
 
   // @ts-ignore
   return fetch(`${base()}/___tina/upload`, {
