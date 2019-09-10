@@ -1,77 +1,122 @@
-import { FormOptions } from '@tinacms/core'
+import { FormOptions, Form } from '@tinacms/core'
 import { useCMSForm, useCMS } from '@tinacms/react-tinacms'
 import {
-  ERROR_MISSING_CMS_GATSBY,
-  ERROR_MISSING_REMARK_ID,
   ERROR_MISSING_REMARK_PATH,
+  ERROR_MISSING_REMARK_RAW_MARKDOWN,
+  ERROR_MISSING_REMARK_RAW_FRONTMATTER,
 } from './errors'
 import { useEffect, useMemo } from 'react'
 import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
+import { FormSubscriber } from 'final-form'
 
-let throttle = require('lodash.throttle')
+let get = require('lodash.get')
 
 export function useRemarkForm(
   markdownRemark: RemarkNode,
-  formOverrrides: Partial<FormOptions<any>> = {},
-  timeout: Number = 100
+  formOverrrides: Partial<FormOptions<any>> = {}
 ) {
   if (!markdownRemark) {
     return [markdownRemark, null]
   }
-  if (typeof markdownRemark.id === 'undefined') {
-    throw new Error(ERROR_MISSING_REMARK_ID)
-  }
-  // TODO: Only required when saving to local filesystem.
-  if (
-    typeof markdownRemark.fields === 'undefined' ||
-    typeof markdownRemark.fields.fileRelativePath === 'undefined'
-  ) {
+
+  validateMarkdownRemark(markdownRemark)
+
+  let cms = useCMS()
+  let name = markdownRemark.fileRelativePath
+  let fields = formOverrrides.fields || generateFields(markdownRemark)
+  let initialValues = useMemo(
+    () => ({
+      ...markdownRemark,
+      rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
+    }),
+    [markdownRemark.rawFrontmatter]
+  )
+
+  let [values, form] = useCMSForm({
+    name,
+    initialValues,
+    fields,
+    onSubmit(data) {
+      return cms.api.git.onSubmit!({
+        files: [data.fileRelativePath],
+        message: data.__commit_message || 'Tina commit',
+        name: data.__commit_name,
+        email: data.__commit_email,
+      })
+    },
+  })
+
+  syncFormWithInitialValues(form, initialValues)
+
+  watchFormValues(form, formState => {
+    cms.api.git.onChange!({
+      fileRelativePath: formState.values.fileRelativePath,
+      content: toMarkdownString(formState.values),
+    })
+  })
+
+  return [markdownRemark, form]
+}
+
+/**
+ * Subscribes to value updates from the form with the given callback.
+ */
+function watchFormValues(form: Form, cb: FormSubscriber<any>) {
+  useEffect(() => {
+    if (!form) return
+    // TODO: Can we _not_ call the callback on-subscribe?
+    return form.subscribe(cb, { values: true })
+  }, [form])
+}
+
+/**
+ * Updates the Form with new values from the MarkdownRemark node.
+ *
+ * Only updates fields that are:
+ *
+ * 1. registered with the form
+ * 2. not currently active
+ *
+ * It also updates the `markdownRemark.frontmatter` property. This is
+ * in-case that field is being used in previewing.
+ */
+function syncFormWithInitialValues(form: Form, initialValues: any) {
+  useEffect(() => {
+    if (!form) return
+    form.finalForm.batch(() => {
+      /**
+       * Only update form fields that are observed.
+       */
+      form.fields.forEach((field: any) => {
+        let state = form.finalForm.getFieldState(field.name)
+        if (state && !state.active) {
+          form.finalForm.change(field.name, get(initialValues, field.name))
+        }
+      })
+      /**
+       * Also update frontmatter incase it's being used for previewing.
+       */
+      form.finalForm.change('frontmatter', initialValues.frontmatter)
+    })
+  }, [initialValues])
+}
+
+/**
+ * Throws an error if the MarkdownRemark node does not have the
+ * fields required for editing.
+ */
+function validateMarkdownRemark(markdownRemark: RemarkNode) {
+  if (typeof markdownRemark.fileRelativePath === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
-  try {
-    let cms = useCMS()
 
-    let throttledOnChange = useMemo(() => {
-      return throttle(cms.api.git.onChange, timeout)
-    }, [timeout])
+  if (typeof markdownRemark.rawFrontmatter === 'undefined') {
+    throw new Error(ERROR_MISSING_REMARK_RAW_FRONTMATTER)
+  }
 
-    let [values, form] = useCMSForm({
-      name: markdownRemark.fields.fileRelativePath,
-      initialValues: markdownRemark,
-      fields: generateFields(markdownRemark),
-      onSubmit(data) {
-        if (process.env.NODE_ENV === 'development') {
-          return cms.api.git.onSubmit!({
-            files: [data.fields.fileRelativePath],
-            message: data.__commit_message || 'Tina commit',
-            name: data.__commit_name,
-            email: data.__commit_email,
-          })
-        } else {
-          console.log('Not supported')
-        }
-      },
-      ...formOverrrides,
-    })
-
-    useEffect(() => {
-      if (!form) return
-      return form.subscribe(
-        (formState: any) => {
-          throttledOnChange({
-            fileRelativePath: formState.values.fields.fileRelativePath,
-            content: toMarkdownString(formState.values),
-          })
-        },
-        { values: true }
-      )
-    }, [form])
-
-    return [markdownRemark, form]
-  } catch (e) {
-    // TODO: this swallows too many errors
-    throw new Error(ERROR_MISSING_CMS_GATSBY)
+  if (typeof markdownRemark.rawMarkdownBody === 'undefined') {
+    throw new Error(ERROR_MISSING_REMARK_RAW_MARKDOWN)
   }
 }

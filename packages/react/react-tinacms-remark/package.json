@@ -21,6 +21,7 @@
   "dependencies": {
     "@tinacms/core": "^0.1.0-alpha.3",
     "@tinacms/react-tinacms": "^0.1.0-alpha.3",
-    "@tinacms/tinacms": "^0.1.0-alpha.6"
+    "@tinacms/tinacms": "^0.1.0-alpha.6",
+    "lodash.get": "^4.4.2"
   }
 }
