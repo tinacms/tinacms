@@ -25,7 +25,6 @@ export function useRemarkForm(
 
   let cms = useCMS()
   let name = markdownRemark.fileRelativePath
-  let fields = formOverrrides.fields || generateFields(markdownRemark)
   let initialValues = useMemo(
     () => ({
       ...markdownRemark,
@@ -33,6 +32,7 @@ export function useRemarkForm(
     }),
     [markdownRemark.rawFrontmatter]
   )
+  let fields = formOverrrides.fields || generateFields(initialValues)
 
   let [values, form] = useCMSForm({
     name,
