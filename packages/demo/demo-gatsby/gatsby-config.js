@@ -15,9 +15,16 @@ module.exports = {
         title: "Tina Gatsby Demo",
         logo:
           "https://seeklogo.com/images/G/gatsby-logo-1A245AD37F-seeklogo.com.png",
-        plugins: ["@tinacms/gatsby-tinacms-git", "@tinacms/react-tinacms-json"],
+        plugins: [
+          "@tinacms/gatsby-tinacms-git",
+          "@tinacms/gatsby-tinacms-json",
+        ],
+        sidebar: {
+          position: "float",
+        },
       },
     },
+    "@tinacms/gatsby-tinacms-json",
     {
       resolve: `gatsby-source-filesystem`,
       options: {

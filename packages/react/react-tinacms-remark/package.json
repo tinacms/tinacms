@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-tinacms-remark",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.9",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -10,6 +10,7 @@
   "scripts": {
     "watch": "cms-scripts watch",
     "build": "cms-scripts build",
+    "dev": "cms-scripts dev",
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
@@ -19,8 +20,9 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.0-alpha.3",
-    "@tinacms/react-tinacms": "^0.1.0-alpha.3",
-    "@tinacms/tinacms": "^0.1.0-alpha.4"
+    "@tinacms/core": "^0.1.0-alpha.4",
+    "@tinacms/react-tinacms": "^0.1.0-alpha.4",
+    "@tinacms/tinacms": "^0.1.0-alpha.7",
+    "lodash.get": "^4.4.2"
   }
 }

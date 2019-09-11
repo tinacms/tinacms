@@ -8,13 +8,8 @@ interface RemarkFormProps extends Partial<FormOptions<any>> {
   timeout?: number
 }
 
-export function RemarkForm({
-  remark,
-  render,
-  timeout,
-  ...options
-}: RemarkFormProps) {
-  let [markdownRemark, form] = useRemarkForm(remark, options, timeout)
+export function RemarkForm({ remark, render, ...options }: RemarkFormProps) {
+  let [markdownRemark, form] = useRemarkForm(remark, options)
 
   return render({ form, markdownRemark })
 }

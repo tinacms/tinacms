@@ -5,6 +5,9 @@ export const GitApi = {
   onChange(data: any) {
     writeToDisk(data)
   },
+  onUploadMedia(data: any) {
+    writeMediaToDisk(data)
+  },
   onDelete(data: any) {
     deleteFromDisk(data)
   },
@@ -16,6 +19,7 @@ export const GitApi = {
 export const GitSsrApi = {
   onSubmit(data: any) {},
   onChange(data: any) {},
+  onUploadMedia(data: any) {},
   onDelete(data: any) {},
   isAuthenticated() {},
 }
@@ -33,6 +37,24 @@ function commit(data: any) {
       'Content-Type': 'application/json; charset=utf-8',
     },
     body: JSON.stringify(data),
+  })
+    .then(response => {
+      console.log(response.json())
+    })
+    .catch(e => {
+      console.error(e)
+    })
+}
+
+function writeMediaToDisk(data: any) {
+  let formData = new FormData()
+  formData.append('file', data.content)
+  formData.append('directory', data.directory)
+
+  // @ts-ignore
+  return fetch(`${base()}/___tina/upload`, {
+    method: 'POST',
+    body: formData,
   })
     .then(response => {
       console.log(response.json())

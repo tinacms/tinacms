@@ -3,9 +3,6 @@ export interface RemarkNode {
   frontmatter: any
   html: string
   rawMarkdownBody: string
-  fields: {
-    fileRelativePath: string
-    rawFrontmatter?: any
-  }
-  [key: string]: any
+  fileRelativePath: string
+  rawFrontmatter: any
 }

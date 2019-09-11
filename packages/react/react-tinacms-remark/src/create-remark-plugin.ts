@@ -32,7 +32,8 @@ export function createRemarkButton(
           // unnecessary
           id: '',
           html: '',
-          fields: { fileRelativePath },
+          fileRelativePath,
+          rawFrontmatter: {},
         }),
       })
     },
