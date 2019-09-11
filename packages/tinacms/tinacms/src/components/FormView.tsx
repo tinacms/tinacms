@@ -15,7 +15,7 @@ export const FormsView = () => {
   const forms = cms.forms.all()
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
 
-  const [editingForm, setEditingForm] = useState(() => {
+  const [editingForm, setEditingForm] = useState<Form | null>(() => {
     return cms.forms.all()[0] as Form | null
   })
 
@@ -61,14 +61,6 @@ export const FormsView = () => {
       /> */}
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
-          let isFile, fileRelativePath: any
-          try {
-            //@ts-ignore
-            fileRelativePath = form.getState().values!.fields!.fileRelativePath
-            isFile = true
-          } catch (e) {
-            isFile = false
-          }
           return (
             <>
               {/* <h3>Editing form {editingForm.name}</h3> */}
@@ -85,7 +77,7 @@ export const FormsView = () => {
                   Save
                 </SaveButton>
 
-                {isFile ? (
+                {editingForm.actions.length > 0 ? (
                   <>
                     <MoreActions
                       onClick={() =>
@@ -93,24 +85,9 @@ export const FormsView = () => {
                       }
                     ></MoreActions>
                     <ActionMenu open={actionMenuVisibility}>
-                      <ActionButton>Do Something</ActionButton>
-                      <ActionButton
-                        onClick={() => {
-                          if (
-                            !confirm(
-                              `Are you sure you want to delete ${fileRelativePath}?`
-                            )
-                          ) {
-                            return
-                          }
-                          // @ts-ignore
-                          cms.api.git.onDelete!({
-                            relPath: fileRelativePath,
-                          })
-                        }}
-                      >
-                        Delete
-                      </ActionButton>
+                      {editingForm.actions.map(Action => (
+                        <Action />
+                      ))}
                     </ActionMenu>
                   </>
                 ) : null}
@@ -253,7 +230,7 @@ const ActionMenu = styled.div<{ open: boolean }>`
     `};
 `
 
-const ActionButton = styled.button`
+export const ActionButton = styled.button`
   position: relative;
   text-align: center;
   font-size: 0.75rem;
