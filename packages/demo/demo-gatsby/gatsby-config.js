@@ -21,6 +21,7 @@ module.exports = {
         },
       },
     },
+    "@tinacms/react-tinacms-json",
     {
       resolve: `gatsby-source-filesystem`,
       options: {

@@ -42,7 +42,7 @@ export function useJsonForm(
       if (!form) return
       return form.subscribe(
         (formState: any) => {
-          let { fileRelativePath, ...data } = formState.values
+          let { fileRelativePath, rawJsonData, ...data } = formState.values
           cms.api.git!.onChange!({
             fileRelativePath: fileRelativePath,
             content: JSON.stringify(data, null, 2),
