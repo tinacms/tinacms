@@ -8,6 +8,7 @@
 import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
+import { useJsonForm } from "@tinacms/react-tinacms-json"
 
 import { rhythm } from "../utils/typography"
 
@@ -21,21 +22,26 @@ const Bio = () => {
           }
         }
       }
-      dataJson(fields: { fileRelativePath: { eq: "/data/author.json" } }) {
+      dataJson(fileRelativePath: { eq: "/data/author.json" }) {
         firstName
         lastName
         location
         social {
           twitter
         }
-        fields {
-          fileRelativePath
-        }
+        fileRelativePath
+        rawJsonData
       }
     }
   `)
 
-  const author = data.dataJson
+  const author = useJsonForm(data.dataJson, {
+    fields: [
+      { name: "firstName", component: "text" },
+      { name: "lastName", component: "text" },
+      { name: "location", component: "text" },
+    ],
+  })
 
   return (
     <div

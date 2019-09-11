@@ -1,14 +1,29 @@
-exports.onCreateNode = ({ node, actions, getNode }: any) => {
-  const { createNodeField } = actions
+// @ts-ignore
+import { GraphQLString } from 'gatsby/graphql'
 
-  if (node.internal.type === `DataJson`) {
-    // const value = createFilePath({ node, getNode })
-    let pathRoot = process.cwd()
-    let parent = getNode(node.parent)
-    createNodeField({
-      name: `fileRelativePath`,
-      node,
-      value: parent.absolutePath.replace(pathRoot, ''),
-    })
+exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
+  let pathRoot = process.cwd()
+
+  if (!/.*Json$/.test(type.name)) {
+    return {}
+  }
+
+  return {
+    rawJsonData: {
+      type: GraphQLString,
+      args: {},
+      resolve: ({ children, id, internal, parent, ...data }: any) => {
+        return JSON.stringify(data)
+      },
+    },
+    fileRelativePath: {
+      type: GraphQLString,
+      args: {},
+      resolve: ({ children, id, internal, parent, ...data }: any) => {
+        let p = getNode(parent)
+
+        return p.absolutePath.replace(pathRoot, '')
+      },
+    },
   }
 }
