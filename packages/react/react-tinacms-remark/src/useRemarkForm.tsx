@@ -61,7 +61,7 @@ export function useRemarkForm(
 }
 
 /**
- * TODO: Remove duplication with react-tinacms-json
+ * TODO: Remove duplication with gatsby-tinacms-json
  *
  * Subscribes to value updates from the form with the given callback.
  */

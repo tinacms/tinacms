@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/react-tinacms-json",
+  "name": "@tinacms/gatsby-tinacms-json",
   "version": "0.1.0-alpha.3",
   "main": "index.js",
   "types": "index.d.ts",
