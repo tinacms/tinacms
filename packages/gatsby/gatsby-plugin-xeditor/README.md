@@ -125,7 +125,7 @@ To customize the component type of your fields using `RemarkForm`, you can pass 
 ```javascript
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
-    fields: [{ name: 'frontmatter.title', component: 'short-text' }],
+    fields: [{ name: 'rawFrontmatter.title', component: 'short-text' }],
   })
 
   return <h1>{markdownRemark.frontmatter.title}</h1>
@@ -142,7 +142,7 @@ class BlogPostTemplate extends React.Component {
     return (
       <RemarkForm
         remark={this.props.data.markdownRemark}
-        fields={[{ name: 'frontmatter.title', component: 'short-text' }]}
+        fields={[{ name: 'rawFrontmatter.title', component: 'short-text' }]}
       >
         {({ markdownRemark }) => {
           return <h1>{markdownRemark.frontmatter.title}</h1>
@@ -160,7 +160,7 @@ import { ShortTextField } from './your-custom-field'
 
 function BlogPostTemplate(props) {
   const [markdownRemark] = useRemarkForm(props.data.markdownRemark, {
-    fields: [{ name: 'frontmatter.title', component: ShortTextField }],
+    fields: [{ name: 'rawFrontmatter.title', component: ShortTextField }],
   })
 
   return <h1>{markdownRemark.frontmatter.title}</h1>

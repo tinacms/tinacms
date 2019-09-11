@@ -5,6 +5,7 @@ import styled from 'styled-components'
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
+  previewSrc: string
 }
 
 const getBorderColor = (props: any) => {
@@ -49,7 +50,11 @@ const StyledImage = styled.img`
   }
 `
 
-export const ImageUpload = ({ onDrop, value }: ImageUploadProps) => {
+export const ImageUpload = ({
+  onDrop,
+  value,
+  previewSrc,
+}: ImageUploadProps) => {
   const {
     getRootProps,
     getInputProps,
@@ -62,7 +67,7 @@ export const ImageUpload = ({ onDrop, value }: ImageUploadProps) => {
     <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
       {value ? (
-        <StyledImage src={value} />
+        <StyledImage src={previewSrc} />
       ) : (
         <ImgPlaceholder>
           <p>Drag 'n' drop some files here, or click to select files</p>

@@ -5,7 +5,7 @@ let waitingForBuild = false
 let nextArgs: any = null
 let count = 0
 
-const MAX_BUILD_TIME = 150
+const MAX_BUILD_TIME = 1000
 
 export function writeFile(filepath: string, content: string) {
   count++
