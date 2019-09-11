@@ -8,7 +8,7 @@
 import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
-import { useJsonForm } from "@tinacms/react-tinacms-json"
+import { useJsonForm } from "../../../../gatsby/gatsby-tinacms-json"
 
 import { rhythm } from "../utils/typography"
 
