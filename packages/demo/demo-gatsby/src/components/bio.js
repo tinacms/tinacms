@@ -30,16 +30,16 @@ const Bio = () => {
           twitter
         }
         fileRelativePath
-        rawJsonData
+        rawJson
       }
     }
   `)
 
   const author = useJsonForm(data.dataJson, {
     fields: [
-      { name: "firstName", component: "text" },
-      { name: "lastName", component: "text" },
-      { name: "location", component: "text" },
+      { name: "rawJson.firstName", component: "text" },
+      { name: "rawJson.lastName", component: "text" },
+      { name: "rawJson.location", component: "text" },
     ],
   })
 

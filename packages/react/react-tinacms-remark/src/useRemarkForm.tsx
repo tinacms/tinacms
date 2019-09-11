@@ -61,6 +61,8 @@ export function useRemarkForm(
 }
 
 /**
+ * TODO: Remove duplication with react-tinacms-json
+ *
  * Subscribes to value updates from the form with the given callback.
  */
 function watchFormValues(form: Form, cb: FormSubscriber<any>) {
