@@ -9,13 +9,13 @@ Creating forms for content provided by the [`gatsby-transformer-json`](https://g
 ## Installation
 
 ```
-npm install --save gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-tinacms-git @tinacms/react-tinacms-json
+npm install --save gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-tinacms-git @tinacms/gatsby-tinacms-json
 ```
 
 or
 
 ```
-yarn add gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-tinacms-git @tinacms/react-tinacms-json
+yarn add gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-tinacms-git @tinacms/gatsby-tinacms-json
 ```
 
 ## Configuring Gatsby
@@ -26,7 +26,7 @@ yarn add gatsby-source-filesystem gatsby-transformer-json @tinacms/gatsby-tinacm
 module.exports = {
   plugins: [
     // ...
-    '@tinacms/react-tinacms-json',
+    '@tinacms/gatsby-tinacms-json',
     {
       resolve: `gatsby-source-filesystem`,
       options: {
@@ -101,7 +101,7 @@ useJsonForm(data): [values, form]
 **src/templates/blog-post.js**
 
 ```jsx
-import { useJsonForm } from '@tinacms/react-tinacms-json'
+import { useJsonForm } from '@tinacms/gatsby-tinacms-json'
 
 function DataTemplate(props) {
   const [data] = useJsonForm(props.data.dataJson)
@@ -128,7 +128,7 @@ only available within Function Components you will wneed to use `JsonForm` if yo
 **src/templates/blog-post.js**
 
 ```jsx
-import { JsonForm } from '@tinacms/react-tinacms-json'
+import { JsonForm } from '@tinacms/gatsby-tinacms-json'
 
 class DataTemplate extends React.Component {
   render() {
