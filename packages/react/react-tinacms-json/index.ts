@@ -1,12 +1,14 @@
 import { Form, FormOptions } from '@tinacms/core'
 import { useCMSForm, useCMS } from '@tinacms/react-tinacms'
-import { useEffect } from 'react'
+import { useEffect, useMemo } from 'react'
+import { FormSubscriber } from 'final-form'
+
+let get = require('lodash.get')
 
 interface JsonNode {
-  fields: {
-    fileRelativePath: string
-  }
-  [key: string]: any
+  rawJson: string
+  fileRelativePath: string
+  [key: string]: string
 }
 
 export function useJsonForm(
@@ -16,55 +18,60 @@ export function useJsonForm(
   if (!jsonNode) {
     return [{}, null]
   }
-  // TODO: Only required when saving to local filesystem.
-  if (typeof jsonNode.fileRelativePath === 'undefined') {
-    // TODO
-    // throw new Error(ERROR_MISSING_REMARK_PATH)
-  }
-  try {
-    let cms = useCMS()
+  validateJsonNode(jsonNode)
 
-    let [values, form] = useCMSForm({
-      name: jsonNode.fileRelativePath,
-      initialValues: jsonNode,
-      fields: generateFields(jsonNode),
-      onSubmit(data) {
-        if (process.env.NODE_ENV === 'development') {
-          //
-        } else {
-          console.log('Not supported')
-        }
-      },
-      ...formOptions,
+  let cms = useCMS()
+  let name = jsonNode.fileRelativePath
+  let initialValues = useMemo(
+    () => ({
+      jsonNode: jsonNode,
+      rawJson: JSON.parse(jsonNode.rawJson),
+    }),
+    [jsonNode.rawJson]
+  )
+  let fields = formOptions.fields || generateFields(initialValues.rawJson)
+
+  let [values, form] = useCMSForm({
+    name,
+    initialValues,
+    fields,
+    onSubmit(data) {
+      // TODO: Commit & Push
+    },
+    ...formOptions,
+  })
+
+  syncFormWithInitialValues(form, initialValues)
+
+  watchFormValues(form, formState => {
+    let { fileRelativePath, rawJson, ...data } = formState.values.rawJson
+    cms.api.git.onChange!({
+      fileRelativePath: formState.values.jsonNode.fileRelativePath,
+      content: JSON.stringify(data, null, 2),
     })
+  })
 
-    useEffect(() => {
-      if (!form) return
-      return form.subscribe(
-        (formState: any) => {
-          let { fileRelativePath, rawJsonData, ...data } = formState.values
-          cms.api.git!.onChange!({
-            fileRelativePath: fileRelativePath,
-            content: JSON.stringify(data, null, 2),
-          })
-        },
-        { values: true }
-      )
-    }, [form])
-
-    return [jsonNode, form]
-  } catch (e) {
-    // throw new Error(ERROR_MISSING_CMS_GATSBY)
-    throw e
-  }
+  return [jsonNode, form]
 }
 
-function generateFields(post: JsonNode) {
-  let { fields, ...dataFields } = post
-  return Object.keys(dataFields).map(key => ({
+function generateFields(post: any) {
+  return Object.keys(post).map(key => ({
     component: 'text',
-    name: key,
+    name: `rawJson.${key}`,
   }))
+}
+
+/**
+ * TODO: Remove duplication with react-tinacms-remark
+ *
+ * Subscribes to value updates from the form with the given callback.
+ */
+function watchFormValues(form: Form, cb: FormSubscriber<any>) {
+  useEffect(() => {
+    if (!form) return
+    // TODO: Can we _not_ call the callback on-subscribe?
+    return form.subscribe(cb, { values: true })
+  }, [form])
 }
 
 interface JsonFormProps extends Partial<FormOptions<any>> {
@@ -76,4 +83,41 @@ export function JsonForm({ data, render, ...options }: JsonFormProps) {
   let [currentData, form] = useJsonForm(data, options)
 
   return render({ form, data: currentData })
+}
+
+function validateJsonNode(jsonNode: JsonNode) {
+  // TODO
+}
+
+/**
+ * Updates the Form with new values from the MarkdownRemark node.
+ *
+ * Only updates fields that are:
+ *
+ * 1. registered with the form
+ * 2. not currently active
+ *
+ * It also updates the `markdownRemark.frontmatter` property. This is
+ * in-case that field is being used in previewing.
+ */
+function syncFormWithInitialValues(form: Form, initialValues: any) {
+  useEffect(() => {
+    if (!form) return
+    form.finalForm.batch(() => {
+      /**
+       * Only update form fields that are observed.
+       */
+      form.fields.forEach((field: any) => {
+        let state = form.finalForm.getFieldState(field.name)
+        if (state && !state.active) {
+          form.finalForm.change(field.name, get(initialValues, field.name))
+        }
+      })
+
+      /**
+       * Also update frontmatter incase it's being used for previewing.
+       */
+      form.finalForm.change('jsonNode', initialValues.jsonNode)
+    })
+  }, [initialValues])
 }

@@ -9,7 +9,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
   }
 
   return {
-    rawJsonData: {
+    rawJson: {
       type: GraphQLString,
       args: {},
       resolve: ({ children, id, internal, parent, ...data }: any) => {
