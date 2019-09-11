@@ -3,6 +3,8 @@ export * from './modalProvider'
 export * from './fields'
 export * from './Tina'
 
+export { ActionButton } from './components/FormView'
+
 import {
   TextInput,
   TextAreaInput,
