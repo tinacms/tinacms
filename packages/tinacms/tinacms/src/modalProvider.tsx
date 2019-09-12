@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
 import styled, { ThemeProvider } from 'styled-components'
-import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
+import { Theme, GlobalStyles, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
 
 interface Props {
   children: any
@@ -21,7 +21,6 @@ export const ModalProvider = ({ children }: Props) => {
   }, [])
 
   return (
-    <ThemeProvider theme={Theme}>
       <>
         <div id="modal-root" ref={setModalRef} />
         <ModalContainerContext.Provider
@@ -30,7 +29,6 @@ export const ModalProvider = ({ children }: Props) => {
           {...children}
         </ModalContainerContext.Provider>
       </>
-    </ThemeProvider>
   )
 }
 
@@ -72,7 +70,7 @@ export const Modal = ({
             border: 0,
           }}
         >
-          <RootElement />
+          <GlobalStyles />
           <ModalOverlay>
             <div {...props} />
           </ModalOverlay>
