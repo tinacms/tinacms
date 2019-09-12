@@ -3,7 +3,7 @@ import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
 import styled, { ThemeProvider } from 'styled-components'
-import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
+import { Theme, GlobalStyles, Z_INDEX } from './Globals'
 
 interface Props {
   children: any
@@ -21,16 +21,14 @@ export const ModalProvider = ({ children }: Props) => {
   }, [])
 
   return (
-    <ThemeProvider theme={Theme}>
-      <>
-        <div id="modal-root" ref={setModalRef} />
-        <ModalContainerContext.Provider
-          value={{ portalNode: modalRootContainerRef }}
-        >
-          {...children}
-        </ModalContainerContext.Provider>
-      </>
-    </ThemeProvider>
+    <>
+      <div id="modal-root" ref={setModalRef} />
+      <ModalContainerContext.Provider
+        value={{ portalNode: modalRootContainerRef }}
+      >
+        {...children}
+      </ModalContainerContext.Provider>
+    </>
   )
 }
 
@@ -68,11 +66,11 @@ export const Modal = ({
             width: '100vw',
             margin: '0 auto',
             position: 'fixed',
-            zIndex: 1001,
+            zIndex: Z_INDEX + 100,
             border: 0,
           }}
         >
-          <RootElement />
+          <GlobalStyles />
           <ModalOverlay>
             <div {...props} />
           </ModalOverlay>

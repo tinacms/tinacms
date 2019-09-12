@@ -20,7 +20,7 @@ module.exports = {
           "@tinacms/gatsby-tinacms-json",
         ],
         sidebar: {
-          position: "float",
+          position: "fixed",
         },
       },
     },
