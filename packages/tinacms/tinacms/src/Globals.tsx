@@ -34,7 +34,7 @@ export const Theme = {
   padding: 1.25,
 }
 
-export const RootElement = createGlobalStyle`
+export const GlobalStyles = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
   html {
     font-family: 'Inter', sans-serif;

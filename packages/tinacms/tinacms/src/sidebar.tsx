@@ -12,7 +12,7 @@ import { TextField } from '@tinacms/fields'
 import { Close, Hamburger, LeftArrow, Edit } from '@tinacms/icons'
 import {
   Theme,
-  RootElement,
+  GlobalStyles,
   HEADER_HEIGHT,
   FOOTER_HEIGHT,
   SIDEBAR_WIDTH,
@@ -21,14 +21,15 @@ import {
 import { Button } from './components/Button'
 import { useSidebar } from './sidebarProvider'
 
-export const Sidebar = ({ open = true }: { open?: boolean }) => {
+export const Sidebar = () => {
   const cms = useCMS()
+  const sidebar = useSidebar()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <SidebarContainer open={open}>
+    <SidebarContainer open={sidebar.isOpen}>
       <StyledFrame
         id="sidebar-frame"
         frameStyles={{
@@ -43,8 +44,8 @@ export const Sidebar = ({ open = true }: { open?: boolean }) => {
           pointerEvents: open ? 'all' : 'none',
         }}
       >
-        <SidebarWrapper open={open}>
-          <RootElement />
+        <SidebarWrapper open={sidebar.isOpen}>
+          <GlobalStyles />
           <SidebarHeader>
             <ActionsToggle
               onClick={() => setMenuVisibility(!menuIsVisible)}
@@ -85,7 +86,7 @@ export const Sidebar = ({ open = true }: { open?: boolean }) => {
           )}
         </SidebarWrapper>
       </StyledFrame>
-      <SidebarToggle open={open} />
+      <SidebarToggle {...sidebar} />
     </SidebarContainer>
   )
 }
@@ -129,8 +130,7 @@ const CreateContentButton = ({ plugin }: any) => {
   )
 }
 
-const SidebarToggle = ({ open = true }: { open?: boolean }) => {
-  let sidebar = useSidebar()
+const SidebarToggle = (sidebar:any) => {
 
   return (
     <StyledFrame
@@ -149,9 +149,9 @@ const SidebarToggle = ({ open = true }: { open?: boolean }) => {
       }}
     >
       <>
-        <RootElement />
+        <GlobalStyles />
         <SidebarToggleButton onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}>
-          {open ? <LeftArrow /> : <Edit />}
+          {sidebar.isOpen ? <LeftArrow /> : <Edit />}
         </SidebarToggleButton>
       </>
     </StyledFrame>
