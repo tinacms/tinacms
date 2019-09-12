@@ -14,7 +14,6 @@ import { ActionsMenu } from './ActionsMenu'
 export const FormsView = () => {
   const cms = useCMS()
   const forms = cms.forms.all()
-
   const [editingForm, setEditingForm] = useState<Form | null>(() => {
     return cms.forms.all()[0] as Form | null
   })
@@ -51,14 +50,14 @@ export const FormsView = () => {
         setActiveForm={setEditingForm}
       />
     )
-
+      //how to get this forms list to render again???
   return (
     <>
-      {/* <FormsList
+      <FormsList
         forms={forms}
         activeForm={editingForm}
         setActiveForm={setEditingForm}
-      /> */}
+      />
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
           return (
