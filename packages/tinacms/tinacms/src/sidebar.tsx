@@ -2,19 +2,15 @@ import * as React from 'react'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
-import styled, { css, ThemeProvider } from 'styled-components'
-import { FormsView, SaveButton, CancelButton } from './components/FormView'
+import styled from 'styled-components'
+import { FormsView } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
-import { Modal, ModalHeader, ModalBody } from './modalProvider'
-import { ModalPopup } from './modalPopup'
+import { Modal } from './modalProvider'
 import { ModalFullscreen } from './modalFullscreen'
-import { TextField } from '@tinacms/fields'
 import { Close, Hamburger, LeftArrow, Edit } from '@tinacms/icons'
 import {
-  Theme,
   GlobalStyles,
   HEADER_HEIGHT,
-  FOOTER_HEIGHT,
   SIDEBAR_WIDTH,
   TOGGLE_WIDTH,
   Z_INDEX,
