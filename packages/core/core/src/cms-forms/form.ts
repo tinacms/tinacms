@@ -4,11 +4,13 @@ export class Form<S = any> {
   name: string
   fields: Field[]
   finalForm: FormApi<S>
+  actions: any[]
 
-  constructor({ name, fields, ...options }: FormOptions<S>) {
+  constructor({ name, fields, actions, ...options }: FormOptions<S>) {
     this.name = name
     this.fields = fields
     this.finalForm = createForm<S>(options)
+    this.actions = actions || []
   }
 
   subscribe: FormApi<S>['subscribe'] = (cb, options) => {
@@ -27,6 +29,7 @@ export class Form<S = any> {
 export interface FormOptions<S> extends Config<S> {
   name: string
   fields: Field[]
+  actions?: any[]
 }
 
 export interface Field {

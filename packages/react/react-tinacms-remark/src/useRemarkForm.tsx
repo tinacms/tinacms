@@ -1,4 +1,5 @@
 import { FormOptions, Form } from '@tinacms/core'
+import { ActionButton } from '@tinacms/tinacms'
 import { useCMSForm, useCMS } from '@tinacms/react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
@@ -10,6 +11,7 @@ import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import { FormSubscriber } from 'final-form'
+import * as React from 'react'
 
 let get = require('lodash.get')
 
@@ -46,6 +48,27 @@ export function useRemarkForm(
         email: data.__commit_email,
       })
     },
+    actions: [
+      () => (
+        <ActionButton
+          onClick={() => {
+            if (
+              !confirm(
+                `Are you sure you want to delete ${markdownRemark.fileRelativePath}?`
+              )
+            ) {
+              return
+            }
+            // @ts-ignore
+            cms.api.git.onDelete!({
+              relPath: markdownRemark.fileRelativePath,
+            })
+          }}
+        >
+          Delete
+        </ActionButton>
+      ),
+    ],
   })
 
   syncFormWithInitialValues(form, initialValues)
