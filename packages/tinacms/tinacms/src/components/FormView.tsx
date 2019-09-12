@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { Modal, ModalBody, ModalHeader } from '..'
-import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
+import { Theme, GlobalStyles, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 
@@ -175,29 +175,29 @@ const CreateButton = styled(Button)`
   width: 100%;
 `
 
-const FieldsWrapper = styled.div`
-  position: absolute;
-  left: 0;
-  top: 0;
-  height: calc(100vh - (${HEADER_HEIGHT + FOOTER_HEIGHT}rem));
+export const FieldsWrapper = styled.div`
   width: 100%;
   padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
     ${p => p.theme.padding}rem;
   overflow-y: auto;
+  flex: 1 0 4rem;
+  ul,
+  li {
+    margin: 0;
+    padding: 0;
+    list-style: none;
+  }
 `
 
 const FormsFooter = styled.div`
   display: flex;
   justify-content: space-between;
-  position: absolute;
-  left: 0;
-  bottom: 0;
   width: 100%;
   height: ${FOOTER_HEIGHT}rem;
   background-color: white;
   border-top: 1px solid #efefef;
   padding: 0.75rem 1.25rem;
-  box-shadow: inset -1px 0 0 #efefef;
+  flex: 0 0 ${FOOTER_HEIGHT}rem;
 `
 
 export const SaveButton = styled(Button)`
