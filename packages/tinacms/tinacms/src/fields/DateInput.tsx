@@ -4,25 +4,26 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import * as ReactDatetime from 'react-datetime'
 import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { DatetimepickerProps } from 'react-datetime'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useFrameContext } from '../styled-frame'
 import styled from 'styled-components'
-import { TextField } from '@tinacms/fields'
 
-let area: any
 export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
     let [isOpen, setIsOpen] = useState(false)
-    const handleClick = (event: MouseEvent) => {
-      if (!area.contains(event.target)) {
-        setIsOpen(false)
-      } else {
-        setIsOpen(true)
-      }
-    }
+    let area = useRef(null)
 
     const documentContext = useFrameContext().document
     useEffect(() => {
+      const handleClick = (event: MouseEvent) => {
+        if (!area.current) return
+        // @ts-ignore
+        if (!area.current!.contains(event.target)) {
+          setIsOpen(false)
+        } else {
+          setIsOpen(true)
+        }
+      }
       documentContext.addEventListener('mouseup', handleClick, false)
       return () => {
         documentContext.removeEventListener('mouseup', handleClick, false)
@@ -31,11 +32,7 @@ export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 
     return (
       <DatetimeContainer>
-        <ReactDateTimeContainer
-          ref={ref => {
-            area = ref
-          }}
-        >
+        <ReactDateTimeContainer ref={area}>
           <ReactDatetime
             value={input.value}
             onFocus={input.onFocus}
