@@ -363,16 +363,20 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
 `
 
 const SidebarContainer = styled.div<{ open: boolean }>`
-  position: fixed;
-  display: block;
-  background: transparent;
-  height: 100%;
-  width: calc(${SIDEBAR_WIDTH} + ${TOGGLE_WIDTH});
-  margin: 0;
-  padding: 0;
-  border: 0;
-  z-index: ${Z_INDEX};
-  transition: all ${p => (p.open ? 150 : 200)}ms ease-out;
-  transform: translate3d(${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH)}, 0, 0);
+  position: fixed !important;
+  display: block !important;
+  background: transparent !important;
+  height: 100% !important;
+  width: calc(${SIDEBAR_WIDTH} + ${TOGGLE_WIDTH}) !important;
+  margin: 0 !important;
+  padding: 0 !important;
+  border: 0 !important;
+  z-index: ${Z_INDEX} !important;
+  transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
+  transform: translate3d(
+    ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH)},
+    0,
+    0
+  ) !important;
   pointer-events: none;
 `
