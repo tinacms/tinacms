@@ -5,6 +5,7 @@ export const HEADER_HEIGHT = 4
 export const FOOTER_HEIGHT = 4
 export const SIDEBAR_WIDTH = '340px'
 export const TOGGLE_WIDTH = '3.5rem'
+export const Z_INDEX = 2147000000
 
 export const Theme = {
   color: {
