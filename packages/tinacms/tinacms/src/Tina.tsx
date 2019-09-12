@@ -29,4 +29,5 @@ const SiteWrapper = styled.div<{ open: boolean; position: string }>`
     props.position === 'fixed' && props.open
       ? 'calc(100% - ' + SIDEBAR_WIDTH + ')'
       : '100%'};
+  transition: all ${props => (props.open ? 150 : 200)}ms ease-out;
 `
