@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { Sidebar } from './sidebar'
-import styled from 'styled-components'
+import styled, { css, ThemeProvider } from 'styled-components'
+import { Theme, RootElement } from './Globals'
 
 interface SidebarProps {
   isOpen: boolean
@@ -9,7 +10,7 @@ interface SidebarProps {
 
 const SidebarContext = React.createContext<SidebarProps | null>(null)
 
-export const SidebarProvider: React.FC = ({ children, ...sidebar }) => {
+export const SidebarProvider: React.FC = ({ ...sidebar }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
   const props = {
@@ -19,10 +20,12 @@ export const SidebarProvider: React.FC = ({ children, ...sidebar }) => {
 
   return (
     <SidebarContext.Provider value={props}>
-      <SidebarLayoutContainer>
-        <Sidebar open={isOpen} {...sidebar} />
-        <SiteContainer>{children}</SiteContainer>
-      </SidebarLayoutContainer>
+      <ThemeProvider theme={Theme}>
+        <>
+          <RootElement />
+          <Sidebar open={isOpen} {...sidebar} />
+        </>
+      </ThemeProvider>
     </SidebarContext.Provider>
   )
 }
@@ -40,17 +43,3 @@ export function useSidebar(): SidebarProps {
 interface SidebarLayoutContainerProps {
   isSidebarOpen: boolean
 }
-
-const SidebarLayoutContainer = styled.div`
-  display: flex;
-  justify-content: space-between;
-  flex-wrap: nowrap;
-  height: 100vh;
-`
-
-const SiteContainer = styled.div`
-  z-index: 0;
-  overflow-y: auto;
-  position: relative;
-  flex: 1 0 auto;
-`
