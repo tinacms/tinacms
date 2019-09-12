@@ -7,9 +7,7 @@ import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
 import { useFrameContext } from '../styled-frame'
 import styled from 'styled-components'
-import { TextField } from '@tinacms/fields'
 
-let area: any
 export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
     let [isOpen, setIsOpen] = useState(false)

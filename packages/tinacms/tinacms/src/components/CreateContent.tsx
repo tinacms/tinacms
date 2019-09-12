@@ -1,48 +1,61 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { useCMS } from '@tinacms/react-tinacms'
-import { TextField } from '@tinacms/fields'
 import { SaveButton, CancelButton } from './FormView'
 import { Modal, ModalHeader, ModalBody } from '../modalProvider'
 import { ModalPopup } from '../modalPopup'
 import { Button } from './Button'
+import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
+import { useMemo } from 'react'
+import { Form } from '@tinacms/core'
 
 export const CreateContentButton = ({ plugin }: any) => {
-  let cms = useCMS()
-  let [postName, setPostName] = React.useState('')
   let [open, setOpen] = React.useState(false)
   return (
     <div>
       <CreateButton onClick={() => setOpen(p => !p)}>
         {plugin.name}
       </CreateButton>
-      {open && (
-        <Modal>
-          <ModalPopup>
-            <ModalHeader>{plugin.name}</ModalHeader>
-            <ModalBody>
-              <TextField
-                onChange={e => setPostName(e.target.value)}
-                value={postName}
-              />
-            </ModalBody>
-            <ModalActions>
-              <SaveButton
-                onClick={() => {
-                  plugin.onSubmit(postName, cms)
-                  setOpen(false)
-                }}
-              >
-                Create
-              </SaveButton>
-              <CancelButton onClick={() => setOpen(p => !p)}>
-                Cancel
-              </CancelButton>
-            </ModalActions>
-          </ModalPopup>
-        </Modal>
-      )}
+      {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
     </div>
+  )
+}
+
+const FormModal = ({ plugin, close }: any) => {
+  let cms = useCMS()
+  let form: Form = useMemo(
+    () =>
+      new Form({
+        name: 'create-form',
+        actions: [],
+        fields: plugin.fields,
+        onSubmit(values) {
+          plugin.onSubmit(values, cms).then(() => {
+            close()
+          })
+        },
+      }),
+    []
+  )
+  return (
+    <Modal>
+      <FormBuilder form={form}>
+        {({ handleSubmit }) => {
+          return (
+            <ModalPopup>
+              <ModalHeader>{plugin.name}</ModalHeader>
+              <ModalBody>
+                <FieldsBuilder form={form} />
+              </ModalBody>
+              <ModalActions>
+                <SaveButton onClick={handleSubmit as any}>Create</SaveButton>
+                <CancelButton onClick={close}>Cancel</CancelButton>
+              </ModalActions>
+            </ModalPopup>
+          )
+        }}
+      </FormBuilder>
+    </Modal>
   )
 }
 

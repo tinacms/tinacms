@@ -13,7 +13,7 @@ import {
   DateInput,
 } from './fields'
 import { MediaView, SettingsView } from './components/FormView'
-import { CMS, Plugin } from '@tinacms/core'
+import { CMS, Plugin, Field } from '@tinacms/core'
 import { ImageUploadInput } from './fields/ImageUploadInput'
 
 export const cms = new CMS()
@@ -60,4 +60,5 @@ cms.fields.add({
 export interface AddContentPlugin extends Plugin {
   __type: 'content-button'
   onSubmit(value: string, cms: CMS): Promise<void> | void
+  fields: Field[]
 }
