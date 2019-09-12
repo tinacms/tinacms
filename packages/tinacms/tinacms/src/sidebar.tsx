@@ -358,9 +358,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   }
   &:after {
     /* Overlay outer border */
-    border-style: solid;
-    border-width: 1px 1px 1px 0;
-    border-color: rgba(51, 51, 51, 0.09);
+    border-right: 1px solid rgba(51, 51, 51, 0.09);
   }
 `
 
