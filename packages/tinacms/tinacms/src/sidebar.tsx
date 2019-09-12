@@ -223,7 +223,7 @@ const SidebarHeader = styled.div`
   width: 100%;
   height: ${HEADER_HEIGHT}rem;
   flex: 0 0 ${HEADER_HEIGHT}rem;
-  padding: 0.75rem ${p => p.theme.padding}rem;
+  padding: 0 ${p => p.theme.padding}rem;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
 `
 
