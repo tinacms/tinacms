@@ -90,7 +90,6 @@ const CreatePostPlugin = createRemarkButton({
     return `content/blog/${title.replace(/\s+/g, "-").toLowerCase()}/index.md`
   },
   frontmatter({ title }) {
-    console.log({ title })
     // Asynchronously generate front matter by fetching data from some server.
     return new Promise(resolve => {
       setTimeout(() => {
@@ -106,6 +105,9 @@ const CreatePostPlugin = createRemarkButton({
   body({ title }) {
     return `# ${title}`
   },
+  fields: [
+    { name: "title", label: "Title", component: "text", required: true },
+  ],
 })
 
 export default withPlugin(Layout, CreatePostPlugin)
