@@ -17,6 +17,7 @@ import {
   FOOTER_HEIGHT,
   SIDEBAR_WIDTH,
   TOGGLE_WIDTH,
+  Z_INDEX,
 } from './Globals'
 import { Button } from './components/Button'
 import { useSidebar } from './sidebarProvider'
@@ -36,7 +37,7 @@ export const Sidebar = () => {
           position: 'absolute',
           left: '0',
           top: '0',
-          width: 'calc(0.5rem + ' + SIDEBAR_WIDTH + ')',
+          width: 'calc(8px + ' + SIDEBAR_WIDTH + ')',
           height: '100%',
           margin: '0',
           padding: '0',
@@ -137,9 +138,9 @@ const SidebarToggle = (sidebar: any) => {
       frameStyles={{
         position: 'absolute',
         right: '0',
-        bottom: '1.5rem',
-        width: '3.5rem',
-        height: '4rem',
+        bottom: '20px',
+        width: '56px',
+        height: '64px',
         margin: '0',
         padding: '0',
         border: '0',
@@ -370,7 +371,7 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   margin: 0;
   padding: 0;
   border: 0;
-  z-index: 2147000000;
+  z-index: ${Z_INDEX};
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out;
   transform: translate3d(${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH)}, 0, 0);
   pointer-events: none;
