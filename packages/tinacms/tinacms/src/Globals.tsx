@@ -3,6 +3,8 @@ import styled, { ThemeProvider, createGlobalStyle } from 'styled-components'
 
 export const HEADER_HEIGHT = 4
 export const FOOTER_HEIGHT = 4
+export const SIDEBAR_WIDTH = '340px'
+export const TOGGLE_WIDTH = '3.5rem'
 
 export const Theme = {
   color: {
@@ -36,8 +38,10 @@ export const RootElement = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
   html {
     font-family: 'Inter', sans-serif;
-    font-size: 16px;
+    font-size: 100%;
+    -webkit-text-size-adjust: 100%;
     box-sizing: border-box;
+    overflow: hidden;
   }
   @supports (font-variation-settings: normal) {
     html { font-family: 'Inter var', sans-serif; }
@@ -58,5 +62,7 @@ export const RootElement = createGlobalStyle`
     margin-right: -1.25rem;
     border-top: 1px solid #F2F2F2;
     border-bottom: none;
+    height: 0;
+    box-sizing: content-box;
   }
 `
