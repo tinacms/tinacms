@@ -2,24 +2,21 @@ import * as React from 'react'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
-import styled, { css, ThemeProvider } from 'styled-components'
-import { FormsView, SaveButton, CancelButton } from './components/FormView'
+import styled from 'styled-components'
+import { FormsView } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
-import { Modal, ModalHeader, ModalBody } from './modalProvider'
-import { ModalPopup } from './modalPopup'
+import { Modal } from './modalProvider'
 import { ModalFullscreen } from './modalFullscreen'
-import { TextField } from '@tinacms/fields'
 import { Close, Hamburger, LeftArrow, Edit } from '@tinacms/icons'
 import {
-  Theme,
   GlobalStyles,
   HEADER_HEIGHT,
-  FOOTER_HEIGHT,
   SIDEBAR_WIDTH,
   TOGGLE_WIDTH,
   Z_INDEX,
 } from './Globals'
 import { Button } from './components/Button'
+import { CreateContentButton } from './components/CreateContent'
 import { useSidebar } from './sidebarProvider'
 
 export const Sidebar = () => {
@@ -89,45 +86,6 @@ export const Sidebar = () => {
       </StyledFrame>
       <SidebarToggle {...sidebar} />
     </SidebarContainer>
-  )
-}
-
-const CreateContentButton = ({ plugin }: any) => {
-  let cms = useCMS()
-  let [postName, setPostName] = React.useState('')
-  let [open, setOpen] = React.useState(false)
-  return (
-    <div>
-      <CreateButton onClick={() => setOpen(p => !p)}>
-        {plugin.name}
-      </CreateButton>
-      {open && (
-        <Modal>
-          <ModalPopup>
-            <ModalHeader>{plugin.name}</ModalHeader>
-            <ModalBody>
-              <TextField
-                onChange={e => setPostName(e.target.value)}
-                value={postName}
-              />
-            </ModalBody>
-            <ModalActions>
-              <SaveButton
-                onClick={() => {
-                  plugin.onSubmit(postName, cms)
-                  setOpen(false)
-                }}
-              >
-                Create
-              </SaveButton>
-              <CancelButton onClick={() => setOpen(p => !p)}>
-                Cancel
-              </CancelButton>
-            </ModalActions>
-          </ModalPopup>
-        </Modal>
-      )}
-    </div>
   )
 }
 

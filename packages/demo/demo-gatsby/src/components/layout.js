@@ -85,11 +85,11 @@ class Layout extends React.Component {
 }
 
 const CreatePostPlugin = createRemarkButton({
-  label: "Create Blog Post",
-  filename(title) {
+  label: "Create Post",
+  filename({ title }) {
     return `content/blog/${title.replace(/\s+/g, "-").toLowerCase()}/index.md`
   },
-  frontmatter(title) {
+  frontmatter({ title }) {
     // Asynchronously generate front matter by fetching data from some server.
     return new Promise(resolve => {
       setTimeout(() => {
@@ -102,9 +102,12 @@ const CreatePostPlugin = createRemarkButton({
       }, 1000)
     })
   },
-  body(title) {
+  body({ title }) {
     return `# ${title}`
   },
+  fields: [
+    { name: "title", label: "Title", component: "text", required: true },
+  ],
 })
 
 export default withPlugin(Layout, CreatePostPlugin)
