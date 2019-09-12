@@ -5,7 +5,7 @@ import styled from 'styled-components'
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
-  previewSrc: string
+  previewSrc?: string
 }
 
 const getBorderColor = (props: any) => {
@@ -23,7 +23,11 @@ const getBorderColor = (props: any) => {
 
 const DropArea = styled.div`
   border-width: 2px;
-  border-radius: ${p => p.theme.radius.small};
+  /* Where do we get access to this global theme? need to import it?
+  or use the context api?
+  border-radius: ${p => p.theme.radius.small}; 
+  */
+  border-radius: .25rem;
   border-color: ${props => getBorderColor(props)};
   border-style: dashed;
   transition: border 0.24s ease-in-out;
@@ -43,7 +47,8 @@ const ImgPlaceholder = styled.div`
 
 const StyledImage = styled.img`
   max-width: 100%;
-  border-radius: ${p => p.theme.radius.small};
+  /* border-radius: ${p => p.theme.radius.small}; */
+  border-radius: .25rem;
   transition: opacity ${p => p.theme.timing.short} ease-out;
   ${DropArea}:hover & {
     opacity: 0.6;
