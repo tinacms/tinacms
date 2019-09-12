@@ -43,9 +43,6 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: border-box;
     overflow: hidden;
   }
-  @supports (font-variation-settings: normal) {
-    html { font-family: 'Inter var', sans-serif; }
-  }
 
   body {
     margin: 0;
