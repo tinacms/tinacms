@@ -12,6 +12,7 @@ import { TextField } from '@tinacms/fields'
 import { Close, Hamburger } from '@tinacms/icons'
 import { Theme, RootElement, HEADER_HEIGHT, FOOTER_HEIGHT } from './Globals'
 import { Button } from './components/Button'
+import { CreateContentButton } from './components/CreateContent'
 
 export const Sidebar = ({
   open = true,
@@ -87,45 +88,6 @@ export const Sidebar = ({
         </StyledFrame>
       </SidebarContainer>
     </ThemeProvider>
-  )
-}
-
-const CreateContentButton = ({ plugin }: any) => {
-  let cms = useCMS()
-  let [postName, setPostName] = React.useState('')
-  let [open, setOpen] = React.useState(false)
-  return (
-    <div>
-      <CreateButton onClick={() => setOpen(p => !p)}>
-        {plugin.name}
-      </CreateButton>
-      {open && (
-        <Modal>
-          <ModalPopup>
-            <ModalHeader>{plugin.name}</ModalHeader>
-            <ModalBody>
-              <TextField
-                onChange={e => setPostName(e.target.value)}
-                value={postName}
-              />
-            </ModalBody>
-            <ModalActions>
-              <SaveButton
-                onClick={() => {
-                  plugin.onSubmit(postName, cms)
-                  setOpen(false)
-                }}
-              >
-                Create
-              </SaveButton>
-              <CancelButton onClick={() => setOpen(p => !p)}>
-                Cancel
-              </CancelButton>
-            </ModalActions>
-          </ModalPopup>
-        </Modal>
-      )}
-    </div>
   )
 }
 
@@ -285,20 +247,5 @@ const MenuPanel = styled.div<{ visible: boolean }>`
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-`
-
-const CreateButton = styled(Button)`
-  width: 100%;
-`
-
-const ModalActions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border-radius: 0 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big};
-  overflow: hidden;
-  ${Button} {
-    border-radius: 0;
-    flex: 1 0 auto;
   }
 `
