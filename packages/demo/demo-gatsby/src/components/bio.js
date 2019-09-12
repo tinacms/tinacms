@@ -37,9 +37,9 @@ const Bio = () => {
 
   const [author] = useJsonForm(data.dataJson, {
     fields: [
-      { name: "rawJson.firstName", component: "text" },
-      { name: "rawJson.lastName", component: "text" },
-      { name: "rawJson.location", component: "text" },
+      { label: "First Name", name: "rawJson.firstName", description:"Enter first name", component: "text" },
+      { label: "Last Name", name: "rawJson.lastName", description:"Enter last name", component: "text" },
+      { label: "Location", name: "rawJson.location", description:"Enter where they're based", component: "text" },
     ],
   })
 
