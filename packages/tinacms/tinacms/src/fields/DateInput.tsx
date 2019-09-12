@@ -4,24 +4,26 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import * as ReactDatetime from 'react-datetime'
 import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { DatetimepickerProps } from 'react-datetime'
-import { useEffect, useState } from 'react'
+import { useEffect, useState, useRef } from 'react'
 import { useFrameContext } from '../styled-frame'
 import styled from 'styled-components'
 
-let area: any
 export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
     let [isOpen, setIsOpen] = useState(false)
-    const handleClick = (event: MouseEvent) => {
-      if (!area.contains(event.target)) {
-        setIsOpen(false)
-      } else {
-        setIsOpen(true)
-      }
-    }
+    let area = useRef(null)
 
     const documentContext = useFrameContext().document
     useEffect(() => {
+      const handleClick = (event: MouseEvent) => {
+        if (!area.current) return
+        // @ts-ignore
+        if (!area.current!.contains(event.target)) {
+          setIsOpen(false)
+        } else {
+          setIsOpen(true)
+        }
+      }
       documentContext.addEventListener('mouseup', handleClick, false)
       return () => {
         documentContext.removeEventListener('mouseup', handleClick, false)
@@ -30,11 +32,7 @@ export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 
     return (
       <DatetimeContainer>
-        <ReactDateTimeContainer
-          ref={ref => {
-            area = ref
-          }}
-        >
+        <ReactDateTimeContainer ref={area}>
           <ReactDatetime
             value={input.value}
             onFocus={input.onFocus}
@@ -52,24 +50,28 @@ export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 // if we could reuse those styles instead of having a duplicate.
 const DatetimeContainer = styled.div`
   input {
-    background-color: #f8f8f8;
+    background-color: ${p => p.theme.color.light};
+    border-radius: ${p => p.theme.input.radius};
+    font-size: ${p => p.theme.input.fontSize};
+    line-height: ${p => p.theme.input.lineHeight};
+    transition: background-color ${p => p.theme.timing.short} ease-out,
+      border-color ${p => p.theme.timing.short} ease-out,
+      box-shadow ${p => p.theme.timing.medium} ease-out;
+    padding: ${p => p.theme.input.padding};
     border-width: 1px;
     border-style: solid;
     border-color: #f2f2f2;
-    border-radius: 0.25rem;
     width: 100%;
-    font-size: 0.9rem;
-    padding: 0.75rem;
     margin: 0;
     outline: none;
-    transition: all 150ms ease-out;
 
     &:hover {
-      background-color: #f2f2f2;
+      background-color: #f0f0f0;
     }
 
     &:focus {
-      border-color: #333333;
+      border-color: ${p => p.theme.color.primary};
+      box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
       background-color: #f8f8f8;
     }
 

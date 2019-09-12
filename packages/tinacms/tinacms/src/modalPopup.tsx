@@ -1,5 +1,5 @@
-import styled, { keyframes } from 'styled-components'
 import * as React from 'react'
+import styled, { keyframes } from 'styled-components'
 
 const ModalPopupKeyframes = keyframes`
   0% {

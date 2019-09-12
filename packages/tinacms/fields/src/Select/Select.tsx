@@ -3,7 +3,7 @@ import { useMemo, useCallback, useEffect, useState } from 'react'
 import SelectBase, { components, Async } from 'react-select'
 import { Props as ReactSelectProps } from 'react-select/lib/Select'
 import { Props as AsyncProps } from 'react-select/lib/Async'
-import { Icon } from '@forestryio/icons'
+import { Close, ChevronDown } from '@tinacms/icons'
 
 type Styles = {
   [key: string]: (provided: any, state: any) => object
@@ -86,7 +86,7 @@ const DropdownIndicator = (props: any) => {
   return (
     // @ts-ignore
     <components.DropdownIndicator {...props}>
-      <Icon name="ChevronDown" width={12} height={12} />
+      <ChevronDown />
     </components.DropdownIndicator>
   )
 }
@@ -98,7 +98,7 @@ const IndicatorSeparator = ({ innerProps }: any) => {
 const MultiValueRemove = (props: any) => {
   return (
     <components.MultiValueRemove {...props}>
-      <Icon name="X" width={8} height={8} />
+      <Close />
     </components.MultiValueRemove>
   )
 }
@@ -109,7 +109,7 @@ const ClearIndicator = (props: any) => {
   } = props
   return (
     <div style={clearIndicatorStyle} {...restInnerProps} ref={ref}>
-      <Icon name="X" width={8} height={8} />
+      <Close />
     </div>
   )
 }

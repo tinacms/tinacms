@@ -27,6 +27,7 @@ export class CMS {
 export interface API {
   onSubmit?(data: any): any
   onChange?(data: any): any
+  onUploadMedia?(data: any): any
   onDelete?(data: any): any
   isAuthenticated?(): any
   authenticate?(): Promise<any>
