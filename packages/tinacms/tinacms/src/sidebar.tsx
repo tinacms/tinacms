@@ -130,8 +130,7 @@ const CreateContentButton = ({ plugin }: any) => {
   )
 }
 
-const SidebarToggle = (sidebar:any) => {
-
+const SidebarToggle = (sidebar: any) => {
   return (
     <StyledFrame
       id="sidebar-frame"
@@ -299,7 +298,7 @@ const SidebarToggleButton = styled.button`
   position: fixed;
   top: 0.5rem;
   left: 0;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 0.5rem 0.5rem 0;
   width: 3rem;
   height: 3rem;
@@ -352,7 +351,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   }
   &:before {
     /* Animate box-shadow with opacity for better performance */
-    box-shadow: ${p => p.theme.shadow.big};
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1), 2px 0 8px rgba(0, 0, 0, 0.15);
     transition: all ${p => (p.open ? 150 : 200)}ms ease-out;
     opacity: ${p => (p.open ? 1 : 0)};
   }
