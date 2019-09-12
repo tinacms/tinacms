@@ -4,6 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const openRepo = require('simple-git/promise')
+var multer = require('multer')
 
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
@@ -12,8 +13,34 @@ const DEFAULT_NAME = 'Tina'
 const DEFAULT_EMAIL = 'nolan@forestry.io'
 const DEFAULT_MESSAGE = 'Update from Tina'
 
+//If an upload path doesnt exist, create it
+function verifyUploadPath(uploadPath: string, callback: () => void) {
+  fs.exists(uploadPath, function(exists: boolean) {
+    if (exists) {
+      callback()
+    } else {
+      fs.mkdir(uploadPath, function() {
+        callback()
+      })
+    }
+  })
+}
+
 export function router() {
   let pathRoot = process.cwd()
+  const tmpImgDir = path.join(pathRoot, '/tmp/')
+
+  var tmpImgStorage = multer.diskStorage({
+    destination: function(req: any, file: any, cb: any) {
+      verifyUploadPath(tmpImgDir, () => {
+        cb(null, tmpImgDir)
+      })
+    },
+    filename: function(req: any, file: any, cb: any) {
+      cb(null, file.originalname)
+    },
+  })
+  const upload = multer({ storage: tmpImgStorage })
 
   const repo = openRepo(pathRoot)
   // TODO: Don't do this
@@ -55,6 +82,20 @@ export function router() {
         req.body.content
       )
       res.send(req.body.content)
+    } catch (e) {
+      res.status(500).json({ status: 'error', message: e.message })
+    }
+  })
+
+  router.post('/upload', upload.single('file'), (req: any, res: any) => {
+    try {
+      const fileName = req.file.originalname
+      let tmpPath = path.join(tmpImgDir, fileName)
+      let finalPath = path.join(pathRoot, req.body.directory, fileName)
+      fs.rename(tmpPath, finalPath, (err: any) => {
+        if (err) console.error(err)
+      })
+      res.send(req.file)
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
     }

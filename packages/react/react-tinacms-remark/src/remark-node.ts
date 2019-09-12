@@ -1,11 +1,5 @@
 export interface RemarkNode {
-  id: string
-  frontmatter: any
-  html: string
+  fileRelativePath: string
+  rawFrontmatter: any
   rawMarkdownBody: string
-  fields: {
-    fileRelativePath: string
-    rawFrontmatter?: any
-  }
-  [key: string]: any
 }

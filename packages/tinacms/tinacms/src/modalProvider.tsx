@@ -2,8 +2,8 @@ import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
-import styled, { createGlobalStyle } from 'styled-components'
-import { RootElement } from './sidebar'
+import styled, { ThemeProvider } from 'styled-components'
+import { Theme, GlobalStyles, Z_INDEX } from './Globals'
 
 interface Props {
   children: any
@@ -39,7 +39,6 @@ interface ModalContainerProps {
 const ModalContainerContext = React.createContext<ModalContainerProps | null>(
   null
 )
-const Padding = 1.25
 
 export function useModalContainer(): ModalContainerProps {
   let modalContainer = React.useContext(ModalContainerContext)
@@ -67,11 +66,11 @@ export const Modal = ({
             width: '100vw',
             margin: '0 auto',
             position: 'fixed',
-            zIndex: 1001,
+            zIndex: Z_INDEX + 100,
             border: 0,
           }}
         >
-          <RootElement />
+          <GlobalStyles />
           <ModalOverlay>
             <div {...props} />
           </ModalOverlay>
@@ -99,11 +98,12 @@ export const ModalHeader = styled.div`
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: ${Padding}rem ${Padding}rem 0 ${Padding}rem;
+  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
+    ${p => p.theme.padding}rem;
   margin: 0;
 `
 
 export const ModalBody = styled.div`
-  padding: ${Padding}rem;
+  padding: ${p => p.theme.padding}rem;
   margin: 0;
 `
