@@ -5,13 +5,26 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useRemarkForm } from "@tinacms/react-tinacms-remark"
+import { liveRemarkForm } from "@tinacms/react-tinacms-remark"
 import Img from "gatsby-image"
+import { TinaField } from "@tinacms/react-tinacms"
+import { Wysiwyg, Toggle } from "@tinacms/fields"
+
+const PlainText = props => (
+  <input style={{ background: "transparent " }} {...props.input} />
+)
+const MyToggle = props => (
+  <>
+    <label>Draft: </label>
+    <Toggle {...props} />
+  </>
+)
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
+  const { isEditing, setIsEditing } = props
 
   return (
     <Layout location={props.location} title={siteTitle}>
@@ -39,10 +52,9 @@ function BlogPostTemplate(props) {
               marginTop: rhythm(2),
             }}
           >
-            {post.frontmatter.title}{" "}
-            {post.frontmatter.draft && (
-              <small style={{ color: "fuchsia" }}>Draft</small>
-            )}
+            <TinaField name="rawFrontmatter.title" Component={PlainText}>
+              {post.frontmatter.title}{" "}
+            </TinaField>
           </h1>
           <div
             style={{
@@ -69,16 +81,33 @@ function BlogPostTemplate(props) {
       </div>
 
       <div
-        dangerouslySetInnerHTML={{
-          __html: props.data.markdownRemark.html,
-        }}
         style={{
           marginLeft: `auto`,
           marginRight: `auto`,
           maxWidth: rhythm(24),
           padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
         }}
-      />
+      >
+        <button onClick={() => setIsEditing(p => !p)}>
+          {isEditing ? "Stop Editing" : "Start Editing"}
+        </button>
+        <TinaField
+          name="rawFrontmatter.draft"
+          Component={MyToggle}
+          type="checkbox"
+        >
+          {post.frontmatter.draft && (
+            <small style={{ color: "fuchsia" }}>Draft</small>
+          )}
+        </TinaField>
+        <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
+          <div
+            dangerouslySetInnerHTML={{
+              __html: props.data.markdownRemark.html,
+            }}
+          />
+        </TinaField>
+      </div>
       <div
         style={{
           marginBottom: rhythm(1),
@@ -118,83 +147,81 @@ function BlogPostTemplate(props) {
   )
 }
 
-export default props => {
-  useRemarkForm(props.data.markdownRemark, {
-    fields: [
-      {
-        label: "Title",
-        name: "rawFrontmatter.title",
-        component: "text",
-        required: true,
+const BlogPostForm = {
+  fields: [
+    {
+      label: "Title",
+      name: "rawFrontmatter.title",
+      component: "text",
+      required: true,
+    },
+    {
+      label: "Draft",
+      name: "rawFrontmatter.draft",
+      component: "toggle",
+    },
+    {
+      label: "Date",
+      name: "rawFrontmatter.date",
+      component: function ReadOnly({ input }) {
+        return <div>{input.value}</div>
       },
-      {
-        label: "Draft",
-        name: "rawFrontmatter.draft",
-        component: "toggle",
-      },
-      {
-        label: "Date",
-        name: "rawFrontmatter.date",
-        component: function ReadOnly({ input }) {
-          return <div>{input.value}</div>
-        },
-      },
-      {
-        label: "Description",
-        name: "rawFrontmatter.description",
-        component: "textarea",
-      },
-      {
-        label: "Heading color",
-        name: "rawFrontmatter.heading_color",
-        component: "color",
-      },
-      {
-        name: "rawFrontmatter.thumbnail",
-        label: "Thumbnail",
-        component: "image",
-        // Generate the frontmatter value based on the filename
-        parse: filename => `./${filename}`,
+    },
+    {
+      label: "Description",
+      name: "rawFrontmatter.description",
+      component: "textarea",
+    },
+    {
+      label: "Heading color",
+      name: "rawFrontmatter.heading_color",
+      component: "color",
+    },
+    {
+      name: "rawFrontmatter.thumbnail",
+      label: "Thumbnail",
+      component: "image",
+      // Generate the frontmatter value based on the filename
+      parse: filename => `./${filename}`,
 
-        // Decide the file upload directory for the post
-        uploadDir: blogPost => {
-          let postPathParts = blogPost.fileRelativePath.split("/")
+      // Decide the file upload directory for the post
+      uploadDir: blogPost => {
+        let postPathParts = blogPost.fileRelativePath.split("/")
 
-          let postDirectory = postPathParts
-            .splice(0, postPathParts.length - 1)
-            .join("/")
+        let postDirectory = postPathParts
+          .splice(0, postPathParts.length - 1)
+          .join("/")
 
-          return postDirectory
-        },
+        return postDirectory
+      },
 
-        // Generate the src attribute for the preview image.
-        previewSrc: formValues => {
-          if (!formValues.frontmatter.thumbnail) return ""
-          return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
-        },
+      // Generate the src attribute for the preview image.
+      previewSrc: formValues => {
+        if (!formValues.frontmatter.thumbnail) return ""
+        return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
       },
-      { label: "Body", name: "rawMarkdownBody", component: "markdown" },
-      { name: "hr", component: () => <hr /> },
-      {
-        label: "Commit Name",
-        name: "__commit_name",
-        component: "text",
-      },
-      {
-        label: "Commit Email",
-        name: "__commit_email",
-        component: "text",
-      },
-      {
-        label: "Commit Message (Optional)",
-        name: "__commit_message",
-        component: "textarea",
-      },
-    ],
-  })
-
-  return <BlogPostTemplate {...props} />
+    },
+    { label: "Body", name: "rawMarkdownBody", component: "markdown" },
+    { name: "hr", component: () => <hr /> },
+    {
+      label: "Commit Name",
+      name: "__commit_name",
+      component: "text",
+    },
+    {
+      label: "Commit Email",
+      name: "__commit_email",
+      component: "text",
+    },
+    {
+      label: "Commit Message (Optional)",
+      name: "__commit_message",
+      component: "textarea",
+    },
+  ],
 }
+
+export default liveRemarkForm(BlogPostTemplate, BlogPostForm)
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
