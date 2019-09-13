@@ -8,6 +8,6 @@ export function generateFields(post: RemarkNode) {
 
   return [
     ...frontmatterFields,
-    { component: 'textarea', name: 'rawMarkdownBody' },
+    { component: 'markdown', name: 'rawMarkdownBody' },
   ]
 }
