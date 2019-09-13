@@ -11,6 +11,7 @@ import {
   ColorPickerField,
   ToggleField,
   DateInput,
+  Markdown,
 } from './fields'
 import { MediaView, SettingsView } from './components/FormView'
 import { CMS, Plugin, Field } from '@tinacms/core'
@@ -55,6 +56,11 @@ cms.fields.add({
   name: 'toggle',
   type: 'checkbox',
   Component: ToggleField,
+})
+
+cms.fields.add({
+  name: 'markdown',
+  Component: Markdown,
 })
 
 export interface AddContentPlugin extends Plugin {

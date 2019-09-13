@@ -173,7 +173,7 @@ export default props => {
           return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
         },
       },
-      { label: "Body", name: "rawMarkdownBody", component: "textarea" },
+      { label: "Body", name: "rawMarkdownBody", component: "markdown" },
       { name: "hr", component: () => <hr /> },
       {
         label: "Commit Name",

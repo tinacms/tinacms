@@ -2,7 +2,7 @@ import { Token } from '../types'
 import { Schema, Mark, Node } from 'prosemirror-model'
 import { MarkdownSerializerState, Nodes } from '../to_markdown'
 // @ts-ignore
-import * as get from 'lodash.get'
+const get = require('lodash.get')
 interface Hash<T> {
   [key: string]: T
 }
