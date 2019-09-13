@@ -1,8 +1,10 @@
 ---
 title: My Second Post!
-date: '2015-05-06T23:46:37.121Z'
+date: "2015-05-06T23:46:37.121Z"
 description: Test
-heading_color: null
+heading_color: "#404040"
+draft: false
+thumbnail: ../hello-world/salty_egg.jpg
 ---
 
 Wow! I love blogging so much already.
