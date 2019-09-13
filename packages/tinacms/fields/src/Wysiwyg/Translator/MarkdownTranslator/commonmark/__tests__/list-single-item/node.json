@@ -1,0 +1,32 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "ordered_list",
+      "attrs": {
+        "order": 1,
+        "tight": false
+      },
+      "content": [
+        {
+          "type": "list_item",
+          "content": [
+            {
+              "type": "paragraph",
+              "attrs": {
+                "class": "",
+                "id": ""
+              },
+              "content": [
+                {
+                  "type": "text",
+                  "text": "Single List Item"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
