@@ -8,7 +8,17 @@ import { rhythm } from "../utils/typography"
 import { liveRemarkForm } from "@tinacms/react-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField } from "@tinacms/react-tinacms"
-import { Wysiwyg } from "@tinacms/fields"
+import { Wysiwyg, Toggle } from "@tinacms/fields"
+
+const PlainText = props => (
+  <input style={{ background: "transparent " }} {...props.input} />
+)
+const MyToggle = props => (
+  <>
+    <label>Draft: </label>
+    <Toggle {...props} />
+  </>
+)
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
@@ -42,10 +52,9 @@ function BlogPostTemplate(props) {
               marginTop: rhythm(2),
             }}
           >
-            {post.frontmatter.title}{" "}
-            {post.frontmatter.draft && (
-              <small style={{ color: "fuchsia" }}>Draft</small>
-            )}
+            <TinaField name="rawFrontmatter.title" Component={PlainText}>
+              {post.frontmatter.title}{" "}
+            </TinaField>
           </h1>
           <div
             style={{
@@ -82,6 +91,15 @@ function BlogPostTemplate(props) {
         <button onClick={() => setIsEditing(p => !p)}>
           {isEditing ? "Stop Editing" : "Start Editing"}
         </button>
+        <TinaField
+          name="rawFrontmatter.draft"
+          Component={MyToggle}
+          type="checkbox"
+        >
+          {post.frontmatter.draft && (
+            <small style={{ color: "fuchsia" }}>Draft</small>
+          )}
+        </TinaField>
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
             dangerouslySetInnerHTML={{

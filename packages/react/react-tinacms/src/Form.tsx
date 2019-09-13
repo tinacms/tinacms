@@ -39,15 +39,20 @@ export function TinaForm({ form, children }: Props) {
 
 interface TinaFieldsProps {
   name: string
+  type?: string
   Component: any
   children: any
 }
 
-export function TinaField({ name, Component, children }: TinaFieldsProps) {
+export function TinaField({
+  Component,
+  children,
+  ...fieldProps
+}: TinaFieldsProps) {
   let isEditing = useContext(EditingContext)
-  if (!isEditing) return children
+  if (!isEditing) return children || null
   return (
-    <Field name={name}>
+    <Field {...fieldProps}>
       {({ input, meta }) => {
         return <Component input={input} meta={meta} />
       }}
