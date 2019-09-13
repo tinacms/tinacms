@@ -7,6 +7,7 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { useRemarkForm } from "@tinacms/react-tinacms-remark"
 import Img from "gatsby-image"
+import { TinaForm } from "@tinacms/react-tinacms"
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
@@ -14,112 +15,122 @@ function BlogPostTemplate(props) {
   const { previous, next } = props.pageContext
 
   return (
-    <Layout location={props.location} title={siteTitle}>
-      <SEO
-        title={post.frontmatter.title}
-        description={post.frontmatter.description || post.excerpt}
-      />
+    <TinaForm form={props.form}>
+      {({ isEditing, setIsEditing }) => (
+        <Layout location={props.location} title={siteTitle}>
+          <SEO
+            title={post.frontmatter.title}
+            description={post.frontmatter.description || post.excerpt}
+          />
 
-      <div
-        style={{
-          backgroundColor: post.frontmatter.heading_color || "#ffffff",
-        }}
-      >
-        <div
-          style={{
-            marginLeft: `auto`,
-            marginRight: `auto`,
-            maxWidth: rhythm(24),
-            padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
-          }}
-        >
-          <h1
-            style={{
-              margin: 0,
-              marginTop: rhythm(2),
-            }}
-          >
-            {post.frontmatter.title}{" "}
-            {post.frontmatter.draft && (
-              <small style={{ color: "fuchsia" }}>Draft</small>
-            )}
-          </h1>
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: rhythm(2),
-              marginBottom: rhythm(1),
+              backgroundColor: post.frontmatter.heading_color || "#ffffff",
             }}
           >
-            <Bio />
+            <div
+              style={{
+                marginLeft: `auto`,
+                marginRight: `auto`,
+                maxWidth: rhythm(24),
+                padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
+              }}
+            >
+              <h1
+                style={{
+                  margin: 0,
+                  marginTop: rhythm(2),
+                }}
+              >
+                {post.frontmatter.title}{" "}
+                {post.frontmatter.draft && (
+                  <small style={{ color: "fuchsia" }}>Draft</small>
+                )}
+              </h1>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: rhythm(2),
+                  marginBottom: rhythm(1),
+                }}
+              >
+                <Bio />
 
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {post.frontmatter.thumbnail && (
-                <Img
-                  fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
-                  alt="Gatsby can't find me"
-                />
-              )}
-              <span style={{ fontWeight: "600" }}>Date</span>
-              <p>{post.frontmatter.date}</p>
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {post.frontmatter.thumbnail && (
+                    <Img
+                      fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                      alt="Gatsby can't find me"
+                    />
+                  )}
+                  <span style={{ fontWeight: "600" }}>Date</span>
+                  <p>{post.frontmatter.date}</p>
+                </div>
+              </div>
             </div>
           </div>
-        </div>
-      </div>
 
-      <div
-        dangerouslySetInnerHTML={{
-          __html: props.data.markdownRemark.html,
-        }}
-        style={{
-          marginLeft: `auto`,
-          marginRight: `auto`,
-          maxWidth: rhythm(24),
-          padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
-        }}
-      />
-      <div
-        style={{
-          marginBottom: rhythm(1),
-          width: "100%",
-          height: "1px",
-          backgroundColor: "#eaeaea",
-        }}
-      />
-      <ul
-        style={{
-          marginLeft: `auto`,
-          marginRight: `auto`,
-          maxWidth: rhythm(24),
-          display: `flex`,
-          flexWrap: `wrap`,
-          justifyContent: `space-between`,
-          listStyle: `none`,
-          padding: 0,
-        }}
-      >
-        <li>
-          {previous && (
-            <Link to={previous.fields.slug} rel="prev">
-              ← {previous.frontmatter.title}
-            </Link>
-          )}
-        </li>
-        <li>
-          {next && (
-            <Link to={next.fields.slug} rel="next">
-              {next.frontmatter.title} →
-            </Link>
-          )}
-        </li>
-      </ul>
-    </Layout>
+          <div
+            style={{
+              marginLeft: `auto`,
+              marginRight: `auto`,
+              maxWidth: rhythm(24),
+              padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
+            }}
+          >
+            <button onClick={() => setIsEditing(p => !p)}>
+              {isEditing ? "Stop Editing" : "Start Editing"}
+            </button>
+            <div
+              dangerouslySetInnerHTML={{
+                __html: props.data.markdownRemark.html,
+              }}
+            />
+          </div>
+          <div
+            style={{
+              marginBottom: rhythm(1),
+              width: "100%",
+              height: "1px",
+              backgroundColor: "#eaeaea",
+            }}
+          />
+          <ul
+            style={{
+              marginLeft: `auto`,
+              marginRight: `auto`,
+              maxWidth: rhythm(24),
+              display: `flex`,
+              flexWrap: `wrap`,
+              justifyContent: `space-between`,
+              listStyle: `none`,
+              padding: 0,
+            }}
+          >
+            <li>
+              {previous && (
+                <Link to={previous.fields.slug} rel="prev">
+                  ← {previous.frontmatter.title}
+                </Link>
+              )}
+            </li>
+            <li>
+              {next && (
+                <Link to={next.fields.slug} rel="next">
+                  {next.frontmatter.title} →
+                </Link>
+              )}
+            </li>
+          </ul>
+        </Layout>
+      )}
+    </TinaForm>
   )
 }
 
 export default props => {
-  useRemarkForm(props.data.markdownRemark, {
+  let [values, form] = useRemarkForm(props.data.markdownRemark, {
     fields: [
       {
         label: "Title",
@@ -193,7 +204,7 @@ export default props => {
     ],
   })
 
-  return <BlogPostTemplate {...props} />
+  return <BlogPostTemplate {...props} form={form} />
 }
 
 export const pageQuery = graphql`
