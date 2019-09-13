@@ -7,7 +7,8 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { useRemarkForm } from "@tinacms/react-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaForm } from "@tinacms/react-tinacms"
+import { TinaForm, TinaField } from "@tinacms/react-tinacms"
+import { Wysiwyg } from "@tinacms/fields"
 
 function BlogPostTemplate(props) {
   const post = props.data.markdownRemark
@@ -82,11 +83,13 @@ function BlogPostTemplate(props) {
             <button onClick={() => setIsEditing(p => !p)}>
               {isEditing ? "Stop Editing" : "Start Editing"}
             </button>
-            <div
-              dangerouslySetInnerHTML={{
-                __html: props.data.markdownRemark.html,
-              }}
-            />
+            <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: props.data.markdownRemark.html,
+                }}
+              />
+            </TinaField>
           </div>
           <div
             style={{

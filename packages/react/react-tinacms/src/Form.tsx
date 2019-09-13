@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { useState } from 'react'
+import { useState, useContext } from 'react'
 import { Form } from '@tinacms/core'
 import { FormBuilder } from '@tinacms/form-builder'
 import { Field } from 'react-final-form'
@@ -13,23 +13,39 @@ export interface Props {
   children({ isEditing, setIsEditing }: RenderProps): any // TODO: Fix return type
 }
 
+const EditingContext = React.createContext(false)
+
 export function TinaForm({ form, children }: Props) {
   let [isEditing, setIsEditing] = useState(false)
-  if (!form) return children({ isEditing, setIsEditing })
+
+  if (!form) {
+    return (
+      <EditingContext.Provider value={isEditing}>
+        {children({ isEditing, setIsEditing })}
+      </EditingContext.Provider>
+    )
+  }
+
   return (
-    <FormBuilder form={form}>
-      {() => {
-        return children({ isEditing, setIsEditing })
-      }}
-    </FormBuilder>
+    <EditingContext.Provider value={isEditing}>
+      <FormBuilder form={form}>
+        {() => {
+          return children({ isEditing, setIsEditing })
+        }}
+      </FormBuilder>
+    </EditingContext.Provider>
   )
 }
 
 interface TinaFieldsProps {
   name: string
   Component: any
+  children: any
 }
-export function TinaFields({ name, Component }: TinaFieldsProps) {
+
+export function TinaField({ name, Component, children }: TinaFieldsProps) {
+  let isEditing = useContext(EditingContext)
+  if (!isEditing) return children
   return (
     <Field name={name}>
       {({ input, meta }) => {
