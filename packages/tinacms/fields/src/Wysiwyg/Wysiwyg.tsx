@@ -23,5 +23,6 @@ export const Wysiwyg = styled(({ input, plugins, ...styleProps }: any) => {
     </div>
   )
 })`
+  @import url('https://raw.githubusercontent.com/ProseMirror/prosemirror-gapcursor/master/style/gapcursor.css');
   white-space: pre-wrap;
 `

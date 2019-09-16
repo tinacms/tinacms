@@ -26,7 +26,7 @@ export function createEditorState(
       history(),
       // links(schema),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
-      // gapCursor(),
+      gapCursor(),
       menu(translator, false),
       ...plugins,
     ],
