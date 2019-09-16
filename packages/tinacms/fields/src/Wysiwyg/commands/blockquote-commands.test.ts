@@ -1,5 +1,5 @@
 import { PMTestHarness } from '../../prosemirror-test-utils'
-import { defaultBlockSchema } from '../schema'
+import { defaultSchema } from '../default-schema'
 import { liftBlockquote } from './blockquote-commands'
 
 let {
@@ -10,7 +10,7 @@ let {
   bulletList,
   text,
   blockquote,
-} = new PMTestHarness(defaultBlockSchema)
+} = new PMTestHarness(defaultSchema)
 
 describe('liftBlockquote', () => {
   it('should do nothing to paragraph', () => {

@@ -1,4 +1,5 @@
 import { Node } from 'prosemirror-model'
+import { SchemaNodePlugin } from '../..'
 
 /**
  * bullet_list
@@ -19,6 +20,7 @@ export const bullet_list = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'bullet_list',
   node: bullet_list,
-}
+} as SchemaNodePlugin
