@@ -2,12 +2,9 @@ import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 import { Plugin } from 'prosemirror-state'
 
-import { defaultBlockSchema } from './schema'
-import { MarkdownTranslator } from './Translator'
 import { createEditorState } from './state'
-
-let schema = defaultBlockSchema
-let translator = MarkdownTranslator.fromSchema(schema, {})
+import { useProsemirrorSchema } from './useProsemirrorSchema'
+import { useMarkdownTranslator } from './useMarkdownTranslator'
 
 export interface Input {
   value: string
@@ -18,6 +15,16 @@ export function useTinaProsemirror(
   input: Input,
   plugins: Plugin<any>[] = []
 ): React.RefObject<Node> {
+  /**
+   * Construct the Prosemirror Schema
+   */
+  let [schema] = useProsemirrorSchema()
+
+  /**
+   * Create a MarkdownTranslattor based on the schema
+   */
+  let [translator] = useMarkdownTranslator(schema)
+
   /**
    * A reference to the DOM Node where the prosemirror editor will be added.
    */
