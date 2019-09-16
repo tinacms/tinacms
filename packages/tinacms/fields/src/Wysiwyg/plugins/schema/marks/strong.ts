@@ -1,4 +1,4 @@
-import { SchemaMarkPlugin } from '..'
+import { SchemaMarkPlugin } from '../..'
 
 export default {
   __type: 'wysiwyg:schema:mark',

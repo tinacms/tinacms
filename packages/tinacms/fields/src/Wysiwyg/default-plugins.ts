@@ -2,10 +2,10 @@ import { Plugin } from '@tinacms/core'
 import { SchemaMarkPlugin, SchemaNodePlugin } from './plugins'
 
 // wysiwyg:schema:marks
-import code from './plugins/marks/code'
-import em from './plugins/marks/em'
-import link from './plugins/marks/link'
-import strong from './plugins/marks/strong'
+import code from './plugins/schema/marks/code'
+import em from './plugins/schema/marks/em'
+import link from './plugins/schema/marks/link'
+import strong from './plugins/schema/marks/strong'
 
 // wysiwyg:schema:nodes
 import blockquote from './plugins/schema/nodes/blockquote'

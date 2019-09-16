@@ -1,5 +1,5 @@
 import { Node } from 'prosemirror-model'
-import { docAttrs, getAttrs, domAttrs } from '../../../schema/nodes/utils'
+import { docAttrs, getAttrs, domAttrs } from './utils'
 import { SchemaNodePlugin } from '../..'
 
 export const paragraph = {
