@@ -1,3 +1,5 @@
+import { SchemaNodePlugin } from '../..'
+
 /**
  * list_item
  */
@@ -11,6 +13,7 @@ export const list_item = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'list_item',
   node: list_item,
-}
+} as SchemaNodePlugin

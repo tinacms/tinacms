@@ -1,3 +1,5 @@
+import { SchemaNodePlugin } from '../..'
+
 /**
  * horizontal_rule
  */
@@ -11,6 +13,7 @@ export const horizontal_rule = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'horizontal_rule',
   node: horizontal_rule,
-}
+} as SchemaNodePlugin
