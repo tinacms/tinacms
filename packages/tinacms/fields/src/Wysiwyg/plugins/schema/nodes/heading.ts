@@ -1,5 +1,5 @@
 import { Node } from 'prosemirror-model'
-import { getAttrsWith, docAttrs, domAttrs } from '../../../schema/nodes/utils'
+import { getAttrsWith, docAttrs, domAttrs } from './utils'
 import { SchemaNodePlugin } from '../..'
 
 /**

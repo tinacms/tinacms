@@ -1,5 +1,5 @@
 import { Node } from 'prosemirror-model'
-import { SchemaMarkPlugin } from '..'
+import { SchemaMarkPlugin } from '../..'
 
 /**
  * Link
