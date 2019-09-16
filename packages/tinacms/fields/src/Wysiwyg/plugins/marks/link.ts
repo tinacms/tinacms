@@ -1,4 +1,5 @@
 import { Node } from 'prosemirror-model'
+import { SchemaMarkPlugin } from '..'
 
 /**
  * Link
@@ -34,4 +35,8 @@ const link = {
   },
 }
 
-export default { name: 'link', mark: link }
+export default {
+  __type: 'wysiwyg:schema:mark',
+  name: 'link',
+  mark: link,
+} as SchemaMarkPlugin
