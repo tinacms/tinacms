@@ -1,5 +1,5 @@
 import { Node } from 'prosemirror-model'
-import { getAttrsWith, docAttrs, domAttrs } from './utils'
+import { getAttrsWith, docAttrs, domAttrs } from '../../../schema/nodes/utils'
 
 /**
  * heading
@@ -30,4 +30,9 @@ export const heading = {
     const { level, ...other } = node.attrs
     return ['h' + level, domAttrs(other), 0]
   },
+}
+
+export default {
+  name: 'heading',
+  node: heading,
 }

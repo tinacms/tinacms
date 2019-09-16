@@ -12,3 +12,8 @@ export const code_block = {
     return ['pre', ['code', 0]]
   },
 }
+
+export default {
+  name: 'code_block',
+  node: code_block,
+}

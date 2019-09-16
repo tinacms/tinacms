@@ -1,5 +1,5 @@
 import { Node } from 'prosemirror-model'
-import { docAttrs, getAttrs, domAttrs } from './utils'
+import { docAttrs, getAttrs, domAttrs } from '../../../schema/nodes/utils'
 
 export const paragraph = {
   content: 'inline*',
@@ -16,4 +16,9 @@ export const paragraph = {
   toDOM(node: Node) {
     return ['p', domAttrs(node.attrs), 0]
   },
+}
+
+export default {
+  name: 'paragraph',
+  node: paragraph,
 }

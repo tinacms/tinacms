@@ -9,3 +9,8 @@ export const horizontal_rule = {
     return ['hr']
   },
 }
+
+export default {
+  name: 'horizontal_rule',
+  node: horizontal_rule,
+}
