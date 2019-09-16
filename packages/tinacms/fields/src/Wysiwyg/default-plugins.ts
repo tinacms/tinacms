@@ -8,6 +8,7 @@ import link from './plugins/schema/marks/link'
 import strong from './plugins/schema/marks/strong'
 
 // wysiwyg:schema:nodes
+import doc from './plugins/schema/nodes/doc'
 import blockquote from './plugins/schema/nodes/blockquote'
 import bullet_list from './plugins/schema/nodes/list-bullet'
 import code_block from './plugins/schema/nodes/code-block'
@@ -21,9 +22,10 @@ import paragraph from './plugins/schema/nodes/paragraph'
 import text from './plugins/schema/nodes/text'
 import tables from './plugins/schema/nodes/tables'
 
-const MARK_PLUGINS: SchemaMarkPlugin[] = [code, em, link, strong]
+export const MARK_PLUGINS: SchemaMarkPlugin[] = [code, em, link, strong]
 
-const NODE_PLUGINS: SchemaNodePlugin[] = [
+export const NODE_PLUGINS: SchemaNodePlugin[] = [
+  doc,
   blockquote,
   bullet_list,
   code_block,

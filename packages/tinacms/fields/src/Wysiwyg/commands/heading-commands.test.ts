@@ -1,9 +1,9 @@
 import { deleteEmptyHeading, toggleHeader } from './heading-commands'
 import { PMTestHarness } from '../../prosemirror-test-utils'
-import { defaultBlockSchema } from '../schema'
+import { defaultSchema } from '../default-schema'
 
 let { forDoc, doc, p, text, strong, em, heading } = new PMTestHarness(
-  defaultBlockSchema
+  defaultSchema
 )
 
 describe('deleteEmptyHeading', () => {
@@ -35,9 +35,9 @@ describe('deleteEmptyHeading', () => {
 
 describe('toggleHeader', () => {
   let toggleH1 = toggleHeader(
-    defaultBlockSchema.nodes.heading,
+    defaultSchema.nodes.heading,
     { level: 1 },
-    defaultBlockSchema.nodes.paragraph,
+    defaultSchema.nodes.paragraph,
     null
   )
 

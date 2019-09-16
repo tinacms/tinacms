@@ -1,8 +1,8 @@
 import { PMTestHarness } from '../../prosemirror-test-utils'
-import { defaultBlockSchema } from '../schema'
 import { insertImage, alignImage, removeImage } from './image-commands'
+import { defaultSchema } from '../default-schema'
 
-let { forDoc, doc, p, text, image } = new PMTestHarness(defaultBlockSchema)
+let { forDoc, doc, p, text, image } = new PMTestHarness(defaultSchema)
 
 describe('insertImage', () => {
   it('should insert an image with the given src', () => {
