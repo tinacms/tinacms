@@ -9,6 +9,5 @@ export const defaultBlockSchema = new Schema({
     link: true,
     strong: true,
     em: true,
-    s: true,
   }),
 } as any)
