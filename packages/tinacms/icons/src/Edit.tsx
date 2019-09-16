@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const Edit = () => (
+export const EditIcon = () => (
   <svg
     width="32"
     height="32"

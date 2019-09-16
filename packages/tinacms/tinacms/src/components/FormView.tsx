@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
-import { EllipsisVertical } from '@tinacms/icons'
+import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { TextField } from '@tinacms/fields'
 import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
