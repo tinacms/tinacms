@@ -1,3 +1,5 @@
+import { SchemaMarkPlugin } from ".."
+
 /**
  * code
  */
@@ -8,4 +10,4 @@ const code = {
   },
 }
 
-export default { name: 'code', mark: code }
+export default { __type: 'wysiwyg:schema:mark', name: 'code', mark: code } as SchemaMarkPlugin
