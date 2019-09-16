@@ -1,3 +1,5 @@
+import { SchemaNodePlugin } from '../..'
+
 /**
  * text
  */
@@ -6,6 +8,7 @@ export const text = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'text',
   node: text,
-}
+} as SchemaNodePlugin

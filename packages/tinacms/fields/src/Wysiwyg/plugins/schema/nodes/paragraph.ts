@@ -1,5 +1,6 @@
 import { Node } from 'prosemirror-model'
 import { docAttrs, getAttrs, domAttrs } from '../../../schema/nodes/utils'
+import { SchemaNodePlugin } from '../..'
 
 export const paragraph = {
   content: 'inline*',
@@ -19,6 +20,7 @@ export const paragraph = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'paragraph',
   node: paragraph,
-}
+} as SchemaNodePlugin

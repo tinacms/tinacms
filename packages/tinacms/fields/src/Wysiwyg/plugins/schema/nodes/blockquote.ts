@@ -1,3 +1,5 @@
+import { SchemaNodePlugin } from '../..'
+
 export const blockquote = {
   content: 'block+',
   group: 'block',
@@ -9,6 +11,7 @@ export const blockquote = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'blockquote',
   node: blockquote,
-}
+} as SchemaNodePlugin
