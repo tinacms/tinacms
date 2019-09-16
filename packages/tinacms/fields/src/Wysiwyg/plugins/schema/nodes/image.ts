@@ -1,4 +1,4 @@
-import { Node } from "prosemirror-model"
+import { Node } from 'prosemirror-model'
 
 export const image = {
   inline: true,
@@ -10,20 +10,20 @@ export const image = {
     width: { default: null },
     height: { default: null },
   },
-  group: "inline",
+  group: 'inline',
   draggable: true,
   allowGapCursor: true,
   parseDOM: [
     {
-      tag: "img[src]",
+      tag: 'img[src]',
       getAttrs(dom: HTMLElement) {
         return {
-          src: dom.getAttribute("src"),
-          title: dom.getAttribute("title"),
-          alt: dom.getAttribute("alt"),
+          src: dom.getAttribute('src'),
+          title: dom.getAttribute('title'),
+          alt: dom.getAttribute('alt'),
           align: getAlignFromDOM(dom),
-          width: dom.getAttribute("width"),
-          height: dom.getAttribute("height"),
+          width: dom.getAttribute('width'),
+          height: dom.getAttribute('height'),
         }
       },
     },
@@ -37,16 +37,16 @@ export const image = {
     if (node.attrs.alt) attrs.alt = node.attrs.alt
     if (node.attrs.width) attrs.width = node.attrs.width
     if (node.attrs.height) attrs.height = node.attrs.height
-    if (node.attrs.align) attrs["class"] = `align-${node.attrs.align}`
+    if (node.attrs.align) attrs['class'] = `align-${node.attrs.align}`
 
-    return ["img", attrs]
+    return ['img', attrs]
   },
 }
 
 const alignRegex = /align-([a-z]*)/
 
 export function getAlignFromDOM(image: HTMLElement) {
-  const className = image.getAttribute("class") || ""
+  const className = image.getAttribute('class') || ''
 
   const match = alignRegex.exec(className)
 
@@ -55,4 +55,9 @@ export function getAlignFromDOM(image: HTMLElement) {
   }
 
   return null
+}
+
+export default {
+  name: 'image',
+  node: image,
 }
