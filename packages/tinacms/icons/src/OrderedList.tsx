@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const OlIcon = () => (
+export const OrderedListIcon = () => (
   <svg
     width="32"
     height="32"

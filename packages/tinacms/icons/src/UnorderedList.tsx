@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const UlIcon = () => (
+export const UnorderedListIcon = () => (
   <svg
     width="32"
     height="32"
