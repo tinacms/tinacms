@@ -9,6 +9,7 @@ import { history } from 'prosemirror-history'
 import { keymap } from './plugins/keymap'
 import { inputRules } from './plugins/input-rules'
 import { Translator } from '../Translator'
+import { menu } from './plugins/Menu'
 
 export function createEditorState(
   schema: Schema,
@@ -25,7 +26,7 @@ export function createEditorState(
       // links(schema),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       // gapCursor(),
-      // menu(store, translator, !fullsize, format),
+      menu(translator, false),
     ],
   })
 }

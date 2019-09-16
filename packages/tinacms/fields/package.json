@@ -10,6 +10,7 @@
   "scripts": {
     "watch": "cms-scripts watch",
     "build": "cms-scripts build",
+    "dev": "cms-scripts dev",
     "test": "jest --passWithNoTests",
     "storybook": "start-storybook -p 9001 -c .storybook"
   },
