@@ -1,7 +1,9 @@
-import { Node } from "prosemirror-model"
-import { image } from "./image"
-import { blockDoc } from "./blockDoc"
-import { tables } from "./tables"
+import { Node } from 'prosemirror-model'
+import { image } from './image'
+import { blockDoc } from './blockDoc'
+import { tables } from './tables'
+import { paragraph } from './paragraph'
+import { getAttrsWith, docAttrs, domAttrs } from './utils'
 
 /**
  * buildNodes
@@ -48,84 +50,25 @@ export function buildNodes(blockContent?: boolean, options: NodesOptions = {}) {
  * utils?
  */
 
-function domAttrs(attrs: any) {
-  let domAttrs: any = {}
-  for (let key in attrs) {
-    if (attrs[key]) {
-      domAttrs[`forestry-${key}`] = attrs[key]
-    }
-  }
-  return domAttrs
-}
-
-function docAttrs(attrs: any) {
-  let domAttrs: any = {}
-  for (let key in attrs) {
-    if (attrs[key]) {
-      domAttrs[key] = attrs[key]
-    }
-  }
-  return domAttrs
-}
-
-function getAttrsWith(attrs: object) {
-  return function(dom: HTMLElement) {
-    return {
-      ...attrs,
-      ...getAttrs(dom),
-    }
-  }
-}
-
-function getAttrs(dom: HTMLElement) {
-  let attrs: any = {}
-  let attributes = dom.attributes
-  for (let i = 0; i < attributes.length; i++) {
-    const attribute = attributes[i]
-    if (attribute.value) {
-      let name = attribute.name.startsWith("forestry-") ? attribute.name.slice(9) : attribute.name
-
-      attrs[name] = attribute.value
-    }
-  }
-  return attrs
-}
-
 /**
  * inlineDoc
  */
-const inlineDoc = { content: "inline*", marks: "_" }
+const inlineDoc = { content: 'inline*', marks: '_' }
 
 /**
  * paragraph
  */
-const paragraph = {
-  content: "inline*",
-  marks: "_",
-  attrs: {
-    class: { default: "" },
-    id: { default: "" },
-  },
-  group: "block",
-  parseDOM: [{ tag: "p", getAttrs }],
-  toDocument(node: Node) {
-    return ["p", docAttrs(node.attrs), 0]
-  },
-  toDOM(node: Node) {
-    return ["p", domAttrs(node.attrs), 0]
-  },
-}
 
 /**
  * blockquote
  */
 const blockquote = {
-  content: "block+",
-  group: "block",
+  content: 'block+',
+  group: 'block',
   defining: true,
-  parseDOM: [{ tag: "blockquote" }],
+  parseDOM: [{ tag: 'blockquote' }],
   toDOM() {
-    return ["blockquote", 0]
+    return ['blockquote', 0]
   },
 }
 
@@ -133,11 +76,11 @@ const blockquote = {
  * horizontal_rule
  */
 const horizontal_rule = {
-  group: "block",
+  group: 'block',
   allowGapCursor: true,
-  parseDOM: [{ tag: "hr" }],
+  parseDOM: [{ tag: 'hr' }],
   toDOM() {
-    return ["hr"]
+    return ['hr']
   },
 }
 
@@ -147,28 +90,28 @@ const horizontal_rule = {
 const heading = {
   attrs: {
     level: { default: 1 },
-    class: { default: "" },
-    id: { default: "" },
+    class: { default: '' },
+    id: { default: '' },
   },
-  content: "inline*",
-  marks: "_",
-  group: "block",
+  content: 'inline*',
+  marks: '_',
+  group: 'block',
   defining: true,
   parseDOM: [
-    { tag: "h1", getAttrs: getAttrsWith({ level: 1 }) },
-    { tag: "h2", getAttrs: getAttrsWith({ level: 2 }) },
-    { tag: "h3", getAttrs: getAttrsWith({ level: 3 }) },
-    { tag: "h4", getAttrs: getAttrsWith({ level: 4 }) },
-    { tag: "h5", getAttrs: getAttrsWith({ level: 5 }) },
-    { tag: "h6", getAttrs: getAttrsWith({ level: 6 }) },
+    { tag: 'h1', getAttrs: getAttrsWith({ level: 1 }) },
+    { tag: 'h2', getAttrs: getAttrsWith({ level: 2 }) },
+    { tag: 'h3', getAttrs: getAttrsWith({ level: 3 }) },
+    { tag: 'h4', getAttrs: getAttrsWith({ level: 4 }) },
+    { tag: 'h5', getAttrs: getAttrsWith({ level: 5 }) },
+    { tag: 'h6', getAttrs: getAttrsWith({ level: 6 }) },
   ],
   toDocument(node: Node) {
     const { level, ...other } = node.attrs
-    return ["h" + level, docAttrs(other), 0]
+    return ['h' + level, docAttrs(other), 0]
   },
   toDOM(node: Node) {
     const { level, ...other } = node.attrs
-    return ["h" + level, domAttrs(other), 0]
+    return ['h' + level, domAttrs(other), 0]
   },
 }
 
@@ -176,14 +119,14 @@ const heading = {
  * code_block
  */
 const code_block = {
-  content: "text*",
-  attrs: { params: { default: "" } },
-  group: "block",
+  content: 'text*',
+  attrs: { params: { default: '' } },
+  group: 'block',
   code: true,
   defining: true,
-  parseDOM: [{ tag: "pre", preserveWhitespace: "full" }],
+  parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
   toDOM() {
-    return ["pre", ["code", 0]]
+    return ['pre', ['code', 0]]
   },
 }
 
@@ -191,7 +134,7 @@ const code_block = {
  * text
  */
 const text = {
-  group: "inline",
+  group: 'inline',
 }
 
 /**
@@ -199,11 +142,11 @@ const text = {
  */
 const hard_break = {
   inline: true,
-  group: "inline",
+  group: 'inline',
   selectable: false,
-  parseDOM: [{ tag: "br" }],
+  parseDOM: [{ tag: 'br' }],
   toDOM() {
-    return ["br"]
+    return ['br']
   },
 }
 
@@ -211,27 +154,27 @@ const hard_break = {
  * Ordered List
  */
 const ordered_list = {
-  content: "list_item+",
-  group: "block",
+  content: 'list_item+',
+  group: 'block',
   attrs: { order: { default: 1 }, tight: { default: false } },
   parseDOM: [
     {
-      tag: "ol",
+      tag: 'ol',
       getAttrs(dom: Element) {
         return {
           // @ts-ignore
-          order: dom.hasAttribute("start") ? +dom.getAttribute("start") : 1,
-          tight: dom.hasAttribute("data-tight"),
+          order: dom.hasAttribute('start') ? +dom.getAttribute('start') : 1,
+          tight: dom.hasAttribute('data-tight'),
         }
       },
     },
   ],
   toDOM(node: Node) {
     return [
-      "ol",
+      'ol',
       {
         start: node.attrs.order == 1 ? null : node.attrs.order,
-        "data-tight": node.attrs.tight ? "true" : null,
+        'data-tight': node.attrs.tight ? 'true' : null,
       },
       0,
     ]
@@ -242,12 +185,17 @@ const ordered_list = {
  * bullet_list
  */
 const bullet_list = {
-  content: "list_item+",
-  group: "block",
+  content: 'list_item+',
+  group: 'block',
   attrs: { tight: { default: false } },
-  parseDOM: [{ tag: "ul", getAttrs: (dom: Element) => ({ tight: dom.hasAttribute("data-tight") }) }],
+  parseDOM: [
+    {
+      tag: 'ul',
+      getAttrs: (dom: Element) => ({ tight: dom.hasAttribute('data-tight') }),
+    },
+  ],
   toDOM(node: Node) {
-    return ["ul", { "data-tight": node.attrs.tight ? "true" : null }, 0]
+    return ['ul', { 'data-tight': node.attrs.tight ? 'true' : null }, 0]
   },
 }
 
@@ -255,11 +203,11 @@ const bullet_list = {
  * list_item
  */
 const list_item = {
-  content: "paragraph block*",
+  content: 'paragraph block*',
   defining: true,
-  parseDOM: [{ tag: "li" }],
+  parseDOM: [{ tag: 'li' }],
   toDOM() {
-    return ["li", 0]
+    return ['li', 0]
   },
 }
 
