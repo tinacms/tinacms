@@ -34,11 +34,163 @@ const { undoInputRule } = require('prosemirror-inputrules')
 const mac =
   typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
+interface KeymapPlugin {
+  __type: 'wysiwyg:keymap'
+  key: string
+  command(schema: Schema): any // TODO Command
+  ifMark?: string
+  ifMac?: boolean
+  unlessMac?: boolean
+  onCondition?(schema: Schema): boolean
+}
+
+let hardBreakCmd = (schema: Schema) => {
+  let br = schema.nodes.hard_break
+  return chainCommands(exitCode, (state, dispatch) => {
+    // @ts-ignore
+    dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView())
+    return true
+  })
+}
+
+let headingCmd = (level: number) => (schema: Schema) => {
+  let heading = schema.nodes.heading
+  return toggleHeader(heading, { level: 1 }, schema.nodes.paragraph, null)
+}
+
+const KEYMAP_PLUGINS: KeymapPlugin[] = [
+  { __type: 'wysiwyg:keymap', key: 'Mod-z', command: () => undo },
+  { __type: 'wysiwyg:keymap', key: 'Backspace', command: () => undoInputRule },
+  { __type: 'wysiwyg:keymap', key: 'Mod-Shift-z', command: () => redo },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-y',
+    command: () => redo,
+    unlessMac: true,
+  },
+  { __type: 'wysiwyg:keymap', key: 'Tab', command: () => () => true },
+  { __type: 'wysiwyg:keymap', key: 'Shift-Tab', command: () => () => true },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-b',
+    ifMark: 'strong',
+    command: schema => toggleMark(schema.marks.strong),
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-i',
+    ifMark: 'em',
+    command: schema => toggleMark(schema.marks.em),
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-k',
+    ifMark: 'link',
+    command: schema => {
+      const toggleLink = toggleMark(schema.marks.link, {
+        href: '',
+        title: '',
+        creating: 'creating',
+        editing: 'editing',
+      })
+
+      return function(state: any, dispatch: any) {
+        if (!(state.selection as any).$cursor) {
+          return toggleLink(state as any, dispatch)
+        }
+        return false
+      }
+    },
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Enter',
+    command: hardBreakCmd,
+    ifMark: 'hard_break',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Shift-Enter',
+    command: hardBreakCmd,
+    ifMark: 'hard_break',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Ctrl-Enter',
+    command: hardBreakCmd,
+    ifMark: 'hard_break',
+    ifMac: true,
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Alt-1',
+    command: headingCmd(1),
+    ifMark: 'heading',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Alt-2',
+    command: headingCmd(2),
+    ifMark: 'heading',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Alt-3',
+    command: headingCmd(3),
+    ifMark: 'heading',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Alt-4',
+    command: headingCmd(4),
+    ifMark: 'heading',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Alt-5',
+    command: headingCmd(5),
+    ifMark: 'heading',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Alt-6',
+    command: headingCmd(6),
+    ifMark: 'heading',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Backspace',
+    command: () => deleteEmptyHeading,
+    ifMark: 'heading',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Mod-Alt-7',
+    command: () => toggleOrderedList,
+    ifMark: 'ordered_list',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Backspace',
+    command: () => toggleBulletList,
+    ifMark: 'bullet_list',
+  },
+  {
+    __type: 'wysiwyg:keymap',
+    key: 'Backspace',
+    command: schema => liftListItem(schema.nodes.list_item),
+    onCondition(schema) {
+      return !!(schema.nodes.bullet_list || schema.nodes.ordered_list)
+    },
+  },
+]
+
 export function buildKeymap(schema: Schema, blockContent?: boolean) {
   let keys: any = {
     ...baseKeymap,
     Enter: chainCommands(createParagraphNear, liftEmptyBlock, splitBlock),
   }
+
   let type: any
 
   function bind(key: string, cmd: any) {
@@ -48,147 +200,21 @@ export function buildKeymap(schema: Schema, blockContent?: boolean) {
     keys[key] = cmd
   }
 
-  /**
-   * Undo
-   */
-  bind('Mod-z', undo)
-  bind('Backspace', undoInputRule)
+  KEYMAP_PLUGINS.forEach(plugin => {
+    let skip = false
 
-  /**
-   * Redo
-   */
-  bind('Shift-Mod-z', redo)
-  if (!mac) {
-    bind('Mod-y', redo)
-  }
+    // Exit early if this is a Mac, and it shouldn't be added for Mac.
+    if (plugin.unlessMac && mac) skip = true
 
-  /**
-   * Tab
-   */
-  bind('Tab', () => {
-    return true
+    // Exit early if it is for a mark that doesn't exist.
+    if (plugin.ifMark && !schema.marks[plugin.ifMark]) skip = true
+
+    // Exit if condition not met
+    if (plugin.onCondition && !plugin.onCondition(schema)) skip = true
+
+    // Bind the command
+    bind(plugin.key, plugin.command(schema))
   })
-
-  bind('Shift-Tab', () => {
-    return true
-  })
-
-  if (blockContent) {
-    // bind("Ctrl-Mod-ArrowUp", moveNodeUp)
-    // bind("Ctrl-Mod-ArrowDown", moveNodeDown)
-  }
-
-  /**
-   * Strong – <strong />
-   */
-  if ((type = schema.marks.strong)) {
-    bind('Mod-b', toggleMark(type))
-  }
-
-  /**
-   * Emphasis – <em />
-   */
-  if ((type = schema.marks.em)) {
-    bind('Mod-i', toggleMark(type))
-  }
-
-  /**
-   * Link – <a />
-   */
-  if ((type = schema.marks.link)) {
-    const toggleLink = toggleMark(type, {
-      href: '',
-      title: '',
-      creating: 'creating',
-      editing: 'editing',
-    })
-
-    bind('Mod-k', function(state: any, dispatch: any) {
-      if (!(state.selection as any).$cursor) {
-        return toggleLink(state as any, dispatch)
-      }
-      return false
-    })
-  }
-
-  /**
-   * Underline – <span style="text-decoration: underline" />
-   */
-  if ((type = schema.marks.underline)) {
-    bind('Mod-u', toggleMark(type))
-  }
-
-  /**
-   * Hard Break – <br />
-   */
-  if ((type = schema.nodes.hard_break)) {
-    let br = type,
-      cmd = chainCommands(exitCode, (state, dispatch) => {
-        // @ts-ignore
-        dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView())
-        return true
-      })
-    if (!schema.nodes.paragraph) {
-      bind('Enter', cmd)
-    }
-    bind('Mod-Enter', cmd)
-    bind('Shift-Enter', cmd)
-    if (mac) bind('Ctrl-Enter', cmd)
-  }
-
-  /**
-   * Headings - <h{n} />
-   */
-  if ((type = schema.nodes.heading)) {
-    bind(
-      'Mod-Alt-1',
-      toggleHeader(type, { level: 1 }, schema.nodes.paragraph, null)
-    )
-    bind(
-      'Mod-Alt-2',
-      toggleHeader(type, { level: 2 }, schema.nodes.paragraph, null)
-    )
-    bind(
-      'Mod-Alt-3',
-      toggleHeader(type, { level: 3 }, schema.nodes.paragraph, null)
-    )
-    bind(
-      'Mod-Alt-4',
-      toggleHeader(type, { level: 4 }, schema.nodes.paragraph, null)
-    )
-    bind(
-      'Mod-Alt-5',
-      toggleHeader(type, { level: 5 }, schema.nodes.paragraph, null)
-    )
-    bind(
-      'Mod-Alt-6',
-      toggleHeader(type, { level: 6 }, schema.nodes.paragraph, null)
-    )
-    bind('Backspace', deleteEmptyHeading)
-  }
-
-  /**
-   * Ordered List
-   */
-  if ((type = schema.nodes.ordered_list)) {
-    bind('Mod-Alt-7', toggleOrderedList)
-  }
-
-  /**
-   * Bullet List
-   */
-  if ((type = schema.nodes.bullet_list)) {
-    bind('Mod-Alt-8', toggleBulletList)
-  }
-
-  /**
-   * Allow lifting lists with
-   * paragraph shortcut
-   */
-  if ((type = schema.nodes.bullet_list) || (type = schema.nodes.ordered_list)) {
-    let lift = liftListItem(schema.nodes.list_item)
-    bind('Mod-Alt-9', lift)
-  }
 
   /**
    * Code Block - <pre />
