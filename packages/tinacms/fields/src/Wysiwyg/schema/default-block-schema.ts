@@ -1,9 +1,9 @@
-import { Schema } from "prosemirror-model"
-import { nodes } from "./nodes"
-import { buildMarks } from "./marks"
+import { Schema } from 'prosemirror-model'
+import { NODES } from './nodes'
+import { buildMarks } from './marks'
 
 export const defaultBlockSchema = new Schema({
-  nodes,
+  nodes: NODES,
   marks: buildMarks({
     code: true,
     link: true,
