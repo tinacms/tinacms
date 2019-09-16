@@ -1,6 +1,6 @@
 import * as fs from 'fs'
 import * as path from 'path'
-import { defaultBlockSchema } from '../../schema'
+import { defaultSchema } from '../../default-schema'
 import { MarkdownTranslator } from './index'
 
 const pathOf = (...files: string[]) => path.resolve(__dirname, ...files)
@@ -15,9 +15,7 @@ describe('Markdown Translators', () => {
     if (flavour !== 'commonmark') {
       return
     }
-    const translator = MarkdownTranslator.commonMarkFromSchema(
-      defaultBlockSchema
-    )
+    const translator = MarkdownTranslator.commonMarkFromSchema(defaultSchema)
 
     describe(flavour, () => {
       if (!isDirectory(flavour)) {
