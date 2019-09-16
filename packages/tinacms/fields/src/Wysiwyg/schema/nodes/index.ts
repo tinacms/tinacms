@@ -1,15 +1,30 @@
-import { image } from './image'
 import { tables } from './tables'
-import { paragraph } from './paragraph'
-import { blockquote } from './blockquote'
-import { horizontal_rule } from './hr'
-import { list_item } from './list-item'
-import { bullet_list } from './list-bullet'
-import { ordered_list } from './list-ordered'
-import { hard_break } from './hard-break'
-import { heading } from './heading'
-import { code_block } from './code-block'
-import { text } from './text'
+
+import blockquote from '../../plugins/schema/nodes/blockquote'
+import bullet_list from '../../plugins/schema/nodes/list-bullet'
+import code_block from '../../plugins/schema/nodes/code-block'
+import hard_break from '../../plugins/schema/nodes/hard-break'
+import heading from '../../plugins/schema/nodes/heading'
+import horizontal_rule from '../../plugins/schema/nodes/hr'
+import image from '../../plugins/schema/nodes/image'
+import list_item from '../../plugins/schema/nodes/list-item'
+import ordered_list from '../../plugins/schema/nodes/list-ordered'
+import paragraph from '../../plugins/schema/nodes/paragraph'
+import text from '../../plugins/schema/nodes/text'
+
+const DEFAULT_PLUGINS = [
+  blockquote,
+  bullet_list,
+  code_block,
+  hard_break,
+  heading,
+  horizontal_rule,
+  image,
+  list_item,
+  ordered_list,
+  paragraph,
+  text,
+]
 
 /**
  * buildNodes
@@ -64,16 +79,18 @@ const blockDoc = { content: 'block+' }
  */
 export const NODES = {
   doc: blockDoc,
-  paragraph,
-  blockquote,
-  horizontal_rule,
-  heading,
-  image,
-  code_block,
-  text,
-  hard_break,
-  ordered_list,
-  bullet_list,
-  list_item,
   ...tables,
+
+  // Plugins
+  paragraph: paragraph.node,
+  blockquote: blockquote.node,
+  horizontal_rule: horizontal_rule.node,
+  heading: heading.node,
+  image: image.node,
+  code_block: code_block.node,
+  text: text.node,
+  hard_break: hard_break.node,
+  ordered_list: ordered_list.node,
+  bullet_list: bullet_list.node,
+  list_item: list_item.node,
 }

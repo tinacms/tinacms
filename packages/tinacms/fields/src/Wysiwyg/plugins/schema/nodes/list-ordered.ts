@@ -30,3 +30,8 @@ export const ordered_list = {
     ]
   },
 }
+
+export default {
+  name: 'ordered_list',
+  node: ordered_list,
+}

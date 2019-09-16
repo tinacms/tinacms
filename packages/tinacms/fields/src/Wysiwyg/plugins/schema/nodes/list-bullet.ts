@@ -17,3 +17,8 @@ export const bullet_list = {
     return ['ul', { 'data-tight': node.attrs.tight ? 'true' : null }, 0]
   },
 }
+
+export default {
+  name: 'bullet_list',
+  node: bullet_list,
+}

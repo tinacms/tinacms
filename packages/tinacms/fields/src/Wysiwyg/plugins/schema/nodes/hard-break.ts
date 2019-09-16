@@ -10,3 +10,8 @@ export const hard_break = {
     return ['br']
   },
 }
+
+export default {
+  name: 'hard_break',
+  node: hard_break,
+}

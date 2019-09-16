@@ -9,3 +9,8 @@ export const list_item = {
     return ['li', 0]
   },
 }
+
+export default {
+  name: 'list_item',
+  node: list_item,
+}

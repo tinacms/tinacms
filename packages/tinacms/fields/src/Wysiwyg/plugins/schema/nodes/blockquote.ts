@@ -7,3 +7,8 @@ export const blockquote = {
     return ['blockquote', 0]
   },
 }
+
+export default {
+  name: 'blockquote',
+  node: blockquote,
+}
