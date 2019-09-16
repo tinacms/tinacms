@@ -1,15 +1,23 @@
 import * as React from 'react'
+import { EditorView } from 'prosemirror-view'
+import { Plugin } from 'prosemirror-state'
+
 import { defaultBlockSchema } from './schema'
 import { MarkdownTranslator } from './Translator'
-import { EditorView } from 'prosemirror-view'
 import { createEditorState } from './state'
+
 let schema = defaultBlockSchema
 let translator = MarkdownTranslator.fromSchema(schema, {})
 
-export function useTinaProsemirror(input: {
+export interface Input {
   value: string
   onChange(value: string): void
-}): React.RefObject<Node> {
+}
+
+export function useTinaProsemirror(
+  input: Input,
+  plugins: Plugin<any>[] = []
+): React.RefObject<Node> {
   /**
    * A reference to the DOM Node where the prosemirror editor will be added.
    */
@@ -29,7 +37,7 @@ export function useTinaProsemirror(input: {
         /**
          * The initial state of the Wysiwyg
          */
-        state: createEditorState(schema, translator, input.value),
+        state: createEditorState(schema, translator, plugins, input.value),
         /**
          * Call input.onChange with the translated content after updating
          * the Prosemiror state.
