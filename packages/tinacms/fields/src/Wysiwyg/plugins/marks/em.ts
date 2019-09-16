@@ -1,7 +1,10 @@
+import { SchemaMarkPlugin } from '..'
+
 /**
  * Emphasis
  */
 export default {
+  __type: 'wysiwyg:schema:mark',
   name: 'em',
   mark: {
     parseDOM: [
@@ -17,4 +20,4 @@ export default {
       return ['em']
     },
   },
-}
+} as SchemaMarkPlugin

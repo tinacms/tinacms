@@ -1,4 +1,7 @@
+import { SchemaMarkPlugin } from '..'
+
 export default {
+  __type: 'wysiwyg:schema:mark',
   name: 'strong',
   mark: {
     parseDOM: [
@@ -23,4 +26,4 @@ export default {
       return ['strong']
     },
   },
-}
+} as SchemaMarkPlugin
