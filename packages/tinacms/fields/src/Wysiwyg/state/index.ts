@@ -1,5 +1,5 @@
 import { Schema } from 'prosemirror-model'
-import { EditorState } from 'prosemirror-state'
+import { EditorState, Plugin } from 'prosemirror-state'
 // @ts-ignore
 import { dropCursor } from 'prosemirror-dropcursor'
 // @ts-ignore
@@ -14,6 +14,7 @@ import { menu } from './plugins/Menu'
 export function createEditorState(
   schema: Schema,
   translator: Translator,
+  plugins: Plugin<any>[],
   value: string
 ) {
   return EditorState.create({
@@ -27,6 +28,7 @@ export function createEditorState(
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       // gapCursor(),
       menu(translator, false),
+      ...plugins,
     ],
   })
 }
