@@ -1,10 +1,42 @@
+import { Plugin } from '@tinacms/core'
+import { SchemaMarkPlugin, SchemaNodePlugin } from './plugins'
+
+// wysiwyg:schema:marks
 import code from './plugins/marks/code'
 import em from './plugins/marks/em'
 import link from './plugins/marks/link'
 import strong from './plugins/marks/strong'
-import { Plugin } from '@tinacms/core'
-import { SchemaMarkPlugin } from './plugins'
 
-export const MARK_PLUGINS: SchemaMarkPlugin[] = [code, em, link, strong]
+// wysiwyg:schema:nodes
+import blockquote from './plugins/schema/nodes/blockquote'
+import bullet_list from './plugins/schema/nodes/list-bullet'
+import code_block from './plugins/schema/nodes/code-block'
+import hard_break from './plugins/schema/nodes/hard-break'
+import heading from './plugins/schema/nodes/heading'
+import horizontal_rule from './plugins/schema/nodes/hr'
+import image from './plugins/schema/nodes/image'
+import list_item from './plugins/schema/nodes/list-item'
+import ordered_list from './plugins/schema/nodes/list-ordered'
+import paragraph from './plugins/schema/nodes/paragraph'
+import text from './plugins/schema/nodes/text'
+import tables from './plugins/schema/nodes/tables'
 
-export const ALL_PLUGINS: Plugin[] = [...MARK_PLUGINS]
+const MARK_PLUGINS: SchemaMarkPlugin[] = [code, em, link, strong]
+
+const NODE_PLUGINS: SchemaNodePlugin[] = [
+  blockquote,
+  bullet_list,
+  code_block,
+  hard_break,
+  heading,
+  horizontal_rule,
+  image,
+  list_item,
+  ordered_list,
+  paragraph,
+  text,
+  ...tables,
+]
+
+// all
+export const ALL_PLUGINS: Plugin[] = [...MARK_PLUGINS, ...NODE_PLUGINS]

@@ -1,3 +1,5 @@
+import { SchemaNodePlugin } from '../..'
+
 /**
  * hard_break
  */
@@ -12,6 +14,7 @@ export const hard_break = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'hard_break',
   node: hard_break,
-}
+} as SchemaNodePlugin

@@ -1,3 +1,5 @@
+import { SchemaNodePlugin } from '../..'
+
 /**
  * code_block
  */
@@ -14,6 +16,7 @@ export const code_block = {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'code_block',
   node: code_block,
-}
+} as SchemaNodePlugin

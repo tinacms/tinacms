@@ -1,4 +1,5 @@
 import { Node } from 'prosemirror-model'
+import { SchemaNodePlugin } from '../..'
 
 export const image = {
   inline: true,
@@ -58,6 +59,7 @@ export function getAlignFromDOM(image: HTMLElement) {
 }
 
 export default {
+  __type: 'wysiwyg:schema:node',
   name: 'image',
   node: image,
-}
+} as SchemaNodePlugin

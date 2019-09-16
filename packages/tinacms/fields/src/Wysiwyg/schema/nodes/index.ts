@@ -1,4 +1,4 @@
-import { tables } from './tables'
+import { tables } from '../../plugins/schema/nodes/tables'
 
 import blockquote from '../../plugins/schema/nodes/blockquote'
 import bullet_list from '../../plugins/schema/nodes/list-bullet'
@@ -11,20 +11,6 @@ import list_item from '../../plugins/schema/nodes/list-item'
 import ordered_list from '../../plugins/schema/nodes/list-ordered'
 import paragraph from '../../plugins/schema/nodes/paragraph'
 import text from '../../plugins/schema/nodes/text'
-
-const DEFAULT_PLUGINS = [
-  blockquote,
-  bullet_list,
-  code_block,
-  hard_break,
-  heading,
-  horizontal_rule,
-  image,
-  list_item,
-  ordered_list,
-  paragraph,
-  text,
-]
 
 /**
  * buildNodes
