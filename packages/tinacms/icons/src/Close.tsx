@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const Close = () => (
+export const CloseIcon = () => (
   <svg
     width="16"
     height="16"

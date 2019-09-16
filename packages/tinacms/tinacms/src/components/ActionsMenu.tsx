@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { EllipsisVertical } from '@tinacms/icons'
+import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { useState, FC } from 'react'
 
 export interface ActionsMenuProps {
@@ -23,7 +23,7 @@ export const ActionsMenu: FC<ActionsMenuProps> = ({ actions }) => {
 
 const MoreActionsButton = styled(p => (
   <button {...p}>
-    <EllipsisVertical />
+    <EllipsisVerticalIcon />
   </button>
 ))`
   height: 100%;
