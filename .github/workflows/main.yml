@@ -9,7 +9,9 @@ jobs:
     
     steps:
     - uses: actions/checkout@v1
-    - name: Bootstrap Dependencies
+    - name: Install Dependencies
+      run: npm i
+    - name: Bootstrap Development
       run: npm run bs
     - name: Run a multi-line script
-      run: lerna run test --parallel
+      run: ./bin/lerna run test --parallel
