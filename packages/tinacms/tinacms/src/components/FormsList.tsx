@@ -1,6 +1,8 @@
 import * as React from 'react'
 import styled from 'styled-components'
+
 import { Form } from '@tinacms/core'
+import { Theme } from '../Globals'
 
 interface FormsListProps {
     forms: Form[]
@@ -18,7 +20,7 @@ interface FormsListProps {
               style={{
                 color:
                   activeForm && activeForm.name === form.name
-                    ? 'blue'
+                    ? Theme.color.primary
                     : 'inherit',
               }}
               onClick={() => setActiveForm(form)}
