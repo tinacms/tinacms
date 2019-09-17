@@ -1,6 +1,6 @@
 import { FormOptions, Form } from '@tinacms/core'
 import { ActionButton } from '@tinacms/tinacms'
-import { useCMSForm, useCMS } from '@tinacms/react-tinacms'
+import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -10,7 +10,6 @@ import { useEffect, useMemo } from 'react'
 import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
-import { FormSubscriber } from 'final-form'
 import * as React from 'react'
 
 let get = require('lodash.get')
@@ -81,19 +80,6 @@ export function useRemarkForm(
   })
 
   return [markdownRemark, form]
-}
-
-/**
- * TODO: Remove duplication with gatsby-tinacms-json
- *
- * Subscribes to value updates from the form with the given callback.
- */
-function watchFormValues(form: Form, cb: FormSubscriber<any>) {
-  useEffect(() => {
-    if (!form) return
-    // TODO: Can we _not_ call the callback on-subscribe?
-    return form.subscribe(cb, { values: true })
-  }, [form])
 }
 
 /**
