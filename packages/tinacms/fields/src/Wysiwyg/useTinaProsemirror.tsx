@@ -44,7 +44,7 @@ export function useTinaProsemirror(
         /**
          * The initial state of the Wysiwyg
          */
-        state: createEditorState(schema, translator, [], input.value),
+        state: createEditorState(schema, translator, plugins, input.value),
         /**
          * Call input.onChange with the translated content after updating
          * the Prosemiror state.

@@ -19,17 +19,7 @@ import { toggleBulletList, toggleOrderedList } from '../commands/list-commands'
 import { deleteEmptyHeading, toggleHeader } from '../commands/heading-commands'
 import { undo, redo } from 'prosemirror-history'
 import { undoInputRule } from 'prosemirror-inputrules'
-
-interface KeymapPlugin {
-  __type: 'wysiwyg:keymap'
-  key: string
-  command(schema: Schema): any // TODO Command
-  ifMark?: string
-  ifNode?: string
-  ifMac?: boolean
-  unlessMac?: boolean
-  onCondition?(schema: Schema): boolean
-}
+import { KeymapPlugin } from '.'
 
 let hardBreakCmd = (schema: Schema) => {
   let br = schema.nodes.hard_break
@@ -46,32 +36,32 @@ let headingCmd = (level: number) => (schema: Schema) => {
 }
 
 export const KEYMAP_PLUGINS: KeymapPlugin[] = [
-  { __type: 'wysiwyg:keymap', key: 'Mod-z', command: () => undo },
-  { __type: 'wysiwyg:keymap', key: 'Backspace', command: () => undoInputRule },
-  { __type: 'wysiwyg:keymap', key: 'Mod-Shift-z', command: () => redo },
+  { __type: 'wysiwyg:keymap', name: 'Mod-z', command: () => undo },
+  { __type: 'wysiwyg:keymap', name: 'Backspace', command: () => undoInputRule },
+  { __type: 'wysiwyg:keymap', name: 'Mod-Shift-z', command: () => redo },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-y',
+    name: 'Mod-y',
     command: () => redo,
     unlessMac: true,
   },
-  { __type: 'wysiwyg:keymap', key: 'Tab', command: () => () => true },
-  { __type: 'wysiwyg:keymap', key: 'Shift-Tab', command: () => () => true },
+  { __type: 'wysiwyg:keymap', name: 'Tab', command: () => () => true },
+  { __type: 'wysiwyg:keymap', name: 'Shift-Tab', command: () => () => true },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-b',
+    name: 'Mod-b',
     ifMark: 'strong',
     command: schema => toggleMark(schema.marks.strong),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-i',
+    name: 'Mod-i',
     ifMark: 'em',
     command: schema => toggleMark(schema.marks.em),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-k',
+    name: 'Mod-k',
     ifMark: 'link',
     command: schema => {
       const toggleLink = toggleMark(schema.marks.link, {
@@ -91,56 +81,56 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Enter',
+    name: 'Mod-Enter',
     command: hardBreakCmd,
     ifNode: 'hard_break',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Shift-Enter',
+    name: 'Shift-Enter',
     command: hardBreakCmd,
     ifNode: 'hard_break',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Ctrl-Enter',
+    name: 'Ctrl-Enter',
     command: hardBreakCmd,
     ifNode: 'hard_break',
     ifMac: true,
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-1',
+    name: 'Mod-Alt-1',
     command: headingCmd(1),
     ifNode: 'heading',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-2',
+    name: 'Mod-Alt-2',
     command: headingCmd(2),
     ifNode: 'heading',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-3',
+    name: 'Mod-Alt-3',
     command: headingCmd(3),
     ifNode: 'heading',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-4',
+    name: 'Mod-Alt-4',
     command: headingCmd(4),
     ifNode: 'heading',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-5',
+    name: 'Mod-Alt-5',
     command: headingCmd(5),
     ifNode: 'heading',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-6',
+    name: 'Mod-Alt-6',
     command: headingCmd(6),
     ifNode: 'heading',
   },
@@ -148,25 +138,25 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
   {
     // TODO: NOT WORKING
     __type: 'wysiwyg:keymap',
-    key: 'Backspace',
+    name: 'Backspace',
     command: () => deleteEmptyHeading,
     ifNode: 'heading',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-7',
+    name: 'Mod-Alt-7',
     command: () => toggleOrderedList,
     ifNode: 'ordered_list',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-8',
+    name: 'Mod-Alt-8',
     command: () => toggleBulletList,
     ifNode: 'bullet_list',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-9',
+    name: 'Mod-Alt-9',
     command: schema => liftListItem(schema.nodes.list_item),
     onCondition(schema) {
       return !!(schema.nodes.bullet_list || schema.nodes.ordered_list)
@@ -174,85 +164,85 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-0',
+    name: 'Mod-Alt-0',
     command: schema => setBlockType(schema.nodes.code_block),
     ifNode: 'code_block',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'ArrowLeft',
+    name: 'ArrowLeft',
     command: () => arrowHandler('left'),
     ifNode: 'code_block',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'ArrowRight',
+    name: 'ArrowRight',
     command: () => arrowHandler('right'),
     ifNode: 'code_block',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'ArrowUp',
+    name: 'ArrowUp',
     command: () => arrowHandler('up'),
     ifNode: 'code_block',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'ArrowDown',
+    name: 'ArrowDown',
     command: () => arrowHandler('down'),
     ifNode: 'code_block',
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-0',
+    name: 'Mod-0',
     ifMark: 'code',
     command: schema => toggleMark(schema.marks.code),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod->',
+    name: 'Mod->',
     ifNode: 'blockquote',
     command: schema => wrapIn(schema.nodes.blockquote),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-<',
+    name: 'Mod-<',
     ifNode: 'blockquote',
     command: () => liftBlockquote,
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Alt-9',
+    name: 'Mod-Alt-9',
     ifNode: 'paragraph',
     command: schema => setBlockType(schema.nodes.paragraph),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Shift-Ctrl-0',
+    name: 'Shift-Ctrl-0',
     ifNode: 'paragraph',
     command: schema => setBlockType(schema.nodes.paragraph),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Mod-Enter',
+    name: 'Mod-Enter',
     ifNode: 'horizontal_rule',
     command: () => insertHr,
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Enter',
+    name: 'Enter',
     ifNode: 'list_item',
     command: schema => splitListItem(schema.nodes.list_item),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Tab',
+    name: 'Tab',
     ifNode: 'list_item',
     command: schema => sinkListItem(schema.nodes.list_item),
   },
   {
     __type: 'wysiwyg:keymap',
-    key: 'Shift-Tab',
+    name: 'Shift-Tab',
     ifNode: 'list_item',
     command: schema => liftListItem(schema.nodes.list_item),
   },
