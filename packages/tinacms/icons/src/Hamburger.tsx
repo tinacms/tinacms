@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const Hamburger = () => (
+export const HamburgerIcon = () => (
   <svg
     width="20"
     height="16"
