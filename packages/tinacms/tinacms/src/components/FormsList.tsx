@@ -11,8 +11,7 @@ interface FormsListProps {
   const FormsList = ({ forms, activeForm, setActiveForm, isEditing }: FormsListProps) => {
     return (
       <StyledFormList isEditing={isEditing}>
-        {/* <h1>Editable Files</h1>
-        <span /> */}
+          {/* <h1>Editable Files</h1> */}
         <ul>
           {forms.map(form => (
             <>
@@ -40,10 +39,9 @@ interface FormsListProps {
         0,
         0
     );
-    h1 {
-        font-size: 1.2rem;
-        color: #333;
-        font-weight: normal;
+    h1{
+      color: #333;
+      font-weight: normal;
     }
     span {
       display: block;
