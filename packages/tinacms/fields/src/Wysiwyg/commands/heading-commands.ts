@@ -10,13 +10,13 @@ export function deleteEmptyHeading(state: EditorState, dispatch: any) {
   if (node.textContent.length) return false
   if (dispatch) {
     dispatch(
-      (state.tr
+      state.tr
         // Replace the entire heading with an empty paragraph
         .replaceRangeWith(
           $cursor.pos - 1,
           $cursor.pos + node.nodeSize - 1,
           state.schema.nodes.paragraph.create()
-        ) as any) // <- Fucking types are wrong
+        )
         // Set the seleciton to be at the start of the paragram
         .setSelection(Selection.near(state.doc.resolve($cursor.pos - 1)))
     )
