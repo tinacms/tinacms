@@ -7,7 +7,12 @@ import { FormsView } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal } from './modalProvider'
 import { ModalFullscreen } from './modalFullscreen'
-import { CloseIcon, HamburgerIcon, LeftArrowIcon, EditIcon } from '@tinacms/icons'
+import {
+  CloseIcon,
+  HamburgerIcon,
+  LeftArrowIcon,
+  EditIcon,
+} from '@tinacms/icons'
 import {
   GlobalStyles,
   HEADER_HEIGHT,
