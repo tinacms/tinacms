@@ -3,7 +3,6 @@ import styled from 'styled-components'
 
 import { LeftArrow } from '@tinacms/icons'
 
-//TODO: Make Form Name better
 const EditingFormTitle = ({form, setEditingForm, isMultiform }: any) => {
     return (
         <StyledEditingFormTitle isMultiform={isMultiform} onClick={() => isMultiform && setEditingForm(null)}>
