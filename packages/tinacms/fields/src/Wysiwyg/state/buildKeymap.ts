@@ -6,12 +6,13 @@ import {
   splitBlock,
 } from 'prosemirror-commands'
 import { Schema } from 'prosemirror-model'
-import { KEYMAP_PLUGINS } from '../../../plugins/keymap'
+import { findPlugins, KeymapPlugin } from '../plugins'
+import { Plugin } from '@tinacms/core'
 
 const mac =
   typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
-export function buildKeymap(schema: Schema) {
+export function buildKeymap(schema: Schema, plugins: Plugin[]) {
   let keys: any = {
     ...baseKeymap,
   }
@@ -23,7 +24,7 @@ export function buildKeymap(schema: Schema) {
     keys[key] = cmd
   }
 
-  KEYMAP_PLUGINS.forEach(plugin => {
+  findPlugins<KeymapPlugin>('wysiwyg:keymap', plugins).forEach(plugin => {
     let skip = false
 
     // Exit early if this is a Mac, and it shouldn't be added for Mac.
@@ -39,7 +40,7 @@ export function buildKeymap(schema: Schema) {
     if (plugin.onCondition && !plugin.onCondition(schema)) skip = true
 
     // Bind the command
-    if (!skip) bind(plugin.key, plugin.command(schema))
+    if (!skip) bind(plugin.name, plugin.command(schema))
   })
 
   bind('Enter', chainCommands(createParagraphNear, liftEmptyBlock, splitBlock))
