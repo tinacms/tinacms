@@ -11,6 +11,7 @@ import { Theme, GlobalStyles, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
+import EditingFormTitle from './EditingFormTitle'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -19,6 +20,7 @@ export const FormsView = () => {
     return cms.forms.all()[0] as Form | null
   })
 
+  /***** Makes the default state the forms list, wait until user input to setEditingForm
   useSubscribable(cms.forms, () => {
     const forms = cms.forms.all()
     if (forms.length == 1) {
@@ -30,6 +32,7 @@ export const FormsView = () => {
       setEditingForm(null)
     }
   })
+  */
 
   /**
    * No Forms
@@ -51,19 +54,14 @@ export const FormsView = () => {
         setActiveForm={setEditingForm}
       />
     )
-      //how to get this forms list to render again???
+
   return (
     <>
-      <FormsList
-        forms={forms}
-        activeForm={editingForm}
-        setActiveForm={setEditingForm}
-      />
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
           return (
             <>
-              {/* <h3>Editing form {editingForm.name}</h3> */}
+              <EditingFormTitle form={editingForm as any} setEditingForm={setEditingForm as any} />
               <FieldsWrapper>
                 {editingForm &&
                   (editingForm.fields.length ? (
