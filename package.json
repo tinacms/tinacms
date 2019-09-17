@@ -5,7 +5,7 @@
     "bootstrap": "lerna bootstrap --hoist",
     "bs": "npm run bootstrap",
     "link": "lerna link",
-    "test": "lerna run test --parallel",
+    "test": "lerna run test",
     "build": "lerna run build"
   },
   "devDependencies": {
