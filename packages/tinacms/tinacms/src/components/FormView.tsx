@@ -156,6 +156,7 @@ const CreateButton = styled(Button)`
 `
 
 export const FieldsWrapper = styled.div`
+  scrollbar-width: none;
   width: 100%;
   padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
     ${p => p.theme.padding}rem;
@@ -170,6 +171,9 @@ export const FieldsWrapper = styled.div`
 `
 
 const TransitionForm = styled.section<{ isEditing: Boolean }>`
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
   transition: transform 150ms ease-out;
   transform: translate3d(
     ${p => !p.isEditing ? `640px` : '0'},
