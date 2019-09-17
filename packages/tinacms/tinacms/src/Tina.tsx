@@ -24,6 +24,9 @@ export const Tina: React.FC<TinaProps> = ({ children, position }) => {
   return (
     <CMSContext.Provider value={cms}>
       <SidebarContext.Provider value={props}>
+        <SiteWrapper open={isOpen} position={position}>
+          {children}
+        </SiteWrapper>
         <ThemeProvider theme={Theme}>
           <ModalProvider>
             <TinaReset>
@@ -31,9 +34,6 @@ export const Tina: React.FC<TinaProps> = ({ children, position }) => {
             </TinaReset>
           </ModalProvider>
         </ThemeProvider>
-        <SiteWrapper open={isOpen} position={position}>
-          {children}
-        </SiteWrapper>
       </SidebarContext.Provider>
     </CMSContext.Provider>
   )
@@ -44,7 +44,6 @@ const SiteWrapper = styled.div<{ open: boolean; position: string }>`
   top: 0 !important;
   right: 0 !important;
   height: 100% !important;
-  z-index: -1 !important;
   width: ${props =>
     props.position === 'fixed' && props.open
       ? 'calc(100% - ' + SIDEBAR_WIDTH + ')'

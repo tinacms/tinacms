@@ -1,5 +1,6 @@
 import * as React from 'react'
 import { FormOptions } from '@tinacms/core'
+import { TinaForm } from '@tinacms/react-tinacms'
 import { useRemarkForm } from './useRemarkForm'
 
 export function remarkForm(
@@ -10,5 +11,31 @@ export function remarkForm(
     let [markdownRemark] = useRemarkForm(props.data.markdownRemark, options)
 
     return <Component {...props} data={{ ...props.data, markdownRemark }} />
+  }
+}
+
+export function liveRemarkForm(
+  Component: any,
+  options: Partial<FormOptions<any>> = {}
+) {
+  return function RemarkForm(props: any) {
+    let [markdownRemark, form] = useRemarkForm(
+      props.data.markdownRemark,
+      options
+    )
+
+    return (
+      <TinaForm form={form}>
+        {editingProps => {
+          return (
+            <Component
+              {...props}
+              data={{ ...props.data, markdownRemark }}
+              {...editingProps}
+            />
+          )
+        }}
+      </TinaForm>
+    )
   }
 }
