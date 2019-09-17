@@ -10,6 +10,7 @@
   "scripts": {
     "test": "jest --passWithNoTests",
     "watch": "cms-scripts watch",
+    "dev": "cms-scripts dev",
     "build": "cms-scripts build"
   },
   "devDependencies": {
@@ -19,6 +20,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.0-alpha.5"
+    "@tinacms/core": "^0.1.0-alpha.5",
+    "@tinacms/form-builder": "0.1.0-alpha.5"
   }
 }
