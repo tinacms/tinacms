@@ -26,6 +26,7 @@ export const MARK_PLUGINS: SchemaMarkPlugin[] = [code, em, link, strong]
 
 export const NODE_PLUGINS: SchemaNodePlugin[] = [
   doc,
+  paragraph,
   blockquote,
   bullet_list,
   code_block,
@@ -35,7 +36,6 @@ export const NODE_PLUGINS: SchemaNodePlugin[] = [
   image,
   list_item,
   ordered_list,
-  paragraph,
   text,
   ...tables,
 ]
