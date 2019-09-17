@@ -310,13 +310,6 @@ export function switchListType(listType: NodeType) {
     if (!dispatch) return true
 
     let tr = state.tr
-    let $start = tr.doc.resolve(range.start)
-    // Get the
-    console.log({
-      range,
-      $start,
-      parent: range.parent,
-    })
     dispatch((tr as any).setNodeMarkup(range.start - 1, listType))
     return true
   }
