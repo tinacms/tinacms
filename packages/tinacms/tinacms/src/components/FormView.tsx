@@ -7,7 +7,7 @@ import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { Modal, ModalBody, ModalHeader } from '..'
-import { Theme, GlobalStyles, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
+import { Theme, GlobalStyles, SIDEBAR_WIDTH, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
@@ -19,6 +19,7 @@ export const FormsView = () => {
   const [editingForm, setEditingForm] = useState<Form | null>(() => {
     return cms.forms.all()[0] as Form | null
   })
+  const [isEditing, setIsEditing] = useState(false)
 
   /***** Makes the default state the forms list, wait until user input to setEditingForm
   useSubscribable(cms.forms, () => {
@@ -33,6 +34,11 @@ export const FormsView = () => {
     }
   })
   */
+
+  //Toggles editing prop for component animations
+  React.useEffect(() => {
+    editingForm ? setIsEditing(true) : setIsEditing(false)
+  })
 
   /**
    * No Forms
@@ -49,6 +55,7 @@ export const FormsView = () => {
   if (!editingForm)
     return (
       <FormsList
+        isEditing={isEditing}
         forms={forms}
         activeForm={editingForm}
         setActiveForm={setEditingForm}
@@ -60,7 +67,7 @@ export const FormsView = () => {
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
           return (
-            <>
+            <TransitionForm isEditing={isEditing}>
               <EditingFormTitle form={editingForm as any} setEditingForm={setEditingForm as any} />
               <FieldsWrapper>
                 {editingForm &&
@@ -78,7 +85,7 @@ export const FormsView = () => {
                   <ActionsMenu actions={editingForm.actions} />
                 )}
               </FormsFooter>
-            </>
+            </TransitionForm>
           )
         }}
       </FormBuilder>
@@ -160,6 +167,15 @@ export const FieldsWrapper = styled.div`
     padding: 0;
     list-style: none;
   }
+`
+
+const TransitionForm = styled.section<{ isEditing: Boolean }>`
+  transition: transform 150ms ease-out;
+  transform: translate3d(
+    ${p => !p.isEditing ? `640px` : '0'},
+    0,
+    0
+  );
 `
 
 const FormsFooter = styled.div`

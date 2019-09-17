@@ -20,20 +20,20 @@ const StyledEditingFormTitle = styled.div`
     align-items: center;
     padding:  ${p => p.theme.padding}rem;
     color: inherit;
-    transition: color 300ms ease;
+    transition: color 250ms ease;
     svg {
         width: 15px;
         fill: #949494;
         height: 15px;
         transform: translate3d(-4px, 0, 0);
-        transition: transform 300ms ease;
+        transition: transform 250ms ease;
     }
     :hover {
         color: ${p => p.theme.color.primary};
-        transition: color 300ms ease;
+        transition: color 250ms ease;
         svg {
         transform: translate3d(-7px, 0, 0);
-        transition: transform 300ms ease;
+        transition: transform 250ms ease;
         }
     }
 `
