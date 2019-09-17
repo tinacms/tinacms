@@ -28,6 +28,7 @@
     "@tinacms/icons": "^0.0.1-alpha.1",
     "@tinacms/react-tinacms": "^0.1.0-alpha.5",
     "react-datetime": "^2.16.3",
+    "react-dismissible": "^1.0.0",
     "react-frame-component": "^4.1.1",
     "styled-components": "^4.3.2"
   },
