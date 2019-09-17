@@ -1,0 +1,41 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "attrs": {
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "em"
+            }
+          ],
+          "text": "italic"
+        }
+      ]
+    },
+    {
+      "type": "paragraph",
+      "attrs": {
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "em"
+            }
+          ],
+          "text": "italic"
+        }
+      ]
+    }
+  ]
+}

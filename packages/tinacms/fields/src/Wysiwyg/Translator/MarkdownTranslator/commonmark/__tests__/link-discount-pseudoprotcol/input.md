@@ -1,0 +1,1 @@
+[Text](abbr:discount.abbr)
