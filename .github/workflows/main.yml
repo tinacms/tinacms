@@ -1,17 +1,16 @@
-name: CI
+name: Run all tests
 
 on: [push]
 
 jobs:
   build:
-
     runs-on: ubuntu-latest
-    
+
     steps:
-    - uses: actions/checkout@v1
-    - name: Install Dependencies
-      run: npm i
-    - name: Bootstrap Development
-      run: npm run bs
-    - name: Run a multi-line script
-      run: ./bin/lerna run test --parallel
+      - uses: actions/checkout@v1
+      - name: Install Dependencies
+        run: npm i
+      - name: Bootstrap Development
+        run: npm run bs
+      - name: Run Tests
+        run: npm run test
