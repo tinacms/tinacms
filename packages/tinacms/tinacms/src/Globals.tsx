@@ -65,6 +65,11 @@ export const GlobalStyles = createGlobalStyle`
     height: 0;
     box-sizing: content-box;
   }
+  h1 {
+    font-size: 1.2rem;
+    font-weight: normal;
+    margin: 0;
+  }
 `
 
 export const TinaReset = styled.div`
