@@ -21,19 +21,19 @@ export const FormsView = () => {
   })
   const [isEditing, setIsEditing] = useState(false)
 
-  /***** Makes the default state the forms list, wait until user input to setEditingForm
+  //Makes the default state the forms list, wait until user input to setEditingForm
+  //if they navigate to another page, gets reset to null / formsList
   useSubscribable(cms.forms, () => {
     const forms = cms.forms.all()
-    if (forms.length == 1) {
-      setEditingForm(forms[0])
-      return
-    }
+    // if (forms.length == 1) {
+    //   setEditingForm(forms[0])
+    //   return
+    // }
 
     if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
       setEditingForm(null)
     }
   })
-  */
 
   //Toggles editing prop for component animations
   React.useEffect(() => {
