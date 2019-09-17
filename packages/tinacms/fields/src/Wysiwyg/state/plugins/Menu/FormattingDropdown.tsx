@@ -6,6 +6,9 @@ import { blockTool } from './blockControl'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
+import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './Menu'
+import styled from 'styled-components'
+import { HeadingIcon } from '@tinacms/icons'
 
 interface State {
   active: boolean
@@ -26,25 +29,18 @@ export class FormattingDropdown extends React.Component<any, State> {
     let { bottom, view } = this.props
     let { active } = this.state
     return (
-      <div
-        // className={c('headings-toggle', 'menu-control')}
-        onClick={this.toggle}
-      >
-        <span>
-          H1
-          {/* {bottom ? (
-            <Icon name="HeadingsDown" width={14} height={14} />
-          ) : (
-            <Icon name="HeadingsUp" width={14} height={14} />
-          )} */}
-        </span>
+      <MenuDropdownWrapper>
+        <MenuButton data-tooltip={'Heading'} onClick={this.toggle}>
+          <HeadingIcon />
+        </MenuButton>
         {/* <Dismissible onDismiss={this.toggle} active={active} escape> */}
-        <ul
-        // className={c('formatting-dropdown', {
-        //   top: !bottom,
-        //   bottom,
-        //   active,
-        // })}
+        <MenuButtonDropdown
+          open={true}
+          // className={c('formatting-dropdown', {
+          //   top: !bottom,
+          //   bottom,
+          //   active,
+          // })}
         >
           <H1 view={view} onClick={this.toggle} />
           <H2 view={view} onClick={this.toggle} />
@@ -52,9 +48,9 @@ export class FormattingDropdown extends React.Component<any, State> {
           <H4 view={view} onClick={this.toggle} />
           <H5 view={view} onClick={this.toggle} />
           <H6 view={view} onClick={this.toggle} />
-        </ul>
+        </MenuButtonDropdown>
         {/* </Dismissible> */}
-      </div>
+      </MenuDropdownWrapper>
     )
   }
 }
@@ -72,43 +68,80 @@ function makeToggleHeader(level: number) {
   }
 }
 
+const HeadingOne = styled.div`
+  font-size: 40px;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+`
+const HeadingTwo = styled.div`
+  font-size: 34px;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+`
+const HeadingThree = styled.div`
+  font-size: 26px;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+`
+const HeadingFour = styled.div`
+  font-size: 21px;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+`
+const HeadingFive = styled.div`
+  font-size: 18px;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+`
+const HeadingSix = styled.div`
+  font-size: 16px;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+`
+
 const H1 = blockTool({
-  className: 'h1',
+  Component: HeadingOne,
   children: 'Heading 1',
   command: makeToggleHeader(1),
   typeName: 'heading',
   attrs: { level: 1 },
 })
 const H2 = blockTool({
-  className: 'h2',
+  Component: HeadingTwo,
   children: 'Heading 2',
   command: makeToggleHeader(2),
   typeName: 'heading',
   attrs: { level: 2 },
 })
 const H3 = blockTool({
-  className: 'h3',
+  Component: HeadingThree,
   children: 'Heading 3',
   command: makeToggleHeader(3),
   typeName: 'heading',
   attrs: { level: 3 },
 })
 const H4 = blockTool({
-  className: 'h4',
+  Component: HeadingFour,
   children: 'Heading 4',
   command: makeToggleHeader(4),
   typeName: 'heading',
   attrs: { level: 4 },
 })
 const H5 = blockTool({
-  className: 'h5',
+  Component: HeadingFive,
   children: 'Heading 5',
   command: makeToggleHeader(5),
   typeName: 'heading',
   attrs: { level: 5 },
 })
 const H6 = blockTool({
-  className: 'h6',
+  Component: HeadingSix,
   children: 'Heading 6',
   command: makeToggleHeader(6),
   typeName: 'heading',

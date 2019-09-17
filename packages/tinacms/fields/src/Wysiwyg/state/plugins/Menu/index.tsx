@@ -29,7 +29,6 @@ export class MenuView {
     render(
       <ViewContainer frame={this.frame}>
         <TranslatorContext.Provider value={this.translator}>
-          <Thing> Hi</Thing>
           <Menu view={this.view} bottom={this.bottom} format={'markdown'} />
         </TranslatorContext.Provider>
       </ViewContainer>,
@@ -59,10 +58,6 @@ export function menu(translator: Translator, bottom?: boolean, frame?: any) {
     // TODO: Fix
   } as any)
 }
-
-const Thing = styled.div`
-  background: pink;
-`
 
 const ViewContainer: FC<{ frame: any }> = ({ frame, children }) => {
   console.log(frame)

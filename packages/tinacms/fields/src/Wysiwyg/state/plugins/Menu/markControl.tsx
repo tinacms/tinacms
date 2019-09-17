@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 import { toggleMark } from 'prosemirror-commands'
+import { MenuButton } from './Menu'
 
 export interface Props {
   view: EditorView
@@ -8,7 +9,7 @@ export interface Props {
 
 export interface Options {
   mark: string
-  icon: string
+  Icon: any // Fix type
   title?: string
   defaultAttrs?: any
   selectionOnly?: boolean
@@ -20,7 +21,7 @@ export interface Options {
 
 export function markControl({
   mark,
-  icon,
+  Icon,
   tooltip,
   size,
   stroke,
@@ -92,18 +93,15 @@ export function markControl({
         return null
       }
       return (
-        <div data-tooltip={tooltip} data-side="top">
-          <div
-            // className={c('menu-control', {
-            //   active: this.active,
-            //   disabled: this.disabled,
-            // })}
-            onClick={this.onClick}
-          >
-            {icon}
-            {/* <Icon name={icon} width={size} height={size} stroke={stroke} /> */}
-          </div>
-        </div>
+        <MenuButton
+          data-tooltip={tooltip}
+          data-side="top"
+          onClick={this.onClick}
+          active={this.active}
+          disabled={this.disabled}
+        >
+          <Icon />
+        </MenuButton>
       )
     }
   }

@@ -20,18 +20,32 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   height: 100%;
 
   > [contenteditable] {
-    outline: 0px solid transparent;
-    border-bottom: 1px dashed ${mediumGrey};
-    padding-top: 1rem;
-    padding-bottom: 0.5em;
-    min-height: 100px;
+    background-color: ${p => p.theme.color.light};
+    border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
+    border-radius: ${p => p.theme.input.radius};
+    font-size: ${p => p.theme.input.fontSize};
+    line-height: ${p => p.theme.input.lineHeight};
+    transition: background-color ${p => p.theme.timing.short} ease-out,
+      border-color ${p => p.theme.timing.short} ease-out,
+      box-shadow ${p => p.theme.timing.medium} ease-out;
+    padding: ${p => p.theme.input.padding};
+    border-width: 1px;
+    border-style: solid;
+    width: 100%;
+    margin: 0;
+    outline: none;
 
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 
+    &:hover {
+      background-color: #f0f0f0;
+    }
+
     &:focus {
-      //put Tina brand color here!!!!
-      border-bottom: 1px solid rgb(33, 224, 158);
+      border-color: ${p => p.theme.color.primary};
+      box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
+      background-color: #f8f8f8;
     }
 
     div::selection {
@@ -85,47 +99,54 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     font-size: 40px;
     line-height: 48px;
     margin-top: 0;
+    &:not(:first-child) {
+      margin-top: 32px;
+    }
   }
 
-  // Set margin top if h1 is used somewhere in the middle of the document
-  * + h1 {
-    margin-top: 32px;
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    &:not(:first-child) {
+      margin-top: 21px;
+    }
   }
 
   h2 {
     font-size: 34px;
     line-height: 38px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h3 {
     font-size: 26px;
     line-height: 30px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h4 {
     font-size: 21px;
     line-height: 28px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h5 {
     font-size: 18px;
     line-height: 24px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h6 {
     font-size: 16px;
     line-height: 20px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   // Links
   a {
-    //make this a tina brand color!!
-    color: rgb(33, 224, 158);
+    color: #0084ff;
     border: 0;
     font-weight: normal;
     text-decoration: underline;
@@ -175,7 +196,7 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   code {
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
-    background: ${lightGrey};
+    background: rgba(53, 50, 50, 0.08);
     padding: 0.1em 0.25em;
   }
 

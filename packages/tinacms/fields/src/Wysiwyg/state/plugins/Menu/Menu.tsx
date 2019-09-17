@@ -10,6 +10,21 @@ import {
 } from '../../../commands/list-commands'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
+import styled, { css } from 'styled-components'
+import {
+  BoldIcon,
+  CodeIcon,
+  HeadingIcon,
+  ItalicIcon,
+  LinkIcon,
+  OrderedListIcon,
+  QuoteIcon,
+  RedoIcon,
+  UndoIcon,
+  UnorderedListIcon,
+  UnderlineIcon,
+} from '@tinacms/icons'
+
 // import { ImageControl } from './images'
 
 interface Props {
@@ -24,28 +39,28 @@ interface State {
 
 const BoldControl = markControl({
   mark: 'strong',
-  icon: 'Bold',
+  Icon: BoldIcon,
   tooltip: 'Bold',
   size: 12,
   stroke: 3,
 })
 const ItalicControl = markControl({
   mark: 'em',
-  icon: 'Italic',
+  Icon: ItalicIcon,
   tooltip: 'Italic',
   size: 12,
   stroke: 2,
 })
 const UnderlineControl = markControl({
   mark: 'underline',
-  icon: 'Underline',
+  Icon: UnderlineIcon,
   tooltip: 'Underline',
   size: 12,
   stroke: 2,
 })
 const LinkControl = markControl({
   mark: 'link',
-  icon: 'Link',
+  Icon: LinkIcon,
   tooltip: 'Link',
   size: 14,
   stroke: 2,
@@ -66,38 +81,25 @@ export class Menu extends React.Component<Props, State> {
     const supportBlocks = true
 
     return (
-      <div>
-        <div>
-          <UndoControl view={view} />
-          <RedoControl view={view} />
-        </div>
-        <div>
-          {supportBlocks && <FormattingDropdown view={view} bottom={bottom} />}
-          <BoldControl view={view} />
-          <ItalicControl view={view} />
-          <UnderlineControl view={view} />
-          <LinkControl view={view} />
-          {/* <ImageControl view={view} bottom={bottom} /> */}
-          {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
-          {supportBlocks && <CodeControl view={view} bottom={bottom} />}
-          {supportBlocks && <BulletList view={view} bottom={bottom} />}
-          {supportBlocks && <OrderedList view={view} bottom={bottom} />}
-        </div>
-        <div>
-          {/*
-          <div className={c("menu-control")} title="Fullscreen" data-tooltip="Fullscreen" data-side="left">
-            <Icon name="Fullscreen" width={14} height={14} stroke={2} />
-          </div>
-          */}
-        </div>
-      </div>
+      <MenuContainer>
+        {supportBlocks && <FormattingDropdown view={view} bottom={bottom} />}
+        <BoldControl view={view} />
+        <ItalicControl view={view} />
+        <UnderlineControl view={view} />
+        <LinkControl view={view} />
+        {/* <ImageControl view={view} bottom={bottom} /> */}
+        {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
+        {supportBlocks && <CodeControl view={view} bottom={bottom} />}
+        {supportBlocks && <BulletList view={view} bottom={bottom} />}
+        {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+      </MenuContainer>
     )
   }
 }
 
 const commandContrl = (
   command: any,
-  icon: string,
+  Icon: any, // Fix type
   _title: string,
   tooltip: string,
   size: number,
@@ -118,18 +120,14 @@ const commandContrl = (
     canDo = () => command(this.props.view.state)
     render() {
       return (
-        <div data-tooltip={tooltip}>
-          <div
-            // className={c('menu-control', {
-            //   disabled: !this.canDo(),
-            //   bottom: this.props.bottom,
-            // })}
-            onClick={this.onClick}
-          >
-            {icon}
-            {/* <Icon name={icon} width={size} height={size} stroke={stroke} /> */}
-          </div>
-        </div>
+        <MenuButton
+          data-tooltip={tooltip}
+          onClick={this.onClick}
+          bottom={this.props.bottom}
+          disabled={!this.canDo()}
+        >
+          <Icon />
+        </MenuButton>
       )
     }
   }
@@ -142,7 +140,7 @@ function makeCodeBlock(state: EditorState, dispatch: any) {
 }
 const QuoteControl = commandContrl(
   wrapInBlockquote,
-  'Quote',
+  QuoteIcon,
   'Blockquote',
   'Blockquote',
   14,
@@ -150,18 +148,18 @@ const QuoteControl = commandContrl(
 )
 const CodeControl = commandContrl(
   makeCodeBlock,
-  'Code',
+  CodeIcon,
   'Codeblock',
   'Codeblock',
   14,
   2,
   false
 ) //codeblock focusing messes with scroll
-const RedoControl = commandContrl(redo, 'Redo', 'Redo', 'Redo', 14, 2)
-const UndoControl = commandContrl(undo, 'Undo', 'Undo', 'Undo', 14, 2)
+const RedoControl = commandContrl(redo, RedoIcon, 'Redo', 'Redo', 14, 2)
+const UndoControl = commandContrl(undo, UndoIcon, 'Undo', 'Undo', 14, 2)
 const BulletList = commandContrl(
   toggleBulletList,
-  'UnorderedList',
+  UnorderedListIcon,
   'Unordered List',
   'Unordered List',
   16,
@@ -169,9 +167,116 @@ const BulletList = commandContrl(
 )
 const OrderedList = commandContrl(
   toggleOrderedList,
-  'OrderedList',
+  OrderedListIcon,
   'Ordered List',
   'Ordered List',
   16,
   2
 )
+
+const MenuContainer = styled.div`
+  display: flex;
+  justify-content: space-between;
+  position: sticky;
+  top: 0;
+  width: 100%;
+  border: 1px solid rgba(53, 50, 50, 0.09);
+  border-radius: 0.5rem;
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  overflow: visible;
+  display: flex;
+  flex: 0 0 auto;
+  z-index: 10;
+  margin: 0 0 0.75rem 0;
+`
+
+export const MenuButton = styled.button<{
+  active?: boolean
+  disabled?: boolean
+  bottom?: boolean
+}>`
+  flex: 1 0 auto;
+  background-color: ${p =>
+    p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
+  color: ${p => (p.active ? '#0084ff' : '#353232')};
+  fill: ${p => (p.active ? '#0084ff' : '#353232')};
+  border: none;
+  outline: none;
+  padding: 0.25rem 0.375rem;
+  transition: all 85ms ease-out;
+  cursor: pointer;
+  &:hover {
+    background-color: rgba(53, 50, 50, 0.09);
+  }
+  &:active {
+    color: #0084ff;
+    fill: #0084ff;
+    background-color: rgba(53, 50, 50, 0.05);
+  }
+  &:not(:last-child) {
+    border-right: 1px solid rgba(53, 50, 50, 0.09);
+  }
+  &:first-child {
+    padding-left: 0.5rem;
+    border-radius: 0.5rem 0 0 0.5rem;
+  }
+  &:last-child {
+    padding-right: 0.5rem;
+    border-radius: 0 0.5rem 0.5rem 0;
+  }
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
+`
+
+export const MenuDropdownWrapper = styled.div`
+  position: relative;
+`
+
+export const MenuButtonDropdown = styled.ul<{ open: boolean }>`
+  border-radius: 0.5rem;
+  border: 1px solid #efefef;
+  display: block;
+  position: absolute;
+  left: 0;
+  transform: translate3d(0, 1.75rem, 0) scale3d(0.5, 0.5, 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 85ms ease-out;
+  transform-origin: 0 0;
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
+    0px 4px 8px rgba(48, 48, 48, 0.1);
+  background-color: white;
+  overflow: hidden;
+  li {
+    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
+      Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
+    display: block;
+    padding: 0.5rem 1rem;
+    list-style: none;
+    transition: all 85ms ease-out;
+    cursor: pointer;
+    &:first-child {
+      padding-top: 0.75rem;
+    }
+    &:last-child {
+      padding-bottom: 0.75rem;
+    }
+    &:hover {
+      background-color: rgba(53, 50, 50, 0.09);
+    }
+    &:active {
+      color: #0084ff;
+      fill: #0084ff;
+      background-color: rgba(53, 50, 50, 0.05);
+    }
+  }
+  ${props =>
+    props.open &&
+    css`
+      opacity: 1;
+      pointer-events: all;
+      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+    `};
+`

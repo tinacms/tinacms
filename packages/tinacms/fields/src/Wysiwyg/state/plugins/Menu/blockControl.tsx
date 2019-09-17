@@ -2,15 +2,15 @@ import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 
 interface BlockTool {
+  Component: any
   children: any
-  className: string
   command: Function
   typeName?: string
   attrs?: any
 }
 
 export function blockTool(options: BlockTool) {
-  let { className, children, command, typeName, attrs } = options
+  let { Component, children, command, typeName, attrs } = options
   return class extends React.Component<
     { view: EditorView; onClick(): void },
     any
@@ -42,7 +42,7 @@ export function blockTool(options: BlockTool) {
           // )}
           onClick={this.onClick}
         >
-          {children}
+          <Component>{children}</Component>
         </li>
       )
     }
