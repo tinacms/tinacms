@@ -11,15 +11,19 @@ interface FormsListProps {
   const FormsList = ({ forms, activeForm, setActiveForm, isEditing }: FormsListProps) => {
     return (
       <StyledFormList isEditing={isEditing}>
-        <h1>Editable Files</h1>
+        {/* <h1>Editable Files</h1>
+        <span /> */}
         <ul>
           {forms.map(form => (
-            <li
-              key={form.name}
-              onClick={() => setActiveForm(form)}
-            >
-              {form.name}
-            </li>
+            <>
+              <li
+                key={form.name}
+                onClick={() => setActiveForm(form)}
+              >
+                <h1>{form.name}</h1>
+              </li>
+              <span />
+            </>
           ))}
         </ul>
       </StyledFormList>
@@ -30,8 +34,6 @@ interface FormsListProps {
 
   const StyledFormList = styled.section<{ isEditing: Boolean }>`
     padding: ${p => p.theme.padding}rem;
-    background-color: ${p => p.theme.color.light};
-    border-bottom: 1px solid rgba(51,51,51,0.04);
     transition: transform 150ms ease-in;
     transform: translate3d(
         ${p => p.isEditing ? `-100%` : '0'},
@@ -42,9 +44,13 @@ interface FormsListProps {
         font-size: 1.2rem;
         color: #333;
         font-weight: normal;
-        padding: 0 0 ${p => p.theme.input.padding} 0;
-        margin: 0 0 .85rem 0;
-        border-bottom: 0.5px solid lightgray;
+    }
+    span {
+      display: block;
+      width: 15%;
+      background-color: rgba(51,51,51,0.1);
+      height: 1px;
+      margin: ${p => p.theme.paddingSml}rem 0;
     }
     ul {
         cursor: pointer;
@@ -54,15 +60,19 @@ interface FormsListProps {
         color: #747474;
         font-size: .8rem;
         li:not(:last-child) {
-        margin-bottom: ${p => p.theme.input.padding};
-        padding-bottom: .5rem;
+          margin-bottom: ${p => p.theme.paddingSml}rem;
+          padding-bottom: .5rem;
         }
         li {
-        transition: color 250ms ease;
+          color: #333;
+          h1 {
+            color: inherit;
+          }
+          transition: color 200ms ease;
         }
         li:hover {
-        color: ${p => p.theme.color.primary};
-        transition: color 250ms ease;
+          color: ${p => p.theme.color.primary};
+          transition: color 200ms ease;
         }
     }
 `
