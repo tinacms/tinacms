@@ -4,18 +4,18 @@ import styled from 'styled-components'
 import { LeftArrow } from '@tinacms/icons'
 
 //TODO: Make Form Name better
-const EditingFormTitle = ({form, setEditingForm }: any) => {
+const EditingFormTitle = ({form, setEditingForm, isMultiform }: any) => {
     return (
-        <StyledEditingFormTitle onClick={() => setEditingForm(null)}>
-            <LeftArrow />
+        <StyledEditingFormTitle isMultiform={isMultiform} onClick={() => isMultiform && setEditingForm(null)}>
+            {isMultiform && <LeftArrow />}
             <h1>{form.name}</h1>
         </StyledEditingFormTitle>
 )}
 
-const StyledEditingFormTitle = styled.div`
+const StyledEditingFormTitle = styled.div<{isMultiform: Boolean}>`
+    cursor: ${p => p.isMultiform && 'pointer'};
     background-color: ${p => p.theme.color.light};
     border-bottom: 1px solid rgba(51,51,51,0.04);
-    cursor: pointer;
     display: flex;  
     align-items: center;
     padding:  ${p => p.theme.padding}rem;
@@ -29,7 +29,7 @@ const StyledEditingFormTitle = styled.div`
         transition: transform 250ms ease;
     }
     :hover {
-        color: ${p => p.theme.color.primary};
+        color: ${p => p.isMultiform && `${p.theme.color.primary}`};
         transition: color 250ms ease;
         svg {
         transform: translate3d(-7px, 0, 0);

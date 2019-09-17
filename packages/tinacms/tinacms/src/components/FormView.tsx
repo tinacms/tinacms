@@ -20,15 +20,22 @@ export const FormsView = () => {
     return cms.forms.all()[0] as Form | null
   })
   const [isEditing, setIsEditing] = useState(false)
+  const [ isMultiform, setIsMultiform ] = useState(false)
 
-  //Makes the default state the forms list, wait until user input to setEditingForm
-  //if they navigate to another page, gets reset to null / formsList
   useSubscribable(cms.forms, () => {
     const forms = cms.forms.all()
-    // if (forms.length == 1) {
-    //   setEditingForm(forms[0])
-    //   return
-    // }
+    if (forms.length == 1) {
+      setIsMultiform(false)
+      setEditingForm(forms[0])
+      return
+    }
+
+    //if multiforms, set default view to formslist
+    if(forms.length > 1 ) {
+      setIsMultiform(true)
+      //if they navigate to another page w/ no active form, reset
+      !editingForm && setEditingForm(null)
+    }
 
     if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
       setEditingForm(null)
@@ -68,7 +75,7 @@ export const FormsView = () => {
         {({ handleSubmit, pristine, form }) => {
           return (
             <TransitionForm isEditing={isEditing}>
-              <EditingFormTitle form={editingForm as any} setEditingForm={setEditingForm as any} />
+              <EditingFormTitle isMultiform={isMultiform} form={editingForm as any} setEditingForm={setEditingForm as any} />
               <FieldsWrapper>
                 {editingForm &&
                   (editingForm.fields.length ? (
