@@ -1,13 +1,21 @@
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
+import { useFrameContext } from '../styled-frame'
+import * as React from 'react'
 
 let lightGrey = 'rgb(243, 243, 243)'
 let lightMediumGrey = `rgb(200, 200, 200)`
 let mediumGrey = `rgb(143, 143, 143);`
 let darkGrey = 'rgb(40, 40, 40)'
 
-export const Markdown = wrapFieldsWithMeta(styled(Wysiwyg)`
+const FramedWysiwyg = (props: any) => {
+  let frame = useFrameContext()
+
+  return <Wysiwyg {...props} frame={frame} />
+}
+
+export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   position: relative;
   height: 100%;
 

@@ -11,17 +11,21 @@ let darkGrey = 'rgb(40, 40, 40)'
 
 interface Wysiwyg {
   input: any
+  frame?: any
   plugins?: Plugin[]
 }
 
-export const Wysiwyg = styled(({ input, plugins, ...styleProps }: any) => {
-  let prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS)
+export const Wysiwyg = styled(
+  ({ input, plugins, frame, ...styleProps }: any) => {
+    console.log('Frame', frame)
+    let prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame)
 
-  return (
-    <div>
-      <div {...styleProps} ref={prosemirrorEl} />
-    </div>
-  )
-})`
+    return (
+      <div>
+        <div {...styleProps} ref={prosemirrorEl} />
+      </div>
+    )
+  }
+)`
   white-space: pre-wrap;
 `
