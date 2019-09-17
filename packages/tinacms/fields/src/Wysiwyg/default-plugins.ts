@@ -21,11 +21,13 @@ import ordered_list from './plugins/schema/nodes/list-ordered'
 import paragraph from './plugins/schema/nodes/paragraph'
 import text from './plugins/schema/nodes/text'
 import tables from './plugins/schema/nodes/tables'
+import { KEYMAP_PLUGINS } from './plugins/keymap'
 
 export const MARK_PLUGINS: SchemaMarkPlugin[] = [code, em, link, strong]
 
 export const NODE_PLUGINS: SchemaNodePlugin[] = [
   doc,
+  paragraph,
   blockquote,
   bullet_list,
   code_block,
@@ -35,10 +37,13 @@ export const NODE_PLUGINS: SchemaNodePlugin[] = [
   image,
   list_item,
   ordered_list,
-  paragraph,
   text,
   ...tables,
 ]
 
 // all
-export const ALL_PLUGINS: Plugin[] = [...MARK_PLUGINS, ...NODE_PLUGINS]
+export const ALL_PLUGINS: Plugin[] = [
+  ...MARK_PLUGINS,
+  ...NODE_PLUGINS,
+  ...KEYMAP_PLUGINS,
+]
