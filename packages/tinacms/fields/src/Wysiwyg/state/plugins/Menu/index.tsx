@@ -5,6 +5,12 @@ import { EditorView } from 'prosemirror-view'
 import { Plugin } from 'prosemirror-state'
 import { Translator } from '../../../Translator'
 import { TranslatorContext } from './TranslatorContext'
+import styled from 'styled-components'
+
+// @ts-ignore TODO: add to package.json
+import { FrameContext } from 'react-frame-component'
+import { StyleSheetManager } from 'styled-components'
+import { useContext, FC } from 'react'
 
 export class MenuView {
   dom: HTMLElement
@@ -13,7 +19,7 @@ export class MenuView {
     private view: EditorView,
     private translator: Translator,
     private bottom?: boolean,
-    private format: 'markdown' | 'html' | 'html-blocks' = 'html'
+    private frame?: any
   ) {
     this.dom = document.createElement('div')
     this.render()
@@ -21,9 +27,12 @@ export class MenuView {
 
   render() {
     render(
-      <TranslatorContext.Provider value={this.translator}>
-        <Menu view={this.view} bottom={this.bottom} format={this.format} />
-      </TranslatorContext.Provider>,
+      <ViewContainer frame={this.frame}>
+        <TranslatorContext.Provider value={this.translator}>
+          <Thing> Hi</Thing>
+          <Menu view={this.view} bottom={this.bottom} format={'markdown'} />
+        </TranslatorContext.Provider>
+      </ViewContainer>,
       this.dom
     )
   }
@@ -38,10 +47,10 @@ export class MenuView {
   }
 }
 
-export function menu(translator: Translator, bottom?: boolean) {
+export function menu(translator: Translator, bottom?: boolean, frame?: any) {
   return new Plugin({
     view(view: EditorView) {
-      let menuView = new MenuView(view, translator, bottom)
+      let menuView = new MenuView(view, translator, bottom, frame)
       const richTextNode = view.dom.parentNode
       const parentElement = richTextNode!.parentElement
       parentElement!.insertBefore(menuView.dom, richTextNode)
@@ -49,4 +58,18 @@ export function menu(translator: Translator, bottom?: boolean) {
     },
     // TODO: Fix
   } as any)
+}
+
+const Thing = styled.div`
+  background: pink;
+`
+
+const ViewContainer: FC<{ frame: any }> = ({ frame, children }) => {
+  console.log(frame)
+  if (!frame) return <>{children}</>
+  return (
+    <StyleSheetManager target={frame.document.head}>
+      {children}
+    </StyleSheetManager>
+  )
 }

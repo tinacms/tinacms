@@ -13,7 +13,8 @@ export interface Input {
 
 export function useTinaProsemirror(
   input: Input,
-  plugins: Plugin[] = []
+  plugins: Plugin[] = [],
+  frame?: any
 ): React.RefObject<Node> {
   /**
    * Construct the Prosemirror Schema
@@ -44,7 +45,13 @@ export function useTinaProsemirror(
         /**
          * The initial state of the Wysiwyg
          */
-        state: createEditorState(schema, translator, plugins, input.value),
+        state: createEditorState(
+          schema,
+          translator,
+          plugins,
+          input.value,
+          frame
+        ),
         /**
          * Call input.onChange with the translated content after updating
          * the Prosemiror state.
