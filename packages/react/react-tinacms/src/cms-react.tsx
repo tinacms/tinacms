@@ -1,5 +1,7 @@
 import * as React from 'react'
 import { CMS, Plugin, Form, Subscribable, FormOptions } from '@tinacms/core'
+import { useEffect } from 'react'
+import { FormSubscriber } from 'final-form'
 
 export const ERROR_MISSING_CMS = `useCMS could not find an instance of CMS`
 
@@ -80,4 +82,28 @@ export function withPlugin(Component: any, plugin: Plugin) {
     usePlugin(plugin)
     return <Component {...props} />
   }
+}
+
+/**
+ * Subscribes to value updates from the form with the given callback.
+ */
+export function watchFormValues(form: Form, cb: FormSubscriber<any>) {
+  useEffect(() => {
+    if (!form) return
+
+    // `form.subscribe` sends the current state on-subscription.
+    // We want to ignore that first call.
+    let firstUpdate = true
+
+    return form.subscribe(
+      formState => {
+        if (firstUpdate) {
+          firstUpdate = false
+        } else {
+          cb(formState)
+        }
+      },
+      { values: true }
+    )
+  }, [form])
 }
