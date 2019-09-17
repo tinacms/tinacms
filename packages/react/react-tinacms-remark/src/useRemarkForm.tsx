@@ -26,7 +26,7 @@ export function useRemarkForm(
   validateMarkdownRemark(markdownRemark)
 
   let cms = useCMS()
-  let name = markdownRemark.fileRelativePath
+  let name = markdownRemark.frontmatter.title
   let initialValues = useMemo(
     () => ({
       ...markdownRemark,
