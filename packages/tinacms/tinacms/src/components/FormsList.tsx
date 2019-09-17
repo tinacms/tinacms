@@ -17,12 +17,6 @@ interface FormsListProps {
           {forms.map(form => (
             <li
               key={form.name}
-              style={{
-                color:
-                  activeForm && activeForm.name === form.name
-                    ? Theme.color.primary
-                    : 'inherit',
-              }}
               onClick={() => setActiveForm(form)}
             >
               {form.name}
@@ -62,7 +56,8 @@ interface FormsListProps {
       -webkit-transition: color 300ms ease;
       transition: color 300ms ease;
     }
-    li:active {
+    li:hover {
+      color: ${p => p.theme.color.primary};
       -webkit-transition: color 300ms ease;
       transition: color 300ms ease;
     }
