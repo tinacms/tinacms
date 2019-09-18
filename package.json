@@ -2,11 +2,11 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap --hoist",
+    "bootstrap": "lerna bootstrap --hoist --strict --reject-cycles",
     "bs": "npm run bootstrap",
-    "link": "lerna link",
-    "test": "lerna run test",
-    "build": "lerna run build"
+    "test": "lerna run test --reject-cycles",
+    "watch": "lerna run watch --parallel --reject-cylcles",
+    "build": "lerna run build --reject-cycles"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
