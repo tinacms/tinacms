@@ -2,16 +2,16 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap --hoist",
+    "bootstrap": "lerna bootstrap --hoist --reject-cycles",
     "bs": "npm run bootstrap",
-    "link": "lerna link",
-    "test": "lerna run test",
-    "build": "lerna run build"
+    "test": "lerna run test --reject-cycles",
+    "watch": "lerna run watch --parallel --reject-cylcles",
+    "build": "lerna run build --reject-cycles"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "commander": "^2.20.0",
-    "lerna": "^3.15.0",
+    "lerna": "^3.16.4",
     "rollup": "^1.16.7",
     "rollup-plugin-commonjs": "^10.0.1",
     "rollup-plugin-typescript2": "^0.22.0",
@@ -19,6 +19,7 @@
     "typescript": "^3.5.3"
   },
   "dependencies": {
+    "danger": "^9.2.0",
     "react-frame-component": "^4.1.1"
   }
 }
