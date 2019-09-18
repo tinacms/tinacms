@@ -1,10 +1,11 @@
 {
-  "name": "@tinacms/template",
-  "version": "0.1.0",
+  "name": "react-dismissible",
+  "version": "1.0.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
   "files": [
+    "README.md",
     "build"
   ],
   "scripts": {
@@ -15,7 +16,8 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
-    "cms-scripts": "0.1.0-alpha.2",
+    "@testing-library/react": "^9.1.4",
+    "cms-scripts": "^0.1.0-alpha.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
