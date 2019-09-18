@@ -1,7 +1,6 @@
 import { Form, FormOptions } from '@tinacms/core'
-import { useCMSForm, useCMS } from '@tinacms/react-tinacms'
+import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
 import { useEffect, useMemo } from 'react'
-import { FormSubscriber } from 'final-form'
 
 let get = require('lodash.get')
 
@@ -59,19 +58,6 @@ function generateFields(post: any) {
     component: 'text',
     name: `rawJson.${key}`,
   }))
-}
-
-/**
- * TODO: Remove duplication with react-tinacms-remark
- *
- * Subscribes to value updates from the form with the given callback.
- */
-function watchFormValues(form: Form, cb: FormSubscriber<any>) {
-  useEffect(() => {
-    if (!form) return
-    // TODO: Can we _not_ call the callback on-subscribe?
-    return form.subscribe(cb, { values: true })
-  }, [form])
 }
 
 interface JsonFormProps extends Partial<FormOptions<any>> {
