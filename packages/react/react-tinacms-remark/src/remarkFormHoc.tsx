@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { FormOptions } from '@tinacms/core'
-import { TinaForm } from '@tinacms/react-tinacms'
+import { TinaForm } from '@tinacms/form-builder'
 import { useRemarkForm } from './useRemarkForm'
 
 export function remarkForm(
