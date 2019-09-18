@@ -3,6 +3,8 @@ import * as React from 'react'
 import { lift, wrapIn } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { blockTool } from './blockControl'
+import { Dismissible } from 'react-dismissible'
+// import { useFrameContext } from '../../../../../../tinacms/src/styled-frame'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
@@ -26,30 +28,34 @@ export class FormattingDropdown extends React.Component<any, State> {
     )
   lift = () => lift(this.props.view.state, this.props.view.dispatch)
   render() {
-    let { bottom, view } = this.props
-    let { active } = this.state
+    let { bottom, view, frame } = this.props
+    //const frame = useFrameContext()
     return (
       <MenuDropdownWrapper>
-        <MenuButton data-tooltip={'Heading'} onClick={this.toggle}>
+        <MenuButton
+          data-tooltip={'Heading'}
+          onClick={this.toggle}
+          active={this.state.active}
+        >
           <HeadingIcon />
         </MenuButton>
-        {/* <Dismissible onDismiss={this.toggle} active={active} escape> */}
-        <MenuButtonDropdown
-          open={true}
-          // className={c('formatting-dropdown', {
-          //   top: !bottom,
-          //   bottom,
-          //   active,
-          // })}
-        >
-          <H1 view={view} onClick={this.toggle} />
-          <H2 view={view} onClick={this.toggle} />
-          <H3 view={view} onClick={this.toggle} />
-          <H4 view={view} onClick={this.toggle} />
-          <H5 view={view} onClick={this.toggle} />
-          <H6 view={view} onClick={this.toggle} />
+        <MenuButtonDropdown open={this.state.active}>
+          <Dismissible
+            click
+            escape
+            onDismiss={() => {
+              this.toggle()
+            }}
+            document={frame.document}
+          >
+            <H1 view={view} onClick={this.toggle} />
+            <H2 view={view} onClick={this.toggle} />
+            <H3 view={view} onClick={this.toggle} />
+            <H4 view={view} onClick={this.toggle} />
+            <H5 view={view} onClick={this.toggle} />
+            <H6 view={view} onClick={this.toggle} />
+          </Dismissible>
         </MenuButtonDropdown>
-        {/* </Dismissible> */}
       </MenuDropdownWrapper>
     )
   }

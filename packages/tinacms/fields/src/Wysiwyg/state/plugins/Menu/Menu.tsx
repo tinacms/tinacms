@@ -31,6 +31,7 @@ interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
   view: EditorView
+  frame: any
 }
 
 interface State {
@@ -76,13 +77,15 @@ const LinkControl = markControl({
 
 export class Menu extends React.Component<Props, State> {
   render() {
-    const { view, bottom = false } = this.props
+    const { view, bottom = false, frame } = this.props
 
     const supportBlocks = true
 
     return (
       <MenuContainer>
-        {supportBlocks && <FormattingDropdown view={view} bottom={bottom} />}
+        {supportBlocks && (
+          <FormattingDropdown view={view} bottom={bottom} frame={frame} />
+        )}
         <BoldControl view={view} />
         <ItalicControl view={view} />
         <UnderlineControl view={view} />
@@ -228,6 +231,13 @@ export const MenuButton = styled.button<{
     width: 1.25rem;
     height: 1.25rem;
   }
+  ${props =>
+    props.active &&
+    css`
+      color: #0084ff;
+      fill: #0084ff;
+      background-color: rgba(53, 50, 50, 0.05);
+    `};
 `
 
 export const MenuDropdownWrapper = styled.div`
@@ -240,7 +250,8 @@ export const MenuButtonDropdown = styled.ul<{ open: boolean }>`
   display: block;
   position: absolute;
   left: 0;
-  transform: translate3d(0, 1.75rem, 0) scale3d(0.5, 0.5, 1);
+  bottom: -0.5rem;
+  transform: translate3d(0, 100%, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 85ms ease-out;
@@ -277,6 +288,6 @@ export const MenuButtonDropdown = styled.ul<{ open: boolean }>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, 0, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, 100%, 0) scale3d(1, 1, 1);
     `};
 `
