@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/next-tinacms-markdown",
-  "version": "0.0.1-alpha.4",
+  "version": "0.0.1-alpha.5",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -19,7 +19,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.1.0-alpha.5",
-    "@tinacms/react-tinacms": "^0.1.0-alpha.5",
+    "@tinacms/react-tinacms": "^0.1.0-alpha.6",
     "cms-scripts": "^0.1.0-alpha.2",
     "gray-matter": "4.0.2"
   }

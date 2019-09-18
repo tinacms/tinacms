@@ -1,6 +1,6 @@
 {
   "name": "demo-next",
-  "version": "0.1.1-alpha.7",
+  "version": "0.1.1-alpha.8",
   "private": true,
   "scripts": {
     "dev": "next dev",
@@ -9,9 +9,9 @@
   "dependencies": {
     "@tinacms/api-git": "^0.1.0-alpha.6",
     "@tinacms/next-tinacms-git": "^0.0.1-alpha.3",
-    "@tinacms/next-tinacms-markdown": "^0.0.1-alpha.4",
-    "@tinacms/react-tinacms": "^0.1.0-alpha.5",
-    "@tinacms/tinacms": "^0.1.0-alpha.8",
+    "@tinacms/next-tinacms-markdown": "^0.0.1-alpha.5",
+    "@tinacms/react-tinacms": "^0.1.0-alpha.6",
+    "@tinacms/tinacms": "^0.1.0-alpha.9",
     "next": "9.0.5"
   }
 }
