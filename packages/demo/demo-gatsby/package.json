@@ -9,6 +9,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.1.0-alpha.5",
+    "@tinacms/fields": "^0.1.0-alpha.9",
     "@tinacms/form-builder": "^0.1.0-alpha.5",
     "@tinacms/gatsby-plugin-tinacms": "^0.1.0-alpha.8",
     "@tinacms/gatsby-tinacms-git": "^0.1.0-alpha.10",
