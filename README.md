@@ -7,6 +7,7 @@
 - [Documentation](./docs/README.md)
   - [Gatsby Starter](./gatsby/starter-setup.md)
   - [Manual Setup](./gatsby/manual-setup.md)
+- [Roadmap](./ROADMAP.md)
 - [Contributing](./CONTRIBUTING.md)
   - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
   - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
