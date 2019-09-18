@@ -2,7 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "bootstrap": "lerna bootstrap --hoist --strict --reject-cycles",
+    "bootstrap": "lerna bootstrap --hoist --reject-cycles",
     "bs": "npm run bootstrap",
     "test": "lerna run test --reject-cycles",
     "watch": "lerna run watch --parallel --reject-cylcles",
