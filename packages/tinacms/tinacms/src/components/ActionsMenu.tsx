@@ -2,20 +2,33 @@ import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { useState, FC } from 'react'
+import { Dismissible } from 'react-dismissible'
+import { useFrameContext } from '../styled-frame'
 
 export interface ActionsMenuProps {
   actions: any[]
 }
 
 export const ActionsMenu: FC<ActionsMenuProps> = ({ actions }) => {
+  const frame = useFrameContext()
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
   return (
     <>
       <MoreActionsButton onClick={() => setActionMenuVisibility(p => !p)} />
       <ActionsOverlay open={actionMenuVisibility}>
-        {actions.map(Action => (
-          <Action />
-        ))}
+        <Dismissible
+          click
+          escape
+          disabled={!actionMenuVisibility}
+          document={frame.document}
+          onDismiss={() => {
+            setActionMenuVisibility(p => !p)
+          }}
+        >
+          {actions.map(Action => (
+            <Action />
+          ))}
+        </Dismissible>
       </ActionsOverlay>
     </>
   )
