@@ -5,6 +5,7 @@
     "bootstrap": "lerna bootstrap --hoist --reject-cycles",
     "bs": "npm run bootstrap",
     "test": "lerna run test --reject-cycles",
+    "dev": "lerna run dev --reject-cycles",
     "watch": "lerna run watch --parallel --reject-cylcles",
     "build": "lerna run build --reject-cycles"
   },
