@@ -29,7 +29,12 @@ export class MenuView {
     render(
       <ViewContainer frame={this.frame}>
         <TranslatorContext.Provider value={this.translator}>
-          <Menu view={this.view} bottom={this.bottom} format={'markdown'} />
+          <Menu
+            view={this.view}
+            bottom={this.bottom}
+            format={'markdown'}
+            frame={this.frame}
+          />
         </TranslatorContext.Provider>
       </ViewContainer>,
       this.dom
