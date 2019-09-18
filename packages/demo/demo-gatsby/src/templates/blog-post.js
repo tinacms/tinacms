@@ -7,7 +7,7 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { liveRemarkForm } from "@tinacms/react-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaField } from "@tinacms/react-tinacms"
+import { TinaField } from "@tinacms/form-builder"
 import { Wysiwyg, Toggle } from "@tinacms/fields"
 
 const PlainText = props => (
