@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useState, useContext } from 'react'
 import { Form } from '@tinacms/core'
-import { FormBuilder } from '@tinacms/form-builder'
+import { FormBuilder } from './final-form-builder'
 import { Field } from 'react-final-form'
 
 interface RenderProps {
