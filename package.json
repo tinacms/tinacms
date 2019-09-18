@@ -11,7 +11,7 @@
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "commander": "^2.20.0",
-    "lerna": "^3.15.0",
+    "lerna": "^3.16.4",
     "rollup": "^1.16.7",
     "rollup-plugin-commonjs": "^10.0.1",
     "rollup-plugin-typescript2": "^0.22.0",
