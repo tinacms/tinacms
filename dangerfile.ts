@@ -1,34 +1,72 @@
 import { markdown, danger, warn, message } from 'danger'
 
-const allFiles = [
-  ...danger.git.created_files,
-  ...danger.git.deleted_files,
-  ...danger.git.modified_files,
-]
+runChecksOnPullRequest()
 
+/**
+ * An object representing a package in tinacms/tinacms.
+ */
 interface TinaPackage {
+  /**
+   * The path to the package in the repo.
+   */
   path: string
+
+  /**
+   * The contents of it's `package.json`.
+   */
   packageJson: any
 }
 
-let modifiedPackages = getModifiedPackages()
+/**
+ * Executes all checks for the Pull Request.
+ */
+function runChecksOnPullRequest() {
+  const allFiles = [
+    ...danger.git.created_files,
+    ...danger.git.deleted_files,
+    ...danger.git.modified_files,
+  ]
 
-modifiedPackages.forEach(p => {
-  warnIfMissingChangelogEntry(p)
-  warnIfMissingTestChanges(p)
-})
+  let modifiedPackages = getModifiedPackages(allFiles)
 
-listTouchedPackages()
-listTouchedWorkflows()
+  modifiedPackages.forEach(p => {
+    warnIfMissingChangelogEntry(p)
+    warnIfMissingTestChanges(p)
+  })
 
-function listTouchedWorkflows() {
-  message(`### Modified Github Workflows
-* ${allFiles
-    .filter(filepath => filepath.startsWith('.github/workflows/'))
-    .join('\n* ')}`)
+  listTouchedPackages(modifiedPackages)
+  listTouchedWorkflows(allFiles)
 }
 
-function listTouchedPackages() {
+/**
+ * Example Output:
+ * ```
+ * ### Modified Github Workflows
+ *
+ * * .github/workflows/danger.yml
+ * ```
+ */
+function listTouchedWorkflows(allFiles: string[]) {
+  let touchedWorkflows = allFiles.filter(filepath =>
+    filepath.startsWith('.github/workflows/')
+  )
+  if (touchedWorkflows.length === 0) return
+
+  message(`### Modified Github Workflows
+
+* ${touchedWorkflows.join('\n* ')}`)
+}
+
+/**
+ * Example Output:
+ * ```
+ * ### Modified Packages
+ *
+ * * `@tinacms/fields`
+ * * `react-tinacms`
+ * ```
+ */
+function listTouchedPackages(modifiedPackages: TinaPackage[]) {
   if (!modifiedPackages.length) return
   markdown(`### Modified Packages
 
@@ -39,6 +77,12 @@ The following packages were modified by this pull request:
     .join('\n* ')}`)
 }
 
+/**
+ * Example Output:
+ * ```
+ * `@tinacms/core` may need a CHANGELOG entry.
+ * ```
+ */
 function warnIfMissingChangelogEntry({ path, packageJson }: TinaPackage) {
   const hasCHANGELOGChanges = !!danger.git.modified_files.find(
     p => p === `${path}/CHANGELOG.md`
@@ -48,6 +92,13 @@ function warnIfMissingChangelogEntry({ path, packageJson }: TinaPackage) {
   }
 }
 
+/**
+ * Example Output:
+ *
+ * ```
+ * `@tinacms/core` may need new tests.
+ * ```
+ */
 function warnIfMissingTestChanges({ path, packageJson }: TinaPackage) {
   const hasCHANGELOGChanges = !!danger.git.modified_files.find(p =>
     p.match(/.*.test.tsx?/)
@@ -57,7 +108,10 @@ function warnIfMissingTestChanges({ path, packageJson }: TinaPackage) {
   }
 }
 
-function getModifiedPackages() {
+/**
+ * Lists all packages modified by this PR.
+ */
+function getModifiedPackages(allFiles: string[]) {
   let packageList: TinaPackage[] = []
   let paths = new Set(
     allFiles
