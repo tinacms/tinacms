@@ -10,6 +10,7 @@
   "scripts": {
     "test": "jest --passWithNoTests",
     "watch": "cms-scripts watch",
+    "dev": "cms-scripts dev",
     "build": "cms-scripts build"
   },
   "devDependencies": {

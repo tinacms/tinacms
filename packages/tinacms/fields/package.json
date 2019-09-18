@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "watch": "cms-scripts watch",
+    "dev": "cms-scripts dev",
     "build": "cms-scripts build",
     "test": "jest --passWithNoTests",
     "storybook": "start-storybook -p 9001 -c .storybook"
