@@ -33,9 +33,9 @@ npm run start
 | ---------------------------------- | --------------------------------------------- |
 | npm run bootstrap                  | Install dependencies and link local packages. |
 | npm run build                      | Build all packages                            |
+| npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages                    |
 | lerna run build --scope \<package> | Build only \<package>.                        |
-| lerna run watch --parallel         | Watch all packages for rebuilds.              |
 
 ## Links
 
