@@ -2,12 +2,13 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "build": "lerna run build --reject-cycles",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles",
     "bs": "npm run bootstrap",
-    "test": "lerna run test --reject-cycles",
     "dev": "lerna run dev --reject-cycles",
-    "watch": "lerna run watch --parallel --reject-cylcles",
-    "build": "lerna run build --reject-cycles"
+    "release": "lerna publish --reject-cycles --conventional-commits --create-release github",
+    "test": "lerna run test --reject-cycles",
+    "watch": "lerna run watch --parallel --reject-cylcles"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
