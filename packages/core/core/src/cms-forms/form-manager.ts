@@ -8,22 +8,22 @@ export class FormManager extends Subscribable {
 
   createForm = <S>(options: FormOptions<S>): Form<S> => {
     let form = new Form<S>(options)
-    this.__forms[options.name] = form
+    this.__forms[options.id] = form
     this.notifiySubscribers()
     return form
   }
 
-  findForm(name: string): Form | null {
-    return this.__forms[name]
+  findForm(id: string): Form | null {
+    return this.__forms[id]
   }
 
-  removeForm = (name: string) => {
-    delete this.__forms[name]
+  removeForm = (id: string) => {
+    delete this.__forms[id]
     this.notifiySubscribers()
   }
 
   all() {
-    return Object.keys(this.__forms).map(name => this.__forms[name])
+    return Object.keys(this.__forms).map(id => this.__forms[id])
   }
 }
 

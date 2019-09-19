@@ -1,13 +1,15 @@
 import { FormApi, createForm, Config } from 'final-form'
 
 export class Form<S = any> {
-  name: string
+  id: any
+  label: string
   fields: Field[]
   finalForm: FormApi<S>
   actions: any[]
 
-  constructor({ name, fields, actions, ...options }: FormOptions<S>) {
-    this.name = name
+  constructor({  id, label, fields, actions, ...options }: FormOptions<S>) {
+    this.id = id
+    this.label = label
     this.fields = fields
     this.finalForm = createForm<S>(options)
     this.actions = actions || []
@@ -27,7 +29,8 @@ export class Form<S = any> {
 }
 
 export interface FormOptions<S> extends Config<S> {
-  name: string
+  id: any
+  label: string
   fields: Field[]
   actions?: any[]
 }

@@ -29,7 +29,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
    * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
    */
   return (
-    <FF form={form.finalForm} key={form.name}>
+    <FF form={form.finalForm} key={form.id}>
       {children}
     </FF>
   )
