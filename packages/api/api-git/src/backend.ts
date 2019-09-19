@@ -81,7 +81,7 @@ export function router() {
         path.join(pathRoot, decodeURIComponent(req.params.relPath)),
         req.body.content
       )
-      res.send(req.body.content)
+      res.json({ content: req.body.content })
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
     }
@@ -117,7 +117,7 @@ export function router() {
       .catch(e => {
         // TODO: More intelligently respond
         res.status(412)
-        res.send(e.message)
+        res.json({ status: 'failure', error: e.message })
       })
   })
 
