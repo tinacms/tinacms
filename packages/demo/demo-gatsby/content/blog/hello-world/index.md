@@ -1,7 +1,10 @@
 ---
 title: Hello W
-date: '2015-05-01T22:12:03.284Z'
+date: "2015-05-01T22:12:03.284Z"
 description: O'Ha
+heading_color: white
+draft: false
+thumbnail: ../hello-world/salty_egg.jpg
 ---
 
 This is my first post on my new fake blog! How exciting!

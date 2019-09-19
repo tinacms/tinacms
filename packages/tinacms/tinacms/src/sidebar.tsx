@@ -290,7 +290,6 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  justify-content: space-between;
   width: ${SIDEBAR_WIDTH}px;
   height: 100%;
   left: 0;
