@@ -21,7 +21,7 @@ export function useJsonForm(
   validateJsonNode(jsonNode)
 
   let cms = useCMS()
-  let name = jsonNode.fileRelativePath
+  let label = jsonNode.fileRelativePath
   const id = jsonNode.id
   let initialValues = useMemo(
     () => ({
@@ -34,7 +34,7 @@ export function useJsonForm(
 
   let [values, form] = useCMSForm({
     id,
-    name,
+    label,
     initialValues,
     fields,
     onSubmit(data) {
