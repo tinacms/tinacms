@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/tinacms",
-  "version": "0.1.0-alpha.12",
+  "version": "0.1.0-alpha.13",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
