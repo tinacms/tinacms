@@ -49,12 +49,19 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
         if (plugin && plugin.type) {
           type = plugin.type
         }
+
+        let parse = field.parse
+
+        if (!parse && plugin && plugin.parse) {
+          parse = plugin.parse
+        }
+
         return (
           <FinalField
             name={field.name}
             key={field.name}
             type={type}
-            parse={field.parse}
+            parse={parse}
             format={field.format}
             validate={(value, values, meta) => {
               if (plugin && plugin.validate) {
