@@ -3,5 +3,5 @@ export interface RemarkNode {
   rawFrontmatter: any
   rawMarkdownBody: string
   id: string
-  frontmatter: any
+  frontmatter?: any
 }

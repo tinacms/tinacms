@@ -26,7 +26,8 @@ const FormModal = ({ plugin, close }: any) => {
   let form: Form = useMemo(
     () =>
       new Form({
-        name: 'create-form',
+        label: 'create-form',
+        id: 'create-form-id',
         actions: [],
         fields: plugin.fields,
         onSubmit(values) {
