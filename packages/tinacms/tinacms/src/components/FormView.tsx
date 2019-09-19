@@ -12,6 +12,7 @@ import {
   TinaResetStyles,
   TinaReset,
   Theme,
+  padding,
 } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
@@ -182,8 +183,7 @@ const CreateButton = styled(Button)`
 
 export const FieldsWrapper = styled.div`
   width: 100%;
-  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
-    ${p => p.theme.padding}rem;
+  padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
   overflow-y: auto;
   flex: 1 0 4rem;
   ul,

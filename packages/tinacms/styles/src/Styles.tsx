@@ -4,8 +4,56 @@ import styled, {
   createGlobalStyle,
   css,
 } from 'styled-components'
+import { defaultProps } from 'react-select/lib/Async'
 
-export const Theme = {
+export interface ThemeProps {
+  theme: Theme
+}
+
+export function borderRadius(size: keyof Theme['radius'] = 'big') {
+  return (props: ThemeProps) => props.theme.radius[size]
+}
+
+export function padding(size: keyof Theme['padding'] = 'big') {
+  return (props: ThemeProps) => props.theme.padding[size]
+}
+
+export function color(name: keyof Theme['color']) {
+  return (props: ThemeProps) => props.theme.color[name]
+}
+
+export interface Theme {
+  color: {
+    primary: string
+    light: string
+    dark: string
+  }
+  radius: {
+    small: string
+    big: string
+  }
+  shadow: {
+    small: string
+    big: string
+  }
+  timing: {
+    short: string
+    medium: string
+    long: string
+  }
+  input: {
+    padding: string
+    radius: string
+    fontSize: string
+    lineHeight: number
+  }
+  padding: {
+    small: number
+    big: number
+  }
+}
+
+export const theme: Theme = {
   color: {
     primary: '#0084ff',
     light: '#F4F4F4',
@@ -31,7 +79,10 @@ export const Theme = {
     fontSize: '0.9rem',
     lineHeight: 1.35,
   },
-  padding: 1.25,
+  padding: {
+    small: 0.75,
+    big: 1.25,
+  },
 }
 
 export const GlobalStyles = createGlobalStyle`

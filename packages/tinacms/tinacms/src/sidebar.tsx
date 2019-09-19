@@ -13,7 +13,7 @@ import {
   LeftArrowIcon,
   EditIcon,
 } from '@tinacms/icons'
-import { GlobalStyles } from '@tinacms/styles'
+import { GlobalStyles, padding, color } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from './Globals'
 import { Button } from './components/Button'
 import { CreateContentButton } from './components/CreateContent'
@@ -117,7 +117,7 @@ const SidebarToggle = (sidebar: any) => {
 }
 
 const MenuList = styled.div`
-  margin: 2rem -${p => p.theme.padding}rem 2rem -${p => p.theme.padding}rem;
+  margin: 2rem -${padding()}rem 2rem -${padding()}rem;
   display: block;
 `
 
@@ -125,8 +125,7 @@ const MenuLink = styled.div<{ value: string }>`
   color: #f2f2f2;
   font-size: 1.125rem;
   font-weight: 500;
-  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem
-    ${p => p.theme.padding}rem 4rem;
+  padding: ${padding()}rem ${padding()}rem ${padding()}rem 4rem;
   position: relative;
   cursor: pointer;
   transition: all ${p => p.theme.timing.short} ease-out;
@@ -163,7 +162,7 @@ const MenuLink = styled.div<{ value: string }>`
   }
   svg {
     position: absolute;
-    left: ${p => p.theme.padding}rem;
+    left: ${padding()}rem;
     top: 50%;
     transform: translate3d(0, -50%, 0);
     width: 1.75rem;
@@ -181,13 +180,13 @@ const SidebarHeader = styled.div`
   width: 100%;
   height: 4rem;
   flex: 0 0 4rem;
-  padding: 0 ${p => p.theme.padding}rem;
+  padding: 0 ${padding()}rem;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
 `
 
 const ActionsToggle = styled.button<{ open: boolean }>`
-  padding: 0 ${p => p.theme.padding}rem;
-  margin-left: -${p => p.theme.padding}rem;
+  padding: 0 ${padding()}rem;
+  margin-left: -${padding()}rem;
   background: transparent;
   outline: none;
   border: 0;
@@ -209,7 +208,7 @@ const MenuWrapper = styled.div`
   height: calc(100vh - (4rem));
   width: 100%;
   overflow: hidden;
-  padding: ${p => p.theme.padding}rem;
+  padding: ${padding()}rem;
   ul,
   li {
     margin: 0;
@@ -219,7 +218,7 @@ const MenuWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
-  background: #333333;
+  background: ${color('dark')};
   z-index: 1000;
   position: absolute;
   top: 0;
@@ -228,7 +227,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   width: ${SIDEBAR_WIDTH}px;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
-  padding: ${p => p.theme.padding}rem;
+  padding: ${padding()}rem;
   transition: all 150ms ease-out;
   ul,
   li {
