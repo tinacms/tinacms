@@ -24,6 +24,7 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
 } from '@tinacms/icons'
+import { MenuOption } from './blockControl'
 
 // import { ImageControl } from './images'
 
@@ -244,7 +245,7 @@ export const MenuDropdownWrapper = styled.div`
   position: relative;
 `
 
-export const MenuButtonDropdown = styled.ul<{ open: boolean }>`
+export const MenuButtonDropdown = styled.div<{ open: boolean }>`
   border-radius: 0.5rem;
   border: 1px solid #efefef;
   display: block;
@@ -260,29 +261,6 @@ export const MenuButtonDropdown = styled.ul<{ open: boolean }>`
     0px 4px 8px rgba(48, 48, 48, 0.1);
   background-color: white;
   overflow: hidden;
-  li {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
-    display: block;
-    padding: 0.5rem 1rem;
-    list-style: none;
-    transition: all 85ms ease-out;
-    cursor: pointer;
-    &:first-child {
-      padding-top: 0.75rem;
-    }
-    &:last-child {
-      padding-bottom: 0.75rem;
-    }
-    &:hover {
-      background-color: rgba(53, 50, 50, 0.09);
-    }
-    &:active {
-      color: #0084ff;
-      fill: #0084ff;
-      background-color: rgba(53, 50, 50, 0.05);
-    }
-  }
   ${props =>
     props.open &&
     css`

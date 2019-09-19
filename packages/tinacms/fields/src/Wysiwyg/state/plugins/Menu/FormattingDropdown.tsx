@@ -4,7 +4,6 @@ import { lift, wrapIn } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { blockTool } from './blockControl'
 import { Dismissible } from 'react-dismissible'
-// import { useFrameContext } from '../../../../../../tinacms/src/styled-frame'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
@@ -28,8 +27,7 @@ export class FormattingDropdown extends React.Component<any, State> {
     )
   lift = () => lift(this.props.view.state, this.props.view.dispatch)
   render() {
-    let { bottom, view, frame } = this.props
-    //const frame = useFrameContext()
+    let { view, frame } = this.props
     return (
       <MenuDropdownWrapper>
         <MenuButton
@@ -43,6 +41,7 @@ export class FormattingDropdown extends React.Component<any, State> {
           <Dismissible
             click
             escape
+            disabled={!this.state.active}
             onDismiss={() => {
               this.toggle()
             }}
