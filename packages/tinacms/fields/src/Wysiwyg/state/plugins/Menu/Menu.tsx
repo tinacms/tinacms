@@ -243,9 +243,8 @@ export const MenuButton = styled.button<{
     props.disabled &&
     css`
       pointer-events: none;
-      background-color: rgba(53, 50, 50, 0.03);
-      color: #b4b4b4;
-      fill: #b4b4b4;
+      color: #d1d1d1;
+      fill: #d1d1d1;
     `};
 `
 
