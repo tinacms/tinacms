@@ -19,10 +19,10 @@ export function useCMSForm(options: FormOptions<any>) {
       )
 
       return () => {
-        form && cms.forms.removeForm(form.name)
+        form && cms.forms.removeForm(form.id)
       }
     },
-    [options.name]
+    [options.id]
   )
 
   return [form ? form.values : options.initialValues, form]

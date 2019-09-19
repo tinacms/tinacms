@@ -33,6 +33,7 @@ export const Theme = {
     lineHeight: 1.35,
   },
   padding: 1.25,
+  paddingSml: .75
 }
 
 export const GlobalStyles = createGlobalStyle`
@@ -48,6 +49,7 @@ export const GlobalStyles = createGlobalStyle`
   body {
     margin: 0;
     padding: 0;
+    color: #333;
   }
   *, *:before, *:after {
     box-sizing: inherit;
@@ -62,6 +64,11 @@ export const GlobalStyles = createGlobalStyle`
     border-bottom: none;
     height: 0;
     box-sizing: content-box;
+  }
+  h1 {
+    font-size: 1.2rem;
+    font-weight: normal;
+    margin: 0;
   }
 `
 

@@ -32,6 +32,7 @@ export function createRemarkButton(
       cms.api.git!.onChange!({
         fileRelativePath,
         content: toMarkdownString({
+          id: '',
           fileRelativePath,
           rawFrontmatter,
           rawMarkdownBody,
