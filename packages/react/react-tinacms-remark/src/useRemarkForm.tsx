@@ -25,7 +25,8 @@ export function useRemarkForm(
   validateMarkdownRemark(markdownRemark)
 
   let cms = useCMS()
-  let name = markdownRemark.frontmatter.title
+  let label = markdownRemark.frontmatter.title
+  const id = markdownRemark.id
   let initialValues = useMemo(
     () => ({
       ...markdownRemark,
@@ -36,7 +37,8 @@ export function useRemarkForm(
   let fields = formOverrrides.fields || generateFields(initialValues)
 
   let [values, form] = useCMSForm({
-    name,
+    label,
+    id,
     initialValues,
     fields,
     onSubmit(data) {

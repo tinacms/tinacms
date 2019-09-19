@@ -37,7 +37,7 @@ export const FormsView = () => {
       !editingForm && setEditingForm(null)
     }
 
-    if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
+    if (editingForm && forms.findIndex(f => f.id == editingForm.id) < 0) {
       setEditingForm(null)
     }
   })
