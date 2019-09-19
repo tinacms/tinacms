@@ -165,9 +165,9 @@ const MenuContainer = styled.div`
   position: sticky;
   top: 0;
   width: 100%;
-  border: 1px solid rgba(53, 50, 50, 0.09);
   border-radius: 0.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
+    inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
   overflow: visible;
   display: flex;
   flex: 0 0 auto;
@@ -187,9 +187,12 @@ export const MenuButton = styled.button<{
   fill: ${p => (p.active ? '#0084ff' : '#353232')};
   border: none;
   outline: none;
-  padding: 0.25rem 0.375rem;
+  padding: 0.375rem;
   transition: all 85ms ease-out;
   cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &:hover {
     background-color: rgba(53, 50, 50, 0.09);
   }

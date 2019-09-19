@@ -38,6 +38,10 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 
+    ::selection {
+      background-color: rgba(0, 132, 255, 0.3);
+    }
+
     &:hover {
       background-color: #f0f0f0;
     }
@@ -60,9 +64,6 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   // Base styling
   color: ${darkGrey};
   background-color: #fff;
-  //Add Inter to global styles or whichever main font we use
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 26px;
   white-space: pre-wrap;
@@ -86,8 +87,6 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   h4,
   h5,
   h6 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-weight: 600;
     text-transform: none;
     padding: 0;
