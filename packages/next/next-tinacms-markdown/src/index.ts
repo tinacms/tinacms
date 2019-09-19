@@ -63,7 +63,8 @@ export function useMarkdownForm(
   // return throttle(cms.api.git.onChange, 300)
   // }, [])
   let [values, form] = useCMSForm({
-    name: markdownRemark.path,
+    label: markdownRemark.path,
+    id: markdownRemark.path,
     initialValues: markdownRemark,
     async onSubmit(data) {
       console.log({ data })
