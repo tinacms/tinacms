@@ -16,7 +16,7 @@ interface FormsListProps {
           {forms.map(form => (
             <>
               <li
-                key={form.name}
+                key={form.id}
                 onClick={() => setActiveForm(form)}
               >
                 <h1>{form.name}</h1>

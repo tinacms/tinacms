@@ -5,6 +5,7 @@ import { useEffect, useMemo } from 'react'
 let get = require('lodash.get')
 
 interface JsonNode {
+  id: string
   rawJson: string
   fileRelativePath: string
   [key: string]: string
@@ -21,6 +22,7 @@ export function useJsonForm(
 
   let cms = useCMS()
   let name = jsonNode.fileRelativePath
+  const id = jsonNode.id
   let initialValues = useMemo(
     () => ({
       jsonNode: jsonNode,
@@ -31,6 +33,7 @@ export function useJsonForm(
   let fields = formOptions.fields || generateFields(initialValues.rawJson)
 
   let [values, form] = useCMSForm({
+    id,
     name,
     initialValues,
     fields,
