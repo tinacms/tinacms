@@ -14,6 +14,7 @@ function BlogIndex(props) {
 
   const [styles] = useCMSForm({
     name: "blog-index-styles",
+    label: "Blog Styles",
     initialValues: {
       backgroundColor: "",
       hideBio: false,
