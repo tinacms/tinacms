@@ -16,25 +16,41 @@ import {
 } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
+import FormsList from './FormsList'
+import EditingFormTitle from './EditingFormTitle'
 
 export const FormsView = () => {
   const cms = useCMS()
   const forms = cms.forms.all()
-
   const [editingForm, setEditingForm] = useState<Form | null>(() => {
     return cms.forms.all()[0] as Form | null
   })
+  const [isEditing, setIsEditing] = useState(false)
+  const [isMultiform, setIsMultiform] = useState(false)
 
   useSubscribable(cms.forms, () => {
     const forms = cms.forms.all()
     if (forms.length == 1) {
+      setIsMultiform(false)
       setEditingForm(forms[0])
       return
     }
 
-    if (editingForm && forms.findIndex(f => f.name == editingForm.name) < 0) {
+    //if multiforms, set default view to formslist
+    if (forms.length > 1) {
+      setIsMultiform(true)
+      //if they navigate to another page w/ no active form, reset
+      !editingForm && setEditingForm(null)
+    }
+
+    if (editingForm && forms.findIndex(f => f.id == editingForm.id) < 0) {
       setEditingForm(null)
     }
+  })
+
+  //Toggles editing prop for component animations
+  React.useEffect(() => {
+    editingForm ? setIsEditing(true) : setIsEditing(false)
   })
 
   /**
@@ -52,6 +68,7 @@ export const FormsView = () => {
   if (!editingForm)
     return (
       <FormsList
+        isEditing={isEditing}
         forms={forms}
         activeForm={editingForm}
         setActiveForm={setEditingForm}
@@ -60,16 +77,15 @@ export const FormsView = () => {
 
   return (
     <>
-      {/* <FormsList
-        forms={forms}
-        activeForm={editingForm}
-        setActiveForm={setEditingForm}
-      /> */}
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
           return (
-            <>
-              {/* <h3>Editing form {editingForm.name}</h3> */}
+            <TransitionForm isEditing={isEditing}>
+              <EditingFormTitle
+                isMultiform={isMultiform}
+                form={editingForm as any}
+                setEditingForm={setEditingForm as any}
+              />
               <FieldsWrapper>
                 {editingForm &&
                   (editingForm.fields.length ? (
@@ -86,7 +102,7 @@ export const FormsView = () => {
                   <ActionsMenu actions={editingForm.actions} />
                 )}
               </FormsFooter>
-            </>
+            </TransitionForm>
           )
         }}
       </FormBuilder>
@@ -127,32 +143,6 @@ const CreateContentButton = ({ plugin }: any) => {
   )
 }
 
-interface FormsListProps {
-  forms: Form[]
-  activeForm: Form | null
-  setActiveForm(form: Form): void
-}
-const FormsList = ({ forms, activeForm, setActiveForm }: FormsListProps) => {
-  return (
-    <ul>
-      {forms.map(form => (
-        <li
-          key={form.name}
-          style={{
-            textDecoration:
-              activeForm && activeForm.name === form.name
-                ? 'underline'
-                : 'none',
-          }}
-          onClick={() => setActiveForm(form)}
-        >
-          {form.name}
-        </li>
-      ))}
-    </ul>
-  )
-}
-
 export const MediaView: ScreenPlugin = {
   __type: 'screen',
   name: 'Media Manager',
@@ -182,6 +172,7 @@ const CreateButton = styled(Button)`
 `
 
 export const FieldsWrapper = styled.div`
+  scrollbar-width: none;
   width: 100%;
   padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
   overflow-y: auto;
@@ -192,6 +183,14 @@ export const FieldsWrapper = styled.div`
     padding: 0;
     list-style: none;
   }
+`
+
+const TransitionForm = styled.section<{ isEditing: Boolean }>`
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  transition: transform 150ms ease-out;
+  transform: translate3d(${p => (!p.isEditing ? `640px` : '0')}, 0, 0);
 `
 
 const FormsFooter = styled.div`
