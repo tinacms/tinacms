@@ -13,6 +13,11 @@ export const ImageUploadInput = wrapFieldsWithMeta<InputProps, ImageProps>(
   ({ form, field, input }) => {
     let cms = useCMS()
 
+    if (!field.uploadDir)
+      throw new Error(
+        'TinaCMS `image` field is missing the `uploadDir` option.'
+      )
+
     return (
       <ImageUpload
         value={input.value}
