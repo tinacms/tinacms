@@ -3,7 +3,8 @@ import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
 import styled, { ThemeProvider } from 'styled-components'
-import { Theme, GlobalStyles, Z_INDEX } from './Globals'
+import { Z_INDEX } from './Globals'
+import { GlobalStyles } from '@tinacms/styles'
 
 interface Props {
   children: any

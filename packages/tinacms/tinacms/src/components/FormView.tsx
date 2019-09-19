@@ -7,7 +7,12 @@ import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { Modal, ModalBody, ModalHeader } from '..'
-import { Theme, GlobalStyles, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
+import {
+  GlobalStyles,
+  TinaResetStyles,
+  TinaReset,
+  Theme,
+} from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 
@@ -193,11 +198,11 @@ const FormsFooter = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  height: ${FOOTER_HEIGHT}rem;
+  height: 4rem;
   background-color: white;
   border-top: 1px solid #efefef;
   padding: 0.75rem 1.25rem;
-  flex: 0 0 ${FOOTER_HEIGHT}rem;
+  flex: 0 0 4rem;
 `
 
 export const SaveButton = styled(Button)`
