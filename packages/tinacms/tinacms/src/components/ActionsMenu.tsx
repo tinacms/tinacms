@@ -1,6 +1,7 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
+import { padding } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from '../styled-frame'
@@ -62,8 +63,8 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  bottom: ${p => p.theme.padding}rem;
-  right: ${p => p.theme.padding}rem;
+  bottom: ${padding()}rem;
+  right: ${padding()}rem;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;

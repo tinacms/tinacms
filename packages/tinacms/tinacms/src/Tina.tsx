@@ -8,7 +8,7 @@ import {
   GlobalStyles,
   TinaResetStyles,
   TinaReset,
-  Theme,
+  theme,
 } from '@tinacms/styles'
 import { Sidebar } from './sidebar'
 import { SIDEBAR_WIDTH } from './Globals'
@@ -31,7 +31,7 @@ export const Tina: React.FC<TinaProps> = ({ children, position }) => {
         <SiteWrapper open={isOpen} position={position}>
           {children}
         </SiteWrapper>
-        <ThemeProvider theme={Theme}>
+        <ThemeProvider theme={theme}>
           <ModalProvider>
             <TinaReset>
               <Sidebar />
