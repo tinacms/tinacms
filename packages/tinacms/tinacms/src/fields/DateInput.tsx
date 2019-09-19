@@ -7,6 +7,7 @@ import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
 import { useFrameContext } from '../styled-frame'
 import styled from 'styled-components'
+import { color } from '@tinacms/styles'
 
 export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
@@ -70,8 +71,8 @@ const DatetimeContainer = styled.div`
     }
 
     &:focus {
-      border-color: ${p => p.theme.color.primary};
-      box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
+      border-color: ${color('primary')};
+      box-shadow: 0 0 2px 0 ${color('primary')};
       background-color: #f8f8f8;
     }
 

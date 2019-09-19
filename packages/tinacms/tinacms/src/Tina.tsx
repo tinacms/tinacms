@@ -4,10 +4,14 @@ import { ModalProvider } from './modalProvider'
 import { SidebarContext, useSidebar } from './sidebarProvider'
 import { cms } from './index'
 import styled, { css, ThemeProvider } from 'styled-components'
-
-import { Theme, GlobalStyles } from './Globals'
+import {
+  GlobalStyles,
+  TinaResetStyles,
+  TinaReset,
+  theme,
+} from '@tinacms/styles'
 import { Sidebar } from './sidebar'
-import { TinaReset, SIDEBAR_WIDTH } from './Globals'
+import { SIDEBAR_WIDTH } from './Globals'
 
 interface TinaProps {
   position: 'fixed' | 'float'
@@ -27,7 +31,7 @@ export const Tina: React.FC<TinaProps> = ({ children, position }) => {
         <SiteWrapper open={isOpen} position={position}>
           {children}
         </SiteWrapper>
-        <ThemeProvider theme={Theme}>
+        <ThemeProvider theme={theme}>
           <ModalProvider>
             <TinaReset>
               <Sidebar />
@@ -40,13 +44,15 @@ export const Tina: React.FC<TinaProps> = ({ children, position }) => {
 }
 
 const SiteWrapper = styled.div<{ open: boolean; position: string }>`
+  ${TinaResetStyles}
+  overflow: visible !important;
   position: absolute !important;
   top: 0 !important;
   right: 0 !important;
   height: 100% !important;
   width: ${props =>
     props.position === 'fixed' && props.open
-      ? 'calc(100% - ' + SIDEBAR_WIDTH + ')'
+      ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
       : '100%'} !important;
   transition: all ${props => (props.open ? 150 : 200)}ms ease-out !important;
 `

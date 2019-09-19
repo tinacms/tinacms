@@ -3,6 +3,7 @@ import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
 import { useFrameContext } from '../styled-frame'
 import * as React from 'react'
+import { color } from '@tinacms/styles'
 
 let lightGrey = 'rgb(243, 243, 243)'
 let lightMediumGrey = `rgb(200, 200, 200)`
@@ -47,8 +48,8 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     }
 
     &:focus {
-      border-color: ${p => p.theme.color.primary};
-      box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
+      border-color: ${color('primary')};
+      box-shadow: 0 0 2px 0 ${color('primary')};
       background-color: #f8f8f8;
     }
 

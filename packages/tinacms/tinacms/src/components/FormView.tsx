@@ -7,7 +7,13 @@ import { useState } from 'react'
 import { Form, ScreenPlugin } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { Modal, ModalBody, ModalHeader } from '..'
-import { Theme, GlobalStyles, SIDEBAR_WIDTH, HEADER_HEIGHT, FOOTER_HEIGHT } from '../Globals'
+import {
+  GlobalStyles,
+  TinaResetStyles,
+  TinaReset,
+  Theme,
+  padding,
+} from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
@@ -20,7 +26,7 @@ export const FormsView = () => {
     return cms.forms.all()[0] as Form | null
   })
   const [isEditing, setIsEditing] = useState(false)
-  const [ isMultiform, setIsMultiform ] = useState(false)
+  const [isMultiform, setIsMultiform] = useState(false)
 
   useSubscribable(cms.forms, () => {
     const forms = cms.forms.all()
@@ -31,7 +37,7 @@ export const FormsView = () => {
     }
 
     //if multiforms, set default view to formslist
-    if(forms.length > 1 ) {
+    if (forms.length > 1) {
       setIsMultiform(true)
       //if they navigate to another page w/ no active form, reset
       !editingForm && setEditingForm(null)
@@ -75,7 +81,11 @@ export const FormsView = () => {
         {({ handleSubmit, pristine, form }) => {
           return (
             <TransitionForm isEditing={isEditing}>
-              <EditingFormTitle isMultiform={isMultiform} form={editingForm as any} setEditingForm={setEditingForm as any} />
+              <EditingFormTitle
+                isMultiform={isMultiform}
+                form={editingForm as any}
+                setEditingForm={setEditingForm as any}
+              />
               <FieldsWrapper>
                 {editingForm &&
                   (editingForm.fields.length ? (
@@ -133,7 +143,6 @@ const CreateContentButton = ({ plugin }: any) => {
   )
 }
 
-
 export const MediaView: ScreenPlugin = {
   __type: 'screen',
   name: 'Media Manager',
@@ -165,8 +174,7 @@ const CreateButton = styled(Button)`
 export const FieldsWrapper = styled.div`
   scrollbar-width: none;
   width: 100%;
-  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
-    ${p => p.theme.padding}rem;
+  padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
   overflow-y: auto;
   flex: 1 0 4rem;
   ul,
@@ -182,22 +190,18 @@ const TransitionForm = styled.section<{ isEditing: Boolean }>`
   flex-grow: 1;
   flex-direction: column;
   transition: transform 150ms ease-out;
-  transform: translate3d(
-    ${p => !p.isEditing ? `640px` : '0'},
-    0,
-    0
-  );
+  transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
 `
 
 const FormsFooter = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
-  height: ${FOOTER_HEIGHT}rem;
+  height: 4rem;
   background-color: white;
   border-top: 1px solid #efefef;
   padding: 0.75rem 1.25rem;
-  flex: 0 0 ${FOOTER_HEIGHT}rem;
+  flex: 0 0 4rem;
 `
 
 export const SaveButton = styled(Button)`
