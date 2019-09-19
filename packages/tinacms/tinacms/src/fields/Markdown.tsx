@@ -278,34 +278,4 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
       }
     }
   }
-
-  h1:before {
-    content: 'h1';
-    top: 7px;
-  }
-
-  h2:before {
-    content: 'h2';
-    top: 6px;
-  }
-
-  h3:before {
-    content: 'h3';
-    top: 3px;
-  }
-
-  h4:before {
-    content: 'h4';
-    top: 2px;
-  }
-
-  h5:before {
-    content: 'h5';
-    top: 1px;
-  }
-
-  h6:before {
-    content: 'h6';
-    top: 1px;
-  }
 `)
