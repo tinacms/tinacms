@@ -239,6 +239,14 @@ export const MenuButton = styled.button<{
       fill: #0084ff;
       background-color: rgba(53, 50, 50, 0.05);
     `};
+  ${props =>
+    props.disabled &&
+    css`
+      pointer-events: none;
+      background-color: rgba(53, 50, 50, 0.03);
+      color: #b4b4b4;
+      fill: #b4b4b4;
+    `};
 `
 
 export const MenuDropdownWrapper = styled.div`
