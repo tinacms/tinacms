@@ -7,7 +7,7 @@ const EditingFormTitle = ({form, setEditingForm, isMultiform }: any) => {
     return (
         <StyledEditingFormTitle isMultiform={isMultiform} onClick={() => isMultiform && setEditingForm(null)}>
             {isMultiform && <LeftArrow />}
-            <h1>{form.name}</h1>
+            <h1>{form.label}</h1>
         </StyledEditingFormTitle>
 )}
 
