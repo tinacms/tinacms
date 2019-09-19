@@ -37,7 +37,3 @@ npm run start
 | npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages                    |
 | lerna run build --scope \<package> | Build only \<package>.                        |
-
-## Links
-
-- [Circle CI](https://circleci.com/gh/tinacms/tinacms): Continuous Integration
