@@ -42,29 +42,21 @@ const BoldControl = markControl({
   mark: 'strong',
   Icon: BoldIcon,
   tooltip: 'Bold',
-  size: 12,
-  stroke: 3,
 })
 const ItalicControl = markControl({
   mark: 'em',
   Icon: ItalicIcon,
   tooltip: 'Italic',
-  size: 12,
-  stroke: 2,
 })
 const UnderlineControl = markControl({
   mark: 'underline',
   Icon: UnderlineIcon,
   tooltip: 'Underline',
-  size: 12,
-  stroke: 2,
 })
 const LinkControl = markControl({
   mark: 'link',
   Icon: LinkIcon,
   tooltip: 'Link',
-  size: 14,
-  stroke: 2,
   selectionOnly: true,
   defaultAttrs: {
     href: '',
@@ -105,8 +97,6 @@ const commandContrl = (
   Icon: any, // Fix type
   _title: string,
   tooltip: string,
-  size: number,
-  stroke: number,
   focusOnCreate: boolean = true
 ) =>
   class CommandControl extends React.Component<any, any> {
@@ -145,36 +135,28 @@ const QuoteControl = commandContrl(
   wrapInBlockquote,
   QuoteIcon,
   'Blockquote',
-  'Blockquote',
-  14,
-  2
+  'Blockquote'
 )
 const CodeControl = commandContrl(
   makeCodeBlock,
   CodeIcon,
   'Codeblock',
   'Codeblock',
-  14,
-  2,
   false
 ) //codeblock focusing messes with scroll
-const RedoControl = commandContrl(redo, RedoIcon, 'Redo', 'Redo', 14, 2)
-const UndoControl = commandContrl(undo, UndoIcon, 'Undo', 'Undo', 14, 2)
+const RedoControl = commandContrl(redo, RedoIcon, 'Redo', 'Redo')
+const UndoControl = commandContrl(undo, UndoIcon, 'Undo', 'Undo')
 const BulletList = commandContrl(
   toggleBulletList,
   UnorderedListIcon,
   'Unordered List',
-  'Unordered List',
-  16,
-  2
+  'Unordered List'
 )
 const OrderedList = commandContrl(
   toggleOrderedList,
   OrderedListIcon,
   'Ordered List',
-  'Ordered List',
-  16,
-  2
+  'Ordered List'
 )
 
 const MenuContainer = styled.div`
