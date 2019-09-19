@@ -13,13 +13,8 @@ import {
   LeftArrowIcon,
   EditIcon,
 } from '@tinacms/icons'
-import {
-  GlobalStyles,
-  HEADER_HEIGHT,
-  SIDEBAR_WIDTH,
-  TOGGLE_WIDTH,
-  Z_INDEX,
-} from './Globals'
+import { GlobalStyles } from '@tinacms/styles'
+import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from './Globals'
 import { Button } from './components/Button'
 import { CreateContentButton } from './components/CreateContent'
 import { useSidebar } from './sidebarProvider'
@@ -39,7 +34,7 @@ export const Sidebar = () => {
           position: 'absolute',
           left: '0',
           top: '0',
-          width: 'calc(8px + ' + SIDEBAR_WIDTH + ')',
+          width: SIDEBAR_WIDTH + 8 + 'px',
           height: '100%',
           margin: '0',
           padding: '0',
@@ -184,8 +179,8 @@ const SidebarHeader = styled.div`
   position: relative;
   z-index: 1050;
   width: 100%;
-  height: ${HEADER_HEIGHT}rem;
-  flex: 0 0 ${HEADER_HEIGHT}rem;
+  height: 4rem;
+  flex: 0 0 4rem;
   padding: 0 ${p => p.theme.padding}rem;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
 `
@@ -198,7 +193,7 @@ const ActionsToggle = styled.button<{ open: boolean }>`
   border: 0;
   text-align: left;
   width: 3rem;
-  height: ${HEADER_HEIGHT}rem;
+  height: 4rem;
   transition: all 75ms ease-out;
   fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
   &:hover {
@@ -210,8 +205,8 @@ const ActionsToggle = styled.button<{ open: boolean }>`
 const MenuWrapper = styled.div`
   position: absolute;
   left: 0;
-  top: ${HEADER_HEIGHT}rem;
-  height: calc(100vh - (${HEADER_HEIGHT}rem));
+  top: 4rem;
+  height: calc(100vh - (4rem));
   width: 100%;
   overflow: hidden;
   padding: ${p => p.theme.padding}rem;
@@ -330,14 +325,14 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   display: block !important;
   background: transparent !important;
   height: 100% !important;
-  width: calc(${SIDEBAR_WIDTH} + ${TOGGLE_WIDTH}) !important;
+  width: ${SIDEBAR_WIDTH + TOGGLE_WIDTH}px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
   z-index: ${Z_INDEX} !important;
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
   transform: translate3d(
-    ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH)},
+    ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH + 'px')},
     0,
     0
   ) !important;
