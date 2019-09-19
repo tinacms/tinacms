@@ -29,7 +29,6 @@ export class FormManager extends Subscribable {
 
 export interface FieldPlugin {
   __type: 'field'
-  id: string
   name: string
   Component: React.FC<any>
   type?: string
