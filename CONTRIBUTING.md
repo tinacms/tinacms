@@ -9,7 +9,13 @@ The following is a set of guidelines and tips for contributingto the TinaCMS and
 - **Writing Docs, Guides, or Blog Posts**
 - **Voluntering for User Testing**
 
-## Creating Packages
+## Contributing Code
+
+### Making Commits
+
+TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/) to generate CHANGELOG entries. Please make sure your commits follow this convention.
+
+### Creating Packages
 
 | Type                    | Folder   | Naming Convention  |
 | ----------------------- | -------- | ------------------ |
@@ -18,6 +24,7 @@ The following is a set of guidelines and tips for contributingto the TinaCMS and
 | React specific packages | `react`  | `react-tinacms-*`  |
 | Vue specific packages   | `vue`    | `vue-tinacms-*`    |
 | Gastby plugins          | `gatsby` | `gatsby-tinacms-*` |
+| NextJS package          | `next`   | `next-tinacms-*`   |
 | Demo Projects           | `demo`   | `demo-*`           |
 
 ## Troubleshooting in Development
