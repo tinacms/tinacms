@@ -47,6 +47,7 @@
   "dependencies": {
     "@tinacms/icons": "^0.0.1-alpha.1",
     "@tinacms/core": "^0.1.0-alpha.5",
+    "@tinacms/styles": "^0.0.1-alpha.1",
     "@sambego/storybook-styles": "^1.0.0",
     "@types/react-select": "^2.0.11",
     "color-string": "^1.5.3",

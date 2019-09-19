@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { color } from '@tinacms/styles'
 import styled, { css } from 'styled-components'
 
 type a = React.DetailedHTMLProps<

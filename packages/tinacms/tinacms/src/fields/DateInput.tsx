@@ -7,6 +7,7 @@ import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
 import { useFrameContext } from '../styled-frame'
 import styled from 'styled-components'
+import { color } from '@tinacms/styles'
 
 export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
