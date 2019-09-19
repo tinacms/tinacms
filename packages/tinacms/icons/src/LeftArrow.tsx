@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const LeftArrow = () => (
+export const LeftArrowIcon = () => (
   <svg
     width="32"
     height="32"

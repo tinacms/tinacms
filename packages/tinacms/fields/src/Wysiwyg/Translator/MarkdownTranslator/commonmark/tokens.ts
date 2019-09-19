@@ -237,6 +237,7 @@ const NODES: Nodes = {
     NODES.table_cell(state, node)
   },
 }
+
 const MARKS = {
   em: {
     open: '_',

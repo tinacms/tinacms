@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const ChevronDown = () => (
+export const ChevronDownIcon = () => (
   <svg
     width="32"
     height="32"

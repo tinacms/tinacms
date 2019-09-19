@@ -7,7 +7,12 @@ import { FormsView } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal } from './modalProvider'
 import { ModalFullscreen } from './modalFullscreen'
-import { Close, Hamburger, LeftArrow, Edit } from '@tinacms/icons'
+import {
+  CloseIcon,
+  HamburgerIcon,
+  LeftArrowIcon,
+  EditIcon,
+} from '@tinacms/icons'
 import {
   GlobalStyles,
   HEADER_HEIGHT,
@@ -49,7 +54,7 @@ export const Sidebar = () => {
               onClick={() => setMenuVisibility(!menuIsVisible)}
               open={menuIsVisible}
             >
-              {menuIsVisible ? <Close /> : <Hamburger />}
+              {menuIsVisible ? <CloseIcon /> : <HamburgerIcon />}
             </ActionsToggle>
           </SidebarHeader>
           <FormsView />
@@ -68,7 +73,7 @@ export const Sidebar = () => {
                       setMenuVisibility(false)
                     }}
                   >
-                    <Close /> {view.name}
+                    <CloseIcon /> {view.name}
                   </MenuLink>
                 ))}
               </MenuList>
@@ -109,7 +114,7 @@ const SidebarToggle = (sidebar: any) => {
       <>
         <GlobalStyles />
         <SidebarToggleButton onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}>
-          {sidebar.isOpen ? <LeftArrow /> : <Edit />}
+          {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
         </SidebarToggleButton>
       </>
     </StyledFrame>
