@@ -33,8 +33,8 @@ export const TextArea = styled.textarea<{ error?: boolean }>`
   }
 
   &:focus {
-    border-color: ${p => p.theme.color.primary};
-    box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
+    border-color: ${color('primary')};
+    box-shadow: 0 0 2px 0 ${color('primary')};
     background-color: #f8f8f8;
   }
 

@@ -145,14 +145,14 @@ const MenuLink = styled.div<{ value: string }>`
     opacity: 0;
   }
   &:hover {
-    color: ${p => p.theme.color.primary};
+    color: ${color('primary')};
     &:after {
       transform: translate3d(0, 0, 0);
       transition: transform ${p => p.theme.timing.short} ease-out, opacity 0ms;
       opacity: 1;
     }
     svg {
-      fill: ${p => p.theme.color.primary};
+      fill: ${color('primary')};
     }
     & ~ * {
       &:after {
