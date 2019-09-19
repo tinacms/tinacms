@@ -23,8 +23,6 @@ export function markControl({
   mark,
   Icon,
   tooltip,
-  size,
-  stroke,
   defaultAttrs,
   selectionOnly = false,
   noMix = [],
