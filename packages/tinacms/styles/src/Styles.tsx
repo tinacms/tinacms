@@ -56,7 +56,7 @@ export interface Theme {
 export const theme: Theme = {
   color: {
     primary: '#0084ff',
-    light: '#F4F4F4',
+    light: '#F2F2F2',
     dark: '#353232',
   },
   radius: {
@@ -103,12 +103,12 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: inherit;
   }
   hr {
-    border-color: #F2F2F2;
-    color: #F2F2F2;
+    border-color: ${color('light')};
+    color: ${color('light')};
     margin-bottom: 1.5rem;
     margin-left: -1.25rem;
     margin-right: -1.25rem;
-    border-top: 1px solid #F2F2F2;
+    border-top: 1px solid ${color('light')};
     border-bottom: none;
     height: 0;
     box-sizing: content-box;
