@@ -65,7 +65,6 @@ export function menu(translator: Translator, bottom?: boolean, frame?: any) {
 }
 
 const ViewContainer: FC<{ frame: any }> = ({ frame, children }) => {
-  console.log(frame)
   if (!frame) return <>{children}</>
   return (
     <StyleSheetManager target={frame.document.head}>
