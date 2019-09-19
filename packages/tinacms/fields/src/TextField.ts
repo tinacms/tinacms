@@ -1,4 +1,5 @@
 import * as React from 'react'
+import { color } from '@tinacms/styles'
 import styled, { css } from 'styled-components'
 
 type a = React.DetailedHTMLProps<
@@ -31,8 +32,8 @@ export const TextField = styled.input<{ error?: boolean }>`
   }
 
   &:focus {
-    border-color: ${p => p.theme.color.primary};
-    box-shadow: 0 0 2px ${p => p.theme.color.primary};
+    border-color: ${color('primary')};
+    box-shadow: 0 0 2px ${color('primary')};
     background-color: #f8f8f8;
   }
 

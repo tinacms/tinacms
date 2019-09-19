@@ -3,7 +3,8 @@ import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from './styled-frame'
 import styled, { ThemeProvider } from 'styled-components'
-import { Theme, GlobalStyles, Z_INDEX } from './Globals'
+import { Z_INDEX } from './Globals'
+import { GlobalStyles, padding } from '@tinacms/styles'
 
 interface Props {
   children: any
@@ -98,12 +99,11 @@ export const ModalHeader = styled.div`
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem 0
-    ${p => p.theme.padding}rem;
+  padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
   margin: 0;
 `
 
 export const ModalBody = styled.div`
-  padding: ${p => p.theme.padding}rem;
+  padding: ${padding()}rem;
   margin: 0;
 `

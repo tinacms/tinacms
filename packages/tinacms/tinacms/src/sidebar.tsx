@@ -13,13 +13,8 @@ import {
   LeftArrowIcon,
   EditIcon,
 } from '@tinacms/icons'
-import {
-  GlobalStyles,
-  HEADER_HEIGHT,
-  SIDEBAR_WIDTH,
-  TOGGLE_WIDTH,
-  Z_INDEX,
-} from './Globals'
+import { GlobalStyles, padding, color } from '@tinacms/styles'
+import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from './Globals'
 import { Button } from './components/Button'
 import { CreateContentButton } from './components/CreateContent'
 import { useSidebar } from './sidebarProvider'
@@ -39,7 +34,7 @@ export const Sidebar = () => {
           position: 'absolute',
           left: '0',
           top: '0',
-          width: 'calc(8px + ' + SIDEBAR_WIDTH + ')',
+          width: SIDEBAR_WIDTH + 8 + 'px',
           height: '100%',
           margin: '0',
           padding: '0',
@@ -100,7 +95,7 @@ const SidebarToggle = (sidebar: any) => {
       id="sidebar-frame"
       frameStyles={{
         position: 'absolute',
-        right: '0',
+        left: SIDEBAR_WIDTH + 'px',
         bottom: '20px',
         width: '56px',
         height: '64px',
@@ -122,16 +117,15 @@ const SidebarToggle = (sidebar: any) => {
 }
 
 const MenuList = styled.div`
-  margin: 2rem -${p => p.theme.padding}rem 2rem -${p => p.theme.padding}rem;
+  margin: 2rem -${padding()}rem 2rem -${padding()}rem;
   display: block;
 `
 
 const MenuLink = styled.div<{ value: string }>`
-  color: #f2f2f2;
+  color: ${color('light')};
   font-size: 1.125rem;
   font-weight: 500;
-  padding: ${p => p.theme.padding}rem ${p => p.theme.padding}rem
-    ${p => p.theme.padding}rem 4rem;
+  padding: ${padding()}rem ${padding()}rem ${padding()}rem 4rem;
   position: relative;
   cursor: pointer;
   transition: all ${p => p.theme.timing.short} ease-out;
@@ -151,14 +145,14 @@ const MenuLink = styled.div<{ value: string }>`
     opacity: 0;
   }
   &:hover {
-    color: ${p => p.theme.color.primary};
+    color: ${color('primary')};
     &:after {
       transform: translate3d(0, 0, 0);
       transition: transform ${p => p.theme.timing.short} ease-out, opacity 0ms;
       opacity: 1;
     }
     svg {
-      fill: ${p => p.theme.color.primary};
+      fill: ${color('primary')};
     }
     & ~ * {
       &:after {
@@ -168,7 +162,7 @@ const MenuLink = styled.div<{ value: string }>`
   }
   svg {
     position: absolute;
-    left: ${p => p.theme.padding}rem;
+    left: ${padding()}rem;
     top: 50%;
     transform: translate3d(0, -50%, 0);
     width: 1.75rem;
@@ -184,21 +178,21 @@ const SidebarHeader = styled.div`
   position: relative;
   z-index: 1050;
   width: 100%;
-  height: ${HEADER_HEIGHT}rem;
-  flex: 0 0 ${HEADER_HEIGHT}rem;
-  padding: 0 ${p => p.theme.padding}rem;
+  height: 4rem;
+  flex: 0 0 4rem;
+  padding: 0 ${padding()}rem;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
 `
 
 const ActionsToggle = styled.button<{ open: boolean }>`
-  padding: 0 ${p => p.theme.padding}rem;
-  margin-left: -${p => p.theme.padding}rem;
+  padding: 0 ${padding()}rem;
+  margin-left: -${padding()}rem;
   background: transparent;
   outline: none;
   border: 0;
   text-align: left;
   width: 3rem;
-  height: ${HEADER_HEIGHT}rem;
+  height: 4rem;
   transition: all 75ms ease-out;
   fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
   &:hover {
@@ -210,11 +204,11 @@ const ActionsToggle = styled.button<{ open: boolean }>`
 const MenuWrapper = styled.div`
   position: absolute;
   left: 0;
-  top: ${HEADER_HEIGHT}rem;
-  height: calc(100vh - (${HEADER_HEIGHT}rem));
+  top: 4rem;
+  height: calc(100vh - (4rem));
   width: 100%;
   overflow: hidden;
-  padding: ${p => p.theme.padding}rem;
+  padding: ${padding()}rem;
   ul,
   li {
     margin: 0;
@@ -224,16 +218,16 @@ const MenuWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
-  background: #333333;
+  background: ${color('dark')};
   z-index: 1000;
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
-  width: ${SIDEBAR_WIDTH};
+  width: ${SIDEBAR_WIDTH}px;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
-  padding: ${p => p.theme.padding}rem;
+  padding: ${padding()}rem;
   transition: all 150ms ease-out;
   ul,
   li {
@@ -296,8 +290,8 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  /* justify-content: space-between; */
-  width: ${SIDEBAR_WIDTH};
+  width: ${SIDEBAR_WIDTH}px;
+  overflow: hidden;
   height: 100%;
   left: 0;
   top: 0;
@@ -330,14 +324,14 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   display: block !important;
   background: transparent !important;
   height: 100% !important;
-  width: calc(${SIDEBAR_WIDTH} + ${TOGGLE_WIDTH}) !important;
+  width: ${SIDEBAR_WIDTH + TOGGLE_WIDTH}px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
   z-index: ${Z_INDEX} !important;
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
   transform: translate3d(
-    ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH)},
+    ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH + 'px')},
     0,
     0
   ) !important;

@@ -1,12 +1,13 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
+import { color } from '@tinacms/styles'
 
 export const Button = styled.button`
   text-align: center;
   border: 0;
   border-radius: ${p => p.theme.radius.big};
   box-shadow: ${p => p.theme.shadow.small};
-  background-color: ${p => p.theme.color.primary};
+  background-color: ${color('primary')};
   color: white;
   font-weight: 500;
   cursor: pointer;
