@@ -1,12 +1,12 @@
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { LeftArrow } from '@tinacms/icons'
+import { LeftArrowIcon } from '@tinacms/icons'
 
 const EditingFormTitle = ({form, setEditingForm, isMultiform }: any) => {
     return (
         <StyledEditingFormTitle isMultiform={isMultiform} onClick={() => isMultiform && setEditingForm(null)}>
-            {isMultiform && <LeftArrow />}
+            {isMultiform && <LeftArrowIcon />}
             <h1>{form.label}</h1>
         </StyledEditingFormTitle>
 )}
