@@ -26,6 +26,7 @@ export function useRemarkForm(
 
   let cms = useCMS()
   let name = markdownRemark.frontmatter.title
+  const id = markdownRemark.id
   let initialValues = useMemo(
     () => ({
       ...markdownRemark,
@@ -37,6 +38,7 @@ export function useRemarkForm(
 
   let [values, form] = useCMSForm({
     name,
+    id,
     initialValues,
     fields,
     onSubmit(data) {
