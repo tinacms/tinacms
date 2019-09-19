@@ -1,6 +1,6 @@
 import * as React from 'react'
 
-export const EllipsisVertical = () => (
+export const EllipsisVerticalIcon = () => (
   <svg
     width="4"
     height="14"

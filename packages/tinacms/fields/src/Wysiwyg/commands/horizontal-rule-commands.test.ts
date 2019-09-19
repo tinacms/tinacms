@@ -1,8 +1,8 @@
 import { PMTestHarness } from '../../prosemirror-test-utils'
-import { defaultBlockSchema } from '../schema'
 import { insertHr } from './horizontal-rule-commands'
+import { defaultSchema } from '../default-schema'
 
-let { forDoc, doc, p, text, hr } = new PMTestHarness(defaultBlockSchema)
+let { forDoc, doc, p, text, hr } = new PMTestHarness(defaultSchema)
 
 describe('insertHr', () => {
   it('should insert an hr at the cursor', () => {

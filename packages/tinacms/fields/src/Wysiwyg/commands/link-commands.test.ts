@@ -6,10 +6,10 @@ import {
   insertLinkToFile,
 } from './link-commands'
 import { PMTestHarness } from '../../prosemirror-test-utils'
-import { defaultBlockSchema } from '../schema'
+import { defaultSchema } from '../default-schema'
 
 let { forDoc, shouldNotRun, doc, p, link, text } = new PMTestHarness(
-  defaultBlockSchema
+  defaultSchema
 )
 
 /**
