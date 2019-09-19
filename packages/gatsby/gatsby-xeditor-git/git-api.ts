@@ -37,13 +37,9 @@ function commit(data: any) {
       'Content-Type': 'application/json; charset=utf-8',
     },
     body: JSON.stringify(data),
+  }).catch(e => {
+    console.error(e)
   })
-    .then(response => {
-      console.log(response.json())
-    })
-    .catch(e => {
-      console.error(e)
-    })
 }
 
 function writeMediaToDisk(data: any) {
@@ -55,13 +51,9 @@ function writeMediaToDisk(data: any) {
   return fetch(`${base()}/___tina/upload`, {
     method: 'POST',
     body: formData,
+  }).catch(e => {
+    console.error(e)
   })
-    .then(response => {
-      console.log(response.json())
-    })
-    .catch(e => {
-      console.error(e)
-    })
 }
 
 function writeToDisk(data: any) {
@@ -75,13 +67,9 @@ function writeToDisk(data: any) {
       },
       body: JSON.stringify(data),
     }
-  )
-    .then(response => {
-      console.log(response.json())
-    })
-    .catch(e => {
-      console.error(e)
-    })
+  ).catch(e => {
+    console.error(e)
+  })
 }
 
 function deleteFromDisk(data: any) {
@@ -91,7 +79,7 @@ function deleteFromDisk(data: any) {
       'Content-Type': 'application/json; charset=utf-8',
     },
   })
-    .then(response => {
+    .then(() => {
       window.history.back()
     })
     .catch(e => {

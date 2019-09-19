@@ -29,10 +29,7 @@ function runChecksOnPullRequest() {
 
   let modifiedPackages = getModifiedPackages(allFiles)
 
-  modifiedPackages.forEach(p => {
-    warnIfMissingChangelogEntry(p)
-    warnIfMissingTestChanges(p)
-  })
+  modifiedPackages.forEach(warnIfMissingTestChanges)
 
   listTouchedPackages(modifiedPackages)
   listTouchedWorkflows(allFiles)
@@ -79,31 +76,16 @@ The following packages were modified by this pull request:
 
 /**
  * Example Output:
- * ```
- * `@tinacms/core` may need a CHANGELOG entry.
- * ```
- */
-function warnIfMissingChangelogEntry({ path, packageJson }: TinaPackage) {
-  const hasCHANGELOGChanges = !!danger.git.modified_files.find(
-    p => p === `${path}/CHANGELOG.md`
-  )
-  if (!hasCHANGELOGChanges) {
-    warn(`\`${packageJson.name}\` may need a CHANGELOG entry.`)
-  }
-}
-
-/**
- * Example Output:
  *
  * ```
  * `@tinacms/core` may need new tests.
  * ```
  */
 function warnIfMissingTestChanges({ path, packageJson }: TinaPackage) {
-  const hasCHANGELOGChanges = !!danger.git.modified_files.find(p =>
+  const hasTestChanges = !!danger.git.modified_files.find(p =>
     p.match(/.*.test.tsx?/)
   )
-  if (!hasCHANGELOGChanges) {
+  if (!hasTestChanges) {
     warn(`\`${packageJson.name}\` may need new tests.`)
   }
 }
