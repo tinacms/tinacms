@@ -36,6 +36,7 @@ cms.fields.add({
   name: 'date',
   Component: DateInput,
   parse(date: any) {
+    if (typeof date === 'string') return date
     return date.toDate()
   },
 })
