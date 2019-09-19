@@ -4,5 +4,8 @@
   "location": "Charlottetown",
   "social": {
     "twitter": "ncphi"
+  },
+  "__gatsby_resolved": {
+    "fileRelativePath": "/data/author.json"
   }
 }

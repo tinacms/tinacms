@@ -1,9 +1,9 @@
-import { defaultBlockSchema } from '../schema'
 import { PMTestHarness } from '../../prosemirror-test-utils'
+import { defaultSchema } from '../default-schema'
 import { singleMarkCommand } from './single-mark-command'
 import { EM } from '../state/plugins/input-rules'
 
-let { forDoc, doc, p, text, em } = new PMTestHarness(defaultBlockSchema)
+let { forDoc, doc, p, text, em } = new PMTestHarness(defaultSchema)
 
 const P1_START = () => 1
 
@@ -18,7 +18,7 @@ function getStart(p1: string, ...paragraphs: string[]): number {
 
 describe('single-mark', () => {
   describe('em', () => {
-    const command = singleMarkCommand(defaultBlockSchema.marks.em, null)
+    const command = singleMarkCommand(defaultSchema.marks.em, null)
     const start = P1_START()
 
     it('*test*', () => {
