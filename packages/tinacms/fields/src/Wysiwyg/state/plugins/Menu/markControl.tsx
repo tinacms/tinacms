@@ -14,8 +14,6 @@ export interface Options {
   defaultAttrs?: any
   selectionOnly?: boolean
   tooltip?: string
-  size: number
-  stroke: number
   noMix?: string[]
 }
 
