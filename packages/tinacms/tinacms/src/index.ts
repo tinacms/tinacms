@@ -35,6 +35,9 @@ cms.fields.add({
 cms.fields.add({
   name: 'date',
   Component: DateInput,
+  parse(date: any) {
+    return date.toDate()
+  },
 })
 
 cms.fields.add({
