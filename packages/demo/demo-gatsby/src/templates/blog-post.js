@@ -163,9 +163,7 @@ const BlogPostForm = {
     {
       label: "Date",
       name: "rawFrontmatter.date",
-      component: function ReadOnly({ input }) {
-        return <div>{input.value}</div>
-      },
+      component: "date",
     },
     {
       label: "Description",
