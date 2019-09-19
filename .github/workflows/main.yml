@@ -12,5 +12,7 @@ jobs:
         run: npm i
       - name: Bootstrap Development
         run: npm run bs
+      - name: Build Packages
+        run: npm run build
       - name: Run Tests
         run: npm run test

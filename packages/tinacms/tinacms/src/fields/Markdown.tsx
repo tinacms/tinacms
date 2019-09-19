@@ -1,29 +1,55 @@
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
+import { useFrameContext } from '../styled-frame'
+import * as React from 'react'
 
 let lightGrey = 'rgb(243, 243, 243)'
 let lightMediumGrey = `rgb(200, 200, 200)`
 let mediumGrey = `rgb(143, 143, 143);`
 let darkGrey = 'rgb(40, 40, 40)'
 
-export const Markdown = wrapFieldsWithMeta(styled(Wysiwyg)`
+const FramedWysiwyg = (props: any) => {
+  let frame = useFrameContext()
+
+  return <Wysiwyg {...props} frame={frame} />
+}
+
+export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   position: relative;
   height: 100%;
 
   > [contenteditable] {
-    outline: 0px solid transparent;
-    border-bottom: 1px dashed ${mediumGrey};
-    padding-top: 1rem;
-    padding-bottom: 0.5em;
-    min-height: 100px;
+    background-color: ${p => p.theme.color.light};
+    border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
+    border-radius: ${p => p.theme.input.radius};
+    font-size: ${p => p.theme.input.fontSize};
+    line-height: ${p => p.theme.input.lineHeight};
+    transition: background-color ${p => p.theme.timing.short} ease-out,
+      border-color ${p => p.theme.timing.short} ease-out,
+      box-shadow ${p => p.theme.timing.medium} ease-out;
+    padding: ${p => p.theme.input.padding};
+    border-width: 1px;
+    border-style: solid;
+    width: 100%;
+    margin: 0;
+    outline: none;
 
     overflow: auto;
     -webkit-overflow-scrolling: touch;
 
+    ::selection {
+      background-color: rgba(0, 132, 255, 0.3);
+    }
+
+    &:hover {
+      background-color: #f0f0f0;
+    }
+
     &:focus {
-      //put Tina brand color here!!!!
-      border-bottom: 1px solid rgb(33, 224, 158);
+      border-color: ${p => p.theme.color.primary};
+      box-shadow: 0 0 2px 0 ${p => p.theme.color.primary};
+      background-color: #f8f8f8;
     }
 
     div::selection {
@@ -38,9 +64,6 @@ export const Markdown = wrapFieldsWithMeta(styled(Wysiwyg)`
   // Base styling
   color: ${darkGrey};
   background-color: #fff;
-  //Add Inter to global styles or whichever main font we use
-  font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-    Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
   font-size: 16px;
   line-height: 26px;
   white-space: pre-wrap;
@@ -64,8 +87,6 @@ export const Markdown = wrapFieldsWithMeta(styled(Wysiwyg)`
   h4,
   h5,
   h6 {
-    font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto,
-      Oxygen, Ubuntu, Cantarell, 'Open Sans', 'Helvetica Neue', sans-serif;
     font-weight: 600;
     text-transform: none;
     padding: 0;
@@ -77,47 +98,54 @@ export const Markdown = wrapFieldsWithMeta(styled(Wysiwyg)`
     font-size: 40px;
     line-height: 48px;
     margin-top: 0;
+    &:not(:first-child) {
+      margin-top: 32px;
+    }
   }
 
-  // Set margin top if h1 is used somewhere in the middle of the document
-  * + h1 {
-    margin-top: 32px;
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    &:not(:first-child) {
+      margin-top: 21px;
+    }
   }
 
   h2 {
     font-size: 34px;
     line-height: 38px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h3 {
     font-size: 26px;
     line-height: 30px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h4 {
     font-size: 21px;
     line-height: 28px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h5 {
     font-size: 18px;
     line-height: 24px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   h6 {
     font-size: 16px;
     line-height: 20px;
-    margin-top: 21px;
+    margin-top: 0;
   }
 
   // Links
   a {
-    //make this a tina brand color!!
-    color: rgb(33, 224, 158);
+    color: #0084ff;
     border: 0;
     font-weight: normal;
     text-decoration: underline;
@@ -167,7 +195,7 @@ export const Markdown = wrapFieldsWithMeta(styled(Wysiwyg)`
   code {
     font-family: 'Roboto Mono', monospace;
     font-size: 14px;
-    background: ${lightGrey};
+    background: rgba(53, 50, 50, 0.08);
     padding: 0.1em 0.25em;
   }
 
@@ -249,35 +277,5 @@ export const Markdown = wrapFieldsWithMeta(styled(Wysiwyg)`
         display: none;
       }
     }
-  }
-
-  h1:before {
-    content: 'h1';
-    top: 7px;
-  }
-
-  h2:before {
-    content: 'h2';
-    top: 6px;
-  }
-
-  h3:before {
-    content: 'h3';
-    top: 3px;
-  }
-
-  h4:before {
-    content: 'h4';
-    top: 2px;
-  }
-
-  h5:before {
-    content: 'h5';
-    top: 1px;
-  }
-
-  h6:before {
-    content: 'h6';
-    top: 1px;
   }
 `)

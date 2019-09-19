@@ -7,6 +7,7 @@
 - [Documentation](./docs/README.md)
   - [Gatsby Starter](./gatsby/starter-setup.md)
   - [Manual Setup](./gatsby/manual-setup.md)
+- [Roadmap](./ROADMAP.md)
 - [Contributing](./CONTRIBUTING.md)
   - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
   - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
@@ -36,7 +37,3 @@ npm run start
 | npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages                    |
 | lerna run build --scope \<package> | Build only \<package>.                        |
-
-## Links
-
-- [Circle CI](https://circleci.com/gh/tinacms/tinacms): Continuous Integration
