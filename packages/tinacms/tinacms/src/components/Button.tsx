@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
+import { color } from '@tinacms/styles'
 
 export const Button = styled.button`
   text-align: center;

@@ -3,6 +3,7 @@ import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
 import { useFrameContext } from '../styled-frame'
 import * as React from 'react'
+import { color } from '@tinacms/styles'
 
 let lightGrey = 'rgb(243, 243, 243)'
 let lightMediumGrey = `rgb(200, 200, 200)`

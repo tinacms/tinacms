@@ -122,7 +122,7 @@ const MenuList = styled.div`
 `
 
 const MenuLink = styled.div<{ value: string }>`
-  color: #f2f2f2;
+  color: ${color('light')};
   font-size: 1.125rem;
   font-weight: 500;
   padding: ${padding()}rem ${padding()}rem ${padding()}rem 4rem;
