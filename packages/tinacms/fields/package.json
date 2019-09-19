@@ -9,6 +9,7 @@
   ],
   "scripts": {
     "watch": "cms-scripts watch",
+    "dev": "cms-scripts dev",
     "build": "cms-scripts build",
     "dev": "cms-scripts dev",
     "test": "jest --passWithNoTests",
