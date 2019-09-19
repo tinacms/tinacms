@@ -190,7 +190,7 @@ const TransitionForm = styled.section<{ isEditing: Boolean }>`
   flex-grow: 1;
   flex-direction: column;
   transition: transform 150ms ease-out;
-  transform: translate3d(${p => (!p.isEditing ? `640px` : '0')}, 0, 0);
+  transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
 `
 
 const FormsFooter = styled.div`
