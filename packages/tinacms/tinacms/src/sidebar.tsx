@@ -95,7 +95,7 @@ const SidebarToggle = (sidebar: any) => {
       id="sidebar-frame"
       frameStyles={{
         position: 'absolute',
-        right: '0',
+        left: SIDEBAR_WIDTH + 'px',
         bottom: '20px',
         width: '56px',
         height: '64px',
@@ -225,7 +225,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   top: 0;
   left: 0;
   height: 100%;
-  width: ${SIDEBAR_WIDTH};
+  width: ${SIDEBAR_WIDTH}px;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: ${p => p.theme.padding}rem;
@@ -292,7 +292,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   flex-direction: column;
   flex-wrap: nowrap;
   justify-content: space-between;
-  width: ${SIDEBAR_WIDTH};
+  width: ${SIDEBAR_WIDTH}px;
   height: 100%;
   left: 0;
   top: 0;

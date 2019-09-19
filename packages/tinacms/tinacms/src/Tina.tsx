@@ -45,13 +45,14 @@ export const Tina: React.FC<TinaProps> = ({ children, position }) => {
 
 const SiteWrapper = styled.div<{ open: boolean; position: string }>`
   ${TinaResetStyles}
+  overflow: visible !important;
   position: absolute !important;
   top: 0 !important;
   right: 0 !important;
   height: 100% !important;
   width: ${props =>
     props.position === 'fixed' && props.open
-      ? 'calc(100% - ' + SIDEBAR_WIDTH + ')'
+      ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
       : '100%'} !important;
   transition: all ${props => (props.open ? 150 : 200)}ms ease-out !important;
 `
