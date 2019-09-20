@@ -178,21 +178,20 @@ const SidebarHeader = styled.div`
   position: relative;
   z-index: 1050;
   width: 100%;
-  height: 4rem;
-  flex: 0 0 4rem;
+  height: 3.25rem;
+  flex: 0 0 3.25rem;
   padding: 0 ${padding()}rem;
-  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
 `
 
 const ActionsToggle = styled.button<{ open: boolean }>`
-  padding: 0 ${padding()}rem;
+  padding: ${padding()}rem 0 0 ${padding()}rem;
   margin-left: -${padding()}rem;
   background: transparent;
   outline: none;
   border: 0;
   text-align: left;
-  width: 3rem;
-  height: 4rem;
+  width: 4rem;
+  height: 3.25rem;
   transition: all 75ms ease-out;
   fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
   &:hover {
