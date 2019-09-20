@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { FormsView } from './components/FormView'
 import { ScreenPlugin } from '@tinacms/core'
 import { Modal } from './modalProvider'
@@ -96,7 +96,7 @@ const SidebarToggle = (sidebar: any) => {
       frameStyles={{
         position: 'absolute',
         left: SIDEBAR_WIDTH + 'px',
-        bottom: '20px',
+        bottom: '32px',
         width: '56px',
         height: '64px',
         margin: '0',
@@ -108,7 +108,10 @@ const SidebarToggle = (sidebar: any) => {
     >
       <>
         <GlobalStyles />
-        <SidebarToggleButton onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}>
+        <SidebarToggleButton
+          onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
+          open={sidebar.isOpen}
+        >
           {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
         </SidebarToggleButton>
       </>
@@ -251,13 +254,23 @@ const ModalActions = styled.div`
   }
 `
 
-const SidebarToggleButton = styled.button`
+const SidebarToggleAnimation = keyframes`
+  from {
+    transform: translate3d(-100%,0,0);
+  }
+
+  to {
+    transform: translate3d(-0.125rem,0,0);
+  }
+`
+
+const SidebarToggleButton = styled.button<{ open: boolean }>`
   position: fixed;
   top: 0.5rem;
   left: 0;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 0.5rem 0.5rem 0;
-  width: 3rem;
+  width: 3.125rem;
   height: 3rem;
   border: 0;
   outline: none;
@@ -269,10 +282,13 @@ const SidebarToggleButton = styled.button`
   background-color: #0084ff;
   background-repeat: no-repeat;
   background-position: center;
-  transition: background 0.35s ease;
+  transition: all 150ms ease-out;
   cursor: pointer;
+  transform: translate3d(${p => (p.open ? 0 : '-0.125rem')}, 0, 0);
+  animation: ${SidebarToggleAnimation} 150ms ease-out 1;
   &:hover {
     background-color: #4ea9ff;
+    transform: translate3d(${p => (p.open ? '-0.125rem' : 0)}, 0, 0);
   }
   &:active {
     background-color: #0073df;
