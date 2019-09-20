@@ -13,6 +13,7 @@ import {
   TinaReset,
   Theme,
   padding,
+  color,
 } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
@@ -161,10 +162,90 @@ export const SettingsView: ScreenPlugin = {
   },
 }
 
-const NoFormsPlaceholder = () => <p>There is nothing to edit on this page</p>
+const Emoji = styled.span`
+  font-size: 2.5rem;
+  line-height: 1;
+  display: inline-block;
+`
+
+const EmptyState = styled.div`
+  > *:first-child {
+    margin: 0 0 1rem 0;
+  }
+  h3 {
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: inherit;
+    display: block;
+    margin: 0 0 1rem 0;
+    ${Emoji} {
+      font-size: 1em;
+    }
+  }
+  p {
+    display: block;
+    margin: 0 0 1rem 0;
+  }
+`
+
+const LightButton = styled.a`
+  text-align: center;
+  border: 0;
+  border-radius: ${p => p.theme.radius.big};
+  box-shadow: ${p => p.theme.shadow.small};
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all ${p => p.theme.timing.short} ease-out;
+  background-color: ${color('light')};
+  color: ${color('dark')};
+  padding: ${padding('small')}rem ${padding('big')}rem ${padding('small')}rem
+    3.5rem;
+  position: relative;
+  text-decoration: none;
+  display: inline-block;
+  ${Emoji} {
+    font-size: 1.5rem;
+    position: absolute;
+    left: ${padding('big')}rem;
+    top: 50%;
+    transform-origin: 50% 50%;
+    transform: translate3d(0, -50%, 0);
+    transition: all ${p => p.theme.timing.short} ease-out;
+  }
+  &:hover {
+    color: ${color('primary')};
+    ${Emoji} {
+      transform: translate3d(0, -50%, 0);
+    }
+  }
+`
+
+const NoFormsPlaceholder = () => (
+  <EmptyState>
+    <Emoji>🎉 👋</Emoji>
+    <h3>
+      Welcome to <b>Tina</b>!
+    </h3>
+    <p>Let's get a form set up so you can start editing.</p>
+    <p>
+      <LightButton href="/" target="_blank">
+        <Emoji>📖</Emoji> Form Setup Guide
+      </LightButton>
+    </p>
+  </EmptyState>
+)
 
 const NoFieldsPlaceholder = () => (
-  <p>There are no fields registered with this form</p>
+  <EmptyState>
+    <Emoji>🤔</Emoji>
+    <h3>Hey, you don't have any fields added to this form.</h3>
+    <p>
+      <LightButton href="/" target="_blank">
+        <Emoji>📖</Emoji> Field Setup Guide
+      </LightButton>
+    </p>
+  </EmptyState>
 )
 
 const CreateButton = styled(Button)`
