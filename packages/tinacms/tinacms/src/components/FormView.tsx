@@ -59,12 +59,9 @@ export const FormsView = () => {
    */
   if (!forms.length)
     return (
-      <>
-        {cms.plugins.all('content-button').map(plugin => (
-          <CreateContentButton plugin={plugin} />
-        ))}
+      <FieldsWrapper>
         <NoFormsPlaceholder />
-      </>
+      </FieldsWrapper>
     )
   if (!editingForm)
     return (
