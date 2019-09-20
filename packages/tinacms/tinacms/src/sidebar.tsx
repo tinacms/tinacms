@@ -184,7 +184,7 @@ const SidebarHeader = styled.div`
 `
 
 const ActionsToggle = styled.button<{ open: boolean }>`
-  padding: ${padding()}rem 0 0 ${padding()}rem;
+  padding: 1rem 0 0 ${padding()}rem;
   margin-left: -${padding()}rem;
   background: transparent;
   outline: none;
