@@ -185,7 +185,7 @@ const EmptyState = styled.div`
   }
 `
 
-const LightButton = styled.a`
+const LinkButton = styled.a`
   text-align: center;
   border: 0;
   border-radius: ${p => p.theme.radius.big};
@@ -226,9 +226,12 @@ const NoFormsPlaceholder = () => (
     </h3>
     <p>Let's get a form set up so you can start editing.</p>
     <p>
-      <LightButton href="/" target="_blank">
+      <LinkButton
+        href="https://github.com/tinacms/tinacms-site/blob/master/docs/gatsby/content-editing.md"
+        target="_blank"
+      >
         <Emoji>📖</Emoji> Form Setup Guide
-      </LightButton>
+      </LinkButton>
     </p>
   </EmptyState>
 )
@@ -238,9 +241,12 @@ const NoFieldsPlaceholder = () => (
     <Emoji>🤔</Emoji>
     <h3>Hey, you don't have any fields added to this form.</h3>
     <p>
-      <LightButton href="/" target="_blank">
+      <LinkButton
+        href="https://github.com/tinacms/tinacms-site/blob/master/docs/gatsby/content-editing.md"
+        target="_blank"
+      >
         <Emoji>📖</Emoji> Field Setup Guide
-      </LightButton>
+      </LinkButton>
     </p>
   </EmptyState>
 )
