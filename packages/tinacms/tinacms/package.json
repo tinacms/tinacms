@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/tinacms",
-  "version": "0.1.0-alpha.14",
+  "version": "0.1.0-alpha.15",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -24,7 +24,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.1.0-alpha.6",
-    "@tinacms/fields": "^0.1.0-alpha.10",
+    "@tinacms/fields": "^0.1.0-alpha.11",
     "@tinacms/form-builder": "^0.1.0-alpha.9",
     "@tinacms/icons": "^0.0.1-alpha.2",
     "@tinacms/react-tinacms": "^0.1.0-alpha.9",
