@@ -13,7 +13,7 @@ import {
   LeftArrowIcon,
   EditIcon,
 } from '@tinacms/icons'
-import { GlobalStyles, padding, color } from '@tinacms/styles'
+import { GlobalStyles, padding, color, TinaResetStyles } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from './Globals'
 import { Button } from './components/Button'
 import { CreateContentButton } from './components/CreateContent'
@@ -321,6 +321,8 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
 
 const SidebarContainer = styled.div<{ open: boolean }>`
   position: fixed !important;
+  top: 0 !important;
+  left: 0 !important;
   display: block !important;
   background: transparent !important;
   height: 100% !important;
