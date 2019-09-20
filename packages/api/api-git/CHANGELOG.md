@@ -1,0 +1,11 @@
+# Change Log
+
+All notable changes to this project will be documented in this file.
+See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
+
+# [0.1.0-alpha.7](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.1.0-alpha.6...@tinacms/api-git@0.1.0-alpha.7) (2019-09-20)
+
+
+### Bug Fixes
+
+* api responses are valid json ([a054752](https://github.com/tinacms/tinacms/commit/a054752))
