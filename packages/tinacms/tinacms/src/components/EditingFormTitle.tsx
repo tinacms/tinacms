@@ -11,39 +11,35 @@ const EditingFormTitle = ({ form, setEditingForm, isMultiform }: any) => {
       onClick={() => isMultiform && setEditingForm(null)}
     >
       {isMultiform && <LeftArrowIcon />}
-      <HeadingOne>{form.label}</HeadingOne>
+      {form.label}
     </StyledEditingFormTitle>
   )
 }
 
 const StyledEditingFormTitle = styled.div<{ isMultiform: Boolean }>`
   cursor: ${p => p.isMultiform && 'pointer'};
-  background-color: ${p => p.theme.color.light};
-  border-bottom: 1px solid rgba(51, 51, 51, 0.04);
+  background-color: white;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
   display: flex;
   align-items: center;
   padding: ${padding('small')}rem ${padding()}rem;
   color: inherit;
-  transition: color 250ms ease;
+  font-size: 1.2rem;
+  transition: color 250ms ease-out;
   svg {
-    width: 15px;
-    fill: #949494;
-    height: 15px;
+    width: 1.25rem;
+    fill: ${color('medium')};
+    height: auto;
     transform: translate3d(-4px, 0, 0);
-    transition: transform 250ms ease;
+    transition: transform 250ms ease-out;
   }
   :hover {
     color: ${p => p.isMultiform && `${p.theme.color.primary}`};
-    transition: color 250ms ease;
     svg {
       transform: translate3d(-7px, 0, 0);
       transition: transform 250ms ease;
     }
   }
-`
-
-const HeadingOne = styled.h1`
-  margin: 0;
 `
 
 export default EditingFormTitle

@@ -26,6 +26,7 @@ export interface Theme {
   color: {
     primary: string
     light: string
+    medium: string
     dark: string
   }
   radius: {
@@ -57,6 +58,7 @@ export const theme: Theme = {
   color: {
     primary: '#0084ff',
     light: '#F2F2F2',
+    medium: '#B4B4B4',
     dark: '#353232',
   },
   radius: {

@@ -2,6 +2,7 @@ import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { Form } from '@tinacms/core'
 import { padding, color } from '@tinacms/styles'
+import { RightArrowIcon } from '@tinacms/icons'
 
 interface FormsListProps {
   forms: Form[]
@@ -19,7 +20,8 @@ const FormsList = ({
     <StyledFormList isEditing={isEditing}>
       {forms.map(form => (
         <FormListItem key={form.id} onClick={() => setActiveForm(form)}>
-          {form.label}
+          <span>{form.label}</span>
+          <RightArrowIcon />
         </FormListItem>
       ))}
     </StyledFormList>
@@ -36,6 +38,17 @@ const FormListItem = styled.li`
   color: #333;
   font-weight: normal;
   transition: color 150ms ease-out;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  svg {
+    width: 1.25rem;
+    fill: ${color('medium')};
+    margin-top: -1px;
+    height: auto;
+    transform: translate3d(0, 0, 0);
+    transition: transform 250ms ease-out;
+  }
   &:after {
     content: '';
     display: block;
@@ -51,6 +64,10 @@ const FormListItem = styled.li`
   }
   &:hover {
     color: ${color('primary')};
+    svg {
+      transform: translate3d(3px, 0, 0);
+      transition: transform 250ms ease;
+    }
     &:after {
       transform: scale3d(1, 1, 1);
     }
