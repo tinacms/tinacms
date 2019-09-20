@@ -99,11 +99,12 @@ export const ModalHeader = styled.div`
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
+  padding: ${padding()}rem ${padding()}rem ${padding()}rem ${padding()}rem;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
   margin: 0;
 `
 
 export const ModalBody = styled.div`
-  padding: ${padding()}rem;
+  padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
   margin: 0;
 `
