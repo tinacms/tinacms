@@ -57,12 +57,7 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length)
-    return (
-      <FieldsWrapper>
-        <NoFormsPlaceholder />
-      </FieldsWrapper>
-    )
+  if (!forms.length) return <NoFormsPlaceholder />
   if (!editingForm)
     return (
       <FormsList
@@ -84,14 +79,14 @@ export const FormsView = () => {
                 form={editingForm as any}
                 setEditingForm={setEditingForm as any}
               />
-              <FieldsWrapper>
-                {editingForm &&
-                  (editingForm.fields.length ? (
+              {editingForm &&
+                (editingForm.fields.length ? (
+                  <FieldsWrapper>
                     <FieldsBuilder form={editingForm} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  ))}
-              </FieldsWrapper>
+                  </FieldsWrapper>
+                ) : (
+                  <NoFieldsPlaceholder />
+                ))}
               <FormsFooter>
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
@@ -166,6 +161,8 @@ const Emoji = styled.span`
 `
 
 const EmptyState = styled.div`
+  padding: ${padding()}rem;
+  flex: 1 0 auto;
   > *:first-child {
     margin: 0 0 1rem 0;
   }
