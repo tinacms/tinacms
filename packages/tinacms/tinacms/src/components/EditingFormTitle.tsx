@@ -28,7 +28,7 @@ const StyledEditingFormTitle = styled.div<{ isMultiform: Boolean }>`
   transition: color 250ms ease-out;
   svg {
     width: 1.25rem;
-    fill: #949494;
+    fill: ${color('medium')};
     height: auto;
     transform: translate3d(-4px, 0, 0);
     transition: transform 250ms ease-out;
