@@ -41,6 +41,7 @@ const FormListItem = styled.li`
   display: flex;
   justify-content: space-between;
   align-items: center;
+  user-select: none;
   svg {
     width: 1.25rem;
     fill: ${color('medium')};

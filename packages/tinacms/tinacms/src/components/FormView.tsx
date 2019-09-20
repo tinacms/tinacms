@@ -13,6 +13,7 @@ import {
   TinaReset,
   Theme,
   padding,
+  color,
 } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
@@ -56,15 +57,7 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length)
-    return (
-      <>
-        {cms.plugins.all('content-button').map(plugin => (
-          <CreateContentButton plugin={plugin} />
-        ))}
-        <NoFormsPlaceholder />
-      </>
-    )
+  if (!forms.length) return <NoFormsPlaceholder />
   if (!editingForm)
     return (
       <FormsList
@@ -86,14 +79,14 @@ export const FormsView = () => {
                 form={editingForm as any}
                 setEditingForm={setEditingForm as any}
               />
-              <FieldsWrapper>
-                {editingForm &&
-                  (editingForm.fields.length ? (
+              {editingForm &&
+                (editingForm.fields.length ? (
+                  <FieldsWrapper>
                     <FieldsBuilder form={editingForm} />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  ))}
-              </FieldsWrapper>
+                  </FieldsWrapper>
+                ) : (
+                  <NoFieldsPlaceholder />
+                ))}
               <FormsFooter>
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
@@ -161,10 +154,98 @@ export const SettingsView: ScreenPlugin = {
   },
 }
 
-const NoFormsPlaceholder = () => <p>There is nothing to edit on this page</p>
+const Emoji = styled.span`
+  font-size: 2.5rem;
+  line-height: 1;
+  display: inline-block;
+`
+
+const EmptyState = styled.div`
+  padding: ${padding()}rem;
+  flex: 1 0 auto;
+  > *:first-child {
+    margin: 0 0 1rem 0;
+  }
+  h3 {
+    font-size: 1.2rem;
+    font-weight: normal;
+    color: inherit;
+    display: block;
+    margin: 0 0 1rem 0;
+    ${Emoji} {
+      font-size: 1em;
+    }
+  }
+  p {
+    display: block;
+    margin: 0 0 1rem 0;
+  }
+`
+
+const LinkButton = styled.a`
+  text-align: center;
+  border: 0;
+  border-radius: ${p => p.theme.radius.big};
+  box-shadow: ${p => p.theme.shadow.small};
+  font-weight: 500;
+  cursor: pointer;
+  font-size: 0.75rem;
+  transition: all ${p => p.theme.timing.short} ease-out;
+  background-color: ${color('light')};
+  color: ${color('dark')};
+  padding: ${padding('small')}rem ${padding('big')}rem ${padding('small')}rem
+    3.5rem;
+  position: relative;
+  text-decoration: none;
+  display: inline-block;
+  ${Emoji} {
+    font-size: 1.5rem;
+    position: absolute;
+    left: ${padding('big')}rem;
+    top: 50%;
+    transform-origin: 50% 50%;
+    transform: translate3d(0, -50%, 0);
+    transition: all ${p => p.theme.timing.short} ease-out;
+  }
+  &:hover {
+    color: ${color('primary')};
+    ${Emoji} {
+      transform: translate3d(0, -50%, 0);
+    }
+  }
+`
+
+const NoFormsPlaceholder = () => (
+  <EmptyState>
+    <Emoji>🎉 👋</Emoji>
+    <h3>
+      Welcome to <b>Tina</b>!
+    </h3>
+    <p>Let's get a form set up so you can start editing.</p>
+    <p>
+      <LinkButton
+        href="https://github.com/tinacms/tinacms-site/blob/master/docs/gatsby/content-editing.md"
+        target="_blank"
+      >
+        <Emoji>📖</Emoji> Form Setup Guide
+      </LinkButton>
+    </p>
+  </EmptyState>
+)
 
 const NoFieldsPlaceholder = () => (
-  <p>There are no fields registered with this form</p>
+  <EmptyState>
+    <Emoji>🤔</Emoji>
+    <h3>Hey, you don't have any fields added to this form.</h3>
+    <p>
+      <LinkButton
+        href="https://github.com/tinacms/tinacms-site/blob/master/docs/gatsby/content-editing.md"
+        target="_blank"
+      >
+        <Emoji>📖</Emoji> Field Setup Guide
+      </LinkButton>
+    </p>
+  </EmptyState>
 )
 
 const CreateButton = styled(Button)`
