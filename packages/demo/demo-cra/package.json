@@ -1,6 +1,5 @@
 {
   "name": "demo-cra",
-  "version": "0.1.0-alpha.11",
   "private": true,
   "dependencies": {
     "@tinacms/react-tinacms": "^0.1.0-alpha.9",
