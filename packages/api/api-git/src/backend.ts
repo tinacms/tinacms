@@ -3,14 +3,12 @@ import { writeFile, deleteFile } from './file-writer'
 const fs = require('fs')
 const path = require('path')
 const express = require('express')
-const openRepo = require('simple-git/promise')
+const git = require('simple-git/promise')
 var multer = require('multer')
 
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
-const DEFAULT_NAME = 'Tina'
-const DEFAULT_EMAIL = 'nolan@forestry.io'
 const DEFAULT_MESSAGE = 'Update from Tina'
 
 //If an upload path doesnt exist, create it
@@ -41,10 +39,6 @@ export function router() {
     },
   })
   const upload = multer({ storage: tmpImgStorage })
-
-  const repo = openRepo(pathRoot)
-  // TODO: Don't do this
-  repo.env('GIT_SSH_COMMAND', GIT_SSH_COMMAND)
 
   let router = express.Router()
   router.use(express.json())
@@ -128,11 +122,30 @@ export function router() {
     email?: string
   }
 
+  function openRepo() {
+    const repo = git(pathRoot)
+
+    /**
+     * This is here to allow committing from the cloud
+     *
+     * `repo.env` overwrites the environment. Adding `...process.env`
+     *  is required for accessing global config values. (i.e. user.name, user.email)
+     */
+    repo.env({ ...process.env, GIT_SSH_COMMAND: GIT_SSH_COMMAND })
+
+    return repo
+  }
+
   async function commit({ files, message, name, email }: CommitOptions) {
-    let options = {
-      '--author': `"${name || DEFAULT_NAME} <${email || DEFAULT_EMAIL}>"`,
+    let options
+
+    if (email) {
+      options = {
+        '--author': `"${name || email} <${email}>"`,
+      }
     }
 
+    const repo = openRepo()
     await repo.commit(message || DEFAULT_MESSAGE, ...files, options)
     await repo.push()
   }
