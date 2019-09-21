@@ -12,6 +12,8 @@ jobs:
         run: npm i
       - name: Bootstrap Development
         run: npm run bs
+      - name: Lint Source Coude
+        run: npm run lint
       - name: Build Packages
         run: npm run build
       - name: Run Tests

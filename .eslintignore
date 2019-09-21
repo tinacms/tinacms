@@ -1,0 +1,4 @@
+packages/demo
+node_modules
+build
+**/*.d.ts
