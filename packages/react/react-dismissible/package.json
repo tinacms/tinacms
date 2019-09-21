@@ -1,6 +1,6 @@
 {
   "name": "react-dismissible",
-  "version": "1.0.1",
+  "version": "1.0.2",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
