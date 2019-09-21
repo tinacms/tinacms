@@ -21,7 +21,6 @@ To get started:
 git clone git@github.com:tinacms/tinacms.git
 cd tinacms
 npm run bootstrap
-npm run build
 
 # Start the Gatsby demo
 cd packages/demo/demo-gatsby
