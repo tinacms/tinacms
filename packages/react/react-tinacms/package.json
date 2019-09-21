@@ -8,6 +8,7 @@
     "build"
   ],
   "scripts": {
+    "prepublish": "npm run build",
     "test": "jest --passWithNoTests",
     "watch": "cms-scripts watch",
     "dev": "cms-scripts dev",
