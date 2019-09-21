@@ -15,9 +15,10 @@ import { SIDEBAR_WIDTH } from './Globals'
 
 interface TinaProps {
   position: 'fixed' | 'float'
+  hidden?: boolean
 }
 
-export const Tina: React.FC<TinaProps> = ({ children, position }) => {
+export const Tina: React.FC<TinaProps> = ({ children, position, hidden }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
   const props = {
@@ -31,13 +32,15 @@ export const Tina: React.FC<TinaProps> = ({ children, position }) => {
         <SiteWrapper open={isOpen} position={position}>
           {children}
         </SiteWrapper>
-        <ThemeProvider theme={theme}>
-          <ModalProvider>
-            <TinaReset>
-              <Sidebar />
-            </TinaReset>
-          </ModalProvider>
-        </ThemeProvider>
+        {!hidden && (
+          <ThemeProvider theme={theme}>
+            <ModalProvider>
+              <TinaReset>
+                <Sidebar />
+              </TinaReset>
+            </ModalProvider>
+          </ThemeProvider>
+        )}
       </SidebarContext.Provider>
     </CMSContext.Provider>
   )

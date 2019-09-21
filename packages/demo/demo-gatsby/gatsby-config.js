@@ -12,14 +12,12 @@ module.exports = {
     {
       resolve: "@tinacms/gatsby-plugin-tinacms",
       options: {
-        title: "Tina Gatsby Demo",
-        logo:
-          "https://seeklogo.com/images/G/gatsby-logo-1A245AD37F-seeklogo.com.png",
         plugins: [
           "@tinacms/gatsby-tinacms-git",
           "@tinacms/gatsby-tinacms-json",
         ],
         sidebar: {
+          hidden: process.env.NODE_ENV === "production",
           position: "fixed",
         },
       },
