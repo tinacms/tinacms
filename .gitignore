@@ -5,3 +5,4 @@
 **/.rts2_cache
 *.swp
 packages/cli/forestry/.env
+*.tgz
