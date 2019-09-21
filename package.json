@@ -2,6 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
+    "lint": "eslint './packages/**/*{.ts,.tsx}'",
     "build": "lerna run build --reject-cycles",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles",
     "bs": "npm run bootstrap",
@@ -12,7 +13,13 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
     "commander": "^2.20.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^2.0.1",
     "lerna": "^3.16.4",
     "rollup": "^1.21.4",
     "rollup-plugin-commonjs": "^10.0.1",
