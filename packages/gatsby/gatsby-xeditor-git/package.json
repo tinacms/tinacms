@@ -13,6 +13,7 @@
     "file-writer.js"
   ],
   "scripts": {
+    "prepublish": "npm run build",
     "watch": "tsc -w",
     "build": "tsc"
   },
