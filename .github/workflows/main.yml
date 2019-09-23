@@ -1,6 +1,11 @@
 name: Run all tests
 
-on: [push]
+on:
+  push:
+    paths:
+      - '**.js'
+      - '**.ts'
+      - '**.tsx'
 
 jobs:
   build:
