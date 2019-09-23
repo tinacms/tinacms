@@ -1,5 +1,5 @@
 require('dotenv').config() // load process.env values
-import { initServer } from './cmds/initServer'
+import { initServer } from './cmds/apps/initServer'
 import { login } from './cmds/login'
 
 import * as commander from 'commander'

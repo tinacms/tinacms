@@ -1,7 +1,7 @@
 import chalk from 'chalk'
 import axios from 'axios'
 import * as listr from 'listr'
-import { readConfig } from '../../config'
+import { readConfig } from '../../../config'
 
 export const postToForestry = async (
   provider: string,
