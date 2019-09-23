@@ -47,7 +47,9 @@ export const Tina: React.FC<TinaProps> = ({ children, position, hidden }) => {
 }
 
 const SiteWrapper = styled.div<{ open: boolean; position: string }>`
-  ${TinaResetStyles}
+  opacity: 1 !important;
+  background-color: transparent !important;
+  background-image: none !important;
   overflow: visible !important;
   position: absolute !important;
   top: 0 !important;
