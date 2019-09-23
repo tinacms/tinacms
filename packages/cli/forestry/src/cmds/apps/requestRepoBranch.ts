@@ -34,7 +34,3 @@ export async function requestBranch() {
 
   return branchConfirmation.branch
 }
-
-const isHttpUrl = (url: string) => {
-  return false
-}
