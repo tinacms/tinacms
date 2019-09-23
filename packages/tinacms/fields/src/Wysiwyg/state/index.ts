@@ -13,6 +13,7 @@ import { Translator } from '../Translator'
 import { menu } from './plugins/Menu'
 import { KEYMAP_PLUGINS } from '../plugins/keymap'
 import { buildKeymap } from './buildKeymap'
+import { links } from './plugins/links'
 
 export function createEditorState(
   schema: Schema,
@@ -28,7 +29,7 @@ export function createEditorState(
       inputRules(schema),
       keymap(buildKeymap(schema, plugins)),
       history(),
-      // links(schema),
+      links(schema),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       gapCursor(),
       menu(translator, false, frame),
