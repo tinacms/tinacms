@@ -1,19 +1,24 @@
-import { Mark, MarkType, ResolvedPos } from "prosemirror-model"
-import { EditorState } from "prosemirror-state"
-import { EditorView } from "prosemirror-view"
+import { Mark, MarkType, ResolvedPos } from 'prosemirror-model'
+import { EditorState } from 'prosemirror-state'
+import { EditorView } from 'prosemirror-view'
 
 export function renderLinkForm(view: EditorView, link: Element) {
   const tr = view.state.tr
-  tr.setMeta("type", "forestry/render")
-  tr.setMeta("clickTarget", link)
+  tr.setMeta('type', 'tinacms/render')
+  tr.setMeta('clickTarget', link)
   view.dispatch(tr)
 }
 
-export function insertLinkToFile(state: EditorState, dispatch: Function, url: string) {
-  url = url || ""
-  let filenamePath = url.split("/")
-  let filename = decodeURI(filenamePath[filenamePath.length - 1]) || "Download File"
-  let attrs = { title: filename, href: url, editing: "", creating: "" }
+export function insertLinkToFile(
+  state: EditorState,
+  dispatch: Function,
+  url: string
+) {
+  url = url || ''
+  let filenamePath = url.split('/')
+  let filename =
+    decodeURI(filenamePath[filenamePath.length - 1]) || 'Download File'
+  let attrs = { title: filename, href: url, editing: '', creating: '' }
   let schema = state.schema
   let node = schema.text(attrs.title, [schema.marks.link.create(attrs)])
   dispatch(state.tr.replaceSelectionWith(node, false))
@@ -22,7 +27,7 @@ export function insertLinkToFile(state: EditorState, dispatch: Function, url: st
 
 export function unmountLinkForm(view: EditorView) {
   const tr = view.state.tr
-  tr.setMeta("type", "forestry/unmount")
+  tr.setMeta('type', 'tinacms/unmount')
   view.dispatch(tr)
 }
 
@@ -34,7 +39,7 @@ export function unmountLinkForm(view: EditorView) {
  * @param {(tr: Transaction) => void} dispatch
  */
 export function startEditingLink(state: EditorState, dispatch: Function) {
-  const linkMarkType = state.schema.marks["link"]
+  const linkMarkType = state.schema.marks['link']
 
   const $cursor: ResolvedPos = (state.selection as any).$cursor
   const tr = state.tr
@@ -47,8 +52,8 @@ export function startEditingLink(state: EditorState, dispatch: Function) {
     const { from, to, mark } = markExtend($cursor, linkMarkType)
     const attrs = {
       ...(mark ? mark.attrs : {}),
-      editing: "editing",
-      creating: "",
+      editing: 'editing',
+      creating: '',
     }
     tr.addMark(from, to, linkMarkType.create(attrs))
     dispatch(tr.scrollIntoView())
@@ -72,7 +77,8 @@ function markExtend($cursor: ResolvedPos, markType: MarkType) {
 
   const mark = markType.isInSet($cursor.parent.child(startIndex).marks)
   // TODO: This might be a problem.
-  const hasMark = (index: number) => mark!.isInSet($cursor.parent.child(index).marks)
+  const hasMark = (index: number) =>
+    mark!.isInSet($cursor.parent.child(index).marks)
 
   while (startIndex > 0 && hasMark(startIndex - 1)) {
     startIndex--
@@ -103,15 +109,15 @@ function markExtend($cursor: ResolvedPos, markType: MarkType) {
 export function stopEditingLink(state: EditorState, dispatch: Function) {
   let changes: { from: number; to: number; mark: Mark }[] = []
 
-  const linkMarkType = state.schema.marks["link"]
+  const linkMarkType = state.schema.marks['link']
   state.doc.descendants((node, i) => {
     let linkMark = linkMarkType.isInSet(node.marks)
 
-    if (linkMark && linkMark.attrs.editing == "editing") {
+    if (linkMark && linkMark.attrs.editing == 'editing') {
       const attrs = {
         ...linkMark.attrs,
-        editing: "",
-        creating: "",
+        editing: '',
+        creating: '',
       }
       changes.push({
         from: i,
@@ -139,9 +145,13 @@ export function stopEditingLink(state: EditorState, dispatch: Function) {
  * @param {(tr: Transaction) => void} dispatch
  * @param {Object} attrs
  */
-export function updateLinkBeingEdited(state: EditorState, dispatch: Function, attrs: object) {
+export function updateLinkBeingEdited(
+  state: EditorState,
+  dispatch: Function,
+  attrs: object
+) {
   if (dispatch) {
-    const linkMarkType = state.schema.marks["link"]
+    const linkMarkType = state.schema.marks['link']
     const tr = state.tr
 
     state.doc.descendants((node, i) => {
@@ -161,7 +171,7 @@ export function updateLinkBeingEdited(state: EditorState, dispatch: Function, at
 
 export function removeLinkBeingEdited(state: EditorState, dispatch: Function) {
   if (dispatch) {
-    const linkMarkType = state.schema.marks["link"]
+    const linkMarkType = state.schema.marks['link']
     const tr = state.tr
 
     state.doc.descendants((node, i) => {

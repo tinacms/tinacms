@@ -57,6 +57,7 @@ export class LinkForm extends React.Component<Props, State> {
     return (
       <div
         style={{
+          backgroundColor: 'white',
           position: 'relative',
           height: 'max-content',
           ...style,
