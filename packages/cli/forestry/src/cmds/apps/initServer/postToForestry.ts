@@ -6,14 +6,17 @@ import { readConfig } from '../../../config'
 export const postToForestry = async (
   provider: string,
   gitProviderToken: string,
-  repo: string,
-  branch: string
+  httpsUrl: string
 ) => {
   console.log(
     `\nyour site will available at: ${chalk.green('dev.hamburger.com')}`
   )
 
   const authToken = readConfig().auth.access_token
+
+  console.log(
+    `provider ${provider} token ${gitProviderToken} https_url ${httpsUrl}`
+  )
 
   const tasks = new listr([
     {
@@ -25,10 +28,9 @@ export const postToForestry = async (
           data: {
             provider: provider,
             token: gitProviderToken,
-            repo,
-            branch: branch,
+            https_url: httpsUrl,
           },
-          url: `${process.env.API_URL}/app/create`,
+          url: `${process.env.API_URL}/apps`,
         }),
     },
     {
