@@ -2,7 +2,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useCMS } from '@tinacms/react-tinacms'
 import { SaveButton, CancelButton } from './FormView'
-import { Modal, ModalHeader, ModalBody } from '../modalProvider'
+import { Modal, ModalHeader, ModalBody, ModalActions } from '../modalProvider'
 import { ModalPopup } from '../modalPopup'
 import { Button } from './Button'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
@@ -78,17 +78,4 @@ const CloseButton = styled.div`
 
 const CreateButton = styled(Button)`
   width: 100%;
-`
-
-const ModalActions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border-radius: 0 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big};
-  padding: 0 ${padding()}rem ${padding()}rem ${padding()}rem;
-  overflow: hidden;
-  ${Button} {
-    &:not(:last-child) {
-      margin-right: ${padding()}rem;
-    }
-  }
 `
