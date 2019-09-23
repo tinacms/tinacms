@@ -7,6 +7,7 @@ import * as commander from 'commander'
 import { version } from '../package.json'
 import { isAuthenticated } from './config'
 import { initConfig } from './cmds/initConfig'
+import { create } from './cmds/apps/create'
 
 export function init(args: any) {
   const program = new commander.Command()
@@ -54,6 +55,11 @@ export function init(args: any) {
 
   program
     .command('apps:create')
+    .description('Creates an application in forestry')
+    .action(async () => await verifyAuthorized(create))
+
+  program
+    .command('apps:init')
     .description('Set up the cloud development server')
     .action(async () => await verifyAuthorized(initServer))
 
