@@ -27,7 +27,7 @@ export class FormManager extends Subscribable {
   }
 }
 
-// TODO: Move out of here. //
+// TODO: Move out of here
 export interface FieldPlugin {
   __type: 'field'
   name: string
