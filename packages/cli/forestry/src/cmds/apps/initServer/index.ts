@@ -2,8 +2,9 @@ import * as figlet from 'figlet'
 import chalk from 'chalk'
 import { requestGitProvider } from '../requestGitProvider'
 import { retrieveAuthToken } from '../retrieveAuthToken'
-import { requestRepoBranch } from '../requestRepoBranch'
+import { requestRepo } from '../requestRepoBranch'
 import { postToForestry } from './postToForestry'
+import { getGitHttpUrl } from '../gitUrl'
 const clear = require('clear')
 
 export async function initServer() {
@@ -13,14 +14,9 @@ export async function initServer() {
   )
   console.log('\n')
 
-  const repoBranch = await requestRepoBranch()
-  const gitProvider = await requestGitProvider(repoBranch.repo)
+  const repo = await requestRepo()
+  const gitProvider = await requestGitProvider(repo)
   const authToken = await retrieveAuthToken(gitProvider)
 
-  await postToForestry(
-    gitProvider,
-    authToken,
-    repoBranch.repo,
-    repoBranch.branch
-  )
+  await postToForestry(gitProvider, authToken, getGitHttpUrl(repo))
 }
