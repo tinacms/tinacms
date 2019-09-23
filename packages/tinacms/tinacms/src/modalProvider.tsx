@@ -5,6 +5,7 @@ import { StyledFrame } from './styled-frame'
 import styled, { ThemeProvider } from 'styled-components'
 import { Z_INDEX } from './Globals'
 import { GlobalStyles, padding } from '@tinacms/styles'
+import { Button } from './components/Button'
 
 interface Props {
   children: any
