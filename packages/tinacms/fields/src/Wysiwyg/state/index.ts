@@ -29,7 +29,7 @@ export function createEditorState(
       inputRules(schema),
       keymap(buildKeymap(schema, plugins)),
       history(),
-      links(schema),
+      links(schema, frame),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       gapCursor(),
       menu(translator, false, frame),
