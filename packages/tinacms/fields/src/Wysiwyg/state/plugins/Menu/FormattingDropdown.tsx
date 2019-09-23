@@ -28,6 +28,10 @@ export class FormattingDropdown extends React.Component<any, State> {
   lift = () => lift(this.props.view.state, this.props.view.dispatch)
   render() {
     let { view, frame } = this.props
+    let document
+    if (frame) {
+      document = frame.document
+    }
     return (
       <MenuDropdownWrapper>
         <MenuButton
@@ -45,7 +49,7 @@ export class FormattingDropdown extends React.Component<any, State> {
             onDismiss={() => {
               this.toggle()
             }}
-            document={frame.document}
+            document={document}
           >
             <H1 view={view} onClick={this.toggle} />
             <H2 view={view} onClick={this.toggle} />
