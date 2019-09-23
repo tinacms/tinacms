@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.17](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.16...@tinacms/tinacms@0.1.0-alpha.17) (2019-09-23)
+
+
+### Bug Fixes
+
+* remove css reset from site wrapper ([9a5821d](https://github.com/tinacms/tinacms/commit/9a5821d))
+
+
+### Features
+
+* **sidebar:** "hidden" prop hides sidebar ([f448e6d](https://github.com/tinacms/tinacms/commit/f448e6d)), closes [#91](https://github.com/tinacms/tinacms/issues/91)
+
+
+
+
+
 # [0.1.0-alpha.16](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.15...@tinacms/tinacms@0.1.0-alpha.16) (2019-09-21)
 
 **Note:** Version bump only for package @tinacms/tinacms
