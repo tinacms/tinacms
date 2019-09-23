@@ -1,15 +1,15 @@
 // Process [link](<to> "stuff")
 // https://github.com/markdown-it/markdown-it/blob/master/lib/rules_inline/link.js
-"use strict"
+'use strict'
 
-import { parseLinkDestination } from "../helpers/parseLinkDestination"
+import { parseLinkDestination } from '../helpers/parseLinkDestination'
 
 function _link(md: any) {
   return function(state: any, silent: any) {
-    var normalizeReference = state.md.utils.normalizeReference
-    var isSpace = state.md.utils.isSpace
+    let normalizeReference = state.md.utils.normalizeReference
+    let isSpace = state.md.utils.isSpace
 
-    var attrs,
+    let attrs,
       code,
       label,
       labelEnd,
@@ -19,7 +19,7 @@ function _link(md: any) {
       ref,
       title,
       token,
-      href = "",
+      href = '',
       oldPos = state.pos,
       max = state.posMax,
       start = state.pos,
@@ -66,7 +66,7 @@ function _link(md: any) {
         if (state.md.validateLink(href)) {
           pos = res.pos
         } else {
-          href = ""
+          href = ''
         }
       }
 
@@ -96,7 +96,7 @@ function _link(md: any) {
           }
         }
       } else {
-        title = ""
+        title = ''
       }
 
       if (pos >= max || state.src.charCodeAt(pos) !== 0x29 /* ) */) {
@@ -110,7 +110,7 @@ function _link(md: any) {
       //
       // Link reference
       //
-      if (typeof state.env.references === "undefined") {
+      if (typeof state.env.references === 'undefined') {
         return false
       }
 
@@ -149,15 +149,15 @@ function _link(md: any) {
       state.pos = labelStart
       state.posMax = labelEnd
 
-      token = state.push("link_open", "a", 1)
-      token.attrs = attrs = [["href", href]]
+      token = state.push('link_open', 'a', 1)
+      token.attrs = attrs = [['href', href]]
       if (title) {
-        attrs.push(["title", title])
+        attrs.push(['title', title])
       }
 
       state.md.inline.tokenize(state)
 
-      token = state.push("link_close", "a", -1)
+      token = state.push('link_close', 'a', -1)
     }
 
     state.pos = pos
@@ -167,5 +167,5 @@ function _link(md: any) {
 }
 
 export function link(md: any) {
-  md.inline.ruler.before("emphasis", "link", _link(md))
+  md.inline.ruler.before('emphasis', 'link', _link(md))
 }
