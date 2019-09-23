@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.18](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.17...@tinacms/tinacms@0.1.0-alpha.18) (2019-09-23)
+
+
+### Bug Fixes
+
+* **sidebar:** call isOpen instead of the open ([c89efb6](https://github.com/tinacms/tinacms/commit/c89efb6))
+
+
+
+
+
 # [0.1.0-alpha.17](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.16...@tinacms/tinacms@0.1.0-alpha.17) (2019-09-23)
 
 
