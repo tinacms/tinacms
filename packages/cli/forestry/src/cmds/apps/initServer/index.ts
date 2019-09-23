@@ -1,8 +1,8 @@
 import * as figlet from 'figlet'
 import chalk from 'chalk'
-import { requestGitProvider } from './requestGitProvider'
-import { retrieveAuthToken } from './retrieveAuthToken'
-import { requestRepoBranch } from './requestRepoBranch'
+import { requestGitProvider } from '../requestGitProvider'
+import { retrieveAuthToken } from '../retrieveAuthToken'
+import { requestRepoBranch } from '../requestRepoBranch'
 import { postToForestry } from './postToForestry'
 const clear = require('clear')
 
