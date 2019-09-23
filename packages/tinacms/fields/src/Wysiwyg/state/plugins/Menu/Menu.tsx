@@ -75,9 +75,7 @@ export class Menu extends React.Component<Props, State> {
 
     return (
       <MenuContainer>
-        {supportBlocks && (
-          <FormattingDropdown view={view} bottom={bottom} frame={frame} />
-        )}
+        {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
         <BoldControl view={view} />
         <ItalicControl view={view} />
         <UnderlineControl view={view} />
