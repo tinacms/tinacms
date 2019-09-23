@@ -9,9 +9,9 @@
   ],
   "scripts": {
     "prepublish": "npm run build",
-    "watch": "cms-scripts watch",
+    "watch": "cms-scripts watchDebug",
     "build": "cms-scripts build",
-    "dev": "cms-scripts dev",
+    "dev": "cms-scripts devDebug",
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
