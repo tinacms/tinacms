@@ -10,12 +10,21 @@ import { toggleHeader as th } from '../../../commands/heading-commands'
 import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './Menu'
 import styled from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
+import { EditorView } from 'prosemirror-view'
 
 interface State {
   active: boolean
 }
 
-export class FormattingDropdown extends React.Component<any, State> {
+export interface FormattingDropdownProps {
+  view: EditorView
+  frame?: { document: Document }
+}
+
+export class FormattingDropdown extends React.Component<
+  FormattingDropdownProps,
+  State
+> {
   state = {
     active: false,
   }
@@ -28,6 +37,10 @@ export class FormattingDropdown extends React.Component<any, State> {
   lift = () => lift(this.props.view.state, this.props.view.dispatch)
   render() {
     let { view, frame } = this.props
+    let document
+    if (frame) {
+      document = frame.document
+    }
     return (
       <MenuDropdownWrapper>
         <MenuButton
@@ -45,7 +58,7 @@ export class FormattingDropdown extends React.Component<any, State> {
             onDismiss={() => {
               this.toggle()
             }}
-            document={frame.document}
+            document={document}
           >
             <H1 view={view} onClick={this.toggle} />
             <H2 view={view} onClick={this.toggle} />
