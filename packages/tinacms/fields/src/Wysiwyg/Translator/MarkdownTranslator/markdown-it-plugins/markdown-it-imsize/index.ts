@@ -1,12 +1,12 @@
 // Process ![test]( x =100x200)
 //                    ^^^^^^^^ this size specification
 
-import { parseImageSize } from "./helpers/parse_image_size"
-import { parseLinkDestination } from "../helpers/parseLinkDestination"
+import { parseImageSize } from './helpers/parse_image_size'
+import { parseLinkDestination } from '../helpers/parseLinkDestination'
 
 function image_with_size(md: any) {
   return function(state: any, silent: any) {
-    var attrs,
+    let attrs,
       code,
       label,
       labelEnd,
@@ -20,7 +20,7 @@ function image_with_size(md: any) {
       token,
       tokens: any,
       start,
-      href = "",
+      href = '',
       oldPos = state.pos,
       max = state.posMax
 
@@ -67,7 +67,7 @@ function image_with_size(md: any) {
         if (state.md.validateLink(href)) {
           pos = res.pos
         } else {
-          href = ""
+          href = ''
         }
       }
 
@@ -97,7 +97,7 @@ function image_with_size(md: any) {
           }
         }
       } else {
-        title = ""
+        title = ''
       }
 
       // [link](  <href>  "title" =WxH  )
@@ -135,7 +135,7 @@ function image_with_size(md: any) {
       //
       // Link reference
       //
-      if (typeof state.env.references === "undefined") {
+      if (typeof state.env.references === 'undefined') {
         return false
       }
 
@@ -183,7 +183,7 @@ function image_with_size(md: any) {
       state.pos = labelStart
       state.posMax = labelEnd
 
-      var newState = new state.md.inline.State(
+      let newState = new state.md.inline.State(
         state.src.slice(labelStart, labelEnd),
         state.md,
         state.env,
@@ -191,19 +191,19 @@ function image_with_size(md: any) {
       )
       newState.md.inline.tokenize(newState)
 
-      token = state.push("image", "img", 0)
-      token.attrs = attrs = [["src", href], ["alt", ""]]
+      token = state.push('image', 'img', 0)
+      token.attrs = attrs = [['src', href], ['alt', '']]
       token.children = tokens
       if (title) {
-        attrs.push(["title", title])
+        attrs.push(['title', title])
       }
 
       if (width !== null) {
-        attrs.push(["width", width as any])
+        attrs.push(['width', width as any])
       }
 
       if (height !== null) {
-        attrs.push(["height", height as any])
+        attrs.push(['height', height as any])
       }
     }
 
@@ -214,5 +214,5 @@ function image_with_size(md: any) {
 }
 
 export function imsize(md: any) {
-  md.inline.ruler.before("emphasis", "image", image_with_size(md))
+  md.inline.ruler.before('emphasis', 'image', image_with_size(md))
 }
