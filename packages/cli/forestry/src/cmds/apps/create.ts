@@ -5,8 +5,7 @@ import { retrieveAuthToken } from './retrieveAuthToken'
 import { requestRepo } from './requestRepoBranch'
 import axios from 'axios'
 import { getGitHttpUrl } from './gitUrl'
-import { resolve } from 'url'
-import listr = require('listr')
+import { readConfig } from '../../config'
 const clear = require('clear')
 
 export async function create() {
@@ -18,16 +17,17 @@ export async function create() {
 
   const repo = await requestRepo()
   const gitProvider = await requestGitProvider(repo)
-  const authToken = await retrieveAuthToken(gitProvider)
+  const gitProviderAuthToken = await retrieveAuthToken(gitProvider)
 
   console.log('Creating app...')
 
+  const authToken = readConfig().auth.access_token
   const result = await axios({
     method: 'POST',
     headers: { Authorization: 'Bearer ' + authToken },
     data: {
       provider: gitProvider,
-      token: authToken,
+      token: gitProviderAuthToken,
       https_url: getGitHttpUrl(repo),
     },
     url: `${process.env.API_URL}/apps`,

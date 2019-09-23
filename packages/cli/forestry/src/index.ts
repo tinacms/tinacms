@@ -7,7 +7,8 @@ import * as commander from 'commander'
 import { version } from '../package.json'
 import { isAuthenticated } from './config'
 import { initConfig } from './cmds/initConfig'
-import { create } from './cmds/apps/create'
+import { create as createApp } from './cmds/apps/create'
+import { create as createEnvironment } from './cmds/apps/environment/create'
 
 export function init(args: any) {
   const program = new commander.Command()
@@ -56,11 +57,18 @@ export function init(args: any) {
   program
     .command('apps:create')
     .description('Creates an application in forestry')
-    .action(async () => await verifyAuthorized(create))
+    .action(async () => await verifyAuthorized(createApp))
+
+  program
+    .command('environments:create')
+    .description('Creates an environment for an app in forestry')
+    .action(async () => await verifyAuthorized(createEnvironment))
 
   program
     .command('apps:init')
-    .description('Set up the cloud development server')
+    .description(
+      'DEPRECATED - shows off a flow for creating a cloud development server in one step'
+    )
     .action(async () => await verifyAuthorized(initServer))
 
   // error on unknown commands
