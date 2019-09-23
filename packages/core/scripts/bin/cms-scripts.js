@@ -33,9 +33,15 @@ const COMMANDS = {
     build(createBuildOptions({ uglify: { debug: false } }))
   },
   dev() {
+    build(createBuildOptions())
+  },
+  devDebug() {
     build(createBuildOptions({ uglify: { debug: true } }))
   },
   watch() {
+    watch(createBuildOptions())
+  },
+  watchDebug() {
     watch(createBuildOptions({ uglify: { debug: true } }))
   },
 }
