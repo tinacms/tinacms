@@ -2,12 +2,14 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useCMS } from '@tinacms/react-tinacms'
 import { SaveButton, CancelButton } from './FormView'
-import { Modal, ModalHeader, ModalBody } from '../modalProvider'
+import { Modal, ModalHeader, ModalBody, ModalActions } from '../modalProvider'
 import { ModalPopup } from '../modalPopup'
 import { Button } from './Button'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/core'
+import { CloseIcon } from '@tinacms/icons'
+import { padding, color } from '@tinacms/styles'
 
 export const CreateContentButton = ({ plugin }: any) => {
   let [open, setOpen] = React.useState(false)
@@ -44,7 +46,12 @@ const FormModal = ({ plugin, close }: any) => {
         {({ handleSubmit }) => {
           return (
             <ModalPopup>
-              <ModalHeader>{plugin.name}</ModalHeader>
+              <ModalHeader>
+                {plugin.name}
+                <CloseButton onClick={close}>
+                  <CloseIcon />
+                </CloseButton>
+              </ModalHeader>
               <ModalBody>
                 <FieldsBuilder form={form} />
               </ModalBody>
@@ -60,17 +67,15 @@ const FormModal = ({ plugin, close }: any) => {
   )
 }
 
-const CreateButton = styled(Button)`
-  width: 100%;
+const CloseButton = styled.div`
+  fill: ${color('medium')};
+  cursor: pointer;
+  transition: fill 85ms ease-out;
+  &:hover {
+    fill: ${color('dark')};
+  }
 `
 
-const ModalActions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border-radius: 0 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big};
-  overflow: hidden;
-  ${Button} {
-    border-radius: 0;
-    flex: 1 0 auto;
-  }
+const CreateButton = styled(Button)`
+  width: 100%;
 `

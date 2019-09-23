@@ -286,13 +286,14 @@ const FormsFooter = styled.div`
 `
 
 export const SaveButton = styled(Button)`
-  flex: 1 0 auto;
+  flex: 1.5 0 auto;
   padding: 0.75rem 1.5rem;
 `
 
 export const CancelButton = styled(SaveButton)`
   background-color: transparent;
-  border: 1px solid #0084ff;
+  box-shadow: none;
+  border: none;
   color: #0084ff;
   &:hover {
     background-color: #f7f7f7;

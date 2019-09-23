@@ -3,7 +3,7 @@ import styled, { keyframes } from 'styled-components'
 
 const ModalPopupKeyframes = keyframes`
   0% {
-    transform: translate3d( 0, 2rem, 0 );
+    transform: translate3d( 0, -2rem, 0 );
     opacity: 0;
   }
 
