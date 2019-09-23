@@ -15,14 +15,17 @@ export class LinkView {
   constructor(
     public view: EditorView,
     public schema: Schema,
-    public renderTarget: HTMLElement
+    public renderTarget: HTMLElement,
+    public extraDoc?: Document
   ) {
     document.addEventListener('click', this.handleClick)
+    if (extraDoc) extraDoc.addEventListener('click', this.handleClick)
     window.addEventListener('resize', this.unmountLinkForm)
   }
 
   destroy = (): void => {
     document.removeEventListener('click', this.handleClick)
+    if (this.extraDoc) this.extraDoc.addEventListener('click', this.handleClick)
     window.removeEventListener('resize', this.unmountLinkForm)
     this.renderTarget.parentElement!.removeChild(this.renderTarget)
   }
