@@ -167,7 +167,7 @@ export class MarkdownSerializerState {
   text(text: string, escape?: boolean) {
     let lines = text.split('\n')
     for (let i = 0; i < lines.length; i++) {
-      var startOfLine = this.atBlank() || this.closed
+      let startOfLine = this.atBlank() || this.closed
       this.write()
       this.out += escape !== false ? this.esc(lines[i], startOfLine) : lines[i]
       if (i != lines.length - 1) this.out += '\n'
@@ -323,7 +323,7 @@ export class MarkdownSerializerState {
   }
 
   quote(str: string) {
-    var wrap =
+    let wrap =
       str.indexOf('"') == -1 ? '""' : str.indexOf("'") == -1 ? "''" : '()'
     return wrap[0] + str + wrap[1]
   }

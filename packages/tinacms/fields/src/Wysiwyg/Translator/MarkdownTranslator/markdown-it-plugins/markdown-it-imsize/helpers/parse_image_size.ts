@@ -1,6 +1,6 @@
 // Parse image size
 //
-"use strict"
+'use strict'
 
 type Result = {
   ok: boolean
@@ -20,7 +20,10 @@ function parseNextNumber(str: string, pos: number, max: number) {
 
   code = str.charCodeAt(pos)
 
-  while ((pos < max && (code >= 0x30 /* 0 */ && code <= 0x39)) /* 9 */ || code === 0x25 /* % */) {
+  while (
+    (pos < max && (code >= 0x30 /* 0 */ && code <= 0x39)) /* 9 */ ||
+    code === 0x25 /* % */
+  ) {
     code = str.charCodeAt(++pos)
   }
 
@@ -32,7 +35,7 @@ function parseNextNumber(str: string, pos: number, max: number) {
 }
 
 export function parseImageSize(str: string, pos: number, max: number) {
-  var code,
+  let code,
     result: Result = {
       ok: false,
       pos: 0,
@@ -60,7 +63,7 @@ export function parseImageSize(str: string, pos: number, max: number) {
   }
 
   // parse width
-  var resultW = parseNextNumber(str, pos, max)
+  let resultW = parseNextNumber(str, pos, max)
   pos = resultW.pos
 
   // next charactor must be 'x'
@@ -72,7 +75,7 @@ export function parseImageSize(str: string, pos: number, max: number) {
   pos++
 
   // parse height
-  var resultH = parseNextNumber(str, pos, max)
+  let resultH = parseNextNumber(str, pos, max)
   pos = resultH.pos
 
   result.width = resultW.value
