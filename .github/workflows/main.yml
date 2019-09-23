@@ -3,8 +3,8 @@ name: Run all tests
 on:
   push:
     paths:
-      - '*.js'
-      - '*.tsx?'
+      - '**.js'
+      - '**.tsx?'
 
 jobs:
   build:
