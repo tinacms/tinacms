@@ -12,10 +12,10 @@ export function links(schema: Schema, frame?: { document: Document }): Plugin {
   return new Plugin({
     filterTransaction(tr: Transaction): boolean {
       switch (tr.getMeta('type')) {
-        case 'forestry/render':
+        case 'tinacms/render':
           linkForm.render(tr.getMeta('clickTarget'))
           return false
-        case 'forestry/unmount':
+        case 'tinacms/unmount':
           linkForm.unmount()
           return false
         default:
