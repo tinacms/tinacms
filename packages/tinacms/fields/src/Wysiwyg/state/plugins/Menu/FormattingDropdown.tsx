@@ -10,12 +10,21 @@ import { toggleHeader as th } from '../../../commands/heading-commands'
 import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './Menu'
 import styled from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
+import { EditorView } from 'prosemirror-view'
 
 interface State {
   active: boolean
 }
 
-export class FormattingDropdown extends React.Component<any, State> {
+export interface FormattingDropdownProps {
+  view: EditorView
+  frame?: { document: Document }
+}
+
+export class FormattingDropdown extends React.Component<
+  FormattingDropdownProps,
+  State
+> {
   state = {
     active: false,
   }
