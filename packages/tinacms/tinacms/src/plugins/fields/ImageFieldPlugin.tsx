@@ -9,7 +9,7 @@ interface ImageProps {
   uploadDir(form: any): string
 }
 
-export const ImageUploadInput = wrapFieldsWithMeta<InputProps, ImageProps>(
+export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
   ({ form, field, input }) => {
     let cms = useCMS()
 
@@ -34,5 +34,5 @@ export const ImageUploadInput = wrapFieldsWithMeta<InputProps, ImageProps>(
 
 export default {
   name: 'image',
-  Component: ImageUploadInput,
+  Component: ImageField,
 }
