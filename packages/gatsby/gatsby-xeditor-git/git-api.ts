@@ -1,27 +1,81 @@
-export const GitApi = {
-  onSubmit(data: any) {
+export interface TinaGitApi {
+  commitAndPush(data: any): Promise<any>
+  writeToDisk(data: any): Promise<any>
+  writeMediaToDisk(data: any): Promise<any>
+  deleteFromDisk(data: any): Promise<any>
+
+  /**
+   * An alias to `commitAndPush`
+   *
+   * @deprecated
+   */
+  onSubmit(data: any): Promise<any>
+  /**
+   * An alias to `writeToDisk`
+   *
+   * @deprecated
+   */
+  onChange(data: any): Promise<any>
+  /**
+   * An alias to `writeMediaToDisk`
+   *
+   * @deprecated
+   */
+  onUploadMedia(data: any): Promise<any>
+  /**
+   * An alias to `deleteFromDisk`
+   *
+   * @deprecated
+   */
+  onDelete(data: any): Promise<any>
+  /**
+   * @deprecated
+   */
+  isAuthenticated(): boolean
+}
+
+export const GitApi: TinaGitApi = {
+  commitAndPush(data: any) {
     return commit(data)
   },
+  writeToDisk(data: any) {
+    return writeToDisk(data)
+  },
+  writeMediaToDisk(data: any) {
+    return writeMediaToDisk(data)
+  },
+  deleteFromDisk(data: any) {
+    return deleteFromDisk(data)
+  },
+  onSubmit(data: any) {
+    return GitApi.commitAndPush(data)
+  },
   onChange(data: any) {
-    writeToDisk(data)
+    return GitApi.writeToDisk(data)
   },
   onUploadMedia(data: any) {
-    writeMediaToDisk(data)
+    return GitApi.writeMediaToDisk(data)
   },
   onDelete(data: any) {
-    deleteFromDisk(data)
+    return GitApi.deleteFromDisk(data)
   },
   isAuthenticated() {
     return true
   },
 }
 
-export const GitSsrApi = {
-  onSubmit(data: any) {},
-  onChange(data: any) {},
-  onUploadMedia(data: any) {},
-  onDelete(data: any) {},
-  isAuthenticated() {},
+export const GitSsrApi: TinaGitApi = {
+  async onSubmit() {},
+  async onChange() {},
+  async onUploadMedia() {},
+  async onDelete() {},
+  isAuthenticated() {
+    return false
+  },
+  async commitAndPush() {},
+  async writeToDisk() {},
+  async writeMediaToDisk() {},
+  async deleteFromDisk() {},
 }
 
 let base = () => {
