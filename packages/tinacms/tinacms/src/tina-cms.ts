@@ -1,4 +1,5 @@
-import { CMS, PluginType, FieldPlugin, ScreenPlugin } from '@tinacms/core'
+import { CMS, PluginType, ScreenPlugin } from '@tinacms/core'
+import { FieldPlugin } from '@tinacms/form-builder'
 
 export class TinaCMS extends CMS {
   get fields(): PluginType<FieldPlugin> {

@@ -102,7 +102,7 @@ const FieldRegistrar = ({ children }) => {
   React.useEffect(() => {
     if (firstRender) {
       //make sure to only register the field plugin once
-      cms.forms.addFieldPlugin({
+      cms.fields.add({
         name: 'short-text',
         Component: ShortTextField,
       })
