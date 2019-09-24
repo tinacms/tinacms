@@ -15,10 +15,12 @@
   "scripts": {
     "prepublish": "npm run build",
     "watch": "tsc -w",
+    "dev": "tsc",
     "build": "tsc"
   },
   "dependencies": {
     "@tinacms/api-git": "^0.1.0-alpha.12",
+    "@tinacms/git-client": "^0.1.0-alpha.0",
     "@tinacms/core": "^0.1.0-alpha.8",
     "@tinacms/gatsby-plugin-tinacms": "^0.1.0-alpha.18",
     "@tinacms/react-tinacms": "^0.1.0-alpha.11",
