@@ -5,17 +5,10 @@ export class CMS {
   forms: FormManager
   plugins: PluginManager
   api: { [key: string]: any } = {}
+
   constructor() {
     this.forms = new FormManager()
     this.plugins = new PluginManager()
-  }
-
-  get fields(): PluginType<FieldPlugin> {
-    return this.plugins.findOrCreateMap('field')
-  }
-
-  get screens(): PluginType<ScreenPlugin> {
-    return this.plugins.findOrCreateMap('screen')
   }
 
   registerApi(name: string, api: any): void {
