@@ -13,16 +13,7 @@ export * from './plugins/screen-plugin'
 
 export { ActionButton } from './components/ActionsMenu'
 
-import {
-  TextInput,
-  TextAreaInput,
-  ColorPickerField,
-  ToggleField,
-  DateInput,
-  Markdown,
-} from './plugins/fields'
 import { MediaView, SettingsView } from './components/FormView'
-import { ImageUploadInput } from './plugins/fields/ImageUploadInput'
 import { TinaCMS } from './tina-cms'
 
 export const cms = new TinaCMS()
@@ -32,45 +23,18 @@ cms.screens.add(MediaView)
 cms.screens.add(SettingsView)
 
 // Field Plugins
-cms.fields.add({
-  name: 'text',
-  Component: TextInput,
-  validate(value: any, values: any, meta: any, field: any) {
-    if (field.required && !value) return 'Required'
-  },
-})
+import TextFieldPlugin from './plugins/fields/TextInput'
+import TextareaPlugin from './plugins/fields/TextAreaInput'
+import DateFieldPlugin from './plugins/fields/DateInput'
+import ImageFieldPlugin from './plugins/fields/ImageUploadInput'
+import ColorPickerFieldPlugin from './plugins/fields/ColorPickerField'
+import ToggleFieldPlugin from './plugins/fields/ToggleField'
+import MarkdownFieldPlugin from './plugins/fields/Markdown'
 
-cms.fields.add({
-  name: 'date',
-  Component: DateInput,
-  parse(date: any) {
-    if (typeof date === 'string') return date
-    return date.toDate()
-  },
-})
-
-cms.fields.add({
-  name: 'image',
-  Component: ImageUploadInput,
-})
-
-cms.fields.add({
-  name: 'textarea',
-  Component: TextAreaInput,
-})
-
-cms.fields.add({
-  name: 'color',
-  Component: ColorPickerField,
-})
-
-cms.fields.add({
-  name: 'toggle',
-  type: 'checkbox',
-  Component: ToggleField,
-})
-
-cms.fields.add({
-  name: 'markdown',
-  Component: Markdown,
-})
+cms.fields.add(TextFieldPlugin)
+cms.fields.add(TextareaPlugin)
+cms.fields.add(DateFieldPlugin)
+cms.fields.add(ImageFieldPlugin)
+cms.fields.add(ColorPickerFieldPlugin)
+cms.fields.add(ToggleFieldPlugin)
+cms.fields.add(MarkdownFieldPlugin)

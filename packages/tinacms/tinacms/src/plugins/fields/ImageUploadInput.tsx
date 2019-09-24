@@ -31,3 +31,8 @@ export const ImageUploadInput = wrapFieldsWithMeta<InputProps, ImageProps>(
     )
   }
 )
+
+export default {
+  name: 'image',
+  Component: ImageUploadInput,
+}
