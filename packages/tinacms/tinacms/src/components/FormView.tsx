@@ -1,25 +1,14 @@
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
-import { EllipsisVerticalIcon } from '@tinacms/icons'
-import { TextField } from '@tinacms/fields'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
-import styled, { css } from 'styled-components'
-import { Modal, ModalBody, ModalHeader } from '..'
-import {
-  GlobalStyles,
-  TinaResetStyles,
-  TinaReset,
-  Theme,
-  padding,
-  color,
-} from '@tinacms/styles'
+import styled from 'styled-components'
+import { padding, color } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import EditingFormTitle from './EditingFormTitle'
-import { ScreenPlugin } from '../plugins/screen-plugin'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -102,57 +91,6 @@ export const FormsView = () => {
       </FormBuilder>
     </>
   )
-}
-
-const CreateContentButton = ({ plugin }: any) => {
-  let cms = useCMS()
-  let [postName, setPostName] = React.useState('')
-  let [open, setOpen] = React.useState(false)
-  return (
-    <div>
-      <CreateButton onClick={() => setOpen(p => !p)}>
-        {plugin.name}
-      </CreateButton>
-      {open && (
-        <Modal>
-          <ModalHeader>Create</ModalHeader>
-          <ModalBody>
-            <TextField
-              onChange={e => setPostName(e.target.value)}
-              value={postName}
-            />
-
-            <SaveButton
-              onClick={() => {
-                plugin.onSubmit(postName, cms)
-                setOpen(false)
-              }}
-            >
-              Save
-            </SaveButton>
-          </ModalBody>
-        </Modal>
-      )}
-    </div>
-  )
-}
-
-export const MediaView: ScreenPlugin = {
-  __type: 'screen',
-  name: 'Media Manager',
-  icon: 'forestry-logo',
-  Component: () => {
-    return <h2>Hello World</h2>
-  },
-}
-
-export const SettingsView: ScreenPlugin = {
-  __type: 'screen',
-  name: 'Site Settings',
-  icon: 'forestry-logo',
-  Component: () => {
-    return <h2>Hello World</h2>
-  },
 }
 
 const Emoji = styled.span`

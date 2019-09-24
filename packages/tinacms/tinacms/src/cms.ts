@@ -1,6 +1,9 @@
-import { MediaView, SettingsView } from './components/FormView'
 import { TinaCMS } from './tina-cms'
 
+// Screen Plugins
+import { MediaView, SettingsView } from './plugins/screens'
+
+// Field Plugins
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
 import TextareaFieldPlugin from './plugins/fields/TextareaFieldPlugin'
 import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
