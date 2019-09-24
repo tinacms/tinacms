@@ -1,10 +1,9 @@
 import * as React from 'react'
-import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
+import { useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from './styled-frame'
 import styled, { keyframes } from 'styled-components'
 import { FormsView } from './components/FormView'
-import { ScreenPlugin } from '@tinacms/core'
 import { Modal } from './modalProvider'
 import { ModalFullscreen } from './modalFullscreen'
 import {
@@ -18,9 +17,11 @@ import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from './Globals'
 import { Button } from './components/Button'
 import { CreateContentButton } from './components/CreateContent'
 import { useSidebar } from './sidebarProvider'
+import { ScreenPlugin } from './plugins/screen-plugin'
+import { useTina } from './use-tina'
 
 export const Sidebar = () => {
-  const cms = useCMS()
+  const cms = useTina()
   const sidebar = useSidebar()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)

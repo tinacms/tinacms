@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form, CMS } from '@tinacms/core'
+import { Form } from '@tinacms/core'
 import { useCMS } from '@tinacms/react-tinacms'
 import {
   Form as FinalForm,
@@ -7,6 +7,7 @@ import {
   FormRenderProps,
 } from 'react-final-form'
 import { FC } from 'react'
+import { FieldPlugin } from './field-plugin'
 
 export interface FormBuilderProps {
   form: Form
@@ -44,7 +45,9 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
   return (
     <>
       {form.fields.map(field => {
-        let plugin = cms.fields.find(field.component as string)
+        let plugin = cms.plugins
+          .findOrCreateMap<FieldPlugin>('fields')
+          .find(field.component as string)
         let type: string | undefined
         if (plugin && plugin.type) {
           type = plugin.type
