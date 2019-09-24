@@ -1,7 +1,7 @@
 // Components
 export * from './components/Tina'
-export * from './components/sidebarProvider'
-export * from './components/modalProvider'
+export * from './components/SidebarProvider'
+export * from './components/ModalProvider'
 export * from './fields'
 
 // React

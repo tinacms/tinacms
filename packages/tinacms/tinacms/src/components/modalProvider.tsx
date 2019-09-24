@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { StyledFrame } from './styled-frame'
+import { StyledFrame } from './SyledFrame'
 import styled from 'styled-components'
 import { Z_INDEX } from '../Globals'
 import { GlobalStyles, padding } from '@tinacms/styles'

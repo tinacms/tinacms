@@ -5,7 +5,7 @@ import * as ReactDatetime from 'react-datetime'
 import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
-import { useFrameContext } from '../components/styled-frame'
+import { useFrameContext } from '../components/SyledFrame'
 import styled from 'styled-components'
 import { color } from '@tinacms/styles'
 

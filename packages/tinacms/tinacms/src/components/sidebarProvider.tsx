@@ -16,7 +16,3 @@ export function useSidebar(): SidebarProps {
 
   return sidebar
 }
-
-interface SidebarLayoutContainerProps {
-  isSidebarOpen: boolean
-}
