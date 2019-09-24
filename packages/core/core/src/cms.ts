@@ -16,8 +16,3 @@ export class CMS {
     this.api[name] = api
   }
 }
-
-export interface ScreenPlugin extends Plugin {
-  __type: 'screen'
-  Component: any
-}
