@@ -23,18 +23,18 @@ cms.screens.add(MediaView)
 cms.screens.add(SettingsView)
 
 // Field Plugins
-import TextFieldPlugin from './plugins/fields/TextInput'
-import TextareaPlugin from './plugins/fields/TextAreaInput'
-import DateFieldPlugin from './plugins/fields/DateInput'
-import ImageFieldPlugin from './plugins/fields/ImageUploadInput'
-import ColorPickerFieldPlugin from './plugins/fields/ColorPickerField'
-import ToggleFieldPlugin from './plugins/fields/ToggleField'
-import MarkdownFieldPlugin from './plugins/fields/Markdown'
+import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
+import TextareaFieldPlugin from './plugins/fields/TextareaFieldPlugin'
+import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
+import ImageFieldPlugin from './plugins/fields/ImageFieldPlugin'
+import ColorFieldPlugin from './plugins/fields/ColorFieldPlugin'
+import ToggleFieldPlugin from './plugins/fields/ToggleFieldPlugin'
+import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 
 cms.fields.add(TextFieldPlugin)
-cms.fields.add(TextareaPlugin)
+cms.fields.add(TextareaFieldPlugin)
 cms.fields.add(DateFieldPlugin)
 cms.fields.add(ImageFieldPlugin)
-cms.fields.add(ColorPickerFieldPlugin)
+cms.fields.add(ColorFieldPlugin)
 cms.fields.add(ToggleFieldPlugin)
 cms.fields.add(MarkdownFieldPlugin)
