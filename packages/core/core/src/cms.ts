@@ -1,5 +1,5 @@
-import { FormManager, FieldPlugin } from './cms-forms'
-import { PluginManager, PluginType, Plugin } from './plugins'
+import { FormManager } from './cms-forms'
+import { PluginManager, Plugin } from './plugins'
 
 export class CMS {
   forms: FormManager
