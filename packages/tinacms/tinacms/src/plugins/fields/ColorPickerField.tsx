@@ -13,3 +13,8 @@ export const ColorPickerField = wrapFieldsWithMeta<InputProps, ColorProps>(
     )
   }
 )
+
+export default {
+  name: 'color',
+  Component: ColorPickerField,
+}

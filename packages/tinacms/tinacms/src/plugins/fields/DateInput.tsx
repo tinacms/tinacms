@@ -82,3 +82,12 @@ const DatetimeContainer = styled.div`
     }
   }
 `
+
+export default {
+  name: 'date',
+  Component: DateInput,
+  parse(date: any) {
+    if (typeof date === 'string') return date
+    return date.toDate()
+  },
+}

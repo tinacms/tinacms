@@ -280,3 +280,8 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     }
   }
 `)
+
+export default {
+  name: 'markdown',
+  Component: Markdown,
+}
