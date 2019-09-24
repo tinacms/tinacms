@@ -1,142 +1,124 @@
-export interface TinaGitApi {
-  commitAndPush(data: any): Promise<any>
-  writeToDisk(data: any): Promise<any>
-  writeMediaToDisk(data: any): Promise<any>
-  deleteFromDisk(data: any): Promise<any>
+export class GitClient {
+  constructor(private baseUrl: string) {}
 
   /**
    * An alias to `commitAndPush`
    *
    * @deprecated
    */
-  onSubmit(data: any): Promise<any>
+  onSubmit(data: any): Promise<any> {
+    return this.commitAndPush(data)
+  }
   /**
    * An alias to `writeToDisk`
    *
    * @deprecated
    */
-  onChange(data: any): Promise<any>
+  onChange(data: any): Promise<any> {
+    return this.writeToDisk(data)
+  }
   /**
    * An alias to `writeMediaToDisk`
    *
    * @deprecated
    */
-  onUploadMedia(data: any): Promise<any>
+  onUploadMedia(data: any): Promise<any> {
+    return this.writeMediaToDisk(data)
+  }
   /**
    * An alias to `deleteFromDisk`
    *
    * @deprecated
    */
-  onDelete(data: any): Promise<any>
+  onDelete(data: any): Promise<any> {
+    return this.deleteFromDisk(data)
+  }
   /**
    * @deprecated
    */
-  isAuthenticated(): boolean
-}
-
-export const GitApi: TinaGitApi = {
-  commitAndPush(data: any) {
-    return commit(data)
-  },
-  writeToDisk(data: any) {
-    return writeToDisk(data)
-  },
-  writeMediaToDisk(data: any) {
-    return writeMediaToDisk(data)
-  },
-  deleteFromDisk(data: any) {
-    return deleteFromDisk(data)
-  },
-  onSubmit(data: any) {
-    return GitApi.commitAndPush(data)
-  },
-  onChange(data: any) {
-    return GitApi.writeToDisk(data)
-  },
-  onUploadMedia(data: any) {
-    return GitApi.writeMediaToDisk(data)
-  },
-  onDelete(data: any) {
-    return GitApi.deleteFromDisk(data)
-  },
-  isAuthenticated() {
+  isAuthenticated(): boolean {
     return true
-  },
-}
+  }
 
-export const GitSsrApi: TinaGitApi = {
-  async onSubmit() {},
-  async onChange() {},
-  async onUploadMedia() {},
-  async onDelete() {},
-  isAuthenticated() {
-    return false
-  },
-  async commitAndPush() {},
-  async writeToDisk() {},
-  async writeMediaToDisk() {},
-  async deleteFromDisk() {},
-}
-
-let base = () => {
-  let { protocol, hostname, port } = window.location
-  return `${protocol}//${hostname}${port != '80' ? `:${port}` : ''}`
-}
-
-function commit(data: any) {
-  // @ts-ignore
-  return fetch(`${base()}/___tina/commit`, {
-    method: 'POST',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-    body: JSON.stringify(data),
-  }).catch(e => {
-    console.error(e)
-  })
-}
-
-function writeMediaToDisk(data: any) {
-  let formData = new FormData()
-  formData.append('file', data.content)
-  formData.append('directory', data.directory)
-
-  // @ts-ignore
-  return fetch(`${base()}/___tina/upload`, {
-    method: 'POST',
-    body: formData,
-  }).catch(e => {
-    console.error(e)
-  })
-}
-
-function writeToDisk(data: any) {
-  // @ts-ignore
-  return fetch(
-    `${base()}/___tina/${encodeURIComponent(data.fileRelativePath)}`,
-    {
-      method: 'PUT',
+  /**
+   *
+   * TODO: Add return type.
+   * TODO: Remove `catch`
+   */
+  commitAndPush(data: {
+    files: string[]
+    message?: string
+    name?: string
+    email?: string
+  }): Promise<any> {
+    return fetch(`${this.baseUrl}/___tina/commit`, {
+      method: 'POST',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(data),
-    }
-  ).catch(e => {
-    console.error(e)
-  })
-}
-
-function deleteFromDisk(data: any) {
-  return fetch(`${base()}/___tina/${encodeURIComponent(data.relPath)}`, {
-    method: 'DELETE',
-    headers: {
-      'Content-Type': 'application/json; charset=utf-8',
-    },
-  })
-    .then(() => {
-      window.history.back()
-    })
-    .catch(e => {
+    }).catch(e => {
       console.error(e)
     })
+  }
+
+  /**
+   *
+   * TODO: Add return type.
+   * TODO: Remove `catch`
+   */
+  writeToDisk(data: {
+    fileRelativePath: string
+    content: string
+  }): Promise<any> {
+    console.log(data)
+    return fetch(
+      `${this.baseUrl}/___tina/${encodeURIComponent(data.fileRelativePath)}`,
+      {
+        method: 'PUT',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify(data),
+      }
+    ).catch(e => {
+      console.error(e)
+    })
+  }
+
+  /**
+   * Uploads a File to disk
+   * TODO: Remove `catch`
+   */
+  writeMediaToDisk(data: { directory: string; content: File }): Promise<any> {
+    let formData = new FormData()
+    formData.append('file', data.content)
+    formData.append('directory', data.directory)
+    return fetch(`${this.baseUrl}/___tina/upload`, {
+      method: 'POST',
+      body: formData,
+    }).catch(e => {
+      console.error(e)
+    })
+  }
+
+  /**
+   * TODO: rename `data.relPath` to `data.fileRelativePath`
+   * TODO: Add return type.
+   * TODO: Remove `catch`
+   */
+  deleteFromDisk(data: { relPath: string }): Promise<any> {
+    return fetch(
+      `${this.baseUrl}/___tina/${encodeURIComponent(data.relPath)}`,
+      {
+        method: 'DELETE',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify(data),
+      }
+    ).catch(e => {
+      console.error(e)
+    })
+  }
 }
