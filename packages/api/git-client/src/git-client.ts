@@ -51,7 +51,7 @@ export class GitClient {
     name?: string
     email?: string
   }): Promise<any> {
-    return fetch(`${this.baseUrl}/___tina/commit`, {
+    return fetch(`${this.baseUrl}/commit`, {
       method: 'POST',
       headers: {
         'Content-Type': 'application/json; charset=utf-8',
@@ -73,7 +73,7 @@ export class GitClient {
   }): Promise<any> {
     console.log(data)
     return fetch(
-      `${this.baseUrl}/___tina/${encodeURIComponent(data.fileRelativePath)}`,
+      `${this.baseUrl}/${encodeURIComponent(data.fileRelativePath)}`,
       {
         method: 'PUT',
         headers: {
@@ -94,7 +94,7 @@ export class GitClient {
     let formData = new FormData()
     formData.append('file', data.content)
     formData.append('directory', data.directory)
-    return fetch(`${this.baseUrl}/___tina/upload`, {
+    return fetch(`${this.baseUrl}/upload`, {
       method: 'POST',
       body: formData,
     }).catch(e => {
@@ -108,16 +108,13 @@ export class GitClient {
    * TODO: Remove `catch`
    */
   deleteFromDisk(data: { relPath: string }): Promise<any> {
-    return fetch(
-      `${this.baseUrl}/___tina/${encodeURIComponent(data.relPath)}`,
-      {
-        method: 'DELETE',
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-        body: JSON.stringify(data),
-      }
-    ).catch(e => {
+    return fetch(`${this.baseUrl}/${encodeURIComponent(data.relPath)}`, {
+      method: 'DELETE',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(data),
+    }).catch(e => {
       console.error(e)
     })
   }
