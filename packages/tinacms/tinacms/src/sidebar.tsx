@@ -17,7 +17,7 @@ import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from './Globals'
 import { Button } from './components/Button'
 import { CreateContentButton } from './components/CreateContent'
 import { useSidebar } from './sidebarProvider'
-import { ScreenPlugin } from './screen-plugin'
+import { ScreenPlugin } from './plugins/screen-plugin'
 import { useTinaCMS } from './use-tina-cms'
 
 export const Sidebar = () => {
