@@ -4,13 +4,15 @@
   "version": "0.1.0-alpha.20",
   "files": [
     "index.js",
-    "audit.js",
+    "index.d.ts",
     "gatsby-browser.js",
-    "git-api.js",
+    "gatsby-browser.d.ts",
     "gatsby-node.js",
-    "errors.js",
-    "markdownRemark",
-    "file-writer.js"
+    "gatsby-node.d.ts",
+    "gastby-ssr.js",
+    "gastby-ssr.d.ts",
+    "CHANGELOG.md",
+    "README.md"
   ],
   "scripts": {
     "prepublish": "npm run build",
