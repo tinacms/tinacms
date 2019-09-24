@@ -2,6 +2,7 @@ export * from './sidebarProvider'
 export * from './modalProvider'
 export * from './fields'
 export * from './Tina'
+export * from './use-tina-cms'
 
 export { ActionButton } from './components/ActionsMenu'
 
