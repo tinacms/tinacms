@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.20](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0-alpha.19...@tinacms/react-tinacms-remark@0.1.0-alpha.20) (2019-09-23)
+
+**Note:** Version bump only for package @tinacms/react-tinacms-remark
+
+
+
+
+
+# [0.1.0-alpha.19](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0-alpha.18...@tinacms/react-tinacms-remark@0.1.0-alpha.19) (2019-09-23)
+
+**Note:** Version bump only for package @tinacms/react-tinacms-remark
+
+
+
+
+
 # [0.1.0-alpha.18](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0-alpha.17...@tinacms/react-tinacms-remark@0.1.0-alpha.18) (2019-09-21)
 
 **Note:** Version bump only for package @tinacms/react-tinacms-remark
