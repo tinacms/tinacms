@@ -3,10 +3,10 @@ import { ColorPicker } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps } from 'react-select/lib/components/Input'
 
-interface ColorProps {
+export interface ColorFieldProps {
   colorFormat: string
 }
-export const ColorPickerField = wrapFieldsWithMeta<InputProps, ColorProps>(
+export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
   ({ input, field }) => {
     return (
       <ColorPicker colorFormat={(field as any).colorFormat} input={input} />
@@ -16,5 +16,5 @@ export const ColorPickerField = wrapFieldsWithMeta<InputProps, ColorProps>(
 
 export default {
   name: 'color',
-  Component: ColorPickerField,
+  Component: ColorField,
 }

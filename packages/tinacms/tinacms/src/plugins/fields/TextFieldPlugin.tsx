@@ -1,14 +1,14 @@
 import * as React from 'react'
-import { TextField, InputProps } from '@tinacms/fields'
+import { TextField as BaseTextField, InputProps } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
-export const TextInput = wrapFieldsWithMeta<InputProps>(({ input }) => (
-  <TextField {...input} />
+export const TextField = wrapFieldsWithMeta<InputProps>(({ input }) => (
+  <BaseTextField {...input} />
 ))
 
 export default {
   name: 'text',
-  Component: TextInput,
+  Component: TextField,
   validate(value: any, values: any, meta: any, field: any) {
     if (field.required && !value) return 'Required'
   },

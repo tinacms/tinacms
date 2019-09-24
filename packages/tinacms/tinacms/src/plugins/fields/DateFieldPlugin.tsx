@@ -9,7 +9,7 @@ import { useFrameContext } from '../../components/SyledFrame'
 import styled from 'styled-components'
 import { color } from '@tinacms/styles'
 
-export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
+export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
     let [isOpen, setIsOpen] = useState(false)
     let area = useRef(null)
@@ -85,7 +85,7 @@ const DatetimeContainer = styled.div`
 
 export default {
   name: 'date',
-  Component: DateInput,
+  Component: DateField,
   parse(date: any) {
     if (typeof date === 'string') return date
     return date.toDate()
