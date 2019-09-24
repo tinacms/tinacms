@@ -1,6 +1,6 @@
-import { GitSsrApi } from './git-api'
+import { GitClient } from './git-api'
 import { cms } from '@tinacms/tinacms'
 
 exports.onPreRenderHTML = () => {
-  cms.registerApi('git', GitSsrApi)
+  cms.registerApi('git', new GitClient('localhost'))
 }

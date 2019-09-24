@@ -1,6 +1,8 @@
-import { GitApi } from './git-api'
+import { GitClient } from './git-api'
 import { cms } from '@tinacms/tinacms'
 
 exports.onClientEntry = () => {
-  cms.registerApi('git', GitApi)
+  let { protocol, hostname, port } = window.location
+  let baseUrl = `${protocol}//${hostname}${port != '80' ? `:${port}` : ''}`
+  cms.registerApi('git', new GitClient(baseUrl))
 }
