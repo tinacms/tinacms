@@ -2,11 +2,11 @@ import * as React from 'react'
 import { CMSContext } from '@tinacms/react-tinacms'
 import { ModalProvider } from './modalProvider'
 import { SidebarContext } from './sidebarProvider'
-import { cms } from './index'
+import { cms } from '../index'
 import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset, theme } from '@tinacms/styles'
 import { Sidebar } from './sidebar'
-import { SIDEBAR_WIDTH } from './Globals'
+import { SIDEBAR_WIDTH } from '../Globals'
 
 interface TinaProps {
   position: 'fixed' | 'float'
