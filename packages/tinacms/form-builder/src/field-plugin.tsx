@@ -1,6 +1,5 @@
 import { Field } from '@tinacms/core'
 
-// TODO: Move out of here
 export interface FieldPlugin {
   __type: 'field'
   name: string
