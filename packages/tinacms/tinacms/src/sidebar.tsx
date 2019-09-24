@@ -18,10 +18,10 @@ import { Button } from './components/Button'
 import { CreateContentButton } from './components/CreateContent'
 import { useSidebar } from './sidebarProvider'
 import { ScreenPlugin } from './plugins/screen-plugin'
-import { useTinaCMS } from './use-tina-cms'
+import { useTina } from './use-tina'
 
 export const Sidebar = () => {
-  const cms = useTinaCMS()
+  const cms = useTina()
   const sidebar = useSidebar()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)

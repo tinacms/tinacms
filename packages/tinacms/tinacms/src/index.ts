@@ -5,7 +5,7 @@ export * from './modalProvider'
 export * from './fields'
 
 // React
-export * from './use-tina-cms'
+export * from './use-tina'
 
 // Plugins
 export * from './plugins/create-content-form-plugin'
