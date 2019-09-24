@@ -2,7 +2,7 @@
 export * from './components/Tina'
 export * from './components/SidebarProvider'
 export * from './components/ModalProvider'
-export * from './fields'
+export * from './plugins/fields'
 
 // React
 export * from './hooks/use-tina'
@@ -20,9 +20,9 @@ import {
   ToggleField,
   DateInput,
   Markdown,
-} from './fields'
+} from './plugins/fields'
 import { MediaView, SettingsView } from './components/FormView'
-import { ImageUploadInput } from './fields/ImageUploadInput'
+import { ImageUploadInput } from './plugins/fields/ImageUploadInput'
 import { TinaCMS } from './tina-cms'
 
 export const cms = new TinaCMS()
