@@ -19,7 +19,7 @@ import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import EditingFormTitle from './EditingFormTitle'
-import { ScreenPlugin } from '../screen-plugin'
+import { ScreenPlugin } from '../plugins/screen-plugin'
 
 export const FormsView = () => {
   const cms = useCMS()
