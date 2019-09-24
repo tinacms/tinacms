@@ -1,4 +1,3 @@
-import * as figlet from 'figlet'
 import chalk from 'chalk'
 import axios from 'axios'
 import { readConfig } from '../../../config'
