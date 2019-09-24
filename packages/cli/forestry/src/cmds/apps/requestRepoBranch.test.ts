@@ -1,4 +1,4 @@
-import { requestRepoBranch } from './requestRepoBranch'
+import { requestRepo, requestBranch } from './requestRepoBranch'
 
 jest.mock('inquirer')
 jest.mock('simple-git/promise')
@@ -52,12 +52,12 @@ describe('requestRepoBranch', () => {
   })
 
   it('returns origin remote', async () => {
-    const result = await requestRepoBranch()
-    expect(result.repo).toEqual(repoUrl)
+    const result = await requestRepo()
+    expect(result).toEqual(repoUrl)
   })
 
   it('returns selected branch', async () => {
-    const result = await requestRepoBranch()
-    expect(result.branch).toEqual('test1')
+    const result = await requestBranch()
+    expect(result).toEqual('test1')
   })
 })
