@@ -39,7 +39,7 @@ export const Sidebar = () => {
           margin: '0',
           padding: '0',
           border: '0',
-          pointerEvents: open ? 'all' : 'none',
+          pointerEvents: sidebar.isOpen ? 'all' : 'none',
         }}
       >
         <SidebarWrapper open={sidebar.isOpen}>
