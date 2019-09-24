@@ -26,33 +26,6 @@ import { CMS } from '@tinacms/core'
 let cms = new CMS()
 ```
 
-### Add fields plugins:
-
-```javascript
-cms.forms.addFieldPlugin({
-  name: "text",
-  Component({ input, field }) {
-    return (
-      <label name={input.name}>
-        {field.name}
-        <input {...} />
-      </label>
-    )
-  }
-})
-
-```
-
-### Field Plugin Props
-
-```
-- input: [See Input Props here](https://github.com/final-form/react-final-form#fieldrenderprops)
-- meta: [See Meta Props here](https://github.com/final-form/react-final-form#fieldrenderprops)
-- field:
-  - name: string;
-  - component: React.FC<any> | string;
-```
-
 ### Register a new form:
 
 ```javascript
@@ -99,10 +72,4 @@ TODO
 
 #### `all(): Form[]`
 
-#### `addFieldPlugin(): void`
-
-#### `getFieldPlugin(name: string): FieldPlugin | null`
-
 ### `FormOptions<S>`
-
-### `FieldPlugin`

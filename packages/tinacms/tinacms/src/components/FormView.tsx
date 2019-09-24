@@ -4,7 +4,7 @@ import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { TextField } from '@tinacms/fields'
 import { useState } from 'react'
-import { Form, ScreenPlugin } from '@tinacms/core'
+import { Form } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { Modal, ModalBody, ModalHeader } from '..'
 import {
@@ -19,6 +19,7 @@ import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import EditingFormTitle from './EditingFormTitle'
+import { ScreenPlugin } from '../plugins/screen-plugin'
 
 export const FormsView = () => {
   const cms = useCMS()
