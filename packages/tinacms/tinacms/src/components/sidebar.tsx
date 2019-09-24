@@ -18,7 +18,7 @@ import { Button } from './Button'
 import { CreateContentButton } from './CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../plugins/screen-plugin'
-import { useTina } from '../use-tina'
+import { useTina } from '../hooks/use-tina'
 
 export const Sidebar = () => {
   const cms = useTina()
