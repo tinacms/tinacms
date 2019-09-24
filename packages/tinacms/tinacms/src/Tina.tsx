@@ -1,15 +1,10 @@
 import * as React from 'react'
 import { CMSContext } from '@tinacms/react-tinacms'
 import { ModalProvider } from './modalProvider'
-import { SidebarContext, useSidebar } from './sidebarProvider'
+import { SidebarContext } from './sidebarProvider'
 import { cms } from './index'
-import styled, { css, ThemeProvider } from 'styled-components'
-import {
-  GlobalStyles,
-  TinaResetStyles,
-  TinaReset,
-  theme,
-} from '@tinacms/styles'
+import styled, { ThemeProvider } from 'styled-components'
+import { TinaReset, theme } from '@tinacms/styles'
 import { Sidebar } from './sidebar'
 import { SIDEBAR_WIDTH } from './Globals'
 
