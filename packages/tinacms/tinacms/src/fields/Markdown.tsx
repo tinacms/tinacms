@@ -1,7 +1,7 @@
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
-import { useFrameContext } from '../components/styled-frame'
+import { useFrameContext } from '../components/SyledFrame'
 import * as React from 'react'
 import { color } from '@tinacms/styles'
 
