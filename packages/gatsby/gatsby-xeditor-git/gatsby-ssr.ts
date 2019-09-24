@@ -1,4 +1,4 @@
-import { GitClient } from './git-api'
+import { GitClient } from '@tinacms/git-client'
 import { cms } from '@tinacms/tinacms'
 
 exports.onPreRenderHTML = () => {
