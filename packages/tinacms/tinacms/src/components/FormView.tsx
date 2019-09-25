@@ -69,7 +69,7 @@ export const FormsView = () => {
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
           return (
-            <TransitionForm isEditing={isEditing}>
+            <FormAnimation isEditing={isEditing}>
               <FormHeader
                 isMultiform={isMultiform}
                 form={editingForm as any}
@@ -83,15 +83,15 @@ export const FormsView = () => {
                     <NoFieldsPlaceholder />
                   ))}
               </FormBody>
-              <FormsFooter>
+              <FormFooter>
                 {editingForm.actions.length > 0 && (
                   <ActionsMenu actions={editingForm.actions} />
                 )}
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
-              </FormsFooter>
-            </TransitionForm>
+              </FormFooter>
+            </FormAnimation>
           )
         }}
       </FormBuilder>
@@ -244,7 +244,7 @@ export const FormBody = styled.div`
   }
 `
 
-const FormsFooter = styled.div`
+const FormFooter = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -255,12 +255,23 @@ const FormsFooter = styled.div`
   flex: 0 0 4rem;
 `
 
-const TransitionForm = styled.section<{ isEditing: Boolean }>`
+const FormAnimation = styled.section<{ isEditing: Boolean }>`
   display: flex;
   flex-grow: 1;
   flex-direction: column;
-  transition: transform 150ms ease-out;
-  transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
+  overflow: hidden;
+  ${FormHeader} {
+    transition: transform 150ms ease-out;
+    transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
+  }
+  ${FormBody} {
+    transition: transform 150ms ease-out;
+    transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
+  }
+  ${FormFooter} {
+    transition: transform 150ms ease-out;
+    transform: translate3d(0, ${p => (!p.isEditing ? '100%' : '0')}, 0);
+  }
 `
 
 export const SaveButton = styled(Button)`
