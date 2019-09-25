@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/forestry-cli",
-  "version": "0.1.0-alpha.8",
+  "version": "0.1.0-alpha.14",
   "license": "MIT",
   "devDependencies": {
     "@types/clear": "0.1.0",
@@ -9,14 +9,14 @@
     "@types/figlet": "1.2.0",
     "@types/inquirer": "^6.5.0",
     "@types/listr": "0.14.2",
-    "cms-scripts": "^0.1.0-alpha.2",
+    "cms-scripts": "^0.1.0-alpha.3",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "bin": {
-    "forestry": "bin/forestry"
+    "forestry-api": "./bin/forestry"
   },
   "scripts": {
     "build": "tsc",
@@ -24,7 +24,8 @@
     "watch": "tsc -w"
   },
   "files": [
-    "build"
+    "build",
+    "bin"
   ],
   "dependencies": {
     "axios": "0.19.0",
@@ -39,6 +40,8 @@
     "listr": "0.14.3",
     "open": "^6.4.0",
     "path": "^0.12.7",
-    "simple-git": "1.124.0"
+    "simple-git": "1.124.0",
+    "dotenv": "8.1.0",
+    "commander": "3.0.1"
   }
 }

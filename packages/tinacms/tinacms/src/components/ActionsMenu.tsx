@@ -4,7 +4,7 @@ import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { padding } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
-import { useFrameContext } from '../styled-frame'
+import { useFrameContext } from './SyledFrame'
 
 export interface ActionsMenuProps {
   actions: any[]

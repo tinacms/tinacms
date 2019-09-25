@@ -38,7 +38,7 @@ export const promptConfig = async (defaults: Config) => {
     return defaults
   } else {
     const configKeys = [...Object.keys(defaults)]
-    var questions = configKeys.map(key => {
+    let questions = configKeys.map(key => {
       return {
         message: `${key}`,
         type: 'input',
