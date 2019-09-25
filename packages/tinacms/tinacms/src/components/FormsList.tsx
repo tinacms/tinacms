@@ -87,13 +87,30 @@ const slideIn = keyframes`
   }
 `
 
+function slideInMixin(i: number) {
+  return `
+    &:nth-child(${i + 1}) {
+      animation-delay: ${25 * i}ms;
+    }
+  `
+}
+
+function staggerSlideIn() {
+  let animationCss = ''
+  for (let index = 0; index < 15; index += 1) {
+    animationCss += slideInMixin(index)
+  }
+  return animationCss
+}
+
 const StyledFormList = styled.ul<{ isEditing: Boolean }>`
   padding: ${padding()}rem;
-  transition: transform 150ms ease-out;
-  transform: translate3d(${p => (p.isEditing ? `-100%` : '0')}, 0, 0);
   cursor: pointer;
   list-style: none;
   margin: 0;
   padding: 0;
-  animation: ${slideIn} 150ms ease-out both 1;
+  ${FormListItem} {
+    animation: ${slideIn} 150ms ease-out both 1;
+    ${staggerSlideIn()}
+  }
 `
