@@ -8,7 +8,7 @@ import { padding, color } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
-import EditingFormTitle from './EditingFormTitle'
+import { LeftArrowIcon } from '@tinacms/icons'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -70,7 +70,7 @@ export const FormsView = () => {
         {({ handleSubmit, pristine, form }) => {
           return (
             <TransitionForm isEditing={isEditing}>
-              <EditingFormTitle
+              <FormHeader
                 isMultiform={isMultiform}
                 form={editingForm as any}
                 setEditingForm={setEditingForm as any}
@@ -195,6 +195,41 @@ const CreateButton = styled(Button)`
   width: 100%;
 `
 
+const FormHeader = styled(
+  ({ form, setEditingForm, isMultiform, ...styleProps }: any) => {
+    return (
+      <div {...styleProps} onClick={() => isMultiform && setEditingForm(null)}>
+        {isMultiform && <LeftArrowIcon />}
+        {form.label}
+      </div>
+    )
+  }
+)`
+  cursor: ${p => p.isMultiform && 'pointer'};
+  background-color: white;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
+  display: flex;
+  align-items: center;
+  padding: ${padding('small')}rem ${padding()}rem;
+  color: inherit;
+  font-size: 1.2rem;
+  transition: color 250ms ease-out;
+  svg {
+    width: 1.25rem;
+    fill: ${color('medium')};
+    height: auto;
+    transform: translate3d(-4px, 0, 0);
+    transition: transform 250ms ease-out;
+  }
+  :hover {
+    color: ${p => p.isMultiform && `${p.theme.color.primary}`};
+    svg {
+      transform: translate3d(-7px, 0, 0);
+      transition: transform 250ms ease;
+    }
+  }
+`
+
 export const FormBody = styled.div`
   scrollbar-width: none;
   width: 100%;
@@ -209,14 +244,6 @@ export const FormBody = styled.div`
   }
 `
 
-const TransitionForm = styled.section<{ isEditing: Boolean }>`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  transition: transform 150ms ease-out;
-  transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
-`
-
 const FormsFooter = styled.div`
   display: flex;
   justify-content: space-between;
@@ -226,6 +253,14 @@ const FormsFooter = styled.div`
   border-top: 1px solid #efefef;
   padding: 0.75rem 1.25rem;
   flex: 0 0 4rem;
+`
+
+const TransitionForm = styled.section<{ isEditing: Boolean }>`
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  transition: transform 150ms ease-out;
+  transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
 `
 
 export const SaveButton = styled(Button)`
