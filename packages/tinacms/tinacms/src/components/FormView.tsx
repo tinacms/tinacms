@@ -78,12 +78,12 @@ export const FormsView = () => {
                   <NoFieldsPlaceholder />
                 ))}
               <FormsFooter>
-                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
-                  Save
-                </SaveButton>
                 {editingForm.actions.length > 0 && (
                   <ActionsMenu actions={editingForm.actions} />
                 )}
+                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
+                  Save
+                </SaveButton>
               </FormsFooter>
             </TransitionForm>
           )
