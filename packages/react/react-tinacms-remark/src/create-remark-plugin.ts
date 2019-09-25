@@ -13,13 +13,20 @@ interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
 }
 
 const DEFAULT_REMARK_FIELDS = [
-  { name: 'title', component: 'text', label: 'Title' },
+  {
+    name: 'filename',
+    component: 'text',
+    label: 'Filename',
+    placeholder: 'content/blog/hello-world/index.md',
+    description:
+      'The full path to the new markdown file, relative to the repository root.',
+  },
 ]
 
 export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
 ): AddContentPlugin {
-  let formatFilename = options.filename || ((value: any) => value.title)
+  let formatFilename = options.filename || ((value: any) => value.filepath)
   let createFrontmatter = options.frontmatter || (() => ({}))
   let createBody = options.body || (() => '')
   return {
@@ -44,3 +51,16 @@ export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
     },
   }
 }
+
+createRemarkButton({
+  label: 'Create Post',
+  filename(form) {
+    return `blog/content/${form.title}/index.md`
+  },
+  frontmatter(form) {
+    return {
+      title: form.title,
+      date: new Date(),
+    }
+  },
+})
