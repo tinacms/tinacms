@@ -2,6 +2,7 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
 import styled from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
+import { padding } from '@tinacms/styles'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -120,10 +121,22 @@ const Panel = styled(function Panel({
 
   return (
     <div {...styleProps}>
+      <button onClick={() => setExpanded(false)}>Back</button>
       {isExpanded ? <FieldsBuilder form={form} fields={fields} /> : null}
     </div>
   )
-})``
+})`
+  position: fixed;
+  width: 100%;
+  height: 100%;
+  top: 4rem;
+  left: ${p => (p.isExpanded ? '0' : 'calc(100% - 0px)')};
+  overflow-y: auto;
+  background: white;
+  padding: ${padding()}rem;
+  z-index: 500;
+  transition: left 0.35s ease, max-height 0.5s ease;
+`
 
 export interface GroupFieldProps {
   field: Field
