@@ -1,7 +1,7 @@
 # TinaCMS
 
+[![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
-![Build](https://github.com/tinacms/tinacms/workflows/.github/workflows/main.yml/badge.svg)
 
 ## Getting Started
 
