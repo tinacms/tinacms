@@ -153,7 +153,18 @@ const BlogPostForm = {
       label: "Fake Author",
       name: "rawFrontmatter.fakeAuthor",
       component: "group",
-      fields: [{ name: "name", component: "text" }],
+      fields: [
+        { name: "name", component: "text" },
+        {
+          name: "social",
+          component: "group",
+          fields: [
+            { name: "twitter", component: "text" },
+            { name: "facebook", component: "text" },
+            { name: "instagram", component: "text" },
+          ],
+        },
+      ],
     },
     {
       label: "Title",

@@ -13,10 +13,12 @@ export interface GroupProps {
   input: any
   meta: any
   field: GroupFieldDefinititon
-  form: Form
+  form: any
+  tinaForm: Form
 }
 
 export const Group = styled(function Group({
+  tinaForm,
   form,
   field,
   input,
@@ -34,7 +36,7 @@ export const Group = styled(function Group({
         isExpanded={isExpanded}
         setExpanded={setExpanded}
         field={field}
-        form={form}
+        tinaForm={tinaForm}
       />
     </div>
   )
@@ -101,14 +103,14 @@ const Header = styled.div`
 interface PanelProps {
   setExpanded(next: boolean): void
   isExpanded: boolean
-  form: Form
+  tinaForm: Form
   field: GroupFieldDefinititon
 }
 
 const Panel = styled(function Panel({
   setExpanded,
   isExpanded,
-  form,
+  tinaForm,
   field,
   ...styleProps
 }: PanelProps) {
@@ -122,7 +124,7 @@ const Panel = styled(function Panel({
   return (
     <div {...styleProps}>
       <button onClick={() => setExpanded(false)}>Back</button>
-      {isExpanded ? <FieldsBuilder form={form} fields={fields} /> : null}
+      {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
     </div>
   )
 })`
