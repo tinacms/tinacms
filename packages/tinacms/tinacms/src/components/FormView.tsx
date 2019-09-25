@@ -8,7 +8,7 @@ import { padding, color } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
-import EditingFormTitle from './EditingFormTitle'
+import { LeftArrowIcon } from '@tinacms/icons'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -47,7 +47,13 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length) return <NoFormsPlaceholder />
+  if (!forms.length)
+    return (
+      <FormBody>
+        <NoFormsPlaceholder />
+      </FormBody>
+    )
+
   if (!editingForm)
     return (
       <FormsList
@@ -63,29 +69,29 @@ export const FormsView = () => {
       <FormBuilder form={editingForm as any}>
         {({ handleSubmit, pristine, form }) => {
           return (
-            <TransitionForm isEditing={isEditing}>
-              <EditingFormTitle
+            <FormAnimation isEditing={isEditing}>
+              <FormHeader
                 isMultiform={isMultiform}
                 form={editingForm as any}
                 setEditingForm={setEditingForm as any}
               />
-              {editingForm &&
-                (editingForm.fields.length ? (
-                  <FieldsWrapper>
+              <FormBody>
+                {editingForm &&
+                  (editingForm.fields.length ? (
                     <FieldsBuilder form={editingForm} />
-                  </FieldsWrapper>
-                ) : (
-                  <NoFieldsPlaceholder />
-                ))}
-              <FormsFooter>
-                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
-                  Save
-                </SaveButton>
+                  ) : (
+                    <NoFieldsPlaceholder />
+                  ))}
+              </FormBody>
+              <FormFooter>
                 {editingForm.actions.length > 0 && (
                   <ActionsMenu actions={editingForm.actions} />
                 )}
-              </FormsFooter>
-            </TransitionForm>
+                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
+                  Save
+                </SaveButton>
+              </FormFooter>
+            </FormAnimation>
           )
         }}
       </FormBuilder>
@@ -100,24 +106,22 @@ const Emoji = styled.span`
 `
 
 const EmptyState = styled.div`
-  padding: ${padding()}rem;
-  flex: 1 0 auto;
   > *:first-child {
-    margin: 0 0 1rem 0;
+    margin: 0 0 ${padding('big')} 0;
   }
   h3 {
     font-size: 1.2rem;
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 1rem 0;
+    margin: 0 0 ${padding('big')} 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 1rem 0;
+    margin: 0 0 ${padding('big')} 0;
   }
 `
 
@@ -191,7 +195,42 @@ const CreateButton = styled(Button)`
   width: 100%;
 `
 
-export const FieldsWrapper = styled.div`
+const FormHeader = styled(
+  ({ form, setEditingForm, isMultiform, ...styleProps }: any) => {
+    return (
+      <div {...styleProps} onClick={() => isMultiform && setEditingForm(null)}>
+        {isMultiform && <LeftArrowIcon />}
+        {form.label}
+      </div>
+    )
+  }
+)`
+  cursor: ${p => p.isMultiform && 'pointer'};
+  background-color: white;
+  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
+  display: flex;
+  align-items: center;
+  padding: ${padding('small')}rem ${padding()}rem;
+  color: inherit;
+  font-size: 1.2rem;
+  transition: color 250ms ease-out;
+  svg {
+    width: 1.25rem;
+    fill: ${color('medium')};
+    height: auto;
+    transform: translate3d(-4px, 0, 0);
+    transition: transform 250ms ease-out;
+  }
+  :hover {
+    color: ${p => p.isMultiform && `${p.theme.color.primary}`};
+    svg {
+      transform: translate3d(-7px, 0, 0);
+      transition: transform 250ms ease;
+    }
+  }
+`
+
+export const FormBody = styled.div`
   scrollbar-width: none;
   width: 100%;
   padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
@@ -205,15 +244,7 @@ export const FieldsWrapper = styled.div`
   }
 `
 
-const TransitionForm = styled.section<{ isEditing: Boolean }>`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
-  transition: transform 150ms ease-out;
-  transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
-`
-
-const FormsFooter = styled.div`
+const FormFooter = styled.div`
   display: flex;
   justify-content: space-between;
   width: 100%;
@@ -222,6 +253,25 @@ const FormsFooter = styled.div`
   border-top: 1px solid #efefef;
   padding: 0.75rem 1.25rem;
   flex: 0 0 4rem;
+`
+
+const FormAnimation = styled.section<{ isEditing: Boolean }>`
+  display: flex;
+  flex-grow: 1;
+  flex-direction: column;
+  overflow: hidden;
+  ${FormHeader} {
+    transition: transform 150ms ease-out;
+    transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
+  }
+  ${FormBody} {
+    transition: transform 150ms ease-out;
+    transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
+  }
+  ${FormFooter} {
+    transition: transform 150ms ease-out;
+    transform: translate3d(0, ${p => (!p.isEditing ? '100%' : '0')}, 0);
+  }
 `
 
 export const SaveButton = styled(Button)`
