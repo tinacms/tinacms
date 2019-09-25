@@ -51,16 +51,3 @@ export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
     },
   }
 }
-
-createRemarkButton({
-  label: 'Create Post',
-  filename(form) {
-    return `blog/content/${form.title}/index.md`
-  },
-  frontmatter(form) {
-    return {
-      title: form.title,
-      date: new Date(),
-    }
-  },
-})
