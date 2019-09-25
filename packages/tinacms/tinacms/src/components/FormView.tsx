@@ -47,7 +47,13 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length) return <NoFormsPlaceholder />
+  if (!forms.length)
+    return (
+      <FormBody>
+        <NoFormsPlaceholder />
+      </FormBody>
+    )
+
   if (!editingForm)
     return (
       <FormsList
@@ -69,14 +75,14 @@ export const FormsView = () => {
                 form={editingForm as any}
                 setEditingForm={setEditingForm as any}
               />
-              {editingForm &&
-                (editingForm.fields.length ? (
-                  <FieldsWrapper>
+              <FormBody>
+                {editingForm &&
+                  (editingForm.fields.length ? (
                     <FieldsBuilder form={editingForm} />
-                  </FieldsWrapper>
-                ) : (
-                  <NoFieldsPlaceholder />
-                ))}
+                  ) : (
+                    <NoFieldsPlaceholder />
+                  ))}
+              </FormBody>
               <FormsFooter>
                 {editingForm.actions.length > 0 && (
                   <ActionsMenu actions={editingForm.actions} />
@@ -100,24 +106,22 @@ const Emoji = styled.span`
 `
 
 const EmptyState = styled.div`
-  padding: ${padding()}rem;
-  flex: 1 0 auto;
   > *:first-child {
-    margin: 0 0 1rem 0;
+    margin: 0 0 ${padding('big')} 0;
   }
   h3 {
     font-size: 1.2rem;
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 1rem 0;
+    margin: 0 0 ${padding('big')} 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 1rem 0;
+    margin: 0 0 ${padding('big')} 0;
   }
 `
 
@@ -191,7 +195,7 @@ const CreateButton = styled(Button)`
   width: 100%;
 `
 
-export const FieldsWrapper = styled.div`
+export const FormBody = styled.div`
   scrollbar-width: none;
   width: 100%;
   padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
