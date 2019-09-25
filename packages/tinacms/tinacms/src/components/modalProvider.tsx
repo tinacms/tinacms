@@ -112,10 +112,12 @@ export const ModalBody = styled.div`
 
 export const ModalActions = styled.div`
   display: flex;
-  justify-content: space-between;
+  justify-content: flex-end;
   border-radius: 0 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big};
   padding: 0 ${padding()}rem ${padding()}rem ${padding()}rem;
   ${Button} {
+    flex: 0 1 auto;
+    min-width: 8rem;
     margin: 0 ${padding('small')}rem;
     &:first-child {
       margin-left: 0;
