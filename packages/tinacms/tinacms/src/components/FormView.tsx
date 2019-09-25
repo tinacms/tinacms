@@ -72,7 +72,10 @@ export const FormsView = () => {
               {editingForm &&
                 (editingForm.fields.length ? (
                   <FieldsWrapper>
-                    <FieldsBuilder form={editingForm} />
+                    <FieldsBuilder
+                      form={editingForm}
+                      fields={editingForm.fields}
+                    />
                   </FieldsWrapper>
                 ) : (
                   <NoFieldsPlaceholder />
