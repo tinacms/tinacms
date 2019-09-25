@@ -1,28 +1,32 @@
 {
   "name": "@tinacms/gatsby-tinacms-git",
   "main": "index.js",
-  "version": "0.1.0-alpha.18",
+  "version": "0.1.0-alpha.20",
   "files": [
     "index.js",
-    "audit.js",
+    "index.d.ts",
     "gatsby-browser.js",
-    "git-api.js",
+    "gatsby-browser.d.ts",
     "gatsby-node.js",
-    "errors.js",
-    "markdownRemark",
-    "file-writer.js"
+    "gatsby-node.d.ts",
+    "gastby-ssr.js",
+    "gastby-ssr.d.ts",
+    "CHANGELOG.md",
+    "README.md"
   ],
   "scripts": {
     "prepublish": "npm run build",
     "watch": "tsc -w",
+    "dev": "tsc",
     "build": "tsc"
   },
   "dependencies": {
-    "@tinacms/api-git": "^0.1.0-alpha.11",
-    "@tinacms/core": "^0.1.0-alpha.7",
-    "@tinacms/gatsby-plugin-tinacms": "^0.1.0-alpha.16",
-    "@tinacms/react-tinacms": "^0.1.0-alpha.10",
-    "@tinacms/tinacms": "^0.1.0-alpha.16",
+    "@tinacms/api-git": "^0.1.0-alpha.12",
+    "@tinacms/git-client": "^0.1.0-alpha.0",
+    "@tinacms/core": "^0.1.0-alpha.8",
+    "@tinacms/gatsby-plugin-tinacms": "^0.1.0-alpha.18",
+    "@tinacms/react-tinacms": "^0.1.0-alpha.11",
+    "@tinacms/tinacms": "^0.1.0-alpha.18",
     "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0",
     "@types/js-yaml": "^3.12.1",

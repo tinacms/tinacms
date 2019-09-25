@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const git = require('simple-git/promise')
-var multer = require('multer')
+let multer = require('multer')
 
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
@@ -28,7 +28,7 @@ export function router() {
   let pathRoot = process.cwd()
   const tmpImgDir = path.join(pathRoot, '/tmp/')
 
-  var tmpImgStorage = multer.diskStorage({
+  let tmpImgStorage = multer.diskStorage({
     destination: function(req: any, file: any, cb: any) {
       verifyUploadPath(tmpImgDir, () => {
         cb(null, tmpImgDir)

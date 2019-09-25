@@ -7,7 +7,7 @@ const AUTH0_BASE_URL = 'https://forestryio.auth0.com'
 const CALLBACK_ROUTE = '/auth/callback'
 
 export const waitForAuth = (app: express.Express) => {
-  var verifier = base64URLEncode(randomBytes(32))
+  let verifier = base64URLEncode(randomBytes(32))
   const authUrl = createAuthURL(verifier)
 
   const authResult = new Promise(resolve => {
@@ -17,9 +17,7 @@ export const waitForAuth = (app: express.Express) => {
         client_id: process.env.AUTH0_CLIENT_ID,
         code_verifier: verifier,
         code: req.query.code,
-        redirect_uri: `http://localhost:${
-          process.env.AUTH_CALLBACK_PORT
-        }${CALLBACK_ROUTE}`,
+        redirect_uri: `http://localhost:${process.env.AUTH_CALLBACK_PORT}${CALLBACK_ROUTE}`,
       })
 
       resolve(body.data)
@@ -37,15 +35,13 @@ export const waitForAuth = (app: express.Express) => {
 }
 
 function createAuthURL(verifier: string) {
-  var challenge = base64URLEncode(sha256(verifier))
+  let challenge = base64URLEncode(sha256(verifier))
   const callback = encodeURIComponent(
     `http://localhost:${process.env.AUTH_CALLBACK_PORT}${CALLBACK_ROUTE}`
   )
 
   return (
-    `${AUTH0_BASE_URL}/authorize?client_id=${
-      process.env.AUTH0_CLIENT_ID
-    }&redirect_uri=${callback}&response_type=code&code_challenge_method=S256&code_challenge=${challenge}` +
+    `${AUTH0_BASE_URL}/authorize?client_id=${process.env.AUTH0_CLIENT_ID}&redirect_uri=${callback}&response_type=code&code_challenge_method=S256&code_challenge=${challenge}` +
     `&scope=offline_access&audience=${encodeURIComponent(
       'https://api.forestry.io'
     )}`
