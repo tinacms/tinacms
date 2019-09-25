@@ -8,11 +8,17 @@ import {
   stopEditingLink,
   updateLinkBeingEdited,
 } from '../../../commands'
+import styled, { StyleSheetManager } from 'styled-components'
+import { FC } from 'react'
 
 export class LinkFormController {
   clickTarget: HTMLElement | null = null
 
-  constructor(protected renderTarget: HTMLElement, protected view: EditorView) {
+  constructor(
+    protected renderTarget: HTMLElement,
+    protected view: EditorView,
+    protected frame?: { document: Document }
+  ) {
     //
   }
 
@@ -24,47 +30,33 @@ export class LinkFormController {
   unmount = () => unmountComponentAtNode(this.renderTarget)
 
   component(): any {
-    const minWidth = 200
-    const arrowSize = 14
+    const minWidth = 240
     const left = calcLeftOffset(this.clickTarget!, this.renderTarget, minWidth)
     const top = `calc(2rem + ${this.clickTarget!.offsetTop -
       this.renderTarget.offsetTop}px)`
+    const arrowOffset = calcArrowLeftOffset(
+      this.clickTarget!,
+      this.renderTarget,
+      minWidth
+    )
     return (
-      <div
-      // className={c('link-form--container')}
-      >
-        <div
-          // className={c('link-form--arrow-container')}
-          style={{
-            left: calcArrowLeftOffset(
-              this.clickTarget!,
-              this.renderTarget,
-              minWidth
-            ),
-            top,
-          }}
-        >
-          <div
-            // className={c('link-form--arrow')}
+      <ViewContainer frame={this.frame}>
+        <>
+          <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+          <LinkForm
             style={{
-              width: `${arrowSize}px`,
-              height: `${arrowSize}px`,
+              left,
+              top,
+              minWidth: `${minWidth}px`,
             }}
+            removeLink={this.removeLink}
+            onChange={this.onChange}
+            href={this.href}
+            title={this.title}
+            cancel={this.cancel}
           />
-        </div>
-        <LinkForm
-          style={{
-            left,
-            top,
-            minWidth: `${minWidth}px`,
-          }}
-          removeLink={this.removeLink}
-          onChange={this.onChange}
-          href={this.href}
-          title={this.title}
-          cancel={this.cancel}
-        />
-      </div>
+        </>
+      </ViewContainer>
     )
   }
 
@@ -88,6 +80,28 @@ export class LinkFormController {
     })
   }
 }
+
+const ViewContainer: FC<{ frame: any }> = ({ frame, children }) => {
+  if (!frame) return <>{children}</>
+  return (
+    <StyleSheetManager target={frame.document.head}>
+      {children}
+    </StyleSheetManager>
+  )
+}
+
+const LinkArrow = styled.div<{ offset: string; top: string }>`
+  position: absolute;
+  top: ${p => p.top};
+  left: ${p => p.offset};
+  margin-top: 3px;
+  transform: translate3d(-50%, -100%, 0);
+  width: 1rem;
+  height: 0.8rem;
+  clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+  background-color: white;
+  z-index: 100;
+`
 
 /**
  * Calculates the leftOffset of the form.
@@ -114,12 +128,12 @@ function calcLeftOffset(
 
   let leftEdgeOutsideView = ol < -ol_rt
   if (leftEdgeOutsideView) {
-    return `-1rem`
+    return `-0.5rem`
   }
 
   const rightEdgeOutsideView = ol + minWidth > ow_rt
   if (rightEdgeOutsideView) {
-    return `calc(${ol - (ol + minWidth - ow_rt)}px + 1rem)`
+    return `calc(${ol - (ol + minWidth - ow_rt)}px + 0.5rem)`
   }
 
   return `${ol}px`

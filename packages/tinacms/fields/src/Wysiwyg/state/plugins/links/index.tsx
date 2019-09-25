@@ -24,7 +24,7 @@ export function links(schema: Schema, frame?: { document: Document }): Plugin {
     },
     view(editorView: any) {
       insertElBefore(renderTarget, editorView.dom)
-      linkForm = new LinkFormController(renderTarget, editorView as any)
+      linkForm = new LinkFormController(renderTarget, editorView as any, frame)
       let doc
       if (frame) {
         doc = frame.document
