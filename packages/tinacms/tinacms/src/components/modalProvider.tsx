@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
-import { StyledFrame } from './styled-frame'
-import styled, { ThemeProvider } from 'styled-components'
-import { Z_INDEX } from './Globals'
+import { StyledFrame } from './SyledFrame'
+import styled from 'styled-components'
+import { Z_INDEX } from '../Globals'
 import { GlobalStyles, padding } from '@tinacms/styles'
-import { Button } from './components/Button'
+import { Button } from './Button'
 
 interface Props {
   children: any
