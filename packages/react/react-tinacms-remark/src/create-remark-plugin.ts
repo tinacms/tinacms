@@ -2,19 +2,22 @@ import { toMarkdownString } from './to-markdown'
 import { CMS, Field } from '@tinacms/core'
 import { AddContentPlugin } from '@tinacms/tinacms'
 
-interface CreateRemarkButtonOptions {
+type MaybePromise<T> = Promise<T> | T
+
+interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
   label: string
-  filename(value: string): Promise<string> | string
-  frontmatter(value: string): Promise<object> | object
-  body(value: string): Promise<string> | string
+  filename?(value: FormShape): MaybePromise<string>
+  frontmatter?(value: FormShape): MaybePromise<FrontmatterShape>
+  body?(value: FormShape): MaybePromise<string>
   fields?: Field[]
 }
+
 const DEFAULT_REMARK_FIELDS = [
   { name: 'title', component: 'text', label: 'Title' },
 ]
 
-export function createRemarkButton(
-  options: CreateRemarkButtonOptions
+export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
+  options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
 ): AddContentPlugin {
   let formatFilename = options.filename || ((value: any) => value.title)
   let createFrontmatter = options.frontmatter || (() => ({}))
