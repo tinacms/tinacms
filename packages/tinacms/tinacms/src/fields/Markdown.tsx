@@ -60,6 +60,14 @@ export const Markdown = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     div[contenteditable] {
       display: inline-block;
     }
+
+    > *:first-child {
+      margin-top: 0;
+    }
+
+    > *:last-child {
+      margin-bottom: 0;
+    }
   }
 
   // Base styling
