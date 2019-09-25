@@ -79,6 +79,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
                   <field.component
                     {...fieldProps}
                     form={form.finalForm}
+                    tinaForm={form}
                     field={field}
                   />
                 )
@@ -89,6 +90,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
                   <plugin.Component
                     {...fieldProps}
                     form={form.finalForm}
+                    tinaForm={form}
                     field={field}
                   />
                 )
