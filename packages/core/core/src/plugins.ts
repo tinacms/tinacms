@@ -9,7 +9,7 @@ export interface Plugin {
 export class PluginManager {
   private plugins: Map<PluginType> = {}
 
-  findOrCreateMap<T extends Plugin = Plugin>(type: string): PluginType<T> {
+  findOrCreateMap<T extends Plugin = Plugin>(type: T['__type']): PluginType<T> {
     return (this.plugins[type] =
       this.plugins[type] || new PluginType(type)) as PluginType<T>
   }
