@@ -5,11 +5,11 @@ import * as ReactDatetime from 'react-datetime'
 import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
-import { useFrameContext } from '../styled-frame'
+import { useFrameContext } from '../../components/SyledFrame'
 import styled from 'styled-components'
 import { color } from '@tinacms/styles'
 
-export const DateInput = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
+export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
     let [isOpen, setIsOpen] = useState(false)
     let area = useRef(null)
@@ -82,3 +82,12 @@ const DatetimeContainer = styled.div`
     }
   }
 `
+
+export default {
+  name: 'date',
+  Component: DateField,
+  parse(date: any) {
+    if (typeof date === 'string') return date
+    return date.toDate()
+  },
+}
