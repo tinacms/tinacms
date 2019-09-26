@@ -1,4 +1,5 @@
 import { FormApi, createForm, Config } from 'final-form'
+import arrayMutators from 'final-form-arrays'
 
 export class Form<S = any> {
   id: any
@@ -7,11 +8,17 @@ export class Form<S = any> {
   finalForm: FormApi<S>
   actions: any[]
 
-  constructor({  id, label, fields, actions, ...options }: FormOptions<S>) {
+  constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
     this.id = id
     this.label = label
     this.fields = fields
-    this.finalForm = createForm<S>(options)
+    this.finalForm = createForm<S>({
+      ...options,
+      mutators: {
+        ...arrayMutators,
+        ...options.mutators,
+      },
+    })
     this.actions = actions || []
   }
 
