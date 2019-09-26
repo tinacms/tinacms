@@ -12,6 +12,7 @@ import ColorFieldPlugin from './plugins/fields/ColorFieldPlugin'
 import ToggleFieldPlugin from './plugins/fields/ToggleFieldPlugin'
 import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
+import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 
 export const cms = new TinaCMS()
 
@@ -26,3 +27,4 @@ cms.fields.add(ColorFieldPlugin)
 cms.fields.add(ToggleFieldPlugin)
 cms.fields.add(MarkdownFieldPlugin)
 cms.fields.add(GroupFieldPlugin)
+cms.fields.add(GroupListFieldPlugin)
