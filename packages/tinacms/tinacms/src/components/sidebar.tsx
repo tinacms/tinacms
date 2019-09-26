@@ -307,7 +307,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   flex-direction: column;
   flex-wrap: nowrap;
   width: ${SIDEBAR_WIDTH}px;
-  overflow: hidden;
+  overflow: visible;
   height: 100%;
   left: 0;
   top: 0;
@@ -325,7 +325,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   }
   &:before {
     /* Animate box-shadow with opacity for better performance */
-    box-shadow: 0 0 3px rgba(0, 0, 0, 0.1), 2px 0 8px rgba(0, 0, 0, 0.15);
+    box-shadow: 0 0 3px rgba(0, 0, 0, 0.07), 2px 0 8px rgba(0, 0, 0, 0.07);
     transition: all ${p => (p.open ? 150 : 200)}ms ease-out;
     opacity: ${p => (p.open ? 1 : 0)};
   }

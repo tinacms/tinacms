@@ -56,8 +56,8 @@ const FormModal = ({ plugin, close }: any) => {
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
               <ModalActions>
-                <SaveButton onClick={handleSubmit as any}>Create</SaveButton>
                 <CancelButton onClick={close}>Cancel</CancelButton>
+                <SaveButton onClick={handleSubmit as any}>Create</SaveButton>
               </ModalActions>
             </ModalPopup>
           )
