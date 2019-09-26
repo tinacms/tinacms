@@ -49,6 +49,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
         let plugin = cms.plugins
           .findOrCreateMap<FieldPlugin>('field')
           .find(field.component as string)
+
         let type: string | undefined
         if (plugin && plugin.type) {
           type = plugin.type
@@ -60,6 +61,12 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
           parse = plugin.parse
         }
 
+        let defaultValue = field.defaultValue
+
+        if (!parse && plugin && plugin.defaultValue) {
+          defaultValue = plugin.defaultValue
+        }
+
         return (
           <FinalField
             name={field.name}
@@ -67,6 +74,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
             type={type}
             parse={parse}
             format={field.format}
+            defaultValue={defaultValue}
             validate={(value, values, meta) => {
               if (plugin && plugin.validate) {
                 return plugin.validate(value, values, meta, field)
