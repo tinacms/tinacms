@@ -238,4 +238,5 @@ interface GroupFieldProps {
 export default {
   name: 'group-list',
   Component: Group,
+  defaultValue: [],
 }
