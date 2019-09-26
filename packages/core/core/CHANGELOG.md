@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.9](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.0-alpha.8...@tinacms/core@0.1.0-alpha.9) (2019-09-25)
+
+
+### Bug Fixes
+
+* tighten types around `cms.plugins.findOrCreateMap` ([2791bf7](https://github.com/tinacms/tinacms/commit/2791bf7))
+
+
+
+
+
 # [0.1.0-alpha.8](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.0-alpha.7...@tinacms/core@0.1.0-alpha.8) (2019-09-23)
 
 **Note:** Version bump only for package @tinacms/core
