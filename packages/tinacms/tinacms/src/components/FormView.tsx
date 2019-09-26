@@ -9,7 +9,7 @@ import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import EditingFormTitle from './EditingFormTitle'
-import { DragDropContext } from 'react-beautiful-dnd'
+import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -45,6 +45,18 @@ export const FormsView = () => {
     editingForm ? setIsEditing(true) : setIsEditing(false)
   })
 
+  let moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      let form = editingForm!.finalForm
+      if (!result.destination) return
+      let { move } = form.mutators
+
+      let name = result.type
+      move(name, result.source.index, result.destination.index)
+    },
+    [editingForm]
+  )
+
   /**
    * No Forms
    */
@@ -61,9 +73,9 @@ export const FormsView = () => {
 
   return (
     <FormBuilder form={editingForm as any}>
-      {({ handleSubmit, pristine, form }) => {
+      {({ handleSubmit, pristine }) => {
         return (
-          <DragDropContext onDragEnd={() => alert('TODO')}>
+          <DragDropContext onDragEnd={moveArrayItem}>
             <TransitionForm isEditing={isEditing}>
               <EditingFormTitle
                 isMultiform={isMultiform}

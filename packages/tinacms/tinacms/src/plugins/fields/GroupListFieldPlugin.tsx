@@ -31,7 +31,7 @@ const Group = styled(function Group({
     alert('TODO')
   }, [])
 
-  let items = input.items || [{}, {}]
+  let items = input.value
   return (
     <div {...styleProps}>
       <Header>
