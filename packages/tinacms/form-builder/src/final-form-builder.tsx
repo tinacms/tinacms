@@ -8,6 +8,7 @@ import {
 } from 'react-final-form'
 import { FC } from 'react'
 import { FieldPlugin } from './field-plugin'
+import styled from 'styled-components'
 
 export interface FormBuilderProps {
   form: Form
@@ -44,7 +45,7 @@ export interface FieldsBuilderProps {
 export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   let cms = useCMS()
   return (
-    <>
+    <FieldsGroup>
       {fields.map(field => {
         let plugin = cms.plugins
           .findOrCreateMap<FieldPlugin>('field')
@@ -101,6 +102,15 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
           </FinalField>
         )
       })}
-    </>
+    </FieldsGroup>
   )
 }
+
+const FieldsGroup = styled.div`
+  display: block;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 1.25rem 1.25rem 0 1.25rem;
+`

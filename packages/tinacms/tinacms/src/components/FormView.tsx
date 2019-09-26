@@ -236,8 +236,8 @@ const FormHeader = styled(
 export const FormBody = styled.div`
   scrollbar-width: none;
   width: 100%;
-  padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
-  overflow-y: auto;
+  overflow-y: hidden;
+  overflow-x: hidden;
   flex: 1 0 4rem;
   ul,
   li {
