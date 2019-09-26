@@ -49,10 +49,8 @@ export const FormsView = () => {
     (result: DropResult) => {
       let form = editingForm!.finalForm
       if (!result.destination) return
-      let { move } = form.mutators
-
       let name = result.type
-      move(name, result.source.index, result.destination.index)
+      form.mutators.move(name, result.source.index, result.destination.index)
     },
     [editingForm]
   )

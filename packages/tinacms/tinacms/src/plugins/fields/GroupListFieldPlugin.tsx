@@ -28,8 +28,11 @@ const Group = styled(function Group({
   ...styleProps
 }: GroupProps) {
   let addItem = React.useCallback(() => {
-    alert('TODO')
-  }, [])
+    let obj = {
+      // TODO: Create based off field?
+    }
+    form.mutators.insert(field.name, 0, obj)
+  }, [form, field])
 
   let items = input.value
   return (
@@ -49,7 +52,7 @@ const Group = styled(function Group({
                   <Item
                     tinaForm={tinaForm}
                     field={field}
-                    item={items[index]}
+                    item={item}
                     index={index}
                   />
                 ))}
