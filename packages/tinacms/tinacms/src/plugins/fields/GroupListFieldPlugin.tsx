@@ -46,7 +46,12 @@ const Group = styled(function Group({
             {provider => (
               <ul ref={provider.innerRef} className="edit-page--list-parent">
                 {items.map((item: any, index: any) => (
-                  <Item tinaForm={tinaForm} field={field} index={index} />
+                  <Item
+                    tinaForm={tinaForm}
+                    field={field}
+                    item={items[index]}
+                    index={index}
+                  />
                 ))}
               </ul>
             )}
@@ -145,7 +150,7 @@ height: auto;
 }
 }`
 
-const Item = styled(({ tinaForm, field, index, ...p }) => {
+const Item = styled(({ tinaForm, field, index, item, ...p }) => {
   let [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <Draggable
@@ -163,7 +168,10 @@ const Item = styled(({ tinaForm, field, index, ...p }) => {
             {...p}
           >
             <div>Drag Handle</div>
-            <label onClick={() => setExpanded(true)}>Item Label</label>
+            <label onClick={() => setExpanded(true)}>
+              {/* This is hardcoded because I know it's in the blog-post.js template */}
+              {item.alt}
+            </label>
             <button>Delette</button>
           </Header>
           <Panel
