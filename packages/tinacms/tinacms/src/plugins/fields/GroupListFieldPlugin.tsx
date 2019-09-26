@@ -8,6 +8,7 @@ import { Button } from '../../components/Button'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
+  defaultItem: object
   fields: Field[]
 }
 
@@ -28,9 +29,7 @@ const Group = styled(function Group({
   ...styleProps
 }: GroupProps) {
   let addItem = React.useCallback(() => {
-    let obj = {
-      // TODO: Create based off field?
-    }
+    let obj = field.defaultItem || {}
     form.mutators.insert(field.name, 0, obj)
   }, [form, field])
 
