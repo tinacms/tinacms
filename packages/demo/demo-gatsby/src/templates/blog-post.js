@@ -150,6 +150,15 @@ function BlogPostTemplate(props) {
 const BlogPostForm = {
   fields: [
     {
+      label: "Gallery",
+      name: "gallery",
+      component: "group-list",
+      fields: [
+        { name: "alt", component: "text" },
+        { name: "src", component: "text" },
+      ],
+    },
+    {
       label: "Fake Author",
       name: "rawFrontmatter.fakeAuthor",
       component: "group",

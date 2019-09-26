@@ -9,6 +9,7 @@ import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import EditingFormTitle from './EditingFormTitle'
+import { DragDropContext } from 'react-beautiful-dnd'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -59,10 +60,10 @@ export const FormsView = () => {
     )
 
   return (
-    <>
-      <FormBuilder form={editingForm as any}>
-        {({ handleSubmit, pristine, form }) => {
-          return (
+    <FormBuilder form={editingForm as any}>
+      {({ handleSubmit, pristine, form }) => {
+        return (
+          <DragDropContext onDragEnd={() => alert('TODO')}>
             <TransitionForm isEditing={isEditing}>
               <EditingFormTitle
                 isMultiform={isMultiform}
@@ -89,10 +90,10 @@ export const FormsView = () => {
                 )}
               </FormsFooter>
             </TransitionForm>
-          )
-        }}
-      </FormBuilder>
-    </>
+          </DragDropContext>
+        )
+      }}
+    </FormBuilder>
   )
 }
 
