@@ -151,7 +151,7 @@ const BlogPostForm = {
   fields: [
     {
       label: "Gallery",
-      name: "gallery",
+      name: "rawFrontmatter.gallery",
       component: "group-list",
       fields: [
         { name: "alt", component: "text" },
