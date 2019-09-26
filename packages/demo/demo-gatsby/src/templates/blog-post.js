@@ -156,6 +156,22 @@ const BlogPostForm = {
       fields: [
         { name: "alt", component: "text" },
         { name: "src", component: "text" },
+        {
+          label: "Photographer",
+          name: "photographer",
+          component: "group",
+          fields: [
+            { name: "name", component: "text" },
+            {
+              name: "social",
+              component: "group-list",
+              fields: [
+                { name: "platformName", component: "text" },
+                { name: "account", component: "text" },
+              ],
+            },
+          ],
+        },
       ],
     },
     {

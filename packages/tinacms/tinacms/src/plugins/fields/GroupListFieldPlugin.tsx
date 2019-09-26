@@ -34,7 +34,7 @@ const Group = styled(function Group({
     form.mutators.insert(field.name, 0, obj)
   }, [form, field])
 
-  let items = input.value
+  let items = input.value || []
   return (
     <div {...styleProps}>
       <Header>
@@ -155,6 +155,9 @@ height: auto;
 
 const Item = styled(({ tinaForm, field, index, item, ...p }) => {
   let [isExpanded, setExpanded] = React.useState<boolean>(false)
+  let removeItem = React.useCallback(() => {
+    tinaForm.finalForm.mutators.remove(field.name, 0)
+  }, [tinaForm, field])
   return (
     <Draggable
       key={index}
@@ -175,7 +178,7 @@ const Item = styled(({ tinaForm, field, index, item, ...p }) => {
               {/* This is hardcoded because I know it's in the blog-post.js template */}
               {item.alt}
             </label>
-            <button>Delette</button>
+            <button onClick={removeItem}>Delete</button>
           </Header>
           <Panel
             isExpanded={isExpanded}
@@ -241,5 +244,4 @@ interface GroupFieldProps {
 export default {
   name: 'group-list',
   Component: Group,
-  defaultValue: [],
 }
