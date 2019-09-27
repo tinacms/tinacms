@@ -53,7 +53,7 @@ const FormModal = ({ plugin, close }: any) => {
                 </CloseButton>
               </ModalHeader>
               <ModalBody>
-                <FieldsBuilder form={form} />
+                <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
               <ModalActions>
                 <CancelButton onClick={close}>Cancel</CancelButton>
