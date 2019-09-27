@@ -2,8 +2,13 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useCMS } from '@tinacms/react-tinacms'
 import { SaveButton, CancelButton } from './FormView'
-import { Modal, ModalHeader, ModalBody, ModalActions } from './ModalProvider'
-import { ModalPopup } from './ModalPopup'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalActions,
+} from './modals/ModalProvider'
+import { ModalPopup } from './modals/ModalPopup'
 import { Button } from './Button'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
