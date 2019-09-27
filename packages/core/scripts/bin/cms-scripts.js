@@ -68,15 +68,12 @@ function createBuildOptions(options = {}) {
   const package = require(path.join(absolutePath, 'package.json'))
   console.log(`Building Package: ${package.name}@${package.version}`)
 
-  const externalKeys = Object.keys(package.peerDependencies || {})
+  const dependencyKeys = Object.keys(package.dependencies || {})
+  const peerDependencyKeys = Object.keys(package.peerDependencies || {})
 
   const inputOptions = {
     input: path.join(absolutePath, 'src', 'index.ts'),
-    external: targetId => {
-      return !!externalKeys.find(extId => {
-        return new RegExp(/^extId$/i).test(targetId)
-      })
-    },
+    external: [...dependencyKeys, ...peerDependencyKeys],
     plugins: [
       rollupTypescript({
         typescript,
