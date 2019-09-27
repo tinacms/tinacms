@@ -1,7 +1,7 @@
 import * as React from 'react'
 import { SketchPicker } from 'react-color'
 
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
 
 type DivProps = any
@@ -68,18 +68,46 @@ export const Swatch = styled(
   }
 `
 
+const ColorPopupKeyframes = keyframes`
+  0% {
+    transform: translate3d(-50%, 5px, 0) scale3d(0.5,0.5,1)
+  }
+  100% {
+    transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
+  }
+`
+
 export const Popover = styled.div`
   position: absolute;
+  left: 50%;
+  transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
+  transform-origin: 50% -0.5rem;
+  animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
   z-index: 900;
+  &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    margin-top: 2px;
+    transform: translate3d(-50%, -100%, 0);
+    width: 1rem;
+    height: 0.8rem;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background-color: white;
+    z-index: 100;
+  }
 `
 
 export const Cover = styled.div`
   position: fixed;
-  top: 0px;
-  right: 0px;
-  bottom: 0px;
-  left: 0px;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100%;
   height: 100vh;
+  z-index: 800;
 `
 
 interface Props {
@@ -155,15 +183,18 @@ export class ColorPicker extends React.Component<Props, State> {
           colorFormat={this.colorFormat}
         />
         {this.state.displayColorPicker ? (
-          <Popover>
+          <>
+            <Popover>
+              <SketchPicker
+                presetColors={[...this.presetColors, nullColor]}
+                color={this.colorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+                onChange={this.handleChange}
+                disableAlpha={true}
+                width={'240px'}
+              />{' '}
+            </Popover>
             <Cover onClick={this.handleClose} />
-            <SketchPicker
-              presetColors={[...this.presetColors, nullColor]}
-              color={this.colorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
-              onChange={this.handleChange}
-              disableAlpha={true}
-            />{' '}
-          </Popover>
+          </>
         ) : null}{' '}
       </>
     )
