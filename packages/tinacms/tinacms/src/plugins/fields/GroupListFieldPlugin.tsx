@@ -18,6 +18,7 @@ import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 interface GroupFieldDefinititon extends Field {
   component: 'group'
   defaultItem: object
+  key: string
   fields: Field[]
 }
 
@@ -43,6 +44,7 @@ const Group = function Group({
   }, [form, field])
 
   let items = input.value || []
+
   return (
     <>
       <GroupListHeader>
@@ -58,12 +60,14 @@ const Group = function Group({
               <ul ref={provider.innerRef} className="edit-page--list-parent">
                 {items.map((item: any, index: any) => (
                   <Item
+                    key={item[field.key]}
                     tinaForm={tinaForm}
                     field={field}
                     item={item}
                     index={index}
                   />
                 ))}
+                {provider.placeholder}
               </ul>
             )}
           </Droppable>

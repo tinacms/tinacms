@@ -153,6 +153,7 @@ const BlogPostForm = {
       label: "Gallery",
       name: "rawFrontmatter.gallery",
       component: "group-list",
+      key: "alt",
       defaultItem: {
         alt: "",
         src: "",
