@@ -14,7 +14,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install Dependencies
-        run: npm i
+        run: npm ci
       - name: Bootstrap Development
         run: npm run bs
       - name: Lint Source Coude
