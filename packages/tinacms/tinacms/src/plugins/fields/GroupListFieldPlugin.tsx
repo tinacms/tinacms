@@ -5,6 +5,15 @@ import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding } from '@tinacms/styles'
 import { Droppable, DropResult, Draggable } from 'react-beautiful-dnd'
 import { Button } from '../../components/Button'
+import {
+  AddIcon,
+  DragIcon,
+  ReorderIcon,
+  RightArrowIcon,
+  TrashIcon,
+  LeftArrowIcon,
+} from '@tinacms/icons'
+import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -20,7 +29,7 @@ interface GroupProps {
   tinaForm: Form
 }
 
-const Group = styled(function Group({
+const Group = function Group({
   tinaForm,
   form,
   field,
@@ -35,14 +44,14 @@ const Group = styled(function Group({
 
   let items = input.value || []
   return (
-    <div {...styleProps}>
-      <Header>
-        <label>{field.label || field.name}</label>
-      </Header>
+    <>
+      <GroupListHeader>
+        <GroupLabel>{field.label || field.name}</GroupLabel>
+        <GroupHeaderButton onClick={addItem}>
+          <AddIcon />
+        </GroupHeaderButton>
+      </GroupListHeader>
       <GroupListPanel>
-        <div>
-          <GroupHeaderButton onClick={addItem}>Add</GroupHeaderButton>
-        </div>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
             {provider => (
@@ -60,99 +69,18 @@ const Group = styled(function Group({
           </Droppable>
         </ItemList>
       </GroupListPanel>
-    </div>
+    </>
   )
-})`
-  border: 1px solid pink;
-  border-radius: 0.3rem;
-  margin: 1.5rem 0;
-  transition: background 0.15s ease;
-  overflow: visible;
-`
-
-const Header = styled.div`
-  position: relative;
-  cursor: pointer;
-  display: flex;
-  justify-content: flex-start;
-  align-items: center;
-
-  > label {
-    flex: 1;
-    margin: 0;
-    cursor: pointer;
-    text-transform: none;
-    font-size: 0.85rem;
-    font-weight: 500;
-    color: #282828;
-    padding: 1.5rem;
-    overflow-x: hidden;
-
-    > div {
-      white-space: nowrap;
-      text-overflow: ellipsis;
-      overflow-x: hidden;
-    }
-
-    &.multiLine {
-      padding: calc(1.5rem - 10px) 0 calc(1.5rem - 9px) 1.5rem;
-    }
-
-    .move-icon + label {
-      padding: 1.5rem 0;
-    }
-  }
-
-  .move-icon {
-    cursor: move;
-    line-height: 0;
-    padding: 1.5rem;
-  }
-
-  .delete {
-    margin-left: auto;
-    opacity: 0.6;
-    line-height: 0;
-    padding: 1.5rem;
-
-    &:hover {
-      opacity: 1;
-      color: $error;
-    }
-  }
-`
-
-const GroupListPanel = styled.div`
-  max-height: initial;
-  position: relative;
-  border-left: 0px;
-
-  position: initial;
-  height: auto;
-
-  top: 4rem;
-`
-
-const GroupHeaderButton = styled(Button)`
-  align-self: center !important;
-  margin: 0 1.5rem;
-`
-
-const ItemList = styled.div`
-overflow: auto;
-padding: 1rem 1.5rem 1.5rem 1.5rem;
-height: auto;
-
-> ul > ${Group} {
-  background-color: white;
-  margin: 1rem 0;
-  width: 100%;
-  border: 1px solid #f3f3f3;
-  border-radius: 0.15rem;
 }
-}`
 
-const Item = styled(({ tinaForm, field, index, item, ...p }) => {
+interface ItemProps {
+  tinaForm: Form
+  field: GroupFieldDefinititon
+  index: number
+  item: any
+}
+
+const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
   let [isExpanded, setExpanded] = React.useState<boolean>(false)
   let removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, 0)
@@ -166,32 +94,187 @@ const Item = styled(({ tinaForm, field, index, item, ...p }) => {
     >
       {provider => (
         <>
-          <Header
+          <ItemHeader
             ref={provider.innerRef}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
             {...p}
           >
-            <div>Drag Handle</div>
-            <label onClick={() => setExpanded(true)}>
-              {/* This is hardcoded because I know it's in the blog-post.js template */}
-              {item.alt}
-            </label>
-            <button onClick={removeItem}>Delete</button>
-          </Header>
+            <DragHandle />
+            <GroupLabel onClick={() => setExpanded(true)}>
+              {item.alt || field.label || field.name}
+              {item.alt ? '' : ' Item'}
+            </GroupLabel>
+            <DeleteButton onClick={removeItem}>
+              <TrashIcon />
+            </DeleteButton>
+          </ItemHeader>
           <Panel
             isExpanded={isExpanded}
             setExpanded={setExpanded}
             field={field}
             index={index}
             tinaForm={tinaForm}
+            itemTitle={
+              item.alt ? item.alt : (field.label || field.name) + ' Item'
+            }
           />
         </>
       )}
     </Draggable>
   )
+}
+
+const GroupLabel = styled.span`
+  margin: 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  flex: 1 0 auto;
+  color: inherit;
+  transition: all 85ms ease-out;
+  text-align: left;
+  max-width: calc(100% - 2.25rem);
+  overflow: hidden;
+  text-overflow: ellipsis;
+`
+
+const GroupListHeader = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 0.75rem;
+  ${GroupLabel} {
+    font-size: 1rem;
+  }
+`
+
+const GroupListPanel = styled.div`
+  max-height: initial;
+  position: relative;
+  height: auto;
+  margin-bottom: 1.5rem;
+  border-radius: 0.25rem;
+  background-color: #f2f2f2;
+`
+
+const GroupHeaderButton = styled(Button)`
+  border-radius: 10rem;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  margin: -0.25rem 0;
+  position: relative;
+  fill: white;
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+`
+
+const ItemList = styled.div``
+
+const ItemHeader = styled.div`
+  position: relative;
+  cursor: pointer;
+  display: flex;
+  justify-content: space-between;
+  align-items: stretch;
+  background-color: white;
+  border: 1px solid #e1e1e1;
+  margin: 0 0 -1px 0;
+  overflow: visible;
+  line-height: 1.35;
+  padding: 0;
+  color: #282828;
+  fill: #b4b4b4;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 85ms ease-out;
+
+  ${GroupLabel} {
+    padding: 0.5rem 0;
+    align-self: center;
+  }
+
+  svg {
+    fill: inherit;
+    width: 1.25rem;
+    height: auto;
+    transition: all 85ms ease-out;
+  }
+
+  &:hover {
+    color: #0084ff;
+    fill: #353232;
+    ${GroupLabel} {
+      color: inherit;
+    }
+  }
+
+  &:first-child {
+    border-radius: 0.25rem 0.25rem 0 0;
+  }
+
+  &:nth-last-child(2) {
+    border-radius: 0 0 0.25rem 0.25rem;
+    &:first-child {
+      border-radius: 0.25rem;
+    }
+  }
+`
+
+const DeleteButton = styled.button`
+  text-align: center;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.75rem;
+  transition: all 85ms ease-out;
+  &:hover {
+    background-color: #f2f2f2;
+  }
+`
+
+const DragHandle = styled(function DragHandle({ ...styleProps }) {
+  return (
+    <div {...styleProps}>
+      <DragIcon />
+      <ReorderIcon />
+    </div>
+  )
 })`
-  border: 1px solid pink;
+  padding-left: 0.75rem;
+  margin-right: 0.25rem;
+  flex: 0 0 auto;
+  width: 2rem;
+  position: relative;
+  fill: inherit;
+  svg {
+    position: absolute;
+    left: 50%;
+    top: 50%;
+    width: 1.25rem;
+    height: 1.25rem;
+    transform: translate3d(-50%, -50%, 0);
+    transition: all 85ms ease-out;
+  }
+  svg:last-child {
+    opacity: 0;
+  }
+  *:hover > & {
+    svg:first-child {
+      opacity: 0;
+    }
+    svg:last-child {
+      opacity: 1;
+    }
+  }
 `
 
 interface PanelProps {
@@ -200,15 +283,16 @@ interface PanelProps {
   tinaForm: Form
   index: number
   field: GroupFieldDefinititon
+  itemTitle: string
 }
 
-const Panel = styled(function Panel({
+const Panel = function Panel({
   setExpanded,
   isExpanded,
   tinaForm,
-  index,
   field,
-  ...styleProps
+  index,
+  itemTitle,
 }: PanelProps) {
   let fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
@@ -218,23 +302,17 @@ const Panel = styled(function Panel({
   }, [field.fields])
 
   return (
-    <div {...styleProps}>
-      <button onClick={() => setExpanded(false)}>Back</button>
-      {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-    </div>
+    <GroupPanel isExpanded={isExpanded}>
+      <PanelHeader onClick={() => setExpanded(false)}>
+        <LeftArrowIcon />
+        <GroupLabel>{itemTitle || field.label || field.name}</GroupLabel>
+      </PanelHeader>
+      <PanelBody>
+        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
+      </PanelBody>
+    </GroupPanel>
   )
-})`
-  position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 4rem;
-  left: ${p => (p.isExpanded ? '0' : 'calc(100% - 0px)')};
-  overflow-y: auto;
-  background: white;
-  padding: ${padding()}rem;
-  z-index: 500;
-  transition: left 0.35s ease, max-height 0.5s ease;
-`
+}
 
 interface GroupFieldProps {
   field: Field

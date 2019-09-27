@@ -3,12 +3,7 @@ import { Field, Form } from '@tinacms/core'
 import styled from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding } from '@tinacms/styles'
-import {
-  EditIcon,
-  ChevronUpIcon,
-  LeftArrowIcon,
-  RightArrowIcon,
-} from '@tinacms/icons'
+import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -110,7 +105,7 @@ const Header = styled.div`
   }
 `
 
-const PanelHeader = styled(Header)`
+export const PanelHeader = styled(Header)`
   flex: 0 0 auto;
   justify-content: flex-start;
   border: none;
@@ -129,7 +124,7 @@ const PanelHeader = styled(Header)`
   }
 `
 
-const PanelBody = styled.div`
+export const PanelBody = styled.div`
   position: relative;
   display: block;
   flex: 1 1 auto;
@@ -144,7 +139,7 @@ const GroupLabel = styled.span`
   transition: all 85ms ease-out;
 `
 
-const GroupPanel = styled.div<{ isExpanded: boolean }>`
+export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   position: fixed;
   width: 100%;
   height: 100%;
