@@ -3,7 +3,12 @@ import { Field, Form } from '@tinacms/core'
 import styled from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding } from '@tinacms/styles'
-import { EditIcon, ChevronUpIcon, LeftArrowIcon } from '@tinacms/icons'
+import {
+  EditIcon,
+  ChevronUpIcon,
+  LeftArrowIcon,
+  RightArrowIcon,
+} from '@tinacms/icons'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -30,7 +35,7 @@ export const Group = function Group({
     <>
       <Header onClick={() => setExpanded(p => !p)}>
         {Label(field)}
-        <EditIcon />
+        <RightArrowIcon />
       </Header>
       <Panel
         isExpanded={isExpanded}
@@ -66,7 +71,7 @@ const Panel = function Panel({
   return (
     <GroupPanel isExpanded={isExpanded}>
       <PanelHeader onClick={() => setExpanded(false)}>
-        {Label(field)} <ChevronUpIcon />
+        <LeftArrowIcon /> {Label(field)}
       </PanelHeader>
       <PanelBody>
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
@@ -94,9 +99,10 @@ const Header = styled.div`
   color: #282828;
 
   svg {
-    width: 20px;
+    width: 1.25rem;
     height: auto;
     fill: #b4b4b4;
+    transition: all 85ms ease-out;
   }
 
   &:hover {
@@ -106,10 +112,21 @@ const Header = styled.div`
 
 const PanelHeader = styled(Header)`
   flex: 0 0 auto;
+  justify-content: flex-start;
   border: none;
   border-bottom: 1px solid #efefef;
   margin: 0;
   padding: 0.75rem 1.25rem;
+
+  svg {
+    transform: translate3d(-4px, 0, 0);
+  }
+
+  &:hover {
+    svg {
+      transform: translate3d(-7px, 0, 0);
+    }
+  }
 `
 
 const PanelBody = styled.div`
