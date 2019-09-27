@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
-import { StyledFrame } from './SyledFrame'
+import { StyledFrame } from '../SyledFrame'
 import styled, { keyframes } from 'styled-components'
-import { FormsView } from './FormView'
-import { Modal } from './ModalProvider'
-import { ModalFullscreen } from './ModalFullscreen'
+import { FormsView } from '../FormView'
+import { Modal } from '../modals/ModalProvider'
+import { ModalFullscreen } from '../modals/ModalFullscreen'
 import {
   CloseIcon,
   HamburgerIcon,
@@ -13,12 +13,12 @@ import {
   EditIcon,
 } from '@tinacms/icons'
 import { GlobalStyles, padding, color, TinaResetStyles } from '@tinacms/styles'
-import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from '../Globals'
-import { Button } from './Button'
-import { CreateContentButton } from './CreateContent'
+import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from '../../Globals'
+import { Button } from '../Button'
+import { CreateContentButton } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
-import { ScreenPlugin } from '../plugins/screen-plugin'
-import { useTina } from '../hooks/use-tina'
+import { ScreenPlugin } from '../../plugins/screen-plugin'
+import { useTina } from '../../hooks/use-tina'
 
 export const Sidebar = () => {
   const cms = useTina()
