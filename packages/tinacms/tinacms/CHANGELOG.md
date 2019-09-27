@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.19](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.18...@tinacms/tinacms@0.1.0-alpha.19) (2019-09-25)
+
+
+### Features
+
+* **TextFieldPlugin:** accept placeholder ([e40b6ad](https://github.com/tinacms/tinacms/commit/e40b6ad))
+
+
+
+
+
 # [0.1.0-alpha.18](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.17...@tinacms/tinacms@0.1.0-alpha.18) (2019-09-23)
 
 

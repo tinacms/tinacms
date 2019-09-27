@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/forestry-cli",
-  "version": "0.1.0-alpha.14",
+  "version": "0.1.0-alpha.15",
   "license": "MIT",
   "devDependencies": {
     "@types/clear": "0.1.0",
@@ -31,8 +31,10 @@
     "axios": "0.19.0",
     "chalk": "^2.4.2",
     "clear": "^0.1.0",
+    "commander": "3.0.1",
     "cors": "^2.8.5",
     "crypto": "^1.0.1",
+    "dotenv": "8.1.0",
     "esm": "3.2.25",
     "express": "^4.17.1",
     "figlet": "^1.2.3",
@@ -40,8 +42,6 @@
     "listr": "0.14.3",
     "open": "^6.4.0",
     "path": "^0.12.7",
-    "simple-git": "1.124.0",
-    "dotenv": "8.1.0",
-    "commander": "3.0.1"
+    "simple-git": "1.124.0"
   }
 }
