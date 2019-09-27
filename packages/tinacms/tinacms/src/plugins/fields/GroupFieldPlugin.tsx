@@ -119,7 +119,7 @@ const PanelBody = styled.div`
   overflow-y: auto;
 `
 
-const GroupLabel = styled.label`
+const GroupLabel = styled.span`
   margin: 0;
   font-size: 0.85rem;
   font-weight: 500;
