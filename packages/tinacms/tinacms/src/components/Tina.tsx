@@ -1,11 +1,11 @@
 import * as React from 'react'
 import { CMSContext } from '@tinacms/react-tinacms'
 import { ModalProvider } from './modals/ModalProvider'
-import { SidebarContext } from './SidebarProvider'
+import { SidebarContext } from './sidebar/SidebarProvider'
 import { cms } from '../index'
 import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset, theme } from '@tinacms/styles'
-import { Sidebar } from './Sidebar'
+import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 
 interface TinaProps {

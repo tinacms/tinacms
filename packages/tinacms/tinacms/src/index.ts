@@ -1,6 +1,6 @@
 // Components
 export * from './components/Tina'
-export * from './components/SidebarProvider'
+export * from './components/sidebar/SidebarProvider'
 export * from './components/modals/ModalProvider'
 export { ActionButton } from './components/ActionsMenu'
 
