@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { CMSContext } from '@tinacms/react-tinacms'
-import { ModalProvider } from './ModalProvider'
+import { ModalProvider } from './modals/ModalProvider'
 import { SidebarContext } from './SidebarProvider'
 import { cms } from '../index'
 import styled, { ThemeProvider } from 'styled-components'

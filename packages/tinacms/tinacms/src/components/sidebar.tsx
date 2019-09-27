@@ -4,8 +4,8 @@ import { useState } from 'react'
 import { StyledFrame } from './SyledFrame'
 import styled, { keyframes } from 'styled-components'
 import { FormsView } from './FormView'
-import { Modal } from './ModalProvider'
-import { ModalFullscreen } from './ModalFullscreen'
+import { Modal } from './modals/ModalProvider'
+import { ModalFullscreen } from './modals/ModalFullscreen'
 import {
   CloseIcon,
   HamburgerIcon,
