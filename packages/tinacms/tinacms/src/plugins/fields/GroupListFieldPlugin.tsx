@@ -87,8 +87,8 @@ interface ItemProps {
 const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
   let [isExpanded, setExpanded] = React.useState<boolean>(false)
   let removeItem = React.useCallback(() => {
-    tinaForm.finalForm.mutators.remove(field.name, 0)
-  }, [tinaForm, field])
+    tinaForm.finalForm.mutators.remove(field.name, index)
+  }, [tinaForm, field, index])
   return (
     <Draggable
       key={index}
