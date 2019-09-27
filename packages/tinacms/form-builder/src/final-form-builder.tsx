@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { Form } from '@tinacms/core'
+import { Form, Field } from '@tinacms/core'
 import { useCMS } from '@tinacms/react-tinacms'
 import {
   Form as FinalForm,
@@ -8,6 +8,7 @@ import {
 } from 'react-final-form'
 import { FC } from 'react'
 import { FieldPlugin } from './field-plugin'
+import styled from 'styled-components'
 
 export interface FormBuilderProps {
   form: Form
@@ -38,13 +39,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
 
 export interface FieldsBuilderProps {
   form: Form
+  fields: Field[]
 }
 
-export function FieldsBuilder({ form }: FieldsBuilderProps) {
+export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   let cms = useCMS()
   return (
-    <>
-      {form.fields.map(field => {
+    <FieldsGroup>
+      {fields.map(field => {
         let plugin = cms.plugins
           .findOrCreateMap<FieldPlugin>('field')
           .find(field.component as string)
@@ -78,6 +80,7 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
                   <field.component
                     {...fieldProps}
                     form={form.finalForm}
+                    tinaForm={form}
                     field={field}
                   />
                 )
@@ -88,6 +91,7 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
                   <plugin.Component
                     {...fieldProps}
                     form={form.finalForm}
+                    tinaForm={form}
                     field={field}
                   />
                 )
@@ -98,6 +102,15 @@ export function FieldsBuilder({ form }: FieldsBuilderProps) {
           </FinalField>
         )
       })}
-    </>
+    </FieldsGroup>
   )
 }
+
+const FieldsGroup = styled.div`
+  display: block;
+  width: 100%;
+  overflow-x: hidden;
+  overflow-y: auto;
+  max-height: 100%;
+  padding: 1.25rem 1.25rem 0 1.25rem;
+`
