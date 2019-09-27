@@ -17,12 +17,9 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
       <FieldWrapper>
         <FieldLabel htmlFor={name}>
           {props.field.label || props.field.name}
-          {
-            props.field.description &&
-            <FieldDescription>
-              {props.field.description}
-            </FieldDescription>
-          }
+          {props.field.description && (
+            <FieldDescription>{props.field.description}</FieldDescription>
+          )}
         </FieldLabel>
         <Field {...props} />
         {props.meta.error && <FieldError>{props.meta.error}</FieldError>}
@@ -33,6 +30,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
 
 // Styling
 const FieldWrapper = styled.div`
+  position: relative;
   margin-bottom: 1.5rem;
 `
 
@@ -47,7 +45,7 @@ const FieldLabel = styled.label`
 
 const FieldDescription = styled.p`
   color: #949494;
-  font-size: .65rem;
+  font-size: 0.65rem;
   font-style: italic;
   font-weight: lighter;
 `
