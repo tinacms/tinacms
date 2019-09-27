@@ -101,10 +101,12 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
             {...p}
           >
             <DragHandle />
-            <GroupLabel onClick={() => setExpanded(true)}>
-              {item.alt || field.label || field.name}
-              {item.alt ? '' : ' Item'}
-            </GroupLabel>
+            <ItemClickTarget onClick={() => setExpanded(true)}>
+              <GroupLabel>
+                {item.alt || field.label || field.name}
+                {item.alt ? '' : ' Item'}
+              </GroupLabel>
+            </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
             </DeleteButton>
@@ -124,6 +126,16 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
     </Draggable>
   )
 }
+
+const ItemClickTarget = styled.div`
+  flex: 1 1 0;
+  min-width: 0;
+  position: relative;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0.5rem;
+`
 
 const GroupLabel = styled.span`
   margin: 0;
@@ -163,7 +175,7 @@ const GroupHeaderButton = styled(Button)`
   padding: 0;
   width: 2rem;
   height: 2rem;
-  margin: -0.25rem 0;
+  margin: -0.125rem 0;
   position: relative;
   fill: white;
   svg {
@@ -197,15 +209,15 @@ const ItemHeader = styled.div`
   transition: all 85ms ease-out;
 
   ${GroupLabel} {
-    padding: 0.5rem 0;
     align-self: center;
+    max-width: 100%;
   }
 
   svg {
     fill: inherit;
     width: 1.25rem;
     height: auto;
-    transition: all 85ms ease-out;
+    transition: fill 85ms ease-out;
   }
 
   &:hover {
@@ -234,7 +246,7 @@ const DeleteButton = styled.button`
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 0.75rem;
+  padding: 0.75rem 0.5rem;
   transition: all 85ms ease-out;
   &:hover {
     background-color: #f2f2f2;
@@ -249,12 +261,17 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
     </div>
   )
 })`
-  padding-left: 0.75rem;
-  margin-right: 0.25rem;
+  margin: 0;
   flex: 0 0 auto;
   width: 2rem;
   position: relative;
   fill: inherit;
+  padding: 0.75rem 0;
+  transition: all 85ms ease-out;
+  &:hover {
+    background-color: #f2f2f2;
+    cursor: grab;
+  }
   svg {
     position: absolute;
     left: 50%;
