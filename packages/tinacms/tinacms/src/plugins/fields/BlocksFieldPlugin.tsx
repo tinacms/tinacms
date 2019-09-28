@@ -37,12 +37,7 @@ interface BlockFieldProps {
   tinaForm: Form
 }
 
-const Blocks = function Group({
-  tinaForm,
-  form,
-  field,
-  input,
-}: BlockFieldProps) {
+const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
   let addItem = React.useCallback(
     (name, template) => {
       let obj = template.defaultItem || {}
@@ -113,7 +108,7 @@ const Blocks = function Group({
   )
 }
 
-interface ItemProps {
+interface BlockListItemProps {
   tinaForm: Form
   field: BlocksFieldDefinititon
   index: number
@@ -127,8 +122,7 @@ const BlockListItem = ({
   index,
   template,
   block,
-  ...p
-}: ItemProps) => {
+}: BlockListItemProps) => {
   let [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   let removeItem = React.useCallback(() => {
@@ -150,7 +144,6 @@ const BlockListItem = ({
             ref={provider.innerRef}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
-            {...p}
           >
             <DragHandle />
             <ItemClickTarget onClick={() => setExpanded(true)}>
@@ -167,7 +160,8 @@ const BlockListItem = ({
             item={block}
             index={index}
             tinaForm={tinaForm}
-            itemTitle={label}
+            label={label}
+            template={template}
           />
         </>
       )}
@@ -349,7 +343,8 @@ interface PanelProps {
   index: number
   field: BlocksFieldDefinititon
   item: any
-  itemTitle: string
+  label: string
+  template: BlockTemplate
 }
 
 const Panel = function Panel({
@@ -358,25 +353,24 @@ const Panel = function Panel({
   tinaForm,
   field,
   index,
-  item,
-  itemTitle,
+  label,
+  template,
 }: PanelProps) {
   let fields: any[] = React.useMemo(() => {
-    let template = field.templates[item._template]
-    if (!template) return []
     return template.fields.map((subField: any) => ({
       ...subField,
       name: `${field.name}.${index}.${subField.name}`,
     }))
-  }, [field.templates, item._template])
+  }, [template])
 
   return (
     <GroupPanel isExpanded={isExpanded}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
-        <GroupLabel>{itemTitle || field.label || field.name}</GroupLabel>
+        <GroupLabel>{label}</GroupLabel>
       </PanelHeader>
       <PanelBody>
+        {/* RENDER OPTIMIZATION: Only render fields of expanded fields.  */}
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
       </PanelBody>
     </GroupPanel>
