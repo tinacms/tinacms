@@ -12,7 +12,6 @@ import {
   LeftArrowIcon,
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { TextField } from '@tinacms/fields'
 import { Dismissible } from 'react-dismissible'
 
 interface BlocksFieldDefinititon extends Field {
@@ -41,7 +40,6 @@ const Blocks = function Group({
   form,
   field,
   input,
-  meta,
 }: BlockFieldProps) {
   let addItem = React.useCallback(
     (name, template) => {
@@ -67,7 +65,14 @@ const Blocks = function Group({
         <Dismissible click escape onDismiss={() => setVisible(false)}>
           <ul>
             {Object.entries(field.templates).map(([name, template]) => (
-              <li onClick={() => addItem(name, template)}>{template.label}</li>
+              <li
+                onClick={() => {
+                  addItem(name, template)
+                  setVisible(false)
+                }}
+              >
+                {template.label}
+              </li>
             ))}
           </ul>
         </Dismissible>
@@ -340,7 +345,6 @@ const Panel = function Panel({
 }: PanelProps) {
   let fields: any[] = React.useMemo(() => {
     let template = field.templates[item._template]
-    console.log('TEMPLATE', { template })
     if (!template) return []
     return template.fields.map((subField: any) => ({
       ...subField,
