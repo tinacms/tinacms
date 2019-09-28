@@ -18,13 +18,15 @@ interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
   defaultItem: object
   templates: {
-    [key: string]: {
-      label: string
-      defaultItem: object
-      key: string
-      fields: Field[]
-    }
+    [key: string]: BlockTemplate
   }
+}
+
+interface BlockTemplate {
+  label: string
+  defaultItem: object
+  key: string
+  fields: Field[]
 }
 
 interface BlockFieldProps {
@@ -82,13 +84,22 @@ const Blocks = function Group({
           <Droppable droppableId={field.name} type={field.name}>
             {provider => (
               <ul ref={provider.innerRef} className="edit-page--list-parent">
-                {items.map((item: any, index: any) => {
+                {items.map((block: any, index: any) => {
+                  let template = field.templates[block._template]
+                  if (!template) {
+                    // TODO: if no template return invalid entry
+                  }
+
                   return (
-                    <Item
-                      tinaForm={tinaForm}
-                      field={field}
-                      item={item}
+                    <BlockListItem
+                      // TODO: Find beter solution for `key`. Using a value from the
+                      // block will cause the panel to close if the key property is changed.
+                      key={index}
+                      block={block}
+                      template={template}
                       index={index}
+                      field={field}
+                      tinaForm={tinaForm}
                     />
                   )
                 })}
@@ -106,14 +117,26 @@ interface ItemProps {
   tinaForm: Form
   field: BlocksFieldDefinititon
   index: number
-  item: any
+  block: any
+  template: BlockTemplate
 }
 
-const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
+const BlockListItem = ({
+  tinaForm,
+  field,
+  index,
+  template,
+  block,
+  ...p
+}: ItemProps) => {
   let [isExpanded, setExpanded] = React.useState<boolean>(false)
+
   let removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
+
+  let label = block[template.key] || template.label
+
   return (
     <Draggable
       key={index}
@@ -131,10 +154,7 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
           >
             <DragHandle />
             <ItemClickTarget onClick={() => setExpanded(true)}>
-              <GroupLabel>
-                {item.alt || field.label || field.name}
-                {item.alt ? '' : ' Item'}
-              </GroupLabel>
+              <GroupLabel>{label}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
@@ -144,12 +164,10 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
             isExpanded={isExpanded}
             setExpanded={setExpanded}
             field={field}
-            item={item}
+            item={block}
             index={index}
             tinaForm={tinaForm}
-            itemTitle={
-              item.alt ? item.alt : (field.label || field.name) + ' Item'
-            }
+            itemTitle={label}
           />
         </>
       )}
