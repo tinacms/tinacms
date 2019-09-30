@@ -156,15 +156,6 @@ const GroupPanelKeyframes = keyframes`
   }
 `
 
-const GroupPanelExitKeyframes = keyframes`
-  0% {
-    transform: translate3d( 0, 0, 0 );
-  }
-  100% {
-    transform: translate3d( 100%, 0, 0 );
-  }
-`
-
 export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   position: fixed;
   width: ${SIDEBAR_WIDTH}px;
@@ -179,16 +170,21 @@ export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
 
   > * {
-    animation-name: ${p => (p.isExpanded ? GroupPanelKeyframes : '')};
-    animation-duration: 150ms;
-    animation-delay: 0;
-    animation-iteration-count: 1;
-    animation-timing-function: ease-out;
-    transition: transform 150ms ease-out;
+    ${p =>
+      p.isExpanded &&
+      css`
+        animation-name: ${GroupPanelKeyframes};
+        animation-duration: 150ms;
+        animation-delay: 0;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-out;
+        animation-fill-mode: backwards;
+      `};
 
     ${p =>
       !p.isExpanded &&
       css`
+        transition: transform 150ms ease-out;
         transform: translate3d(100%, 0, 0);
       `};
   }
