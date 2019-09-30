@@ -45,12 +45,34 @@ function syncFormWithInitialValues(form?: Form, initialValues?: any) {
   React.useEffect(() => {
     if (!form) return
     form.finalForm.batch(() => {
-      Object.entries(form.fieldSubscriptions).forEach(([path]) => {
-        let state = form.finalForm.getFieldState(path)
-        if (state && !state.active) {
-          form.finalForm.change(path, get(initialValues, path))
-        }
+      findInactiveFields(form).forEach(path => {
+        form.finalForm.change(path, get(initialValues, path))
       })
     })
   }, [initialValues])
+}
+
+function findInactiveFields(form: Form) {
+  let pathsToUpdate: string[] = []
+  Object.entries(form.fieldSubscriptions).forEach(([path]) => {
+    let state = form.finalForm.getFieldState(path)
+    if (!state) return
+
+    if (/INDEX/.test(path)) {
+      let listPath = path.split('.INDEX.')[0]
+      let listState = form.finalForm.getFieldState(listPath)
+      if (!listState) return
+
+      for (let i = 0; i < listState.value.length; i++) {
+        let indexPath = path.replace('INDEX', `${i}`)
+        let indexState = form.finalForm.getFieldState(indexPath)
+        if (indexState && !indexState!.active) {
+          pathsToUpdate.push(indexPath)
+        }
+      }
+    } else if (!state.active) {
+      pathsToUpdate.push(path)
+    }
+  })
+  return pathsToUpdate
 }
