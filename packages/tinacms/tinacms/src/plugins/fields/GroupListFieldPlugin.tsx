@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding } from '@tinacms/styles'
 import { Droppable, DropResult, Draggable } from 'react-beautiful-dnd'
@@ -56,8 +56,8 @@ const Group = function Group({
       <GroupListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
-            {provider => (
-              <ul ref={provider.innerRef} className="edit-page--list-parent">
+            {(provider, snapshot) => (
+              <div ref={provider.innerRef}>
                 {items.map((item: any, index: any) => (
                   <Item
                     key={item[field.key]}
@@ -68,7 +68,7 @@ const Group = function Group({
                   />
                 ))}
                 {provider.placeholder}
-              </ul>
+              </div>
             )}
           </Droppable>
         </ItemList>
@@ -96,10 +96,11 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
       draggableId={`${field.name}.${index}`}
       index={index}
     >
-      {provider => (
+      {(provider, snapshot) => (
         <>
           <ItemHeader
             ref={provider.innerRef}
+            isDragging={snapshot.isDragging}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
             {...p}
@@ -194,7 +195,7 @@ const GroupHeaderButton = styled(Button)`
 
 const ItemList = styled.div``
 
-const ItemHeader = styled.div`
+const ItemHeader = styled.div<{ isDragging: boolean }>`
   position: relative;
   cursor: pointer;
   display: flex;
@@ -241,6 +242,13 @@ const ItemHeader = styled.div`
       border-radius: 0.25rem;
     }
   }
+
+  ${p =>
+    p.isDragging &&
+    css`
+      border-radius: 0.25rem;
+      box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+    `};
 `
 
 const DeleteButton = styled.button`
