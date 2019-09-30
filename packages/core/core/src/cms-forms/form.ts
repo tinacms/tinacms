@@ -38,9 +38,16 @@ export class Form<S = any> {
     fields.forEach(field => {
       let path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
 
-      // @ts-ignore
-      let subfields = field.fields
-      if (subfields) {
+      let isGroup = ['group'].includes(field.component as string)
+      let isArray = ['group-list'].includes(field.component as string)
+      if (isArray) {
+        // @ts-ignore
+        let subfields = field.fields || []
+        // This will work for groups. But not for group-lists or blocks.
+        this.registerFields(subfields, `${path}.INDEX`)
+      } else if (isGroup) {
+        // @ts-ignore
+        let subfields = field.fields || []
         // This will work for groups. But not for group-lists or blocks.
         this.registerFields(subfields, path)
       } else {
