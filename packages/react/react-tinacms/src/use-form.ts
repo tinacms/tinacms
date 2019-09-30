@@ -45,25 +45,23 @@ function syncFormWithInitialValues(form?: Form, initialValues?: any) {
   React.useEffect(() => {
     if (!form) return
     form.finalForm.batch(() => {
-      findInactiveFields(form).forEach(path => {
+      findInactiveFormFields(form).forEach(path => {
         form.finalForm.change(path, get(initialValues, path))
       })
     })
   }, [initialValues])
 }
 
-function findInactiveFields(form: Form) {
+function findInactiveFormFields(form: Form) {
   let pathsToUpdate: string[] = []
   Object.entries(form.fieldSubscriptions).forEach(([path]) => {
-    pathsToUpdate = pathsToUpdate.concat(yadiyada(form, path))
+    pathsToUpdate = pathsToUpdate.concat(findInactiveFieldsInPath(form, path))
   })
   return pathsToUpdate
 }
 
-function yadiyada(form: Form, path: string) {
+function findInactiveFieldsInPath(form: Form, path: string) {
   let pathsToUpdate: string[] = []
-  let state = form.finalForm.getFieldState(path)
-  if (!state) return pathsToUpdate
 
   if (/INDEX/.test(path)) {
     let listPath = path.split('.INDEX.')[0]
@@ -71,14 +69,15 @@ function yadiyada(form: Form, path: string) {
     if (listState) {
       for (let i = 0; i < listState.value.length; i++) {
         let indexPath = path.replace('INDEX', `${i}`)
-        let indexState = form.finalForm.getFieldState(indexPath)
-        if (indexState && !indexState!.active) {
-          pathsToUpdate.push(indexPath)
-        }
+        let subpaths = findInactiveFieldsInPath(form, indexPath)
+        pathsToUpdate = [...pathsToUpdate, ...subpaths]
       }
     }
-  } else if (!state.active) {
-    pathsToUpdate.push(path)
+  } else {
+    let state = form.finalForm.getFieldState(path)
+    if (state && !state.active) {
+      pathsToUpdate.push(path)
+    }
   }
   return pathsToUpdate
 }
