@@ -42,11 +42,9 @@ export class Form<S = any> {
       let isGroup = ['group'].includes(field.component as string)
       let isArray = ['group-list'].includes(field.component as string)
       if (isArray) {
-        // @ts-ignore
         let subfields = field.fields || []
         this.registerFields(subfields, `${path}.INDEX`)
       } else if (isGroup) {
-        // @ts-ignore
         let subfields = field.fields || []
         this.registerFields(subfields, path)
       }
