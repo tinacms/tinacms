@@ -43,12 +43,10 @@ export class Form<S = any> {
       if (isArray) {
         // @ts-ignore
         let subfields = field.fields || []
-        // This will work for groups. But not for group-lists or blocks.
         this.registerFields(subfields, `${path}.INDEX`)
       } else if (isGroup) {
         // @ts-ignore
         let subfields = field.fields || []
-        // This will work for groups. But not for group-lists or blocks.
         this.registerFields(subfields, path)
       } else {
         this.fieldSubscriptions[path] = {
