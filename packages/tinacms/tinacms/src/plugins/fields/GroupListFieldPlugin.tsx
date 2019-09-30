@@ -91,6 +91,7 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
   let removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
+  let title = item.alt ? item.alt : (field.label || field.name) + ' Item'
   return (
     <Draggable
       key={index}
@@ -109,10 +110,7 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
           >
             <DragHandle />
             <ItemClickTarget onClick={() => setExpanded(true)}>
-              <GroupLabel>
-                {item.alt || field.label || field.name}
-                {item.alt ? '' : ' Item'}
-              </GroupLabel>
+              <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
@@ -124,9 +122,7 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
             field={field}
             index={index}
             tinaForm={tinaForm}
-            itemTitle={
-              item.alt ? item.alt : (field.label || field.name) + ' Item'
-            }
+            itemTitle={title}
           />
         </>
       )}
@@ -335,7 +331,7 @@ const Panel = function Panel({
     <GroupPanel isExpanded={isExpanded}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
-        <GroupLabel>{itemTitle || field.label || field.name}</GroupLabel>
+        <GroupLabel>{itemTitle}</GroupLabel>
       </PanelHeader>
       <PanelBody>
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
