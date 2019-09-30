@@ -4,7 +4,6 @@ import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
 interface FieldSubscription {
   path: string
   field: Field
-  skipSync: boolean
   unsubscribe: Unsubscribe
 }
 
@@ -47,12 +46,12 @@ export class Form<S = any> {
       } else if (isGroup) {
         let subfields = field.fields || []
         this.registerFields(subfields, path)
-      }
-      this.fieldSubscriptions[path] = {
-        path,
-        field,
-        skipSync: isGroup || isArray,
-        unsubscribe: this.finalForm.registerField(path, () => {}, {}),
+      } else {
+        this.fieldSubscriptions[path] = {
+          path,
+          field,
+          unsubscribe: this.finalForm.registerField(path, () => {}, {}),
+        }
       }
     })
   }
