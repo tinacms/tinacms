@@ -71,7 +71,7 @@ export interface Field {
   name: string
   label?: string
   description?: string
-  component: React.FC<any> | string
+  component: React.FC<any> | string | null
   parse?: (value: string, name: string) => any
   format?: (value: string, name: string) => any
 }
