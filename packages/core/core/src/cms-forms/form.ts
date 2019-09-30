@@ -1,4 +1,10 @@
-import { FormApi, createForm, Config } from 'final-form'
+import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
+
+interface FieldSubscription {
+  path: string
+  field: Field
+  unsubscribe: Unsubscribe
+}
 
 export class Form<S = any> {
   id: any
@@ -7,12 +13,38 @@ export class Form<S = any> {
   finalForm: FormApi<S>
   actions: any[]
 
-  constructor({  id, label, fields, actions, ...options }: FormOptions<S>) {
+  fieldSubscriptions: { [key: string]: FieldSubscription } = {}
+
+  constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
     this.id = id
     this.label = label
     this.fields = fields
     this.finalForm = createForm<S>(options)
+    /**
+     * We register fields at creation time so we don't have to relay
+     * on `react-final-form` components being rendered.
+     */
+    this.registerFields(this.fields)
     this.actions = actions || []
+  }
+
+  private registerFields(fields: Field[], pathPrefix?: string) {
+    fields.forEach(field => {
+      let path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
+
+      // @ts-ignore
+      let subfields = field.fields
+      if (subfields) {
+        // This will work for groups. But not for group-lists or blocks.
+        this.registerFields(subfields, path)
+      } else {
+        this.fieldSubscriptions[path] = {
+          path,
+          field,
+          unsubscribe: this.finalForm.registerField(path, () => {}, {}),
+        }
+      }
+    })
   }
 
   subscribe: FormApi<S>['subscribe'] = (cb, options) => {
