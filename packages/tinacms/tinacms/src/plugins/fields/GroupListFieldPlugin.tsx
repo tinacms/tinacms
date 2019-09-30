@@ -58,6 +58,7 @@ const Group = function Group({
           <Droppable droppableId={field.name} type={field.name}>
             {(provider, snapshot) => (
               <div ref={provider.innerRef}>
+                {items.length === 0 && <EmptyState />}
                 {items.map((item: any, index: any) => (
                   <Item
                     key={item[field.key]}
@@ -76,6 +77,8 @@ const Group = function Group({
     </>
   )
 }
+
+const EmptyState = () => <div>There's no items</div>
 
 interface ItemProps {
   tinaForm: Form
