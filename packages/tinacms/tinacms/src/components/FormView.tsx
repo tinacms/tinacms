@@ -3,12 +3,19 @@ import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
-import styled from 'styled-components'
+import styled, { keyframes } from 'styled-components'
 import { padding, color } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
+import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
+import {
+  SIDEBAR_HEADER_HEIGHT,
+  FORM_HEADER_HEIGHT,
+  FORM_FOOTER_HEIGHT,
+  SIDEBAR_WIDTH,
+} from '../Globals'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -44,6 +51,16 @@ export const FormsView = () => {
     editingForm ? setIsEditing(true) : setIsEditing(false)
   })
 
+  let moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      let form = editingForm!.finalForm
+      if (!result.destination) return
+      let name = result.type
+      form.mutators.move(name, result.source.index, result.destination.index)
+    },
+    [editingForm]
+  )
+
   /**
    * No Forms
    */
@@ -65,10 +82,10 @@ export const FormsView = () => {
     )
 
   return (
-    <>
-      <FormBuilder form={editingForm as any}>
-        {({ handleSubmit, pristine, form }) => {
-          return (
+    <FormBuilder form={editingForm as any}>
+      {({ handleSubmit, pristine, form }) => {
+        return (
+          <DragDropContext onDragEnd={moveArrayItem}>
             <FormAnimation isEditing={isEditing}>
               <FormHeader
                 isMultiform={isMultiform}
@@ -90,15 +107,16 @@ export const FormsView = () => {
                 {editingForm.actions.length > 0 && (
                   <ActionsMenu actions={editingForm.actions} />
                 )}
+
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
               </FormFooter>
             </FormAnimation>
-          )
-        }}
-      </FormBuilder>
-    </>
+          </DragDropContext>
+        )
+      }}
+    </FormBuilder>
   )
 }
 
@@ -208,12 +226,16 @@ const FormHeader = styled(
     )
   }
 )`
+  position: absolute;
+  top: 0;
+  height: ${FORM_HEADER_HEIGHT}rem;
+  width: ${SIDEBAR_WIDTH}px;
   cursor: ${p => p.isMultiform && 'pointer'};
   background-color: white;
   border-bottom: 1px solid rgba(51, 51, 51, 0.09);
   display: flex;
   align-items: center;
-  padding: ${padding('small')}rem ${padding()}rem;
+  padding: 0 ${padding()}rem;
   color: inherit;
   font-size: 1.2rem;
   transition: color 250ms ease-out;
@@ -234,11 +256,13 @@ const FormHeader = styled(
 `
 
 export const FormBody = styled.div`
+  position: absolute;
+  top: ${FORM_HEADER_HEIGHT}rem;
+  bottom: ${FORM_FOOTER_HEIGHT}rem;
   scrollbar-width: none;
-  width: 100%;
+  width: ${SIDEBAR_WIDTH}px;
   overflow-y: hidden;
   overflow-x: hidden;
-  flex: 1 0 4rem;
   ul,
   li {
     margin: 0;
@@ -248,32 +272,38 @@ export const FormBody = styled.div`
 `
 
 const FormFooter = styled.div`
+  position: absolute;
+  bottom: 0;
   display: flex;
   justify-content: space-between;
-  width: 100%;
-  height: 4rem;
+  align-items: center;
+  width: ${SIDEBAR_WIDTH}px;
+  height: ${FORM_FOOTER_HEIGHT}rem;
   background-color: white;
   border-top: 1px solid #efefef;
-  padding: 0.75rem 1.25rem;
-  flex: 0 0 4rem;
+  padding: 0 1.25rem;
 `
 
-const FormAnimation = styled.section<{ isEditing: Boolean }>`
-  display: flex;
-  flex-grow: 1;
-  flex-direction: column;
+const FormAnimationKeyframes = keyframes`
+  0% {
+    transform: translate3d( 100%, 0, 0 );
+  }
+  100% {
+    transform: translate3d( 0, 0, 0 );
+  }
+`
+
+const FormAnimation = styled.div<{ isEditing: Boolean }>`
   overflow: hidden;
-  ${FormHeader} {
-    transition: transform 150ms ease-out;
-    transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
-  }
-  ${FormBody} {
-    transition: transform 150ms ease-out;
-    transform: translate3d(${p => (!p.isEditing ? '100%' : '0')}, 0, 0);
-  }
-  ${FormFooter} {
-    transition: transform 150ms ease-out;
-    transform: translate3d(0, ${p => (!p.isEditing ? '100%' : '0')}, 0);
+  height: 100%;
+  width: ${SIDEBAR_WIDTH}px;
+  position: relative;
+  ${FormHeader}, ${FormBody}, ${FormFooter} {
+    animation-name: ${FormAnimationKeyframes};
+    animation-duration: 150ms;
+    animation-delay: 0;
+    animation-iteration-count: 1;
+    animation-timing-function: ease-out;
   }
 `
 
