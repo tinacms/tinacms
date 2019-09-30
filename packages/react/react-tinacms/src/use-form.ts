@@ -60,6 +60,30 @@ function findInactiveFormFields(form: Form) {
   return pathsToUpdate
 }
 
+/**
+ * Recursively looks up all fields associated with a path.
+ *
+ * Simple string
+ * ```
+ * 'name' => ['name']
+ * ```
+ *
+ * With a list of two authors:
+ * ```
+ * 'authors.INDEX.name' => [
+ *  'authors.0.name',
+ *  'authors.1.name',
+ * ]
+ * ```
+ *
+ * With a list of one author with two books:
+ * ```
+ * 'authors.INDEX.books.INDEX.title' => [
+ *  'authors.0.books.0.title',
+ *  'authors.0.books.1.title',
+ * ]
+ * ```
+ */
 function findInactiveFieldsInPath(form: Form, path: string) {
   let pathsToUpdate: string[] = []
 
