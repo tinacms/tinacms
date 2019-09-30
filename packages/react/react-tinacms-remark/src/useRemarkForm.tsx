@@ -1,4 +1,4 @@
-import { FormOptions, Form } from '@tinacms/core'
+import { FormOptions, Form, Field } from '@tinacms/core'
 import { ActionButton } from '@tinacms/tinacms'
 import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
 import {
@@ -35,6 +35,10 @@ export function useRemarkForm(
     [markdownRemark.rawFrontmatter]
   )
   let fields = formOverrrides.fields || generateFields(initialValues)
+  // The `frontmatter` object might be used by fields for previewing.
+  // We register it just so we can update keep it up-to-date.
+  // @ts-ignore
+  fields.push({ name: 'frontmatter', component: () => null as any })
 
   let [values, form] = useCMSForm({
     label,
@@ -92,26 +96,18 @@ export function useRemarkForm(
  * 1. registered with the form
  * 2. not currently active
  *
- * It also updates the `markdownRemark.frontmatter` property. This is
- * in-case that field is being used in previewing.
+ * TODO: Move into `react-tinacms`
  */
 function syncFormWithInitialValues(form: Form, initialValues: any) {
   useEffect(() => {
     if (!form) return
     form.finalForm.batch(() => {
-      /**
-       * Only update form fields that are observed.
-       */
-      form.fields.forEach((field: any) => {
-        let state = form.finalForm.getFieldState(field.name)
+      Object.entries(form.fieldSubscriptions).forEach(([path]) => {
+        let state = form.finalForm.getFieldState(path)
         if (state && !state.active) {
-          form.finalForm.change(field.name, get(initialValues, field.name))
+          form.finalForm.change(path, get(initialValues, path))
         }
       })
-      /**
-       * Also update frontmatter incase it's being used for previewing.
-       */
-      form.finalForm.change('frontmatter', initialValues.frontmatter)
     })
   }, [initialValues])
 }
