@@ -12,4 +12,5 @@ export interface FieldPlugin {
     field: Field
   ): string | object | undefined
   parse?: (value: string, name: string) => any
+  defaultValue?: any
 }

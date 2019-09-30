@@ -150,6 +150,40 @@ function BlogPostTemplate(props) {
 const BlogPostForm = {
   fields: [
     {
+      label: "Gallery",
+      name: "rawFrontmatter.gallery",
+      component: "group-list",
+      key: "alt",
+      defaultItem: {
+        alt: "",
+        src: "",
+        photographer: {
+          name: "",
+          social: [],
+        },
+      },
+      fields: [
+        { name: "alt", component: "text" },
+        { name: "src", component: "text" },
+        {
+          label: "Photographer",
+          name: "photographer",
+          component: "group",
+          fields: [
+            { name: "name", component: "text" },
+            {
+              name: "social",
+              component: "group-list",
+              fields: [
+                { name: "platformName", component: "text" },
+                { name: "account", component: "text" },
+              ],
+            },
+          ],
+        },
+      ],
+    },
+    {
       label: "Fake Author",
       name: "rawFrontmatter.fakeAuthor",
       component: "group",

@@ -1,3 +1,4 @@
+import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
 
 interface FieldSubscription {
@@ -12,14 +13,19 @@ export class Form<S = any> {
   fields: Field[]
   finalForm: FormApi<S>
   actions: any[]
-
   fieldSubscriptions: { [key: string]: FieldSubscription } = {}
 
   constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
     this.id = id
     this.label = label
     this.fields = fields
-    this.finalForm = createForm<S>(options)
+    this.finalForm = createForm<S>({
+      ...options,
+      mutators: {
+        ...arrayMutators,
+        ...options.mutators,
+      },
+    })
     /**
      * We register fields at creation time so we don't have to relay
      * on `react-final-form` components being rendered.
@@ -74,4 +80,5 @@ export interface Field {
   component: React.FC<any> | string | null
   parse?: (value: string, name: string) => any
   format?: (value: string, name: string) => any
+  defaultValue?: any
 }
