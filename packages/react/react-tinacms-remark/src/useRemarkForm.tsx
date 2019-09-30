@@ -1,4 +1,4 @@
-import { FormOptions, Form, Field } from '@tinacms/core'
+import { FormOptions } from '@tinacms/core'
 import { ActionButton } from '@tinacms/tinacms'
 import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
 import {
@@ -6,13 +6,11 @@ import {
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
   ERROR_MISSING_REMARK_RAW_FRONTMATTER,
 } from './errors'
-import { useEffect, useMemo } from 'react'
+import { useMemo } from 'react'
 import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
-
-let get = require('lodash.get')
 
 export function useRemarkForm(
   markdownRemark: RemarkNode,
@@ -38,7 +36,7 @@ export function useRemarkForm(
   // The `frontmatter` object might be used by fields for previewing.
   // We register it just so we can update keep it up-to-date.
   // @ts-ignore
-  fields.push({ name: 'frontmatter', component: () => null as any })
+  fields.push({ name: 'frontmatter', component: null })
 
   let [values, form] = useCMSForm({
     label,
@@ -76,8 +74,6 @@ export function useRemarkForm(
     ],
   })
 
-  syncFormWithInitialValues(form, initialValues)
-
   watchFormValues(form, formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
@@ -86,30 +82,6 @@ export function useRemarkForm(
   })
 
   return [markdownRemark, form]
-}
-
-/**
- * Updates the Form with new values from the MarkdownRemark node.
- *
- * Only updates fields that are:
- *
- * 1. registered with the form
- * 2. not currently active
- *
- * TODO: Move into `react-tinacms`
- */
-function syncFormWithInitialValues(form: Form, initialValues: any) {
-  useEffect(() => {
-    if (!form) return
-    form.finalForm.batch(() => {
-      Object.entries(form.fieldSubscriptions).forEach(([path]) => {
-        let state = form.finalForm.getFieldState(path)
-        if (state && !state.active) {
-          form.finalForm.change(path, get(initialValues, path))
-        }
-      })
-    })
-  }, [initialValues])
 }
 
 /**
