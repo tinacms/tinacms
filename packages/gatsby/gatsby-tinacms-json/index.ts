@@ -1,8 +1,6 @@
-import { Form, FormOptions } from '@tinacms/core'
+import { Form, FormOptions, Field } from '@tinacms/core'
 import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
-import { useEffect, useMemo } from 'react'
-
-let get = require('lodash.get')
+import { useMemo } from 'react'
 
 interface JsonNode {
   id: string
@@ -32,6 +30,8 @@ export function useJsonForm(
   )
   let fields = formOptions.fields || generateFields(initialValues.rawJson)
 
+  fields.push({ name: 'jsonNode', component: null })
+
   let [values, form] = useCMSForm({
     id,
     label,
@@ -42,8 +42,6 @@ export function useJsonForm(
     },
     ...formOptions,
   })
-
-  syncFormWithInitialValues(form, initialValues)
 
   watchFormValues(form, formState => {
     let { fileRelativePath, rawJson, ...data } = formState.values.rawJson
@@ -56,7 +54,7 @@ export function useJsonForm(
   return [jsonNode, form]
 }
 
-function generateFields(post: any) {
+function generateFields(post: any): Field[] {
   return Object.keys(post).map(key => ({
     component: 'text',
     name: `rawJson.${key}`,
@@ -76,37 +74,4 @@ export function JsonForm({ data, render, ...options }: JsonFormProps) {
 
 function validateJsonNode(jsonNode: JsonNode) {
   // TODO
-}
-
-/**
- * Updates the Form with new values from the MarkdownRemark node.
- *
- * Only updates fields that are:
- *
- * 1. registered with the form
- * 2. not currently active
- *
- * It also updates the `markdownRemark.frontmatter` property. This is
- * in-case that field is being used in previewing.
- */
-function syncFormWithInitialValues(form: Form, initialValues: any) {
-  useEffect(() => {
-    if (!form) return
-    form.finalForm.batch(() => {
-      /**
-       * Only update form fields that are observed.
-       */
-      form.fields.forEach((field: any) => {
-        let state = form.finalForm.getFieldState(field.name)
-        if (state && !state.active) {
-          form.finalForm.change(field.name, get(initialValues, field.name))
-        }
-      })
-
-      /**
-       * Also update frontmatter incase it's being used for previewing.
-       */
-      form.finalForm.change('jsonNode', initialValues.jsonNode)
-    })
-  }, [initialValues])
 }
