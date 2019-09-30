@@ -55,14 +55,20 @@ function syncFormWithInitialValues(form?: Form, initialValues?: any) {
 function findInactiveFields(form: Form) {
   let pathsToUpdate: string[] = []
   Object.entries(form.fieldSubscriptions).forEach(([path]) => {
-    let state = form.finalForm.getFieldState(path)
-    if (!state) return
+    pathsToUpdate = pathsToUpdate.concat(yadiyada(form, path))
+  })
+  return pathsToUpdate
+}
 
-    if (/INDEX/.test(path)) {
-      let listPath = path.split('.INDEX.')[0]
-      let listState = form.finalForm.getFieldState(listPath)
-      if (!listState) return
+function yadiyada(form: Form, path: string) {
+  let pathsToUpdate: string[] = []
+  let state = form.finalForm.getFieldState(path)
+  if (!state) return pathsToUpdate
 
+  if (/INDEX/.test(path)) {
+    let listPath = path.split('.INDEX.')[0]
+    let listState = form.finalForm.getFieldState(listPath)
+    if (listState) {
       for (let i = 0; i < listState.value.length; i++) {
         let indexPath = path.replace('INDEX', `${i}`)
         let indexState = form.finalForm.getFieldState(indexPath)
@@ -70,9 +76,9 @@ function findInactiveFields(form: Form) {
           pathsToUpdate.push(indexPath)
         }
       }
-    } else if (!state.active) {
-      pathsToUpdate.push(path)
     }
-  })
+  } else if (!state.active) {
+    pathsToUpdate.push(path)
+  }
   return pathsToUpdate
 }
