@@ -54,7 +54,8 @@ function syncFormWithInitialValues(form?: Form, initialValues?: any) {
 
 function findInactiveFormFields(form: Form) {
   let pathsToUpdate: string[] = []
-  Object.entries(form.fieldSubscriptions).forEach(([path]) => {
+  Object.entries(form.fieldSubscriptions).forEach(([path, field]) => {
+    if (field.skipSync) return
     pathsToUpdate = pathsToUpdate.concat(findInactiveFieldsInPath(form, path))
   })
   return pathsToUpdate
@@ -84,14 +85,14 @@ function findInactiveFormFields(form: Form) {
  * ]
  * ```
  */
-function findInactiveFieldsInPath(form: Form, path: string) {
+export function findInactiveFieldsInPath(form: Form, path: string) {
   let pathsToUpdate: string[] = []
 
   if (/INDEX/.test(path)) {
     let listPath = path.split('.INDEX.')[0]
-    let listState = form.finalForm.getFieldState(listPath)
+    let listState = get(form.finalForm.getState().values, listPath, [])
     if (listState) {
-      for (let i = 0; i < listState.value.length; i++) {
+      for (let i = 0; i < listState.length; i++) {
         let indexPath = path.replace('INDEX', `${i}`)
         let subpaths = findInactiveFieldsInPath(form, indexPath)
         pathsToUpdate = [...pathsToUpdate, ...subpaths]
@@ -99,7 +100,7 @@ function findInactiveFieldsInPath(form: Form, path: string) {
     }
   } else {
     let state = form.finalForm.getFieldState(path)
-    if (state && !state.active) {
+    if (!state || !state.active) {
       pathsToUpdate.push(path)
     }
   }
