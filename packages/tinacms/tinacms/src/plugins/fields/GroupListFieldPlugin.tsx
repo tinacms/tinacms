@@ -79,17 +79,6 @@ const Group = function Group({
 
 const EmptyState = () => <EmptyList>There's no items</EmptyList>
 
-const EmptyList = styled.div`
-  text-align: center;
-  border-radius: 0.25rem;
-  background-color: #fafafa;
-  color: #bdbdbd;
-  line-height: 1.35;
-  padding: 0.75rem 0;
-  font-size: 0.85rem;
-  font-weight: 500;
-`
-
 interface ItemProps {
   tinaForm: Form
   field: GroupFieldDefinititon
@@ -202,6 +191,17 @@ const GroupHeaderButton = styled(Button)`
   }
 `
 
+const EmptyList = styled.div`
+  text-align: center;
+  border-radius: 0.25rem;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  line-height: 1.35;
+  padding: 0.75rem 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+`
+
 const ItemList = styled.div``
 
 const ItemHeader = styled.div<{ isDragging: boolean }>`
@@ -283,6 +283,7 @@ const DeleteButton = styled.button`
   background: transparent;
   cursor: pointer;
   padding: 0.75rem 0.5rem;
+  margin: 0;
   transition: all 85ms ease-out;
   &:hover {
     background-color: #f2f2f2;
