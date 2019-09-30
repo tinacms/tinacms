@@ -61,7 +61,6 @@ const Group = function Group({
                 {items.length === 0 && <EmptyState />}
                 {items.map((item: any, index: any) => (
                   <Item
-                    key={item[field.key]}
                     tinaForm={tinaForm}
                     field={field}
                     item={item}
