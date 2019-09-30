@@ -77,7 +77,18 @@ const Group = function Group({
   )
 }
 
-const EmptyState = () => <div>There's no items</div>
+const EmptyState = () => <EmptyList>There's no items</EmptyList>
+
+const EmptyList = styled.div`
+  text-align: center;
+  border-radius: 0.25rem;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  line-height: 1.35;
+  padding: 0.75rem 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+`
 
 interface ItemProps {
   tinaForm: Form
@@ -246,6 +257,22 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
     css`
       border-radius: 0.25rem;
       box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+
+      svg {
+        fill: #353232;
+      }
+      ${GroupLabel} {
+        color: #0084ff;
+      }
+
+      ${DragHandle} {
+        svg:first-child {
+          opacity: 0;
+        }
+        svg:last-child {
+          opacity: 1;
+        }
+      }
     `};
 `
 
