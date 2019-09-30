@@ -115,6 +115,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
 }
 
 const FieldsGroup = styled.div`
+  position: relative;
   display: block;
   width: 100%;
   overflow-x: hidden;

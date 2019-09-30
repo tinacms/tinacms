@@ -206,29 +206,28 @@ const ItemHeader = styled.div`
   overflow: visible;
   line-height: 1.35;
   padding: 0;
-  color: #282828;
-  fill: #b4b4b4;
   font-size: 0.85rem;
   font-weight: 500;
-  transition: all 85ms ease-out;
 
   ${GroupLabel} {
+    color: #282828;
     align-self: center;
     max-width: 100%;
   }
 
   svg {
-    fill: inherit;
+    fill: #b4b4b4;
     width: 1.25rem;
     height: auto;
     transition: fill 85ms ease-out;
   }
 
   &:hover {
-    color: #0084ff;
-    fill: #353232;
+    svg {
+      fill: #353232;
+    }
     ${GroupLabel} {
-      color: inherit;
+      color: #0084ff;
     }
   }
 
