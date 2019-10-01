@@ -26,4 +26,15 @@ export const Wysiwyg = styled(
   }
 )`
   white-space: pre-wrap;
+
+  .CodeMirror {
+    width: 100%;
+    height: auto;
+    border-radius: ${props => props.theme.radius.small}
+    margin-bottom: 1rem;
+
+    .CodeMirror-sizer {
+      min-height: auto;
+    }
+  }
 `
