@@ -26,7 +26,7 @@ const DEFAULT_REMARK_FIELDS = [
 export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
 ): AddContentPlugin {
-  let formatFilename = options.filename || ((value: any) => value.filepath)
+  let formatFilename = options.filename || ((form: any) => form.filename)
   let createFrontmatter = options.frontmatter || (() => ({}))
   let createBody = options.body || (() => '')
   return {
