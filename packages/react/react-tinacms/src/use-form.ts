@@ -37,20 +37,72 @@ export function useCMSForm(options: FormOptions<any>) {
  * Only updates fields that are:
  *
  * 1. registered with the form
- * 2. not currently active
+ * 2. not currently [active](https://final-form.org/docs/final-form/types/FieldState#active)
  *
- * TODO: Move into `react-tinacms`
  */
 function syncFormWithInitialValues(form?: Form, initialValues?: any) {
   React.useEffect(() => {
     if (!form) return
     form.finalForm.batch(() => {
-      Object.entries(form.fieldSubscriptions).forEach(([path]) => {
-        let state = form.finalForm.getFieldState(path)
-        if (state && !state.active) {
-          form.finalForm.change(path, get(initialValues, path))
-        }
+      findInactiveFormFields(form).forEach(path => {
+        form.finalForm.change(path, get(initialValues, path))
       })
     })
   }, [initialValues])
+}
+
+function findInactiveFormFields(form: Form) {
+  let pathsToUpdate: string[] = []
+  Object.entries(form.fieldSubscriptions).forEach(([path, field]) => {
+    pathsToUpdate = pathsToUpdate.concat(findInactiveFieldsInPath(form, path))
+  })
+  return pathsToUpdate
+}
+
+/**
+ * Recursively looks up all non-[active](https://final-form.org/docs/final-form/types/FieldState#active)
+ * fields associated with a path.
+ *
+ *
+ * Simple string
+ * ```
+ * 'name' => ['name']
+ * ```
+ *
+ * With a list of two authors:
+ * ```
+ * 'authors.INDEX.name' => [
+ *  'authors.0.name',
+ *  'authors.1.name',
+ * ]
+ * ```
+ *
+ * With a list of one author with two books:
+ * ```
+ * 'authors.INDEX.books.INDEX.title' => [
+ *  'authors.0.books.0.title',
+ *  'authors.0.books.1.title',
+ * ]
+ * ```
+ */
+export function findInactiveFieldsInPath(form: Form, path: string) {
+  let pathsToUpdate: string[] = []
+
+  if (/INDEX/.test(path)) {
+    let listPath = path.split('.INDEX.')[0]
+    let listState = get(form.finalForm.getState().values, listPath, [])
+    if (listState) {
+      for (let i = 0; i < listState.length; i++) {
+        let indexPath = path.replace('INDEX', `${i}`)
+        let subpaths = findInactiveFieldsInPath(form, indexPath)
+        pathsToUpdate = [...pathsToUpdate, ...subpaths]
+      }
+    }
+  } else {
+    let state = form.finalForm.getFieldState(path)
+    if (!state || !state.active) {
+      pathsToUpdate.push(path)
+    }
+  }
+  return pathsToUpdate
 }
