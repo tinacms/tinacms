@@ -46,7 +46,9 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   let cms = useCMS()
   return (
     <FieldsGroup>
-      {fields.map(field => {
+      {fields.map((field: Field) => {
+        if (field.component === null) return null
+
         let plugin = cms.plugins
           .findOrCreateMap<FieldPlugin>('field')
           .find(field.component as string)
@@ -83,7 +85,10 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
             }}
           >
             {fieldProps => {
-              if (typeof field.component !== 'string') {
+              if (
+                typeof field.component !== 'string' &&
+                field.component !== null
+              ) {
                 return (
                   <field.component
                     {...fieldProps}
@@ -115,6 +120,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
 }
 
 const FieldsGroup = styled.div`
+  position: relative;
   display: block;
   width: 100%;
   overflow-x: hidden;

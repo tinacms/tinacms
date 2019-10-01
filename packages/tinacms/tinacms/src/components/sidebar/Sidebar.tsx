@@ -13,7 +13,12 @@ import {
   EditIcon,
 } from '@tinacms/icons'
 import { GlobalStyles, padding, color, TinaResetStyles } from '@tinacms/styles'
-import { SIDEBAR_WIDTH, TOGGLE_WIDTH, Z_INDEX } from '../../Globals'
+import {
+  SIDEBAR_WIDTH,
+  TOGGLE_WIDTH,
+  Z_INDEX,
+  SIDEBAR_HEADER_HEIGHT,
+} from '../../Globals'
 import { Button } from '../Button'
 import { CreateContentButton } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
@@ -177,13 +182,12 @@ const MenuLink = styled.div<{ value: string }>`
 `
 
 const SidebarHeader = styled.div`
-  display: flex;
   align-items: center;
-  position: relative;
+  position: fixed;
+  top: 0;
   z-index: 1050;
   width: 100%;
-  height: 3.25rem;
-  flex: 0 0 3.25rem;
+  height: ${SIDEBAR_HEADER_HEIGHT}rem;
   padding: 0 ${padding()}rem;
 `
 
@@ -298,7 +302,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
 
 const SidebarWrapper = styled.div<{ open: boolean }>`
   margin: 0;
-  padding: 0;
+  padding: ${SIDEBAR_HEADER_HEIGHT}rem 0 0 0;
   border: 0;
   z-index: 1;
   background-color: white;

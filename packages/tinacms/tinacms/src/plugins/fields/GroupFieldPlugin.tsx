@@ -1,9 +1,15 @@
 import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
-import styled from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
+import {
+  SIDEBAR_HEADER_HEIGHT,
+  SIDEBAR_WIDTH,
+  FORM_HEADER_HEIGHT,
+  FORM_FOOTER_HEIGHT,
+} from '../../Globals'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -69,7 +75,8 @@ const Panel = function Panel({
         <LeftArrowIcon /> {Label(field)}
       </PanelHeader>
       <PanelBody>
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
+        {/* {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null} */}
+        <FieldsBuilder form={tinaForm} fields={fields} />
       </PanelBody>
     </GroupPanel>
   )
@@ -107,6 +114,7 @@ const Header = styled.div`
 
 export const PanelHeader = styled(Header)`
   flex: 0 0 auto;
+  background: white;
   justify-content: flex-start;
   border: none;
   border-bottom: 1px solid #efefef;
@@ -125,8 +133,9 @@ export const PanelHeader = styled(Header)`
 `
 
 export const PanelBody = styled.div`
+  background: white;
   position: relative;
-  display: block;
+  display: flex;
   flex: 1 1 auto;
   overflow-y: auto;
 `
@@ -139,21 +148,47 @@ const GroupLabel = styled.span`
   transition: all 85ms ease-out;
 `
 
+const GroupPanelKeyframes = keyframes`
+  0% {
+    transform: translate3d( 100%, 0, 0 );
+  }
+  100% {
+    transform: translate3d( 0, 0, 0 );
+  }
+`
+
 export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   position: fixed;
-  width: 100%;
-  height: 100%;
-  top: 0;
+  width: ${SIDEBAR_WIDTH}px;
+  top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}rem;
+  bottom: ${FORM_FOOTER_HEIGHT}rem;
   left: 0;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  transform: translate3d(${p => (p.isExpanded ? '0' : '100%')}, 0, 0);
-  overflow-y: hidden;
-  overflow-x: hidden;
-  background: white;
+  overflow: hidden;
   z-index: 50;
-  transition: transform 250ms ease-out;
+  pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
+
+  > * {
+    ${p =>
+      p.isExpanded &&
+      css`
+        animation-name: ${GroupPanelKeyframes};
+        animation-duration: 150ms;
+        animation-delay: 0;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-out;
+        animation-fill-mode: backwards;
+      `};
+
+    ${p =>
+      !p.isExpanded &&
+      css`
+        transition: transform 150ms ease-out;
+        transform: translate3d(100%, 0, 0);
+      `};
+  }
 `
 
 export interface GroupFieldProps {

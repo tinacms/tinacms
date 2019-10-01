@@ -1,6 +1,6 @@
 import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding } from '@tinacms/styles'
 import { Droppable, DropResult, Draggable } from 'react-beautiful-dnd'
@@ -56,11 +56,11 @@ const Group = function Group({
       <GroupListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
-            {provider => (
-              <ul ref={provider.innerRef} className="edit-page--list-parent">
+            {(provider, snapshot) => (
+              <div ref={provider.innerRef}>
+                {items.length === 0 && <EmptyState />}
                 {items.map((item: any, index: any) => (
                   <Item
-                    key={item[field.key]}
                     tinaForm={tinaForm}
                     field={field}
                     item={item}
@@ -68,7 +68,7 @@ const Group = function Group({
                   />
                 ))}
                 {provider.placeholder}
-              </ul>
+              </div>
             )}
           </Droppable>
         </ItemList>
@@ -76,6 +76,8 @@ const Group = function Group({
     </>
   )
 }
+
+const EmptyState = () => <EmptyList>There's no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
@@ -89,6 +91,7 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
   let removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
+  let title = item.alt ? item.alt : (field.label || field.name) + ' Item'
   return (
     <Draggable
       key={index}
@@ -96,20 +99,18 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
       draggableId={`${field.name}.${index}`}
       index={index}
     >
-      {provider => (
+      {(provider, snapshot) => (
         <>
           <ItemHeader
             ref={provider.innerRef}
+            isDragging={snapshot.isDragging}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
             {...p}
           >
             <DragHandle />
             <ItemClickTarget onClick={() => setExpanded(true)}>
-              <GroupLabel>
-                {item.alt || field.label || field.name}
-                {item.alt ? '' : ' Item'}
-              </GroupLabel>
+              <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
@@ -121,9 +122,7 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
             field={field}
             index={index}
             tinaForm={tinaForm}
-            itemTitle={
-              item.alt ? item.alt : (field.label || field.name) + ' Item'
-            }
+            itemTitle={title}
           />
         </>
       )}
@@ -192,9 +191,20 @@ const GroupHeaderButton = styled(Button)`
   }
 `
 
+const EmptyList = styled.div`
+  text-align: center;
+  border-radius: 0.25rem;
+  background-color: #fafafa;
+  color: #bdbdbd;
+  line-height: 1.35;
+  padding: 0.75rem 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+`
+
 const ItemList = styled.div``
 
-const ItemHeader = styled.div`
+const ItemHeader = styled.div<{ isDragging: boolean }>`
   position: relative;
   cursor: pointer;
   display: flex;
@@ -206,29 +216,28 @@ const ItemHeader = styled.div`
   overflow: visible;
   line-height: 1.35;
   padding: 0;
-  color: #282828;
-  fill: #b4b4b4;
   font-size: 0.85rem;
   font-weight: 500;
-  transition: all 85ms ease-out;
 
   ${GroupLabel} {
+    color: #282828;
     align-self: center;
     max-width: 100%;
   }
 
   svg {
-    fill: inherit;
+    fill: #b4b4b4;
     width: 1.25rem;
     height: auto;
     transition: fill 85ms ease-out;
   }
 
   &:hover {
-    color: #0084ff;
-    fill: #353232;
+    svg {
+      fill: #353232;
+    }
     ${GroupLabel} {
-      color: inherit;
+      color: #0084ff;
     }
   }
 
@@ -242,6 +251,29 @@ const ItemHeader = styled.div`
       border-radius: 0.25rem;
     }
   }
+
+  ${p =>
+    p.isDragging &&
+    css`
+      border-radius: 0.25rem;
+      box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+
+      svg {
+        fill: #353232;
+      }
+      ${GroupLabel} {
+        color: #0084ff;
+      }
+
+      ${DragHandle} {
+        svg:first-child {
+          opacity: 0;
+        }
+        svg:last-child {
+          opacity: 1;
+        }
+      }
+    `};
 `
 
 const DeleteButton = styled.button`
@@ -251,6 +283,7 @@ const DeleteButton = styled.button`
   background: transparent;
   cursor: pointer;
   padding: 0.75rem 0.5rem;
+  margin: 0;
   transition: all 85ms ease-out;
   &:hover {
     background-color: #f2f2f2;
@@ -326,10 +359,10 @@ const Panel = function Panel({
     <GroupPanel isExpanded={isExpanded}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
-        <GroupLabel>{itemTitle || field.label || field.name}</GroupLabel>
+        <GroupLabel>{itemTitle}</GroupLabel>
       </PanelHeader>
       <PanelBody>
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
+        <FieldsBuilder form={tinaForm} fields={fields} />
       </PanelBody>
     </GroupPanel>
   )
