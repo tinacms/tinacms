@@ -38,10 +38,13 @@ export class Form<S = any> {
     fields.forEach(field => {
       let path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
 
-      // @ts-ignore
-      let subfields = field.fields
-      if (subfields) {
-        // This will work for groups. But not for group-lists or blocks.
+      let isGroup = ['group'].includes(field.component as string)
+      let isArray = ['group-list'].includes(field.component as string)
+      if (isArray) {
+        let subfields = field.fields || []
+        this.registerFields(subfields, `${path}.INDEX`)
+      } else if (isGroup) {
+        let subfields = field.fields || []
         this.registerFields(subfields, path)
       } else {
         this.fieldSubscriptions[path] = {
@@ -81,4 +84,5 @@ export interface Field {
   parse?: (value: string, name: string) => any
   format?: (value: string, name: string) => any
   defaultValue?: any
+  fields?: Field[]
 }
