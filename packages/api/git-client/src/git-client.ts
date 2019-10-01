@@ -71,7 +71,6 @@ export class GitClient {
     fileRelativePath: string
     content: string
   }): Promise<any> {
-    console.log(data)
     return fetch(
       `${this.baseUrl}/${encodeURIComponent(data.fileRelativePath)}`,
       {
