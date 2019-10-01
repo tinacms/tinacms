@@ -39,7 +39,7 @@ export class Form<S = any> {
       let path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
 
       let isGroup = ['group'].includes(field.component as string)
-      let isArray = ['group-list'].includes(field.component as string)
+      let isArray = ['group-list', 'blocks'].includes(field.component as string)
       if (isArray) {
         let subfields = field.fields || []
         this.registerFields(subfields, `${path}.INDEX`)
