@@ -1,4 +1,0 @@
-#!/usr/bin/env node
-
-require = require('esm')(module)
-require('../build/').init(process.argv)
