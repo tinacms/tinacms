@@ -14,7 +14,15 @@ export const Wysiwyg = styled(
   ({ input, plugins, frame, ...styleProps }: any) => {
     let prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame)
 
-    return <div {...styleProps} ref={prosemirrorEl} />
+    return (
+      <>
+        <link
+          rel="stylesheet"
+          href="https://codemirror.net/lib/codemirror.css"
+        />
+        <div {...styleProps} ref={prosemirrorEl} />
+      </>
+    )
   }
 )`
   white-space: pre-wrap;
