@@ -23,3 +23,9 @@ gallery:
 # TootToot
 
 [test]()
+
+```javascript
+let a = "test"
+
+console.log("Hello")
+```
