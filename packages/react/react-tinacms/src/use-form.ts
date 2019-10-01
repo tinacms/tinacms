@@ -37,9 +37,8 @@ export function useCMSForm(options: FormOptions<any>) {
  * Only updates fields that are:
  *
  * 1. registered with the form
- * 2. not currently active
+ * 2. not currently [active](https://final-form.org/docs/final-form/types/FieldState#active)
  *
- * TODO: Move into `react-tinacms`
  */
 function syncFormWithInitialValues(form?: Form, initialValues?: any) {
   React.useEffect(() => {
@@ -61,7 +60,9 @@ function findInactiveFormFields(form: Form) {
 }
 
 /**
- * Recursively looks up all fields associated with a path.
+ * Recursively looks up all non-[active](https://final-form.org/docs/final-form/types/FieldState#active)
+ * fields associated with a path.
+ *
  *
  * Simple string
  * ```
