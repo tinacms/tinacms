@@ -188,7 +188,7 @@ const NoFormsPlaceholder = () => (
     <p>Let's get a form set up so you can start editing.</p>
     <p>
       <LinkButton
-        href="https://github.com/tinacms/tinacms-site/blob/master/docs/gatsby/content-editing.md"
+        href="https://github.com/tinacms/tinacms-site/blob/master/content/docs/gatsby/content-editing.md"
         target="_blank"
       >
         <Emoji>📖</Emoji> Form Setup Guide
