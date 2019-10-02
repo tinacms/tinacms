@@ -123,8 +123,8 @@ const FieldsGroup = styled.div`
   position: relative;
   display: block;
   width: 100%;
+  height: 100%;
   overflow-x: hidden;
   overflow-y: auto;
-  max-height: 100%;
   padding: 1.25rem 1.25rem 0 1.25rem;
 `

@@ -19,12 +19,12 @@ import { padding, color } from '@tinacms/styles'
 export const CreateContentButton = ({ plugin }: any) => {
   let [open, setOpen] = React.useState(false)
   return (
-    <div>
+    <>
       <CreateButton onClick={() => setOpen(p => !p)}>
         {plugin.name}
       </CreateButton>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
-    </div>
+    </>
   )
 }
 
@@ -81,6 +81,23 @@ const CloseButton = styled.div`
   }
 `
 
-const CreateButton = styled(Button)`
+export const CreateButton = styled.button`
+  position: relative;
+  text-align: center;
+  font-size: 0.75rem;
+  padding: 0.75rem 1.25rem;
+  font-weight: 500;
   width: 100%;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  border: 0;
+  transition: all 85ms ease-out;
+  &:hover {
+    color: ${color('primary')};
+    background-color: #f6f6f9;
+  }
+  &:not(:last-child) {
+    border-bottom: 1px solid #efefef;
+  }
 `
