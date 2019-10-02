@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
-import { StyledFrame } from '../SyledFrame'
-import styled, { keyframes } from 'styled-components'
+import { StyledFrame, useFrameContext } from '../SyledFrame'
+import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from '../FormView'
 import { Modal } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
@@ -11,6 +11,7 @@ import {
   HamburgerIcon,
   LeftArrowIcon,
   EditIcon,
+  AddIcon,
 } from '@tinacms/icons'
 import { GlobalStyles, padding, color, TinaResetStyles } from '@tinacms/styles'
 import {
@@ -24,13 +25,16 @@ import { CreateContentButton } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useTina } from '../../hooks/use-tina'
+import { Dismissible } from 'react-dismissible'
 
 export const Sidebar = () => {
+  const frame = useFrameContext()
   const cms = useTina()
   const sidebar = useSidebar()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
+  let [visible, setVisible] = React.useState(false)
 
   return (
     <SidebarContainer open={sidebar.isOpen}>
@@ -51,20 +55,41 @@ export const Sidebar = () => {
         <SidebarWrapper open={sidebar.isOpen}>
           <GlobalStyles />
           <SidebarHeader>
-            <ActionsToggle
+            <MenuToggle
               onClick={() => setMenuVisibility(!menuIsVisible)}
               open={menuIsVisible}
             >
               {menuIsVisible ? <CloseIcon /> : <HamburgerIcon />}
-            </ActionsToggle>
+            </MenuToggle>
+
+            <ContentMenuWrapper>
+              <PlusButton onClick={() => setVisible(true)} open={visible}>
+                <AddIcon />
+              </PlusButton>
+              <ContentMenu open={visible}>
+                <Dismissible
+                  click
+                  escape
+                  onDismiss={() => setVisible(false)}
+                  document={frame.document}
+                  disabled={!visible}
+                >
+                  {cms.plugins.all('content-button').map(plugin => (
+                    <CreateContentButton
+                      plugin={plugin}
+                      onClick={() => {
+                        setVisible(false)
+                      }}
+                    />
+                  ))}
+                </Dismissible>
+              </ContentMenu>
+            </ContentMenuWrapper>
           </SidebarHeader>
           <FormsView />
 
           <MenuPanel visible={menuIsVisible}>
             <MenuWrapper>
-              {cms.plugins.all('content-button').map(plugin => (
-                <CreateContentButton plugin={plugin} />
-              ))}
               <MenuList>
                 {cms.screens.all().map(view => (
                   <MenuLink
@@ -94,6 +119,70 @@ export const Sidebar = () => {
     </SidebarContainer>
   )
 }
+
+const ContentMenuWrapper = styled.div`
+  position: relative;
+`
+
+const PlusButton = styled(Button)<{ open: boolean }>`
+  border-radius: 10rem;
+  padding: 0;
+  width: 2rem;
+  height: 2rem;
+  margin: 0;
+  position: relative;
+  fill: white;
+  transform-origin: 50% 50%;
+  transition: all 150ms ease-out;
+  svg {
+    position: absolute;
+    top: 50%;
+    left: 50%;
+    transform: translate3d(-50%, -50%, 0);
+    width: 1.5rem;
+    height: 1.5rem;
+  }
+  &:focus {
+    outline: none;
+  }
+  ${props =>
+    props.open &&
+    css`
+      transform: rotate(45deg);
+      background-color: white;
+      fill: ${color('primary')};
+      &:hover {
+        background-color: #f6f6f9;
+      }
+    `};
+`
+
+const ContentMenu = styled.div<{ open: boolean }>`
+  min-width: 12rem;
+  border-radius: 0.5rem;
+  border: 1px solid #efefef;
+  display: block;
+  position: absolute;
+  top: 0;
+  right: 0;
+  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 150ms ease-out;
+  transform-origin: 100% 0;
+  box-shadow: ${p => p.theme.shadow.big};
+  background-color: white;
+  overflow: hidden;
+  z-index: 100;
+
+  ${props =>
+    props.open &&
+    css`
+      opacity: 1;
+      pointer-events: all;
+      transform: translate3d(0, 2.25rem, 0) scale3d(1, 1, 1);
+    `};
+`
 
 const SidebarToggle = (sidebar: any) => {
   return (
@@ -182,24 +271,26 @@ const MenuLink = styled.div<{ value: string }>`
 `
 
 const SidebarHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   position: fixed;
   top: 0;
   z-index: 1050;
-  width: 100%;
   height: ${SIDEBAR_HEADER_HEIGHT}rem;
-  padding: 0 ${padding()}rem;
+  width: ${SIDEBAR_WIDTH}px;
+  padding: 1rem ${padding()}rem 0 ${padding()}rem;
 `
 
-const ActionsToggle = styled.button<{ open: boolean }>`
-  padding: 1rem 0 0 ${padding()}rem;
+const MenuToggle = styled.button<{ open: boolean }>`
+  padding: 0 0 0 ${padding()}rem;
   margin-left: -${padding()}rem;
   background: transparent;
   outline: none;
   border: 0;
   text-align: left;
   width: 4rem;
-  height: 3.25rem;
+  height: 2rem;
   transition: all 75ms ease-out;
   fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
   &:hover {
@@ -211,11 +302,12 @@ const ActionsToggle = styled.button<{ open: boolean }>`
 const MenuWrapper = styled.div`
   position: absolute;
   left: 0;
-  top: 4rem;
-  height: calc(100vh - (4rem));
+  top: 0;
+  height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: ${padding()}rem;
+  padding: ${SIDEBAR_HEADER_HEIGHT}rem ${padding()}rem ${padding()}rem
+    ${padding()}rem;
   ul,
   li {
     margin: 0;
@@ -242,10 +334,6 @@ const MenuPanel = styled.div<{ visible: boolean }>`
     padding: 0;
     list-style: none;
   }
-`
-
-const CreateButton = styled(Button)`
-  width: 100%;
 `
 
 const ModalActions = styled.div`
