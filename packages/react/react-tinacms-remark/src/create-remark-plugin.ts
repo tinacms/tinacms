@@ -6,33 +6,22 @@ type MaybePromise<T> = Promise<T> | T
 
 interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
   label: string
-  filename?(value: FormShape): MaybePromise<string>
+  fields: Field[]
+  filename(value: FormShape): MaybePromise<string>
   frontmatter?(value: FormShape): MaybePromise<FrontmatterShape>
   body?(value: FormShape): MaybePromise<string>
-  fields?: Field[]
 }
-
-const DEFAULT_REMARK_FIELDS = [
-  {
-    name: 'filename',
-    component: 'text',
-    label: 'Filename',
-    placeholder: 'content/blog/hello-world/index.md',
-    description:
-      'The full path to the new markdown file, relative to the repository root.',
-  },
-]
 
 export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
 ): AddContentPlugin {
-  let formatFilename = options.filename || ((form: any) => form.filename)
+  let formatFilename = options.filename
   let createFrontmatter = options.frontmatter || (() => ({}))
   let createBody = options.body || (() => '')
   return {
     __type: 'content-button',
     name: options.label,
-    fields: options.fields || DEFAULT_REMARK_FIELDS,
+    fields: options.fields,
     onSubmit: async (value: any, cms: CMS) => {
       let filename = await formatFilename(value)
       let rawFrontmatter = await createFrontmatter(value)
