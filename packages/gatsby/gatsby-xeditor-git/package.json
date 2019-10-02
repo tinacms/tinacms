@@ -14,6 +14,21 @@
     "CHANGELOG.md",
     "README.md"
   ],
+  "keywords": [
+    "tinacms",
+    "cms",
+    "gatsby",
+    "git",
+    "react"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/gatsby-tinacms-json"
+  },
   "scripts": {
     "prepublish": "npm run build",
     "watch": "tsc -w",

@@ -25,6 +25,7 @@ function BlogPostTemplate(props) {
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
   const { isEditing, setIsEditing } = props
+  const blocks = post.frontmatter.blocks || []
 
   return (
     <Layout location={props.location} title={siteTitle}>
@@ -100,6 +101,20 @@ function BlogPostTemplate(props) {
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
         </TinaField>
+        {blocks.map(({ _template, ...block }) => {
+          switch (_template) {
+            case "heading":
+              return <h1>{block.text}</h1>
+            case "image":
+              return (
+                <p>
+                  <img {...block} />
+                </p>
+              )
+            default:
+              return "What"
+          }
+        })}
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
             dangerouslySetInnerHTML={{
@@ -147,13 +162,40 @@ function BlogPostTemplate(props) {
   )
 }
 
+const heading = {
+  label: "Heading",
+  defaultItem: {
+    text: "",
+  },
+  fields: [{ name: "text", component: "text", label: "Text" }],
+}
+
+const image = {
+  label: "img",
+  defaultItem: {
+    text: "",
+  },
+  fields: [
+    { name: "src", component: "text", label: "Source URL" },
+    { name: "alt", component: "text", label: "Alt Text" },
+  ],
+}
+
 const BlogPostForm = {
   fields: [
+    {
+      label: "Blocks",
+      name: "rawFrontmatter.blocks",
+      component: "blocks",
+      templates: {
+        heading,
+        image,
+      },
+    },
     {
       label: "Gallery",
       name: "rawFrontmatter.gallery",
       component: "group-list",
-      key: "alt",
       defaultItem: {
         alt: "",
         src: "",
@@ -289,6 +331,12 @@ export const pageQuery = graphql`
       rawMarkdownBody
 
       frontmatter {
+        blocks {
+          _template
+          text
+          alt
+          src
+        }
         title
         date(formatString: "DD MMMM, YYYY")
         description
