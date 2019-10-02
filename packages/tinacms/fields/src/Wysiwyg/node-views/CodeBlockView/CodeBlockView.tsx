@@ -9,14 +9,22 @@ import {
   exitCodeHard,
 } from '../../commands/codeblock-commands'
 
-const CodeMirror = require('codemirror')
-
 // TODO
 type CodeMirrorEditor = any
 
+const ssr = typeof navigator == 'undefined'
+const mac =
+  typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
+
+let CodeMirror: any = null
+
+if (!ssr) {
+  CodeMirror = require('codemirror')
+}
+
 export class CodeBlockView implements NodeView {
   cm: CodeMirrorEditor
-  dom: HTMLElement
+  dom?: HTMLElement
   updating: boolean = false
 
   constructor(
@@ -24,6 +32,7 @@ export class CodeBlockView implements NodeView {
     protected view: EditorView,
     protected getPos: () => number
   ) {
+    if (ssr) return
     this.cm = this.setupCodeMirror(node)
     this.dom = this.cm.getWrapperElement()
     setTimeout(() => this.cm.refresh(), 20)
@@ -118,8 +127,8 @@ export class CodeBlockView implements NodeView {
    */
   codeMirrorKeymap() {
     let view = this.view
-    let mod = /Mac/.test(navigator.platform) ? 'Cmd' : 'Ctrl'
-    return (CodeMirror as any).normalizeKeyMap({
+    let mod = mac ? 'Cmd' : 'Ctrl'
+    return CodeMirror.normalizeKeyMap({
       Up: () => this.maybeEscape('line', -1),
       Left: () => this.maybeEscape('char', -1),
       Down: () => this.maybeEscape('line', 1),
