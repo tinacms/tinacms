@@ -185,7 +185,7 @@ const BlogPostForm = {
   fields: [
     {
       label: "Blocks",
-      name: "rawFrontmatter.blocks",
+      name: "frontmatter.blocks",
       component: "blocks",
       templates: {
         heading,
@@ -194,7 +194,7 @@ const BlogPostForm = {
     },
     {
       label: "Gallery",
-      name: "rawFrontmatter.gallery",
+      name: "frontmatter.gallery",
       component: "group-list",
       defaultItem: {
         alt: "",
@@ -227,7 +227,7 @@ const BlogPostForm = {
     },
     {
       label: "Fake Author",
-      name: "rawFrontmatter.fakeAuthor",
+      name: "frontmatter.fakeAuthor",
       component: "group",
       fields: [
         { name: "name", component: "text" },
@@ -244,32 +244,32 @@ const BlogPostForm = {
     },
     {
       label: "Title",
-      name: "rawFrontmatter.title",
+      name: "frontmatter.title",
       component: "text",
       required: true,
     },
     {
       label: "Draft",
-      name: "rawFrontmatter.draft",
+      name: "frontmatter.draft",
       component: "toggle",
     },
     {
       label: "Date",
-      name: "rawFrontmatter.date",
+      name: "frontmatter.date",
       component: "date",
     },
     {
       label: "Description",
-      name: "rawFrontmatter.description",
+      name: "frontmatter.description",
       component: "textarea",
     },
     {
       label: "Heading color",
-      name: "rawFrontmatter.heading_color",
+      name: "frontmatter.heading_color",
       component: "color",
     },
     {
-      name: "rawFrontmatter.thumbnail",
+      name: "frontmatter.thumbnail",
       label: "Thumbnail",
       component: "image",
       // Generate the frontmatter value based on the filename

@@ -32,11 +32,24 @@ export function useRemarkForm(
     }),
     [markdownRemark.rawFrontmatter]
   )
-  let fields = formOverrrides.fields || generateFields(initialValues)
-  // The `frontmatter` object might be used by fields for previewing.
-  // We register it just so we can update keep it up-to-date.
-  // @ts-ignore
-  fields.push({ name: 'frontmatter', component: null })
+
+  let fields = React.useMemo(() => {
+    let fields = formOverrrides.fields || generateFields(initialValues)
+    fields = fields.map(field => {
+      if (field.name.startsWith('frontmatter.')) {
+        return {
+          ...field,
+          name: field.name.replace('frontmatter.', 'rawFrontmatter.'),
+        }
+      }
+      return field
+    })
+    // The `frontmatter` object might be used by fields for previewing.
+    // We register it just so we can update keep it up-to-date.
+    // @ts-ignore
+    fields.push({ name: 'frontmatter', component: null })
+    return fields
+  }, [formOverrrides.fields])
 
   let [values, form] = useCMSForm({
     label,
