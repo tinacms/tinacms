@@ -227,23 +227,10 @@ const BlockOption = styled.button`
   cursor: pointer;
   outline: none;
   border: 0;
-  &:after {
-    content: '';
-    position: absolute;
-    display: block;
-    width: 100%;
-    height: 100%;
-    top: 0;
-    left: 0;
-    opacity: 0;
-    transition: opacity 75ms ease-out;
-    background-color: #f8f8f8;
-    z-index: -1;
-  }
+  transition: all 85ms ease-out;
   &:hover {
-    &:after {
-      opacity: 1;
-    }
+    color: ${color('primary')};
+    background-color: #f6f6f9;
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
@@ -321,6 +308,9 @@ const GroupHeaderButton = styled(Button)<{ open: boolean }>`
       transform: rotate(45deg);
       background-color: white;
       fill: ${color('primary')};
+      &:hover {
+        background-color: #f6f6f9;
+      }
     `};
 `
 

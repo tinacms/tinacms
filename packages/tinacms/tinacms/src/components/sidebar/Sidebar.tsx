@@ -11,8 +11,9 @@ import {
   HamburgerIcon,
   LeftArrowIcon,
   EditIcon,
+  AddIcon,
 } from '@tinacms/icons'
-import { GlobalStyles, padding, color, TinaResetStyles } from '@tinacms/styles'
+import { GlobalStyles, padding, color } from '@tinacms/styles'
 import {
   SIDEBAR_WIDTH,
   TOGGLE_WIDTH,
@@ -20,7 +21,7 @@ import {
   SIDEBAR_HEADER_HEIGHT,
 } from '../../Globals'
 import { Button } from '../Button'
-import { CreateContentButton } from '../CreateContent'
+import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useTina } from '../../hooks/use-tina'
@@ -51,20 +52,18 @@ export const Sidebar = () => {
         <SidebarWrapper open={sidebar.isOpen}>
           <GlobalStyles />
           <SidebarHeader>
-            <ActionsToggle
+            <MenuToggle
               onClick={() => setMenuVisibility(!menuIsVisible)}
               open={menuIsVisible}
             >
               {menuIsVisible ? <CloseIcon /> : <HamburgerIcon />}
-            </ActionsToggle>
+            </MenuToggle>
+            <CreateContentMenu />
           </SidebarHeader>
           <FormsView />
 
           <MenuPanel visible={menuIsVisible}>
             <MenuWrapper>
-              {cms.plugins.all('content-button').map(plugin => (
-                <CreateContentButton plugin={plugin} />
-              ))}
               <MenuList>
                 {cms.screens.all().map(view => (
                   <MenuLink
@@ -182,24 +181,26 @@ const MenuLink = styled.div<{ value: string }>`
 `
 
 const SidebarHeader = styled.div`
+  display: flex;
+  justify-content: space-between;
   align-items: center;
   position: fixed;
   top: 0;
   z-index: 1050;
-  width: 100%;
   height: ${SIDEBAR_HEADER_HEIGHT}rem;
-  padding: 0 ${padding()}rem;
+  width: ${SIDEBAR_WIDTH}px;
+  padding: 1rem ${padding()}rem 0 ${padding()}rem;
 `
 
-const ActionsToggle = styled.button<{ open: boolean }>`
-  padding: 1rem 0 0 ${padding()}rem;
+const MenuToggle = styled.button<{ open: boolean }>`
+  padding: 0 0 0 ${padding()}rem;
   margin-left: -${padding()}rem;
   background: transparent;
   outline: none;
   border: 0;
   text-align: left;
   width: 4rem;
-  height: 3.25rem;
+  height: 2rem;
   transition: all 75ms ease-out;
   fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
   &:hover {
@@ -211,11 +212,12 @@ const ActionsToggle = styled.button<{ open: boolean }>`
 const MenuWrapper = styled.div`
   position: absolute;
   left: 0;
-  top: 4rem;
-  height: calc(100vh - (4rem));
+  top: 0;
+  height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: ${padding()}rem;
+  padding: ${SIDEBAR_HEADER_HEIGHT}rem ${padding()}rem ${padding()}rem
+    ${padding()}rem;
   ul,
   li {
     margin: 0;
@@ -242,10 +244,6 @@ const MenuPanel = styled.div<{ visible: boolean }>`
     padding: 0;
     list-style: none;
   }
-`
-
-const CreateButton = styled(Button)`
-  width: 100%;
 `
 
 const ModalActions = styled.div`
