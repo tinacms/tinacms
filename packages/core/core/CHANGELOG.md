@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.10](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.0-alpha.9...@tinacms/core@0.1.0-alpha.10) (2019-10-02)
+
+
+### Bug Fixes
+
+* sync first-level group-list items ([49550a5](https://github.com/tinacms/tinacms/commit/49550a5))
+* updating groups from disk ([a56b127](https://github.com/tinacms/tinacms/commit/a56b127))
+
+
+### Features
+
+* field.component can be null ([385c137](https://github.com/tinacms/tinacms/commit/385c137))
+* fields can have default values ([54c8602](https://github.com/tinacms/tinacms/commit/54c8602))
+
+
+
+
+
 # [0.1.0-alpha.9](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.0-alpha.8...@tinacms/core@0.1.0-alpha.9) (2019-09-25)
 
 

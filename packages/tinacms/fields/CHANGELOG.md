@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.15](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.0-alpha.14...@tinacms/fields@0.1.0-alpha.15) (2019-10-02)
+
+
+### Features
+
+* **wysiwyg:** add codeblock support to wysiwyg ([149e411](https://github.com/tinacms/tinacms/commit/149e411))
+
+
+
+
+
 # [0.1.0-alpha.14](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.0-alpha.13...@tinacms/fields@0.1.0-alpha.14) (2019-09-25)
 
 
