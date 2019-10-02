@@ -120,6 +120,36 @@ export const Sidebar = () => {
   )
 }
 
+const SidebarToggle = (sidebar: any) => {
+  return (
+    <StyledFrame
+      id="sidebar-frame"
+      frameStyles={{
+        position: 'absolute',
+        left: SIDEBAR_WIDTH + 'px',
+        bottom: '32px',
+        width: '56px',
+        height: '64px',
+        margin: '0',
+        padding: '0',
+        border: '0',
+        overflow: 'hidden',
+        pointerEvents: 'all',
+      }}
+    >
+      <>
+        <GlobalStyles />
+        <SidebarToggleButton
+          onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
+          open={sidebar.isOpen}
+        >
+          {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
+        </SidebarToggleButton>
+      </>
+    </StyledFrame>
+  )
+}
+
 const ContentMenuWrapper = styled.div`
   position: relative;
 `
@@ -183,36 +213,6 @@ const ContentMenu = styled.div<{ open: boolean }>`
       transform: translate3d(0, 2.25rem, 0) scale3d(1, 1, 1);
     `};
 `
-
-const SidebarToggle = (sidebar: any) => {
-  return (
-    <StyledFrame
-      id="sidebar-frame"
-      frameStyles={{
-        position: 'absolute',
-        left: SIDEBAR_WIDTH + 'px',
-        bottom: '32px',
-        width: '56px',
-        height: '64px',
-        margin: '0',
-        padding: '0',
-        border: '0',
-        overflow: 'hidden',
-        pointerEvents: 'all',
-      }}
-    >
-      <>
-        <GlobalStyles />
-        <SidebarToggleButton
-          onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
-          open={sidebar.isOpen}
-        >
-          {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
-        </SidebarToggleButton>
-      </>
-    </StyledFrame>
-  )
-}
 
 const MenuList = styled.div`
   margin: 2rem -${padding()}rem 2rem -${padding()}rem;
