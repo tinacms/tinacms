@@ -28,7 +28,7 @@ cd packages/demo/demo-gatsby
 npm run start
 ```
 
-## Commands
+### Commands
 
 | Commands                           | Descriptiton                                  |
 | ---------------------------------- | --------------------------------------------- |
@@ -37,3 +37,13 @@ npm run start
 | npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages                    |
 | lerna run build --scope \<package> | Build only \<package>.                        |
+
+## Releasing
+
+### Commands
+
+| Commands         | Descriptiton                                                          |
+| ---------------- | --------------------------------------------------------------------- |
+| npm run release  | Publishes a release for all changed packages. Updates changelog.      |
+| npm run prelease | Publishes a pre-release versions of all changed packages.             |
+| npm run graduate | Publishes a release for all pre-released packages. Updates changelog. |
