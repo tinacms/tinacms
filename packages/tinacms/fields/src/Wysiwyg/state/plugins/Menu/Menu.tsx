@@ -181,8 +181,8 @@ export const MenuButton = styled.button<{
   flex: 1 0 auto;
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p => (p.active ? '#0084ff' : '#353232')};
-  fill: ${p => (p.active ? '#0084ff' : '#353232')};
+  color: ${p => (p.active ? '#0084ff' : '#433E52')};
+  fill: ${p => (p.active ? '#0084ff' : '#433E52')};
   border: none;
   outline: none;
   padding: 0.375rem;

@@ -261,8 +261,8 @@ export const FormBody = styled.div`
   bottom: ${FORM_FOOTER_HEIGHT}rem;
   scrollbar-width: none;
   width: ${SIDEBAR_WIDTH}px;
-  overflow-y: hidden;
-  overflow-x: hidden;
+  overflow: hidden;
+  background-color: #F6F6F9;
   ul,
   li {
     margin: 0;

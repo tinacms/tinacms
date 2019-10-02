@@ -25,6 +25,7 @@ export function color(name: keyof Theme['color']) {
 export interface Theme {
   color: {
     primary: string
+    error: string
     light: string
     medium: string
     dark: string
@@ -57,12 +58,13 @@ export interface Theme {
 export const theme: Theme = {
   color: {
     primary: '#0084ff',
-    light: '#F2F2F2',
-    medium: '#B4B4B4',
-    dark: '#353232',
+    error: 'red',
+    light: '#F6F6F9',
+    medium: '#EDECF3',
+    dark: '#433E52',
   },
   radius: {
-    small: '0.25rem',
+    small: '0.3rem',
     big: '1.5rem',
   },
   shadow: {
@@ -77,7 +79,7 @@ export const theme: Theme = {
   },
   input: {
     padding: '0.75rem',
-    radius: '0.25rem',
+    radius: '0.3rem',
     fontSize: '0.9rem',
     lineHeight: 1.35,
   },

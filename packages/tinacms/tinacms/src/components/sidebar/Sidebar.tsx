@@ -202,7 +202,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
   width: 4rem;
   height: 2rem;
   transition: all 75ms ease-out;
-  fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
+  fill: ${p => (p.open ? '#F6F6F9' : '#828282')};
   &:hover {
     opacity: 0.6;
     cursor: pointer;
