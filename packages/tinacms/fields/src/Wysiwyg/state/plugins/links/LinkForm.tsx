@@ -101,7 +101,7 @@ const LinkPopup = styled.div`
   background-color: white;
   position: relative;
   height: max-content;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
   filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
     drop-shadow(0px 2px 3px rgba(48, 48, 48, 0.15));
@@ -160,7 +160,7 @@ const LinkActions = styled.div`
 const LinkButton = styled.button`
   text-align: center;
   border: 0;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
   background-color: #0084ff;
   color: white;

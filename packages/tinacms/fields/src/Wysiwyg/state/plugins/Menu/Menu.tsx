@@ -163,7 +163,7 @@ const MenuContainer = styled.div`
   position: sticky;
   top: 0;
   width: 100%;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
     inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
   overflow: visible;
@@ -204,11 +204,11 @@ export const MenuButton = styled.button<{
   }
   &:first-child {
     padding-left: 0.5rem;
-    border-radius: 0.5rem 0 0 0.5rem;
+    border-radius: 1.5rem 0 0 1.5rem;
   }
   &:last-child {
     padding-right: 0.5rem;
-    border-radius: 0 0.5rem 0.5rem 0;
+    border-radius: 0 1.5rem 1.5rem 0;
   }
   svg {
     width: 1.25rem;
@@ -235,7 +235,7 @@ export const MenuDropdownWrapper = styled.div`
 `
 
 export const MenuButtonDropdown = styled.div<{ open: boolean }>`
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   border: 1px solid #efefef;
   display: block;
   position: absolute;

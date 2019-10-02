@@ -63,7 +63,7 @@ export const theme: Theme = {
   },
   radius: {
     small: '0.25rem',
-    big: '0.5rem',
+    big: '1.5rem',
   },
   shadow: {
     small: '0px 2px 3px rgba(48, 48, 48, 0.15)',

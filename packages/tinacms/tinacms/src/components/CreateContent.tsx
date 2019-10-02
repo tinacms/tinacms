@@ -152,7 +152,7 @@ const PlusButton = styled(Button)<{ open: boolean }>`
 
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   border: 1px solid #efefef;
   display: block;
   position: absolute;

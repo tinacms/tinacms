@@ -17,7 +17,7 @@ export const ModalPopup = styled.div`
   z-index: 1;
   overflow: visible; /* Keep this as "visible", select component needs to overflow */
   background-color: #fefefe;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   margin: 2.5rem auto;
   width: 460px;
   max-width: 90%;

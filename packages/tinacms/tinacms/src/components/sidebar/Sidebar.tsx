@@ -272,7 +272,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   top: 0.5rem;
   left: 0;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 0 0.5rem 0.5rem 0;
+  border-radius: 0 1.5rem 1.5rem 0;
   width: 3.125rem;
   height: 3rem;
   border: 0;
