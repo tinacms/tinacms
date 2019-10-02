@@ -7,6 +7,21 @@
   "files": [
     "build"
   ],
+  "keywords": [
+    "tinacms",
+    "cms",
+    "react",
+    "remark",
+    "gatsby"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/react/react-tinacms-remark"
+  },
   "scripts": {
     "prepublish": "npm run build",
     "watch": "cms-scripts watch",
