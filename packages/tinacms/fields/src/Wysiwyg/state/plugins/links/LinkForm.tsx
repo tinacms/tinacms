@@ -123,8 +123,8 @@ const LinkLabel = styled.label`
 `
 
 const LinkInput = styled.input`
-  background-color: #f2f2f2;
-  border-color: #f2f2f2;
+  background-color: #F6F6F9;
+  border-color: #F6F6F9;
   border-radius: 0.25rem;
   font-size: 0.8rem;
   line-height: 1.35;

@@ -51,29 +51,25 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 // if we could reuse those styles instead of having a duplicate.
 const DatetimeContainer = styled.div`
   input {
-    background-color: ${p => p.theme.color.light};
-    border-radius: ${p => p.theme.input.radius};
+    position: relative;
+    background-color: white;
+    border-radius: 0.3rem;
     font-size: ${p => p.theme.input.fontSize};
     line-height: ${p => p.theme.input.lineHeight};
-    transition: background-color ${p => p.theme.timing.short} ease-out,
-      border-color ${p => p.theme.timing.short} ease-out,
-      box-shadow ${p => p.theme.timing.medium} ease-out;
+    transition: all 85ms ease-out;
     padding: ${p => p.theme.input.padding};
-    border-width: 1px;
-    border-style: solid;
-    border-color: #f2f2f2;
+    border: 1px solid #edecf3;
     width: 100%;
     margin: 0;
     outline: none;
+    box-shadow: 0 0 0 2px transparent;
 
     &:hover {
-      background-color: #f0f0f0;
+      box-shadow: 0 0 0 2px #e1ddec;
     }
 
     &:focus {
-      border-color: ${color('primary')};
-      box-shadow: 0 0 2px 0 ${color('primary')};
-      background-color: #f8f8f8;
+      box-shadow: 0 0 0 2px ${color('primary')};
     }
 
     &::placeholder {

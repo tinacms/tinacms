@@ -170,7 +170,7 @@ const GroupListPanel = styled.div`
   height: auto;
   margin-bottom: 1.5rem;
   border-radius: 0.25rem;
-  background-color: #f2f2f2;
+  background-color: #f6f6f9;
 `
 
 const GroupHeaderButton = styled(Button)`
@@ -226,7 +226,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   }
 
   svg {
-    fill: #b4b4b4;
+    fill: #edecf3;
     width: 1.25rem;
     height: auto;
     transition: fill 85ms ease-out;
@@ -234,7 +234,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   &:hover {
     svg {
-      fill: #353232;
+      fill: #433e52;
     }
     ${GroupLabel} {
       color: #0084ff;
@@ -259,7 +259,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
       box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
 
       svg {
-        fill: #353232;
+        fill: #433e52;
       }
       ${GroupLabel} {
         color: #0084ff;
@@ -286,7 +286,7 @@ const DeleteButton = styled.button`
   margin: 0;
   transition: all 85ms ease-out;
   &:hover {
-    background-color: #f2f2f2;
+    background-color: #f6f6f9;
   }
 `
 
@@ -306,7 +306,7 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
   padding: 0.75rem 0;
   transition: all 85ms ease-out;
   &:hover {
-    background-color: #f2f2f2;
+    background-color: #f6f6f9;
     cursor: grab;
   }
   svg {
