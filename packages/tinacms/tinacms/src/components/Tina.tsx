@@ -4,16 +4,22 @@ import { ModalProvider } from './modals/ModalProvider'
 import { SidebarContext } from './sidebar/SidebarProvider'
 import { cms } from '../index'
 import styled, { ThemeProvider } from 'styled-components'
-import { TinaReset, theme } from '@tinacms/styles'
+import { TinaReset, Theme, theme as DEFAULT_THEME } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 
 interface TinaProps {
   position: 'fixed' | 'float'
   hidden?: boolean
+  theme?: Theme
 }
 
-export const Tina: React.FC<TinaProps> = ({ children, position, hidden }) => {
+export const Tina: React.FC<TinaProps> = ({
+  children,
+  position,
+  hidden,
+  theme = DEFAULT_THEME,
+}) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
   const props = {
