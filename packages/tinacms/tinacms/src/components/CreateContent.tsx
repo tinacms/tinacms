@@ -167,7 +167,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, 2.5rem, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, 2.75rem, 0) scale3d(1, 1, 1);
     `};
 `
 
