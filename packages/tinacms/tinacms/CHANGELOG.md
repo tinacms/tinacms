@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.20](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.19...@tinacms/tinacms@0.1.0-alpha.20) (2019-10-02)
+
+
+### Bug Fixes
+
+* Link to docs ([080ccea](https://github.com/tinacms/tinacms/commit/080ccea)), closes [#161](https://github.com/tinacms/tinacms/issues/161)
+* pass onClick to CreateContentButton ([273b85a](https://github.com/tinacms/tinacms/commit/273b85a))
+* remove reliance on transform/position quirk ([a188e64](https://github.com/tinacms/tinacms/commit/a188e64))
+* safari group panel bug ([5bf6853](https://github.com/tinacms/tinacms/commit/5bf6853))
+* set fieldWrapper to position relative ([3e9f953](https://github.com/tinacms/tinacms/commit/3e9f953))
+* set key on create content button ([68bf64e](https://github.com/tinacms/tinacms/commit/68bf64e))
+* syncing fields for layered group-lists ([c34936e](https://github.com/tinacms/tinacms/commit/c34936e))
+
+
+### Features
+
+* add field plugin for Group Lists ([41fb5a4](https://github.com/tinacms/tinacms/commit/41fb5a4))
+* Add Group field plugin ([b58864c](https://github.com/tinacms/tinacms/commit/b58864c))
+* blocks field plugin ([cac4d86](https://github.com/tinacms/tinacms/commit/cac4d86))
+* move create buttons to header plus menu ([39f3d80](https://github.com/tinacms/tinacms/commit/39f3d80))
+* theme override ([4dd592e](https://github.com/tinacms/tinacms/commit/4dd592e))
+
+
+
+
+
 # [0.1.0-alpha.19](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.18...@tinacms/tinacms@0.1.0-alpha.19) (2019-09-25)
 
 

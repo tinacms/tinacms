@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.22](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0-alpha.21...@tinacms/react-tinacms-remark@0.1.0-alpha.22) (2019-10-02)
+
+
+### Bug Fixes
+
+* default `formatFilename` function ([d610682](https://github.com/tinacms/tinacms/commit/d610682))
+* updating groups from disk ([a56b127](https://github.com/tinacms/tinacms/commit/a56b127))
+
+
+
+
+
 # [0.1.0-alpha.21](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0-alpha.20...@tinacms/react-tinacms-remark@0.1.0-alpha.21) (2019-09-25)
 
 

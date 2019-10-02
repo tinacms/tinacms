@@ -1,7 +1,7 @@
 {
   "name": "cms-scripts",
   "private": true,
-  "version": "0.1.0-alpha.3",
+  "version": "0.1.0-alpha.4",
   "bin": {
     "cms-scripts": "./bin/cms-scripts.js"
   }
