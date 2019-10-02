@@ -5,6 +5,7 @@ import { Plugin } from '@tinacms/core'
 import { createEditorState } from './state'
 import { useProsemirrorSchema } from './useProsemirrorSchema'
 import { useMarkdownTranslator } from './useMarkdownTranslator'
+import { nodeViews } from './node-views'
 
 export interface Input {
   value: string
@@ -42,6 +43,7 @@ export function useTinaProsemirror(
        * Create a new Prosemirror EditorView on in the DOM
        */
       let editorView = new EditorView(targetNode.current, {
+        nodeViews,
         /**
          * The initial state of the Wysiwyg
          */
