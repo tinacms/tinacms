@@ -11,6 +11,20 @@
     "assets",
     "markdownRemark"
   ],
+  "keywords": [
+    "tinacms",
+    "cms",
+    "gastby",
+    "react"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/gatsby-plugin-xeditor"
+  },
   "scripts": {
     "prepublish": "npm run build",
     "watch": "tsc -w",
