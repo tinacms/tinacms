@@ -1,6 +1,6 @@
 {
   "name": "react-dismissible",
-  "version": "1.0.4",
+  "version": "1.0.5",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -29,7 +29,7 @@
   "devDependencies": {
     "@testing-library/react": "^9.1.4",
     "@types/jest": "^24.0.15",
-    "cms-scripts": "^0.1.0-alpha.4",
+    "cms-scripts": "^0.1.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   }

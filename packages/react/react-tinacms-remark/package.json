@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-tinacms-remark",
-  "version": "0.1.0-alpha.22",
+  "version": "0.1.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -31,15 +31,15 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
-    "cms-scripts": "^0.1.0-alpha.4",
+    "cms-scripts": "^0.1.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.0-alpha.10",
-    "@tinacms/form-builder": "^0.1.0-alpha.13",
-    "@tinacms/react-tinacms": "^0.1.0-alpha.13",
-    "@tinacms/tinacms": "^0.1.0-alpha.20",
+    "@tinacms/core": "^0.1.0",
+    "@tinacms/form-builder": "^0.1.0",
+    "@tinacms/react-tinacms": "^0.1.0",
+    "@tinacms/tinacms": "^0.1.0",
     "lodash.get": "^4.4.2"
   }
 }
