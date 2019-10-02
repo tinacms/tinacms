@@ -54,7 +54,7 @@ export function useRemarkForm(
     actions: [
       () => (
         <ActionButton
-          onClick={() => {
+          onClick={async () => {
             if (
               !confirm(
                 `Are you sure you want to delete ${markdownRemark.fileRelativePath}?`
@@ -63,9 +63,11 @@ export function useRemarkForm(
               return
             }
             // @ts-ignore
-            cms.api.git.onDelete!({
+            await cms.api.git.onDelete!({
               relPath: markdownRemark.fileRelativePath,
             })
+
+            window.history.back()
           }}
         >
           Delete
