@@ -52,11 +52,16 @@ export const CreateContentMenu = () => {
   )
 }
 
-const CreateContentButton = ({ plugin }: any) => {
+const CreateContentButton = ({ plugin, onClick }: any) => {
   let [open, setOpen] = React.useState(false)
   return (
     <>
-      <CreateButton onClick={() => setOpen(p => !p)}>
+      <CreateButton
+        onClick={() => {
+          setOpen(p => !p)
+          onClick()
+        }}
+      >
         {plugin.name}
       </CreateButton>
       {open && <FormModal plugin={plugin} close={() => setOpen(false)} />}
