@@ -40,6 +40,7 @@ export const CreateContentMenu = () => {
           {cms.plugins.all('content-button').map(plugin => (
             <CreateContentButton
               plugin={plugin}
+              key={plugin.name}
               onClick={() => {
                 setVisible(false)
               }}
