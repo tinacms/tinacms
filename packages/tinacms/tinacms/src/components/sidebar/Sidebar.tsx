@@ -1,8 +1,8 @@
 import * as React from 'react'
 import { useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
-import { StyledFrame, useFrameContext } from '../SyledFrame'
-import styled, { keyframes, css } from 'styled-components'
+import { StyledFrame } from '../SyledFrame'
+import styled, { keyframes } from 'styled-components'
 import { FormsView } from '../FormView'
 import { Modal } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
@@ -13,7 +13,7 @@ import {
   EditIcon,
   AddIcon,
 } from '@tinacms/icons'
-import { GlobalStyles, padding, color, TinaResetStyles } from '@tinacms/styles'
+import { GlobalStyles, padding, color } from '@tinacms/styles'
 import {
   SIDEBAR_WIDTH,
   TOGGLE_WIDTH,
@@ -21,20 +21,17 @@ import {
   SIDEBAR_HEADER_HEIGHT,
 } from '../../Globals'
 import { Button } from '../Button'
-import { CreateContentButton } from '../CreateContent'
+import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useTina } from '../../hooks/use-tina'
-import { Dismissible } from 'react-dismissible'
 
 export const Sidebar = () => {
-  const frame = useFrameContext()
   const cms = useTina()
   const sidebar = useSidebar()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
-  let [visible, setVisible] = React.useState(false)
 
   return (
     <SidebarContainer open={sidebar.isOpen}>
@@ -61,30 +58,7 @@ export const Sidebar = () => {
             >
               {menuIsVisible ? <CloseIcon /> : <HamburgerIcon />}
             </MenuToggle>
-
-            <ContentMenuWrapper>
-              <PlusButton onClick={() => setVisible(true)} open={visible}>
-                <AddIcon />
-              </PlusButton>
-              <ContentMenu open={visible}>
-                <Dismissible
-                  click
-                  escape
-                  onDismiss={() => setVisible(false)}
-                  document={frame.document}
-                  disabled={!visible}
-                >
-                  {cms.plugins.all('content-button').map(plugin => (
-                    <CreateContentButton
-                      plugin={plugin}
-                      onClick={() => {
-                        setVisible(false)
-                      }}
-                    />
-                  ))}
-                </Dismissible>
-              </ContentMenu>
-            </ContentMenuWrapper>
+            <CreateContentMenu />
           </SidebarHeader>
           <FormsView />
 
@@ -149,70 +123,6 @@ const SidebarToggle = (sidebar: any) => {
     </StyledFrame>
   )
 }
-
-const ContentMenuWrapper = styled.div`
-  position: relative;
-`
-
-const PlusButton = styled(Button)<{ open: boolean }>`
-  border-radius: 10rem;
-  padding: 0;
-  width: 2rem;
-  height: 2rem;
-  margin: 0;
-  position: relative;
-  fill: white;
-  transform-origin: 50% 50%;
-  transition: all 150ms ease-out;
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-  &:focus {
-    outline: none;
-  }
-  ${props =>
-    props.open &&
-    css`
-      transform: rotate(45deg);
-      background-color: white;
-      fill: ${color('primary')};
-      &:hover {
-        background-color: #f6f6f9;
-      }
-    `};
-`
-
-const ContentMenu = styled.div<{ open: boolean }>`
-  min-width: 12rem;
-  border-radius: 0.5rem;
-  border: 1px solid #efefef;
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 150ms ease-out;
-  transform-origin: 100% 0;
-  box-shadow: ${p => p.theme.shadow.big};
-  background-color: white;
-  overflow: hidden;
-  z-index: 100;
-
-  ${props =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, 2.25rem, 0) scale3d(1, 1, 1);
-    `};
-`
 
 const MenuList = styled.div`
   margin: 2rem -${padding()}rem 2rem -${padding()}rem;
