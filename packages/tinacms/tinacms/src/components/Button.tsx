@@ -4,7 +4,7 @@ import { color } from '@tinacms/styles'
 
 export const Button = styled.button`
   text-align: center;
-  border: 0;
+  border: 1px solid #0574e4;
   border-radius: ${p => p.theme.radius.big};
   box-shadow: ${p => p.theme.shadow.small};
   background-color: ${color('primary')};

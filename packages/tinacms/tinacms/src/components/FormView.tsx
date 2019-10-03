@@ -99,13 +99,13 @@ export const FormsView = () => {
                   ))}
               </FormBody>
               <FormFooter>
-                {editingForm.actions.length > 0 && (
-                  <ActionsMenu actions={editingForm.actions} />
-                )}
-
+                <CancelButton disabled={pristine}>Reset</CancelButton>
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
+                {editingForm.actions.length > 0 && (
+                  <ActionsMenu actions={editingForm.actions} />
+                )}
               </FormFooter>
             </FormAnimation>
           </DragDropContext>
@@ -283,7 +283,7 @@ const FormFooter = styled.div`
   height: ${FORM_FOOTER_HEIGHT}rem;
   background-color: white;
   border-top: 1px solid #edecf3;
-  padding: 0 1.25rem;
+  padding: 0 1rem;
 `
 
 const FormAnimationKeyframes = keyframes`
@@ -322,10 +322,12 @@ export const SaveButton = styled(Button)`
   padding: 0.75rem 1.5rem;
 `
 
-export const CancelButton = styled(SaveButton)`
+const CancelButton = styled(SaveButton)`
   background-color: white;
   border: 1px solid #edecf3;
   color: #0084ff;
+  flex: 0 0 6rem;
+  margin-right: 0.5rem;
   &:hover {
     background-color: #f6f6f9;
     opacity: 1;
