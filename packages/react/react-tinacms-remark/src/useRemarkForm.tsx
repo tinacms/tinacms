@@ -44,10 +44,7 @@ export function useRemarkForm(
       }
       return field
     })
-    // The `frontmatter` object might be used by fields for previewing.
-    // We register it just so we can update keep it up-to-date.
-    // @ts-ignore
-    fields.push({ name: 'frontmatter', component: null })
+
     return fields
   }, [formOverrrides.fields])
 

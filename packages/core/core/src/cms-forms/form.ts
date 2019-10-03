@@ -14,6 +14,7 @@ export class Form<S = any> {
   finalForm: FormApi<S>
   actions: any[]
   fieldSubscriptions: { [key: string]: FieldSubscription } = {}
+  hiddenFields: { [key: string]: FieldSubscription } = {}
 
   constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
     this.id = id
@@ -36,7 +37,49 @@ export class Form<S = any> {
      * on `react-final-form` components being rendered.
      */
     this.registerFields(this.fields)
+    this.discoverHiddenFields(options.initialValues)
+    this.removeDeclaredFieldsFromHiddenLookup()
     this.actions = actions || []
+  }
+
+  private discoverHiddenFields(values: any, prefix?: string) {
+    Object.entries(values).map(([name, value]) => {
+      let path = prefix ? `${prefix}.${name}` : name
+
+      if (Array.isArray(value)) {
+        if (value.find(item => typeof item === 'object')) {
+          let prefix = `${path}.INDEX`
+          value.forEach(item => {
+            this.discoverHiddenFields(item, prefix)
+          })
+        } else {
+          this.hiddenFields[path] = {
+            path,
+            field: { name: path, component: null },
+            unsubscribe: this.finalForm.registerField(path, () => {}, {}),
+          }
+        }
+      } else if (typeof value === 'object' && value !== null) {
+        this.discoverHiddenFields(value, path)
+      } else {
+        // Base Case
+        this.hiddenFields[path] = {
+          path,
+          field: { name: path, component: null },
+          unsubscribe: this.finalForm.registerField(path, () => {}, {}),
+        }
+      }
+    })
+  }
+
+  private removeDeclaredFieldsFromHiddenLookup() {
+    Object.keys(this.fieldSubscriptions).forEach(path => {
+      let hiddenField = this.hiddenFields[path]
+      if (hiddenField) {
+        hiddenField.unsubscribe()
+        delete this.hiddenFields[path]
+      }
+    })
   }
 
   private registerFields(fields: Field[], pathPrefix?: string) {

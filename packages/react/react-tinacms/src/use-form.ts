@@ -51,9 +51,14 @@ function syncFormWithInitialValues(form?: Form, initialValues?: any) {
   }, [initialValues])
 }
 
-function findInactiveFormFields(form: Form) {
+export function findInactiveFormFields(form: Form) {
   let pathsToUpdate: string[] = []
-  Object.entries(form.fieldSubscriptions).forEach(([path, field]) => {
+
+  let hiddenFields = Object.entries(form.hiddenFields)
+  let declaredFields = Object.entries(form.fieldSubscriptions)
+  let allFields = hiddenFields.concat(declaredFields)
+
+  allFields.forEach(([path, field]) => {
     pathsToUpdate = pathsToUpdate.concat(findInactiveFieldsInPath(form, path))
   })
   return pathsToUpdate
