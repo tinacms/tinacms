@@ -1,5 +1,5 @@
 import { Form, Field } from '@tinacms/core'
-import { findInactiveFieldsInPath } from './use-form'
+import { findInactiveFieldsInPath, findInactiveFormFields } from './use-form'
 
 function makeForm(initialValues: any, fields: Field[]) {
   return new Form({
@@ -10,7 +10,77 @@ function makeForm(initialValues: any, fields: Field[]) {
     onSubmit() {},
   })
 }
-describe('findInactiveFields', () => {
+describe('findInactiveFormFields', () => {
+  it('handles this big complex example', () => {
+    let form = makeForm(
+      {
+        // Hidden
+        hidden: 'value',
+        ghostWriter: { name },
+        books: [{ title: 'one' }, { title: 'two' }],
+        favouriteColors: ['red'],
+        // Explicit
+        name: 'test',
+        // author: {name: "test"}, // Intentionally left out
+        magazines: [],
+        newsPapers: [{ title: 'nytimes' }],
+        favouriteCocktail: ['martini'],
+      },
+      [
+        { name: 'name', component: 'text' },
+        {
+          name: 'author',
+          component: 'group',
+          fields: [{ name: 'name', component: 'text' }],
+        },
+        {
+          name: 'magazines',
+          component: 'group-list',
+          fields: [
+            {
+              name: 'title',
+              component: null,
+            },
+          ],
+        },
+        {
+          name: 'newsPapers',
+          component: 'group-list',
+          fields: [
+            {
+              name: 'title',
+              component: null,
+            },
+          ],
+        },
+        {
+          name: 'favouriteCocktails',
+          component: null,
+        },
+      ]
+    )
+
+    let inactiveFields = findInactiveFormFields(form)
+
+    // Hidden
+    expect(inactiveFields).toContain('hidden')
+    expect(inactiveFields).not.toContain('ghostWriter')
+    expect(inactiveFields).toContain('ghostWriter.name')
+    expect(inactiveFields).toContain('books.0.title')
+    expect(inactiveFields).toContain('books.1.title')
+    expect(inactiveFields).toContain('favouriteColors')
+
+    // Explicitt
+    expect(inactiveFields).toContain('name')
+    expect(inactiveFields).not.toContain('author')
+    expect(inactiveFields).toContain('author.name')
+    expect(inactiveFields).toContain('magazines')
+    expect(inactiveFields).toContain('newsPapers.0.title')
+    expect(inactiveFields).toContain('newsPapers.0.title')
+    expect(inactiveFields).toContain('favouriteCocktails')
+  })
+})
+describe('findInactiveFieldsInPath', () => {
   describe('a form with a "name" text field', () => {
     let form = makeForm({ name: 'test' }, [{ name: 'name', component: 'text' }])
 
