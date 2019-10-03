@@ -65,17 +65,20 @@ export const Sidebar = () => {
           <MenuPanel visible={menuIsVisible}>
             <MenuWrapper>
               <MenuList>
-                {cms.screens.all().map(view => (
-                  <MenuLink
-                    value={view.name}
-                    onClick={() => {
-                      setActiveView(view)
-                      setMenuVisibility(false)
-                    }}
-                  >
-                    <CloseIcon /> {view.name}
-                  </MenuLink>
-                ))}
+                {cms.screens.all().map(view => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuLink
+                      value={view.name}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuVisibility(false)
+                      }}
+                    >
+                      <Icon /> {view.name}
+                    </MenuLink>
+                  )
+                })}
               </MenuList>
             </MenuWrapper>
           </MenuPanel>
@@ -141,11 +144,12 @@ const MenuLink = styled.div<{ value: string }>`
   &:after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #565165;
+    top: 0.25rem;
+    bottom: 0.25rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    border-radius: 1.5rem;
+    background-color: #363145;
     z-index: -1;
     transition: all 150ms ease-out;
     transform: translate3d(0, 100%, 0);
@@ -172,9 +176,9 @@ const MenuLink = styled.div<{ value: string }>`
     left: ${padding()}rem;
     top: 50%;
     transform: translate3d(0, -50%, 0);
-    width: 1.75rem;
+    width: 2.25rem;
     height: auto;
-    fill: #bdbdbd;
+    fill: #0084ff;
     transition: all ${p => p.theme.timing.short} ease-out;
   }
 `
