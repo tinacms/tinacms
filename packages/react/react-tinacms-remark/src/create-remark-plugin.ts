@@ -6,37 +6,39 @@ type MaybePromise<T> = Promise<T> | T
 
 interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
   label: string
-  filename?(value: FormShape): MaybePromise<string>
-  frontmatter?(value: FormShape): MaybePromise<FrontmatterShape>
-  body?(value: FormShape): MaybePromise<string>
-  fields?: Field[]
+  fields: Field[]
+  filename(form: FormShape): MaybePromise<string>
+  frontmatter?(form: FormShape): MaybePromise<FrontmatterShape>
+  body?(form: FormShape): MaybePromise<string>
 }
 
-const DEFAULT_REMARK_FIELDS = [
-  {
-    name: 'filename',
-    component: 'text',
-    label: 'Filename',
-    placeholder: 'content/blog/hello-world/index.md',
-    description:
-      'The full path to the new markdown file, relative to the repository root.',
-  },
-]
+const MISSING_FILENAME_MESSAGE =
+  'createRemarkButton must be given `filename(form): string`'
+const MISSING_FIELDS_MESSAGE =
+  'createRemarkButton must be given `fields: Field[]` with at least 1 item'
 
 export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
 ): AddContentPlugin {
-  let formatFilename = options.filename || ((form: any) => form.filename)
+  if (!options.filename) {
+    console.error(MISSING_FILENAME_MESSAGE)
+    throw new Error(MISSING_FILENAME_MESSAGE)
+  }
+  if (!options.fields || options.fields.length === 0) {
+    console.error(MISSING_FIELDS_MESSAGE)
+    throw new Error(MISSING_FIELDS_MESSAGE)
+  }
+  let formatFilename = options.filename
   let createFrontmatter = options.frontmatter || (() => ({}))
   let createBody = options.body || (() => '')
   return {
     __type: 'content-button',
     name: options.label,
-    fields: options.fields || DEFAULT_REMARK_FIELDS,
-    onSubmit: async (value: any, cms: CMS) => {
-      let filename = await formatFilename(value)
-      let rawFrontmatter = await createFrontmatter(value)
-      let rawMarkdownBody = await createBody(value)
+    fields: options.fields,
+    onSubmit: async (form: any, cms: CMS) => {
+      let filename = await formatFilename(form)
+      let rawFrontmatter = await createFrontmatter(form)
+      let rawMarkdownBody = await createBody(form)
 
       let fileRelativePath = filename
       cms.api.git!.onChange!({
