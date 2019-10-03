@@ -120,11 +120,12 @@ const ContentMenuWrapper = styled.div`
 const PlusButton = styled(Button)<{ open: boolean }>`
   border-radius: 10rem;
   padding: 0;
-  width: 2.25rem;
-  height: 2.25rem;
+  width: 2.125rem;
+  height: 2.125rem;
   margin: 0;
   position: relative;
   fill: white;
+  border: 1px solid #0084ff;
   transform-origin: 50% 50%;
   transition: all 150ms ease-out;
   svg {
@@ -132,8 +133,8 @@ const PlusButton = styled(Button)<{ open: boolean }>`
     top: 50%;
     left: 50%;
     transform: translate3d(-50%, -50%, 0);
-    width: 1.75rem;
-    height: 1.75rem;
+    width: 1.625rem;
+    height: 1.625rem;
   }
   &:focus {
     outline: none;
@@ -143,6 +144,7 @@ const PlusButton = styled(Button)<{ open: boolean }>`
     css`
       transform: rotate(45deg);
       background-color: white;
+      border-color: #edecf3;
       fill: ${color('primary')};
       &:hover {
         background-color: #f6f6f9;
@@ -152,8 +154,8 @@ const PlusButton = styled(Button)<{ open: boolean }>`
 
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 0.5rem;
-  border: 1px solid #efefef;
+  border-radius: 1.5rem;
+  border: 1px solid #edecf3;
   display: block;
   position: absolute;
   top: 0;
@@ -178,9 +180,15 @@ const ContentMenu = styled.div<{ open: boolean }>`
 `
 
 const CloseButton = styled.div`
-  fill: ${color('medium')};
+  display: flex;
+  align-items: center;
+  fill: #e1ddec;
   cursor: pointer;
   transition: fill 85ms ease-out;
+  svg {
+    width: 1.5rem;
+    height: auto;
+  }
   &:hover {
     fill: ${color('dark')};
   }

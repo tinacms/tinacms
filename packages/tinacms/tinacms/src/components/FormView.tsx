@@ -3,7 +3,7 @@ import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { padding, color } from '@tinacms/styles'
 import { Button } from './Button'
 import { ActionsMenu } from './ActionsMenu'
@@ -64,12 +64,7 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length)
-    return (
-      <FormBody>
-        <NoFormsPlaceholder />
-      </FormBody>
-    )
+  if (!forms.length) return <NoFormsPlaceholder />
 
   if (!editingForm)
     return (
@@ -127,6 +122,11 @@ const Emoji = styled.span`
 `
 
 const EmptyState = styled.div`
+  position: relative;
+  padding: ${padding()}rem;
+  width: 100%;
+  height: 100%;
+  background: white;
   > *:first-child {
     margin: 0 0 ${padding('big')} 0;
   }
@@ -232,37 +232,39 @@ const FormHeader = styled(
   width: ${SIDEBAR_WIDTH}px;
   cursor: ${p => p.isMultiform && 'pointer'};
   background-color: white;
-  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
+  border-bottom: 1px solid #edecf3;
   display: flex;
   align-items: center;
   padding: 0 ${padding()}rem;
   color: inherit;
   font-size: 1.2rem;
   transition: color 250ms ease-out;
+  user-select: none;
   svg {
-    width: 1.25rem;
-    fill: ${color('medium')};
+    width: 1.5rem;
+    fill: #e1ddec;
     height: auto;
     transform: translate3d(-4px, 0, 0);
-    transition: transform 250ms ease-out;
+    transition: transform 150ms ease-out;
   }
   :hover {
     color: ${p => p.isMultiform && `${p.theme.color.primary}`};
     svg {
+      fill: #433e52;
       transform: translate3d(-7px, 0, 0);
       transition: transform 250ms ease;
     }
   }
 `
 
-export const FormBody = styled.div`
+export const FormBody = styled.div<{ isMultiform?: boolean }>`
   position: absolute;
   top: ${FORM_HEADER_HEIGHT}rem;
   bottom: ${FORM_FOOTER_HEIGHT}rem;
   scrollbar-width: none;
   width: ${SIDEBAR_WIDTH}px;
-  overflow-y: hidden;
-  overflow-x: hidden;
+  overflow: hidden;
+  background-color: #f6f6f9;
   ul,
   li {
     margin: 0;
@@ -280,7 +282,7 @@ const FormFooter = styled.div`
   width: ${SIDEBAR_WIDTH}px;
   height: ${FORM_FOOTER_HEIGHT}rem;
   background-color: white;
-  border-top: 1px solid #efefef;
+  border-top: 1px solid #edecf3;
   padding: 0 1.25rem;
 `
 
@@ -299,12 +301,20 @@ const FormAnimation = styled.div<{ isEditing: Boolean }>`
   width: ${SIDEBAR_WIDTH}px;
   position: relative;
   ${FormHeader}, ${FormBody}, ${FormFooter} {
-    animation-name: ${FormAnimationKeyframes};
-    animation-duration: 150ms;
-    animation-delay: 0;
-    animation-iteration-count: 1;
-    animation-timing-function: ease-out;
+    transform: translate3d(100%, 0, 0);
   }
+  ${p =>
+    p.isEditing &&
+    css`
+      ${FormHeader}, ${FormBody}, ${FormFooter} {
+        transform: none;
+        animation-name: ${FormAnimationKeyframes};
+        animation-duration: 150ms;
+        animation-delay: 0;
+        animation-iteration-count: 1;
+        animation-timing-function: ease-out;
+      }
+    `};
 `
 
 export const SaveButton = styled(Button)`
@@ -313,12 +323,11 @@ export const SaveButton = styled(Button)`
 `
 
 export const CancelButton = styled(SaveButton)`
-  background-color: transparent;
-  box-shadow: none;
-  border: none;
+  background-color: white;
+  border: 1px solid #edecf3;
   color: #0084ff;
   &:hover {
-    background-color: #f7f7f7;
+    background-color: #f6f6f9;
     opacity: 1;
   }
 `

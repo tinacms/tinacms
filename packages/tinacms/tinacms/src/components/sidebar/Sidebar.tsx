@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from '../SyledFrame'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from '../FormView'
 import { Modal } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
@@ -56,7 +56,7 @@ export const Sidebar = () => {
               onClick={() => setMenuVisibility(!menuIsVisible)}
               open={menuIsVisible}
             >
-              {menuIsVisible ? <CloseIcon /> : <HamburgerIcon />}
+              <HamburgerIcon />
             </MenuToggle>
             <CreateContentMenu />
           </SidebarHeader>
@@ -65,17 +65,20 @@ export const Sidebar = () => {
           <MenuPanel visible={menuIsVisible}>
             <MenuWrapper>
               <MenuList>
-                {cms.screens.all().map(view => (
-                  <MenuLink
-                    value={view.name}
-                    onClick={() => {
-                      setActiveView(view)
-                      setMenuVisibility(false)
-                    }}
-                  >
-                    <CloseIcon /> {view.name}
-                  </MenuLink>
-                ))}
+                {cms.screens.all().map(view => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuLink
+                      value={view.name}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuVisibility(false)
+                      }}
+                    >
+                      <Icon /> {view.name}
+                    </MenuLink>
+                  )
+                })}
               </MenuList>
             </MenuWrapper>
           </MenuPanel>
@@ -141,19 +144,19 @@ const MenuLink = styled.div<{ value: string }>`
   &:after {
     content: '';
     position: absolute;
-    top: 0;
-    left: 0;
-    width: 100%;
-    height: 100%;
-    background-color: #3e3e3e;
+    top: 0.25rem;
+    bottom: 0.25rem;
+    left: 0.5rem;
+    right: 0.5rem;
+    border-radius: 1.5rem;
+    background-color: #363145;
     z-index: -1;
-    transition: transform ${p => p.theme.timing.short} ease-out,
-      opacity ${p => p.theme.timing.short} ${p => p.theme.timing.short} ease-out;
+    transition: all 150ms ease-out;
     transform: translate3d(0, 100%, 0);
     opacity: 0;
   }
   &:hover {
-    color: ${color('primary')};
+    color: #2296fe;
     &:after {
       transform: translate3d(0, 0, 0);
       transition: transform ${p => p.theme.timing.short} ease-out, opacity 0ms;
@@ -173,9 +176,9 @@ const MenuLink = styled.div<{ value: string }>`
     left: ${padding()}rem;
     top: 50%;
     transform: translate3d(0, -50%, 0);
-    width: 1.75rem;
+    width: 2.25rem;
     height: auto;
-    fill: #bdbdbd;
+    fill: #b2adbe;
     transition: all ${p => p.theme.timing.short} ease-out;
   }
 `
@@ -201,12 +204,51 @@ const MenuToggle = styled.button<{ open: boolean }>`
   text-align: left;
   width: 4rem;
   height: 2rem;
-  transition: all 75ms ease-out;
-  fill: ${p => (p.open ? '#F2F2F2' : '#828282')};
-  &:hover {
-    opacity: 0.6;
-    cursor: pointer;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
+  svg {
+    position: relative;
+    transition: fill 85ms ease-out;
+    fill: #716c7f;
+    margin-left: -4px;
+    width: 2rem;
+    height: auto;
+    path {
+      position: relative;
+      transition: transform 250ms ease-out, opacity 250ms ease-out,
+        fill 85ms ease-out;
+      transform-origin: 50% 50%;
+    }
   }
+  &:hover {
+    svg {
+      fill: #565165;
+    }
+  }
+  ${props =>
+    props.open &&
+    css`
+      svg {
+        fill: #f6f6f9;
+        &:hover {
+          fill: #edecf3;
+        }
+        path:first-child {
+          /* Top bar */
+          transform: rotate(45deg) translate3d(0, 0.45rem, 0);
+        }
+        path:nth-child(2) {
+          /* Middle bar */
+          transform: translate3d(-100%, 0, 0);
+          opacity: 0;
+        }
+        path:last-child {
+          /* Bottom Bar */
+          transform: rotate(-45deg) translate3d(0, -0.45rem, 0);
+        }
+      }
+    `};
 `
 
 const MenuWrapper = styled.div`
@@ -237,7 +279,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: ${padding()}rem;
-  transition: all 150ms ease-out;
+  transition: all 250ms ease-out;
   ul,
   li {
     margin: 0;
@@ -272,8 +314,8 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   top: 0.5rem;
   left: 0;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 0 0.5rem 0.5rem 0;
-  width: 3.125rem;
+  border-radius: 0 1.5rem 1.5rem 0;
+  width: 3.5rem;
   height: 3rem;
   border: 0;
   outline: none;
@@ -288,13 +330,13 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   transition: all 150ms ease-out;
   cursor: pointer;
   transform: translate3d(${p => (p.open ? 0 : '-0.125rem')}, 0, 0);
-  animation: ${SidebarToggleAnimation} 150ms ease-out 1;
+  animation: ${SidebarToggleAnimation} 150ms 300ms ease-out 1 both;
   &:hover {
-    background-color: #4ea9ff;
+    background-color: #2296fe;
     transform: translate3d(${p => (p.open ? '-0.125rem' : 0)}, 0, 0);
   }
   &:active {
-    background-color: #0073df;
+    background-color: #0574e4;
   }
 `
 

@@ -39,12 +39,12 @@ const FieldLabel = styled.label`
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: #333;
+  color: #433e52;
   margin-bottom: 0.5rem;
 `
 
 const FieldDescription = styled.p`
-  color: #949494;
+  color: #716c7f;
   font-size: 0.65rem;
   font-style: italic;
   font-weight: lighter;

@@ -92,32 +92,37 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #e1e1e1;
-  border-radius: 0.25rem;
+  border: 1px solid #edecf3;
+  border-radius: 0.3rem;
   margin: 0 0 1.5rem 0;
   overflow: visible;
   line-height: 1.35;
   padding: 0.75rem;
   color: #282828;
+  background-color: white;
 
   svg {
-    width: 1.25rem;
+    width: 1.5rem;
     height: auto;
-    fill: #b4b4b4;
+    fill: #e1ddec;
     transition: all 85ms ease-out;
   }
 
   &:hover {
+    svg {
+      fill: #433e52;
+    }
     color: #0084ff;
   }
 `
 
 export const PanelHeader = styled(Header)`
   flex: 0 0 auto;
-  background: white;
+  background-color: white;
   justify-content: flex-start;
   border: none;
-  border-bottom: 1px solid #efefef;
+  border-radius: 0;
+  border-bottom: 1px solid #edecf3;
   margin: 0;
   padding: 0.75rem 1.25rem;
 
@@ -133,7 +138,7 @@ export const PanelHeader = styled(Header)`
 `
 
 export const PanelBody = styled.div`
-  background: white;
+  background: #f6f6f9;
   position: relative;
   display: flex;
   flex: 1 1 auto;

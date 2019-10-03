@@ -12,43 +12,31 @@ export interface TextAreaProps extends a {
 }
 
 export const TextArea = styled.textarea<{ error?: boolean }>`
-  background-color: ${p => p.theme.color.light};
-  border-color: ${p => (p.error ? 'red' : '#F2F2F2')};
-  border-radius: ${p => p.theme.input.radius};
+  position: relative;
+  background-color: white;
+  border-radius: 0.3rem;
   font-size: ${p => p.theme.input.fontSize};
   line-height: ${p => p.theme.input.lineHeight};
-  transition: background-color ${p => p.theme.timing.short} ease-out,
-    border-color ${p => p.theme.timing.short} ease-out,
-    box-shadow ${p => p.theme.timing.medium} ease-out;
+  transition: all 85ms ease-out;
   padding: ${p => p.theme.input.padding};
-  border-width: 1px;
-  border-style: solid;
-  height: 10rem;
+  border: 1px solid #edecf3;
   width: 100%;
   margin: 0;
   outline: none;
   resize: vertical;
+  height: 10rem;
+  box-shadow: 0 0 0 2px ${p => (p.error ? color('error') : 'transparent')};
 
   &:hover {
-    background-color: #f0f0f0;
+    box-shadow: 0 0 0 2px #e1ddec;
   }
 
   &:focus {
-    border-color: ${color('primary')};
-    box-shadow: 0 0 2px 0 ${color('primary')};
-    background-color: #f8f8f8;
+    box-shadow: 0 0 0 2px ${p => (p.error ? color('error') : color('primary'))};
   }
 
   &::placeholder {
     font-size: 0.9rem;
     color: #cfd3d7;
   }
-  ${props =>
-    props.error &&
-    css`
-      border-color: red;
-      &:focus {
-        border-color: red;
-      }
-    `};
 `

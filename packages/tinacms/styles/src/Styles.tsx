@@ -25,6 +25,7 @@ export function color(name: keyof Theme['color']) {
 export interface Theme {
   color: {
     primary: string
+    error: string
     light: string
     medium: string
     dark: string
@@ -57,18 +58,18 @@ export interface Theme {
 export const theme: Theme = {
   color: {
     primary: '#0084ff',
-    light: '#F2F2F2',
-    medium: '#B4B4B4',
-    dark: '#353232',
+    error: 'red',
+    light: '#F6F6F9',
+    medium: '#EDECF3',
+    dark: '#433E52',
   },
   radius: {
-    small: '0.25rem',
-    big: '0.5rem',
+    small: '0.3rem',
+    big: '1.5rem',
   },
   shadow: {
-    small: '0px 2px 3px rgba(48, 48, 48, 0.15)',
-    big:
-      '0px 2px 3px rgba(48, 48, 48, 0.15), 0px 4px 8px rgba(48, 48, 48, 0.1);',
+    small: '0px 2px 3px rgba(0, 0, 0, 0.12)',
+    big: '0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1);',
   },
   timing: {
     short: '85ms',
@@ -77,7 +78,7 @@ export const theme: Theme = {
   },
   input: {
     padding: '0.75rem',
-    radius: '0.25rem',
+    radius: '0.3rem',
     fontSize: '0.9rem',
     lineHeight: 1.35,
   },
@@ -105,12 +106,12 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: inherit;
   }
   hr {
-    border-color: ${color('light')};
-    color: ${color('light')};
+    border-color: #EDECF3;
+    color: #EDECF3;
     margin-bottom: 1.5rem;
     margin-left: -1.25rem;
     margin-right: -1.25rem;
-    border-top: 1px solid ${color('light')};
+    border-top: 1px solid #EDECF3;
     border-bottom: none;
     height: 0;
     box-sizing: content-box;

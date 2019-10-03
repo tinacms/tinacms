@@ -181,9 +181,9 @@ const BlockListItem = ({
 
 const EmptyList = styled.div`
   text-align: center;
-  border-radius: 0.25rem;
-  background-color: #fafafa;
-  color: #bdbdbd;
+  border-radius: 0.3rem;
+  background-color: #edecf3;
+  color: #b2adbe;
   line-height: 1.35;
   padding: 0.75rem 0;
   font-size: 0.85rem;
@@ -192,7 +192,7 @@ const EmptyList = styled.div`
 
 const BlockMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -277,16 +277,16 @@ const GroupListPanel = styled.div`
   position: relative;
   height: auto;
   margin-bottom: 1.5rem;
-  border-radius: 0.25rem;
-  background-color: #f2f2f2;
+  border-radius: 0.3rem;
+  background-color: #edecf3;
 `
 
 const GroupHeaderButton = styled(Button)<{ open: boolean }>`
   border-radius: 10rem;
   padding: 0;
-  width: 2rem;
-  height: 2rem;
-  margin: -0.125rem 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.1rem 0 0 0;
   position: relative;
   fill: white;
   transform-origin: 50% 50%;
@@ -323,7 +323,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   justify-content: space-between;
   align-items: stretch;
   background-color: white;
-  border: 1px solid #e1e1e1;
+  border: 1px solid #edecf3;
   margin: 0 0 -1px 0;
   overflow: visible;
   line-height: 1.35;
@@ -338,7 +338,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   }
 
   svg {
-    fill: #b4b4b4;
+    fill: #e1ddec;
     width: 1.25rem;
     height: auto;
     transition: fill 85ms ease-out;
@@ -346,7 +346,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   &:hover {
     svg {
-      fill: #353232;
+      fill: #433e52;
     }
     ${GroupLabel} {
       color: #0084ff;
@@ -360,18 +360,18 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   &:nth-last-child(2) {
     border-radius: 0 0 0.25rem 0.25rem;
     &:first-child {
-      border-radius: 0.25rem;
+      border-radius: 0.3rem;
     }
   }
 
   ${p =>
     p.isDragging &&
     css`
-      border-radius: 0.25rem;
-      box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+      border-radius: 0.3rem;
+      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
       svg {
-        fill: #353232;
+        fill: #433e52;
       }
       ${GroupLabel} {
         color: #0084ff;
@@ -398,7 +398,7 @@ const DeleteButton = styled.button`
   margin: 0;
   transition: all 85ms ease-out;
   &:hover {
-    background-color: #f2f2f2;
+    background-color: #f6f6f9;
   }
 `
 
@@ -418,7 +418,7 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
   padding: 0.75rem 0;
   transition: all 85ms ease-out;
   &:hover {
-    background-color: #f2f2f2;
+    background-color: #f6f6f9;
     cursor: grab;
   }
   svg {

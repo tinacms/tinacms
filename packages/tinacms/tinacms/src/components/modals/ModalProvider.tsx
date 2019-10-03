@@ -94,34 +94,32 @@ export const ModalOverlay = styled.div`
 `
 
 export const ModalHeader = styled.div`
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: ${padding()}rem ${padding()}rem ${padding()}rem ${padding()}rem;
-  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
+  padding: 0 ${padding()}rem 0 ${padding()}rem;
+  border-bottom: 1px solid #e1ddec;
   margin: 0;
 `
 
 export const ModalBody = styled.div`
-  padding: ${padding()}rem ${padding()}rem 0 ${padding()}rem;
+  padding: 0;
   margin: 0;
 `
 
 export const ModalActions = styled.div`
   display: flex;
   justify-content: flex-end;
-  border-radius: 0 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big};
+  border-radius: 0 0 0.3rem 0.3rem;
   padding: 0 ${padding()}rem ${padding()}rem ${padding()}rem;
   ${Button} {
     flex: 0 1 auto;
     min-width: 8rem;
-    margin: 0 ${padding('small')}rem;
-    &:first-child {
-      margin-left: 0;
-    }
+    margin: 0 ${padding('small')}rem 0 0;
     &:last-child {
       margin-right: 0;
     }
