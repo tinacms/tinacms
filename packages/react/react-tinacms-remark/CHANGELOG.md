@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0...@tinacms/react-tinacms-remark@0.2.0) (2019-10-03)
+
+
+### Bug Fixes
+
+* fields and filename are required ([87c9e53](https://github.com/tinacms/tinacms/commit/87c9e53))
+* navigate back after deleting a file ([c96c697](https://github.com/tinacms/tinacms/commit/c96c697)), closes [#204](https://github.com/tinacms/tinacms/issues/204)
+* throw error if missing fields or filename ([03d0d87](https://github.com/tinacms/tinacms/commit/03d0d87))
+
+
+### Features
+
+* alias "frontmatter." to "rawFrontmatter." ([c234464](https://github.com/tinacms/tinacms/commit/c234464))
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0-alpha.22...@tinacms/react-tinacms-remark@0.1.0) (2019-10-02)
 
 **Note:** Version bump only for package @tinacms/react-tinacms-remark
