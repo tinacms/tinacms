@@ -232,7 +232,7 @@ const FormHeader = styled(
   width: ${SIDEBAR_WIDTH}px;
   cursor: ${p => p.isMultiform && 'pointer'};
   background-color: #f6f6f9;
-  border-bottom: 1px solid #edecf3;
+  border-bottom: 1px solid #e1ddec;
   display: flex;
   align-items: center;
   padding: 0 ${padding()}rem;
@@ -241,7 +241,7 @@ const FormHeader = styled(
   transition: color 250ms ease-out;
   user-select: none;
   svg {
-    width: 1.25rem;
+    width: 1.5rem;
     fill: #e1ddec;
     height: auto;
     transform: translate3d(-4px, 0, 0);
@@ -282,7 +282,7 @@ const FormFooter = styled.div`
   width: ${SIDEBAR_WIDTH}px;
   height: ${FORM_FOOTER_HEIGHT}rem;
   background-color: #f6f6f9;
-  border-top: 1px solid #efefef;
+  border-top: 1px solid #e1ddec;
   padding: 0 1.25rem;
 `
 

@@ -183,7 +183,7 @@ const EmptyList = styled.div`
   text-align: center;
   border-radius: 0.3rem;
   background-color: #edecf3;
-  color: #bdbdbd;
+  color: #b2adbe;
   line-height: 1.35;
   padding: 0.75rem 0;
   font-size: 0.85rem;
