@@ -44,7 +44,7 @@ const FieldLabel = styled.label`
 `
 
 const FieldDescription = styled.p`
-  color: #625d71;
+  color: #716c7f;
   font-size: 0.65rem;
   font-style: italic;
   font-weight: lighter;

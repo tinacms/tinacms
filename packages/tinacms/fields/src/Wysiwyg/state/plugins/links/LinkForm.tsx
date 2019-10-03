@@ -104,7 +104,7 @@ const LinkPopup = styled.div`
   border-radius: 0.3rem;
   border: 1px solid #edecf3;
   filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
-    drop-shadow(0px 2px 3px rgba(48, 48, 48, 0.15));
+    drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
   transform-origin: 50% 0;
   animation: ${LinkPopupKeyframes} 85ms ease-out both 1;
   overflow: visible;
@@ -159,7 +159,7 @@ const LinkButton = styled.button`
   text-align: center;
   border: 0;
   border-radius: 1.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   background-color: #0084ff;
   color: white;
   font-weight: 500;
@@ -178,7 +178,7 @@ const SaveLink = styled.button`
   text-align: center;
   border: 0;
   border-radius: 1.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   background-color: #0084ff;
   color: white;
   font-weight: 500;
