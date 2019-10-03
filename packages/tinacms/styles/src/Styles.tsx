@@ -68,9 +68,8 @@ export const theme: Theme = {
     big: '1.5rem',
   },
   shadow: {
-    small: '0px 2px 3px rgba(48, 48, 48, 0.15)',
-    big:
-      '0px 2px 3px rgba(48, 48, 48, 0.15), 0px 4px 8px rgba(48, 48, 48, 0.1);',
+    small: '0px 2px 3px rgba(0, 0, 0, 0.12)',
+    big: '0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1);',
   },
   timing: {
     short: '85ms',

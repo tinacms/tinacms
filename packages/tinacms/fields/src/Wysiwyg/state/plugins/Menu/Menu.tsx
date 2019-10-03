@@ -165,7 +165,7 @@ const MenuContainer = styled.div`
   width: 100%;
   background-color: white;
   border-radius: 1.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   border: 1px solid #edecf3;
   overflow: visible;
   display: flex;
@@ -247,8 +247,7 @@ export const MenuButtonDropdown = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 0 0;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
-    0px 4px 8px rgba(48, 48, 48, 0.1);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1);
   background-color: white;
   overflow: hidden;
   ${props =>

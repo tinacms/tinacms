@@ -2,7 +2,7 @@ import * as React from 'react'
 import { useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { StyledFrame } from '../SyledFrame'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from '../FormView'
 import { Modal } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
@@ -56,7 +56,7 @@ export const Sidebar = () => {
               onClick={() => setMenuVisibility(!menuIsVisible)}
               open={menuIsVisible}
             >
-              {menuIsVisible ? <CloseIcon /> : <HamburgerIcon />}
+              <HamburgerIcon />
             </MenuToggle>
             <CreateContentMenu />
           </SidebarHeader>
@@ -204,16 +204,51 @@ const MenuToggle = styled.button<{ open: boolean }>`
   text-align: left;
   width: 4rem;
   height: 2rem;
+  display: flex;
+  align-items: center;
+  cursor: pointer;
   svg {
-    transition: fill 75ms ease-out;
-    fill: ${p => (p.open ? '#F6F6F9' : '#625D71')};
-  }
-  &:hover {
-    cursor: pointer;
-    svg {
-      fill: ${p => (p.open ? '#EDECF3' : '#565165')};
+    position: relative;
+    transition: fill 85ms ease-out;
+    fill: #716c7f;
+    margin-left: -4px;
+    width: 2rem;
+    height: auto;
+    path {
+      position: relative;
+      transition: transform 250ms ease-out, opacity 250ms ease-out,
+        fill 85ms ease-out;
+      transform-origin: 50% 50%;
     }
   }
+  &:hover {
+    svg {
+      fill: #565165;
+    }
+  }
+  ${props =>
+    props.open &&
+    css`
+      svg {
+        fill: #f6f6f9;
+        &:hover {
+          fill: #edecf3;
+        }
+        path:first-child {
+          /* Top bar */
+          transform: rotate(45deg) translate3d(0, 0.45rem, 0);
+        }
+        path:nth-child(2) {
+          /* Middle bar */
+          transform: translate3d(-100%, 0, 0);
+          opacity: 0;
+        }
+        path:last-child {
+          /* Bottom Bar */
+          transform: rotate(-45deg) translate3d(0, -0.45rem, 0);
+        }
+      }
+    `};
 `
 
 const MenuWrapper = styled.div`
@@ -244,7 +279,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: ${padding()}rem;
-  transition: all 150ms ease-out;
+  transition: all 250ms ease-out;
   ul,
   li {
     margin: 0;

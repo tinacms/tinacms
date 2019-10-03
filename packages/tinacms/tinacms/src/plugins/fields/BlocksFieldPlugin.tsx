@@ -278,7 +278,7 @@ const GroupListPanel = styled.div`
   height: auto;
   margin-bottom: 1.5rem;
   border-radius: 0.3rem;
-  background-color: #f6f6f9;
+  background-color: #edecf3;
 `
 
 const GroupHeaderButton = styled(Button)<{ open: boolean }>`
@@ -368,7 +368,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
     p.isDragging &&
     css`
       border-radius: 0.3rem;
-      box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+      box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
       svg {
         fill: #433e52;
