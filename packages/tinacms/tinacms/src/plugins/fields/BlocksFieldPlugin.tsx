@@ -284,9 +284,9 @@ const GroupListPanel = styled.div`
 const GroupHeaderButton = styled(Button)<{ open: boolean }>`
   border-radius: 10rem;
   padding: 0;
-  width: 2rem;
-  height: 2rem;
-  margin: -0.125rem 0;
+  width: 1.75rem;
+  height: 1.75rem;
+  margin: -0.1rem 0 0 0;
   position: relative;
   fill: white;
   transform-origin: 50% 50%;

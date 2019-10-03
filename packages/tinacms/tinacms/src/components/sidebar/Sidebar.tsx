@@ -156,7 +156,7 @@ const MenuLink = styled.div<{ value: string }>`
     opacity: 0;
   }
   &:hover {
-    color: ${color('primary')};
+    color: #2296fe;
     &:after {
       transform: translate3d(0, 0, 0);
       transition: transform ${p => p.theme.timing.short} ease-out, opacity 0ms;
