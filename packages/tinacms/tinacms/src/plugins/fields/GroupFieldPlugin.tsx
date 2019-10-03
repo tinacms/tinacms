@@ -121,6 +121,7 @@ export const PanelHeader = styled(Header)`
   background-color: white;
   justify-content: flex-start;
   border: none;
+  border-radius: 0;
   border-bottom: 1px solid #edecf3;
   margin: 0;
   padding: 0.75rem 1.25rem;
