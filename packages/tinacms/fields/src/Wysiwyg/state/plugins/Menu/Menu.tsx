@@ -163,9 +163,10 @@ const MenuContainer = styled.div`
   position: sticky;
   top: 0;
   width: 100%;
-  border-radius: 0.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
-    inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
+  background-color: white;
+  border-radius: 1.5rem;
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
+  border: 1px solid #edecf3;
   overflow: visible;
   display: flex;
   flex: 0 0 auto;
@@ -181,8 +182,8 @@ export const MenuButton = styled.button<{
   flex: 1 0 auto;
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p => (p.active ? '#0084ff' : '#353232')};
-  fill: ${p => (p.active ? '#0084ff' : '#353232')};
+  color: ${p => (p.active ? '#0084ff' : '#433E52')};
+  fill: ${p => (p.active ? '#0084ff' : '#433E52')};
   border: none;
   outline: none;
   padding: 0.375rem;
@@ -203,12 +204,12 @@ export const MenuButton = styled.button<{
     border-right: 1px solid rgba(53, 50, 50, 0.09);
   }
   &:first-child {
-    padding-left: 0.5rem;
-    border-radius: 0.5rem 0 0 0.5rem;
+    padding-left: 0.75rem;
+    border-radius: 1.5rem 0 0 1.5rem;
   }
   &:last-child {
-    padding-right: 0.5rem;
-    border-radius: 0 0.5rem 0.5rem 0;
+    padding-right: 0.75rem;
+    border-radius: 0 1.5rem 1.5rem 0;
   }
   svg {
     width: 1.25rem;
@@ -235,7 +236,7 @@ export const MenuDropdownWrapper = styled.div`
 `
 
 export const MenuButtonDropdown = styled.div<{ open: boolean }>`
-  border-radius: 0.5rem;
+  border-radius: 1.5rem;
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -246,8 +247,7 @@ export const MenuButtonDropdown = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 0 0;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
-    0px 4px 8px rgba(48, 48, 48, 0.1);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1);
   background-color: white;
   overflow: hidden;
   ${props =>
@@ -271,7 +271,8 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
     padding-bottom: 0.75rem;
   }
   &:hover {
-    background-color: rgba(53, 50, 50, 0.09);
+    background-color: #f6f6f9;
+    color: #0084ff;
   }
   &:active {
     color: #0084ff;
