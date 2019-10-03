@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0...@tinacms/tinacms@0.1.1) (2019-10-03)
+
+
+### Bug Fixes
+
+* no fields/forms placeholder padding ([89f03ba](https://github.com/tinacms/tinacms/commit/89f03ba))
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.0-alpha.20...@tinacms/tinacms@0.1.0) (2019-10-02)
 
 **Note:** Version bump only for package @tinacms/tinacms
