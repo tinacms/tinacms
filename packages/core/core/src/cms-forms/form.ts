@@ -21,6 +21,11 @@ export class Form<S = any> {
     this.fields = fields
     this.finalForm = createForm<S>({
       ...options,
+      async onSubmit(values, form, cb) {
+        let response = await options.onSubmit(values, form, cb)
+        form.initialize(values)
+        return response
+      },
       mutators: {
         ...arrayMutators,
         ...options.mutators,
