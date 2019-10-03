@@ -11,7 +11,7 @@ export interface InputProps extends a {
   ref?: any
 }
 
-export const TextField = styled.input<{ error?: boolean }>`
+export const TextFieldCss = css<{ error?: boolean }>`
   position: relative;
   background-color: white;
   border-radius: 0.3rem;
@@ -37,4 +37,8 @@ export const TextField = styled.input<{ error?: boolean }>`
     font-size: 0.9rem;
     color: #cfd3d7;
   }
+`
+
+export const TextField = styled.input<{ error?: boolean }>`
+  ${TextFieldCss}
 `

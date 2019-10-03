@@ -13,9 +13,12 @@ export const Button = styled.button`
   cursor: pointer;
   font-size: 0.75rem;
   padding: 0.75rem;
-  transition: opacity ${p => p.theme.timing.short} ease-out;
+  transition: all 85ms ease-out;
   &:hover {
-    opacity: 0.6;
+    background-color: #2296fe;
+  }
+  &:active {
+    background-color: #0574e4;
   }
   ${p =>
     p.disabled &&

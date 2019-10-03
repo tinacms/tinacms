@@ -98,14 +98,13 @@ const LinkPopupKeyframes = keyframes`
 `
 
 const LinkPopup = styled.div`
-  background-color: white;
+  background-color: #f6f6f9;
   position: relative;
   height: max-content;
-  border-radius: 1.5rem;
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
+  border-radius: 0.3rem;
+  border: 1px solid #edecf3;
   filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
     drop-shadow(0px 2px 3px rgba(48, 48, 48, 0.15));
-  box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
   transform-origin: 50% 0;
   animation: ${LinkPopupKeyframes} 85ms ease-out both 1;
   overflow: visible;
@@ -118,31 +117,30 @@ const LinkLabel = styled.label`
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: #333;
+  color: #433e52;
   margin-bottom: 0.2rem;
 `
 
 const LinkInput = styled.input`
-  background-color: #F6F6F9;
-  border-color: #F6F6F9;
-  border-radius: 0.25rem;
+  position: relative;
+  background-color: white;
+  border-radius: 0.3rem;
   font-size: 0.8rem;
   line-height: 1.35;
+  transition: all 85ms ease-out;
   padding: 0.5rem 0.75rem;
-  border-width: 1px;
-  border-style: solid;
+  border: 1px solid #edecf3;
   width: 100%;
   margin: 0 0 0.5rem 0;
   outline: none;
+  box-shadow: 0 0 0 2px transparent;
 
   &:hover {
-    background-color: #f0f0f0;
+    box-shadow: 0 0 0 2px #e1ddec;
   }
 
   &:focus {
-    border-color: #0084ff;
-    box-shadow: 0 0 2px #0084ff;
-    background-color: #f8f8f8;
+    box-shadow: 0 0 0 2px #0084ff;
   }
 
   &::placeholder {
@@ -176,15 +174,33 @@ const LinkButton = styled.button`
   }
 `
 
-const SaveLink = styled(LinkButton)``
+const SaveLink = styled.button`
+  text-align: center;
+  border: 0;
+  border-radius: 1.5rem;
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  background-color: #0084ff;
+  color: white;
+  font-weight: 500;
+  cursor: pointer;
+  transition: all 85ms ease-out;
+  font-size: 0.75rem;
+  padding: 0.5rem 1.25rem;
+  margin-left: 0.5rem;
+  &:hover {
+    background-color: #2296fe;
+  }
+  &:active {
+    background-color: #0574e4;
+  }
+`
 
-const DeleteLink = styled(LinkButton)`
-  background-color: transparent;
-  box-shadow: none;
-  border: none;
+const DeleteLink = styled(SaveLink)`
+  background-color: white;
+  border: 1px solid #edecf3;
   color: #0084ff;
   &:hover {
-    background-color: #f7f7f7;
+    background-color: #f6f6f9;
     opacity: 1;
   }
 `

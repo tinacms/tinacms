@@ -145,10 +145,9 @@ const MenuLink = styled.div<{ value: string }>`
     left: 0;
     width: 100%;
     height: 100%;
-    background-color: #3e3e3e;
+    background-color: #565165;
     z-index: -1;
-    transition: transform ${p => p.theme.timing.short} ease-out,
-      opacity ${p => p.theme.timing.short} ${p => p.theme.timing.short} ease-out;
+    transition: all 150ms ease-out;
     transform: translate3d(0, 100%, 0);
     opacity: 0;
   }
@@ -201,11 +200,15 @@ const MenuToggle = styled.button<{ open: boolean }>`
   text-align: left;
   width: 4rem;
   height: 2rem;
-  transition: all 75ms ease-out;
-  fill: ${p => (p.open ? '#F6F6F9' : '#828282')};
+  svg {
+    transition: fill 75ms ease-out;
+    fill: ${p => (p.open ? '#F6F6F9' : '#625D71')};
+  }
   &:hover {
-    opacity: 0.6;
     cursor: pointer;
+    svg {
+      fill: ${p => (p.open ? '#EDECF3' : '#565165')};
+    }
   }
 `
 
@@ -273,7 +276,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   left: 0;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 1.5rem 1.5rem 0;
-  width: 3.125rem;
+  width: 3.5rem;
   height: 3rem;
   border: 0;
   outline: none;
@@ -288,13 +291,13 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   transition: all 150ms ease-out;
   cursor: pointer;
   transform: translate3d(${p => (p.open ? 0 : '-0.125rem')}, 0, 0);
-  animation: ${SidebarToggleAnimation} 150ms ease-out 1;
+  animation: ${SidebarToggleAnimation} 150ms 300ms ease-out 1 both;
   &:hover {
-    background-color: #4ea9ff;
+    background-color: #2296fe;
     transform: translate3d(${p => (p.open ? '-0.125rem' : 0)}, 0, 0);
   }
   &:active {
-    background-color: #0073df;
+    background-color: #0574e4;
   }
 `
 
@@ -303,7 +306,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   padding: ${SIDEBAR_HEADER_HEIGHT}rem 0 0 0;
   border: 0;
   z-index: 1;
-  background-color: white;
+  background-color: #f6f6f9;
   position: absolute;
   display: flex;
   flex-direction: column;
