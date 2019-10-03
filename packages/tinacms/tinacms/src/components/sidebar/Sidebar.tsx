@@ -178,7 +178,7 @@ const MenuLink = styled.div<{ value: string }>`
     transform: translate3d(0, -50%, 0);
     width: 2.25rem;
     height: auto;
-    fill: #0084ff;
+    fill: #b2adbe;
     transition: all ${p => p.theme.timing.short} ease-out;
   }
 `
