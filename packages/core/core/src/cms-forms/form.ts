@@ -17,11 +17,13 @@ export class Form<S = any> {
   hiddenFields: { [key: string]: FieldSubscription } = {}
 
   constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
+    let initialValues = options.initialValues || ({} as S)
     this.id = id
     this.label = label
     this.fields = fields
     this.finalForm = createForm<S>({
       ...options,
+      initialValues,
       async onSubmit(values, form, cb) {
         let response = await options.onSubmit(values, form, cb)
         form.initialize(values)
@@ -37,7 +39,7 @@ export class Form<S = any> {
      * on `react-final-form` components being rendered.
      */
     this.registerFields(this.fields)
-    this.discoverHiddenFields(options.initialValues)
+    this.discoverHiddenFields(initialValues)
     this.removeDeclaredFieldsFromHiddenLookup()
     this.actions = actions || []
   }
