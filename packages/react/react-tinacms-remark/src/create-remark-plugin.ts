@@ -12,16 +12,21 @@ interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
   body?(form: FormShape): MaybePromise<string>
 }
 
+const MISSING_FILENAME_MESSAGE =
+  'createRemarkButton must be given `filename(form): string`'
+const MISSING_FIELDS_MESSAGE =
+  'createRemarkButton must be given `fields: Field[]` with at least 1 itekkk'
+
 export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
 ): AddContentPlugin {
   if (!options.filename) {
-    throw new Error('createRemarkButton must be given `filename(form): string`')
+    console.error(MISSING_FILENAME_MESSAGE)
+    throw new Error(MISSING_FILENAME_MESSAGE)
   }
   if (!options.fields || options.fields.length === 0) {
-    throw new Error(
-      'createRemarkButton must be given `fields: Field[]` with at least 1 itekkk'
-    )
+    console.error(MISSING_FIELDS_MESSAGE)
+    throw new Error(MISSING_FIELDS_MESSAGE)
   }
   let formatFilename = options.filename
   let createFrontmatter = options.frontmatter || (() => ({}))
