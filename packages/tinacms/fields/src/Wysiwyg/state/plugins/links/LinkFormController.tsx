@@ -99,7 +99,7 @@ const LinkArrow = styled.div<{ offset: string; top: string }>`
   width: 1rem;
   height: 0.8rem;
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
-  background-color: white;
+  background-color: #f6f6f9;
   z-index: 100;
 `
 

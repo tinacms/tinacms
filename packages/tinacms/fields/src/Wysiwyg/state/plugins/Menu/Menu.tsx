@@ -163,9 +163,10 @@ const MenuContainer = styled.div`
   position: sticky;
   top: 0;
   width: 100%;
+  background-color: white;
   border-radius: 1.5rem;
-  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15),
-    inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
+  box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
+  border: 1px solid #edecf3;
   overflow: visible;
   display: flex;
   flex: 0 0 auto;
@@ -203,11 +204,11 @@ export const MenuButton = styled.button<{
     border-right: 1px solid rgba(53, 50, 50, 0.09);
   }
   &:first-child {
-    padding-left: 0.5rem;
+    padding-left: 0.75rem;
     border-radius: 1.5rem 0 0 1.5rem;
   }
   &:last-child {
-    padding-right: 0.5rem;
+    padding-right: 0.75rem;
     border-radius: 0 1.5rem 1.5rem 0;
   }
   svg {
@@ -271,7 +272,8 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
     padding-bottom: 0.75rem;
   }
   &:hover {
-    background-color: rgba(53, 50, 50, 0.09);
+    background-color: #f6f6f9;
+    color: #0084ff;
   }
   &:active {
     color: #0084ff;

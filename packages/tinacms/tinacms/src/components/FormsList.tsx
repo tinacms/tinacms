@@ -35,7 +35,7 @@ const FormListItem = styled.li`
   font-size: 1.3rem;
   position: relative;
   padding: ${padding()}rem;
-  color: #333;
+  color: #433e52;
   font-weight: normal;
   transition: color 150ms ease-out;
   display: flex;
@@ -44,7 +44,7 @@ const FormListItem = styled.li`
   user-select: none;
   svg {
     width: 1.25rem;
-    fill: ${color('medium')};
+    fill: #e1ddec;
     margin-top: -1px;
     height: auto;
     transform: translate3d(0, 0, 0);
@@ -54,7 +54,7 @@ const FormListItem = styled.li`
     content: '';
     display: block;
     width: calc(100% - ${padding()}rem - ${padding()}rem);
-    background-color: ${color('light')};
+    background-color: ${color('medium')};
     height: 1px;
     position: absolute;
     bottom: 0;
@@ -68,6 +68,7 @@ const FormListItem = styled.li`
     svg {
       transform: translate3d(3px, 0, 0);
       transition: transform 250ms ease;
+      fill: #433e52;
     }
     &:after {
       transform: scale3d(1, 1, 1);

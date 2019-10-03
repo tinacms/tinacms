@@ -181,8 +181,8 @@ const BlockListItem = ({
 
 const EmptyList = styled.div`
   text-align: center;
-  border-radius: 0.25rem;
-  background-color: #fafafa;
+  border-radius: 0.3rem;
+  background-color: #edecf3;
   color: #bdbdbd;
   line-height: 1.35;
   padding: 0.75rem 0;
@@ -277,7 +277,7 @@ const GroupListPanel = styled.div`
   position: relative;
   height: auto;
   margin-bottom: 1.5rem;
-  border-radius: 0.25rem;
+  border-radius: 0.3rem;
   background-color: #f6f6f9;
 `
 
@@ -323,7 +323,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   justify-content: space-between;
   align-items: stretch;
   background-color: white;
-  border: 1px solid #e1e1e1;
+  border: 1px solid #edecf3;
   margin: 0 0 -1px 0;
   overflow: visible;
   line-height: 1.35;
@@ -338,7 +338,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   }
 
   svg {
-    fill: #edecf3;
+    fill: #e1ddec;
     width: 1.25rem;
     height: auto;
     transition: fill 85ms ease-out;
@@ -360,14 +360,14 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   &:nth-last-child(2) {
     border-radius: 0 0 0.25rem 0.25rem;
     &:first-child {
-      border-radius: 0.25rem;
+      border-radius: 0.3rem;
     }
   }
 
   ${p =>
     p.isDragging &&
     css`
-      border-radius: 0.25rem;
+      border-radius: 0.3rem;
       box-shadow: 0px 2px 3px rgba(48, 48, 48, 0.15);
 
       svg {

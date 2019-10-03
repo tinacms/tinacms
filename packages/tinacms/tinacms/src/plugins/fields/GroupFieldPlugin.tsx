@@ -92,29 +92,33 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #e1e1e1;
-  border-radius: 0.25rem;
+  border: 1px solid #edecf3;
+  border-radius: 0.3rem;
   margin: 0 0 1.5rem 0;
   overflow: visible;
   line-height: 1.35;
   padding: 0.75rem;
   color: #282828;
+  background-color: white;
 
   svg {
     width: 1.25rem;
     height: auto;
-    fill: #edecf3;
+    fill: #e1ddec;
     transition: all 85ms ease-out;
   }
 
   &:hover {
+    svg {
+      fill: #433e52;
+    }
     color: #0084ff;
   }
 `
 
 export const PanelHeader = styled(Header)`
   flex: 0 0 auto;
-  background: white;
+  background-color: #f6f6f9;
   justify-content: flex-start;
   border: none;
   border-bottom: 1px solid #efefef;
