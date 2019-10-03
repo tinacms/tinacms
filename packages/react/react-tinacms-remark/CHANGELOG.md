@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.2.0...@tinacms/react-tinacms-remark@0.2.1) (2019-10-03)
+
+
+### Bug Fixes
+
+* overriding remark form label ([f8e965d](https://github.com/tinacms/tinacms/commit/f8e965d)), closes [#215](https://github.com/tinacms/tinacms/issues/215)
+* top level "frontmatter" alias ([cc8b0bc](https://github.com/tinacms/tinacms/commit/cc8b0bc))
+
+
+
+
+
 # [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.1.0...@tinacms/react-tinacms-remark@0.2.0) (2019-10-03)
 
 
