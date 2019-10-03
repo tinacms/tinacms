@@ -23,7 +23,7 @@ export function useRemarkForm(
   validateMarkdownRemark(markdownRemark)
 
   let cms = useCMS()
-  let label = markdownRemark.frontmatter.title
+  let label = formOverrrides.label || markdownRemark.frontmatter.title
   const id = markdownRemark.id
   let initialValues = useMemo(
     () => ({
