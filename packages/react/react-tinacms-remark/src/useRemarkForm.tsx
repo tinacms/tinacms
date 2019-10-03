@@ -36,10 +36,13 @@ export function useRemarkForm(
   let fields = React.useMemo(() => {
     let fields = formOverrrides.fields || generateFields(initialValues)
     fields = fields.map(field => {
-      if (field.name.startsWith('frontmatter.')) {
+      if (
+        field.name === 'frontmatter' ||
+        field.name.startsWith('frontmatter.')
+      ) {
         return {
           ...field,
-          name: field.name.replace('frontmatter.', 'rawFrontmatter.'),
+          name: field.name.replace('frontmatter', 'rawFrontmatter'),
         }
       }
       return field
