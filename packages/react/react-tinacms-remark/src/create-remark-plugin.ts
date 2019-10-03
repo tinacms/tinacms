@@ -20,7 +20,7 @@ export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   }
   if (!options.fields || options.fields.length === 0) {
     throw new Error(
-      'createRemarkButton must be given `fields: Field[]` with at least 1 itekkk'
+      'createRemarkButton must be given `fields: Field[]` with at least 1 item'
     )
   }
   let formatFilename = options.filename
