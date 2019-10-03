@@ -16,6 +16,7 @@ import {
   FORM_FOOTER_HEIGHT,
   SIDEBAR_WIDTH,
 } from '../Globals'
+import { ResetForm } from './ResetForm'
 
 export const FormsView = () => {
   const cms = useCMS()
@@ -99,7 +100,7 @@ export const FormsView = () => {
                   ))}
               </FormBody>
               <FormFooter>
-                <CancelButton disabled={pristine}>Reset</CancelButton>
+                <ResetForm pristine={pristine} />
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
@@ -320,16 +321,4 @@ const FormAnimation = styled.div<{ isEditing: Boolean }>`
 export const SaveButton = styled(Button)`
   flex: 1.5 0 auto;
   padding: 0.75rem 1.5rem;
-`
-
-const CancelButton = styled(SaveButton)`
-  background-color: white;
-  border: 1px solid #edecf3;
-  color: #0084ff;
-  flex: 0 0 6rem;
-  margin-right: 0.5rem;
-  &:hover {
-    background-color: #f6f6f9;
-    opacity: 1;
-  }
 `
