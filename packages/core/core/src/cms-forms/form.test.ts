@@ -1,6 +1,18 @@
 import { Form } from './form'
 
 describe('Form', () => {
+  describe('creating forms', () => {
+    describe('without initialValues', () => {
+      it('is fine', () => {
+        new Form({
+          id: 'example',
+          label: 'Example',
+          onSubmit: jest.fn(),
+          fields: [],
+        })
+      })
+    })
+  })
   describe('#onSubmit', () => {
     describe('after a successful submission', () => {
       it('reinitializes the form with the new values', async () => {
