@@ -22,15 +22,7 @@ const getBorderColor = (props: any) => {
 }
 
 const DropArea = styled.div`
-  border-width: 2px;
-  /* Where do we get access to this global theme? need to import it?
-  or use the context api?
-  border-radius: ${p => p.theme.radius.small}; 
-  */
-  border-radius: .25rem;
-  border-color: ${props => getBorderColor(props)};
-  border-style: dashed;
-  transition: border 0.24s ease-in-out;
+  border-radius: 0.3rem;
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -39,16 +31,23 @@ const DropArea = styled.div`
 `
 
 const ImgPlaceholder = styled.div`
-  align-items: center;
-  padding: 20px;
-  background-color: #fafafa;
-  color: #bdbdbd;
+  text-align: center;
+  border-radius: 0.3rem;
+  background-color: #edecf3;
+  color: #b2adbe;
+  line-height: 1.35;
+  padding: 0.75rem 0;
+  font-size: 0.85rem;
+  font-weight: 500;
+  transition: all 85ms ease-out;
+  &:hover {
+    opacity: 0.6;
+  }
 `
 
 const StyledImage = styled.img`
   max-width: 100%;
-  /* border-radius: ${p => p.theme.radius.small}; */
-  border-radius: .25rem;
+  border-radius: 0.3rem;
   transition: opacity ${p => p.theme.timing.short} ease-out;
   ${DropArea}:hover & {
     opacity: 0.6;
@@ -75,7 +74,9 @@ export const ImageUpload = ({
         <StyledImage src={previewSrc} />
       ) : (
         <ImgPlaceholder>
-          <p>Drag 'n' drop some files here, or click to select files</p>
+          Drag 'n' drop some files here,
+          <br />
+          or click to select files
         </ImgPlaceholder>
       )}
     </DropArea>

@@ -125,6 +125,7 @@ const PlusButton = styled(Button)<{ open: boolean }>`
   margin: 0;
   position: relative;
   fill: white;
+  border: 1px solid #0084ff;
   transform-origin: 50% 50%;
   transition: all 150ms ease-out;
   svg {
@@ -143,6 +144,7 @@ const PlusButton = styled(Button)<{ open: boolean }>`
     css`
       transform: rotate(45deg);
       background-color: white;
+      border-color: #edecf3;
       fill: ${color('primary')};
       &:hover {
         background-color: #f6f6f9;
@@ -153,7 +155,7 @@ const PlusButton = styled(Button)<{ open: boolean }>`
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
   border-radius: 1.5rem;
-  border: 1px solid #efefef;
+  border: 1px solid #edecf3;
   display: block;
   position: absolute;
   top: 0;

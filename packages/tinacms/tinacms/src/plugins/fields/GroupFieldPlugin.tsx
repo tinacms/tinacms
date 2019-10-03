@@ -102,7 +102,7 @@ const Header = styled.div`
   background-color: white;
 
   svg {
-    width: 1.25rem;
+    width: 1.5rem;
     height: auto;
     fill: #e1ddec;
     transition: all 85ms ease-out;
@@ -121,7 +121,7 @@ export const PanelHeader = styled(Header)`
   background-color: #f6f6f9;
   justify-content: flex-start;
   border: none;
-  border-bottom: 1px solid #efefef;
+  border-bottom: 1px solid #e1ddec;
   margin: 0;
   padding: 0.75rem 1.25rem;
 
