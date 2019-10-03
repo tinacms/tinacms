@@ -180,9 +180,15 @@ const ContentMenu = styled.div<{ open: boolean }>`
 `
 
 const CloseButton = styled.div`
-  fill: ${color('medium')};
+  display: flex;
+  align-items: center;
+  fill: #e1ddec;
   cursor: pointer;
   transition: fill 85ms ease-out;
+  svg {
+    width: 1.5rem;
+    height: auto;
+  }
   &:hover {
     fill: ${color('dark')};
   }
