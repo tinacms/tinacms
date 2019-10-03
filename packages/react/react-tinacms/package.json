@@ -34,6 +34,8 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.0"
+    "@tinacms/core": "^0.1.0",
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2"
   }
 }
