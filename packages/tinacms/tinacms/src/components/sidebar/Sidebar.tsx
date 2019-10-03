@@ -345,7 +345,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   padding: ${SIDEBAR_HEADER_HEIGHT}rem 0 0 0;
   border: 0;
   z-index: 1;
-  background-color: #f6f6f9;
+  background-color: white;
   position: absolute;
   display: flex;
   flex-direction: column;

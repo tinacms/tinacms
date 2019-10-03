@@ -231,8 +231,8 @@ const FormHeader = styled(
   height: ${FORM_HEADER_HEIGHT}rem;
   width: ${SIDEBAR_WIDTH}px;
   cursor: ${p => p.isMultiform && 'pointer'};
-  background-color: #f6f6f9;
-  border-bottom: 1px solid #e1ddec;
+  background-color: white;
+  border-bottom: 1px solid #edecf3;
   display: flex;
   align-items: center;
   padding: 0 ${padding()}rem;
@@ -281,8 +281,8 @@ const FormFooter = styled.div`
   align-items: center;
   width: ${SIDEBAR_WIDTH}px;
   height: ${FORM_FOOTER_HEIGHT}rem;
-  background-color: #f6f6f9;
-  border-top: 1px solid #e1ddec;
+  background-color: white;
+  border-top: 1px solid #edecf3;
   padding: 0 1.25rem;
 `
 

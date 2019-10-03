@@ -54,7 +54,7 @@ const FormListItem = styled.li`
     content: '';
     display: block;
     width: 100%;
-    background-color: #e1ddec;
+    background-color: #edecf3;
     height: 1px;
     position: absolute;
     bottom: 0;
