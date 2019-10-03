@@ -94,15 +94,15 @@ export const ModalOverlay = styled.div`
 `
 
 export const ModalHeader = styled.div`
+  height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: ${padding('small')}rem ${padding()}rem ${padding('small')}rem
-    ${padding()}rem;
-  border-bottom: 1px solid rgba(51, 51, 51, 0.09);
+  padding: 0 ${padding()}rem 0 ${padding()}rem;
+  border-bottom: 1px solid #e1ddec;
   margin: 0;
 `
 
