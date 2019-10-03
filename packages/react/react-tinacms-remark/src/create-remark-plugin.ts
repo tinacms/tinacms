@@ -15,7 +15,7 @@ interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
 const MISSING_FILENAME_MESSAGE =
   'createRemarkButton must be given `filename(form): string`'
 const MISSING_FIELDS_MESSAGE =
-  'createRemarkButton must be given `fields: Field[]` with at least 1 itekkk'
+  'createRemarkButton must be given `fields: Field[]` with at least 1 item'
 
 export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
