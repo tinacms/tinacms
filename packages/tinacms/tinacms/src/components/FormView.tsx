@@ -87,12 +87,14 @@ export const FormsView = () => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
             <FormAnimation isEditing={isEditing}>
-              <FormHeader
-                isMultiform={isMultiform}
-                form={editingForm as any}
-                setEditingForm={setEditingForm as any}
-              />
-              <FormBody>
+              {isMultiform && (
+                <FormHeader
+                  isMultiform={isMultiform}
+                  form={editingForm as any}
+                  setEditingForm={setEditingForm as any}
+                />
+              )}
+              <FormBody isMultiform={isMultiform}>
                 {editingForm &&
                   (editingForm.fields.length ? (
                     <FieldsBuilder
@@ -262,9 +264,10 @@ const FormHeader = styled(
   }
 `
 
-export const FormBody = styled.div`
+export const FormBody = styled.div<{ isMultiform?: boolean }>`
   position: absolute;
-  top: ${FORM_HEADER_HEIGHT}rem;
+  top: 0.875rem;
+  border-top: 1px solid #edecf3;
   bottom: ${FORM_FOOTER_HEIGHT}rem;
   scrollbar-width: none;
   width: ${SIDEBAR_WIDTH}px;
@@ -276,6 +279,12 @@ export const FormBody = styled.div`
     padding: 0;
     list-style: none;
   }
+  ${props =>
+    props.isMultiform &&
+    css`
+      top: ${FORM_HEADER_HEIGHT}rem;
+      border-top: none;
+    `};
 `
 
 const FormFooter = styled.div`
