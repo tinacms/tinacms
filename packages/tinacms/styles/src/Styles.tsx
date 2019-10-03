@@ -116,6 +116,14 @@ export const GlobalStyles = createGlobalStyle`
     height: 0;
     box-sizing: content-box;
   }
+  h1, h2, h3, h4, h5, h6, p {
+    &:first-child {
+      margin-top: 0;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
 `
 
 export const TinaResetStyles = css`
