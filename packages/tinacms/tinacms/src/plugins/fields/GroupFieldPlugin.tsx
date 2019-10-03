@@ -118,10 +118,10 @@ const Header = styled.div`
 
 export const PanelHeader = styled(Header)`
   flex: 0 0 auto;
-  background-color: #f6f6f9;
+  background-color: white;
   justify-content: flex-start;
   border: none;
-  border-bottom: 1px solid #e1ddec;
+  border-bottom: 1px solid #edecf3;
   margin: 0;
   padding: 0.75rem 1.25rem;
 
