@@ -127,6 +127,11 @@ const Emoji = styled.span`
 `
 
 const EmptyState = styled.div`
+  position: relative;
+  padding: ${padding()}rem;
+  width: 100%;
+  height: 100%;
+  background: white;
   > *:first-child {
     margin: 0 0 ${padding('big')} 0;
   }
