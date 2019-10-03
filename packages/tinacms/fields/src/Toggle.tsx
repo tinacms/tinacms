@@ -18,18 +18,8 @@ export const Toggle: FC<ToggleProps> = props => {
     <ToggleElement>
       <ToggleInput id={props.name} type="checkbox" {...props.input} />
       <ToggleLabel htmlFor={props.name} role="switch" disabled={props.disabled}>
-        <ToggleSwitch xmlns="http://www.w3.org/2000/svg">
-          <g>
-            <rect rx="10" id="container" height="20" width="40" />
-            <ellipse
-              ry="8"
-              rx="8"
-              id="dot"
-              cy="10"
-              cx={props.input.value ? '30' : '10'}
-              fill={props.input.value ? '#000' : '#999'}
-            />
-          </g>
+        <ToggleSwitch checked={props.input.value ? true : false}>
+          <span></span>
         </ToggleSwitch>
       </ToggleLabel>
     </ToggleElement>
@@ -48,24 +38,32 @@ const ToggleLabel = styled.label<{ disabled?: boolean }>`
   background: none;
   color: inherit;
   padding: 0;
-  font: inherit;
   opacity: ${props => (props.disabled ? '0.4' : '1')};
-  outline: inherit;
-  width: 40px;
-  height: 20px;
+  outline: none;
+  width: 3rem;
+  height: 1.75rem;
   pointer-events: ${props => (props.disabled ? 'none' : 'inherit')};
 `
 
-const ToggleSwitch = styled.svg`
-  width: 40px;
-  height: 20px;
-  overflow: visible;
-  rect {
-    fill: #f3f3f3;
-    transition: all 0.15s ease;
-  }
-  ellipse {
-    transition: all 0.15s ease;
+const ToggleSwitch = styled.div<{ checked: boolean }>`
+  position: relative;
+  width: 3rem;
+  height: 1.75rem;
+  border-radius: 1.5rem;
+  background-color: white;
+  border: 1px solid #edecf3;
+  pointer-events: none;
+  margin-left: -2px;
+  span {
+    position: absolute;
+    border-radius: 1.5rem;
+    left: 2px;
+    top: 50%;
+    width: calc(1.75rem - 6px);
+    height: calc(1.75rem - 6px);
+    background: ${p => (p.checked ? '#0084FF' : '#E1DDEC')};
+    transform: translate3d(${p => (p.checked ? '1.25rem' : '0')}, -50%, 0);
+    transition: all 150ms ease-out;
   }
 `
 
@@ -73,17 +71,9 @@ const ToggleInput = styled.input`
   position: absolute;
   left: 0;
   top: 0;
-  width: 100%;
-  height: 100%;
+  width: 3rem;
+  height: 1.75rem;
   opacity: 0;
   margin: 0;
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
-
-  &:focus + ${ToggleLabel} {
-    > ${ToggleSwitch} {
-      rect {
-        fill: #dedede;
-      }
-    }
-  }
 `
