@@ -64,12 +64,7 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length)
-    return (
-      <FormBody>
-        <NoFormsPlaceholder />
-      </FormBody>
-    )
+  if (!forms.length) return <NoFormsPlaceholder />
 
   if (!editingForm)
     return (
