@@ -17,7 +17,7 @@ export class Form<S = any> {
   hiddenFields: { [key: string]: FieldSubscription } = {}
 
   constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
-    let initialValues = options.initialValues || ({} as S)
+    const initialValues = options.initialValues || ({} as S)
     this.id = id
     this.label = label
     this.fields = fields
@@ -25,7 +25,7 @@ export class Form<S = any> {
       ...options,
       initialValues,
       async onSubmit(values, form, cb) {
-        let response = await options.onSubmit(values, form, cb)
+        const response = await options.onSubmit(values, form, cb)
         form.initialize(values)
         return response
       },
@@ -46,11 +46,11 @@ export class Form<S = any> {
 
   private discoverHiddenFields(values: any, prefix?: string) {
     Object.entries(values).map(([name, value]) => {
-      let path = prefix ? `${prefix}.${name}` : name
+      const path = prefix ? `${prefix}.${name}` : name
 
       if (Array.isArray(value)) {
         if (value.find(item => typeof item === 'object')) {
-          let prefix = `${path}.INDEX`
+          const prefix = `${path}.INDEX`
           value.forEach(item => {
             this.discoverHiddenFields(item, prefix)
           })
@@ -76,7 +76,7 @@ export class Form<S = any> {
 
   private removeDeclaredFieldsFromHiddenLookup() {
     Object.keys(this.fieldSubscriptions).forEach(path => {
-      let hiddenField = this.hiddenFields[path]
+      const hiddenField = this.hiddenFields[path]
       if (hiddenField) {
         hiddenField.unsubscribe()
         delete this.hiddenFields[path]
@@ -86,15 +86,15 @@ export class Form<S = any> {
 
   private registerFields(fields: Field[], pathPrefix?: string) {
     fields.forEach(field => {
-      let path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
+      const path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
 
-      let isGroup = ['group'].includes(field.component as string)
-      let isArray = ['group-list', 'blocks'].includes(field.component as string)
+      const isGroup = ['group'].includes(field.component as string)
+      const isArray = ['group-list', 'blocks'].includes(field.component as string)
       if (isArray) {
-        let subfields = field.fields || []
+        const subfields = field.fields || []
         this.registerFields(subfields, `${path}.INDEX`)
       } else if (isGroup) {
-        let subfields = field.fields || []
+        const subfields = field.fields || []
         this.registerFields(subfields, path)
       } else {
         this.fieldSubscriptions[path] = {

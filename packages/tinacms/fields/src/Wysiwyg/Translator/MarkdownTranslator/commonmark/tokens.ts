@@ -7,13 +7,13 @@ interface Hash<T> {
   [key: string]: T
 }
 
-let ALIGN_STYLES: any = {
+const ALIGN_STYLES: any = {
   ['text-align:left']: 'left',
   ['text-align:center']: 'center',
   ['text-align:right']: 'right',
 }
 
-let ALIGN_DASHES: any = {
+const ALIGN_DASHES: any = {
   left: ':---',
   center: ':---:',
   right: '---:',
@@ -135,11 +135,11 @@ const NODES: Nodes = {
     state.renderList(node, '  ', () => (node.attrs.bullet || '*') + ' ')
   },
   ordered_list(state: MarkdownSerializerState, node: Node) {
-    let start = node.attrs.order || 1
-    let maxW = String(start + node.childCount - 1).length
-    let space = state.repeat(' ', maxW + 2)
+    const start = node.attrs.order || 1
+    const maxW = String(start + node.childCount - 1).length
+    const space = state.repeat(' ', maxW + 2)
     state.renderList(node, space, i => {
-      let nStr = String(start + i)
+      const nStr = String(start + i)
       return state.repeat(' ', maxW - nStr.length) + nStr + '. '
     })
   },
@@ -163,9 +163,9 @@ const NODES: Nodes = {
     if (node.attrs.height || node.attrs.width) {
       size = ` =${node.attrs.width || ''}x${node.attrs.height || ''}`
     }
-    let alt = state.esc(node.attrs.alt || '')
-    let src = state.esc(node.attrs.src)
-    let title = node.attrs.title ? ' ' + state.quote(node.attrs.title) : ''
+    const alt = state.esc(node.attrs.alt || '')
+    const src = state.esc(node.attrs.src)
+    const title = node.attrs.title ? ' ' + state.quote(node.attrs.title) : ''
     state.write(`![${alt}](${src}${title}${size})`)
   },
 
@@ -195,8 +195,8 @@ const NODES: Nodes = {
       if (inHead && nextRowIsInBody) {
         state.write('|')
         for (let i = 0; i < row.childCount; i++) {
-          let align = row.content.child(i).attrs.align
-          let dash = ALIGN_DASHES[align] || '---'
+          const align = row.content.child(i).attrs.align
+          const dash = ALIGN_DASHES[align] || '---'
           state.write(` ${dash} |`)
         }
         state.write('\n')
@@ -223,9 +223,9 @@ const NODES: Nodes = {
      * state.text method and added the replacement.
      */
     node.forEach((n, _, _i) => {
-      let lines = n.text ? n.text.split('\n') : []
+      const lines = n.text ? n.text.split('\n') : []
       for (let i = 0; i < lines.length; i++) {
-        let startOfLine = state.atBlank() || state.closed
+        const startOfLine = state.atBlank() || state.closed
         state.write()
         state.out += state.esc(lines[i], startOfLine).replace(/[\|]/g, '\\$&')
         if (i != lines.length - 1) state.out += '\n'
@@ -261,7 +261,7 @@ const MARKS = {
       node?: Node
     ) {
       if (mark.openedWith) {
-        let closeWith = mark.openedWith
+        const closeWith = mark.openedWith
         // @ts-ignore
         mark.openedWith = null
         return closeWith
@@ -294,7 +294,7 @@ const MARKS = {
 }
 
 export function buildTokensForSchema(schema: Schema): Hash<Token> {
-  let tokens: Hash<Token> = {}
+  const tokens: Hash<Token> = {}
 
   if (schema.nodes.blockquote) tokens.blockquote = TOKENS.blockquote
   if (schema.nodes.paragraph) tokens.paragraph = TOKENS.paragraph
@@ -332,7 +332,7 @@ export function buildTokensForSchema(schema: Schema): Hash<Token> {
 }
 
 export function buildNodesFromSchema(schema: Schema): Nodes {
-  let nodes: Nodes = {}
+  const nodes: Nodes = {}
 
   if (schema.nodes.blockquote) nodes.blockquote = NODES.blockquote
   if (schema.nodes.paragraph) nodes.paragraph = NODES.paragraph
@@ -361,7 +361,7 @@ export function buildNodesFromSchema(schema: Schema): Nodes {
 }
 
 export function buildMarksFromSchema(schema: Schema) {
-  let marks: any = {}
+  const marks: any = {}
   if (schema.marks.em) marks.em = MARKS.em
   if (schema.marks.strong) marks.strong = MARKS.strong
   if (schema.marks.link) marks.link = MARKS.link

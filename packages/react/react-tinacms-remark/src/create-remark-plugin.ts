@@ -28,19 +28,19 @@ export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
     console.error(MISSING_FIELDS_MESSAGE)
     throw new Error(MISSING_FIELDS_MESSAGE)
   }
-  let formatFilename = options.filename
-  let createFrontmatter = options.frontmatter || (() => ({}))
-  let createBody = options.body || (() => '')
+  const formatFilename = options.filename
+  const createFrontmatter = options.frontmatter || (() => ({}))
+  const createBody = options.body || (() => '')
   return {
     __type: 'content-button',
     name: options.label,
     fields: options.fields,
     onSubmit: async (form: any, cms: CMS) => {
-      let filename = await formatFilename(form)
-      let rawFrontmatter = await createFrontmatter(form)
-      let rawMarkdownBody = await createBody(form)
+      const filename = await formatFilename(form)
+      const rawFrontmatter = await createFrontmatter(form)
+      const rawMarkdownBody = await createBody(form)
 
-      let fileRelativePath = filename
+      const fileRelativePath = filename
       cms.api.git!.onChange!({
         fileRelativePath,
         content: toMarkdownString({

@@ -30,7 +30,7 @@ export const image = {
     },
   ],
   toDOM(node: Node) {
-    let attrs: any = {
+    const attrs: any = {
       src: node.attrs.src,
     }
 

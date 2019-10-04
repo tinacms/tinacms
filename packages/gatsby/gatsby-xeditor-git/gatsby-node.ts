@@ -3,7 +3,7 @@ import { router as gitRouter } from '@tinacms/api-git'
 import { GraphQLString } from 'gatsby/graphql'
 
 exports.setFieldsOnGraphQLNodeType = ({ type }: any) => {
-  let pathRoot = process.cwd()
+  const pathRoot = process.cwd()
   if (type.name === `MarkdownRemark`) {
     return {
       rawFrontmatter: {

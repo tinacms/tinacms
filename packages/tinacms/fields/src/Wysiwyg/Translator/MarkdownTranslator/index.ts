@@ -19,7 +19,7 @@ export class MarkdownTranslator extends Translator {
   }
 
   static commonMarkFromSchema(schema: Schema) {
-    let translator = new MarkdownTranslator(schema)
+    const translator = new MarkdownTranslator(schema)
     translator.parser = CommonMarkParser(schema)
     translator.serializer = CommonMarkSerializer(schema)
     return translator

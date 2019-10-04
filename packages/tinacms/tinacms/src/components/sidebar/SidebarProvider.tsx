@@ -8,7 +8,7 @@ interface SidebarProps {
 export const SidebarContext = React.createContext<SidebarProps | null>(null)
 
 export function useSidebar(): SidebarProps {
-  let sidebar = React.useContext(SidebarContext)
+  const sidebar = React.useContext(SidebarContext)
 
   if (!sidebar) {
     throw new Error('No Sidebar context provided')

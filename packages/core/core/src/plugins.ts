@@ -37,7 +37,7 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
   }
 
   add(plugin: T | Omit<T, '__type'>) {
-    let p = plugin as T
+    const p = plugin as T
 
     if (!p.__type) {
       p.__type = this.__type
@@ -56,10 +56,10 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
   }
 
   remove(pluginOrName: string | T): T | undefined {
-    let name =
+    const name =
       typeof pluginOrName === 'string' ? pluginOrName : pluginOrName.name
 
-    let plugin = this.__plugins[name]
+    const plugin = this.__plugins[name]
 
     delete this.__plugins[name]
     this.notifiySubscribers()

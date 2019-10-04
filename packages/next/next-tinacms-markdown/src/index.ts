@@ -57,12 +57,12 @@ export function useMarkdownForm(
   markdownRemark: Markdown,
   formOverrrides: FormOptions<any>
 ) {
-  let cms = useCMS()
+  const cms = useCMS()
 
   // let throttledOnChange = React.useMemo(() => {
   // return throttle(cms.api.git.onChange, 300)
   // }, [])
-  let [values, form] = useCMSForm({
+  const [values, form] = useCMSForm({
     label: markdownRemark.path,
     id: markdownRemark.path,
     initialValues: markdownRemark,

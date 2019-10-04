@@ -43,13 +43,13 @@ export interface FieldsBuilderProps {
 }
 
 export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
-  let cms = useCMS()
+  const cms = useCMS()
   return (
     <FieldsGroup>
       {fields.map((field: Field) => {
         if (field.component === null) return null
 
-        let plugin = cms.plugins
+        const plugin = cms.plugins
           .findOrCreateMap<FieldPlugin>('field')
           .find(field.component as string)
 
