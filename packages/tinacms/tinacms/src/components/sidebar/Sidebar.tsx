@@ -136,22 +136,23 @@ const MenuLink = styled.div<{ value: string }>`
   color: ${color('light')};
   font-size: 1.125rem;
   font-weight: 500;
-  padding: ${padding()}rem ${padding()}rem ${padding()}rem 4rem;
+  padding: ${padding('small')}rem ${padding()}rem ${padding('small')}rem 4rem;
   position: relative;
   cursor: pointer;
   transition: all ${p => p.theme.timing.short} ease-out;
   overflow: hidden;
+  margin-bottom: ${padding('small')}rem;
   &:after {
     content: '';
     position: absolute;
-    top: 0.25rem;
-    bottom: 0.25rem;
+    top: 0;
+    bottom: 0;
     left: 0.5rem;
     right: 0.5rem;
     border-radius: 1.5rem;
     background-color: #363145;
     z-index: -1;
-    transition: all 150ms ease-out;
+    transition: all 150ms ease;
     transform: translate3d(0, 100%, 0);
     opacity: 0;
   }
