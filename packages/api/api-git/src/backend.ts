@@ -124,20 +124,6 @@ export function router() {
     email?: string
   }
 
-  function openRepo() {
-    const repo = git(pathRoot)
-
-    /**
-     * This is here to allow committing from the cloud
-     *
-     * `repo.env` overwrites the environment. Adding `...process.env`
-     *  is required for accessing global config values. (i.e. user.name, user.email)
-     */
-    repo.env({ ...process.env, GIT_SSH_COMMAND: GIT_SSH_COMMAND })
-
-    return repo
-  }
-
   async function commit({ files, message, name, email }: CommitOptions) {
     let options
 
@@ -147,10 +133,29 @@ export function router() {
       }
     }
 
-    const repo = openRepo()
+    const repo = openRepo(pathRoot)
     await repo.commit(message || DEFAULT_MESSAGE, ...files, options)
     await repo.push()
   }
 
   return router
+}
+
+/**
+ * Opens and prepares a SimpleGit repository.
+ *
+ * @param absolutePath string
+ */
+function openRepo(absolutePath: string) {
+  const repo = git(absolutePath)
+
+  /**
+   * This is here to allow committing from the cloud
+   *
+   * `repo.env` overwrites the environment. Adding `...process.env`
+   *  is required for accessing global config values. (i.e. user.name, user.email)
+   */
+  repo.env({ ...process.env, GIT_SSH_COMMAND: GIT_SSH_COMMAND })
+
+  return repo
 }
