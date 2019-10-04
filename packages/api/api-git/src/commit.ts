@@ -1,4 +1,5 @@
-import * as git from 'simple-git/promise'
+// @ts-ignore
+const git = require('simple-git/promise')
 
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
