@@ -44,7 +44,6 @@ export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
       cms.api.git!.onChange!({
         fileRelativePath,
         content: toMarkdownString({
-          id: '',
           fileRelativePath,
           rawFrontmatter,
           rawMarkdownBody,
