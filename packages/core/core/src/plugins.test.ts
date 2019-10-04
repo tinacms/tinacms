@@ -4,7 +4,7 @@ describe('PluginManager', () => {
   describe('when nothing has been added', () => {
     describe('#all', () => {
       it('returns no items', () => {
-        let plugins = new PluginManager()
+        const plugins = new PluginManager()
 
         expect(plugins.all('test')).toHaveLength(0)
       })
@@ -12,9 +12,9 @@ describe('PluginManager', () => {
   })
   describe('when a "test" plugin has been added', () => {
     it('notifies the subscribers', () => {
-      let listeners = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
-      let p = { __type: 'test', name: 'Example' }
-      let plugins = new PluginManager()
+      const listeners = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
+      const p = { __type: 'test', name: 'Example' }
+      const plugins = new PluginManager()
       listeners.forEach(listener =>
         plugins.findOrCreateMap('test').subscribe(listener)
       )
@@ -25,16 +25,16 @@ describe('PluginManager', () => {
     })
     describe('#all', () => {
       it('contains the plugin', () => {
-        let p = { __type: 'test', name: 'Example' }
-        let plugins = new PluginManager()
+        const p = { __type: 'test', name: 'Example' }
+        const plugins = new PluginManager()
 
         plugins.add(p)
 
         expect(plugins.all('test')).toContain(p)
       })
       it('returns no items of a different type', () => {
-        let p = { __type: 'test', name: 'Example' }
-        let plugins = new PluginManager()
+        const p = { __type: 'test', name: 'Example' }
+        const plugins = new PluginManager()
 
         plugins.add(p)
 

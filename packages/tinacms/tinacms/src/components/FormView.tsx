@@ -49,13 +49,13 @@ export const FormsView = () => {
   //Toggles editing prop for component animations
   React.useEffect(() => {
     editingForm ? setIsEditing(true) : setIsEditing(false)
-  })
+  }, [editingForm])
 
-  let moveArrayItem = React.useCallback(
+  const moveArrayItem = React.useCallback(
     (result: DropResult) => {
-      let form = editingForm!.finalForm
+      const form = editingForm!.finalForm
       if (!result.destination) return
-      let name = result.type
+      const name = result.type
       form.mutators.move(name, result.source.index, result.destination.index)
     },
     [editingForm]

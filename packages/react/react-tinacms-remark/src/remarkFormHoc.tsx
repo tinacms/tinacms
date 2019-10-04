@@ -8,7 +8,7 @@ export function remarkForm(
   options: Partial<FormOptions<any>> = {}
 ) {
   return function RemarkForm(props: any) {
-    let [markdownRemark] = useRemarkForm(props.data.markdownRemark, options)
+    const [markdownRemark] = useRemarkForm(props.data.markdownRemark, options)
 
     return <Component {...props} data={{ ...props.data, markdownRemark }} />
   }
@@ -19,7 +19,7 @@ export function liveRemarkForm(
   options: Partial<FormOptions<any>> = {}
 ) {
   return function RemarkForm(props: any) {
-    let [markdownRemark, form] = useRemarkForm(
+    const [markdownRemark, form] = useRemarkForm(
       props.data.markdownRemark,
       options
     )

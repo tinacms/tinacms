@@ -36,7 +36,7 @@ class MarkdownParseState {
   // using the current marks as styling.
   addText(text: string) {
     if (!text) return
-    let nodes = this.top().content,
+    const nodes = this.top().content,
       last = nodes[nodes.length - 1]
     let node = this.schema.text(text, this.marks),
       merged
@@ -59,8 +59,8 @@ class MarkdownParseState {
 
   parseTokens(toks: Token[]) {
     for (let i = 0; i < toks.length; i++) {
-      let tok = toks[i]
-      let handler = this.tokenHandlers[tok.type]
+      const tok = toks[i]
+      const handler = this.tokenHandlers[tok.type]
       if (!handler)
         throw new Error(
           'Token type `' + tok.type + '` not supported by Markdown parser'
@@ -72,7 +72,7 @@ class MarkdownParseState {
   // : (NodeType, ?Object, ?[Node]) → ?Node
   // Add a node at the current position.
   addNode(type: NodeType, attrs?: object, content?: Node[]) {
-    let node = type.createAndFill(attrs, content, this.marks)
+    const node = type.createAndFill(attrs, content, this.marks)
     if (!node) return null
     this.push(node)
     return node
@@ -88,7 +88,7 @@ class MarkdownParseState {
   // Close and return the node that is currently on top of the stack.
   closeNode() {
     if (this.marks.length) this.marks = Mark.none
-    let info = this.stack.pop()
+    const info = this.stack.pop()
     if (!info) return //devWarn("Attempted to close a non-existent node.")
     return this.addNode(info.type, info.attrs, info.content)
   }
@@ -120,11 +120,11 @@ interface Hash<T> {
 }
 
 function tokenHandlers(schema: THSchema, tokens: Hash<Token>) {
-  let handlers = Object.create(null)
-  for (let type in tokens) {
-    let spec = tokens[type]
+  const handlers = Object.create(null)
+  for (const type in tokens) {
+    const spec = tokens[type]
     if (spec.block) {
-      let nodeType = schema.nodeType(spec.block)
+      const nodeType = schema.nodeType(spec.block)
       if (noOpenClose(type)) {
         handlers[type] = (state: MarkdownParseState, tok: Token) => {
           state.openNode(nodeType, attrs(spec, tok))
@@ -138,11 +138,11 @@ function tokenHandlers(schema: THSchema, tokens: Hash<Token>) {
           state.closeNode()
       }
     } else if (spec.node) {
-      let nodeType = schema.nodeType(spec.node)
+      const nodeType = schema.nodeType(spec.node)
       handlers[type] = (state: MarkdownParseState, tok: Token) =>
         state.addNode(nodeType, attrs(spec, tok))
     } else if (spec.mark) {
-      let markType = schema.marks[spec.mark]
+      const markType = schema.marks[spec.mark]
       if (noOpenClose(type)) {
         handlers[type] = (state: MarkdownParseState, tok: Token) => {
           state.openMark(markType.create(attrs(spec, tok)))

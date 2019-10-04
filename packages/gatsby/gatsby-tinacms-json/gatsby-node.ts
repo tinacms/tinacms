@@ -2,7 +2,7 @@
 import { GraphQLString } from 'gatsby/graphql'
 
 exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
-  let pathRoot = process.cwd()
+  const pathRoot = process.cwd()
 
   if (!/.*Json$/.test(type.name)) {
     return {}
@@ -20,7 +20,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
       type: GraphQLString,
       args: {},
       resolve: ({ children, id, internal, parent, ...data }: any) => {
-        let p = getNode(parent)
+        const p = getNode(parent)
 
         return p.absolutePath.replace(pathRoot, '')
       },

@@ -3,7 +3,7 @@ import { defaultSchema } from '../default-schema'
 import { singleMarkCommand } from './single-mark-command'
 import { EM } from '../state/plugins/input-rules'
 
-let { forDoc, doc, p, text, em } = new PMTestHarness(defaultSchema)
+const { forDoc, doc, p, text, em } = new PMTestHarness(defaultSchema)
 
 const P1_START = () => 1
 

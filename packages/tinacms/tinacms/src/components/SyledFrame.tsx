@@ -38,7 +38,7 @@ interface FrameProps {
 }
 const FrameContext = React.createContext<FrameProps | null>(null)
 export function useFrameContext(): FrameProps {
-  let frame = React.useContext(FrameContext)
+  const frame = React.useContext(FrameContext)
 
   if (!frame) {
     return {

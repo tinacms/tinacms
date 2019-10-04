@@ -53,8 +53,8 @@ export class CodeBlockView implements NodeView {
    */
   forwardSelection = () => {
     if (!this.cm.hasFocus()) return
-    let state = this.view.state
-    let selection = this.asProseMirrorSelection(state.doc)
+    const state = this.view.state
+    const selection = this.asProseMirrorSelection(state.doc)
     if (!selection.eq(state.selection as any)) {
       this.view.dispatch(state.tr.setSelection(selection as any))
     }
@@ -71,11 +71,11 @@ export class CodeBlockView implements NodeView {
    * to keep the two editors in sync.
    */
   valueChanged() {
-    let change = computeChange(this.node.textContent, this.cm.getValue())
+    const change = computeChange(this.node.textContent, this.cm.getValue())
     if (change) {
-      let codeBlockStart = this.getPos() + 1
-      let schema = this.view.state.schema
-      let tr = this.view.state.tr.replaceWith(
+      const codeBlockStart = this.getPos() + 1
+      const schema = this.view.state.schema
+      const tr = this.view.state.tr.replaceWith(
         codeBlockStart + change.from,
         codeBlockStart + change.to,
         change.text ? schema.text(change.text) : null
@@ -88,9 +88,9 @@ export class CodeBlockView implements NodeView {
    * Creates a ProseMirror TextSelection based off the CodeMirror selection.
    */
   asProseMirrorSelection(doc: Node): Selection {
-    let offset = this.getPos() + 1
-    let anchor = this.cm.indexFromPos(this.cm.getCursor('anchor')) + offset
-    let head = this.cm.indexFromPos(this.cm.getCursor('head')) + offset
+    const offset = this.getPos() + 1
+    const anchor = this.cm.indexFromPos(this.cm.getCursor('anchor')) + offset
+    const head = this.cm.indexFromPos(this.cm.getCursor('head')) + offset
     return TextSelection.create(doc, anchor, head)
   }
 
@@ -126,8 +126,8 @@ export class CodeBlockView implements NodeView {
    * Generates a Keymap for the CodeMirror instance.
    */
   codeMirrorKeymap() {
-    let view = this.view
-    let mod = mac ? 'Cmd' : 'Ctrl'
+    const view = this.view
+    const mod = mac ? 'Cmd' : 'Ctrl'
     return CodeMirror.normalizeKeyMap({
       Up: () => this.maybeEscape('line', -1),
       Left: () => this.maybeEscape('char', -1),
@@ -144,14 +144,14 @@ export class CodeBlockView implements NodeView {
       [`${mod}-Z`]: () => undo(view.state as any, view.dispatch as any),
       [`Shift-${mod}-Z`]: () => redo(view.state as any, view.dispatch as any),
       [`${mod}-Shift-Enter`]: () => {
-        let pos = this.cm.getCursor()
+        const pos = this.cm.getCursor()
 
         if (this.cm.somethingSelected() || pos.line != this.cm.firstLine()) {
           return CodeMirror.Pass
         }
 
         if (view.state.selection.$anchor.parentOffset) {
-          let pos = view.state.selection.$anchor.pos
+          const pos = view.state.selection.$anchor.pos
           view.dispatch(
             view.state.tr.setSelection(Selection.near(
               this.view.state.doc.resolve(pos - 1),
@@ -166,14 +166,14 @@ export class CodeBlockView implements NodeView {
         return true
       },
       ['Shift-Enter']: () => {
-        let pos = this.cm.getCursor()
+        const pos = this.cm.getCursor()
 
         if (this.cm.somethingSelected() || pos.line != this.cm.lastLine()) {
           return CodeMirror.Pass
         }
 
         if (view.state.selection.$anchor.parentOffset) {
-          let pos = view.state.selection.$anchor.pos
+          const pos = view.state.selection.$anchor.pos
           view.dispatch(
             view.state.tr.setSelection(Selection.near(
               this.view.state.doc.resolve(pos - 1),
@@ -192,7 +192,7 @@ export class CodeBlockView implements NodeView {
   }
 
   maybeEscape(unit: string, dir: number) {
-    let pos = this.cm.getCursor()
+    const pos = this.cm.getCursor()
     if (
       this.cm.somethingSelected() ||
       pos.line != (dir < 0 ? this.cm.firstLine() : this.cm.lastLine()) ||
@@ -202,9 +202,9 @@ export class CodeBlockView implements NodeView {
       return CodeMirror.Pass
     }
 
-    let targetPos = this.getPos() + (dir < 0 ? 0 : this.node.nodeSize)
-    let selection = Selection.near(this.view.state.doc.resolve(targetPos), dir)
-    let atEndOfDocument = !(
+    const targetPos = this.getPos() + (dir < 0 ? 0 : this.node.nodeSize)
+    const selection = Selection.near(this.view.state.doc.resolve(targetPos), dir)
+    const atEndOfDocument = !(
       selection.$from.pos + 1 <
       (this.view.state.doc.content as any).size
     )
@@ -224,7 +224,7 @@ export class CodeBlockView implements NodeView {
   update(node: Node) {
     if (node.type != this.node.type) return false
     this.node = node
-    let change = computeChange(this.cm.getValue(), node.textContent)
+    const change = computeChange(this.cm.getValue(), node.textContent)
     if (change) {
       this.updating = true
       this.cm.replaceRange(
