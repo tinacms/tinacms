@@ -2,7 +2,7 @@
   "name": "demo-next",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "develop": "next dev",
     "start": "next start"
   },
   "dependencies": {
