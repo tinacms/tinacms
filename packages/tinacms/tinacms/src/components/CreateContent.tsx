@@ -24,32 +24,36 @@ export const CreateContentMenu = () => {
   const frame = useFrameContext()
   let [visible, setVisible] = React.useState(false)
 
-  return (
-    <ContentMenuWrapper>
-      <PlusButton onClick={() => setVisible(true)} open={visible}>
-        <AddIcon />
-      </PlusButton>
-      <ContentMenu open={visible}>
-        <Dismissible
-          click
-          escape
-          onDismiss={() => setVisible(false)}
-          document={frame.document}
-          disabled={!visible}
-        >
-          {cms.plugins.all('content-button').map(plugin => (
-            <CreateContentButton
-              plugin={plugin}
-              key={plugin.name}
-              onClick={() => {
-                setVisible(false)
-              }}
-            />
-          ))}
-        </Dismissible>
-      </ContentMenu>
-    </ContentMenuWrapper>
-  )
+  if (cms.plugins.all('content-button').length) {
+    return (
+      <ContentMenuWrapper>
+        <PlusButton onClick={() => setVisible(true)} open={visible}>
+          <AddIcon />
+        </PlusButton>
+        <ContentMenu open={visible}>
+          <Dismissible
+            click
+            escape
+            onDismiss={() => setVisible(false)}
+            document={frame.document}
+            disabled={!visible}
+          >
+            {cms.plugins.all('content-button').map(plugin => (
+              <CreateContentButton
+                plugin={plugin}
+                key={plugin.name}
+                onClick={() => {
+                  setVisible(false)
+                }}
+              />
+            ))}
+          </Dismissible>
+        </ContentMenu>
+      </ContentMenuWrapper>
+    )
+  }
+
+  return null
 }
 
 const CreateContentButton = ({ plugin, onClick }: any) => {

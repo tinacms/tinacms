@@ -72,7 +72,7 @@ const Panel = function Panel({
   return (
     <GroupPanel isExpanded={isExpanded}>
       <PanelHeader onClick={() => setExpanded(false)}>
-        <LeftArrowIcon /> {Label(field)}
+        <LeftArrowIcon /> <span>{Label(field)}</span>
       </PanelHeader>
       <PanelBody>
         {/* {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null} */}
@@ -117,6 +117,9 @@ const Header = styled.div`
 `
 
 export const PanelHeader = styled(Header)`
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
   flex: 0 0 auto;
   background-color: white;
   justify-content: flex-start;
@@ -126,7 +129,15 @@ export const PanelHeader = styled(Header)`
   margin: 0;
   padding: 0.75rem 1.25rem;
 
+  span {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+
   svg {
+    flex: 0 0 auto;
     transform: translate3d(-4px, 0, 0);
   }
 
