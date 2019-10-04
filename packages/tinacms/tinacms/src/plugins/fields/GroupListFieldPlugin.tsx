@@ -144,13 +144,13 @@ const GroupLabel = styled.span`
   margin: 0;
   font-size: 0.85rem;
   font-weight: 500;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: inherit;
   transition: all 85ms ease-out;
   text-align: left;
-  max-width: calc(100% - 2.25rem);
-  overflow: hidden;
-  text-overflow: ellipsis;
 `
 
 const GroupListHeader = styled.div`

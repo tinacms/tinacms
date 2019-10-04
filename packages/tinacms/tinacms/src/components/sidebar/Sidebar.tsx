@@ -187,12 +187,11 @@ const SidebarHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
-  top: 0;
   z-index: 1050;
-  height: ${SIDEBAR_HEADER_HEIGHT}rem;
-  width: ${SIDEBAR_WIDTH}px;
-  padding: 1rem ${padding()}rem 0 ${padding()}rem;
+  flex: 0 0 3.75rem;
+  height: 3.75rem;
+  width: 100%;
+  padding: 0 ${padding()}rem;
 `
 
 const MenuToggle = styled.button<{ open: boolean }>`
@@ -342,11 +341,11 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
 
 const SidebarWrapper = styled.div<{ open: boolean }>`
   margin: 0;
-  padding: ${SIDEBAR_HEADER_HEIGHT}rem 0 0 0;
+  padding: 0;
   border: 0;
   z-index: 1;
   background-color: white;
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
