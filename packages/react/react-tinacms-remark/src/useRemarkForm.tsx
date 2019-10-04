@@ -24,7 +24,7 @@ export function useRemarkForm(
 
   let cms = useCMS()
   let label = formOverrrides.label || markdownRemark.frontmatter.title
-  const id = markdownRemark.id
+  const id = markdownRemark.fileRelativePath
   let initialValues = useMemo(
     () => ({
       ...markdownRemark,
