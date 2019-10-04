@@ -24,7 +24,6 @@
     "directory": "packages/gatsby-tinacms-json"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "tsc -w",
     "build": "tsc",
     "test": "jest --passWithNoTests"

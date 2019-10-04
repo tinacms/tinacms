@@ -22,7 +22,6 @@
     "build"
   ],
   "scripts": {
-    "prepublish": "npm run build",
     "test": "jest --passWithNoTests",
     "build": "cms-scripts build",
     "dev": "cms-scripts dev",

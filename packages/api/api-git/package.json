@@ -22,7 +22,6 @@
     "directory": "packages/api/api-git"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "cms-scripts watchDebug",
     "build": "cms-scripts build",
     "dev": "cms-scripts devDebug",
