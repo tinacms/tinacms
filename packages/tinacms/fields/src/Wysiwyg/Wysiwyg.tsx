@@ -12,7 +12,7 @@ interface Wysiwyg {
 
 export const Wysiwyg = styled(
   ({ input, plugins, frame, ...styleProps }: any) => {
-    let prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame)
+    const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame)
 
     return (
       <>

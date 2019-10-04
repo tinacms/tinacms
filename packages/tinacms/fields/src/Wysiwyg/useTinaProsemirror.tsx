@@ -20,12 +20,12 @@ export function useTinaProsemirror(
   /**
    * Construct the Prosemirror Schema
    */
-  let [schema] = useProsemirrorSchema(plugins)
+  const [schema] = useProsemirrorSchema(plugins)
 
   /**
    * Create a MarkdownTranslattor based on the schema
    */
-  let [translator] = useMarkdownTranslator(schema)
+  const [translator] = useMarkdownTranslator(schema)
 
   /**
    * A reference to the DOM Node where the prosemirror editor will be added.
@@ -42,7 +42,7 @@ export function useTinaProsemirror(
       /**
        * Create a new Prosemirror EditorView on in the DOM
        */
-      let editorView = new EditorView(targetNode.current, {
+      const editorView = new EditorView(targetNode.current, {
         nodeViews,
         /**
          * The initial state of the Wysiwyg
@@ -77,7 +77,7 @@ export function useTinaProsemirror(
     /**
      * Rerender if the target Node has changed.
      */
-    [targetNode.current]
+    [frame, input, plugins, schema, translator]
   )
 
   return targetNode

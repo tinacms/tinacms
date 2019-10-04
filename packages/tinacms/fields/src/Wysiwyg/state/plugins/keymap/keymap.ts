@@ -35,7 +35,7 @@ const mac =
   typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
 export function buildKeymap(schema: Schema, blockContent?: boolean) {
-  let keys: any = {
+  const keys: any = {
     ...baseKeymap,
     Enter: chainCommands(createParagraphNear, liftEmptyBlock, splitBlock),
   }
@@ -122,7 +122,7 @@ export function buildKeymap(schema: Schema, blockContent?: boolean) {
    * Hard Break – <br />
    */
   if ((type = schema.nodes.hard_break)) {
-    let br = type,
+    const br = type,
       cmd = chainCommands(exitCode, (state, dispatch) => {
         // @ts-ignore
         dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView())
@@ -186,7 +186,7 @@ export function buildKeymap(schema: Schema, blockContent?: boolean) {
    * paragraph shortcut
    */
   if ((type = schema.nodes.bullet_list) || (type = schema.nodes.ordered_list)) {
-    let lift = liftListItem(schema.nodes.list_item)
+    const lift = liftListItem(schema.nodes.list_item)
     bind('Mod-Alt-9', lift)
   }
 
@@ -248,9 +248,9 @@ function arrowHandler(
 ) {
   return (state: EditorState, dispatch: any, view: EditorView) => {
     if (state.selection.empty && view.endOfTextblock(dir)) {
-      let side = dir == 'left' || dir == 'up' ? -1 : 1
-      let $head = state.selection.$head
-      let nextPos = (Selection as any).near(
+      const side = dir == 'left' || dir == 'up' ? -1 : 1
+      const $head = state.selection.$head
+      const nextPos = (Selection as any).near(
         state.doc.resolve(side > 0 ? $head.after() : $head.before()),
         side
       )
@@ -265,9 +265,9 @@ function arrowHandler(
 
 export function isListType(listType: NodeType) {
   return function(state: EditorState) {
-    let { $from, $to } = state.selection
+    const { $from, $to } = state.selection
     // @ts-ignore
-    let range = $from.blockRange(
+    const range = $from.blockRange(
       $to,
       // @ts-ignore
       node => node.childCount && node.firstChild.type == listType
@@ -277,9 +277,9 @@ export function isListType(listType: NodeType) {
 }
 
 export function isNotAList(state: EditorState) {
-  let { ordered_list, bullet_list } = state.schema.nodes
-  let { $from, $to } = state.selection
-  let range = $from.blockRange(
+  const { ordered_list, bullet_list } = state.schema.nodes
+  const { $from, $to } = state.selection
+  const range = $from.blockRange(
     $to,
     // @ts-ignore
     node =>
@@ -298,10 +298,10 @@ export function isNotAList(state: EditorState) {
 
 export function switchListType(listType: NodeType) {
   return function(state: EditorState, dispatch: any) {
-    let itemType = state.schema.nodes.list_item
-    let { $from, $to } = state.selection
+    const itemType = state.schema.nodes.list_item
+    const { $from, $to } = state.selection
     // @ts-ignore
-    let range = $from.blockRange(
+    const range = $from.blockRange(
       $to,
       // @ts-ignore
       node => node.childCount && node.firstChild.type == itemType
@@ -309,7 +309,7 @@ export function switchListType(listType: NodeType) {
     if (!range) return false
     if (!dispatch) return true
 
-    let tr = state.tr
+    const tr = state.tr
     dispatch((tr as any).setNodeMarkup(range.start - 1, listType))
     return true
   }

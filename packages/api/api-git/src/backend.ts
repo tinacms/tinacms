@@ -4,7 +4,7 @@ const fs = require('fs')
 const path = require('path')
 const express = require('express')
 const git = require('simple-git/promise')
-let multer = require('multer')
+const multer = require('multer')
 
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
@@ -25,10 +25,10 @@ function verifyUploadPath(uploadPath: string, callback: () => void) {
 }
 
 export function router() {
-  let pathRoot = process.cwd()
+  const pathRoot = process.cwd()
   const tmpImgDir = path.join(pathRoot, '/tmp/')
 
-  let tmpImgStorage = multer.diskStorage({
+  const tmpImgStorage = multer.diskStorage({
     destination: function(req: any, file: any, cb: any) {
       verifyUploadPath(tmpImgDir, () => {
         cb(null, tmpImgDir)
@@ -40,12 +40,12 @@ export function router() {
   })
   const upload = multer({ storage: tmpImgStorage })
 
-  let router = express.Router()
+  const router = express.Router()
   router.use(express.json())
 
   router.delete('/:relPath', (req: any, res: any) => {
-    let rel = decodeURIComponent(req.params.relPath)
-    let abs = path.join(pathRoot, rel)
+    const rel = decodeURIComponent(req.params.relPath)
+    const abs = path.join(pathRoot, rel)
     try {
       deleteFile(abs)
     } catch (e) {
@@ -84,8 +84,8 @@ export function router() {
   router.post('/upload', upload.single('file'), (req: any, res: any) => {
     try {
       const fileName = req.file.originalname
-      let tmpPath = path.join(tmpImgDir, fileName)
-      let finalPath = path.join(pathRoot, req.body.directory, fileName)
+      const tmpPath = path.join(tmpImgDir, fileName)
+      const finalPath = path.join(pathRoot, req.body.directory, fileName)
       fs.rename(tmpPath, finalPath, (err: any) => {
         if (err) console.error(err)
       })
@@ -96,8 +96,8 @@ export function router() {
   })
 
   router.post('/commit', (req: any, res: any) => {
-    let message = req.body.message
-    let files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
+    const message = req.body.message
+    const files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
     // TODO: Separate commit and push???
     commit({
       name: req.body.name,

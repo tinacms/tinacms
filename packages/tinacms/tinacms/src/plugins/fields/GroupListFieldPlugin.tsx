@@ -38,12 +38,12 @@ const Group = function Group({
   meta,
   ...styleProps
 }: GroupProps) {
-  let addItem = React.useCallback(() => {
-    let obj = field.defaultItem || {}
+  const addItem = React.useCallback(() => {
+    const obj = field.defaultItem || {}
     form.mutators.insert(field.name, 0, obj)
   }, [form, field])
 
-  let items = input.value || []
+  const items = input.value || []
 
   return (
     <>
@@ -87,11 +87,11 @@ interface ItemProps {
 }
 
 const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
-  let [isExpanded, setExpanded] = React.useState<boolean>(false)
-  let removeItem = React.useCallback(() => {
+  const [isExpanded, setExpanded] = React.useState<boolean>(false)
+  const removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
-  let title = item.alt ? item.alt : (field.label || field.name) + ' Item'
+  const title = item.alt ? item.alt : (field.label || field.name) + ' Item'
   return (
     <Draggable
       key={index}
@@ -351,12 +351,12 @@ const Panel = function Panel({
   index,
   itemTitle,
 }: PanelProps) {
-  let fields: any[] = React.useMemo(() => {
+  const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
       ...subField,
       name: `${field.name}.${index}.${subField.name}`,
     }))
-  }, [field.fields])
+  }, [field.fields, field.name, index])
 
   return (
     <GroupPanel isExpanded={isExpanded}>

@@ -43,7 +43,7 @@ const ModalContainerContext = React.createContext<ModalContainerProps | null>(
 )
 
 export function useModalContainer(): ModalContainerProps {
-  let modalContainer = React.useContext(ModalContainerContext)
+  const modalContainer = React.useContext(ModalContainerContext)
 
   if (!modalContainer) {
     throw new Error('No Modal Container context provided')

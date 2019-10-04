@@ -21,8 +21,8 @@ import { undo, redo } from 'prosemirror-history'
 import { undoInputRule } from 'prosemirror-inputrules'
 import { KeymapPlugin } from '.'
 
-let hardBreakCmd = (schema: Schema) => {
-  let br = schema.nodes.hard_break
+const hardBreakCmd = (schema: Schema) => {
+  const br = schema.nodes.hard_break
   return chainCommands(exitCode, (state, dispatch) => {
     // @ts-ignore
     dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView())
@@ -30,8 +30,8 @@ let hardBreakCmd = (schema: Schema) => {
   })
 }
 
-let headingCmd = (level: number) => (schema: Schema) => {
-  let heading = schema.nodes.heading
+const headingCmd = (level: number) => (schema: Schema) => {
+  const heading = schema.nodes.heading
   return toggleHeader(heading, { level }, schema.nodes.paragraph, null)
 }
 
@@ -253,9 +253,9 @@ function arrowHandler(
 ) {
   return (state: EditorState, dispatch: any, view: EditorView) => {
     if (state.selection.empty && view.endOfTextblock(dir)) {
-      let side = dir == 'left' || dir == 'up' ? -1 : 1
-      let $head = state.selection.$head
-      let nextPos = (Selection as any).near(
+      const side = dir == 'left' || dir == 'up' ? -1 : 1
+      const $head = state.selection.$head
+      const nextPos = (Selection as any).near(
         state.doc.resolve(side > 0 ? $head.after() : $head.before()),
         side
       )
@@ -270,9 +270,9 @@ function arrowHandler(
 
 export function isListType(listType: NodeType) {
   return function(state: EditorState) {
-    let { $from, $to } = state.selection
+    const { $from, $to } = state.selection
     // @ts-ignore
-    let range = $from.blockRange(
+    const range = $from.blockRange(
       $to,
       // @ts-ignore
       node => node.childCount && node.firstChild.type == listType
@@ -282,9 +282,9 @@ export function isListType(listType: NodeType) {
 }
 
 export function isNotAList(state: EditorState) {
-  let { ordered_list, bullet_list } = state.schema.nodes
-  let { $from, $to } = state.selection
-  let range = $from.blockRange(
+  const { ordered_list, bullet_list } = state.schema.nodes
+  const { $from, $to } = state.selection
+  const range = $from.blockRange(
     $to,
     // @ts-ignore
     node =>
@@ -303,10 +303,10 @@ export function isNotAList(state: EditorState) {
 
 export function switchListType(listType: NodeType) {
   return function(state: EditorState, dispatch: any) {
-    let itemType = state.schema.nodes.list_item
-    let { $from, $to } = state.selection
+    const itemType = state.schema.nodes.list_item
+    const { $from, $to } = state.selection
     // @ts-ignore
-    let range = $from.blockRange(
+    const range = $from.blockRange(
       $to,
       // @ts-ignore
       node => node.childCount && node.firstChild.type == itemType
@@ -314,8 +314,8 @@ export function switchListType(listType: NodeType) {
     if (!range) return false
     if (!dispatch) return true
 
-    let tr = state.tr
-    let $start = tr.doc.resolve(range.start)
+    const tr = state.tr
+    const $start = tr.doc.resolve(range.start)
     // Get the
     console.log({
       range,

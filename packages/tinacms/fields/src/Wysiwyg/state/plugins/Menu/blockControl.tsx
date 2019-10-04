@@ -12,7 +12,7 @@ interface BlockTool {
 }
 
 export function blockTool(options: BlockTool) {
-  let { Component, children, command, typeName, attrs } = options
+  const { Component, children, command, typeName, attrs } = options
   return class extends React.Component<
     { view: EditorView; onClick(): void },
     any
@@ -26,12 +26,12 @@ export function blockTool(options: BlockTool) {
     get active(): boolean {
       if (!typeName) return false
 
-      let { state } = this.props.view
-      let $from = state.selection.$from
-      let node = $from.node($from.depth)
-      let correctNodeType = node.type.name === typeName
+      const { state } = this.props.view
+      const $from = state.selection.$from
+      const node = $from.node($from.depth)
+      const correctNodeType = node.type.name === typeName
       // Only works for Heading
-      let correctAttrs = attrs ? node.attrs.level === attrs.level : true
+      const correctAttrs = attrs ? node.attrs.level === attrs.level : true
       return correctNodeType && correctAttrs
     }
     render() {
