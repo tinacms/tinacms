@@ -26,7 +26,6 @@
     "directory": "packages/gatsby-plugin-xeditor"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "tsc -w",
     "build": "tsc"
   },

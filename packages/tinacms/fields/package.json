@@ -21,7 +21,6 @@
     "directory": "packages/tinacms/fields"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "cms-scripts watch",
     "dev": "cms-scripts dev",
     "build": "cms-scripts build",

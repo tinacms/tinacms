@@ -21,7 +21,6 @@
     "directory": "packages/tinacms/icons"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "cms-scripts watch",
     "build": "cms-scripts build",
     "dev": "cms-scripts dev",

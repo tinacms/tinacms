@@ -30,7 +30,6 @@
     "directory": "packages/gatsby-tinacms-json"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "tsc -w",
     "dev": "tsc",
     "build": "tsc"
