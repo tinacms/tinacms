@@ -8,7 +8,7 @@ import {
 import { PMTestHarness } from '../../prosemirror-test-utils'
 import { defaultSchema } from '../default-schema'
 
-let { forDoc, shouldNotRun, doc, p, link, text } = new PMTestHarness(
+const { forDoc, shouldNotRun, doc, p, link, text } = new PMTestHarness(
   defaultSchema
 )
 

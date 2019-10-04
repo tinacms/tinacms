@@ -11,8 +11,8 @@ import { TextFieldCss } from '@tinacms/fields'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
-    let [isOpen, setIsOpen] = useState(false)
-    let area = useRef(null)
+    const [isOpen, setIsOpen] = useState(false)
+    const area = useRef(null)
 
     const documentContext = useFrameContext().document
     useEffect(() => {
@@ -29,7 +29,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
       return () => {
         documentContext.removeEventListener('mouseup', handleClick, false)
       }
-    }, [])
+    }, [documentContext])
 
     return (
       <DatetimeContainer>

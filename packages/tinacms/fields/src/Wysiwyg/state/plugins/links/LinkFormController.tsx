@@ -126,7 +126,7 @@ function calcLeftOffset(
   const ol_rt = renderTarget.offsetLeft
   const ol = ol_ct - ol_rt + ow_ct / 2 - minWidth / 2
 
-  let leftEdgeOutsideView = ol < -ol_rt
+  const leftEdgeOutsideView = ol < -ol_rt
   if (leftEdgeOutsideView) {
     return `-0.5rem`
   }

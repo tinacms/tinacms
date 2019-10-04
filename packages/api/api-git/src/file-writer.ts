@@ -21,7 +21,7 @@ export function deleteFile(path: string) {
 }
 
 function cacheCommand(filepath: string, data: any) {
-  let prevCacheNumber = count - 1
+  const prevCacheNumber = count - 1
   if (DEBUG) {
     console.info(`caching ${count}: start`)
     if (nextArgs) {
@@ -35,18 +35,18 @@ function cacheCommand(filepath: string, data: any) {
 function tryToWrite() {
   if (!nextArgs) return
 
-  let curr = count
+  const curr = count
   if (DEBUG) console.info(`write ${curr}: start`)
   if (waitingForBuild) {
     if (DEBUG) console.info(`write ${curr}: waiting for gatsby`)
     return
   }
 
-  let [filepath, content] = nextArgs
+  const [filepath, content] = nextArgs
   waitingForBuild = true
   nextArgs = null
 
-  let parentDir = path.dirname(filepath)
+  const parentDir = path.dirname(filepath)
   if (!fs.existsSync(parentDir)) {
     fs.mkdirSync(parentDir, { recursive: true })
   }

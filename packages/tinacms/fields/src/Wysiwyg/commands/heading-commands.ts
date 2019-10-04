@@ -2,9 +2,9 @@ import { EditorState, Selection } from 'prosemirror-state'
 import { NodeType, Node } from 'prosemirror-model'
 
 export function deleteEmptyHeading(state: EditorState, dispatch: any) {
-  let { $cursor } = state.selection as any
+  const { $cursor } = state.selection as any
   if (!$cursor) return false
-  let node = state.doc.nodeAt(Math.max($cursor.pos - 1, 0))
+  const node = state.doc.nodeAt(Math.max($cursor.pos - 1, 0))
   if (!node) return false
   if (node.type != state.schema.nodes.heading) return false
   if (node.textContent.length) return false
@@ -31,7 +31,7 @@ export function toggleHeader(
   fallbackAttrs: any
 ) {
   return function(state: EditorState, dispatch: Function) {
-    let { from, to } = state.selection
+    const { from, to } = state.selection
     let firstTextblock: Node | null = null
     let firstPos = -1
     // Find the first textblock
@@ -46,12 +46,12 @@ export function toggleHeader(
 
     if (!firstTextblock || firstPos < 0) return false
 
-    let $firstPos = state.doc.resolve(firstPos)
-    let index = $firstPos.index()
+    const $firstPos = state.doc.resolve(firstPos)
+    const index = $firstPos.index()
 
-    let setAsParagraph = state.selection.$head.parent.attrs.level == attrs.level
-    let nextNodeType = setAsParagraph ? fallBackNodeType : nodeType
-    let nextAttrs = setAsParagraph ? fallbackAttrs : attrs
+    const setAsParagraph = state.selection.$head.parent.attrs.level == attrs.level
+    const nextNodeType = setAsParagraph ? fallBackNodeType : nodeType
+    const nextAttrs = setAsParagraph ? fallbackAttrs : attrs
 
     if (!$firstPos.parent.canReplaceWith(index, index + 1, nextNodeType))
       return false

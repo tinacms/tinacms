@@ -31,7 +31,7 @@ export const Group = function Group({
   input,
   meta,
 }: GroupProps) {
-  let [isExpanded, setExpanded] = React.useState<boolean>(false)
+  const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <>
       <Header onClick={() => setExpanded(p => !p)}>
@@ -62,12 +62,12 @@ const Panel = function Panel({
   field,
   children,
 }: PanelProps) {
-  let fields: any[] = React.useMemo(() => {
+  const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
       ...subField,
       name: `${field.name}.${subField.name}`,
     }))
-  }, [field.fields])
+  }, [field.fields, field.name])
 
   return (
     <GroupPanel isExpanded={isExpanded}>

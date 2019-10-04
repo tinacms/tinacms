@@ -4,7 +4,7 @@ import { Schema } from 'prosemirror-model'
 import { SchemaNodePlugin, SchemaMarkPlugin } from './plugins'
 
 export function useProsemirrorSchema(plugins: Plugin[]) {
-  let schema = React.useMemo(() => {
+  const schema = React.useMemo(() => {
     return new Schema({
       nodes: getNodes(plugins as any),
       marks: getMarks(plugins as any),
@@ -15,7 +15,7 @@ export function useProsemirrorSchema(plugins: Plugin[]) {
 }
 
 function getNodes(plugins: SchemaNodePlugin[]) {
-  let nodes: any = {}
+  const nodes: any = {}
 
   plugins
     .filter(plugin => plugin.__type === 'wysiwyg:schema:node')
@@ -27,7 +27,7 @@ function getNodes(plugins: SchemaNodePlugin[]) {
 }
 
 function getMarks(plugins: SchemaMarkPlugin[]) {
-  let marks: any = {}
+  const marks: any = {}
 
   plugins
     .filter(plugin => plugin.__type === 'wysiwyg:schema:mark')

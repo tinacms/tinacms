@@ -9,7 +9,7 @@ export class Subscribable {
   }
 
   unsubscribe(listener: Function) {
-    let index = this.__subscribers.indexOf(listener)
+    const index = this.__subscribers.indexOf(listener)
     this.__subscribers.splice(index, 1)
   }
 

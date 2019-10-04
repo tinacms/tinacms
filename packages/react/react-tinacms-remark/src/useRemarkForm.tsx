@@ -22,18 +22,18 @@ export function useRemarkForm(
 
   validateMarkdownRemark(markdownRemark)
 
-  let cms = useCMS()
-  let label = formOverrrides.label || markdownRemark.frontmatter.title
+  const cms = useCMS()
+  const label = formOverrrides.label || markdownRemark.frontmatter.title
   const id = markdownRemark.fileRelativePath
-  let initialValues = useMemo(
+  const initialValues = useMemo(
     () => ({
       ...markdownRemark,
       rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
     }),
-    [markdownRemark.rawFrontmatter]
+    [markdownRemark]
   )
 
-  let fields = React.useMemo(() => {
+  const fields = React.useMemo(() => {
     let fields = formOverrrides.fields || generateFields(initialValues)
     fields = fields.map(field => {
       if (
@@ -49,9 +49,9 @@ export function useRemarkForm(
     })
 
     return fields
-  }, [formOverrrides.fields])
+  }, [formOverrrides.fields, initialValues])
 
-  let [values, form] = useCMSForm({
+  const [values, form] = useCMSForm({
     label,
     id,
     initialValues,
