@@ -123,26 +123,34 @@ const Emoji = styled.span`
 
 const EmptyState = styled.div`
   position: relative;
-  padding: ${padding()}rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: ${padding()}rem ${padding()}rem 4rem ${padding()}rem;
   width: 100%;
   height: 100%;
-  background: white;
+  overflow-y: auto;
   > *:first-child {
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
+  }
+  > ${Emoji} {
+    display: block;
   }
   h3 {
     font-size: 1.2rem;
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
   }
 `
 
@@ -150,12 +158,13 @@ const LinkButton = styled.a`
   text-align: center;
   border: 0;
   border-radius: ${p => p.theme.radius.big};
+  border: 1px solid #edecf3;
   box-shadow: ${p => p.theme.shadow.small};
   font-weight: 500;
   cursor: pointer;
   font-size: 0.75rem;
   transition: all ${p => p.theme.timing.short} ease-out;
-  background-color: ${color('light')};
+  background-color: white;
   color: ${color('dark')};
   padding: ${padding('small')}rem ${padding('big')}rem ${padding('small')}rem
     3.5rem;
@@ -181,11 +190,15 @@ const LinkButton = styled.a`
 
 const NoFormsPlaceholder = () => (
   <EmptyState>
-    <Emoji>🎉 👋</Emoji>
+    <Emoji>👋</Emoji>
     <h3>
       Welcome to <b>Tina</b>!
     </h3>
-    <p>Let's get a form set up so you can start editing.</p>
+    <p>
+      Let's get a form set up
+      <br />
+      so you can start editing.
+    </p>
     <p>
       <LinkButton
         href="https://github.com/tinacms/tinacms-site/blob/master/content/docs/gatsby/content-editing.md"
