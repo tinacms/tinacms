@@ -4,40 +4,14 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as express from 'express'
 
-// @ts-ignore TODO: check if there's types
-import multer from 'multer'
-
 import { commit } from './commit'
-
-//If an upload path doesnt exist, create it
-function verifyUploadPath(uploadPath: string, callback: () => void) {
-  fs.exists(uploadPath, function(exists: boolean) {
-    if (exists) {
-      callback()
-    } else {
-      fs.mkdir(uploadPath, function() {
-        callback()
-      })
-    }
-  })
-}
+import { createUploader } from './upload'
 
 export function router() {
   const pathRoot = process.cwd()
   const tmpImgDir = path.join(pathRoot, '/tmp/')
 
-  const tmpImgStorage = multer.diskStorage({
-    destination: function(req: any, file: any, cb: any) {
-      verifyUploadPath(tmpImgDir, () => {
-        cb(null, tmpImgDir)
-      })
-    },
-    filename: function(req: any, file: any, cb: any) {
-      cb(null, file.originalname)
-    },
-  })
-  const upload = multer({ storage: tmpImgStorage })
-
+  const uploader = createUploader(tmpImgDir)
   const router = express.Router()
   router.use(express.json())
 
@@ -80,7 +54,7 @@ export function router() {
     }
   })
 
-  router.post('/upload', upload.single('file'), (req: any, res: any) => {
+  router.post('/upload', uploader.single('file'), (req: any, res: any) => {
     try {
       const fileName = req.file.originalname
       const tmpPath = path.join(tmpImgDir, fileName)
