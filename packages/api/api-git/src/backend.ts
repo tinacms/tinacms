@@ -1,10 +1,12 @@
 import { writeFile, deleteFile } from './file-writer'
 
-const fs = require('fs')
-const path = require('path')
-const express = require('express')
-const git = require('simple-git/promise')
-const multer = require('multer')
+import * as fs from 'fs'
+import * as path from 'path'
+import * as express from 'express'
+import * as git from 'simple-git/promise'
+
+// @ts-ignore TODO: check if there's types
+import multer from 'multer'
 
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
