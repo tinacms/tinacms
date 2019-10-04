@@ -30,7 +30,7 @@ export const Wysiwyg = styled(
   .CodeMirror {
     width: 100%;
     height: auto;
-    border-radius: ${props => props.theme.radius.small}
+    border-radius: 0.3rem;
     margin-bottom: 1rem;
 
     .CodeMirror-sizer {
