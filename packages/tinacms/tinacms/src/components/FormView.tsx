@@ -81,7 +81,7 @@ export const FormsView = () => {
       {({ handleSubmit, pristine, form }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
-            <FormAnimation isEditing={isEditing}>
+            <FormWrapper isEditing={isEditing}>
               <FormHeader
                 isMultiform={isMultiform}
                 form={editingForm as any}
@@ -107,7 +107,7 @@ export const FormsView = () => {
                   Save
                 </SaveButton>
               </FormFooter>
-            </FormAnimation>
+            </FormWrapper>
           </DragDropContext>
         )
       }}
@@ -221,26 +221,34 @@ const FormHeader = styled(
     return (
       <div {...styleProps} onClick={() => isMultiform && setEditingForm(null)}>
         {isMultiform && <LeftArrowIcon />}
-        {form.label}
+        <span>{form.label}</span>
       </div>
     )
   }
 )`
-  position: absolute;
-  top: 0;
+  position: relative;
+  width: 100%;
   height: ${FORM_HEADER_HEIGHT}rem;
-  width: ${SIDEBAR_WIDTH}px;
+  flex: 0 0 ${FORM_HEADER_HEIGHT}rem;
   cursor: ${p => p.isMultiform && 'pointer'};
   background-color: white;
   border-bottom: 1px solid #edecf3;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  padding: 0 ${padding()}rem;
+  padding: 0 ${padding()}rem ${padding('small')}rem ${padding()}rem;
   color: inherit;
   font-size: 1.2rem;
   transition: color 250ms ease-out;
   user-select: none;
+  span {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   svg {
+    flex: 0 0 auto;
     width: 1.5rem;
     fill: #e1ddec;
     height: auto;
@@ -257,30 +265,23 @@ const FormHeader = styled(
   }
 `
 
-export const FormBody = styled.div<{ isMultiform?: boolean }>`
-  position: absolute;
-  top: ${FORM_HEADER_HEIGHT}rem;
-  bottom: ${FORM_FOOTER_HEIGHT}rem;
+export const FormBody = styled.div`
+  position: relative;
+  flex: 1 1 auto;
   scrollbar-width: none;
-  width: ${SIDEBAR_WIDTH}px;
+  width: 100%;
   overflow: hidden;
   background-color: #f6f6f9;
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
 `
 
 const FormFooter = styled.div`
-  position: absolute;
-  bottom: 0;
+  position: relative;
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: ${SIDEBAR_WIDTH}px;
-  height: ${FORM_FOOTER_HEIGHT}rem;
+  width: 100%;
+  height: 4rem;
   background-color: white;
   border-top: 1px solid #edecf3;
   padding: 0 1.25rem;
@@ -295,10 +296,13 @@ const FormAnimationKeyframes = keyframes`
   }
 `
 
-const FormAnimation = styled.div<{ isEditing: Boolean }>`
+const FormWrapper = styled.div<{ isEditing: Boolean }>`
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   overflow: hidden;
   height: 100%;
-  width: ${SIDEBAR_WIDTH}px;
+  width: 100%;
   position: relative;
   ${FormHeader}, ${FormBody}, ${FormFooter} {
     transform: translate3d(100%, 0, 0);
