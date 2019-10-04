@@ -211,8 +211,8 @@ const SidebarHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   z-index: 1050;
-  flex: 0 0 3.75rem;
-  height: 3.75rem;
+  flex: 0 0 ${SIDEBAR_HEADER_HEIGHT}rem;
+  height: ${SIDEBAR_HEADER_HEIGHT}rem;
   width: 100%;
   padding: 0 ${padding()}rem;
 `
