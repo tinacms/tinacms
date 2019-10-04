@@ -55,6 +55,7 @@ export function router() {
     }
 
     commit({
+      pathRoot,
       name: req.body.name,
       email: req.body.email,
       message: `Update from Tina: delete ${rel}`,
@@ -102,6 +103,7 @@ export function router() {
     const files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
     // TODO: Separate commit and push???
     commit({
+      pathRoot,
       name: req.body.name,
       email: req.body.email,
       message,
@@ -117,28 +119,38 @@ export function router() {
       })
   })
 
-  interface CommitOptions {
-    files: string[]
-    message?: string
-    name?: string
-    email?: string
-  }
-
-  async function commit({ files, message, name, email }: CommitOptions) {
-    let options
-
-    if (email) {
-      options = {
-        '--author': `"${name || email} <${email}>"`,
-      }
-    }
-
-    const repo = openRepo(pathRoot)
-    await repo.commit(message || DEFAULT_MESSAGE, ...files, options)
-    await repo.push()
-  }
-
   return router
+}
+
+interface CommitOptions {
+  pathRoot: string
+  files: string[]
+  message?: string
+  name?: string
+  email?: string
+}
+
+/**
+ * Commit a set of files in a Git repo
+ */
+async function commit({
+  files,
+  message,
+  name,
+  email,
+  pathRoot,
+}: CommitOptions) {
+  let options
+
+  if (email) {
+    options = {
+      '--author': `"${name || email} <${email}>"`,
+    }
+  }
+
+  const repo = openRepo(pathRoot)
+  await repo.commit(message || DEFAULT_MESSAGE, ...files, options)
+  await repo.push()
 }
 
 /**
