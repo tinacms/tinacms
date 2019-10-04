@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-tinacms",
-  "version": "0.1.1",
+  "version": "0.1.2-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -33,7 +33,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.1",
+    "@tinacms/core": "^0.1.2-alpha.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2"
   }
