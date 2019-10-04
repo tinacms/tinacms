@@ -110,6 +110,7 @@ const StyledFormList = styled.ul<{ isEditing: Boolean }>`
   list-style: none;
   margin: 0;
   padding: 0;
+  overflow-y: auto;
   ${FormListItem} {
     animation: ${slideIn} 150ms ease-out both 1;
     ${staggerSlideIn()}
