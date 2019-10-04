@@ -12,6 +12,7 @@ import {
   LeftArrowIcon,
   EditIcon,
   AddIcon,
+  TinaIcon,
 } from '@tinacms/icons'
 import { GlobalStyles, padding, color } from '@tinacms/styles'
 import {
@@ -25,6 +26,7 @@ import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useTina } from '../../hooks/use-tina'
+import style from 'react-syntax-highlighter/dist/styles/hljs/mono-blue'
 
 export const Sidebar = () => {
   const cms = useTina()
@@ -81,6 +83,7 @@ export const Sidebar = () => {
                 })}
               </MenuList>
             </MenuWrapper>
+            <Watermark />
           </MenuPanel>
           {ActiveView && (
             <Modal>
@@ -96,6 +99,25 @@ export const Sidebar = () => {
     </SidebarContainer>
   )
 }
+
+const Watermark = styled(({ ...styleProps }: any) => {
+  return (
+    <div {...styleProps}>
+      <TinaIcon />
+    </div>
+  )
+})`
+  position: absolute;
+  z-index: -1;
+  bottom: ${padding()}rem;
+  left: ${padding()}rem;
+  svg {
+    width: 8rem;
+    height: 8rem;
+    margin: -0.25rem -1.25rem;
+    fill: #363145;
+  }
+`
 
 const SidebarToggle = (sidebar: any) => {
   return (
