@@ -12,14 +12,16 @@ export function router() {
   const tmpImgDir = path.join(pathRoot, '/tmp/')
 
   const uploader = createUploader(tmpImgDir)
+
   const router = express.Router()
   router.use(express.json())
 
   router.delete('/:relPath', (req: any, res: any) => {
-    const rel = decodeURIComponent(req.params.relPath)
-    const abs = path.join(pathRoot, rel)
+    const fileRelativePath = decodeURIComponent(req.params.relPath)
+    const fileAbsolutePath = path.join(pathRoot, fileRelativePath)
+
     try {
-      deleteFile(abs)
+      deleteFile(fileAbsolutePath)
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
     }
@@ -28,8 +30,8 @@ export function router() {
       pathRoot,
       name: req.body.name,
       email: req.body.email,
-      message: `Update from Tina: delete ${rel}`,
-      files: [abs],
+      message: `Update from Tina: delete ${fileRelativePath}`,
+      files: [fileAbsolutePath],
     })
       .then(() => {
         res.json({ status: 'success' })
@@ -40,14 +42,14 @@ export function router() {
   })
 
   router.put('/:relPath', (req: any, res: any) => {
+    const fileRelativePath = decodeURIComponent(req.params.relPath)
+    const fileAbsolutePath = path.join(pathRoot, fileRelativePath)
+
     if (DEBUG) {
-      console.log(path.join(pathRoot, decodeURIComponent(req.params.relPath)))
+      console.log(fileAbsolutePath)
     }
     try {
-      writeFile(
-        path.join(pathRoot, decodeURIComponent(req.params.relPath)),
-        req.body.content
-      )
+      writeFile(fileAbsolutePath, req.body.content)
       res.json({ content: req.body.content })
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
