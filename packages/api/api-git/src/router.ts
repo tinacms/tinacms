@@ -8,17 +8,17 @@ import { commit } from './commit'
 import { createUploader } from './upload'
 
 export function router() {
-  const pathRoot = process.cwd()
-  const tmpImgDir = path.join(pathRoot, '/tmp/')
+  const REPO_ABSOLUTE_PATH = process.cwd()
+  const TMP_DIR = path.join(REPO_ABSOLUTE_PATH, '/tmp/')
 
-  const uploader = createUploader(tmpImgDir)
+  const uploader = createUploader(TMP_DIR)
 
   const router = express.Router()
   router.use(express.json())
 
   router.delete('/:relPath', (req: any, res: any) => {
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(pathRoot, fileRelativePath)
+    const fileAbsolutePath = path.join(REPO_ABSOLUTE_PATH, fileRelativePath)
 
     try {
       deleteFile(fileAbsolutePath)
@@ -27,7 +27,7 @@ export function router() {
     }
 
     commit({
-      pathRoot,
+      pathRoot: REPO_ABSOLUTE_PATH,
       name: req.body.name,
       email: req.body.email,
       message: `Update from Tina: delete ${fileRelativePath}`,
@@ -43,7 +43,7 @@ export function router() {
 
   router.put('/:relPath', (req: any, res: any) => {
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(pathRoot, fileRelativePath)
+    const fileAbsolutePath = path.join(REPO_ABSOLUTE_PATH, fileRelativePath)
 
     if (DEBUG) {
       console.log(fileAbsolutePath)
@@ -59,8 +59,12 @@ export function router() {
   router.post('/upload', uploader.single('file'), (req: any, res: any) => {
     try {
       const fileName = req.file.originalname
-      const tmpPath = path.join(tmpImgDir, fileName)
-      const finalPath = path.join(pathRoot, req.body.directory, fileName)
+      const tmpPath = path.join(TMP_DIR, fileName)
+      const finalPath = path.join(
+        REPO_ABSOLUTE_PATH,
+        req.body.directory,
+        fileName
+      )
       fs.rename(tmpPath, finalPath, (err: any) => {
         if (err) console.error(err)
       })
@@ -72,10 +76,12 @@ export function router() {
 
   router.post('/commit', (req: any, res: any) => {
     const message = req.body.message
-    const files = req.body.files.map((rel: string) => path.join(pathRoot, rel))
+    const files = req.body.files.map((rel: string) =>
+      path.join(REPO_ABSOLUTE_PATH, rel)
+    )
     // TODO: Separate commit and push???
     commit({
-      pathRoot,
+      pathRoot: REPO_ABSOLUTE_PATH,
       name: req.body.name,
       email: req.body.email,
       message,
