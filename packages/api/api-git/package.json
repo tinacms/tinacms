@@ -22,9 +22,9 @@
     "directory": "packages/api/api-git"
   },
   "scripts": {
-    "watch": "cms-scripts watchDebug",
+    "watch": "cms-scripts watch",
     "build": "cms-scripts build",
-    "dev": "cms-scripts devDebug",
+    "dev": "cms-scripts dev",
     "test": "jest --passWithNoTests"
   },
   "dependencies": {
