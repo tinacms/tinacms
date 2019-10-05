@@ -7,10 +7,14 @@ import * as express from 'express'
 import { commit } from './commit'
 import { createUploader } from './upload'
 
-export function router() {
+export interface GitRouterConfig {
+  defaultCommitMessage?: string
+}
+export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = process.cwd()
   const TMP_DIR = path.join(REPO_ABSOLUTE_PATH, '/tmp/')
-  const DEFAULT_COMMIT_MESSAGE = 'Update from Tina'
+  const DEFAULT_COMMIT_MESSAGE =
+    config.defaultCommitMessage || 'Update from Tina'
 
   const uploader = createUploader(TMP_DIR)
 
