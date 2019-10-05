@@ -4,12 +4,10 @@ const git = require('simple-git/promise')
 const GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
 
-const DEFAULT_MESSAGE = 'Update from Tina'
-
 export interface CommitOptions {
   pathRoot: string
   files: string[]
-  message?: string
+  message: string
   name?: string
   email?: string
 }
@@ -33,7 +31,7 @@ export async function commit({
   }
 
   const repo = openRepo(pathRoot)
-  await repo.commit(message || DEFAULT_MESSAGE, ...files, options)
+  await repo.commit(message, ...files, options)
   await repo.push()
 }
 

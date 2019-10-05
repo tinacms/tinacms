@@ -10,6 +10,7 @@ import { createUploader } from './upload'
 export function router() {
   const REPO_ABSOLUTE_PATH = process.cwd()
   const TMP_DIR = path.join(REPO_ABSOLUTE_PATH, '/tmp/')
+  const DEFAULT_COMMIT_MESSAGE = 'Update from Tina'
 
   const uploader = createUploader(TMP_DIR)
 
@@ -75,7 +76,7 @@ export function router() {
   })
 
   router.post('/commit', (req: any, res: any) => {
-    const message = req.body.message
+    const message = req.body.message || DEFAULT_COMMIT_MESSAGE
     const files = req.body.files.map((rel: string) =>
       path.join(REPO_ABSOLUTE_PATH, rel)
     )
