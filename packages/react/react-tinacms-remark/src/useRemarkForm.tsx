@@ -30,7 +30,7 @@ export function useRemarkForm(
       ...markdownRemark,
       rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
     }),
-    [markdownRemark]
+    [markdownRemark.rawFrontmatter]
   )
 
   const fields = React.useMemo(() => {
@@ -49,7 +49,7 @@ export function useRemarkForm(
     })
 
     return fields
-  }, [formOverrrides.fields, initialValues])
+  }, [formOverrrides.fields])
 
   const [values, form] = useCMSForm({
     label,
