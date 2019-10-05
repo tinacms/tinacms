@@ -2,6 +2,7 @@
 const path = require('path')
 const rollup = require('rollup')
 const rollupTypescript = require('rollup-plugin-typescript2')
+const rollupReplace = require('rollup-plugin-replace')
 const rollupCommonJs = require('rollup-plugin-commonjs')
 const typescript = require('typescript')
 const { uglify } = require('rollup-plugin-uglify')
@@ -30,19 +31,13 @@ program
 
 const COMMANDS = {
   build() {
-    build(createBuildOptions({ uglify: { debug: false } }))
+    build(createBuildOptions({ uglify: true, debug: false }))
   },
   dev() {
-    build(createBuildOptions())
-  },
-  devDebug() {
-    build(createBuildOptions({ uglify: { debug: true } }))
+    build(createBuildOptions({ uglify: false, debug: true }))
   },
   watch() {
-    watch(createBuildOptions())
-  },
-  watchDebug() {
-    watch(createBuildOptions({ uglify: { debug: true } }))
+    watch(createBuildOptions({ uglify: false, debug: true }))
   },
 }
 
@@ -84,6 +79,9 @@ function createBuildOptions(options = {}) {
           path.join(absolutePath, 'src', '**/*.ts+(|x)'),
         ],
       }),
+      rollupReplace({
+        DEBUG: options.debug,
+      }),
       rollupCommonJs({
         sourceMap: true,
       }),
@@ -91,15 +89,7 @@ function createBuildOptions(options = {}) {
   }
 
   if (options.uglify) {
-    inputOptions.plugins.push(
-      uglify({
-        compress: {
-          global_defs: {
-            DEBUG: options.uglify.debug,
-          },
-        },
-      })
-    )
+    inputOptions.plugins.push(uglify())
   }
 
   const outputOptions = {
