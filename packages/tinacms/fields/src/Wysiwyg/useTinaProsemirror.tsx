@@ -77,7 +77,7 @@ export function useTinaProsemirror(
     /**
      * Rerender if the target Node has changed.
      */
-    [frame, input, plugins, schema, translator]
+    [targetNode.current]
   )
 
   return targetNode
