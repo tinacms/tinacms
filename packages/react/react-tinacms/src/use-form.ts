@@ -23,7 +23,7 @@ export function useCMSForm(options: FormOptions<any>) {
         form && cms.forms.removeForm(form.id)
       }
     },
-    [cms.forms, options, options.id]
+    [options.id]
   )
 
   syncFormWithInitialValues(form, options.initialValues)
