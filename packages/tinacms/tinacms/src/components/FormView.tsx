@@ -79,7 +79,7 @@ export const FormsView = () => {
                   ))}
               </FormBody>
               <FormFooter>
-                <ResetForm pristine={pristine} />
+                {activeForm.reset && <ResetForm pristine={pristine} />}
                 {activeForm.actions.length > 0 && (
                   <ActionsMenu actions={activeForm.actions} />
                 )}
