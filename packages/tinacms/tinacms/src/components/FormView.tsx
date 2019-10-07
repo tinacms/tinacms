@@ -16,10 +16,18 @@ export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
   const cms = useCMS()
 
-  useSubscribable(cms.forms)
+  /**
+   * If there's only one form, make it the active form.
+   */
+  useSubscribable(cms.forms, () => {
+    if (cms.forms.all().length === 1) {
+      setActiveFormId(cms.forms.all()[0].id)
+    }
+  })
 
   const forms = cms.forms.all()
   const activeForm = activeFormId ? cms.forms.findForm(activeFormId) : null
+
   const isEditing = !!activeForm
 
   const moveArrayItem = React.useCallback(
