@@ -6,20 +6,14 @@ import { RightArrowIcon } from '@tinacms/icons'
 
 interface FormsListProps {
   forms: Form[]
-  activeForm: Form | null
-  setActiveForm(form: Form): void
+  setActiveFormId(id?: string): void
   isEditing: Boolean
 }
-const FormsList = ({
-  forms,
-  activeForm,
-  setActiveForm,
-  isEditing,
-}: FormsListProps) => {
+const FormsList = ({ forms, setActiveFormId, isEditing }: FormsListProps) => {
   return (
     <StyledFormList isEditing={isEditing}>
       {forms.map(form => (
-        <FormListItem key={form.id} onClick={() => setActiveForm(form)}>
+        <FormListItem key={form.id} onClick={() => setActiveFormId(form.id)}>
           <span>{form.label}</span>
           <RightArrowIcon />
         </FormListItem>
