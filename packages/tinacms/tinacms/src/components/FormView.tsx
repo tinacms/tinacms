@@ -79,7 +79,9 @@ export const FormsView = () => {
                   ))}
               </FormBody>
               <FormFooter>
-                <ResetForm pristine={pristine} />
+                {activeForm.reset && (
+                  <ResetForm pristine={pristine} reset={activeForm.reset} />
+                )}
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
