@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/tinacms",
-  "version": "0.1.2",
+  "version": "0.1.3-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -30,22 +30,22 @@
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@types/styled-components": "4.1.8",
-    "cms-scripts": "^0.1.0",
+    "cms-scripts": "^0.1.2-alpha.0",
     "jest": "^24.8.0",
     "react": "^16.8.6",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.2",
-    "@tinacms/fields": "^0.1.2",
-    "@tinacms/form-builder": "^0.1.2",
-    "@tinacms/icons": "^0.2.0",
-    "@tinacms/react-tinacms": "^0.1.2",
-    "@tinacms/styles": "^0.0.3",
+    "@tinacms/core": "^0.2.0-alpha.0",
+    "@tinacms/fields": "^0.1.3-alpha.0",
+    "@tinacms/form-builder": "^0.1.3-alpha.0",
+    "@tinacms/icons": "^0.3.0-alpha.0",
+    "@tinacms/react-tinacms": "^0.1.3-alpha.0",
+    "@tinacms/styles": "^0.0.4-alpha.0",
     "@types/react-beautiful-dnd": "^11.0.3",
     "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",
-    "react-dismissible": "^1.0.6",
+    "react-dismissible": "^1.0.7-alpha.0",
     "react-frame-component": "^4.1.1",
     "styled-components": "^4.3.2"
   },

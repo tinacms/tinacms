@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.1.1...@tinacms/icons@0.3.0-alpha.0) (2019-10-07)
+
+
+### Features
+
+* add Tina icon ([6e54f42](https://github.com/tinacms/tinacms/commit/6e54f42))
+
+
+
+
+
 # [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.2.0-alpha.0...@tinacms/icons@0.2.0) (2019-10-04)
 
 **Note:** Version bump only for package @tinacms/icons
