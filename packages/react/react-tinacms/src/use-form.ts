@@ -12,7 +12,7 @@ export function useCMSForm(options: FormOptions<any>) {
     function createForm() {
       const form = cms.forms.createForm(options)
       setForm(form)
-      form.subscribe(
+      const unsubscribe = form.subscribe(
         form => {
           setValues(form.values)
         },
@@ -20,7 +20,10 @@ export function useCMSForm(options: FormOptions<any>) {
       )
 
       return () => {
-        form && cms.forms.removeForm(form.id)
+        unsubscribe()
+        if (form) {
+          cms.forms.removeForm(form.id)
+        }
       }
     },
     [options.id]
@@ -29,12 +32,12 @@ export function useCMSForm(options: FormOptions<any>) {
   React.useEffect(() => {
     if (!form) return
     form.updateFields(options.fields)
-  }, [options.fields])
+  }, [form, options.fields])
 
   React.useEffect(() => {
     if (!form) return
     form.label = options.label
-  }, [options.label])
+  }, [form, options.label])
 
   syncFormWithInitialValues(form, options.initialValues)
 
