@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/next-tinacms-markdown",
-  "version": "0.0.4-alpha.0",
+  "version": "0.0.4",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -15,13 +15,13 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
-    "cms-scripts": "^0.1.2-alpha.0",
+    "cms-scripts": "^0.1.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.2.0-alpha.0",
-    "@tinacms/react-tinacms": "^0.1.3-alpha.0",
+    "@tinacms/core": "^0.2.0",
+    "@tinacms/react-tinacms": "^0.1.3",
     "gray-matter": "4.0.2"
   }
 }
