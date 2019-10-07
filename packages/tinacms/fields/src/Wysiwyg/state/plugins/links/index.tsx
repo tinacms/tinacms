@@ -56,7 +56,7 @@ export function links(schema: Schema, frame?: { document: Document }): Plugin {
  */
 const IMG_REGEX = /\.(jpe?g|png)/
 
-let linkify = function(fragment: Fragment): Fragment {
+const linkify = function(fragment: Fragment): Fragment {
   const linkified: Node[] = []
   fragment.forEach(function(child: Node) {
     if (child.isText) {
@@ -66,7 +66,7 @@ let linkify = function(fragment: Fragment): Fragment {
 
       const link = child.type.schema.marks['link']
       const img = child.type.schema.nodes['image']
-      let matches: any[] = []
+      const matches: any[] = []
 
       while ((match = HTTP_LINK_REGEX.exec(text))) {
         const start = match.index

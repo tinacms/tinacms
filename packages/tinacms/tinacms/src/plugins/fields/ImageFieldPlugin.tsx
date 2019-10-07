@@ -11,7 +11,7 @@ interface ImageProps {
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
   ({ form, field, input }) => {
-    let cms = useCMS()
+    const cms = useCMS()
 
     return (
       <ImageUpload

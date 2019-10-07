@@ -1,5 +1,5 @@
 import { Form, Field } from '@tinacms/core'
-import { findInactiveFieldsInPath } from './use-form'
+import { findInactiveFieldsInPath, findInactiveFormFields } from './use-form'
 
 function makeForm(initialValues: any, fields: Field[]) {
   return new Form({
@@ -10,9 +10,79 @@ function makeForm(initialValues: any, fields: Field[]) {
     onSubmit() {},
   })
 }
-describe('findInactiveFields', () => {
+describe('findInactiveFormFields', () => {
+  it('handles this big complex example', () => {
+    const form = makeForm(
+      {
+        // Hidden
+        hidden: 'value',
+        ghostWriter: { name },
+        books: [{ title: 'one' }, { title: 'two' }],
+        favouriteColors: ['red'],
+        // Explicit
+        name: 'test',
+        // author: {name: "test"}, // Intentionally left out
+        magazines: [],
+        newsPapers: [{ title: 'nytimes' }],
+        favouriteCocktail: ['martini'],
+      },
+      [
+        { name: 'name', component: 'text' },
+        {
+          name: 'author',
+          component: 'group',
+          fields: [{ name: 'name', component: 'text' }],
+        },
+        {
+          name: 'magazines',
+          component: 'group-list',
+          fields: [
+            {
+              name: 'title',
+              component: null,
+            },
+          ],
+        },
+        {
+          name: 'newsPapers',
+          component: 'group-list',
+          fields: [
+            {
+              name: 'title',
+              component: null,
+            },
+          ],
+        },
+        {
+          name: 'favouriteCocktails',
+          component: null,
+        },
+      ]
+    )
+
+    const inactiveFields = findInactiveFormFields(form)
+
+    // Hidden
+    expect(inactiveFields).toContain('hidden')
+    expect(inactiveFields).not.toContain('ghostWriter')
+    expect(inactiveFields).toContain('ghostWriter.name')
+    expect(inactiveFields).toContain('books.0.title')
+    expect(inactiveFields).toContain('books.1.title')
+    expect(inactiveFields).toContain('favouriteColors')
+
+    // Explicitt
+    expect(inactiveFields).toContain('name')
+    expect(inactiveFields).not.toContain('author')
+    expect(inactiveFields).toContain('author.name')
+    expect(inactiveFields).toContain('magazines')
+    expect(inactiveFields).toContain('newsPapers.0.title')
+    expect(inactiveFields).toContain('newsPapers.0.title')
+    expect(inactiveFields).toContain('favouriteCocktails')
+  })
+})
+describe('findInactiveFieldsInPath', () => {
   describe('a form with a "name" text field', () => {
-    let form = makeForm({ name: 'test' }, [{ name: 'name', component: 'text' }])
+    const form = makeForm({ name: 'test' }, [{ name: 'name', component: 'text' }])
 
     describe('given the "name" path', () => {
       it('returns only that field', () => {
@@ -22,8 +92,8 @@ describe('findInactiveFields', () => {
   })
 
   describe('given the path to some authors name', () => {
-    let path = 'authors.INDEX.name'
-    let fields = [
+    const path = 'authors.INDEX.name'
+    const fields = [
       {
         name: 'authors',
         component: 'group-list',
@@ -33,36 +103,36 @@ describe('findInactiveFields', () => {
 
     describe('a form with no authors', () => {
       it('returns an empty array', () => {
-        let data = { authors: [] }
+        const data = { authors: [] }
 
-        let form = makeForm(data, fields)
+        const form = makeForm(data, fields)
 
         expect(findInactiveFieldsInPath(form, path)).toEqual([])
       })
     })
     describe('a form with one author', () => {
       it('returns the path to that authors name', () => {
-        let data = { authors: [{ name: 'bill' }] }
+        const data = { authors: [{ name: 'bill' }] }
 
-        let form = makeForm(data, fields)
+        const form = makeForm(data, fields)
 
         expect(findInactiveFieldsInPath(form, path)).toEqual(['authors.0.name'])
       })
     })
     describe('a form with two authors', () => {
       it('returns the path to both authors name', () => {
-        let data = { authors: [{ name: 'bob' }, { name: 'doug' }] }
+        const data = { authors: [{ name: 'bob' }, { name: 'doug' }] }
 
-        let form = makeForm(data, fields)
+        const form = makeForm(data, fields)
 
-        let inactiveFields = ['authors.0.name', 'authors.1.name']
+        const inactiveFields = ['authors.0.name', 'authors.1.name']
 
         expect(findInactiveFieldsInPath(form, path)).toEqual(inactiveFields)
       })
     })
     describe('a form with 5 authors', () => {
       it('returns the path to all authors name', () => {
-        let data = {
+        const data = {
           authors: [
             { name: 'bob' },
             { name: 'rob' },
@@ -72,9 +142,9 @@ describe('findInactiveFields', () => {
           ],
         }
 
-        let form = makeForm(data, fields)
+        const form = makeForm(data, fields)
 
-        let inactiveFields = [
+        const inactiveFields = [
           'authors.0.name',
           'authors.1.name',
           'authors.2.name',
@@ -88,9 +158,9 @@ describe('findInactiveFields', () => {
   })
 
   it('authors.INDEX.books.INDEX.title | 1 author 2 books', () => {
-    let data = { authors: [{ books: [{ title: 'what' }, { title: 'what' }] }] }
+    const data = { authors: [{ books: [{ title: 'what' }, { title: 'what' }] }] }
 
-    let form = makeForm(data, [
+    const form = makeForm(data, [
       {
         name: 'authors',
         component: 'group-list',
@@ -104,7 +174,7 @@ describe('findInactiveFields', () => {
       },
     ])
 
-    let inactiveFields = ['authors.0.books.0.title', 'authors.0.books.1.title']
+    const inactiveFields = ['authors.0.books.0.title', 'authors.0.books.1.title']
 
     expect(
       findInactiveFieldsInPath(form, 'authors.INDEX.books.INDEX.title')

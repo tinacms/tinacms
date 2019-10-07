@@ -9,16 +9,16 @@ class Example extends Subscribable {
 describe('Subscribable', () => {
   describe('#subscribe', () => {
     it('does not callback initially', () => {
-      let subscribable = new Example()
-      let callback = jest.fn()
+      const subscribable = new Example()
+      const callback = jest.fn()
 
       subscribable.subscribe(callback)
 
       expect(callback).not.toHaveBeenCalled()
     })
     it('calls the callback when notify', () => {
-      let subscribable = new Example()
-      let callback = jest.fn()
+      const subscribable = new Example()
+      const callback = jest.fn()
       subscribable.subscribe(callback)
 
       subscribable.notify()
@@ -26,8 +26,8 @@ describe('Subscribable', () => {
       expect(callback).toHaveBeenCalled()
     })
     it('calls the callback on subsequent calls', () => {
-      let subscribable = new Example()
-      let callback = jest.fn()
+      const subscribable = new Example()
+      const callback = jest.fn()
       subscribable.subscribe(callback)
 
       subscribable.notify()
@@ -37,9 +37,9 @@ describe('Subscribable', () => {
       expect(callback).toHaveBeenCalledTimes(3)
     })
     it('returns an unsubscribe function', () => {
-      let subscribable = new Example()
-      let callback = jest.fn()
-      let unsubscribe = subscribable.subscribe(callback)
+      const subscribable = new Example()
+      const callback = jest.fn()
+      const unsubscribe = subscribable.subscribe(callback)
 
       subscribable.notify()
       unsubscribe()
@@ -49,9 +49,9 @@ describe('Subscribable', () => {
     })
     describe('when there are multiple subscribers', () => {
       it('calls them all each time', () => {
-        let subscribable = new Example()
-        let cb1 = jest.fn()
-        let cb2 = jest.fn()
+        const subscribable = new Example()
+        const cb1 = jest.fn()
+        const cb2 = jest.fn()
         subscribable.subscribe(cb1)
         subscribable.subscribe(cb2)
 
@@ -67,8 +67,8 @@ describe('Subscribable', () => {
   describe('when already subscribed', () => {
     describe('after calling #unsubscribe', () => {
       it('does not call the callback', () => {
-        let subscribable = new Example()
-        let cb1 = jest.fn()
+        const subscribable = new Example()
+        const cb1 = jest.fn()
         subscribable.subscribe(cb1)
 
         subscribable.notify()
@@ -78,9 +78,9 @@ describe('Subscribable', () => {
         expect(cb1).toHaveBeenCalledTimes(1)
       })
       it('does not unsubscribe other callbacks', () => {
-        let subscribable = new Example()
-        let cb1 = jest.fn()
-        let cb2 = jest.fn()
+        const subscribable = new Example()
+        const cb1 = jest.fn()
+        const cb2 = jest.fn()
         subscribable.subscribe(cb1)
         subscribable.subscribe(cb2)
 

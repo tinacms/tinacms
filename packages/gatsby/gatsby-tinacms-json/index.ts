@@ -1,6 +1,6 @@
 import { Form, FormOptions, Field } from '@tinacms/core'
 import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 
 interface JsonNode {
   id: string
@@ -18,21 +18,21 @@ export function useJsonForm(
   }
   validateJsonNode(jsonNode)
 
-  let cms = useCMS()
-  let label = jsonNode.fileRelativePath
+  const cms = useCMS()
+  const label = jsonNode.fileRelativePath
   const id = jsonNode.id
-  let initialValues = useMemo(
+  const initialValues = useMemo(
     () => ({
       jsonNode: jsonNode,
       rawJson: JSON.parse(jsonNode.rawJson),
     }),
-    [jsonNode.rawJson]
+    [jsonNode]
   )
-  let fields = formOptions.fields || generateFields(initialValues.rawJson)
+  const fields = formOptions.fields || generateFields(initialValues.rawJson)
 
   fields.push({ name: 'jsonNode', component: null })
 
-  let [values, form] = useCMSForm({
+  const [values, form] = useCMSForm({
     id,
     label,
     initialValues,
@@ -43,13 +43,15 @@ export function useJsonForm(
     ...formOptions,
   })
 
-  watchFormValues(form, formState => {
-    let { fileRelativePath, rawJson, ...data } = formState.values.rawJson
+  const writeToDisk = useCallback(formState => {
+    const { fileRelativePath, rawJson, ...data } = formState.values.rawJson
     cms.api.git.onChange!({
       fileRelativePath: formState.values.jsonNode.fileRelativePath,
       content: JSON.stringify(data, null, 2),
     })
-  })
+  }, [])
+
+  watchFormValues(form, writeToDisk)
 
   return [jsonNode, form]
 }
@@ -67,7 +69,7 @@ interface JsonFormProps extends Partial<FormOptions<any>> {
 }
 
 export function JsonForm({ data, render, ...options }: JsonFormProps) {
-  let [currentData, form] = useJsonForm(data, options)
+  const [currentData, form] = useJsonForm(data, options)
 
   return render({ form, data: currentData })
 }

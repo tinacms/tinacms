@@ -3,7 +3,7 @@ import { storiesOf } from '@storybook/react'
 import { Wysiwyg } from '../src/Wysiwyg'
 
 const Basic = () => {
-  let [value, setValue] = React.useState('')
+  const [value, setValue] = React.useState('')
   return (
     <Wysiwyg
       input={{

@@ -1,18 +1,18 @@
 import { FormOptions, Form } from '@tinacms/core'
 import * as React from 'react'
 import { useCMS } from './use-cms'
-let get = require('lodash.get')
+const get = require('lodash.get')
 
 export function useCMSForm(options: FormOptions<any>) {
-  let cms = useCMS()
-  let [form, setForm] = React.useState<Form | undefined>()
-  let [_, setValues] = React.useState(options.initialValues)
+  const cms = useCMS()
+  const [form, setForm] = React.useState<Form | undefined>()
+  const [_, setValues] = React.useState(options.initialValues)
 
   React.useEffect(
     function createForm() {
-      let form = cms.forms.createForm(options)
+      const form = cms.forms.createForm(options)
       setForm(form)
-      form.subscribe(
+      const unsubscribe = form.subscribe(
         form => {
           setValues(form.values)
         },
@@ -20,11 +20,24 @@ export function useCMSForm(options: FormOptions<any>) {
       )
 
       return () => {
-        form && cms.forms.removeForm(form.id)
+        unsubscribe()
+        if (form) {
+          cms.forms.removeForm(form.id)
+        }
       }
     },
     [options.id]
   )
+
+  React.useEffect(() => {
+    if (!form) return
+    form.updateFields(options.fields)
+  }, [form, options.fields])
+
+  React.useEffect(() => {
+    if (!form) return
+    form.label = options.label
+  }, [form, options.label])
 
   syncFormWithInitialValues(form, options.initialValues)
 
@@ -48,12 +61,17 @@ function syncFormWithInitialValues(form?: Form, initialValues?: any) {
         form.finalForm.change(path, get(initialValues, path))
       })
     })
-  }, [initialValues])
+  }, [form, initialValues])
 }
 
-function findInactiveFormFields(form: Form) {
+export function findInactiveFormFields(form: Form) {
   let pathsToUpdate: string[] = []
-  Object.entries(form.fieldSubscriptions).forEach(([path, field]) => {
+
+  const hiddenFields = Object.entries(form.hiddenFields)
+  const declaredFields = Object.entries(form.fieldSubscriptions)
+  const allFields = hiddenFields.concat(declaredFields)
+
+  allFields.forEach(([path, field]) => {
     pathsToUpdate = pathsToUpdate.concat(findInactiveFieldsInPath(form, path))
   })
   return pathsToUpdate
@@ -89,17 +107,17 @@ export function findInactiveFieldsInPath(form: Form, path: string) {
   let pathsToUpdate: string[] = []
 
   if (/INDEX/.test(path)) {
-    let listPath = path.split('.INDEX.')[0]
-    let listState = get(form.finalForm.getState().values, listPath, [])
+    const listPath = path.split('.INDEX.')[0]
+    const listState = get(form.finalForm.getState().values, listPath, [])
     if (listState) {
       for (let i = 0; i < listState.length; i++) {
-        let indexPath = path.replace('INDEX', `${i}`)
-        let subpaths = findInactiveFieldsInPath(form, indexPath)
+        const indexPath = path.replace('INDEX', `${i}`)
+        const subpaths = findInactiveFieldsInPath(form, indexPath)
         pathsToUpdate = [...pathsToUpdate, ...subpaths]
       }
     }
   } else {
-    let state = form.finalForm.getFieldState(path)
+    const state = form.finalForm.getFieldState(path)
     if (!state || !state.active) {
       pathsToUpdate.push(path)
     }

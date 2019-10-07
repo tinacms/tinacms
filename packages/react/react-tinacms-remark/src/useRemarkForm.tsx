@@ -22,36 +22,36 @@ export function useRemarkForm(
 
   validateMarkdownRemark(markdownRemark)
 
-  let cms = useCMS()
-  let label = markdownRemark.frontmatter.title
-  const id = markdownRemark.id
-  let initialValues = useMemo(
+  const cms = useCMS()
+  const label = formOverrrides.label || markdownRemark.frontmatter.title
+  const id = markdownRemark.fileRelativePath
+  const initialValues = useMemo(
     () => ({
       ...markdownRemark,
       rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
     }),
-    [markdownRemark.rawFrontmatter]
+    [markdownRemark.rawFrontmatter, markdownRemark.rawMarkdownBody]
   )
 
-  let fields = React.useMemo(() => {
+  const fields = React.useMemo(() => {
     let fields = formOverrrides.fields || generateFields(initialValues)
     fields = fields.map(field => {
-      if (field.name.startsWith('frontmatter.')) {
+      if (
+        field.name === 'frontmatter' ||
+        field.name.startsWith('frontmatter.')
+      ) {
         return {
           ...field,
-          name: field.name.replace('frontmatter.', 'rawFrontmatter.'),
+          name: field.name.replace('frontmatter', 'rawFrontmatter'),
         }
       }
       return field
     })
-    // The `frontmatter` object might be used by fields for previewing.
-    // We register it just so we can update keep it up-to-date.
-    // @ts-ignore
-    fields.push({ name: 'frontmatter', component: null })
+
     return fields
   }, [formOverrrides.fields])
 
-  let [values, form] = useCMSForm({
+  const [values, form] = useCMSForm({
     label,
     id,
     initialValues,
@@ -89,12 +89,14 @@ export function useRemarkForm(
     ],
   })
 
-  watchFormValues(form, formState => {
+  let writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
       content: toMarkdownString(formState.values),
     })
-  })
+  }, [])
+
+  watchFormValues(form, writeToDisk)
 
   return [markdownRemark, form]
 }

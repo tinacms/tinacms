@@ -5,7 +5,7 @@ export class FormManager extends Subscribable {
   private __forms: { [key: string]: Form } = {}
 
   createForm = <S>(options: FormOptions<S>): Form<S> => {
-    let form = new Form<S>(options)
+    const form = new Form<S>(options)
     this.__forms[options.id] = form
     this.notifiySubscribers()
     return form

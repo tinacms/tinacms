@@ -4,7 +4,7 @@ import { Schema } from 'prosemirror-model'
 
 export function useMarkdownTranslator(schema: Schema) {
   // TODO: Use `wysiwyg:markdown` plugins
-  let translator = React.useMemo(() => MarkdownTranslator.fromSchema(schema), [
+  const translator = React.useMemo(() => MarkdownTranslator.fromSchema(schema), [
     schema,
   ])
 

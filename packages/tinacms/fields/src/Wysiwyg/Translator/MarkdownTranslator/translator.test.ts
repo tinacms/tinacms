@@ -42,8 +42,8 @@ describe('Markdown Translators', () => {
       const input = fs.readFileSync(pathOf(flavour, '__tests__', file), 'utf8')
 
       it(file, () => {
-        let node = translator.nodeFromString(input)!
-        let output = translator.stringFromNode(node)
+        const node = translator.nodeFromString(input)!
+        const output = translator.stringFromNode(node)
         expect(output).toBe(input)
       })
     }
@@ -61,8 +61,8 @@ describe('Markdown Translators', () => {
       const expectedNode = readFile('node.json')
       const expectedOutput = readFile('output.md')
 
-      let node = translator.nodeFromString(input)!
-      let output = translator.stringFromNode(node)
+      const node = translator.nodeFromString(input)!
+      const output = translator.stringFromNode(node)
 
       describe(dir, () => {
         if (expectedNode) {
