@@ -10,12 +10,13 @@ interface FieldSubscription {
 export class Form<S = any> {
   id: any
   label: string
-  fields: Field[]
   finalForm: FormApi<S>
+  fields: Field[]
   actions: any[]
   fieldSubscriptions: { [key: string]: FieldSubscription } = {}
   hiddenFields: { [key: string]: FieldSubscription } = {}
   initialValues: any
+  reset?: () => void
 
   constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
     const initialValues = options.initialValues || ({} as S)
@@ -97,7 +98,9 @@ export class Form<S = any> {
       const path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
 
       const isGroup = ['group'].includes(field.component as string)
-      const isArray = ['group-list', 'blocks'].includes(field.component as string)
+      const isArray = ['group-list', 'blocks'].includes(
+        field.component as string
+      )
       if (isArray) {
         const subfields = field.fields || []
         this.registerFields(subfields, `${path}.INDEX`)
@@ -132,6 +135,7 @@ export interface FormOptions<S> extends Config<S> {
   label: string
   fields: Field[]
   actions?: any[]
+  reset?: () => void
 }
 
 export interface Field {
