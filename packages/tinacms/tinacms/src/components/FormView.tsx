@@ -10,12 +10,7 @@ import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
-import {
-  SIDEBAR_HEADER_HEIGHT,
-  FORM_HEADER_HEIGHT,
-  FORM_FOOTER_HEIGHT,
-  SIDEBAR_WIDTH,
-} from '../Globals'
+import { FORM_HEADER_HEIGHT } from '../Globals'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
@@ -26,14 +21,6 @@ export const FormsView = () => {
   const forms = cms.forms.all()
   const activeForm = activeFormId ? cms.forms.findForm(activeFormId) : null
   const isEditing = !!activeForm
-
-  const setEditingForm = React.useCallback((form: Form) => {
-    if (!form) {
-      setActiveFormId(undefined)
-    } else {
-      setActiveFormId(form.id)
-    }
-  }, [])
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -50,15 +37,15 @@ export const FormsView = () => {
    */
   if (!forms.length) return <NoFormsPlaceholder />
 
-  if (!activeForm)
+  if (!activeForm) {
     return (
       <FormsList
         isEditing={isEditing}
         forms={forms}
-        activeForm={activeForm}
-        setActiveForm={setEditingForm}
+        setActiveFormId={setActiveFormId}
       />
     )
+  }
 
   return (
     <FormBuilder form={activeForm as any}>
@@ -68,8 +55,8 @@ export const FormsView = () => {
             <FormWrapper isEditing={isEditing}>
               <FormHeader
                 isMultiform={forms.length > 1}
-                form={activeForm as any}
-                setEditingForm={setEditingForm as any}
+                activeForm={activeForm}
+                setActiveFormId={setActiveFormId}
               />
               <FormBody>
                 {activeForm &&
@@ -209,16 +196,23 @@ const NoFieldsPlaceholder = () => (
   </EmptyState>
 )
 
-const CreateButton = styled(Button)`
-  width: 100%;
-`
+interface FormHeaderProps {
+  activeForm: Form
+  setActiveFormId(id?: string): void
+  isMultiform: boolean
+}
 
 const FormHeader = styled(
-  ({ form, setEditingForm, isMultiform, ...styleProps }: any) => {
+  ({
+    activeForm,
+    setActiveFormId,
+    isMultiform,
+    ...styleProps
+  }: FormHeaderProps) => {
     return (
-      <div {...styleProps} onClick={() => isMultiform && setEditingForm(null)}>
+      <div {...styleProps} onClick={() => isMultiform && setActiveFormId()}>
         {isMultiform && <LeftArrowIcon />}
-        <span>{form.label}</span>
+        <span>{activeForm.label}</span>
       </div>
     )
   }
