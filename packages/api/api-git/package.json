@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/api-git",
-  "version": "0.2.0-alpha.0",
+  "version": "0.2.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -36,7 +36,7 @@
     "@types/express": "^4.17.0",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.7.11",
-    "cms-scripts": "^0.1.2-alpha.0",
+    "cms-scripts": "^0.1.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   }
