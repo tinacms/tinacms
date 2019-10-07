@@ -38,6 +38,11 @@ export function useTinaProsemirror(
     }
   }, [])
 
+  /**
+   * The Prosemirror EditorView instance
+   */
+  const [editorView, setEditorView] = React.useState<EditorView>()
+
   React.useEffect(
     function setupEditor() {
       /**
@@ -77,10 +82,15 @@ export function useTinaProsemirror(
           }
         },
       })
+
+      setEditorView(editorView)
       /**
        * Destroy the EditorView to prevent duplicates
        */
-      return () => editorView.destroy()
+      return () => {
+        setEditorView(undefined)
+        editorView.destroy()
+      }
     },
     /**
      * Rerender if the target Node has changed.
