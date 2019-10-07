@@ -80,13 +80,12 @@ export const FormsView = () => {
               </FormBody>
               <FormFooter>
                 {activeForm.reset && <ResetForm pristine={pristine} />}
-                {activeForm.actions.length > 0 && (
-                  <ActionsMenu actions={activeForm.actions} />
-                )}
-
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
+                {activeForm.actions.length > 0 && (
+                  <ActionsMenu actions={activeForm.actions} />
+                )}
               </FormFooter>
             </FormWrapper>
           </DragDropContext>
