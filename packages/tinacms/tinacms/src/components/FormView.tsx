@@ -18,47 +18,31 @@ import {
 } from '../Globals'
 
 export const FormsView = () => {
+  const [activeFormId, setActiveFormId] = useState<string>()
   const cms = useCMS()
+
+  useSubscribable(cms.forms)
+
   const forms = cms.forms.all()
-  const [editingForm, setEditingForm] = useState<Form | null>(() => {
-    return cms.forms.all()[0] as Form | null
-  })
-  const [isEditing, setIsEditing] = useState(false)
-  const [isMultiform, setIsMultiform] = useState(false)
+  const activeForm = activeFormId ? cms.forms.findForm(activeFormId) : null
+  const isEditing = !!activeForm
 
-  useSubscribable(cms.forms, () => {
-    const forms = cms.forms.all()
-    if (forms.length == 1) {
-      setIsMultiform(false)
-      setEditingForm(forms[0])
-      return
+  const setEditingForm = React.useCallback((form: Form) => {
+    if (!form) {
+      setActiveFormId(undefined)
+    } else {
+      setActiveFormId(form.id)
     }
-
-    //if multiforms, set default view to formslist
-    if (forms.length > 1) {
-      setIsMultiform(true)
-      //if they navigate to another page w/ no active form, reset
-      !editingForm && setEditingForm(null)
-    }
-
-    if (editingForm && forms.findIndex(f => f.id == editingForm.id) < 0) {
-      setEditingForm(null)
-    }
-  })
-
-  //Toggles editing prop for component animations
-  React.useEffect(() => {
-    editingForm ? setIsEditing(true) : setIsEditing(false)
-  }, [editingForm])
+  }, [])
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
-      const form = editingForm!.finalForm
+      const form = activeForm!.finalForm
       if (!result.destination) return
       const name = result.type
       form.mutators.move(name, result.source.index, result.destination.index)
     },
-    [editingForm]
+    [activeForm]
   )
 
   /**
@@ -66,41 +50,41 @@ export const FormsView = () => {
    */
   if (!forms.length) return <NoFormsPlaceholder />
 
-  if (!editingForm)
+  if (!activeForm)
     return (
       <FormsList
         isEditing={isEditing}
         forms={forms}
-        activeForm={editingForm}
+        activeForm={activeForm}
         setActiveForm={setEditingForm}
       />
     )
 
   return (
-    <FormBuilder form={editingForm as any}>
+    <FormBuilder form={activeForm as any}>
       {({ handleSubmit, pristine, form }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
             <FormWrapper isEditing={isEditing}>
               <FormHeader
-                isMultiform={isMultiform}
-                form={editingForm as any}
+                isMultiform={forms.length > 1}
+                form={activeForm as any}
                 setEditingForm={setEditingForm as any}
               />
               <FormBody>
-                {editingForm &&
-                  (editingForm.fields.length ? (
+                {activeForm &&
+                  (activeForm.fields.length ? (
                     <FieldsBuilder
-                      form={editingForm}
-                      fields={editingForm.fields}
+                      form={activeForm}
+                      fields={activeForm.fields}
                     />
                   ) : (
                     <NoFieldsPlaceholder />
                   ))}
               </FormBody>
               <FormFooter>
-                {editingForm.actions.length > 0 && (
-                  <ActionsMenu actions={editingForm.actions} />
+                {activeForm.actions.length > 0 && (
+                  <ActionsMenu actions={activeForm.actions} />
                 )}
 
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
