@@ -120,18 +120,18 @@ export class PMTestHarness {
    * Creates a new `text` node with a `link` mark.
    */
   link = (content: string, attrs: LinkAttrs) => {
-    let _attrs = { creating: "", editing: "", ...attrs }
-    let mark = this.marks.link.create(_attrs)
+    const _attrs = { creating: "", editing: "", ...attrs }
+    const mark = this.marks.link.create(_attrs)
     return this.text(content, [mark])
   }
 
   strong = (content: string) => {
-    let mark = this.marks.strong.create()
+    const mark = this.marks.strong.create()
     return this.text(content, [mark])
   }
 
   em = (content: string) => {
-    let mark = this.marks.em.create()
+    const mark = this.marks.em.create()
     return this.text(content, [mark])
   }
 
@@ -143,7 +143,7 @@ export class PMTestHarness {
   }
 
   image = (attrs: ImageAttrs) => {
-    let _attrs = { alt: "", title: "", ...attrs }
+    const _attrs = { alt: "", title: "", ...attrs }
     return this.nodes.image.create(_attrs)
   }
 

@@ -90,7 +90,7 @@ export class GitClient {
    * TODO: Remove `catch`
    */
   writeMediaToDisk(data: { directory: string; content: File }): Promise<any> {
-    let formData = new FormData()
+    const formData = new FormData()
     formData.append('file', data.content)
     formData.append('directory', data.directory)
     return fetch(`${this.baseUrl}/upload`, {

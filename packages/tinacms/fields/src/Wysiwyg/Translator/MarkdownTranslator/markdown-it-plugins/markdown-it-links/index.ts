@@ -6,8 +6,8 @@ import { parseLinkDestination } from '../helpers/parseLinkDestination'
 
 function _link(md: any) {
   return function(state: any, silent: any) {
-    let normalizeReference = state.md.utils.normalizeReference
-    let isSpace = state.md.utils.isSpace
+    const normalizeReference = state.md.utils.normalizeReference
+    const isSpace = state.md.utils.isSpace
 
     let attrs,
       code,

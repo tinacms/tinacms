@@ -7,7 +7,7 @@ import { MarkType, NodeType, Schema } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
 import { singleMarkCommand } from '../../../commands/single-mark-command'
 
-let star = '\\*'
+const star = '\\*'
 const double = (boundary: string) =>
   new RegExp(
     `${boundary}${boundary}([^\r\n\t\f${boundary}} ](.*[^\r\n\t\f${boundary} ])?)${boundary}${boundary}`
@@ -25,7 +25,7 @@ export const EM_UNDERSCORE = single('_')
 export const CODE = single('`')
 
 export function buildInputRules(schema: Schema) {
-  let rules = []
+  const rules = []
   let type: NodeType
   if ((type = schema.nodes.blockquote)) rules.push(blockQuoteRule(type))
   if ((type = schema.nodes.ordered_list)) rules.push(orderedListRule(type))
@@ -57,12 +57,12 @@ function markInputRule(regexp: RegExp, markType: MarkType, getAttrs: any) {
     start: number,
     end: number
   ) => {
-    let attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs
-    let tr = state.tr
+    const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs
+    const tr = state.tr
 
     if (match[1]) {
-      let textStart = start + match[0].indexOf(match[1])
-      let textEnd = textStart + match[1].length
+      const textStart = start + match[0].indexOf(match[1])
+      const textEnd = textStart + match[1].length
       if (textEnd < end) tr.delete(textEnd, end)
       if (textStart > start) tr.delete(start, textStart)
       end = start + match[1].length

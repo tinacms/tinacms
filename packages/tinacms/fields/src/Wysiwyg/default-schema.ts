@@ -10,7 +10,7 @@ export const defaultSchema = new Schema({
 } as any)
 
 function getNodes(plugins: SchemaNodePlugin[]) {
-  let nodes: any = {}
+  const nodes: any = {}
 
   plugins
     .filter(plugin => plugin.__type === 'wysiwyg:schema:node')
@@ -22,7 +22,7 @@ function getNodes(plugins: SchemaNodePlugin[]) {
 }
 
 function getMarks(plugins: SchemaMarkPlugin[]) {
-  let nodes: any = {}
+  const nodes: any = {}
 
   plugins
     .filter(plugin => plugin.__type === 'wysiwyg:schema:mark')

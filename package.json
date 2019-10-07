@@ -7,9 +7,6 @@
     "bootstrap": "lerna bootstrap --hoist --reject-cycles",
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
-    "release": "lerna publish --reject-cycles --conventional-commits --create-release github",
-    "graduate": "lerna publish --reject-cycles --conventional-commits --conventional-graduate --create-release github",
-    "alpha": "lerna publish --reject-cycles --conventional-commits --conventional-prerelease --create-release github",
     "test": "lerna run test --reject-cycles",
     "watch": "lerna run watch --parallel --reject-cylcles"
   },
@@ -25,6 +22,7 @@
     "lerna": "^3.16.4",
     "rollup": "^1.21.4",
     "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-replace": "^2.2.0",
     "rollup-plugin-typescript2": "^0.22.0",
     "rollup-plugin-uglify": "^6.0.3",
     "typescript": "^3.5.3"

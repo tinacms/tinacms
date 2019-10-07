@@ -36,7 +36,7 @@ export class FormattingDropdown extends React.Component<
     )
   lift = () => lift(this.props.view.state, this.props.view.dispatch)
   render() {
-    let { view, frame } = this.props
+    const { view, frame } = this.props
     let document
     if (frame) {
       document = frame.document

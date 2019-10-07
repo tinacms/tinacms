@@ -38,16 +38,16 @@ export function markControl({
     }
 
     markIsActive = (markName: string): boolean => {
-      let { state } = this.props.view
-      let mark = this.markType(markName)
-      let { from, $from, to, empty } = state.selection
+      const { state } = this.props.view
+      const mark = this.markType(markName)
+      const { from, $from, to, empty } = state.selection
       if (empty) return !!mark.isInSet(state.storedMarks || $from.marks())
       else return state.doc.rangeHasMark(from, to, mark)
     }
 
     get disabled(): boolean {
       if (selectionOnly) {
-        let { $cursor } = this.props.view.state.selection as any
+        const { $cursor } = this.props.view.state.selection as any
         return !!$cursor || this.inCodeBlock || this.incompatibleMarksAreActive
       }
 
@@ -55,8 +55,8 @@ export function markControl({
     }
 
     get inCodeBlock(): boolean {
-      let view = this.props.view
-      let node = view.state.selection.$from.node(
+      const view = this.props.view
+      const node = view.state.selection.$from.node(
         view.state.selection.$from.depth
       )
       return node.type === view.state.schema.nodes.code_block

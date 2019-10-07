@@ -2,13 +2,13 @@
   "name": "demo-next",
   "private": true,
   "scripts": {
-    "dev": "next dev",
+    "develop": "next dev",
     "start": "next start"
   },
   "dependencies": {
     "@tinacms/api-git": "^0.1.0",
     "@tinacms/next-tinacms-git": "^0.0.1",
-    "@tinacms/next-tinacms-markdown": "^0.0.2",
+    "@tinacms/next-tinacms-markdown": "^0.0.3",
     "@tinacms/react-tinacms": "^0.1.1",
     "@tinacms/tinacms": "^0.1.1",
     "next": "9.0.5"

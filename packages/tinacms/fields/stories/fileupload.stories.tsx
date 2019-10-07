@@ -4,7 +4,7 @@ import { ImageUpload } from '../src/ImageUpload'
 import { useState } from 'react'
 
 const ImageUploader = () => {
-  let [img, setImg] = useState<string>()
+  const [img, setImg] = useState<string>()
 
   return (
     <ImageUpload

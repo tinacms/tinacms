@@ -16,7 +16,7 @@ export interface Props {
 const EditingContext = React.createContext(false)
 
 export function TinaForm({ form, children }: Props) {
-  let [isEditing, setIsEditing] = useState(false)
+  const [isEditing, setIsEditing] = useState(false)
 
   if (!form) {
     return (
@@ -49,7 +49,7 @@ export function TinaField({
   children,
   ...fieldProps
 }: TinaFieldsProps) {
-  let isEditing = useContext(EditingContext)
+  const isEditing = useContext(EditingContext)
   if (!isEditing) return children || null
   return (
     <Field {...fieldProps}>

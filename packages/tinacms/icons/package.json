@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/icons",
-  "version": "0.1.1",
+  "version": "0.2.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -21,7 +21,6 @@
     "directory": "packages/tinacms/icons"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "cms-scripts watch",
     "build": "cms-scripts build",
     "dev": "cms-scripts dev",

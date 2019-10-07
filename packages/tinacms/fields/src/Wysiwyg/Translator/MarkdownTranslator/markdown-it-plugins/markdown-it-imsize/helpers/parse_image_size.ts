@@ -12,8 +12,8 @@ type Result = {
 
 function parseNextNumber(str: string, pos: number, max: number) {
   let code
-  let start = pos
-  let result: Result = {
+  const start = pos
+  const result: Result = {
     ok: false,
     pos: pos,
   }
@@ -63,7 +63,7 @@ export function parseImageSize(str: string, pos: number, max: number) {
   }
 
   // parse width
-  let resultW = parseNextNumber(str, pos, max)
+  const resultW = parseNextNumber(str, pos, max)
   pos = resultW.pos
 
   // next charactor must be 'x'
@@ -75,7 +75,7 @@ export function parseImageSize(str: string, pos: number, max: number) {
   pos++
 
   // parse height
-  let resultH = parseNextNumber(str, pos, max)
+  const resultH = parseNextNumber(str, pos, max)
   pos = resultH.pos
 
   result.width = resultW.value

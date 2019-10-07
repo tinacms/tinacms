@@ -49,13 +49,13 @@ export const FormsView = () => {
   //Toggles editing prop for component animations
   React.useEffect(() => {
     editingForm ? setIsEditing(true) : setIsEditing(false)
-  })
+  }, [editingForm])
 
-  let moveArrayItem = React.useCallback(
+  const moveArrayItem = React.useCallback(
     (result: DropResult) => {
-      let form = editingForm!.finalForm
+      const form = editingForm!.finalForm
       if (!result.destination) return
-      let name = result.type
+      const name = result.type
       form.mutators.move(name, result.source.index, result.destination.index)
     },
     [editingForm]
@@ -81,7 +81,7 @@ export const FormsView = () => {
       {({ handleSubmit, pristine, form }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
-            <FormAnimation isEditing={isEditing}>
+            <FormWrapper isEditing={isEditing}>
               <FormHeader
                 isMultiform={isMultiform}
                 form={editingForm as any}
@@ -107,7 +107,7 @@ export const FormsView = () => {
                   Save
                 </SaveButton>
               </FormFooter>
-            </FormAnimation>
+            </FormWrapper>
           </DragDropContext>
         )
       }}
@@ -123,26 +123,34 @@ const Emoji = styled.span`
 
 const EmptyState = styled.div`
   position: relative;
-  padding: ${padding()}rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: ${padding()}rem ${padding()}rem 4rem ${padding()}rem;
   width: 100%;
   height: 100%;
-  background: white;
+  overflow-y: auto;
   > *:first-child {
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
+  }
+  > ${Emoji} {
+    display: block;
   }
   h3 {
     font-size: 1.2rem;
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
   }
 `
 
@@ -150,12 +158,13 @@ const LinkButton = styled.a`
   text-align: center;
   border: 0;
   border-radius: ${p => p.theme.radius.big};
+  border: 1px solid #edecf3;
   box-shadow: ${p => p.theme.shadow.small};
   font-weight: 500;
   cursor: pointer;
   font-size: 0.75rem;
   transition: all ${p => p.theme.timing.short} ease-out;
-  background-color: ${color('light')};
+  background-color: white;
   color: ${color('dark')};
   padding: ${padding('small')}rem ${padding('big')}rem ${padding('small')}rem
     3.5rem;
@@ -181,11 +190,15 @@ const LinkButton = styled.a`
 
 const NoFormsPlaceholder = () => (
   <EmptyState>
-    <Emoji>🎉 👋</Emoji>
+    <Emoji>👋</Emoji>
     <h3>
       Welcome to <b>Tina</b>!
     </h3>
-    <p>Let's get a form set up so you can start editing.</p>
+    <p>
+      Let's get a form set up
+      <br />
+      so you can start editing.
+    </p>
     <p>
       <LinkButton
         href="https://github.com/tinacms/tinacms-site/blob/master/content/docs/gatsby/content-editing.md"
@@ -221,26 +234,34 @@ const FormHeader = styled(
     return (
       <div {...styleProps} onClick={() => isMultiform && setEditingForm(null)}>
         {isMultiform && <LeftArrowIcon />}
-        {form.label}
+        <span>{form.label}</span>
       </div>
     )
   }
 )`
-  position: absolute;
-  top: 0;
+  position: relative;
+  width: 100%;
   height: ${FORM_HEADER_HEIGHT}rem;
-  width: ${SIDEBAR_WIDTH}px;
+  flex: 0 0 ${FORM_HEADER_HEIGHT}rem;
   cursor: ${p => p.isMultiform && 'pointer'};
   background-color: white;
   border-bottom: 1px solid #edecf3;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  padding: 0 ${padding()}rem;
+  padding: 0 ${padding()}rem ${padding('small')}rem ${padding()}rem;
   color: inherit;
   font-size: 1.2rem;
   transition: color 250ms ease-out;
   user-select: none;
+  span {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   svg {
+    flex: 0 0 auto;
     width: 1.5rem;
     fill: #e1ddec;
     height: auto;
@@ -257,30 +278,23 @@ const FormHeader = styled(
   }
 `
 
-export const FormBody = styled.div<{ isMultiform?: boolean }>`
-  position: absolute;
-  top: ${FORM_HEADER_HEIGHT}rem;
-  bottom: ${FORM_FOOTER_HEIGHT}rem;
+export const FormBody = styled.div`
+  position: relative;
+  flex: 1 1 auto;
   scrollbar-width: none;
-  width: ${SIDEBAR_WIDTH}px;
+  width: 100%;
   overflow: hidden;
   background-color: #f6f6f9;
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
 `
 
 const FormFooter = styled.div`
-  position: absolute;
-  bottom: 0;
+  position: relative;
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: ${SIDEBAR_WIDTH}px;
-  height: ${FORM_FOOTER_HEIGHT}rem;
+  width: 100%;
+  height: 4rem;
   background-color: white;
   border-top: 1px solid #edecf3;
   padding: 0 1.25rem;
@@ -295,10 +309,13 @@ const FormAnimationKeyframes = keyframes`
   }
 `
 
-const FormAnimation = styled.div<{ isEditing: Boolean }>`
+const FormWrapper = styled.div<{ isEditing: Boolean }>`
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   overflow: hidden;
   height: 100%;
-  width: ${SIDEBAR_WIDTH}px;
+  width: 100%;
   position: relative;
   ${FormHeader}, ${FormBody}, ${FormFooter} {
     transform: translate3d(100%, 0, 0);

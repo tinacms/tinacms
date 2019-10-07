@@ -17,8 +17,8 @@ describe('link regex', () => {
 
 function valid(url: string) {
   it(`should match: ${url}`, () => {
-    let result = url.match(HTTP_LINK_REGEX)
-    let match = result ? result[0] : ''
+    const result = url.match(HTTP_LINK_REGEX)
+    const match = result ? result[0] : ''
     expect(match).toBe(url)
   })
 }

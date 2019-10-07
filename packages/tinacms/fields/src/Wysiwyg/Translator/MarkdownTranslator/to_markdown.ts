@@ -64,7 +64,7 @@ export class MarkdownSerializer {
   // Serialize the content of the given node to
   // [CommonMark](http://commonmark.org/).
   serialize(content: Node, options: object = {}) {
-    let state = new MarkdownSerializerState(this.nodes, this.marks, options)
+    const state = new MarkdownSerializerState(this.nodes, this.marks, options)
     state.renderContent(content)
     return state.out
   }
@@ -113,7 +113,7 @@ export class MarkdownSerializerState {
       if (size == null) size = 2
       if (size > 1) {
         let delimMin = this.delim
-        let trim = /\s+$/.exec(delimMin)
+        const trim = /\s+$/.exec(delimMin)
         if (trim) delimMin = delimMin.slice(0, delimMin.length - trim[0].length)
         for (let i = 1; i < size; i++) this.out += delimMin + '\n'
       }
@@ -127,7 +127,7 @@ export class MarkdownSerializerState {
   // the end of the block, and `f` is a function that renders the
   // content of the block.
   wrapBlock(delim: string, firstDelim: string, node: Node, f: Function) {
-    let old = this.delim
+    const old = this.delim
     this.write(firstDelim || delim)
     this.delim += delim
     f()
@@ -165,9 +165,9 @@ export class MarkdownSerializerState {
   // Add the given text to the document. When escape is not `false`,
   // it will be escaped.
   text(text: string, escape?: boolean) {
-    let lines = text.split('\n')
+    const lines = text.split('\n')
     for (let i = 0; i < lines.length; i++) {
-      let startOfLine = this.atBlank() || this.closed
+      const startOfLine = this.atBlank() || this.closed
       this.write()
       this.out += escape !== false ? this.esc(lines[i], startOfLine) : lines[i]
       if (i != lines.length - 1) this.out += '\n'
@@ -192,7 +192,7 @@ export class MarkdownSerializerState {
   renderInline(parent: Node) {
     let active: any[] = [],
       trailing = ''
-    let progress = (node: Node | null, _?: any, index: number = 0) => {
+    const progress = (node: Node | null, _?: any, index: number = 0) => {
       let marks = node ? node.marks : []
 
       let leading = trailing
@@ -203,14 +203,14 @@ export class MarkdownSerializerState {
         node &&
         node.isText &&
         marks.some((mark, _i, _a) => {
-          let info = this.marks[mark.type.name]
+          const info = this.marks[mark.type.name]
           return !!(info && info.expelEnclosingWhitespace)
         }) &&
         /^(\s*)(.*?)(\s*)$/.test(node.text || '') // Todo: Don't duplicate this check.
       ) {
         // @ts-ignore
         // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        let [_, lead, inner, trail] = /^(\s*)(.*?)(\s*)$/.exec(node.text)
+        const [_, lead, inner, trail] = /^(\s*)(.*?)(\s*)$/.exec(node.text)
         leading += lead
         trailing = trail
         if (lead || trail) {
@@ -219,19 +219,19 @@ export class MarkdownSerializerState {
         }
       }
 
-      let inner = marks.length && marks[marks.length - 1]
-      let noEsc = inner && (this.marks[inner.type.name] as any).escape === false
-      let len = marks.length - (noEsc ? 1 : 0)
+      const inner = marks.length && marks[marks.length - 1]
+      const noEsc = inner && (this.marks[inner.type.name] as any).escape === false
+      const len = marks.length - (noEsc ? 1 : 0)
 
       // Try to reorder 'mixable' marks, such as em and strong, which
       // in Markdown may be opened and closed in different order, so
       // that order of the marks for the token matches the order in
       // active.
       outer: for (let i = 0; i < len; i++) {
-        let mark = marks[i]
+        const mark = marks[i]
         if (!this.marks[mark.type.name].mixable) break
         for (let j = 0; j < active.length; j++) {
-          let other = active[j]
+          const other = active[j]
           if (!this.marks[other.type.name].mixable) break
           if (mark.eq(other)) {
             if (i > j)
@@ -269,7 +269,7 @@ export class MarkdownSerializerState {
       // Open the marks that need to be opened
       if (node) {
         while (active.length < len) {
-          let add = marks[active.length]
+          const add = marks[active.length]
           active.push(add)
           this.text(this.markString(add, true, node), false)
         }
@@ -299,8 +299,8 @@ export class MarkdownSerializerState {
     if (this.closed && this.closed.type == node.type) this.flushClose(3)
     else if (this.inTightList) this.flushClose(1)
 
-    let isTight = this.options.tightLists
-    let prevTight = this.inTightList
+    const isTight = this.options.tightLists
+    const prevTight = this.inTightList
     this.inTightList = !!isTight
     node.forEach((child, _, i) => {
       if (i && isTight) this.flushClose(1)
@@ -323,7 +323,7 @@ export class MarkdownSerializerState {
   }
 
   quote(str: string) {
-    let wrap =
+    const wrap =
       str.indexOf('"') == -1 ? '""' : str.indexOf("'") == -1 ? "''" : '()'
     return wrap[0] + str + wrap[1]
   }
@@ -339,8 +339,8 @@ export class MarkdownSerializerState {
   // : (Mark, bool) → string
   // Get the markdown string for a given opening or closing mark.
   markString(mark: Mark, open: boolean, node: Node | null) {
-    let info = this.marks[mark.type.name]
-    let value = open ? info.open : info.close
+    const info = this.marks[mark.type.name]
+    const value = open ? info.open : info.close
     return typeof value == 'string' ? value : value(this, mark, node)
   }
 
