@@ -89,12 +89,14 @@ export function useRemarkForm(
     ],
   })
 
-  watchFormValues(form, formState => {
+  let writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
       content: toMarkdownString(formState.values),
     })
-  })
+  }, [])
+
+  watchFormValues(form, writeToDisk)
 
   return [markdownRemark, form]
 }
