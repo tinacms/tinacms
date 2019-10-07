@@ -15,6 +15,7 @@ export class Form<S = any> {
   actions: any[]
   fieldSubscriptions: { [key: string]: FieldSubscription } = {}
   hiddenFields: { [key: string]: FieldSubscription } = {}
+  initialValues: any
 
   constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
     const initialValues = options.initialValues || ({} as S)
@@ -34,14 +35,21 @@ export class Form<S = any> {
         ...options.mutators,
       },
     })
+
+    this.actions = actions || []
+    this.initialValues = initialValues
+    this.updateFields(this.fields)
+  }
+
+  updateFields(fields: Field[]) {
+    this.fields = fields
     /**
      * We register fields at creation time so we don't have to relay
      * on `react-final-form` components being rendered.
      */
     this.registerFields(this.fields)
-    this.discoverHiddenFields(initialValues)
+    this.discoverHiddenFields(this.initialValues)
     this.removeDeclaredFieldsFromHiddenLookup()
-    this.actions = actions || []
   }
 
   private discoverHiddenFields(values: any, prefix?: string) {
