@@ -183,7 +183,7 @@ function image_with_size(md: any) {
       state.pos = labelStart
       state.posMax = labelEnd
 
-      let newState = new state.md.inline.State(
+      const newState = new state.md.inline.State(
         state.src.slice(labelStart, labelEnd),
         state.md,
         state.env,

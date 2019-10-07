@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.1.1-alpha.0...@tinacms/api-git@0.1.1) (2019-10-04)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.1.0-alpha.13...@tinacms/api-git@0.1.0) (2019-10-02)
 
 **Note:** Version bump only for package @tinacms/api-git

@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/gatsby-tinacms-json",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "MIT",
@@ -24,7 +24,6 @@
     "directory": "packages/gatsby-tinacms-json"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "tsc -w",
     "build": "tsc",
     "test": "jest --passWithNoTests"
@@ -35,7 +34,7 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.1",
-    "@tinacms/react-tinacms": "^0.1.1"
+    "@tinacms/core": "^0.1.2",
+    "@tinacms/react-tinacms": "^0.1.2"
   }
 }

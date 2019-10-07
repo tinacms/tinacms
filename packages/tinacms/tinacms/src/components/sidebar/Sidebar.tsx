@@ -12,6 +12,7 @@ import {
   LeftArrowIcon,
   EditIcon,
   AddIcon,
+  TinaIcon,
 } from '@tinacms/icons'
 import { GlobalStyles, padding, color } from '@tinacms/styles'
 import {
@@ -25,6 +26,7 @@ import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useTina } from '../../hooks/use-tina'
+import style from 'react-syntax-highlighter/dist/styles/hljs/mono-blue'
 
 export const Sidebar = () => {
   const cms = useTina()
@@ -81,6 +83,7 @@ export const Sidebar = () => {
                 })}
               </MenuList>
             </MenuWrapper>
+            <Watermark />
           </MenuPanel>
           {ActiveView && (
             <Modal>
@@ -96,6 +99,25 @@ export const Sidebar = () => {
     </SidebarContainer>
   )
 }
+
+const Watermark = styled(({ ...styleProps }: any) => {
+  return (
+    <div {...styleProps}>
+      <TinaIcon />
+    </div>
+  )
+})`
+  position: absolute;
+  z-index: -1;
+  bottom: ${padding()}rem;
+  left: ${padding()}rem;
+  svg {
+    width: 8rem;
+    height: 8rem;
+    margin: -0.25rem -1.25rem;
+    fill: #363145;
+  }
+`
 
 const SidebarToggle = (sidebar: any) => {
   return (
@@ -136,22 +158,23 @@ const MenuLink = styled.div<{ value: string }>`
   color: ${color('light')};
   font-size: 1.125rem;
   font-weight: 500;
-  padding: ${padding()}rem ${padding()}rem ${padding()}rem 4rem;
+  padding: ${padding('small')}rem ${padding()}rem ${padding('small')}rem 4rem;
   position: relative;
   cursor: pointer;
   transition: all ${p => p.theme.timing.short} ease-out;
   overflow: hidden;
+  margin-bottom: ${padding('small')}rem;
   &:after {
     content: '';
     position: absolute;
-    top: 0.25rem;
-    bottom: 0.25rem;
+    top: 0;
+    bottom: 0;
     left: 0.5rem;
     right: 0.5rem;
     border-radius: 1.5rem;
     background-color: #363145;
     z-index: -1;
-    transition: all 150ms ease-out;
+    transition: all 150ms ease;
     transform: translate3d(0, 100%, 0);
     opacity: 0;
   }
@@ -187,12 +210,11 @@ const SidebarHeader = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  position: fixed;
-  top: 0;
   z-index: 1050;
+  flex: 0 0 ${SIDEBAR_HEADER_HEIGHT}rem;
   height: ${SIDEBAR_HEADER_HEIGHT}rem;
-  width: ${SIDEBAR_WIDTH}px;
-  padding: 1rem ${padding()}rem 0 ${padding()}rem;
+  width: 100%;
+  padding: 0 ${padding()}rem;
 `
 
 const MenuToggle = styled.button<{ open: boolean }>`
@@ -342,11 +364,11 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
 
 const SidebarWrapper = styled.div<{ open: boolean }>`
   margin: 0;
-  padding: ${SIDEBAR_HEADER_HEIGHT}rem 0 0 0;
+  padding: 0;
   border: 0;
   z-index: 1;
   background-color: white;
-  position: absolute;
+  position: fixed;
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;

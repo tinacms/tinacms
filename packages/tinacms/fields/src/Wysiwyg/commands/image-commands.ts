@@ -15,9 +15,9 @@ export function alignImage(
   at: number,
   direction: "left" | "right" | "center" | ""
 ) {
-  let node = state.doc.nodeAt(at)
+  const node = state.doc.nodeAt(at)
   if (!node || node.type !== state.schema.nodes.image) return false
-  let attrs = {
+  const attrs = {
     ...node.attrs,
     align: node.attrs.align === direction ? null : direction,
   }
@@ -29,9 +29,9 @@ export function alignImage(
 }
 
 export function removeImage(state: EditorState, dispatch: Function, at: number) {
-  let from = at
-  let to = from + 1
-  let node = state.doc.nodeAt(from)
+  const from = at
+  const to = from + 1
+  const node = state.doc.nodeAt(from)
   if (!node || node.type != state.schema.nodes.image) return false
   if (dispatch) {
     dispatch(state.tr.delete(from, to) as any)

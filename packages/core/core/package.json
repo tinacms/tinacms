@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/core",
-  "version": "0.1.1",
+  "version": "0.1.2",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -21,7 +21,6 @@
     "directory": "packages/core/core"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "test": "jest --passWithNoTests",
     "watch": "cms-scripts watch",
     "dev": "cms-scripts dev",

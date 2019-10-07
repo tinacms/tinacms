@@ -1,13 +1,13 @@
 import { EditorState, Selection } from 'prosemirror-state'
 
 export function exitCodeHard(state: EditorState, dispatch: any) {
-  let { $head } = state.selection
-  let above = $head.node(-1) as any
-  let after = $head.indexAfter(-1)
-  let type = above.defaultContentType(after)
+  const { $head } = state.selection
+  const above = $head.node(-1) as any
+  const after = $head.indexAfter(-1)
+  const type = above.defaultContentType(after)
   if (dispatch) {
-    let pos = $head.before()
-    let tr: any = state.tr.replaceWith(pos, pos, type.createAndFill())
+    const pos = $head.before()
+    const tr: any = state.tr.replaceWith(pos, pos, type.createAndFill())
     tr.setSelection(Selection.near(tr.doc.resolve(pos), 1))
     dispatch(tr.scrollIntoView())
   }
@@ -15,15 +15,15 @@ export function exitCodeHard(state: EditorState, dispatch: any) {
 }
 
 export function exitCodeUp(state: EditorState, dispatch: any) {
-  let { $head, $anchor } = state.selection
+  const { $head, $anchor } = state.selection
   if (!$head.parent.type.spec.code || !$head.sameParent($anchor)) return false
-  let above: any = $head.node(-1)
-  let after = $head.indexAfter(-1)
-  let type = above.defaultContentType(after)
+  const above: any = $head.node(-1)
+  const after = $head.indexAfter(-1)
+  const type = above.defaultContentType(after)
   if (!above.canReplaceWith(after, after, type)) return false
   if (dispatch) {
-    let pos = $head.before()
-    let tr: any = state.tr.replaceWith(pos, pos, type.createAndFill())
+    const pos = $head.before()
+    const tr: any = state.tr.replaceWith(pos, pos, type.createAndFill())
     tr.setSelection(Selection.near(tr.doc.resolve(pos), -1))
     dispatch(tr.scrollIntoView())
   }
@@ -33,15 +33,15 @@ export function exitCodeUp(state: EditorState, dispatch: any) {
 export function deleteEmptyCodeblock(cm: any) {
   return (state: any, dispatch: any) => {
     // Todo: It would be nice to have a way to get this without CodeMirror being passed in.
-    let pos = cm.getCursor()
-    let code = cm.getValue()
-    let codeWithoutInvisibles = code.replace(/[ \r\n]/g, '')
-    let shouldRemove = !codeWithoutInvisibles
+    const pos = cm.getCursor()
+    const code = cm.getValue()
+    const codeWithoutInvisibles = code.replace(/[ \r\n]/g, '')
+    const shouldRemove = !codeWithoutInvisibles
     if (!(pos.line == 0 && pos.ch == 0 && shouldRemove)) {
       return false
     }
 
-    let { $from } = state.selection
+    const { $from } = state.selection
 
     if (dispatch) {
       // I hate my life

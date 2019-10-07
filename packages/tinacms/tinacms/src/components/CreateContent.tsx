@@ -22,38 +22,42 @@ import { useTina } from '../hooks/use-tina'
 export const CreateContentMenu = () => {
   const cms = useTina()
   const frame = useFrameContext()
-  let [visible, setVisible] = React.useState(false)
+  const [visible, setVisible] = React.useState(false)
 
-  return (
-    <ContentMenuWrapper>
-      <PlusButton onClick={() => setVisible(true)} open={visible}>
-        <AddIcon />
-      </PlusButton>
-      <ContentMenu open={visible}>
-        <Dismissible
-          click
-          escape
-          onDismiss={() => setVisible(false)}
-          document={frame.document}
-          disabled={!visible}
-        >
-          {cms.plugins.all('content-button').map(plugin => (
-            <CreateContentButton
-              plugin={plugin}
-              key={plugin.name}
-              onClick={() => {
-                setVisible(false)
-              }}
-            />
-          ))}
-        </Dismissible>
-      </ContentMenu>
-    </ContentMenuWrapper>
-  )
+  if (cms.plugins.all('content-button').length) {
+    return (
+      <ContentMenuWrapper>
+        <PlusButton onClick={() => setVisible(true)} open={visible}>
+          <AddIcon />
+        </PlusButton>
+        <ContentMenu open={visible}>
+          <Dismissible
+            click
+            escape
+            onDismiss={() => setVisible(false)}
+            document={frame.document}
+            disabled={!visible}
+          >
+            {cms.plugins.all('content-button').map(plugin => (
+              <CreateContentButton
+                plugin={plugin}
+                key={plugin.name}
+                onClick={() => {
+                  setVisible(false)
+                }}
+              />
+            ))}
+          </Dismissible>
+        </ContentMenu>
+      </ContentMenuWrapper>
+    )
+  }
+
+  return null
 }
 
 const CreateContentButton = ({ plugin, onClick }: any) => {
-  let [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false)
   return (
     <>
       <CreateButton
@@ -70,8 +74,8 @@ const CreateContentButton = ({ plugin, onClick }: any) => {
 }
 
 const FormModal = ({ plugin, close }: any) => {
-  let cms = useCMS()
-  let form: Form = useMemo(
+  const cms = useCMS()
+  const form: Form = useMemo(
     () =>
       new Form({
         label: 'create-form',
@@ -84,7 +88,7 @@ const FormModal = ({ plugin, close }: any) => {
           })
         },
       }),
-    []
+    [close, cms, plugin]
   )
   return (
     <Modal>

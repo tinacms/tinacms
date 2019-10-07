@@ -12,14 +12,19 @@ module.exports = {
     {
       resolve: "@tinacms/gatsby-plugin-tinacms",
       options: {
-        plugins: [
-          "@tinacms/gatsby-tinacms-git",
-          "@tinacms/gatsby-tinacms-json",
-        ],
         sidebar: {
           hidden: process.env.NODE_ENV === "production",
           position: "fixed",
         },
+        plugins: [
+          "@tinacms/gatsby-tinacms-json",
+          {
+            resolve: "@tinacms/gatsby-tinacms-git",
+            options: {
+              defaultCommitMessage: "Update from the content ",
+            },
+          },
+        ],
       },
     },
     "@tinacms/gatsby-tinacms-json",
