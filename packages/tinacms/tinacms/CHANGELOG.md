@@ -3,6 +3,20 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.1...@tinacms/tinacms@0.1.3-alpha.0) (2019-10-07)
+
+
+### Bug Fixes
+
+* add form list scroll support ([ef7fcf3](https://github.com/tinacms/tinacms/commit/ef7fcf3))
+* improve layout, add support for long titles ([1ce0bfb](https://github.com/tinacms/tinacms/commit/1ce0bfb))
+* maintain order of forms in sidebar ([ccc9839](https://github.com/tinacms/tinacms/commit/ccc9839)), closes [#229](https://github.com/tinacms/tinacms/issues/229)
+* only render create content button when available ([e540dd8](https://github.com/tinacms/tinacms/commit/e540dd8))
+
+
+
+
+
 ## [0.1.2](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.2-alpha.0...@tinacms/tinacms@0.1.2) (2019-10-04)
 
 **Note:** Version bump only for package @tinacms/tinacms
