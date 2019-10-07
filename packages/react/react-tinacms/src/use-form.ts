@@ -31,6 +31,11 @@ export function useCMSForm(options: FormOptions<any>) {
     form.updateFields(options.fields)
   }, [options.fields])
 
+  React.useEffect(() => {
+    if (!form) return
+    form.label = options.label
+  }, [options.label])
+
   syncFormWithInitialValues(form, options.initialValues)
 
   return [form ? form.values : options.initialValues, form]
