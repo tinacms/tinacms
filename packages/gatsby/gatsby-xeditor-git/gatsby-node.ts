@@ -1,4 +1,4 @@
-import { router as gitRouter } from '@tinacms/api-git'
+import { router as gitRouter, GitRouterConfig } from '@tinacms/api-git'
 // @ts-ignore
 import { GraphQLString } from 'gatsby/graphql'
 
@@ -35,6 +35,12 @@ exports.setFieldsOnGraphQLNodeType = ({ type }: any) => {
   return {}
 }
 
-exports.onCreateDevServer = ({ app }: { app: any }) => {
-  app.use('/___tina', gitRouter())
+exports.onCreateDevServer = ({
+  app,
+  options,
+}: {
+  app: any
+  options: GitRouterConfig
+}) => {
+  app.use('/___tina', gitRouter(options))
 }
