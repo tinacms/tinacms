@@ -11,7 +11,12 @@ import {
 import { CloseIcon } from '@tinacms/icons'
 import { ModalPopup } from './modals/ModalPopup'
 
-export const ResetForm = ({ pristine }: any) => {
+interface ResetFormProps {
+  pristine: boolean
+  reset(): void
+}
+
+export const ResetForm = ({ pristine, reset }: ResetFormProps) => {
   let [open, setOpen] = React.useState(false)
   return (
     <>
@@ -23,12 +28,17 @@ export const ResetForm = ({ pristine }: any) => {
       >
         Reset
       </ResetButton>
-      {open && <ResetModal close={() => setOpen(false)} />}
+      {open && <ResetModal reset={reset} close={() => setOpen(false)} />}
     </>
   )
 }
 
-const ResetModal = ({ close }: any) => {
+interface ResetModalProps {
+  close(): void
+  reset(): void
+}
+
+const ResetModal = ({ close, reset }: ResetModalProps) => {
   return (
     <Modal>
       <ModalPopup>
@@ -43,7 +53,7 @@ const ResetModal = ({ close }: any) => {
         </ModalBody>
         <ModalActions>
           <CancelButton onClick={close}>Cancel</CancelButton>
-          <ConfirmButton>Reset</ConfirmButton>
+          <ConfirmButton onClick={reset}>Reset</ConfirmButton>
         </ModalActions>
       </ModalPopup>
     </Modal>
