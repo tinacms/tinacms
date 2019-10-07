@@ -18,6 +18,10 @@ export interface FormBuilderProps {
 const FF: any = FinalForm
 
 export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
+  const [i, setI] = React.useState(0)
+  React.useEffect(() => {
+    setI(i => i + 1)
+  }, [form])
   /**
    * > Why is a `key` being set when this isn't an array?
    *
@@ -31,7 +35,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
    * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
    */
   return (
-    <FF form={form.finalForm} key={form.id}>
+    <FF form={form.finalForm} key={`${i}: ${form.id}`}>
       {children}
     </FF>
   )
