@@ -1,6 +1,6 @@
 import { Form, FormOptions, Field } from '@tinacms/core'
 import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
-import { useMemo } from 'react'
+import { useMemo, useCallback } from 'react'
 
 interface JsonNode {
   id: string
@@ -43,13 +43,15 @@ export function useJsonForm(
     ...formOptions,
   })
 
-  watchFormValues(form, formState => {
+  const writeToDisk = useCallback(formState => {
     const { fileRelativePath, rawJson, ...data } = formState.values.rawJson
     cms.api.git.onChange!({
       fileRelativePath: formState.values.jsonNode.fileRelativePath,
       content: JSON.stringify(data, null, 2),
     })
-  })
+  }, [])
+
+  watchFormValues(form, writeToDisk)
 
   return [jsonNode, form]
 }

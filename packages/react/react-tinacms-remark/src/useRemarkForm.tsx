@@ -30,7 +30,7 @@ export function useRemarkForm(
       ...markdownRemark,
       rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
     }),
-    [markdownRemark.rawFrontmatter]
+    [markdownRemark.rawFrontmatter, markdownRemark.rawMarkdownBody]
   )
 
   const fields = React.useMemo(() => {
@@ -89,12 +89,14 @@ export function useRemarkForm(
     ],
   })
 
-  watchFormValues(form, formState => {
+  let writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
       content: toMarkdownString(formState.values),
     })
-  })
+  }, [])
+
+  watchFormValues(form, writeToDisk)
 
   return [markdownRemark, form]
 }
