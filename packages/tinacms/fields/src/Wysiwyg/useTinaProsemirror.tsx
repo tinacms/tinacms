@@ -115,7 +115,12 @@ export function useTinaProsemirror(
   )
 
   React.useEffect(() => {
-    if (editorView && !focussed) {
+    /**
+     * The editorView may exist, even if it's docView does not.
+     * Trying to updateState when the docView dne throws an error.
+     */
+    // @ts-ignore This exists. Types are lying.
+    if (editorView && editorView.docView && !focussed) {
       editorView.updateState(createState(input.value))
     }
   }, [input.value, editorView, focussed])
