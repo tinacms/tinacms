@@ -3,6 +3,56 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.3...@tinacms/react-tinacms@0.1.4-alpha.0) (2019-10-07)
+
+
+### Bug Fixes
+
+* use-form unsubscribes from value updates ([03f9513](https://github.com/tinacms/tinacms/commit/03f9513))
+
+
+
+
+
+## [0.1.3](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.3-alpha.0...@tinacms/react-tinacms@0.1.3) (2019-10-07)
+
+**Note:** Version bump only for package @tinacms/react-tinacms
+
+
+
+
+
+## [0.1.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.1...@tinacms/react-tinacms@0.1.3-alpha.0) (2019-10-07)
+
+
+### Bug Fixes
+
+* useForm updates a forms fields if changed ([7fe7471](https://github.com/tinacms/tinacms/commit/7fe7471))
+* useForm updates form label if changed ([a4dc0b3](https://github.com/tinacms/tinacms/commit/a4dc0b3)), closes [#244](https://github.com/tinacms/tinacms/issues/244)
+
+
+
+
+
+## [0.1.2](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.2-alpha.0...@tinacms/react-tinacms@0.1.2) (2019-10-04)
+
+**Note:** Version bump only for package @tinacms/react-tinacms
+
+
+
+
+
+## [0.1.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0...@tinacms/react-tinacms@0.1.1) (2019-10-03)
+
+
+### Bug Fixes
+
+* update form with undeclared fields ([972d315](https://github.com/tinacms/tinacms/commit/972d315))
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0-alpha.13...@tinacms/react-tinacms@0.1.0) (2019-10-02)
 
 **Note:** Version bump only for package @tinacms/react-tinacms

@@ -41,7 +41,7 @@ export class MenuView {
 export function menu(translator: Translator, bottom?: boolean) {
   return new Plugin({
     view(view: EditorView) {
-      let menuView = new MenuView(view, translator, bottom)
+      const menuView = new MenuView(view, translator, bottom)
       const richTextNode = view.dom.parentNode
       const parentElement = richTextNode!.parentElement
       parentElement!.insertBefore(menuView.dom, richTextNode)

@@ -1,14 +1,14 @@
 export function parseLinkDestination(md: any, state: any, pos: any): any {
-  let isSpace = md.utils.isSpace
-  let unescapeAll = md.utils.unescapeAll
-  let str = state.src
-  let max = state.posMax
+  const isSpace = md.utils.isSpace
+  const unescapeAll = md.utils.unescapeAll
+  const str = state.src
+  const max = state.posMax
 
   let code
   let level: number
-  let lines = 0
-  let start = pos
-  let result = {
+  const lines = 0
+  const start = pos
+  const result = {
     ok: false,
     pos: 0,
     lines: 0,

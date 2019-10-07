@@ -41,18 +41,18 @@ interface BlockFieldProps {
 
 const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
   const frame = useFrameContext()
-  let addItem = React.useCallback(
+  const addItem = React.useCallback(
     (name, template) => {
-      let obj = template.defaultItem || {}
+      const obj = template.defaultItem || {}
       obj._template = name
       form.mutators.insert(field.name, 0, obj)
     },
-    [form]
+    [field.name, form.mutators]
   )
 
-  let items = input.value || []
+  const items = input.value || []
 
-  let [visible, setVisible] = React.useState(false)
+  const [visible, setVisible] = React.useState(false)
   return (
     <>
       <GroupListHeader>
@@ -88,7 +88,7 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
               <div ref={provider.innerRef} className="edit-page--list-parent">
                 {items.length === 0 && <EmptyState />}
                 {items.map((block: any, index: any) => {
-                  let template = field.templates[block._template]
+                  const template = field.templates[block._template]
                   if (!template) {
                     // TODO: if no template return invalid entry
                   }
@@ -132,13 +132,13 @@ const BlockListItem = ({
   template,
   block,
 }: BlockListItemProps) => {
-  let [isExpanded, setExpanded] = React.useState<boolean>(false)
+  const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
-  let removeItem = React.useCallback(() => {
+  const removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
-  let label = block[template.key] || template.label
+  const label = block[template.key] || template.label
 
   return (
     <Draggable
@@ -251,13 +251,13 @@ const GroupLabel = styled.span`
   margin: 0;
   font-size: 0.85rem;
   font-weight: 500;
-  flex: 1 0 auto;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
   color: inherit;
   transition: all 85ms ease-out;
   text-align: left;
-  max-width: calc(100% - 2.25rem);
-  overflow: hidden;
-  text-overflow: ellipsis;
 `
 
 const GroupListHeader = styled.div`
@@ -463,12 +463,12 @@ const Panel = function Panel({
   label,
   template,
 }: PanelProps) {
-  let fields: any[] = React.useMemo(() => {
+  const fields: any[] = React.useMemo(() => {
     return template.fields.map((subField: any) => ({
       ...subField,
       name: `${field.name}.${index}.${subField.name}`,
     }))
-  }, [template])
+  }, [field.name, index, template.fields])
 
   return (
     <GroupPanel isExpanded={isExpanded}>

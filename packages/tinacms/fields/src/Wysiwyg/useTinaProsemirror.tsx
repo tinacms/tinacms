@@ -10,50 +10,67 @@ import { nodeViews } from './node-views'
 export interface Input {
   value: string
   onChange(value: string): void
+  onFocus(): void
+  onBlur(): void
 }
 
 export function useTinaProsemirror(
   input: Input,
   plugins: Plugin[] = [],
   frame?: any
-): React.RefObject<Node> {
+) {
   /**
    * Construct the Prosemirror Schema
    */
-  let [schema] = useProsemirrorSchema(plugins)
+  const [schema] = useProsemirrorSchema(plugins)
 
   /**
    * Create a MarkdownTranslattor based on the schema
    */
-  let [translator] = useMarkdownTranslator(schema)
+  const [translator] = useMarkdownTranslator(schema)
 
   /**
    * A reference to the DOM Node where the prosemirror editor will be added.
    */
-  const targetNode = React.useRef<Node>(null)
+  const [el, setEl] = React.useState<Node>()
+
+  const elRef = React.useCallback((nextEl: Node) => {
+    if (nextEl !== el) {
+      setEl(nextEl)
+    }
+  }, [])
+
+  /**
+   * CreateState
+   */
+  const createState = React.useCallback((value: string) => {
+    return createEditorState(schema, translator, plugins, value, frame)
+  }, [])
+
+  /**
+   * The Prosemirror EditorView instance
+   */
+  const [editorView, setEditorView] = React.useState<EditorView>()
+  const [focussed, setFocus] = React.useState(false)
 
   React.useEffect(
     function setupEditor() {
       /**
        * Exit early if the target Node has not yet been set.
        */
-      if (!targetNode.current) return
+      if (!el) {
+        return
+      }
 
       /**
        * Create a new Prosemirror EditorView on in the DOM
        */
-      let editorView = new EditorView(targetNode.current, {
+      const editorView = new EditorView(el, {
         nodeViews,
         /**
          * The initial state of the Wysiwyg
          */
-        state: createEditorState(
-          schema,
-          translator,
-          plugins,
-          input.value,
-          frame
-        ),
+        state: createState(input.value),
         /**
          * Call input.onChange with the translated content after updating
          * the Prosemiror state.
@@ -68,17 +85,45 @@ export function useTinaProsemirror(
             input.onChange(translator!.stringFromNode(tr.doc))
           }
         },
+        handleDOMEvents: {
+          focus: () => {
+            setFocus(true)
+            input.onFocus()
+            return true
+          },
+          blur: () => {
+            setFocus(false)
+            input.onBlur()
+            return true
+          },
+        },
       })
+
+      setEditorView(editorView)
       /**
        * Destroy the EditorView to prevent duplicates
        */
-      return () => editorView.destroy()
+      return () => {
+        setEditorView(undefined)
+        editorView.destroy()
+      }
     },
     /**
      * Rerender if the target Node has changed.
      */
-    [targetNode.current]
+    [el]
   )
 
-  return targetNode
+  React.useEffect(() => {
+    /**
+     * The editorView may exist, even if it's docView does not.
+     * Trying to updateState when the docView dne throws an error.
+     */
+    // @ts-ignore This exists. Types are lying.
+    if (editorView && editorView.docView && !focussed) {
+      editorView.updateState(createState(input.value))
+    }
+  }, [input.value, editorView, focussed])
+
+  return elRef
 }

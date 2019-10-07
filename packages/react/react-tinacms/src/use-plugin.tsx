@@ -8,9 +8,9 @@ import { useCMS } from './use-cms'
  * @param plugin Plugin
  */
 export function usePlugin(plugin: Plugin) {
-  let cms = useCMS()
+  const cms = useCMS()
   React.useEffect(() => {
     cms.plugins.add(plugin)
     return () => cms.plugins.remove(plugin)
-  }, [plugin])
+  }, [cms.plugins, plugin])
 }

@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.2.0-alpha.0...@tinacms/core@0.2.0) (2019-10-07)
+
+**Note:** Version bump only for package @tinacms/core
+
+
+
+
+
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.1...@tinacms/core@0.2.0-alpha.0) (2019-10-07)
+
+
+### Bug Fixes
+
+* initialValues defualts to empty object ([5088086](https://github.com/tinacms/tinacms/commit/5088086))
+
+
+### Features
+
+* form fields can be updated ([7f4818b](https://github.com/tinacms/tinacms/commit/7f4818b))
+
+
+
+
+
+## [0.1.2](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.2-alpha.0...@tinacms/core@0.1.2) (2019-10-04)
+
+**Note:** Version bump only for package @tinacms/core
+
+
+
+
+
+## [0.1.1](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.0...@tinacms/core@0.1.1) (2019-10-03)
+
+
+### Bug Fixes
+
+* reinitialize form after successful submission ([2bfba2b](https://github.com/tinacms/tinacms/commit/2bfba2b)), closes [#206](https://github.com/tinacms/tinacms/issues/206)
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.1.0-alpha.10...@tinacms/core@0.1.0) (2019-10-02)
 
 **Note:** Version bump only for package @tinacms/core

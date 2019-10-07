@@ -2,7 +2,7 @@ import { PMTestHarness } from '../../prosemirror-test-utils'
 import { defaultSchema } from '../default-schema'
 import { liftBlockquote } from './blockquote-commands'
 
-let {
+const {
   forDoc,
   doc,
   p,

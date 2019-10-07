@@ -143,8 +143,8 @@ export function Select(props: SelectProps) {
   /**
    * Convert any `string`items to valid `Option`s.
    */
-  let options = useMemo((): Option[] => {
-    let o: any[] = props.options || []
+  const options = useMemo((): Option[] => {
+    const o: any[] = props.options || []
 
     return o.map((o: any) => {
       if (['string', 'number'].indexOf(typeof o) >= 0) {
@@ -157,19 +157,19 @@ export function Select(props: SelectProps) {
   /**
    * Determine the selected `Option` based on `value` prop.
    */
-  let selectedOption = useMemo(() => {
+  const selectedOption = useMemo(() => {
     return options.find(option => option.value === props.value)
   }, [options, props.value])
 
   /**
    * Calls the `onChange` prop with `option.value`.
    */
-  let onChange = useCallback(
+  const onChange = useCallback(
     (option?: Option) => {
       if (!option) return props.onChange('')
       return (props.onChange as any)(option.value as any)
     },
-    [props.onChange]
+    [props]
   )
 
   /**
@@ -191,7 +191,7 @@ export function Select(props: SelectProps) {
         onChange(options[0])
       }
     },
-    [props.value, props.isLoading, props.isClearable]
+    [props.value, props.isLoading, props.isClearable, selectedOption, onChange, options]
   )
 
   return (
@@ -240,7 +240,7 @@ export function AsyncSelect<O = any>({
     if (dynamicOptions) {
       setLoadedOptionsChangedCount(loadedOptionsChangedCount + 1)
     }
-  }, [props.loadOptions, dynamicOptions])
+  }, [props.loadOptions, dynamicOptions, loadedOptionsChangedCount])
 
   return (
     <Async

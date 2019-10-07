@@ -6,7 +6,7 @@ import { ColorFormat } from '../src/ColorPicker/color-formatter'
 storiesOf('ColorPicker', module).add('Hex', () => <BasicExample />)
 
 function BasicExample() {
-  let [value, setValue] = React.useState()
+  const [value, setValue] = React.useState()
   return (
     <ColorPicker
       colorFormat={ColorFormat.Hex}

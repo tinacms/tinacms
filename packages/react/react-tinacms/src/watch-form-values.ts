@@ -23,5 +23,5 @@ export function watchFormValues(form: Form, cb: FormSubscriber<any>) {
       },
       { values: true }
     )
-  }, [form])
+  }, [cb, form])
 }
