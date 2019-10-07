@@ -12,7 +12,7 @@ interface FormsListProps {
 const FormsList = ({ forms, setActiveFormId, isEditing }: FormsListProps) => {
   return (
     <StyledFormList isEditing={isEditing}>
-      {forms.map(form => (
+      {forms.sort(byId).map(form => (
         <FormListItem key={form.id} onClick={() => setActiveFormId(form.id)}>
           <span>{form.label}</span>
           <RightArrowIcon />
@@ -20,6 +20,16 @@ const FormsList = ({ forms, setActiveFormId, isEditing }: FormsListProps) => {
       ))}
     </StyledFormList>
   )
+}
+
+const byId = (b: Form, a: Form) => {
+  if (a.id < b.id) {
+    return -1
+  }
+  if (a.id > b.id) {
+    return 1
+  }
+  return 0
 }
 
 export default FormsList
