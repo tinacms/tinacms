@@ -88,7 +88,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    ```
 1. **Publish to NPM:**
    ```
-   lerna publish from-git
+   lerna publish from-git --dist-tag next
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
