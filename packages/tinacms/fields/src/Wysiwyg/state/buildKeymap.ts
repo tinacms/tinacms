@@ -13,7 +13,7 @@ const mac =
   typeof navigator != 'undefined' ? /Mac/.test(navigator.platform) : false
 
 export function buildKeymap(schema: Schema, plugins: Plugin[]) {
-  let keys: any = {
+  const keys: any = {
     ...baseKeymap,
   }
 

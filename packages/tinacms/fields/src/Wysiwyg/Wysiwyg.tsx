@@ -12,7 +12,7 @@ interface Wysiwyg {
 
 export const Wysiwyg = styled(
   ({ input, plugins, frame, ...styleProps }: any) => {
-    let prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame)
+    const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame)
 
     return (
       <>
@@ -30,7 +30,7 @@ export const Wysiwyg = styled(
   .CodeMirror {
     width: 100%;
     height: auto;
-    border-radius: ${props => props.theme.radius.small}
+    border-radius: 0.3rem;
     margin-bottom: 1rem;
 
     .CodeMirror-sizer {

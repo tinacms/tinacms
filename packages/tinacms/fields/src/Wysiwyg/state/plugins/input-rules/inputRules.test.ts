@@ -106,10 +106,10 @@ describe('InputRules', () => {
 function validatorFor(regexp: RegExp, validity: boolean = true) {
   return (str: string, match?: string) =>
     it(str, () => {
-      let isMatch = regexp.test(str)
+      const isMatch = regexp.test(str)
       expect(isMatch).toBe(validity)
       if (match && isMatch) {
-        let result = regexp.exec(str)!
+        const result = regexp.exec(str)!
         expect(result[0]).toBe(match)
       }
     })

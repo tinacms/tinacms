@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/fields",
-  "version": "0.1.0",
+  "version": "0.1.4-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -21,7 +21,6 @@
     "directory": "packages/tinacms/fields"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "watch": "cms-scripts watch",
     "dev": "cms-scripts dev",
     "build": "cms-scripts build",
@@ -50,7 +49,7 @@
     "@types/styled-components": "4.1.8",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
-    "cms-scripts": "^0.1.0",
+    "cms-scripts": "^0.1.2",
     "jest": "^24.8.0",
     "react": "^16.8.6",
     "react-docgen-typescript-loader": "^3.1.0",
@@ -60,9 +59,9 @@
   },
   "dependencies": {
     "@sambego/storybook-styles": "^1.0.0",
-    "@tinacms/core": "^0.1.0",
-    "@tinacms/icons": "^0.1.0",
-    "@tinacms/styles": "^0.0.1",
+    "@tinacms/core": "^0.2.0",
+    "@tinacms/icons": "^0.3.0",
+    "@tinacms/styles": "^0.0.4",
     "@types/react-select": "^2.0.11",
     "codemirror": "^5.42.2",
     "color-string": "^1.5.3",
@@ -79,7 +78,7 @@
     "prosemirror-tables": "0.4.1",
     "prosemirror-view": "^1.11.3",
     "react-color": "^2.17.3",
-    "react-dismissible": "^1.0.5",
+    "react-dismissible": "^1.0.7",
     "react-dropzone": "10.1.8",
     "react-select": "^2.3.0",
     "styled-components": "^4.3.2"

@@ -6,12 +6,12 @@ import * as React from 'react'
 import { color } from '@tinacms/styles'
 
 // let lightGrey = 'rgb(243, 243, 243)'
-let lightMediumGrey = `rgb(200, 200, 200)`
+const lightMediumGrey = `rgb(200, 200, 200)`
 // let mediumGrey = `rgb(143, 143, 143);`
-let darkGrey = 'rgb(40, 40, 40)'
+const darkGrey = 'rgb(40, 40, 40)'
 
 const FramedWysiwyg = (props: any) => {
-  let frame = useFrameContext()
+  const frame = useFrameContext()
 
   return <Wysiwyg {...props} frame={frame} />
 }

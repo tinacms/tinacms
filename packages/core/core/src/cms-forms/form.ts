@@ -14,15 +14,19 @@ export class Form<S = any> {
   finalForm: FormApi<S>
   actions: any[]
   fieldSubscriptions: { [key: string]: FieldSubscription } = {}
+  hiddenFields: { [key: string]: FieldSubscription } = {}
+  initialValues: any
 
   constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
+    const initialValues = options.initialValues || ({} as S)
     this.id = id
     this.label = label
     this.fields = fields
     this.finalForm = createForm<S>({
       ...options,
+      initialValues,
       async onSubmit(values, form, cb) {
-        let response = await options.onSubmit(values, form, cb)
+        const response = await options.onSubmit(values, form, cb)
         form.initialize(values)
         return response
       },
@@ -31,25 +35,74 @@ export class Form<S = any> {
         ...options.mutators,
       },
     })
+
+    this.actions = actions || []
+    this.initialValues = initialValues
+    this.updateFields(this.fields)
+  }
+
+  updateFields(fields: Field[]) {
+    this.fields = fields
     /**
      * We register fields at creation time so we don't have to relay
      * on `react-final-form` components being rendered.
      */
     this.registerFields(this.fields)
-    this.actions = actions || []
+    this.discoverHiddenFields(this.initialValues)
+    this.removeDeclaredFieldsFromHiddenLookup()
+  }
+
+  private discoverHiddenFields(values: any, prefix?: string) {
+    Object.entries(values).map(([name, value]) => {
+      const path = prefix ? `${prefix}.${name}` : name
+
+      if (Array.isArray(value)) {
+        if (value.find(item => typeof item === 'object')) {
+          const prefix = `${path}.INDEX`
+          value.forEach(item => {
+            this.discoverHiddenFields(item, prefix)
+          })
+        } else {
+          this.hiddenFields[path] = {
+            path,
+            field: { name: path, component: null },
+            unsubscribe: this.finalForm.registerField(path, () => {}, {}),
+          }
+        }
+      } else if (typeof value === 'object' && value !== null) {
+        this.discoverHiddenFields(value, path)
+      } else {
+        // Base Case
+        this.hiddenFields[path] = {
+          path,
+          field: { name: path, component: null },
+          unsubscribe: this.finalForm.registerField(path, () => {}, {}),
+        }
+      }
+    })
+  }
+
+  private removeDeclaredFieldsFromHiddenLookup() {
+    Object.keys(this.fieldSubscriptions).forEach(path => {
+      const hiddenField = this.hiddenFields[path]
+      if (hiddenField) {
+        hiddenField.unsubscribe()
+        delete this.hiddenFields[path]
+      }
+    })
   }
 
   private registerFields(fields: Field[], pathPrefix?: string) {
     fields.forEach(field => {
-      let path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
+      const path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
 
-      let isGroup = ['group'].includes(field.component as string)
-      let isArray = ['group-list', 'blocks'].includes(field.component as string)
+      const isGroup = ['group'].includes(field.component as string)
+      const isArray = ['group-list', 'blocks'].includes(field.component as string)
       if (isArray) {
-        let subfields = field.fields || []
+        const subfields = field.fields || []
         this.registerFields(subfields, `${path}.INDEX`)
       } else if (isGroup) {
-        let subfields = field.fields || []
+        const subfields = field.fields || []
         this.registerFields(subfields, path)
       } else {
         this.fieldSubscriptions[path] = {

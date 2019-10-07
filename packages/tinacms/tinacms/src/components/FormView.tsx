@@ -10,56 +10,35 @@ import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
-import {
-  SIDEBAR_HEADER_HEIGHT,
-  FORM_HEADER_HEIGHT,
-  FORM_FOOTER_HEIGHT,
-  SIDEBAR_WIDTH,
-} from '../Globals'
+import { FORM_HEADER_HEIGHT } from '../Globals'
 import { ResetForm } from './ResetForm'
 
 export const FormsView = () => {
+  const [activeFormId, setActiveFormId] = useState<string>()
   const cms = useCMS()
-  const forms = cms.forms.all()
-  const [editingForm, setEditingForm] = useState<Form | null>(() => {
-    return cms.forms.all()[0] as Form | null
-  })
-  const [isEditing, setIsEditing] = useState(false)
-  const [isMultiform, setIsMultiform] = useState(false)
 
+  /**
+   * If there's only one form, make it the active form.
+   */
   useSubscribable(cms.forms, () => {
-    const forms = cms.forms.all()
-    if (forms.length == 1) {
-      setIsMultiform(false)
-      setEditingForm(forms[0])
-      return
-    }
-
-    //if multiforms, set default view to formslist
-    if (forms.length > 1) {
-      setIsMultiform(true)
-      //if they navigate to another page w/ no active form, reset
-      !editingForm && setEditingForm(null)
-    }
-
-    if (editingForm && forms.findIndex(f => f.id == editingForm.id) < 0) {
-      setEditingForm(null)
+    if (cms.forms.all().length === 1) {
+      setActiveFormId(cms.forms.all()[0].id)
     }
   })
 
-  //Toggles editing prop for component animations
-  React.useEffect(() => {
-    editingForm ? setIsEditing(true) : setIsEditing(false)
-  })
+  const forms = cms.forms.all()
+  const activeForm = activeFormId ? cms.forms.findForm(activeFormId) : null
 
-  let moveArrayItem = React.useCallback(
+  const isEditing = !!activeForm
+
+  const moveArrayItem = React.useCallback(
     (result: DropResult) => {
-      let form = editingForm!.finalForm
+      const form = activeForm!.finalForm
       if (!result.destination) return
-      let name = result.type
+      const name = result.type
       form.mutators.move(name, result.source.index, result.destination.index)
     },
-    [editingForm]
+    [activeForm]
   )
 
   /**
@@ -67,33 +46,33 @@ export const FormsView = () => {
    */
   if (!forms.length) return <NoFormsPlaceholder />
 
-  if (!editingForm)
+  if (!activeForm) {
     return (
       <FormsList
         isEditing={isEditing}
         forms={forms}
-        activeForm={editingForm}
-        setActiveForm={setEditingForm}
+        setActiveFormId={setActiveFormId}
       />
     )
+  }
 
   return (
-    <FormBuilder form={editingForm as any}>
+    <FormBuilder form={activeForm as any}>
       {({ handleSubmit, pristine, form }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
-            <FormAnimation isEditing={isEditing}>
+            <FormWrapper isEditing={isEditing}>
               <FormHeader
-                isMultiform={isMultiform}
-                form={editingForm as any}
-                setEditingForm={setEditingForm as any}
+                isMultiform={forms.length > 1}
+                activeForm={activeForm}
+                setActiveFormId={setActiveFormId}
               />
               <FormBody>
-                {editingForm &&
-                  (editingForm.fields.length ? (
+                {activeForm &&
+                  (activeForm.fields.length ? (
                     <FieldsBuilder
-                      form={editingForm}
-                      fields={editingForm.fields}
+                      form={activeForm}
+                      fields={activeForm.fields}
                     />
                   ) : (
                     <NoFieldsPlaceholder />
@@ -104,11 +83,11 @@ export const FormsView = () => {
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
-                {editingForm.actions.length > 0 && (
-                  <ActionsMenu actions={editingForm.actions} />
+                {activeForm.actions.length > 0 && (
+                  <ActionsMenu actions={activeForm.actions} />
                 )}
               </FormFooter>
-            </FormAnimation>
+            </FormWrapper>
           </DragDropContext>
         )
       }}
@@ -124,26 +103,34 @@ const Emoji = styled.span`
 
 const EmptyState = styled.div`
   position: relative;
-  padding: ${padding()}rem;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+  text-align: center;
+  padding: ${padding()}rem ${padding()}rem 4rem ${padding()}rem;
   width: 100%;
   height: 100%;
-  background: white;
+  overflow-y: auto;
   > *:first-child {
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
+  }
+  > ${Emoji} {
+    display: block;
   }
   h3 {
     font-size: 1.2rem;
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 ${padding('big')} 0;
+    margin: 0 0 ${padding()}rem 0;
   }
 `
 
@@ -151,12 +138,13 @@ const LinkButton = styled.a`
   text-align: center;
   border: 0;
   border-radius: ${p => p.theme.radius.big};
+  border: 1px solid #edecf3;
   box-shadow: ${p => p.theme.shadow.small};
   font-weight: 500;
   cursor: pointer;
   font-size: 0.75rem;
   transition: all ${p => p.theme.timing.short} ease-out;
-  background-color: ${color('light')};
+  background-color: white;
   color: ${color('dark')};
   padding: ${padding('small')}rem ${padding('big')}rem ${padding('small')}rem
     3.5rem;
@@ -182,11 +170,15 @@ const LinkButton = styled.a`
 
 const NoFormsPlaceholder = () => (
   <EmptyState>
-    <Emoji>🎉 👋</Emoji>
+    <Emoji>👋</Emoji>
     <h3>
       Welcome to <b>Tina</b>!
     </h3>
-    <p>Let's get a form set up so you can start editing.</p>
+    <p>
+      Let's get a form set up
+      <br />
+      so you can start editing.
+    </p>
     <p>
       <LinkButton
         href="https://github.com/tinacms/tinacms-site/blob/master/content/docs/gatsby/content-editing.md"
@@ -213,35 +205,50 @@ const NoFieldsPlaceholder = () => (
   </EmptyState>
 )
 
-const CreateButton = styled(Button)`
-  width: 100%;
-`
+interface FormHeaderProps {
+  activeForm: Form
+  setActiveFormId(id?: string): void
+  isMultiform: boolean
+}
 
 const FormHeader = styled(
-  ({ form, setEditingForm, isMultiform, ...styleProps }: any) => {
+  ({
+    activeForm,
+    setActiveFormId,
+    isMultiform,
+    ...styleProps
+  }: FormHeaderProps) => {
     return (
-      <div {...styleProps} onClick={() => isMultiform && setEditingForm(null)}>
+      <div {...styleProps} onClick={() => isMultiform && setActiveFormId()}>
         {isMultiform && <LeftArrowIcon />}
-        {form.label}
+        <span>{activeForm.label}</span>
       </div>
     )
   }
 )`
-  position: absolute;
-  top: 0;
+  position: relative;
+  width: 100%;
   height: ${FORM_HEADER_HEIGHT}rem;
-  width: ${SIDEBAR_WIDTH}px;
+  flex: 0 0 ${FORM_HEADER_HEIGHT}rem;
   cursor: ${p => p.isMultiform && 'pointer'};
   background-color: white;
   border-bottom: 1px solid #edecf3;
   display: flex;
+  flex-wrap: nowrap;
   align-items: center;
-  padding: 0 ${padding()}rem;
+  padding: 0 ${padding()}rem ${padding('small')}rem ${padding()}rem;
   color: inherit;
   font-size: 1.2rem;
   transition: color 250ms ease-out;
   user-select: none;
+  span {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
   svg {
+    flex: 0 0 auto;
     width: 1.5rem;
     fill: #e1ddec;
     height: auto;
@@ -258,30 +265,23 @@ const FormHeader = styled(
   }
 `
 
-export const FormBody = styled.div<{ isMultiform?: boolean }>`
-  position: absolute;
-  top: ${FORM_HEADER_HEIGHT}rem;
-  bottom: ${FORM_FOOTER_HEIGHT}rem;
+export const FormBody = styled.div`
+  position: relative;
+  flex: 1 1 auto;
   scrollbar-width: none;
-  width: ${SIDEBAR_WIDTH}px;
+  width: 100%;
   overflow: hidden;
   background-color: #f6f6f9;
-  ul,
-  li {
-    margin: 0;
-    padding: 0;
-    list-style: none;
-  }
 `
 
 const FormFooter = styled.div`
-  position: absolute;
-  bottom: 0;
+  position: relative;
+  flex: 0 0 auto;
   display: flex;
   justify-content: space-between;
   align-items: center;
-  width: ${SIDEBAR_WIDTH}px;
-  height: ${FORM_FOOTER_HEIGHT}rem;
+  width: 100%;
+  height: 4rem;
   background-color: white;
   border-top: 1px solid #edecf3;
   padding: 0 1rem;
@@ -296,10 +296,13 @@ const FormAnimationKeyframes = keyframes`
   }
 `
 
-const FormAnimation = styled.div<{ isEditing: Boolean }>`
+const FormWrapper = styled.div<{ isEditing: Boolean }>`
+  display: flex;
+  flex-direction: column;
+  flex-wrap: nowrap;
   overflow: hidden;
   height: 100%;
-  width: ${SIDEBAR_WIDTH}px;
+  width: 100%;
   position: relative;
   ${FormHeader}, ${FormBody}, ${FormFooter} {
     transform: translate3d(100%, 0, 0);

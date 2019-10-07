@@ -32,7 +32,7 @@ export interface Props {
 export class Dismissible extends React.Component<Props, {}> {
   area: any
   get documents() {
-    let targets = [document]
+    const targets = [document]
 
     if (this.props.document) {
       targets.push(this.props.document)
@@ -85,7 +85,7 @@ export class Dismissible extends React.Component<Props, {}> {
   }
 
   render() {
-    let { onDismiss, click, escape, ...props } = this.props
+    const { onDismiss, click, escape, ...props } = this.props
 
     return <div ref={ref => (this.area = ref)} {...props} />
   }

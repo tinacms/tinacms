@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-tinacms",
-  "version": "0.1.0",
+  "version": "0.1.4-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "MIT",
@@ -21,7 +21,6 @@
     "directory": "packages/react/react-tinacms"
   },
   "scripts": {
-    "prepublish": "npm run build",
     "test": "jest --passWithNoTests",
     "watch": "cms-scripts watch",
     "dev": "cms-scripts dev",
@@ -29,11 +28,13 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
-    "cms-scripts": "^0.1.0",
+    "cms-scripts": "^0.1.2",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.1.0"
+    "@tinacms/core": "^0.2.0",
+    "lodash.get": "^4.4.2",
+    "lodash.set": "^4.3.2"
   }
 }

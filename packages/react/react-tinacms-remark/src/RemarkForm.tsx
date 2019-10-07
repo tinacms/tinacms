@@ -9,7 +9,7 @@ interface RemarkFormProps extends Partial<FormOptions<any>> {
 }
 
 export function RemarkForm({ remark, render, ...options }: RemarkFormProps) {
-  let [markdownRemark, form] = useRemarkForm(remark, options)
+  const [markdownRemark, form] = useRemarkForm(remark, options)
 
   return render({ form, markdownRemark })
 }

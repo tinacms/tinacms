@@ -66,3 +66,57 @@ Linking prevents running `npm install` from directly inside a package from worki
 3. **When I run `npm run bs` it deletes the contents of a package?**
 
    This sucks. Try running `lerna clean` and then running `npm run bs` again.
+
+## Releasing
+
+### Prerelease
+
+1. **Build the source files:**
+
+   ```
+   npm run build
+   ```
+
+1. **Generate CHANGELOGs and git tags:**
+   ```
+   lerna version \
+     --conventional-commits \
+     --conventional-prerelease \
+     --no-push \
+     --allow-branch master \
+     -m "chore(publish): prerelease"
+   ```
+1. **Publish to NPM:**
+   ```
+   lerna publish from-git --dist-tag next
+   ```
+1. **Push CHANGELOGs and git tags to Github:**
+   ```
+   git push
+   ```
+
+### Graduating Prereleases
+
+1. **Build the source files:**
+
+   ```
+   npm run build
+   ```
+
+1. **Generate CHANGELOGs and git tags:**
+   ```
+   lerna version \
+     --conventional-commits \
+     --conventional-graduate \
+     --no-push \
+     --allow-branch master \
+     -m "chore(publish): graduation"
+   ```
+1. **Publish to NPM:**
+   ```
+   lerna publish from-git
+   ```
+1. **Push CHANGELOGs and git tags to Github:**
+   ```
+   git push
+   ```

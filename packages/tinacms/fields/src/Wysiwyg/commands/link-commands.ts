@@ -15,12 +15,12 @@ export function insertLinkToFile(
   url: string
 ) {
   url = url || ''
-  let filenamePath = url.split('/')
-  let filename =
+  const filenamePath = url.split('/')
+  const filename =
     decodeURI(filenamePath[filenamePath.length - 1]) || 'Download File'
-  let attrs = { title: filename, href: url, editing: '', creating: '' }
-  let schema = state.schema
-  let node = schema.text(attrs.title, [schema.marks.link.create(attrs)])
+  const attrs = { title: filename, href: url, editing: '', creating: '' }
+  const schema = state.schema
+  const node = schema.text(attrs.title, [schema.marks.link.create(attrs)])
   dispatch(state.tr.replaceSelectionWith(node, false))
   return true
 }
@@ -45,7 +45,7 @@ export function startEditingLink(state: EditorState, dispatch: Function) {
   const tr = state.tr
 
   if (!$cursor) return false
-  let node = state.doc.nodeAt($cursor.pos)
+  const node = state.doc.nodeAt($cursor.pos)
   if (!node || !linkMarkType.isInSet(node.marks)) return false
 
   if (dispatch) {
@@ -91,7 +91,7 @@ function markExtend($cursor: ResolvedPos, markType: MarkType) {
   let endPos = startPos
 
   for (let i = 0; i < endIndex; i++) {
-    let size = $cursor.parent.child(i).nodeSize
+    const size = $cursor.parent.child(i).nodeSize
     if (i < startIndex) startPos += size
     endPos += size
   }
@@ -107,11 +107,11 @@ function markExtend($cursor: ResolvedPos, markType: MarkType) {
  * @returns {boolean}
  */
 export function stopEditingLink(state: EditorState, dispatch: Function) {
-  let changes: { from: number; to: number; mark: Mark }[] = []
+  const changes: { from: number; to: number; mark: Mark }[] = []
 
   const linkMarkType = state.schema.marks['link']
   state.doc.descendants((node, i) => {
-    let linkMark = linkMarkType.isInSet(node.marks)
+    const linkMark = linkMarkType.isInSet(node.marks)
 
     if (linkMark && linkMark.attrs.editing == 'editing') {
       const attrs = {
