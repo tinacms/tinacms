@@ -120,5 +120,14 @@ export function router(config: GitRouterConfig = {}) {
       })
   })
 
+  router.get('/show/:fileRelativePath', (req, res) => {
+    res.status(501)
+    res.json({
+      status: 'failure',
+      message: 'NOT IMPLMENTED',
+      fileRelativePath: req.body.fileRelativePath,
+    })
+  })
+
   return router
 }
