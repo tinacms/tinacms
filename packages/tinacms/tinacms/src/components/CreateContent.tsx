@@ -1,7 +1,6 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useCMS } from '@tinacms/react-tinacms'
-import { SaveButton } from './FormView'
 import {
   Modal,
   ModalHeader,
@@ -9,12 +8,12 @@ import {
   ModalActions,
 } from './modals/ModalProvider'
 import { ModalPopup } from './modals/ModalPopup'
-import { Button } from './Button'
+import { IconButton, Button } from '@tinacms/fields'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/core'
 import { CloseIcon, AddIcon } from '@tinacms/icons'
-import { padding, color } from '@tinacms/styles'
+import { padding, color, radius, font } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
 import { useTina } from '../hooks/use-tina'
@@ -27,9 +26,9 @@ export const CreateContentMenu = () => {
   if (cms.plugins.all('content-button').length) {
     return (
       <ContentMenuWrapper>
-        <PlusButton onClick={() => setVisible(true)} open={visible}>
+        <IconButton onClick={() => setVisible(true)} open={visible} primary>
           <AddIcon />
-        </PlusButton>
+        </IconButton>
         <ContentMenu open={visible}>
           <Dismissible
             click
@@ -106,8 +105,10 @@ const FormModal = ({ plugin, close }: any) => {
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
               <ModalActions>
-                <CancelButton onClick={close}>Cancel</CancelButton>
-                <SaveButton onClick={handleSubmit as any}>Create</SaveButton>
+                <Button onClick={close}>Cancel</Button>
+                <Button onClick={handleSubmit as any} margin primary>
+                  Create
+                </Button>
               </ModalActions>
             </ModalPopup>
           )
@@ -121,45 +122,10 @@ const ContentMenuWrapper = styled.div`
   position: relative;
 `
 
-const PlusButton = styled(Button)<{ open: boolean }>`
-  border-radius: 10rem;
-  padding: 0;
-  width: 2.125rem;
-  height: 2.125rem;
-  margin: 0;
-  position: relative;
-  fill: white;
-  border: 1px solid #0084ff;
-  transform-origin: 50% 50%;
-  transition: all 150ms ease-out;
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    width: 1.625rem;
-    height: 1.625rem;
-  }
-  &:focus {
-    outline: none;
-  }
-  ${props =>
-    props.open &&
-    css`
-      transform: rotate(45deg);
-      background-color: white;
-      border-color: #edecf3;
-      fill: ${color('primary')};
-      &:hover {
-        background-color: #f6f6f9;
-      }
-    `};
-`
-
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 1.5rem;
-  border: 1px solid #edecf3;
+  border-radius: ${radius()};
+  border: 1px solid ${color.grey(2)};
   display: block;
   position: absolute;
   top: 0;
@@ -186,7 +152,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
 const CloseButton = styled.div`
   display: flex;
   align-items: center;
-  fill: #e1ddec;
+  fill: ${color.grey(3)};
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
@@ -194,14 +160,14 @@ const CloseButton = styled.div`
     height: auto;
   }
   &:hover {
-    fill: ${color('dark')};
+    fill: ${color.grey(8)};
   }
 `
 
 const CreateButton = styled.button`
   position: relative;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: ${font.size(0)};
   padding: 0.75rem 1.25rem;
   font-weight: 500;
   width: 100%;
@@ -211,20 +177,10 @@ const CreateButton = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color('primary')};
+    color: ${color.primary()};
     background-color: #f6f6f9;
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
-  }
-`
-
-const CancelButton = styled(SaveButton)`
-  background-color: white;
-  border: 1px solid #edecf3;
-  color: #0084ff;
-  &:hover {
-    background-color: #f6f6f9;
-    opacity: 1;
   }
 `

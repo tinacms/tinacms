@@ -17,7 +17,8 @@ export interface Input {
 export function useTinaProsemirror(
   input: Input,
   plugins: Plugin[] = [],
-  frame?: any
+  frame?: any,
+  theme?: any
 ) {
   /**
    * Construct the Prosemirror Schema
@@ -44,7 +45,7 @@ export function useTinaProsemirror(
    * CreateState
    */
   const createState = React.useCallback((value: string) => {
-    return createEditorState(schema, translator, plugins, value, frame)
+    return createEditorState(schema, translator, plugins, value, frame, theme)
   }, [])
 
   /**
