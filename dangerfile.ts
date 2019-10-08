@@ -117,6 +117,17 @@ function getModifiedPackages(allFiles: string[]) {
     allFiles
       .filter(filepath => filepath.startsWith('packages/'))
       .filter(filepath => !filepath.startsWith('packages/demo'))
+      /**
+       * These are all the old directory groups.
+       * For some reason they still exist in Github, even
+       * though they can't be found. This is causing the danger
+       * build to fail. Technology, amirite?
+       */
+      .filter(filepath => !filepath.startsWith('packages/api/'))
+      .filter(filepath => !filepath.startsWith('packages/next/'))
+      .filter(filepath => !filepath.startsWith('packages/react/'))
+      .filter(filepath => !filepath.startsWith('packages/gatsby/'))
+      .filter(filepath => !filepath.startsWith('packages/core/'))
       .map(filepath => {
         if (filepath.startsWith('packages/@tinacms')) {
           return filepath
