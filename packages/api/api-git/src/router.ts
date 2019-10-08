@@ -15,10 +15,8 @@ export interface GitRouterConfig {
 }
 export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
-  const CONTENT_ABSOLUTE_PATH = path.join(
-    REPO_ABSOLUTE_PATH,
-    config.pathToContent || ''
-  )
+  const CONTENT_REL_PATH = config.pathToContent || ''
+  const CONTENT_ABSOLUTE_PATH = path.join(REPO_ABSOLUTE_PATH, CONTENT_REL_PATH)
   const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
   const DEFAULT_COMMIT_MESSAGE =
     config.defaultCommitMessage || 'Update from Tina'
@@ -127,12 +125,27 @@ export function router(config: GitRouterConfig = {}) {
   })
 
   router.get('/show/:fileRelativePath', (req, res) => {
-    res.status(501)
-    res.json({
-      status: 'failure',
-      message: 'NOT IMPLMENTED',
-      fileRelativePath: req.params.fileRelativePath,
-    })
+    let repo = openRepo(REPO_ABSOLUTE_PATH)
+
+    repo
+      .show([
+        `HEAD:${path.join(CONTENT_REL_PATH, req.params.fileRelativePath)}`,
+      ])
+      .then((data: any) => {
+        res.json({
+          fileRelativePath: req.params.fileRelativePath,
+          content: data,
+          status: 'success',
+        })
+      })
+      .catch((e: any) => {
+        res.status(501)
+        res.json({
+          status: 'failure',
+          message: e.message,
+          fileRelativePath: req.params.fileRelativePath,
+        })
+      })
   })
 
   return router
