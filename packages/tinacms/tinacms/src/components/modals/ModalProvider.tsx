@@ -106,8 +106,8 @@ export const ModalHeader = styled.div`
   margin: 0;
 `
 
-export const ModalBody = styled.div`
-  padding: 0;
+export const ModalBody = styled.div<{ padded?: boolean }>`
+  padding: ${p => (p.padded ? padding() : '0')}rem;
   margin: 0;
 `
 
