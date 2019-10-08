@@ -26,7 +26,6 @@ import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useTina } from '../../hooks/use-tina'
-import style from 'react-syntax-highlighter/dist/styles/hljs/mono-blue'
 
 export const Sidebar = () => {
   const cms = useTina()

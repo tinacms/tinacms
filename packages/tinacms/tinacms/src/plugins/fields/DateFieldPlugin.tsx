@@ -7,7 +7,7 @@ import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
 import { useFrameContext } from '../../components/SyledFrame'
 import styled from 'styled-components'
-import { TextFieldCss } from '@tinacms/fields'
+import { InputCss } from '@tinacms/fields'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
@@ -49,7 +49,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
 
 const DatetimeContainer = styled.div`
   input {
-    ${TextFieldCss}
+    ${InputCss};
   }
 `
 
