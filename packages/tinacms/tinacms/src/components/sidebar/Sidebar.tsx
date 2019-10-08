@@ -14,7 +14,7 @@ import {
   AddIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import { GlobalStyles, padding, color } from '@tinacms/styles'
+import { GlobalStyles, padding, color, radius, font } from '@tinacms/styles'
 import {
   SIDEBAR_WIDTH,
   TOGGLE_WIDTH,
@@ -155,30 +155,29 @@ const MenuList = styled.div`
 
 const MenuLink = styled.div<{ value: string }>`
   color: ${color.grey(1)};
-  font-size: 1.125rem;
+  font-size: ${font.size(4)};
   font-weight: 500;
-  padding: ${padding('small')} ${padding()} ${padding('small')} 4rem;
+  padding: ${padding()} ${padding()} ${padding()} 4rem;
   position: relative;
   cursor: pointer;
   transition: all ${p => p.theme.timing.short} ease-out;
   overflow: hidden;
-  margin-bottom: ${padding('small')};
   &:after {
     content: '';
     position: absolute;
-    top: 0;
-    bottom: 0;
+    top: 0.5rem;
+    bottom: 0.5rem;
     left: 0.5rem;
     right: 0.5rem;
-    border-radius: 1.5rem;
-    background-color: #363145;
+    border-radius: ${radius()};
+    background-color: ${color.grey(9)};
     z-index: -1;
     transition: all 150ms ease;
     transform: translate3d(0, 100%, 0);
     opacity: 0;
   }
   &:hover {
-    color: #2296fe;
+    color: ${color.primary('light')};
     &:after {
       transform: translate3d(0, 0, 0);
       transition: transform ${p => p.theme.timing.short} ease-out, opacity 0ms;
@@ -200,7 +199,7 @@ const MenuLink = styled.div<{ value: string }>`
     transform: translate3d(0, -50%, 0);
     width: 2.25rem;
     height: auto;
-    fill: #b2adbe;
+    fill: ${color.grey(4)};
     transition: all ${p => p.theme.timing.short} ease-out;
   }
 `
@@ -344,7 +343,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   justify-content: center;
   fill: white;
   text-align: center;
-  background-color: #0084ff;
+  background-color: ${color.primary()};
   background-repeat: no-repeat;
   background-position: center;
   transition: all 150ms ease-out;
@@ -352,11 +351,11 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   transform: translate3d(${p => (p.open ? 0 : '-0.125rem')}, 0, 0);
   animation: ${SidebarToggleAnimation} 150ms 300ms ease-out 1 both;
   &:hover {
-    background-color: #2296fe;
+    background-color: ${color.primary('light')};
     transform: translate3d(${p => (p.open ? '-0.125rem' : 0)}, 0, 0);
   }
   &:active {
-    background-color: #0574e4;
+    background-color: ${color.primary('dark')};
   }
 `
 

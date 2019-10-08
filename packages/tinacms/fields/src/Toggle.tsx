@@ -1,6 +1,7 @@
 import { FC } from 'react'
 import styled from 'styled-components'
 import * as React from 'react'
+import { color } from '@tinacms/styles'
 
 export interface ToggleProps {
   name: string
@@ -61,7 +62,7 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
     top: 50%;
     width: calc(1.75rem - 6px);
     height: calc(1.75rem - 6px);
-    background: ${p => (p.checked ? '#0084FF' : '#E1DDEC')};
+    background: ${p => (p.checked ? color.primary() : '#E1DDEC')};
     transform: translate3d(${p => (p.checked ? '1.25rem' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
   }
