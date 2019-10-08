@@ -3,7 +3,7 @@
   "version": "0.2.4-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "files": [
     "build"
   ],
