@@ -102,5 +102,10 @@ export function router(config: GitRouterConfig = {}) {
       })
   })
 
+  router.post('/reset', (req, res) => {
+    res.status(501)
+    res.json({ status: 'failure', error: 'Not implemented' })
+  })
+
   return router
 }
