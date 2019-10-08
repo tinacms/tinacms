@@ -21,6 +21,12 @@ export function useJsonForm(
   const cms = useCMS()
   const label = jsonNode.fileRelativePath
   const id = jsonNode.fileRelativePath
+
+  /**
+   * The state of the JsonForm, generated from the contents of the
+   * Json file currently on disk. This state will contain any
+   * un-committed changes in the Json file.
+   */
   const valuesOnDisk = useMemo(
     () => ({
       jsonNode: jsonNode,
@@ -29,13 +35,18 @@ export function useJsonForm(
     [jsonNode]
   )
 
+  /**
+   * The state of the JsonForm, generated from the contents of the
+   * Json file at the HEAD of this git branch.
+   */
   const [valuesInGit, setValuesInGit] = useState()
   useEffect(() => {
     cms.api.git
-      .show(id)
+      .show(id) // Load the contents of this file at HEAD
       .then((git: any) => {
+        // Parse the JSON into a JsonForm data structure and store it in state.
         let rawJson = JSON.parse(git.content)
-        setValuesInGit({ ...valuesOnDisk, rawJson })
+        setValuesInGit({ jsonNode: valuesOnDisk.jsonNode, rawJson })
       })
       .catch((e: any) => {
         console.log('FAILED', e)
@@ -44,6 +55,7 @@ export function useJsonForm(
 
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
 
+  // TODO: This may not be necessary.
   fields.push({ name: 'jsonNode', component: null })
 
   const [values, form] = useCMSForm({
