@@ -1,5 +1,5 @@
 import * as React from 'react'
-import { color } from '@tinacms/styles'
+import { color, padding, font } from '@tinacms/styles'
 import styled, { css } from 'styled-components'
 
 type a = React.DetailedHTMLProps<
@@ -15,24 +15,24 @@ export const TextArea = styled.textarea<{ error?: boolean }>`
   position: relative;
   background-color: white;
   border-radius: 0.3rem;
-  font-size: ${p => p.theme.input.fontSize};
-  line-height: ${p => p.theme.input.lineHeight};
+  font-size: ${font.size(2)};
+  line-height: 1.32;
   transition: all 85ms ease-out;
-  padding: ${p => p.theme.input.padding};
+  padding: ${padding('small')};
   border: 1px solid #edecf3;
   width: 100%;
   margin: 0;
   outline: none;
   resize: vertical;
   height: 10rem;
-  box-shadow: 0 0 0 2px ${p => (p.error ? color('error') : 'transparent')};
+  box-shadow: 0 0 0 2px ${p => (p.error ? color.error() : 'transparent')};
 
   &:hover {
     box-shadow: 0 0 0 2px #e1ddec;
   }
 
   &:focus {
-    box-shadow: 0 0 0 2px ${p => (p.error ? color('error') : color('primary'))};
+    box-shadow: 0 0 0 2px ${p => (p.error ? color.error() : color.primary())};
   }
 
   &::placeholder {

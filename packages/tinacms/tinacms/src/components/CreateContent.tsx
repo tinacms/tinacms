@@ -149,7 +149,7 @@ const PlusButton = styled(Button)<{ open: boolean }>`
       transform: rotate(45deg);
       background-color: white;
       border-color: #edecf3;
-      fill: ${color('primary')};
+      fill: ${color.primary()};
       &:hover {
         background-color: #f6f6f9;
       }
@@ -194,7 +194,7 @@ const CloseButton = styled.div`
     height: auto;
   }
   &:hover {
-    fill: ${color('dark')};
+    fill: ${color.grey(8)};
   }
 `
 
@@ -211,7 +211,7 @@ const CreateButton = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color('primary')};
+    color: ${color.primary()};
     background-color: #f6f6f9;
   }
   &:not(:last-child) {

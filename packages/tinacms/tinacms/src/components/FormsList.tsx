@@ -38,7 +38,7 @@ const FormListItem = styled.li`
   position: relative;
   font-size: 1.3rem;
   position: relative;
-  padding: ${padding()}rem;
+  padding: ${padding()};
   color: #433e52;
   font-weight: normal;
   transition: color 150ms ease-out;
@@ -62,20 +62,20 @@ const FormListItem = styled.li`
     height: 1px;
     position: absolute;
     bottom: 0;
-    left: ${padding()}rem;
+    left: ${padding()};
     transform-origin: 0 0;
     transform: scale3d(0.15, 1, 1) translate3d(0, 0, 0);
     transition: all 250ms ease-out;
   }
   &:hover {
-    color: ${color('primary')};
+    color: ${color.primary()};
     svg {
       transform: translate3d(3px, 0, 0);
       transition: transform 250ms ease;
       fill: #433e52;
     }
     &:after {
-      transform: scale3d(1, 1, 1) translate3d(-${padding()}rem, 0, 0);
+      transform: scale3d(1, 1, 1) translate3d(-${padding()}, 0, 0);
     }
   }
 `
@@ -109,7 +109,7 @@ function staggerSlideIn() {
 }
 
 const StyledFormList = styled.ul<{ isEditing: Boolean }>`
-  padding: ${padding()}rem;
+  padding: ${padding()};
   cursor: pointer;
   list-style: none;
   margin: 0;

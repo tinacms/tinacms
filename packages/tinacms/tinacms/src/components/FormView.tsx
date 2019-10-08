@@ -112,12 +112,12 @@ const EmptyState = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: ${padding()}rem ${padding()}rem 4rem ${padding()}rem;
+  padding: ${padding()} ${padding()} 4rem ${padding()};
   width: 100%;
   height: 100%;
   overflow-y: auto;
   > *:first-child {
-    margin: 0 0 ${padding()}rem 0;
+    margin: 0 0 ${padding()} 0;
   }
   > ${Emoji} {
     display: block;
@@ -127,14 +127,14 @@ const EmptyState = styled.div`
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 ${padding()}rem 0;
+    margin: 0 0 ${padding()} 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 ${padding()}rem 0;
+    margin: 0 0 ${padding()} 0;
   }
 `
 
@@ -149,23 +149,22 @@ const LinkButton = styled.a`
   font-size: 0.75rem;
   transition: all ${p => p.theme.timing.short} ease-out;
   background-color: white;
-  color: ${color('dark')};
-  padding: ${padding('small')}rem ${padding('big')}rem ${padding('small')}rem
-    3.5rem;
+  color: ${color.grey(8)};
+  padding: ${padding('small')} ${padding('big')} ${padding('small')} 3.5rem;
   position: relative;
   text-decoration: none;
   display: inline-block;
   ${Emoji} {
     font-size: 1.5rem;
     position: absolute;
-    left: ${padding('big')}rem;
+    left: ${padding('big')};
     top: 50%;
     transform-origin: 50% 50%;
     transform: translate3d(0, -50%, 0);
     transition: all ${p => p.theme.timing.short} ease-out;
   }
   &:hover {
-    color: ${color('primary')};
+    color: ${color.primary()};
     ${Emoji} {
       transform: translate3d(0, -50%, 0);
     }
@@ -240,7 +239,7 @@ const FormHeader = styled(
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 0 ${padding()}rem ${padding('small')}rem ${padding()}rem;
+  padding: 0 ${padding()} ${padding('small')} ${padding()};
   color: inherit;
   font-size: 1.2rem;
   transition: color 250ms ease-out;

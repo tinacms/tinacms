@@ -66,8 +66,8 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  bottom: ${padding()}rem;
-  right: ${padding()}rem;
+  bottom: ${padding()};
+  right: ${padding()};
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;

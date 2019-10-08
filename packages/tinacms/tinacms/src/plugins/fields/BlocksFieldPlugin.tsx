@@ -229,7 +229,7 @@ const BlockOption = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color('primary')};
+    color: ${color.primary()};
     background-color: #f6f6f9;
   }
   &:not(:last-child) {
@@ -307,7 +307,7 @@ const GroupHeaderButton = styled(Button)<{ open: boolean }>`
     css`
       transform: rotate(45deg);
       background-color: white;
-      fill: ${color('primary')};
+      fill: ${color.primary()};
       &:hover {
         background-color: #f6f6f9;
       }
