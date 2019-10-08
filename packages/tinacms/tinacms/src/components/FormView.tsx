@@ -4,7 +4,7 @@ import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
 import styled, { keyframes, css } from 'styled-components'
-import { padding, color } from '@tinacms/styles'
+import { padding, color, font } from '@tinacms/styles'
 import { Button } from '@tinacms/fields'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
@@ -129,7 +129,7 @@ const EmptyState = styled.div`
     display: block;
   }
   h3 {
-    font-size: 1.2rem;
+    font-size: ${font.size(5)};
     font-weight: normal;
     color: inherit;
     display: block;
@@ -148,11 +148,11 @@ const LinkButton = styled.a`
   text-align: center;
   border: 0;
   border-radius: ${p => p.theme.radius.big};
-  border: 1px solid #edecf3;
+  border: 1px solid ${color.grey(2)};
   box-shadow: ${p => p.theme.shadow.small};
   font-weight: 500;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: ${font.size(0)};
   transition: all ${p => p.theme.timing.short} ease-out;
   background-color: white;
   color: ${color.grey(8)};
@@ -241,13 +241,13 @@ const FormHeader = styled(
   flex: 0 0 ${FORM_HEADER_HEIGHT}rem;
   cursor: ${p => p.isMultiform && 'pointer'};
   background-color: white;
-  border-bottom: 1px solid #edecf3;
+  border-bottom: 1px solid ${color.grey(2)};
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
   padding: 0 ${padding()} ${padding('small')} ${padding()};
   color: inherit;
-  font-size: 1.2rem;
+  font-size: ${font.size(5)};
   transition: color 250ms ease-out;
   user-select: none;
   span {
@@ -259,7 +259,7 @@ const FormHeader = styled(
   svg {
     flex: 0 0 auto;
     width: 1.5rem;
-    fill: #e1ddec;
+    fill: ${color.grey(3)};
     height: auto;
     transform: translate3d(-4px, 0, 0);
     transition: transform 150ms ease-out;
@@ -267,7 +267,7 @@ const FormHeader = styled(
   :hover {
     color: ${p => p.isMultiform && `${p.theme.color.primary}`};
     svg {
-      fill: #433e52;
+      fill: ${color.grey(8)};
       transform: translate3d(-7px, 0, 0);
       transition: transform 250ms ease;
     }
@@ -292,7 +292,7 @@ const FormFooter = styled.div`
   width: 100%;
   height: 4rem;
   background-color: white;
-  border-top: 1px solid #edecf3;
+  border-top: 1px solid ${color.grey(2)};
   padding: 0 1rem;
 `
 

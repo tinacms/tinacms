@@ -4,7 +4,7 @@ import { createPortal } from 'react-dom'
 import { StyledFrame } from '../SyledFrame'
 import styled from 'styled-components'
 import { Z_INDEX } from '../../Globals'
-import { GlobalStyles, padding } from '@tinacms/styles'
+import { GlobalStyles, padding, font, color } from '@tinacms/styles'
 import { Button } from '@tinacms/fields'
 
 interface Props {
@@ -98,11 +98,11 @@ export const ModalHeader = styled.div`
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: 1.2rem;
+  font-size: ${font.size(5)};
   font-weight: 500;
   line-height: normal;
   padding: 0 ${padding()} 0 ${padding()};
-  border-bottom: 1px solid #e1ddec;
+  border-bottom: 1px solid ${color.grey(3)};
   margin: 0;
 `
 

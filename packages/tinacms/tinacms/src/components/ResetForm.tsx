@@ -69,7 +69,7 @@ const ResetButton = styled(Button)`
 const CloseButton = styled.div`
   display: flex;
   align-items: center;
-  fill: #e1ddec;
+  fill: ${color.grey(3)};
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {

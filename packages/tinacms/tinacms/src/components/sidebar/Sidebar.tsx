@@ -114,7 +114,7 @@ const Watermark = styled(({ ...styleProps }: any) => {
     width: 8rem;
     height: 8rem;
     margin: -0.25rem -1.25rem;
-    fill: #363145;
+    fill: ${color.grey(9)};
   }
 `
 
@@ -230,7 +230,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
   svg {
     position: relative;
     transition: fill 85ms ease-out;
-    fill: #716c7f;
+    fill: ${color.grey(6)};
     margin-left: -4px;
     width: 2rem;
     height: auto;
@@ -243,7 +243,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
   }
   &:hover {
     svg {
-      fill: #565165;
+      fill: ${color.grey(7)};
     }
   }
   ${props =>
@@ -252,7 +252,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
       svg {
         fill: #f6f6f9;
         &:hover {
-          fill: #edecf3;
+          fill: ${color.grey(2)};
         }
         path:first-child {
           /* Top bar */
