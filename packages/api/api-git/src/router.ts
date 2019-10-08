@@ -113,7 +113,6 @@ export function router(config: GitRouterConfig = {}) {
       .checkout(files[0])
       .then(() => {
         res.json({ status: 'success' })
-        console.log(res)
       })
       .catch((e: any) => {
         res.status(412)
