@@ -3,7 +3,7 @@
   "version": "1.0.7",
   "main": "build/index.js",
   "types": "build/index.d.ts",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "keywords": [
     "react"
   ],
