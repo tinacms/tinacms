@@ -9,7 +9,7 @@ import {
   ModalActions,
 } from './modals/ModalProvider'
 import { ModalPopup } from './modals/ModalPopup'
-import { Button } from './Button'
+import { Button } from '@tinacms/fields'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/core'

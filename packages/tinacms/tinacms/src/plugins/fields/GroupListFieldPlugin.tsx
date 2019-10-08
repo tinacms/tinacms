@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding, color } from '@tinacms/styles'
 import { Droppable, DropResult, Draggable } from 'react-beautiful-dnd'
-import { Button } from '../../components/Button'
+import { Button } from '@tinacms/fields'
 import {
   AddIcon,
   DragIcon,

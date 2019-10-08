@@ -21,7 +21,7 @@ import {
   Z_INDEX,
   SIDEBAR_HEADER_HEIGHT,
 } from '../../Globals'
-import { Button } from '../Button'
+import { Button } from '@tinacms/fields'
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'

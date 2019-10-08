@@ -3,7 +3,7 @@ import { Field, Form } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { Button } from '../../components/Button'
+import { Button } from '@tinacms/fields'
 import {
   AddIcon,
   DragIcon,
