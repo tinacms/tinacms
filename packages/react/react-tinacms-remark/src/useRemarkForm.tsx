@@ -27,6 +27,11 @@ export function useRemarkForm(
   const label = formOverrrides.label || markdownRemark.frontmatter.title
   const id = markdownRemark.fileRelativePath
 
+  /**
+   * The state of the RemarkForm, generated from the contents of the
+   * Markdown file currently on disk. This state will contain any
+   * un-committed changes in the Markdown file.
+   */
   const valuesOnDisk = useMemo(
     () => ({
       ...markdownRemark,
@@ -35,11 +40,16 @@ export function useRemarkForm(
     [markdownRemark.rawFrontmatter, markdownRemark.rawMarkdownBody]
   )
 
+  /**
+   * The state of the RemarkForm, generated from the contents of the
+   * Markdown file at the HEAD of this git branch.
+   */
   const [valuesInGit, setValuesInGit] = React.useState()
   React.useEffect(() => {
     cms.api.git
-      .show(id)
+      .show(id) // Load the contents of this file at HEAD
       .then((git: any) => {
+        // Parse the content into the RemarkForm data structure and store it in state.
         let { content: rawMarkdownBody, data: rawFrontmatter } = matter(
           git.content
         )
@@ -50,9 +60,16 @@ export function useRemarkForm(
       })
   }, [id])
 
+  /**
+   * The list of Field definitions used to generate the form.
+   */
   const fields = React.useMemo(() => {
     let fields = formOverrrides.fields || generateFields(valuesOnDisk)
     fields = fields.map(field => {
+      /**
+       * Treat the field.name prefix `frontmatter` as an alias to
+       * `rawFrontmatter`. This is to make defining fields more intuitive.
+       */
       if (
         field.name === 'frontmatter' ||
         field.name.startsWith('frontmatter.')
