@@ -24,7 +24,7 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
 } from '@tinacms/icons'
-import { radius, color } from '@tinacms/styles'
+import { radius, color, padding } from '@tinacms/styles'
 
 // import { ImageControl } from './images'
 
@@ -185,8 +185,8 @@ export const MenuButton = styled.button<{
   flex: 1 0 auto;
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p => (p.active ? '#0084ff' : 'color.grey(8)')};
-  fill: ${p => (p.active ? '#0084ff' : 'color.grey(8)')};
+  color: ${p => (p.active ? '#0084ff' : color.grey(8))};
+  fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
   border: none;
   outline: none;
   padding: 0.375rem;
@@ -268,18 +268,18 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
   transition: all 85ms ease-out;
   cursor: pointer;
   &:first-child {
-    padding-top: 0.75rem;
+    padding-top: ${padding('small')};
   }
   &:last-child {
-    padding-bottom: 0.75rem;
+    padding-bottom: ${padding('small')};
   }
   &:hover {
-    background-color: #f6f6f9;
-    color: #0084ff;
+    background-color: ${color.grey(1)};
+    color: ${color.primary()};
   }
   &:active {
-    color: #0084ff;
-    fill: #0084ff;
+    color: ${color.primary()};
+    fill: ${color.primary()};
     background-color: rgba(53, 50, 50, 0.05);
   }
 `

@@ -186,12 +186,12 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: inherit;
   }
   hr {
-    border-color: #F6F6F9;
-    color: #F6F6F9;
+    border-color: #EDECF3;
+    color: #EDECF3;
     margin-bottom: 1.5rem;
     margin-left: -1.25rem;
     margin-right: -1.25rem;
-    border-top: 1px solid #F6F6F9;
+    border-top: 1px solid #EDECF3;
     border-bottom: none;
     height: 0;
     box-sizing: content-box;
