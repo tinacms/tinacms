@@ -8,6 +8,8 @@ import { TinaReset, Theme, DefaultTheme } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 
+const merge = require('lodash.merge')
+
 interface TinaProps {
   position: 'fixed' | 'float'
   hidden?: boolean
@@ -18,7 +20,7 @@ export const Tina: React.FC<TinaProps> = ({
   children,
   position,
   hidden,
-  theme = DefaultTheme,
+  theme,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -34,7 +36,7 @@ export const Tina: React.FC<TinaProps> = ({
           {children}
         </SiteWrapper>
         {!hidden && (
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={merge(DefaultTheme, theme)}>
             <ModalProvider>
               <TinaReset>
                 <Sidebar />
