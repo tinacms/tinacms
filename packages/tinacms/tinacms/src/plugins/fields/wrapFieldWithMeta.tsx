@@ -42,6 +42,9 @@ const FieldLabel = styled.label`
   line-height: 1.35;
   color: #433e52;
   margin-bottom: 0.5rem;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
 `
 
 const FieldDescription = styled.p`
@@ -49,6 +52,7 @@ const FieldDescription = styled.p`
   font-size: 0.65rem;
   font-style: italic;
   font-weight: lighter;
+  padding-top: 0.25rem;
 `
 
 const FieldError = styled.span`
