@@ -6,6 +6,7 @@ import * as express from 'express'
 
 import { commit } from './commit'
 import { createUploader } from './upload'
+import { openRepo } from './open-repo'
 
 export interface GitRouterConfig {
   defaultCommitMessage?: string
@@ -103,8 +104,21 @@ export function router(config: GitRouterConfig = {}) {
   })
 
   router.post('/reset', (req, res) => {
-    res.status(501)
-    res.json({ status: 'failure', error: 'Not implemented' })
+    let repo = openRepo(REPO_ABSOLUTE_PATH)
+    const files = req.body.files.map((rel: string) =>
+      path.join(REPO_ABSOLUTE_PATH, rel)
+    )
+    if (DEBUG) console.log(files)
+    repo
+      .checkout(files[0])
+      .then(() => {
+        res.json({ status: 'success' })
+        console.log(res)
+      })
+      .catch((e: any) => {
+        res.status(412)
+        res.json({ status: 'failure', error: e.message })
+      })
   })
 
   return router
