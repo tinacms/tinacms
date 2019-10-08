@@ -26,6 +26,7 @@
   "scripts": {
     "watch": "tsc -w",
     "build": "tsc",
+    "dev": "tsc",
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {

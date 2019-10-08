@@ -3,13 +3,17 @@ import * as React from 'react'
 import { useCMS } from './use-cms'
 const get = require('lodash.get')
 
-export function useCMSForm(options: FormOptions<any>) {
+interface UseFormOptions extends FormOptions<any> {
+  currentValues?: any
+}
+export function useCMSForm(options: UseFormOptions) {
   const cms = useCMS()
   const [form, setForm] = React.useState<Form | undefined>()
   const [_, setValues] = React.useState(options.initialValues)
 
   React.useEffect(
     function createForm() {
+      if (!options.initialValues) return
       const form = cms.forms.createForm(options)
       setForm(form)
       const unsubscribe = form.subscribe(
@@ -26,7 +30,7 @@ export function useCMSForm(options: FormOptions<any>) {
         }
       }
     },
-    [options.id]
+    [options.id, options.initialValues]
   )
 
   React.useEffect(() => {
@@ -39,7 +43,10 @@ export function useCMSForm(options: FormOptions<any>) {
     form.label = options.label
   }, [form, options.label])
 
-  syncFormWithInitialValues(form, options.initialValues)
+  syncFormWithCurrentValues(
+    form,
+    options.currentValues || options.initialValues
+  )
 
   return [form ? form.values : options.initialValues, form]
 }
@@ -53,7 +60,7 @@ export function useCMSForm(options: FormOptions<any>) {
  * 2. not currently [active](https://final-form.org/docs/final-form/types/FieldState#active)
  *
  */
-function syncFormWithInitialValues(form?: Form, initialValues?: any) {
+function syncFormWithCurrentValues(form?: Form, initialValues?: any) {
   React.useEffect(() => {
     if (!form) return
     form.finalForm.batch(() => {
