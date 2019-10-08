@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { InputCss } from '.'
+import { InputCss } from './Input'
 
 type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,

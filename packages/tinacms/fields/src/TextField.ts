@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { InputCss, InputProps } from '.'
+import { InputCss } from './Input'
 
 type a = React.DetailedHTMLProps<
   React.InputHTMLAttributes<HTMLInputElement>,
@@ -11,10 +11,6 @@ export interface TextFieldProps extends a {
   ref?: any
 }
 
-export const TextFieldCss = css<InputProps>`
-  ${InputCss};
-`
-
 export const TextField = styled.input<TextFieldProps>`
-  ${TextFieldCss}
+  ${InputCss}
 `
