@@ -14,7 +14,6 @@ interface Wysiwyg {
 export const Wysiwyg = styled(
   ({ input, plugins, frame, ...styleProps }: any) => {
     const theme = React.useContext(ThemeContext)
-    console.log({ theme })
     const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame, theme)
 
     return (
