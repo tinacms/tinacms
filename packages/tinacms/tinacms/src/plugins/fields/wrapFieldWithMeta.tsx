@@ -39,6 +39,7 @@ const FieldLabel = styled.label`
   font-size: 0.8rem;
   font-weight: 600;
   letter-spacing: 0.01em;
+  line-height: 1.35;
   color: #433e52;
   margin-bottom: 0.5rem;
 `

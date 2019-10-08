@@ -101,13 +101,13 @@ export const ModalHeader = styled.div`
   font-size: 1.2rem;
   font-weight: 500;
   line-height: normal;
-  padding: 0 ${padding()}rem 0 ${padding()}rem;
+  padding: 0 ${padding()} 0 ${padding()};
   border-bottom: 1px solid #e1ddec;
   margin: 0;
 `
 
 export const ModalBody = styled.div<{ padded?: boolean }>`
-  padding: ${p => (p.padded ? padding() : '0')}rem;
+  padding: ${p => (p.padded ? padding() : '0')};
   margin: 0;
 `
 
@@ -115,11 +115,11 @@ export const ModalActions = styled.div`
   display: flex;
   justify-content: flex-end;
   border-radius: 0 0 0.3rem 0.3rem;
-  padding: 0 ${padding()}rem ${padding()}rem ${padding()}rem;
+  padding: 0 ${padding()} ${padding()} ${padding()};
   ${Button} {
     flex: 0 1 auto;
     min-width: 8rem;
-    margin: 0 ${padding('small')}rem 0 0;
+    margin: 0 ${padding('small')} 0 0;
     &:last-child {
       margin-right: 0;
     }

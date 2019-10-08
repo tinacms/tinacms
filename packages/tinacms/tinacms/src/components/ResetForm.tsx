@@ -99,6 +99,6 @@ const CloseButton = styled.div`
     height: auto;
   }
   &:hover {
-    fill: ${color('dark')};
+    fill: ${color.grey(8)};
   }
 `

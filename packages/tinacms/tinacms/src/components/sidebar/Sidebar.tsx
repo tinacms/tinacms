@@ -109,8 +109,8 @@ const Watermark = styled(({ ...styleProps }: any) => {
 })`
   position: absolute;
   z-index: -1;
-  bottom: ${padding()}rem;
-  left: ${padding()}rem;
+  bottom: ${padding()};
+  left: ${padding()};
   svg {
     width: 8rem;
     height: 8rem;
@@ -150,20 +150,20 @@ const SidebarToggle = (sidebar: any) => {
 }
 
 const MenuList = styled.div`
-  margin: 2rem -${padding()}rem 2rem -${padding()}rem;
+  margin: 2rem -${padding()} 2rem -${padding()};
   display: block;
 `
 
 const MenuLink = styled.div<{ value: string }>`
-  color: ${color('light')};
+  color: ${color.grey(1)};
   font-size: 1.125rem;
   font-weight: 500;
-  padding: ${padding('small')}rem ${padding()}rem ${padding('small')}rem 4rem;
+  padding: ${padding('small')} ${padding()} ${padding('small')} 4rem;
   position: relative;
   cursor: pointer;
   transition: all ${p => p.theme.timing.short} ease-out;
   overflow: hidden;
-  margin-bottom: ${padding('small')}rem;
+  margin-bottom: ${padding('small')};
   &:after {
     content: '';
     position: absolute;
@@ -186,7 +186,7 @@ const MenuLink = styled.div<{ value: string }>`
       opacity: 1;
     }
     svg {
-      fill: ${color('primary')};
+      fill: ${color.primary()};
     }
     & ~ * {
       &:after {
@@ -196,7 +196,7 @@ const MenuLink = styled.div<{ value: string }>`
   }
   svg {
     position: absolute;
-    left: ${padding()}rem;
+    left: ${padding()};
     top: 50%;
     transform: translate3d(0, -50%, 0);
     width: 2.25rem;
@@ -214,12 +214,12 @@ const SidebarHeader = styled.div`
   flex: 0 0 ${SIDEBAR_HEADER_HEIGHT}rem;
   height: ${SIDEBAR_HEADER_HEIGHT}rem;
   width: 100%;
-  padding: 0 ${padding()}rem;
+  padding: 0 ${padding()};
 `
 
 const MenuToggle = styled.button<{ open: boolean }>`
-  padding: 0 0 0 ${padding()}rem;
-  margin-left: -${padding()}rem;
+  padding: 0 0 0 ${padding()};
+  margin-left: -${padding()};
   background: transparent;
   outline: none;
   border: 0;
@@ -280,8 +280,7 @@ const MenuWrapper = styled.div`
   height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: ${SIDEBAR_HEADER_HEIGHT}rem ${padding()}rem ${padding()}rem
-    ${padding()}rem;
+  padding: ${SIDEBAR_HEADER_HEIGHT}rem ${padding()} ${padding()} ${padding()};
   ul,
   li {
     margin: 0;
@@ -291,7 +290,7 @@ const MenuWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
-  background: ${color('dark')};
+  background: ${color.grey(8)};
   z-index: 1000;
   position: absolute;
   top: 0;
@@ -300,7 +299,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   width: ${SIDEBAR_WIDTH}px;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
-  padding: ${padding()}rem;
+  padding: ${padding()};
   transition: all 250ms ease-out;
   ul,
   li {

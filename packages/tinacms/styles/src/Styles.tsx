@@ -1,38 +1,57 @@
 import * as React from 'react'
-import styled, {
-  ThemeProvider,
-  createGlobalStyle,
-  css,
-} from 'styled-components'
-import { defaultProps } from 'react-select/lib/Async'
+import styled, { createGlobalStyle, css } from 'styled-components'
 
 export interface ThemeProps {
   theme: Theme
 }
 
-export function borderRadius(size: keyof Theme['radius'] = 'big') {
-  return (props: ThemeProps) => props.theme.radius[size]
-}
-
-export function padding(size: keyof Theme['padding'] = 'big') {
-  return (props: ThemeProps) => props.theme.padding[size]
-}
-
-export function color(name: keyof Theme['color']) {
-  return (props: ThemeProps) => props.theme.color[name]
-}
-
 export interface Theme {
   color: {
-    primary: string
-    error: string
-    light: string
-    medium: string
-    dark: string
+    primary: {
+      light: string
+      medium: string
+      dark: string
+    }
+    error: {
+      light: string
+      medium: string
+      dark: string
+    }
+    grey: {
+      0: string
+      1: string
+      2: string
+      3: string
+      4: string
+      5: string
+      6: string
+      7: string
+      8: string
+      9: string
+    }
   }
   radius: {
     small: string
     big: string
+  }
+  padding: {
+    small: string
+    big: string
+  }
+  font: {
+    size: {
+      0: string
+      1: string
+      2: string
+      3: string
+      4: string
+      5: string
+      6: string
+    }
+    weight: {
+      regular: number
+      bold: number
+    }
   }
   shadow: {
     small: string
@@ -43,29 +62,55 @@ export interface Theme {
     medium: string
     long: string
   }
-  input: {
-    padding: string
-    radius: string
-    fontSize: string
-    lineHeight: number
-  }
-  padding: {
-    small: number
-    big: number
-  }
 }
 
-export const theme: Theme = {
+export const DefaultTheme: Theme = {
   color: {
-    primary: '#0084ff',
-    error: 'red',
-    light: '#F6F6F9',
-    medium: '#EDECF3',
-    dark: '#433E52',
+    primary: {
+      light: '#2296FE',
+      medium: '#0084ff',
+      dark: '#0574E4',
+    },
+    error: {
+      light: '#EB6337',
+      medium: '#EC4815',
+      dark: '#DC4419',
+    },
+    grey: {
+      0: '#FFFFFF',
+      1: '#F6F6F9',
+      2: '#EDECF3',
+      3: '#E1DDEC',
+      4: '#B2ADBE',
+      5: '#918C9E',
+      6: '#716C7F',
+      7: '#565165',
+      8: '#433E52',
+      9: '#363145',
+    },
   },
   radius: {
     small: '0.3rem',
     big: '1.5rem',
+  },
+  padding: {
+    small: '0.75rem',
+    big: '1.25rem',
+  },
+  font: {
+    size: {
+      0: '0.7rem',
+      1: '0.8rem',
+      2: '0.9rem',
+      3: '1rem',
+      4: '1.1rem',
+      5: '1.2rem',
+      6: '1.3rem',
+    },
+    weight: {
+      regular: 500,
+      bold: 600,
+    },
   },
   shadow: {
     small: '0px 2px 3px rgba(0, 0, 0, 0.12)',
@@ -76,16 +121,51 @@ export const theme: Theme = {
     medium: '150ms',
     long: '250ms',
   },
-  input: {
-    padding: '0.75rem',
-    radius: '0.3rem',
-    fontSize: '0.9rem',
-    lineHeight: 1.35,
-  },
-  padding: {
-    small: 0.75,
-    big: 1.25,
-  },
+}
+
+/* Color Helpers */
+
+function primary(value: keyof Theme['color']['primary'] = 'medium') {
+  return (props: ThemeProps) => props.theme.color['primary'][value]
+}
+
+function grey(value: keyof Theme['color']['grey'] = 0) {
+  return (props: ThemeProps) => props.theme.color['grey'][value]
+}
+
+function error(value: keyof Theme['color']['error'] = 'medium') {
+  return (props: ThemeProps) => props.theme.color['error'][value]
+}
+
+export const color = {
+  primary: primary,
+  grey: grey,
+  error: error,
+}
+
+/* Font Helpers */
+
+function size(value: keyof Theme['font']['size'] = 0) {
+  return (props: ThemeProps) => props.theme.font.size[value]
+}
+
+function weight(value: keyof Theme['font']['weight'] = 'regular') {
+  return (props: ThemeProps) => props.theme.font.weight[value]
+}
+
+export const font = {
+  size: size,
+  weight: weight,
+}
+
+/* Other Helpers */
+
+export const radius = function(size: keyof Theme['radius'] = 'big') {
+  return (props: ThemeProps) => props.theme.radius[size]
+}
+
+export const padding = function(size: keyof Theme['padding'] = 'big') {
+  return (props: ThemeProps) => props.theme.padding[size]
 }
 
 export const GlobalStyles = createGlobalStyle`
@@ -106,12 +186,12 @@ export const GlobalStyles = createGlobalStyle`
     box-sizing: inherit;
   }
   hr {
-    border-color: #EDECF3;
-    color: #EDECF3;
+    border-color: #F6F6F9;
+    color: #F6F6F9;
     margin-bottom: 1.5rem;
     margin-left: -1.25rem;
     margin-right: -1.25rem;
-    border-top: 1px solid #EDECF3;
+    border-top: 1px solid #F6F6F9;
     border-bottom: none;
     height: 0;
     box-sizing: content-box;

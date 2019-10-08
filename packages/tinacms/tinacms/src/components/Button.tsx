@@ -7,7 +7,7 @@ export const Button = styled.button`
   border: 1px solid #0574e4;
   border-radius: ${p => p.theme.radius.big};
   box-shadow: ${p => p.theme.shadow.small};
-  background-color: ${color('primary')};
+  background-color: ${color.primary()};
   color: white;
   font-weight: 500;
   cursor: pointer;
