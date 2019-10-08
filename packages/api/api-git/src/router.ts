@@ -53,7 +53,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.put('/:relPath', (req: any, res: any) => {
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(REPO_ABSOLUTE_PATH, fileRelativePath)
+    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
 
     if (DEBUG) {
       console.log(fileAbsolutePath)
