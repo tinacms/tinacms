@@ -1,6 +1,6 @@
 import * as React from 'react'
 import styled, { keyframes, css } from 'styled-components'
-import { Button } from './Button'
+import { Button } from '@tinacms/fields'
 import { padding, color } from '@tinacms/styles'
 import {
   Modal,
