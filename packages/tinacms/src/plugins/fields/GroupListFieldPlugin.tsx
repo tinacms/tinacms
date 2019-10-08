@@ -20,9 +20,15 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
-import { padding, color, font, radius } from '@tinacms/styles'
+import {
+  padding,
+  color,
+  font,
+  radius,
+  IconButton,
+  Button,
+} from '@tinacms/styles'
 import { Droppable, DropResult, Draggable } from 'react-beautiful-dnd'
-import { IconButton, Button } from '@tinacms/fields'
 import {
   AddIcon,
   DragIcon,

@@ -32,14 +32,20 @@ import {
   AddIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import { GlobalStyles, padding, color, radius, font } from '@tinacms/styles'
+import {
+  GlobalStyles,
+  Button,
+  padding,
+  color,
+  radius,
+  font,
+} from '@tinacms/styles'
 import {
   SIDEBAR_WIDTH,
   TOGGLE_WIDTH,
   Z_INDEX,
   SIDEBAR_HEADER_HEIGHT,
 } from '../../Globals'
-import { Button } from '@tinacms/fields'
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
