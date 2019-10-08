@@ -9,11 +9,17 @@ import { createUploader } from './upload'
 import { openRepo } from './open-repo'
 
 export interface GitRouterConfig {
+  pathToRepo?: string
+  pathToContent?: string
   defaultCommitMessage?: string
 }
 export function router(config: GitRouterConfig = {}) {
-  const REPO_ABSOLUTE_PATH = process.cwd()
-  const TMP_DIR = path.join(REPO_ABSOLUTE_PATH, '/tmp/')
+  const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
+  const CONTENT_ABSOLUTE_PATH = path.join(
+    REPO_ABSOLUTE_PATH,
+    config.pathToContent || ''
+  )
+  const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
   const DEFAULT_COMMIT_MESSAGE =
     config.defaultCommitMessage || 'Update from Tina'
 
@@ -24,7 +30,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.delete('/:relPath', (req: any, res: any) => {
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(REPO_ABSOLUTE_PATH, fileRelativePath)
+    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
 
     try {
       deleteFile(fileAbsolutePath)
@@ -83,7 +89,7 @@ export function router(config: GitRouterConfig = {}) {
   router.post('/commit', (req: any, res: any) => {
     const message = req.body.message || DEFAULT_COMMIT_MESSAGE
     const files = req.body.files.map((rel: string) =>
-      path.join(REPO_ABSOLUTE_PATH, rel)
+      path.join(CONTENT_ABSOLUTE_PATH, rel)
     )
     // TODO: Separate commit and push???
     commit({
@@ -106,7 +112,7 @@ export function router(config: GitRouterConfig = {}) {
   router.post('/reset', (req, res) => {
     let repo = openRepo(REPO_ABSOLUTE_PATH)
     const files = req.body.files.map((rel: string) =>
-      path.join(REPO_ABSOLUTE_PATH, rel)
+      path.join(CONTENT_ABSOLUTE_PATH, rel)
     )
     if (DEBUG) console.log(files)
     repo
@@ -125,7 +131,7 @@ export function router(config: GitRouterConfig = {}) {
     res.json({
       status: 'failure',
       message: 'NOT IMPLMENTED',
-      fileRelativePath: req.body.fileRelativePath,
+      fileRelativePath: req.params.fileRelativePath,
     })
   })
 
