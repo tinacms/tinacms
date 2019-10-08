@@ -13,6 +13,7 @@ export function useCMSForm(options: UseFormOptions) {
 
   React.useEffect(
     function createForm() {
+      if (!options.initialValues) return
       const form = cms.forms.createForm(options)
       setForm(form)
       const unsubscribe = form.subscribe(
@@ -29,7 +30,7 @@ export function useCMSForm(options: UseFormOptions) {
         }
       }
     },
-    [options.id]
+    [options.id, options.initialValues]
   )
 
   React.useEffect(() => {
