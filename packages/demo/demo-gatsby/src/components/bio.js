@@ -8,7 +8,7 @@
 import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
-import { useJsonForm } from "../../../../gatsby/gatsby-tinacms-json"
+import { useJsonForm } from "@tinacms/gatsby-tinacms-json"
 
 import { rhythm } from "../utils/typography"
 
@@ -39,9 +39,24 @@ const Bio = () => {
   const [author] = useJsonForm(data.dataJson, {
     label: "Author",
     fields: [
-      { label: "First Name", name: "rawJson.firstName", description:"Enter first name", component: "text" },
-      { label: "Last Name", name: "rawJson.lastName", description:"Enter last name", component: "text" },
-      { label: "Location", name: "rawJson.location", description:"Enter where they're based", component: "text" },
+      {
+        label: "First Name",
+        name: "rawJson.firstName",
+        description: "Enter first name",
+        component: "text",
+      },
+      {
+        label: "Last Name",
+        name: "rawJson.lastName",
+        description: "Enter last name",
+        component: "text",
+      },
+      {
+        label: "Location",
+        name: "rawJson.location",
+        description: "Enter where they're based",
+        component: "text",
+      },
     ],
   })
 
