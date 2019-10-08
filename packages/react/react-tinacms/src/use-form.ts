@@ -4,7 +4,7 @@ import { useCMS } from './use-cms'
 const get = require('lodash.get')
 
 interface UseFormOptions extends FormOptions<any> {
-  currentValues: any
+  currentValues?: any
 }
 export function useCMSForm(options: UseFormOptions) {
   const cms = useCMS()
