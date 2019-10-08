@@ -3,11 +3,10 @@ import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
 import { useFrameContext } from '../../components/SyledFrame'
 import * as React from 'react'
-import { color } from '@tinacms/styles'
+import { InputCss } from '@tinacms/fields'
+import { color, padding, font } from '@tinacms/styles'
 
-// let lightGrey = 'rgb(243, 243, 243)'
 const lightMediumGrey = `rgb(200, 200, 200)`
-// let mediumGrey = `rgb(143, 143, 143);`
 const darkGrey = 'rgb(40, 40, 40)'
 
 const FramedWysiwyg = (props: any) => {
@@ -21,35 +20,9 @@ export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   height: 100%;
 
   > [contenteditable] {
-    position: relative;
-    background-color: white;
-    border-radius: 0.3rem;
-    font-size: ${p => p.theme.input.fontSize};
-    line-height: ${p => p.theme.input.lineHeight};
-    transition: all 85ms 85ms ease-out;
-    padding: ${p => p.theme.input.padding};
-    border: 1px solid #edecf3;
-    width: 100%;
-    margin: 0;
-    outline: none;
-    box-shadow: 0 0 0 2px ${p => (p.error ? color('error') : 'transparent')};
+    ${InputCss}
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-
-    &:hover {
-      box-shadow: 0 0 0 2px #e1ddec;
-      transition-delay: 0s;
-    }
-
-    &:focus {
-      box-shadow: 0 0 0 2px
-        ${p => (p.error ? color('error') : color('primary'))};
-    }
-
-    &::placeholder {
-      font-size: 0.9rem;
-      color: #cfd3d7;
-    }
 
     ::selection {
       background-color: rgba(0, 132, 255, 0.3);

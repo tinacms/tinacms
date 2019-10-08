@@ -19,7 +19,8 @@ export class MenuView {
     private view: EditorView,
     private translator: Translator,
     private bottom?: boolean,
-    private frame?: any
+    private frame?: any,
+    private theme?: any
   ) {
     this.dom = document.createElement('div')
     this.render()
@@ -34,6 +35,7 @@ export class MenuView {
             bottom={this.bottom}
             format={'markdown'}
             frame={this.frame}
+            theme={this.theme}
           />
         </TranslatorContext.Provider>
       </ViewContainer>,
@@ -51,10 +53,15 @@ export class MenuView {
   }
 }
 
-export function menu(translator: Translator, bottom?: boolean, frame?: any) {
+export function menu(
+  translator: Translator,
+  bottom?: boolean,
+  frame?: any,
+  theme?: any
+) {
   return new Plugin({
     view(view: EditorView) {
-      const menuView = new MenuView(view, translator, bottom, frame)
+      const menuView = new MenuView(view, translator, bottom, frame, theme)
       const richTextNode = view.dom.parentNode
       const parentElement = richTextNode!.parentElement
       parentElement!.insertBefore(menuView.dom, richTextNode)

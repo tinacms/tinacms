@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
-import { padding } from '@tinacms/styles'
+import { padding, color, radius, font } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
@@ -56,18 +56,18 @@ const MoreActionsButton = styled(p => (
   align-items: center;
   &:hover {
     background-color: #f6f6f9;
-    fill: #433e52;
+    fill: ${color.grey(8)};
   }
 `
 
 const ActionsOverlay = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  bottom: ${padding()}rem;
-  right: ${padding()}rem;
+  bottom: ${padding()};
+  right: ${padding()};
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
@@ -89,7 +89,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
 export const ActionButton = styled.button`
   position: relative;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: ${font.size(0)};
   padding: 0.75rem;
   font-weight: 500;
   width: 100%;
