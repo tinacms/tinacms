@@ -117,12 +117,20 @@ function getModifiedPackages(allFiles: string[]) {
     allFiles
       .filter(filepath => filepath.startsWith('packages/'))
       .filter(filepath => !filepath.startsWith('packages/demo'))
-      .map(filepath =>
-        filepath
+      .map(filepath => {
+        // packages/react-tinacms
+        // packages/@tinacms/core
+        if (filepath.startsWith('packages/@tinacms')) {
+          return filepath
+            .split('/')
+            .slice(0, 3)
+            .join('/')
+        }
+        return filepath
           .split('/')
-          .slice(0, 3)
+          .slice(0, 2)
           .join('/')
-      )
+      })
   )
 
   paths.forEach(path => {
