@@ -3,7 +3,7 @@
   "version": "0.1.4-alpha.0",
   "main": "index.js",
   "types": "index.d.ts",
-  "license": "MIT",
+  "license": "Apache-2.0",
   "files": [
     "index.js",
     "gatsby-node.js"
