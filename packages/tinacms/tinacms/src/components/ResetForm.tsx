@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { keyframes, css } from 'styled-components'
-import { Button } from './Button'
+import { Button } from '@tinacms/fields'
 import { padding, color } from '@tinacms/styles'
 import {
   Modal,
@@ -70,8 +70,17 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
           <p>Are you sure you want to reset all changes?</p>
         </ModalBody>
         <ModalActions>
-          <CancelButton onClick={close}>Cancel</CancelButton>
-          <ConfirmButton onClick={reset}>Reset</ConfirmButton>
+          <Button onClick={close}>Cancel</Button>
+          <Button 
+            margin 
+            primary
+            onClick={async () => {
+              await reset()
+              close()
+            }}  
+          >
+            Reset
+          </Button>
         </ModalActions>
       </ModalPopup>
     </Modal>
@@ -79,37 +88,13 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
 }
 
 const ResetButton = styled(Button)`
-  background-color: white;
-  border: 1px solid #edecf3;
-  color: #0084ff;
   flex: 0 0 6rem;
-  padding: 0.75rem 1.5rem;
-  margin-right: 0.5rem;
-  &:hover {
-    background-color: #f6f6f9;
-    opacity: 1;
-  }
-`
-
-const ConfirmButton = styled(Button)`
-  padding: 0.75rem 1.5rem;
-`
-
-const CancelButton = styled(ConfirmButton)`
-  background-color: white;
-  border: 1px solid #edecf3;
-  color: #0084ff;
-  margin-right: 0.5rem;
-  &:hover {
-    background-color: #f6f6f9;
-    opacity: 1;
-  }
 `
 
 const CloseButton = styled.div`
   display: flex;
   align-items: center;
-  fill: #e1ddec;
+  fill: ${color.grey(3)};
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
@@ -117,6 +102,6 @@ const CloseButton = styled.div`
     height: auto;
   }
   &:hover {
-    fill: ${color('dark')};
+    fill: ${color.grey(8)};
   }
 `

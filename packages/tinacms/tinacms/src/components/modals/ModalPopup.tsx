@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import styled, { keyframes } from 'styled-components'
+import { radius } from '@tinacms/styles'
 
 const ModalPopupKeyframes = keyframes`
   0% {
@@ -35,7 +36,7 @@ export const ModalPopup = styled.div`
   z-index: 1;
   overflow: visible; /* Keep this as "visible", select component needs to overflow */
   background-color: #f6f6f9;
-  border-radius: 0.3rem;
+  border-radius: ${radius('small')};
   margin: 2.5rem auto;
   width: 460px;
   max-width: 90%;

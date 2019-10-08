@@ -26,7 +26,11 @@ import {
   stopEditingLink,
   updateLinkBeingEdited,
 } from '../../../commands'
-import styled, { StyleSheetManager } from 'styled-components'
+import styled, {
+  StyleSheetManager,
+  ThemeProvider,
+  ThemeContext,
+} from 'styled-components'
 import { FC } from 'react'
 
 export class LinkFormController {
@@ -35,7 +39,8 @@ export class LinkFormController {
   constructor(
     protected renderTarget: HTMLElement,
     protected view: EditorView,
-    protected frame?: { document: Document }
+    protected frame?: { document: Document },
+    protected theme?: any
   ) {
     //
   }
@@ -57,23 +62,26 @@ export class LinkFormController {
       this.renderTarget,
       minWidth
     )
+
     return (
       <ViewContainer frame={this.frame}>
-        <>
-          <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
-          <LinkForm
-            style={{
-              left,
-              top,
-              minWidth: `${minWidth}px`,
-            }}
-            removeLink={this.removeLink}
-            onChange={this.onChange}
-            href={this.href}
-            title={this.title}
-            cancel={this.cancel}
-          />
-        </>
+        <ThemeProvider theme={this.theme}>
+          <>
+            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+            <LinkForm
+              style={{
+                left,
+                top,
+                minWidth: `${minWidth}px`,
+              }}
+              removeLink={this.removeLink}
+              onChange={this.onChange}
+              href={this.href}
+              title={this.title}
+              cancel={this.cancel}
+            />
+          </>
+        </ThemeProvider>
       </ViewContainer>
     )
   }

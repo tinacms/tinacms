@@ -17,10 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { ThemeContext } from 'styled-components'
 import { Plugin } from '@tinacms/core'
 import { useTinaProsemirror } from './useTinaProsemirror'
 import { ALL_PLUGINS } from './default-plugins'
+import { CodeMirrorCss } from './CodeMirrorCss'
 
 interface Wysiwyg {
   input: any
@@ -30,7 +31,8 @@ interface Wysiwyg {
 
 export const Wysiwyg = styled(
   ({ input, plugins, frame, ...styleProps }: any) => {
-    const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame)
+    const theme = React.useContext(ThemeContext)
+    const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, frame, theme)
 
     return (
       <>
@@ -43,16 +45,5 @@ export const Wysiwyg = styled(
     )
   }
 )`
-  white-space: pre-wrap;
-
-  .CodeMirror {
-    width: 100%;
-    height: auto;
-    border-radius: 0.3rem;
-    margin-bottom: 1rem;
-
-    .CodeMirror-sizer {
-      min-height: auto;
-    }
-  }
+  ${CodeMirrorCss}
 `

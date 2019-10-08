@@ -20,7 +20,7 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
 import styled, { keyframes, css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
-import { padding } from '@tinacms/styles'
+import { padding, color, radius, font } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
 import {
   SIDEBAR_HEADER_HEIGHT,
@@ -110,8 +110,8 @@ const Header = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid #edecf3;
-  border-radius: 0.3rem;
+  border: 1px solid ${color.grey(2)};
+  border-radius: ${radius('small')};
   margin: 0 0 1.5rem 0;
   overflow: visible;
   line-height: 1.35;
@@ -122,13 +122,13 @@ const Header = styled.div`
   svg {
     width: 1.5rem;
     height: auto;
-    fill: #e1ddec;
+    fill: ${color.grey(3)};
     transition: all 85ms ease-out;
   }
 
   &:hover {
     svg {
-      fill: #433e52;
+      fill: ${color.grey(8)};
     }
     color: #0084ff;
   }
@@ -143,7 +143,7 @@ export const PanelHeader = styled(Header)`
   justify-content: flex-start;
   border: none;
   border-radius: 0;
-  border-bottom: 1px solid #edecf3;
+  border-bottom: 1px solid ${color.grey(2)};
   margin: 0;
   padding: 0.75rem 1.25rem;
 
@@ -176,7 +176,7 @@ export const PanelBody = styled.div`
 
 const GroupLabel = styled.span`
   margin: 0;
-  font-size: 0.85rem;
+  font-size: ${font.size(2)};
   font-weight: 500;
   color: inherit;
   transition: all 85ms ease-out;

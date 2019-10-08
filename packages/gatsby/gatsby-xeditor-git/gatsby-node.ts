@@ -53,12 +53,6 @@ exports.setFieldsOnGraphQLNodeType = ({ type }: any) => {
   return {}
 }
 
-exports.onCreateDevServer = ({
-  app,
-  options,
-}: {
-  app: any
-  options: GitRouterConfig
-}) => {
+exports.onCreateDevServer = ({ app }: any, options: GitRouterConfig) => {
   app.use('/___tina', gitRouter(options))
 }

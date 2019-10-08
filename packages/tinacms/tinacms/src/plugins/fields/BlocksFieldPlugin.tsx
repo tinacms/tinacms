@@ -21,7 +21,7 @@ import { Field, Form } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { Button } from '../../components/Button'
+import { IconButton, Button } from '@tinacms/fields'
 import {
   AddIcon,
   DragIcon,
@@ -31,7 +31,7 @@ import {
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from 'react-dismissible'
-import { padding, color } from '@tinacms/styles'
+import { padding, color, radius, font } from '@tinacms/styles'
 import { useFrameContext } from '../../components/SyledFrame'
 
 interface BlocksFieldDefinititon extends Field {
@@ -75,9 +75,14 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
     <>
       <GroupListHeader>
         <GroupLabel>{field.label || field.name}</GroupLabel>
-        <GroupHeaderButton onClick={() => setVisible(true)} open={visible}>
+        <IconButton
+          onClick={() => setVisible(true)}
+          open={visible}
+          primary
+          small
+        >
           <AddIcon />
-        </GroupHeaderButton>
+        </IconButton>
         <BlockMenu open={visible}>
           <Dismissible
             click
@@ -199,18 +204,18 @@ const BlockListItem = ({
 
 const EmptyList = styled.div`
   text-align: center;
-  border-radius: 0.3rem;
-  background-color: #edecf3;
-  color: #b2adbe;
+  border-radius: ${radius('small')};
+  background-color: ${color.grey(2)};
+  color: ${color.grey(4)};
   line-height: 1.35;
   padding: 0.75rem 0;
-  font-size: 0.85rem;
+  font-size: ${font.size(2)};
   font-weight: 500;
 `
 
 const BlockMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -237,8 +242,8 @@ const BlockMenu = styled.div<{ open: boolean }>`
 const BlockOption = styled.button`
   position: relative;
   text-align: center;
-  font-size: 0.75rem;
-  padding: 0.75rem;
+  font-size: ${font.size(0)};
+  padding: ${padding('small')};
   font-weight: 500;
   width: 100%;
   background: none;
@@ -247,7 +252,7 @@ const BlockOption = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color('primary')};
+    color: ${color.primary()};
     background-color: #f6f6f9;
   }
   &:not(:last-child) {
@@ -267,7 +272,7 @@ const ItemClickTarget = styled.div`
 
 const GroupLabel = styled.span`
   margin: 0;
-  font-size: 0.85rem;
+  font-size: ${font.size(2)};
   font-weight: 500;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -286,7 +291,7 @@ const GroupListHeader = styled.div`
   margin-bottom: 0.75rem;
   position: relative;
   ${GroupLabel} {
-    font-size: 1rem;
+    font-size: ${font.size(3)};
   }
 `
 
@@ -295,41 +300,8 @@ const GroupListPanel = styled.div`
   position: relative;
   height: auto;
   margin-bottom: 1.5rem;
-  border-radius: 0.3rem;
-  background-color: #edecf3;
-`
-
-const GroupHeaderButton = styled(Button)<{ open: boolean }>`
-  border-radius: 10rem;
-  padding: 0;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: -0.1rem 0 0 0;
-  position: relative;
-  fill: white;
-  transform-origin: 50% 50%;
-  transition: all 150ms ease-out;
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-  &:focus {
-    outline: none;
-  }
-  ${props =>
-    props.open &&
-    css`
-      transform: rotate(45deg);
-      background-color: white;
-      fill: ${color('primary')};
-      &:hover {
-        background-color: #f6f6f9;
-      }
-    `};
+  border-radius: ${radius('small')};
+  background-color: ${color.grey(2)};
 `
 
 const ItemList = styled.div``
@@ -341,12 +313,12 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   justify-content: space-between;
   align-items: stretch;
   background-color: white;
-  border: 1px solid #edecf3;
+  border: 1px solid ${color.grey(2)};
   margin: 0 0 -1px 0;
   overflow: visible;
   line-height: 1.35;
   padding: 0;
-  font-size: 0.85rem;
+  font-size: ${font.size(2)};
   font-weight: 500;
 
   ${GroupLabel} {
@@ -356,7 +328,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   }
 
   svg {
-    fill: #e1ddec;
+    fill: ${color.grey(3)};
     width: 1.25rem;
     height: auto;
     transition: fill 85ms ease-out;
@@ -364,7 +336,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   &:hover {
     svg {
-      fill: #433e52;
+      fill: ${color.grey(8)};
     }
     ${GroupLabel} {
       color: #0084ff;
@@ -378,18 +350,18 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   &:nth-last-child(2) {
     border-radius: 0 0 0.25rem 0.25rem;
     &:first-child {
-      border-radius: 0.3rem;
+      border-radius: ${radius('small')};
     }
   }
 
   ${p =>
     p.isDragging &&
     css`
-      border-radius: 0.3rem;
+      border-radius: ${radius('small')};
       box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
       svg {
-        fill: #433e52;
+        fill: ${color.grey(8)};
       }
       ${GroupLabel} {
         color: #0084ff;
