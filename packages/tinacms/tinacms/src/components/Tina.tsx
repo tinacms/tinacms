@@ -27,6 +27,8 @@ export const Tina: React.FC<TinaProps> = ({
   const props = {
     isOpen,
     setIsOpen,
+    position,
+    hidden,
   }
 
   return (
