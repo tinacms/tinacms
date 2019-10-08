@@ -41,19 +41,22 @@ const MoreActionsButton = styled(p => (
   </button>
 ))`
   height: 100%;
-  width: 2rem;
+  width: 2.5rem;
   background-color: transparent;
   background-position: center;
   background-size: auto 1.125rem;
   background-repeat: no-repeat;
-  margin-left: -0.5rem;
-  margin-right: 0.75rem;
   border: 0;
+  margin: 0 -1rem 0 0.5rem;
   outline: none;
   cursor: pointer;
   transition: opacity 85ms ease-out;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   &:hover {
-    opacity: 0.6;
+    background-color: #f6f6f9;
+    fill: #433e52;
   }
 `
 
@@ -64,12 +67,12 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   display: block;
   position: absolute;
   bottom: ${padding()}rem;
-  left: ${padding()}rem;
+  right: ${padding()}rem;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 85ms ease-out;
-  transform-origin: 0% 100%;
+  transform-origin: 100% 100%;
   box-shadow: ${p => p.theme.shadow.big};
   background-color: white;
   overflow: hidden;

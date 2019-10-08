@@ -16,8 +16,16 @@ export class Form<S = any> {
   fieldSubscriptions: { [key: string]: FieldSubscription } = {}
   hiddenFields: { [key: string]: FieldSubscription } = {}
   initialValues: any
+  reset?(): void
 
-  constructor({ id, label, fields, actions, ...options }: FormOptions<S>) {
+  constructor({
+    id,
+    label,
+    fields,
+    actions,
+    reset,
+    ...options
+  }: FormOptions<S>) {
     const initialValues = options.initialValues || ({} as S)
     this.id = id
     this.label = label
@@ -36,6 +44,7 @@ export class Form<S = any> {
       },
     })
 
+    this.reset = reset
     this.actions = actions || []
     this.initialValues = initialValues
     this.updateFields(this.fields)
@@ -97,7 +106,9 @@ export class Form<S = any> {
       const path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
 
       const isGroup = ['group'].includes(field.component as string)
-      const isArray = ['group-list', 'blocks'].includes(field.component as string)
+      const isArray = ['group-list', 'blocks'].includes(
+        field.component as string
+      )
       if (isArray) {
         const subfields = field.fields || []
         this.registerFields(subfields, `${path}.INDEX`)
@@ -131,6 +142,7 @@ export interface FormOptions<S> extends Config<S> {
   id: any
   label: string
   fields: Field[]
+  reset?(): void
   actions?: any[]
 }
 

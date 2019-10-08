@@ -10,6 +10,7 @@ import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
+import { ResetForm } from './ResetForm'
 import { FORM_HEADER_HEIGHT } from '../Globals'
 
 export const FormsView = () => {
@@ -43,7 +44,9 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length) return <NoFormsPlaceholder />
+  if (!forms.length) {
+    return <NoFormsPlaceholder />
+  }
 
   if (!activeForm) {
     return (
@@ -78,13 +81,15 @@ export const FormsView = () => {
                   ))}
               </FormBody>
               <FormFooter>
-                {activeForm.actions.length > 0 && (
-                  <ActionsMenu actions={activeForm.actions} />
+                {activeForm.reset && (
+                  <ResetForm pristine={pristine} reset={activeForm.reset} />
                 )}
-
                 <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
                   Save
                 </SaveButton>
+                {activeForm.actions.length > 0 && (
+                  <ActionsMenu actions={activeForm.actions} />
+                )}
               </FormFooter>
             </FormWrapper>
           </DragDropContext>
@@ -283,7 +288,7 @@ const FormFooter = styled.div`
   height: 4rem;
   background-color: white;
   border-top: 1px solid #edecf3;
-  padding: 0 1.25rem;
+  padding: 0 1rem;
 `
 
 const FormAnimationKeyframes = keyframes`
@@ -323,14 +328,4 @@ const FormWrapper = styled.div<{ isEditing: Boolean }>`
 export const SaveButton = styled(Button)`
   flex: 1.5 0 auto;
   padding: 0.75rem 1.5rem;
-`
-
-export const CancelButton = styled(SaveButton)`
-  background-color: white;
-  border: 1px solid #edecf3;
-  color: #0084ff;
-  &:hover {
-    background-color: #f6f6f9;
-    opacity: 1;
-  }
 `
