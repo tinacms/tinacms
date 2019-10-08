@@ -1,7 +1,7 @@
 import { FC } from 'react'
 import styled from 'styled-components'
 import * as React from 'react'
-import { color } from '@tinacms/styles'
+import { color, radius } from '@tinacms/styles'
 
 export interface ToggleProps {
   name: string
@@ -50,19 +50,19 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
   position: relative;
   width: 3rem;
   height: 1.75rem;
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   background-color: white;
-  border: 1px solid #edecf3;
+  border: 1px solid ${color.grey(2)};
   pointer-events: none;
   margin-left: -2px;
   span {
     position: absolute;
-    border-radius: 1.5rem;
+    border-radius: ${radius()};
     left: 2px;
     top: 50%;
     width: calc(1.75rem - 6px);
     height: calc(1.75rem - 6px);
-    background: ${p => (p.checked ? color.primary() : '#E1DDEC')};
+    background: ${p => (p.checked ? color.primary() : 'color.grey(3)')};
     transform: translate3d(${p => (p.checked ? '1.25rem' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
   }

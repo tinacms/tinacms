@@ -13,7 +13,7 @@ import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/core'
 import { CloseIcon, AddIcon } from '@tinacms/icons'
-import { padding, color } from '@tinacms/styles'
+import { padding, color, radius, font } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
 import { useTina } from '../hooks/use-tina'
@@ -124,8 +124,8 @@ const ContentMenuWrapper = styled.div`
 
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 1.5rem;
-  border: 1px solid #edecf3;
+  border-radius: ${radius()};
+  border: 1px solid ${color.grey(2)};
   display: block;
   position: absolute;
   top: 0;
@@ -152,7 +152,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
 const CloseButton = styled.div`
   display: flex;
   align-items: center;
-  fill: #e1ddec;
+  fill: ${color.grey(3)};
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
@@ -167,7 +167,7 @@ const CloseButton = styled.div`
 const CreateButton = styled.button`
   position: relative;
   text-align: center;
-  font-size: 0.75rem;
+  font-size: ${font.size(0)};
   padding: 0.75rem 1.25rem;
   font-weight: 500;
   width: 100%;

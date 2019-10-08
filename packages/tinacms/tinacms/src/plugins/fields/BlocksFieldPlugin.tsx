@@ -13,7 +13,7 @@ import {
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from 'react-dismissible'
-import { padding, color } from '@tinacms/styles'
+import { padding, color, radius, font } from '@tinacms/styles'
 import { useFrameContext } from '../../components/SyledFrame'
 
 interface BlocksFieldDefinititon extends Field {
@@ -186,18 +186,18 @@ const BlockListItem = ({
 
 const EmptyList = styled.div`
   text-align: center;
-  border-radius: 0.3rem;
-  background-color: #edecf3;
-  color: #b2adbe;
+  border-radius: ${radius('small')};
+  background-color: ${color.grey(2)};
+  color: ${color.grey(4)};
   line-height: 1.35;
   padding: 0.75rem 0;
-  font-size: 0.85rem;
+  font-size: ${font.size(2)};
   font-weight: 500;
 `
 
 const BlockMenu = styled.div<{ open: boolean }>`
   min-width: 12rem;
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -224,8 +224,8 @@ const BlockMenu = styled.div<{ open: boolean }>`
 const BlockOption = styled.button`
   position: relative;
   text-align: center;
-  font-size: 0.75rem;
-  padding: 0.75rem;
+  font-size: ${font.size(0)};
+  padding: ${padding('small')};
   font-weight: 500;
   width: 100%;
   background: none;
@@ -254,7 +254,7 @@ const ItemClickTarget = styled.div`
 
 const GroupLabel = styled.span`
   margin: 0;
-  font-size: 0.85rem;
+  font-size: ${font.size(2)};
   font-weight: 500;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -273,7 +273,7 @@ const GroupListHeader = styled.div`
   margin-bottom: 0.75rem;
   position: relative;
   ${GroupLabel} {
-    font-size: 1rem;
+    font-size: ${font.size(3)};
   }
 `
 
@@ -282,8 +282,8 @@ const GroupListPanel = styled.div`
   position: relative;
   height: auto;
   margin-bottom: 1.5rem;
-  border-radius: 0.3rem;
-  background-color: #edecf3;
+  border-radius: ${radius('small')};
+  background-color: ${color.grey(2)};
 `
 
 const ItemList = styled.div``
@@ -295,12 +295,12 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   justify-content: space-between;
   align-items: stretch;
   background-color: white;
-  border: 1px solid #edecf3;
+  border: 1px solid ${color.grey(2)};
   margin: 0 0 -1px 0;
   overflow: visible;
   line-height: 1.35;
   padding: 0;
-  font-size: 0.85rem;
+  font-size: ${font.size(2)};
   font-weight: 500;
 
   ${GroupLabel} {
@@ -310,7 +310,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   }
 
   svg {
-    fill: #e1ddec;
+    fill: ${color.grey(3)};
     width: 1.25rem;
     height: auto;
     transition: fill 85ms ease-out;
@@ -318,7 +318,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   &:hover {
     svg {
-      fill: #433e52;
+      fill: ${color.grey(8)};
     }
     ${GroupLabel} {
       color: #0084ff;
@@ -332,18 +332,18 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   &:nth-last-child(2) {
     border-radius: 0 0 0.25rem 0.25rem;
     &:first-child {
-      border-radius: 0.3rem;
+      border-radius: ${radius('small')};
     }
   }
 
   ${p =>
     p.isDragging &&
     css`
-      border-radius: 0.3rem;
+      border-radius: ${radius('small')};
       box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
       svg {
-        fill: #433e52;
+        fill: ${color.grey(8)};
       }
       ${GroupLabel} {
         color: #0084ff;

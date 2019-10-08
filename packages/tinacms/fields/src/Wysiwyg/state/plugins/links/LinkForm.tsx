@@ -1,5 +1,6 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
+import { radius, color, font } from '@tinacms/styles'
 
 type E = React.ChangeEvent<HTMLInputElement>
 
@@ -101,8 +102,8 @@ const LinkPopup = styled.div`
   background-color: #f6f6f9;
   position: relative;
   height: max-content;
-  border-radius: 0.3rem;
-  border: 1px solid #edecf3;
+  border-radius: ${radius('small')};
+  border: 1px solid ${color.grey(2)};
   filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
     drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
   transform-origin: 50% 0;
@@ -114,29 +115,29 @@ const LinkPopup = styled.div`
 
 const LinkLabel = styled.label`
   display: block;
-  font-size: 0.8rem;
+  font-size: ${font.size(1)};
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: #433e52;
+  color: ${color.grey(8)};
   margin-bottom: 0.2rem;
 `
 
 const LinkInput = styled.input`
   position: relative;
   background-color: white;
-  border-radius: 0.3rem;
-  font-size: 0.8rem;
+  border-radius: ${radius('small')};
+  font-size: ${font.size(1)};
   line-height: 1.35;
   transition: all 85ms ease-out;
   padding: 0.5rem 0.75rem;
-  border: 1px solid #edecf3;
+  border: 1px solid ${color.grey(2)};
   width: 100%;
   margin: 0 0 0.5rem 0;
   outline: none;
   box-shadow: 0 0 0 2px transparent;
 
   &:hover {
-    box-shadow: 0 0 0 2px #e1ddec;
+    box-shadow: 0 0 0 2px ${color.grey(3)};
   }
 
   &:focus {
@@ -144,7 +145,7 @@ const LinkInput = styled.input`
   }
 
   &::placeholder {
-    font-size: 0.9rem;
+    font-size: ${font.size(2)};
     color: #cfd3d7;
   }
 `
@@ -158,13 +159,13 @@ const LinkActions = styled.div`
 const LinkButton = styled.button`
   text-align: center;
   border: 0;
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   background-color: #0084ff;
   color: white;
   font-weight: 500;
   cursor: pointer;
-  font-size: 0.75rem;
+  font-size: ${font.size(0)};
   padding: 0.5rem 1.25rem;
   transition: opacity 86ms ease-out;
   margin-left: 0.5rem;
@@ -177,14 +178,14 @@ const LinkButton = styled.button`
 const SaveLink = styled.button`
   text-align: center;
   border: 0;
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   background-color: #0084ff;
   color: white;
   font-weight: 500;
   cursor: pointer;
   transition: all 85ms ease-out;
-  font-size: 0.75rem;
+  font-size: ${font.size(0)};
   padding: 0.5rem 1.25rem;
   margin-left: 0.5rem;
   &:hover {
@@ -197,7 +198,7 @@ const SaveLink = styled.button`
 
 const DeleteLink = styled(SaveLink)`
   background-color: white;
-  border: 1px solid #edecf3;
+  border: 1px solid ${color.grey(2)};
   color: #0084ff;
   &:hover {
     background-color: #f6f6f9;

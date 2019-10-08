@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { Form } from '@tinacms/core'
-import { padding, color } from '@tinacms/styles'
+import { padding, color, font } from '@tinacms/styles'
 import { RightArrowIcon } from '@tinacms/icons'
 
 interface FormsListProps {
@@ -36,10 +36,10 @@ export default FormsList
 
 const FormListItem = styled.li`
   position: relative;
-  font-size: 1.3rem;
+  font-size: ${font.size(6)};
   position: relative;
   padding: ${padding()};
-  color: #433e52;
+  color: ${color.grey(8)};
   font-weight: normal;
   transition: color 150ms ease-out;
   display: flex;
@@ -48,7 +48,7 @@ const FormListItem = styled.li`
   user-select: none;
   svg {
     width: 1.5rem;
-    fill: #e1ddec;
+    fill: ${color.grey(3)};
     margin-top: -1px;
     height: auto;
     transform: translate3d(0, 0, 0);
@@ -58,7 +58,7 @@ const FormListItem = styled.li`
     content: '';
     display: block;
     width: 100%;
-    background-color: #edecf3;
+    background-color: ${color.grey(2)};
     height: 1px;
     position: absolute;
     bottom: 0;
@@ -72,7 +72,7 @@ const FormListItem = styled.li`
     svg {
       transform: translate3d(3px, 0, 0);
       transition: transform 250ms ease;
-      fill: #433e52;
+      fill: ${color.grey(8)};
     }
     &:after {
       transform: scale3d(1, 1, 1) translate3d(-${padding()}, 0, 0);
