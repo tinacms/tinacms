@@ -52,8 +52,10 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
           <p>Are you sure you want to reset all changes?</p>
         </ModalBody>
         <ModalActions>
-          <CancelButton onClick={close}>Cancel</CancelButton>
-          <ConfirmButton onClick={reset}>Reset</ConfirmButton>
+          <Button onClick={close}>Cancel</Button>
+          <Button onClick={reset} margin primary>
+            Reset
+          </Button>
         </ModalActions>
       </ModalPopup>
     </Modal>
@@ -66,21 +68,6 @@ const ResetButton = styled(Button)`
   color: #0084ff;
   flex: 0 0 6rem;
   padding: 0.75rem 1.5rem;
-  margin-right: 0.5rem;
-  &:hover {
-    background-color: #f6f6f9;
-    opacity: 1;
-  }
-`
-
-const ConfirmButton = styled(Button)`
-  padding: 0.75rem 1.5rem;
-`
-
-const CancelButton = styled(ConfirmButton)`
-  background-color: white;
-  border: 1px solid #edecf3;
-  color: #0084ff;
   margin-right: 0.5rem;
   &:hover {
     background-color: #f6f6f9;

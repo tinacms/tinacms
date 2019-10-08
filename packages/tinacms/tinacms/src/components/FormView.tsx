@@ -84,9 +84,15 @@ export const FormsView = () => {
                 {activeForm.reset && (
                   <ResetForm pristine={pristine} reset={activeForm.reset} />
                 )}
-                <SaveButton onClick={() => handleSubmit()} disabled={pristine}>
+                <Button
+                  onClick={() => handleSubmit()}
+                  disabled={pristine}
+                  primary
+                  grow
+                  margin
+                >
                   Save
-                </SaveButton>
+                </Button>
                 {activeForm.actions.length > 0 && (
                   <ActionsMenu actions={activeForm.actions} />
                 )}
