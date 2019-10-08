@@ -23,7 +23,11 @@ import { LinkView } from './LinkView'
 
 export const HTTP_LINK_REGEX = /\bhttps?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:;%_\+.,~#?&//=]*)/g
 
-export function links(schema: Schema, frame?: { document: Document }): Plugin {
+export function links(
+  schema: Schema,
+  frame?: { document: Document },
+  theme?: any
+): Plugin {
   const renderTarget = createInvisibleDiv('links')
   let linkForm: LinkFormController
   let shiftKey: boolean
@@ -42,7 +46,12 @@ export function links(schema: Schema, frame?: { document: Document }): Plugin {
     },
     view(editorView: any) {
       insertElBefore(renderTarget, editorView.dom)
-      linkForm = new LinkFormController(renderTarget, editorView as any, frame)
+      linkForm = new LinkFormController(
+        renderTarget,
+        editorView as any,
+        frame,
+        theme
+      )
       let doc
       if (frame) {
         doc = frame.document

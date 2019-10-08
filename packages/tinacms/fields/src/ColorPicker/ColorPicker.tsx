@@ -21,6 +21,7 @@ import { SketchPicker } from 'react-color'
 
 import styled, { keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
+import { font } from '@tinacms/styles'
 
 type DivProps = any
 type WrappedFieldProps = any
@@ -64,7 +65,7 @@ export const Swatch = styled(
     align-items: center;
     justify-content: center;
 
-    font-size: 0.8rem;
+    font-size: ${font.size(1)};
     font-weight: bold;
 
     width: 100%;

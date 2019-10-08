@@ -28,7 +28,7 @@ import {
 } from '../../../commands/list-commands'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
-import styled, { css } from 'styled-components'
+import styled, { css, ThemeProvider, ThemeContext } from 'styled-components'
 import {
   BoldIcon,
   CodeIcon,
@@ -42,6 +42,7 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
 } from '@tinacms/icons'
+import { radius, color, padding } from '@tinacms/styles'
 
 // import { ImageControl } from './images'
 
@@ -50,6 +51,7 @@ interface Props {
   format: 'html' | 'markdown' | 'html-blocks'
   view: EditorView
   frame: any
+  theme: any
 }
 
 interface State {
@@ -85,13 +87,14 @@ const LinkControl = markControl({
   noMix: ['code'],
 })
 
-export class Menu extends React.Component<Props, State> {
-  render() {
-    const { view, bottom = false, frame } = this.props
+export const Menu = (props: Props) => {
+  const { view, bottom = false, frame, theme } = props
 
-    const supportBlocks = true
+  const supportBlocks = true
+  console.log(theme)
 
-    return (
+  return (
+    <ThemeProvider theme={theme}>
       <MenuContainer>
         {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
         <BoldControl view={view} />
@@ -104,8 +107,8 @@ export class Menu extends React.Component<Props, State> {
         {supportBlocks && <BulletList view={view} bottom={bottom} />}
         {supportBlocks && <OrderedList view={view} bottom={bottom} />}
       </MenuContainer>
-    )
-  }
+    </ThemeProvider>
+  )
 }
 
 const commandContrl = (
@@ -182,9 +185,9 @@ const MenuContainer = styled.div`
   top: 0;
   width: 100%;
   background-color: white;
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  border: 1px solid #edecf3;
+  border: 1px solid ${color.grey(2)};
   overflow: visible;
   display: flex;
   flex: 0 0 auto;
@@ -200,8 +203,8 @@ export const MenuButton = styled.button<{
   flex: 1 0 auto;
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p => (p.active ? '#0084ff' : '#433E52')};
-  fill: ${p => (p.active ? '#0084ff' : '#433E52')};
+  color: ${p => (p.active ? '#0084ff' : color.grey(8))};
+  fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
   border: none;
   outline: none;
   padding: 0.375rem;
@@ -223,7 +226,7 @@ export const MenuButton = styled.button<{
   }
   &:first-child {
     padding-left: 0.75rem;
-    border-radius: 1.5rem 0 0 1.5rem;
+    border-radius: ${radius()} 0 0 ${radius()};
   }
   &:last-child {
     padding-right: 0.75rem;
@@ -254,7 +257,7 @@ export const MenuDropdownWrapper = styled.div`
 `
 
 export const MenuButtonDropdown = styled.div<{ open: boolean }>`
-  border-radius: 1.5rem;
+  border-radius: ${radius()};
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -283,18 +286,18 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
   transition: all 85ms ease-out;
   cursor: pointer;
   &:first-child {
-    padding-top: 0.75rem;
+    padding-top: ${padding('small')};
   }
   &:last-child {
-    padding-bottom: 0.75rem;
+    padding-bottom: ${padding('small')};
   }
   &:hover {
-    background-color: #f6f6f9;
-    color: #0084ff;
+    background-color: ${color.grey(1)};
+    color: ${color.primary()};
   }
   &:active {
-    color: #0084ff;
-    fill: #0084ff;
+    color: ${color.primary()};
+    fill: ${color.primary()};
     background-color: rgba(53, 50, 50, 0.05);
   }
 `

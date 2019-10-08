@@ -27,11 +27,15 @@ import { createUploader } from './upload'
 import { openRepo } from './open-repo'
 
 export interface GitRouterConfig {
+  pathToRepo?: string
+  pathToContent?: string
   defaultCommitMessage?: string
 }
 export function router(config: GitRouterConfig = {}) {
-  const REPO_ABSOLUTE_PATH = process.cwd()
-  const TMP_DIR = path.join(REPO_ABSOLUTE_PATH, '/tmp/')
+  const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
+  const CONTENT_REL_PATH = config.pathToContent || ''
+  const CONTENT_ABSOLUTE_PATH = path.join(REPO_ABSOLUTE_PATH, CONTENT_REL_PATH)
+  const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
   const DEFAULT_COMMIT_MESSAGE =
     config.defaultCommitMessage || 'Update from Tina'
 
@@ -42,7 +46,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.delete('/:relPath', (req: any, res: any) => {
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(REPO_ABSOLUTE_PATH, fileRelativePath)
+    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
 
     try {
       deleteFile(fileAbsolutePath)
@@ -67,7 +71,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.put('/:relPath', (req: any, res: any) => {
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(REPO_ABSOLUTE_PATH, fileRelativePath)
+    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
 
     if (DEBUG) {
       console.log(fileAbsolutePath)
@@ -101,7 +105,7 @@ export function router(config: GitRouterConfig = {}) {
   router.post('/commit', (req: any, res: any) => {
     const message = req.body.message || DEFAULT_COMMIT_MESSAGE
     const files = req.body.files.map((rel: string) =>
-      path.join(REPO_ABSOLUTE_PATH, rel)
+      path.join(CONTENT_ABSOLUTE_PATH, rel)
     )
     // TODO: Separate commit and push???
     commit({
@@ -124,7 +128,7 @@ export function router(config: GitRouterConfig = {}) {
   router.post('/reset', (req, res) => {
     let repo = openRepo(REPO_ABSOLUTE_PATH)
     const files = req.body.files.map((rel: string) =>
-      path.join(REPO_ABSOLUTE_PATH, rel)
+      path.join(CONTENT_ABSOLUTE_PATH, rel)
     )
     if (DEBUG) console.log(files)
     repo
@@ -135,6 +139,30 @@ export function router(config: GitRouterConfig = {}) {
       .catch((e: any) => {
         res.status(412)
         res.json({ status: 'failure', error: e.message })
+      })
+  })
+
+  router.get('/show/:fileRelativePath', (req, res) => {
+    let repo = openRepo(REPO_ABSOLUTE_PATH)
+
+    repo
+      .show([
+        `HEAD:${path.join(CONTENT_REL_PATH, req.params.fileRelativePath)}`,
+      ])
+      .then((data: any) => {
+        res.json({
+          fileRelativePath: req.params.fileRelativePath,
+          content: data,
+          status: 'success',
+        })
+      })
+      .catch((e: any) => {
+        res.status(501)
+        res.json({
+          status: 'failure',
+          message: e.message,
+          fileRelativePath: req.params.fileRelativePath,
+        })
       })
   })
 

@@ -22,9 +22,11 @@ import { ModalProvider } from './modals/ModalProvider'
 import { SidebarContext } from './sidebar/SidebarProvider'
 import { cms } from '../index'
 import styled, { ThemeProvider } from 'styled-components'
-import { TinaReset, Theme, theme as DEFAULT_THEME } from '@tinacms/styles'
+import { TinaReset, Theme, DefaultTheme } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
+
+const merge = require('lodash.merge')
 
 interface TinaProps {
   position: 'fixed' | 'float'
@@ -36,7 +38,7 @@ export const Tina: React.FC<TinaProps> = ({
   children,
   position,
   hidden,
-  theme = DEFAULT_THEME,
+  theme,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -54,7 +56,7 @@ export const Tina: React.FC<TinaProps> = ({
           {children}
         </SiteWrapper>
         {!hidden && (
-          <ThemeProvider theme={theme}>
+          <ThemeProvider theme={merge(DefaultTheme, theme)}>
             <ModalProvider>
               <TinaReset>
                 <Sidebar />
