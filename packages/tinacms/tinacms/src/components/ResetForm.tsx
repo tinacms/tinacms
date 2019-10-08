@@ -63,16 +63,7 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
 }
 
 const ResetButton = styled(Button)`
-  background-color: white;
-  border: 1px solid #edecf3;
-  color: #0084ff;
   flex: 0 0 6rem;
-  padding: 0.75rem 1.5rem;
-  margin-right: 0.5rem;
-  &:hover {
-    background-color: #f6f6f9;
-    opacity: 1;
-  }
 `
 
 const CloseButton = styled.div`
