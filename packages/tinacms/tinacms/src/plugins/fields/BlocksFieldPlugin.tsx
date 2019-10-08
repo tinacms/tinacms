@@ -3,7 +3,7 @@ import { Field, Form } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { Button } from '@tinacms/fields'
+import { IconButton, Button } from '@tinacms/fields'
 import {
   AddIcon,
   DragIcon,
@@ -57,9 +57,14 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
     <>
       <GroupListHeader>
         <GroupLabel>{field.label || field.name}</GroupLabel>
-        <GroupHeaderButton onClick={() => setVisible(true)} open={visible}>
+        <IconButton
+          onClick={() => setVisible(true)}
+          open={visible}
+          primary
+          small
+        >
           <AddIcon />
-        </GroupHeaderButton>
+        </IconButton>
         <BlockMenu open={visible}>
           <Dismissible
             click
@@ -279,39 +284,6 @@ const GroupListPanel = styled.div`
   margin-bottom: 1.5rem;
   border-radius: 0.3rem;
   background-color: #edecf3;
-`
-
-const GroupHeaderButton = styled(Button)<{ open: boolean }>`
-  border-radius: 10rem;
-  padding: 0;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: -0.1rem 0 0 0;
-  position: relative;
-  fill: white;
-  transform-origin: 50% 50%;
-  transition: all 150ms ease-out;
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    width: 1.5rem;
-    height: 1.5rem;
-  }
-  &:focus {
-    outline: none;
-  }
-  ${props =>
-    props.open &&
-    css`
-      transform: rotate(45deg);
-      background-color: white;
-      fill: ${color.primary()};
-      &:hover {
-        background-color: #f6f6f9;
-      }
-    `};
 `
 
 const ItemList = styled.div``

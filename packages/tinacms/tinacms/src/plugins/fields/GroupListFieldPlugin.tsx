@@ -4,7 +4,7 @@ import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { padding, color } from '@tinacms/styles'
 import { Droppable, DropResult, Draggable } from 'react-beautiful-dnd'
-import { Button } from '@tinacms/fields'
+import { IconButton, Button } from '@tinacms/fields'
 import {
   AddIcon,
   DragIcon,
@@ -49,9 +49,9 @@ const Group = function Group({
     <>
       <GroupListHeader>
         <GroupLabel>{field.label || field.name}</GroupLabel>
-        <GroupHeaderButton onClick={addItem}>
+        <IconButton onClick={addItem} primary small>
           <AddIcon />
-        </GroupHeaderButton>
+        </IconButton>
       </GroupListHeader>
       <GroupListPanel>
         <ItemList>
@@ -171,24 +171,6 @@ const GroupListPanel = styled.div`
   margin-bottom: 1.5rem;
   border-radius: 0.3rem;
   background-color: #edecf3;
-`
-
-const GroupHeaderButton = styled(Button)`
-  border-radius: 1.5rem;
-  padding: 0;
-  width: 1.75rem;
-  height: 1.75rem;
-  margin: -0.1rem 0 0 0;
-  position: relative;
-  fill: white;
-  svg {
-    position: absolute;
-    top: 50%;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    width: 1.5rem;
-    height: 1.5rem;
-  }
 `
 
 const EmptyList = styled.div`
