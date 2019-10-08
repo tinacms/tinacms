@@ -21,7 +21,6 @@ import { Field, Form } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import { IconButton, Button } from '@tinacms/fields'
 import {
   AddIcon,
   DragIcon,
@@ -31,7 +30,14 @@ import {
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from 'react-dismissible'
-import { padding, color, radius, font } from '@tinacms/styles'
+import {
+  padding,
+  color,
+  radius,
+  font,
+  IconButton,
+  Button,
+} from '@tinacms/styles'
 import { useFrameContext } from '../../components/SyledFrame'
 
 interface BlocksFieldDefinititon extends Field {

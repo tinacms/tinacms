@@ -18,8 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { keyframes, css } from 'styled-components'
-import { Button } from '@tinacms/fields'
-import { padding, color } from '@tinacms/styles'
+import { Button, padding, color } from '@tinacms/styles'
 import {
   Modal,
   ModalHeader,
@@ -71,13 +70,13 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
         </ModalBody>
         <ModalActions>
           <Button onClick={close}>Cancel</Button>
-          <Button 
-            margin 
+          <Button
+            margin
             primary
             onClick={async () => {
               await reset()
               close()
-            }}  
+            }}
           >
             Reset
           </Button>

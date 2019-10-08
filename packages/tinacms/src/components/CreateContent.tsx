@@ -26,12 +26,18 @@ import {
   ModalActions,
 } from './modals/ModalProvider'
 import { ModalPopup } from './modals/ModalPopup'
-import { IconButton, Button } from '@tinacms/fields'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/core'
 import { CloseIcon, AddIcon } from '@tinacms/icons'
-import { padding, color, radius, font } from '@tinacms/styles'
+import {
+  padding,
+  color,
+  radius,
+  font,
+  IconButton,
+  Button,
+} from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
 import { useTina } from '../hooks/use-tina'

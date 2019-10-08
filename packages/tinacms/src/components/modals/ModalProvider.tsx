@@ -22,8 +22,7 @@ import { createPortal } from 'react-dom'
 import { StyledFrame } from '../SyledFrame'
 import styled from 'styled-components'
 import { Z_INDEX } from '../../Globals'
-import { GlobalStyles, padding, font, color } from '@tinacms/styles'
-import { Button } from '@tinacms/fields'
+import { GlobalStyles, Button, padding, font, color } from '@tinacms/styles'
 
 interface Props {
   children: any

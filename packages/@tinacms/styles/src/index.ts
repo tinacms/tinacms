@@ -17,3 +17,4 @@ limitations under the License.
 */
 
 export * from './Styles'
+export * from './Button'
