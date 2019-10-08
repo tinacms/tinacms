@@ -11,6 +11,7 @@ import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
+const matter = require('gray-matter')
 
 export function useRemarkForm(
   markdownRemark: RemarkNode,
@@ -25,7 +26,8 @@ export function useRemarkForm(
   const cms = useCMS()
   const label = formOverrrides.label || markdownRemark.frontmatter.title
   const id = markdownRemark.fileRelativePath
-  const initialValues = useMemo(
+
+  const valuesOnDisk = useMemo(
     () => ({
       ...markdownRemark,
       rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
@@ -33,8 +35,23 @@ export function useRemarkForm(
     [markdownRemark.rawFrontmatter, markdownRemark.rawMarkdownBody]
   )
 
+  const [valuesInGit, setValuesInGit] = React.useState()
+  React.useEffect(() => {
+    cms.api.git
+      .show(id)
+      .then((git: any) => {
+        let { content: rawMarkdownBody, data: rawFrontmatter } = matter(
+          git.content
+        )
+        setValuesInGit({ ...valuesOnDisk, rawFrontmatter, rawMarkdownBody })
+      })
+      .catch((e: any) => {
+        console.log('FAILED', e)
+      })
+  }, [id])
+
   const fields = React.useMemo(() => {
-    let fields = formOverrrides.fields || generateFields(initialValues)
+    let fields = formOverrrides.fields || generateFields(valuesOnDisk)
     fields = fields.map(field => {
       if (
         field.name === 'frontmatter' ||
@@ -54,7 +71,8 @@ export function useRemarkForm(
   const [values, form] = useCMSForm({
     label,
     id,
-    initialValues,
+    initialValues: valuesInGit,
+    currentValues: valuesOnDisk,
     fields,
     onSubmit(data) {
       return cms.api.git.onSubmit!({
