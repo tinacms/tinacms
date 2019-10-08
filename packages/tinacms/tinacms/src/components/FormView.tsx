@@ -44,7 +44,9 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length) return <NoFormsPlaceholder />
+  if (!forms.length) {
+    return <NoFormsPlaceholder />
+  }
 
   if (!activeForm) {
     return (
