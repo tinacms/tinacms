@@ -117,4 +117,17 @@ export class GitClient {
       console.error(e)
     })
   }
+
+  /**
+   * Resets the given files.
+   */
+  reset(data: { files: string[] }) {
+    return fetch(`${this.baseUrl}/reset`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+      body: JSON.stringify(data),
+    })
+  }
 }
