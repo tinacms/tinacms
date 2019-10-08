@@ -3,7 +3,6 @@ import styled, { ThemeContext } from 'styled-components'
 import { Plugin } from '@tinacms/core'
 import { useTinaProsemirror } from './useTinaProsemirror'
 import { ALL_PLUGINS } from './default-plugins'
-import { radius } from '@tinacms/styles'
 import { CodeMirrorCss } from './CodeMirrorCss'
 
 interface Wysiwyg {

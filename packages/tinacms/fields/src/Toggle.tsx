@@ -62,7 +62,7 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
     top: 50%;
     width: calc(1.75rem - 6px);
     height: calc(1.75rem - 6px);
-    background: ${p => (p.checked ? color.primary() : 'color.grey(3)')};
+    background: ${p => (p.checked ? color.primary() : color.grey(3))};
     transform: translate3d(${p => (p.checked ? '1.25rem' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
   }
