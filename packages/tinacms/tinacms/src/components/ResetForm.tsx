@@ -53,7 +53,14 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
         </ModalBody>
         <ModalActions>
           <CancelButton onClick={close}>Cancel</CancelButton>
-          <ConfirmButton onClick={reset}>Reset</ConfirmButton>
+          <ConfirmButton
+            onClick={async () => {
+              await reset()
+              close()
+            }}
+          >
+            Reset
+          </ConfirmButton>
         </ModalActions>
       </ModalPopup>
     </Modal>
