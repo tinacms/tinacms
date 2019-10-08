@@ -1,6 +1,6 @@
 import { Form, FormOptions, Field } from '@tinacms/core'
 import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
-import { useMemo, useCallback } from 'react'
+import { useMemo, useCallback, useState, useEffect } from 'react'
 
 interface JsonNode {
   id: string
@@ -20,25 +20,48 @@ export function useJsonForm(
 
   const cms = useCMS()
   const label = jsonNode.fileRelativePath
-  const id = jsonNode.id
-  const initialValues = useMemo(
+  const id = jsonNode.fileRelativePath
+  const valuesOnDisk = useMemo(
     () => ({
       jsonNode: jsonNode,
       rawJson: JSON.parse(jsonNode.rawJson),
     }),
     [jsonNode]
   )
-  const fields = formOptions.fields || generateFields(initialValues.rawJson)
+
+  const [valuesInGit, setValuesInGit] = useState()
+  useEffect(() => {
+    cms.api.git
+      .show(id)
+      .then((git: any) => {
+        let rawJson = JSON.parse(git.content)
+        setValuesInGit({ ...valuesOnDisk, rawJson })
+      })
+      .catch((e: any) => {
+        console.log('FAILED', e)
+      })
+  }, [id])
+
+  const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
 
   fields.push({ name: 'jsonNode', component: null })
 
   const [values, form] = useCMSForm({
     id,
     label,
-    initialValues,
+    initialValues: valuesInGit,
+    currentValues: valuesOnDisk,
     fields,
     onSubmit(data) {
-      // TODO: Commit & Push
+      return cms.api.git.onSubmit!({
+        files: [data.fileRelativePath],
+        message: data.__commit_message || 'Tina commit',
+        name: data.__commit_name,
+        email: data.__commit_email,
+      })
+    },
+    reset() {
+      return cms.api.git.reset({ files: [id] })
     },
     ...formOptions,
   })
