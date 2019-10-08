@@ -17,15 +17,16 @@ TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.
 
 ### Creating Packages
 
-| Type                    | Folder   | Naming Convention  |
-| ----------------------- | -------- | ------------------ |
-| Internal packages       | `core`   | `@tinacms/*`       |
-| Node API extensions     | `api`    | `@tinacms/api-*`   |
-| React specific packages | `react`  | `react-tinacms-*`  |
-| Vue specific packages   | `vue`    | `vue-tinacms-*`    |
-| Gastby plugins          | `gatsby` | `gatsby-tinacms-*` |
-| NextJS package          | `next`   | `next-tinacms-*`   |
-| Demo Projects           | `demo`   | `demo-*`           |
+Packages in Tina are organized according to ther name
+
+| Type                    | Naming Convention  | Example Path            |
+| ----------------------- | ------------------ | ----------------------- |
+| Internal packages       | `@tinacms/*`       | `@tinacms/core`         |
+| Node API extensions     | `@tinacms/api-*`   | `@tinacms/api-git`      |
+| React specific packages | `react-tinacms-*`  | `react-tinacms-remark`  |
+| Gastby plugins          | `gatsby-tinacms-*` | `gatsby-tinacms-json`   |
+| NextJS package          | `next-tinacms-*`   | `next-tinacms-markdown` |
+| Demo Projects           | `demo-*`           | `demo-gatsby`           |
 
 ## Troubleshooting in Development
 
