@@ -1,3 +1,4 @@
+#!/usr/bin/env node
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -16,7 +17,6 @@ limitations under the License.
 
 */
 
-#!/usr/bin/env node
 const path = require('path')
 const rollup = require('rollup')
 const rollupTypescript = require('rollup-plugin-typescript2')
