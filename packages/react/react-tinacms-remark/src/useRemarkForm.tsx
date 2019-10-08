@@ -64,6 +64,9 @@ export function useRemarkForm(
         email: data.__commit_email,
       })
     },
+    reset() {
+      return cms.api.git.reset({ files: [id] })
+    },
     actions: [
       () => (
         <ActionButton
