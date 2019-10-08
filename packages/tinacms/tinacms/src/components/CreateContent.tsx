@@ -1,7 +1,7 @@
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { useCMS } from '@tinacms/react-tinacms'
-import { SaveButton, CancelButton } from './FormView'
+import { SaveButton } from './FormView'
 import {
   Modal,
   ModalHeader,
@@ -216,5 +216,15 @@ const CreateButton = styled.button`
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
+  }
+`
+
+const CancelButton = styled(SaveButton)`
+  background-color: white;
+  border: 1px solid #edecf3;
+  color: #0084ff;
+  &:hover {
+    background-color: #f6f6f9;
+    opacity: 1;
   }
 `
