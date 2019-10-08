@@ -130,4 +130,20 @@ export class GitClient {
       body: JSON.stringify(data),
     })
   }
+
+  /**
+   * Get the contents of a file for the most recent commit.
+   */
+  show(fileRelativePath: string) {
+    return fetch(
+      `${this.baseUrl}/show/${encodeURIComponent(fileRelativePath)}`,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      }
+    ).then(response => {
+      return response.json()
+    })
+  }
 }
