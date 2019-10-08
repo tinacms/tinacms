@@ -118,8 +118,6 @@ function getModifiedPackages(allFiles: string[]) {
       .filter(filepath => filepath.startsWith('packages/'))
       .filter(filepath => !filepath.startsWith('packages/demo'))
       .map(filepath => {
-        // packages/react-tinacms
-        // packages/@tinacms/core
         if (filepath.startsWith('packages/@tinacms')) {
           return filepath
             .split('/')
