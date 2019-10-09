@@ -222,6 +222,10 @@ const BlogPostForm = {
           social: [],
         },
       },
+      itemProps: item => ({
+        key: item.src,
+        label: item.alt,
+      }),
       fields: [
         { name: "alt", component: "text" },
         { name: "src", component: "text" },
