@@ -21,34 +21,33 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '@tinacms/fields'
 import { useCMS } from '@tinacms/react-tinacms'
 
+type FieldProps = any
 interface ImageProps {
   path: string
-  previewSrc(form: any): string
+  previewSrc(form: any, field: FieldProps): string
   uploadDir(form: any): string
 }
 
-export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
-  ({ form, field, input }) => {
-    const cms = useCMS()
+export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
+  const cms = useCMS()
 
-    return (
-      <ImageUpload
-        value={input.value}
-        previewSrc={field.previewSrc(form.getState().values)}
-        onDrop={(acceptedFiles: any[]) => {
-          acceptedFiles.forEach(async (file: any) => {
-            // @ts-ignore
-            await cms.api.git!.onUploadMedia!({
-              directory: field.uploadDir(form.getState().values),
-              content: file,
-            })
-            input.onChange(file.name)
+  return (
+    <ImageUpload
+      value={props.input.value}
+      previewSrc={props.field.previewSrc(props.form.getState().values, props)}
+      onDrop={(acceptedFiles: any[]) => {
+        acceptedFiles.forEach(async (file: any) => {
+          // @ts-ignore
+          await cms.api.git!.onUploadMedia!({
+            directory: props.field.uploadDir(props.form.getState().values),
+            content: file,
           })
-        }}
-      />
-    )
-  }
-)
+          props.input.onChange(file.name)
+        })
+      }}
+    />
+  )
+})
 
 export default {
   name: 'image',
