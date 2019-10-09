@@ -41,7 +41,7 @@ import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
-  defaultItem: object
+  defaultItem: object | (() => object)
   key: string
   fields: Field[]
 }
@@ -63,7 +63,12 @@ const Group = function Group({
   ...styleProps
 }: GroupProps) {
   const addItem = React.useCallback(() => {
-    const obj = field.defaultItem || {}
+    let obj = {}
+    if (typeof field.defaultItem === 'function') {
+      obj = field.defaultItem()
+    } else {
+      obj = field.defaultItem || {}
+    }
     form.mutators.insert(field.name, 0, obj)
   }, [form, field])
 
@@ -118,7 +123,6 @@ const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
   const title = item.alt ? item.alt : (field.label || field.name) + ' Item'
   return (
     <Draggable
-      key={index}
       type={field.name}
       draggableId={`${field.name}.${index}`}
       index={index}
