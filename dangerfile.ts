@@ -49,6 +49,7 @@ function runChecksOnPullRequest() {
 
   modifiedPackages.forEach(warnIfMissingTestChanges)
   modifiedPackages.forEach(checkForNpmScripts)
+  modifiedPackages.forEach(checkForLicense)
 
   listTouchedPackages(modifiedPackages)
   listTouchedWorkflows(allFiles)
@@ -89,6 +90,16 @@ function checkForNpmScripts({ packageJson }: TinaPackage) {
       fail(`${packageJson.name} is missing a required script: ${scriptName}`)
     }
   })
+}
+
+/**
+ *
+ */
+function checkForLicense({ packageJson }: TinaPackage) {
+  let license = 'Apache-2.0'
+  if (packageJson.license !== license) {
+    fail(`${packageJson.name} package.json is missing the license: ${license}`)
+  }
 }
 
 /**
