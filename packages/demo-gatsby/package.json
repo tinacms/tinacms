@@ -35,6 +35,7 @@
     "gatsby-transformer-json": "^2.2.2",
     "gatsby-transformer-remark": "^2.6.9",
     "gatsby-transformer-sharp": "^2.2.4",
+    "lodash.get": "^4.4.2",
     "prismjs": "^1.16.0",
     "react": "^16.8.6",
     "react-dom": "^16.8.6",
