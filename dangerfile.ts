@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { markdown, danger, warn, message } from 'danger'
+import { markdown, danger, warn, fail, message } from 'danger'
 
 runChecksOnPullRequest()
 
@@ -48,6 +48,7 @@ function runChecksOnPullRequest() {
   let modifiedPackages = getModifiedPackages(allFiles)
 
   modifiedPackages.forEach(warnIfMissingTestChanges)
+  modifiedPackages.forEach(checkForNpmScripts)
 
   listTouchedPackages(modifiedPackages)
   listTouchedWorkflows(allFiles)
@@ -70,6 +71,24 @@ function listTouchedWorkflows(allFiles: string[]) {
   message(`### Modified Github Workflows
 
 * ${touchedWorkflows.join('\n* ')}`)
+}
+
+/**
+ *
+ */
+function checkForNpmScripts({ packageJson }: TinaPackage) {
+  if (packageJson.name === 'cms-scripts') {
+    return
+  }
+  let scripts = packageJson.scripts || {}
+
+  let requiredScripts = ['dev', 'build', 'watch']
+
+  requiredScripts.forEach(scriptName => {
+    if (!scripts[scriptName]) {
+      fail(`${packageJson.name} is missing a required script: ${scriptName}`)
+    }
+  })
 }
 
 /**
