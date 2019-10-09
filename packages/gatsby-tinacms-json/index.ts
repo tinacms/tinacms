@@ -31,7 +31,7 @@ export function useJsonForm(
   jsonNode: JsonNode,
   formOptions: Partial<FormOptions<any>> = {}
 ) {
-  if (!jsonNode) {
+  if (!jsonNode || process.env.NODE_ENV === 'production') {
     return [{}, null]
   }
   validateJsonNode(jsonNode)
