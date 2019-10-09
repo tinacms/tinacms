@@ -21,7 +21,7 @@ import { SketchPicker } from 'react-color'
 
 import styled, { keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
-import { font } from '@tinacms/styles'
+import { font, color, radius, shadow, timing } from '@tinacms/styles'
 
 type DivProps = any
 type WrappedFieldProps = any
@@ -53,9 +53,9 @@ export const Swatch = styled(
     </div>
   )
 )`
-  background: ${p => p.theme.color.light};
-  border-radius: ${p => p.theme.radius.big};
-  box-shadow: ${p => p.theme.shadow.small};
+  background: ${color.grey(2)};
+  border-radius: ${radius('big')};
+  box-shadow: ${shadow('small')};
   cursor: pointer;
   width: 100%;
   margin: 0;
@@ -70,14 +70,14 @@ export const Swatch = styled(
 
     width: 100%;
     height: 2.5rem;
-    border-radius: ${p => p.theme.radius.big};
+    border-radius: ${radius('big')};
     box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
     background: ${props =>
       props.colorRGBA
         ? `rgba(${props.colorRGBA.r}, ${props.colorRGBA.g}, ${props.colorRGBA.b}, ${props.colorRGBA.a})`
         : `#fff`};
     color: ${props => GetTextColorForBackground(props.colorRGBA)};
-    transition: all ${p => p.theme.timing.short} ease-out;
+    transition: all ${timing('short')} ease-out;
   }
 
   &:hover {
