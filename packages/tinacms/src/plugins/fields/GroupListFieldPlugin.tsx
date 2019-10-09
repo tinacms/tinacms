@@ -41,9 +41,30 @@ import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
-  defaultItem: object | (() => object)
-  key: string
   fields: Field[]
+  defaultItem?: object | (() => object)
+  /**
+   * An optional function which generates `props` for
+   * this items's `li`.
+   */
+  itemProps?: (
+    item: object
+  ) => {
+    /**
+     * The `key` property used to optimize the rendering of lists.
+     *
+     * If rendering is causing problems, use `defaultItem` to
+     * generate a unique key for the item.
+     *
+     * Reference:
+     * * https://reactjs.org/docs/lists-and-keys.html
+     */
+    key?: string
+    /**
+     * The label to be display on the list item.
+     */
+    label?: string
+  }
 }
 
 interface GroupProps {
@@ -73,6 +94,13 @@ const Group = function Group({
   }, [form, field])
 
   const items = input.value || []
+  const itemProps = React.useCallback(
+    (item: object) => {
+      if (!field.itemProps) return {}
+      return field.itemProps(item)
+    },
+    [field.itemProps]
+  )
 
   return (
     <>
@@ -94,6 +122,7 @@ const Group = function Group({
                     field={field}
                     item={item}
                     index={index}
+                    {...itemProps(item)}
                   />
                 ))}
                 {provider.placeholder}
@@ -113,14 +142,15 @@ interface ItemProps {
   field: GroupFieldDefinititon
   index: number
   item: any
+  label?: string
 }
 
-const Item = ({ tinaForm, field, index, item, ...p }: ItemProps) => {
+const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
-  const title = item.alt ? item.alt : (field.label || field.name) + ' Item'
+  const title = label || (field.label || field.name) + ' Item'
   return (
     <Draggable
       type={field.name}
