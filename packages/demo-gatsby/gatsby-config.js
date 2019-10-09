@@ -17,7 +17,7 @@ limitations under the License.
 */
 const path = require("path")
 
-const REPO_ABSOLUTE_PATH = path.join(process.cwd(), "../../..")
+const REPO_ABSOLUTE_PATH = path.join(process.cwd(), "../..")
 
 module.exports = {
   siteMetadata: {
@@ -43,7 +43,7 @@ module.exports = {
             resolve: "@tinacms/gatsby-tinacms-git",
             options: {
               pathToRepo: REPO_ABSOLUTE_PATH,
-              pathToContent: "packages/demo/demo-gatsby",
+              pathToContent: "packages/demo-gatsby",
               defaultCommitMessage: "Update from the content ",
             },
           },
