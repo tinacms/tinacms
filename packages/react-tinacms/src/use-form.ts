@@ -26,9 +26,9 @@ interface UseFormOptions extends FormOptions<any> {
 }
 export function useCMSForm<FormShape = any>(
   options: UseFormOptions
-): [FormShape, Form | null] {
+): [FormShape, Form | undefined] {
   if (process.env.NODE_ENV === 'production') {
-    return [options.initialValues, null]
+    return [options.initialValues, undefined]
   }
   const cms = useCMS()
   const [form, setForm] = React.useState<Form | undefined>()
