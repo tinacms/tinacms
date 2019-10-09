@@ -27,6 +27,7 @@ import { liveRemarkForm } from "@tinacms/react-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField } from "@tinacms/form-builder"
 import { Wysiwyg, Toggle } from "@tinacms/fields"
+const get = require("lodash.get")
 
 const PlainText = props => (
   <input style={{ background: "transparent " }} {...props.input} />
@@ -309,9 +310,11 @@ const BlogPostForm = {
       },
 
       // Generate the src attribute for the preview image.
-      previewSrc: formValues => {
-        if (!formValues.frontmatter.thumbnail) return ""
-        return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
+      previewSrc: (formValues, { input }) => {
+        let path = input.name.replace("rawFrontmatter", "frontmatter")
+        let gastbyImageNode = get(formValues, path)
+        if (!gastbyImageNode) return ""
+        return gastbyImageNode.childImageSharp.fluid.src
       },
     },
     { label: "Body", name: "rawMarkdownBody", component: "markdown" },
