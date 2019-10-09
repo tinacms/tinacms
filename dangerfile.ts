@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { markdown, danger, warn, message } from 'danger'
+import { markdown, danger, warn, fail, message } from 'danger'
 
 runChecksOnPullRequest()
 
@@ -48,6 +48,8 @@ function runChecksOnPullRequest() {
   let modifiedPackages = getModifiedPackages(allFiles)
 
   modifiedPackages.forEach(warnIfMissingTestChanges)
+  modifiedPackages.forEach(checkForNpmScripts)
+  modifiedPackages.forEach(checkForLicense)
 
   listTouchedPackages(modifiedPackages)
   listTouchedWorkflows(allFiles)
@@ -70,6 +72,34 @@ function listTouchedWorkflows(allFiles: string[]) {
   message(`### Modified Github Workflows
 
 * ${touchedWorkflows.join('\n* ')}`)
+}
+
+/**
+ *
+ */
+function checkForNpmScripts({ packageJson }: TinaPackage) {
+  if (packageJson.name === 'cms-scripts') {
+    return
+  }
+  let scripts = packageJson.scripts || {}
+
+  let requiredScripts = ['dev', 'build', 'watch']
+
+  requiredScripts.forEach(scriptName => {
+    if (!scripts[scriptName]) {
+      fail(`${packageJson.name} is missing a required script: ${scriptName}`)
+    }
+  })
+}
+
+/**
+ *
+ */
+function checkForLicense({ packageJson }: TinaPackage) {
+  let license = 'Apache-2.0'
+  if (packageJson.license !== license) {
+    fail(`${packageJson.name} package.json is missing the license: ${license}`)
+  }
 }
 
 /**
