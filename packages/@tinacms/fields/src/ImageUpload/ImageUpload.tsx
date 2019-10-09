@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
-import { radius, color, font } from '@tinacms/styles'
+import { radius, color, font, timing } from '@tinacms/styles'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
@@ -67,7 +67,7 @@ const ImgPlaceholder = styled.div`
 const StyledImage = styled.img`
   max-width: 100%;
   border-radius: ${radius('small')};
-  transition: opacity ${p => p.theme.timing.short} ease-out;
+  transition: opacity ${timing('short')} ease-out;
   ${DropArea}:hover & {
     opacity: 0.6;
   }

@@ -22,7 +22,15 @@ import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
 import styled, { keyframes, css } from 'styled-components'
-import { Button, padding, color, font } from '@tinacms/styles'
+import {
+  Button,
+  padding,
+  color,
+  font,
+  timing,
+  radius,
+  shadow,
+} from '@tinacms/styles'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
@@ -170,13 +178,13 @@ const EmptyState = styled.div`
 const LinkButton = styled.a`
   text-align: center;
   border: 0;
-  border-radius: ${p => p.theme.radius.big};
+  border-radius: ${radius('big')};
   border: 1px solid ${color.grey(2)};
-  box-shadow: ${p => p.theme.shadow.small};
+  box-shadow: ${shadow('small')};
   font-weight: 500;
   cursor: pointer;
   font-size: ${font.size(0)};
-  transition: all ${p => p.theme.timing.short} ease-out;
+  transition: all ${timing('short')} ease-out;
   background-color: white;
   color: ${color.grey(8)};
   padding: ${padding('small')} ${padding('big')} ${padding('small')} 3.5rem;
@@ -190,7 +198,7 @@ const LinkButton = styled.a`
     top: 50%;
     transform-origin: 50% 50%;
     transform: translate3d(0, -50%, 0);
-    transition: all ${p => p.theme.timing.short} ease-out;
+    transition: all ${timing('short')} ease-out;
   }
   &:hover {
     color: ${color.primary()};
@@ -288,7 +296,7 @@ const FormHeader = styled(
     transition: transform 150ms ease-out;
   }
   :hover {
-    color: ${p => p.isMultiform && `${p.theme.color.primary}`};
+    color: ${p => p.isMultiform && `${color.primary()}`};
     svg {
       fill: ${color.grey(8)};
       transform: translate3d(-7px, 0, 0);

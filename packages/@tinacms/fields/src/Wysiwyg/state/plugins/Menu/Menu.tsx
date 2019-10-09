@@ -91,7 +91,6 @@ export const Menu = (props: Props) => {
   const { view, bottom = false, frame, theme } = props
 
   const supportBlocks = true
-  console.log(theme)
 
   return (
     <ThemeProvider theme={theme}>
