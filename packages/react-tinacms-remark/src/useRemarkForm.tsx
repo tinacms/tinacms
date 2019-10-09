@@ -35,7 +35,7 @@ export function useRemarkForm(
   markdownRemark: RemarkNode,
   formOverrrides: Partial<FormOptions<any>> = {}
 ) {
-  if (!markdownRemark) {
+  if (!markdownRemark || process.env.NODE_ENV === 'production') {
     return [markdownRemark, null]
   }
 

@@ -24,7 +24,12 @@ const get = require('lodash.get')
 interface UseFormOptions extends FormOptions<any> {
   currentValues?: any
 }
-export function useCMSForm(options: UseFormOptions) {
+export function useCMSForm<FormShape = any>(
+  options: UseFormOptions
+): [FormShape, Form | null] {
+  if (process.env.NODE_ENV === 'production') {
+    return [options.initialValues, null]
+  }
   const cms = useCMS()
   const [form, setForm] = React.useState<Form | undefined>()
   const [_, setValues] = React.useState(options.initialValues)
