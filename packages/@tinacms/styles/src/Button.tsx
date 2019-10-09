@@ -17,7 +17,7 @@ limitations under the License.
 */
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { padding, color, radius, font } from './Styles'
+import { padding, color, radius, font, shadow } from './Styles'
 
 export interface ButtonProps {
   primary?: boolean
@@ -31,7 +31,7 @@ export const Button = styled.button<ButtonProps>`
   text-align: center;
   border: 0;
   border-radius: ${radius()};
-  box-shadow: ${p => p.theme.shadow.small};
+  box-shadow: ${shadow('small')};
   background-color: ${color.grey()};
   border: 1px solid ${color.grey(2)};
   color: ${color.primary()};

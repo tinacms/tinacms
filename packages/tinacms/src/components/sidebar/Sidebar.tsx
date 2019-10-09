@@ -25,11 +25,9 @@ import { FormsView } from '../FormView'
 import { Modal } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
 import {
-  CloseIcon,
   HamburgerIcon,
   LeftArrowIcon,
   EditIcon,
-  AddIcon,
   TinaIcon,
 } from '@tinacms/icons'
 import {
@@ -39,6 +37,7 @@ import {
   color,
   radius,
   font,
+  timing,
 } from '@tinacms/styles'
 import {
   SIDEBAR_WIDTH,
@@ -184,7 +183,7 @@ const MenuLink = styled.div<{ value: string }>`
   padding: ${padding()} ${padding()} ${padding()} 4rem;
   position: relative;
   cursor: pointer;
-  transition: all ${p => p.theme.timing.short} ease-out;
+  transition: all ${timing('short')} ease-out;
   overflow: hidden;
   &:after {
     content: '';
@@ -204,7 +203,7 @@ const MenuLink = styled.div<{ value: string }>`
     color: ${color.primary('light')};
     &:after {
       transform: translate3d(0, 0, 0);
-      transition: transform ${p => p.theme.timing.short} ease-out, opacity 0ms;
+      transition: transform ${timing('short')} ease-out, opacity 0ms;
       opacity: 1;
     }
     svg {
@@ -224,7 +223,7 @@ const MenuLink = styled.div<{ value: string }>`
     width: 2.25rem;
     height: auto;
     fill: ${color.grey(4)};
-    transition: all ${p => p.theme.timing.short} ease-out;
+    transition: all ${timing('short')} ease-out;
   }
 `
 
@@ -334,7 +333,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
 const ModalActions = styled.div`
   display: flex;
   justify-content: space-between;
-  border-radius: 0 0 ${p => p.theme.radius.big} ${p => p.theme.radius.big};
+  border-radius: 0 0 ${radius('big')} ${radius('big')};
   overflow: hidden;
   ${Button} {
     border-radius: 0;

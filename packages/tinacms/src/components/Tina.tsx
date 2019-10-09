@@ -22,7 +22,7 @@ import { ModalProvider } from './modals/ModalProvider'
 import { SidebarContext } from './sidebar/SidebarProvider'
 import { cms } from '../index'
 import styled, { ThemeProvider } from 'styled-components'
-import { TinaReset, Theme, DefaultTheme } from '@tinacms/styles'
+import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 
@@ -38,7 +38,7 @@ export const Tina: React.FC<TinaProps> = ({
   children,
   position,
   hidden,
-  theme,
+  theme: themeOverrides,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -49,6 +49,13 @@ export const Tina: React.FC<TinaProps> = ({
     hidden,
   }
 
+  const theme: ThemeProps['theme'] = React.useMemo(
+    () => ({
+      tinacms: merge(DefaultTheme, theme) as Theme,
+    }),
+    [DefaultTheme, themeOverrides]
+  )
+
   return (
     <CMSContext.Provider value={cms}>
       <SidebarContext.Provider value={props}>
@@ -56,7 +63,7 @@ export const Tina: React.FC<TinaProps> = ({
           {children}
         </SiteWrapper>
         {!hidden && (
-          <ThemeProvider theme={merge(DefaultTheme, theme)}>
+          <ThemeProvider theme={theme}>
             <ModalProvider>
               <TinaReset>
                 <Sidebar />

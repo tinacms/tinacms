@@ -16,11 +16,12 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import * as React from 'react'
 import styled, { createGlobalStyle, css } from 'styled-components'
 
 export interface ThemeProps {
-  theme: Theme
+  theme: {
+    tinacms?: Theme
+  }
 }
 
 export interface Theme {
@@ -142,17 +143,21 @@ export const DefaultTheme: Theme = {
 }
 
 /* Color Helpers */
+const tinacms = (props: ThemeProps): Theme => {
+  let tina = props.theme.tinacms
+  return tina || DefaultTheme
+}
 
 function primary(value: keyof Theme['color']['primary'] = 'medium') {
-  return (props: ThemeProps) => props.theme.color['primary'][value]
+  return (props: ThemeProps) => tinacms(props).color['primary'][value]
 }
 
 function grey(value: keyof Theme['color']['grey'] = 0) {
-  return (props: ThemeProps) => props.theme.color['grey'][value]
+  return (props: ThemeProps) => tinacms(props).color['grey'][value]
 }
 
 function error(value: keyof Theme['color']['error'] = 'medium') {
-  return (props: ThemeProps) => props.theme.color['error'][value]
+  return (props: ThemeProps) => tinacms(props).color['error'][value]
 }
 
 export const color = {
@@ -164,11 +169,11 @@ export const color = {
 /* Font Helpers */
 
 function size(value: keyof Theme['font']['size'] = 0) {
-  return (props: ThemeProps) => props.theme.font.size[value]
+  return (props: ThemeProps) => tinacms(props).font.size[value]
 }
 
 function weight(value: keyof Theme['font']['weight'] = 'regular') {
-  return (props: ThemeProps) => props.theme.font.weight[value]
+  return (props: ThemeProps) => tinacms(props).font.weight[value]
 }
 
 export const font = {
@@ -179,11 +184,19 @@ export const font = {
 /* Other Helpers */
 
 export const radius = function(size: keyof Theme['radius'] = 'big') {
-  return (props: ThemeProps) => props.theme.radius[size]
+  return (props: ThemeProps) => tinacms(props).radius[size]
 }
 
 export const padding = function(size: keyof Theme['padding'] = 'big') {
-  return (props: ThemeProps) => props.theme.padding[size]
+  return (props: ThemeProps) => tinacms(props).padding[size]
+}
+
+export const shadow = function(size: keyof Theme['shadow'] = 'big') {
+  return (props: ThemeProps) => tinacms(props).padding[size]
+}
+
+export const timing = function(length: keyof Theme['timing']) {
+  return (props: ThemeProps) => tinacms(props).timing[length]
 }
 
 export const GlobalStyles = createGlobalStyle`
