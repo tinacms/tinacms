@@ -27,6 +27,7 @@
   },
   "scripts": {
     "watch": "tsc -w",
+    "dev": "tsc",
     "build": "tsc"
   },
   "dependencies": {
