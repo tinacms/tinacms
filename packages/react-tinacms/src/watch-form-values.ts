@@ -23,7 +23,10 @@ import { useEffect } from 'react'
 /**
  * Subscribes to value updates from the form with the given callback.
  */
-export function watchFormValues(form: Form, cb: FormSubscriber<any>) {
+export function watchFormValues(
+  form: Form | undefined,
+  cb: FormSubscriber<any>
+) {
   useEffect(() => {
     if (!form) return
 
