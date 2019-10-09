@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
-import { padding, color, radius, font } from '@tinacms/styles'
+import { padding, color, radius, font, shadow } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
@@ -91,7 +91,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 100% 100%;
-  box-shadow: ${p => p.theme.shadow.big};
+  box-shadow: ${shadow('big')};
   background-color: white;
   overflow: hidden;
   z-index: 100;
