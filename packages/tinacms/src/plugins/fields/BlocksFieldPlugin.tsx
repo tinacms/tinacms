@@ -37,6 +37,7 @@ import {
   font,
   IconButton,
   Button,
+  shadow,
 } from '@tinacms/styles'
 import { useFrameContext } from '../../components/SyledFrame'
 
@@ -232,7 +233,7 @@ const BlockMenu = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 100% 0;
-  box-shadow: ${p => p.theme.shadow.big};
+  box-shadow: ${shadow('big')};
   background-color: white;
   overflow: hidden;
   z-index: 100;
