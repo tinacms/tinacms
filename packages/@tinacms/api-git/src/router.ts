@@ -147,10 +147,12 @@ export function router(config: GitRouterConfig = {}) {
   router.get('/show/:fileRelativePath', (req, res) => {
     let repo = openRepo(REPO_ABSOLUTE_PATH)
 
+    let filePath = path
+      .join(CONTENT_REL_PATH, req.params.fileRelativePath)
+      .replace(/^\/*/, '')
+
     repo
-      .show([
-        `HEAD:${path.join(CONTENT_REL_PATH, req.params.fileRelativePath)}`,
-      ])
+      .show([`HEAD:${filePath}`])
       .then((data: any) => {
         res.json({
           fileRelativePath: req.params.fileRelativePath,
