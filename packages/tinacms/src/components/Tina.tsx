@@ -51,7 +51,7 @@ export const Tina: React.FC<TinaProps> = ({
 
   const theme: ThemeProps['theme'] = React.useMemo(
     () => ({
-      tinacms: merge(DefaultTheme, theme) as Theme,
+      tinacms: merge(DefaultTheme, themeOverrides) as Theme,
     }),
     [DefaultTheme, themeOverrides]
   )
