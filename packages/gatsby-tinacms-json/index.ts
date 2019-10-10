@@ -104,9 +104,10 @@ export function useJsonForm(
     })
   }, [])
 
-  watchFormValues(form, writeToDisk)
-
-  return [jsonNode, form]
+  if (form) {
+    watchFormValues(form, writeToDisk)
+  }
+  return [jsonNode, form as Form]
 }
 
 function generateFields(post: any): Field[] {
@@ -124,7 +125,7 @@ interface JsonFormProps extends Partial<FormOptions<any>> {
 export function JsonForm({ data, render, ...options }: JsonFormProps) {
   const [currentData, form] = useJsonForm(data, options)
 
-  return render({ form, data: currentData })
+  return render({ form: form as any, data: currentData })
 }
 
 function validateJsonNode(jsonNode: JsonNode) {

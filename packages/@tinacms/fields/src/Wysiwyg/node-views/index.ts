@@ -21,7 +21,7 @@ import { Decoration, EditorView, NodeView } from 'prosemirror-view'
 
 import { CodeBlockView } from './CodeBlockView'
 
-type NodeViews = {
+export type NodeViews = {
   [name: string]: (
     node: Node,
     view: EditorView,
