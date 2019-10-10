@@ -4,8 +4,10 @@ on: push
 
 jobs:
   build:
-    runs-on: macOS-latest
-
+    strategy:
+      matrix:
+        os: [ubuntu-latest, macOS-latest, windows-latest]
+    runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
@@ -19,7 +21,10 @@ jobs:
 
       - name: Build
         run: npm run build
-
+  test:
+    runs-on: macOS-latest
+    needs: build
+    steps:
       - name: Test
         run: npm run test
 
