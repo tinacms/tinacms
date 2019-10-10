@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form } from '@tinacms/core'
+import { FormOptions, Form, Field } from '@tinacms/core'
 import * as React from 'react'
 import { useCMS } from './use-cms'
 const get = require('lodash.get')
@@ -56,34 +56,50 @@ export function useCMSForm<FormShape = any>(
     [options.id, options.initialValues]
   )
 
-  React.useEffect(() => {
-    if (!form) return
-    form.updateFields(options.fields)
-  }, [form, options.fields])
-
-  React.useEffect(() => {
-    if (!form) return
-    form.label = options.label
-  }, [form, options.label])
-
-  syncFormWithCurrentValues(
-    form,
-    options.currentValues || options.initialValues
-  )
+  updateFormFields(options.fields, form)
+  updateFormLabel(options.label, form)
+  updateFormValues(options.currentValues || options.initialValues, form)
 
   return [form ? form.values : options.initialValues, form]
 }
 
 /**
- * Updates the Form with new values from the MarkdownRemark node.
+ * A React Hook that update's the `Form` if `fields` are changed.
+ *
+ * This hook is useful when dynamically creating fields, or updating
+ * them via hot module replacement.
+ */
+function updateFormFields(fields: Field[], form?: Form) {
+  React.useEffect(() => {
+    if (!form) return
+    form.updateFields(fields)
+  }, [form, fields])
+}
+
+/**
+ * A React Hook that update's the `Form` if the `label` is changed.
+ *
+ * This hook is useful when dynamically creating creating the label,
+ * or updating it via hot module replacement.
+ */
+function updateFormLabel(label: string, form?: Form) {
+  React.useEffect(() => {
+    if (!form) return
+    form.label = label
+  }, [form, label])
+}
+
+/**
+ * Updates the Form with new values.
  *
  * Only updates fields that are:
  *
  * 1. registered with the form
  * 2. not currently [active](https://final-form.org/docs/final-form/types/FieldState#active)
  *
+ * This hook is useful when the form must be kept in sync with the data source.
  */
-function syncFormWithCurrentValues(form?: Form, initialValues?: any) {
+function updateFormValues(initialValues: any = {}, form?: Form) {
   React.useEffect(() => {
     if (!form) return
     form.finalForm.batch(() => {
