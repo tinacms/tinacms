@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FormOptions } from '@tinacms/core'
+import { FormOptions, Form } from '@tinacms/core'
 import { TinaForm } from '@tinacms/form-builder'
 import { useRemarkForm } from './useRemarkForm'
 
@@ -43,7 +43,7 @@ export function liveRemarkForm(
     )
 
     return (
-      <TinaForm form={form}>
+      <TinaForm form={form as Form}>
         {editingProps => {
           return (
             <Component
