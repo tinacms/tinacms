@@ -63,3 +63,31 @@ export const pageQuery = graphql\`
  }
 \`
   `
+
+export const ERROR_INVALID_QUERY_NAME = (queryName: string) =>
+  `useRemarkForm(markdownRemark) '${queryName}' was not found on the top node of the graphql query` +
+  `
+
+1. Check if the '${queryName}' attribute is included in the GraphQL query. For example:
+
+export const pageQuery = graphql\`
+  query BlogPostBySlug($slug: String!) {
+    markdownRemark(fields: { slug: { eq: $slug } }) {
+      rawMarkdownBody
+      // etc...
+    }
+ }
+
+2. If you are using an alias, For example:
+
+ export const pageQuery = graphql\`
+   query BlogPostBySlug($slug: String!) {
+     myContent: markdownRemark(fields: { slug: { eq: $slug } }) {
+       rawMarkdownBody
+       // etc...
+     }
+  }
+ 
+  ...then you can optionally use the 'queryName' option to specify a new property in place of ${queryName}
+\`
+  `
