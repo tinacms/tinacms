@@ -64,7 +64,7 @@ export function useJsonForm(
       .then((git: any) => {
         // Parse the JSON into a JsonForm data structure and store it in state.
         let rawJson = JSON.parse(git.content)
-        setValuesInGit({ jsonNode: valuesOnDisk.jsonNode, rawJson })
+        setValuesInGit({ jsonNode, rawJson })
       })
       .catch((e: any) => {
         console.log('FAILED', e)
@@ -76,25 +76,28 @@ export function useJsonForm(
   // TODO: This may not be necessary.
   fields.push({ name: 'jsonNode', component: null })
 
-  const [values, form] = useCMSForm({
-    id,
-    label,
-    initialValues: valuesInGit,
-    currentValues: valuesOnDisk,
-    fields,
-    onSubmit(data) {
-      return cms.api.git.onSubmit!({
-        files: [data.fileRelativePath],
-        message: data.__commit_message || 'Tina commit',
-        name: data.__commit_name,
-        email: data.__commit_email,
-      })
+  const [values, form] = useCMSForm(
+    {
+      id,
+      label,
+      initialValues: valuesInGit,
+      fields,
+      onSubmit(data) {
+        return cms.api.git.onSubmit!({
+          files: [data.fileRelativePath],
+          message: data.__commit_message || 'Tina commit',
+          name: data.__commit_name,
+          email: data.__commit_email,
+        })
+      },
+      reset() {
+        return cms.api.git.reset({ files: [id] })
+      },
+      ...formOptions,
     },
-    reset() {
-      return cms.api.git.reset({ files: [id] })
-    },
-    ...formOptions,
-  })
+    // The Form will be updated if these values change.
+    { values: valuesOnDisk, label, fields }
+  )
 
   const writeToDisk = useCallback(formState => {
     const { fileRelativePath, rawJson, ...data } = formState.values.rawJson
