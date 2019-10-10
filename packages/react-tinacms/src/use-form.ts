@@ -21,11 +21,15 @@ import * as React from 'react'
 import { useCMS } from './use-cms'
 const get = require('lodash.get')
 
-interface UseFormOptions extends FormOptions<any> {
-  currentValues?: any
+interface WatchableFormValue {
+  values: any
+  label: FormOptions<any>['label']
+  fields: FormOptions<any>['fields']
 }
+
 export function useCMSForm<FormShape = any>(
-  options: UseFormOptions
+  options: FormOptions<any>,
+  watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
   if (process.env.NODE_ENV === 'production') {
     return [options.initialValues, undefined]
@@ -53,12 +57,12 @@ export function useCMSForm<FormShape = any>(
         }
       }
     },
-    [options.id, options.initialValues]
+    [options.id, !!options.initialValues]
   )
 
-  updateFormFields(options.fields, form)
-  updateFormLabel(options.label, form)
-  updateFormValues(options.currentValues || options.initialValues, form)
+  updateFormFields(watch.fields, form)
+  updateFormLabel(watch.label, form)
+  updateFormValues(watch.values, form)
 
   return [form ? form.values : options.initialValues, form]
 }
@@ -69,9 +73,9 @@ export function useCMSForm<FormShape = any>(
  * This hook is useful when dynamically creating fields, or updating
  * them via hot module replacement.
  */
-function updateFormFields(fields: Field[], form?: Form) {
+function updateFormFields(fields?: Field[], form?: Form) {
   React.useEffect(() => {
-    if (!form) return
+    if (!form || typeof fields === 'undefined') return
     form.updateFields(fields)
   }, [form, fields])
 }
@@ -82,9 +86,9 @@ function updateFormFields(fields: Field[], form?: Form) {
  * This hook is useful when dynamically creating creating the label,
  * or updating it via hot module replacement.
  */
-function updateFormLabel(label: string, form?: Form) {
+function updateFormLabel(label?: string, form?: Form) {
   React.useEffect(() => {
-    if (!form) return
+    if (!form || typeof label === 'undefined') return
     form.label = label
   }, [form, label])
 }
@@ -99,15 +103,15 @@ function updateFormLabel(label: string, form?: Form) {
  *
  * This hook is useful when the form must be kept in sync with the data source.
  */
-function updateFormValues(initialValues: any = {}, form?: Form) {
+function updateFormValues(values: any = {}, form?: Form) {
   React.useEffect(() => {
-    if (!form) return
+    if (!form || typeof values === 'undefined') return
     form.finalForm.batch(() => {
       findInactiveFormFields(form).forEach(path => {
-        form.finalForm.change(path, get(initialValues, path))
+        form.finalForm.change(path, get(values, path))
       })
     })
-  }, [form, initialValues])
+  }, [form, values])
 }
 
 export function findInactiveFormFields(form: Form) {
