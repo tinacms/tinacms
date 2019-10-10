@@ -85,7 +85,7 @@ export function useTinaProsemirror(
        * Create a new Prosemirror EditorView on in the DOM
        */
       const editorView = new EditorView(el, {
-        nodeViews,
+        nodeViews: nodeViews as any,
         /**
          * The initial state of the Wysiwyg
          */
