@@ -30,6 +30,8 @@ export interface GitRouterConfig {
   pathToRepo?: string
   pathToContent?: string
   defaultCommitMessage?: string
+  defaultCommitName?: string
+  defaultCommitEmail?: string
 }
 export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
@@ -56,8 +58,8 @@ export function router(config: GitRouterConfig = {}) {
 
     commit({
       pathRoot: REPO_ABSOLUTE_PATH,
-      name: req.body.name,
-      email: req.body.email,
+      name: req.body.name || config.defaultCommitName,
+      email: req.body.email || config.defaultCommitEmail,
       message: `Update from Tina: delete ${fileRelativePath}`,
       files: [fileAbsolutePath],
     })
