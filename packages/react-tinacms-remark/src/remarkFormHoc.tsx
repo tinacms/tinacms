@@ -20,20 +20,16 @@ import * as React from 'react'
 import { FormOptions, Form } from '@tinacms/core'
 import { TinaForm } from '@tinacms/form-builder'
 import { useRemarkForm } from './useRemarkForm'
+import { ERROR_INVALID_QUERY_NAME } from './errors'
 
 interface RemarkFormProps extends Partial<FormOptions<any>> {
   queryName?: string // Configure where we are pulling the initial form data from.
 }
 
-export function remarkForm(
-  Component: any,
-  options: RemarkFormProps = {
-    queryName: 'markdownRemark',
-  }
-) {
+export function remarkForm(Component: any, options: RemarkFormProps = {}) {
   return function RemarkForm(props: any) {
     const [markdownRemark] = useRemarkForm(
-      props.data[options.queryName || 'markdownRemark'],
+      getMarkdownRemark(props.data, options.queryName),
       options
     )
 
@@ -44,7 +40,7 @@ export function remarkForm(
 export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
   return function RemarkForm(props: any) {
     const [markdownRemark, form] = useRemarkForm(
-      props.data[options.queryName || 'markdownRemark'],
+      getMarkdownRemark(props.data, options.queryName),
       options
     )
 
@@ -62,4 +58,12 @@ export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
       </TinaForm>
     )
   }
+}
+
+const getMarkdownRemark = (data: any, queryName: string = 'markdownRemark') => {
+  const markdownRemark = data[queryName]
+  if (!markdownRemark) {
+    throw ERROR_INVALID_QUERY_NAME(queryName)
+  }
+  return markdownRemark
 }
