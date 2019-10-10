@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.1...@tinacms/tinacms@0.2.0-alpha.1) (2019-10-10)
+
+
+### Bug Fixes
+
+* add form list scroll support ([ef7fcf3](https://github.com/tinacms/tinacms/commit/ef7fcf3))
+* always activate an only-form ([b58e5fc](https://github.com/tinacms/tinacms/commit/b58e5fc))
+* close Reset Modal after success ([701bd3c](https://github.com/tinacms/tinacms/commit/701bd3c))
+* hmr of forms doesn't break the fs connection ([4501df3](https://github.com/tinacms/tinacms/commit/4501df3))
+* improve layout, add support for long titles ([1ce0bfb](https://github.com/tinacms/tinacms/commit/1ce0bfb))
+* inline wysiwyg  keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
+* maintain order of forms in sidebar ([ccc9839](https://github.com/tinacms/tinacms/commit/ccc9839)), closes [#229](https://github.com/tinacms/tinacms/issues/229)
+* only render create content button when available ([e540dd8](https://github.com/tinacms/tinacms/commit/e540dd8))
+* remove console.log() ([5577549](https://github.com/tinacms/tinacms/commit/5577549))
+* remove theme ref from wysiwyg ([8dd00a8](https://github.com/tinacms/tinacms/commit/8dd00a8))
+* replace theme with themeOverrides ([54224dc](https://github.com/tinacms/tinacms/commit/54224dc))
+* wysiwyg does not blow up on hot-reload ([8915523](https://github.com/tinacms/tinacms/commit/8915523))
+* wysiwyg syncs with source content ([31f1fa9](https://github.com/tinacms/tinacms/commit/31f1fa9))
+
+
+### Features
+
+* add reset button to form footer ([f2ec90b](https://github.com/tinacms/tinacms/commit/f2ec90b))
+* add reset modal ([2667618](https://github.com/tinacms/tinacms/commit/2667618))
+* add Tina icon ([6e54f42](https://github.com/tinacms/tinacms/commit/6e54f42))
+* allow partial theme override ([54bc7e2](https://github.com/tinacms/tinacms/commit/54bc7e2))
+* **image:** previewSrc is given it's fields props ([d108d1a](https://github.com/tinacms/tinacms/commit/d108d1a)), closes [#273](https://github.com/tinacms/tinacms/issues/273)
+* **sidebar:** add position & hidden to sidebar context ([ba89f50](https://github.com/tinacms/tinacms/commit/ba89f50))
+* group-list accepts itemProps function ([ca9a627](https://github.com/tinacms/tinacms/commit/ca9a627)), closes [#222](https://github.com/tinacms/tinacms/issues/222)
+* group-list defaultItem can be a function ([d7b21d2](https://github.com/tinacms/tinacms/commit/d7b21d2))
+
+
+
+
+
 # [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.1.1...@tinacms/tinacms@0.2.0-alpha.0) (2019-10-09)
 
 
