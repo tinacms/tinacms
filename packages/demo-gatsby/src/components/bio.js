@@ -30,6 +30,26 @@ import { useJsonForm } from "@tinacms/gatsby-tinacms-json"
 
 import { rhythm } from "../utils/typography"
 
+const fields = [
+  {
+    label: "First Name",
+    name: "rawJson.firstName",
+    description: "Enter first name",
+    component: "text",
+  },
+  {
+    label: "Last Name",
+    name: "rawJson.lastName",
+    description: "Enter last name",
+    component: "text",
+  },
+  {
+    label: "Location",
+    name: "rawJson.location",
+    description: "Enter where they're based",
+    component: "text",
+  },
+]
 const Bio = () => {
   const data = useStaticQuery(graphql`
     query BioQuery {
@@ -56,26 +76,7 @@ const Bio = () => {
 
   const [author] = useJsonForm(data.dataJson, {
     label: "Author",
-    fields: [
-      {
-        label: "First Name",
-        name: "rawJson.firstName",
-        description: "Enter first name",
-        component: "text",
-      },
-      {
-        label: "Last Name",
-        name: "rawJson.lastName",
-        description: "Enter last name",
-        component: "text",
-      },
-      {
-        label: "Location",
-        name: "rawJson.location",
-        description: "Enter where they're based",
-        component: "text",
-      },
-    ],
+    fields,
   })
 
   /*

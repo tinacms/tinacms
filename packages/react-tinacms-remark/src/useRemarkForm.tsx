@@ -103,47 +103,54 @@ export function useRemarkForm(
     return fields
   }, [formOverrrides.fields])
 
-  const [values, form] = useCMSForm({
-    label,
-    id,
-    initialValues: valuesInGit,
-    currentValues: valuesOnDisk,
-    fields,
-    onSubmit(data) {
-      return cms.api.git.onSubmit!({
-        files: [data.fileRelativePath],
-        message: data.__commit_message || 'Tina commit',
-        name: data.__commit_name,
-        email: data.__commit_email,
-      })
-    },
-    reset() {
-      return cms.api.git.reset({ files: [id] })
-    },
-    actions: [
-      () => (
-        <ActionButton
-          onClick={async () => {
-            if (
-              !confirm(
-                `Are you sure you want to delete ${markdownRemark.fileRelativePath}?`
-              )
-            ) {
-              return
-            }
-            // @ts-ignore
-            await cms.api.git.onDelete!({
-              relPath: markdownRemark.fileRelativePath,
-            })
+  const [values, form] = useCMSForm(
+    {
+      label,
+      id,
+      initialValues: valuesInGit,
+      fields,
+      onSubmit(data) {
+        return cms.api.git.onSubmit!({
+          files: [data.fileRelativePath],
+          message: data.__commit_message || 'Tina commit',
+          name: data.__commit_name,
+          email: data.__commit_email,
+        })
+      },
+      reset() {
+        return cms.api.git.reset({ files: [id] })
+      },
+      actions: [
+        () => (
+          <ActionButton
+            onClick={async () => {
+              if (
+                !confirm(
+                  `Are you sure you want to delete ${markdownRemark.fileRelativePath}?`
+                )
+              ) {
+                return
+              }
+              // @ts-ignore
+              await cms.api.git.onDelete!({
+                relPath: markdownRemark.fileRelativePath,
+              })
 
-            window.history.back()
-          }}
-        >
-          Delete
-        </ActionButton>
-      ),
-    ],
-  })
+              window.history.back()
+            }}
+          >
+            Delete
+          </ActionButton>
+        ),
+      ],
+    },
+    // The Form will be updated if these values change.
+    {
+      label,
+      fields,
+      values: valuesOnDisk,
+    }
+  )
 
   let writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({

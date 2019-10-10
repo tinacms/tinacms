@@ -31,7 +31,7 @@ function BlogIndex(props) {
   const posts = data.allMarkdownRemark.edges
 
   const [styles] = useCMSForm({
-    name: "blog-index-styles",
+    id: "blog-index-styles",
     label: "Blog Styles",
     initialValues: {
       backgroundColor: "",
@@ -64,6 +64,7 @@ function BlogIndex(props) {
       alert("Saving doesn't do anything.")
     },
   })
+
   return (
     <Layout location={props.location} title={siteTitle}>
       <div
