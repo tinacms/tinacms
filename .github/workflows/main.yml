@@ -1,11 +1,6 @@
-name: Run all tests
+name: Build, Test, Lint
 
-on:
-  push:
-    paths:
-      - '**.js'
-      - '**.ts'
-      - '**.tsx'
+on: push
 
 jobs:
   build:
@@ -13,13 +8,17 @@ jobs:
 
     steps:
       - uses: actions/checkout@v1
-      - name: Install Dependencies
-        run: npm ci
-      - name: Bootstrap Development
-        run: npm run bs
-      - name: Lint Source Coude
-        run: npm run lint
-      - name: Build Packages
+
+      - name: Install
+        run: |
+          npm ci
+          npm run bs
+
+      - name: Build
         run: npm run build
-      - name: Run Tests
+
+      - name: Test
         run: npm run test
+
+      - name: Lint
+        run: npm run lint
