@@ -21,24 +21,30 @@ import { FormOptions, Form } from '@tinacms/core'
 import { TinaForm } from '@tinacms/form-builder'
 import { useRemarkForm } from './useRemarkForm'
 
+interface RemarkFormProps extends Partial<FormOptions<any>> {
+  queryName?: string // Configure where we are pulling the initial form data from.
+}
+
 export function remarkForm(
   Component: any,
-  options: Partial<FormOptions<any>> = {}
+  options: RemarkFormProps = {
+    queryName: 'markdownRemark',
+  }
 ) {
   return function RemarkForm(props: any) {
-    const [markdownRemark] = useRemarkForm(props.data.markdownRemark, options)
+    const [markdownRemark] = useRemarkForm(
+      props.data[options.queryName || 'markdownRemark'],
+      options
+    )
 
     return <Component {...props} data={{ ...props.data, markdownRemark }} />
   }
 }
 
-export function liveRemarkForm(
-  Component: any,
-  options: Partial<FormOptions<any>> = {}
-) {
+export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
   return function RemarkForm(props: any) {
     const [markdownRemark, form] = useRemarkForm(
-      props.data.markdownRemark,
+      props.data[options.queryName || 'markdownRemark'],
       options
     )
 
