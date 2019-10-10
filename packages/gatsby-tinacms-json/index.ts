@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { Form, FormOptions, Field } from '@tinacms/core'
-import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
+import { useCMSForm, useCMS, useWatchFormValues } from '@tinacms/react-tinacms'
 import { useMemo, useCallback, useState, useEffect } from 'react'
 
 interface JsonNode {
@@ -104,9 +104,8 @@ export function useJsonForm(
     })
   }, [])
 
-  if (form) {
-    watchFormValues(form, writeToDisk)
-  }
+  useWatchFormValues(form, writeToDisk)
+
   return [jsonNode, form as Form]
 }
 

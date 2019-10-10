@@ -18,7 +18,7 @@ limitations under the License.
 
 import { FormOptions, Form } from '@tinacms/core'
 import { ActionButton } from '@tinacms/tinacms'
-import { useCMSForm, useCMS, watchFormValues } from '@tinacms/react-tinacms'
+import { useCMSForm, useCMS, useWatchFormValues } from '@tinacms/react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -152,9 +152,7 @@ export function useRemarkForm(
     })
   }, [])
 
-  if (form) {
-    watchFormValues(form, writeToDisk)
-  }
+  useWatchFormValues(form, writeToDisk)
 
   return [markdownRemark, form]
 }
