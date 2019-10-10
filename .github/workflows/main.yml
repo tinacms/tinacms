@@ -21,10 +21,22 @@ jobs:
 
       - name: Build
         run: npm run build
+
+      - name: Upload Artifact
+        uses: actions/upload-artifact@v1
+        with:
+          name: build-cache
+          path: .
   test:
     runs-on: macOS-latest
     needs: build
     steps:
+      - name: Download Artifact
+        uses: actions/download-artifact@v1
+        with:
+          name: build-cache
+          path: .
+
       - name: Test
         run: npm run test
 
