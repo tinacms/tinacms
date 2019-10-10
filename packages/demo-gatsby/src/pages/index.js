@@ -33,33 +33,39 @@ function BlogIndex(props) {
   const [styles] = useCMSForm({
     name: "blog-index-styles",
     label: "Blog Styles",
-    initialValues: {
-      backgroundColor: "",
-      hideBio: false,
-      date: "2019 03 04",
-      thumbnail:
-        "https://images.unsplash.com/photo-1518259102261-b40117eabbc9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2550&q=80",
-    },
-    fields: [
-      {
-        name: "backgroundColor",
-        label: "Heading Color",
-        component: "color",
-        colorFormat: "HeX",
-      },
-      {
-        name: "hideBio",
-        label: "Hide Bio",
-        component: "toggle",
-      },
-      {
-        name: "date",
-        label: "Date",
-        component: "date",
-        dateFormat: "YYYY MM DD",
-        timeFormat: null,
-      },
-    ],
+    initialValues: React.useMemo(
+      () => ({
+        backgroundColor: "",
+        hideBio: false,
+        date: "2019 03 04",
+        thumbnail:
+          "https://images.unsplash.com/photo-1518259102261-b40117eabbc9?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2550&q=80",
+      }),
+      []
+    ),
+    fields: React.useMemo(
+      () => [
+        {
+          name: "backgroundColor",
+          label: "Heading Color",
+          component: "color",
+          colorFormat: "HeX",
+        },
+        {
+          name: "hideBio",
+          label: "Hide Bio",
+          component: "toggle",
+        },
+        {
+          name: "date",
+          label: "Date",
+          component: "date",
+          dateFormat: "YYYY MM DD",
+          timeFormat: null,
+        },
+      ],
+      []
+    ),
     onSubmit() {
       alert("Saving doesn't do anything.")
     },
