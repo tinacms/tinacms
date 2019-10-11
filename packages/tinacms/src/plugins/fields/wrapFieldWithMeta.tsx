@@ -68,7 +68,7 @@ const FieldLabel = styled.label`
 
 const FieldDescription = styled.p`
   color: ${color.grey(6)};
-  font-size: 0.65rem;
+  font-size: ${font.size(0)};
   font-style: italic;
   font-weight: lighter;
   padding-top: 0.25rem;
