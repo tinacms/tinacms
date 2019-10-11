@@ -10,7 +10,7 @@
     "@tinacms/next-tinacms-git": "0.0.3-alpha.1",
     "@tinacms/next-tinacms-markdown": "0.0.5-alpha.2",
     "@tinacms/react-tinacms": "0.2.0-alpha.0",
-    "@tinacms/tinacms": "0.2.0-alpha.1",
+    "@tinacms/tinacms": "0.2.0-alpha.2",
     "next": "9.0.5"
   }
 }
