@@ -97,8 +97,8 @@ export const Button = styled.button<ButtonProps>`
 
 export const IconButton = styled(Button)`
   padding: 0;
-  width: 2.125rem;
-  height: 2.125rem;
+  width: 2rem;
+  height: 2rem;
   margin: 0;
   position: relative;
   border: 1px solid ${color.primary()};

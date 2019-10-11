@@ -109,7 +109,8 @@ export const ActionButton = styled.button`
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};
-  padding: 0.75rem;
+  padding: 0 0.75rem;
+  height: 2.5rem;
   font-weight: 500;
   width: 100%;
   background: none;
@@ -118,7 +119,8 @@ export const ActionButton = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    background-color: #f8f8f8;
+    color: ${color.primary()};
+    background-color: #f6f6f9;
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;

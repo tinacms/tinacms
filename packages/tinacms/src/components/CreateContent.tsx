@@ -193,7 +193,8 @@ const CreateButton = styled.button`
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};
-  padding: 0.75rem 1.25rem;
+  padding: 0 0.75rem;
+  height: 2.5rem;
   font-weight: 500;
   width: 100%;
   background: none;
