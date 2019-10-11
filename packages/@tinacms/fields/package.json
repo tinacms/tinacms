@@ -21,9 +21,9 @@
     "directory": "packages/tinacms/fields"
   },
   "scripts": {
-    "watch": "cms-scripts watch",
-    "dev": "cms-scripts dev",
-    "build": "cms-scripts build",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "build": "tinacms-scripts build",
     "test": "jest --passWithNoTests",
     "storybook": "start-storybook -p 9001 -c .storybook"
   },
@@ -49,7 +49,7 @@
     "@types/styled-components": "4.1.8",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
-    "cms-scripts": "^0.1.3-alpha.1",
+    "@tinacms/scripts": "^0.1.3-alpha.1",
     "jest": "^24.8.0",
     "react": "^16.8.6",
     "react-docgen-typescript-loader": "^3.1.0",
