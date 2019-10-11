@@ -20,14 +20,14 @@
     "directory": "packages/group/package"
   },
   "scripts": {
-    "watch": "cms-scripts watch",
-    "build": "cms-scripts build",
-    "dev": "cms-scripts dev",
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
-    "cms-scripts": "0.1.0",
+    "@tinacms/scripts": "0.1.0",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
