@@ -131,7 +131,7 @@ const FormModal = ({ plugin, close }: any) => {
               </ModalBody>
               <ModalActions>
                 <Button onClick={close}>Cancel</Button>
-                <Button onClick={handleSubmit as any} margin primary>
+                <Button onClick={handleSubmit as any} primary>
                   Create
                 </Button>
               </ModalActions>
