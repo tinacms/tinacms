@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/form-builder",
-  "version": "0.1.4-alpha.2",
+  "version": "0.1.4-alpha.3",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
