@@ -141,7 +141,6 @@ const commandContrl = (
           onClick={this.onClick}
           bottom={this.props.bottom}
           disabled={!this.canDo()}
-          onMouseDown={(e: any) => e.preventDefault()}
         >
           <Icon />
         </MenuButton>
