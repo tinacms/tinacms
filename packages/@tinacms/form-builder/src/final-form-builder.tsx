@@ -149,5 +149,5 @@ const FieldsGroup = styled.div`
   padding: 1.25rem 1.25rem 0 1.25rem;
   white-space: nowrap;
   overflow-x: hidden;
-  overflow-y: scroll;
+  overflow-y: auto !important;
 `
