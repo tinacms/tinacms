@@ -347,7 +347,7 @@ const SidebarToggleAnimation = keyframes`
   }
 
   to {
-    transform: translate3d(-0.125rem,0,0);
+    transform: translate3d(0,0,0);
   }
 `
 
@@ -357,8 +357,8 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   left: 0;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 1.5rem 1.5rem 0;
-  width: 3.5rem;
-  height: 3rem;
+  width: 3.125rem;
+  height: 2.75rem;
   border: 0;
   outline: none;
   display: flex;
@@ -371,11 +371,9 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   background-position: center;
   transition: all 150ms ease-out;
   cursor: pointer;
-  transform: translate3d(${p => (p.open ? 0 : '-0.125rem')}, 0, 0);
-  animation: ${SidebarToggleAnimation} 150ms 300ms ease-out 1 both;
+  animation: ${SidebarToggleAnimation} 200ms 300ms ease-out 1 both;
   &:hover {
     background-color: ${color.primary('light')};
-    transform: translate3d(${p => (p.open ? '-0.125rem' : 0)}, 0, 0);
   }
   &:active {
     background-color: ${color.primary('dark')};

@@ -133,7 +133,7 @@ export const DefaultTheme: Theme = {
   },
   shadow: {
     small: '0px 2px 3px rgba(0, 0, 0, 0.12)',
-    big: '0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1);',
+    big: '0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1)',
   },
   timing: {
     short: '85ms',
@@ -192,7 +192,7 @@ export const padding = function(size: keyof Theme['padding'] = 'big') {
 }
 
 export const shadow = function(size: keyof Theme['shadow'] = 'big') {
-  return (props: ThemeProps) => tinacms(props).padding[size]
+  return (props: ThemeProps) => tinacms(props).shadow[size]
 }
 
 export const timing = function(length: keyof Theme['timing']) {
