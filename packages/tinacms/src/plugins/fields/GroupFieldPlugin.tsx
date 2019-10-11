@@ -195,7 +195,7 @@ const GroupPanelKeyframes = keyframes`
 export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   position: fixed;
   width: ${SIDEBAR_WIDTH}px;
-  top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}rem;
+  top: ${SIDEBAR_HEADER_HEIGHT}rem;
   bottom: ${FORM_FOOTER_HEIGHT}rem;
   left: 0;
   display: flex;
@@ -204,6 +204,7 @@ export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   overflow: hidden;
   z-index: 50;
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
+  border-top: 1px solid ${color.grey(2)};
 
   > * {
     ${p =>
