@@ -137,7 +137,7 @@ export const ModalActions = styled.div`
   ${Button} {
     flex: 0 1 auto;
     min-width: 8rem;
-    margin: 0 ${padding('small')} 0 0;
+    margin: 0 0.5rem 0 0;
     &:last-child {
       margin-right: 0;
     }
