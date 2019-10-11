@@ -38,7 +38,8 @@ import FormsList from './FormsList'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
 import { ResetForm } from './ResetForm'
-import { FORM_HEADER_HEIGHT } from '../Globals'
+import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
+import { GroupPanel } from '../plugins/fields'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
@@ -54,6 +55,7 @@ export const FormsView = () => {
   })
 
   const forms = cms.forms.all()
+  const isMultiform = forms.length > 1
   const activeForm = activeFormId ? cms.forms.findForm(activeFormId) : null
 
   const isEditing = !!activeForm
@@ -90,12 +92,13 @@ export const FormsView = () => {
       {({ handleSubmit, pristine, form }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
-            <FormWrapper isEditing={isEditing}>
-              <FormHeader
-                isMultiform={forms.length > 1}
-                activeForm={activeForm}
-                setActiveFormId={setActiveFormId}
-              />
+            <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
+              {isMultiform && (
+                <FormHeader
+                  activeForm={activeForm}
+                  setActiveFormId={setActiveFormId}
+                />
+              )}
               <FormBody>
                 {activeForm &&
                   (activeForm.fields.length ? (
@@ -250,19 +253,13 @@ const NoFieldsPlaceholder = () => (
 interface FormHeaderProps {
   activeForm: Form
   setActiveFormId(id?: string): void
-  isMultiform: boolean
 }
 
 const FormHeader = styled(
-  ({
-    activeForm,
-    setActiveFormId,
-    isMultiform,
-    ...styleProps
-  }: FormHeaderProps) => {
+  ({ activeForm, setActiveFormId, ...styleProps }: FormHeaderProps) => {
     return (
-      <div {...styleProps} onClick={() => isMultiform && setActiveFormId()}>
-        {isMultiform && <LeftArrowIcon />}
+      <div {...styleProps} onClick={() => setActiveFormId()}>
+        <LeftArrowIcon />
         <span>{activeForm.label}</span>
       </div>
     )
@@ -272,9 +269,8 @@ const FormHeader = styled(
   width: 100%;
   height: ${FORM_HEADER_HEIGHT}rem;
   flex: 0 0 ${FORM_HEADER_HEIGHT}rem;
-  cursor: ${p => p.isMultiform && 'pointer'};
+  cursor: pointer;
   background-color: white;
-  border-bottom: 1px solid ${color.grey(2)};
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
@@ -298,7 +294,7 @@ const FormHeader = styled(
     transition: transform 150ms ease-out;
   }
   :hover {
-    color: ${p => p.isMultiform && `${color.primary()}`};
+    color: ${color.primary()};
     svg {
       fill: ${color.grey(8)};
       transform: translate3d(-7px, 0, 0);
@@ -310,9 +306,12 @@ const FormHeader = styled(
 export const FormBody = styled.div`
   position: relative;
   flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
   scrollbar-width: none;
   width: 100%;
   overflow: hidden;
+  border-top: 1px solid ${color.grey(2)};
   background-color: #f6f6f9;
 `
 
@@ -338,7 +337,12 @@ const FormAnimationKeyframes = keyframes`
   }
 `
 
-const FormWrapper = styled.div<{ isEditing: Boolean }>`
+interface FormWrapperProps {
+  isEditing: Boolean
+  isMultiform: Boolean
+}
+
+const FormWrapper = styled.div<FormWrapperProps>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
@@ -346,9 +350,11 @@ const FormWrapper = styled.div<{ isEditing: Boolean }>`
   height: 100%;
   width: 100%;
   position: relative;
+
   ${FormHeader}, ${FormBody}, ${FormFooter} {
     transform: translate3d(100%, 0, 0);
   }
+
   ${p =>
     p.isEditing &&
     css`
@@ -359,6 +365,14 @@ const FormWrapper = styled.div<{ isEditing: Boolean }>`
         animation-delay: 0;
         animation-iteration-count: 1;
         animation-timing-function: ease-out;
+      }
+    `};
+
+  ${p =>
+    p.isMultiform &&
+    css`
+      ${GroupPanel} {
+        top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}rem;
       }
     `};
 `
