@@ -43,7 +43,7 @@ running `npm run bootstrap` shoudl fix the issue.
 #### Example error message
 
 ```
-sh: cms-scripts: command not found
+sh: tinacms-scripts: command not found
 ```
 
 ### I can't add dependencies to a package
