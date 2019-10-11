@@ -23,15 +23,15 @@
   ],
   "scripts": {
     "test": "jest --passWithNoTests",
-    "build": "cms-scripts build",
-    "dev": "cms-scripts dev",
-    "watch": "cms-scripts watch"
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "watch": "tinacms-scripts watch"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@types/lodash.merge": "^4.6.6",
     "@types/styled-components": "4.1.8",
-    "cms-scripts": "^0.1.3-alpha.1",
+    "@tinacms/scripts": "^0.1.3-alpha.1",
     "jest": "^24.8.0",
     "react": "^16.8.6",
     "ts-jest": "^24.0.2"

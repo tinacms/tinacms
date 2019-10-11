@@ -78,7 +78,7 @@ function listTouchedWorkflows(allFiles: string[]) {
  *
  */
 function checkForNpmScripts({ packageJson }: TinaPackage) {
-  if (packageJson.name === 'cms-scripts') {
+  if (packageJson.name === '@tinacms/scripts') {
     return
   }
   let scripts = packageJson.scripts || {}
