@@ -1313,9 +1313,9 @@
   resolved "https://registry.yarnpkg.com/@tinacms/persistent-session-storage/-/persistent-session-storage-0.1.0-alpha.1.tgz#ff9f95b370b4582d4a04f903f372532de5273af6"
   integrity sha512-cHXjZx2UXlrZKEmhLgocNW1Eg0JqqmU9ILO6k01Rs4bFTeuxqq61zDAngInSYb525+R7x1vWfMbPlQfEMQZZ9w==
 
-"@tinacms/react-tinacms-remark@^0.1.0-alpha.9":
+"@tinacms/gatsby-tinacms-remark@^0.1.0-alpha.9":
   version "0.1.0-alpha.9"
-  resolved "https://registry.yarnpkg.com/@tinacms/react-tinacms-remark/-/react-tinacms-remark-0.1.0-alpha.9.tgz#4d909161d1bc30aec6275cec04f7afd3e43973cc"
+  resolved "https://registry.yarnpkg.com/@tinacms/gatsby-tinacms-remark/-/gatsby-tinacms-remark-0.1.0-alpha.9.tgz#4d909161d1bc30aec6275cec04f7afd3e43973cc"
   integrity sha512-rVeAdeOJPeg1Yr6jXJu8J4dtV6DrJhvKOdYPCBuseNURiF31a5LiKUfZ0ErXs6YMtLSvFe0XUOqcs7aLJNw5nw==
   dependencies:
     "@tinacms/core" "^0.1.0-alpha.4"
