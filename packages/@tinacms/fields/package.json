@@ -82,7 +82,8 @@
     "react-dismissible": "^1.0.8-alpha.2",
     "react-dropzone": "10.1.8",
     "react-select": "^2.3.0",
-    "styled-components": "^4.3.2"
+    "styled-components": "^4.3.2",
+    "moment": "^2.21.0"
   },
   "peerDependencies": {
     "react": "^16.8.6",

@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 // @ts-ignore
-import { GraphQLString } from 'gatsby/graphql'
+import { GraphQLString } from 'graphql'
 
 exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
   const pathRoot = process.cwd()

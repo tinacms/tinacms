@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import { router as gitRouter, GitRouterConfig } from '@tinacms/api-git'
-// @ts-ignore
-import { GraphQLString } from 'gatsby/graphql'
+import { GraphQLString } from 'graphql'
 
 exports.setFieldsOnGraphQLNodeType = ({ type }: any) => {
   const pathRoot = process.cwd()

@@ -46,6 +46,7 @@
   },
   "devDependencies": {
     "@types/react": "^16.8.23",
+    "@types/styled-components": "^4.1.19",
     "react": "^16.8.6"
   },
   "peerDependencies": {
