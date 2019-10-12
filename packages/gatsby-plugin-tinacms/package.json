@@ -2,6 +2,7 @@
   "name": "@tinacms/gatsby-plugin-tinacms",
   "main": "index.js",
   "version": "0.1.4-alpha.4",
+  "license": "Apache-2.0",
   "files": [
     "index.js",
     "gatsby-browser.js",
