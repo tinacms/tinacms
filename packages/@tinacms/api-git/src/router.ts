@@ -26,6 +26,8 @@ import { commit } from './commit'
 import { createUploader } from './upload'
 import { openRepo } from './open-repo'
 
+declare var DEBUG: boolean
+
 export interface GitRouterConfig {
   pathToRepo?: string
   pathToContent?: string

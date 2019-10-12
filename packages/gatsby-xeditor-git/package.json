@@ -34,6 +34,9 @@
     "dev": "tsc",
     "build": "tsc"
   },
+  "devDependencies": {
+    "graphql": "^14.1.1"
+  },
   "dependencies": {
     "@tinacms/api-git": "^0.2.1-alpha.3",
     "@tinacms/core": "^0.2.1-alpha.2",
@@ -50,5 +53,8 @@
     "js-yaml": "^3.13.1",
     "lodash.throttle": "^4.1.1",
     "simple-git": "1.124.0"
+  },
+  "peerDependencies": {
+    "graphql": "^14.1.1"
   }
 }

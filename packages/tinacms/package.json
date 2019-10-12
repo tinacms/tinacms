@@ -31,10 +31,12 @@
     "@tinacms/scripts": "^0.1.3-alpha.2",
     "@types/jest": "^24.0.15",
     "@types/lodash.merge": "^4.6.6",
-    "@types/styled-components": "4.1.8",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.8.5",
     "jest": "^24.8.0",
     "react": "^16.8.6",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^24.0.2",
+    "react-dom": "^16.8.6"
   },
   "dependencies": {
     "@tinacms/core": "^0.2.1-alpha.2",
@@ -44,14 +46,16 @@
     "@tinacms/react-tinacms": "^0.2.0-alpha.1",
     "@tinacms/styles": "^0.0.5-alpha.3",
     "@types/react-beautiful-dnd": "^11.0.3",
+    "@types/styled-components": "4.1.8",
     "lodash.merge": "^4.6.2",
     "react-beautiful-dnd": "^11.0.5",
-    "react-datetime": "^2.16.3",
     "react-dismissible": "^1.0.8-alpha.2",
     "react-frame-component": "^4.1.1",
-    "styled-components": "^4.3.2"
+    "styled-components": "^4.3.2",
+    "react-datetime": "^2.16.3"
   },
   "peerDependencies": {
-    "react": "^16.8.6"
+    "react": "^16.8.6",
+    "react-dom": "^16.8.6"
   }
 }

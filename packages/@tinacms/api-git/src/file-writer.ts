@@ -25,6 +25,8 @@ let count = 0
 
 const MAX_BUILD_TIME = 1000
 
+declare var DEBUG: boolean
+
 export function writeFile(filepath: string, content: string) {
   count++
 

@@ -41,6 +41,14 @@
     "cors": "^2.8.5",
     "express": "^4.17.1",
     "js-yaml": "^3.13.1",
-    "lodash.throttle": "^4.1.1"
+    "lodash.throttle": "^4.1.1",
+    "react-dom": "16.10.2"
+  },
+  "devDependencies": {
+    "@types/react": "^16.8.23",
+    "react": "^16.8.6"
+  },
+  "peerDependencies": {
+    "react": "^16.8.6"
   }
 }

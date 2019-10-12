@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
 import styled, { keyframes } from 'styled-components'
 import { radius } from '@tinacms/styles'
 
