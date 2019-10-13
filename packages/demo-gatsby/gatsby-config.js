@@ -39,6 +39,7 @@ module.exports = {
         },
         plugins: [
           "@tinacms/gatsby-tinacms-json",
+          "@tinacms/gatsby-tinacms-remark",
           {
             resolve: "@tinacms/gatsby-tinacms-git",
             options: {

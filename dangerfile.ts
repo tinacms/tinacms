@@ -173,12 +173,16 @@ function getModifiedPackages(allFiles: string[]) {
   )
 
   paths.forEach(path => {
-    let packageJson = require(`./${path}/package.json`)
+    try {
+      let packageJson = require(`./${path}/package.json`)
 
-    packageList.push({
-      path,
-      packageJson,
-    })
+      packageList.push({
+        path,
+        packageJson,
+      })
+    } catch (e) {
+      warn(`Could not find package: ${path}`)
+    }
   })
   return packageList
 }
