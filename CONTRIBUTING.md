@@ -121,3 +121,28 @@ Linking prevents running `npm install` from directly inside a package from worki
    ```
    git push
    ```
+
+### Release
+
+1. **Build the source files:**
+
+   ```
+   npm run build
+   ```
+
+1. **Generate CHANGELOGs and git tags:**
+   ```
+   lerna version \
+     --conventional-commits \
+     --no-push \
+     --allow-branch master \
+     -m "chore(publish): release"
+   ```
+1. **Publish to NPM:**
+   ```
+   lerna publish from-git
+   ```
+1. **Push CHANGELOGs and git tags to Github:**
+   ```
+   git push
+   ```
