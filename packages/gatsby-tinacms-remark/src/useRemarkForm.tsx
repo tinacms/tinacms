@@ -53,7 +53,7 @@ export function useRemarkForm(
   const valuesOnDisk = useMemo(
     () => ({
       fileRelativePath: markdownRemark.fileRelativePath,
-      frontmatter: markdownRemark.rawMarkdownBody,
+      frontmatter: markdownRemark.frontmatter,
       rawMarkdownBody: markdownRemark.rawMarkdownBody,
       rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
     }),
