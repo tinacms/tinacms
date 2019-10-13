@@ -15,7 +15,7 @@
     "@tinacms/gatsby-tinacms-json": "0.2.1",
     "@tinacms/react-tinacms": "0.2.0",
     "@tinacms/gatsby-tinacms-remark": "0.3.2",
-    "@tinacms/tinacms": "0.2.0",
+    "@tinacms/tinacms": "0.2.1",
     "@types/react": "^16.8.23",
     "gatsby": "^2.13.34",
     "gatsby-image": "^2.2.6",
