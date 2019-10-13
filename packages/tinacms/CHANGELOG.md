@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0-alpha.4](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.2.0-alpha.3...@tinacms/tinacms@0.2.0-alpha.4) (2019-10-13)
+
+
+### Bug Fixes
+
+* only render form in panel when open ([72f4f83](https://github.com/tinacms/tinacms/commit/72f4f83))
+
+
+
+
+
 # [0.2.0-alpha.3](https://github.com/tinacms/tinacms/compare/@tinacms/tinacms@0.2.0-alpha.2...@tinacms/tinacms@0.2.0-alpha.3) (2019-10-11)
 
 **Note:** Version bump only for package @tinacms/tinacms

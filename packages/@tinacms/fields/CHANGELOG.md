@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.4-alpha.5](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.4-alpha.4...@tinacms/fields@0.1.4-alpha.5) (2019-10-13)
+
+
+### Bug Fixes
+
+* clicking wysiwyg does not provoke blur ([388c429](https://github.com/tinacms/tinacms/commit/388c429))
+* **wysiwyg:** links can once again be created ([093a58c](https://github.com/tinacms/tinacms/commit/093a58c))
+
+
+
+
+
 ## [0.1.4-alpha.4](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.4-alpha.3...@tinacms/fields@0.1.4-alpha.4) (2019-10-11)
 
 **Note:** Version bump only for package @tinacms/fields
