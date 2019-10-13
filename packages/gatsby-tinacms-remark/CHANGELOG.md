@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.3.0-alpha.3 (2019-10-13)
+
+**Note:** Version bump only for package @tinacms/gatsby-tinacms-remark
+
+
+
+
+
 # [0.3.0-alpha.2](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms-remark@0.3.0-alpha.1...@tinacms/react-tinacms-remark@0.3.0-alpha.2) (2019-10-11)
 
 **Note:** Version bump only for package @tinacms/react-tinacms-remark
