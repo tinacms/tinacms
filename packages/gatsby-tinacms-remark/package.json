@@ -2,10 +2,10 @@
   "name": "@tinacms/gatsby-tinacms-remark",
   "version": "0.3.0-alpha.2",
   "main": "index.js",
-  "types": "build/index.d.ts",
+  "types": "src/index.d.ts",
   "license": "Apache-2.0",
   "files": [
-    "build",
+    "src",
     "index.js",
     "gatsby-node.js"
   ],
