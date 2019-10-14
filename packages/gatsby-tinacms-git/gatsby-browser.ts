@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { GitClient } from '@tinacms/git-client'
-import { cms } from '@tinacms/tinacms'
+import { cms } from 'tinacms'
 
 exports.onClientEntry = () => {
   const { protocol, hostname, port } = window.location

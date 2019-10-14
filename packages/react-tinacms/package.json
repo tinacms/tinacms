@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/react-tinacms",
+  "name": "react-tinacms",
   "version": "0.2.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
