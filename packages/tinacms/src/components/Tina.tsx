@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { CMSContext } from '@tinacms/react-tinacms'
+import { CMSContext } from 'react-tinacms'
 import { ModalProvider } from './modals/ModalProvider'
 import { SidebarContext } from './sidebar/SidebarProvider'
 import { cms } from '../index'
