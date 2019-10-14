@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.6 (2019-10-14)
+
+### Bug Fixes
+
+- **wysiwyg:** default the theme to an empty object ([026d1b9](https://github.com/tinacms/tinacms/commit/026d1b9))
+
 ## 0.1.5 (2019-10-13)
 
 ### Bug Fixes
