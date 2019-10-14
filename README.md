@@ -5,6 +5,7 @@
 
 ## Getting Started
 
+- [Website](https://tinacms.org/)
 - [Documentation](https://tinacms.org/docs/)
 - [Roadmap](./ROADMAP.md)
 - [Contributing](./CONTRIBUTING.md)
@@ -12,6 +13,8 @@
   - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
   - [Releasing](./CONTRIBUTING.md#Releasing)
+
+[![Tina Demo](https://tinacms.org/86eeb01f0e69c12bb5603865954d79ba/temporary_show_tina.gif)](https://tinacms.org/)
 
 ## Development
 
