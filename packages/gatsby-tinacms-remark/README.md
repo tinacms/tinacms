@@ -8,7 +8,7 @@ Tina is a lightweight but powerful toolkit for creating a site editing ui with j
 
 Tina is optimized for nextgen JAMstack tools. It is based in javascript and is extensible enough to be configured with many different frameworks. Right now we have explored using Tina with Gatsby, Create-React-App & Next.js, with plans to dive into Vue.
 
-[Visit the website to learn more!](https://tinacms.org/docs/
+[Visit the website to learn more!](https://tinacms.org/docs/)
 
 ## Installation
 
