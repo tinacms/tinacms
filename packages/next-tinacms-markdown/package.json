@@ -21,7 +21,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.2.1",
-    "@tinacms/react-tinacms": "^0.2.0",
+    "react-tinacms": "^0.2.0",
     "gray-matter": "4.0.2"
   }
 }

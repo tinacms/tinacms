@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { GitClient } from '@tinacms/git-client'
-import { cms } from '@tinacms/tinacms'
+import { cms } from 'tinacms'
 
 exports.onPreRenderHTML = () => {
   cms.registerApi('git', new GitClient('localhost'))

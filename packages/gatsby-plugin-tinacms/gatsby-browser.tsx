@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Tina } from '@tinacms/tinacms'
+import { Tina } from 'tinacms'
 
 export const wrapRootElement = ({ element }: any, options: any) => {
   return <Tina {...options.sidebar}>{element}</Tina>

@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/gatsby-tinacms-remark",
+  "name": "gatsby-tinacms-remark",
   "version": "0.3.2",
   "main": "index.js",
   "types": "src/index.d.ts",
@@ -39,8 +39,8 @@
   "dependencies": {
     "@tinacms/core": "^0.2.1",
     "@tinacms/form-builder": "^0.1.4",
-    "@tinacms/react-tinacms": "^0.2.0",
-    "@tinacms/tinacms": "^0.2.1",
+    "react-tinacms": "^0.2.0",
+    "tinacms": "^0.2.1",
     "gray-matter": "^4.0.2",
     "lodash.get": "^4.4.2"
   }

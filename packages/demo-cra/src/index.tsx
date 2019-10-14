@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import { Tina } from '@tinacms/tinacms'
+import { Tina } from 'tinacms'
 
 ReactDOM.render(
   <Tina>

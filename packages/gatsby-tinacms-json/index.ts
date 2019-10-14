@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { Form, FormOptions, Field } from '@tinacms/core'
-import { useCMSForm, useCMS, useWatchFormValues } from '@tinacms/react-tinacms'
+import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import { useMemo, useCallback, useState, useEffect } from 'react'
 
 interface JsonNode {

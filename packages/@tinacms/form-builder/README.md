@@ -17,5 +17,5 @@ yarn add @tinacms/form-builder
 ## Getting Started
 
 ```javascript
-import {} from '@tinacms/react-tinacms'
+import {} from 'react-tinacms'
 ```

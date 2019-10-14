@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { useCMS } from '@tinacms/react-tinacms'
+import { useCMS } from 'react-tinacms'
 import { TinaCMS } from '../tina-cms'
 
 export function useTina() {
