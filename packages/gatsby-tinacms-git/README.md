@@ -1,25 +1,30 @@
 # gatsby-tinacms-git
 
-A Gatsby plugin for the Tina CMS that provides an API for writing changes to the local filesystem. It does this by :
+A Gatsby/Tina plugin for editing content/data files stored in git.
 
-- Creating a NodeJS server that writes changes to markdonw files.
-- Registers a `git` API with the `cms` that posts changes to the server.
+**What is Tina?**
+
+Tina is a lightweight but powerful toolkit for creating a site editing ui with javascript components. Tina surfaces superpowers for dev’s to create, expand on and customize a simple yet intuitive ui for editing content.
+
+Tina is optimized for nextgen JAMstack tools. It is based in javascript and is extensible enough to be configured with many different frameworks. Right now we have explored using Tina with Gatsby, Create-React-App & Next.js, with plans to dive into Vue.
+
+[Visit the website to learn more!](https://tinacms.org/docs/
 
 ## Installation
 
 ```
-npm install --save gatsby-tinacms-git
+npm install --save gatsby-plugin-tinacms gatsby-tinacms-git
 ```
 
 or
 
 ```sh
-yarn add gatsby-tinacms-git
+yarn add gatsby-plugin-tinacms gatsby-tinacms-git
 ```
 
 ## Setup
 
-Include `gatsby-tinacms-git` in the list of gatsby plugins:
+Include `gatsby-plugin-tinacms` and `gatsby-tinacms-git`in your config:
 
 _gatsby-config.js_
 
@@ -28,7 +33,12 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    'gatsby-tinacms-git',
+    {
+      resolve: 'gatsby-plugin-tinacms',
+      options: {
+        plugins: ['gatsby-tinacms-git'],
+      },
+    },
   ],
 }
 ```
