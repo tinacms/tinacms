@@ -33,5 +33,3 @@ exports.onClientEntry = () => {
 
   window.tinacms.registerApi('git', new GitClient(baseUrl))
 }
-
-exports.bigBut = () => {}
