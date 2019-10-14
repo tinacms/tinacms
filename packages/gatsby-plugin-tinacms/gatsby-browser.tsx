@@ -20,7 +20,11 @@ import * as React from 'react'
 import { Tina, cms } from '@tinacms/tinacms'
 
 exports.wrapRootElement = ({ element }: any, options: any) => {
-  return <Tina {...options.sidebar}>{element}</Tina>
+  return (
+    <Tina cms={window.tinacms} {...options.sidebar}>
+      {element}
+    </Tina>
+  )
 }
 
 declare let window: any
