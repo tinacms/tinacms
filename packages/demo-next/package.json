@@ -6,11 +6,11 @@
     "start": "next start"
   },
   "dependencies": {
-    "@tinacms/api-git": "0.2.2",
-    "@tinacms/next-tinacms-git": "0.0.4",
-    "@tinacms/next-tinacms-markdown": "0.0.6",
-    "react-tinacms": "0.3.0",
-    "tinacms": "0.3.0",
+    "@tinacms/api-git": "0.2.3",
+    "@tinacms/next-tinacms-git": "0.0.5",
+    "@tinacms/next-tinacms-markdown": "0.0.7",
+    "react-tinacms": "0.4.0",
+    "tinacms": "0.4.0",
     "next": "9.0.5"
   }
 }
