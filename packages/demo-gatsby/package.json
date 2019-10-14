@@ -12,7 +12,7 @@
     "@tinacms/form-builder": "0.1.4",
     "@tinacms/gatsby-plugin-tinacms": "0.1.5",
     "@tinacms/gatsby-tinacms-git": "0.2.2",
-    "@tinacms/gatsby-tinacms-json": "0.2.1",
+    "@tinacms/gatsby-tinacms-json": "0.2.0",
     "@tinacms/react-tinacms": "0.2.0",
     "@tinacms/gatsby-tinacms-remark": "0.3.2",
     "@tinacms/tinacms": "0.2.1",
