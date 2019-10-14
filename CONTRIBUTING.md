@@ -70,6 +70,32 @@ Linking prevents running `npm install` from directly inside a package from worki
 
 ## Releasing
 
+The general release process looks like this:
+
+1. **Build the source files:**
+
+   The source must be compiled, minified, and uglified in preparation for release.
+
+1. **Generate CHANGELOGs and git tags:**
+
+   We use `lerna` to generate CHANGELOG files automatically from our commit messages.
+
+1. **Clean the CHANGELOGs**
+
+   Lerna sometimes adds empty changelog entries. For example, if `react-tinacms` is changed
+   then `tinacms` will get get a patch update with only the dependency updated. The following
+   script removes those entries from the changelog:
+
+1. **Publish to NPM:**
+
+   You must have an NPM_TOKEN set locally that has access to the `@tinacms` organization
+
+1. **Push CHANGELOGs and git tags to Github:**
+
+   Let everyone know!
+
+The exact commands vary slightly depending on the type of release being made.
+
 ### Prerelease
 
 1. **Build the source files:**
@@ -79,6 +105,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    ```
 
 1. **Generate CHANGELOGs and git tags:**
+
    ```
    lerna version \
      --conventional-commits \
@@ -87,6 +114,13 @@ Linking prevents running `npm install` from directly inside a package from worki
      --allow-branch master \
      -m "chore(publish): prerelease"
    ```
+
+1. **Clean the CHANGELOGs**
+
+   ```
+   lcc **
+   ```
+
 1. **Publish to NPM:**
    ```
    lerna publish from-git --dist-tag next
@@ -105,6 +139,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    ```
 
 1. **Generate CHANGELOGs and git tags:**
+
    ```
    lerna version \
      --conventional-commits \
@@ -113,11 +148,21 @@ Linking prevents running `npm install` from directly inside a package from worki
      --allow-branch master \
      -m "chore(publish): graduation"
    ```
-1. **Publish to NPM:**
+
+1. **Clean the CHANGELOGs**
+
+   ```
+   lcc **
+   ``
+   ```
+
+1) **Publish to NPM:**
+
    ```
    lerna publish from-git
    ```
-1. **Push CHANGELOGs and git tags to Github:**
+
+1) **Push CHANGELOGs and git tags to Github:**
    ```
    git push
    ```
@@ -131,6 +176,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    ```
 
 1. **Generate CHANGELOGs and git tags:**
+
    ```
    lerna version \
      --conventional-commits \
@@ -138,6 +184,15 @@ Linking prevents running `npm install` from directly inside a package from worki
      --allow-branch master \
      -m "chore(publish): release"
    ```
+
+1. **Clean the CHANGELOGs**
+
+   ```
+   lcc **
+   ``
+
+   ```
+
 1. **Publish to NPM:**
    ```
    lerna publish from-git
