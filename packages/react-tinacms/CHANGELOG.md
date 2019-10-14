@@ -3,23 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.2.0-alpha.1...@tinacms/react-tinacms@0.2.0) (2019-10-13)
+# [0.2.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.2.0-alpha.1...react-tinacms@0.2.0) (2019-10-13)
 
-**Note:** Version bump only for package @tinacms/react-tinacms
-
-
-
-
-
-# [0.2.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.2.0-alpha.0...@tinacms/react-tinacms@0.2.0-alpha.1) (2019-10-11)
-
-**Note:** Version bump only for package @tinacms/react-tinacms
+**Note:** Version bump only for package react-tinacms
 
 
 
 
 
-# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.1...@tinacms/react-tinacms@0.2.0-alpha.0) (2019-10-10)
+# [0.2.0-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.2.0-alpha.0...react-tinacms@0.2.0-alpha.1) (2019-10-11)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.1...react-tinacms@0.2.0-alpha.0) (2019-10-10)
 
 
 ### Features
@@ -30,15 +30,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-## [0.1.4-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.1...@tinacms/react-tinacms@0.1.4-alpha.1) (2019-10-09)
+## [0.1.4-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.1...react-tinacms@0.1.4-alpha.1) (2019-10-09)
 
-**Note:** Version bump only for package @tinacms/react-tinacms
-
-
+**Note:** Version bump only for package react-tinacms
 
 
 
-## [0.1.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.3...@tinacms/react-tinacms@0.1.4-alpha.0) (2019-10-07)
+
+
+## [0.1.4-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.3...react-tinacms@0.1.4-alpha.0) (2019-10-07)
 
 
 ### Bug Fixes
@@ -49,15 +49,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-## [0.1.3](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.3-alpha.0...@tinacms/react-tinacms@0.1.3) (2019-10-07)
+## [0.1.3](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.3-alpha.0...react-tinacms@0.1.3) (2019-10-07)
 
-**Note:** Version bump only for package @tinacms/react-tinacms
-
-
+**Note:** Version bump only for package react-tinacms
 
 
 
-## [0.1.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.1...@tinacms/react-tinacms@0.1.3-alpha.0) (2019-10-07)
+
+
+## [0.1.3-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.1...react-tinacms@0.1.3-alpha.0) (2019-10-07)
 
 
 ### Bug Fixes
@@ -69,15 +69,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-## [0.1.2](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.2-alpha.0...@tinacms/react-tinacms@0.1.2) (2019-10-04)
+## [0.1.2](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.2-alpha.0...react-tinacms@0.1.2) (2019-10-04)
 
-**Note:** Version bump only for package @tinacms/react-tinacms
-
-
+**Note:** Version bump only for package react-tinacms
 
 
 
-## [0.1.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0...@tinacms/react-tinacms@0.1.1) (2019-10-03)
+
+
+## [0.1.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.0...react-tinacms@0.1.1) (2019-10-03)
 
 
 ### Bug Fixes
@@ -88,15 +88,15 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [0.1.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0-alpha.13...@tinacms/react-tinacms@0.1.0) (2019-10-02)
+# [0.1.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.0-alpha.13...react-tinacms@0.1.0) (2019-10-02)
 
-**Note:** Version bump only for package @tinacms/react-tinacms
-
-
+**Note:** Version bump only for package react-tinacms
 
 
 
-# [0.1.0-alpha.13](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0-alpha.12...@tinacms/react-tinacms@0.1.0-alpha.13) (2019-10-02)
+
+
+# [0.1.0-alpha.13](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.0-alpha.12...react-tinacms@0.1.0-alpha.13) (2019-10-02)
 
 
 ### Bug Fixes
@@ -108,31 +108,31 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 
 
-# [0.1.0-alpha.12](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0-alpha.11...@tinacms/react-tinacms@0.1.0-alpha.12) (2019-09-25)
+# [0.1.0-alpha.12](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.0-alpha.11...react-tinacms@0.1.0-alpha.12) (2019-09-25)
 
-**Note:** Version bump only for package @tinacms/react-tinacms
-
-
-
-
-
-# [0.1.0-alpha.11](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0-alpha.10...@tinacms/react-tinacms@0.1.0-alpha.11) (2019-09-23)
-
-**Note:** Version bump only for package @tinacms/react-tinacms
+**Note:** Version bump only for package react-tinacms
 
 
 
 
 
-# [0.1.0-alpha.10](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0-alpha.9...@tinacms/react-tinacms@0.1.0-alpha.10) (2019-09-21)
+# [0.1.0-alpha.11](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.0-alpha.10...react-tinacms@0.1.0-alpha.11) (2019-09-23)
 
-**Note:** Version bump only for package @tinacms/react-tinacms
-
-
+**Note:** Version bump only for package react-tinacms
 
 
 
-# [0.1.0-alpha.9](https://github.com/tinacms/tinacms/compare/@tinacms/react-tinacms@0.1.0-alpha.8...@tinacms/react-tinacms@0.1.0-alpha.9) (2019-09-20)
+
+
+# [0.1.0-alpha.10](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.0-alpha.9...react-tinacms@0.1.0-alpha.10) (2019-09-21)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
+# [0.1.0-alpha.9](https://github.com/tinacms/tinacms/compare/react-tinacms@0.1.0-alpha.8...react-tinacms@0.1.0-alpha.9) (2019-09-20)
 
 
 ### Bug Fixes

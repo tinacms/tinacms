@@ -23,7 +23,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useCMSForm } from "@tinacms/react-tinacms"
+import { useCMSForm } from "react-tinacms"
 
 function BlogIndex(props) {
   const { data } = props

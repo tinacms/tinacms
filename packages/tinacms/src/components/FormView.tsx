@@ -20,7 +20,7 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
 import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
-import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
+import { useCMS, useSubscribable } from 'react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
 import styled, { keyframes, css } from 'styled-components'

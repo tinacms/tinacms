@@ -19,7 +19,7 @@ limitations under the License.
 // @ts-ignore the types are wrong?
 import matter from 'gray-matter'
 import { FormOptions } from '@tinacms/core'
-import { useCMS, useCMSForm } from '@tinacms/react-tinacms'
+import { useCMS, useCMSForm } from 'react-tinacms'
 import * as yaml from 'js-yaml'
 
 interface MarkdownCollection {

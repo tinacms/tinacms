@@ -1,5 +1,5 @@
 {
-  "name": "@tinacms/gatsby-tinacms-json",
+  "name": "gatsby-tinacms-json",
   "version": "0.2.0",
   "main": "index.js",
   "types": "index.d.ts",
@@ -36,6 +36,6 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.2.1",
-    "@tinacms/react-tinacms": "^0.2.0"
+    "react-tinacms": "^0.2.0"
   }
 }

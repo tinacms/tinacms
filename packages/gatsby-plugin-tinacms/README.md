@@ -1,22 +1,22 @@
-# @tinacms/gatsby-plugin-tinacms
+# gatsby-plugin-tinacms
 
 A Gatsby plugin for the Tina CMS.
 
 ## Installation
 
 ```
-npm install --save @tinacms/gatsby-plugin-tinacms
+npm install --save gatsby-plugin-tinacms
 ```
 
 or
 
 ```sh
-yarn add @tinacms/gatsby-plugin-tinacms
+yarn add gatsby-plugin-tinacms
 ```
 
 ## Setup
 
-Include `@tinacms/gatsby-plugin-tinacms` in the list of gatsby plugins:
+Include `gatsby-plugin-tinacms` in the list of gatsby plugins:
 
 _gatsby.config.js_
 
@@ -25,7 +25,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@tinacms/gatsby-plugin-tinacms',
+    'gatsby-plugin-tinacms',
   ],
 }
 ```
@@ -88,7 +88,7 @@ You may want to register your fields inside `wrapPageElement` to ensure that the
 ```javascript
 //gatsby-browser.js
 import * as React from 'react'
-import { useCMS } from '@tinacms/react-tinacms'
+import { useCMS } from 'react-tinacms'
 import { ShortTextField } from './your-custom-field'
 
 export const wrapPageElement = ({ element }) => {
@@ -135,7 +135,7 @@ function BlogPostTemplate(props) {
 **Using the RemarkForm renderProps approach:**
 
 ```javascript
-import { RemarkForm } from '@tinacms/gatsby-plugin-tinacms'
+import { RemarkForm } from 'gatsby-plugin-tinacms'
 
 class BlogPostTemplate extends React.Component {
   render() {

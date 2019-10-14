@@ -1,4 +1,4 @@
-# @tinacms/gatsby-tinacms-git
+# gatsby-tinacms-git
 
 A Gatsby plugin for the Tina CMS that provides an API for writing changes to the local filesystem. It does this by :
 
@@ -8,18 +8,18 @@ A Gatsby plugin for the Tina CMS that provides an API for writing changes to the
 ## Installation
 
 ```
-npm install --save @tinacms/gatsby-tinacms-git
+npm install --save gatsby-tinacms-git
 ```
 
 or
 
 ```sh
-yarn add @tinacms/gatsby-tinacms-git
+yarn add gatsby-tinacms-git
 ```
 
 ## Setup
 
-Include `@tinacms/gatsby-tinacms-git` in the list of gatsby plugins:
+Include `gatsby-tinacms-git` in the list of gatsby plugins:
 
 _gatsby-config.js_
 
@@ -28,7 +28,7 @@ module.exports = {
   // ...
   plugins: [
     // ...
-    '@tinacms/gatsby-tinacms-git',
+    'gatsby-tinacms-git',
   ],
 }
 ```
