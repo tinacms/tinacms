@@ -1,62 +1,49 @@
-# Remark Adapter for Tina Gatsby Plugin
+# gatsby-tinacms-remark
 
-This library makes it easy to edit content provided by the [`gatsby-transformer-remark`](https://github.com/gatsbyjs/gatsby/tree/master/packages/gatsby-transformer-remark) plugin. There are two ways to register remark forms with the CMS, depending on how your React template is setup.
+A Gatsby/Tina plugin for editing Markdown files stored in git.
 
-1. `useRemarkForm`: A [Hook](https://reactjs.org/docs/hooks-intro.html). Used when the page template is a function component.
-1. `RemarkForm`: A [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) component. Used when the page template is a class component.
+**What is Tina?**
 
-## Option 1: `useRemarkForm(remark): [values, form]`
+Tina is a lightweight but powerful toolkit for creating a site editing ui with javascript components. Tina surfaces superpowers for dev’s to create, expand on and customize a simple yet intuitive ui for editing content.
 
-**Arguments**
+Tina is optimized for nextgen JAMstack tools. It is based in javascript and is extensible enough to be configured with many different frameworks. Right now we have explored using Tina with Gatsby, Create-React-App & Next.js, with plans to dive into Vue.
 
-- `remark`: the data returned from a Gatsby `markdownRemark` query.
+[Visit the website to learn more!](https://tinacms.org/docs/)
 
-**Return**
+## Installation
 
-- `[values, form]`
-  - `values`: The current values to be display. This has the same shape as the `markdownRemark` data.
-  - `form`: A reference to the `Form`. See `@tinacms/cms` for more details.
+```
+npm install --save gatsby-plugin-tinacms gatsby-tinacms-git gatsby-tinacms-remark
+```
 
-**src/templates/blog-post.js**
+or
+
+```sh
+yarn add gatsby-plugin-tinacms gatsby-tinacms-git gatsby-tinacms-remark
+```
+
+## Setup
+
+Include `gatsby-plugin-tinacms`, `gatsby-tinacms-git`, and `gatsby-tinacms-remark` in your config:
+
+_gatsby-config.js_
 
 ```javascript
-import { useRemarkForm } from 'gatsby-plugin-tinacms'
-
-function BlogPostTemplate(props) {
-  const [markdownRemark] = useRemarkForm(props.data.markdownRemark)
-
-  return <h1>{markdownRemark.frontmatter.title}</h1>
+module.exports = {
+  // ...
+  plugins: [
+    // ...
+    {
+      resolve: 'gatsby-plugin-tinacms',
+      options: {
+        plugins: ['gatsby-tinacms-git', 'gatsby-tinacms-remark'],
+      },
+    },
+  ],
 }
 ```
 
-## Option 2: `RemarkForm`
+## Next Steps
 
-`RemarkForm` is a [Render Props](https://reactjs.org/docs/render-props.html#use-render-props-for-cross-cutting-concerns) based component for accessing CMS Forms.
-
-This is a thin wrapper around `useRemarkForm`. Since React [Hooks](https://reactjs.org/docs/hooks-intro.html) are only available within Function Components you may need to use `RemarkForm` instead of calling `useRemarkForm` directly.
-
-**Props**
-
-- `remark`: the data returned from a Gatsby `markdownRemark` query.
-- `render(renderProps): JSX.Element`: A function that returns JSX elements
-  - `renderProps.markdownRemark`: The current values to be displayed. This has the same shape as the `markdownRemark` data that was passed in.
-  - `renderProps.form`: A reference to the `Form`. See `@tinacms/cms` for more details.
-
-**src/templates/blog-post.js**
-
-```javascript
-import { RemarkForm } from 'gatsby-plugin-tinacms'
-
-class BlogPostTemplate extends React.Component {
-  render() {
-    return (
-      <RemarkForm
-        remark={this.props.data.markdownRemark}
-        render={({ markdownRemark }) => {
-          return <h1>{markdownRemark.frontmatter.title}</h1>
-        }}
-      />
-    )
-  }
-}
-```
+Visit the [Markdown in Gatsby](https://tinacms.org/docs/gatsby/markdown) guide for more information
+on creating and editing markdown files.
