@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Tina, cms } from '@tinacms/tinacms'
+import { Tina, TinaCMS } from '@tinacms/tinacms'
 
 exports.wrapRootElement = ({ element }: any, options: any) => {
   return (
@@ -30,5 +30,5 @@ exports.wrapRootElement = ({ element }: any, options: any) => {
 declare let window: any
 
 exports.onClientEntry = (...args: any[]) => {
-  window.tinacms = cms
+  window.tinacms = new TinaCMS()
 }
