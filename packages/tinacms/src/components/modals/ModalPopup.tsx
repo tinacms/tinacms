@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import styled, { keyframes } from 'styled-components'
+import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
 import { radius } from '@tinacms/styles'
 
 const ModalPopupKeyframes = keyframes`

@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 
+import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
 import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
 import styled, { keyframes, css } from 'styled-components'

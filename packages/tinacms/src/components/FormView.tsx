@@ -21,6 +21,7 @@ import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
+import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
 import styled, { keyframes, css } from 'styled-components'
 import {
   Button,
