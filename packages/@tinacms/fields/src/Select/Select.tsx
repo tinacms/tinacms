@@ -209,7 +209,14 @@ export function Select(props: SelectProps) {
         onChange(options[0])
       }
     },
-    [props.value, props.isLoading, props.isClearable, selectedOption, onChange, options]
+    [
+      props.value,
+      props.isLoading,
+      props.isClearable,
+      selectedOption,
+      onChange,
+      options,
+    ]
   )
 
   return (

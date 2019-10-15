@@ -55,7 +55,9 @@ export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
     fields: options.fields,
     onSubmit: async (form: any, cms: CMS) => {
       const filename = await formatFilename(form)
+      //@ts-ignore
       const rawFrontmatter = await createFrontmatter(form)
+      //@ts-ignore
       const rawMarkdownBody = await createBody(form)
 
       const fileRelativePath = filename

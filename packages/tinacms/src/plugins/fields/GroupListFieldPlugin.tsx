@@ -86,6 +86,7 @@ const Group = function Group({
   const addItem = React.useCallback(() => {
     let obj = {}
     if (typeof field.defaultItem === 'function') {
+      //@ts-ignore
       obj = field.defaultItem()
     } else {
       obj = field.defaultItem || {}

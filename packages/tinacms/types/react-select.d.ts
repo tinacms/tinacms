@@ -16,23 +16,4 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { Toggle, ToggleProps, InputProps } from '@tinacms/fields'
-
-export const ToggleField = wrapFieldsWithMeta<InputProps, ToggleProps>(
-  ({ input, field }) => (
-    <Toggle
-      value={input.value}
-      onFocus={input.onFocus}
-      onChange={input.onChange}
-      {...field}
-    />
-  )
-)
-
-export default {
-  name: 'toggle',
-  type: 'checkbox',
-  Component: ToggleField,
-}
+declare module 'react-select'

@@ -39,7 +39,7 @@ tables.table_header = {
 export { tables }
 
 const plugins: SchemaNodePlugin[] = Object.keys(tables).map(name => ({
-  __type: 'wysiwyg:schema:node',
+  __type: 'wysiwyg:schema:node' as any,
   name,
   node: (tables as any)[name],
 }))

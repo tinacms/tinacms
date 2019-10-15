@@ -48,6 +48,8 @@ interface Map<T> {
 
 type PluginMap<T extends Plugin = Plugin> = Map<T>
 
+type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
+
 export class PluginType<T extends Plugin = Plugin> extends Subscribable {
   __plugins: PluginMap<T> = {}
   constructor(private __type: string) {
