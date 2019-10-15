@@ -17,8 +17,8 @@ limitations under the License.
 */
 
 import { FormOptions, Form } from '@tinacms/core'
-import { ActionButton } from '@tinacms/tinacms'
-import { useCMSForm, useCMS, useWatchFormValues } from '@tinacms/react-tinacms'
+import { ActionButton } from 'tinacms'
+import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -53,7 +53,7 @@ export function useRemarkForm(
   const valuesOnDisk = useMemo(
     () => ({
       fileRelativePath: markdownRemark.fileRelativePath,
-      frontmatter: markdownRemark.rawMarkdownBody,
+      frontmatter: markdownRemark.frontmatter,
       rawMarkdownBody: markdownRemark.rawMarkdownBody,
       rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
     }),

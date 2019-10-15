@@ -1,28 +1,33 @@
-# `@tinacms/react-tinacms`
+# react-tinacms
+
+The `react-tinacms` package provides helpers for using Tina in React applications
+
+Tina is a lightweight but powerful toolkit for creating a site editing ui with javascript components. Tina surfaces superpowers for dev’s to create, expand on and customize a simple yet intuitive ui for editing content.
+
+Tina is optimized for nextgen JAMstack tools. It is based in javascript and is extensible enough to be configured with many different frameworks. Right now we have explored using Tina with Gatsby, Create-React-App & Next.js, with plans to dive into Vue.
+
+[Visit the website to learn more!](https://tinacms.org/docs/)
 
 ## Install
 
 ```
-npm install --save @tinacms/react-tinacms
+npm install --save react-tinacms
 ```
 
 or
 
 ```
-yarn add @tinacms/react-tinacms
+yarn add react-tinacms
 ```
 
 ## Getting Started
 
-`@tinacms/cms-react` is a thin wrapper around the `@tinacms/cms`.
-
 ```javascript
 import * as React from 'react'
 import { CMS } from '@tinacms/core'
-import { CMSContext } from '@tinacms/react-tinacms'
+import { CMSContext } from 'react-tinacms'
 
 let cms = new CMS()
-cms.forms
 
 function MyApp() {
   let cms = useCMS()
@@ -45,21 +50,3 @@ React.render(
   document.body
 )
 ```
-
-## API
-
-### `CMSContext`
-
-A React context for providing a `CMS` instance.
-
-### `useCMS(): CMS`
-
-A React hook for accessing the `CMS`.
-
-### `useCMSForm(name: string): Form | null`
-
-A React hook for creating and subscribing to a `Form` in the `CMS`.
-
-### `useSubscribable(subscribable: Subscribable, callback?: () => void): void`
-
-A React hook for subscribing to some `Subscribable`.

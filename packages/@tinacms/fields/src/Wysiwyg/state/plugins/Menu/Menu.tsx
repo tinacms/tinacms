@@ -92,9 +92,14 @@ export const Menu = (props: Props) => {
 
   const supportBlocks = true
 
+  const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
+    e.stopPropagation()
+    e.preventDefault()
+  }, [])
+
   return (
     <ThemeProvider theme={theme}>
-      <MenuContainer>
+      <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
         {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
         <BoldControl view={view} />
         <ItalicControl view={view} />

@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
-import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
+import { useCMS, useSubscribable } from 'react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
 import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
@@ -225,7 +225,7 @@ const NoFormsPlaceholder = () => (
     </p>
     <p>
       <LinkButton
-        href="https://github.com/tinacms/tinacms-site/blob/master/content/docs/gatsby/content-editing.md"
+        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
         target="_blank"
       >
         <Emoji>📖</Emoji> Form Setup Guide
@@ -240,7 +240,7 @@ const NoFieldsPlaceholder = () => (
     <h3>Hey, you don't have any fields added to this form.</h3>
     <p>
       <LinkButton
-        href="https://github.com/tinacms/tinacms-site/blob/master/docs/gatsby/content-editing.md"
+        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
         target="_blank"
       >
         <Emoji>📖</Emoji> Field Setup Guide

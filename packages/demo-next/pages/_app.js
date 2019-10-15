@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import App from 'next/app'
-import { Tina, cms } from '@tinacms/tinacms'
+import { Tina, cms } from 'tinacms'
 
 cms.registerApi('git')
 

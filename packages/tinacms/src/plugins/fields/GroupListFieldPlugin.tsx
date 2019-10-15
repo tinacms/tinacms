@@ -406,7 +406,7 @@ const Panel = function Panel({
         <GroupLabel>{itemTitle}</GroupLabel>
       </PanelHeader>
       <PanelBody>
-        <FieldsBuilder form={tinaForm} fields={fields} />
+        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
       </PanelBody>
     </GroupPanel>
   )

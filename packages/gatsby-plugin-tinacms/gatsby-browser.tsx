@@ -16,9 +16,9 @@ limitations under the License.
 
 */
 
-import { GitClient } from '@tinacms/git-client'
-import { cms } from '@tinacms/tinacms'
+import * as React from 'react'
+import { Tina } from 'tinacms'
 
-exports.onPreRenderHTML = () => {
-  cms.registerApi('git', new GitClient('localhost'))
+export const wrapRootElement = ({ element }: any, options: any) => {
+  return <Tina {...options.sidebar}>{element}</Tina>
 }

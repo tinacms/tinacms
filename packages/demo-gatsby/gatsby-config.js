@@ -31,16 +31,17 @@ module.exports = {
   },
   plugins: [
     {
-      resolve: "@tinacms/gatsby-plugin-tinacms",
+      resolve: "gatsby-plugin-tinacms",
       options: {
         sidebar: {
           hidden: process.env.NODE_ENV === "production",
           position: "fixed",
         },
         plugins: [
-          "@tinacms/gatsby-tinacms-json",
+          "gatsby-tinacms-json",
+          "gatsby-tinacms-remark",
           {
-            resolve: "@tinacms/gatsby-tinacms-git",
+            resolve: "gatsby-tinacms-git",
             options: {
               pathToRepo: REPO_ABSOLUTE_PATH,
               pathToContent: "packages/demo-gatsby",
@@ -52,7 +53,7 @@ module.exports = {
         ],
       },
     },
-    "@tinacms/gatsby-tinacms-json",
+    "gatsby-tinacms-json",
     {
       resolve: `gatsby-source-filesystem`,
       options: {

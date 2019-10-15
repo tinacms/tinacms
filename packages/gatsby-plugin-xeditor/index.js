@@ -1,3 +1,4 @@
+"use strict";
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -15,10 +16,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-import * as React from 'react'
-import { Tina } from '@tinacms/tinacms'
-
-export const wrapRootElement = ({ element }: any, options: any) => {
-  return <Tina {...options.sidebar}>{element}</Tina>
-}
+Object.defineProperty(exports, "__esModule", { value: true });
+var tinacms_1 = require("@tinacms/tinacms");
+exports.cms = tinacms_1.cms;

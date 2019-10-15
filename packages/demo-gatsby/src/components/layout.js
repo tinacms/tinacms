@@ -20,8 +20,8 @@ import React from "react"
 import { Link } from "gatsby"
 
 import { rhythm, scale } from "../utils/typography"
-import { createRemarkButton } from "@tinacms/react-tinacms-remark"
-import { withPlugin } from "@tinacms/react-tinacms"
+import { createRemarkButton } from "gatsby-tinacms-remark"
+import { withPlugin } from "react-tinacms"
 
 class Layout extends React.Component {
   render() {

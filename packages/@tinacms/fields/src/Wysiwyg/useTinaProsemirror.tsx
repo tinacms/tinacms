@@ -70,7 +70,6 @@ export function useTinaProsemirror(
    * The Prosemirror EditorView instance
    */
   const [editorView, setEditorView] = React.useState<EditorView>()
-  const [focussed, setFocus] = React.useState(false)
 
   React.useEffect(
     function setupEditor() {
@@ -104,18 +103,6 @@ export function useTinaProsemirror(
             input.onChange(translator!.stringFromNode(tr.doc))
           }
         },
-        handleDOMEvents: {
-          focus: () => {
-            setFocus(true)
-            input.onFocus()
-            return true
-          },
-          blur: () => {
-            setFocus(false)
-            input.onBlur()
-            return true
-          },
-        },
       })
 
       setEditorView(editorView)
@@ -138,11 +125,18 @@ export function useTinaProsemirror(
      * The editorView may exist, even if it's docView does not.
      * Trying to updateState when the docView dne throws an error.
      */
-    // @ts-ignore This exists. Types are lying.
-    if (editorView && editorView.docView && !focussed) {
+    if (!el) return
+    if (!editorView) return
+    // @ts-ignore
+    if (!editorView.docView) return
+
+    const doc = frame ? frame.document : document
+    const wysiwygIsActive = el.contains(doc.activeElement)
+
+    if (!wysiwygIsActive) {
       editorView.updateState(createState(input.value))
     }
-  }, [input.value, editorView, focussed])
+  }, [input.value, editorView])
 
   return elRef
 }
