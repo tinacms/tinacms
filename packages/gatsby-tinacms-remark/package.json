@@ -39,7 +39,8 @@
     "ts-jest": "^24.0.2",
     "react": "^16.8.6",
     "tinacms": "^0.4.0",
-    "react-tinacms": "^0.4.0"
+    "react-tinacms": "^0.4.0",
+    "graphql": "^14.1.1"
   },
   "dependencies": {
     "@tinacms/core": "^0.2.3",
@@ -51,6 +52,7 @@
   "peerDependencies": {
     "react": "^16.8.6",
     "react-tinacms": "^0.4.0",
-    "tinacms": "^0.4.0"
+    "tinacms": "^0.4.0",
+    "graphql": "^14.1.1"
   }
 }

@@ -15,37 +15,37 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-const { GraphQLString } = require("gatsby/graphql");
+const { GraphQLString } = require('graphql')
 
 exports.setFieldsOnGraphQLNodeType = ({ type }) => {
-  const pathRoot = process.cwd();
+  const pathRoot = process.cwd()
   if (type.name === `MarkdownRemark`) {
     return {
       rawFrontmatter: {
         type: GraphQLString,
         args: {
           myArgument: {
-            type: GraphQLString
-          }
+            type: GraphQLString,
+          },
         },
         resolve: source => {
-          return JSON.stringify(source.frontmatter);
-        }
+          return JSON.stringify(source.frontmatter)
+        },
       },
       fileRelativePath: {
         type: GraphQLString,
         args: {
           myArgument: {
-            type: GraphQLString
-          }
+            type: GraphQLString,
+          },
         },
         resolve: source => {
-          return source.fileAbsolutePath.replace(pathRoot, "");
-        }
-      }
-    };
+          return source.fileAbsolutePath.replace(pathRoot, '')
+        },
+      },
+    }
   }
 
   // by default return empty object
-  return {};
-};
+  return {}
+}

@@ -11,6 +11,7 @@
     "@tinacms/next-tinacms-markdown": "0.0.7",
     "react-tinacms": "0.4.0",
     "tinacms": "0.4.0",
-    "next": "9.0.5"
+    "next": "9.0.5",
+    "moment": "^2.21.0"
   }
 }
