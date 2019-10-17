@@ -1,5 +1,6 @@
 {
   "name": "demo-gatsby",
+  "version": "1.0.0",
   "private": true,
   "description": "A starter for a blog powered by Gatsby and Markdown",
   "author": "Kyle Mathews <mathews.kyle@gmail.com>",
