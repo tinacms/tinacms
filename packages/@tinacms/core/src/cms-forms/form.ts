@@ -169,8 +169,8 @@ export interface Field {
   label?: string
   description?: string
   component: React.FC<any> | string | null
-  parse?: (value: string, name: string) => any
-  format?: (value: string, name: string) => any
+  parse?: (value: any, name: string, field: Field) => any
+  format?: (value: any, name: string, field: Field) => any
   defaultValue?: any
   fields?: Field[]
 }
