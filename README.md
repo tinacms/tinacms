@@ -34,7 +34,7 @@ npm run start
 
 ### Commands
 
-| Commands                           | Descriptiton                                  |
+| Commands                           | Description                                  |
 | ---------------------------------- | --------------------------------------------- |
 | npm run bootstrap                  | Install dependencies and link local packages. |
 | npm run build                      | Build all packages                            |
