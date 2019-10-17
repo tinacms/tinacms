@@ -23,11 +23,11 @@ To get started:
 ```bash
 git clone git@github.com:tinacms/tinacms.git
 cd tinacms
-npm run bootstrap
+npm install && npm run bootstrap
 
 # Start the Gatsby demo
-cd packages/demo/demo-gatsby
-npm run start
+cd packages/demo-gatsby
+npm install && npm run start
 ```
 
 ### Commands
