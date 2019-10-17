@@ -27,7 +27,7 @@ npm install && npm run bootstrap
 
 # Start the Gatsby demo
 cd packages/demo-gatsby
-npm install && npm run start
+npm run start
 ```
 
 > **TinaCMS** uses [**Lerna**](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
