@@ -29,6 +29,7 @@ export interface FieldPlugin {
     meta: any,
     field: Field
   ): string | object | undefined
-  parse?: (value: string, name: string) => any
+  parse?: (value: any, name: string, field: Field) => any
+  format?: (value: any, name: string, field: Field) => any
   defaultValue?: any
 }
