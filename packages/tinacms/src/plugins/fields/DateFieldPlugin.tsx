@@ -57,6 +57,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
             onFocus={input.onFocus}
             onChange={input.onChange}
             open={isOpen}
+            utc
             {...field}
           />
         </ReactDateTimeContainer>
