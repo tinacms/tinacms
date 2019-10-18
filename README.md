@@ -24,6 +24,7 @@ To get started:
 git clone git@github.com:tinacms/tinacms.git
 cd tinacms
 npm install && npm run bootstrap
+npm run build
 
 # Start the Gatsby demo
 cd packages/demo-gatsby
@@ -34,7 +35,7 @@ npm run start
 
 ### Commands
 
-| Commands                           | Description                                  |
+| Commands                           | Description                                   |
 | ---------------------------------- | --------------------------------------------- |
 | npm run bootstrap                  | Install dependencies and link local packages. |
 | npm run build                      | Build all packages                            |
