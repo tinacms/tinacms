@@ -20,9 +20,11 @@ import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
 import { radius, color, font, timing } from '@tinacms/styles'
+import { TrashIcon } from '@tinacms/icons'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
+  onClear: () => void
   value?: string
   previewSrc?: string
 }
@@ -64,6 +66,13 @@ const ImgPlaceholder = styled.div`
   }
 `
 
+const ImageActions = styled.div`
+  top: 0;
+  right: 0;
+  position: absolute;
+  display: none;
+`
+
 const StyledImage = styled.img`
   max-width: 100%;
   border-radius: ${radius('small')};
@@ -71,10 +80,25 @@ const StyledImage = styled.img`
   ${DropArea}:hover & {
     opacity: 0.6;
   }
+
+  ${ImageActions} {
+    display: block;
+  }
+`
+
+const StyledImageContainer = styled.div`
+  position: relative;
+
+  &:hover {
+    ${ImageActions} {
+      display: block;
+    }
+  }
 `
 
 export const ImageUpload = ({
   onDrop,
+  onClear,
   value,
   previewSrc,
 }: ImageUploadProps) => {
@@ -90,7 +114,19 @@ export const ImageUpload = ({
     <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
       {value ? (
-        <StyledImage src={previewSrc} />
+        <StyledImageContainer>
+          <StyledImage src={previewSrc} />
+          <ImageActions>
+            <DeleteButton
+              onClick={e => {
+                e.stopPropagation()
+                onClear()
+              }}
+            >
+              <TrashIcon />
+            </DeleteButton>
+          </ImageActions>
+        </StyledImageContainer>
       ) : (
         <ImgPlaceholder>
           Drag 'n' drop some files here,
@@ -101,3 +137,20 @@ export const ImageUpload = ({
     </DropArea>
   )
 }
+
+const DeleteButton = styled.button`
+  text-align: center;
+  flex: 0 0 auto;
+  border: 0;
+  background: transparent;
+  cursor: pointer;
+  padding: 0.75rem 0.5rem;
+  margin: 0;
+  transition: all 85ms ease-out;
+  svg {
+    transition: all 85ms ease-out;
+  }
+  &:hover {
+    background-color: #f6f6f9;
+  }
+`

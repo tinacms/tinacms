@@ -296,7 +296,7 @@ const BlogPostForm = {
       label: "Thumbnail",
       component: "image",
       // Generate the frontmatter value based on the filename
-      parse: filename => `./${filename}`,
+      parse: filename => (filename ? `./${filename}` : null),
 
       // Decide the file upload directory for the post
       uploadDir: blogPost => {
