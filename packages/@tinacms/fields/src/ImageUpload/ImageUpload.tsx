@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
-import { radius, color, font, timing } from '@tinacms/styles'
+import { radius, color, font, timing, IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
 
 interface ImageUploadProps {
@@ -66,32 +66,34 @@ const ImgPlaceholder = styled.div`
   }
 `
 
-const ImageActions = styled.div`
-  top: 0;
-  right: 0;
-  position: absolute;
-  display: none;
-`
-
 const StyledImage = styled.img`
   max-width: 100%;
   border-radius: ${radius('small')};
   transition: opacity ${timing('short')} ease-out;
-  ${DropArea}:hover & {
-    opacity: 0.6;
-  }
+  margin: 0;
+  display: block;
+`
 
-  ${ImageActions} {
-    display: block;
+const DeleteButton = styled(IconButton)`
+  top: 0.5rem;
+  right: 0.5rem;
+  position: absolute;
+  &:not(:hover) {
+    fill: ${color.grey()};
+    background-color: transparent;
+    border-color: transparent;
   }
 `
 
 const StyledImageContainer = styled.div`
+  background-color: ${color.grey(4)};
   position: relative;
-
+  border-radius: ${radius('small')};
+  overflow: hidden;
+  background-color: ${color.grey(8)};
   &:hover {
-    ${ImageActions} {
-      display: block;
+    ${StyledImage} {
+      opacity: 0.6;
     }
   }
 `
@@ -116,16 +118,14 @@ export const ImageUpload = ({
       {value ? (
         <StyledImageContainer>
           <StyledImage src={previewSrc} />
-          <ImageActions>
-            <DeleteButton
-              onClick={e => {
-                e.stopPropagation()
-                onClear()
-              }}
-            >
-              <TrashIcon />
-            </DeleteButton>
-          </ImageActions>
+          <DeleteButton
+            onClick={e => {
+              e.stopPropagation()
+              onClear()
+            }}
+          >
+            <TrashIcon />
+          </DeleteButton>
         </StyledImageContainer>
       ) : (
         <ImgPlaceholder>
@@ -137,20 +137,3 @@ export const ImageUpload = ({
     </DropArea>
   )
 }
-
-const DeleteButton = styled.button`
-  text-align: center;
-  flex: 0 0 auto;
-  border: 0;
-  background: transparent;
-  cursor: pointer;
-  padding: 0.75rem 0.5rem;
-  margin: 0;
-  transition: all 85ms ease-out;
-  svg {
-    transition: all 85ms ease-out;
-  }
-  &:hover {
-    background-color: #f6f6f9;
-  }
-`
