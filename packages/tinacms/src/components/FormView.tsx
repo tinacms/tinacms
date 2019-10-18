@@ -147,6 +147,15 @@ const Emoji = styled.span`
   display: inline-block;
 `
 
+const EmptyStateAnimation = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`
+
 const EmptyState = styled.div`
   position: relative;
   display: flex;
@@ -158,6 +167,12 @@ const EmptyState = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  animation-name: ${EmptyStateAnimation};
+  animation-delay: 300ms;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+  animation-duration: 150ms;
   > *:first-child {
     margin: 0 0 ${padding()} 0;
   }
