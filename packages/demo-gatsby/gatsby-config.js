@@ -35,7 +35,7 @@ module.exports = {
       options: {
         sidebar: {
           hidden: process.env.NODE_ENV === "production",
-          position: "fixed",
+          position: "displace",
         },
         plugins: [
           "gatsby-tinacms-json",
