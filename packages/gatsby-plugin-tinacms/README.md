@@ -41,7 +41,7 @@ module.exports = {
         ],
         sidebar: {
           hidden: process.env.NODE_ENV === 'production',
-          position: 'fixed',
+          position: 'displace',
         },
       },
     },
