@@ -80,11 +80,8 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
           type = plugin.type
         }
 
-        let parse = field.parse
-
-        if (!parse && plugin && plugin.parse) {
-          parse = plugin.parse
-        }
+        let parse = getProp('parse', field, plugin)
+        let validate = getProp('validate', field, plugin)
 
         let defaultValue = field.defaultValue
 
@@ -101,8 +98,8 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
             format={field.format}
             defaultValue={defaultValue}
             validate={(value, values, meta) => {
-              if (plugin && plugin.validate) {
-                return plugin.validate(value, values, meta, field)
+              if (validate) {
+                return validate(value, values, meta, field)
               }
             }}
           >
@@ -151,3 +148,21 @@ const FieldsGroup = styled.div`
   overflow-x: hidden;
   overflow-y: auto !important;
 `
+
+/**
+ *
+ * @param name
+ * @param field
+ * @param plugin
+ */
+function getProp(
+  name: keyof FieldPlugin & keyof Field,
+  field: Field,
+  plugin?: FieldPlugin
+): any {
+  let prop = field[name]
+  if (!prop && plugin && plugin[name]) {
+    prop = plugin[name]
+  }
+  return prop
+}

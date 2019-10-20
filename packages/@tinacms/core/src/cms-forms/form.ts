@@ -34,6 +34,12 @@ export interface Field {
   component: React.FC<any> | string | null
   parse?: (value: string, name: string) => any
   format?: (value: string, name: string) => any
+  validate?(
+    value: any,
+    allValues: any,
+    meta: any,
+    field: Field
+  ): string | object | undefined
   defaultValue?: any
   fields?: Field[]
 }
