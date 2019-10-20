@@ -1,7 +1,3 @@
----
-title: Pull Request
----
-
 <!--
 
 Thank you for contributing to TinaCMS!
