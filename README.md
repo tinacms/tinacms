@@ -1,7 +1,7 @@
 # TinaCMS
 
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
-[![lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
+[![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)
 
 ## Getting Started
 
@@ -26,7 +26,7 @@ cd tinacms
 npm install && npm run bootstrap
 npm run build
 
-# Start the Gatsby demo
+# Start Gatsby demo
 cd packages/demo-gatsby
 npm run start
 ```
@@ -38,7 +38,7 @@ npm run start
 | Commands                           | Description                                   |
 | ---------------------------------- | --------------------------------------------- |
 | npm run bootstrap                  | Install dependencies and link local packages. |
-| npm run build                      | Build all packages                            |
+| npm run build                      | Build all packages.                           |
 | npm run watch                      | Watch all packages for rebuilds.              |
-| npm run test                       | Run tests for all packages                    |
+| npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
