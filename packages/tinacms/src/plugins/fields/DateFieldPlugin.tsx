@@ -57,6 +57,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
             onFocus={input.onFocus}
             onChange={input.onChange}
             open={isOpen}
+            utc // https://github.com/tinacms/tinacms/pull/326#issuecomment-543836469
             {...field}
           />
         </ReactDateTimeContainer>
