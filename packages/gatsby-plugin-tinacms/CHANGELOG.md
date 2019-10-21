@@ -5,7 +5,6 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 0.1.8-alpha.0 (2019-10-21)
 
-
 ### Bug Fixes
 
-* SidebarPosition can be displace/overlay ([217d09d](https://github.com/tinacms/tinacms/commit/217d09d)), closes [#302](https://github.com/tinacms/tinacms/issues/302)
+- SidebarPosition can be displace/overlay ([217d09d](https://github.com/tinacms/tinacms/commit/217d09d)), closes [#302](https://github.com/tinacms/tinacms/issues/302)

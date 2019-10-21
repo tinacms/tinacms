@@ -5,14 +5,9 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## 0.3.5-alpha.0 (2019-10-21)
 
-
 ### Bug Fixes
 
-* remark form frontmatter values ([27dc9dd](https://github.com/tinacms/tinacms/commit/27dc9dd))
-
-
-
-
+- remark form frontmatter values ([27dc9dd](https://github.com/tinacms/tinacms/commit/27dc9dd))
 
 ## 0.3.4 (2019-10-14)
 
