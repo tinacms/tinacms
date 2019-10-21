@@ -83,8 +83,11 @@ The general release process looks like this:
 1. **Clean the CHANGELOGs**
 
    Lerna sometimes adds empty changelog entries. For example, if `react-tinacms` is changed
-   then `tinacms` will get get a patch update with only the dependency updated. The following
-   script removes those entries from the changelog:
+   then `tinacms` will get get a patch update with only the dependency updated. Make sure to install `lerna-clean-changelog-cli`:
+
+   ```
+   npm i -g lerna-clean-changelogs-cli
+   ```
 
 1. **Publish to NPM:**
 
@@ -153,7 +156,6 @@ The exact commands vary slightly depending on the type of release being made.
 
    ```
    lcc **
-   ``
    ```
 
 1) **Publish to NPM:**
@@ -189,8 +191,6 @@ The exact commands vary slightly depending on the type of release being made.
 
    ```
    lcc **
-   ``
-
    ```
 
 1. **Publish to NPM:**
