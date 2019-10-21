@@ -28,8 +28,10 @@ import { SIDEBAR_WIDTH } from '../Globals'
 
 const merge = require('lodash.merge')
 
+type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
+
 interface TinaProps {
-  position: 'fixed' | 'float'
+  position: SidebarPosition
   hidden?: boolean
   theme?: Theme
 }
@@ -76,7 +78,7 @@ export const Tina: React.FC<TinaProps> = ({
   )
 }
 
-const SiteWrapper = styled.div<{ open: boolean; position: string }>`
+const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
   opacity: 1 !important;
   background-color: transparent !important;
   background-image: none !important;
@@ -86,8 +88,12 @@ const SiteWrapper = styled.div<{ open: boolean; position: string }>`
   right: 0 !important;
   height: 100% !important;
   width: ${props =>
-    props.position === 'fixed' && props.open
+    isFixed(props.position) && props.open
       ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
       : '100%'} !important;
   transition: all ${props => (props.open ? 150 : 200)}ms ease-out !important;
 `
+
+function isFixed(position: SidebarPosition): boolean {
+  return position === 'fixed' || position === 'displace'
+}

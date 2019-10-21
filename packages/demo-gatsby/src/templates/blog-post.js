@@ -303,7 +303,7 @@ const BlogPostForm = {
       label: "Thumbnail",
       component: "image",
       // Generate the frontmatter value based on the filename
-      parse: filename => `./${filename}`,
+      parse: filename => (filename ? `./${filename}` : null),
 
       // Decide the file upload directory for the post
       uploadDir: blogPost => {
@@ -313,7 +313,7 @@ const BlogPostForm = {
           .splice(0, postPathParts.length - 1)
           .join("/")
 
-        return postDirectory
+        return "packages/demo-gatsby" + postDirectory
       },
 
       // Generate the src attribute for the preview image.

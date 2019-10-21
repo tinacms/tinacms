@@ -26,6 +26,7 @@ interface ImageProps {
   path: string
   previewSrc(form: any, field: FieldProps): string
   uploadDir(form: any): string
+  clearable?: boolean // defaults to true
 }
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
@@ -37,7 +38,6 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       previewSrc={props.field.previewSrc(props.form.getState().values, props)}
       onDrop={(acceptedFiles: any[]) => {
         acceptedFiles.forEach(async (file: any) => {
-          // @ts-ignore
           await cms.api.git!.onUploadMedia!({
             directory: props.field.uploadDir(props.form.getState().values),
             content: file,
@@ -45,6 +45,13 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
           props.input.onChange(file.name)
         })
       }}
+      onClear={
+        props.field.clearable === false
+          ? undefined
+          : () => {
+              props.input.onChange('')
+            }
+      }
     />
   )
 })
