@@ -45,6 +45,7 @@ export async function commit({
   }
 
   const repo = openRepo(pathRoot)
+  await repo.add(...files)
   await repo.commit(message, ...files, options)
   await repo.push()
 }
