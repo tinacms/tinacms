@@ -144,30 +144,28 @@ export function router(config: GitRouterConfig = {}) {
       })
   })
 
-  router.get('/show/:fileRelativePath', (req, res) => {
-    let repo = openRepo(REPO_ABSOLUTE_PATH)
+  router.get('/show/:fileRelativePath', async (req, res) => {
+    try {
+      let repo = openRepo(REPO_ABSOLUTE_PATH)
 
-    let filePath = path
-      .join(CONTENT_REL_PATH, req.params.fileRelativePath)
-      .replace(/^\/*/, '')
+      let filePath = path
+        .join(CONTENT_REL_PATH, req.params.fileRelativePath)
+        .replace(/^\/*/, '')
 
-    repo
-      .show([`HEAD:${filePath}`])
-      .then((data: any) => {
-        res.json({
-          fileRelativePath: req.params.fileRelativePath,
-          content: data,
-          status: 'success',
-        })
+      let data = await repo.show([`HEAD:${filePath}`])
+      res.json({
+        fileRelativePath: req.params.fileRelativePath,
+        content: data,
+        status: 'success',
       })
-      .catch((e: any) => {
-        res.status(501)
-        res.json({
-          status: 'failure',
-          message: e.message,
-          fileRelativePath: req.params.fileRelativePath,
-        })
+    } catch (e) {
+      res.status(501)
+      res.json({
+        status: 'failure',
+        message: e.message,
+        fileRelativePath: req.params.fileRelativePath,
       })
+    }
   })
 
   return router
