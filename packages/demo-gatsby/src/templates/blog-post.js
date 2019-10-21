@@ -269,7 +269,14 @@ const BlogPostForm = {
       label: "Title",
       name: "frontmatter.title",
       component: "text",
-      required: true,
+      validate(value = "") {
+        if (value.length < 5) {
+          return `Please add ${5 - value.length} characters`
+        }
+        if (value.length > 100) {
+          return `Please remove ${value.length - 100} characters`
+        }
+      },
     },
     {
       label: "Draft",
