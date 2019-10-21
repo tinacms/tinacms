@@ -25,6 +25,7 @@ import * as express from 'express'
 import { commit } from './commit'
 import { createUploader } from './upload'
 import { openRepo } from './open-repo'
+import { show } from './show'
 
 export interface GitRouterConfig {
   pathToRepo?: string
@@ -104,27 +105,28 @@ export function router(config: GitRouterConfig = {}) {
     }
   })
 
-  router.post('/commit', (req: any, res: any) => {
-    const message = req.body.message || DEFAULT_COMMIT_MESSAGE
-    const files = req.body.files.map((rel: string) =>
-      path.join(CONTENT_ABSOLUTE_PATH, rel)
-    )
-    // TODO: Separate commit and push???
-    commit({
-      pathRoot: REPO_ABSOLUTE_PATH,
-      name: req.body.name,
-      email: req.body.email,
-      message,
-      files,
-    })
-      .then(() => {
-        res.json({ status: 'success' })
+  router.post('/commit', async (req: any, res: any) => {
+    try {
+      const message = req.body.message || DEFAULT_COMMIT_MESSAGE
+      const files = req.body.files.map((rel: string) =>
+        path.join(CONTENT_ABSOLUTE_PATH, rel)
+      )
+
+      // TODO: Separate commit and push???
+      await commit({
+        pathRoot: REPO_ABSOLUTE_PATH,
+        name: req.body.name,
+        email: req.body.email,
+        message,
+        files,
       })
-      .catch(e => {
-        // TODO: More intelligently respond
-        res.status(412)
-        res.json({ status: 'failure', error: e.message })
-      })
+
+      res.json({ status: 'success' })
+    } catch (e) {
+      // TODO: More intelligently respond
+      res.status(412)
+      res.json({ status: 'failure', error: e.message })
+    }
   })
 
   router.post('/reset', (req, res) => {
@@ -144,30 +146,30 @@ export function router(config: GitRouterConfig = {}) {
       })
   })
 
-  router.get('/show/:fileRelativePath', (req, res) => {
-    let repo = openRepo(REPO_ABSOLUTE_PATH)
+  router.get('/show/:fileRelativePath', async (req, res) => {
+    try {
+      let fileRelativePath = path
+        .join(CONTENT_REL_PATH, req.params.fileRelativePath)
+        .replace(/^\/*/, '')
 
-    let filePath = path
-      .join(CONTENT_REL_PATH, req.params.fileRelativePath)
-      .replace(/^\/*/, '')
+      let content = await show({
+        pathRoot: REPO_ABSOLUTE_PATH,
+        fileRelativePath,
+      })
 
-    repo
-      .show([`HEAD:${filePath}`])
-      .then((data: any) => {
-        res.json({
-          fileRelativePath: req.params.fileRelativePath,
-          content: data,
-          status: 'success',
-        })
+      res.json({
+        fileRelativePath: req.params.fileRelativePath,
+        content,
+        status: 'success',
       })
-      .catch((e: any) => {
-        res.status(501)
-        res.json({
-          status: 'failure',
-          message: e.message,
-          fileRelativePath: req.params.fileRelativePath,
-        })
+    } catch (e) {
+      res.status(501)
+      res.json({
+        status: 'failure',
+        message: e.message,
+        fileRelativePath: req.params.fileRelativePath,
       })
+    }
   })
 
   return router
