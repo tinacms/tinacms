@@ -104,27 +104,28 @@ export function router(config: GitRouterConfig = {}) {
     }
   })
 
-  router.post('/commit', (req: any, res: any) => {
-    const message = req.body.message || DEFAULT_COMMIT_MESSAGE
-    const files = req.body.files.map((rel: string) =>
-      path.join(CONTENT_ABSOLUTE_PATH, rel)
-    )
-    // TODO: Separate commit and push???
-    commit({
-      pathRoot: REPO_ABSOLUTE_PATH,
-      name: req.body.name,
-      email: req.body.email,
-      message,
-      files,
-    })
-      .then(() => {
-        res.json({ status: 'success' })
+  router.post('/commit', async (req: any, res: any) => {
+    try {
+      const message = req.body.message || DEFAULT_COMMIT_MESSAGE
+      const files = req.body.files.map((rel: string) =>
+        path.join(CONTENT_ABSOLUTE_PATH, rel)
+      )
+
+      // TODO: Separate commit and push???
+      await commit({
+        pathRoot: REPO_ABSOLUTE_PATH,
+        name: req.body.name,
+        email: req.body.email,
+        message,
+        files,
       })
-      .catch(e => {
-        // TODO: More intelligently respond
-        res.status(412)
-        res.json({ status: 'failure', error: e.message })
-      })
+
+      res.json({ status: 'success' })
+    } catch (e) {
+      // TODO: More intelligently respond
+      res.status(412)
+      res.json({ status: 'failure', error: e.message })
+    }
   })
 
   router.post('/reset', (req, res) => {
