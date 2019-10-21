@@ -83,8 +83,11 @@ The general release process looks like this:
 1. **Clean the CHANGELOGs**
 
    Lerna sometimes adds empty changelog entries. For example, if `react-tinacms` is changed
-   then `tinacms` will get get a patch update with only the dependency updated. The following
-   script removes those entries from the changelog:
+   then `tinacms` will get get a patch update with only the dependency updated. Make sure to install `lerna-clean-changelog-cli`:
+
+   ```
+   npm i -g lerna-clean-changelogs-cli
+   ```
 
 1. **Publish to NPM:**
 
@@ -111,19 +114,19 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-prerelease \
      --no-push \
-     --allow-branch master \
+     --allow-branch next \
      -m "chore(publish): prerelease"
    ```
 
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1. **Publish to NPM:**
    ```
-   lerna publish from-git --dist-tag next
+   lerna publish from-package --dist-tag next
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
@@ -145,21 +148,20 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-graduate \
      --no-push \
-     --allow-branch master \
+     --allow-branch next \
      -m "chore(publish): graduation"
    ```
 
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
-   ``
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1) **Publish to NPM:**
 
    ```
-   lerna publish from-git
+   lerna publish from-package
    ```
 
 1) **Push CHANGELOGs and git tags to Github:**
@@ -188,14 +190,12 @@ The exact commands vary slightly depending on the type of release being made.
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
-   ``
-
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1. **Publish to NPM:**
    ```
-   lerna publish from-git
+   lerna publish from-package
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
