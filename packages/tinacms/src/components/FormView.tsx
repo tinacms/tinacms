@@ -20,7 +20,7 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
 import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
-import { useCMS, useSubscribable } from '@tinacms/react-tinacms'
+import { useCMS, useSubscribable } from 'react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
 import styled, { keyframes, css } from 'styled-components'
@@ -147,6 +147,15 @@ const Emoji = styled.span`
   display: inline-block;
 `
 
+const EmptyStateAnimation = keyframes`
+  0% {
+    opacity: 0;
+  }
+  100% {
+    opacity: 1;
+  }
+`
+
 const EmptyState = styled.div`
   position: relative;
   display: flex;
@@ -158,6 +167,12 @@ const EmptyState = styled.div`
   width: 100%;
   height: 100%;
   overflow-y: auto;
+  animation-name: ${EmptyStateAnimation};
+  animation-delay: 300ms;
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+  animation-duration: 150ms;
   > *:first-child {
     margin: 0 0 ${padding()} 0;
   }
@@ -226,7 +241,7 @@ const NoFormsPlaceholder = () => (
     </p>
     <p>
       <LinkButton
-        href="https://github.com/tinacms/tinacms-site/blob/master/content/docs/gatsby/content-editing.md"
+        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
         target="_blank"
       >
         <Emoji>📖</Emoji> Form Setup Guide
@@ -241,7 +256,7 @@ const NoFieldsPlaceholder = () => (
     <h3>Hey, you don't have any fields added to this form.</h3>
     <p>
       <LinkButton
-        href="https://github.com/tinacms/tinacms-site/blob/master/docs/gatsby/content-editing.md"
+        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
         target="_blank"
       >
         <Emoji>📖</Emoji> Field Setup Guide

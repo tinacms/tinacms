@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Tina, TinaCMS } from '@tinacms/tinacms'
+import { Tina, TinaCMS } from 'tinacms'
 
 exports.wrapRootElement = ({ element }: any, options: any) => {
   return (

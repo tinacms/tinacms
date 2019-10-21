@@ -31,17 +31,17 @@ module.exports = {
   },
   plugins: [
     {
-      resolve: "@tinacms/gatsby-plugin-tinacms",
+      resolve: "gatsby-plugin-tinacms",
       options: {
         sidebar: {
           hidden: process.env.NODE_ENV === "production",
-          position: "fixed",
+          position: "displace",
         },
         plugins: [
-          "@tinacms/gatsby-tinacms-json",
-          "@tinacms/gatsby-tinacms-remark",
+          "gatsby-tinacms-json",
+          "gatsby-tinacms-remark",
           {
-            resolve: "@tinacms/gatsby-tinacms-git",
+            resolve: "gatsby-tinacms-git",
             options: {
               pathToRepo: REPO_ABSOLUTE_PATH,
               pathToContent: "packages/demo-gatsby",
