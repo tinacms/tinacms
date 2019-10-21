@@ -24,7 +24,7 @@ import { TrashIcon } from '@tinacms/icons'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
-  onClear: () => void
+  onClear?: () => void
   value?: string
   previewSrc?: string
 }
@@ -118,14 +118,16 @@ export const ImageUpload = ({
       {value ? (
         <StyledImageContainer>
           <StyledImage src={previewSrc} />
-          <DeleteButton
-            onClick={e => {
-              e.stopPropagation()
-              onClear()
-            }}
-          >
-            <TrashIcon />
-          </DeleteButton>
+          {onClear && (
+            <DeleteButton
+              onClick={e => {
+                e.stopPropagation()
+                onClear()
+              }}
+            >
+              <TrashIcon />
+            </DeleteButton>
+          )}
         </StyledImageContainer>
       ) : (
         <ImgPlaceholder>
