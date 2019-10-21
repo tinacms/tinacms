@@ -152,7 +152,15 @@ export function router(config: GitRouterConfig = {}) {
         .join(CONTENT_REL_PATH, req.params.fileRelativePath)
         .replace(/^\/*/, '')
 
-      let data = await repo.show([`HEAD:${filePath}`])
+      let data: any
+      try {
+        data = await repo.show([`HEAD:${filePath}`])
+      } catch (e) {
+        data = fs.readFileSync(
+          path.join(CONTENT_ABSOLUTE_PATH, req.params.fileRelativePath),
+          'utf8'
+        )
+      }
       res.json({
         fileRelativePath: req.params.fileRelativePath,
         content: data,
