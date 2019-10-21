@@ -25,6 +25,7 @@ import * as express from 'express'
 import { commit } from './commit'
 import { createUploader } from './upload'
 import { openRepo } from './open-repo'
+import { show } from './show'
 
 export interface GitRouterConfig {
   pathToRepo?: string
@@ -151,14 +152,14 @@ export function router(config: GitRouterConfig = {}) {
         .join(CONTENT_REL_PATH, req.params.fileRelativePath)
         .replace(/^\/*/, '')
 
-      let data = await show({
+      let content = await show({
         pathRoot: REPO_ABSOLUTE_PATH,
         fileRelativePath,
       })
 
       res.json({
         fileRelativePath: req.params.fileRelativePath,
-        content: data,
+        content,
         status: 'success',
       })
     } catch (e) {
@@ -172,19 +173,4 @@ export function router(config: GitRouterConfig = {}) {
   })
 
   return router
-}
-
-interface ShowConfig {
-  pathRoot: string
-  fileRelativePath: string
-}
-
-async function show({ pathRoot, fileRelativePath }: ShowConfig) {
-  let repo = openRepo(pathRoot)
-
-  try {
-    return await repo.show([`HEAD:${fileRelativePath}`])
-  } catch (e) {
-    return fs.readFileSync(path.join(pathRoot, fileRelativePath), 'utf8')
-  }
 }
