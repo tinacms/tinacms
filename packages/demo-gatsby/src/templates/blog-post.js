@@ -23,7 +23,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { liveRemarkForm } from "@tinacms/gatsby-tinacms-remark"
+import { liveRemarkForm } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField } from "@tinacms/form-builder"
 import { Wysiwyg, Toggle } from "@tinacms/fields"
@@ -269,7 +269,14 @@ const BlogPostForm = {
       label: "Title",
       name: "frontmatter.title",
       component: "text",
-      required: true,
+      validate(value = "") {
+        if (value.length < 5) {
+          return `Please add ${5 - value.length} characters`
+        }
+        if (value.length > 100) {
+          return `Please remove ${value.length - 100} characters`
+        }
+      },
     },
     {
       label: "Draft",
@@ -296,7 +303,7 @@ const BlogPostForm = {
       label: "Thumbnail",
       component: "image",
       // Generate the frontmatter value based on the filename
-      parse: filename => `./${filename}`,
+      parse: filename => (filename ? `./${filename}` : null),
 
       // Decide the file upload directory for the post
       uploadDir: blogPost => {
@@ -306,7 +313,7 @@ const BlogPostForm = {
           .splice(0, postPathParts.length - 1)
           .join("/")
 
-        return postDirectory
+        return "packages/demo-gatsby" + postDirectory
       },
 
       // Generate the src attribute for the preview image.

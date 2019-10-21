@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { Form, Field } from '@tinacms/core'
-import { useCMS } from '@tinacms/react-tinacms'
+import { useCMS } from 'react-tinacms'
 import {
   Form as FinalForm,
   Field as FinalField,
@@ -80,10 +80,13 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
           type = plugin.type
         }
 
-        let parse = field.parse
+        let parse = getProp('parse', field, plugin)
+        let validate = getProp('validate', field, plugin)
 
-        if (!parse && plugin && plugin.parse) {
-          parse = plugin.parse
+        let format = field.format
+
+        if (!format && plugin && plugin.format) {
+          format = plugin.format
         }
 
         let defaultValue = field.defaultValue
@@ -97,12 +100,20 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
             name={field.name}
             key={field.name}
             type={type}
-            parse={parse}
-            format={field.format}
+            parse={
+              parse
+                ? (value: any, name: string) => parse!(value, name, field)
+                : undefined
+            }
+            format={
+              format
+                ? (value: any, name: string) => format!(value, name, field)
+                : undefined
+            }
             defaultValue={defaultValue}
             validate={(value, values, meta) => {
-              if (plugin && plugin.validate) {
-                return plugin.validate(value, values, meta, field)
+              if (validate) {
+                return validate(value, values, meta, field)
               }
             }}
           >
@@ -151,3 +162,21 @@ const FieldsGroup = styled.div`
   overflow-x: hidden;
   overflow-y: auto !important;
 `
+
+/**
+ *
+ * @param name
+ * @param field
+ * @param plugin
+ */
+function getProp(
+  name: keyof FieldPlugin & keyof Field,
+  field: Field,
+  plugin?: FieldPlugin
+): any {
+  let prop = field[name]
+  if (!prop && plugin && plugin[name]) {
+    prop = plugin[name]
+  }
+  return prop
+}

@@ -1,13 +1,15 @@
 ---
-name: Bug Report 🐞
-about: Something isn't working as expected? Here is the right place to report.
-labels: bug
+name: Tina Development
+about: Having trouble developing Tina? We'll help you get sorted
+labels: development
 ---
 
 <!--
   Please fill out each section below, otherwise your issue will be closed. This info allows Tina maintainers to diagnose (and fix!) your issue as quickly as possible.
 
   Before opening a new issue, please search existing issues: https://github.com/tinacms/tinacms/issues
+
+  Also check out the troubleshooting section of the CONTRIBUTING doc: https://github.com/tinacms/tinacms/blob/master/CONTRIBUTING.md#troubleshooting-in-development
 -->
 
 ## Description
@@ -28,4 +30,8 @@ What happened.
 
 ### Environment
 
-<!-- Make sure to add at least package versions and browser information. -->
+| Tool    | Version     |
+| ------- | ----------- |
+| tinacms | commit-hash |
+| npm     | version     |
+| node    | version     |

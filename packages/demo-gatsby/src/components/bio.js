@@ -26,7 +26,7 @@ limitations under the License.
 import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
-import { useJsonForm } from "@tinacms/gatsby-tinacms-json"
+import { useJsonForm } from "gatsby-tinacms-json"
 
 import { rhythm } from "../utils/typography"
 
