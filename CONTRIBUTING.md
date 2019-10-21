@@ -126,7 +126,7 @@ The exact commands vary slightly depending on the type of release being made.
 
 1. **Publish to NPM:**
    ```
-   lerna publish from-git --dist-tag next
+   lerna publish from-package --dist-tag next
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
@@ -161,7 +161,7 @@ The exact commands vary slightly depending on the type of release being made.
 1) **Publish to NPM:**
 
    ```
-   lerna publish from-git
+   lerna publish from-package
    ```
 
 1) **Push CHANGELOGs and git tags to Github:**
@@ -195,7 +195,7 @@ The exact commands vary slightly depending on the type of release being made.
 
 1. **Publish to NPM:**
    ```
-   lerna publish from-git
+   lerna publish from-package
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
