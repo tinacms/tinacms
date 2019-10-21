@@ -121,7 +121,7 @@ The exact commands vary slightly depending on the type of release being made.
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1. **Publish to NPM:**
@@ -155,7 +155,7 @@ The exact commands vary slightly depending on the type of release being made.
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1) **Publish to NPM:**
@@ -190,7 +190,7 @@ The exact commands vary slightly depending on the type of release being made.
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1. **Publish to NPM:**
