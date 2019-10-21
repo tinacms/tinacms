@@ -17,8 +17,12 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Tina } from 'tinacms'
+import { Tina, TinaCMS } from 'tinacms'
 
-export const wrapRootElement = ({ element }: any, options: any) => {
-  return <Tina {...options.sidebar}>{element}</Tina>
+exports.wrapRootElement = ({ element }: any, options: any) => {
+  return (
+    <Tina {...options.sidebar} cms={new TinaCMS()}>
+      {element}
+    </Tina>
+  )
 }
