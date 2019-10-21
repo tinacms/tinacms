@@ -5,16 +5,11 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ## [0.1.8-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.1...@tinacms/fields@0.1.8-alpha.0) (2019-10-21)
 
-
 ### Bug Fixes
 
-* clicking wysiwyg does not provoke blur ([388c429](https://github.com/tinacms/tinacms/commit/388c429))
-* **wysiwyg:** default the theme to an empty object ([026d1b9](https://github.com/tinacms/tinacms/commit/026d1b9))
-* **wysiwyg:** links can once again be created ([093a58c](https://github.com/tinacms/tinacms/commit/093a58c))
-
-
-
-
+- clicking wysiwyg does not provoke blur ([388c429](https://github.com/tinacms/tinacms/commit/388c429))
+- **wysiwyg:** default the theme to an empty object ([026d1b9](https://github.com/tinacms/tinacms/commit/026d1b9))
+- **wysiwyg:** links can once again be created ([093a58c](https://github.com/tinacms/tinacms/commit/093a58c))
 
 ## 0.1.7 (2019-10-14)
 
