@@ -26,6 +26,7 @@ interface ImageProps {
   path: string
   previewSrc(form: any, field: FieldProps): string
   uploadDir(form: any): string
+  clearable?: boolean // defaults to true
 }
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
@@ -44,9 +45,13 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
           props.input.onChange(file.name)
         })
       }}
-      onClear={() => {
-        props.input.onChange('')
-      }}
+      onClear={
+        props.field.clearable === false
+          ? undefined
+          : () => {
+              props.input.onChange('')
+            }
+      }
     />
   )
 })
