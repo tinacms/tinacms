@@ -83,6 +83,12 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
         let parse = getProp('parse', field, plugin)
         let validate = getProp('validate', field, plugin)
 
+        let format = field.format
+
+        if (!format && plugin && plugin.format) {
+          format = plugin.format
+        }
+
         let defaultValue = field.defaultValue
 
         if (!parse && plugin && plugin.defaultValue) {
@@ -94,8 +100,16 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
             name={field.name}
             key={field.name}
             type={type}
-            parse={parse}
-            format={field.format}
+            parse={
+              parse
+                ? (value: any, name: string) => parse!(value, name, field)
+                : undefined
+            }
+            format={
+              format
+                ? (value: any, name: string) => format!(value, name, field)
+                : undefined
+            }
             defaultValue={defaultValue}
             validate={(value, values, meta) => {
               if (validate) {

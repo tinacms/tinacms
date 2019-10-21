@@ -26,6 +26,7 @@ import { useEffect, useState, useRef } from 'react'
 import { useFrameContext } from '../../components/SyledFrame'
 import styled from 'styled-components'
 import { InputCss } from '@tinacms/fields'
+import { format, parse } from './dateFormat'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
@@ -57,6 +58,8 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
             onFocus={input.onFocus}
             onChange={input.onChange}
             open={isOpen}
+            timeFormat={false}
+            utc // https://github.com/tinacms/tinacms/pull/326#issuecomment-543836469
             {...field}
           />
         </ReactDateTimeContainer>
@@ -74,8 +77,6 @@ const DatetimeContainer = styled.div`
 export default {
   name: 'date',
   Component: DateField,
-  parse(date: any) {
-    if (typeof date === 'string') return date
-    return date.toDate()
-  },
+  format,
+  parse,
 }
