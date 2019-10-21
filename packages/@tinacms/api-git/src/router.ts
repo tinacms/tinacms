@@ -147,21 +147,15 @@ export function router(config: GitRouterConfig = {}) {
 
   router.get('/show/:fileRelativePath', async (req, res) => {
     try {
-      let repo = openRepo(REPO_ABSOLUTE_PATH)
-
-      let filePath = path
+      let fileRelativePath = path
         .join(CONTENT_REL_PATH, req.params.fileRelativePath)
         .replace(/^\/*/, '')
 
-      let data: any
-      try {
-        data = await repo.show([`HEAD:${filePath}`])
-      } catch (e) {
-        data = fs.readFileSync(
-          path.join(CONTENT_ABSOLUTE_PATH, req.params.fileRelativePath),
-          'utf8'
-        )
-      }
+      let data = await show({
+        pathRoot: REPO_ABSOLUTE_PATH,
+        fileRelativePath,
+      })
+
       res.json({
         fileRelativePath: req.params.fileRelativePath,
         content: data,
@@ -178,4 +172,19 @@ export function router(config: GitRouterConfig = {}) {
   })
 
   return router
+}
+
+interface ShowConfig {
+  pathRoot: string
+  fileRelativePath: string
+}
+
+async function show({ pathRoot, fileRelativePath }: ShowConfig) {
+  let repo = openRepo(pathRoot)
+
+  try {
+    return await repo.show([`HEAD:${fileRelativePath}`])
+  } catch (e) {
+    return fs.readFileSync(path.join(pathRoot, fileRelativePath), 'utf8')
+  }
 }
