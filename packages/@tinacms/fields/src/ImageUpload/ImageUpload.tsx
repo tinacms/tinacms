@@ -19,10 +19,12 @@ limitations under the License.
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
-import { radius, color, font, timing } from '@tinacms/styles'
+import { radius, color, font, timing, IconButton } from '@tinacms/styles'
+import { TrashIcon } from '@tinacms/icons'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
+  onClear?: () => void
   value?: string
   previewSrc?: string
 }
@@ -68,13 +70,37 @@ const StyledImage = styled.img`
   max-width: 100%;
   border-radius: ${radius('small')};
   transition: opacity ${timing('short')} ease-out;
-  ${DropArea}:hover & {
-    opacity: 0.6;
+  margin: 0;
+  display: block;
+`
+
+const DeleteButton = styled(IconButton)`
+  top: 0.5rem;
+  right: 0.5rem;
+  position: absolute;
+  &:not(:hover) {
+    fill: ${color.grey()};
+    background-color: transparent;
+    border-color: transparent;
+  }
+`
+
+const StyledImageContainer = styled.div`
+  background-color: ${color.grey(4)};
+  position: relative;
+  border-radius: ${radius('small')};
+  overflow: hidden;
+  background-color: ${color.grey(8)};
+  &:hover {
+    ${StyledImage} {
+      opacity: 0.6;
+    }
   }
 `
 
 export const ImageUpload = ({
   onDrop,
+  onClear,
   value,
   previewSrc,
 }: ImageUploadProps) => {
@@ -90,7 +116,19 @@ export const ImageUpload = ({
     <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
       {value ? (
-        <StyledImage src={previewSrc} />
+        <StyledImageContainer>
+          <StyledImage src={previewSrc} />
+          {onClear && (
+            <DeleteButton
+              onClick={e => {
+                e.stopPropagation()
+                onClear()
+              }}
+            >
+              <TrashIcon />
+            </DeleteButton>
+          )}
+        </StyledImageContainer>
       ) : (
         <ImgPlaceholder>
           Drag 'n' drop some files here,
