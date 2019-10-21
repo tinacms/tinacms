@@ -53,7 +53,6 @@ module.exports = {
         ],
       },
     },
-    "gatsby-tinacms-json",
     {
       resolve: `gatsby-source-filesystem`,
       options: {

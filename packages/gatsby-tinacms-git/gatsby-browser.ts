@@ -17,12 +17,19 @@ limitations under the License.
 */
 
 import { GitClient } from '@tinacms/git-client'
-import { cms } from 'tinacms'
+
+declare let window: any
 
 exports.onClientEntry = () => {
+  if (!window.tinacms) {
+    throw new Error(
+      '`window.tinacms` not found. Did you forget to add `gatsby-plugin-tinacms` to your `gatsby-config.js`?'
+    )
+  }
   const { protocol, hostname, port } = window.location
   const baseUrl = `${protocol}//${hostname}${
     port != '80' ? `:${port}` : ''
   }/___tina`
-  cms.registerApi('git', new GitClient(baseUrl))
+
+  window.tinacms.registerApi('git', new GitClient(baseUrl))
 }

@@ -31,4 +31,4 @@ export * from './plugins/screen-plugin'
 export * from './plugins/fields'
 
 // TinaCMS Instance
-export * from './cms'
+export { TinaCMS } from './tina-cms'

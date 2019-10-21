@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export { cms } from 'tinacms'
+// no-op
