@@ -101,7 +101,6 @@ export const IconButton = styled(Button)`
   height: 2rem;
   margin: 0;
   position: relative;
-  border: 1px solid ${color.primary()};
   transform-origin: 50% 50%;
   transition: all 150ms ease-out;
   padding: 0;
