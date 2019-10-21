@@ -111,7 +111,7 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-prerelease \
      --no-push \
-     --allow-branch master \
+     --allow-branch next \
      -m "chore(publish): prerelease"
    ```
 
@@ -145,7 +145,7 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-graduate \
      --no-push \
-     --allow-branch master \
+     --allow-branch next \
      -m "chore(publish): graduation"
    ```
 
