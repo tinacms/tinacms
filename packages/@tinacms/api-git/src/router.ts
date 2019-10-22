@@ -146,6 +146,47 @@ export function router(config: GitRouterConfig = {}) {
       })
   })
 
+  router.get('/branch', async (req, res) => {
+    try {
+      let summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
+      res.send({ status: 'success', branch: summary.branches[summary.current] })
+    } catch(e) {
+      // TODO: More intelligently respond
+      res.status(500)
+      res.json({ status: 'failure', message: e.message })
+    }
+  })
+
+  router.get('/branches', async (req, res) => {
+    try {
+      let summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
+      res.send({ status: 'success', branches: summary.all })
+    } catch(e) {
+      // TODO: More intelligently respond
+      res.status(500)
+      res.json({ status: 'failure', message: e.message })
+    }
+  })
+
+  router.get('/branches/:name', async (req, res) => {
+    try {
+      let summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
+      let branch = summary.branches[req.params.name];
+
+      if (!branch) {
+        res.status(404);
+        res.json({ status: 'failure', message: `Branch not found: ${String(branch)}` });
+        return;
+      }
+
+      res.send({ status: 'success', branch })
+    } catch(e) {
+      // TODO: More intelligently respond
+      res.status(500)
+      res.json({ status: 'failure', message: e.message })
+    }
+  })
+
   router.get('/show/:fileRelativePath', async (req, res) => {
     try {
       let fileRelativePath = path
