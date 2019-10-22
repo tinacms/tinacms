@@ -98,16 +98,18 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
             document={frame.document}
             disabled={!visible}
           >
-            {Object.entries(field.templates).map(([name, template]) => (
-              <BlockOption
-                onClick={() => {
-                  addItem(name, template)
-                  setVisible(false)
-                }}
-              >
-                {template.label}
-              </BlockOption>
-            ))}
+            <BlockMenuList>
+              {Object.entries(field.templates).map(([name, template]) => (
+                <BlockOption
+                  onClick={() => {
+                    addItem(name, template)
+                    setVisible(false)
+                  }}
+                >
+                  {template.label}
+                </BlockOption>
+              ))}
+            </BlockMenuList>
           </Dismissible>
         </BlockMenu>
       </GroupListHeader>
@@ -244,6 +246,11 @@ const BlockMenu = styled.div<{ open: boolean }>`
       pointer-events: all;
       transform: translate3d(0, 2.25rem, 0) scale3d(1, 1, 1);
     `};
+`
+
+const BlockMenuList = styled.div`
+  display: flex;
+  flex-direction: column;
 `
 
 const BlockOption = styled.button`
