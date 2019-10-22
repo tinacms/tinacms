@@ -85,6 +85,22 @@ export class GitClient {
    * TODO: Add return type.
    * TODO: Remove `catch`
    */
+  push(): Promise<any> {
+    return fetch(`${this.baseUrl}/push`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    }).catch(e => {
+      console.error(e)
+    })
+  }
+
+  /**
+   *
+   * TODO: Add return type.
+   * TODO: Remove `catch`
+   */
   writeToDisk(data: {
     fileRelativePath: string
     content: string
