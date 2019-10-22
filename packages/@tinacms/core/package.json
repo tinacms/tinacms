@@ -1,11 +1,12 @@
 {
   "name": "@tinacms/core",
   "version": "0.2.3",
-  "main": "build/index.js",
-  "types": "build/index.d.ts",
+  "main": "dist/index.js",
+  "module": "dist/tinacore.esm.js",
+  "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
   "files": [
-    "build"
+    "dist"
   ],
   "keywords": [
     "tinacms",
@@ -22,9 +23,9 @@
   },
   "scripts": {
     "test": "jest --passWithNoTests",
-    "watch": "tinacms-scripts watch",
-    "dev": "tinacms-scripts dev",
-    "build": "tinacms-scripts build"
+    "watch": "tsdx watch --name TinaCore",
+    "dev": "tsdx build --name TinaCore",
+    "build": "tsdx build --name TinaCore"
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.5",
@@ -39,6 +40,6 @@
     "final-form-arrays": "^3.0.1"
   },
   "peerDependencies": {
-    "react": "^16.8.6"
+    "react": ">=16"
   }
 }
