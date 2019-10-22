@@ -135,6 +135,17 @@ export function router(config: GitRouterConfig = {}) {
     }
   })
 
+  router.post('/push', async (req: any, res: any) => {
+    try {
+      await openRepo(REPO_ABSOLUTE_PATH).push()
+      res.json({ status: 'success' })
+    } catch (e) {
+      // TODO: More intelligently respond
+      res.status(412)
+      res.json({ status: 'failure', error: e.message })
+    }
+  })
+
   router.post('/reset', (req, res) => {
     let repo = openRepo(REPO_ABSOLUTE_PATH)
     const files = req.body.files.map((rel: string) =>
