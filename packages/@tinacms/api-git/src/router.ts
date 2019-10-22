@@ -33,6 +33,7 @@ export interface GitRouterConfig {
   defaultCommitMessage?: string
   defaultCommitName?: string
   defaultCommitEmail?: string
+  pushOnCommit?: boolean
 }
 export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
@@ -41,6 +42,9 @@ export function router(config: GitRouterConfig = {}) {
   const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
   const DEFAULT_COMMIT_MESSAGE =
     config.defaultCommitMessage || 'Update from Tina'
+  const PUSH_ON_COMMIT = typeof config.pushOnCommit === 'boolean'
+    ? config.pushOnCommit
+    : true;
 
   const uploader = createUploader(TMP_DIR)
 
@@ -62,6 +66,7 @@ export function router(config: GitRouterConfig = {}) {
       name: req.body.name || config.defaultCommitName,
       email: req.body.email || config.defaultCommitEmail,
       message: `Update from Tina: delete ${fileRelativePath}`,
+      push: PUSH_ON_COMMIT,
       files: [fileAbsolutePath],
     })
       .then(() => {
@@ -117,6 +122,7 @@ export function router(config: GitRouterConfig = {}) {
         pathRoot: REPO_ABSOLUTE_PATH,
         name: req.body.name,
         email: req.body.email,
+        push: PUSH_ON_COMMIT,
         message,
         files,
       })
