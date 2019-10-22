@@ -1,9 +1,10 @@
 *.log
 **/node_modules/
 **/build/
-**/.rpt2_cache
-**/.rts2_cache
+**/dist/
+**/.cache
+**/.rpt2_cache*
+**/.rts2_cache*
 *.swp
-packages/cli/forestry/.env
 *.tgz
 .DS_Store
