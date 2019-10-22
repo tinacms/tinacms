@@ -32,7 +32,7 @@ npm run start
 ```
 
 **Do not run `npm install` from inside the `packages` directory**
- 
+
 TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
 
 ### Commands
@@ -44,3 +44,22 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 | npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
+
+## Release Process
+
+Tina has three main branches:
+
+- **master:** The bleeding edge of tinacms
+- **next:** A preview of the next release
+- **latest:** The current stable release
+
+The flow of changes therefore looks like:
+
+> `fix-some-bug` => `master` => `next` => `latest`
+
+This flow happens over a 2 week release process:
+
+- Day 1: A new `next` branch is created from `master`.
+- Week 1: `next` is kept up to date with `master` with frequent pre-releases
+- Week 2: `next` is frozen for new development but critical bug fixes can be cherry picked.
+- Day 14: `next` is released to npm, and then merged into `latest`
