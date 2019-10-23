@@ -24,6 +24,7 @@ export interface CommitOptions {
   message: string
   name?: string
   email?: string
+  push?: boolean
 }
 
 /**
@@ -35,6 +36,7 @@ export async function commit({
   name,
   email,
   pathRoot,
+  push,
 }: CommitOptions) {
   let options
 
@@ -46,6 +48,6 @@ export async function commit({
 
   const repo = openRepo(pathRoot)
   await repo.add(...files)
-  await repo.commit(message, ...files, options)
-  await repo.push()
+  const commitResult = await repo.commit(message, ...files, options)
+  return push ? await repo.push() : commitResult;
 }
