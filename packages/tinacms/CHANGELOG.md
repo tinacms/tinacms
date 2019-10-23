@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.5.0-alpha.0...tinacms@0.5.0-alpha.1) (2019-10-23)
+
+### Bug Fixes
+
+- fix block menu not showing all items ([e955542](https://github.com/tinacms/tinacms/commit/e955542))
+
 ## 0.5.0-alpha.0 (2019-10-21)
 
 ### Bug Fixes
