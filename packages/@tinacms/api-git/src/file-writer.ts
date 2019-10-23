@@ -25,13 +25,25 @@ let count = 0
 
 const MAX_BUILD_TIME = 1000
 
-export function writeFile(filepath: string, content: string) {
+export function checkFilePathIsInGitRepo(filepath: string, repoAbsolutePath: string) {
+  const fullpath = path.resolve(filepath)
+  if (fullpath.includes(repoAbsolutePath)) {
+    return true
+  } else {
+    return false
+  }
+}
+
+export function writeFile(filepath: string, content: string, repoAbsolutePath: string) {
   count++
-
+  if (DEBUG) console.info(`checkFilePathIsInGitRepo? ${checkFilePathIsInGitRepo(filepath, repoAbsolutePath)}`)
   if (DEBUG) console.info(`request ${count} received`)
-
-  cacheCommand(filepath, content)
-  tryToWrite()
+  if (checkFilePathIsInGitRepo(filepath, repoAbsolutePath)) {
+    cacheCommand(filepath, content)
+    tryToWrite()
+  } else {
+    throw new Error(`Filepath is outside git repository! (filepath: ${filepath})`)
+  }
 }
 
 export function deleteFile(path: string) {

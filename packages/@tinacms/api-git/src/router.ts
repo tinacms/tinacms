@@ -80,7 +80,7 @@ export function router(config: GitRouterConfig = {}) {
       console.log(fileAbsolutePath)
     }
     try {
-      writeFile(fileAbsolutePath, req.body.content)
+      writeFile(fileAbsolutePath, req.body.content, REPO_ABSOLUTE_PATH)
       res.json({ content: req.body.content })
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
