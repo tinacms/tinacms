@@ -164,4 +164,37 @@ export class GitClient {
       return response.json()
     })
   }
+
+  /**
+   * Get information about a local branch by name, or the current branch if no
+   * name is specified.
+   */
+  branch(name?: string) {
+    return fetch(
+      `${this.baseUrl}/${name ? `branches/${name}` : 'branch'}`,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      }
+    ).then(response => {
+      return response.json()
+    })
+  }
+
+  /**
+   * Get a list of the names of all local branches.
+   */
+  branches() {
+    return fetch(
+      `${this.baseUrl}/branches`,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      }
+    ).then(response => {
+      return response.json()
+    })
+  }
 }
