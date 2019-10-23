@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 /**
- * ## gatsby plugin entry
+ * # gatsby plugin entry
  *
  * Top-level `index.js` is required for gatsby to recognize
  * the package as a valid plugin. This just exports the src
