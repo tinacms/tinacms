@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.0.8-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.0.8-alpha.0...@tinacms/styles@0.0.8-alpha.1) (2019-10-23)
+
+**Note:** Version bump only for package @tinacms/styles
+
+
+
+
+
 ## [0.0.8-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.0.2...@tinacms/styles@0.0.8-alpha.0) (2019-10-21)
 
 ### Bug Fixes
