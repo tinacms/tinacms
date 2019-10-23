@@ -1,13 +1,13 @@
 # Contributing to TinaCMS
 
-The following is a set of guidelines and tips for contributingto the TinaCMS and its packages.
+The following is a set of guidelines and tips for contributing to the TinaCMS and its packages.
 
 ## How to Contribute
 
 - **Reporting Bugs**
 - **Suggesting Enhancements**
 - **Writing Docs, Guides, or Blog Posts**
-- **Voluntering for User Testing**
+- **Volunteering for User Testing**
 
 ## Contributing Code
 
@@ -17,7 +17,7 @@ TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.
 
 ### Creating Packages
 
-Packages in Tina are organized according to ther name
+Packages in Tina are organized according to thier name
 
 | Type                    | Naming Convention  | Example Path            |
 | ----------------------- | ------------------ | ----------------------- |
@@ -38,7 +38,7 @@ This section contains solutions to various problems you may run into when develo
 ### I pulled down changes and now my packages won't build
 
 The links between the local packages may have been broken. If this is the problem, then
-running `npm run bootstrap` shoudl fix the issue.
+running `npm run bootstrap` should fix the issue.
 
 #### Example error message
 
