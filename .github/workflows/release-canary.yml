@@ -23,3 +23,5 @@ jobs:
 
       - name: Release Canary
         run: ./node_modules/.bin/lerna publish --canary --yes --pre-id canary --dist-tag canary
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
