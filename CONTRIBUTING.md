@@ -130,7 +130,7 @@ The exact commands vary slightly depending on the type of release being made.
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
-   git push
+   git push && git push --tags
    ```
 
 ### Graduating Prereleases
@@ -166,7 +166,7 @@ The exact commands vary slightly depending on the type of release being made.
 
 1) **Push CHANGELOGs and git tags to Github:**
    ```
-   git push
+   git push && git push --tags
    ```
 
 ### Release
@@ -199,5 +199,5 @@ The exact commands vary slightly depending on the type of release being made.
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
-   git push
+   git push && git push --tags
    ```
