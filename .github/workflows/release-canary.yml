@@ -21,7 +21,8 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Authorize NPM
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN}}" > ~/.npmrc
+
       - name: Release Canary
         run: ./node_modules/.bin/lerna publish --canary --yes --pre-id canary --dist-tag canary
-        env:
-          NPM_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
