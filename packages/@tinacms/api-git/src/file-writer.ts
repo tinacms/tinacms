@@ -27,7 +27,8 @@ const MAX_BUILD_TIME = 1000
 
 export function checkFilePathIsInGitRepo(filepath: string, repoAbsolutePath: string) {
   const fullpath = path.resolve(filepath)
-  if (fullpath.includes(repoAbsolutePath)) {
+  const repopath = path.resolve(repoAbsolutePath)
+  if (fullpath.includes(repopath)) {
     return true
   } else {
     return false
