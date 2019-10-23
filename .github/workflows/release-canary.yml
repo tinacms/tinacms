@@ -1,0 +1,25 @@
+name: Release Canary
+
+on:
+  push:
+    branches:
+      - master
+      - canary
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install
+        run: npm ci
+
+      - name: Bootstrap
+        run: npm run bs
+
+      - name: Build
+        run: npm run build
+
+      - name: Release Canary
+        run: lerna publish --canary --pre-id canary --dist-tag canary
