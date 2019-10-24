@@ -23,11 +23,13 @@
     "directory": "packages/api/api-git"
   },
   "scripts": {
-    "start": "node ./bin/server.js",
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
     "test": "jest --passWithNoTests"
+  },
+  "bin": {
+    "tina-git-server": "./bin/server.js"
   },
   "dependencies": {
     "express": "^4.17.1",
