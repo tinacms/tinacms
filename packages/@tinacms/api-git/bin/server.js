@@ -1,3 +1,5 @@
+#!/usr/bin/env node
+
 const port = parseInt(process.argv[2])
 const pkg = require("../build/index.js")
 
