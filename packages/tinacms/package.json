@@ -31,9 +31,9 @@
     "@tinacms/scripts": "^0.1.5",
     "@types/jest": "^24.0.15",
     "@types/lodash.merge": "^4.6.6",
+    "@types/react-beautiful-dnd": "^11.0.3",
     "@types/styled-components": "4.1.8",
     "jest": "^24.8.0",
-    "react": "^16.8.6",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
@@ -42,7 +42,6 @@
     "@tinacms/form-builder": "^0.1.6",
     "@tinacms/icons": "^0.3.3",
     "@tinacms/styles": "^0.0.7",
-    "@types/react-beautiful-dnd": "^11.0.3",
     "lodash.merge": "^4.6.2",
     "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",
@@ -52,6 +51,6 @@
     "styled-components": "^4.3.2"
   },
   "peerDependencies": {
-    "react": "^16.8.6"
+    "react": ">=16.8"
   }
 }
