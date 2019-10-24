@@ -3,15 +3,16 @@
   "version": "1.0.0",
   "private": true,
   "scripts": {
-    "develop": "next dev",
+    "develop": "concurrently \"next dev\" \"tina-git-server 3001\"",
     "start": "next start"
   },
   "dependencies": {
     "@tinacms/api-git": "0.2.3",
     "@tinacms/next-tinacms-git": "0.0.5",
     "@tinacms/next-tinacms-markdown": "0.0.7",
+    "concurrently": "^5.0.0",
+    "next": "9.0.5",
     "react-tinacms": "0.4.0",
-    "tinacms": "0.4.0",
-    "next": "9.0.5"
+    "tinacms": "0.4.0"
   }
 }
