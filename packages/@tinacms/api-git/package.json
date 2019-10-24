@@ -5,7 +5,8 @@
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
   "files": [
-    "build"
+    "build",
+    "bin"
   ],
   "keywords": [
     "tinacms",
@@ -22,6 +23,7 @@
     "directory": "packages/api/api-git"
   },
   "scripts": {
+    "start": "node ./bin/server.js",
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
