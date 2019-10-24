@@ -34,6 +34,20 @@ export interface GitRouterConfig {
   defaultCommitName?: string
   defaultCommitEmail?: string
 }
+
+export function checkFilePathIsInGitRepo(
+  filepath: string,
+  repoAbsolutePath: string
+) {
+  const fullpath = path.resolve(filepath)
+  const repopath = path.resolve(repoAbsolutePath)
+  if (fullpath.startsWith(repopath)) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
   const CONTENT_REL_PATH = config.pathToContent || ''
@@ -80,7 +94,13 @@ export function router(config: GitRouterConfig = {}) {
       console.log(fileAbsolutePath)
     }
     try {
-      writeFile(fileAbsolutePath, req.body.content, REPO_ABSOLUTE_PATH)
+      const fileIsInRepo = checkFilePathIsInGitRepo(
+        fileAbsolutePath,
+        REPO_ABSOLUTE_PATH
+      )
+      if (fileIsInRepo) {
+        writeFile(fileAbsolutePath, req.body.content)
+      }
       res.json({ content: req.body.content })
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
