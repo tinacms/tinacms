@@ -22,7 +22,7 @@ import * as path from 'path'
 
 const LICENSE_HEADER: string[] = [
   `Copyright 2019 Forestry.io Inc`,
-  `Licensed under the Apache License, Version 2.0 (the "License");`,
+  `Licensed under the Apache License, Version 2.0 \\(the "License"\\);`,
   `you may not use this file except in compliance with the License.`,
   `You may obtain a copy of the License at`,
   `http://www.apache.org/licenses/LICENSE-2.0`,
@@ -142,6 +142,7 @@ function checkFileForLicenseHeader(filepath: string) {
 function isMissingHeader(content: string) {
   for (const line of LICENSE_HEADER) {
     if (!content.match(new RegExp(line))) {
+      console.log(line)
       return true
     }
   }
