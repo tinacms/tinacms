@@ -212,6 +212,7 @@ export const MenuButton = styled.button<{
   border: none;
   outline: none;
   padding: 0.375rem;
+  margin: 0;
   transition: all 85ms ease-out;
   cursor: pointer;
   display: flex;
