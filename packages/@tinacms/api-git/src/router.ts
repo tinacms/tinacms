@@ -35,6 +35,20 @@ export interface GitRouterConfig {
   defaultCommitEmail?: string
   pushOnCommit?: boolean
 }
+
+export function checkFilePathIsInRepo(
+  filepath: string,
+  repoAbsolutePath: string
+) {
+  const fullpath = path.resolve(filepath)
+  const repopath = path.resolve(repoAbsolutePath)
+  if (fullpath.startsWith(repopath)) {
+    return true
+  } else {
+    return false
+  }
+}
+
 export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
   const CONTENT_REL_PATH = config.pathToContent || ''
@@ -85,7 +99,17 @@ export function router(config: GitRouterConfig = {}) {
       console.log(fileAbsolutePath)
     }
     try {
-      writeFile(fileAbsolutePath, req.body.content)
+      const fileIsInRepo = checkFilePathIsInRepo(
+        fileAbsolutePath,
+        CONTENT_ABSOLUTE_PATH
+      )
+      if (fileIsInRepo) {
+        writeFile(fileAbsolutePath, req.body.content)
+      } else {
+        throw new Error(
+          `Failed to write to: ${fileRelativePath} \nCannot write outside of the content directory.`
+        )
+      }
       res.json({ content: req.body.content })
     } catch (e) {
       res.status(500).json({ status: 'error', message: e.message })
