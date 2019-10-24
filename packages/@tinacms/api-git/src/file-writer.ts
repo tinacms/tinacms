@@ -27,9 +27,6 @@ const MAX_BUILD_TIME = 1000
 
 export function writeFile(filepath: string, content: string) {
   count++
-
-  if (DEBUG) console.info(`request ${count} received`)
-
   cacheCommand(filepath, content)
   tryToWrite()
 }

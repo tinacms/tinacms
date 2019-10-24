@@ -25,7 +25,7 @@
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest --passWithNoTests"
+    "test": "jest"
   },
   "dependencies": {
     "express": "^4.17.1",
