@@ -47,7 +47,15 @@ interface TinaPackage {
   /**
    * The contents of it's `package.json`.
    */
-  packageJson: any
+  packageJson: {
+    name: string
+    scripts: {
+      dev: string
+      build: string
+      watch: string
+    }
+    license: string
+  }
 }
 
 /**
@@ -140,7 +148,11 @@ function checkForNpmScripts({ packageJson }: TinaPackage) {
   }
   let scripts = packageJson.scripts || {}
 
-  let requiredScripts = ['dev', 'build', 'watch']
+  let requiredScripts: (keyof TinaPackage['packageJson']['scripts'])[] = [
+    'dev',
+    'build',
+    'watch',
+  ]
 
   requiredScripts.forEach(scriptName => {
     if (!scripts[scriptName]) {
