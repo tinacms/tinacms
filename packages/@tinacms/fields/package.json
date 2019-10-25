@@ -78,10 +78,10 @@
     "react-color": "^2.17.3",
     "react-dismissible": "^1.0.10",
     "react-dropzone": "10.1.8",
-    "react-select": "^2.3.0",
-    "styled-components": "^4.3.2"
+    "react-select": "^2.3.0"
   },
   "peerDependencies": {
+    "styled-components": ">=4.1",
     "react": ">=16.8",
     "react-dom": ">=16.8"
   }
