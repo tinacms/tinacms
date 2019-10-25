@@ -54,6 +54,28 @@ interface BlockTemplate {
   defaultItem?: object | (() => object)
   key: string
   fields: Field[]
+  /**
+   * An optional function which generates `props` for
+   * this items's `li`.
+   */
+  itemProps?: (
+    item: object
+  ) => {
+    /**
+     * The `key` property used to optimize the rendering of lists.
+     *
+     * If rendering is causing problems, use `defaultItem` to
+     * generate a unique key for the item.
+     *
+     * Reference:
+     * * https://reactjs.org/docs/lists-and-keys.html
+     */
+    key?: string
+    /**
+     * The label to be display on the list item.
+     */
+    label?: string
+  }
 }
 
 interface BlockFieldProps {
@@ -129,6 +151,13 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
                   if (!template) {
                     // TODO: if no template return invalid entry
                   }
+                  const itemProps = React.useCallback(
+                    (item: object) => {
+                      if (!template.itemProps) return {}
+                      return template.itemProps(item)
+                    },
+                    [template.itemProps]
+                  )
 
                   return (
                     <BlockListItem
@@ -139,6 +168,7 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
                       index={index}
                       field={field}
                       tinaForm={tinaForm}
+                      {...itemProps(block)}
                     />
                   )
                 })}
@@ -160,9 +190,11 @@ interface BlockListItemProps {
   index: number
   block: any
   template: BlockTemplate
+  label?: string
 }
 
 const BlockListItem = ({
+  label,
   tinaForm,
   field,
   index,
@@ -174,8 +206,6 @@ const BlockListItem = ({
   const removeItem = React.useCallback(() => {
     tinaForm.finalForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
-
-  const label = block[template.key] || template.label
 
   return (
     <Draggable
@@ -194,7 +224,7 @@ const BlockListItem = ({
           >
             <DragHandle />
             <ItemClickTarget onClick={() => setExpanded(true)}>
-              <GroupLabel>{label}</GroupLabel>
+              <GroupLabel>{label || template.label}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
@@ -207,7 +237,7 @@ const BlockListItem = ({
             item={block}
             index={index}
             tinaForm={tinaForm}
-            label={label}
+            label={label || template.label}
             template={template}
           />
         </>
