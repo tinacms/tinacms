@@ -1,0 +1,27 @@
+name: Release Canary
+
+on:
+  push:
+    branches:
+      - master
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+
+      - name: Install
+        run: npm ci
+
+      - name: Bootstrap
+        run: npm run bs
+
+      - name: Build
+        run: npm run build
+
+      - name: Authorize NPM
+        run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN}}" > ~/.npmrc
+
+      - name: Release Canary
+        run: ./node_modules/.bin/lerna publish --canary --yes --preid canary --dist-tag canary
