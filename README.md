@@ -58,9 +58,18 @@ The flow of changes therefore looks like:
 
 > `fix-some-bug` => `master` => `next` => `latest`
 
-This flow happens over a 2 week release process:
+The process happens over a week:
 
-- Day 1: A new `next` branch is created from `master`.
-- Week 1: `next` is kept up to date with `master` with frequent pre-releases
-- Week 2: `next` is frozen for new development but critical bug fixes can be cherry picked.
-- Day 14: `next` is released to npm, and then merged into `latest`
+- On Monday
+  1. `next` is merged into `latest`; then `latest` is published to npm
+  2. `master` is merged into `next`; then `next` is published to npm
+- Any hot fixes for bugs will be cherry picked into `next` and `latest`
+  and the published accordingly.
+- Every pull request merged to `master` automatically triggers a
+  `canary` release.
+
+With this process:
+
+- all accepted changes are available as `canary` releases for early testing
+- critical fixes are published as soon as possible
+- new features and minor fixes take ~1.5 weeks to be published
