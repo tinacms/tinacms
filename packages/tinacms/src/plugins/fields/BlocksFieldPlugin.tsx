@@ -51,7 +51,7 @@ interface BlocksFieldDefinititon extends Field {
 
 interface BlockTemplate {
   label: string
-  defaultItem: object
+  defaultItem?: object | (() => object)
   key: string
   fields: Field[]
 }
@@ -67,8 +67,13 @@ interface BlockFieldProps {
 const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
   const frame = useFrameContext()
   const addItem = React.useCallback(
-    (name, template) => {
-      const obj = template.defaultItem || {}
+    (name: string, template: BlockTemplate) => {
+      let obj: any = {}
+      if (typeof template.defaultItem === 'function') {
+        obj = template.defaultItem()
+      } else {
+        obj = template.defaultItem || {}
+      }
       obj._template = name
       form.mutators.insert(field.name, 0, obj)
     },
