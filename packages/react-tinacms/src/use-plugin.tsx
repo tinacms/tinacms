@@ -23,12 +23,24 @@ import { useCMS } from './use-cms'
 /**
  * A React Hook for adding Plugins to the CMS.
  *
- * @param plugin Plugin
+ * @alias usePlugins
  */
-export function usePlugin(plugin: Plugin) {
+export const usePlugin = usePlugins
+
+/**
+ *
+ * @alias usePlugin
+ */
+export function usePlugins(...plugins: Plugin[]) {
   const cms = useCMS()
   React.useEffect(() => {
-    cms.plugins.add(plugin)
-    return () => cms.plugins.remove(plugin)
-  }, [cms.plugins, plugin])
+    plugins.forEach(plugin => {
+      cms.plugins.add(plugin)
+    })
+    return () => {
+      plugins.forEach(plugin => {
+        cms.plugins.remove(plugin)
+      })
+    }
+  }, [cms.plugins, ...plugins])
 }
