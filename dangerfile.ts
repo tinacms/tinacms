@@ -60,8 +60,10 @@ function runChecksOnPullRequest() {
     ...danger.git.modified_files,
   ]
 
+  // Files
   allFiles.filter(fileNeedsLicense).forEach(checkFileForLicenseHeader)
 
+  // Packages
   let modifiedPackages = getModifiedPackages(allFiles)
 
   modifiedPackages.forEach(warnIfMissingTestChanges)
@@ -69,7 +71,45 @@ function runChecksOnPullRequest() {
   modifiedPackages.forEach(checkForLicense)
 
   listTouchedPackages(modifiedPackages)
+
+  // Github Actions Workflows
   listTouchedWorkflows(allFiles)
+
+  // Pull Request
+  if (modifiedPackages.length > 0) {
+    checkForMilestone()
+  }
+}
+
+/**
+ * Any PR that modifies one of the packages should be attached to a milestone.
+ */
+function checkForMilestone() {
+  // @ts-ignore
+  if (danger.github.pr.milestone) {
+    // @ts-ignore
+    let milestone: Milestone = danger.github.pr.milestone
+    message(
+      // @ts-ignore
+      `You can expect the changes in this PR to be published on ${formatDate(
+        new Date(milestone.due_on)
+      )}`
+    )
+  } else {
+    warn(`@tinacms/dev please add to a Milestone before merging `)
+  }
+}
+
+// This is missing from the `danger` types
+interface Milestone {
+  due_on: string
+}
+
+function formatDate(date: Date) {
+  const day = date.getDay()
+  const month = date.getMonth() + 1
+  const year = date.getFullYear()
+  return `${year}-${month}-${day}`
 }
 
 /**
