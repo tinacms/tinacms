@@ -27,9 +27,9 @@ import * as React from 'react'
  * @param plugin Plugin
  * @alias withPlugin
  */
-export function withPlugins(Component: any, ...plugins: Plugin[]) {
+export function withPlugins(Component: any, plugins: Plugin | Plugin[]) {
   return (props: any) => {
-    usePlugin(...plugins)
+    usePlugin(plugins)
     return <Component {...props} />
   }
 }
