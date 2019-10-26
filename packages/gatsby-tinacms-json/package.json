@@ -36,6 +36,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.2.3",
+    "graphql": "^14.5.8",
     "react-tinacms": "^0.4.0"
   }
 }
