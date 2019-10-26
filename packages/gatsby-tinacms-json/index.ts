@@ -32,9 +32,6 @@ export function useJsonForm(
   jsonNode: JsonNode,
   formOptions: Partial<FormOptions<any>> = {}
 ) {
-  if (!jsonNode || process.env.NODE_ENV === 'production') {
-    return [{}, null]
-  }
   validateJsonNode(jsonNode)
 
   const cms = useCMS()
@@ -64,7 +61,7 @@ export function useJsonForm(
       .show(id) // Load the contents of this file at HEAD
       .then((git: any) => {
         // Parse the JSON into a JsonForm data structure and store it in state.
-        let rawJson = JSON.parse(git.content)
+        const rawJson = JSON.parse(git.content)
         setValuesInGit({ jsonNode, rawJson })
       })
       .catch((e: any) => {
@@ -77,7 +74,7 @@ export function useJsonForm(
   // TODO: This may not be necessary.
   fields.push({ name: 'jsonNode', component: null })
 
-  const [values, form] = useCMSForm(
+  const [, form] = useCMSForm(
     {
       id,
       label,
@@ -110,6 +107,10 @@ export function useJsonForm(
 
   useWatchFormValues(form, writeToDisk)
 
+  if (!jsonNode || process.env.NODE_ENV === 'production') {
+    return [{}, null]
+  }
+
   return [jsonNode, form as Form]
 }
 
@@ -131,6 +132,6 @@ export function JsonForm({ data, render, ...options }: JsonFormProps) {
   return render({ form: form as any, data: currentData })
 }
 
-function validateJsonNode(jsonNode: JsonNode) {
+function validateJsonNode(_jsonNode: JsonNode) {
   // TODO
 }
