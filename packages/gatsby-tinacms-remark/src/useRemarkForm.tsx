@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form } from '@tinacms/core'
+import { FormOptions } from '@tinacms/core'
 import { ActionButton } from 'tinacms'
 import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import {
@@ -35,10 +35,6 @@ export function useRemarkForm(
   markdownRemark: RemarkNode,
   formOverrrides: Partial<FormOptions<any>> = {}
 ) {
-  if (!markdownRemark || process.env.NODE_ENV === 'production') {
-    return [markdownRemark, null]
-  }
-
   validateMarkdownRemark(markdownRemark)
 
   const cms = useCMS()
@@ -70,7 +66,7 @@ export function useRemarkForm(
       .show(id) // Load the contents of this file at HEAD
       .then((git: any) => {
         // Parse the content into the RemarkForm data structure and store it in state.
-        let { content: rawMarkdownBody, data: rawFrontmatter } = matter(
+        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
           git.content
         )
         setValuesInGit({ ...valuesOnDisk, rawFrontmatter, rawMarkdownBody })
@@ -105,7 +101,7 @@ export function useRemarkForm(
     return fields
   }, [formOverrrides.fields])
 
-  const [values, form] = useCMSForm(
+  const [, form] = useCMSForm(
     {
       label,
       id,
@@ -133,7 +129,6 @@ export function useRemarkForm(
               ) {
                 return
               }
-              // @ts-ignore
               await cms.api.git.onDelete!({
                 relPath: markdownRemark.fileRelativePath,
               })
@@ -154,7 +149,7 @@ export function useRemarkForm(
     }
   )
 
-  let writeToDisk = React.useCallback(formState => {
+  const writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
       content: toMarkdownString(formState.values),
@@ -162,6 +157,10 @@ export function useRemarkForm(
   }, [])
 
   useWatchFormValues(form, writeToDisk)
+
+  if (!markdownRemark || process.env.NODE_ENV === 'production') {
+    return [markdownRemark, null]
+  }
 
   return [markdownRemark, form]
 }
