@@ -37,6 +37,8 @@
     "@types/jest": "^24.0.15",
     "@types/lodash.get": "^4.4.5",
     "@types/prosemirror-commands": "^1.0.1",
+    "@types/prosemirror-dropcursor": "^1.0.0",
+    "@types/prosemirror-gapcursor": "^1.0.1",
     "@types/prosemirror-history": "^1.0.1",
     "@types/prosemirror-inputrules": "^1.0.2",
     "@types/prosemirror-keymap": "^1.0.1",

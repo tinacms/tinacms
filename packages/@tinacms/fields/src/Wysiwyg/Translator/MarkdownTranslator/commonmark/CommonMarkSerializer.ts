@@ -25,7 +25,6 @@ import { buildMarksFromSchema, buildNodesFromSchema } from "./tokens"
 export function CommonMarkSerializer(schema: Schema) {
   return new MarkdownSerializer(
     buildNodesFromSchema(schema),
-    // @ts-ignore
     buildMarksFromSchema(schema)
   )
 }
