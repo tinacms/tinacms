@@ -32,10 +32,10 @@ export function singleMarkCommand(markType: MarkType, getAttrs: any) {
       const textStart = start + 1 + offset
       const textEnd = textStart + match[textGroup].length
 
-      const deleteStart = [textStart - 1, textStart]
+      const deleteStart: [number, number] = [textStart - 1, textStart]
       const nextChar = getNextChar(state, textEnd)
       const deleteEndEnd = nextChar ? 0 : 1
-      const deleteEnd = [textEnd, textEnd + deleteEndEnd]
+      const deleteEnd: [number, number] = [textEnd, textEnd + deleteEndEnd]
       // console.log({
       //   match,
       //   start,
@@ -46,9 +46,7 @@ export function singleMarkCommand(markType: MarkType, getAttrs: any) {
       //   deleteStart,
       //   deleteEnd,
       // })
-      //@ts-ignore
       tr.delete(...deleteEnd)
-      //@ts-ignore
       tr.delete(...deleteStart)
       end = start + match[textGroup].length + offset
     }

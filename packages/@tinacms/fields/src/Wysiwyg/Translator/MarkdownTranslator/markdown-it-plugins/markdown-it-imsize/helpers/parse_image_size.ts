@@ -53,11 +53,12 @@ function parseNextNumber(str: string, pos: number, max: number) {
 }
 
 export function parseImageSize(str: string, pos: number, max: number) {
-  let code,
-    result: Result = {
-      ok: false,
-      pos: 0,
-    }
+  let code
+
+  const result: Result = {
+    ok: false,
+    pos: 0,
+  }
 
   if (pos >= max) {
     return result

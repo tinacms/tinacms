@@ -27,8 +27,6 @@ function image_with_size(md: any) {
     let attrs,
       code,
       label,
-      labelEnd,
-      labelStart,
       pos,
       ref,
       res,
@@ -38,8 +36,9 @@ function image_with_size(md: any) {
       token,
       tokens: any,
       start,
-      href = '',
-      oldPos = state.pos,
+      href = ''
+
+    const oldPos = state.pos,
       max = state.posMax
 
     if (state.src.charCodeAt(state.pos) !== 0x21 /* ! */) {
@@ -49,8 +48,8 @@ function image_with_size(md: any) {
       return false
     }
 
-    labelStart = state.pos + 2
-    labelEnd = md.helpers.parseLinkLabel(state, state.pos + 1, false)
+    const labelStart = state.pos + 2
+    const labelEnd = md.helpers.parseLinkLabel(state, state.pos + 1, false)
 
     // parser failed to find ']', so it's not a valid link
     if (labelEnd < 0) {
