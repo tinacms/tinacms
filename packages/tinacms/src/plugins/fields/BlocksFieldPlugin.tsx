@@ -36,7 +36,6 @@ import {
   radius,
   font,
   IconButton,
-  Button,
   shadow,
 } from '@tinacms/styles'
 import { useFrameContext } from '../../components/SyledFrame'
@@ -116,7 +115,7 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
       <GroupListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
-            {(provider, snapshot) => (
+            {(provider) => (
               <div ref={provider.innerRef} className="edit-page--list-parent">
                 {items.length === 0 && <EmptyState />}
                 {items.map((block: any, index: any) => {
