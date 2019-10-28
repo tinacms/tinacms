@@ -29,11 +29,22 @@ interface JsonNode {
 }
 
 export function useJsonForm(
-  jsonNode: JsonNode,
+  jsonNode: JsonNode | null | undefined,
   formOptions: Partial<FormOptions<any>> = {}
 ) {
+  /**
+   * We're returning early here which means all the hooks called by this hook
+   * violate the rules of hooks. In the case of the check for
+   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
+   * will never change at runtime.
+   */
+  if (!jsonNode || process.env.NODE_ENV === 'production') {
+    return [jsonNode, null]
+  }
+
   validateJsonNode(jsonNode)
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
   const label = jsonNode.fileRelativePath
   const id = jsonNode.fileRelativePath
@@ -43,6 +54,7 @@ export function useJsonForm(
    * Json file currently on disk. This state will contain any
    * un-committed changes in the Json file.
    */
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
       jsonNode: jsonNode,
@@ -55,7 +67,9 @@ export function useJsonForm(
    * The state of the JsonForm, generated from the contents of the
    * Json file at the HEAD of this git branch.
    */
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [valuesInGit, setValuesInGit] = useState()
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useEffect(() => {
     cms.api.git
       .show(id) // Load the contents of this file at HEAD
@@ -74,6 +88,7 @@ export function useJsonForm(
   // TODO: This may not be necessary.
   fields.push({ name: 'jsonNode', component: null })
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, form] = useCMSForm(
     {
       id,
@@ -97,6 +112,7 @@ export function useJsonForm(
     { values: valuesOnDisk, label, fields }
   )
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = useCallback(formState => {
     const { fileRelativePath, rawJson, ...data } = formState.values.rawJson
     cms.api.git.onChange!({
@@ -105,11 +121,8 @@ export function useJsonForm(
     })
   }, [])
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useWatchFormValues(form, writeToDisk)
-
-  if (!jsonNode || process.env.NODE_ENV === 'production') {
-    return [{}, null]
-  }
 
   return [jsonNode, form as Form]
 }

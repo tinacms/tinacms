@@ -32,11 +32,22 @@ import * as React from 'react'
 const matter = require('gray-matter')
 
 export function useRemarkForm(
-  markdownRemark: RemarkNode,
+  markdownRemark: RemarkNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
 ) {
+  /**
+   * We're returning early here which means all the hooks called by this hook
+   * violate the rules of hooks. In the case of the check for
+   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
+   * will never change at runtime.
+   */
+  if (!markdownRemark || process.env.NODE_ENV === 'production') {
+    return [markdownRemark, null]
+  }
+
   validateMarkdownRemark(markdownRemark)
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
   const label = formOverrrides.label || markdownRemark.frontmatter.title
   const id = markdownRemark.fileRelativePath
@@ -46,6 +57,7 @@ export function useRemarkForm(
    * Markdown file currently on disk. This state will contain any
    * un-committed changes in the Markdown file.
    */
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
       fileRelativePath: markdownRemark.fileRelativePath,
@@ -60,7 +72,9 @@ export function useRemarkForm(
    * The state of the RemarkForm, generated from the contents of the
    * Markdown file at the HEAD of this git branch.
    */
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [valuesInGit, setValuesInGit] = React.useState()
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   React.useEffect(() => {
     cms.api.git
       .show(id) // Load the contents of this file at HEAD
@@ -79,6 +93,7 @@ export function useRemarkForm(
   /**
    * The list of Field definitions used to generate the form.
    */
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const fields = React.useMemo(() => {
     let fields = formOverrrides.fields || generateFields(valuesOnDisk)
     fields = fields.map(field => {
@@ -101,6 +116,7 @@ export function useRemarkForm(
     return fields
   }, [formOverrrides.fields])
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, form] = useCMSForm(
     {
       label,
@@ -149,6 +165,7 @@ export function useRemarkForm(
     }
   )
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
@@ -156,11 +173,8 @@ export function useRemarkForm(
     })
   }, [])
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useWatchFormValues(form, writeToDisk)
-
-  if (!markdownRemark || process.env.NODE_ENV === 'production') {
-    return [markdownRemark, null]
-  }
 
   return [markdownRemark, form]
 }
