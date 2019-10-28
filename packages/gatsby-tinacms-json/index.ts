@@ -132,5 +132,16 @@ export function JsonForm({ data, render, ...options }: JsonFormProps) {
 }
 
 function validateJsonNode(jsonNode: JsonNode) {
-  // TODO
+  if (typeof jsonNode.fileRelativePath === 'undefined') {
+    throw new Error(ERROR_MISSING_REMARK_PATH)
+  }
 }
+
+export const ERROR_MISSING_REMARK_PATH =
+  'useJsonForm(jsonNode) Required attribute `fileRelativePath` was not found on the `jsonNode`.' +
+  `
+
+1. Check if the \`gatsby-tinacms-json\` was added to the \`gatsby-config.js\`.
+2. Check if the \`fileRelativePath\` attribute is included in the GraphQL query.
+
+  `
