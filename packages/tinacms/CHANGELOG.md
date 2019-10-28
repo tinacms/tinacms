@@ -3,7 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0](https://github.com/tinacms/tinacms/compare/tinacms@0.5.0-alpha.0...tinacms@0.5.0) (2019-10-28)
+## [0.6.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.5.0-alpha.0...tinacms@0.6.0-alpha.0) (2019-10-28)
+
+### Bug Fixes
+
+- fix block menu not showing all items ([c61829a](https://github.com/tinacms/tinacms/commit/c61829a))
+- styled-components is a peerDependency ([baaf3de](https://github.com/tinacms/tinacms/commit/baaf3de))
+
+### Features
+
+- **blocks:** add itemProps function to templates ([5fd0224](https://github.com/tinacms/tinacms/commit/5fd0224))
+- **blocks:** defaultItem can be a function ([a7b8ef6](https://github.com/tinacms/tinacms/commit/a7b8ef6))
+
+## 0.5.0 (2019-10-28)
 
 ### Bug Fixes
 

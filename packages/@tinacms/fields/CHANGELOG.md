@@ -3,7 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.1.8](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.8-alpha.0...@tinacms/fields@0.1.8) (2019-10-28)
+## [0.1.9-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.8-alpha.0...@tinacms/fields@0.1.9-alpha.0) (2019-10-28)
+
+### Bug Fixes
+
+- remove margin from wysiwyg menu buttons ([7a4df52](https://github.com/tinacms/tinacms/commit/7a4df52))
+- styled-components is a peerDependency ([baaf3de](https://github.com/tinacms/tinacms/commit/baaf3de))
+
+## 0.1.8 (2019-10-28)
 
 ### Bug Fixes
 

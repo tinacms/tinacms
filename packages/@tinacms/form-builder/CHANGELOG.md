@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.0-alpha.0...@tinacms/form-builder@0.2.0) (2019-10-28)
+## 0.2.0 (2019-10-28)
 
 ### Bug Fixes
 
