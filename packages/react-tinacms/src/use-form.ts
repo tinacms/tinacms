@@ -31,10 +31,24 @@ export function useCMSForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
+  /**
+   * We're returning early here which means all the hooks called by this hook
+   * violate the rules of hooks. In the case of the check for
+   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
+   * will never change at runtime.
+   */
+  if (process.env.NODE_ENV === 'production') {
+    return [options.initialValues, undefined]
+  }
+
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [form, setForm] = React.useState<Form | undefined>()
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, setValues] = React.useState(options.initialValues)
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   React.useEffect(
     function createForm() {
       if (!options.initialValues) return
@@ -57,13 +71,12 @@ export function useCMSForm<FormShape = any>(
     [options.id, !!options.initialValues]
   )
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormFields(watch.fields, form)
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormLabel(watch.label, form)
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormValues(watch.values, form)
-
-  if (process.env.NODE_ENV === 'production') {
-    return [options.initialValues, undefined]
-  }
 
   return [form ? form.values : options.initialValues, form]
 }
