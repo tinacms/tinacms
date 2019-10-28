@@ -135,6 +135,10 @@ function validateJsonNode(jsonNode: JsonNode) {
   if (typeof jsonNode.fileRelativePath === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_PATH)
   }
+
+  if (typeof jsonNode.rawJson === 'undefined') {
+    throw new Error(ERROR_MISSING_RAW_JSON)
+  }
 }
 
 export const ERROR_MISSING_REMARK_PATH =
@@ -143,5 +147,14 @@ export const ERROR_MISSING_REMARK_PATH =
 
 1. Check if the \`gatsby-tinacms-json\` was added to the \`gatsby-config.js\`.
 2. Check if the \`fileRelativePath\` attribute is included in the GraphQL query.
+
+  `
+
+export const ERROR_MISSING_RAW_JSON =
+  'useJsonForm(jsonNode) Required attribute `rawJson` was not found on the `jsonNode`.' +
+  `
+
+1. Check if the \`gatsby-tinacms-json\` was added to the \`gatsby-config.js\`.
+2. Check if the \`rawJson\` attribute is included in the GraphQL query.
 
   `
