@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/styles",
-  "version": "0.0.7",
+  "version": "0.0.8",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -27,12 +27,13 @@
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.5",
+    "@tinacms/scripts": "^0.1.6",
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^24.0.2",
+    "styled-components": "4.1.0"
   },
-  "dependencies": {
-    "styled-components": "^4.3.2"
+  "peerDependencies": {
+    "styled-components": ">=4.1"
   }
 }
