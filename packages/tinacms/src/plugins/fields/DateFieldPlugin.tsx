@@ -31,14 +31,15 @@ import { format, parse } from './dateFormat'
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
     const [isOpen, setIsOpen] = useState(false)
-    const area = useRef(null)
+    const area = useRef<HTMLDivElement>(null!)
 
     const documentContext = useFrameContext().document
     useEffect(() => {
       const handleClick = (event: MouseEvent) => {
         if (!area.current) return
-        // @ts-ignore
-        if (!area.current!.contains(event.target)) {
+        if (!event.target) return
+
+        if (!area.current.contains(event.target as HTMLElement)) {
           setIsOpen(false)
         } else {
           setIsOpen(true)

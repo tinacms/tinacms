@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import { InputCss } from './Input'
 
 type a = React.DetailedHTMLProps<

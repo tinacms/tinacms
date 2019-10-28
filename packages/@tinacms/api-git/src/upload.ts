@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-// @ts-ignore TODO: check if there's types
 import multer from 'multer'
 import * as fs from 'fs'
 

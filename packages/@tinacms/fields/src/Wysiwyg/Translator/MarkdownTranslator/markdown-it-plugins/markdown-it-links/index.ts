@@ -30,25 +30,24 @@ function _link(md: any) {
     let attrs,
       code,
       label,
-      labelEnd,
-      labelStart,
       pos,
       res,
       ref,
       title,
       token,
       href = '',
-      oldPos = state.pos,
-      max = state.posMax,
       start = state.pos,
       parseReference = true
+
+    const oldPos = state.pos,
+      max = state.posMax
 
     if (state.src.charCodeAt(state.pos) !== 0x5b /* [ */) {
       return false
     }
 
-    labelStart = state.pos + 1
-    labelEnd = state.md.helpers.parseLinkLabel(state, state.pos, true)
+    const labelStart = state.pos + 1
+    const labelEnd = state.md.helpers.parseLinkLabel(state, state.pos, true)
 
     // parser failed to find ']', so it's not a valid link
     if (labelEnd < 0) {

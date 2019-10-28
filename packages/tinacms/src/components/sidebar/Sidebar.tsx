@@ -32,7 +32,6 @@ import {
 } from '@tinacms/icons'
 import {
   GlobalStyles,
-  Button,
   padding,
   color,
   radius,
@@ -327,17 +326,6 @@ const MenuPanel = styled.div<{ visible: boolean }>`
     margin: 0;
     padding: 0;
     list-style: none;
-  }
-`
-
-const ModalActions = styled.div`
-  display: flex;
-  justify-content: space-between;
-  border-radius: 0 0 ${radius('big')} ${radius('big')};
-  overflow: hidden;
-  ${Button} {
-    border-radius: 0;
-    flex: 1 0 auto;
   }
 `
 
