@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.5.0-alpha.0...react-tinacms@0.5.0) (2019-10-28)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
 ## 0.5.0-alpha.0 (2019-10-21)
 
 ### Bug Fixes
