@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## 0.3.5-alpha.0 (2019-10-21)
+## [0.3.5](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.3.5-alpha.0...gatsby-tinacms-remark@0.3.5) (2019-10-28)
 
 ### Bug Fixes
 

@@ -3,9 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.2.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.1.0...@tinacms/api-git@0.2.4-alpha.0) (2019-10-21)
-
-### Bug Fixes
+## [0.2.4](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.2.4-alpha.0...@tinacms/api-git@0.2.4) (2019-10-28)
 
 - /show returns current version if not in git ([142f2c4](https://github.com/tinacms/tinacms/commit/142f2c4)), closes [#306](https://github.com/tinacms/tinacms/issues/306)
 - ignore leading slash in file paths ([c6a8d02](https://github.com/tinacms/tinacms/commit/c6a8d02))
