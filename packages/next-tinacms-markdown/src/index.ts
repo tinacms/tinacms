@@ -16,6 +16,8 @@ limitations under the License.
 
 */
 
+// `gray-matter` has types but they appear to be wrong
+// @ts-ignore
 import matter from 'gray-matter'
 import { FormOptions } from '@tinacms/core'
 import { useCMS, useCMSForm } from 'react-tinacms'

@@ -16,6 +16,8 @@ limitations under the License.
 
 */
 
+// `multer` has types but the appear to be wrong
+// @ts-ignore
 import multer from 'multer'
 import * as fs from 'fs'
 
