@@ -20,6 +20,8 @@ import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
 import { findInactiveFormFields } from './findInactiveFields'
 
+const get = require('lodash.get')
+
 export interface FormOptions<S> extends Config<S> {
   id: any
   label: string
@@ -181,7 +183,15 @@ export class Form<S = any> {
     return this.finalForm.getState().values
   }
 
-  get inactiveFields() {
+  private get inactiveFields() {
     return findInactiveFormFields(this)
+  }
+
+  updateValues(values: S) {
+    this.finalForm.batch(() => {
+      this.inactiveFields.forEach(path => {
+        this.finalForm.change(path, get(values, path))
+      })
+    })
   }
 }
