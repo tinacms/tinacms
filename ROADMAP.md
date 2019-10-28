@@ -38,3 +38,4 @@ Two high-level sets of issues have been identified:
 - How to manage menus
 - Adding a core notification system
 - Adding other backends
+- Notification system
