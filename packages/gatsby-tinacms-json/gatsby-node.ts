@@ -16,8 +16,7 @@ limitations under the License.
 
 */
 
-// @ts-ignore
-import { GraphQLString } from 'gatsby/graphql'
+import { GraphQLString } from 'graphql'
 
 exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
   const pathRoot = process.cwd()
@@ -37,7 +36,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
     fileRelativePath: {
       type: GraphQLString,
       args: {},
-      resolve: ({ children, id, internal, parent, ...data }: any) => {
+      resolve: ({ children, id, internal, parent, ..._data }: any) => {
         const p = getNode(parent)
 
         return p.absolutePath.replace(pathRoot, '')
