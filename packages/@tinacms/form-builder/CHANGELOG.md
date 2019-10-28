@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.0-alpha.0...@tinacms/form-builder@0.2.0) (2019-10-28)
+
+### Bug Fixes
+
+- remove scrollbar from short forms ([95d7985](https://github.com/tinacms/tinacms/commit/95d7985))
+- safari form overflow scrolling ([559ce36](https://github.com/tinacms/tinacms/commit/559ce36))
+
+### Features
+
+- **fields:** a validate function can be set on field definitions ([63f15fc](https://github.com/tinacms/tinacms/commit/63f15fc))
+
 ## [0.1.4-alpha.3](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.1.4-alpha.2...@tinacms/form-builder@0.1.4-alpha.3) (2019-10-11)
 
 ### Bug Fixes

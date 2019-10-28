@@ -1,6 +1,6 @@
 {
   "name": "react-dismissible",
-  "version": "1.0.10",
+  "version": "1.0.11",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@testing-library/react": "^9.1.4",
-    "@tinacms/scripts": "^0.1.5",
+    "@tinacms/scripts": "^0.1.6",
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
