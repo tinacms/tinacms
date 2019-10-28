@@ -3,16 +3,11 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.5.0-alpha.0...tinacms@0.5.0-alpha.1) (2019-10-23)
+## [0.5.0](https://github.com/tinacms/tinacms/compare/tinacms@0.5.0-alpha.0...tinacms@0.5.0) (2019-10-28)
 
 ### Bug Fixes
 
 - fix block menu not showing all items ([e955542](https://github.com/tinacms/tinacms/commit/e955542))
-
-## 0.5.0-alpha.0 (2019-10-21)
-
-### Bug Fixes
-
 - add fix for body padding ([82a8d9c](https://github.com/tinacms/tinacms/commit/82a8d9c))
 - add form list scroll support ([ef7fcf3](https://github.com/tinacms/tinacms/commit/ef7fcf3))
 - add format func to datePicker to fix issue where date wouldn't display correctly until clicked by the picker. Hide timeFormat by default ([9eb5978](https://github.com/tinacms/tinacms/commit/9eb5978))
@@ -24,7 +19,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - close Reset Modal after success ([701bd3c](https://github.com/tinacms/tinacms/commit/701bd3c))
 - hmr of forms doesn't break the fs connection ([4501df3](https://github.com/tinacms/tinacms/commit/4501df3))
 - improve layout, add support for long titles ([1ce0bfb](https://github.com/tinacms/tinacms/commit/1ce0bfb))
-- inline wysiwyg  keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
+- inline wysiwyg keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
 - Link to docs ([080ccea](https://github.com/tinacms/tinacms/commit/080ccea)), closes [#161](https://github.com/tinacms/tinacms/issues/161)
 - maintain order of forms in sidebar ([ccc9839](https://github.com/tinacms/tinacms/commit/ccc9839)), closes [#229](https://github.com/tinacms/tinacms/issues/229)
 - no fields/forms placeholder padding ([89f03ba](https://github.com/tinacms/tinacms/commit/89f03ba))
@@ -95,7 +90,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - close Reset Modal after success ([701bd3c](https://github.com/tinacms/tinacms/commit/701bd3c))
 - hmr of forms doesn't break the fs connection ([4501df3](https://github.com/tinacms/tinacms/commit/4501df3))
 - improve layout, add support for long titles ([1ce0bfb](https://github.com/tinacms/tinacms/commit/1ce0bfb))
-- inline wysiwyg  keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
+- inline wysiwyg keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
 - Link to docs ([080ccea](https://github.com/tinacms/tinacms/commit/080ccea)), closes [#161](https://github.com/tinacms/tinacms/issues/161)
 - maintain order of forms in sidebar ([ccc9839](https://github.com/tinacms/tinacms/commit/ccc9839)), closes [#229](https://github.com/tinacms/tinacms/issues/229)
 - no fields/forms placeholder padding ([89f03ba](https://github.com/tinacms/tinacms/commit/89f03ba))
@@ -165,7 +160,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - close Reset Modal after success ([701bd3c](https://github.com/tinacms/tinacms/commit/701bd3c))
 - hmr of forms doesn't break the fs connection ([4501df3](https://github.com/tinacms/tinacms/commit/4501df3))
 - improve layout, add support for long titles ([1ce0bfb](https://github.com/tinacms/tinacms/commit/1ce0bfb))
-- inline wysiwyg  keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
+- inline wysiwyg keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
 - Link to docs ([080ccea](https://github.com/tinacms/tinacms/commit/080ccea)), closes [#161](https://github.com/tinacms/tinacms/issues/161)
 - maintain order of forms in sidebar ([ccc9839](https://github.com/tinacms/tinacms/commit/ccc9839)), closes [#229](https://github.com/tinacms/tinacms/issues/229)
 - no fields/forms placeholder padding ([89f03ba](https://github.com/tinacms/tinacms/commit/89f03ba))
@@ -243,7 +238,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - close Reset Modal after success ([701bd3c](https://github.com/tinacms/tinacms/commit/701bd3c))
 - hmr of forms doesn't break the fs connection ([4501df3](https://github.com/tinacms/tinacms/commit/4501df3))
 - improve layout, add support for long titles ([1ce0bfb](https://github.com/tinacms/tinacms/commit/1ce0bfb))
-- inline wysiwyg  keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
+- inline wysiwyg keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
 - maintain order of forms in sidebar ([ccc9839](https://github.com/tinacms/tinacms/commit/ccc9839)), closes [#229](https://github.com/tinacms/tinacms/issues/229)
 - only render create content button when available ([e540dd8](https://github.com/tinacms/tinacms/commit/e540dd8))
 - remove console.log() ([5577549](https://github.com/tinacms/tinacms/commit/5577549))
@@ -272,7 +267,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 - close Reset Modal after success ([701bd3c](https://github.com/tinacms/tinacms/commit/701bd3c))
 - hmr of forms doesn't break the fs connection ([4501df3](https://github.com/tinacms/tinacms/commit/4501df3))
 - improve layout, add support for long titles ([1ce0bfb](https://github.com/tinacms/tinacms/commit/1ce0bfb))
-- inline wysiwyg  keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
+- inline wysiwyg keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
 - maintain order of forms in sidebar ([ccc9839](https://github.com/tinacms/tinacms/commit/ccc9839)), closes [#229](https://github.com/tinacms/tinacms/issues/229)
 - only render create content button when available ([e540dd8](https://github.com/tinacms/tinacms/commit/e540dd8))
 - remove console.log() ([5577549](https://github.com/tinacms/tinacms/commit/5577549))

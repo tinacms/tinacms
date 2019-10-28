@@ -3,7 +3,7 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.1.8-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.1...@tinacms/fields@0.1.8-alpha.0) (2019-10-21)
+## [0.1.8](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.8-alpha.0...@tinacms/fields@0.1.8) (2019-10-28)
 
 ### Bug Fixes
 
@@ -47,7 +47,7 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Bug Fixes
 
-- inline wysiwyg  keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
+- inline wysiwyg keeps focus on first edit ([f209b34](https://github.com/tinacms/tinacms/commit/f209b34))
 - remove theme ref from wysiwyg ([8dd00a8](https://github.com/tinacms/tinacms/commit/8dd00a8))
 
 ## [0.1.0-alpha.15](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.0-alpha.14...@tinacms/fields@0.1.0-alpha.15) (2019-10-02)
