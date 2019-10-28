@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.5.0-alpha.0...react-tinacms@0.5.0) (2019-10-28)
+
+### Bug Fixes
+
+- useCMS checks the window for a cms instance ([6b80ed4](https://github.com/tinacms/tinacms/commit/6b80ed4))
+
+### Features
+
+- forms are neve registered in production ([f81211e](https://github.com/tinacms/tinacms/commit/f81211e))
+
 ## 0.4.0 (2019-10-14)
 
 ### Features
