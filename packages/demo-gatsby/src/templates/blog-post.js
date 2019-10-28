@@ -186,14 +186,21 @@ const heading = {
   defaultItem: {
     text: "",
   },
+  itemProps: block => ({
+    label: `${block.text}`,
+  }),
   fields: [{ name: "text", component: "text", label: "Text" }],
 }
 
 const image = {
-  label: "img",
+  label: "Image",
   defaultItem: {
     text: "",
   },
+  itemProps: block => ({
+    key: `${block.src}`,
+    label: `${block.alt}`,
+  }),
   fields: [
     { name: "src", component: "text", label: "Source URL" },
     { name: "alt", component: "text", label: "Alt Text" },

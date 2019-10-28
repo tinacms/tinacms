@@ -1,0 +1,35 @@
+{
+  "name": "root",
+  "private": true,
+  "scripts": {
+    "lint": "eslint './packages/**/*{.ts,.tsx}'",
+    "build": "lerna run build --reject-cycles",
+    "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
+    "bs": "npm run bootstrap",
+    "dev": "lerna run dev --reject-cycles",
+    "nuke": "lerna clean -y && find packages -name 'build' -type d -prune -exec rm -rf '{}' + && find packages -name '.rts2_cache' -type d -prune -exec rm -rf '{}' +",
+    "test": "lerna run test --reject-cycles",
+    "watch": "lerna run watch --parallel --reject-cylcles"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
+    "commander": "^2.20.0",
+    "eslint": "^6.4.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^2.0.1",
+    "lerna": "^3.16.4",
+    "rollup": "^1.21.4",
+    "rollup-plugin-commonjs": "^10.0.1",
+    "rollup-plugin-replace": "^2.2.0",
+    "rollup-plugin-typescript2": "^0.22.0",
+    "rollup-plugin-uglify": "^6.0.3",
+    "typescript": "^3.5.3"
+  },
+  "dependencies": {
+    "danger": "^9.2.0",
+    "react-frame-component": "^4.1.1"
+  }
+}

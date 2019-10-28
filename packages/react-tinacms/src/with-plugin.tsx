@@ -25,10 +25,20 @@ import * as React from 'react'
  *
  * @param Component A React Component
  * @param plugin Plugin
+ * @alias withPlugin
  */
-export function withPlugin(Component: any, plugin: Plugin) {
+export function withPlugins(Component: any, plugins: Plugin | Plugin[]) {
   return (props: any) => {
-    usePlugin(plugin)
+    usePlugin(plugins)
     return <Component {...props} />
   }
 }
+
+/**
+ * A Higher-Order-Component for adding Plugins to the CMS.
+ *
+ * @param Component A React Component
+ * @param plugin Plugin
+ * @alias withPlugins
+ */
+export const withPlugin = withPlugins

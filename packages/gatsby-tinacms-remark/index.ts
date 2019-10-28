@@ -16,4 +16,9 @@ limitations under the License.
 
 */
 
+/**
+ * Top-level `index.js` is required for gatsby to recognize
+ * the package as a valid plugin. This just exports the src
+ * dir, which is compiled typescript.
+ */
 export * from './src'

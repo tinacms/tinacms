@@ -20,12 +20,12 @@ export class GitClient {
   constructor(private baseUrl: string) {}
 
   /**
-   * An alias to `commitAndPush`
+   * An alias to `commit`
    *
    * @deprecated
    */
   onSubmit(data: any): Promise<any> {
-    return this.commitAndPush(data)
+    return this.commit(data)
   }
   /**
    * An alias to `writeToDisk`
@@ -63,7 +63,7 @@ export class GitClient {
    * TODO: Add return type.
    * TODO: Remove `catch`
    */
-  commitAndPush(data: {
+  commit(data: {
     files: string[]
     message?: string
     name?: string
@@ -75,6 +75,22 @@ export class GitClient {
         'Content-Type': 'application/json; charset=utf-8',
       },
       body: JSON.stringify(data),
+    }).catch(e => {
+      console.error(e)
+    })
+  }
+
+  /**
+   *
+   * TODO: Add return type.
+   * TODO: Remove `catch`
+   */
+  push(): Promise<any> {
+    return fetch(`${this.baseUrl}/push`, {
+      method: 'POST',
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
     }).catch(e => {
       console.error(e)
     })
@@ -155,6 +171,39 @@ export class GitClient {
   show(fileRelativePath: string) {
     return fetch(
       `${this.baseUrl}/show/${encodeURIComponent(fileRelativePath)}`,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      }
+    ).then(response => {
+      return response.json()
+    })
+  }
+
+  /**
+   * Get information about a local branch by name, or the current branch if no
+   * name is specified.
+   */
+  branch(name?: string) {
+    return fetch(
+      `${this.baseUrl}/${name ? `branches/${name}` : 'branch'}`,
+      {
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+      }
+    ).then(response => {
+      return response.json()
+    })
+  }
+
+  /**
+   * Get a list of the names of all local branches.
+   */
+  branches() {
+    return fetch(
+      `${this.baseUrl}/branches`,
       {
         headers: {
           'Content-Type': 'application/json; charset=utf-8',

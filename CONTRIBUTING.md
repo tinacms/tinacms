@@ -1,13 +1,13 @@
 # Contributing to TinaCMS
 
-The following is a set of guidelines and tips for contributingto the TinaCMS and its packages.
+The following is a set of guidelines and tips for contributing to the TinaCMS and its packages.
 
 ## How to Contribute
 
 - **Reporting Bugs**
 - **Suggesting Enhancements**
 - **Writing Docs, Guides, or Blog Posts**
-- **Voluntering for User Testing**
+- **Volunteering for User Testing**
 
 ## Contributing Code
 
@@ -17,7 +17,7 @@ TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.
 
 ### Creating Packages
 
-Packages in Tina are organized according to ther name
+Packages in Tina are organized according to thier name
 
 | Type                    | Naming Convention  | Example Path            |
 | ----------------------- | ------------------ | ----------------------- |
@@ -38,7 +38,7 @@ This section contains solutions to various problems you may run into when develo
 ### I pulled down changes and now my packages won't build
 
 The links between the local packages may have been broken. If this is the problem, then
-running `npm run bootstrap` shoudl fix the issue.
+running `npm run bootstrap` should fix the issue.
 
 #### Example error message
 
@@ -83,8 +83,11 @@ The general release process looks like this:
 1. **Clean the CHANGELOGs**
 
    Lerna sometimes adds empty changelog entries. For example, if `react-tinacms` is changed
-   then `tinacms` will get get a patch update with only the dependency updated. The following
-   script removes those entries from the changelog:
+   then `tinacms` will get get a patch update with only the dependency updated. Make sure to install `lerna-clean-changelog-cli`:
+
+   ```
+   npm i -g lerna-clean-changelogs-cli
+   ```
 
 1. **Publish to NPM:**
 
@@ -111,23 +114,23 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-prerelease \
      --no-push \
-     --allow-branch master \
+     --allow-branch next \
      -m "chore(publish): prerelease"
    ```
 
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1. **Publish to NPM:**
    ```
-   lerna publish from-git --dist-tag next
+   lerna publish from-package --dist-tag next
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
-   git push
+   git push && git push --tags
    ```
 
 ### Graduating Prereleases
@@ -145,26 +148,25 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-graduate \
      --no-push \
-     --allow-branch master \
+     --allow-branch next \
      -m "chore(publish): graduation"
    ```
 
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
-   ``
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1) **Publish to NPM:**
 
    ```
-   lerna publish from-git
+   lerna publish from-package
    ```
 
 1) **Push CHANGELOGs and git tags to Github:**
    ```
-   git push
+   git push && git push --tags
    ```
 
 ### Release
@@ -188,16 +190,14 @@ The exact commands vary slightly depending on the type of release being made.
 1. **Clean the CHANGELOGs**
 
    ```
-   lcc **
-   ``
-
+   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1. **Publish to NPM:**
    ```
-   lerna publish from-git
+   lerna publish from-package
    ```
 1. **Push CHANGELOGs and git tags to Github:**
    ```
-   git push
+   git push && git push --tags
    ```
