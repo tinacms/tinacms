@@ -19,7 +19,6 @@ limitations under the License.
 import { FormOptions, Form, Field } from '@tinacms/core'
 import * as React from 'react'
 import { useCMS } from './use-cms'
-const get = require('lodash.get')
 
 interface WatchableFormValue {
   values: any
@@ -106,10 +105,6 @@ function updateFormLabel(label?: string, form?: Form) {
 function updateFormValues(values: any = {}, form?: Form) {
   React.useEffect(() => {
     if (!form || typeof values === 'undefined') return
-    form.finalForm.batch(() => {
-      form.inactiveFields.forEach(path => {
-        form.finalForm.change(path, get(values, path))
-      })
-    })
+    form.updateValues(values)
   }, [form, values])
 }
