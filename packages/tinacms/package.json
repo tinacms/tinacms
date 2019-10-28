@@ -47,10 +47,10 @@
     "react-datetime": "^2.16.3",
     "react-dismissible": "^1.0.10",
     "react-frame-component": "^4.1.1",
-    "react-tinacms": "^0.4.0",
-    "styled-components": "^4.3.2"
+    "react-tinacms": "^0.4.0"
   },
   "peerDependencies": {
-    "react": ">=16.8"
+    "react": ">=16.8",
+    "styled-components": ">=4.1"
   }
 }
