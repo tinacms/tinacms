@@ -18,6 +18,7 @@ limitations under the License.
 
 import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
+import { findInactiveFormFields } from './findInactiveFields'
 
 export interface FormOptions<S> extends Config<S> {
   id: any
@@ -178,5 +179,9 @@ export class Form<S = any> {
 
   get values() {
     return this.finalForm.getState().values
+  }
+
+  get inactiveFields() {
+    return findInactiveFormFields(this)
   }
 }

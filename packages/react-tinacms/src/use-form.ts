@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form, Field, findInactiveFormFields } from '@tinacms/core'
+import { FormOptions, Form, Field } from '@tinacms/core'
 import * as React from 'react'
 import { useCMS } from './use-cms'
 const get = require('lodash.get')
@@ -107,7 +107,7 @@ function updateFormValues(values: any = {}, form?: Form) {
   React.useEffect(() => {
     if (!form || typeof values === 'undefined') return
     form.finalForm.batch(() => {
-      findInactiveFormFields(form).forEach(path => {
+      form.inactiveFields.forEach(path => {
         form.finalForm.change(path, get(values, path))
       })
     })
