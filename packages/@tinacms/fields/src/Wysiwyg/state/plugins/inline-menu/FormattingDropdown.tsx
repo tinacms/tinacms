@@ -41,7 +41,8 @@ export class FormattingDropdown extends React.Component<any, State> {
     )
   lift = () => lift(this.props.view.state, this.props.view.dispatch)
   render() {
-    const { view } = this.props
+    const { bottom, view } = this.props
+    const { active } = this.state
     return (
       <div
         // className={c('headings-toggle', 'menu-control')}

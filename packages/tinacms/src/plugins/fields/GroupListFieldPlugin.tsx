@@ -21,16 +21,19 @@ import { Field, Form } from '@tinacms/core'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import {
+  padding,
   color,
   font,
   radius,
   IconButton,
+  Button,
 } from '@tinacms/styles'
-import { Droppable, Draggable } from 'react-beautiful-dnd'
+import { Droppable, DropResult, Draggable } from 'react-beautiful-dnd'
 import {
   AddIcon,
   DragIcon,
   ReorderIcon,
+  RightArrowIcon,
   TrashIcon,
   LeftArrowIcon,
 } from '@tinacms/icons'
@@ -77,6 +80,8 @@ const Group = function Group({
   form,
   field,
   input,
+  meta,
+  ...styleProps
 }: GroupProps) {
   const addItem = React.useCallback(() => {
     let obj = {}
@@ -108,7 +113,7 @@ const Group = function Group({
       <GroupListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
-            {(provider) => (
+            {(provider, snapshot) => (
               <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyState />}
                 {items.map((item: any, index: any) => (
