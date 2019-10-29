@@ -144,7 +144,7 @@ const linkify = function(fragment: Fragment): Fragment {
  * @param {Element} sibling
  */
 export function insertElBefore(element: Element, sibling: Element) {
-  if (!sibling.parentElement) throw new Error('Sibling must not be an orphan!');
+  // @ts-ignore
   sibling.parentElement.insertBefore(element, sibling)
 }
 

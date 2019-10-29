@@ -142,7 +142,8 @@ export function buildKeymap(schema: Schema, blockContent?: boolean) {
   if ((type = schema.nodes.hard_break)) {
     const br = type,
       cmd = chainCommands(exitCode, (state, dispatch) => {
-        dispatch!(state.tr.replaceSelectionWith(br.create()).scrollIntoView())
+        // @ts-ignore
+        dispatch(state.tr.replaceSelectionWith(br.create()).scrollIntoView())
         return true
       })
     if (!schema.nodes.paragraph) {
@@ -283,9 +284,11 @@ function arrowHandler(
 export function isListType(listType: NodeType) {
   return function(state: EditorState) {
     const { $from, $to } = state.selection
+    // @ts-ignore
     const range = $from.blockRange(
       $to,
-      node => !!(node.firstChild && node.firstChild.type == listType)
+      // @ts-ignore
+      node => node.childCount && node.firstChild.type == listType
     )
     return range && state.doc.child(range.start).type == listType
   }
@@ -296,11 +299,13 @@ export function isNotAList(state: EditorState) {
   const { $from, $to } = state.selection
   const range = $from.blockRange(
     $to,
-    node => !!(
-      node.firstChild &&
+    // @ts-ignore
+    node =>
+      node.childCount &&
+      // @ts-ignore
       (node.firstChild.type == ordered_list ||
+        // @ts-ignore
         node.firstChild.type == bullet_list)
-    )
   )
   return (
     range &&
@@ -313,9 +318,11 @@ export function switchListType(listType: NodeType) {
   return function(state: EditorState, dispatch: any) {
     const itemType = state.schema.nodes.list_item
     const { $from, $to } = state.selection
+    // @ts-ignore
     const range = $from.blockRange(
       $to,
-      node => !!(node.firstChild && node.firstChild.type == itemType)
+      // @ts-ignore
+      node => node.childCount && node.firstChild.type == itemType
     )
     if (!range) return false
     if (!dispatch) return true

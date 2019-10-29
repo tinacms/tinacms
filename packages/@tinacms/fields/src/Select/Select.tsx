@@ -64,7 +64,7 @@ const customStyles: Styles = {
     ...provided,
     cursor: 'pointer',
   }),
-  multiValue: (provided) => ({
+  multiValue: (provided, state) => ({
     ...provided,
     borderRadius: 4.8,
     backgroundColor: '#f3f3f3',
@@ -101,9 +101,8 @@ const clearIndicatorStyle = {
 }
 
 const DropdownIndicator = (props: any) => {
-  if (!components.DropdownIndicator) return null;
-
   return (
+    // @ts-ignore
     <components.DropdownIndicator {...props}>
       <ChevronDownIcon />
     </components.DropdownIndicator>
@@ -137,7 +136,7 @@ type Omit<T, K extends keyof T> = Pick<T, Exclude<keyof T, K>>
 
 interface Option {
   label: string
-  value: string
+  value: string | number
 }
 
 interface SelectProps
@@ -184,13 +183,9 @@ export function Select(props: SelectProps) {
    * Calls the `onChange` prop with `option.value`.
    */
   const onChange = useCallback(
-    (option: Option | ReadonlyArray<Option> | null | undefined) => {
+    (option?: Option) => {
       if (!option) return props.onChange('')
-      if (Array.isArray(option)) {
-        return props.onChange(option[0] ? option[0].value as string : '')
-      }
-
-      props.onChange((option as Option).value)
+      return (props.onChange as any)(option.value as any)
     },
     [props]
   )
@@ -208,7 +203,7 @@ export function Select(props: SelectProps) {
         // If the select isClearable
         // and the value is not empty
         // then clear the value
-        if (props.value) onChange(null)
+        if (props.value) onChange()
       } else {
         // otherwise set it to the first option (doesn't matter if it exists)
         onChange(options[0])
@@ -232,6 +227,7 @@ export function Select(props: SelectProps) {
       {...props}
       options={options}
       value={selectedOption}
+      // @ts-ignore
       onChange={onChange}
       components={{
         ClearIndicator,

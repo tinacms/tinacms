@@ -23,9 +23,12 @@ import { EditorView } from 'prosemirror-view'
 import { Plugin } from 'prosemirror-state'
 import { Translator } from '../../../Translator'
 import { TranslatorContext } from './TranslatorContext'
+import styled from 'styled-components'
 
+// @ts-ignore TODO: add to package.json
+import { FrameContext } from 'react-frame-component'
 import { StyleSheetManager } from 'styled-components'
-import { FC } from 'react'
+import { useContext, FC } from 'react'
 
 export class MenuView {
   dom: HTMLElement

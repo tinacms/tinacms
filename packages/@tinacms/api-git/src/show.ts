@@ -26,7 +26,7 @@ export interface ShowConfig {
 }
 
 export async function show({ pathRoot, fileRelativePath }: ShowConfig) {
-  const repo = openRepo(pathRoot)
+  let repo = openRepo(pathRoot)
 
   try {
     return await repo.show([`HEAD:${fileRelativePath}`])
