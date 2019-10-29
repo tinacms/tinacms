@@ -182,12 +182,16 @@ function fileNeedsLicense(filepath: string) {
  *
  */
 function checkFileForLicenseHeader(filepath: string) {
-  let content = fs.readFileSync(path.resolve(`./${filepath}`), {
-    encoding: 'utf8',
-  })
+  try {
+    let content = fs.readFileSync(path.resolve(`./${filepath}`), {
+      encoding: 'utf8',
+    })
 
-  if (isMissingHeader(content)) {
-    fail(`${filepath} is missing the license header`)
+    if (isMissingHeader(content)) {
+      fail(`${filepath} is missing the license header`)
+    }
+  } catch {
+    // The file was deleted. That's okay.
   }
 }
 
