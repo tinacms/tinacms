@@ -17,17 +17,13 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { EditorView, NodeView } from 'prosemirror-view'
+import { EditorView } from 'prosemirror-view'
 import { Plugin } from '@tinacms/core'
 
 import { createEditorState } from './state'
 import { useProsemirrorSchema } from './useProsemirrorSchema'
 import { useMarkdownTranslator } from './useMarkdownTranslator'
 import { nodeViews } from './node-views'
-
-interface CheckableEditorView extends EditorView {
-  docView: NodeView | null,
-}
 
 export interface Input {
   value: string
@@ -131,7 +127,8 @@ export function useTinaProsemirror(
      */
     if (!el) return
     if (!editorView) return
-    if (!(editorView as CheckableEditorView).docView) return
+    // @ts-ignore
+    if (!editorView.docView) return
 
     const doc = frame ? frame.document : document
     const wysiwygIsActive = el.contains(doc.activeElement)

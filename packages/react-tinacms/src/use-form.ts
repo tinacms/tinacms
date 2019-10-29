@@ -31,24 +31,13 @@ export function useCMSForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
-  /**
-   * We're returning early here which means all the hooks called by this hook
-   * violate the rules of hooks. In the case of the check for
-   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
-   * will never change at runtime.
-   */
   if (process.env.NODE_ENV === 'production') {
     return [options.initialValues, undefined]
   }
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [form, setForm] = React.useState<Form | undefined>()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, setValues] = React.useState(options.initialValues)
+  const [_, setValues] = React.useState(options.initialValues)
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   React.useEffect(
     function createForm() {
       if (!options.initialValues) return
@@ -71,12 +60,9 @@ export function useCMSForm<FormShape = any>(
     [options.id, !!options.initialValues]
   )
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useUpdateFormFields(watch.fields, form)
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useUpdateFormLabel(watch.label, form)
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useUpdateFormValues(watch.values, form)
+  updateFormFields(watch.fields, form)
+  updateFormLabel(watch.label, form)
+  updateFormValues(watch.values, form)
 
   return [form ? form.values : options.initialValues, form]
 }
@@ -87,7 +73,7 @@ export function useCMSForm<FormShape = any>(
  * This hook is useful when dynamically creating fields, or updating
  * them via hot module replacement.
  */
-function useUpdateFormFields(fields?: Field[], form?: Form) {
+function updateFormFields(fields?: Field[], form?: Form) {
   React.useEffect(() => {
     if (!form || typeof fields === 'undefined') return
     form.updateFields(fields)
@@ -100,7 +86,7 @@ function useUpdateFormFields(fields?: Field[], form?: Form) {
  * This hook is useful when dynamically creating creating the label,
  * or updating it via hot module replacement.
  */
-function useUpdateFormLabel(label?: string, form?: Form) {
+function updateFormLabel(label?: string, form?: Form) {
   React.useEffect(() => {
     if (!form || typeof label === 'undefined') return
     form.label = label
@@ -117,7 +103,7 @@ function useUpdateFormLabel(label?: string, form?: Form) {
  *
  * This hook is useful when the form must be kept in sync with the data source.
  */
-function useUpdateFormValues(values: any = {}, form?: Form) {
+function updateFormValues(values: any = {}, form?: Form) {
   React.useEffect(() => {
     if (!form || typeof values === 'undefined') return
     form.finalForm.batch(() => {
@@ -135,7 +121,7 @@ export function findInactiveFormFields(form: Form) {
   const declaredFields = Object.entries(form.fieldSubscriptions)
   const allFields = hiddenFields.concat(declaredFields)
 
-  allFields.forEach(([path]) => {
+  allFields.forEach(([path, field]) => {
     pathsToUpdate = pathsToUpdate.concat(findInactiveFieldsInPath(form, path))
   })
   return pathsToUpdate

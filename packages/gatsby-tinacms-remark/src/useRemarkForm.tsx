@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions } from '@tinacms/core'
+import { FormOptions, Form } from '@tinacms/core'
 import { ActionButton } from 'tinacms'
 import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import {
@@ -32,22 +32,15 @@ import * as React from 'react'
 const matter = require('gray-matter')
 
 export function useRemarkForm(
-  markdownRemark: RemarkNode | null | undefined,
+  markdownRemark: RemarkNode,
   formOverrrides: Partial<FormOptions<any>> = {}
 ) {
-  /**
-   * We're returning early here which means all the hooks called by this hook
-   * violate the rules of hooks. In the case of the check for
-   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
-   * will never change at runtime.
-   */
   if (!markdownRemark || process.env.NODE_ENV === 'production') {
     return [markdownRemark, null]
   }
 
   validateMarkdownRemark(markdownRemark)
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
   const label = formOverrrides.label || markdownRemark.frontmatter.title
   const id = markdownRemark.fileRelativePath
@@ -57,7 +50,6 @@ export function useRemarkForm(
    * Markdown file currently on disk. This state will contain any
    * un-committed changes in the Markdown file.
    */
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
       fileRelativePath: markdownRemark.fileRelativePath,
@@ -72,15 +64,13 @@ export function useRemarkForm(
    * The state of the RemarkForm, generated from the contents of the
    * Markdown file at the HEAD of this git branch.
    */
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [valuesInGit, setValuesInGit] = React.useState()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   React.useEffect(() => {
     cms.api.git
       .show(id) // Load the contents of this file at HEAD
       .then((git: any) => {
         // Parse the content into the RemarkForm data structure and store it in state.
-        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
+        let { content: rawMarkdownBody, data: rawFrontmatter } = matter(
           git.content
         )
         setValuesInGit({ ...valuesOnDisk, rawFrontmatter, rawMarkdownBody })
@@ -93,7 +83,6 @@ export function useRemarkForm(
   /**
    * The list of Field definitions used to generate the form.
    */
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const fields = React.useMemo(() => {
     let fields = formOverrrides.fields || generateFields(valuesOnDisk)
     fields = fields.map(field => {
@@ -116,8 +105,7 @@ export function useRemarkForm(
     return fields
   }, [formOverrrides.fields])
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useCMSForm(
+  const [values, form] = useCMSForm(
     {
       label,
       id,
@@ -145,6 +133,7 @@ export function useRemarkForm(
               ) {
                 return
               }
+              // @ts-ignore
               await cms.api.git.onDelete!({
                 relPath: markdownRemark.fileRelativePath,
               })
@@ -165,15 +154,13 @@ export function useRemarkForm(
     }
   )
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const writeToDisk = React.useCallback(formState => {
+  let writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
       content: toMarkdownString(formState.values),
     })
   }, [])
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useWatchFormValues(form, writeToDisk)
 
   return [markdownRemark, form]

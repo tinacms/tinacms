@@ -61,8 +61,8 @@ export class LinkView {
       e.preventDefault()
       e.stopPropagation()
       if (e.metaKey) {
-        const href = clickedLink.getAttribute('href');
-        window.open(href ? href : undefined, '_blank')
+        // @ts-ignore
+        window.open(clickedLink.getAttribute('href'), '_blank')
       } else {
         startEditingLink(this.view.state, this.view.dispatch)
       }
