@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import '@tinacms/fields/node_modules/@tinacms/styles'
-import styled, { keyframes } from 'styled-components'
+import styled, { keyframes, StyledComponent } from 'styled-components'
 import { radius } from '@tinacms/styles'
 
 const ModalPopupKeyframes = keyframes`
@@ -32,7 +32,7 @@ const ModalPopupKeyframes = keyframes`
   }
 `
 
-export const ModalPopup = styled.div`
+export const ModalPopup: StyledComponent<'div', {}, {}> = styled.div`
   display: block;
   z-index: 1;
   overflow: visible; /* Keep this as "visible", select component needs to overflow */

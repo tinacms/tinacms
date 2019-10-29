@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled, { css, StyledComponent } from 'styled-components'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { padding, color, radius, font, shadow } from '@tinacms/styles'
 import '@tinacms/fields/node_modules/@tinacms/styles'
@@ -105,7 +105,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
     `};
 `
 
-export const ActionButton = styled.button`
+export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};

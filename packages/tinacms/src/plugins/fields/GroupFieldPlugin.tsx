@@ -19,7 +19,7 @@ limitations under the License.
 import '@tinacms/fields/node_modules/@tinacms/styles'
 import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
-import styled, { keyframes, css } from 'styled-components'
+import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { color, radius, font } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
@@ -99,7 +99,7 @@ const Label = function(field: GroupFieldDefinititon) {
   return <GroupLabel>{field.label || field.name}</GroupLabel>
 }
 
-const Header = styled.div`
+const Header: StyledComponent<'div', {}, {}> = styled.div`
   position: relative;
   cursor: pointer;
   display: flex;
@@ -129,7 +129,7 @@ const Header = styled.div`
   }
 `
 
-export const PanelHeader = styled(Header)`
+export const PanelHeader: StyledComponent<typeof Header, {}, {}> = styled(Header)`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
