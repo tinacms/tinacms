@@ -19,7 +19,7 @@ limitations under the License.
 import { Token } from '../types'
 import { Schema, Mark, Node } from 'prosemirror-model'
 import { MarkdownSerializerState, Nodes } from '../to_markdown'
-
+// @ts-ignore
 const get = require('lodash.get')
 interface Hash<T> {
   [key: string]: T
@@ -117,10 +117,12 @@ const TOKENS = {
 
 const NODES: Nodes = {
   blockquote(state: MarkdownSerializerState, node: Node) {
+    // @ts-ignore
     state.wrapBlock('> ', null, node, () => state.renderContent(node))
   },
   code_block(state: MarkdownSerializerState, node: Node) {
     if (!node.attrs.params) {
+      // @ts-ignore
       state.wrapBlock('    ', null, node, () =>
         state.text(node.textContent, false)
       )
@@ -163,11 +165,12 @@ const NODES: Nodes = {
     state.renderContent(node)
   },
 
+  // @ts-ignore
   paragraph(
     state: MarkdownSerializerState,
     node: Node,
-    _parent?: Node,
-    _index?: number
+    _parent: Node,
+    _index: number
   ) {
     state.renderInline(node)
     state.closeBlock(node)
@@ -184,13 +187,13 @@ const NODES: Nodes = {
     state.write(`![${alt}](${src}${title}${size})`)
   },
 
+  // @ts-ignore
   hard_break(
     state: MarkdownSerializerState,
     node: Node,
-    parent?: Node,
-    index?: number
+    parent: Node,
+    index: number
   ) {
-    if (!parent || typeof index !== 'number') return;
     for (let i = index + 1; i < parent.childCount; i++)
       if (parent.child(i).type != node.type) {
         state.write('  \n')
@@ -198,7 +201,7 @@ const NODES: Nodes = {
       }
   },
   text(state: MarkdownSerializerState, node: Node) {
-    if (typeof node.text !== 'string') return
+    // @ts-ignore
     state.text(node.text)
   },
   table(state: MarkdownSerializerState, node: Node) {
@@ -264,21 +267,24 @@ const MARKS = {
     open(
       _state: MarkdownSerializerState,
       mark: Mark & { openedWith: string },
-      node: Node | null
+      node?: Node
     ) {
+      // @ts-ignore
       if (get(node, 'text', '').endsWith('*')) return (mark.openedWith = '__')
       return '**'
     },
     close(
       _state: MarkdownSerializerState,
-      mark: Mark & { openedWith: string | null },
-      node: Node | null
+      mark: Mark & { openedWith: string },
+      node?: Node
     ) {
       if (mark.openedWith) {
         const closeWith = mark.openedWith
+        // @ts-ignore
         mark.openedWith = null
         return closeWith
       }
+      // @ts-ignore
       if (get(node, 'text', '').endsWith('*')) return '__'
       return '**'
     },

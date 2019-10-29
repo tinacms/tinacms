@@ -19,7 +19,9 @@ limitations under the License.
 import { Plugin } from '@tinacms/core'
 import { Schema } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
+// @ts-ignore
 import { dropCursor } from 'prosemirror-dropcursor'
+// @ts-ignore
 import { gapCursor } from 'prosemirror-gapcursor'
 import { history } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
@@ -27,6 +29,7 @@ import { keymap } from 'prosemirror-keymap'
 import { inputRules } from './plugins/input-rules'
 import { Translator } from '../Translator'
 import { menu } from './plugins/Menu'
+import { KEYMAP_PLUGINS } from '../plugins/keymap'
 import { buildKeymap } from './buildKeymap'
 import { links } from './plugins/links'
 

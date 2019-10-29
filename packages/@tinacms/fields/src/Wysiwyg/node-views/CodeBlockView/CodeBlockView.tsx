@@ -129,6 +129,8 @@ export class CodeBlockView implements NodeView {
    * Creates a new instance of CodeMirror from a ProseMirror Node
    */
   setupCodeMirror(node: Node): CodeMirrorEditor {
+    // TODO: Look into this.
+    // @ts-ignore Apparently this is invalid but it works?
     return CodeMirror(null, {
       value: node.textContent,
       lineNumbers: true,
