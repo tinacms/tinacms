@@ -38,6 +38,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.3.0",
-    "react-tinacms": "^0.5.0"
+    "react-tinacms": "^0.5.0",
+    "tinacms": "^0.5.0"
   }
 }

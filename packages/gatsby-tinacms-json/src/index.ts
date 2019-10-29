@@ -21,6 +21,8 @@ import { Form, FormOptions, Field } from '@tinacms/core'
 import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import { useMemo, useCallback, useState, useEffect } from 'react'
 
+export * from './create-json-plugin'
+
 interface JsonNode {
   id: string
   rawJson: string
