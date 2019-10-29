@@ -19,8 +19,8 @@ limitations under the License.
 import { TinaCMS } from '../tina-cms'
 import { Field, Plugin } from '@tinacms/core'
 
-export interface AddContentPlugin extends Plugin {
+export interface AddContentPlugin<FormShape> extends Plugin {
   __type: 'content-button'
-  onSubmit(value: string, cms: TinaCMS): Promise<void> | void
+  onSubmit(value: FormShape, cms: TinaCMS): Promise<void> | void
   fields: Field[]
 }
