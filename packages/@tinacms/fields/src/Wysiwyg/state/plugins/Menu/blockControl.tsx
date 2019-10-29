@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
+import styled from 'styled-components'
 import { MenuOption } from './Menu'
 
 interface BlockTool {
