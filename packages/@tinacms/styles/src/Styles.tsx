@@ -144,7 +144,7 @@ export const DefaultTheme: Theme = {
 
 /* Color Helpers */
 const tinacms = (props: ThemeProps): Theme => {
-  let tina = props.theme.tinacms
+  const tina = props.theme.tinacms
   return tina || DefaultTheme
 }
 

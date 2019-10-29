@@ -144,7 +144,7 @@ export class MarkdownSerializerState {
   // line in `firstDelim`. `node` should be the node that is closed at
   // the end of the block, and `f` is a function that renders the
   // content of the block.
-  wrapBlock(delim: string, firstDelim: string, node: Node, f: Function) {
+  wrapBlock(delim: string, firstDelim: string | null, node: Node, f: Function) {
     const old = this.delim
     this.write(firstDelim || delim)
     this.delim += delim
@@ -208,8 +208,8 @@ export class MarkdownSerializerState {
   // :: (Node)
   // Render the contents of `parent` as inline content.
   renderInline(parent: Node) {
-    let active: any[] = [],
-      trailing = ''
+    const active: any[] = []
+    let  trailing = ''
     const progress = (node: Node | null, _?: any, index: number = 0) => {
       let marks = node ? node.marks : []
 
@@ -226,9 +226,7 @@ export class MarkdownSerializerState {
         }) &&
         /^(\s*)(.*?)(\s*)$/.test(node.text || '') // Todo: Don't duplicate this check.
       ) {
-        // @ts-ignore
-        // eslint-disable-next-line @typescript-eslint/no-unused-vars
-        const [_, lead, inner, trail] = /^(\s*)(.*?)(\s*)$/.exec(node.text)
+        const [, lead, inner, trail] = Array.from(/^(\s*)(.*?)(\s*)$/.exec(node.text || '') || [])
         leading += lead
         trailing = trail
         if (lead || trail) {
