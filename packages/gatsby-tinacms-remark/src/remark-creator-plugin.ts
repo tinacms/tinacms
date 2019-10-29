@@ -42,10 +42,10 @@ const MISSING_FIELDS_MESSAGE =
 export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
   options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
 ): AddContentPlugin<FormShape> {
-  return new CreateRemarkPlugin<FormShape, FrontmatterShape>(options)
+  return new RemarkCreatorPlugin<FormShape, FrontmatterShape>(options)
 }
 
-export class CreateRemarkPlugin<FormShape = any, FrontmatterShape = any>
+export class RemarkCreatorPlugin<FormShape = any, FrontmatterShape = any>
   implements AddContentPlugin<FormShape> {
   __type: 'content-button' = 'content-button'
   name: AddContentPlugin<FormShape>['name']
