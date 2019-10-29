@@ -15,10 +15,11 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-const { GraphQLString } = require("gatsby/graphql")
+const { GraphQLString } = require("gatsby/graphql");
+const slash = require("slash");
 
 exports.setFieldsOnGraphQLNodeType = ({ type }) => {
-  const pathRoot = process.cwd()
+  const pathRoot = slash(process.cwd());
   if (type.name === `MarkdownRemark`) {
     return {
       rawFrontmatter: {
