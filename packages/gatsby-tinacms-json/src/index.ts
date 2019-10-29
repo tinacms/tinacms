@@ -15,13 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-// TODO: Move to `use-json-form.ts`
 import { Form, FormOptions, Field } from '@tinacms/core'
 import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import { useMemo, useCallback, useState, useEffect } from 'react'
-
-export * from './create-json-plugin'
 
 interface JsonNode {
   id: string
@@ -134,5 +130,28 @@ export function JsonForm({ data, render, ...options }: JsonFormProps) {
 }
 
 function validateJsonNode(jsonNode: JsonNode) {
-  // TODO
+  if (typeof jsonNode.fileRelativePath === 'undefined') {
+    throw new Error(ERROR_MISSING_REMARK_PATH)
+  }
+
+  if (typeof jsonNode.rawJson === 'undefined') {
+    throw new Error(ERROR_MISSING_RAW_JSON)
+  }
 }
+
+export const ERROR_MISSING_REMARK_PATH =
+  'useJsonForm(jsonNode) Required attribute `fileRelativePath` was not found on the `jsonNode`.' +
+  `
+
+1. Check if the \`gatsby-tinacms-json\` was added to the \`gatsby-config.js\`.
+2. Check if the \`fileRelativePath\` attribute is included in the GraphQL query.
+
+  `
+
+export const ERROR_MISSING_RAW_JSON =
+  'useJsonForm(jsonNode) Required attribute `rawJson` was not found on the `jsonNode`.' +
+  `
+
+1. Check if the \`gatsby-tinacms-json\` was added to the \`gatsby-config.js\`.
+2. Check if the \`rawJson\` attribute is included in the GraphQL query.
+`
