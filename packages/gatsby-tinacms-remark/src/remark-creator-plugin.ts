@@ -16,35 +16,47 @@ limitations under the License.
 
 */
 
-import { CMS, Field } from '@tinacms/core'
+import { toMarkdownString } from './to-markdown'
+import { CMS, Field, Form } from '@tinacms/core'
 import { AddContentPlugin } from 'tinacms'
 
 type MaybePromise<T> = Promise<T> | T
 
-interface CreateJsonButtonOptions<FormShape, JsonShape> {
+interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
   label: string
   fields: Field[]
   filename(form: FormShape): MaybePromise<string>
-  data?(form: FormShape): MaybePromise<JsonShape>
+  frontmatter?(form: FormShape): MaybePromise<FrontmatterShape>
+  body?(form: FormShape): MaybePromise<string>
 }
 
 const MISSING_FILENAME_MESSAGE =
-  'createJsonButton must be given `filename(form): string`'
-
+  'createRemarkButton must be given `filename(form): string`'
 const MISSING_FIELDS_MESSAGE =
-  'createJsonButton must be given `fields: Field[]` with at least 1 item'
+  'createRemarkButton must be given `fields: Field[]` with at least 1 item'
 
-export class CreateJsonPlugin<FormShape = any, FrontmatterShape = any>
+/**
+ *
+ * @deprecated in favour of calling `CreateRemarkPlugin` class directly.
+ */
+export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
+  options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>
+): AddContentPlugin<FormShape> {
+  return new RemarkCreatorPlugin<FormShape, FrontmatterShape>(options)
+}
+
+export class RemarkCreatorPlugin<FormShape = any, FrontmatterShape = any>
   implements AddContentPlugin<FormShape> {
   __type: 'content-button' = 'content-button'
   name: AddContentPlugin<FormShape>['name']
   fields: AddContentPlugin<FormShape>['fields']
 
-  // Json Specific
+  // Remark Specific
   filename: (form: FormShape) => MaybePromise<string>
-  data: (form: FormShape) => MaybePromise<FrontmatterShape>
+  frontmatter: (form: FormShape) => MaybePromise<FrontmatterShape>
+  body: (form: any) => MaybePromise<string>
 
-  constructor(options: CreateJsonButtonOptions<FormShape, FrontmatterShape>) {
+  constructor(options: CreateRemarkButtonOptions<FormShape, FrontmatterShape>) {
     if (!options.filename) {
       console.error(MISSING_FILENAME_MESSAGE)
       throw new Error(MISSING_FILENAME_MESSAGE)
@@ -58,17 +70,22 @@ export class CreateJsonPlugin<FormShape = any, FrontmatterShape = any>
     this.name = options.label
     this.fields = options.fields
     this.filename = options.filename
-    this.data = options.data || (() => ({} as FrontmatterShape))
+    this.frontmatter = options.frontmatter || (() => ({} as FrontmatterShape))
+    this.body = options.body || (() => '')
   }
 
-  // @ts-ignore will be fixed once AddContentPlugin is generic
   async onSubmit(form: FormShape, cms: CMS) {
     const fileRelativePath = await this.filename(form)
-    const content = await this.data(form)
+    const rawFrontmatter = await this.frontmatter(form)
+    const rawMarkdownBody = await this.body(form)
 
     cms.api.git!.onChange!({
       fileRelativePath,
-      content: JSON.stringify(content, null, 2),
+      content: toMarkdownString({
+        fileRelativePath,
+        rawFrontmatter,
+        rawMarkdownBody,
+      }),
     })
   }
 }
