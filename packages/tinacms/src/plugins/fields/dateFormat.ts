@@ -1,12 +1,11 @@
-import * as _moment from 'moment'
+import moment from 'moment'
 import { DatetimepickerProps } from 'react-datetime'
-const moment = _moment //https://github.com/jvandemo/generator-angular2-library/issues/221#issuecomment-355945207
 
 const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY'
 
 // Format date for display
 export const format = (
-  val: _moment.Moment | string,
+  val: moment.Moment | string,
   _name: string,
   field: DatetimepickerProps
 ): string => {
@@ -24,7 +23,7 @@ export const format = (
 
 // Format datepicker value for export
 export const parse = (
-  val: _moment.Moment | string,
+  val: moment.Moment | string,
   _name: string,
   field: DatetimepickerProps
 ) => {
