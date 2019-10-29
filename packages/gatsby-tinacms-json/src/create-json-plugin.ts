@@ -34,7 +34,7 @@ const MISSING_FILENAME_MESSAGE =
 const MISSING_FIELDS_MESSAGE =
   'createJsonButton must be given `fields: Field[]` with at least 1 item'
 
-export class CreateJsonPlugin<FormShape = any, FrontmatterShape = any>
+export class JsonCreatorPlugin<FormShape = any, FrontmatterShape = any>
   implements AddContentPlugin<FormShape> {
   __type: 'content-button' = 'content-button'
   name: AddContentPlugin<FormShape>['name']
