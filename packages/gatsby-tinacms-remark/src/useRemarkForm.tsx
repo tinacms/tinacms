@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions } from '@tinacms/core'
+import { FormOptions, Form } from '@tinacms/core'
 import { ActionButton } from 'tinacms'
 import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import {
@@ -34,7 +34,7 @@ const matter = require('gray-matter')
 export function useRemarkForm(
   markdownRemark: RemarkNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
-) {
+): [RemarkNode | null | undefined, Form | string | null | undefined] {
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks. In the case of the check for
