@@ -23,7 +23,7 @@ import '@tinacms/fields/node_modules/@tinacms/styles'
 import { useCMS, useSubscribable } from 'react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
-import styled, { keyframes, css } from 'styled-components'
+import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import {
   Button,
   padding,
@@ -318,7 +318,7 @@ const FormHeader = styled(
   }
 `
 
-export const FormBody = styled.div`
+export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   position: relative;
   flex: 1 1 auto;
   display: flex;
@@ -392,7 +392,7 @@ const FormWrapper = styled.div<FormWrapperProps>`
     `};
 `
 
-export const SaveButton = styled(Button)`
+export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(Button)`
   flex: 1.5 0 auto;
   padding: 0.75rem 1.5rem;
 `
