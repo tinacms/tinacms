@@ -39,7 +39,6 @@ export async function commit({
   push,
 }: CommitOptions) {
   let options
-
   if (email) {
     options = {
       '--author': `"${name || email} <${email}>"`,
@@ -47,7 +46,8 @@ export async function commit({
   }
 
   const repo = openRepo(pathRoot)
-  await repo.add(...files)
-  const commitResult = await repo.commit(message, ...files, options)
-  return push ? await repo.push() : commitResult;
+
+  await repo.add(files)
+  const commitResult = await repo.commit(message, files, options)
+  return push ? await repo.push() : commitResult
 }
