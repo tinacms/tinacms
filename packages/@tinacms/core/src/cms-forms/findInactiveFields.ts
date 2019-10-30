@@ -58,6 +58,7 @@ export function findInactiveFormFields(form: Form) {
  *  'authors.0.books.1.title',
  * ]
  * ```
+ *
  */
 export function findInactiveFieldsInPath(form: Form, path: string) {
   let pathsToUpdate: string[] = []
