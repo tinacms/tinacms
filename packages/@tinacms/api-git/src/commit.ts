@@ -38,14 +38,16 @@ export async function commit({
   pathRoot,
   push,
 }: CommitOptions) {
+  const repo = openRepo(pathRoot)
+
   let options
   if (email) {
     options = {
       '--author': `"${name || email} <${email}>"`,
     }
+    repo.addConfig('user.name', name || email)
+    repo.addConfig('user.email', email)
   }
-
-  const repo = openRepo(pathRoot)
 
   await repo.add(files)
   const commitResult = await repo.commit(message, files, options)
