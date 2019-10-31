@@ -39,7 +39,6 @@ export async function commit({
   push,
 }: CommitOptions) {
   let options
-
   if (email) {
     options = {
       '--author': `"${name || email} <${email}>"`,
@@ -47,7 +46,10 @@ export async function commit({
   }
 
   const repo = openRepo(pathRoot)
-  await repo.add(...files)
-  const commitResult = await repo.commit(message, ...files, options)
-  return push ? await repo.push() : commitResult;
+
+  const branchName = await repo.revparse('--abbrev-ref HEAD')
+
+  await repo.add(files)
+  const commitResult = await repo.commit(message, files, options)
+  return push ? await repo.push(['-u', 'origin', branchName]) : commitResult
 }

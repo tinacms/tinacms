@@ -16,8 +16,11 @@ limitations under the License.
 
 */
 
-import { Form, Field } from '@tinacms/core'
-import { findInactiveFieldsInPath, findInactiveFormFields } from './use-form'
+import { Form, Field } from './form'
+import {
+  findInactiveFieldsInPath,
+  findInactiveFormFields,
+} from './findInactiveFields'
 
 function makeForm(initialValues: any, fields: Field[]) {
   return new Form({
@@ -100,7 +103,9 @@ describe('findInactiveFormFields', () => {
 })
 describe('findInactiveFieldsInPath', () => {
   describe('a form with a "name" text field', () => {
-    const form = makeForm({ name: 'test' }, [{ name: 'name', component: 'text' }])
+    const form = makeForm({ name: 'test' }, [
+      { name: 'name', component: 'text' },
+    ])
 
     describe('given the "name" path', () => {
       it('returns only that field', () => {
@@ -176,7 +181,9 @@ describe('findInactiveFieldsInPath', () => {
   })
 
   it('authors.INDEX.books.INDEX.title | 1 author 2 books', () => {
-    const data = { authors: [{ books: [{ title: 'what' }, { title: 'what' }] }] }
+    const data = {
+      authors: [{ books: [{ title: 'what' }, { title: 'what' }] }],
+    }
 
     const form = makeForm(data, [
       {
@@ -192,7 +199,10 @@ describe('findInactiveFieldsInPath', () => {
       },
     ])
 
-    const inactiveFields = ['authors.0.books.0.title', 'authors.0.books.1.title']
+    const inactiveFields = [
+      'authors.0.books.0.title',
+      'authors.0.books.1.title',
+    ]
 
     expect(
       findInactiveFieldsInPath(form, 'authors.INDEX.books.INDEX.title')
