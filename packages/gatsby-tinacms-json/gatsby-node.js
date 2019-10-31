@@ -16,10 +16,9 @@ limitations under the License.
 
 */
 
-// @ts-ignore
-import { GraphQLString } from 'gatsby/graphql'
+const { GraphQLString } = require('gatsby/graphql')
 
-exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
+exports.setFieldsOnGraphQLNodeType = ({ type, getNode }) => {
   const pathRoot = process.cwd()
 
   if (!/.*Json$/.test(type.name)) {
@@ -30,14 +29,14 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNode }: any) => {
     rawJson: {
       type: GraphQLString,
       args: {},
-      resolve: ({ children, id, internal, parent, ...data }: any) => {
+      resolve: ({ children, id, internal, parent, ...data }) => {
         return JSON.stringify(data)
       },
     },
     fileRelativePath: {
       type: GraphQLString,
       args: {},
-      resolve: ({ children, id, internal, parent, ...data }: any) => {
+      resolve: ({ parent }) => {
         const p = getNode(parent)
 
         return p.absolutePath.replace(pathRoot, '')

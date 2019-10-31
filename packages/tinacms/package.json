@@ -33,6 +33,7 @@
     "@types/lodash.merge": "^4.6.6",
     "@types/react-beautiful-dnd": "^11.0.3",
     "@types/styled-components": "4.1.8",
+    "styled-components": ">=4.1",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
@@ -48,8 +49,7 @@
     "react-datetime": "^2.16.3",
     "react-dismissible": "^1.0.11",
     "react-frame-component": "^4.1.1",
-    "react-tinacms": "^0.5.0",
-    "styled-components": "^4.3.2"
+    "react-tinacms": "^0.5.0"
   },
   "peerDependencies": {
     "react": ">=16.8",
