@@ -1,6 +1,6 @@
 # TinaCMS
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-25-orange.svg?style=flat-square)](#contributors)
+[![All Contributors](https://img.shields.io/badge/all_contributors-26-orange.svg?style=flat-square)](#contributors)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
@@ -82,8 +82,7 @@ With this process:
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
+<!-- prettier-ignore -->
 <table>
   <tr>
     <td align="center"><a href="https://forestry.io"><img src="https://avatars3.githubusercontent.com/u/16868456?v=4" width="100px;" alt="Forestry.io"/><br /><sub><b>Forestry.io</b></sub></a><br /><a href="#financial-forestryio" title="Financial">💵</a></td>
@@ -117,11 +116,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/bolariin"><img src="https://avatars1.githubusercontent.com/u/24629960?v=4" width="100px;" alt="Bolarinwa Balogun"/><br /><sub><b>Bolarinwa Balogun</b></sub></a><br /><a href="#infra-bolariin" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="http://metamas.com"><img src="https://avatars2.githubusercontent.com/u/2520253?v=4" width="100px;" alt="Mason Medeiros"/><br /><sub><b>Mason Medeiros</b></sub></a><br /><a href="#userTesting-metamas" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/IronSean"><img src="https://avatars3.githubusercontent.com/u/1960190?v=4" width="100px;" alt="ironsean"/><br /><sub><b>ironsean</b></sub></a><br /><a href="#userTesting-IronSean" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/kypp"><img src="https://avatars1.githubusercontent.com/u/4457071?v=4" width="100px;" alt="kyp"/><br /><sub><b>kyp</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Akypp" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
-<!-- markdownlint-enable -->
-<!-- prettier-ignore-end -->
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
