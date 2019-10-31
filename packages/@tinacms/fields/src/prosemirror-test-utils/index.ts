@@ -23,7 +23,7 @@ interface Dispatch {
   (tr: Transaction): void
 }
 
-interface Command {
+export interface Command {
   (state: EditorState, dispatch: Dispatch | null, ...args: any[]): boolean | Transaction | null
 }
 

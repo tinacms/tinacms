@@ -17,8 +17,11 @@ limitations under the License.
 */
 
 import { EditorState } from "prosemirror-state"
+import { EditorView } from 'prosemirror-view'
 
-export function insertImage(state: EditorState, dispatch: Function, src: string) {
+type Dispatch = typeof EditorView.prototype.dispatch;
+
+export function insertImage(state: EditorState, dispatch: Dispatch | null, src: string) {
   const nodeType = state.schema.nodes["image"]
   const image = nodeType.createAndFill({ src, alt: "", title: "" })
   if (dispatch) {
@@ -29,7 +32,7 @@ export function insertImage(state: EditorState, dispatch: Function, src: string)
 
 export function alignImage(
   state: EditorState,
-  dispatch: Function,
+  dispatch: Dispatch | null,
   at: number,
   direction: "left" | "right" | "center" | ""
 ) {
@@ -46,7 +49,7 @@ export function alignImage(
   return true
 }
 
-export function removeImage(state: EditorState, dispatch: Function, at: number) {
+export function removeImage(state: EditorState, dispatch: Dispatch | null, at: number) {
   const from = at
   const to = from + 1
   const node = state.doc.nodeAt(from)
