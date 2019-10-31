@@ -22,9 +22,7 @@ declare let window: any
 
 exports.onClientEntry = () => {
   if (!window.tinacms) {
-    throw new Error(
-      '`window.tinacms` not found. Did you forget to add `gatsby-plugin-tinacms` to your `gatsby-config.js`?'
-    )
+    throw new Error(ERROR_TINACMS_NOT_FOUND)
   }
   const { protocol, hostname, port } = window.location
   const baseUrl = `${protocol}//${hostname}${
@@ -33,3 +31,19 @@ exports.onClientEntry = () => {
 
   window.tinacms.registerApi('git', new GitClient(baseUrl))
 }
+
+const ERROR_TINACMS_NOT_FOUND = `\`window.tinacms\` not found
+
+1. Make sure to add \`gatsby-plugin-tinacms\` to your \`gatsby-config.js\`
+2. Make sure \`gatsby-tinamcms-git\` is a sub-plugin of \`gatsby-plugin-tinacms\`
+
+{
+  resolve: "gatsby-plugin-tinacms",
+  options: {
+    plugins: [
+      "gatsby-tinacms-git",
+    ]
+  }
+}
+
+`
