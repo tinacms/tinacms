@@ -51,5 +51,5 @@ export async function commit({
 
   await repo.add(files)
   const commitResult = await repo.commit(message, files, options)
-  return push ? await repo.push('origin', branchName) : commitResult
+  return push ? await repo.push(['-u', 'origin', branchName]) : commitResult
 }
