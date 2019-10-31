@@ -130,7 +130,7 @@ export const FormsView = () => {
                   Save
                 </Button>
                 {activeForm.actions.length > 0 && (
-                  <ActionsMenu actions={activeForm.actions} />
+                  <ActionsMenu actions={activeForm.actions} form={activeForm} />
                 )}
               </FormFooter>
             </FormWrapper>
