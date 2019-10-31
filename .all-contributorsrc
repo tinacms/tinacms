@@ -278,6 +278,15 @@
       "contributions": [
         "userTesting"
       ]
+    },
+    {
+      "login": "kypp",
+      "name": "kyp",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4457071?v=4",
+      "profile": "https://github.com/kypp",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
