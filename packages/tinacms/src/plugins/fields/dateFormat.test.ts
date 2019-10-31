@@ -18,8 +18,7 @@ limitations under the License.
 
 import { format, parse } from './dateFormat'
 
-import * as _moment from 'moment'
-const moment = _moment //https://github.com/jvandemo/generator-angular2-library/issues/221#issuecomment-355945207
+import moment from 'moment'
 
 describe('date format', () => {
   describe('format', () => {
