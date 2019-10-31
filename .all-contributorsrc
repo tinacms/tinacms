@@ -117,7 +117,8 @@
       "contributions": [
         "projectManagement",
         "talk",
-        "ideas"
+        "ideas",
+        "bug"
       ]
     },
     {
@@ -277,6 +278,15 @@
       "profile": "https://github.com/IronSean",
       "contributions": [
         "userTesting"
+      ]
+    },
+    {
+      "login": "kypp",
+      "name": "kyp",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4457071?v=4",
+      "profile": "https://github.com/kypp",
+      "contributions": [
+        "bug"
       ]
     }
   ],
