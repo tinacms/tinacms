@@ -123,19 +123,19 @@ export function useRemarkForm(
         return cms.api.git.reset({ files: [id] })
       },
       actions: [
-        () => (
+        ({ form }: { form: Form }) => (
           <ActionButton
             onClick={async () => {
               if (
                 !confirm(
-                  `Are you sure you want to delete ${markdownRemark.fileRelativePath}?`
+                  `Are you sure you want to delete ${form.values.fileRelativePath}?`
                 )
               ) {
                 return
               }
               // @ts-ignore
               await cms.api.git.onDelete!({
-                relPath: markdownRemark.fileRelativePath,
+                relPath: form.values.fileRelativePath,
               })
 
               window.history.back()
