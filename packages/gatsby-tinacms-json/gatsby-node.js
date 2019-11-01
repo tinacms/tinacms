@@ -36,7 +36,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNode }) => {
     fileRelativePath: {
       type: GraphQLString,
       args: {},
-      resolve: ({ parent }: any) => {
+      resolve: ({ parent }) => {
         const p = getNode(parent)
 
         return p.absolutePath.replace(pathRoot, '')
