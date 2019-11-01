@@ -18,8 +18,7 @@ limitations under the License.
 
 import { format, parse } from './dateFormat'
 
-import * as _moment from 'moment'
-const moment = _moment //https://github.com/jvandemo/generator-angular2-library/issues/221#issuecomment-355945207
+import moment from 'moment'
 
 describe('date format', () => {
   describe('format', () => {
@@ -37,7 +36,6 @@ describe('date format', () => {
     describe('with date string input', () => {
       it('returns properly formatted string', () => {
         const dateString = '03 02 1972'
-        const dateFormat = 'MM DD YYYY'
         const result = format(dateString, 'date', { dateFormat: 'MM YYYY' })
         expect(result).toEqual('03 1972')
       })

@@ -1,6 +1,9 @@
-# TinaCMS
+# [TinaCMS](https://tinacms.org) &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
+
 <!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+
 [![All Contributors](https://img.shields.io/badge/all_contributors-25-orange.svg?style=flat-square)](#contributors)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
@@ -82,8 +85,7 @@ With this process:
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
 <!-- ALL-CONTRIBUTORS-LIST:START - Do not remove or modify this section -->
-<!-- prettier-ignore-start -->
-<!-- markdownlint-disable -->
+<!-- prettier-ignore -->
 <table>
   <tr>
     <td align="center"><a href="https://forestry.io"><img src="https://avatars3.githubusercontent.com/u/16868456?v=4" width="100px;" alt="Forestry.io"/><br /><sub><b>Forestry.io</b></sub></a><br /><a href="#financial-forestryio" title="Financial">💵</a></td>
@@ -95,7 +97,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://itsnwa.com"><img src="https://avatars1.githubusercontent.com/u/19958806?v=4" width="100px;" alt="Nichlas Wærnes Andersen"/><br /><sub><b>Nichlas Wærnes Andersen</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=itsnwa" title="Code">💻</a> <a href="#design-itsnwa" title="Design">🎨</a> <a href="#ideas-itsnwa" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/jpatters"><img src="https://avatars1.githubusercontent.com/u/195614?v=4" width="100px;" alt="Jordan"/><br /><sub><b>Jordan</b></sub></a><br /><a href="#projectManagement-jpatters" title="Project Management">📆</a> <a href="#talk-jpatters" title="Talks">📢</a> <a href="#ideas-jpatters" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/jpatters"><img src="https://avatars1.githubusercontent.com/u/195614?v=4" width="100px;" alt="Jordan"/><br /><sub><b>Jordan</b></sub></a><br /><a href="#projectManagement-jpatters" title="Project Management">📆</a> <a href="#talk-jpatters" title="Talks">📢</a> <a href="#ideas-jpatters" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Ajpatters" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://frank.taillandier.me"><img src="https://avatars3.githubusercontent.com/u/103008?v=4" width="100px;" alt="Frank Taillandier"/><br /><sub><b>Frank Taillandier</b></sub></a><br /><a href="#review-DirtyF" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/tinacms/tinacms/commits?author=DirtyF" title="Documentation">📖</a> <a href="#projectManagement-DirtyF" title="Project Management">📆</a> <a href="#userTesting-DirtyF" title="User Testing">📓</a></td>
     <td align="center"><a href="http://forestry.io"><img src="https://avatars0.githubusercontent.com/u/776019?v=4" width="100px;" alt="Scott Gallant"/><br /><sub><b>Scott Gallant</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=scottgallant" title="Documentation">📖</a> <a href="#talk-scottgallant" title="Talks">📢</a> <a href="#fundingFinding-scottgallant" title="Funding Finding">🔍</a></td>
     <td align="center"><a href="http://www.mitchmac.com"><img src="https://avatars2.githubusercontent.com/u/618212?v=4" width="100px;" alt="Mitch MacKenzie"/><br /><sub><b>Mitch MacKenzie</b></sub></a><br /><a href="#userTesting-mitchmac" title="User Testing">📓</a></td>
@@ -117,11 +119,13 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/bolariin"><img src="https://avatars1.githubusercontent.com/u/24629960?v=4" width="100px;" alt="Bolarinwa Balogun"/><br /><sub><b>Bolarinwa Balogun</b></sub></a><br /><a href="#infra-bolariin" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="http://metamas.com"><img src="https://avatars2.githubusercontent.com/u/2520253?v=4" width="100px;" alt="Mason Medeiros"/><br /><sub><b>Mason Medeiros</b></sub></a><br /><a href="#userTesting-metamas" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/IronSean"><img src="https://avatars3.githubusercontent.com/u/1960190?v=4" width="100px;" alt="ironsean"/><br /><sub><b>ironsean</b></sub></a><br /><a href="#userTesting-IronSean" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/kypp"><img src="https://avatars1.githubusercontent.com/u/4457071?v=4" width="100px;" alt="kyp"/><br /><sub><b>kyp</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Akypp" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

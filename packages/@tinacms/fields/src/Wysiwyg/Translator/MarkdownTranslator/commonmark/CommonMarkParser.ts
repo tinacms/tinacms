@@ -18,7 +18,6 @@ limitations under the License.
 
 import { imsize } from '../markdown-it-plugins/markdown-it-imsize'
 import { link } from '../markdown-it-plugins/markdown-it-links'
-// @ts-ignore
 import { MarkdownParser } from '../from_markdown'
 import { Schema } from 'prosemirror-model'
 import { buildTokensForSchema } from './tokens'
