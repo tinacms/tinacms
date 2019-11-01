@@ -134,28 +134,7 @@ export function useRemarkForm(
       reset() {
         return cms.api.git.reset({ files: [id] })
       },
-      actions: [
-        ({ form }: { form: Form }) => (
-          <ActionButton
-            onClick={async () => {
-              if (
-                !confirm(
-                  `Are you sure you want to delete ${form.values.fileRelativePath}?`
-                )
-              ) {
-                return
-              }
-              await cms.api.git.onDelete!({
-                relPath: form.values.fileRelativePath,
-              })
-
-              window.history.back()
-            }}
-          >
-            Delete
-          </ActionButton>
-        ),
-      ],
+      actions: [DeleteAction],
     },
     // The Form will be updated if these values change.
     {
@@ -195,4 +174,28 @@ function validateMarkdownRemark(markdownRemark: RemarkNode) {
   if (typeof markdownRemark.rawMarkdownBody === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_RAW_MARKDOWN)
   }
+}
+
+function DeleteAction({ form }: { form: Form }) {
+  const cms = useCMS()
+  return (
+    <ActionButton
+      onClick={async () => {
+        if (
+          !confirm(
+            `Are you sure you want to delete ${form.values.fileRelativePath}?`
+          )
+        ) {
+          return
+        }
+        await cms.api.git.onDelete!({
+          relPath: form.values.fileRelativePath,
+        })
+
+        window.history.back()
+      }}
+    >
+      Delete
+    </ActionButton>
+  )
 }
