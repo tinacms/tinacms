@@ -104,7 +104,7 @@ function updateFormLabel(label?: string, form?: Form) {
  */
 function updateFormValues(values: any = {}, form?: Form) {
   React.useEffect(() => {
-    if (!form || Object.keys(values).length == 0) return
+    if (!form || typeof values === 'undefined') return
     form.updateValues(values)
   }, [form, values])
 }
