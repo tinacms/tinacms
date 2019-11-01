@@ -27,7 +27,7 @@ export function findInactiveFormFields(form: Form) {
   const declaredFields = Object.entries(form.fieldSubscriptions)
   const allFields = hiddenFields.concat(declaredFields)
 
-  allFields.forEach(([path, field]) => {
+  allFields.forEach(([path]) => {
     pathsToUpdate = pathsToUpdate.concat(findInactiveFieldsInPath(form, path))
   })
   return pathsToUpdate

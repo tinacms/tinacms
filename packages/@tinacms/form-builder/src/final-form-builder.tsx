@@ -80,8 +80,8 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
           type = plugin.type
         }
 
-        let parse = getProp('parse', field, plugin)
-        let validate = getProp('validate', field, plugin)
+        const parse = getProp('parse', field, plugin)
+        const validate = getProp('validate', field, plugin)
 
         let format = field.format
 

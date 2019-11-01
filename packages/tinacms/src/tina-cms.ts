@@ -29,13 +29,10 @@ import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
-import { MediaView, SettingsView } from './plugins/screens'
 
 export class TinaCMS extends CMS {
   constructor() {
     super()
-    this.screens.add(MediaView)
-    this.screens.add(SettingsView)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
