@@ -5,6 +5,7 @@
   "types": "index.d.ts",
   "license": "Apache-2.0",
   "files": [
+    "src",
     "index.js",
     "gatsby-node.js"
   ],
@@ -24,20 +25,22 @@
     "directory": "packages/gatsby-tinacms-json"
   },
   "scripts": {
-    "watch": "tsc -w",
-    "build": "tsc",
-    "dev": "tsc",
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
+    "@tinacms/scripts": "^0.1.6",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
     "@tinacms/core": "^0.3.0",
     "gatsby-plugin-tinacms": "0.1.8",
+    "graphql": "^14.5.8",
     "react-tinacms": "^0.5.0",
-    "tinacms": "0.5.0"
+    "tinacms": "^0.5.0"
   }
 }

@@ -29,19 +29,6 @@ interface ImageUploadProps {
   previewSrc?: string
 }
 
-const getBorderColor = (props: any) => {
-  if (props.isDragAccept) {
-    return '#00e676'
-  }
-  if (props.isDragReject) {
-    return '#ff1744'
-  }
-  if (props.isDragActive) {
-    return '#2196f3'
-  }
-  return '#fff'
-}
-
 const DropArea = styled.div`
   border-radius: ${radius('small')};
   flex: 1;

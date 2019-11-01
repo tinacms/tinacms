@@ -22,7 +22,6 @@ import styled from 'styled-components'
 import { useFrameContext } from '../../components/SyledFrame'
 import * as React from 'react'
 import { InputCss } from '@tinacms/fields'
-import { color, padding, font } from '@tinacms/styles'
 
 const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'

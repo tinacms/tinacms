@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { InputProps } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import * as ReactDatetime from 'react-datetime'
+import ReactDatetime from 'react-datetime'
 import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
@@ -31,14 +31,15 @@ import { format, parse } from './dateFormat'
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field }) => {
     const [isOpen, setIsOpen] = useState(false)
-    const area = useRef(null)
+    const area = useRef<HTMLDivElement>(null!)
 
     const documentContext = useFrameContext().document
     useEffect(() => {
       const handleClick = (event: MouseEvent) => {
         if (!area.current) return
-        // @ts-ignore
-        if (!area.current!.contains(event.target)) {
+        if (!event.target) return
+
+        if (!area.current.contains(event.target as HTMLElement)) {
           setIsOpen(false)
         } else {
           setIsOpen(true)

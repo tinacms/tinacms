@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { FormManager } from './cms-forms'
-import { PluginManager, Plugin } from './plugins'
+import { PluginManager } from './plugins'
 
 export class CMS {
   forms: FormManager

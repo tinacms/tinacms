@@ -28,7 +28,7 @@ interface BlockTool {
 }
 
 export function blockTool(options: BlockTool) {
-  const { className, children, command, typeName, attrs } = options
+  const { children, command, typeName, attrs } = options
   return class extends React.Component<
     { view: EditorView; onClick(): void },
     any
