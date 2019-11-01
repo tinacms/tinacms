@@ -18,8 +18,11 @@ limitations under the License.
 
 import { EditorState, Selection } from 'prosemirror-state'
 import { NodeType, Node } from 'prosemirror-model'
+import { EditorView } from 'prosemirror-view'
 
-export function deleteEmptyHeading(state: EditorState, dispatch: any) {
+type Dispatch = typeof EditorView.prototype.dispatch;
+
+export function deleteEmptyHeading(state: EditorState, dispatch: Dispatch | null) {
   const { $cursor } = state.selection as any
   if (!$cursor) return false
   const node = state.doc.nodeAt(Math.max($cursor.pos - 1, 0))
@@ -48,7 +51,7 @@ export function toggleHeader(
   fallBackNodeType: NodeType,
   fallbackAttrs: any
 ) {
-  return function(state: EditorState, dispatch: Function) {
+  return function(state: EditorState, dispatch: Dispatch | null) {
     const { from, to } = state.selection
     let firstTextblock: Node | null = null
     let firstPos = -1

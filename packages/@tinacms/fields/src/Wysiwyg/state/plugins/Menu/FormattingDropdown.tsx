@@ -92,7 +92,7 @@ export class FormattingDropdown extends React.Component<
 }
 
 function makeToggleHeader(level: number) {
-  return function toggleHeader(state: EditorState, dispatch: Function) {
+  return function toggleHeader(state: EditorState, dispatch: typeof EditorView.prototype.dispatch) {
     const tn = th(
       state.schema.nodes.heading,
       { level },

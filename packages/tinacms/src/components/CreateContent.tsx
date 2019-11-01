@@ -31,7 +31,6 @@ import { useMemo } from 'react'
 import { Form } from '@tinacms/core'
 import { CloseIcon, AddIcon } from '@tinacms/icons'
 import {
-  padding,
   color,
   radius,
   font,

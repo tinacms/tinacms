@@ -29,7 +29,6 @@ import {
 import styled, {
   StyleSheetManager,
   ThemeProvider,
-  ThemeContext,
 } from 'styled-components'
 import { FC } from 'react'
 

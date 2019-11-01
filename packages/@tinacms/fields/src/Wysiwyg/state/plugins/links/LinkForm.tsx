@@ -174,25 +174,6 @@ const LinkActions = styled.div`
   padding-top: 0.25rem;
 `
 
-const LinkButton = styled.button`
-  text-align: center;
-  border: 0;
-  border-radius: ${radius()};
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  background-color: #0084ff;
-  color: white;
-  font-weight: 500;
-  cursor: pointer;
-  font-size: ${font.size(0)};
-  padding: 0.5rem 1.25rem;
-  transition: opacity 86ms ease-out;
-  margin-left: 0.5rem;
-  flex: 0 1 auto;
-  &:hover {
-    opacity: 0.6;
-  }
-`
-
 const SaveLink = styled.button`
   text-align: center;
   border: 0;
