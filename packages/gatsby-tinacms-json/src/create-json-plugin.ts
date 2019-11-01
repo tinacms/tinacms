@@ -61,7 +61,6 @@ export class JsonCreatorPlugin<FormShape = any, FrontmatterShape = any>
     this.data = options.data || (() => ({} as FrontmatterShape))
   }
 
-  // @ts-ignore will be fixed once AddContentPlugin is generic
   async onSubmit(form: FormShape, cms: CMS) {
     const fileRelativePath = await this.filename(form)
     const content = await this.data(form)

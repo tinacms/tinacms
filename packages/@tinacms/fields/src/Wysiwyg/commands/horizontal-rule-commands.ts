@@ -17,8 +17,11 @@ limitations under the License.
 */
 
 import { EditorState } from "prosemirror-state"
+import { EditorView } from 'prosemirror-view'
 
-export function insertHr(state: EditorState, dispatch: Function) {
+type Dispatch = typeof EditorView.prototype.dispatch;
+
+export function insertHr(state: EditorState, dispatch: Dispatch | null) {
   const type = state.schema.nodes.horizontal_rule
   if (dispatch) {
     dispatch(state.tr.replaceSelectionWith(type.create()).scrollIntoView())

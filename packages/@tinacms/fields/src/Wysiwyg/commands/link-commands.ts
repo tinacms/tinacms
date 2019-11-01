@@ -20,6 +20,8 @@ import { Mark, MarkType, ResolvedPos } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
+type Dispatch = typeof EditorView.prototype.dispatch;
+
 export function renderLinkForm(view: EditorView, link: Element) {
   const tr = view.state.tr
   tr.setMeta('type', 'tinacms/render')
@@ -29,7 +31,7 @@ export function renderLinkForm(view: EditorView, link: Element) {
 
 export function insertLinkToFile(
   state: EditorState,
-  dispatch: Function,
+  dispatch: Dispatch | null,
   url: string
 ) {
   url = url || ''
@@ -39,7 +41,9 @@ export function insertLinkToFile(
   const attrs = { title: filename, href: url, editing: '', creating: '' }
   const schema = state.schema
   const node = schema.text(attrs.title, [schema.marks.link.create(attrs)])
-  dispatch(state.tr.replaceSelectionWith(node, false))
+  if (dispatch) {
+    dispatch(state.tr.replaceSelectionWith(node, false))
+  }
   return true
 }
 
@@ -56,7 +60,7 @@ export function unmountLinkForm(view: EditorView) {
  * @param {EditorState} state
  * @param {(tr: Transaction) => void} dispatch
  */
-export function startEditingLink(state: EditorState, dispatch: Function) {
+export function startEditingLink(state: EditorState, dispatch: Dispatch | null) {
   const linkMarkType = state.schema.marks['link']
 
   const $cursor: ResolvedPos = (state.selection as any).$cursor
@@ -124,7 +128,7 @@ function markExtend($cursor: ResolvedPos, markType: MarkType) {
  * @param {(tr: Transaction) => void} dispatch
  * @returns {boolean}
  */
-export function stopEditingLink(state: EditorState, dispatch: Function) {
+export function stopEditingLink(state: EditorState, dispatch: Dispatch | null) {
   const changes: { from: number; to: number; mark: Mark }[] = []
 
   const linkMarkType = state.schema.marks['link']
@@ -165,7 +169,7 @@ export function stopEditingLink(state: EditorState, dispatch: Function) {
  */
 export function updateLinkBeingEdited(
   state: EditorState,
-  dispatch: Function,
+  dispatch: Dispatch | null,
   attrs: object
 ) {
   if (dispatch) {
@@ -187,7 +191,7 @@ export function updateLinkBeingEdited(
   return true
 }
 
-export function removeLinkBeingEdited(state: EditorState, dispatch: Function) {
+export function removeLinkBeingEdited(state: EditorState, dispatch: Dispatch | null) {
   if (dispatch) {
     const linkMarkType = state.schema.marks['link']
     const tr = state.tr
