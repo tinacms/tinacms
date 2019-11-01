@@ -16,17 +16,16 @@ limitations under the License.
 
 */
 
-import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
+import '@tinacms/fields/node_modules/@tinacms/styles'
 import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
-import styled, { keyframes, css } from 'styled-components'
+import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
-import { padding, color, radius, font } from '@tinacms/styles'
+import { color, radius, font } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
 import {
   SIDEBAR_HEADER_HEIGHT,
   SIDEBAR_WIDTH,
-  FORM_HEADER_HEIGHT,
   FORM_FOOTER_HEIGHT,
 } from '../../Globals'
 
@@ -45,10 +44,7 @@ export interface GroupProps {
 
 export const Group = function Group({
   tinaForm,
-  form,
   field,
-  input,
-  meta,
 }: GroupProps) {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
@@ -79,7 +75,6 @@ const Panel = function Panel({
   isExpanded,
   tinaForm,
   field,
-  children,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
@@ -104,7 +99,7 @@ const Label = function(field: GroupFieldDefinititon) {
   return <GroupLabel>{field.label || field.name}</GroupLabel>
 }
 
-const Header = styled.div`
+const Header: StyledComponent<'div', {}, {}> = styled.div`
   position: relative;
   cursor: pointer;
   display: flex;
@@ -134,7 +129,7 @@ const Header = styled.div`
   }
 `
 
-export const PanelHeader = styled(Header)`
+export const PanelHeader: StyledComponent<typeof Header, {}, {}> = styled(Header)`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;

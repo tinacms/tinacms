@@ -30,8 +30,7 @@ export default {
       { tag: 'em' },
       {
         style: 'font-style',
-        // @ts-ignore
-        getAttrs: (value: string): string => value == 'italic' && null,
+        getAttrs: (value: string): null | boolean => value === 'italic' && null,
       },
     ],
     toDOM() {

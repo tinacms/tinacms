@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-const { GraphQLString } = require('gatsby/graphql')
+const { GraphQLString } = require('graphql')
 
 exports.setFieldsOnGraphQLNodeType = ({ type, getNode }) => {
   const pathRoot = process.cwd()

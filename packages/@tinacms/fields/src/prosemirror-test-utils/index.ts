@@ -23,8 +23,8 @@ interface Dispatch {
   (tr: Transaction): void
 }
 
-interface Command {
-  (state: EditorState, dispatch: Dispatch, ...args: any[]): boolean | Transaction | null
+export interface Command {
+  (state: EditorState, dispatch: Dispatch | null, ...args: any[]): boolean | Transaction | null
 }
 
 interface LinkAttrs {
@@ -93,7 +93,6 @@ export class PMTestHarness {
   }
 
   shouldNotRun = (command: Command, ...args: any[]) => {
-    // @ts-ignore
     const shouldRun = command(this.state, null, ...args)
 
     expect(shouldRun).toBeFalsy()

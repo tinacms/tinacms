@@ -17,8 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { keyframes, css } from 'styled-components'
-import { Button, padding, color } from '@tinacms/styles'
+import styled from 'styled-components'
+import { Button, color } from '@tinacms/styles'
 import {
   Modal,
   ModalHeader,
@@ -34,7 +34,7 @@ interface ResetFormProps {
 }
 
 export const ResetForm = ({ pristine, reset }: ResetFormProps) => {
-  let [open, setOpen] = React.useState(false)
+  const [open, setOpen] = React.useState(false)
   return (
     <>
       <ResetButton

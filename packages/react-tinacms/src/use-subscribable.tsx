@@ -24,7 +24,7 @@ import { Subscribable } from '@tinacms/core'
  * @param cb (Optional) A callback to be executed when an event occurs.
  */
 export function useSubscribable(subscribable: Subscribable, cb?: Function) {
-  const [_, s] = React.useState(0)
+  const [, s] = React.useState(0)
   React.useEffect(() => {
     return subscribable.subscribe(() => {
       s(x => x + 1)
