@@ -15,22 +15,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-import * as React from 'react'
-import styled from 'styled-components'
-import { InputCss } from './Input'
-
-type a = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->
-export interface TextAreaProps extends a {
-  error?: boolean
-  ref?: any
-}
-
-export const TextArea = styled.textarea<{ error?: boolean }>`
-  ${InputCss};
-  resize: vertical;
-  height: 10rem;
-`
+export * from './use-json-form'
+export * from './create-json-plugin'

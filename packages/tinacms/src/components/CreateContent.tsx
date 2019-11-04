@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { useCMS } from 'react-tinacms'
+import { useCMS, useSubscribable } from 'react-tinacms'
 import {
   Modal,
   ModalHeader,
@@ -31,7 +31,6 @@ import { useMemo } from 'react'
 import { Form } from '@tinacms/core'
 import { CloseIcon, AddIcon } from '@tinacms/icons'
 import {
-  padding,
   color,
   radius,
   font,
@@ -48,7 +47,11 @@ export const CreateContentMenu = () => {
   const frame = useFrameContext()
   const [visible, setVisible] = React.useState(false)
 
-  if (cms.plugins.all('content-button').length) {
+  const contentCreatorPlugins = cms.plugins.findOrCreateMap('content-button')
+
+  useSubscribable(contentCreatorPlugins)
+
+  if (contentCreatorPlugins.all().length) {
     return (
       <ContentMenuWrapper>
         <IconButton onClick={() => setVisible(true)} open={visible} primary>
@@ -62,7 +65,7 @@ export const CreateContentMenu = () => {
             document={frame.document}
             disabled={!visible}
           >
-            {cms.plugins.all('content-button').map(plugin => (
+            {contentCreatorPlugins.all().map(plugin => (
               <CreateContentButton
                 plugin={plugin}
                 key={plugin.name}

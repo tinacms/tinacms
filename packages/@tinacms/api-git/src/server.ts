@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 const express = require('express')
+const cors = require('cors')
 
 import { router, GitRouterConfig } from "./router"
 
@@ -24,6 +25,7 @@ export class GitApiServer {
     server: any
     constructor(config: GitRouterConfig) {
         this.server = express()
+        this.server.use(cors())
         this.server.use('/___tina', router(config))
     }
 

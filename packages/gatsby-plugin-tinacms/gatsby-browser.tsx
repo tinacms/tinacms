@@ -29,6 +29,6 @@ exports.wrapRootElement = ({ element }: any, options: any) => {
 
 declare let window: any
 
-exports.onClientEntry = (...args: any[]) => {
+exports.onClientEntry = (..._args: any[]) => {
   window.tinacms = new TinaCMS()
 }

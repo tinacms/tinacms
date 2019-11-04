@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import { redo, undo } from 'prosemirror-history'
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
 
@@ -28,17 +27,14 @@ import {
 } from '../../../commands/list-commands'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
-import styled, { css, ThemeProvider, ThemeContext } from 'styled-components'
+import styled, { css, ThemeProvider } from 'styled-components'
 import {
   BoldIcon,
   CodeIcon,
-  HeadingIcon,
   ItalicIcon,
   LinkIcon,
   OrderedListIcon,
   QuoteIcon,
-  RedoIcon,
-  UndoIcon,
   UnorderedListIcon,
   UnderlineIcon,
 } from '@tinacms/icons'
@@ -167,8 +163,6 @@ const CodeControl = commandContrl(
   'Codeblock',
   false
 ) //codeblock focusing messes with scroll
-const RedoControl = commandContrl(redo, RedoIcon, 'Redo', 'Redo')
-const UndoControl = commandContrl(undo, UndoIcon, 'Undo', 'Undo')
 const BulletList = commandContrl(
   toggleBulletList,
   UnorderedListIcon,
