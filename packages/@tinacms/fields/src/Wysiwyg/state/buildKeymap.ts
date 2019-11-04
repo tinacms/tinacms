@@ -42,6 +42,8 @@ export function buildKeymap(schema: Schema, plugins: Plugin[]) {
     keys[key] = cmd
   }
 
+  bind('Enter', chainCommands(createParagraphNear, liftEmptyBlock, splitBlock))
+
   findPlugins<KeymapPlugin>('wysiwyg:keymap', plugins).forEach(plugin => {
     let skip = false
 
@@ -60,8 +62,6 @@ export function buildKeymap(schema: Schema, plugins: Plugin[]) {
     // Bind the command
     if (!skip) bind(plugin.name, plugin.command(schema))
   })
-
-  bind('Enter', chainCommands(createParagraphNear, liftEmptyBlock, splitBlock))
 
   return keys
 }
