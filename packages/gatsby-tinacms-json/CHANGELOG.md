@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.5.1 (2019-11-04)
+
+### Bug Fixes
+
+- **useJsonForm:** label can be overridden ([9478450](https://github.com/tinacms/tinacms/commit/9478450))
+- **useJsonForm:** should return jsonNode in prod ([d4ec5b4](https://github.com/tinacms/tinacms/commit/d4ec5b4))
+
 ## 0.5.0 (2019-10-28)
 
 ### Features
