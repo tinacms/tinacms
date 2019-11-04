@@ -43,7 +43,7 @@ export function useJsonForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
-  const label = jsonNode.fileRelativePath
+  const label = formOptions.label || jsonNode.fileRelativePath
   const id = jsonNode.fileRelativePath
 
   /**
