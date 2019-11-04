@@ -42,15 +42,18 @@ import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
 import { GroupPanel } from '../plugins/fields'
 
 export const FormsView = () => {
-  const [activeFormId, setActiveFormId] = useState<string>()
+  const [activeFormId, setActiveFormId] = useState()
   const cms = useCMS()
 
   /**
    * If there's only one form, make it the active form.
+   * If there's multiple forms, set to null so the list shows.
    */
   useSubscribable(cms.forms, () => {
     if (cms.forms.all().length === 1) {
       setActiveFormId(cms.forms.all()[0].id)
+    } else {
+      setActiveFormId(null)
     }
   })
 
@@ -73,11 +76,11 @@ export const FormsView = () => {
   /**
    * No Forms
    */
-  if (!forms.length) {
+  if ( !forms.length ) {
     return <NoFormsPlaceholder />
   }
 
-  if (!activeForm) {
+  if ( !activeForm ) {
     return (
       <FormsList
         isEditing={isEditing}
