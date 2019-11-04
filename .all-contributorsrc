@@ -288,6 +288,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "smashercosmo",
+      "name": "Vladislav Shkodin",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/273283?v=4",
+      "profile": "https://github.com/smashercosmo",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
