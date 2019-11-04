@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { FormOptions, Form } from '@tinacms/core'
-import { ActionButton } from 'tinacms'
 import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
@@ -51,6 +50,7 @@ export function useRemarkForm(
   const cms = useCMS()
   const label = formOverrrides.label || markdownRemark.frontmatter.title
   const id = markdownRemark.fileRelativePath
+  const actions = formOverrrides.actions
 
   /**
    * The state of the RemarkForm, generated from the contents of the
@@ -134,28 +134,7 @@ export function useRemarkForm(
       reset() {
         return cms.api.git.reset({ files: [id] })
       },
-      actions: [
-        () => (
-          <ActionButton
-            onClick={async () => {
-              if (
-                !confirm(
-                  `Are you sure you want to delete ${markdownRemark.fileRelativePath}?`
-                )
-              ) {
-                return
-              }
-              await cms.api.git.onDelete!({
-                relPath: markdownRemark.fileRelativePath,
-              })
-
-              window.history.back()
-            }}
-          >
-            Delete
-          </ActionButton>
-        ),
-      ],
+      actions,
     },
     // The Form will be updated if these values change.
     {
