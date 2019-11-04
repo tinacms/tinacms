@@ -23,7 +23,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { liveRemarkForm } from "gatsby-tinacms-remark"
+import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField } from "@tinacms/form-builder"
 import { Wysiwyg, Toggle } from "@tinacms/fields"
@@ -208,6 +208,7 @@ const image = {
 }
 
 const BlogPostForm = {
+  actions: [DeleteAction],
   fields: [
     {
       label: "Blocks",
