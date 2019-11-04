@@ -18,9 +18,6 @@ limitations under the License.
 
 import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
-import { findInactiveFormFields } from './findInactiveFields'
-
-const get = require('lodash.get')
 
 export interface FormOptions<S> extends Config<S> {
   id: any
@@ -183,15 +180,39 @@ export class Form<S = any> {
     return this.finalForm.getState().values
   }
 
-  private get inactiveFields() {
-    return findInactiveFormFields(this)
-  }
-
   updateValues(values: S) {
     this.finalForm.batch(() => {
-      this.inactiveFields.forEach(path => {
-        this.finalForm.change(path, get(values, path))
-      })
+      const activePath: string | undefined = this.finalForm.getState().active
+
+      if (!activePath) {
+        updateEverything(this.finalForm, values)
+      } else {
+        updateSelectively(this.finalForm, values)
+      }
     })
   }
+}
+
+function updateEverything(form: FormApi<any>, values: any) {
+  Object.entries(values).forEach(([path, value]) => {
+    form.change(path, value)
+  })
+}
+
+function updateSelectively(form: FormApi<any>, values: any, prefix?: string) {
+  const activePath: string = form.getState().active!
+
+  Object.entries(values).forEach(([name, value]) => {
+    const path = prefix ? `${prefix}.${name}` : name
+
+    if (typeof value === 'object') {
+      if (activePath.startsWith(path)) {
+        updateSelectively(form, value, path)
+      } else {
+        form.change(path, value)
+      }
+    } else if (path !== activePath) {
+      form.change(path, value)
+    }
+  })
 }
