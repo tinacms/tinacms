@@ -17,19 +17,21 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import styled, { css, StyledComponent } from 'styled-components'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { padding, color, radius, font, shadow } from '@tinacms/styles'
-import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
+import '@tinacms/fields/node_modules/@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
+import { Form } from '@tinacms/core'
 
 export interface ActionsMenuProps {
+  form: Form
   actions: any[]
 }
 
-export const ActionsMenu: FC<ActionsMenuProps> = ({ actions }) => {
+export const ActionsMenu: FC<ActionsMenuProps> = ({ actions, form }) => {
   const frame = useFrameContext()
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
   return (
@@ -46,7 +48,7 @@ export const ActionsMenu: FC<ActionsMenuProps> = ({ actions }) => {
           }}
         >
           {actions.map(Action => (
-            <Action />
+            <Action form={form} />
           ))}
         </Dismissible>
       </ActionsOverlay>
@@ -105,7 +107,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
     `};
 `
 
-export const ActionButton = styled.button`
+export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};

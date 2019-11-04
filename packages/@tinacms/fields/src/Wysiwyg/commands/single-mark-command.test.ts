@@ -26,12 +26,12 @@ const { forDoc, doc, p, text, em } = new PMTestHarness(defaultSchema)
 const P1_START = () => 1
 
 function getStart(p1: string, ...paragraphs: string[]): number {
-  if (paragraphs.length === 0) {
+  const [first, ...rest] = paragraphs;
+  if (typeof first !== 'string') {
     return 1
   }
 
-  // @ts-ignore
-  return p1.length + 2 + getStart(...paragraphs)
+  return p1.length + 2 + getStart(first, ...rest)
 }
 
 describe('single-mark', () => {

@@ -16,12 +16,12 @@ limitations under the License.
 
 */
 
-import * as _ from '@tinacms/fields/node_modules/@tinacms/styles'
+import '@tinacms/fields/node_modules/@tinacms/styles'
 import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from '../SyledFrame'
-import styled from 'styled-components'
+import styled, { StyledComponent } from 'styled-components'
 import { Z_INDEX } from '../../Globals'
 import { GlobalStyles, Button, padding, font, color } from '@tinacms/styles'
 
@@ -111,7 +111,7 @@ export const ModalOverlay = styled.div`
   padding: 0;
 `
 
-export const ModalHeader = styled.div`
+export const ModalHeader: StyledComponent<'div', {}> = styled.div`
   height: 3.5rem;
   display: flex;
   align-items: center;
@@ -129,7 +129,7 @@ export const ModalBody = styled.div<{ padded?: boolean }>`
   margin: 0;
 `
 
-export const ModalActions = styled.div`
+export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
   display: flex;
   justify-content: flex-end;
   border-radius: 0 0 0.3rem 0.3rem;

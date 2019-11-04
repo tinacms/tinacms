@@ -55,9 +55,11 @@ class MarkdownParseState {
   addText(text: string) {
     if (!text) return
     const nodes = this.top().content,
-      last = nodes[nodes.length - 1]
-    let node = this.schema.text(text, this.marks),
-      merged
+      last = nodes[nodes.length - 1],
+      node = this.schema.text(text, this.marks)
+
+    let merged
+
     if (last && (merged = maybeMerge(last, node)))
       nodes[nodes.length - 1] = merged
     else nodes.push(node)
@@ -259,8 +261,8 @@ export class MarkdownParser {
   // and create a ProseMirror document as prescribed by this parser's
   // rules.
   parse(text: string) {
-    let state = new MarkdownParseState(this.schema, this.tokenHandlers),
-      doc
+    const state = new MarkdownParseState(this.schema, this.tokenHandlers)
+    let doc
     state.parseTokens(this.tokenizer.parse(text, {}))
     do {
       doc = state.closeNode()
