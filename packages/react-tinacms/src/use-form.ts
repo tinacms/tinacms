@@ -116,7 +116,7 @@ function useUpdateFormLabel(label?: string, form?: Form) {
  *
  * This hook is useful when the form must be kept in sync with the data source.
  */
-function useUpdateFormValues(values: any = {}, form?: Form) {
+function useUpdateFormValues(values: any, form?: Form) {
   React.useEffect(() => {
     if (!form || typeof values === 'undefined') return
     form.updateValues(values)
