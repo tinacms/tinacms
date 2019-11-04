@@ -56,8 +56,6 @@ export class Form<S = any> {
   fields: Field[]
   finalForm: FormApi<S>
   actions: any[]
-  fieldSubscriptions: { [key: string]: FieldSubscription } = {}
-  hiddenFields: { [key: string]: FieldSubscription } = {}
   initialValues: any
   reset?(): void
 
@@ -95,77 +93,6 @@ export class Form<S = any> {
 
   updateFields(fields: Field[]) {
     this.fields = fields
-    /**
-     * We register fields at creation time so we don't have to relay
-     * on `react-final-form` components being rendered.
-     */
-    this.registerFields(this.fields)
-    this.discoverHiddenFields(this.initialValues)
-    this.removeDeclaredFieldsFromHiddenLookup()
-  }
-
-  private discoverHiddenFields(values: any, prefix?: string) {
-    Object.entries(values).map(([name, value]) => {
-      const path = prefix ? `${prefix}.${name}` : name
-
-      if (Array.isArray(value)) {
-        if (value.find(item => typeof item === 'object')) {
-          const prefix = `${path}.INDEX`
-          value.forEach(item => {
-            this.discoverHiddenFields(item, prefix)
-          })
-        } else {
-          this.hiddenFields[path] = {
-            path,
-            field: { name: path, component: null },
-            unsubscribe: this.finalForm.registerField(path, () => {}, {}),
-          }
-        }
-      } else if (typeof value === 'object' && value !== null) {
-        this.discoverHiddenFields(value, path)
-      } else {
-        // Base Case
-        this.hiddenFields[path] = {
-          path,
-          field: { name: path, component: null },
-          unsubscribe: this.finalForm.registerField(path, () => {}, {}),
-        }
-      }
-    })
-  }
-
-  private removeDeclaredFieldsFromHiddenLookup() {
-    Object.keys(this.fieldSubscriptions).forEach(path => {
-      const hiddenField = this.hiddenFields[path]
-      if (hiddenField) {
-        hiddenField.unsubscribe()
-        delete this.hiddenFields[path]
-      }
-    })
-  }
-
-  private registerFields(fields: Field[], pathPrefix?: string) {
-    fields.forEach(field => {
-      const path = pathPrefix ? `${pathPrefix}.${field.name}` : field.name
-
-      const isGroup = ['group'].includes(field.component as string)
-      const isArray = ['group-list', 'blocks'].includes(
-        field.component as string
-      )
-      if (isArray) {
-        const subfields = field.fields || []
-        this.registerFields(subfields, `${path}.INDEX`)
-      } else if (isGroup) {
-        const subfields = field.fields || []
-        this.registerFields(subfields, path)
-      } else {
-        this.fieldSubscriptions[path] = {
-          path,
-          field,
-          unsubscribe: this.finalForm.registerField(path, () => {}, {}),
-        }
-      }
-    })
   }
 
   subscribe: FormApi<S>['subscribe'] = (cb, options) => {
