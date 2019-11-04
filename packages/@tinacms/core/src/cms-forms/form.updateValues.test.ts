@@ -100,6 +100,7 @@ describe('Form#updateValues', () => {
         const form = makeForm({ author: { name: 'Ella', age: 23 } }, [])
         const nextValues = { author: { name: 'Georgina', age: 30 } }
 
+        form.finalForm.registerField('author.name', () => {}, {})
         form.finalForm.focus('author.name')
         form.updateValues(nextValues)
 
@@ -119,6 +120,7 @@ describe('Form#updateValues', () => {
         seo: { description: 'A new description' },
       }
 
+      form.finalForm.registerField('author.name', () => {}, {})
       form.finalForm.focus('author.name')
       form.updateValues(nextValues)
 
