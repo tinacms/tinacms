@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.3.0 (2019-11-04)
+
+### Bug Fixes
+
+- add check if filepath isn't outside git repository ([#355](https://github.com/tinacms/tinacms/issues/355)) ([dcf89f9](https://github.com/tinacms/tinacms/commit/dcf89f9)), closes [#250](https://github.com/tinacms/tinacms/issues/250)
+
+### Features
+
+- **git:** add script to start standalone git api server ([743ec25](https://github.com/tinacms/tinacms/commit/743ec25))
+- **git:** implement branch API endpoints ([837df80](https://github.com/tinacms/tinacms/commit/837df80))
+- **git:** implement push endpoint ([4db1284](https://github.com/tinacms/tinacms/commit/4db1284))
+- **git:** implement pushOnCommit option ([4413a6e](https://github.com/tinacms/tinacms/commit/4413a6e))
+
 ## [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.2.4-alpha.0...@tinacms/api-git@0.3.0-alpha.0) (2019-10-28)
 
 ### Bug Fixes
