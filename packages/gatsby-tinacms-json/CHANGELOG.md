@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.5.0-alpha.0...gatsby-tinacms-json@0.6.0) (2019-11-04)
+
+
+### Bug Fixes
+
+* **useJsonForm:** error if missing rawJson ([e6e9bd8](https://github.com/tinacms/tinacms/commit/e6e9bd8))
+* **useJsonForm:** errorif missing fileRelativePath ([8b0647c](https://github.com/tinacms/tinacms/commit/8b0647c))
+* return jsonNode if in production ([b0c9712](https://github.com/tinacms/tinacms/commit/b0c9712))
+* **useJsonForm:** label can be overridden ([9478450](https://github.com/tinacms/tinacms/commit/9478450))
+* **useJsonForm:** should return jsonNode in prod ([d4ec5b4](https://github.com/tinacms/tinacms/commit/d4ec5b4))
+
+
+### Features
+
+* CreateJsonForm plugin ([f75cc82](https://github.com/tinacms/tinacms/commit/f75cc82))
+* use form options label when provided ([4fb9d31](https://github.com/tinacms/tinacms/commit/4fb9d31))
+
+
+
+
+
 ## 0.5.0 (2019-10-28)
 
 ### Features
