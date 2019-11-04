@@ -1,7 +1,7 @@
 {
   "name": "gatsby-tinacms-git",
   "main": "index.js",
-  "version": "0.2.6",
+  "version": "0.2.7",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -36,7 +36,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@tinacms/api-git": "^0.3.1",
+    "@tinacms/api-git": "^0.4.0",
     "@tinacms/core": "^0.4.0",
     "@tinacms/git-client": "^0.2.0",
     "@types/cors": "^2.8.5",

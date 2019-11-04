@@ -1,13 +1,13 @@
 {
   "name": "demo-next",
-  "version": "1.0.2",
+  "version": "1.0.3",
   "private": true,
   "scripts": {
     "develop": "concurrently \"next dev\" \"tina-git-server 3001\"",
     "start": "next start"
   },
   "dependencies": {
-    "@tinacms/api-git": "^0.3.1",
+    "@tinacms/api-git": "^0.4.0",
     "@tinacms/next-tinacms-git": "^0.0.7",
     "@tinacms/next-tinacms-markdown": "^0.0.9",
     "concurrently": "^5.0.0",
