@@ -7,7 +7,7 @@
     "start": "next start"
   },
   "dependencies": {
-    "@tinacms/api-git": "^0.3.0",
+    "@tinacms/api-git": "^0.3.1",
     "@tinacms/next-tinacms-git": "^0.0.7",
     "@tinacms/next-tinacms-markdown": "^0.0.9",
     "concurrently": "^5.0.0",
