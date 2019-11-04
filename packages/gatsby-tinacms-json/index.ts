@@ -39,7 +39,7 @@ export function useJsonForm(
 
   const cms = useCMS()
   const label = jsonNode.fileRelativePath
-  const id = jsonNode.fileRelativePath
+  const id = formOptions.label || jsonNode.fileRelativePath
 
   /**
    * The state of the JsonForm, generated from the contents of the
