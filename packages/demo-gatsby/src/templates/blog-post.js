@@ -363,13 +363,10 @@ export const pageQuery = graphql`
       }
     }
     markdownRemark(fields: { slug: { eq: $slug } }) {
+      ...TinaRemark
       id
       excerpt(pruneLength: 160)
       html
-      fileRelativePath
-      rawFrontmatter
-      rawMarkdownBody
-
       frontmatter {
         blocks {
           _template
