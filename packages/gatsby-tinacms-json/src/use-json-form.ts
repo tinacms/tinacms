@@ -37,13 +37,13 @@ export function useJsonForm(
    * will never change at runtime.
    */
   if (!jsonNode || process.env.NODE_ENV === 'production') {
-    return [{}, null]
+    return [jsonNode, null]
   }
   validateJsonNode(jsonNode)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
-  const label = jsonNode.fileRelativePath
+  const label = formOptions.label || jsonNode.fileRelativePath
   const id = jsonNode.fileRelativePath
 
   /**
