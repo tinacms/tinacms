@@ -3,7 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.3.5](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.3.5-alpha.0...gatsby-tinacms-remark@0.3.5) (2019-10-28)
+## 0.3.6 (2019-11-04)
+
+### Bug Fixes
+
+- path resolution for Gatsby remark on Windows [#382](https://github.com/tinacms/tinacms/issues/382) ([#389](https://github.com/tinacms/tinacms/issues/389)) ([7173f66](https://github.com/tinacms/tinacms/commit/7173f66))
+
+## 0.3.5 (2019-10-28)
 
 ### Bug Fixes
 

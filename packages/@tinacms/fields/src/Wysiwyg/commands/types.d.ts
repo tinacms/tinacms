@@ -16,6 +16,8 @@ limitations under the License.
 
 */
 
+import { EditorState } from "prosemirror-state";
+
 export interface Command {
   (state: EditorState, ...options: any[]): void
 }

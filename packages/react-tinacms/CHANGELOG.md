@@ -3,7 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.5.0-alpha.0...react-tinacms@0.5.0) (2019-10-28)
+## 0.6.0 (2019-11-04)
+
+### Bug Fixes
+
+- remove default value assignment in updateFormValues ([f9e4056](https://github.com/tinacms/tinacms/commit/f9e4056))
+
+### Features
+
+- usePlugins accepts multiple plugins ([5ab24db](https://github.com/tinacms/tinacms/commit/5ab24db))
+- withPlugins accepst multiple plugins ([9e48c00](https://github.com/tinacms/tinacms/commit/9e48c00))
+
+## [0.6.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.5.0-alpha.0...react-tinacms@0.6.0-alpha.0) (2019-10-28)
+
+### Features
+
+- usePlugins accepts multiple plugins ([5ab24db](https://github.com/tinacms/tinacms/commit/5ab24db))
+- withPlugins accepst multiple plugins ([9e48c00](https://github.com/tinacms/tinacms/commit/9e48c00))
+
+## 0.5.0 (2019-10-28)
 
 ### Bug Fixes
 

@@ -3,13 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.0.8](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.0.8-alpha.0...@tinacms/styles@0.0.8) (2019-10-28)
+## 0.0.9 (2019-11-04)
 
-**Note:** Version bump only for package @tinacms/styles
+### Bug Fixes
 
+- styled-components is a peerDependency ([baaf3de](https://github.com/tinacms/tinacms/commit/baaf3de))
 
+## [0.0.9-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.0.8-alpha.0...@tinacms/styles@0.0.9-alpha.0) (2019-10-28)
 
+### Bug Fixes
 
+- styled-components is a peerDependency ([baaf3de](https://github.com/tinacms/tinacms/commit/baaf3de))
 
 ## [0.0.8-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.0.2...@tinacms/styles@0.0.8-alpha.0) (2019-10-21)
 
