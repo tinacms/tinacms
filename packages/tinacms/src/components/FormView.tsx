@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
-import '@tinacms/fields/node_modules/@tinacms/styles'
 import { useCMS, useSubscribable } from 'react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
@@ -392,7 +391,9 @@ const FormWrapper = styled.div<FormWrapperProps>`
     `};
 `
 
-export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(Button)`
+export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
+  Button
+)`
   flex: 1.5 0 auto;
   padding: 0.75rem 1.5rem;
 `
