@@ -20,12 +20,12 @@ export const ERROR_MISSING_REMARK_PATH =
   'useRemarkForm(markdownRemark) Required attribute `fileRelativePath` was not found on `markdownRemark` node.' +
   `
 
-1. Check if the \`fileRelativePath\` attribute is included in the GraphQL query. For example:
+1. Check if the \`...TinaRemark\` fragment is included in the markdownRemark GraphQL query. For example:
 
 export const pageQuery = graphql\`
   query BlogPostBySlug($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
-      fileRelativePath
+      ...TinaRemark
       // etc...
     }
  }
@@ -36,12 +36,12 @@ export const ERROR_MISSING_REMARK_RAW_MARKDOWN =
   'useRemarkForm(markdownRemark) Required attribute `rawMarkdownBody` was not found on `markdownRemark` node.' +
   `
 
-1. Check if the \`rawMarkdownBody\` attribute is included in the GraphQL query. For example:
+1. Check if the \`...TinaRemark\` fragment is included in the markdownRemark GraphQL query. For example:
 
 export const pageQuery = graphql\`
   query BlogPostBySlug($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
-      rawMarkdownBody
+      ...TinaRemark
       // etc...
     }
  }
@@ -52,7 +52,7 @@ export const ERROR_MISSING_REMARK_RAW_FRONTMATTER =
   'useRemarkForm(markdownRemark) Required attribute `rawFrontmatter` was not found on `markdownRemark` node.' +
   `
 
-1. Check if the \`rawFrontmatter\` attribute is included in the GraphQL query. For example:
+1. Check if the \`...TinaRemark\` fragment is included in the markdownRemark GraphQL query. For example:
 
 export const pageQuery = graphql\`
   query BlogPostBySlug($slug: String!) {
@@ -73,21 +73,23 @@ export const ERROR_INVALID_QUERY_NAME = (queryName: string) =>
 export const pageQuery = graphql\`
   query BlogPostBySlug($slug: String!) {
     markdownRemark(fields: { slug: { eq: $slug } }) {
-      rawMarkdownBody
+      ...TinaRemark
       // etc...
     }
  }
 
 2. If you are using an alias, For example:
 
- export const pageQuery = graphql\`
-   query BlogPostBySlug($slug: String!) {
-     myContent: markdownRemark(fields: { slug: { eq: $slug } }) {
-       rawMarkdownBody
+   export const pageQuery = graphql\`
+     query BlogPostBySlug($slug: String!) {
+       ${queryName}: markdownRemark(fields: { slug: { eq: $slug } }) {
+          ...TinaRemark
        // etc...
-     }
-  }
- 
-  ...then you can optionally use the 'queryName' option to specify a new property in place of ${queryName}
+       }
+    }
+
+  then you can optionally use the 'queryName' option to specify a new property in place of 'markdownRemark':
+
+    export const remarkForm(BlogPostTemplate, { queryName: ${queryName} })
 \`
   `
