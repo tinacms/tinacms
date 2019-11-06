@@ -56,7 +56,7 @@ export const FormsView = () => {
 
   const forms = cms.forms.all()
   const isMultiform = forms.length > 1
-  const activeForm = activeFormId ? cms.forms.findForm(activeFormId) : null
+  const activeForm = activeFormId ? cms.forms.find(activeFormId) : null
 
   const isEditing = !!activeForm
 
@@ -392,7 +392,9 @@ const FormWrapper = styled.div<FormWrapperProps>`
     `};
 `
 
-export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(Button)`
+export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
+  Button
+)`
   flex: 1.5 0 auto;
   padding: 0.75rem 1.5rem;
 `
