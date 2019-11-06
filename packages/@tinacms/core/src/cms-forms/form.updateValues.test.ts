@@ -226,26 +226,43 @@ describe('Form#updateValues', () => {
         })
       })
     })
-    it('asdfasdf', () => {
-      const form = makeForm(
-        {
-          author: { name: 'Ella' },
-          seo: { description: 'A description' },
-        },
-        []
-      )
-      const nextValues = {
-        author: { name: 'Bella' },
-        seo: { description: 'A new description' },
+
+    describe('when there is two groups: "author" and "seo"', () => {
+      const initialValues = {
+        author: { name: 'Ella' },
+        seo: { description: 'A description' },
       }
 
-      form.finalForm.registerField('author.name', () => {}, {})
-      form.finalForm.focus('author.name')
-      form.updateValues(nextValues)
+      let form: Form
 
-      expect(form.values).toEqual({
-        author: { name: 'Ella' },
-        seo: { description: 'A new description' },
+      beforeEach(() => (form = makeForm(initialValues)))
+
+      describe('when "author.name" is active', () => {
+        beforeEach(() => {
+          form.finalForm.registerField('author.name', () => {}, {})
+          form.finalForm.focus('author.name')
+        })
+
+        describe('and both "author.name" and "seo.description" are changed', () => {
+          const nextValues = {
+            author: { name: 'Bella' },
+            seo: { description: 'A new description' },
+          }
+
+          beforeEach(() => {
+            form.updateValues(nextValues)
+          })
+
+          it('does not update the author.name', () => {
+            expect(form.values.author.name).toEqual('Ella')
+          })
+
+          it('does updates the seo.description', () => {
+            expect(form.values.seo.description).toEqual(
+              nextValues.seo.description
+            )
+          })
+        })
       })
     })
   })
