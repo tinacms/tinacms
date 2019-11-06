@@ -18,7 +18,7 @@ limitations under the License.
 
 import { Form, Field } from './form'
 
-function makeForm(initialValues: any, fields: Field[]) {
+function makeForm(initialValues: any, fields: Field[] = []) {
   return new Form({
     id: 'test',
     label: 'Test',
@@ -30,22 +30,21 @@ function makeForm(initialValues: any, fields: Field[]) {
 
 describe('Form#updateValues', () => {
   describe('for primitive fields', () => {
-    const fields = [
-      { name: 'name', component: 'text' },
-      { name: 'name', component: 'toggle' },
-    ]
-
     describe('changing explicit fields', () => {
-      it('updates text', () => {
-        const form = makeForm({ name: 'test' }, fields)
+      it('updates strings', () => {
+        const form = makeForm({ name: 'test' }, [
+          { name: 'name', component: 'text' },
+        ])
         const nextValues = { name: 'modified' }
 
         form.updateValues(nextValues)
 
         expect(form.values).toEqual(nextValues)
       })
-      it('updates toggle', () => {
-        const form = makeForm({ draft: true }, fields)
+      it('updates booleans', () => {
+        const form = makeForm({ draft: true }, [
+          { name: 'name', component: 'toggle' },
+        ])
         const nextValues = { draft: 'draft' }
 
         form.updateValues(nextValues)
@@ -53,19 +52,28 @@ describe('Form#updateValues', () => {
         expect(form.values).toEqual(nextValues)
       })
     })
+
     describe('changing implicit fields', () => {
-      it('updates a text field', () => {
-        const form = makeForm({ name: 'test', shy: '' }, fields)
+      it('updates strings', () => {
+        const form = makeForm({ name: 'test', shy: '' })
         const nextValues = { name: 'test', shy: 'boi' }
 
         form.updateValues(nextValues)
 
         expect(form.values).toEqual(nextValues)
       })
+      it('updates numbers', () => {
+        const form = makeForm({ age: 20 })
+        const nextValues = { age: 23 }
+
+        form.updateValues(nextValues)
+
+        expect(form.values).toEqual(nextValues)
+      })
     })
-    describe('changing undeclared fields', () => {
-      it('updates a text field', () => {
-        const form = makeForm({ name: 'test' }, fields)
+    describe('when `nextValues` has a new field', () => {
+      it('adds that field', () => {
+        const form = makeForm({ name: 'test' })
         const nextValues = { name: 'test', newKid: 'on the block' }
 
         form.updateValues(nextValues)
@@ -73,60 +81,188 @@ describe('Form#updateValues', () => {
         expect(form.values).toEqual(nextValues)
       })
     })
-    // TODO: This should probably change
-    it('does not remove deleted fields', () => {
-      const form = makeForm({ name: 'test' }, fields)
-      const nextValues = {}
+    describe('when `nextValues` is missing a field', () => {
+      // TODO: This should probably change
+      it('does not remove deleted fields', () => {
+        const form = makeForm({ name: 'test' })
+        const nextValues = {}
 
-      form.updateValues(nextValues)
+        form.updateValues(nextValues)
 
-      expect(form.values).not.toEqual(nextValues)
+        expect(form.values).not.toEqual(nextValues)
+      })
     })
   })
 
-  describe('for groups', () => {
-    describe('with no active fields', () => {
-      it('updates name', () => {
-        const form = makeForm({ author: { name: 'Ella', age: 23 } }, [])
+  describe('for a group of "author" fields. Form = { author: { name: string, age: number } }', () => {
+    interface S {
+      author: {
+        name: string
+        age: number
+      }
+    }
+    describe('with no active field', () => {
+      describe('when only the "name" is changed', () => {
+        const initialValues = { author: { name: 'Ella', age: 23 } }
         const nextValues = { author: { name: 'Georgina', age: 23 } }
 
-        form.updateValues(nextValues)
+        let form: Form<S>
 
-        expect(form.values).toEqual(nextValues)
+        beforeEach(() => {
+          form = makeForm(initialValues)
+          form.updateValues(nextValues)
+        })
+
+        it('changes the "name"', () => {
+          expect(form.values.author.name).toEqual(nextValues.author.name)
+        })
+
+        it('does not changes the "age"', () => {
+          expect(form.values.author.age).toEqual(initialValues.author.age)
+        })
+      })
+      describe('when only the "age" is changed', () => {
+        const initialValues = { author: { name: 'Ella', age: 23 } }
+        const nextValues = { author: { name: 'Ella', age: 68 } }
+
+        let form: Form<S>
+
+        beforeEach(() => {
+          form = makeForm(initialValues)
+          form.updateValues(nextValues)
+        })
+
+        it('does not change the "name"', () => {
+          expect(form.values.author.name).toEqual(initialValues.author.name)
+        })
+
+        it('changes the "age"', () => {
+          expect(form.values.author.age).toEqual(nextValues.author.age)
+        })
+      })
+      describe('when both the "name" and "age" are changed', () => {
+        const initialValues = { author: { name: 'Ella', age: 23 } }
+        const nextValues = { author: { name: 'Georgina', age: 52 } }
+
+        let form: Form<S>
+
+        beforeEach(() => {
+          form = makeForm(initialValues)
+
+          form.updateValues(nextValues)
+        })
+
+        it('changes the "name"', () => {
+          expect(form.values.author.name).toEqual(nextValues.author.name)
+        })
+
+        it('changes the "age"', () => {
+          expect(form.values.author.age).toEqual(nextValues.author.age)
+        })
       })
     })
-    describe('with the name active', () => {
-      it('only updates the age', () => {
-        const form = makeForm({ author: { name: 'Ella', age: 23 } }, [])
-        const nextValues = { author: { name: 'Georgina', age: 30 } }
 
-        form.finalForm.registerField('author.name', () => {}, {})
-        form.finalForm.focus('author.name')
-        form.updateValues(nextValues)
+    describe('with the "name" active', () => {
+      describe('when only the "name" is changed', () => {
+        const initialValues = { author: { name: 'Ella', age: 23 } }
+        const nextValues = { author: { name: 'Georgina', age: 23 } }
 
-        expect(form.values).toEqual({ author: { name: 'Ella', age: 30 } })
+        let form: Form<S>
+
+        beforeEach(() => {
+          form = makeForm(initialValues)
+          form.finalForm.registerField('author.name', () => {}, {})
+          form.finalForm.focus('author.name')
+          form.updateValues(nextValues)
+        })
+
+        it('does not change the "name"', () => {
+          expect(form.values.author.name).toEqual(initialValues.author.name)
+        })
+
+        it('does not change the "age"', () => {
+          expect(form.values.author.age).toEqual(initialValues.author.age)
+        })
+      })
+      describe('when only the "age" is changed', () => {
+        const initialValues = { author: { name: 'Ella', age: 50 } }
+        const nextValues = { author: { name: 'Ella', age: 5 } }
+
+        let form: Form<S>
+
+        beforeEach(() => {
+          form = makeForm(initialValues)
+          form.finalForm.registerField('author.name', () => {}, {})
+          form.finalForm.focus('author.name')
+          form.updateValues(nextValues)
+        })
+
+        it('changes the "age"', () => {
+          expect(form.values).toEqual(nextValues)
+        })
+
+        it('does not change the "name"', () => {
+          expect(form.values.author.name).toEqual(initialValues.author.name)
+        })
+      })
+      describe('when both the "name" and "age" are changed', () => {
+        let form: Form<S>
+        const initialValues = { author: { name: 'Steve', age: 50 } }
+        const nextValues = { author: { name: 'Ellen', age: 42 } }
+
+        beforeEach(() => {
+          form = makeForm(initialValues)
+          form.finalForm.registerField('author.name', () => {}, {})
+          form.finalForm.focus('author.name')
+          form.updateValues(nextValues)
+        })
+
+        it('changes the "age"', () => {
+          expect(form.values.author.age).toEqual(nextValues.author.age)
+        })
+
+        it('does not change the "name"', () => {
+          expect(form.values.author.name).toEqual(initialValues.author.name)
+        })
       })
     })
-    it('asdfasdf', () => {
-      const form = makeForm(
-        {
-          author: { name: 'Ella' },
-          seo: { description: 'A description' },
-        },
-        []
-      )
-      const nextValues = {
-        author: { name: 'Bella' },
-        seo: { description: 'A new description' },
+
+    describe('when there is two groups: "author" and "seo"', () => {
+      const initialValues = {
+        author: { name: 'Ella' },
+        seo: { description: 'A description' },
       }
 
-      form.finalForm.registerField('author.name', () => {}, {})
-      form.finalForm.focus('author.name')
-      form.updateValues(nextValues)
+      let form: Form
 
-      expect(form.values).toEqual({
-        author: { name: 'Ella' },
-        seo: { description: 'A new description' },
+      beforeEach(() => (form = makeForm(initialValues)))
+
+      describe('when "author.name" is active', () => {
+        beforeEach(() => {
+          form.finalForm.registerField('author.name', () => {}, {})
+          form.finalForm.focus('author.name')
+        })
+
+        describe('and both "author.name" and "seo.description" are changed', () => {
+          const nextValues = {
+            author: { name: 'Bella' },
+            seo: { description: 'A new description' },
+          }
+
+          beforeEach(() => {
+            form.updateValues(nextValues)
+          })
+
+          it('does not update the author.name', () => {
+            expect(form.values.author.name).toEqual('Ella')
+          })
+
+          it('does updates the seo.description', () => {
+            expect(form.values.seo.description).toEqual(
+              nextValues.seo.description
+            )
+          })
+        })
       })
     })
   })
