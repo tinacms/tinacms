@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import '@tinacms/fields/node_modules/@tinacms/styles'
 import * as React from 'react'
 import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'

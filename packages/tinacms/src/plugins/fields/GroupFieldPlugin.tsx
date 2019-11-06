@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import '@tinacms/fields/node_modules/@tinacms/styles'
 import * as React from 'react'
 import { Field, Form } from '@tinacms/core'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
@@ -42,10 +41,7 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = function Group({
-  tinaForm,
-  field,
-}: GroupProps) {
+export const Group = function Group({ tinaForm, field }: GroupProps) {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <>
@@ -129,7 +125,9 @@ const Header: StyledComponent<'div', {}, {}> = styled.div`
   }
 `
 
-export const PanelHeader: StyledComponent<typeof Header, {}, {}> = styled(Header)`
+export const PanelHeader: StyledComponent<typeof Header, {}, {}> = styled(
+  Header
+)`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
