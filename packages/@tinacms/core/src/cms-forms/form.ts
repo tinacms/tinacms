@@ -85,7 +85,14 @@ export class Form<S = any> {
         return response
       },
       mutators: {
-        ...arrayMutators,
+        /**
+         * TODO: Broken by `final-form@4.18.6`.
+         *
+         * Left comment in the docs
+         *
+         * https://github.com/final-form/final-form/pull/275#issuecomment-551132760
+         */
+        ...(arrayMutators as any),
         ...options.mutators,
       },
     })
