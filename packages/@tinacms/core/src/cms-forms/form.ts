@@ -114,6 +114,10 @@ export class Form<S = any> {
     return this.finalForm.getState().values
   }
 
+  get name() {
+    return this.id
+  }
+
   updateValues(values: S) {
     this.finalForm.batch(() => {
       const activePath: string | undefined = this.finalForm.getState().active

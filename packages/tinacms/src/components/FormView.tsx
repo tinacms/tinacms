@@ -55,7 +55,7 @@ export const FormsView = () => {
 
   const forms = cms.forms.all()
   const isMultiform = forms.length > 1
-  const activeForm = activeFormId ? cms.forms.findForm(activeFormId) : null
+  const activeForm = activeFormId ? cms.forms.find(activeFormId) : null
 
   const isEditing = !!activeForm
 
