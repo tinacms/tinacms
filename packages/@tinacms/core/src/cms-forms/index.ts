@@ -16,5 +16,4 @@ limitations under the License.
 
 */
 
-export * from './form-manager'
 export * from './form'
