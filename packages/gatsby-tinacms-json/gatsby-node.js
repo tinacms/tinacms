@@ -29,7 +29,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type, getNode }) => {
     rawJson: {
       type: GraphQLString,
       args: {},
-      resolve: ({ children, id, internal, parent, ...data }) => {
+      resolve: ({ children, id, internal, parent, fields, ...data }) => {
         return JSON.stringify(data)
       },
     },
