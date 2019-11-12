@@ -68,9 +68,13 @@ Linking prevents running `npm install` from directly inside a package from worki
 
    This sucks. Try running `lerna clean` and then running `npm run bs` again.
 
-## Releasing
+## General Release Process
 
 The general release process looks like this:
+
+1. **Merge Changes**
+
+   Merge the changes to be published into the appropriate branche.
 
 1. **Build the source files:**
 
@@ -97,9 +101,27 @@ The general release process looks like this:
 
    Let everyone know!
 
+1. **Backmerge to Source Branch**
+
+   Merge the current branch back into the source of the changes.
+
 The exact commands vary slightly depending on the type of release being made.
 
+### Canary
+
+Canary release are automatically created when commits are pushed to `master`.
+
 ### Prerelease
+
+i.e. `yarn add tinacms@next`
+
+1. **Merge Changes**
+
+   ```
+   git checkout next
+   git merge master
+   git push
+   ```
 
 1. **Build the source files:**
 
@@ -125,15 +147,35 @@ The exact commands vary slightly depending on the type of release being made.
    ```
 
 1. **Publish to NPM:**
+
    ```
    lerna publish from-package --dist-tag next
    ```
+
 1. **Push CHANGELOGs and git tags to Github:**
+
    ```
    git push && git push --tags
    ```
 
-### Graduating Prereleases
+1. **Backmerge to `master`**
+
+   ```
+   git checkout master
+   git merge next
+   ```
+
+### Release
+
+i.e `yarn add tinacms` or `yarn add tinacms@latest`
+
+1. **Merge Changes**
+
+   ```
+   git checkout latest
+   git merge next
+   git push
+   ```
 
 1. **Build the source files:**
 
@@ -148,6 +190,7 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-graduate \
      --no-push \
+     --allow-branch latest \
      -m "chore(publish): latest"
    ```
 
@@ -168,35 +211,9 @@ The exact commands vary slightly depending on the type of release being made.
    git push && git push --tags
    ```
 
-### Release
-
-1. **Build the source files:**
+1. **Backmerge to `next`**
 
    ```
-   npm run build
-   ```
-
-1. **Generate CHANGELOGs and git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --no-push \
-     --allow-branch master \
-     -m "chore(publish): release"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
-1. **Publish to NPM:**
-   ```
-   lerna publish from-package
-   ```
-1. **Push CHANGELOGs and git tags to Github:**
-   ```
-   git push && git push --tags
+   git checkout next
+   git merge latest
    ```
