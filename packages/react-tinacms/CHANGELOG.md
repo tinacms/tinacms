@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.5.0-alpha.0...react-tinacms@0.8.0) (2019-11-12)
+
+
+### Bug Fixes
+
+* early return for empty watch values ([8f37ad4](https://github.com/tinacms/tinacms/commit/8f37ad4))
+* remove default value assignment in updateFormValues ([f9e4056](https://github.com/tinacms/tinacms/commit/f9e4056))
+* remove default value assignment in updateFormValues ([4cf7864](https://github.com/tinacms/tinacms/commit/4cf7864))
+
+
+### Features
+
+* usePlugins accepts multiple plugins ([5ab24db](https://github.com/tinacms/tinacms/commit/5ab24db))
+* withPlugins accepst multiple plugins ([9e48c00](https://github.com/tinacms/tinacms/commit/9e48c00))
+
+
+
+
+
 ## 0.7.0 (2019-11-12)
 
 ### Bug Fixes
