@@ -48,6 +48,20 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 | npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
 
+### Testing With External Projects
+
+Currently, testing with external projects is somewhat inelegant, but this repo includes a folder designed for importing external projects into the monorepo so the development versions of Tina packages can be bootstrapped into the project. To import an external project:
+
+1. `git clone` or simply copy the project into the `packages/@testing` folder. Everything in this folder is ignored by git.
+2. In the root of the monorepo, run `npm run bs` to bootstrap the packages
+3. Navigate to your project folder and develop normally
+
+**Pitfalls of Testing with External Projects**
+
+- Running `npm run build` in the root of the monorepo will run a `build` script if your project has one defined. *TODO: filter out projects in `@testing` from `lerna run` scripts*
+- Gatsby and React both rely on some globally-persisted values which can cause errors if you have multiple copies of these dependencies installed. When testing a Gatsby site, many issues can be worked around by temporarily deleting the `demo-gatsby` package and bootstrapping again.
+
+
 ## Release Process
 
 Tina has three main branches:
