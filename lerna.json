@@ -3,7 +3,10 @@
   "version": "independent",
   "command": {
     "publish": {
-      "ignoreChanges": ["packages/demo/**/*"]
+      "ignoreChanges": ["packages/demo-*", "packages/@testing/**"]
+    },
+    "run": {
+      "ignore": []
     }
   }
 }
