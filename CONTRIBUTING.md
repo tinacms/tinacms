@@ -74,7 +74,7 @@ The general release process looks like this:
 
 1. **Merge Changes**
 
-   Merge the changes to be published into the appropriate branche.
+   Merge the changes to be published into the appropriate branch.
 
 1. **Build the source files:**
 

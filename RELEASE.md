@@ -56,6 +56,7 @@ i.e. `yarn add tinacms@next`
    ```
    git checkout master
    git merge next
+   git push
    ```
 
 ## Release
@@ -109,4 +110,5 @@ i.e `yarn add tinacms` or `yarn add tinacms@latest`
    ```
    git checkout next
    git merge latest
+   git push
    ```
