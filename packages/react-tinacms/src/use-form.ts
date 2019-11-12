@@ -51,7 +51,8 @@ export function useCMSForm<FormShape = any>(
   React.useEffect(
     function createForm() {
       if (!options.initialValues) return
-      const form = cms.forms.createForm(options)
+      const form = new Form(options)
+      cms.forms.add(form)
       setForm(form)
       const unsubscribe = form.subscribe(
         form => {
@@ -63,7 +64,7 @@ export function useCMSForm<FormShape = any>(
       return () => {
         unsubscribe()
         if (form) {
-          cms.forms.removeForm(form.id)
+          cms.forms.remove(form.id)
         }
       }
     },
