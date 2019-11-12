@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.3.0 (2019-11-12)
+
+### Features
+
+- **git:** add branch API endpoints to client ([3e80033](https://github.com/tinacms/tinacms/commit/3e80033))
+- **git:** implement push endpoint ([4db1284](https://github.com/tinacms/tinacms/commit/4db1284))
+- **git:** implement pushOnCommit option ([4413a6e](https://github.com/tinacms/tinacms/commit/4413a6e))
+
 ## 0.2.0 (2019-11-04)
 
 ### Features
