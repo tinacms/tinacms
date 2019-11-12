@@ -142,18 +142,26 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
       <GroupListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
-            {(provider) => (
+            {provider => (
               <div ref={provider.innerRef} className="edit-page--list-parent">
                 {items.length === 0 && <EmptyState />}
                 {items.map((block: any, index: any) => {
                   const template = field.templates[block._template]
+
                   if (!template) {
-                    // TODO: if no template return invalid entry
+                    return (
+                      <InvalidBlockListItem
+                        index={index}
+                        field={field}
+                        tinaForm={tinaForm}
+                      />
+                    )
                   }
+
                   const itemProps = (item: object) => {
                     if (!template.itemProps) return {}
                     return template.itemProps(item)
-                  };
+                  }
 
                   return (
                     <BlockListItem
@@ -237,6 +245,46 @@ const BlockListItem = ({
             template={template}
           />
         </>
+      )}
+    </Draggable>
+  )
+}
+
+const InvalidBlockListItem = ({
+  tinaForm,
+  field,
+  index,
+}: {
+  tinaForm: Form
+  field: Field
+  index: number
+}) => {
+  const removeItem = React.useCallback(() => {
+    tinaForm.finalForm.mutators.remove(field.name, index)
+  }, [tinaForm, field, index])
+
+  return (
+    <Draggable
+      key={index}
+      type={field.name}
+      draggableId={`${field.name}.${index}`}
+      index={index}
+    >
+      {(provider, snapshot) => (
+        <ItemHeader
+          ref={provider.innerRef}
+          isDragging={snapshot.isDragging}
+          {...provider.draggableProps}
+          {...provider.dragHandleProps}
+        >
+          <DragHandle />
+          <ItemClickTarget>
+            <GroupLabel>Invalid Block</GroupLabel>
+          </ItemClickTarget>
+          <DeleteButton onClick={removeItem}>
+            <TrashIcon />
+          </DeleteButton>
+        </ItemHeader>
       )}
     </Draggable>
   )
