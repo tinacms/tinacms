@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.6.0...gatsby-tinacms-json@0.6.2-alpha.0) (2019-11-12)
+
+
+### Bug Fixes
+
+* **useJsonForm:** writes out all data Closes [#450](https://github.com/tinacms/tinacms/issues/450) ([565e4bb](https://github.com/tinacms/tinacms/commit/565e4bb))
+
+
+
+
+
 ## 0.6.0 (2019-11-04)
 
 ### Bug Fixes
