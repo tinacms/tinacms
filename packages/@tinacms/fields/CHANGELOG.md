@@ -3,6 +3,15 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.1.10 (2019-11-12)
+
+### Bug Fixes
+
+- remove margin from wysiwyg menu buttons ([7a4df52](https://github.com/tinacms/tinacms/commit/7a4df52))
+- styled-components is a peerDependency ([baaf3de](https://github.com/tinacms/tinacms/commit/baaf3de))
+- **wysiwyg:** enter should split items ([209984f](https://github.com/tinacms/tinacms/commit/209984f)), closes [#393](https://github.com/tinacms/tinacms/issues/393)
+- **wysiwyg:** enter should split items ([16fabe3](https://github.com/tinacms/tinacms/commit/16fabe3)), closes [#393](https://github.com/tinacms/tinacms/issues/393)
+
 ## 0.1.9 (2019-11-04)
 
 ### Bug Fixes
