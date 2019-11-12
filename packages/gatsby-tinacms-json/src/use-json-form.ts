@@ -111,10 +111,10 @@ export function useJsonForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = useCallback(formState => {
-    const { fileRelativePath, rawJson, ...data } = formState.values.rawJson
+    const { rawJson, jsonNode } = formState.values
     cms.api.git.onChange!({
-      fileRelativePath: formState.values.jsonNode.fileRelativePath,
-      content: JSON.stringify(data, null, 2),
+      fileRelativePath: jsonNode.fileRelativePath,
+      content: JSON.stringify(rawJson, null, 2),
     })
   }, [])
 
