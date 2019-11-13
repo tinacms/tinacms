@@ -279,7 +279,7 @@ const InvalidBlockListItem = ({
         >
           <DragHandle />
           <ItemClickTarget>
-            <GroupLabel>Invalid Block</GroupLabel>
+            <GroupLabel error>Invalid Block</GroupLabel>
           </ItemClickTarget>
           <DeleteButton onClick={removeItem}>
             <TrashIcon />
@@ -363,7 +363,7 @@ const ItemClickTarget = styled.div`
   padding: 0.5rem;
 `
 
-const GroupLabel = styled.span`
+const GroupLabel = styled.span<{ error?: boolean }>`
   margin: 0;
   font-size: ${font.size(2)};
   font-weight: 500;
@@ -374,6 +374,12 @@ const GroupLabel = styled.span`
   color: inherit;
   transition: all 85ms ease-out;
   text-align: left;
+
+  ${props =>
+    props.error &&
+    css`
+      color: ${color.error()} !important;
+    `};
 `
 
 const GroupListHeader = styled.div`
