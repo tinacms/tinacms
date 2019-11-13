@@ -43,8 +43,10 @@ export function useCMSForm<FormShape = any>(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [values, form] = useForm<FormShape>(options, watch)
 
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   React.useEffect(() => {
     if (!form) return
 
@@ -65,12 +67,9 @@ export function useForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [form, setForm] = React.useState<Form | undefined>()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, setValues] = React.useState(options.initialValues)
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   React.useEffect(
     function createForm() {
       if (!options.initialValues) return
@@ -90,11 +89,8 @@ export function useForm<FormShape = any>(
     [options.id, !!options.initialValues]
   )
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormFields(watch.fields, form)
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormLabel(watch.label, form)
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormValues(watch.values, form)
 
   return [form ? form.values : options.initialValues, form]
