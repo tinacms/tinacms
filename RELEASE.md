@@ -1,10 +1,39 @@
 # Releasing
 
-## Canary
+## Release Process
+
+Tina has three main branches:
+
+- **master:** The bleeding edge of tinacms
+- **latest:** The current release
+
+The flow of changes therefore looks like:
+
+> `fix-some-bug` => `master` => `latest`
+
+The process looks like this:
+
+- On Monday `master` is merged into `latest`; then `latest` is published to npm
+- Any hot fixes for bugs will be cherry picked into `latest`
+  and the published accordingly.
+- Every pull request merged to `master` automatically triggers a
+  `canary` release.
+
+With this process:
+
+- all accepted changes are available as `canary` releases for early testing
+- critical fixes are published as soon as possible
+- new features and minor fixes take half a week (on average) to be published
+
+## Creating Releases
+
+### Canary
 
 Canary release are automatically created when commits are pushed to `master`.
 
-## Prerelease
+<!--COMMENT THIS OUT FOR NOW. WE WANT A FASTER CYCLE
+
+### Prerelease
 
 i.e. `yarn add tinacms@next`
 
@@ -58,8 +87,9 @@ i.e. `yarn add tinacms@next`
    git merge next
    git push
    ```
+-->
 
-## Release
+### Release
 
 i.e `yarn add tinacms` or `yarn add tinacms@latest`
 

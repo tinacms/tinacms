@@ -4,6 +4,7 @@
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-27-orange.svg?style=flat-square)](#contributors)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Getting Started
@@ -15,7 +16,7 @@
   - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
   - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
-  - [Releasing](./CONTRIBUTING.md#Releasing)
+- [Release Process](./RELEASE.md)
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
 
@@ -47,34 +48,6 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 | npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
-
-## Release Process
-
-Tina has three main branches:
-
-- **master:** The bleeding edge of tinacms
-- **next:** A preview of the next release
-- **latest:** The current stable release
-
-The flow of changes therefore looks like:
-
-> `fix-some-bug` => `master` => `next` => `latest`
-
-The process happens over a week:
-
-- On Monday
-  1. `next` is merged into `latest`; then `latest` is published to npm
-  2. `master` is merged into `next`; then `next` is published to npm
-- Any hot fixes for bugs will be cherry picked into `next` and `latest`
-  and the published accordingly.
-- Every pull request merged to `master` automatically triggers a
-  `canary` release.
-
-With this process:
-
-- all accepted changes are available as `canary` releases for early testing
-- critical fixes are published as soon as possible
-- new features and minor fixes take ~1.5 weeks to be published
 
 ## Contributors ✨
 
