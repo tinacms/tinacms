@@ -59,16 +59,6 @@ export const FormsView = () => {
 
   const isEditing = !!activeForm
 
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      const form = activeForm!.finalForm
-      if (!result.destination) return
-      const name = result.type
-      form.mutators.move(name, result.source.index, result.destination.index)
-    },
-    [activeForm]
-  )
-
   /**
    * No Forms
    */
@@ -85,6 +75,37 @@ export const FormsView = () => {
       />
     )
   }
+
+  return (
+    <FormView
+      activeForm={activeForm}
+      setActiveFormId={setActiveFormId}
+      isMultiform={isMultiform}
+    />
+  )
+}
+
+export interface FormViewProps {
+  activeForm: Form
+  setActiveFormId(id: string): void
+  isMultiform: boolean
+}
+export function FormView({
+  activeForm,
+  setActiveFormId,
+  isMultiform,
+}: FormViewProps) {
+  const isEditing = !!activeForm
+
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      const form = activeForm!.finalForm
+      if (!result.destination) return
+      const name = result.type
+      form.mutators.move(name, result.source.index, result.destination.index)
+    },
+    [activeForm]
+  )
 
   return (
     <FormBuilder form={activeForm as any}>
