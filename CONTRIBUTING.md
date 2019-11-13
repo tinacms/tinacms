@@ -148,8 +148,7 @@ The exact commands vary slightly depending on the type of release being made.
      --conventional-commits \
      --conventional-graduate \
      --no-push \
-     --allow-branch next \
-     -m "chore(publish): graduation"
+     -m "chore(publish): latest"
    ```
 
 1. **Clean the CHANGELOGs**

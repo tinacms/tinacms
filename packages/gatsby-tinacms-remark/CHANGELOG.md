@@ -3,11 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## 0.3.6 (2019-11-04)
+## [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.0...gatsby-tinacms-remark@0.5.0-alpha.0) (2019-11-12)
+
+### Features
+
+- **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
+
+## 0.4.0 (2019-11-04)
 
 ### Bug Fixes
 
+- **useRemarkForm:** accepts a list of actions ([7a30539](https://github.com/tinacms/tinacms/commit/7a30539))
 - path resolution for Gatsby remark on Windows [#382](https://github.com/tinacms/tinacms/issues/382) ([#389](https://github.com/tinacms/tinacms/issues/389)) ([7173f66](https://github.com/tinacms/tinacms/commit/7173f66))
+- path resolution for Gatsby remark on Windows [#382](https://github.com/tinacms/tinacms/issues/382) ([#389](https://github.com/tinacms/tinacms/issues/389)) ([546fcd2](https://github.com/tinacms/tinacms/commit/546fcd2))
+
+### Features
+
+- **create remark plugin:** defined as class ([6fa1fae](https://github.com/tinacms/tinacms/commit/6fa1fae))
+- **DeleteAction:** lets you delete remark files ([8505e92](https://github.com/tinacms/tinacms/commit/8505e92))
 
 ## 0.3.5 (2019-10-28)
 
