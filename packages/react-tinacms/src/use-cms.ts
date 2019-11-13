@@ -23,10 +23,8 @@ export const ERROR_MISSING_CMS = `useCMS could not find an instance of CMS`
 
 export const CMSContext = React.createContext<CMS | null>(null)
 
-declare const window: { tinacms?: CMS }
-
 export function useCMS(): CMS {
-  const cms = React.useContext(CMSContext) || window.tinacms
+  const cms = React.useContext(CMSContext)
 
   if (!cms) {
     throw new Error(ERROR_MISSING_CMS)
