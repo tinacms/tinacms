@@ -17,8 +17,10 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ScreenPlugin } from '../screen-plugin'
 import { SettingsIcon, MediaIcon } from '@tinacms/icons'
+import { Form } from '@tinacms/core'
+import { ScreenPlugin } from '../screen-plugin'
+import { FormView } from '../../components/FormView'
 
 export const MediaView: ScreenPlugin = {
   __type: 'screen',
@@ -36,4 +38,25 @@ export const SettingsView: ScreenPlugin = {
   Component: () => {
     return <h2>Hello World</h2>
   },
+}
+
+export class GlobalFormPlugin implements ScreenPlugin {
+  __type: ScreenPlugin['__type'] = 'screen'
+  name: ScreenPlugin['name']
+  Component: ScreenPlugin['Component']
+  Icon: ScreenPlugin['Icon']
+
+  constructor(public form: Form, icon: ScreenPlugin['Icon']) {
+    this.name = form.label
+    this.Icon = icon || SettingsIcon
+    this.Component = () => {
+      return (
+        <FormView
+          activeForm={form}
+          isMultiform={false}
+          setActiveFormId={null as any}
+        />
+      )
+    }
+  }
 }
