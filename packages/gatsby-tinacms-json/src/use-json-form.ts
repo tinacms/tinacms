@@ -18,6 +18,8 @@ limitations under the License.
 import { Form, FormOptions, Field } from '@tinacms/core'
 import { useCMS, useWatchFormValues, usePlugins, useForm } from 'react-tinacms'
 import { useMemo, useCallback, useState, useEffect } from 'react'
+import * as React from 'react'
+import { GlobalFormPlugin } from 'tinacms'
 
 interface JsonNode {
   id: string
@@ -29,7 +31,7 @@ interface JsonNode {
 export function useJsonForm(
   jsonNode: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}
-) {
+): [JsonNode | null, Form | null] {
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks. In the case of the check for
@@ -124,6 +126,21 @@ export function useJsonForm(
   return [jsonNode, form as Form]
 }
 
+
+export function useGlobalJsonForm(
+  jsonNode: JsonNode | null,
+  formOptions: Partial<FormOptions<any>> = {}
+) {
+  const [values, form] = useJsonForm(jsonNode, formOptions)
+  usePlugins(
+    React.useMemo(() => {
+      if (form) {
+        return new GlobalFormPlugin(form, null)
+      }
+    }, [form])
+  )
+  return [values, form]
+}
 function generateFields(post: any): Field[] {
   return Object.keys(post).map(key => ({
     component: 'text',
