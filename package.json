@@ -16,7 +16,6 @@
     "@types/vfile-message": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
-    "@types/vfile-message": "^2.0.0",
     "commander": "^2.20.0",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
