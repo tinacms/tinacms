@@ -16,4 +16,12 @@ limitations under the License.
 
 */
 
-export * from './form'
+import { graphql } from 'gatsby'
+
+export const tinaRemarkFragment = graphql`
+  fragment TinaRemark on MarkdownRemark {
+    fileRelativePath
+    rawFrontmatter
+    rawMarkdownBody
+  }
+`

@@ -3,12 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## 0.8.0 (2019-11-12)
+
+### Bug Fixes
+
+- fix block menu not showing all items ([c61829a](https://github.com/tinacms/tinacms/commit/c61829a))
+- styled-components is a peerDependency ([baaf3de](https://github.com/tinacms/tinacms/commit/baaf3de))
+- **content creator:** subscribe to plugin changes ([565ead9](https://github.com/tinacms/tinacms/commit/565ead9)), closes [#391](https://github.com/tinacms/tinacms/issues/391)
+- **create content plugins:** form shape is generic ([4f691ac](https://github.com/tinacms/tinacms/commit/4f691ac))
+
+### Features
+
+- **blocks:** add itemProps function to templates ([5fd0224](https://github.com/tinacms/tinacms/commit/5fd0224))
+- **blocks:** defaultItem can be a function ([a7b8ef6](https://github.com/tinacms/tinacms/commit/a7b8ef6))
+
 ## 0.6.0 (2019-11-04)
 
 ### Bug Fixes
 
 - fix block menu not showing all items ([c61829a](https://github.com/tinacms/tinacms/commit/c61829a))
 - styled-components is a peerDependency ([baaf3de](https://github.com/tinacms/tinacms/commit/baaf3de))
+- **content creator:** subscribe to plugin changes ([565ead9](https://github.com/tinacms/tinacms/commit/565ead9)), closes [#391](https://github.com/tinacms/tinacms/issues/391)
+- **create content plugins:** form shape is generic ([4f691ac](https://github.com/tinacms/tinacms/commit/4f691ac))
 
 ### Features
 

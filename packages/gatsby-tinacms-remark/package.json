@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.3.6",
+  "version": "0.4.3",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -31,17 +31,17 @@
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.7",
+    "@tinacms/scripts": "^0.1.10",
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.3.1",
-    "@tinacms/form-builder": "^0.2.1",
+    "@tinacms/core": "^0.4.3",
+    "@tinacms/form-builder": "^0.2.4",
     "gray-matter": "^4.0.2",
     "lodash.get": "^4.4.2",
-    "react-tinacms": "^0.6.0",
-    "tinacms": "^0.6.0"
+    "react-tinacms": "^0.8.0",
+    "tinacms": "^0.8.0"
   }
 }
