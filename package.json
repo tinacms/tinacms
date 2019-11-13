@@ -13,6 +13,7 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
+    "@types/vfile-message": "^2.0.0",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "commander": "^2.20.0",
