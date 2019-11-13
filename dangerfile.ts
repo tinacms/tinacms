@@ -248,6 +248,7 @@ function getModifiedPackages(allFiles: string[]) {
     allFiles
       .filter(filepath => filepath.startsWith('packages/'))
       .filter(filepath => !filepath.startsWith('packages/demo'))
+      .filter(filepath => !filepath.startsWith('packages/@testing'))
       /**
        * These are all the old directory groups.
        * For some reason they still exist in Github, even
