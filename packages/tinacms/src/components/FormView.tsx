@@ -123,6 +123,7 @@ export const FormsView = () => {
                 <Button
                   onClick={() => handleSubmit()}
                   disabled={pristine}
+                  busy={submitting}
                   primary
                   grow
                   margin
