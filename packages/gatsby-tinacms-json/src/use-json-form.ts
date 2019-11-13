@@ -126,6 +126,14 @@ export function useJsonForm(
   return [jsonNode, form as Form]
 }
 
+export function useLocalJsonForm(
+  jsonNode: JsonNode | null,
+  formOptions: Partial<FormOptions<any>> = {}
+) {
+  const [values, form] = useJsonForm(jsonNode, formOptions)
+  usePlugins(form as any)
+  return [values, form]
+}
 
 export function useGlobalJsonForm(
   jsonNode: JsonNode | null,
@@ -141,6 +149,7 @@ export function useGlobalJsonForm(
   )
   return [values, form]
 }
+
 function generateFields(post: any): Field[] {
   return Object.keys(post).map(key => ({
     component: 'text',
