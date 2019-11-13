@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { FormOptions, Form } from '@tinacms/core'
-import { useLocalForm, useCMS, useWatchFormValues } from 'react-tinacms'
+import { useCMS, useWatchFormValues, useForm, usePlugins } from 'react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -117,7 +117,7 @@ export function useRemarkForm(
   }, [formOverrrides.fields])
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useLocalForm(
+  const [, form] = useForm(
     {
       label,
       id,
@@ -156,6 +156,18 @@ export function useRemarkForm(
   useWatchFormValues(form, writeToDisk)
 
   return [markdownRemark, form]
+}
+
+export function useLocalRemarkForm(
+  markdownRemark: RemarkNode | null | undefined,
+  formOverrrides: Partial<FormOptions<any>> = {}
+): [RemarkNode | null | undefined, Form | string | null | undefined] {
+  const [values, form] = useRemarkForm(markdownRemark, formOverrrides)
+
+  // @ts-ignore form can be `null` and usePlugins doesn't like that.
+  usePlugins(form)
+
+  return [values, form]
 }
 
 /**
