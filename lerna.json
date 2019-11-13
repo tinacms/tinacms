@@ -1,9 +1,12 @@
 {
-  "packages": ["packages/@tinacms/*", "packages/[!@]*"],
+  "packages": ["packages/@tinacms/*", "packages/[!@]*", "packages/@testing/*"],
   "version": "independent",
   "command": {
     "publish": {
-      "ignoreChanges": ["packages/demo/**/*"]
+      "ignoreChanges": ["packages/demo-*", "packages/@testing/**"]
+    },
+    "run": {
+      "ignore": []
     }
   }
 }
