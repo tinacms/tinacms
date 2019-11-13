@@ -42,6 +42,29 @@ export function useCMSForm<FormShape = any>(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
+
+  const [values, form] = useForm<FormShape>(options, watch)
+
+  React.useEffect(() => {
+    if (!form) return
+
+    cms.forms.add(form)
+
+    return () => {
+      cms.forms.remove(form.id)
+    }
+  }, [form])
+
+  return [values, form]
+}
+
+/**
+ * A hook that creates a form and updates it's watched properties.
+ */
+export function useForm<FormShape = any>(
+  options: FormOptions<any>,
+  watch: Partial<WatchableFormValue> = {}
+): [FormShape, Form | undefined] {
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [form, setForm] = React.useState<Form | undefined>()
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
@@ -52,7 +75,6 @@ export function useCMSForm<FormShape = any>(
     function createForm() {
       if (!options.initialValues) return
       const form = new Form(options)
-      cms.forms.add(form)
       setForm(form)
       const unsubscribe = form.subscribe(
         form => {
@@ -63,9 +85,6 @@ export function useCMSForm<FormShape = any>(
 
       return () => {
         unsubscribe()
-        if (form) {
-          cms.forms.remove(form.id)
-        }
       }
     },
     [options.id, !!options.initialValues]
@@ -80,7 +99,6 @@ export function useCMSForm<FormShape = any>(
 
   return [form ? form.values : options.initialValues, form]
 }
-
 /**
  * A React Hook that update's the `Form` if `fields` are changed.
  *
