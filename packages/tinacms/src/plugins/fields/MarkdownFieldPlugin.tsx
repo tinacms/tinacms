@@ -34,7 +34,9 @@ const FramedWysiwyg = (props: any) => {
 
 export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   position: relative;
-  height: 100%;
+  min-height: 15rem;
+  max-height: 25rem;
+  overflow-y: scroll;
 
   > [contenteditable] {
     ${InputCss}
