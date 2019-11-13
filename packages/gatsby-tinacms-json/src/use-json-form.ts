@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import { Form, FormOptions, Field } from '@tinacms/core'
-import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
+import { useLocalForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import { useMemo, useCallback, useState, useEffect } from 'react'
 
 interface JsonNode {
@@ -86,7 +86,7 @@ export function useJsonForm(
   fields.push({ name: 'jsonNode', component: null })
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useCMSForm(
+  const [, form] = useLocalForm(
     {
       id,
       label,

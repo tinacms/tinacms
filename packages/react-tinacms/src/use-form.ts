@@ -26,7 +26,7 @@ interface WatchableFormValue {
   fields: FormOptions<any>['fields']
 }
 
-export function useCMSForm<FormShape = any>(
+export function useLocalForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
@@ -48,6 +48,11 @@ export function useCMSForm<FormShape = any>(
 
   return [values, form]
 }
+
+/**
+ * @alias useLocalForm
+ */
+export const useCMSForm = useLocalForm
 
 /**
  * A hook that creates a form and updates it's watched properties.

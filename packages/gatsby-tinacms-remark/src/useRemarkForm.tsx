@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { FormOptions, Form } from '@tinacms/core'
-import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
+import { useLocalForm, useCMS, useWatchFormValues } from 'react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -117,7 +117,7 @@ export function useRemarkForm(
   }, [formOverrrides.fields])
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useCMSForm(
+  const [, form] = useLocalForm(
     {
       label,
       id,

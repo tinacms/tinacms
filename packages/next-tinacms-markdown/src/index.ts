@@ -18,7 +18,7 @@ limitations under the License.
 
 import matter from 'gray-matter'
 import { FormOptions } from '@tinacms/core'
-import { useCMS, useCMSForm } from 'react-tinacms'
+import { useCMS, useLocalForm } from 'react-tinacms'
 import * as yaml from 'js-yaml'
 
 interface MarkdownCollection {
@@ -79,7 +79,7 @@ export function useMarkdownForm(
   // let throttledOnChange = React.useMemo(() => {
   // return throttle(cms.api.git.onChange, 300)
   // }, [])
-  const [values, form] = useCMSForm({
+  const [values, form] = useLocalForm({
     label: markdownRemark.path,
     id: markdownRemark.path,
     initialValues: markdownRemark,
