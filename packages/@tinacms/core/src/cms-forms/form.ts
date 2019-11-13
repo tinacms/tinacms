@@ -25,6 +25,9 @@ export interface FormOptions<S> extends Config<S> {
   fields: Field[]
   reset?(): void
   actions?: any[]
+  meta?: {
+    [key: string]: string
+  }
 }
 
 export interface Field {
@@ -58,6 +61,7 @@ export class Form<S = any> {
   actions: any[]
   initialValues: any
   reset?(): void
+  meta: { [key: string]: any }
 
   constructor({
     id,
@@ -92,6 +96,7 @@ export class Form<S = any> {
       },
     })
 
+    this.meta = options.meta || {}
     this.reset = reset
     this.actions = actions || []
     this.initialValues = initialValues
