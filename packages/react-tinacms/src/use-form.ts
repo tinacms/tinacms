@@ -18,7 +18,7 @@ limitations under the License.
 
 import { FormOptions, Form, Field } from '@tinacms/core'
 import * as React from 'react'
-import { useCMS } from './use-cms'
+import { usePlugins } from './use-plugin'
 
 interface WatchableFormValue {
   values: any
@@ -41,21 +41,10 @@ export function useCMSForm<FormShape = any>(
   }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const cms = useCMS()
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [values, form] = useForm<FormShape>(options, watch)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  React.useEffect(() => {
-    if (!form) return
-
-    cms.forms.add(form)
-
-    return () => {
-      cms.forms.remove(form.id)
-    }
-  }, [form])
+  usePlugins(form)
 
   return [values, form]
 }
