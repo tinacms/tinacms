@@ -118,9 +118,9 @@ export const DefaultTheme: Theme = {
   },
   font: {
     size: {
-      0: '0.6875', // 11px
-      1: '0.8125', // 13px
-      2: '0.9375', // 15px
+      0: '0.6875rem', // 11px
+      1: '0.8125rem', // 13px
+      2: '0.9375rem', // 15px
       3: '1rem', // 16px
       4: '1.125rem', // 18px
       5: '1.25rem', // 20px
