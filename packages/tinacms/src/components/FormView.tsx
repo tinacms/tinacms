@@ -77,11 +77,13 @@ export const FormsView = () => {
   }
 
   return (
-    <FormView
-      activeForm={activeForm}
-      setActiveFormId={setActiveFormId}
-      isMultiform={isMultiform}
-    />
+    <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
+      <FormView
+        activeForm={activeForm}
+        setActiveFormId={setActiveFormId}
+        isMultiform={isMultiform}
+      />
+    </FormWrapper>
   )
 }
 
@@ -112,48 +114,43 @@ export function FormView({
       {({ handleSubmit, pristine, form }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
-            <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-              {isMultiform && (
-                <FormHeader
-                  activeForm={activeForm}
-                  setActiveFormId={setActiveFormId}
+            {isMultiform && (
+              <FormHeader
+                activeForm={activeForm}
+                setActiveFormId={setActiveFormId}
+              />
+            )}
+            <FormBody>
+              {activeForm &&
+                (activeForm.fields.length ? (
+                  <FieldsBuilder form={activeForm} fields={activeForm.fields} />
+                ) : (
+                  <NoFieldsPlaceholder />
+                ))}
+            </FormBody>
+            <FormFooter>
+              {activeForm.reset && (
+                <ResetForm
+                  pristine={pristine}
+                  reset={async () => {
+                    form.reset()
+                    await activeForm.reset!()
+                  }}
                 />
               )}
-              <FormBody>
-                {activeForm &&
-                  (activeForm.fields.length ? (
-                    <FieldsBuilder
-                      form={activeForm}
-                      fields={activeForm.fields}
-                    />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  ))}
-              </FormBody>
-              <FormFooter>
-                {activeForm.reset && (
-                  <ResetForm
-                    pristine={pristine}
-                    reset={async () => {
-                      form.reset()
-                      await activeForm.reset!()
-                    }}
-                  />
-                )}
-                <Button
-                  onClick={() => handleSubmit()}
-                  disabled={pristine}
-                  primary
-                  grow
-                  margin
-                >
-                  Save
-                </Button>
-                {activeForm.actions.length > 0 && (
-                  <ActionsMenu actions={activeForm.actions} form={activeForm} />
-                )}
-              </FormFooter>
-            </FormWrapper>
+              <Button
+                onClick={() => handleSubmit()}
+                disabled={pristine}
+                primary
+                grow
+                margin
+              >
+                Save
+              </Button>
+              {activeForm.actions.length > 0 && (
+                <ActionsMenu actions={activeForm.actions} form={activeForm} />
+              )}
+            </FormFooter>
           </DragDropContext>
         )
       }}
