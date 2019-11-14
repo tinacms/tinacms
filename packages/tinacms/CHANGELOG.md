@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1](https://github.com/tinacms/tinacms/compare/tinacms@0.8.0...tinacms@0.8.1) (2019-11-14)
+
+
+### Bug Fixes
+
+* correct react-tinacms version ([e8a4f55](https://github.com/tinacms/tinacms/commit/e8a4f55))
+
+
+
+
+
 ## 0.8.0 (2019-11-12)
 
 ### Bug Fixes
