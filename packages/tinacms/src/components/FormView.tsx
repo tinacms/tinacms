@@ -121,35 +121,42 @@ export function FormView({
               />
             )}
             <FormBody>
-              {activeForm &&
-                (activeForm.fields.length ? (
-                  <FieldsBuilder form={activeForm} fields={activeForm.fields} />
-                ) : (
-                  <NoFieldsPlaceholder />
-                ))}
+              <Wrapper>
+                {activeForm &&
+                  (activeForm.fields.length ? (
+                    <FieldsBuilder
+                      form={activeForm}
+                      fields={activeForm.fields}
+                    />
+                  ) : (
+                    <NoFieldsPlaceholder />
+                  ))}
+              </Wrapper>
             </FormBody>
             <FormFooter>
-              {activeForm.reset && (
-                <ResetForm
-                  pristine={pristine}
-                  reset={async () => {
-                    form.reset()
-                    await activeForm.reset!()
-                  }}
-                />
-              )}
-              <Button
-                onClick={() => handleSubmit()}
-                disabled={pristine}
-                primary
-                grow
-                margin
-              >
-                Save
-              </Button>
-              {activeForm.actions.length > 0 && (
-                <ActionsMenu actions={activeForm.actions} form={activeForm} />
-              )}
+              <Wrapper>
+                {activeForm.reset && (
+                  <ResetForm
+                    pristine={pristine}
+                    reset={async () => {
+                      form.reset()
+                      await activeForm.reset!()
+                    }}
+                  />
+                )}
+                <Button
+                  onClick={() => handleSubmit()}
+                  disabled={pristine}
+                  primary
+                  grow
+                  margin
+                >
+                  Save
+                </Button>
+                {activeForm.actions.length > 0 && (
+                  <ActionsMenu actions={activeForm.actions} form={activeForm} />
+                )}
+              </Wrapper>
             </FormFooter>
           </DragDropContext>
         )
@@ -335,6 +342,13 @@ const FormHeader = styled(
   }
 `
 
+export const Wrapper = styled.div`
+  display: block;
+  margin: 0 auto;
+  max-width: 500px;
+  width: 100%;
+`
+
 export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   position: relative;
   flex: 1 1 auto;
@@ -345,19 +359,30 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   overflow: hidden;
   border-top: 1px solid ${color.grey(2)};
   background-color: #f6f6f9;
+
+  ${Wrapper} {
+    max-height: 100%;
+    scrollbar-width: none;
+  }
 `
 
 const FormFooter = styled.div`
   position: relative;
   flex: 0 0 auto;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   width: 100%;
   height: 4rem;
   background-color: white;
   border-top: 1px solid ${color.grey(2)};
-  padding: 0 1rem;
+
+  ${Wrapper} {
+    flex: 1 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+  }
 `
 
 const FormAnimationKeyframes = keyframes`

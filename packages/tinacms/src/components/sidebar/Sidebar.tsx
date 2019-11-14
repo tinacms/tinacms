@@ -28,6 +28,7 @@ import {
   ModalBody,
   ModalActions,
 } from '../modals/ModalProvider'
+import { ModalFullscreen } from '../modals/ModalFullscreen'
 import { ModalPopup } from '../modals/ModalPopup'
 import {
   HamburgerIcon,
@@ -114,7 +115,7 @@ export const Sidebar = () => {
           </MenuPanel>
           {ActiveView && (
             <Modal>
-              <ModalPopup>
+              <ModalFullscreen>
                 <ModalHeader>
                   {ActiveView.name}
                   <CloseButton
@@ -128,7 +129,7 @@ export const Sidebar = () => {
                 <ModalBody>
                   <ActiveView.Component />
                 </ModalBody>
-              </ModalPopup>
+              </ModalFullscreen>
             </Modal>
           )}
         </SidebarWrapper>
