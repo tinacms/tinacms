@@ -114,28 +114,48 @@ export const Sidebar = () => {
             <Watermark />
           </MenuPanel>
           {ActiveView && (
-            <Modal>
-              <ModalFullscreen>
-                <ModalHeader>
-                  {ActiveView.name}
-                  <CloseButton
-                    onClick={() => {
-                      setActiveView(null)
-                    }}
-                  >
-                    <CloseIcon />
-                  </CloseButton>
-                </ModalHeader>
-                <ModalBody>
-                  <ActiveView.Component />
-                </ModalBody>
-              </ModalFullscreen>
-            </Modal>
+            <ActiveViewModal
+              name={ActiveView.name}
+              close={() => setActiveView(null)}
+              layout={ActiveView.layout}
+            >
+              <ActiveView.Component />
+            </ActiveViewModal>
           )}
         </SidebarWrapper>
       </StyledFrame>
       <SidebarToggle {...sidebar} />
     </SidebarContainer>
+  )
+}
+
+const ActiveViewModal = ({ children, name, close, layout }: any) => {
+  let Wrapper
+
+  switch (layout) {
+    case 'popup':
+      Wrapper = ModalPopup
+      break
+    case 'fullscreen':
+      Wrapper = ModalFullscreen
+      break
+    default:
+      Wrapper = ModalPopup
+      break
+  }
+
+  return (
+    <Modal>
+      <Wrapper>
+        <ModalHeader>
+          {name}
+          <CloseButton onClick={close}>
+            <CloseIcon />
+          </CloseButton>
+        </ModalHeader>
+        <ModalBody>{children}</ModalBody>
+      </Wrapper>
+    </Modal>
   )
 }
 
