@@ -22,12 +22,7 @@ import { useState } from 'react'
 import { StyledFrame } from '../SyledFrame'
 import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from '../FormView'
-import {
-  Modal,
-  ModalHeader,
-  ModalBody,
-  ModalActions,
-} from '../modals/ModalProvider'
+import { Modal, ModalHeader, ModalBody } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
 import { ModalPopup } from '../modals/ModalPopup'
 import {
@@ -129,7 +124,19 @@ export const Sidebar = () => {
   )
 }
 
-const ActiveViewModal = ({ children, name, close, layout }: any) => {
+interface ActiveViewProps {
+  children: any
+  name: string
+  close: any
+  layout?: 'fullscreen' | 'popup'
+}
+
+const ActiveViewModal = ({
+  children,
+  name,
+  close,
+  layout,
+}: ActiveViewProps) => {
   let Wrapper
 
   switch (layout) {
