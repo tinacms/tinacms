@@ -97,8 +97,6 @@ export function FormView({
   setActiveFormId,
   isMultiform,
 }: FormViewProps) {
-  const isEditing = !!activeForm
-
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
       const form = activeForm!.finalForm
