@@ -1,7 +1,7 @@
 {
   "name": "gatsby-plugin-tinacms",
   "main": "index.js",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -32,7 +32,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@tinacms/core": "^0.4.3",
+    "@tinacms/core": "^0.4.4",
     "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0",
     "@types/js-yaml": "^3.12.1",
@@ -41,7 +41,7 @@
     "express": "^4.17.1",
     "js-yaml": "^3.13.1",
     "lodash.throttle": "^4.1.1",
-    "react-tinacms": "^0.8.0",
-    "tinacms": "^0.8.0"
+    "react-tinacms": "^0.8.1",
+    "tinacms": "^0.8.1"
   }
 }
