@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/fields",
-  "version": "0.1.12",
+  "version": "0.1.13",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -59,7 +59,7 @@
   },
   "dependencies": {
     "@sambego/storybook-styles": "^1.0.0",
-    "@tinacms/core": "^0.4.3",
+    "@tinacms/core": "^0.4.4",
     "@tinacms/icons": "^0.3.8",
     "@tinacms/styles": "^0.0.12",
     "@types/react-select": "^2.0.11",
