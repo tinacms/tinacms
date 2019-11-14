@@ -36,6 +36,7 @@ import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
+import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
 import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
 import { GroupPanel } from '../plugins/fields'
@@ -109,7 +110,7 @@ export function FormView({
 
   return (
     <FormBuilder form={activeForm as any}>
-      {({ handleSubmit, pristine, form }) => {
+      {({ handleSubmit, pristine, form, submitting }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
             {isMultiform && (
@@ -145,11 +146,13 @@ export function FormView({
                 <Button
                   onClick={() => handleSubmit()}
                   disabled={pristine}
+                  busy={submitting}
                   primary
                   grow
                   margin
                 >
-                  Save
+                  {submitting && <LoadingDots />}
+                  {!submitting && 'Save'}
                 </Button>
                 {activeForm.actions.length > 0 && (
                   <ActionsMenu actions={activeForm.actions} form={activeForm} />

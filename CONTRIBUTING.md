@@ -19,14 +19,13 @@ TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.
 
 Packages in Tina are organized according to thier name
 
-| Type                    | Naming Convention  | Example Path            |
-| ----------------------- | ------------------ | ----------------------- |
-| Internal packages       | `@tinacms/*`       | `@tinacms/core`         |
-| Node API extensions     | `@tinacms/api-*`   | `@tinacms/api-git`      |
-| React specific packages | `react-tinacms-*`  | `react-tinacms-remark`  |
-| Gastby plugins          | `gatsby-tinacms-*` | `gatsby-tinacms-json`   |
-| NextJS package          | `next-tinacms-*`   | `next-tinacms-markdown` |
-| Demo Projects           | `demo-*`           | `demo-gatsby`           |
+| Type                    | Naming Convention  | Example Path           |
+| ----------------------- | ------------------ | ---------------------- |
+| Internal packages       | `@tinacms/*`       | `@tinacms/core`        |
+| Node API extensions     | `@tinacms/api-*`   | `@tinacms/api-git`     |
+| React specific packages | `react-tinacms-*`  | `react-tinacms-remark` |
+| Gastby plugins          | `gatsby-tinacms-*` | `gatsby-tinacms-json`  |
+| Demo Projects           | `demo-*`           | `demo-gatsby`          |
 
 ## Troubleshooting in Development
 
@@ -68,9 +67,13 @@ Linking prevents running `npm install` from directly inside a package from worki
 
    This sucks. Try running `lerna clean` and then running `npm run bs` again.
 
-## Releasing
+## General Release Process
 
 The general release process looks like this:
+
+1. **Merge Changes**
+
+   Merge the changes to be published into the appropriate branch.
 
 1. **Build the source files:**
 
@@ -97,106 +100,12 @@ The general release process looks like this:
 
    Let everyone know!
 
+1. **Backmerge to Source Branch**
+
+   Merge the current branch back into the source of the changes.
+
 The exact commands vary slightly depending on the type of release being made.
 
-### Prerelease
+### Specific Release Process
 
-1. **Build the source files:**
-
-   ```
-   npm run build
-   ```
-
-1. **Generate CHANGELOGs and git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --conventional-prerelease \
-     --no-push \
-     --allow-branch next \
-     -m "chore(publish): prerelease"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
-1. **Publish to NPM:**
-   ```
-   lerna publish from-package --dist-tag next
-   ```
-1. **Push CHANGELOGs and git tags to Github:**
-   ```
-   git push && git push --tags
-   ```
-
-### Graduating Prereleases
-
-1. **Build the source files:**
-
-   ```
-   npm run build
-   ```
-
-1. **Generate CHANGELOGs and git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --conventional-graduate \
-     --no-push \
-     -m "chore(publish): latest"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
-1) **Publish to NPM:**
-
-   ```
-   lerna publish from-package
-   ```
-
-1) **Push CHANGELOGs and git tags to Github:**
-   ```
-   git push && git push --tags
-   ```
-
-### Release
-
-1. **Build the source files:**
-
-   ```
-   npm run build
-   ```
-
-1. **Generate CHANGELOGs and git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --no-push \
-     --allow-branch master \
-     -m "chore(publish): release"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
-1. **Publish to NPM:**
-   ```
-   lerna publish from-package
-   ```
-1. **Push CHANGELOGs and git tags to Github:**
-   ```
-   git push && git push --tags
-   ```
+Checkout the [RELEASE.md](./RELEASE.md) file to see how to release.
