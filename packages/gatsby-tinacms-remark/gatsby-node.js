@@ -20,7 +20,14 @@ const slash = require("slash");
 
 exports.setFieldsOnGraphQLNodeType = ({ type }) => {
   const pathRoot = slash(process.cwd());
-  if (type.name === `MarkdownRemark`) {
+
+  const hasMarkdown = type.nodes.reduce((hasMarkdown, node) => {
+    if (hasMarkdown) return true
+    if (node.internal.owner === 'gatsby-transformer-remark') return true
+    return false
+  }, false)
+
+  if (hasMarkdown) {
     return {
       rawFrontmatter: {
         type: GraphQLString,
