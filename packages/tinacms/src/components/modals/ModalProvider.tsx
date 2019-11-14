@@ -129,7 +129,7 @@ export const ModalBody = styled.div<{ padded?: boolean }>`
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 240px;
+  min-height: 10rem;
 
   &:last-child {
     border-radius: 0 0 0.3rem 0.3rem;
