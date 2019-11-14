@@ -22,13 +22,19 @@ import { useState } from 'react'
 import { StyledFrame } from '../SyledFrame'
 import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from '../FormView'
-import { Modal } from '../modals/ModalProvider'
-import { ModalFullscreen } from '../modals/ModalFullscreen'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalActions,
+} from '../modals/ModalProvider'
+import { ModalPopup } from '../modals/ModalPopup'
 import {
   HamburgerIcon,
   LeftArrowIcon,
   EditIcon,
   TinaIcon,
+  CloseIcon,
 } from '@tinacms/icons'
 import {
   GlobalStyles,
@@ -108,10 +114,21 @@ export const Sidebar = () => {
           </MenuPanel>
           {ActiveView && (
             <Modal>
-              <ModalFullscreen>
-                <button onClick={() => setActiveView(null)}>Close Modal</button>
-                <ActiveView.Component />
-              </ModalFullscreen>
+              <ModalPopup>
+                <ModalHeader>
+                  {ActiveView.name}
+                  <CloseButton
+                    onClick={() => {
+                      setActiveView(null)
+                    }}
+                  >
+                    <CloseIcon />
+                  </CloseButton>
+                </ModalHeader>
+                <ModalBody>
+                  <ActiveView.Component />
+                </ModalBody>
+              </ModalPopup>
             </Modal>
           )}
         </SidebarWrapper>
@@ -426,4 +443,19 @@ const SidebarContainer = styled.div<{ open: boolean }>`
     0
   ) !important;
   pointer-events: none;
+`
+
+const CloseButton = styled.div`
+  display: flex;
+  align-items: center;
+  fill: ${color.grey(3)};
+  cursor: pointer;
+  transition: fill 85ms ease-out;
+  svg {
+    width: 1.5rem;
+    height: auto;
+  }
+  &:hover {
+    fill: ${color.grey(8)};
+  }
 `
