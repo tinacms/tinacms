@@ -21,6 +21,7 @@ export * from './components/Tina'
 export * from './components/sidebar/SidebarProvider'
 export * from './components/modals/ModalProvider'
 export { ActionButton } from './components/ActionsMenu'
+export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // React
 export * from './hooks/use-tina'

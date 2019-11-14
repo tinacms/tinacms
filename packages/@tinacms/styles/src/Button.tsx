@@ -24,6 +24,7 @@ export interface ButtonProps {
   margin?: boolean
   grow?: boolean
   open?: boolean
+  busy?: boolean
 }
 
 export const Button = styled.button<ButtonProps>`
@@ -41,11 +42,13 @@ export const Button = styled.button<ButtonProps>`
   height: 2.5rem;
   padding: 0 ${padding()};
   transition: all 85ms ease-out;
+
   &:hover {
     background-color: ${color.grey(1)};
   }
   &:active {
     background-color: ${color.grey(2)};
+    outline: none;
   }
 
   ${p =>
@@ -91,6 +94,12 @@ export const Button = styled.button<ButtonProps>`
     p.grow &&
     css`
       flex-grow: 1;
+    `};
+
+  ${p =>
+    p.busy &&
+    css`
+      cursor: wait;
     `};
 `
 
