@@ -18,13 +18,18 @@ limitations under the License.
 
 import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
+import { Plugin } from '../plugins'
 
 export interface FormOptions<S> extends Config<S> {
   id: any
   label: string
   fields: Field[]
+  __type?: string
   reset?(): void
   actions?: any[]
+  meta?: {
+    [key: string]: string
+  }
 }
 
 export interface Field {
@@ -50,7 +55,8 @@ interface FieldSubscription {
   unsubscribe: Unsubscribe
 }
 
-export class Form<S = any> {
+export class Form<S = any> implements Plugin {
+  __type: string
   id: any
   label: string
   fields: Field[]
@@ -58,6 +64,7 @@ export class Form<S = any> {
   actions: any[]
   initialValues: any
   reset?(): void
+  meta: { [key: string]: any }
 
   constructor({
     id,
@@ -68,6 +75,7 @@ export class Form<S = any> {
     ...options
   }: FormOptions<S>) {
     const initialValues = options.initialValues || ({} as S)
+    this.__type = options.__type || 'form'
     this.id = id
     this.label = label
     this.fields = fields
@@ -92,6 +100,7 @@ export class Form<S = any> {
       },
     })
 
+    this.meta = options.meta || {}
     this.reset = reset
     this.actions = actions || []
     this.initialValues = initialValues
