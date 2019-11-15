@@ -21,11 +21,7 @@ const slash = require("slash");
 exports.setFieldsOnGraphQLNodeType = ({ type }) => {
   const pathRoot = slash(process.cwd());
 
-  const hasMarkdown = type.nodes.reduce((hasMarkdown, node) => {
-    if (hasMarkdown) return true
-    if (node.internal.owner === 'gatsby-transformer-remark') return true
-    return false
-  }, false)
+  const hasMarkdown = !!type.nodes.find(node => node.internal.owner === 'gatsby-transformer-remark')
 
   if (hasMarkdown) {
     return {
