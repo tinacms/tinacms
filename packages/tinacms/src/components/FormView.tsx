@@ -60,16 +60,6 @@ export const FormsView = () => {
 
   const isEditing = !!activeForm
 
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      const form = activeForm!.finalForm
-      if (!result.destination) return
-      const name = result.type
-      form.mutators.move(name, result.source.index, result.destination.index)
-    },
-    [activeForm]
-  )
-
   /**
    * No Forms
    */
@@ -88,18 +78,49 @@ export const FormsView = () => {
   }
 
   return (
+    <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
+      <FormView
+        activeForm={activeForm}
+        setActiveFormId={setActiveFormId}
+        isMultiform={isMultiform}
+      />
+    </FormWrapper>
+  )
+}
+
+export interface FormViewProps {
+  activeForm: Form
+  setActiveFormId(id: string): void
+  isMultiform: boolean
+}
+export function FormView({
+  activeForm,
+  setActiveFormId,
+  isMultiform,
+}: FormViewProps) {
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      const form = activeForm!.finalForm
+      if (!result.destination) return
+      const name = result.type
+      form.mutators.move(name, result.source.index, result.destination.index)
+    },
+    [activeForm]
+  )
+
+  return (
     <FormBuilder form={activeForm as any}>
       {({ handleSubmit, pristine, form, submitting }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
-            <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-              {isMultiform && (
-                <FormHeader
-                  activeForm={activeForm}
-                  setActiveFormId={setActiveFormId}
-                />
-              )}
-              <FormBody>
+            {isMultiform && (
+              <FormHeader
+                activeForm={activeForm}
+                setActiveFormId={setActiveFormId}
+              />
+            )}
+            <FormBody>
+              <Wrapper>
                 {activeForm &&
                   (activeForm.fields.length ? (
                     <FieldsBuilder
@@ -109,8 +130,10 @@ export const FormsView = () => {
                   ) : (
                     <NoFieldsPlaceholder />
                   ))}
-              </FormBody>
-              <FormFooter>
+              </Wrapper>
+            </FormBody>
+            <FormFooter>
+              <Wrapper>
                 {activeForm.reset && (
                   <ResetForm
                     pristine={pristine}
@@ -134,8 +157,8 @@ export const FormsView = () => {
                 {activeForm.actions.length > 0 && (
                   <ActionsMenu actions={activeForm.actions} form={activeForm} />
                 )}
-              </FormFooter>
-            </FormWrapper>
+              </Wrapper>
+            </FormFooter>
           </DragDropContext>
         )
       }}
@@ -320,6 +343,13 @@ const FormHeader = styled(
   }
 `
 
+export const Wrapper = styled.div`
+  display: block;
+  margin: 0 auto;
+  max-width: 500px;
+  width: 100%;
+`
+
 export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   position: relative;
   flex: 1 1 auto;
@@ -330,19 +360,30 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   overflow: hidden;
   border-top: 1px solid ${color.grey(2)};
   background-color: #f6f6f9;
+
+  ${Wrapper} {
+    max-height: 100%;
+    scrollbar-width: none;
+  }
 `
 
 const FormFooter = styled.div`
   position: relative;
   flex: 0 0 auto;
   display: flex;
-  justify-content: space-between;
   align-items: center;
   width: 100%;
   height: 4rem;
   background-color: white;
   border-top: 1px solid ${color.grey(2)};
-  padding: 0 1rem;
+
+  ${Wrapper} {
+    flex: 1 0 auto;
+    display: flex;
+    justify-content: space-between;
+    align-items: center;
+    padding: 0 1rem;
+  }
 `
 
 const FormAnimationKeyframes = keyframes`

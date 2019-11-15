@@ -23,14 +23,15 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useCMSForm } from "react-tinacms"
+import { useForm, usePlugin } from "react-tinacms"
+import { GlobalFormPlugin } from "tinacms"
 
 function BlogIndex(props) {
   const { data } = props
   const siteTitle = data.site.siteMetadata.title
   const posts = data.allMarkdownRemark.edges
 
-  const [styles] = useCMSForm({
+  const [styles, form] = useForm({
     id: "blog-index-styles",
     label: "Blog Styles",
     initialValues: {
@@ -64,6 +65,8 @@ function BlogIndex(props) {
       alert("Saving doesn't do anything.")
     },
   })
+
+  useGlobalFormPlugin(form)
 
   return (
     <Layout location={props.location} title={siteTitle}>
@@ -136,3 +139,12 @@ export const pageQuery = graphql`
     }
   }
 `
+
+function useGlobalFormPlugin(form) {
+  const GlobalForm = React.useMemo(() => {
+    if (!form) return
+    return new GlobalFormPlugin(form)
+  }, [form])
+
+  usePlugin(GlobalForm)
+}
