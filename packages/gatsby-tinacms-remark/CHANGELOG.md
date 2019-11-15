@@ -9,6 +9,10 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 - **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
 
+## [0.4.4](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.3...gatsby-tinacms-remark@0.4.4) (2019-11-14)
+
+**Note:** Version bump only for package gatsby-tinacms-remark
+
 ## 0.4.0 (2019-11-04)
 
 ### Bug Fixes
