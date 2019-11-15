@@ -18,7 +18,7 @@ limitations under the License.
 
 import { FormOptions, Form, Field } from '@tinacms/core'
 import * as React from 'react'
-import { useCMS } from './use-cms'
+import { usePlugins } from './use-plugin'
 
 interface WatchableFormValue {
   values: any
@@ -26,7 +26,7 @@ interface WatchableFormValue {
   fields: FormOptions<any>['fields']
 }
 
-export function useCMSForm<FormShape = any>(
+export function useLocalForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
@@ -41,18 +41,33 @@ export function useCMSForm<FormShape = any>(
   }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const cms = useCMS()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [form, setForm] = React.useState<Form | undefined>()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, setValues] = React.useState(options.initialValues)
+  const [values, form] = useForm<FormShape>(options, watch)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
+  usePlugins(form)
+
+  return [values, form]
+}
+
+/**
+ * @alias useLocalForm
+ */
+export const useCMSForm = useLocalForm
+
+/**
+ * A hook that creates a form and updates it's watched properties.
+ */
+export function useForm<FormShape = any>(
+  options: FormOptions<any>,
+  watch: Partial<WatchableFormValue> = {}
+): [FormShape, Form | undefined] {
+  const [form, setForm] = React.useState<Form | undefined>()
+  const [, setValues] = React.useState(options.initialValues)
+
   React.useEffect(
     function createForm() {
       if (!options.initialValues) return
       const form = new Form(options)
-      cms.forms.add(form)
       setForm(form)
       const unsubscribe = form.subscribe(
         form => {
@@ -63,24 +78,17 @@ export function useCMSForm<FormShape = any>(
 
       return () => {
         unsubscribe()
-        if (form) {
-          cms.forms.remove(form.id)
-        }
       }
     },
     [options.id, !!options.initialValues]
   )
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormFields(watch.fields, form)
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormLabel(watch.label, form)
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useUpdateFormValues(watch.values, form)
 
   return [form ? form.values : options.initialValues, form]
 }
-
 /**
  * A React Hook that update's the `Form` if `fields` are changed.
  *

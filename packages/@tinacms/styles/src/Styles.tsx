@@ -118,13 +118,13 @@ export const DefaultTheme: Theme = {
   },
   font: {
     size: {
-      0: '0.7rem',
-      1: '0.8rem',
-      2: '0.9rem',
-      3: '1rem',
-      4: '1.1rem',
-      5: '1.2rem',
-      6: '1.3rem',
+      0: '0.6875rem', // 11px
+      1: '0.8125rem', // 13px
+      2: '0.9375rem', // 15px
+      3: '1rem', // 16px
+      4: '1.125rem', // 18px
+      5: '1.25rem', // 20px
+      6: '1.375rem', // 22px
     },
     weight: {
       regular: 500,

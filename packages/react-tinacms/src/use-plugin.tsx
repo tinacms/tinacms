@@ -31,15 +31,17 @@ export const usePlugin = usePlugins
  *
  * @alias usePlugin
  */
-export function usePlugins(plugins: Plugin | Plugin[]) {
+export function usePlugins(plugins?: Plugin | Plugin[]) {
   const cms = useCMS()
 
   let pluginArray: Plugin[]
 
   if (Array.isArray(plugins)) {
     pluginArray = plugins
-  } else {
+  } else if (plugins) {
     pluginArray = [plugins]
+  } else {
+    pluginArray = []
   }
 
   React.useEffect(() => {

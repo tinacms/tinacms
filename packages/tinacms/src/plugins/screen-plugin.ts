@@ -22,4 +22,5 @@ export interface ScreenPlugin extends Plugin {
   __type: 'screen'
   Component: any
   Icon: any
+  layout: 'fullscreen' | 'popup'
 }
