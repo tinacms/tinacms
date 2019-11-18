@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/api-git",
-  "version": "0.4.4-alpha.0",
+  "version": "0.4.4-alpha.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -39,7 +39,7 @@
     "simple-git": "1.126.0"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.11-alpha.0",
+    "@tinacms/scripts": "^0.1.11-alpha.1",
     "@types/express": "^4.17.0",
     "@types/jest": "^24.0.15",
     "@types/node": "^12.7.11",
