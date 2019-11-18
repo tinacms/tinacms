@@ -96,7 +96,7 @@ export function useJsonForm(
       fields,
       onSubmit(data) {
         return cms.api.git.onSubmit!({
-          files: [data.fileRelativePath],
+          files: [data.jsonNode.fileRelativePath],
           message: data.__commit_message || 'Tina commit',
           name: data.__commit_name,
           email: data.__commit_email,
