@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-json",
-  "version": "0.6.4",
+  "version": "0.7.0-alpha.1",
   "main": "index.js",
   "types": "index.d.ts",
   "license": "Apache-2.0",
@@ -31,16 +31,16 @@
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.10",
+    "@tinacms/scripts": "^0.1.11-alpha.1",
     "@types/jest": "^24.0.15",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.4.4",
-    "gatsby-plugin-tinacms": "^0.1.13",
+    "@tinacms/core": "^0.5.0-alpha.1",
+    "gatsby-plugin-tinacms": "^0.1.14-alpha.1",
     "graphql": "^14.5.8",
-    "react-tinacms": "^0.8.1",
-    "tinacms": "^0.8.1"
+    "react-tinacms": "^0.9.0-alpha.1",
+    "tinacms": "^0.9.0-alpha.1"
   }
 }

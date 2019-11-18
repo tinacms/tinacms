@@ -3,6 +3,34 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.4...gatsby-tinacms-remark@0.5.0-alpha.1) (2019-11-18)
+
+
+### Features
+
+* **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
+* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
+* **useLocalRemark:** create local markdown forms ([1e291ab](https://github.com/tinacms/tinacms/commit/1e291ab))
+* useGlobalRemarkForm ([1133164](https://github.com/tinacms/tinacms/commit/1133164))
+
+
+
+
+
+# [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.4...gatsby-tinacms-remark@0.5.0-alpha.0) (2019-11-18)
+
+
+### Features
+
+* **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
+* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
+* **useLocalRemark:** create local markdown forms ([1e291ab](https://github.com/tinacms/tinacms/commit/1e291ab))
+* useGlobalRemarkForm ([1133164](https://github.com/tinacms/tinacms/commit/1133164))
+
+
+
+
+
 ## [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.0...gatsby-tinacms-remark@0.5.0-alpha.0) (2019-11-12)
 
 ### Features

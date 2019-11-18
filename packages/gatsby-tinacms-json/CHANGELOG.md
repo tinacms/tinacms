@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.6.4...gatsby-tinacms-json@0.7.0-alpha.1) (2019-11-18)
+
+
+### Bug Fixes
+
+* **useJsonForm:** writes out all data Closes [#450](https://github.com/tinacms/tinacms/issues/450) ([565e4bb](https://github.com/tinacms/tinacms/commit/565e4bb))
+
+
+### Features
+
+* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
+* useGlobalJsonForm ([9aa8ade](https://github.com/tinacms/tinacms/commit/9aa8ade))
+* useJsonForm only creates forms ([ea78eb6](https://github.com/tinacms/tinacms/commit/ea78eb6))
+* useLocalJsonForm ([0d3cd82](https://github.com/tinacms/tinacms/commit/0d3cd82))
+
+
+
+
+
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.6.4...gatsby-tinacms-json@0.7.0-alpha.0) (2019-11-18)
+
+
+### Bug Fixes
+
+* **useJsonForm:** writes out all data Closes [#450](https://github.com/tinacms/tinacms/issues/450) ([565e4bb](https://github.com/tinacms/tinacms/commit/565e4bb))
+
+
+### Features
+
+* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
+* useGlobalJsonForm ([9aa8ade](https://github.com/tinacms/tinacms/commit/9aa8ade))
+* useJsonForm only creates forms ([ea78eb6](https://github.com/tinacms/tinacms/commit/ea78eb6))
+* useLocalJsonForm ([0d3cd82](https://github.com/tinacms/tinacms/commit/0d3cd82))
+
+
+
+
+
 ## [0.6.4](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.6.3...gatsby-tinacms-json@0.6.4) (2019-11-14)
 
 **Note:** Version bump only for package gatsby-tinacms-json
