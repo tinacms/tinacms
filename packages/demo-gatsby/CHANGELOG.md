@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.1.6...demo-gatsby@1.2.0-alpha.1) (2019-11-18)
+
+
+### Features
+
+* **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e94f112))
+
+
+
+
+
 # [1.2.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.1.6...demo-gatsby@1.2.0-alpha.0) (2019-11-18)
 
 
