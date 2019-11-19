@@ -43,5 +43,8 @@
     "lodash.get": "^4.4.2",
     "react-tinacms": "^0.8.1",
     "tinacms": "^0.8.1"
+  },
+  "peerDependencies": {
+    "gatsby-transformer-remark": "^2.6.37"
   }
 }
