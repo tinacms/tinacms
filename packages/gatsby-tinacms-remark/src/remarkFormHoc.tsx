@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { FormOptions, Form } from '@tinacms/core'
 import { TinaForm } from '@tinacms/form-builder'
-import { useRemarkForm } from './useRemarkForm'
+import { useLocalRemarkForm, useGlobalRemarkForm } from './useRemarkForm'
 import { ERROR_INVALID_QUERY_NAME } from './errors'
 
 interface RemarkFormProps extends Partial<FormOptions<any>> {
@@ -28,7 +28,7 @@ interface RemarkFormProps extends Partial<FormOptions<any>> {
 
 export function remarkForm(Component: any, options: RemarkFormProps = {}) {
   return function RemarkForm(props: any) {
-    const [markdownRemark] = useRemarkForm(
+    const [markdownRemark] = useLocalRemarkForm(
       getMarkdownRemark(props.data, options.queryName),
       options
     )
@@ -39,7 +39,7 @@ export function remarkForm(Component: any, options: RemarkFormProps = {}) {
 
 export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
   return function RemarkForm(props: any) {
-    const [markdownRemark, form] = useRemarkForm(
+    const [markdownRemark, form] = useLocalRemarkForm(
       getMarkdownRemark(props.data, options.queryName),
       options
     )
@@ -60,6 +60,19 @@ export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
   }
 }
 
+export function globalRemarkForm(
+  Component: any,
+  options: RemarkFormProps = {}
+) {
+  return function RemarkForm(props: any) {
+    const [markdownRemark] = useGlobalRemarkForm(
+      getMarkdownRemark(props.data, options.queryName),
+      options
+    )
+
+    return <Component {...props} data={{ ...props.data, markdownRemark }} />
+  }
+}
 const getMarkdownRemark = (data: any, queryName: string = 'markdownRemark') => {
   const markdownRemark = data[queryName]
   if (!markdownRemark) {

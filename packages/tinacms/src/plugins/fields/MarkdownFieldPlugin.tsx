@@ -34,14 +34,14 @@ const FramedWysiwyg = (props: any) => {
 
 export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
   position: relative;
-  min-height: 15rem;
-  max-height: 25rem;
-  overflow-y: scroll;
 
   > [contenteditable] {
     ${InputCss}
     overflow: auto;
     -webkit-overflow-scrolling: touch;
+    min-height: 15rem;
+    max-height: 25rem;
+    overflow-y: auto;
 
     ::selection {
       background-color: rgba(0, 132, 255, 0.3);

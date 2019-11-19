@@ -47,7 +47,7 @@ export async function commit({
 
   const repo = openRepo(pathRoot)
 
-  const branchName = await repo.revparse('--abbrev-ref HEAD')
+  const branchName = await repo.revparse(['--abbrev-ref HEAD'])
 
   await repo.add(files)
   const commitResult = await repo.commit(message, files, options)
