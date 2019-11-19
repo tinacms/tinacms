@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.12](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.12-alpha.1...gatsby-tinacms-git@0.2.12) (2019-11-18)
+
+**Note:** Version bump only for package gatsby-tinacms-git
+
+
+
+
+
+## [0.2.12-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.11...gatsby-tinacms-git@0.2.12-alpha.1) (2019-11-18)
+
+**Note:** Version bump only for package gatsby-tinacms-git
+
+
+
+
+
+## [0.2.12-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.11...gatsby-tinacms-git@0.2.12-alpha.0) (2019-11-18)
+
+**Note:** Version bump only for package gatsby-tinacms-git
+
+
+
+
+
 ## [0.2.11](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.10...gatsby-tinacms-git@0.2.11) (2019-11-14)
 
 **Note:** Version bump only for package gatsby-tinacms-git

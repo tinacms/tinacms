@@ -21,7 +21,9 @@ const { GraphQLString } = require('graphql')
 exports.setFieldsOnGraphQLNodeType = ({ type, getNode }) => {
   const pathRoot = process.cwd()
 
-  if (!/.*Json$/.test(type.name)) {
+  const hasJson = !!type.nodes.find(node => node.internal.owner === 'gatsby-transformer-json')
+
+  if (!hasJson) {
     return {}
   }
 

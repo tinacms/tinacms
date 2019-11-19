@@ -17,7 +17,8 @@ limitations under the License.
 */
 
 import { FormOptions, Form } from '@tinacms/core'
-import { useCMSForm, useCMS, useWatchFormValues } from 'react-tinacms'
+import { GlobalFormPlugin } from 'tinacms'
+import { useCMS, useWatchFormValues, useForm, usePlugins } from 'react-tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -33,7 +34,7 @@ const matter = require('gray-matter')
 export function useRemarkForm(
   markdownRemark: RemarkNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
-): [RemarkNode | null | undefined, Form | string | null | undefined] {
+): [RemarkNode | null | undefined, Form | null | undefined] {
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks. In the case of the check for
@@ -117,7 +118,7 @@ export function useRemarkForm(
   }, [formOverrrides.fields])
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useCMSForm(
+  const [, form] = useForm(
     {
       label,
       id,
@@ -156,6 +157,35 @@ export function useRemarkForm(
   useWatchFormValues(form, writeToDisk)
 
   return [markdownRemark, form]
+}
+
+export function useLocalRemarkForm(
+  markdownRemark: RemarkNode | null | undefined,
+  formOverrrides: Partial<FormOptions<any>> = {}
+): [RemarkNode | null | undefined, Form | string | null | undefined] {
+  const [values, form] = useRemarkForm(markdownRemark, formOverrrides)
+
+  // @ts-ignore form can be `null` and usePlugins doesn't like that.
+  usePlugins(form)
+
+  return [values, form]
+}
+
+export function useGlobalRemarkForm(
+  markdownRemark: RemarkNode | null | undefined,
+  formOverrrides: Partial<FormOptions<any>> = {}
+): [RemarkNode | null | undefined, Form | string | null | undefined] {
+  const [values, form] = useRemarkForm(markdownRemark, formOverrrides)
+
+  usePlugins(
+    React.useMemo(() => {
+      if (form) {
+        return new GlobalFormPlugin(form, null)
+      }
+    }, [form])
+  )
+
+  return [values, form]
 }
 
 /**
