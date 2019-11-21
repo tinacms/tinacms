@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '@tinacms/fields'
-import { useCMS } from 'react-tinacms'
+import { useCMS } from '@tinacms/react-core'
 
 type FieldProps = any
 interface ImageProps {

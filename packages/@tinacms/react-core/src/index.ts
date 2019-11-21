@@ -16,9 +16,9 @@ limitations under the License.
 
 */
 
-import { useCMS } from '@tinacms/react-core'
-import { TinaCMS } from '../tina-cms'
-
-export function useTina() {
-  return useCMS() as TinaCMS
-}
+export * from './use-cms'
+export * from './use-form'
+export * from './use-plugin'
+export * from './use-subscribable'
+export * from './use-watch-form-values'
+export * from './with-plugin'

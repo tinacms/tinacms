@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useSubscribable } from 'react-tinacms'
+import { useSubscribable } from '@tinacms/react-core'
 import { useState } from 'react'
 import { StyledFrame } from '../SyledFrame'
 import styled, { keyframes, css } from 'styled-components'

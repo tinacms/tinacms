@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
-import { useCMS, useSubscribable } from 'react-tinacms'
+import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'

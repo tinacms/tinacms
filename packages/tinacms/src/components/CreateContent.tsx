@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { useCMS, useSubscribable } from 'react-tinacms'
+import { useCMS, useSubscribable } from '@tinacms/react-core'
 import {
   Modal,
   ModalHeader,
