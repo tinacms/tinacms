@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useSubscribable } from '@tinacms/react-core'
 import { useState } from 'react'
 import { StyledFrame } from '../SyledFrame'
 import styled, { keyframes, css } from 'styled-components'
@@ -49,10 +48,10 @@ import {
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
-import { useTina } from '../../hooks/use-tina'
+import { useSubscribable, useCMS } from '../../react-tinacms'
 
 export const Sidebar = () => {
-  const cms = useTina()
+  const cms = useCMS()
   const sidebar = useSidebar()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
