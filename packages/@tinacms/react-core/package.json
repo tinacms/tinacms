@@ -1,0 +1,34 @@
+{
+  "name": "@tinacms/react-core",
+  "version": "0.1.0",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "module": "dist/react-core.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "watch": "tsdx watch",
+    "build": "tsdx build",
+    "dev": "tsdx build",
+    "test": "tsdx test --env=jsdom",
+    "lint": "tsdx lint"
+  },
+  "dependencies": {
+    "@tinacms/core": "^0.5.0"
+  },
+  "peerDependencies": {
+    "react": ">=16"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.23",
+    "@types/react": "^16.9.11",
+    "@types/react-dom": "^16.9.4",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.2"
+  }
+}
