@@ -16,7 +16,12 @@ limitations under the License.
 
 */
 import { Form, FormOptions, Field } from '@tinacms/core'
-import { useCMS, useWatchFormValues, usePlugins, useForm } from 'react-tinacms'
+import {
+  useCMS,
+  useWatchFormValues,
+  usePlugins,
+  useForm,
+} from '@tinacms/react-core'
 import { useMemo, useCallback, useState, useEffect } from 'react'
 import * as React from 'react'
 import { GlobalFormPlugin } from 'tinacms'

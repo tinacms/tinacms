@@ -18,7 +18,7 @@ limitations under the License.
 
 import { FormOptions, Form } from '@tinacms/core'
 import { GlobalFormPlugin } from 'tinacms'
-import { useCMS, useWatchFormValues, useForm, usePlugins } from 'react-tinacms'
+import { useCMS, useWatchFormValues, useForm, usePlugins } from '@tinacms/react-core'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,

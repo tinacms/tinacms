@@ -23,7 +23,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useForm, usePlugin } from "react-tinacms"
+import { useForm, usePlugin } from "@tinacms/react-core"
 import { GlobalFormPlugin } from "tinacms"
 
 function BlogIndex(props) {

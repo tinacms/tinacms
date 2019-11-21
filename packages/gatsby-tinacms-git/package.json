@@ -48,7 +48,7 @@
     "gatsby-plugin-tinacms": "^0.1.14",
     "js-yaml": "^3.13.1",
     "lodash.throttle": "^4.1.1",
-    "react-tinacms": "^0.9.0",
+    "@tinacms/react-core": "^0.9.0",
     "simple-git": "1.124.0",
     "tinacms": "^0.9.0"
   }
