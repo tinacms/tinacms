@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Form } from '@tinacms/core'
+import { Form } from 'tinacms'
 import { ActionButton, useCMS } from 'tinacms'
 
 export function DeleteAction({ form }: { form: Form }) {
