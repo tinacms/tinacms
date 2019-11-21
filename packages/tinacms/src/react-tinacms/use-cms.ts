@@ -16,21 +16,11 @@ limitations under the License.
 
 */
 
-// Components
-export * from './components/Tina'
-export * from './components/sidebar/SidebarProvider'
-export * from './components/modals/ModalProvider'
-export { ActionButton } from './components/ActionsMenu'
-export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
+import { useCMS as useBaseCMS } from '@tinacms/react-core'
+import { TinaCMS } from '../tina-cms'
 
-// React
-export * from './react-tinacms'
+export { ERROR_MISSING_CMS, CMSContext } from '@tinacms/react-core'
 
-// Plugins
-export * from './plugins/create-content-form-plugin'
-export * from './plugins/screen-plugin'
-export * from './plugins/fields'
-export { GlobalFormPlugin } from './plugins/screens'
-
-// TinaCMS Instance
-export { TinaCMS } from './tina-cms'
+export function useCMS(): TinaCMS {
+  return useBaseCMS() as TinaCMS
+}
