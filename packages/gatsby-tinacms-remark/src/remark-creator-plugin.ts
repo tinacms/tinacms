@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import { toMarkdownString } from './to-markdown'
-import { CMS, Field } from 'tinacms'
-import { AddContentPlugin } from 'tinacms'
+import { CMS, Field, AddContentPlugin } from 'tinacms'
 
 type MaybePromise<T> = Promise<T> | T
 
