@@ -22,3 +22,5 @@ export * from './use-plugin'
 export * from './use-subscribable'
 export * from './use-watch-form-values'
 export * from './with-plugin'
+
+export { Plugin, Form, FormOptions, Field } from '@tinacms/core'

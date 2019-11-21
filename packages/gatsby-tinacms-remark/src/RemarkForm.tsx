@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form } from '@tinacms/core'
+import { FormOptions, Form } from 'tinacms'
 import { RemarkNode } from './remark-node'
 import { useLocalRemarkForm } from './useRemarkForm'
 

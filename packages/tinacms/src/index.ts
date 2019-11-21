@@ -34,3 +34,4 @@ export { GlobalFormPlugin } from './plugins/screens'
 
 // TinaCMS Instance
 export { TinaCMS } from './tina-cms'
+export { TinaCMS as CMS } from './tina-cms'

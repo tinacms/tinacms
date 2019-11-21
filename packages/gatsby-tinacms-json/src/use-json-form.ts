@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { Form, FormOptions, Field } from '@tinacms/core'
+import { Form, FormOptions, Field } from 'tinacms'
 import {
   useCMS,
   useWatchFormValues,
