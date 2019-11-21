@@ -21,10 +21,10 @@ import {
   useWatchFormValues,
   usePlugins,
   useForm,
-} from '@tinacms/react-core'
+  GlobalFormPlugin,
+} from 'tinacms'
 import { useMemo, useCallback, useState, useEffect } from 'react'
 import * as React from 'react'
-import { GlobalFormPlugin } from 'tinacms'
 
 interface JsonNode {
   id: string
