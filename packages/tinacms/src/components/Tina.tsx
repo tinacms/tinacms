@@ -84,7 +84,7 @@ const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
   opacity: 1 !important;
   background-color: transparent !important;
   background-image: none !important;
-  overflow: visible !important;
+  overflow: ${props => (props.open ? 'hidden' : 'visible')} !important;
   position: absolute !important;
   top: 0 !important;
   right: 0 !important;
