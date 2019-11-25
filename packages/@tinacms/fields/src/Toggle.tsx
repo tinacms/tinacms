@@ -33,11 +33,13 @@ export interface ToggleProps {
 }
 
 export const Toggle: FC<ToggleProps> = props => {
+  const checked = !!(props.input.value || props.input.checked)
+
   return (
     <ToggleElement>
       <ToggleInput id={props.name} type="checkbox" {...props.input} />
       <ToggleLabel htmlFor={props.name} role="switch" disabled={props.disabled}>
-        <ToggleSwitch checked={props.input.value ? true : false}>
+        <ToggleSwitch checked={checked}>
           <span></span>
         </ToggleSwitch>
       </ToggleLabel>
