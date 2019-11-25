@@ -1,7 +1,7 @@
 {
   "name": "gatsby-tinacms-git",
   "main": "index.js",
-  "version": "0.2.13-alpha.1",
+  "version": "0.2.13",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -36,7 +36,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@tinacms/api-git": "^0.4.5-alpha.0",
+    "@tinacms/api-git": "^0.4.5",
     "@tinacms/core": "^0.5.0",
     "@tinacms/git-client": "^0.4.1",
     "@types/cors": "^2.8.5",
@@ -45,11 +45,11 @@
     "@types/lodash.throttle": "^4.1.6",
     "cors": "^2.8.5",
     "express": "^4.17.1",
-    "gatsby-plugin-tinacms": "^0.1.15-alpha.1",
+    "gatsby-plugin-tinacms": "^0.1.15",
     "js-yaml": "^3.13.1",
     "lodash.throttle": "^4.1.1",
-    "react-tinacms": "^0.9.1-alpha.0",
+    "react-tinacms": "^0.9.1",
     "simple-git": "1.124.0",
-    "tinacms": "^0.9.1-alpha.1"
+    "tinacms": "^0.9.1"
   }
 }
