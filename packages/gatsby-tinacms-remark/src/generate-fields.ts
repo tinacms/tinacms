@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { RemarkNode } from './remark-node'
-import { Field } from '@tinacms/core'
+import { Field } from 'tinacms'
 
 export function generateFields(post: RemarkNode): Field[] {
   const frontmatterFields = Object.keys(post.rawFrontmatter).map(key => ({
