@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { useCMS, useSubscribable } from 'react-tinacms'
 import {
   Modal,
   ModalHeader,
@@ -40,10 +39,10 @@ import {
 } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
-import { useTina } from '../hooks/use-tina'
+import { useCMS, useSubscribable } from '../react-tinacms'
 
 export const CreateContentMenu = () => {
-  const cms = useTina()
+  const cms = useCMS()
   const frame = useFrameContext()
   const [visible, setVisible] = React.useState(false)
 

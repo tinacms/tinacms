@@ -21,7 +21,7 @@ import { Link } from "gatsby"
 
 import { rhythm, scale } from "../utils/typography"
 import { createRemarkButton } from "gatsby-tinacms-remark"
-import { withPlugin } from "react-tinacms"
+import { withPlugin } from "tinacms"
 
 class Layout extends React.Component {
   render() {

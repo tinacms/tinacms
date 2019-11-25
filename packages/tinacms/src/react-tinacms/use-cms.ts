@@ -16,18 +16,11 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form } from 'tinacms'
-import { RemarkNode } from './remark-node'
-import { useLocalRemarkForm } from './useRemarkForm'
+import { useCMS as useBaseCMS } from '@tinacms/react-core'
+import { TinaCMS } from '../tina-cms'
 
-interface RemarkFormProps extends Partial<FormOptions<any>> {
-  remark: RemarkNode
-  render(renderProps: { form: Form; markdownRemark: any }): JSX.Element
-  timeout?: number
-}
+export { ERROR_MISSING_CMS, CMSContext } from '@tinacms/react-core'
 
-export function RemarkForm({ remark, render, ...options }: RemarkFormProps) {
-  const [markdownRemark, form] = useLocalRemarkForm(remark, options)
-
-  return render({ form: form as Form, markdownRemark })
+export function useCMS(): TinaCMS {
+  return useBaseCMS() as TinaCMS
 }
