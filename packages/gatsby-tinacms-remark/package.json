@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.5.1-alpha.1",
+  "version": "0.5.1-alpha.2",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -42,7 +42,7 @@
     "gray-matter": "^4.0.2",
     "lodash.get": "^4.4.2",
     "react-tinacms": "^0.9.1-alpha.0",
-    "tinacms": "^0.9.1-alpha.0"
+    "tinacms": "^0.9.1-alpha.1"
   },
   "peerDependencies": {
     "gatsby-transformer-remark": ">=2.6"
