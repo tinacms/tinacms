@@ -17,11 +17,14 @@ limitations under the License.
 */
 
 const { GraphQLString } = require('graphql')
+const slash = require('slash')
 
 exports.setFieldsOnGraphQLNodeType = ({ type, getNode }) => {
-  const pathRoot = process.cwd()
+  const pathRoot = slash(process.cwd())
 
-  const hasJson = !!type.nodes.find(node => node.internal.owner === 'gatsby-transformer-json')
+  const hasJson = !!type.nodes.find(
+    node => node.internal.owner === 'gatsby-transformer-json'
+  )
 
   if (!hasJson) {
     return {}

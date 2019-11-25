@@ -34,24 +34,26 @@ export const usePlugin = usePlugins
 export function usePlugins(plugins?: Plugin | Plugin[]) {
   const cms = useCMS()
 
-  let pluginArray: Plugin[]
+  let pluginArray: (Plugin | undefined)[]
 
   if (Array.isArray(plugins)) {
     pluginArray = plugins
-  } else if (plugins) {
-    pluginArray = [plugins]
   } else {
-    pluginArray = []
+    pluginArray = [plugins]
   }
 
   React.useEffect(() => {
     pluginArray.forEach(plugin => {
-      cms.plugins.add(plugin)
+      if (plugin) {
+        cms.plugins.add(plugin);
+      }
     })
 
     return () => {
       pluginArray.forEach(plugin => {
-        cms.plugins.remove(plugin)
+        if (plugin) {
+          cms.plugins.remove(plugin);
+        }
       })
     }
   }, [cms.plugins, ...pluginArray])

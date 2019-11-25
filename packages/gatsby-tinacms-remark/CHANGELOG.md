@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.1...gatsby-tinacms-remark@0.6.0-alpha.0) (2019-11-25)
+
+
+### Features
+
+* tinacms re-exports important types from @tinacms/core ([c51e9de](https://github.com/tinacms/tinacms/commit/c51e9de))
+
+
+
+
+
+## [0.5.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.1-alpha.2...gatsby-tinacms-remark@0.5.1) (2019-11-25)
+
+**Note:** Version bump only for package gatsby-tinacms-remark
+
+
+
+
+
+## [0.5.1-alpha.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.1-alpha.0...gatsby-tinacms-remark@0.5.1-alpha.2) (2019-11-25)
+
+**Note:** Version bump only for package gatsby-tinacms-remark
+
+
+
+
+
+## [0.5.1-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.0...gatsby-tinacms-remark@0.5.1-alpha.0) (2019-11-25)
+
+
+### Bug Fixes
+
+* **remark:** check node ownership instead of type name ([cab520d](https://github.com/tinacms/tinacms/commit/cab520d))
+
+
+
+
+
 # [0.5.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.0-alpha.1...gatsby-tinacms-remark@0.5.0) (2019-11-18)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
