@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.6-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.5...@tinacms/api-git@0.4.6-alpha.0) (2019-11-25)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
+## [0.4.5](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.5-alpha.0...@tinacms/api-git@0.4.5) (2019-11-25)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
+## [0.4.5-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.4...@tinacms/api-git@0.4.5-alpha.0) (2019-11-25)
+
+
+### Bug Fixes
+
+* revparse expects array of strings ([0871f3b](https://github.com/tinacms/tinacms/commit/0871f3b))
+
+
+
+
+
 ## [0.4.4](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.4-alpha.1...@tinacms/api-git@0.4.4) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/api-git

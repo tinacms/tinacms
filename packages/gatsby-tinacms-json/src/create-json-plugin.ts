@@ -16,8 +16,7 @@ limitations under the License.
 
 */
 
-import { CMS, Field } from '@tinacms/core'
-import { AddContentPlugin } from 'tinacms'
+import { CMS, Field, AddContentPlugin } from 'tinacms'
 
 type MaybePromise<T> = Promise<T> | T
 
