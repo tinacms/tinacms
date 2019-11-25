@@ -31,8 +31,6 @@ With this process:
 
 Canary release are automatically created when commits are pushed to `master`.
 
-<!--COMMENT THIS OUT FOR NOW. WE WANT A FASTER CYCLE
-
 ### Prerelease
 
 i.e. `yarn add tinacms@next`
@@ -58,14 +56,8 @@ i.e. `yarn add tinacms@next`
      --conventional-commits \
      --conventional-prerelease \
      --no-push \
-     --allow-branch next \
+     --allow-branch master \
      -m "chore(publish): prerelease"
-   ```
-
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
    ```
 
 1. **Publish to NPM:**
@@ -79,15 +71,6 @@ i.e. `yarn add tinacms@next`
    ```
    git push && git push --tags
    ```
-
-1. **Backmerge to `master`**
-
-   ```
-   git checkout master
-   git merge next
-   git push
-   ```
--->
 
 ### Release
 
@@ -118,12 +101,6 @@ i.e `yarn add tinacms` or `yarn add tinacms@latest`
      -m "chore(publish): latest"
    ```
 
-1. **Clean the CHANGELOGs**
-
-   ```
-   lcc ** && git commit -am "chore: clean changelogs"
-   ```
-
 1) **Publish to NPM:**
 
    ```
@@ -138,7 +115,7 @@ i.e `yarn add tinacms` or `yarn add tinacms@latest`
 1. **Backmerge to `next`**
 
    ```
-   git checkout next
+   git checkout master
    git merge latest
    git push
    ```

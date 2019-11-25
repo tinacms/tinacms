@@ -1,9 +1,9 @@
 {
   "name": "demo-cra",
-  "version": "1.0.7",
+  "version": "1.0.8",
   "private": true,
   "dependencies": {
-    "tinacms": "^0.9.0"
+    "tinacms": "^0.9.1"
   },
   "devDependencies": {
     "@types/jest": "^24.0.15",
