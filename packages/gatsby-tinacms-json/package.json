@@ -41,6 +41,7 @@
     "gatsby-plugin-tinacms": "^0.1.14",
     "graphql": "^14.5.8",
     "react-tinacms": "^0.9.0",
-    "tinacms": "^0.9.0"
+    "tinacms": "^0.9.0",
+    "slash": "^3.0.0"
   }
 }

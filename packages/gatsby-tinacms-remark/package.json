@@ -42,7 +42,8 @@
     "gray-matter": "^4.0.2",
     "lodash.get": "^4.4.2",
     "react-tinacms": "^0.9.0",
-    "tinacms": "^0.9.0"
+    "tinacms": "^0.9.0",
+    "slash": "^3.0.0"
   },
   "peerDependencies": {
     "gatsby-transformer-remark": ">=2.6"
