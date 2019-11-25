@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.7.1...gatsby-tinacms-json@0.8.0-alpha.0) (2019-11-25)
+
+
+### Features
+
+* tinacms re-exports important types from @tinacms/core ([c51e9de](https://github.com/tinacms/tinacms/commit/c51e9de))
+
+
+
+
+
 ## [0.7.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.7.1-alpha.1...gatsby-tinacms-json@0.7.1) (2019-11-25)
 
 **Note:** Version bump only for package gatsby-tinacms-json

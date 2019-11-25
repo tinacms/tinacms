@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.14-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.13...gatsby-tinacms-git@0.2.14-alpha.0) (2019-11-25)
+
+**Note:** Version bump only for package gatsby-tinacms-git
+
+
+
+
+
 ## [0.2.13](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.13-alpha.1...gatsby-tinacms-git@0.2.13) (2019-11-25)
 
 **Note:** Version bump only for package gatsby-tinacms-git
