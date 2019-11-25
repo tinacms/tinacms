@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { CMSContext } from 'react-tinacms'
 import { ModalProvider } from './modals/ModalProvider'
 import { SidebarContext } from './sidebar/SidebarProvider'
 import styled, { ThemeProvider } from 'styled-components'
@@ -25,6 +24,7 @@ import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS } from '../tina-cms'
+import { CMSContext } from '../react-tinacms'
 
 const merge = require('lodash.merge')
 

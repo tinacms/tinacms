@@ -24,7 +24,7 @@ yarn add react-tinacms
 
 ```javascript
 import * as React from 'react'
-import { CMS } from '@tinacms/core'
+import { CMS } from 'tinacms'
 import { CMSContext } from 'react-tinacms'
 
 let cms = new CMS()

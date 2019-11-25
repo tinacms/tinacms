@@ -41,7 +41,6 @@
     "@tinacms/form-builder": "^0.2.7",
     "gray-matter": "^4.0.2",
     "lodash.get": "^4.4.2",
-    "react-tinacms": "^0.9.1",
     "tinacms": "^0.9.1"
   },
   "peerDependencies": {

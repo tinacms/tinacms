@@ -3,7 +3,6 @@
   "version": "1.0.8",
   "private": true,
   "dependencies": {
-    "react-tinacms": "^0.9.1",
     "tinacms": "^0.9.1"
   },
   "devDependencies": {
@@ -12,7 +11,6 @@
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.8.5",
     "react-scripts": "3.0.1",
-    "react-tinacms": "^0.5.0",
     "tinacms": "^0.5.0",
     "typescript": "^3.5.3"
   },
