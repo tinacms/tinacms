@@ -24,7 +24,7 @@ export { ActionButton } from './components/ActionsMenu'
 export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // React
-export * from './hooks/use-tina'
+export * from './react-tinacms'
 
 // Plugins
 export * from './plugins/create-content-form-plugin'
@@ -34,3 +34,4 @@ export { GlobalFormPlugin } from './plugins/screens'
 
 // TinaCMS Instance
 export { TinaCMS } from './tina-cms'
+export { TinaCMS as CMS } from './tina-cms'

@@ -16,9 +16,14 @@ limitations under the License.
 
 */
 
-export * from './use-cms'
-export * from './use-form'
-export * from './use-plugin'
-export * from './use-subscribable'
-export * from './use-watch-form-values'
-export * from './with-plugin'
+export {
+  useCMS,
+  useForm,
+  useLocalForm,
+  usePlugins,
+  useSubscribable,
+  useWatchFormValues,
+  ERROR_MISSING_CMS,
+  CMSContext,
+  withPlugins,
+} from 'tinacms'

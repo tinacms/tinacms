@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
-import { useCMS, useSubscribable } from 'react-tinacms'
 import { useState } from 'react'
 import { Form } from '@tinacms/core'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
@@ -40,6 +39,7 @@ import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
 import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
 import { GroupPanel } from '../plugins/fields'
+import { useCMS, useSubscribable } from '../react-tinacms'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
