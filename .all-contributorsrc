@@ -316,6 +316,15 @@
       "contributions": [
         "video"
       ]
+    },
+    {
+      "login": "SceptreData",
+      "name": "David Bergeron",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/15841748?v=4",
+      "profile": "https://github.com/SceptreData",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7
