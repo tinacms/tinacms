@@ -87,6 +87,67 @@ function runChecksOnPullRequest() {
   if (modifiedPackages.length > 0) {
     checkForMilestone()
   }
+
+  checkForDocsChanges(allFiles)
+}
+
+interface Consumers {
+  [key: string]: Dep[]
+}
+
+interface Dep {
+  file: string
+  details: string
+}
+async function checkForDocsChanges(files: string[]) {
+  files = files.map(file => `/${file}`)
+  const consumerRequest = await fetch('https://tinacms.org/consumers.json')
+  const consumers: Consumers = await consumerRequest.json()
+
+  const potentialDocChanges: [string, Dep][] = []
+  Object.keys(consumers).forEach(docFile => {
+    const dependencies = consumers[docFile]
+
+    dependencies.forEach(dep => {
+      if (files.includes(dep.file)) {
+        potentialDocChanges.push([docFile, dep])
+      }
+    })
+  })
+
+  warnUpdateDoc(potentialDocChanges)
+}
+
+const warnUpdateDoc = (changes: [string, Dep][]) =>
+  warn(`
+Update Docs for tinacms#${danger.github.pr.number}
+
+
+<a href="https://github.com/tinacms/tinacms-site/issues/new?&title=${updateDocTitle(
+    changes
+  )}&body=${updateDocBody(changes)}">Create Issue</a>
+`)
+
+const updateDocTitle = (chagnes: [string, Dep][]) =>
+  encodeURIComponent(`Update Docs for tinacms#${danger.github.pr.number}`)
+
+const updateDocBody = (changes: [string, Dep][]) =>
+  encodeURIComponent(`
+A [pull request](${
+    danger.github.pr.html_url
+  }) in tinacms may require documentation updates.
+
+The following files may need to be updated:
+
+| File | Reason |
+| --- | --- |
+${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)}
+`)
+
+const fileLink = (file: string) => {
+  const filename = file.split('/').pop()
+
+  return `[${filename}](https://github.com/tinacms/tinacms-site/tree/master/${file})`
 }
 
 /**
