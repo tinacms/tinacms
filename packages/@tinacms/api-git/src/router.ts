@@ -36,6 +36,9 @@ export interface GitRouterConfig {
   pushOnCommit?: boolean
 }
 
+/**
+ *
+ */
 export function checkFilePathIsInRepo(
   filepath: string,
   repoAbsolutePath: string
