@@ -25,8 +25,7 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaField } from "@tinacms/form-builder"
-import { Wysiwyg, Toggle } from "@tinacms/fields"
+import { TinaField, Wysiwyg, Toggle } from "tinacms"
 const get = require("lodash.get")
 
 const PlainText = props => (

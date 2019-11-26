@@ -115,7 +115,9 @@ async function checkForDocsChanges(files: string[]) {
     })
   })
 
-  warnUpdateDoc(potentialDocChanges)
+  if (potentialDocChanges.length > 0) {
+    warnUpdateDoc(potentialDocChanges)
+  }
 }
 
 const warnUpdateDoc = (changes: [string, Dep][]) =>
