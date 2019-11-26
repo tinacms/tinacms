@@ -325,6 +325,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "Spraynard",
+      "name": "Kellan Martin",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/17299952?v=4",
+      "profile": "http://kellanmartin.com",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7
