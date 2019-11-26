@@ -87,7 +87,53 @@ function runChecksOnPullRequest() {
   if (modifiedPackages.length > 0) {
     checkForMilestone()
   }
+
+  checkForDocsChanges(allFiles)
 }
+
+interface Consumers {
+  [key: string]: Dep[]
+}
+
+interface Dep {
+  file: string
+  details: string
+}
+async function checkForDocsChanges(files: string[]) {
+  files = files.map(file => `/${file}`)
+  const consumerRequest = await fetch('https://tinacms.org/consumers.json')
+  const consumers: Consumers = await consumerRequest.json()
+
+  Object.keys(consumers).forEach(docFile => {
+    const dependencies = consumers[docFile]
+
+    dependencies.forEach(dep => {
+      if (files.includes(dep.file)) {
+        warnUpdateDoc(docFile, dep)
+      }
+    })
+  })
+}
+
+const warnUpdateDoc = (doc: string, dep: Dep) =>
+  warn(`
+Update Doc: ${doc}
+
+${dep.details}
+
+<a href="https://github.com/tinacms/tinacms/issues/new?&title=${updateDocTitle(
+    doc,
+    dep
+  )}&body=${updateDocBody(doc, dep)}${danger.github.pr.number}">Create Issue</a>
+`)
+
+const updateDocTitle = (doc: string, dep: Dep) =>
+  encodeURIComponent(`Update ${doc}`)
+const updateDocBody = (doc: string, dep: Dep) =>
+  encodeURIComponent(`
+The file \`${dep.file}\` was changed in [tinacms](${danger.github.pr.html_url}).
+
+The docs should be updated. `)
 
 /**
  * Any PR that modifies one of the packages should be attached to a milestone.
