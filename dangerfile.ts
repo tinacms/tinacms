@@ -104,36 +104,51 @@ async function checkForDocsChanges(files: string[]) {
   const consumerRequest = await fetch('https://tinacms.org/consumers.json')
   const consumers: Consumers = await consumerRequest.json()
 
+  const potentialDocChanges: [string, Dep][] = []
   Object.keys(consumers).forEach(docFile => {
     const dependencies = consumers[docFile]
 
     dependencies.forEach(dep => {
       if (files.includes(dep.file)) {
-        warnUpdateDoc(docFile, dep)
+        potentialDocChanges.push([docFile, dep])
       }
     })
   })
+
+  warnUpdateDoc(potentialDocChanges)
 }
 
-const warnUpdateDoc = (doc: string, dep: Dep) =>
+const warnUpdateDoc = (changes: [string, Dep][]) =>
   warn(`
-Update Doc: ${doc}
+Update Docs for tinacms#${danger.github.pr.number}
 
-${dep.details}
 
 <a href="https://github.com/tinacms/tinacms-site/issues/new?&title=${updateDocTitle(
-    doc,
-    dep
-  )}&body=${updateDocBody(doc, dep)}${danger.github.pr.number}">Create Issue</a>
+    changes
+  )}&body=${updateDocBody(changes)}">Create Issue</a>
 `)
 
-const updateDocTitle = (doc: string, dep: Dep) =>
-  encodeURIComponent(`Update ${doc}`)
-const updateDocBody = (doc: string, dep: Dep) =>
-  encodeURIComponent(`
-The file \`${dep.file}\` was changed in [tinacms](${danger.github.pr.html_url}).
+const updateDocTitle = (chagnes: [string, Dep][]) =>
+  encodeURIComponent(`Update Docs for tinacms#${danger.github.pr.number}`)
 
-The docs should be updated. `)
+const updateDocBody = (changes: [string, Dep][]) =>
+  encodeURIComponent(`
+A [pull request](${
+    danger.github.pr.html_url
+  }) in tinacms may require documentation updates.
+
+The following files may need to be updated:
+
+| File | Reason |
+| --- | --- |
+${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)}
+`)
+
+const fileLink = (file: string) => {
+  const filename = file.split('/').pop()
+
+  return `[${filename}](https://github.com/tinacms/tinacms-site/tree/master/${file})`
+}
 
 /**
  * Any PR that modifies one of the packages should be attached to a milestone.
