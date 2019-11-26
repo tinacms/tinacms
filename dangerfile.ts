@@ -121,7 +121,7 @@ Update Doc: ${doc}
 
 ${dep.details}
 
-<a href="https://github.com/tinacms/tinacms/issues/new?&title=${updateDocTitle(
+<a href="https://github.com/tinacms/tinacms-site/issues/new?&title=${updateDocTitle(
     doc,
     dep
   )}&body=${updateDocBody(doc, dep)}${danger.github.pr.number}">Create Issue</a>
