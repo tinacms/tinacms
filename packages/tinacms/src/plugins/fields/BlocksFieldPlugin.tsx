@@ -40,7 +40,7 @@ import {
 } from '@tinacms/styles'
 import { useFrameContext } from '../../components/SyledFrame'
 
-interface BlocksFieldDefinititon extends Field {
+export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
   defaultItem: object
   templates: {
@@ -48,7 +48,7 @@ interface BlocksFieldDefinititon extends Field {
   }
 }
 
-interface BlockTemplate {
+export interface BlockTemplate {
   label: string
   defaultItem?: object | (() => object)
   key: string

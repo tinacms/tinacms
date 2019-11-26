@@ -26,6 +26,8 @@ import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
+import { Blocks } from "react-tinacms-blocks"
+
 const get = require("lodash.get")
 
 const PlainText = props => (
@@ -119,20 +121,13 @@ function BlogPostTemplate(props) {
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
         </TinaField>
-        {blocks.map(({ _template, ...block }) => {
-          switch (_template) {
-            case "heading":
-              return <h1>{block.text}</h1>
-            case "image":
-              return (
-                <p>
-                  <img {...block} />
-                </p>
-              )
-            default:
-              return "What"
-          }
-        })}
+        <Blocks
+          data={blocks}
+          templates={{
+            heading,
+            image,
+          }}
+        />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
             dangerouslySetInnerHTML={{
@@ -189,6 +184,9 @@ const heading = {
     label: `${block.text}`,
   }),
   fields: [{ name: "text", component: "text", label: "Text" }],
+  Component(props) {
+    return <h1>{props.data.text}</h1>
+  },
 }
 
 const image = {
@@ -204,6 +202,13 @@ const image = {
     { name: "src", component: "text", label: "Source URL" },
     { name: "alt", component: "text", label: "Alt Text" },
   ],
+  Component(props) {
+    return (
+      <p>
+        <img {...props.data} />
+      </p>
+    )
+  },
 }
 
 const BlogPostForm = {
