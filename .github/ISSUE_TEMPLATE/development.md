@@ -30,8 +30,10 @@ What happened.
 
 ### Environment
 
-| Tool    | Version     |
-| ------- | ----------- |
-| tinacms | commit-hash |
-| npm     | version     |
-| node    | version     |
+| Tool    | Version |
+| ------- | ------- |
+| browser |         |
+| os      |         |
+| node    |         |
+| npm     |         |
+| tinacms |         |

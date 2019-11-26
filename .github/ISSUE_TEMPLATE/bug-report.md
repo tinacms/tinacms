@@ -24,8 +24,16 @@ What should happen?
 
 ### Actual result
 
-What happened.
+What actually happened?
 
 ### Environment
 
-<!-- Make sure to add at least package versions and browser information. -->
+<!-- Please add as much information about your environment as possible. -->
+
+| Tool    | Version |
+| ------- | ------- |
+| browser |         |
+| os      |         |
+| node    |         |
+| npm     |         |
+| tinacms |         |
