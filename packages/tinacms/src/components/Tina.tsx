@@ -28,9 +28,9 @@ import { CMSContext } from '../react-tinacms'
 
 const merge = require('lodash.merge')
 
-type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
+export type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
-interface TinaProps {
+export interface TinaProps {
   cms: TinaCMS
   position: SidebarPosition
   hidden?: boolean
