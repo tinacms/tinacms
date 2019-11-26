@@ -1,3 +1,8 @@
+import { FormOptions, Form } from '@tinacms/core'
+import { GlobalFormPlugin } from '../plugins/screens'
+import { useMemo } from 'react'
+import { useForm, WatchableFormValue, usePlugins } from '@tinacms/react-core'
+
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -16,4 +21,21 @@ limitations under the License.
 
 */
 
-export { useLocalForm, useForm } from '@tinacms/react-core'
+export { useLocalForm, useForm, WatchableFormValue } from '@tinacms/react-core'
+
+export function useGlobalForm<FormShape = any>(
+  options: FormOptions<any>,
+  watch: Partial<WatchableFormValue> = {}
+): [FormShape, Form | undefined] {
+  const [values, form] = useForm(options, watch)
+
+  const GlobalForm = useMemo(() => {
+    if (!form) return
+
+    return new GlobalFormPlugin(form)
+  }, [form])
+
+  usePlugins(GlobalForm)
+
+  return [values, form]
+}

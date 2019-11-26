@@ -20,7 +20,7 @@ import { FormOptions, Form, Field } from '@tinacms/core'
 import * as React from 'react'
 import { usePlugins } from './use-plugin'
 
-interface WatchableFormValue {
+export interface WatchableFormValue {
   values: any
   label: FormOptions<any>['label']
   fields: FormOptions<any>['fields']
