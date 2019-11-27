@@ -80,7 +80,13 @@ describe('Blocks', () => {
             process.env.NODE_ENV = 'development'
 
             const rendering = () =>
-              render(<Blocks name="" data={data} templates={{}} />)
+              render(
+                <Blocks
+                  name=""
+                  data={data}
+                  templates={{ heading: headingWithoutComponent }}
+                />
+              )
 
             expect(rendering).toThrow()
           })
