@@ -52,6 +52,12 @@ export function Blocks({ name, data = [], templates = {} }: BlocksProps) {
   )
 }
 
+/**
+ * Conditionally return `null` or throw an Error depending on NODE_ENV.o
+ *
+ * Useful if you want to provide the developer with some information
+ * while they are developing, but then fail silently in production.
+ */
 const nullOrError = (message: string) => {
   if (process.env.NODE_ENV === 'development') {
     throw new Error(message)
