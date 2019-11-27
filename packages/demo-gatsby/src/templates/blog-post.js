@@ -122,6 +122,7 @@ function BlogPostTemplate(props) {
           )}
         </TinaField>
         <Blocks
+          name="rawFrontmatter.blocks"
           data={blocks}
           templates={{
             heading,
@@ -185,8 +186,27 @@ const heading = {
   }),
   fields: [{ name: "text", component: "text", label: "Text" }],
   Component(props) {
-    return <h1>{props.data.text}</h1>
+    return (
+      <TinaField
+        name={`${props.name}.${props.index}.text`}
+        Component={EditableHeadingBlock}
+      >
+        <HeadingBlock {...props} />
+      </TinaField>
+    )
   },
+}
+
+const EditableHeadingBlock = props => {
+  return (
+    <h1>
+      <PlainText {...props} />
+    </h1>
+  )
+}
+
+const HeadingBlock = props => {
+  return <h1>{props.data.text}</h1>
 }
 
 const image = {
@@ -205,6 +225,14 @@ const image = {
   Component(props) {
     return (
       <p>
+        <TinaField
+          name={`${props.name}.${props.index}.src`}
+          Component={PlainText}
+        />
+        <TinaField
+          name={`${props.name}.${props.index}.alt`}
+          Component={PlainText}
+        />
         <img {...props.data} />
       </p>
     )
