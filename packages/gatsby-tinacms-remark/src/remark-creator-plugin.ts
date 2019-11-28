@@ -46,7 +46,7 @@ export function createRemarkButton<FormShape = any, FrontmatterShape = any>(
 
 export class RemarkCreatorPlugin<FormShape = any, FrontmatterShape = any>
   implements AddContentPlugin<FormShape> {
-  __type: 'content-button' = 'content-button'
+  __type: 'content-creator' = 'content-creator'
   name: AddContentPlugin<FormShape>['name']
   fields: AddContentPlugin<FormShape>['fields']
 
