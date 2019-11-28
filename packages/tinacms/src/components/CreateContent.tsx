@@ -122,7 +122,7 @@ const FormModal = ({ plugin, close }: any) => {
         {({ handleSubmit }) => {
           return (
             <ModalPopup>
-              <ModalHeader title={plugin.name} close={close}></ModalHeader>
+              <ModalHeader close={close}>{plugin.name}</ModalHeader>
               <ModalBody>
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>

@@ -153,7 +153,7 @@ const ActiveViewModal = ({
   return (
     <Modal>
       <Wrapper>
-        <ModalHeader title={name} close={close}></ModalHeader>
+        <ModalHeader close={close}>{name}</ModalHeader>
         <ModalBody>{children}</ModalBody>
       </Wrapper>
     </Modal>
