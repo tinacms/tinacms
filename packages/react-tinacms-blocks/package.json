@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-blocks",
-  "version": "0.0.0",
+  "version": "0.1.0-alpha.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-blocks.esm.js",
@@ -15,7 +15,6 @@
     "test": "tsdx test --env=jsdom",
     "lint": "tsdx lint"
   },
-  "dependencies": {},
   "peerDependencies": {
     "react": ">=16.8"
   },
