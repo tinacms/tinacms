@@ -135,7 +135,7 @@ const CloseButton = styled.div`
 
 interface ModalHeaderProps {
   title: string
-  close(): void
+  close(): any
 }
 
 export const ModalHeader = styled(
