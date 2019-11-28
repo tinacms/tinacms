@@ -28,7 +28,7 @@ import { ModalPopup } from './modals/ModalPopup'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/core'
-import { CloseIcon, AddIcon } from '@tinacms/icons'
+import { AddIcon } from '@tinacms/icons'
 import {
   color,
   radius,
@@ -122,12 +122,7 @@ const FormModal = ({ plugin, close }: any) => {
         {({ handleSubmit }) => {
           return (
             <ModalPopup>
-              <ModalHeader>
-                {plugin.name}
-                <CloseButton onClick={close}>
-                  <CloseIcon />
-                </CloseButton>
-              </ModalHeader>
+              <ModalHeader title={plugin.name} close={close}></ModalHeader>
               <ModalBody>
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
@@ -174,21 +169,6 @@ const ContentMenu = styled.div<{ open: boolean }>`
       pointer-events: all;
       transform: translate3d(0, 2.75rem, 0) scale3d(1, 1, 1);
     `};
-`
-
-const CloseButton = styled.div`
-  display: flex;
-  align-items: center;
-  fill: ${color.grey(3)};
-  cursor: pointer;
-  transition: fill 85ms ease-out;
-  svg {
-    width: 1.5rem;
-    height: auto;
-  }
-  &:hover {
-    fill: ${color.grey(8)};
-  }
 `
 
 const CreateButton = styled.button`
