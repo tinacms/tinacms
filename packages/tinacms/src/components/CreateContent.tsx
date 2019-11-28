@@ -46,7 +46,7 @@ export const CreateContentMenu = () => {
   const frame = useFrameContext()
   const [visible, setVisible] = React.useState(false)
 
-  const contentCreatorPlugins = cms.plugins.findOrCreateMap('content-button')
+  const contentCreatorPlugins = cms.plugins.findOrCreateMap('content-creator')
 
   useSubscribable(contentCreatorPlugins)
 
