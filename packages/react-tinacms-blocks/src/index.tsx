@@ -16,12 +16,4 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+export { Blocks, BlocksProps } from './blocks'
