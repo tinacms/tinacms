@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export { Blocks, BlocksProps, BlockTemplate } from './blocks'
+export { Blocks, BlocksProps } from './blocks'
