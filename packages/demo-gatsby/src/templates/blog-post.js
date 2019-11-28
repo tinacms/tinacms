@@ -124,9 +124,9 @@ function BlogPostTemplate(props) {
         <Blocks
           name="rawFrontmatter.blocks"
           data={blocks}
-          templates={{
-            heading,
-            image,
+          components={{
+            heading: EditableHeading,
+            image: EditableImage,
           }}
         />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
@@ -176,6 +176,9 @@ function BlogPostTemplate(props) {
   )
 }
 
+/**
+ * HEADING BLOCK
+ */
 const heading = {
   label: "Heading",
   defaultItem: {
@@ -185,16 +188,17 @@ const heading = {
     label: `${block.text}`,
   }),
   fields: [{ name: "text", component: "text", label: "Text" }],
-  Component(props) {
-    return (
-      <TinaField
-        name={`${props.name}.${props.index}.text`}
-        Component={EditableHeadingBlock}
-      >
-        <HeadingBlock {...props} />
-      </TinaField>
-    )
-  },
+}
+
+function EditableHeading(props) {
+  return (
+    <TinaField
+      name={`${props.name}.${props.index}.text`}
+      Component={EditableHeadingBlock}
+    >
+      <HeadingBlock {...props} />
+    </TinaField>
+  )
 }
 
 const EditableHeadingBlock = props => {
@@ -209,6 +213,10 @@ const HeadingBlock = props => {
   return <h1>{props.data.text}</h1>
 }
 
+/**
+ * IMAGE BLOCK
+ */
+// Image Block Template
 const image = {
   label: "Image",
   defaultItem: {
@@ -222,23 +230,28 @@ const image = {
     { name: "src", component: "text", label: "Source URL" },
     { name: "alt", component: "text", label: "Alt Text" },
   ],
-  Component(props) {
-    return (
-      <p>
-        <TinaField
-          name={`${props.name}.${props.index}.src`}
-          Component={PlainText}
-        />
-        <TinaField
-          name={`${props.name}.${props.index}.alt`}
-          Component={PlainText}
-        />
-        <img {...props.data} />
-      </p>
-    )
-  },
 }
 
+// Image Block Component
+function EditableImage(props) {
+  return (
+    <p>
+      <TinaField
+        name={`${props.name}.${props.index}.src`}
+        Component={PlainText}
+      />
+      <TinaField
+        name={`${props.name}.${props.index}.alt`}
+        Component={PlainText}
+      />
+      <img {...props.data} />
+    </p>
+  )
+}
+
+/**
+ * Blog Post Form
+ */
 const BlogPostForm = {
   actions: [DeleteAction],
   fields: [
