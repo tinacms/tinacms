@@ -59,7 +59,7 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
   return (
     <Modal>
       <ModalPopup>
-        <ModalHeader title="Reset" close={close}></ModalHeader>
+        <ModalHeader close={close}>Reset</ModalHeader>
         <ModalBody padded={true}>
           <p>Are you sure you want to reset all changes?</p>
         </ModalBody>

@@ -134,15 +134,15 @@ const CloseButton = styled.div`
 `
 
 interface ModalHeaderProps {
-  title: string
   close(): any
+  children: any
 }
 
 export const ModalHeader = styled(
-  ({ title, close, ...styleProps }: ModalHeaderProps) => {
+  ({ children, close, ...styleProps }: ModalHeaderProps) => {
     return (
       <div {...styleProps}>
-        <ModalTitle>{title}</ModalTitle>
+        <ModalTitle>{children}</ModalTitle>
         <CloseButton onClick={close}>
           <CloseIcon />
         </CloseButton>
