@@ -21,6 +21,7 @@ import { useCallback, useState } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from '../SyledFrame'
 import styled, { StyledComponent } from 'styled-components'
+import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'
 import { GlobalStyles, Button, padding, font, color } from '@tinacms/styles'
 
@@ -110,14 +111,49 @@ export const ModalOverlay = styled.div`
   padding: 0;
 `
 
-export const ModalHeader: StyledComponent<'div', {}> = styled.div`
+const ModalTitle = styled.h2`
+  font-size: ${font.size(5)};
+  font-weight: 500;
+  line-height: normal;
+  margin: 0;
+`
+
+const CloseButton = styled.div`
+  display: flex;
+  align-items: center;
+  fill: ${color.grey(5)};
+  cursor: pointer;
+  transition: fill 85ms ease-out;
+  svg {
+    width: 1.5rem;
+    height: auto;
+  }
+  &:hover {
+    fill: ${color.grey(8)};
+  }
+`
+
+interface ModalHeaderProps {
+  title: string
+  close(): void
+}
+
+export const ModalHeader = styled(
+  ({ title, close, ...styleProps }: ModalHeaderProps) => {
+    return (
+      <div {...styleProps}>
+        <ModalTitle>{title}</ModalTitle>
+        <CloseButton onClick={close}>
+          <CloseIcon />
+        </CloseButton>
+      </div>
+    )
+  }
+)`
   height: 3.5rem;
   display: flex;
   align-items: center;
   justify-content: space-between;
-  font-size: ${font.size(5)};
-  font-weight: 500;
-  line-height: normal;
   padding: 0 ${padding()} 0 ${padding()};
   border-bottom: 1px solid ${color.grey(3)};
   margin: 0;
