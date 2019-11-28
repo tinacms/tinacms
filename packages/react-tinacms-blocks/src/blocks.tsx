@@ -16,37 +16,26 @@ limitations under the License.
 
 */
 import * as React from 'react'
-import { BlockTemplate as DefaultBlockTemplate } from 'tinacms'
-
-export interface BlockTemplate extends DefaultBlockTemplate {
-  Component: any
-}
 
 export interface BlocksProps {
   name: string
   data: any[]
-  templates: {
-    [key: string]: BlockTemplate
+  components: {
+    [key: string]: any // Todo: React Component
   }
 }
 
-export function Blocks({ name, data = [], templates = {} }: BlocksProps) {
+export function Blocks({ name, data = [], components = {} }: BlocksProps) {
   return (
     <>
       {data.map((data, index) => {
-        const template = templates[data._template]
+        const Component = components[data._template]
 
-        if (!template) {
+        if (!Component) {
           return nullOrError('Unrecognized Block Type: ' + data._template)
         }
 
-        if (!template.Component) {
-          return nullOrError(
-            `The "${template.label}" block template is missing the Component`
-          )
-        }
-
-        return <template.Component data={data} index={index} name={name} />
+        return <Component data={data} index={index} name={name} />
       })}
     </>
   )

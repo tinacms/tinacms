@@ -16,9 +16,7 @@
     "test": "tsdx test --env=jsdom",
     "lint": "tsdx lint"
   },
-  "dependencies": {
-    "tinacms": "^0.10.0-alpha.0"
-  },
+  "dependencies": {},
   "peerDependencies": {
     "react": ">=16.8"
   },
