@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.10.0-alpha.0...tinacms@0.10.0-alpha.1) (2019-11-28)
+
+
+### Features
+
+* **Blocks:** add Block component ([cfcb618](https://github.com/tinacms/tinacms/commit/cfcb618))
+* **useGlobalForm:** add hook for registering global forms ([d450cae](https://github.com/tinacms/tinacms/commit/d450cae))
+
+
+
+
+
 # [0.10.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.9.1...tinacms@0.10.0-alpha.0) (2019-11-25)
 
 
