@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCallback, useState } from 'react'
+import { useCallback, useState, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import { StyledFrame } from '../SyledFrame'
 import styled, { StyledComponent } from 'styled-components'
@@ -133,13 +133,14 @@ const CloseButton = styled.div`
   }
 `
 
-interface ModalHeaderProps {
-  close(): any
-  children: any
-}
+// export interface ModalHeaderProps {
+//   children: ReactNode
+//   close(): void
+// }
 
 export const ModalHeader = styled(
-  ({ children, close, ...styleProps }: ModalHeaderProps) => {
+  // TODO: Replacing `any` with `ModalHeaderProps` breaks the build ????????/
+  ({ children, close, ...styleProps }: any) => {
     return (
       <div {...styleProps}>
         <ModalTitle>{children}</ModalTitle>
