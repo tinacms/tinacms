@@ -3,14 +3,30 @@ import { TinaField, Form } from 'tinacms'
 
 import { Blocks, BlocksProps } from './blocks'
 
+export interface BlocksRenderProps {
+  insert(obj: any, index: number): void
+  move(from: number, to: number): void
+  remove(index: number): void
+}
 export interface InlineBlocksProps extends BlocksProps {
   // TODO: We shouldn't have to pass this in.
   form: Form
+  renderBefore(props: BlocksRenderProps): any // TODO: Proper types
 }
 
-export function InlineBlocks({ name, form, ...props }: InlineBlocksProps) {
+export function InlineBlocks({
+  name,
+  form,
+  renderBefore,
+  ...props
+}: InlineBlocksProps) {
   const EditableBlocks = React.useMemo(
-    () => createEditableBlocks(form, props.components),
+    () =>
+      createEditableBlocks({
+        form,
+        components: props.components,
+        renderBefore,
+      }),
     [form, props.components]
   )
   return (
@@ -20,10 +36,15 @@ export function InlineBlocks({ name, form, ...props }: InlineBlocksProps) {
   )
 }
 
-function createEditableBlocks(
-  form: Form,
+function createEditableBlocks({
+  form,
+  components,
+  renderBefore,
+}: {
+  form: Form
   components: InlineBlocksProps['components']
-) {
+  renderBefore: any
+}) {
   return function(props: any) {
     return (
       <EditableBlocks
@@ -31,16 +52,18 @@ function createEditableBlocks(
         components={components}
         data={props.input.value}
         form={form}
+        renderBefore={renderBefore}
       />
     )
   }
 }
 
-export function EditableBlocks({
+function EditableBlocks({
   name,
   data = [],
   components = {},
   form,
+  renderBefore,
 }: InlineBlocksProps) {
   const move = useCallback(
     (from: number, to: number) => {
@@ -65,6 +88,7 @@ export function EditableBlocks({
 
   return (
     <>
+      {renderBefore && renderBefore({ insert, move, remove })}
       {data.map((data, index) => {
         const Component = components[data._template]
 

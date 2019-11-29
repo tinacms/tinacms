@@ -127,6 +127,12 @@ function BlogPostTemplate(props) {
           name="rawFrontmatter.blocks"
           data={blocks}
           components={BLOCK_COMPONENTS}
+          renderBefore={props => (
+            <>
+              <br />
+              <BlocksActions {...props} />
+            </>
+          )}
         />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
@@ -198,12 +204,13 @@ const heading = {
   fields: [{ name: "text", component: "text", label: "Text" }],
 }
 const BlocksActions = ({ index, insert, remove, move }) => {
+  const hasIndex = index || index === 0
   return (
     <>
       {insert && (
         <button
           onClick={() =>
-            insert({ _template: "heading", ...heading.defaultItem }, index)
+            insert({ _template: "heading", ...heading.defaultItem }, index || 0)
           }
         >
           Add Heading
@@ -212,15 +219,23 @@ const BlocksActions = ({ index, insert, remove, move }) => {
       {insert && (
         <button
           onClick={() =>
-            insert({ _template: "image", ...image.defaultItem }, index)
+            insert({ _template: "image", ...image.defaultItem }, index || 0)
           }
         >
           Add Image
         </button>
       )}
-      {move && <button onClick={() => move(index, index - 1)}>Up</button>}
-      {move && <button onClick={() => move(index, index + 1)}>Down</button>}
-      {remove && <button onClick={() => remove(index)}>Remove</button>}
+      {hasIndex && move && (
+        <button onClick={() => move(index, index - 1)} disabled={index === 0}>
+          Up
+        </button>
+      )}
+      {hasIndex && move && (
+        <button onClick={() => move(index, index + 1)}>Down</button>
+      )}
+      {hasIndex && remove && (
+        <button onClick={() => remove(index)}>Remove</button>
+      )}
     </>
   )
 }
@@ -228,10 +243,6 @@ const BlocksActions = ({ index, insert, remove, move }) => {
 function EditableHeading(props) {
   return (
     <div style={{ border: "5px solid purple" }}>
-      <BlocksActions
-        {...props}
-        defaultItem={{ _template: "heading", ...heading.defaultItem }}
-      />
       <h1>
         <TinaField
           name={`${props.name}.${props.index}.text`}
@@ -240,6 +251,10 @@ function EditableHeading(props) {
           {props.data.text}
         </TinaField>
       </h1>
+      <BlocksActions
+        {...props}
+        defaultItem={{ _template: "heading", ...heading.defaultItem }}
+      />
     </div>
   )
 }
@@ -271,10 +286,6 @@ const image = {
 function EditableImage(props) {
   return (
     <p style={{ border: "5px solid green" }}>
-      <BlocksActions
-        {...props}
-        defaultItem={{ _template: "image", ...image.defaultItem }}
-      />
       <TinaField
         name={`${props.name}.${props.index}.src`}
         Component={PlainText}
@@ -284,6 +295,10 @@ function EditableImage(props) {
         Component={PlainText}
       />
       <img {...props.data} />
+      <BlocksActions
+        {...props}
+        defaultItem={{ _template: "image", ...image.defaultItem }}
+      />
     </p>
   )
 }
