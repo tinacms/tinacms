@@ -17,3 +17,4 @@ limitations under the License.
 */
 
 export { Blocks, BlocksProps } from './blocks'
+export { InlineBlocks, InlineBlocksProps } from './inline-blocks'

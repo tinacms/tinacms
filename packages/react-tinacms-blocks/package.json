@@ -16,9 +16,11 @@
     "lint": "tsdx lint"
   },
   "peerDependencies": {
+    "tinacms": ">=0.10",
     "react": ">=16.8"
   },
   "devDependencies": {
+    "tinacms": "0.10.0-alpha.1",
     "@types/jest": "^24.0.23",
     "tsdx": "^0.11.0"
   }

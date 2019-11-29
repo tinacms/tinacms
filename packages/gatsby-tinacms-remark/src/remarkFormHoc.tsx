@@ -52,6 +52,7 @@ export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
               {...props}
               data={{ ...props.data, markdownRemark }}
               {...editingProps}
+              form={form}
             />
           )
         }}
