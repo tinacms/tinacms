@@ -20,6 +20,9 @@ jobs:
       - name: Build
         run: npm run build
 
+      - name: Cleanup
+        run: git checkout .
+
       - name: Authorize NPM
         run: echo "//registry.npmjs.org/:_authToken=${{ secrets.NPM_AUTH_TOKEN}}" > ~/.npmrc
 
