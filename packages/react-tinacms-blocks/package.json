@@ -16,6 +16,7 @@
     "lint": "tsdx lint"
   },
   "peerDependencies": {
+    "tinacms": ">=0.10",
     "react": ">=16.8"
   },
   "devDependencies": {
