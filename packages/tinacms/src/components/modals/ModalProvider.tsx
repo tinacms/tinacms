@@ -23,7 +23,15 @@ import { StyledFrame } from '../SyledFrame'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'
-import { GlobalStyles, Button, padding, font, color } from '@tinacms/styles'
+import {
+  GlobalStyles,
+  Button,
+  padding,
+  font,
+  color,
+  // Needed for type inference
+  ThemeProps,
+} from '@tinacms/styles'
 
 interface Props {
   children: any
@@ -133,14 +141,13 @@ const CloseButton = styled.div`
   }
 `
 
-// export interface ModalHeaderProps {
-//   children: ReactNode
-//   close(): void
-// }
+export interface ModalHeaderProps {
+  children: ReactNode
+  close(): void
+}
 
 export const ModalHeader = styled(
-  // TODO: Replacing `any` with `ModalHeaderProps` breaks the build ????????/
-  ({ children, close, ...styleProps }: any) => {
+  ({ children, close, ...styleProps }: ModalHeaderProps) => {
     return (
       <div {...styleProps}>
         <ModalTitle>{children}</ModalTitle>
