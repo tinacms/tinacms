@@ -29,7 +29,7 @@ import {
   padding,
   font,
   color,
-  // Needed for type inference
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
   ThemeProps,
 } from '@tinacms/styles'
 

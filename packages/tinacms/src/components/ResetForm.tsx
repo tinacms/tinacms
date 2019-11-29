@@ -18,14 +18,13 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { Button, color } from '@tinacms/styles'
+import { Button } from '@tinacms/styles'
 import {
   Modal,
   ModalHeader,
   ModalBody,
   ModalActions,
 } from './modals/ModalProvider'
-import { CloseIcon } from '@tinacms/icons'
 import { ModalPopup } from './modals/ModalPopup'
 
 interface ResetFormProps {
