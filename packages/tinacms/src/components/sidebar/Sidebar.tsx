@@ -29,7 +29,6 @@ import {
   LeftArrowIcon,
   EditIcon,
   TinaIcon,
-  CloseIcon,
 } from '@tinacms/icons'
 import {
   GlobalStyles,
