@@ -31,6 +31,12 @@ module.exports = {
   },
   plugins: [
     {
+      resolve: "gatsby-tinacms-auth",
+      options: {
+        authEnvironments: ["development"],
+      },
+    },
+    {
       resolve: "gatsby-plugin-tinacms",
       options: {
         sidebar: {
