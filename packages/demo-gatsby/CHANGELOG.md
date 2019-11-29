@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.2-alpha.0...demo-gatsby@1.3.0-alpha.0) (2019-11-28)
+
+
+### Features
+
+* **Blocks:** add Block component ([cfcb618](https://github.com/gatsbyjs/gatsby-starter-blog/commit/cfcb618))
+* **useGlobalForm:** add hook for registering global forms ([d450cae](https://github.com/gatsbyjs/gatsby-starter-blog/commit/d450cae))
+
+
+
+
+
 ## [1.2.2-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.1...demo-gatsby@1.2.2-alpha.0) (2019-11-25)
 
 **Note:** Version bump only for package demo-gatsby

@@ -1,9 +1,9 @@
 {
-  "name": "@tinacms/react-core",
-  "version": "0.2.0-alpha.0",
+  "name": "react-tinacms-blocks",
+  "version": "0.1.0-alpha.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
-  "module": "dist/react-core.esm.js",
+  "module": "dist/react-tinacms-blocks.esm.js",
   "typings": "dist/index.d.ts",
   "files": [
     "dist"
@@ -15,18 +15,11 @@
     "test": "tsdx test --env=jsdom",
     "lint": "tsdx lint"
   },
-  "dependencies": {
-    "@tinacms/core": "^0.5.0",
-    "lodash.get": "^4.4.2",
-    "lodash.set": "^4.3.2"
-  },
   "peerDependencies": {
     "react": ">=16.8"
   },
   "devDependencies": {
     "@types/jest": "^24.0.23",
-    "tsdx": "^0.11.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.2"
+    "tsdx": "^0.11.0"
   }
 }
