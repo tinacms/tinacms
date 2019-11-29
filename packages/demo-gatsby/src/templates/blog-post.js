@@ -210,7 +210,10 @@ const BlocksActions = ({ index, insert, remove, move }) => {
       {insert && (
         <button
           onClick={() =>
-            insert({ _template: "heading", ...heading.defaultItem }, index || 0)
+            insert(
+              { _template: "heading", ...heading.defaultItem },
+              (index || -1) + 1
+            )
           }
         >
           Add Heading
@@ -219,7 +222,10 @@ const BlocksActions = ({ index, insert, remove, move }) => {
       {insert && (
         <button
           onClick={() =>
-            insert({ _template: "image", ...image.defaultItem }, index || 0)
+            insert(
+              { _template: "image", ...image.defaultItem },
+              (index || -1) + 1
+            )
           }
         >
           Add Image
@@ -309,15 +315,6 @@ function EditableImage(props) {
 const BlogPostForm = {
   actions: [DeleteAction],
   fields: [
-    {
-      label: "Blocks",
-      name: "frontmatter.blocks",
-      component: "blocks",
-      templates: {
-        heading,
-        image,
-      },
-    },
     {
       label: "Gallery",
       name: "frontmatter.gallery",
@@ -430,23 +427,6 @@ const BlogPostForm = {
         if (!gastbyImageNode) return ""
         return gastbyImageNode.childImageSharp.fluid.src
       },
-    },
-    { label: "Body", name: "rawMarkdownBody", component: "markdown" },
-    { name: "hr", component: () => <hr /> },
-    {
-      label: "Commit Name",
-      name: "__commit_name",
-      component: "text",
-    },
-    {
-      label: "Commit Email",
-      name: "__commit_email",
-      component: "text",
-    },
-    {
-      label: "Commit Message (Optional)",
-      name: "__commit_message",
-      component: "textarea",
     },
   ],
 }
