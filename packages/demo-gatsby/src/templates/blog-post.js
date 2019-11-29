@@ -26,7 +26,7 @@ import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
-import { Blocks } from "react-tinacms-blocks"
+import { InlineBlocks } from "react-tinacms-blocks"
 
 const get = require("lodash.get")
 
@@ -41,6 +41,7 @@ const MyToggle = props => (
 )
 
 function BlogPostTemplate(props) {
+  const form = props.form
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
@@ -121,13 +122,11 @@ function BlogPostTemplate(props) {
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
         </TinaField>
-        <Blocks
+        <InlineBlocks
+          form={form}
           name="rawFrontmatter.blocks"
           data={blocks}
-          components={{
-            heading: EditableHeading,
-            image: EditableImage,
-          }}
+          components={BLOCK_COMPONENTS}
         />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
@@ -177,6 +176,15 @@ function BlogPostTemplate(props) {
 }
 
 /**
+ * Blocks Components
+ */
+
+const BLOCK_COMPONENTS = {
+  heading: EditableHeading,
+  image: EditableImage,
+}
+
+/**
  * HEADING BLOCK
  */
 const heading = {
@@ -189,23 +197,50 @@ const heading = {
   }),
   fields: [{ name: "text", component: "text", label: "Text" }],
 }
-
-function EditableHeading(props) {
+const BlocksActions = ({ index, insert, remove, move }) => {
   return (
-    <TinaField
-      name={`${props.name}.${props.index}.text`}
-      Component={EditableHeadingBlock}
-    >
-      <HeadingBlock {...props} />
-    </TinaField>
+    <>
+      {insert && (
+        <button
+          onClick={() =>
+            insert({ _template: "heading", ...heading.defaultItem }, index)
+          }
+        >
+          Add Heading
+        </button>
+      )}
+      {insert && (
+        <button
+          onClick={() =>
+            insert({ _template: "image", ...image.defaultItem }, index)
+          }
+        >
+          Add Image
+        </button>
+      )}
+      {move && <button onClick={() => move(index, index - 1)}>Up</button>}
+      {move && <button onClick={() => move(index, index + 1)}>Down</button>}
+      {remove && <button onClick={() => remove(index)}>Remove</button>}
+    </>
   )
 }
 
-const EditableHeadingBlock = props => {
+function EditableHeading(props) {
   return (
-    <h1>
-      <PlainText {...props} />
-    </h1>
+    <div style={{ border: "5px solid purple" }}>
+      <BlocksActions
+        {...props}
+        defaultItem={{ _template: "heading", ...heading.defaultItem }}
+      />
+      <h1>
+        <TinaField
+          name={`${props.name}.${props.index}.text`}
+          Component={PlainText}
+        >
+          {props.data.text}
+        </TinaField>
+      </h1>
+    </div>
   )
 }
 
@@ -235,7 +270,11 @@ const image = {
 // Image Block Component
 function EditableImage(props) {
   return (
-    <p>
+    <p style={{ border: "5px solid green" }}>
+      <BlocksActions
+        {...props}
+        defaultItem={{ _template: "image", ...image.defaultItem }}
+      />
       <TinaField
         name={`${props.name}.${props.index}.src`}
         Component={PlainText}
