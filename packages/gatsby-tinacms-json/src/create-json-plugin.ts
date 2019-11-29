@@ -35,7 +35,7 @@ const MISSING_FIELDS_MESSAGE =
 
 export class JsonCreatorPlugin<FormShape = any, FrontmatterShape = any>
   implements AddContentPlugin<FormShape> {
-  __type: 'content-button' = 'content-button'
+  __type: 'content-creator' = 'content-creator'
   name: AddContentPlugin<FormShape>['name']
   fields: AddContentPlugin<FormShape>['fields']
 

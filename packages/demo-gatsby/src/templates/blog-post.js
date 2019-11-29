@@ -26,6 +26,8 @@ import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
+import { Blocks } from "react-tinacms-blocks"
+
 const get = require("lodash.get")
 
 const PlainText = props => (
@@ -119,20 +121,14 @@ function BlogPostTemplate(props) {
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
         </TinaField>
-        {blocks.map(({ _template, ...block }) => {
-          switch (_template) {
-            case "heading":
-              return <h1>{block.text}</h1>
-            case "image":
-              return (
-                <p>
-                  <img {...block} />
-                </p>
-              )
-            default:
-              return "What"
-          }
-        })}
+        <Blocks
+          name="rawFrontmatter.blocks"
+          data={blocks}
+          components={{
+            heading: EditableHeading,
+            image: EditableImage,
+          }}
+        />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
             dangerouslySetInnerHTML={{
@@ -180,6 +176,9 @@ function BlogPostTemplate(props) {
   )
 }
 
+/**
+ * HEADING BLOCK
+ */
 const heading = {
   label: "Heading",
   defaultItem: {
@@ -191,6 +190,33 @@ const heading = {
   fields: [{ name: "text", component: "text", label: "Text" }],
 }
 
+function EditableHeading(props) {
+  return (
+    <TinaField
+      name={`${props.name}.${props.index}.text`}
+      Component={EditableHeadingBlock}
+    >
+      <HeadingBlock {...props} />
+    </TinaField>
+  )
+}
+
+const EditableHeadingBlock = props => {
+  return (
+    <h1>
+      <PlainText {...props} />
+    </h1>
+  )
+}
+
+const HeadingBlock = props => {
+  return <h1>{props.data.text}</h1>
+}
+
+/**
+ * IMAGE BLOCK
+ */
+// Image Block Template
 const image = {
   label: "Image",
   defaultItem: {
@@ -206,6 +232,26 @@ const image = {
   ],
 }
 
+// Image Block Component
+function EditableImage(props) {
+  return (
+    <p>
+      <TinaField
+        name={`${props.name}.${props.index}.src`}
+        Component={PlainText}
+      />
+      <TinaField
+        name={`${props.name}.${props.index}.alt`}
+        Component={PlainText}
+      />
+      <img {...props.data} />
+    </p>
+  )
+}
+
+/**
+ * Blog Post Form
+ */
 const BlogPostForm = {
   actions: [DeleteAction],
   fields: [
