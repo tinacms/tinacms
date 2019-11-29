@@ -26,7 +26,7 @@ import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
-import { InlineBlocks } from "react-tinacms-blocks"
+import { BlogBlocks } from "../components/blog-blocks"
 
 const get = require("lodash.get")
 
@@ -122,18 +122,7 @@ function BlogPostTemplate(props) {
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
         </TinaField>
-        <InlineBlocks
-          form={form}
-          name="rawFrontmatter.blocks"
-          data={blocks}
-          components={BLOCK_COMPONENTS}
-          renderBefore={props => (
-            <>
-              <br />
-              <BlocksActions {...props} />
-            </>
-          )}
-        />
+        <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
             dangerouslySetInnerHTML={{
@@ -178,134 +167,6 @@ function BlogPostTemplate(props) {
         </li>
       </ul>
     </Layout>
-  )
-}
-
-/**
- * Blocks Components
- */
-
-const BLOCK_COMPONENTS = {
-  heading: EditableHeading,
-  image: EditableImage,
-}
-
-/**
- * HEADING BLOCK
- */
-const heading = {
-  label: "Heading",
-  defaultItem: {
-    text: "",
-  },
-  itemProps: block => ({
-    label: `${block.text}`,
-  }),
-  fields: [{ name: "text", component: "text", label: "Text" }],
-}
-const BlocksActions = ({ index, insert, remove, move }) => {
-  const hasIndex = index || index === 0
-  return (
-    <>
-      {insert && (
-        <button
-          onClick={() =>
-            insert(
-              { _template: "heading", ...heading.defaultItem },
-              (index || -1) + 1
-            )
-          }
-        >
-          Add Heading
-        </button>
-      )}
-      {insert && (
-        <button
-          onClick={() =>
-            insert(
-              { _template: "image", ...image.defaultItem },
-              (index || -1) + 1
-            )
-          }
-        >
-          Add Image
-        </button>
-      )}
-      {hasIndex && move && (
-        <button onClick={() => move(index, index - 1)} disabled={index === 0}>
-          Up
-        </button>
-      )}
-      {hasIndex && move && (
-        <button onClick={() => move(index, index + 1)}>Down</button>
-      )}
-      {hasIndex && remove && (
-        <button onClick={() => remove(index)}>Remove</button>
-      )}
-    </>
-  )
-}
-
-function EditableHeading(props) {
-  return (
-    <div style={{ border: "5px solid purple" }}>
-      <h1>
-        <TinaField
-          name={`${props.name}.${props.index}.text`}
-          Component={PlainText}
-        >
-          {props.data.text}
-        </TinaField>
-      </h1>
-      <BlocksActions
-        {...props}
-        defaultItem={{ _template: "heading", ...heading.defaultItem }}
-      />
-    </div>
-  )
-}
-
-const HeadingBlock = props => {
-  return <h1>{props.data.text}</h1>
-}
-
-/**
- * IMAGE BLOCK
- */
-// Image Block Template
-const image = {
-  label: "Image",
-  defaultItem: {
-    text: "",
-  },
-  itemProps: block => ({
-    key: `${block.src}`,
-    label: `${block.alt}`,
-  }),
-  fields: [
-    { name: "src", component: "text", label: "Source URL" },
-    { name: "alt", component: "text", label: "Alt Text" },
-  ],
-}
-
-// Image Block Component
-function EditableImage(props) {
-  return (
-    <p style={{ border: "5px solid green" }}>
-      <TinaField
-        name={`${props.name}.${props.index}.src`}
-        Component={PlainText}
-      />
-      <TinaField
-        name={`${props.name}.${props.index}.alt`}
-        Component={PlainText}
-      />
-      <img {...props.data} />
-      <BlocksActions
-        {...props}
-        defaultItem={{ _template: "image", ...image.defaultItem }}
-      />
-    </p>
   )
 }
 
