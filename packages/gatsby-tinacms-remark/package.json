@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.6.0-alpha.2",
+  "version": "0.6.0",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -38,11 +38,11 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.5.0",
-    "@tinacms/form-builder": "^0.2.8-alpha.1",
+    "@tinacms/form-builder": "^0.2.8",
     "gray-matter": "^4.0.2",
     "lodash.get": "^4.4.2",
     "slash": "^3.0.0",
-    "tinacms": "^0.10.0-alpha.2"
+    "tinacms": "^0.10.0"
   },
   "peerDependencies": {
     "gatsby-transformer-remark": ">=2.6"
