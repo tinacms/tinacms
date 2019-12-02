@@ -34,7 +34,6 @@ export const AuthContainer = (props: any) => {
         body: JSON.stringify({ token: authToken }),
       })
       return result.status == 200
-      // console.log(JSON.stringify('result ' + JSON.stringify(result.status)))
     }
     verifyAccess().then(hasAccess => {
       setAuthState(hasAccess ? 'authenticated' : 'unauthenticated')

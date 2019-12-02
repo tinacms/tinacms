@@ -26,7 +26,6 @@ exports.onCreateDevServer = ({ app }: any, options: any) => {
   router.use(express.json())
 
   router.post('/___tina/teams/auth', (req: any, res: any) => {
-    console.log(`body ${JSON.stringify(req.body)}`)
     const { token } = req.body
     const client = jwksClient({
       strictSsl: true, // Default value
@@ -50,7 +49,6 @@ exports.onCreateDevServer = ({ app }: any, options: any) => {
     }
     client.getSigningKey(decoded.header.kid, (err: any, key: any) => {
       if (err) {
-        console.log(JSON.stringify(`err ${err}`))
         res.status(401).json({
           message: 'unauthorized',
         })
@@ -58,8 +56,6 @@ exports.onCreateDevServer = ({ app }: any, options: any) => {
       }
 
       const signingKey = key.publicKey || key.rsaPublicKey
-
-      console.log(signingKey)
       jwt.verify(
         token,
         signingKey,
