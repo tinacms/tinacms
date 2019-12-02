@@ -334,7 +334,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "jonmiller0",
+      "name": "Jon Miller",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/22771842?v=4",
+      "profile": "https://github.com/jonmiller0",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
