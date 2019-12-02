@@ -334,7 +334,17 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "pcast01",
+      "name": "Paul",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1172644?v=4",
+      "profile": "https://pcast01.github.io/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }
