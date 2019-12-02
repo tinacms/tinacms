@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-blocks",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-blocks.esm.js",
@@ -16,12 +16,12 @@
     "lint": "tsdx lint"
   },
   "peerDependencies": {
-    "tinacms": ">=0.10",
-    "react": ">=16.8"
+    "react": ">=16.8",
+    "tinacms": ">=0.10"
   },
   "devDependencies": {
-    "tinacms": "0.10.0-alpha.1",
     "@types/jest": "^24.0.23",
+    "tinacms": "^0.10.0-alpha.2",
     "tsdx": "^0.11.0"
   }
 }
