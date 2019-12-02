@@ -39,11 +39,22 @@ exports.onCreateDevServer = ({ app }: any, options: any) => {
       complete: true,
     }) as any
 
-    console.log(JSON.stringify(`decoded ${JSON.stringify(decoded)}`))
+    console.log(JSON.stringify(`decoded! ${decoded}`))
 
+    if (!decoded) {
+      //invalid token
+      res.status(401).json({
+        message: 'unauthorized',
+      })
+      return
+    }
     client.getSigningKey(decoded.header.kid, (err: any, key: any) => {
       if (err) {
         console.log(JSON.stringify(`err ${err}`))
+        res.status(401).json({
+          message: 'unauthorized',
+        })
+        return
       }
 
       const signingKey = key.publicKey || key.rsaPublicKey

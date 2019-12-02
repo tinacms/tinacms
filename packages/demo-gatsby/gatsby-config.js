@@ -31,12 +31,6 @@ module.exports = {
   },
   plugins: [
     {
-      resolve: "gatsby-tinacms-auth",
-      options: {
-        authEnvironments: ["development"],
-      },
-    },
-    {
       resolve: "gatsby-plugin-tinacms",
       options: {
         sidebar: {
@@ -130,6 +124,12 @@ module.exports = {
       resolve: `gatsby-plugin-typography`,
       options: {
         pathToConfigModule: `src/utils/typography`,
+      },
+    },
+    {
+      resolve: "gatsby-tinacms-auth",
+      options: {
+        authEnvironments: ["development"],
       },
     },
   ],
