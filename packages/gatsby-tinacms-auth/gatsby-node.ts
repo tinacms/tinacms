@@ -22,6 +22,10 @@ import * as express from 'express'
 import { VIRTUAL_SERVICE_DOMAIN } from './contants'
 
 exports.onCreateDevServer = ({ app }: any) => {
+  app.use(router())
+}
+
+function router() {
   const router = express.Router()
   router.use(express.json())
 
@@ -71,5 +75,5 @@ exports.onCreateDevServer = ({ app }: any) => {
     })
   })
 
-  app.use(router)
+  return router
 }
