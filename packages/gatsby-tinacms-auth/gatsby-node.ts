@@ -21,7 +21,7 @@ import * as jwt from 'jsonwebtoken'
 import * as express from 'express'
 import { VIRTUAL_SERVICE_DOMAIN } from './contants'
 
-exports.onCreateDevServer = ({ app }: any, options: any) => {
+exports.onCreateDevServer = ({ app }: any) => {
   const router = express.Router()
   router.use(express.json())
 
