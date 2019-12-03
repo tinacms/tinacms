@@ -44,6 +44,7 @@ module.exports = {
             resolve: "gatsby-tinacms-git",
             options: {
               pathToRepo: REPO_ABSOLUTE_PATH,
+              pushOnCommit: false,
               pathToContent: "packages/demo-gatsby",
               defaultCommitMessage: "Update from the content ",
               defaultCommitName: "TinaCMS",
