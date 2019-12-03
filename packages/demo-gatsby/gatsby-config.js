@@ -38,6 +38,12 @@ module.exports = {
           position: "displace",
         },
         plugins: [
+          {
+            resolve: "gatsby-tinacms-auth",
+            options: {
+              authEnvironments: ["development"],
+            },
+          },
           "gatsby-tinacms-json",
           "gatsby-tinacms-remark",
           {
@@ -124,12 +130,6 @@ module.exports = {
       resolve: `gatsby-plugin-typography`,
       options: {
         pathToConfigModule: `src/utils/typography`,
-      },
-    },
-    {
-      resolve: "gatsby-tinacms-auth",
-      options: {
-        authEnvironments: ["development"],
       },
     },
   ],
