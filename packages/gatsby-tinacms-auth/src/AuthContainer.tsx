@@ -20,7 +20,7 @@ export const AuthContainer = (props: any) => {
 
   let authToken = Cookies.get(AUTH_COOKIE_KEY)
   if (!authToken) {
-    createAuthCookie()
+    createAuthCookieFromURL()
     return
   }
 
@@ -43,16 +43,21 @@ export const AuthContainer = (props: any) => {
   return authState == 'authenticated' ? children : <div>{authState}</div>
 }
 
-const createAuthCookie = () => {
-  const token = new URL(window.location.href).searchParams.get('token') || ''
+const createAuthCookieFromURL = () => {
+  const token = new URL(window.location.href).searchParams.get('token')
+  //redirect if no token supplied
   if (!token) {
-    window.location.href = `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy?connector_id=${TINA_CONNECTOR_ID}&origin=${encodeURIComponent(
-      window.location.href
+    window.location.href = `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector_id=${TINA_CONNECTOR_ID}&origin=${encodeURIComponent(
+      removeTrailingSlash(window.location.href)
     )}`
     return
   }
 
   Cookies.set(AUTH_COOKIE_KEY, token)
-  window.location.href = window.location.href.split('token')[0]
+  window.location.href = window.location.href.split('token')[0] //TODO strip only token query param
   return
+}
+
+function removeTrailingSlash(url: string) {
+  return url.replace(/\/$/, '')
 }
