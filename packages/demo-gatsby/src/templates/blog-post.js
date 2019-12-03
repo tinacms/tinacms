@@ -23,7 +23,11 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
+import {
+  liveRemarkForm,
+  DeleteAction,
+  SaveWithMessageAction,
+} from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
@@ -174,7 +178,7 @@ function BlogPostTemplate(props) {
  * Blog Post Form
  */
 const BlogPostForm = {
-  actions: [DeleteAction],
+  actions: [DeleteAction, SaveWithMessageAction],
   fields: [
     {
       label: "Gallery",
