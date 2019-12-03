@@ -38,8 +38,6 @@ exports.onCreateDevServer = ({ app }: any, options: any) => {
       complete: true,
     }) as any
 
-    console.log(JSON.stringify(`decoded! ${decoded}`))
-
     if (!decoded) {
       //invalid token
       res.status(401).json({
@@ -62,7 +60,6 @@ exports.onCreateDevServer = ({ app }: any, options: any) => {
         // { audience: 'urn:foo' },
         function(err: any, decoded: string | object) {
           if (!err) {
-            console.log('verified')
             res.json({
               decoded,
             })
