@@ -19,18 +19,24 @@ limitations under the License.
 import jwksClient from 'jwks-rsa'
 import * as jwt from 'jsonwebtoken'
 import * as express from 'express'
+import cookieParser from 'cookie-parser'
 import { VIRTUAL_SERVICE_DOMAIN } from './contants'
 
 exports.onCreateDevServer = ({ app }: any) => {
   app.use(router())
 }
 
+const AUTH_COOKIE_KEY = 'tina-auth'
+
 function router() {
   const router = express.Router()
+
+  router.use(cookieParser())
   router.use(express.json())
 
   router.post('/___tina/teams/auth', (req: any, res: any) => {
-    const { token } = req.body
+    const token = req.cookies[AUTH_COOKIE_KEY]
+
     const client = jwksClient({
       strictSsl: true,
       jwksUri: `https://api.${VIRTUAL_SERVICE_DOMAIN}/dex/keys`,
