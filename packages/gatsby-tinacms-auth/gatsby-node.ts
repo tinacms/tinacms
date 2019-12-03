@@ -28,10 +28,8 @@ exports.onCreateDevServer = ({ app }: any, options: any) => {
   router.post('/___tina/teams/auth', (req: any, res: any) => {
     const { token } = req.body
     const client = jwksClient({
-      strictSsl: true, // Default value
+      strictSsl: true,
       jwksUri: `https://api.${VIRTUAL_SERVICE_DOMAIN}/dex/keys`,
-      requestHeaders: {}, // Optional
-      requestAgentOptions: {}, // Optional
     })
 
     const decoded = jwt.decode(token, {
