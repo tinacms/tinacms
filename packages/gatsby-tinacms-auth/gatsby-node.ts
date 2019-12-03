@@ -26,59 +26,87 @@ exports.onCreateDevServer = ({ app }: any) => {
   app.use(router())
 }
 
+interface TinaTeamsUser {
+  iss: string
+  sub: string
+  aud: string
+  exp: number
+  iat: number
+  at_hash: string
+  email: string
+  email_verified: boolean
+  name: string
+  federated_claims: {
+    connector_id: string
+    user_id: string
+  }
+}
+
 const AUTH_COOKIE_KEY = 'tina-auth'
 
 function router() {
   const router = express.Router()
 
   router.use(cookieParser())
+
   router.use(express.json())
 
-  router.post('/___tina/teams/auth', (req: any, res: any) => {
+  router.use(function authentication(req, res, next) {
     const token = req.cookies[AUTH_COOKIE_KEY]
+
+    const decoded = jwt.decode(token, {
+      complete: true,
+    }) as any
+
+    if (!decoded) return next()
 
     const client = jwksClient({
       strictSsl: true,
       jwksUri: `https://api.${VIRTUAL_SERVICE_DOMAIN}/dex/keys`,
     })
 
-    const decoded = jwt.decode(token, {
-      complete: true,
-    }) as any
-
-    if (!decoded) {
-      //invalid token
-      res.status(401).json({
-        message: 'unauthorized',
-      })
-      return
-    }
     client.getSigningKey(decoded.header.kid, (err: any, key: any) => {
       if (err) {
-        res.status(401).json({
-          message: 'unauthorized',
-        })
-        return
+        return next()
       }
 
       const signingKey = key.publicKey || key.rsaPublicKey
+
       jwt.verify(
         token,
         signingKey,
         // { audience: 'urn:foo' },
         function(err: any, decoded: string | object) {
-          if (!err) {
-            res.json({
-              decoded,
-            })
+          let user: any
+          if (!err && typeof decoded === 'object') {
+            user = { authorized: true, ...decoded }
           } else {
-            res.status(401).json({
-              message: 'unauthorized',
-            })
+            user = { authorized: false }
           }
+          // @ts-ignore
+          req.user = user
+          next()
         }
       )
     })
+  })
+
+  router.use(function authorization(req, res, next) {
+    // TODO
+    next()
+  })
+
+  router.post('/___tina/teams/auth', (req: any, res: any) => {
+    if (!req.user) {
+      //invalid token
+      res.status(401).json({
+        message: 'unauthorized',
+      })
+    } else {
+      res.json({
+        decoded: req.user,
+      })
+    }
   })
 
   return router
