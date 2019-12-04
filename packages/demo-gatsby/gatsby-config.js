@@ -38,12 +38,7 @@ module.exports = {
           position: "displace",
         },
         plugins: [
-          {
-            resolve: "gatsby-tinacms-auth",
-            options: {
-              authEnvironments: ["development"],
-            },
-          },
+          "gatsby-tinacms-auth",
           "gatsby-tinacms-json",
           "gatsby-tinacms-remark",
           {
