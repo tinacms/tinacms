@@ -8,6 +8,7 @@
 
 - [Website](https://tinacms.org/)
 - [Documentation](https://tinacms.org/docs/)
+- [Forum](https://community.tinacms.org/)
 - [Roadmap](./ROADMAP.md)
 - [Contributing](./CONTRIBUTING.md)
   - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
