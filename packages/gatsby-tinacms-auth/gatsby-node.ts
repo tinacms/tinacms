@@ -16,11 +16,13 @@ limitations under the License.
 
 */
 
-import jwksClient from 'jwks-rsa'
-import * as jwt from 'jsonwebtoken'
 import * as express from 'express'
 import cookieParser from 'cookie-parser'
-import { VIRTUAL_SERVICE_DOMAIN, TINA_CONNECTOR_ID } from './contants'
+import {
+  authenticate,
+  redirectNonAuthenticated,
+  authorize,
+} from './src/backend/authMiddleware'
 
 exports.onCreateDevServer = ({ app }: any) => {
   app.use(router())
@@ -42,8 +44,6 @@ interface TinaTeamsUser {
   }
 }
 
-const AUTH_COOKIE_KEY = 'tina-auth'
-
 function router() {
   const router = express.Router()
 
@@ -51,83 +51,11 @@ function router() {
 
   router.use(express.json())
 
-  router.use(function authentication(req, res, next) {
-    const token = req.cookies[AUTH_COOKIE_KEY]
-
-    const decoded = jwt.decode(token, {
-      complete: true,
-    }) as any
-
-    if (!decoded) return next()
-
-    const client = jwksClient({
-      strictSsl: true,
-      jwksUri: `https://api.${VIRTUAL_SERVICE_DOMAIN}/dex/keys`,
-    })
-
-    client.getSigningKey(decoded.header.kid, (err: any, key: any) => {
-      if (err) {
-        return next()
-      }
-
-      const signingKey = key.publicKey || key.rsaPublicKey
-
-      jwt.verify(
-        token,
-        signingKey,
-        // { audience: 'urn:foo' },
-        function(err: any, decoded: string | object) {
-          let user: any
-          if (!err && typeof decoded === 'object') {
-            user = { authorized: true, ...decoded }
-          } else {
-            user = { authorized: false }
-          }
-          // @ts-ignore
-          req.user = user
-          next()
-        }
-      )
-    })
-  })
-
-  router.use(function redirectNonAuthenticated(req: any, res, next) {
-    if (req.user && req.user.authorized) {
-      next()
-    } else {
-      const token = req.query.token
-      //redirect if no token supplied
-      if (!token) {
-        var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
-        res.redirect(
-          `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector_id=${TINA_CONNECTOR_ID}&origin=${encodeURIComponent(
-            removeTrailingSlash(fullUrl)
-          )}`
-        )
-        return
-      }
-
-      res.cookie(AUTH_COOKIE_KEY, token)
-      res.redirect(req.originalUrl.split('?').shift())
-    }
-  })
-
-  router.use(function authorization(req: any, res, next) {
-    // TODO
-    if (process.env.REQUIRE_AUTH) {
-      if (!req.user || !req.user.authorized) {
-        //invalid token
-
-        res.status(401).json({
-          message: 'unauthorized',
-        })
-      } else {
-        next()
-      }
-    } else {
-      next()
-    }
-  })
+  if (process.env.REQUIRE_AUTH) {
+    router.use(authenticate)
+    router.use(redirectNonAuthenticated)
+    router.use(authorize)
+  }
 
   router.post('/___tina/teams/auth', (req: any, res: any) => {
     res.json({
@@ -136,8 +64,4 @@ function router() {
   })
 
   return router
-}
-
-function removeTrailingSlash(url: string) {
-  return url.replace(/\/$/, '')
 }
