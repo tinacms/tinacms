@@ -50,18 +50,17 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
   } else {
     const token = req.query.token
     //redirect if no token supplied
-    if (!token) {
+    if (token) {
+      res.cookie(AUTH_COOKIE_KEY, token)
+      res.redirect(req.originalUrl.split('?').shift())
+    } else {
       var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
       res.redirect(
         `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector_id=${TINA_CONNECTOR_ID}&origin=${encodeURIComponent(
           removeTrailingSlash(fullUrl)
         )}`
       )
-      return
     }
-
-    res.cookie(AUTH_COOKIE_KEY, token)
-    res.redirect(req.originalUrl.split('?').shift())
   }
 }
 

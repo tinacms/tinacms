@@ -24,6 +24,10 @@ import {
   authorize,
 } from './src/backend/authMiddleware'
 
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
+
 exports.onCreateDevServer = ({ app }: any) => {
   app.use(router())
 }
