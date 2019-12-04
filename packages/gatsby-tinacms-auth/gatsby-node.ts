@@ -20,7 +20,7 @@ import jwksClient from 'jwks-rsa'
 import * as jwt from 'jsonwebtoken'
 import * as express from 'express'
 import cookieParser from 'cookie-parser'
-import { VIRTUAL_SERVICE_DOMAIN } from './contants'
+import { VIRTUAL_SERVICE_DOMAIN, TINA_CONNECTOR_ID } from './contants'
 
 exports.onCreateDevServer = ({ app }: any) => {
   app.use(router())
@@ -91,23 +91,53 @@ function router() {
     })
   })
 
-  router.use(function authorization(req, res, next) {
-    // TODO
-    next()
-  })
-
-  router.post('/___tina/teams/auth', (req: any, res: any) => {
-    if (!req.user) {
-      //invalid token
-      res.status(401).json({
-        message: 'unauthorized',
-      })
+  router.use(function redirectNonAuthenticated(req: any, res, next) {
+    if (req.user && req.user.authorized) {
+      next()
     } else {
-      res.json({
-        decoded: req.user,
-      })
+      const token = req.query.token
+      //redirect if no token supplied
+      if (!token) {
+        var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
+        res.redirect(
+          `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector_id=${TINA_CONNECTOR_ID}&origin=${encodeURIComponent(
+            removeTrailingSlash(fullUrl)
+          )}`
+        )
+        return
+      }
+
+      res.cookie(AUTH_COOKIE_KEY, token)
+      res.redirect(req.originalUrl.split('?').shift())
     }
   })
 
+  router.use(function authorization(req: any, res, next) {
+    // TODO
+    if (process.env.REQUIRE_AUTH) {
+      if (!req.user || !req.user.authorized) {
+        //invalid token
+
+        res.status(401).json({
+          message: 'unauthorized',
+        })
+      } else {
+        next()
+      }
+    } else {
+      next()
+    }
+  })
+
+  router.post('/___tina/teams/auth', (req: any, res: any) => {
+    res.json({
+      decoded: req.user,
+    })
+  })
+
   return router
+}
+
+function removeTrailingSlash(url: string) {
+  return url.replace(/\/$/, '')
 }
