@@ -17,6 +17,7 @@ limitations under the License.
 */
 import jwksClient from 'jwks-rsa'
 import * as jwt from 'jsonwebtoken'
+const fetch = require('node-fetch')
 
 require('dotenv').config({
   path: `.env.${process.env.NODE_ENV}`,
@@ -26,6 +27,8 @@ const VIRTUAL_SERVICE_DOMAIN = process.env.VIRTUAL_SERVICE_DOMAIN || 'tina.io'
 const JWKS_URI = process.env.JWKS_URI || 'https://api.tina.io/dex/keys'
 const CONNECTOR_ID =
   process.env.CONNECTOR_ID || '1714dd58-a2a5-4bee-99d4-07b0b3fcb2a7'
+const TINA_TEAMS_API_URL =
+  process.env.TINA_TEAMS_API_URL || 'https://api.tina.io/v1'
 
 const AUTH_COOKIE_KEY = 'tina-auth'
 
@@ -78,6 +81,11 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
       res.redirect(req.originalUrl.split('?').shift())
     } else {
       const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
+      console.log(
+        `fullUrl https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector=${CONNECTOR_ID}&origin=${encodeURIComponent(
+          removeTrailingSlash(fullUrl)
+        )}`
+      )
       res.redirect(
         `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector=${CONNECTOR_ID}&origin=${encodeURIComponent(
           removeTrailingSlash(fullUrl)
@@ -88,8 +96,31 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
 }
 
 export function authorize(req: any, res: any, next: any) {
-  // TODO - Verify within our API
-  next()
+  console.log(
+    `dns ${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(
+      req.get('host')
+    )}/access ${JSON.stringify(req.user)} ${req.cookies[AUTH_COOKIE_KEY]}`
+  )
+
+  fetch(
+    `${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(req.get('host'))}/access`,
+    {
+      method: 'GET',
+      headers: { Authorization: 'Bearer ' + req.cookies[AUTH_COOKIE_KEY] },
+    }
+  )
+    .then((result: any) => {
+      if (result.ok) {
+        next()
+      } else {
+        res.status(401)
+        res.send('Unauthorized')
+      }
+    })
+    .catch(() => {
+      res.status(401)
+      res.send('Unauthorized')
+    })
 }
 
 function removeTrailingSlash(url: string) {
