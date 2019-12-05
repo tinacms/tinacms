@@ -334,7 +334,26 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "jonmiller0",
+      "name": "Jon Miller",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/22771842?v=4",
+      "profile": "https://github.com/jonmiller0",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "pcast01",
+      "name": "Paul",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1172644?v=4",
+      "profile": "https://pcast01.github.io/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
-  "contributorsPerLine": 7
+  "contributorsPerLine": 7,
+  "skipCi": true
 }

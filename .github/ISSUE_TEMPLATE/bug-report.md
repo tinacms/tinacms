@@ -28,7 +28,20 @@ What actually happened?
 
 ### Environment
 
+#### Tinacms Package Versions
+<!--
+Run the following command to get the list of tinacms-package versions in your node_modules:
+
+    npm ls | grep tinacms | grep -v deduped
+-->
+
+```text
+
+```
+
 <!-- Please add as much information about your environment as possible. -->
+
+#### Tools
 
 | Tool    | Version |
 | ------- | ------- |
@@ -36,4 +49,4 @@ What actually happened?
 | os      |         |
 | node    |         |
 | npm     |         |
-| tinacms |         |
+

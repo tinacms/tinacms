@@ -171,6 +171,7 @@ export function useLocalRemarkForm(
 ): [RemarkNode | null | undefined, Form | string | null | undefined] {
   const [values, form] = useRemarkForm(markdownRemark, formOverrrides)
 
+  // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore form can be `null` and usePlugins doesn't like that.
   usePlugins(form)
 
