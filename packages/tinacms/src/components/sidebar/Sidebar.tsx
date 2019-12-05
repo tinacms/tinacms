@@ -29,7 +29,6 @@ import {
   LeftArrowIcon,
   EditIcon,
   TinaIcon,
-  CloseIcon,
 } from '@tinacms/icons'
 import {
   GlobalStyles,
@@ -153,12 +152,7 @@ const ActiveViewModal = ({
   return (
     <Modal>
       <Wrapper>
-        <ModalHeader>
-          {name}
-          <CloseButton onClick={close}>
-            <CloseIcon />
-          </CloseButton>
-        </ModalHeader>
+        <ModalHeader close={close}>{name}</ModalHeader>
         <ModalBody>{children}</ModalBody>
       </Wrapper>
     </Modal>
@@ -470,19 +464,4 @@ const SidebarContainer = styled.div<{ open: boolean }>`
     0
   ) !important;
   pointer-events: none;
-`
-
-const CloseButton = styled.div`
-  display: flex;
-  align-items: center;
-  fill: ${color.grey(3)};
-  cursor: pointer;
-  transition: fill 85ms ease-out;
-  svg {
-    width: 1.5rem;
-    height: auto;
-  }
-  &:hover {
-    fill: ${color.grey(8)};
-  }
 `

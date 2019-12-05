@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.3.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.3.0-alpha.1...demo-gatsby@1.3.0) (2019-12-02)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+# [1.3.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.3.0-alpha.0...demo-gatsby@1.3.0-alpha.1) (2019-12-02)
+
+
+### Features
+
+* **renderBefore:** lets you create blocks menus ([84fd165](https://github.com/gatsbyjs/gatsby-starter-blog/commit/84fd165))
+
+
+
+
+
 # [1.3.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.2-alpha.0...demo-gatsby@1.3.0-alpha.0) (2019-11-28)
 
 

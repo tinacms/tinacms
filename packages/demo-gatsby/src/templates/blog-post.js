@@ -26,7 +26,7 @@ import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
-import { Blocks } from "react-tinacms-blocks"
+import { BlogBlocks } from "../components/blog-blocks"
 
 const get = require("lodash.get")
 
@@ -41,6 +41,7 @@ const MyToggle = props => (
 )
 
 function BlogPostTemplate(props) {
+  const form = props.form
   const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
@@ -121,14 +122,7 @@ function BlogPostTemplate(props) {
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
         </TinaField>
-        <Blocks
-          name="rawFrontmatter.blocks"
-          data={blocks}
-          components={{
-            heading: EditableHeading,
-            image: EditableImage,
-          }}
-        />
+        <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
             dangerouslySetInnerHTML={{
@@ -177,93 +171,11 @@ function BlogPostTemplate(props) {
 }
 
 /**
- * HEADING BLOCK
- */
-const heading = {
-  label: "Heading",
-  defaultItem: {
-    text: "",
-  },
-  itemProps: block => ({
-    label: `${block.text}`,
-  }),
-  fields: [{ name: "text", component: "text", label: "Text" }],
-}
-
-function EditableHeading(props) {
-  return (
-    <TinaField
-      name={`${props.name}.${props.index}.text`}
-      Component={EditableHeadingBlock}
-    >
-      <HeadingBlock {...props} />
-    </TinaField>
-  )
-}
-
-const EditableHeadingBlock = props => {
-  return (
-    <h1>
-      <PlainText {...props} />
-    </h1>
-  )
-}
-
-const HeadingBlock = props => {
-  return <h1>{props.data.text}</h1>
-}
-
-/**
- * IMAGE BLOCK
- */
-// Image Block Template
-const image = {
-  label: "Image",
-  defaultItem: {
-    text: "",
-  },
-  itemProps: block => ({
-    key: `${block.src}`,
-    label: `${block.alt}`,
-  }),
-  fields: [
-    { name: "src", component: "text", label: "Source URL" },
-    { name: "alt", component: "text", label: "Alt Text" },
-  ],
-}
-
-// Image Block Component
-function EditableImage(props) {
-  return (
-    <p>
-      <TinaField
-        name={`${props.name}.${props.index}.src`}
-        Component={PlainText}
-      />
-      <TinaField
-        name={`${props.name}.${props.index}.alt`}
-        Component={PlainText}
-      />
-      <img {...props.data} />
-    </p>
-  )
-}
-
-/**
  * Blog Post Form
  */
 const BlogPostForm = {
   actions: [DeleteAction],
   fields: [
-    {
-      label: "Blocks",
-      name: "frontmatter.blocks",
-      component: "blocks",
-      templates: {
-        heading,
-        image,
-      },
-    },
     {
       label: "Gallery",
       name: "frontmatter.gallery",
@@ -376,23 +288,6 @@ const BlogPostForm = {
         if (!gastbyImageNode) return ""
         return gastbyImageNode.childImageSharp.fluid.src
       },
-    },
-    { label: "Body", name: "rawMarkdownBody", component: "markdown" },
-    { name: "hr", component: () => <hr /> },
-    {
-      label: "Commit Name",
-      name: "__commit_name",
-      component: "text",
-    },
-    {
-      label: "Commit Email",
-      name: "__commit_email",
-      component: "text",
-    },
-    {
-      label: "Commit Message (Optional)",
-      name: "__commit_message",
-      component: "textarea",
     },
   ],
 }
