@@ -15,13 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import {
-  AUTH_COOKIE_KEY,
-  VIRTUAL_SERVICE_DOMAIN,
-  TINA_CONNECTOR_ID,
-} from '../../contants'
 import jwksClient from 'jwks-rsa'
 import * as jwt from 'jsonwebtoken'
+
+require('dotenv').config({
+  path: `.env.${process.env.NODE_ENV}`,
+})
+
+const VIRTUAL_SERVICE_DOMAIN = process.env.VIRTUAL_SERVICE_DOMAIN || 'tina.io'
+const JWKS_URI = process.env.JWKS_URI || 'https://api.tina.io/dex/keys'
+const CONNECTOR_ID =
+  process.env.CONNECTOR_ID || '1714dd58-a2a5-4bee-99d4-07b0b3fcb2a7'
+
+const AUTH_COOKIE_KEY = 'tina-auth'
 
 export function authenticate(req: any, res: any, next: any) {
   const token = req.cookies[AUTH_COOKIE_KEY]
@@ -34,7 +40,7 @@ export function authenticate(req: any, res: any, next: any) {
 
   const client = jwksClient({
     strictSsl: true,
-    jwksUri: `https://api.${VIRTUAL_SERVICE_DOMAIN}/dex/keys`,
+    jwksUri: JWKS_URI,
   })
 
   client.getSigningKey(decoded.header.kid, (err: any, key: any) => {
@@ -73,7 +79,7 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
     } else {
       var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
       res.redirect(
-        `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector_id=${TINA_CONNECTOR_ID}&origin=${encodeURIComponent(
+        `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector=${CONNECTOR_ID}&origin=${encodeURIComponent(
           removeTrailingSlash(fullUrl)
         )}`
       )
