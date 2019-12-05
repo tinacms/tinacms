@@ -38,7 +38,7 @@ module.exports = {
           position: "displace",
         },
         plugins: [
-          "gatsby-tinacms-auth",
+          "gatsby-tinacms-teams",
           "gatsby-tinacms-json",
           "gatsby-tinacms-remark",
           {
