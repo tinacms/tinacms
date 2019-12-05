@@ -28,17 +28,13 @@
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@tinacms/scripts": "0.1.0",
-    "@types/cookie-parser": "^1.4.2",
     "@types/jsonwebtoken": "8.3.5",
-    "@types/js-cookie": "2.2.4",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "1.6.0",
-    "js-cookie": "2.2.1",
-    "node-fetch": "2.6.0",
-    "cookie-parser": "^1.2.0"
+    "node-fetch": "2.6.0"
   }
 }
