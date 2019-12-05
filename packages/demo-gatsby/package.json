@@ -46,7 +46,7 @@
     "typeface-montserrat": "0.0.75",
     "typography": "^0.16.19",
     "typography-theme-wordpress-2016": "^0.16.19",
-    "gatsby-tinacms-auth": "0.0.1"
+    "gatsby-tinacms-teams": "0.0.1"
   },
   "devDependencies": {
     "prettier": "^1.18.2"
