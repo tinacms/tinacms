@@ -32,6 +32,22 @@ const TINA_TEAMS_API_URL =
 
 const AUTH_COOKIE_KEY = 'tina-auth'
 
+interface TinaTeamsUser {
+  iss: string
+  sub: string
+  aud: string
+  exp: number
+  iat: number
+  at_hash: string
+  email: string
+  email_verified: boolean
+  name: string
+  federated_claims: {
+    connector_id: string
+    user_id: string
+  }
+}
+
 export function authenticate(req: any, res: any, next: any) {
   const token = req.cookies[AUTH_COOKIE_KEY]
 
@@ -80,11 +96,6 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
       res.redirect(req.originalUrl.split('?').shift())
     } else {
       const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
-      console.log(
-        `fullUrl https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector=${CONNECTOR_ID}&origin=${encodeURIComponent(
-          removeTrailingSlash(fullUrl)
-        )}`
-      )
       res.redirect(
         `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector=${CONNECTOR_ID}&origin=${encodeURIComponent(
           removeTrailingSlash(fullUrl)
@@ -95,12 +106,6 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
 }
 
 export function authorize(req: any, res: any, next: any) {
-  console.log(
-    `dns ${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(
-      req.get('host')
-    )}/access ${JSON.stringify(req.user)} ${req.cookies[AUTH_COOKIE_KEY]}`
-  )
-
   fetch(
     `${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(req.get('host'))}/access`,
     {
