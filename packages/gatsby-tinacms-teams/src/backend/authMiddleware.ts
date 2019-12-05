@@ -59,7 +59,6 @@ export function authenticate(req: any, res: any, next: any) {
         if (!err && typeof decoded === 'object') {
           user = { ...decoded }
         }
-        // @ts-ignore
         req.user = user
         next()
       }
