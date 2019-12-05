@@ -77,7 +77,7 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
       res.cookie(AUTH_COOKIE_KEY, token)
       res.redirect(req.originalUrl.split('?').shift())
     } else {
-      var fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
+      const fullUrl = req.protocol + '://' + req.get('host') + req.originalUrl
       res.redirect(
         `https://api.${VIRTUAL_SERVICE_DOMAIN}/auth-proxy/redirect?connector=${CONNECTOR_ID}&origin=${encodeURIComponent(
           removeTrailingSlash(fullUrl)
