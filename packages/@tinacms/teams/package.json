@@ -1,0 +1,44 @@
+{
+  "name": "@tinacms/teams",
+  "version": "0.1.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "Apache-2.0",
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "tinacms",
+    "cms"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/group/package"
+  },
+  "scripts": {
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jest --passWithNoTests"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.15",
+    "@tinacms/scripts": "0.1.0",
+    "@types/cookie-parser": "^1.4.2",
+    "@types/jsonwebtoken": "8.3.5",
+    "@types/js-cookie": "2.2.4",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
+  },
+  "dependencies": {
+    "jsonwebtoken": "8.5.1",
+    "jwks-rsa": "1.6.0",
+    "js-cookie": "2.2.1",
+    "node-fetch": "2.6.0",
+    "cookie-parser": "^1.2.0"
+  }
+}

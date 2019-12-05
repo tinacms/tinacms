@@ -16,30 +16,4 @@ limitations under the License.
 
 */
 
-import * as express from 'express'
-import cookieParser from 'cookie-parser'
-import {
-  authenticate,
-  redirectNonAuthenticated,
-  authorize,
-} from '@tinacms/teams'
-
-exports.onCreateDevServer = ({ app }: any) => {
-  app.use(router())
-}
-
-function router() {
-  const router = express.Router()
-
-  router.use(cookieParser())
-
-  router.use(express.json())
-
-  if (process.env.REQUIRE_AUTH) {
-    router.use(authenticate)
-    router.use(redirectNonAuthenticated)
-    router.use(authorize)
-  }
-
-  return router
-}
+export * from './authMiddleware'

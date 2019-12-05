@@ -16,30 +16,7 @@ limitations under the License.
 
 */
 
-import * as express from 'express'
-import cookieParser from 'cookie-parser'
-import {
-  authenticate,
-  redirectNonAuthenticated,
-  authorize,
-} from '@tinacms/teams'
+const { createJestConfig } = require('@tinacms/scripts')
+const pack = require('./package')
 
-exports.onCreateDevServer = ({ app }: any) => {
-  app.use(router())
-}
-
-function router() {
-  const router = express.Router()
-
-  router.use(cookieParser())
-
-  router.use(express.json())
-
-  if (process.env.REQUIRE_AUTH) {
-    router.use(authenticate)
-    router.use(redirectNonAuthenticated)
-    router.use(authorize)
-  }
-
-  return router
-}
+module.exports = createJestConfig(pack)
