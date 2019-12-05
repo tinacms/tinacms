@@ -15,17 +15,3 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-import * as React from 'react'
-import { AuthContainer } from './src/AuthContainer'
-interface Options {
-  authEnvironments: string[]
-}
-
-exports.wrapRootElement = ({ element }: any, options: Options) => {
-  return (
-    <AuthContainer authEnvironments={options.authEnvironments}>
-      {element}
-    </AuthContainer>
-  )
-}
