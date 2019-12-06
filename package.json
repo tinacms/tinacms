@@ -8,6 +8,7 @@
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
     "nuke": "lerna clean -y && find packages -name 'build' -type d -prune -exec rm -rf '{}' + && find packages -name '.rts2_cache' -type d -prune -exec rm -rf '{}' +",
+    "hard-reset": "npm run nuke && npm run bs && npm run build",
     "test": "lerna run test --reject-cycles",
     "watch": "lerna run watch --parallel --reject-cycles"
   },
