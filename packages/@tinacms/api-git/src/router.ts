@@ -68,6 +68,7 @@ export function router(config: GitRouterConfig = {}) {
   router.use(express.json())
 
   router.delete('/:relPath', (req: any, res: any) => {
+    const user = req.user || {}
     const fileRelativePath = decodeURIComponent(req.params.relPath)
     const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
 
@@ -79,8 +80,8 @@ export function router(config: GitRouterConfig = {}) {
 
     commit({
       pathRoot: REPO_ABSOLUTE_PATH,
-      name: req.body.name || config.defaultCommitName,
-      email: req.body.email || config.defaultCommitEmail,
+      name: user.name || req.body.name || config.defaultCommitName,
+      email: user.email || req.body.email || config.defaultCommitEmail,
       message: `Update from Tina: delete ${fileRelativePath}`,
       push: PUSH_ON_COMMIT,
       files: [fileAbsolutePath],
@@ -138,6 +139,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.post('/commit', async (req: any, res: any) => {
     try {
+      const user = req.user || {}
       const message = req.body.message || DEFAULT_COMMIT_MESSAGE
       const files = req.body.files.map((rel: string) =>
         path.join(CONTENT_ABSOLUTE_PATH, rel)
@@ -146,8 +148,8 @@ export function router(config: GitRouterConfig = {}) {
       // TODO: Separate commit and push???
       await commit({
         pathRoot: REPO_ABSOLUTE_PATH,
-        name: req.body.name || config.defaultCommitName,
-        email: req.body.email || config.defaultCommitEmail,
+        name: user.name || req.body.name || config.defaultCommitName,
+        email: user.email || req.body.email || config.defaultCommitEmail,
         push: PUSH_ON_COMMIT,
         message,
         files,

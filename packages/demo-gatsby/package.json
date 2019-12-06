@@ -45,7 +45,8 @@
     "typeface-merriweather": "0.0.72",
     "typeface-montserrat": "0.0.75",
     "typography": "^0.16.19",
-    "typography-theme-wordpress-2016": "^0.16.19"
+    "typography-theme-wordpress-2016": "^0.16.19",
+    "gatsby-tinacms-teams": "0.0.1"
   },
   "devDependencies": {
     "prettier": "^1.18.2"
@@ -64,6 +65,7 @@
     "develop": "gatsby develop",
     "format": "prettier --write src/**/*.{js,jsx}",
     "start": "npm run develop",
+    "auth-start": "REQUIRE_AUTH=true npm run start",
     "serve": "gatsby serve"
   }
 }
