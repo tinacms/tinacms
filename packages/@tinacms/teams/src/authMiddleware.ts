@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 import jwksClient from 'jwks-rsa'
+import * as path from 'path'
 import * as jwt from 'jsonwebtoken'
 const fetch = require('node-fetch')
 
@@ -106,6 +107,7 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
 }
 
 export function authorize(req: any, res: any, next: any) {
+  const unauthorizedView = path.join(__dirname + '/../public/unauthorized.html')
   fetch(
     `${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(req.get('host'))}/access`,
     {
@@ -118,12 +120,12 @@ export function authorize(req: any, res: any, next: any) {
         next()
       } else {
         res.status(401)
-        res.send('Unauthorized')
+        res.sendFile(unauthorizedView)
       }
     })
     .catch(() => {
       res.status(401)
-      res.send('Unauthorized')
+      res.sendFile(unauthorizedView)
     })
 }
 
