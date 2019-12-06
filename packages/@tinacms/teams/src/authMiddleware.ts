@@ -45,7 +45,17 @@ interface TinaTeamsUser {
   }
 }
 
-export function authenticate(req: any, res: any, next: any) {
+const NO_COOKIES_ERROR = `@tinacms/teams \`authenticate\` middleware could not find cookies on the request.
+
+Try adding the \`cookie-parser\` middleware to your express app.
+
+https://github.com/expressjs/cookie-parser
+`
+
+export function authenticate(req: any, _res: any, next: any) {
+  if (!req.cookies) {
+    throw new Error(NO_COOKIES_ERROR)
+  }
   const token = req.cookies[AUTH_COOKIE_KEY]
 
   const decoded = jwt.decode(token, {
