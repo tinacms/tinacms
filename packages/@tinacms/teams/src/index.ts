@@ -17,3 +17,4 @@ limitations under the License.
 */
 
 export * from './authMiddleware'
+export * from './router'

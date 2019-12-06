@@ -28,11 +28,13 @@
   "devDependencies": {
     "@types/jest": "^24.0.15",
     "@tinacms/scripts": "0.1.0",
+    "@types/express": "^4.17.0",
     "@types/jsonwebtoken": "8.3.5",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
+    "express": "^4.17.1",
     "jsonwebtoken": "8.5.1",
     "jwks-rsa": "1.6.0",
     "node-fetch": "2.6.0"

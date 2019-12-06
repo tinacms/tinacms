@@ -15,20 +15,19 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
 import * as express from 'express'
-import cookieParser from 'cookie-parser'
-import { router as teamsRouter } from '@tinacms/teams'
+import {
+  authenticate,
+  redirectNonAuthenticated,
+  authorize,
+} from './authMiddleware'
 
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`,
-})
+export function router() {
+  const router = express.Router()
 
-exports.onCreateDevServer = ({ app }: any) => {
-  app.use(cookieParser())
-  app.use(express.json())
+  router.use(authenticate)
+  router.use(redirectNonAuthenticated)
+  router.use(authorize)
 
-  if (process.env.REQUIRE_AUTH) {
-    app.use(teamsRouter())
-  }
+  return router
 }
