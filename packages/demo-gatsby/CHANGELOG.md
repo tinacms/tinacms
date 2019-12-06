@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.3.0...demo-gatsby@1.4.0-alpha.0) (2019-12-06)
+
+
+### Features
+
+* **commit identity:** add user identity if present on request ([9b48331](https://github.com/gatsbyjs/gatsby-starter-blog/commit/9b48331))
+
+
+
+
+
 # [1.3.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.3.0-alpha.1...demo-gatsby@1.3.0) (2019-12-02)
 
 **Note:** Version bump only for package demo-gatsby

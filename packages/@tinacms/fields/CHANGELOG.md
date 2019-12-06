@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.17-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.16...@tinacms/fields@0.1.17-alpha.0) (2019-12-06)
+
+
+### Bug Fixes
+
+* **wysiwyg:** inline code ticks always inside ([377675c](https://github.com/tinacms/tinacms/commit/377675c)), closes [#480](https://github.com/tinacms/tinacms/issues/480)
+
+
+
+
+
 ## [0.1.16](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.16-alpha.0...@tinacms/fields@0.1.16) (2019-12-02)
 
 **Note:** Version bump only for package @tinacms/fields
