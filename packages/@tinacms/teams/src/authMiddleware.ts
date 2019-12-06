@@ -20,10 +20,6 @@ import * as path from 'path'
 import * as jwt from 'jsonwebtoken'
 const fetch = require('node-fetch')
 
-require('dotenv').config({
-  path: `.env.${process.env.NODE_ENV}`,
-})
-
 const VIRTUAL_SERVICE_DOMAIN = process.env.VIRTUAL_SERVICE_DOMAIN || 'tina.io'
 const JWKS_URI = process.env.JWKS_URI || 'https://api.tina.io/dex/keys'
 const CONNECTOR_ID =
