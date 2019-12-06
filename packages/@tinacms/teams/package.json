@@ -5,7 +5,8 @@
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
   "files": [
-    "build"
+    "build",
+    "public"
   ],
   "keywords": [
     "tinacms",
