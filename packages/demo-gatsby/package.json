@@ -64,7 +64,7 @@
   "scripts": {
     "develop": "gatsby develop",
     "format": "prettier --write src/**/*.{js,jsx}",
-    "start": "REQUIRE_AUTH=true npm run develop",
+    "start": "npm run develop",
     "auth-start": "REQUIRE_AUTH=true npm run start",
     "serve": "gatsby serve"
   }

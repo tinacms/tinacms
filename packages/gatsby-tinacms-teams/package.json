@@ -33,6 +33,7 @@
   },
   "dependencies": {
     "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "@tinacms/teams": "0.1.0",
     "cookie-parser": "^1.2.0"
