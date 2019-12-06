@@ -29,21 +29,20 @@ require('dotenv').config({
 })
 
 exports.onCreateDevServer = ({ app }: any) => {
-  app.use(router())
-}
-
-function router() {
-  const router = express.Router()
-
-  router.use(cookieParser())
-
-  router.use(express.json())
+  app.use(cookieParser())
+  app.use(express.json())
 
   if (process.env.REQUIRE_AUTH) {
-    router.use(authenticate)
-    router.use(redirectNonAuthenticated)
-    router.use(authorize)
+    app.use(teamsRouter())
   }
+}
+
+function teamsRouter() {
+  const router = express.Router()
+
+  router.use(authenticate)
+  router.use(redirectNonAuthenticated)
+  router.use(authorize)
 
   return router
 }
