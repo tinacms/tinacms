@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.6...@tinacms/api-git@0.5.0-alpha.0) (2019-12-06)
+
+
+### Features
+
+* **commit identity:** add user identity if present on request ([9b48331](https://github.com/tinacms/tinacms/commit/9b48331))
+
+
+
+
+
 ## [0.4.6](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.6-alpha.2...@tinacms/api-git@0.4.6) (2019-12-02)
 
 **Note:** Version bump only for package @tinacms/api-git
