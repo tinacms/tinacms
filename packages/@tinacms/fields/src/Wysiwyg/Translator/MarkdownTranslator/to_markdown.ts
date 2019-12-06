@@ -213,7 +213,7 @@ export class MarkdownSerializerState {
     const progress = (node: Node | null, _?: any, index: number = 0) => {
       let marks = node ? node.marks : []
 
-      let indexOfCode = marks.findIndex(p => p.type.name === 'code')
+      const indexOfCode = marks.findIndex(p => p.type.name === 'code')
       if (indexOfCode >= 0 && marks.length > 1) {
         marks = [
           ...marks.slice(0, indexOfCode),
