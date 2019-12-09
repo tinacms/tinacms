@@ -30,20 +30,8 @@ export function useLocalForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
-  /**
-   * We're returning early here which means all the hooks called by this hook
-   * violate the rules of hooks. In the case of the check for
-   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
-   * will never change at runtime.
-   */
-  if (process.env.NODE_ENV === 'production') {
-    return [options.initialValues, undefined]
-  }
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [values, form] = useForm<FormShape>(options, watch)
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
   usePlugins(form)
 
   return [values, form]
