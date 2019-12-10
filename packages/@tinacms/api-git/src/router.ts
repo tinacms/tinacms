@@ -24,7 +24,7 @@ import * as express from 'express'
 
 import { commit } from './commit'
 import { createUploader } from './upload'
-import { openRepo } from './open-repo'
+import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
 import { show } from './show'
 
 export interface GitRouterConfig {
@@ -52,6 +52,21 @@ export function checkFilePathIsInRepo(
   }
 }
 
+function createSSHKey(pathRoot: string) {
+  if (process.env.SSH_KEY) {
+    const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
+    const parentDir = path.dirname(ssh_path)
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir, { recursive: true })
+    }
+    fs.writeFile(ssh_path, process.env.SSH_KEY, (err: any) => {
+      if (err) {
+        console.error(err)
+      }
+    })
+  }
+}
+
 export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
   const CONTENT_REL_PATH = config.pathToContent || ''
@@ -66,6 +81,8 @@ export function router(config: GitRouterConfig = {}) {
 
   const router = express.Router()
   router.use(express.json())
+
+  createSSHKey(REPO_ABSOLUTE_PATH)
 
   router.delete('/:relPath', (req: any, res: any) => {
     const user = req.user || {}
