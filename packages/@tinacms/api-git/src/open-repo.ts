@@ -17,10 +17,11 @@ limitations under the License.
 */
 
 const git = require('simple-git/promise')
+import * as path from 'path'
 
-const GIT_SSH_COMMAND =
+export const SSH_KEY_RELATIVE_PATH = '.ssh/id_rsa'
+const DEFAULT_GIT_SSH_COMMAND =
   'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
-
 /**
  * Opens and prepares a SimpleGit repository.
  *
@@ -35,7 +36,13 @@ export function openRepo(absolutePath: string) {
    * `repo.env` overwrites the environment. Adding `...process.env`
    *  is required for accessing global config values. (i.e. user.name, user.email)
    */
-  repo.env({ ...process.env, GIT_SSH_COMMAND: GIT_SSH_COMMAND })
+
+  repo.env({
+    ...process.env,
+    GIT_SSH_COMMAND: process.env.SSH_KEY
+      ? `ssh -i ${path.join(absolutePath, SSH_KEY_RELATIVE_PATH)} -F /dev/null`
+      : DEFAULT_GIT_SSH_COMMAND,
+  })
 
   return repo
 }
