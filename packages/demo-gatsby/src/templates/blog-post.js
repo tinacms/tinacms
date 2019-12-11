@@ -27,6 +27,7 @@ import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
+import { EditToggle } from "../components/edit-toggle"
 
 const get = require("lodash.get")
 
@@ -48,8 +49,11 @@ function BlogPostTemplate(props) {
   const { isEditing, setIsEditing } = props
   const blocks = post.frontmatter.blocks || []
 
+  // setIsEditing(true)
+
   return (
     <Layout location={props.location} title={siteTitle}>
+      <EditToggle isEditing={isEditing} setIsEditing={setIsEditing} />
       <SEO
         title={post.frontmatter.title}
         description={post.frontmatter.description || post.excerpt}
@@ -110,9 +114,6 @@ function BlogPostTemplate(props) {
           padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
         }}
       >
-        <button onClick={() => setIsEditing(p => !p)}>
-          {isEditing ? "Stop Editing" : "Start Editing"}
-        </button>
         <TinaField
           name="rawFrontmatter.draft"
           Component={MyToggle}
