@@ -40,10 +40,12 @@ const PlainTextarea = styled.textarea`
   width: 100%;
   margin: 0;
   padding: 0;
-  min-height: none;
+  min-height: 0;
   max-height: none;
   resize: none;
   overflow: hidden;
+  line-height: inherit;
+  font-size: inherit;
   &:focus {
     outline: none;
   }
@@ -54,7 +56,7 @@ const PlainText = ({ input, ...styleProps }) => {
   useEffect(() => {
     autosize(textInput)
   }, [])
-  return <PlainTextarea ref={c => (textInput = c)} {...input} />
+  return <PlainTextarea ref={c => (textInput = c)} {...input} rows="1" />
 }
 
 const MyToggle = props => (
