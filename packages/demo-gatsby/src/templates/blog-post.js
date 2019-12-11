@@ -16,9 +16,10 @@ limitations under the License.
 
 */
 
-import React from "react"
+import React, { useEffect } from "react"
 import { Link, graphql } from "gatsby"
 
+import styled from "styled-components"
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -29,11 +30,33 @@ import { TinaField, Wysiwyg, Toggle } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
 import { EditToggle } from "../components/edit-toggle"
 
+import autosize from "autosize"
+
 const get = require("lodash.get")
 
-const PlainText = props => (
-  <input style={{ background: "transparent " }} {...props.input} />
-)
+const PlainTextarea = styled.textarea`
+  border: none;
+  background: transparent;
+  width: 100%;
+  margin: 0;
+  padding: 0;
+  min-height: none;
+  max-height: none;
+  resize: none;
+  overflow: hidden;
+  &:focus {
+    outline: none;
+  }
+`
+
+const PlainText = ({ input, ...styleProps }) => {
+  let textInput = React.createRef()
+  useEffect(() => {
+    autosize(textInput)
+  }, [])
+  return <PlainTextarea ref={c => (textInput = c)} {...input} />
+}
+
 const MyToggle = props => (
   <>
     <label>Draft: </label>
@@ -48,8 +71,6 @@ function BlogPostTemplate(props) {
   const { previous, next } = props.pageContext
   const { isEditing, setIsEditing } = props
   const blocks = post.frontmatter.blocks || []
-
-  // setIsEditing(true)
 
   return (
     <Layout location={props.location} title={siteTitle}>
