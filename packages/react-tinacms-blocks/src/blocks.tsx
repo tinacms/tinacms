@@ -25,7 +25,10 @@ export interface BlocksProps {
   }
 }
 
-export function Blocks({ name, data = [], components = {} }: BlocksProps) {
+export function Blocks({ name, data, components }: BlocksProps) {
+  data = data || []
+  components = components || {}
+
   return (
     <>
       {data.map((data, index) => {
