@@ -4,8 +4,6 @@ date: '2019-09-18T03:00:00.000Z'
 heading_color: pink
 description: 'My new post. '
 blocks:
-  - _template: heading
-    text: My first Tina post
   - _template: image
     alt: My kitchen
     src: >-
