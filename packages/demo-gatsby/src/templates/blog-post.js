@@ -29,35 +29,9 @@ import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
 import { EditToggle } from "../components/edit-toggle"
-
-import autosize from "autosize"
+import { PlainTextInput } from "../components/plain-text-input"
 
 const get = require("lodash.get")
-
-const PlainTextarea = styled.textarea`
-  border: none;
-  background: transparent;
-  width: 100%;
-  margin: 0;
-  padding: 0;
-  min-height: 0;
-  max-height: none;
-  resize: none;
-  overflow: hidden;
-  line-height: inherit;
-  font-size: inherit;
-  &:focus {
-    outline: none;
-  }
-`
-
-const PlainText = ({ input, ...styleProps }) => {
-  let textInput = React.createRef()
-  useEffect(() => {
-    autosize(textInput)
-  }, [])
-  return <PlainTextarea ref={c => (textInput = c)} {...input} rows="1" />
-}
 
 const MyToggle = props => (
   <>
@@ -101,7 +75,7 @@ function BlogPostTemplate(props) {
               marginTop: rhythm(2),
             }}
           >
-            <TinaField name="rawFrontmatter.title" Component={PlainText}>
+            <TinaField name="rawFrontmatter.title" Component={PlainTextInput}>
               {post.frontmatter.title}{" "}
             </TinaField>
           </h1>
@@ -125,6 +99,16 @@ function BlogPostTemplate(props) {
               <span style={{ fontWeight: "600" }}>Date</span>
               <p>{post.frontmatter.date}</p>
             </div>
+
+            <TinaField
+              name="rawFrontmatter.draft"
+              Component={MyToggle}
+              type="checkbox"
+            >
+              {post.frontmatter.draft && (
+                <small style={{ color: "fuchsia" }}>Draft</small>
+              )}
+            </TinaField>
           </div>
         </div>
       </div>
@@ -137,15 +121,6 @@ function BlogPostTemplate(props) {
           padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
         }}
       >
-        <TinaField
-          name="rawFrontmatter.draft"
-          Component={MyToggle}
-          type="checkbox"
-        >
-          {post.frontmatter.draft && (
-            <small style={{ color: "fuchsia" }}>Draft</small>
-          )}
-        </TinaField>
         <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
