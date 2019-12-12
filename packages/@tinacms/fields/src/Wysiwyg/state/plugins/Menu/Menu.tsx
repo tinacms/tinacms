@@ -18,6 +18,7 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
+import { useState, useRef, useEffect } from 'react';
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
@@ -85,6 +86,26 @@ const LinkControl = markControl({
 
 export const Menu = (props: Props) => {
   const { view, bottom = false, frame, theme } = props
+  const [menuFixed, setMenuFixed] = useState(false);
+  const [menuOffset, setMenuOffset] = useState();
+  const [menuWidth, setMenuWidth] = useState();
+  const menuRef: any = useRef();
+
+  const handleScroll = () => {
+    if (window.scrollY > menuRef.current.offsetTop && !menuFixed) {
+      // Need to remember the menu original position and width
+      setMenuOffset(menuRef.current.offsetTop);
+      setMenuWidth(menuRef.current.offsetWidth);
+      setMenuFixed(true);
+    } else if (window.scrollY < menuOffset && menuFixed) {
+      setMenuFixed(false);
+    }
+  };
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll);   
+    return () => window.removeEventListener('scroll', handleScroll);
+  })
 
   const supportBlocks = true
 
@@ -95,18 +116,23 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-        {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
-        <BoldControl view={view} />
-        <ItalicControl view={view} />
-        <UnderlineControl view={view} />
-        <LinkControl view={view} />
-        {/* <ImageControl view={view} bottom={bottom} /> */}
-        {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
-        {supportBlocks && <CodeControl view={view} bottom={bottom} />}
-        {supportBlocks && <BulletList view={view} bottom={bottom} />}
-        {supportBlocks && <OrderedList view={view} bottom={bottom} />}
-      </MenuContainer>
+        <MenuContainer 
+          menuFixed={menuFixed}
+          menuWidth={menuWidth}
+          ref={menuRef}
+          onMouseDown={preventProsemirrorFocusLoss}
+        >
+          {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
+          <BoldControl view={view} />
+          <ItalicControl view={view} />
+          <UnderlineControl view={view} />
+          <LinkControl view={view} />
+          {/* <ImageControl view={view} bottom={bottom} /> */}
+          {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
+          {supportBlocks && <CodeControl view={view} bottom={bottom} />}
+          {supportBlocks && <BulletList view={view} bottom={bottom} />}
+          {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+        </MenuContainer>
     </ThemeProvider>
   )
 }
@@ -176,12 +202,18 @@ const OrderedList = commandContrl(
   'Ordered List'
 )
 
-const MenuContainer = styled.div`
+type MenuContainerProps = {
+  menuFixed: boolean
+  menuWidth: number
+}
+
+const MenuContainer = styled.div<MenuContainerProps>`
   display: flex;
   justify-content: space-between;
-  position: sticky;
+  position: ${({ menuFixed }) => menuFixed ? 'fixed' : 'relative'};
   top: 0;
   width: 100%;
+  max-width: ${({ menuWidth }) => `${menuWidth}px` };
   background-color: white;
   border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
