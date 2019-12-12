@@ -77,11 +77,14 @@ function createEditableBlocks({
 
 function EditableBlocks({
   name,
-  data = [],
-  components = {},
+  data,
+  components,
   form,
   renderBefore,
 }: InlineBlocksProps) {
+  data = data || []
+  components = components || {}
+
   const move = useCallback(
     (from: number, to: number) => {
       form.finalForm.mutators.move(name, from, to)
