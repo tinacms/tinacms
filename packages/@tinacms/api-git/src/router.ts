@@ -64,6 +64,8 @@ function createSSHKey(pathRoot: string) {
         console.error(err)
       }
     })
+
+    // TODO: Ensure remote URL is ssh
   }
 }
 
