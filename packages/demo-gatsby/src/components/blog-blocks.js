@@ -59,13 +59,13 @@ const BLOCK_COMPONENTS = {
   image: EditableImage,
 }
 
-const AddBlockMenu = ({ insert, index }) => {
+const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
   const [visible, setVisible] = React.useState(false)
 
   if (!insert) return null
 
   return (
-    <AddBlockMenuWrapper visible={visible}>
+    <div visible={visible} {...styleProps}>
       <AddBlockButton
         onClick={() => setVisible(visible => !visible)}
         open={visible}
@@ -97,9 +97,19 @@ const AddBlockMenu = ({ insert, index }) => {
           Image
         </BlockOption>
       </BlocksMenu>
-    </AddBlockMenuWrapper>
+    </div>
   )
-}
+})`
+  position: absolute;
+  bottom: -1.5rem;
+  width: 100%;
+  transform: translate3d(0, calc(100% - 2rem), 0);
+  z-index: 100;
+  pointer-events: none;
+  opacity: 0;
+  transition: all 150ms ease-out;
+  z-index: 1500;
+`
 
 const AddBlockButton = styled(TinaButton)`
   font-family: "Inter", sans-serif;
@@ -124,43 +134,6 @@ const AddBlockButton = styled(TinaButton)`
       svg {
         transform: rotate(45deg);
       }
-    `};
-`
-
-const AddBlockMenuWrapperVisible = css`
-  opacity: 1;
-`
-
-const AddBlockMenuWrapper = styled.div`
-  position: absolute;
-  bottom: 0;
-  width: 100%;
-  transform: translate3d(0, 50%, 0);
-  z-index: 100;
-  opacity: 0;
-  transition: all 150ms ease-out;
-
-  &:hover {
-    ${AddBlockMenuWrapperVisible}
-  }
-
-  &:after {
-    content: "";
-    display: block;
-    position: absolute;
-    top: 50%;
-    left: 0;
-    width: 100%;
-    height: 2px;
-    background: ${color.primary()};
-    transform: translate3d(0, -50%, 0);
-    z-index: -1;
-  }
-
-  ${props =>
-    props.visible &&
-    css`
-      ${AddBlockMenuWrapperVisible}
     `};
 `
 
@@ -189,6 +162,33 @@ const BlocksMenu = styled.div`
       pointer-events: all;
       transform: translate3d(-50%, 3rem, 0) scale3d(1, 1, 1);
     `};
+`
+
+const MoveButtons = styled.div`
+  display: flex;
+
+  > * {
+    &:not(:last-child) {
+      border-top-right-radius: 0;
+      border-bottom-right-radius: 0;
+      border-right: 2px solid rgba(255, 255, 255, 0.2);
+    }
+    &:not(:first-child) {
+      border-top-left-radius: 0;
+      border-bottom-left-radius: 0;
+    }
+  }
+`
+
+const MoveButton = styled(IconButton)`
+  width: 2.5rem;
+`
+
+const CloseButton = styled(IconButton)`
+  svg {
+    width: 1.25rem;
+    height: 1.25rem;
+  }
 `
 
 const BlockOption = styled.button`
@@ -232,19 +232,19 @@ const BlocksActions = styled(
     return (
       <div {...styleProps}>
         {hasIndex && move && (
-          <IconButton onClick={moveBlockUp} disabled={index === 0} primary>
-            <ChevronUpIcon />
-          </IconButton>
-        )}
-        {hasIndex && move && (
-          <IconButton onClick={moveBlockDown} primary>
-            <ChevronDownIcon />
-          </IconButton>
+          <MoveButtons>
+            <MoveButton onClick={moveBlockUp} disabled={index === 0} primary>
+              <ChevronUpIcon />
+            </MoveButton>
+            <MoveButton onClick={moveBlockDown} primary>
+              <ChevronDownIcon />
+            </MoveButton>
+          </MoveButtons>
         )}
         {hasIndex && remove && (
-          <IconButton onClick={removeBlock} primary>
+          <CloseButton onClick={removeBlock} primary>
             <CloseIcon />
-          </IconButton>
+          </CloseButton>
         )}
       </div>
     )
@@ -279,6 +279,12 @@ const BlocksActions = styled(
 const BlockFocusOutlineVisible = css`
   &:after {
     opacity: 1;
+  }
+
+  ${AddBlockMenu} {
+    opacity: 1;
+    pointer-events: all;
+    transform: translate3d(0, 100%, 0);
   }
 
   ${BlocksActions} {
