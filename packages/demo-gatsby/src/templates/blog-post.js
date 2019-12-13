@@ -33,12 +33,20 @@ import { PlainTextInput } from "../components/plain-text-input"
 
 const get = require("lodash.get")
 
-const MyToggle = props => (
-  <>
-    <label>Draft: </label>
+const MyToggle = styled((props, ...styleProps) => (
+  <div {...styleProps}>
+    <label>Date</label>
     <Toggle {...props} />
-  </>
-)
+  </div>
+))`
+  display: none;
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-weight: 600;
+  }
+`
 
 function BlogPostTemplate(props) {
   const form = props.form
