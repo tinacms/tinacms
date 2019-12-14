@@ -99,7 +99,9 @@ const CreateContentButton = ({ plugin, onClick }: any) => {
   )
 }
 
-const FormModal = ({ plugin, close }: any) => {
+export const FormModal = ({ plugin, close }: any) => {
+  console.log("plugin", plugin);
+  console.log("close", close);
   const cms = useCMS()
   const form: Form = useMemo(
     () =>
@@ -123,7 +125,7 @@ const FormModal = ({ plugin, close }: any) => {
           return (
             <ModalPopup>
               <ModalHeader close={close}>{plugin.name}</ModalHeader>
-              <ModalBody>
+              <ModalBody onKeyPress={(e) => e.charCode === 13 ? handleSubmit() as any : null}>
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
               <ModalActions>

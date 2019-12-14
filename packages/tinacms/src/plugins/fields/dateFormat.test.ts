@@ -58,8 +58,6 @@ describe('date format', () => {
         const date = moment(dateString, dateFormat)
         const result = parse(date, 'date', { dateFormat: 'MM YYYY' }) as Date
 
-        console.log('mmm ' + result)
-        console.log('month: ' + result.getMonth())
         expect(result.getMonth()).toEqual(6)
         expect(result.getFullYear()).toEqual(1972)
       })
