@@ -17,7 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { SketchPicker } from 'react-color'
+import { useState } from 'react'
+import { SketchPicker, BlockPicker } from 'react-color'
 
 import styled, { keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
@@ -131,6 +132,8 @@ export const Cover = styled.div`
 
 interface Props {
   colorFormat: ColorFormat
+  userColors: string[]
+  widget: string
   input: WrappedFieldProps['input']
 }
 
@@ -140,82 +143,148 @@ interface State {
 
 const nullColor = 'transparent'
 
-export class ColorPicker extends React.Component<Props, State> {
-  static defaultProps = {
-    colorFormat: ColorFormat.Hex,
-  }
-  presetColors = [
-    '#D0021B',
-    '#F5A623',
-    '#F8E71C',
-    '#8B572A',
-    '#7ED321',
-    '#417505',
-    '#BD10E0',
-    '#9013FE',
-    '#4A90E2',
-    '#50E3C2',
-    '#B8E986',
-    '#000000',
-    '#4A4A4A',
-    '#9B9B9B',
-    '#FFFFFF',
-  ]
+const presetColors = [
+  '#D0021B',
+  '#F5A623',
+  '#F8E71C',
+  '#8B572A',
+  '#7ED321',
+  '#417505',
+  '#BD10E0',
+  '#9013FE',
+  '#4A90E2',
+  '#50E3C2',
+  '#B8E986',
+  '#000000',
+  '#4A4A4A',
+  '#9B9B9B',
+  '#FFFFFF',
+]
 
-  state = {
-    displayColorPicker: false,
-  }
+export const ColorPicker:React.FC<Props> = ({
+    colorFormat,
+    userColors = presetColors,
+    widget = "sketch",
+    input
+}) => {
+  const [displayColorPicker, setDisplayColorPicker] = useState(false);
 
-  get colorFormat() {
-    return (this.props.colorFormat || ColorFormat.Hex).toLowerCase()
-  }
+  const getColorFormat = (colorFormat || ColorFormat.Hex).toLowerCase();
+  const getColorRGBA = input.value ? ColorFormatter[getColorFormat].parse(input.value) : null
+  const handleClick = () => setDisplayColorPicker(!displayColorPicker);
+  const handleClose = () => setDisplayColorPicker(false);
 
-  handleClick = () => {
-    this.setState({ displayColorPicker: !this.state.displayColorPicker })
-  }
-
-  handleClose = () => {
-    this.setState({ displayColorPicker: false })
-  }
-
-  handleChange = (pickerColor: any) => {
+  const handleChange = (pickerColor: any) => {
     const color = (pickerColor.hex === nullColor
       ? null
-      : { ...pickerColor.rgb, a: 1 }) as ColorRGBA | null
-    this.props.input.onChange(
-      color ? ColorFormatter[this.colorFormat].getValue(color) : null
+      : { ...pickerColor.rgb, a: 1}) as ColorRGBA | null
+    input.onChange(
+      color ? ColorFormatter[getColorFormat].getValue(color) : null
     )
   }
 
-  get colorRGBA() {
-    return this.props.input.value
-      ? ColorFormatter[this.colorFormat].parse(this.props.input.value)
-      : null
-  }
-
-  render() {
-    return (
-      <>
-        <Swatch
-          onClick={this.handleClick}
-          colorRGBA={this.colorRGBA}
-          colorFormat={this.colorFormat}
-        />
-        {this.state.displayColorPicker ? (
-          <>
-            <Popover>
-              <SketchPicker
-                presetColors={[...this.presetColors, nullColor]}
-                color={this.colorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
-                onChange={this.handleChange}
-                disableAlpha={true}
-                width={'240px'}
-              />{' '}
-            </Popover>
-            <Cover onClick={this.handleClose} />
-          </>
-        ) : null}{' '}
-      </>
-    )
-  }
+  return (
+    <>
+      <Swatch
+        onClick={handleClick}
+        colorRGBA={getColorRGBA}
+        colorFormat={getColorFormat}
+      />
+      {displayColorPicker ? (
+        <>
+          <Popover>
+            {widget === 'sketch' ?
+            <SketchPicker
+              presetColors={[...userColors, nullColor]}
+              color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+              onChange={handleChange}
+              disableAlpha={true}
+              width={'240px'}
+            />
+            : 
+            <BlockPicker
+              colors={[...userColors, nullColor]}
+              color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+              onChange={handleChange}
+              width={'240px'}
+            />}{' '}              
+          </Popover>
+          <Cover onClick={handleClose} />
+        </>
+      ) : null}{' '}
+    </>
+  )
 }
+
+// export class ColorPicker extends React.Component<Props, State> {
+//   static defaultProps = {
+//     colorFormat: ColorFormat.Hex,
+//     userColors: presetColors,
+//   }
+  
+//   state = {
+//     displayColorPicker: false,
+//   }
+
+//   get colorFormat() {
+//     return (this.props.colorFormat || ColorFormat.Hex).toLowerCase()
+//   }
+
+//   handleClick = () => {
+//     this.setState({ displayColorPicker: !this.state.displayColorPicker })
+//   }
+
+//   handleClose = () => {
+//     this.setState({ displayColorPicker: false })
+//   }
+
+//   handleChange = (pickerColor: any) => {
+//     const color = (pickerColor.hex === nullColor
+//       ? null
+//       : { ...pickerColor.rgb, a: 1 }) as ColorRGBA | null
+//     this.props.input.onChange(
+//       color ? ColorFormatter[this.colorFormat].getValue(color) : null
+//     )
+//   }
+
+//   get colorRGBA() {
+//     return this.props.input.value
+//       ? ColorFormatter[this.colorFormat].parse(this.props.input.value)
+//       : null
+//   }
+
+//   render() {
+//     return (
+//       <>
+//         <Swatch
+//           onClick={this.handleClick}
+//           colorRGBA={this.colorRGBA}
+//           colorFormat={this.colorFormat}
+//         />
+//         {this.state.displayColorPicker ? (
+//           <>
+//             <Popover>
+//               {console.log(this.props.widget)}
+//               {this.props.widget === 'sketch' ?
+//               <SketchPicker
+//                 presetColors={[...this.props.userColors, nullColor]}
+//                 color={this.colorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+//                 onChange={this.handleChange}
+//                 disableAlpha={true}
+//                 width={'240px'}
+//               />
+//               : 
+//               <BlockPicker
+//                 colors={[...this.props.userColors, nullColor]}
+//                 color={this.colorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+//                 onChange={this.handleChange}
+//                 width={'240px'}
+//               />}{' '}              
+//             </Popover>
+//             <Cover onClick={this.handleClose} />
+//           </>
+//         ) : null}{' '}
+//       </>
+//     )
+//   }
+// }
