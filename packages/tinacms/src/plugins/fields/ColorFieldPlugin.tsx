@@ -23,11 +23,18 @@ import { InputProps } from 'react-select/lib/components/Input'
 
 export interface ColorFieldProps {
   colorFormat: string
+  colors: string[]
+  widget: string
 }
 export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
   ({ input, field }) => {
     return (
-      <ColorPicker colorFormat={(field as any).colorFormat} input={input} />
+      <ColorPicker
+        colorFormat={(field as any).colorFormat}
+        userColors={(field as any).colors}
+        widget={(field as any).widget}
+        input={input}
+      />
     )
   }
 )

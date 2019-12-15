@@ -262,6 +262,8 @@ const BlogPostForm = {
       label: "Heading color",
       name: "frontmatter.heading_color",
       component: "color",
+      colors: ["#ff0000", "#ffff00", "#00ff00", "#0000ff"],
+      widget: "sketch"
     },
     {
       name: "frontmatter.thumbnail",
