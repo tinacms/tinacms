@@ -26,6 +26,7 @@ import { commit } from './commit'
 import { createUploader } from './upload'
 import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
 import { show } from './show'
+import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
 
 export interface GitRouterConfig {
   pathToRepo?: string
@@ -52,7 +53,26 @@ export function checkFilePathIsInRepo(
   }
 }
 
-function createSSHKey(pathRoot: string) {
+// Ensure remote URL is ssh
+export async function updateRemoteToSSH(pathRoot: string) {
+  const repo = await openRepo(pathRoot)
+  const remotes = await repo.getRemotes(true)
+  const originRemotes = remotes.filter((r: any) => r.name == 'origin')
+
+  console.log(JSON.stringify(`originRemotes ${originRemotes}`))
+  if (!originRemotes.length) {
+    throw new Error('No origin remote on the given rpeo')
+  }
+
+  let originURL = originRemotes[0].refs.push
+
+  if (originURL && !isSSHUrl(originURL)) {
+    repo.removeRemote('origin')
+    repo.addRemote('origin', getGitSSHUrl(originURL))
+  }
+}
+
+async function createSSHKey(pathRoot: string) {
   if (process.env.SSH_KEY) {
     const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
     const parentDir = path.dirname(ssh_path)
@@ -65,7 +85,7 @@ function createSSHKey(pathRoot: string) {
       }
     })
 
-    // TODO: Ensure remote URL is ssh
+    updateRemoteToSSH(pathRoot)
   }
 }
 
