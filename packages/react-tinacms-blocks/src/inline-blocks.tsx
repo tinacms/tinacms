@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import React, { useCallback } from 'react'
-import { TinaField, Form } from 'tinacms'
+import { TinaField, Form, BlockTemplate } from 'tinacms'
 
 import { Blocks, BlocksProps } from './blocks'
 
@@ -25,10 +25,12 @@ export interface BlocksRenderProps {
   move(from: number, to: number): void
   remove(index: number): void
   data: any[]
+  templates: BlockTemplate[]
 }
 export interface InlineBlocksProps extends BlocksProps {
   // TODO: We shouldn't have to pass this in.
   form: Form
+  templates: BlockTemplate[]
   renderBefore(props: BlocksRenderProps): any // TODO: Proper types
 }
 
@@ -36,6 +38,7 @@ export function InlineBlocks({
   name,
   form,
   renderBefore,
+  templates,
   ...props
 }: InlineBlocksProps) {
   const EditableBlocks = React.useMemo(
@@ -43,6 +46,7 @@ export function InlineBlocks({
       createEditableBlocks({
         form,
         components: props.components,
+        templates,
         renderBefore,
       }),
     [form, props.components]
@@ -57,10 +61,12 @@ export function InlineBlocks({
 function createEditableBlocks({
   form,
   components,
+  templates,
   renderBefore,
 }: {
   form: Form
   components: InlineBlocksProps['components']
+  templates: BlockTemplate[]
   renderBefore: any
 }) {
   return function(props: any) {
@@ -68,6 +74,7 @@ function createEditableBlocks({
       <EditableBlocks
         name={props.input.name}
         components={components}
+        templates={templates}
         data={props.input.value}
         form={form}
         renderBefore={renderBefore}
@@ -80,6 +87,7 @@ function EditableBlocks({
   name,
   data,
   components,
+  templates,
   form,
   renderBefore,
 }: InlineBlocksProps) {
@@ -109,7 +117,7 @@ function EditableBlocks({
 
   return (
     <>
-      {renderBefore && renderBefore({ insert, move, remove, data })}
+      {renderBefore && renderBefore({ insert, move, remove, data, templates })}
       {data.map((data, index) => {
         const Component = components[data._template]
 
@@ -121,6 +129,7 @@ function EditableBlocks({
             move={move}
             remove={remove}
             insert={insert}
+            templates={templates}
           />
         )
       })}
