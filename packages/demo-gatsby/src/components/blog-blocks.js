@@ -65,15 +65,26 @@ const BLOCK_COMPONENTS = {
 const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
   const [open, setOpen] = React.useState(false)
 
+  const clickHandler = event => {
+    event.preventDefault()
+    setOpen(open => !open)
+  }
+
+  useEffect(() => {
+    document.addEventListener(
+      "mouseup",
+      event => {
+        setOpen(false)
+      },
+      false
+    )
+  }, [])
+
   if (!insert) return null
 
   return (
     <div open={open} {...styleProps}>
-      <AddBlockButton
-        onClick={() => setOpen(open => !open)}
-        open={open}
-        primary
-      >
+      <AddBlockButton onClick={clickHandler} open={open} primary>
         <AddIcon /> Add Block
       </AddBlockButton>
       <BlocksMenu open={open}>
@@ -322,8 +333,6 @@ const BlockFocusOutline = styled.div`
     ${BlockFocusOutlineVisible}
   }
 
-  ${props => props.active && BlockFocusOutlineVisible};
-
   ${AddBlockMenu} {
     position: absolute;
     bottom: -1.5rem;
@@ -348,6 +357,8 @@ const BlockFocusOutline = styled.div`
       height: calc(100% + 1.5rem);
     }
   }
+
+  ${props => props.active && BlockFocusOutlineVisible};
 `
 
 const BlockWrapper = ({
