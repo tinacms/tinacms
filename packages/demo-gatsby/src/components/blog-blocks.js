@@ -218,7 +218,7 @@ const BlockOption = styled.button`
 `
 
 const BlocksActions = styled(
-  ({ index, insert, remove, move, ...styleProps }) => {
+  ({ index, insert, remove, move, template, ...styleProps }) => {
     const hasIndex = index || index === 0
     const moveBlockUp = event => {
       event.stopPropagation()
@@ -366,6 +366,7 @@ const BlockWrapper = ({
   move,
   templates,
   children,
+  data,
   ...styleProps
 }) => {
   const [active, setActive] = React.useState(false)
@@ -397,6 +398,7 @@ const BlockWrapper = ({
         index={index}
         move={move}
         remove={remove}
+        template={templates.find(template => template.type === data._template)}
       />
       {children}
       <AddBlockMenu insert={insert} index={index} templates={templates} />
@@ -423,14 +425,6 @@ function EditableHeading(props) {
 function EditableImage(props) {
   return (
     <BlockWrapper {...props}>
-      <TinaField
-        name={`${props.name}.${props.index}.src`}
-        Component={PlainTextInput}
-      />
-      <TinaField
-        name={`${props.name}.${props.index}.alt`}
-        Component={PlainTextInput}
-      />
       <img {...props.data} />
     </BlockWrapper>
   )
@@ -448,7 +442,6 @@ const heading = {
   itemProps: block => ({
     label: `${block.text}`,
   }),
-  fields: [{ name: "text", component: "text", label: "Text" }],
 }
 
 /**
