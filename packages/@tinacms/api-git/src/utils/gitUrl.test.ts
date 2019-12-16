@@ -49,4 +49,13 @@ describe('getGitSSHUrl', () => {
 
     expect(output).toBe('git@gitlab.com:tinacms/tinacms.git')
   })
+
+  it('converts http with auth', () => {
+    let input =
+      'https://api-key:fewhuyfgerguyrebrhe@gitlab.com/tinacms/tinacms.git'
+
+    let output = getGitSSHUrl(input)
+
+    expect(output).toBe('git@gitlab.com:tinacms/tinacms.git')
+  })
 })
