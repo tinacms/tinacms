@@ -41,12 +41,18 @@ export function BlogBlocks({ form, data }) {
       form={form}
       name="rawFrontmatter.blocks"
       data={data}
+      templates={[image, heading]}
       components={BLOCK_COMPONENTS}
       renderBefore={props => {
         if (!props.data || props.data.length < 1)
           return (
             <div style={{ position: "relative" }}>
-              <AddBlockMenu insert={props.insert} index={props.index} visible />
+              <AddBlockMenu
+                insert={props.insert}
+                index={props.index}
+                templates={props.templates}
+                visible
+              />
             </div>
           )
       }}
@@ -62,7 +68,7 @@ const BLOCK_COMPONENTS = {
   image: EditableImage,
 }
 
-const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
+const AddBlockMenu = styled(({ insert, index, templates, ...styleProps }) => {
   const [open, setOpen] = React.useState(false)
 
   const clickHandler = event => {
@@ -71,16 +77,14 @@ const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
   }
 
   useEffect(() => {
-    document.addEventListener(
-      "mouseup",
-      event => {
-        setOpen(false)
-      },
-      false
-    )
+    const setInactive = () => setOpen(false)
+    document.addEventListener("mouseup", setInactive, false)
+    return () => document.removeEventListener("mouseup", setInactive)
   }, [])
 
   if (!insert) return null
+
+  templates = templates || []
 
   return (
     <div open={open} {...styleProps}>
@@ -88,28 +92,17 @@ const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
         <AddIcon /> Add Block
       </AddBlockButton>
       <BlocksMenu open={open}>
-        <BlockOption
-          onClick={() => {
-            insert(
-              { _template: "heading", ...heading.defaultItem },
-              (index || -1) + 1
-            )
-            setOpen(false)
-          }}
-        >
-          Heading
-        </BlockOption>
-        <BlockOption
-          onClick={() => {
-            insert(
-              { _template: "image", ...image.defaultItem },
-              (index || -1) + 1
-            )
-            setOpen(false)
-          }}
-        >
-          Image
-        </BlockOption>
+        {templates.map(({ label, type, defaultItem }) => (
+          <BlockOption
+            onClick={() => {
+              insert({ _template: type, ...defaultItem }, (index || -1) + 1)
+              setOpen(false)
+            }}
+          >
+            {label}
+          </BlockOption>
+        ))}
+        {/* TODO: No templates? Link to docs or something. */}
       </BlocksMenu>
     </div>
   )
@@ -221,7 +214,7 @@ const BlockOption = styled.button`
 `
 
 const BlocksActions = styled(
-  ({ index, insert, remove, move, ...styleProps }) => {
+  ({ index, insert, remove, move, template, ...styleProps }) => {
     const hasIndex = index || index === 0
     const moveBlockUp = event => {
       event.stopPropagation()
@@ -351,10 +344,11 @@ const BlockFocusOutline = styled.div`
       display: block;
       position: absolute;
       bottom: 0;
-      left: -1.5rem;
+      left: -6rem;
       z-index: -1;
-      width: calc(100% + 3rem);
+      width: calc(100% + 12rem);
       height: calc(100% + 1.5rem);
+      clip-path: polygon(0 0, 100% 0, calc(100% - 6rem) 100%, 6rem 100%);
     }
   }
 
@@ -366,7 +360,9 @@ const BlockWrapper = ({
   index,
   remove,
   move,
+  templates,
   children,
+  data,
   ...styleProps
 }) => {
   const [active, setActive] = React.useState(false)
@@ -398,9 +394,10 @@ const BlockWrapper = ({
         index={index}
         move={move}
         remove={remove}
+        template={templates.find(template => template.type === data._template)}
       />
       {children}
-      <AddBlockMenu insert={insert} index={index} />
+      <AddBlockMenu insert={insert} index={index} templates={templates} />
     </BlockFocusOutline>
   )
 }
@@ -424,14 +421,6 @@ function EditableHeading(props) {
 function EditableImage(props) {
   return (
     <BlockWrapper {...props}>
-      <TinaField
-        name={`${props.name}.${props.index}.src`}
-        Component={PlainTextInput}
-      />
-      <TinaField
-        name={`${props.name}.${props.index}.alt`}
-        Component={PlainTextInput}
-      />
       <img {...props.data} />
     </BlockWrapper>
   )
@@ -441,6 +430,7 @@ function EditableImage(props) {
  * HEADING BLOCK
  */
 const heading = {
+  type: "heading",
   label: "Heading",
   defaultItem: {
     text: "",
@@ -448,7 +438,6 @@ const heading = {
   itemProps: block => ({
     label: `${block.text}`,
   }),
-  fields: [{ name: "text", component: "text", label: "Text" }],
 }
 
 /**
@@ -456,6 +445,7 @@ const heading = {
  */
 // Image Block Template
 const image = {
+  type: "image",
   label: "Image",
   defaultItem: {
     text: "",
