@@ -59,7 +59,6 @@ export async function updateRemoteToSSH(pathRoot: string) {
   const remotes = await repo.getRemotes(true)
   const originRemotes = remotes.filter((r: any) => r.name == 'origin')
 
-  console.log(JSON.stringify(`originRemotes ${originRemotes}`))
   if (!originRemotes.length) {
     throw new Error('No origin remote on the given rpeo')
   }
