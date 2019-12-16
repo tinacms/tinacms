@@ -77,13 +77,9 @@ const AddBlockMenu = styled(({ insert, index, templates, ...styleProps }) => {
   }
 
   useEffect(() => {
-    document.addEventListener(
-      "mouseup",
-      event => {
-        setOpen(false)
-      },
-      false
-    )
+    const setInactive = () => setOpen(false)
+    document.addEventListener("mouseup", setInactive, false)
+    return () => document.removeEventListener("mouseup", setInactive)
   }, [])
 
   if (!insert) return null
