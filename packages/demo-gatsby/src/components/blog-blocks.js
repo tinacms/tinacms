@@ -377,13 +377,11 @@ const BlockWrapper = ({
   }
 
   useEffect(() => {
-    document.addEventListener(
-      "mouseup",
-      event => {
-        setActive(false)
-      },
-      false
-    )
+    const setInactive = () => setActive(false)
+
+    document.addEventListener("mouseup", setInactive, false)
+
+    return () => document.removeEventListener("mouseup", setInactive)
   }, [])
 
   if (!insert) return children
