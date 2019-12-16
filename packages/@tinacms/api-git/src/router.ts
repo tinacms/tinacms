@@ -67,7 +67,9 @@ export async function updateRemoteToSSH(pathRoot: string) {
 
   if (originURL && !isSSHUrl(originURL)) {
     repo.removeRemote('origin')
-    repo.addRemote('origin', getGitSSHUrl(originURL))
+    const newRemote = getGitSSHUrl(originURL)
+    console.log(`newRemote ${newRemote}`)
+    repo.addRemote('origin', newRemote)
   }
 }
 
@@ -78,11 +80,7 @@ async function createSSHKey(pathRoot: string) {
     if (!fs.existsSync(parentDir)) {
       fs.mkdirSync(parentDir, { recursive: true })
     }
-    fs.writeFile(ssh_path, process.env.SSH_KEY, (err: any) => {
-      if (err) {
-        console.error(err)
-      }
-    })
+    fs.writeFileSync(ssh_path, process.env.SSH_KEY, { mode: 0o600 })
 
     updateRemoteToSSH(pathRoot)
   }
