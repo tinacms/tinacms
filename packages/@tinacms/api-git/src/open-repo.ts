@@ -30,6 +30,19 @@ const DEFAULT_GIT_SSH_COMMAND =
 export function openRepo(absolutePath: string) {
   const repo = git(absolutePath)
 
+  let options = [
+    '-o UserKnownHostsFile=/dev/null',
+    '-o StrictHostKeyChecking=no',
+  ]
+
+  if (process.env.SSH_KEY) {
+    options = [
+      ...options,
+      `-i ${path.join(absolutePath, SSH_KEY_RELATIVE_PATH)}`,
+      '-F /dev/null',
+    ]
+  }
+
   /**
    * This is here to allow committing from the cloud
    *
@@ -37,11 +50,11 @@ export function openRepo(absolutePath: string) {
    *  is required for accessing global config values. (i.e. user.name, user.email)
    */
 
+  const gitCmd = `ssh ${options.join(' ')}`
+  console.log(`gitCmd ${gitCmd}`)
   repo.env({
     ...process.env,
-    GIT_SSH_COMMAND: process.env.SSH_KEY
-      ? `ssh -i ${path.join(absolutePath, SSH_KEY_RELATIVE_PATH)} -F /dev/null`
-      : DEFAULT_GIT_SSH_COMMAND,
+    GIT_SSH_COMMAND: gitCmd,
   })
 
   return repo
