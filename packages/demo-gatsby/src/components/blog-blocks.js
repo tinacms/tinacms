@@ -42,11 +42,14 @@ export function BlogBlocks({ form, data }) {
       name="rawFrontmatter.blocks"
       data={data}
       components={BLOCK_COMPONENTS}
-      renderBefore={props => (
-        <div style={{ position: "relative" }}>
-          <AddBlockMenu insert={props.insert} index={props.index} />
-        </div>
-      )}
+      renderBefore={props => {
+        if (!props.data || props.data.length < 1)
+          return (
+            <div style={{ position: "relative" }}>
+              <AddBlockMenu insert={props.insert} index={props.index} visible />
+            </div>
+          )
+      }}
     />
   )
 }
@@ -60,27 +63,27 @@ const BLOCK_COMPONENTS = {
 }
 
 const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
-  const [visible, setVisible] = React.useState(false)
+  const [open, setOpen] = React.useState(false)
 
   if (!insert) return null
 
   return (
-    <div visible={visible} {...styleProps}>
+    <div open={open} {...styleProps}>
       <AddBlockButton
-        onClick={() => setVisible(visible => !visible)}
-        open={visible}
+        onClick={() => setOpen(open => !open)}
+        open={open}
         primary
       >
         <AddIcon /> Add Block
       </AddBlockButton>
-      <BlocksMenu open={visible}>
+      <BlocksMenu open={open}>
         <BlockOption
           onClick={() => {
             insert(
               { _template: "heading", ...heading.defaultItem },
               (index || -1) + 1
             )
-            setVisible(false)
+            setOpen(false)
           }}
         >
           Heading
@@ -91,7 +94,7 @@ const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
               { _template: "image", ...image.defaultItem },
               (index || -1) + 1
             )
-            setVisible(false)
+            setOpen(false)
           }}
         >
           Image
@@ -100,15 +103,7 @@ const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
     </div>
   )
 })`
-  position: absolute;
-  bottom: -1.5rem;
-  width: 100%;
-  transform: translate3d(0, calc(100% - 2rem), 0);
-  z-index: 100;
-  pointer-events: none;
-  opacity: 0;
-  transition: all 150ms ease-out;
-  z-index: 1500;
+  margin-bottom: 1rem;
 `
 
 const AddBlockButton = styled(TinaButton)`
@@ -192,6 +187,7 @@ const CloseButton = styled(IconButton)`
 `
 
 const BlockOption = styled.button`
+  font-family: "Inter", sans-serif;
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};
@@ -215,7 +211,6 @@ const BlockOption = styled.button`
 
 const BlocksActions = styled(
   ({ index, insert, remove, move, ...styleProps }) => {
-    console.log(insert)
     const hasIndex = index || index === 0
     const moveBlockUp = event => {
       event.stopPropagation()
@@ -259,6 +254,7 @@ const BlocksActions = styled(
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
+  transition-delay: 300ms;
 
   &:after {
     content: "";
@@ -278,19 +274,27 @@ const BlocksActions = styled(
 
 const BlockFocusOutlineVisible = css`
   &:after {
-    opacity: 1;
+    opacity: 0.3;
+    transition-delay: 0s;
+    ${props =>
+      props.active &&
+      css`
+        opacity: 1;
+      `};
   }
 
   ${AddBlockMenu} {
     opacity: 1;
     pointer-events: all;
-    transform: translate3d(0, 100%, 0);
+    transform: translate3d(-50%, 100%, 0);
+    transition-delay: 0s;
   }
 
   ${BlocksActions} {
     opacity: 1;
     pointer-events: all;
     transform: translate3d(0, -100%, 0);
+    transition-delay: 0s;
   }
 `
 
@@ -311,6 +315,7 @@ const BlockFocusOutline = styled.div`
     pointer-events: none;
     z-index: 1000;
     transition: all 150ms ease-out;
+    transition-delay: 300ms;
   }
 
   &:hover {
@@ -318,6 +323,31 @@ const BlockFocusOutline = styled.div`
   }
 
   ${props => props.active && BlockFocusOutlineVisible};
+
+  ${AddBlockMenu} {
+    position: absolute;
+    bottom: -1.5rem;
+    left: 50%;
+    transform: translate3d(-50%, calc(100% - 2rem), 0);
+    width: auto;
+    pointer-events: none;
+    opacity: 0;
+    z-index: 1500;
+    transition: all 150ms ease-out;
+    transition-delay: 300ms;
+    margin: 0;
+
+    &:after {
+      content: "";
+      display: block;
+      position: absolute;
+      bottom: 0;
+      left: -1.5rem;
+      z-index: -1;
+      width: calc(100% + 3rem);
+      height: calc(100% + 1.5rem);
+    }
+  }
 `
 
 const BlockWrapper = ({
@@ -332,7 +362,6 @@ const BlockWrapper = ({
   const blockRef = React.createRef()
   const clickHandler = event => {
     event.preventDefault()
-    console.log(blockRef)
     setActive(true)
   }
 
