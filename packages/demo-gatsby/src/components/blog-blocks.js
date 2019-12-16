@@ -41,12 +41,18 @@ export function BlogBlocks({ form, data }) {
       form={form}
       name="rawFrontmatter.blocks"
       data={data}
+      templates={[image, heading]}
       components={BLOCK_COMPONENTS}
       renderBefore={props => {
         if (!props.data || props.data.length < 1)
           return (
             <div style={{ position: "relative" }}>
-              <AddBlockMenu insert={props.insert} index={props.index} visible />
+              <AddBlockMenu
+                insert={props.insert}
+                index={props.index}
+                templates={props.templates}
+                visible
+              />
             </div>
           )
       }}
@@ -62,7 +68,7 @@ const BLOCK_COMPONENTS = {
   image: EditableImage,
 }
 
-const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
+const AddBlockMenu = styled(({ insert, index, templates, ...styleProps }) => {
   const [open, setOpen] = React.useState(false)
 
   const clickHandler = event => {
@@ -82,34 +88,25 @@ const AddBlockMenu = styled(({ insert, index, ...styleProps }) => {
 
   if (!insert) return null
 
+  templates = templates || []
+
   return (
     <div open={open} {...styleProps}>
       <AddBlockButton onClick={clickHandler} open={open} primary>
         <AddIcon /> Add Block
       </AddBlockButton>
       <BlocksMenu open={open}>
-        <BlockOption
-          onClick={() => {
-            insert(
-              { _template: "heading", ...heading.defaultItem },
-              (index || -1) + 1
-            )
-            setOpen(false)
-          }}
-        >
-          Heading
-        </BlockOption>
-        <BlockOption
-          onClick={() => {
-            insert(
-              { _template: "image", ...image.defaultItem },
-              (index || -1) + 1
-            )
-            setOpen(false)
-          }}
-        >
-          Image
-        </BlockOption>
+        {templates.map(({ label, type, defaultItem }) => (
+          <BlockOption
+            onClick={() => {
+              insert({ _template: type, ...defaultItem }, (index || -1) + 1)
+              setOpen(false)
+            }}
+          >
+            {label}
+          </BlockOption>
+        ))}
+        {/* TODO: No templates? Link to docs or something. */}
       </BlocksMenu>
     </div>
   )
@@ -366,6 +363,7 @@ const BlockWrapper = ({
   index,
   remove,
   move,
+  templates,
   children,
   ...styleProps
 }) => {
@@ -400,7 +398,7 @@ const BlockWrapper = ({
         remove={remove}
       />
       {children}
-      <AddBlockMenu insert={insert} index={index} />
+      <AddBlockMenu insert={insert} index={index} templates={templates} />
     </BlockFocusOutline>
   )
 }
@@ -441,6 +439,7 @@ function EditableImage(props) {
  * HEADING BLOCK
  */
 const heading = {
+  type: "heading",
   label: "Heading",
   defaultItem: {
     text: "",
@@ -456,6 +455,7 @@ const heading = {
  */
 // Image Block Template
 const image = {
+  type: "image",
   label: "Image",
   defaultItem: {
     text: "",
