@@ -348,10 +348,11 @@ const BlockFocusOutline = styled.div`
       display: block;
       position: absolute;
       bottom: 0;
-      left: -1.5rem;
+      left: -6rem;
       z-index: -1;
-      width: calc(100% + 3rem);
+      width: calc(100% + 12rem);
       height: calc(100% + 1.5rem);
+      clip-path: polygon(0 0, 100% 0, calc(100% - 6rem) 100%, 6rem 100%);
     }
   }
 
