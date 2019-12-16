@@ -24,6 +24,7 @@ export interface BlocksRenderProps {
   insert(obj: any, index: number): void
   move(from: number, to: number): void
   remove(index: number): void
+  data: any[]
 }
 export interface InlineBlocksProps extends BlocksProps {
   // TODO: We shouldn't have to pass this in.
@@ -108,7 +109,7 @@ function EditableBlocks({
 
   return (
     <>
-      {renderBefore && renderBefore({ insert, move, remove })}
+      {renderBefore && renderBefore({ insert, move, remove, data })}
       {data.map((data, index) => {
         const Component = components[data._template]
 
