@@ -24,7 +24,7 @@ import { InputProps } from 'react-select/lib/components/Input'
 export interface ColorFieldProps {
   colorFormat: string
   colors: string[]
-  widget: string
+  widget?: "sketch" | "block"
 }
 export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
   ({ input, field }) => {
