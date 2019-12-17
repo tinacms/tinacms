@@ -18,11 +18,21 @@ limitations under the License.
 import React from 'react'
 import { render } from '@testing-library/react'
 import { Blocks } from './blocks'
+import { Form } from 'tinacms'
 
 describe('Blocks', () => {
+  const form = new Form({
+    id: 'example',
+    label: 'Example Form',
+    fields: [],
+    onSubmit() {},
+  })
+
   describe('without data', () => {
     it('renders nothing into the containing element', () => {
-      const renderedBlock = render(<Blocks name="" data={[]} components={{}} />)
+      const renderedBlock = render(
+        <Blocks form={form} name="" data={[]} components={{}} />
+      )
 
       expect(renderedBlock.container.children).toHaveLength(0)
     })
@@ -35,7 +45,7 @@ describe('Blocks', () => {
     describe('when there are no components', () => {
       it('renders nothing into the containing element', () => {
         const renderedBlock = render(
-          <Blocks name="" data={data} components={{}} />
+          <Blocks form={form} name="" data={data} components={{}} />
         )
 
         expect(renderedBlock.container.children).toHaveLength(0)
@@ -48,7 +58,7 @@ describe('Blocks', () => {
           process.env.NODE_ENV = 'development'
 
           const rendering = () =>
-            render(<Blocks name="" data={data} components={{}} />)
+            render(<Blocks form={form} name="" data={data} components={{}} />)
 
           expect(rendering).toThrow()
         })
@@ -60,7 +70,7 @@ describe('Blocks', () => {
 
       it('renders that Component', () => {
         const renderedBlock = render(
-          <Blocks name="" data={data} components={{ heading }} />
+          <Blocks form={form} name="" data={data} components={{ heading }} />
         )
 
         const headingBlock = renderedBlock.queryByText(text)
