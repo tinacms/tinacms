@@ -20,8 +20,7 @@ const git = require('simple-git/promise')
 import * as path from 'path'
 
 export const SSH_KEY_RELATIVE_PATH = '.ssh/id_rsa'
-const DEFAULT_GIT_SSH_COMMAND =
-  'ssh -o UserKnownHostsFile=/dev/null -o StrictHostKeyChecking=no'
+
 /**
  * Opens and prepares a SimpleGit repository.
  *
@@ -38,6 +37,7 @@ export function openRepo(absolutePath: string) {
   if (process.env.SSH_KEY) {
     options = [
       ...options,
+      '-o IdentitiesOnly=yes',
       `-i ${path.join(absolutePath, SSH_KEY_RELATIVE_PATH)}`,
       '-F /dev/null',
     ]
