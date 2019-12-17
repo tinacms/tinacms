@@ -51,6 +51,8 @@ export function openRepo(absolutePath: string) {
    */
 
   repo.env({
+    GIT_COMMITTER_EMAIL: 'tina@tinacms.org',
+    GIT_COMMITTER_NAME: 'TinaCMS',
     ...process.env,
     GIT_SSH_COMMAND: `ssh ${options.join(' ')}`,
   })
