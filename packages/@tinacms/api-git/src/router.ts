@@ -107,7 +107,6 @@ export function router(config: GitRouterConfig = {}) {
   createSSHKey(REPO_ABSOLUTE_PATH)
 
   router.delete('/:relPath', (req: any, res: any) => {
-    console.log(`SSH_KEY ${process.env.SSH_KEY}`)
     const user = req.user || {}
     const fileRelativePath = decodeURIComponent(req.params.relPath)
     const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
