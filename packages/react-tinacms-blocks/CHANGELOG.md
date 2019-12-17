@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.1.1-alpha.0...react-tinacms-blocks@0.2.0-alpha.0) (2019-12-17)
+
+
+### Bug Fixes
+
+* **blocks:** move defaults inside function ([7a7b035](https://github.com/tinacms/tinacms/commit/7a7b035))
+
+
+### Features
+
+* adds block wrapper & add block menu to inline-blocks ([f2f910b](https://github.com/tinacms/tinacms/commit/f2f910b))
+
+
+
+
+
 ## [0.1.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.1.0...react-tinacms-blocks@0.1.1-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package react-tinacms-blocks
