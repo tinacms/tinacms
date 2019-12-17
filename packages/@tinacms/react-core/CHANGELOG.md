@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.1-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.1-alpha.0...@tinacms/react-core@0.2.1-alpha.1) (2019-12-17)
+
+
+### Bug Fixes
+
+* **useForm:** allow forms in production ([c4bfebd](https://github.com/tinacms/tinacms/commit/c4bfebd))
+
+
+
+
+
 ## [0.2.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.0...@tinacms/react-core@0.2.1-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package @tinacms/react-core

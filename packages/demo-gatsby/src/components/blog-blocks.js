@@ -17,7 +17,8 @@ limitations under the License.
 */
 import React from "react"
 import { TinaField } from "tinacms"
-import { InlineBlocks } from "react-tinacms-blocks"
+import { InlineBlocks, BlockWrapper, AddBlockMenu } from "react-tinacms-blocks"
+import { PlainTextInput } from "./plain-text-input"
 
 export function BlogBlocks({ form, data }) {
   return (
@@ -25,16 +26,25 @@ export function BlogBlocks({ form, data }) {
       form={form}
       name="rawFrontmatter.blocks"
       data={data}
+      templates={[image, heading]}
       components={BLOCK_COMPONENTS}
-      renderBefore={props => (
-        <>
-          <br />
-          <BlocksActions {...props} />
-        </>
-      )}
+      renderBefore={props => {
+        if (!props.data || props.data.length < 1)
+          return (
+            <div style={{ position: "relative" }}>
+              {/* Todo: handle the default state in InlineBlocks? */}
+              <AddBlockMenu
+                insert={props.insert}
+                index={props.index}
+                templates={props.templates}
+              />
+            </div>
+          )
+      }}
     />
   )
 }
+
 /**
  * Blocks Components
  */
@@ -43,97 +53,36 @@ const BLOCK_COMPONENTS = {
   image: EditableImage,
 }
 
-function BlocksActions({ index, insert, remove, move }) {
-  const hasIndex = index || index === 0
-  return (
-    <>
-      {insert && (
-        <button
-          onClick={() =>
-            insert(
-              { _template: "heading", ...heading.defaultItem },
-              (index || -1) + 1
-            )
-          }
-        >
-          Add Heading
-        </button>
-      )}
-      {insert && (
-        <button
-          onClick={() =>
-            insert(
-              { _template: "image", ...image.defaultItem },
-              (index || -1) + 1
-            )
-          }
-        >
-          Add Image
-        </button>
-      )}
-      {hasIndex && move && (
-        <button onClick={() => move(index, index - 1)} disabled={index === 0}>
-          Up
-        </button>
-      )}
-      {hasIndex && move && (
-        <button onClick={() => move(index, index + 1)}>Down</button>
-      )}
-      {hasIndex && remove && (
-        <button onClick={() => remove(index)}>Remove</button>
-      )}
-    </>
-  )
-}
-
+// Heading Block Component
 function EditableHeading(props) {
   return (
-    <div style={{ border: "5px solid purple" }}>
+    <BlockWrapper {...props}>
       <h1>
         <TinaField
           name={`${props.name}.${props.index}.text`}
-          Component={PlainText}
+          Component={PlainTextInput}
         >
           {props.data.text}
         </TinaField>
       </h1>
-      <BlocksActions
-        {...props}
-        defaultItem={{ _template: "heading", ...heading.defaultItem }}
-      />
-    </div>
+    </BlockWrapper>
   )
 }
 
 // Image Block Component
 function EditableImage(props) {
   return (
-    <p style={{ border: "5px solid green" }}>
-      <TinaField
-        name={`${props.name}.${props.index}.src`}
-        Component={PlainText}
-      />
-      <TinaField
-        name={`${props.name}.${props.index}.alt`}
-        Component={PlainText}
-      />
+    <BlockWrapper {...props}>
       <img {...props.data} />
-      <BlocksActions
-        {...props}
-        defaultItem={{ _template: "image", ...image.defaultItem }}
-      />
-    </p>
+    </BlockWrapper>
   )
 }
 
-function PlainText(props) {
-  return <input style={{ background: "transparent " }} {...props.input} />
-}
-
 /**
- * HEADING BLOCK
+ * HEADING BLOCK TEMPLATE
  */
 const heading = {
+  type: "heading",
   label: "Heading",
   defaultItem: {
     text: "",
@@ -141,14 +90,13 @@ const heading = {
   itemProps: block => ({
     label: `${block.text}`,
   }),
-  fields: [{ name: "text", component: "text", label: "Text" }],
 }
 
 /**
- * IMAGE BLOCK
+ * IMAGE BLOCK TEMPLATE
  */
-// Image Block Template
 const image = {
+  type: "image",
   label: "Image",
   defaultItem: {
     text: "",
