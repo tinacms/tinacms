@@ -16,8 +16,10 @@ limitations under the License.
 
 */
 import * as React from 'react'
+import { Form } from 'tinacms'
 
 export interface BlocksProps {
+  form: Form
   name: string
   data: any[]
   components: {
@@ -25,7 +27,7 @@ export interface BlocksProps {
   }
 }
 
-export function Blocks({ name, data, components }: BlocksProps) {
+export function Blocks({ form, name, data, components }: BlocksProps) {
   data = data || []
   components = components || {}
 
@@ -38,7 +40,7 @@ export function Blocks({ name, data, components }: BlocksProps) {
           return nullOrError('Unrecognized Block Type: ' + data._template)
         }
 
-        return <Component data={data} index={index} name={name} />
+        return <Component form={form} data={data} index={index} name={name} />
       })}
     </>
   )
