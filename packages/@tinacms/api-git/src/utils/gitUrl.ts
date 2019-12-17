@@ -25,7 +25,7 @@ export const getGitSSHUrl = (url: string) => {
     new RegExp(`https:\/\/(.*?@)?(.+?)\/(.*?)(?:\.git)?$`)
   )
   const domain = match && match.length > 2 ? match[2] : ''
-  let usernameRepo = match && match.length > 3 ? match[3] : ''
+  const usernameRepo = match && match.length > 3 ? match[3] : ''
   return `git@${domain}:${usernameRepo}.git`
 }
 
