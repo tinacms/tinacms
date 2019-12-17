@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.2...demo-gatsby@1.4.0) (2019-12-17)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
 # [1.4.0-alpha.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.1...demo-gatsby@1.4.0-alpha.2) (2019-12-17)
 
 
