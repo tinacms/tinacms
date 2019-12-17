@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.1-alpha.0...gatsby-tinacms-json@0.8.1-alpha.1) (2019-12-17)
+
+
+### Bug Fixes
+
+* **typescript:** Corrected path to type definitions ([9e79534](https://github.com/tinacms/tinacms/commit/9e79534))
+
+
+
+
+
 ## [0.8.1-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.0...gatsby-tinacms-json@0.8.1-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package gatsby-tinacms-json
