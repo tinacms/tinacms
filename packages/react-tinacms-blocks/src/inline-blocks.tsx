@@ -43,8 +43,6 @@ export interface BlocksRenderProps {
   templates: BlockTemplate[]
 }
 export interface InlineBlocksProps extends BlocksProps {
-  // TODO: We shouldn't have to pass this in.
-  form: Form
   templates: BlockTemplate[]
   renderBefore(props: BlocksRenderProps): any // TODO: Proper types
 }
@@ -68,7 +66,7 @@ export function InlineBlocks({
   )
   return (
     <TinaField name={name} Component={EditableBlocks}>
-      <Blocks name={name} {...props} />
+      <Blocks name={name} form={form} {...props} />
     </TinaField>
   )
 }
@@ -138,6 +136,7 @@ function EditableBlocks({
 
         return (
           <Component
+            form={form}
             data={data}
             index={index}
             name={name}
