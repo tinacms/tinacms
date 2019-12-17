@@ -27,6 +27,7 @@ import { createUploader } from './upload'
 import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
 import { show } from './show'
 import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
+import atob from 'atob'
 
 export interface GitRouterConfig {
   pathToRepo?: string
@@ -63,14 +64,11 @@ export async function updateRemoteToSSH(pathRoot: string) {
     throw new Error('No origin remote on the given rpeo')
   }
 
-  console.log(`originRemotes: ${JSON.stringify(originRemotes)}`)
-
-  let originURL = originRemotes[0].refs.push
+  const originURL = originRemotes[0].refs.push
 
   if (originURL && !isSSHUrl(originURL)) {
     repo.removeRemote('origin')
     const newRemote = getGitSSHUrl(originURL)
-    console.log(`newRemote ${newRemote}`)
     repo.addRemote('origin', newRemote)
   }
 }
@@ -82,7 +80,10 @@ async function createSSHKey(pathRoot: string) {
     if (!fs.existsSync(parentDir)) {
       fs.mkdirSync(parentDir, { recursive: true })
     }
-    fs.writeFileSync(ssh_path, process.env.SSH_KEY, { mode: 0o600 })
+    fs.writeFileSync(ssh_path, atob(process.env.SSH_KEY), {
+      encoding: 'utf8',
+      mode: 0o600,
+    })
 
     updateRemoteToSSH(pathRoot)
   }

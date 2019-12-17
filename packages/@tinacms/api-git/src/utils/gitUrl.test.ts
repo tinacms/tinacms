@@ -20,9 +20,9 @@ import { getGitSSHUrl } from './gitUrl'
 describe('getGitSSHUrl', () => {
   describe('with ssh url', () => {
     it('returns original ssh url', () => {
-      let input = 'git@bitbucket.org:tinacms/tinacms.git'
+      const input = 'git@bitbucket.org:tinacms/tinacms.git'
 
-      let output = getGitSSHUrl(input)
+      const output = getGitSSHUrl(input)
 
       expect(output).toBe(input)
     })
@@ -30,43 +30,43 @@ describe('getGitSSHUrl', () => {
 
   describe('with http url', () => {
     it('converts bitbucket http url', () => {
-      let input = 'https://bitbucket.org/tinacms/tinacms.git'
+      const input = 'https://bitbucket.org/tinacms/tinacms.git'
 
-      let output = getGitSSHUrl(input)
+      const output = getGitSSHUrl(input)
 
       expect(output).toBe('git@bitbucket.org:tinacms/tinacms.git')
     })
 
     it('converts github http url', () => {
-      let input = 'https://github.com/tinacms/tinacms.git'
+      const input = 'https://github.com/tinacms/tinacms.git'
 
-      let output = getGitSSHUrl(input)
+      const output = getGitSSHUrl(input)
 
       expect(output).toBe('git@github.com:tinacms/tinacms.git')
     })
 
     it('converts gitlab http url', () => {
-      let input = 'https://gitlab.com/tinacms/tinacms.git'
+      const input = 'https://gitlab.com/tinacms/tinacms.git'
 
-      let output = getGitSSHUrl(input)
+      const output = getGitSSHUrl(input)
 
       expect(output).toBe('git@gitlab.com:tinacms/tinacms.git')
     })
 
     it('converts http with auth', () => {
-      let input =
+      const input =
         'https://api-key:fewhuyfgerguyrebrhe@gitlab.com/tinacms/tinacms.git'
 
-      let output = getGitSSHUrl(input)
+      const output = getGitSSHUrl(input)
 
       expect(output).toBe('git@gitlab.com:tinacms/tinacms.git')
     })
 
     it('converts http without .git', () => {
-      let input =
+      const input =
         'https://api-key:fewhuyfgerguyrebrhe@gitlab.com/tinacms/tinacms'
 
-      let output = getGitSSHUrl(input)
+      const output = getGitSSHUrl(input)
 
       expect(output).toBe('git@gitlab.com:tinacms/tinacms.git')
     })

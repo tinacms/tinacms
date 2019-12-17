@@ -50,11 +50,9 @@ export function openRepo(absolutePath: string) {
    *  is required for accessing global config values. (i.e. user.name, user.email)
    */
 
-  const gitCmd = `ssh ${options.join(' ')}`
-  console.log(`gitCmd ${gitCmd}`)
   repo.env({
     ...process.env,
-    GIT_SSH_COMMAND: gitCmd,
+    GIT_SSH_COMMAND: `ssh ${options.join(' ')}`,
   })
 
   return repo
