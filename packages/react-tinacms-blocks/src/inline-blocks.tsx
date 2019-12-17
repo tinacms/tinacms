@@ -25,13 +25,13 @@ import {
   color,
   shadow,
   font,
-} from "@tinacms/styles"
+} from '@tinacms/styles'
 import {
   CloseIcon,
   AddIcon,
   ChevronUpIcon,
   ChevronDownIcon,
-} from "@tinacms/icons"
+} from '@tinacms/icons'
 
 import { Blocks, BlocksProps } from './blocks'
 
@@ -153,8 +153,8 @@ function EditableBlocks({
 }
 
 /*
-** Block Wrapper Component
-*/
+ ** Block Wrapper Component
+ */
 
 interface BlockWrapperProps extends InlineBlocksProps {
   insert(obj: any, index: number): void
@@ -175,7 +175,7 @@ export const BlockWrapper = ({
   children,
   data,
   ...styleProps
-} : BlockWrapperProps) => {
+}: BlockWrapperProps) => {
   const [active, setActive] = React.useState(false)
   const clickHandler = (event: React.MouseEvent) => {
     event.preventDefault()
@@ -185,19 +185,15 @@ export const BlockWrapper = ({
   useEffect(() => {
     const setInactive = () => setActive(false)
 
-    document.addEventListener("mouseup", setInactive, false)
+    document.addEventListener('mouseup', setInactive, false)
 
-    return () => document.removeEventListener("mouseup", setInactive)
+    return () => document.removeEventListener('mouseup', setInactive)
   }, [])
 
   if (!insert) return children
 
   return (
-    <BlockFocusOutline
-      {...styleProps}
-      onClick={clickHandler}
-      active={active}
-    >
+    <BlockFocusOutline {...styleProps} onClick={clickHandler} active={active}>
       <BlocksActions
         insert={insert}
         index={index}
@@ -212,53 +208,55 @@ export const BlockWrapper = ({
 }
 
 /*
-** Add Block Menu Component
-*/
+ ** Add Block Menu Component
+ */
 
-export const AddBlockMenu = styled(({ insert, index, templates, ...styleProps }) => {
-  const [open, setOpen] = React.useState(false)
+export const AddBlockMenu = styled(
+  ({ insert, index, templates, ...styleProps }) => {
+    const [open, setOpen] = React.useState(false)
 
-  const clickHandler = (event: React.MouseEvent) => {
-    event.preventDefault()
-    setOpen(open => !open)
+    const clickHandler = (event: React.MouseEvent) => {
+      event.preventDefault()
+      setOpen(open => !open)
+    }
+
+    useEffect(() => {
+      const setInactive = () => setOpen(false)
+      document.addEventListener('mouseup', setInactive, false)
+      return () => document.removeEventListener('mouseup', setInactive)
+    }, [])
+
+    if (!insert) return null
+
+    templates = templates || []
+
+    return (
+      <div open={open} {...styleProps}>
+        <AddBlockButton onClick={clickHandler} open={open} primary>
+          <AddIcon /> Add Block
+        </AddBlockButton>
+        <BlocksMenu open={open}>
+          {templates.map(({ label, type, defaultItem }: BlockTemplate) => (
+            <BlockOption
+              onClick={() => {
+                insert({ _template: type, ...defaultItem }, (index || -1) + 1)
+                setOpen(false)
+              }}
+            >
+              {label}
+            </BlockOption>
+          ))}
+          {/* TODO: No templates? Link to docs or something. */}
+        </BlocksMenu>
+      </div>
+    )
   }
-
-  useEffect(() => {
-    const setInactive = () => setOpen(false)
-    document.addEventListener("mouseup", setInactive, false)
-    return () => document.removeEventListener("mouseup", setInactive)
-  }, [])
-
-  if (!insert) return null
-
-  templates = templates || []
-
-  return (
-    <div open={open} {...styleProps}>
-      <AddBlockButton onClick={clickHandler} open={open} primary>
-        <AddIcon /> Add Block
-      </AddBlockButton>
-      <BlocksMenu open={open}>
-        {templates.map(({ label, type, defaultItem } : BlockTemplate) => (
-          <BlockOption
-            onClick={() => {
-              insert({ _template: type, ...defaultItem }, (index || -1) + 1)
-              setOpen(false)
-            }}
-          >
-            {label}
-          </BlockOption>
-        ))}
-        {/* TODO: No templates? Link to docs or something. */}
-      </BlocksMenu>
-    </div>
-  )
-})`
+)`
   margin-bottom: 1rem;
 `
 
 const AddBlockButton = styled(TinaButton)`
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   display: flex;
   align-items: center;
   margin: 0 auto;
@@ -301,7 +299,7 @@ const BlocksMenu = styled.div<BlocksUIProps>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 50% 0;
-  box-shadow: ${shadow("big")};
+  box-shadow: ${shadow('big')};
   background-color: white;
   overflow: hidden;
   z-index: 100;
@@ -315,7 +313,7 @@ const BlocksMenu = styled.div<BlocksUIProps>`
 `
 
 const BlockOption = styled.button`
-  font-family: "Inter", sans-serif;
+  font-family: 'Inter', sans-serif;
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};
@@ -411,7 +409,7 @@ const BlocksActions = styled(
   transition-delay: 300ms;
 
   &:after {
-    content: "";
+    content: '';
     display: block;
     position: absolute;
     top: 0;
@@ -456,7 +454,7 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
   position: relative;
 
   &:after {
-    content: "";
+    content: '';
     display: block;
     position: absolute;
     left: -1rem;
@@ -490,7 +488,7 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
     margin: 0;
 
     &:after {
-      content: "";
+      content: '';
       display: block;
       position: absolute;
       bottom: 0;
@@ -504,4 +502,3 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
 
   ${props => props.active && BlockFocusOutlineVisible};
 `
-
