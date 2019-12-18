@@ -28,6 +28,7 @@ const TINA_TEAMS_API_URL =
   process.env.TINA_TEAMS_API_URL || 'https://api.tina.io/v1'
 
 const AUTH_COOKIE_KEY = 'tina-auth'
+const TINA_TEAMS_NAMESPACE = process.env.TINA_TEAMS_NAMESPACE
 
 interface TinaTeamsUser {
   iss: string
@@ -113,9 +114,19 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
 }
 
 export function authorize(req: any, res: any, next: any) {
+  const missingNamespaceError = path.join(
+    __dirname + '/../public/missing-namespace.html'
+  )
+  if (!TINA_TEAMS_NAMESPACE) {
+    res.status(422)
+    res.sendFile(missingNamespaceError)
+  }
+
   const unauthorizedView = path.join(__dirname + '/../public/unauthorized.html')
   fetch(
-    `${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(req.get('host'))}/access`,
+    `${TINA_TEAMS_API_URL}/sites/${TINA_TEAMS_NAMESPACE}/${encodeURIComponent(
+      req.get('host')
+    )}/access`,
     {
       method: 'GET',
       headers: { Authorization: 'Bearer ' + req.cookies[AUTH_COOKIE_KEY] },
