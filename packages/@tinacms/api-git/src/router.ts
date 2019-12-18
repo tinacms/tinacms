@@ -24,8 +24,10 @@ import * as express from 'express'
 
 import { commit } from './commit'
 import { createUploader } from './upload'
-import { openRepo } from './open-repo'
+import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
 import { show } from './show'
+import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
+import atob from 'atob'
 
 export interface GitRouterConfig {
   pathToRepo?: string
@@ -52,6 +54,41 @@ export function checkFilePathIsInRepo(
   }
 }
 
+// Ensure remote URL is ssh
+export async function updateRemoteToSSH(pathRoot: string) {
+  const repo = await openRepo(pathRoot)
+  const remotes = await repo.getRemotes(true)
+  const originRemotes = remotes.filter((r: any) => r.name == 'origin')
+
+  if (!originRemotes.length) {
+    throw new Error('No origin remote on the given rpeo')
+  }
+
+  const originURL = originRemotes[0].refs.push
+
+  if (originURL && !isSSHUrl(originURL)) {
+    repo.removeRemote('origin')
+    const newRemote = getGitSSHUrl(originURL)
+    repo.addRemote('origin', newRemote)
+  }
+}
+
+async function createSSHKey(pathRoot: string) {
+  if (process.env.SSH_KEY) {
+    const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
+    const parentDir = path.dirname(ssh_path)
+    if (!fs.existsSync(parentDir)) {
+      fs.mkdirSync(parentDir, { recursive: true })
+    }
+    fs.writeFileSync(ssh_path, atob(process.env.SSH_KEY), {
+      encoding: 'utf8',
+      mode: 0o600,
+    })
+
+    updateRemoteToSSH(pathRoot)
+  }
+}
+
 export function router(config: GitRouterConfig = {}) {
   const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
   const CONTENT_REL_PATH = config.pathToContent || ''
@@ -66,6 +103,8 @@ export function router(config: GitRouterConfig = {}) {
 
   const router = express.Router()
   router.use(express.json())
+
+  createSSHKey(REPO_ABSOLUTE_PATH)
 
   router.delete('/:relPath', (req: any, res: any) => {
     const user = req.user || {}
