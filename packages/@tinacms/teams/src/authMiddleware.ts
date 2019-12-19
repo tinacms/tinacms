@@ -126,7 +126,7 @@ export function authorize(req: any, res: any, next: any) {
     )
     fetch(
       `${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(
-        TINA_TEAMS_NAMESPACE || ''
+        TINA_TEAMS_NAMESPACE
       )}/${encodeURIComponent(req.get('host'))}/access`,
       {
         method: 'GET',
