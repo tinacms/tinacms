@@ -56,4 +56,13 @@ Alternatively, you can use .env files:
 REQUIRE_AUTH=true
 ```
 
+You will also need to set the `TINA_TEAMS_NAMESPACE` environment variable. This will be the email of the user who owns this site within Tina Teams
+
+**.env.staging**
+
+```
+REQUIRE_AUTH=true
+TINA_TEAMS_NAMESPACE=james@forestry.io
+```
+
 [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/h_46/v1573166832/Tina_CMS_Wordmark.png)](https://tinacms.org)

@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.4.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.2...demo-gatsby@1.4.0) (2019-12-17)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+# [1.4.0-alpha.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.1...demo-gatsby@1.4.0-alpha.2) (2019-12-17)
+
+
+### Bug Fixes
+
+* always show add block when focused ([1b3eaa1](https://github.com/gatsbyjs/gatsby-starter-blog/commit/1b3eaa1))
+* improve add block menu psuedo hover helper ([29e16ea](https://github.com/gatsbyjs/gatsby-starter-blog/commit/29e16ea))
+
+
+### Features
+
+* show blocks menu when there's no blocks ([ff1848c](https://github.com/gatsbyjs/gatsby-starter-blog/commit/ff1848c))
+
+
+
+
+
 # [1.4.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.0...demo-gatsby@1.4.0-alpha.1) (2019-12-06)
 
 **Note:** Version bump only for package demo-gatsby
