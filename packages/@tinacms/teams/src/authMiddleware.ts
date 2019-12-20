@@ -28,6 +28,7 @@ const TINA_TEAMS_API_URL =
   process.env.TINA_TEAMS_API_URL || 'https://api.tina.io/v1'
 
 const AUTH_COOKIE_KEY = 'tina-auth'
+const TINA_TEAMS_NAMESPACE = process.env.TINA_TEAMS_NAMESPACE
 
 interface TinaTeamsUser {
   iss: string
@@ -113,26 +114,38 @@ export function redirectNonAuthenticated(req: any, res: any, next: any) {
 }
 
 export function authorize(req: any, res: any, next: any) {
-  const unauthorizedView = path.join(__dirname + '/../public/unauthorized.html')
-  fetch(
-    `${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(req.get('host'))}/access`,
-    {
-      method: 'GET',
-      headers: { Authorization: 'Bearer ' + req.cookies[AUTH_COOKIE_KEY] },
-    }
-  )
-    .then((result: any) => {
-      if (result.ok) {
-        next()
-      } else {
+  if (!TINA_TEAMS_NAMESPACE) {
+    const missingNamespaceError = path.join(
+      __dirname + '/../public/missing-namespace.html'
+    )
+    res.status(422)
+    res.sendFile(missingNamespaceError)
+  } else {
+    const unauthorizedView = path.join(
+      __dirname + '/../public/unauthorized.html'
+    )
+    fetch(
+      `${TINA_TEAMS_API_URL}/sites/${encodeURIComponent(
+        TINA_TEAMS_NAMESPACE
+      )}/${encodeURIComponent(req.get('host'))}/access`,
+      {
+        method: 'GET',
+        headers: { Authorization: 'Bearer ' + req.cookies[AUTH_COOKIE_KEY] },
+      }
+    )
+      .then((result: any) => {
+        if (result.ok) {
+          next()
+        } else {
+          res.status(401)
+          res.sendFile(unauthorizedView)
+        }
+      })
+      .catch(() => {
         res.status(401)
         res.sendFile(unauthorizedView)
-      }
-    })
-    .catch(() => {
-      res.status(401)
-      res.sendFile(unauthorizedView)
-    })
+      })
+  }
 }
 
 function removeTrailingSlash(url: string) {

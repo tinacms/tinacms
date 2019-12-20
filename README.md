@@ -6,6 +6,16 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-35-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
+## :tada::confetti_ball: Happy Holidays :confetti_ball::tada:
+
+The holidays are here again! 
+
+The TinaCMS core team will be taking some much earned time off for the next couple weeks.
+
+The whole team will be back on January 6th. Until then, we may be a bit slower than usual responding to Issues and Pull Requests.
+
+Thanks for your patience :heart:
+
 ## Getting Started
 
 - [Website](https://tinacms.org/)
