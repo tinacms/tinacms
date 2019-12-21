@@ -19,7 +19,7 @@ gallery:
       social:
         - {}
 draft: true
-cool: Tina rules!
+cool: How cool!
 ---
 
 # TootToot
