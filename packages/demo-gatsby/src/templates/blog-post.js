@@ -25,7 +25,7 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaField, Wysiwyg, Toggle } from "tinacms"
+import { TinaField, Wysiwyg, Toggle, Select } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
 
 const get = require("lodash.get")
@@ -33,12 +33,9 @@ const get = require("lodash.get")
 const PlainText = props => (
   <input style={{ background: "transparent " }} {...props.input} />
 )
-const MyToggle = props => (
-  <>
-    <label>Draft: </label>
-    <Toggle {...props} />
-  </>
-)
+const MyToggle = props => <Toggle {...props} />
+
+const MySelect = props => <Select {...props} />
 
 function BlogPostTemplate(props) {
   const form = props.form
@@ -113,14 +110,24 @@ function BlogPostTemplate(props) {
         <button onClick={() => setIsEditing(p => !p)}>
           {isEditing ? "Stop Editing" : "Start Editing"}
         </button>
+
         <TinaField
           name="rawFrontmatter.draft"
           Component={MyToggle}
-          type="checkbox"
+          type="toggle"
         >
           {post.frontmatter.draft && (
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
+        </TinaField><br />
+
+        <TinaField
+          name="rawFrontmatter.cool"
+          Component={MySelect}
+          type="select"
+        >
+          <p>{post.frontmatter.cool}</p>
+        
         </TinaField>
         <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
@@ -249,6 +256,12 @@ const BlogPostForm = {
       component: "toggle",
     },
     {
+      label: "New Shiny Select",
+      name: "frontmatter.cool",
+      component: "select",
+      values: ["Tina rules!", "Love this!", "How cool!"]
+    },
+    {
       label: "Date",
       name: "frontmatter.date",
       component: "date",
@@ -319,6 +332,7 @@ export const pageQuery = graphql`
         description
         heading_color
         draft
+        cool
         thumbnail {
           childImageSharp {
             fluid {
