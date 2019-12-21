@@ -25,7 +25,7 @@ interface SelectFieldProps {
   label: string
   name: string
   component: string
-  values: string[]
+  options: string[]
 }
 
 export interface SelectProps {
@@ -48,8 +48,8 @@ export const Select: React.FC<SelectProps> = ({ input, field }) => {
         onChange={handleChange}
         {...input}
       >
-        {field.values ? (
-          field.values.map(option => (
+        {field.options ? (
+          field.options.map(option => (
             <option value={option} key={option}>
               {option}
             </option>

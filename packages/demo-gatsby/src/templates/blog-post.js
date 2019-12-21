@@ -259,7 +259,7 @@ const BlogPostForm = {
       label: "New Shiny Select",
       name: "frontmatter.cool",
       component: "select",
-      values: ["Tina rules!", "Love this!", "How cool!"]
+      options: ["Tina rules!", "Love this!", "How cool!"]
     },
     {
       label: "Date",
