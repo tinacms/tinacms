@@ -17,8 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useState } from 'react'
-// import { color, radius } from '@tinacms/styles'
 import styled from 'styled-components'
 
 interface SelectFieldProps {
@@ -33,23 +31,22 @@ export interface SelectProps {
   input: any
   field: SelectFieldProps
   disabled?: boolean
+  options?: string[]
 }
 
-export const Select: React.FC<SelectProps> = ({ input, field }) => {
-  const [selectValue, setSelectValue] = useState(input.value)
-  const handleChange = (e: React.ChangeEvent<HTMLSelectElement>) =>
-    setSelectValue(e.currentTarget.value)
+export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
+  const selectOptions = options || field.options
 
   return (
     <SelectElement>
       <select
         id={input.name}
-        value={selectValue}
-        onChange={handleChange}
+        value={input.value}
+        onChange={input.onChange}
         {...input}
       >
-        {field.options ? (
-          field.options.map(option => (
+        {selectOptions ? (
+          selectOptions.map(option => (
             <option value={option} key={option}>
               {option}
             </option>
