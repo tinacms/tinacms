@@ -1,9 +1,13 @@
 ---
-title: A new Gatsby starter for Tina
-date: '2019-09-17T22:00:00.000Z'
+title: sdfsdf sdfsdf
+date: '2019-12-02T00:00:00.000Z'
 heading_color: pink
 description: 'My new post. '
 blocks:
+  - _template: image
+    text: ''
+  - _template: heading
+    text: ''
   - _template: heading
     text: My first Tina post
   - _template: image
@@ -18,9 +22,9 @@ gallery:
       name: ''
       social:
         - {}
-draft: true
+draft: false
 cool: How cool!
-testNumber: 2
+testNumber: '34.34'
 ---
 
 # TootToot
