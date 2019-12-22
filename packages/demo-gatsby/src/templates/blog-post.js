@@ -25,7 +25,7 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaField, Wysiwyg, Toggle, Select } from "tinacms"
+import { TinaField, Wysiwyg, Toggle, Select, Number } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
 
 const get = require("lodash.get")
@@ -35,7 +35,17 @@ const PlainText = props => (
 )
 const MyToggle = props => <Toggle {...props} />
 
-const MySelect = props => <Select {...props} />
+const MySelect = props => {
+  console.log("MySelectProps: ", props)
+
+  return <Select {...props} />
+} 
+
+// const MyNumber = props => {
+// console.log("props: ", props)
+// return <Number {...props} />
+
+// }
 
 function BlogPostTemplate(props) {
   const form = props.form
@@ -125,10 +135,18 @@ function BlogPostTemplate(props) {
           name="rawFrontmatter.cool"
           Component={MySelect}
           type="select"
+          options={[100, "Love this!", "How cool!"]}
         >
-          <p>{post.frontmatter.cool}</p>
-        
+          <p>{post.frontmatter.cool}</p>        
         </TinaField>
+        {/* <TinaField
+          name="rawFrontmatter.testNumber"
+          Component={Number}
+          type="number"
+        >
+          <p>Number: {post.frontmatter.testNumber}</p>
+            {console.log(typeof post.frontmatter.testNumber)}
+        </TinaField> */}
         <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
@@ -259,7 +277,13 @@ const BlogPostForm = {
       label: "New Shiny Select",
       name: "frontmatter.cool",
       component: "select",
-      options: ["Tina rules!", "Love this!", "How cool!"]
+      options: [100, "Love this!", "How cool!"]
+    },
+    {
+      label: "Testing Number Component",
+      name: "frontmatter.testNumber",
+      component: "number",
+      steps: 3
     },
     {
       label: "Date",
@@ -333,6 +357,7 @@ export const pageQuery = graphql`
         heading_color
         draft
         cool
+        testNumber
         thumbnail {
           childImageSharp {
             fluid {
