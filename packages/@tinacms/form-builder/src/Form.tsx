@@ -69,10 +69,11 @@ export function TinaField({
 }: TinaFieldsProps) {
   const isEditing = useContext(EditingContext)
   if (!isEditing) return children || null
+
   return (
     <Field {...fieldProps}>
       {({ input, meta }) => {
-        return <Component input={input} meta={meta} />
+        return <Component input={input} meta={meta} {...fieldProps} />
       }}
     </Field>
   )
