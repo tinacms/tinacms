@@ -20,6 +20,7 @@ gallery:
         - {}
 draft: true
 cool: How cool!
+testNumber: 2
 ---
 
 # TootToot
