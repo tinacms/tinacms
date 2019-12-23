@@ -16,13 +16,13 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { NumberInput } from '@tinacms/fields'
+
+export const NumberField = wrapFieldsWithMeta(NumberInput)
+
+export default {
+  name: 'number',
+  type: 'number',
+  Component: NumberField,
+}

@@ -16,13 +16,29 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+import * as React from 'react'
+
+interface NumberFieldProps {
+  label: string
+  name: string
+  component: string
+  steps: number | string
+}
+
+export interface NumberProps {
+  name: string
+  input: any
+  field: NumberFieldProps
+  disabled?: boolean
+  steps: number | string
+}
+
+export const NumberInput: React.FC<NumberProps> = ({ input, field, steps }) => (
+  <input
+    type="number"
+    step={steps || field.steps}
+    value={input.value}
+    onChange={input.onChange}
+    {...input}
+  />
+)
