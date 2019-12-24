@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
+import { Dismissible } from 'react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
 
 import styled, { keyframes } from 'styled-components'
@@ -135,6 +136,7 @@ interface Props {
   userColors: string[]
   widget?: 'sketch' | 'block'
   input: WrappedFieldProps['input']
+  frame: any
 }
 
 const nullColor = 'transparent'
@@ -190,6 +192,7 @@ export const ColorPicker: React.FC<Props> = ({
   userColors = presetColors,
   widget = 'sketch',
   input,
+  frame,
 }) => {
   const Widget = WIDGETS[widget]
   if (!Widget) throw new Error('You must specify a widget type.')
@@ -200,8 +203,6 @@ export const ColorPicker: React.FC<Props> = ({
   const getColorRGBA = input.value
     ? ColorFormatter[getColorFormat].parse(input.value)
     : null
-  const handleClick = () => setDisplayColorPicker(!displayColorPicker)
-  const handleClose = () => setDisplayColorPicker(false)
 
   const handleChange = (pickerColor: any) => {
     const color = (pickerColor.hex === nullColor
@@ -215,13 +216,19 @@ export const ColorPicker: React.FC<Props> = ({
   return (
     <>
       <Swatch
-        onClick={handleClick}
+        onClick={() => setDisplayColorPicker(!displayColorPicker)}
         colorRGBA={getColorRGBA}
         colorFormat={getColorFormat}
       />
       {displayColorPicker && (
-        <>
-          <Popover>
+        <Popover>
+          <Dismissible
+            click
+            escape
+            disabled={!displayColorPicker}
+            onDismiss={() => setDisplayColorPicker(false)}
+            document={frame.document}
+          >
             <Widget
               presetColors={[...userColors, nullColor]}
               color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
@@ -229,9 +236,8 @@ export const ColorPicker: React.FC<Props> = ({
               disableAlpha={true}
               width={'240px'}
             />
-          </Popover>
-          <Cover onClick={handleClose} />
-        </>
+          </Dismissible>
+        </Popover>
       )}
     </>
   )
