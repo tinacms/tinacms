@@ -99,12 +99,10 @@ export const Dismissible: React.FC<Props> = ({
     }
     // Clean up event listeners on unmount
     return () => {
-      documents.forEach(document =>
+      documents.forEach(document => {
         document.body.removeEventListener('click', handleDocumentClick)
-      )
-      documents.forEach(document =>
         document.removeEventListener('keydown', handleEscape)
-      )
+      })
     }
   })
 
