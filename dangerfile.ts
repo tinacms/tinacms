@@ -130,7 +130,7 @@ Update Docs for tinacms#${danger.github.pr.number}
   )}&body=${updateDocBody(changes)}">Create Issue</a>
 `)
 
-const updateDocTitle = (chagnes: [string, Dep][]) =>
+const updateDocTitle = (changes: [string, Dep][]) =>
   encodeURIComponent(`Update Docs for tinacms#${danger.github.pr.number}`)
 
 const updateDocBody = (changes: [string, Dep][]) =>
