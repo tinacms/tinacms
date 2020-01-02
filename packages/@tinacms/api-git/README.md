@@ -59,4 +59,4 @@ The following environment variables can be configured:
 ```
 
 - `GIT_REMOTE`: Git remote where to push/pull from.
-- `SSH_KEY`: Base64-encoded ssh key (with write access).
+- `SSH_KEY`: Base64-encoded SSH key (with write access).
