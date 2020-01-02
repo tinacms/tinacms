@@ -35,7 +35,7 @@ exports.onClientEntry = () => {
 const ERROR_TINACMS_NOT_FOUND = `\`window.tinacms\` not found
 
 1. Make sure to add \`gatsby-plugin-tinacms\` to your \`gatsby-config.js\`
-2. Make sure \`gatsby-tinamcms-git\` is a sub-plugin of \`gatsby-plugin-tinacms\`
+2. Make sure \`gatsby-tinacms-git\` is a sub-plugin of \`gatsby-plugin-tinacms\`
 
 {
   resolve: "gatsby-plugin-tinacms",
