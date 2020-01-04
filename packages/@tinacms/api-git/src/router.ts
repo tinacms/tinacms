@@ -95,7 +95,7 @@ export function router(config: GitRouterConfig = {}) {
   const CONTENT_ABSOLUTE_PATH = path.join(REPO_ABSOLUTE_PATH, CONTENT_REL_PATH)
   const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
   const DEFAULT_COMMIT_MESSAGE =
-    config.defaultCommitMessage || 'Update from Tina'
+    config.defaultCommitMessage || 'Edited with TinaCMS'
   const PUSH_ON_COMMIT =
     typeof config.pushOnCommit === 'boolean' ? config.pushOnCommit : true
 
