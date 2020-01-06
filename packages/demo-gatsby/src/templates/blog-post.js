@@ -353,7 +353,6 @@ export const pageQuery = graphql`
         heading_color
         draft
         cool
-        testNumber
         thumbnail {
           childImageSharp {
             fluid {
