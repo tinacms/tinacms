@@ -1,7 +1,13 @@
 ---
+<<<<<<< HEAD
 title: sdfsdf sdfsdf
 date: '2019-12-02T00:00:00.000Z'
 heading_color: pink
+=======
+title: A new Gatsby starter for Tina
+date: '2019-09-18T03:00:00.000Z'
+heading_color: '#FF9A9A'
+>>>>>>> master
 description: 'My new post. '
 blocks:
   - _template: image

@@ -352,6 +352,33 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "chriswillsflannery",
+      "name": "Chris Flannery",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/6463453?v=4",
+      "profile": "https://github.com/chriswillsflannery",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "JeffersonBledsoe",
+      "name": "Jefferson Bledsoe",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/30210785?v=4",
+      "profile": "https://github.com/JeffersonBledsoe",
+      "contributions": [
+        "test"
+      ]
+    },
+    {
+      "login": "kenniaa",
+      "name": "Kenia",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14225265?v=4",
+      "profile": "https://github.com/kenniaa",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.0-alpha.0...tinacms@0.11.0) (2019-12-17)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+# [0.11.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.10.1-alpha.0...tinacms@0.11.0-alpha.0) (2019-12-17)
+
+
+### Features
+
+* allow user to user enter/return key to create new blog entry ([d850cfb](https://github.com/tinacms/tinacms/commit/d850cfb))
+* **Blocks:** have a "type" string ([19008ff](https://github.com/tinacms/tinacms/commit/19008ff))
+
+
+
+
+
 ## [0.10.1-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.10.0...tinacms@0.10.1-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package tinacms
