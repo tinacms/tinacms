@@ -38,38 +38,38 @@ import {
   font,
   timing,
 } from '@tinacms/styles'
-import {
-  SIDEBAR_WIDTH,
-  TOGGLE_WIDTH,
-  Z_INDEX,
-  SIDEBAR_HEADER_HEIGHT,
-} from '../../Globals'
+import { TOGGLE_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useSubscribable, useCMS } from '../../react-tinacms'
 
-export const Sidebar = () => {
+export const Sidebar = (props: any) => {
   const cms = useCMS()
   const sidebar = useSidebar()
+  const container: any = React.useRef()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <SidebarContainer open={sidebar.isOpen}>
+    <SidebarContainer
+      ref={container}
+      open={sidebar.isOpen}
+      currentWidth={sidebar.width}
+    >
       <StyledFrame
         id="sidebar-frame"
         frameStyles={{
           position: 'absolute',
           left: '0',
           top: '0',
-          width: SIDEBAR_WIDTH + 8 + 'px',
+          width: '100%',
           height: '100%',
           margin: '0',
           padding: '0',
           border: '0',
-          pointerEvents: sidebar.isOpen ? 'all' : 'none',
+          pointerEvents: (sidebar.isOpen || !props.isResizing) ? 'all' : 'none',
         }}
       >
         <SidebarWrapper open={sidebar.isOpen}>
@@ -184,7 +184,7 @@ const SidebarToggle = (sidebar: any) => {
       id="sidebar-frame"
       frameStyles={{
         position: 'absolute',
-        left: SIDEBAR_WIDTH + 'px',
+        left: sidebar.width + 'px',
         bottom: '32px',
         width: '56px',
         height: '64px',
@@ -332,6 +332,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
 `
 
 const MenuWrapper = styled.div`
+resize: both;
   position: absolute;
   left: 0;
   top: 0;
@@ -354,7 +355,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   top: 0;
   left: 0;
   height: 100%;
-  width: ${SIDEBAR_WIDTH}px;
+  width: 100%;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: ${padding()};
@@ -416,7 +417,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  width: ${SIDEBAR_WIDTH}px;
+  width: calc(100% - ${TOGGLE_WIDTH}px);
   overflow: visible;
   height: 100%;
   left: 0;
@@ -445,21 +446,21 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   }
 `
 
-const SidebarContainer = styled.div<{ open: boolean }>`
+const SidebarContainer = styled.div<{ open: boolean; currentWidth: number }>`
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
   display: block !important;
-  background: transparent !important;
   height: 100% !important;
-  width: ${SIDEBAR_WIDTH + TOGGLE_WIDTH}px !important;
+  background: transparent !important;
+  width: ${p => p.currentWidth + TOGGLE_WIDTH}px;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
   z-index: ${Z_INDEX} !important;
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
   transform: translate3d(
-    ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH + 'px')},
+    ${p => (p.open ? '0' : '-' + p.currentWidth + 'px')},
     0,
     0
   ) !important;

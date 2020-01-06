@@ -25,6 +25,7 @@ import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
+import { ResizerBar } from './ResizerBar'
 
 const merge = require('lodash.merge')
 
@@ -45,12 +46,14 @@ export const Tina: React.FC<TinaProps> = ({
   theme: themeOverrides,
 }) => {
   const [isOpen, setIsOpen] = React.useState(false)
+  const [width, setWidth] = React.useState(SIDEBAR_WIDTH)
 
   const props = {
     isOpen,
     setIsOpen,
     position,
     hidden,
+    width,
   }
 
   const theme: ThemeProps['theme'] = React.useMemo(
@@ -63,7 +66,13 @@ export const Tina: React.FC<TinaProps> = ({
   return (
     <CMSContext.Provider value={cms}>
       <SidebarContext.Provider value={props}>
-        <SiteWrapper open={isOpen} position={position}>
+        <ResizerBar
+          resizerBarWidth={10}
+          open={isOpen}
+          sideBarWidth={width}
+          setSideBarWidth={setWidth}
+        />
+        <SiteWrapper open={isOpen} position={position} width={width}>
           {children}
         </SiteWrapper>
         {!hidden && (
@@ -80,7 +89,11 @@ export const Tina: React.FC<TinaProps> = ({
   )
 }
 
-const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
+const SiteWrapper = styled.div<{
+  open: boolean
+  position: SidebarPosition
+  width: number
+}>`
   opacity: 1 !important;
   background-color: transparent !important;
   background-image: none !important;
@@ -91,8 +104,8 @@ const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
   height: 100% !important;
   width: ${props =>
     isFixed(props.position) && props.open
-      ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
-      : '100%'} !important;
+      ? 'calc(100% - ' + props.width + 'px)'
+      : '100%'};
   transition: all ${props => (props.open ? 150 : 200)}ms ease-out !important;
 `
 

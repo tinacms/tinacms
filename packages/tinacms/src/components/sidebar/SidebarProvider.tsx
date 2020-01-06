@@ -20,6 +20,7 @@ import * as React from 'react'
 
 interface SidebarProps {
   isOpen: boolean
+  width: number
   setIsOpen: (_isOpen: boolean) => void
 }
 
