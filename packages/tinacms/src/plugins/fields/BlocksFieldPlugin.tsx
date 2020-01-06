@@ -42,13 +42,13 @@ import { useFrameContext } from '../../components/SyledFrame'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
-  defaultItem: object
   templates: {
     [key: string]: BlockTemplate
   }
 }
 
 export interface BlockTemplate {
+  type: string
   label: string
   defaultItem?: object | (() => object)
   key: string

@@ -16,9 +16,10 @@ limitations under the License.
 
 */
 
-import React from "react"
+import React, { useEffect } from "react"
 import { Link, graphql } from "gatsby"
 
+import styled from "styled-components"
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -27,9 +28,12 @@ import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle, Select, Number } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
+import { EditToggle } from "../components/edit-toggle"
+import { PlainTextInput } from "../components/plain-text-input"
 
 const get = require("lodash.get")
 
+<<<<<<< HEAD
 const PlainText = props => (
   <input style={{ background: "transparent " }} {...props.input} />
 )
@@ -46,6 +50,22 @@ const MySelect = props => {
 // return <Number {...props} />
 
 // }
+=======
+const MyToggle = styled((props, ...styleProps) => (
+  <div {...styleProps}>
+    <label>Date</label>
+    <Toggle {...props} />
+  </div>
+))`
+  display: none;
+  display: flex;
+  flex-direction: column;
+
+  label {
+    font-weight: 600;
+  }
+`
+>>>>>>> master
 
 function BlogPostTemplate(props) {
   const form = props.form
@@ -57,6 +77,7 @@ function BlogPostTemplate(props) {
 
   return (
     <Layout location={props.location} title={siteTitle}>
+      <EditToggle isEditing={isEditing} setIsEditing={setIsEditing} />
       <SEO
         title={post.frontmatter.title}
         description={post.frontmatter.description || post.excerpt}
@@ -81,7 +102,7 @@ function BlogPostTemplate(props) {
               marginTop: rhythm(2),
             }}
           >
-            <TinaField name="rawFrontmatter.title" Component={PlainText}>
+            <TinaField name="rawFrontmatter.title" Component={PlainTextInput}>
               {post.frontmatter.title}{" "}
             </TinaField>
           </h1>
@@ -105,6 +126,16 @@ function BlogPostTemplate(props) {
               <span style={{ fontWeight: "600" }}>Date</span>
               <p>{post.frontmatter.date}</p>
             </div>
+
+            <TinaField
+              name="rawFrontmatter.draft"
+              Component={MyToggle}
+              type="checkbox"
+            >
+              {post.frontmatter.draft && (
+                <small style={{ color: "fuchsia" }}>Draft</small>
+              )}
+            </TinaField>
           </div>
         </div>
       </div>
@@ -117,6 +148,7 @@ function BlogPostTemplate(props) {
           padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
         }}
       >
+<<<<<<< HEAD
         <button onClick={() => setIsEditing(p => !p)}>
           {isEditing ? "Stop Editing" : "Start Editing"}
         </button>
@@ -147,6 +179,8 @@ function BlogPostTemplate(props) {
           <p>Number: {post.frontmatter.testNumber}</p>
             {console.log(typeof post.frontmatter.testNumber)}
         </TinaField> */}
+=======
+>>>>>>> master
         <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
@@ -299,6 +333,8 @@ const BlogPostForm = {
       label: "Heading color",
       name: "frontmatter.heading_color",
       component: "color",
+      colors: ["#ff0000", "#ffff00", "#00ff00", "#0000ff"],
+      widget: "sketch"
     },
     {
       name: "frontmatter.thumbnail",
