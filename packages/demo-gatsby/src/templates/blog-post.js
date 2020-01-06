@@ -37,7 +37,7 @@ const PlainText = props => (
   <input style={{ background: "transparent " }} {...props.input} />
 )
 const MyToggle = props => <Toggle {...props} />
-const MySelect = props =>  <Select {...props} />
+const MySelect = props => <Select {...props} />
 
 function BlogPostTemplate(props) {
   const form = props.form
@@ -132,14 +132,15 @@ function BlogPostTemplate(props) {
           {post.frontmatter.draft && (
             <small style={{ color: "fuchsia" }}>Draft</small>
           )}
-        </TinaField><br />
+        </TinaField>
+        <br />
 
         <TinaField
           name="rawFrontmatter.cool"
           Component={MySelect}
           options={[100, "Love this!", "How cool!"]}
         >
-          <p>{post.frontmatter.cool}</p>        
+          <p>{post.frontmatter.cool}</p>
         </TinaField>
         <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
@@ -271,13 +272,13 @@ const BlogPostForm = {
       label: "New Shiny Select",
       name: "frontmatter.cool",
       component: "select",
-      options: [100, "Love this!", "How cool!"]
+      options: [100, "Love this!", "How cool!"],
     },
     {
       label: "Testing Number Component",
       name: "frontmatter.testNumber",
       component: "number",
-      steps: 3
+      steps: 3,
     },
     {
       label: "Date",
@@ -294,7 +295,7 @@ const BlogPostForm = {
       name: "frontmatter.heading_color",
       component: "color",
       colors: ["#ff0000", "#ffff00", "#00ff00", "#0000ff"],
-      widget: "sketch"
+      widget: "sketch",
     },
     {
       name: "frontmatter.thumbnail",
@@ -352,7 +353,6 @@ export const pageQuery = graphql`
         description
         heading_color
         draft
-        cool
         thumbnail {
           childImageSharp {
             fluid {
