@@ -61,31 +61,31 @@ export const Dismissible: React.FC<Props> = ({
     ? [document, customDocument]
     : [document]
 
-  const stopAndPrevent = (event: MouseEvent | KeyboardEvent) => {
-    event.stopPropagation()
-    event.stopImmediatePropagation()
-    event.preventDefault()
-  }
-
-  const handleDocumentClick = (event: MouseEvent) => {
-    if (disabled) return
-
-    if (!area.current.contains(event.target)) {
-      onDismiss(event)
-      stopAndPrevent(event)
-    }
-  }
-
-  const handleEscape = (event: KeyboardEvent) => {
-    if (disabled) return
-
-    if (event.keyCode == 27) {
-      onDismiss(event)
-      stopAndPrevent(event)
-    }
-  }
-
   useEffect(() => {
+    const stopAndPrevent = (event: MouseEvent | KeyboardEvent) => {
+      event.stopPropagation()
+      event.stopImmediatePropagation()
+      event.preventDefault()
+    }
+
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (disabled) return
+
+      if (!area.current.contains(event.target)) {
+        stopAndPrevent(event)
+        onDismiss(event)
+      }
+    }
+
+    const handleEscape = (event: KeyboardEvent) => {
+      if (disabled) return
+
+      if (event.keyCode === 27) {
+        stopAndPrevent(event)
+        onDismiss(event)       
+      }
+    }
+
     if (click) {
       documents.forEach(document =>
         document.body.addEventListener('click', handleDocumentClick)
@@ -104,7 +104,7 @@ export const Dismissible: React.FC<Props> = ({
         document.removeEventListener('keydown', handleEscape)
       })
     }
-  })
+  }, [click, documents, escape, disabled, onDismiss])
 
   return <div ref={area} {...props} />
 }
