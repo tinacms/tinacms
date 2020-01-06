@@ -33,39 +33,11 @@ import { PlainTextInput } from "../components/plain-text-input"
 
 const get = require("lodash.get")
 
-<<<<<<< HEAD
 const PlainText = props => (
   <input style={{ background: "transparent " }} {...props.input} />
 )
 const MyToggle = props => <Toggle {...props} />
-
-const MySelect = props => {
-  console.log("MySelectProps: ", props)
-
-  return <Select {...props} />
-} 
-
-// const MyNumber = props => {
-// console.log("props: ", props)
-// return <Number {...props} />
-
-// }
-=======
-const MyToggle = styled((props, ...styleProps) => (
-  <div {...styleProps}>
-    <label>Date</label>
-    <Toggle {...props} />
-  </div>
-))`
-  display: none;
-  display: flex;
-  flex-direction: column;
-
-  label {
-    font-weight: 600;
-  }
-`
->>>>>>> master
+const MySelect = props =>  <Select {...props} />
 
 function BlogPostTemplate(props) {
   const form = props.form
@@ -130,7 +102,7 @@ function BlogPostTemplate(props) {
             <TinaField
               name="rawFrontmatter.draft"
               Component={MyToggle}
-              type="checkbox"
+              type="toggle"
             >
               {post.frontmatter.draft && (
                 <small style={{ color: "fuchsia" }}>Draft</small>
@@ -148,7 +120,6 @@ function BlogPostTemplate(props) {
           padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
         }}
       >
-<<<<<<< HEAD
         <button onClick={() => setIsEditing(p => !p)}>
           {isEditing ? "Stop Editing" : "Start Editing"}
         </button>
@@ -166,21 +137,10 @@ function BlogPostTemplate(props) {
         <TinaField
           name="rawFrontmatter.cool"
           Component={MySelect}
-          type="select"
           options={[100, "Love this!", "How cool!"]}
         >
           <p>{post.frontmatter.cool}</p>        
         </TinaField>
-        {/* <TinaField
-          name="rawFrontmatter.testNumber"
-          Component={Number}
-          type="number"
-        >
-          <p>Number: {post.frontmatter.testNumber}</p>
-            {console.log(typeof post.frontmatter.testNumber)}
-        </TinaField> */}
-=======
->>>>>>> master
         <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
