@@ -16,13 +16,19 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+export const getGitSSHUrl = (url: string) => {
+  const isSSH = isSSHUrl(url)
+  if (isSSH) {
+    return url
+  }
+  const match = url.match(
+    new RegExp(`https:\/\/(.*?@)?(.+?)\/(.*?)(?:\.git)?$`)
+  )
+  const domain = match && match.length > 2 ? match[2] : ''
+  const usernameRepo = match && match.length > 3 ? match[3] : ''
+  return `git@${domain}:${usernameRepo}.git`
+}
+
+export const isSSHUrl = (str: string) => {
+  return str.startsWith('git@') || str.startsWith('ssh://')
+}

@@ -60,4 +60,32 @@ describe('PluginManager', () => {
       })
     })
   })
+  describe('when a "test" plugin has been removed', () => {
+    it('notifies the subscribers', () => {
+      const listeners = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
+      const p = { __type: 'test', name: 'Example' }
+      const plugins = new PluginManager()
+      plugins.add(p)
+
+      listeners.forEach(listener =>
+        plugins.findOrCreateMap('test').subscribe(listener)
+      )
+
+      plugins.remove(p)
+
+      listeners.forEach(listener => expect(listener).toHaveBeenCalled())
+    })
+    describe('#all', () => {
+      it('no longer contains the plugin', () => {
+        const p = { __type: 'test', name: 'Example' }
+        const plugins = new PluginManager()
+
+        plugins.add(p)
+        expect(plugins.all('test')).toContain(p)
+
+        plugins.remove(p)
+        expect(plugins.all('test')).not.toContain(p)
+      })
+    })
+  })
 })
