@@ -16,13 +16,13 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { Select } from '@tinacms/fields'
+
+export const SelectField = wrapFieldsWithMeta(Select)
+
+export default {
+  name: 'select',
+  type: 'select',
+  Component: SelectField,
+}
