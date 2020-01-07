@@ -34,7 +34,6 @@ export interface ToggleProps {
 
 export const Toggle: FC<ToggleProps> = props => {
   const checked = !!(props.input.value || props.input.checked)
-
   return (
     <ToggleElement>
       <ToggleInput id={props.name} type="checkbox" {...props.input} />
