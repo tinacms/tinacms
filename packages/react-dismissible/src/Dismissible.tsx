@@ -62,7 +62,7 @@ export const Dismissible: React.FC<Props> = ({
     : [document]
 
   useEffect(() => {
-    const stopAndPrevent = (event: MouseEvent | KeyboardEvent) => {
+    const stopAndPrevent = (event: MouseEvent) => {
       event.stopPropagation()
       event.stopImmediatePropagation()
       event.preventDefault()
@@ -81,7 +81,7 @@ export const Dismissible: React.FC<Props> = ({
       if (disabled) return
 
       if (event.keyCode === 27) {
-        stopAndPrevent(event)
+        event.stopPropagation()
         onDismiss(event)       
       }
     }
