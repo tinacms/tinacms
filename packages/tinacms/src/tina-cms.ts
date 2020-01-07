@@ -25,6 +25,7 @@ import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
 import ImageFieldPlugin from './plugins/fields/ImageFieldPlugin'
 import ColorFieldPlugin from './plugins/fields/ColorFieldPlugin'
 import ToggleFieldPlugin from './plugins/fields/ToggleFieldPlugin'
+import SelectFieldPlugin from './plugins/fields/SelectFieldPlugin'
 import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
@@ -39,6 +40,7 @@ export class TinaCMS extends CMS {
     this.fields.add(ImageFieldPlugin)
     this.fields.add(ColorFieldPlugin)
     this.fields.add(ToggleFieldPlugin)
+    this.fields.add(SelectFieldPlugin)
     this.fields.add(MarkdownFieldPlugin)
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
