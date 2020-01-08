@@ -104,7 +104,7 @@ export const Dismissible: React.FC<Props> = ({
         document.removeEventListener('keydown', handleEscape)
       })
     }
-  }, [click, documents, escape, disabled, onDismiss])
+  }, [click, document, customDocument, escape, disabled, onDismiss])
 
   return <div ref={area} {...props} />
 }
