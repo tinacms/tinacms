@@ -44,7 +44,7 @@ export const ResizerBar = ({
         setBarPos(e.clientX - resizerBarWidth / 2)
       }
     },
-    [isResizing.current]
+    [isResizing]
   )
 
   const handleMouseUp = React.useCallback(
@@ -60,7 +60,7 @@ export const ResizerBar = ({
         setSideBarWidth(e.clientX)
       }
     },
-    [isResizing.current]
+    [isResizing]
   )
 
   const handleMouseDown = React.useCallback(() => {
@@ -68,7 +68,7 @@ export const ResizerBar = ({
     isResizing.current = true
     document.addEventListener('mousemove', resize)
     document.addEventListener('mouseup', handleMouseUp)
-  }, [isResizing.current])
+  }, [isResizing])
 
   return (
     <Resizer
