@@ -16,12 +16,7 @@ limitations under the License.
 
 */
 
-import { FormApi } from 'final-form'
-import { FieldRenderProps } from 'react-final-form'
-import { Field } from '@tinacms/forms'
+const { createJestConfig } = require('@tinacms/scripts')
+const pack = require('./package')
 
-export interface FieldProps<InputProps>
-  extends FieldRenderProps<any, HTMLElement> {
-  field: Field & InputProps
-  form: FormApi
-}
+module.exports = createJestConfig(pack)
