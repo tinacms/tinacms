@@ -4,6 +4,8 @@ date: '2015-05-06T23:46:37.121Z'
 description: Test
 heading_color: '#404040'
 draft: false
+cool: Tina Rules!
+testNumber: '26'
 thumbnail: ../hello-world/salty_egg.jpg
 ---
 Wow! I love _**blogging**_ so much already.
