@@ -37,32 +37,38 @@ export const ResizerBar = ({
   const [barPos, setBarPos] = React.useState(sideBarWidth - resizerBarWidth / 2)
   const isResizing: any = React.useRef()
 
-  const resize = (e: any) => {
-    e.preventDefault()
-    if (isResizing.current) {
-      setBarPos(e.clientX - resizerBarWidth / 2)
-    }
-  }
+  const resize = React.useCallback(
+    (e: any) => {
+      e.preventDefault()
+      if (isResizing.current) {
+        setBarPos(e.clientX - resizerBarWidth / 2)
+      }
+    },
+    [isResizing.current]
+  )
 
-  const handleMouseUp = (e: any) => {
-    console.log('removing eventlistener')
-    isResizing.current = false
-    document.removeEventListener('mousemove', resize)
-    document.removeEventListener('mouseup', handleMouseUp)
-    if (e.clientX <= SIDEBAR_MIN_WIDTH) {
-      setSideBarWidth(SIDEBAR_MIN_WIDTH)
-      setBarPos(SIDEBAR_MIN_WIDTH - resizerBarWidth / 2)
-    } else {
-      setSideBarWidth(e.clientX)
-    }
-  }
+  const handleMouseUp = React.useCallback(
+    (e: any) => {
+      console.log('removing eventlistener')
+      isResizing.current = false
+      document.removeEventListener('mousemove', resize)
+      document.removeEventListener('mouseup', handleMouseUp)
+      if (e.clientX <= SIDEBAR_MIN_WIDTH) {
+        setSideBarWidth(SIDEBAR_MIN_WIDTH)
+        setBarPos(SIDEBAR_MIN_WIDTH - resizerBarWidth / 2)
+      } else {
+        setSideBarWidth(e.clientX)
+      }
+    },
+    [isResizing.current]
+  )
 
-  const handleMouseDown = () => {
+  const handleMouseDown = React.useCallback(() => {
     console.log('adding eventlistener')
     isResizing.current = true
     document.addEventListener('mousemove', resize)
     document.addEventListener('mouseup', handleMouseUp)
-  }
+  }, [isResizing.current])
 
   return (
     <Resizer
@@ -85,7 +91,7 @@ const Resizer = styled.div<{
 }>`
   display: flex;
   align-items: center;
-  cursor: pointer;
+  cursor: col-resize;
   background: ${p =>
     p.isResizing
       ? 'linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)) no-repeat center/1px 100%'
