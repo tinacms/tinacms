@@ -17,8 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import Frame, { FrameContextConsumer } from 'react-frame-component'
-import { StyleSheetManager } from 'styled-components'
 
 interface Props
   extends React.DetailedHTMLProps<
@@ -28,25 +26,11 @@ interface Props
   children: any
   frameStyles: any
 }
-export const StyledFrame = ({
-  children,
-  frameStyles,
-  ...frameProps
-}: Props) => {
+export const StyledFrame = ({ children, frameStyles, id }: Props) => {
   return (
-    <Frame style={frameStyles} {...frameProps}>
-      <FrameContextConsumer>
-        {(frameProps: any) => {
-          return (
-            <StyleSheetManager target={frameProps.document.head}>
-              <FrameContext.Provider value={frameProps}>
-                {children}
-              </FrameContext.Provider>
-            </StyleSheetManager>
-          )
-        }}
-      </FrameContextConsumer>
-    </Frame>
+    <div style={frameStyles} id={id}>
+      {children}
+    </div>
   )
 }
 
