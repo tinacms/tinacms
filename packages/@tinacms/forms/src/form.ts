@@ -18,7 +18,7 @@ limitations under the License.
 
 import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
-import { Plugin } from '../plugins'
+import { Plugin } from '@tinacms/core'
 
 export interface FormOptions<S> extends Config<S> {
   id: any

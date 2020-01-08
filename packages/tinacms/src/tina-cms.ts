@@ -30,6 +30,7 @@ import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
+import { Form } from '@tinacms/forms'
 
 export class TinaCMS extends CMS {
   constructor() {
@@ -46,6 +47,11 @@ export class TinaCMS extends CMS {
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
   }
+
+  get forms() {
+    return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
+  }
+
   get fields(): PluginType<FieldPlugin> {
     return this.plugins.findOrCreateMap('field')
   }

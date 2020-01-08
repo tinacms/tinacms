@@ -23,7 +23,7 @@ import { padding, color, radius, font, shadow } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { useFrameContext } from './SyledFrame'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 
 export interface ActionsMenuProps {
   form: Form
