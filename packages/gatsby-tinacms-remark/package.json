@@ -45,6 +45,6 @@
     "tinacms": "^0.11.0"
   },
   "peerDependencies": {
-    "gatsby-transformer-remark": ">=2.6"
+    "gatsby-transformer-remark": ">=2.1.1"
   }
 }
