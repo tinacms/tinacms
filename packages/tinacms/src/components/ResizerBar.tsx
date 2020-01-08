@@ -18,10 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import {
-  radius,
-  color,
-} from '@tinacms/styles'
+import { radius, color } from '@tinacms/styles'
+import { SIDEBAR_MIN_WIDTH, Z_INDEX } from '../Globals'
 
 interface ResizerBarProps {
   resizerBarWidth: number
@@ -36,36 +34,43 @@ export const ResizerBar = ({
   sideBarWidth,
   setSideBarWidth,
 }: ResizerBarProps) => {
-  const [isResizing, setIsResizing] = React.useState(false)
-  const [barPos, setBarPos] = React.useState(sideBarWidth - resizerBarWidth/2)
+  const [barPos, setBarPos] = React.useState(sideBarWidth - resizerBarWidth / 2)
+  const isResizing: any = React.useRef()
 
-  const handleResizeMouseDown = () => {
-    setIsResizing(true)
+  const resize = (e: any) => {
+    e.preventDefault()
+    if (isResizing.current) {
+      setBarPos(e.clientX - resizerBarWidth / 2)
+    }
   }
 
-  React.useEffect(() => {
-    const resize = (e: any) => {
-      e.preventDefault()
-      if (isResizing) {
-        setBarPos(e.clientX - resizerBarWidth / 2)
-      }
-    }
-
-    document.addEventListener('mousemove', resize)
-    document.addEventListener('mouseup', (e: any) => {
-      document.removeEventListener('mousemove', resize)
-      setIsResizing(false)
+  const handleMouseUp = (e: any) => {
+    console.log('removing eventlistener')
+    isResizing.current = false
+    document.removeEventListener('mousemove', resize)
+    document.removeEventListener('mouseup', handleMouseUp)
+    if (e.clientX <= SIDEBAR_MIN_WIDTH) {
+      setSideBarWidth(SIDEBAR_MIN_WIDTH)
+      setBarPos(SIDEBAR_MIN_WIDTH - resizerBarWidth / 2)
+    } else {
       setSideBarWidth(e.clientX)
-    })
-  }, [isResizing])
+    }
+  }
+
+  const handleMouseDown = () => {
+    console.log('adding eventlistener')
+    isResizing.current = true
+    document.addEventListener('mousemove', resize)
+    document.addEventListener('mouseup', handleMouseUp)
+  }
 
   return (
     <Resizer
-      onMouseDown={handleResizeMouseDown}
+      onMouseDown={handleMouseDown}
       resizerBarWidth={resizerBarWidth}
       xPos={barPos}
       open={open}
-      isResizing={isResizing}
+      isResizing={isResizing.current}
     >
       <Handle />
     </Resizer>
@@ -80,6 +85,7 @@ const Resizer = styled.div<{
 }>`
   display: flex;
   align-items: center;
+  cursor: pointer;
   background: ${p =>
     p.isResizing
       ? 'linear-gradient(rgba(0, 0, 0, 0.2), rgba(0, 0, 0, 0.2)) no-repeat center/1px 100%'
@@ -89,15 +95,35 @@ const Resizer = styled.div<{
   position: fixed;
   border-radius: 20px;
   left: ${p => (!p.open ? -p.resizerBarWidth : p.xPos)}px;
-  z-index: 2147000001;
+  z-index: ${Z_INDEX + 1};
   transition: ${p =>
     // Don't apply the transition when we're resizing
     p.isResizing ? 'none' : `all ${p.open ? 150 : 200}ms ease-out`};
 `
 
 const Handle = styled.div`
+  position: relative;
   background: ${color.primary()};
   border-radius: ${radius()};
   width: 20px;
   height: 20px;
+
+  :before,
+  :after {
+    content: '';
+    width: 0;
+    height: 12px;
+    position: absolute;
+    top: 4px;
+  }
+
+  :before {
+    border-left: 1px solid #fff;
+    left: 3px;
+  }
+
+  :after {
+    border-right: 1px solid #fff;
+    right: 3px;
+  }
 `

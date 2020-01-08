@@ -69,10 +69,10 @@ export const Sidebar = (props: any) => {
           margin: '0',
           padding: '0',
           border: '0',
-          pointerEvents: (sidebar.isOpen || !props.isResizing) ? 'all' : 'none',
+          pointerEvents: sidebar.isOpen || !props.isResizing ? 'all' : 'none',
         }}
       >
-        <SidebarWrapper open={sidebar.isOpen}>
+        <SidebarWrapper open={sidebar.isOpen} currentWidth={sidebar.width}>
           <GlobalStyles />
           <SidebarHeader>
             <MenuToggle
@@ -85,7 +85,7 @@ export const Sidebar = (props: any) => {
           </SidebarHeader>
           <FormsView />
 
-          <MenuPanel visible={menuIsVisible}>
+          <MenuPanel visible={menuIsVisible} currentWidth={sidebar.width}>
             <MenuWrapper>
               <MenuList>
                 {cms.screens.all().map(view => {
@@ -332,7 +332,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
 `
 
 const MenuWrapper = styled.div`
-resize: both;
+  resize: both;
   position: absolute;
   left: 0;
   top: 0;
@@ -348,14 +348,14 @@ resize: both;
   }
 `
 
-const MenuPanel = styled.div<{ visible: boolean }>`
+const MenuPanel = styled.div<{ visible: boolean; currentWidth: number }>`
   background: ${color.grey(8)};
   z-index: 1000;
   position: absolute;
   top: 0;
   left: 0;
   height: 100%;
-  width: 100%;
+  width: ${p => p.currentWidth}px;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: ${padding()};
@@ -407,7 +407,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   }
 `
 
-const SidebarWrapper = styled.div<{ open: boolean }>`
+const SidebarWrapper = styled.div<{ open: boolean; currentWidth: number }>`
   margin: 0;
   padding: 0;
   border: 0;
@@ -417,7 +417,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  width: calc(100% - ${TOGGLE_WIDTH}px);
+  width: ${p => p.currentWidth}px;
   overflow: visible;
   height: 100%;
   left: 0;

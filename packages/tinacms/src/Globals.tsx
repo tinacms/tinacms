@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 export const SIDEBAR_WIDTH = 340 // px
+export const SIDEBAR_MIN_WIDTH = 320 //px
 export const SIDEBAR_HEADER_HEIGHT = 3.75 // rem
 export const FORM_HEADER_HEIGHT = 2.5 // rem
 export const FORM_FOOTER_HEIGHT = 3.75 // rem
