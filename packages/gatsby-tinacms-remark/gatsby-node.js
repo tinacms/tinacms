@@ -27,22 +27,12 @@ exports.setFieldsOnGraphQLNodeType = ({ type }) => {
     return {
       rawFrontmatter: {
         type: GraphQLString,
-        args: {
-          myArgument: {
-            type: GraphQLString,
-          },
-        },
         resolve: source => {
           return JSON.stringify(source.frontmatter)
         },
       },
       fileRelativePath: {
         type: GraphQLString,
-        args: {
-          myArgument: {
-            type: GraphQLString,
-          },
-        },
         resolve: source => {
           return source.fileAbsolutePath.replace(pathRoot, "")
         },
