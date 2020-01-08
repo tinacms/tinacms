@@ -379,6 +379,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "andrew-t-james",
+      "name": "Andrew James",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/13269277?v=4",
+      "profile": "https://andrewjames.dev",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
