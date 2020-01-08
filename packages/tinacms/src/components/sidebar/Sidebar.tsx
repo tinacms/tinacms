@@ -73,7 +73,6 @@ export const Sidebar = () => {
         }}
       >
         <SidebarWrapper open={sidebar.isOpen}>
-          <GlobalStyles />
           <SidebarHeader>
             <MenuToggle
               onClick={() => setMenuVisibility(!menuIsVisible)}
@@ -196,7 +195,6 @@ const SidebarToggle = (sidebar: any) => {
       }}
     >
       <>
-        <GlobalStyles />
         <SidebarToggleButton
           onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
           open={sidebar.isOpen}
@@ -378,7 +376,7 @@ const SidebarToggleAnimation = keyframes`
 `
 
 const SidebarToggleButton = styled.button<{ open: boolean }>`
-  position: fixed;
+  position: absolute;
   top: 0.5rem;
   left: 0;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);

@@ -201,43 +201,14 @@ export const timing = function(length: keyof Theme['timing']) {
 
 export const GlobalStyles = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
-  html {
-    font-family: 'Inter', sans-serif;
-    font-size: 100%;
-    -webkit-text-size-adjust: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-  }
-  *, *:before, *:after {
-    box-sizing: inherit;
-  }
-  hr {
-    border-color: #EDECF3;
-    color: #EDECF3;
-    margin-bottom: 1.5rem;
-    margin-left: -1.25rem;
-    margin-right: -1.25rem;
-    border-top: 1px solid #EDECF3;
-    border-bottom: none;
-    height: 0;
-    box-sizing: content-box;
-  }
-  h1, h2, h3, h4, h5, h6, p {
-    &:first-child {
-      margin-top: 0;
-    }
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
 `
 
 export const TinaResetStyles = css`
+  font-family: 'Inter', sans-serif;
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   backface-visibility: visible;
@@ -251,7 +222,6 @@ export const TinaResetStyles = css`
   bottom: auto;
   box-shadow: none;
   box-sizing: border-box;
-  box-sizing: content-box;
   caption-side: top;
   clear: none;
   clip: auto;
@@ -301,12 +271,40 @@ export const TinaResetStyles = css`
   white-space: normal;
   word-break: normal;
   word-spacing: normal;
-  font-family: 'Inter', sans-serif;
 `
 
 export const TinaReset = styled.div`
   ${TinaResetStyles}
-  * {
-    ${TinaResetStyles}
+
+  *, *:before, *:after {
+    box-sizing: inherit;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  hr {
+    border-color: #edecf3;
+    color: #edecf3;
+    margin-bottom: 1.5rem;
+    margin-left: -1.25rem;
+    margin-right: -1.25rem;
+    border-top: 1px solid #edecf3;
+    border-bottom: none;
+    height: 0;
+    box-sizing: content-box;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    &:first-child {
+      margin-top: 0;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
   }
 `

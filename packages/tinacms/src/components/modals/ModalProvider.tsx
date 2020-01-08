@@ -24,6 +24,7 @@ import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'
 import {
+  TinaReset,
   GlobalStyles,
   Button,
   padding,
@@ -88,21 +89,22 @@ export const Modal = ({
 
   return portalNode && portalNode
     ? (createPortal(
-        <StyledFrame
-          frameStyles={{
-            height: '100vh',
-            width: '100vw',
-            margin: '0 auto',
-            position: 'fixed',
-            zIndex: Z_INDEX + 100,
-            border: 0,
-          }}
-        >
-          <GlobalStyles />
-          <ModalOverlay>
-            <div {...props} />
-          </ModalOverlay>
-        </StyledFrame>,
+        <TinaReset>
+          <StyledFrame
+            frameStyles={{
+              height: '100vh',
+              width: '100vw',
+              margin: '0 auto',
+              position: 'fixed',
+              zIndex: Z_INDEX + 100,
+              border: 0,
+            }}
+          >
+            <ModalOverlay>
+              <div {...props} />
+            </ModalOverlay>
+          </StyledFrame>
+        </TinaReset>,
         portalNode
       ) as any)
     : null
