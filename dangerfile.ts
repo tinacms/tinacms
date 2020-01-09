@@ -143,7 +143,7 @@ The following files may need to be updated:
 
 | File | Reason |
 | --- | --- |
-${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)}
+${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`).join('\n')}
 `)
 
 const fileLink = (file: string) => {
