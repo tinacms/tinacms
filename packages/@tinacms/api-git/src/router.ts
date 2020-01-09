@@ -97,8 +97,15 @@ async function configureGitRemote(pathRoot: string) {
 
 async function updateOrigin(pathRoot: string, remote: string) {
   const repo = await openRepo(pathRoot)
+  const newRemote = getGitSSHUrl(remote)
+
+  const existingRemotes = await repo.getRemotes(true)
+  if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
+    console.warn(`Changing remote origin to ${newRemote}`)
+  }
+
   await repo.removeRemote('origin')
-  await repo.addRemote('origin', getGitSSHUrl(remote))
+  await repo.addRemote('origin', newRemote)
 }
 
 export function router(config: GitRouterConfig = {}) {
