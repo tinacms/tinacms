@@ -20,7 +20,7 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
 import { useState } from 'react'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import {
   Button,

@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import { padding, color, font } from '@tinacms/styles'
 import { RightArrowIcon } from '@tinacms/icons'
 
