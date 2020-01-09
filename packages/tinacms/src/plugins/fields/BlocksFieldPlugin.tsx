@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '@tinacms/core'
+import { Field, Form } from '@tinacms/forms'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'

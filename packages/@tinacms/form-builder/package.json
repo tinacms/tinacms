@@ -35,6 +35,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.5.1",
+    "@tinacms/forms": "^0.0.0",
     "@tinacms/react-core": "^0.2.1",
     "final-form": "^4.18.2",
     "react-final-form": "^6.3.0"
