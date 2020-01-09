@@ -16,7 +16,10 @@ limitations under the License.
 
 */
 
-.tinacms-image {
-  display: inline-block;
-  padding: 1em;
-}
+import { css } from 'styled-components'
+
+export const ProseMirrorCss = css`
+  .ProseMirror .tinacms-image {
+    padding: 1em;
+  }
+`

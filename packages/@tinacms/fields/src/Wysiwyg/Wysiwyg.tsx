@@ -22,6 +22,7 @@ import { Plugin } from '@tinacms/core'
 import { useTinaProsemirror } from './useTinaProsemirror'
 import { ALL_PLUGINS } from './default-plugins'
 import { CodeMirrorCss } from './CodeMirrorCss'
+import { ProseMirrorCss } from './ProseMirrorCss'
 
 interface Wysiwyg {
   input: any
@@ -45,5 +46,5 @@ export const Wysiwyg = styled(
     )
   }
 )`
-  ${CodeMirrorCss}
+  ${CodeMirrorCss}${ProseMirrorCss}
 `

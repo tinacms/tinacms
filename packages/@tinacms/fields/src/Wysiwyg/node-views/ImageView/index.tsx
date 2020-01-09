@@ -19,8 +19,6 @@ limitations under the License.
 import { Node } from 'prosemirror-model'
 import { EditorView, NodeView } from 'prosemirror-view'
 
-import './image.css'
-
 export class ImageView implements NodeView {
   node: Node
   view: EditorView
