@@ -52,10 +52,10 @@
     "@types/styled-components": "4.1.8",
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
-    "jest": "^24.8.0",
+    "jest": "^24.9.0",
     "react-docgen-typescript-loader": "^3.1.0",
     "react-docgen-typescript-webpack-plugin": "^1.1.0",
-    "ts-jest": "^24.0.2"
+    "ts-jest": "^24.3.0"
   },
   "dependencies": {
     "@sambego/storybook-styles": "^1.0.0",

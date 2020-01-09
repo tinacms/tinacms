@@ -30,8 +30,8 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
     "@types/jest": "^24.0.15",
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2"
+    "jest": "^24.9.0",
+    "ts-jest": "^24.3.0"
   },
   "dependencies": {
     "@tinacms/core": "^0.5.1",
