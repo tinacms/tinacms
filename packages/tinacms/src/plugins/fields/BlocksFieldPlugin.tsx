@@ -208,7 +208,7 @@ const BlockListItem = ({
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   const removeItem = React.useCallback(() => {
-    tinaForm.finalForm.mutators.remove(field.name, index)
+    tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
   return (
@@ -260,7 +260,7 @@ const InvalidBlockListItem = ({
   index: number
 }) => {
   const removeItem = React.useCallback(() => {
-    tinaForm.finalForm.mutators.remove(field.name, index)
+    tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
   return (
