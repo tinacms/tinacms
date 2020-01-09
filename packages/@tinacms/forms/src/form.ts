@@ -119,6 +119,10 @@ export class Form<S = any> implements Plugin {
     return this.finalForm.submit()
   }
 
+  get mutators() {
+    return this.finalForm.mutators
+  }
+
   get values() {
     return this.finalForm.getState().values
   }
