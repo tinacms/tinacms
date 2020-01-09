@@ -16,12 +16,4 @@ limitations under the License.
 
 */
 
-import { FormApi } from 'final-form'
-import { FieldRenderProps } from 'react-final-form'
-import { Field } from '@tinacms/forms'
-
-export interface FieldProps<InputProps>
-  extends FieldRenderProps<any, HTMLElement> {
-  field: Field & InputProps
-  form: FormApi
-}
+declare module 'react-frame-component'

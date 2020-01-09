@@ -20,8 +20,37 @@ const fs = require('fs')
 const path = require('path')
 
 let waitingForBuild = false
-let nextArgs: any = null
 let count = 0
+
+interface FileChange {
+  filepath: string
+  content: string
+}
+
+class FileChangeQueue {
+  private pendingChanges: FileChange[] = []
+
+  get length() {
+    return this.pendingChanges.length
+  }
+
+  addFileChange(change: FileChange) {
+    const fileIndex = this.pendingChanges.findIndex(
+      ({ filepath }) => change.filepath === filepath
+    )
+    if (fileIndex < 0) {
+      this.pendingChanges.push(change)
+    } else {
+      this.pendingChanges[fileIndex] = change
+    }
+  }
+
+  getNextFileChange() {
+    return this.pendingChanges.shift()
+  }
+}
+
+const queue = new FileChangeQueue()
 
 const MAX_BUILD_TIME = 1000
 
@@ -36,19 +65,18 @@ export function deleteFile(path: string) {
 }
 
 function cacheCommand(filepath: string, data: any) {
-  const prevCacheNumber = count - 1
   if (DEBUG) {
     console.info(`caching ${count}: start`)
-    if (nextArgs) {
-      console.info(`caching ${count}: discarding ${prevCacheNumber}`)
-    }
   }
-  nextArgs = [filepath, data]
+  queue.addFileChange({ filepath, content: data as string })
   if (DEBUG) console.info(`caching ${count}: end`)
 }
 
 function tryToWrite() {
-  if (!nextArgs) return
+  if (!queue.length) {
+    if (DEBUG) console.info(`nothing to write.`)
+    return
+  }
 
   const curr = count
   if (DEBUG) console.info(`write ${curr}: start`)
@@ -57,14 +85,18 @@ function tryToWrite() {
     return
   }
 
-  const [filepath, content] = nextArgs
+  const { filepath, content } = queue.getNextFileChange() || {
+    filepath: '',
+    content: '',
+  }
   waitingForBuild = true
-  nextArgs = null
 
   const parentDir = path.dirname(filepath)
+
   if (!fs.existsSync(parentDir)) {
     fs.mkdirSync(parentDir, { recursive: true })
   }
+
   fs.writeFile(filepath, content, (err: any) => {
     if (err) {
       if (DEBUG) console.info(`write ${curr}: end; failure`)

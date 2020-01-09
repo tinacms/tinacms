@@ -27,7 +27,7 @@ import {
 import { ModalPopup } from './modals/ModalPopup'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
 import {
   color,
@@ -123,7 +123,11 @@ const FormModal = ({ plugin, close }: any) => {
           return (
             <ModalPopup>
               <ModalHeader close={close}>{plugin.name}</ModalHeader>
-              <ModalBody onKeyPress={(e) => e.charCode === 13 ? handleSubmit() as any : null}>
+              <ModalBody
+                onKeyPress={e =>
+                  e.charCode === 13 ? (handleSubmit() as any) : null
+                }
+              >
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
               <ModalActions>

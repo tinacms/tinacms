@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import { Form } from './cms-forms'
 import { PluginManager } from './plugins'
 
 export class CMS {
@@ -30,9 +29,5 @@ export class CMS {
   registerApi(name: string, api: any): void {
     // TODO: Make sure we're not overwriting an existing API.
     this.api[name] = api
-  }
-
-  get forms() {
-    return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
   }
 }
