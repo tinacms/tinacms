@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-37-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-38-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## :tada::confetti_ball: Happy Holidays :confetti_ball::tada:
@@ -167,6 +167,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://github.com/kenniaa"><img src="https://avatars2.githubusercontent.com/u/14225265?v=4" width="100px;" alt=""/><br /><sub><b>Kenia</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=kenniaa" title="Code">💻</a></td>
     <td align="center"><a href="https://andrewjames.dev"><img src="https://avatars3.githubusercontent.com/u/13269277?v=4" width="100px;" alt=""/><br /><sub><b>Andrew James</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=andrew-t-james" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/brooksztb"><img src="https://avatars3.githubusercontent.com/u/31398142?v=4" width="100px;" alt=""/><br /><sub><b>Zach B</b></sub></a><br /><a href="#talk-brooksztb" title="Talks">📢</a></td>
   </tr>
 </table>
 
