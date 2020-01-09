@@ -48,3 +48,15 @@ server.use('/___tina', gitApi.router(options))
 - `defaultCommitName`: The default git user name.
 - `defaultCommitEmail`: The default git user email.
 - `pushOnCommit`: Indicates if every commit should also be pushed automatically. Default: true.
+
+### Configure env
+
+The following environment variables can be configured:
+
+```
+  GIT_REMOTE
+  SSH_KEY
+```
+
+- `GIT_REMOTE`: Git remote where to push/pull from.
+- `SSH_KEY`: Base64-encoded SSH key (with write access).
