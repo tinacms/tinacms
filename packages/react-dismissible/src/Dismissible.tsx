@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { useRef, useEffect } from 'react'
 
 export interface Props {
   /**
@@ -47,64 +48,63 @@ export interface Props {
   document?: Document
 }
 
-export class Dismissible extends React.Component<Props, {}> {
-  area: any
-  get documents() {
-    const targets = [document]
+export const Dismissible: React.FC<Props> = ({
+  onDismiss,
+  escape = false,
+  click = false,
+  disabled = false,
+  document: customDocument,
+  ...props
+}) => {
+  const area: any = useRef()
+  const documents: any[] = customDocument
+    ? [document, customDocument]
+    : [document]
 
-    if (this.props.document) {
-      targets.push(this.props.document)
-    }
-    return targets
-  }
-  componentDidMount() {
-    if (this.props.click) {
-      this.documents.forEach(document =>
-        document.body.addEventListener('click', this.handleDocumentClick)
-      )
-    }
-
-    if (this.props.escape) {
-      this.documents.forEach(document =>
-        document.addEventListener('keydown', this.handleEscape)
-      )
-    }
-  }
-
-  componentWillUnmount() {
-    this.documents.forEach(document =>
-      document.body.removeEventListener('click', this.handleDocumentClick)
-    )
-    this.documents.forEach(document =>
-      document.removeEventListener('keydown', this.handleEscape)
-    )
-  }
-
-  handleDocumentClick = (event: MouseEvent) => {
-    if (this.props.disabled) return
-
-    const area: any = this.area
-
-    if (!area.contains(event.target)) {
-      this.props.onDismiss(event)
+  useEffect(() => {
+    const stopAndPrevent = (event: MouseEvent) => {
       event.stopPropagation()
       event.stopImmediatePropagation()
       event.preventDefault()
     }
-  }
 
-  handleEscape = (event: KeyboardEvent) => {
-    if (this.props.disabled) return
+    const handleDocumentClick = (event: MouseEvent) => {
+      if (disabled) return
 
-    if (event.keyCode == 27) {
-      this.props.onDismiss(event)
-      event.stopPropagation()
+      if (!area.current.contains(event.target)) {
+        stopAndPrevent(event)
+        onDismiss(event)
+      }
     }
-  }
 
-  render() {
-    const { onDismiss, click, escape, ...props } = this.props
+    const handleEscape = (event: KeyboardEvent) => {
+      if (disabled) return
 
-    return <div ref={ref => (this.area = ref)} {...props} />
-  }
+      if (event.keyCode === 27) {
+        event.stopPropagation()
+        onDismiss(event)       
+      }
+    }
+
+    if (click) {
+      documents.forEach(document =>
+        document.body.addEventListener('click', handleDocumentClick)
+      )
+    }
+
+    if (escape) {
+      documents.forEach(document =>
+        document.addEventListener('keydown', handleEscape)
+      )
+    }
+    // Clean up event listeners on unmount
+    return () => {
+      documents.forEach(document => {
+        document.body.removeEventListener('click', handleDocumentClick)
+        document.removeEventListener('keydown', handleEscape)
+      })
+    }
+  }, [click, document, customDocument, escape, disabled, onDismiss])
+
+  return <div ref={area} {...props} />
 }
