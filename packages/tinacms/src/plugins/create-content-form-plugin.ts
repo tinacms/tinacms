@@ -17,7 +17,8 @@ limitations under the License.
 */
 
 import { TinaCMS } from '../tina-cms'
-import { Field, Plugin } from '@tinacms/core'
+import { Plugin } from '@tinacms/core'
+import { Field } from '@tinacms/forms'
 
 export interface AddContentPlugin<FormShape> extends Plugin {
   __type: 'content-creator'

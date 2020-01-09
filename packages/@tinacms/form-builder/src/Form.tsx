@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import { FormBuilder } from './final-form-builder'
 import { Field } from 'react-final-form'
 
@@ -84,5 +84,5 @@ TinaField.propTypes = {
   name: PropTypes.string,
   type: PropTypes.string,
   Component: PropTypes.any.isRequired,
-  children: PropTypes.any
-};
+  children: PropTypes.any,
+}
