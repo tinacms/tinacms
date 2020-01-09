@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form, Field } from '@tinacms/core'
+import { FormOptions, Form, Field } from '@tinacms/forms'
 import * as React from 'react'
 import { usePlugins } from './use-plugin'
 

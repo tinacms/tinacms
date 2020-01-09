@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Form, Field } from '@tinacms/core'
+import { Form, Field } from '@tinacms/forms'
 import { useCMS } from '@tinacms/react-core'
 import {
   Form as FinalForm,

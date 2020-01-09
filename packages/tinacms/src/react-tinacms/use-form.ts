@@ -1,4 +1,4 @@
-import { FormOptions, Form } from '@tinacms/core'
+import { FormOptions, Form } from '@tinacms/forms'
 import { GlobalFormPlugin } from '../plugins/screens'
 import { useMemo } from 'react'
 import { useForm, WatchableFormValue, usePlugins } from '@tinacms/react-core'
