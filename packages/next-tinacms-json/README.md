@@ -5,5 +5,5 @@ This package provides helpers for editing content stored in JSON files in the lo
 - `useJsonForm`
 - `useLocalJsonForm`
 - `useGlobalJsonForm`
-- `InlinJsonForm`: A render-children component
+- `InlineJsonForm`: A render-children component
 - `inlineJsonForm`: A higher-order component
