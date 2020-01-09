@@ -100,10 +100,13 @@ export function FormView({
 }: FormViewProps) {
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
-      const form = activeForm!.finalForm
-      if (!result.destination) return
+      if (!result.destination || !activeForm) return
       const name = result.type
-      form.mutators.move(name, result.source.index, result.destination.index)
+      activeForm.mutators.move(
+        name,
+        result.source.index,
+        result.destination.index
+      )
     },
     [activeForm]
   )
