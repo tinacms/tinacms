@@ -19,7 +19,8 @@ limitations under the License.
 import { css } from 'styled-components'
 
 export const ProseMirrorCss = css`
-  .ProseMirror .tinacms-image {
-    padding: 1em;
+  .ProseMirror .tinacms-image-wrapper {
+    display: inline-block;
+    margin: 1em 0;
   }
 `

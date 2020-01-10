@@ -32,10 +32,10 @@ export class ImageView implements NodeView {
     this.getPos = getPos
 
     this.dom = document.createElement('span')
+    this.dom.classList.add('tinacms-image-wrapper')
     this.img = document.createElement('img')
     const { src, align, alt, title, width, height } = node.attrs
     this.img.src = src
-    this.img.classList.add('tinacms-image')
     if (height) this.img.style.height = height
     if (width) this.img.style.width = width
     if (align) this.img.classList.add(`align-${align}`)
