@@ -17,7 +17,13 @@ limitations under the License.
 */
 
 import { useCallback, useEffect, useState } from 'react'
-import { useWatchFormValues, useForm, useCMS } from 'tinacms'
+import {
+  useWatchFormValues,
+  useForm,
+  useCMS,
+  FormOptions,
+  Field,
+} from 'tinacms'
 
 /**
  * A datastructure representing a JsonFile stored in Git
@@ -27,10 +33,16 @@ export interface JsonFile<T = any> {
   data: T
 }
 
+interface Options {
+  id?: string
+  label?: string
+  fields: Field[]
+  actions: FormOptions<any>['actions']
+}
 /**
  * Creates a TinaCMS Form for editing a JsonFile in Git
  */
-export function useJsonForm<T = any>(jsonFile: JsonFile<T>) {
+export function useJsonForm<T = any>(jsonFile: JsonFile<T>, options: Options) {
   const cms = useCMS()
 
   const [valuesInGit, setValuesInGit] = useState<JsonFile<T>>()
@@ -48,10 +60,16 @@ export function useJsonForm<T = any>(jsonFile: JsonFile<T>) {
       })
   }, [jsonFile.fileRelativePath])
 
+  const id = options.id || jsonFile.fileRelativePath
+  const label = options.label || jsonFile.fileRelativePath
+  const fields = options.fields || []
+  const actions = options.actions || []
   const [values, form] = useForm(
     {
-      id: jsonFile.fileRelativePath,
-      label: jsonFile.fileRelativePath,
+      id,
+      label,
+      fields,
+      actions,
       initialValues: valuesInGit,
       onSubmit() {
         return cms.api.git.commit({
@@ -59,9 +77,8 @@ export function useJsonForm<T = any>(jsonFile: JsonFile<T>) {
           message: `Commit from Tina: Update ${jsonFile.fileRelativePath}`,
         })
       },
-      fields: [{ name: 'title', label: 'Title', component: 'text' }],
     },
-    { values: jsonFile.data }
+    { values: jsonFile.data, label }
   )
 
   const writeToDisk = useCallback(formState => {
