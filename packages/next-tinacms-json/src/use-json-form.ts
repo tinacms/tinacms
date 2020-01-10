@@ -77,6 +77,9 @@ export function useJsonForm<T = any>(jsonFile: JsonFile<T>, options: Options) {
           message: `Commit from Tina: Update ${jsonFile.fileRelativePath}`,
         })
       },
+      reset() {
+        return cms.api.git.reset({ files: [id] })
+      },
     },
     { values: jsonFile.data, label }
   )
