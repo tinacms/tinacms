@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0-alpha.12](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.11...@tinacms/api-git@0.5.0-alpha.12) (2020-01-10)
+
+
+### Features
+
+* allow git remote to be configurable ([837af32](https://github.com/tinacms/tinacms/commit/837af32))
+
+
+
+
+
 # [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.1...@tinacms/api-git@0.5.0) (2019-12-17)
 
 **Note:** Version bump only for package @tinacms/api-git
