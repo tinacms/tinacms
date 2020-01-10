@@ -33,16 +33,19 @@ export interface JsonFile<T = any> {
   data: T
 }
 
-interface Options {
+export interface Options {
   id?: string
   label?: string
-  fields: Field[]
-  actions: FormOptions<any>['actions']
+  fields?: Field[]
+  actions?: FormOptions<any>['actions']
 }
 /**
  * Creates a TinaCMS Form for editing a JsonFile in Git
  */
-export function useJsonForm<T = any>(jsonFile: JsonFile<T>, options: Options) {
+export function useJsonForm<T = any>(
+  jsonFile: JsonFile<T>,
+  options: Options = {}
+) {
   const cms = useCMS()
 
   const [valuesInGit, setValuesInGit] = useState<JsonFile<T>>()
