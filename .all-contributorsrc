@@ -399,6 +399,15 @@
       "contributions": [
         "talk"
       ]
+    },
+    {
+      "login": "jpuri",
+      "name": "Jyoti Puri",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/2182307?v=4",
+      "profile": "https://github.com/jpuri",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
