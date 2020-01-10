@@ -35,4 +35,23 @@ const Basic = () => {
   )
 }
 
-storiesOf('Wysiwyg', module).add('Basic', () => <Basic />)
+const WithImage = () => {
+  const [value, setValue] = React.useState(
+    '![alt text](https://i.imgur.com/2FCfbgg.jpg "Logo Title Text 1")'
+  )
+  return (
+    <Wysiwyg
+      input={{
+        value,
+        onChange: (val: string) => {
+          console.log(val)
+          setValue(val)
+        },
+      }}
+    />
+  )
+}
+
+storiesOf('Wysiwyg', module)
+  .add('Basic', () => <Basic />)
+  .add('WithImage', () => <WithImage />)
