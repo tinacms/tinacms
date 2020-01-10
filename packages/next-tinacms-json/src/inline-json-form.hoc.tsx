@@ -19,7 +19,7 @@ limitations under the License.
 import React from 'react'
 import { FC } from 'react'
 import { NextPage } from 'next'
-import { JsonFile } from './use-json-form'
+import { JsonFile, Options } from './use-json-form'
 import {
   InlineJsonFormRenderProps,
   InlineJsonForm,
@@ -29,11 +29,12 @@ import {
  * inlineJsonForm
  */
 export function inlineJsonForm(
-  Component: FC<InlineJsonFormRenderProps>
+  Component: FC<InlineJsonFormRenderProps>,
+  options?: Options
 ): NextPage<{ jsonFile: JsonFile }> {
   return props => {
     return (
-      <InlineJsonForm jsonFile={props.jsonFile}>
+      <InlineJsonForm jsonFile={props.jsonFile} {...options}>
         {inlineProps => {
           return <Component {...inlineProps} />
         }}
