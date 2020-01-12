@@ -408,6 +408,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "nibtime",
+      "name": "nibtime",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/52962482?v=4",
+      "profile": "https://github.com/nibtime",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
