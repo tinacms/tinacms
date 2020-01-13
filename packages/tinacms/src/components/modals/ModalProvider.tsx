@@ -90,20 +90,9 @@ export const Modal = ({
   return portalNode && portalNode
     ? (createPortal(
         <TinaReset>
-          <StyledFrame
-            frameStyles={{
-              height: '100vh',
-              width: '100vw',
-              margin: '0 auto',
-              position: 'fixed',
-              zIndex: Z_INDEX + 100,
-              border: 0,
-            }}
-          >
-            <ModalOverlay>
-              <div {...props} />
-            </ModalOverlay>
-          </StyledFrame>
+          <ModalOverlay>
+            <div {...props} />
+          </ModalOverlay>
         </TinaReset>,
         portalNode
       ) as any)
@@ -116,9 +105,12 @@ export const ModalOverlay = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   overflow: auto;
   padding: 0;
+  z-index: ${Z_INDEX + 100};
 `
 
 const ModalTitle = styled.h2`
