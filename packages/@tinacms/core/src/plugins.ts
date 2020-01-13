@@ -18,38 +18,189 @@ limitations under the License.
 
 import { Subscribable } from './subscribable'
 
+/**
+ * An object used to extend or modify the behaviour of the content management system.
+ */
 export interface Plugin {
+  /**
+   * Used to organize plugins with a common purpose.
+   */
   __type: string
+  /**
+   * A unique identifier for the plugin.
+   *
+   * @todo Rename to `id`.
+   */
   name: string
+  /**
+   * A string referencing an icon.
+   *
+   * ### !DEPRECATED!
+   *
+   * This shouldn't be here. Please assume it isn't.
+   */
   icon?: string
 }
 
+/**
+ * This class keeps track of all the different types of [[Plugin|plugins]]
+ * used in the [[CMS]].
+ */
 export class PluginManager {
+  /**
+   * @ignore
+   */
   private plugins: Map<PluginType> = {}
 
-  findOrCreateMap<T extends Plugin = Plugin>(type: T['__type']): PluginType<T> {
+  /**
+   * Gets the [[PluginType|collection of plugins]] for the given type.
+   *
+   * #### Example: Basic Usage
+   *
+   * ```ts
+   * const colorPlugins = cms.plugins.get("color")
+   * ```
+   *
+   * #### Example: Advanced Types
+   *
+   * A type param can be added to specify the kind of [[Plugin]]
+   * that is being listed.
+   *
+   * ```ts
+   * const colorPlugins = cms.plugins.get<ColorPlugin>("color")
+   * ```
+   *
+   * @param type The type of plugins to be retrieved
+   * @typeparam P A subclass of [[Plugin]]
+   */
+  get<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
     return (this.plugins[type] =
-      this.plugins[type] || new PluginType(type)) as PluginType<T>
+      this.plugins[type] || new PluginType(type)) as PluginType<P>
   }
-  add<T extends Plugin = Plugin>(view: T) {
-    this.findOrCreateMap(view.__type).add(view)
+
+  /**
+   * An alias to [[get]]
+   *
+   * ### !DEPRECATED!
+   *
+   * This name is unnecessarily verbose and weird.
+   */
+  findOrCreateMap<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
+    return this.get(type)
   }
-  remove<T extends Plugin = Plugin>(view: T) {
-    this.findOrCreateMap(view.__type).remove(view)
+
+  /**
+   * Adds a [[Plugin]] to the [[CMS]].
+   *
+   * #### Example: Basic Usage
+   *
+   * ```js
+   * cms.plugins.add({ __type: "color", name: "red" })
+   * ```
+   *
+   * #### Example: Advanced Types
+   *
+   * ```ts
+   * interface ColorPlugin extends Plugin {
+   *   __type: "color"
+   *   hex: string
+   *   rgb: string
+   * }
+   *
+   * cms.plugins.add<ColorPlugin>({
+   *   __type: "color",
+   *   name: "red",
+   *   hex: "#FF0000",
+   *   rgb: "RGBA(255, 0, 0, 1)"
+   * })
+   * ```
+   *
+   * @typeparam P
+   * @param plugin
+   * @todo Consider returning the plugin which was just added.
+   */
+  add<P extends Plugin = Plugin>(plugin: P) {
+    this.findOrCreateMap(plugin.__type).add(plugin)
   }
-  all<T extends Plugin = Plugin>(type: string): T[] {
-    return this.findOrCreateMap<T>(type).all()
+
+  /**
+   * Removes the given [[Plugin|plugin]] from the [[CMS]].
+   *
+   * #### Example: Basic Usage
+   *
+   * In this example a plugin is added to the [[CMS]] and removed
+   * 5 seconds later.
+   *
+   * ```ts
+   * const redPlugin = {
+   *   __type: "color",
+   *   name: "red",
+   *   hex: "#FF0000",
+   *   rgb: "RGBA(255, 0, 0, 1)"
+   * }
+   *
+   * cms.plugins.add(redPlugin)
+   *
+   * setTimeout(() => {
+   *   cms.plugins.remove(redPlugin)
+   * }, 5000)
+   * ```
+   *
+   * @typeparam P A subclass of [[Plugin]]
+   * @param plugin The plugin to be removed from the CMS.
+   */
+  remove<P extends Plugin = Plugin>(plugin: P) {
+    this.findOrCreateMap(plugin.__type).remove(plugin)
+  }
+
+  /**
+   * Returns a list of all the [[Plugin|plugins]] of the given type.
+   *
+   * #### Example: Basic Usage
+   *
+   * ```ts
+   * cms.plugins.all("color").forEach(color => {
+   *   console.log(color.name)
+   * })
+   * ```
+   *
+   * #### Example: Advanced Types
+   *
+   * A type param can be added to specify the kind of [[Plugin]]
+   * that is being listed.
+   *
+   * ```ts
+   * cms.plugins.all<ColorPlugin>("color").forEach(color => {
+   *   console.log(color.name, color.hex)
+   * })
+   * ```
+   *
+   * @returns A list of all the [[Plugin|plugins]] of the given type.
+   * @param type The name of the plugin
+   */
+  all<P extends Plugin = Plugin>(type: string): P[] {
+    return this.findOrCreateMap<P>(type).all()
   }
 }
 
+/**
+ * @ignore
+ */
 interface Map<T> {
   [key: string]: T
 }
 
+/**
+ * @ignore
+ */
 type PluginMap<T extends Plugin = Plugin> = Map<T>
 
 export class PluginType<T extends Plugin = Plugin> extends Subscribable {
+  /**
+   * @ignore
+   */
   __plugins: PluginMap<T> = {}
+
   constructor(private __type: string) {
     super()
   }

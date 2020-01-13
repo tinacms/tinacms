@@ -16,9 +16,15 @@ limitations under the License.
 
 */
 
+/**
+ * @ignore
+ */
 export type Unsubscribe = () => void
 
 export class Subscribable {
+  /**
+   * @ignore
+   */
   protected __subscribers: Function[] = []
 
   subscribe(listener: Function): Unsubscribe {
