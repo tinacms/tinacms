@@ -5,7 +5,10 @@ module.exports = packageJson => {
 
   return {
     ignoreCompilerErrors: 'true',
-    exclude: ['**/*+(.spec|.test|.e2e).ts', '**/*+(.spec|.test|.e2e).tsx'],
+    exclude: [
+      '**/*+(index|.spec|.test|.e2e).ts',
+      '**/*+(index|.spec|.test|.e2e).tsx',
+    ],
     excludeNotExported: false,
     gitRevision,
   }
