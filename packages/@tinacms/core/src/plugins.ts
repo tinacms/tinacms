@@ -31,10 +31,10 @@ export class PluginManager {
     return (this.plugins[type] =
       this.plugins[type] || new PluginType(type)) as PluginType<T>
   }
-  add(view: Plugin) {
+  add<T extends Plugin = Plugin>(view: T) {
     this.findOrCreateMap(view.__type).add(view)
   }
-  remove(view: Plugin) {
+  remove<T extends Plugin = Plugin>(view: T) {
     this.findOrCreateMap(view.__type).remove(view)
   }
   all<T extends Plugin = Plugin>(type: string): T[] {
