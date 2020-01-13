@@ -52,6 +52,27 @@ const WithImage = () => {
   )
 }
 
+const WithTable = () => {
+  const [value, setValue] = React.useState(
+    `| A | B | C |
+| --- | --- | ---:|
+| aaa | bbb | ccc |
+| aaa | bbb | ccc |`
+  )
+  return (
+    <Wysiwyg
+      input={{
+        value,
+        onChange: (val: string) => {
+          console.log(val)
+          setValue(val)
+        },
+      }}
+    />
+  )
+}
+
 storiesOf('Wysiwyg', module)
   .add('Basic', () => <Basic />)
   .add('WithImage', () => <WithImage />)
+  .add('WithTable', () => <WithTable />)
