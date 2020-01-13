@@ -346,7 +346,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   position: absolute;
   pointer-events: all;
   bottom: 44px;
-  left: ${SIDEBAR_WIDTH + 'px'};
+  left: ${SIDEBAR_WIDTH}px;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 1.5rem 1.5rem 0;
   width: 50px;
@@ -418,7 +418,7 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   display: block !important;
   background: transparent !important;
   height: 100% !important;
-  width: ${SIDEBAR_WIDTH + TOGGLE_WIDTH}px !important;
+  width: ${SIDEBAR_WIDTH}px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
