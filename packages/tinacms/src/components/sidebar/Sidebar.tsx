@@ -164,30 +164,12 @@ const Watermark = styled(({ ...styleProps }: any) => {
 
 const SidebarToggle = (sidebar: any) => {
   return (
-    <StyledFrame
-      id="sidebar-frame"
-      frameStyles={{
-        position: 'absolute',
-        left: SIDEBAR_WIDTH + 'px',
-        bottom: '32px',
-        width: '56px',
-        height: '64px',
-        margin: '0',
-        padding: '0',
-        border: '0',
-        overflow: 'hidden',
-        pointerEvents: 'all',
-      }}
+    <SidebarToggleButton
+      onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
+      open={sidebar.isOpen}
     >
-      <>
-        <SidebarToggleButton
-          onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
-          open={sidebar.isOpen}
-        >
-          {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
-        </SidebarToggleButton>
-      </>
-    </StyledFrame>
+      {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
+    </SidebarToggleButton>
   )
 }
 
@@ -362,12 +344,13 @@ const SidebarToggleAnimation = keyframes`
 
 const SidebarToggleButton = styled.button<{ open: boolean }>`
   position: absolute;
-  top: 0.5rem;
-  left: 0;
+  pointer-events: all;
+  bottom: 44px;
+  left: ${SIDEBAR_WIDTH + 'px'};
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 1.5rem 1.5rem 0;
-  width: 3.125rem;
-  height: 2.75rem;
+  width: 50px;
+  height: 44px;
   border: 0;
   outline: none;
   display: flex;
