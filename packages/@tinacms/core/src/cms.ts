@@ -16,6 +16,13 @@ limitations under the License.
 
 */
 
+/**
+ * This package contains the [[CMS]] class which is the core
+ * piece of any content management system.
+ *
+ * @packageDocumentation
+ */
+
 import { PluginManager } from './plugins'
 
 export class CMS {
