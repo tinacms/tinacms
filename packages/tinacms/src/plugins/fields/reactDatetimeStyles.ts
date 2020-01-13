@@ -18,7 +18,7 @@ limitations under the License.
 
 /*!
   Moved the react-datetime styles to this style in JS file
-  So that it will work with the StyledFrame & Rollup
+  So that it will work with Rollup
  * https://github.com/YouCanBookMe/react-datetime
  */
 

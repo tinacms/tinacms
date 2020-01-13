@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { useCallback, useState, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { StyledFrame } from '../SyledFrame'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'

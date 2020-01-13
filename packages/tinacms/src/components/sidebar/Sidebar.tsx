@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import { StyledFrame } from '../SyledFrame'
 import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from '../FormView'
 import { Modal, ModalHeader, ModalBody } from '../modals/ModalProvider'
