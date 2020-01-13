@@ -18,6 +18,7 @@ limitations under the License.
 
 import { tableNodes } from 'prosemirror-tables'
 import { SchemaNodePlugin } from '../..'
+import { Node } from 'prosemirror-model'
 
 const tables = tableNodes({
   tableGroup: 'block',
@@ -29,6 +30,9 @@ tables.table_cell = {
   ...tables.table_cell,
   marks: '_',
   attrs: { ...tables.table_cell.attrs, align: { default: null } },
+  toDOM(node: Node) {
+    return ['td', { style: `text-align: ${node.attrs.align};` }, 0]
+  },
 } as any
 tables.table_header = {
   ...tables.table_header,

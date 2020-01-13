@@ -25,6 +25,7 @@ import {
   toggleBulletList,
   toggleOrderedList,
 } from '../../../commands/list-commands'
+import { insertTable } from '../../../commands/table-commands'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import styled, { css, ThemeProvider } from 'styled-components'
@@ -35,6 +36,7 @@ import {
   LinkIcon,
   OrderedListIcon,
   QuoteIcon,
+  TableIcon,
   UnorderedListIcon,
   UnderlineIcon,
 } from '@tinacms/icons'
@@ -102,6 +104,7 @@ export const Menu = (props: Props) => {
         <UnderlineControl view={view} />
         <LinkControl view={view} />
         {/* <ImageControl view={view} bottom={bottom} /> */}
+        {supportBlocks && <TableControl view={view} bottom={bottom} />}
         {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
         {supportBlocks && <CodeControl view={view} bottom={bottom} />}
         {supportBlocks && <BulletList view={view} bottom={bottom} />}
@@ -147,9 +150,14 @@ const commandContrl = (
 function wrapInBlockquote(state: EditorState, dispatch: any) {
   return wrapIn(state.schema.nodes.blockquote)(state, dispatch)
 }
+function insertTableCmd(state: EditorState, dispatch: any) {
+  return insertTable(state, dispatch)
+}
 function makeCodeBlock(state: EditorState, dispatch: any) {
   return setBlockType(state.schema.nodes.code_block)(state, dispatch)
 }
+const TableControl = commandContrl(insertTableCmd, TableIcon, 'Table', 'Table')
+
 const QuoteControl = commandContrl(
   wrapInBlockquote,
   QuoteIcon,
