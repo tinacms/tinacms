@@ -58,64 +58,49 @@ export const Sidebar = () => {
 
   return (
     <SidebarContainer open={sidebar.isOpen}>
-      <StyledFrame
-        id="sidebar-frame"
-        frameStyles={{
-          position: 'absolute',
-          left: '0',
-          top: '0',
-          width: SIDEBAR_WIDTH + 8 + 'px',
-          height: '100%',
-          margin: '0',
-          padding: '0',
-          border: '0',
-          pointerEvents: sidebar.isOpen ? 'all' : 'none',
-        }}
-      >
-        <SidebarWrapper open={sidebar.isOpen}>
-          <SidebarHeader>
-            <MenuToggle
-              onClick={() => setMenuVisibility(!menuIsVisible)}
-              open={menuIsVisible}
-            >
-              <HamburgerIcon />
-            </MenuToggle>
-            <CreateContentMenu />
-          </SidebarHeader>
-          <FormsView />
+      <SidebarWrapper open={sidebar.isOpen}>
+        <SidebarHeader>
+          <MenuToggle
+            onClick={() => setMenuVisibility(!menuIsVisible)}
+            open={menuIsVisible}
+          >
+            <HamburgerIcon />
+          </MenuToggle>
+          <CreateContentMenu />
+        </SidebarHeader>
+        <FormsView />
 
-          <MenuPanel visible={menuIsVisible}>
-            <MenuWrapper>
-              <MenuList>
-                {cms.screens.all().map(view => {
-                  const Icon = view.Icon
-                  return (
-                    <MenuLink
-                      value={view.name}
-                      onClick={() => {
-                        setActiveView(view)
-                        setMenuVisibility(false)
-                      }}
-                    >
-                      <Icon /> {view.name}
-                    </MenuLink>
-                  )
-                })}
-              </MenuList>
-            </MenuWrapper>
-            <Watermark />
-          </MenuPanel>
-          {ActiveView && (
-            <ActiveViewModal
-              name={ActiveView.name}
-              close={() => setActiveView(null)}
-              layout={ActiveView.layout}
-            >
-              <ActiveView.Component />
-            </ActiveViewModal>
-          )}
-        </SidebarWrapper>
-      </StyledFrame>
+        <MenuPanel visible={menuIsVisible}>
+          <MenuWrapper>
+            <MenuList>
+              {cms.screens.all().map(view => {
+                const Icon = view.Icon
+                return (
+                  <MenuLink
+                    value={view.name}
+                    onClick={() => {
+                      setActiveView(view)
+                      setMenuVisibility(false)
+                    }}
+                  >
+                    <Icon /> {view.name}
+                  </MenuLink>
+                )
+              })}
+            </MenuList>
+          </MenuWrapper>
+          <Watermark />
+        </MenuPanel>
+        {ActiveView && (
+          <ActiveViewModal
+            name={ActiveView.name}
+            close={() => setActiveView(null)}
+            layout={ActiveView.layout}
+          >
+            <ActiveView.Component />
+          </ActiveViewModal>
+        )}
+      </SidebarWrapper>
       <SidebarToggle {...sidebar} />
     </SidebarContainer>
   )
@@ -461,5 +446,5 @@ const SidebarContainer = styled.div<{ open: boolean }>`
     0,
     0
   ) !important;
-  pointer-events: none;
+  pointer-events: ${p => (p.open ? `all` : `none`)};
 `
