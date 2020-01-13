@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.11.1-alpha.1",
+  "version": "0.11.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -38,18 +38,18 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.6.0-alpha.0",
-    "@tinacms/fields": "^0.2.0-alpha.0",
-    "@tinacms/form-builder": "^0.2.10-alpha.1",
-    "@tinacms/forms": "^0.1.0-alpha.1",
+    "@tinacms/core": "^0.6.0",
+    "@tinacms/fields": "^0.2.0",
+    "@tinacms/form-builder": "^0.2.10",
+    "@tinacms/forms": "^0.1.0",
     "@tinacms/icons": "^0.3.9",
-    "@tinacms/react-core": "^0.2.2-alpha.1",
+    "@tinacms/react-core": "^0.2.2",
     "@tinacms/styles": "^0.1.0",
     "@types/react-beautiful-dnd": "^11.0.3",
     "lodash.merge": "^4.6.2",
     "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",
-    "react-dismissible": "^1.1.0-alpha.1",
+    "react-dismissible": "^1.1.0",
     "react-frame-component": "^4.1.1"
   },
   "peerDependencies": {
