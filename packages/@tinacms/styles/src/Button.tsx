@@ -113,6 +113,7 @@ export const IconButton = styled(Button)`
   transition: all 150ms ease-out;
   padding: 0;
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
 
