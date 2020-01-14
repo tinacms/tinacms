@@ -31,9 +31,14 @@ tables.table_cell = {
   marks: '_',
   attrs: { ...tables.table_cell.attrs, align: { default: null } },
   toDOM(node: Node) {
-    return ['td', { style: `text-align: ${node.attrs.align};` }, 0]
+    const attrs: { style?: string } = {}
+    if (node.attrs.align) {
+      attrs.style = `text-align: ${node.attrs.align};`
+    }
+    return ['td', attrs, 0]
   },
 } as any
+
 tables.table_header = {
   ...tables.table_header,
   marks: '_',
