@@ -83,9 +83,10 @@ const proseMirrorTableStyles = `
     border-top: 1px solid #c1c7cd;
     position: absolute;
     left: -1px;
+    top: -1px;
     height: 10px;
-    width: 100%;
-    transform: translate(0px, -22px);
+    width: calc(100% + 2px);
+    transform: translate(0px, -100%);
   }
   .ProseMirror .tina_table_header_ext_left {
     background: #f0f1f3;
@@ -93,18 +94,22 @@ const proseMirrorTableStyles = `
     border-bottom: 1px solid #c1c7cd;
     border-top: 1px solid #c1c7cd;
     position: absolute;
-    height: 100%;
+    height: calc(100% + 2px);
     width: 10px;
-    transform: translate(-16px, -11px);
+    left: -1px;
+    top: -1px;
+    transform: translate(-100%, 0);
   }
   .ProseMirror .tina_table_header_ext_top_left {
     background: #f0f1f3;
     border-left: 1px solid #c1c7cd;
     border-top: 1px solid #c1c7cd;
     position: absolute;
+    top: -1px;
+    left: -1px;
     height: 10px;
     width: 10px;
-    transform: translate(-16px, -22px);
+    transform: translate(-100%, -100%);
   }
 `
 
