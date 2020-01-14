@@ -33,17 +33,14 @@ export class LinkView {
   constructor(
     public view: EditorView,
     public schema: Schema,
-    public renderTarget: HTMLElement,
-    public extraDoc?: Document
+    public renderTarget: HTMLElement
   ) {
     document.addEventListener('click', this.handleClick)
-    if (extraDoc) extraDoc.addEventListener('click', this.handleClick)
     window.addEventListener('resize', this.unmountLinkForm)
   }
 
   destroy = (): void => {
     document.removeEventListener('click', this.handleClick)
-    if (this.extraDoc) this.extraDoc.addEventListener('click', this.handleClick)
     window.removeEventListener('resize', this.unmountLinkForm)
     this.renderTarget.parentElement!.removeChild(this.renderTarget)
   }
@@ -61,7 +58,7 @@ export class LinkView {
       e.preventDefault()
       e.stopPropagation()
       if (e.metaKey) {
-        const href = clickedLink.getAttribute('href');
+        const href = clickedLink.getAttribute('href')
         window.open(href ? href : undefined, '_blank')
       } else {
         startEditingLink(this.view.state, this.view.dispatch)

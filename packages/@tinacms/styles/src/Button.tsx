@@ -39,7 +39,7 @@ export const Button = styled.button<ButtonProps>`
   font-weight: 500;
   cursor: pointer;
   font-size: ${font.size(1)};
-  height: 2.5rem;
+  height: 40px;
   padding: 0 ${padding()};
   transition: all 85ms ease-out;
 
@@ -77,7 +77,7 @@ export const Button = styled.button<ButtonProps>`
   ${p =>
     p.small &&
     css`
-      height: 2rem;
+      height: 32px;
       font-size: ${font.size(0)};
       padding: 0 ${padding()};
     `};
@@ -86,7 +86,7 @@ export const Button = styled.button<ButtonProps>`
     p.margin &&
     css`
       &:not(:first-child) {
-        margin-left: 0.5rem;
+        margin-left: 8px;
       }
     `};
 
@@ -105,32 +105,33 @@ export const Button = styled.button<ButtonProps>`
 
 export const IconButton = styled(Button)`
   padding: 0;
-  width: 2rem;
-  height: 2rem;
+  width: 32px;
+  height: 32px;
   margin: 0;
   position: relative;
   transform-origin: 50% 50%;
   transition: all 150ms ease-out;
   padding: 0;
   display: flex;
+  flex-shrink: 0;
   justify-content: center;
   align-items: center;
 
   svg {
-    width: 1.625rem;
-    height: 1.625rem;
+    width: 26px;
+    height: 26px;
   }
 
   ${p =>
     p.small &&
     css`
-      width: 1.75rem;
-      height: 1.75rem;
+      width: 28px;
+      height: 28px;
       padding: 0;
 
       svg {
-        width: 1.5rem;
-        height: 1.5rem;
+        width: 24px;
+        height: 24px;
       }
     `};
 

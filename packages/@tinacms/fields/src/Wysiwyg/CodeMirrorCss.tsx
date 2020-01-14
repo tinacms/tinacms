@@ -25,8 +25,8 @@ export const CodeMirrorCss = css`
     font-family: monospace;
     height: auto;
     width: 100%;
-    border-radius: 0.3rem;
-    margin-bottom: 1rem;
+    border-radius: 5px;
+    margin-bottom: 16px;
     color: black;
     direction: ltr;
   }

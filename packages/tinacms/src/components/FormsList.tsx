@@ -65,7 +65,7 @@ const FormListItem = styled.li`
   align-items: center;
   user-select: none;
   svg {
-    width: 1.5rem;
+    width: 24px;
     fill: ${color.grey(3)};
     margin-top: -1px;
     height: auto;

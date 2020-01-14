@@ -26,11 +26,8 @@ import {
   stopEditingLink,
   updateLinkBeingEdited,
 } from '../../../commands'
-import styled, {
-  StyleSheetManager,
-  ThemeProvider,
-} from 'styled-components'
-import { FC } from 'react'
+import styled, { ThemeProvider } from 'styled-components'
+import { TinaReset } from '@tinacms/styles'
 
 export class LinkFormController {
   clickTarget: HTMLElement | null = null
@@ -38,7 +35,6 @@ export class LinkFormController {
   constructor(
     protected renderTarget: HTMLElement,
     protected view: EditorView,
-    protected frame?: { document: Document },
     protected theme?: any
   ) {
     //
@@ -54,7 +50,7 @@ export class LinkFormController {
   component(): any {
     const minWidth = 240
     const left = calcLeftOffset(this.clickTarget!, this.renderTarget, minWidth)
-    const top = `calc(2rem + ${this.clickTarget!.offsetTop -
+    const top = `calc(32px + ${this.clickTarget!.offsetTop -
       this.renderTarget.offsetTop}px)`
     const arrowOffset = calcArrowLeftOffset(
       this.clickTarget!,
@@ -63,9 +59,9 @@ export class LinkFormController {
     )
 
     return (
-      <ViewContainer frame={this.frame}>
-        <ThemeProvider theme={this.theme}>
-          <>
+      <ThemeProvider theme={this.theme}>
+        <TinaReset>
+          <LinkFormWrapper>
             <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
             <LinkForm
               style={{
@@ -79,9 +75,9 @@ export class LinkFormController {
               title={this.title}
               cancel={this.cancel}
             />
-          </>
-        </ThemeProvider>
-      </ViewContainer>
+          </LinkFormWrapper>
+        </TinaReset>
+      </ThemeProvider>
     )
   }
 
@@ -106,14 +102,9 @@ export class LinkFormController {
   }
 }
 
-const ViewContainer: FC<{ frame: any }> = ({ frame, children }) => {
-  if (!frame) return <>{children}</>
-  return (
-    <StyleSheetManager target={frame.document.head}>
-      {children}
-    </StyleSheetManager>
-  )
-}
+const LinkFormWrapper = styled.div`
+  position: relative;
+`
 
 const LinkArrow = styled.div<{ offset: string; top: string }>`
   position: absolute;
@@ -121,8 +112,8 @@ const LinkArrow = styled.div<{ offset: string; top: string }>`
   left: ${p => p.offset};
   margin-top: 3px;
   transform: translate3d(-50%, -100%, 0);
-  width: 1rem;
-  height: 0.8rem;
+  width: 16px;
+  height: 13px;
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   background-color: #f6f6f9;
   z-index: 100;
@@ -153,12 +144,12 @@ function calcLeftOffset(
 
   const leftEdgeOutsideView = ol < -ol_rt
   if (leftEdgeOutsideView) {
-    return `-0.5rem`
+    return `-8px`
   }
 
   const rightEdgeOutsideView = ol + minWidth > ow_rt
   if (rightEdgeOutsideView) {
-    return `calc(${ol - (ol + minWidth - ow_rt)}px + 0.5rem)`
+    return `calc(${ol - (ol + minWidth - ow_rt)}px + 8px)`
   }
 
   return `${ol}px`
