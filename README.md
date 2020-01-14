@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-39-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-40-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Getting Started
@@ -159,6 +159,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://andrewjames.dev"><img src="https://avatars3.githubusercontent.com/u/13269277?v=4" width="100px;" alt=""/><br /><sub><b>Andrew James</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=andrew-t-james" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/brooksztb"><img src="https://avatars3.githubusercontent.com/u/31398142?v=4" width="100px;" alt=""/><br /><sub><b>Zach B</b></sub></a><br /><a href="#talk-brooksztb" title="Talks">📢</a></td>
     <td align="center"><a href="https://github.com/jpuri"><img src="https://avatars0.githubusercontent.com/u/2182307?v=4" width="100px;" alt=""/><br /><sub><b>Jyoti Puri</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=jpuri" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/nibtime"><img src="https://avatars2.githubusercontent.com/u/52962482?v=4" width="100px;" alt=""/><br /><sub><b>nibtime</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=nibtime" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Anibtime" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
