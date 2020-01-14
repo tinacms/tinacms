@@ -26,10 +26,7 @@ import {
   stopEditingLink,
   updateLinkBeingEdited,
 } from '../../../commands'
-import styled, {
-  StyleSheetManager,
-  ThemeProvider,
-} from 'styled-components'
+import styled, { StyleSheetManager, ThemeProvider } from 'styled-components'
 import { FC } from 'react'
 
 export class LinkFormController {
@@ -121,8 +118,8 @@ const LinkArrow = styled.div<{ offset: string; top: string }>`
   left: ${p => p.offset};
   margin-top: 3px;
   transform: translate3d(-50%, -100%, 0);
-  width: 1rem;
-  height: 0.8rem;
+  width: 16px;
+  height: 13px;
   clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
   background-color: #f6f6f9;
   z-index: 100;
@@ -153,12 +150,12 @@ function calcLeftOffset(
 
   const leftEdgeOutsideView = ol < -ol_rt
   if (leftEdgeOutsideView) {
-    return `-0.5rem`
+    return `-8px`
   }
 
   const rightEdgeOutsideView = ol + minWidth > ow_rt
   if (rightEdgeOutsideView) {
-    return `calc(${ol - (ol + minWidth - ow_rt)}px + 0.5rem)`
+    return `calc(${ol - (ol + minWidth - ow_rt)}px + 8px)`
   }
 
   return `${ol}px`

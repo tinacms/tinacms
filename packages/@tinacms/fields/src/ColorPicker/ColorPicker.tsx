@@ -71,7 +71,7 @@ export const Swatch = styled(
     font-weight: bold;
 
     width: 100%;
-    height: 2.5rem;
+    height: 40px;
     border-radius: ${radius('big')};
     box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
     background: ${props =>
@@ -102,7 +102,7 @@ export const Popover = styled.div`
   position: absolute;
   left: 50%;
   transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
-  transform-origin: 50% -0.5rem;
+  transform-origin: 50% -8px;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
   z-index: 900;
   &:before {
@@ -112,8 +112,8 @@ export const Popover = styled.div`
     left: 50%;
     margin-top: 2px;
     transform: translate3d(-50%, -100%, 0);
-    width: 1rem;
-    height: 0.8rem;
+    width: 16px;
+    height: 13px;
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     background-color: white;
     z-index: 100;

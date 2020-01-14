@@ -157,7 +157,7 @@ const FieldsGroup = styled.div`
   display: block;
   width: 100%;
   height: 100%;
-  padding: 1.25rem 1.25rem 0 1.25rem;
+  padding: 20px 20px 0 20px;
   white-space: nowrap;
   overflow-x: hidden;
   overflow-y: auto !important;

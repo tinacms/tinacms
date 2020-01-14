@@ -126,7 +126,7 @@ const CloseButton = styled.div`
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
-    width: 1.5rem;
+    width: 24px;
     height: auto;
   }
   &:hover {
@@ -151,7 +151,7 @@ export const ModalHeader = styled(
     )
   }
 )`
-  height: 3.5rem;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -166,21 +166,21 @@ export const ModalBody = styled.div<{ padded?: boolean }>`
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 10rem;
+  min-height: 160px;
 
   &:last-child {
-    border-radius: 0 0 0.3rem 0.3rem;
+    border-radius: 0 0 5px 5px;
   }
 `
 
 export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
   display: flex;
   justify-content: flex-end;
-  border-radius: 0 0 0.3rem 0.3rem;
+  border-radius: 0 0 5px 5px;
   padding: 0 ${padding()} ${padding()} ${padding()};
   ${Button} {
     flex: 0 1 auto;
-    min-width: 8rem;
+    min-width: 128px;
     margin: 0 ${padding('small')} 0 0;
     &:last-child {
       margin-right: 0;
