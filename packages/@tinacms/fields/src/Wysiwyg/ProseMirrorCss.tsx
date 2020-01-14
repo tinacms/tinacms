@@ -19,6 +19,7 @@ limitations under the License.
 import { css } from 'styled-components'
 
 const proseMirrorTableStyles = `
+  /* START: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
   .ProseMirror .tableWrapper {
     overflow-x: auto;
   }
@@ -60,9 +61,50 @@ const proseMirrorTableStyles = `
     background: rgba(200, 200, 255, 0.4);
     pointer-events: none;
   }
+  /* END: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
+  .ProseMirror table {
+    display: inline-table;
+    margin: 10px;
+    overflow: visible;
+    width: calc(100% - 20px);
+  }
+  .ProseMirror th {
+    background-color: #f0f1f3;
+  }
   .ProseMirror table td,
   .ProseMirror table th {
-    border: 1px solid gray;
+    border: 1px solid #c1c7cd;
+    padding: 10px 4px;
+  }
+  .ProseMirror .tina_table_header_ext_top {
+    background: #f0f1f3;
+    border-left: 1px solid #c1c7cd;
+    border-right: 1px solid #c1c7cd;
+    border-top: 1px solid #c1c7cd;
+    position: absolute;
+    left: -1px;
+    height: 10px;
+    width: 100%;
+    transform: translate(0px, -22px);
+  }
+  .ProseMirror .tina_table_header_ext_left {
+    background: #f0f1f3;
+    border-left: 1px solid #c1c7cd;
+    border-bottom: 1px solid #c1c7cd;
+    border-top: 1px solid #c1c7cd;
+    position: absolute;
+    height: 100%;
+    width: 10px;
+    transform: translate(-16px, -11px);
+  }
+  .ProseMirror .tina_table_header_ext_top_left {
+    background: #f0f1f3;
+    border-left: 1px solid #c1c7cd;
+    border-top: 1px solid #c1c7cd;
+    position: absolute;
+    height: 10px;
+    width: 10px;
+    transform: translate(-16px, -22px);
   }
 `
 
