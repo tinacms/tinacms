@@ -44,7 +44,7 @@ const ImgPlaceholder = styled.div`
   background-color: ${color.grey(2)};
   color: ${color.grey(4)};
   line-height: 1.35;
-  padding: 0.75rem 0;
+  padding: 12px 0;
   font-size: ${font.size(2)};
   font-weight: 500;
   transition: all 85ms ease-out;
@@ -68,8 +68,8 @@ const StyledImage = styled.img`
 `
 
 const DeleteButton = styled(IconButton)`
-  top: 0.5rem;
-  right: 0.5rem;
+  top: 8px;
+  right: 8px;
   position: absolute;
   &:not(:hover) {
     fill: ${color.grey()};

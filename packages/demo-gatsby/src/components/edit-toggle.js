@@ -1,4 +1,3 @@
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -35,11 +34,11 @@ export const EditToggle = styled(
   }
 )`
   position: fixed;
-  bottom: 2.875rem;
-  margin-left: 4rem;
+  bottom: 46px;
+  margin-left: 64px;
   display: flex;
   align-items: center;
   justify-content: center;
-  min-width: 8rem;
+  min-width: 128px;
   font-family: "Inter", sans-serif;
 `

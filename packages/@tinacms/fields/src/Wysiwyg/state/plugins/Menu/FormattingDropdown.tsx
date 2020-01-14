@@ -36,7 +36,6 @@ interface State {
 
 export interface FormattingDropdownProps {
   view: EditorView
-  frame?: { document: Document }
 }
 
 export class FormattingDropdown extends React.Component<
@@ -54,11 +53,7 @@ export class FormattingDropdown extends React.Component<
     )
   lift = () => lift(this.props.view.state, this.props.view.dispatch)
   render() {
-    const { view, frame } = this.props
-    let document
-    if (frame) {
-      document = frame.document
-    }
+    const { view } = this.props
     return (
       <MenuDropdownWrapper>
         <MenuButton
@@ -76,7 +71,6 @@ export class FormattingDropdown extends React.Component<
             onDismiss={() => {
               this.toggle()
             }}
-            document={document}
           >
             <H1 view={view} onClick={this.toggle} />
             <H2 view={view} onClick={this.toggle} />
@@ -92,7 +86,10 @@ export class FormattingDropdown extends React.Component<
 }
 
 function makeToggleHeader(level: number) {
-  return function toggleHeader(state: EditorState, dispatch: typeof EditorView.prototype.dispatch) {
+  return function toggleHeader(
+    state: EditorState,
+    dispatch: typeof EditorView.prototype.dispatch
+  ) {
     const tn = th(
       state.schema.nodes.heading,
       { level },

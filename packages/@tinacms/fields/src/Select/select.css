@@ -17,10 +17,10 @@ limitations under the License.
 */
 
 .Select-control {
-  border-radius: 0.3rem;
+  border-radius: 5px;
   border: 1px solid #dee2e6;
   transition: border 0.2s ease;
-  font-size: 0.9rem;
+  font-size: 14px;
   height: 30px;
 }
 
@@ -38,7 +38,7 @@ limitations under the License.
 
 .Select-menu-outer {
   border: 1px solid #adb5bd;
-  font-size: 0.9rem;
+  font-size: 14px;
 }
 
 .Select-option.is-selected {

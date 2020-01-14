@@ -251,7 +251,7 @@ export const AddBlockMenu = styled(
     )
   }
 )`
-  margin-bottom: 1rem;
+  margin-bottom: 16px;
 `
 
 const AddBlockButton = styled(TinaButton)`
@@ -286,7 +286,7 @@ interface BlocksUIProps {
 }
 
 const BlocksMenu = styled.div<BlocksUIProps>`
-  min-width: 12rem;
+  min-width: 192px;
   border-radius: ${radius()};
   border: 1px solid ${color.grey(2)};
   display: block;
@@ -307,7 +307,7 @@ const BlocksMenu = styled.div<BlocksUIProps>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(-50%, 3rem, 0) scale3d(1, 1, 1);
+      transform: translate3d(-50%, 48px, 0) scale3d(1, 1, 1);
     `};
 `
 
@@ -316,8 +316,8 @@ const BlockOption = styled.button`
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};
-  padding: 0 0.75rem;
-  height: 2.5rem;
+  padding: 0 12px;
+  height: 40px;
   font-weight: 500;
   width: 100%;
   background: none;
@@ -350,13 +350,13 @@ const MoveButtons = styled.div`
 `
 
 const MoveButton = styled(IconButton)`
-  width: 2.5rem;
+  width: 40px;
 `
 
 const CloseButton = styled(IconButton)`
   svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 20px;
+    height: 20px;
   }
 `
 
@@ -399,9 +399,9 @@ const BlocksActions = styled(
   display: flex;
   position: absolute;
   z-index: 1000;
-  top: -1.5rem;
-  right: -1.25rem;
-  transform: translate3d(0, calc(-100% + 1rem), 0);
+  top: -24px;
+  right: -20px;
+  transform: translate3d(0, calc(-100% + 16px), 0);
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
@@ -414,12 +414,12 @@ const BlocksActions = styled(
     top: 0;
     right: 0;
     z-index: -1;
-    width: calc(100% + 1.5rem);
-    height: calc(100% + 1.5rem);
+    width: calc(100% + 24px);
+    height: calc(100% + 24px);
   }
 
   > * {
-    margin: 0.25rem;
+    margin: 4px;
   }
 `
 
@@ -456,8 +456,8 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
     content: '';
     display: block;
     position: absolute;
-    left: -1rem;
-    top: -1rem;
+    left: -16px;
+    top: -16px;
     width: calc(100% + 2rem);
     height: calc(100% + 2rem);
     border: 3px solid ${color.primary()};
@@ -475,7 +475,7 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
 
   ${AddBlockMenu} {
     position: absolute;
-    bottom: -1.5rem;
+    bottom: -24px;
     left: 50%;
     transform: translate3d(-50%, calc(100% - 2rem), 0);
     width: auto;
@@ -491,11 +491,11 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
       display: block;
       position: absolute;
       bottom: 0;
-      left: -6rem;
+      left: -96px;
       z-index: -1;
       width: calc(100% + 12rem);
-      height: calc(100% + 1.5rem);
-      clip-path: polygon(0 0, 100% 0, calc(100% - 6rem) 100%, 6rem 100%);
+      height: calc(100% + 24px);
+      clip-path: polygon(0 0, 100% 0, calc(100% - 96px) 100%, 96px 100%);
     }
   }
 

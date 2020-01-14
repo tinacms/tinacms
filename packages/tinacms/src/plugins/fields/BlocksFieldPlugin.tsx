@@ -38,7 +38,6 @@ import {
   IconButton,
   shadow,
 } from '@tinacms/styles'
-import { useFrameContext } from '../../components/SyledFrame'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -86,7 +85,6 @@ interface BlockFieldProps {
 }
 
 const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
-  const frame = useFrameContext()
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
       let obj: any = {}
@@ -121,7 +119,6 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
             click
             escape
             onDismiss={() => setVisible(false)}
-            document={frame.document}
             disabled={!visible}
           >
             <BlockMenuList>
@@ -296,13 +293,13 @@ const EmptyList = styled.div`
   background-color: ${color.grey(2)};
   color: ${color.grey(4)};
   line-height: 1.35;
-  padding: 0.75rem 0;
+  padding: 12px 0;
   font-size: ${font.size(2)};
   font-weight: 500;
 `
 
 const BlockMenu = styled.div<{ open: boolean }>`
-  min-width: 12rem;
+  min-width: 192px;
   border-radius: ${radius()};
   border: 1px solid #efefef;
   display: block;
@@ -323,7 +320,7 @@ const BlockMenu = styled.div<{ open: boolean }>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, 2.25rem, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, 36px, 0) scale3d(1, 1, 1);
     `};
 `
 
@@ -360,7 +357,7 @@ const ItemClickTarget = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  padding: 0.5rem;
+  padding: 8px;
 `
 
 const GroupLabel = styled.span<{ error?: boolean }>`
@@ -387,7 +384,7 @@ const GroupListHeader = styled.div`
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 0.75rem;
+  margin-bottom: 12px;
   position: relative;
   ${GroupLabel} {
     font-size: ${font.size(3)};
@@ -398,7 +395,7 @@ const GroupListPanel = styled.div`
   max-height: initial;
   position: relative;
   height: auto;
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
   border-radius: ${radius('small')};
   background-color: ${color.grey(2)};
 `
@@ -428,7 +425,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   svg {
     fill: ${color.grey(3)};
-    width: 1.25rem;
+    width: 20px;
     height: auto;
     transition: fill 85ms ease-out;
   }
@@ -443,11 +440,11 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   }
 
   &:first-child {
-    border-radius: 0.25rem 0.25rem 0 0;
+    border-radius: 4px 4px 0 0;
   }
 
   &:nth-last-child(2) {
-    border-radius: 0 0 0.25rem 0.25rem;
+    border-radius: 0 0 4px 4px;
     &:first-child {
       border-radius: ${radius('small')};
     }
@@ -483,7 +480,7 @@ const DeleteButton = styled.button`
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 0.75rem 0.5rem;
+  padding: 12px 8px;
   margin: 0;
   transition: all 85ms ease-out;
   &:hover {
@@ -501,10 +498,10 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
 })`
   margin: 0;
   flex: 0 0 auto;
-  width: 2rem;
+  width: 32px;
   position: relative;
   fill: inherit;
-  padding: 0.75rem 0;
+  padding: 12px 0;
   transition: all 85ms ease-out;
   &:hover {
     background-color: #f6f6f9;
@@ -514,8 +511,8 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
     position: absolute;
     left: 50%;
     top: 50%;
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 20px;
+    height: 20px;
     transform: translate3d(-50%, -50%, 0);
     transition: all 85ms ease-out;
   }

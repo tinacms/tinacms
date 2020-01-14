@@ -57,7 +57,7 @@ export const InputCss = css<InputProps>`
     p.small &&
     css`
       font-size: ${font.size(1)};
-      padding: 0.5rem ${padding('small')};
+      padding: 8px ${padding('small')};
     `};
 `
 

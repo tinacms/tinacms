@@ -26,7 +26,7 @@ import { useMarkdownTranslator } from './useMarkdownTranslator'
 import { nodeViews } from './node-views'
 
 interface CheckableEditorView extends EditorView {
-  docView: NodeView | null,
+  docView: NodeView | null
 }
 
 export interface Input {
@@ -39,7 +39,6 @@ export interface Input {
 export function useTinaProsemirror(
   input: Input,
   plugins: Plugin[] = [],
-  frame?: any,
   theme?: any
 ) {
   /**
@@ -67,7 +66,7 @@ export function useTinaProsemirror(
    * CreateState
    */
   const createState = React.useCallback((value: string) => {
-    return createEditorState(schema, translator, plugins, value, frame, theme)
+    return createEditorState(schema, translator, plugins, value, theme)
   }, [])
 
   /**
@@ -133,13 +132,12 @@ export function useTinaProsemirror(
     if (!editorView) return
     if (!(editorView as CheckableEditorView).docView) return
 
-    const doc = frame ? frame.document : document
-    const wysiwygIsActive = el.contains(doc.activeElement)
+    const wysiwygIsActive = el.contains(document.activeElement)
 
     if (!wysiwygIsActive) {
       editorView.updateState(createState(input.value))
     }
-  }, [input.value, editorView])
+  }, [input.value, editorView, document])
 
   return elRef
 }
