@@ -60,15 +60,15 @@ const ToggleLabel = styled.label<{ disabled?: boolean }>`
   padding: 0;
   opacity: ${props => (props.disabled ? '0.4' : '1')};
   outline: none;
-  width: 3rem;
-  height: 1.75rem;
+  width: 48px;
+  height: 28px;
   pointer-events: ${props => (props.disabled ? 'none' : 'inherit')};
 `
 
 const ToggleSwitch = styled.div<{ checked: boolean }>`
   position: relative;
-  width: 3rem;
-  height: 1.75rem;
+  width: 48px;
+  height: 28px;
   border-radius: ${radius()};
   background-color: white;
   border: 1px solid ${color.grey(2)};
@@ -79,10 +79,10 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
     border-radius: ${radius()};
     left: 2px;
     top: 50%;
-    width: calc(1.75rem - 6px);
-    height: calc(1.75rem - 6px);
+    width: calc(28px - 6px);
+    height: calc(28px - 6px);
     background: ${p => (p.checked ? color.primary() : color.grey(3))};
-    transform: translate3d(${p => (p.checked ? '1.25rem' : '0')}, -50%, 0);
+    transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
   }
 `
@@ -91,8 +91,8 @@ const ToggleInput = styled.input`
   position: absolute;
   left: 0;
   top: 0;
-  width: 3rem;
-  height: 1.75rem;
+  width: 48px;
+  height: 28px;
   opacity: 0;
   margin: 0;
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};

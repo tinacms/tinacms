@@ -103,15 +103,15 @@ const Header: StyledComponent<'div', {}, {}> = styled.div`
   align-items: center;
   border: 1px solid ${color.grey(2)};
   border-radius: ${radius('small')};
-  margin: 0 0 1.5rem 0;
+  margin: 0 0 24px 0;
   overflow: visible;
   line-height: 1.35;
-  padding: 0.75rem;
+  padding: 12px;
   color: #282828;
   background-color: white;
 
   svg {
-    width: 1.5rem;
+    width: 24px;
     height: auto;
     fill: ${color.grey(3)};
     transition: all 85ms ease-out;
@@ -138,7 +138,7 @@ export const PanelHeader: StyledComponent<typeof Header, {}, {}> = styled(
   border-radius: 0;
   border-bottom: 1px solid ${color.grey(2)};
   margin: 0;
-  padding: 0.75rem 1.25rem;
+  padding: 12px 20px;
 
   span {
     flex: 1 1 auto;
@@ -187,8 +187,8 @@ const GroupPanelKeyframes = keyframes`
 export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   position: fixed;
   width: ${SIDEBAR_WIDTH}px;
-  top: ${SIDEBAR_HEADER_HEIGHT}rem;
-  bottom: ${FORM_FOOTER_HEIGHT}rem;
+  top: ${SIDEBAR_HEADER_HEIGHT}px;
+  bottom: ${FORM_FOOTER_HEIGHT}px;
   left: 0;
   display: flex;
   flex-direction: column;
