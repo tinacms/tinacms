@@ -136,7 +136,6 @@ interface Props {
   userColors: string[]
   widget?: 'sketch' | 'block'
   input: WrappedFieldProps['input']
-  frame: any
 }
 
 const nullColor = 'transparent'
@@ -192,7 +191,6 @@ export const ColorPicker: React.FC<Props> = ({
   userColors = presetColors,
   widget = 'sketch',
   input,
-  frame,
 }) => {
   const Widget = WIDGETS[widget]
   if (!Widget) throw new Error('You must specify a widget type.')
@@ -227,7 +225,6 @@ export const ColorPicker: React.FC<Props> = ({
             escape
             disabled={!displayColorPicker}
             onDismiss={() => setDisplayColorPicker(false)}
-            document={frame.document}
           >
             <Widget
               presetColors={[...userColors, nullColor]}

@@ -22,7 +22,6 @@ import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { padding, color, radius, font, shadow } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
-import { useFrameContext } from './SyledFrame'
 import { Form } from '@tinacms/core'
 
 export interface ActionsMenuProps {
@@ -31,7 +30,6 @@ export interface ActionsMenuProps {
 }
 
 export const ActionsMenu: FC<ActionsMenuProps> = ({ actions, form }) => {
-  const frame = useFrameContext()
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
   return (
     <>
@@ -41,7 +39,6 @@ export const ActionsMenu: FC<ActionsMenuProps> = ({ actions, form }) => {
           click
           escape
           disabled={!actionMenuVisibility}
-          document={frame.document}
           onDismiss={() => {
             setActionMenuVisibility(p => !p)
           }}
