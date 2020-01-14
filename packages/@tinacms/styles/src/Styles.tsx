@@ -307,4 +307,12 @@ export const TinaReset = styled.div`
       margin-bottom: 0;
     }
   }
+  td,
+  th {
+    padding: 0;
+    width: auto;
+    height: auto;
+    border: inherit;
+    margin: 0;
+  }
 `
