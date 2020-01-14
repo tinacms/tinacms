@@ -18,6 +18,7 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
@@ -85,6 +86,37 @@ const LinkControl = markControl({
 
 export const Menu = (props: Props) => {
   const { view, bottom = false, frame, theme } = props
+  const [menuFixed, setMenuFixed] = useState(false)
+  const [menuOffset, setMenuOffset] = useState(0)
+  const [menuWidth, setMenuWidth] = useState()
+  const menuRef: any = useRef()
+
+  const handleScroll = () => {
+    // Need to know the Y coord of the bottom of the div that contains the text
+    const textAreaBottom =
+      menuRef.current.parentElement.nextSibling.offsetHeight + menuOffset
+
+    if (
+      window.scrollY > menuOffset &&
+      window.scrollY < textAreaBottom &&
+      !menuFixed
+    ) {
+      // Need to remember the menu original position and width
+      setMenuOffset(menuRef.current.offsetTop)
+      setMenuWidth(menuRef.current.offsetWidth)
+      setMenuFixed(true)
+    } else if (
+      (window.scrollY < menuOffset || window.scrollY > textAreaBottom) &&
+      menuFixed
+    ) {
+      setMenuFixed(false)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  })
 
   const supportBlocks = true
 
@@ -95,7 +127,12 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
+      <MenuContainer
+        menuFixed={menuFixed}
+        menuWidth={menuWidth}
+        ref={menuRef}
+        onMouseDown={preventProsemirrorFocusLoss}
+      >
         {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
         <BoldControl view={view} />
         <ItalicControl view={view} />
@@ -176,12 +213,18 @@ const OrderedList = commandContrl(
   'Ordered List'
 )
 
-const MenuContainer = styled.div`
+type MenuContainerProps = {
+  menuFixed: boolean
+  menuWidth: number
+}
+
+const MenuContainer = styled.div<MenuContainerProps>`
   display: flex;
   justify-content: space-between;
-  position: sticky;
+  position: ${({ menuFixed }) => (menuFixed ? 'fixed' : 'relative')};
   top: 0;
   width: 100%;
+  max-width: ${({ menuWidth }) => `${menuWidth}px`};
   background-color: white;
   border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
