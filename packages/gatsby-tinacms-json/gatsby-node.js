@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-const { GraphQLString } = require('graphql')
+const { GraphQLString } = require('gatsby/graphql')
 const slash = require('slash')
 
 exports.setFieldsOnGraphQLNodeType = ({ type, getNode }) => {
