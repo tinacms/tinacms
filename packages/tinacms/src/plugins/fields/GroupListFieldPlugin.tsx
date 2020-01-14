@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '@tinacms/core'
+import { Field, Form } from '@tinacms/forms'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { color, font, radius, IconButton } from '@tinacms/styles'
@@ -133,7 +133,7 @@ interface ItemProps {
 const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
-    tinaForm.finalForm.mutators.remove(field.name, index)
+    tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
   const title = label || (field.label || field.name) + ' Item'
   return (

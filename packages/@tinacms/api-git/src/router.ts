@@ -67,9 +67,9 @@ export async function updateRemoteToSSH(pathRoot: string) {
   const originURL = originRemotes[0].refs.push
 
   if (originURL && !isSSHUrl(originURL)) {
-    repo.removeRemote('origin')
+    await repo.removeRemote('origin')
     const newRemote = getGitSSHUrl(originURL)
-    repo.addRemote('origin', newRemote)
+    await repo.addRemote('origin', newRemote)
   }
 }
 
@@ -84,9 +84,28 @@ async function createSSHKey(pathRoot: string) {
       encoding: 'utf8',
       mode: 0o600,
     })
-
-    updateRemoteToSSH(pathRoot)
   }
+}
+
+async function configureGitRemote(pathRoot: string) {
+  await createSSHKey(pathRoot)
+  if (process.env.GIT_REMOTE) {
+    await updateOrigin(pathRoot, process.env.GIT_REMOTE)
+  }
+  await updateRemoteToSSH(pathRoot)
+}
+
+async function updateOrigin(pathRoot: string, remote: string) {
+  const repo = await openRepo(pathRoot)
+  const newRemote = getGitSSHUrl(remote)
+
+  const existingRemotes = await repo.getRemotes(true)
+  if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
+    console.warn(`Changing remote origin to ${newRemote}`)
+  }
+
+  await repo.removeRemote('origin')
+  await repo.addRemote('origin', newRemote)
 }
 
 export function router(config: GitRouterConfig = {}) {
@@ -104,7 +123,7 @@ export function router(config: GitRouterConfig = {}) {
   const router = express.Router()
   router.use(express.json())
 
-  createSSHKey(REPO_ABSOLUTE_PATH)
+  configureGitRemote(REPO_ABSOLUTE_PATH)
 
   router.delete('/:relPath', (req: any, res: any) => {
     const user = req.user || {}

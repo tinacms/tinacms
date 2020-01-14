@@ -109,21 +109,21 @@ function EditableBlocks({
 
   const move = useCallback(
     (from: number, to: number) => {
-      form.finalForm.mutators.move(name, from, to)
+      form.mutators.move(name, from, to)
     },
     [form, name]
   )
 
   const remove = React.useCallback(
     (index: number) => {
-      form.finalForm.mutators.remove(name, index)
+      form.mutators.remove(name, index)
     },
     [form, name]
   )
 
   const insert = React.useCallback(
     (block: any, index: number) => {
-      form.finalForm.mutators.insert(name, index, block)
+      form.mutators.insert(name, index, block)
     },
     [form, name]
   )

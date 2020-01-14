@@ -1,0 +1,39 @@
+{
+  "name": "next-tinacms-json",
+  "version": "0.1.0-alpha.1",
+  "license": "Apache-2.0",
+  "author": "Nolan Phillips",
+  "main": "dist/index.js",
+  "module": "dist/next-tinacms-json.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "watch": "tsdx watch",
+    "build": "tsdx build",
+    "dev": "tsdx build",
+    "test": "tsdx test --env=jsdom",
+    "lint": "tsdx lint"
+  },
+  "peerDependencies": {
+    "next": ">=9",
+    "react": ">=16",
+    "tinacms": ">=0.11"
+  },
+  "dependencies": {
+    "next": ">=9",
+    "react": ">=16",
+    "tinacms": "^0.11.1-alpha.1"
+  },
+  "devDependencies": {
+    "@types/jest": "^24.0.25",
+    "@types/react": "^16.9.17",
+    "@types/react-dom": "^16.9.4",
+    "react": "^16.12.0",
+    "react-dom": "^16.12.0",
+    "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.7.4"
+  }
+}

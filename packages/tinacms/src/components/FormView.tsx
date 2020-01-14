@@ -20,7 +20,7 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
 import { useState } from 'react'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import {
   Button,
@@ -100,10 +100,13 @@ export function FormView({
 }: FormViewProps) {
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
-      const form = activeForm!.finalForm
-      if (!result.destination) return
+      if (!result.destination || !activeForm) return
       const name = result.type
-      form.mutators.move(name, result.source.index, result.destination.index)
+      activeForm.mutators.move(
+        name,
+        result.source.index,
+        result.destination.index
+      )
     },
     [activeForm]
   )

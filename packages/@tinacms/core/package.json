@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/core",
-  "version": "0.5.1",
+  "version": "0.6.0-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -9,8 +9,7 @@
   ],
   "keywords": [
     "tinacms",
-    "cms",
-    "react"
+    "cms"
   ],
   "bugs": {
     "url": "https://github.com/tinacms/tinacms/issues"
@@ -32,12 +31,5 @@
     "@types/react": "^16.8.23",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
-  },
-  "dependencies": {
-    "final-form": "^4.18.2",
-    "final-form-arrays": "^3.0.1"
-  },
-  "peerDependencies": {
-    "react": ">=16.8"
   }
 }

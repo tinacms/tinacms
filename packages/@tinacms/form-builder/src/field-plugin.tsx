@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Field } from '@tinacms/core'
+import { Field } from '@tinacms/forms'
 
 export interface FieldPlugin {
   __type: 'field'

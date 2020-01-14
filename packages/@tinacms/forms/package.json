@@ -1,0 +1,44 @@
+{
+  "name": "@tinacms/forms",
+  "version": "0.1.0-alpha.1",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "Apache-2.0",
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "tinacms",
+    "cms",
+    "react"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/core/core"
+  },
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "build": "tinacms-scripts build"
+  },
+  "devDependencies": {
+    "@tinacms/core": "^0.6.0-alpha.0",
+    "@tinacms/scripts": "^0.1.11",
+    "@types/jest": "^24.0.15",
+    "@types/react": "^16.8.23",
+    "jest": "^24.8.0",
+    "ts-jest": "^24.0.2"
+  },
+  "dependencies": {
+    "final-form": "^4.18.2",
+    "final-form-arrays": "^3.0.1"
+  },
+  "peerDependencies": {
+    "react": ">=16.8"
+  }
+}
