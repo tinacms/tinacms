@@ -342,12 +342,12 @@ export const pageQuery = graphql`
       excerpt(pruneLength: 160)
       html
       frontmatter {
-        blocks {
-          _template
-          text
-          alt
-          src
-        }
+        # blocks {
+        #   _template
+        #   text
+        #   alt
+        #   src
+        # }
         title
         date(formatString: "DD MMMM, YYYY")
         description
