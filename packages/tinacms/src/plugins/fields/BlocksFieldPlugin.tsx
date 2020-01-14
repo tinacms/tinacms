@@ -38,7 +38,6 @@ import {
   IconButton,
   shadow,
 } from '@tinacms/styles'
-import { useFrameContext } from '../../components/SyledFrame'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -86,7 +85,6 @@ interface BlockFieldProps {
 }
 
 const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
-  const frame = useFrameContext()
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
       let obj: any = {}
@@ -121,7 +119,6 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
             click
             escape
             onDismiss={() => setVisible(false)}
-            document={frame.document}
             disabled={!visible}
           >
             <BlockMenuList>

@@ -19,20 +19,13 @@ limitations under the License.
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
-import { useFrameContext } from '../../components/SyledFrame'
 import * as React from 'react'
 import { InputCss } from '@tinacms/fields'
 
 const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'
 
-const FramedWysiwyg = (props: any) => {
-  const frame = useFrameContext()
-
-  return <Wysiwyg {...props} frame={frame} />
-}
-
-export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
+export const MarkdownField = wrapFieldsWithMeta(styled(Wysiwyg)`
   position: relative;
 
   > [contenteditable] {

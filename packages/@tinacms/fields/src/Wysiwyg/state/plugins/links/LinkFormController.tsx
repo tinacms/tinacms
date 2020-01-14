@@ -26,8 +26,7 @@ import {
   stopEditingLink,
   updateLinkBeingEdited,
 } from '../../../commands'
-import styled, { StyleSheetManager, ThemeProvider } from 'styled-components'
-import { FC } from 'react'
+import styled, { ThemeProvider } from 'styled-components'
 
 export class LinkFormController {
   clickTarget: HTMLElement | null = null
@@ -35,7 +34,6 @@ export class LinkFormController {
   constructor(
     protected renderTarget: HTMLElement,
     protected view: EditorView,
-    protected frame?: { document: Document },
     protected theme?: any
   ) {
     //
@@ -60,25 +58,23 @@ export class LinkFormController {
     )
 
     return (
-      <ViewContainer frame={this.frame}>
-        <ThemeProvider theme={this.theme}>
-          <>
-            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
-            <LinkForm
-              style={{
-                left,
-                top,
-                minWidth: `${minWidth}px`,
-              }}
-              removeLink={this.removeLink}
-              onChange={this.onChange}
-              href={this.href}
-              title={this.title}
-              cancel={this.cancel}
-            />
-          </>
-        </ThemeProvider>
-      </ViewContainer>
+      <ThemeProvider theme={this.theme}>
+        <>
+          <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+          <LinkForm
+            style={{
+              left,
+              top,
+              minWidth: `${minWidth}px`,
+            }}
+            removeLink={this.removeLink}
+            onChange={this.onChange}
+            href={this.href}
+            title={this.title}
+            cancel={this.cancel}
+          />
+        </>
+      </ThemeProvider>
     )
   }
 
@@ -101,15 +97,6 @@ export class LinkFormController {
       creating: '',
     })
   }
-}
-
-const ViewContainer: FC<{ frame: any }> = ({ frame, children }) => {
-  if (!frame) return <>{children}</>
-  return (
-    <StyleSheetManager target={frame.document.head}>
-      {children}
-    </StyleSheetManager>
-  )
 }
 
 const LinkArrow = styled.div<{ offset: string; top: string }>`

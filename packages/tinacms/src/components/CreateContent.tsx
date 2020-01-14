@@ -38,12 +38,10 @@ import {
   shadow,
 } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
-import { useFrameContext } from './SyledFrame'
 import { useCMS, useSubscribable } from '../react-tinacms'
 
 export const CreateContentMenu = () => {
   const cms = useCMS()
-  const frame = useFrameContext()
   const [visible, setVisible] = React.useState(false)
 
   const contentCreatorPlugins = cms.plugins.findOrCreateMap('content-creator')
@@ -61,7 +59,6 @@ export const CreateContentMenu = () => {
             click
             escape
             onDismiss={() => setVisible(false)}
-            document={frame.document}
             disabled={!visible}
           >
             {contentCreatorPlugins.all().map(plugin => (

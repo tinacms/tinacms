@@ -46,7 +46,6 @@ interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
   view: EditorView
-  frame: any
   theme: any
 }
 
@@ -84,7 +83,7 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { view, bottom = false, frame, theme } = props
+  const { view, bottom = false, theme } = props
 
   const supportBlocks = true
 
@@ -96,7 +95,7 @@ export const Menu = (props: Props) => {
   return (
     <ThemeProvider theme={theme}>
       <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-        {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
+        {supportBlocks && <FormattingDropdown view={view} />}
         <BoldControl view={view} />
         <ItalicControl view={view} />
         <UnderlineControl view={view} />
