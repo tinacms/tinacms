@@ -230,7 +230,7 @@ export const TinaResetStyles = css`
   direction: ltr;
   display: inline;
   float: none;
-  font-size: 100%;
+  font-size: 16px;
   font-stretch: normal;
   font-style: normal;
   font-variant: normal;
