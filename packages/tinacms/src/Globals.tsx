@@ -20,5 +20,4 @@ export const SIDEBAR_WIDTH = 340 // px
 export const SIDEBAR_HEADER_HEIGHT = 60 // px
 export const FORM_HEADER_HEIGHT = 40 // px
 export const FORM_FOOTER_HEIGHT = 60 // px
-export const TOGGLE_WIDTH = 60 // px
 export const Z_INDEX = 2147000000

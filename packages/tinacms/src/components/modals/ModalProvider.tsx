@@ -24,7 +24,6 @@ import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'
 import {
   TinaReset,
-  GlobalStyles,
   Button,
   padding,
   font,

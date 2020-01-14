@@ -29,20 +29,8 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import {
-  GlobalStyles,
-  padding,
-  color,
-  radius,
-  font,
-  timing,
-} from '@tinacms/styles'
-import {
-  SIDEBAR_WIDTH,
-  TOGGLE_WIDTH,
-  Z_INDEX,
-  SIDEBAR_HEADER_HEIGHT,
-} from '../../Globals'
+import { padding, color, radius, font, timing } from '@tinacms/styles'
+import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
