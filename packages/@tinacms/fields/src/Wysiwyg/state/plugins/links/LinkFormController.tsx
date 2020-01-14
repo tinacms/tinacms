@@ -27,6 +27,7 @@ import {
   updateLinkBeingEdited,
 } from '../../../commands'
 import styled, { ThemeProvider } from 'styled-components'
+import { TinaReset } from '@tinacms/styles'
 
 export class LinkFormController {
   clickTarget: HTMLElement | null = null
@@ -49,7 +50,7 @@ export class LinkFormController {
   component(): any {
     const minWidth = 240
     const left = calcLeftOffset(this.clickTarget!, this.renderTarget, minWidth)
-    const top = `calc(2rem + ${this.clickTarget!.offsetTop -
+    const top = `calc(32px + ${this.clickTarget!.offsetTop -
       this.renderTarget.offsetTop}px)`
     const arrowOffset = calcArrowLeftOffset(
       this.clickTarget!,
@@ -59,21 +60,23 @@ export class LinkFormController {
 
     return (
       <ThemeProvider theme={this.theme}>
-        <>
-          <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
-          <LinkForm
-            style={{
-              left,
-              top,
-              minWidth: `${minWidth}px`,
-            }}
-            removeLink={this.removeLink}
-            onChange={this.onChange}
-            href={this.href}
-            title={this.title}
-            cancel={this.cancel}
-          />
-        </>
+        <TinaReset>
+          <LinkFormWrapper>
+            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+            <LinkForm
+              style={{
+                left,
+                top,
+                minWidth: `${minWidth}px`,
+              }}
+              removeLink={this.removeLink}
+              onChange={this.onChange}
+              href={this.href}
+              title={this.title}
+              cancel={this.cancel}
+            />
+          </LinkFormWrapper>
+        </TinaReset>
       </ThemeProvider>
     )
   }
@@ -98,6 +101,10 @@ export class LinkFormController {
     })
   }
 }
+
+const LinkFormWrapper = styled.div`
+  position: relative;
+`
 
 const LinkArrow = styled.div<{ offset: string; top: string }>`
   position: absolute;
