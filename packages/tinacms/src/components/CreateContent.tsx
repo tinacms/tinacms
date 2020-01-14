@@ -27,7 +27,7 @@ import {
 import { ModalPopup } from './modals/ModalPopup'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
 import {
   color,

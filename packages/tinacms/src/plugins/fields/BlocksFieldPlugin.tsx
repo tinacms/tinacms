@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '@tinacms/core'
+import { Field, Form } from '@tinacms/forms'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
@@ -205,7 +205,7 @@ const BlockListItem = ({
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   const removeItem = React.useCallback(() => {
-    tinaForm.finalForm.mutators.remove(field.name, index)
+    tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
   return (
@@ -257,7 +257,7 @@ const InvalidBlockListItem = ({
   index: number
 }) => {
   const removeItem = React.useCallback(() => {
-    tinaForm.finalForm.mutators.remove(field.name, index)
+    tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
   return (
