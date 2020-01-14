@@ -61,7 +61,8 @@ export async function updateRemoteToSSH(pathRoot: string) {
   const originRemotes = remotes.filter((r: any) => r.name == 'origin')
 
   if (!originRemotes.length) {
-    throw new Error('No origin remote on the given rpeo')
+    console.warn('No origin remote on the given repo')
+    return
   }
 
   const originURL = originRemotes[0].refs.push
@@ -123,6 +124,8 @@ export function router(config: GitRouterConfig = {}) {
   const router = express.Router()
   router.use(express.json())
 
+  // TODO: There shold be some way of making sure this only happens
+  //       in a cloud editing environment.
   configureGitRemote(REPO_ABSOLUTE_PATH)
 
   router.delete('/:relPath', (req: any, res: any) => {
