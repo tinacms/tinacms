@@ -418,6 +418,16 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "jsoulet",
+      "name": "Johan Soulet",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/2269599?v=4",
+      "profile": "http://doyoubuzz.com/johan-soulet",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
