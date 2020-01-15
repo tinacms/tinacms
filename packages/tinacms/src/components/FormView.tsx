@@ -361,7 +361,6 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   scrollbar-width: none;
   width: 100%;
   overflow: hidden;
-  border-top: 1px solid ${color.grey(2)};
   background-color: #f6f6f9;
 
   ${Wrapper} {
