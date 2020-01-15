@@ -22,7 +22,6 @@ import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { padding, color, radius, font, shadow } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
-import { useFrameContext } from './SyledFrame'
 import { Form } from '@tinacms/forms'
 
 export interface ActionsMenuProps {
@@ -31,7 +30,6 @@ export interface ActionsMenuProps {
 }
 
 export const ActionsMenu: FC<ActionsMenuProps> = ({ actions, form }) => {
-  const frame = useFrameContext()
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
   return (
     <>
@@ -41,7 +39,6 @@ export const ActionsMenu: FC<ActionsMenuProps> = ({ actions, form }) => {
           click
           escape
           disabled={!actionMenuVisibility}
-          document={frame.document}
           onDismiss={() => {
             setActionMenuVisibility(p => !p)
           }}
@@ -61,13 +58,13 @@ const MoreActionsButton = styled(p => (
   </button>
 ))`
   height: 100%;
-  width: 2.5rem;
+  width: 40px;
   background-color: transparent;
   background-position: center;
-  background-size: auto 1.125rem;
+  background-size: auto 18px;
   background-repeat: no-repeat;
   border: 0;
-  margin: 0 -1rem 0 0.5rem;
+  margin: 0 -16px 0 8px;
   outline: none;
   cursor: pointer;
   transition: opacity 85ms ease-out;
@@ -81,7 +78,7 @@ const MoreActionsButton = styled(p => (
 `
 
 const ActionsOverlay = styled.div<{ open: boolean }>`
-  min-width: 12rem;
+  min-width: 192px;
   border-radius: ${radius()};
   border: 1px solid #efefef;
   display: block;
@@ -102,7 +99,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, -1.75rem, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, -28px, 0) scale3d(1, 1, 1);
     `};
 `
 
@@ -110,8 +107,8 @@ export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};
-  padding: 0 0.75rem;
-  height: 2.5rem;
+  padding: 0 12px;
+  height: 40px;
   font-weight: 500;
   width: 100%;
   background: none;

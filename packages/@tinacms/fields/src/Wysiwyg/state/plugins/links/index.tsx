@@ -23,11 +23,7 @@ import { LinkView } from './LinkView'
 
 export const HTTP_LINK_REGEX = /\bhttps?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:;%_\+.,~#?&//=]*)/g
 
-export function links(
-  schema: Schema,
-  frame?: { document: Document },
-  theme?: any
-): Plugin {
+export function links(schema: Schema, theme?: any): Plugin {
   const renderTarget = createInvisibleDiv('links')
   let linkForm: LinkFormController
   let shiftKey: boolean
@@ -46,17 +42,8 @@ export function links(
     },
     view(editorView: any) {
       insertElBefore(renderTarget, editorView.dom)
-      linkForm = new LinkFormController(
-        renderTarget,
-        editorView as any,
-        frame,
-        theme
-      )
-      let doc
-      if (frame) {
-        doc = frame.document
-      }
-      return new LinkView(editorView as any, schema, renderTarget, doc)
+      linkForm = new LinkFormController(renderTarget, editorView as any, theme)
+      return new LinkView(editorView as any, schema, renderTarget)
     },
     props: {
       transformPasted(slice: Slice): Slice {
@@ -144,7 +131,7 @@ const linkify = function(fragment: Fragment): Fragment {
  * @param {Element} sibling
  */
 export function insertElBefore(element: Element, sibling: Element) {
-  if (!sibling.parentElement) throw new Error('Sibling must not be an orphan!');
+  if (!sibling.parentElement) throw new Error('Sibling must not be an orphan!')
   sibling.parentElement.insertBefore(element, sibling)
 }
 

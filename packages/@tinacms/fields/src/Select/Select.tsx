@@ -31,7 +31,7 @@ const customStyles: Styles = {
   // The main container
   control: (provided, state) => ({
     ...provided,
-    fontSize: '0.9rem',
+    fontSize: '14px',
     minHeight: 32,
     borderWidth: '1px',
     borderColor: state.isFocused ? '#333' : '#dedede',
@@ -43,7 +43,7 @@ const customStyles: Styles = {
     display: 'flex',
     alignItems: 'center',
     height: 26,
-    fontSize: '0.9rem',
+    fontSize: '14px',
     color: state.isSelected ? 'black' : '#666',
     backgroundColor: state.isDisabled
       ? null
@@ -64,7 +64,7 @@ const customStyles: Styles = {
     ...provided,
     cursor: 'pointer',
   }),
-  multiValue: (provided) => ({
+  multiValue: provided => ({
     ...provided,
     borderRadius: 4.8,
     backgroundColor: '#f3f3f3',
@@ -74,15 +74,15 @@ const customStyles: Styles = {
   }),
   multiValueRemove: (provided, state) => ({
     ...provided,
-    borderRadius: '0 0.3rem 0.3rem 0',
+    borderRadius: '0 5px 5px 0',
     backgroundColor: state.isFocused ? '#333' : null,
-    padding: '0 0.4rem',
+    padding: '0 6px',
     cursor: 'pointer',
   }),
   noOptionsMessage: provided => ({
     ...provided,
-    fontSize: '0.8rem',
-    padding: '1rem 0',
+    fontSize: '13px',
+    padding: '16px 0',
   }),
 }
 
@@ -95,13 +95,13 @@ const indicatorSeparatorStyle = {
 }
 
 const clearIndicatorStyle = {
-  fontSize: '0.8rem',
+  fontSize: '13px',
   cursor: 'pointer',
-  padding: '0.5rem',
+  padding: '8px',
 }
 
 const DropdownIndicator = (props: any) => {
-  if (!components.DropdownIndicator) return null;
+  if (!components.DropdownIndicator) return null
 
   return (
     <components.DropdownIndicator {...props}>
@@ -187,7 +187,7 @@ export function Select(props: SelectProps) {
     (option: Option | ReadonlyArray<Option> | null | undefined) => {
       if (!option) return props.onChange('')
       if (Array.isArray(option)) {
-        return props.onChange(option[0] ? option[0].value as string : '')
+        return props.onChange(option[0] ? (option[0].value as string) : '')
       }
 
       props.onChange((option as Option).value)
@@ -214,7 +214,14 @@ export function Select(props: SelectProps) {
         onChange(options[0])
       }
     },
-    [props.value, props.isLoading, props.isClearable, selectedOption, onChange, options]
+    [
+      props.value,
+      props.isLoading,
+      props.isClearable,
+      selectedOption,
+      onChange,
+      options,
+    ]
   )
 
   return (
