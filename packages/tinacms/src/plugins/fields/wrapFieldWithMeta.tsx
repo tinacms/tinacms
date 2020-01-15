@@ -68,7 +68,7 @@ export const FieldMeta: React.FC<FieldMetaProps> = props => {
 // Styling
 const FieldWrapper = styled.div`
   position: relative;
-  margin-bottom: 1.5rem;
+  margin-bottom: 24px;
 `
 
 const FieldLabel = styled.label`
@@ -78,7 +78,7 @@ const FieldLabel = styled.label`
   letter-spacing: 0.01em;
   line-height: 1.35;
   color: ${color.grey(8)};
-  margin-bottom: 0.5rem;
+  margin-bottom: 8px;
   text-overflow: ellipsis;
   width: 100%;
   overflow: hidden;
@@ -89,14 +89,14 @@ const FieldDescription = styled.p`
   font-size: ${font.size(0)};
   font-style: italic;
   font-weight: lighter;
-  padding-top: 0.25rem;
-  white-space: normal
+  padding-top: 4px;
+  white-space: normal;
 `
 
 const FieldError = styled.span`
   display: block;
   color: red;
   font-size: ${font.size(1)};
-  margin-top: 0.5rem;
+  margin-top: 8px;
   font-weight: 500;
 `
