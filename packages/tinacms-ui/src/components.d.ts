@@ -23,6 +23,7 @@ export namespace Components {
     * The middle name
     */
     'middle': string;
+    'toot': () => void;
   }
 }
 
@@ -53,6 +54,7 @@ declare namespace LocalJSX {
     * The middle name
     */
     'middle'?: string;
+    'toot'?: () => void;
   }
 
   interface IntrinsicElements {

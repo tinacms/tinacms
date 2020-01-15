@@ -30,6 +30,7 @@ import {
   timing,
   radius,
   shadow,
+  MyComponent,
 } from '@tinacms/styles'
 import { ActionsMenu } from './ActionsMenu'
 import FormsList from './FormsList'
@@ -124,6 +125,11 @@ export function FormView({
             )}
             <FormBody>
               <Wrapper>
+                <MyComponent
+                  first="Nolan"
+                  last="Phillips"
+                  toot={() => alert('TOOT')}
+                />
                 {activeForm &&
                   (activeForm.fields.length ? (
                     <FieldsBuilder
