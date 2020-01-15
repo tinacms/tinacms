@@ -143,7 +143,9 @@ The following files may need to be updated:
 
 | File | Reason |
 | --- | --- |
-${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`).join('\n')}
+${changes
+  .map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)
+  .join('\n')}
 `)
 
 const fileLink = (file: string) => {
@@ -238,7 +240,9 @@ function checkForLicense({ packageJson }: TinaPackage) {
  *
  */
 function fileNeedsLicense(filepath: string) {
-  return new RegExp(/\.(js|tsx?)$/).test(filepath)
+  const isJsOrTs = new RegExp(/\.(js|tsx?)$/).test(filepath)
+  const isNotTypeDef = filepath.endsWith('.d.ts')
+  return isJsOrTs && isNotTypeDef
 }
 
 /**
