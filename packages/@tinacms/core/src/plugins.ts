@@ -16,6 +16,33 @@ limitations under the License.
 
 */
 
+/**
+ * This package defines the plugin system of TinaCMS.
+ *
+ * The management of plugins is a core part of a content
+ * management system. The API for managing plugins in TinaCMS is quite
+ * powerful, although the implementation is a bit awkward.
+ *
+ * [[Plugin|Plugins]] are objects used to extend and modify the
+ * behaviour of the CMS. Each plugin has a `__type` field that is used
+ * to group plugins by their purpose.
+ *
+ * The [[PluginType]] class is responsible for managing a collection of
+ * plugins with the same `__type` value. Plugins can be added and removed from
+ * the `PluginType` over the life of the application.
+ *
+ * A new [[CMS]] is not initialized with any `PluginTypes`.
+ * Instead it has a single [[PluginTypeManager]] which is responsible for
+ * creating and managing different `PluginType` instances.
+ *
+ * Although somewhat confusing from the maintainers perspective, this
+ * structure results in a pretty easy to use interface for the clients.
+ * The concept of `PluginType` and `PluginTypeManager` are not really
+ * meant to be exposed to developers using TinaCMS in their projects.
+ *
+ * @packageDocumentation
+ */
+
 import { Subscribable } from './subscribable'
 
 /**
@@ -43,10 +70,9 @@ export interface Plugin {
 }
 
 /**
- * This class keeps track of all the different types of [[Plugin|plugins]]
- * used in the [[CMS]].
+ * Manages all of the [[PluginType|PluginTypes]] on a [[CMS]].
  */
-export class PluginManager {
+export class PluginTypeManager {
   /**
    * @ignore
    */
@@ -63,7 +89,7 @@ export class PluginManager {
    *
    * #### Example: Advanced Types
    *
-   * A type param can be added to specify the kind of [[Plugin]]
+   * A type param can be added to specify the kind of Plugin
    * that is being listed.
    *
    * ```ts
@@ -71,9 +97,9 @@ export class PluginManager {
    * ```
    *
    * @param type The type of plugins to be retrieved
-   * @typeparam P A subclass of [[Plugin]]
+   * @typeparam P A subclass of Plugin. Optional.
    */
-  get<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
+  getType<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
     return (this.plugins[type] =
       this.plugins[type] || new PluginType(type)) as PluginType<P>
   }
@@ -86,11 +112,11 @@ export class PluginManager {
    * This name is unnecessarily verbose and weird.
    */
   findOrCreateMap<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
-    return this.get(type)
+    return this.getType(type)
   }
 
   /**
-   * Adds a [[Plugin]] to the [[CMS]].
+   * Adds a Plugin to the CMS.
    *
    * #### Example: Basic Usage
    *
@@ -115,7 +141,7 @@ export class PluginManager {
    * })
    * ```
    *
-   * @typeparam P
+   * @typeparam P A subclass of Plugin. Optional.
    * @param plugin
    * @todo Consider returning the plugin which was just added.
    */
@@ -124,11 +150,11 @@ export class PluginManager {
   }
 
   /**
-   * Removes the given [[Plugin|plugin]] from the [[CMS]].
+   * Removes the given plugin from the CMS.
    *
-   * #### Example: Basic Usage
+   * #### Example
    *
-   * In this example a plugin is added to the [[CMS]] and removed
+   * In this example a plugin is added to the CMS and removed
    * 5 seconds later.
    *
    * ```ts
@@ -146,7 +172,7 @@ export class PluginManager {
    * }, 5000)
    * ```
    *
-   * @typeparam P A subclass of [[Plugin]]
+   * @typeparam P A subclass of Plugin. Optional.
    * @param plugin The plugin to be removed from the CMS.
    */
   remove<P extends Plugin = Plugin>(plugin: P) {
@@ -154,7 +180,7 @@ export class PluginManager {
   }
 
   /**
-   * Returns a list of all the [[Plugin|plugins]] of the given type.
+   * Returns a list of all the plugins of the given type.
    *
    * #### Example: Basic Usage
    *
@@ -166,8 +192,8 @@ export class PluginManager {
    *
    * #### Example: Advanced Types
    *
-   * A type param can be added to specify the kind of [[Plugin]]
-   * that is being listed.
+   * A generic can be added to specify the type of plugins
+   * that are being retrieved.
    *
    * ```ts
    * cms.plugins.all<ColorPlugin>("color").forEach(color => {
@@ -175,8 +201,9 @@ export class PluginManager {
    * })
    * ```
    *
-   * @returns A list of all the [[Plugin|plugins]] of the given type.
+   * @typeparam P A subclass of Plugin. Optional.
    * @param type The name of the plugin
+   * @returns An array of all plugins of the given type.
    */
   all<P extends Plugin = Plugin>(type: string): P[] {
     return this.findOrCreateMap<P>(type).all()
@@ -195,16 +222,40 @@ interface Map<T> {
  */
 type PluginMap<T extends Plugin = Plugin> = Map<T>
 
+/**
+ * A collection of plugins with the same `__type` value.
+ */
 export class PluginType<T extends Plugin = Plugin> extends Subscribable {
   /**
    * @ignore
    */
   __plugins: PluginMap<T> = {}
 
+  /**
+   *
+   * @param __type The `__type` of plugin being managed.
+   */
   constructor(private __type: string) {
     super()
   }
 
+  /**
+   * Adds a new plugin to the collection.
+   *
+   * ### Example
+   *
+   * ```ts
+   * interface ColorPlugin extends Plugin {
+   *   hex: string
+   * }
+   *
+   * const colorPlugins = new PluginType<ColorPlugin>("color")
+   *
+   * colorPlugins.add({ name: "red", hex: "#f00" })
+   * ```
+   *
+   * @param plugin A new plugin. The `__type` is optional and will be added if it's missing.
+   */
   add(plugin: T | Omit<T, '__type'>) {
     const p = plugin as T
 
@@ -220,10 +271,34 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
     return Object.keys(this.__plugins).map(name => this.__plugins[name])
   }
 
+  /**
+   *
+   * Looks up a plugin by it's `name`.
+   *
+   * ### Example
+   *
+   * ```ts
+   * const colorPlugins = new PluginType<ColorPlugin>("color")
+   *
+   * colorPlugins.add({ name: "red", hex: "#f00" })
+   *
+   * colorPlugins.find("red")  // { __type: "color", name: "red", hex: "#f00" }
+   * colorPlugin.find("large") // undefined
+   * ```
+   *
+   * @param name The `name` of the plugin to be retrieved.
+   */
   find(name: string): T | undefined {
     return this.__plugins[name]
   }
 
+  /**
+   * Pass this function a plugin or the `name` of a plugin to have
+   * it be removed from the CMS.
+   *
+   * @param pluginOrName The `name` of a plugin, or the plugin itself.
+   * @returns The plugin that was removed, or `undefined` if it was not found.
+   */
   remove(pluginOrName: string | T): T | undefined {
     const name =
       typeof pluginOrName === 'string' ? pluginOrName : pluginOrName.name
