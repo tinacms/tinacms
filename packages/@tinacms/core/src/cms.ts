@@ -23,7 +23,7 @@ limitations under the License.
  * @packageDocumentation
  */
 
-import { PluginManager } from './plugins'
+import { PluginTypeManager } from './plugins'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -72,7 +72,7 @@ export class CMS {
    * [[Plugin|Plugins]] are used to extend or modify the CMSs feature set.
    *
    */
-  plugins: PluginManager
+  plugins: PluginTypeManager
 
   /**
    * The set of APIs registered with the CMS.
@@ -103,7 +103,7 @@ export class CMS {
    * @hidden
    */
   constructor() {
-    this.plugins = new PluginManager()
+    this.plugins = new PluginTypeManager()
   }
 
   /**
