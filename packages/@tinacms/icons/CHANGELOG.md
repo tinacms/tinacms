@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.3.9...@tinacms/icons@0.4.0-alpha.0) (2020-01-16)
+
+
+### Features
+
+* basic support for tables in wysiwym ([84159ba](https://github.com/tinacms/tinacms/commit/84159ba))
+* update table icon ([448dab5](https://github.com/tinacms/tinacms/commit/448dab5))
+
+
+
+
+
 ## [0.3.9](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.3.9-alpha.1...@tinacms/icons@0.3.9) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/icons
