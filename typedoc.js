@@ -16,19 +16,18 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { storiesOf } from '@storybook/react'
-import { ColorPicker } from '../src/ColorPicker'
-import { ColorFormat } from '../src/ColorPicker/color-formatter'
+module.exports = packageJson => {
+  const gitRevision = `${packageJson.name}@${packageJson.version}`
 
-storiesOf('ColorPicker', module).add('Hex', () => <BasicExample />)
+  // TODO: If current branch is not `master` or `latest` then gitRevision is the current branch
 
-function BasicExample() {
-  const [value, setValue] = React.useState()
-  return (
-    <ColorPicker
-      colorFormat={ColorFormat.Hex}
-      input={{ value, onChange: setValue }}
-    />
-  )
+  return {
+    ignoreCompilerErrors: 'true',
+    exclude: [
+      '**/*+(index|.spec|.test|.e2e).ts',
+      '**/*+(index|.spec|.test|.e2e).tsx',
+    ],
+    excludeNotExported: false,
+    gitRevision,
+  }
 }
