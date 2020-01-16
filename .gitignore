@@ -7,3 +7,4 @@
 packages/cli/forestry/.env
 *.tgz
 .DS_Store
+**/docs/
