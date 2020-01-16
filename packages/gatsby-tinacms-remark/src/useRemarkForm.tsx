@@ -38,9 +38,11 @@ import * as React from 'react'
 const matter = require('gray-matter')
 
 export function useRemarkForm(
-  markdownRemark: RemarkNode | null | undefined,
+  _markdownRemark: RemarkNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
 ): [RemarkNode | null | undefined, Form | null | undefined] {
+  const markdownRemark = usePersistentValue(_markdownRemark)
+
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks. In the case of the check for
@@ -211,4 +213,14 @@ function validateMarkdownRemark(markdownRemark: RemarkNode) {
   if (typeof markdownRemark.rawMarkdownBody === 'undefined') {
     throw new Error(ERROR_MISSING_REMARK_RAW_MARKDOWN)
   }
+}
+
+function usePersistentValue<T>(nextData: T): T {
+  const [data, setData] = React.useState(nextData)
+
+  React.useEffect(() => {
+    setData(nextData || data)
+  }, [nextData])
+
+  return data
 }
