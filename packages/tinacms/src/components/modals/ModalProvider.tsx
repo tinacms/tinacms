@@ -155,8 +155,9 @@ export const ModalHeader = styled(
   align-items: center;
   justify-content: space-between;
   padding: 0 ${padding()} 0 ${padding()};
-  border-bottom: 1px solid ${color.grey(3)};
   margin: 0;
+  background-color: white;
+  border-radius: 5px 5px 0 0;
 `
 
 export const ModalBody = styled.div<{ padded?: boolean }>`

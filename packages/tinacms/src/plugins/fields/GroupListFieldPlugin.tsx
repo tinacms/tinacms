@@ -65,9 +65,16 @@ interface GroupProps {
   field: GroupFieldDefinititon
   form: any
   tinaForm: Form
+  formBoundingBox: any
 }
 
-const Group = function Group({ tinaForm, form, field, input }: GroupProps) {
+const Group = function Group({
+  tinaForm,
+  form,
+  field,
+  input,
+  formBoundingBox,
+}: GroupProps) {
   const addItem = React.useCallback(() => {
     let obj = {}
     if (typeof field.defaultItem === 'function') {
@@ -107,6 +114,7 @@ const Group = function Group({ tinaForm, form, field, input }: GroupProps) {
                     field={field}
                     item={item}
                     index={index}
+                    formBoundingBox={formBoundingBox}
                     {...itemProps(item)}
                   />
                 ))}
@@ -127,15 +135,25 @@ interface ItemProps {
   field: GroupFieldDefinititon
   index: number
   item: any
+  formBoundingBox: any
   label?: string
 }
 
-const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
+const Item = ({
+  tinaForm,
+  field,
+  index,
+  item,
+  label,
+  formBoundingBox,
+  ...p
+}: ItemProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
   const title = label || (field.label || field.name) + ' Item'
+
   return (
     <Draggable
       type={field.name}
@@ -166,6 +184,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             index={index}
             tinaForm={tinaForm}
             itemTitle={title}
+            formBoundingBox={formBoundingBox}
           />
         </>
       )}
@@ -366,6 +385,7 @@ interface PanelProps {
   index: number
   field: GroupFieldDefinititon
   itemTitle: string
+  formBoundingBox: any
 }
 
 const Panel = function Panel({
@@ -375,6 +395,7 @@ const Panel = function Panel({
   field,
   index,
   itemTitle,
+  formBoundingBox,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
@@ -384,7 +405,7 @@ const Panel = function Panel({
   }, [field.fields, field.name, index])
 
   return (
-    <GroupPanel isExpanded={isExpanded}>
+    <GroupPanel isExpanded={isExpanded} formBoundingBox={formBoundingBox}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
         <GroupLabel>{itemTitle}</GroupLabel>

@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
-import { useState } from 'react'
+import { useState, useRef, useEffect } from 'react'
 import { Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import {
@@ -111,6 +111,24 @@ export function FormView({
     [activeForm]
   )
 
+  const formBodyObserver = React.useRef(
+    new ResizeObserver(refs => {
+      setFormBoundingBox(refs[0].contentRect)
+    })
+  )
+
+  const formBodyRef = useRef<HTMLDivElement>(null)
+
+  const [formBoundingBox, setFormBoundingBox] = useState<
+    ClientRect | DOMRect | null
+  >(null)
+
+  React.useEffect(() => {
+    if (formBodyRef.current) {
+      formBodyObserver.current.observe(formBodyRef.current)
+    }
+  }, [formBodyRef, formBodyObserver])
+
   return (
     <FormBuilder form={activeForm as any}>
       {({ handleSubmit, pristine, form, submitting }) => {
@@ -122,13 +140,14 @@ export function FormView({
                 setActiveFormId={setActiveFormId}
               />
             )}
-            <FormBody>
+            <FormBody ref={formBodyRef}>
               <Wrapper>
                 {activeForm &&
                   (activeForm.fields.length ? (
                     <FieldsBuilder
                       form={activeForm}
                       fields={activeForm.fields}
+                      formBoundingBox={formBoundingBox}
                     />
                   ) : (
                     <NoFieldsPlaceholder />
@@ -361,7 +380,9 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   scrollbar-width: none;
   width: 100%;
   overflow: hidden;
-  background-color: #f6f6f9;
+  border-top: 1px solid ${color.grey(2)};
+  border-bottom: 1px solid ${color.grey(2)};
+  background-color: ${color.grey(1)};
 
   ${Wrapper} {
     height: 100%;
@@ -377,7 +398,6 @@ const FormFooter = styled.div`
   width: 100%;
   height: 64px;
   background-color: white;
-  border-top: 1px solid ${color.grey(2)};
 
   ${Wrapper} {
     flex: 1 0 auto;

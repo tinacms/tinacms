@@ -22,13 +22,8 @@ import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { color, radius, font } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
-import {
-  SIDEBAR_HEADER_HEIGHT,
-  SIDEBAR_WIDTH,
-  FORM_FOOTER_HEIGHT,
-} from '../../Globals'
 
-export interface GroupFieldDefinititon extends Field {
+export interface GroupFieldDefinition extends Field {
   component: 'group'
   fields: Field[]
 }
@@ -36,13 +31,19 @@ export interface GroupFieldDefinititon extends Field {
 export interface GroupProps {
   input: any
   meta: any
-  field: GroupFieldDefinititon
+  field: GroupFieldDefinition
   form: any
   tinaForm: Form
+  formBoundingBox: any
 }
 
-export const Group = function Group({ tinaForm, field }: GroupProps) {
+export const Group = function Group({
+  tinaForm,
+  field,
+  formBoundingBox,
+}: GroupProps) {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
+
   return (
     <>
       <Header onClick={() => setExpanded(p => !p)}>
@@ -54,6 +55,7 @@ export const Group = function Group({ tinaForm, field }: GroupProps) {
         setExpanded={setExpanded}
         field={field}
         tinaForm={tinaForm}
+        formBoundingBox={formBoundingBox}
       />
     </>
   )
@@ -63,14 +65,16 @@ interface PanelProps {
   setExpanded(next: boolean): void
   isExpanded: boolean
   tinaForm: Form
-  field: GroupFieldDefinititon
+  field: GroupFieldDefinition
   children?: any
+  formBoundingBox: any
 }
 const Panel = function Panel({
   setExpanded,
   isExpanded,
   tinaForm,
   field,
+  formBoundingBox,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
@@ -80,7 +84,7 @@ const Panel = function Panel({
   }, [field.fields, field.name])
 
   return (
-    <GroupPanel isExpanded={isExpanded}>
+    <GroupPanel isExpanded={isExpanded} formBoundingBox={formBoundingBox}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon /> <span>{Label(field)}</span>
       </PanelHeader>
@@ -91,7 +95,7 @@ const Panel = function Panel({
   )
 }
 
-const Label = function(field: GroupFieldDefinititon) {
+const Label = function(field: GroupFieldDefinition) {
   return <GroupLabel>{field.label || field.name}</GroupLabel>
 }
 
@@ -184,19 +188,40 @@ const GroupPanelKeyframes = keyframes`
   }
 `
 
-export const GroupPanel = styled.div<{ isExpanded: boolean }>`
-  position: fixed;
-  width: ${SIDEBAR_WIDTH}px;
-  top: ${SIDEBAR_HEADER_HEIGHT}px;
-  bottom: ${FORM_FOOTER_HEIGHT}px;
-  left: 0;
+export const GroupPanel = styled.div<{
+  isExpanded: boolean
+  formBoundingBox: any
+}>`
+  position: relative;
   display: flex;
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
   z-index: 50;
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
+  opacity: ${p => (p.isExpanded ? '1' : '0')};
   border-top: 1px solid ${color.grey(2)};
+  border-bottom: 1px solid ${color.grey(2)};
+
+  ${p =>
+    p.formBoundingBox &&
+    css`
+      position: fixed;
+      width: ${p.formBoundingBox.width}px;
+      height: ${p.formBoundingBox.height}px;
+      top: ${p.formBoundingBox.y}px;
+      left: ${p.formBoundingBox.x}px;
+    `}
+
+  ${p =>
+    !p.formBoundingBox &&
+    css`
+      position: absolute;
+      width: 100%;
+      height: 100%;
+      top: 0;
+      left: 0;
+    `}
 
   > * {
     ${p =>

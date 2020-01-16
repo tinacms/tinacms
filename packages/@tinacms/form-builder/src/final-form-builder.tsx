@@ -62,9 +62,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
 export interface FieldsBuilderProps {
   form: Form
   fields: Field[]
+  formBoundingBox?: any
 }
 
-export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
+export function FieldsBuilder({
+  form,
+  fields,
+  formBoundingBox,
+}: FieldsBuilderProps) {
   const cms = useCMS()
   return (
     <FieldsGroup>
@@ -139,6 +144,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
                     form={form.finalForm}
                     tinaForm={form}
                     field={field}
+                    formBoundingBox={formBoundingBox}
                   />
                 )
               }

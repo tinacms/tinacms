@@ -82,9 +82,16 @@ interface BlockFieldProps {
   field: BlocksFieldDefinititon
   form: any
   tinaForm: Form
+  formBoundingBox: any
 }
 
-const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
+const Blocks = function({
+  tinaForm,
+  form,
+  field,
+  input,
+  formBoundingBox,
+}: BlockFieldProps) {
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
       let obj: any = {}
@@ -169,6 +176,7 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
                       index={index}
                       field={field}
                       tinaForm={tinaForm}
+                      formBoundingBox={formBoundingBox}
                       {...itemProps(block)}
                     />
                   )
@@ -191,6 +199,7 @@ interface BlockListItemProps {
   index: number
   block: any
   template: BlockTemplate
+  formBoundingBox: any
   label?: string
 }
 
@@ -201,6 +210,7 @@ const BlockListItem = ({
   index,
   template,
   block,
+  formBoundingBox,
 }: BlockListItemProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
@@ -240,6 +250,7 @@ const BlockListItem = ({
             tinaForm={tinaForm}
             label={label || template.label}
             template={template}
+            formBoundingBox={formBoundingBox}
           />
         </>
       )}
@@ -538,6 +549,7 @@ interface PanelProps {
   item: any
   label: string
   template: BlockTemplate
+  formBoundingBox: any
 }
 
 const Panel = function Panel({
@@ -548,6 +560,7 @@ const Panel = function Panel({
   index,
   label,
   template,
+  formBoundingBox,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
     return template.fields.map((subField: any) => ({
@@ -557,7 +570,7 @@ const Panel = function Panel({
   }, [field.name, index, template.fields])
 
   return (
-    <GroupPanel isExpanded={isExpanded}>
+    <GroupPanel isExpanded={isExpanded} formBoundingBox={formBoundingBox}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
         <GroupLabel>{label}</GroupLabel>

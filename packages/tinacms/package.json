@@ -33,6 +33,7 @@
     "@types/lodash.merge": "^4.6.6",
     "@types/react-beautiful-dnd": "^11.0.3",
     "@types/styled-components": "4.1.8",
+    "@types/resize-observer-browser": "0.1.3",
     "jest": "^24.8.0",
     "styled-components": ">=4.1",
     "ts-jest": "^24.0.2"
