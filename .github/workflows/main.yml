@@ -16,7 +16,7 @@ jobs:
            
       - if: matrix.os == 'windows-latest'
         run: |
-          npm install --global --production windows-build-tools
+          npm install --global --production windows-build-tools@4.0.0
           npm install --global --production node-gyp
           
       - name: Install
