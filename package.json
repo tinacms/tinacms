@@ -2,7 +2,7 @@
   "name": "root",
   "private": true,
   "scripts": {
-    "lint": "eslint './packages/**/*{.ts,.tsx}'",
+    "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "build": "lerna run build --reject-cycles",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
     "bs": "npm run bootstrap",
