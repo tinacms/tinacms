@@ -2,7 +2,7 @@
 title: A new Gatsby starter for Tina!
 date: '2019-12-02T00:00:00.000Z'
 heading_color: pink
-description: My new post. !!!!f
+description: My new post.
 blocks:
   - _template: image
     text: ''
