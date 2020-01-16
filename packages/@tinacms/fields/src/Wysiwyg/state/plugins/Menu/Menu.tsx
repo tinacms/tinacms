@@ -18,6 +18,7 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
+import { useState, useRef, useEffect } from 'react'
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
@@ -48,7 +49,6 @@ interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
   view: EditorView
-  frame: any
   theme: any
 }
 
@@ -86,7 +86,38 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { view, bottom = false, frame, theme } = props
+  const { view, bottom = false, theme } = props
+  const [menuFixed, setMenuFixed] = useState(false)
+  const [menuOffset, setMenuOffset] = useState(0)
+  const [menuWidth, setMenuWidth] = useState()
+  const menuRef: any = useRef()
+
+  const handleScroll = () => {
+    // Need to know the Y coord of the bottom of the div that contains the text
+    const textAreaBottom =
+      menuRef.current.parentElement.nextSibling.offsetHeight + menuOffset
+
+    if (
+      window.scrollY > menuOffset &&
+      window.scrollY < textAreaBottom &&
+      !menuFixed
+    ) {
+      // Need to remember the menu original position and width
+      setMenuOffset(menuRef.current.offsetTop)
+      setMenuWidth(menuRef.current.offsetWidth)
+      setMenuFixed(true)
+    } else if (
+      (window.scrollY < menuOffset || window.scrollY > textAreaBottom) &&
+      menuFixed
+    ) {
+      setMenuFixed(false)
+    }
+  }
+
+  useEffect(() => {
+    window.addEventListener('scroll', handleScroll)
+    return () => window.removeEventListener('scroll', handleScroll)
+  })
 
   const supportBlocks = true
 
@@ -97,8 +128,13 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-        {supportBlocks && <FormattingDropdown view={view} frame={frame} />}
+      <MenuContainer
+        menuFixed={menuFixed}
+        menuWidth={menuWidth}
+        ref={menuRef}
+        onMouseDown={preventProsemirrorFocusLoss}
+      >
+        {supportBlocks && <FormattingDropdown view={view} />}
         <BoldControl view={view} />
         <ItalicControl view={view} />
         <UnderlineControl view={view} />
@@ -184,12 +220,18 @@ const OrderedList = commandContrl(
   'Ordered List'
 )
 
-const MenuContainer = styled.div`
+type MenuContainerProps = {
+  menuFixed: boolean
+  menuWidth: number
+}
+
+const MenuContainer = styled.div<MenuContainerProps>`
   display: flex;
   justify-content: space-between;
-  position: sticky;
+  position: ${({ menuFixed }) => (menuFixed ? 'fixed' : 'relative')};
   top: 0;
   width: 100%;
+  max-width: ${({ menuWidth }) => `${menuWidth}px`};
   background-color: white;
   border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
@@ -198,7 +240,7 @@ const MenuContainer = styled.div`
   display: flex;
   flex: 0 0 auto;
   z-index: 10;
-  margin: 0 0 0.75rem 0;
+  margin: 0 0 12px 0;
 `
 
 export const MenuButton = styled.button<{
@@ -213,7 +255,7 @@ export const MenuButton = styled.button<{
   fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
   border: none;
   outline: none;
-  padding: 0.375rem;
+  padding: 6px;
   margin: 0;
   transition: all 85ms ease-out;
   cursor: pointer;
@@ -232,16 +274,16 @@ export const MenuButton = styled.button<{
     border-right: 1px solid rgba(53, 50, 50, 0.09);
   }
   &:first-child {
-    padding-left: 0.75rem;
+    padding-left: 12px;
     border-radius: ${radius()} 0 0 ${radius()};
   }
   &:last-child {
-    padding-right: 0.75rem;
-    border-radius: 0 1.5rem 1.5rem 0;
+    padding-right: 12px;
+    border-radius: 0 24px 24px 0;
   }
   svg {
-    width: 1.25rem;
-    height: 1.25rem;
+    width: 20px;
+    height: 20px;
   }
   ${props =>
     props.active &&
@@ -269,7 +311,7 @@ export const MenuButtonDropdown = styled.div<{ open: boolean }>`
   display: block;
   position: absolute;
   left: 0;
-  bottom: -0.5rem;
+  bottom: -8px;
   transform: translate3d(0, 100%, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
@@ -289,7 +331,7 @@ export const MenuButtonDropdown = styled.div<{ open: boolean }>`
 
 export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
   display: block;
-  padding: 0.5rem 1rem;
+  padding: 8px 16px;
   transition: all 85ms ease-out;
   cursor: pointer;
   &:first-child {

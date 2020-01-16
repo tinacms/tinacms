@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.12...@tinacms/api-git@0.5.2) (2020-01-14)
+
+
+### Bug Fixes
+
+* server should start without an origin ([ad59ccf](https://github.com/tinacms/tinacms/commit/ad59ccf)), closes [#596](https://github.com/tinacms/tinacms/issues/596)
+
+
+
+
+
+# [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.12...@tinacms/api-git@0.5.0) (2020-01-13)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
 # [0.5.0-alpha.12](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.11...@tinacms/api-git@0.5.0-alpha.12) (2020-01-10)
 
 

@@ -38,6 +38,44 @@ describe('updateRemoteToSSH', () => {
 
   let repo: any
 
+  describe('without a remote', () => {
+    beforeEach(() => {
+      repo = {
+        getRemotes: jest.fn().mockImplementation(() => {
+          return Promise.resolve([])
+        }),
+        removeRemote: jest.fn(),
+        addRemote: jest.fn(),
+      }
+      mock = require('./open-repo').openRepo
+      mock.mockImplementation(() => {
+        return repo
+      })
+    })
+
+    it('does not throw an error', async () => {
+      expect(async () => {
+        await updateRemoteToSSH('./')
+      }).not.toThrowError()
+    })
+
+    it('does not tryto remove a remote', async () => {
+      await updateRemoteToSSH('./')
+      expect(repo.removeRemote).not.toHaveBeenCalledWith(
+        'origin',
+        'git@github.com:tinacms/tunacms.git'
+      )
+    })
+
+    it('does not try to add a remote', async () => {
+      await updateRemoteToSSH('./')
+      expect(repo.addRemote).not.toHaveBeenCalledWith(
+        'origin',
+        'git@github.com:tinacms/tunacms.git'
+      )
+    })
+  })
+
   describe('with http remote', () => {
     beforeEach(() => {
       repo = {

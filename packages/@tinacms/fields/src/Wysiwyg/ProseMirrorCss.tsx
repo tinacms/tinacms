@@ -83,10 +83,10 @@ const proseMirrorTableStyles = `
     border-top: 1px solid #c1c7cd;
     position: absolute;
     left: -1px;
-    top: -1px;
+    // top: -1px;
     height: 10px;
-    width: calc(100% + 2px);
-    transform: translate(0px, -100%);
+    width: 100%;
+    transform: translate(0px, -22px);
   }
   .ProseMirror .tina_table_header_ext_left {
     background: #f0f1f3;
@@ -96,20 +96,21 @@ const proseMirrorTableStyles = `
     position: absolute;
     height: calc(100% + 2px);
     width: 10px;
-    left: -1px;
-    top: -1px;
-    transform: translate(-100%, 0);
+    // left: -1px;
+    // top: -1px;
+    height: 100%;
+    transform: translate(-16px, -11px);
   }
   .ProseMirror .tina_table_header_ext_top_left {
     background: #f0f1f3;
     border-left: 1px solid #c1c7cd;
     border-top: 1px solid #c1c7cd;
     position: absolute;
-    top: -1px;
-    left: -1px;
+    // top: -1px;
+    // left: -1px;
     height: 10px;
     width: 10px;
-    transform: translate(-100%, -100%);
+    transform: translate(-16px, -22px);
   }
 `
 

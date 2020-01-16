@@ -32,5 +32,5 @@ export interface TextAreaProps extends a {
 export const TextArea = styled.textarea<{ error?: boolean }>`
   ${InputCss};
   resize: vertical;
-  height: 10rem;
+  height: 160px;
 `
