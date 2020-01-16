@@ -154,7 +154,7 @@ export function router(config: GitRouterConfig = {}) {
       .then(() => {
         res.json({ status: 'success' })
       })
-      .catch(e => {
+      .catch(() => {
         res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
       })
   })
