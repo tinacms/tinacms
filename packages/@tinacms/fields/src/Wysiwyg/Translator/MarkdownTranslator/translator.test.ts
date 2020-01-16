@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as fs from 'fs'
 import * as path from 'path'
+import eol from "eol";
 import { defaultSchema } from '../../default-schema'
 import { MarkdownTranslator } from './index'
 
@@ -77,7 +78,7 @@ describe('Markdown Translators', () => {
 
       const input = readFile('input.md')
       const expectedNode = readFile('node.json')
-      const expectedOutput = readFile('output.md')
+      const expectedOutput = eol.auto(readFile('output.md'))
 
       const node = translator.nodeFromString(input)!
       const output = translator.stringFromNode(node)
