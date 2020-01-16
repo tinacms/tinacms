@@ -111,21 +111,24 @@ export function FormView({
     [activeForm]
   )
 
-  const formBodyObserver = React.useRef(
-    new ResizeObserver(refs => {
-      setFormBoundingBox(refs[0].contentRect)
-    })
-  )
+  const [formBodyObserver, setFormBodyObserver] = useState<any>(false)
+
+  useEffect(() => {
+    setFormBodyObserver(
+      new ResizeObserver(refs => {
+        console.log(refs[0].target.getBoundingClientRect())
+        setFormBoundingBox(refs[0].target.getBoundingClientRect())
+      })
+    )
+  }, [])
 
   const formBodyRef = useRef<HTMLDivElement>(null)
 
-  const [formBoundingBox, setFormBoundingBox] = useState<
-    ClientRect | DOMRect | null
-  >(null)
+  const [formBoundingBox, setFormBoundingBox] = useState<any>(null)
 
   React.useEffect(() => {
-    if (formBodyRef.current) {
-      formBodyObserver.current.observe(formBodyRef.current)
+    if (formBodyRef.current && formBodyObserver) {
+      formBodyObserver.observe(formBodyRef.current)
     }
   }, [formBodyRef, formBodyObserver])
 
