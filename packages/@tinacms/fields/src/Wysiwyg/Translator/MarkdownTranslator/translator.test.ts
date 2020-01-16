@@ -94,7 +94,7 @@ describe('Markdown Translators', () => {
 
         if (expectedOutput) {
           it('MD Output', () => {
-            expect(output).toEqual(expectedOutput)
+            expect(output).toBe(expectedOutput)
           })
         } else {
           writeFile('output.md', output)
