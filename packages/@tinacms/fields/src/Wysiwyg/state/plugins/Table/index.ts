@@ -17,9 +17,11 @@ limitations under the License.
 */
 
 import { Plugin, PluginKey } from 'prosemirror-state'
-import { Decoration, DecorationSet, EditorView } from 'prosemirror-view'
+import { DecorationSet, EditorView } from 'prosemirror-view'
 import { findParentNodeOfType } from 'prosemirror-utils'
-import { TableMap, CellSelection } from 'prosemirror-tables'
+import { TableMap } from 'prosemirror-tables'
+
+import { buildCellSelection, buildExtendedHeaders } from './utils'
 
 export const blockPluginKey = new PluginKey('block')
 
@@ -36,33 +38,11 @@ export const tablePlugin = new Plugin({
         const { table } = newState.schema.nodes
         const tableNode = findParentNodeOfType(table)(selection)
         if (tableNode) {
-          const tableMap = TableMap.get(tableNode.node)
-          const cellMap = tableMap.map
-          const decorations = []
-          const div = document.createElement('div')
-          div.classList.add('tina_table_header_ext_top_left')
-          decorations.push(Decoration.widget(tableNode.start + 2, div))
-          for (let i = 0; i < tableMap.width; i++) {
-            const div = document.createElement('div')
-            div.classList.add('tina_table_header_ext_top')
-            decorations.push(
-              Decoration.widget(tableNode.start + cellMap[i] + 1, div)
-            )
-          }
-          for (let i = 0; i < tableMap.height; i++) {
-            const div = document.createElement('div')
-            div.classList.add('tina_table_header_ext_left')
-            decorations.push(
-              Decoration.widget(
-                tableNode.start + cellMap[i * tableMap.width] + 1,
-                div
-              )
-            )
-          }
+          const decorations = buildExtendedHeaders(tableNode, selection)
           if (decorations.length)
             return {
               deco: DecorationSet.create(newState.doc, decorations),
-              selectedTableMap: tableMap,
+              tableMap: TableMap.get(tableNode.node),
               selectedTable: tableNode,
             }
         }
@@ -74,45 +54,29 @@ export const tablePlugin = new Plugin({
     decorations(state) {
       return (this as any).getState(state).deco
     },
+    /**
+     * When extended table header is clicked, corresponding column or row should be selected.
+     */
     handleClickOn(
       view: EditorView,
-      pos: number,
-      node: any,
+      _1: any,
+      _2: any,
       nodePos: number,
       event: any,
       direct: boolean
     ) {
       if (!direct) return false
-      console.log(nodePos)
       const targetClasses = event.target.classList
       const { state, dispatch } = view
       const tablePluginState = blockPluginKey.getState(state)
-      let cellSelection
-      if (targetClasses.contains('tina_table_header_ext_left')) {
-        const { width } = tablePluginState.selectedTableMap
-        cellSelection = new CellSelection(
-          state.doc.resolve(nodePos + (width - 1) * 2),
-          state.doc.resolve(nodePos)
-        )
-      }
-      if (targetClasses.contains('tina_table_header_ext_top')) {
-        const { height, width } = tablePluginState.selectedTableMap
-        cellSelection = new CellSelection(
-          state.doc.resolve(
-            nodePos + width * (height - 1) * 2 + (height - 1) * 2
-          ),
-          state.doc.resolve(nodePos)
-        )
-      }
-      if (targetClasses.contains('tina_table_header_ext_top_left')) {
-        const { height, width } = tablePluginState.selectedTableMap
-
-        console.log(nodePos, nodePos + height * width * 2 + height - 1)
-        cellSelection = new CellSelection(
-          state.doc.resolve(nodePos + height * width * 2 + height - 1),
-          state.doc.resolve(nodePos)
-        )
-      }
+      const { tableMap: tableMap, selectedTable } = tablePluginState
+      const cellSelection = buildCellSelection(
+        nodePos,
+        targetClasses.value,
+        tableMap,
+        selectedTable,
+        state
+      )
       if (cellSelection) dispatch(state.tr.setSelection(cellSelection as any))
       return false
     },

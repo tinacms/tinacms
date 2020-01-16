@@ -63,6 +63,8 @@ const proseMirrorTableStyles = `
   }
   /* END: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
   .ProseMirror table {
+    border-right: 1px solid #c1c7cd;
+    border-bottom: 1px solid #c1c7cd;
     display: inline-table;
     margin: 10px;
     overflow: visible;
@@ -73,7 +75,8 @@ const proseMirrorTableStyles = `
   }
   .ProseMirror table td,
   .ProseMirror table th {
-    border: 1px solid #c1c7cd;
+    border-top: 1px solid #c1c7cd;
+    border-left: 1px solid #c1c7cd;
     padding: 10px 4px;
   }
   .ProseMirror .tina_table_header_ext_top {
@@ -82,11 +85,16 @@ const proseMirrorTableStyles = `
     border-right: 1px solid #c1c7cd;
     border-top: 1px solid #c1c7cd;
     position: absolute;
-    left: -1px;
-    // top: -1px;
     height: 10px;
     width: 100%;
-    transform: translate(0px, -22px);
+    transform: translate(-5px, -22px);
+  }
+  .ProseMirror div.tina_table_header_ext_top_selected {
+    background: #537ff7;
+    border-left: 1px solid #013bda;
+    border-right: 1px solid #013bda;
+    border-top: 1px solid #013bda;
+    z-index: 1;
   }
   .ProseMirror .tina_table_header_ext_left {
     background: #f0f1f3;
@@ -96,21 +104,35 @@ const proseMirrorTableStyles = `
     position: absolute;
     height: calc(100% + 2px);
     width: 10px;
-    // left: -1px;
-    // top: -1px;
     height: 100%;
     transform: translate(-16px, -11px);
+  }
+  .ProseMirror div.tina_table_header_ext_left_selected {
+    background: #537ff7;
+    border-left: 1px solid #013bda;
+    border-top: 1px solid #013bda;
+    border-bottom: 1px solid #013bda;
+    z-index: 1;
   }
   .ProseMirror .tina_table_header_ext_top_left {
     background: #f0f1f3;
     border-left: 1px solid #c1c7cd;
     border-top: 1px solid #c1c7cd;
     position: absolute;
-    // top: -1px;
-    // left: -1px;
     height: 10px;
     width: 10px;
     transform: translate(-16px, -22px);
+  }
+  .ProseMirror div.tina_table_header_ext_top_left_selected {
+    background: #2962ff;
+    border-left: 1px solid #013bda;
+    border-right: 1px solid #013bda;
+    border-top: 1px solid #013bda;
+    border-bottom: 1px solid #013bda;
+    z-index: 1;
+  }
+  .ProseMirror .selectedCell {
+    border: 1px solid #013bda;
   }
 `
 
