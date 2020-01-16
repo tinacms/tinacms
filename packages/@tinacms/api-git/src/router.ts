@@ -139,7 +139,7 @@ export function router(config: GitRouterConfig = {}) {
 
     try {
       deleteFile(fileAbsolutePath)
-    } catch (e) {
+    } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
 
@@ -154,7 +154,7 @@ export function router(config: GitRouterConfig = {}) {
       .then(() => {
         res.json({ status: 'success' })
       })
-      .catch(e => {
+      .catch(() => {
         res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
       })
   })
@@ -179,7 +179,7 @@ export function router(config: GitRouterConfig = {}) {
         )
       }
       res.json({ content: req.body.content })
-    } catch (e) {
+    } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
@@ -197,7 +197,7 @@ export function router(config: GitRouterConfig = {}) {
         if (err) console.error(err)
       })
       res.send(req.file)
-    } catch (e) {
+    } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
@@ -221,7 +221,7 @@ export function router(config: GitRouterConfig = {}) {
       })
 
       res.json({ status: 'success' })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
 
       res.status(412)
@@ -233,7 +233,7 @@ export function router(config: GitRouterConfig = {}) {
     try {
       await openRepo(REPO_ABSOLUTE_PATH).push()
       res.json({ status: 'success' })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
 
       res.status(412)
@@ -252,7 +252,7 @@ export function router(config: GitRouterConfig = {}) {
       .then(() => {
         res.json({ status: 'success' })
       })
-      .catch((e: any) => {
+      .catch(() => {
         res.status(412)
         res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
       })
@@ -262,7 +262,7 @@ export function router(config: GitRouterConfig = {}) {
     try {
       const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
       res.send({ status: 'success', branch: summary.branches[summary.current] })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
 
       res.status(500)
@@ -274,7 +274,7 @@ export function router(config: GitRouterConfig = {}) {
     try {
       const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
       res.send({ status: 'success', branches: summary.all })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
 
       res.status(500)
@@ -297,7 +297,7 @@ export function router(config: GitRouterConfig = {}) {
       }
 
       res.send({ status: 'success', branch })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
 
       res.status(500)
@@ -321,7 +321,7 @@ export function router(config: GitRouterConfig = {}) {
         content,
         status: 'success',
       })
-    } catch (e) {
+    } catch {
       res.status(501)
       res.json({
         status: 'failure',
