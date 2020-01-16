@@ -22,6 +22,7 @@ yarn add @tinacms/core
 Below are the answer to a couple common questions.
 
 If you have any other questions, go to the [TinaCMS Community](https://tinacms.org/community/) page to join our Slack or open an issue on Github!
+Every question you ask helps us make working with TinaCMS even better :)
 
 ### What does the CMS do?
 
@@ -29,8 +30,6 @@ The responsibility of the `CMS` keeps track of two broad types of objects:
 
 - Plugins, which extend or change the behaviour of the CMS.
 - APIs, which allow the CMS to integrate with third party services.
-
-Every question you ask helps us make working with TinaCMS even better :)
 
 ### What? That doesn't seem like a CMS
 

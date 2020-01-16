@@ -16,13 +16,13 @@ limitations under the License.
 
 */
 
-import { PluginManager } from './plugins'
+import { PluginTypeManager } from './plugins'
 
-describe('PluginManager', () => {
+describe('PluginTypeManager', () => {
   describe('when nothing has been added', () => {
     describe('#all', () => {
       it('returns no items', () => {
-        const plugins = new PluginManager()
+        const plugins = new PluginTypeManager()
 
         expect(plugins.all('test')).toHaveLength(0)
       })
@@ -32,7 +32,7 @@ describe('PluginManager', () => {
     it('notifies the subscribers', () => {
       const listeners = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
       const p = { __type: 'test', name: 'Example' }
-      const plugins = new PluginManager()
+      const plugins = new PluginTypeManager()
       listeners.forEach(listener =>
         plugins.findOrCreateMap('test').subscribe(listener)
       )
@@ -44,7 +44,7 @@ describe('PluginManager', () => {
     describe('#all', () => {
       it('contains the plugin', () => {
         const p = { __type: 'test', name: 'Example' }
-        const plugins = new PluginManager()
+        const plugins = new PluginTypeManager()
 
         plugins.add(p)
 
@@ -52,7 +52,7 @@ describe('PluginManager', () => {
       })
       it('returns no items of a different type', () => {
         const p = { __type: 'test', name: 'Example' }
-        const plugins = new PluginManager()
+        const plugins = new PluginTypeManager()
 
         plugins.add(p)
 
@@ -64,7 +64,7 @@ describe('PluginManager', () => {
     it('notifies the subscribers', () => {
       const listeners = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
       const p = { __type: 'test', name: 'Example' }
-      const plugins = new PluginManager()
+      const plugins = new PluginTypeManager()
       plugins.add(p)
 
       listeners.forEach(listener =>
@@ -78,7 +78,7 @@ describe('PluginManager', () => {
     describe('#all', () => {
       it('no longer contains the plugin', () => {
         const p = { __type: 'test', name: 'Example' }
-        const plugins = new PluginManager()
+        const plugins = new PluginTypeManager()
 
         plugins.add(p)
         expect(plugins.all('test')).toContain(p)

@@ -23,6 +23,7 @@
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
+    "docs": "npx typedoc",
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
