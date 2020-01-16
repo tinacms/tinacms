@@ -54,6 +54,10 @@ export function checkFilePathIsInRepo(
   }
 }
 
+// Don't return full error message to client incase confidential details leak
+const GIT_ERROR_MESSAGE =
+  'Git Operation failed: Check the logs for more details'
+
 // Ensure remote URL is ssh
 export async function updateRemoteToSSH(pathRoot: string) {
   const repo = await openRepo(pathRoot)
@@ -136,7 +140,7 @@ export function router(config: GitRouterConfig = {}) {
     try {
       deleteFile(fileAbsolutePath)
     } catch (e) {
-      res.status(500).json({ status: 'error', message: e.message })
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
 
     commit({
@@ -151,7 +155,7 @@ export function router(config: GitRouterConfig = {}) {
         res.json({ status: 'success' })
       })
       .catch(e => {
-        res.status(500).json({ status: 'error', message: e.message })
+        res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
       })
   })
 
@@ -176,7 +180,7 @@ export function router(config: GitRouterConfig = {}) {
       }
       res.json({ content: req.body.content })
     } catch (e) {
-      res.status(500).json({ status: 'error', message: e.message })
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -194,7 +198,7 @@ export function router(config: GitRouterConfig = {}) {
       })
       res.send(req.file)
     } catch (e) {
-      res.status(500).json({ status: 'error', message: e.message })
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -219,8 +223,9 @@ export function router(config: GitRouterConfig = {}) {
       res.json({ status: 'success' })
     } catch (e) {
       // TODO: More intelligently respond
+
       res.status(412)
-      res.json({ status: 'failure', error: e.message })
+      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -230,8 +235,9 @@ export function router(config: GitRouterConfig = {}) {
       res.json({ status: 'success' })
     } catch (e) {
       // TODO: More intelligently respond
+
       res.status(412)
-      res.json({ status: 'failure', error: e.message })
+      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -248,7 +254,7 @@ export function router(config: GitRouterConfig = {}) {
       })
       .catch((e: any) => {
         res.status(412)
-        res.json({ status: 'failure', error: e.message })
+        res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
       })
   })
 
@@ -258,8 +264,9 @@ export function router(config: GitRouterConfig = {}) {
       res.send({ status: 'success', branch: summary.branches[summary.current] })
     } catch (e) {
       // TODO: More intelligently respond
+
       res.status(500)
-      res.json({ status: 'failure', message: e.message })
+      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -269,8 +276,9 @@ export function router(config: GitRouterConfig = {}) {
       res.send({ status: 'success', branches: summary.all })
     } catch (e) {
       // TODO: More intelligently respond
+
       res.status(500)
-      res.json({ status: 'failure', message: e.message })
+      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -291,8 +299,9 @@ export function router(config: GitRouterConfig = {}) {
       res.send({ status: 'success', branch })
     } catch (e) {
       // TODO: More intelligently respond
+
       res.status(500)
-      res.json({ status: 'failure', message: e.message })
+      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -316,7 +325,7 @@ export function router(config: GitRouterConfig = {}) {
       res.status(501)
       res.json({
         status: 'failure',
-        message: e.message,
+        message: GIT_ERROR_MESSAGE,
         fileRelativePath: req.params.fileRelativePath,
       })
     }
