@@ -17,9 +17,9 @@ limitations under the License.
 */
 
 import { Plugin, PluginKey } from 'prosemirror-state'
-import { Decoration, DecorationSet } from 'prosemirror-view'
+import { Decoration, DecorationSet, EditorView } from 'prosemirror-view'
 import { findParentNodeOfType } from 'prosemirror-utils'
-import { TableMap } from 'prosemirror-tables'
+import { TableMap, CellSelection } from 'prosemirror-tables'
 
 export const blockPluginKey = new PluginKey('block')
 
@@ -62,6 +62,8 @@ export const tablePlugin = new Plugin({
           if (decorations.length)
             return {
               deco: DecorationSet.create(newState.doc, decorations),
+              selectedTableMap: tableMap,
+              selectedTable: tableNode,
             }
         }
       }
@@ -71,6 +73,48 @@ export const tablePlugin = new Plugin({
   props: {
     decorations(state) {
       return (this as any).getState(state).deco
+    },
+    handleClickOn(
+      view: EditorView,
+      pos: number,
+      node: any,
+      nodePos: number,
+      event: any,
+      direct: boolean
+    ) {
+      if (!direct) return false
+      console.log(nodePos)
+      const targetClasses = event.target.classList
+      const { state, dispatch } = view
+      const tablePluginState = blockPluginKey.getState(state)
+      let cellSelection
+      if (targetClasses.contains('tina_table_header_ext_left')) {
+        const { width } = tablePluginState.selectedTableMap
+        cellSelection = new CellSelection(
+          state.doc.resolve(nodePos + (width - 1) * 2),
+          state.doc.resolve(nodePos)
+        )
+      }
+      if (targetClasses.contains('tina_table_header_ext_top')) {
+        const { height, width } = tablePluginState.selectedTableMap
+        cellSelection = new CellSelection(
+          state.doc.resolve(
+            nodePos + width * (height - 1) * 2 + (height - 1) * 2
+          ),
+          state.doc.resolve(nodePos)
+        )
+      }
+      if (targetClasses.contains('tina_table_header_ext_top_left')) {
+        const { height, width } = tablePluginState.selectedTableMap
+
+        console.log(nodePos, nodePos + height * width * 2 + height - 1)
+        cellSelection = new CellSelection(
+          state.doc.resolve(nodePos + height * width * 2 + height - 1),
+          state.doc.resolve(nodePos)
+        )
+      }
+      if (cellSelection) dispatch(state.tr.setSelection(cellSelection as any))
+      return false
     },
   },
 })

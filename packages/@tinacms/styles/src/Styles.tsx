@@ -109,22 +109,22 @@ export const DefaultTheme: Theme = {
     },
   },
   radius: {
-    small: '0.3rem',
-    big: '1.5rem',
+    small: '5px',
+    big: '24px',
   },
   padding: {
-    small: '0.75rem',
-    big: '1.25rem',
+    small: '12px',
+    big: '20px',
   },
   font: {
     size: {
-      0: '0.6875rem', // 11px
-      1: '0.8125rem', // 13px
-      2: '0.9375rem', // 15px
-      3: '1rem', // 16px
-      4: '1.125rem', // 18px
-      5: '1.25rem', // 20px
-      6: '1.375rem', // 22px
+      0: '11px',
+      1: '13px',
+      2: '15px',
+      3: '16px',
+      4: '18px',
+      5: '20px',
+      6: '22px',
     },
     weight: {
       regular: 500,
@@ -201,43 +201,14 @@ export const timing = function(length: keyof Theme['timing']) {
 
 export const GlobalStyles = createGlobalStyle`
   @import url('https://rsms.me/inter/inter.css');
-  html {
-    font-family: 'Inter', sans-serif;
-    font-size: 100%;
-    -webkit-text-size-adjust: 100%;
-    box-sizing: border-box;
-    overflow: hidden;
-  }
-
-  body {
-    margin: 0;
-    padding: 0;
-  }
-  *, *:before, *:after {
-    box-sizing: inherit;
-  }
-  hr {
-    border-color: #EDECF3;
-    color: #EDECF3;
-    margin-bottom: 1.5rem;
-    margin-left: -1.25rem;
-    margin-right: -1.25rem;
-    border-top: 1px solid #EDECF3;
-    border-bottom: none;
-    height: 0;
-    box-sizing: content-box;
-  }
-  h1, h2, h3, h4, h5, h6, p {
-    &:first-child {
-      margin-top: 0;
-    }
-    &:last-child {
-      margin-bottom: 0;
-    }
-  }
 `
 
 export const TinaResetStyles = css`
+  font-family: 'Inter', sans-serif;
+  font-size: 100%;
+  -webkit-text-size-adjust: 100%;
+  box-sizing: border-box;
+  overflow: hidden;
   -webkit-font-smoothing: antialiased;
   -webkit-text-size-adjust: 100%;
   backface-visibility: visible;
@@ -251,7 +222,6 @@ export const TinaResetStyles = css`
   bottom: auto;
   box-shadow: none;
   box-sizing: border-box;
-  box-sizing: content-box;
   caption-side: top;
   clear: none;
   clip: auto;
@@ -260,7 +230,7 @@ export const TinaResetStyles = css`
   direction: ltr;
   display: inline;
   float: none;
-  font-size: 100%;
+  font-size: 16px;
   font-stretch: normal;
   font-style: normal;
   font-variant: normal;
@@ -301,12 +271,48 @@ export const TinaResetStyles = css`
   white-space: normal;
   word-break: normal;
   word-spacing: normal;
-  font-family: 'Inter', sans-serif;
 `
 
 export const TinaReset = styled.div`
   ${TinaResetStyles}
-  * {
-    ${TinaResetStyles}
+
+  *, *:before, *:after {
+    box-sizing: inherit;
+    font-family: inherit;
+    font-size: inherit;
+  }
+
+  hr {
+    border-color: #edecf3;
+    color: #edecf3;
+    margin-bottom: 24px;
+    margin-left: -20px;
+    margin-right: -20px;
+    border-top: 1px solid #edecf3;
+    border-bottom: none;
+    height: 0;
+    box-sizing: content-box;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6,
+  p {
+    &:first-child {
+      margin-top: 0;
+    }
+    &:last-child {
+      margin-bottom: 0;
+    }
+  }
+  td,
+  th {
+    padding: 0;
+    width: auto;
+    height: auto;
+    border: inherit;
+    margin: 0;
   }
 `
