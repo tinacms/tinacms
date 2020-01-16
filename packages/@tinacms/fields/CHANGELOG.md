@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.2.1...@tinacms/fields@0.3.0-alpha.0) (2020-01-16)
+
+
+### Bug Fixes
+
+* remove use of frame ([ae4a055](https://github.com/tinacms/tinacms/commit/ae4a055))
+
+
+### Features
+
+* adding highlighting to table selection ([98e6e7c](https://github.com/tinacms/tinacms/commit/98e6e7c))
+* basic support for tables in wysiwym ([84159ba](https://github.com/tinacms/tinacms/commit/84159ba))
+* Style improvements in tables. ([904d9f4](https://github.com/tinacms/tinacms/commit/904d9f4))
+
+
+
+
+
 ## [0.2.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.2.0...@tinacms/fields@0.2.1) (2020-01-14)
 
 **Note:** Version bump only for package @tinacms/fields
