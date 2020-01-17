@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as fs from 'fs'
 import * as path from 'path'
+import eol from "eol";
 import { defaultSchema } from '../../default-schema'
 import { MarkdownTranslator } from './index'
 
@@ -57,11 +58,11 @@ describe('Markdown Translators', () => {
     })
 
     function testFile(flavour: string, file: string) {
-      const input = fs.readFileSync(pathOf(flavour, '__tests__', file), 'utf8')
+      const input = eol.auto(fs.readFileSync(pathOf(flavour, '__tests__', file), 'utf8'))
 
       it(file, () => {
         const node = translator.nodeFromString(input)!
-        const output = translator.stringFromNode(node)
+        const output = eol.auto(translator.stringFromNode(node))
         expect(output).toBe(input)
       })
     }
@@ -75,12 +76,12 @@ describe('Markdown Translators', () => {
       const writeFile = (file: string, content: string) =>
         fs.writeFile(pathOf(flavour, '__tests__', dir, file), content, () => {})
 
-      const input = readFile('input.md')
+      const input = eol.auto(readFile('input.md'))
       const expectedNode = readFile('node.json')
-      const expectedOutput = readFile('output.md')
+      const expectedOutput = eol.auto(readFile('output.md'))
 
       const node = translator.nodeFromString(input)!
-      const output = translator.stringFromNode(node)
+      const output = eol.auto(translator.stringFromNode(node))
 
       describe(dir, () => {
         if (expectedNode) {

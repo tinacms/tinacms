@@ -26,27 +26,18 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaField, Wysiwyg, Toggle } from "tinacms"
+import { TinaField, Wysiwyg, Toggle, Select } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
 import { EditToggle } from "../components/edit-toggle"
 import { PlainTextInput } from "../components/plain-text-input"
 
 const get = require("lodash.get")
 
-const MyToggle = styled((props, ...styleProps) => (
-  <div {...styleProps}>
-    <label>Date</label>
-    <Toggle {...props} />
-  </div>
-))`
-  display: none;
-  display: flex;
-  flex-direction: column;
-
-  label {
-    font-weight: 600;
-  }
-`
+const PlainText = props => (
+  <input style={{ background: "transparent " }} {...props.input} />
+)
+const MyToggle = props => <Toggle {...props} />
+const MySelect = props => <Select {...props} />
 
 function BlogPostTemplate(props) {
   const form = props.form
@@ -129,6 +120,28 @@ function BlogPostTemplate(props) {
           padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
         }}
       >
+        <button onClick={() => setIsEditing(p => !p)}>
+          {isEditing ? "Stop Editing" : "Start Editing"}
+        </button>
+
+        <TinaField
+          name="rawFrontmatter.draft"
+          Component={MyToggle}
+          type="checkbox"
+        >
+          {post.frontmatter.draft && (
+            <small style={{ color: "fuchsia" }}>Draft</small>
+          )}
+        </TinaField>
+        <br />
+
+        <TinaField
+          name="rawFrontmatter.cool"
+          Component={MySelect}
+          options={[100, "Love this!", "How cool!"]}
+        >
+          <p>{post.frontmatter.cool}</p>
+        </TinaField>
         <BlogBlocks form={form} data={blocks} />
         <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
@@ -256,6 +269,18 @@ const BlogPostForm = {
       component: "toggle",
     },
     {
+      label: "New Shiny Select",
+      name: "frontmatter.cool",
+      component: "select",
+      options: [100, "Love this!", "How cool!"],
+    },
+    {
+      label: "Testing Number Component",
+      name: "frontmatter.testNumber",
+      component: "number",
+      steps: 3,
+    },
+    {
       label: "Date",
       name: "frontmatter.date",
       component: "date",
@@ -269,6 +294,8 @@ const BlogPostForm = {
       label: "Heading color",
       name: "frontmatter.heading_color",
       component: "color",
+      colors: ["#ff0000", "#ffff00", "#00ff00", "#0000ff"],
+      widget: "sketch",
     },
     {
       name: "frontmatter.thumbnail",
@@ -315,17 +342,18 @@ export const pageQuery = graphql`
       excerpt(pruneLength: 160)
       html
       frontmatter {
-        blocks {
-          _template
-          text
-          alt
-          src
-        }
+        # blocks {
+        #   _template
+        #   text
+        #   alt
+        #   src
+        # }
         title
         date(formatString: "DD MMMM, YYYY")
         description
         heading_color
         draft
+        cool
         thumbnail {
           childImageSharp {
             fluid {

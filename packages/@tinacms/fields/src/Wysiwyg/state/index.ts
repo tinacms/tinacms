@@ -23,19 +23,20 @@ import { dropCursor } from 'prosemirror-dropcursor'
 import { gapCursor } from 'prosemirror-gapcursor'
 import { history } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
+import { tableEditing } from 'prosemirror-tables'
 
 import { inputRules } from './plugins/input-rules'
 import { Translator } from '../Translator'
 import { menu } from './plugins/Menu'
 import { buildKeymap } from './buildKeymap'
 import { links } from './plugins/links'
+import { tablePlugin } from './plugins/Table'
 
 export function createEditorState(
   schema: Schema,
   translator: Translator,
   plugins: Plugin[],
   value: string,
-  frame: any,
   theme: any // TODO: update type
 ) {
   return EditorState.create({
@@ -45,10 +46,12 @@ export function createEditorState(
       inputRules(schema),
       keymap(buildKeymap(schema, plugins)),
       history(),
-      links(schema, frame, theme),
+      links(schema, theme),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       gapCursor(),
-      menu(translator, false, frame, theme),
+      menu(translator, false, theme),
+      tableEditing(),
+      tablePlugin,
     ],
   })
 }

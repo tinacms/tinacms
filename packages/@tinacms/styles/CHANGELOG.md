@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.1.0...@tinacms/styles@0.1.1-alpha.0) (2020-01-16)
+
+
+### Bug Fixes
+
+* remove global styles, fix issues from iframe removal ([0b1b836](https://github.com/tinacms/tinacms/commit/0b1b836))
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.1.0-alpha.1...@tinacms/styles@0.1.0) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/styles
