@@ -428,6 +428,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "Sampangpang",
+      "name": "Sampangpang",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/14543106?v=4",
+      "profile": "https://github.com/Sampangpang",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
