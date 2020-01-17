@@ -127,7 +127,7 @@ const LinkPopup = styled.div`
   transform-origin: 50% 0;
   animation: ${LinkPopupKeyframes} 85ms ease-out both 1;
   overflow: visible;
-  padding: 0.75rem;
+  padding: 12px;
   z-index: 10;
 `
 
@@ -137,7 +137,7 @@ const LinkLabel = styled.label`
   font-weight: 600;
   letter-spacing: 0.01em;
   color: ${color.grey(8)};
-  margin-bottom: 0.2rem;
+  margin-bottom: 3px;
 `
 
 const LinkInput = styled.input`
@@ -147,10 +147,10 @@ const LinkInput = styled.input`
   font-size: ${font.size(1)};
   line-height: 1.35;
   transition: all 85ms ease-out;
-  padding: 0.5rem 0.75rem;
+  padding: 8px 12px;
   border: 1px solid ${color.grey(2)};
   width: 100%;
-  margin: 0 0 0.5rem 0;
+  margin: 0 0 8px 0;
   outline: none;
   box-shadow: 0 0 0 2px transparent;
 
@@ -171,7 +171,7 @@ const LinkInput = styled.input`
 const LinkActions = styled.div`
   display: flex;
   justify-content: flex-end;
-  padding-top: 0.25rem;
+  padding-top: 4px;
 `
 
 const SaveLink = styled.button`
@@ -185,8 +185,8 @@ const SaveLink = styled.button`
   cursor: pointer;
   transition: all 85ms ease-out;
   font-size: ${font.size(0)};
-  padding: 0.5rem 1.25rem;
-  margin-left: 0.5rem;
+  padding: 8px 20px;
+  margin-left: 8px;
   &:hover {
     background-color: #2296fe;
   }

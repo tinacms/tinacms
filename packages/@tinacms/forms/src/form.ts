@@ -18,7 +18,7 @@ limitations under the License.
 
 import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
-import { Plugin } from '../plugins'
+import { Plugin } from '@tinacms/core'
 
 export interface FormOptions<S> extends Config<S> {
   id: any
@@ -117,6 +117,10 @@ export class Form<S = any> implements Plugin {
 
   submit: FormApi<S>['submit'] = () => {
     return this.finalForm.submit()
+  }
+
+  get mutators() {
+    return this.finalForm.mutators
   }
 
   get values() {

@@ -37,7 +37,7 @@ export const ModalPopup: StyledComponent<'div', {}, {}> = styled.div`
   overflow: visible; /* Keep this as "visible", select component needs to overflow */
   background-color: #f6f6f9;
   border-radius: ${radius('small')};
-  margin: 2.5rem auto;
+  margin: 40px auto;
   width: 460px;
   max-width: 90%;
   animation: ${ModalPopupKeyframes} 150ms ease-out 1;

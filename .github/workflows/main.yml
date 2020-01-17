@@ -6,14 +6,19 @@ jobs:
   build:
     strategy:
       matrix:
-        os: [ubuntu-latest, macOS-latest]
+        os: [ubuntu-latest, macOS-latest, windows-latest]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
-
+          node-version: '10.x'           
+           
+      - if: matrix.os == 'windows-latest'
+        run: |
+          npm install --global --production windows-build-tools@4.0.0
+          npm install --global --production node-gyp
+          
       - name: Install
         run: |
           npm ci

@@ -27,7 +27,7 @@ import {
 import { ModalPopup } from './modals/ModalPopup'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
 import {
   color,
@@ -38,12 +38,10 @@ import {
   shadow,
 } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
-import { useFrameContext } from './SyledFrame'
 import { useCMS, useSubscribable } from '../react-tinacms'
 
 export const CreateContentMenu = () => {
   const cms = useCMS()
-  const frame = useFrameContext()
   const [visible, setVisible] = React.useState(false)
 
   const contentCreatorPlugins = cms.plugins.findOrCreateMap('content-creator')
@@ -61,7 +59,6 @@ export const CreateContentMenu = () => {
             click
             escape
             onDismiss={() => setVisible(false)}
-            document={frame.document}
             disabled={!visible}
           >
             {contentCreatorPlugins.all().map(plugin => (
@@ -123,7 +120,11 @@ const FormModal = ({ plugin, close }: any) => {
           return (
             <ModalPopup>
               <ModalHeader close={close}>{plugin.name}</ModalHeader>
-              <ModalBody onKeyPress={(e) => e.charCode === 13 ? handleSubmit() as any : null}>
+              <ModalBody
+                onKeyPress={e =>
+                  e.charCode === 13 ? (handleSubmit() as any) : null
+                }
+              >
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
               <ModalActions>
@@ -145,7 +146,7 @@ const ContentMenuWrapper = styled.div`
 `
 
 const ContentMenu = styled.div<{ open: boolean }>`
-  min-width: 12rem;
+  min-width: 192px;
   border-radius: ${radius()};
   border: 1px solid ${color.grey(2)};
   display: block;
@@ -167,7 +168,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, 2.75rem, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, 44px, 0) scale3d(1, 1, 1);
     `};
 `
 
@@ -175,8 +176,8 @@ const CreateButton = styled.button`
   position: relative;
   text-align: center;
   font-size: ${font.size(0)};
-  padding: 0 0.75rem;
-  height: 2.5rem;
+  padding: 0 12px;
+  height: 40px;
   font-weight: 500;
   width: 100%;
   background: none;

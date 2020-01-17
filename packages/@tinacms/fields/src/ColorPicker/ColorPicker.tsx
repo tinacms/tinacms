@@ -17,7 +17,9 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { SketchPicker } from 'react-color'
+import { useState } from 'react'
+import { Dismissible } from 'react-dismissible'
+import { SketchPicker, BlockPicker } from 'react-color'
 
 import styled, { keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
@@ -69,7 +71,7 @@ export const Swatch = styled(
     font-weight: bold;
 
     width: 100%;
-    height: 2.5rem;
+    height: 40px;
     border-radius: ${radius('big')};
     box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
     background: ${props =>
@@ -100,7 +102,7 @@ export const Popover = styled.div`
   position: absolute;
   left: 50%;
   transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
-  transform-origin: 50% -0.5rem;
+  transform-origin: 50% -8px;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
   z-index: 900;
   &:before {
@@ -110,8 +112,8 @@ export const Popover = styled.div`
     left: 50%;
     margin-top: 2px;
     transform: translate3d(-50%, -100%, 0);
-    width: 1rem;
-    height: 0.8rem;
+    width: 16px;
+    height: 13px;
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     background-color: white;
     z-index: 100;
@@ -131,91 +133,109 @@ export const Cover = styled.div`
 
 interface Props {
   colorFormat: ColorFormat
+  userColors: string[]
+  widget?: 'sketch' | 'block'
   input: WrappedFieldProps['input']
-}
-
-interface State {
-  displayColorPicker: boolean
 }
 
 const nullColor = 'transparent'
 
-export class ColorPicker extends React.Component<Props, State> {
-  static defaultProps = {
-    colorFormat: ColorFormat.Hex,
-  }
-  presetColors = [
-    '#D0021B',
-    '#F5A623',
-    '#F8E71C',
-    '#8B572A',
-    '#7ED321',
-    '#417505',
-    '#BD10E0',
-    '#9013FE',
-    '#4A90E2',
-    '#50E3C2',
-    '#B8E986',
-    '#000000',
-    '#4A4A4A',
-    '#9B9B9B',
-    '#FFFFFF',
-  ]
+const presetColors = [
+  '#D0021B',
+  '#F5A623',
+  '#F8E71C',
+  '#8B572A',
+  '#7ED321',
+  '#417505',
+  '#BD10E0',
+  '#9013FE',
+  '#4A90E2',
+  '#50E3C2',
+  '#B8E986',
+  '#000000',
+  '#4A4A4A',
+  '#9B9B9B',
+  '#FFFFFF',
+]
 
-  state = {
-    displayColorPicker: false,
-  }
+interface WidgetProps {
+  presetColors: string[]
+  color: ColorRGBA
+  onChange: (pickerColor: any) => void
+  disableAlpha?: boolean
+  width: string
+}
 
-  get colorFormat() {
-    return (this.props.colorFormat || ColorFormat.Hex).toLowerCase()
-  }
+const SketchWidget: React.FC<WidgetProps> = props => (
+  <SketchPicker
+    presetColors={props.presetColors}
+    color={props.color}
+    onChange={props.onChange}
+    disableAlpha={props.disableAlpha}
+    width={props.width}
+  />
+)
+const BlockWidget: React.FC<WidgetProps> = props => (
+  <BlockPicker
+    colors={props.presetColors}
+    color={props.color}
+    onChange={props.onChange}
+    width={props.width}
+  />
+)
 
-  handleClick = () => {
-    this.setState({ displayColorPicker: !this.state.displayColorPicker })
-  }
+const WIDGETS = { sketch: SketchWidget, block: BlockWidget }
 
-  handleClose = () => {
-    this.setState({ displayColorPicker: false })
-  }
+export const ColorPicker: React.FC<Props> = ({
+  colorFormat,
+  userColors = presetColors,
+  widget = 'sketch',
+  input,
+}) => {
+  const Widget = WIDGETS[widget]
+  if (!Widget) throw new Error('You must specify a widget type.')
 
-  handleChange = (pickerColor: any) => {
+  const [displayColorPicker, setDisplayColorPicker] = useState(false)
+
+  const getColorFormat = (colorFormat || ColorFormat.Hex).toLowerCase()
+  const getColorRGBA = input.value
+    ? ColorFormatter[getColorFormat].parse(input.value)
+    : null
+
+  const handleChange = (pickerColor: any) => {
     const color = (pickerColor.hex === nullColor
       ? null
       : { ...pickerColor.rgb, a: 1 }) as ColorRGBA | null
-    this.props.input.onChange(
-      color ? ColorFormatter[this.colorFormat].getValue(color) : null
+    input.onChange(
+      color ? ColorFormatter[getColorFormat].getValue(color) : null
     )
   }
 
-  get colorRGBA() {
-    return this.props.input.value
-      ? ColorFormatter[this.colorFormat].parse(this.props.input.value)
-      : null
-  }
-
-  render() {
-    return (
-      <>
-        <Swatch
-          onClick={this.handleClick}
-          colorRGBA={this.colorRGBA}
-          colorFormat={this.colorFormat}
-        />
-        {this.state.displayColorPicker ? (
-          <>
-            <Popover>
-              <SketchPicker
-                presetColors={[...this.presetColors, nullColor]}
-                color={this.colorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
-                onChange={this.handleChange}
-                disableAlpha={true}
-                width={'240px'}
-              />{' '}
-            </Popover>
-            <Cover onClick={this.handleClose} />
-          </>
-        ) : null}{' '}
-      </>
-    )
-  }
+  return (
+    <>
+      <Swatch
+        onClick={() => setDisplayColorPicker(!displayColorPicker)}
+        colorRGBA={getColorRGBA}
+        colorFormat={getColorFormat}
+      />
+      {displayColorPicker && (
+        <Popover>
+          <Dismissible
+            click
+            escape
+            disabled={!displayColorPicker}
+            onDismiss={() => setDisplayColorPicker(false)}
+          >
+            <Widget
+              presetColors={[...userColors, nullColor]}
+              color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+              onChange={handleChange}
+              disableAlpha={true}
+              width={'240px'}
+            />
+          </Dismissible>
+        </Popover>
+      )}
+    </>
+  )
 }

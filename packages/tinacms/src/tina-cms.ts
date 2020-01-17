@@ -26,10 +26,12 @@ import ImageFieldPlugin from './plugins/fields/ImageFieldPlugin'
 import ColorFieldPlugin from './plugins/fields/ColorFieldPlugin'
 import NumberFieldPlugin from './plugins/fields/NumberFieldPlugin'
 import ToggleFieldPlugin from './plugins/fields/ToggleFieldPlugin'
+import SelectFieldPlugin from './plugins/fields/SelectFieldPlugin'
 import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
+import { Form } from '@tinacms/forms'
 
 export class TinaCMS extends CMS {
   constructor() {
@@ -41,11 +43,17 @@ export class TinaCMS extends CMS {
     this.fields.add(ColorFieldPlugin)
     this.fields.add(NumberFieldPlugin)
     this.fields.add(ToggleFieldPlugin)
+    this.fields.add(SelectFieldPlugin)
     this.fields.add(MarkdownFieldPlugin)
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
   }
+
+  get forms() {
+    return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
+  }
+
   get fields(): PluginType<FieldPlugin> {
     return this.plugins.findOrCreateMap('field')
   }

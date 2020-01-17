@@ -130,7 +130,7 @@ Update Docs for tinacms#${danger.github.pr.number}
   )}&body=${updateDocBody(changes)}">Create Issue</a>
 `)
 
-const updateDocTitle = (chagnes: [string, Dep][]) =>
+const updateDocTitle = (changes: [string, Dep][]) =>
   encodeURIComponent(`Update Docs for tinacms#${danger.github.pr.number}`)
 
 const updateDocBody = (changes: [string, Dep][]) =>
@@ -143,7 +143,7 @@ The following files may need to be updated:
 
 | File | Reason |
 | --- | --- |
-${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)}
+${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`).join('\n')}
 `)
 
 const fileLink = (file: string) => {

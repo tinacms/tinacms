@@ -18,7 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState, useContext } from 'react'
-import { Form } from '@tinacms/core'
+import PropTypes from 'prop-types'
+import { Form } from '@tinacms/forms'
 import { FormBuilder } from './final-form-builder'
 import { Field } from 'react-final-form'
 
@@ -69,11 +70,19 @@ export function TinaField({
 }: TinaFieldsProps) {
   const isEditing = useContext(EditingContext)
   if (!isEditing) return children || null
+
   return (
     <Field {...fieldProps}>
       {({ input, meta }) => {
-        return <Component input={input} meta={meta} />
+        return <Component input={input} meta={meta} {...fieldProps} />
       }}
     </Field>
   )
+}
+
+TinaField.propTypes = {
+  name: PropTypes.string,
+  type: PropTypes.string,
+  Component: PropTypes.any.isRequired,
+  children: PropTypes.any,
 }

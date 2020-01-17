@@ -21,9 +21,13 @@ import { CMS, Field, AddContentPlugin } from 'tinacms'
 
 type MaybePromise<T> = Promise<T> | T
 
+interface AnyField extends Field {
+  [key: string]: any
+}
+
 interface CreateRemarkButtonOptions<FormShape, FrontmatterShape> {
   label: string
-  fields: Field[]
+  fields: AnyField[]
   filename(form: FormShape): MaybePromise<string>
   frontmatter?(form: FormShape): MaybePromise<FrontmatterShape>
   body?(form: FormShape): MaybePromise<string>

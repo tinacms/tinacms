@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { SettingsIcon } from '@tinacms/icons'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import { ScreenPlugin } from '../screen-plugin'
 import { FormView } from '../../components/FormView'
 
