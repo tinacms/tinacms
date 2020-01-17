@@ -164,7 +164,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/cleitonper"><img src="https://avatars1.githubusercontent.com/u/13934790?v=4" width="100px;" alt=""/><br /><sub><b>Cleiton Pereira</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Acleitonper" title="Bug reports">🐛</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="https://github.com/chrisdmacrae"><img src="https://avatars2.githubusercontent.com/u/6855186?v=4" width="100px;" alt=""/><br /><sub><b>chrisdmacrae</b></sub></a><br /><a href="#infra-chrisdmacrae" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
+    <td align="center"><a href="https://github.com/chrisdmacrae"><img src="https://avatars2.githubusercontent.com/u/6855186?v=4" width="100px;" alt=""/><br /><sub><b>chrisdmacrae</b></sub></a><br /><a href="#infra-chrisdmacrae" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#question-chrisdmacrae" title="Answering Questions">💬</a> <a href="#ideas-chrisdmacrae" title="Ideas, Planning, & Feedback">🤔</a></td>
   </tr>
 </table>
 
