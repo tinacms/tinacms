@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import { padding, color, font } from '@tinacms/styles'
 import { RightArrowIcon } from '@tinacms/icons'
 
@@ -65,7 +65,7 @@ const FormListItem = styled.li`
   align-items: center;
   user-select: none;
   svg {
-    width: 1.5rem;
+    width: 24px;
     fill: ${color.grey(3)};
     margin-top: -1px;
     height: auto;

@@ -23,7 +23,6 @@ import ReactDatetime from 'react-datetime'
 import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
-import { useFrameContext } from '../../components/SyledFrame'
 import styled from 'styled-components'
 import { InputCss } from '@tinacms/fields'
 import { format, parse } from './dateFormat'
@@ -33,7 +32,6 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
     const [isOpen, setIsOpen] = useState(false)
     const area = useRef<HTMLDivElement>(null!)
 
-    const documentContext = useFrameContext().document
     useEffect(() => {
       const handleClick = (event: MouseEvent) => {
         if (!area.current) return
@@ -45,11 +43,11 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
           setIsOpen(true)
         }
       }
-      documentContext.addEventListener('mouseup', handleClick, false)
+      document.addEventListener('mouseup', handleClick, false)
       return () => {
-        documentContext.removeEventListener('mouseup', handleClick, false)
+        document.removeEventListener('mouseup', handleClick, false)
       }
-    }, [documentContext])
+    }, [document])
 
     return (
       <DatetimeContainer>

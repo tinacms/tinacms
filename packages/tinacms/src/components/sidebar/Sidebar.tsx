@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import { StyledFrame } from '../SyledFrame'
 import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from '../FormView'
 import { Modal, ModalHeader, ModalBody } from '../modals/ModalProvider'
@@ -30,15 +29,8 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import {
-  GlobalStyles,
-  padding,
-  color,
-  radius,
-  font,
-  timing,
-} from '@tinacms/styles'
-import { TOGGLE_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
+import { padding, color, radius, font, timing } from '@tinacms/styles'
+import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
@@ -53,70 +45,50 @@ export const Sidebar = (props: any) => {
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <SidebarContainer
-      ref={container}
-      open={sidebar.isOpen}
-      currentWidth={sidebar.width}
-    >
-      <StyledFrame
-        id="sidebar-frame"
-        frameStyles={{
-          position: 'absolute',
-          left: '0',
-          top: '0',
-          width: '100%',
-          height: '100%',
-          margin: '0',
-          padding: '0',
-          border: '0',
-          pointerEvents: sidebar.isOpen || !props.isResizing ? 'all' : 'none',
-        }}
-      >
-        <SidebarWrapper open={sidebar.isOpen} currentWidth={sidebar.width}>
-          <GlobalStyles />
-          <SidebarHeader>
-            <MenuToggle
-              onClick={() => setMenuVisibility(!menuIsVisible)}
-              open={menuIsVisible}
-            >
-              <HamburgerIcon />
-            </MenuToggle>
-            <CreateContentMenu />
-          </SidebarHeader>
-          <FormsView />
+    <SidebarContainer open={sidebar.isOpen}>
+      <SidebarWrapper open={sidebar.isOpen}>
+        <SidebarHeader>
+          <MenuToggle
+            onClick={() => setMenuVisibility(!menuIsVisible)}
+            open={menuIsVisible}
+          >
+            <HamburgerIcon />
+          </MenuToggle>
+          <CreateContentMenu />
+        </SidebarHeader>
+        <FormsView />
 
-          <MenuPanel visible={menuIsVisible} currentWidth={sidebar.width}>
-            <MenuWrapper>
-              <MenuList>
-                {cms.screens.all().map(view => {
-                  const Icon = view.Icon
-                  return (
-                    <MenuLink
-                      value={view.name}
-                      onClick={() => {
-                        setActiveView(view)
-                        setMenuVisibility(false)
-                      }}
-                    >
-                      <Icon /> {view.name}
-                    </MenuLink>
-                  )
-                })}
-              </MenuList>
-            </MenuWrapper>
-            <Watermark />
-          </MenuPanel>
-          {ActiveView && (
-            <ActiveViewModal
-              name={ActiveView.name}
-              close={() => setActiveView(null)}
-              layout={ActiveView.layout}
-            >
-              <ActiveView.Component />
-            </ActiveViewModal>
-          )}
-        </SidebarWrapper>
-      </StyledFrame>
+        <MenuPanel visible={menuIsVisible}>
+          <MenuWrapper>
+            <MenuList>
+              {cms.screens.all().map(view => {
+                const Icon = view.Icon
+                return (
+                  <MenuLink
+                    value={view.name}
+                    onClick={() => {
+                      setActiveView(view)
+                      setMenuVisibility(false)
+                    }}
+                  >
+                    <Icon /> {view.name}
+                  </MenuLink>
+                )
+              })}
+            </MenuList>
+          </MenuWrapper>
+          <Watermark />
+        </MenuPanel>
+        {ActiveView && (
+          <ActiveViewModal
+            name={ActiveView.name}
+            close={() => setActiveView(null)}
+            layout={ActiveView.layout}
+          >
+            <ActiveView.Component />
+          </ActiveViewModal>
+        )}
+      </SidebarWrapper>
       <SidebarToggle {...sidebar} />
     </SidebarContainer>
   )
@@ -171,45 +143,26 @@ const Watermark = styled(({ ...styleProps }: any) => {
   bottom: ${padding()};
   left: ${padding()};
   svg {
-    width: 8rem;
-    height: 8rem;
-    margin: -0.25rem -1.25rem;
+    width: 128px;
+    height: 128px;
+    margin: -4px -20px;
     fill: ${color.grey(9)};
   }
 `
 
 const SidebarToggle = (sidebar: any) => {
   return (
-    <StyledFrame
-      id="sidebar-frame"
-      frameStyles={{
-        position: 'absolute',
-        left: sidebar.width + 'px',
-        bottom: '32px',
-        width: '56px',
-        height: '64px',
-        margin: '0',
-        padding: '0',
-        border: '0',
-        overflow: 'hidden',
-        pointerEvents: 'all',
-      }}
+    <SidebarToggleButton
+      onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
+      open={sidebar.isOpen}
     >
-      <>
-        <GlobalStyles />
-        <SidebarToggleButton
-          onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
-          open={sidebar.isOpen}
-        >
-          {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
-        </SidebarToggleButton>
-      </>
-    </StyledFrame>
+      {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
+    </SidebarToggleButton>
   )
 }
 
 const MenuList = styled.div`
-  margin: 2rem -${padding()} 2rem -${padding()};
+  margin: 32px -${padding()} 32px -${padding()};
   display: block;
 `
 
@@ -217,7 +170,7 @@ const MenuLink = styled.div<{ value: string }>`
   color: ${color.grey(1)};
   font-size: ${font.size(4)};
   font-weight: 500;
-  padding: ${padding()} ${padding()} ${padding()} 4rem;
+  padding: ${padding()} ${padding()} ${padding()} 64px;
   position: relative;
   cursor: pointer;
   transition: all ${timing('short')} ease-out;
@@ -225,10 +178,10 @@ const MenuLink = styled.div<{ value: string }>`
   &:after {
     content: '';
     position: absolute;
-    top: 0.5rem;
-    bottom: 0.5rem;
-    left: 0.5rem;
-    right: 0.5rem;
+    top: 8px;
+    bottom: 8px;
+    left: 8px;
+    right: 8px;
     border-radius: ${radius()};
     background-color: ${color.grey(9)};
     z-index: -1;
@@ -257,7 +210,7 @@ const MenuLink = styled.div<{ value: string }>`
     left: ${padding()};
     top: 50%;
     transform: translate3d(0, -50%, 0);
-    width: 2.25rem;
+    width: 36px;
     height: auto;
     fill: ${color.grey(4)};
     transition: all ${timing('short')} ease-out;
@@ -269,8 +222,8 @@ const SidebarHeader = styled.div`
   justify-content: space-between;
   align-items: center;
   z-index: 1050;
-  flex: 0 0 ${SIDEBAR_HEADER_HEIGHT}rem;
-  height: ${SIDEBAR_HEADER_HEIGHT}rem;
+  flex: 0 0 ${SIDEBAR_HEADER_HEIGHT}px;
+  height: ${SIDEBAR_HEADER_HEIGHT}px;
   width: 100%;
   padding: 0 ${padding()};
 `
@@ -282,8 +235,8 @@ const MenuToggle = styled.button<{ open: boolean }>`
   outline: none;
   border: 0;
   text-align: left;
-  width: 4rem;
-  height: 2rem;
+  width: 64px;
+  height: 32px;
   display: flex;
   align-items: center;
   cursor: pointer;
@@ -292,7 +245,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
     transition: fill 85ms ease-out;
     fill: ${color.grey(6)};
     margin-left: -4px;
-    width: 2rem;
+    width: 32px;
     height: auto;
     path {
       position: relative;
@@ -339,7 +292,7 @@ const MenuWrapper = styled.div`
   height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: ${SIDEBAR_HEADER_HEIGHT}rem ${padding()} ${padding()} ${padding()};
+  padding: ${SIDEBAR_HEADER_HEIGHT}px ${padding()} ${padding()} ${padding()};
   ul,
   li {
     margin: 0;
@@ -379,13 +332,14 @@ const SidebarToggleAnimation = keyframes`
 `
 
 const SidebarToggleButton = styled.button<{ open: boolean }>`
-  position: fixed;
-  top: 0.5rem;
-  left: 0;
+  position: absolute;
+  pointer-events: all;
+  bottom: 44px;
+  left: ${SIDEBAR_WIDTH}px;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
-  border-radius: 0 1.5rem 1.5rem 0;
-  width: 3.125rem;
-  height: 2.75rem;
+  border-radius: 0 24px 24px 0;
+  width: 50px;
+  height: 44px;
   border: 0;
   outline: none;
   display: flex;
@@ -452,8 +406,7 @@ const SidebarContainer = styled.div<{ open: boolean; currentWidth: number }>`
   left: 0 !important;
   display: block !important;
   height: 100% !important;
-  background: transparent !important;
-  width: ${p => p.currentWidth + TOGGLE_WIDTH}px;
+  width: ${SIDEBAR_WIDTH}px !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
@@ -464,5 +417,5 @@ const SidebarContainer = styled.div<{ open: boolean; currentWidth: number }>`
     0,
     0
   ) !important;
-  pointer-events: none;
+  pointer-events: ${p => (p.open ? `all` : `none`)};
 `

@@ -29,6 +29,10 @@ import { show } from './show'
 import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
 import atob from 'atob'
 
+// Don't return full error message to client incase confidential details leak
+const GIT_ERROR_MESSAGE =
+  'Git Operation failed: Check the logs for more details'
+
 export interface GitRouterConfig {
   pathToRepo?: string
   pathToContent?: string
@@ -61,15 +65,16 @@ export async function updateRemoteToSSH(pathRoot: string) {
   const originRemotes = remotes.filter((r: any) => r.name == 'origin')
 
   if (!originRemotes.length) {
-    throw new Error('No origin remote on the given rpeo')
+    console.warn('No origin remote on the given repo')
+    return
   }
 
   const originURL = originRemotes[0].refs.push
 
   if (originURL && !isSSHUrl(originURL)) {
-    repo.removeRemote('origin')
+    await repo.removeRemote('origin')
     const newRemote = getGitSSHUrl(originURL)
-    repo.addRemote('origin', newRemote)
+    await repo.addRemote('origin', newRemote)
   }
 }
 
@@ -84,9 +89,28 @@ async function createSSHKey(pathRoot: string) {
       encoding: 'utf8',
       mode: 0o600,
     })
-
-    updateRemoteToSSH(pathRoot)
   }
+}
+
+async function configureGitRemote(pathRoot: string) {
+  await createSSHKey(pathRoot)
+  if (process.env.GIT_REMOTE) {
+    await updateOrigin(pathRoot, process.env.GIT_REMOTE)
+  }
+  await updateRemoteToSSH(pathRoot)
+}
+
+async function updateOrigin(pathRoot: string, remote: string) {
+  const repo = await openRepo(pathRoot)
+  const newRemote = getGitSSHUrl(remote)
+
+  const existingRemotes = await repo.getRemotes(true)
+  if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
+    console.warn(`Changing remote origin to ${newRemote}`)
+  }
+
+  await repo.removeRemote('origin')
+  await repo.addRemote('origin', newRemote)
 }
 
 export function router(config: GitRouterConfig = {}) {
@@ -104,7 +128,9 @@ export function router(config: GitRouterConfig = {}) {
   const router = express.Router()
   router.use(express.json())
 
-  createSSHKey(REPO_ABSOLUTE_PATH)
+  // TODO: There shold be some way of making sure this only happens
+  //       in a cloud editing environment.
+  configureGitRemote(REPO_ABSOLUTE_PATH)
 
   router.delete('/:relPath', (req: any, res: any) => {
     const user = req.user || {}
@@ -113,8 +139,8 @@ export function router(config: GitRouterConfig = {}) {
 
     try {
       deleteFile(fileAbsolutePath)
-    } catch (e) {
-      res.status(500).json({ status: 'error', message: e.message })
+    } catch {
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
 
     commit({
@@ -128,8 +154,8 @@ export function router(config: GitRouterConfig = {}) {
       .then(() => {
         res.json({ status: 'success' })
       })
-      .catch(e => {
-        res.status(500).json({ status: 'error', message: e.message })
+      .catch(() => {
+        res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
       })
   })
 
@@ -153,8 +179,8 @@ export function router(config: GitRouterConfig = {}) {
         )
       }
       res.json({ content: req.body.content })
-    } catch (e) {
-      res.status(500).json({ status: 'error', message: e.message })
+    } catch {
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -171,8 +197,8 @@ export function router(config: GitRouterConfig = {}) {
         if (err) console.error(err)
       })
       res.send(req.file)
-    } catch (e) {
-      res.status(500).json({ status: 'error', message: e.message })
+    } catch {
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -195,10 +221,10 @@ export function router(config: GitRouterConfig = {}) {
       })
 
       res.json({ status: 'success' })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
       res.status(412)
-      res.json({ status: 'failure', error: e.message })
+      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -206,10 +232,10 @@ export function router(config: GitRouterConfig = {}) {
     try {
       await openRepo(REPO_ABSOLUTE_PATH).push()
       res.json({ status: 'success' })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
       res.status(412)
-      res.json({ status: 'failure', error: e.message })
+      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -224,9 +250,9 @@ export function router(config: GitRouterConfig = {}) {
       .then(() => {
         res.json({ status: 'success' })
       })
-      .catch((e: any) => {
+      .catch(() => {
         res.status(412)
-        res.json({ status: 'failure', error: e.message })
+        res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
       })
   })
 
@@ -234,10 +260,10 @@ export function router(config: GitRouterConfig = {}) {
     try {
       const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
       res.send({ status: 'success', branch: summary.branches[summary.current] })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
       res.status(500)
-      res.json({ status: 'failure', message: e.message })
+      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -245,10 +271,10 @@ export function router(config: GitRouterConfig = {}) {
     try {
       const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
       res.send({ status: 'success', branches: summary.all })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
       res.status(500)
-      res.json({ status: 'failure', message: e.message })
+      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -267,10 +293,10 @@ export function router(config: GitRouterConfig = {}) {
       }
 
       res.send({ status: 'success', branch })
-    } catch (e) {
+    } catch {
       // TODO: More intelligently respond
       res.status(500)
-      res.json({ status: 'failure', message: e.message })
+      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -290,11 +316,11 @@ export function router(config: GitRouterConfig = {}) {
         content,
         status: 'success',
       })
-    } catch (e) {
+    } catch {
       res.status(501)
       res.json({
         status: 'failure',
-        message: e.message,
+        message: GIT_ERROR_MESSAGE,
         fileRelativePath: req.params.fileRelativePath,
       })
     }

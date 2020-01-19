@@ -19,12 +19,11 @@ limitations under the License.
 import * as React from 'react'
 import { useCallback, useState, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
-import { StyledFrame } from '../SyledFrame'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'
 import {
-  GlobalStyles,
+  TinaReset,
   Button,
   padding,
   font,
@@ -88,21 +87,11 @@ export const Modal = ({
 
   return portalNode && portalNode
     ? (createPortal(
-        <StyledFrame
-          frameStyles={{
-            height: '100vh',
-            width: '100vw',
-            margin: '0 auto',
-            position: 'fixed',
-            zIndex: Z_INDEX + 100,
-            border: 0,
-          }}
-        >
-          <GlobalStyles />
+        <TinaReset>
           <ModalOverlay>
             <div {...props} />
           </ModalOverlay>
-        </StyledFrame>,
+        </TinaReset>,
         portalNode
       ) as any)
     : null
@@ -114,9 +103,12 @@ export const ModalOverlay = styled.div`
   right: 0;
   bottom: 0;
   left: 0;
+  width: 100vw;
+  height: 100vh;
   background: rgba(0, 0, 0, 0.5);
   overflow: auto;
   padding: 0;
+  z-index: ${Z_INDEX + 100};
 `
 
 const ModalTitle = styled.h2`
@@ -133,7 +125,7 @@ const CloseButton = styled.div`
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
-    width: 1.5rem;
+    width: 24px;
     height: auto;
   }
   &:hover {
@@ -158,7 +150,7 @@ export const ModalHeader = styled(
     )
   }
 )`
-  height: 3.5rem;
+  height: 56px;
   display: flex;
   align-items: center;
   justify-content: space-between;
@@ -173,21 +165,21 @@ export const ModalBody = styled.div<{ padded?: boolean }>`
   overflow: hidden;
   display: flex;
   flex-direction: column;
-  min-height: 10rem;
+  min-height: 160px;
 
   &:last-child {
-    border-radius: 0 0 0.3rem 0.3rem;
+    border-radius: 0 0 5px 5px;
   }
 `
 
 export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
   display: flex;
   justify-content: flex-end;
-  border-radius: 0 0 0.3rem 0.3rem;
+  border-radius: 0 0 5px 5px;
   padding: 0 ${padding()} ${padding()} ${padding()};
   ${Button} {
     flex: 0 1 auto;
-    min-width: 8rem;
+    min-width: 128px;
     margin: 0 ${padding('small')} 0 0;
     &:last-child {
       margin-right: 0;

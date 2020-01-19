@@ -20,7 +20,7 @@ import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
 import { useState } from 'react'
-import { Form } from '@tinacms/core'
+import { Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import {
   Button,
@@ -100,10 +100,13 @@ export function FormView({
 }: FormViewProps) {
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
-      const form = activeForm!.finalForm
-      if (!result.destination) return
+      if (!result.destination || !activeForm) return
       const name = result.type
-      form.mutators.move(name, result.source.index, result.destination.index)
+      activeForm.mutators.move(
+        name,
+        result.source.index,
+        result.destination.index
+      )
     },
     [activeForm]
   )
@@ -167,7 +170,7 @@ export function FormView({
 }
 
 const Emoji = styled.span`
-  font-size: 2.5rem;
+  font-size: 40px;
   line-height: 1;
   display: inline-block;
 `
@@ -188,7 +191,7 @@ const EmptyState = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: ${padding()} ${padding()} 4rem ${padding()};
+  padding: ${padding()} ${padding()} 64px ${padding()};
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -232,12 +235,12 @@ const LinkButton = styled.a`
   transition: all ${timing('short')} ease-out;
   background-color: white;
   color: ${color.grey(8)};
-  padding: ${padding('small')} ${padding('big')} ${padding('small')} 3.5rem;
+  padding: ${padding('small')} ${padding('big')} ${padding('small')} 56px;
   position: relative;
   text-decoration: none;
   display: inline-block;
   ${Emoji} {
-    font-size: 1.5rem;
+    font-size: 24px;
     position: absolute;
     left: ${padding('big')};
     top: 50%;
@@ -307,8 +310,8 @@ const FormHeader = styled(
 )`
   position: relative;
   width: 100%;
-  height: ${FORM_HEADER_HEIGHT}rem;
-  flex: 0 0 ${FORM_HEADER_HEIGHT}rem;
+  height: ${FORM_HEADER_HEIGHT}px;
+  flex: 0 0 ${FORM_HEADER_HEIGHT}px;
   cursor: pointer;
   background-color: white;
   display: flex;
@@ -327,7 +330,7 @@ const FormHeader = styled(
   }
   svg {
     flex: 0 0 auto;
-    width: 1.5rem;
+    width: 24px;
     fill: ${color.grey(3)};
     height: auto;
     transform: translate3d(-4px, 0, 0);
@@ -373,7 +376,7 @@ const FormFooter = styled.div`
   display: flex;
   align-items: center;
   width: 100%;
-  height: 4rem;
+  height: 64px;
   background-color: white;
   border-top: 1px solid ${color.grey(2)};
 
@@ -382,7 +385,7 @@ const FormFooter = styled.div`
     display: flex;
     justify-content: space-between;
     align-items: center;
-    padding: 0 1rem;
+    padding: 0 16px;
   }
 `
 
@@ -430,7 +433,7 @@ const FormWrapper = styled.div<FormWrapperProps>`
     p.isMultiform &&
     css`
       ${GroupPanel} {
-        top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}rem;
+        top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}px;
       }
     `};
 `
@@ -439,5 +442,5 @@ export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
   Button
 )`
   flex: 1.5 0 auto;
-  padding: 0.75rem 1.5rem;
+  padding: 12px 24px;
 `

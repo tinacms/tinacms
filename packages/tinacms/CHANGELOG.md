@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.3-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.2...tinacms@0.11.3-alpha.0) (2020-01-16)
+
+
+### Bug Fixes
+
+* remove global styles, fix issues from iframe removal ([0b1b836](https://github.com/tinacms/tinacms/commit/0b1b836))
+* remove styled frame comopnent ([eb30b25](https://github.com/tinacms/tinacms/commit/eb30b25))
+* remove styled frame from modal ([3905ab0](https://github.com/tinacms/tinacms/commit/3905ab0))
+* remove styled frame from sidebar container ([e274b7d](https://github.com/tinacms/tinacms/commit/e274b7d))
+* remove styled frame from sidebar toggle ([32bffff](https://github.com/tinacms/tinacms/commit/32bffff))
+* remove use of frame ([ae4a055](https://github.com/tinacms/tinacms/commit/ae4a055))
+
+
+
+
+
+## [0.11.2](https://github.com/tinacms/tinacms/compare/tinacms@0.11.1...tinacms@0.11.2) (2020-01-14)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+## [0.11.1](https://github.com/tinacms/tinacms/compare/tinacms@0.11.1-alpha.1...tinacms@0.11.1) (2020-01-13)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+## [0.11.1-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.11.1-alpha.0...tinacms@0.11.1-alpha.1) (2020-01-10)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
 # [0.11.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.0-alpha.0...tinacms@0.11.0) (2019-12-17)
 
 **Note:** Version bump only for package tinacms

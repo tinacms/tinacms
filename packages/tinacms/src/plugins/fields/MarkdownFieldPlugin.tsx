@@ -19,28 +19,20 @@ limitations under the License.
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
-import { useFrameContext } from '../../components/SyledFrame'
-import * as React from 'react'
 import { InputCss } from '@tinacms/fields'
 
 const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'
 
-const FramedWysiwyg = (props: any) => {
-  const frame = useFrameContext()
-
-  return <Wysiwyg {...props} frame={frame} />
-}
-
-export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
+export const MarkdownField = wrapFieldsWithMeta(styled(Wysiwyg)`
   position: relative;
 
   > [contenteditable] {
     ${InputCss}
     overflow: auto;
     -webkit-overflow-scrolling: touch;
-    min-height: 15rem;
-    max-height: 25rem;
+    min-height: 200px;
+    max-height: 500px;
     overflow-y: auto;
 
     ::selection {
@@ -91,7 +83,7 @@ export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     font-weight: 600;
     text-transform: none;
     padding: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
   }
 
   h1 {
@@ -168,7 +160,7 @@ export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
 
   ul {
     margin-left: 1.5em;
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
     list-style-type: disc;
     list-style-position: outside;
     list-style-image: none;
@@ -176,7 +168,7 @@ export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
 
   ol {
     margin-left: 1.25em;
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
     list-style-type: decimal;
   }
 
@@ -209,7 +201,7 @@ export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     max-width: 100%;
     border: 0;
     padding: 0;
-    margin-bottom: 1rem;
+    margin-bottom: 16px;
   }
 
   hr {
@@ -218,11 +210,11 @@ export const MarkdownField = wrapFieldsWithMeta(styled(FramedWysiwyg)`
     width: 100%;
     border: 0;
     background: ${lightMediumGrey};
-    margin: 1rem 0;
+    margin: 16px 0;
   }
 
   blockquote {
-    margin: 0 0 1rem 0;
+    margin: 0 0 16px 0;
     border-left: 2px solid ${lightMediumGrey};
     padding-left: 15px;
   }

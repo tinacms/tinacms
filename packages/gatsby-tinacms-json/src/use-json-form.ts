@@ -34,9 +34,11 @@ interface JsonNode {
 }
 
 export function useJsonForm(
-  jsonNode: JsonNode | null,
+  _jsonNode: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}
 ): [JsonNode | null, Form | null] {
+  const jsonNode = usePersistentValue(_jsonNode)
+
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks. In the case of the check for
@@ -199,3 +201,13 @@ export const ERROR_MISSING_RAW_JSON =
 1. Check if the \`gatsby-tinacms-json\` was added to the \`gatsby-config.js\`.
 2. Check if the \`rawJson\` attribute is included in the GraphQL query.
 `
+
+function usePersistentValue<T>(nextData: T): T {
+  const [data, setData] = React.useState(nextData)
+
+  React.useEffect(() => {
+    setData(nextData || data)
+  }, [nextData])
+
+  return data
+}
