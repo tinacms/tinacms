@@ -30,13 +30,18 @@ import {
   TinaIcon,
 } from '@tinacms/icons'
 import { padding, color, radius, font, timing } from '@tinacms/styles'
-import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
+import {
+  SIDEBAR_WIDTH,
+  Z_INDEX,
+  SIDEBAR_HEADER_HEIGHT,
+  TOGGLE_WIDTH,
+} from '../../Globals'
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useSubscribable, useCMS } from '../../react-tinacms'
 
-export const Sidebar = (props: any) => {
+export const Sidebar = () => {
   const cms = useCMS()
   const sidebar = useSidebar()
   const container: any = React.useRef()
@@ -45,8 +50,12 @@ export const Sidebar = (props: any) => {
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <SidebarContainer open={sidebar.isOpen}>
-      <SidebarWrapper open={sidebar.isOpen}>
+    <SidebarContainer
+      open={sidebar.isOpen}
+      ref={container}
+      currentWidth={sidebar.width}
+    >
+      <SidebarWrapper open={sidebar.isOpen} currentWidth={sidebar.width}>
         <SidebarHeader>
           <MenuToggle
             onClick={() => setMenuVisibility(!menuIsVisible)}
@@ -58,7 +67,7 @@ export const Sidebar = (props: any) => {
         </SidebarHeader>
         <FormsView />
 
-        <MenuPanel visible={menuIsVisible}>
+        <MenuPanel visible={menuIsVisible} currentWidth={sidebar.width}>
           <MenuWrapper>
             <MenuList>
               {cms.screens.all().map(view => {
@@ -406,7 +415,7 @@ const SidebarContainer = styled.div<{ open: boolean; currentWidth: number }>`
   left: 0 !important;
   display: block !important;
   height: 100% !important;
-  width: ${SIDEBAR_WIDTH}px !important;
+  width: ${p => p.currentWidth + TOGGLE_WIDTH}px;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
