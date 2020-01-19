@@ -44,17 +44,12 @@ import { useSubscribable, useCMS } from '../../react-tinacms'
 export const Sidebar = () => {
   const cms = useCMS()
   const sidebar = useSidebar()
-  const container: any = React.useRef()
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
 
   return (
-    <SidebarContainer
-      open={sidebar.isOpen}
-      ref={container}
-      currentWidth={sidebar.width}
-    >
+    <SidebarContainer open={sidebar.isOpen} currentWidth={sidebar.width}>
       <SidebarWrapper open={sidebar.isOpen} currentWidth={sidebar.width}>
         <SidebarHeader>
           <MenuToggle
@@ -164,6 +159,7 @@ const SidebarToggle = (sidebar: any) => {
     <SidebarToggleButton
       onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
       open={sidebar.isOpen}
+      currentWidth={sidebar.width}
     >
       {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
     </SidebarToggleButton>
@@ -340,11 +336,14 @@ const SidebarToggleAnimation = keyframes`
   }
 `
 
-const SidebarToggleButton = styled.button<{ open: boolean }>`
+const SidebarToggleButton = styled.button<{
+  open: boolean
+  currentWidth: number
+}>`
   position: absolute;
   pointer-events: all;
   bottom: 44px;
-  left: ${SIDEBAR_WIDTH}px;
+  left: ${p => p.currentWidth}px;
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 24px 24px 0;
   width: 50px;
