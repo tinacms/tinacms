@@ -66,9 +66,9 @@ const proseMirrorTableStyles = `
     border-right: 1px solid #c1c7cd;
     border-bottom: 1px solid #c1c7cd;
     display: inline-table;
-    margin: 10px;
+    margin: 35px;
     overflow: visible;
-    width: calc(100% - 20px);
+    width: calc(100% - 70px);
   }
   .ProseMirror th {
     background-color: #f0f1f3;
@@ -94,7 +94,7 @@ const proseMirrorTableStyles = `
     border-left: 1px solid #013bda;
     border-right: 1px solid #013bda;
     border-top: 1px solid #013bda;
-    z-index: 1;
+    z-index: 10;
   }
   .ProseMirror .tina_table_header_ext_left {
     background: #f0f1f3;
@@ -112,7 +112,7 @@ const proseMirrorTableStyles = `
     border-left: 1px solid #013bda;
     border-top: 1px solid #013bda;
     border-bottom: 1px solid #013bda;
-    z-index: 1;
+    z-index: 10;
   }
   .ProseMirror .tina_table_header_ext_top_left {
     background: #f0f1f3;
@@ -129,7 +129,7 @@ const proseMirrorTableStyles = `
     border-right: 1px solid #013bda;
     border-top: 1px solid #013bda;
     border-bottom: 1px solid #013bda;
-    z-index: 1;
+    z-index: 10;
   }
   .ProseMirror .selectedCell {
     border: 1px solid #013bda;
