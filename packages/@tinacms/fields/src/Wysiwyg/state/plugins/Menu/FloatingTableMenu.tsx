@@ -20,7 +20,7 @@ import * as React from 'react'
 import * as ReactDOM from 'react-dom'
 import { EditorView } from 'prosemirror-view'
 import { deleteColumn, deleteRow } from 'prosemirror-tables'
-
+import { IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
 import styled from 'styled-components'
 
@@ -45,15 +45,27 @@ export const FloatingTableMenu = (props: FloatingTableMenuProps) => {
     <>
       {markerDivCol &&
         ReactDOM.createPortal(
-          <IconWrapperCol onClick={() => deleteColumn(state, dispatch)}>
-            <TrashIcon />
+          <IconWrapperCol>
+            <IconButton
+              onClick={() => deleteColumn(state, dispatch)}
+              small
+              primary
+            >
+              <TrashIcon />
+            </IconButton>
           </IconWrapperCol>,
           markerDivCol
         )}
       {markerDivRow &&
         ReactDOM.createPortal(
-          <IconWrapperRow onClick={() => deleteRow(state, dispatch)}>
-            <TrashIcon />
+          <IconWrapperRow>
+            <IconButton
+              onClick={() => deleteRow(state, dispatch)}
+              small
+              primary
+            >
+              <TrashIcon />
+            </IconButton>
           </IconWrapperRow>,
           markerDivRow
         )}
@@ -62,15 +74,15 @@ export const FloatingTableMenu = (props: FloatingTableMenuProps) => {
 }
 
 const IconWrapperCol = styled.span`
-  left: 50%;
-  margin-left: -16px;
   position: absolute;
-  top: -30px;
+  top: -8px;
+  left: 50%;
+  transform: translate3d(-50%, -100%, 0);
 `
 
 const IconWrapperRow = styled.span`
-  left: -30px;
-  margin-top: -18px;
   position: absolute;
   top: 50%;
+  left: -8px;
+  transform: translate3d(-100%, -50%, 0);
 `
