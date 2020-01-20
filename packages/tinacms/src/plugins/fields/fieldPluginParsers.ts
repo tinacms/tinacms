@@ -16,16 +16,9 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { TextArea, InputProps } from '@tinacms/fields'
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { parseString } from './fieldPluginParsers';
-
-export const TextareaField = wrapFieldsWithMeta<InputProps>(({ input }) => (
-  <TextArea {...input} />
-))
-export default {
-  name: 'textarea',
-  Component: TextareaField,
-  parseString,
-}
+/**
+ * Default text to empty string if text field is cleared
+ * @param value The text field value
+ * @returns Either the string value or an empty string
+ */
+export const parseString = (value: string): string => typeof value === 'string' ? value : '';
