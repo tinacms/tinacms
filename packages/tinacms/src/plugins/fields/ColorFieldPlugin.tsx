@@ -20,7 +20,7 @@ import * as React from 'react'
 import { ColorPicker } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps } from 'react-select/lib/components/Input'
-import { parseString } from './fieldPluginParsers';
+import { parse } from './fieldPluginParsers';
 
 export interface ColorFieldProps {
   colorFormat: string
@@ -43,5 +43,5 @@ export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
 export default {
   name: 'color',
   Component: ColorField,
-  parseString,
+  parse,
 }

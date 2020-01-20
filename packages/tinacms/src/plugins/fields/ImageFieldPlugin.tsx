@@ -20,7 +20,7 @@ import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '@tinacms/fields'
 import { useCMS } from '../../react-tinacms'
-import { parseString } from './fieldPluginParsers';
+import { parse } from './fieldPluginParsers';
 
 type FieldProps = any
 interface ImageProps {
@@ -60,5 +60,5 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
 export default {
   name: 'image',
   Component: ImageField,
-  parseString,
+  parse,
 }

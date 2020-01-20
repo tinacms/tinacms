@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { TextArea, InputProps } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { parseString } from './fieldPluginParsers';
+import { parse } from './fieldPluginParsers';
 
 export const TextareaField = wrapFieldsWithMeta<InputProps>(({ input }) => (
   <TextArea {...input} />
@@ -27,5 +27,5 @@ export const TextareaField = wrapFieldsWithMeta<InputProps>(({ input }) => (
 export default {
   name: 'textarea',
   Component: TextareaField,
-  parseString,
+  parse,
 }

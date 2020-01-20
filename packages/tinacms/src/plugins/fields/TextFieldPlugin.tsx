@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { TextField as BaseTextField, InputProps } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { parseString } from './fieldPluginParsers';
+import { parse } from './fieldPluginParsers';
 
 export const TextField = wrapFieldsWithMeta<
   { placeholder: string },
@@ -34,5 +34,5 @@ export default {
   validate(value: any, values: any, meta: any, field: any) {
     if (field.required && !value) return 'Required'
   },
-  parseString,
+  parse,
 }

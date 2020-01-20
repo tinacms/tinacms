@@ -21,4 +21,4 @@ limitations under the License.
  * @param value The text field value
  * @returns Either the string value or an empty string
  */
-export const parseString = (value: string): string => typeof value === 'string' ? value : '';
+export const parse = (value: string): string => typeof value === 'string' ? value : '';

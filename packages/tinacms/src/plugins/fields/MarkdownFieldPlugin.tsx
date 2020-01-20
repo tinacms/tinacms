@@ -20,7 +20,7 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
 import { InputCss } from '@tinacms/fields'
-import { parseString } from './fieldPluginParsers';
+import { parse } from './fieldPluginParsers';
 
 const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'
@@ -266,5 +266,5 @@ export const MarkdownField = wrapFieldsWithMeta(styled(Wysiwyg)`
 export default {
   name: 'markdown',
   Component: MarkdownField,
-  parseString,
+  parse,
 }
