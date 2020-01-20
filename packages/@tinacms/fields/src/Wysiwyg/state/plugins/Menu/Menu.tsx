@@ -22,6 +22,7 @@ import { useState, useRef, useEffect } from 'react'
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
+import { FloatingTableMenu } from './FloatingTableMenu'
 import {
   toggleBulletList,
   toggleOrderedList,
@@ -128,24 +129,27 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <MenuContainer
-        menuFixed={menuFixed}
-        menuWidth={menuWidth}
-        ref={menuRef}
-        onMouseDown={preventProsemirrorFocusLoss}
-      >
-        {supportBlocks && <FormattingDropdown view={view} />}
-        <BoldControl view={view} />
-        <ItalicControl view={view} />
-        <UnderlineControl view={view} />
-        <LinkControl view={view} />
-        {/* <ImageControl view={view} bottom={bottom} /> */}
-        {supportBlocks && <TableControl view={view} bottom={bottom} />}
-        {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
-        {supportBlocks && <CodeControl view={view} bottom={bottom} />}
-        {supportBlocks && <BulletList view={view} bottom={bottom} />}
-        {supportBlocks && <OrderedList view={view} bottom={bottom} />}
-      </MenuContainer>
+      <>
+        <MenuContainer
+          menuFixed={menuFixed}
+          menuWidth={menuWidth}
+          ref={menuRef}
+          onMouseDown={preventProsemirrorFocusLoss}
+        >
+          {supportBlocks && <FormattingDropdown view={view} />}
+          <BoldControl view={view} />
+          <ItalicControl view={view} />
+          <UnderlineControl view={view} />
+          <LinkControl view={view} />
+          {/* <ImageControl view={view} bottom={bottom} /> */}
+          {supportBlocks && <TableControl view={view} bottom={bottom} />}
+          {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
+          {supportBlocks && <CodeControl view={view} bottom={bottom} />}
+          {supportBlocks && <BulletList view={view} bottom={bottom} />}
+          {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+        </MenuContainer>
+        <FloatingTableMenu view={view} />
+      </>
     </ThemeProvider>
   )
 }
