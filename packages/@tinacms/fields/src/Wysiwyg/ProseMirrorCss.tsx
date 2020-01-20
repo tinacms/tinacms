@@ -20,6 +20,9 @@ import { css } from 'styled-components'
 
 const proseMirrorTableStyles = `
   /* START: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
+  .ProseMirror:focus {
+    outline: 0px solid transparent;
+  }
   .ProseMirror .tableWrapper {
     overflow-x: auto;
   }
@@ -66,9 +69,9 @@ const proseMirrorTableStyles = `
     border-right: 1px solid #c1c7cd;
     border-bottom: 1px solid #c1c7cd;
     display: inline-table;
-    margin: 35px;
+    margin: 32px 0 32px 0;
     overflow: visible;
-    width: calc(100% - 70px);
+    width: 100%;
   }
   .ProseMirror th {
     background-color: #f0f1f3;
@@ -78,6 +81,7 @@ const proseMirrorTableStyles = `
     border-top: 1px solid #c1c7cd;
     border-left: 1px solid #c1c7cd;
     padding: 10px 4px;
+    position: relative;
   }
   .ProseMirror .tina_table_header_ext_top {
     background: #f0f1f3;
@@ -86,8 +90,12 @@ const proseMirrorTableStyles = `
     border-top: 1px solid #c1c7cd;
     position: absolute;
     height: 10px;
-    width: 100%;
-    transform: translate(-5px, -22px);
+    width: calc(100% + 2px);
+    top: 0;
+    left: 0;
+    margin: -1px 0 0 -1px;
+    transform: translate3d(0, -100%, 0);
+    cursor: pointer;
   }
   .ProseMirror div.tina_table_header_ext_top_selected {
     background: #537ff7;
@@ -104,8 +112,11 @@ const proseMirrorTableStyles = `
     position: absolute;
     height: calc(100% + 2px);
     width: 10px;
-    height: 100%;
-    transform: translate(-16px, -11px);
+    top: 0;
+    left: 0;
+    margin: -1px 0 0 -1px;
+    transform: translate3d(-100%, 0, 0);
+    cursor: pointer;
   }
   .ProseMirror div.tina_table_header_ext_left_selected {
     background: #537ff7;
@@ -121,7 +132,11 @@ const proseMirrorTableStyles = `
     position: absolute;
     height: 10px;
     width: 10px;
-    transform: translate(-16px, -22px);
+    top: 0;
+    left: 0;
+    margin: -1px 0 0 -1px;
+    transform: translate3d(-100%,-100%,0);
+    border-radius: 5px 0 0 0;
   }
   .ProseMirror div.tina_table_header_ext_top_left_selected {
     background: #2962ff;
