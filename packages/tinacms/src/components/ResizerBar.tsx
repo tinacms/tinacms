@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { radius, color } from '@tinacms/styles'
+import { radius, color, timing } from '@tinacms/styles'
 import { SIDEBAR_MIN_WIDTH, Z_INDEX } from '../Globals'
 
 interface ResizerBarProps {
@@ -83,14 +83,46 @@ export const ResizerBar = ({
   )
 }
 
+const Handle = styled.div`
+  position: relative;
+  background-color: ${color.primary()};
+  width: 16px;
+  left: 50%;
+  top: 50%;
+  height: 28px;
+  border-radius: ${radius('small')};
+  transform: translate3d(-50%, -50%, 0);
+  transition: all ${timing('short')} 150ms ease-out;
+  opacity: 0;
+
+  :before,
+  :after {
+    content: '';
+    width: 2px;
+    transform: translate3d(-50%, -50%, 0);
+    height: 16px;
+    top: 50%;
+    position: absolute;
+    background-color: ${color.grey(0)};
+    border-radius: 1px;
+    box-shadow: 1px 1px 1px rgba(0, 0, 0, 0.03);
+  }
+
+  :before {
+    left: 33.33%;
+  }
+
+  :after {
+    left: 66.66%;
+  }
+`
+
 const Resizer = styled.div<{
   resizerBarWidth: number
   xPos: number
   open: boolean
   isResizing: boolean
 }>`
-  display: flex;
-  align-items: center;
   cursor: col-resize;
   background: ${p =>
     p.isResizing
@@ -105,31 +137,10 @@ const Resizer = styled.div<{
   transition: ${p =>
     // Don't apply the transition when we're resizing
     p.isResizing ? 'none' : `all ${p.open ? 150 : 200}ms ease-out`};
-`
 
-const Handle = styled.div`
-  position: relative;
-  background: ${color.primary()};
-  border-radius: ${radius()};
-  width: 20px;
-  height: 20px;
-
-  :before,
-  :after {
-    content: '';
-    width: 0;
-    height: 12px;
-    position: absolute;
-    top: 4px;
-  }
-
-  :before {
-    border-left: 1px solid #fff;
-    left: 3px;
-  }
-
-  :after {
-    border-right: 1px solid #fff;
-    right: 3px;
+  &:hover {
+    ${Handle} {
+      opacity: 1;
+    }
   }
 `

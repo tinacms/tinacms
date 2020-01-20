@@ -30,12 +30,7 @@ import {
   TinaIcon,
 } from '@tinacms/icons'
 import { padding, color, radius, font, timing } from '@tinacms/styles'
-import {
-  SIDEBAR_WIDTH,
-  Z_INDEX,
-  SIDEBAR_HEADER_HEIGHT,
-  TOGGLE_WIDTH,
-} from '../../Globals'
+import { Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from '../CreateContent'
 import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
@@ -414,7 +409,7 @@ const SidebarContainer = styled.div<{ open: boolean; currentWidth: number }>`
   left: 0 !important;
   display: block !important;
   height: 100% !important;
-  width: ${p => p.currentWidth + TOGGLE_WIDTH}px;
+  width: ${p => p.currentWidth}px;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
