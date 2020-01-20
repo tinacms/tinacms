@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { css } from 'styled-components'
-import { color } from '@tinacms/styles'
 
 const proseMirrorTableStyles = `
   /* START: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
