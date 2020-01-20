@@ -302,7 +302,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.get('/show/:fileRelativePath', async (req, res) => {
     try {
-      const fileRelativePath = path
+      const fileRelativePath = path.posix
         .join(CONTENT_REL_PATH, req.params.fileRelativePath)
         .replace(/^\/*/, '')
 
