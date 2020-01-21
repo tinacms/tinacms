@@ -20,8 +20,14 @@ import React, { useState, useEffect, HTMLAttributes } from 'react'
 import * as ReactDOM from 'react-dom'
 import styled from 'styled-components'
 import { AddIcon } from '@tinacms/icons'
+import { IconButton } from '@tinacms/styles'
 import { EditorView } from 'prosemirror-view'
 import { addColumnAfter } from 'prosemirror-tables'
+
+const paddingX = 8
+const paddingY = 6
+const borderWidth = 1
+const controlSize = 12
 
 interface AddColumnMenuProps {
   index: number
@@ -50,9 +56,11 @@ export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
         onMouseLeave={() => setHovered(false)}
       >
         {hovered ? (
-          <IconWrapper onClick={() => addColumn(index)}>
-            <AddIcon />
-          </IconWrapper>
+          <IconWrapperCol>
+            <IconButton onClick={() => addColumn(index)} small primary>
+              <AddIcon />
+            </IconButton>
+          </IconWrapperCol>
         ) : (
           <Pointer />
         )}
@@ -64,11 +72,11 @@ export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
 }
 
 const Wrapper = styled.div`
-  left: 100%;
-  margin-left: -10px;
+  top: -7px;
   position: absolute;
-  top: -24px;
+  right: 0;
   padding: 8px;
+  transform: translate3d(50%, -100%, 0);
 `
 
 const Pointer = styled.div`
@@ -78,20 +86,21 @@ const Pointer = styled.div`
   width: 4px;
 `
 
-const IconWrapper = styled.span`
-  left: -6px;
+const IconWrapperCol = styled.span`
   position: absolute;
-  top: -12px;
+  top: 0;
+  left: 50%;
+  transform: translate3d(-50%, -50%, 0);
 `
 
 const ColumnDivider = styled.div<
   HTMLAttributes<HTMLDivElement> & { height: number }
 >`
   position: absolute;
-  width: 2px;
   background: #0574e4;
-  left: calc(100% - 1px);
+  top: ${-1 * borderWidth}px;
   z-index: 1000;
-  top: -6px;
-  height: ${({ height }) => `${height + 17}px`};
+  right: ${-1 * borderWidth}px;
+  width: ${2 * borderWidth}px;
+  height: ${({ height }) => `${height + controlSize - borderWidth}px`};
 `
