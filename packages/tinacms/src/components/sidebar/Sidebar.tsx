@@ -260,7 +260,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
   }
   ${props =>
     props.open &&
-    css`
+    css<any>`
       svg {
         fill: #f6f6f9;
         &:hover {
