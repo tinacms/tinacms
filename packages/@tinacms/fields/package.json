@@ -77,7 +77,7 @@
     "prosemirror-model": "^1.0.0",
     "prosemirror-schema-list": "^1.0.3",
     "prosemirror-state": "^1.2.4",
-    "prosemirror-tables": "0.4.1",
+    "prosemirror-tables": "1.0.0",
     "prosemirror-transform": "^1.0.0",
     "prosemirror-utils": "^0.9.6",
     "prosemirror-view": "^1.11.3",
