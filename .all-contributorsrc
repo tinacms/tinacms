@@ -467,6 +467,15 @@
         "code",
         "test"
       ]
+    },
+    {
+      "login": "molebox",
+      "name": "Hungry Bear Studio",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/22930449?v=4",
+      "profile": "https://www.hungrybearstudio.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
