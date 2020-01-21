@@ -57,7 +57,7 @@ export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
       >
         {hovered ? (
           <IconWrapperRow>
-            <IconButton onClick={() => addRow(index - 1} small primary>
+            <IconButton onClick={() => addRow(index - 1)} small primary>
               <AddIcon />
             </IconButton>
           </IconWrapperRow>
@@ -77,6 +77,7 @@ const Wrapper = styled.div`
   bottom: 0;
   padding: 8px;
   transform: translate3d(-100%, 50%, 0);
+  user-select: none;
 `
 
 const Pointer = styled.div`

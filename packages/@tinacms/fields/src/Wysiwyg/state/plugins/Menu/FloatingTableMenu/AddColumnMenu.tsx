@@ -77,6 +77,7 @@ const Wrapper = styled.div`
   right: 0;
   padding: 8px;
   transform: translate3d(50%, -100%, 0);
+  user-select: none;
 `
 
 const Pointer = styled.div`
