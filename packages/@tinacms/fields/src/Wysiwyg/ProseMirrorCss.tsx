@@ -90,9 +90,9 @@ const proseMirrorTableStyles = `
     border-top: 1px solid #E1DDEC;
     position: absolute;
     height: 12px;
-    width: 100%;
+    width: calc(100% + 2px);
     margin: -1px 0 0 -1px;
-    transform: translate3d(-4px,-25px,0px);
+    transform: translate3d(-4px,-24px,0px);
     cursor: pointer;
     z-index: 1;
   }
@@ -107,12 +107,10 @@ const proseMirrorTableStyles = `
     border-bottom: 1px solid #E1DDEC;
     border-top: 1px solid #E1DDEC;
     position: absolute;
-    height: 100%;
+    height: calc(100% + 2px);
     width: 12px;
-    top: 0;
-    left: 0;
     margin: -1px 0 0 -1px;
-    transform: translate3d(-100%, 0, 0);
+    transform: translate3d(-16px,-12px,0);
     cursor: pointer;
     z-index: 1;
   }
