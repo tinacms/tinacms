@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { NodeType, Schema } from 'prosemirror-model'
-import { EditorState } from 'prosemirror-state'
+import { EditorState, Selection } from 'prosemirror-state'
 import {
   setBlockType,
   toggleMark,
@@ -272,7 +272,7 @@ function arrowHandler(
     if (state.selection.empty && view.endOfTextblock(dir)) {
       const side = dir == 'left' || dir == 'up' ? -1 : 1
       const $head = state.selection.$head
-      const nextPos = (Selection as any).near(
+      const nextPos = Selection.near(
         state.doc.resolve(side > 0 ? $head.after() : $head.before()),
         side
       )
@@ -301,11 +301,12 @@ export function isNotAList(state: EditorState) {
   const { $from, $to } = state.selection
   const range = $from.blockRange(
     $to,
-    node => !!(
-      node.firstChild &&
-      (node.firstChild.type == ordered_list ||
-        node.firstChild.type == bullet_list)
-    )
+    node =>
+      !!(
+        node.firstChild &&
+        (node.firstChild.type == ordered_list ||
+          node.firstChild.type == bullet_list)
+      )
   )
   return (
     range &&
