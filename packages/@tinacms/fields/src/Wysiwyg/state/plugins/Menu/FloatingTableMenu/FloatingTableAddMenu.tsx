@@ -19,7 +19,7 @@ limitations under the License.
 import React, { useState, HTMLAttributes } from 'react'
 import * as ReactDOM from 'react-dom'
 import { EditorView } from 'prosemirror-view'
-import { addColumnAt } from 'prosemirror-utils'
+import { addColumnAfter } from 'prosemirror-tables'
 import { AddIcon } from '@tinacms/icons'
 import styled from 'styled-components'
 
@@ -45,7 +45,7 @@ export default (props: FloatingTableAddMenu) => {
   if (!markerDivCol.length && !markerDivRow.length) return null
   const [hovered, setHovered] = useState(false)
   const addColumn = (pos: number) => {
-    dispatch(addColumnAt(pos)(state.tr))
+    addColumnAfter(state, dispatch)
   }
   return (
     <>
