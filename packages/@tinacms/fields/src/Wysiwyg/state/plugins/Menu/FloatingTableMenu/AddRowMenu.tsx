@@ -21,7 +21,13 @@ import * as ReactDOM from 'react-dom'
 import { EditorView } from 'prosemirror-view'
 import { addRowAfter } from 'prosemirror-tables'
 import { AddIcon } from '@tinacms/icons'
+import { IconButton } from '@tinacms/styles'
 import styled from 'styled-components'
+
+const paddingX = 8
+const paddingY = 6
+const borderWidth = 1
+const controlSize = 12
 
 interface AddRowMenuProps {
   index: number
@@ -50,9 +56,11 @@ export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
         onMouseLeave={() => setHovered(false)}
       >
         {hovered ? (
-          <IconWrapper onClick={() => addRow(index)}>
-            <AddIcon />
-          </IconWrapper>
+          <IconWrapperRow>
+            <IconButton onClick={() => addRow(index)} small primary>
+              <AddIcon />
+            </IconButton>
+          </IconWrapperRow>
         ) : (
           <Pointer />
         )}
@@ -64,10 +72,11 @@ export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
 }
 
 const Wrapper = styled.div`
-  left: -24px;
+  left: -7px;
   position: absolute;
-  top: calc(100% - 9px);
+  bottom: 0;
   padding: 8px;
+  transform: translate3d(-100%, 50%, 0);
 `
 
 const Pointer = styled.div`
@@ -77,21 +86,21 @@ const Pointer = styled.div`
   width: 4px;
 `
 
-const IconWrapper = styled.span`
-  left: -16px;
+const IconWrapperRow = styled.span`
   position: absolute;
-  top: calc(100% - 22px);
+  top: 50%;
+  left: 0;
+  transform: translate3d(-50%, -50%, 0);
 `
 
 const ColumnDivider = styled.div<
   HTMLAttributes<HTMLDivElement> & { width: number }
 >`
   position: absolute;
-  width: 2px;
   background: #0574e4;
-  left: calc(100% - 17px);
+  left: ${-1 * borderWidth}px;
   z-index: 1000;
-  top: 100%;
-  height: 2px;
-  width: ${({ width }) => `${width + 17}px`};
+  bottom: ${-1 * borderWidth}px;
+  height: ${2 * borderWidth}px;
+  width: ${({ width }) => `${width + controlSize - borderWidth}px`};
 `
