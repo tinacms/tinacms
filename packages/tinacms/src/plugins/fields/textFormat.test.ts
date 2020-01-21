@@ -16,23 +16,21 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { TextField as BaseTextField, InputProps } from '@tinacms/fields'
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { parse } from './textFormat'
 
-export const TextField = wrapFieldsWithMeta<
-  { placeholder: string },
-  InputProps
->(({ input, field }) => (
-  <BaseTextField {...input} placeholder={field.placeholder} />
-))
+describe('text format', () => {
+  describe('parse', () => {
+    it('returns text field\'s value', () => {
+      const value = 'this is a test value';
+      const result = parse(value);
 
-export default {
-  name: 'text',
-  Component: TextField,
-  validate(value: any, values: any, meta: any, field: any) {
-    if (field.required && !value) return 'Required'
-  },
-  parse,
-}
+      expect(result).toEqual(value);
+    });
+
+    it('returns empty string if value is undefined', () => {
+      const result = parse();
+
+      expect(result).toEqual('');
+    });
+  });
+});
