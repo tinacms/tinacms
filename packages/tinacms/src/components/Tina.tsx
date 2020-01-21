@@ -18,13 +18,12 @@ limitations under the License.
 
 import * as React from 'react'
 import { ModalProvider } from './modals/ModalProvider'
-import { SidebarContext } from './sidebar/SidebarProvider'
 import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS } from '../tina-cms'
-import { CMSContext } from '../react-tinacms'
+import { CMSContext, useSubscribable } from '../react-tinacms'
 
 const merge = require('lodash.merge')
 
@@ -44,15 +43,7 @@ export const Tina: React.FC<TinaProps> = ({
   hidden,
   theme: themeOverrides,
 }) => {
-  const [isOpen, setIsOpen] = React.useState(false)
-
-  const props = {
-    isOpen,
-    setIsOpen,
-    position,
-    hidden,
-  }
-
+  useSubscribable(cms.sidebar)
   const theme: ThemeProps['theme'] = React.useMemo(
     () => ({
       tinacms: merge(DefaultTheme, themeOverrides) as Theme,
@@ -62,20 +53,18 @@ export const Tina: React.FC<TinaProps> = ({
 
   return (
     <CMSContext.Provider value={cms}>
-      <SidebarContext.Provider value={props}>
-        <SiteWrapper open={isOpen} position={position}>
-          {children}
-        </SiteWrapper>
-        {!hidden && (
-          <ThemeProvider theme={theme}>
-            <ModalProvider>
-              <TinaReset>
-                <Sidebar />
-              </TinaReset>
-            </ModalProvider>
-          </ThemeProvider>
-        )}
-      </SidebarContext.Provider>
+      <SiteWrapper open={cms.sidebar.isOpen} position={position}>
+        {children}
+      </SiteWrapper>
+      {!hidden && (
+        <ThemeProvider theme={theme}>
+          <ModalProvider>
+            <TinaReset>
+              <Sidebar />
+            </TinaReset>
+          </ModalProvider>
+        </ThemeProvider>
+      )}
     </CMSContext.Provider>
   )
 }
