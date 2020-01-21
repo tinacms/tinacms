@@ -36,6 +36,10 @@ module.exports = {
         sidebar: {
           hidden: process.env.NODE_ENV === "production",
           position: "displace",
+          buttons: {
+            save: "Spara",
+            reset: "Återställ",
+          },
         },
         plugins: [
           "gatsby-tinacms-teams",

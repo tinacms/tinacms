@@ -30,11 +30,17 @@ const merge = require('lodash.merge')
 
 export type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
+export interface actionButtons {
+  save: string
+  reset: string
+}
+
 export interface TinaProps {
   cms: TinaCMS
   position: SidebarPosition
   hidden?: boolean
   theme?: Theme
+  buttons: actionButtons
 }
 
 export const Tina: React.FC<TinaProps> = ({
