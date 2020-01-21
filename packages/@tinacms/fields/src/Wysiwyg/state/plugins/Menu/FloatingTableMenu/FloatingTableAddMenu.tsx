@@ -16,92 +16,56 @@ limitations under the License.
 
 */
 
-import React, { useState, HTMLAttributes } from 'react'
-import * as ReactDOM from 'react-dom'
+import React from 'react'
 import { EditorView } from 'prosemirror-view'
-import { addColumnAfter } from 'prosemirror-tables'
-import { AddIcon } from '@tinacms/icons'
-import styled from 'styled-components'
+
+import AddColumnMenu from './AddColumnMenu'
+import AddRowMenu from './AddRowMenu'
 
 interface FloatingTableAddMenu {
   view: EditorView
 }
 
-export default (props: FloatingTableAddMenu) => {
-  const { state, dispatch } = props.view
+export default ({ view }: FloatingTableAddMenu) => {
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left'
   )
   if (!markerDivTable.length) return null
   const tableElm = markerDivTable[0].closest('table')
   if (!tableElm) return null
-  const { height: tableHeight } = tableElm.getBoundingClientRect()
+  const { height, width } = tableElm.getBoundingClientRect()
   const markerDivCol = document.getElementsByClassName(
     'tina_table_header_ext_top'
   )
+  const markerCols = [markerDivTable[0]]
+  for (let i = 0; i < markerDivCol.length; i++) {
+    markerCols.push(markerDivCol[i])
+  }
   const markerDivRow = document.getElementsByClassName(
     'tina_table_header_ext_left'
   )
-  if (!markerDivCol.length && !markerDivRow.length) return null
-  const [hovered, setHovered] = useState(false)
-  const addColumn = (pos: number) => {
-    addColumnAfter(state, dispatch)
+  const markerRows = [markerDivTable[0]]
+  for (let i = 0; i < markerDivRow.length; i++) {
+    markerRows.push(markerDivRow[i])
   }
   return (
     <>
-      {markerDivCol &&
-        ReactDOM.createPortal(
-          <>
-            <Wrapper
-              onMouseEnter={() => setHovered(true)}
-              onMouseLeave={() => setHovered(false)}
-            >
-              {hovered ? (
-                <IconWrapper onClick={() => addColumn(1)}>
-                  <AddIcon />
-                </IconWrapper>
-              ) : (
-                <Pointer />
-              )}
-            </Wrapper>
-            {hovered && <ColumnDivider height={tableHeight}></ColumnDivider>}
-          </>,
-          markerDivCol[0]
-        )}
+      {markerCols.map((marker, index) => (
+        <AddColumnMenu
+          index={index}
+          marker={marker as HTMLElement}
+          tableHeight={height}
+          view={view}
+        />
+      ))}
+      {markerRows.map((marker, index) => (
+        <AddRowMenu
+          index={index}
+          marker={marker as HTMLElement}
+          tableWidth={width}
+          view={view}
+        />
+      ))}
     </>
   )
 }
-
-const Wrapper = styled.div`
-  left: 100%;
-  margin-left: -10px;
-  position: absolute;
-  top: -24px;
-  padding: 8px;
-`
-
-const Pointer = styled.div`
-  background: #e1ddec;
-  border-radius: 50%;
-  height: 4px;
-  width: 4px;
-`
-
-const IconWrapper = styled.span`
-  left: -7px;
-  position: absolute;
-  top: -12px;
-`
-
-const ColumnDivider = styled.div<
-  HTMLAttributes<HTMLDivElement> & { height: number }
->`
-  position: absolute;
-  width: 2px;
-  background: #0574e4;
-  left: calc(100% - 2px);
-  transform: translateZ(10px);
-  z-index: 1000;
-  top: -4px;
-  height: ${({ height }) => `${height + 15}px`};
-`
