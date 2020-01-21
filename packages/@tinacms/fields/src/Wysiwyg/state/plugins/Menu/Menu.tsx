@@ -252,14 +252,14 @@ export const MenuButton = styled.button<{
   disabled?: boolean
   bottom?: boolean
 }>`
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
   color: ${p => (p.active ? '#0084ff' : color.grey(8))};
   fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
   border: none;
   outline: none;
-  padding: 6px;
+  padding: 6px 0;
   margin: 0;
   transition: all 85ms ease-out;
   cursor: pointer;
@@ -307,6 +307,11 @@ export const MenuButton = styled.button<{
 
 export const MenuDropdownWrapper = styled.div`
   position: relative;
+  flex: 1 1 auto;
+
+  ${MenuButton} {
+    width: 100%;
+  }
 `
 
 export const MenuButtonDropdown = styled.div<{ open: boolean }>`
