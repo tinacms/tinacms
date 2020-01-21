@@ -30,9 +30,10 @@ import { ModalPopup } from './modals/ModalPopup'
 interface ResetFormProps {
   pristine: boolean
   reset(): void
+  label: string
 }
 
-export const ResetForm = ({ pristine, reset }: ResetFormProps) => {
+export const ResetForm = ({ pristine, reset, label }: ResetFormProps) => {
   const [open, setOpen] = React.useState(false)
   return (
     <>
@@ -42,7 +43,7 @@ export const ResetForm = ({ pristine, reset }: ResetFormProps) => {
         }}
         disabled={pristine}
       >
-        Reset
+        {label}
       </ResetButton>
       {open && <ResetModal reset={reset} close={() => setOpen(false)} />}
     </>

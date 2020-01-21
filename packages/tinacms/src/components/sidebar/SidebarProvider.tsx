@@ -17,10 +17,12 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { actionButtons } from '../Tina'
 
 interface SidebarProps {
   isOpen: boolean
   setIsOpen: (_isOpen: boolean) => void
+  buttons: actionButtons
 }
 
 export const SidebarContext = React.createContext<SidebarProps | null>(null)

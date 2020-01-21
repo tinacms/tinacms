@@ -49,6 +49,7 @@ export const Tina: React.FC<TinaProps> = ({
   position,
   hidden,
   theme: themeOverrides,
+  buttons = { save: 'Save', reset: 'Reset'}
 }) => {
   const [isOpen, setIsOpen] = React.useState(false)
 
@@ -57,6 +58,7 @@ export const Tina: React.FC<TinaProps> = ({
     setIsOpen,
     position,
     hidden,
+    buttons,
   }
 
   const theme: ThemeProps['theme'] = React.useMemo(

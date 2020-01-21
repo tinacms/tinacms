@@ -40,6 +40,7 @@ import { ResetForm } from './ResetForm'
 import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
 import { GroupPanel } from '../plugins/fields'
 import { useCMS, useSubscribable } from '../react-tinacms'
+import { useSidebar } from './sidebar/SidebarProvider'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
@@ -110,6 +111,7 @@ export function FormView({
     },
     [activeForm]
   )
+  const sidebar = useSidebar()
 
   return (
     <FormBuilder form={activeForm as any}>
@@ -144,6 +146,7 @@ export function FormView({
                       form.reset()
                       await activeForm.reset!()
                     }}
+                    label={sidebar.buttons.reset}
                   />
                 )}
                 <Button
@@ -155,7 +158,7 @@ export function FormView({
                   margin
                 >
                   {submitting && <LoadingDots />}
-                  {!submitting && 'Save'}
+                  {!submitting && sidebar.buttons.save}
                 </Button>
                 {activeForm.actions.length > 0 && (
                   <ActionsMenu actions={activeForm.actions} form={activeForm} />
