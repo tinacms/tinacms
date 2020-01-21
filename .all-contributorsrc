@@ -457,6 +457,25 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "NickCis",
+      "name": "Nicolas Cisco",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/174561?v=4",
+      "profile": "https://www.nckweb.com.ar",
+      "contributions": [
+        "code",
+        "test"
+      ]
+    },
+    {
+      "login": "molebox",
+      "name": "Hungry Bear Studio",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/22930449?v=4",
+      "profile": "https://www.hungrybearstudio.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
