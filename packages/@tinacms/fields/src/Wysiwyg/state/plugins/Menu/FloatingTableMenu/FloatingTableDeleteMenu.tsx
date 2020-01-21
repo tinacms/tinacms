@@ -24,11 +24,11 @@ import { IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
 import styled from 'styled-components'
 
-interface FloatingTableMenuProps {
+interface FloatingTableDeleteMenuProps {
   view: EditorView
 }
 
-export const FloatingTableMenu = (props: FloatingTableMenuProps) => {
+export default (props: FloatingTableDeleteMenuProps) => {
   const { state, dispatch } = props.view
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left_selected'
