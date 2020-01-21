@@ -57,7 +57,7 @@ export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
       >
         {hovered ? (
           <IconWrapperRow>
-            <IconButton onClick={() => addRow(index)} small primary>
+            <IconButton onClick={() => addRow(index - 1} small primary>
               <AddIcon />
             </IconButton>
           </IconWrapperRow>
