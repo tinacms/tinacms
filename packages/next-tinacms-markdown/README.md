@@ -4,3 +4,4 @@ This package provides helpers for editing content stored in Markdown files in th
 
 - `useMarkdownForm`
 - `useLocalMarkdownForm`
+- `useGlobalMarkdownForm`
