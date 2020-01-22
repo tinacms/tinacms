@@ -11,6 +11,7 @@
 
 - [Website](https://tinacms.org/)
 - [Documentation](https://tinacms.org/docs/)
+- [Slack](https://tinacms.slack.com)
 - [Forum](https://community.tinacms.org/)
 - [Roadmap](./ROADMAP.md)
 - [Contributing](./CONTRIBUTING.md)
