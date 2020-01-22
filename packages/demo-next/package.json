@@ -20,7 +20,6 @@
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
-    "glob": "^7.1.6",
     "loader": "^2.1.1",
     "next": "^9.2.0",
     "next-tinacms-markdown": "^0.1.0-alpha.0",
