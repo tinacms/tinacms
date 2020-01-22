@@ -2,7 +2,7 @@
   "name": "next-tinacms-markdown",
   "version": "0.1.0-alpha.0",
   "license": "Apache-2.0",
-  "author": "Nolan Phillips",
+  "author": "Kendall Strautman",
   "main": "dist/index.js",
   "module": "dist/next-tinacms-markdown.esm.js",
   "typings": "dist/index.d.ts",
