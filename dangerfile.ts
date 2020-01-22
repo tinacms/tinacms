@@ -394,11 +394,11 @@ const warnAboutUnused = (
 ) =>
   warn(`${packageJson.name} has unused ${type}
 
-${deps.map(dep => `* ${dep}\n`)}\n
+${deps.map(dep => `* ${dep}`).join('\n')}\n
 `)
 
 const warnAboutMissingDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
   warn(`${packageJson.name} is missing dependencies for the following packages:
 
-${deps.map(dep => `* ${dep}\n`)}\n
+${deps.map(dep => `* ${dep}`).join('\n')}\n
 `)
