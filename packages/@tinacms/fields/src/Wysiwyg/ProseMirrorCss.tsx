@@ -88,6 +88,7 @@ const proseMirrorTableStyles = `
   -1}px);
     cursor: pointer;
     z-index: 1;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_top_selected {
     background: #0084ff;
@@ -105,6 +106,7 @@ const proseMirrorTableStyles = `
   -1}px);
     cursor: pointer;
     z-index: 1;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_left_selected {
     background: #0084ff;
@@ -122,6 +124,8 @@ const proseMirrorTableStyles = `
   -1}px);
     border-radius: 5px 0 0 0;
     z-index: 1;
+    cursor: pointer;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_top_left_selected {
     background: #0084ff;
