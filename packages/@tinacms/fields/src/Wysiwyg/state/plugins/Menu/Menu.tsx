@@ -143,8 +143,6 @@ export const Menu = (props: Props) => {
 
   const supportBlocks = true
 
-  useEffect(() => {}, [])
-
   const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
     e.stopPropagation()
     e.preventDefault()
