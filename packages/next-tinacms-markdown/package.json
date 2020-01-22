@@ -22,9 +22,6 @@
     "tinacms": ">=0.11"
   },
   "dependencies": {
-    "next": ">=9",
-    "react": ">=16",
-    "tinacms": "^0.11.3-alpha.0",
     "gray-matter": "^4.0.2"
   },
   "devDependencies": {
@@ -35,6 +32,8 @@
     "react-dom": "^16.12.0",
     "tsdx": "^0.11.0",
     "tslib": "^1.10.0",
-    "typescript": "^3.7.4"
+    "typescript": "^3.7.4",
+    "next": ">=9",
+    "tinacms": ">=0.11"
   }
 }
