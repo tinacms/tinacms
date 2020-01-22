@@ -1,7 +1,7 @@
 {
   "name": "gatsby-tinacms-teams",
   "main": "index.js",
-  "version": "0.1.2-alpha.0",
+  "version": "0.1.2",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -32,7 +32,7 @@
     "build": "tsc"
   },
   "dependencies": {
-    "@tinacms/teams": "^0.2.0-alpha.0",
+    "@tinacms/teams": "^0.2.0",
     "cookie-parser": "^1.2.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
