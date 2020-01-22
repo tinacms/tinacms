@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { useCallback, useEffect, useState, useMemo } from 'react'
+import { useCallback, useEffect, useState } from 'react'
 const matter = require('gray-matter')
 import * as yaml from 'js-yaml'
 
@@ -63,15 +63,7 @@ export function useMarkdownForm (
   const cms = useCMS()
 
   const [valuesInGit, setValuesInGit] = useState()
-
-  const valuesOnDisk = useMemo(
-    () => ({
-      fileRelativePath: markdownFile.fileRelativePath,
-      frontmatter: markdownFile.frontmatter,
-      markdownBody: markdownFile.markdownBody,
-    }),
-    [markdownFile.frontmatter, markdownFile.markdownBody]
-  )
+  const valuesOnDisk = markdownFile
 
   useEffect(() => {
     cms.api.git
