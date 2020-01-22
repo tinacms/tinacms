@@ -16,21 +16,11 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
+import { useCMS, useSubscribable } from '../../react-tinacms'
 
-interface SidebarProps {
-  isOpen: boolean
-  setIsOpen: (_isOpen: boolean) => void
-}
+export function useSidebar() {
+  const sidebar = useCMS().sidebar
 
-export const SidebarContext = React.createContext<SidebarProps | null>(null)
-
-export function useSidebar(): SidebarProps {
-  const sidebar = React.useContext(SidebarContext)
-
-  if (!sidebar) {
-    throw new Error('No Sidebar context provided')
-  }
-
+  useSubscribable(sidebar)
   return sidebar
 }

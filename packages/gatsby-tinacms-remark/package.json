@@ -33,18 +33,19 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
     "@types/jest": "^24.0.15",
+    "@types/js-yaml": "^3.12.1",
     "jest": "^24.8.0",
+    "tinacms": "^0.11.3",
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.6.1",
-    "@tinacms/form-builder": "^0.2.12",
     "gray-matter": "^4.0.2",
+    "js-yaml": "^3.13.1",
     "lodash.get": "^4.4.2",
-    "slash": "^3.0.0",
-    "tinacms": "^0.11.3"
+    "slash": "^3.0.0"
   },
   "peerDependencies": {
-    "gatsby-transformer-remark": ">=2.1.1"
+    "gatsby-transformer-remark": ">=2.1.1",
+    "tinacms": ">=0.11"
   }
 }
