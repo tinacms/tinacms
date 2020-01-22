@@ -124,5 +124,5 @@ export function useMarkdownForm (
 
   useWatchFormValues(form, writeToDisk)
 
-  return [values || {markdownBody: markdownFile.markdownBody, frontmatter: markdownFile.frontmatter}, form]
+  return [values || markdownFile, form]
 }
