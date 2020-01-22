@@ -39,8 +39,8 @@ export { useSidebar } from './components/sidebar/SidebarProvider'
 
 // Plugin Types
 export { AddContentPlugin } from './plugins/create-content-form-plugin'
-export { ScreenPlugin } from './plugins/screen-plugin'
 export { GlobalFormPlugin } from './plugins/screens'
+export { ScreenPlugin } from './plugins/screen-plugin'
 
 // Pre-registered Plugins
 export * from './plugins/fields'
