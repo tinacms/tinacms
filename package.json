@@ -33,7 +33,7 @@
     "rollup-plugin-typescript2": "^0.22.0",
     "typedoc": "^0.16.2",
     "rollup-plugin-uglify": "^6.0.4",
-    "typescript": "^3.5.3"
+    "typescript": "^3.7.5"
   },
   "dependencies": {
     "danger": "^9.2.0",

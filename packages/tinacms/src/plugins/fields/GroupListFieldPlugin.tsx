@@ -279,7 +279,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   ${p =>
     p.isDragging &&
-    css`
+    css<any>`
       border-radius: ${radius('small')};
       box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
