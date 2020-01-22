@@ -20,7 +20,6 @@
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "commander": "^2.20.0",
-    "depcheck": "^0.9.1",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-react": "^7.14.3",
@@ -38,6 +37,7 @@
   },
   "dependencies": {
     "danger": "^9.2.0",
+    "depcheck": "^0.9.1",
     "react-frame-component": "^4.1.1"
   }
 }
