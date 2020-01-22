@@ -119,3 +119,53 @@ i.e `yarn add tinacms` or `yarn add tinacms@latest`
    git merge latest
    git push
    ```
+
+## Listing Contributors
+
+To generate a list of contributors
+
+**By # of Commits**
+
+Command:
+
+```
+git shortlog tinacms@PREV..tinacms@LATEST -sn --no-merges
+```
+
+Example Output:
+
+```
+4  Nolan Phillips
+2  Thomas Weibenfalk
+1  Scott Byrne
+```
+
+**With Links to Commits**
+
+Command:
+
+```
+
+git shortlog tinacms@PREV..tinacms@LATEST \
+ -n \
+ --no-merges \
+ --format="%s (https://github.com/tinacms/tinacms/commit/%h)"
+
+```
+
+Example Output:
+
+```
+Nolan Phillips (4):
+      chore: version bump (https://github.com/tinacms/tinacms/commit/d5a2dc3e)
+      fix: server should start without an origin (https://github.com/tinacms/tinacms/commit/ad59ccf4)
+      test: without a remote updateRemoteToSSH does nothing (https://github.com/tinacms/tinacms/commit/9a1c05a0)
+      chore(publish): latest (https://github.com/tinacms/tinacms/commit/1ab2b192)
+
+Thomas Weibenfalk (2):
+      fixed sticky menu (https://github.com/tinacms/tinacms/commit/e864f4f5)
+      Un-stuck menu when reaching bottom of WYSIWYG fixed (https://github.com/tinacms/tinacms/commit/cec271be)
+
+Scott Byrne (1):
+      chore: update lock files (https://github.com/tinacms/tinacms/commit/74804219)
+```
