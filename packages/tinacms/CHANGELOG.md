@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.3](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3-alpha.1...tinacms@0.11.3) (2020-01-22)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+## [0.11.3-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3-alpha.0...tinacms@0.11.3-alpha.1) (2020-01-22)
+
+
+### Bug Fixes
+
+* FieldPlugins for text have a default to empty string, instead of undefined ([c899ee5](https://github.com/tinacms/tinacms/commit/c899ee5))
+
+
+
+
+
 ## [0.11.3-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.2...tinacms@0.11.3-alpha.0) (2020-01-16)
 
 

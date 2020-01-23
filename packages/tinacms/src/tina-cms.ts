@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { CMS, PluginType } from '@tinacms/core'
+import { CMS, PluginType, Subscribable } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -33,6 +33,8 @@ import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import { Form } from '@tinacms/forms'
 
 export class TinaCMS extends CMS {
+  sidebar: SidebarState = new SidebarState()
+
   constructor() {
     super()
     this.fields.add(TextFieldPlugin)
@@ -58,5 +60,18 @@ export class TinaCMS extends CMS {
 
   get screens(): PluginType<ScreenPlugin> {
     return this.plugins.findOrCreateMap('screen')
+  }
+}
+
+export class SidebarState extends Subscribable {
+  private _isOpen: boolean = false
+
+  get isOpen() {
+    return this._isOpen
+  }
+
+  set isOpen(nextValue: boolean) {
+    this._isOpen = nextValue
+    this.notifiySubscribers()
   }
 }
