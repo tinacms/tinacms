@@ -89,7 +89,7 @@ The flow of changes therefore looks like:
 This is a weekly process:
 
 - On Monday `master` is merged into `latest` which is then published to npm.
-- Hot fixes are cherry picked onto `latest` and the published.
+- Hot fixes are cherry picked onto `latest` and then published.
 - Prereleases are created off of `master` whenever they're needed.
 
 With this process:
