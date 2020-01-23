@@ -41,7 +41,6 @@
   "dependencies": {
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
-    "lodash.get": "^4.4.2",
     "slash": "^3.0.0"
   },
   "peerDependencies": {
