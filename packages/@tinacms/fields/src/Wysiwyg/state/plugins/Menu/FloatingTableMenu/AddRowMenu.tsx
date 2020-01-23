@@ -19,13 +19,11 @@ limitations under the License.
 import React, { useEffect, useState, HTMLAttributes } from 'react'
 import * as ReactDOM from 'react-dom'
 import { EditorView } from 'prosemirror-view'
-import { addRowAfter } from 'prosemirror-tables'
+import { addRowAt } from 'prosemirror-utils'
 import { AddIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
 import styled from 'styled-components'
 
-const paddingX = 8
-const paddingY = 6
 const borderWidth = 1
 const controlSize = 12
 
@@ -38,10 +36,8 @@ interface AddRowMenuProps {
 
 export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
   const { state, dispatch } = view
-  const addRow = (pos: number) => {
-    console.log(pos)
-    addRowAfter(state, dispatch)
-  }
+  const addRow = (pos: number) => dispatch(addRowAt(pos)(state.tr))
+
   const [hovered, setHovered] = useState(false)
 
   useEffect(() => {
@@ -55,9 +51,9 @@ export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
         onMouseEnter={() => setHovered(true)}
         onMouseLeave={() => setHovered(false)}
       >
-        {hovered ? (
+        {hovered && index > 0 ? (
           <IconWrapperRow>
-            <IconButton onClick={() => addRow(index - 1)} small primary>
+            <IconButton onClick={() => addRow(index)} small primary>
               <AddIcon />
             </IconButton>
           </IconWrapperRow>

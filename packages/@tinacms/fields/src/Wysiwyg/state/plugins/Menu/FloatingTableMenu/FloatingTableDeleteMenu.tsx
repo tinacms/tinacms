@@ -37,9 +37,16 @@ export default (props: FloatingTableDeleteMenuProps) => {
   const markerDivCol = document.getElementsByClassName(
     'tina_table_header_ext_top_selected'
   )[0]
-  const markerDivRow = document.getElementsByClassName(
-    'tina_table_header_ext_left_selected'
-  )[0]
+  const markerDivRows = document.getElementsByClassName(
+    'tina_table_header_ext_left'
+  )
+  let markerDivRow
+  for (let i = 1; i < markerDivRows.length; i++) {
+    if (
+      markerDivRows[i].classList.contains('tina_table_header_ext_left_selected')
+    )
+      markerDivRow = markerDivRows[i]
+  }
   if (!markerDivCol && !markerDivRow) return null
   return (
     <>
