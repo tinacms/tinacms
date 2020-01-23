@@ -23,7 +23,7 @@ limitations under the License.
  * @packageDocumentation
  */
 
-import { PluginTypeManager } from './plugins'
+import { Plugin, PluginTypeManager } from './plugins'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -65,6 +65,11 @@ import { PluginTypeManager } from './plugins'
  * cms.colors.all()
  * ```
  */
+export interface CMSConfig {
+  plugins?: Array<Plugin>
+  apis?: { [key: string]: any }
+}
+
 export class CMS {
   /**
    * An object for managing CMSs plugins.
@@ -102,8 +107,16 @@ export class CMS {
   /**
    * @hidden
    */
-  constructor() {
+  constructor(config: CMSConfig | null = null) {
     this.plugins = new PluginTypeManager()
+
+    if (config && config.plugins) {
+      config.plugins.forEach(plugin => this.plugins.add(plugin))
+    }
+
+    if (config && config.apis) {
+      Object.entries(config.apis).forEach(([name, api]) => this.registerApi(name, api))
+    }
   }
 
   /**
