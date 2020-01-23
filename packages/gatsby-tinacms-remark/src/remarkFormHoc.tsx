@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FormOptions, Form } from 'tinacms'
-import { TinaForm } from '@tinacms/form-builder'
+import { FormOptions, Form, TinaForm } from 'tinacms'
 import { useLocalRemarkForm, useGlobalRemarkForm } from './useRemarkForm'
 import { ERROR_INVALID_QUERY_NAME } from './errors'
 
