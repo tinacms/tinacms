@@ -95,28 +95,27 @@ export const Menu = (props: Props) => {
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
 
   useEffect(() => {
-    if (menuRef.current) {
+    if (menuRef.current && sticky) {
       setMenuBoundingBox(menuRef.current.getBoundingClientRect())
     }
   }, [menuRef])
 
   useLayoutEffect(() => {
-    if (!isBrowser || !menuRef.current) {
+    if (!isBrowser || !menuRef.current || !sticky) {
       return
     }
 
     const handleScroll = () => {
-      const textAreaBottom = menuRef.current
+      const startPosition = menuRef.current
+        ? menuRef.current.parentElement.offsetTop
+        : 0
+      const endPosition = menuRef.current
         ? menuRef.current.parentElement.nextSibling.offsetHeight +
+          menuRef.current.parentElement.offsetHeight +
           menuRef.current.parentElement.offsetTop
         : 0
 
-      if (
-        menuBoundingBox &&
-        window.scrollY > menuRef.current.parentElement.offsetTop &&
-        window.scrollY < textAreaBottom &&
-        sticky
-      ) {
+      if (window.scrollY > startPosition && window.scrollY < endPosition) {
         setMenuFixed(true)
       } else {
         setMenuFixed(false)
