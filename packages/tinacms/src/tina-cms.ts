@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { CMS, PluginType, Subscribable } from '@tinacms/core'
+import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -35,8 +35,8 @@ import { Form } from '@tinacms/forms'
 export class TinaCMS extends CMS {
   sidebar: SidebarState = new SidebarState()
 
-  constructor() {
-    super()
+  constructor(config: CMSConfig | null = null) {
+    super(config)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
