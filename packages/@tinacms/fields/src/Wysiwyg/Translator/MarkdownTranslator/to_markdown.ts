@@ -207,7 +207,7 @@ export class MarkdownSerializerState {
 
   // :: (Node)
   // Render the contents of `parent` as inline content.
-  renderInline(parent: Node) {
+  renderInline(parent: Node, escFn?: Function) {
     const active: any[] = []
     let trailing = ''
     const progress = (node: Node | null, _?: any, index: number = 0) => {
@@ -307,7 +307,7 @@ export class MarkdownSerializerState {
         if (noEsc && node.isText && inner)
           this.text(
             this.markString(inner, false, node) +
-              node.text +
+              (escFn ? escFn(node.text) : node.text) +
               this.markString(inner, true, node),
             false
           )
