@@ -1,36 +1,41 @@
 ---
 title: A new Gatsby starter for Tina
-date: "2019-12-02T00:00:00.000Z"
+date: '2019-12-02T00:00:00.000Z'
 heading_color: pink
-description: "My new post. "
+description: 'My new post. '
 blocks:
   - _template: image
-    text: ""
+    text: ''
   - _template: heading
-    text: ""
+    text: ''
 gallery:
   - alt: Another photo
     src: >-
       https://images.unsplash.com/photo-1556910096-6f5e72db6803?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80
     photographer:
-      name: ""
+      name: ''
       social:
         - {}
 draft: false
 ---
-
 ## Ipsos ore erat
+
+| 1 | 2 |
+| --- | --- |
+| 2 |  |
+| 3 |  |
 
 Lorem markdownum densissima; factas tosta rogantem velatae male virus. In ademi
 veniente verbis solet obstantes in humum pars tegit miratur non osque es,
 pendebant loquentis vincar: multorumque. Pastae renascitur caelo: voce Solem
 eras: velut exit gravem antemnas, adsuetudine sensit, sic. Evomit nova, tam, et
 tibi, quod illa, Libycas tamen experiensque. Esse dicta, positus suis.
+-
 
-- Cur illo et opifex da quid
-- Quod antra
-- Toto iam tollit verba delicuit avum demunt
-- Insilit incinxit homini silet profecturas
+* Cur illo et opifex da quid
+* Quod antra
+* Toto iam tollit verba delicuit avum demunt
+* Insilit incinxit homini silet profecturas
 
 Festinat Aetnen, orbe fretum poterisne paelice ista tam fateri Troas; cum.
 _Labor_ et iacta pudore quicquid mixtis, hos ad, fata, quoque permanet nullo
@@ -47,12 +52,12 @@ auratam ad quibus altore tuas luctibus? Ora membris **velut**, et ferro.
 Fretaque est vulnifico inter somnusque [Caeneus](http://paro.net/) eripitur
 laudare fatemur Tartara, unde umbrosum vetustas.
 
-- Longa patrio maiorque vertere est donisque tutam
-- Tuens ipse iamque depositoque ponite humo
-- Sacra vultumque violasse quoque pennaeque praemia prius
-- Eripiunt fulminibus luctatur stipite
-- Felle a discors miserrima in tamen Aphareia
-- Tyranni tamen caeli
+* Longa patrio maiorque vertere est donisque tutam
+* Tuens ipse iamque depositoque ponite humo
+* Sacra vultumque violasse quoque pennaeque praemia prius
+* Eripiunt fulminibus luctatur stipite
+* Felle a discors miserrima in tamen Aphareia
+* Tyranni tamen caeli
 
 Numinis facies Hymenaeus **creatus** ducit, sit rettuleram contra absistit.
 Consistere genusque permulsit Bacchum indignere frondes.

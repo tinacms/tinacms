@@ -4,19 +4,20 @@
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-46-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Getting Started
 
 - [Website](https://tinacms.org/)
 - [Documentation](https://tinacms.org/docs/)
+- [Slack](https://tinacms.slack.com)
 - [Forum](https://community.tinacms.org/)
 - [Roadmap](./ROADMAP.md)
 - [Contributing](./CONTRIBUTING.md)
   - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
   - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
-- [Release Process](./RELEASE.md)
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
 
@@ -60,6 +61,7 @@ Currently, testing with external projects is somewhat inelegant, but this repo i
 **Pitfalls of Testing with External Projects**
 
 - Running `npm run build` in the root of the monorepo will run a `build` script if your project has one defined. If this causes problems (tina may be causing your build to fail in the first place, and you want to skip the build for now but still build the other packages,) you can get around this by either running `lerna run build --ignore=YOUR_PACKAGE_NAME` or adding the name of your package to the `ignore` array for the `run` command in `lerna.json`.
+
 ```json
 //lerna.json
 {
@@ -70,36 +72,30 @@ Currently, testing with external projects is somewhat inelegant, but this repo i
   }
 }
 ```
-- Gatsby and React both rely on some globally-persisted values which can cause errors if you have multiple copies of these dependencies installed. When testing a Gatsby site, many issues can be worked around by temporarily deleting the `demo-gatsby` package and bootstrapping again.
 
+- Gatsby and React both rely on some globally-persisted values which can cause errors if you have multiple copies of these dependencies installed. When testing a Gatsby site, many issues can be worked around by temporarily deleting the `demo-gatsby` package and bootstrapping again.
 
 ## Release Process
 
-Tina has three main branches:
+Tina has two main branches:
 
 - **master:** The bleeding edge of tinacms
-- **next:** A preview of the next release
 - **latest:** The current stable release
 
 The flow of changes therefore looks like:
 
-> `fix-some-bug` => `master` => `next` => `latest`
+> `fix-some-bug` => `master` => `latest`
 
-The process happens over a week:
+This is a weekly process:
 
-- On Monday
-  1. `next` is merged into `latest`; then `latest` is published to npm
-  2. `master` is merged into `next`; then `next` is published to npm
-- Any hot fixes for bugs will be cherry picked into `next` and `latest`
-  and the published accordingly.
-- Every pull request merged to `master` automatically triggers a
-  `canary` release.
+- On Monday `master` is merged into `latest` which is then published to npm.
+- Hot fixes are cherry picked onto `latest` and then published.
+- Prereleases are created off of `master` whenever they're needed.
 
 With this process:
 
-- all accepted changes are available as `canary` releases for early testing
 - critical fixes are published as soon as possible
-- new features and minor fixes take ~1.5 weeks to be published
+- new features and minor fixes take 3-5 days to be published
 
 ## Contributors ✨
 
@@ -173,6 +169,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!

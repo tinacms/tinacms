@@ -18,25 +18,14 @@ limitations under the License.
 
 import { css } from 'styled-components'
 
+const paddingX = 8
+const paddingY = 6
+const borderWidth = 1
+const controlSize = 12
+
 const proseMirrorTableStyles = `
-  /* START: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
-  .ProseMirror:focus {
-    outline: 0px solid transparent;
-  }
   .ProseMirror .tableWrapper {
     overflow-x: auto;
-  }
-  .ProseMirror table {
-    border-collapse: collapse;
-    table-layout: fixed;
-    width: 100%;
-    overflow: hidden;
-  }
-  .ProseMirror td,
-  .ProseMirror th {
-    vertical-align: top;
-    box-sizing: border-box;
-    position: relative;
   }
   .ProseMirror .column-resize-handle {
     position: absolute;
@@ -61,13 +50,17 @@ const proseMirrorTableStyles = `
     right: 0;
     top: 0;
     bottom: 0;
-    background: rgba(0, 132, 255, 0.3);
+    background: rgba(0, 132, 255, 0.25);
+    /* This provides a bullet-proof border for selected cells even with border collapsing */
+    box-shadow: 0 0 0 1px #0574E4;
     pointer-events: none;
   }
-  /* END: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
+  .ProseMirror:focus {
+    outline: 0px solid transparent;
+  }
   .ProseMirror table {
-    border-right: 1px solid #E1DDEC;
-    border-bottom: 1px solid #E1DDEC;
+    border-collapse: collapse;
+    table-layout: fixed;
     display: inline-table;
     margin: 32px 0 32px 0;
     overflow: visible;
@@ -78,24 +71,24 @@ const proseMirrorTableStyles = `
   }
   .ProseMirror table td,
   .ProseMirror table th {
-    border-top: 1px solid #E1DDEC;
-    border-left: 1px solid #E1DDEC;
-    padding: 12px 4px;
+    border: 1px solid #E1DDEC;
+    padding: ${paddingY}px ${paddingX}px;
     position: relative;
+    vertical-align: top;
+    box-sizing: border-box;
   }
   .ProseMirror .tina_table_header_ext_top {
     background: #F6F6F9;
-    border-left: 1px solid #E1DDEC;
-    border-right: 1px solid #E1DDEC;
-    border-top: 1px solid #E1DDEC;
+    border: 1px solid #E1DDEC;
     position: absolute;
-    height: 12px;
-    width: calc(100% + 2px);
-    top: 0;
-    left: 0;
-    margin: -1px 0 0 -1px;
-    transform: translate3d(0, -100%, 0);
+    height: ${controlSize}px;
+    width: calc(100% + ${borderWidth * 2}px);
+    transform: translate(${(borderWidth + paddingX) * -1}px, ${(controlSize +
+  paddingY) *
+  -1}px);
     cursor: pointer;
+    z-index: 1;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_top_selected {
     background: #0084ff;
@@ -104,17 +97,16 @@ const proseMirrorTableStyles = `
   }
   .ProseMirror .tina_table_header_ext_left {
     background: #F6F6F9;
-    border-left: 1px solid #E1DDEC;
-    border-bottom: 1px solid #E1DDEC;
-    border-top: 1px solid #E1DDEC;
+    border: 1px solid #E1DDEC;
     position: absolute;
-    height: calc(100% + 2px);
-    width: 12px;
-    top: 0;
-    left: 0;
-    margin: -1px 0 0 -1px;
-    transform: translate3d(-100%, 0, 0);
+    height: calc(100% + ${borderWidth * 2}px);
+    width: ${controlSize}px;
+    transform: translate(${(controlSize + paddingX) * -1}px, ${(borderWidth +
+  paddingY) *
+  -1}px);
     cursor: pointer;
+    z-index: 1;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_left_selected {
     background: #0084ff;
@@ -123,16 +115,17 @@ const proseMirrorTableStyles = `
   }
   .ProseMirror .tina_table_header_ext_top_left {
     background: #F6F6F9;
-    border-left: 1px solid #E1DDEC;
-    border-top: 1px solid #E1DDEC;
+    border: 1px solid #E1DDEC;
     position: absolute;
-    height: 12px;
-    width: 12px;
-    top: 0;
-    left: 0;
-    margin: -1px 0 0 -1px;
-    transform: translate3d(-100%,-100%,0);
+    height: ${controlSize}px;
+    width: ${controlSize}px;
+    transform: translate(${(controlSize + paddingX) * -1}px, ${(controlSize +
+  paddingY) *
+  -1}px);
     border-radius: 5px 0 0 0;
+    z-index: 1;
+    cursor: pointer;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_top_left_selected {
     background: #0084ff;
@@ -140,7 +133,7 @@ const proseMirrorTableStyles = `
     z-index: 10;
   }
   .ProseMirror .selectedCell {
-    border: 1px solid #0574E4;
+    border-color: transparent;
   }
 `
 
