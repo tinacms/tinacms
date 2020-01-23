@@ -150,10 +150,9 @@ export const Menu = (props: Props) => {
   return (
     <ThemeProvider theme={theme}>
       <>
-        <MenuPlaceholder
-          menuFixed={menuFixed}
-          menuBoundingBox={menuBoundingBox}
-        ></MenuPlaceholder>
+        {menuFixed && (
+          <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
+        )}
         <MenuContainer
           menuFixed={menuFixed}
           menuBoundingBox={menuBoundingBox}
@@ -248,26 +247,24 @@ const OrderedList = commandContrl(
   'Ordered List'
 )
 
+type MenuPlaceholderProps = {
+  menuBoundingBox: any
+}
+
+const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
+  color: transparent;
+  background: transparent;
+  pointer-events: none;
+  position: relative;
+  display: block;
+  height: ${props => props.menuBoundingBox.height}px;
+  width: ${props => props.menuBoundingBox.width}px;
+`
+
 type MenuContainerProps = {
   menuFixed: boolean
   menuBoundingBox: any
 }
-
-const MenuPlaceholder = styled.div<MenuContainerProps>`
-  color: transparent;
-  background: transparent;
-  pointer-events: none;
-  display: none;
-  position: relative;
-
-  ${props =>
-    props.menuFixed &&
-    css`
-      display: block;
-      height: ${props.menuBoundingBox.height}px;
-      width: ${props.menuBoundingBox.width}px;
-    `};
-`
 
 const MenuContainer = styled.div<MenuContainerProps>`
   display: flex;
