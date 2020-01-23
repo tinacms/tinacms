@@ -10,8 +10,6 @@
     "gatsby-browser.d.ts",
     "gatsby-node.js",
     "gatsby-node.d.ts",
-    "gastby-ssr.js",
-    "gastby-ssr.d.ts",
     "CHANGELOG.md",
     "README.md"
   ],
@@ -28,27 +26,17 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/gatsby-tinacms-json"
+    "directory": "packages/gatsby-tinacms-git"
   },
   "scripts": {
     "watch": "tsc -w",
     "dev": "tsc",
     "build": "tsc"
   },
+  "devDependencies": {},
+  "peerDependencies": {},
   "dependencies": {
     "@tinacms/api-git": "^0.5.3",
-    "@tinacms/core": "^0.6.1",
-    "@tinacms/git-client": "^0.4.1",
-    "@types/cors": "^2.8.5",
-    "@types/express": "^4.17.0",
-    "@types/js-yaml": "^3.12.1",
-    "@types/lodash.throttle": "^4.1.6",
-    "cors": "^2.8.5",
-    "express": "^4.17.1",
-    "gatsby-plugin-tinacms": "^0.1.20",
-    "js-yaml": "^3.13.1",
-    "lodash.throttle": "^4.1.1",
-    "simple-git": "1.124.0",
-    "tinacms": "^0.11.3"
+    "@tinacms/git-client": "^0.4.1"
   }
 }

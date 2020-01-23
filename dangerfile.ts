@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import { markdown, danger, warn, fail, message } from 'danger'
+import depcheck from 'depcheck'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -77,6 +78,7 @@ function runChecksOnPullRequest() {
   modifiedPackages.forEach(warnIfMissingTestChanges)
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
+  modifiedPackages.forEach(checkDeps)
 
   listTouchedPackages(modifiedPackages)
 
@@ -143,7 +145,9 @@ The following files may need to be updated:
 
 | File | Reason |
 | --- | --- |
-${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`).join('\n')}
+${changes
+  .map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)
+  .join('\n')}
 `)
 
 const fileLink = (file: string) => {
@@ -351,3 +355,55 @@ function getModifiedPackages(allFiles: string[]) {
   })
   return packageList
 }
+
+function checkDeps(tinaPackage: TinaPackage) {
+  const DEPCHECK_OPTIONS = {
+    ignoreMatches: [
+      '@babel/*',
+      '@types/*',
+      'jest',
+      'tsdx',
+      'ts-jest',
+      'tslib',
+      'typescript',
+      '*-loader',
+      '*-webpack-plugin',
+      '@storybook/*',
+      '@sambego/*',
+    ],
+  }
+  const packagePath = path.resolve(
+    tinaPackage.path.replace('/package.json', '')
+  )
+
+  // Intentionally cast to any
+  depcheck(packagePath, DEPCHECK_OPTIONS, (results: any) => {
+    const unusedDependencies = ['dependencies', 'devDependencies']
+    unusedDependencies.forEach(type => {
+      if (results[type].length) {
+        warnAboutUnused(tinaPackage, type, results[type])
+      }
+    })
+
+    const missingDeps = Object.keys(results.missing)
+    if (missingDeps.length > 0) {
+      warnAboutMissingDeps(tinaPackage, missingDeps)
+    }
+  })
+}
+
+const warnAboutUnused = (
+  { packageJson }: TinaPackage,
+  type: string,
+  deps: string[]
+) =>
+  warn(`${packageJson.name} has unused ${type}
+
+${deps.map(dep => `* ${dep}`).join('\n')}\n
+`)
+
+const warnAboutMissingDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
+  warn(`${packageJson.name} is missing dependencies for the following packages:
+
+${deps.map(dep => `* ${dep}`).join('\n')}\n
+`)

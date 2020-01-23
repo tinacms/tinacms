@@ -1,0 +1,44 @@
+{
+  "name": "nextjs-blog-starter",
+  "private": true,
+  "description": "A simple starter to get up and developing quickly with Next.js",
+  "license": "Apache-2.0",
+  "version": "0.1.0",
+  "author": "Kendall Strautman",
+  "scripts": {
+    "dev-next": "next",
+    "dev": "node server.js",
+    "develop": "npm run dev",
+    "build": "next build",
+    "start": "cross-env NODE_ENV=production node server.js",
+    "export": "next export",
+    "deploy": "npm run build && npm run export"
+  },
+  "dependencies": {
+    "@tinacms/api-git": "^0.5.3",
+    "@tinacms/git-client": "^0.4.1",
+    "cors": "^2.8.5",
+    "dotenv": "^8.2.0",
+    "express": "^4.17.1",
+    "loader": "^2.1.1",
+    "next": "^9.2.0",
+    "next-tinacms-markdown": "^0.1.0-alpha.0",
+    "next-tinacms-json": "0.1.2",
+    "prop-types": "^15.7.2",
+    "react-markdown": "^4.1.0",
+    "raw-loader": "^3.0.0",
+    "tinacms": "^0.11.3",
+    "webpack": "^4.41.5"
+  },
+  "devDependencies": {
+    "prettier": "^1.18.2",
+    "styled-jsx": "^3.2.4"
+  },
+  "keywords": [
+    "nextjs"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/kendallstrautman/nextjs-blog-starter"
+  }
+}
