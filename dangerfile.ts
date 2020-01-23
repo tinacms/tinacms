@@ -359,12 +359,17 @@ function getModifiedPackages(allFiles: string[]) {
 function checkDeps(tinaPackage: TinaPackage) {
   const DEPCHECK_OPTIONS = {
     ignoreMatches: [
-      'jest',
-      '@types/jest',
-      'tsdx',
+      '@babel/*',
       '@types/*',
-      'typescript',
+      'jest',
+      'tsdx',
+      'ts-jest',
       'tslib',
+      'typescript',
+      '*-loader',
+      '*-webpack-plugin',
+      '@storybook/*',
+      '@sambego/*',
     ],
   }
   const packagePath = path.resolve(
