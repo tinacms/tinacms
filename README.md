@@ -95,7 +95,7 @@ This is a weekly process:
 With this process:
 
 - critical fixes are published as soon as possible
-- new features and minor fixes take ~0.5 week to be published
+- new features and minor fixes take 3-5 days to be published
 
 ## Contributors ✨
 
