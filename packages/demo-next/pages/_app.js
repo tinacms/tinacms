@@ -21,14 +21,7 @@ import App from 'next/app'
 import { withTina } from 'tinacms'
 import { GitClient } from '@tinacms/git-client'
 
-class MyApp extends App {
-  render() {
-    const { Component, pageProps } = this.props
-    return <Component {...pageProps} />
-  }
-}
-
-export default withTina(MyApp, {
+export default withTina(App, {
   cms: {
     apis: {
       git: new GitClient('http://localhost:3000/___tina')
