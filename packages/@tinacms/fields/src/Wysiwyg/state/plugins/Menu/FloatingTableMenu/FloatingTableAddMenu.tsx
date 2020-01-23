@@ -52,6 +52,7 @@ export default ({ view }: FloatingTableAddMenu) => {
     <>
       {markerCols.map((marker, index) => (
         <AddColumnMenu
+          key={`add-column-menu-${index}`}
           index={index}
           marker={marker as HTMLElement}
           tableHeight={height}
@@ -60,6 +61,7 @@ export default ({ view }: FloatingTableAddMenu) => {
       ))}
       {markerRows.map((marker, index) => (
         <AddRowMenu
+          key={`add-row-menu-${index}`}
           index={index}
           marker={marker as HTMLElement}
           tableWidth={width}

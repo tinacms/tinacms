@@ -22,10 +22,8 @@ import styled from 'styled-components'
 import { AddIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
 import { EditorView } from 'prosemirror-view'
-import { addColumnAfter } from 'prosemirror-tables'
+import { addColumnAt } from 'prosemirror-utils'
 
-const paddingX = 8
-const paddingY = 6
 const borderWidth = 1
 const controlSize = 12
 
@@ -40,8 +38,9 @@ export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
   const { state, dispatch } = view
   const addColumn = (pos: number) => {
     console.log(pos)
-    addColumnAfter(state, dispatch)
+    dispatch(addColumnAt(pos)(state.tr))
   }
+
   const [hovered, setHovered] = useState(false)
 
   useEffect(() => {
@@ -57,7 +56,7 @@ export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
       >
         {hovered ? (
           <IconWrapperCol>
-            <IconButton onClick={() => addColumn(index - 1)} small primary>
+            <IconButton onClick={() => addColumn(index)} small primary>
               <AddIcon />
             </IconButton>
           </IconWrapperCol>
