@@ -25,10 +25,10 @@ export default function Layout(props) {
       className="layout"
     >
     <Meta 
-      siteTitle={props.siteTitle} 
+      siteTitle={props.siteTitle || "Site Title"} 
       siteDescription={props.siteDescription} 
     />
-    <Header siteTitle={props.siteTitle} />
+    <Header siteTitle={props.siteTitle || "Site Title"} />
     <div className="content">{props.children}</div>
     <style jsx>
       {`
