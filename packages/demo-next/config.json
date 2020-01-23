@@ -1,0 +1,15 @@
+{
+  "title": "A Blog Title",
+  "description": "Starter blog using Forestry CMS with Next.js.",
+  "contact": {
+    "website_url": "https://forestry.io",
+    "made_with_url": "https://gatsbyjs.com",
+    "email": "info@forestry.io",
+    "twitter_handle": "@forestryio",
+    "twitter_url": "https://twitter.com/forestryio",
+    "github_handle": "forestryio",
+    "github_url": "https://github.com/forestryio"
+  },
+  "primary_color": "#AEC4BE",
+  "repository_url": "https://github.com/kendallstrautman/starter-blog-next"
+}
