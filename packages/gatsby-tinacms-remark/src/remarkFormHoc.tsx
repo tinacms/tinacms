@@ -36,7 +36,10 @@ export function remarkForm(Component: any, options: RemarkFormProps = {}) {
   }
 }
 
-export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
+export function inlineRemarkForm(
+  Component: any,
+  options: RemarkFormProps = {}
+) {
   return function RemarkForm(props: any) {
     const [markdownRemark, form] = useLocalRemarkForm(
       getMarkdownRemark(props.data, options.queryName),
@@ -59,6 +62,11 @@ export function liveRemarkForm(Component: any, options: RemarkFormProps = {}) {
     )
   }
 }
+
+/**
+ * @deprecated
+ */
+export const liveRemarkForm = inlineRemarkForm
 
 export function globalRemarkForm(
   Component: any,
