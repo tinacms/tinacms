@@ -209,7 +209,10 @@ function image_with_size(md: any) {
       newState.md.inline.tokenize(newState)
 
       token = state.push('image', 'img', 0)
-      token.attrs = attrs = [['src', href], ['alt', '']]
+      token.attrs = attrs = [
+        ['src', href],
+        ['alt', ''],
+      ]
       token.children = tokens
       if (title) {
         attrs.push(['title', title])

@@ -169,10 +169,9 @@ export class CodeBlockView implements NodeView {
         if (view.state.selection.$anchor.parentOffset) {
           const pos = view.state.selection.$anchor.pos
           view.dispatch(
-            view.state.tr.setSelection(Selection.near(
-              this.view.state.doc.resolve(pos - 1),
-              -1
-            ) as any)
+            view.state.tr.setSelection(
+              Selection.near(this.view.state.doc.resolve(pos - 1), -1) as any
+            )
           )
         }
 
@@ -191,10 +190,9 @@ export class CodeBlockView implements NodeView {
         if (view.state.selection.$anchor.parentOffset) {
           const pos = view.state.selection.$anchor.pos
           view.dispatch(
-            view.state.tr.setSelection(Selection.near(
-              this.view.state.doc.resolve(pos - 1),
-              -1
-            ) as any)
+            view.state.tr.setSelection(
+              Selection.near(this.view.state.doc.resolve(pos - 1), -1) as any
+            )
           )
         }
 
@@ -219,7 +217,10 @@ export class CodeBlockView implements NodeView {
     }
 
     const targetPos = this.getPos() + (dir < 0 ? 0 : this.node.nodeSize)
-    const selection = Selection.near(this.view.state.doc.resolve(targetPos), dir)
+    const selection = Selection.near(
+      this.view.state.doc.resolve(targetPos),
+      dir
+    )
     const atEndOfDocument = !(
       selection.$from.pos + 1 <
       (this.view.state.doc.content as any).size

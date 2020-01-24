@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Node } from "prosemirror-model"
+import { Node } from 'prosemirror-model'
 
 export abstract class Translator {
   abstract nodeFromString(content: string): Node | null

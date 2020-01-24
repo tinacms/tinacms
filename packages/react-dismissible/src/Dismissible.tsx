@@ -82,7 +82,7 @@ export const Dismissible: React.FC<Props> = ({
 
       if (event.keyCode === 27) {
         event.stopPropagation()
-        onDismiss(event)       
+        onDismiss(event)
       }
     }
 

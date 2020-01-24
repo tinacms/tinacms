@@ -190,7 +190,7 @@ const NODES: Nodes = {
     parent?: Node,
     index?: number
   ) {
-    if (!parent || typeof index !== 'number') return;
+    if (!parent || typeof index !== 'number') return
     for (let i = index + 1; i < parent.childCount; i++)
       if (parent.child(i).type != node.type) {
         state.write('  \n')

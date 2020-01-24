@@ -186,14 +186,11 @@ export class GitClient {
    * name is specified.
    */
   branch(name?: string) {
-    return fetch(
-      `${this.baseUrl}/${name ? `branches/${name}` : 'branch'}`,
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-      }
-    ).then(response => {
+    return fetch(`${this.baseUrl}/${name ? `branches/${name}` : 'branch'}`, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    }).then(response => {
       return response.json()
     })
   }
@@ -202,14 +199,11 @@ export class GitClient {
    * Get a list of the names of all local branches.
    */
   branches() {
-    return fetch(
-      `${this.baseUrl}/branches`,
-      {
-        headers: {
-          'Content-Type': 'application/json; charset=utf-8',
-        },
-      }
-    ).then(response => {
+    return fetch(`${this.baseUrl}/branches`, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    }).then(response => {
       return response.json()
     })
   }

@@ -16,12 +16,18 @@ limitations under the License.
 
 */
 
-import { EditorState } from "prosemirror-state"
-import { MarkType } from "prosemirror-model"
+import { EditorState } from 'prosemirror-state'
+import { MarkType } from 'prosemirror-model'
 
 export function singleMarkCommand(markType: MarkType, getAttrs: any) {
   // Version 1
-  return function command(state: EditorState, dispatch: any, match: any, start: number, end: number) {
+  return function command(
+    state: EditorState,
+    dispatch: any,
+    match: any,
+    start: number,
+    end: number
+  ) {
     const attrs = getAttrs instanceof Function ? getAttrs(match) : getAttrs
     const tr = state.tr
 
@@ -64,6 +70,6 @@ function getNextChar(state: EditorState, textEnd: number) {
   try {
     return state.doc.textBetween(textEnd + 1, textEnd + 2)
   } catch (e) {
-    return ""
+    return ''
   }
 }

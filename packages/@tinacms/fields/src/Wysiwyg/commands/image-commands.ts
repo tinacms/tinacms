@@ -16,14 +16,18 @@ limitations under the License.
 
 */
 
-import { EditorState } from "prosemirror-state"
+import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
-type Dispatch = typeof EditorView.prototype.dispatch;
+type Dispatch = typeof EditorView.prototype.dispatch
 
-export function insertImage(state: EditorState, dispatch: Dispatch | null, src: string) {
-  const nodeType = state.schema.nodes["image"]
-  const image = nodeType.createAndFill({ src, alt: "", title: "" })
+export function insertImage(
+  state: EditorState,
+  dispatch: Dispatch | null,
+  src: string
+) {
+  const nodeType = state.schema.nodes['image']
+  const image = nodeType.createAndFill({ src, alt: '', title: '' })
   if (dispatch) {
     dispatch(state.tr.replaceSelectionWith(image))
   }
@@ -34,7 +38,7 @@ export function alignImage(
   state: EditorState,
   dispatch: Dispatch | null,
   at: number,
-  direction: "left" | "right" | "center" | ""
+  direction: 'left' | 'right' | 'center' | ''
 ) {
   const node = state.doc.nodeAt(at)
   if (!node || node.type !== state.schema.nodes.image) return false
@@ -44,12 +48,18 @@ export function alignImage(
   }
 
   if (dispatch) {
-    dispatch((state.tr as any).setNodeMarkup(at, node.type, attrs, node.marks) as any)
+    dispatch(
+      (state.tr as any).setNodeMarkup(at, node.type, attrs, node.marks) as any
+    )
   }
   return true
 }
 
-export function removeImage(state: EditorState, dispatch: Dispatch | null, at: number) {
+export function removeImage(
+  state: EditorState,
+  dispatch: Dispatch | null,
+  at: number
+) {
   const from = at
   const to = from + 1
   const node = state.doc.nodeAt(from)

@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export const parse = (value?: string) => value || '';
+export const parse = (value?: string) => value || ''

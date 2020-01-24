@@ -26,7 +26,7 @@ const { forDoc, doc, p, text, em } = new PMTestHarness(defaultSchema)
 const P1_START = () => 1
 
 function getStart(p1: string, ...paragraphs: string[]): number {
-  const [first, ...rest] = paragraphs;
+  const [first, ...rest] = paragraphs
   if (typeof first !== 'string') {
     return 1
   }

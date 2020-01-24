@@ -20,7 +20,7 @@ import { Mark, MarkType, ResolvedPos } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
-type Dispatch = typeof EditorView.prototype.dispatch;
+type Dispatch = typeof EditorView.prototype.dispatch
 
 export function renderLinkForm(view: EditorView, link: Element) {
   const tr = view.state.tr
@@ -60,7 +60,10 @@ export function unmountLinkForm(view: EditorView) {
  * @param {EditorState} state
  * @param {(tr: Transaction) => void} dispatch
  */
-export function startEditingLink(state: EditorState, dispatch: Dispatch | null) {
+export function startEditingLink(
+  state: EditorState,
+  dispatch: Dispatch | null
+) {
   const linkMarkType = state.schema.marks['link']
 
   const $cursor: ResolvedPos = (state.selection as any).$cursor
@@ -191,7 +194,10 @@ export function updateLinkBeingEdited(
   return true
 }
 
-export function removeLinkBeingEdited(state: EditorState, dispatch: Dispatch | null) {
+export function removeLinkBeingEdited(
+  state: EditorState,
+  dispatch: Dispatch | null
+) {
   if (dispatch) {
     const linkMarkType = state.schema.marks['link']
     const tr = state.tr

@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { EditorState } from "prosemirror-state"
-import { liftListItem, wrapInList } from "prosemirror-schema-list"
+import { EditorState } from 'prosemirror-state'
+import { liftListItem, wrapInList } from 'prosemirror-schema-list'
 
 export function toggleBulletList(state: EditorState, dispatch: any) {
   const lift = liftListItem(state.schema.nodes.list_item)

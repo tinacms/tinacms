@@ -16,12 +16,12 @@ limitations under the License.
 
 */
 
-import { EditorState } from "prosemirror-state"
-import { liftTarget } from "prosemirror-transform"
-import { NodeType } from "prosemirror-model"
+import { EditorState } from 'prosemirror-state'
+import { liftTarget } from 'prosemirror-transform'
+import { NodeType } from 'prosemirror-model'
 import { EditorView } from 'prosemirror-view'
 
-type Dispatch = typeof EditorView.prototype.dispatch;
+type Dispatch = typeof EditorView.prototype.dispatch
 
 export function liftBlockquote(state: EditorState, dispatch: Dispatch | null) {
   const range = getRangeForType(state, state.schema.nodes.blockquote)

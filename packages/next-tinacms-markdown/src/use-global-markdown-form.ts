@@ -23,7 +23,10 @@ import { GlobalFormPlugin, usePlugins } from 'tinacms'
 /**
  * Registers a Global Form with TinaCMS for editing a Markdown File.
  */
-export function useGlobalMarkdownForm(markdownFile: MarkdownFile, options?: Options) {
+export function useGlobalMarkdownForm(
+  markdownFile: MarkdownFile,
+  options?: Options
+) {
   const [values, form] = useMarkdownForm(markdownFile, options)
   const globalFormPlugin = useMemo(() => {
     if (form) {

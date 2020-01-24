@@ -31,7 +31,9 @@ export const ordered_list = {
       tag: 'ol',
       getAttrs(dom: Element) {
         return {
-          order: dom.hasAttribute('start') ? +(dom.getAttribute('start') || 0) : 1,
+          order: dom.hasAttribute('start')
+            ? +(dom.getAttribute('start') || 0)
+            : 1,
           tight: dom.hasAttribute('data-tight'),
         }
       },

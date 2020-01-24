@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export * from "./CodeBlockView"
+export * from './CodeBlockView'

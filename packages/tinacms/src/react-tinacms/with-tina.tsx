@@ -22,40 +22,43 @@ import { Tina, TinaProps } from '../components/Tina'
 import { TinaCMS } from '../tina-cms'
 
 export interface TinaConfig {
-    cms?: CMSConfig,
-    sidebar?: {
-        position?: TinaProps["position"],
-        hidden?: TinaProps["hidden"],
-        theme?: TinaProps["theme"]
-    }
+  cms?: CMSConfig
+  sidebar?: {
+    position?: TinaProps['position']
+    hidden?: TinaProps['hidden']
+    theme?: TinaProps['theme']
+  }
 }
 
 function mergeDefaultConfig(config?: TinaConfig) {
-    // TODO maybe use lodash/fp/defaultsDeep
-    // Using lodash/fp libs requires installing all of lodash so requires consideration
-    const merge = require('lodash.merge')
-    const cloneDeep = require('lodash.clonedeep')
-    return merge({
-        cms: {
-            plugins: [],
-            apis: {},
-        },
-        sidebar: {
-            position: 'displace',
-            hidden: false,
-            theme: {}
-        }
-    }, cloneDeep(config))
+  // TODO maybe use lodash/fp/defaultsDeep
+  // Using lodash/fp libs requires installing all of lodash so requires consideration
+  const merge = require('lodash.merge')
+  const cloneDeep = require('lodash.clonedeep')
+  return merge(
+    {
+      cms: {
+        plugins: [],
+        apis: {},
+      },
+      sidebar: {
+        position: 'displace',
+        hidden: false,
+        theme: {},
+      },
+    },
+    cloneDeep(config)
+  )
 }
 
 export function withTina(Component: any, config?: TinaConfig) {
-    return (props: any) => {
-        const safeConfig = React.useMemo(() => mergeDefaultConfig(config), [config])
-        const cms = React.useMemo(() => new TinaCMS(safeConfig.cms), [safeConfig])
-        return (
-        <Tina cms={cms} {...safeConfig.sidebar}>
-            <Component {...props} />
-        </Tina>
-        )
-    }
+  return (props: any) => {
+    const safeConfig = React.useMemo(() => mergeDefaultConfig(config), [config])
+    const cms = React.useMemo(() => new TinaCMS(safeConfig.cms), [safeConfig])
+    return (
+      <Tina cms={cms} {...safeConfig.sidebar}>
+        <Component {...props} />
+      </Tina>
+    )
+  }
 }

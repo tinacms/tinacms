@@ -39,7 +39,7 @@ function parseNextNumber(str: string, pos: number, max: number) {
   code = str.charCodeAt(pos)
 
   while (
-    (pos < max && (code >= 0x30 /* 0 */ && code <= 0x39)) /* 9 */ ||
+    (pos < max && code >= 0x30 /* 0 */ && code <= 0x39) /* 9 */ ||
     code === 0x25 /* % */
   ) {
     code = str.charCodeAt(++pos)

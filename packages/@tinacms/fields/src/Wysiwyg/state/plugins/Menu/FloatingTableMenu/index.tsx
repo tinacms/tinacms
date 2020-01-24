@@ -27,7 +27,6 @@ interface FloatingTableMenuProps {
 }
 
 export const FloatingTableMenu = (props: FloatingTableMenuProps) => {
-  
   return (
     <>
       <FloatingTableDeleteMenu {...props} />

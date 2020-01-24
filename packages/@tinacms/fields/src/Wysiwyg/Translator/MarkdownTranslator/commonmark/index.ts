@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export * from "./CommonMarkSerializer"
-export * from "./CommonMarkParser"
+export * from './CommonMarkSerializer'
+export * from './CommonMarkParser'

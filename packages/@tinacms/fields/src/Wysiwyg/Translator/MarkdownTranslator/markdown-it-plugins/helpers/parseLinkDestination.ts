@@ -30,7 +30,7 @@ export function parseLinkDestination(md: any, state: any, pos: any): any {
     ok: false,
     pos: 0,
     lines: 0,
-    str: "",
+    str: '',
   }
 
   if (str.charCodeAt(pos) === 0x3c /* < */) {

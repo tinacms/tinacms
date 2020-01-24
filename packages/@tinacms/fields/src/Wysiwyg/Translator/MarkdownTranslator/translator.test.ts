@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as fs from 'fs'
 import * as path from 'path'
-import eol from "eol";
+import eol from 'eol'
 import { defaultSchema } from '../../default-schema'
 import { MarkdownTranslator } from './index'
 
@@ -58,7 +58,9 @@ describe('Markdown Translators', () => {
     })
 
     function testFile(flavour: string, file: string) {
-      const input = eol.auto(fs.readFileSync(pathOf(flavour, '__tests__', file), 'utf8'))
+      const input = eol.auto(
+        fs.readFileSync(pathOf(flavour, '__tests__', file), 'utf8')
+      )
 
       it(file, () => {
         const node = translator.nodeFromString(input)!

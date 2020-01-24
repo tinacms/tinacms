@@ -20,9 +20,12 @@ import { EditorState, Selection } from 'prosemirror-state'
 import { NodeType, Node } from 'prosemirror-model'
 import { EditorView } from 'prosemirror-view'
 
-type Dispatch = typeof EditorView.prototype.dispatch;
+type Dispatch = typeof EditorView.prototype.dispatch
 
-export function deleteEmptyHeading(state: EditorState, dispatch: Dispatch | null) {
+export function deleteEmptyHeading(
+  state: EditorState,
+  dispatch: Dispatch | null
+) {
   const { $cursor } = state.selection as any
   if (!$cursor) return false
   const node = state.doc.nodeAt(Math.max($cursor.pos - 1, 0))
@@ -70,7 +73,8 @@ export function toggleHeader(
     const $firstPos = state.doc.resolve(firstPos)
     const index = $firstPos.index()
 
-    const setAsParagraph = state.selection.$head.parent.attrs.level == attrs.level
+    const setAsParagraph =
+      state.selection.$head.parent.attrs.level == attrs.level
     const nextNodeType = setAsParagraph ? fallBackNodeType : nodeType
     const nextAttrs = setAsParagraph ? fallbackAttrs : attrs
 
