@@ -197,9 +197,15 @@ const NODES: Nodes = {
         return
       }
   },
-  text(state: MarkdownSerializerState, node: Node) {
+  text(
+    state: MarkdownSerializerState,
+    node: Node,
+    _1,
+    _2,
+    escFn?: (str: string) => string
+  ) {
     if (typeof node.text !== 'string') return
-    state.text(node.text)
+    state.text(node.text, true, escFn)
   },
   table(state: MarkdownSerializerState, node: Node) {
     let inHead = true
