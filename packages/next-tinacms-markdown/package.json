@@ -26,11 +26,6 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.25",
-    "@types/react": "^16.9.17",
-    "@types/react-dom": "^16.9.4",
-    "tsdx": "^0.11.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.4",
     "next": "^0.9.2",
     "tinacms": "^0.11.3"
   }
