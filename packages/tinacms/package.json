@@ -50,8 +50,7 @@
     "lodash.merge": "^4.6.2",
     "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",
-    "react-dismissible": "^1.1.2",
-    "react-frame-component": "^4.1.1"
+    "react-dismissible": "^1.1.2"
   },
   "peerDependencies": {
     "react": ">=16.8",

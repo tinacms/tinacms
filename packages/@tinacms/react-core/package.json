@@ -17,9 +17,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.6.1",
-    "@tinacms/forms": "^0.1.1",
-    "lodash.get": "^4.4.2",
-    "lodash.set": "^4.3.2"
+    "@tinacms/forms": "^0.1.1"
   },
   "peerDependencies": {
     "react": ">=16.8"
