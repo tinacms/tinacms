@@ -46,6 +46,7 @@
     "@tinacms/react-core": "^0.2.4",
     "@tinacms/styles": "^0.1.1",
     "@types/react-beautiful-dnd": "^11.0.3",
+    "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",

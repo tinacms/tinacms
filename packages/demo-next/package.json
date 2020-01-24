@@ -9,7 +9,6 @@
     "dev-next": "next",
     "dev": "node server.js",
     "develop": "npm run dev",
-    "build": "next build",
     "start": "cross-env NODE_ENV=production node server.js",
     "export": "next export",
     "deploy": "npm run build && npm run export"
