@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0...@tinacms/fields@0.3.1-alpha.0) (2020-01-24)
+
+
+### Bug Fixes
+
+* off by one error for add row/col ([6959e09](https://github.com/tinacms/tinacms/commit/6959e09))
+
+
+
+
+
 # [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0-alpha.1...@tinacms/fields@0.3.0) (2020-01-22)
 
 **Note:** Version bump only for package @tinacms/fields

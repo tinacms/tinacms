@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.3-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.1.2...next-tinacms-json@0.1.3-alpha.0) (2020-01-24)
+
+
+### Bug Fixes
+
+* **deps:** tinacms, react, and next are peerDeps ([2e3347c](https://github.com/tinacms/tinacms/commit/2e3347c))
+* move devDeps to root ([a6c827b](https://github.com/tinacms/tinacms/commit/a6c827b))
+* updates InlineJsonForm to call useLocalJsonForm ([e6a454c](https://github.com/tinacms/tinacms/commit/e6a454c))
+
+
+
+
+
 ## [0.1.2](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.1.2-alpha.1...next-tinacms-json@0.1.2) (2020-01-22)
 
 **Note:** Version bump only for package next-tinacms-json

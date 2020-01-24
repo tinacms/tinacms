@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.18-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.17...gatsby-tinacms-git@0.2.18-alpha.0) (2020-01-24)
+
+
+### Bug Fixes
+
+* **deps:** removed unnecessary deps ([26db4a4](https://github.com/tinacms/tinacms/commit/26db4a4))
+
+
+
+
+
 ## [0.2.17](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.17-alpha.1...gatsby-tinacms-git@0.2.17) (2020-01-22)
 
 **Note:** Version bump only for package gatsby-tinacms-git
