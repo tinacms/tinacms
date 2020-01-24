@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.6.1...@tinacms/core@0.7.0-alpha.0) (2020-01-24)
+
+
+### Features
+
+* **cms:** configure plugins/apis on instantiation ([fdd749b](https://github.com/tinacms/tinacms/commit/fdd749b))
+
+
+
+
+
 ## [0.6.1](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.6.1-alpha.0...@tinacms/core@0.6.1) (2020-01-22)
 
 **Note:** Version bump only for package @tinacms/core
