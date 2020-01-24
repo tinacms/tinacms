@@ -34,6 +34,7 @@
     "rollup-plugin-typescript2": "^0.22.0",
     "rollup-plugin-uglify": "^6.0.4",
     "tsdx": "^0.11.0",
+    "tslib": "^1.10.0",
     "typedoc": "^0.16.2",
     "typescript": "^3.7.5"
   },
