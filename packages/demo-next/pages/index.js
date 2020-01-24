@@ -16,41 +16,38 @@ limitations under the License.
 
 */
 
-import { inlineJsonForm  } from 'next-tinacms-json';
+import { inlineJsonForm, jsonForm } from 'next-tinacms-json'
 
-import Layout from "../components/Layout";
-import BlogList from "../components/BlogList";
+import Layout from '../components/Layout'
+import BlogList from '../components/BlogList'
 
 function Index(props) {
   return (
-    <Layout 
-      pathname="/" 
-      siteTitle={props.title} 
+    <Layout
+      pathname="/"
+      siteTitle={props.title}
       siteDescription={props.description}
     >
       <section>
         <BlogList data={props.data} />
       </section>
     </Layout>
-  );
-};
+  )
+}
 
 const formOptions = {
   label: 'Home Page',
   fields: [
-    { label:"Name",
-      name:"name",
-      component: "text"
-    },
-      {
+    { label: 'Name', name: 'name', component: 'text' },
+    {
       name: 'body',
       label: 'Home Page Content',
       component: 'markdown',
     },
-  ]
+  ],
 }
 
-const EditableIndex = inlineJsonForm(Index, formOptions) 
+const EditableIndex = jsonForm(Index, formOptions)
 
 export default EditableIndex
 
@@ -62,7 +59,7 @@ EditableIndex.getInitialProps = async function() {
     description: configData.description,
     jsonFile: {
       fileRelativePath: `data/index.json`,
-      data: indexData
-    }
+      data: indexData,
+    },
   }
 }
