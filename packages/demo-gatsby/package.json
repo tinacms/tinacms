@@ -13,7 +13,6 @@
     "@tinacms/form-builder": "^0.2.12",
     "@tinacms/icons": "^0.4.0",
     "@tinacms/styles": "^0.1.1",
-    "@types/react": "^16.8.23",
     "autosize": "^4.0.2",
     "gatsby": "2.15.34",
     "gatsby-image": "^2.2.6",
