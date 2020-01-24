@@ -34,6 +34,16 @@ const LICENSE_HEADER: string[] = [
   `limitations under the License.`,
 ]
 
+const failAboutIllegalDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
+  fail(`
+Please remove the following dependencies from ${packageJson.name}:
+
+${deps.map(dep => `* ${dep}`).join('\n')}\n
+
+This repository defines the above package in the root level package.json in
+order to (1) have consistency across packages and (2) prevent bugs during development.
+`)
+
 runChecksOnPullRequest()
 
 /**
@@ -56,6 +66,8 @@ interface TinaPackage {
       watch: string
     }
     license: string
+    dependencies?: { [key: string]: string }
+    devDependencies?: { [key: string]: string }
   }
 }
 
@@ -75,10 +87,11 @@ function runChecksOnPullRequest() {
   // Packages
   let modifiedPackages = getModifiedPackages(allFiles)
 
-  modifiedPackages.forEach(warnIfMissingTestChanges)
+  // modifiedPackages.forEach(warnIfMissingTestChanges)
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
   modifiedPackages.forEach(checkDeps)
+  modifiedPackages.forEach(checkForGlobalDeps)
 
   listTouchedPackages(modifiedPackages)
 
@@ -192,16 +205,19 @@ function formatDate(date: Date) {
  * ```
  * ### Modified Github Workflows
  *
- * * .github/workflows/danger.yml
+ * * .github/workflows/main.yml
+ * * dangerfile.ts
  * ```
  */
 function listTouchedWorkflows(allFiles: string[]) {
-  let touchedWorkflows = allFiles.filter(filepath =>
-    filepath.startsWith('.github/workflows/')
+  let touchedWorkflows = allFiles.filter(
+    filepath =>
+      filepath.startsWith('.github/workflows/') ||
+      filepath.endsWith('dangerfile.ts')
   )
   if (touchedWorkflows.length === 0) return
 
-  message(`### Modified Github Workflows
+  message(`### Modified CI Scripts
 
 * ${touchedWorkflows.join('\n* ')}`)
 }
@@ -407,3 +423,29 @@ const warnAboutMissingDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
 
 ${deps.map(dep => `* ${dep}`).join('\n')}\n
 `)
+
+function checkForGlobalDeps(tinaPackage: TinaPackage) {
+  const deps = Object.keys(tinaPackage.packageJson.dependencies || {})
+  const devDeps = Object.keys(tinaPackage.packageJson.devDependencies || {})
+
+  const illegalDeps = Array.from(new Set([...deps, ...devDeps])).filter(
+    isIllegal
+  )
+
+  if (illegalDeps.length > 0) {
+    failAboutIllegalDeps(tinaPackage, illegalDeps)
+  }
+}
+
+function isIllegal(dep: string) {
+  return (
+    [
+      'typescript',
+      'tslib',
+      'react',
+      'react-dom',
+      '@types/react',
+      '@types/react-dom',
+    ].indexOf(dep) >= 0
+  )
+}
