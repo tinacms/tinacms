@@ -87,7 +87,7 @@ function runChecksOnPullRequest() {
   // Packages
   let modifiedPackages = getModifiedPackages(allFiles)
 
-  modifiedPackages.forEach(warnIfMissingTestChanges)
+  // modifiedPackages.forEach(warnIfMissingTestChanges)
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
   modifiedPackages.forEach(checkDeps)
