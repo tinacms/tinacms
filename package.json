@@ -22,10 +22,12 @@
     "commander": "^2.20.0",
     "eslint": "^6.4.0",
     "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-prettier": "^3.1.2",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^2.0.1",
     "lerna": "^3.16.4",
     "next": "^9.2.0",
+    "prettier": "^1.19.1",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "rollup": "^1.21.4",
@@ -38,7 +40,6 @@
   },
   "dependencies": {
     "danger": "^9.2.0",
-    "depcheck": "^0.9.1",
-    "react-frame-component": "^4.1.1"
+    "depcheck": "^0.9.1"
   }
 }

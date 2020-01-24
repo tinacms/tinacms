@@ -9,7 +9,7 @@
     "prettier",
     "prettier/@typescript-eslint"
   ],
-  "plugins": ["@typescript-eslint", "react-hooks", "react"],
+  "plugins": ["@typescript-eslint", "react-hooks", "react", "prettier"],
   "rules": {
     "@typescript-eslint/explicit-function-return-type": "off",
     "@typescript-eslint/explicit-member-accessibility": "off",
@@ -36,6 +36,7 @@
     "cript-eslint/no-empty-function": "off",
     "@typescript-eslint/prefer-interface": "off",
     "prefer-const": "warn",
+    "prettier/prettier": "warn",
     "react/jsx-uses-react": "error",
     "react/jsx-uses-vars": "error",
     "react-hooks/rules-of-hooks": "warn",
