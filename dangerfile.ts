@@ -205,16 +205,19 @@ function formatDate(date: Date) {
  * ```
  * ### Modified Github Workflows
  *
- * * .github/workflows/danger.yml
+ * * .github/workflows/main.yml
+ * * dangerfile.ts
  * ```
  */
 function listTouchedWorkflows(allFiles: string[]) {
-  let touchedWorkflows = allFiles.filter(filepath =>
-    filepath.startsWith('.github/workflows/')
+  let touchedWorkflows = allFiles.filter(
+    filepath =>
+      filepath.startsWith('.github/workflows/') ||
+      filepath.endsWith('dangerfile.ts')
   )
   if (touchedWorkflows.length === 0) return
 
-  message(`### Modified Github Workflows
+  message(`### Modified CI Scripts
 
 * ${touchedWorkflows.join('\n* ')}`)
 }
