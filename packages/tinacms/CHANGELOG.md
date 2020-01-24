@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3...tinacms@0.12.0-alpha.0) (2020-01-24)
+
+
+### Features
+
+* **TinaCMS:** configure plugins/apis on instantiation ([eeec343](https://github.com/tinacms/tinacms/commit/eeec343))
+* **withTina:** add HOC for <Tina> CMS provider ([b3c44ef](https://github.com/tinacms/tinacms/commit/b3c44ef))
+
+
+
+
+
 ## [0.11.3](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3-alpha.1...tinacms@0.11.3) (2020-01-22)
 
 **Note:** Version bump only for package tinacms

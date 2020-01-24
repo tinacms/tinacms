@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/forms",
-  "version": "0.1.1",
+  "version": "0.1.2-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -27,10 +27,9 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.6.1",
+    "@tinacms/core": "^0.7.0-alpha.0",
     "@tinacms/scripts": "^0.1.11",
     "@types/jest": "^24.0.15",
-    "@types/react": "^16.8.23",
     "jest": "^24.8.0",
     "ts-jest": "^24.0.2"
   },

@@ -269,7 +269,7 @@ const NoFormsPlaceholder = () => (
     </p>
     <p>
       <LinkButton
-        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
+        href="https://tinacms.org/docs/getting-started/introduction/#get-started"
         target="_blank"
       >
         <Emoji>📖</Emoji> Form Setup Guide

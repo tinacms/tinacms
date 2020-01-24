@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-core",
-  "version": "0.2.4",
+  "version": "0.2.5-alpha.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-core.esm.js",
@@ -16,8 +16,8 @@
     "lint": "tsdx lint"
   },
   "dependencies": {
-    "@tinacms/core": "^0.6.1",
-    "@tinacms/forms": "^0.1.1",
+    "@tinacms/core": "^0.7.0-alpha.0",
+    "@tinacms/forms": "^0.1.2-alpha.0",
     "lodash.get": "^4.4.2",
     "lodash.set": "^4.3.2"
   },
@@ -25,9 +25,6 @@
     "react": ">=16.8"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.23",
-    "tsdx": "^0.11.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.2"
+    "@types/jest": "^24.0.23"
   }
 }
