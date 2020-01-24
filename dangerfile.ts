@@ -435,5 +435,14 @@ function checkForGlobalDeps(tinaPackage: TinaPackage) {
 }
 
 function isIllegal(dep: string) {
-  return ['typescript', 'tslib', 'react', 'react-dom'].indexOf(dep) >= 0
+  return (
+    [
+      'typescript',
+      'tslib',
+      'react',
+      'react-dom',
+      '@types/react',
+      '@types/react-dom',
+    ].indexOf(dep) >= 0
+  )
 }
