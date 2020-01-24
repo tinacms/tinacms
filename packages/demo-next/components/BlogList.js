@@ -22,8 +22,8 @@ const BlogList = (props) => {
 
   return (
     <div>
-      <h3>Hi! My name is {props.data.frontmatter.name || 'no name'}</h3>
-      <ReactMarkdown>{props.data.markdownBody || 'md body goes here'}</ReactMarkdown>
+      <h3>Hi! My name is {props.data.name || 'no name'}</h3>
+      <ReactMarkdown>{props.data.body || 'md body goes here'}</ReactMarkdown>
       <style jsx>
         {`
           div {
@@ -34,6 +34,7 @@ const BlogList = (props) => {
             align-items: center;
             flex-direction: column;
             text-align: center;
+            padding: 3rem;
           }
         `}
       </style>

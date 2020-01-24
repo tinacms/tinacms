@@ -16,31 +16,12 @@ limitations under the License.
 
 */
 
-import matter from "gray-matter";
-import { useLocalMarkdownForm } from 'next-tinacms-markdown';
+import { inlineJsonForm  } from 'next-tinacms-json';
 
 import Layout from "../components/Layout";
 import BlogList from "../components/BlogList";
 
-
-export default function Index(props) {
-  const formOptions = {
-    label: 'Home Page',
-    fields: [
-      { label:"Name",
-        name:"frontmatter.name",
-        component: "text"
-      },
-        {
-        name: 'markdownBody',
-        label: 'Home Page Content',
-        component: 'markdown',
-      },
-    ]
-  }
-  const [data] = useLocalMarkdownForm(props.data, formOptions)
-
-  console.log("data", data)
+function Index(props) {
   return (
     <Layout 
       pathname="/" 
@@ -48,24 +29,40 @@ export default function Index(props) {
       siteDescription={props.description}
     >
       <section>
-        <BlogList data={data} />
+        <BlogList data={props.data} />
       </section>
     </Layout>
   );
 };
 
-Index.getInitialProps = async function() {
-  const configData = await import(`../data/config.json`)
-  const indexData = await import(`../data/index.md`)
-  const data = matter(indexData.default)
+const formOptions = {
+  label: 'Home Page',
+  fields: [
+    { label:"Name",
+      name:"name",
+      component: "text"
+    },
+      {
+      name: 'body',
+      label: 'Home Page Content',
+      component: 'markdown',
+    },
+  ]
+}
 
+const EditableIndex = inlineJsonForm(Index, formOptions) 
+
+export default EditableIndex
+
+EditableIndex.getInitialProps = async function() {
+  const configData = await import(`../data/config.json`)
+  const indexData = await import(`../data/index.json`)
   return {
     title: configData.title,
     description: configData.description,
-    data: {
-      fileRelativePath: `data/index.md`,
-      frontmatter: data.data,
-      markdownBody: data.content
+    jsonFile: {
+      fileRelativePath: `data/index.json`,
+      data: indexData
     }
   }
 }
