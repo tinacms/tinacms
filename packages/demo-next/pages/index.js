@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { inlineJsonForm  } from 'next-tinacms-json';
+import { inlineJsonForm, jsonForm  } from 'next-tinacms-json';
 
 import Layout from "../components/Layout";
 import BlogList from "../components/BlogList";
@@ -50,7 +50,7 @@ const formOptions = {
   ]
 }
 
-const EditableIndex = inlineJsonForm(Index, formOptions) 
+const EditableIndex = jsonForm(Index, formOptions)
 
 export default EditableIndex
 
