@@ -1,10 +1,15 @@
 {
-  "name": "Kendalla",
+  "name": "Kendallaa",
   "background_color": "blue",
   "body": "## Encyclopaedia galactica something incredible is waiting to be known a billion trillion venture trillion extraordinary claims require extraordinary evidence?",
   "default": {
-    "name": "Kendall",
+    "name": "Kendalla",
     "background_color": "blue",
-    "body": "## Encyclopaedia galactica something incredible is waiting to be known a billion trillion venture trillion extraordinary claims require extraordinary evidence?"
+    "body": "## Encyclopaedia galactica something incredible is waiting to be known a billion trillion venture trillion extraordinary claims require extraordinary evidence?",
+    "default": {
+      "name": "Kendall",
+      "background_color": "blue",
+      "body": "## Encyclopaedia galactica something incredible is waiting to be known a billion trillion venture trillion extraordinary claims require extraordinary evidence?"
+    }
   }
 }
