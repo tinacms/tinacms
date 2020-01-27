@@ -386,6 +386,7 @@ function checkDeps(tinaPackage: TinaPackage) {
       '*-webpack-plugin',
       '@storybook/*',
       '@sambego/*',
+      '@tinacms/scripts',
     ],
   }
   const packagePath = path.resolve(
