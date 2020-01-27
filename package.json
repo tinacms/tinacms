@@ -42,7 +42,6 @@
   },
   "dependencies": {
     "danger": "^9.2.0",
-    "depcheck": "^0.9.1",
-    "react-frame-component": "^4.1.1"
+    "depcheck": "^0.9.1"
   }
 }
