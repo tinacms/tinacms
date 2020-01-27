@@ -19,7 +19,6 @@ import { useLocalJsonForm } from './use-local-json-form'
 
 interface JsonFormProps extends Options {
   jsonFile: JsonFile
-  options?: Options
   data?: any
 }
 
