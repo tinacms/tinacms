@@ -37,7 +37,6 @@ interface AddColumnMenuProps {
 export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
   const { state, dispatch } = view
   const addColumn = (pos: number) => {
-    console.log(pos)
     dispatch(addColumnAt(pos)(state.tr))
   }
 
