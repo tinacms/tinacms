@@ -30,7 +30,6 @@ export function markdownForm(
   options: Options
 ): NextPage<MarkdownFormProps> {
   return function MarkdownForm(props: MarkdownFormProps) {
-    console.log(props)
     const { markdownFile } = props
     const [data] = useLocalMarkdownForm(markdownFile, options)
 
