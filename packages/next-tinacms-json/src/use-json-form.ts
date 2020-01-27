@@ -90,7 +90,7 @@ export function useJsonForm<T = any>(
   const writeToDisk = useCallback(formState => {
     cms.api.git.writeToDisk({
       fileRelativePath: jsonFile.fileRelativePath,
-      content: JSON.stringify(formState.values),
+      content: JSON.stringify(formState.values, null, 2),
     })
   }, [])
 
