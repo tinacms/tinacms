@@ -190,16 +190,22 @@ const NODES: Nodes = {
     parent?: Node,
     index?: number
   ) {
-    if (!parent || typeof index !== 'number') return;
+    if (!parent || typeof index !== 'number') return
     for (let i = index + 1; i < parent.childCount; i++)
       if (parent.child(i).type != node.type) {
         state.write('  \n')
         return
       }
   },
-  text(state: MarkdownSerializerState, node: Node) {
+  text(
+    state: MarkdownSerializerState,
+    node: Node,
+    _1,
+    _2,
+    escFn?: (str: string) => string
+  ) {
     if (typeof node.text !== 'string') return
-    state.text(node.text)
+    state.text(node.text, true, escFn)
   },
   table(state: MarkdownSerializerState, node: Node) {
     let inHead = true
@@ -231,21 +237,9 @@ const NODES: Nodes = {
   table_cell(state: MarkdownSerializerState, node: Node) {
     state.write(' ')
     /**
-     * So only in the case of table's are pipes escaped.
-     * Rather then try to refactor the to_markdown.ts file so
-     * that more things can be escaped, I inlined state.renderContent
-     * and assumed it will always render as text, then inlined the
-     * state.text method and added the replacement.
+     * In the case of table's are pipes escaped.
      */
-    node.forEach((n, _, _i) => {
-      const lines = n.text ? n.text.split('\n') : []
-      for (let i = 0; i < lines.length; i++) {
-        const startOfLine = state.atBlank() || state.closed
-        state.write()
-        state.out += state.esc(lines[i], startOfLine).replace(/[\|]/g, '\\$&')
-        if (i != lines.length - 1) state.out += '\n'
-      }
-    })
+    state.renderInline(node, (str: String) => str.replace(/[\|]/g, '\\$&'))
     state.write(' |')
   },
   table_header(state: MarkdownSerializerState, node: Node) {
