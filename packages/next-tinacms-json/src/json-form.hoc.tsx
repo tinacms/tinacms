@@ -17,7 +17,7 @@ import { NextPage } from 'next'
 import { JsonFile, Options } from './use-json-form'
 import { useLocalJsonForm } from './use-local-json-form'
 
-interface JsonFormProps extends Options {
+interface JsonFormProps {
   jsonFile: JsonFile
   data?: any
 }
