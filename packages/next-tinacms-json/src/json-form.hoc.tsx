@@ -19,7 +19,7 @@ import { useLocalJsonForm } from './use-local-json-form'
 
 interface JsonFormProps {
   jsonFile: JsonFile
-  data?: any
+  fileRelativePath: string
 }
 
 /**
@@ -28,11 +28,17 @@ interface JsonFormProps {
 export function jsonForm(
   Component: FC<JsonFormProps>,
   options: Options
-): NextPage<{ jsonFile: JsonFile }> {
+): NextPage<JsonFormProps> {
   return function JsonForm(props: JsonFormProps) {
     const { jsonFile } = props
     const [data] = useLocalJsonForm(jsonFile, options)
 
-    return <Component {...props} {...props.jsonFile} data={data} />
+    return (
+      <Component
+        {...props}
+        fileRelativePath={props.jsonFile.fileRelativePath}
+        jsonFile={data}
+      />
+    )
   }
 }

@@ -29,7 +29,7 @@ export interface InlineJsonFormProps extends Options {
 
 export interface InlineJsonFormRenderProps {
   form: Form
-  data: any
+  jsonFile: JsonFile
   isEditing: boolean
   setIsEditing(value: boolean): void
 }
@@ -44,7 +44,7 @@ export const InlineJsonForm: FC<InlineJsonFormProps> = props => {
         return children({
           ...editingProps,
           form,
-          data,
+          jsonFile: data,
         })
       }}
     </TinaForm>
