@@ -18,6 +18,9 @@ import ReactMarkdown from 'react-markdown'
 import Layout from '../components/Layout'
 
 function Info(props) {
+  /*
+   ** To test the hook
+   */
   // const formOptions = {
   //   label: 'Home Page',
   //   fields: [
@@ -30,7 +33,7 @@ function Info(props) {
   //   ],
   // }
   // const [data] = useLocalMarkdownForm(props.markdownFile, formOptions)
-  console.log('props', props)
+
   const data = props.markdownFile
   return (
     <Layout
