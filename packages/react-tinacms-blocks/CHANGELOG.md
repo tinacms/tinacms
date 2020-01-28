@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.4](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.2.4-alpha.0...react-tinacms-blocks@0.2.4) (2020-01-27)
+
+**Note:** Version bump only for package react-tinacms-blocks
+
+
+
+
+
 ## [0.2.4-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.2.3...react-tinacms-blocks@0.2.4-alpha.0) (2020-01-24)
 
 **Note:** Version bump only for package react-tinacms-blocks

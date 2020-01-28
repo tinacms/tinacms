@@ -32,6 +32,8 @@ import {
   liftListItem,
 } from 'prosemirror-schema-list'
 import { EditorView } from 'prosemirror-view'
+import { findParentNodeOfType } from 'prosemirror-utils'
+import * as TableCommands from 'prosemirror-tables'
 import { liftBlockquote } from '../commands/blockquote-commands'
 import { toggleBulletList, toggleOrderedList } from '../commands/list-commands'
 import { deleteEmptyHeading, toggleHeader } from '../commands/heading-commands'
@@ -62,8 +64,8 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
     command: () => redo,
     unlessMac: true,
   },
-  { __type: 'wysiwyg:keymap', name: 'Tab', command: () => () => true },
-  { __type: 'wysiwyg:keymap', name: 'Shift-Tab', command: () => () => true },
+  { __type: 'wysiwyg:keymap', name: 'Tab', command: () => tab },
+  { __type: 'wysiwyg:keymap', name: 'Shift-Tab', command: () => shiftTab },
   {
     __type: 'wysiwyg:keymap',
     name: 'Mod-b',
@@ -189,25 +191,25 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
     __type: 'wysiwyg:keymap',
     name: 'ArrowLeft',
     command: () => arrowHandler('left'),
-    ifNode: 'code_block',
+    ifNodes: ['code_block', 'table'],
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'ArrowRight',
     command: () => arrowHandler('right'),
-    ifNode: 'code_block',
+    ifNodes: ['code_block', 'table'],
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'ArrowUp',
     command: () => arrowHandler('up'),
-    ifNode: 'code_block',
+    ifNodes: ['code_block', 'table'],
   },
   {
     __type: 'wysiwyg:keymap',
     name: 'ArrowDown',
     command: () => arrowHandler('down'),
-    ifNode: 'code_block',
+    ifNodes: ['code_block', 'table'],
   },
   {
     __type: 'wysiwyg:keymap',
@@ -276,10 +278,33 @@ function arrowHandler(
         state.doc.resolve(side > 0 ? $head.after() : $head.before()),
         side
       )
-      if (nextPos.$head && nextPos.$head.parent.type.name == 'code_block') {
-        dispatch(state.tr.setSelection(nextPos))
-        return true
+      if (nextPos.$head) {
+        const { name } = nextPos.$head.parent.type
+        if (
+          name == 'code_block' ||
+          name === 'table_header' ||
+          name === 'table_cell'
+        ) {
+          dispatch(state.tr.setSelection(nextPos))
+          return true
+        }
       }
+    }
+    return false
+  }
+}
+
+const tab = goToCell(1)
+
+const shiftTab = goToCell(-1)
+
+function goToCell(dir: number) {
+  return (state: EditorState, dispatch: any) => {
+    const { table } = state.schema.nodes
+    const parentTable = findParentNodeOfType(table)(state.selection)
+    if (parentTable) {
+      TableCommands.goToNextCell(1 * dir)(state, dispatch)
+      return true
     }
     return false
   }

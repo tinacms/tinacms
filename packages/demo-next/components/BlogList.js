@@ -16,14 +16,16 @@ limitations under the License.
 
 */
 
-import ReactMarkdown from "react-markdown";
+import ReactMarkdown from 'react-markdown'
 
-const BlogList = (props) => {
-
+const BlogList = props => {
+  console.log(props)
   return (
     <div>
-      <h3>Hi! My name is {props.data.name || 'no name'}</h3>
-      <ReactMarkdown>{props.data.body || 'md body goes here'}</ReactMarkdown>
+      <h3>Hi! My name is {props.data ? props.data.name : 'no name'}</h3>
+      <ReactMarkdown>
+        {props.data ? props.data.body : 'md body goes here'}
+      </ReactMarkdown>
       <style jsx>
         {`
           div {
@@ -39,7 +41,7 @@ const BlogList = (props) => {
         `}
       </style>
     </div>
-  );
-};
+  )
+}
 
-export default BlogList;
+export default BlogList

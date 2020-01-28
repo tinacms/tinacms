@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.0-alpha.0...tinacms@0.12.0) (2020-01-27)
+
+
+### Bug Fixes
+
+* removed unused dependencies from package.json ([0945fed](https://github.com/tinacms/tinacms/commit/0945fed))
+
+
+
+
+
 # [0.12.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3...tinacms@0.12.0-alpha.0) (2020-01-24)
 
 
