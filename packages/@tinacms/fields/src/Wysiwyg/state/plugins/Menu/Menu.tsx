@@ -30,6 +30,7 @@ import {
 import { insertTable } from '../../../commands/table-commands'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
+import { findParentNodeOfType } from 'prosemirror-utils'
 import styled, { css, ThemeProvider } from 'styled-components'
 import {
   BoldIcon,
@@ -191,6 +192,10 @@ function wrapInBlockquote(state: EditorState, dispatch: any) {
   return wrapIn(state.schema.nodes.blockquote)(state, dispatch)
 }
 function insertTableCmd(state: EditorState, dispatch: any) {
+  const { table } = state.schema.nodes
+  const { selection } = state
+  const tableParent = findParentNodeOfType(table)(selection)
+  if (tableParent) return false
   return insertTable(state, dispatch)
 }
 function makeCodeBlock(state: EditorState, dispatch: any) {

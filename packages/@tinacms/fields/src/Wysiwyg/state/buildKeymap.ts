@@ -55,6 +55,8 @@ export function buildKeymap(schema: Schema, plugins: Plugin[]) {
 
     // Exit early if it is for a node type that doesn't exist.
     if (plugin.ifNode && !schema.nodes[plugin.ifNode]) skip = true
+    if (plugin.ifNodes && !plugin.ifNodes.some(n => schema.nodes[n]))
+      skip = true
 
     // Exit if condition not met
     if (plugin.onCondition && !plugin.onCondition(schema)) skip = true
