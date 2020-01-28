@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.1.3](https://github.com/tinacms/tinacms/compare/react-dismissible@1.1.3-alpha.0...react-dismissible@1.1.3) (2020-01-27)
+
+**Note:** Version bump only for package react-dismissible
+
+
+
+
+
 ## [1.1.3-alpha.0](https://github.com/tinacms/tinacms/compare/react-dismissible@1.1.2...react-dismissible@1.1.3-alpha.0) (2020-01-24)
 
 **Note:** Version bump only for package react-dismissible
