@@ -37,6 +37,7 @@ export interface KeymapPlugin {
   command(schema: Schema): any // TODO Command
   ifMark?: string
   ifNode?: string
+  ifNodes?: string[]
   ifMac?: boolean
   unlessMac?: boolean
   onCondition?(schema: Schema): boolean
