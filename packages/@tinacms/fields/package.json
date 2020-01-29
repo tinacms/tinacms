@@ -25,7 +25,8 @@
     "dev": "tinacms-scripts dev",
     "build": "tinacms-scripts build",
     "test": "jest --passWithNoTests",
-    "storybook": "start-storybook -p 9001 -c .storybook"
+    "storybook": "start-storybook -p 9001 -c .storybook",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",

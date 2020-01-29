@@ -25,7 +25,8 @@
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
