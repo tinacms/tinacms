@@ -48,10 +48,11 @@ export class LinkFormController {
   unmount = () => unmountComponentAtNode(this.renderTarget)
 
   component(): any {
+    if (!this.clickTarget) return
     const minWidth = 240
     const left = calcLeftOffset(this.clickTarget!, this.renderTarget, minWidth)
-    const top = `calc(32px + ${this.clickTarget!.offsetTop -
-      this.renderTarget.offsetTop}px)`
+    const top = `calc(32px + ${findElementOffsetTop(this.clickTarget) -
+      findElementOffsetTop(this.renderTarget)}px)`
     const arrowOffset = calcArrowLeftOffset(
       this.clickTarget!,
       this.renderTarget,
@@ -119,6 +120,26 @@ const LinkArrow = styled.div<{ offset: string; top: string }>`
   z-index: 100;
 `
 
+const findElementOffsetTop = (element: HTMLElement) => {
+  let target = element
+  let offsetTop = target.offsetTop
+  while (target.offsetParent) {
+    target = target.offsetParent as HTMLElement
+    offsetTop += target.offsetTop
+  }
+  return offsetTop
+}
+
+const findElementOffsetLeft = (element: HTMLElement) => {
+  let target = element
+  let offsetLeft = target.offsetLeft
+  while (target.offsetParent) {
+    target = target.offsetParent as HTMLElement
+    offsetLeft += target.offsetLeft
+  }
+  return offsetLeft
+}
+
 /**
  * Calculates the leftOffset of the form.
  *
@@ -137,9 +158,9 @@ function calcLeftOffset(
   minWidth: number
 ) {
   const ow_ct = clickTarget.offsetWidth
-  const ol_ct = clickTarget.offsetLeft
+  const ol_ct = findElementOffsetLeft(clickTarget)
   const ow_rt = renderTarget.parentElement!.offsetWidth
-  const ol_rt = renderTarget.offsetLeft
+  const ol_rt = findElementOffsetLeft(renderTarget)
   const ol = ol_ct - ol_rt + ow_ct / 2 - minWidth / 2
 
   const leftEdgeOutsideView = ol < -ol_rt
@@ -161,8 +182,8 @@ function calcArrowLeftOffset(
   _minWidth: number
 ) {
   const ow_ct = clickTarget.offsetWidth
-  const ol_ct = clickTarget.offsetLeft
-  const ol_rt = renderTarget.offsetLeft
+  const ol_ct = findElementOffsetLeft(clickTarget)
+  const ol_rt = findElementOffsetLeft(renderTarget)
   const ol = ol_ct - ol_rt + ow_ct / 2
   return `${ol}px`
 }
