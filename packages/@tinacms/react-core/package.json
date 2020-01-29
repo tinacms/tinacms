@@ -13,7 +13,8 @@
     "build": "tsdx build",
     "dev": "tsdx build",
     "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint"
+    "lint": "tsdx lint",
+    "docs": "npx typedoc"
   },
   "dependencies": {
     "@tinacms/core": "^0.7.0",
