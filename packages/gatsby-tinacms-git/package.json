@@ -31,7 +31,8 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "tsc",
-    "build": "tsc"
+    "build": "tsc",
+    "docs": "npx typedoc"
   },
   "dependencies": {
     "@tinacms/api-git": "^0.5.4",
