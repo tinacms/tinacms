@@ -21,6 +21,7 @@ import { EditorView } from 'prosemirror-view'
 
 import FloatingTableDeleteMenu from './FloatingTableDeleteMenu'
 import FloatingTableAddMenu from './FloatingTableAddMenu'
+import TableOptionsMenu from './TableOptionsMenu'
 
 interface FloatingTableMenuProps {
   view: EditorView
@@ -32,6 +33,7 @@ export const FloatingTableMenu = (props: FloatingTableMenuProps) => {
     <>
       <FloatingTableDeleteMenu {...props} />
       <FloatingTableAddMenu {...props} />
+      <TableOptionsMenu {...props} />
     </>
   )
 }
