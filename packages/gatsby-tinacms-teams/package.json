@@ -29,7 +29,8 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "tsc",
-    "build": "tsc"
+    "build": "tsc",
+    "docs": "npx typedoc"
   },
   "dependencies": {
     "@tinacms/teams": "^0.2.0",

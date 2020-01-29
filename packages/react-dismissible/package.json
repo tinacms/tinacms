@@ -23,7 +23,8 @@
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
     "@testing-library/react": "^9.1.4",

@@ -14,7 +14,8 @@
     "build": "tsdx build",
     "dev": "tsdx build",
     "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint"
+    "lint": "tsdx lint",
+    "docs": "npx typedoc"
   },
   "peerDependencies": {
     "next": ">=9",
