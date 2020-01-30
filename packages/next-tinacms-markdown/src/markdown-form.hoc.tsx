@@ -14,12 +14,14 @@ limitations under the License.
 import React from 'react'
 import { FC } from 'react'
 import { NextPage } from 'next'
+import { Form } from 'tinacms'
 import { MarkdownFile, Options } from './use-markdown-form'
 import { useLocalMarkdownForm } from './use-local-markdown-form'
 
 interface MarkdownFormProps {
   markdownFile: MarkdownFile
   fileRelativePath: string
+  form: Form
 }
 
 /**
@@ -31,13 +33,14 @@ export function markdownForm(
 ): NextPage<MarkdownFormProps> {
   return function MarkdownForm(props: MarkdownFormProps) {
     const { markdownFile } = props
-    const [data] = useLocalMarkdownForm(markdownFile, options)
+    const [data, form] = useLocalMarkdownForm(markdownFile, options)
 
     return (
       <Component
         {...props}
         fileRelativePath={props.markdownFile.fileRelativePath}
         markdownFile={data}
+        form={form}
       />
     )
   }
