@@ -34,7 +34,7 @@ export function inlineJsonForm(
 ): NextPage<{ jsonFile: JsonFile }> {
   return props => {
     return (
-      <InlineJsonForm jsonFile={props.jsonFile} {...options}>
+      <InlineJsonForm {...props} jsonFile={props.jsonFile} {...options}>
         {inlineProps => {
           return <Component {...inlineProps} />
         }}
