@@ -42,42 +42,47 @@ export const Sidebar = () => {
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
+  const allScreens = cms.screens.all();
+  const showMenu = allScreens.length > 0;
 
   return (
     <SidebarContainer open={cms.sidebar.isOpen}>
       <SidebarWrapper open={cms.sidebar.isOpen}>
         <SidebarHeader>
-          <MenuToggle
-            onClick={() => setMenuVisibility(!menuIsVisible)}
-            open={menuIsVisible}
-          >
-            <HamburgerIcon />
-          </MenuToggle>
+          {showMenu && (
+            <MenuToggle
+              onClick={() => setMenuVisibility(!menuIsVisible)}
+              open={menuIsVisible}
+            >
+              <HamburgerIcon />
+            </MenuToggle>
+          )}
           <CreateContentMenu />
         </SidebarHeader>
         <FormsView />
-
-        <MenuPanel visible={menuIsVisible}>
-          <MenuWrapper>
-            <MenuList>
-              {cms.screens.all().map(view => {
-                const Icon = view.Icon
-                return (
-                  <MenuLink
-                    value={view.name}
-                    onClick={() => {
-                      setActiveView(view)
-                      setMenuVisibility(false)
-                    }}
-                  >
-                    <Icon /> {view.name}
-                  </MenuLink>
-                )
-              })}
-            </MenuList>
-          </MenuWrapper>
-          <Watermark />
-        </MenuPanel>
+        {showMenu && (
+          <MenuPanel visible={menuIsVisible}>
+            <MenuWrapper>
+              <MenuList>
+                {allScreens.map(view => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuLink
+                      value={view.name}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuVisibility(false)
+                      }}
+                    >
+                      <Icon /> {view.name}
+                    </MenuLink>
+                  )
+                })}
+              </MenuList>
+            </MenuWrapper>
+            <Watermark />
+          </MenuPanel>
+        )}
         {ActiveView && (
           <ActiveViewModal
             name={ActiveView.name}
