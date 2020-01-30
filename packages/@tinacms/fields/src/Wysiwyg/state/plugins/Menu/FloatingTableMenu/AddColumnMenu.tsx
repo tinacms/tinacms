@@ -55,7 +55,14 @@ export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
       >
         {hovered ? (
           <IconWrapperCol>
-            <IconButton onClick={() => addColumn(index)} small primary>
+            <IconButton
+              onClick={() => {
+                addColumn(index)
+                setHovered(false)
+              }}
+              small
+              primary
+            >
               <AddIcon />
             </IconButton>
           </IconWrapperCol>
