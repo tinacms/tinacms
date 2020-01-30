@@ -17,18 +17,21 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Tina, TinaCMS } from 'tinacms'
+import {Tina, TinaCMS} from 'tinacms'
 
 exports.wrapRootElement = ({ element }: any, options: any) => {
-  return (
-    <Tina cms={window.tinacms} {...options.sidebar}>
-      {element}
-    </Tina>
-  )
+    if (options.manualInit) {
+        return element;
+    }
+    return (
+        <Tina cms={window.tinacms}>
+            {element}
+        </Tina>
+    )
 }
 
 declare let window: any
 
-exports.onClientEntry = (..._args: any[]) => {
-  window.tinacms = new TinaCMS()
+exports.onClientEntry = (_: null, pluginOptions: any) => {
+    window.tinacms = new TinaCMS(pluginOptions)
 }
