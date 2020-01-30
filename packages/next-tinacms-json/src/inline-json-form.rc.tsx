@@ -43,7 +43,6 @@ export const InlineJsonForm: FC<InlineJsonFormProps> = props => {
       {editingProps => {
         return children({
           ...editingProps,
-          ...props,
           form,
           jsonFile: data,
         })
