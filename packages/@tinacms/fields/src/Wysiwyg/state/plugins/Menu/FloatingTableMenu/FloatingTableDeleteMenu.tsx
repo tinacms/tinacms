@@ -54,7 +54,10 @@ export default (props: FloatingTableDeleteMenuProps) => {
         ReactDOM.createPortal(
           <IconWrapperCol>
             <IconButton
-              onClick={() => deleteColumn(state, dispatch)}
+              onClick={() => {
+                deleteColumn(state, dispatch)
+                props.view.focus()
+              }}
               small
               primary
             >
@@ -67,7 +70,10 @@ export default (props: FloatingTableDeleteMenuProps) => {
         ReactDOM.createPortal(
           <IconWrapperRow>
             <IconButton
-              onClick={() => deleteRow(state, dispatch)}
+              onClick={() => {
+                deleteRow(state, dispatch)
+                props.view.focus()
+              }}
               small
               primary
             >
