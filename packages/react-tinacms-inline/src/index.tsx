@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-console.log('dummy')
+export * from './inline-form'
