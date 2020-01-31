@@ -17,6 +17,8 @@
   },
   "peerDependencies": {
     "react": ">=16.8",
+    "react-final-form": "^>=6",
+    "styled-components": ">=4.1",
     "tinacms": ">=0.10"
   },
   "devDependencies": {
