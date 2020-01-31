@@ -34,10 +34,15 @@ interface TableOptionsMenu {
   view: EditorView
 }
 
-const alignColumn = (view: EditorView, align: string) => {
+const alignColumn = (view: EditorView, alignValue: string) => {
   const { state, dispatch } = view
   const { selection } = state
-  const { table } = state.schema.nodes
+  const { table, table_cell, table_header } = state.schema.nodes
+  const tableCell = findParentNodeOfType(table_cell)(state.selection)
+  const tableHeader = findParentNodeOfType(table_header)(state.selection)
+  const cellNode = tableCell || tableHeader
+  if (!cellNode) return
+  const align = cellNode.node.attrs.align === alignValue ? undefined : alignValue
   const tableNode = findParentNodeOfType(table)(state.selection)
   if (!tableNode) return
   const tableMap = TableMap.get(tableNode.node)
