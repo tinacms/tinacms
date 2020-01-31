@@ -52,12 +52,14 @@ const alignColumn = (view: EditorView, align: string) => {
       setCellAttrs(cell, { align })(tr)
     )(state.tr)
   )
+  view.focus()
 }
 
 export default ({ view }: TableOptionsMenu) => {
   const deleteSelectedTable = () => {
     const { state, dispatch } = view
     deleteTable(state, dispatch)
+    view.focus()
   }
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left'
