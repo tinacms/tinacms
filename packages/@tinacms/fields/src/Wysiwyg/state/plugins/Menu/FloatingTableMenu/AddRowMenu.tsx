@@ -19,7 +19,7 @@ limitations under the License.
 import React, { useEffect, useState, HTMLAttributes } from 'react'
 import * as ReactDOM from 'react-dom'
 import { EditorView } from 'prosemirror-view'
-import { addRowAt } from 'prosemirror-utils'
+import { cloneRowAt } from 'prosemirror-utils'
 import { AddIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
 import styled from 'styled-components'
@@ -37,7 +37,7 @@ interface AddRowMenuProps {
 export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
   const { state, dispatch } = view
   const addRow = (pos: number) => {
-    dispatch(addRowAt(pos)(state.tr))
+    dispatch(cloneRowAt(pos - 1)(state.tr))
     view.focus()
   }
 
