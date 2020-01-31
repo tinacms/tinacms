@@ -14,9 +14,22 @@ gallery:
         - {}
 draft: false
 ---
-## Table
+## Fun with Flags
 
-|  |  |  |
-| --- | --- | --- |
-|  |  |  |
-|  |  |  |
+| Name | Based in |
+| :---: | :---: |
+| Dan | 🇺🇸 |
+| DJ | 🇺🇸 |
+| Frank | 🇫🇷 |
+| Greg | 🇨🇦 |
+| James | 🇨🇦 |
+| Jeff | 🇺🇸 |
+| Joel | 🇨🇦 |
+| Jordan | 🇨🇦 |
+| Jyoti | 🇮🇳 |
+| Kayla | 🇨🇦 |
+| Kendall | 🇺🇸 |
+| Mitch | 🇨🇦 |
+| Nolan | 🇨🇦 |
+| Sam | 🇨🇦 |
+| Scott | 🇺🇸 |
