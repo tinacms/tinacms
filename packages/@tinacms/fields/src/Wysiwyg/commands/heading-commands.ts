@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { EditorState, Selection, TextSelection } from 'prosemirror-state'
+import { EditorState, TextSelection } from 'prosemirror-state'
 import { NodeType, Node } from 'prosemirror-model'
 import { EditorView } from 'prosemirror-view'
 
