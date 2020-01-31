@@ -36,7 +36,8 @@ export function inlineJsonForm(
     return (
       <InlineJsonForm jsonFile={props.jsonFile} {...options}>
         {inlineProps => {
-          return <Component {...inlineProps} />
+          const combinedProps = {...props, ...inlineProps}
+          return <Component {...combinedProps} />
         }}
       </InlineJsonForm>
     )
