@@ -15,9 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { BlockTemplate } from 'tinacms'
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-text'
-export * from './inline-field-blocks'
-export * from './block'
+/**
+ * Blocks consist of a `template` and a `Component`
+ */
+export interface Block {
+  Component: React.FC<BlockComponentProps>
+  template: BlockTemplate
+}
+
+export interface BlockComponentProps {
+  index: number
+  data: any
+}
