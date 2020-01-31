@@ -1,11 +1,137 @@
-import * as React from 'react'
-import { Form } from 'tinacms'
-import { useJsonForm } from 'next-tinacms-json'
-import { FormBuilder, FormBuilderProps } from '@tinacms/form-builder'
-import { Field, FormRenderProps, FieldRenderProps } from 'react-final-form'
+/**
 
+Copyright 2019 Forestry.io Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+*/
+
+import * as React from 'react'
+import { useJsonForm } from 'next-tinacms-json'
+import { ModalProvider, BlockTemplate } from 'tinacms'
+import {
+  InlineForm,
+  InlineTextField,
+  InlineBlocks,
+  BlocksControls,
+  BlockText,
+  useInlineForm,
+} from 'react-tinacms-inline'
+
+/**
+ * This is an example page that uses Blocks from Json
+ */
+export default function BlocksExample({ jsonFile }) {
+  const [, form] = useJsonForm(jsonFile)
+
+  if (!form) return null
+
+  return (
+    <ModalProvider>
+      <InlineForm form={form}>
+        <EditToggle />
+        <DiscardChanges />
+        <h1>
+          <InlineTextField name="title" />
+        </h1>
+        <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
+      </InlineForm>
+    </ModalProvider>
+  )
+}
+
+/**
+ * CallToAction template + Component
+ */
+const cta_template: BlockTemplate = {
+  type: 'cta',
+  label: 'Call to Action',
+  defaultItem: { url: '', text: 'Signup!' },
+  key: undefined,
+  fields: [
+    { name: 'text', label: 'Text', component: 'text' },
+    { name: 'url', label: 'URL', component: 'text' },
+  ],
+}
+
+function CallToActionBlock({ data, index }) {
+  return (
+    <BlocksControls index={index}>
+      <button
+        onClick={() => window.open(data.url, '_blank')}
+        style={{ display: 'block', background: 'pink' }}
+      >
+        {data.text}
+      </button>
+    </BlocksControls>
+  )
+}
+
+/**
+ * Hero template + Component
+ */
+const hero_template: BlockTemplate = {
+  type: 'hero',
+  label: 'Hero',
+  defaultItem: { text: 'Spiderman' },
+  key: undefined,
+  fields: [],
+}
+
+function HeroBlock({ index }) {
+  return (
+    <BlocksControls index={index}>
+      <h2>
+        My Hero: <BlockText name="text" />
+      </h2>
+    </BlocksControls>
+  )
+}
+
+/**
+ * This is the Blocks lookup that was passed to `<InlineBlocks>` in the
+ * main `BlocksExample` component.
+ */
+const PAGE_BUILDER_BLOCKS = {
+  cta: {
+    Component: CallToActionBlock,
+    template: cta_template,
+  },
+  hero: {
+    Component: HeroBlock,
+    template: hero_template,
+  },
+}
+
+/**
+ * EVERYTHING BELOW HERE IS NOT IMPORTANT TO UNDERSTANDING BLOCKS
+ */
+
+BlocksExample.getInitialProps = async function() {
+  const blocksData = await import(`../data/blocks.json`)
+  return {
+    jsonFile: {
+      fileRelativePath: `data/blocks.json`,
+      data: blocksData.default,
+    },
+  }
+}
+
+/**
+ * Toggle
+ */
 function EditToggle() {
-  const { status, deactivate, activate } = React.useContext(InlineFormContext)
+  const { status, deactivate, activate } = useInlineForm()
 
   return (
     <button
@@ -17,131 +143,17 @@ function EditToggle() {
     </button>
   )
 }
-/**
- * This is an example page that uses Blocks from Json
- */
-export default function BlocksExample({ jsonFile }) {
-  const [, form] = useJsonForm(jsonFile)
 
-  if (!form) return null
+function DiscardChanges() {
+  const { form } = useInlineForm()
 
   return (
-    // TODO: Allow regular children
-    <InlineForm form={form}>
-      {() => (
-        <>
-          <EditToggle />
-          <h1>
-            <InlineTextField name="title" />
-          </h1>
-        </>
-      )}
-    </InlineForm>
-  )
-}
-
-BlocksExample.getInitialProps = async function() {
-  const blocksData = await import(`../data/blocks.json`)
-  return {
-    jsonFile: {
-      fileRelativePath: `data/index.json`,
-      data: blocksData.default,
-    },
-  }
-}
-
-/**
- * InlineForm
- *
- * Sets up a FinaForm context and tracks the state of the form.
- */
-interface InlineFormProps {
-  form: Form
-  children(
-    props: FormRenderProps &
-      Pick<InlineFormState, 'activate' | 'deactivate' | 'status'>
-  ): any
-}
-
-interface InlineFormState {
-  form: Form
-  status: InlineFormStatus
-  activate(): void
-  deactivate(): void
-}
-type InlineFormStatus = 'active' | 'inactive'
-
-function InlineForm({ form, children }: InlineFormProps) {
-  const [status, setStatus] = React.useState<InlineFormStatus>('inactive')
-
-  const inlineFormState = React.useMemo(() => {
-    return {
-      form,
-      status,
-      activate: () => setStatus('active'),
-      deactivate: () => setStatus('inactive'),
-    }
-  }, [form, status])
-
-  return (
-    <InlineFormContext.Provider value={inlineFormState}>
-      <FormBuilder form={form}>
-        {formProps =>
-          // @ts-ignore
-          children({
-            ...inlineFormState,
-            ...formProps,
-          })
-        }
-      </FormBuilder>
-    </InlineFormContext.Provider>
-  )
-}
-
-const InlineFormContext = React.createContext<InlineFormState | null>(null)
-
-/**
- *
- */
-interface InlineFieldProps {
-  name: string
-  children(fieldProps: InlineFieldRenderProps): React.ReactElement
-}
-
-interface InlineFieldRenderProps<V = any>
-  extends Partial<FieldRenderProps<V>>,
-    InlineFormState {}
-
-function InlineField({ name, children }: InlineFieldProps) {
-  const formState = React.useContext(InlineFormContext)
-
-  return (
-    <Field name={name}>
-      {fieldProps => {
-        return children({
-          ...fieldProps,
-          ...formState,
-        })
+    <button
+      onClick={() => {
+        form.finalForm.reset()
       }}
-    </Field>
-  )
-}
-
-/**
- * InlineTextField
- */
-interface InlineTextFieldProps {
-  name: string
-}
-function InlineTextField({ name }: InlineTextFieldProps) {
-  return (
-    <InlineField name={name}>
-      {({ input, status }) => {
-        if (status === 'active') {
-          return <input type="text" {...input} />
-        }
-        return <>{input.value}</>
-      }}
-    </InlineField>
+    >
+      Discard Changes
+    </button>
   )
 }
