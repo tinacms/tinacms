@@ -27,6 +27,7 @@
     "prop-types": "^15.7.2",
     "raw-loader": "^3.0.0",
     "react-markdown": "^4.1.0",
+    "react-tinacms-inline": "^0.0.0",
     "tinacms": "^0.12.0",
     "webpack": "^4.41.5"
   },
