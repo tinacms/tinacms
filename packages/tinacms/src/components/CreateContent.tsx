@@ -44,7 +44,7 @@ export const CreateContentMenu = () => {
   const cms = useCMS()
   const [visible, setVisible] = React.useState(false)
 
-  const contentCreatorPlugins = cms.plugins.findOrCreateMap('content-creator')
+  const contentCreatorPlugins = cms.plugins['content-creator']
 
   useSubscribable(contentCreatorPlugins)
 

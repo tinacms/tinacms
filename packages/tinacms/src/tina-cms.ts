@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
+import { CMS, CMSConfig, PluginCollection, Subscribable } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -51,15 +51,15 @@ export class TinaCMS extends CMS {
   }
 
   get forms() {
-    return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
+    return this.plugins.forms as PluginCollection<Form & { __type: string }>
   }
 
-  get fields(): PluginType<FieldPlugin> {
-    return this.plugins.findOrCreateMap('field')
+  get fields() {
+    return this.plugins.field as PluginCollection<FieldPlugin>
   }
 
-  get screens(): PluginType<ScreenPlugin> {
-    return this.plugins.findOrCreateMap('screen')
+  get screens() {
+    return this.plugins.screen as PluginCollection<ScreenPlugin>
   }
 }
 

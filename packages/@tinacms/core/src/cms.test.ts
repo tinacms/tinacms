@@ -32,7 +32,7 @@ describe('CMS', () => {
         plugins: [p],
       })
       expect(cms).toBeInstanceOf(CMS)
-      expect(cms.plugins.all('test')).toContain(p)
+      expect(cms.plugins.test.all()).toContain(p)
     })
   })
   describe('When configured with an api', () => {

@@ -45,14 +45,14 @@ export function usePlugins(plugins?: Plugin | Plugin[]) {
   React.useEffect(() => {
     pluginArray.forEach(plugin => {
       if (plugin) {
-        cms.plugins.add(plugin);
+        cms.plugins[plugin.__type].add(plugin)
       }
     })
 
     return () => {
       pluginArray.forEach(plugin => {
         if (plugin) {
-          cms.plugins.remove(plugin);
+          cms.plugins[plugin.__type].remove(plugin)
         }
       })
     }

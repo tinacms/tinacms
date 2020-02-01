@@ -63,10 +63,9 @@ cms.api.github
 ```ts
 import github from 'my-github-client'
 
-cms.plugins.add({
-  __type: 'some-plugin',
+cms.plugins['some-plugin'].add({
   some: 'value',
 })
 
-cms.plugins.all('some-plugin') // [{ __type: 'some-plugin', some: 'value' }]
+cms.plugins['some-plugin'].all() // [{ __type: 'some-plugin', some: 'value' }]
 ```

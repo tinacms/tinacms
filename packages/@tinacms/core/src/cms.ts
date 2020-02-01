@@ -23,7 +23,7 @@ limitations under the License.
  * @packageDocumentation
  */
 
-import { Plugin, PluginTypeManager } from './plugins'
+import { Plugin, PluginCollection } from './plugins'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -77,7 +77,7 @@ export class CMS {
    * [[Plugin|Plugins]] are used to extend or modify the CMSs feature set.
    *
    */
-  plugins: PluginTypeManager
+  plugins: { [key: string]: PluginCollection }
 
   /**
    * The set of APIs registered with the CMS.
@@ -108,14 +108,19 @@ export class CMS {
    * @hidden
    */
   constructor(config: CMSConfig | null = null) {
-    this.plugins = new PluginTypeManager()
+    this.plugins = createPluginProxy()
 
     if (config && config.plugins) {
-      config.plugins.forEach(plugin => this.plugins.add(plugin))
+      config.plugins.forEach(plugin => {
+        const plugins = this.plugins[plugin.__type]
+        plugins.add(plugin)
+      })
     }
 
     if (config && config.apis) {
-      Object.entries(config.apis).forEach(([name, api]) => this.registerApi(name, api))
+      Object.entries(config.apis).forEach(([name, api]) =>
+        this.registerApi(name, api)
+      )
     }
   }
 
@@ -138,4 +143,21 @@ export class CMS {
     // TODO: Make sure we're not overwriting an existing API.
     this.api[name] = api
   }
+}
+
+function createPluginProxy() {
+  const plugins = {} as { [key: string]: PluginCollection }
+
+  return new Proxy(plugins, {
+    get<T extends Plugin = Plugin>(
+      plugins: { [key: string]: PluginCollection },
+      pluginType: string | symbol | number
+    ) {
+      if (typeof pluginType === 'string') {
+        return (plugins[pluginType] =
+          plugins[pluginType] || new PluginCollection<T>(pluginType))
+      }
+      return undefined
+    },
+  })
 }
