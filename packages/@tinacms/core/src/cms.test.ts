@@ -19,33 +19,31 @@ limitations under the License.
 import { CMS } from './cms'
 
 describe('CMS', () => {
-    describe('When instantiated with no arguments', () => {
-        it('instantiates without error', () => {
-            const cms = new CMS()
-            expect(cms).toBeInstanceOf(CMS)
-        })
+  describe('When instantiated with no arguments', () => {
+    it('instantiates without error', () => {
+      const cms = new CMS()
+      expect(cms).toBeInstanceOf(CMS)
     })
-    describe('When configured with a plugin', () => {
-        it('instantiates with the plugin', () => {
-            const p =  { __type: 'test', name: 'Example' }
-            const cms = new CMS({
-                plugins: [
-                   p
-                ]
-            })
-            expect(cms).toBeInstanceOf(CMS)
-            expect(cms.plugins.all('test')).toContain(p)
-        })
+  })
+  describe('When configured with a plugin', () => {
+    it('instantiates with the plugin', () => {
+      const p = { __type: 'test', name: 'Example' }
+      const cms = new CMS({
+        plugins: [p],
+      })
+      expect(cms).toBeInstanceOf(CMS)
+      expect(cms.plugins.all('test')).toContain(p)
     })
-    describe('When configured with an api', () => {
-        it('instantiates with the api', () => {
-            const cms = new CMS({
-                apis: {
-                    test: { foo: 'bar' }
-                }
-            })
-            expect(cms).toBeInstanceOf(CMS)
-            expect(cms.api.test).toHaveProperty('foo')
-        })
+  })
+  describe('When configured with an api', () => {
+    it('instantiates with the api', () => {
+      const cms = new CMS({
+        apis: {
+          test: { foo: 'bar' },
+        },
+      })
+      expect(cms).toBeInstanceOf(CMS)
+      expect(cms.api.test).toHaveProperty('foo')
     })
+  })
 })
