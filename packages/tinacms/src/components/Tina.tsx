@@ -24,10 +24,10 @@ import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
+import {SidebarPosition} from "@tinacms/core";
 
 const merge = require('lodash.merge')
 
-export type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
 export interface TinaProps {
   cms: TinaCMS
