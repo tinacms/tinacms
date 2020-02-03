@@ -27,7 +27,6 @@ import {
   findParentNodeOfType,
   forEachCellInColumn,
   setCellAttrs,
-  getSelectionRect,
 } from 'prosemirror-utils'
 
 interface FloatingTableDeleteMenuProps {

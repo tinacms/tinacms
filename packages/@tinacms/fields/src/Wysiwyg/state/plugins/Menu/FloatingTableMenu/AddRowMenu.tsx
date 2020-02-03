@@ -19,7 +19,12 @@ limitations under the License.
 import React, { useEffect, useState, HTMLAttributes } from 'react'
 import * as ReactDOM from 'react-dom'
 import { EditorView } from 'prosemirror-view'
-import { addRowAt } from 'prosemirror-utils'
+import { TableMap } from 'prosemirror-tables'
+import {
+  addRowAt,
+  findParentNodeOfType,
+  getCellsInRow,
+} from 'prosemirror-utils'
 import { AddIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
 import styled from 'styled-components'
@@ -38,6 +43,19 @@ export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
   const { state, dispatch } = view
   const addRow = (pos: number) => {
     if (pos > 1) dispatch(addRowAt(pos, true)(state.tr))
+    else {
+      const { table, table_cell, table_row } = state.schema.nodes
+      const tableNode = findParentNodeOfType(table)(state.selection)
+      if (!tableNode) return
+      const tableMap = TableMap.get(tableNode.node)
+      const position = tableNode.start + tableMap.map[tableMap.width] - 1
+      const cellInNextRow = getCellsInRow(0)(state.selection)
+      if (!cellInNextRow) return
+      const cells = cellInNextRow?.map(cell =>
+        table_cell.createAndFill({ ...cell.node.attrs })
+      )
+      dispatch(state.tr.insert(position, table_row.create(null, cells)))
+    }
     view.focus()
   }
 
