@@ -83,7 +83,6 @@ export class LinkForm extends React.Component<Props, State> {
         <LinkLabel>Title</LinkLabel>
         <LinkInput
           placeholder="Enter Title"
-          autoFocus
           type={'text'}
           value={title}
           onChange={this.setTitle}
