@@ -19,7 +19,6 @@ limitations under the License.
 import ReactMarkdown from 'react-markdown'
 
 const BlogList = props => {
-  console.log(props)
   return (
     <div>
       <h3>Hi! My name is {props.data ? props.data.name : 'no name'}</h3>
