@@ -16,7 +16,7 @@
 
  */
 
-import {CMS, CMSConfig, PluginType, Subscribable} from '@tinacms/core'
+import {CMS, CMSConfig, PluginType, SidebarPosition, Subscribable} from '@tinacms/core'
 import {FieldPlugin} from '@tinacms/form-builder'
 import {ScreenPlugin} from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -31,14 +31,13 @@ import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import {Form} from '@tinacms/forms'
-import {SidebarPosition} from "./components/Tina";
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
 
-  constructor(config: CMSConfig | null = null) {
+  constructor(config: CMSConfig) {
     super(config)
-    // @ts-ignore
+
     this.sidebar = new SidebarState(config.sidebar.position)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
@@ -67,13 +66,11 @@ export class TinaCMS extends CMS {
 }
 
 export class SidebarState extends Subscribable {
-  constructor(position: SidebarPosition) {
-    super();
-    this._position = position;
+  constructor(public position: SidebarPosition) {
+    super()
   }
 
   private _isOpen: boolean = false
-  private _position: SidebarPosition;
 
   get isOpen() {
     return this._isOpen
@@ -82,9 +79,5 @@ export class SidebarState extends Subscribable {
   set isOpen(nextValue: boolean) {
     this._isOpen = nextValue
     this.notifiySubscribers()
-  }
-
-  get position(): "fixed" | "float" | "displace" | "overlay" {
-    return this._position;
   }
 }
