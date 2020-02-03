@@ -15,31 +15,31 @@ import React from 'react'
 import { FC } from 'react'
 import { NextPage } from 'next'
 import { Form } from 'tinacms'
-import { JsonFile, Options } from './use-json-form'
-import { useLocalJsonForm } from './use-local-json-form'
+import { MarkdownFile, Options } from './use-markdown-form'
+import { useLocalMarkdownForm } from './use-local-markdown-form'
 
-interface JsonFormProps {
-  jsonFile: JsonFile
+interface MarkdownFormProps {
+  markdownFile: MarkdownFile
   fileRelativePath: string
   form: Form
 }
 
 /**
- * jsonForm HOC
+ * markdownForm HOC
  */
-export function jsonForm(
-  Component: FC<JsonFormProps>,
+export function markdownForm(
+  Component: FC<MarkdownFormProps>,
   options: Options
-): NextPage<JsonFormProps> {
-  return function JsonForm(props: JsonFormProps) {
-    const { jsonFile } = props
-    const [data, form] = useLocalJsonForm(jsonFile, options)
+): NextPage<MarkdownFormProps> {
+  return function MarkdownForm(props: MarkdownFormProps) {
+    const { markdownFile } = props
+    const [data, form] = useLocalMarkdownForm(markdownFile, options)
 
     return (
       <Component
         {...props}
-        fileRelativePath={props.jsonFile.fileRelativePath}
-        jsonFile={data}
+        fileRelativePath={props.markdownFile.fileRelativePath}
+        markdownFile={data}
         form={form}
       />
     )

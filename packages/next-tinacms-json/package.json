@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-json",
-  "version": "0.2.1-alpha.0",
+  "version": "0.3.0",
   "license": "Apache-2.0",
   "author": "Nolan Phillips",
   "main": "dist/index.js",
@@ -23,6 +23,6 @@
   },
   "devDependencies": {
     "@types/jest": "^24.0.25",
-    "tinacms": "^0.12.1-alpha.0"
+    "tinacms": "^0.12.1"
   }
 }
