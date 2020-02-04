@@ -41,7 +41,8 @@ const alignColumn = (view: EditorView, alignValue: string) => {
   const tableHeader = findParentNodeOfType(table_header)(state.selection)
   const cellNode = tableCell || tableHeader
   if (!cellNode) return
-  const align = cellNode.node.attrs.align === alignValue ? undefined : alignValue
+  const align =
+    cellNode.node.attrs.align === alignValue ? undefined : alignValue
   const tableNode = findParentNodeOfType(table)(state.selection)
   if (!tableNode) return
   const tableMap = TableMap.get(tableNode.node)
@@ -53,7 +54,7 @@ const alignColumn = (view: EditorView, alignValue: string) => {
   const columnPos = cellPos % tableMap.width
   dispatch(
     forEachCellInColumn(columnPos, (cell, tr) => {
-      return setCellAttrs(cell, { align })(tr);
+      return setCellAttrs(cell, { align })(tr)
     })(state.tr)
   )
   view.focus()
@@ -84,13 +85,25 @@ export default (props: FloatingTableDeleteMenuProps) => {
       {markerDivCol &&
         ReactDOM.createPortal(
           <IconWrapperCol>
-            <IconButton onClick={() => alignColumn(props.view, 'left')} small primary>
+            <IconButton
+              onClick={() => alignColumn(props.view, 'left')}
+              small
+              primary
+            >
               <AlignLeft />
             </IconButton>
-            <IconButton onClick={() => alignColumn(props.view, 'center')} small primary>
+            <IconButton
+              onClick={() => alignColumn(props.view, 'center')}
+              small
+              primary
+            >
               <AlignCenter />
             </IconButton>
-            <IconButton onClick={() => alignColumn(props.view, 'right')} small primary>
+            <IconButton
+              onClick={() => alignColumn(props.view, 'right')}
+              small
+              primary
+            >
               <AlignRight />
             </IconButton>
             <IconButton
@@ -135,7 +148,6 @@ const IconWrapperCol = styled.span`
   button:not(:first-of-type) {
     margin-left: 10px;
   }
-
 `
 
 const IconWrapperRow = styled.span`
