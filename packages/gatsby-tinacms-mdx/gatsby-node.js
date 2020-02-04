@@ -36,7 +36,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type }) => {
       rawMarkdownBody: {
         type: GraphQLString,
         resolve: source => {
-          return JSON.stringify(source.rawBody)
+          return source.rawBody.replace(new RegExp(/^---[\s\S]*---[\n\r]*/), '')
         }
       },
       fileRelativePath: {
