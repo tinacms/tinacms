@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 
-import FloatingTableDeleteMenu from './FloatingTableDeleteMenu'
+import FloatingTableColumnMenu from './FloatingTableColumnMenu'
 import FloatingTableAddMenu from './FloatingTableAddMenu'
 import TableOptionsMenu from './TableOptionsMenu'
 
@@ -28,10 +28,9 @@ interface FloatingTableMenuProps {
 }
 
 export const FloatingTableMenu = (props: FloatingTableMenuProps) => {
-  
   return (
     <>
-      <FloatingTableDeleteMenu {...props} />
+      <FloatingTableColumnMenu {...props} />
       <FloatingTableAddMenu {...props} />
       <TableOptionsMenu {...props} />
     </>
