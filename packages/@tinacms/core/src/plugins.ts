@@ -264,7 +264,7 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
     }
 
     this.__plugins[p.name] = p
-    this.notifiySubscribers()
+    this.notifySubscribers()
   }
 
   all(): T[] {
@@ -306,7 +306,7 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
     const plugin = this.__plugins[name]
 
     delete this.__plugins[name]
-    this.notifiySubscribers()
+    this.notifySubscribers()
 
     return plugin
   }

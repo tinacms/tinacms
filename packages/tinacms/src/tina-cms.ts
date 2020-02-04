@@ -72,6 +72,6 @@ export class SidebarState extends Subscribable {
 
   set isOpen(nextValue: boolean) {
     this._isOpen = nextValue
-    this.notifiySubscribers()
+    this.notifySubscribers()
   }
 }

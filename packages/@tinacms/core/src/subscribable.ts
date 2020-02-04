@@ -96,7 +96,7 @@ export class Subscribable {
    * cup.empty() // Logs: false
    * ```
    */
-  protected notifiySubscribers() {
+  protected notifySubscribers() {
     // TODO: Catch and log errors.
     this.__subscribers.forEach(cb => cb())
   }

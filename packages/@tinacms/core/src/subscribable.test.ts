@@ -20,7 +20,7 @@ import { Subscribable } from './subscribable'
 
 class Example extends Subscribable {
   notify() {
-    this.notifiySubscribers()
+    this.notifySubscribers()
   }
 }
 
