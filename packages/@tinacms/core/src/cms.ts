@@ -23,7 +23,7 @@ limitations under the License.
  * @packageDocumentation
  */
 
-import {Plugin, PluginTypeManager} from './plugins'
+import { Plugin, PluginTypeManager } from './plugins'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -65,12 +65,7 @@ import {Plugin, PluginTypeManager} from './plugins'
  * cms.colors.all()
  * ```
  */
-export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay';
 export interface CMSConfig {
-  sidebar: {
-    hidden: boolean
-    position: SidebarPosition
-  }
   plugins?: Array<Plugin>
   apis?: { [key: string]: any }
 }
@@ -120,7 +115,9 @@ export class CMS {
     }
 
     if (config && config.apis) {
-      Object.entries(config.apis).forEach(([name, api]) => this.registerApi(name, api))
+      Object.entries(config.apis).forEach(([name, api]) =>
+        this.registerApi(name, api)
+      )
     }
   }
 

@@ -16,9 +16,9 @@
 
  */
 
-import {CMS, CMSConfig, PluginType, SidebarPosition, Subscribable} from '@tinacms/core'
-import {FieldPlugin} from '@tinacms/form-builder'
-import {ScreenPlugin} from './plugins/screen-plugin'
+import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
+import { FieldPlugin } from '@tinacms/form-builder'
+import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
 import TextareaFieldPlugin from './plugins/fields/TextareaFieldPlugin'
 import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
@@ -30,15 +30,24 @@ import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
-import {Form} from '@tinacms/forms'
+import { Form } from '@tinacms/forms'
+
+export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
+
+export interface TinaCMSConfig extends CMSConfig{
+  sidebar: {
+    hidden: boolean
+    position: SidebarPosition
+  }
+}
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
 
-  constructor(config: CMSConfig) {
+  constructor({ sidebar, ...config}: TinaCMSConfig) {
     super(config)
 
-    this.sidebar = new SidebarState(config.sidebar.position)
+    this.sidebar = new SidebarState(sidebar.position)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)

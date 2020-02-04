@@ -22,12 +22,10 @@ import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
-import { TinaCMS } from '../tina-cms'
+import { TinaCMS, SidebarPosition } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
-import {SidebarPosition} from "@tinacms/core";
 
 const merge = require('lodash.merge')
-
 
 export interface TinaProps {
   cms: TinaCMS
