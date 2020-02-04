@@ -26,9 +26,9 @@ import { Subscribable } from '@tinacms/core'
 export function useSubscribable(subscribable: Subscribable, cb?: Function) {
   const [, s] = React.useState(0)
   React.useEffect(() => {
-    return subscribable.subscribe(() => {
+    return subscribable.subscribe((props: any) => {
       s(x => x + 1)
-      if (cb) cb()
+      if (cb) cb(props)
     })
   })
 }
