@@ -21,12 +21,12 @@ import { MdxNode } from './mdx-node'
 import { useLocalMdx } from './useMdxForm'
 
 interface MdxFormProps extends Partial<FormOptions<any>> {
-  _mdx: MdxNode
+  mdx: MdxNode
   render(renderProps: { form: Form; mdx: any }): JSX.Element
   timeout?: number
 }
 
-export function MdxForm({ _mdx, render, ...options }: MdxFormProps) {
+export function MdxForm({ mdx: _mdx, render, ...options }: MdxFormProps) {
   const [mdx, form] = useLocalMdx(_mdx, options)
 
   return render({ form: form as Form, mdx })
