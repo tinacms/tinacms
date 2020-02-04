@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FormOptions, Form } from 'tinacms'
-import { TinaForm } from '@tinacms/form-builder'
+import { FormOptions, Form, TinaForm } from 'tinacms'
 import { useLocalMdx, useGlobalMdx } from './useMdxForm'
 import { ERROR_INVALID_QUERY_NAME } from './errors'
 
@@ -28,10 +27,7 @@ interface MdxFormProps extends Partial<FormOptions<any>> {
 
 export function mdx(Component: any, options: MdxFormProps = {}) {
   return function Mdx(props: any) {
-    const [mdx] = useLocalMdx(
-      getMdx(props.data, options.queryName),
-      options
-    )
+    const [mdx] = useLocalMdx(getMdx(props.data, options.queryName), options)
 
     return <Component {...props} data={{ ...props.data, mdx }} />
   }
@@ -63,10 +59,7 @@ export function liveMdx(Component: any, options: MdxFormProps = {}) {
 
 export function globalMdx(Component: any, options: MdxFormProps = {}) {
   return function Mdx(props: any) {
-    const [mdx] = useGlobalMdx(
-      getMdx(props.data, options.queryName),
-      options
-    )
+    const [mdx] = useGlobalMdx(getMdx(props.data, options.queryName), options)
 
     return <Component {...props} data={{ ...props.data, mdx }} />
   }
