@@ -17,6 +17,9 @@ limitations under the License.
 */
 
 export * from './Add'
+export * from './AlignCenter'
+export * from './AlignLeft'
+export * from './AlignRight'
 export * from './Close'
 export * from './EllipsisVertical'
 export * from './Hamburger'

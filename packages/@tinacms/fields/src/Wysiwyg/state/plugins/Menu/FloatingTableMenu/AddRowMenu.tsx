@@ -36,7 +36,10 @@ interface AddRowMenuProps {
 
 export default ({ index, marker, tableWidth, view }: AddRowMenuProps) => {
   const { state, dispatch } = view
-  const addRow = (pos: number) => dispatch(addRowAt(pos)(state.tr))
+  const addRow = (pos: number) => {
+    if (pos > 1) dispatch(addRowAt(pos, true)(state.tr))
+    view.focus()
+  }
 
   const [hovered, setHovered] = useState(false)
 

@@ -18,14 +18,45 @@ limitations under the License.
 
 import * as React from 'react'
 import * as ReactDOM from 'react-dom'
-import { EditorView } from 'prosemirror-view'
-import { deleteColumn, deleteRow } from 'prosemirror-tables'
-import { IconButton } from '@tinacms/styles'
-import { TrashIcon } from '@tinacms/icons'
 import styled from 'styled-components'
+import { EditorView } from 'prosemirror-view'
+import { deleteColumn, deleteRow, TableMap } from 'prosemirror-tables'
+import { IconButton } from '@tinacms/styles'
+import { AlignCenter, AlignLeft, AlignRight, TrashIcon } from '@tinacms/icons'
+import {
+  findParentNodeOfType,
+  forEachCellInColumn,
+  setCellAttrs,
+} from 'prosemirror-utils'
 
 interface FloatingTableDeleteMenuProps {
   view: EditorView
+}
+
+const alignColumn = (view: EditorView, alignValue: string) => {
+  const { state, dispatch } = view
+  const { selection } = state
+  const { table, table_cell, table_header } = state.schema.nodes
+  const tableCell = findParentNodeOfType(table_cell)(state.selection)
+  const tableHeader = findParentNodeOfType(table_header)(state.selection)
+  const cellNode = tableCell || tableHeader
+  if (!cellNode) return
+  const align = cellNode.node.attrs.align === alignValue ? undefined : alignValue
+  const tableNode = findParentNodeOfType(table)(state.selection)
+  if (!tableNode) return
+  const tableMap = TableMap.get(tableNode.node)
+  const pos = Object.entries(tableMap.map).find(
+    entry => entry[1] > selection.head - tableNode.start
+  )
+  if (!pos) return
+  const cellPos = parseInt(pos[0]) - 1
+  const columnPos = cellPos % tableMap.width
+  dispatch(
+    forEachCellInColumn(columnPos, (cell, tr) => {
+      return setCellAttrs(cell, { align })(tr);
+    })(state.tr)
+  )
+  view.focus()
 }
 
 export default (props: FloatingTableDeleteMenuProps) => {
@@ -53,8 +84,20 @@ export default (props: FloatingTableDeleteMenuProps) => {
       {markerDivCol &&
         ReactDOM.createPortal(
           <IconWrapperCol>
+            <IconButton onClick={() => alignColumn(props.view, 'left')} small primary>
+              <AlignLeft />
+            </IconButton>
+            <IconButton onClick={() => alignColumn(props.view, 'center')} small primary>
+              <AlignCenter />
+            </IconButton>
+            <IconButton onClick={() => alignColumn(props.view, 'right')} small primary>
+              <AlignRight />
+            </IconButton>
             <IconButton
-              onClick={() => deleteColumn(state, dispatch)}
+              onClick={() => {
+                deleteColumn(state, dispatch)
+                props.view.focus()
+              }}
               small
               primary
             >
@@ -67,7 +110,10 @@ export default (props: FloatingTableDeleteMenuProps) => {
         ReactDOM.createPortal(
           <IconWrapperRow>
             <IconButton
-              onClick={() => deleteRow(state, dispatch)}
+              onClick={() => {
+                deleteRow(state, dispatch)
+                props.view.focus()
+              }}
               small
               primary
             >
@@ -81,10 +127,15 @@ export default (props: FloatingTableDeleteMenuProps) => {
 }
 
 const IconWrapperCol = styled.span`
+  display: flex;
+  left: 50%;
   position: absolute;
   top: -8px;
-  left: 50%;
   transform: translate3d(-50%, -100%, 0);
+  button:not(:first-of-type) {
+    margin-left: 10px;
+  }
+
 `
 
 const IconWrapperRow = styled.span`
