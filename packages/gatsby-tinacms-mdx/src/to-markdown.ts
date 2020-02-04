@@ -19,11 +19,11 @@ limitations under the License.
 import { MdxNode } from './mdx-node'
 import * as yaml from 'js-yaml'
 
-export function toMarkdownString(remark: MdxNode) {
+export function toMarkdownString(mdx: MdxNode) {
   return (
     '---\n' +
-    yaml.dump(remark.rawFrontmatter) +
+    yaml.dump(mdx.rawFrontmatter) +
     '---\n' +
-    (remark.rawMarkdownBody || '')
+    (mdx.rawMarkdownBody || '')
   )
 }
