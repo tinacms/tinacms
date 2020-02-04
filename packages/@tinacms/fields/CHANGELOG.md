@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.0-alpha.0...@tinacms/fields@0.4.0) (2020-02-03)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+# [0.4.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1...@tinacms/fields@0.4.0-alpha.0) (2020-02-03)
+
+
+### Bug Fixes
+
+* focus editor after table action. ([fe33e9f](https://github.com/tinacms/tinacms/commit/fe33e9f))
+* more improvements in table column menu ([6e7e8f4](https://github.com/tinacms/tinacms/commit/6e7e8f4))
+* positioning of link creation modal inside table ([55fe132](https://github.com/tinacms/tinacms/commit/55fe132))
+* table column align options fixes ([7b7a8c2](https://github.com/tinacms/tinacms/commit/7b7a8c2))
+
+
+### Features
+
+* table column alignment ([418c2dd](https://github.com/tinacms/tinacms/commit/418c2dd))
+
+
+
+
+
 ## [0.3.2-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1...@tinacms/fields@0.3.2-alpha.0) (2020-01-29)
 
 **Note:** Version bump only for package @tinacms/fields

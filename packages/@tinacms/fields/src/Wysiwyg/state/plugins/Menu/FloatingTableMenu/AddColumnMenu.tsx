@@ -38,6 +38,7 @@ export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
   const { state, dispatch } = view
   const addColumn = (pos: number) => {
     dispatch(addColumnAt(pos)(state.tr))
+    view.focus()
   }
 
   const [hovered, setHovered] = useState(false)
@@ -55,7 +56,14 @@ export default ({ index, marker, tableHeight, view }: AddColumnMenuProps) => {
       >
         {hovered ? (
           <IconWrapperCol>
-            <IconButton onClick={() => addColumn(index)} small primary>
+            <IconButton
+              onClick={() => {
+                addColumn(index)
+                setHovered(false)
+              }}
+              small
+              primary
+            >
               <AddIcon />
             </IconButton>
           </IconWrapperCol>
