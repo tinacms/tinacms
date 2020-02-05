@@ -32,6 +32,7 @@ import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager } from './media'
+import { MediaScreen } from './plugins/screens/media-screen'
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState = new SidebarState()
@@ -50,6 +51,7 @@ export class TinaCMS extends CMS {
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
+    this.screens.add(MediaScreen)
   }
 
   get forms() {
