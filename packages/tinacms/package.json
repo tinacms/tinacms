@@ -29,13 +29,10 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
-    "@types/jest": "^24.0.15",
     "@types/lodash.merge": "^4.6.6",
     "@types/react-beautiful-dnd": "^11.0.3",
     "@types/styled-components": "4.1.8",
-    "jest": "^24.8.0",
-    "styled-components": ">=4.1",
-    "ts-jest": "^24.0.2"
+    "styled-components": ">=4.1"
   },
   "dependencies": {
     "@tinacms/core": "^0.7.0",
