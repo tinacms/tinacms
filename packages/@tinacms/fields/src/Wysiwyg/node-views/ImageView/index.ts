@@ -18,6 +18,7 @@ limitations under the License.
 
 import { Node } from 'prosemirror-model'
 import { EditorView, NodeView } from 'prosemirror-view'
+import { imagePluginKey } from '../../state/plugins/Image'
 
 export class ImageView implements NodeView {
   node: Node
@@ -44,11 +45,22 @@ export class ImageView implements NodeView {
     this.dom.appendChild(this.img)
   }
 
+  update(node: Node) {
+    if (this.img) {
+      const { alt, title } = node.attrs
+      if (alt) this.img.alt = alt
+      if (title) this.img.title = title
+    }
+    return true
+  }
+
   selectNode = () => {
     if (this.img) this.img.style.outline = '4px solid #0084FF'
   }
 
   deselectNode = () => {
-    if (this.img) this.img.style.outline = ''
+    const { state } = this.view
+    const { selectedImage } = imagePluginKey.getState(state)
+    if (!selectedImage && this.img) this.img.style.outline = ''
   }
 }
