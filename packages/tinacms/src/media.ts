@@ -71,12 +71,19 @@ class DummyMedia implements Media {
 class DummyMediaStore implements MediaStore {
   async list(options: MediaListOptions) {
     const _ = options
-    return [new DummyMedia('')]
+    return [
+      new DummyMedia('terry.jpg'),
+      new DummyMedia('toot-toot.jpg'),
+      new DummyMedia('baby-yoda.jpg'),
+      new DummyMedia('tina.jpg'),
+      new DummyMedia('clifford.jpg'),
+    ]
   }
   async persist(reference: string) {
     return new DummyMedia(reference)
   }
   async delete(ref: string) {
+    alert(`Media Deleted: ${ref}`)
     return ref
   }
   async find(ref: string) {
