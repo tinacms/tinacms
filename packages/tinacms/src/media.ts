@@ -38,7 +38,7 @@ export interface MediaListOptions {
  */
 export interface MediaStore {
   list(options: MediaListOptions): Promise<Media[]>
-  persist(reference: string): Promise<Media>
+  persist(files: File[]): Promise<Media>
   delete(reference: string): Promise<any>
   find(src: string): Promise<Media> // finds an object in the media store based on the src string (such as one pulled from document)
 }
@@ -79,8 +79,10 @@ class DummyMediaStore implements MediaStore {
       new DummyMedia('clifford.jpg'),
     ]
   }
-  async persist(reference: string) {
-    return new DummyMedia(reference)
+  async persist(files: File[]) {
+    alert('UPLOADING FILES')
+    console.log(files)
+    return new DummyMedia('yay.txt')
   }
   async delete(ref: string) {
     alert(`Media Deleted: ${ref}`)

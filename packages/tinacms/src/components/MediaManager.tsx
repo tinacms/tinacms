@@ -2,6 +2,9 @@ import * as React from 'react'
 import { useState, useEffect } from 'react'
 import { useCMS } from '../react-tinacms'
 import { MediaFilter, Media } from '../media'
+import { useDropzone } from 'react-dropzone'
+import styled from 'styled-components'
+import { radius, color, font } from '@tinacms/styles'
 
 interface MediaProps {
   multiple?: boolean
@@ -25,7 +28,7 @@ export const MediaManager = (props: MediaProps) => {
   }, [])
 
   return (
-    <div style={{ display: 'flex' }}>
+    <div>
       <nav>
         <button
           disabled={!selected.length}
@@ -49,25 +52,95 @@ export const MediaManager = (props: MediaProps) => {
           </button>
         )}
       </nav>
-      {allMedia.map((media: Media) => (
-        <div
-          key={media.src}
-          style={{
-            border: '2px solid',
-            padding: '.5rem',
-            margin: '.5rem',
-            borderColor: selected.includes(media.reference) ? 'green' : 'black',
-          }}
-          onClick={event => {
-            handleClickToSelect(event, media)
-          }}
-        >
-          file: {media.src}
-        </div>
-      ))}
+      <MediaDropZone
+        onDrop={files => {
+          console.log('DROP')
+          cms.media.store.persist(files)
+        }}
+      >
+        {/* TODO: PREVIEW IMAGE WHILE IT IS BEING UPLOADED */}
+        {allMedia.map((media: Media) => (
+          <div
+            key={media.src}
+            style={{
+              border: '2px solid',
+              padding: '.5rem',
+              margin: '.5rem',
+              borderColor: selected.includes(media.reference)
+                ? 'green'
+                : 'black',
+            }}
+            onClick={event => {
+              handleClickToSelect(event, media)
+              event.stopPropagation()
+              event.preventDefault()
+            }}
+          >
+            file: {media.src}
+          </div>
+        ))}
+      </MediaDropZone>
     </div>
   )
 }
+
+interface ImageUploadProps {
+  onDrop: (acceptedFiles: File[]) => void
+  children: any
+}
+
+const MediaDropZone = ({ onDrop, children }: ImageUploadProps) => {
+  const {
+    getRootProps,
+    getInputProps,
+    isDragActive,
+    isDragAccept,
+    isDragReject,
+  } = useDropzone({
+    accept: '*',
+    onDrop,
+    noClick: true,
+    noDragEventsBubbling: false,
+  })
+
+  return (
+    <div
+      {...getRootProps({ isDragActive, isDragAccept, isDragReject })}
+      style={{
+        display: 'flex',
+        outline: isDragActive ? '2px solid pink' : '',
+        minHeight: '50vh',
+      }}
+    >
+      <input {...getInputProps()} />
+      {children}
+    </div>
+  )
+}
+
+const DropArea = styled.div`
+  border-radius: ${radius('small')};
+  flex: 1;
+  display: flex;
+  flex-direction: column;
+  outline: none;
+  cursor: pointer;
+`
+
+const ImgPlaceholder = styled.div`
+  text-align: center;
+  border-radius: ${radius('small')};
+  background-color: ${color.grey(2)};
+  color: ${color.grey(4)};
+  line-height: 1.35;
+  padding: 12px 0;
+  font-size: ${font.size(2)};
+  font-weight: 500;
+  transition: all 85ms ease-out;
+  &:hover {
+    opacity: 0.6;
+  }
+`
 
 /**
  * NOTE: This is curently more complex then necessary.
