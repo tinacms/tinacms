@@ -18,7 +18,7 @@ limitations under the License.
 
 import { FormOptions, Form } from 'tinacms'
 import { MdxNode } from './mdx-node'
-import { useLocalMdx } from './useMdxForm'
+import { useLocalMdxForm } from './useMdxForm'
 
 interface MdxFormProps extends Partial<FormOptions<any>> {
   mdx: MdxNode
@@ -27,7 +27,7 @@ interface MdxFormProps extends Partial<FormOptions<any>> {
 }
 
 export function MdxForm({ mdx: _mdx, render, ...options }: MdxFormProps) {
-  const [mdx, form] = useLocalMdx(_mdx, options)
+  const [mdx, form] = useLocalMdxForm(_mdx, options)
 
   return render({ form: form as Form, mdx })
 }
