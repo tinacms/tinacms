@@ -33,6 +33,7 @@ import { TinaCMS } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
 import { MediaProps } from '../media'
 import { MediaManager } from './MediaManager'
+import { Dismissible } from 'react-dismissible'
 
 const merge = require('lodash.merge')
 
@@ -78,13 +79,11 @@ export const Tina: React.FC<TinaProps> = ({
               >
                 <button
                   onClick={() => {
-                    const options = {
+                    cms.media.open({
                       onChoose: (media: any) => {
-                        return media[0].src
+                        alert(`INSERTING: ${media[0].src}`)
                       },
-                    }
-                    console.log('open medias')
-                    cms.media.open(options)
+                    })
                   }}
                 >
                   Open media
@@ -112,12 +111,20 @@ const MediaManagerModal = ({ cms }: { cms: TinaCMS }) => {
   }
   return (
     <Modal>
-      <ModalFullscreen>
-        <ModalHeader close={() => setIsOpen(false)}>Media</ModalHeader>
-        <ModalBody padded>
-          <MediaManager {...(mediaProps as any)} />
-        </ModalBody>
-      </ModalFullscreen>
+      <Dismissible onDismiss={() => setIsOpen(false)} escape click>
+        <ModalFullscreen>
+          <ModalHeader close={() => setIsOpen(false)}>Media</ModalHeader>
+          <ModalBody padded>
+            <MediaManager
+              {...mediaProps}
+              onChoose={selected => {
+                mediaProps.onChoose(selected)
+                setIsOpen(false)
+              }}
+            />
+          </ModalBody>
+        </ModalFullscreen>
+      </Dismissible>
     </Modal>
   )
 }
