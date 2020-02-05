@@ -33,6 +33,21 @@ export const MediaManager = (props: MediaProps) => {
         >
           Delete {!!selected.length && `${selected.length} items`}
         </button>
+        {props.onChoose && (
+          <button
+            disabled={!selected.length}
+            onClick={() => {
+              props.onChoose!(
+                // TODO: `seleted` should be Media[]
+                selected.map(ref =>
+                  allMedia.find((media: Media) => media.reference === ref)
+                )
+              )
+            }}
+          >
+            Choose
+          </button>
+        )}
       </nav>
       {allMedia.map((media: Media) => (
         <div

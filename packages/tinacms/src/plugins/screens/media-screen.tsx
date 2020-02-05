@@ -6,9 +6,8 @@ export const MediaScreen: ScreenPlugin = {
   __type: 'screen',
   name: 'Media',
   layout: 'fullscreen',
-  Icon: () => <>M</>,
-  Component(props: any) {
-    console.log('MediaManager', props)
-    return <MediaManager onChoose={() => alert('no')} />
+  Icon: () => null,
+  Component() {
+    return <MediaManager />
   },
 }

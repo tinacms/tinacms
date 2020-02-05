@@ -116,7 +116,6 @@ const MediaManagerModal = ({ cms }: { cms: TinaCMS }) => {
         <ModalHeader close={() => setIsOpen(false)}>Media</ModalHeader>
         <ModalBody padded>
           <MediaManager {...(mediaProps as any)} />
-          <button onClick={() => mediaProps.onChoose()}>Choose</button>
         </ModalBody>
       </ModalFullscreen>
     </Modal>
