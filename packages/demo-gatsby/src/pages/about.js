@@ -24,16 +24,29 @@ import Layout from "../components/layout"
 import SEO from "../components/seo"
 
 function AboutPage(props) {
+  const formOptions = {
+    fields: [
+      {
+        label: "Title",
+        name: "rawFrontmatter.title",
+        component: "text",
+      },
+      {
+        label: "Body",
+        name: "rawMarkdownBody",
+        component: "markdown",
+      },
+    ],
+  }
+
   const siteTitle = props.data.site.siteMetadata.title
-  const frontmatter = props.data.mdx.frontmatter
-  const mdxBody = props.data.mdx.body
-  const [data] = useLocalMdx(props.data.mdx)
+  const [data] = useLocalMdx(props.data.mdx, formOptions)
   console.log("data", data)
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO title="About" />
       <h1>{data.frontmatter.title}</h1>
-      <MDXRenderer>{mdxBody}</MDXRenderer>
+      <MDXRenderer>{data.body}</MDXRenderer>
     </Layout>
   )
 }
