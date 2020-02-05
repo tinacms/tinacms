@@ -17,6 +17,7 @@ limitations under the License.
 */
 const { GraphQLString } = require('gatsby/graphql')
 const slash = require('slash')
+const matter = require('gray-matter')
 
 exports.setFieldsOnGraphQLNodeType = ({ type }) => {
   const pathRoot = slash(process.cwd())
@@ -31,20 +32,20 @@ exports.setFieldsOnGraphQLNodeType = ({ type }) => {
         type: GraphQLString,
         resolve: source => {
           return JSON.stringify(source.frontmatter)
-        }
+        },
       },
       rawMarkdownBody: {
         type: GraphQLString,
         resolve: source => {
-          return source.rawBody.replace(new RegExp(/^---[\s\S]*---[\n\r]*/), '')
-        }
+          return matter(source.rawBody).content
+        },
       },
       fileRelativePath: {
         type: GraphQLString,
         resolve: source => {
           return source.fileAbsolutePath.replace(pathRoot, '')
-        }
-      }
+        },
+      },
     }
   }
 
