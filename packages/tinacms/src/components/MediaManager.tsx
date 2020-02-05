@@ -53,9 +53,12 @@ export const MediaManager = (props: MediaProps) => {
         )}
       </nav>
       <MediaDropZone
-        onDrop={files => {
-          console.log('DROP')
-          cms.media.store.persist(files)
+        accept={cms.media.store.accept}
+        onDropAccepted={accepted => {
+          cms.media.store.persist(accepted)
+        }}
+        onDropRejected={rejected => {
+          console.log('REJECTED', rejected)
         }}
       >
         {/* TODO: PREVIEW IMAGE WHILE IT IS BEING UPLOADED */}
@@ -85,11 +88,18 @@ export const MediaManager = (props: MediaProps) => {
 }
 
 interface ImageUploadProps {
-  onDrop: (acceptedFiles: File[]) => void
+  accept: string
+  onDropAccepted: (accepted: File[]) => void
+  onDropRejected: (rejected: File[]) => void
   children: any
 }
 
-const MediaDropZone = ({ onDrop, children }: ImageUploadProps) => {
+const MediaDropZone = ({
+  accept,
+  onDropAccepted,
+  onDropRejected,
+  children,
+}: ImageUploadProps) => {
   const {
     getRootProps,
     getInputProps,
@@ -97,8 +107,9 @@ const MediaDropZone = ({ onDrop, children }: ImageUploadProps) => {
     isDragAccept,
     isDragReject,
   } = useDropzone({
-    accept: '*',
-    onDrop,
+    accept,
+    onDropAccepted,
+    onDropRejected,
     noClick: true,
     noDragEventsBubbling: false,
   })
@@ -117,30 +128,6 @@ const MediaDropZone = ({ onDrop, children }: ImageUploadProps) => {
     </div>
   )
 }
-
-const DropArea = styled.div`
-  border-radius: ${radius('small')};
-  flex: 1;
-  display: flex;
-  flex-direction: column;
-  outline: none;
-  cursor: pointer;
-`
-
-const ImgPlaceholder = styled.div`
-  text-align: center;
-  border-radius: ${radius('small')};
-  background-color: ${color.grey(2)};
-  color: ${color.grey(4)};
-  line-height: 1.35;
-  padding: 12px 0;
-  font-size: ${font.size(2)};
-  font-weight: 500;
-  transition: all 85ms ease-out;
-  &:hover {
-    opacity: 0.6;
-  }
-`
 
 /**
  * NOTE: This is curently more complex then necessary.

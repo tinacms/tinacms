@@ -37,6 +37,7 @@ export interface MediaListOptions {
  * examples: local filesystem, cloudinary
  */
 export interface MediaStore {
+  accept: string
   list(options: MediaListOptions): Promise<Media[]>
   persist(files: File[]): Promise<Media>
   delete(reference: string): Promise<any>
@@ -69,6 +70,7 @@ class DummyMedia implements Media {
 }
 
 class DummyMediaStore implements MediaStore {
+  accept = 'img/png,image/png'
   async list(options: MediaListOptions) {
     const _ = options
     return [
