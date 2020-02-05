@@ -23,12 +23,12 @@ import {
   useCMS,
   useWatchFormValues,
   useForm,
-  usePlugins
+  usePlugins,
 } from 'tinacms'
 import {
   ERROR_MISSING_MDX_PATH,
   ERROR_MISSING_MDX_RAW_MARKDOWN,
-  ERROR_MISSING_MDX_RAW_FRONTMATTER
+  ERROR_MISSING_MDX_RAW_FRONTMATTER,
 } from './errors'
 import { useMemo } from 'react'
 import { MdxNode } from './mdx-node'
@@ -72,7 +72,7 @@ export function useMdxForm(
       fileRelativePath: mdx.fileRelativePath,
       frontmatter: mdx.frontmatter,
       rawMarkdownBody: mdx.rawMarkdownBody,
-      rawFrontmatter: JSON.parse(mdx.rawFrontmatter)
+      rawFrontmatter: JSON.parse(mdx.rawFrontmatter),
     }),
     [mdx.rawFrontmatter, mdx.rawMarkdownBody]
   )
@@ -116,7 +116,7 @@ export function useMdxForm(
       ) {
         return {
           ...field,
-          name: field.name.replace('frontmatter', 'rawFrontmatter')
+          name: field.name.replace('frontmatter', 'rawFrontmatter'),
         }
       }
       return field
@@ -137,19 +137,19 @@ export function useMdxForm(
           files: [data.fileRelativePath],
           message: data.__commit_message || 'Tina commit',
           name: data.__commit_name,
-          email: data.__commit_email
+          email: data.__commit_email,
         })
       },
       reset() {
         return cms.api.git.reset({ files: [id] })
       },
-      actions
+      actions,
     },
     // The Form will be updated if these values change.
     {
       label,
       fields,
-      values: valuesOnDisk
+      values: valuesOnDisk,
     }
   )
 
@@ -157,7 +157,7 @@ export function useMdxForm(
   const writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
-      content: toMarkdownString(formState.values)
+      content: toMarkdownString(formState.values),
     })
   }, [])
 
@@ -167,7 +167,7 @@ export function useMdxForm(
   return [mdx, form]
 }
 
-export function useLocalMdx(
+export function useLocalMdxForm(
   mdx: MdxNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
 ): [MdxNode | null | undefined, Form | string | null | undefined] {
@@ -180,7 +180,7 @@ export function useLocalMdx(
   return [values, form]
 }
 
-export function useGlobalMdx(
+export function useGlobalMdxForm(
   mdx: MdxNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
 ): [MdxNode | null | undefined, Form | string | null | undefined] {
