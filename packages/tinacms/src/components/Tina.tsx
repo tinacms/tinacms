@@ -17,13 +17,22 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ModalProvider } from './modals/ModalProvider'
+import { useState } from 'react'
+import {
+  ModalProvider,
+  Modal,
+  ModalHeader,
+  ModalBody,
+} from './modals/ModalProvider'
+import { ModalFullscreen } from './modals/ModalFullscreen'
 import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
+import { MediaProps } from '../media'
+import { MediaManager } from './MediaManager'
 
 const merge = require('lodash.merge')
 
@@ -61,11 +70,56 @@ export const Tina: React.FC<TinaProps> = ({
           <ModalProvider>
             <TinaReset>
               <Sidebar />
+              <div
+                style={{
+                  position: 'absolute',
+                  zIndex: 9999,
+                }}
+              >
+                <button
+                  onClick={() => {
+                    const options = {
+                      onChoose: (media: any) => {
+                        return media[0].src
+                      },
+                    }
+                    console.log('open medias')
+                    cms.media.open(options)
+                  }}
+                >
+                  Open media
+                </button>
+              </div>
+              <MediaManagerModal cms={cms} />
             </TinaReset>
           </ModalProvider>
         </ThemeProvider>
       )}
     </CMSContext.Provider>
+  )
+}
+
+const MediaManagerModal = ({ cms }: { cms: TinaCMS }) => {
+  let [isOpen, setIsOpen] = useState(false)
+  let [mediaProps, setMediaProps] = useState({} as any)
+  useSubscribable(cms.media, (props: any) => {
+    setIsOpen(true)
+    setMediaProps(props)
+  })
+
+  if (!isOpen) {
+    return null
+  }
+  return (
+    <Modal>
+      <ModalFullscreen>
+        <ModalHeader close={() => setIsOpen(false)}>Media</ModalHeader>
+        <ModalBody padded>
+          <MediaManager {...(mediaProps as any)} />
+          <button onClick={() => mediaProps.onChoose()}>Choose</button>
+        </ModalBody>
+      </ModalFullscreen>
+    </Modal>
   )
 }
 
