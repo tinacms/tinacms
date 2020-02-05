@@ -41,7 +41,6 @@ function AboutPage(props) {
 
   const siteTitle = props.data.site.siteMetadata.title
   const [data] = useLocalMdx(props.data.mdx, formOptions)
-  console.log("data", data)
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO title="About" />
