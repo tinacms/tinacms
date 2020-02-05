@@ -44,6 +44,9 @@
     "slash": "^3.0.0"
   },
   "peerDependencies": {
-    "gatsby-transformer-remark": ">=2.1.1"
+    "@mdx-js/mdx": ">=1.5.1",
+    "@mdx-js/react": ">=1.5.5",
+    "gatsby-plugin-mdx": ">=1.0.53",
+    "tinacms": ">=0.11"
   }
 }
