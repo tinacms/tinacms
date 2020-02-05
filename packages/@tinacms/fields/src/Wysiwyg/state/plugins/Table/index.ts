@@ -23,10 +23,10 @@ import { TableMap } from 'prosemirror-tables'
 
 import { buildCellSelection, buildExtendedHeaders } from './utils'
 
-export const blockPluginKey = new PluginKey('block')
+export const tablePluginKey = new PluginKey('table')
 
 export const tablePlugin = new Plugin({
-  key: blockPluginKey,
+  key: tablePluginKey,
 
   state: {
     init: () => {
@@ -68,7 +68,7 @@ export const tablePlugin = new Plugin({
       if (!direct) return false
       const targetClasses = event.target.classList
       const { state, dispatch } = view
-      const tablePluginState = blockPluginKey.getState(state)
+      const tablePluginState = tablePluginKey.getState(state)
       const { tableMap: tableMap, selectedTable } = tablePluginState
       const cellSelection = buildCellSelection(
         nodePos,

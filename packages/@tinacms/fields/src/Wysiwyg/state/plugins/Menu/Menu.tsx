@@ -23,6 +23,7 @@ import { useState, useRef, useEffect } from 'react'
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
 import { FloatingTableMenu } from './FloatingTableMenu'
+import ImageMenu from './ImageMenu'
 import {
   toggleBulletList,
   toggleOrderedList,
@@ -151,6 +152,7 @@ export const Menu = (props: Props) => {
           {supportBlocks && <OrderedList view={view} bottom={bottom} />}
         </MenuContainer>
         <FloatingTableMenu view={view} />
+        <ImageMenu view={view} />
       </>
     </ThemeProvider>
   )
