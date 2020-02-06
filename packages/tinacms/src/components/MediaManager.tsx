@@ -113,10 +113,17 @@ function DeleteButton({ selected, cms }: { selected: string[]; cms: TinaCMS }) {
               <ModalActions>
                 <Button onClick={close}>Cancel</Button>
                 <Button
-                  onClick={() => cms.media.store.delete(selected)}
+                  onClick={async () => {
+                    try {
+                      await cms.media.store.delete(selected)
+                    } catch (e) {
+                      // TODO
+                    }
+                    close()
+                  }}
                   primary
                 >
-                  Create
+                  Delete
                 </Button>
               </ModalActions>
             </ModalPopup>
