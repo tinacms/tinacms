@@ -35,6 +35,7 @@ module.exports = {
     {
       resolve: "gatsby-plugin-tinacms",
       options: {
+        manualInit: true,
         sidebar: {
           hidden: process.env.NODE_ENV === "production",
           position: "displace",
