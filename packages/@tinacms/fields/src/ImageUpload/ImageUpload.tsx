@@ -28,6 +28,7 @@ interface ImageUploadProps {
   onClear?: () => void
   value?: string
   previewSrc?: string
+  multiple?: boolean
 }
 
 const DropArea = styled.div`
@@ -105,7 +106,12 @@ export const ImageUpload = ({
     isDragActive,
     isDragAccept,
     isDragReject,
-  } = useDropzone({ accept: 'image/*', onDrop, noClick: !!onClick })
+  } = useDropzone({
+    accept: 'image/*',
+    onDrop,
+    noClick: !!onClick,
+    multiple: false,
+  })
 
   const rootProps = getRootProps({ isDragActive, isDragAccept, isDragReject })
   return (
