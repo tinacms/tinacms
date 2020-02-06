@@ -3,8 +3,16 @@ import { useState, useEffect } from 'react'
 import { useCMS } from '../react-tinacms'
 import { MediaFilter, Media } from '../media'
 import { useDropzone } from 'react-dropzone'
-import styled from 'styled-components'
-import { radius, color, font } from '@tinacms/styles'
+import { Button } from '@tinacms/styles'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalActions,
+} from './modals/ModalProvider'
+import { Dismissible } from 'react-dismissible'
+import { ModalPopup } from './modals/ModalPopup'
+import { TinaCMS } from '../tina-cms'
 
 interface MediaProps {
   multiple?: boolean
@@ -30,12 +38,7 @@ export const MediaManager = (props: MediaProps) => {
   return (
     <div>
       <nav>
-        <button
-          disabled={!selected.length}
-          onClick={() => cms.media.store.delete(selected[0])}
-        >
-          Delete {!!selected.length && `${selected.length} items`}
-        </button>
+        <DeleteButton cms={cms} selected={selected} />
         {props.onChoose && (
           <button
             disabled={!selected.length}
@@ -87,6 +90,40 @@ export const MediaManager = (props: MediaProps) => {
         ))}
       </MediaDropZone>
     </div>
+  )
+}
+
+function DeleteButton({ selected, cms }: { selected: string[]; cms: TinaCMS }) {
+  const [opened, setOpened] = useState(false)
+  const open = () => setOpened(true)
+  const close = () => setOpened(false)
+  return (
+    <>
+      <button disabled={!selected.length} onClick={open}>
+        Delete {!!selected.length && `${selected.length} items`}
+      </button>
+      {opened && (
+        <Modal>
+          <Dismissible onDismiss={close}>
+            <ModalPopup>
+              <ModalHeader close={close}>Deleting Media</ModalHeader>
+              <ModalBody>
+                Are you sure you want to delete these files?
+              </ModalBody>
+              <ModalActions>
+                <Button onClick={close}>Cancel</Button>
+                <Button
+                  onClick={() => cms.media.store.delete(selected)}
+                  primary
+                >
+                  Create
+                </Button>
+              </ModalActions>
+            </ModalPopup>
+          </Dismissible>
+        </Modal>
+      )}
+    </>
   )
 }
 

@@ -45,7 +45,7 @@ export interface MediaStore {
   accept: string
   list(options: MediaListOptions): Promise<Media[]>
   persist(files: MediaUploadOptions[]): Promise<Media[]>
-  delete(reference: string): Promise<any>
+  delete(reference: string[]): Promise<any>
   find(src: string): Promise<Media> // finds an object in the media store based on the src string (such as one pulled from document)
 }
 
@@ -91,7 +91,7 @@ class DummyMediaStore implements MediaStore {
     console.log(files)
     return files.map(({ file }) => new DummyMedia(file.name))
   }
-  async delete(ref: string) {
+  async delete(ref: string[]) {
     alert(`Media Deleted: ${ref}`)
     return ref
   }
