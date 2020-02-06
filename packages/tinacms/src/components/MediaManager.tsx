@@ -30,7 +30,7 @@ export const MediaManager = (props: MediaProps) => {
 
   useEffect(() => {
     ;(async () => {
-      let media = await cms.media.store.list({ limit: 8, offset: 0 })
+      const media = await cms.media.store.list({ limit: 8, offset: 0 })
       setMedia(media)
     })()
   }, [])
@@ -213,7 +213,7 @@ function singleSelectReducer(
   switch (changes.type) {
     case 'SELECT_MEDIA':
     case 'SHIFT_SELECT_MEDIA':
-      let lastSelected = changes.selected[changes.selected.length - 1]
+      const lastSelected = changes.selected[changes.selected.length - 1]
       return {
         ...state,
         selected:
