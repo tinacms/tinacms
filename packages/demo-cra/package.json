@@ -6,7 +6,6 @@
     "tinacms": "^0.12.1"
   },
   "devDependencies": {
-    "@types/jest": "^24.0.15",
     "@types/node": "12.6.8",
     "react-scripts": "3.0.1",
     "tinacms": "^0.5.0"

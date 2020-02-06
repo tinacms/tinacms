@@ -32,10 +32,7 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
-    "@types/jest": "^24.0.15",
-    "jest": "^24.8.0",
-    "tinacms": "^0.12.1",
-    "ts-jest": "^24.0.2"
+    "tinacms": "^0.12.1"
   },
   "dependencies": {
     "slash": "^3.0.0"
