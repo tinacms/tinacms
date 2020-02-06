@@ -32,6 +32,11 @@ export interface MediaListOptions {
   offset: number
 }
 
+export interface MediaUploadOptions {
+  directory: string
+  file: File
+}
+
 /**
  * MediaStore provides an interface for interacting with a media storage service
  * examples: local filesystem, cloudinary
@@ -39,7 +44,7 @@ export interface MediaListOptions {
 export interface MediaStore {
   accept: string
   list(options: MediaListOptions): Promise<Media[]>
-  persist(files: File[]): Promise<Media>
+  persist(files: MediaUploadOptions[]): Promise<Media[]>
   delete(reference: string): Promise<any>
   find(src: string): Promise<Media> // finds an object in the media store based on the src string (such as one pulled from document)
 }
@@ -81,10 +86,10 @@ class DummyMediaStore implements MediaStore {
       new DummyMedia('clifford.jpg'),
     ]
   }
-  async persist(files: File[]) {
+  async persist(files: MediaUploadOptions[]) {
     alert('UPLOADING FILES')
     console.log(files)
-    return new DummyMedia('yay.txt')
+    return files.map(({ file }) => new DummyMedia(file.name))
   }
   async delete(ref: string) {
     alert(`Media Deleted: ${ref}`)
