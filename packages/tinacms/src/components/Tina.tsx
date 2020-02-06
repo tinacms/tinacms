@@ -111,20 +111,18 @@ const MediaManagerModal = ({ cms }: { cms: TinaCMS }) => {
   }
   return (
     <Modal>
-      <Dismissible onDismiss={() => setIsOpen(false)} escape click>
-        <ModalFullscreen>
-          <ModalHeader close={() => setIsOpen(false)}>Media</ModalHeader>
-          <ModalBody padded>
-            <MediaManager
-              {...mediaProps}
-              onChoose={selected => {
-                mediaProps.onChoose(selected)
-                setIsOpen(false)
-              }}
-            />
-          </ModalBody>
-        </ModalFullscreen>
-      </Dismissible>
+      <ModalFullscreen>
+        <ModalHeader close={() => setIsOpen(false)}>Media</ModalHeader>
+        <ModalBody padded>
+          <MediaManager
+            {...mediaProps}
+            onChoose={selected => {
+              mediaProps.onChoose(selected)
+              setIsOpen(false)
+            }}
+          />
+        </ModalBody>
+      </ModalFullscreen>
     </Modal>
   )
 }
