@@ -31,9 +31,7 @@ import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
-import { MediaProps } from '../media'
 import { MediaManager } from './MediaManager'
-import { Dismissible } from 'react-dismissible'
 
 const merge = require('lodash.merge')
 
@@ -99,8 +97,8 @@ export const Tina: React.FC<TinaProps> = ({
 }
 
 const MediaManagerModal = ({ cms }: { cms: TinaCMS }) => {
-  let [isOpen, setIsOpen] = useState(false)
-  let [mediaProps, setMediaProps] = useState({} as any)
+  const [isOpen, setIsOpen] = useState(false)
+  const [mediaProps, setMediaProps] = useState({} as any)
   useSubscribable(cms.media, (props: any) => {
     setIsOpen(true)
     setMediaProps(props)

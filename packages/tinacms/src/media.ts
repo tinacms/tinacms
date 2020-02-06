@@ -76,8 +76,7 @@ class DummyMedia implements Media {
 
 class DummyMediaStore implements MediaStore {
   accept = 'img/png,image/png'
-  async list(options: MediaListOptions) {
-    const _ = options
+  async list(_options: MediaListOptions) {
     return [
       new DummyMedia('terry.jpg'),
       new DummyMedia('toot-toot.jpg'),

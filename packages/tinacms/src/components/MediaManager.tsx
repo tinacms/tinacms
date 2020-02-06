@@ -23,10 +23,10 @@ interface MediaProps {
 }
 
 export const MediaManager = (props: MediaProps) => {
-  let cms = useCMS()
-  let [allMedia, setMedia] = useState([] as any)
+  const cms = useCMS()
+  const [allMedia, setMedia] = useState([] as any)
 
-  let { selected, handleClickToSelect } = useSelection(props.selected)
+  const { selected, handleClickToSelect } = useSelection(props.selected)
 
   useEffect(() => {
     ;(async () => {
