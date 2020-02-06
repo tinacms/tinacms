@@ -55,7 +55,10 @@ export const MediaManager = (props: MediaProps) => {
       <MediaDropZone
         accept={cms.media.store.accept}
         onDropAccepted={accepted => {
-          cms.media.store.persist(accepted)
+          cms.media.store.persist(
+            // TODO: Where does that `directory` come from?
+            accepted.map(file => ({ file, directory: '' }))
+          )
         }}
         onDropRejected={rejected => {
           console.log('REJECTED', rejected)
