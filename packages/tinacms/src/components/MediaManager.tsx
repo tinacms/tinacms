@@ -152,6 +152,7 @@ const MediaDropZone = ({
     onDropRejected,
     noClick: true,
     noDragEventsBubbling: false,
+    noKeyboard: true,
   })
 
   return (
