@@ -16,10 +16,11 @@ limitations under the License.
 
 */
 
-import React, { useState } from 'react'
+import React, { useState, useRef, useEffect } from 'react'
 import { EditorView } from 'prosemirror-view'
 import styled from 'styled-components'
 
+import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
 
 interface FloatingImageMenu {
@@ -32,7 +33,28 @@ export default ({ view }: FloatingImageMenu) => {
   const { node, pos } = selectedImage
   const [title, setTitle] = useState(node.attrs.title)
   const [alt, setAlt] = useState(node.attrs.alt)
-  const { top } = view.coordsAtPos(pos)
+  const { top, left } = view.coordsAtPos(pos)
+  const [modalTop, setModalTop] = useState(top)
+  const [modalLeft, setModalLeft] = useState(left)
+  const wrapperRef = useRef() as React.MutableRefObject<HTMLElement>
+
+  useEffect(() => {
+    const image = document.getElementsByClassName('tina-selected-image')[0]
+    if (image) {
+      const imageDimensions = image.getBoundingClientRect()
+      const wrapperDimensions = wrapperRef.current.getBoundingClientRect()
+      setModalLeft(
+        imageDimensions.width / 2 +
+          findElementOffsetLeft(image as HTMLElement) -
+          wrapperDimensions.width / 2
+      )
+      setModalTop(
+        imageDimensions.height +
+          findElementOffsetTop(image as HTMLElement) -
+          wrapperDimensions.height
+      )
+    }
+  }, [])
 
   const updateNodeAttrs = () => {
     const { dispatch, state } = view
@@ -53,7 +75,7 @@ export default ({ view }: FloatingImageMenu) => {
   }
 
   return (
-    <Wrapper top={top}>
+    <Wrapper top={modalTop} left={modalLeft} ref={wrapperRef}>
       <div>
         <span>Title</span>
         <span>
@@ -73,9 +95,17 @@ export default ({ view }: FloatingImageMenu) => {
 }
 
 const Wrapper = styled.span<
-  React.HTMLAttributes<HTMLDivElement> & { top: number }
+  React.HTMLAttributes<HTMLDivElement> & {
+    left: number
+    top: number
+    ref: React.MutableRefObject<HTMLElement>
+  }
 >`
   background: white;
+  border: 1px solid gray;
+  border-radius: 4px;
+  padding: 20px;
   position: absolute;
+  left: ${({ left }) => `${left}px`};
   top: ${({ top }) => `${top}px`};
 `

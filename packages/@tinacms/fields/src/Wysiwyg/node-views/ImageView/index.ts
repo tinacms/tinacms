@@ -55,12 +55,18 @@ export class ImageView implements NodeView {
   }
 
   selectNode = () => {
-    if (this.img) this.img.style.outline = '4px solid #0084FF'
+    if (this.img) {
+      this.img.style.outline = '4px solid #0084FF'
+      this.img.classList.add('tina-selected-image')
+    }
   }
 
   deselectNode = () => {
     const { state } = this.view
     const { selectedImage } = imagePluginKey.getState(state)
-    if (!selectedImage && this.img) this.img.style.outline = ''
+    if (!selectedImage && this.img) {
+      this.img.style.outline = ''
+      this.img.classList.remove('tina-selected-image')
+    }
   }
 }

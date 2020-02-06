@@ -29,6 +29,10 @@ export const imagePlugin = new Plugin({
       return { selectedImage: undefined }
     },
     apply(tr, prev) {
+      if (prev && prev.selectedImage) {
+        const { pos } = prev.selectedImage
+        if (!tr.doc.nodeAt(pos)) return {}
+      }
       const selectedImage = tr.getMeta('image_clicked')
       if (selectedImage) return { selectedImage }
       if (selectedImage === false) return { selectedImage: undefined }
