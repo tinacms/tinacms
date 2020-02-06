@@ -22,7 +22,6 @@
   "devDependencies": {
     "@tinacms/icons": "^0.5.0",
     "@tinacms/styles": "^0.1.1",
-    "@types/jest": "^24.0.23",
     "tinacms": "^0.12.1"
   }
 }
