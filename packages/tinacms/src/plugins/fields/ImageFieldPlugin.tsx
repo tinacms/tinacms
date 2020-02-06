@@ -37,19 +37,28 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
     <ImageUpload
       value={props.input.value}
       previewSrc={props.field.previewSrc(props.form.getState().values, props)}
-      onDrop={async (acceptedFiles: File[]) => {
+      onClick={() => {
+        cms.media.open({
+          onChoose([media]) {
+            if (media) {
+              props.input.onChange(media.reference)
+            }
+          },
+        })
+      }}
+      onDrop={async ([file]: File[]) => {
         // TODO: Can we force this to only accept 1 file when dropped?
         const directory = props.field.uploadDir(props.form.getState().values)
 
-        const allMedia = await cms.media.store.persist(
-          acceptedFiles.map(file => ({
+        const [media] = await cms.media.store.persist([
+          {
             directory,
-            file: file,
-          }))
-        )
+            file,
+          },
+        ])
 
-        if (allMedia.length > 0) {
-          props.input.onChange(allMedia[0].reference)
+        if (media) {
+          props.input.onChange(media.reference)
         } else {
           // TODO Handle failure
         }
