@@ -33,6 +33,7 @@ export default ({ view }: TableOptionsMenu) => {
   const deleteSelectedTable = () => {
     const { state, dispatch } = view
     deleteTable(state, dispatch)
+    view.focus()
   }
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left'
@@ -56,7 +57,6 @@ const Wrapper = styled.div<
 >`
   background-color: #ffffff;
   border-radius: 2px;
-  // border: 1px solid #e1ddec;
   cursor: default;
   padding: 0px 4px;
   position: absolute;

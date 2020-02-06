@@ -271,7 +271,7 @@ function arrowHandler(
   dir: 'left' | 'right' | 'up' | 'down' | 'forward' | 'backward'
 ) {
   return (state: EditorState, dispatch: any, view: EditorView) => {
-    if (state.selection.empty && view.endOfTextblock(dir)) {
+    if (view.endOfTextblock(dir)) {
       const side = dir == 'left' || dir == 'up' ? -1 : 1
       const $head = state.selection.$head
       const nextPos = Selection.near(

@@ -24,7 +24,6 @@ import { TinaCMS } from '../tina-cms'
 export interface TinaConfig {
     cms?: CMSConfig,
     sidebar?: {
-        position?: TinaProps["position"],
         hidden?: TinaProps["hidden"],
         theme?: TinaProps["theme"]
     }

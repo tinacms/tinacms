@@ -98,8 +98,6 @@ export function markControl({
       }
 
       toggleMark(this.markType(mark), defaultAttrs)(state, dispatch)
-
-      this.props.view.focus()
     }
 
     render() {

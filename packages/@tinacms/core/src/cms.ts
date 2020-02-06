@@ -115,7 +115,9 @@ export class CMS {
     }
 
     if (config && config.apis) {
-      Object.entries(config.apis).forEach(([name, api]) => this.registerApi(name, api))
+      Object.entries(config.apis).forEach(([name, api]) =>
+        this.registerApi(name, api)
+      )
     }
   }
 

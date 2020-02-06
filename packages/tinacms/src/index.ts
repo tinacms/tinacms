@@ -30,7 +30,7 @@ export { TinaCMS as CMS } from './tina-cms'
 /**
  * Tina Sidebar
  */
-export { Tina, TinaProps, SidebarPosition } from './components/Tina'
+export { Tina, TinaProps } from './components/Tina'
 export { useSidebar } from './components/sidebar/SidebarProvider'
 
 /**
