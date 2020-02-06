@@ -14,6 +14,11 @@ gallery:
         - {}
 draft: false
 ---
+
+## Image settings
+
+![Photo from Unplash](https://images.unsplash.com/photo-1556910096-6f5e72db6803?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80 "Photo from Unplash")
+
 ## Fun with Flags
 
 | Name | Based in |
