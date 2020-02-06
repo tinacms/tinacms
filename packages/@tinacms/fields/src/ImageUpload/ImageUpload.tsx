@@ -24,6 +24,7 @@ import { TrashIcon } from '@tinacms/icons'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
+  onClick?: () => void
   onClear?: () => void
   value?: string
   previewSrc?: string
@@ -93,6 +94,7 @@ const StyledImageContainer = styled.div`
 
 export const ImageUpload = ({
   onDrop,
+  onClick,
   onClear,
   value,
   previewSrc,
@@ -103,10 +105,11 @@ export const ImageUpload = ({
     isDragActive,
     isDragAccept,
     isDragReject,
-  } = useDropzone({ accept: 'image/*', onDrop })
+  } = useDropzone({ accept: 'image/*', onDrop, noClick: !!onClick })
 
+  const rootProps = getRootProps({ isDragActive, isDragAccept, isDragReject })
   return (
-    <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+    <DropArea {...rootProps} onClick={onClick || rootProps.onClick}>
       <input {...getInputProps()} />
       {value ? (
         <StyledImageContainer>
