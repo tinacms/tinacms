@@ -95,6 +95,7 @@ export const Menu = (props: Props) => {
   const menuRef: any = useRef()
 
   const handleScroll = () => {
+    if (!menuRef.current) return
     // Need to know the Y coord of the bottom of the div that contains the text
     const textAreaBottom =
       menuRef.current.parentElement.nextSibling.offsetHeight + menuOffset
