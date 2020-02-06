@@ -16,7 +16,9 @@ draft: false
 ---
 ## Fun with Flags
 
-| Name | Based in |
+![Image result for flowers](https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/colorful-of-dahlia-pink-flower-in-beautiful-garden-royalty-free-image-825886130-1554743243.jpg?crop=0.669xw:1.00xh;0.331xw,0&resize=640:*)
+
+|  | Based in |
 | :---: | :---: |
 | Dan | 🇺🇸 |
 | DJ | 🇺🇸 |
