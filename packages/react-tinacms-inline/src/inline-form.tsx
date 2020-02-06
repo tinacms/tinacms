@@ -26,12 +26,12 @@ export interface InlineFormProps {
 }
 
 export interface InlineFormRenderChild {
-  (props: InlineFormRendeChildOptions):
+  (props: InlineFormRenderChildOptions):
     | React.ReactElement
     | React.ReactElement[]
 }
 
-export type InlineFormRendeChildOptions = InlineFormState &
+export type InlineFormRenderChildOptions = InlineFormState &
   Omit<FormRenderProps<any>, 'form'>
 
 export interface InlineFormState {
