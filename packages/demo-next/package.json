@@ -16,6 +16,7 @@
   "dependencies": {
     "@tinacms/api-git": "^0.5.4",
     "@tinacms/git-client": "^0.4.1",
+    "@tinacms/form-builder": "^0.2.13",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
@@ -26,6 +27,7 @@
     "prop-types": "^15.7.2",
     "raw-loader": "^3.0.0",
     "react-markdown": "^4.1.0",
+    "react-tinacms-inline": "^0.0.0",
     "tinacms": "^0.12.1",
     "webpack": "^4.41.5"
   },
