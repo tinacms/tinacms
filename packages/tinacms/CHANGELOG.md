@@ -3,6 +3,88 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.13.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.1...tinacms@0.13.0-alpha.0) (2020-02-06)
+
+
+### Bug Fixes
+
+* **withTina:** TinaCMSConfig compat ([101c61d](https://github.com/tinacms/tinacms/commit/101c61d))
+
+
+### Features
+
+* **Modals:** export all modal components ([3309eaf](https://github.com/tinacms/tinacms/commit/3309eaf))
+
+
+
+
+
+## [0.12.1](https://github.com/tinacms/tinacms/compare/tinacms@0.12.1-alpha.1...tinacms@0.12.1) (2020-02-03)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+## [0.12.1-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.12.0...tinacms@0.12.1-alpha.1) (2020-02-03)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+## [0.12.1-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.0...tinacms@0.12.1-alpha.0) (2020-01-29)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+# [0.12.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.0-alpha.0...tinacms@0.12.0) (2020-01-27)
+
+
+### Bug Fixes
+
+* removed unused dependencies from package.json ([0945fed](https://github.com/tinacms/tinacms/commit/0945fed))
+
+
+
+
+
+# [0.12.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3...tinacms@0.12.0-alpha.0) (2020-01-24)
+
+
+### Features
+
+* **TinaCMS:** configure plugins/apis on instantiation ([eeec343](https://github.com/tinacms/tinacms/commit/eeec343))
+* **withTina:** add HOC for <Tina> CMS provider ([b3c44ef](https://github.com/tinacms/tinacms/commit/b3c44ef))
+
+
+
+
+
+## [0.11.3](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3-alpha.1...tinacms@0.11.3) (2020-01-22)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+## [0.11.3-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3-alpha.0...tinacms@0.11.3-alpha.1) (2020-01-22)
+
+
+### Bug Fixes
+
+* FieldPlugins for text have a default to empty string, instead of undefined ([c899ee5](https://github.com/tinacms/tinacms/commit/c899ee5))
+
+
+
+
+
 ## [0.11.3-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.2...tinacms@0.11.3-alpha.0) (2020-01-16)
 
 

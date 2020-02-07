@@ -16,13 +16,16 @@ limitations under the License.
 
 */
 
-import { EditorState, Selection } from 'prosemirror-state'
+import { EditorState, TextSelection } from 'prosemirror-state'
 import { NodeType, Node } from 'prosemirror-model'
 import { EditorView } from 'prosemirror-view'
 
-type Dispatch = typeof EditorView.prototype.dispatch;
+type Dispatch = typeof EditorView.prototype.dispatch
 
-export function deleteEmptyHeading(state: EditorState, dispatch: Dispatch | null) {
+export function deleteEmptyHeading(
+  state: EditorState,
+  dispatch: Dispatch | null
+) {
   const { $cursor } = state.selection as any
   if (!$cursor) return false
   const node = state.doc.nodeAt(Math.max($cursor.pos - 1, 0))
@@ -30,16 +33,18 @@ export function deleteEmptyHeading(state: EditorState, dispatch: Dispatch | null
   if (node.type != state.schema.nodes.heading) return false
   if (node.textContent.length) return false
   if (dispatch) {
+    const { tr } = state
     dispatch(
-      state.tr
+      tr
         // Replace the entire heading with an empty paragraph
         .replaceRangeWith(
           $cursor.pos - 1,
           $cursor.pos + node.nodeSize - 1,
           state.schema.nodes.paragraph.create()
         )
-        // Set the seleciton to be at the start of the paragram
-        .setSelection(Selection.near(state.doc.resolve($cursor.pos - 1)))
+        // Set the selection to be at the start of the paragraph
+        .setSelection(new TextSelection(tr.doc.resolve(state.selection.head)))
+        .scrollIntoView()
     )
   }
   return true
@@ -70,7 +75,8 @@ export function toggleHeader(
     const $firstPos = state.doc.resolve(firstPos)
     const index = $firstPos.index()
 
-    const setAsParagraph = state.selection.$head.parent.attrs.level == attrs.level
+    const setAsParagraph =
+      state.selection.$head.parent.attrs.level == attrs.level
     const nextNodeType = setAsParagraph ? fallBackNodeType : nodeType
     const nextAttrs = setAsParagraph ? fallbackAttrs : attrs
 

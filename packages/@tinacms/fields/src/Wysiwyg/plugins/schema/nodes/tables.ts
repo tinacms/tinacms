@@ -43,6 +43,13 @@ tables.table_header = {
   ...tables.table_header,
   marks: '_',
   attrs: { ...tables.table_header.attrs, align: { default: null } },
+  toDOM(node: Node) {
+    const attrs: { style?: string } = {}
+    if (node.attrs.align) {
+      attrs.style = `text-align: ${node.attrs.align};`
+    }
+    return ['th', attrs, 0]
+  },
 } as any
 
 export { tables }

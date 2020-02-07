@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import { markdown, danger, warn, fail, message } from 'danger'
+import depcheck from 'depcheck'
 import * as fs from 'fs'
 import * as path from 'path'
 
@@ -32,6 +33,16 @@ const LICENSE_HEADER: string[] = [
   `See the License for the specific language governing permissions and`,
   `limitations under the License.`,
 ]
+
+const failAboutIllegalDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
+  fail(`
+Please remove the following dependencies from ${packageJson.name}:
+
+${deps.map(dep => `* ${dep}`).join('\n')}\n
+
+This repository defines the above package in the root level package.json in
+order to (1) have consistency across packages and (2) prevent bugs during development.
+`)
 
 runChecksOnPullRequest()
 
@@ -55,6 +66,8 @@ interface TinaPackage {
       watch: string
     }
     license: string
+    dependencies?: { [key: string]: string }
+    devDependencies?: { [key: string]: string }
   }
 }
 
@@ -74,9 +87,11 @@ function runChecksOnPullRequest() {
   // Packages
   let modifiedPackages = getModifiedPackages(allFiles)
 
-  modifiedPackages.forEach(warnIfMissingTestChanges)
+  // modifiedPackages.forEach(warnIfMissingTestChanges)
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
+  modifiedPackages.forEach(checkDeps)
+  modifiedPackages.forEach(checkForGlobalDeps)
 
   listTouchedPackages(modifiedPackages)
 
@@ -143,7 +158,9 @@ The following files may need to be updated:
 
 | File | Reason |
 | --- | --- |
-${changes.map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`).join('\n')}
+${changes
+  .map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)
+  .join('\n')}
 `)
 
 const fileLink = (file: string) => {
@@ -188,16 +205,19 @@ function formatDate(date: Date) {
  * ```
  * ### Modified Github Workflows
  *
- * * .github/workflows/danger.yml
+ * * .github/workflows/main.yml
+ * * dangerfile.ts
  * ```
  */
 function listTouchedWorkflows(allFiles: string[]) {
-  let touchedWorkflows = allFiles.filter(filepath =>
-    filepath.startsWith('.github/workflows/')
+  let touchedWorkflows = allFiles.filter(
+    filepath =>
+      filepath.startsWith('.github/workflows/') ||
+      filepath.endsWith('dangerfile.ts')
   )
   if (touchedWorkflows.length === 0) return
 
-  message(`### Modified Github Workflows
+  message(`### Modified CI Scripts
 
 * ${touchedWorkflows.join('\n* ')}`)
 }
@@ -350,4 +370,83 @@ function getModifiedPackages(allFiles: string[]) {
     }
   })
   return packageList
+}
+
+function checkDeps(tinaPackage: TinaPackage) {
+  const DEPCHECK_OPTIONS = {
+    ignoreMatches: [
+      '@babel/*',
+      '@types/*',
+      'jest',
+      'tsdx',
+      'ts-jest',
+      'tslib',
+      'typescript',
+      '*-loader',
+      '*-webpack-plugin',
+      '@storybook/*',
+      '@sambego/*',
+      '@tinacms/scripts',
+    ],
+  }
+  const packagePath = path.resolve(
+    tinaPackage.path.replace('/package.json', '')
+  )
+
+  // Intentionally cast to any
+  depcheck(packagePath, DEPCHECK_OPTIONS, (results: any) => {
+    const unusedDependencies = ['dependencies', 'devDependencies']
+    unusedDependencies.forEach(type => {
+      if (results[type].length) {
+        warnAboutUnused(tinaPackage, type, results[type])
+      }
+    })
+
+    const missingDeps = Object.keys(results.missing)
+    if (missingDeps.length > 0) {
+      warnAboutMissingDeps(tinaPackage, missingDeps)
+    }
+  })
+}
+
+const warnAboutUnused = (
+  { packageJson }: TinaPackage,
+  type: string,
+  deps: string[]
+) =>
+  warn(`${packageJson.name} has unused ${type}
+
+${deps.map(dep => `* ${dep}`).join('\n')}\n
+`)
+
+const warnAboutMissingDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
+  warn(`${packageJson.name} is missing dependencies for the following packages:
+
+${deps.map(dep => `* ${dep}`).join('\n')}\n
+`)
+
+function checkForGlobalDeps(tinaPackage: TinaPackage) {
+  const deps = Object.keys(tinaPackage.packageJson.dependencies || {})
+  const devDeps = Object.keys(tinaPackage.packageJson.devDependencies || {})
+
+  const illegalDeps = Array.from(new Set([...deps, ...devDeps])).filter(
+    isIllegal
+  )
+
+  if (illegalDeps.length > 0) {
+    failAboutIllegalDeps(tinaPackage, illegalDeps)
+  }
+}
+
+function isIllegal(dep: string) {
+  return (
+    [
+      'typescript',
+      'tslib',
+      'react',
+      'react-dom',
+      '@types/react',
+      '@types/react-dom',
+    ].indexOf(dep) >= 0
+  )
 }

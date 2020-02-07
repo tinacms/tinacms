@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.14-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.13...@tinacms/form-builder@0.2.14-alpha.0) (2020-02-06)
+
+**Note:** Version bump only for package @tinacms/form-builder
+
+
+
+
+
+## [0.2.13](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.13-alpha.0...@tinacms/form-builder@0.2.13) (2020-01-27)
+
+
+### Bug Fixes
+
+* removed unused dependencies from package.json ([0945fed](https://github.com/tinacms/tinacms/commit/0945fed))
+* update peerDependencies ([2e10c9e](https://github.com/tinacms/tinacms/commit/2e10c9e))
+
+
+
+
+
+## [0.2.13-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.12...@tinacms/form-builder@0.2.13-alpha.0) (2020-01-24)
+
+**Note:** Version bump only for package @tinacms/form-builder
+
+
+
+
+
+## [0.2.12](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.12-alpha.1...@tinacms/form-builder@0.2.12) (2020-01-22)
+
+**Note:** Version bump only for package @tinacms/form-builder
+
+
+
+
+
+## [0.2.12-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.12-alpha.0...@tinacms/form-builder@0.2.12-alpha.1) (2020-01-22)
+
+**Note:** Version bump only for package @tinacms/form-builder
+
+
+
+
+
 ## [0.2.12-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.11...@tinacms/form-builder@0.2.12-alpha.0) (2020-01-16)
 
 **Note:** Version bump only for package @tinacms/form-builder

@@ -3,20 +3,20 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-41-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-48-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Getting Started
 
 - [Website](https://tinacms.org/)
 - [Documentation](https://tinacms.org/docs/)
+- [Slack](https://tinacms.slack.com)
 - [Forum](https://community.tinacms.org/)
 - [Roadmap](./ROADMAP.md)
 - [Contributing](./CONTRIBUTING.md)
   - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
   - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
-- [Release Process](./RELEASE.md)
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
 
@@ -60,6 +60,7 @@ Currently, testing with external projects is somewhat inelegant, but this repo i
 **Pitfalls of Testing with External Projects**
 
 - Running `npm run build` in the root of the monorepo will run a `build` script if your project has one defined. If this causes problems (tina may be causing your build to fail in the first place, and you want to skip the build for now but still build the other packages,) you can get around this by either running `lerna run build --ignore=YOUR_PACKAGE_NAME` or adding the name of your package to the `ignore` array for the `run` command in `lerna.json`.
+
 ```json
 //lerna.json
 {
@@ -70,36 +71,30 @@ Currently, testing with external projects is somewhat inelegant, but this repo i
   }
 }
 ```
-- Gatsby and React both rely on some globally-persisted values which can cause errors if you have multiple copies of these dependencies installed. When testing a Gatsby site, many issues can be worked around by temporarily deleting the `demo-gatsby` package and bootstrapping again.
 
+- Gatsby and React both rely on some globally-persisted values which can cause errors if you have multiple copies of these dependencies installed. When testing a Gatsby site, many issues can be worked around by temporarily deleting the `demo-gatsby` package and bootstrapping again.
 
 ## Release Process
 
-Tina has three main branches:
+Tina has two main branches:
 
 - **master:** The bleeding edge of tinacms
-- **next:** A preview of the next release
 - **latest:** The current stable release
 
 The flow of changes therefore looks like:
 
-> `fix-some-bug` => `master` => `next` => `latest`
+> `fix-some-bug` => `master` => `latest`
 
-The process happens over a week:
+This is a weekly process:
 
-- On Monday
-  1. `next` is merged into `latest`; then `latest` is published to npm
-  2. `master` is merged into `next`; then `next` is published to npm
-- Any hot fixes for bugs will be cherry picked into `next` and `latest`
-  and the published accordingly.
-- Every pull request merged to `master` automatically triggers a
-  `canary` release.
+- On Monday `master` is merged into `latest` which is then published to npm.
+- Hot fixes are cherry picked onto `latest` and then published.
+- Prereleases are created off of `master` whenever they're needed.
 
 With this process:
 
-- all accepted changes are available as `canary` releases for early testing
 - critical fixes are published as soon as possible
-- new features and minor fixes take ~1.5 weeks to be published
+- new features and minor fixes take 3-5 days to be published
 
 ## Contributors ✨
 
@@ -161,6 +156,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/jpuri"><img src="https://avatars0.githubusercontent.com/u/2182307?v=4" width="100px;" alt=""/><br /><sub><b>Jyoti Puri</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=jpuri" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/nibtime"><img src="https://avatars2.githubusercontent.com/u/52962482?v=4" width="100px;" alt=""/><br /><sub><b>nibtime</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=nibtime" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Anibtime" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://doyoubuzz.com/johan-soulet"><img src="https://avatars0.githubusercontent.com/u/2269599?v=4" width="100px;" alt=""/><br /><sub><b>Johan Soulet</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=jsoulet" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Ajsoulet" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/cleitonper"><img src="https://avatars1.githubusercontent.com/u/13934790?v=4" width="100px;" alt=""/><br /><sub><b>Cleiton Pereira</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Acleitonper" title="Bug reports">🐛</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/chrisdmacrae"><img src="https://avatars2.githubusercontent.com/u/6855186?v=4" width="100px;" alt=""/><br /><sub><b>chrisdmacrae</b></sub></a><br /><a href="#infra-chrisdmacrae" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="#question-chrisdmacrae" title="Answering Questions">💬</a> <a href="#ideas-chrisdmacrae" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/jhuggett"><img src="https://avatars2.githubusercontent.com/u/59655877?v=4" width="100px;" alt=""/><br /><sub><b>jhuggett</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=jhuggett" title="Code">💻</a></td>
+    <td align="center"><a href="https://www.nckweb.com.ar"><img src="https://avatars0.githubusercontent.com/u/174561?v=4" width="100px;" alt=""/><br /><sub><b>Nicolas Cisco</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=NickCis" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/commits?author=NickCis" title="Tests">⚠️</a></td>
+    <td align="center"><a href="https://www.hungrybearstudio.com/"><img src="https://avatars1.githubusercontent.com/u/22930449?v=4" width="100px;" alt=""/><br /><sub><b>Hungry Bear Studio</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=molebox" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/alexbarbato"><img src="https://avatars1.githubusercontent.com/u/23562192?v=4" width="100px;" alt=""/><br /><sub><b>Alex Barbato</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=alexbarbato" title="Code">💻</a></td>
+    <td align="center"><a href="http://danitulp.nl"><img src="https://avatars3.githubusercontent.com/u/18421761?v=4" width="100px;" alt=""/><br /><sub><b>Dani Tulp</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=DaniTulp" title="Code">💻</a></td>
   </tr>
 </table>
 

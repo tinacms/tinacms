@@ -1,0 +1,31 @@
+{
+  "name": "next-tinacms-markdown",
+  "version": "0.2.1-alpha.0",
+  "license": "Apache-2.0",
+  "author": "Kendall Strautman",
+  "main": "dist/index.js",
+  "module": "dist/next-tinacms-markdown.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "watch": "tsdx watch",
+    "build": "tsdx build",
+    "dev": "tsdx build",
+    "test": "tsdx test --env=jsdom",
+    "lint": "tsdx lint"
+  },
+  "peerDependencies": {
+    "next": ">=9",
+    "react": ">=16",
+    "tinacms": ">=0.11"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.2",
+    "js-yaml": "^3.13.1"
+  },
+  "devDependencies": {
+    "tinacms": "^0.13.0-alpha.0"
+  }
+}

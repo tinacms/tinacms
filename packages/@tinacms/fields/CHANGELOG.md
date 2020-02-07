@@ -3,6 +3,94 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.0...@tinacms/fields@0.4.1-alpha.0) (2020-02-06)
+
+
+### Bug Fixes
+
+* inserting row in table at position 1 ([c965154](https://github.com/tinacms/tinacms/commit/c965154))
+* url input box to get focused when link menu is opened. ([6a7dfbd](https://github.com/tinacms/tinacms/commit/6a7dfbd))
+
+
+
+
+
+# [0.4.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.0-alpha.0...@tinacms/fields@0.4.0) (2020-02-03)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+# [0.4.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1...@tinacms/fields@0.4.0-alpha.0) (2020-02-03)
+
+
+### Bug Fixes
+
+* focus editor after table action. ([fe33e9f](https://github.com/tinacms/tinacms/commit/fe33e9f))
+* more improvements in table column menu ([6e7e8f4](https://github.com/tinacms/tinacms/commit/6e7e8f4))
+* positioning of link creation modal inside table ([55fe132](https://github.com/tinacms/tinacms/commit/55fe132))
+* table column align options fixes ([7b7a8c2](https://github.com/tinacms/tinacms/commit/7b7a8c2))
+
+
+### Features
+
+* table column alignment ([418c2dd](https://github.com/tinacms/tinacms/commit/418c2dd))
+
+
+
+
+
+## [0.3.2-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1...@tinacms/fields@0.3.2-alpha.0) (2020-01-29)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+## [0.3.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1-alpha.0...@tinacms/fields@0.3.1) (2020-01-27)
+
+
+### Bug Fixes
+
+* correct keymaps in table ([ed3fccb](https://github.com/tinacms/tinacms/commit/ed3fccb))
+
+
+
+
+
+## [0.3.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0...@tinacms/fields@0.3.1-alpha.0) (2020-01-24)
+
+
+### Bug Fixes
+
+* off by one error for add row/col ([6959e09](https://github.com/tinacms/tinacms/commit/6959e09))
+
+
+
+
+
+# [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0-alpha.1...@tinacms/fields@0.3.0) (2020-01-22)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+# [0.3.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0-alpha.0...@tinacms/fields@0.3.0-alpha.1) (2020-01-22)
+
+
+### Bug Fixes
+
+* **wysiwyg:** prevent selection crash from arrows ([c389b01](https://github.com/tinacms/tinacms/commit/c389b01))
+
+
+
+
+
 # [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.2.1...@tinacms/fields@0.3.0-alpha.0) (2020-01-16)
 
 

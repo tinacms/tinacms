@@ -18,22 +18,14 @@ limitations under the License.
 
 import { css } from 'styled-components'
 
+const paddingX = 8
+const paddingY = 6
+const borderWidth = 1
+const controlSize = 12
+
 const proseMirrorTableStyles = `
-  /* START: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
   .ProseMirror .tableWrapper {
     overflow-x: auto;
-  }
-  .ProseMirror table {
-    border-collapse: collapse;
-    table-layout: fixed;
-    width: 100%;
-    overflow: hidden;
-  }
-  .ProseMirror td,
-  .ProseMirror th {
-    vertical-align: top;
-    box-sizing: border-box;
-    position: relative;
   }
   .ProseMirror .column-resize-handle {
     position: absolute;
@@ -58,81 +50,90 @@ const proseMirrorTableStyles = `
     right: 0;
     top: 0;
     bottom: 0;
-    background: rgba(200, 200, 255, 0.4);
+    background: rgba(0, 132, 255, 0.25);
+    /* This provides a bullet-proof border for selected cells even with border collapsing */
+    box-shadow: 0 0 0 1px #0574E4;
     pointer-events: none;
   }
-  /* END: copied from https://github.com/ProseMirror/prosemirror-tables/blob/master/style/tables.css */
+  .ProseMirror:focus {
+    outline: 0px solid transparent;
+  }
   .ProseMirror table {
-    border-right: 1px solid #c1c7cd;
-    border-bottom: 1px solid #c1c7cd;
+    border-collapse: collapse;
+    table-layout: fixed;
     display: inline-table;
-    margin: 10px;
+    margin: 32px 0 32px 0;
     overflow: visible;
-    width: calc(100% - 20px);
+    width: 100%;
   }
   .ProseMirror th {
-    background-color: #f0f1f3;
+    background-color: #F6F6F9;
   }
   .ProseMirror table td,
   .ProseMirror table th {
-    border-top: 1px solid #c1c7cd;
-    border-left: 1px solid #c1c7cd;
-    padding: 10px 4px;
+    border: 1px solid #E1DDEC;
+    padding: ${paddingY}px ${paddingX}px;
+    position: relative;
+    vertical-align: top;
+    box-sizing: border-box;
   }
   .ProseMirror .tina_table_header_ext_top {
-    background: #f0f1f3;
-    border-left: 1px solid #c1c7cd;
-    border-right: 1px solid #c1c7cd;
-    border-top: 1px solid #c1c7cd;
+    background: #F6F6F9;
+    border: 1px solid #E1DDEC;
     position: absolute;
-    height: 10px;
-    width: 100%;
-    transform: translate(-5px, -22px);
+    height: ${controlSize}px;
+    width: calc(100% + ${borderWidth * 2}px);
+    transform: translate(${(borderWidth + paddingX) * -1}px, ${(controlSize +
+  paddingY) *
+  -1}px);
+    cursor: pointer;
+    z-index: 1;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_top_selected {
-    background: #537ff7;
-    border-left: 1px solid #013bda;
-    border-right: 1px solid #013bda;
-    border-top: 1px solid #013bda;
-    z-index: 1;
+    background: #0084ff;
+    border-color: #0574E4;
+    z-index: 10;
   }
   .ProseMirror .tina_table_header_ext_left {
-    background: #f0f1f3;
-    border-left: 1px solid #c1c7cd;
-    border-bottom: 1px solid #c1c7cd;
-    border-top: 1px solid #c1c7cd;
+    background: #F6F6F9;
+    border: 1px solid #E1DDEC;
     position: absolute;
-    height: calc(100% + 2px);
-    width: 10px;
-    height: 100%;
-    transform: translate(-16px, -11px);
+    height: calc(100% + ${borderWidth * 2}px);
+    width: ${controlSize}px;
+    transform: translate(${(controlSize + paddingX) * -1}px, ${(borderWidth +
+  paddingY) *
+  -1}px);
+    cursor: pointer;
+    z-index: 1;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_left_selected {
-    background: #537ff7;
-    border-left: 1px solid #013bda;
-    border-top: 1px solid #013bda;
-    border-bottom: 1px solid #013bda;
-    z-index: 1;
+    background: #0084ff;
+    border-color: #0574E4;
+    z-index: 10;
   }
   .ProseMirror .tina_table_header_ext_top_left {
-    background: #f0f1f3;
-    border-left: 1px solid #c1c7cd;
-    border-top: 1px solid #c1c7cd;
+    background: #F6F6F9;
+    border: 1px solid #E1DDEC;
     position: absolute;
-    height: 10px;
-    width: 10px;
-    transform: translate(-16px, -22px);
+    height: ${controlSize}px;
+    width: ${controlSize}px;
+    transform: translate(${(controlSize + paddingX) * -1}px, ${(controlSize +
+  paddingY) *
+  -1}px);
+    border-radius: 5px 0 0 0;
+    z-index: 1;
+    cursor: pointer;
+    user-select: none;
   }
   .ProseMirror div.tina_table_header_ext_top_left_selected {
-    background: #2962ff;
-    border-left: 1px solid #013bda;
-    border-right: 1px solid #013bda;
-    border-top: 1px solid #013bda;
-    border-bottom: 1px solid #013bda;
-    z-index: 1;
+    background: #0084ff;
+    border-color: #0574E4;
+    z-index: 10;
   }
   .ProseMirror .selectedCell {
-    border: 1px solid #013bda;
+    border-color: transparent;
   }
 `
 
