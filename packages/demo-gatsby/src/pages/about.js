@@ -17,7 +17,7 @@ limitations under the License.
 */
 import React from "react"
 import { graphql } from "gatsby"
-import { useLocalMdx } from "gatsby-tinacms-mdx"
+import { useLocalMdxForm } from "gatsby-tinacms-mdx"
 import { MDXRenderer } from "gatsby-plugin-mdx"
 
 import Layout from "../components/layout"
@@ -40,7 +40,7 @@ function AboutPage(props) {
   }
 
   const siteTitle = props.data.site.siteMetadata.title
-  const [data] = useLocalMdx(props.data.mdx, formOptions)
+  const [data] = useLocalMdxForm(props.data.mdx, formOptions)
   return (
     <Layout location={props.location} title={siteTitle}>
       <SEO title="About" />
