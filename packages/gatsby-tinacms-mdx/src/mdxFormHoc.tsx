@@ -25,15 +25,18 @@ interface MdxFormProps extends Partial<FormOptions<any>> {
   queryName?: string // Configure where we are pulling the initial form data from.
 }
 
-export function mdx(Component: any, options: MdxFormProps = {}) {
+export function mdxForm(Component: any, options: MdxFormProps = {}) {
   return function Mdx(props: any) {
-    const [mdx] = useLocalMdxForm(getMdx(props.data, options.queryName), options)
+    const [mdx] = useLocalMdxForm(
+      getMdx(props.data, options.queryName),
+      options
+    )
 
     return <Component {...props} data={{ ...props.data, mdx }} />
   }
 }
 
-export function liveMdx(Component: any, options: MdxFormProps = {}) {
+export function inlineMdx(Component: any, options: MdxFormProps = {}) {
   return function Mdx(props: any) {
     const [mdx, form] = useLocalMdxForm(
       getMdx(props.data, options.queryName),
@@ -59,11 +62,15 @@ export function liveMdx(Component: any, options: MdxFormProps = {}) {
 
 export function GlobalMdxForm(Component: any, options: MdxFormProps = {}) {
   return function Mdx(props: any) {
-    const [mdx] = useGlobalMdxForm(getMdx(props.data, options.queryName), options)
+    const [mdx] = useGlobalMdxForm(
+      getMdx(props.data, options.queryName),
+      options
+    )
 
     return <Component {...props} data={{ ...props.data, mdx }} />
   }
 }
+
 const getMdx = (data: any, queryName: string = 'mdx') => {
   const mdx = data[queryName]
   if (!mdx) {
