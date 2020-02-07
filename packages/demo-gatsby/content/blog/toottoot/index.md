@@ -13,6 +13,7 @@ gallery:
       social:
         - {}
 draft: false
+testNumber: 42
 ---
 ## Fun with Flags
 
