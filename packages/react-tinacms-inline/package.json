@@ -1,0 +1,30 @@
+{
+  "name": "react-tinacms-inline",
+  "version": "0.1.0-alpha.0",
+  "license": "Apache-2.0",
+  "main": "dist/index.js",
+  "module": "dist/react-tinacms-inline.esm.js",
+  "typings": "dist/index.d.ts",
+  "files": [
+    "dist"
+  ],
+  "scripts": {
+    "watch": "tsdx watch",
+    "build": "tsdx build",
+    "dev": "tsdx build",
+    "test": "tsdx test --env=jsdom --passWithNoTests",
+    "lint": "tsdx lint"
+  },
+  "peerDependencies": {
+    "react": ">=16.8",
+    "react-final-form": "^>=6",
+    "styled-components": ">=4.1",
+    "tinacms": ">=0.10"
+  },
+  "devDependencies": {
+    "@tinacms/icons": "^0.4.1",
+    "@tinacms/styles": "^0.1.2-alpha.0",
+    "@types/jest": "^24.0.23",
+    "tinacms": "^0.13.0-alpha.0"
+  }
+}

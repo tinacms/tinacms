@@ -3,7 +3,7 @@
   "private": true,
   "description": "A simple starter to get up and developing quickly with Next.js",
   "license": "Apache-2.0",
-  "version": "0.2.1",
+  "version": "0.2.2-alpha.0",
   "author": "Kendall Strautman",
   "scripts": {
     "dev-next": "next",
@@ -14,19 +14,21 @@
     "deploy": "npm run build && npm run export"
   },
   "dependencies": {
-    "@tinacms/api-git": "^0.5.4",
-    "@tinacms/git-client": "^0.4.1",
+    "@tinacms/api-git": "^0.5.5-alpha.0",
+    "@tinacms/form-builder": "^0.2.14-alpha.0",
+    "@tinacms/git-client": "^0.4.2-alpha.0",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",
     "loader": "^2.1.1",
     "next": "^9.2.0",
-    "next-tinacms-json": "^0.3.0",
-    "next-tinacms-markdown": "^0.2.0",
+    "next-tinacms-json": "^0.3.1-alpha.0",
+    "next-tinacms-markdown": "^0.2.1-alpha.0",
     "prop-types": "^15.7.2",
     "raw-loader": "^3.0.0",
     "react-markdown": "^4.1.0",
-    "tinacms": "^0.12.1",
+    "react-tinacms-inline": "^0.1.0-alpha.0",
+    "tinacms": "^0.13.0-alpha.0",
     "webpack": "^4.41.5"
   },
   "devDependencies": {
