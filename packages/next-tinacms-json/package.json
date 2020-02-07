@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-json",
-  "version": "0.1.2-alpha.0",
+  "version": "0.3.1-alpha.0",
   "license": "Apache-2.0",
   "author": "Nolan Phillips",
   "main": "dist/index.js",
@@ -21,19 +21,7 @@
     "react": ">=16",
     "tinacms": ">=0.11"
   },
-  "dependencies": {
-    "next": ">=9",
-    "react": ">=16",
-    "tinacms": "^0.11.3-alpha.0"
-  },
   "devDependencies": {
-    "@types/jest": "^24.0.25",
-    "@types/react": "^16.9.17",
-    "@types/react-dom": "^16.9.4",
-    "react": "^16.12.0",
-    "react-dom": "^16.12.0",
-    "tsdx": "^0.11.0",
-    "tslib": "^1.10.0",
-    "typescript": "^3.7.4"
+    "tinacms": "^0.13.0-alpha.0"
   }
 }

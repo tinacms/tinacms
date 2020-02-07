@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.5-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.4...@tinacms/api-git@0.5.5-alpha.0) (2020-02-06)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
+## [0.5.4](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.4-alpha.0...@tinacms/api-git@0.5.4) (2020-01-27)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
+## [0.5.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.3...@tinacms/api-git@0.5.4-alpha.0) (2020-01-24)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
+## [0.5.3](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.3-alpha.1...@tinacms/api-git@0.5.3) (2020-01-22)
+
+**Note:** Version bump only for package @tinacms/api-git
+
+
+
+
+
+## [0.5.3-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.3-alpha.0...@tinacms/api-git@0.5.3-alpha.1) (2020-01-22)
+
+
+### Bug Fixes
+
+* **git:** don't return git error in response ([60630bb](https://github.com/tinacms/tinacms/commit/60630bb))
+* **show file:** sanitize path URLs for windows. ([09ec9a4](https://github.com/tinacms/tinacms/commit/09ec9a4))
+
+
+
+
+
 ## [0.5.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.2...@tinacms/api-git@0.5.3-alpha.0) (2020-01-16)
 
 **Note:** Version bump only for package @tinacms/api-git

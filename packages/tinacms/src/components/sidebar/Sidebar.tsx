@@ -32,52 +32,57 @@ import {
 import { padding, color, radius, font, timing } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from '../CreateContent'
-import { useSidebar } from './SidebarProvider'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useSubscribable, useCMS } from '../../react-tinacms'
+import { SidebarState } from '../../tina-cms'
 
 export const Sidebar = () => {
   const cms = useCMS()
-  const sidebar = useSidebar()
+  useSubscribable(cms.sidebar)
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
+  const allScreens = cms.screens.all();
+  const showMenu = allScreens.length > 0;
 
   return (
-    <SidebarContainer open={sidebar.isOpen}>
-      <SidebarWrapper open={sidebar.isOpen}>
+    <SidebarContainer open={cms.sidebar.isOpen}>
+      <SidebarWrapper open={cms.sidebar.isOpen}>
         <SidebarHeader>
-          <MenuToggle
-            onClick={() => setMenuVisibility(!menuIsVisible)}
-            open={menuIsVisible}
-          >
-            <HamburgerIcon />
-          </MenuToggle>
+          {showMenu && (
+            <MenuToggle
+              onClick={() => setMenuVisibility(!menuIsVisible)}
+              open={menuIsVisible}
+            >
+              <HamburgerIcon />
+            </MenuToggle>
+          )}
           <CreateContentMenu />
         </SidebarHeader>
         <FormsView />
-
-        <MenuPanel visible={menuIsVisible}>
-          <MenuWrapper>
-            <MenuList>
-              {cms.screens.all().map(view => {
-                const Icon = view.Icon
-                return (
-                  <MenuLink
-                    value={view.name}
-                    onClick={() => {
-                      setActiveView(view)
-                      setMenuVisibility(false)
-                    }}
-                  >
-                    <Icon /> {view.name}
-                  </MenuLink>
-                )
-              })}
-            </MenuList>
-          </MenuWrapper>
-          <Watermark />
-        </MenuPanel>
+        {showMenu && (
+          <MenuPanel visible={menuIsVisible}>
+            <MenuWrapper>
+              <MenuList>
+                {allScreens.map(view => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuLink
+                      value={view.name}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuVisibility(false)
+                      }}
+                    >
+                      <Icon /> {view.name}
+                    </MenuLink>
+                  )
+                })}
+              </MenuList>
+            </MenuWrapper>
+            <Watermark />
+          </MenuPanel>
+        )}
         {ActiveView && (
           <ActiveViewModal
             name={ActiveView.name}
@@ -88,7 +93,7 @@ export const Sidebar = () => {
           </ActiveViewModal>
         )}
       </SidebarWrapper>
-      <SidebarToggle {...sidebar} />
+      <SidebarToggle sidebar={cms.sidebar} />
     </SidebarContainer>
   )
 }
@@ -149,10 +154,10 @@ const Watermark = styled(({ ...styleProps }: any) => {
   }
 `
 
-const SidebarToggle = (sidebar: any) => {
+const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
   return (
     <SidebarToggleButton
-      onClick={() => sidebar.setIsOpen(!sidebar.isOpen)}
+      onClick={() => (sidebar.isOpen = !sidebar.isOpen)}
       open={sidebar.isOpen}
     >
       {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
@@ -260,7 +265,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
   }
   ${props =>
     props.open &&
-    css`
+    css<any>`
       svg {
         fill: #f6f6f9;
         &:hover {

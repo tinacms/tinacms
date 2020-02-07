@@ -30,7 +30,7 @@ export { TinaCMS as CMS } from './tina-cms'
 /**
  * Tina Sidebar
  */
-export { Tina, TinaProps, SidebarPosition } from './components/Tina'
+export { Tina, TinaProps } from './components/Tina'
 export { useSidebar } from './components/sidebar/SidebarProvider'
 
 /**
@@ -39,8 +39,8 @@ export { useSidebar } from './components/sidebar/SidebarProvider'
 
 // Plugin Types
 export { AddContentPlugin } from './plugins/create-content-form-plugin'
-export { ScreenPlugin } from './plugins/screen-plugin'
 export { GlobalFormPlugin } from './plugins/screens'
+export { ScreenPlugin } from './plugins/screen-plugin'
 
 // Pre-registered Plugins
 export * from './plugins/fields'
@@ -50,7 +50,7 @@ export * from './plugins/fields'
  */
 
 // Inline Editing Components
-export { TinaField, TinaForm } from '@tinacms/form-builder'
+export * from '@tinacms/form-builder'
 
 // Field/Input Component
 export { Wysiwyg, Toggle, NumberInput, Input } from '@tinacms/fields'
@@ -58,6 +58,8 @@ export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // Modal Components
 export * from './components/modals/ModalProvider'
+export * from './components/modals/ModalPopup'
+export * from './components/modals/ModalFullscreen'
 
 // Form Actions Components
 export { ActionButton } from './components/ActionsMenu'

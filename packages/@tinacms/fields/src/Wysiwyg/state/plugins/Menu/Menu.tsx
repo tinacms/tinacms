@@ -22,6 +22,7 @@ import { useState, useRef, useEffect } from 'react'
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
+import { FloatingTableMenu } from './FloatingTableMenu'
 import {
   toggleBulletList,
   toggleOrderedList,
@@ -29,6 +30,7 @@ import {
 import { insertTable } from '../../../commands/table-commands'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
+import { findParentNodeOfType } from 'prosemirror-utils'
 import styled, { css, ThemeProvider } from 'styled-components'
 import {
   BoldIcon,
@@ -93,6 +95,7 @@ export const Menu = (props: Props) => {
   const menuRef: any = useRef()
 
   const handleScroll = () => {
+    if (!menuRef.current) return
     // Need to know the Y coord of the bottom of the div that contains the text
     const textAreaBottom =
       menuRef.current.parentElement.nextSibling.offsetHeight + menuOffset
@@ -128,24 +131,27 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <MenuContainer
-        menuFixed={menuFixed}
-        menuWidth={menuWidth}
-        ref={menuRef}
-        onMouseDown={preventProsemirrorFocusLoss}
-      >
-        {supportBlocks && <FormattingDropdown view={view} />}
-        <BoldControl view={view} />
-        <ItalicControl view={view} />
-        <UnderlineControl view={view} />
-        <LinkControl view={view} />
-        {/* <ImageControl view={view} bottom={bottom} /> */}
-        {supportBlocks && <TableControl view={view} bottom={bottom} />}
-        {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
-        {supportBlocks && <CodeControl view={view} bottom={bottom} />}
-        {supportBlocks && <BulletList view={view} bottom={bottom} />}
-        {supportBlocks && <OrderedList view={view} bottom={bottom} />}
-      </MenuContainer>
+      <>
+        <MenuContainer
+          menuFixed={menuFixed}
+          menuWidth={menuWidth}
+          ref={menuRef}
+          onMouseDown={preventProsemirrorFocusLoss}
+        >
+          {supportBlocks && <FormattingDropdown view={view} />}
+          <BoldControl view={view} />
+          <ItalicControl view={view} />
+          <UnderlineControl view={view} />
+          <LinkControl view={view} />
+          {/* <ImageControl view={view} bottom={bottom} /> */}
+          {supportBlocks && <TableControl view={view} bottom={bottom} />}
+          {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
+          {supportBlocks && <CodeControl view={view} bottom={bottom} />}
+          {supportBlocks && <BulletList view={view} bottom={bottom} />}
+          {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+        </MenuContainer>
+        <FloatingTableMenu view={view} />
+      </>
     </ThemeProvider>
   )
 }
@@ -187,6 +193,10 @@ function wrapInBlockquote(state: EditorState, dispatch: any) {
   return wrapIn(state.schema.nodes.blockquote)(state, dispatch)
 }
 function insertTableCmd(state: EditorState, dispatch: any) {
+  const { table } = state.schema.nodes
+  const { selection } = state
+  const tableParent = findParentNodeOfType(table)(selection)
+  if (tableParent) return false
   return insertTable(state, dispatch)
 }
 function makeCodeBlock(state: EditorState, dispatch: any) {
@@ -248,14 +258,14 @@ export const MenuButton = styled.button<{
   disabled?: boolean
   bottom?: boolean
 }>`
-  flex: 1 0 auto;
+  flex: 1 1 auto;
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
   color: ${p => (p.active ? '#0084ff' : color.grey(8))};
   fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
   border: none;
   outline: none;
-  padding: 6px;
+  padding: 6px 0;
   margin: 0;
   transition: all 85ms ease-out;
   cursor: pointer;
@@ -303,6 +313,11 @@ export const MenuButton = styled.button<{
 
 export const MenuDropdownWrapper = styled.div`
   position: relative;
+  flex: 1 1 auto;
+
+  ${MenuButton} {
+    width: 100%;
+  }
 `
 
 export const MenuButtonDropdown = styled.div<{ open: boolean }>`

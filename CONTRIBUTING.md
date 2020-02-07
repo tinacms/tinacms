@@ -25,6 +25,7 @@ Packages in Tina are organized according to thier name
 | Node API extensions     | `@tinacms/api-*`   | `@tinacms/api-git`     |
 | React specific packages | `react-tinacms-*`  | `react-tinacms-remark` |
 | Gastby plugins          | `gatsby-tinacms-*` | `gatsby-tinacms-json`  |
+| Next.js helpers         | `next-tinacms-*`   | `next-tinacms-json`    |
 | Demo Projects           | `demo-*`           | `demo-gatsby`          |
 
 ## Troubleshooting in Development
@@ -67,45 +68,22 @@ Linking prevents running `npm install` from directly inside a package from worki
 
    This sucks. Try running `lerna clean` and then running `npm run bs` again.
 
-## General Release Process
+### Failed to Compile: Module not found: Can't resolve 'some-tinacms-package'
 
-The general release process looks like this:
+There are two reasons this error might occur:
 
-1. **Merge Changes**
+1. **The package did not link to `some-tinacms-package`**
 
-   Merge the changes to be published into the appropriate branch.
+   This is likely the problem if `some-tinacms-package` is missing from
+   the `node_modules`. If it is, do the following:
 
-1. **Build the source files:**
+   - Make sure `some-tinacms-package` is listed in the `package.json`
+   - Run `npm run bootstrap` from the root of the repo.
 
-   The source must be compiled, minified, and uglified in preparation for release.
+1. **`some-tinacms-package` was not built.**
 
-1. **Generate CHANGELOGs and git tags:**
+   This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
 
-   We use `lerna` to generate CHANGELOG files automatically from our commit messages.
+## Release Process
 
-1. **Clean the CHANGELOGs**
-
-   Lerna sometimes adds empty changelog entries. For example, if `react-tinacms` is changed
-   then `tinacms` will get get a patch update with only the dependency updated. Make sure to install `lerna-clean-changelog-cli`:
-
-   ```
-   npm i -g lerna-clean-changelogs-cli
-   ```
-
-1. **Publish to NPM:**
-
-   You must have an NPM_TOKEN set locally that has access to the `@tinacms` organization
-
-1. **Push CHANGELOGs and git tags to Github:**
-
-   Let everyone know!
-
-1. **Backmerge to Source Branch**
-
-   Merge the current branch back into the source of the changes.
-
-The exact commands vary slightly depending on the type of release being made.
-
-### Specific Release Process
-
-Checkout the [RELEASE.md](./RELEASE.md) file to see how to release.
+The TinaCMS core team releases frequently. Checkout the [RELEASE.md](./RELEASE.md) file to see how to create a release.
