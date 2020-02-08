@@ -16,11 +16,15 @@ limitations under the License.
 
 */
 
+import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { NumberInput } from '@tinacms/fields'
-import { parse } from './numberFormat';
+import { NumberInput as BaseNumberInput, NumberProps } from '@tinacms/fields'
+import { parse } from './numberFormat'
 
-export const NumberField = wrapFieldsWithMeta(NumberInput)
+export const NumberField = wrapFieldsWithMeta<
+  { placeholder: string },
+  NumberProps
+>(() => <BaseNumberInput />)
 
 export default {
   name: 'number',
