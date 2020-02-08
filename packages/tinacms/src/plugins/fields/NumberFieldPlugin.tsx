@@ -18,11 +18,12 @@ limitations under the License.
 
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { NumberInput } from '@tinacms/fields'
+import { parse } from './numberFormat';
 
 export const NumberField = wrapFieldsWithMeta(NumberInput)
 
 export default {
   name: 'number',
   Component: NumberField,
-  parse: (value?: any) => +value,
+  parse,
 }
