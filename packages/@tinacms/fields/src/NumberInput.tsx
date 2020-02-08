@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { Input } from './Input'
 
 interface NumberFieldProps {
   label: string
@@ -34,7 +35,7 @@ export interface NumberProps {
 }
 
 export const NumberInput: React.FC<NumberProps> = ({ input, field, steps }) => (
-  <input
+  <Input
     type="number"
     step={steps || field.steps}
     value={input.value}
