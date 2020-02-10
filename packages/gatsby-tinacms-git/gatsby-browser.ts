@@ -16,8 +16,7 @@ limitations under the License.
 
 */
 
-import { GitClient } from '@tinacms/git-client'
-import { GitMediaStore } from './git-media-store'
+import { GitClient, GitMediaStore } from '@tinacms/git-client'
 
 declare let window: any
 

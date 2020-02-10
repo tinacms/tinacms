@@ -36,11 +36,5 @@
   "dependencies": {
     "@tinacms/api-git": "^0.5.5-alpha.0",
     "@tinacms/git-client": "^0.4.2-alpha.0"
-  },
-  "devDependencies": {
-    "tinacms": "^0.13.0-alpha.0"
-  },
-  "peerDependencies": {
-    "tinacms": ">=0.13"
   }
 }
