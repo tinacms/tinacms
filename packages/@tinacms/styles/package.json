@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/styles",
-  "version": "0.1.1",
+  "version": "0.1.2-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -28,10 +28,7 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
-    "@types/jest": "^24.0.15",
-    "jest": "^24.8.0",
-    "styled-components": ">=4.1",
-    "ts-jest": "^24.0.2"
+    "styled-components": ">=4.1"
   },
   "peerDependencies": {
     "styled-components": ">=4.1"

@@ -50,7 +50,7 @@ export * from './plugins/fields'
  */
 
 // Inline Editing Components
-export { TinaField, TinaForm } from '@tinacms/form-builder'
+export * from '@tinacms/form-builder'
 
 // Field/Input Component
 export { Wysiwyg, Toggle, Select, Input } from '@tinacms/fields'
@@ -58,6 +58,8 @@ export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // Modal Components
 export * from './components/modals/ModalProvider'
+export * from './components/modals/ModalPopup'
+export * from './components/modals/ModalFullscreen'
 
 // Form Actions Components
 export { ActionButton } from './components/ActionsMenu'
