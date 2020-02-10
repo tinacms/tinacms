@@ -3,6 +3,11 @@
   "version": "0.1.11",
   "license": "Apache-2.0",
   "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/scripts"
+  },
   "bin": {
     "tinacms-scripts": "./bin/scripts.js"
   },

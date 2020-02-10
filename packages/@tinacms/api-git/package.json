@@ -20,13 +20,14 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/api/api-git"
+    "directory": "packages/@tinacms/api-git"
   },
   "scripts": {
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest"
+    "test": "jest",
+    "docs": "npx typedoc"
   },
   "bin": {
     "tina-git-server": "./bin/server.js"

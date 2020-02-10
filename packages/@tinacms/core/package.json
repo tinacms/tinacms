@@ -17,7 +17,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/core/core"
+    "directory": "packages/@tinacms/core"
   },
   "scripts": {
     "test": "jest --passWithNoTests",
