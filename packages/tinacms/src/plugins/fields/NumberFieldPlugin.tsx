@@ -23,7 +23,7 @@ import { parse } from './numberFormat'
 
 export const NumberField = wrapFieldsWithMeta<
   NumberProps
->(() => <BaseNumberInput />)
+>(BaseNumberInput)
 
 export default {
   name: 'number',
