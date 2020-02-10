@@ -14,7 +14,6 @@ jobs:
       - name: Install
         run: |
           npm ci
-          npm run bs
 
       - name: Build Docs
         run: npm run docs
