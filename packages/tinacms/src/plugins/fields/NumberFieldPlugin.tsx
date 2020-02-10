@@ -22,7 +22,6 @@ import { NumberInput as BaseNumberInput, NumberProps } from '@tinacms/fields'
 import { parse } from './numberFormat'
 
 export const NumberField = wrapFieldsWithMeta<
-  { placeholder: string },
   NumberProps
 >(() => <BaseNumberInput />)
 
