@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.1.2...@tinacms/forms@0.1.3-alpha.0) (2020-02-06)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
 ## [0.1.2](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.1.2-alpha.0...@tinacms/forms@0.1.2) (2020-01-27)
 
 **Note:** Version bump only for package @tinacms/forms
