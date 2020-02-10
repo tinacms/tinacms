@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { NumberInput as BaseNumberInput, NumberProps } from '@tinacms/fields'
 import { parse } from './numberFormat'
