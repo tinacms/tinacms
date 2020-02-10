@@ -37,7 +37,6 @@ import { generateFields } from './generate-fields'
 import * as React from 'react'
 const matter = require('gray-matter')
 import { transform } from 'buble-jsx-only'
-console.log(transform)
 
 export function useMdxForm(
   _mdx: MdxNode | null | undefined,
@@ -166,10 +165,13 @@ export function useMdxForm(
   }, [])
 
   const isValidMdxState = (mdxContent: any) => {
-    // const compiler = createMdxAstCompiler()
-    // const mdast = compiler.parse(mdxContent)
-    console.log(mdxContent)
-    return true
+    const wrapped = `<div>${mdxContent}</div>`
+    try {
+      transform(wrapped, {
+        objectAssign: 'Object.assign',
+      })
+      return true
+    } catch (err) {}
   }
 
   const validateAndWriteToDisk = (formState: any) => {
