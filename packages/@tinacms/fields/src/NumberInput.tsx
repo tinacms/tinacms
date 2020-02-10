@@ -19,27 +19,16 @@ limitations under the License.
 import * as React from 'react'
 import { Input } from './Input'
 
-interface NumberFieldProps {
-  label: string
-  name: string
-  component: string
-  steps: number | string
+type a = React.DetailedHTMLProps<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  HTMLInputElement
+>
+export interface NumberProps extends a {
+  step?: string | number
 }
 
-export interface NumberProps {
-  name: string
-  input: any
-  field: NumberFieldProps
-  disabled?: boolean
-  steps: number | string
-}
-
-export const NumberInput: React.FC<NumberProps> = ({ input, field, steps }) => (
-  <Input
-    type="number"
-    step={steps || field.steps}
-    value={input.value}
-    onChange={input.onChange}
-    {...input}
-  />
-)
+export const NumberInput: React.FC<NumberProps> = ({
+  onChange,
+  value,
+  step,
+}) => <Input type="number" step={step} value={value} onChange={onChange} />

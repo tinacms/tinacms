@@ -1,6 +1,6 @@
 ---
 title: A new Gatsby starter for Tina
-date: 2020-02-04T00:00:00.000Z
+date: 2020-02-05T00:00:00.000Z
 heading_color: pink
 description: 'My new post. '
 blocks: []
@@ -13,7 +13,8 @@ gallery:
       social:
         - {}
 draft: false
-testNumber: 42
+testNumber: 40
+cool: How cool!
 ---
 ## Fun with Flags
 
