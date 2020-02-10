@@ -18,7 +18,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/tinacms/styles"
+    "directory": "packages/@tinacms/styles"
   },
   "scripts": {
     "watch": "tinacms-scripts watch",

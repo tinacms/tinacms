@@ -19,7 +19,7 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/tinacms/form-builder"
+    "directory": "packages/@tinacms/form-builder"
   },
   "scripts": {
     "test": "jest --passWithNoTests",

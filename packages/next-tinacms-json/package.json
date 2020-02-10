@@ -9,6 +9,11 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/next-tinacms-json"
+  },
   "scripts": {
     "watch": "tsdx watch",
     "build": "tsdx build",
