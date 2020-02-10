@@ -104,7 +104,8 @@ export const Menu = (props: Props) => {
     if (
       window.scrollY > menuOffset &&
       window.scrollY < textAreaBottom &&
-      !menuFixed
+      !menuFixed &&
+      menuRef.current
     ) {
       // Need to remember the menu original position and width
       setMenuOffset(menuRef.current.offsetTop)
