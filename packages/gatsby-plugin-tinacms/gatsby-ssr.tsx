@@ -21,7 +21,7 @@ import { Tina, TinaCMS } from 'tinacms'
 
 exports.wrapRootElement = ({ element }: any, options: any) => {
   return (
-    <Tina {...options.sidebar} cms={new TinaCMS()}>
+    <Tina {...options.sidebar} cms={new TinaCMS(options)}>
       {element}
     </Tina>
   )

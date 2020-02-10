@@ -22,16 +22,13 @@ import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
-import { TinaCMS } from '../tina-cms'
+import { TinaCMS, SidebarPosition } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
 
 const merge = require('lodash.merge')
 
-export type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
-
 export interface TinaProps {
   cms: TinaCMS
-  position: SidebarPosition
   hidden?: boolean
   theme?: Theme
 }
@@ -39,7 +36,6 @@ export interface TinaProps {
 export const Tina: React.FC<TinaProps> = ({
   cms,
   children,
-  position,
   hidden,
   theme: themeOverrides,
 }) => {
@@ -53,7 +49,7 @@ export const Tina: React.FC<TinaProps> = ({
 
   return (
     <CMSContext.Provider value={cms}>
-      <SiteWrapper open={cms.sidebar.isOpen} position={position}>
+      <SiteWrapper open={cms.sidebar.isOpen} position={cms.sidebar.position}>
         {children}
       </SiteWrapper>
       {!hidden && (
