@@ -8,6 +8,11 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/react-tinacms-blocks"
+  },
   "scripts": {
     "watch": "tsdx watch",
     "build": "tsdx build",
