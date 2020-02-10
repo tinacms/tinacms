@@ -22,11 +22,12 @@ import { Field } from 'tinacms'
 export function generateFields(post: MdxNode): Field[] {
   const frontmatterFields = Object.keys(post.rawFrontmatter).map(key => ({
     component: 'text',
-    name: `rawFrontmatter.${key}`
+    name: `rawFrontmatter.${key}`,
   }))
 
   return [
     ...frontmatterFields,
-    { component: 'markdown', name: 'rawMarkdownBody' }
+    { component: 'markdown', name: 'rawMarkdownBody' },
   ]
+  //is it possible to add a validate function here? I couldn't get it to work
 }
