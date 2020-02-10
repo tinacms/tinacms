@@ -1,10 +1,13 @@
 import { MediaStore, MediaUploadOptions, Media } from 'tinacms'
-import { GitClient } from '@tinacms/git-client'
+import { GitClient } from './git-client'
+
 export class GitMediaStore implements MediaStore {
   accept = '*'
+
   constructor(private client: GitClient) {
     //
   }
+
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     const uploaded: Media[] = []
 

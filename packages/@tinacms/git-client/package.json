@@ -28,6 +28,10 @@
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.11"
+    "@tinacms/scripts": "^0.1.11",
+    "tinacms": "^0.13.0-alpha.0"
+  },
+  "peerDependencies": {
+    "tinacms": ">=0.13"
   }
 }
