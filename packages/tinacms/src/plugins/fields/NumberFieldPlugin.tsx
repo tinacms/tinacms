@@ -15,14 +15,17 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
+import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { NumberInput as BaseNumberInput, NumberProps } from '@tinacms/fields'
-import { parse } from './numberFormat'
+import { NumberInput as BaseNumberField, InputProps } from '@tinacms/fields'
+import { parse } from './numberFormat';
 
 export const NumberField = wrapFieldsWithMeta<
-  NumberProps
->(BaseNumberInput)
+  { step: string | number },
+  InputProps
+>(({ input, field }) => (
+  <BaseNumberField {...input} step={field.step} />
+))
 
 export default {
   name: 'number',
