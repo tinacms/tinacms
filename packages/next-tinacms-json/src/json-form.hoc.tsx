@@ -14,12 +14,14 @@ limitations under the License.
 import React from 'react'
 import { FC } from 'react'
 import { NextPage } from 'next'
+import { Form } from 'tinacms'
 import { JsonFile, Options } from './use-json-form'
 import { useLocalJsonForm } from './use-local-json-form'
 
 interface JsonFormProps {
   jsonFile: JsonFile
   fileRelativePath: string
+  form: Form
 }
 
 /**
@@ -31,13 +33,14 @@ export function jsonForm(
 ): NextPage<JsonFormProps> {
   return function JsonForm(props: JsonFormProps) {
     const { jsonFile } = props
-    const [data] = useLocalJsonForm(jsonFile, options)
+    const [data, form] = useLocalJsonForm(jsonFile, options)
 
     return (
       <Component
         {...props}
         fileRelativePath={props.jsonFile.fileRelativePath}
         jsonFile={data}
+        form={form}
       />
     )
   }
