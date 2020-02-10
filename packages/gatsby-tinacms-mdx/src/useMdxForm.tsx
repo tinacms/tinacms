@@ -35,7 +35,7 @@ import { MdxNode } from './mdx-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
-const matter = require('gray-matter')
+import matter from 'gray-matter'
 import { transform } from 'buble-jsx-only'
 
 export function useMdxForm(
@@ -43,7 +43,6 @@ export function useMdxForm(
   formOverrrides: Partial<FormOptions<any>> = {}
 ): [MdxNode | null | undefined, Form | null | undefined] {
   const mdx = usePersistentValue(_mdx)
-
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks. In the case of the check for
@@ -171,7 +170,13 @@ export function useMdxForm(
         objectAssign: 'Object.assign',
       })
       return true
-    } catch (err) {}
+    } catch (err) {
+      console.log('🚨 Not saving until your mdx is vallid')
+      if (form) {
+        // set error state somehow
+        console.log(form.meta)
+      }
+    }
   }
 
   const validateAndWriteToDisk = (formState: any) => {
