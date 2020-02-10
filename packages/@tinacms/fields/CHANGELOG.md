@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.0...@tinacms/fields@0.4.1-alpha.0) (2020-02-06)
+
+
+### Bug Fixes
+
+* inserting row in table at position 1 ([c965154](https://github.com/tinacms/tinacms/commit/c965154))
+* url input box to get focused when link menu is opened. ([6a7dfbd](https://github.com/tinacms/tinacms/commit/6a7dfbd))
+
+
+
+
+
 # [0.4.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.0-alpha.0...@tinacms/fields@0.4.0) (2020-02-03)
 
 **Note:** Version bump only for package @tinacms/fields
