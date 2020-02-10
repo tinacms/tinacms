@@ -36,6 +36,7 @@ import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
 const matter = require('gray-matter')
+const createMdxAstCompiler = require(`@mdx-js/mdx`).mdx
 
 export function useMdxForm(
   _mdx: MdxNode | null | undefined,
@@ -163,13 +164,14 @@ export function useMdxForm(
     })
   }, [])
 
-  const isValidMdxState = mdx => {
-    //Somehow test if MDX will crap out the page
-    console.log(mdx)
+  const isValidMdxState = (mdxContent: any) => {
+    const compiler = createMdxAstCompiler()
+    const mdast = compiler.parse(mdxContent)
+    console.log(mdast)
     return true
   }
 
-  const validateAndWriteToDisk = formState => {
+  const validateAndWriteToDisk = (formState: { rawMarkdownBody: any }) => {
     if (isValidMdxState(formState.rawMarkdownBody)) {
       setIsValidMdx(true)
       writeToDisk(formState)
