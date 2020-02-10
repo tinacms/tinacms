@@ -19,6 +19,7 @@ limitations under the License.
 import React, { useState, useRef, useEffect } from 'react'
 import { EditorView } from 'prosemirror-view'
 import styled from 'styled-components'
+import debounce from 'lodash/debounce'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
@@ -38,7 +39,7 @@ export default ({ view }: FloatingImageMenu) => {
   const [modalLeft, setModalLeft] = useState(left)
   const wrapperRef = useRef() as React.MutableRefObject<HTMLElement>
 
-  useEffect(() => {
+  function positionImage() {
     const image = document.getElementsByClassName('tina-selected-image')[0]
     if (image) {
       const imageDimensions = image.getBoundingClientRect()
@@ -54,7 +55,11 @@ export default ({ view }: FloatingImageMenu) => {
           wrapperDimensions.height
       )
     }
-  }, [])
+  }
+
+  const debouncedPositionImage = debounce(positionImage, 20)
+  window.addEventListener('scroll', debouncedPositionImage)
+  useEffect(positionImage, [selectedImage.pos])
 
   const updateNodeAttrs = () => {
     const { dispatch, state } = view
