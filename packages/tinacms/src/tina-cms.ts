@@ -31,10 +31,11 @@ import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import { Form } from '@tinacms/forms'
+import { MediaManager, MediaStore, MediaUploadOptions } from './media'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
-export interface TinaCMSConfig extends CMSConfig{
+export interface TinaCMSConfig extends CMSConfig {
   sidebar: {
     hidden: boolean
     position: SidebarPosition
@@ -43,8 +44,9 @@ export interface TinaCMSConfig extends CMSConfig{
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
+  media = new MediaManager(new DummyMediaStore())
 
-  constructor({ sidebar, ...config}: TinaCMSConfig) {
+  constructor({ sidebar, ...config }: TinaCMSConfig) {
     super(config)
 
     this.sidebar = new SidebarState(sidebar.position)
@@ -88,5 +90,17 @@ export class SidebarState extends Subscribable {
   set isOpen(nextValue: boolean) {
     this._isOpen = nextValue
     this.notifiySubscribers()
+  }
+}
+
+class DummyMediaStore implements MediaStore {
+  accept = '*'
+  async persist(files: MediaUploadOptions[]) {
+    alert('UPLOADING FILES')
+    console.log(files)
+    return files.map(({ directory, file }) => ({
+      directory,
+      filename: file.name,
+    }))
   }
 }
