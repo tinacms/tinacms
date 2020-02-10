@@ -18,14 +18,15 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/tinacms/fields"
+    "directory": "packages/@tinacms/fields"
   },
   "scripts": {
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
     "build": "tinacms-scripts build",
     "test": "jest --passWithNoTests",
-    "storybook": "start-storybook -p 9001 -c .storybook"
+    "storybook": "start-storybook -p 9001 -c .storybook",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
     "@babel/core": "^7.5.5",
