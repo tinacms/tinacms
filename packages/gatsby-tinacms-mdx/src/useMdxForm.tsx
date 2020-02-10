@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
+import { useState } from 'react'
 import {
   FormOptions,
   Form,
@@ -36,6 +36,8 @@ import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
 const matter = require('gray-matter')
+import { transform } from 'buble-jsx-only'
+console.log(transform)
 
 export function useMdxForm(
   _mdx: MdxNode | null | undefined,
@@ -60,6 +62,8 @@ export function useMdxForm(
   const label = formOverrrides.label || mdx.frontmatter.title
   const id = mdx.fileRelativePath
   const actions = formOverrrides.actions
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
+  const [isValidMdx, setIsValidMdx] = useState(true)
 
   /**
    * The state of the Mdx, generated from the contents of the
@@ -161,8 +165,24 @@ export function useMdxForm(
     })
   }, [])
 
+  const isValidMdxState = (mdxContent: any) => {
+    // const compiler = createMdxAstCompiler()
+    // const mdast = compiler.parse(mdxContent)
+    console.log(mdxContent)
+    return true
+  }
+
+  const validateAndWriteToDisk = (formState: any) => {
+    if (isValidMdxState(formState.values.rawMarkdownBody)) {
+      setIsValidMdx(true)
+      writeToDisk(formState)
+    } else {
+      setIsValidMdx(false)
+    }
+  }
+
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
+  useWatchFormValues(form, validateAndWriteToDisk)
 
   return [mdx, form]
 }
