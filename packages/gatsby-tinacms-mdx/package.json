@@ -32,20 +32,16 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
-    "@types/jest": "^24.0.15",
     "@types/js-yaml": "^3.12.1",
-    "jest": "^24.8.0",
-    "tinacms": "^0.12.1-alpha.0",
-    "ts-jest": "^24.0.2"
+    "tinacms": "^0.13.0-alpha.0"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
-    "slash": "^3.0.0"
+    "slash": "^3.0.0",
+    "buble-jsx-only": "^0.19.8"
   },
   "peerDependencies": {
-    "@mdx-js/mdx": ">=1.5.1",
-    "@mdx-js/react": ">=1.5.5",
     "gatsby-plugin-mdx": ">=1.0.53",
     "tinacms": ">=0.11"
   }
