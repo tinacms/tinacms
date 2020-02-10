@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/git-client",
-  "version": "0.4.1",
+  "version": "0.4.2-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -28,9 +28,6 @@
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.11",
-    "@types/jest": "^24.0.15",
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2"
+    "@tinacms/scripts": "^0.1.11"
   }
 }
