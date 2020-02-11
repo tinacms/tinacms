@@ -18,7 +18,7 @@ limitations under the License.
 
 import { router as gitRouter, GitRouterConfig, configureGitRemote } from '@tinacms/api-git'
 
-exports.onCreateDevServer = ({ app }: any, options: GitRouterConfig) => {
+exports.onCreateDevServer = ({ app }: any, options: Partial<GitRouterConfig>) => {
   if (process.env.TINA_CEE !== undefined) {
     configureGitRemote(options)
   }
