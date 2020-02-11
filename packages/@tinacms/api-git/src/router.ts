@@ -33,25 +33,40 @@ const GIT_ERROR_MESSAGE =
   'Git Operation failed: Check the logs for more details'
 
 export interface GitRouterConfig {
-  pathToRepo?: string
-  pathToContent?: string
-  defaultCommitMessage?: string
-  defaultCommitName?: string
-  defaultCommitEmail?: string
-  pushOnCommit?: boolean
+  pathToRepo: string
+  pathToContent: string
+  defaultCommitMessage: string
+  defaultCommitName: string
+  defaultCommitEmail: string
+  pushOnCommit: boolean
   sshKey?: string
   gitRemote?: string
 }
 
-export function router(config: GitRouterConfig = {}) {
-  const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
-  const CONTENT_REL_PATH = config.pathToContent || ''
-  const CONTENT_ABSOLUTE_PATH = path.join(REPO_ABSOLUTE_PATH, CONTENT_REL_PATH)
+const DEFAULT_OPTIONS: GitRouterConfig = {
+  pathToRepo: process.cwd(),
+  pathToContent: '',
+  defaultCommitMessage: 'Edited with TinaCMS',
+  defaultCommitName: 'TinaCMS',
+  defaultCommitEmail: 'git@tinacms.org',
+  pushOnCommit: true
+}
+
+function setDefaults<T>(partial: Partial<T>, defaults: T): T {
+  return Object.assign({}, defaults, partial)
+}
+
+export function router(config: Partial<GitRouterConfig> = {}) {
+  const {
+    pathToRepo,
+    pathToContent,
+    defaultCommitMessage,
+    defaultCommitName,
+    defaultCommitEmail,
+    pushOnCommit
+  } = setDefaults(config, DEFAULT_OPTIONS)
+  const CONTENT_ABSOLUTE_PATH = path.join(pathToRepo, pathToContent)
   const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
-  const DEFAULT_COMMIT_MESSAGE =
-    config.defaultCommitMessage || 'Edited with TinaCMS'
-  const PUSH_ON_COMMIT =
-    typeof config.pushOnCommit === 'boolean' ? config.pushOnCommit : true
 
   const uploader = createUploader(TMP_DIR)
 
@@ -70,11 +85,11 @@ export function router(config: GitRouterConfig = {}) {
     }
 
     commit({
-      pathRoot: REPO_ABSOLUTE_PATH,
-      name: user.name || req.body.name || config.defaultCommitName,
-      email: user.email || req.body.email || config.defaultCommitEmail,
+      pathRoot: pathToRepo,
+      name: user.name || req.body.name || defaultCommitName,
+      email: user.email || req.body.email || defaultCommitEmail,
       message: `Update from Tina: delete ${fileRelativePath}`,
-      push: PUSH_ON_COMMIT,
+      push: pushOnCommit,
       files: [fileAbsolutePath],
     })
       .then(() => {
@@ -115,7 +130,7 @@ export function router(config: GitRouterConfig = {}) {
       const fileName = req.file.originalname
       const tmpPath = path.join(TMP_DIR, fileName)
       const finalPath = path.join(
-        REPO_ABSOLUTE_PATH,
+        pathToRepo,
         req.body.directory,
         fileName
       )
@@ -131,17 +146,17 @@ export function router(config: GitRouterConfig = {}) {
   router.post('/commit', async (req: any, res: any) => {
     try {
       const user = req.user || {}
-      const message = req.body.message || DEFAULT_COMMIT_MESSAGE
+      const message = req.body.message || defaultCommitMessage
       const files = req.body.files.map((rel: string) =>
         path.join(CONTENT_ABSOLUTE_PATH, rel)
       )
 
       // TODO: Separate commit and push???
       await commit({
-        pathRoot: REPO_ABSOLUTE_PATH,
-        name: user.name || req.body.name || config.defaultCommitName,
-        email: user.email || req.body.email || config.defaultCommitEmail,
-        push: PUSH_ON_COMMIT,
+        pathRoot: pathToRepo,
+        name: user.name || req.body.name || defaultCommitName,
+        email: user.email || req.body.email || defaultCommitEmail,
+        push: pushOnCommit,
         message,
         files,
       })
@@ -156,7 +171,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.post('/push', async (req: any, res: any) => {
     try {
-      await openRepo(REPO_ABSOLUTE_PATH).push()
+      await openRepo(pathToRepo).push()
       res.json({ status: 'success' })
     } catch {
       // TODO: More intelligently respond
@@ -166,7 +181,7 @@ export function router(config: GitRouterConfig = {}) {
   })
 
   router.post('/reset', (req, res) => {
-    const repo = openRepo(REPO_ABSOLUTE_PATH)
+    const repo = openRepo(pathToRepo)
     const files = req.body.files.map((rel: string) =>
       path.join(CONTENT_ABSOLUTE_PATH, rel)
     )
@@ -184,7 +199,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.get('/branch', async (req, res) => {
     try {
-      const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
+      const summary = await openRepo(pathToRepo).branchLocal()
       res.send({ status: 'success', branch: summary.branches[summary.current] })
     } catch {
       // TODO: More intelligently respond
@@ -195,7 +210,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.get('/branches', async (req, res) => {
     try {
-      const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
+      const summary = await openRepo(pathToRepo).branchLocal()
       res.send({ status: 'success', branches: summary.all })
     } catch {
       // TODO: More intelligently respond
@@ -206,7 +221,7 @@ export function router(config: GitRouterConfig = {}) {
 
   router.get('/branches/:name', async (req, res) => {
     try {
-      const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
+      const summary = await openRepo(pathToRepo).branchLocal()
       const branch = summary.branches[req.params.name]
 
       if (!branch) {
@@ -229,11 +244,11 @@ export function router(config: GitRouterConfig = {}) {
   router.get('/show/:fileRelativePath', async (req, res) => {
     try {
       const fileRelativePath = path.posix
-        .join(CONTENT_REL_PATH, req.params.fileRelativePath)
+        .join(pathToContent, req.params.fileRelativePath)
         .replace(/^\/*/, '')
 
       const content = await show({
-        pathRoot: REPO_ABSOLUTE_PATH,
+        pathRoot: pathToRepo,
         fileRelativePath,
       })
 
