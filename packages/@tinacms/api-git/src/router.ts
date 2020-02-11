@@ -22,12 +22,11 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as express from 'express'
 
+import { configureGitRemote } from './configure'
 import { commit } from './commit'
 import { createUploader } from './upload'
-import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
+import { openRepo } from './open-repo'
 import { show } from './show'
-import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
-import atob from 'atob'
 
 // Don't return full error message to client incase confidential details leak
 const GIT_ERROR_MESSAGE =
@@ -58,61 +57,6 @@ export function checkFilePathIsInRepo(
   } else {
     return false
   }
-}
-
-// Ensure remote URL is ssh
-export async function updateRemoteToSSH(pathRoot: string) {
-  const repo = await openRepo(pathRoot)
-  const remotes = await repo.getRemotes(true)
-  const originRemotes = remotes.filter((r: any) => r.name == 'origin')
-
-  if (!originRemotes.length) {
-    console.warn('No origin remote on the given repo')
-    return
-  }
-
-  const originURL = originRemotes[0].refs.push
-
-  if (originURL && !isSSHUrl(originURL)) {
-    await repo.removeRemote('origin')
-    const newRemote = getGitSSHUrl(originURL)
-    await repo.addRemote('origin', newRemote)
-  }
-}
-
-async function createSSHKey(pathRoot: string, sshKey?: string) {
-  if (sshKey) {
-    const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
-    const parentDir = path.dirname(ssh_path)
-    if (!fs.existsSync(parentDir)) {
-      fs.mkdirSync(parentDir, { recursive: true })
-    }
-    fs.writeFileSync(ssh_path, atob(sshKey), {
-      encoding: 'utf8',
-      mode: 0o600,
-    })
-  }
-}
-
-async function configureGitRemote(pathRoot: string, gitRemote?: string, sshKey?: string) {
-  await createSSHKey(pathRoot, sshKey)
-  if (gitRemote) {
-    await updateOrigin(pathRoot, gitRemote)
-  }
-  await updateRemoteToSSH(pathRoot)
-}
-
-async function updateOrigin(pathRoot: string, remote: string) {
-  const repo = await openRepo(pathRoot)
-  const newRemote = getGitSSHUrl(remote)
-
-  const existingRemotes = await repo.getRemotes(true)
-  if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
-    console.warn(`Changing remote origin to ${newRemote}`)
-  }
-
-  await repo.removeRemote('origin')
-  await repo.addRemote('origin', newRemote)
 }
 
 export function router(config: GitRouterConfig = {}) {
