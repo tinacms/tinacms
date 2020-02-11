@@ -118,7 +118,9 @@
         "projectManagement",
         "talk",
         "ideas",
-        "bug"
+        "bug",
+        "infra",
+        "doc"
       ]
     },
     {

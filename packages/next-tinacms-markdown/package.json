@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-markdown",
-  "version": "0.2.1-alpha.0",
+  "version": "0.2.1",
   "license": "Apache-2.0",
   "author": "Kendall Strautman",
   "main": "dist/index.js",
@@ -9,12 +9,18 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/next-tinacms-markdown"
+  },
   "scripts": {
     "watch": "tsdx watch",
     "build": "tsdx build",
     "dev": "tsdx build",
     "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint"
+    "lint": "tsdx lint",
+    "docs": "npx typedoc"
   },
   "peerDependencies": {
     "next": ">=9",
@@ -26,6 +32,6 @@
     "js-yaml": "^3.13.1"
   },
   "devDependencies": {
-    "tinacms": "^0.13.0-alpha.0"
+    "tinacms": "^0.13.0"
   }
 }

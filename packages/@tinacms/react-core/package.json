@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-core",
-  "version": "0.2.6-alpha.0",
+  "version": "0.2.6",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-core.esm.js",
@@ -8,16 +8,22 @@
   "files": [
     "dist"
   ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/react-core"
+  },
   "scripts": {
     "watch": "tsdx watch",
     "build": "tsdx build",
     "dev": "tsdx build",
     "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint"
+    "lint": "tsdx lint",
+    "docs": "npx typedoc"
   },
   "dependencies": {
-    "@tinacms/core": "^0.7.1-alpha.0",
-    "@tinacms/forms": "^0.1.3-alpha.0"
+    "@tinacms/core": "^0.7.1",
+    "@tinacms/forms": "^0.1.3"
   },
   "peerDependencies": {
     "react": ">=16.8"
