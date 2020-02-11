@@ -41,7 +41,7 @@ export default ({ view }: FloatingImageMenu) => {
 
   function positionImage() {
     const image = document.getElementsByClassName('tina-selected-image')[0]
-    if (image) {
+    if (image && wrapperRef.current) {
       const imageDimensions = image.getBoundingClientRect()
       const wrapperDimensions = wrapperRef.current.getBoundingClientRect()
       setModalLeft(
