@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { checkFilePathIsInRepo } from './router'
+import { checkFilePathIsInRepo } from './paths'
 jest.mock('./open-repo')
 
 describe('checkFilePathIsInRepo', () => {
