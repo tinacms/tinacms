@@ -52,10 +52,6 @@ const DEFAULT_OPTIONS: GitRouterConfig = {
   pushOnCommit: true
 }
 
-function setDefaults<T>(defaults: T, partial: Partial<T>): T {
-  return Object.assign({}, defaults, partial)
-}
-
 export function router(config: Partial<GitRouterConfig> = {}) {
   const {
     pathToRepo,
@@ -64,7 +60,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
     defaultCommitName,
     defaultCommitEmail,
     pushOnCommit
-  } = setDefaults(DEFAULT_OPTIONS, config)
+  }: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config}
   const CONTENT_ABSOLUTE_PATH = path.join(pathToRepo, pathToContent)
   const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
 
