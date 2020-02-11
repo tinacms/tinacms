@@ -43,9 +43,6 @@ export const imagePlugin = new Plugin({
     decorations(state) {
       return (this as any).getState(state).deco
     },
-    /**
-     * When extended table header is clicked, corresponding column or row should be selected.
-     */
     handleClickOn(
       view: EditorView,
       _1: any,
