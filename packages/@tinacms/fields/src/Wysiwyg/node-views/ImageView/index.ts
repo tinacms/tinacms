@@ -62,9 +62,13 @@ export class ImageView implements NodeView {
   }
 
   deselectNode = () => {
-    const { state } = this.view
-    const { selectedImage } = imagePluginKey.getState(state)
-    if ((!selectedImage || selectedImage.pos !== this.getPos()) && this.img) {
+    // const { state } = this.view
+    // const { selectedImage } = imagePluginKey.getState(state)
+    // if ((!selectedImage || selectedImage.pos !== this.getPos()) && this.img) {
+    // this.img.style.outline = ''
+    // this.img.classList.remove('tina-selected-image')
+    // }
+    if (this.img) {
       this.img.style.outline = ''
       this.img.classList.remove('tina-selected-image')
     }
