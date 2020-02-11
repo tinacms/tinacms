@@ -27,6 +27,7 @@ import { createUploader } from './upload'
 import { openRepo } from './open-repo'
 import { show } from './show'
 import { checkFilePathIsInRepo } from './utils'
+import { Repo } from './repo'
 
 // Don't return full error message to client incase confidential details leak
 const GIT_ERROR_MESSAGE =
@@ -53,18 +54,18 @@ const DEFAULT_OPTIONS: GitRouterConfig = {
 }
 
 export function router(config: Partial<GitRouterConfig> = {}) {
+  const options: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config}
+
   const {
-    pathToRepo,
-    pathToContent,
     defaultCommitMessage,
     defaultCommitName,
     defaultCommitEmail,
     pushOnCommit
-  }: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config}
-  const CONTENT_ABSOLUTE_PATH = path.join(pathToRepo, pathToContent)
-  const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
+  } = options
 
-  const uploader = createUploader(TMP_DIR)
+  const repo = new Repo(options)
+
+  const uploader = createUploader(repo.tmpDir)
 
   const router = express.Router()
   router.use(express.json())
@@ -72,7 +73,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
   router.delete('/:relPath', (req: any, res: any) => {
     const user = req.user || {}
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
+    const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
 
     try {
       deleteFile(fileAbsolutePath)
@@ -81,7 +82,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
     }
 
     commit({
-      pathRoot: pathToRepo,
+      pathRoot: repo.pathToRepo,
       name: user.name || req.body.name || defaultCommitName,
       email: user.email || req.body.email || defaultCommitEmail,
       message: `Update from Tina: delete ${fileRelativePath}`,
@@ -98,7 +99,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
 
   router.put('/:relPath', (req: any, res: any) => {
     const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
+    const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
 
     if (DEBUG) {
       console.log(fileAbsolutePath)
@@ -106,7 +107,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
     try {
       const fileIsInRepo = checkFilePathIsInRepo(
         fileAbsolutePath,
-        CONTENT_ABSOLUTE_PATH
+        repo.contentAbsolutePath
       )
       if (fileIsInRepo) {
         writeFile(fileAbsolutePath, req.body.content)
@@ -124,9 +125,9 @@ export function router(config: Partial<GitRouterConfig> = {}) {
   router.post('/upload', uploader.single('file'), (req: any, res: any) => {
     try {
       const fileName = req.file.originalname
-      const tmpPath = path.join(TMP_DIR, fileName)
+      const tmpPath = path.join(repo.tmpDir, fileName)
       const finalPath = path.join(
-        pathToRepo,
+        repo.pathToRepo,
         req.body.directory,
         fileName
       )
@@ -144,12 +145,12 @@ export function router(config: Partial<GitRouterConfig> = {}) {
       const user = req.user || {}
       const message = req.body.message || defaultCommitMessage
       const files = req.body.files.map((rel: string) =>
-        path.join(CONTENT_ABSOLUTE_PATH, rel)
+        path.join(repo.contentAbsolutePath, rel)
       )
 
       // TODO: Separate commit and push???
       await commit({
-        pathRoot: pathToRepo,
+        pathRoot: repo.pathToRepo,
         name: user.name || req.body.name || defaultCommitName,
         email: user.email || req.body.email || defaultCommitEmail,
         push: pushOnCommit,
@@ -167,7 +168,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
 
   router.post('/push', async (req: any, res: any) => {
     try {
-      await openRepo(pathToRepo).push()
+      await openRepo(repo.pathToRepo).push()
       res.json({ status: 'success' })
     } catch {
       // TODO: More intelligently respond
@@ -177,12 +178,12 @@ export function router(config: Partial<GitRouterConfig> = {}) {
   })
 
   router.post('/reset', (req, res) => {
-    const repo = openRepo(pathToRepo)
+    const gitRepo = openRepo(repo.pathToRepo)
     const files = req.body.files.map((rel: string) =>
-      path.join(CONTENT_ABSOLUTE_PATH, rel)
+      path.join(repo.contentAbsolutePath, rel)
     )
     if (DEBUG) console.log(files)
-    repo
+    gitRepo
       .checkout(files[0])
       .then(() => {
         res.json({ status: 'success' })
@@ -195,7 +196,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
 
   router.get('/branch', async (req, res) => {
     try {
-      const summary = await openRepo(pathToRepo).branchLocal()
+      const summary = await openRepo(repo.pathToRepo).branchLocal()
       res.send({ status: 'success', branch: summary.branches[summary.current] })
     } catch {
       // TODO: More intelligently respond
@@ -206,7 +207,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
 
   router.get('/branches', async (req, res) => {
     try {
-      const summary = await openRepo(pathToRepo).branchLocal()
+      const summary = await openRepo(repo.pathToRepo).branchLocal()
       res.send({ status: 'success', branches: summary.all })
     } catch {
       // TODO: More intelligently respond
@@ -217,7 +218,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
 
   router.get('/branches/:name', async (req, res) => {
     try {
-      const summary = await openRepo(pathToRepo).branchLocal()
+      const summary = await openRepo(repo.pathToRepo).branchLocal()
       const branch = summary.branches[req.params.name]
 
       if (!branch) {
@@ -240,11 +241,11 @@ export function router(config: Partial<GitRouterConfig> = {}) {
   router.get('/show/:fileRelativePath', async (req, res) => {
     try {
       const fileRelativePath = path.posix
-        .join(pathToContent, req.params.fileRelativePath)
+        .join(repo.pathToContent, req.params.fileRelativePath)
         .replace(/^\/*/, '')
 
       const content = await show({
-        pathRoot: pathToRepo,
+        pathRoot: repo.pathToRepo,
         fileRelativePath,
       })
 
