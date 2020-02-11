@@ -172,19 +172,20 @@ export function useMdxForm(
       return true
     } catch (err) {
       console.log('🚨 Not saving until your mdx is vallid')
-      if (form) {
-        // set error state somehow
-        console.log(form.meta)
-      }
     }
   }
 
   const validateAndWriteToDisk = (formState: any) => {
+    const formElement = document.querySelector("[name='rawMarkdownBody']")
     if (isValidMdxState(formState.values.rawMarkdownBody)) {
       setIsValidMdx(true)
+      if (formElement)
+        formElement.setAttribute('style', 'border: 1px solid #b6b6b6;')
       writeToDisk(formState)
     } else {
       setIsValidMdx(false)
+      if (formElement)
+        formElement.setAttribute('style', 'border: 1px solid red;')
     }
   }
 
