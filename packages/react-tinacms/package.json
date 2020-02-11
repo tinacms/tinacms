@@ -18,13 +18,14 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/react/react-tinacms"
+    "directory": "packages/react-tinacms"
   },
   "scripts": {
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11"
