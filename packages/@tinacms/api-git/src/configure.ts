@@ -20,7 +20,7 @@ import * as fs from 'fs'
 import * as path from 'path'
 
 import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
-import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
+import { getGitSSHUrl, isSSHUrl } from './utils'
 import atob from 'atob'
 
 export interface GitRemoteConfig {
