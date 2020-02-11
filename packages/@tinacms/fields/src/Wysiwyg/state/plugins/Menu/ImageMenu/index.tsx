@@ -19,7 +19,7 @@ limitations under the License.
 import React, { useState, useRef, useEffect } from 'react'
 import { EditorView } from 'prosemirror-view'
 import debounce from 'lodash/debounce'
-import styled, { keyframes } from 'styled-components'
+import styled from 'styled-components'
 import { TinaReset, radius, color, font } from '@tinacms/styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
@@ -29,7 +29,8 @@ interface FloatingImageMenu {
   view: EditorView
 }
 
-export default ({ view }: FloatingImageMenu) => {
+export default (props: FloatingImageMenu) => {
+  const { view } = props
   const { selectedImage } = imagePluginKey.getState(view.state)
   if (!selectedImage) return null
   const { node, pos } = selectedImage
@@ -39,10 +40,12 @@ export default ({ view }: FloatingImageMenu) => {
   const [modalTop, setModalTop] = useState(top)
   const [modalLeft, setModalLeft] = useState(left)
   const wrapperRef = useRef() as React.MutableRefObject<HTMLElement>
+  const imageRef = useRef() as React.MutableRefObject<HTMLImageElement>
 
-  function positionImage() {
+  function positionImage(scroll?: boolean) {
     const image = document.getElementsByClassName('tina-selected-image')[0]
-    if (image && wrapperRef.current) {
+    if (image && (imageRef.current !== image || scroll) && wrapperRef.current) {
+      imageRef.current = image as any
       const imageDimensions = image.getBoundingClientRect()
       const wrapperDimensions = wrapperRef.current.getBoundingClientRect()
       setModalLeft(
@@ -58,9 +61,14 @@ export default ({ view }: FloatingImageMenu) => {
     }
   }
 
-  const debouncedPositionImage = debounce(positionImage, 20)
-  window.addEventListener('scroll', debouncedPositionImage)
-  useEffect(positionImage, [selectedImage.pos])
+  useEffect(() => {
+    const debouncedPositionImage = debounce(() => positionImage(true), 20)
+    window.addEventListener('scroll', debouncedPositionImage)
+    return () => {
+      window.removeEventListener('scroll', debouncedPositionImage)
+    }
+  })
+  useEffect(positionImage)
 
   const updateNodeAttrs = () => {
     const { dispatch, state } = view
@@ -107,15 +115,6 @@ export default ({ view }: FloatingImageMenu) => {
   )
 }
 
-const LinkPopupKeyframes = keyframes`
-  0% {
-    transform: scale3d(0.5,0.5,1)
-  }
-  100% {
-    transform: scale3d(1, 1, 1);
-  }
-`
-
 const LinkPopup = styled.span<
   React.HTMLAttributes<HTMLDivElement> & {
     left: number
@@ -131,7 +130,6 @@ const LinkPopup = styled.span<
   filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
     drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
   transform-origin: 50% 0;
-  animation: ${LinkPopupKeyframes} 85ms ease-out both 1;
   overflow: visible;
   padding: 12px;
   z-index: 10;
