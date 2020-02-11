@@ -17,12 +17,14 @@ limitations under the License.
 */
 
 import * as path from 'path'
+import { commit, CommitOptions } from './commit'
+import { openRepo } from './open-repo'
+import { show } from '../build/show'
 
 export interface GitRepoConfig {
   pathToRepo: string
   pathToContent: string
 }
-
 
 export class Repo {
 
@@ -44,5 +46,27 @@ export class Repo {
 
   fileAbsolutePath(fileRelativePath: string) {
     return path.join(this.contentAbsolutePath, fileRelativePath)
+  }
+
+  commit(options: Omit<CommitOptions, "pathRoot">) {
+    return commit({
+      pathRoot: this.pathToRepo,
+      ...options
+    })
+  }
+
+  push() {
+    return openRepo(this.pathToRepo).push()
+  }
+
+  reset(files: string[]) {
+    return openRepo(this.pathToRepo).checkout(files[0])
+  }
+
+  getFileAtHead(fileRelativePath: string) {
+    return show({
+      pathRoot: this.pathToRepo,
+      fileRelativePath
+    })
   }
 }
