@@ -1,0 +1,26 @@
+name: Build and publish Auto generated API documentation
+
+on: pull_request
+
+jobs:
+  build:
+    runs-on: ubuntu-18.04
+    steps:
+      - uses: actions/checkout@v1
+      - uses: actions/setup-node@v1
+        with:
+          node-version: '10.x'
+
+      - name: Install
+        run: |
+          npm ci
+
+      - name: Build Docs
+        run: npm run docs
+
+      - name: Publish Docs
+        env:
+          AWS_ACCESS_KEY_ID: ${{ secrets.AWS_ACCESS_KEY_ID }}
+          AWS_SECRET_ACCESS_KEY: ${{ secrets.AWS_SECRET_ACCESS_KEY }}
+          AWS_DEFAULT_REGION: us-east-1
+        run: aws s3 cp ./docs s3://${{ secrets.BUCKET_NAME }} --recursive
