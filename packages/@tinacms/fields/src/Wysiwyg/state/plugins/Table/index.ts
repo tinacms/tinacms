@@ -32,7 +32,8 @@ export const tablePlugin = new Plugin({
     init: () => {
       return { deco: DecorationSet.empty }
     },
-    apply(_1, _2, _3, newState) {
+    apply(tr, prev, _3, newState) {
+      if (tr.getMeta('image_clicked') === false) return prev
       const { selection } = newState
       if (selection) {
         const { table } = newState.schema.nodes
