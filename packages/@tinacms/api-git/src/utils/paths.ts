@@ -23,10 +23,6 @@ export function checkFilePathIsInRepo(
   repoAbsolutePath: string
 ) {
   const fullpath = path.resolve(filepath)
-  const repopath = path.resolve(repoAbsolutePath)
-  if (fullpath.startsWith(repopath)) {
-    return true
-  } else {
-    return false
-  }
+  const repopath = path.resolve(repoAbsolutePath).replace(/\/+$/, '') + '/'
+  return fullpath.startsWith(repopath)
 }
