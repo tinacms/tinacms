@@ -19,9 +19,15 @@ import React from "react"
 import { graphql } from "gatsby"
 import { useLocalMdxForm } from "gatsby-tinacms-mdx"
 import { MDXRenderer } from "gatsby-plugin-mdx"
+import { MDXProvider } from "@mdx-js/react"
 
 import Layout from "../components/layout"
 import SEO from "../components/seo"
+
+const HowAreYa = ({ you }) => <p>{you} is a fruit</p>
+const shorties = {
+  HowAreYa,
+}
 
 function AboutPage(props) {
   const formOptions = {
@@ -29,6 +35,12 @@ function AboutPage(props) {
       {
         label: "Title",
         name: "rawFrontmatter.title",
+        component: "text",
+      },
+      {
+        label: "Fruit",
+        name: "rawFrontmatter.fruit",
+        description: "🍅🍋🍑🍇🥝",
         component: "text",
       },
       {
@@ -45,7 +57,11 @@ function AboutPage(props) {
     <Layout location={props.location} title={siteTitle}>
       <SEO title="About" />
       <h1>{data.frontmatter.title}</h1>
-      <MDXRenderer>{data.body}</MDXRenderer>
+      <MDXProvider components={shorties}>
+        <MDXRenderer fruit={props.data.mdx.frontmatter.fruit}>
+          {data.body}
+        </MDXRenderer>
+      </MDXProvider>
     </Layout>
   )
 }
@@ -65,6 +81,7 @@ export const aboutPageQuery = graphql`
         date
         description
         title
+        fruit
       }
       fileRelativePath
       rawFrontmatter

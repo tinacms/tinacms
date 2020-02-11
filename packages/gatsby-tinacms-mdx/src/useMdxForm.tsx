@@ -60,8 +60,6 @@ export function useMdxForm(
   const label = formOverrrides.label || mdx.frontmatter.title
   const id = mdx.fileRelativePath
   const actions = formOverrrides.actions
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [isValidMdx, setIsValidMdx] = useState(true)
 
   /**
    * The state of the Mdx, generated from the contents of the
@@ -107,7 +105,7 @@ export function useMdxForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const fields = React.useMemo(() => {
     let fields = formOverrrides.fields || generateFields(valuesOnDisk)
-    fields = fields.map(field => {
+    fields = fields.map((field: any) => {
       /**
        * Treat the field.name prefix `frontmatter` as an alias to
        * `rawFrontmatter`. This is to make defining fields more intuitive.
@@ -134,7 +132,7 @@ export function useMdxForm(
       id,
       initialValues: valuesInGit,
       fields,
-      onSubmit(data) {
+      onSubmit(data: any) {
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],
           message: data.__commit_message || 'Tina commit',
@@ -163,34 +161,8 @@ export function useMdxForm(
     })
   }, [])
 
-  const isValidMdxState = (mdxContent: any) => {
-    const wrapped = `<div>${mdxContent}</div>`
-    try {
-      transform(wrapped, {
-        objectAssign: 'Object.assign',
-      })
-      return true
-    } catch (err) {
-      console.log('🚨 Not saving until your MDX is valid')
-    }
-  }
-
-  const validateAndWriteToDisk = (formState: any) => {
-    const formElement = document.querySelector("[name='rawMarkdownBody']")
-    if (isValidMdxState(formState.values.rawMarkdownBody)) {
-      setIsValidMdx(true)
-      if (formElement)
-        formElement.setAttribute('style', 'border: 1px solid #b6b6b6;')
-      writeToDisk(formState)
-    } else {
-      setIsValidMdx(false)
-      if (formElement)
-        formElement.setAttribute('style', 'border: 1px solid red;')
-    }
-  }
-
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, validateAndWriteToDisk)
+  useWatchFormValues(form, writeToDisk)
 
   return [mdx, form]
 }
