@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/core",
-  "version": "0.7.1-alpha.1",
+  "version": "0.7.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -27,6 +27,6 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.12-alpha.0"
+    "@tinacms/scripts": "^0.1.12"
   }
 }
