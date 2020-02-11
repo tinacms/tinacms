@@ -19,6 +19,12 @@ limitations under the License.
 import { MdxNode } from './mdx-node'
 import { Field } from 'tinacms'
 
+// eslint-disable-next-line @typescript-eslint/no-unused-vars
+function isFormValid(value: any) {
+  console.log('inside')
+  return { valid: false, meta: 'not valid', error: true }
+}
+
 export function generateFields(post: MdxNode): Field[] {
   const frontmatterFields = Object.keys(post.rawFrontmatter).map(key => ({
     component: 'text',
@@ -27,7 +33,6 @@ export function generateFields(post: MdxNode): Field[] {
 
   return [
     ...frontmatterFields,
-    { component: 'markdown', name: 'rawMarkdownBody' },
+    { component: 'markdown', name: 'rawMarkdownBody', validate: isFormValid },
   ]
-  //is it possible to add a validate function here? I couldn't get it to work
 }

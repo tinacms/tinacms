@@ -171,7 +171,7 @@ export function useMdxForm(
       })
       return true
     } catch (err) {
-      console.log('🚨 Not saving until your mdx is vallid')
+      console.log('🚨 Not saving until your MDX is valid')
     }
   }
 

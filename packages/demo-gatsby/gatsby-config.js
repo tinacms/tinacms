@@ -52,6 +52,7 @@ module.exports = {
               defaultCommitMessage: "Update from the content ",
               defaultCommitName: "TinaCMS",
               defaultCommitEmail: "git@tinacms.org",
+              pushOnCommit: false,
             },
           },
         ],
