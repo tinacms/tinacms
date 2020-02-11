@@ -22,6 +22,7 @@ import * as path from 'path'
 import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
 import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
 import atob from 'atob'
+import { GitRouterConfig } from './router'
 
 // Ensure remote URL is ssh
 export async function updateRemoteToSSH(pathRoot: string) {
@@ -43,12 +44,15 @@ export async function updateRemoteToSSH(pathRoot: string) {
   }
 }
 
-export async function configureGitRemote(pathRoot: string, gitRemote?: string, sshKey?: string) {
-  await createSSHKey(pathRoot, sshKey)
-  if (gitRemote) {
-    await updateOrigin(pathRoot, gitRemote)
+export async function configureGitRemote({ pathToRepo, gitRemote, sshKey }: GitRouterConfig) {
+  const PATH_ROOT = pathToRepo || process.cwd()
+  if (sshKey) {
+    await createSSHKey(PATH_ROOT, sshKey)
   }
-  await updateRemoteToSSH(pathRoot)
+  if (gitRemote) {
+    await updateOrigin(PATH_ROOT, gitRemote)
+  }
+  await updateRemoteToSSH(PATH_ROOT)
 }
 
 async function updateOrigin(pathRoot: string, remote: string) {
@@ -64,16 +68,14 @@ async function updateOrigin(pathRoot: string, remote: string) {
   await repo.addRemote('origin', newRemote)
 }
 
-async function createSSHKey(pathRoot: string, sshKey?: string) {
-  if (sshKey) {
-    const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
-    const parentDir = path.dirname(ssh_path)
-    if (!fs.existsSync(parentDir)) {
-      fs.mkdirSync(parentDir, { recursive: true })
-    }
-    fs.writeFileSync(ssh_path, atob(sshKey), {
-      encoding: 'utf8',
-      mode: 0o600,
-    })
+async function createSSHKey(pathRoot: string, sshKey: string) {
+  const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
+  const parentDir = path.dirname(ssh_path)
+  if (!fs.existsSync(parentDir)) {
+    fs.mkdirSync(parentDir, { recursive: true })
   }
+  fs.writeFileSync(ssh_path, atob(sshKey), {
+    encoding: 'utf8',
+    mode: 0o600,
+  })
 }
