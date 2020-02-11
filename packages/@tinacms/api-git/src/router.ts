@@ -26,6 +26,7 @@ import { commit } from './commit'
 import { createUploader } from './upload'
 import { openRepo } from './open-repo'
 import { show } from './show'
+import { checkFilePathIsInRepo } from './utils'
 
 // Don't return full error message to client incase confidential details leak
 const GIT_ERROR_MESSAGE =
@@ -40,22 +41,6 @@ export interface GitRouterConfig {
   pushOnCommit?: boolean
   sshKey?: string
   gitRemote?: string
-}
-
-/**
- *
- */
-export function checkFilePathIsInRepo(
-  filepath: string,
-  repoAbsolutePath: string
-) {
-  const fullpath = path.resolve(filepath)
-  const repopath = path.resolve(repoAbsolutePath)
-  if (fullpath.startsWith(repopath)) {
-    return true
-  } else {
-    return false
-  }
 }
 
 export function router(config: GitRouterConfig = {}) {

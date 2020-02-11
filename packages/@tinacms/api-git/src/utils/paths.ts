@@ -16,5 +16,17 @@ limitations under the License.
 
 */
 
-export * from './gitUrl'
-export * from './paths'
+import * as path from 'path'
+
+export function checkFilePathIsInRepo(
+  filepath: string,
+  repoAbsolutePath: string
+) {
+  const fullpath = path.resolve(filepath)
+  const repopath = path.resolve(repoAbsolutePath)
+  if (fullpath.startsWith(repopath)) {
+    return true
+  } else {
+    return false
+  }
+}
