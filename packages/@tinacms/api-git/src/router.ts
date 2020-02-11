@@ -40,6 +40,8 @@ export interface GitRouterConfig {
   defaultCommitName?: string
   defaultCommitEmail?: string
   pushOnCommit?: boolean
+  sshKey?: string
+  gitRemote?: string
 }
 
 /**
@@ -78,24 +80,24 @@ export async function updateRemoteToSSH(pathRoot: string) {
   }
 }
 
-async function createSSHKey(pathRoot: string) {
-  if (process.env.SSH_KEY) {
+async function createSSHKey(pathRoot: string, sshKey?: string) {
+  if (sshKey) {
     const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
     const parentDir = path.dirname(ssh_path)
     if (!fs.existsSync(parentDir)) {
       fs.mkdirSync(parentDir, { recursive: true })
     }
-    fs.writeFileSync(ssh_path, atob(process.env.SSH_KEY), {
+    fs.writeFileSync(ssh_path, atob(sshKey), {
       encoding: 'utf8',
       mode: 0o600,
     })
   }
 }
 
-async function configureGitRemote(pathRoot: string) {
-  await createSSHKey(pathRoot)
-  if (process.env.GIT_REMOTE) {
-    await updateOrigin(pathRoot, process.env.GIT_REMOTE)
+async function configureGitRemote(pathRoot: string, gitRemote?: string, sshKey?: string) {
+  await createSSHKey(pathRoot, sshKey)
+  if (gitRemote) {
+    await updateOrigin(pathRoot, gitRemote)
   }
   await updateRemoteToSSH(pathRoot)
 }
@@ -130,7 +132,7 @@ export function router(config: GitRouterConfig = {}) {
 
   // TODO: There shold be some way of making sure this only happens
   //       in a cloud editing environment.
-  configureGitRemote(REPO_ABSOLUTE_PATH)
+  configureGitRemote(REPO_ABSOLUTE_PATH, config.gitRemote, config.sshKey)
 
   router.delete('/:relPath', (req: any, res: any) => {
     const user = req.user || {}
