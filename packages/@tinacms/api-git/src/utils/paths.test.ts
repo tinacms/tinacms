@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { checkFilePathIsInRepo } from './paths'
-jest.mock('./open-repo')
+jest.mock('../open-repo')
 
 describe('checkFilePathIsInRepo', () => {
   test('returns false if path not in repo', () => {
