@@ -22,7 +22,12 @@ import * as path from 'path'
 import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
 import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
 import atob from 'atob'
-import { GitRouterConfig } from './router'
+
+export interface GitRemoteConfig {
+  pathToRepo?: string
+  gitRemote?: string
+  sshKey?: string
+}
 
 // Ensure remote URL is ssh
 export async function updateRemoteToSSH(pathRoot: string) {
@@ -44,7 +49,8 @@ export async function updateRemoteToSSH(pathRoot: string) {
   }
 }
 
-export async function configureGitRemote({ pathToRepo, gitRemote, sshKey }: GitRouterConfig) {
+export async function configureGitRemote(options: GitRemoteConfig) {
+  const { pathToRepo, gitRemote, sshKey } = options
   const PATH_ROOT = pathToRepo || process.cwd()
   if (sshKey) {
     await createSSHKey(PATH_ROOT, sshKey)
