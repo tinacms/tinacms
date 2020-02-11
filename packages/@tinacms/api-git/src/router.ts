@@ -22,7 +22,6 @@ import * as fs from 'fs'
 import * as path from 'path'
 import * as express from 'express'
 
-import { configureGitRemote } from './configure'
 import { commit } from './commit'
 import { createUploader } from './upload'
 import { openRepo } from './open-repo'
@@ -73,10 +72,6 @@ export function router(config: GitRouterConfig = {}) {
 
   const router = express.Router()
   router.use(express.json())
-
-  // TODO: There shold be some way of making sure this only happens
-  //       in a cloud editing environment.
-  configureGitRemote(REPO_ABSOLUTE_PATH, config.gitRemote, config.sshKey)
 
   router.delete('/:relPath', (req: any, res: any) => {
     const user = req.user || {}
