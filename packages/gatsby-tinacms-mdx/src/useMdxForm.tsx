@@ -161,8 +161,26 @@ export function useMdxForm(
     })
   }, [])
 
+  const isValidMdxState = (mdxContent: any) => {
+    const wrapped = `<div>${mdxContent}</div>`
+    try {
+      transform(wrapped, {
+        objectAssign: 'Object.assign',
+      })
+      return true
+    } catch (err) {
+      console.log('🚨 Malformed MDX please fix before save')
+    }
+  }
+
+  const validateAndWriteToDisk = (formState: any) => {
+    if (isValidMdxState(formState.values.rawMarkdownBody)) {
+      writeToDisk(formState)
+    }
+  }
+
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
+  useWatchFormValues(form, validateAndWriteToDisk)
 
   return [mdx, form]
 }
