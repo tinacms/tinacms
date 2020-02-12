@@ -33,6 +33,7 @@ export interface Options {
   selectionOnly?: boolean
   tooltip?: string
   noMix?: string[]
+  isDisabled?: (view: EditorView) => boolean
 }
 
 export function markControl({
@@ -42,6 +43,7 @@ export function markControl({
   defaultAttrs,
   selectionOnly = false,
   noMix = [],
+  isDisabled,
 }: Options) {
   return class _ extends React.Component<Props, any> {
     static displayName = `${mark}Control`
@@ -64,10 +66,14 @@ export function markControl({
     }
 
     get disabled(): boolean {
-      if (selectionOnly) {
-        const { $cursor } = this.props.view.state.selection as any
-        return !!$cursor || this.inCodeBlock || this.incompatibleMarksAreActive
-      }
+      if (isDisabled) return isDisabled(this.props.view)
+      if (mark === 'image')
+        if (selectionOnly) {
+          const { $cursor } = this.props.view.state.selection as any
+          return (
+            !!$cursor || this.inCodeBlock || this.incompatibleMarksAreActive
+          )
+        }
 
       return this.inCodeBlock || this.incompatibleMarksAreActive
     }
