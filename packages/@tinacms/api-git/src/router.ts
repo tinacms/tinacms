@@ -23,7 +23,6 @@ import * as path from 'path'
 import * as express from 'express'
 
 import { createUploader } from './upload'
-import { openRepo } from './open-repo'
 import { checkFilePathIsInRepo } from './utils'
 import { Repo } from './repo'
 
@@ -205,50 +204,6 @@ export function router(config: Partial<GitRouterConfig> = {}) {
         message: GIT_ERROR_MESSAGE,
         fileRelativePath: req.params.fileRelativePath,
       })
-    }
-  })
-
-  router.get('/branch', async (req, res) => {
-    try {
-      const summary = await openRepo(repo.pathToRepo).branchLocal()
-      res.send({ status: 'success', branch: summary.branches[summary.current] })
-    } catch {
-      // TODO: More intelligently respond
-      res.status(500)
-      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
-    }
-  })
-
-  router.get('/branches', async (req, res) => {
-    try {
-      const summary = await openRepo(repo.pathToRepo).branchLocal()
-      res.send({ status: 'success', branches: summary.all })
-    } catch {
-      // TODO: More intelligently respond
-      res.status(500)
-      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
-    }
-  })
-
-  router.get('/branches/:name', async (req, res) => {
-    try {
-      const summary = await openRepo(repo.pathToRepo).branchLocal()
-      const branch = summary.branches[req.params.name]
-
-      if (!branch) {
-        res.status(404)
-        res.json({
-          status: 'failure',
-          message: `Branch not found: ${String(branch)}`,
-        })
-        return
-      }
-
-      res.send({ status: 'success', branch })
-    } catch {
-      // TODO: More intelligently respond
-      res.status(500)
-      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
     }
   })
 
