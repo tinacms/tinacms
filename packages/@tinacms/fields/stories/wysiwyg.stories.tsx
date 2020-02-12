@@ -37,7 +37,10 @@ const Basic = () => {
 
 const WithImage = () => {
   const [value, setValue] = React.useState(
-    '![alt text](https://i.imgur.com/2FCfbgg.jpg "Logo Title Text 1")'
+    `![alt text](https://i.imgur.com/2FCfbgg.jpg "Logo Title Text 1")
+    test
+    test
+    ![alt text](https://i.imgur.com/2FCfbgg.jpg "Logo Title Text 1")`
   )
   return (
     <Wysiwyg
