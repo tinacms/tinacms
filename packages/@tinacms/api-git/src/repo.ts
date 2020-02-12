@@ -22,11 +22,6 @@ import * as path from 'path'
 import { promises as fs } from 'fs'
 import { getGitSSHUrl } from './utils'
 
-export interface GitRepoConfig {
-  pathToRepo: string
-  pathToContent: string
-}
-
 export interface CommitOptions {
   files: string[]
   message: string
@@ -36,17 +31,12 @@ export interface CommitOptions {
 }
 
 export class Repo {
-  pathToRepo: string
-  pathToContent: string
-  gitRemote?: string
-  sshKey?: string
-
   SSH_KEY_RELATIVE_PATH = '.ssh/id_rsa'
 
-  constructor(options: GitRepoConfig) {
-    this.pathToRepo = options.pathToRepo
-    this.pathToContent = options.pathToContent
-  }
+  constructor(
+    public pathToRepo: string = process.cwd(),
+    public pathToContent: string = ''
+  ) {}
 
   get contentAbsolutePath() {
     return path.join(this.pathToRepo, this.pathToContent)

@@ -31,36 +31,33 @@ const GIT_ERROR_MESSAGE =
   'Git Operation failed: Check the logs for more details'
 
 export interface GitRouterConfig {
-  pathToRepo: string
-  pathToContent: string
   defaultCommitMessage: string
   defaultCommitName: string
   defaultCommitEmail: string
   pushOnCommit: boolean
-  sshKey?: string
+}
+
+export interface GitServerConfig extends GitRouterConfig {
+  pathToRepo: string
+  pathToContent: string
   gitRemote?: string
+  sshKey?: string
 }
 
 const DEFAULT_OPTIONS: GitRouterConfig = {
-  pathToRepo: process.cwd(),
-  pathToContent: '',
   defaultCommitMessage: 'Edited with TinaCMS',
   defaultCommitName: 'TinaCMS',
   defaultCommitEmail: 'git@tinacms.org',
   pushOnCommit: true,
 }
 
-export function router(config: Partial<GitRouterConfig> = {}) {
-  const options: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config }
-
+export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
   const {
     defaultCommitMessage,
     defaultCommitName,
     defaultCommitEmail,
     pushOnCommit,
-  } = options
-
-  const repo = new Repo(options)
+  }: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config }
 
   const uploader = createUploader(repo.tmpDir)
 
