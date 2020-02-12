@@ -18,7 +18,6 @@ limitations under the License.
 
 import { Node } from 'prosemirror-model'
 import { EditorView, NodeView } from 'prosemirror-view'
-import { imagePluginKey } from '../../state/plugins/Image'
 
 export class ImageView implements NodeView {
   node: Node
