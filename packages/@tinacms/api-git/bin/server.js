@@ -18,9 +18,8 @@ limitations under the License.
 
 */
 
-
 const port = parseInt(process.argv[2])
-const pkg = require("../build/index.js")
-
-const server = new pkg.GitApiServer({})
+const pkg = require('../build/index.js')
+const repo = pkg.Repo()
+const server = new pkg.GitApiServer(repo, {})
 server.start(port ? port : 4567)

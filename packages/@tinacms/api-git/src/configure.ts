@@ -19,12 +19,6 @@ limitations under the License.
 import { isSSHUrl } from './utils'
 import { Repo } from './repo'
 
-export interface GitRemoteConfig {
-  pathToRepo?: string
-  gitRemote?: string
-  sshKey?: string
-}
-
 // Ensure remote URL is ssh
 export async function updateRemoteToSSH(repo: Repo) {
   const originURL = await repo.getOrigin()

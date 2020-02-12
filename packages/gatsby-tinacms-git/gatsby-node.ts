@@ -16,11 +16,20 @@ limitations under the License.
 
 */
 
-import { router as gitRouter, GitRouterConfig, configureGitRemote } from '@tinacms/api-git'
+import {
+  router as gitRouter,
+  GitServerConfig,
+  configureGitRemote,
+  Repo,
+} from '@tinacms/api-git'
 
-exports.onCreateDevServer = ({ app }: any, options: Partial<GitRouterConfig>) => {
+exports.onCreateDevServer = (
+  { app }: any,
+  options: Partial<GitServerConfig>
+) => {
+  const repo = new Repo(options.pathToRepo, options.pathToContent)
   if (process.env.TINA_CEE !== undefined) {
-    configureGitRemote(options)
+    configureGitRemote(repo, options.gitRemote, options.sshKey)
   }
-  app.use('/___tina', gitRouter(options))
+  app.use('/___tina', gitRouter(repo, options))
 }
