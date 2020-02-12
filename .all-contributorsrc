@@ -118,7 +118,9 @@
         "projectManagement",
         "talk",
         "ideas",
-        "bug"
+        "bug",
+        "infra",
+        "doc"
       ]
     },
     {
@@ -473,6 +475,24 @@
       "name": "Hungry Bear Studio",
       "avatar_url": "https://avatars1.githubusercontent.com/u/22930449?v=4",
       "profile": "https://www.hungrybearstudio.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "alexbarbato",
+      "name": "Alex Barbato",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/23562192?v=4",
+      "profile": "https://github.com/alexbarbato",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "DaniTulp",
+      "name": "Dani Tulp",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/18421761?v=4",
+      "profile": "http://danitulp.nl",
       "contributions": [
         "code"
       ]

@@ -19,7 +19,8 @@ limitations under the License.
 import React from 'react'
 import { TinaForm, Form } from 'tinacms'
 import { FC } from 'react'
-import { JsonFile, useJsonForm, Options } from './use-json-form'
+import { JsonFile, Options } from './use-json-form'
+import { useLocalJsonForm } from './use-local-json-form'
 
 export interface InlineJsonFormProps extends Options {
   jsonFile: JsonFile
@@ -28,14 +29,14 @@ export interface InlineJsonFormProps extends Options {
 
 export interface InlineJsonFormRenderProps {
   form: Form
-  data: any
+  jsonFile: JsonFile
   isEditing: boolean
   setIsEditing(value: boolean): void
 }
 
 export const InlineJsonForm: FC<InlineJsonFormProps> = props => {
   const { children, jsonFile, ...options } = props
-  const [data, form] = useJsonForm(jsonFile, options)
+  const [data, form] = useLocalJsonForm(jsonFile, options)
 
   return (
     <TinaForm form={form}>
@@ -43,7 +44,7 @@ export const InlineJsonForm: FC<InlineJsonFormProps> = props => {
         return children({
           ...editingProps,
           form,
-          data,
+          jsonFile: data,
         })
       }}
     </TinaForm>

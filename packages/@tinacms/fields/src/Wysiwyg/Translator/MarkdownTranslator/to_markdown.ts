@@ -40,7 +40,8 @@ export interface Nodes {
     state: MarkdownSerializerState,
     node: Node,
     parent?: Node,
-    index?: number
+    index?: number,
+    escFn?: (str: string) => string
   ) => void
 }
 
@@ -182,21 +183,29 @@ export class MarkdownSerializerState {
   // :: (string, ?bool)
   // Add the given text to the document. When escape is not `false`,
   // it will be escaped.
-  text(text: string, escape?: boolean) {
+  text(text: string, escape?: boolean, escFn?: (str: string) => string) {
     const lines = text.split('\n')
     for (let i = 0; i < lines.length; i++) {
       const startOfLine = this.atBlank() || this.closed
       this.write()
-      this.out += escape !== false ? this.esc(lines[i], startOfLine) : lines[i]
+      let escapedString =
+        escape !== false ? this.esc(lines[i], startOfLine) : lines[i]
+      escapedString = escFn ? escFn(escapedString) : escapedString
+      this.out += escapedString
       if (i != lines.length - 1) this.out += '\n'
     }
   }
 
   // :: (Node)
   // Render the given node as a block.
-  render(node: Node, parent: Node | number, index: number) {
+  render(
+    node: Node,
+    parent: Node | number,
+    index: number,
+    escFn?: (str: string) => string
+  ) {
     if (typeof parent == 'number') throw new Error('!')
-    this.nodes[node.type.name](this, node, parent, index)
+    this.nodes[node.type.name](this, node, parent, index, escFn)
   }
 
   // :: (Node)
@@ -207,7 +216,7 @@ export class MarkdownSerializerState {
 
   // :: (Node)
   // Render the contents of `parent` as inline content.
-  renderInline(parent: Node) {
+  renderInline(parent: Node, escFn?: (str: string) => string) {
     const active: any[] = []
     let trailing = ''
     const progress = (node: Node | null, _?: any, index: number = 0) => {
@@ -309,9 +318,10 @@ export class MarkdownSerializerState {
             this.markString(inner, false, node) +
               node.text +
               this.markString(inner, true, node),
-            false
+            false,
+            escFn
           )
-        else this.render(node, parent, index)
+        else this.render(node, parent, index, escFn)
       }
     }
     parent.forEach(progress)

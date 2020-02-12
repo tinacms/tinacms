@@ -3,6 +3,73 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.6.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.2-alpha.1...demo-gatsby@1.6.2) (2020-02-11)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.6.2-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.2-alpha.0...demo-gatsby@1.6.2-alpha.1) (2020-02-11)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.6.2-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.1...demo-gatsby@1.6.2-alpha.0) (2020-02-06)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.6.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.1-alpha.1...demo-gatsby@1.6.1) (2020-02-03)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.6.1-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.0...demo-gatsby@1.6.1-alpha.1) (2020-02-03)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.6.1-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.0...demo-gatsby@1.6.1-alpha.0) (2020-01-29)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+# [1.6.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.0-alpha.0...demo-gatsby@1.6.0) (2020-01-27)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+# [1.6.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.2...demo-gatsby@1.6.0-alpha.0) (2020-01-24)
+
+
+### Features
+
+* **inlineRemarkForm:** create in-page editing experiences ([ef4df82](https://github.com/gatsbyjs/gatsby-starter-blog/commit/ef4df82))
+
+
+
+
+
 ## [1.5.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.2-alpha.1...demo-gatsby@1.5.2) (2020-01-22)
 
 **Note:** Version bump only for package demo-gatsby

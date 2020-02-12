@@ -29,6 +29,9 @@ export default function Header(props) {
         <Link href="/">
           <h1>{props.siteTitle}</h1>
         </Link>
+        <Link href="/info">
+          <h1>Info</h1>
+        </Link>
       </nav>
       <style jsx>
         {`

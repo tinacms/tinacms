@@ -1,7 +1,7 @@
 {
   "name": "gatsby-tinacms-teams",
   "main": "index.js",
-  "version": "0.1.2",
+  "version": "0.1.4",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -29,18 +29,17 @@
   "scripts": {
     "watch": "tsc -w",
     "dev": "tsc",
-    "build": "tsc"
+    "build": "tsc",
+    "docs": "npx typedoc"
   },
   "dependencies": {
-    "@tinacms/teams": "^0.2.0",
+    "@tinacms/teams": "^0.2.1",
     "cookie-parser": "^1.2.0",
-    "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1"
   },
   "devDependencies": {
     "@types/cookie-parser": "^1.4.2",
-    "@types/cors": "^2.8.5",
     "@types/express": "^4.17.0"
   }
 }

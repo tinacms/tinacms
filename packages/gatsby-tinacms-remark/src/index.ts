@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 export * from './useRemarkForm'
-export * from './remarkFormHoc'
+export * from './remark-form-hoc'
 export * from './RemarkForm'
 export * from './remark-creator-plugin'
 export * from './form-actions/delete-action'

@@ -68,6 +68,22 @@ Linking prevents running `npm install` from directly inside a package from worki
 
    This sucks. Try running `lerna clean` and then running `npm run bs` again.
 
+### Failed to Compile: Module not found: Can't resolve 'some-tinacms-package'
+
+There are two reasons this error might occur:
+
+1. **The package did not link to `some-tinacms-package`**
+
+   This is likely the problem if `some-tinacms-package` is missing from
+   the `node_modules`. If it is, do the following:
+
+   - Make sure `some-tinacms-package` is listed in the `package.json`
+   - Run `npm run bootstrap` from the root of the repo.
+
+1. **`some-tinacms-package` was not built.**
+
+   This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
+
 ## Release Process
 
 The TinaCMS core team releases frequently. Checkout the [RELEASE.md](./RELEASE.md) file to see how to create a release.
