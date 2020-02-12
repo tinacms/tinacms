@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-const git = require('simple-git/promise')
+import git from 'simple-git/promise'
 
 import * as path from 'path'
 import { promises as fs } from 'fs'
@@ -78,6 +78,7 @@ export class Repo {
 
     await repo.add(files)
     const commitResult = await repo.commit(message, files, flags)
+    // @ts-ignore The types are incorrect for push
     return push ? await repo.push(['-u', 'origin', branchName]) : commitResult
   }
 
