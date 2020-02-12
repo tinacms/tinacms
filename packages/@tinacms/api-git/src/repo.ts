@@ -26,7 +26,6 @@ export interface CommitOptions {
   message: string
   name?: string
   email?: string
-  push?: boolean
 }
 
 export class Repo {
@@ -62,7 +61,7 @@ export class Repo {
    * @param options
    */
   async commit(options: CommitOptions) {
-    const { files: relFilePaths, message, name, email, push } = options
+    const { files: relFilePaths, message, name, email } = options
     const files = relFilePaths.map(rel => this.fileAbsolutePath(rel))
     let flags
     if (options.email) {
@@ -72,16 +71,16 @@ export class Repo {
     }
 
     const repo = this.open()
-    const branchName = await repo.revparse(['--abbrev-ref', 'HEAD'])
 
     await repo.add(files)
-    const commitResult = await repo.commit(message, files, flags)
-    // @ts-ignore The types are incorrect for push
-    return push ? await repo.push(['-u', 'origin', branchName]) : commitResult
+    return await repo.commit(message, files, flags)
   }
 
-  push() {
-    return this.open().push()
+  async push() {
+    const repo = this.open()
+    const branchName = await repo.revparse(['--abbrev-ref', 'HEAD'])
+    // @ts-ignore The types are incorrect for push
+    return repo.push(['-u', 'origin', branchName])
   }
 
   reset(filepath: string) {

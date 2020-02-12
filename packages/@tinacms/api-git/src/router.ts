@@ -69,9 +69,13 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
         name: user.name || req.body.name || defaultCommitName,
         email: user.email || req.body.email || defaultCommitEmail,
         message: `Update from Tina: delete ${fileRelativePath}`,
-        push: pushOnCommit,
         files: [fileRelativePath],
       })
+
+      if (pushOnCommit) {
+        await repo.push()
+      }
+
       res.json({ status: 'success' })
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
@@ -128,10 +132,13 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
       await repo.commit({
         name: user.name || req.body.name || defaultCommitName,
         email: user.email || req.body.email || defaultCommitEmail,
-        push: pushOnCommit,
         message,
         files: req.body.files,
       })
+
+      if (pushOnCommit) {
+        await repo.push()
+      }
 
       res.json({ status: 'success' })
     } catch {
