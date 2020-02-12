@@ -19,8 +19,8 @@ limitations under the License.
 const git = require('simple-git/promise')
 
 import * as path from 'path'
+import { promises as fs } from 'fs'
 import { commit, CommitOptions } from './commit'
-import { show } from './show'
 
 export interface GitRepoConfig {
   pathToRepo: string
@@ -67,10 +67,11 @@ export class Repo {
   }
 
   getFileAtHead(fileRelativePath: string) {
-    return show({
-      pathRoot: this.pathToRepo,
-      fileRelativePath
-    })
+    try {
+      return this.open().show([`HEAD:${fileRelativePath}`])
+    } catch (e) {
+      return fs.readFile(path.join(this.pathToRepo, fileRelativePath), { encoding: 'utf8' })
+    }
   }
 
   open() {
