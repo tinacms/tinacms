@@ -25,18 +25,24 @@ import { commit, CommitOptions } from './commit'
 export interface GitRepoConfig {
   pathToRepo: string
   pathToContent: string
+  gitRemote?: string
+  sshKey?: string
 }
 
 export class Repo {
 
   pathToRepo: string
   pathToContent: string
+  gitRemote?: string
+  sshKey?: string
 
   SSH_KEY_RELATIVE_PATH = '.ssh/id_rsa'
 
   constructor(options: GitRepoConfig) {
     this.pathToRepo = options.pathToRepo
     this.pathToContent = options.pathToContent
+    this.gitRemote = options.gitRemote
+    this.sshKey = options.sshKey
   }
 
   get contentAbsolutePath() {
@@ -82,7 +88,7 @@ export class Repo {
       '-o StrictHostKeyChecking=no',
     ]
 
-    if (process.env.SSH_KEY) {
+    if (this.sshKey) {
       options = [
         ...options,
         '-o IdentitiesOnly=yes',
