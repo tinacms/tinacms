@@ -31,6 +31,7 @@ import { menu } from './plugins/Menu'
 import { buildKeymap } from './buildKeymap'
 import { links } from './plugins/links'
 import { tablePlugin } from './plugins/Table'
+import { imagePlugin } from './plugins/Image'
 
 export function createEditorState(
   schema: Schema,
@@ -52,6 +53,7 @@ export function createEditorState(
       menu(translator, false, theme),
       tableEditing(),
       tablePlugin,
+      imagePlugin,
     ],
   })
 }
