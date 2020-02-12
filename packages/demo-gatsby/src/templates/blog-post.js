@@ -24,7 +24,7 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { liveRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
+import { inlineRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { TinaField, Wysiwyg, Toggle, Select } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
@@ -326,7 +326,7 @@ const BlogPostForm = {
   ],
 }
 
-export default liveRemarkForm(BlogPostTemplate, BlogPostForm)
+export default inlineRemarkForm(BlogPostTemplate, BlogPostForm)
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {

@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.6.4",
+  "version": "0.7.2",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -22,26 +22,23 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/react/gatsby-tinacms-remark"
+    "directory": "packages/gatsby-tinacms-remark"
   },
   "scripts": {
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.11",
-    "@types/jest": "^24.0.15",
+    "@tinacms/scripts": "^0.1.12",
     "@types/js-yaml": "^3.12.1",
-    "jest": "^24.8.0",
-    "tinacms": "^0.11.3",
-    "ts-jest": "^24.0.2"
+    "tinacms": "^0.13.0"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
-    "lodash.get": "^4.4.2",
     "slash": "^3.0.0"
   },
   "peerDependencies": {

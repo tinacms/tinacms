@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/icons",
-  "version": "0.4.0",
+  "version": "0.5.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -18,18 +18,16 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/tinacms/icons"
+    "directory": "packages/@tinacms/icons"
   },
   "scripts": {
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.11",
-    "@types/jest": "^24.0.15",
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2"
+    "@tinacms/scripts": "^0.1.12"
   }
 }

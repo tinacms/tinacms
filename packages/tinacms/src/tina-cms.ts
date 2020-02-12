@@ -1,22 +1,22 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+ Copyright 2019 Forestry.io Inc
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
-*/
+ */
 
-import { CMS, PluginType, Subscribable } from '@tinacms/core'
+import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -32,11 +32,22 @@ import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import { Form } from '@tinacms/forms'
 
-export class TinaCMS extends CMS {
-  sidebar: SidebarState = new SidebarState()
+export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
-  constructor() {
-    super()
+export interface TinaCMSConfig extends CMSConfig{
+  sidebar: {
+    hidden: boolean
+    position: SidebarPosition
+  }
+}
+
+export class TinaCMS extends CMS {
+  sidebar: SidebarState
+
+  constructor({ sidebar, ...config}: TinaCMSConfig) {
+    super(config)
+
+    this.sidebar = new SidebarState(sidebar.position)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
@@ -64,6 +75,10 @@ export class TinaCMS extends CMS {
 }
 
 export class SidebarState extends Subscribable {
+  constructor(public position: SidebarPosition) {
+    super()
+  }
+
   private _isOpen: boolean = false
 
   get isOpen() {

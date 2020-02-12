@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/teams",
-  "version": "0.2.0",
+  "version": "0.2.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -18,21 +18,19 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/group/package"
+    "directory": "packages/@tinacms/teams"
   },
   "scripts": {
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
     "@tinacms/scripts": "0.1.0",
     "@types/express": "^4.17.0",
-    "@types/jest": "^24.0.15",
-    "@types/jsonwebtoken": "8.3.5",
-    "jest": "^24.8.0",
-    "ts-jest": "^24.0.2"
+    "@types/jsonwebtoken": "8.3.5"
   },
   "dependencies": {
     "express": "^4.17.1",

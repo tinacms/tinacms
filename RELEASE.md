@@ -30,7 +30,8 @@ i.e. `yarn add tinacms@next`
      --conventional-prerelease \
      --no-push \
      --allow-branch master \
-     -m "chore(publish): prerelease"
+     -m "chore(publish): prerelease" \
+     --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
    ```
 
 1. **Publish to NPM:**
@@ -71,7 +72,8 @@ i.e `yarn add tinacms` or `yarn add tinacms@latest`
      --conventional-graduate \
      --no-push \
      --allow-branch latest \
-     -m "chore(publish): latest"
+     -m "chore(publish): latest" \
+     --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
    ```
 
 1) **Publish to NPM:**
