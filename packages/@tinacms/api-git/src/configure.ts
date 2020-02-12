@@ -18,15 +18,16 @@ limitations under the License.
 
 import * as path from 'path'
 import { promises as fs } from 'fs'
-import { isSSHUrl } from './utils'
+import { isSSHUrl, getGitSSHUrl } from './utils'
 import { Repo } from './repo'
 
 // Ensure remote URL is ssh
 export async function updateRemoteToSSH(repo: Repo) {
-  const originURL = await repo.getOrigin()
+  const remote = await repo.getOrigin()
 
-  if (originURL && !isSSHUrl(originURL)) {
-    await repo.updateOrigin(originURL)
+  if (remote && !isSSHUrl(remote)) {
+    const newRemote = getGitSSHUrl(remote)
+    await repo.updateOrigin(newRemote)
   }
 }
 
