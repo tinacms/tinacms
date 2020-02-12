@@ -20,7 +20,6 @@ const git = require('simple-git/promise')
 
 import * as path from 'path'
 import { promises as fs } from 'fs'
-import { commit, CommitOptions } from './commit'
 
 export interface GitRepoConfig {
   pathToRepo: string
@@ -29,8 +28,15 @@ export interface GitRepoConfig {
   sshKey?: string
 }
 
-export class Repo {
+export interface CommitOptions {
+  files: string[]
+  message: string
+  name?: string
+  email?: string
+  push?: boolean
+}
 
+export class Repo {
   pathToRepo: string
   pathToContent: string
   gitRemote?: string
@@ -57,11 +63,21 @@ export class Repo {
     return path.join(this.contentAbsolutePath, fileRelativePath)
   }
 
-  commit(options: Omit<CommitOptions, "pathRoot">) {
-    return commit({
-      pathRoot: this.pathToRepo,
-      ...options
-    })
+  async commit(options: CommitOptions) {
+    const { files, message, name, email, push } = options
+    let flags
+    if (options.email) {
+      flags = {
+        '--author': `"${name || email} <${email}>"`,
+      }
+    }
+
+    const repo = this.open()
+    const branchName = await repo.revparse(['--abbrev-ref', 'HEAD'])
+
+    await repo.add(files)
+    const commitResult = await repo.commit(message, files, flags)
+    return push ? await repo.push(['-u', 'origin', branchName]) : commitResult
   }
 
   push() {
@@ -69,6 +85,7 @@ export class Repo {
   }
 
   reset(files: string[]) {
+    // TODO: I feel like this in wrong. Taking a list of files and then only resetting the first one?
     return this.open().checkout(files[0])
   }
 
@@ -76,7 +93,9 @@ export class Repo {
     try {
       return this.open().show([`HEAD:${fileRelativePath}`])
     } catch (e) {
-      return fs.readFile(path.join(this.pathToRepo, fileRelativePath), { encoding: 'utf8' })
+      return fs.readFile(path.join(this.pathToRepo, fileRelativePath), {
+        encoding: 'utf8',
+      })
     }
   }
 
