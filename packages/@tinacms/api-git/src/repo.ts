@@ -119,7 +119,7 @@ export class Repo {
   }
 
   async updateOrigin(newRemote: string) {
-    const repo = await this.open()
+    const repo = this.open()
 
     const existingRemotes = await repo.getRemotes(true)
     if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
