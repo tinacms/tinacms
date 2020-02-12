@@ -140,7 +140,7 @@ const warnUpdateDoc = (changes: [string, Dep][]) =>
 Update Docs for tinacms#${danger.github.pr.number}
 
 
-<a href="https://github.com/tinacms/tinacms-site/issues/new?&title=${updateDocTitle(
+<a href="https://github.com/tinacms/tinacms.org/issues/new?&title=${updateDocTitle(
     changes
   )}&body=${updateDocBody(changes)}">Create Issue</a>
 `)
