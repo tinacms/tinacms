@@ -19,7 +19,7 @@ limitations under the License.
 import * as path from 'path'
 import { commit, CommitOptions } from './commit'
 import { openRepo } from './open-repo'
-import { show } from '../build/show'
+import { show } from './show'
 
 export interface GitRepoConfig {
   pathToRepo: string
