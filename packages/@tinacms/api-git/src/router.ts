@@ -18,7 +18,7 @@ limitations under the License.
 
 import { writeFile, deleteFile } from './file-writer'
 
-import * as fs from 'fs'
+import { promises as fs } from 'fs'
 import * as path from 'path'
 import * as express from 'express'
 
@@ -47,17 +47,17 @@ const DEFAULT_OPTIONS: GitRouterConfig = {
   defaultCommitMessage: 'Edited with TinaCMS',
   defaultCommitName: 'TinaCMS',
   defaultCommitEmail: 'git@tinacms.org',
-  pushOnCommit: true
+  pushOnCommit: true,
 }
 
 export function router(config: Partial<GitRouterConfig> = {}) {
-  const options: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config}
+  const options: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config }
 
   const {
     defaultCommitMessage,
     defaultCommitName,
     defaultCommitEmail,
-    pushOnCommit
+    pushOnCommit,
   } = options
 
   const repo = new Repo(options)
@@ -117,23 +117,21 @@ export function router(config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/upload', uploader.single('file'), (req: any, res: any) => {
-    try {
+  router.post(
+    '/upload',
+    uploader.single('file'),
+    async (req: any, res: any) => {
       const fileName = req.file.originalname
       const tmpPath = path.join(repo.tmpDir, fileName)
-      const finalPath = path.join(
-        repo.pathToRepo,
-        req.body.directory,
-        fileName
-      )
-      fs.rename(tmpPath, finalPath, (err: any) => {
-        if (err) console.error(err)
-      })
-      res.send(req.file)
-    } catch {
-      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
+      const finalPath = path.join(repo.pathToRepo, req.body.directory, fileName)
+      try {
+        await fs.rename(tmpPath, finalPath)
+        res.send(req.file)
+      } catch {
+        res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
+      }
     }
-  })
+  )
 
   router.post('/commit', async (req: any, res: any) => {
     try {
