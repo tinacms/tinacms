@@ -20,12 +20,11 @@ const git = require('simple-git/promise')
 
 import * as path from 'path'
 import { promises as fs } from 'fs'
+import { getGitSSHUrl } from './utils'
 
 export interface GitRepoConfig {
   pathToRepo: string
   pathToContent: string
-  gitRemote?: string
-  sshKey?: string
 }
 
 export interface CommitOptions {
@@ -47,8 +46,6 @@ export class Repo {
   constructor(options: GitRepoConfig) {
     this.pathToRepo = options.pathToRepo
     this.pathToContent = options.pathToContent
-    this.gitRemote = options.gitRemote
-    this.sshKey = options.sshKey
   }
 
   get contentAbsolutePath() {
@@ -57,6 +54,10 @@ export class Repo {
 
   get tmpDir() {
     return path.join(this.contentAbsolutePath, '/tmp/')
+  }
+
+  get sshKeyPath() {
+    return path.join(this.pathToRepo, this.SSH_KEY_RELATIVE_PATH)
   }
 
   fileAbsolutePath(fileRelativePath: string) {
@@ -99,6 +100,41 @@ export class Repo {
     }
   }
 
+  async getOrigin() {
+    const repo = this.open()
+    const remotes = await repo.getRemotes(true)
+    const originRemotes = remotes.filter((r: any) => r.name == 'origin')
+
+    if (!originRemotes.length) {
+      console.warn('No origin remote on the given repo')
+      return
+    }
+
+    return originRemotes[0].refs.push
+  }
+
+  async updateOrigin(remote: string) {
+    const repo = await this.open()
+    const newRemote = getGitSSHUrl(remote)
+
+    const existingRemotes = await repo.getRemotes(true)
+    if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
+      console.warn(`Changing remote origin to ${newRemote}`)
+    }
+
+    await repo.removeRemote('origin')
+    await repo.addRemote('origin', newRemote)
+  }
+
+  async createSSHKey(sshKey: string) {
+    const parentDir = path.dirname(this.sshKeyPath)
+    await fs.mkdir(parentDir, { recursive: true })
+    await fs.writeFile(this.sshKeyPath, atob(sshKey), {
+      encoding: 'utf8',
+      mode: 0o600,
+    })
+  }
+
   open() {
     const repo = git(this.pathToRepo)
 
@@ -107,13 +143,16 @@ export class Repo {
       '-o StrictHostKeyChecking=no',
     ]
 
-    if (this.sshKey) {
+    try {
+      fs.stat(this.sshKeyPath)
       options = [
         ...options,
         '-o IdentitiesOnly=yes',
-        `-i ${path.join(this.pathToRepo, this.SSH_KEY_RELATIVE_PATH)}`,
+        `-i ${this.sshKeyPath}`,
         '-F /dev/null',
       ]
+    } catch {
+      console.warn('No SSH key set.')
     }
 
     /**
