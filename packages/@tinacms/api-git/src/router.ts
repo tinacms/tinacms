@@ -37,13 +37,6 @@ export interface GitRouterConfig {
   pushOnCommit: boolean
 }
 
-export interface GitServerConfig extends GitRouterConfig {
-  pathToRepo: string
-  pathToContent: string
-  gitRemote?: string
-  sshKey?: string
-}
-
 const DEFAULT_OPTIONS: GitRouterConfig = {
   defaultCommitMessage: 'Edited with TinaCMS',
   defaultCommitName: 'TinaCMS',
@@ -65,23 +58,19 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
   router.use(express.json())
 
   router.delete('/:relPath', async (req: any, res: any) => {
-    const user = req.user || {}
-    const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
-
     try {
+      const user = req.user || {}
+      const fileRelativePath = decodeURIComponent(req.params.relPath)
+      const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
+
       // TODO: we need to check if it is safe to delete the file. See the put route for an example
       deleteFile(fileAbsolutePath)
-    } catch {
-      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
-    }
-    try {
       await repo.commit({
         name: user.name || req.body.name || defaultCommitName,
         email: user.email || req.body.email || defaultCommitEmail,
         message: `Update from Tina: delete ${fileRelativePath}`,
         push: pushOnCommit,
-        files: [fileAbsolutePath],
+        files: [fileRelativePath],
       })
       res.json({ status: 'success' })
     } catch {
@@ -90,13 +79,9 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
   })
 
   router.put('/:relPath', (req: any, res: any) => {
-    const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
-
-    if (DEBUG) {
-      console.log(fileAbsolutePath)
-    }
     try {
+      const fileRelativePath = decodeURIComponent(req.params.relPath)
+      const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
       const fileIsInRepo = checkFilePathIsInRepo(
         fileAbsolutePath,
         repo.contentAbsolutePath
@@ -118,10 +103,14 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     '/upload',
     uploader.single('file'),
     async (req: any, res: any) => {
-      const fileName = req.file.originalname
-      const tmpPath = path.join(repo.tmpDir, fileName)
-      const finalPath = path.join(repo.pathToRepo, req.body.directory, fileName)
       try {
+        const fileName = req.file.originalname
+        const tmpPath = path.join(repo.tmpDir, fileName)
+        const finalPath = path.join(
+          repo.pathToRepo,
+          req.body.directory,
+          fileName
+        )
         await fs.rename(tmpPath, finalPath)
         res.send(req.file)
       } catch {
@@ -134,9 +123,6 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     try {
       const user = req.user || {}
       const message = req.body.message || defaultCommitMessage
-      const files = req.body.files.map((rel: string) =>
-        path.join(repo.contentAbsolutePath, rel)
-      )
 
       // TODO: Separate commit and push???
       await repo.commit({
@@ -144,7 +130,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
         email: user.email || req.body.email || defaultCommitEmail,
         push: pushOnCommit,
         message,
-        files,
+        files: req.body.files,
       })
 
       res.json({ status: 'success' })
@@ -165,14 +151,9 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
   })
 
   router.post('/reset', async (req, res) => {
-    const files = req.body.files.map((rel: string) =>
-      path.join(repo.contentAbsolutePath, rel)
-    )
-
-    if (DEBUG) console.log(files)
-
     try {
-      await repo.reset(files[0])
+      // TODO: I feel like this in wrong. Taking a list of files and then only resetting the first one?
+      await repo.reset(req.body.files[0])
       res.json({ status: 'success' })
     } catch {
       res.status(412).json({ status: 'failure', error: GIT_ERROR_MESSAGE })
@@ -181,11 +162,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
 
   router.get('/show/:fileRelativePath', async (req, res) => {
     try {
-      const fileRelativePath = path.posix
-        .join(repo.pathToContent, req.params.fileRelativePath)
-        .replace(/^\/*/, '')
-
-      const content = await repo.getFileAtHead(fileRelativePath)
+      const content = await repo.getFileAtHead(req.params.fileRelativePath)
 
       res.json({
         fileRelativePath: req.params.fileRelativePath,

@@ -27,9 +27,17 @@ exports.onCreateDevServer = (
   { app }: any,
   options: Partial<GitServerConfig>
 ) => {
-  const repo = new Repo(options.pathToRepo, options.pathToContent)
+  const {
+    pathToRepo,
+    pathToContent,
+    gitRemote,
+    sshKey,
+    ...routerOptions
+  } = options
+
+  const repo = new Repo(pathToRepo, pathToContent)
   if (process.env.TINA_CEE !== undefined) {
-    configureGitRemote(repo, options.gitRemote, options.sshKey)
+    configureGitRemote(repo, gitRemote, sshKey)
   }
-  app.use('/___tina', gitRouter(repo, options))
+  app.use('/___tina', gitRouter(repo, routerOptions))
 }
