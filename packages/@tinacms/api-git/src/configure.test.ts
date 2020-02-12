@@ -17,46 +17,27 @@ limitations under the License.
 */
 
 import { updateRemoteToSSH } from './configure'
-jest.mock('./open-repo')
+import { Repo } from './repo'
 
 describe('updateRemoteToSSH', () => {
-  let mock
-
-  let repo: any
+  let repo: Repo
 
   describe('without a remote', () => {
     beforeEach(() => {
-      repo = {
-        getRemotes: jest.fn().mockImplementation(() => {
-          return Promise.resolve([])
-        }),
-        removeRemote: jest.fn(),
-        addRemote: jest.fn(),
-      }
-      mock = require('./open-repo').openRepo
-      mock.mockImplementation(() => {
-        return repo
-      })
+      repo = new Repo()
+      repo.getOrigin = jest.fn()
+      repo.updateOrigin = jest.fn()
     })
 
     it('does not throw an error', async () => {
       expect(async () => {
-        await updateRemoteToSSH('./')
+        await updateRemoteToSSH(repo)
       }).not.toThrowError()
     })
 
-    it('does not tryto remove a remote', async () => {
-      await updateRemoteToSSH('./')
-      expect(repo.removeRemote).not.toHaveBeenCalledWith(
-        'origin',
-        'git@github.com:tinacms/tunacms.git'
-      )
-    })
-
-    it('does not try to add a remote', async () => {
-      await updateRemoteToSSH('./')
-      expect(repo.addRemote).not.toHaveBeenCalledWith(
-        'origin',
+    it('does not try to update the origin', async () => {
+      await updateRemoteToSSH(repo)
+      expect(repo.updateOrigin).not.toHaveBeenCalledWith(
         'git@github.com:tinacms/tunacms.git'
       )
     })
@@ -64,30 +45,16 @@ describe('updateRemoteToSSH', () => {
 
   describe('with http remote', () => {
     beforeEach(() => {
-      repo = {
-        getRemotes: jest.fn().mockImplementation(() => {
-          return Promise.resolve([
-            {
-              name: 'origin',
-              refs: {
-                push: 'https://github.com/tinacms/tunacms.git',
-              },
-            },
-          ])
-        }),
-        removeRemote: jest.fn(),
-        addRemote: jest.fn(),
-      }
-      mock = require('./open-repo').openRepo
-      mock.mockImplementation(() => {
-        return repo
-      })
+      repo = new Repo()
+      repo.getOrigin = jest
+        .fn()
+        .mockResolvedValue('https://github.com/tinacms/tunacms.git')
+      repo.updateOrigin = jest.fn()
     })
 
-    test('should replace remote', async () => {
-      await updateRemoteToSSH('./')
-      expect(repo.addRemote).toHaveBeenCalledWith(
-        'origin',
+    test('should try to update the origin', async () => {
+      await updateRemoteToSSH(repo)
+      expect(repo.updateOrigin).toHaveBeenCalledWith(
         'git@github.com:tinacms/tunacms.git'
       )
     })
@@ -95,29 +62,16 @@ describe('updateRemoteToSSH', () => {
 
   describe('with ssh remote', () => {
     beforeEach(() => {
-      repo = {
-        getRemotes: jest.fn().mockImplementation(() => {
-          return Promise.resolve([
-            {
-              name: 'origin',
-              refs: {
-                push: 'git@github.com:tinacms/tunacms.git',
-              },
-            },
-          ])
-        }),
-        removeRemote: jest.fn(),
-        addRemote: jest.fn(),
-      }
-      mock = require('./open-repo').openRepo
-      mock.mockImplementation(() => {
-        return repo
-      })
+      repo = new Repo()
+      repo.getOrigin = jest
+        .fn()
+        .mockResolvedValue('git@github.com:tinacms/tunacms.git')
+      repo.updateOrigin = jest.fn()
     })
 
     test('should replace remote', async () => {
-      await updateRemoteToSSH('./')
-      expect(repo.addRemote).not.toHaveBeenCalled()
+      await updateRemoteToSSH(repo)
+      expect(repo.updateOrigin).not.toHaveBeenCalled()
     })
   })
 })

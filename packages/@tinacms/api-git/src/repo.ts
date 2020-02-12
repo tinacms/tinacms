@@ -20,7 +20,6 @@ import git from 'simple-git/promise'
 
 import * as path from 'path'
 import { promises as fs } from 'fs'
-import { getGitSSHUrl } from './utils'
 
 export interface CommitOptions {
   files: string[]
@@ -119,9 +118,8 @@ export class Repo {
     return originRemotes[0].refs.push
   }
 
-  async updateOrigin(remote: string) {
+  async updateOrigin(newRemote: string) {
     const repo = await this.open()
-    const newRemote = getGitSSHUrl(remote)
 
     const existingRemotes = await repo.getRemotes(true)
     if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
