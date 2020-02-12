@@ -24,7 +24,6 @@ import * as express from 'express'
 
 import { createUploader } from './upload'
 import { openRepo } from './open-repo'
-import { show } from './show'
 import { checkFilePathIsInRepo } from './utils'
 import { Repo } from './repo'
 
@@ -69,7 +68,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
   const router = express.Router()
   router.use(express.json())
 
-  router.delete('/:relPath', (req: any, res: any) => {
+  router.delete('/:relPath', async (req: any, res: any) => {
     const user = req.user || {}
     const fileRelativePath = decodeURIComponent(req.params.relPath)
     const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
@@ -80,20 +79,18 @@ export function router(config: Partial<GitRouterConfig> = {}) {
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
-
-    repo.commit({
-      name: user.name || req.body.name || defaultCommitName,
-      email: user.email || req.body.email || defaultCommitEmail,
-      message: `Update from Tina: delete ${fileRelativePath}`,
-      push: pushOnCommit,
-      files: [fileAbsolutePath],
-    })
-      .then(() => {
-        res.json({ status: 'success' })
+    try {
+      await repo.commit({
+        name: user.name || req.body.name || defaultCommitName,
+        email: user.email || req.body.email || defaultCommitEmail,
+        message: `Update from Tina: delete ${fileRelativePath}`,
+        push: pushOnCommit,
+        files: [fileAbsolutePath],
       })
-      .catch(() => {
-        res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
-      })
+      res.json({ status: 'success' })
+    } catch {
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
+    }
   })
 
   router.put('/:relPath', (req: any, res: any) => {
@@ -159,8 +156,7 @@ export function router(config: Partial<GitRouterConfig> = {}) {
       res.json({ status: 'success' })
     } catch {
       // TODO: More intelligently respond
-      res.status(412)
-      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
+      res.status(412).json({ status: 'failure', error: GIT_ERROR_MESSAGE })
     }
   })
 
@@ -170,26 +166,23 @@ export function router(config: Partial<GitRouterConfig> = {}) {
       res.json({ status: 'success' })
     } catch {
       // TODO: More intelligently respond
-      res.status(412)
-      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
+      res.status(412).json({ status: 'failure', error: GIT_ERROR_MESSAGE })
     }
   })
 
-  router.post('/reset', (req, res) => {
+  router.post('/reset', async (req, res) => {
     const files = req.body.files.map((rel: string) =>
       path.join(repo.contentAbsolutePath, rel)
     )
 
     if (DEBUG) console.log(files)
 
-    repo.reset(files[0])
-      .then(() => {
-        res.json({ status: 'success' })
-      })
-      .catch(() => {
-        res.status(412)
-        res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
-      })
+    try {
+      await repo.reset(files[0])
+      res.json({ status: 'success' })
+    } catch {
+      res.status(412).json({ status: 'failure', error: GIT_ERROR_MESSAGE })
+    }
   })
 
   router.get('/show/:fileRelativePath', async (req, res) => {
