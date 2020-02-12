@@ -43,6 +43,7 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
     "@types/atob": "2.1.2",
+    "@types/cors": "^2.8.6",
     "@types/express": "^4.17.0"
   }
 }

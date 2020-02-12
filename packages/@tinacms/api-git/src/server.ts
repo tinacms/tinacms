@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-const express = require('express')
-const cors = require('cors')
+import express from 'express'
+import cors from 'cors'
 
 import { router, GitRouterConfig } from './router'
 import { configureGitRemote } from './configure'
