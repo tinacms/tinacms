@@ -51,11 +51,20 @@ export class Repo {
   }
 
   fileAbsolutePath(fileRelativePath: string) {
-    return path.join(this.contentAbsolutePath, fileRelativePath)
+    return path.posix.join(this.contentAbsolutePath, fileRelativePath)
   }
 
+  fileRelativePath(filepath: string) {
+    return path.posix.join(this.pathToContent, filepath)
+  }
+
+  /**
+   *
+   * @param options
+   */
   async commit(options: CommitOptions) {
-    const { files, message, name, email, push } = options
+    const { files: relFilePaths, message, name, email, push } = options
+    const files = relFilePaths.map(rel => this.fileAbsolutePath(rel))
     let flags
     if (options.email) {
       flags = {
@@ -76,24 +85,30 @@ export class Repo {
     return this.open().push()
   }
 
-  reset(files: string[]) {
-    // TODO: I feel like this in wrong. Taking a list of files and then only resetting the first one?
-    return this.open().checkout(files[0])
+  reset(filepath: string) {
+    const absPath = this.fileAbsolutePath(filepath)
+    return this.open().checkout(absPath)
   }
 
-  getFileAtHead(fileRelativePath: string) {
+  /**
+   *
+   * @param filepath
+   * @todo This method name is not ideal. We want the latest version of the file that has been committed or the current version of a file that has not been committed
+   *
+   */
+  getFileAtHead(filepath: string) {
     try {
-      return this.open().show([`HEAD:${fileRelativePath}`])
+      const relativePath = this.fileRelativePath(filepath)
+      return this.open().show([`HEAD:${relativePath.replace(/^\/*/, '')}`])
     } catch (e) {
-      return fs.readFile(path.join(this.pathToRepo, fileRelativePath), {
+      return fs.readFile(this.fileAbsolutePath(filepath), {
         encoding: 'utf8',
       })
     }
   }
 
   async getOrigin() {
-    const repo = this.open()
-    const remotes = await repo.getRemotes(true)
+    const remotes = await this.open().getRemotes(true)
     const originRemotes = remotes.filter((r: any) => r.name == 'origin')
 
     if (!originRemotes.length) {
@@ -115,15 +130,6 @@ export class Repo {
 
     await repo.removeRemote('origin')
     await repo.addRemote('origin', newRemote)
-  }
-
-  async createSSHKey(sshKey: string) {
-    const parentDir = path.dirname(this.sshKeyPath)
-    await fs.mkdir(parentDir, { recursive: true })
-    await fs.writeFile(this.sshKeyPath, atob(sshKey), {
-      encoding: 'utf8',
-      mode: 0o600,
-    })
   }
 
   open() {

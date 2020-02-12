@@ -19,19 +19,35 @@ limitations under the License.
 const express = require('express')
 const cors = require('cors')
 
-import { router, GitServerConfig } from './router'
+import { router, GitRouterConfig } from './router'
 import { configureGitRemote } from './configure'
 import { Repo } from './repo'
 
+export interface GitServerConfig extends GitRouterConfig {
+  pathToRepo: string
+  pathToContent: string
+  gitRemote?: string
+  sshKey?: string
+}
+
 export class GitApiServer {
   server: any
-  constructor(repo: Repo, config: GitServerConfig) {
+  constructor(options: Partial<GitServerConfig>) {
+    const {
+      pathToRepo,
+      pathToContent,
+      gitRemote,
+      sshKey,
+      ...routerOptions
+    } = options
+
+    const repo = new Repo(pathToRepo, pathToContent)
     if (process.env.TINA_CEE !== undefined) {
-      configureGitRemote(repo, config.gitRemote, config.sshKey)
+      configureGitRemote(repo, gitRemote, sshKey)
     }
     this.server = express()
     this.server.use(cors())
-    this.server.use('/___tina', router(repo, config))
+    this.server.use('/___tina', router(repo, routerOptions))
   }
 
   start(port: number) {
