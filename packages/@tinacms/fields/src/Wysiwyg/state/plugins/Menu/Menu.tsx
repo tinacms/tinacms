@@ -252,7 +252,7 @@ const MenuContainer = styled.div<MenuContainerProps>`
   overflow: visible;
   display: flex;
   flex: 0 0 auto;
-  z-index: 10;
+  z-index: 100;
   margin: 0 0 12px 0;
 `
 
