@@ -16,12 +16,8 @@ limitations under the License.
 
 */
 
-import * as fs from 'fs'
-import * as path from 'path'
-
-import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
-import { getGitSSHUrl, isSSHUrl } from './utils'
-import atob from 'atob'
+import { isSSHUrl } from './utils'
+import { Repo } from './repo'
 
 export interface GitRemoteConfig {
   pathToRepo?: string
@@ -30,58 +26,25 @@ export interface GitRemoteConfig {
 }
 
 // Ensure remote URL is ssh
-export async function updateRemoteToSSH(pathRoot: string) {
-  const repo = await openRepo(pathRoot)
-  const remotes = await repo.getRemotes(true)
-  const originRemotes = remotes.filter((r: any) => r.name == 'origin')
-
-  if (!originRemotes.length) {
-    console.warn('No origin remote on the given repo')
-    return
-  }
-
-  const originURL = originRemotes[0].refs.push
+export async function updateRemoteToSSH(repo: Repo) {
+  const originURL = await repo.getOrigin()
 
   if (originURL && !isSSHUrl(originURL)) {
-    await repo.removeRemote('origin')
-    const newRemote = getGitSSHUrl(originURL)
-    await repo.addRemote('origin', newRemote)
+    await repo.updateOrigin(originURL)
   }
 }
 
-export async function configureGitRemote(options: GitRemoteConfig) {
-  const { pathToRepo, gitRemote, sshKey } = options
-  const PATH_ROOT = pathToRepo || process.cwd()
+export async function configureGitRemote(
+  repo: Repo,
+  gitRemote?: string,
+  sshKey?: string
+) {
   if (sshKey) {
-    await createSSHKey(PATH_ROOT, sshKey)
+    await repo.createSSHKey(sshKey)
   }
   if (gitRemote) {
-    await updateOrigin(PATH_ROOT, gitRemote)
+    await repo.updateOrigin(gitRemote)
+  } else {
+    await updateRemoteToSSH(repo)
   }
-  await updateRemoteToSSH(PATH_ROOT)
-}
-
-async function updateOrigin(pathRoot: string, remote: string) {
-  const repo = await openRepo(pathRoot)
-  const newRemote = getGitSSHUrl(remote)
-
-  const existingRemotes = await repo.getRemotes(true)
-  if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
-    console.warn(`Changing remote origin to ${newRemote}`)
-  }
-
-  await repo.removeRemote('origin')
-  await repo.addRemote('origin', newRemote)
-}
-
-async function createSSHKey(pathRoot: string, sshKey: string) {
-  const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
-  const parentDir = path.dirname(ssh_path)
-  if (!fs.existsSync(parentDir)) {
-    fs.mkdirSync(parentDir, { recursive: true })
-  }
-  fs.writeFileSync(ssh_path, atob(sshKey), {
-    encoding: 'utf8',
-    mode: 0o600,
-  })
 }
