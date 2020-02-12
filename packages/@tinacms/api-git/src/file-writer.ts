@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-const fs = require('fs')
-const path = require('path')
+import fs from 'fs'
+import path from 'path'
 
 let waitingForBuild = false
 let count = 0
