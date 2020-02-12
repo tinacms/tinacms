@@ -24,6 +24,7 @@ import { TinaReset, radius, color, font } from '@tinacms/styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
+import { NodeSelection } from 'prosemirror-state'
 
 interface FloatingImageMenu {
   view: EditorView
@@ -73,12 +74,15 @@ export default (props: FloatingImageMenu) => {
   const updateNodeAttrs = () => {
     const { dispatch, state } = view
     const { image } = state.schema.nodes
+    const { tr } = state
     dispatch(
-      state.tr.setNodeMarkup(pos, image, {
-        ...node.attrs,
-        alt,
-        title,
-      })
+      tr
+        .setNodeMarkup(pos, image, {
+          ...node.attrs,
+          alt,
+          title,
+        })
+        .setSelection(new NodeSelection(tr.doc.resolve(pos)))
     )
     view.focus()
   }
