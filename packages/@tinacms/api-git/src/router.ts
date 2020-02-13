@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import { promises as fs } from 'fs'
 import * as path from 'path'
 import * as express from 'express'
 
@@ -86,32 +85,25 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post(
-    '/upload',
-    uploader.single('file'),
-    async (req: any, res: any) => {
-      try {
-        const fileName = req.file.originalname
-        const tmpPath = path.join(repo.tmpDir, fileName)
-        const finalPath = path.join(
-          repo.pathToRepo,
-          req.body.directory,
-          fileName
-        )
-        await fs.rename(tmpPath, finalPath)
-        res.send(req.file)
-      } catch {
-        res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
-      }
+  router.post('/upload', uploader.single('file'), async (req, res: any) => {
+    try {
+      // TODO: I changed the way this works. It feels like this is how it was supposed to work but I can't find a good reference to it being used.
+      const relativeFilePath = path.join(
+        req.body.directory,
+        req.file.originalname
+      )
+      repo.writeFile(relativeFilePath, req.file.buffer)
+      res.send(req.file)
+    } catch {
+      res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
-  )
+  })
 
   router.post('/commit', async (req: any, res: any) => {
     try {
       const user = req.user || {}
       const message = req.body.message || defaultCommitMessage
 
-      // TODO: Separate commit and push???
       await repo.commit({
         name: user.name || req.body.name || defaultCommitName,
         email: user.email || req.body.email || defaultCommitEmail,

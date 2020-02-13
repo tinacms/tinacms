@@ -72,7 +72,7 @@ export class Repo {
     }
   }
 
-  writeFile(filepath: string, contents: string) {
+  writeFile(filepath: string, contents: string | Buffer) {
     const fileAbsolutePath = this.fileAbsolutePath(filepath)
     if (this.fileIsInRepo(fileAbsolutePath)) {
       writeFile(fileAbsolutePath, contents)
