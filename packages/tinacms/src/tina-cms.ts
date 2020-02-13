@@ -32,6 +32,7 @@ import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import { Form } from '@tinacms/forms'
+import { Theme } from '@tinacms/styles'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
@@ -39,6 +40,7 @@ export interface TinaCMSConfig extends CMSConfig {
   sidebar?: {
     hidden?: boolean
     position?: SidebarPosition
+    theme?: Theme
   }
 }
 
@@ -79,6 +81,7 @@ export class TinaCMS extends CMS {
 interface SidebarStateOptions {
   hidden?: boolean
   position?: SidebarPosition
+  theme?: Theme
 }
 
 export class SidebarState extends Subscribable {
@@ -86,11 +89,13 @@ export class SidebarState extends Subscribable {
 
   position: SidebarPosition = 'displace'
   hidden: boolean = false
+  theme?: Theme
 
   constructor(options: SidebarStateOptions = {}) {
     super()
     this.position = options.position || 'displace'
     this.hidden = !!options.hidden
+    this.theme = options.theme
   }
 
   get isOpen() {
