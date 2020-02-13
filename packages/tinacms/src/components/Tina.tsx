@@ -29,12 +29,16 @@ const merge = require('lodash.merge')
 
 export interface TinaProps {
   cms: TinaCMS
+  hidden?: boolean
   theme?: Theme
+  position?: SidebarPosition
 }
 
 export const Tina: React.FC<TinaProps> = ({
   cms,
   children,
+  hidden,
+  position,
   theme: themeOverrides,
 }) => {
   useSubscribable(cms.sidebar)
@@ -45,12 +49,19 @@ export const Tina: React.FC<TinaProps> = ({
     [DefaultTheme, themeOverrides]
   )
 
+  if (typeof !hidden === 'undefined') {
+    hidden = cms.sidebar.hidden
+  }
+
   return (
     <CMSContext.Provider value={cms}>
-      <SiteWrapper open={cms.sidebar.isOpen} position={cms.sidebar.position}>
+      <SiteWrapper
+        open={cms.sidebar.isOpen}
+        position={position || cms.sidebar.position}
+      >
         {children}
       </SiteWrapper>
-      {!cms.sidebar.hidden && (
+      {!hidden && (
         <ThemeProvider theme={theme}>
           <ModalProvider>
             <TinaReset>
