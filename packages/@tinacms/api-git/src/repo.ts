@@ -58,14 +58,13 @@ export class Repo {
     return path.posix.join(this.pathToContent, filepath)
   }
 
-  writeFile(filepath: string, contents: string) {
-    const fileAbsolutePath = this.fileAbsolutePath(filepath)
+  fileIsInRepo(filepath: string) {
     const fileIsInRepo = checkFilePathIsInRepo(
-      fileAbsolutePath,
+      filepath,
       this.contentAbsolutePath
     )
     if (fileIsInRepo) {
-      writeFile(fileAbsolutePath, contents)
+      return true
     } else {
       throw new Error(
         `Failed to write to: ${filepath} \nCannot write outside of the content directory.`
@@ -73,19 +72,18 @@ export class Repo {
     }
   }
 
+  writeFile(filepath: string, contents: string) {
+    const fileAbsolutePath = this.fileAbsolutePath(filepath)
+    if (this.fileIsInRepo(fileAbsolutePath)) {
+      writeFile(fileAbsolutePath, contents)
+    }
+  }
+
   async deleteFiles(filepath: string, commitOptions: CommitOptions) {
     const fileAbsolutePath = this.fileAbsolutePath(filepath)
-    const fileIsInRepo = checkFilePathIsInRepo(
-      fileAbsolutePath,
-      this.contentAbsolutePath
-    )
-    if (fileIsInRepo) {
+    if (this.fileIsInRepo(fileAbsolutePath)) {
       deleteFile(fileAbsolutePath)
       await this.commit(commitOptions)
-    } else {
-      throw new Error(
-        `Failed to write to: ${filepath} \nCannot write outside of the content directory.`
-      )
     }
   }
 
