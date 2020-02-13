@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { TinaCMSConfig } from 'tinacms/build/tina-cms'
+import { TinaCMSConfig } from 'tinacms'
 
 export interface GatsbyPluginTinacmsOptions {
   sidebar: TinaCMSConfig['sidebar']

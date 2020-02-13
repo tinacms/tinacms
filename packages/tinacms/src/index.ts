@@ -24,7 +24,7 @@ export * from './react-tinacms'
 /**
  * The Tina CMS Class
  */
-export { TinaCMS } from './tina-cms'
+export { TinaCMS, TinaCMSConfig } from './tina-cms'
 export { TinaCMS as CMS } from './tina-cms'
 
 /**
