@@ -15,15 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import * as React from 'react'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { NumberInput as BaseNumberField, InputProps } from '@tinacms/fields'
+import { parse } from './numberFormat';
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+export const NumberField = wrapFieldsWithMeta<
+  { step: string | number },
+  InputProps
+>(({ input, field }) => (
+  <BaseNumberField {...input} step={field.step} />
+))
+
+export default {
+  name: 'number',
+  Component: NumberField,
+  parse,
+}
