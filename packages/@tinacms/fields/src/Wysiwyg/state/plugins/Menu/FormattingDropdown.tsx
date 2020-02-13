@@ -26,7 +26,7 @@ import { Dismissible } from 'react-dismissible'
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
 import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './Menu'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
 import { EditorView } from 'prosemirror-view'
 
@@ -102,47 +102,39 @@ function makeToggleHeader(level: number) {
   }
 }
 
-const HeadingZero = styled.div`
-  font-size: 16px;
+const BaseHeading = css`
   white-space: nowrap;
   line-height: 1;
   display: block;
+`
+
+const HeadingZero = styled.div`
+  font-size: 16px;
+  ${BaseHeading}
 `
 const HeadingOne = styled.div`
   font-size: 40px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+  ${BaseHeading}
 `
 const HeadingTwo = styled.div`
   font-size: 34px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+  ${BaseHeading}
 `
 const HeadingThree = styled.div`
   font-size: 26px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+  ${BaseHeading}
 `
 const HeadingFour = styled.div`
   font-size: 21px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+  ${BaseHeading}
 `
 const HeadingFive = styled.div`
   font-size: 18px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+  ${BaseHeading}
 `
 const HeadingSix = styled.div`
   font-size: 16px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+  ${BaseHeading}
 `
 
 const NoHeading = blockTool({

@@ -361,4 +361,11 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
     fill: ${color.primary()};
     background-color: rgba(53, 50, 50, 0.05);
   }
+  ${props =>
+    props.active &&
+    css`
+      color: #0084ff;
+      fill: #0084ff;
+      background-color: rgba(53, 50, 50, 0.05);
+    `};
 `
