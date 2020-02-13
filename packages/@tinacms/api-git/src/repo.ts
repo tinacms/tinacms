@@ -20,6 +20,7 @@ import git from 'simple-git/promise'
 
 import * as path from 'path'
 import { promises as fs } from 'fs'
+import { deleteFile } from './file-writer'
 
 export interface CommitOptions {
   files: string[]
@@ -54,6 +55,14 @@ export class Repo {
 
   fileRelativePath(filepath: string) {
     return path.posix.join(this.pathToContent, filepath)
+  }
+
+  async deleteFiles(filepath: string, deleteOptions: CommitOptions) {
+    const fileAbsolutePath = this.fileAbsolutePath(filepath)
+
+    // TODO: we need to check if it is safe to delete the file. See the put route for an example
+    deleteFile(fileAbsolutePath)
+    await this.commit(deleteOptions)
   }
 
   /**
