@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { writeFile, deleteFile } from './file-writer'
+import { writeFile } from './file-writer'
 
 import { promises as fs } from 'fs'
 import * as path from 'path'
@@ -61,11 +61,8 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     try {
       const user = req.user || {}
       const fileRelativePath = decodeURIComponent(req.params.relPath)
-      const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
 
-      // TODO: we need to check if it is safe to delete the file. See the put route for an example
-      deleteFile(fileAbsolutePath)
-      await repo.commit({
+      await repo.deleteFiles(fileRelativePath, {
         name: user.name || req.body.name || defaultCommitName,
         email: user.email || req.body.email || defaultCommitEmail,
         message: `Update from Tina: delete ${fileRelativePath}`,
