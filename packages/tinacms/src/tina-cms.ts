@@ -35,7 +35,7 @@ import { Form } from '@tinacms/forms'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
-export interface TinaCMSConfig extends CMSConfig{
+export interface TinaCMSConfig extends CMSConfig {
   sidebar: {
     hidden: boolean
     position: SidebarPosition
@@ -45,10 +45,10 @@ export interface TinaCMSConfig extends CMSConfig{
 export class TinaCMS extends CMS {
   sidebar: SidebarState
 
-  constructor({ sidebar, ...config}: TinaCMSConfig) {
+  constructor({ sidebar, ...config }: TinaCMSConfig) {
     super(config)
 
-    this.sidebar = new SidebarState(sidebar.position)
+    this.sidebar = new SidebarState(sidebar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
@@ -76,12 +76,22 @@ export class TinaCMS extends CMS {
   }
 }
 
-export class SidebarState extends Subscribable {
-  constructor(public position: SidebarPosition) {
-    super()
-  }
+interface SidebarStateOptions {
+  hidden?: boolean
+  position?: SidebarPosition
+}
 
+export class SidebarState extends Subscribable {
   private _isOpen: boolean = false
+
+  position: SidebarPosition = 'displace'
+  hidden: boolean = false
+
+  constructor(options: SidebarStateOptions = {}) {
+    super()
+    this.position = options.position || 'displace'
+    this.hidden = !!options.hidden
+  }
 
   get isOpen() {
     return this._isOpen
