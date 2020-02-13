@@ -36,9 +36,9 @@ import { Form } from '@tinacms/forms'
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
 export interface TinaCMSConfig extends CMSConfig {
-  sidebar: {
-    hidden: boolean
-    position: SidebarPosition
+  sidebar?: {
+    hidden?: boolean
+    position?: SidebarPosition
   }
 }
 
