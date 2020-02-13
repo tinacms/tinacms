@@ -86,12 +86,29 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/upload', uploader.single('file'), async (req, res) => {
+  router.post('/upload', uploader.single('file'), async (req: any, res) => {
     try {
+      const user = req.user || {}
+      const message = req.body.message || defaultCommitMessage
+
       const fileName = req.file.originalname
       const tmpPath = path.join(repo.tmpDir, fileName)
-      const finalPath = path.join(repo.pathToRepo, req.body.directory, fileName)
-      fs.renameSync(tmpPath, finalPath)
+      const relativePath = path.join(req.body.directory, fileName)
+      const absPath = repo.fileAbsolutePath(relativePath)
+
+      fs.renameSync(tmpPath, absPath)
+
+      await repo.commit({
+        name: user.name || req.body.name || defaultCommitName,
+        email: user.email || req.body.email || defaultCommitEmail,
+        message,
+        files: [relativePath],
+      })
+
+      if (pushOnCommit) {
+        await repo.push()
+      }
+
       res.send(req.file)
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
