@@ -43,7 +43,7 @@ export class GitApiServer {
 
     const repo = new Repo(pathToRepo, pathToContent)
 
-    // NOTE: Environemnt variables are always interpreted as strings. If TINA_CEE is set to anything, this will evaluate as true
+    // NOTE: Environment variables are always interpreted as strings. If TINA_CEE is set to anything, this will evaluate as true
     if (process.env.TINA_CEE !== undefined) {
       configureGitRemote(repo, gitRemote, sshKey)
     }

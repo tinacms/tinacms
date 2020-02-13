@@ -19,7 +19,7 @@ limitations under the License.
 import git from 'simple-git/promise'
 
 import * as path from 'path'
-import { promises as fs } from 'fs'
+import * as fs from 'fs'
 import { deleteFile, writeFile } from './file-writer'
 import { checkFilePathIsInParent } from './utils'
 
@@ -125,12 +125,14 @@ export class Repo {
    * @todo This method name is not ideal. We want the latest version of the file that has been committed or the current version of a file that has not been committed
    *
    */
-  getFileAtHead(filepath: string) {
+  async getFileAtHead(filepath: string) {
     try {
       const relativePath = this.fileRelativePath(filepath)
-      return this.open().show([`HEAD:${relativePath.replace(/^\/*/, '')}`])
+      return await this.open().show([
+        `HEAD:${relativePath.replace(/^\/*/, '')}`,
+      ])
     } catch (e) {
-      return fs.readFile(this.fileAbsolutePath(filepath), {
+      return fs.readFileSync(this.fileAbsolutePath(filepath), {
         encoding: 'utf8',
       })
     }
@@ -169,7 +171,7 @@ export class Repo {
     ]
 
     try {
-      fs.stat(this.sshKeyPath)
+      fs.statSync(this.sshKeyPath)
       options = [
         ...options,
         '-o IdentitiesOnly=yes',

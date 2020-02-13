@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as path from 'path'
+import * as fs from 'fs'
 import * as express from 'express'
 
 import { createUploader } from './upload'
@@ -87,12 +88,10 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
 
   router.post('/upload', uploader.single('file'), async (req, res) => {
     try {
-      // TODO: I changed the way this works. It feels like this is how it was supposed to work but I can't find a good reference to it being used.
-      const relativeFilePath = path.join(
-        req.body.directory,
-        req.file.originalname
-      )
-      repo.writeFile(relativeFilePath, req.file.buffer)
+      const fileName = req.file.originalname
+      const tmpPath = path.join(repo.tmpDir, fileName)
+      const finalPath = path.join(repo.pathToRepo, req.body.directory, fileName)
+      fs.renameSync(tmpPath, finalPath)
       res.send(req.file)
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
