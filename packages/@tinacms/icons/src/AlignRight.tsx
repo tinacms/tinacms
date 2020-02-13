@@ -19,13 +19,10 @@ limitations under the License.
 import * as React from 'react'
 
 export const AlignRight = () => (
-  <svg
-    xmlns="http://www.w3.org/2000/svg"
-    height="24"
-    viewBox="0 0 24 24"
-    width="24"
-  >
-    <path d="M3 21h18v-2H3v2zm6-4h12v-2H9v2zm-6-4h18v-2H3v2zm6-4h12V7H9v2zM3 3v2h18V3H3z" />
-    <path d="M0 0h24v24H0z" fill="none" />
+  <svg viewBox="0 0 32 32" xmlns="http://www.w3.org/2000/svg">
+    <path
+      d="M11.875 24H27V26H11.875V24ZM5 18H27V20H5V18ZM5 6H27V8H5V6ZM11.875 12H27V14H11.875V12Z"
+      fill="inherit"
+    />
   </svg>
 )
