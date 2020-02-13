@@ -239,8 +239,6 @@ type MenuContainerProps = {
 }
 
 const MenuContainer = styled.div<MenuContainerProps>`
-  display: flex;
-  justify-content: space-between;
   position: ${({ menuFixed }) => (menuFixed ? 'fixed' : 'relative')};
   top: 0;
   width: 100%;
@@ -249,11 +247,18 @@ const MenuContainer = styled.div<MenuContainerProps>`
   border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   border: 1px solid ${color.grey(2)};
-  overflow: visible;
-  display: flex;
-  flex: 0 0 auto;
+  overflow: hidden;
   z-index: 100;
   margin: 0 0 12px 0;
+
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+`
+
+const MenuItem = css`
+  flex: 1 1 36px;
 `
 
 export const MenuButton = styled.button<{
@@ -261,15 +266,15 @@ export const MenuButton = styled.button<{
   disabled?: boolean
   bottom?: boolean
 }>`
-  flex: 1 1 auto;
+  ${MenuItem}
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
   color: ${p => (p.active ? '#0084ff' : color.grey(8))};
   fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
-  border: none;
+  border: 1px solid ${color.grey(2)};
+  margin: -1px;
   outline: none;
-  padding: 6px 0;
-  margin: 0;
+  padding: 6px;
   transition: all 85ms ease-out;
   cursor: pointer;
   display: flex;
@@ -282,17 +287,6 @@ export const MenuButton = styled.button<{
     color: #0084ff;
     fill: #0084ff;
     background-color: rgba(53, 50, 50, 0.05);
-  }
-  &:not(:last-child) {
-    border-right: 1px solid rgba(53, 50, 50, 0.09);
-  }
-  &:first-child {
-    padding-left: 12px;
-    border-radius: ${radius()} 0 0 ${radius()};
-  }
-  &:last-child {
-    padding-right: 12px;
-    border-radius: 0 24px 24px 0;
   }
   svg {
     width: 20px;
@@ -315,8 +309,8 @@ export const MenuButton = styled.button<{
 `
 
 export const MenuDropdownWrapper = styled.div`
+  ${MenuItem}
   position: relative;
-  flex: 1 1 auto;
 
   ${MenuButton} {
     width: 100%;
