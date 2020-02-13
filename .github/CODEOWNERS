@@ -7,7 +7,7 @@ packages/@tinacms/teams/* @jamespohalloran
 packages/gatsby-tinacms-teams/* @jamespohalloran
 
 # Prosemirror Wysiwyg
-packages/@tinacms/fields/src/Wysiwyg @jpuri @ncphillips
+packages/@tinacms/fields/src/Wysiwyg/* @jpuri @ncphillips
 
 # Styling
 packages/@tinacms/styles/* @spbyrne
