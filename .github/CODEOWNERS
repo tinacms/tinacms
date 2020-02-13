@@ -3,7 +3,7 @@
 * @tinacms/maintainers
 
 # Tina Teams
-packages/@tinacms/teams @jamespohalloran
+packages/@tinacms/teams/* @jamespohalloran
 packages/gatsby-tinacms-teams @jamespohalloran
 
 # Prosemirror Wysiwyg
