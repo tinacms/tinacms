@@ -40,7 +40,7 @@ export const Tina: React.FC<TinaProps> = ({
   useSubscribable(cms.sidebar)
   const theme: ThemeProps['theme'] = React.useMemo(
     () => ({
-      tinacms: merge(DefaultTheme, themeOverrides) as Theme,
+      tinacms: merge(DefaultTheme, cms.sidebar.theme, themeOverrides) as Theme,
     }),
     [DefaultTheme, themeOverrides]
   )
