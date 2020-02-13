@@ -53,7 +53,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
   const router = express.Router()
   router.use(express.json())
 
-  router.delete('/:relPath', async (req: any, res: any) => {
+  router.delete('/:relPath', async (req: any, res) => {
     try {
       const user = req.user || {}
       const fileRelativePath = decodeURIComponent(req.params.relPath)
@@ -75,7 +75,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.put('/:relPath', (req: any, res: any) => {
+  router.put('/:relPath', (req, res) => {
     try {
       const fileRelativePath = decodeURIComponent(req.params.relPath)
       repo.writeFile(fileRelativePath, req.body.content)
@@ -85,7 +85,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/upload', uploader.single('file'), async (req, res: any) => {
+  router.post('/upload', uploader.single('file'), async (req, res) => {
     try {
       // TODO: I changed the way this works. It feels like this is how it was supposed to work but I can't find a good reference to it being used.
       const relativeFilePath = path.join(
@@ -99,7 +99,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/commit', async (req: any, res: any) => {
+  router.post('/commit', async (req: any, res) => {
     try {
       const user = req.user || {}
       const message = req.body.message || defaultCommitMessage
@@ -122,7 +122,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     }
   })
 
-  router.post('/push', async (req: any, res: any) => {
+  router.post('/push', async (req, res) => {
     try {
       await repo.push()
       res.json({ status: 'success' })
