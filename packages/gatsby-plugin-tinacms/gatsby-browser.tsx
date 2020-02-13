@@ -17,21 +17,28 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import {Tina, TinaCMS} from 'tinacms'
+import { Tina, TinaCMS } from 'tinacms'
+import { TinaCMSConfig } from 'tinacms/build/tina-cms'
 
-exports.wrapRootElement = ({ element }: any, options: any) => {
-    if (options.manualInit) {
-        return element;
-    }
-    return (
-        <Tina cms={window.tinacms}>
-            {element}
-        </Tina>
-    )
+interface GatsbyPluginTinacmsOptions {
+  sidebar: TinaCMSConfig['sidebar']
+  manualInit?: boolean
+}
+
+exports.wrapRootElement = (
+  { element }: any,
+  options: GatsbyPluginTinacmsOptions
+) => {
+  if (options.manualInit) {
+    return element
+  }
+  return <Tina cms={window.tinacms}>{element}</Tina>
 }
 
 declare let window: any
 
-exports.onClientEntry = (_: null, pluginOptions: any) => {
-    window.tinacms = new TinaCMS(pluginOptions)
+exports.onClientEntry = (_: null, options: GatsbyPluginTinacmsOptions) => {
+  window.tinacms = new TinaCMS({
+    sidebar: options.sidebar,
+  })
 }
