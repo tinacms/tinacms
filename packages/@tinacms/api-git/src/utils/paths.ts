@@ -17,9 +17,16 @@ limitations under the License.
 */
 
 import * as path from 'path'
+import * as os from 'os'
 
 export function checkFilePathIsInParent(filepath: string, parent: string) {
-  const fullpath = path.posix.resolve(filepath)
-  const repopath = path.posix.resolve(parent).replace(/\/+$/, '') + '/'
+  const fullpath = path.resolve(filepath)
+  const repopath = (() => {
+    if (os.type() === 'Windows_NT') {
+      return path.resolve(parent).replace(/\\+$/, '') + '\\'
+    } else {
+      return path.resolve(parent).replace(/\/+$/, '') + '/'
+    }
+  })()
   return fullpath.startsWith(repopath)
 }
