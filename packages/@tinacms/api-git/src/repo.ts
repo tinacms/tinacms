@@ -51,7 +51,7 @@ export class Repo {
   }
 
   fileAbsolutePath(fileRelativePath: string) {
-    return path.posix.join(this.contentAbsolutePath, fileRelativePath)
+    return path.join(this.contentAbsolutePath, fileRelativePath)
   }
 
   fileRelativePath(filepath: string) {
