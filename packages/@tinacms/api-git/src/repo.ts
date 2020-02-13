@@ -21,7 +21,7 @@ import git from 'simple-git/promise'
 import * as path from 'path'
 import { promises as fs } from 'fs'
 import { deleteFile, writeFile } from './file-writer'
-import { checkFilePathIsInRepo } from './utils'
+import { checkFilePathIsInParent } from './utils'
 
 export interface CommitOptions {
   files: string[]
@@ -59,7 +59,7 @@ export class Repo {
   }
 
   fileIsInRepo(filepath: string) {
-    const fileIsInRepo = checkFilePathIsInRepo(
+    const fileIsInRepo = checkFilePathIsInParent(
       filepath,
       this.contentAbsolutePath
     )

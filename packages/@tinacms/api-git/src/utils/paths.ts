@@ -18,11 +18,8 @@ limitations under the License.
 
 import * as path from 'path'
 
-export function checkFilePathIsInRepo(
-  filepath: string,
-  repoAbsolutePath: string
-) {
+export function checkFilePathIsInParent(filepath: string, parent: string) {
   const fullpath = path.resolve(filepath)
-  const repopath = path.resolve(repoAbsolutePath).replace(/\/+$/, '') + '/'
+  const repopath = path.resolve(parent).replace(/\/+$/, '') + '/'
   return fullpath.startsWith(repopath)
 }

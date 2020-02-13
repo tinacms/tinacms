@@ -18,18 +18,18 @@ limitations under the License.
 
 import * as path from 'path'
 
-import { checkFilePathIsInRepo } from './paths'
+import { checkFilePathIsInParent } from './paths'
 
-describe('checkFilePathIsInRepo', () => {
+describe('checkFilePathIsInParent', () => {
   test('returns false if path not in repo', () => {
     const fileRelativePath = '../../../some-outside-file.json'
     const repoAbsPath = path.resolve('./')
-    expect(checkFilePathIsInRepo(fileRelativePath, repoAbsPath)).toBeFalsy()
+    expect(checkFilePathIsInParent(fileRelativePath, repoAbsPath)).toBeFalsy()
   })
 
   test('returns true if path in repo', () => {
     const fileRelativePath = './some-inside-file.json'
     const repoAbsPath = path.resolve('./')
-    expect(checkFilePathIsInRepo(fileRelativePath, repoAbsPath)).toBeTruthy()
+    expect(checkFilePathIsInParent(fileRelativePath, repoAbsPath)).toBeTruthy()
   })
 })
