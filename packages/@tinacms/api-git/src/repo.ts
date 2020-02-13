@@ -20,7 +20,8 @@ import git from 'simple-git/promise'
 
 import * as path from 'path'
 import { promises as fs } from 'fs'
-import { deleteFile } from './file-writer'
+import { deleteFile, writeFile } from './file-writer'
+import { checkFilePathIsInRepo } from './utils'
 
 export interface CommitOptions {
   files: string[]
@@ -55,6 +56,21 @@ export class Repo {
 
   fileRelativePath(filepath: string) {
     return path.posix.join(this.pathToContent, filepath)
+  }
+
+  writeFile(filepath: string, contents: string) {
+    const fileAbsolutePath = this.fileAbsolutePath(filepath)
+    const fileIsInRepo = checkFilePathIsInRepo(
+      fileAbsolutePath,
+      this.contentAbsolutePath
+    )
+    if (fileIsInRepo) {
+      writeFile(fileAbsolutePath, contents)
+    } else {
+      throw new Error(
+        `Failed to write to: ${filepath} \nCannot write outside of the content directory.`
+      )
+    }
   }
 
   async deleteFiles(filepath: string, deleteOptions: CommitOptions) {

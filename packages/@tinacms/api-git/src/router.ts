@@ -16,14 +16,11 @@ limitations under the License.
 
 */
 
-import { writeFile } from './file-writer'
-
 import { promises as fs } from 'fs'
 import * as path from 'path'
 import * as express from 'express'
 
 import { createUploader } from './upload'
-import { checkFilePathIsInRepo } from './utils'
 import { Repo } from './repo'
 
 // Don't return full error message to client incase confidential details leak
@@ -82,18 +79,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
   router.put('/:relPath', (req: any, res: any) => {
     try {
       const fileRelativePath = decodeURIComponent(req.params.relPath)
-      const fileAbsolutePath = repo.fileAbsolutePath(fileRelativePath)
-      const fileIsInRepo = checkFilePathIsInRepo(
-        fileAbsolutePath,
-        repo.contentAbsolutePath
-      )
-      if (fileIsInRepo) {
-        writeFile(fileAbsolutePath, req.body.content)
-      } else {
-        throw new Error(
-          `Failed to write to: ${fileRelativePath} \nCannot write outside of the content directory.`
-        )
-      }
+      repo.writeFile(fileRelativePath, req.body.content)
       res.json({ content: req.body.content })
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
