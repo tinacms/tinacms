@@ -73,12 +73,20 @@ export class Repo {
     }
   }
 
-  async deleteFiles(filepath: string, deleteOptions: CommitOptions) {
+  async deleteFiles(filepath: string, commitOptions: CommitOptions) {
     const fileAbsolutePath = this.fileAbsolutePath(filepath)
-
-    // TODO: we need to check if it is safe to delete the file. See the put route for an example
-    deleteFile(fileAbsolutePath)
-    await this.commit(deleteOptions)
+    const fileIsInRepo = checkFilePathIsInRepo(
+      fileAbsolutePath,
+      this.contentAbsolutePath
+    )
+    if (fileIsInRepo) {
+      deleteFile(fileAbsolutePath)
+      await this.commit(commitOptions)
+    } else {
+      throw new Error(
+        `Failed to write to: ${filepath} \nCannot write outside of the content directory.`
+      )
+    }
   }
 
   /**
