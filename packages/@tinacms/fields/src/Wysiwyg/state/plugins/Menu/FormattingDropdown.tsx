@@ -72,6 +72,7 @@ export class FormattingDropdown extends React.Component<
               this.toggle()
             }}
           >
+            <NoHeading view={view} onClick={this.toggle} />
             <H1 view={view} onClick={this.toggle} />
             <H2 view={view} onClick={this.toggle} />
             <H3 view={view} onClick={this.toggle} />
@@ -101,6 +102,12 @@ function makeToggleHeader(level: number) {
   }
 }
 
+const HeadingZero = styled.div`
+  font-size: 16px;
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+`
 const HeadingOne = styled.div`
   font-size: 40px;
   white-space: nowrap;
@@ -138,6 +145,13 @@ const HeadingSix = styled.div`
   display: block;
 `
 
+const NoHeading = blockTool({
+  Component: HeadingZero,
+  children: 'Normal Text',
+  command: makeToggleHeader(0),
+  typeName: 'normal',
+  attrs: { level: 0 },
+})
 const H1 = blockTool({
   Component: HeadingOne,
   children: 'Heading 1',

@@ -44,7 +44,7 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
 } from '@tinacms/icons'
-import { radius, color, padding } from '@tinacms/styles'
+import { TinaReset, radius, color, padding } from '@tinacms/styles'
 
 // import { ImageControl } from './images'
 
@@ -133,7 +133,7 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <>
+      <TinaReset>
         <MenuContainer
           menuFixed={menuFixed}
           menuWidth={menuWidth}
@@ -154,7 +154,7 @@ export const Menu = (props: Props) => {
         </MenuContainer>
         <FloatingTableMenu view={view} />
         <ImageMenu view={view} />
-      </>
+      </TinaReset>
     </ThemeProvider>
   )
 }
