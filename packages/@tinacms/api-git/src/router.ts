@@ -93,23 +93,25 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
 
       const fileName = req.file.originalname
       const tmpPath = path.join(repo.tmpDir, fileName)
-      const relativePath = path.join(req.body.directory, fileName)
-      const absPath = repo.fileAbsolutePath(relativePath)
+      const relPath = path.join(req.body.directory, fileName)
+      const absPath = repo.fileAbsolutePath(relPath)
 
-      fs.renameSync(tmpPath, absPath)
+      if (repo.fileIsInRepo(absPath)) {
+        fs.renameSync(tmpPath, absPath)
 
-      await repo.commit({
-        name: user.name || req.body.name || defaultCommitName,
-        email: user.email || req.body.email || defaultCommitEmail,
-        message,
-        files: [relativePath],
-      })
+        await repo.commit({
+          name: user.name || req.body.name || defaultCommitName,
+          email: user.email || req.body.email || defaultCommitEmail,
+          message,
+          files: [relPath],
+        })
 
-      if (pushOnCommit) {
-        await repo.push()
+        if (pushOnCommit) {
+          await repo.push()
+        }
+
+        res.send(req.file)
       }
-
-      res.send(req.file)
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
