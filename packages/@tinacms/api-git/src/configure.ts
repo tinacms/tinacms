@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as path from 'path'
-import { promises as fs } from 'fs'
+import * as fs from 'fs'
 import { isSSHUrl, getGitSSHUrl } from './utils'
 import { Repo } from './repo'
 
@@ -31,10 +31,10 @@ export async function updateRemoteToSSH(repo: Repo) {
   }
 }
 
-async function createSSHKey(repo: Repo, sshKey: string) {
+function createSSHKey(repo: Repo, sshKey: string) {
   const parentDir = path.dirname(repo.sshKeyPath)
-  await fs.mkdir(parentDir, { recursive: true })
-  await fs.writeFile(repo.sshKeyPath, atob(sshKey), {
+  fs.mkdirSync(parentDir, { recursive: true })
+  fs.writeFileSync(repo.sshKeyPath, atob(sshKey), {
     encoding: 'utf8',
     mode: 0o600,
   })
@@ -46,7 +46,7 @@ export async function configureGitRemote(
   sshKey?: string
 ) {
   if (sshKey) {
-    await createSSHKey(repo, sshKey)
+    createSSHKey(repo, sshKey)
   }
   if (gitRemote) {
     await repo.updateOrigin(gitRemote)
