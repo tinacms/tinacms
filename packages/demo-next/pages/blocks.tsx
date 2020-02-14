@@ -128,7 +128,7 @@ BlocksExample.getInitialProps = async function() {
 /**
  * Toggle
  */
-function EditToggle() {
+export function EditToggle() {
   const { status, deactivate, activate } = useInlineForm()
 
   return (
@@ -142,7 +142,7 @@ function EditToggle() {
   )
 }
 
-function DiscardChanges() {
+export function DiscardChanges() {
   const { form } = useInlineForm()
 
   return (
