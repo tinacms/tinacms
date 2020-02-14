@@ -59,23 +59,17 @@ export class Repo {
   }
 
   fileIsInRepo(filepath: string) {
-    const fileIsInRepo = checkFilePathIsInParent(
-      filepath,
-      this.contentAbsolutePath
-    )
-    if (fileIsInRepo) {
-      return true
-    } else {
-      throw new Error(
-        `Failed to write to: ${filepath} \nCannot write outside of the content directory.`
-      )
-    }
+    return checkFilePathIsInParent(filepath, this.contentAbsolutePath)
   }
 
   writeFile(filepath: string, contents: string | Buffer) {
     const fileAbsolutePath = this.fileAbsolutePath(filepath)
     if (this.fileIsInRepo(fileAbsolutePath)) {
       writeFile(fileAbsolutePath, contents)
+    } else {
+      throw new Error(
+        `Failed to write to: ${filepath} \nCannot write outside of the content directory.`
+      )
     }
   }
 
@@ -84,6 +78,10 @@ export class Repo {
     if (this.fileIsInRepo(fileAbsolutePath)) {
       deleteFile(fileAbsolutePath)
       await this.commit(commitOptions)
+    } else {
+      throw new Error(
+        `Failed to delete: ${filepath} \nCannot delete outside of the content directory.`
+      )
     }
   }
 
