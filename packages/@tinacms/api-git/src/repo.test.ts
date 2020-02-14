@@ -21,6 +21,7 @@ import * as os from 'os'
 import { Repo, CommitOptions } from './repo'
 import * as utils from './utils'
 import * as fw from './file-writer'
+import { SimpleGit } from 'simple-git/promise'
 
 describe('repo class', () => {
   if (os.type() == 'Windows_NT') {
@@ -63,6 +64,18 @@ describe('repo class', () => {
             'path/to/content/some/file.html'
           )
         })
+
+        it('checks that files are in the contentAbsolutePath', async () => {
+          // @ts-ignore
+          utils.checkFilePathIsInParent = jest.fn()
+
+          repo.fileIsInRepo('some/file.html')
+
+          expect(utils.checkFilePathIsInParent).toBeCalledWith(
+            'some/file.html',
+            'C:\\Users\\tina\\project\\path\\to\\content'
+          )
+        })
       })
     })
   } else {
@@ -103,6 +116,18 @@ describe('repo class', () => {
             'path/to/content/some/file.html'
           )
         })
+
+        it('checks that files are in the contentAbsolutePath', async () => {
+          // @ts-ignore
+          utils.checkFilePathIsInParent = jest.fn()
+
+          repo.fileIsInRepo('some/file.html')
+
+          expect(utils.checkFilePathIsInParent).toBeCalledWith(
+            'some/file.html',
+            '/Users/tina/project/path/to/content'
+          )
+        })
       })
     })
   }
@@ -111,18 +136,6 @@ describe('repo class', () => {
     let repo: Repo
     beforeEach(() => {
       repo = new Repo('/home/users/tina/project', 'path/to/content')
-    })
-
-    it('checks that files are in the contentAbsolutePath', async () => {
-      // @ts-ignore
-      utils.checkFilePathIsInParent = jest.fn()
-
-      repo.fileIsInRepo('some/file.html')
-
-      expect(utils.checkFilePathIsInParent).toBeCalledWith(
-        'some/file.html',
-        '/home/users/tina/project/path/to/content'
-      )
     })
 
     describe('when writing a file', () => {
@@ -178,26 +191,60 @@ describe('repo class', () => {
         expect(repo.commit).not.toHaveBeenCalled()
       })
     })
+
+    describe('when committing', () => {
+      let simplegit: any
+      let commitOptions: CommitOptions
+      let absFiles: string[]
+      const message = 'hello world'
+      const files = ['some/file.html']
+
+      beforeEach(() => {
+        simplegit = jest.fn()
+        simplegit.add = jest.fn()
+        simplegit.commit = jest.fn()
+
+        repo.open = jest.fn().mockReturnValue(simplegit)
+        commitOptions = { files, message }
+        absFiles = files.map(rel => repo.fileAbsolutePath(rel))
+      })
+
+      it('does not set the author when email is not set', async () => {
+        await repo.commit(commitOptions)
+        expect(simplegit.commit).toHaveBeenCalledWith(
+          message,
+          absFiles,
+          undefined
+        )
+      })
+
+      it('sets the author when the email is set', async () => {
+        await repo.commit({ ...commitOptions, email: 'hello@tinacms.org' })
+        expect(simplegit.commit).toHaveBeenCalledWith(message, absFiles, {
+          '--author': '"hello@tinacms.org <hello@tinacms.org>"',
+        })
+      })
+
+      it('sets the name and email when the name and email are set', async () => {
+        await repo.commit({
+          ...commitOptions,
+          email: 'hello@tinacms.org',
+          name: 'Tina CMS',
+        })
+        expect(simplegit.commit).toHaveBeenCalledWith(message, absFiles, {
+          '--author': '"Tina CMS <hello@tinacms.org>"',
+        })
+      })
+
+      it('adds all files to be committed', async () => {
+        await repo.commit(commitOptions)
+        expect(simplegit.add).toHaveBeenCalledWith(absFiles)
+      })
+
+      it('makes a commit', async () => {
+        await repo.commit(commitOptions)
+        expect(simplegit.commit).toHaveBeenCalled()
+      })
+    })
   })
-
-  // describe('without a remote', () => {
-  //   beforeEach(() => {
-  //     repo = new Repo()
-  //     repo.getOrigin = jest.fn()
-  //     repo.updateOrigin = jest.fn()
-  //   })
-
-  //   it('does not throw an error', async () => {
-  //     expect(async () => {
-  //       await updateRemoteToSSH(repo)
-  //     }).not.toThrowError()
-  //   })
-
-  //   it('does not try to update the origin', async () => {
-  //     await updateRemoteToSSH(repo)
-  //     expect(repo.updateOrigin).not.toHaveBeenCalledWith(
-  //       'git@github.com:tinacms/tunacms.git'
-  //     )
-  //   })
-  // })
 })
