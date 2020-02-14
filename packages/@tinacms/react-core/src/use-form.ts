@@ -65,13 +65,12 @@ export function useForm<FormShape = any>(
         })
       )
     },
-    [options.id, !!options.initialValues]
+    [options.id]
   )
 
   useUpdateFormFields(watch.fields, form)
   useUpdateFormLabel(watch.label, form)
   useUpdateFormValues(watch.values, form)
-  useUpdateFormInitialValues(options.initialValues, form)
 
   return [form ? form.values : options.initialValues, form]
 }
@@ -123,13 +122,4 @@ function useUpdateFormValues(values: any, form?: Form) {
     if (!form || typeof values === 'undefined') return
     form.updateValues(values)
   }, [form, values])
-}
-
-function useUpdateFormInitialValues(initialValues: any, form?: Form) {
-  React.useEffect(() => {
-    if (!form || typeof initialValues === 'undefined') return
-    const values = form.values
-    form.finalForm.initialize(initialValues)
-    form.updateValues(values)
-  }, [form, initialValues])
 }
