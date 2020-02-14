@@ -63,12 +63,18 @@ export default (props: FloatingImageMenu) => {
   }
 
   useEffect(() => {
-    const debouncedPositionImage = debounce(() => positionImage(true), 20)
+    const debouncedPositionImage = debounce(() => positionImage(true), 10)
     window.addEventListener('scroll', debouncedPositionImage)
     return () => {
       window.removeEventListener('scroll', debouncedPositionImage)
     }
   })
+
+  useEffect(() => {
+    setTitle(node.attrs.title)
+    setAlt(node.attrs.alt)
+  }, [selectedImage.node])
+
   useEffect(positionImage)
 
   const updateNodeAttrs = () => {
@@ -85,11 +91,14 @@ export default (props: FloatingImageMenu) => {
         .setSelection(new NodeSelection(tr.doc.resolve(pos)))
     )
     view.focus()
+    closeImageSettings()
   }
 
   const closeImageSettings = () => {
     const { dispatch, state } = view
     dispatch(state.tr.setMeta('image_clicked', false))
+    setTitle('')
+    setAlt('')
   }
 
   return (
@@ -128,7 +137,6 @@ const LinkPopup = styled.span<
 >`
   background-color: #f6f6f9;
   position: absolute;
-  height: max-content;
   border-radius: ${radius('small')};
   border: 1px solid ${color.grey(2)};
   filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
