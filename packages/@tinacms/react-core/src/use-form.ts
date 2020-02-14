@@ -50,15 +50,11 @@ export function useForm<FormShape = any>(
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
   const [, setValues] = React.useState(options.initialValues)
-  const [form, setForm] = React.useState<Form>(() => {
-    return createForm(options, (form: any) => {
-      setValues(form.values)
-    })
-  })
+  const [form, setForm] = React.useState<Form>()
 
   React.useEffect(
     function() {
-      if (form.id === options.id) return
+      if (form && form.id === options.id) return
       setForm(
         createForm(options, (form: any) => {
           setValues(form.values)
