@@ -21,12 +21,11 @@ import * as os from 'os'
 
 export function checkFilePathIsInParent(filepath: string, parent: string) {
   const fullpath = path.resolve(filepath)
-  const repopath = (() => {
-    if (os.type() === 'Windows_NT') {
-      return path.resolve(parent).replace(/\\+$/, '') + '\\'
-    } else {
-      return path.resolve(parent).replace(/\/+$/, '') + '/'
-    }
-  })()
+  let repopath: string
+  if (os.type() === 'Windows_NT') {
+    repopath = path.resolve(parent).replace(/\\+$/, '') + '\\'
+  } else {
+    repopath = path.resolve(parent).replace(/\/+$/, '') + '/'
+  }
   return fullpath.startsWith(repopath)
 }
