@@ -30,7 +30,7 @@ export interface FormOptions<S> extends Config<S> {
   meta?: {
     [key: string]: string
   }
-  loadInitialValues: () => Promise<S>
+  loadInitialValues?: () => Promise<S>
 }
 
 export interface Field {
