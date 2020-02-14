@@ -76,7 +76,7 @@ export class Form<S = any> implements Plugin {
     loadInitialValues,
     ...options
   }: FormOptions<S>) {
-    let initialValues = options.initialValues || ({} as S)
+    const initialValues = options.initialValues || ({} as S)
     this.__type = options.__type || 'form'
     this.id = id
     this.label = label
