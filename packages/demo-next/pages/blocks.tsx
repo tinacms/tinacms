@@ -34,8 +34,6 @@ import {
 export default function BlocksExample({ jsonFile }) {
   const [, form] = useJsonForm(jsonFile)
 
-  if (!form) return null
-
   return (
     <ModalProvider>
       <InlineForm form={form}>
