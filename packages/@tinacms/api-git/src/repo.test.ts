@@ -21,7 +21,6 @@ import * as os from 'os'
 import { Repo, CommitOptions } from './repo'
 import * as utils from './utils'
 import * as fw from './file-writer'
-import { SimpleGit } from 'simple-git/promise'
 
 describe('repo class', () => {
   if (os.type() == 'Windows_NT') {
@@ -244,6 +243,151 @@ describe('repo class', () => {
       it('makes a commit', async () => {
         await repo.commit(commitOptions)
         expect(simplegit.commit).toHaveBeenCalled()
+      })
+    })
+
+    describe('when pushing', () => {
+      let simplegit: any
+
+      beforeEach(() => {
+        simplegit = jest.fn()
+        simplegit.revparse = jest.fn().mockResolvedValue('master')
+        simplegit.push = jest.fn()
+
+        repo.open = jest.fn().mockReturnValue(simplegit)
+      })
+
+      it('pushes to the correct branch', async () => {
+        await repo.push()
+
+        expect(simplegit.push).toHaveBeenCalledWith(['-u', 'origin', 'master'])
+      })
+    })
+
+    describe('when getting a file', () => {
+      let simplegit: any
+
+      beforeEach(() => {
+        simplegit = jest.fn()
+        simplegit.show = jest.fn()
+        repo.open = jest.fn().mockReturnValue(simplegit)
+      })
+
+      it('asks for the file without leading slashes', async () => {
+        await repo.getFileAtHead('some/file.html')
+        expect(simplegit.show).toHaveBeenCalledWith([
+          'HEAD:path/to/content/some/file.html',
+        ])
+      })
+
+      it.skip('uses the current file on disk if fails to get it from git', async () => {
+        // TODO: Can't figure out how to test this
+        // simplegit.show = jest.fn().mockRejectedValue(new Error())
+        // await repo.getFileAtHead('some/file.html')
+        // expect(fs.readFileSync).toHaveBeenCalledWith(
+        //   '/home/users/tina/project/path/to/content/some/file.html'
+        // )
+      })
+    })
+
+    describe('when getting the origin', () => {
+      let simplegit: any
+
+      beforeEach(() => {
+        simplegit = jest.fn()
+        repo.open = jest.fn().mockReturnValue(simplegit)
+      })
+
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
+      it('returns the push ref for origin if we have an origin', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'origin', refs: { push: 'push' } }])
+        const result = await repo.getOrigin()
+        expect(result).toBe('push')
+      })
+
+      it('returns nothing when there is no origin', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'notorigin', refs: { push: 'push' } }])
+
+        const result = await repo.getOrigin()
+        expect(result).toBe(undefined)
+      })
+
+      it('warns the user when there is no origin', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'notorigin', refs: { push: 'push' } }])
+
+        jest.spyOn(console, 'warn')
+        await repo.getOrigin()
+        expect(console.warn).toHaveBeenCalled()
+      })
+
+      it('does not warn the user when there is an origin', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'origin', refs: { push: 'push' } }])
+
+        jest.spyOn(console, 'warn')
+        expect(console.warn).not.toHaveBeenCalled()
+      })
+    })
+
+    describe('when updating the origin', () => {
+      let simplegit: any
+
+      beforeEach(() => {
+        simplegit = jest.fn()
+        simplegit.removeRemote = jest.fn()
+        simplegit.addRemote = jest.fn()
+        repo.open = jest.fn().mockReturnValue(simplegit)
+      })
+
+      afterEach(() => {
+        jest.clearAllMocks()
+      })
+
+      it('removes the existing remote', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'origin', refs: { push: 'push' } }])
+        await repo.updateOrigin('neworiginurl')
+        expect(simplegit.removeRemote).toHaveBeenCalled()
+      })
+
+      it('warns the user when replacing an existing origin', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'origin', refs: { push: 'push' } }])
+        jest.spyOn(console, 'warn')
+        await repo.updateOrigin('neworiginurl')
+        expect(console.warn).toHaveBeenCalled()
+      })
+
+      it('does not warn the user if there is not already an origin', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'notorigin', refs: { push: 'push' } }])
+        jest.spyOn(console, 'warn')
+        await repo.updateOrigin('neworiginurl')
+        expect(console.warn).not.toHaveBeenCalled()
+      })
+
+      it('adds the new remote', async () => {
+        simplegit.getRemotes = jest
+          .fn()
+          .mockResolvedValue([{ name: 'origin', refs: { push: 'push' } }])
+        await repo.updateOrigin('neworiginurl')
+        expect(simplegit.addRemote).toHaveBeenCalledWith(
+          'origin',
+          'neworiginurl'
+        )
       })
     })
   })

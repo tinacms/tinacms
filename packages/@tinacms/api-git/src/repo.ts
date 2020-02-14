@@ -138,7 +138,7 @@ export class Repo {
 
   async getOrigin() {
     const remotes = await this.open().getRemotes(true)
-    const originRemotes = remotes.filter((r: any) => r.name == 'origin')
+    const originRemotes = remotes.filter(r => r.name == 'origin')
 
     if (!originRemotes.length) {
       console.warn('No origin remote on the given repo')
@@ -152,7 +152,7 @@ export class Repo {
     const repo = this.open()
 
     const existingRemotes = await repo.getRemotes(true)
-    if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
+    if (existingRemotes.filter(r => r.name == 'origin').length) {
       console.warn(`Changing remote origin to ${newRemote}`)
     }
 
