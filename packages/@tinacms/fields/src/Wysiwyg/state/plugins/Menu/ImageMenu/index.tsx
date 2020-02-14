@@ -69,6 +69,12 @@ export default (props: FloatingImageMenu) => {
       window.removeEventListener('scroll', debouncedPositionImage)
     }
   })
+
+  useEffect(() => {
+    setTitle(node.attrs.title)
+    setAlt(node.attrs.alt)
+  }, [selectedImage.node])
+
   useEffect(positionImage)
 
   const updateNodeAttrs = () => {

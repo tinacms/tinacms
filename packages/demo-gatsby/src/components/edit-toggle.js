@@ -41,4 +41,5 @@ export const EditToggle = styled(
   justify-content: center;
   min-width: 128px;
   font-family: "Inter", sans-serif;
+  z-index: 10;
 `
