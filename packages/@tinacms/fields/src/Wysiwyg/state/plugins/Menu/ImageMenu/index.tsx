@@ -91,6 +91,8 @@ export default (props: FloatingImageMenu) => {
   const closeImageSettings = () => {
     const { dispatch, state } = view
     dispatch(state.tr.setMeta('image_clicked', false))
+    setTitle('')
+    setAlt('')
   }
 
   return (
