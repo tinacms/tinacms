@@ -43,7 +43,7 @@ export class Repo {
   }
 
   get tmpDir() {
-    return path.join(this.contentAbsolutePath, '/tmp/')
+    return path.join(this.contentAbsolutePath, '/tmp')
   }
 
   get sshKeyPath() {
