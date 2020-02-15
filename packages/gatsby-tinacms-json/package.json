@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-json",
-  "version": "0.8.7-alpha.0",
+  "version": "0.8.8-alpha.0",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -28,11 +28,12 @@
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jest --passWithNoTests"
+    "test": "jest --passWithNoTests",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.11",
-    "tinacms": "^0.13.0-alpha.0"
+    "@tinacms/scripts": "^0.1.12",
+    "tinacms": "^0.13.1-alpha.0"
   },
   "dependencies": {
     "slash": "^3.0.0"
