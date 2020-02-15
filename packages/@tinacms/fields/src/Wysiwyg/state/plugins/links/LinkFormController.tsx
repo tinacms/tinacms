@@ -26,6 +26,7 @@ import {
   stopEditingLink,
   updateLinkBeingEdited,
 } from '../../../commands'
+import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
 import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
 
@@ -119,26 +120,6 @@ const LinkArrow = styled.div<{ offset: string; top: string }>`
   background-color: #f6f6f9;
   z-index: 100;
 `
-
-const findElementOffsetTop = (element: HTMLElement) => {
-  let target = element
-  let offsetTop = target.offsetTop
-  while (target.offsetParent) {
-    target = target.offsetParent as HTMLElement
-    offsetTop += target.offsetTop
-  }
-  return offsetTop
-}
-
-const findElementOffsetLeft = (element: HTMLElement) => {
-  let target = element
-  let offsetLeft = target.offsetLeft
-  while (target.offsetParent) {
-    target = target.offsetParent as HTMLElement
-    offsetLeft += target.offsetLeft
-  }
-  return offsetLeft
-}
 
 /**
  * Calculates the leftOffset of the form.

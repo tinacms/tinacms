@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms",
-  "version": "0.9.9-alpha.0",
+  "version": "0.9.10-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -18,18 +18,19 @@
   "repository": {
     "type": "git",
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/react/react-tinacms"
+    "directory": "packages/react-tinacms"
   },
   "scripts": {
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build",
+    "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.11"
+    "@tinacms/scripts": "^0.1.12"
   },
   "dependencies": {
-    "tinacms": "^0.13.0-alpha.0"
+    "tinacms": "^0.13.1-alpha.0"
   }
 }

@@ -49,26 +49,23 @@ export function useForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
-  const [form, setForm] = React.useState<Form | undefined>()
   const [, setValues] = React.useState(options.initialValues)
+  const [form, setForm] = React.useState<Form>(() => {
+    return createForm(options, (form: any) => {
+      setValues(form.values)
+    })
+  })
 
   React.useEffect(
-    function createForm() {
-      if (!options.initialValues) return
-      const form = new Form(options)
-      setForm(form)
-      const unsubscribe = form.subscribe(
-        form => {
+    function() {
+      if (form.id === options.id) return
+      setForm(
+        createForm(options, (form: any) => {
           setValues(form.values)
-        },
-        { values: true }
+        })
       )
-
-      return () => {
-        unsubscribe()
-      }
     },
-    [options.id, !!options.initialValues]
+    [options.id]
   )
 
   useUpdateFormFields(watch.fields, form)
@@ -77,6 +74,13 @@ export function useForm<FormShape = any>(
 
   return [form ? form.values : options.initialValues, form]
 }
+
+function createForm(options: FormOptions<any>, cb: any): Form {
+  const form = new Form(options)
+  form.subscribe(cb, { values: true })
+  return form
+}
+
 /**
  * A React Hook that update's the `Form` if `fields` are changed.
  *

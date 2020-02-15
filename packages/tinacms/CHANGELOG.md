@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.13.1-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.0...tinacms@0.13.1-alpha.0) (2020-02-14)
+
+
+### Bug Fixes
+
+* **Tina:** can override hidden and position ([63824ea](https://github.com/tinacms/tinacms/commit/63824ea))
+* hiding the sidebar ([691e936](https://github.com/tinacms/tinacms/commit/691e936)), closes [#744](https://github.com/tinacms/tinacms/issues/744)
+* sidebar theming ([a5b02e8](https://github.com/tinacms/tinacms/commit/a5b02e8))
+* TinaCMS sidebar props are entirely optional ([8e15c21](https://github.com/tinacms/tinacms/commit/8e15c21))
+
+
+
+
+
+# [0.13.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.0-alpha.1...tinacms@0.13.0) (2020-02-11)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+# [0.13.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.13.0-alpha.0...tinacms@0.13.0-alpha.1) (2020-02-11)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
 # [0.13.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.1...tinacms@0.13.0-alpha.0) (2020-02-06)
 
 
