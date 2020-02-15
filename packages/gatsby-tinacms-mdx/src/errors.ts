@@ -32,8 +32,8 @@ export const pageQuery = graphql\`
 \`
   `
 
-export const ERROR_MISSING_MDX_RAW_MARKDOWN =
-  'useMdxForm(mdx) Required attribute `rawMarkdownBody` was not found on `mdx` node.' +
+export const ERROR_MISSING_MDX_RAW_MDX =
+  'useMdxForm(mdx) Required attribute `rawMdxBody` was not found on `mdx` node.' +
   `
 
 1. Check if the \`...TinaMdx\` fragment is included in the mdx GraphQL query. For example:
