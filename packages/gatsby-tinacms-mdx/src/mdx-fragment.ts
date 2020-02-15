@@ -22,6 +22,6 @@ export const tinaMdxFragment = graphql`
   fragment TinaMdx on Mdx {
     fileRelativePath
     rawFrontmatter
-    rawMarkdownBody
+    rawMdxBody
   }
 `

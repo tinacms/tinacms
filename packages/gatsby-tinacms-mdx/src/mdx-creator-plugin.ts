@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { toMarkdownString } from './to-markdown'
+import { toMdxString } from './to-mdx'
 import { CMS, Field, AddContentPlugin } from 'tinacms'
 
 type MaybePromise<T> = Promise<T> | T
@@ -80,14 +80,14 @@ export class MdxCreatorPlugin<FormShape = any, FrontmatterShape = any>
   async onSubmit(form: FormShape, cms: CMS) {
     const fileRelativePath = await this.filename(form)
     const rawFrontmatter = await this.frontmatter(form)
-    const rawMarkdownBody = await this.body(form)
+    const rawMdxBody = await this.body(form)
 
     cms.api.git!.onChange!({
       fileRelativePath,
-      content: toMarkdownString({
+      content: toMdxString({
         fileRelativePath,
         rawFrontmatter,
-        rawMarkdownBody,
+        rawMdxBody,
       }),
     })
   }

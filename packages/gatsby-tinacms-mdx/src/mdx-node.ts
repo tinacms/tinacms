@@ -17,8 +17,8 @@ limitations under the License.
 */
 
 export interface MdxNode {
+  rawMdxBody: string
   fileRelativePath: string
   rawFrontmatter: any
-  rawMarkdownBody: string
   frontmatter?: any
 }
