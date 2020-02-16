@@ -48,7 +48,20 @@ export const useCMSForm = useLocalForm
 export function useForm<FormShape = any>(
   { loadInitialValues, ...options }: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
-): [FormShape, Form | undefined] {
+): [FormShape, Form] {
+  /**
+   * `initialValues` will be usually be undefined if `loadInitialValues` is used.
+   *
+   * If the form helper is using `watch.values`, which would contain
+   * the current state of the form, then we set that to the `initialValues`
+   * so the form is initialized with some state.
+   *
+   * This is beneficial for SSR and will hopefully not be noticeable
+   * when editing the site as the actual `initialValues` will be set
+   * behind the scenes.
+   */
+  options.initialValues = options.initialValues || watch.values
+
   const [, setValues] = React.useState(options.initialValues)
   const [form, setForm] = React.useState<Form>(() => {
     return createForm(options, (form: any) => {
@@ -70,7 +83,7 @@ export function useForm<FormShape = any>(
 
   React.useEffect(() => {
     if (loadInitialValues) {
-      loadInitialValues().then(values => {
+      loadInitialValues().then((values: any) => {
         form.updateInitialValues(values)
       })
     }
@@ -83,9 +96,9 @@ export function useForm<FormShape = any>(
   return [form ? form.values : options.initialValues, form]
 }
 
-function createForm(options: FormOptions<any>, cb: any): Form {
+function createForm(options: FormOptions<any>, handleChange: any): Form {
   const form = new Form(options)
-  form.subscribe(cb, { values: true })
+  form.subscribe(handleChange, { values: true })
   return form
 }
 
