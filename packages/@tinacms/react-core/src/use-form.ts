@@ -108,7 +108,7 @@ function createForm(options: FormOptions<any>, handleChange: any): Form {
  * This hook is useful when dynamically creating fields, or updating
  * them via hot module replacement.
  */
-function useUpdateFormFields(form: Form, fields: Field[]) {
+function useUpdateFormFields(form: Form, fields?: Field[]) {
   React.useEffect(() => {
     if (typeof fields === 'undefined') return
     form.updateFields(fields)
