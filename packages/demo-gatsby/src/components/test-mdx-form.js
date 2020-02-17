@@ -1,0 +1,53 @@
+/**
+
+Copyright 2019 Forestry.io Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+*/
+
+// 1. import MdxForm
+import { graphql } from "gatsby"
+import { MdxForm } from "@tinacms/gatsby-tinacms-mdx"
+
+class TestMdxForm extends React.Component {
+  render() {
+    /*
+     ** 2. Return MdxForm, pass in mdx
+     **    as props and return the jsx this component
+     **    should render
+     */
+    return (
+      <RemarkMdx
+        mdx={this.props.data.mdx}
+        render={({ mdx }) => {
+          return <h1>{mdx.frontmatter.title}</h1>
+        }}
+      />
+    )
+  }
+}
+
+export default TestMdxForm
+
+// 3. Add ...TinaMdx fragment to query
+export const pageQuery = graphql`
+  query {
+    mdx(fields: { slug: { eq: "My Cool Post" } }) {
+      ...TinaMdx
+      frontmatter {
+        title
+      }
+    }
+  }
+`
