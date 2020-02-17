@@ -20,7 +20,6 @@ import { MdxNode } from './mdx-node'
 import * as yaml from 'js-yaml'
 
 export function toMdxString(mdx: MdxNode) {
-  console.log('hello Paul')
   return [
     '---\n',
     yaml.dump(mdx.rawFrontmatter),
