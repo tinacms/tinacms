@@ -27,12 +27,12 @@ import {
 } from 'tinacms'
 import {
   ERROR_MISSING_MDX_PATH,
-  ERROR_MISSING_MDX_RAW_MARKDOWN,
+  ERROR_MISSING_RAW_MDX_BODY,
   ERROR_MISSING_MDX_RAW_FRONTMATTER,
 } from './errors'
 import { useMemo } from 'react'
 import { MdxNode } from './mdx-node'
-import { toMarkdownString } from './to-markdown'
+import { toMdxString } from './to-mdx'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
 const matter = require('gray-matter')
@@ -53,7 +53,7 @@ export function useMdxForm(
     return [mdx, null]
   }
 
-  validateMdx(mdx)
+  checkMdxExists(mdx)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
@@ -62,7 +62,7 @@ export function useMdxForm(
   const actions = formOverrrides.actions
 
   /**
-   * The state of the Mdx, generated from the contents of the
+   * The state of the MdxForm, generated from the contents of the
    * Markdown file currently on disk. This state will contain any
    * un-committed changes in the Markdown file.
    */
@@ -71,33 +71,11 @@ export function useMdxForm(
     () => ({
       fileRelativePath: mdx.fileRelativePath,
       frontmatter: mdx.frontmatter,
-      rawMarkdownBody: mdx.rawMarkdownBody,
+      rawMdxBody: mdx.rawMdxBody,
       rawFrontmatter: JSON.parse(mdx.rawFrontmatter),
     }),
-    [mdx.rawFrontmatter, mdx.rawMarkdownBody]
+    [mdx.rawFrontmatter, mdx.rawMdxBody]
   )
-
-  /**
-   * The state of the Mdx, generated from the contents of the
-   * Markdown file at the HEAD of this git branch.
-   */
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [valuesInGit, setValuesInGit] = React.useState()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  React.useEffect(() => {
-    cms.api.git
-      .show(id) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        // Parse the content into the Mdx data structure and store it in state.
-        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
-          git.content
-        )
-        setValuesInGit({ ...valuesOnDisk, rawFrontmatter, rawMarkdownBody })
-      })
-      .catch((e: any) => {
-        console.log('FAILED', e)
-      })
-  }, [id])
 
   /**
    * The list of Field definitions used to generate the form.
@@ -130,9 +108,19 @@ export function useMdxForm(
     {
       label,
       id,
-      initialValues: valuesInGit,
+      loadInitialValues() {
+        return cms.api.git
+          .show(id) // Load the contents of this file at HEAD
+          .then((git: any) => {
+            // Parse the content into the MdxForm data structure and store it in state.
+            const { content: rawMdxBody, data: rawFrontmatter } = matter(
+              git.content
+            )
+            return { ...valuesOnDisk, rawFrontmatter, rawMdxBody }
+          })
+      },
       fields,
-      onSubmit(data) {
+      onSubmit(data: any) {
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],
           message: data.__commit_message || 'Tina commit',
@@ -157,7 +145,7 @@ export function useMdxForm(
   const writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
-      content: toMarkdownString(formState.values),
+      content: toMdxString(formState.values),
     })
   }, [])
 
@@ -201,7 +189,7 @@ export function useGlobalMdxForm(
  * Throws an error if the Mdx node does not have the
  * fields required for editing.
  */
-function validateMdx(mdx: MdxNode) {
+function checkMdxExists(mdx: MdxNode) {
   if (typeof mdx.fileRelativePath === 'undefined') {
     throw new Error(ERROR_MISSING_MDX_PATH)
   }
@@ -210,8 +198,8 @@ function validateMdx(mdx: MdxNode) {
     throw new Error(ERROR_MISSING_MDX_RAW_FRONTMATTER)
   }
 
-  if (typeof mdx.rawMarkdownBody === 'undefined') {
-    throw new Error(ERROR_MISSING_MDX_RAW_MARKDOWN)
+  if (typeof mdx.rawMdxBody === 'undefined') {
+    throw new Error(ERROR_MISSING_RAW_MDX_BODY)
   }
 }
 

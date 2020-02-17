@@ -34,7 +34,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type }) => {
           return JSON.stringify(source.frontmatter)
         },
       },
-      rawMarkdownBody: {
+      rawMdxBody: {
         type: GraphQLString,
         resolve: source => {
           return matter(source.rawBody).content
