@@ -33,7 +33,7 @@ function AboutPage(props) {
       },
       {
         label: "Body",
-        name: "rawMarkdownBody",
+        name: "rawMdxBody",
         component: "markdown",
       },
     ],
@@ -67,9 +67,7 @@ export const aboutPageQuery = graphql`
         title
       }
       fileRelativePath
-      rawFrontmatter
-      rawMarkdownBody
-      rawBody
+      ...TinaMdx
     }
   }
 `
