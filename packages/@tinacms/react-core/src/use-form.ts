@@ -29,7 +29,7 @@ export interface WatchableFormValue {
 export function useLocalForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
-): [FormShape, Form | undefined] {
+): [FormShape, Form] {
   const [values, form] = useForm<FormShape>(options, watch)
 
   usePlugins(form)
@@ -48,7 +48,20 @@ export const useCMSForm = useLocalForm
 export function useForm<FormShape = any>(
   { loadInitialValues, ...options }: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
-): [FormShape, Form | undefined] {
+): [FormShape, Form] {
+  /**
+   * `initialValues` will be usually be undefined if `loadInitialValues` is used.
+   *
+   * If the form helper is using `watch.values`, which would contain
+   * the current state of the form, then we set that to the `initialValues`
+   * so the form is initialized with some state.
+   *
+   * This is beneficial for SSR and will hopefully not be noticeable
+   * when editing the site as the actual `initialValues` will be set
+   * behind the scenes.
+   */
+  options.initialValues = options.initialValues || watch.values
+
   const [, setValues] = React.useState(options.initialValues)
   const [form, setForm] = React.useState<Form>(() => {
     return createForm(options, (form: any) => {
@@ -70,22 +83,22 @@ export function useForm<FormShape = any>(
 
   React.useEffect(() => {
     if (loadInitialValues) {
-      loadInitialValues().then(values => {
+      loadInitialValues().then((values: any) => {
         form.updateInitialValues(values)
       })
     }
   }, [form])
 
-  useUpdateFormFields(watch.fields, form)
-  useUpdateFormLabel(watch.label, form)
-  useUpdateFormValues(watch.values, form)
+  useUpdateFormFields(form, watch.fields)
+  useUpdateFormLabel(form, watch.label)
+  useUpdateFormValues(form, watch.values)
 
   return [form ? form.values : options.initialValues, form]
 }
 
-function createForm(options: FormOptions<any>, cb: any): Form {
+function createForm(options: FormOptions<any>, handleChange: any): Form {
   const form = new Form(options)
-  form.subscribe(cb, { values: true })
+  form.subscribe(handleChange, { values: true })
   return form
 }
 
@@ -95,9 +108,9 @@ function createForm(options: FormOptions<any>, cb: any): Form {
  * This hook is useful when dynamically creating fields, or updating
  * them via hot module replacement.
  */
-function useUpdateFormFields(fields?: Field[], form?: Form) {
+function useUpdateFormFields(form: Form, fields?: Field[]) {
   React.useEffect(() => {
-    if (!form || typeof fields === 'undefined') return
+    if (typeof fields === 'undefined') return
     form.updateFields(fields)
   }, [form, fields])
 }
@@ -108,9 +121,9 @@ function useUpdateFormFields(fields?: Field[], form?: Form) {
  * This hook is useful when dynamically creating creating the label,
  * or updating it via hot module replacement.
  */
-function useUpdateFormLabel(label?: string, form?: Form) {
+function useUpdateFormLabel(form: Form, label?: string) {
   React.useEffect(() => {
-    if (!form || typeof label === 'undefined') return
+    if (typeof label === 'undefined') return
     form.label = label
   }, [form, label])
 }
@@ -125,9 +138,9 @@ function useUpdateFormLabel(label?: string, form?: Form) {
  *
  * This hook is useful when the form must be kept in sync with the data source.
  */
-function useUpdateFormValues(values: any, form?: Form) {
+function useUpdateFormValues(form: Form, values?: any) {
   React.useEffect(() => {
-    if (!form || typeof values === 'undefined') return
+    if (typeof values === 'undefined') return
     form.updateValues(values)
   }, [form, values])
 }
