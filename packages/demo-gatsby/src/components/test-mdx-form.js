@@ -16,11 +16,14 @@ limitations under the License.
 
 */
 
+import React from "react"
 // 1. import MdxForm
-import { graphql } from "gatsby"
-import { MdxForm } from "@tinacms/gatsby-tinacms-mdx"
+import { MdxForm } from "gatsby-tinacms-mdx"
 
 class TestMdxForm extends React.Component {
+  constructor(props) {
+    super(props)
+  }
   render() {
     /*
      ** 2. Return MdxForm, pass in mdx
@@ -28,8 +31,8 @@ class TestMdxForm extends React.Component {
      **    should render
      */
     return (
-      <RemarkMdx
-        mdx={this.props.data.mdx}
+      <MdxForm
+        mdx={this.props.mdx}
         render={({ mdx }) => {
           return <h1>{mdx.frontmatter.title}</h1>
         }}
@@ -39,15 +42,3 @@ class TestMdxForm extends React.Component {
 }
 
 export default TestMdxForm
-
-// 3. Add ...TinaMdx fragment to query
-export const pageQuery = graphql`
-  query {
-    mdx(fields: { slug: { eq: "My Cool Post" } }) {
-      ...TinaMdx
-      frontmatter {
-        title
-      }
-    }
-  }
-`
