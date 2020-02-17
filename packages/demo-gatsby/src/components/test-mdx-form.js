@@ -19,6 +19,7 @@ limitations under the License.
 import React from "react"
 // 1. import MdxForm
 import { MdxForm } from "gatsby-tinacms-mdx"
+import { MDXRenderer } from "gatsby-plugin-mdx"
 
 class TestMdxForm extends React.Component {
   constructor(props) {
@@ -34,7 +35,12 @@ class TestMdxForm extends React.Component {
       <MdxForm
         mdx={this.props.mdx}
         render={({ mdx }) => {
-          return <h1>{mdx.frontmatter.title}</h1>
+          return (
+            <>
+              <h1>{mdx.frontmatter.title}</h1>
+              <MDXRenderer>{mdx.body}</MDXRenderer>
+            </>
+          )
         }}
       />
     )
