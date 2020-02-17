@@ -59,7 +59,7 @@ export const aboutPageQuery = graphql`
         title
       }
     }
-    mdx {
+    mdx(fileRelativePath: { eq: "/content/about.mdx" }) {
       body
       frontmatter {
         date
