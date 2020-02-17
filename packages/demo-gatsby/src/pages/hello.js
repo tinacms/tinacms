@@ -17,13 +17,30 @@ limitations under the License.
 */
 
 import React from "react"
+import { graphql } from "gatsby"
 import TestMdxForm from "../components/test-mdx-form"
 
-const HelloPage = () => (
-  <div>
-    <h1>Hi Joe</h1>
-    {/* <TestMdxForm /> */}
-  </div>
-)
+const HelloPage = props => {
+  const mdx = props.data.mdx
+  return (
+    <div>
+      <h1>Hi Joe</h1>
+      <TestMdxForm mdx={mdx} />
+    </div>
+  )
+}
 
 export default HelloPage
+
+// Add ...TinaMdx fragment to query
+export const pageQuery = graphql`
+  query {
+    mdx(fileRelativePath: { eq: "/content/hello.mdx" }) {
+      ...TinaMdx
+      frontmatter {
+        title
+      }
+      body
+    }
+  }
+`
