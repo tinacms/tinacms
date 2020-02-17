@@ -32,7 +32,7 @@ export const pageQuery = graphql\`
 \`
   `
 
-export const ERROR_MISSING_MDX_RAW_MDX =
+export const ERROR_MISSING_RAW_MDX_BODY =
   'useMdxForm(mdx) Required attribute `rawMdxBody` was not found on `mdx` node.' +
   `
 

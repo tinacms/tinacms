@@ -27,7 +27,7 @@ import {
 } from 'tinacms'
 import {
   ERROR_MISSING_MDX_PATH,
-  ERROR_MISSING_MDX_RAW_MARKDOWN,
+  ERROR_MISSING_RAW_MDX_BODY,
   ERROR_MISSING_MDX_RAW_FRONTMATTER,
 } from './errors'
 import { useMemo } from 'react'
@@ -53,7 +53,7 @@ export function useMdxForm(
     return [mdx, null]
   }
 
-  validateMdxExists(mdx)
+  checkMdxExists(mdx)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
@@ -189,7 +189,7 @@ export function useGlobalMdxForm(
  * Throws an error if the Mdx node does not have the
  * fields required for editing.
  */
-function validateMdxExists(mdx: MdxNode) {
+function checkMdxExists(mdx: MdxNode) {
   if (typeof mdx.fileRelativePath === 'undefined') {
     throw new Error(ERROR_MISSING_MDX_PATH)
   }
@@ -199,7 +199,7 @@ function validateMdxExists(mdx: MdxNode) {
   }
 
   if (typeof mdx.rawMdxBody === 'undefined') {
-    throw new Error(ERROR_MISSING_MDX_RAW_MARKDOWN)
+    throw new Error(ERROR_MISSING_RAW_MDX_BODY)
   }
 }
 
