@@ -46,7 +46,7 @@ export const useCMSForm = useLocalForm
  * A hook that creates a form and updates it's watched properties.
  */
 export function useForm<FormShape = any>(
-  options: FormOptions<any>,
+  { loadInitialValues, ...options }: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form | undefined] {
   const [, setValues] = React.useState(options.initialValues)
@@ -67,6 +67,14 @@ export function useForm<FormShape = any>(
     },
     [options.id]
   )
+
+  React.useEffect(() => {
+    if (loadInitialValues) {
+      loadInitialValues().then(values => {
+        form.updateInitialValues(values)
+      })
+    }
+  }, [form])
 
   useUpdateFormFields(watch.fields, form)
   useUpdateFormLabel(watch.label, form)
