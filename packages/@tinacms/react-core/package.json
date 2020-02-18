@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-core",
-  "version": "0.2.7-alpha.1",
+  "version": "0.2.7",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-core.esm.js",
@@ -23,7 +23,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.7.1",
-    "@tinacms/forms": "^0.2.0-alpha.0"
+    "@tinacms/forms": "^0.2.0"
   },
   "peerDependencies": {
     "react": ">=16.8"
