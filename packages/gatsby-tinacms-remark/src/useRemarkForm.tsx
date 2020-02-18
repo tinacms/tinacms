@@ -78,28 +78,6 @@ export function useRemarkForm(
   )
 
   /**
-   * The state of the RemarkForm, generated from the contents of the
-   * Markdown file at the HEAD of this git branch.
-   */
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [valuesInGit, setValuesInGit] = React.useState()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  React.useEffect(() => {
-    cms.api.git
-      .show(id) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        // Parse the content into the RemarkForm data structure and store it in state.
-        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
-          git.content
-        )
-        setValuesInGit({ ...valuesOnDisk, rawFrontmatter, rawMarkdownBody })
-      })
-      .catch((e: any) => {
-        console.log('FAILED', e)
-      })
-  }, [id])
-
-  /**
    * The list of Field definitions used to generate the form.
    */
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
@@ -130,9 +108,19 @@ export function useRemarkForm(
     {
       label,
       id,
-      initialValues: valuesInGit,
+      loadInitialValues() {
+        return cms.api.git
+          .show(id) // Load the contents of this file at HEAD
+          .then((git: any) => {
+            // Parse the content into the RemarkForm data structure and store it in state.
+            const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
+              git.content
+            )
+            return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
+          })
+      },
       fields,
-      onSubmit(data) {
+      onSubmit(data: any) {
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],
           message: data.__commit_message || 'Tina commit',

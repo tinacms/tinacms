@@ -16,14 +16,19 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+import * as React from 'react'
+import { Input } from './Input'
+
+type a = React.DetailedHTMLProps<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  HTMLInputElement
+>
+export interface NumberProps extends a {
+  step?: string | number
+}
+
+export const NumberInput: React.FC<NumberProps> = ({
+  onChange,
+  value,
+  step,
+}) => <Input type="number" step={step} value={value} onChange={onChange} />
