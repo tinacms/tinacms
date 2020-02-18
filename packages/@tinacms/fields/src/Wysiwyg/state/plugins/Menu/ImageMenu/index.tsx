@@ -123,18 +123,25 @@ export default (props: FloatingImageMenu) => {
           value={alt}
           onChange={evt => setAlt(evt.target.value)}
         />
-        <input
-          type="checkbox"
-          checked={linked}
-          onChange={() => {
-            toggleLinked(!linked)
-            if (!linked) {
-              setLinkTitle('')
-              setLinkSrc('')
-            }
-          }}
-        />
-        Linked
+        <ToggleElement>
+          <ToggleInput
+            id="toggleImageLink"
+            onChange={() => {
+              toggleLinked(!linked)
+              if (!linked) {
+                setLinkTitle('')
+                setLinkSrc('')
+              }
+            }}
+            type="checkbox"
+          />
+          <ToggleLabel htmlFor="toggleImageLink" role="switch">
+            Linked
+            <ToggleSwitch checked={linked}>
+              <span></span>
+            </ToggleSwitch>
+          </ToggleLabel>
+        </ToggleElement>
         {linked && (
           <>
             <LinkLabel>Link Title</LinkLabel>
@@ -254,4 +261,58 @@ const CancelLink = styled(SaveLink)`
     background-color: #f6f6f9;
     opacity: 1;
   }
+`
+
+const ToggleElement = styled.div`
+  display: block;
+  position: relative;
+  margin: 0 0 0.5rem 0;
+`
+
+const ToggleLabel = styled.label<{ disabled?: boolean }>`
+  background: none;
+  color: inherit;
+  padding: 0;
+  opacity: ${props => (props.disabled ? '0.4' : '1')};
+  outline: none;
+  height: 28px;
+  pointer-events: ${props => (props.disabled ? 'none' : 'inherit')};
+  font-size: ${font.size(1)};
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: ${color.grey(8)};
+`
+
+const ToggleSwitch = styled.div<{ checked: boolean }>`
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border-radius: ${radius()};
+  background-color: white;
+  border: 1px solid ${color.grey(2)};
+  pointer-events: none;
+  margin-left: -2px;
+  span {
+    position: absolute;
+    border-radius: ${radius()};
+    left: 2px;
+    top: 50%;
+    width: calc(28px - 6px);
+    height: calc(28px - 6px);
+    background: ${p => (p.checked ? color.primary() : color.grey(3))};
+    transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
+    transition: all 150ms ease-out;
+  }
+`
+
+const ToggleInput = styled.input`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 28px;
+  opacity: 0;
+  margin: 0;
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
 `
