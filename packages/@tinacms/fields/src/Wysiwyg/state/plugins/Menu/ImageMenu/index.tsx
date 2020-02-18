@@ -136,7 +136,7 @@ export default (props: FloatingImageMenu) => {
             type="checkbox"
           />
           <ToggleLabel htmlFor="toggleImageLink" role="switch">
-            Linked
+            Insert Link
             <ToggleSwitch checked={linked}>
               <span></span>
             </ToggleSwitch>
