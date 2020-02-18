@@ -16,14 +16,22 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+export const findElementOffsetTop = (element: HTMLElement) => {
+  let target = element
+  let offsetTop = target.offsetTop
+  while (target.offsetParent) {
+    target = target.offsetParent as HTMLElement
+    offsetTop += target.offsetTop
+  }
+  return offsetTop
+}
+
+export const findElementOffsetLeft = (element: HTMLElement) => {
+  let target = element
+  let offsetLeft = target.offsetLeft
+  while (target.offsetParent) {
+    target = target.offsetParent as HTMLElement
+    offsetLeft += target.offsetLeft
+  }
+  return offsetLeft
+}

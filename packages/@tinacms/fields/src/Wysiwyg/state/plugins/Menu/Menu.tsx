@@ -23,6 +23,7 @@ import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
 import { FloatingTableMenu } from './FloatingTableMenu'
+import ImageMenu from './ImageMenu'
 import {
   toggleBulletList,
   toggleOrderedList,
@@ -173,6 +174,7 @@ export const Menu = (props: Props) => {
           {supportBlocks && <OrderedList view={view} bottom={bottom} />}
         </MenuContainer>
         <FloatingTableMenu view={view} />
+        <ImageMenu view={view} />
       </>
     </ThemeProvider>
   )
@@ -284,7 +286,7 @@ const MenuContainer = styled.div<MenuContainerProps>`
   overflow: visible;
   display: flex;
   flex: 0 0 auto;
-  z-index: 10;
+  z-index: 100;
   margin: 0 0 12px 0;
 
   ${props =>

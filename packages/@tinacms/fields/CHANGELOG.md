@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.0-alpha.0...@tinacms/fields@0.5.0) (2020-02-18)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+# [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.1...@tinacms/fields@0.5.0-alpha.0) (2020-02-14)
+
+
+### Bug Fixes
+
+* image modal issues ([462e9a1](https://github.com/tinacms/tinacms/commit/462e9a1))
+* reset inputs image modal inputs as modal closes ([f05fe2d](https://github.com/tinacms/tinacms/commit/f05fe2d))
+
+
+### Features
+
+* update image settings ([0919bd5](https://github.com/tinacms/tinacms/commit/0919bd5))
+
+
+
+
+
 ## [0.4.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.1-alpha.1...@tinacms/fields@0.4.1) (2020-02-11)
 
 **Note:** Version bump only for package @tinacms/fields
