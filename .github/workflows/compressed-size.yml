@@ -1,0 +1,18 @@
+name: Compressed Size
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - name: Install
+        run: |
+          npm ci
+          npm run bs
+      - uses: preactjs/compressed-size-action@v1
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+        inputs:
+          pattern: '{**/dist/*.js,**/build/*.js}'
