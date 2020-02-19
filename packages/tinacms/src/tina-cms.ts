@@ -107,15 +107,12 @@ export class SidebarState extends Subscribable {
     this.notifiySubscribers()
   }
 
-  private _isHidden: boolean = this.hidden
-
   get isHidden() {
-    return this._isHidden
+    return this.hidden
   }
 
   set isHidden(nextValue: boolean) {
     this.hidden = nextValue
-    this._isHidden = this.hidden
     this.notifiySubscribers()
   }
 }
