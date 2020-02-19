@@ -72,6 +72,12 @@ export default (props: FloatingImageMenu) => {
   })
 
   useEffect(() => {
+    setLinkTitle(linkMark ? linkMark.attrs.title : '')
+    setLinkSrc(linkMark ? linkMark.attrs.href : '')
+    toggleLinked(!!linkMark)
+  }, [linkMark])
+
+  useEffect(() => {
     setTitle(node.attrs.title)
     setAlt(node.attrs.alt)
   }, [selectedImage.node])
@@ -94,7 +100,6 @@ export default (props: FloatingImageMenu) => {
       title,
     }).setSelection(new NodeSelection(tr.doc.resolve(pos)))
     dispatch(tr)
-    view.focus()
     closeImageSettings()
   }
 
@@ -103,6 +108,8 @@ export default (props: FloatingImageMenu) => {
     dispatch(state.tr.setMeta('image_clicked', false))
     setTitle('')
     setAlt('')
+    setLinkTitle('')
+    setLinkSrc('')
   }
 
   const handleKeyPress = (evt: React.KeyboardEvent) => {
