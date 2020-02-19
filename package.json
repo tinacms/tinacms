@@ -5,6 +5,7 @@
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "build": "lerna run build --reject-cycles",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
+    "postinstall": "npm run bootstrap",
     "ci": "npm ci && npm run bootstrap",
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
