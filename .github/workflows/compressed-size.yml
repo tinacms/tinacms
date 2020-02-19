@@ -7,10 +7,10 @@ jobs:
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
-      - uses: preactjs/compressed-size-action@v1
+      - uses: tinacms/compressed-size-action@v1
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
-          pattern: '**/**/*.js'
+          pattern: '{**/dist/**/*.js,**/build/**/*.js}'
           build-script: 'bootstrap && npm run build'
           collapse-unchanged: true
           show-total: true
