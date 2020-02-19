@@ -88,13 +88,13 @@ export class SidebarState extends Subscribable {
   private _isOpen: boolean = false
 
   position: SidebarPosition = 'displace'
-  hidden: boolean = false
+  _hidden: boolean = false
   theme?: Theme
 
   constructor(options: SidebarStateOptions = {}) {
     super()
     this.position = options.position || 'displace'
-    this.hidden = !!options.hidden
+    this._hidden = !!options.hidden
     this.theme = options.theme
   }
 
@@ -107,12 +107,12 @@ export class SidebarState extends Subscribable {
     this.notifiySubscribers()
   }
 
-  get isHidden() {
-    return this.hidden
+  get hidden() {
+    return this._hidden
   }
 
-  set isHidden(nextValue: boolean) {
-    this.hidden = nextValue
+  set hidden(nextValue: boolean) {
+    this._hidden = nextValue
     this.notifiySubscribers()
   }
 }
