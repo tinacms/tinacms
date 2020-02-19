@@ -11,6 +11,6 @@ jobs:
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
           pattern: '{**/dist/**/*.js,**/build/**/*.js}'
-          install-script: 'npm run ci'
+          install-script: 'npm run bootstrap'
           collapse-unchanged: true
           show-total: true
