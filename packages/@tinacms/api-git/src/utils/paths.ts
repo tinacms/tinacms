@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -18,7 +16,16 @@ limitations under the License.
 
 */
 
-const port = parseInt(process.argv[2])
-const pkg = require('../build/index.js')
-const server = new pkg.GitApiServer({})
-server.start(port ? port : 4567)
+import * as path from 'path'
+import * as os from 'os'
+
+export function checkFilePathIsInParent(filepath: string, parent: string) {
+  const fullpath = path.resolve(filepath)
+  let repopath: string
+  if (os.type() === 'Windows_NT') {
+    repopath = path.resolve(parent).replace(/\\+$/, '') + '\\'
+  } else {
+    repopath = path.resolve(parent).replace(/\/+$/, '') + '/'
+  }
+  return fullpath.startsWith(repopath)
+}

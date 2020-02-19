@@ -16,21 +16,44 @@ limitations under the License.
 
 */
 
-const express = require('express')
-const cors = require('cors')
+import express from 'express'
+import cors from 'cors'
 
-import { router, GitRouterConfig } from "./router"
+import { router, GitRouterConfig } from './router'
+import { configureGitRemote } from './configure'
+import { Repo } from './repo'
+
+export interface GitServerConfig extends GitRouterConfig {
+  pathToRepo: string
+  pathToContent: string
+  gitRemote?: string
+  sshKey?: string
+}
 
 export class GitApiServer {
-    server: any
-    constructor(config: GitRouterConfig) {
-        this.server = express()
-        this.server.use(cors())
-        this.server.use('/___tina', router(config))
-    }
+  server: any
+  constructor(options: Partial<GitServerConfig>) {
+    const {
+      pathToRepo,
+      pathToContent,
+      gitRemote,
+      sshKey,
+      ...routerOptions
+    } = options
 
-    start(port: number) {
-        this.server.listen(port)
-        console.log(`TinaCMS git API server running on localhost:${port}`)
+    const repo = new Repo(pathToRepo, pathToContent)
+
+    // NOTE: Environment variables are always interpreted as strings. If TINA_CEE is set to anything, this will evaluate as true
+    if (process.env.TINA_CEE !== undefined) {
+      configureGitRemote(repo, gitRemote, sshKey)
     }
+    this.server = express()
+    this.server.use(cors())
+    this.server.use('/___tina', router(repo, routerOptions))
+  }
+
+  start(port: number) {
+    this.server.listen(port)
+    console.log(`TinaCMS git API server running on localhost:${port}`)
+  }
 }
