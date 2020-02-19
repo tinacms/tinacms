@@ -1,4 +1,4 @@
-name: Compressed Size
+name: Compressed Size Diff
 
 on: [pull_request]
 
