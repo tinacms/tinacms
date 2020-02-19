@@ -10,7 +10,7 @@ jobs:
       - uses: tinacms/compressed-size-action@master
         with:
           repo-token: '${{ secrets.GITHUB_TOKEN }}'
-          install-script: 'npm ci && npm run bs'
+          install-script: 'npm run ci'
           pattern: '{**/dist/**/*.js,**/build/**/*.js}'
           collapse-unchanged: true
           show-total: true
