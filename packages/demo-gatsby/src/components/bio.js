@@ -27,6 +27,7 @@ import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
 import { useLocalJsonForm } from "gatsby-tinacms-json"
+import { useCMS } from "tinacms"
 
 import { rhythm } from "../utils/typography"
 
@@ -51,6 +52,9 @@ const fields = [
   },
 ]
 const Bio = () => {
+  const cms = useCMS()
+  cms.sidebar.isHidden = false
+
   const data = useStaticQuery(graphql`
     query BioQuery {
       avatar: file(absolutePath: { regex: "/profile-pic.jpg/" }) {
