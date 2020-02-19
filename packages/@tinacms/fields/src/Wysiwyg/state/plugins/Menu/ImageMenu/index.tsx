@@ -105,9 +105,19 @@ export default (props: FloatingImageMenu) => {
     setAlt('')
   }
 
+  const handleKeyPress = (evt: React.KeyboardEvent) => {
+    if (evt.key === 'Escape') closeImageSettings()
+    if (evt.key === 'Enter') updateNodeAttrs()
+  }
+
   return (
     <TinaReset>
-      <LinkPopup top={modalTop} left={modalLeft} ref={wrapperRef}>
+      <LinkPopup
+        top={modalTop}
+        left={modalLeft}
+        ref={wrapperRef}
+        onKeyDown={handleKeyPress}
+      >
         <LinkLabel>Title</LinkLabel>
         <LinkInput
           placeholder="Enter Title"
