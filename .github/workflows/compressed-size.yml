@@ -9,8 +9,8 @@ jobs:
       - uses: actions/checkout@v1
       - uses: tinacms/compressed-size-action@master
         with:
-          repo-token: '${{ secrets.GITHUB_TOKEN }}'
           pattern: '{**/dist/**/*.js,**/build/**/*.js}'
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
           collapse-unchanged: true
           install-script: 'npm ci'
           show-total: true
