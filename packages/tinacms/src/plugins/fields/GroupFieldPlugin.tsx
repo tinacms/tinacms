@@ -27,6 +27,7 @@ import {
   SIDEBAR_WIDTH,
   FORM_FOOTER_HEIGHT,
 } from '../../Globals'
+import { useFormPortal } from '../../components/FormPortal'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -72,6 +73,7 @@ const Panel = function Panel({
   tinaForm,
   field,
 }: PanelProps) {
+  const FormPortal = useFormPortal()
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
       ...subField,
@@ -80,14 +82,18 @@ const Panel = function Panel({
   }, [field.fields, field.name])
 
   return (
-    <GroupPanel isExpanded={isExpanded}>
-      <PanelHeader onClick={() => setExpanded(false)}>
-        <LeftArrowIcon /> <span>{Label(field)}</span>
-      </PanelHeader>
-      <PanelBody>
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-      </PanelBody>
-    </GroupPanel>
+    <FormPortal>
+      <GroupPanel isExpanded={isExpanded}>
+        <PanelHeader onClick={() => setExpanded(false)}>
+          <LeftArrowIcon /> <span>{Label(field)}</span>
+        </PanelHeader>
+        <PanelBody>
+          {isExpanded ? (
+            <FieldsBuilder form={tinaForm} fields={fields} />
+          ) : null}
+        </PanelBody>
+      </GroupPanel>
+    </FormPortal>
   )
 }
 

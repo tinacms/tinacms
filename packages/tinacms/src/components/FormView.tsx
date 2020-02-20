@@ -40,6 +40,7 @@ import { ResetForm } from './ResetForm'
 import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
 import { GroupPanel } from '../plugins/fields'
 import { useCMS, useSubscribable } from '../react-tinacms'
+import { FormPortalProvider } from './FormPortal'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
@@ -99,13 +100,15 @@ export const FormsView = () => {
   return (
     <>
       {activeForm && (
-        <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          <FormView
-            activeForm={activeForm}
-            setActiveFormId={setActiveFormId}
-            isMultiform={isMultiform}
-          />
-        </FormWrapper>
+        <FormPortalProvider>
+          <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
+            <FormView
+              activeForm={activeForm}
+              setActiveFormId={setActiveFormId}
+              isMultiform={isMultiform}
+            />
+          </FormWrapper>
+        </FormPortalProvider>
       )}
     </>
   )
