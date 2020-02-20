@@ -8,6 +8,8 @@
     "url": "https://github.com/gatsbyjs/gatsby/issues"
   },
   "dependencies": {
+    "@mdx-js/mdx": "^1.5.5",
+    "@mdx-js/react": "^1.5.5",
     "@tinacms/core": "^0.7.1",
     "@tinacms/fields": "^0.5.0",
     "@tinacms/form-builder": "^0.2.15",
@@ -19,6 +21,7 @@
     "gatsby-plugin-feed": "^2.3.5",
     "gatsby-plugin-google-analytics": "^2.1.4",
     "gatsby-plugin-manifest": "^2.2.4",
+    "gatsby-plugin-mdx": "^1.0.70",
     "gatsby-plugin-offline": "^2.2.4",
     "gatsby-plugin-react-helmet": "^3.1.2",
     "gatsby-plugin-sharp": "^2.2.9",
@@ -31,6 +34,7 @@
     "gatsby-remark-smartypants": "^2.1.2",
     "gatsby-source-filesystem": "^2.1.6",
     "gatsby-tinacms-git": "^0.2.19",
+    "gatsby-tinacms-mdx": "^0.0.1",
     "gatsby-tinacms-json": "^0.8.8",
     "gatsby-tinacms-remark": "^0.7.3",
     "gatsby-tinacms-teams": "^0.1.4",
