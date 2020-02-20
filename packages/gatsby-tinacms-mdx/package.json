@@ -33,7 +33,7 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.11",
     "@types/js-yaml": "^3.12.1",
-    "tinacms": "^0.13.1-alpha.0"
+    "tinacms": "^0.13.1"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
