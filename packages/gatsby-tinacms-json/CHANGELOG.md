@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.9-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.8...gatsby-tinacms-json@0.8.9-alpha.0) (2020-02-20)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
 ## [0.8.8](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.8-alpha.1...gatsby-tinacms-json@0.8.8) (2020-02-18)
 
 **Note:** Version bump only for package gatsby-tinacms-json
