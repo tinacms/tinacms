@@ -47,17 +47,36 @@ export const FormsView = () => {
 
   /**
    * If there's only one form, make it the active form.
+   *
+   * TODO: There's an issue where the forms register one
+   * by one, so the 'active form' always gets set as if there
+   * were only one form, even when there are multiple
    */
-  useSubscribable(cms.forms, () => {
+
+  function setSingleActiveForm() {
     if (cms.forms.all().length === 1) {
       setActiveFormId(cms.forms.all()[0].id)
     }
+  }
+
+  /*
+   ** Subscribes the forms to the CMS,
+   ** passing a callback to set active form
+   */
+  useSubscribable(cms.forms, () => {
+    setSingleActiveForm()
   })
+
+  /*
+   ** Sets single active form on componentDidMount
+   */
+  React.useEffect(() => {
+    setSingleActiveForm()
+  }, [])
 
   const forms = cms.forms.all()
   const isMultiform = forms.length > 1
   const activeForm = activeFormId ? cms.forms.find(activeFormId) : null
-
   const isEditing = !!activeForm
 
   /**
@@ -67,7 +86,7 @@ export const FormsView = () => {
     return <NoFormsPlaceholder />
   }
 
-  if (!activeForm) {
+  if (isMultiform && !activeForm) {
     return (
       <FormsList
         isEditing={isEditing}
@@ -78,13 +97,17 @@ export const FormsView = () => {
   }
 
   return (
-    <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-      <FormView
-        activeForm={activeForm}
-        setActiveFormId={setActiveFormId}
-        isMultiform={isMultiform}
-      />
-    </FormWrapper>
+    <>
+      {activeForm && (
+        <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
+          <FormView
+            activeForm={activeForm}
+            setActiveFormId={setActiveFormId}
+            isMultiform={isMultiform}
+          />
+        </FormWrapper>
+      )}
+    </>
   )
 }
 
