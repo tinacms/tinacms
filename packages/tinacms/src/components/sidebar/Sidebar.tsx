@@ -42,8 +42,8 @@ export const Sidebar = () => {
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
-  const allScreens = cms.screens.all();
-  const showMenu = allScreens.length > 0;
+  const allScreens = cms.screens.all()
+  const showMenu = allScreens.length > 0
 
   return (
     <SidebarContainer open={cms.sidebar.isOpen}>
@@ -89,7 +89,7 @@ export const Sidebar = () => {
             close={() => setActiveView(null)}
             layout={ActiveView.layout}
           >
-            <ActiveView.Component />
+            <ActiveView.Component close={() => setActiveView(null)} />
           </ActiveViewModal>
         )}
       </SidebarWrapper>
