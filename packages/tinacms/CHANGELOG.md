@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.1...tinacms@0.14.0-alpha.0) (2020-02-20)
+
+
+### Bug Fixes
+
+* **tinacms:** if single form, FormView no longer renders form list ([780b16c](https://github.com/tinacms/tinacms/commit/780b16c))
+
+
+### Features
+
+* **tinacms:** adds isHidden getter & setter to sidebar instance ([e98e595](https://github.com/tinacms/tinacms/commit/e98e595))
+
+
+
+
+
 ## [0.13.1](https://github.com/tinacms/tinacms/compare/tinacms@0.13.1-alpha.1...tinacms@0.13.1) (2020-02-18)
 
 **Note:** Version bump only for package tinacms

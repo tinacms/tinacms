@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.6-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.5...@tinacms/api-git@0.5.6-alpha.0) (2020-02-20)
+
+
+### Bug Fixes
+
+* ensure uploaded files get committed to the repo ([d3d38a3](https://github.com/tinacms/tinacms/commit/d3d38a3))
+* make sure it's safe to delete the file before we delete it ([58542c0](https://github.com/tinacms/tinacms/commit/58542c0))
+* protect against uploading files to directories outside the repo ([338e239](https://github.com/tinacms/tinacms/commit/338e239))
+
+
+
+
+
 ## [0.5.5](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.5-alpha.1...@tinacms/api-git@0.5.5) (2020-02-11)
 
 **Note:** Version bump only for package @tinacms/api-git

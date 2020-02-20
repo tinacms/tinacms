@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.7.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.3...demo-gatsby@1.7.0-alpha.0) (2020-02-20)
+
+
+### Bug Fixes
+
+* add missing header to hello.js ([1814e34](https://github.com/gatsbyjs/gatsby-starter-blog/commit/1814e34))
+* ensure uploaded files get committed to the repo ([d3d38a3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/d3d38a3))
+
+
+### Features
+
+* add new mdx page and mdx component ([b9b85d3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/b9b85d3))
+* adds form options ([0d0d4a3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/0d0d4a3))
+* adds mdx config to gatsby demo ([e227fe0](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e227fe0))
+
+
+
+
+
 ## [1.6.3](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.3-alpha.1...demo-gatsby@1.6.3) (2020-02-18)
 
 **Note:** Version bump only for package demo-gatsby

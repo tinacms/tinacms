@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.4-alpha.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.2.3...nextjs-blog-starter@0.2.4-alpha.0) (2020-02-20)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
 ## [0.2.3](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.2.3-alpha.1...nextjs-blog-starter@0.2.3) (2020-02-18)
 
 **Note:** Version bump only for package nextjs-blog-starter
