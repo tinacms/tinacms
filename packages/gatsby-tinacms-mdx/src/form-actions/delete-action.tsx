@@ -16,19 +16,29 @@ limitations under the License.
 
 */
 
-import multer from 'multer'
-import * as fs from 'fs'
+import * as React from 'react'
+import { ActionButton, useCMS, Form } from 'tinacms'
 
-export function createUploader(tmpImgDir: string) {
-  const tmpImgStorage = multer.diskStorage({
-    destination: function(req: any, file: any, cb: any) {
-      fs.mkdir(tmpImgDir, { recursive: true }, () => {
-        cb(null, tmpImgDir)
-      })
-    },
-    filename: function(req: any, file: any, cb: any) {
-      cb(null, file.originalname)
-    },
-  })
-  return multer({ storage: tmpImgStorage })
+export function DeleteAction({ form }: { form: Form }) {
+  const cms = useCMS()
+  return (
+    <ActionButton
+      onClick={async () => {
+        if (
+          !confirm(
+            `Are you sure you want to delete ${form.values.fileRelativePath}?`
+          )
+        ) {
+          return
+        }
+        await cms.api.git.onDelete!({
+          relPath: form.values.fileRelativePath,
+        })
+
+        window.history.back()
+      }}
+    >
+      Delete
+    </ActionButton>
+  )
 }

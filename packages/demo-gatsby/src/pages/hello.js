@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -18,7 +16,31 @@ limitations under the License.
 
 */
 
-const port = parseInt(process.argv[2])
-const pkg = require('../build/index.js')
-const server = new pkg.GitApiServer({})
-server.start(port ? port : 4567)
+import React from "react"
+import { graphql } from "gatsby"
+import TestMdxForm from "../components/test-mdx-form"
+
+const HelloPage = props => {
+  const mdx = props.data.mdx
+  return (
+    <div>
+      <h1>Hi Joe</h1>
+      <TestMdxForm mdx={mdx} />
+    </div>
+  )
+}
+
+export default HelloPage
+
+// Add ...TinaMdx fragment to query
+export const pageQuery = graphql`
+  query {
+    mdx(fileRelativePath: { eq: "/content/hello.mdx" }) {
+      ...TinaMdx
+      frontmatter {
+        title
+      }
+      body
+    }
+  }
+`

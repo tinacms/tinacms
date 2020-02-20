@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -18,7 +16,18 @@ limitations under the License.
 
 */
 
-const port = parseInt(process.argv[2])
-const pkg = require('../build/index.js')
-const server = new pkg.GitApiServer({})
-server.start(port ? port : 4567)
+import { FormOptions, Form } from 'tinacms'
+import { MdxNode } from './mdx-node'
+import { useLocalMdxForm } from './useMdxForm'
+
+interface MdxFormProps extends Partial<FormOptions<any>> {
+  mdx: MdxNode
+  render(renderProps: { form: Form; mdx: any }): JSX.Element
+  timeout?: number
+}
+
+export function MdxForm({ mdx: _mdx, render, ...options }: MdxFormProps) {
+  const [mdx, form] = useLocalMdxForm(_mdx, options)
+
+  return render({ form: form as Form, mdx })
+}
