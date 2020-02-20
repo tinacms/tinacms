@@ -55,8 +55,10 @@ export default FormsList
 const FormListItem = styled.li`
   position: relative;
   font-size: ${font.size(6)};
+  line-height: 1.2;
   position: relative;
   padding: ${padding()};
+  margin: 0;
   color: ${color.grey(8)};
   font-weight: normal;
   transition: color 150ms ease-out;
@@ -65,7 +67,7 @@ const FormListItem = styled.li`
   align-items: center;
   user-select: none;
   svg {
-    width: 24px;
+    width: 28px;
     fill: ${color.grey(3)};
     margin-top: -1px;
     height: auto;
