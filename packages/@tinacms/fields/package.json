@@ -63,6 +63,7 @@
     "@types/react-select": "^2.0.11",
     "codemirror": "^5.42.2",
     "color-string": "^1.5.3",
+    "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
     "markdown-it": "^8.3.1",
     "prosemirror-commands": "^1.0.8",
