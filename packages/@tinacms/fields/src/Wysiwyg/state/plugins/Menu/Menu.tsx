@@ -29,6 +29,7 @@ import {
   toggleOrderedList,
 } from '../../../commands/list-commands'
 import { insertTable } from '../../../commands/table-commands'
+import { imagePluginKey } from '../Image'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
@@ -86,6 +87,9 @@ const LinkControl = markControl({
     creating: 'creating',
   },
   noMix: ['code'],
+  isDisabled: (view: EditorView) => {
+    return !!imagePluginKey.getState(view.state).selectedImage
+  },
 })
 
 export const Menu = (props: Props) => {
