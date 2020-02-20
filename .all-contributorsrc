@@ -120,7 +120,8 @@
         "ideas",
         "bug",
         "infra",
-        "doc"
+        "doc",
+        "code"
       ]
     },
     {
@@ -493,6 +494,15 @@
       "name": "Dani Tulp",
       "avatar_url": "https://avatars3.githubusercontent.com/u/18421761?v=4",
       "profile": "http://danitulp.nl",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "PaulBunker",
+      "name": "PaulBunker",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1537408?v=4",
+      "profile": "https://github.com/PaulBunker",
       "contributions": [
         "code"
       ]

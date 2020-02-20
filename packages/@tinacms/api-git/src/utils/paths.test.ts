@@ -16,21 +16,20 @@ limitations under the License.
 
 */
 
-import * as fs from 'fs'
 import * as path from 'path'
-import { openRepo } from './open-repo'
 
-export interface ShowConfig {
-  pathRoot: string
-  fileRelativePath: string
-}
+import { checkFilePathIsInParent } from './paths'
 
-export async function show({ pathRoot, fileRelativePath }: ShowConfig) {
-  const repo = openRepo(pathRoot)
+describe('checkFilePathIsInParent', () => {
+  test('returns false if path not in repo', () => {
+    const fileRelativePath = '../../../some-outside-file.json'
+    const repoAbsPath = path.resolve('./')
+    expect(checkFilePathIsInParent(fileRelativePath, repoAbsPath)).toBeFalsy()
+  })
 
-  try {
-    return await repo.show([`HEAD:${fileRelativePath}`])
-  } catch (e) {
-    return fs.readFileSync(path.join(pathRoot, fileRelativePath), 'utf8')
-  }
-}
+  test('returns true if path in repo', () => {
+    const fileRelativePath = './some-inside-file.json'
+    const repoAbsPath = path.resolve('./')
+    expect(checkFilePathIsInParent(fileRelativePath, repoAbsPath)).toBeTruthy()
+  })
+})
