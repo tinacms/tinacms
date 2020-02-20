@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 
+import React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { Wysiwyg } from '@tinacms/fields'
 import styled from 'styled-components'
@@ -25,7 +26,9 @@ import { parse } from './textFormat'
 const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'
 
-export const MarkdownField = wrapFieldsWithMeta(styled(Wysiwyg)`
+export const MarkdownField = wrapFieldsWithMeta(styled(props => {
+  return <Wysiwyg {...props} sticky={false} />
+})`
   position: relative;
 
   > [contenteditable] {
