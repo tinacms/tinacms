@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -18,7 +16,14 @@ limitations under the License.
 
 */
 
-const port = parseInt(process.argv[2])
-const pkg = require('../build/index.js')
-const server = new pkg.GitApiServer({})
-server.start(port ? port : 4567)
+import { MdxNode } from './mdx-node'
+import { Field } from 'tinacms'
+
+export function generateFields(post: MdxNode): Field[] {
+  const frontmatterFields = Object.keys(post.rawFrontmatter).map(key => ({
+    component: 'text',
+    name: `rawFrontmatter.${key}`,
+  }))
+
+  return [...frontmatterFields, { component: 'markdown', name: 'rawMdxBody' }]
+}

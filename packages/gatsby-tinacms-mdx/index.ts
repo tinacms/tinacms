@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -18,7 +16,9 @@ limitations under the License.
 
 */
 
-const port = parseInt(process.argv[2])
-const pkg = require('../build/index.js')
-const server = new pkg.GitApiServer({})
-server.start(port ? port : 4567)
+/**
+ * Top-level `index.js` is required for gatsby to recognize
+ * the package as a valid plugin. This just exports the src
+ * dir, which is compiled typescript.
+ */
+export * from './src'

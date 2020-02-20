@@ -43,6 +43,13 @@ export const imagePlugin = new Plugin({
     decorations(state) {
       return (this as any).getState(state).deco
     },
+    handleKeyDown(view: EditorView, event: KeyboardEvent) {
+      if (event.key === 'Escape') {
+        const { state, dispatch } = view
+        dispatch(state.tr.setMeta('image_clicked', false))
+      }
+      return false
+    },
     handleClickOn(
       view: EditorView,
       _1: any,

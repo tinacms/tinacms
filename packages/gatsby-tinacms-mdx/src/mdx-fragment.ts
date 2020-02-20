@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -18,7 +16,12 @@ limitations under the License.
 
 */
 
-const port = parseInt(process.argv[2])
-const pkg = require('../build/index.js')
-const server = new pkg.GitApiServer({})
-server.start(port ? port : 4567)
+import { graphql } from 'gatsby'
+
+export const tinaMdxFragment = graphql`
+  fragment TinaMdx on Mdx {
+    fileRelativePath
+    rawFrontmatter
+    rawMdxBody
+  }
+`

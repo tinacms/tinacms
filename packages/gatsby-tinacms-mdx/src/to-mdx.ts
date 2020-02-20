@@ -1,5 +1,3 @@
-#!/usr/bin/env node
-
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -18,7 +16,14 @@ limitations under the License.
 
 */
 
-const port = parseInt(process.argv[2])
-const pkg = require('../build/index.js')
-const server = new pkg.GitApiServer({})
-server.start(port ? port : 4567)
+import { MdxNode } from './mdx-node'
+import * as yaml from 'js-yaml'
+
+export function toMdxString(mdx: MdxNode) {
+  return [
+    '---\n',
+    yaml.dump(mdx.rawFrontmatter),
+    '---\n',
+    mdx.rawMdxBody || '',
+  ].join('')
+}

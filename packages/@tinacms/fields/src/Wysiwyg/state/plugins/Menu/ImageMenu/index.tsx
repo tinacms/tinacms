@@ -25,6 +25,7 @@ import { TinaReset, radius, color, font } from '@tinacms/styles'
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
 import { NodeSelection } from 'prosemirror-state'
+import { Mark } from 'prosemirror-model'
 
 interface FloatingImageMenu {
   view: EditorView
@@ -35,30 +36,30 @@ export default (props: FloatingImageMenu) => {
   const { selectedImage } = imagePluginKey.getState(view.state)
   if (!selectedImage) return null
   const { node, pos } = selectedImage
+  const { link } = view.state.schema.marks
+  const linkMark = node.marks.find((mark: Mark) => mark.type === link)
   const [title, setTitle] = useState(node.attrs.title)
   const [alt, setAlt] = useState(node.attrs.alt)
+  const [linkTitle, setLinkTitle] = useState(linkMark && linkMark.attrs.title)
+  const [linkSrc, setLinkSrc] = useState(linkMark && linkMark.attrs.href)
   const { top, left } = view.coordsAtPos(pos)
   const [modalTop, setModalTop] = useState(top)
   const [modalLeft, setModalLeft] = useState(left)
   const wrapperRef = useRef() as React.MutableRefObject<HTMLElement>
   const imageRef = useRef() as React.MutableRefObject<HTMLImageElement>
+  const [linked, toggleLinked] = useState(!!linkMark)
 
   function positionImage(scroll?: boolean) {
     const image = document.getElementsByClassName('tina-selected-image')[0]
     if (image && (imageRef.current !== image || scroll) && wrapperRef.current) {
       imageRef.current = image as any
-      const imageDimensions = image.getBoundingClientRect()
       const wrapperDimensions = wrapperRef.current.getBoundingClientRect()
       setModalLeft(
-        imageDimensions.width / 2 +
+        image.clientWidth / 2 +
           findElementOffsetLeft(image as HTMLElement) -
           wrapperDimensions.width / 2
       )
-      setModalTop(
-        imageDimensions.height +
-          findElementOffsetTop(image as HTMLElement) -
-          wrapperDimensions.height
-      )
+      setModalTop(findElementOffsetTop(image as HTMLElement))
     }
   }
 
@@ -71,6 +72,12 @@ export default (props: FloatingImageMenu) => {
   })
 
   useEffect(() => {
+    setLinkTitle(linkMark ? linkMark.attrs.title : '')
+    setLinkSrc(linkMark ? linkMark.attrs.href : '')
+    toggleLinked(!!linkMark)
+  }, [linkMark])
+
+  useEffect(() => {
     setTitle(node.attrs.title)
     setAlt(node.attrs.alt)
   }, [selectedImage.node])
@@ -80,17 +87,19 @@ export default (props: FloatingImageMenu) => {
   const updateNodeAttrs = () => {
     const { dispatch, state } = view
     const { image } = state.schema.nodes
+    const { link } = state.schema.marks
     const { tr } = state
-    dispatch(
-      tr
-        .setNodeMarkup(pos, image, {
-          ...node.attrs,
-          alt,
-          title,
-        })
-        .setSelection(new NodeSelection(tr.doc.resolve(pos)))
-    )
-    view.focus()
+    if (linked && (linkSrc || linkTitle)) {
+      tr.addMark(pos, pos + 1, link.create({ href: linkSrc, title: linkTitle }))
+    } else {
+      tr.removeMark(pos, pos + 1, link)
+    }
+    tr.setNodeMarkup(pos, image, {
+      ...node.attrs,
+      alt,
+      title,
+    }).setSelection(new NodeSelection(tr.doc.resolve(pos)))
+    dispatch(tr)
     closeImageSettings()
   }
 
@@ -99,11 +108,23 @@ export default (props: FloatingImageMenu) => {
     dispatch(state.tr.setMeta('image_clicked', false))
     setTitle('')
     setAlt('')
+    setLinkTitle('')
+    setLinkSrc('')
+  }
+
+  const handleKeyPress = (evt: React.KeyboardEvent) => {
+    if (evt.key === 'Escape') closeImageSettings()
+    if (evt.key === 'Enter') updateNodeAttrs()
   }
 
   return (
     <TinaReset>
-      <LinkPopup top={modalTop} left={modalLeft} ref={wrapperRef}>
+      <LinkPopup
+        top={modalTop}
+        left={modalLeft}
+        ref={wrapperRef}
+        onKeyDown={handleKeyPress}
+      >
         <LinkLabel>Title</LinkLabel>
         <LinkInput
           placeholder="Enter Title"
@@ -113,12 +134,50 @@ export default (props: FloatingImageMenu) => {
         />
         <LinkLabel>Alt</LinkLabel>
         <LinkInput
-          placeholder="Enter URL"
+          placeholder="Enter Alt Text"
           autoFocus
           type={'text'}
           value={alt}
           onChange={evt => setAlt(evt.target.value)}
         />
+        <ToggleElement>
+          <ToggleInput
+            id="toggleImageLink"
+            onChange={() => {
+              toggleLinked(!linked)
+              if (!linked) {
+                setLinkTitle('')
+                setLinkSrc('')
+              }
+            }}
+            type="checkbox"
+          />
+          <ToggleLabel htmlFor="toggleImageLink" role="switch">
+            Insert Link
+            <ToggleSwitch checked={linked}>
+              <span></span>
+            </ToggleSwitch>
+          </ToggleLabel>
+        </ToggleElement>
+        {linked && (
+          <>
+            <LinkLabel>Link Title</LinkLabel>
+            <LinkInput
+              placeholder="Enter Link Title"
+              autoFocus
+              type={'text'}
+              value={linkTitle}
+              onChange={evt => setLinkTitle(evt.target.value)}
+            />
+            <LinkLabel>Link URL</LinkLabel>
+            <LinkInput
+              placeholder="Enter Link URL"
+              type={'text'}
+              value={linkSrc}
+              onChange={evt => setLinkSrc(evt.target.value)}
+            />
+          </>
+        )}
         <LinkActions>
           <CancelLink onClick={closeImageSettings}>Cancel</CancelLink>
           <SaveLink onClick={updateNodeAttrs}>Save</SaveLink>
@@ -128,13 +187,10 @@ export default (props: FloatingImageMenu) => {
   )
 }
 
-const LinkPopup = styled.span<
-  React.HTMLAttributes<HTMLDivElement> & {
-    left: number
-    top: number
-    ref: React.MutableRefObject<HTMLElement>
-  }
->`
+const LinkPopup = styled.span<{
+  left: number
+  top: number
+}>`
   background-color: #f6f6f9;
   position: absolute;
   border-radius: ${radius('small')};
@@ -222,4 +278,58 @@ const CancelLink = styled(SaveLink)`
     background-color: #f6f6f9;
     opacity: 1;
   }
+`
+
+const ToggleElement = styled.div`
+  display: block;
+  position: relative;
+  margin: 0 0 0.5rem 0;
+`
+
+const ToggleLabel = styled.label<{ disabled?: boolean }>`
+  background: none;
+  color: inherit;
+  padding: 0;
+  opacity: ${props => (props.disabled ? '0.4' : '1')};
+  outline: none;
+  height: 28px;
+  pointer-events: ${props => (props.disabled ? 'none' : 'inherit')};
+  font-size: ${font.size(1)};
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: ${color.grey(8)};
+`
+
+const ToggleSwitch = styled.div<{ checked: boolean }>`
+  position: relative;
+  width: 48px;
+  height: 28px;
+  border-radius: ${radius()};
+  background-color: white;
+  border: 1px solid ${color.grey(2)};
+  pointer-events: none;
+  margin-left: -2px;
+  span {
+    position: absolute;
+    border-radius: ${radius()};
+    left: 2px;
+    top: 50%;
+    width: calc(28px - 6px);
+    height: calc(28px - 6px);
+    background: ${p => (p.checked ? color.primary() : color.grey(3))};
+    transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
+    transition: all 150ms ease-out;
+  }
+`
+
+const ToggleInput = styled.input`
+  position: absolute;
+  left: 0;
+  top: 0;
+  width: 48px;
+  height: 28px;
+  opacity: 0;
+  margin: 0;
+  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
 `
