@@ -30,6 +30,7 @@ import {
   LeftArrowIcon,
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
+import { useFormPortal } from '../../components/FormPortal'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -131,6 +132,7 @@ interface ItemProps {
 }
 
 const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
+  const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
@@ -159,14 +161,16 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
               <TrashIcon />
             </DeleteButton>
           </ItemHeader>
-          <Panel
-            isExpanded={isExpanded}
-            setExpanded={setExpanded}
-            field={field}
-            index={index}
-            tinaForm={tinaForm}
-            itemTitle={title}
-          />
+          <FormPortal>
+            <Panel
+              isExpanded={isExpanded}
+              setExpanded={setExpanded}
+              field={field}
+              index={index}
+              tinaForm={tinaForm}
+              itemTitle={title}
+            />
+          </FormPortal>
         </>
       )}
     </Draggable>
