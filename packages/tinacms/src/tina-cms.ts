@@ -21,6 +21,7 @@ import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
 import TextareaFieldPlugin from './plugins/fields/TextareaFieldPlugin'
+import CodeFieldPlugin from './plugins/fields/CodeFieldPlugin'
 import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
 import ImageFieldPlugin from './plugins/fields/ImageFieldPlugin'
 import ColorFieldPlugin from './plugins/fields/ColorFieldPlugin'
@@ -53,6 +54,7 @@ export class TinaCMS extends CMS {
     this.sidebar = new SidebarState(sidebar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
+    this.fields.add(CodeFieldPlugin)
     this.fields.add(DateFieldPlugin)
     this.fields.add(ImageFieldPlugin)
     this.fields.add(ColorFieldPlugin)

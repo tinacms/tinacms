@@ -34,7 +34,7 @@ function AboutPage(props) {
       {
         label: "Body",
         name: "rawMdxBody",
-        component: "markdown",
+        component: "code",
       },
     ],
   }

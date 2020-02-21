@@ -16,13 +16,22 @@ limitations under the License.
 
 */
 
-export * from './TextField'
-export * from './TextArea'
-export * from './ColorPicker'
-export * from './Toggle'
-export * from './Select'
-export * from './NumberInput'
-export * from './ImageUpload'
-export * from './Wysiwyg'
-export * from './Input'
-export * from './code'
+import * as React from 'react'
+import styled from 'styled-components'
+import { InputCss } from '../Input'
+
+type a = React.DetailedHTMLProps<
+  React.InputHTMLAttributes<HTMLInputElement>,
+  HTMLInputElement
+>
+export interface CodeProps extends a {
+  error?: boolean
+  ref?: any
+}
+
+export const Code = styled.textarea<{ error?: boolean }>`
+  ${InputCss};
+  resize: vertical;
+  height: 160px;
+  font-family: monospace;
+`

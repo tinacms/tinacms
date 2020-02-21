@@ -53,7 +53,14 @@ export * from './plugins/fields'
 export * from '@tinacms/form-builder'
 
 // Field/Input Component
-export { Wysiwyg, Toggle, Select, NumberInput, Input } from '@tinacms/fields'
+export {
+  Wysiwyg,
+  Toggle,
+  Select,
+  NumberInput,
+  Input,
+  Code,
+} from '@tinacms/fields'
 export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // Modal Components

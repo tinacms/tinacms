@@ -16,13 +16,16 @@ limitations under the License.
 
 */
 
-export * from './TextField'
-export * from './TextArea'
-export * from './ColorPicker'
-export * from './Toggle'
-export * from './Select'
-export * from './NumberInput'
-export * from './ImageUpload'
-export * from './Wysiwyg'
-export * from './Input'
-export * from './code'
+import * as React from 'react'
+import { Code, InputProps } from '@tinacms/fields'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { parse } from './textFormat'
+
+export const CodeField = wrapFieldsWithMeta<InputProps>(({ input }) => (
+  <Code {...input} />
+))
+export default {
+  name: 'code',
+  Component: CodeField,
+  parse,
+}

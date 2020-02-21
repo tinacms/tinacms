@@ -16,13 +16,10 @@ limitations under the License.
 
 */
 
-export * from './TextField'
-export * from './TextArea'
-export * from './ColorPicker'
-export * from './Toggle'
-export * from './Select'
-export * from './NumberInput'
-export * from './ImageUpload'
-export * from './Wysiwyg'
-export * from './Input'
-export * from './code'
+import * as React from 'react'
+import { storiesOf } from '@storybook/react'
+import { Code } from '../src/Code'
+
+storiesOf('Code', module)
+  .add('Default', () => <Code />)
+  .add('Auto height', () => <Code />)
