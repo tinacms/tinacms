@@ -42,7 +42,7 @@
     "tsdx": "^0.11.0",
     "tslib": "^1.10.0",
     "typedoc": "^0.16.2",
-    "typescript": "^3.7.5"
+    "typescript": "^3.8.2"
   },
   "dependencies": {
     "danger": "^9.2.0",
