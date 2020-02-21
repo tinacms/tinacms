@@ -38,6 +38,7 @@ import {
   IconButton,
   shadow,
 } from '@tinacms/styles'
+import { useFormPortal } from '../../components/FormPortal'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -202,6 +203,7 @@ const BlockListItem = ({
   template,
   block,
 }: BlockListItemProps) => {
+  const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   const removeItem = React.useCallback(() => {
@@ -231,16 +233,18 @@ const BlockListItem = ({
               <TrashIcon />
             </DeleteButton>
           </ItemHeader>
-          <Panel
-            isExpanded={isExpanded}
-            setExpanded={setExpanded}
-            field={field}
-            item={block}
-            index={index}
-            tinaForm={tinaForm}
-            label={label || template.label}
-            template={template}
-          />
+          <FormPortal>
+            <Panel
+              isExpanded={isExpanded}
+              setExpanded={setExpanded}
+              field={field}
+              item={block}
+              index={index}
+              tinaForm={tinaForm}
+              label={label || template.label}
+              template={template}
+            />
+          </FormPortal>
         </>
       )}
     </Draggable>
