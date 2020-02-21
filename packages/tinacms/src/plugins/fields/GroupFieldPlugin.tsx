@@ -20,7 +20,13 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
-import { color, radius, font } from '@tinacms/styles'
+import {
+  color,
+  radius,
+  font,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ThemeProps,
+} from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
 import { useFormPortal } from '../../components/FormPortal'
 
