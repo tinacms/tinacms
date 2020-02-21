@@ -20,14 +20,8 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
-import { color, radius, font, padding } from '@tinacms/styles'
+import { color, radius, font } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
-import {
-  SIDEBAR_HEADER_HEIGHT,
-  SIDEBAR_WIDTH,
-  FORM_FOOTER_HEIGHT,
-  FORM_HEADER_HEIGHT,
-} from '../../Globals'
 import { useFormPortal } from '../../components/FormPortal'
 
 export interface GroupFieldDefinititon extends Field {
@@ -135,18 +129,17 @@ const Header: StyledComponent<'div', {}, {}> = styled.div`
 export const PanelHeader = styled.div`
   position: relative;
   width: 100%;
-  height: ${FORM_HEADER_HEIGHT}px;
-  flex: 0 0 ${FORM_HEADER_HEIGHT}px;
   cursor: pointer;
   background-color: white;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 0 ${padding()} ${padding('small')} ${padding()};
+  padding: 4px 18px 4px 18px;
   color: inherit;
-  font-size: ${font.size(5)};
+  font-size: ${font.size(3)};
   transition: color 250ms ease-out;
   user-select: none;
+  border-bottom: 1px solid ${color.grey(2)};
   margin: 0;
   span {
     flex: 1 1 auto;
@@ -190,10 +183,10 @@ const GroupPanelKeyframes = keyframes`
 `
 
 export const GroupPanel = styled.div<{ isExpanded: boolean }>`
-  position: fixed;
-  width: ${SIDEBAR_WIDTH}px;
-  top: ${SIDEBAR_HEADER_HEIGHT}px;
-  bottom: ${FORM_FOOTER_HEIGHT}px;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
   left: 0;
   display: flex;
   flex-direction: column;
@@ -201,7 +194,6 @@ export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   overflow: hidden;
   z-index: 50;
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
-  /* border-top: 1px solid ${color.grey(2)}; */
 
   > * {
     ${p =>

@@ -100,15 +100,13 @@ export const FormsView = () => {
   return (
     <>
       {activeForm && (
-        <FormPortalProvider>
-          <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-            <FormView
-              activeForm={activeForm}
-              setActiveFormId={setActiveFormId}
-              isMultiform={isMultiform}
-            />
-          </FormWrapper>
-        </FormPortalProvider>
+        <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
+          <FormView
+            activeForm={activeForm}
+            setActiveFormId={setActiveFormId}
+            isMultiform={isMultiform}
+          />
+        </FormWrapper>
       )}
     </>
   )
@@ -149,17 +147,19 @@ export function FormView({
               />
             )}
             <FormBody>
-              <Wrapper>
-                {activeForm &&
-                  (activeForm.fields.length ? (
-                    <FieldsBuilder
-                      form={activeForm}
-                      fields={activeForm.fields}
-                    />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  ))}
-              </Wrapper>
+              <FormPortalProvider>
+                <Wrapper>
+                  {activeForm &&
+                    (activeForm.fields.length ? (
+                      <FieldsBuilder
+                        form={activeForm}
+                        fields={activeForm.fields}
+                      />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    ))}
+                </Wrapper>
+              </FormPortalProvider>
             </FormBody>
             <FormFooter>
               <Wrapper>
@@ -336,8 +336,6 @@ const FormHeader = styled(
 )`
   position: relative;
   width: 100%;
-  height: ${FORM_HEADER_HEIGHT}px;
-  flex: 0 0 ${FORM_HEADER_HEIGHT}px;
   cursor: pointer;
   background-color: white;
   display: flex;
@@ -455,13 +453,13 @@ const FormWrapper = styled.div<FormWrapperProps>`
       }
     `};
 
-  ${p =>
+  /* ${p =>
     p.isMultiform &&
     css`
       ${GroupPanel} {
         top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}px;
       }
-    `};
+    `}; */
 `
 
 export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
