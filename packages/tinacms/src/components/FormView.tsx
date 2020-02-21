@@ -452,14 +452,6 @@ const FormWrapper = styled.div<FormWrapperProps>`
         animation-timing-function: ease-out;
       }
     `};
-
-  /* ${p =>
-    p.isMultiform &&
-    css`
-      ${GroupPanel} {
-        top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}px;
-      }
-    `}; */
 `
 
 export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
