@@ -49,6 +49,22 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
     pushOnCommit,
   }: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config }
 
+  if (!repo) {
+    /**
+     * Incase js users forget to pass in `repo`.
+     */
+    throw new Error(
+      '@tinacms/api-git#router(repo, config): Parameter `repo` is missing.'
+    )
+  } else if (!(repo instanceof Repo)) {
+    /**
+     * Maintains backwards compatibility. Types are intentionally
+     * left out to discourage people from using it.
+     */
+    const repoConfig: any = repo
+    repo = new Repo(repoConfig.pathToRepo, repoConfig.pathToContent)
+  }
+
   const uploader = createUploader(repo.tmpDir)
 
   const router = express.Router()

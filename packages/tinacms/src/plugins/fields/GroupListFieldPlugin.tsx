@@ -121,7 +121,7 @@ const Group = function Group({ tinaForm, form, field, input }: GroupProps) {
   )
 }
 
-const EmptyState = () => <EmptyList>There's no items</EmptyList>
+const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
