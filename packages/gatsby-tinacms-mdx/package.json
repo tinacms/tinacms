@@ -39,6 +39,10 @@
     "ts-jest": "^24.0.2"
   },
   "dependencies": {
+    "acorn": "^6.1.1",
+    "acorn-dynamic-import": "^4.0.0",
+    "acorn-jsx": "^5.0.1",
+    "buble-jsx-only": "^0.19.8",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
     "slash": "^3.0.0"

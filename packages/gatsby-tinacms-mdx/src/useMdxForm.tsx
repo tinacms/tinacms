@@ -36,6 +36,7 @@ import { toMdxString } from './to-mdx'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
 const matter = require('gray-matter')
+import { validateMDX } from './validateMdx'
 
 export function useMdxForm(
   _mdx: MdxNode | null | undefined,
@@ -121,6 +122,11 @@ export function useMdxForm(
       },
       fields,
       onSubmit(data: any) {
+        const error = validateMDX(data.rawMdxBody)
+        debugger
+        if (error) {
+          alert(error)
+        }
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],
           message: data.__commit_message || 'Tina commit',
@@ -149,8 +155,13 @@ export function useMdxForm(
     })
   }, [])
 
+  const check = (formState: any) => {
+    const error = validateMDX(formState.values.rawMdxBody)
+    if (!error) writeToDisk(formState)
+  }
+
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
+  useWatchFormValues(form, check)
 
   return [mdx, form]
 }
