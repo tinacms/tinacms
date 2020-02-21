@@ -42,7 +42,7 @@ export const Group = function Group({ tinaForm, field }: GroupProps) {
   return (
     <>
       <Header onClick={() => setExpanded(p => !p)}>
-        {Label(field)}
+        {field.label || field.name}
         <RightArrowIcon />
       </Header>
       <Panel
@@ -80,7 +80,7 @@ const Panel = function Panel({
     <FormPortal>
       <GroupPanel isExpanded={isExpanded}>
         <PanelHeader onClick={() => setExpanded(false)}>
-          <LeftArrowIcon /> <span>{Label(field)}</span>
+          <LeftArrowIcon /> <span>{field.label || field.name}</span>
         </PanelHeader>
         <PanelBody>
           {isExpanded ? (
@@ -90,10 +90,6 @@ const Panel = function Panel({
       </GroupPanel>
     </FormPortal>
   )
-}
-
-const Label = function(field: GroupFieldDefinititon) {
-  return field.label || field.name
 }
 
 const Header: StyledComponent<'div', {}, {}> = styled.div`
