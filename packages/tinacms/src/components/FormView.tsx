@@ -37,8 +37,6 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
 import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
-import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
-import { GroupPanel } from '../plugins/fields'
 import { useCMS, useSubscribable } from '../react-tinacms'
 import { FormPortalProvider } from './FormPortal'
 
