@@ -34,11 +34,6 @@ export const FormPortalProvider: React.FC = styled(
     )
   }
 )`
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  overflow: hidden;
   height: 100%;
-  width: 100%;
-  position: relative;
+  scrollbar-width: none;
 `
