@@ -123,16 +123,16 @@ export function useMdxForm(
       fields,
       onSubmit(data: any) {
         const error = validateMDX(data.rawMdxBody)
-        debugger
         if (error) {
           alert(error)
+        } else {
+          return cms.api.git.onSubmit!({
+            files: [data.fileRelativePath],
+            message: data.__commit_message || 'Tina commit',
+            name: data.__commit_name,
+            email: data.__commit_email,
+          })
         }
-        return cms.api.git.onSubmit!({
-          files: [data.fileRelativePath],
-          message: data.__commit_message || 'Tina commit',
-          name: data.__commit_name,
-          email: data.__commit_email,
-        })
       },
       reset() {
         return cms.api.git.reset({ files: [id] })
