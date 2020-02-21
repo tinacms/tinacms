@@ -49,9 +49,11 @@ export const Tina: React.FC<TinaProps> = ({
     [DefaultTheme, themeOverrides]
   )
 
-  if (typeof hidden === 'undefined') {
-    hidden = cms.sidebar.hidden
-  }
+  React.useEffect(() => {
+    if (typeof hidden !== 'undefined') {
+      cms.sidebar.hidden = hidden
+    }
+  }, [hidden])
 
   return (
     <CMSContext.Provider value={cms}>
@@ -61,7 +63,7 @@ export const Tina: React.FC<TinaProps> = ({
       >
         {children}
       </SiteWrapper>
-      {!hidden && (
+      {!cms.sidebar.hidden && (
         <ThemeProvider theme={theme}>
           <ModalProvider>
             <TinaReset>
