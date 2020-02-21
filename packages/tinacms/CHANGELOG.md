@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0-alpha.0...tinacms@0.14.0-alpha.1) (2020-02-21)
+
+
+### Bug Fixes
+
+* pass close to ScreenPlugin components ([081f9b6](https://github.com/tinacms/tinacms/commit/081f9b6))
+
+
+
+
+
 # [0.14.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.1...tinacms@0.14.0-alpha.0) (2020-02-20)
 
 

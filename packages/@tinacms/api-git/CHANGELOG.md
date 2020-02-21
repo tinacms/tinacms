@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.6-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.6-alpha.0...@tinacms/api-git@0.5.6-alpha.1) (2020-02-21)
+
+
+### Bug Fixes
+
+* import atob in non-browser context ([0857768](https://github.com/tinacms/tinacms/commit/0857768))
+
+
+
+
+
 ## [0.5.6-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.5...@tinacms/api-git@0.5.6-alpha.0) (2020-02-20)
 
 
