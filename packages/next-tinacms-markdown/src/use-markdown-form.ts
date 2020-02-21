@@ -103,7 +103,7 @@ export function useMarkdownForm(
 
   const writeToDisk = useCallback(formState => {
     cms.api.git.writeToDisk({
-      fileRelativePath: markdownFile.fileRelativePath,
+      fileRelativePath: formState.values.fileRelativePath,
       content: toMarkdownString(formState.values),
     })
   }, [])
