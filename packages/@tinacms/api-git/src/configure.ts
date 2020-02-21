@@ -20,6 +20,7 @@ import * as path from 'path'
 import * as fs from 'fs'
 import { isSSHUrl, getGitSSHUrl } from './utils'
 import { Repo } from './repo'
+import atob from 'atob'
 
 // Ensure remote URL is ssh
 export async function updateRemoteToSSH(repo: Repo) {
