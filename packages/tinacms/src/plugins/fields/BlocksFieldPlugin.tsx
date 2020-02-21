@@ -184,7 +184,7 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
   )
 }
 
-const EmptyState = () => <EmptyList>There's no items</EmptyList>
+const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface BlockListItemProps {
   tinaForm: Form
