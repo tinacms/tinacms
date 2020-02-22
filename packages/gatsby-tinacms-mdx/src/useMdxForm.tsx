@@ -157,7 +157,7 @@ export function useMdxForm(
   }, [])
 
   const check = (formState: any) => {
-    const error = validateMDX(formState.values.rawMdxBody)
+    const error = validateMdx(formState.values.rawMdxBody)
     if (!error) writeToDisk(formState)
   }
 
