@@ -126,13 +126,14 @@ export function useMdxForm(
         const error = validateMdx(data.rawMdxBody)
         if (error) {
           throw ERROR_INVALID_MDX(error)
+        } else {
+          return cms.api.git.onSubmit!({
+            files: [data.fileRelativePath],
+            message: data.__commit_message || 'Tina commit',
+            name: data.__commit_name,
+            email: data.__commit_email,
+          })
         }
-        return cms.api.git.onSubmit!({
-          files: [data.fileRelativePath],
-          message: data.__commit_message || 'Tina commit',
-          name: data.__commit_name,
-          email: data.__commit_email,
-        })
       },
       reset() {
         return cms.api.git.reset({ files: [id] })
