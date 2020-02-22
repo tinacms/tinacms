@@ -93,3 +93,8 @@ export const pageQuery = graphql\`
     export const mdxForm(BlogPostTemplate, { queryName: ${queryName} })
 \`
   `
+
+export const ERROR_INVALID_MDX = (details: string) =>
+  `Invalid MDX
+  ${details}
+  `

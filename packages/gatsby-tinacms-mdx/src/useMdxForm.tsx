@@ -29,14 +29,15 @@ import {
   ERROR_MISSING_MDX_PATH,
   ERROR_MISSING_RAW_MDX_BODY,
   ERROR_MISSING_MDX_RAW_FRONTMATTER,
+  ERROR_INVALID_MDX,
 } from './errors'
 import { useMemo } from 'react'
 import { MdxNode } from './mdx-node'
 import { toMdxString } from './to-mdx'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
-const matter = require('gray-matter')
-import { validateMDX } from './validateMdx'
+import matter from 'gray-matter'
+import { transform } from 'buble-jsx-only'
 
 export function useMdxForm(
   _mdx: MdxNode | null | undefined,
@@ -122,10 +123,9 @@ export function useMdxForm(
       },
       fields,
       onSubmit(data: any) {
-        const error = validateMDX(data.rawMdxBody)
-        debugger
+        const error = validateMdx(data.rawMdxBody)
         if (error) {
-          alert(error)
+          throw ERROR_INVALID_MDX(error)
         }
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],
@@ -222,4 +222,18 @@ function usePersistentValue<T>(nextData: T): T {
   }, [nextData])
 
   return data
+}
+
+/* 
+Borrowed from the `mdx-js` runtime: https://github.com/mdx-js/mdx/blob/995b9c991b26274d3fecc7cca810562fc4a1a4b6/packages/runtime/src/index.js#L31-L38 
+*/
+function validateMdx(value: string): string | undefined {
+  const jsx = 'var thing = (<div>' + value + '</div>)'
+  try {
+    transform(jsx, {
+      objectAssign: 'Object.assign',
+    })
+  } catch (err) {
+    return err
+  }
 }
