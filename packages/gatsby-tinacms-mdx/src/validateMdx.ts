@@ -15,19 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { transform } from 'buble-jsx-only'
 
-import { MdxNode } from './mdx-node'
-import { Field } from 'tinacms'
-import { validateMdx } from './validateMdx'
-
-export function generateFields(post: MdxNode): Field[] {
-  const frontmatterFields = Object.keys(post.rawFrontmatter).map(key => ({
-    component: 'text',
-    name: `rawFrontmatter.${key}`,
-  }))
-
-  return [
-    ...frontmatterFields,
-    { component: 'markdown', name: 'rawMdxBody', validate: validateMdx },
-  ]
+/* 
+Borrowed from the `mdx-js` runtime: https://github.com/mdx-js/mdx/blob/995b9c991b26274d3fecc7cca810562fc4a1a4b6/packages/runtime/src/index.js#L31-L38 
+*/
+export function validateMdx(value: string): string | undefined {
+  const jsx = 'var thing = (<div>' + value + '</div>)'
+  try {
+    transform(jsx, {
+      objectAssign: 'Object.assign',
+    })
+  } catch (err) {
+    return err
+  }
 }

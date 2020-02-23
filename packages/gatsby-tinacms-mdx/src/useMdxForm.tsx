@@ -37,7 +37,7 @@ import { toMdxString } from './to-mdx'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
 import matter from 'gray-matter'
-import { transform } from 'buble-jsx-only'
+import { validateMdx } from './validateMdx'
 
 export function useMdxForm(
   _mdx: MdxNode | null | undefined,
@@ -223,18 +223,4 @@ function usePersistentValue<T>(nextData: T): T {
   }, [nextData])
 
   return data
-}
-
-/* 
-Borrowed from the `mdx-js` runtime: https://github.com/mdx-js/mdx/blob/995b9c991b26274d3fecc7cca810562fc4a1a4b6/packages/runtime/src/index.js#L31-L38 
-*/
-function validateMdx(value: string): string | undefined {
-  const jsx = 'var thing = (<div>' + value + '</div>)'
-  try {
-    transform(jsx, {
-      objectAssign: 'Object.assign',
-    })
-  } catch (err) {
-    return err
-  }
 }
