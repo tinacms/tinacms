@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-inline",
-  "version": "0.1.2-alpha.1",
+  "version": "0.1.2",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-inline.esm.js",
@@ -24,6 +24,6 @@
   "devDependencies": {
     "@tinacms/icons": "^0.4.1",
     "@tinacms/styles": "^0.1.2",
-    "tinacms": "^0.14.0-alpha.1"
+    "tinacms": "^0.14.0"
   }
 }

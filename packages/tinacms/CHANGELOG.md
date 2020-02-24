@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.14.0](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0-alpha.1...tinacms@0.14.0) (2020-02-24)
+
+
+### Bug Fixes
+
+* **sidebar:** fix toggling hidden state ([254326c](https://github.com/tinacms/tinacms/commit/254326c))
+
+
+### Features
+
+* **Sidebar:** set the text of save/reset buttons ([5af1516](https://github.com/tinacms/tinacms/commit/5af1516)), closes [#620](https://github.com/tinacms/tinacms/issues/620) [#647](https://github.com/tinacms/tinacms/issues/647)
+
+
+
+
+
 # [0.14.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0-alpha.0...tinacms@0.14.0-alpha.1) (2020-02-21)
 
 
