@@ -15,15 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import type { DependencyList } from "react"
+import { usePlugins } from '@tinacms/react-core'
+import { useMemo } from 'react'
+import { createScreen, ScreenOptions } from "../plugins/screen-plugin"
 
-export * from './use-cms'
-export * from './use-form'
-export * from './use-plugin'
-export * from './use-screen-plugin'
-export * from './use-subscribable'
-export * from './use-watch-form-values'
-export * from './with-plugin'
-export * from './with-tina'
+export function useScreenPlugin(options: ScreenOptions, deps?: DependencyList ) {
+  const memo = useMemo(() => {
+    return createScreen(options)
+  }, deps)
 
-export { Plugin } from '@tinacms/core'
-export { Form, FormOptions, Field } from '@tinacms/forms'
+  usePlugins(memo)
+}
