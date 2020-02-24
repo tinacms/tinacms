@@ -17,11 +17,32 @@ limitations under the License.
 */
 
 import { inlineJsonForm } from 'next-tinacms-json'
+import { useScreenPlugin } from 'tinacms'
 
 import Layout from '../components/Layout'
 import BlogList from '../components/BlogList'
 
+function Component({ title }) {
+  return <h1>{title}</h1>
+}
+
+function useGasPlugin(props, deps) {
+  useScreenPlugin(
+    {
+      name: 'Some Heading',
+      Icon: () => '',
+      Component,
+      props,
+    },
+    deps
+  )
+}
+
 function Index(props) {
+  const title = 'Example Screen'
+
+  useGasPlugin({ title }, [title])
+
   return (
     <Layout
       pathname="/"
