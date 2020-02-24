@@ -17,10 +17,34 @@ limitations under the License.
 */
 
 import { Plugin } from '@tinacms/core'
+import React from 'react'
 
 export interface ScreenPlugin extends Plugin {
   __type: 'screen'
   Component: any
   Icon: any
   layout: 'fullscreen' | 'popup'
+}
+
+export interface ScreenOptions<T = {}> {
+  name: string
+  Component: React.FC<T>
+  Icon: any
+  layout?: ScreenPlugin['layout']
+  props?: T
+}
+
+export function createScreen({
+  Component,
+  props,
+  ...options
+}: ScreenOptions): ScreenPlugin {
+  return {
+    __type: 'screen',
+    layout: 'popup',
+    ...options,
+    Component(screenProps: any) {
+      return <Component {...screenProps} {...props} />
+    },
+  }
 }
