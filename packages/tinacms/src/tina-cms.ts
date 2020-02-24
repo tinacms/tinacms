@@ -37,11 +37,7 @@ import { Theme } from '@tinacms/styles'
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
 export interface TinaCMSConfig extends CMSConfig {
-  sidebar?: {
-    hidden?: boolean
-    position?: SidebarPosition
-    theme?: Theme
-  }
+  sidebar?: SidebarStateOptions
 }
 
 export class TinaCMS extends CMS {
