@@ -22,4 +22,3 @@ import { Code } from '../src/Code'
 
 storiesOf('Code', module)
   .add('Default', () => <Code />)
-  .add('Auto height', () => <Code />)
