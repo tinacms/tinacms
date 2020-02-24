@@ -69,6 +69,7 @@ module.exports = {
       options: {
         path: `${__dirname}/content`,
         name: `content`,
+        ignore: ["*/*"],
       },
     },
     {
