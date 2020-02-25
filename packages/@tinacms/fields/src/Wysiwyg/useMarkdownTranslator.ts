@@ -17,14 +17,17 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { MarkdownTranslator } from './Translator'
+import { MarkdownTranslator, Format, DOMTranslator } from './Translator'
 import { Schema } from 'prosemirror-model'
 
-export function useMarkdownTranslator(schema: Schema) {
-  // TODO: Use `wysiwyg:markdown` plugins
-  const translator = React.useMemo(() => MarkdownTranslator.fromSchema(schema), [
-    schema,
-  ])
+export function useMarkdownTranslator(
+  schema: Schema,
+  format: Format = 'markdown'
+) {
+  const translator = React.useMemo(() => {
+    if (format === 'html') return DOMTranslator.fromSchema(schema)
+    return MarkdownTranslator.fromSchema(schema)
+  }, [schema])
 
   return [translator]
 }

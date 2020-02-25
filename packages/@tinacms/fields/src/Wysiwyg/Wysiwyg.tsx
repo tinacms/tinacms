@@ -23,17 +23,25 @@ import { useTinaProsemirror } from './useTinaProsemirror'
 import { ALL_PLUGINS } from './default-plugins'
 import { CodeMirrorCss } from './CodeMirrorCss'
 import { ProseMirrorCss } from './ProseMirrorCss'
+import { Format } from './Translator'
 
 interface Wysiwyg {
   input: any
   plugins?: Plugin[]
   sticky?: boolean
+  format?: Format
 }
 
 export const Wysiwyg = styled(
-  ({ input, plugins, sticky, ...styleProps }: any) => {
+  ({ input, plugins, sticky, format, ...styleProps }: any) => {
     const theme = React.useContext(ThemeContext) || {}
-    const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, theme, sticky)
+    const prosemirrorEl = useTinaProsemirror(
+      input,
+      ALL_PLUGINS,
+      theme,
+      sticky,
+      format
+    )
 
     return (
       <>
