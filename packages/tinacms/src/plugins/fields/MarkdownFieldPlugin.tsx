@@ -27,7 +27,7 @@ const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'
 
 export const MarkdownField = wrapFieldsWithMeta(styled(props => {
-  return <Wysiwyg {...props} sticky={false} />
+  return <Wysiwyg {...props} sticky={false} format="markdown" />
 })`
   position: relative;
 
