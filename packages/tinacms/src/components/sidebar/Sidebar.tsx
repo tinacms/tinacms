@@ -222,11 +222,10 @@ const MenuLink = styled.div<{ value: string }>`
 `
 
 const SidebarHeader = styled.div`
-  display: flex;
-  justify-content: space-between;
+  display: grid;
+  grid-template-areas: "hamburger actions";
   align-items: center;
   z-index: 1050;
-  flex: 0 0 ${SIDEBAR_HEADER_HEIGHT}px;
   height: ${SIDEBAR_HEADER_HEIGHT}px;
   width: 100%;
   padding: 0 ${padding()};
@@ -241,8 +240,8 @@ const MenuToggle = styled.button<{ open: boolean }>`
   text-align: left;
   width: 64px;
   height: 32px;
-  display: flex;
-  align-items: center;
+  grid-area: hamburger;
+  justify-self: start;
   cursor: pointer;
   svg {
     position: relative;
