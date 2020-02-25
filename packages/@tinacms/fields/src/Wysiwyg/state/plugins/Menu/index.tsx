@@ -77,6 +77,11 @@ export function menu(
       parentElement!.insertBefore(menuView.dom, richTextNode)
       return menuView
     },
+    props: {
+      handleScrollToSelection() {
+        return true
+      },
+    },
     // TODO: Fix
   } as any)
 }
