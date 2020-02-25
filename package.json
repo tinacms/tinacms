@@ -28,9 +28,11 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^2.0.1",
+    "husky": "^4.2.3",
     "jest": "^24.9.0",
     "lerna": "^3.16.4",
     "next": "^9.2.0",
+    "pretty-quick": "^2.0.1",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "rollup": "^1.21.4",
@@ -47,5 +49,10 @@
   "dependencies": {
     "danger": "^9.2.0",
     "depcheck": "^0.9.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
