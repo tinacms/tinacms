@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
-import { MenuOption } from './Menu'
+import { MenuOption } from './'
 
 interface BlockTool {
   Component: any
@@ -31,19 +31,22 @@ interface BlockTool {
 export function blockTool(options: BlockTool) {
   const { Component, children, command, typeName, attrs } = options
   return class extends React.Component<
-    { view: EditorView; onClick(): void },
+    { editorView: { view: EditorView }; onClick(): void },
     any
   > {
-    canDo = () => command(this.props.view.state)
+    canDo = () => command(this.props.editorView.view.state)
     onClick = () => {
-      command(this.props.view.state, this.props.view.dispatch)
-      this.props.view.focus()
+      command(
+        this.props.editorView.view.state,
+        this.props.editorView.view.dispatch
+      )
+      this.props.editorView.view.focus()
       this.props.onClick()
     }
     get active(): boolean {
       if (!typeName) return false
 
-      const { state } = this.props.view
+      const { state } = this.props.editorView.view
       const $from = state.selection.$from
       const node = $from.node($from.depth)
       const correctNodeType = node.type.name === typeName

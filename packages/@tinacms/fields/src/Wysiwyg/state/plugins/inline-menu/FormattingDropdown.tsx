@@ -35,13 +35,14 @@ export class FormattingDropdown extends React.Component<any, State> {
   }
   toggle = () => this.setState(({ active }) => ({ active: !active }))
   blockQuote = () =>
-    wrapIn(this.props.view.state.schema.nodes.blockquote)(
+    wrapIn(this.props.editorView.view.state.schema.nodes.blockquote)(
       this.props.view.state,
       this.props.view.dispatch
     )
-  lift = () => lift(this.props.view.state, this.props.view.dispatch)
+  lift = () =>
+    lift(this.props.editorView.view.state, this.props.editorView.view.dispatch)
   render() {
-    const { view } = this.props
+    const { editorView } = this.props
     return (
       <div
         // className={c('headings-toggle', 'menu-control')}
@@ -63,12 +64,12 @@ export class FormattingDropdown extends React.Component<any, State> {
         //   active,
         // })}
         >
-          <H1 view={view} onClick={this.toggle} />
-          <H2 view={view} onClick={this.toggle} />
-          <H3 view={view} onClick={this.toggle} />
-          <H4 view={view} onClick={this.toggle} />
-          <H5 view={view} onClick={this.toggle} />
-          <H6 view={view} onClick={this.toggle} />
+          <H1 editorView={editorView} onClick={this.toggle} />
+          <H2 editorView={editorView} onClick={this.toggle} />
+          <H3 editorView={editorView} onClick={this.toggle} />
+          <H4 editorView={editorView} onClick={this.toggle} />
+          <H5 editorView={editorView} onClick={this.toggle} />
+          <H6 editorView={editorView} onClick={this.toggle} />
         </ul>
         {/* </Dismissible> */}
       </div>

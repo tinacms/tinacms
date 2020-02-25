@@ -25,7 +25,7 @@ import { Dismissible } from 'react-dismissible'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
-import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './Menu'
+import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './'
 import styled from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
 import { EditorView } from 'prosemirror-view'
@@ -35,7 +35,7 @@ interface State {
 }
 
 export interface FormattingDropdownProps {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 export class FormattingDropdown extends React.Component<
@@ -47,13 +47,14 @@ export class FormattingDropdown extends React.Component<
   }
   toggle = () => this.setState(({ active }) => ({ active: !active }))
   blockQuote = () =>
-    wrapIn(this.props.view.state.schema.nodes.blockquote)(
-      this.props.view.state,
-      this.props.view.dispatch
+    wrapIn(this.props.editorView.view.state.schema.nodes.blockquote)(
+      this.props.editorView.view.state,
+      this.props.editorView.view.dispatch
     )
-  lift = () => lift(this.props.view.state, this.props.view.dispatch)
+  lift = () =>
+    lift(this.props.editorView.view.state, this.props.editorView.view.dispatch)
   render() {
-    const { view } = this.props
+    const { editorView } = this.props
     return (
       <MenuDropdownWrapper>
         <MenuButton
@@ -72,12 +73,12 @@ export class FormattingDropdown extends React.Component<
               this.toggle()
             }}
           >
-            <H1 view={view} onClick={this.toggle} />
-            <H2 view={view} onClick={this.toggle} />
-            <H3 view={view} onClick={this.toggle} />
-            <H4 view={view} onClick={this.toggle} />
-            <H5 view={view} onClick={this.toggle} />
-            <H6 view={view} onClick={this.toggle} />
+            <H1 editorView={editorView} onClick={this.toggle} />
+            <H2 editorView={editorView} onClick={this.toggle} />
+            <H3 editorView={editorView} onClick={this.toggle} />
+            <H4 editorView={editorView} onClick={this.toggle} />
+            <H5 editorView={editorView} onClick={this.toggle} />
+            <H6 editorView={editorView} onClick={this.toggle} />
           </Dismissible>
         </MenuButtonDropdown>
       </MenuDropdownWrapper>

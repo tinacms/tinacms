@@ -125,7 +125,7 @@ const commandContrl = (
   class CommandControl extends React.Component<any, any> {
     onClick = () => {
       if (this.canDo()) {
-        const { view } = this.props
+        const { view } = this.props.editorView
         command(view.state, view.dispatch)
 
         if (focusOnCreate) {
@@ -133,7 +133,7 @@ const commandContrl = (
         }
       }
     }
-    canDo = () => command(this.props.view.state)
+    canDo = () => command(this.props.editorView.view.state)
     render() {
       return (
         <div data-tooltip={tooltip}>

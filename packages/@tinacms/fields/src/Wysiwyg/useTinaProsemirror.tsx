@@ -39,8 +39,7 @@ export interface Input {
 export function useTinaProsemirror(
   input: Input,
   plugins: Plugin[] = [],
-  theme?: any,
-  sticky?: boolean
+  theme?: any
 ) {
   /**
    * Construct the Prosemirror Schema
@@ -67,13 +66,15 @@ export function useTinaProsemirror(
    * CreateState
    */
   const createState = React.useCallback((value: string) => {
-    return createEditorState(schema, translator, plugins, value, theme, sticky)
+    return createEditorState(schema, translator, plugins, value)
   }, [])
 
   /**
    * The Prosemirror EditorView instance
    */
-  const [editorView, setEditorView] = React.useState<EditorView>()
+  const [editorView, setEditorView] = React.useState<{
+    view: EditorView
+  }>()
 
   React.useEffect(
     function setupEditor() {
@@ -87,7 +88,7 @@ export function useTinaProsemirror(
       /**
        * Create a new Prosemirror EditorView on in the DOM
        */
-      const editorView = new EditorView(el, {
+      const view = new EditorView(el, {
         nodeViews: nodeViews as any,
         /**
          * The initial state of the Wysiwyg
@@ -99,9 +100,10 @@ export function useTinaProsemirror(
          * @param tr
          */
         dispatchTransaction(tr) {
-          const nextState: any = editorView.state.apply(tr as any)
+          const nextState: any = view.state.apply(tr as any)
 
-          editorView.updateState(nextState as any)
+          view.updateState(nextState as any)
+          setEditorView({ view })
 
           if (tr.docChanged) {
             input.onChange(translator!.stringFromNode(tr.doc))
@@ -109,13 +111,13 @@ export function useTinaProsemirror(
         },
       })
 
-      setEditorView(editorView)
+      setEditorView({ view })
       /**
        * Destroy the EditorView to prevent duplicates
        */
       return () => {
         setEditorView(undefined)
-        editorView.destroy()
+        view.destroy()
       }
     },
     /**
@@ -131,14 +133,14 @@ export function useTinaProsemirror(
      */
     if (!el) return
     if (!editorView) return
-    if (!(editorView as CheckableEditorView).docView) return
+    if (!(editorView.view as CheckableEditorView).docView) return
 
     const wysiwygIsActive = el.contains(document.activeElement)
 
     if (!wysiwygIsActive) {
-      editorView.updateState(createState(input.value))
+      // editorView.updateState(createState(input.value))
     }
   }, [input.value, editorView, document])
 
-  return elRef
+  return { elRef, editorView }
 }

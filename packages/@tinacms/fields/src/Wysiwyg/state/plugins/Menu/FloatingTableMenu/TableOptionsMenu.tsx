@@ -18,18 +18,20 @@ limitations under the License.
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { EditorView } from 'prosemirror-view'
+// import { EditorView } from 'prosemirror-view'
 import { deleteTable } from 'prosemirror-tables'
 import styled from 'styled-components'
 
 import { TrashIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
+import { EditorView } from 'prosemirror-view'
 
 interface TableOptionsMenu {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
-export default ({ view }: TableOptionsMenu) => {
+export default ({ editorView }: TableOptionsMenu) => {
+  const { view } = editorView
   const deleteSelectedTable = () => {
     const { state, dispatch } = view
     deleteTable(state, dispatch)

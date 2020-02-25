@@ -17,6 +17,8 @@ limitations under the License.
 */
 
 import React, { useState, useRef, useEffect } from 'react'
+import { NodeSelection } from 'prosemirror-state'
+import { Mark } from 'prosemirror-model'
 import { EditorView } from 'prosemirror-view'
 import debounce from 'lodash/debounce'
 import styled from 'styled-components'
@@ -24,15 +26,13 @@ import { TinaReset, radius, color, font } from '@tinacms/styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
-import { NodeSelection } from 'prosemirror-state'
-import { Mark } from 'prosemirror-model'
 
 interface FloatingImageMenu {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 export default (props: FloatingImageMenu) => {
-  const { view } = props
+  const { view } = props.editorView
   const { selectedImage } = imagePluginKey.getState(view.state)
   if (!selectedImage) return null
   const { node, pos } = selectedImage
@@ -116,7 +116,7 @@ export default (props: FloatingImageMenu) => {
     if (evt.key === 'Escape') closeImageSettings()
     if (evt.key === 'Enter') updateNodeAttrs()
   }
-
+  // return <TinaReset>test</TinaReset>
   return (
     <TinaReset>
       <LinkPopup
@@ -125,17 +125,17 @@ export default (props: FloatingImageMenu) => {
         ref={wrapperRef}
         onKeyDown={handleKeyPress}
       >
-        <LinkLabel>Title</LinkLabel>
+        {/* <LinkLabel>Title</LinkLabel>
         <LinkInput
           placeholder="Enter Title"
           type={'text'}
           value={title}
           onChange={evt => setTitle(evt.target.value)}
         />
-        <LinkLabel>Alt</LinkLabel>
+        <LinkLabel>Alt</LinkLabel> */}
         <LinkInput
           placeholder="Enter Alt Text"
-          autoFocus
+          // autoFocus
           type={'text'}
           value={alt}
           onChange={evt => setAlt(evt.target.value)}

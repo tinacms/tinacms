@@ -23,6 +23,7 @@ import { useTinaProsemirror } from './useTinaProsemirror'
 import { ALL_PLUGINS } from './default-plugins'
 import { CodeMirrorCss } from './CodeMirrorCss'
 import { ProseMirrorCss } from './ProseMirrorCss'
+import { Menu } from './state/plugins/Menu'
 
 interface Wysiwyg {
   input: any
@@ -33,13 +34,23 @@ interface Wysiwyg {
 export const Wysiwyg = styled(
   ({ input, plugins, sticky, ...styleProps }: any) => {
     const theme = React.useContext(ThemeContext) || {}
-    const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, theme, sticky)
-
+    const { elRef: prosemirrorEl, editorView } = useTinaProsemirror(
+      input,
+      ALL_PLUGINS,
+      theme
+    )
     return (
       <>
         <link
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
+        />
+        <Menu
+          editorView={editorView}
+          format={'markdown'}
+          theme={theme}
+          bottom={false}
+          sticky={sticky}
         />
         <div {...styleProps} ref={prosemirrorEl} />
       </>

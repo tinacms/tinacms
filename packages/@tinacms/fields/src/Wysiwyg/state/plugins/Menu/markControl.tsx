@@ -19,10 +19,10 @@ limitations under the License.
 import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 import { toggleMark } from 'prosemirror-commands'
-import { MenuButton } from './Menu'
+import { MenuButton } from './'
 
 export interface Props {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 export interface Options {
@@ -49,7 +49,7 @@ export function markControl({
     static displayName = `${mark}Control`
 
     markType(markName: string) {
-      const schema = this.props.view.state.schema
+      const schema = this.props.editorView.view.state.schema
       return schema.marks[markName]
     }
 
@@ -58,7 +58,7 @@ export function markControl({
     }
 
     markIsActive = (markName: string): boolean => {
-      const { state } = this.props.view
+      const { state } = this.props.editorView.view
       const mark = this.markType(markName)
       const { from, $from, to, empty } = state.selection
       if (empty) return !!mark.isInSet(state.storedMarks || $from.marks())
@@ -66,10 +66,10 @@ export function markControl({
     }
 
     get disabled(): boolean {
-      if (isDisabled) return isDisabled(this.props.view)
+      if (isDisabled) return isDisabled(this.props.editorView.view)
       if (mark === 'image')
         if (selectionOnly) {
-          const { $cursor } = this.props.view.state.selection as any
+          const { $cursor } = this.props.editorView.view.state.selection as any
           return (
             !!$cursor || this.inCodeBlock || this.incompatibleMarksAreActive
           )
@@ -79,7 +79,7 @@ export function markControl({
     }
 
     get inCodeBlock(): boolean {
-      const view = this.props.view
+      const { view } = this.props.editorView
       const node = view.state.selection.$from.node(
         view.state.selection.$from.depth
       )
@@ -97,7 +97,7 @@ export function markControl({
 
     onClick = () => {
       if (this.disabled) return
-      const { state, dispatch } = this.props.view
+      const { state, dispatch } = this.props.editorView.view
 
       if ((state.selection as any).$cursor && selectionOnly) {
         return

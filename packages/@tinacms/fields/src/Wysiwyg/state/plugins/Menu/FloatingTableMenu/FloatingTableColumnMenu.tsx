@@ -30,7 +30,7 @@ import {
 } from 'prosemirror-utils'
 
 interface FloatingTableDeleteMenuProps {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 const alignColumn = (view: EditorView, alignValue: string) => {
@@ -61,7 +61,7 @@ const alignColumn = (view: EditorView, alignValue: string) => {
 }
 
 export default (props: FloatingTableDeleteMenuProps) => {
-  const { state, dispatch } = props.view
+  const { state, dispatch } = props.editorView.view
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left_selected'
   )[0]
@@ -86,21 +86,21 @@ export default (props: FloatingTableDeleteMenuProps) => {
         ReactDOM.createPortal(
           <IconWrapperCol>
             <IconButton
-              onClick={() => alignColumn(props.view, 'left')}
+              onClick={() => alignColumn(props.editorView.view, 'left')}
               small
               primary
             >
               <AlignLeft />
             </IconButton>
             <IconButton
-              onClick={() => alignColumn(props.view, 'center')}
+              onClick={() => alignColumn(props.editorView.view, 'center')}
               small
               primary
             >
               <AlignCenter />
             </IconButton>
             <IconButton
-              onClick={() => alignColumn(props.view, 'right')}
+              onClick={() => alignColumn(props.editorView.view, 'right')}
               small
               primary
             >
@@ -109,7 +109,7 @@ export default (props: FloatingTableDeleteMenuProps) => {
             <IconButton
               onClick={() => {
                 deleteColumn(state, dispatch)
-                props.view.focus()
+                props.editorView.view.focus()
               }}
               small
               primary
@@ -125,7 +125,7 @@ export default (props: FloatingTableDeleteMenuProps) => {
             <IconButton
               onClick={() => {
                 deleteRow(state, dispatch)
-                props.view.focus()
+                props.editorView.view.focus()
               }}
               small
               primary

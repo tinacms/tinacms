@@ -17,16 +17,18 @@ limitations under the License.
 */
 
 import React from 'react'
-import { EditorView } from 'prosemirror-view'
+// import { EditorView } from 'prosemirror-view'
 
 import AddColumnMenu from './AddColumnMenu'
 import AddRowMenu from './AddRowMenu'
+import { EditorView } from 'prosemirror-view'
 
 interface FloatingTableAddMenu {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
-export default ({ view }: FloatingTableAddMenu) => {
+export default ({ editorView }: FloatingTableAddMenu) => {
+  const { view } = editorView
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left'
   )
