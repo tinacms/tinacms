@@ -68,8 +68,8 @@ export const imagePlugin = new Plugin({
       }
       return false
     },
-    handleScrollToSelection() {
-      return true
-    },
+    // handleScrollToSelection() {
+    //   return true
+    // },
   },
 })
