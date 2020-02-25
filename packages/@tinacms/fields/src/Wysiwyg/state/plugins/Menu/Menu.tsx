@@ -30,7 +30,7 @@ import {
 } from '../../../commands/list-commands'
 import { insertTable } from '../../../commands/table-commands'
 import { imagePluginKey } from '../Image'
-import { wrapIn, setBlockType } from 'prosemirror-commands'
+import { wrapIn, lift, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
 import styled, { css, ThemeProvider } from 'styled-components'
@@ -46,6 +46,7 @@ import {
   UnderlineIcon,
 } from '@tinacms/icons'
 import { radius, color, padding } from '@tinacms/styles'
+import { NodeRange } from 'prosemirror-model'
 
 // import { ImageControl } from './images'
 
@@ -218,6 +219,19 @@ const commandContrl = (
   }
 
 function wrapInBlockquote(state: EditorState, dispatch: any) {
+  const { blockquote } = state.schema.nodes
+  const { start, node } =
+    findParentNodeOfType(blockquote)(state.selection) || {}
+  if (start && node) {
+    const { tr } = state
+    const nodeRange = tr.doc
+      .resolve(start + 1)
+      .blockRange(tr.doc.resolve(start + node.nodeSize - 2))
+    if (nodeRange) {
+      if (dispatch) return dispatch(tr.lift(nodeRange, 0))
+      else return true
+    }
+  }
   return wrapIn(state.schema.nodes.blockquote)(state, dispatch)
 }
 function insertTableCmd(state: EditorState, dispatch: any) {
