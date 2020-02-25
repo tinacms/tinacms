@@ -80,12 +80,15 @@ export function useJsonForm<T = any>(
     { values: jsonFile.data, label }
   )
 
-  const writeToDisk = useCallback(formState => {
-    cms.api.git.writeToDisk({
-      fileRelativePath: jsonFile.fileRelativePath,
-      content: JSON.stringify(formState.values, null, 2),
-    })
-  }, [])
+  const writeToDisk = useCallback(
+    formState => {
+      cms.api.git.writeToDisk({
+        fileRelativePath: jsonFile.fileRelativePath,
+        content: JSON.stringify(formState.values, null, 2),
+      })
+    },
+    [jsonFile.fileRelativePath]
+  )
 
   useWatchFormValues(form, writeToDisk)
 
