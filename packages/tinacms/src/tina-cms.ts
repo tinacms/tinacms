@@ -37,11 +37,7 @@ import { Theme } from '@tinacms/styles'
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
 export interface TinaCMSConfig extends CMSConfig {
-  sidebar?: {
-    hidden?: boolean
-    position?: SidebarPosition
-    theme?: Theme
-  }
+  sidebar?: SidebarStateOptions
 }
 
 export class TinaCMS extends CMS {
@@ -82,6 +78,12 @@ interface SidebarStateOptions {
   hidden?: boolean
   position?: SidebarPosition
   theme?: Theme
+  buttons?: SidebarButtons
+}
+
+interface SidebarButtons {
+  save: string
+  reset: string
 }
 
 export class SidebarState extends Subscribable {
@@ -90,12 +92,23 @@ export class SidebarState extends Subscribable {
   position: SidebarPosition = 'displace'
   _hidden: boolean = false
   theme?: Theme
+  buttons: SidebarButtons = {
+    save: 'Save',
+    reset: 'Reset',
+  }
 
   constructor(options: SidebarStateOptions = {}) {
     super()
     this.position = options.position || 'displace'
     this._hidden = !!options.hidden
     this.theme = options.theme
+
+    if (options.buttons?.save) {
+      this.buttons.save = options.buttons.save
+    }
+    if (options.buttons?.reset) {
+      this.buttons.reset = options.buttons.reset
+    }
   }
 
   get isOpen() {

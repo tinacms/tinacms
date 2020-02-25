@@ -120,6 +120,7 @@ export function FormView({
   setActiveFormId,
   isMultiform,
 }: FormViewProps) {
+  const cms = useCMS()
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
       if (!result.destination || !activeForm) return
@@ -168,7 +169,9 @@ export function FormView({
                       form.reset()
                       await activeForm.reset!()
                     }}
-                  />
+                  >
+                    {cms.sidebar.buttons.reset}
+                  </ResetForm>
                 )}
                 <Button
                   onClick={() => handleSubmit()}
@@ -179,7 +182,7 @@ export function FormView({
                   margin
                 >
                   {submitting && <LoadingDots />}
-                  {!submitting && 'Save'}
+                  {!submitting && cms.sidebar.buttons.save}
                 </Button>
                 {activeForm.actions.length > 0 && (
                   <ActionsMenu actions={activeForm.actions} form={activeForm} />

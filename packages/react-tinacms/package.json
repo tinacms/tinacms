@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms",
-  "version": "0.9.11-alpha.1",
+  "version": "0.9.11",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -31,6 +31,6 @@
     "@tinacms/scripts": "^0.1.12"
   },
   "dependencies": {
-    "tinacms": "^0.14.0-alpha.1"
+    "tinacms": "^0.14.0"
   }
 }
