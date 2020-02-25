@@ -48,6 +48,13 @@ export async function configureGitRemote(
 ) {
   if (sshKey) {
     createSSHKey(repo, sshKey)
+  } else {
+    console.warn(
+      'No SSH key set. You may be unable to make commits using TinaCMS. ' +
+        'The TinaCMS git server requires an SSH key to work in cloud ' +
+        'editing environments. Please visit the documentation to learn ' +
+        'more: https://tinacms.org/docs/gatsby/configure-git-plugin'
+    )
   }
   if (gitRemote) {
     await repo.updateOrigin(gitRemote)
