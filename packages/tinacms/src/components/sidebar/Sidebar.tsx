@@ -48,7 +48,7 @@ export const Sidebar = () => {
   return (
     <SidebarContainer open={cms.sidebar.isOpen}>
       <SidebarWrapper open={cms.sidebar.isOpen}>
-        <SidebarHeader>
+        <SidebarHeader hasOneChild={!showMenu}>
           {showMenu && (
             <MenuToggle
               onClick={() => setMenuVisibility(!menuIsVisible)}
@@ -221,9 +221,9 @@ const MenuLink = styled.div<{ value: string }>`
   }
 `
 
-const SidebarHeader = styled.div`
+const SidebarHeader = styled.div<{ hasOneChild: boolean }>`
   display: flex;
-  justify-content: space-between;
+  justify-content: ${p => p.hasOneChild ? 'flex-end' : 'space-between'};
   align-items: center;
   z-index: 1050;
   flex: 0 0 ${SIDEBAR_HEADER_HEIGHT}px;
