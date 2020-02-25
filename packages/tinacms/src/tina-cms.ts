@@ -31,6 +31,7 @@ import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
+import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { Theme } from '@tinacms/styles'
 
@@ -56,6 +57,7 @@ export class TinaCMS extends CMS {
     this.fields.add(ToggleFieldPlugin)
     this.fields.add(SelectFieldPlugin)
     this.fields.add(MarkdownFieldPlugin)
+    this.fields.add(HtmlFieldPlugin)
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
