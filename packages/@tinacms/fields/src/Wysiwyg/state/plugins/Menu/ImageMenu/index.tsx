@@ -18,7 +18,7 @@ limitations under the License.
 
 import React, { useState, useRef, useEffect } from 'react'
 import { EditorView } from 'prosemirror-view'
-import debounce from 'lodash/debounce'
+import debounce from 'lodash.debounce'
 import styled from 'styled-components'
 import { TinaReset, radius, color, font } from '@tinacms/styles'
 
