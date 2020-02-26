@@ -23,16 +23,17 @@ import { TableMap } from 'prosemirror-tables'
 
 import { buildCellSelection, buildExtendedHeaders } from './utils'
 
-export const blockPluginKey = new PluginKey('block')
+export const tablePluginKey = new PluginKey('table')
 
 export const tablePlugin = new Plugin({
-  key: blockPluginKey,
+  key: tablePluginKey,
 
   state: {
     init: () => {
       return { deco: DecorationSet.empty }
     },
-    apply(_1, _2, _3, newState) {
+    apply(tr, prev, _3, newState) {
+      if (tr.getMeta('image_clicked') === false) return prev
       const { selection } = newState
       if (selection) {
         const { table } = newState.schema.nodes
@@ -68,7 +69,7 @@ export const tablePlugin = new Plugin({
       if (!direct) return false
       const targetClasses = event.target.classList
       const { state, dispatch } = view
-      const tablePluginState = blockPluginKey.getState(state)
+      const tablePluginState = tablePluginKey.getState(state)
       const { tableMap: tableMap, selectedTable } = tablePluginState
       const cellSelection = buildCellSelection(
         nodePos,

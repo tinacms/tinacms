@@ -23,7 +23,7 @@ import {
   useForm,
   GlobalFormPlugin,
 } from 'tinacms'
-import { useMemo, useCallback, useState, useEffect } from 'react'
+import { useMemo, useCallback } from 'react'
 import * as React from 'react'
 
 interface JsonNode {
@@ -69,26 +69,6 @@ export function useJsonForm(
     [jsonNode]
   )
 
-  /**
-   * The state of the JsonForm, generated from the contents of the
-   * Json file at the HEAD of this git branch.
-   */
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [valuesInGit, setValuesInGit] = useState()
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useEffect(() => {
-    cms.api.git
-      .show(id) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        // Parse the JSON into a JsonForm data structure and store it in state.
-        const rawJson = JSON.parse(git.content)
-        setValuesInGit({ jsonNode, rawJson })
-      })
-      .catch((e: any) => {
-        console.log('FAILED', e)
-      })
-  }, [id])
-
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
 
   // TODO: This may not be necessary.
@@ -99,9 +79,17 @@ export function useJsonForm(
     {
       id,
       label,
-      initialValues: valuesInGit,
       fields,
-      onSubmit(data) {
+      loadInitialValues() {
+        return cms.api.git
+          .show(id) // Load the contents of this file at HEAD
+          .then((git: any) => {
+            // Parse the JSON into a JsonForm data structure and store it in state.
+            const rawJson = JSON.parse(git.content)
+            return { jsonNode, rawJson }
+          })
+      },
+      onSubmit(data: any) {
         return cms.api.git.onSubmit!({
           files: [data.jsonNode.fileRelativePath],
           message: data.__commit_message || 'Tina commit',

@@ -30,6 +30,7 @@ export interface FormOptions<S> extends Config<S> {
   meta?: {
     [key: string]: string
   }
+  loadInitialValues?: () => Promise<S>
 }
 
 export interface Field {
@@ -72,6 +73,7 @@ export class Form<S = any> implements Plugin {
     fields,
     actions,
     reset,
+    loadInitialValues,
     ...options
   }: FormOptions<S>) {
     const initialValues = options.initialValues || ({} as S)
@@ -105,6 +107,12 @@ export class Form<S = any> implements Plugin {
     this.actions = actions || []
     this.initialValues = initialValues
     this.updateFields(this.fields)
+
+    if (loadInitialValues) {
+      loadInitialValues().then(initialValues => {
+        this.updateInitialValues(initialValues)
+      })
+    }
   }
 
   updateFields(fields: Field[]) {
@@ -133,6 +141,20 @@ export class Form<S = any> implements Plugin {
 
   updateValues(values: S) {
     this.finalForm.batch(() => {
+      const activePath: string | undefined = this.finalForm.getState().active
+
+      if (!activePath) {
+        updateEverything(this.finalForm, values)
+      } else {
+        updateSelectively(this.finalForm, values)
+      }
+    })
+  }
+
+  updateInitialValues(initialValues: S) {
+    this.finalForm.batch(() => {
+      const values = this.values
+      this.finalForm.initialize(initialValues)
       const activePath: string | undefined = this.finalForm.getState().active
 
       if (!activePath) {

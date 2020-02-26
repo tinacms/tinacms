@@ -31,13 +31,15 @@ import { menu } from './plugins/Menu'
 import { buildKeymap } from './buildKeymap'
 import { links } from './plugins/links'
 import { tablePlugin } from './plugins/Table'
+import { imagePlugin } from './plugins/Image'
 
 export function createEditorState(
   schema: Schema,
   translator: Translator,
   plugins: Plugin[],
   value: string,
-  theme: any // TODO: update type
+  theme: any, // TODO: update type
+  sticky?: boolean
 ) {
   return EditorState.create({
     schema,
@@ -49,9 +51,10 @@ export function createEditorState(
       links(schema, theme),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       gapCursor(),
-      menu(translator, false, theme),
+      menu(translator, false, theme, sticky),
       tableEditing(),
       tablePlugin,
+      imagePlugin,
     ],
   })
 }

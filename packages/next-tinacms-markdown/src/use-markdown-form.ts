@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 const matter = require('gray-matter')
 import * as yaml from 'js-yaml'
 
@@ -32,7 +32,7 @@ import {
  * A datastructure representing a MarkdownFile stored in Git
  */
 
-export interface MarkdownFile  {
+export interface MarkdownFile {
   fileRelativePath: string
   frontmatter: any
   markdownBody: string
@@ -56,29 +56,13 @@ export function toMarkdownString(markdownFile: MarkdownFile) {
 /**
  * Creates a TinaCMS Form for editing a MarkdownFile in Git
  */
-export function useMarkdownForm (
+export function useMarkdownForm(
   markdownFile: MarkdownFile,
   options: Options = {}
 ) {
   const cms = useCMS()
 
-  const [valuesInGit, setValuesInGit] = useState()
   const valuesOnDisk = markdownFile
-
-  useEffect(() => {
-    cms.api.git
-      .show(markdownFile.fileRelativePath) // Load the contents of this file at HEAD
-        .then((git: {content: string}) => {
-          // Parse the content into the MarkdownForm data structure and store it in state.
-          const { content: markdownBody, data: frontmatter } = matter(
-            git.content
-          )
-          setValuesInGit({ frontmatter, markdownBody })
-      })
-      .catch((e: any) => {
-        console.log('FAILED', e)
-      })
-  }, [markdownFile.fileRelativePath])
 
   const id = options.id || markdownFile.fileRelativePath
   const label = options.label || markdownFile.fileRelativePath
@@ -90,7 +74,17 @@ export function useMarkdownForm (
       label,
       fields,
       actions,
-      initialValues: valuesInGit,
+      loadInitialValues() {
+        return cms.api.git
+          .show(markdownFile.fileRelativePath) // Load the contents of this file at HEAD
+          .then((git: { content: string }) => {
+            // Parse the content into the MarkdownForm data structure and store it in state.
+            const { content: markdownBody, data: frontmatter } = matter(
+              git.content
+            )
+            return { frontmatter, markdownBody }
+          })
+      },
       onSubmit() {
         return cms.api.git.commit({
           files: [markdownFile.fileRelativePath],
@@ -101,15 +95,15 @@ export function useMarkdownForm (
         return cms.api.git.reset({ files: [id] })
       },
     },
-    { 
+    {
       values: valuesOnDisk,
-      label
+      label,
     }
   )
 
   const writeToDisk = useCallback(formState => {
     cms.api.git.writeToDisk({
-      fileRelativePath: markdownFile.fileRelativePath,
+      fileRelativePath: formState.values.fileRelativePath,
       content: toMarkdownString(formState.values),
     })
   }, [])

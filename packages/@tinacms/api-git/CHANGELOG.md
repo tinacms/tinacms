@@ -3,205 +3,132 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.5.5](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.5-alpha.1...@tinacms/api-git@0.5.5) (2020-02-11)
+## [0.5.7-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.6...@tinacms/api-git@0.5.7-alpha.0) (2020-02-26)
+
+### Bug Fixes
+
+- **repo:** issue missing ssh_key warning in setup ([6787143](https://github.com/tinacms/tinacms/commit/6787143))
+
+## [0.5.6](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.6-alpha.1...@tinacms/api-git@0.5.6) (2020-02-24)
 
 **Note:** Version bump only for package @tinacms/api-git
 
+## [0.5.6-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.6-alpha.0...@tinacms/api-git@0.5.6-alpha.1) (2020-02-21)
 
+### Bug Fixes
 
+- import atob in non-browser context ([0857768](https://github.com/tinacms/tinacms/commit/0857768))
 
+## [0.5.6-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.5...@tinacms/api-git@0.5.6-alpha.0) (2020-02-20)
+
+### Bug Fixes
+
+- ensure uploaded files get committed to the repo ([d3d38a3](https://github.com/tinacms/tinacms/commit/d3d38a3))
+- make sure it's safe to delete the file before we delete it ([58542c0](https://github.com/tinacms/tinacms/commit/58542c0))
+- protect against uploading files to directories outside the repo ([338e239](https://github.com/tinacms/tinacms/commit/338e239))
+
+## [0.5.5](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.5-alpha.1...@tinacms/api-git@0.5.5) (2020-02-11)
+
+**Note:** Version bump only for package @tinacms/api-git
 
 ## [0.5.5-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.5-alpha.0...@tinacms/api-git@0.5.5-alpha.1) (2020-02-11)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.5.5-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.4...@tinacms/api-git@0.5.5-alpha.0) (2020-02-06)
 
 **Note:** Version bump only for package @tinacms/api-git
-
-
-
-
 
 ## [0.5.4](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.4-alpha.0...@tinacms/api-git@0.5.4) (2020-01-27)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.5.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.3...@tinacms/api-git@0.5.4-alpha.0) (2020-01-24)
 
 **Note:** Version bump only for package @tinacms/api-git
-
-
-
-
 
 ## [0.5.3](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.3-alpha.1...@tinacms/api-git@0.5.3) (2020-01-22)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.5.3-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.3-alpha.0...@tinacms/api-git@0.5.3-alpha.1) (2020-01-22)
-
 
 ### Bug Fixes
 
-* **git:** don't return git error in response ([60630bb](https://github.com/tinacms/tinacms/commit/60630bb))
-* **show file:** sanitize path URLs for windows. ([09ec9a4](https://github.com/tinacms/tinacms/commit/09ec9a4))
-
-
-
-
+- **git:** don't return git error in response ([60630bb](https://github.com/tinacms/tinacms/commit/60630bb))
+- **show file:** sanitize path URLs for windows. ([09ec9a4](https://github.com/tinacms/tinacms/commit/09ec9a4))
 
 ## [0.5.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.2...@tinacms/api-git@0.5.3-alpha.0) (2020-01-16)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.5.2](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.12...@tinacms/api-git@0.5.2) (2020-01-14)
-
 
 ### Bug Fixes
 
-* server should start without an origin ([ad59ccf](https://github.com/tinacms/tinacms/commit/ad59ccf)), closes [#596](https://github.com/tinacms/tinacms/issues/596)
-
-
-
-
+- server should start without an origin ([ad59ccf](https://github.com/tinacms/tinacms/commit/ad59ccf)), closes [#596](https://github.com/tinacms/tinacms/issues/596)
 
 # [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.12...@tinacms/api-git@0.5.0) (2020-01-13)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 # [0.5.0-alpha.12](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.11...@tinacms/api-git@0.5.0-alpha.12) (2020-01-10)
-
 
 ### Features
 
-* allow git remote to be configurable ([837af32](https://github.com/tinacms/tinacms/commit/837af32))
-
-
-
-
+- allow git remote to be configurable ([837af32](https://github.com/tinacms/tinacms/commit/837af32))
 
 # [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.1...@tinacms/api-git@0.5.0) (2019-12-17)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 # [0.5.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.0-alpha.0...@tinacms/api-git@0.5.0-alpha.1) (2019-12-17)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 # [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.6...@tinacms/api-git@0.5.0-alpha.0) (2019-12-06)
-
 
 ### Features
 
-* **commit identity:** add user identity if present on request ([9b48331](https://github.com/tinacms/tinacms/commit/9b48331))
-
-
-
-
+- **commit identity:** add user identity if present on request ([9b48331](https://github.com/tinacms/tinacms/commit/9b48331))
 
 ## [0.4.6](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.6-alpha.2...@tinacms/api-git@0.4.6) (2019-12-02)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.4.6-alpha.2](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.6-alpha.1...@tinacms/api-git@0.4.6-alpha.2) (2019-12-02)
 
 **Note:** Version bump only for package @tinacms/api-git
-
-
-
-
 
 ## [0.4.6-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.6-alpha.0...@tinacms/api-git@0.4.6-alpha.1) (2019-11-28)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.4.6-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.5...@tinacms/api-git@0.4.6-alpha.0) (2019-11-25)
 
 **Note:** Version bump only for package @tinacms/api-git
-
-
-
-
 
 ## [0.4.5](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.5-alpha.0...@tinacms/api-git@0.4.5) (2019-11-25)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.4.5-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.4...@tinacms/api-git@0.4.5-alpha.0) (2019-11-25)
-
 
 ### Bug Fixes
 
-* revparse expects array of strings ([0871f3b](https://github.com/tinacms/tinacms/commit/0871f3b))
-
-
-
-
+- revparse expects array of strings ([0871f3b](https://github.com/tinacms/tinacms/commit/0871f3b))
 
 ## [0.4.4](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.4-alpha.1...@tinacms/api-git@0.4.4) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.4.4-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.3...@tinacms/api-git@0.4.4-alpha.1) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/api-git
 
-
-
-
-
 ## [0.4.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.4.3...@tinacms/api-git@0.4.4-alpha.0) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/api-git
-
-
-
-
 
 ## 0.3.0 (2019-11-04)
 

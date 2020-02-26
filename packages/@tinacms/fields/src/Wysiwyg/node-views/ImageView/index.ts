@@ -44,11 +44,30 @@ export class ImageView implements NodeView {
     this.dom.appendChild(this.img)
   }
 
+  update(node: Node) {
+    if (this.img) {
+      const { alt, title } = node.attrs
+      if (alt) this.img.alt = alt
+      if (title) this.img.title = title
+    }
+    return true
+  }
+
   selectNode = () => {
-    if (this.img) this.img.style.outline = '4px solid #0084FF'
+    if (this.img) {
+      this.img.style.outline = '4px solid #0084FF'
+      this.img.classList.add('tina-selected-image')
+    }
   }
 
   deselectNode = () => {
-    if (this.img) this.img.style.outline = ''
+    if (this.img) {
+      this.img.style.outline = ''
+      this.img.classList.remove('tina-selected-image')
+    }
+  }
+
+  destroy = () => {
+    this.deselectNode()
   }
 }

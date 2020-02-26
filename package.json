@@ -5,6 +5,7 @@
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "build": "lerna run build --reject-cycles",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
+    "postinstall": "npm run bootstrap",
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
     "nuke": "./scripts/nuke.sh",
@@ -27,9 +28,11 @@
     "eslint-config-prettier": "^6.3.0",
     "eslint-plugin-react": "^7.14.3",
     "eslint-plugin-react-hooks": "^2.0.1",
+    "husky": "^4.2.3",
     "jest": "^24.9.0",
     "lerna": "^3.16.4",
     "next": "^9.2.0",
+    "pretty-quick": "^2.0.1",
     "react": "16.12.0",
     "react-dom": "16.12.0",
     "rollup": "^1.21.4",
@@ -41,10 +44,15 @@
     "tsdx": "^0.11.0",
     "tslib": "^1.10.0",
     "typedoc": "^0.16.2",
-    "typescript": "^3.7.5"
+    "typescript": "^3.8.2"
   },
   "dependencies": {
     "danger": "^9.2.0",
     "depcheck": "^0.9.1"
+  },
+  "husky": {
+    "hooks": {
+      "pre-commit": "pretty-quick --staged"
+    }
   }
 }
