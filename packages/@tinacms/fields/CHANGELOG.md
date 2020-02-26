@@ -3,290 +3,167 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.1...@tinacms/fields@0.5.2-alpha.0) (2020-02-26)
+
+### Bug Fixes
+
+- blockquote option to toggle and not nest. ([dc8d12f](https://github.com/tinacms/tinacms/commit/dc8d12f))
+
 ## [0.5.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.1-alpha.0...@tinacms/fields@0.5.1) (2020-02-24)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.5.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.0...@tinacms/fields@0.5.1-alpha.0) (2020-02-20)
-
 
 ### Bug Fixes
 
-* improve sticky logic ([6a9488a](https://github.com/tinacms/tinacms/commit/6a9488a))
-* improve wysiwyg sticky toolbar ([cae0716](https://github.com/tinacms/tinacms/commit/cae0716))
-
-
-
-
+- improve sticky logic ([6a9488a](https://github.com/tinacms/tinacms/commit/6a9488a))
+- improve wysiwyg sticky toolbar ([cae0716](https://github.com/tinacms/tinacms/commit/cae0716))
 
 # [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.0-alpha.0...@tinacms/fields@0.5.0) (2020-02-18)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 # [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.1...@tinacms/fields@0.5.0-alpha.0) (2020-02-14)
-
 
 ### Bug Fixes
 
-* image modal issues ([462e9a1](https://github.com/tinacms/tinacms/commit/462e9a1))
-* reset inputs image modal inputs as modal closes ([f05fe2d](https://github.com/tinacms/tinacms/commit/f05fe2d))
-
+- image modal issues ([462e9a1](https://github.com/tinacms/tinacms/commit/462e9a1))
+- reset inputs image modal inputs as modal closes ([f05fe2d](https://github.com/tinacms/tinacms/commit/f05fe2d))
 
 ### Features
 
-* update image settings ([0919bd5](https://github.com/tinacms/tinacms/commit/0919bd5))
-
-
-
-
+- update image settings ([0919bd5](https://github.com/tinacms/tinacms/commit/0919bd5))
 
 ## [0.4.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.1-alpha.1...@tinacms/fields@0.4.1) (2020-02-11)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.4.1-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.1-alpha.0...@tinacms/fields@0.4.1-alpha.1) (2020-02-11)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.0...@tinacms/fields@0.4.1-alpha.0) (2020-02-06)
-
 
 ### Bug Fixes
 
-* inserting row in table at position 1 ([c965154](https://github.com/tinacms/tinacms/commit/c965154))
-* url input box to get focused when link menu is opened. ([6a7dfbd](https://github.com/tinacms/tinacms/commit/6a7dfbd))
-
-
-
-
+- inserting row in table at position 1 ([c965154](https://github.com/tinacms/tinacms/commit/c965154))
+- url input box to get focused when link menu is opened. ([6a7dfbd](https://github.com/tinacms/tinacms/commit/6a7dfbd))
 
 # [0.4.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.4.0-alpha.0...@tinacms/fields@0.4.0) (2020-02-03)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 # [0.4.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1...@tinacms/fields@0.4.0-alpha.0) (2020-02-03)
-
 
 ### Bug Fixes
 
-* focus editor after table action. ([fe33e9f](https://github.com/tinacms/tinacms/commit/fe33e9f))
-* more improvements in table column menu ([6e7e8f4](https://github.com/tinacms/tinacms/commit/6e7e8f4))
-* positioning of link creation modal inside table ([55fe132](https://github.com/tinacms/tinacms/commit/55fe132))
-* table column align options fixes ([7b7a8c2](https://github.com/tinacms/tinacms/commit/7b7a8c2))
-
+- focus editor after table action. ([fe33e9f](https://github.com/tinacms/tinacms/commit/fe33e9f))
+- more improvements in table column menu ([6e7e8f4](https://github.com/tinacms/tinacms/commit/6e7e8f4))
+- positioning of link creation modal inside table ([55fe132](https://github.com/tinacms/tinacms/commit/55fe132))
+- table column align options fixes ([7b7a8c2](https://github.com/tinacms/tinacms/commit/7b7a8c2))
 
 ### Features
 
-* table column alignment ([418c2dd](https://github.com/tinacms/tinacms/commit/418c2dd))
-
-
-
-
+- table column alignment ([418c2dd](https://github.com/tinacms/tinacms/commit/418c2dd))
 
 ## [0.3.2-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1...@tinacms/fields@0.3.2-alpha.0) (2020-01-29)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.3.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.1-alpha.0...@tinacms/fields@0.3.1) (2020-01-27)
-
 
 ### Bug Fixes
 
-* correct keymaps in table ([ed3fccb](https://github.com/tinacms/tinacms/commit/ed3fccb))
-
-
-
-
+- correct keymaps in table ([ed3fccb](https://github.com/tinacms/tinacms/commit/ed3fccb))
 
 ## [0.3.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0...@tinacms/fields@0.3.1-alpha.0) (2020-01-24)
 
-
 ### Bug Fixes
 
-* off by one error for add row/col ([6959e09](https://github.com/tinacms/tinacms/commit/6959e09))
-
-
-
-
+- off by one error for add row/col ([6959e09](https://github.com/tinacms/tinacms/commit/6959e09))
 
 # [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0-alpha.1...@tinacms/fields@0.3.0) (2020-01-22)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 # [0.3.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.3.0-alpha.0...@tinacms/fields@0.3.0-alpha.1) (2020-01-22)
-
 
 ### Bug Fixes
 
-* **wysiwyg:** prevent selection crash from arrows ([c389b01](https://github.com/tinacms/tinacms/commit/c389b01))
-
-
-
-
+- **wysiwyg:** prevent selection crash from arrows ([c389b01](https://github.com/tinacms/tinacms/commit/c389b01))
 
 # [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.2.1...@tinacms/fields@0.3.0-alpha.0) (2020-01-16)
 
-
 ### Bug Fixes
 
-* remove use of frame ([ae4a055](https://github.com/tinacms/tinacms/commit/ae4a055))
-
+- remove use of frame ([ae4a055](https://github.com/tinacms/tinacms/commit/ae4a055))
 
 ### Features
 
-* adding highlighting to table selection ([98e6e7c](https://github.com/tinacms/tinacms/commit/98e6e7c))
-* basic support for tables in wysiwym ([84159ba](https://github.com/tinacms/tinacms/commit/84159ba))
-* Style improvements in tables. ([904d9f4](https://github.com/tinacms/tinacms/commit/904d9f4))
-
-
-
-
+- adding highlighting to table selection ([98e6e7c](https://github.com/tinacms/tinacms/commit/98e6e7c))
+- basic support for tables in wysiwym ([84159ba](https://github.com/tinacms/tinacms/commit/84159ba))
+- Style improvements in tables. ([904d9f4](https://github.com/tinacms/tinacms/commit/904d9f4))
 
 ## [0.2.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.2.0...@tinacms/fields@0.2.1) (2020-01-14)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 # [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.2.0-alpha.0...@tinacms/fields@0.2.0) (2020-01-13)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 # [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.18-alpha.0...@tinacms/fields@0.2.0-alpha.0) (2020-01-10)
-
 
 ### Features
 
-* **wysiwyg:** image display & selection  ([af900d9](https://github.com/tinacms/tinacms/commit/af900d9))
-
-
-
-
+- **wysiwyg:** image display & selection ([af900d9](https://github.com/tinacms/tinacms/commit/af900d9))
 
 ## [0.1.17](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.17-alpha.1...@tinacms/fields@0.1.17) (2019-12-17)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.1.17-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.17-alpha.0...@tinacms/fields@0.1.17-alpha.1) (2019-12-17)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.1.17-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.16...@tinacms/fields@0.1.17-alpha.0) (2019-12-06)
-
 
 ### Bug Fixes
 
-* **wysiwyg:** inline code ticks always inside ([377675c](https://github.com/tinacms/tinacms/commit/377675c)), closes [#480](https://github.com/tinacms/tinacms/issues/480)
-
-
-
-
+- **wysiwyg:** inline code ticks always inside ([377675c](https://github.com/tinacms/tinacms/commit/377675c)), closes [#480](https://github.com/tinacms/tinacms/issues/480)
 
 ## [0.1.16](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.16-alpha.0...@tinacms/fields@0.1.16) (2019-12-02)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.1.16-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.15...@tinacms/fields@0.1.16-alpha.0) (2019-11-28)
 
 **Note:** Version bump only for package @tinacms/fields
-
-
-
-
 
 ## [0.1.15](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.15-alpha.0...@tinacms/fields@0.1.15) (2019-11-25)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.1.15-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.14...@tinacms/fields@0.1.15-alpha.0) (2019-11-25)
 
 **Note:** Version bump only for package @tinacms/fields
-
-
-
-
 
 ## [0.1.14](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.14-alpha.1...@tinacms/fields@0.1.14) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.1.14-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.13...@tinacms/fields@0.1.14-alpha.1) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/fields
-
-
-
-
 
 ## [0.1.14-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.13...@tinacms/fields@0.1.14-alpha.0) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/fields
 
-
-
-
-
 ## [0.1.13](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.1.12...@tinacms/fields@0.1.13) (2019-11-14)
 
 **Note:** Version bump only for package @tinacms/fields
-
-
-
-
 
 ## 0.1.12 (2019-11-12)
 

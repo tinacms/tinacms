@@ -3,303 +3,167 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.7.4](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.4-alpha.1...gatsby-tinacms-remark@0.7.4) (2020-02-24)
+## [0.7.5-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.4...gatsby-tinacms-remark@0.7.5-alpha.0) (2020-02-26)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
+## [0.7.4](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.4-alpha.1...gatsby-tinacms-remark@0.7.4) (2020-02-24)
 
-
-
+**Note:** Version bump only for package gatsby-tinacms-remark
 
 ## [0.7.4-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.4-alpha.0...gatsby-tinacms-remark@0.7.4-alpha.1) (2020-02-21)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.7.4-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.3...gatsby-tinacms-remark@0.7.4-alpha.0) (2020-02-20)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 ## [0.7.3](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.3-alpha.1...gatsby-tinacms-remark@0.7.3) (2020-02-18)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.7.3-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.3-alpha.0...gatsby-tinacms-remark@0.7.3-alpha.1) (2020-02-16)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 ## [0.7.3-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.2...gatsby-tinacms-remark@0.7.3-alpha.0) (2020-02-14)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.7.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.2-alpha.1...gatsby-tinacms-remark@0.7.2) (2020-02-11)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 ## [0.7.2-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.2-alpha.0...gatsby-tinacms-remark@0.7.2-alpha.1) (2020-02-11)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.7.2-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.1...gatsby-tinacms-remark@0.7.2-alpha.0) (2020-02-06)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 ## [0.7.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.1-alpha.1...gatsby-tinacms-remark@0.7.1) (2020-02-03)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.7.1-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.0...gatsby-tinacms-remark@0.7.1-alpha.1) (2020-02-03)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 ## [0.7.1-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.0...gatsby-tinacms-remark@0.7.1-alpha.0) (2020-01-29)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 # [0.7.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.0-alpha.0...gatsby-tinacms-remark@0.7.0) (2020-01-27)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 # [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.4...gatsby-tinacms-remark@0.7.0-alpha.0) (2020-01-24)
-
 
 ### Bug Fixes
 
-* **deps:** add js-yaml as dependency ([956378b](https://github.com/tinacms/tinacms/commit/956378b))
-* **deps:** tinacms is a peerDep ([a2045e9](https://github.com/tinacms/tinacms/commit/a2045e9))
-
+- **deps:** add js-yaml as dependency ([956378b](https://github.com/tinacms/tinacms/commit/956378b))
+- **deps:** tinacms is a peerDep ([a2045e9](https://github.com/tinacms/tinacms/commit/a2045e9))
 
 ### Features
 
-* **inlineRemarkForm:** create in-page editing experiences ([ef4df82](https://github.com/tinacms/tinacms/commit/ef4df82))
-
-
-
-
+- **inlineRemarkForm:** create in-page editing experiences ([ef4df82](https://github.com/tinacms/tinacms/commit/ef4df82))
 
 ## [0.6.4](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.4-alpha.1...gatsby-tinacms-remark@0.6.4) (2020-01-22)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.6.4-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.4-alpha.0...gatsby-tinacms-remark@0.6.4-alpha.1) (2020-01-22)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.6.4-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.3...gatsby-tinacms-remark@0.6.4-alpha.0) (2020-01-16)
-
 
 ### Bug Fixes
 
-* disregard intermittent null vals from gatsby ([d102745](https://github.com/tinacms/tinacms/commit/d102745))
-* make Field interface accept extra properties ([2a45c41](https://github.com/tinacms/tinacms/commit/2a45c41))
-
-
-
-
+- disregard intermittent null vals from gatsby ([d102745](https://github.com/tinacms/tinacms/commit/d102745))
+- make Field interface accept extra properties ([2a45c41](https://github.com/tinacms/tinacms/commit/2a45c41))
 
 ## [0.6.3](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.2...gatsby-tinacms-remark@0.6.3) (2020-01-14)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.6.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.2-alpha.1...gatsby-tinacms-remark@0.6.2) (2020-01-13)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 ## [0.6.2-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.2-alpha.0...gatsby-tinacms-remark@0.6.2-alpha.1) (2020-01-10)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.6.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.1-alpha.1...gatsby-tinacms-remark@0.6.1) (2019-12-17)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 ## [0.6.1-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.1-alpha.0...gatsby-tinacms-remark@0.6.1-alpha.1) (2019-12-17)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.6.1-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.0...gatsby-tinacms-remark@0.6.1-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
-
-
-
-
 
 # [0.6.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.0-alpha.2...gatsby-tinacms-remark@0.6.0) (2019-12-02)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 # [0.6.0-alpha.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.0-alpha.1...gatsby-tinacms-remark@0.6.0-alpha.2) (2019-12-02)
-
 
 ### Features
 
-* liveRemarkForm passes form to Component ([24cfa90](https://github.com/tinacms/tinacms/commit/24cfa90))
-
-
-
-
+- liveRemarkForm passes form to Component ([24cfa90](https://github.com/tinacms/tinacms/commit/24cfa90))
 
 # [0.6.0-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.6.0-alpha.0...gatsby-tinacms-remark@0.6.0-alpha.1) (2019-11-28)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 # [0.6.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.1...gatsby-tinacms-remark@0.6.0-alpha.0) (2019-11-25)
-
 
 ### Features
 
-* tinacms re-exports important types from @tinacms/core ([c51e9de](https://github.com/tinacms/tinacms/commit/c51e9de))
-
-
-
-
+- tinacms re-exports important types from @tinacms/core ([c51e9de](https://github.com/tinacms/tinacms/commit/c51e9de))
 
 ## [0.5.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.1-alpha.2...gatsby-tinacms-remark@0.5.1) (2019-11-25)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.5.1-alpha.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.1-alpha.0...gatsby-tinacms-remark@0.5.1-alpha.2) (2019-11-25)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 ## [0.5.1-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.0...gatsby-tinacms-remark@0.5.1-alpha.0) (2019-11-25)
-
 
 ### Bug Fixes
 
-* **remark:** check node ownership instead of type name ([cab520d](https://github.com/tinacms/tinacms/commit/cab520d))
-
-
-
-
+- **remark:** check node ownership instead of type name ([cab520d](https://github.com/tinacms/tinacms/commit/cab520d))
 
 # [0.5.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.5.0-alpha.1...gatsby-tinacms-remark@0.5.0) (2019-11-18)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
 
-
-
-
-
 # [0.5.0-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.4...gatsby-tinacms-remark@0.5.0-alpha.1) (2019-11-18)
-
 
 ### Features
 
-* **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
-* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
-* **useLocalRemark:** create local markdown forms ([1e291ab](https://github.com/tinacms/tinacms/commit/1e291ab))
-* useGlobalRemarkForm ([1133164](https://github.com/tinacms/tinacms/commit/1133164))
-
-
-
-
+- **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
+- **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
+- **useLocalRemark:** create local markdown forms ([1e291ab](https://github.com/tinacms/tinacms/commit/1e291ab))
+- useGlobalRemarkForm ([1133164](https://github.com/tinacms/tinacms/commit/1133164))
 
 # [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.4...gatsby-tinacms-remark@0.5.0-alpha.0) (2019-11-18)
 
-
 ### Features
 
-* **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
-* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
-* **useLocalRemark:** create local markdown forms ([1e291ab](https://github.com/tinacms/tinacms/commit/1e291ab))
-* useGlobalRemarkForm ([1133164](https://github.com/tinacms/tinacms/commit/1133164))
-
-
-
-
+- **GraphQL:** add TinaRemark fragment ([257e08f](https://github.com/tinacms/tinacms/commit/257e08f))
+- **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
+- **useLocalRemark:** create local markdown forms ([1e291ab](https://github.com/tinacms/tinacms/commit/1e291ab))
+- useGlobalRemarkForm ([1133164](https://github.com/tinacms/tinacms/commit/1133164))
 
 ## [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.4.0...gatsby-tinacms-remark@0.5.0-alpha.0) (2019-11-12)
 
