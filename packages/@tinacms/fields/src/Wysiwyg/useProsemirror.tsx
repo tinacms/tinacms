@@ -37,7 +37,7 @@ export interface Input {
   onBlur(): void
 }
 
-export function useTinaProsemirror(
+export function useProsemirror(
   input: Input,
   plugins: Plugin[] = [],
   theme?: any,

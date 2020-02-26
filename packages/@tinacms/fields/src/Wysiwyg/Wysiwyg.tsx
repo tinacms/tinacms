@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled, { ThemeContext } from 'styled-components'
 import { Plugin } from '@tinacms/core'
-import { useTinaProsemirror } from './useTinaProsemirror'
+import { useProsemirror } from './useProsemirror'
 import { ALL_PLUGINS } from './default-plugins'
 import { CodeMirrorCss } from './CodeMirrorCss'
 import { ProseMirrorCss } from './ProseMirrorCss'
@@ -35,7 +35,7 @@ interface Wysiwyg {
 export const Wysiwyg = styled(
   ({ input, plugins, sticky, format, ...styleProps }: any) => {
     const theme = React.useContext(ThemeContext) || {}
-    const prosemirrorEl = useTinaProsemirror(
+    const prosemirrorEl = useProsemirror(
       input,
       ALL_PLUGINS,
       theme,
