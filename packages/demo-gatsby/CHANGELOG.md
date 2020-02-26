@@ -3,332 +3,182 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [1.7.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.7.0-alpha.1...demo-gatsby@1.7.0) (2020-02-24)
+## [1.7.1-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.7.0...demo-gatsby@1.7.1-alpha.0) (2020-02-26)
 
 **Note:** Version bump only for package demo-gatsby
 
+# [1.7.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.7.0-alpha.1...demo-gatsby@1.7.0) (2020-02-24)
 
-
-
+**Note:** Version bump only for package demo-gatsby
 
 # [1.7.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.7.0-alpha.0...demo-gatsby@1.7.0-alpha.1) (2020-02-21)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.7.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.3...demo-gatsby@1.7.0-alpha.0) (2020-02-20)
-
 
 ### Bug Fixes
 
-* add missing header to hello.js ([1814e34](https://github.com/gatsbyjs/gatsby-starter-blog/commit/1814e34))
-* ensure uploaded files get committed to the repo ([d3d38a3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/d3d38a3))
-
+- add missing header to hello.js ([1814e34](https://github.com/gatsbyjs/gatsby-starter-blog/commit/1814e34))
+- ensure uploaded files get committed to the repo ([d3d38a3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/d3d38a3))
 
 ### Features
 
-* add new mdx page and mdx component ([b9b85d3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/b9b85d3))
-* adds form options ([0d0d4a3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/0d0d4a3))
-* adds mdx config to gatsby demo ([e227fe0](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e227fe0))
-
-
-
-
+- add new mdx page and mdx component ([b9b85d3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/b9b85d3))
+- adds form options ([0d0d4a3](https://github.com/gatsbyjs/gatsby-starter-blog/commit/0d0d4a3))
+- adds mdx config to gatsby demo ([e227fe0](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e227fe0))
 
 ## [1.6.3](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.3-alpha.1...demo-gatsby@1.6.3) (2020-02-18)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.6.3-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.3-alpha.0...demo-gatsby@1.6.3-alpha.1) (2020-02-16)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 ## [1.6.3-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.2...demo-gatsby@1.6.3-alpha.0) (2020-02-14)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.6.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.2-alpha.1...demo-gatsby@1.6.2) (2020-02-11)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 ## [1.6.2-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.2-alpha.0...demo-gatsby@1.6.2-alpha.1) (2020-02-11)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.6.2-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.1...demo-gatsby@1.6.2-alpha.0) (2020-02-06)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 ## [1.6.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.1-alpha.1...demo-gatsby@1.6.1) (2020-02-03)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.6.1-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.0...demo-gatsby@1.6.1-alpha.1) (2020-02-03)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 ## [1.6.1-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.0...demo-gatsby@1.6.1-alpha.0) (2020-01-29)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.6.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.6.0-alpha.0...demo-gatsby@1.6.0) (2020-01-27)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.6.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.2...demo-gatsby@1.6.0-alpha.0) (2020-01-24)
-
 
 ### Features
 
-* **inlineRemarkForm:** create in-page editing experiences ([ef4df82](https://github.com/gatsbyjs/gatsby-starter-blog/commit/ef4df82))
-
-
-
-
+- **inlineRemarkForm:** create in-page editing experiences ([ef4df82](https://github.com/gatsbyjs/gatsby-starter-blog/commit/ef4df82))
 
 ## [1.5.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.2-alpha.1...demo-gatsby@1.5.2) (2020-01-22)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.5.2-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.2-alpha.0...demo-gatsby@1.5.2-alpha.1) (2020-01-22)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 ## [1.5.2-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.1...demo-gatsby@1.5.2-alpha.0) (2020-01-16)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.5.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.0...demo-gatsby@1.5.1) (2020-01-14)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 # [1.5.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.0-alpha.1...demo-gatsby@1.5.0) (2020-01-13)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.5.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.5.0-alpha.0...demo-gatsby@1.5.0-alpha.1) (2020-01-10)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 # [1.4.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.2...demo-gatsby@1.4.0) (2019-12-17)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.4.0-alpha.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.1...demo-gatsby@1.4.0-alpha.2) (2019-12-17)
-
 
 ### Bug Fixes
 
-* always show add block when focused ([1b3eaa1](https://github.com/gatsbyjs/gatsby-starter-blog/commit/1b3eaa1))
-* improve add block menu psuedo hover helper ([29e16ea](https://github.com/gatsbyjs/gatsby-starter-blog/commit/29e16ea))
-
+- always show add block when focused ([1b3eaa1](https://github.com/gatsbyjs/gatsby-starter-blog/commit/1b3eaa1))
+- improve add block menu psuedo hover helper ([29e16ea](https://github.com/gatsbyjs/gatsby-starter-blog/commit/29e16ea))
 
 ### Features
 
-* show blocks menu when there's no blocks ([ff1848c](https://github.com/gatsbyjs/gatsby-starter-blog/commit/ff1848c))
-
-
-
-
+- show blocks menu when there's no blocks ([ff1848c](https://github.com/gatsbyjs/gatsby-starter-blog/commit/ff1848c))
 
 # [1.4.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.4.0-alpha.0...demo-gatsby@1.4.0-alpha.1) (2019-12-06)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.4.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.3.0...demo-gatsby@1.4.0-alpha.0) (2019-12-06)
-
 
 ### Features
 
-* **commit identity:** add user identity if present on request ([9b48331](https://github.com/gatsbyjs/gatsby-starter-blog/commit/9b48331))
-
-
-
-
+- **commit identity:** add user identity if present on request ([9b48331](https://github.com/gatsbyjs/gatsby-starter-blog/commit/9b48331))
 
 # [1.3.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.3.0-alpha.1...demo-gatsby@1.3.0) (2019-12-02)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.3.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.3.0-alpha.0...demo-gatsby@1.3.0-alpha.1) (2019-12-02)
-
 
 ### Features
 
-* **renderBefore:** lets you create blocks menus ([84fd165](https://github.com/gatsbyjs/gatsby-starter-blog/commit/84fd165))
-
-
-
-
+- **renderBefore:** lets you create blocks menus ([84fd165](https://github.com/gatsbyjs/gatsby-starter-blog/commit/84fd165))
 
 # [1.3.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.2-alpha.0...demo-gatsby@1.3.0-alpha.0) (2019-11-28)
 
-
 ### Features
 
-* **Blocks:** add Block component ([cfcb618](https://github.com/gatsbyjs/gatsby-starter-blog/commit/cfcb618))
-* **useGlobalForm:** add hook for registering global forms ([d450cae](https://github.com/gatsbyjs/gatsby-starter-blog/commit/d450cae))
-
-
-
-
+- **Blocks:** add Block component ([cfcb618](https://github.com/gatsbyjs/gatsby-starter-blog/commit/cfcb618))
+- **useGlobalForm:** add hook for registering global forms ([d450cae](https://github.com/gatsbyjs/gatsby-starter-blog/commit/d450cae))
 
 ## [1.2.2-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.1...demo-gatsby@1.2.2-alpha.0) (2019-11-25)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.2.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.1-alpha.1...demo-gatsby@1.2.1) (2019-11-25)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 ## [1.2.1-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.1-alpha.0...demo-gatsby@1.2.1-alpha.1) (2019-11-25)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 ## [1.2.1-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.0...demo-gatsby@1.2.1-alpha.0) (2019-11-25)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 # [1.2.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.0-alpha.2...demo-gatsby@1.2.0) (2019-11-18)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.2.0-alpha.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.2.0-alpha.1...demo-gatsby@1.2.0-alpha.2) (2019-11-18)
 
 **Note:** Version bump only for package demo-gatsby
 
-
-
-
-
 # [1.2.0-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.1.6...demo-gatsby@1.2.0-alpha.1) (2019-11-18)
-
 
 ### Features
 
-* **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e94f112))
-
-
-
-
+- **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e94f112))
 
 # [1.2.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.1.6...demo-gatsby@1.2.0-alpha.0) (2019-11-18)
 
-
 ### Features
 
-* **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e94f112))
-
-
-
-
+- **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/gatsbyjs/gatsby-starter-blog/commit/e94f112))
 
 ## [1.1.6](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.1.5...demo-gatsby@1.1.6) (2019-11-14)
 
 **Note:** Version bump only for package demo-gatsby
-
-
-
-
 
 ## 1.1.0 (2019-10-28)
 
