@@ -20,7 +20,7 @@ import * as React from 'react'
 import { MarkdownTranslator, Format, DOMTranslator } from './Translator'
 import { Schema } from 'prosemirror-model'
 
-export function useMarkdownTranslator(
+export function useProsemirrorTranslator(
   schema: Schema,
   format: Format = 'markdown'
 ) {
