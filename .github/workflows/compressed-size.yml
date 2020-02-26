@@ -1,0 +1,17 @@
+name: Compressed Size Diff
+
+on: [pull_request]
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v1
+      - uses: tinacms/compressed-size-action@master
+        with:
+          repo-token: '${{ secrets.GITHUB_TOKEN }}'
+          pattern: '{**/dist/**/*.js,**/build/**/*.js}'
+          exclude: '{**/*.map,**/*.development.js,**/node_modules/**}'
+          collapse-unchanged: true
+          install-script: 'npm ci'
+          show-total: true

@@ -1,0 +1,49 @@
+{
+  "name": "gatsby-tinacms-mdx",
+  "version": "0.1.0",
+  "main": "index.js",
+  "types": "src/index.d.ts",
+  "license": "Apache-2.0",
+  "files": [
+    "src",
+    "index.js",
+    "gatsby-node.js"
+  ],
+  "keywords": [
+    "tinacms",
+    "cms",
+    "react",
+    "mdx",
+    "gatsby"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/react/gatsby-tinacms-mdx"
+  },
+  "scripts": {
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jest --passWithNoTests"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "^0.1.11",
+    "@types/js-yaml": "^3.12.1",
+    "tinacms": "^0.14.0"
+  },
+  "dependencies": {
+    "gray-matter": "^4.0.2",
+    "js-yaml": "^3.13.1",
+    "slash": "^3.0.0"
+  },
+  "peerDependencies": {
+    "@mdx-js/mdx": ">=1.5.1",
+    "@mdx-js/react": ">=1.5.5",
+    "gatsby-plugin-mdx": ">=1.0.53",
+    "tinacms": ">=0.11"
+  }
+}

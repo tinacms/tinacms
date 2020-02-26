@@ -20,13 +20,15 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
-import { color, radius, font } from '@tinacms/styles'
-import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
 import {
-  SIDEBAR_HEADER_HEIGHT,
-  SIDEBAR_WIDTH,
-  FORM_FOOTER_HEIGHT,
-} from '../../Globals'
+  color,
+  radius,
+  font,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ThemeProps,
+} from '@tinacms/styles'
+import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
+import { useFormPortal } from '../../components/FormPortal'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -46,7 +48,7 @@ export const Group = function Group({ tinaForm, field }: GroupProps) {
   return (
     <>
       <Header onClick={() => setExpanded(p => !p)}>
-        {Label(field)}
+        {field.label || field.name}
         <RightArrowIcon />
       </Header>
       <Panel
@@ -72,6 +74,7 @@ const Panel = function Panel({
   tinaForm,
   field,
 }: PanelProps) {
+  const FormPortal = useFormPortal()
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
       ...subField,
@@ -80,19 +83,19 @@ const Panel = function Panel({
   }, [field.fields, field.name])
 
   return (
-    <GroupPanel isExpanded={isExpanded}>
-      <PanelHeader onClick={() => setExpanded(false)}>
-        <LeftArrowIcon /> <span>{Label(field)}</span>
-      </PanelHeader>
-      <PanelBody>
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-      </PanelBody>
-    </GroupPanel>
+    <FormPortal>
+      <GroupPanel isExpanded={isExpanded}>
+        <PanelHeader onClick={() => setExpanded(false)}>
+          <LeftArrowIcon /> <span>{field.label || field.name}</span>
+        </PanelHeader>
+        <PanelBody>
+          {isExpanded ? (
+            <FieldsBuilder form={tinaForm} fields={fields} />
+          ) : null}
+        </PanelBody>
+      </GroupPanel>
+    </FormPortal>
   )
-}
-
-const Label = function(field: GroupFieldDefinititon) {
-  return <GroupLabel>{field.label || field.name}</GroupLabel>
 }
 
 const Header: StyledComponent<'div', {}, {}> = styled.div`
@@ -125,36 +128,41 @@ const Header: StyledComponent<'div', {}, {}> = styled.div`
   }
 `
 
-export const PanelHeader: StyledComponent<typeof Header, {}, {}> = styled(
-  Header
-)`
+export const PanelHeader = styled.div`
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  background-color: white;
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  flex: 0 0 auto;
-  background-color: white;
-  justify-content: flex-start;
-  border: none;
-  border-radius: 0;
+  padding: 4px 18px 4px 18px;
+  color: inherit;
+  font-size: ${font.size(3)};
+  transition: color 250ms ease-out;
+  user-select: none;
   border-bottom: 1px solid ${color.grey(2)};
   margin: 0;
-  padding: 12px 20px;
-
   span {
     flex: 1 1 auto;
     white-space: nowrap;
     overflow: hidden;
     text-overflow: ellipsis;
   }
-
   svg {
     flex: 0 0 auto;
+    width: 24px;
+    fill: ${color.grey(3)};
+    height: auto;
     transform: translate3d(-4px, 0, 0);
+    transition: transform 150ms ease-out;
   }
-
-  &:hover {
+  :hover {
+    color: ${color.primary()};
     svg {
+      fill: ${color.grey(8)};
       transform: translate3d(-7px, 0, 0);
+      transition: transform 250ms ease;
     }
   }
 `
@@ -167,14 +175,6 @@ export const PanelBody = styled.div`
   overflow-y: auto;
 `
 
-const GroupLabel = styled.span`
-  margin: 0;
-  font-size: ${font.size(2)};
-  font-weight: 500;
-  color: inherit;
-  transition: all 85ms ease-out;
-`
-
 const GroupPanelKeyframes = keyframes`
   0% {
     transform: translate3d( 100%, 0, 0 );
@@ -185,10 +185,10 @@ const GroupPanelKeyframes = keyframes`
 `
 
 export const GroupPanel = styled.div<{ isExpanded: boolean }>`
-  position: fixed;
-  width: ${SIDEBAR_WIDTH}px;
-  top: ${SIDEBAR_HEADER_HEIGHT}px;
-  bottom: ${FORM_FOOTER_HEIGHT}px;
+  position: absolute;
+  width: 100%;
+  top: 0;
+  bottom: 0;
   left: 0;
   display: flex;
   flex-direction: column;
@@ -196,7 +196,6 @@ export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   overflow: hidden;
   z-index: 50;
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
-  border-top: 1px solid ${color.grey(2)};
 
   > * {
     ${p =>

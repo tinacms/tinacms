@@ -312,7 +312,7 @@ const BlogPostForm = {
           .splice(0, postPathParts.length - 1)
           .join("/")
 
-        return "packages/demo-gatsby" + postDirectory
+        return postDirectory
       },
 
       // Generate the src attribute for the preview image.

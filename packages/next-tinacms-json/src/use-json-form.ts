@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { useCallback, useEffect, useState } from 'react'
+import { useCallback } from 'react'
 import {
   useWatchFormValues,
   useForm,
@@ -48,21 +48,6 @@ export function useJsonForm<T = any>(
 ) {
   const cms = useCMS()
 
-  const [valuesInGit, setValuesInGit] = useState<JsonFile<T>>()
-
-  useEffect(() => {
-    cms.api.git
-      .show(jsonFile.fileRelativePath) // Load the contents of this file at HEAD
-      .then((git: { content: string }) => {
-        const jsonFileInGit = JSON.parse(git.content)
-
-        setValuesInGit(jsonFileInGit)
-      })
-      .catch((e: any) => {
-        console.log('FAILED', e)
-      })
-  }, [jsonFile.fileRelativePath])
-
   const id = options.id || jsonFile.fileRelativePath
   const label = options.label || jsonFile.fileRelativePath
   const fields = options.fields || []
@@ -73,7 +58,15 @@ export function useJsonForm<T = any>(
       label,
       fields,
       actions,
-      initialValues: valuesInGit,
+      loadInitialValues() {
+        return cms.api.git
+          .show(jsonFile.fileRelativePath) // Load the contents of this file at HEAD
+          .then((git: { content: string }) => {
+            const jsonFileInGit = JSON.parse(git.content)
+
+            return jsonFileInGit
+          })
+      },
       onSubmit() {
         return cms.api.git.commit({
           files: [jsonFile.fileRelativePath],
@@ -87,12 +80,15 @@ export function useJsonForm<T = any>(
     { values: jsonFile.data, label }
   )
 
-  const writeToDisk = useCallback(formState => {
-    cms.api.git.writeToDisk({
-      fileRelativePath: jsonFile.fileRelativePath,
-      content: JSON.stringify(formState.values, null, 2),
-    })
-  }, [])
+  const writeToDisk = useCallback(
+    formState => {
+      cms.api.git.writeToDisk({
+        fileRelativePath: jsonFile.fileRelativePath,
+        content: JSON.stringify(formState.values, null, 2),
+      })
+    },
+    [jsonFile.fileRelativePath]
+  )
 
   useWatchFormValues(form, writeToDisk)
 

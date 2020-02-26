@@ -66,4 +66,8 @@ export class ImageView implements NodeView {
       this.img.classList.remove('tina-selected-image')
     }
   }
+
+  destroy = () => {
+    this.deselectNode()
+  }
 }

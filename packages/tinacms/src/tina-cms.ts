@@ -32,23 +32,21 @@ import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import { Form } from '@tinacms/forms'
+import { Theme } from '@tinacms/styles'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
-export interface TinaCMSConfig extends CMSConfig{
-  sidebar: {
-    hidden: boolean
-    position: SidebarPosition
-  }
+export interface TinaCMSConfig extends CMSConfig {
+  sidebar?: SidebarStateOptions
 }
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
 
-  constructor({ sidebar, ...config}: TinaCMSConfig) {
+  constructor({ sidebar, ...config }: TinaCMSConfig) {
     super(config)
 
-    this.sidebar = new SidebarState(sidebar.position)
+    this.sidebar = new SidebarState(sidebar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
@@ -76,12 +74,42 @@ export class TinaCMS extends CMS {
   }
 }
 
+interface SidebarStateOptions {
+  hidden?: boolean
+  position?: SidebarPosition
+  theme?: Theme
+  buttons?: SidebarButtons
+}
+
+interface SidebarButtons {
+  save: string
+  reset: string
+}
+
 export class SidebarState extends Subscribable {
-  constructor(public position: SidebarPosition) {
-    super()
+  private _isOpen: boolean = false
+
+  position: SidebarPosition = 'displace'
+  _hidden: boolean = false
+  theme?: Theme
+  buttons: SidebarButtons = {
+    save: 'Save',
+    reset: 'Reset',
   }
 
-  private _isOpen: boolean = false
+  constructor(options: SidebarStateOptions = {}) {
+    super()
+    this.position = options.position || 'displace'
+    this._hidden = !!options.hidden
+    this.theme = options.theme
+
+    if (options.buttons?.save) {
+      this.buttons.save = options.buttons.save
+    }
+    if (options.buttons?.reset) {
+      this.buttons.reset = options.buttons.reset
+    }
+  }
 
   get isOpen() {
     return this._isOpen
@@ -89,6 +117,15 @@ export class SidebarState extends Subscribable {
 
   set isOpen(nextValue: boolean) {
     this._isOpen = nextValue
+    this.notifiySubscribers()
+  }
+
+  get hidden() {
+    return this._hidden
+  }
+
+  set hidden(nextValue: boolean) {
+    this._hidden = nextValue
     this.notifiySubscribers()
   }
 }

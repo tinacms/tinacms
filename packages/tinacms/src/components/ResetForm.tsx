@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { FC } from 'react'
 import styled from 'styled-components'
 import { Button } from '@tinacms/styles'
 import {
@@ -28,11 +29,16 @@ import {
 import { ModalPopup } from './modals/ModalPopup'
 
 interface ResetFormProps {
+  children: any
   pristine: boolean
   reset(): void
 }
 
-export const ResetForm = ({ pristine, reset }: ResetFormProps) => {
+export const ResetForm: FC<ResetFormProps> = ({
+  pristine,
+  reset,
+  children,
+}: ResetFormProps) => {
   const [open, setOpen] = React.useState(false)
   return (
     <>
@@ -42,7 +48,7 @@ export const ResetForm = ({ pristine, reset }: ResetFormProps) => {
         }}
         disabled={pristine}
       >
-        Reset
+        {children}
       </ResetButton>
       {open && <ResetModal reset={reset} close={() => setOpen(false)} />}
     </>
