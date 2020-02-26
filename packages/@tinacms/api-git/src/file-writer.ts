@@ -106,8 +106,9 @@ function tryToWrite() {
       // Temp solution; we haven't figured out how to
       // call `buildFinished` when Gatsby's build actually
       // finishes.
-      const MAX_BUILD_TIME = Number(process.env.MAX_BUILD_TIME) || 1000
-      setTimeout(buildFinished, MAX_BUILD_TIME)
+      const TINA_GIT_DEBOUNCE_MS =
+        Number(process.env.TINA_GIT_DEBOUNCE_MS) || 1000
+      setTimeout(buildFinished, TINA_GIT_DEBOUNCE_MS)
     }
   })
 }
