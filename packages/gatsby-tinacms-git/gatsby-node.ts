@@ -32,7 +32,6 @@ exports.onCreateDevServer = (
     pathToContent,
     gitRemote,
     sshKey,
-    maxBuildTime,
     ...routerOptions
   } = options
 
