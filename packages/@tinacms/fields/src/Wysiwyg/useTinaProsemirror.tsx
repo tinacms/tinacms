@@ -22,7 +22,7 @@ import { Plugin } from '@tinacms/core'
 
 import { createEditorState } from './state'
 import { useProsemirrorSchema } from './useProsemirrorSchema'
-import { useMarkdownTranslator } from './useMarkdownTranslator'
+import { useProsemirrorTranslator } from './useProsemirrorTranslator'
 import { nodeViews } from './node-views'
 import { Format } from './Translator'
 
@@ -52,7 +52,7 @@ export function useTinaProsemirror(
   /**
    * Create a MarkdownTranslattor based on the schema
    */
-  const [translator] = useMarkdownTranslator(schema, format)
+  const [translator] = useProsemirrorTranslator(schema, format)
 
   /**
    * A reference to the DOM Node where the prosemirror editor will be added.
