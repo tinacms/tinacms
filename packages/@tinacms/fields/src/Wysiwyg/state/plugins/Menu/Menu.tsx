@@ -18,7 +18,7 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
-import { useState, useRef, useEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
@@ -29,6 +29,7 @@ import {
   toggleOrderedList,
 } from '../../../commands/list-commands'
 import { insertTable } from '../../../commands/table-commands'
+import { imagePluginKey } from '../Image'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
@@ -53,6 +54,7 @@ interface Props {
   format: 'html' | 'markdown' | 'html-blocks'
   view: EditorView
   theme: any
+  sticky?: boolean
 }
 
 interface State {
@@ -86,43 +88,63 @@ const LinkControl = markControl({
     creating: 'creating',
   },
   noMix: ['code'],
+  isDisabled: (view: EditorView) => {
+    return !!imagePluginKey.getState(view.state).selectedImage
+  },
 })
 
 export const Menu = (props: Props) => {
-  const { view, bottom = false, theme } = props
+  const { view, bottom = false, theme, sticky = true } = props
   const [menuFixed, setMenuFixed] = useState(false)
-  const [menuOffset, setMenuOffset] = useState(0)
-  const [menuWidth, setMenuWidth] = useState()
-  const menuRef: any = useRef()
-
-  const handleScroll = () => {
-    if (!menuRef.current) return
-    // Need to know the Y coord of the bottom of the div that contains the text
-    const textAreaBottom =
-      menuRef.current.parentElement.nextSibling.offsetHeight + menuOffset
-
-    if (
-      window.scrollY > menuOffset &&
-      window.scrollY < textAreaBottom &&
-      !menuFixed &&
-      menuRef.current
-    ) {
-      // Need to remember the menu original position and width
-      setMenuOffset(menuRef.current.offsetTop)
-      setMenuWidth(menuRef.current.offsetWidth)
-      setMenuFixed(true)
-    } else if (
-      (window.scrollY < menuOffset || window.scrollY > textAreaBottom) &&
-      menuFixed
-    ) {
-      setMenuFixed(false)
-    }
-  }
+  const isBrowser = typeof window !== `undefined`
+  const menuRef: any = useRef<HTMLDivElement>(null)
+  const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
 
   useEffect(() => {
+    if (menuRef.current && sticky) {
+      setMenuBoundingBox(menuRef.current.getBoundingClientRect())
+    }
+  }, [menuRef])
+
+  useLayoutEffect(() => {
+    if (!isBrowser || !menuRef.current || !sticky) {
+      return
+    }
+
+    const handleScroll = () => {
+      const MenuWrapperDiv = menuRef.current.parentElement.parentElement
+      const WysiwygEditorDiv = MenuWrapperDiv.nextSibling
+      const startPosition = menuRef.current ? MenuWrapperDiv.offsetTop : 0
+      const endPosition = menuRef.current
+        ? WysiwygEditorDiv.offsetHeight +
+          MenuWrapperDiv.offsetHeight +
+          MenuWrapperDiv.offsetTop
+        : 0
+
+      if (window.scrollY > startPosition && window.scrollY < endPosition) {
+        setMenuFixed(true)
+      } else {
+        setMenuFixed(false)
+      }
+    }
+
+    const handleResize = () => {
+      if (menuRef.current) {
+        const wasMenuFixed = menuFixed
+        setMenuFixed(false)
+        setMenuBoundingBox(menuRef.current.getBoundingClientRect())
+        setMenuFixed(wasMenuFixed)
+      }
+    }
+
     window.addEventListener('scroll', handleScroll)
-    return () => window.removeEventListener('scroll', handleScroll)
-  })
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [menuRef, menuBoundingBox])
 
   const supportBlocks = true
 
@@ -133,10 +155,13 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <TinaReset>
+      <MenuWrapper>
+        {menuFixed && (
+          <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
+        )}
         <MenuContainer
           menuFixed={menuFixed}
-          menuWidth={menuWidth}
+          menuBoundingBox={menuBoundingBox}
           ref={menuRef}
           onMouseDown={preventProsemirrorFocusLoss}
         >
@@ -154,7 +179,7 @@ export const Menu = (props: Props) => {
         </MenuContainer>
         <FloatingTableMenu view={view} />
         <ImageMenu view={view} />
-      </TinaReset>
+      </MenuWrapper>
     </ThemeProvider>
   )
 }
@@ -233,16 +258,38 @@ const OrderedList = commandContrl(
   'Ordered List'
 )
 
+type MenuPlaceholderProps = {
+  menuBoundingBox: any
+}
+
+const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
+  color: transparent;
+  background: transparent;
+  pointer-events: none;
+  position: relative;
+  display: block;
+  height: ${props => props.menuBoundingBox.height}px;
+  width: ${props => props.menuBoundingBox.width}px;
+`
+
+const MenuWrapper = styled(TinaReset)`
+  position: relative;
+`
+
 type MenuContainerProps = {
   menuFixed: boolean
-  menuWidth: number
+  menuBoundingBox: any
 }
 
 const MenuContainer = styled.div<MenuContainerProps>`
-  position: ${({ menuFixed }) => (menuFixed ? 'fixed' : 'relative')};
+  display: flex;
+  flex-direction: row;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  justify-content: space-between;
+  position: relative;
   top: 0;
   width: 100%;
-  max-width: ${({ menuWidth }) => `${menuWidth}px`};
   background-color: white;
   border-radius: ${radius()};
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
@@ -251,10 +298,12 @@ const MenuContainer = styled.div<MenuContainerProps>`
   z-index: 100;
   margin: 0 0 12px 0;
 
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
+  ${props =>
+    props.menuFixed &&
+    css`
+      position: fixed;
+      width: ${props.menuBoundingBox.width}px;
+    `};
 `
 
 const MenuItem = css`

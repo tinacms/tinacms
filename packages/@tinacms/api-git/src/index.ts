@@ -18,3 +18,5 @@ limitations under the License.
 
 export * from './router'
 export * from './server'
+export * from './configure'
+export * from './repo'

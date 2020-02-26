@@ -34,8 +34,6 @@ import {
 export default function BlocksExample({ jsonFile }) {
   const [, form] = useJsonForm(jsonFile)
 
-  if (!form) return null
-
   return (
     <ModalProvider>
       <InlineForm form={form}>
@@ -130,7 +128,7 @@ BlocksExample.getInitialProps = async function() {
 /**
  * Toggle
  */
-function EditToggle() {
+export function EditToggle() {
   const { status, deactivate, activate } = useInlineForm()
 
   return (
@@ -144,7 +142,7 @@ function EditToggle() {
   )
 }
 
-function DiscardChanges() {
+export function DiscardChanges() {
   const { form } = useInlineForm()
 
   return (

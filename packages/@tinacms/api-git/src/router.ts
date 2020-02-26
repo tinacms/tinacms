@@ -16,300 +16,169 @@ limitations under the License.
 
 */
 
-import { writeFile, deleteFile } from './file-writer'
-
-import * as fs from 'fs'
 import * as path from 'path'
+import * as fs from 'fs'
 import * as express from 'express'
 
-import { commit } from './commit'
 import { createUploader } from './upload'
-import { openRepo, SSH_KEY_RELATIVE_PATH } from './open-repo'
-import { show } from './show'
-import { getGitSSHUrl, isSSHUrl } from './utils/gitUrl'
-import atob from 'atob'
+import { Repo } from './repo'
 
 // Don't return full error message to client incase confidential details leak
 const GIT_ERROR_MESSAGE =
   'Git Operation failed: Check the logs for more details'
 
 export interface GitRouterConfig {
-  pathToRepo?: string
-  pathToContent?: string
-  defaultCommitMessage?: string
-  defaultCommitName?: string
-  defaultCommitEmail?: string
-  pushOnCommit?: boolean
+  defaultCommitMessage: string
+  defaultCommitName: string
+  defaultCommitEmail: string
+  pushOnCommit: boolean
 }
 
-/**
- *
- */
-export function checkFilePathIsInRepo(
-  filepath: string,
-  repoAbsolutePath: string
-) {
-  const fullpath = path.resolve(filepath)
-  const repopath = path.resolve(repoAbsolutePath)
-  if (fullpath.startsWith(repopath)) {
-    return true
-  } else {
-    return false
-  }
+const DEFAULT_OPTIONS: GitRouterConfig = {
+  defaultCommitMessage: 'Edited with TinaCMS',
+  defaultCommitName: 'TinaCMS',
+  defaultCommitEmail: 'git@tinacms.org',
+  pushOnCommit: true,
 }
 
-// Ensure remote URL is ssh
-export async function updateRemoteToSSH(pathRoot: string) {
-  const repo = await openRepo(pathRoot)
-  const remotes = await repo.getRemotes(true)
-  const originRemotes = remotes.filter((r: any) => r.name == 'origin')
+export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
+  const {
+    defaultCommitMessage,
+    defaultCommitName,
+    defaultCommitEmail,
+    pushOnCommit,
+  }: GitRouterConfig = { ...DEFAULT_OPTIONS, ...config }
 
-  if (!originRemotes.length) {
-    console.warn('No origin remote on the given repo')
-    return
+  if (!repo) {
+    /**
+     * Incase js users forget to pass in `repo`.
+     */
+    throw new Error(
+      '@tinacms/api-git#router(repo, config): Parameter `repo` is missing.'
+    )
+  } else if (!(repo instanceof Repo)) {
+    /**
+     * Maintains backwards compatibility. Types are intentionally
+     * left out to discourage people from using it.
+     */
+    const repoConfig: any = repo
+    repo = new Repo(repoConfig.pathToRepo, repoConfig.pathToContent)
   }
 
-  const originURL = originRemotes[0].refs.push
-
-  if (originURL && !isSSHUrl(originURL)) {
-    await repo.removeRemote('origin')
-    const newRemote = getGitSSHUrl(originURL)
-    await repo.addRemote('origin', newRemote)
-  }
-}
-
-async function createSSHKey(pathRoot: string) {
-  if (process.env.SSH_KEY) {
-    const ssh_path = path.join(pathRoot, SSH_KEY_RELATIVE_PATH)
-    const parentDir = path.dirname(ssh_path)
-    if (!fs.existsSync(parentDir)) {
-      fs.mkdirSync(parentDir, { recursive: true })
-    }
-    fs.writeFileSync(ssh_path, atob(process.env.SSH_KEY), {
-      encoding: 'utf8',
-      mode: 0o600,
-    })
-  }
-}
-
-async function configureGitRemote(pathRoot: string) {
-  await createSSHKey(pathRoot)
-  if (process.env.GIT_REMOTE) {
-    await updateOrigin(pathRoot, process.env.GIT_REMOTE)
-  }
-  await updateRemoteToSSH(pathRoot)
-}
-
-async function updateOrigin(pathRoot: string, remote: string) {
-  const repo = await openRepo(pathRoot)
-  const newRemote = getGitSSHUrl(remote)
-
-  const existingRemotes = await repo.getRemotes(true)
-  if (existingRemotes.filter((r: any) => r.name == 'origin').length) {
-    console.warn(`Changing remote origin to ${newRemote}`)
-  }
-
-  await repo.removeRemote('origin')
-  await repo.addRemote('origin', newRemote)
-}
-
-export function router(config: GitRouterConfig = {}) {
-  const REPO_ABSOLUTE_PATH = config.pathToRepo || process.cwd()
-  const CONTENT_REL_PATH = config.pathToContent || ''
-  const CONTENT_ABSOLUTE_PATH = path.join(REPO_ABSOLUTE_PATH, CONTENT_REL_PATH)
-  const TMP_DIR = path.join(CONTENT_ABSOLUTE_PATH, '/tmp/')
-  const DEFAULT_COMMIT_MESSAGE =
-    config.defaultCommitMessage || 'Edited with TinaCMS'
-  const PUSH_ON_COMMIT =
-    typeof config.pushOnCommit === 'boolean' ? config.pushOnCommit : true
-
-  const uploader = createUploader(TMP_DIR)
+  const uploader = createUploader(repo.tmpDir)
 
   const router = express.Router()
   router.use(express.json())
 
-  // TODO: There shold be some way of making sure this only happens
-  //       in a cloud editing environment.
-  configureGitRemote(REPO_ABSOLUTE_PATH)
-
-  router.delete('/:relPath', (req: any, res: any) => {
-    const user = req.user || {}
-    const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
-
+  router.delete('/:relPath', async (req: any, res) => {
     try {
-      deleteFile(fileAbsolutePath)
+      const user = req.user || {}
+      const fileRelativePath = decodeURIComponent(req.params.relPath)
+
+      await repo.deleteFiles(fileRelativePath, {
+        name: user.name || req.body.name || defaultCommitName,
+        email: user.email || req.body.email || defaultCommitEmail,
+        message: `Update from Tina: delete ${fileRelativePath}`,
+        files: [fileRelativePath],
+      })
+
+      if (pushOnCommit) {
+        await repo.push()
+      }
+
+      res.json({ status: 'success' })
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
-
-    commit({
-      pathRoot: REPO_ABSOLUTE_PATH,
-      name: user.name || req.body.name || config.defaultCommitName,
-      email: user.email || req.body.email || config.defaultCommitEmail,
-      message: `Update from Tina: delete ${fileRelativePath}`,
-      push: PUSH_ON_COMMIT,
-      files: [fileAbsolutePath],
-    })
-      .then(() => {
-        res.json({ status: 'success' })
-      })
-      .catch(() => {
-        res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
-      })
   })
 
-  router.put('/:relPath', (req: any, res: any) => {
-    const fileRelativePath = decodeURIComponent(req.params.relPath)
-    const fileAbsolutePath = path.join(CONTENT_ABSOLUTE_PATH, fileRelativePath)
-
-    if (DEBUG) {
-      console.log(fileAbsolutePath)
-    }
+  router.put('/:relPath', (req, res) => {
     try {
-      const fileIsInRepo = checkFilePathIsInRepo(
-        fileAbsolutePath,
-        CONTENT_ABSOLUTE_PATH
-      )
-      if (fileIsInRepo) {
-        writeFile(fileAbsolutePath, req.body.content)
-      } else {
-        throw new Error(
-          `Failed to write to: ${fileRelativePath} \nCannot write outside of the content directory.`
-        )
-      }
+      const fileRelativePath = decodeURIComponent(req.params.relPath)
+      repo.writeFile(fileRelativePath, req.body.content)
       res.json({ content: req.body.content })
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
 
-  router.post('/upload', uploader.single('file'), (req: any, res: any) => {
+  router.post('/upload', uploader.single('file'), async (req: any, res) => {
     try {
+      const user = req.user || {}
+      const message = req.body.message || defaultCommitMessage
+
       const fileName = req.file.originalname
-      const tmpPath = path.join(TMP_DIR, fileName)
-      const finalPath = path.join(
-        REPO_ABSOLUTE_PATH,
-        req.body.directory,
-        fileName
-      )
-      fs.rename(tmpPath, finalPath, (err: any) => {
-        if (err) console.error(err)
-      })
-      res.send(req.file)
+      const tmpPath = path.join(repo.tmpDir, fileName)
+      const relPath = path.join(req.body.directory, fileName)
+      const absPath = repo.fileAbsolutePath(relPath)
+
+      if (repo.fileIsInRepo(absPath)) {
+        fs.renameSync(tmpPath, absPath)
+
+        await repo.commit({
+          name: user.name || req.body.name || defaultCommitName,
+          email: user.email || req.body.email || defaultCommitEmail,
+          message,
+          files: [relPath],
+        })
+
+        if (pushOnCommit) {
+          await repo.push()
+        }
+
+        res.send(req.file)
+      }
     } catch {
       res.status(500).json({ status: 'error', message: GIT_ERROR_MESSAGE })
     }
   })
 
-  router.post('/commit', async (req: any, res: any) => {
+  router.post('/commit', async (req: any, res) => {
     try {
       const user = req.user || {}
-      const message = req.body.message || DEFAULT_COMMIT_MESSAGE
-      const files = req.body.files.map((rel: string) =>
-        path.join(CONTENT_ABSOLUTE_PATH, rel)
-      )
+      const message = req.body.message || defaultCommitMessage
 
-      // TODO: Separate commit and push???
-      await commit({
-        pathRoot: REPO_ABSOLUTE_PATH,
-        name: user.name || req.body.name || config.defaultCommitName,
-        email: user.email || req.body.email || config.defaultCommitEmail,
-        push: PUSH_ON_COMMIT,
+      await repo.commit({
+        name: user.name || req.body.name || defaultCommitName,
+        email: user.email || req.body.email || defaultCommitEmail,
         message,
-        files,
+        files: req.body.files,
       })
 
-      res.json({ status: 'success' })
-    } catch {
-      // TODO: More intelligently respond
-      res.status(412)
-      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
-    }
-  })
-
-  router.post('/push', async (req: any, res: any) => {
-    try {
-      await openRepo(REPO_ABSOLUTE_PATH).push()
-      res.json({ status: 'success' })
-    } catch {
-      // TODO: More intelligently respond
-      res.status(412)
-      res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
-    }
-  })
-
-  router.post('/reset', (req, res) => {
-    const repo = openRepo(REPO_ABSOLUTE_PATH)
-    const files = req.body.files.map((rel: string) =>
-      path.join(CONTENT_ABSOLUTE_PATH, rel)
-    )
-    if (DEBUG) console.log(files)
-    repo
-      .checkout(files[0])
-      .then(() => {
-        res.json({ status: 'success' })
-      })
-      .catch(() => {
-        res.status(412)
-        res.json({ status: 'failure', error: GIT_ERROR_MESSAGE })
-      })
-  })
-
-  router.get('/branch', async (req, res) => {
-    try {
-      const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
-      res.send({ status: 'success', branch: summary.branches[summary.current] })
-    } catch {
-      // TODO: More intelligently respond
-      res.status(500)
-      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
-    }
-  })
-
-  router.get('/branches', async (req, res) => {
-    try {
-      const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
-      res.send({ status: 'success', branches: summary.all })
-    } catch {
-      // TODO: More intelligently respond
-      res.status(500)
-      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
-    }
-  })
-
-  router.get('/branches/:name', async (req, res) => {
-    try {
-      const summary = await openRepo(REPO_ABSOLUTE_PATH).branchLocal()
-      const branch = summary.branches[req.params.name]
-
-      if (!branch) {
-        res.status(404)
-        res.json({
-          status: 'failure',
-          message: `Branch not found: ${String(branch)}`,
-        })
-        return
+      if (pushOnCommit) {
+        await repo.push()
       }
 
-      res.send({ status: 'success', branch })
+      res.json({ status: 'success' })
     } catch {
       // TODO: More intelligently respond
-      res.status(500)
-      res.json({ status: 'failure', message: GIT_ERROR_MESSAGE })
+      res.status(412).json({ status: 'failure', error: GIT_ERROR_MESSAGE })
+    }
+  })
+
+  router.post('/push', async (req, res) => {
+    try {
+      await repo.push()
+      res.json({ status: 'success' })
+    } catch {
+      // TODO: More intelligently respond
+      res.status(412).json({ status: 'failure', error: GIT_ERROR_MESSAGE })
+    }
+  })
+
+  router.post('/reset', async (req, res) => {
+    try {
+      // TODO: I feel like this in wrong. Taking a list of files and then only resetting the first one?
+      await repo.reset(req.body.files[0])
+      res.json({ status: 'success' })
+    } catch {
+      res.status(412).json({ status: 'failure', error: GIT_ERROR_MESSAGE })
     }
   })
 
   router.get('/show/:fileRelativePath', async (req, res) => {
     try {
-      const fileRelativePath = path.posix
-        .join(CONTENT_REL_PATH, req.params.fileRelativePath)
-        .replace(/^\/*/, '')
-
-      const content = await show({
-        pathRoot: REPO_ABSOLUTE_PATH,
-        fileRelativePath,
-      })
+      const content = await repo.getFileAtHead(req.params.fileRelativePath)
 
       res.json({
         fileRelativePath: req.params.fileRelativePath,
