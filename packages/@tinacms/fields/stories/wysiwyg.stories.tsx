@@ -35,6 +35,22 @@ const Basic = () => {
   )
 }
 
+const HTMLFormat = () => {
+  const [value, setValue] = React.useState('<p>testing...</p>')
+  return (
+    <Wysiwyg
+      input={{
+        value,
+        onChange: (val: string) => {
+          console.log(val)
+          setValue(val)
+        },
+      }}
+      format="html"
+    />
+  )
+}
+
 const WithImage = () => {
   const [value, setValue] = React.useState(
     `![alt text](https://i.imgur.com/2FCfbgg.jpg "Logo Title Text 1")
@@ -77,5 +93,6 @@ const WithTable = () => {
 
 storiesOf('Wysiwyg', module)
   .add('Basic', () => <Basic />)
+  .add('HTML Format', () => <HTMLFormat />)
   .add('WithImage', () => <WithImage />)
   .add('WithTable', () => <WithTable />)
