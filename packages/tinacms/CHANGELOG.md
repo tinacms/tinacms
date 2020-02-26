@@ -3,298 +3,225 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-# [0.13.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.0-alpha.1...tinacms@0.13.0) (2020-02-11)
+# [0.15.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0...tinacms@0.15.0-alpha.0) (2020-02-26)
+
+### Bug Fixes
+
+- **sidebar:** fix layout issue with sidebar header ([cc86f50](https://github.com/tinacms/tinacms/commit/cc86f50))
+
+### Features
+
+- add useScreenPlugin for react ([7236374](https://github.com/tinacms/tinacms/commit/7236374))
+- createScreen helps with making plugins ([1a35617](https://github.com/tinacms/tinacms/commit/1a35617))
+
+# [0.14.0](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0-alpha.1...tinacms@0.14.0) (2020-02-24)
+
+### Bug Fixes
+
+- **sidebar:** fix toggling hidden state ([254326c](https://github.com/tinacms/tinacms/commit/254326c))
+
+### Features
+
+- **Sidebar:** set the text of save/reset buttons ([5af1516](https://github.com/tinacms/tinacms/commit/5af1516)), closes [#620](https://github.com/tinacms/tinacms/issues/620) [#647](https://github.com/tinacms/tinacms/issues/647)
+
+# [0.14.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0-alpha.0...tinacms@0.14.0-alpha.1) (2020-02-21)
+
+### Bug Fixes
+
+- pass close to ScreenPlugin components ([081f9b6](https://github.com/tinacms/tinacms/commit/081f9b6))
+
+# [0.14.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.1...tinacms@0.14.0-alpha.0) (2020-02-20)
+
+### Bug Fixes
+
+- **tinacms:** if single form, FormView no longer renders form list ([780b16c](https://github.com/tinacms/tinacms/commit/780b16c))
+
+### Features
+
+- **tinacms:** adds isHidden getter & setter to sidebar instance ([e98e595](https://github.com/tinacms/tinacms/commit/e98e595))
+
+## [0.13.1](https://github.com/tinacms/tinacms/compare/tinacms@0.13.1-alpha.1...tinacms@0.13.1) (2020-02-18)
 
 **Note:** Version bump only for package tinacms
 
+## [0.13.1-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.13.1-alpha.0...tinacms@0.13.1-alpha.1) (2020-02-16)
 
+**Note:** Version bump only for package tinacms
 
+## [0.13.1-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.0...tinacms@0.13.1-alpha.0) (2020-02-14)
 
+### Bug Fixes
+
+- **Tina:** can override hidden and position ([63824ea](https://github.com/tinacms/tinacms/commit/63824ea))
+- hiding the sidebar ([691e936](https://github.com/tinacms/tinacms/commit/691e936)), closes [#744](https://github.com/tinacms/tinacms/issues/744)
+- sidebar theming ([a5b02e8](https://github.com/tinacms/tinacms/commit/a5b02e8))
+- TinaCMS sidebar props are entirely optional ([8e15c21](https://github.com/tinacms/tinacms/commit/8e15c21))
+
+# [0.13.0](https://github.com/tinacms/tinacms/compare/tinacms@0.13.0-alpha.1...tinacms@0.13.0) (2020-02-11)
+
+**Note:** Version bump only for package tinacms
 
 # [0.13.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.13.0-alpha.0...tinacms@0.13.0-alpha.1) (2020-02-11)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 # [0.13.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.1...tinacms@0.13.0-alpha.0) (2020-02-06)
-
 
 ### Bug Fixes
 
-* **withTina:** TinaCMSConfig compat ([101c61d](https://github.com/tinacms/tinacms/commit/101c61d))
-
+- **withTina:** TinaCMSConfig compat ([101c61d](https://github.com/tinacms/tinacms/commit/101c61d))
 
 ### Features
 
-* **Modals:** export all modal components ([3309eaf](https://github.com/tinacms/tinacms/commit/3309eaf))
-
-
-
-
+- **Modals:** export all modal components ([3309eaf](https://github.com/tinacms/tinacms/commit/3309eaf))
 
 ## [0.12.1](https://github.com/tinacms/tinacms/compare/tinacms@0.12.1-alpha.1...tinacms@0.12.1) (2020-02-03)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 ## [0.12.1-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.12.0...tinacms@0.12.1-alpha.1) (2020-02-03)
 
 **Note:** Version bump only for package tinacms
-
-
-
-
 
 ## [0.12.1-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.0...tinacms@0.12.1-alpha.0) (2020-01-29)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 # [0.12.0](https://github.com/tinacms/tinacms/compare/tinacms@0.12.0-alpha.0...tinacms@0.12.0) (2020-01-27)
-
 
 ### Bug Fixes
 
-* removed unused dependencies from package.json ([0945fed](https://github.com/tinacms/tinacms/commit/0945fed))
-
-
-
-
+- removed unused dependencies from package.json ([0945fed](https://github.com/tinacms/tinacms/commit/0945fed))
 
 # [0.12.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3...tinacms@0.12.0-alpha.0) (2020-01-24)
 
-
 ### Features
 
-* **TinaCMS:** configure plugins/apis on instantiation ([eeec343](https://github.com/tinacms/tinacms/commit/eeec343))
-* **withTina:** add HOC for <Tina> CMS provider ([b3c44ef](https://github.com/tinacms/tinacms/commit/b3c44ef))
-
-
-
-
+- **TinaCMS:** configure plugins/apis on instantiation ([eeec343](https://github.com/tinacms/tinacms/commit/eeec343))
+- **withTina:** add HOC for <Tina> CMS provider ([b3c44ef](https://github.com/tinacms/tinacms/commit/b3c44ef))
 
 ## [0.11.3](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3-alpha.1...tinacms@0.11.3) (2020-01-22)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 ## [0.11.3-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.11.3-alpha.0...tinacms@0.11.3-alpha.1) (2020-01-22)
-
 
 ### Bug Fixes
 
-* FieldPlugins for text have a default to empty string, instead of undefined ([c899ee5](https://github.com/tinacms/tinacms/commit/c899ee5))
-
-
-
-
+- FieldPlugins for text have a default to empty string, instead of undefined ([c899ee5](https://github.com/tinacms/tinacms/commit/c899ee5))
 
 ## [0.11.3-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.2...tinacms@0.11.3-alpha.0) (2020-01-16)
 
-
 ### Bug Fixes
 
-* remove global styles, fix issues from iframe removal ([0b1b836](https://github.com/tinacms/tinacms/commit/0b1b836))
-* remove styled frame comopnent ([eb30b25](https://github.com/tinacms/tinacms/commit/eb30b25))
-* remove styled frame from modal ([3905ab0](https://github.com/tinacms/tinacms/commit/3905ab0))
-* remove styled frame from sidebar container ([e274b7d](https://github.com/tinacms/tinacms/commit/e274b7d))
-* remove styled frame from sidebar toggle ([32bffff](https://github.com/tinacms/tinacms/commit/32bffff))
-* remove use of frame ([ae4a055](https://github.com/tinacms/tinacms/commit/ae4a055))
-
-
-
-
+- remove global styles, fix issues from iframe removal ([0b1b836](https://github.com/tinacms/tinacms/commit/0b1b836))
+- remove styled frame comopnent ([eb30b25](https://github.com/tinacms/tinacms/commit/eb30b25))
+- remove styled frame from modal ([3905ab0](https://github.com/tinacms/tinacms/commit/3905ab0))
+- remove styled frame from sidebar container ([e274b7d](https://github.com/tinacms/tinacms/commit/e274b7d))
+- remove styled frame from sidebar toggle ([32bffff](https://github.com/tinacms/tinacms/commit/32bffff))
+- remove use of frame ([ae4a055](https://github.com/tinacms/tinacms/commit/ae4a055))
 
 ## [0.11.2](https://github.com/tinacms/tinacms/compare/tinacms@0.11.1...tinacms@0.11.2) (2020-01-14)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 ## [0.11.1](https://github.com/tinacms/tinacms/compare/tinacms@0.11.1-alpha.1...tinacms@0.11.1) (2020-01-13)
 
 **Note:** Version bump only for package tinacms
-
-
-
-
 
 ## [0.11.1-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.11.1-alpha.0...tinacms@0.11.1-alpha.1) (2020-01-10)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 # [0.11.0](https://github.com/tinacms/tinacms/compare/tinacms@0.11.0-alpha.0...tinacms@0.11.0) (2019-12-17)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 # [0.11.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.10.1-alpha.0...tinacms@0.11.0-alpha.0) (2019-12-17)
-
 
 ### Features
 
-* allow user to user enter/return key to create new blog entry ([d850cfb](https://github.com/tinacms/tinacms/commit/d850cfb))
-* **Blocks:** have a "type" string ([19008ff](https://github.com/tinacms/tinacms/commit/19008ff))
-
-
-
-
+- allow user to user enter/return key to create new blog entry ([d850cfb](https://github.com/tinacms/tinacms/commit/d850cfb))
+- **Blocks:** have a "type" string ([19008ff](https://github.com/tinacms/tinacms/commit/19008ff))
 
 ## [0.10.1-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.10.0...tinacms@0.10.1-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 # [0.10.0](https://github.com/tinacms/tinacms/compare/tinacms@0.10.0-alpha.2...tinacms@0.10.0) (2019-12-02)
 
 **Note:** Version bump only for package tinacms
-
-
-
-
 
 # [0.10.0-alpha.2](https://github.com/tinacms/tinacms/compare/tinacms@0.10.0-alpha.1...tinacms@0.10.0-alpha.2) (2019-12-02)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 # [0.10.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.10.0-alpha.0...tinacms@0.10.0-alpha.1) (2019-11-28)
-
 
 ### Features
 
-* **Blocks:** add Block component ([cfcb618](https://github.com/tinacms/tinacms/commit/cfcb618))
-* **useGlobalForm:** add hook for registering global forms ([d450cae](https://github.com/tinacms/tinacms/commit/d450cae))
-
-
-
-
+- **Blocks:** add Block component ([cfcb618](https://github.com/tinacms/tinacms/commit/cfcb618))
+- **useGlobalForm:** add hook for registering global forms ([d450cae](https://github.com/tinacms/tinacms/commit/d450cae))
 
 # [0.10.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.9.1...tinacms@0.10.0-alpha.0) (2019-11-25)
 
-
 ### Features
 
-* tinacms re-exports important types from @tinacms/core ([c51e9de](https://github.com/tinacms/tinacms/commit/c51e9de))
-
-
-
-
+- tinacms re-exports important types from @tinacms/core ([c51e9de](https://github.com/tinacms/tinacms/commit/c51e9de))
 
 ## [0.9.1](https://github.com/tinacms/tinacms/compare/tinacms@0.9.1-alpha.1...tinacms@0.9.1) (2019-11-25)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 ## [0.9.1-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.9.1-alpha.0...tinacms@0.9.1-alpha.1) (2019-11-25)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 ## [0.9.1-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.9.0...tinacms@0.9.1-alpha.0) (2019-11-25)
-
 
 ### Bug Fixes
 
-* set form body wrapper height to 100% ([e43d1dc](https://github.com/tinacms/tinacms/commit/e43d1dc))
-
-
-
-
+- set form body wrapper height to 100% ([e43d1dc](https://github.com/tinacms/tinacms/commit/e43d1dc))
 
 # [0.9.0](https://github.com/tinacms/tinacms/compare/tinacms@0.9.0-alpha.1...tinacms@0.9.0) (2019-11-18)
 
 **Note:** Version bump only for package tinacms
 
-
-
-
-
 # [0.9.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.8.1...tinacms@0.9.0-alpha.1) (2019-11-18)
-
 
 ### Bug Fixes
 
-* **Blocks:** add placeholder for invalid blocks ([c3c2515](https://github.com/tinacms/tinacms/commit/c3c2515))
-
+- **Blocks:** add placeholder for invalid blocks ([c3c2515](https://github.com/tinacms/tinacms/commit/c3c2515))
 
 ### Features
 
-* **FieldMeta:** provide basic field meta component ([fdb058d](https://github.com/tinacms/tinacms/commit/fdb058d))
-* add busy state to button, use when saving ([5f9e810](https://github.com/tinacms/tinacms/commit/5f9e810))
-* Add loading indicator on saving ([5faaf79](https://github.com/tinacms/tinacms/commit/5faaf79))
-* **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/tinacms/tinacms/commit/e94f112))
-* adds min-max height on markdown component ([3f7935b](https://github.com/tinacms/tinacms/commit/3f7935b))
-* screen plugins accept layout prop ([b14382e](https://github.com/tinacms/tinacms/commit/b14382e))
-
-
-
-
+- **FieldMeta:** provide basic field meta component ([fdb058d](https://github.com/tinacms/tinacms/commit/fdb058d))
+- add busy state to button, use when saving ([5f9e810](https://github.com/tinacms/tinacms/commit/5f9e810))
+- Add loading indicator on saving ([5faaf79](https://github.com/tinacms/tinacms/commit/5faaf79))
+- **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/tinacms/tinacms/commit/e94f112))
+- adds min-max height on markdown component ([3f7935b](https://github.com/tinacms/tinacms/commit/3f7935b))
+- screen plugins accept layout prop ([b14382e](https://github.com/tinacms/tinacms/commit/b14382e))
 
 # [0.9.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.8.1...tinacms@0.9.0-alpha.0) (2019-11-18)
 
-
 ### Bug Fixes
 
-* **Blocks:** add placeholder for invalid blocks ([c3c2515](https://github.com/tinacms/tinacms/commit/c3c2515))
-
+- **Blocks:** add placeholder for invalid blocks ([c3c2515](https://github.com/tinacms/tinacms/commit/c3c2515))
 
 ### Features
 
-* **FieldMeta:** provide basic field meta component ([fdb058d](https://github.com/tinacms/tinacms/commit/fdb058d))
-* add busy state to button, use when saving ([5f9e810](https://github.com/tinacms/tinacms/commit/5f9e810))
-* Add loading indicator on saving ([5faaf79](https://github.com/tinacms/tinacms/commit/5faaf79))
-* **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/tinacms/tinacms/commit/e94f112))
-* adds min-max height on markdown component ([3f7935b](https://github.com/tinacms/tinacms/commit/3f7935b))
-* screen plugins accept layout prop ([b14382e](https://github.com/tinacms/tinacms/commit/b14382e))
-
-
-
-
+- **FieldMeta:** provide basic field meta component ([fdb058d](https://github.com/tinacms/tinacms/commit/fdb058d))
+- add busy state to button, use when saving ([5f9e810](https://github.com/tinacms/tinacms/commit/5f9e810))
+- Add loading indicator on saving ([5faaf79](https://github.com/tinacms/tinacms/commit/5faaf79))
+- **Global Forms:** global forms can be registerd as plugins ([e94f112](https://github.com/tinacms/tinacms/commit/e94f112))
+- adds min-max height on markdown component ([3f7935b](https://github.com/tinacms/tinacms/commit/3f7935b))
+- screen plugins accept layout prop ([b14382e](https://github.com/tinacms/tinacms/commit/b14382e))
 
 ## [0.8.1](https://github.com/tinacms/tinacms/compare/tinacms@0.8.0...tinacms@0.8.1) (2019-11-14)
 
-
 ### Bug Fixes
 
-* correct react-tinacms version ([e8a4f55](https://github.com/tinacms/tinacms/commit/e8a4f55))
-
-
-
-
+- correct react-tinacms version ([e8a4f55](https://github.com/tinacms/tinacms/commit/e8a4f55))
 
 ## 0.8.0 (2019-11-12)
 

@@ -16,11 +16,4 @@ limitations under the License.
 
 */
 
-import { Plugin } from '@tinacms/core'
-
-export interface ScreenPlugin extends Plugin {
-  __type: 'screen'
-  Component: any
-  Icon: any
-  layout: 'fullscreen' | 'popup'
-}
+export const parse = (value?: string) => value && +value;

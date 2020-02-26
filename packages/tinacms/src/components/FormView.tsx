@@ -37,9 +37,8 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
 import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
-import { FORM_HEADER_HEIGHT, SIDEBAR_HEADER_HEIGHT } from '../Globals'
-import { GroupPanel } from '../plugins/fields'
 import { useCMS, useSubscribable } from '../react-tinacms'
+import { FormPortalProvider } from './FormPortal'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
@@ -47,17 +46,36 @@ export const FormsView = () => {
 
   /**
    * If there's only one form, make it the active form.
+   *
+   * TODO: There's an issue where the forms register one
+   * by one, so the 'active form' always gets set as if there
+   * were only one form, even when there are multiple
    */
-  useSubscribable(cms.forms, () => {
+
+  function setSingleActiveForm() {
     if (cms.forms.all().length === 1) {
       setActiveFormId(cms.forms.all()[0].id)
     }
+  }
+
+  /*
+   ** Subscribes the forms to the CMS,
+   ** passing a callback to set active form
+   */
+  useSubscribable(cms.forms, () => {
+    setSingleActiveForm()
   })
+
+  /*
+   ** Sets single active form on componentDidMount
+   */
+  React.useEffect(() => {
+    setSingleActiveForm()
+  }, [])
 
   const forms = cms.forms.all()
   const isMultiform = forms.length > 1
   const activeForm = activeFormId ? cms.forms.find(activeFormId) : null
-
   const isEditing = !!activeForm
 
   /**
@@ -67,7 +85,7 @@ export const FormsView = () => {
     return <NoFormsPlaceholder />
   }
 
-  if (!activeForm) {
+  if (isMultiform && !activeForm) {
     return (
       <FormsList
         isEditing={isEditing}
@@ -78,13 +96,17 @@ export const FormsView = () => {
   }
 
   return (
-    <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-      <FormView
-        activeForm={activeForm}
-        setActiveFormId={setActiveFormId}
-        isMultiform={isMultiform}
-      />
-    </FormWrapper>
+    <>
+      {activeForm && (
+        <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
+          <FormView
+            activeForm={activeForm}
+            setActiveFormId={setActiveFormId}
+            isMultiform={isMultiform}
+          />
+        </FormWrapper>
+      )}
+    </>
   )
 }
 
@@ -98,6 +120,7 @@ export function FormView({
   setActiveFormId,
   isMultiform,
 }: FormViewProps) {
+  const cms = useCMS()
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
       if (!result.destination || !activeForm) return
@@ -123,17 +146,19 @@ export function FormView({
               />
             )}
             <FormBody>
-              <Wrapper>
-                {activeForm &&
-                  (activeForm.fields.length ? (
-                    <FieldsBuilder
-                      form={activeForm}
-                      fields={activeForm.fields}
-                    />
-                  ) : (
-                    <NoFieldsPlaceholder />
-                  ))}
-              </Wrapper>
+              <FormPortalProvider>
+                <Wrapper>
+                  {activeForm &&
+                    (activeForm.fields.length ? (
+                      <FieldsBuilder
+                        form={activeForm}
+                        fields={activeForm.fields}
+                      />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    ))}
+                </Wrapper>
+              </FormPortalProvider>
             </FormBody>
             <FormFooter>
               <Wrapper>
@@ -144,7 +169,9 @@ export function FormView({
                       form.reset()
                       await activeForm.reset!()
                     }}
-                  />
+                  >
+                    {cms.sidebar.buttons.reset}
+                  </ResetForm>
                 )}
                 <Button
                   onClick={() => handleSubmit()}
@@ -155,7 +182,7 @@ export function FormView({
                   margin
                 >
                   {submitting && <LoadingDots />}
-                  {!submitting && 'Save'}
+                  {!submitting && cms.sidebar.buttons.save}
                 </Button>
                 {activeForm.actions.length > 0 && (
                   <ActionsMenu actions={activeForm.actions} form={activeForm} />
@@ -310,8 +337,6 @@ const FormHeader = styled(
 )`
   position: relative;
   width: 100%;
-  height: ${FORM_HEADER_HEIGHT}px;
-  flex: 0 0 ${FORM_HEADER_HEIGHT}px;
   cursor: pointer;
   background-color: white;
   display: flex;
@@ -426,14 +451,6 @@ const FormWrapper = styled.div<FormWrapperProps>`
         animation-delay: 0;
         animation-iteration-count: 1;
         animation-timing-function: ease-out;
-      }
-    `};
-
-  ${p =>
-    p.isMultiform &&
-    css`
-      ${GroupPanel} {
-        top: ${SIDEBAR_HEADER_HEIGHT + FORM_HEADER_HEIGHT}px;
       }
     `};
 `

@@ -143,6 +143,8 @@ const FormModal = ({ plugin, close }: any) => {
 
 const ContentMenuWrapper = styled.div`
   position: relative;
+  grid-area: actions;
+  justify-self: end;
 `
 
 const ContentMenu = styled.div<{ open: boolean }>`

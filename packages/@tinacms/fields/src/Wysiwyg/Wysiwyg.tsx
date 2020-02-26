@@ -27,18 +27,24 @@ import { ProseMirrorCss } from './ProseMirrorCss'
 interface Wysiwyg {
   input: any
   plugins?: Plugin[]
+  sticky?: boolean
 }
 
-export const Wysiwyg = styled(({ input, plugins, ...styleProps }: any) => {
-  const theme = React.useContext(ThemeContext) || {}
-  const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, theme)
+export const Wysiwyg = styled(
+  ({ input, plugins, sticky, ...styleProps }: any) => {
+    const theme = React.useContext(ThemeContext) || {}
+    const prosemirrorEl = useTinaProsemirror(input, ALL_PLUGINS, theme, sticky)
 
-  return (
-    <>
-      <link rel="stylesheet" href="https://codemirror.net/lib/codemirror.css" />
-      <div {...styleProps} ref={prosemirrorEl} />
-    </>
-  )
-})`
+    return (
+      <>
+        <link
+          rel="stylesheet"
+          href="https://codemirror.net/lib/codemirror.css"
+        />
+        <div {...styleProps} ref={prosemirrorEl} />
+      </>
+    )
+  }
+)`
   ${CodeMirrorCss}${ProseMirrorCss}
 `

@@ -3,245 +3,159 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
-## [0.9.9](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.9-alpha.1...react-tinacms@0.9.9) (2020-02-11)
+## [0.9.12-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.11...react-tinacms@0.9.12-alpha.0) (2020-02-26)
 
 **Note:** Version bump only for package react-tinacms
 
+## [0.9.11](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.11-alpha.1...react-tinacms@0.9.11) (2020-02-24)
 
+**Note:** Version bump only for package react-tinacms
 
+## [0.9.11-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.11-alpha.0...react-tinacms@0.9.11-alpha.1) (2020-02-21)
 
+**Note:** Version bump only for package react-tinacms
+
+## [0.9.11-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.10...react-tinacms@0.9.11-alpha.0) (2020-02-20)
+
+**Note:** Version bump only for package react-tinacms
+
+## [0.9.10](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.10-alpha.1...react-tinacms@0.9.10) (2020-02-18)
+
+**Note:** Version bump only for package react-tinacms
+
+## [0.9.10-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.10-alpha.0...react-tinacms@0.9.10-alpha.1) (2020-02-16)
+
+**Note:** Version bump only for package react-tinacms
+
+## [0.9.10-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.9...react-tinacms@0.9.10-alpha.0) (2020-02-14)
+
+**Note:** Version bump only for package react-tinacms
+
+## [0.9.9](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.9-alpha.1...react-tinacms@0.9.9) (2020-02-11)
+
+**Note:** Version bump only for package react-tinacms
 
 ## [0.9.9-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.9-alpha.0...react-tinacms@0.9.9-alpha.1) (2020-02-11)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.9-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.8...react-tinacms@0.9.9-alpha.0) (2020-02-06)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.8](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.8-alpha.1...react-tinacms@0.9.8) (2020-02-03)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.8-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.7...react-tinacms@0.9.8-alpha.1) (2020-02-03)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.8-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.7...react-tinacms@0.9.8-alpha.0) (2020-01-29)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.7](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.7-alpha.0...react-tinacms@0.9.7) (2020-01-27)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.7-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.6...react-tinacms@0.9.7-alpha.0) (2020-01-24)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.6](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.6-alpha.1...react-tinacms@0.9.6) (2020-01-22)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.6-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.6-alpha.0...react-tinacms@0.9.6-alpha.1) (2020-01-22)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.6-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.5...react-tinacms@0.9.6-alpha.0) (2020-01-16)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.5](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.4...react-tinacms@0.9.5) (2020-01-14)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.4](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.4-alpha.1...react-tinacms@0.9.4) (2020-01-13)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.4-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.4-alpha.0...react-tinacms@0.9.4-alpha.1) (2020-01-10)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.3](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.3-alpha.1...react-tinacms@0.9.3) (2019-12-17)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.3-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.3-alpha.0...react-tinacms@0.9.3-alpha.1) (2019-12-17)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.3-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.2...react-tinacms@0.9.3-alpha.0) (2019-12-06)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.2](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.2-alpha.2...react-tinacms@0.9.2) (2019-12-02)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.2-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.2-alpha.1...react-tinacms@0.9.2-alpha.2) (2019-12-02)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.2-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.2-alpha.0...react-tinacms@0.9.2-alpha.1) (2019-11-28)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.2-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.1...react-tinacms@0.9.2-alpha.0) (2019-11-25)
 
 **Note:** Version bump only for package react-tinacms
-
-
-
-
 
 ## [0.9.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.1-alpha.0...react-tinacms@0.9.1) (2019-11-25)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 ## [0.9.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.0...react-tinacms@0.9.1-alpha.0) (2019-11-25)
-
 
 ### Bug Fixes
 
-* plugins no longer empty array ([ab2db96](https://github.com/tinacms/tinacms/commit/ab2db96))
-
-
-
-
+- plugins no longer empty array ([ab2db96](https://github.com/tinacms/tinacms/commit/ab2db96))
 
 # [0.9.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.0-alpha.1...react-tinacms@0.9.0) (2019-11-18)
 
 **Note:** Version bump only for package react-tinacms
 
-
-
-
-
 # [0.9.0-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.8.1...react-tinacms@0.9.0-alpha.1) (2019-11-18)
-
 
 ### Bug Fixes
 
-* **usePlugins:** can receive `undefined` pluginsc ([5fe0848](https://github.com/tinacms/tinacms/commit/5fe0848))
-
+- **usePlugins:** can receive `undefined` pluginsc ([5fe0848](https://github.com/tinacms/tinacms/commit/5fe0848))
 
 ### Features
 
-* **useForm:** creates a form ([edf6eda](https://github.com/tinacms/tinacms/commit/edf6eda))
-* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
-
-
-
-
+- **useForm:** creates a form ([edf6eda](https://github.com/tinacms/tinacms/commit/edf6eda))
+- **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
 
 # [0.9.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.8.1...react-tinacms@0.9.0-alpha.0) (2019-11-18)
 
-
 ### Bug Fixes
 
-* **usePlugins:** can receive `undefined` pluginsc ([5fe0848](https://github.com/tinacms/tinacms/commit/5fe0848))
-
+- **usePlugins:** can receive `undefined` pluginsc ([5fe0848](https://github.com/tinacms/tinacms/commit/5fe0848))
 
 ### Features
 
-* **useForm:** creates a form ([edf6eda](https://github.com/tinacms/tinacms/commit/edf6eda))
-* **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
-
-
-
-
+- **useForm:** creates a form ([edf6eda](https://github.com/tinacms/tinacms/commit/edf6eda))
+- **useLocalForm:** replaces useCMSForm ([d8a7351](https://github.com/tinacms/tinacms/commit/d8a7351))
 
 ## [0.8.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.8.0...react-tinacms@0.8.1) (2019-11-14)
 
-
 ### Bug Fixes
 
-* **useCMS:** should not look for tina on window ([00bcee7](https://github.com/tinacms/tinacms/commit/00bcee7))
-
-
-
-
+- **useCMS:** should not look for tina on window ([00bcee7](https://github.com/tinacms/tinacms/commit/00bcee7))
 
 ## 0.8.0 (2019-11-12)
 

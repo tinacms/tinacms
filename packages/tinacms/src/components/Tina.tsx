@@ -31,28 +31,39 @@ export interface TinaProps {
   cms: TinaCMS
   hidden?: boolean
   theme?: Theme
+  position?: SidebarPosition
 }
 
 export const Tina: React.FC<TinaProps> = ({
   cms,
   children,
   hidden,
+  position,
   theme: themeOverrides,
 }) => {
   useSubscribable(cms.sidebar)
   const theme: ThemeProps['theme'] = React.useMemo(
     () => ({
-      tinacms: merge(DefaultTheme, themeOverrides) as Theme,
+      tinacms: merge(DefaultTheme, cms.sidebar.theme, themeOverrides) as Theme,
     }),
     [DefaultTheme, themeOverrides]
   )
 
+  React.useEffect(() => {
+    if (typeof hidden !== 'undefined') {
+      cms.sidebar.hidden = hidden
+    }
+  }, [hidden])
+
   return (
     <CMSContext.Provider value={cms}>
-      <SiteWrapper open={cms.sidebar.isOpen} position={cms.sidebar.position}>
+      <SiteWrapper
+        open={cms.sidebar.isOpen}
+        position={position || cms.sidebar.position}
+      >
         {children}
       </SiteWrapper>
-      {!hidden && (
+      {!cms.sidebar.hidden && (
         <ThemeProvider theme={theme}>
           <ModalProvider>
             <TinaReset>
