@@ -63,3 +63,6 @@ export * from './components/modals/ModalFullscreen'
 
 // Form Actions Components
 export { ActionButton } from './components/ActionsMenu'
+
+// Media Manager
+export * from './media'
