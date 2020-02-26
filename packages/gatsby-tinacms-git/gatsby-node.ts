@@ -32,9 +32,11 @@ exports.onCreateDevServer = (
     pathToContent,
     gitRemote,
     sshKey,
+    maxBuildTime,
     ...routerOptions
   } = options
 
+  process.env.MAX_BUILD_TIME = maxBuildTime || '1000'
   const repo = new Repo(pathToRepo, pathToContent)
   // NOTE: Environment variables are always interpreted as strings. If TINA_CEE is set to anything, this will evaluate as true
   if (process.env.TINA_CEE !== undefined) {

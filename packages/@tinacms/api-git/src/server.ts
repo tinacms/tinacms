@@ -27,6 +27,7 @@ export interface GitServerConfig extends GitRouterConfig {
   pathToRepo: string
   pathToContent: string
   gitRemote?: string
+  maxBuildTime?: string
   sshKey?: string
 }
 
