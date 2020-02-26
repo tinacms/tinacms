@@ -30,7 +30,7 @@ import {
 } from '../../../commands/list-commands'
 import { insertTable } from '../../../commands/table-commands'
 import { imagePluginKey } from '../Image'
-import { wrapIn, lift, setBlockType } from 'prosemirror-commands'
+import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
 import styled, { css, ThemeProvider } from 'styled-components'
@@ -46,7 +46,6 @@ import {
   UnderlineIcon,
 } from '@tinacms/icons'
 import { radius, color, padding } from '@tinacms/styles'
-import { NodeRange } from 'prosemirror-model'
 
 // import { ImageControl } from './images'
 
