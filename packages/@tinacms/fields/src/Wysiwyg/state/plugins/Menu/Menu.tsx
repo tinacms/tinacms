@@ -112,13 +112,13 @@ export const Menu = (props: Props) => {
     }
 
     const handleScroll = () => {
-      const MenuWrapperDiv = menuRef.current.parentElement.parentElement
-      const WysiwygEditorDiv = MenuWrapperDiv.nextSibling
-      const startPosition = menuRef.current ? MenuWrapperDiv.offsetTop : 0
+      const menuWrapperDiv = menuRef.current.parentElement.parentElement
+      const wysiwygEditorDiv = menuWrapperDiv.nextSibling
+      const startPosition = menuRef.current ? menuWrapperDiv.offsetTop : 0
       const endPosition = menuRef.current
-        ? WysiwygEditorDiv.offsetHeight +
-          MenuWrapperDiv.offsetHeight +
-          MenuWrapperDiv.offsetTop
+        ? wysiwygEditorDiv.offsetHeight +
+          menuWrapperDiv.offsetHeight +
+          menuWrapperDiv.offsetTop
         : 0
 
       if (window.scrollY > startPosition && window.scrollY < endPosition) {
