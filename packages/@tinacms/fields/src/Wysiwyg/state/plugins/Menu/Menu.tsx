@@ -284,6 +284,7 @@ type MenuWrapperProps = {
 const MenuWrapper = styled.div<MenuWrapperProps>`
   position: relative;
   margin-bottom: 14px;
+  z-index: 10000;
 
   ${props =>
     props.menuFixed &&
