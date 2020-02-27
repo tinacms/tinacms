@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.1...@tinacms/fields@0.5.2-alpha.0) (2020-02-26)
+
+### Bug Fixes
+
+- blockquote option to toggle and not nest. ([dc8d12f](https://github.com/tinacms/tinacms/commit/dc8d12f))
+
 ## [0.5.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.1-alpha.0...@tinacms/fields@0.5.1) (2020-02-24)
 
 **Note:** Version bump only for package @tinacms/fields

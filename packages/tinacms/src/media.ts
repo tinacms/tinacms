@@ -15,16 +15,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { Subscribable } from '@tinacms/core'
 
-import * as React from 'react'
-import { MarkdownTranslator } from './Translator'
-import { Schema } from 'prosemirror-model'
+export interface Media {
+  directory: string
+  filename: string
+}
 
-export function useMarkdownTranslator(schema: Schema) {
-  // TODO: Use `wysiwyg:markdown` plugins
-  const translator = React.useMemo(() => MarkdownTranslator.fromSchema(schema), [
-    schema,
-  ])
+export interface MediaUploadOptions {
+  directory: string
+  file: File
+}
 
-  return [translator]
+export interface MediaStore {
+  accept: string
+  persist(files: MediaUploadOptions[]): Promise<Media[]>
+}
+
+export class MediaManager extends Subscribable {
+  constructor(public store: MediaStore) {
+    super()
+  }
 }

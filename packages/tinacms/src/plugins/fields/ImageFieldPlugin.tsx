@@ -37,14 +37,19 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
     <ImageUpload
       value={props.input.value}
       previewSrc={props.field.previewSrc(props.form.getState().values, props)}
-      onDrop={(acceptedFiles: any[]) => {
-        acceptedFiles.forEach(async (file: any) => {
-          await cms.api.git!.onUploadMedia!({
-            directory: props.field.uploadDir(props.form.getState().values),
-            content: file,
-          })
-          props.input.onChange(file.name)
-        })
+      onDrop={async ([file]: File[]) => {
+        const directory = props.field.uploadDir(props.form.getState().values)
+        const [media] = await cms.media.store.persist([
+          {
+            directory,
+            file,
+          },
+        ])
+        if (media) {
+          props.input.onChange(media.filename)
+        } else {
+          // TODO Handle failure
+        }
       }}
       onClear={
         props.field.clearable === false

@@ -31,7 +31,9 @@ import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
 import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
 import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
+import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
 import { Form } from '@tinacms/forms'
+import { MediaManager, MediaStore, MediaUploadOptions } from './media'
 import { Theme } from '@tinacms/styles'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
@@ -42,6 +44,7 @@ export interface TinaCMSConfig extends CMSConfig {
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
+  media = new MediaManager(new DummyMediaStore())
 
   constructor({ sidebar, ...config }: TinaCMSConfig) {
     super(config)
@@ -56,6 +59,7 @@ export class TinaCMS extends CMS {
     this.fields.add(ToggleFieldPlugin)
     this.fields.add(SelectFieldPlugin)
     this.fields.add(MarkdownFieldPlugin)
+    this.fields.add(HtmlFieldPlugin)
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
@@ -127,5 +131,17 @@ export class SidebarState extends Subscribable {
   set hidden(nextValue: boolean) {
     this._hidden = nextValue
     this.notifiySubscribers()
+  }
+}
+
+class DummyMediaStore implements MediaStore {
+  accept = '*'
+  async persist(files: MediaUploadOptions[]) {
+    alert('UPLOADING FILES')
+    console.log(files)
+    return files.map(({ directory, file }) => ({
+      directory,
+      filename: file.name,
+    }))
   }
 }

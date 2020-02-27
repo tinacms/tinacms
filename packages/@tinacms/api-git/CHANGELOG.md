@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.7-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.6...@tinacms/api-git@0.5.7-alpha.0) (2020-02-26)
+
+### Bug Fixes
+
+- **repo:** issue missing ssh_key warning in setup ([6787143](https://github.com/tinacms/tinacms/commit/6787143))
+
 ## [0.5.6](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.6-alpha.1...@tinacms/api-git@0.5.6) (2020-02-24)
 
 **Note:** Version bump only for package @tinacms/api-git
