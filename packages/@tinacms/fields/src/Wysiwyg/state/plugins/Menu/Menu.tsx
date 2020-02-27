@@ -45,7 +45,8 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
 } from '@tinacms/icons'
-import { TinaReset, radius, color, padding } from '@tinacms/styles'
+import { radius, color, padding } from '@tinacms/styles'
+import { MenuPortalProvider, useMenuPortal } from './MenuPortal'
 
 // import { ImageControl } from './images'
 
@@ -155,7 +156,7 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <MenuWrapper>
+      <MenuPortalProvider>
         {menuFixed && (
           <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
         )}
@@ -179,7 +180,7 @@ export const Menu = (props: Props) => {
         </MenuContainer>
         <FloatingTableMenu view={view} />
         <ImageMenu view={view} />
-      </MenuWrapper>
+      </MenuPortalProvider>
     </ThemeProvider>
   )
 }
@@ -272,10 +273,6 @@ const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
   width: ${props => props.menuBoundingBox.width}px;
 `
 
-const MenuWrapper = styled(TinaReset)`
-  position: relative;
-`
-
 type MenuContainerProps = {
   menuFixed: boolean
   menuBoundingBox: any
@@ -296,7 +293,6 @@ const MenuContainer = styled.div<MenuContainerProps>`
   border: 1px solid ${color.grey(2)};
   overflow: hidden;
   z-index: 100;
-  margin: 0 0 12px 0;
 
   ${props =>
     props.menuFixed &&
@@ -314,6 +310,7 @@ export const MenuButton = styled.button<{
   active?: boolean
   disabled?: boolean
   bottom?: boolean
+  ref?: any
 }>`
   ${MenuItem}
   background-color: ${p =>
@@ -366,13 +363,36 @@ export const MenuDropdownWrapper = styled.div`
   }
 `
 
-export const MenuButtonDropdown = styled.div<{ open: boolean }>`
+export const MenuButtonDropdown = styled(
+  ({ children, open, triggerRef, ...styleProps }) => {
+    const MenuPortal = useMenuPortal()
+    const [menuDropdownBoundingBox, setMenuDropdownBoundingBox] = useState<any>(
+      null
+    )
+
+    useEffect(() => {
+      console.log(menuDropdownBoundingBox)
+    }, [menuDropdownBoundingBox])
+
+    useEffect(() => {
+      if (triggerRef.current) {
+        setMenuDropdownBoundingBox(triggerRef.current.getBoundingClientRect())
+      }
+    }, [triggerRef])
+
+    return (
+      <MenuPortal>
+        <div {...styleProps}>{children}</div>
+      </MenuPortal>
+    )
+  }
+)`
   border-radius: ${radius()};
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  left: 0;
-  bottom: -8px;
+  bottom: -4px;
+  left: 0px;
   transform: translate3d(0, 100%, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
