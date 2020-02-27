@@ -49,7 +49,4 @@ export const MenuPortalProvider: React.FC = ({ children }) => {
   )
 }
 
-const MenuPortalWrapper = styled.div`
-  position: relative;
-  margin-bottom: 14px;
-`
+const MenuPortalWrapper = styled.div``
