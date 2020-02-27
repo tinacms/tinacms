@@ -114,7 +114,6 @@ export const Menu = (props: Props) => {
 
     const handleScroll = () => {
       const menuWrapperDiv = menuRef.current.parentElement
-      console.log(menuWrapperDiv)
       const wysiwygEditorDiv = menuWrapperDiv.nextSibling
       const startPosition = menuRef.current ? menuWrapperDiv.offsetTop : 0
       const endPosition = menuRef.current
@@ -168,10 +167,10 @@ export const Menu = (props: Props) => {
         >
           <MenuPortalProvider>
             <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-              {supportBlocks && <FormattingDropdown view={view} />}
               <BoldControl view={view} />
               <ItalicControl view={view} />
               <UnderlineControl view={view} />
+              {supportBlocks && <FormattingDropdown view={view} />}
               <LinkControl view={view} />
               {/* <ImageControl view={view} bottom={bottom} /> */}
               {supportBlocks && <TableControl view={view} bottom={bottom} />}
@@ -376,23 +375,40 @@ export const MenuDropdownWrapper = styled.div`
 export const MenuButtonDropdown = styled(
   ({ children, open, triggerRef, ...styleProps }) => {
     const MenuPortal = useMenuPortal()
+    const menuPortalRef = React.useRef<HTMLDivElement | null>(null)
+    const [menuPortalBoundingBox, setMenuPortalBoundingBox] = useState<any>(
+      null
+    )
     const [menuDropdownBoundingBox, setMenuDropdownBoundingBox] = useState<any>(
       null
     )
-
-    useEffect(() => {
-      console.log(menuDropdownBoundingBox)
-    }, [menuDropdownBoundingBox])
+    const [menuOffset, setMenuOffset] = useState(0)
 
     useEffect(() => {
       if (triggerRef.current) {
         setMenuDropdownBoundingBox(triggerRef.current.getBoundingClientRect())
       }
-    }, [triggerRef])
+    }, [triggerRef.current])
+
+    useEffect(() => {
+      if (menuPortalRef.current) {
+        setMenuPortalBoundingBox(menuPortalRef.current.getBoundingClientRect())
+      }
+    }, [menuPortalRef.current])
+
+    useEffect(() => {
+      if (menuPortalBoundingBox && menuDropdownBoundingBox) {
+        setMenuOffset(menuDropdownBoundingBox.x - menuPortalBoundingBox.x)
+      }
+    }, [menuPortalBoundingBox, menuDropdownBoundingBox])
 
     return (
       <MenuPortal>
-        <div {...styleProps}>{children}</div>
+        <Offset offset={menuOffset}>
+          <div ref={menuPortalRef} {...styleProps}>
+            {children}
+          </div>
+        </Offset>
       </MenuPortal>
     )
   }
@@ -402,7 +418,7 @@ export const MenuButtonDropdown = styled(
   display: block;
   position: absolute;
   bottom: -4px;
-  left: 0px;
+  left: 0;
   transform: translate3d(0, 100%, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
@@ -411,6 +427,7 @@ export const MenuButtonDropdown = styled(
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1);
   background-color: white;
   overflow: hidden;
+
   ${props =>
     props.open &&
     css`
@@ -418,6 +435,11 @@ export const MenuButtonDropdown = styled(
       pointer-events: all;
       transform: translate3d(0, 100%, 0) scale3d(1, 1, 1);
     `};
+`
+
+const Offset = styled.div<{ offset: number }>`
+  position: absolute;
+  left: ${props => props.offset}px;
 `
 
 export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
