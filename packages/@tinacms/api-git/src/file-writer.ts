@@ -52,8 +52,6 @@ class FileChangeQueue {
 
 const queue = new FileChangeQueue()
 
-const MAX_BUILD_TIME = 1000
-
 export function writeFile(filepath: string, content: string | Buffer) {
   count++
   cacheCommand(filepath, content)
@@ -108,7 +106,9 @@ function tryToWrite() {
       // Temp solution; we haven't figured out how to
       // call `buildFinished` when Gatsby's build actually
       // finishes.
-      setTimeout(buildFinished, MAX_BUILD_TIME)
+      const TINA_GIT_DEBOUNCE_MS =
+        Number(process.env.TINA_GIT_DEBOUNCE_MS) || 1000
+      setTimeout(buildFinished, TINA_GIT_DEBOUNCE_MS)
     }
   })
 }

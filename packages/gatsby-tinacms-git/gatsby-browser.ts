@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { GitClient } from '@tinacms/git-client'
+import { GitClient, GitMediaStore } from '@tinacms/git-client'
 
 declare let window: any
 
@@ -29,7 +29,9 @@ exports.onClientEntry = () => {
     port != '80' ? `:${port}` : ''
   }/___tina`
 
-  window.tinacms.registerApi('git', new GitClient(baseUrl))
+  const client = new GitClient(baseUrl)
+  window.tinacms.registerApi('git', client)
+  window.tinacms.media.store = new GitMediaStore(client)
 }
 
 const ERROR_TINACMS_NOT_FOUND = `\`window.tinacms\` not found

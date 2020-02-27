@@ -16,15 +16,18 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './HtmlFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
-export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
+import * as React from 'react'
+import { MarkdownTranslator, Format, DOMTranslator } from './Translator'
+import { Schema } from 'prosemirror-model'
+
+export function useProsemirrorTranslator(
+  schema: Schema,
+  format: Format = 'markdown'
+) {
+  const translator = React.useMemo(() => {
+    if (format === 'html') return DOMTranslator.fromSchema(schema)
+    return MarkdownTranslator.fromSchema(schema)
+  }, [schema])
+
+  return [translator]
+}

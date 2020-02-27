@@ -22,8 +22,9 @@ import { Plugin } from '@tinacms/core'
 
 import { createEditorState } from './state'
 import { useProsemirrorSchema } from './useProsemirrorSchema'
-import { useMarkdownTranslator } from './useMarkdownTranslator'
+import { useProsemirrorTranslator } from './useProsemirrorTranslator'
 import { nodeViews } from './node-views'
+import { Format } from './Translator'
 
 interface CheckableEditorView extends EditorView {
   docView: NodeView | null
@@ -36,11 +37,12 @@ export interface Input {
   onBlur(): void
 }
 
-export function useTinaProsemirror(
+export function useProsemirror(
   input: Input,
   plugins: Plugin[] = [],
   theme?: any,
-  sticky?: boolean
+  sticky?: boolean,
+  format?: Format
 ) {
   /**
    * Construct the Prosemirror Schema
@@ -50,7 +52,7 @@ export function useTinaProsemirror(
   /**
    * Create a MarkdownTranslattor based on the schema
    */
-  const [translator] = useMarkdownTranslator(schema)
+  const [translator] = useProsemirrorTranslator(schema, format)
 
   /**
    * A reference to the DOM Node where the prosemirror editor will be added.

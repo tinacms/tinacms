@@ -11,6 +11,25 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 
 ### Features
 
+# [0.15.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0...tinacms@0.15.0-alpha.0) (2020-02-26)
+
+### Bug Fixes
+
+- **sidebar:** fix layout issue with sidebar header ([cc86f50](https://github.com/tinacms/tinacms/commit/cc86f50))
+
+### Features
+
+- add useScreenPlugin for react ([7236374](https://github.com/tinacms/tinacms/commit/7236374))
+- createScreen helps with making plugins ([1a35617](https://github.com/tinacms/tinacms/commit/1a35617))
+
+# [0.14.0](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0-alpha.1...tinacms@0.14.0) (2020-02-24)
+
+### Bug Fixes
+
+- **sidebar:** fix toggling hidden state ([254326c](https://github.com/tinacms/tinacms/commit/254326c))
+
+### Features
+
 - **Sidebar:** set the text of save/reset buttons ([5af1516](https://github.com/tinacms/tinacms/commit/5af1516)), closes [#620](https://github.com/tinacms/tinacms/issues/620) [#647](https://github.com/tinacms/tinacms/issues/647)
 
 # [0.14.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0-alpha.0...tinacms@0.14.0-alpha.1) (2020-02-21)

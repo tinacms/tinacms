@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.4-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.3...next-tinacms-json@0.3.4-alpha.0) (2020-02-26)
+
+### Bug Fixes
+
+- **useJsonForm:** update writeToDisk when file is changed ([8e90273](https://github.com/tinacms/tinacms/commit/8e90273)), closes [#790](https://github.com/tinacms/tinacms/issues/790)
+
 ## [0.3.3](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.3-alpha.1...next-tinacms-json@0.3.3) (2020-02-24)
 
 **Note:** Version bump only for package next-tinacms-json

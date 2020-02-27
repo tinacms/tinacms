@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.1.2...react-tinacms-inline@0.2.0-alpha.0) (2020-02-26)
+
+### Features
+
+- **InlineForm:** accept optional defaultStatus ([1f30cb2](https://github.com/tinacms/tinacms/commit/1f30cb2))
+
 ## [0.1.2](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.1.2-alpha.1...react-tinacms-inline@0.1.2) (2020-02-24)
 
 **Note:** Version bump only for package react-tinacms-inline

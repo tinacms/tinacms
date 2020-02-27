@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/api-git",
-  "version": "0.5.6",
+  "version": "0.5.7-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",

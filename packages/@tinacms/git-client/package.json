@@ -29,6 +29,10 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.12"
+    "@tinacms/scripts": "^0.1.12",
+    "tinacms": "^0.15.0-alpha.0"
+  },
+  "peerDependencies": {
+    "tinacms": ">=0.15"
   }
 }
