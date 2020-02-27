@@ -167,10 +167,10 @@ export const Menu = (props: Props) => {
         >
           <MenuPortalProvider>
             <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
+              {supportBlocks && <FormattingDropdown view={view} />}
               <BoldControl view={view} />
               <ItalicControl view={view} />
               <UnderlineControl view={view} />
-              {supportBlocks && <FormattingDropdown view={view} />}
               <LinkControl view={view} />
               {/* <ImageControl view={view} bottom={bottom} /> */}
               {supportBlocks && <TableControl view={view} bottom={bottom} />}
