@@ -113,7 +113,8 @@ export const Menu = (props: Props) => {
     }
 
     const handleScroll = () => {
-      const menuWrapperDiv = menuRef.current.parentElement.parentElement
+      const menuWrapperDiv = menuRef.current.parentElement
+      console.log(menuWrapperDiv)
       const wysiwygEditorDiv = menuWrapperDiv.nextSibling
       const startPosition = menuRef.current ? menuWrapperDiv.offsetTop : 0
       const endPosition = menuRef.current
@@ -156,31 +157,34 @@ export const Menu = (props: Props) => {
 
   return (
     <ThemeProvider theme={theme}>
-      <MenuPortalProvider>
+      <>
         {menuFixed && (
           <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
         )}
-        <MenuContainer
+        <MenuWrapper
           menuFixed={menuFixed}
           menuBoundingBox={menuBoundingBox}
           ref={menuRef}
-          onMouseDown={preventProsemirrorFocusLoss}
         >
-          {supportBlocks && <FormattingDropdown view={view} />}
-          <BoldControl view={view} />
-          <ItalicControl view={view} />
-          <UnderlineControl view={view} />
-          <LinkControl view={view} />
-          {/* <ImageControl view={view} bottom={bottom} /> */}
-          {supportBlocks && <TableControl view={view} bottom={bottom} />}
-          {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
-          {supportBlocks && <CodeControl view={view} bottom={bottom} />}
-          {supportBlocks && <BulletList view={view} bottom={bottom} />}
-          {supportBlocks && <OrderedList view={view} bottom={bottom} />}
-        </MenuContainer>
+          <MenuPortalProvider>
+            <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
+              {supportBlocks && <FormattingDropdown view={view} />}
+              <BoldControl view={view} />
+              <ItalicControl view={view} />
+              <UnderlineControl view={view} />
+              <LinkControl view={view} />
+              {/* <ImageControl view={view} bottom={bottom} /> */}
+              {supportBlocks && <TableControl view={view} bottom={bottom} />}
+              {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
+              {supportBlocks && <CodeControl view={view} bottom={bottom} />}
+              {supportBlocks && <BulletList view={view} bottom={bottom} />}
+              {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+            </MenuContainer>
+          </MenuPortalProvider>
+        </MenuWrapper>
         <FloatingTableMenu view={view} />
         <ImageMenu view={view} />
-      </MenuPortalProvider>
+      </>
     </ThemeProvider>
   )
 }
@@ -273,12 +277,25 @@ const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
   width: ${props => props.menuBoundingBox.width}px;
 `
 
-type MenuContainerProps = {
+type MenuWrapperProps = {
   menuFixed: boolean
   menuBoundingBox: any
 }
 
-const MenuContainer = styled.div<MenuContainerProps>`
+const MenuWrapper = styled.div<MenuWrapperProps>`
+  position: relative;
+  margin-bottom: 14px;
+
+  ${props =>
+    props.menuFixed &&
+    css`
+      position: fixed;
+      width: ${props.menuBoundingBox.width}px;
+      top: 0;
+    `};
+`
+
+const MenuContainer = styled.div`
   display: flex;
   flex-direction: row;
   justify-content: flex-start;
@@ -293,13 +310,6 @@ const MenuContainer = styled.div<MenuContainerProps>`
   border: 1px solid ${color.grey(2)};
   overflow: hidden;
   z-index: 100;
-
-  ${props =>
-    props.menuFixed &&
-    css`
-      position: fixed;
-      width: ${props.menuBoundingBox.width}px;
-    `};
 `
 
 const MenuItem = css`
