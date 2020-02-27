@@ -18,7 +18,7 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react'
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
@@ -313,7 +313,7 @@ const MenuContainer = styled.div`
 `
 
 const MenuItem = css`
-  flex: 1 1 36px;
+  flex: 1 1 24px;
 `
 
 export const MenuButton = styled.button<{
@@ -330,7 +330,7 @@ export const MenuButton = styled.button<{
   border: 1px solid ${color.grey(2)};
   margin: -1px;
   outline: none;
-  padding: 6px;
+  padding: 6px 4px;
   transition: all 85ms ease-out;
   cursor: pointer;
   display: flex;
@@ -377,31 +377,13 @@ export const MenuButtonDropdown = styled(
   ({ children, open, triggerRef, ...styleProps }) => {
     const MenuPortal = useMenuPortal()
     const menuPortalRef = React.useRef<HTMLDivElement | null>(null)
-    const [menuPortalBoundingBox, setMenuPortalBoundingBox] = useState<any>(
-      null
-    )
-    const [menuDropdownBoundingBox, setMenuDropdownBoundingBox] = useState<any>(
-      null
-    )
-    const [menuOffset, setMenuOffset] = useState(0)
 
-    useEffect(() => {
-      if (triggerRef.current) {
-        setMenuDropdownBoundingBox(triggerRef.current.getBoundingClientRect())
-      }
-    }, [triggerRef.current])
-
-    useEffect(() => {
-      if (menuPortalRef.current) {
-        setMenuPortalBoundingBox(menuPortalRef.current.getBoundingClientRect())
-      }
-    }, [menuPortalRef.current])
-
-    useEffect(() => {
-      if (menuPortalBoundingBox && menuDropdownBoundingBox) {
-        setMenuOffset(menuDropdownBoundingBox.x - menuPortalBoundingBox.x)
-      }
-    }, [menuPortalBoundingBox, menuDropdownBoundingBox])
+    const menuOffset = useMemo(() => {
+      if (!triggerRef.current || !menuPortalRef.current) return 0
+      const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
+      const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
+      return menuDropdownBoundingBox.x - menuPortalBoundingBox.x
+    }, [triggerRef.current, menuPortalRef.current])
 
     return (
       <MenuPortal>
