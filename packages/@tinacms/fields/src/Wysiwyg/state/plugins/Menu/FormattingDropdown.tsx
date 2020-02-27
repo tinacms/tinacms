@@ -45,6 +45,7 @@ export class FormattingDropdown extends React.Component<
   state = {
     active: false,
   }
+  menuButtonRef = React.createRef()
   toggle = () => this.setState(({ active }) => ({ active: !active }))
   blockQuote = () =>
     wrapIn(this.props.view.state.schema.nodes.blockquote)(
@@ -57,13 +58,17 @@ export class FormattingDropdown extends React.Component<
     return (
       <MenuDropdownWrapper>
         <MenuButton
+          ref={this.menuButtonRef}
           data-tooltip={'Heading'}
           onClick={this.toggle}
           active={this.state.active}
         >
           <HeadingIcon />
         </MenuButton>
-        <MenuButtonDropdown open={this.state.active}>
+        <MenuButtonDropdown
+          triggerRef={this.menuButtonRef}
+          open={this.state.active}
+        >
           <Dismissible
             click
             escape
@@ -72,7 +77,6 @@ export class FormattingDropdown extends React.Component<
               this.toggle()
             }}
           >
-            <NoHeading view={view} onClick={this.toggle} />
             <H1 view={view} onClick={this.toggle} />
             <H2 view={view} onClick={this.toggle} />
             <H3 view={view} onClick={this.toggle} />
@@ -106,44 +110,28 @@ const BaseHeading = css`
   white-space: nowrap;
   line-height: 1;
   display: block;
+  margin: 0;
 `
 
-const HeadingZero = styled.div`
-  font-size: 16px;
+const HeadingOne = styled.h1`
   ${BaseHeading}
 `
-const HeadingOne = styled.div`
-  font-size: 40px;
+const HeadingTwo = styled.h2`
   ${BaseHeading}
 `
-const HeadingTwo = styled.div`
-  font-size: 34px;
+const HeadingThree = styled.h3`
   ${BaseHeading}
 `
-const HeadingThree = styled.div`
-  font-size: 26px;
+const HeadingFour = styled.h4`
   ${BaseHeading}
 `
-const HeadingFour = styled.div`
-  font-size: 21px;
+const HeadingFive = styled.h5`
   ${BaseHeading}
 `
-const HeadingFive = styled.div`
-  font-size: 18px;
-  ${BaseHeading}
-`
-const HeadingSix = styled.div`
-  font-size: 16px;
+const HeadingSix = styled.h6`
   ${BaseHeading}
 `
 
-const NoHeading = blockTool({
-  Component: HeadingZero,
-  children: 'Normal Text',
-  command: makeToggleHeader(0),
-  typeName: 'normal',
-  attrs: { level: 0 },
-})
 const H1 = blockTool({
   Component: HeadingOne,
   children: 'Heading 1',
