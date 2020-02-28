@@ -24,6 +24,7 @@ import { ALL_PLUGINS } from './default-plugins'
 import { CodeMirrorCss } from './CodeMirrorCss'
 import { ProseMirrorCss } from './ProseMirrorCss'
 import { Format } from './Translator'
+import Menu from './state/plugins/Menu'
 
 interface Wysiwyg {
   input: any
@@ -35,24 +36,36 @@ interface Wysiwyg {
 export const Wysiwyg = styled(
   ({ input, plugins, sticky, format, ...styleProps }: any) => {
     const theme = React.useContext(ThemeContext) || {}
-    const prosemirrorEl = useProsemirror(
+    const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
       input,
       ALL_PLUGINS,
       theme,
-      sticky,
       format
     )
 
     return (
-      <>
+      <WysiwygWrapper>
         <link
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
         />
+        {editorView && (
+          <Menu
+            view={editorView}
+            bottom={false}
+            translator={translator}
+            theme={theme}
+            sticky={sticky}
+          />
+        )}
         <div {...styleProps} ref={prosemirrorEl} />
-      </>
+      </WysiwygWrapper>
     )
   }
 )`
   ${CodeMirrorCss}${ProseMirrorCss}
+`
+
+const WysiwygWrapper = styled.div`
+  position: relative;
 `
