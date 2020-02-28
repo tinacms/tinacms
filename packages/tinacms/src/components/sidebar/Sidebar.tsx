@@ -223,7 +223,7 @@ const MenuLink = styled.div<{ value: string }>`
 
 const SidebarHeader = styled.div`
   display: grid;
-  grid-template-areas: "hamburger actions";
+  grid-template-areas: 'hamburger actions';
   align-items: center;
   z-index: 1050;
   height: ${SIDEBAR_HEADER_HEIGHT}px;
