@@ -61,7 +61,8 @@ const Alert = styled.div<{ level: AlertLevel; index: number }>`
     }
   }};
   position: absolute;
-  bottom: ${({ index }) => index + 1}rem;
+  bottom: ${({ index }) => (index + 1) * 3}rem;
+  left: 5rem;
   width: 50%;
   margin-left: auto;
   margin-right: auto;
