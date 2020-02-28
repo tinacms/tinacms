@@ -28,10 +28,11 @@ export function Alerts() {
 
   return (
     <>
-      {cms.alerts.all.map(alert => {
+      {cms.alerts.all.reverse().map((alert, i) => {
         return (
           <Alert
             key={alert.message}
+            index={i}
             level={alert.level}
             onClick={() => {
               cms.alerts.dismiss(alert)
@@ -45,7 +46,7 @@ export function Alerts() {
   )
 }
 
-const Alert = styled.div<{ level: AlertLevel }>`
+const Alert = styled.div<{ level: AlertLevel; index: number }>`
   border: 1px solid green;
   background: ${({ level }) => {
     switch (level) {
@@ -60,7 +61,7 @@ const Alert = styled.div<{ level: AlertLevel }>`
     }
   }};
   position: absolute;
-  bottom: 1rem;
+  bottom: ${({ index }) => index + 1}rem;
   width: 50%;
   margin-left: auto;
   margin-right: auto;
