@@ -41,7 +41,6 @@ export function useProsemirror(
   input: Input,
   plugins: Plugin[] = [],
   theme?: any,
-  sticky?: boolean,
   format?: Format
 ) {
   /**
@@ -69,7 +68,7 @@ export function useProsemirror(
    * CreateState
    */
   const createState = React.useCallback((value: string) => {
-    return createEditorState(schema, translator, plugins, value, theme, sticky)
+    return createEditorState(schema, translator, plugins, value, theme)
   }, [])
 
   /**
@@ -104,6 +103,7 @@ export function useProsemirror(
           const nextState: any = editorView.state.apply(tr as any)
 
           editorView.updateState(nextState as any)
+          setEditorView(editorView)
 
           if (tr.docChanged) {
             input.onChange(translator!.stringFromNode(tr.doc))
@@ -117,7 +117,7 @@ export function useProsemirror(
        */
       return () => {
         setEditorView(undefined)
-        editorView.destroy()
+        if (editorView) editorView.destroy()
       }
     },
     /**
@@ -142,5 +142,5 @@ export function useProsemirror(
     }
   }, [input.value, editorView, document])
 
-  return elRef
+  return { elRef, editorView, translator }
 }
