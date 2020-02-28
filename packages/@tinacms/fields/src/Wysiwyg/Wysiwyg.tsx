@@ -44,7 +44,7 @@ export const Wysiwyg = styled(
     )
 
     return (
-      <>
+      <WysiwygWrapper>
         <link
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
@@ -59,9 +59,13 @@ export const Wysiwyg = styled(
           />
         )}
         <div {...styleProps} ref={prosemirrorEl} />
-      </>
+      </WysiwygWrapper>
     )
   }
 )`
   ${CodeMirrorCss}${ProseMirrorCss}
+`
+
+const WysiwygWrapper = styled.div`
+  position: relative;
 `
