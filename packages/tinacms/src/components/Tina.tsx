@@ -24,6 +24,7 @@ import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS, SidebarPosition } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
+import { Alerts } from './Alerts'
 
 const merge = require('lodash.merge')
 
@@ -67,6 +68,7 @@ export const Tina: React.FC<TinaProps> = ({
         <ThemeProvider theme={theme}>
           <ModalProvider>
             <TinaReset>
+              <Alerts />
               <Sidebar />
             </TinaReset>
           </ModalProvider>
