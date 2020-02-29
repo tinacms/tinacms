@@ -28,11 +28,11 @@ import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 
 interface FloatingImageMenu {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 export default (props: FloatingImageMenu) => {
-  const { view } = props
+  const { view } = props.editorView
   const { selectedImage } = imagePluginKey.getState(view.state)
   if (!selectedImage) return null
   const { node, pos } = selectedImage
