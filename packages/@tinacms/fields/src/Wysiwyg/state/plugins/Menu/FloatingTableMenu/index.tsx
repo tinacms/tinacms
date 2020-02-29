@@ -24,7 +24,7 @@ import FloatingTableAddMenu from './FloatingTableAddMenu'
 import TableOptionsMenu from './TableOptionsMenu'
 
 interface FloatingTableMenuProps {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 export const FloatingTableMenu = (props: FloatingTableMenuProps) => {

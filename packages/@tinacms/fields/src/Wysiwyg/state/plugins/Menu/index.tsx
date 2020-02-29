@@ -23,18 +23,24 @@ import { Translator } from '../../../Translator'
 import { TranslatorContext } from './TranslatorContext'
 
 interface MenuProps {
-  view: EditorView
+  editorView: { view: EditorView }
   translator: Translator
   bottom?: boolean
   theme?: any
   sticky?: boolean
 }
 
-export default ({ view, translator, bottom, theme, sticky }: MenuProps) => {
+export default ({
+  editorView,
+  translator,
+  bottom,
+  theme,
+  sticky,
+}: MenuProps) => {
   return (
     <TranslatorContext.Provider value={translator}>
       <Menu
-        view={view}
+        editorView={editorView}
         bottom={bottom}
         format="markdown"
         theme={theme}

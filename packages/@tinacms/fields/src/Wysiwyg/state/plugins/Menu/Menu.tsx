@@ -53,7 +53,7 @@ import { MenuPortalProvider, useMenuPortal } from './MenuPortal'
 interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
-  view: EditorView
+  editorView: { view: EditorView }
   theme: any
   sticky?: boolean | string
 }
@@ -95,7 +95,7 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { view, bottom = false, theme, sticky = true } = props
+  const { editorView, bottom = false, theme, sticky = true } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
@@ -152,6 +152,7 @@ export const Menu = (props: Props) => {
     e.preventDefault()
   }, [])
 
+  const { view } = editorView
   return (
     <ThemeProvider theme={theme}>
       <>
@@ -180,8 +181,8 @@ export const Menu = (props: Props) => {
             </MenuContainer>
           </MenuPortalProvider>
         </MenuWrapper>
-        <FloatingTableMenu view={view} />
-        <ImageMenu view={view} />
+        <FloatingTableMenu editorView={editorView} />
+        <ImageMenu editorView={editorView} />
       </>
     </ThemeProvider>
   )
