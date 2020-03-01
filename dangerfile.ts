@@ -166,7 +166,7 @@ ${changes
 const fileLink = (file: string) => {
   const filename = file.split('/').pop()
 
-  return `[${filename}](https://github.com/tinacms/tinacms-site/tree/master/${file})`
+  return `[${filename}](https://github.com/tinacms/tinacms.org/tree/master/${file})`
 }
 
 /**
