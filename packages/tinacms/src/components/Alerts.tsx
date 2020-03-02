@@ -38,7 +38,7 @@ export function Alerts() {
     <>
       {cms.alerts.all.length > 0 && (
         <AlertContainer>
-          {cms.alerts.all.reverse().map((alert, i) => {
+          {cms.alerts.all.map((alert, i) => {
             return (
               <Alert
                 key={alert.id}
