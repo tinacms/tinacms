@@ -41,7 +41,7 @@ export function Alerts() {
           {cms.alerts.all.reverse().map((alert, i) => {
             return (
               <Alert
-                key={alert.message}
+                key={alert.id}
                 index={i}
                 level={alert.level}
                 onClick={() => {

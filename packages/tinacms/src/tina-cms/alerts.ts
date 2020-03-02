@@ -30,9 +30,10 @@ export class Alerts extends Subscribable {
       level,
       message,
       timeout,
+      id: `${message}|${Date.now()}`,
     }
 
-    this.alerts.set(alert.message, alert)
+    this.alerts.set(alert.id, alert)
 
     this.notifiySubscribers()
 
@@ -49,7 +50,7 @@ export class Alerts extends Subscribable {
   }
 
   dismiss(alert: Alert) {
-    this.alerts.delete(alert.message)
+    this.alerts.delete(alert.id)
     this.notifiySubscribers()
   }
 
@@ -74,6 +75,7 @@ export class Alerts extends Subscribable {
 export type AlertLevel = 'info' | 'success' | 'warn' | 'error'
 
 export interface Alert {
+  id: string
   level: AlertLevel
   message: string
   timeout: number
