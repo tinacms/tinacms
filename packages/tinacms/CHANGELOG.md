@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.15.0](https://github.com/tinacms/tinacms/compare/tinacms@0.15.0-alpha.0...tinacms@0.15.0) (2020-03-02)
+
+### Features
+
+- added API for triggering alerts ([e396699](https://github.com/tinacms/tinacms/commit/e396699)), closes [#821](https://github.com/tinacms/tinacms/issues/821)
+- **Fields:** added an HTML field plugin ([f12cf3e](https://github.com/tinacms/tinacms/commit/f12cf3e))
+
 # [0.15.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.14.0...tinacms@0.15.0-alpha.0) (2020-02-26)
 
 ### Bug Fixes

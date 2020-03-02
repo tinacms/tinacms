@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.21-alpha.0...gatsby-tinacms-git@0.3.0) (2020-03-02)
+
+### Features
+
+- **media:** implement GitMediaStore in gatsby-tinacms-git ([5b2fcbe](https://github.com/tinacms/tinacms/commit/5b2fcbe))
+- **MediaStore:** add git backed media store ([a5b9ea4](https://github.com/tinacms/tinacms/commit/a5b9ea4))
+
 ## [0.2.21-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.2.20...gatsby-tinacms-git@0.2.21-alpha.0) (2020-02-26)
 
 **Note:** Version bump only for package gatsby-tinacms-git
