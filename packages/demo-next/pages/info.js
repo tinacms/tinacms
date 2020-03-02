@@ -14,12 +14,14 @@ limitations under the License.
 import matter from 'gray-matter'
 import { useLocalMarkdownForm, markdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
+import { useCMS } from 'tinacms'
 import { InlineForm, InlineTextField } from 'react-tinacms-inline'
 import { EditToggle, DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'
 
 function Info(props) {
+  const cms = useCMS()
   const [data, form] = useLocalMarkdownForm(props.markdownFile, formOptions)
 
   return (
@@ -30,6 +32,34 @@ function Info(props) {
         siteDescription={props.description}
       >
         <section>
+          <div>
+            <button
+              onClick={() => cms.alerts.info(`This is some info ${new Date()}`)}
+            >
+              Info
+            </button>
+            <button
+              onClick={() => cms.alerts.success(`Hoorayyyy ${new Date()}`)}
+            >
+              Success
+            </button>
+            <button
+              onClick={() =>
+                cms.alerts.warn(
+                  `You really shouldnt do that friend ${new Date()}`
+                )
+              }
+            >
+              Warn
+            </button>
+            <button
+              onClick={() =>
+                cms.alerts.error(`Everything went wrong ${new Date()}`)
+              }
+            >
+              Error
+            </button>
+          </div>
           <EditToggle />
           <DiscardChanges />
           <h1>
