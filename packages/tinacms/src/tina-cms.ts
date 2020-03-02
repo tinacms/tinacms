@@ -35,6 +35,7 @@ import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from './media'
 import { Theme } from '@tinacms/styles'
+import { Alerts } from './tina-cms/alerts'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
@@ -45,6 +46,7 @@ export interface TinaCMSConfig extends CMSConfig {
 export class TinaCMS extends CMS {
   sidebar: SidebarState
   media = new MediaManager(new DummyMediaStore())
+  alerts = new Alerts()
 
   constructor({ sidebar, ...config }: TinaCMSConfig) {
     super(config)
