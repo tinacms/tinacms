@@ -24,7 +24,7 @@ export class Alerts extends Subscribable {
   private add(
     level: AlertLevel,
     message: string,
-    timeout: number = 5000
+    timeout: number = 3000
   ): () => void {
     const alert = {
       level,
