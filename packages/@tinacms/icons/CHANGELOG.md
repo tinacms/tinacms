@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.2...@tinacms/icons@0.6.0) (2020-03-02)
+
+### Features
+
+- add alert, error, info & warning icons ([21a9a98](https://github.com/tinacms/tinacms/commit/21a9a98))
+
 ## [0.5.2](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.2-alpha.0...@tinacms/icons@0.5.2) (2020-02-18)
 
 **Note:** Version bump only for package @tinacms/icons
