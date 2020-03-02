@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.15.0-alpha.0",
+  "version": "0.15.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -36,12 +36,12 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.7.1",
-    "@tinacms/fields": "^0.5.2-alpha.0",
+    "@tinacms/fields": "^0.6.0",
     "@tinacms/form-builder": "^0.2.15",
     "@tinacms/forms": "^0.2.0",
-    "@tinacms/icons": "^0.5.2",
+    "@tinacms/icons": "^0.6.0",
     "@tinacms/react-core": "^0.2.7",
-    "@tinacms/styles": "^0.1.2",
+    "@tinacms/styles": "^0.2.0",
     "@types/react-beautiful-dnd": "^11.0.3",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
