@@ -18,7 +18,9 @@
 
 import { useCMS, useSubscribable } from '../react-tinacms'
 import React from 'react'
-import styled from 'styled-components'
+import styled, { css, keyframes } from 'styled-components'
+import { padding, color, radius, font, shadow } from '@tinacms/styles'
+import { AlertIcon, InfoIcon, WarningIcon, ErrorIcon } from '@tinacms/icons'
 import { AlertLevel } from '../tina-cms/alerts'
 
 export function Alerts() {
@@ -28,42 +30,108 @@ export function Alerts() {
 
   return (
     <>
-      {cms.alerts.all.reverse().map((alert, i) => {
-        return (
-          <Alert
-            key={alert.message}
-            index={i}
-            level={alert.level}
-            onClick={() => {
-              cms.alerts.dismiss(alert)
-            }}
-          >
-            {alert.message}
-          </Alert>
-        )
-      })}
+      {cms.alerts.all.length > 0 && (
+        <AlertContainer>
+          {cms.alerts.all.reverse().map((alert, i) => {
+            return (
+              <Alert
+                key={alert.message}
+                index={i}
+                level={alert.level}
+                onClick={() => {
+                  cms.alerts.dismiss(alert)
+                }}
+              >
+                {alert.level === 'info' && <InfoIcon />}
+                {alert.level === 'success' && <AlertIcon />}
+                {alert.level === 'warn' && <WarningIcon />}
+                {alert.level === 'error' && <ErrorIcon />}
+                {alert.message}
+              </Alert>
+            )
+          })}
+        </AlertContainer>
+      )}
     </>
   )
 }
 
+const AlertContainer = styled.div`
+  position: fixed;
+  bottom: 0;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0);
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+`
+
+const AlertEntranceAnimation = keyframes`
+  0% {
+    opacity: 0;
+    transform: translate3d(0, 100%, 0);
+  }
+  100% {
+    opacity: 1;
+    transform: translate3d(0, 0, 0);
+  }
+`
+
 const Alert = styled.div<{ level: AlertLevel; index: number }>`
-  border: 1px solid green;
-  background: ${({ level }) => {
-    switch (level) {
-      case 'info':
-        return 'gray'
-      case 'success':
-        return 'green'
-      case 'warn':
-        return 'yellow'
-      case 'error':
-        return 'red'
-    }
-  }};
-  position: absolute;
-  bottom: ${({ index }) => (index + 1) * 3}rem;
-  left: 5rem;
-  width: 50%;
-  margin-left: auto;
-  margin-right: auto;
+  text-align: center;
+  border: 0;
+  border-radius: ${radius('small')};
+  box-shadow: ${shadow('small')};
+  background-color: ${color.grey(1)};
+  border: 1px solid ${color.grey(2)};
+  color: ${color.grey(9)};
+  fill: ${color.primary()};
+  font-weight: 500;
+  cursor: pointer;
+  font-size: ${font.size(2)};
+  padding: 8px 12px;
+  transition: all 85ms ease-out;
+  margin-bottom: 16px;
+  display: flex;
+  align-items: center;
+
+  animation-name: ${AlertEntranceAnimation};
+  animation-timing-function: ease-out;
+  animation-iteration-count: 1;
+  animation-fill-mode: both;
+  animation-duration: 150ms;
+
+  svg {
+    width: 20px;
+    height: 20px;
+    margin-right: 8px;
+  }
+
+  ${props =>
+    props.level === 'info' &&
+    css`
+      fill: ${color.primary()};
+      border-left: 6px solid ${color.primary()};
+    `};
+
+  ${props =>
+    props.level === 'success' &&
+    css`
+      fill: ${color.success()};
+      border-left: 6px solid ${color.success()};
+    `};
+
+  ${props =>
+    props.level === 'warn' &&
+    css`
+      fill: ${color.warning('dark')};
+      border-left: 6px solid ${color.warning()};
+    `};
+
+  ${props =>
+    props.level === 'error' &&
+    css`
+      fill: ${color.error()};
+      border-left: 6px solid ${color.error()};
+    `};
 `
