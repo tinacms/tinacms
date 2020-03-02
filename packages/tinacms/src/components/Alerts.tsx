@@ -19,7 +19,7 @@
 import { useCMS, useSubscribable } from '../react-tinacms'
 import React from 'react'
 import styled, { css, keyframes } from 'styled-components'
-import { padding, color, radius, font, shadow } from '@tinacms/styles'
+import { color, radius, font, shadow } from '@tinacms/styles'
 import {
   AlertIcon,
   InfoIcon,
