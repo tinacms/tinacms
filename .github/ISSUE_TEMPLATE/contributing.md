@@ -1,7 +1,7 @@
 ---
-name: Tina Development
-about: Having trouble developing Tina? We'll help you get sorted
-labels: development
+name: Contributing
+about: Running into development problems with the tinacms repo? We'll help you get sorted
+labels: contributing
 ---
 
 <!--
