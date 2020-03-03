@@ -26,12 +26,14 @@ import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
 import { inlineRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaField, Wysiwyg, Toggle, Select } from "tinacms"
+import { TinaField, Wysiwyg as BaseWysiwyg, Toggle, Select } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
 import { EditToggle } from "../components/edit-toggle"
 import { PlainTextInput } from "../components/plain-text-input"
 
 const get = require("lodash.get")
+
+const Wysiwyg = props => <BaseWysiwyg {...props} sticky="32px" />
 
 const PlainText = props => (
   <input style={{ background: "transparent " }} {...props.input} />
