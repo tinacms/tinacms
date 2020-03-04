@@ -31,7 +31,7 @@ import {
 } from '@tinacms/icons'
 import { padding, color, radius, font, timing } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
-import { CreateContentMenu } from '../CreateContent'
+import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useSubscribable, useCMS } from '../../react-tinacms'
 import { SidebarState } from '../../tina-cms'
