@@ -42,13 +42,12 @@ import {
   OrderedListIcon,
   QuoteIcon,
   TableIcon,
-  UnorderedListIcon,
   UnderlineIcon,
+  UnorderedListIcon,
 } from '@tinacms/icons'
 import { radius, color, padding } from '@tinacms/styles'
+import { UndoControl, RedoControl } from './historyControl'
 import { MenuPortalProvider, useMenuPortal } from './MenuPortal'
-
-// import { ImageControl } from './images'
 
 interface Props {
   bottom?: boolean
@@ -178,6 +177,8 @@ export const Menu = (props: Props) => {
               {supportBlocks && <CodeControl view={view} bottom={bottom} />}
               {supportBlocks && <BulletList view={view} bottom={bottom} />}
               {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+              <UndoControl view={view} />
+              <RedoControl view={view} />
             </MenuContainer>
           </MenuPortalProvider>
         </MenuWrapper>
