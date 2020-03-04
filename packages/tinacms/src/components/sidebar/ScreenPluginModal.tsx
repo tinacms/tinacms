@@ -17,18 +17,36 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { FC } from 'react'
 import { Modal, ModalHeader, ModalBody } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
 import { ModalPopup } from '../modals/ModalPopup'
+import { ScreenPlugin } from '../../plugins/screen-plugin'
 
-export interface ScreenPluginModalProps {
+export interface ScreenPluginViewProps {
+  screen: ScreenPlugin
+  close(): void
+}
+
+export const ScreenPluginView: FC<ScreenPluginViewProps> = ({
+  screen,
+  close,
+}) => {
+  return (
+    <ScreenPluginModal name={screen.name} close={close} layout={screen.layout}>
+      <screen.Component close={close} />
+    </ScreenPluginModal>
+  )
+}
+
+interface ScreenPluginModalProps {
   children: any
   name: string
   close: any
   layout?: 'fullscreen' | 'popup'
 }
 
-export const ScreenPluginModal = ({
+const ScreenPluginModal = ({
   children,
   name,
   close,
