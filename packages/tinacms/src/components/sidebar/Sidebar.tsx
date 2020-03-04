@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useState } from 'react'
 import styled, { keyframes, css } from 'styled-components'
-import { FormsView } from '../FormView'
+import { FormsView } from './SidebarBody'
 import { Modal, ModalHeader, ModalBody } from '../modals/ModalProvider'
 import { ModalFullscreen } from '../modals/ModalFullscreen'
 import { ModalPopup } from '../modals/ModalPopup'
