@@ -21,7 +21,7 @@ import { padding, color, radius, font } from '@tinacms/styles'
 import styled from 'styled-components'
 
 interface SelectFieldProps {
-  label: string
+  label?: string
   name: string
   component: string
   options: string[]
