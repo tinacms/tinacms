@@ -30,7 +30,7 @@ import {
   LeftArrowIcon,
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { useFormPortal } from '../../components/FormPortal'
+import { useFormPortal } from '../../components/form/FormPortal'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'

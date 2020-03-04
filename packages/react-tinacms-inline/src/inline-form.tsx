@@ -23,6 +23,7 @@ import { FormBuilder, Form } from 'tinacms'
 export interface InlineFormProps {
   form: Form
   children: React.ReactElement | React.ReactElement[] | InlineFormRenderChild
+  initialStatus?: InlineFormStatus
 }
 
 export interface InlineFormRenderChild {
@@ -43,8 +44,12 @@ export interface InlineFormState {
 
 export type InlineFormStatus = 'active' | 'inactive'
 
-export function InlineForm({ form, children }: InlineFormProps) {
-  const [status, setStatus] = React.useState<InlineFormStatus>('inactive')
+export function InlineForm({
+  form,
+  children,
+  initialStatus = 'inactive',
+}: InlineFormProps) {
+  const [status, setStatus] = React.useState<InlineFormStatus>(initialStatus)
 
   const inlineFormState = React.useMemo(() => {
     return {

@@ -3,124 +3,72 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.2...@tinacms/icons@0.6.0) (2020-03-02)
+
+### Features
+
+- add alert, error, info & warning icons ([21a9a98](https://github.com/tinacms/tinacms/commit/21a9a98))
+
 ## [0.5.2](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.2-alpha.0...@tinacms/icons@0.5.2) (2020-02-18)
 
 **Note:** Version bump only for package @tinacms/icons
-
-
-
-
 
 ## [0.5.2-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.1...@tinacms/icons@0.5.2-alpha.0) (2020-02-14)
 
 **Note:** Version bump only for package @tinacms/icons
 
-
-
-
-
 ## [0.5.1](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.1-alpha.1...@tinacms/icons@0.5.1) (2020-02-11)
 
 **Note:** Version bump only for package @tinacms/icons
-
-
-
-
 
 ## [0.5.1-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.1-alpha.0...@tinacms/icons@0.5.1-alpha.1) (2020-02-11)
 
 **Note:** Version bump only for package @tinacms/icons
 
-
-
-
-
 ## [0.5.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.0...@tinacms/icons@0.5.1-alpha.0) (2020-02-06)
 
 **Note:** Version bump only for package @tinacms/icons
-
-
-
-
 
 # [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.0-alpha.0...@tinacms/icons@0.5.0) (2020-02-03)
 
 **Note:** Version bump only for package @tinacms/icons
 
-
-
-
-
 # [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.4.1...@tinacms/icons@0.5.0-alpha.0) (2020-02-03)
-
 
 ### Features
 
-* table column alignment ([418c2dd](https://github.com/tinacms/tinacms/commit/418c2dd))
-
-
-
-
+- table column alignment ([418c2dd](https://github.com/tinacms/tinacms/commit/418c2dd))
 
 ## [0.4.1](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.4.1-alpha.0...@tinacms/icons@0.4.1) (2020-01-27)
 
 **Note:** Version bump only for package @tinacms/icons
 
-
-
-
-
 ## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.4.0...@tinacms/icons@0.4.1-alpha.0) (2020-01-24)
 
 **Note:** Version bump only for package @tinacms/icons
-
-
-
-
 
 # [0.4.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.4.0-alpha.0...@tinacms/icons@0.4.0) (2020-01-22)
 
 **Note:** Version bump only for package @tinacms/icons
 
-
-
-
-
 # [0.4.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.3.9...@tinacms/icons@0.4.0-alpha.0) (2020-01-16)
-
 
 ### Features
 
-* basic support for tables in wysiwym ([84159ba](https://github.com/tinacms/tinacms/commit/84159ba))
-* update table icon ([448dab5](https://github.com/tinacms/tinacms/commit/448dab5))
-
-
-
-
+- basic support for tables in wysiwym ([84159ba](https://github.com/tinacms/tinacms/commit/84159ba))
+- update table icon ([448dab5](https://github.com/tinacms/tinacms/commit/448dab5))
 
 ## [0.3.9](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.3.9-alpha.1...@tinacms/icons@0.3.9) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/icons
 
-
-
-
-
 ## [0.3.9-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.3.8...@tinacms/icons@0.3.9-alpha.1) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/icons
 
-
-
-
-
 ## [0.3.9-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.3.8...@tinacms/icons@0.3.9-alpha.0) (2019-11-18)
 
 **Note:** Version bump only for package @tinacms/icons
-
-
-
-
 
 ## [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.1.1...@tinacms/icons@0.3.0-alpha.0) (2019-10-07)
 

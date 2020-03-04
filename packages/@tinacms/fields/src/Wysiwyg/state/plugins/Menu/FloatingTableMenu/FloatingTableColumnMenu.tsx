@@ -30,7 +30,7 @@ import {
 } from 'prosemirror-utils'
 
 interface FloatingTableDeleteMenuProps {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 const alignColumn = (view: EditorView, alignValue: string) => {
@@ -61,7 +61,7 @@ const alignColumn = (view: EditorView, alignValue: string) => {
 }
 
 export default (props: FloatingTableDeleteMenuProps) => {
-  const { state, dispatch } = props.view
+  const { state, dispatch } = props.editorView.view
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left_selected'
   )[0]
@@ -80,27 +80,24 @@ export default (props: FloatingTableDeleteMenuProps) => {
       markerDivRow = markerDivRows[i]
   }
   if (!markerDivCol && !markerDivRow) return null
+  const { view } = props.editorView
   return (
     <>
       {markerDivCol &&
         ReactDOM.createPortal(
           <IconWrapperCol>
-            <IconButton
-              onClick={() => alignColumn(props.view, 'left')}
-              small
-              primary
-            >
+            <IconButton onClick={() => alignColumn(view, 'left')} small primary>
               <AlignLeft />
             </IconButton>
             <IconButton
-              onClick={() => alignColumn(props.view, 'center')}
+              onClick={() => alignColumn(view, 'center')}
               small
               primary
             >
               <AlignCenter />
             </IconButton>
             <IconButton
-              onClick={() => alignColumn(props.view, 'right')}
+              onClick={() => alignColumn(view, 'right')}
               small
               primary
             >
@@ -109,7 +106,7 @@ export default (props: FloatingTableDeleteMenuProps) => {
             <IconButton
               onClick={() => {
                 deleteColumn(state, dispatch)
-                props.view.focus()
+                view.focus()
               }}
               small
               primary
@@ -125,7 +122,7 @@ export default (props: FloatingTableDeleteMenuProps) => {
             <IconButton
               onClick={() => {
                 deleteRow(state, dispatch)
-                props.view.focus()
+                view.focus()
               }}
               small
               primary

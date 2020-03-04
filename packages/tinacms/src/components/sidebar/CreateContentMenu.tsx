@@ -23,8 +23,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-} from './modals/ModalProvider'
-import { ModalPopup } from './modals/ModalPopup'
+} from '../modals/ModalProvider'
+import { ModalPopup } from '../modals/ModalPopup'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/forms'
@@ -38,7 +38,7 @@ import {
   shadow,
 } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
-import { useCMS, useSubscribable } from '../react-tinacms'
+import { useCMS, useSubscribable } from '../../react-tinacms'
 
 export const CreateContentMenu = () => {
   const cms = useCMS()

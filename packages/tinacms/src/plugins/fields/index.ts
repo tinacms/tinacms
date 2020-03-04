@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 export * from './BlocksFieldPlugin'
+export * from './HtmlFieldPlugin'
 export * from './TextFieldPlugin'
 export * from './MarkdownFieldPlugin'
 export * from './TextareaFieldPlugin'

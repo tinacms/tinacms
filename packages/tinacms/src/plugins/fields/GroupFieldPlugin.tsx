@@ -28,7 +28,7 @@ import {
   ThemeProps,
 } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
-import { useFormPortal } from '../../components/FormPortal'
+import { useFormPortal } from '../../components/form/FormPortal'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'

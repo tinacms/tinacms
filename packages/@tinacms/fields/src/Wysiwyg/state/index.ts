@@ -27,7 +27,6 @@ import { tableEditing } from 'prosemirror-tables'
 
 import { inputRules } from './plugins/input-rules'
 import { Translator } from '../Translator'
-import { menu } from './plugins/Menu'
 import { buildKeymap } from './buildKeymap'
 import { links } from './plugins/links'
 import { tablePlugin } from './plugins/Table'
@@ -38,8 +37,7 @@ export function createEditorState(
   translator: Translator,
   plugins: Plugin[],
   value: string,
-  theme: any, // TODO: update type
-  sticky?: boolean
+  theme: any // TODO: update type
 ) {
   return EditorState.create({
     schema,
@@ -51,7 +49,6 @@ export function createEditorState(
       links(schema, theme),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       gapCursor(),
-      menu(translator, false, theme, sticky),
       tableEditing(),
       tablePlugin,
       imagePlugin,
