@@ -31,7 +31,7 @@ import {
 } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-tinacms'
-import { FormView, FormHeader } from '../FormView'
+import { FormView, FormHeader } from '../form/FormView'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
