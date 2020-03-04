@@ -29,7 +29,7 @@ import {
   radius,
   shadow,
 } from '@tinacms/styles'
-import FormsList from '../FormsList'
+import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-tinacms'
 import { FormView, FormHeader } from '../FormView'
 
@@ -80,7 +80,7 @@ export const FormsView = () => {
 
   if (isMultiform && !activeForm) {
     return (
-      <FormsList
+      <FormList
         isEditing={isEditing}
         forms={forms}
         setActiveFormId={setActiveFormId}
