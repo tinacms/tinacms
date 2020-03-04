@@ -104,6 +104,8 @@ const Group = function Group({ tinaForm, form, field, input }: GroupProps) {
                 {items.length === 0 && <EmptyState />}
                 {items.map((item: any, index: any) => (
                   <Item
+                    // NOTE: Supressing warnings, but not helping with render perf
+                    key={index}
                     tinaForm={tinaForm}
                     field={field}
                     item={item}
