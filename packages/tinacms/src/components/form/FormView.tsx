@@ -35,7 +35,7 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
 import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
-import { useCMS } from '../react-tinacms'
+import { useCMS } from '../../react-tinacms'
 import { FormPortalProvider } from './FormPortal'
 
 export interface FormViewProps {

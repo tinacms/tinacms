@@ -38,7 +38,7 @@ import {
   IconButton,
   shadow,
 } from '@tinacms/styles'
-import { useFormPortal } from '../../components/FormPortal'
+import { useFormPortal } from '../../components/form/FormPortal'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
