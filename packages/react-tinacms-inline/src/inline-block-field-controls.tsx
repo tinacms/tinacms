@@ -92,6 +92,7 @@ function AddBlockMenu({ templates, addBlock }: AddBlockMenu) {
       {templates.map(template => {
         return (
           <button
+            key={template.label}
             onClick={() => {
               addBlock({
                 _template: template.type,
