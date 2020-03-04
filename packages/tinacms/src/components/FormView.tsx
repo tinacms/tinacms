@@ -19,9 +19,8 @@ limitations under the License.
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
-import { useState } from 'react'
 import { Form } from '@tinacms/forms'
-import styled, { keyframes, css, StyledComponent } from 'styled-components'
+import styled, { keyframes, StyledComponent } from 'styled-components'
 import {
   Button,
   padding,
@@ -32,83 +31,12 @@ import {
   shadow,
 } from '@tinacms/styles'
 import { ActionsMenu } from './ActionsMenu'
-import FormsList from './FormsList'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
 import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
-import { useCMS, useSubscribable } from '../react-tinacms'
+import { useCMS } from '../react-tinacms'
 import { FormPortalProvider } from './FormPortal'
-
-export const FormsView = () => {
-  const [activeFormId, setActiveFormId] = useState<string>()
-  const cms = useCMS()
-
-  /**
-   * If there's only one form, make it the active form.
-   *
-   * TODO: There's an issue where the forms register one
-   * by one, so the 'active form' always gets set as if there
-   * were only one form, even when there are multiple
-   */
-
-  function setSingleActiveForm() {
-    if (cms.forms.all().length === 1) {
-      setActiveFormId(cms.forms.all()[0].id)
-    }
-  }
-
-  /*
-   ** Subscribes the forms to the CMS,
-   ** passing a callback to set active form
-   */
-  useSubscribable(cms.forms, () => {
-    setSingleActiveForm()
-  })
-
-  /*
-   ** Sets single active form on componentDidMount
-   */
-  React.useEffect(() => {
-    setSingleActiveForm()
-  }, [])
-
-  const forms = cms.forms.all()
-  const isMultiform = forms.length > 1
-  const activeForm = activeFormId ? cms.forms.find(activeFormId) : null
-  const isEditing = !!activeForm
-
-  /**
-   * No Forms
-   */
-  if (!forms.length) {
-    return <NoFormsPlaceholder />
-  }
-
-  if (isMultiform && !activeForm) {
-    return (
-      <FormsList
-        isEditing={isEditing}
-        forms={forms}
-        setActiveFormId={setActiveFormId}
-      />
-    )
-  }
-
-  return (
-    <>
-      {activeForm && (
-        <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          <FormView
-            activeForm={activeForm}
-            setActiveFormId={setActiveFormId}
-            isMultiform={isMultiform}
-          />
-        </FormWrapper>
-      )}
-    </>
-  )
-}
 
 export interface FormViewProps {
   activeForm: Form
@@ -283,28 +211,6 @@ const LinkButton = styled.a`
   }
 `
 
-const NoFormsPlaceholder = () => (
-  <EmptyState>
-    <Emoji>👋</Emoji>
-    <h3>
-      Welcome to <b>Tina</b>!
-    </h3>
-    <p>
-      Let's get a form set up
-      <br />
-      so you can start editing.
-    </p>
-    <p>
-      <LinkButton
-        href="https://tinacms.org/docs/getting-started/introduction/#get-started"
-        target="_blank"
-      >
-        <Emoji>📖</Emoji> Form Setup Guide
-      </LinkButton>
-    </p>
-  </EmptyState>
-)
-
 const NoFieldsPlaceholder = () => (
   <EmptyState>
     <Emoji>🤔</Emoji>
@@ -320,12 +226,12 @@ const NoFieldsPlaceholder = () => (
   </EmptyState>
 )
 
-interface FormHeaderProps {
+export interface FormHeaderProps {
   activeForm: Form
   setActiveFormId(id?: string): void
 }
 
-const FormHeader = styled(
+export const FormHeader = styled(
   ({ activeForm, setActiveFormId, ...styleProps }: FormHeaderProps) => {
     return (
       <div {...styleProps} onClick={() => setActiveFormId()}>
@@ -412,47 +318,6 @@ const FormFooter = styled.div`
     align-items: center;
     padding: 0 16px;
   }
-`
-
-const FormAnimationKeyframes = keyframes`
-  0% {
-    transform: translate3d( 100%, 0, 0 );
-  }
-  100% {
-    transform: translate3d( 0, 0, 0 );
-  }
-`
-
-interface FormWrapperProps {
-  isEditing: Boolean
-  isMultiform: Boolean
-}
-
-const FormWrapper = styled.div<FormWrapperProps>`
-  display: flex;
-  flex-direction: column;
-  flex-wrap: nowrap;
-  overflow: hidden;
-  height: 100%;
-  width: 100%;
-  position: relative;
-
-  ${FormHeader}, ${FormBody}, ${FormFooter} {
-    transform: translate3d(100%, 0, 0);
-  }
-
-  ${p =>
-    p.isEditing &&
-    css`
-      ${FormHeader}, ${FormBody}, ${FormFooter} {
-        transform: none;
-        animation-name: ${FormAnimationKeyframes};
-        animation-duration: 150ms;
-        animation-delay: 0;
-        animation-iteration-count: 1;
-        animation-timing-function: ease-out;
-      }
-    `};
 `
 
 export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
