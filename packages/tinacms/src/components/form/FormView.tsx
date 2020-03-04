@@ -30,7 +30,7 @@ import {
   radius,
   shadow,
 } from '@tinacms/styles'
-import { ActionsMenu } from './ActionsMenu'
+import { FormActionMenu } from './FormActions'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LeftArrowIcon } from '@tinacms/icons'
 import { LoadingDots } from './LoadingDots'
@@ -113,7 +113,10 @@ export function FormView({
                   {!submitting && cms.sidebar.buttons.save}
                 </Button>
                 {activeForm.actions.length > 0 && (
-                  <ActionsMenu actions={activeForm.actions} form={activeForm} />
+                  <FormActionMenu
+                    actions={activeForm.actions}
+                    form={activeForm}
+                  />
                 )}
               </Wrapper>
             </FormFooter>
