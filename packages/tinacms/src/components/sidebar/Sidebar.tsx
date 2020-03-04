@@ -66,6 +66,7 @@ export const Sidebar = () => {
                   const Icon = view.Icon
                   return (
                     <MenuLink
+                      key={view.name}
                       value={view.name}
                       onClick={() => {
                         setActiveView(view)
