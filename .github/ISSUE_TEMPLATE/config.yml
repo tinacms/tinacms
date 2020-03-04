@@ -1,4 +1,7 @@
 contact_links:
   - name: Website Issues
-    url: https://github.com/tinacms/tinacms-site/issues/new
-    about: If you're reporting on our website, blog, or documentation please visit the tinacms-site repository.
+    url: https://github.com/tinacms/tinacms.org/issues/new
+    about: If you're reporting on our website, blog, or documentation please visit the tinacms.org repository.
+  - name: Questions
+    url: https://community.tinacms.org/
+    about: Looking for advice on how to use TinaCMS? Ask a question on our forum!

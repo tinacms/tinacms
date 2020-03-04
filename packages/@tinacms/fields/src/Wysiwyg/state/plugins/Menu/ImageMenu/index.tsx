@@ -28,11 +28,11 @@ import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 
 interface FloatingImageMenu {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
 export default (props: FloatingImageMenu) => {
-  const { view } = props
+  const { view } = props.editorView
   const { selectedImage } = imagePluginKey.getState(view.state)
   if (!selectedImage) return null
   const { node, pos } = selectedImage
@@ -46,6 +46,7 @@ export default (props: FloatingImageMenu) => {
   const [modalTop, setModalTop] = useState(top)
   const [modalLeft, setModalLeft] = useState(left)
   const wrapperRef = useRef() as React.MutableRefObject<HTMLElement>
+  const inputRef = useRef() as React.MutableRefObject<HTMLInputElement>
   const imageRef = useRef() as React.MutableRefObject<HTMLImageElement>
   const [linked, toggleLinked] = useState(!!linkMark)
 
@@ -81,6 +82,12 @@ export default (props: FloatingImageMenu) => {
     setTitle(node.attrs.title)
     setAlt(node.attrs.alt)
   }, [selectedImage.node])
+
+  useEffect(() => {
+    setTimeout(() => {
+      if (inputRef.current) inputRef.current.focus()
+    })
+  }, [inputRef])
 
   useEffect(positionImage)
 
@@ -129,13 +136,13 @@ export default (props: FloatingImageMenu) => {
         <LinkInput
           placeholder="Enter Title"
           type={'text'}
+          ref={inputRef}
           value={title}
           onChange={evt => setTitle(evt.target.value)}
         />
         <LinkLabel>Alt</LinkLabel>
         <LinkInput
           placeholder="Enter Alt Text"
-          autoFocus
           type={'text'}
           value={alt}
           onChange={evt => setAlt(evt.target.value)}
@@ -164,7 +171,6 @@ export default (props: FloatingImageMenu) => {
             <LinkLabel>Link Title</LinkLabel>
             <LinkInput
               placeholder="Enter Link Title"
-              autoFocus
               type={'text'}
               value={linkTitle}
               onChange={evt => setLinkTitle(evt.target.value)}

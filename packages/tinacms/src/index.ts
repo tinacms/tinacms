@@ -62,4 +62,7 @@ export * from './components/modals/ModalPopup'
 export * from './components/modals/ModalFullscreen'
 
 // Form Actions Components
-export { ActionButton } from './components/ActionsMenu'
+export { ActionButton } from './components/form/FormActions'
+
+// Media Manager
+export * from './media'

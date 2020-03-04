@@ -26,10 +26,11 @@ import { TrashIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
 
 interface TableOptionsMenu {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
-export default ({ view }: TableOptionsMenu) => {
+export default ({ editorView }: TableOptionsMenu) => {
+  const { view } = editorView
   const deleteSelectedTable = () => {
     const { state, dispatch } = view
     deleteTable(state, dispatch)

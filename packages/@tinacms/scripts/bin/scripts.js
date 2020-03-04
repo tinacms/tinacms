@@ -24,6 +24,8 @@ const rollupReplace = require('rollup-plugin-replace')
 const rollupCommonJs = require('rollup-plugin-commonjs')
 const typescript = require('typescript')
 const { uglify } = require('rollup-plugin-uglify')
+const createStyledComponentsTransformer = require('typescript-plugin-styled-components')
+  .default
 
 // Source https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/bin/react-scripts.js#L11-L16
 // Makes the script crash on unhandled rejections instead of silently
@@ -95,6 +97,11 @@ function createBuildOptions(options = {}) {
         include: [
           path.join(absolutePath, 'src', '*.ts+(|x)'),
           path.join(absolutePath, 'src', '**/*.ts+(|x)'),
+        ],
+        transformers: [
+          () => ({
+            before: [createStyledComponentsTransformer()],
+          }),
         ],
       }),
       rollupReplace({

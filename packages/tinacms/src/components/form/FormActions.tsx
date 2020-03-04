@@ -24,12 +24,12 @@ import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { Form } from '@tinacms/forms'
 
-export interface ActionsMenuProps {
+export interface FormActionMenuProps {
   form: Form
   actions: any[]
 }
 
-export const ActionsMenu: FC<ActionsMenuProps> = ({ actions, form }) => {
+export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
   return (
     <>
