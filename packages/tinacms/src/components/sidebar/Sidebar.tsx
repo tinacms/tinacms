@@ -32,7 +32,7 @@ import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useSubscribable, useCMS } from '../../react-tinacms'
 import { SidebarState } from '../../tina-cms'
-import { ScreenPluginModal } from './ScreenPluginModal'
+import { ScreenPluginView } from './ScreenPluginModal'
 
 export const Sidebar = () => {
   const cms = useCMS()
@@ -82,13 +82,10 @@ export const Sidebar = () => {
           </MenuPanel>
         )}
         {activeScreen && (
-          <ScreenPluginModal
-            name={activeScreen.name}
+          <ScreenPluginView
+            screen={activeScreen}
             close={() => setActiveView(null)}
-            layout={activeScreen.layout}
-          >
-            <activeScreen.Component close={() => setActiveView(null)} />
-          </ScreenPluginModal>
+          />
         )}
       </SidebarWrapper>
       <SidebarToggle sidebar={cms.sidebar} />
