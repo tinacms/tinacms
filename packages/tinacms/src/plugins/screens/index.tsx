@@ -20,7 +20,7 @@ import * as React from 'react'
 import { SettingsIcon } from '@tinacms/icons'
 import { Form } from '@tinacms/forms'
 import { ScreenPlugin } from '../screen-plugin'
-import { FormView } from '../../components/FormView'
+import { FormView } from '../../components/form/FormView'
 
 export class GlobalFormPlugin implements ScreenPlugin {
   __type: ScreenPlugin['__type'] = 'screen'
