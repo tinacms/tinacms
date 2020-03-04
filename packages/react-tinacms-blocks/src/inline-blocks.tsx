@@ -237,6 +237,7 @@ export const AddBlockMenu = styled(
         <BlocksMenu open={open}>
           {templates.map(({ label, type, defaultItem }: BlockTemplate) => (
             <BlockOption
+              key={label}
               onClick={() => {
                 insert({ _template: type, ...defaultItem }, (index || -1) + 1)
                 setOpen(false)
