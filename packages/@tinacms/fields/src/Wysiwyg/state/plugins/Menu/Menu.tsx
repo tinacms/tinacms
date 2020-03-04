@@ -55,7 +55,7 @@ interface Props {
   format: 'html' | 'markdown' | 'html-blocks'
   view: EditorView
   theme: any
-  sticky?: boolean
+  sticky?: boolean | string
 }
 
 interface State {
@@ -100,6 +100,7 @@ export const Menu = (props: Props) => {
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
+  const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
 
   useEffect(() => {
     if (menuRef.current && sticky) {
@@ -158,6 +159,7 @@ export const Menu = (props: Props) => {
           <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
         )}
         <MenuWrapper
+          menuFixedTopOffset={menuFixedTopOffset}
           menuFixed={menuFixed}
           menuBoundingBox={menuBoundingBox}
           ref={menuRef}
@@ -289,6 +291,7 @@ const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
 type MenuWrapperProps = {
   menuFixed: boolean
   menuBoundingBox: any
+  menuFixedTopOffset: string
 }
 
 const MenuWrapper = styled.div<MenuWrapperProps>`
@@ -301,7 +304,7 @@ const MenuWrapper = styled.div<MenuWrapperProps>`
     css`
       position: fixed;
       width: ${props.menuBoundingBox.width}px;
-      top: 0;
+      top: ${props.menuFixedTopOffset};
     `};
 `
 
