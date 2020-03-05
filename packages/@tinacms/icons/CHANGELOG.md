@@ -3,6 +3,16 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.2...@tinacms/icons@0.7.0-alpha.0) (2020-03-05)
+
+### Bug Fixes
+
+- react-warnings on re-order icon ([4f44b19](https://github.com/tinacms/tinacms/commit/4f44b19))
+
+### Features
+
+- add alert, error, info & warning icons ([21a9a98](https://github.com/tinacms/tinacms/commit/21a9a98))
+
 # [0.6.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.5.2...@tinacms/icons@0.6.0) (2020-03-02)
 
 ### Features

@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.8-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.7...@tinacms/react-core@0.2.8-alpha.0) (2020-03-05)
+
+**Note:** Version bump only for package @tinacms/react-core
+
 ## [0.2.7](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.7-alpha.1...@tinacms/react-core@0.2.7) (2020-02-18)
 
 **Note:** Version bump only for package @tinacms/react-core

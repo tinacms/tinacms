@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.7-alpha.0...@tinacms/api-git@0.7.0-alpha.0) (2020-03-05)
+
+### Features
+
+- configure debounce rate for filewriting ([3117eb4](https://github.com/tinacms/tinacms/commit/3117eb4))
+
 # [0.6.0](https://github.com/tinacms/tinacms/compare/@tinacms/api-git@0.5.7-alpha.0...@tinacms/api-git@0.6.0) (2020-03-02)
 
 ### Features

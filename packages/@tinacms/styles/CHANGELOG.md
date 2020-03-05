@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.1.2...@tinacms/styles@0.3.0-alpha.0) (2020-03-05)
+
+### Features
+
+- add warning and success colors ([c148e4e](https://github.com/tinacms/tinacms/commit/c148e4e))
+
 # [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.1.2...@tinacms/styles@0.2.0) (2020-03-02)
 
 ### Features
