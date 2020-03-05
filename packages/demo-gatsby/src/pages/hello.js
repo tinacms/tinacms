@@ -35,7 +35,7 @@ export default HelloPage
 // Add ...TinaMdx fragment to query
 export const pageQuery = graphql`
   query {
-    mdx(fileRelativePath: { eq: "/content/hello.mdx" }) {
+    mdx(fileRelativePath: { eq: "/content/mdx/hello.mdx" }) {
       ...TinaMdx
       frontmatter {
         title

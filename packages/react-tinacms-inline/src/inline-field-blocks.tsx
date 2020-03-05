@@ -89,6 +89,8 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
 
               return (
                 <InlineBlock
+                  // NOTE: Supressing warnings, but not helping with render perf
+                  key={index}
                   index={index}
                   name={blockName}
                   data={data}

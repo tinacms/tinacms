@@ -23,10 +23,10 @@ import AddColumnMenu from './AddColumnMenu'
 import AddRowMenu from './AddRowMenu'
 
 interface FloatingTableAddMenu {
-  view: EditorView
+  editorView: { view: EditorView }
 }
 
-export default ({ view }: FloatingTableAddMenu) => {
+export default ({ editorView }: FloatingTableAddMenu) => {
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left'
   )
@@ -48,6 +48,7 @@ export default ({ view }: FloatingTableAddMenu) => {
   for (let i = 0; i < markerDivRow.length; i++) {
     markerRows.push(markerDivRow[i])
   }
+  const { view } = editorView
   return (
     <>
       {markerCols.map((marker, index) => (

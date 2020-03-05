@@ -36,6 +36,16 @@ export interface Theme {
       medium: string
       dark: string
     }
+    warning: {
+      light: string
+      medium: string
+      dark: string
+    }
+    success: {
+      light: string
+      medium: string
+      dark: string
+    }
     grey: {
       0: string
       1: string
@@ -94,6 +104,16 @@ export const DefaultTheme: Theme = {
       light: '#EB6337',
       medium: '#EC4815',
       dark: '#DC4419',
+    },
+    warning: {
+      light: '#F5E06E',
+      medium: '#E9D050',
+      dark: '#D3BA38',
+    },
+    success: {
+      light: '#57C355',
+      medium: '#3CAD3A',
+      dark: '#249A21',
     },
     grey: {
       0: '#FFFFFF',
@@ -160,10 +180,20 @@ function error(value: keyof Theme['color']['error'] = 'medium') {
   return (props: ThemeProps) => tinacms(props).color['error'][value]
 }
 
+function warning(value: keyof Theme['color']['warning'] = 'medium') {
+  return (props: ThemeProps) => tinacms(props).color['warning'][value]
+}
+
+function success(value: keyof Theme['color']['success'] = 'medium') {
+  return (props: ThemeProps) => tinacms(props).color['success'][value]
+}
+
 export const color = {
   primary: primary,
   grey: grey,
   error: error,
+  warning: warning,
+  success: success,
 }
 
 /* Font Helpers */
@@ -314,5 +344,31 @@ export const TinaReset = styled.div`
     height: auto;
     border: inherit;
     margin: 0;
+  }
+  h1,
+  h2,
+  h3,
+  h4,
+  h5,
+  h6 {
+    font-weight: bold;
+  }
+  h1 {
+    font-size: 32px;
+  }
+  h2 {
+    font-size: 24px;
+  }
+  h3 {
+    font-size: 19px;
+  }
+  h4 {
+    font-size: 16px;
+  }
+  h5 {
+    font-size: 14px;
+  }
+  h6 {
+    font-size: 12px;
   }
 `

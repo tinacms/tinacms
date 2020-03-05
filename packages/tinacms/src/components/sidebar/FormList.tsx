@@ -22,12 +22,17 @@ import { Form } from '@tinacms/forms'
 import { padding, color, font } from '@tinacms/styles'
 import { RightArrowIcon } from '@tinacms/icons'
 
-interface FormsListProps {
+export interface FormsListProps {
   forms: Form[]
   setActiveFormId(id?: string): void
   isEditing: Boolean
 }
-const FormsList = ({ forms, setActiveFormId, isEditing }: FormsListProps) => {
+
+export const FormList = ({
+  forms,
+  setActiveFormId,
+  isEditing,
+}: FormsListProps) => {
   return (
     <StyledFormList isEditing={isEditing}>
       {forms.sort(byId).map(form => (
@@ -49,8 +54,6 @@ const byId = (b: Form, a: Form) => {
   }
   return 0
 }
-
-export default FormsList
 
 const FormListItem = styled.li`
   position: relative;
