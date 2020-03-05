@@ -16,7 +16,7 @@
 
  */
 
-import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
+import { CMS, CMSConfig, PluginType } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -43,15 +43,33 @@ export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
 }
 
+export interface SidebarState {
+  isOpen: boolean
+  position: SidebarPosition
+  hidden: boolean
+  theme?: Theme
+  buttons: SidebarButtons
+}
+
 export class TinaCMS extends CMS {
-  sidebar: SidebarState
+  sidebar: SidebarState & Sub<SidebarState>
   media = new MediaManager(new DummyMediaStore())
   alerts = new Alerts()
 
   constructor({ sidebar, ...config }: TinaCMSConfig) {
     super(config)
 
-    this.sidebar = new SidebarState(sidebar)
+    this.sidebar = subscribable<SidebarState>({
+      isOpen: false,
+      position: 'displace',
+      hidden: false,
+      ...(sidebar || {}),
+      buttons: {
+        save: 'Save',
+        reset: 'Reset',
+        ...(sidebar?.buttons || {}),
+      },
+    })
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
@@ -92,50 +110,6 @@ interface SidebarButtons {
   reset: string
 }
 
-export class SidebarState extends Subscribable {
-  private _isOpen: boolean = false
-
-  position: SidebarPosition = 'displace'
-  _hidden: boolean = false
-  theme?: Theme
-  buttons: SidebarButtons = {
-    save: 'Save',
-    reset: 'Reset',
-  }
-
-  constructor(options: SidebarStateOptions = {}) {
-    super()
-    this.position = options.position || 'displace'
-    this._hidden = !!options.hidden
-    this.theme = options.theme
-
-    if (options.buttons?.save) {
-      this.buttons.save = options.buttons.save
-    }
-    if (options.buttons?.reset) {
-      this.buttons.reset = options.buttons.reset
-    }
-  }
-
-  get isOpen() {
-    return this._isOpen
-  }
-
-  set isOpen(nextValue: boolean) {
-    this._isOpen = nextValue
-    this.notifiySubscribers()
-  }
-
-  get hidden() {
-    return this._hidden
-  }
-
-  set hidden(nextValue: boolean) {
-    this._hidden = nextValue
-    this.notifiySubscribers()
-  }
-}
-
 class DummyMediaStore implements MediaStore {
   accept = '*'
   async persist(files: MediaUploadOptions[]) {
@@ -146,4 +120,77 @@ class DummyMediaStore implements MediaStore {
       filename: file.name,
     }))
   }
+}
+
+function subscribable<T extends object>(target: T): T & Sub<T> {
+  const subscribableTarget = target as T & Sub<T>
+
+  const subscribers: {
+    cb: SubscriptionCallback<T>
+    subscription: Subscription<T>
+  }[] = []
+
+  function subscribe(
+    cb: SubscriptionCallback<T>,
+    subscription: Subscription<T>
+  ) {
+    subscribers.push({
+      cb,
+      subscription,
+    })
+
+    return () => unsubscribe(cb)
+  }
+
+  function unsubscribe(removeCB: SubscriptionCallback<T>) {
+    const index = subscribers.findIndex(({ cb }) => cb === removeCB)
+    subscribers.splice(index, 1)
+  }
+
+  function notifyChangeFor(prop: keyof (T & Subscription<T>), obj: T) {
+    subscribers.forEach(({ subscription, cb }) => {
+      if (!subscription || subscription[prop]) {
+        cb(obj)
+      }
+    })
+  }
+
+  const p = new Proxy<T & Sub<T>>(subscribableTarget, {
+    get: function(obj, prop: keyof (T & Subscription<T>)) {
+      if (prop === 'subscribe') {
+        return subscribe
+      }
+      if (prop === 'unsubscribe') {
+        return unsubscribe
+      }
+
+      return obj[prop]
+    },
+    set: function(obj, prop: keyof (T & Subscription<T>), value) {
+      if (prop === 'subscribe' || prop === 'unsubscribe') {
+        return true
+      }
+
+      obj[prop] = value
+      notifyChangeFor(prop, { ...obj })
+
+      return true
+    },
+  })
+
+  return p
+}
+
+export interface Sub<T> {
+  subscribe(
+    cb: SubscriptionCallback<T>,
+    subscription?: Subscription<T>
+  ): Unsubscribe
+  unsubscribe(cb: SubscriptionCallback<T>): void
+}
+
+export type SubscriptionCallback<T> = (t: T) => void
+export type Unsubscribe = () => void
+export type Subscription<T> = {
+  [P in keyof T]?: boolean
 }
