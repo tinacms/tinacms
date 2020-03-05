@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.8.0-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.7.1-alpha.0...demo-gatsby@1.8.0-alpha.0) (2020-03-05)
+
+### Features
+
+- **wysiwyg:** change top-offset of sticky wysiwyg ([7a831da](https://github.com/gatsbyjs/gatsby-starter-blog/commit/7a831da))
+
 ## [1.7.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.7.1-alpha.0...demo-gatsby@1.7.1) (2020-03-02)
 
 **Note:** Version bump only for package demo-gatsby

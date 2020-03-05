@@ -3,6 +3,13 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.4-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.3.3-alpha.0...react-tinacms-blocks@0.3.4-alpha.0) (2020-03-05)
+
+### Bug Fixes
+
+- react warnings from list of BlockOptions ([04c05b5](https://github.com/tinacms/tinacms/commit/04c05b5))
+- react warnings with index ([b705b85](https://github.com/tinacms/tinacms/commit/b705b85))
+
 ## [0.3.3](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.3.3-alpha.0...react-tinacms-blocks@0.3.3) (2020-03-02)
 
 **Note:** Version bump only for package react-tinacms-blocks
