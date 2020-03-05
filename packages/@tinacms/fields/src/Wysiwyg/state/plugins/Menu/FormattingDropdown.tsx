@@ -26,7 +26,7 @@ import { Dismissible } from 'react-dismissible'
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
 import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './Menu'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
 import { EditorView } from 'prosemirror-view'
 
@@ -45,6 +45,7 @@ export class FormattingDropdown extends React.Component<
   state = {
     active: false,
   }
+  menuButtonRef = React.createRef()
   toggle = () => this.setState(({ active }) => ({ active: !active }))
   blockQuote = () =>
     wrapIn(this.props.view.state.schema.nodes.blockquote)(
@@ -57,13 +58,17 @@ export class FormattingDropdown extends React.Component<
     return (
       <MenuDropdownWrapper>
         <MenuButton
+          ref={this.menuButtonRef}
           data-tooltip={'Heading'}
           onClick={this.toggle}
           active={this.state.active}
         >
           <HeadingIcon />
         </MenuButton>
-        <MenuButtonDropdown open={this.state.active}>
+        <MenuButtonDropdown
+          triggerRef={this.menuButtonRef}
+          open={this.state.active}
+        >
           <Dismissible
             click
             escape
@@ -101,41 +106,30 @@ function makeToggleHeader(level: number) {
   }
 }
 
-const HeadingOne = styled.div`
-  font-size: 40px;
+const BaseHeading = css`
   white-space: nowrap;
   line-height: 1;
   display: block;
+  margin: 0;
 `
-const HeadingTwo = styled.div`
-  font-size: 34px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+
+const HeadingOne = styled.h1`
+  ${BaseHeading}
 `
-const HeadingThree = styled.div`
-  font-size: 26px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+const HeadingTwo = styled.h2`
+  ${BaseHeading}
 `
-const HeadingFour = styled.div`
-  font-size: 21px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+const HeadingThree = styled.h3`
+  ${BaseHeading}
 `
-const HeadingFive = styled.div`
-  font-size: 18px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+const HeadingFour = styled.h4`
+  ${BaseHeading}
 `
-const HeadingSix = styled.div`
-  font-size: 16px;
-  white-space: nowrap;
-  line-height: 1;
-  display: block;
+const HeadingFive = styled.h5`
+  ${BaseHeading}
+`
+const HeadingSix = styled.h6`
+  ${BaseHeading}
 `
 
 const H1 = blockTool({

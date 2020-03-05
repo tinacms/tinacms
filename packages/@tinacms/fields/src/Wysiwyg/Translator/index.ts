@@ -18,3 +18,5 @@ limitations under the License.
 
 export * from './Translator'
 export { MarkdownTranslator } from './MarkdownTranslator'
+export { DOMTranslator } from './DOMTranslator'
+export type Format = 'markdown' | 'html'

@@ -177,7 +177,10 @@ export class Repo {
         '-F /dev/null',
       ]
     } catch {
-      console.warn('No SSH key set.')
+      /**
+       * Throws if SSH does not exist.
+       * Not that there's anything wrong with that.
+       */
     }
 
     /**
