@@ -69,14 +69,17 @@ export interface Plugin {
   icon?: string
 }
 
-interface PluginCollectionMethods {
+interface PluginCollectionMethods<Plugin> {
   find(name: string): Plugin | undefined
   all(): Plugin[]
   add(plugin: Omit<Plugin, '__type'>): Plugin
   remove(plugin: Omit<Plugin, '__type'>): void
 }
 
-type PluginCollection = Collection<Plugin, PluginCollectionMethods>
+type PluginCollection<P extends Plugin = Plugin> = Collection<
+  P,
+  PluginCollectionMethods<P>
+>
 
 /**
  * Manages all of the [[PluginType|PluginTypes]] on a [[CMS]].
@@ -108,23 +111,26 @@ export class PluginTypeManager {
    * @param type The type of plugins to be retrieved
    * @typeparam P A subclass of Plugin. Optional.
    */
-  getType<P extends Plugin = Plugin>(type: P['__type']): PluginCollection {
+  getType<P extends Plugin = Plugin>(type: P['__type']): PluginCollection<P> {
     return (this.plugins[type] =
       this.plugins[type] ||
-      createCollection<Plugin, PluginCollectionMethods>({}, plugins => ({
-        add(plugin: Omit<Plugin, '__type'>) {
-          return (plugins[plugin.name] = { ...plugin, __type: type })
-        },
-        remove(plugin: Plugin) {
-          delete plugins[plugin.name]
-        },
-        find(name: string) {
-          return plugins[name]
-        },
-        all() {
-          return plugins.toArray()
-        },
-      })))
+      createCollection<Plugin, PluginCollectionMethods<Plugin>>(
+        {},
+        plugins => ({
+          add(plugin: Omit<Plugin, '__type'>) {
+            return (plugins[plugin.name] = { ...plugin, __type: type })
+          },
+          remove(plugin: Plugin) {
+            delete plugins[plugin.name]
+          },
+          find(name: string) {
+            return plugins[name]
+          },
+          all() {
+            return plugins.toArray()
+          },
+        })
+      )) as PluginCollection<P>
   }
 
   /**
@@ -198,7 +204,7 @@ export class PluginTypeManager {
    * @typeparam P A subclass of Plugin. Optional.
    * @param plugin The plugin to be removed from the CMS.
    */
-  remove<P extends Plugin = Plugin>(plugin: P) {
+  remove<P extends Plugin = Plugin>(plugin: P): void {
     this.findOrCreateMap(plugin.__type).remove(plugin)
   }
 
@@ -228,8 +234,8 @@ export class PluginTypeManager {
    * @param type The name of the plugin
    * @returns An array of all plugins of the given type.
    */
-  all<P extends Plugin = Plugin>(type: string): Plugin[] {
-    return this.findOrCreateMap<Plugin>(type).toArray()
+  all<P extends Plugin = Plugin>(type: string): P[] {
+    return this.findOrCreateMap<P>(type).toArray() as P[]
   }
 }
 
