@@ -17,7 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Subscribable } from '@tinacms/core'
+
+interface Subscribable {
+  subscribe(cb: () => void): () => void
+}
+
 /**
  *
  * @param subscribable An object that can be subscribed to

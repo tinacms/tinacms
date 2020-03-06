@@ -16,7 +16,7 @@
 
  */
 
-import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
+import { CMS, CMSConfig, PluginType } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -36,6 +36,7 @@ import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from './media'
 import { Theme } from '@tinacms/styles'
 import { Alerts } from './tina-cms/alerts'
+import { watch, Subscribable } from 'babas'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
@@ -44,14 +45,24 @@ export interface TinaCMSConfig extends CMSConfig {
 }
 
 export class TinaCMS extends CMS {
-  sidebar: SidebarState
+  sidebar: Subscribable<SidebarState>
   media = new MediaManager(new DummyMediaStore())
   alerts = new Alerts()
 
   constructor({ sidebar, ...config }: TinaCMSConfig) {
     super(config)
 
-    this.sidebar = new SidebarState(sidebar)
+    this.sidebar = watch<SidebarState>({
+      hidden: false,
+      isOpen: false,
+      position: 'displace',
+      ...sidebar,
+      buttons: {
+        save: 'Save',
+        reset: 'Reset',
+        ...(sidebar?.buttons || {}),
+      },
+    })
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
@@ -80,60 +91,19 @@ export class TinaCMS extends CMS {
   }
 }
 
-interface SidebarStateOptions {
-  hidden?: boolean
-  position?: SidebarPosition
+export interface SidebarState {
+  buttons: SidebarButtons
+  hidden: boolean
+  isOpen: boolean
+  position: SidebarPosition
   theme?: Theme
-  buttons?: SidebarButtons
 }
 
-interface SidebarButtons {
+export type SidebarStateOptions = Partial<SidebarState>
+
+export interface SidebarButtons {
   save: string
   reset: string
-}
-
-export class SidebarState extends Subscribable {
-  private _isOpen: boolean = false
-
-  position: SidebarPosition = 'displace'
-  _hidden: boolean = false
-  theme?: Theme
-  buttons: SidebarButtons = {
-    save: 'Save',
-    reset: 'Reset',
-  }
-
-  constructor(options: SidebarStateOptions = {}) {
-    super()
-    this.position = options.position || 'displace'
-    this._hidden = !!options.hidden
-    this.theme = options.theme
-
-    if (options.buttons?.save) {
-      this.buttons.save = options.buttons.save
-    }
-    if (options.buttons?.reset) {
-      this.buttons.reset = options.buttons.reset
-    }
-  }
-
-  get isOpen() {
-    return this._isOpen
-  }
-
-  set isOpen(nextValue: boolean) {
-    this._isOpen = nextValue
-    this.notifiySubscribers()
-  }
-
-  get hidden() {
-    return this._hidden
-  }
-
-  set hidden(nextValue: boolean) {
-    this._hidden = nextValue
-    this.notifiySubscribers()
-  }
 }
 
 class DummyMediaStore implements MediaStore {
