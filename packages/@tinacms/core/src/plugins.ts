@@ -43,7 +43,7 @@ limitations under the License.
  * @packageDocumentation
  */
 
-import { Subscribable } from './subscribable'
+import { createCollection, Collection } from 'babas'
 
 /**
  * An object used to extend or modify the behaviour of the content management system.
@@ -69,6 +69,15 @@ export interface Plugin {
   icon?: string
 }
 
+interface PluginCollectionMethods {
+  find(name: string): Plugin | undefined
+  all(): Plugin[]
+  add(plugin: Omit<Plugin, '__type'>): Plugin
+  remove(plugin: Omit<Plugin, '__type'>): void
+}
+
+type PluginCollection = Collection<Plugin, PluginCollectionMethods>
+
 /**
  * Manages all of the [[PluginType|PluginTypes]] on a [[CMS]].
  */
@@ -76,7 +85,7 @@ export class PluginTypeManager {
   /**
    * @ignore
    */
-  private plugins: Map<PluginType> = {}
+  private plugins: Map<PluginCollection> = {}
 
   /**
    * Gets the [[PluginType|collection of plugins]] for the given type.
@@ -99,9 +108,24 @@ export class PluginTypeManager {
    * @param type The type of plugins to be retrieved
    * @typeparam P A subclass of Plugin. Optional.
    */
-  getType<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
+  getType<P extends Plugin = Plugin>(type: P['__type']): PluginCollection {
     return (this.plugins[type] =
-      this.plugins[type] || new PluginType(type)) as PluginType<P>
+      this.plugins[type] ||
+      createCollection<Plugin, PluginCollectionMethods>({}, plugins => ({
+        add(plugin: Omit<Plugin, '__type'>) {
+          return (plugins[plugin.name] = { ...plugin, __type: type })
+        },
+        remove(plugin: Plugin) {
+          delete plugins[plugin.name]
+        },
+        find(name: string) {
+          return plugins[name]
+        },
+        all() {
+          // @ts-ignore
+          return plugins.toArray() as Plugin[]
+        },
+      })))
   }
 
   /**
@@ -111,7 +135,7 @@ export class PluginTypeManager {
    *
    * This name is unnecessarily verbose and weird.
    */
-  findOrCreateMap<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
+  findOrCreateMap<P extends Plugin = Plugin>(type: P['__type']) {
     return this.getType(type)
   }
 
@@ -206,7 +230,8 @@ export class PluginTypeManager {
    * @returns An array of all plugins of the given type.
    */
   all<P extends Plugin = Plugin>(type: string): P[] {
-    return this.findOrCreateMap<P>(type).all()
+    // @ts-ignore Something seems wrong
+    return this.findOrCreateMap<P>(type).toArray()
   }
 }
 
@@ -221,93 +246,3 @@ interface Map<T> {
  * @ignore
  */
 type PluginMap<T extends Plugin = Plugin> = Map<T>
-
-/**
- * A collection of plugins with the same `__type` value.
- */
-export class PluginType<T extends Plugin = Plugin> extends Subscribable {
-  /**
-   * @ignore
-   */
-  __plugins: PluginMap<T> = {}
-
-  /**
-   *
-   * @param __type The `__type` of plugin being managed.
-   */
-  constructor(private __type: string) {
-    super()
-  }
-
-  /**
-   * Adds a new plugin to the collection.
-   *
-   * ### Example
-   *
-   * ```ts
-   * interface ColorPlugin extends Plugin {
-   *   hex: string
-   * }
-   *
-   * const colorPlugins = new PluginType<ColorPlugin>("color")
-   *
-   * colorPlugins.add({ name: "red", hex: "#f00" })
-   * ```
-   *
-   * @param plugin A new plugin. The `__type` is optional and will be added if it's missing.
-   */
-  add(plugin: T | Omit<T, '__type'>) {
-    const p = plugin as T
-
-    if (!p.__type) {
-      p.__type = this.__type
-    }
-
-    this.__plugins[p.name] = p
-    this.notifiySubscribers()
-  }
-
-  all(): T[] {
-    return Object.keys(this.__plugins).map(name => this.__plugins[name])
-  }
-
-  /**
-   *
-   * Looks up a plugin by it's `name`.
-   *
-   * ### Example
-   *
-   * ```ts
-   * const colorPlugins = new PluginType<ColorPlugin>("color")
-   *
-   * colorPlugins.add({ name: "red", hex: "#f00" })
-   *
-   * colorPlugins.find("red")  // { __type: "color", name: "red", hex: "#f00" }
-   * colorPlugin.find("large") // undefined
-   * ```
-   *
-   * @param name The `name` of the plugin to be retrieved.
-   */
-  find(name: string): T | undefined {
-    return this.__plugins[name]
-  }
-
-  /**
-   * Pass this function a plugin or the `name` of a plugin to have
-   * it be removed from the CMS.
-   *
-   * @param pluginOrName The `name` of a plugin, or the plugin itself.
-   * @returns The plugin that was removed, or `undefined` if it was not found.
-   */
-  remove(pluginOrName: string | T): T | undefined {
-    const name =
-      typeof pluginOrName === 'string' ? pluginOrName : pluginOrName.name
-
-    const plugin = this.__plugins[name]
-
-    delete this.__plugins[name]
-    this.notifiySubscribers()
-
-    return plugin
-  }
-}
