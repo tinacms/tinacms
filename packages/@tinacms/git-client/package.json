@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/git-client",
-  "version": "0.6.0-alpha.0",
+  "version": "0.6.0-alpha.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -30,7 +30,7 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13-alpha.0",
-    "tinacms": "^0.16.0-alpha.0"
+    "tinacms": "^0.16.0-alpha.1"
   },
   "peerDependencies": {
     "tinacms": ">=0.15"

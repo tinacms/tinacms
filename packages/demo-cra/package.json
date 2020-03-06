@@ -1,9 +1,9 @@
 {
   "name": "demo-cra",
-  "version": "1.0.20-alpha.0",
+  "version": "1.0.20-alpha.1",
   "private": true,
   "dependencies": {
-    "tinacms": "^0.16.0-alpha.0"
+    "tinacms": "^0.16.0-alpha.1"
   },
   "devDependencies": {
     "@types/node": "12.6.8",
