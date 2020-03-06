@@ -4,7 +4,6 @@
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-50-orange.svg?style=flat-square)](#contributors-)
-
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Getting Started
@@ -118,7 +117,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/jpatters"><img src="https://avatars1.githubusercontent.com/u/195614?v=4" width="100px;" alt=""/><br /><sub><b>Jordan</b></sub></a><br /><a href="#projectManagement-jpatters" title="Project Management">📆</a> <a href="#talk-jpatters" title="Talks">📢</a> <a href="#ideas-jpatters" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Ajpatters" title="Bug reports">🐛</a> <a href="#infra-jpatters" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/tinacms/tinacms/commits?author=jpatters" title="Documentation">📖</a> <a href="https://github.com/tinacms/tinacms/commits?author=jpatters" title="Code">💻</a></td>
     <td align="center"><a href="https://frank.taillandier.me"><img src="https://avatars3.githubusercontent.com/u/103008?v=4" width="100px;" alt=""/><br /><sub><b>Frank Taillandier</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/pulls?q=is%3Apr+reviewed-by%3ADirtyF" title="Reviewed Pull Requests">👀</a> <a href="https://github.com/tinacms/tinacms/commits?author=DirtyF" title="Documentation">📖</a> <a href="#projectManagement-DirtyF" title="Project Management">📆</a> <a href="#userTesting-DirtyF" title="User Testing">📓</a></td>
     <td align="center"><a href="http://forestry.io"><img src="https://avatars0.githubusercontent.com/u/776019?v=4" width="100px;" alt=""/><br /><sub><b>Scott Gallant</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=scottgallant" title="Documentation">📖</a> <a href="#talk-scottgallant" title="Talks">📢</a> <a href="#fundingFinding-scottgallant" title="Funding Finding">🔍</a></td>
-    <td align="center"><a href="http://www.mitchmac.com"><img src="https://avatars2.githubusercontent.com/u/618212?v=4" width="100px;" alt=""/><br /><sub><b>Mitch MacKenzie</b></sub></a><br /><a href="#userTesting-mitchmac" title="User Testing">📓</a></td>
+    <td align="center"><a href="http://www.mitchmac.com"><img src="https://avatars2.githubusercontent.com/u/618212?v=4" width="100px;" alt=""/><br /><sub><b>Mitch MacKenzie</b></sub></a><br /><a href="#userTesting-mitchmac" title="User Testing">📓</a> <a href="#blog-mitchmac" title="Blogposts">📝</a></td>
     <td align="center"><a href="https://github.com/zacchg"><img src="https://avatars2.githubusercontent.com/u/46639997?v=4" width="100px;" alt=""/><br /><sub><b>zacchg</b></sub></a><br /><a href="#userTesting-zacchg" title="User Testing">📓</a></td>
     <td align="center"><a href="https://github.com/lyleunderwood"><img src="https://avatars0.githubusercontent.com/u/605824?v=4" width="100px;" alt=""/><br /><sub><b>Lyle Underwood</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Alyleunderwood" title="Bug reports">🐛</a> <a href="https://github.com/tinacms/tinacms/commits?author=lyleunderwood" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/Laura1111999"><img src="https://avatars3.githubusercontent.com/u/38682924?v=4" width="100px;" alt=""/><br /><sub><b>Laura1111999</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Laura1111999" title="Documentation">📖</a></td>
@@ -175,7 +174,6 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
-
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
