@@ -26,6 +26,9 @@
     "docs": "npx typedoc",
     "build": "tinacms-scripts build"
   },
+  "dependencies": {
+    "babas": "^0.2.5"
+  },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13-alpha.0"
   }

@@ -122,8 +122,7 @@ export class PluginTypeManager {
           return plugins[name]
         },
         all() {
-          // @ts-ignore
-          return plugins.toArray() as Plugin[]
+          return plugins.toArray()
         },
       })))
   }
@@ -229,9 +228,8 @@ export class PluginTypeManager {
    * @param type The name of the plugin
    * @returns An array of all plugins of the given type.
    */
-  all<P extends Plugin = Plugin>(type: string): P[] {
-    // @ts-ignore Something seems wrong
-    return this.findOrCreateMap<P>(type).toArray()
+  all<P extends Plugin = Plugin>(type: string): Plugin[] {
+    return this.findOrCreateMap<Plugin>(type).toArray()
   }
 }
 

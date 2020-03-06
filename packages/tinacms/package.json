@@ -43,7 +43,7 @@
     "@tinacms/react-core": "^0.2.8-alpha.0",
     "@tinacms/styles": "^0.3.0-alpha.0",
     "@types/react-beautiful-dnd": "^11.0.3",
-    "babas": "^0.2.4",
+    "babas": "^0.2.5",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "react-beautiful-dnd": "^11.0.5",
