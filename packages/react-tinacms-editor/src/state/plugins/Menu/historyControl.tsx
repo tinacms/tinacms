@@ -22,7 +22,7 @@ import { RedoIcon, UndoIcon } from '@tinacms/icons'
 import { EditorView } from 'prosemirror-view'
 import { undo, redo, undoDepth, redoDepth } from 'prosemirror-history'
 
-import { MenuButton } from './Menu'
+import { MenuButton } from './MenuComponents'
 
 interface HistoryProps {
   view: EditorView

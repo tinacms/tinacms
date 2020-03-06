@@ -15,9 +15,7 @@
               "type": "link",
               "attrs": {
                 "href": "https://google.com",
-                "title": null,
-                "editing": null,
-                "creating": null
+                "title": null
               }
             }
           ],
