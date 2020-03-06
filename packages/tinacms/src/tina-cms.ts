@@ -16,7 +16,7 @@
 
  */
 
-import { CMS, CMSConfig, PluginType } from '@tinacms/core'
+import { CMS, CMSConfig, PluginCollection } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
 import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
@@ -82,11 +82,11 @@ export class TinaCMS extends CMS {
     return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
   }
 
-  get fields(): PluginType<FieldPlugin> {
+  get fields(): PluginCollection<FieldPlugin> {
     return this.plugins.findOrCreateMap('field')
   }
 
-  get screens(): PluginType<ScreenPlugin> {
+  get screens(): PluginCollection<ScreenPlugin> {
     return this.plugins.findOrCreateMap('screen')
   }
 }

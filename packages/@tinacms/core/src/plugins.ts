@@ -69,14 +69,14 @@ export interface Plugin {
   icon?: string
 }
 
-interface PluginCollectionMethods<Plugin> {
+export interface PluginCollectionMethods<Plugin> {
   find(name: string): Plugin | undefined
   all(): Plugin[]
   add(plugin: Omit<Plugin, '__type'>): Plugin
   remove(plugin: Omit<Plugin, '__type'>): void
 }
 
-type PluginCollection<P extends Plugin = Plugin> = Collection<
+export type PluginCollection<P extends Plugin = Plugin> = Collection<
   P,
   PluginCollectionMethods<P>
 >
