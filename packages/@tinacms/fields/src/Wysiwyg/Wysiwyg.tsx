@@ -44,7 +44,7 @@ export const Wysiwyg = styled(
     )
 
     return (
-      <WysiwygWrapper>
+      <WysiwygWrapper className="wysiwyg-wrapper">
         <link
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
