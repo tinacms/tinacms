@@ -52,15 +52,24 @@ export default (props: FloatingImageMenu) => {
 
   function positionImage(scroll?: boolean) {
     const image = document.getElementsByClassName('tina-selected-image')[0]
+    const wysiwygWrapper = document.getElementsByClassName('wysiwyg-wrapper')[0]
     if (image && (imageRef.current !== image || scroll) && wrapperRef.current) {
       imageRef.current = image as any
       const wrapperDimensions = wrapperRef.current.getBoundingClientRect()
       setModalLeft(
         image.clientWidth / 2 +
-          findElementOffsetLeft(image as HTMLElement) -
+          findElementOffsetLeft(
+            image as HTMLElement,
+            wysiwygWrapper as HTMLElement
+          ) -
           wrapperDimensions.width / 2
       )
-      setModalTop(findElementOffsetTop(image as HTMLElement))
+      setModalTop(
+        findElementOffsetTop(
+          image as HTMLElement,
+          wysiwygWrapper as HTMLElement
+        )
+      )
     }
   }
 

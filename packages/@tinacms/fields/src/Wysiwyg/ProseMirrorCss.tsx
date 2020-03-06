@@ -24,6 +24,9 @@ const borderWidth = 1
 const controlSize = 12
 
 const proseMirrorTableStyles = `
+  .ProseMirror {
+    display: inline-block
+  }
   .ProseMirror .tableWrapper {
     overflow-x: auto;
   }
