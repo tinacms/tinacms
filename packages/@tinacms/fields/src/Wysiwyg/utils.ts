@@ -25,7 +25,6 @@ export const findElementOffsetTop = (
   while (target.offsetParent && (!parent || target.offsetParent !== parent)) {
     target = target.offsetParent as HTMLElement
     offsetTop += target.offsetTop
-    console.log(target)
   }
   return offsetTop
 }

@@ -48,6 +48,7 @@ import {
 import { radius, color, padding } from '@tinacms/styles'
 import { UndoControl, RedoControl } from './historyControl'
 import { MenuPortalProvider, useMenuPortal } from './MenuPortal'
+import { FloatingLinkForm } from '../links/FloatingLinkForm'
 
 interface Props {
   bottom?: boolean
@@ -84,12 +85,14 @@ const LinkControl = markControl({
   defaultAttrs: {
     href: '',
     title: '',
-    editing: 'editing',
-    creating: 'creating',
   },
   noMix: ['code'],
   isDisabled: (view: EditorView) => {
     return !!imagePluginKey.getState(view.state).selectedImage
+  },
+  onClick: (view: EditorView) => {
+    const { state, dispatch } = view
+    return dispatch(state.tr.setMeta('show_link_toolbar', true))
   },
 })
 
@@ -184,6 +187,7 @@ export const Menu = (props: Props) => {
         </MenuWrapper>
         <FloatingTableMenu editorView={editorView} />
         <ImageMenu editorView={editorView} />
+        <FloatingLinkForm editorView={editorView} />
       </>
     </ThemeProvider>
   )

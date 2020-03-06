@@ -34,6 +34,7 @@ export interface Options {
   tooltip?: string
   noMix?: string[]
   isDisabled?: (view: EditorView) => boolean
+  onClick?: (view: EditorView) => void
 }
 
 export function markControl({
@@ -44,6 +45,7 @@ export function markControl({
   selectionOnly = false,
   noMix = [],
   isDisabled,
+  onClick,
 }: Options) {
   return class _ extends React.Component<Props, any> {
     static displayName = `${mark}Control`
@@ -96,6 +98,9 @@ export function markControl({
     }
 
     onClick = () => {
+      if (onClick) {
+        onClick(this.props.view)
+      }
       if (this.disabled) return
       const { state, dispatch } = this.props.view
 

@@ -16,29 +16,36 @@ limitations under the License.
 
 */
 
-import { Node, Schema, Mark } from "prosemirror-model"
-import { NodeSelection, TextSelection, Selection, EditorState, Transaction } from "prosemirror-state"
+import { Node, Schema, Mark } from 'prosemirror-model'
+import {
+  NodeSelection,
+  TextSelection,
+  Selection,
+  EditorState,
+  Transaction,
+} from 'prosemirror-state'
 
 interface Dispatch {
   (tr: Transaction): void
 }
 
 export interface Command {
-  (state: EditorState, dispatch: Dispatch | null, ...args: any[]): boolean | Transaction | null
+  (state: EditorState, dispatch: Dispatch | null, ...args: any[]):
+    | boolean
+    | Transaction
+    | null
 }
 
 interface LinkAttrs {
   href: string
   title?: string
-  editing?: "editing" | ""
-  creating?: "creating" | ""
 }
 
 interface ImageAttrs {
   src: string
   title?: string
   alt?: string
-  align?: "left" | "right" | "center" | ""
+  align?: 'left' | 'right' | 'center' | ''
 }
 
 export class PMTestHarness {
@@ -72,7 +79,7 @@ export class PMTestHarness {
   }
 
   withTextSelection = (from: number, to?: number) => {
-    to = typeof to == "undefined" ? from : to
+    to = typeof to == 'undefined' ? from : to
     this.setDoc(this.state.doc, TextSelection.create(this.state.doc, from, to))
     return this
   }
@@ -137,8 +144,7 @@ export class PMTestHarness {
    * Creates a new `text` node with a `link` mark.
    */
   link = (content: string, attrs: LinkAttrs) => {
-    const _attrs = { creating: "", editing: "", ...attrs }
-    const mark = this.marks.link.create(_attrs)
+    const mark = this.marks.link.create(attrs)
     return this.text(content, [mark])
   }
 
@@ -160,11 +166,12 @@ export class PMTestHarness {
   }
 
   image = (attrs: ImageAttrs) => {
-    const _attrs = { alt: "", title: "", ...attrs }
+    const _attrs = { alt: '', title: '', ...attrs }
     return this.nodes.image.create(_attrs)
   }
 
   hr = () => this.nodes.horizontal_rule.create()
 
-  heading = (level: number, ...nodes: Node[]) => this.nodes.heading.create({ level }, nodes)
+  heading = (level: number, ...nodes: Node[]) =>
+    this.nodes.heading.create({ level }, nodes)
 }

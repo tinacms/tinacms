@@ -40,7 +40,6 @@ export interface Input {
 export function useProsemirror(
   input: Input,
   plugins: Plugin[] = [],
-  theme?: any,
   format?: Format
 ) {
   /**
@@ -68,7 +67,7 @@ export function useProsemirror(
    * CreateState
    */
   const createState = React.useCallback((value: string) => {
-    return createEditorState(schema, translator, plugins, value, theme)
+    return createEditorState(schema, translator, plugins, value)
   }, [])
 
   /**
@@ -125,22 +124,6 @@ export function useProsemirror(
      */
     [el]
   )
-
-  React.useEffect(() => {
-    /**
-     * The editorView may exist, even if it's docView does not.
-     * Trying to updateState when the docView dne throws an error.
-     */
-    if (!el) return
-    if (!editorView || !editorView.view) return
-    if (!(editorView.view as CheckableEditorView).docView) return
-
-    const wysiwygIsActive = el.contains(document.activeElement)
-
-    if (!wysiwygIsActive) {
-      editorView.view.updateState(createState(input.value))
-    }
-  }, [input.value, editorView, document])
 
   return { elRef, editorView, translator }
 }
