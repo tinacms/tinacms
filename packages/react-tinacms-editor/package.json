@@ -11,6 +11,7 @@
   "scripts": {
     "watch": "tsdx watch",
     "build": "tsdx build",
+    "storybook": "start-storybook -p 9001 -c .storybook",
     "dev": "tsdx build",
     "test": "tsdx test --env=jsdom --passWithNoTests",
     "lint": "tsdx lint"

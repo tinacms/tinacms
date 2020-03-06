@@ -103,9 +103,7 @@
                       "type": "link",
                       "attrs": {
                         "href": "/test",
-                        "title": null,
-                        "editing": null,
-                        "creating": null
+                        "title": null
                       }
                     }
                   ],
