@@ -78,8 +78,6 @@ describe('insertLinkToFile', () => {
 
 /**
  * removeLinkBeingEdited(state, dispatch)
- *
- * TODO: These tests have been invalidated
  */
 describe('removeLinkBeingEdited', () => {
   it('should remove a link being edited', () => {
@@ -91,8 +89,6 @@ describe('removeLinkBeingEdited', () => {
 
 /**
  * updateLinkBeingEdited(state, dispatchi, attrs)
- *
- * TODO: These tests have been invalidated
  */
 describe('updateLinkBeingEdited', () => {
   it('should set href on link being edited', () => {
