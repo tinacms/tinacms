@@ -17,10 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 
 import { useState } from 'react'
-import { Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import {
   Button,
@@ -31,14 +29,9 @@ import {
   radius,
   shadow,
 } from '@tinacms/styles'
-import { ActionsMenu } from './ActionsMenu'
-import FormsList from './FormsList'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { LeftArrowIcon } from '@tinacms/icons'
-import { LoadingDots } from './LoadingDots'
-import { ResetForm } from './ResetForm'
-import { useCMS, useSubscribable } from '../react-tinacms'
-import { FormPortalProvider } from './FormPortal'
+import { FormList } from './FormList'
+import { useCMS, useSubscribable } from '../../react-tinacms'
+import { FormView, FormHeader } from '../form/FormView'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
@@ -87,7 +80,7 @@ export const FormsView = () => {
 
   if (isMultiform && !activeForm) {
     return (
-      <FormsList
+      <FormList
         isEditing={isEditing}
         forms={forms}
         setActiveFormId={setActiveFormId}
@@ -107,92 +100,6 @@ export const FormsView = () => {
         </FormWrapper>
       )}
     </>
-  )
-}
-
-export interface FormViewProps {
-  activeForm: Form
-  setActiveFormId(id: string): void
-  isMultiform: boolean
-}
-export function FormView({
-  activeForm,
-  setActiveFormId,
-  isMultiform,
-}: FormViewProps) {
-  const cms = useCMS()
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      if (!result.destination || !activeForm) return
-      const name = result.type
-      activeForm.mutators.move(
-        name,
-        result.source.index,
-        result.destination.index
-      )
-    },
-    [activeForm]
-  )
-
-  return (
-    <FormBuilder form={activeForm as any}>
-      {({ handleSubmit, pristine, form, submitting }) => {
-        return (
-          <DragDropContext onDragEnd={moveArrayItem}>
-            {isMultiform && (
-              <FormHeader
-                activeForm={activeForm}
-                setActiveFormId={setActiveFormId}
-              />
-            )}
-            <FormBody>
-              <FormPortalProvider>
-                <Wrapper>
-                  {activeForm &&
-                    (activeForm.fields.length ? (
-                      <FieldsBuilder
-                        form={activeForm}
-                        fields={activeForm.fields}
-                      />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    ))}
-                </Wrapper>
-              </FormPortalProvider>
-            </FormBody>
-            <FormFooter>
-              <Wrapper>
-                {activeForm.reset && (
-                  <ResetForm
-                    pristine={pristine}
-                    reset={async () => {
-                      form.reset()
-                      await activeForm.reset!()
-                    }}
-                  >
-                    {cms.sidebar.buttons.reset}
-                  </ResetForm>
-                )}
-                <Button
-                  onClick={() => handleSubmit()}
-                  disabled={pristine}
-                  busy={submitting}
-                  primary
-                  grow
-                  margin
-                >
-                  {submitting && <LoadingDots />}
-                  {!submitting && cms.sidebar.buttons.save}
-                </Button>
-                {activeForm.actions.length > 0 && (
-                  <ActionsMenu actions={activeForm.actions} form={activeForm} />
-                )}
-              </Wrapper>
-            </FormFooter>
-          </DragDropContext>
-        )
-      }}
-    </FormBuilder>
   )
 }
 
@@ -304,72 +211,6 @@ const NoFormsPlaceholder = () => (
     </p>
   </EmptyState>
 )
-
-const NoFieldsPlaceholder = () => (
-  <EmptyState>
-    <Emoji>🤔</Emoji>
-    <h3>Hey, you don't have any fields added to this form.</h3>
-    <p>
-      <LinkButton
-        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
-        target="_blank"
-      >
-        <Emoji>📖</Emoji> Field Setup Guide
-      </LinkButton>
-    </p>
-  </EmptyState>
-)
-
-interface FormHeaderProps {
-  activeForm: Form
-  setActiveFormId(id?: string): void
-}
-
-const FormHeader = styled(
-  ({ activeForm, setActiveFormId, ...styleProps }: FormHeaderProps) => {
-    return (
-      <div {...styleProps} onClick={() => setActiveFormId()}>
-        <LeftArrowIcon />
-        <span>{activeForm.label}</span>
-      </div>
-    )
-  }
-)`
-  position: relative;
-  width: 100%;
-  cursor: pointer;
-  background-color: white;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  padding: 0 ${padding()} ${padding('small')} ${padding()};
-  color: inherit;
-  font-size: ${font.size(5)};
-  transition: color 250ms ease-out;
-  user-select: none;
-  span {
-    flex: 1 1 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  svg {
-    flex: 0 0 auto;
-    width: 24px;
-    fill: ${color.grey(3)};
-    height: auto;
-    transform: translate3d(-4px, 0, 0);
-    transition: transform 150ms ease-out;
-  }
-  :hover {
-    color: ${color.primary()};
-    svg {
-      fill: ${color.grey(8)};
-      transform: translate3d(-7px, 0, 0);
-      transition: transform 250ms ease;
-    }
-  }
-`
 
 export const Wrapper = styled.div`
   display: block;

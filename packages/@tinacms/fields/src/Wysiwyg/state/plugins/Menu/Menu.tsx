@@ -42,20 +42,19 @@ import {
   OrderedListIcon,
   QuoteIcon,
   TableIcon,
-  UnorderedListIcon,
   UnderlineIcon,
+  UnorderedListIcon,
 } from '@tinacms/icons'
 import { radius, color, padding } from '@tinacms/styles'
+import { UndoControl, RedoControl } from './historyControl'
 import { MenuPortalProvider, useMenuPortal } from './MenuPortal'
-
-// import { ImageControl } from './images'
 
 interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
-  view: EditorView
+  editorView: { view: EditorView }
   theme: any
-  sticky?: boolean
+  sticky?: boolean | string
 }
 
 interface State {
@@ -95,11 +94,12 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { view, bottom = false, theme, sticky = true } = props
+  const { editorView, bottom = false, theme, sticky = true } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
+  const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
 
   useEffect(() => {
     if (menuRef.current && sticky) {
@@ -151,6 +151,7 @@ export const Menu = (props: Props) => {
     e.preventDefault()
   }, [])
 
+  const { view } = editorView
   return (
     <ThemeProvider theme={theme}>
       <>
@@ -158,6 +159,7 @@ export const Menu = (props: Props) => {
           <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
         )}
         <MenuWrapper
+          menuFixedTopOffset={menuFixedTopOffset}
           menuFixed={menuFixed}
           menuBoundingBox={menuBoundingBox}
           ref={menuRef}
@@ -175,11 +177,13 @@ export const Menu = (props: Props) => {
               {supportBlocks && <CodeControl view={view} bottom={bottom} />}
               {supportBlocks && <BulletList view={view} bottom={bottom} />}
               {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+              <UndoControl view={view} />
+              <RedoControl view={view} />
             </MenuContainer>
           </MenuPortalProvider>
         </MenuWrapper>
-        <FloatingTableMenu view={view} />
-        <ImageMenu view={view} />
+        <FloatingTableMenu editorView={editorView} />
+        <ImageMenu editorView={editorView} />
       </>
     </ThemeProvider>
   )
@@ -289,19 +293,20 @@ const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
 type MenuWrapperProps = {
   menuFixed: boolean
   menuBoundingBox: any
+  menuFixedTopOffset: string
 }
 
 const MenuWrapper = styled.div<MenuWrapperProps>`
   position: relative;
   margin-bottom: 14px;
-  z-index: 10000;
+  z-index: 900;
 
   ${props =>
     props.menuFixed &&
     css`
       position: fixed;
       width: ${props.menuBoundingBox.width}px;
-      top: 0;
+      top: ${props.menuFixedTopOffset};
     `};
 `
 

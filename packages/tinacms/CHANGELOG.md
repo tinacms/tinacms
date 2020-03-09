@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.16.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.16.0-alpha.0...tinacms@0.16.0-alpha.1) (2020-03-06)
+
+**Note:** Version bump only for package tinacms
+
+# [0.16.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.15.0-alpha.0...tinacms@0.16.0-alpha.0) (2020-03-05)
+
+### Bug Fixes
+
+- BlockOption doesn't throw react warnings ([fcb477a](https://github.com/tinacms/tinacms/commit/fcb477a))
+- react warnings from MenuLinks ([386829f](https://github.com/tinacms/tinacms/commit/386829f))
+- react warnings with index ([b705b85](https://github.com/tinacms/tinacms/commit/b705b85))
+- supress react key warnings from form actions ([42cc21f](https://github.com/tinacms/tinacms/commit/42cc21f))
+
+### Features
+
+- **Fields:** added an HTML field plugin ([f12cf3e](https://github.com/tinacms/tinacms/commit/f12cf3e))
+- added API for triggering alerts ([e396699](https://github.com/tinacms/tinacms/commit/e396699)), closes [#821](https://github.com/tinacms/tinacms/issues/821)
+
 # [0.15.0](https://github.com/tinacms/tinacms/compare/tinacms@0.15.0-alpha.0...tinacms@0.15.0) (2020-03-02)
 
 ### Features

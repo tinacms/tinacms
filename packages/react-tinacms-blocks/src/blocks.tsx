@@ -40,7 +40,16 @@ export function Blocks({ form, name, data, components }: BlocksProps) {
           return nullOrError('Unrecognized Block Type: ' + data._template)
         }
 
-        return <Component form={form} data={data} index={index} name={name} />
+        return (
+          <Component
+            // NOTE: Supressing warnings, but not helping with render perf
+            key={index}
+            form={form}
+            data={data}
+            index={index}
+            name={name}
+          />
+        )
       })}
     </>
   )

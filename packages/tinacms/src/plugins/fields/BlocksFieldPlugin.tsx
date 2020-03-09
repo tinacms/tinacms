@@ -38,7 +38,7 @@ import {
   IconButton,
   shadow,
 } from '@tinacms/styles'
-import { useFormPortal } from '../../components/FormPortal'
+import { useFormPortal } from '../../components/form/FormPortal'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -125,6 +125,7 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
             <BlockMenuList>
               {Object.entries(field.templates).map(([name, template]) => (
                 <BlockOption
+                  key={name}
                   onClick={() => {
                     addItem(name, template)
                     setVisible(false)
@@ -149,6 +150,8 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
                   if (!template) {
                     return (
                       <InvalidBlockListItem
+                        // NOTE: Supressing warnings, but not helping with render perf
+                        key={index}
                         index={index}
                         field={field}
                         tinaForm={tinaForm}
@@ -163,8 +166,8 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
 
                   return (
                     <BlockListItem
-                      // TODO: Find beter solution for `key`. Using a value from the
-                      // block will cause the panel to close if the key property is changed.
+                      // NOTE: Supressing warnings, but not helping with render perf
+                      key={index}
                       block={block}
                       template={template}
                       index={index}

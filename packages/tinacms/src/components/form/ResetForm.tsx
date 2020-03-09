@@ -25,8 +25,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-} from './modals/ModalProvider'
-import { ModalPopup } from './modals/ModalPopup'
+} from '../modals/ModalProvider'
+import { ModalPopup } from '../modals/ModalPopup'
 
 interface ResetFormProps {
   children: any

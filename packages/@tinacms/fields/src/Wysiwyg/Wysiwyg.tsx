@@ -44,14 +44,14 @@ export const Wysiwyg = styled(
     )
 
     return (
-      <WysiwygWrapper>
+      <WysiwygWrapper className="wysiwyg-wrapper">
         <link
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
         />
         {editorView && (
           <Menu
-            view={editorView}
+            editorView={editorView}
             bottom={false}
             translator={translator}
             theme={theme}

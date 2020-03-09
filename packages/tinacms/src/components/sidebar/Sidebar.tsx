@@ -19,10 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useState } from 'react'
 import styled, { keyframes, css } from 'styled-components'
-import { FormsView } from '../FormView'
-import { Modal, ModalHeader, ModalBody } from '../modals/ModalProvider'
-import { ModalFullscreen } from '../modals/ModalFullscreen'
-import { ModalPopup } from '../modals/ModalPopup'
+import { FormsView } from './SidebarBody'
 import {
   HamburgerIcon,
   LeftArrowIcon,
@@ -31,17 +28,18 @@ import {
 } from '@tinacms/icons'
 import { padding, color, radius, font, timing } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
-import { CreateContentMenu } from '../CreateContent'
+import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useSubscribable, useCMS } from '../../react-tinacms'
 import { SidebarState } from '../../tina-cms'
+import { ScreenPluginView } from './ScreenPluginModal'
 
 export const Sidebar = () => {
   const cms = useCMS()
   useSubscribable(cms.sidebar)
   useSubscribable(cms.screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
-  const [ActiveView, setActiveView] = useState<ScreenPlugin | null>(null)
+  const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
   const allScreens = cms.screens.all()
   const showMenu = allScreens.length > 0
 
@@ -68,6 +66,7 @@ export const Sidebar = () => {
                   const Icon = view.Icon
                   return (
                     <MenuLink
+                      key={view.name}
                       value={view.name}
                       onClick={() => {
                         setActiveView(view)
@@ -83,55 +82,15 @@ export const Sidebar = () => {
             <Watermark />
           </MenuPanel>
         )}
-        {ActiveView && (
-          <ActiveViewModal
-            name={ActiveView.name}
+        {activeScreen && (
+          <ScreenPluginView
+            screen={activeScreen}
             close={() => setActiveView(null)}
-            layout={ActiveView.layout}
-          >
-            <ActiveView.Component close={() => setActiveView(null)} />
-          </ActiveViewModal>
+          />
         )}
       </SidebarWrapper>
       <SidebarToggle sidebar={cms.sidebar} />
     </SidebarContainer>
-  )
-}
-
-interface ActiveViewProps {
-  children: any
-  name: string
-  close: any
-  layout?: 'fullscreen' | 'popup'
-}
-
-const ActiveViewModal = ({
-  children,
-  name,
-  close,
-  layout,
-}: ActiveViewProps) => {
-  let Wrapper
-
-  switch (layout) {
-    case 'popup':
-      Wrapper = ModalPopup
-      break
-    case 'fullscreen':
-      Wrapper = ModalFullscreen
-      break
-    default:
-      Wrapper = ModalPopup
-      break
-  }
-
-  return (
-    <Modal>
-      <Wrapper>
-        <ModalHeader close={close}>{name}</ModalHeader>
-        <ModalBody>{children}</ModalBody>
-      </Wrapper>
-    </Modal>
   )
 }
 

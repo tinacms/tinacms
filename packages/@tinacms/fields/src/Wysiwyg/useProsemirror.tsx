@@ -74,7 +74,7 @@ export function useProsemirror(
   /**
    * The Prosemirror EditorView instance
    */
-  const [editorView, setEditorView] = React.useState<EditorView>()
+  const [editorView, setEditorView] = React.useState<{ view: EditorView }>()
 
   React.useEffect(
     function setupEditor() {
@@ -88,7 +88,7 @@ export function useProsemirror(
       /**
        * Create a new Prosemirror EditorView on in the DOM
        */
-      const editorView = new EditorView(el, {
+      const view = new EditorView(el, {
         nodeViews: nodeViews as any,
         /**
          * The initial state of the Wysiwyg
@@ -100,10 +100,10 @@ export function useProsemirror(
          * @param tr
          */
         dispatchTransaction(tr) {
-          const nextState: any = editorView.state.apply(tr as any)
+          const nextState: any = view.state.apply(tr as any)
 
-          editorView.updateState(nextState as any)
-          setEditorView(editorView)
+          view.updateState(nextState as any)
+          setEditorView({ view })
 
           if (tr.docChanged) {
             input.onChange(translator!.stringFromNode(tr.doc))
@@ -111,13 +111,13 @@ export function useProsemirror(
         },
       })
 
-      setEditorView(editorView)
+      setEditorView({ view })
       /**
        * Destroy the EditorView to prevent duplicates
        */
       return () => {
         setEditorView(undefined)
-        if (editorView) editorView.destroy()
+        if (editorView) view.destroy()
       }
     },
     /**
@@ -132,13 +132,13 @@ export function useProsemirror(
      * Trying to updateState when the docView dne throws an error.
      */
     if (!el) return
-    if (!editorView) return
-    if (!(editorView as CheckableEditorView).docView) return
+    if (!editorView || !editorView.view) return
+    if (!(editorView.view as CheckableEditorView).docView) return
 
     const wysiwygIsActive = el.contains(document.activeElement)
 
     if (!wysiwygIsActive) {
-      editorView.updateState(createState(input.value))
+      editorView.view.updateState(createState(input.value))
     }
   }, [input.value, editorView, document])
 

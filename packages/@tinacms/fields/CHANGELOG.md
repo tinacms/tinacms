@@ -3,6 +3,27 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.7.0-alpha.0...@tinacms/fields@0.7.0-alpha.1) (2020-03-06)
+
+**Note:** Version bump only for package @tinacms/fields
+
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.2-alpha.0...@tinacms/fields@0.7.0-alpha.0) (2020-03-05)
+
+### Bug Fixes
+
+- bump zindex ([36bd3ae](https://github.com/tinacms/tinacms/commit/36bd3ae))
+- label on Select Field should be optionalg ([abee3ec](https://github.com/tinacms/tinacms/commit/abee3ec))
+- move logic and fix for portal ([b64b37e](https://github.com/tinacms/tinacms/commit/b64b37e))
+- offset menu to align with trigger ([9e6893a](https://github.com/tinacms/tinacms/commit/9e6893a))
+
+### Features
+
+- add reset wrapper, add normal text mock button ([e76f0ce](https://github.com/tinacms/tinacms/commit/e76f0ce))
+- adding undo redo menu options ([c0cb25a](https://github.com/tinacms/tinacms/commit/c0cb25a))
+- menu portal ([713eafb](https://github.com/tinacms/tinacms/commit/713eafb))
+- **wysiwyg:** change top-offset of sticky wysiwyg ([7a831da](https://github.com/tinacms/tinacms/commit/7a831da))
+- **Wysiwyg:** supports editing HTML ([cd2115e](https://github.com/tinacms/tinacms/commit/cd2115e)), closes [#437](https://github.com/tinacms/tinacms/issues/437)
+
 # [0.6.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.5.2-alpha.0...@tinacms/fields@0.6.0) (2020-03-02)
 
 ### Bug Fixes
