@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-mdx",
-  "version": "0.1.2-alpha.0",
+  "version": "0.1.2",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -31,9 +31,9 @@
     "test": "jest --passWithNoTests"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.13-alpha.0",
+    "@tinacms/scripts": "^0.1.13",
     "@types/js-yaml": "^3.12.1",
-    "tinacms": "^0.16.0-alpha.0"
+    "tinacms": "^0.16.0"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",

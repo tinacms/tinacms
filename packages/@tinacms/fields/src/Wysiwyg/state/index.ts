@@ -31,6 +31,7 @@ import { buildKeymap } from './buildKeymap'
 import { links } from './plugins/links'
 import { tablePlugin } from './plugins/Table'
 import { imagePlugin } from './plugins/Image'
+import { commonPlugin } from './plugins/Common'
 
 export function createEditorState(
   schema: Schema,
@@ -52,6 +53,7 @@ export function createEditorState(
       tableEditing(),
       tablePlugin,
       imagePlugin,
+      commonPlugin,
     ],
   })
 }

@@ -16,20 +16,27 @@ limitations under the License.
 
 */
 
-export const findElementOffsetTop = (element: HTMLElement) => {
+export const findElementOffsetTop = (
+  element: HTMLElement,
+  parent?: HTMLElement
+) => {
   let target = element
   let offsetTop = target.offsetTop
-  while (target.offsetParent) {
+  while (target.offsetParent && (!parent || target.offsetParent !== parent)) {
     target = target.offsetParent as HTMLElement
     offsetTop += target.offsetTop
+    console.log(target)
   }
   return offsetTop
 }
 
-export const findElementOffsetLeft = (element: HTMLElement) => {
+export const findElementOffsetLeft = (
+  element: HTMLElement,
+  parent?: HTMLElement
+) => {
   let target = element
   let offsetLeft = target.offsetLeft
-  while (target.offsetParent) {
+  while (target.offsetParent && (!parent || target.offsetParent !== parent)) {
     target = target.offsetParent as HTMLElement
     offsetLeft += target.offsetLeft
   }
