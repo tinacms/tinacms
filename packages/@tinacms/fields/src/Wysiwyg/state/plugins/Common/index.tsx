@@ -16,6 +16,16 @@ limitations under the License.
 
 */
 
-export function foo() {
-  return 'bar'
-}
+import { Plugin, PluginKey } from 'prosemirror-state'
+
+export const commonPluginKey = new PluginKey('common')
+
+export const commonPlugin = new Plugin({
+  key: commonPluginKey,
+
+  props: {
+    handleScrollToSelection() {
+      return true
+    },
+  },
+})

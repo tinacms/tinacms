@@ -64,7 +64,8 @@
         "code",
         "review",
         "maintenance",
-        "doc"
+        "doc",
+        "blog"
       ]
     },
     {
@@ -79,7 +80,8 @@
         "maintenance",
         "review",
         "test",
-        "code"
+        "code",
+        "blog"
       ]
     },
     {
@@ -95,7 +97,8 @@
         "maintenance",
         "talk",
         "review",
-        "code"
+        "code",
+        "blog"
       ]
     },
     {
@@ -144,7 +147,8 @@
       "contributions": [
         "doc",
         "talk",
-        "fundingFinding"
+        "fundingFinding",
+        "blog"
       ]
     },
     {
@@ -153,7 +157,8 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/618212?v=4",
       "profile": "http://www.mitchmac.com",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "blog"
       ]
     },
     {
@@ -199,7 +204,8 @@
       "avatar_url": "https://avatars1.githubusercontent.com/u/120511?v=4",
       "profile": "https://twitter.com/hypertextmike",
       "contributions": [
-        "userTesting"
+        "userTesting",
+        "doc"
       ]
     },
     {
@@ -515,6 +521,15 @@
       "profile": "https://joeprevite.com",
       "contributions": [
         "code"
+      ]
+    },
+    {
+      "login": "madelyneriksen",
+      "name": "Madelyn Eriksen",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/36825510?v=4",
+      "profile": "https://www.madelyneriksen.com",
+      "contributions": [
+        "blog"
       ]
     }
   ],
