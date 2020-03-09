@@ -87,18 +87,6 @@ describe('removeLinkBeingEdited', () => {
       .apply(removeLinkBeingEdited)
       .expect(doc(p(text('one'))))
   })
-
-  it("should not remove a link that's not being edited", () => {
-    forDoc(doc(p(link('one', { href: '/one' }))))
-      .apply(removeLinkBeingEdited)
-      .expect(doc(p(link('one', { href: '/one' }))))
-  })
-
-  it('should remove a link being edited no matter where it is', () => {
-    forDoc(doc(p(link('one', { href: '/one' }), link('two', { href: '/two' }))))
-      .apply(removeLinkBeingEdited)
-      .expect(doc(p(link('one', { href: '/one' }), text('two'))))
-  })
 })
 
 /**
@@ -126,6 +114,7 @@ describe('updateLinkBeingEdited', () => {
           p(
             link('one', {
               href: '/one',
+              title: 'Link Title',
             })
           )
         )
