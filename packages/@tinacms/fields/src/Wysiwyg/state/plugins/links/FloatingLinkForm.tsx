@@ -40,8 +40,10 @@ export const FloatingLinkForm = ({
 }) => {
   const { view } = editorView
   const linkPluginState = linkPluginKey.getState(view.state)
-  const clickTarget = view.domAtPos(view.state.selection.anchor).node
-    .parentElement
+  const node = view.state.selection.empty
+    ? view.domAtPos(view.state.selection.anchor).node
+    : view.domAtPos(view.state.selection.anchor + 1).node
+  const clickTarget = node.parentNode
 
   const onChange = (attrs: any) => {
     updateLinkBeingEdited(view.state, view.dispatch, attrs)
