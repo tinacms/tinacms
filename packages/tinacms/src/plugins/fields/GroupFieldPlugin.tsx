@@ -28,7 +28,7 @@ import {
   ThemeProps,
 } from '@tinacms/styles'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
-import { useFormPortal } from '../../components/FormPortal'
+import { useFormPortal } from '../../components/form/FormPortal'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -194,7 +194,7 @@ export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  z-index: 50;
+  z-index: 950;
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
 
   > * {
