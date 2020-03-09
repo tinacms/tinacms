@@ -3,6 +3,10 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/tinacms/tinacms/compare/@tinacms/git-client@0.6.0-alpha.1...@tinacms/git-client@0.6.0) (2020-03-09)
+
+**Note:** Version bump only for package @tinacms/git-client
+
 # [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/git-client@0.4.2...@tinacms/git-client@0.5.0) (2020-03-02)
 
 ### Features
