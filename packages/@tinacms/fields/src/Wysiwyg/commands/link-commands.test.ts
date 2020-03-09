@@ -81,7 +81,7 @@ describe('insertLinkToFile', () => {
  *
  * TODO: These tests have been invalidated
  */
-describe.skip('removeLinkBeingEdited', () => {
+describe('removeLinkBeingEdited', () => {
   it('should remove a link being edited', () => {
     forDoc(doc(p(link('one', { href: '/one' }))))
       .apply(removeLinkBeingEdited)
@@ -106,7 +106,7 @@ describe.skip('removeLinkBeingEdited', () => {
  *
  * TODO: These tests have been invalidated
  */
-describe.skip('updateLinkBeingEdited', () => {
+describe('updateLinkBeingEdited', () => {
   it('should set href on link being edited', () => {
     forDoc(doc(p(link('one', { href: '/one' }))))
       .apply(updateLinkBeingEdited, {
