@@ -43,7 +43,7 @@ export function InlineTextareaField({ name }: InlineTextFieldProps) {
   )
 }
 
-const InputFocusWrapper = styled.div`
+export const InputFocusWrapper = styled.div`
   position: relative;
 
   &:focus-within {
