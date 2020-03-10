@@ -16,17 +16,9 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
-import { wysiwygStyles } from './wysiwygStyles'
+import { Node } from 'prosemirror-model'
 
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
-
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse,
+export abstract class Translator {
+  abstract nodeFromString(content: string): Node | null
+  abstract stringFromNode(node: Node): string
 }
