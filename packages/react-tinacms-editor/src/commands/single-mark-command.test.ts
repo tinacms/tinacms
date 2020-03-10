@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { PMTestHarness } from '../../prosemirror-test-utils'
+import { PMTestHarness } from '../prosemirror-test-utils'
 import { defaultSchema } from '../default-schema'
 import { singleMarkCommand } from './single-mark-command'
 import { EM } from '../state/plugins/input-rules'
