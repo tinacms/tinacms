@@ -28,12 +28,12 @@ export interface BlockText {
  ** TODO: Make it accept styles
  */
 
-export function BlockText({ name }: InlineTextFieldProps) {
+export function BlockText({ name, className }: InlineTextFieldProps) {
   return (
     <BlockField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
-          return <InlineTextField {...input} />
+          return <InlineTextField {...input} className={className} />
         }
         return <>{input.value}</>
       }}
