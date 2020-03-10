@@ -16,17 +16,15 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
-import { wysiwygStyles } from './wysiwygStyles'
+// :: MarkdownSerializer
+// A serializer for the [basic schema](#schema).
+import { MarkdownSerializer } from '../to_markdown'
+import { Schema } from 'prosemirror-model'
+import { buildMarksFromSchema, buildNodesFromSchema } from './tokens'
 
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
-
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse,
+export function CommonMarkSerializer(schema: Schema) {
+  return new MarkdownSerializer(
+    buildNodesFromSchema(schema),
+    buildMarksFromSchema(schema)
+  )
 }

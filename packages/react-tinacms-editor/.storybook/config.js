@@ -16,17 +16,12 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
-import { wysiwygStyles } from './wysiwygStyles'
+import { configure } from '@storybook/react'
+// automatically import all files ending in *.stories.tsx
+const req = require.context('../stories', true, /\.stories\.tsx$/)
 
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
-
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse,
+function loadStories() {
+  req.keys().forEach(req)
 }
+
+configure(loadStories, module)
