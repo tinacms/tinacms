@@ -20,7 +20,7 @@
     "react-final-form": "^>=6",
     "styled-components": ">=4.1",
     "tinacms": ">=0.13",
-    "react-textarea-autosize": "^7.1.2"
+    "react-textarea-autosize": ">=7.1"
   },
   "devDependencies": {
     "@tinacms/icons": "^0.4.1",
