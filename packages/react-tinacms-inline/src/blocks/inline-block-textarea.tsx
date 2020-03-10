@@ -14,7 +14,7 @@ export function BlockTextArea({ name }: InlineTextFieldProps) {
     <BlockField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
-          return <InlineTextarea type="text" {...input} />
+          return <InlineTextarea {...input} />
         }
         return <>{input.value}</>
       }}
