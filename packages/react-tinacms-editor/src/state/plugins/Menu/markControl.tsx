@@ -120,7 +120,7 @@ export function markControl({
           data-tooltip={tooltip}
           data-side="top"
           onClick={this.onClick}
-          active={this.active}
+          active={!this.disabled && this.active}
           disabled={this.disabled}
         >
           <Icon />

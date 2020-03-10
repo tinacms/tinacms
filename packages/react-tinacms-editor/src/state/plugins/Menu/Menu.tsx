@@ -84,7 +84,13 @@ const LinkControl = markControl({
   },
   noMix: ['code'],
   isDisabled: (view: EditorView) => {
-    return !!imagePluginKey.getState(view.state).selectedImage
+    const { state } = view
+    const { selection, schema } = state
+    const linkPresent = selection.$anchor
+      .marks()
+      .some(mark => mark.type === schema.marks.link)
+
+    return linkPresent || !!imagePluginKey.getState(view.state).selectedImage
   },
   onClick: (view: EditorView) => {
     const { state, dispatch } = view
