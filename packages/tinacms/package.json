@@ -47,10 +47,12 @@
     "lodash.merge": "^4.6.2",
     "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",
-    "react-dismissible": "^1.1.5"
+    "react-dismissible": "^1.1.5",
+    "react-tinacms-editor": "^0.0.0"
   },
   "peerDependencies": {
     "react": ">=16.8",
+    "react-dom": ">=16.8",
     "styled-components": ">=4.1"
   }
 }
