@@ -27,12 +27,12 @@ import { InlineTextarea } from '../inline-field-textarea'
 interface BlockTextArea {
   name: string
 }
-export function BlockTextArea({ name }: InlineTextFieldProps) {
+export function BlockTextArea({ name, className }: InlineTextFieldProps) {
   return (
     <BlockField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
-          return <InlineTextarea {...input} />
+          return <InlineTextarea {...input} className={className} />
         }
         return <>{input.value}</>
       }}

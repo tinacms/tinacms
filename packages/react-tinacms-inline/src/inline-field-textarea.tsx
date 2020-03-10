@@ -21,19 +21,16 @@ import { InlineField } from './inline-field'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-textarea-autosize'
 import { radius, color } from '@tinacms/styles'
+import { InlineTextFieldProps } from './inline-field-text'
 
-interface InlineTextFieldProps {
-  name: string
-}
-
-export function InlineTextareaField({ name }: InlineTextFieldProps) {
+export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
           return (
             <InputFocusWrapper>
-              <InlineTextarea {...input} rows={1} />
+              <InlineTextarea className={className} {...input} rows={1} />
             </InputFocusWrapper>
           )
         }
