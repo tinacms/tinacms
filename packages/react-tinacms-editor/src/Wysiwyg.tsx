@@ -77,7 +77,7 @@ const WysiwygWrapper = styled.div`
 
 interface InlineWysiwygFieldProps {
   name: string
-  sticky: string
+  sticky?: string
   children: any
 }
 
