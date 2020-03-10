@@ -17,9 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ColorPicker } from '@tinacms/fields'
+import { ColorPicker, InputProps } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { InputProps } from 'react-select/lib/components/Input'
 import { parse } from './textFormat'
 
 export interface ColorFieldProps {
