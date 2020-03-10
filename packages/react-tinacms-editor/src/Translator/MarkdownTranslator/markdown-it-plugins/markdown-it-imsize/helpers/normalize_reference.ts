@@ -16,17 +16,15 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
-import { wysiwygStyles } from './wysiwygStyles'
-
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
-
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse,
+'use strict'
+// Hepler to [reference labels]. No better place for this code :)
+// It's only for refs/links and should not be exported anywhere.
+module.exports = function normalizeReference(str: string) {
+  // use .toUpperCase() instead of .toLowerCase()
+  // here to avoid a conflict with Object.prototype
+  // members (most notably, `__proto__`)
+  return str
+    .trim()
+    .replace(/\s+/g, ' ')
+    .toUpperCase()
 }

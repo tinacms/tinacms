@@ -16,17 +16,15 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
-import { wysiwygStyles } from './wysiwygStyles'
+import { EditorState } from 'prosemirror-state'
+import { EditorView } from 'prosemirror-view'
 
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
+type Dispatch = typeof EditorView.prototype.dispatch
 
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse,
+export function insertHr(state: EditorState, dispatch: Dispatch | null) {
+  const type = state.schema.nodes.horizontal_rule
+  if (dispatch) {
+    dispatch(state.tr.replaceSelectionWith(type.create()).scrollIntoView())
+  }
+  return true
 }

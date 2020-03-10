@@ -15,18 +15,3 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
-import { wysiwygStyles } from './wysiwygStyles'
-
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
-
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse,
-}

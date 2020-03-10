@@ -16,17 +16,12 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
-import { wysiwygStyles } from './wysiwygStyles'
+import { inputRules as pmInputRules } from 'prosemirror-inputrules'
+import { buildInputRules } from './inputRules'
+import { Schema } from 'prosemirror-model'
 
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
+export * from './inputRules'
 
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse,
+export function inputRules(schema: Schema) {
+  return pmInputRules({ rules: buildInputRules(schema) })
 }
