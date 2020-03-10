@@ -30,7 +30,7 @@ import {
 import { Button } from '@tinacms/styles'
 
 import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
-import { useInlineForm } from './inline-form'
+import { useInlineForm } from '../inline-form'
 import { FieldsBuilder } from 'tinacms'
 /**
  *
