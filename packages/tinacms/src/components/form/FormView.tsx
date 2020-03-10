@@ -34,7 +34,6 @@ import {
 } from '@tinacms/styles'
 import { FormActionMenu } from './FormActions'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { LeftArrowIcon } from '@tinacms/icons'
 import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
 import { useCMS } from '../../react-tinacms'
@@ -42,14 +41,8 @@ import { FormPortalProvider } from './FormPortal'
 
 export interface FormViewProps {
   activeForm: Form
-  setActiveFormId(id: string): void
-  isMultiform: boolean
 }
-export function FormView({
-  activeForm,
-  setActiveFormId,
-  isMultiform,
-}: FormViewProps) {
+export function FormView({ activeForm }: FormViewProps) {
   const cms = useCMS()
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
@@ -69,12 +62,6 @@ export function FormView({
       {({ handleSubmit, pristine, form, submitting }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
-            {isMultiform && (
-              <FormHeader
-                activeForm={activeForm}
-                setActiveFormId={setActiveFormId}
-              />
-            )}
             <FormBody>
               <FormPortalProvider>
                 <Wrapper>
@@ -230,57 +217,6 @@ const NoFieldsPlaceholder = () => (
     </p>
   </EmptyState>
 )
-
-export interface FormHeaderProps {
-  activeForm: Form
-  setActiveFormId(id?: string): void
-}
-
-export const FormHeader = styled(
-  ({ activeForm, setActiveFormId, ...styleProps }: FormHeaderProps) => {
-    return (
-      <div {...styleProps} onClick={() => setActiveFormId()}>
-        <LeftArrowIcon />
-        <span>{activeForm.label}</span>
-      </div>
-    )
-  }
-)`
-  position: relative;
-  width: 100%;
-  cursor: pointer;
-  background-color: white;
-  display: flex;
-  flex-wrap: nowrap;
-  align-items: center;
-  padding: 0 ${padding()} ${padding('small')} ${padding()};
-  color: inherit;
-  font-size: ${font.size(5)};
-  transition: color 250ms ease-out;
-  user-select: none;
-  span {
-    flex: 1 1 auto;
-    white-space: nowrap;
-    overflow: hidden;
-    text-overflow: ellipsis;
-  }
-  svg {
-    flex: 0 0 auto;
-    width: 24px;
-    fill: ${color.grey(3)};
-    height: auto;
-    transform: translate3d(-4px, 0, 0);
-    transition: transform 150ms ease-out;
-  }
-  :hover {
-    color: ${color.primary()};
-    svg {
-      fill: ${color.grey(8)};
-      transform: translate3d(-7px, 0, 0);
-      transition: transform 250ms ease;
-    }
-  }
-`
 
 export const Wrapper = styled.div`
   display: block;
