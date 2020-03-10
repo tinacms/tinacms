@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { EditorView, NodeView } from 'prosemirror-view'
+import { EditorView } from 'prosemirror-view'
 import { Plugin } from '@tinacms/core'
 
 import { createEditorState } from './state'
@@ -25,10 +25,6 @@ import { useProsemirrorSchema } from './useProsemirrorSchema'
 import { useProsemirrorTranslator } from './useProsemirrorTranslator'
 import { nodeViews } from './node-views'
 import { Format } from './Translator'
-
-interface CheckableEditorView extends EditorView {
-  docView: NodeView | null
-}
 
 export interface Input {
   value: string
