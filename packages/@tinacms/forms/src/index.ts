@@ -17,3 +17,4 @@ limitations under the License.
 */
 
 export * from './form'
+export { FormApi } from 'final-form'

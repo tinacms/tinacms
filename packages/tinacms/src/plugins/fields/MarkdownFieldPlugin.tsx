@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Wysiwyg } from '@tinacms/fields'
+import { Wysiwyg } from 'react-tinacms-editor'
 import { parse } from './textFormat'
 import { wysiwygStyles } from './wysiwygStyles'
 
