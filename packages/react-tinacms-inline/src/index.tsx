@@ -19,7 +19,4 @@ limitations under the License.
 export * from './inline-form'
 export * from './inline-field'
 export * from './inline-field-text'
-export * from './blocks/inline-field-blocks'
-export * from './blocks/block'
-export * from './blocks/inline-block-field'
-export * from './blocks/inline-block-field-controls'
+export * from './blocks'
