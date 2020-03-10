@@ -20,6 +20,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 
 import {
+  FieldsBuilder,
   BlockTemplate,
   Modal,
   ModalPopup,
@@ -27,11 +28,16 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { Button } from '@tinacms/styles'
-
 import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
-import { FieldsBuilder } from 'tinacms'
+import { radius, color, Button, IconButton } from '@tinacms/styles'
+import {
+  AddIcon,
+  ChevronUpIcon,
+  ChevronDownIcon,
+  CloseIcon,
+} from '@tinacms/icons'
+
 /**
  *
  * TODO: I think this should be defined in `tinacms` and not with the rest of the inline stuff?
@@ -40,6 +46,7 @@ export interface BlocksControlsProps {
   children: any
   index: number
 }
+
 export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { status } = useInlineForm()
   const { insert, move, remove, blocks, count } = useInlineBlocks()
@@ -57,28 +64,85 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
 
   return (
     <BlockWrapper>
-      <AddBlockMenu
-        addBlock={block => insert(index + 1, block)}
-        templates={Object.entries(blocks).map(([, block]) => block.template)}
-      />
-      <button onClick={removeBlock}>Remove</button>
-      <button onClick={moveBlockUp} disabled={isFirst}>
-        Up
-      </button>
-      <button onClick={moveBlockDown} disabled={isLast}>
-        Down
-      </button>
-      <BlockSettings template={template} />
-
+      <BlockMenu>
+        <AddBlockMenu
+          addBlock={block => insert(index + 1, block)}
+          templates={Object.entries(blocks).map(([, block]) => block.template)}
+        />
+        <IconButton primary onClick={moveBlockUp} disabled={isFirst}>
+          <ChevronUpIcon />
+        </IconButton>
+        <IconButton primary onClick={moveBlockDown} disabled={isLast}>
+          <ChevronDownIcon />
+        </IconButton>
+        <IconButton onClick={removeBlock}>
+          <CloseIcon />
+        </IconButton>
+        <BlockSettings template={template} />
+      </BlockMenu>
       {children}
     </BlockWrapper>
   )
 }
 
+const BlockMenu = styled.div`
+  position: absolute;
+  top: -1.5rem;
+  right: -1rem;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+  opacity: 0;
+  transform: translate3d(0, 0, 0);
+  transition: all 120ms ease-out;
+
+  ${Button} {
+    height: 34px;
+    margin-left: 0.5rem;
+  }
+
+  ${IconButton} {
+    width: 34px;
+    height: 34px;
+    margin-left: 0.5rem;
+  }
+`
+
 const BlockWrapper = styled.div`
-  border: 1px solid green;
-  max-width: 500px;
-  margin: 16px;
+  position: relative;
+
+  &:focus-within {
+    ${BlockMenu} {
+      transform: translate3d(0, -100%, 0);
+      opacity: 1;
+    }
+
+    &:after {
+      opacity: 1;
+    }
+  }
+
+  &:hover:not(:focus-within) {
+    &:after {
+      opacity: 0.3;
+    }
+  }
+
+  &:after {
+    content: '';
+    display: block;
+    position: absolute;
+    left: -16px;
+    top: -16px;
+    width: calc(100% + 2rem);
+    height: calc(100% + 2rem);
+    border: 3px solid ${color.primary()};
+    border-radius: ${radius()};
+    opacity: 0;
+    pointer-events: none;
+    z-index: 1000;
+    transition: all 150ms ease-out;
+  }
 `
 
 interface AddBlockMenu {
@@ -91,8 +155,8 @@ function AddBlockMenu({ templates, addBlock }: AddBlockMenu) {
     <>
       {templates.map(template => {
         return (
-          <button
-            key={template.label}
+          <IconButton
+            primary
             onClick={() => {
               addBlock({
                 _template: template.type,
@@ -100,8 +164,8 @@ function AddBlockMenu({ templates, addBlock }: AddBlockMenu) {
               })
             }}
           >
-            Add {template.label}
-          </button>
+            <AddIcon />
+          </IconButton>
         )
       })}
     </>
