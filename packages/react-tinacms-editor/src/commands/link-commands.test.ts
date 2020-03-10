@@ -23,7 +23,7 @@ import {
   startEditingLink,
   insertLinkToFile,
 } from './link-commands'
-import { PMTestHarness } from '../../prosemirror-test-utils'
+import { PMTestHarness } from '../prosemirror-test-utils'
 import { defaultSchema } from '../default-schema'
 
 const { forDoc, shouldNotRun, doc, p, link, text } = new PMTestHarness(
