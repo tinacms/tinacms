@@ -17,24 +17,37 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import styled from 'styled-components'
 import { InlineField } from './inline-field'
+import { InputFocusWrapper } from './inline-field-textarea'
 
 /**
  * InlineTextField
  */
 export interface InlineTextFieldProps {
   name: string
+  className?: string
 }
 
-export function InlineTextField({ name }: InlineTextFieldProps) {
+export function InlineTextField({ name, className }: InlineTextFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
-          return <input type="text" {...input} />
+          return (
+            <InputFocusWrapper>
+              <Input type="text" {...input} className={className} />
+            </InputFocusWrapper>
+          )
         }
         return <>{input.value}</>
       }}
     </InlineField>
   )
 }
+
+const Input = styled.input`
+  /*
+** TODO - add styles
+*/
+`
