@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 
+import { Form } from '@tinacms/forms'
 import { useState } from 'react'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import {
@@ -31,7 +32,8 @@ import {
 } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-tinacms'
-import { FormView, FormHeader } from '../form/FormView'
+import { FormView } from '../form/FormView'
+import { LeftArrowIcon } from '@tinacms/icons'
 
 export const FormsView = () => {
   const [activeFormId, setActiveFormId] = useState<string>()
@@ -92,11 +94,16 @@ export const FormsView = () => {
     <>
       {activeForm && (
         <FormWrapper isEditing={isEditing} isMultiform={isMultiform}>
-          <FormView
-            activeForm={activeForm}
-            setActiveFormId={setActiveFormId}
-            isMultiform={isMultiform}
-          />
+          {isMultiform && (
+            <MultiformFormHeader
+              activeForm={activeForm}
+              setActiveFormId={setActiveFormId}
+            />
+          )}
+          {!isMultiform && activeForm.label && (
+            <FormHeader activeForm={activeForm} />
+          )}
+          <FormView activeForm={activeForm} />
         </FormWrapper>
       )}
     </>
@@ -278,14 +285,14 @@ const FormWrapper = styled.div<FormWrapperProps>`
   width: 100%;
   position: relative;
 
-  ${FormHeader}, ${FormBody}, ${FormFooter} {
+  * > {
     transform: translate3d(100%, 0, 0);
   }
 
   ${p =>
     p.isEditing &&
     css`
-      ${FormHeader}, ${FormBody}, ${FormFooter} {
+      * > {
         transform: none;
         animation-name: ${FormAnimationKeyframes};
         animation-duration: 150ms;
@@ -294,6 +301,103 @@ const FormWrapper = styled.div<FormWrapperProps>`
         animation-timing-function: ease-out;
       }
     `};
+`
+
+export interface MultiformFormHeaderProps {
+  activeForm: Form
+  setActiveFormId(id?: string): void
+}
+
+export const MultiformFormHeader = styled(
+  ({
+    activeForm,
+    setActiveFormId,
+    ...styleProps
+  }: MultiformFormHeaderProps) => {
+    return (
+      <button {...styleProps} onClick={() => setActiveFormId()}>
+        <LeftArrowIcon />
+        <span>{activeForm.label}</span>
+      </button>
+    )
+  }
+)`
+  position: relative;
+  width: 100%;
+  cursor: pointer;
+  border: none;
+  background-image: none;
+  background-color: white;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: 0 ${padding()} ${padding('small')} ${padding()};
+  color: inherit;
+  font-size: ${font.size(5)};
+  transition: color 250ms ease-out;
+  user-select: none;
+
+  span {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+    text-align: left;
+  }
+
+  svg {
+    flex: 0 0 auto;
+    width: 24px;
+    fill: ${color.grey(3)};
+    height: auto;
+    transform: translate3d(-4px, 0, 0);
+    transition: transform 150ms ease-out;
+  }
+
+  :hover,
+  :active {
+    color: ${color.primary()};
+    outline: none;
+    border: none;
+
+    svg {
+      fill: ${color.grey(8)};
+      transform: translate3d(-7px, 0, 0);
+      transition: transform 250ms ease;
+    }
+  }
+`
+
+export interface FormHeaderProps {
+  activeForm: Form
+}
+
+export const FormHeader = styled(
+  ({ activeForm, ...styleProps }: FormHeaderProps) => {
+    return (
+      <div {...styleProps}>
+        <span>{activeForm.label}</span>
+      </div>
+    )
+  }
+)`
+  position: relative;
+  width: 100%;
+  background-color: white;
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: center;
+  padding: 0 ${padding()} ${padding('small')} ${padding()};
+  color: inherit;
+  font-size: ${font.size(5)};
+  user-select: none;
+
+  span {
+    flex: 1 1 auto;
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
 `
 
 export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
