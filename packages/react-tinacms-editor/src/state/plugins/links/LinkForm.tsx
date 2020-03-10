@@ -92,7 +92,6 @@ export class LinkForm extends React.Component<Props, State> {
         <LinkInput
           placeholder="Enter URL"
           type={'text'}
-          autoFocus
           value={href}
           onChange={this.setHref}
           onKeyPress={this.onEnterSave as any}
