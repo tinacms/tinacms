@@ -36,7 +36,7 @@ export function InlineTextField({ name, className }: InlineTextFieldProps) {
         if (status === 'active') {
           return (
             <InputFocusWrapper>
-              <Input type="text" {...input} className={className} />
+              <InlineText type="text" {...input} className={className} />
             </InputFocusWrapper>
           )
         }
@@ -46,7 +46,7 @@ export function InlineTextField({ name, className }: InlineTextFieldProps) {
   )
 }
 
-const Input = styled.input`
+export const InlineText = styled.input`
   /*
 ** TODO - add styles
 */
