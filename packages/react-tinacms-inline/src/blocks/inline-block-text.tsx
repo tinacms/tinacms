@@ -16,10 +16,27 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-text'
-export * from './blocks/inline-field-blocks'
-export * from './blocks/block'
-export * from './blocks/inline-block-field'
-export * from './blocks/inline-block-field-controls'
+import * as React from 'react'
+import { BlockField } from './inline-block-field'
+import { InlineTextFieldProps } from '../inline-field-text'
+
+export interface BlockText {
+  name: string
+}
+
+/*
+ ** TODO: Make it accept styles
+ */
+
+export function BlockText({ name }: InlineTextFieldProps) {
+  return (
+    <BlockField name={name}>
+      {({ input, status }) => {
+        if (status === 'active') {
+          return <input type="text" {...input} />
+        }
+        return <>{input.value}</>
+      }}
+    </BlockField>
+  )
+}
