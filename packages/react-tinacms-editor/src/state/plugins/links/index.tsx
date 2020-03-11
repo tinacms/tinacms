@@ -19,6 +19,7 @@ limitations under the License.
 import { Fragment, Node, Slice, Mark } from 'prosemirror-model'
 import { Plugin, Transaction, PluginKey, EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+import { commonPluginKey } from '../Common'
 
 export const HTTP_LINK_REGEX = /\bhttps?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:;%_\+.,~#?&//=]*)/g
 
@@ -54,15 +55,26 @@ export function links(): Plugin {
           }
         }
 
+        const { editorFocused } = commonPluginKey.getState(state)
+        const { anchor, head } = state.selection
+        let pos = anchor < head ? anchor : head
+        pos = state.selection.empty ? pos : pos + 1
+
         if (
-          state.selection.$anchor
+          state.doc
+            .resolve(pos)
             .marks()
             .some((mark: Mark) => mark.type === state.schema.marks.link)
         ) {
           return {
             show_link_toolbar: true,
           }
+        } else if (editorFocused) {
+          return {
+            show_link_toolbar: false,
+          }
         }
+
         return prev
       },
     },

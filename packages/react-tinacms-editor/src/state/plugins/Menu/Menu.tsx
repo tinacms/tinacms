@@ -86,7 +86,11 @@ const LinkControl = markControl({
   isDisabled: (view: EditorView) => {
     const { state } = view
     const { selection, schema } = state
-    const linkPresent = selection.$anchor
+    const { anchor, head } = view.state.selection
+    let pos = anchor < head ? anchor : head
+    pos = selection.empty ? pos : pos + 1
+    const linkPresent = state.doc
+      .resolve(pos)
       .marks()
       .some(mark => mark.type === schema.marks.link)
 

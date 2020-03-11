@@ -43,6 +43,7 @@ export function createEditorState(
     schema,
     doc: translator.nodeFromString(value),
     plugins: [
+      commonPlugin,
       inputRules(schema),
       keymap(buildKeymap(schema, plugins)),
       history(),
@@ -52,7 +53,6 @@ export function createEditorState(
       tableEditing(),
       tablePlugin,
       imagePlugin,
-      commonPlugin,
     ],
   })
 }
