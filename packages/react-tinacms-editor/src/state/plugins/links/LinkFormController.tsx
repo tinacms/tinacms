@@ -27,17 +27,13 @@ import {
   updateLinkBeingEdited,
 } from '../../../commands'
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
-import styled, { ThemeProvider } from 'styled-components'
+import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
 
 export class LinkFormController {
   clickTarget: HTMLElement | null = null
 
-  constructor(
-    protected renderTarget: HTMLElement,
-    protected view: EditorView,
-    protected theme?: any
-  ) {
+  constructor(protected renderTarget: HTMLElement, protected view: EditorView) {
     //
   }
 
@@ -61,25 +57,23 @@ export class LinkFormController {
     )
 
     return (
-      <ThemeProvider theme={this.theme}>
-        <TinaReset>
-          <LinkFormWrapper>
-            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
-            <LinkForm
-              style={{
-                left,
-                top,
-                minWidth: `${minWidth}px`,
-              }}
-              removeLink={this.removeLink}
-              onChange={this.onChange}
-              href={this.href}
-              title={this.title}
-              cancel={this.cancel}
-            />
-          </LinkFormWrapper>
-        </TinaReset>
-      </ThemeProvider>
+      <TinaReset>
+        <LinkFormWrapper>
+          <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+          <LinkForm
+            style={{
+              left,
+              top,
+              minWidth: `${minWidth}px`,
+            }}
+            removeLink={this.removeLink}
+            onChange={this.onChange}
+            href={this.href}
+            title={this.title}
+            cancel={this.cancel}
+          />
+        </LinkFormWrapper>
+      </TinaReset>
     )
   }
 

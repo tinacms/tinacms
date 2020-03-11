@@ -19,7 +19,6 @@ limitations under the License.
 import { FC } from 'react'
 import styled from 'styled-components'
 import * as React from 'react'
-import { color, radius } from '@tinacms/styles'
 
 export interface ToggleProps {
   name: string
@@ -69,19 +68,20 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
   position: relative;
   width: 48px;
   height: 28px;
-  border-radius: ${radius()};
+  border-radius: var(--radius-big);
   background-color: white;
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--color-grey-2);
   pointer-events: none;
   margin-left: -2px;
   span {
     position: absolute;
-    border-radius: ${radius()};
+    border-radius: var(--radius-big);
     left: 2px;
     top: 50%;
     width: calc(28px - 6px);
     height: calc(28px - 6px);
-    background: ${p => (p.checked ? color.primary() : color.grey(3))};
+    background: ${p =>
+      p.checked ? 'var(--color-primary)' : 'var(--color-grey-3)'};
     transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
   }

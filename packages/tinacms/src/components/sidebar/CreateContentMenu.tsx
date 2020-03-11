@@ -29,14 +29,7 @@ import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
-import {
-  color,
-  radius,
-  font,
-  IconButton,
-  Button,
-  shadow,
-} from '@tinacms/styles'
+import { IconButton, Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import { useCMS, useSubscribable } from '../../react-tinacms'
 
@@ -149,8 +142,8 @@ const ContentMenuWrapper = styled.div`
 
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 192px;
-  border-radius: ${radius()};
-  border: 1px solid ${color.grey(2)};
+  border-radius: var(--radius-big);
+  border: 1px solid var(--color-grey-2);
   display: block;
   position: absolute;
   top: 0;
@@ -160,7 +153,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 100% 0;
-  box-shadow: ${shadow('big')};
+  box-shadow: var(--shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: 100;
@@ -177,7 +170,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
 const CreateButton = styled.button`
   position: relative;
   text-align: center;
-  font-size: ${font.size(0)};
+  font-size: var(--font-size-0);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
@@ -188,7 +181,7 @@ const CreateButton = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color.primary()};
+    color: var(--color-primary);
     background-color: #f6f6f9;
   }
   &:not(:last-child) {

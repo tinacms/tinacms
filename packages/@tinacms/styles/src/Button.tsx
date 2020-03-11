@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 import styled, { css } from 'styled-components'
-import { padding, color, radius, font, shadow } from './Styles'
 
 export interface ButtonProps {
   primary?: boolean
@@ -30,24 +29,24 @@ export interface ButtonProps {
 export const Button = styled.button<ButtonProps>`
   text-align: center;
   border: 0;
-  border-radius: ${radius()};
-  box-shadow: ${shadow('small')};
-  background-color: ${color.grey()};
-  border: 1px solid ${color.grey(2)};
-  color: ${color.primary()};
-  fill: ${color.primary()};
+  border-radius: var(--radius-big);
+  box-shadow: var(--shadow-small);
+  background-color: var(--color-grey-0);
+  border: 1px solid var(--color-grey-2);
+  color: var(--color-primary);
+  fill: var(--color-primary);
   font-weight: 500;
   cursor: pointer;
-  font-size: ${font.size(1)};
+  font-size: var(--font-size-1);
   height: 40px;
-  padding: 0 ${padding()};
+  padding: 0 var(--padding-big);
   transition: all 85ms ease-out;
 
   &:hover {
-    background-color: ${color.grey(1)};
+    background-color: var(--color-grey-1);
   }
   &:active {
-    background-color: ${color.grey(2)};
+    background-color: var(--color-grey-2);
     outline: none;
   }
 
@@ -62,15 +61,15 @@ export const Button = styled.button<ButtonProps>`
   ${p =>
     p.primary &&
     css`
-      background-color: ${color.primary()};
-      color: ${color.grey()};
-      fill: ${color.grey()};
+      background-color: var(--color-primary);
+      color: var(--color-grey-0);
+      fill: var(--color-grey-0);
       border: none;
       &:hover {
-        background-color: ${color.primary('light')};
+        background-color: var(--color-primary-light);
       }
       &:active {
-        background-color: ${color.primary('dark')};
+        background-color: var(--color-primary-dark);
       }
     `};
 
@@ -78,8 +77,8 @@ export const Button = styled.button<ButtonProps>`
     p.small &&
     css`
       height: 32px;
-      font-size: ${font.size(0)};
-      padding: 0 ${padding()};
+      font-size: var(--font-size-0);
+      padding: 0 var(--padding-big);
     `};
 
   ${p =>
@@ -139,15 +138,15 @@ export const IconButton = styled(Button)`
     props.open &&
     css`
       transform: rotate(45deg);
-      background-color: ${color.grey()};
-      border-color: ${color.grey(2)};
+      background-color: var(--color-grey-0);
+      border-color: var(--color-grey-2);
       outline: none;
-      fill: ${color.primary()};
+      fill: var(--color-primary);
       &:hover {
-        background-color: ${color.grey(1)};
+        background-color: var(--color-grey-1);
       }
       &:active {
-        background-color: ${color.grey(2)};
+        background-color: var(--color-grey-2);
       }
     `};
 `

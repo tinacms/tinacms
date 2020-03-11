@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import styled from 'styled-components'
-import { font, color } from '@tinacms/styles'
 
 type InputFieldType<ExtraFieldProps, InputProps> = FieldProps<InputProps> &
   ExtraFieldProps
@@ -73,11 +72,11 @@ const FieldWrapper = styled.div`
 
 const FieldLabel = styled.label`
   display: block;
-  font-size: ${font.size(1)};
+  font-size: var(--font-size-1);
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1.35;
-  color: ${color.grey(8)};
+  color: var(--color-grey-8);
   margin-bottom: 8px;
   text-overflow: ellipsis;
   width: 100%;
@@ -85,8 +84,8 @@ const FieldLabel = styled.label`
 `
 
 const FieldDescription = styled.p`
-  color: ${color.grey(6)};
-  font-size: ${font.size(0)};
+  color: var(--color-grey-6);
+  font-size: var(--font-size-0);
   font-style: italic;
   font-weight: lighter;
   padding-top: 4px;
@@ -96,7 +95,7 @@ const FieldDescription = styled.p`
 const FieldError = styled.span`
   display: block;
   color: red;
-  font-size: ${font.size(1)};
+  font-size: var(--font-size-1);
   margin-top: 8px;
   font-weight: 500;
 `

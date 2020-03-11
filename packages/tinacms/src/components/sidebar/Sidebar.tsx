@@ -26,7 +26,6 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import { padding, color, radius, font, timing } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
@@ -103,13 +102,13 @@ const Watermark = styled(({ ...styleProps }: any) => {
 })`
   position: absolute;
   z-index: -1;
-  bottom: ${padding()};
-  left: ${padding()};
+  bottom: var(--padding-big);
+  left: var(--padding-big);
   svg {
     width: 128px;
     height: 128px;
     margin: -4px -20px;
-    fill: ${color.grey(9)};
+    fill: var(--color-grey-9);
   }
 `
 
@@ -125,18 +124,18 @@ const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
 }
 
 const MenuList = styled.div`
-  margin: 32px -${padding()} 32px -${padding()};
+  margin: 32px calc(var(--padding-big) * -1) 32px calc(var(--padding-big) * -1);
   display: block;
 `
 
 const MenuLink = styled.div<{ value: string }>`
-  color: ${color.grey(1)};
-  font-size: ${font.size(4)};
+  color: var(--color-grey-1);
+  font-size: var(--font-size-4);
   font-weight: 500;
-  padding: ${padding()} ${padding()} ${padding()} 64px;
+  padding: var(--padding-big) var(--padding-big) var(--padding-big) 64px;
   position: relative;
   cursor: pointer;
-  transition: all ${timing('short')} ease-out;
+  transition: all var(--timing-short) ease-out;
   overflow: hidden;
   &:after {
     content: '';
@@ -145,22 +144,22 @@ const MenuLink = styled.div<{ value: string }>`
     bottom: 8px;
     left: 8px;
     right: 8px;
-    border-radius: ${radius()};
-    background-color: ${color.grey(9)};
+    border-radius: var(--radius-big);
+    background-color: var(--color-grey-9);
     z-index: -1;
     transition: all 150ms ease;
     transform: translate3d(0, 100%, 0);
     opacity: 0;
   }
   &:hover {
-    color: ${color.primary('light')};
+    color: var(--color-primary-light);
     &:after {
       transform: translate3d(0, 0, 0);
-      transition: transform ${timing('short')} ease-out, opacity 0ms;
+      transition: transform var(--timing-short) ease-out, opacity 0ms;
       opacity: 1;
     }
     svg {
-      fill: ${color.primary()};
+      fill: var(--color-primary);
     }
     & ~ * {
       &:after {
@@ -170,13 +169,13 @@ const MenuLink = styled.div<{ value: string }>`
   }
   svg {
     position: absolute;
-    left: ${padding()};
+    left: var(--padding-big);
     top: 50%;
     transform: translate3d(0, -50%, 0);
     width: 36px;
     height: auto;
-    fill: ${color.grey(4)};
-    transition: all ${timing('short')} ease-out;
+    fill: var(--color-grey-4);
+    transition: all var(--timing-short) ease-out;
   }
 `
 
@@ -187,12 +186,12 @@ const SidebarHeader = styled.div`
   z-index: 1050;
   height: ${SIDEBAR_HEADER_HEIGHT}px;
   width: 100%;
-  padding: 0 ${padding()};
+  padding: 0 var(--padding-big);
 `
 
 const MenuToggle = styled.button<{ open: boolean }>`
-  padding: 0 0 0 ${padding()};
-  margin-left: -${padding()};
+  padding: 0 0 0 var(--padding-big);
+  margin-left: calc(var(--padding-big) * -1);
   background: transparent;
   outline: none;
   border: 0;
@@ -205,20 +204,20 @@ const MenuToggle = styled.button<{ open: boolean }>`
   svg {
     position: relative;
     transition: fill 85ms ease-out;
-    fill: ${color.grey(6)};
+    fill: var(--color-grey-6);
     margin-left: -4px;
     width: 32px;
     height: auto;
     path {
       position: relative;
-      transition: transform 250ms ease-out, opacity 250ms ease-out,
-        fill 85ms ease-out;
+      transition: transform var(--timing-long) ease-out,
+        opacity var(--timing-long) ease-out, fill var(--timing-short) ease-out;
       transform-origin: 50% 50%;
     }
   }
   &:hover {
     svg {
-      fill: ${color.grey(7)};
+      fill: var(--color-grey-7);
     }
   }
   ${props =>
@@ -227,7 +226,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
       svg {
         fill: #f6f6f9;
         &:hover {
-          fill: ${color.grey(2)};
+          fill: var(--color-grey-2);
         }
         path:first-child {
           /* Top bar */
@@ -253,7 +252,8 @@ const MenuWrapper = styled.div`
   height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: ${SIDEBAR_HEADER_HEIGHT}px ${padding()} ${padding()} ${padding()};
+  padding: ${SIDEBAR_HEADER_HEIGHT}px var(--padding-big) var(--padding-big)
+    var(--padding-big);
   ul,
   li {
     margin: 0;
@@ -263,7 +263,7 @@ const MenuWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
-  background: ${color.grey(8)};
+  background: var(--color-grey-8);
   z-index: 1000;
   position: absolute;
   top: 0;
@@ -272,8 +272,8 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   width: ${SIDEBAR_WIDTH}px;
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
-  padding: ${padding()};
-  transition: all 250ms ease-out;
+  padding: var(--padding-big);
+  transition: all var(--timing-long) ease-out;
   ul,
   li {
     margin: 0;
@@ -308,17 +308,17 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   justify-content: center;
   fill: white;
   text-align: center;
-  background-color: ${color.primary()};
+  background-color: var(--color-primary);
   background-repeat: no-repeat;
   background-position: center;
   transition: all 150ms ease-out;
   cursor: pointer;
   animation: ${SidebarToggleAnimation} 200ms 300ms ease-out 1 both;
   &:hover {
-    background-color: ${color.primary('light')};
+    background-color: var(--color-primary-light);
   }
   &:active {
-    background-color: ${color.primary('dark')};
+    background-color: var(--color-primary-dark);
   }
 `
 

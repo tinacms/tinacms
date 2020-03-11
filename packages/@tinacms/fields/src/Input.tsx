@@ -17,48 +17,48 @@ limitations under the License.
 */
 
 import styled, { css } from 'styled-components'
-import { padding, color, radius, font } from '@tinacms/styles'
 
 export interface InputProps {
   error?: boolean
   small?: boolean
   placeholder?: string
-  step?: string | number
+  step?: string | number
 }
 
 export const InputCss = css<InputProps>`
-  padding: ${padding('small')};
-  border-radius: ${radius('small')};
-  background: ${color.grey(0)};
-  font-size: ${font.size(2)};
+  padding: var(--padding-small);
+  border-radius: var(--radius-small);
+  background: var(--color-grey-0);
+  font-size: var(--font-size-2);
   line-height: 1.35;
   position: relative;
-  background-color: ${color.grey()};
+  background-color: var(--color-grey-0);
   transition: all 85ms ease-out;
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--color-grey-2);
   width: 100%;
   margin: 0;
   outline: none;
-  box-shadow: 0 0 0 2px ${p => (p.error ? color.error() : 'transparent')};
+  box-shadow: 0 0 0 2px ${p => (p.error ? 'var(--color-error)' : 'transparent')};
 
   &:hover {
-    box-shadow: 0 0 0 2px ${color.grey(3)};
+    box-shadow: 0 0 0 2px var(--color-grey-3);
   }
 
   &:focus {
-    box-shadow: 0 0 0 2px ${p => (p.error ? color.error() : color.primary())};
+    box-shadow: 0 0 0 2px
+      ${p => (p.error ? 'var(--color-error)' : 'var(--color-primary)')};
   }
 
   &::placeholder {
-    font-size: ${font.size(2)};
-    color: ${color.grey(3)};
+    font-size: var(--font-size-2);
+    color: var(--color-grey-3);
   }
 
   ${p =>
     p.small &&
     css`
-      font-size: ${font.size(1)};
-      padding: 8px ${padding('small')};
+      font-size: var(--font-size-1);
+      padding: 8px var(--padding-small);
     `};
 `
 

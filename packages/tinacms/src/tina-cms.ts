@@ -34,7 +34,6 @@ import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from './media'
-import { Theme } from '@tinacms/styles'
 import { Alerts } from './tina-cms/alerts'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
@@ -83,7 +82,6 @@ export class TinaCMS extends CMS {
 interface SidebarStateOptions {
   hidden?: boolean
   position?: SidebarPosition
-  theme?: Theme
   buttons?: SidebarButtons
 }
 
@@ -97,7 +95,6 @@ export class SidebarState extends Subscribable {
 
   position: SidebarPosition = 'displace'
   _hidden: boolean = false
-  theme?: Theme
   buttons: SidebarButtons = {
     save: 'Save',
     reset: 'Reset',
@@ -107,7 +104,6 @@ export class SidebarState extends Subscribable {
     super()
     this.position = options.position || 'displace'
     this._hidden = !!options.hidden
-    this.theme = options.theme
 
     if (options.buttons?.save) {
       this.buttons.save = options.buttons.save
