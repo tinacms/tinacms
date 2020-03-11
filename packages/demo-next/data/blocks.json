@@ -1,7 +1,14 @@
 {
   "title": "Page Builder Example",
   "blocks": [
-    { "_template": "hero", "text": "Hello World" },
-    { "_template": "cta", "text": "Log In", "url": "www.google.com" }
+    {
+      "_template": "hero",
+      "text": "Hello World"
+    },
+    {
+      "_template": "cta",
+      "text": "Log In",
+      "url": "www.google.com"
+    }
   ]
 }

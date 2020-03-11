@@ -1,6 +1,7 @@
 ---
 name: Kendall Strautman
 hometown: 'Bend, OR'
+image: /images/iceland-1.jpg
 ---
 ## This blog was created using [TinaCMS](https://tinacms.org) & [NextJS](https://nextjs.org/)
 
