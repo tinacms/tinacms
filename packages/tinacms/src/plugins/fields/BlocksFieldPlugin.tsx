@@ -30,14 +30,7 @@ import {
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from 'react-dismissible'
-import {
-  padding,
-  color,
-  radius,
-  font,
-  IconButton,
-  shadow,
-} from '@tinacms/styles'
+import { IconButton } from '@tinacms/styles'
 import { useFormPortal } from '../../components/form/FormPortal'
 
 export interface BlocksFieldDefinititon extends Field {
@@ -296,18 +289,18 @@ const InvalidBlockListItem = ({
 
 const EmptyList = styled.div`
   text-align: center;
-  border-radius: ${radius('small')};
-  background-color: ${color.grey(2)};
-  color: ${color.grey(4)};
+  border-radius: var(--radius-small);
+  background-color: var(--color-grey-2);
+  color: var(--color-grey-4);
   line-height: 1.35;
   padding: 12px 0;
-  font-size: ${font.size(2)};
+  font-size: var(--font-size-2);
   font-weight: 500;
 `
 
 const BlockMenu = styled.div<{ open: boolean }>`
   min-width: 192px;
-  border-radius: ${radius()};
+  border-radius: var(--radius-big);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -318,7 +311,7 @@ const BlockMenu = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 100% 0;
-  box-shadow: ${shadow('big')};
+  box-shadow: var(--shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: 100;
@@ -339,8 +332,8 @@ const BlockMenuList = styled.div`
 const BlockOption = styled.button`
   position: relative;
   text-align: center;
-  font-size: ${font.size(0)};
-  padding: ${padding('small')};
+  font-size: var(--font-size-0);
+  padding: var(--padding-small);
   font-weight: 500;
   width: 100%;
   background: none;
@@ -349,8 +342,8 @@ const BlockOption = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color.primary()};
-    background-color: #f6f6f9;
+    color: var(--color-primary);
+    background-color: var(--color-grey-1);
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
@@ -369,7 +362,7 @@ const ItemClickTarget = styled.div`
 
 const GroupLabel = styled.span<{ error?: boolean }>`
   margin: 0;
-  font-size: ${font.size(2)};
+  font-size: var(--font-size-2);
   font-weight: 500;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -382,7 +375,7 @@ const GroupLabel = styled.span<{ error?: boolean }>`
   ${props =>
     props.error &&
     css`
-      color: ${color.error()} !important;
+      color: var(--color-error) !important;
     `};
 `
 
@@ -394,7 +387,7 @@ const GroupListHeader = styled.div`
   margin-bottom: 12px;
   position: relative;
   ${GroupLabel} {
-    font-size: ${font.size(3)};
+    font-size: var(--font-size-3);
   }
 `
 
@@ -403,8 +396,8 @@ const GroupListPanel = styled.div`
   position: relative;
   height: auto;
   margin-bottom: 24px;
-  border-radius: ${radius('small')};
-  background-color: ${color.grey(2)};
+  border-radius: var(--radius-small);
+  background-color: var(--color-grey-2);
 `
 
 const ItemList = styled.div``
@@ -416,22 +409,22 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   justify-content: space-between;
   align-items: stretch;
   background-color: white;
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--color-grey-2);
   margin: 0 0 -1px 0;
   overflow: visible;
   line-height: 1.35;
   padding: 0;
-  font-size: ${font.size(2)};
+  font-size: var(--font-size-2);
   font-weight: 500;
 
   ${GroupLabel} {
-    color: #282828;
+    color: var(--color-grey-10);
     align-self: center;
     max-width: 100%;
   }
 
   svg {
-    fill: ${color.grey(3)};
+    fill: var(--color-grey-3);
     width: 20px;
     height: auto;
     transition: fill 85ms ease-out;
@@ -439,10 +432,10 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   &:hover {
     svg {
-      fill: ${color.grey(8)};
+      fill: var(--color-grey-8);
     }
     ${GroupLabel} {
-      color: #0084ff;
+      color: var(--color-primary);
     }
   }
 
@@ -453,21 +446,21 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   &:nth-last-child(2) {
     border-radius: 0 0 4px 4px;
     &:first-child {
-      border-radius: ${radius('small')};
+      border-radius: var(--radius-small);
     }
   }
 
   ${p =>
     p.isDragging &&
     css<any>`
-      border-radius: ${radius('small')};
+      border-radius: var(--radius-small);
       box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
       svg {
-        fill: ${color.grey(8)};
+        fill: var(--color-grey-8);
       }
       ${GroupLabel} {
-        color: #0084ff;
+        color: var(--color-primary);
       }
 
       ${DragHandle} {
@@ -489,9 +482,9 @@ const DeleteButton = styled.button`
   cursor: pointer;
   padding: 12px 8px;
   margin: 0;
-  transition: all 85ms ease-out;
+  transition: all var(--timing-short) ease-out;
   &:hover {
-    background-color: #f6f6f9;
+    background-color: var(--color-grey-1);
   }
 `
 
@@ -511,7 +504,7 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
   padding: 12px 0;
   transition: all 85ms ease-out;
   &:hover {
-    background-color: #f6f6f9;
+    background-color: var(--color-grey-1);
     cursor: grab;
   }
   svg {
@@ -521,7 +514,7 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
     width: 20px;
     height: 20px;
     transform: translate3d(-50%, -50%, 0);
-    transition: all 85ms ease-out;
+    transition: all var(--timing-short) ease-out;
   }
   svg:last-child {
     opacity: 0;

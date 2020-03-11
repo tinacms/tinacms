@@ -18,20 +18,17 @@ limitations under the License.
 
 import * as React from 'react'
 import { ModalProvider } from './modals/ModalProvider'
-import styled, { ThemeProvider } from 'styled-components'
-import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
+import styled from 'styled-components'
+import { TinaReset, GlobalStyles } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS, SidebarPosition } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
 import { Alerts } from './Alerts'
 
-const merge = require('lodash.merge')
-
 export interface TinaProps {
   cms: TinaCMS
   hidden?: boolean
-  theme?: Theme
   position?: SidebarPosition
 }
 
@@ -40,15 +37,8 @@ export const Tina: React.FC<TinaProps> = ({
   children,
   hidden,
   position,
-  theme: themeOverrides,
 }) => {
   useSubscribable(cms.sidebar)
-  const theme: ThemeProps['theme'] = React.useMemo(
-    () => ({
-      tinacms: merge(DefaultTheme, cms.sidebar.theme, themeOverrides) as Theme,
-    }),
-    [DefaultTheme, themeOverrides]
-  )
 
   React.useEffect(() => {
     if (typeof hidden !== 'undefined') {
@@ -65,14 +55,15 @@ export const Tina: React.FC<TinaProps> = ({
         {children}
       </SiteWrapper>
       {!cms.sidebar.hidden && (
-        <ThemeProvider theme={theme}>
+        <>
+          <GlobalStyles />
           <ModalProvider>
             <TinaReset>
               <Alerts />
               <Sidebar />
             </TinaReset>
           </ModalProvider>
-        </ThemeProvider>
+        </>
       )}
     </CMSContext.Provider>
   )

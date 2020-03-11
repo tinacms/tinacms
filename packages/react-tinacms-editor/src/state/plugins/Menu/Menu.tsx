@@ -33,7 +33,7 @@ import { imagePluginKey } from '../Image'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
-import styled, { css, ThemeProvider } from 'styled-components'
+import styled, { css } from 'styled-components'
 import {
   BoldIcon,
   CodeIcon,
@@ -45,7 +45,6 @@ import {
   UnderlineIcon,
   UnorderedListIcon,
 } from '@tinacms/icons'
-import { radius, color, padding } from '@tinacms/styles'
 import { UndoControl, RedoControl } from './historyControl'
 import { MenuPortalProvider, useMenuPortal } from './MenuPortal'
 
@@ -90,7 +89,7 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { editorView, bottom = false, theme, sticky = true } = props
+  const { editorView, bottom = false, sticky = true } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
@@ -149,39 +148,37 @@ export const Menu = (props: Props) => {
 
   const { view } = editorView
   return (
-    <ThemeProvider theme={theme}>
-      <>
-        {menuFixed && (
-          <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
-        )}
-        <MenuWrapper
-          menuFixedTopOffset={menuFixedTopOffset}
-          menuFixed={menuFixed}
-          menuBoundingBox={menuBoundingBox}
-          ref={menuRef}
-        >
-          <MenuPortalProvider>
-            <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-              {supportBlocks && <FormattingDropdown view={view} />}
-              <BoldControl view={view} />
-              <ItalicControl view={view} />
-              <UnderlineControl view={view} />
-              <LinkControl view={view} />
-              {/* <ImageControl view={view} bottom={bottom} /> */}
-              {supportBlocks && <TableControl view={view} bottom={bottom} />}
-              {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
-              {supportBlocks && <CodeControl view={view} bottom={bottom} />}
-              {supportBlocks && <BulletList view={view} bottom={bottom} />}
-              {supportBlocks && <OrderedList view={view} bottom={bottom} />}
-              <UndoControl view={view} />
-              <RedoControl view={view} />
-            </MenuContainer>
-          </MenuPortalProvider>
-        </MenuWrapper>
-        <FloatingTableMenu editorView={editorView} />
-        <ImageMenu editorView={editorView} />
-      </>
-    </ThemeProvider>
+    <>
+      {menuFixed && (
+        <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
+      )}
+      <MenuWrapper
+        menuFixedTopOffset={menuFixedTopOffset}
+        menuFixed={menuFixed}
+        menuBoundingBox={menuBoundingBox}
+        ref={menuRef}
+      >
+        <MenuPortalProvider>
+          <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
+            {supportBlocks && <FormattingDropdown view={view} />}
+            <BoldControl view={view} />
+            <ItalicControl view={view} />
+            <UnderlineControl view={view} />
+            <LinkControl view={view} />
+            {/* <ImageControl view={view} bottom={bottom} /> */}
+            {supportBlocks && <TableControl view={view} bottom={bottom} />}
+            {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
+            {supportBlocks && <CodeControl view={view} bottom={bottom} />}
+            {supportBlocks && <BulletList view={view} bottom={bottom} />}
+            {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+            <UndoControl view={view} />
+            <RedoControl view={view} />
+          </MenuContainer>
+        </MenuPortalProvider>
+      </MenuWrapper>
+      <FloatingTableMenu editorView={editorView} />
+      <ImageMenu editorView={editorView} />
+    </>
   )
 }
 
@@ -316,9 +313,9 @@ const MenuContainer = styled.div`
   top: 0;
   width: 100%;
   background-color: white;
-  border-radius: ${radius()};
+  border-radius: var(--radius-big);
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--color-grey-2);
   overflow: hidden;
   z-index: 100;
 `
@@ -336,9 +333,9 @@ export const MenuButton = styled.button<{
   ${MenuItem}
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p => (p.active ? '#0084ff' : color.grey(8))};
-  fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
-  border: 1px solid ${color.grey(2)};
+  color: ${p => (p.active ? 'var(--color-primary)' : 'var(--color-grey-8)')};
+  fill: ${p => (p.active ? 'var(--color-primary)' : 'var(--color-grey-8)')};
+  border: 1px solid var(--color-grey-2);
   margin: -1px;
   outline: none;
   padding: 6px 4px;
@@ -351,8 +348,8 @@ export const MenuButton = styled.button<{
     background-color: rgba(53, 50, 50, 0.09);
   }
   &:active {
-    color: #0084ff;
-    fill: #0084ff;
+    color: var(--color-primary);
+    fill: var(--color-primary);
     background-color: rgba(53, 50, 50, 0.05);
   }
   svg {
@@ -362,8 +359,8 @@ export const MenuButton = styled.button<{
   ${props =>
     props.active &&
     css`
-      color: #0084ff;
-      fill: #0084ff;
+      color: var(--color-primary);
+      fill: var(--color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
   ${props =>
@@ -407,7 +404,7 @@ export const MenuButtonDropdown = styled(
     )
   }
 )`
-  border-radius: ${radius()};
+  border-radius: var(--radius-big);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -442,25 +439,25 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
   transition: all 85ms ease-out;
   cursor: pointer;
   &:first-child {
-    padding-top: ${padding('small')};
+    padding-top: var(--padding-small);
   }
   &:last-child {
-    padding-bottom: ${padding('small')};
+    padding-bottom: var(--padding-small);
   }
   &:hover {
-    background-color: ${color.grey(1)};
-    color: ${color.primary()};
+    background-color: var(--color-grey-1);
+    color: var(--color-primary);
   }
   &:active {
-    color: ${color.primary()};
-    fill: ${color.primary()};
+    color: var(--color-primary);
+    fill: var(--color-primary);
     background-color: rgba(53, 50, 50, 0.05);
   }
   ${props =>
     props.active &&
     css`
-      color: #0084ff;
-      fill: #0084ff;
+      color: var(--color-primary);
+      fill: var(--color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
 `

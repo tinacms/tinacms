@@ -22,15 +22,7 @@ import { createPortal } from 'react-dom'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'
-import {
-  TinaReset,
-  Button,
-  padding,
-  font,
-  color,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ThemeProps,
-} from '@tinacms/styles'
+import { TinaReset, Button } from '@tinacms/styles'
 
 interface Props {
   children: any
@@ -112,7 +104,7 @@ export const ModalOverlay = styled.div`
 `
 
 const ModalTitle = styled.h2`
-  font-size: ${font.size(5)};
+  font-size: var(--font-size-5);
   font-weight: 500;
   line-height: normal;
   margin: 0;
@@ -121,7 +113,7 @@ const ModalTitle = styled.h2`
 const CloseButton = styled.div`
   display: flex;
   align-items: center;
-  fill: ${color.grey(5)};
+  fill: var(--color-grey-5);
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
@@ -129,7 +121,7 @@ const CloseButton = styled.div`
     height: auto;
   }
   &:hover {
-    fill: ${color.grey(8)};
+    fill: var(--color-grey-8);
   }
 `
 
@@ -154,13 +146,13 @@ export const ModalHeader = styled(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 ${padding()} 0 ${padding()};
-  border-bottom: 1px solid ${color.grey(3)};
+  padding: 0 var(--padding-big) 0 var(--padding-big);
+  border-bottom: 1px solid var(--color-grey-3);
   margin: 0;
 `
 
 export const ModalBody = styled.div<{ padded?: boolean }>`
-  padding: ${p => (p.padded ? padding() : '0')};
+  padding: ${p => (p.padded ? 'var(--padding-big)' : '0')};
   margin: 0;
   overflow: hidden;
   display: flex;
@@ -176,11 +168,11 @@ export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
   display: flex;
   justify-content: flex-end;
   border-radius: 0 0 5px 5px;
-  padding: 0 ${padding()} ${padding()} ${padding()};
+  padding: 0 var(--padding-big) var(--padding-big) var(--padding-big);
   ${Button} {
     flex: 0 1 auto;
     min-width: 128px;
-    margin: 0 ${padding('small')} 0 0;
+    margin: 0 var(--padding-small) 0 0;
     &:last-child {
       margin-right: 0;
     }

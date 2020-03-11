@@ -20,15 +20,7 @@ import * as React from 'react'
 
 import { useState } from 'react'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import {
-  Button,
-  padding,
-  color,
-  font,
-  timing,
-  radius,
-  shadow,
-} from '@tinacms/styles'
+import { Button } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-tinacms'
 import { FormView, FormHeader } from '../form/FormView'
@@ -125,7 +117,7 @@ const EmptyState = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: ${padding()} ${padding()} 64px ${padding()};
+  padding: var(--padding-big) var(--padding-big) 64px var(--padding-big);
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -136,54 +128,54 @@ const EmptyState = styled.div`
   animation-fill-mode: both;
   animation-duration: 150ms;
   > *:first-child {
-    margin: 0 0 ${padding()} 0;
+    margin: 0 0 var(--padding-big) 0;
   }
   > ${Emoji} {
     display: block;
   }
   h3 {
-    font-size: ${font.size(5)};
+    font-size: var(--font-size-5);
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 ${padding()} 0;
+    margin: 0 0 var(--padding-big) 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 ${padding()} 0;
+    margin: 0 0 var(--padding-big) 0;
   }
 `
 
 const LinkButton = styled.a`
   text-align: center;
   border: 0;
-  border-radius: ${radius('big')};
-  border: 1px solid ${color.grey(2)};
-  box-shadow: ${shadow('small')};
+  border-radius: var(--radius-big);
+  border: 1px solid var(--color-grey-2);
+  box-shadow: var(--shadow-small);
   font-weight: 500;
   cursor: pointer;
-  font-size: ${font.size(0)};
-  transition: all ${timing('short')} ease-out;
+  font-size: var(--font-size-0);
+  transition: all var(--timing-short) ease-out;
   background-color: white;
-  color: ${color.grey(8)};
-  padding: ${padding('small')} ${padding('big')} ${padding('small')} 56px;
+  color: var(--color-grey-8);
+  padding: var(--padding-small) var(--padding-big) var(--padding-small) 56px;
   position: relative;
   text-decoration: none;
   display: inline-block;
   ${Emoji} {
     font-size: 24px;
     position: absolute;
-    left: ${padding('big')};
+    left: var(--padding-big);
     top: 50%;
     transform-origin: 50% 50%;
     transform: translate3d(0, -50%, 0);
-    transition: all ${timing('short')} ease-out;
+    transition: all var(--timing-short) ease-out;
   }
   &:hover {
-    color: ${color.primary()};
+    color: var(--color-primary);
     ${Emoji} {
       transform: translate3d(0, -50%, 0);
     }
@@ -227,7 +219,7 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   scrollbar-width: none;
   width: 100%;
   overflow: hidden;
-  border-top: 1px solid ${color.grey(2)};
+  border-top: 1px solid var(--color-grey-2);
   background-color: #f6f6f9;
 
   ${Wrapper} {
@@ -244,7 +236,7 @@ const FormFooter = styled.div`
   width: 100%;
   height: 64px;
   background-color: white;
-  border-top: 1px solid ${color.grey(2)};
+  border-top: 1px solid var(--color-grey-2);
 
   ${Wrapper} {
     flex: 1 0 auto;

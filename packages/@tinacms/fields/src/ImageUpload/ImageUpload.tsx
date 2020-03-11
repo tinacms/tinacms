@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useDropzone } from 'react-dropzone'
 import styled from 'styled-components'
-import { radius, color, font, timing, IconButton } from '@tinacms/styles'
+import { IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
 
 interface ImageUploadProps {
@@ -30,7 +30,7 @@ interface ImageUploadProps {
 }
 
 const DropArea = styled.div`
-  border-radius: ${radius('small')};
+  border-radius: var(--radius-small);
   flex: 1;
   display: flex;
   flex-direction: column;
@@ -40,12 +40,12 @@ const DropArea = styled.div`
 
 const ImgPlaceholder = styled.div`
   text-align: center;
-  border-radius: ${radius('small')};
-  background-color: ${color.grey(2)};
-  color: ${color.grey(4)};
+  border-radius: var(--radius-small);
+  background-color: var(--color-grey-2);
+  color: var(--color-grey-4);
   line-height: 1.35;
   padding: 12px 0;
-  font-size: ${font.size(2)};
+  font-size: var(--font-size-2);
   font-weight: 500;
   transition: all 85ms ease-out;
   &:hover {
@@ -56,8 +56,8 @@ const ImgPlaceholder = styled.div`
 const StyledImage = styled.img`
   max-width: 100%;
   min-height: 100px;
-  border-radius: ${radius('small')};
-  transition: opacity ${timing('short')} ease-out;
+  border-radius: var(--radius-small);
+  transition: opacity var(--timing-short) ease-out;
   margin: 0;
   display: block;
   background-color: #e1ddec;
@@ -72,18 +72,18 @@ const DeleteButton = styled(IconButton)`
   right: 8px;
   position: absolute;
   &:not(:hover) {
-    fill: ${color.grey()};
+    fill: var(--color-grey-0);
     background-color: transparent;
     border-color: transparent;
   }
 `
 
 const StyledImageContainer = styled.div`
-  background-color: ${color.grey(4)};
+  background-color: var(--color-grey-4);
   position: relative;
-  border-radius: ${radius('small')};
+  border-radius: var(--radius-small);
   overflow: hidden;
-  background-color: ${color.grey(8)};
+  background-color: var(--color-grey-8);
   &:hover {
     ${StyledImage} {
       opacity: 0.6;
