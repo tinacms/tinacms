@@ -48,6 +48,7 @@ import { UndoControl, RedoControl } from './historyControl'
 import { MenuPortalProvider } from './MenuPortal'
 import { FloatingLinkForm } from '../links/FloatingLinkForm'
 import FloatingImageMenu from './Image/FloatingImageMenu'
+import ImageMenu from './Image/ImageMenu'
 import {
   MenuButton,
   MenuPlaceholder,
@@ -62,6 +63,7 @@ interface Props {
   editorView: { view: EditorView }
   theme: any
   sticky?: boolean | string
+  imageUpload?: () => [Promise<string>]
 }
 
 const BoldControl = markControl({
@@ -99,7 +101,13 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { editorView, bottom = false, theme, sticky = true } = props
+  const {
+    editorView,
+    bottom = false,
+    theme,
+    sticky = true,
+    imageUpload,
+  } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
@@ -176,6 +184,7 @@ export const Menu = (props: Props) => {
               <ItalicControl view={view} />
               <UnderlineControl view={view} />
               <LinkControl view={view} />
+              <ImageMenu editorView={editorView} imageUpload={imageUpload} />
               {supportBlocks && <TableControl view={view} bottom={bottom} />}
               {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
               {supportBlocks && <CodeControl view={view} bottom={bottom} />}
