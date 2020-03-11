@@ -25,7 +25,6 @@ import { CodeMirrorCss } from './CodeMirrorCss'
 import { ProseMirrorCss } from './ProseMirrorCss'
 import { Format } from './Translator'
 import Menu from './state/plugins/Menu'
-import { InlineField } from 'react-tinacms-inline'
 
 interface Wysiwyg {
   input: any
@@ -70,30 +69,3 @@ export const Wysiwyg = styled(
 const WysiwygWrapper = styled.div`
   position: relative;
 `
-
-/*
- ** Inline WYSIWYG -------------------------------------
- */
-
-interface InlineWysiwygFieldProps {
-  name: string
-  sticky?: string
-  children: any
-}
-
-export function InlineWysiwyg({
-  name,
-  sticky,
-  children,
-}: InlineWysiwygFieldProps) {
-  return (
-    <InlineField name={name}>
-      {({ input, status }: any) => {
-        if (status === 'active') {
-          return <Wysiwyg sticky={sticky} input={input} />
-        }
-        return <>{children}</>
-      }}
-    </InlineField>
-  )
-}
