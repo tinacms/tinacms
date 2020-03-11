@@ -81,19 +81,17 @@ export const GlobalStyles = createGlobalStyle`
 `
 
 export const TinaResetStyles = css`
-  all: unset;
-  box-sizing: border-box;
-  font-family: 'Inter', sans-serif;
+  all: initial;
 
-  *:not(svg|*) {
+  /* *:not(svg) {
     all: unset;
-    font-family: 'Inter', sans-serif;
-  }
+  } */
 
   *,
   *:before,
   *:after {
-    box-sizing: inherit;
+    font-family: 'Inter', sans-serif;
+    box-sizing: border-box;
   }
 
   hr {
@@ -114,11 +112,14 @@ export const TinaResetStyles = css`
   h5,
   h6,
   p {
-    &:first-child {
-      margin-top: 0;
-    }
-    &:last-child {
-      margin-bottom: 0;
+    :not([class]) {
+      font-family: 'Inter', sans-serif;
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
   td,
@@ -135,24 +136,26 @@ export const TinaResetStyles = css`
   h4,
   h5,
   h6 {
-    font-weight: var(--font-weight-bold);
+    :not([class]) {
+      font-weight: var(--font-weight-bold);
+    }
   }
-  h1 {
+  h1:not([class]) {
     font-size: var(--font-size-8);
   }
-  h2 {
+  h2:not([class]) {
     font-size: var(--font-size-7);
   }
-  h3 {
+  h3:not([class]) {
     font-size: var(--font-size-5);
   }
-  h4 {
+  h4:not([class]) {
     font-size: var(--font-size-4);
   }
-  h5 {
+  h5:not([class]) {
     font-size: var(--font-size-3);
   }
-  h6 {
+  h6:not([class]) {
     font-size: var(--font-size-2);
   }
 `
