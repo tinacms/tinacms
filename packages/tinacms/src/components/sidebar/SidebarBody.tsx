@@ -243,25 +243,6 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   }
 `
 
-const FormFooter = styled.div`
-  position: relative;
-  flex: 0 0 auto;
-  display: flex;
-  align-items: center;
-  width: 100%;
-  height: 64px;
-  background-color: white;
-  border-top: 1px solid ${color.grey(2)};
-
-  ${Wrapper} {
-    flex: 1 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-  }
-`
-
 const FormAnimationKeyframes = keyframes`
   0% {
     transform: translate3d( 100%, 0, 0 );
