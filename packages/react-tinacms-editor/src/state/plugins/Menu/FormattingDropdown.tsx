@@ -25,7 +25,11 @@ import { Dismissible } from 'react-dismissible'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
-import { MenuButton, MenuButtonDropdown, MenuDropdownWrapper } from './Menu'
+import {
+  MenuButton,
+  MenuButtonDropdown,
+  MenuDropdownWrapper,
+} from './MenuButton'
 import styled, { css } from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
 import { EditorView } from 'prosemirror-view'

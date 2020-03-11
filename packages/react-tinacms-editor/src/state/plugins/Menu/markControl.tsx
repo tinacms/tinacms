@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 import { toggleMark } from 'prosemirror-commands'
-import { MenuButton } from './Menu'
+import { MenuButton } from './MenuButton'
 
 export interface Props {
   view: EditorView
