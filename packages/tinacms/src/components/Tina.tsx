@@ -28,14 +28,14 @@ import { Alerts } from './Alerts'
 
 const merge = require('lodash.merge')
 
-export interface TinaProps {
+export interface TinaProviderProps {
   cms: TinaCMS
   hidden?: boolean
   theme?: Theme
   position?: SidebarPosition
 }
 
-export const Tina: React.FC<TinaProps> = ({
+export const TinaProvider: React.FC<TinaProviderProps> = ({
   cms,
   children,
   hidden,
@@ -77,6 +77,11 @@ export const Tina: React.FC<TinaProps> = ({
     </CMSContext.Provider>
   )
 }
+
+/**
+ * @deprecated This has been renamed to `TinaProvider`.
+ */
+export const Tina = TinaProvider
 
 const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
   opacity: 1 !important;
