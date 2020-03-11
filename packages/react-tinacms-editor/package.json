@@ -68,7 +68,6 @@
   "peerDependencies": {
     "react": ">=16.8",
     "react-dom": ">=16.8",
-    "styled-components": ">=4.1",
-    "react-tinacms-inline": ">=0.2"
+    "styled-components": ">=4.1"
   }
 }
