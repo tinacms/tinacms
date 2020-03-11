@@ -270,14 +270,14 @@ const FormWrapper = styled.div<FormWrapperProps>`
   width: 100%;
   position: relative;
 
-  ${FormHeader}, ${FormBody}, ${FormFooter} {
+  > * {
     transform: translate3d(100%, 0, 0);
   }
 
   ${p =>
     p.isEditing &&
     css`
-      ${FormHeader}, ${FormBody}, ${FormFooter} {
+      > * {
         transform: none;
         animation-name: ${FormAnimationKeyframes};
         animation-duration: 150ms;
