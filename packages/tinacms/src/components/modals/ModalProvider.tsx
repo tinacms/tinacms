@@ -79,11 +79,9 @@ export const Modal = ({
 
   return portalNode && portalNode
     ? (createPortal(
-        <TinaReset>
-          <ModalOverlay>
-            <div {...props} />
-          </ModalOverlay>
-        </TinaReset>,
+        <ModalOverlay>
+          <div {...props} />
+        </ModalOverlay>,
         portalNode
       ) as any)
     : null
@@ -104,8 +102,8 @@ export const ModalOverlay = styled.div`
 `
 
 const ModalTitle = styled.h2`
-  font-size: var(--font-size-5);
-  font-weight: 500;
+  font-size: var(--font-size-4);
+  font-weight: var(--font-weight-regular);
   line-height: normal;
   margin: 0;
 `

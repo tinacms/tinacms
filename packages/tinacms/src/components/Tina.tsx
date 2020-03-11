@@ -57,12 +57,12 @@ export const Tina: React.FC<TinaProps> = ({
       {!cms.sidebar.hidden && (
         <>
           <GlobalStyles />
-          <ModalProvider>
-            <TinaReset>
+          <TinaReset>
+            <ModalProvider>
               <Alerts />
               <Sidebar />
-            </TinaReset>
-          </ModalProvider>
+            </ModalProvider>
+          </TinaReset>
         </>
       )}
     </CMSContext.Provider>
