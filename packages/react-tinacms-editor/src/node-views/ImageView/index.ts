@@ -19,6 +19,8 @@ limitations under the License.
 import { Node } from 'prosemirror-model'
 import { EditorView, NodeView } from 'prosemirror-view'
 
+const Identity = (str: string) => str
+
 export class ImageView implements NodeView {
   node: Node
   view: EditorView
@@ -26,7 +28,12 @@ export class ImageView implements NodeView {
   dom?: HTMLElement
   img?: HTMLImageElement
 
-  constructor(node: Node, view: EditorView, getPos: () => number) {
+  constructor(
+    node: Node,
+    view: EditorView,
+    getPos: () => number,
+    previewUrl: (url: string) => string = Identity
+  ) {
     this.node = node
     this.view = view
     this.getPos = getPos
@@ -35,7 +42,7 @@ export class ImageView implements NodeView {
     this.dom.classList.add('tinacms-image-wrapper')
     this.img = document.createElement('img')
     const { src, align, alt, title, width, height } = node.attrs
-    this.img.src = src
+    this.img.src = previewUrl(src)
     if (height) this.img.style.height = height
     if (width) this.img.style.width = width
     if (align) this.img.classList.add(`align-${align}`)

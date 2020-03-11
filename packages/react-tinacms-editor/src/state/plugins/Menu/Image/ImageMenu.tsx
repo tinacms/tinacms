@@ -16,39 +16,34 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { Menu } from './Menu'
+import React from 'react'
 import { EditorView } from 'prosemirror-view'
-import { Translator } from '../../../Translator'
-import { TranslatorContext } from './TranslatorContext'
+import { MediaIcon } from '@tinacms/icons'
+import { MenuButton } from '../MenuComponents'
+import { insertImage } from '../../../../commands/image-commands'
 
-interface MenuProps {
+interface ImageMenu {
   editorView: { view: EditorView }
-  translator: Translator
-  bottom?: boolean
-  theme?: any
-  sticky?: boolean
   imageUpload?: () => [Promise<string>]
 }
 
-export default ({
-  editorView,
-  translator,
-  bottom,
-  theme,
-  sticky,
-  imageUpload,
-}: MenuProps) => {
+export default ({ editorView, imageUpload }: ImageMenu) => {
+  if (!imageUpload) return null
+
+  const uploadImageFn = () => {
+    const imagePromises = imageUpload()
+    imagePromises.forEach(promise => {
+      promise.then(url => {
+        const { state, dispatch } = editorView.view
+        insertImage(state, dispatch, url)
+        console.log(url)
+      })
+    })
+  }
+
   return (
-    <TranslatorContext.Provider value={translator}>
-      <Menu
-        editorView={editorView}
-        bottom={bottom}
-        format="markdown"
-        theme={theme}
-        sticky={sticky}
-        imageUpload={imageUpload}
-      />
-    </TranslatorContext.Provider>
+    <MenuButton onClick={uploadImageFn}>
+      <MediaIcon />
+    </MenuButton>
   )
 }

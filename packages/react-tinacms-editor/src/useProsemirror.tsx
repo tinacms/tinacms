@@ -36,7 +36,8 @@ export interface Input {
 export function useProsemirror(
   input: Input,
   plugins: Plugin[] = [],
-  format?: Format
+  format?: Format,
+  previewUrl?: (url: string) => string
 ) {
   /**
    * Construct the Prosemirror Schema
@@ -84,7 +85,7 @@ export function useProsemirror(
        * Create a new Prosemirror EditorView on in the DOM
        */
       const view = new EditorView(el, {
-        nodeViews: nodeViews as any,
+        nodeViews: nodeViews(previewUrl) as any,
         /**
          * The initial state of the Wysiwyg
          */
