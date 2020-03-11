@@ -67,6 +67,16 @@ const WithImage = () => {
           setValue(val)
         },
       }}
+      upload={() => {
+        return [
+          new Promise(resolve => {
+            setTimeout(function() {
+              resolve('https://i.imgur.com/2FCfbgg.jpg')
+            }, 250)
+          }),
+        ]
+      }}
+      previewUrl={(str: string) => str}
     />
   )
 }
