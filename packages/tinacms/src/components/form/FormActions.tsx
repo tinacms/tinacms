@@ -58,8 +58,9 @@ const MoreActionsButton = styled(p => (
     <EllipsisVerticalIcon />
   </button>
 ))`
-  height: 100%;
+  height: 64px;
   width: 40px;
+  align-self: stretch;
   background-color: transparent;
   background-position: center;
   background-size: auto 18px;
