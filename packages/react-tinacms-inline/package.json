@@ -21,12 +21,14 @@
     "styled-components": ">=4.1",
     "tinacms": ">=0.13",
     "react-textarea-autosize": ">=7.1",
-    "react-tinacms-editor": ">=0.0"
+    "react-tinacms-editor": ">=0.0",
+    "react-dropzone": "10.1.8"
   },
   "devDependencies": {
     "@tinacms/icons": "^0.4.1",
     "@tinacms/styles": "^0.3.0",
     "tinacms": "^0.16.0",
-    "react-tinacms-editor": "0.0.0"
+    "react-tinacms-editor": "0.0.0",
+    "react-dropzone": "10.1.8"
   }
 }
