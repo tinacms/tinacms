@@ -56,12 +56,12 @@ const byId = (b: Form, a: Form) => {
 
 const FormListItem = styled.li`
   position: relative;
-  font-size: var(--font-size-6);
+  font-size: var(--tina-font-size-6);
   line-height: 1.2;
   position: relative;
-  padding: var(--padding-big);
+  padding: var(--tina-padding-big);
   margin: 0;
-  color: var(--color-grey-8);
+  color: var(--tina-color-grey-8);
   font-weight: normal;
   transition: color 150ms ease-out;
   display: flex;
@@ -70,7 +70,7 @@ const FormListItem = styled.li`
   user-select: none;
   svg {
     width: 28px;
-    fill: var(--color-grey-3);
+    fill: var(--tina-color-grey-3);
     margin-top: -1px;
     height: auto;
     transform: translate3d(0, 0, 0);
@@ -80,25 +80,25 @@ const FormListItem = styled.li`
     content: '';
     display: block;
     width: 100%;
-    background-color: var(--color-grey-2);
+    background-color: var(--tina-color-grey-2);
     height: 1px;
     position: absolute;
     bottom: 0;
-    left: var(--padding-big);
+    left: var(--tina-padding-big);
     transform-origin: 0 0;
     transform: scale3d(0.15, 1, 1) translate3d(0, 0, 0);
     transition: all 250ms ease-out;
   }
   &:hover {
-    color: var(--color-primary);
+    color: var(--tina-color-primary);
     svg {
       transform: translate3d(3px, 0, 0);
       transition: transform 250ms ease;
-      fill: var(--color-grey-8);
+      fill: var(--tina-color-grey-8);
     }
     &:after {
       transform: scale3d(1, 1, 1)
-        translate3d(calc(var(--padding-big) * -1), 0, 0);
+        translate3d(calc(var(--tina-padding-big) * -1), 0, 0);
     }
   }
 `
@@ -132,7 +132,7 @@ function staggerSlideIn() {
 }
 
 const StyledFormList = styled.ul<{ isEditing: Boolean }>`
-  padding: var(--padding-big);
+  padding: var(--tina-padding-big);
   cursor: pointer;
   list-style: none;
   margin: 0;

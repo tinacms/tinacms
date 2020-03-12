@@ -87,17 +87,17 @@ const AlertEntranceAnimation = keyframes`
 const Alert = styled.div<{ level: AlertLevel; index: number }>`
   text-align: center;
   border: 0;
-  border-radius: var(--radius-small);
-  box-shadow: var(--shadow-small);
-  background-color: var(--color-grey-1);
-  border: 1px solid var(--color-grey-2);
-  color: var(--color-grey-9);
-  fill: var(--color-primary);
+  border-radius: var(--tina-radius-small);
+  box-shadow: var(--tina-shadow-small);
+  background-color: var(--tina-color-grey-1);
+  border: 1px solid var(--tina-color-grey-2);
+  color: var(--tina-color-grey-9);
+  fill: var(--tina-color-primary);
   font-weight: 500;
   cursor: pointer;
-  font-size: var(--font-size-2);
+  font-size: var(--tina-font-size-2);
   padding: 8px 4px 8px 12px;
-  transition: all var(--timing-short) ease-out;
+  transition: all var(--tina-timing-short) ease-out;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -126,29 +126,29 @@ const Alert = styled.div<{ level: AlertLevel; index: number }>`
   ${props =>
     props.level === 'info' &&
     css`
-      fill: var(--color-primary);
-      border-left: 6px solid var(--color-primary);
+      fill: var(--tina-color-primary);
+      border-left: 6px solid var(--tina-color-primary);
     `};
 
   ${props =>
     props.level === 'success' &&
     css`
-      fill: var(--color-success);
-      border-left: 6px solid var(--color-success);
+      fill: var(--tina-color-success);
+      border-left: 6px solid var(--tina-color-success);
     `};
 
   ${props =>
     props.level === 'warn' &&
     css`
-      fill: var(--color-warning-dark);
-      border-left: 6px solid var(--color-warning);
+      fill: var(--tina-color-warning-dark);
+      border-left: 6px solid var(--tina-color-warning);
     `};
 
   ${props =>
     props.level === 'error' &&
     css`
-      fill: var(--color-error);
-      border-left: 6px solid var(--color-error);
+      fill: var(--tina-color-error);
+      border-left: 6px solid var(--tina-color-error);
     `};
 `
 
@@ -164,7 +164,7 @@ const CloseAlert = styled(({ ...styleProps }) => {
   padding: 0;
   margin-left: 14px;
   outline: none;
-  fill: var(--color-grey-5);
+  fill: var(--tina-color-grey-5);
   display: flex;
   align-items: center;
 

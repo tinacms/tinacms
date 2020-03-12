@@ -142,8 +142,8 @@ const ContentMenuWrapper = styled.div`
 
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 192px;
-  border-radius: var(--radius-big);
-  border: 1px solid var(--color-grey-2);
+  border-radius: var(--tina-radius-big);
+  border: 1px solid var(--tina-color-grey-2);
   display: block;
   position: absolute;
   top: 0;
@@ -153,7 +153,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 100% 0;
-  box-shadow: var(--shadow-big);
+  box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: 100;
@@ -170,7 +170,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
 const CreateButton = styled.button`
   position: relative;
   text-align: center;
-  font-size: var(--font-size-0);
+  font-size: var(--tina-font-size-0);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
@@ -181,7 +181,7 @@ const CreateButton = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: var(--color-primary);
+    color: var(--tina-color-primary);
     background-color: #f6f6f9;
   }
   &:not(:last-child) {

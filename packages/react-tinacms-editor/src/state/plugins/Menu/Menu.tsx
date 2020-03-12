@@ -313,9 +313,9 @@ const MenuContainer = styled.div`
   top: 0;
   width: 100%;
   background-color: white;
-  border-radius: var(--radius-big);
+  border-radius: var(--tina-radius-big);
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  border: 1px solid var(--color-grey-2);
+  border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
   z-index: 100;
 `
@@ -333,9 +333,11 @@ export const MenuButton = styled.button<{
   ${MenuItem}
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p => (p.active ? 'var(--color-primary)' : 'var(--color-grey-8)')};
-  fill: ${p => (p.active ? 'var(--color-primary)' : 'var(--color-grey-8)')};
-  border: 1px solid var(--color-grey-2);
+  color: ${p =>
+    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
+  fill: ${p =>
+    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
+  border: 1px solid var(--tina-color-grey-2);
   margin: -1px;
   outline: none;
   padding: 6px 4px;
@@ -348,8 +350,8 @@ export const MenuButton = styled.button<{
     background-color: rgba(53, 50, 50, 0.09);
   }
   &:active {
-    color: var(--color-primary);
-    fill: var(--color-primary);
+    color: var(--tina-color-primary);
+    fill: var(--tina-color-primary);
     background-color: rgba(53, 50, 50, 0.05);
   }
   svg {
@@ -359,8 +361,8 @@ export const MenuButton = styled.button<{
   ${props =>
     props.active &&
     css`
-      color: var(--color-primary);
-      fill: var(--color-primary);
+      color: var(--tina-color-primary);
+      fill: var(--tina-color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
   ${props =>
@@ -404,7 +406,7 @@ export const MenuButtonDropdown = styled(
     )
   }
 )`
-  border-radius: var(--radius-big);
+  border-radius: var(--tina-radius-big);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -439,25 +441,25 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
   transition: all 85ms ease-out;
   cursor: pointer;
   &:first-child {
-    padding-top: var(--padding-small);
+    padding-top: var(--tina-padding-small);
   }
   &:last-child {
-    padding-bottom: var(--padding-small);
+    padding-bottom: var(--tina-padding-small);
   }
   &:hover {
-    background-color: var(--color-grey-1);
-    color: var(--color-primary);
+    background-color: var(--tina-color-grey-1);
+    color: var(--tina-color-primary);
   }
   &:active {
-    color: var(--color-primary);
-    fill: var(--color-primary);
+    color: var(--tina-color-primary);
+    fill: var(--tina-color-primary);
     background-color: rgba(53, 50, 50, 0.05);
   }
   ${props =>
     props.active &&
     css`
-      color: var(--color-primary);
-      fill: var(--color-primary);
+      color: var(--tina-color-primary);
+      fill: var(--tina-color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
 `

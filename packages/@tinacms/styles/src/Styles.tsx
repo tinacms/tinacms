@@ -20,58 +20,58 @@ import styled, { createGlobalStyle, css } from 'styled-components'
 
 const theme = css`
   :root {
-    --color-primary-light: #2296fe;
-    --color-primary: #2296fe;
-    --color-primary-dark: #0574e4;
-    --color-error-light: #eb6337;
-    --color-error: #ec4815;
-    --color-error-dark: #dc4419;
-    --color-warning-light: #f5e06e;
-    --color-warning: #e9d050;
-    --color-warning-dark: #d3ba38;
-    --color-success-light: #57c355;
-    --color-success: #3cad3a;
-    --color-success-dark: #249a21;
-    --color-grey-0: #ffffff;
-    --color-grey-1: #f6f6f9;
-    --color-grey-2: #edecf3;
-    --color-grey-3: #e1ddec;
-    --color-grey-4: #b2adbe;
-    --color-grey-5: #918c9e;
-    --color-grey-6: #716c7f;
-    --color-grey-7: #565165;
-    --color-grey-8: #433e52;
-    --color-grey-9: #363145;
-    --color-grey-10: #282828;
+    --tina-color-primary-light: #2296fe;
+    --tina-color-primary: #2296fe;
+    --tina-color-primary-dark: #0574e4;
+    --tina-color-error-light: #eb6337;
+    --tina-color-error: #ec4815;
+    --tina-color-error-dark: #dc4419;
+    --tina-color-warning-light: #f5e06e;
+    --tina-color-warning: #e9d050;
+    --tina-color-warning-dark: #d3ba38;
+    --tina-color-success-light: #57c355;
+    --tina-color-success: #3cad3a;
+    --tina-color-success-dark: #249a21;
+    --tina-color-grey-0: #ffffff;
+    --tina-color-grey-1: #f6f6f9;
+    --tina-color-grey-2: #edecf3;
+    --tina-color-grey-3: #e1ddec;
+    --tina-color-grey-4: #b2adbe;
+    --tina-color-grey-5: #918c9e;
+    --tina-color-grey-6: #716c7f;
+    --tina-color-grey-7: #565165;
+    --tina-color-grey-8: #433e52;
+    --tina-color-grey-9: #363145;
+    --tina-color-grey-10: #282828;
 
-    --radius-small: 5px;
-    --radius-big: 24px;
+    --tina-radius-small: 5px;
+    --tina-radius-big: 24px;
 
-    --padding-small: 12px;
-    --padding-big: 20px;
+    --tina-padding-small: 12px;
+    --tina-padding-big: 20px;
 
-    --font-size-0: 11px;
-    --font-size-1: 13px;
-    --font-size-2: 15px;
-    --font-size-3: 16px;
-    --font-size-4: 18px;
-    --font-size-5: 20px;
-    --font-size-6: 22px;
-    --font-size-7: 26px;
-    --font-size-8: 32px;
+    --tina-font-size-0: 11px;
+    --tina-font-size-1: 13px;
+    --tina-font-size-2: 15px;
+    --tina-font-size-3: 16px;
+    --tina-font-size-4: 18px;
+    --tina-font-size-5: 20px;
+    --tina-font-size-6: 22px;
+    --tina-font-size-7: 26px;
+    --tina-font-size-8: 32px;
 
-    --font-family: 'Inter', sans-serif;
+    --tina-font-family: 'Inter', sans-serif;
 
-    --font-weight-regular: 500;
-    --font-weight-bold: 600;
+    --tina-font-weight-regular: 500;
+    --tina-font-weight-bold: 600;
 
-    --shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.12),
+    --tina-shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.12),
       0px 4px 8px rgba(48, 48, 48, 0.1);
-    --shadow-small: 0px 2px 3px rgba(0, 0, 0, 0.12);
+    --tina-shadow-small: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
-    --timing-short: 85ms;
-    --timing-medium: 150ms;
-    --timing-long: 250ms;
+    --tina-timing-short: 85ms;
+    --tina-timing-medium: 150ms;
+    --tina-timing-long: 250ms;
   }
 `
 
@@ -81,26 +81,23 @@ export const GlobalStyles = createGlobalStyle`
 `
 
 export const TinaResetStyles = css`
-  all: initial;
-
-  /* *:not(svg) {
-    all: unset;
-  } */
+  * {
+    font-family: 'Inter', sans-serif;
+  }
 
   *,
   *:before,
   *:after {
-    font-family: 'Inter', sans-serif;
     box-sizing: border-box;
   }
 
   hr {
-    border-color: var(--color-grey-2);
-    color: var(--color-grey-2);
-    margin-bottom: var(--padding-big);
-    margin-left: calc(var(--padding-big) * -1);
-    margin-right: calc(var(--padding-big) * -1);
-    border-top: 1px solid var(--color-grey-2);
+    border-color: var(--tina-color-grey-2);
+    color: var(--tina-color-grey-2);
+    margin-bottom: var(--tina-padding-big);
+    margin-left: calc(var(--tina-padding-big) * -1);
+    margin-right: calc(var(--tina-padding-big) * -1);
+    border-top: 1px solid var(--tina-color-grey-2);
     border-bottom: none;
     height: 0;
     box-sizing: content-box;
@@ -137,26 +134,26 @@ export const TinaResetStyles = css`
   h5,
   h6 {
     :not([class]) {
-      font-weight: var(--font-weight-bold);
+      font-weight: var(--tina-font-weight-bold);
     }
   }
   h1:not([class]) {
-    font-size: var(--font-size-8);
+    font-size: var(--tina-font-size-8);
   }
   h2:not([class]) {
-    font-size: var(--font-size-7);
+    font-size: var(--tina-font-size-7);
   }
   h3:not([class]) {
-    font-size: var(--font-size-5);
+    font-size: var(--tina-font-size-5);
   }
   h4:not([class]) {
-    font-size: var(--font-size-4);
+    font-size: var(--tina-font-size-4);
   }
   h5:not([class]) {
-    font-size: var(--font-size-3);
+    font-size: var(--tina-font-size-3);
   }
   h6:not([class]) {
-    font-size: var(--font-size-2);
+    font-size: var(--tina-font-size-2);
   }
 `
 
