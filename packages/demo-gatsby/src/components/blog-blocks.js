@@ -39,10 +39,6 @@ export function BlogBlocks({ form }) {
 /**
  * Blocks Components
  */
-export const BLOCKS = {
-  heading: { Component: EditableHeading, template: heading_template },
-  image: { Component: EditableImage, template: image_template },
-}
 
 // Heading Block Component
 function EditableHeading(props) {
@@ -91,4 +87,15 @@ const image_template = {
     { name: "src", component: "text", label: "Source URL" },
     { name: "alt", component: "text", label: "Alt Text" },
   ],
+}
+
+export const BLOCKS = {
+  heading: {
+    Component: EditableHeading,
+    template: heading_template,
+  },
+  image: {
+    Component: EditableImage,
+    template: image_template,
+  },
 }
