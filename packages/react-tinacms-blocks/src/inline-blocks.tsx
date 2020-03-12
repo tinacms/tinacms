@@ -281,8 +281,8 @@ interface BlocksUIProps {
 
 const BlocksMenu = styled.div<BlocksUIProps>`
   min-width: 192px;
-  border-radius: var(--radius-big);
-  border: 1px solid var(--color-grey-2);
+  border-radius: var(--tina-radius-big);
+  border: 1px solid var(--tina-color-grey-2);
   display: block;
   position: absolute;
   top: 0;
@@ -292,7 +292,7 @@ const BlocksMenu = styled.div<BlocksUIProps>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 50% 0;
-  box-shadow: var(--shadow-big);
+  box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: 100;
@@ -309,7 +309,7 @@ const BlockOption = styled.button`
   font-family: 'Inter', sans-serif;
   position: relative;
   text-align: center;
-  font-size: var(--font-size-0);
+  font-size: var(--tina-font-size-0);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
@@ -320,8 +320,8 @@ const BlockOption = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: var(--color-primary);
-    background-color: var(--color-grey-1);
+    color: var(--tina-color-primary);
+    background-color: var(--tina-color-grey-1);
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
@@ -454,8 +454,8 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
     top: -16px;
     width: calc(100% + 2rem);
     height: calc(100% + 2rem);
-    border: 3px solid var(--color-primary);
-    border-radius: var(--radius-big);
+    border: 3px solid var(--tina-color-primary);
+    border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
     z-index: 1000;

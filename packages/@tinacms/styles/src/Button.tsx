@@ -29,24 +29,24 @@ export interface ButtonProps {
 export const Button = styled.button<ButtonProps>`
   text-align: center;
   border: 0;
-  border-radius: var(--radius-big);
-  box-shadow: var(--shadow-small);
-  background-color: var(--color-grey-0);
-  border: 1px solid var(--color-grey-2);
-  color: var(--color-primary);
-  fill: var(--color-primary);
+  border-radius: var(--tina-radius-big);
+  box-shadow: var(--tina-shadow-small);
+  background-color: var(--tina-color-grey-0);
+  border: 1px solid var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
+  fill: var(--tina-color-primary);
   font-weight: 500;
   cursor: pointer;
-  font-size: var(--font-size-1);
+  font-size: var(--tina-font-size-1);
   height: 40px;
-  padding: 0 var(--padding-big);
+  padding: 0 var(--tina-padding-big);
   transition: all 85ms ease-out;
 
   &:hover {
-    background-color: var(--color-grey-1);
+    background-color: var(--tina-color-grey-1);
   }
   &:active {
-    background-color: var(--color-grey-2);
+    background-color: var(--tina-color-grey-2);
     outline: none;
   }
 
@@ -61,15 +61,15 @@ export const Button = styled.button<ButtonProps>`
   ${p =>
     p.primary &&
     css`
-      background-color: var(--color-primary);
-      color: var(--color-grey-0);
-      fill: var(--color-grey-0);
+      background-color: var(--tina-color-primary);
+      color: var(--tina-color-grey-0);
+      fill: var(--tina-color-grey-0);
       border: none;
       &:hover {
-        background-color: var(--color-primary-light);
+        background-color: var(--tina-color-primary-light);
       }
       &:active {
-        background-color: var(--color-primary-dark);
+        background-color: var(--tina-color-primary-dark);
       }
     `};
 
@@ -77,8 +77,8 @@ export const Button = styled.button<ButtonProps>`
     p.small &&
     css`
       height: 32px;
-      font-size: var(--font-size-0);
-      padding: 0 var(--padding-big);
+      font-size: var(--tina-font-size-0);
+      padding: 0 var(--tina-padding-big);
     `};
 
   ${p =>
@@ -138,15 +138,15 @@ export const IconButton = styled(Button)`
     props.open &&
     css`
       transform: rotate(45deg);
-      background-color: var(--color-grey-0);
-      border-color: var(--color-grey-2);
+      background-color: var(--tina-color-grey-0);
+      border-color: var(--tina-color-grey-2);
       outline: none;
-      fill: var(--color-primary);
+      fill: var(--tina-color-primary);
       &:hover {
-        background-color: var(--color-grey-1);
+        background-color: var(--tina-color-grey-1);
       }
       &:active {
-        background-color: var(--color-grey-2);
+        background-color: var(--tina-color-grey-2);
       }
     `};
 `

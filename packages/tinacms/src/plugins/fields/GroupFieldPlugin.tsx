@@ -97,25 +97,25 @@ const Header: StyledComponent<'div', {}, {}> = styled.div`
   display: flex;
   justify-content: space-between;
   align-items: center;
-  border: 1px solid var(--color-grey-2);
-  border-radius: var(--radius-small);
+  border: 1px solid var(--tina-color-grey-2);
+  border-radius: var(--tina-radius-small);
   margin: 0 0 24px 0;
   overflow: visible;
   line-height: 1.35;
   padding: 12px;
-  color: var(--color-grey-10);
+  color: var(--tina-color-grey-10);
   background-color: white;
 
   svg {
     width: 24px;
     height: auto;
-    fill: var(--color-grey-3);
-    transition: all var(--timing-short) ease-out;
+    fill: var(--tina-color-grey-3);
+    transition: all var(--tina-timing-short) ease-out;
   }
 
   &:hover {
     svg {
-      fill: var(--color-grey-8);
+      fill: var(--tina-color-grey-8);
     }
     color: #0084ff;
   }
@@ -131,10 +131,10 @@ export const PanelHeader = styled.div`
   align-items: center;
   padding: 8px 18px 8px 18px;
   color: inherit;
-  font-size: var(--font-size-3);
-  transition: color var(--timing-medium) ease-out;
+  font-size: var(--tina-font-size-3);
+  transition: color var(--tina-timing-medium) ease-out;
   user-select: none;
-  border-bottom: 1px solid var(--color-grey-2);
+  border-bottom: 1px solid var(--tina-color-grey-2);
   margin: 0;
   span {
     flex: 1 1 auto;
@@ -145,23 +145,23 @@ export const PanelHeader = styled.div`
   svg {
     flex: 0 0 auto;
     width: 24px;
-    fill: var(--color-grey-3);
+    fill: var(--tina-color-grey-3);
     height: auto;
     transform: translate3d(-4px, 0, 0);
-    transition: transform var(--timing-medium) ease-out;
+    transition: transform var(--tina-timing-medium) ease-out;
   }
   :hover {
-    color: var(--color-primary);
+    color: var(--tina-color-primary);
     svg {
-      fill: var(--color-grey-8);
+      fill: var(--tina-color-grey-8);
       transform: translate3d(-7px, 0, 0);
-      transition: transform var(--timing-medium) ease-out;
+      transition: transform var(--tina-timing-medium) ease-out;
     }
   }
 `
 
 export const PanelBody = styled.div`
-  background: var(--color-grey-1);
+  background: var(--tina-color-grey-1);
   position: relative;
   display: flex;
   flex: 1 1 auto;

@@ -102,8 +102,8 @@ export const ModalOverlay = styled.div`
 `
 
 const ModalTitle = styled.h2`
-  font-size: var(--font-size-4);
-  font-weight: var(--font-weight-regular);
+  font-size: var(--tina-font-size-4);
+  font-weight: var(--tina-font-weight-regular);
   line-height: normal;
   margin: 0;
 `
@@ -111,7 +111,7 @@ const ModalTitle = styled.h2`
 const CloseButton = styled.div`
   display: flex;
   align-items: center;
-  fill: var(--color-grey-5);
+  fill: var(--tina-color-grey-5);
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
@@ -119,7 +119,7 @@ const CloseButton = styled.div`
     height: auto;
   }
   &:hover {
-    fill: var(--color-grey-8);
+    fill: var(--tina-color-grey-8);
   }
 `
 
@@ -144,13 +144,13 @@ export const ModalHeader = styled(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 var(--padding-big) 0 var(--padding-big);
-  border-bottom: 1px solid var(--color-grey-3);
+  padding: 0 var(--tina-padding-big) 0 var(--tina-padding-big);
+  border-bottom: 1px solid var(--tina-color-grey-3);
   margin: 0;
 `
 
 export const ModalBody = styled.div<{ padded?: boolean }>`
-  padding: ${p => (p.padded ? 'var(--padding-big)' : '0')};
+  padding: ${p => (p.padded ? 'var(--tina-padding-big)' : '0')};
   margin: 0;
   overflow: hidden;
   display: flex;
@@ -166,11 +166,12 @@ export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
   display: flex;
   justify-content: flex-end;
   border-radius: 0 0 5px 5px;
-  padding: 0 var(--padding-big) var(--padding-big) var(--padding-big);
+  padding: 0 var(--tina-padding-big) var(--tina-padding-big)
+    var(--tina-padding-big);
   ${Button} {
     flex: 0 1 auto;
     min-width: 128px;
-    margin: 0 var(--padding-small) 0 0;
+    margin: 0 var(--tina-padding-small) 0 0;
     &:last-child {
       margin-right: 0;
     }

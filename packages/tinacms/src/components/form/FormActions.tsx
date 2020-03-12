@@ -74,25 +74,25 @@ const MoreActionsButton = styled(p => (
   justify-content: center;
   align-items: center;
   &:hover {
-    background-color: var(--color-grey-1);
-    fill: var(--color-grey-8);
+    background-color: var(--tina-color-grey-1);
+    fill: var(--tina-color-grey-8);
   }
 `
 
 const ActionsOverlay = styled.div<{ open: boolean }>`
   min-width: 192px;
-  border-radius: var(--radius-big);
+  border-radius: var(--tina-radius-big);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  bottom: var(--padding-big);
-  right: var(--padding-big);
+  bottom: var(--tina-padding-big);
+  right: var(--tina-padding-big);
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 100% 100%;
-  box-shadow: var(--shadow-big);
+  box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: 100;
@@ -108,7 +108,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
 export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   position: relative;
   text-align: center;
-  font-size: var(--font-size-0);
+  font-size: var(--tina-font-size-0);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
@@ -119,8 +119,8 @@ export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: var(--color-primary);
-    background-color: var(--color-grey-1);
+    color: var(--tina-color-primary);
+    background-color: var(--tina-color-grey-1);
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
