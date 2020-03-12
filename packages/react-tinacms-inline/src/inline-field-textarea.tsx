@@ -16,27 +16,21 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import styled from 'styled-components'
+import React from 'react'
 import { InlineField } from './inline-field'
+import styled from 'styled-components'
+import TextareaAutosize from 'react-textarea-autosize'
+import { InlineTextFieldProps } from './inline-field-text'
 import { InputFocusWrapper } from './styles'
 
-/**
- * InlineTextField
- */
-export interface InlineTextFieldProps {
-  name: string
-  className?: string
-}
-
-export function InlineTextField({ name, className }: InlineTextFieldProps) {
+export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
           return (
             <InputFocusWrapper>
-              <InlineText type="text" {...input} className={className} />
+              <InlineTextarea className={className} {...input} rows={1} />
             </InputFocusWrapper>
           )
         }
@@ -46,8 +40,27 @@ export function InlineTextField({ name, className }: InlineTextFieldProps) {
   )
 }
 
-export const InlineText = styled.input`
-  /*
-** TODO - add styles
-*/
+export const InlineTextarea = styled(TextareaAutosize)`
+  width: 100%;
+  word-wrap: break-word;
+  display: block;
+  font-size: inherit;
+  box-sizing: border-box;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  margin: 0 auto;
+  max-width: inherit;
+  background-color: inherit;
+  text-align: inherit;
+  outline: none;
+  resize: none;
+  border: none;
+  overflow: visible;
+  position: relative;
+  -ms-overflow-style: none;
+
+  ::-webkit-scrollbar {
+    display: none;
+  }
 `

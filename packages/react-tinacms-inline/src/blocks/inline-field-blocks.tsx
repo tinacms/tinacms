@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { Block } from './block'
-import { InlineField } from './inline-field'
+import { InlineField } from '../inline-field'
 
 /**
  * Blocks
