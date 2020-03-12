@@ -38,13 +38,7 @@ export class GlobalFormPlugin implements ScreenPlugin {
     this.Icon = icon || SettingsIcon
     this.layout = layout || 'popup'
     this.Component = () => {
-      return (
-        <FormView
-          activeForm={form}
-          isMultiform={false}
-          setActiveFormId={null as any}
-        />
-      )
+      return <FormView activeForm={form} />
     }
   }
 }
