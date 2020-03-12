@@ -16,95 +16,77 @@ limitations under the License.
 
 */
 import React from "react"
-import { TinaField } from "tinacms"
-import { InlineBlocks, BlockWrapper, AddBlockMenu } from "react-tinacms-blocks"
-import { PlainTextInput } from "./plain-text-input"
+import {
+  InlineForm,
+  InlineBlocks,
+  BlocksControls,
+  BlockText,
+  BlockTextArea,
+} from "react-tinacms-inline"
 
-export function BlogBlocks({ form, data }) {
+/*
+ ** TODO: figure out why the template isn't working
+ */
+
+export function BlogBlocks({ form }) {
   return (
-    <InlineBlocks
-      form={form}
-      name="rawFrontmatter.blocks"
-      data={data}
-      templates={[image, heading]}
-      components={BLOCK_COMPONENTS}
-      renderBefore={props => {
-        if (!props.data || props.data.length < 1)
-          return (
-            <div style={{ position: "relative" }}>
-              {/* Todo: handle the default state in InlineBlocks? */}
-              <AddBlockMenu
-                insert={props.insert}
-                index={props.index}
-                templates={props.templates}
-              />
-            </div>
-          )
-      }}
-    />
+    <InlineForm form={form}>
+      <InlineBlocks name="rawFrontmatter.blocks" blocks={BLOCKS}></InlineBlocks>
+    </InlineForm>
   )
 }
 
 /**
  * Blocks Components
  */
-const BLOCK_COMPONENTS = {
-  heading: EditableHeading,
-  image: EditableImage,
+export const BLOCKS = {
+  heading: { Component: EditableHeading, template: heading_template },
+  image: { Component: EditableImage, template: image_template },
 }
 
 // Heading Block Component
 function EditableHeading(props) {
   return (
-    <BlockWrapper {...props}>
+    <BlocksControls index={props.index}>
       <h1>
-        <TinaField
-          name={`${props.name}.${props.index}.text`}
-          Component={PlainTextInput}
-        >
-          {props.data.text}
-        </TinaField>
+        <BlockText name="text" />
       </h1>
-    </BlockWrapper>
+    </BlocksControls>
   )
 }
 
 // Image Block Component
 function EditableImage(props) {
   return (
-    <BlockWrapper {...props}>
+    <BlocksControls index={props.index}>
       <img {...props.data} />
-    </BlockWrapper>
+    </BlocksControls>
   )
 }
 
 /**
  * HEADING BLOCK TEMPLATE
  */
-const heading = {
+const heading_template = {
   type: "heading",
   label: "Heading",
   defaultItem: {
     text: "",
   },
-  itemProps: block => ({
-    label: `${block.text}`,
-  }),
+  key: undefined,
+  fields: [],
 }
 
 /**
  * IMAGE BLOCK TEMPLATE
  */
-const image = {
+const image_template = {
   type: "image",
   label: "Image",
   defaultItem: {
     text: "",
   },
-  itemProps: block => ({
-    key: `${block.src}`,
-    label: `${block.alt}`,
-  }),
+  key: undefined,
   fields: [
     { name: "src", component: "text", label: "Source URL" },
     { name: "alt", component: "text", label: "Alt Text" },
