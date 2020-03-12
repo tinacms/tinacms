@@ -90,6 +90,7 @@ const FieldDescription = styled.p`
   font-weight: lighter;
   padding-top: 4px;
   white-space: normal;
+  margin: 0;
 `
 
 const FieldError = styled.span`
