@@ -295,7 +295,7 @@ const BlocksMenu = styled.div<BlocksUIProps>`
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
-  z-index: 100;
+  z-index: 950;
   ${props =>
     props.open &&
     css`

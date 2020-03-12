@@ -47,7 +47,7 @@ export class TinaCMS extends CMS {
   media = new MediaManager(new DummyMediaStore())
   alerts = new Alerts()
 
-  constructor({ sidebar, ...config }: TinaCMSConfig) {
+  constructor({ sidebar, ...config }: TinaCMSConfig = {}) {
     super(config)
 
     this.sidebar = new SidebarState(sidebar)

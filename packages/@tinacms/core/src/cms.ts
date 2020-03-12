@@ -107,14 +107,14 @@ export class CMS {
   /**
    * @hidden
    */
-  constructor(config: CMSConfig | null = null) {
+  constructor(config: CMSConfig = {}) {
     this.plugins = new PluginTypeManager()
 
-    if (config && config.plugins) {
+    if (config.plugins) {
       config.plugins.forEach(plugin => this.plugins.add(plugin))
     }
 
-    if (config && config.apis) {
+    if (config.apis) {
       Object.entries(config.apis).forEach(([name, api]) =>
         this.registerApi(name, api)
       )

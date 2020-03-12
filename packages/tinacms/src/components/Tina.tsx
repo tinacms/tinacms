@@ -26,13 +26,13 @@ import { TinaCMS, SidebarPosition } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
 import { Alerts } from './Alerts'
 
-export interface TinaProps {
+export interface TinaProviderProps {
   cms: TinaCMS
   hidden?: boolean
   position?: SidebarPosition
 }
 
-export const Tina: React.FC<TinaProps> = ({
+export const TinaProvider: React.FC<TinaProviderProps> = ({
   cms,
   children,
   hidden,
@@ -68,6 +68,16 @@ export const Tina: React.FC<TinaProps> = ({
     </CMSContext.Provider>
   )
 }
+
+/**
+ * @deprecated This has been renamed to `TinaProvider`.
+ */
+export const Tina = TinaProvider
+
+/**
+ * @deprecated This has been renamed to `TinaProviderProps`.
+ */
+export type TinaProps = TinaProviderProps
 
 const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
   opacity: 1 !important;
