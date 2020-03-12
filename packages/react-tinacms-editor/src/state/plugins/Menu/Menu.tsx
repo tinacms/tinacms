@@ -52,7 +52,6 @@ interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
   editorView: { view: EditorView }
-  theme: any
   sticky?: boolean | string
 }
 
