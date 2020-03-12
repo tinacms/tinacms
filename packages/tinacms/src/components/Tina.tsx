@@ -83,6 +83,11 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
  */
 export const Tina = TinaProvider
 
+/**
+ * @deprecated This has been renamed to `TinaProviderProps`.
+ */
+export type TinaProps = TinaProviderProps
+
 const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
   opacity: 1 !important;
   background-color: transparent !important;
