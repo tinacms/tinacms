@@ -40,9 +40,7 @@ export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
   )
 }
 
-export const InlineTextarea = styled(({ ...styleProps }) => {
-  return <TextareaAutosize {...styleProps} />
-})`
+export const InlineTextarea = styled(TextareaAutosize)`
   width: 100%;
   word-wrap: break-word;
   display: block;
