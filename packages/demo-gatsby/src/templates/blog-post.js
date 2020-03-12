@@ -27,7 +27,6 @@ import { rhythm } from "../utils/typography"
 import { useLocalRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { ModalProvider } from "tinacms"
-import { BlogBlocks } from "../components/blog-blocks"
 
 import {
   InlineForm,
@@ -37,12 +36,10 @@ import {
   InlineTextField,
   useInlineForm,
 } from "react-tinacms-inline"
+
 import { BLOCKS } from "../components/blog-blocks"
 
 const get = require("lodash.get")
-
-// const MyToggle = props => <Toggle {...props} />
-// const MySelect = props => <Select {...props} />
 
 function BlogPostTemplate(props) {
   const siteTitle = props.data.site.siteMetadata.title
@@ -52,7 +49,6 @@ function BlogPostTemplate(props) {
     props.data.markdownRemark,
     BlogPostForm
   )
-  const blocks = post.frontmatter.blocks || []
 
   return (
     <ModalProvider>
@@ -331,7 +327,7 @@ const BlogPostForm = {
 }
 
 /**
- * Toggle
+ * Toggle -------------------------------------------------------
  */
 export function EditToggle() {
   const { status, deactivate, activate } = useInlineForm()
@@ -361,8 +357,15 @@ export function DiscardChanges() {
   )
 }
 
+/*
+ ** Export -----------------------------------------------
+ */
 // export default inlineRemarkForm(BlogPostTemplate, BlogPostForm)
 export default BlogPostTemplate
+
+/*
+ ** Data Fetching -----------------------------------------------
+ */
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
