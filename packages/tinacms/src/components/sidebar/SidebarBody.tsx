@@ -29,6 +29,8 @@ import {
   timing,
   radius,
   shadow,
+  // eslint-disable-next-line @typescript-eslint/no-unused-vars
+  ThemeProps,
 } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-tinacms'
