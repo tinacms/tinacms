@@ -16,10 +16,21 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-text'
-export * from './inline-field-textarea'
-export * from './inline-wysiwyg'
-export * from './blocks'
-export * from './styles'
+import * as React from 'react'
+import { InlineField, InlineFieldRenderProps } from '../inline-field'
+import { useInlineBlock } from './inline-field-blocks'
+
+export interface BlockFieldProps {
+  name: string
+  children(props: BlockFieldRenderProps): any
+}
+
+interface BlockFieldRenderProps extends InlineFieldRenderProps {
+  name: string
+}
+
+export function BlockField({ name, children }: BlockFieldProps) {
+  const block = useInlineBlock()
+  const fieldName = `${block.name}.${name}`
+  return <InlineField name={fieldName}>{children}</InlineField>
+}

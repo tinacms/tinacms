@@ -17,37 +17,19 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineField, InlineFieldRenderProps } from './inline-field'
-import { InlineTextFieldProps } from './inline-field-text'
-import { useInlineBlock } from './inline-field-blocks'
+import { BlockField } from './inline-block-field'
+import { InlineTextFieldProps, InlineText } from '../inline-field-text'
 
-export interface BlockFieldProps {
-  name: string
-  children(props: BlockFieldRenderProps): any
-}
-
-interface BlockFieldRenderProps extends InlineFieldRenderProps {
-  name: string
-}
-
-export function BlockField({ name, children }: BlockFieldProps) {
-  const block = useInlineBlock()
-  const fieldName = `${block.name}.${name}`
-  return <InlineField name={fieldName}>{children}</InlineField>
-}
-
-/**
- * InlineTextField
- */
 export interface BlockText {
   name: string
 }
-export function BlockText({ name }: InlineTextFieldProps) {
+
+export function BlockText({ name, className }: InlineTextFieldProps) {
   return (
     <BlockField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
-          return <input type="text" {...input} />
+          return <InlineText {...input} className={className} />
         }
         return <>{input.value}</>
       }}
