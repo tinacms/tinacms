@@ -17,37 +17,30 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
 import { InlineField } from './inline-field'
-import { InputFocusWrapper } from './styles'
+import { Wysiwyg } from 'react-tinacms-editor'
 
-/**
- * InlineTextField
- */
-export interface InlineTextFieldProps {
+interface InlineWysiwygFieldProps {
   name: string
-  className?: string
+  sticky?: string
+  children: any
+  format?: 'markdown' | 'html'
 }
 
-export function InlineTextField({ name, className }: InlineTextFieldProps) {
+export function InlineWysiwyg({
+  name,
+  sticky,
+  children,
+  format,
+}: InlineWysiwygFieldProps) {
   return (
     <InlineField name={name}>
-      {({ input, status }) => {
+      {({ input, status }: any) => {
         if (status === 'active') {
-          return (
-            <InputFocusWrapper>
-              <InlineText type="text" {...input} className={className} />
-            </InputFocusWrapper>
-          )
+          return <Wysiwyg sticky={sticky} format={format} input={input} />
         }
-        return <>{input.value}</>
+        return <>{children}</>
       }}
     </InlineField>
   )
 }
-
-export const InlineText = styled.input`
-  /*
-** TODO - add styles
-*/
-`

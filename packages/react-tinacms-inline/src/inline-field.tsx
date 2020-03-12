@@ -20,9 +20,6 @@ import * as React from 'react'
 import { Field, FieldRenderProps } from 'react-final-form'
 import { InlineFormState, useInlineForm } from './inline-form'
 
-/**
- *
- */
 export interface InlineFieldProps {
   name: string
   children(fieldProps: InlineFieldRenderProps): React.ReactElement
