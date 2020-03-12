@@ -129,10 +129,10 @@ export const PanelHeader = styled.div`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 4px 18px 4px 18px;
+  padding: 8px 18px 8px 18px;
   color: inherit;
   font-size: var(--font-size-3);
-  transition: color var(--timing-long) ease-out;
+  transition: color var(--timing-medium) ease-out;
   user-select: none;
   border-bottom: 1px solid var(--color-grey-2);
   margin: 0;
@@ -148,14 +148,14 @@ export const PanelHeader = styled.div`
     fill: var(--color-grey-3);
     height: auto;
     transform: translate3d(-4px, 0, 0);
-    transition: transform 150ms ease-out;
+    transition: transform var(--timing-medium) ease-out;
   }
   :hover {
     color: var(--color-primary);
     svg {
       fill: var(--color-grey-8);
       transform: translate3d(-7px, 0, 0);
-      transition: transform 250ms ease;
+      transition: transform var(--timing-medium) ease-out;
     }
   }
 `
