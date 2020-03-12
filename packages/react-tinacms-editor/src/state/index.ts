@@ -37,8 +37,7 @@ export function createEditorState(
   schema: Schema,
   translator: Translator,
   plugins: Plugin[],
-  value: string,
-  theme: any // TODO: update type
+  value: string
 ) {
   return EditorState.create({
     schema,
@@ -47,7 +46,7 @@ export function createEditorState(
       inputRules(schema),
       keymap(buildKeymap(schema, plugins)),
       history(),
-      links(schema, theme),
+      links(schema),
       dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
       gapCursor(),
       tableEditing(),
