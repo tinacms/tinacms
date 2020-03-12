@@ -31,11 +31,13 @@ import { BlogBlocks } from "../components/blog-blocks"
 
 import {
   InlineForm,
+  InlineBlocks,
   InlineTextareaField,
   InlineWysiwyg,
   InlineTextField,
   useInlineForm,
 } from "react-tinacms-inline"
+import { BLOCKS } from "../components/blog-blocks"
 
 const get = require("lodash.get")
 
@@ -138,7 +140,11 @@ function BlogPostTemplate(props) {
               <p>{post.frontmatter.cool}</p>
             </TinaField> */}
             <p>{post.frontmatter.cool}</p>
-            <BlogBlocks form={form} data={blocks} />
+            <InlineBlocks
+              name="rawFrontmatter.blocks"
+              blocks={BLOCKS}
+            ></InlineBlocks>
+
             <InlineWysiwyg name="rawMarkdownBody">
               <div
                 dangerouslySetInnerHTML={{
