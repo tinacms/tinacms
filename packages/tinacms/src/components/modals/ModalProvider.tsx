@@ -22,7 +22,7 @@ import { createPortal } from 'react-dom'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 import { Z_INDEX } from '../../Globals'
-import { TinaReset, Button } from '@tinacms/styles'
+import { Button } from '@tinacms/styles'
 
 interface Props {
   children: any
