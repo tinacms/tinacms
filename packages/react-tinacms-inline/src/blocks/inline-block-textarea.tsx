@@ -17,37 +17,25 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
-import { InlineField } from './inline-field'
-import { InputFocusWrapper } from './styles'
+import { InlineTextFieldProps } from '../inline-field-text'
+import { BlockField } from './inline-block-field'
+import { InlineTextarea } from '../inline-field-textarea'
 
 /**
- * InlineTextField
+ * InlineTextAreaField
  */
-export interface InlineTextFieldProps {
+interface BlockTextArea {
   name: string
-  className?: string
 }
-
-export function InlineTextField({ name, className }: InlineTextFieldProps) {
+export function BlockTextArea({ name, className }: InlineTextFieldProps) {
   return (
-    <InlineField name={name}>
+    <BlockField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
-          return (
-            <InputFocusWrapper>
-              <InlineText type="text" {...input} className={className} />
-            </InputFocusWrapper>
-          )
+          return <InlineTextarea {...input} className={className} />
         }
         return <>{input.value}</>
       }}
-    </InlineField>
+    </BlockField>
   )
 }
-
-export const InlineText = styled.input`
-  /*
-** TODO - add styles
-*/
-`

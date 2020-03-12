@@ -36,7 +36,7 @@ export {
   // Deprecated aliases to the previous exports
   Tina,
   TinaProps,
-} from './components/Tina'
+} from './components/TinaProvider'
 export { useSidebar } from './components/sidebar/SidebarProvider'
 
 /**
