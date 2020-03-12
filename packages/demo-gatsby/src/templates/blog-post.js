@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import React, { useEffect } from "react"
+import React from "react"
 import { Link, graphql } from "gatsby"
 
 import styled from "styled-components"
@@ -24,171 +24,167 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { inlineRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
+import { useLocalRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { TinaField, Wysiwyg as BaseWysiwyg, Toggle, Select } from "tinacms"
+import { ModalProvider } from "tinacms"
 import { BlogBlocks } from "../components/blog-blocks"
-import { EditToggle } from "../components/edit-toggle"
-import { PlainTextInput } from "../components/plain-text-input"
+
+import {
+  InlineForm,
+  InlineTextareaField,
+  InlineWysiwyg,
+  InlineTextField,
+  useInlineForm,
+} from "react-tinacms-inline"
 
 const get = require("lodash.get")
 
-const Wysiwyg = props => <BaseWysiwyg {...props} sticky="32px" />
-
-const PlainText = props => (
-  <input style={{ background: "transparent " }} {...props.input} />
-)
-const MyToggle = props => <Toggle {...props} />
-const MySelect = props => <Select {...props} />
+// const MyToggle = props => <Toggle {...props} />
+// const MySelect = props => <Select {...props} />
 
 function BlogPostTemplate(props) {
-  const form = props.form
-  const post = props.data.markdownRemark
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
-  const { isEditing, setIsEditing } = props
+
+  const [post, form] = useLocalRemarkForm(
+    props.data.markdownRemark,
+    BlogPostForm
+  )
   const blocks = post.frontmatter.blocks || []
 
   return (
-    <Layout location={props.location} title={siteTitle}>
-      <EditToggle isEditing={isEditing} setIsEditing={setIsEditing} />
-      <SEO
-        title={post.frontmatter.title}
-        description={post.frontmatter.description || post.excerpt}
-      />
+    <ModalProvider>
+      <InlineForm form={form}>
+        <Layout location={props.location} title={siteTitle}>
+          <EditToggle />
+          <SEO
+            title={post.frontmatter.title}
+            description={post.frontmatter.description || post.excerpt}
+          />
 
-      <div
-        style={{
-          backgroundColor: post.frontmatter.heading_color || "#ffffff",
-        }}
-      >
-        <div
-          style={{
-            marginLeft: `auto`,
-            marginRight: `auto`,
-            maxWidth: rhythm(24),
-            padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
-          }}
-        >
-          <h1
-            style={{
-              margin: 0,
-              marginTop: rhythm(2),
-            }}
-          >
-            <TinaField name="rawFrontmatter.title" Component={PlainTextInput}>
-              {post.frontmatter.title}{" "}
-            </TinaField>
-          </h1>
           <div
             style={{
-              display: "flex",
-              justifyContent: "space-between",
-              marginTop: rhythm(2),
-              marginBottom: rhythm(1),
+              backgroundColor: post.frontmatter.heading_color || "#ffffff",
             }}
           >
-            <Bio />
-
-            <div style={{ display: "flex", flexDirection: "column" }}>
-              {post.frontmatter.thumbnail && (
-                <Img
-                  fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
-                  alt="Gatsby can't find me"
-                />
-              )}
-              <span style={{ fontWeight: "600" }}>Date</span>
-              <p>{post.frontmatter.date}</p>
-            </div>
-
-            <TinaField
-              name="rawFrontmatter.draft"
-              Component={MyToggle}
-              type="checkbox"
+            <div
+              style={{
+                marginLeft: `auto`,
+                marginRight: `auto`,
+                maxWidth: rhythm(24),
+                padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
+              }}
             >
-              {post.frontmatter.draft && (
-                <small style={{ color: "fuchsia" }}>Draft</small>
-              )}
-            </TinaField>
+              <h1
+                style={{
+                  margin: 0,
+                  marginTop: rhythm(2),
+                }}
+              >
+                <InlineTextareaField name="rawFrontmatter.title" />
+              </h1>
+              <div
+                style={{
+                  display: "flex",
+                  justifyContent: "space-between",
+                  marginTop: rhythm(2),
+                  marginBottom: rhythm(1),
+                }}
+              >
+                <Bio />
+                <div style={{ display: "flex", flexDirection: "column" }}>
+                  {post.frontmatter.thumbnail && (
+                    <Img
+                      fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                      alt="Gatsby can't find me"
+                    />
+                  )}
+                  <span style={{ fontWeight: "600" }}>Date</span>
+                  <p>{post.frontmatter.date}</p>
+                </div>
+                {/**
+                 * TODO: make inline toggle
+                 */}
+                {/* <TinaField
+                  name="rawFrontmatter.draft"
+                  Component={MyToggle}
+                  type="checkbox"
+                >
+                  {post.frontmatter.draft && (
+                    <small style={{ color: "fuchsia" }}>Draft</small>
+                  )}
+                </TinaField> */}
+              </div>
+            </div>
           </div>
-        </div>
-      </div>
 
-      <div
-        style={{
-          marginLeft: `auto`,
-          marginRight: `auto`,
-          maxWidth: rhythm(24),
-          padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
-        }}
-      >
-        <button onClick={() => setIsEditing(p => !p)}>
-          {isEditing ? "Stop Editing" : "Start Editing"}
-        </button>
-
-        <TinaField
-          name="rawFrontmatter.draft"
-          Component={MyToggle}
-          type="checkbox"
-        >
-          {post.frontmatter.draft && (
-            <small style={{ color: "fuchsia" }}>Draft</small>
-          )}
-        </TinaField>
-        <br />
-
-        <TinaField
-          name="rawFrontmatter.cool"
-          Component={MySelect}
-          options={[100, "Love this!", "How cool!"]}
-        >
-          <p>{post.frontmatter.cool}</p>
-        </TinaField>
-        <BlogBlocks form={form} data={blocks} />
-        <TinaField name="rawMarkdownBody" Component={Wysiwyg}>
           <div
-            dangerouslySetInnerHTML={{
-              __html: props.data.markdownRemark.html,
+            style={{
+              marginLeft: `auto`,
+              marginRight: `auto`,
+              maxWidth: rhythm(24),
+              padding: `${rhythm(1.5)} ${rhythm(3 / 4)}`,
+            }}
+          >
+            {/**
+             * TODO: make inline select
+             */}
+
+            {/* <TinaField
+              name="rawFrontmatter.cool"
+              Component={MySelect}
+              options={[100, "Love this!", "How cool!"]}
+            >
+              <p>{post.frontmatter.cool}</p>
+            </TinaField> */}
+            <p>{post.frontmatter.cool}</p>
+            <BlogBlocks form={form} data={blocks} />
+            <InlineWysiwyg name="rawMarkdownBody">
+              <div
+                dangerouslySetInnerHTML={{
+                  __html: props.data.markdownRemark.html,
+                }}
+              />
+            </InlineWysiwyg>
+          </div>
+          <div
+            style={{
+              marginBottom: rhythm(1),
+              width: "100%",
+              height: "1px",
+              backgroundColor: "#eaeaea",
             }}
           />
-        </TinaField>
-      </div>
-      <div
-        style={{
-          marginBottom: rhythm(1),
-          width: "100%",
-          height: "1px",
-          backgroundColor: "#eaeaea",
-        }}
-      />
-      <ul
-        style={{
-          marginLeft: `auto`,
-          marginRight: `auto`,
-          maxWidth: rhythm(24),
-          display: `flex`,
-          flexWrap: `wrap`,
-          justifyContent: `space-between`,
-          listStyle: `none`,
-          padding: 0,
-        }}
-      >
-        <li>
-          {previous && (
-            <Link to={previous.fields.slug} rel="prev">
-              ← {previous.frontmatter.title}
-            </Link>
-          )}
-        </li>
-        <li>
-          {next && (
-            <Link to={next.fields.slug} rel="next">
-              {next.frontmatter.title} →
-            </Link>
-          )}
-        </li>
-      </ul>
-    </Layout>
+          <ul
+            style={{
+              marginLeft: `auto`,
+              marginRight: `auto`,
+              maxWidth: rhythm(24),
+              display: `flex`,
+              flexWrap: `wrap`,
+              justifyContent: `space-between`,
+              listStyle: `none`,
+              padding: 0,
+            }}
+          >
+            <li>
+              {previous && (
+                <Link to={previous.fields.slug} rel="prev">
+                  ← {previous.frontmatter.title}
+                </Link>
+              )}
+            </li>
+            <li>
+              {next && (
+                <Link to={next.fields.slug} rel="next">
+                  {next.frontmatter.title} →
+                </Link>
+              )}
+            </li>
+          </ul>
+        </Layout>
+      </InlineForm>
+    </ModalProvider>
   )
 }
 
@@ -328,7 +324,39 @@ const BlogPostForm = {
   ],
 }
 
-export default inlineRemarkForm(BlogPostTemplate, BlogPostForm)
+/**
+ * Toggle
+ */
+export function EditToggle() {
+  const { status, deactivate, activate } = useInlineForm()
+
+  return (
+    <button
+      onClick={() => {
+        status === "active" ? deactivate() : activate()
+      }}
+    >
+      {status === "active" ? "Preview" : "Edit"}
+    </button>
+  )
+}
+
+export function DiscardChanges() {
+  const { form } = useInlineForm()
+
+  return (
+    <button
+      onClick={() => {
+        form.finalForm.reset()
+      }}
+    >
+      Discard Changes
+    </button>
+  )
+}
+
+// export default inlineRemarkForm(BlogPostTemplate, BlogPostForm)
+export default BlogPostTemplate
 
 export const pageQuery = graphql`
   query BlogPostBySlug($slug: String!) {
