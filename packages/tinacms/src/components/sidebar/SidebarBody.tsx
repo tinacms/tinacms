@@ -306,8 +306,7 @@ export const MultiformFormHeader = styled(
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 0 var(--tina-padding-big) var(--tina-padding-small)
-    var(--tina-padding-big);
+  padding: 0 var(--tina-padding-big) 10px var(--tina-padding-big);
   color: inherit;
   font-size: var(--tina-font-size-5);
   transition: color 250ms ease-out;
@@ -363,8 +362,7 @@ export const FormHeader = styled(
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 0 var(--tina-padding-big) var(--tina-padding-small)
-    var(--tina-padding-big);
+  padding: 0 var(--tina-padding-big) 10px var(--tina-padding-big);
   color: inherit;
   font-size: var(--tina-font-size-5);
   user-select: none;
