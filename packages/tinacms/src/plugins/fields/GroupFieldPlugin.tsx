@@ -129,7 +129,7 @@ export const PanelHeader = styled.div`
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 8px 18px 8px 18px;
+  padding: 6px 18px 6px 18px;
   color: inherit;
   font-size: var(--tina-font-size-3);
   transition: color var(--tina-timing-medium) ease-out;
