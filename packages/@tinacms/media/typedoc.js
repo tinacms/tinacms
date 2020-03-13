@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export * from '@tinacms/media'
+module.exports = require('../../../typedoc.js')(require('./package.json'))
