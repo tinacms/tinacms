@@ -24,6 +24,7 @@ import {
   FormOptions,
   Field,
 } from 'tinacms'
+import { generateFields } from './generate-fields'
 
 /**
  * A datastructure representing a JsonFile stored in Git
@@ -50,7 +51,7 @@ export function useJsonForm<T = any>(
 
   const id = options.id || jsonFile.fileRelativePath
   const label = options.label || jsonFile.fileRelativePath
-  const fields = options.fields || []
+  const fields = options.fields || generateFields(jsonFile)
   const actions = options.actions || []
   const [values, form] = useForm(
     {
