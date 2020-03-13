@@ -83,6 +83,18 @@ export const GlobalStyles = createGlobalStyle`
 export const TinaResetStyles = css`
   * {
     font-family: 'Inter', sans-serif;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+      border-left: 1px solid var(--tina-color-grey-2);
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--tina-color-grey-3);
+      border-radius: 0;
+      border: none;
+    }
   }
 
   *,
