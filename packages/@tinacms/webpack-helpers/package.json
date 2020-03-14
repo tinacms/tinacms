@@ -9,9 +9,9 @@
     "directory": "packages/@tinacms/webpack-alias"
   },
   "scripts": {
-    "watch": "tinacms-scripts watch",
-    "build": "tinacms-scripts build",
-    "dev": "tinacms-scripts dev"
+    "watch": "echo 'watch'",
+    "build": "echo 'build'",
+    "dev": "echo 'dev'"
   },
   "keywords": [
     "tinacms",
