@@ -30,7 +30,8 @@ function aliasLocal(config, name) {
 function aliasTinaDev(config, pathToTina, packagesToAlias) {
   config.resolve.alias['react'] = path.resolve('./node_modules/react')
 
-  const pathToTinaPackages = `${pathToTina}/packages`
+  const pathToTinaPackages = path.resolve(pathToTina, `packages`)
+
   if (packagesToAlias) {
     packagesToAlias.forEach(packageToAlias => {
       aliasRelative(
