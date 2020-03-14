@@ -2,7 +2,7 @@
 
 ---
 
-Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and introduce inconsistencies with module resolution. If 2 modules rely on the same package you can easily end up with 2 instances of that package, this is problematic for packages like `react` which expect only one instance. If you're app uses webpack you can get around these issues by ensuring that your dependencies come from a specific path on your system. `@tinacms/webpack-helpers` makes it easy to set up:
+Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and introduce inconsistencies with module resolution. If multiple modules rely on the same package you can easily end up with multiple instances of that package, this is problematic for packages like `react` which expect only one instance. If your app uses `webpack` you can get around these issues by ensuring that your dependencies come from a specific path on your system. This is especially helpful for working on the TinaCMS monorepo while using it's packages in your app. `@tinacms/webpack-helpers` makes it easy to set up:
 
 ### Usage
 
@@ -10,6 +10,10 @@ Pass your webpack config to the `aliasTinaDev` function along with the relative 
 
 ```js
 // In your app's webpack config
+const tinaWebpackHelpers = require('@tinacms/webpack-helpers')
+
+...
+
 module.exports = {
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
     if (dev) {
@@ -33,3 +37,5 @@ module.exports = {
   },
 }
 ```
+
+Now any reference to TinaCMS packages will use the local version (ignoring the version in your `.node_modules` directory):
