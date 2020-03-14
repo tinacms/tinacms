@@ -6,6 +6,8 @@ Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and in
 
 ### Usage
 
+Ensure you've set your `tinacms` monorepo up with the initial steps in the README, if your packages don't have a `build` directory the consuming app won't be able to resolve them.
+
 Pass your webpack config to the `aliasTinaDev` function along with the relative path from the site your working on to the `tinacms` monorepo, the following is an example from a next.js app where the monorepo is in an adjacent folder:
 
 ```js
