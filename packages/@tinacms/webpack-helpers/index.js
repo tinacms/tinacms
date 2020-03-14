@@ -41,18 +41,14 @@ function aliasTinaDev(config, pathToTina, packagesToAlias) {
       )
     })
   } else {
-    fs.readdir(pathToTinaPackages, (err, files) => {
-      if (err) {
-        throw err
-      } else {
-        files.forEach(packageToAlias => {
-          aliasRelative(
-            config,
-            packageToAlias,
-            `${pathToTinaPackages}/${packageToAlias}`
-          )
-        })
-      }
+    const files = fs.readdirSync(pathToTinaPackages)
+
+    files.forEach(packageToAlias => {
+      aliasRelative(
+        config,
+        packageToAlias,
+        `${pathToTinaPackages}/${packageToAlias}`
+      )
     })
   }
 }
