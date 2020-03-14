@@ -8,6 +8,11 @@
     "url": "https://github.com/tinacms/tinacms.git",
     "directory": "packages/@tinacms/webpack-alias"
   },
+  "scripts": {
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev"
+  },
   "keywords": [
     "tinacms",
     "webpack"
