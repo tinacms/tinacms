@@ -56,7 +56,7 @@ exports.onCreateWebpackConfig = ({ actions }) => {
     },
   }
 
-  aliasTinaDev(config, '../../tinacms/tinacms')
+  aliasTinaDev(config, '../tinacms')
 
   actions.setWebpackConfig(config)
 }
@@ -71,10 +71,10 @@ Instead, you can simply add the relative paths to your **gatsby-config.js**
 
 ```js
     {
-      resolve: "../../tinacms/tinacms/packages/gatsby-plugin-tinacms",
+      resolve: "../tinacms/packages/gatsby-plugin-tinacms",
       options: {
         plugins: [
-          "../../tinacms/tinacms/packages/gatsby-tinacms-git",
+          "../tinacms/packages/gatsby-tinacms-git",
           "gatsby-tinacms-json",
           "gatsby-tinacms-remark",
         ],
