@@ -36,7 +36,6 @@ function aliasTinaDev(config, pathToTina, packagesToAlias) {
       }
     })
   }
-  // console.log(config.resolve.alias)
 }
 
 module.exports = {
