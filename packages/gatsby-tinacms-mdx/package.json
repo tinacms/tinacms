@@ -36,7 +36,6 @@
     "tinacms": "^0.16.0"
   },
   "dependencies": {
-    "gatsby-tinacms-git": "^0.4.0",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
     "slash": "^3.0.0"
@@ -45,6 +44,7 @@
     "@mdx-js/mdx": ">=1.5.1",
     "@mdx-js/react": ">=1.5.5",
     "gatsby-plugin-mdx": ">=1.0.53",
+    "gatsby-tinacms-git": "^0.4.0",
     "tinacms": ">=0.11"
   }
 }
