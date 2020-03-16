@@ -27,6 +27,7 @@ import {
   FormOptions,
   Field,
 } from 'tinacms'
+import { generateFields } from './generate-fields'
 
 /**
  * A datastructure representing a MarkdownFile stored in Git
@@ -66,7 +67,7 @@ export function useMarkdownForm(
 
   const id = options.id || markdownFile.fileRelativePath
   const label = options.label || markdownFile.fileRelativePath
-  const fields = options.fields || []
+  const fields = options.fields || generateFields(markdownFile)
   const actions = options.actions || []
   const [values, form] = useForm(
     {

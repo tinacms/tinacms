@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-51-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-52-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Getting Started
@@ -146,7 +146,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://kellanmartin.com"><img src="https://avatars1.githubusercontent.com/u/17299952?v=4" width="100px;" alt=""/><br /><sub><b>Kellan Martin</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Spraynard" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/jonmiller0"><img src="https://avatars1.githubusercontent.com/u/22771842?v=4" width="100px;" alt=""/><br /><sub><b>Jon Miller</b></sub></a><br /><a href="#ideas-jonmiller0" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://pcast01.github.io/"><img src="https://avatars1.githubusercontent.com/u/1172644?v=4" width="100px;" alt=""/><br /><sub><b>Paul</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Apcast01" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/chriswillsflannery"><img src="https://avatars3.githubusercontent.com/u/6463453?v=4" width="100px;" alt=""/><br /><sub><b>Chris Flannery</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=chriswillsflannery" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/chriswillsflannery"><img src="https://avatars3.githubusercontent.com/u/6463453?v=4" width="100px;" alt=""/><br /><sub><b>Chris Flannery</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=chriswillsflannery" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/commits?author=chriswillsflannery" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/JeffersonBledsoe"><img src="https://avatars1.githubusercontent.com/u/30210785?v=4" width="100px;" alt=""/><br /><sub><b>Jefferson Bledsoe</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=JeffersonBledsoe" title="Tests">⚠️</a></td>
   </tr>
   <tr>
@@ -170,6 +170,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://joeprevite.com"><img src="https://avatars3.githubusercontent.com/u/3806031?v=4" width="100px;" alt=""/><br /><sub><b>JavaScript Joe</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=jsjoeio" title="Code">💻</a></td>
     <td align="center"><a href="https://www.madelyneriksen.com"><img src="https://avatars3.githubusercontent.com/u/36825510?v=4" width="100px;" alt=""/><br /><sub><b>Madelyn Eriksen</b></sub></a><br /><a href="#blog-madelyneriksen" title="Blogposts">📝</a></td>
+    <td align="center"><a href="http://www.mintel.me"><img src="https://avatars1.githubusercontent.com/u/4574612?v=4" width="100px;" alt=""/><br /><sub><b>Marc Mintel</b></sub></a><br /><a href="#infra-mmintel" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
   </tr>
 </table>
 
