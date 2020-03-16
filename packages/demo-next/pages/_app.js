@@ -16,9 +16,8 @@ limitations under the License.
 
 */
 
-import React from 'react'
 import App from 'next/app'
-import { Tina, TinaCMS, withTina } from 'tinacms'
+import { withTina } from 'tinacms'
 import { GitClient, GitMediaStore } from '@tinacms/git-client'
 
 const client = new GitClient('http://localhost:3000/___tina')
