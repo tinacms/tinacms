@@ -531,6 +531,15 @@
       "contributions": [
         "blog"
       ]
+    },
+    {
+      "login": "mmintel",
+      "name": "Marc Mintel",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4574612?v=4",
+      "profile": "http://www.mintel.me",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
