@@ -1,0 +1,19 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "heading",
+      "attrs": {
+        "level": 1,
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "Heading {: .class}"
+        }
+      ]
+    }
+  ]
+}

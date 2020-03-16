@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.7.0...@tinacms/fields@0.8.0) (2020-03-16)
+
+
+### Features
+
+* introduce react-tinacms-editor ([06bfb4b](https://github.com/tinacms/tinacms/commit/06bfb4b))
+
+
+
+
+
+# [0.7.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.7.0-alpha.1...@tinacms/fields@0.7.0) (2020-03-09)
+
+**Note:** Version bump only for package @tinacms/fields
+
 # [0.7.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.7.0-alpha.0...@tinacms/fields@0.7.0-alpha.1) (2020-03-06)
 
 **Note:** Version bump only for package @tinacms/fields

@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import styled from 'styled-components'
 import { useJsonForm } from 'next-tinacms-json'
 import { ModalProvider, BlockTemplate } from 'tinacms'
 import {
@@ -25,6 +26,7 @@ import {
   InlineBlocks,
   BlocksControls,
   BlockText,
+  BlockTextArea,
   useInlineForm,
 } from 'react-tinacms-inline'
 
@@ -90,11 +92,17 @@ function HeroBlock({ index }) {
   return (
     <BlocksControls index={index}>
       <h2>
-        My Hero: <BlockText name="text" />
+        My Hero: <StyledBlockText name="text" />
       </h2>
     </BlocksControls>
   )
 }
+
+// Testing the block styled component override
+
+const StyledBlockText = styled(BlockText)`
+  color: green;
+`
 
 /**
  * This is the Blocks lookup that was passed to `<InlineBlocks>` in the

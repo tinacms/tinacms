@@ -1,0 +1,34 @@
+{
+  "type": "doc",
+  "content": [
+    {
+      "type": "paragraph",
+      "attrs": {
+        "class": "",
+        "id": ""
+      },
+      "content": [
+        {
+          "type": "text",
+          "text": "This "
+        },
+        {
+          "type": "text",
+          "marks": [
+            {
+              "type": "code"
+            },
+            {
+              "type": "link",
+              "attrs": {
+                "href": "https://google.com",
+                "title": "Should Work"
+              }
+            }
+          ],
+          "text": "link"
+        }
+      ]
+    }
+  ]
+}

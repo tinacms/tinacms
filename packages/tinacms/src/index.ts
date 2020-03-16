@@ -30,7 +30,13 @@ export { TinaCMS as CMS } from './tina-cms'
 /**
  * Tina Sidebar
  */
-export { Tina, TinaProps } from './components/Tina'
+export {
+  TinaProvider,
+  TinaProviderProps,
+  // Deprecated aliases to the previous exports
+  Tina,
+  TinaProps,
+} from './components/TinaProvider'
 export { useSidebar } from './components/sidebar/SidebarProvider'
 
 /**
@@ -53,7 +59,8 @@ export * from './plugins/fields'
 export * from '@tinacms/form-builder'
 
 // Field/Input Component
-export { Wysiwyg, Toggle, Select, NumberInput, Input } from '@tinacms/fields'
+export { Toggle, Select, NumberInput, Input } from '@tinacms/fields'
+export { Wysiwyg } from 'react-tinacms-editor'
 export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // Modal Components

@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.2.1...react-tinacms-inline@0.3.0) (2020-03-16)
+
+
+### Features
+
+* adds inline textarea block and field ([e90c350](https://github.com/tinacms/tinacms/commit/e90c350))
+* inline text and block text accept extended styles ([e5665db](https://github.com/tinacms/tinacms/commit/e5665db))
+* inline textarea and block accept style overrides ([6428362](https://github.com/tinacms/tinacms/commit/6428362))
+
+
+
+
+
+## [0.2.1](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.2.1-alpha.1...react-tinacms-inline@0.2.1) (2020-03-09)
+
+**Note:** Version bump only for package react-tinacms-inline
+
 ## [0.2.1-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.2.1-alpha.0...react-tinacms-inline@0.2.1-alpha.1) (2020-03-06)
 
 **Note:** Version bump only for package react-tinacms-inline
