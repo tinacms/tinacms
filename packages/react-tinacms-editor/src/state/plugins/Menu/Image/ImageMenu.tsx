@@ -36,7 +36,6 @@ export default ({ editorView, imageUpload }: ImageMenu) => {
       promise.then(url => {
         const { state, dispatch } = editorView.view
         insertImage(state, dispatch, url)
-        console.log(url)
       })
     })
   }
