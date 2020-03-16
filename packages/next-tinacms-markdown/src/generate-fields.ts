@@ -16,11 +16,14 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-text'
-export * from './inline-field-textarea'
-export * from './inline-wysiwyg'
-export * from './inline-image-field'
-export * from './blocks'
-export * from './styles'
+import { MarkdownFile } from './use-markdown-form'
+import { Field } from 'tinacms'
+
+export function generateFields(markdownFile: MarkdownFile): Field[] {
+  const frontmatterFields = Object.keys(markdownFile.frontmatter).map(key => ({
+    component: 'text',
+    name: `frontmatter.${key}`,
+  }))
+
+  return [...frontmatterFields, { component: 'markdown', name: 'markdownBody' }]
+}

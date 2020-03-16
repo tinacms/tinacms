@@ -16,11 +16,14 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-text'
-export * from './inline-field-textarea'
-export * from './inline-wysiwyg'
-export * from './inline-image-field'
-export * from './blocks'
-export * from './styles'
+import { JsonFile } from './use-json-form'
+import { Field } from 'tinacms'
+
+export function generateFields(jsonFile: JsonFile): Field[] {
+  return Object.keys(jsonFile.data).map(key => {
+    return {
+      component: 'text',
+      name: `${key}`,
+    }
+  })
+}

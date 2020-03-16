@@ -371,7 +371,8 @@
       "avatar_url": "https://avatars3.githubusercontent.com/u/6463453?v=4",
       "profile": "https://github.com/chriswillsflannery",
       "contributions": [
-        "code"
+        "code",
+        "doc"
       ]
     },
     {
@@ -530,6 +531,15 @@
       "profile": "https://www.madelyneriksen.com",
       "contributions": [
         "blog"
+      ]
+    },
+    {
+      "login": "mmintel",
+      "name": "Marc Mintel",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4574612?v=4",
+      "profile": "http://www.mintel.me",
+      "contributions": [
+        "infra"
       ]
     }
   ],

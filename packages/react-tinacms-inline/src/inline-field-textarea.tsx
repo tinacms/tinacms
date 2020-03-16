@@ -20,8 +20,8 @@ import React from 'react'
 import { InlineField } from './inline-field'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-textarea-autosize'
-import { radius, color } from '@tinacms/styles'
 import { InlineTextFieldProps } from './inline-field-text'
+import { InputFocusWrapper } from './styles'
 
 export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
   return (
@@ -40,41 +40,7 @@ export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
   )
 }
 
-export const InputFocusWrapper = styled.div`
-  position: relative;
-
-  &:focus-within {
-    &:after {
-      opacity: 1;
-    }
-  }
-
-  &:hover:not(:focus-within) {
-    &:after {
-      opacity: 0.3;
-    }
-  }
-
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -16px;
-    top: -16px;
-    width: calc(100% + 2rem);
-    height: calc(100% + 2rem);
-    border: 3px solid ${color.primary()};
-    border-radius: ${radius()};
-    opacity: 0;
-    pointer-events: none;
-    z-index: 1000;
-    transition: all 150ms ease-out;
-  }
-`
-
-export const InlineTextarea = styled(({ ...styleProps }) => {
-  return <TextareaAutosize {...styleProps} />
-})`
+export const InlineTextarea = styled(TextareaAutosize)`
   width: 100%;
   word-wrap: break-word;
   display: block;

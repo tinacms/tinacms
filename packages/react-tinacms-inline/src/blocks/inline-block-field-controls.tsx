@@ -156,6 +156,7 @@ function AddBlockMenu({ templates, addBlock }: AddBlockMenu) {
       {templates.map(template => {
         return (
           <IconButton
+            key={template.label}
             primary
             onClick={() => {
               addBlock({
