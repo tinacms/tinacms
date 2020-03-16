@@ -34,8 +34,10 @@
     "build": "tsc",
     "docs": "npx typedoc"
   },
+  "peerDependencies": {
+    "tinacms": "^0.16.0"
+  },
   "dependencies": {
-    "tinacms": "^0.16.0",
     "@tinacms/api-git": "^0.7.0",
     "@tinacms/git-client": "^0.6.0"
   }
