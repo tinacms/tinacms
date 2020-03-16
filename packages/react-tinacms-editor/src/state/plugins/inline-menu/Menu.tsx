@@ -71,8 +71,6 @@ const LinkControl = markControl({
   defaultAttrs: {
     href: '',
     title: '',
-    editing: 'editing',
-    creating: 'creating',
   },
   noMix: ['code'],
 })

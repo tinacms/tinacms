@@ -39,7 +39,6 @@ export const Wysiwyg = styled(
     const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
       input,
       ALL_PLUGINS,
-      theme,
       format
     )
 

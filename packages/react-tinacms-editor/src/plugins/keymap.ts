@@ -86,8 +86,6 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
       const toggleLink = toggleMark(schema.marks.link, {
         href: '',
         title: '',
-        creating: 'creating',
-        editing: 'editing',
       })
 
       return function(state: any, dispatch: any) {

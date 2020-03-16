@@ -22,9 +22,7 @@
               "type": "link",
               "attrs": {
                 "href": "https://google.com",
-                "title": "Should Work",
-                "editing": null,
-                "creating": null
+                "title": "Should Work"
               }
             }
           ],

@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 import { InlineField } from './inline-field'
-import { InputFocusWrapper } from './inline-field-textarea'
+import { InputFocusWrapper } from './styles'
 
 /**
  * InlineTextField

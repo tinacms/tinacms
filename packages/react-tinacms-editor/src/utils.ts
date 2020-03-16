@@ -15,6 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { EditorState } from 'prosemirror-state'
+import { MarkType, Mark } from 'prosemirror-model'
 
 export const findElementOffsetTop = (
   element: HTMLElement,
@@ -25,7 +27,6 @@ export const findElementOffsetTop = (
   while (target.offsetParent && (!parent || target.offsetParent !== parent)) {
     target = target.offsetParent as HTMLElement
     offsetTop += target.offsetTop
-    console.log(target)
   }
   return offsetTop
 }
@@ -41,4 +42,39 @@ export const findElementOffsetLeft = (
     offsetLeft += target.offsetLeft
   }
   return offsetLeft
+}
+
+/**
+ * Function will check if mark is present in selection.
+ */
+export const isMarkPresent = (state: EditorState, markType: MarkType) =>
+  !!getMarkPresent(state, markType)
+
+/**
+ * Function will check if mark is present in selection.
+ */
+export const getMarkPresent = (state: EditorState, markType: MarkType) => {
+  const { selection } = state
+  const { anchor, head } = selection
+  let start
+  let end
+  if (anchor < head) {
+    start = anchor
+    end = head
+  } else {
+    start = head
+    end = anchor
+  }
+  start = selection.empty ? start : start + 1
+  const mark = markType.isInSet(state.doc.resolve(start).marks())
+
+  if (!mark) return false
+  let markPresent: Mark | undefined = mark
+
+  for (; start < end && markPresent; start += 1) {
+    if (!markType.isInSet(state.doc.resolve(start).marks()))
+      markPresent = undefined
+  }
+
+  return markPresent
 }

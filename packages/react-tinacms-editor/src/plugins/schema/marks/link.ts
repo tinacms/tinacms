@@ -26,8 +26,6 @@ const link = {
   attrs: {
     href: {},
     title: { default: null as any },
-    editing: { default: null as any },
-    creating: { default: null as any },
   },
   inclusive: false,
   parseDOM: [
@@ -37,9 +35,6 @@ const link = {
         return {
           href: dom.getAttribute('href'),
           title: dom.getAttribute('title'),
-          // Internal Use Only
-          editing: dom.getAttribute('editing'),
-          creating: dom.getAttribute('creating'),
         }
       },
     },
@@ -48,8 +43,7 @@ const link = {
     return ['a', node.attrs]
   },
   toDocument(node: Node) {
-    const { editing, creating, ...attrs } = node.attrs
-    return ['a', attrs]
+    return ['a', node.attrs]
   },
 }
 

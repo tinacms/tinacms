@@ -24,18 +24,20 @@ interface InlineWysiwygFieldProps {
   name: string
   sticky?: string
   children: any
+  format?: 'markdown' | 'html'
 }
 
 export function InlineWysiwyg({
   name,
   sticky,
   children,
+  format,
 }: InlineWysiwygFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }: any) => {
         if (status === 'active') {
-          return <Wysiwyg sticky={sticky} input={input} />
+          return <Wysiwyg sticky={sticky} format={format} input={input} />
         }
         return <>{children}</>
       }}
