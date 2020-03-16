@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.6](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.5...next-tinacms-json@0.3.6) (2020-03-16)
+
+
+### Bug Fixes
+
+* useJsonForm generates fields automatically ([e4c9689](https://github.com/tinacms/tinacms/commit/e4c9689))
+
+
+
+
+
 ## [0.3.5](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.5-alpha.1...next-tinacms-json@0.3.5) (2020-03-09)
 
 **Note:** Version bump only for package next-tinacms-json

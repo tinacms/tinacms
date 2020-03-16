@@ -16,16 +16,51 @@ limitations under the License.
 
 */
 
-import { Plugin, PluginKey } from 'prosemirror-state'
+import { Plugin, PluginKey, Transaction } from 'prosemirror-state'
+
+interface CommonPluginState {
+  editorFocused: boolean
+}
 
 export const commonPluginKey = new PluginKey('common')
 
 export const commonPlugin = new Plugin({
   key: commonPluginKey,
+  state: {
+    init: () => {
+      return { editorFocused: false }
+    },
+    apply(tr: Transaction, prev: CommonPluginState) {
+      if (tr.getMeta('editor_focused') === false) {
+        return {
+          editorFocused: false,
+        }
+      }
 
+      if (tr.getMeta('editor_focused')) {
+        return {
+          editorFocused: true,
+        }
+      }
+
+      return prev
+    },
+  },
   props: {
     handleScrollToSelection() {
       return true
+    },
+    handleDOMEvents: {
+      focus(view) {
+        const { state, dispatch } = view
+        dispatch(state.tr.setMeta('editor_focused', true))
+        return false
+      },
+      blur(view) {
+        const { state, dispatch } = view
+        dispatch(state.tr.setMeta('editor_focused', false))
+        return false
+      },
     },
   },
 })
