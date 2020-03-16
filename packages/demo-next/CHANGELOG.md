@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.2.6...nextjs-blog-starter@0.3.0) (2020-03-16)
+
+
+### Features
+
+* inline text and block text accept extended styles ([e5665db](https://github.com/kendallstrautman/nextjs-blog-starter/commit/e5665db))
+
+
+
+
+
 ## [0.2.6](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.2.6-alpha.1...nextjs-blog-starter@0.2.6) (2020-03-09)
 
 **Note:** Version bump only for package nextjs-blog-starter
