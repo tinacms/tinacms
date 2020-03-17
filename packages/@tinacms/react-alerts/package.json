@@ -22,7 +22,15 @@
     "docs": "npx typedoc"
   },
   "dependencies": {},
+  "devDependencies": {
+    "@tinacms/alerts": "^0.0.0",
+    "@tinacms/icons": "^0.7.0",
+    "@tinacms/styles": "^0.3.0"
+  },
   "peerDependencies": {
+    "@tinacms/alerts": ">=0.1",
+    "@tinacms/icons": ">=0.7",
+    "@tinacms/styles": ">=0.3",
     "react": ">=16.8"
   }
 }
