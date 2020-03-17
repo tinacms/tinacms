@@ -137,7 +137,8 @@
         "doc",
         "projectManagement",
         "userTesting",
-        "bug"
+        "bug",
+        "code"
       ]
     },
     {
