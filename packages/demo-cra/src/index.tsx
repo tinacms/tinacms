@@ -21,12 +21,14 @@ import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
-import { Tina } from 'tinacms'
+import { TinaProvider, TinaCMS } from 'tinacms'
+
+const cms = new TinaCMS()
 
 ReactDOM.render(
-  <Tina>
+  <TinaProvider cms={cms}>
     <App />
-  </Tina>,
+  </TinaProvider>,
   document.getElementById('root')
 )
 
