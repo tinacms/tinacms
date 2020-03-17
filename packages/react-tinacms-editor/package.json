@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-editor",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-editor.esm.js",
@@ -44,7 +44,7 @@
     "react-docgen-typescript-webpack-plugin": "^1.1.0"
   },
   "dependencies": {
-    "@tinacms/core": "^0.7.2",
+    "@tinacms/core": "^0.7.3",
     "@tinacms/icons": "^0.7.0",
     "@tinacms/styles": "^0.3.0",
     "codemirror": "^5.42.2",

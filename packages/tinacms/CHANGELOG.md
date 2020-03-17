@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.17.0](https://github.com/tinacms/tinacms/compare/tinacms@0.16.0...tinacms@0.17.0) (2020-03-16)
+
+
+### Bug Fixes
+
+* correct FormApi and FieldRenderProsp imports ([cbedf41](https://github.com/tinacms/tinacms/commit/cbedf41))
+* **TinaCMS:** config is now optional ([ffe567a](https://github.com/tinacms/tinacms/commit/ffe567a))
+* renamed Tina to TinaProvider ([dca44e1](https://github.com/tinacms/tinacms/commit/dca44e1))
+
+
+### Features
+
+* introduce react-tinacms-editor ([06bfb4b](https://github.com/tinacms/tinacms/commit/06bfb4b))
+
+
+
+
+
 # [0.16.0](https://github.com/tinacms/tinacms/compare/tinacms@0.16.0-alpha.1...tinacms@0.16.0) (2020-03-09)
 
 **Note:** Version bump only for package tinacms
