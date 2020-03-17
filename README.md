@@ -3,7 +3,7 @@
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-54-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-55-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 ## Getting Started
@@ -154,6 +154,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://www.mintel.me"><img src="https://avatars1.githubusercontent.com/u/4574612?v=4" width="100px;" alt=""/><br /><sub><b>Marc Mintel</b></sub></a><br /><a href="#infra-mmintel" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a> <a href="https://github.com/tinacms/tinacms/commits?author=mmintel" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Ammintel" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://forestry.io"><img src="https://avatars3.githubusercontent.com/u/5414297?v=4" width="100px;" alt=""/><br /><sub><b>Jeff See</b></sub></a><br /><a href="#infra-jeffsee55" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://github.com/blandfried-magellan"><img src="https://avatars3.githubusercontent.com/u/38441047?v=4" width="100px;" alt=""/><br /><sub><b>Brandon Landfried</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Ablandfried-magellan" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/chaddjohnson"><img src="https://avatars0.githubusercontent.com/u/676134?v=4" width="100px;" alt=""/><br /><sub><b>Chad Johnson</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Achaddjohnson" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
