@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
+export { DeleteAction } from 'gatsby-tinacms-git'
 export * from './useMdxForm'
 export * from './mdxFormHoc'
 export * from './MdxForm'
 export * from './mdx-creator-plugin'
-export * from './form-actions/delete-action'

@@ -16,34 +16,59 @@ limitations under the License.
 
 */
 
-import { Fragment, Node, Schema, Slice } from 'prosemirror-model'
-import { Plugin, Transaction } from 'prosemirror-state'
-import { LinkFormController } from './LinkFormController'
-import { LinkView } from './LinkView'
+import { Fragment, Node, Slice } from 'prosemirror-model'
+import { Plugin, Transaction, PluginKey, EditorState } from 'prosemirror-state'
+import { EditorView } from 'prosemirror-view'
+import { commonPluginKey } from '../Common'
+import { isMarkPresent } from '../../../utils'
 
 export const HTTP_LINK_REGEX = /\bhttps?:\/\/(www\.)?[-a-zA-Z0-9@:%._\+~#=]{2,256}\.[a-z]{2,6}\b([-a-zA-Z0-9@:;%_\+.,~#?&//=]*)/g
 
-export function links(schema: Schema, theme?: any): Plugin {
-  const renderTarget = createInvisibleDiv('links')
-  let linkForm: LinkFormController
+interface LinkPluginState {
+  showLinkForm: boolean
+}
+
+export const linkPluginKey = new PluginKey('image')
+
+export function links(): Plugin {
   let shiftKey: boolean
   return new Plugin({
-    filterTransaction(tr: Transaction): boolean {
-      switch (tr.getMeta('type')) {
-        case 'tinacms/render':
-          linkForm.render(tr.getMeta('clickTarget'))
-          return false
-        case 'tinacms/unmount':
-          linkForm.unmount()
-          return false
-        default:
-          return true
-      }
-    },
-    view(editorView: any) {
-      insertElBefore(renderTarget, editorView.dom)
-      linkForm = new LinkFormController(renderTarget, editorView as any, theme)
-      return new LinkView(editorView as any, schema, renderTarget)
+    key: linkPluginKey,
+    state: {
+      init: () => {
+        return { showLinkForm: false }
+      },
+      apply(
+        tr: Transaction,
+        prev: LinkPluginState,
+        _: any,
+        state: EditorState
+      ) {
+        if (tr.getMeta('show_link_toolbar') === false) {
+          return {
+            show_link_toolbar: false,
+          }
+        }
+
+        if (tr.getMeta('show_link_toolbar')) {
+          return {
+            show_link_toolbar: true,
+          }
+        }
+
+        const { editorFocused } = commonPluginKey.getState(state)
+        if (isMarkPresent(state, state.schema.marks.link)) {
+          return {
+            show_link_toolbar: true,
+          }
+        } else if (editorFocused) {
+          return {
+            show_link_toolbar: false,
+          }
+        }
+
+        return prev
+      },
     },
     props: {
       transformPasted(slice: Slice): Slice {
@@ -55,6 +80,13 @@ export function links(schema: Schema, theme?: any): Plugin {
       handleKeyDown(_x: any, e: any) {
         shiftKey = e.shiftKey
         return false
+      },
+      handleClickOn(view: EditorView, _1: any) {
+        const { dispatch, state } = view
+        const { tr, schema } = state
+        if (!isMarkPresent(state, schema.marks.link)) {
+          dispatch(tr.setMeta('show_link_toolbar', false))
+        }
       },
     },
     // TODO: Fix pls
@@ -101,10 +133,6 @@ const linkify = function(fragment: Fragment): Fragment {
           linkified.push(img.create(attrs))
         } else {
           attrs = { href: urlText, title: urlText }
-          if (matches.length === 1) {
-            attrs.editing = 'editing'
-            attrs.creating = 'creating'
-          }
           linkified.push(
             child.cut(start, end).mark(link.create(attrs).addToSet(child.marks))
           )

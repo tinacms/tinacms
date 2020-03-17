@@ -136,7 +136,9 @@
         "review",
         "doc",
         "projectManagement",
-        "userTesting"
+        "userTesting",
+        "bug",
+        "code"
       ]
     },
     {
@@ -371,7 +373,8 @@
       "avatar_url": "https://avatars3.githubusercontent.com/u/6463453?v=4",
       "profile": "https://github.com/chriswillsflannery",
       "contributions": [
-        "code"
+        "code",
+        "doc"
       ]
     },
     {
@@ -530,6 +533,44 @@
       "profile": "https://www.madelyneriksen.com",
       "contributions": [
         "blog"
+      ]
+    },
+    {
+      "login": "mmintel",
+      "name": "Marc Mintel",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/4574612?v=4",
+      "profile": "http://www.mintel.me",
+      "contributions": [
+        "infra",
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "jeffsee55",
+      "name": "Jeff See",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/5414297?v=4",
+      "profile": "http://forestry.io",
+      "contributions": [
+        "infra"
+      ]
+    },
+    {
+      "login": "blandfried-magellan",
+      "name": "Brandon Landfried",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/38441047?v=4",
+      "profile": "https://github.com/blandfried-magellan",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "chaddjohnson",
+      "name": "Chad Johnson",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/676134?v=4",
+      "profile": "https://github.com/chaddjohnson",
+      "contributions": [
+        "bug"
       ]
     }
   ],
