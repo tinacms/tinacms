@@ -33,6 +33,7 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
     "@types/js-yaml": "^3.12.1",
+    "gatsby-tinacms-git": "^0.4.1",
     "tinacms": "^0.17.0"
   },
   "dependencies": {
@@ -43,7 +44,10 @@
   "peerDependencies": {
     "@mdx-js/mdx": ">=1.5.1",
     "@mdx-js/react": ">=1.5.5",
+    "gatsby": ">=2.15",
     "gatsby-plugin-mdx": ">=1.0.53",
+    "gatsby-tinacms-git": ">=0.4.2",
+    "react": ">=16.8",
     "tinacms": ">=0.11"
   }
 }
