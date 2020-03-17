@@ -136,7 +136,8 @@
         "review",
         "doc",
         "projectManagement",
-        "userTesting"
+        "userTesting",
+        "bug"
       ]
     },
     {
