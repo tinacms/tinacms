@@ -20,6 +20,7 @@ import * as React from 'react'
 import { InlineField } from './inline-field'
 import { useCMS } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
+import { InputFocusWrapper } from './styles'
 
 interface InlineImageProps {
   name: string
@@ -36,25 +37,27 @@ export function InlineImageField({ name, uploadDir, parse }: InlineImageProps) {
       {({ input, status, form }) => {
         if (status === 'active') {
           return (
-            <ImageUpload
-              value={input.value}
-              onDrop={async ([file]: File[]) => {
-                const directory = uploadDir(form)
-                const [media] = await cms.media.store.persist([
-                  {
-                    directory,
-                    file,
-                  },
-                ])
-                if (media) {
-                  input.onChange(parse(media.filename))
-                } else {
-                  // TODO Handle failure
-                }
-                return null
-              }}
-              {...input}
-            />
+            <InputFocusWrapper>
+              <ImageUpload
+                value={input.value}
+                onDrop={async ([file]: File[]) => {
+                  const directory = uploadDir(form)
+                  const [media] = await cms.media.store.persist([
+                    {
+                      directory,
+                      file,
+                    },
+                  ])
+                  if (media) {
+                    input.onChange(parse(media.filename))
+                  } else {
+                    // TODO Handle failure
+                  }
+                  return null
+                }}
+                {...input}
+              />
+            </InputFocusWrapper>
           )
         }
         return <img src={input.value} />
