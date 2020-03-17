@@ -541,6 +541,15 @@
       "contributions": [
         "infra"
       ]
+    },
+    {
+      "login": "jeffsee55",
+      "name": "Jeff See",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/5414297?v=4",
+      "profile": "http://forestry.io",
+      "contributions": [
+        "infra"
+      ]
     }
   ],
   "contributorsPerLine": 7,
