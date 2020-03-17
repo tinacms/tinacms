@@ -540,7 +540,8 @@
       "profile": "http://www.mintel.me",
       "contributions": [
         "infra",
-        "code"
+        "code",
+        "bug"
       ]
     },
     {
