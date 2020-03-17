@@ -33,12 +33,16 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
+    "gatsby-tinacms-git": "^0.4.1",
     "tinacms": "^0.17.0"
   },
   "dependencies": {
     "slash": "^3.0.0"
   },
   "peerDependencies": {
+    "gatsby": ">=2.15",
+    "gatsby-tinacms-git": ">=0.4.2",
+    "react": ">=16.8",
     "tinacms": ">=0.11"
   }
 }
