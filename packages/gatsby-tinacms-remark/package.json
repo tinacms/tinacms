@@ -42,8 +42,10 @@
     "slash": "^3.0.0"
   },
   "peerDependencies": {
+    "gatsby": ">=2.15",
     "gatsby-tinacms-git": "^0.4.0",
     "gatsby-transformer-remark": ">=2.1.1",
-    "tinacms": ">=0.11"
+    "tinacms": ">=0.11",
+    "react": ">=16.8"
   }
 }
