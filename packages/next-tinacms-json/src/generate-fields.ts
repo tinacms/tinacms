@@ -15,6 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-export { DeleteAction } from 'gatsby-tinacms-git'
-export * from './use-json-form'
-export * from './create-json-plugin'
+
+import { JsonFile } from './use-json-form'
+import { Field } from 'tinacms'
+
+export function generateFields(jsonFile: JsonFile): Field[] {
+  return Object.keys(jsonFile.data).map(key => {
+    return {
+      component: 'text',
+      name: `${key}`,
+    }
+  })
+}

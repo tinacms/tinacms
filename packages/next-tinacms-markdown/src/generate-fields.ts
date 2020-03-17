@@ -16,29 +16,14 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { ActionButton, useCMS, Form } from 'tinacms'
+import { MarkdownFile } from './use-markdown-form'
+import { Field } from 'tinacms'
 
-export function DeleteAction({ form }: { form: Form }) {
-  const cms = useCMS()
-  return (
-    <ActionButton
-      onClick={async () => {
-        if (
-          !confirm(
-            `Are you sure you want to delete ${form.values.fileRelativePath}?`
-          )
-        ) {
-          return
-        }
-        await cms.api.git.onDelete!({
-          relPath: form.values.fileRelativePath,
-        })
+export function generateFields(markdownFile: MarkdownFile): Field[] {
+  const frontmatterFields = Object.keys(markdownFile.frontmatter).map(key => ({
+    component: 'text',
+    name: `frontmatter.${key}`,
+  }))
 
-        window.history.back()
-      }}
-    >
-      Delete
-    </ActionButton>
-  )
+  return [...frontmatterFields, { component: 'markdown', name: 'markdownBody' }]
 }

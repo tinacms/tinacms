@@ -15,9 +15,7 @@
               "type": "link",
               "attrs": {
                 "href": "/a-url",
-                "title": null,
-                "editing": null,
-                "creating": null
+                "title": null
               }
             }
           ],
