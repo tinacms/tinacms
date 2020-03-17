@@ -35,6 +35,7 @@
     "docs": "npx typedoc"
   },
   "peerDependencies": {
+    "react": ">=16.8",
     "tinacms": "^0.16.0"
   },
   "dependencies": {
