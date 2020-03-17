@@ -12,8 +12,9 @@ Pass your webpack config to the `aliasTinaDev` function along with the relative 
 
 #### Next.js
 
+**next.config.js**
+
 ```js
-// In your app's webpack config
 const tinaWebpackHelpers = require('@tinacms/webpack-helpers')
 
 ...
@@ -31,6 +32,7 @@ module.exports = {
 This will alias every package in the monorepo so that references within your app point to the local monorepo rather than your app's `node_modules` directory.
 You can specify the package names you'd like to alias as a second argument:
 
+**next.config.js**
 ```js
 module.exports = {
   webpack: (config, { buildId, dev, isServer, defaultLoaders, webpack }) => {
@@ -67,7 +69,9 @@ exports.onCreateWebpackConfig = ({ actions }) => {
 The above solution only aliases packages loaded via the webpack, which
 means the above solution does not work for Gatsby plugins.
 
-Instead, you can simply add the relative paths to your **gatsby-config.js**
+Instead, you can simply add the relative paths to your config:
+
+**gatsby-config.js**
 
 ```js
     {
