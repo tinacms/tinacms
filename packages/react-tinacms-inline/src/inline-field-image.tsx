@@ -18,15 +18,14 @@ limitations under the License.
 
 import * as React from 'react'
 import { InlineField } from './inline-field'
-import { useCMS } from 'tinacms'
+import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
 import { InputFocusWrapper } from './styles'
 
 interface InlineImageProps {
   name: string
-  path?: string
   parse(filename: string): string
-  uploadDir(form: any): string
+  uploadDir(form: Form): string
   children?: any
 }
 
