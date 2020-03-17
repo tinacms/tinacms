@@ -26,10 +26,11 @@
     "docs": "npx typedoc",
     "build": "tinacms-scripts build"
   },
-  "dependencies": {
-    "@tinacms/core": "0.7.2"
-  },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.13"
+    "@tinacms/scripts": "^0.1.13",
+    "@tinacms/core": "^0.7.3"
+  },
+  "peerDependencies": {
+    "@tinacms/core": ">=0.7"
   }
 }
