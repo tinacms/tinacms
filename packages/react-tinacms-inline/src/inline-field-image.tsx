@@ -27,9 +27,15 @@ interface InlineImageProps {
   path?: string
   parse(filename: string): string
   uploadDir(form: any): string
+  children?: any
 }
 
-export function InlineImageField({ name, uploadDir, parse }: InlineImageProps) {
+export function InlineImageField({
+  name,
+  uploadDir,
+  parse,
+  children,
+}: InlineImageProps) {
   const cms = useCMS()
 
   return (
@@ -56,11 +62,13 @@ export function InlineImageField({ name, uploadDir, parse }: InlineImageProps) {
                   return null
                 }}
                 {...input}
-              />
+              >
+                {children}
+              </ImageUpload>
             </InputFocusWrapper>
           )
         }
-        return <img src={input.value} />
+        return children ? children : <img src={input.value} />
       }}
     </InlineField>
   )
@@ -69,9 +77,10 @@ export function InlineImageField({ name, uploadDir, parse }: InlineImageProps) {
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
+  children?: any
 }
 
-export const ImageUpload = ({ onDrop, value }: ImageUploadProps) => {
+export const ImageUpload = ({ onDrop, value, children }: ImageUploadProps) => {
   const {
     getRootProps,
     getInputProps,
@@ -84,9 +93,7 @@ export const ImageUpload = ({ onDrop, value }: ImageUploadProps) => {
     <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
       {value ? (
-        <div>
-          <img src={value} />
-        </div>
+        <div>{children ? children : <img src={value} />}</div>
       ) : (
         <div>
           Drag 'n' drop some files here,
