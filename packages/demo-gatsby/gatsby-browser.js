@@ -19,13 +19,11 @@ distributed under the License is distributed on an "AS IS" BASIS,
 // custom typefaces
 import "typeface-montserrat"
 import "typeface-merriweather"
-import {Tina} from "tinacms";
-import * as React from "react";
+import * as React from "react"
+import { TinaProvider, TinaCMS } from "tinacms"
 
-export function wrapRootElement({element}) {
-    return (
-        <Tina cms={window.tinacms}>
-            {element}
-        </Tina>
-    )
+const cms = new TinaCMS()
+
+export function wrapRootElement({ element }) {
+  return <TinaProvider cms={window.tinacms}>{element}</TinaProvider>
 }
