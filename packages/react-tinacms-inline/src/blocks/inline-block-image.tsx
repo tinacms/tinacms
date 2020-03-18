@@ -18,7 +18,12 @@ limitations under the License.
 
 import * as React from 'react'
 import { BlockField } from './inline-block-field'
-import { InlineImageField, InlineImageProps } from '../inline-field-image'
+import {
+  InlineImageField,
+  InlineImageProps,
+  ImageUpload,
+} from '../inline-field-image'
+import { useCMS } from 'tinacms'
 
 export function BlockImage({
   name,
@@ -26,12 +31,33 @@ export function BlockImage({
   parse,
   uploadDir,
 }: InlineImageProps) {
+  const cms = useCMS()
   return (
     <BlockField name={name}>
-      {({ input, status }) => {
+      {({ input, status, form }) => {
         if (status === 'active') {
           return (
-            <InlineImageField parse={parse} uploadDir={uploadDir} {...input} />
+            <ImageUpload
+              value={input.value}
+              onDrop={async ([file]: File[]) => {
+                const directory = uploadDir(form)
+                const [media] = await cms.media.store.persist([
+                  {
+                    directory,
+                    file,
+                  },
+                ])
+                if (media) {
+                  input.onChange(parse(media.filename))
+                } else {
+                  // TODO Handle failure
+                }
+                return null
+              }}
+              {...input}
+            >
+              {children}
+            </ImageUpload>
           )
         }
         return children ? children : <img src={input.value} />
