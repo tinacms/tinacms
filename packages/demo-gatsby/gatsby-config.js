@@ -49,9 +49,10 @@ module.exports = {
             options: {
               pathToRepo: REPO_ABSOLUTE_PATH,
               pathToContent: "packages/demo-gatsby",
-              defaultCommitMessage: "Update from the content ",
+              defaultCommitMessage: "chore: update from tina",
               defaultCommitName: "TinaCMS",
               defaultCommitEmail: "git@tinacms.org",
+              pushOnCommit: false,
             },
           },
         ],

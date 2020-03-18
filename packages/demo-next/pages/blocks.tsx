@@ -22,6 +22,7 @@ import { useJsonForm } from 'next-tinacms-json'
 import { ModalProvider, BlockTemplate } from 'tinacms'
 import {
   InlineForm,
+  InlineImageField,
   InlineTextField,
   InlineBlocks,
   BlocksControls,
@@ -43,6 +44,11 @@ export default function BlocksExample({ jsonFile }) {
         <DiscardChanges />
         <h1>
           <InlineTextField name="title" />
+          <InlineImageField
+            name="hero_image"
+            parse={filename => `/images/${filename}`}
+            uploadDir={() => '/public/images/'}
+          />
         </h1>
         <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
       </InlineForm>

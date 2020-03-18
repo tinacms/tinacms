@@ -21,6 +21,7 @@ gallery:
 draft: false
 testNumber: 40
 cool: How cool!
+thumbnail: ../../assets/profile-pic.jpg
 ---
 ## Image settings
 
