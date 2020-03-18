@@ -21,7 +21,6 @@ import { useCallback, useState, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
-import { Z_INDEX } from '../../Globals'
 import {
   TinaReset,
   Button,
@@ -29,8 +28,10 @@ import {
   font,
   color,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ThemeProps,
+  // ThemeProps,
 } from '@tinacms/styles'
+
+export const Z_INDEX = 2147000000
 
 interface Props {
   children: any
