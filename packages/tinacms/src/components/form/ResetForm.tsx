@@ -25,8 +25,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-} from '../modals/ModalProvider'
-import { ModalPopup } from '../modals/ModalPopup'
+  ModalPopup,
+} from '@tinacms/react-modals'
 
 interface ResetFormProps {
   children: any

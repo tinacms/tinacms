@@ -23,8 +23,8 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-} from '../modals/ModalProvider'
-import { ModalPopup } from '../modals/ModalPopup'
+  ModalPopup,
+} from '@tinacms/react-modals'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/forms'
