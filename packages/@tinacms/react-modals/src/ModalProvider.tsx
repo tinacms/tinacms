@@ -28,7 +28,6 @@ import {
   font,
   color,
   // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  // ThemeProps,
 } from '@tinacms/styles'
 
 export const Z_INDEX = 2147000000
