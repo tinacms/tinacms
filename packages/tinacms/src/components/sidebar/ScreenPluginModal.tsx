@@ -18,9 +18,13 @@ limitations under the License.
 
 import * as React from 'react'
 import { FC } from 'react'
-import { Modal, ModalHeader, ModalBody } from '../modals/ModalProvider'
-import { ModalFullscreen } from '../modals/ModalFullscreen'
-import { ModalPopup } from '../modals/ModalPopup'
+import {
+  Modal,
+  ModalHeader,
+  ModalBody,
+  ModalFullscreen,
+  ModalPopup,
+} from '@tinacms/react-modals'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 
 export interface ScreenPluginViewProps {
