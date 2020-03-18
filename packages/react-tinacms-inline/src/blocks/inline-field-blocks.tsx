@@ -19,6 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { Block } from './block'
 import { InlineField } from '../inline-field'
+import { useState } from 'react'
 
 /**
  * Blocks
@@ -39,6 +40,8 @@ export interface InlineBlocksActions {
   blocks: {
     [key: string]: Block
   }
+  activeBlock: number | null
+  setActiveBlock: any
 }
 
 export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
@@ -56,12 +59,15 @@ export function useInlineBlocks() {
 }
 
 export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
+  const [activeBlock, setActiveBlock] = useState(-1)
   return (
     <InlineField name={name}>
       {({ input, form }) => {
         const allData: { _template: string }[] = input.value || []
 
         const move = (from: number, to: number) => {
+          const movement = to - from
+          setActiveBlock(activeBlock => activeBlock + movement)
           form.mutators.move(name, from, to)
         }
 
@@ -75,7 +81,15 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
 
         return (
           <InlineBlocksContext.Provider
-            value={{ insert, move, remove, blocks, count: allData.length }}
+            value={{
+              insert,
+              move,
+              remove,
+              blocks,
+              count: allData.length,
+              activeBlock,
+              setActiveBlock,
+            }}
           >
             {allData.map((data, index) => {
               const Block = blocks[data._template]

@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 import {
   FieldsBuilder,
@@ -35,7 +35,8 @@ import {
   AddIcon,
   ChevronUpIcon,
   ChevronDownIcon,
-  CloseIcon,
+  TrashIcon,
+  SettingsIcon,
 } from '@tinacms/icons'
 
 /**
@@ -49,21 +50,42 @@ export interface BlocksControlsProps {
 
 export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { status } = useInlineForm()
-  const { insert, move, remove, blocks, count } = useInlineBlocks()
+  const {
+    insert,
+    move,
+    remove,
+    blocks,
+    count,
+    activeBlock,
+    setActiveBlock,
+  } = useInlineBlocks()
   const { template } = useInlineBlock()
   const isFirst = index === 0
   const isLast = index === count - 1
 
   const removeBlock = () => remove(index)
-  const moveBlockUp = () => move(index, index - 1)
-  const moveBlockDown = () => move(index, index + 1)
 
   if (status === 'inactive') {
     return children
   }
 
+  const moveBlockUp = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    move(index, index - 1)
+  }
+
+  const moveBlockDown = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    move(index, index + 1)
+  }
+
+  const clickHandler = (event: React.MouseEvent) => {
+    event.preventDefault()
+    setActiveBlock(index)
+  }
+
   return (
-    <BlockWrapper>
+    <BlockWrapper active={activeBlock === index} onClick={clickHandler}>
       <BlockMenu>
         <AddBlockMenu
           addBlock={block => insert(index + 1, block)}
@@ -75,8 +97,8 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
         <IconButton primary onClick={moveBlockDown} disabled={isLast}>
           <ChevronDownIcon />
         </IconButton>
-        <IconButton onClick={removeBlock}>
-          <CloseIcon />
+        <IconButton primary onClick={removeBlock}>
+          <TrashIcon />
         </IconButton>
         <BlockSettings template={template} />
       </BlockMenu>
@@ -108,21 +130,14 @@ const BlockMenu = styled.div`
   }
 `
 
-const BlockWrapper = styled.div`
+export interface BlockWrapperProps {
+  active: boolean
+}
+
+const BlockWrapper = styled.div<BlockWrapperProps>`
   position: relative;
 
-  &:focus-within {
-    ${BlockMenu} {
-      transform: translate3d(0, -100%, 0);
-      opacity: 1;
-    }
-
-    &:after {
-      opacity: 1;
-    }
-  }
-
-  &:hover:not(:focus-within) {
+  &:hover {
     &:after {
       opacity: 0.3;
     }
@@ -143,6 +158,19 @@ const BlockWrapper = styled.div`
     z-index: 1000;
     transition: all 150ms ease-out;
   }
+
+  ${p =>
+    p.active &&
+    css`
+      ${BlockMenu} {
+        transform: translate3d(0, -100%, 0);
+        opacity: 1;
+      }
+
+      &:after {
+        opacity: 1 !important;
+      }
+    `};
 `
 
 interface AddBlockMenu {
@@ -186,7 +214,9 @@ function BlockSettings({ template }: BlockSettingsProps) {
   }
   return (
     <>
-      <button onClick={() => setOpen(p => !p)}>Settings</button>
+      <IconButton primary onClick={() => setOpen(p => !p)}>
+        <SettingsIcon />
+      </IconButton>
       {open && (
         <BlockSettingsModal template={template} close={() => setOpen(false)} />
       )}
