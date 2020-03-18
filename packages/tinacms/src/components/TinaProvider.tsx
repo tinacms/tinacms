@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ModalProvider } from './modals/ModalProvider'
+import { ModalProvider } from '@tinacms/react-modals'
 import styled, { ThemeProvider } from 'styled-components'
 import { TinaReset, Theme, DefaultTheme, ThemeProps } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
