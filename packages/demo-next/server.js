@@ -33,10 +33,18 @@ app.prepare().then(() => {
   server.use(cors())
   server.use(
     '/___tina',
-    gitApi.router({
-      pathToRepo: path.join(process.cwd(), '../..'),
-      pathToContent: 'packages/demo-next',
-    })
+    gitApi.router(
+      {
+        pathToRepo: path.join(process.cwd(), '../..'),
+        pathToContent: 'packages/demo-next',
+      },
+      {
+        defaultCommitMessage: 'chore: edited with tina',
+        defaultCommitName: 'Uncle Rico',
+        defaultCommitEmail: 'git@tinacms.org',
+        pushOnCommit: false,
+      }
+    )
   )
 
   server.all('*', (req, res) => {
