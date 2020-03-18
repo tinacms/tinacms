@@ -18,11 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { BlockField } from './inline-block-field'
-import {
-  InlineImageField,
-  InlineImageProps,
-  ImageUpload,
-} from '../inline-field-image'
+import { InlineImageProps, ImageUpload } from '../inline-field-image'
 import { useCMS } from 'tinacms'
 
 export function BlockImage({
