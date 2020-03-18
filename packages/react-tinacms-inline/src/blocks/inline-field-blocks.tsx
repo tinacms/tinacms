@@ -66,9 +66,8 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
         const allData: { _template: string }[] = input.value || []
 
         const move = (from: number, to: number) => {
-          const diff = to - from
-          console.log(diff)
-          setActiveBlock(activeBlock => activeBlock + diff)
+          const movement = to - from
+          setActiveBlock(activeBlock => activeBlock + movement)
           form.mutators.move(name, from, to)
         }
 
