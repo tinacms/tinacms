@@ -45,6 +45,8 @@ export const InlineTextarea = styled(TextareaAutosize)`
   word-wrap: break-word;
   display: block;
   font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
   box-sizing: border-box;
   color: inherit;
   letter-spacing: inherit;
