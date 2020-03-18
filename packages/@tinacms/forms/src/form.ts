@@ -47,6 +47,9 @@ export interface Field {
     field: Field
   ): string | object | undefined
   defaultValue?: any
+  previewSrc?: (form: any, field: Field) => string
+  uploadDir?: (form: any) => string
+  clearable? : boolean  
   fields?: Field[]
 }
 
