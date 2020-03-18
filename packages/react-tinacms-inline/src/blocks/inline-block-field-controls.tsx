@@ -36,6 +36,7 @@ import {
   ChevronUpIcon,
   ChevronDownIcon,
   TrashIcon,
+  SettingsIcon,
 } from '@tinacms/icons'
 
 /**
@@ -186,7 +187,9 @@ function BlockSettings({ template }: BlockSettingsProps) {
   }
   return (
     <>
-      <button onClick={() => setOpen(p => !p)}>Settings</button>
+      <IconButton primary onClick={() => setOpen(p => !p)}>
+        <SettingsIcon />
+      </IconButton>
       {open && (
         <BlockSettingsModal template={template} close={() => setOpen(false)} />
       )}
