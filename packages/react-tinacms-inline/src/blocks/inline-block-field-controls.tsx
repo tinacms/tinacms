@@ -35,7 +35,7 @@ import {
   AddIcon,
   ChevronUpIcon,
   ChevronDownIcon,
-  CloseIcon,
+  TrashIcon,
 } from '@tinacms/icons'
 
 /**
@@ -75,8 +75,8 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
         <IconButton primary onClick={moveBlockDown} disabled={isLast}>
           <ChevronDownIcon />
         </IconButton>
-        <IconButton onClick={removeBlock}>
-          <CloseIcon />
+        <IconButton primary onClick={removeBlock}>
+          <TrashIcon />
         </IconButton>
         <BlockSettings template={template} />
       </BlockMenu>
