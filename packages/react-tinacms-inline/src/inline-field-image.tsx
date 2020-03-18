@@ -22,7 +22,7 @@ import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
 import { InputFocusWrapper } from './styles'
 
-interface InlineImageProps {
+export interface InlineImageProps {
   name: string
   parse(filename: string): string
   uploadDir(form: Form): string
