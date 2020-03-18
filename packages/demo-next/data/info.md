@@ -1,6 +1,7 @@
 ---
 name: Kendall Strautman
 hometown: 'Bend, OR'
+image: /images/davisco-5E5N49RWtbA-unsplash.jpg
 ---
 ## This blog was created using [TinaCMS](https://tinacms.org) & [NextJS](https://nextjs.org/)
 
