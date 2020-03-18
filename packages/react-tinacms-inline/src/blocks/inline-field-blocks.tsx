@@ -59,13 +59,16 @@ export function useInlineBlocks() {
 }
 
 export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
-  const [activeBlock, setActiveBlock] = useState(null)
+  const [activeBlock, setActiveBlock] = useState(-1)
   return (
     <InlineField name={name}>
       {({ input, form }) => {
         const allData: { _template: string }[] = input.value || []
 
         const move = (from: number, to: number) => {
+          const diff = to - from
+          console.log(diff)
+          setActiveBlock(activeBlock => activeBlock + diff)
           form.mutators.move(name, from, to)
         }
 

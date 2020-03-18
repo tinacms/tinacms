@@ -64,17 +64,24 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   const isLast = index === count - 1
 
   const removeBlock = () => remove(index)
-  const moveBlockUp = () => move(index, index - 1)
-  const moveBlockDown = () => move(index, index + 1)
 
   if (status === 'inactive') {
     return children
   }
 
+  const moveBlockUp = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    move(index, index - 1)
+  }
+
+  const moveBlockDown = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    move(index, index + 1)
+  }
+
   const clickHandler = (event: React.MouseEvent) => {
     event.preventDefault()
     setActiveBlock(index)
-    console.log('fuck yeah dude, nice one', activeBlock)
   }
 
   return (
