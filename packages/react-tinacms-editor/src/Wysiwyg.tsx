@@ -26,7 +26,7 @@ import { ProseMirrorCss } from './ProseMirrorCss'
 import { Format } from './Translator'
 import Menu from './state/plugins/Menu'
 
-interface Wysiwyg {
+export interface WysiwygProps {
   input: any
   plugins?: Plugin[]
   sticky?: boolean
@@ -44,7 +44,7 @@ export const Wysiwyg = styled(
     upload,
     previewUrl,
     ...styleProps
-  }: any) => {
+  }: WysiwygProps) => {
     const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
       input,
       ALL_PLUGINS,
@@ -67,7 +67,7 @@ export const Wysiwyg = styled(
             imageUpload={upload}
           />
         )}
-        <div {...styleProps} ref={prosemirrorEl} />
+        <div {...styleProps} ref={prosemirrorEl as any} />
       </WysiwygWrapper>
     )
   }
