@@ -38,6 +38,7 @@ import {
   TrashIcon,
   SettingsIcon,
 } from '@tinacms/icons'
+import { useRef, useEffect } from 'react'
 
 /**
  *
@@ -62,8 +63,19 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { template } = useInlineBlock()
   const isFirst = index === 0
   const isLast = index === count - 1
+  const blockRef = useRef() as React.MutableRefObject<HTMLDivElement>
+  const blockMenuRef = useRef() as React.MutableRefObject<HTMLDivElement>
 
   const removeBlock = () => remove(index)
+
+  useEffect(() => {
+    if (blockRef.current) {
+      document.addEventListener('mousedown', clearActiveBlock)
+    }
+    return () => {
+      document.removeEventListener('mousedown', clearActiveBlock)
+    }
+  }, [blockRef.current])
 
   if (status === 'inactive') {
     return children
@@ -84,9 +96,20 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     setActiveBlock(index)
   }
 
+  const clearActiveBlock = (event: any) => {
+    if (blockRef.current.contains(event.target) || index != activeBlock) {
+      return
+    }
+    setActiveBlock(-1)
+  }
+
   return (
-    <BlockWrapper active={activeBlock === index} onClick={clickHandler}>
-      <BlockMenu>
+    <BlockWrapper
+      ref={blockRef}
+      active={activeBlock === index}
+      onClick={clickHandler}
+    >
+      <BlockMenu ref={blockMenuRef}>
         <AddBlockMenu
           addBlock={block => insert(index + 1, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
