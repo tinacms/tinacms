@@ -25,6 +25,7 @@ import { useProsemirrorSchema } from './useProsemirrorSchema'
 import { useProsemirrorTranslator } from './useProsemirrorTranslator'
 import { nodeViews } from './node-views'
 import { Format } from './Translator'
+import { ImageProps } from './types'
 
 export interface Input {
   value: string
@@ -37,12 +38,13 @@ export function useProsemirror(
   input: Input,
   plugins: Plugin[] = [],
   format?: Format,
-  previewUrl?: (url: string) => string
+  imageProps: ImageProps = {}
 ) {
   /**
    * Construct the Prosemirror Schema
    */
   const [schema] = useProsemirrorSchema(plugins)
+  const { upload, previewUrl } = imageProps
 
   /**
    * Create a MarkdownTranslattor based on the schema
@@ -64,7 +66,7 @@ export function useProsemirror(
    * CreateState
    */
   const createState = React.useCallback((value: string) => {
-    return createEditorState(schema, translator, plugins, value)
+    return createEditorState(schema, translator, plugins, value, upload)
   }, [])
 
   /**

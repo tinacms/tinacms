@@ -37,7 +37,8 @@ export function createEditorState(
   schema: Schema,
   translator: Translator,
   plugins: Plugin[],
-  value: string
+  value: string,
+  uploadImages?: (file: any) => Promise<string>[]
 ) {
   return EditorState.create({
     schema,
@@ -52,7 +53,7 @@ export function createEditorState(
       gapCursor(),
       tableEditing(),
       tablePlugin,
-      imagePlugin,
+      imagePlugin(uploadImages),
     ],
   })
 }

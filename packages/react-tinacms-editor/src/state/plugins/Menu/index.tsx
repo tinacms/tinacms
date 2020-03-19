@@ -28,7 +28,6 @@ interface MenuProps {
   bottom?: boolean
   theme?: any
   sticky?: boolean
-  imageUpload?: () => [Promise<string>]
 }
 
 export default ({
@@ -37,7 +36,6 @@ export default ({
   bottom,
   theme,
   sticky,
-  imageUpload,
 }: MenuProps) => {
   return (
     <TranslatorContext.Provider value={translator}>
@@ -47,7 +45,6 @@ export default ({
         format="markdown"
         theme={theme}
         sticky={sticky}
-        imageUpload={imageUpload}
       />
     </TranslatorContext.Provider>
   )

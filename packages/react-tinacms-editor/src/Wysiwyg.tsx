@@ -25,32 +25,24 @@ import { CodeMirrorCss } from './CodeMirrorCss'
 import { ProseMirrorCss } from './ProseMirrorCss'
 import { Format } from './Translator'
 import Menu from './state/plugins/Menu'
+import { ImageProps } from './types'
 
 interface Wysiwyg {
   input: any
   plugins?: Plugin[]
   sticky?: boolean
   format?: Format
-  upload?: () => [Promise<string>]
-  previewUrl?: (url: string) => string
+  imageProps?: ImageProps
 }
 
 export const Wysiwyg = styled(
-  ({
-    input,
-    plugins,
-    sticky,
-    format,
-    upload,
-    previewUrl,
-    ...styleProps
-  }: any) => {
+  ({ input, plugins, sticky, format, imageProps, ...styleProps }: any) => {
     const theme = React.useContext(ThemeContext) || {}
     const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
       input,
       ALL_PLUGINS,
       format,
-      previewUrl
+      imageProps
     )
 
     return (
@@ -66,7 +58,6 @@ export const Wysiwyg = styled(
             translator={translator}
             theme={theme}
             sticky={sticky}
-            imageUpload={upload}
           />
         )}
         <div {...styleProps} ref={prosemirrorEl} />
