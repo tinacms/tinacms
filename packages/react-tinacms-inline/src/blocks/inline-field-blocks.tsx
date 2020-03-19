@@ -96,7 +96,7 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
               setActiveBlock,
             }}
           >
-            {allData.length < 1 && status != 'inactive' && (
+            {allData.length < 1 && status === 'inactive' && (
               <BlocksEmptyState>
                 <AddBlockMenu
                   addBlock={block => insert(1, block)}
@@ -169,5 +169,6 @@ export function useInlineBlock() {
 }
 
 const BlocksEmptyState = styled.div`
-  padding: ${padding()} 0;
+  margin: ${padding()} 0;
+  position: relative;
 `
