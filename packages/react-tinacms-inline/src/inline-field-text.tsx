@@ -50,6 +50,8 @@ export const InlineText = styled.input`
   width: 100%;
   display: block;
   font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
   box-sizing: border-box;
   color: inherit;
   letter-spacing: inherit;

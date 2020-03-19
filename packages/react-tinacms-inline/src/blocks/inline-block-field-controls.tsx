@@ -30,7 +30,14 @@ import {
 } from 'tinacms'
 import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
-import { radius, color, Button, IconButton } from '@tinacms/styles'
+import {
+  radius,
+  color,
+  Button,
+  IconButton,
+  shadow,
+  font,
+} from '@tinacms/styles'
 import {
   AddIcon,
   ChevronUpIcon,
@@ -173,19 +180,36 @@ const BlockWrapper = styled.div<BlockWrapperProps>`
     `};
 `
 
-interface AddBlockMenu {
+interface AddBlockMenuProps {
   addBlock(data: any): void
   templates: BlockTemplate[]
 }
 
-function AddBlockMenu({ templates, addBlock }: AddBlockMenu) {
+export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
+  const [isOpen, setOpen] = React.useState(false)
+
+  const handleOpenMenu = (event: React.MouseEvent) => {
+    event.preventDefault()
+    setOpen(isOpen => !isOpen)
+  }
+
+  React.useEffect(() => {
+    const setInactive = () => setOpen(false)
+    document.addEventListener('mouseup', setInactive, false)
+    return () => document.removeEventListener('mouseup', setInactive)
+  }, [])
+
+  templates = templates || []
+
   return (
     <>
-      {templates.map(template => {
-        return (
-          <IconButton
+      <AddBlockButton onClick={handleOpenMenu} isOpen={isOpen} primary>
+        <AddIcon /> Add Block
+      </AddBlockButton>
+      <BlocksMenu isOpen={isOpen}>
+        {templates.map((template: BlockTemplate) => (
+          <BlockOption
             key={template.label}
-            primary
             onClick={() => {
               addBlock({
                 _template: template.type,
@@ -193,10 +217,10 @@ function AddBlockMenu({ templates, addBlock }: AddBlockMenu) {
               })
             }}
           >
-            <AddIcon />
-          </IconButton>
-        )
-      })}
+            {template.label}
+          </BlockOption>
+        ))}
+      </BlocksMenu>
     </>
   )
 }
@@ -247,3 +271,83 @@ function BlockSettingsModal({ template, close }: any) {
     </Modal>
   )
 }
+
+interface AddMenuProps {
+  isOpen?: boolean
+  active?: boolean
+}
+
+const AddBlockButton = styled(Button)<AddMenuProps>`
+  font-family: 'Inter', sans-serif;
+  display: flex;
+  align-items: center;
+  margin: 0 auto;
+
+  &:focus {
+    outline: none !important;
+  }
+
+  svg {
+    height: 70%;
+    width: auto;
+    margin-right: 0.5em;
+    transition: all 150ms ease-out;
+  }
+
+  ${props =>
+    props.open &&
+    css`
+      svg {
+        transform: rotate(45deg);
+      }
+    `};
+`
+
+const BlocksMenu = styled.div<AddMenuProps>`
+  min-width: 192px;
+  border-radius: ${radius()};
+  border: 1px solid ${color.grey(2)};
+  display: block;
+  position: absolute;
+  top: 0;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
+  opacity: 0;
+  pointer-events: none;
+  transition: all 150ms ease-out;
+  transform-origin: 50% 0;
+  box-shadow: ${shadow('big')};
+  background-color: white;
+  overflow: hidden;
+  z-index: 950;
+  ${props =>
+    props.isOpen &&
+    css`
+      opacity: 1;
+      pointer-events: all;
+      transform: translate3d(-50%, 48px, 0) scale3d(1, 1, 1);
+    `};
+`
+
+const BlockOption = styled.button`
+  font-family: 'Inter', sans-serif;
+  position: relative;
+  text-align: center;
+  font-size: ${font.size(0)};
+  padding: 0 12px;
+  height: 40px;
+  font-weight: 500;
+  width: 100%;
+  background: none;
+  cursor: pointer;
+  outline: none;
+  border: 0;
+  transition: all 85ms ease-out;
+  &:hover {
+    color: ${color.primary()};
+    background-color: #f6f6f9;
+  }
+  &:not(:last-child) {
+    border-bottom: 1px solid #efefef;
+  }
+`
