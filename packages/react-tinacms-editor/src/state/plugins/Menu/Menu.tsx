@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { EditorView } from 'prosemirror-view'
-import * as React from 'react'
+import React, { useMemo } from 'react'
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 import { markControl } from './markControl'
@@ -49,6 +49,7 @@ import { MenuPortalProvider } from './MenuPortal'
 import { FloatingLinkForm } from '../links/FloatingLinkForm'
 import FloatingImageMenu from './Image/FloatingImageMenu'
 import ImageMenu from './Image/ImageMenu'
+import { useMenuPortal } from './MenuPortal'
 import { isMarkPresent } from '../../../utils'
 
 interface Props {
