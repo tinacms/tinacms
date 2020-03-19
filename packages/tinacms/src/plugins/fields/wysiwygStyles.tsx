@@ -35,6 +35,7 @@ export function wysiwygStyles(component: FC<any>) {
       min-height: 200px;
       max-height: 500px;
       overflow-y: auto;
+      display: block;
 
       ::selection {
         background-color: rgba(0, 132, 255, 0.3);
@@ -68,6 +69,7 @@ export function wysiwygStyles(component: FC<any>) {
     cursor: auto;
     overflow-wrap: break-word;
     word-wrap: break-word;
+    border-radius: var(--tina-radius-small);
 
     p {
       font-size: 16px;
