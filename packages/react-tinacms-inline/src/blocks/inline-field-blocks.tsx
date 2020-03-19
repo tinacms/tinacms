@@ -20,6 +20,10 @@ import * as React from 'react'
 import { Block } from './block'
 import { InlineField } from '../inline-field'
 import { useState } from 'react'
+import { AddBlockMenu } from './inline-block-field-controls'
+import { useInlineForm } from '../inline-form'
+import styled from 'styled-components'
+import { padding } from '@tinacms/styles'
 
 /**
  * Blocks
@@ -60,6 +64,7 @@ export function useInlineBlocks() {
 
 export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
   const [activeBlock, setActiveBlock] = useState(-1)
+  const { status } = useInlineForm()
   return (
     <InlineField name={name}>
       {({ input, form }) => {
@@ -91,6 +96,16 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
               setActiveBlock,
             }}
           >
+            {allData.length < 1 && status != 'inactive' && (
+              <BlocksEmptyState>
+                <AddBlockMenu
+                  addBlock={block => insert(1, block)}
+                  templates={Object.entries(blocks).map(
+                    ([, block]) => block.template
+                  )}
+                />
+              </BlocksEmptyState>
+            )}
             {allData.map((data, index) => {
               const Block = blocks[data._template]
 
@@ -152,3 +167,7 @@ export function useInlineBlock() {
 
   return inlineFormContext
 }
+
+const BlocksEmptyState = styled.div`
+  padding: ${padding()} 0;
+`
