@@ -16,9 +16,10 @@
 
  */
 
-import { useCMS, useSubscribable } from '../react-tinacms'
 import React from 'react'
 import styled, { css, keyframes } from 'styled-components'
+
+import { Alerts as AlertsCollection, AlertLevel } from '@tinacms/alerts'
 import { color, radius, font, shadow } from '@tinacms/styles'
 import {
   AlertIcon,
@@ -27,25 +28,27 @@ import {
   ErrorIcon,
   CloseIcon,
 } from '@tinacms/icons'
-import { AlertLevel } from '../tina-cms/alerts'
+import { useSubscribable } from '@tinacms/react-core'
 
-export function Alerts() {
-  const cms = useCMS()
+export interface AlertsProps {
+  alerts: AlertsCollection
+}
 
-  useSubscribable(cms.alerts)
+export function Alerts({ alerts }: AlertsProps) {
+  useSubscribable(alerts)
 
   return (
     <>
-      {cms.alerts.all.length > 0 && (
+      {alerts.all.length > 0 && (
         <AlertContainer>
-          {cms.alerts.all.map((alert, i) => {
+          {alerts.all.map((alert, i) => {
             return (
               <Alert
                 key={alert.id}
                 index={i}
                 level={alert.level}
                 onClick={() => {
-                  cms.alerts.dismiss(alert)
+                  alerts.dismiss(alert)
                 }}
               >
                 {alert.level === 'info' && <InfoIcon />}
