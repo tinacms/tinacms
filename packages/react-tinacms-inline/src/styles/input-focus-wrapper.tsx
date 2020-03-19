@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import styled from 'styled-components'
-import { radius, color } from '@tinacms/styles'
 
 export const InputFocusWrapper = styled.div`
   position: relative;
@@ -40,13 +39,13 @@ export const InputFocusWrapper = styled.div`
     position: absolute;
     left: -16px;
     top: -16px;
-    width: calc(100% + 2rem);
-    height: calc(100% + 2rem);
-    border: 3px solid ${color.primary()};
-    border-radius: ${radius()};
+    width: calc(100% + 32px);
+    height: calc(100% + 32px);
+    border: 3px solid var(--tina-color-primary);
+    border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
     z-index: 1000;
-    transition: all 150ms ease-out;
+    transition: all var(--tina-timing-medium) ease-out;
   }
 `

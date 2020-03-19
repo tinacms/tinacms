@@ -26,24 +26,16 @@ interface MenuProps {
   editorView: { view: EditorView }
   translator: Translator
   bottom?: boolean
-  theme?: any
   sticky?: boolean
 }
 
-export default ({
-  editorView,
-  translator,
-  bottom,
-  theme,
-  sticky,
-}: MenuProps) => {
+export default ({ editorView, translator, bottom, sticky }: MenuProps) => {
   return (
     <TranslatorContext.Provider value={translator}>
       <Menu
         editorView={editorView}
         bottom={bottom}
         format="markdown"
-        theme={theme}
         sticky={sticky}
       />
     </TranslatorContext.Provider>

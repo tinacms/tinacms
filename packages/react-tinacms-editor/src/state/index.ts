@@ -49,7 +49,7 @@ export function createEditorState(
       keymap(buildKeymap(schema, plugins)),
       history(),
       links(),
-      dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
+      dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
       gapCursor(),
       tableEditing(),
       tablePlugin,
