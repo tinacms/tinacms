@@ -1,0 +1,20 @@
+{
+  "name": "@tinacms/webpack-helpers",
+  "version": "0.1.0-alpha.0",
+  "license": "Apache-2.0",
+  "main": "index.js",
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/webpack-alias"
+  },
+  "scripts": {
+    "watch": "echo 'watch'",
+    "build": "echo 'build'",
+    "dev": "echo 'dev'"
+  },
+  "keywords": [
+    "tinacms",
+    "webpack"
+  ]
+}

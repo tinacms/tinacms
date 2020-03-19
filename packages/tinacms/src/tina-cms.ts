@@ -40,15 +40,21 @@ export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
+  media?: {
+    store: MediaStore
+  }
 }
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
-  media = new MediaManager(new DummyMediaStore())
+  media: MediaManager
   alerts = new Alerts()
 
-  constructor({ sidebar, ...config }: TinaCMSConfig = {}) {
+  constructor({ sidebar, media, ...config }: TinaCMSConfig = {}) {
     super(config)
+
+    const mediaStore = media?.store || new DummyMediaStore()
+    this.media = new MediaManager(mediaStore)
 
     this.sidebar = new SidebarState(sidebar)
     this.fields.add(TextFieldPlugin)

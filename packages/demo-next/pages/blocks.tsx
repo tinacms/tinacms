@@ -22,10 +22,12 @@ import { useJsonForm } from 'next-tinacms-json'
 import { ModalProvider, BlockTemplate } from 'tinacms'
 import {
   InlineForm,
+  InlineImageField,
   InlineTextField,
   InlineBlocks,
   BlocksControls,
   BlockText,
+  BlockImage,
   BlockTextArea,
   useInlineForm,
 } from 'react-tinacms-inline'
@@ -43,6 +45,11 @@ export default function BlocksExample({ jsonFile }) {
         <DiscardChanges />
         <h1>
           <InlineTextField name="title" />
+          <InlineImageField
+            name="hero_image"
+            parse={filename => `/images/${filename}`}
+            uploadDir={() => '/public/images/'}
+          />
         </h1>
         <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
       </InlineForm>
@@ -98,6 +105,36 @@ function HeroBlock({ index }) {
   )
 }
 
+/*
+ ** Image template + Component
+ */
+
+function ImageBlock({ index, data }) {
+  return (
+    <BlocksControls index={index}>
+      <BlockImage
+        name="src"
+        parse={filename => `/images/${filename}`}
+        uploadDir={() => '/public/images/'}
+      >
+        <img src={data.src} alt={data.alt} />
+      </BlockImage>
+    </BlocksControls>
+  )
+}
+
+const image_template: BlockTemplate = {
+  type: 'image',
+  label: 'Image',
+  defaultItem: {
+    _template: 'image',
+    src: '/images/davisco-5E5N49RWtbA-unsplash.jpg',
+    alt: 'image alt text',
+  },
+  key: undefined,
+  fields: [{ name: 'alt', label: 'Image Alt', component: 'text' }],
+}
+
 // Testing the block styled component override
 
 const StyledBlockText = styled(BlockText)`
@@ -116,6 +153,10 @@ const PAGE_BUILDER_BLOCKS = {
   hero: {
     Component: HeroBlock,
     template: hero_template,
+  },
+  image: {
+    Component: ImageBlock,
+    template: image_template,
   },
 }
 

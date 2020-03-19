@@ -15,5 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+export { DeleteAction } from 'gatsby-tinacms-git'
 export * from './use-json-form'
 export * from './create-json-plugin'

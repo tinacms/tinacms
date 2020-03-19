@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.16...@tinacms/form-builder@0.3.0) (2020-03-16)
+
+
+### Features
+
+* expose FieldRenderProps of react-final-form ([860cee8](https://github.com/tinacms/tinacms/commit/860cee8))
+
+
+
+
+
 ## [0.2.16](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.2.16-alpha.0...@tinacms/form-builder@0.2.16) (2020-03-09)
 
 **Note:** Version bump only for package @tinacms/form-builder

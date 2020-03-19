@@ -15,7 +15,12 @@ import matter from 'gray-matter'
 import { useLocalMarkdownForm, markdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
-import { InlineForm, InlineTextField } from 'react-tinacms-inline'
+import {
+  InlineForm,
+  InlineTextField,
+  InlineWysiwyg,
+  InlineImageField,
+} from 'react-tinacms-inline'
 import { EditToggle, DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'
@@ -65,7 +70,14 @@ function Info(props) {
           <h1>
             <InlineTextField name="frontmatter.name" />
           </h1>
-          <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+          <InlineImageField
+            name="frontmatter.image"
+            uploadDir={() => '/public/images/'}
+            parse={filename => `/images/${filename}`}
+          />
+          <InlineWysiwyg name="markdownBody">
+            <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+          </InlineWysiwyg>
         </section>
         <style jsx>
           {`

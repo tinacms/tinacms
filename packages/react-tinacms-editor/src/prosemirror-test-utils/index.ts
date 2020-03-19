@@ -39,8 +39,6 @@ export interface Command {
 interface LinkAttrs {
   href: string
   title?: string
-  editing?: 'editing' | ''
-  creating?: 'creating' | ''
 }
 
 interface ImageAttrs {
@@ -146,8 +144,7 @@ export class PMTestHarness {
    * Creates a new `text` node with a `link` mark.
    */
   link = (content: string, attrs: LinkAttrs) => {
-    const _attrs = { creating: '', editing: '', ...attrs }
-    const mark = this.marks.link.create(_attrs)
+    const mark = this.marks.link.create(attrs)
     return this.text(content, [mark])
   }
 

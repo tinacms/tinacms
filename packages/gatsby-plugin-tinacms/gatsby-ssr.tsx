@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Tina, TinaCMS } from 'tinacms'
+import { TinaProvider, TinaCMS } from 'tinacms'
 import { GatsbyPluginTinacmsOptions } from './options'
 
 exports.wrapRootElement = (
@@ -26,5 +26,5 @@ exports.wrapRootElement = (
 ) => {
   const cms = new TinaCMS({ sidebar: options.sidebar })
 
-  return <Tina cms={cms}>{element}</Tina>
+  return <TinaProvider cms={cms}>{element}</TinaProvider>
 }

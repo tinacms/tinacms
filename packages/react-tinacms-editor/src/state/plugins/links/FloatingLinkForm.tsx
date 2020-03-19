@@ -18,84 +18,103 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
-import { render, unmountComponentAtNode } from 'react-dom'
+import { createRef, useState, useEffect } from 'react'
 
 import { LinkForm } from './LinkForm'
 import {
   removeLinkBeingEdited,
-  stopEditingLink,
+  unmountLinkForm,
   updateLinkBeingEdited,
 } from '../../../commands'
-import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
+import {
+  findElementOffsetTop,
+  findElementOffsetLeft,
+  getMarkPresent,
+} from '../../../utils'
 import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
+import { linkPluginKey } from './index'
 
-export class LinkFormController {
-  clickTarget: HTMLElement | null = null
+const width = 240
 
-  constructor(protected renderTarget: HTMLElement, protected view: EditorView) {
-    //
+export const FloatingLinkForm = ({
+  editorView,
+}: {
+  editorView: { view: EditorView }
+}) => {
+  const { view } = editorView
+  const linkPluginState = linkPluginKey.getState(view.state)
+  const { anchor, head } = view.state.selection
+  const selState = anchor < head ? anchor : head
+  const node = view.state.selection.empty
+    ? view.domAtPos(selState).node
+    : view.domAtPos(selState + 1).node
+  const clickTarget = node.parentNode as HTMLElement
+
+  const onChange = (attrs: any) => {
+    updateLinkBeingEdited(view.state, view.dispatch, attrs)
   }
 
-  render = (link: HTMLElement) => {
-    this.clickTarget = link
-    render(this.component(), this.renderTarget)
+  const onCancel = () => {
+    unmountLinkForm(view)
   }
 
-  unmount = () => unmountComponentAtNode(this.renderTarget)
+  const [position, setPosition] = useState<any>(undefined)
+  const wrapperRef = createRef<any>()
 
-  component(): any {
-    if (!this.clickTarget) return
-    const minWidth = 240
-    const left = calcLeftOffset(this.clickTarget!, this.renderTarget, minWidth)
-    const top = `calc(32px + ${findElementOffsetTop(this.clickTarget) -
-      findElementOffsetTop(this.renderTarget)}px)`
+  useEffect(() => {
+    if (!clickTarget || !wrapperRef.current) {
+      setPosition(undefined)
+      return
+    }
+    const left = calcLeftOffset(clickTarget!, wrapperRef.current, width)
+    const top = `calc(32px + ${findElementOffsetTop(clickTarget) -
+      findElementOffsetTop(wrapperRef.current)}px)`
     const arrowOffset = calcArrowLeftOffset(
-      this.clickTarget!,
-      this.renderTarget,
-      minWidth
+      clickTarget,
+      wrapperRef.current,
+      width
     )
+    setPosition({ arrowOffset, left, top })
+  }, [linkPluginState])
 
-    return (
-      <TinaReset>
-        <LinkFormWrapper>
-          <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
-          <LinkForm
-            style={{
-              left,
-              top,
-              minWidth: `${minWidth}px`,
-            }}
-            removeLink={this.removeLink}
-            onChange={this.onChange}
-            href={this.href}
-            title={this.title}
-            cancel={this.cancel}
-          />
-        </LinkFormWrapper>
-      </TinaReset>
-    )
+  if (!linkPluginState.show_link_toolbar) {
+    return null
   }
 
-  get href() {
-    return this.clickTarget!.getAttribute('href')
+  const { arrowOffset, left, top } = position || {}
+  const { state, dispatch } = view
+  let href = ''
+  let title = ''
+  const linkMark = getMarkPresent(state, state.schema.marks.link)
+  if (linkMark) {
+    href = linkMark.attrs.href
+    title = linkMark.attrs.title
   }
 
-  get title() {
-    return this.clickTarget!.getAttribute('title')
-  }
-
-  cancel = () => stopEditingLink(this.view.state, this.view.dispatch)
-
-  removeLink = () => removeLinkBeingEdited(this.view.state, this.view.dispatch)
-
-  onChange = (attrs: any) => {
-    updateLinkBeingEdited(this.view.state, this.view.dispatch, {
-      ...attrs,
-      editing: '',
-      creating: '',
-    })
-  }
+  return (
+    <div ref={wrapperRef} style={{ position: 'absolute' }}>
+      {position && (
+        <TinaReset>
+          <LinkFormWrapper>
+            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+            <LinkForm
+              style={{
+                left,
+                top,
+                width: `${width}px`,
+              }}
+              removeLink={() => removeLinkBeingEdited(state, dispatch)}
+              onChange={onChange}
+              href={href}
+              title={title}
+              cancel={onCancel}
+            />
+          </LinkFormWrapper>
+        </TinaReset>
+      )}
+    </div>
+  )
 }
 
 const LinkFormWrapper = styled.div`

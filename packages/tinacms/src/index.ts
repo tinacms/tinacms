@@ -64,9 +64,7 @@ export { Wysiwyg } from 'react-tinacms-editor'
 export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // Modal Components
-export * from './components/modals/ModalProvider'
-export * from './components/modals/ModalPopup'
-export * from './components/modals/ModalFullscreen'
+export * from '@tinacms/react-modals'
 
 // Form Actions Components
 export { ActionButton } from './components/form/FormActions'

@@ -43,16 +43,16 @@ export function createEditorState(
     schema,
     doc: translator.nodeFromString(value),
     plugins: [
+      commonPlugin,
       inputRules(schema),
       keymap(buildKeymap(schema, plugins)),
       history(),
-      links(schema),
-      dropCursor({ width: 2, color: 'rgb(33, 224, 158)' }),
+      links(),
+      dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
       gapCursor(),
       tableEditing(),
       tablePlugin,
       imagePlugin,
-      commonPlugin,
     ],
   })
 }
