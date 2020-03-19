@@ -168,25 +168,16 @@ function BlogPostTemplate(props) {
               name="rawMarkdownBody"
               imageProps={{
                 async upload(files) {
-                  const postPathParts = post.fileRelativePath.split("/")
+                  const directory = "/static/images/"
 
-                  const directory = postPathParts
-                    .splice(0, postPathParts.length - 1)
-                    .join("/")
+                  let media = await cms.media.store.persist(
+                    files.map(file => ({
+                      directory,
+                      file,
+                    }))
+                  )
 
-                  let media = []
-                  try {
-                    media = await cms.media.store.persist(
-                      files.map(file => ({
-                        directory,
-                        file,
-                      }))
-                    )
-                  } catch (e) {
-                    cms.alerts.error("Failed to upload file")
-                  }
-
-                  return media.map(m => `./${m.filename}`)
+                  return media.map(m => `/images/${m.filename}`)
                 },
               }}
             >
