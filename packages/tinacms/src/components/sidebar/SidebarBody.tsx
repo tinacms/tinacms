@@ -21,17 +21,7 @@ import * as React from 'react'
 import { Form } from '@tinacms/forms'
 import { useState } from 'react'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import {
-  Button,
-  padding,
-  color,
-  font,
-  timing,
-  radius,
-  shadow,
-  // eslint-disable-next-line @typescript-eslint/no-unused-vars
-  ThemeProps,
-} from '@tinacms/styles'
+import { Button } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-tinacms'
 import { FormView } from '../form/FormView'
@@ -134,7 +124,8 @@ const EmptyState = styled.div`
   align-items: center;
   justify-content: center;
   text-align: center;
-  padding: ${padding()} ${padding()} 64px ${padding()};
+  padding: var(--tina-padding-big) var(--tina-padding-big) 64px
+    var(--tina-padding-big);
   width: 100%;
   height: 100%;
   overflow-y: auto;
@@ -145,54 +136,55 @@ const EmptyState = styled.div`
   animation-fill-mode: both;
   animation-duration: 150ms;
   > *:first-child {
-    margin: 0 0 ${padding()} 0;
+    margin: 0 0 var(--tina-padding-big) 0;
   }
   > ${Emoji} {
     display: block;
   }
   h3 {
-    font-size: ${font.size(5)};
+    font-size: var(--tina-font-size-5);
     font-weight: normal;
     color: inherit;
     display: block;
-    margin: 0 0 ${padding()} 0;
+    margin: 0 0 var(--tina-padding-big) 0;
     ${Emoji} {
       font-size: 1em;
     }
   }
   p {
     display: block;
-    margin: 0 0 ${padding()} 0;
+    margin: 0 0 var(--tina-padding-big) 0;
   }
 `
 
 const LinkButton = styled.a`
   text-align: center;
   border: 0;
-  border-radius: ${radius('big')};
-  border: 1px solid ${color.grey(2)};
-  box-shadow: ${shadow('small')};
+  border-radius: var(--tina-radius-big);
+  border: 1px solid var(--tina-color-grey-2);
+  box-shadow: var(--tina-shadow-small);
   font-weight: 500;
   cursor: pointer;
-  font-size: ${font.size(0)};
-  transition: all ${timing('short')} ease-out;
+  font-size: var(--tina-font-size-0);
+  transition: all var(--tina-timing-short) ease-out;
   background-color: white;
-  color: ${color.grey(8)};
-  padding: ${padding('small')} ${padding('big')} ${padding('small')} 56px;
+  color: var(--tina-color-grey-8);
+  padding: var(--tina-padding-small) var(--tina-padding-big)
+    var(--tina-padding-small) 56px;
   position: relative;
   text-decoration: none;
   display: inline-block;
   ${Emoji} {
     font-size: 24px;
     position: absolute;
-    left: ${padding('big')};
+    left: var(--tina-padding-big);
     top: 50%;
     transform-origin: 50% 50%;
     transform: translate3d(0, -50%, 0);
-    transition: all ${timing('short')} ease-out;
+    transition: all var(--tina-timing-short) ease-out;
   }
   &:hover {
-    color: ${color.primary()};
+    color: var(--tina-color-primary);
     ${Emoji} {
       transform: translate3d(0, -50%, 0);
     }
@@ -236,7 +228,7 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   scrollbar-width: none;
   width: 100%;
   overflow: hidden;
-  border-top: 1px solid ${color.grey(2)};
+  border-top: 1px solid var(--tina-color-grey-2);
   background-color: #f6f6f9;
 
   ${Wrapper} {
@@ -268,14 +260,14 @@ const FormWrapper = styled.div<FormWrapperProps>`
   width: 100%;
   position: relative;
 
-  * > {
+  > * {
     transform: translate3d(100%, 0, 0);
   }
 
   ${p =>
     p.isEditing &&
     css`
-      * > {
+      > * {
         transform: none;
         animation-name: ${FormAnimationKeyframes};
         animation-duration: 150ms;
@@ -314,9 +306,9 @@ export const MultiformFormHeader = styled(
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 0 ${padding()} ${padding('small')} ${padding()};
+  padding: 0 var(--tina-padding-big) 10px var(--tina-padding-big);
   color: inherit;
-  font-size: ${font.size(5)};
+  font-size: var(--tina-font-size-5);
   transition: color 250ms ease-out;
   user-select: none;
 
@@ -331,7 +323,7 @@ export const MultiformFormHeader = styled(
   svg {
     flex: 0 0 auto;
     width: 24px;
-    fill: ${color.grey(3)};
+    fill: var(--tina-color-grey-3);
     height: auto;
     transform: translate3d(-4px, 0, 0);
     transition: transform 150ms ease-out;
@@ -339,14 +331,14 @@ export const MultiformFormHeader = styled(
 
   :hover,
   :active {
-    color: ${color.primary()};
+    color: var(--tina-color-primary);
     outline: none;
     border: none;
 
     svg {
-      fill: ${color.grey(8)};
+      fill: var(--tina-color-grey-8);
       transform: translate3d(-7px, 0, 0);
-      transition: transform 250ms ease;
+      transition: transform var(--tina-timing-long) ease;
     }
   }
 `
@@ -370,9 +362,9 @@ export const FormHeader = styled(
   display: flex;
   flex-wrap: nowrap;
   align-items: center;
-  padding: 0 ${padding()} ${padding('small')} ${padding()};
+  padding: 0 var(--tina-padding-big) 10px var(--tina-padding-big);
   color: inherit;
-  font-size: ${font.size(5)};
+  font-size: var(--tina-font-size-5);
   user-select: none;
 
   span {

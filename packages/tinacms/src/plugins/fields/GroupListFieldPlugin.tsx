@@ -20,7 +20,7 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
-import { color, font, radius, IconButton } from '@tinacms/styles'
+import { IconButton } from '@tinacms/styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import {
   AddIcon,
@@ -191,7 +191,7 @@ const ItemClickTarget = styled.div`
 
 const GroupLabel = styled.span`
   margin: 0;
-  font-size: ${font.size(2)};
+  font-size: var(--tina-font-size-2);
   font-weight: 500;
   flex: 1 1 auto;
   white-space: nowrap;
@@ -209,7 +209,7 @@ const GroupListHeader = styled.div`
   align-items: center;
   margin-bottom: 12px;
   ${GroupLabel} {
-    font-size: ${font.size(3)};
+    font-size: var(--tina-font-size-3);
   }
 `
 
@@ -218,18 +218,18 @@ const GroupListPanel = styled.div`
   position: relative;
   height: auto;
   margin-bottom: 24px;
-  border-radius: ${radius('small')};
-  background-color: ${color.grey(2)};
+  border-radius: var(--tina-radius-small);
+  background-color: var(--tina-color-grey-2);
 `
 
 const EmptyList = styled.div`
   text-align: center;
-  border-radius: ${radius('small')};
-  background-color: ${color.grey(2)};
-  color: ${color.grey(4)};
+  border-radius: var(--tina-radius-small);
+  background-color: var(--tina-color-grey-2);
+  color: var(--tina-color-grey-4);
   line-height: 1.35;
   padding: 12px 0;
-  font-size: ${font.size(2)};
+  font-size: var(--tina-font-size-2);
   font-weight: 500;
 `
 
@@ -242,12 +242,12 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   justify-content: space-between;
   align-items: stretch;
   background-color: white;
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--tina-color-grey-2);
   margin: 0 0 -1px 0;
   overflow: visible;
   line-height: 1.35;
   padding: 0;
-  font-size: ${font.size(2)};
+  font-size: var(--tina-font-size-2);
   font-weight: 500;
 
   ${GroupLabel} {
@@ -257,7 +257,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   }
 
   svg {
-    fill: ${color.grey(3)};
+    fill: var(--tina-color-grey-3);
     width: 20px;
     height: auto;
     transition: fill 85ms ease-out;
@@ -265,10 +265,10 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
   &:hover {
     svg {
-      fill: ${color.grey(8)};
+      fill: var(--tina-color-grey-8);
     }
     ${GroupLabel} {
-      color: #0084ff;
+      color: var(--tina-color-primary);
     }
   }
 
@@ -279,21 +279,21 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   &:nth-last-child(2) {
     border-radius: 0 0 4px 4px;
     &:first-child {
-      border-radius: ${radius('small')};
+      border-radius: var(--tina-radius-small);
     }
   }
 
   ${p =>
     p.isDragging &&
     css<any>`
-      border-radius: ${radius('small')};
+      border-radius: var(--tina-radius-small);
       box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
       svg {
-        fill: ${color.grey(8)};
+        fill: var(--tina-color-grey-8);
       }
       ${GroupLabel} {
-        color: #0084ff;
+        color: var(--tina-color-primary);
       }
 
       ${DragHandle} {
@@ -320,7 +320,7 @@ const DeleteButton = styled.button`
     transition: all 85ms ease-out;
   }
   &:hover {
-    background-color: #f6f6f9;
+    background-color: var(--tina-color-grey-1);
   }
 `
 
@@ -340,7 +340,7 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
   padding: 12px 0;
   transition: all 85ms ease-out;
   &:hover {
-    background-color: #f6f6f9;
+    background-color: var(--tina-color-grey-1);
     cursor: grab;
   }
   svg {

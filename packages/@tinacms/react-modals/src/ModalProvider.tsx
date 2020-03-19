@@ -21,8 +21,7 @@ import { useCallback, useState, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
-import { TinaReset, Button, padding, font, color } from '@tinacms/styles'
-
+import { Button } from '@tinacms/styles'
 export const Z_INDEX = 2147000000
 
 interface Props {
@@ -80,11 +79,9 @@ export const Modal = ({
 
   return portalNode && portalNode
     ? (createPortal(
-        <TinaReset>
-          <ModalOverlay>
-            <div {...props} />
-          </ModalOverlay>
-        </TinaReset>,
+        <ModalOverlay>
+          <div {...props} />
+        </ModalOverlay>,
         portalNode
       ) as any)
     : null
@@ -105,8 +102,8 @@ export const ModalOverlay = styled.div`
 `
 
 const ModalTitle = styled.h2`
-  font-size: ${font.size(5)};
-  font-weight: 500;
+  font-size: var(--tina-font-size-4);
+  font-weight: var(--tina-font-weight-regular);
   line-height: normal;
   margin: 0;
 `
@@ -114,7 +111,7 @@ const ModalTitle = styled.h2`
 const CloseButton = styled.div`
   display: flex;
   align-items: center;
-  fill: ${color.grey(5)};
+  fill: var(--tina-color-grey-5);
   cursor: pointer;
   transition: fill 85ms ease-out;
   svg {
@@ -122,7 +119,7 @@ const CloseButton = styled.div`
     height: auto;
   }
   &:hover {
-    fill: ${color.grey(8)};
+    fill: var(--tina-color-grey-8);
   }
 `
 
@@ -147,13 +144,13 @@ export const ModalHeader = styled(
   display: flex;
   align-items: center;
   justify-content: space-between;
-  padding: 0 ${padding()} 0 ${padding()};
-  border-bottom: 1px solid ${color.grey(3)};
+  padding: 0 var(--tina-padding-big) 0 var(--tina-padding-big);
+  border-bottom: 1px solid var(--tina-color-grey-3);
   margin: 0;
 `
 
 export const ModalBody = styled.div<{ padded?: boolean }>`
-  padding: ${p => (p.padded ? padding() : '0')};
+  padding: ${p => (p.padded ? 'var(--tina-padding-big)' : '0')};
   margin: 0;
   overflow: hidden;
   display: flex;
@@ -169,11 +166,12 @@ export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
   display: flex;
   justify-content: flex-end;
   border-radius: 0 0 5px 5px;
-  padding: 0 ${padding()} ${padding()} ${padding()};
+  padding: 0 var(--tina-padding-big) var(--tina-padding-big)
+    var(--tina-padding-big);
   ${Button} {
     flex: 0 1 auto;
     min-width: 128px;
-    margin: 0 ${padding('small')} 0 0;
+    margin: 0 var(--tina-padding-small) 0 0;
     &:last-child {
       margin-right: 0;
     }
