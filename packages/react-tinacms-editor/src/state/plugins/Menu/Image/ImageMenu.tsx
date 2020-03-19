@@ -24,7 +24,7 @@ import { insertImage } from '../../../../commands/image-commands'
 
 interface ImageMenu {
   editorView: { view: EditorView }
-  imageUpload?: () => [Promise<string>]
+  imageUpload?: () => Promise<string>[]
 }
 
 export default ({ editorView, imageUpload }: ImageMenu) => {
