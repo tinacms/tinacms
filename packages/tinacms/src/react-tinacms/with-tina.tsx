@@ -32,7 +32,6 @@ function mergeDefaultConfig(config?: TinaCMSConfig) {
       sidebar: {
         position: 'displace',
         hidden: false,
-        theme: {},
       },
     },
     cloneDeep(config)
