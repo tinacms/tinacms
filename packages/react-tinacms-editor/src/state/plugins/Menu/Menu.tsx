@@ -18,12 +18,11 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
-import { useState, useRef, useEffect, useLayoutEffect, useMemo } from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 import { markControl } from './markControl'
 import { FormattingDropdown } from './FormattingDropdown'
 import { FloatingTableMenu } from './FloatingTableMenu'
-import ImageMenu from './ImageMenu'
 import {
   toggleBulletList,
   toggleOrderedList,
@@ -46,13 +45,18 @@ import {
   UnorderedListIcon,
 } from '@tinacms/icons'
 import { UndoControl, RedoControl } from './historyControl'
-import { MenuPortalProvider, useMenuPortal } from './MenuPortal'
+import { MenuPortalProvider } from './MenuPortal'
+import { FloatingLinkForm } from '../links/FloatingLinkForm'
+import FloatingImageMenu from './Image/FloatingImageMenu'
+import ImageMenu from './Image/ImageMenu'
+import { isMarkPresent } from '../../../utils'
 
 interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
   editorView: { view: EditorView }
   sticky?: boolean | string
+  imageUpload?: () => [Promise<string>]
 }
 
 const BoldControl = markControl({
@@ -78,17 +82,19 @@ const LinkControl = markControl({
   defaultAttrs: {
     href: '',
     title: '',
-    editing: 'editing',
-    creating: 'creating',
   },
   noMix: ['code'],
-  isDisabled: (view: EditorView) => {
-    return !!imagePluginKey.getState(view.state).selectedImage
+  isDisabled: (view: EditorView) =>
+    isMarkPresent(view.state, view.state.schema.marks.link) ||
+    !!imagePluginKey.getState(view.state).selectedImage,
+  onClick: (view: EditorView) => {
+    const { state, dispatch } = view
+    return dispatch(state.tr.setMeta('show_link_toolbar', true))
   },
 })
 
 export const Menu = (props: Props) => {
-  const { editorView, bottom = false, sticky = true } = props
+  const { editorView, bottom = false, sticky = true, imageUpload } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
@@ -164,7 +170,7 @@ export const Menu = (props: Props) => {
             <ItalicControl view={view} />
             <UnderlineControl view={view} />
             <LinkControl view={view} />
-            {/* <ImageControl view={view} bottom={bottom} /> */}
+            <ImageMenu editorView={editorView} imageUpload={imageUpload} />
             {supportBlocks && <TableControl view={view} bottom={bottom} />}
             {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
             {supportBlocks && <CodeControl view={view} bottom={bottom} />}
@@ -176,7 +182,8 @@ export const Menu = (props: Props) => {
         </MenuPortalProvider>
       </MenuWrapper>
       <FloatingTableMenu editorView={editorView} />
-      <ImageMenu editorView={editorView} />
+      <FloatingImageMenu editorView={editorView} />
+      <FloatingLinkForm editorView={editorView} />
     </>
   )
 }

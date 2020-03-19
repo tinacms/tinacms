@@ -31,11 +31,11 @@ export type NodeViews = {
   ) => NodeView
 } | null
 
-export const nodeViews: NodeViews = {
+export const nodeViews = (previewUrl?: (url: string) => string): NodeViews => ({
   code_block(node, view, getPos) {
     return new CodeBlockView(node, view, getPos)
   },
   image(node, view, getPos) {
-    return new ImageView(node, view, getPos)
+    return new ImageView(node, view, getPos, previewUrl)
   },
-}
+})

@@ -1,0 +1,33 @@
+{
+  "name": "@tinacms/media",
+  "version": "0.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "Apache-2.0",
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "media",
+    "tinacms",
+    "cms"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/media"
+  },
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "docs": "npx typedoc",
+    "build": "tinacms-scripts build"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "^0.1.13"
+  }
+}

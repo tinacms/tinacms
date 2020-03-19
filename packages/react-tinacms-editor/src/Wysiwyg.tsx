@@ -31,14 +31,25 @@ interface Wysiwyg {
   plugins?: Plugin[]
   sticky?: boolean
   format?: Format
+  upload?: () => [Promise<string>]
+  previewUrl?: (url: string) => string
 }
 
 export const Wysiwyg = styled(
-  ({ input, plugins, sticky, format, ...styleProps }: any) => {
+  ({
+    input,
+    plugins,
+    sticky,
+    format,
+    upload,
+    previewUrl,
+    ...styleProps
+  }: any) => {
     const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
       input,
       ALL_PLUGINS,
-      format
+      format,
+      previewUrl
     )
 
     return (
@@ -53,6 +64,7 @@ export const Wysiwyg = styled(
             bottom={false}
             translator={translator}
             sticky={sticky}
+            imageUpload={upload}
           />
         )}
         <div {...styleProps} ref={prosemirrorEl} />

@@ -24,7 +24,7 @@ import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS, SidebarPosition } from '../tina-cms'
 import { CMSContext, useSubscribable } from '../react-tinacms'
-import { Alerts } from './Alerts'
+import { Alerts } from '@tinacms/react-alerts'
 
 export interface TinaProviderProps {
   cms: TinaCMS
@@ -59,7 +59,7 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
           <GlobalStyles />
           <TinaReset>
             <ModalProvider>
-              <Alerts />
+              <Alerts alerts={cms.alerts} />
               <Sidebar />
             </ModalProvider>
           </TinaReset>

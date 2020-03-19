@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.16.0",
+  "version": "0.17.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -35,12 +35,16 @@
     "styled-components": ">=4.1"
   },
   "dependencies": {
+    "@tinacms/alerts": "^0.0.0",
     "@tinacms/core": "^0.7.2",
     "@tinacms/fields": "^0.7.0",
     "@tinacms/form-builder": "^0.2.16",
     "@tinacms/forms": "^0.2.1",
     "@tinacms/icons": "^0.7.0",
-    "@tinacms/react-core": "^0.2.8",
+    "@tinacms/media": "^0.0.0",
+    "@tinacms/react-alerts": "^0.0.0",
+    "@tinacms/react-core": "^0.2.9",
+    "@tinacms/react-modals": "^0.0.0",
     "@tinacms/styles": "^0.3.0",
     "@types/react-beautiful-dnd": "^11.0.3",
     "lodash.clonedeep": "^4.5.0",
@@ -48,7 +52,7 @@
     "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",
     "react-dismissible": "^1.1.5",
-    "react-tinacms-editor": "^0.0.0"
+    "react-tinacms-editor": "^0.1.0"
   },
   "peerDependencies": {
     "react": ">=16.8",
