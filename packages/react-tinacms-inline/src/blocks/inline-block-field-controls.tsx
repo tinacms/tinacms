@@ -147,7 +147,7 @@ const BlockMenu = styled.div`
   opacity: 0;
   transform: translate3d(0, 0, 0);
   transition: all 120ms ease-out;
-
+  z-index: 1001;
   ${Button} {
     height: 34px;
     margin-left: 0.5rem;
@@ -342,7 +342,6 @@ const BlocksMenu = styled.div<AddMenuProps>`
   box-shadow: ${shadow('big')};
   background-color: white;
   overflow: hidden;
-  z-index: 950;
   ${props =>
     props.isOpen &&
     css`
