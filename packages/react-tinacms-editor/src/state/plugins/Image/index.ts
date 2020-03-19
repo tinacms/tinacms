@@ -24,7 +24,7 @@ import { insertImage } from '../../../commands'
 export const imagePluginKey = new PluginKey('image')
 
 export const imagePlugin = (
-  uploadImages?: (files: File[]) => Promise<string>[]
+  uploadImages?: (files: File[]) => Promise<string[]>
 ) =>
   new Plugin({
     key: imagePluginKey,
@@ -89,9 +89,9 @@ export const imagePlugin = (
           if (file.type.match('image.*')) files.push(file)
         }
         if (files.length) {
-          const imagePromises = uploadImages(files)
-          imagePromises.forEach(promise => {
-            promise.then(url => {
+          const uploadPromise = uploadImages(files)
+          uploadPromise.then((urls = []) => {
+            urls.forEach(url => {
               const { state, dispatch } = editorView
               insertImage(state, dispatch, url)
             })

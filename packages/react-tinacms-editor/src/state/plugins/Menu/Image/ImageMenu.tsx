@@ -24,16 +24,16 @@ import { insertImage } from '../../../../commands/image-commands'
 
 interface ImageMenu {
   editorView: { view: EditorView }
-  imageUpload?: () => Promise<string>[]
+  imageUpload?: () => Promise<string[]>
 }
 
 export default ({ editorView, imageUpload }: ImageMenu) => {
   if (!imageUpload) return null
 
   const uploadImageFn = () => {
-    const imagePromises = imageUpload()
-    imagePromises.forEach(promise => {
-      promise.then(url => {
+    const uploadPromise = imageUpload()
+    uploadPromise.then((urls = []) => {
+      urls.forEach(url => {
         const { state, dispatch } = editorView.view
         insertImage(state, dispatch, url)
       })

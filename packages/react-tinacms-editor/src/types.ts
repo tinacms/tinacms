@@ -17,6 +17,6 @@ limitations under the License.
 */
 
 export interface ImageProps {
-  upload?: () => Promise<string>[]
+  upload?: (files: File[]) => Promise<string[]>
   previewUrl?: (url: string) => string
 }

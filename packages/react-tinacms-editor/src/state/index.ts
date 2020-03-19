@@ -38,7 +38,7 @@ export function createEditorState(
   translator: Translator,
   plugins: Plugin[],
   value: string,
-  uploadImages?: (file: any) => Promise<string>[]
+  uploadImages?: (files: File[]) => Promise<string[]>
 ) {
   return EditorState.create({
     schema,
