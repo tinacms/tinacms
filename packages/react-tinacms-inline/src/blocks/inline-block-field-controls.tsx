@@ -85,7 +85,7 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     move(index, index + 1)
   }
 
-  const blockWrapperClick = (event: React.MouseEvent) => {
+  const handleSetActiveBlock = (event: React.MouseEvent) => {
     event.preventDefault()
     setActiveBlock(index)
   }
@@ -94,7 +94,7 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     <BlockWrapper
       ref={blockWrapperRef}
       active={activeBlock === index}
-      onClick={blockWrapperClick}
+      onClick={handleSetActiveBlock}
     >
       <BlockMenu>
         <BlockMenuLeft>
