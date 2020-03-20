@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { ThemeContext } from 'styled-components'
+import styled from 'styled-components'
 import { Plugin } from '@tinacms/core'
 import { useProsemirror } from './useProsemirror'
 import { ALL_PLUGINS } from './default-plugins'
@@ -27,7 +27,7 @@ import { Format } from './Translator'
 import Menu from './state/plugins/Menu'
 import { ImageProps } from './types'
 
-interface Wysiwyg {
+export interface WysiwygProps {
   input: any
   plugins?: Plugin[]
   sticky?: boolean
@@ -36,8 +36,14 @@ interface Wysiwyg {
 }
 
 export const Wysiwyg = styled(
-  ({ input, plugins, sticky, format, imageProps, ...styleProps }: any) => {
-    const theme = React.useContext(ThemeContext) || {}
+  ({
+    input,
+    plugins,
+    sticky,
+    format,
+    imageProps,
+    ...styleProps
+  }: WysiwygProps) => {
     const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
       input,
       ALL_PLUGINS,
@@ -56,11 +62,10 @@ export const Wysiwyg = styled(
             editorView={editorView}
             bottom={false}
             translator={translator}
-            theme={theme}
             sticky={sticky}
           />
         )}
-        <div {...styleProps} ref={prosemirrorEl} />
+        <div {...styleProps} ref={prosemirrorEl as any} />
       </WysiwygWrapper>
     )
   }

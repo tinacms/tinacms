@@ -20,7 +20,7 @@ import React, { useState, useRef, useEffect } from 'react'
 import { EditorView } from 'prosemirror-view'
 import debounce from 'lodash.debounce'
 import styled from 'styled-components'
-import { TinaReset, radius, color, font } from '@tinacms/styles'
+import { TinaReset } from '@tinacms/styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
@@ -208,8 +208,8 @@ const LinkPopup = styled.span<{
 }>`
   background-color: #f6f6f9;
   position: absolute;
-  border-radius: ${radius('small')};
-  border: 1px solid ${color.grey(2)};
+  border-radius: var(--tina-radius-small);
+  border: 1px solid var(--tina-color-grey-2);
   filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
     drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
   transform-origin: 50% 0;
@@ -223,37 +223,37 @@ const LinkPopup = styled.span<{
 
 const LinkLabel = styled.label`
   display: block;
-  font-size: ${font.size(1)};
+  font-size: var(--tina-font-size-1);
   font-weight: 600;
   letter-spacing: 0.01em;
-  color: ${color.grey(8)};
+  color: var(--tina-color-grey-8);
   margin-bottom: 3px;
 `
 
 const LinkInput = styled.input`
   position: relative;
   background-color: white;
-  border-radius: ${radius('small')};
-  font-size: ${font.size(1)};
+  border-radius: var(--tina-radius-small);
+  font-size: var(--tina-font-size-1);
   line-height: 1.35;
   transition: all 85ms ease-out;
   padding: 8px 12px;
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--tina-color-grey-2);
   width: 100%;
   margin: 0 0 8px 0;
   outline: none;
   box-shadow: 0 0 0 2px transparent;
 
   &:hover {
-    box-shadow: 0 0 0 2px ${color.grey(3)};
+    box-shadow: 0 0 0 2px var(--tina-color-grey-3);
   }
 
   &:focus {
-    box-shadow: 0 0 0 2px #0084ff;
+    box-shadow: 0 0 0 2px var(--tina-color-primary);
   }
 
   &::placeholder {
-    font-size: ${font.size(2)};
+    font-size: var(--tina-font-size-2);
     color: #cfd3d7;
   }
 `
@@ -267,30 +267,30 @@ const LinkActions = styled.div`
 const SaveLink = styled.button`
   text-align: center;
   border: 0;
-  border-radius: ${radius()};
+  border-radius: var(--tina-radius-big);
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  background-color: #0084ff;
+  background-color: var(--tina-color-primary);
   color: white;
   font-weight: 500;
   cursor: pointer;
   transition: all 85ms ease-out;
-  font-size: ${font.size(0)};
+  font-size: var(--tina-font-size-0);
   padding: 8px 20px;
   margin-left: 8px;
   &:hover {
-    background-color: #2296fe;
+    background-color: var(--tina-color-primary-light);
   }
   &:active {
-    background-color: #0574e4;
+    background-color: var(--tina-color-primary-dark);
   }
 `
 
 const CancelLink = styled(SaveLink)`
   background-color: white;
-  border: 1px solid ${color.grey(2)};
-  color: #0084ff;
+  border: 1px solid var(--tina-color-grey-2);
+  color: var(--tina-color-primary);
   &:hover {
-    background-color: #f6f6f9;
+    background-color: var(--tina-color-grey-1);
     opacity: 1;
   }
 `
@@ -309,30 +309,31 @@ const ToggleLabel = styled.label<{ disabled?: boolean }>`
   outline: none;
   height: 28px;
   pointer-events: ${props => (props.disabled ? 'none' : 'inherit')};
-  font-size: ${font.size(1)};
+  font-size: var(--tina-font-size-1);
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1.35;
-  color: ${color.grey(8)};
+  color: var(--tina-color-grey-8);
 `
 
 const ToggleSwitch = styled.div<{ checked: boolean }>`
   position: relative;
   width: 48px;
   height: 28px;
-  border-radius: ${radius()};
+  border-radius: var(--tina-radius-big);
   background-color: white;
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--tina-color-grey-2);
   pointer-events: none;
   margin-left: -2px;
   span {
     position: absolute;
-    border-radius: ${radius()};
+    border-radius: var(--tina-radius-big);
     left: 2px;
     top: 50%;
     width: calc(28px - 6px);
     height: calc(28px - 6px);
-    background: ${p => (p.checked ? color.primary() : color.grey(3))};
+    background: ${p =>
+      p.checked ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-3)'};
     transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
   }
