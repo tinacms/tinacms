@@ -31,7 +31,7 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
   const [isOpen, setOpen] = React.useState(false)
 
   const handleOpenMenu = (event: React.MouseEvent) => {
-    event.preventDefault()
+    event.stopPropagation()
     setOpen(isOpen => !isOpen)
   }
 
@@ -44,7 +44,7 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
   templates = templates || []
 
   return (
-    <>
+    <AddBlockWrapper>
       <AddBlockButton onClick={handleOpenMenu} isOpen={isOpen} primary>
         <AddIcon /> Add Block
       </AddBlockButton>
@@ -63,7 +63,7 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
           </BlockOption>
         ))}
       </BlocksMenu>
-    </>
+    </AddBlockWrapper>
   )
 }
 
@@ -76,7 +76,6 @@ const AddBlockButton = styled(Button)<AddMenuProps>`
   font-family: 'Inter', sans-serif;
   display: flex;
   align-items: center;
-  margin: 0 auto;
 
   &:focus {
     outline: none !important;
@@ -98,6 +97,10 @@ const AddBlockButton = styled(Button)<AddMenuProps>`
     `};
 `
 
+const AddBlockWrapper = styled.div`
+  position: relative;
+`
+
 const BlocksMenu = styled.div<AddMenuProps>`
   min-width: 192px;
   border-radius: ${radius()};
@@ -105,8 +108,8 @@ const BlocksMenu = styled.div<AddMenuProps>`
   display: block;
   position: absolute;
   top: 0;
-  left: 50%;
-  transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
+  left: 0;
+  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
@@ -119,7 +122,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(-50%, 48px, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, 48px, 0) scale3d(1, 1, 1);
     `};
 `
 
