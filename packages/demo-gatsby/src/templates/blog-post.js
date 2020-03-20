@@ -39,6 +39,7 @@ import {
 } from "react-tinacms-inline"
 
 import { BLOCKS } from "../components/blog-blocks"
+import { useCMS } from "tinacms"
 
 const get = require("lodash.get")
 
@@ -46,6 +47,7 @@ function BlogPostTemplate(props) {
   const siteTitle = props.data.site.siteMetadata.title
   const { previous, next } = props.pageContext
 
+  const cms = useCMS()
   const [post, form] = useLocalRemarkForm(
     props.data.markdownRemark,
     BlogPostForm
@@ -162,7 +164,23 @@ function BlogPostTemplate(props) {
               blocks={BLOCKS}
             ></InlineBlocks>
 
-            <InlineWysiwyg name="rawMarkdownBody">
+            <InlineWysiwyg
+              name="rawMarkdownBody"
+              imageProps={{
+                async upload(files) {
+                  const directory = "/static/images/"
+
+                  let media = await cms.media.store.persist(
+                    files.map(file => ({
+                      directory,
+                      file,
+                    }))
+                  )
+
+                  return media.map(m => `/images/${m.filename}`)
+                },
+              }}
+            >
               <div
                 dangerouslySetInnerHTML={{
                   __html: props.data.markdownRemark.html,

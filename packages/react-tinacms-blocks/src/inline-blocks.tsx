@@ -18,14 +18,7 @@ limitations under the License.
 import React, { useCallback, useEffect, ReactNode, ReactNodeArray } from 'react'
 import { TinaField, Form, BlockTemplate } from 'tinacms'
 import styled, { css } from 'styled-components'
-import {
-  Button as TinaButton,
-  IconButton,
-  radius,
-  color,
-  shadow,
-  font,
-} from '@tinacms/styles'
+import { Button as TinaButton, IconButton } from '@tinacms/styles'
 import {
   CloseIcon,
   AddIcon,
@@ -288,8 +281,8 @@ interface BlocksUIProps {
 
 const BlocksMenu = styled.div<BlocksUIProps>`
   min-width: 192px;
-  border-radius: ${radius()};
-  border: 1px solid ${color.grey(2)};
+  border-radius: var(--tina-radius-big);
+  border: 1px solid var(--tina-color-grey-2);
   display: block;
   position: absolute;
   top: 0;
@@ -299,7 +292,7 @@ const BlocksMenu = styled.div<BlocksUIProps>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 50% 0;
-  box-shadow: ${shadow('big')};
+  box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: 950;
@@ -316,7 +309,7 @@ const BlockOption = styled.button`
   font-family: 'Inter', sans-serif;
   position: relative;
   text-align: center;
-  font-size: ${font.size(0)};
+  font-size: var(--tina-font-size-0);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
@@ -327,8 +320,8 @@ const BlockOption = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color.primary()};
-    background-color: #f6f6f9;
+    color: var(--tina-color-primary);
+    background-color: var(--tina-color-grey-1);
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
@@ -461,8 +454,8 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
     top: -16px;
     width: calc(100% + 2rem);
     height: calc(100% + 2rem);
-    border: 3px solid ${color.primary()};
-    border-radius: ${radius()};
+    border: 3px solid var(--tina-color-primary);
+    border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
     z-index: 1000;

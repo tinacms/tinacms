@@ -18,26 +18,23 @@ limitations under the License.
 
 import * as React from 'react'
 import { InlineField } from './inline-field'
-import { Wysiwyg } from 'react-tinacms-editor'
+import { Wysiwyg, WysiwygProps } from 'react-tinacms-editor'
 
-interface InlineWysiwygFieldProps {
+interface InlineWysiwygFieldProps extends Omit<WysiwygProps, 'input'> {
   name: string
-  sticky?: string
   children: any
-  format?: 'markdown' | 'html'
 }
 
 export function InlineWysiwyg({
   name,
-  sticky,
   children,
-  format,
+  ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }: any) => {
         if (status === 'active') {
-          return <Wysiwyg sticky={sticky} format={format} input={input} />
+          return <Wysiwyg input={input} {...wysiwygProps} />
         }
         return <>{children}</>
       }}
