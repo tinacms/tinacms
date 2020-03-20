@@ -21,6 +21,7 @@ Two high-level sets of issues have been identified:
 - Collaboration
   - Identifying commit authors
   - Locking forms
+  - On Design: overlay discussion on page components
 - Media management
 - Better media support in the markdown wysiwyg
 - Improving the inline editing experience
