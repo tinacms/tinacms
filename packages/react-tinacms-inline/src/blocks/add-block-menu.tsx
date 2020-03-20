@@ -122,7 +122,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, 48px, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, 41px, 0) scale3d(1, 1, 1);
     `};
 `
 
@@ -132,7 +132,7 @@ const BlockOption = styled.button`
   text-align: center;
   font-size: var(--tina-font-size-1);
   padding: 0 12px;
-  height: 40px;
+  height: 34px;
   font-weight: 500;
   width: 100%;
   background: none;
