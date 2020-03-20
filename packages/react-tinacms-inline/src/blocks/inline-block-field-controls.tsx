@@ -44,10 +44,32 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { template } = useInlineBlock()
   const isFirst = index === 0
   const isLast = index === count - 1
-  const blockRef = React.useRef() as React.MutableRefObject<HTMLDivElement>
-  const blockMenuRef = React.useRef() as React.MutableRefObject<HTMLDivElement>
+  const blockWrapperRef = React.useRef() as React.MutableRefObject<
+    HTMLDivElement
+  >
+  const addBlockRef = React.useRef()
 
   const removeBlock = () => remove(index)
+
+  React.useEffect(() => {
+    if (blockWrapperRef.current) {
+      document.addEventListener('mousedown', clearActiveBlock)
+    }
+    return () => {
+      document.removeEventListener('mousedown', clearActiveBlock)
+    }
+  }, [blockWrapperRef.current])
+
+  const clearActiveBlock = (event: any) => {
+    if (
+      blockWrapperRef.current.contains(event.target) ||
+      index != activeBlock
+    ) {
+      return
+    }
+    console.log(event.target)
+    setActiveBlock(-1)
+  }
 
   if (status === 'inactive') {
     return children
@@ -63,24 +85,25 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     move(index, index + 1)
   }
 
-  const clickHandler = (event: React.MouseEvent) => {
+  const blockWrapperClick = (event: React.MouseEvent) => {
     event.preventDefault()
     setActiveBlock(index)
   }
 
   return (
     <BlockWrapper
-      ref={blockRef}
+      ref={blockWrapperRef}
       active={activeBlock === index}
-      onClick={clickHandler}
+      onClick={blockWrapperClick}
     >
-      <BlockMenu ref={blockMenuRef}>
+      <BlockMenu>
         <BlockMenuLeft>
           <AddBlockMenu
             addBlock={block => insert(index + 1, block)}
             templates={Object.entries(blocks).map(
               ([, block]) => block.template
             )}
+            ref={addBlockRef}
           />
         </BlockMenuLeft>
         <BlockMenuRight>
@@ -147,6 +170,7 @@ export interface BlockWrapperProps {
 
 const BlockWrapper = styled.div<BlockWrapperProps>`
   position: relative;
+  z-index: 100;
 
   &:hover {
     &:after {

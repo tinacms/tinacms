@@ -64,25 +64,6 @@ export function useInlineBlocks() {
 export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
   const [activeBlock, setActiveBlock] = useState(-1)
   const { status } = useInlineForm()
-  const inlineBlocksWrapperRef = React.useRef() as React.MutableRefObject<
-    HTMLDivElement
-  >
-
-  React.useEffect(() => {
-    if (inlineBlocksWrapperRef.current) {
-      document.addEventListener('mousedown', clearActiveBlock)
-    }
-    return () => {
-      document.removeEventListener('mousedown', clearActiveBlock)
-    }
-  }, [inlineBlocksWrapperRef.current])
-
-  const clearActiveBlock = (event: any) => {
-    if (inlineBlocksWrapperRef.current.contains(event.target)) {
-      return
-    }
-    setActiveBlock(-1)
-  }
 
   return (
     <InlineField name={name}>
@@ -125,31 +106,27 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
                 />
               </BlocksEmptyState>
             )}
-            {allData.length > 0 && (
-              <InlineBlocksWrapper ref={inlineBlocksWrapperRef}>
-                {allData.map((data, index) => {
-                  const Block = blocks[data._template]
+            {allData.map((data, index) => {
+              const Block = blocks[data._template]
 
-                  if (!Block) {
-                    console.warn('Unrecognized Block of type:', data._template)
-                    return null
-                  }
+              if (!Block) {
+                console.warn('Unrecognized Block of type:', data._template)
+                return null
+              }
 
-                  const blockName = `${input.name}.${index}`
+              const blockName = `${input.name}.${index}`
 
-                  return (
-                    <InlineBlock
-                      // NOTE: Supressing warnings, but not helping with render perf
-                      key={index}
-                      index={index}
-                      name={blockName}
-                      data={data}
-                      block={Block}
-                    />
-                  )
-                })}
-              </InlineBlocksWrapper>
-            )}
+              return (
+                <InlineBlock
+                  // NOTE: Supressing warnings, but not helping with render perf
+                  key={index}
+                  index={index}
+                  name={blockName}
+                  data={data}
+                  block={Block}
+                />
+              )
+            })}
           </InlineBlocksContext.Provider>
         )
       }}
@@ -193,9 +170,5 @@ export function useInlineBlock() {
 
 const BlocksEmptyState = styled.div`
   margin: var(--tina-padding-big) 0;
-  position: relative;
-`
-
-const InlineBlocksWrapper = styled.div`
   position: relative;
 `
