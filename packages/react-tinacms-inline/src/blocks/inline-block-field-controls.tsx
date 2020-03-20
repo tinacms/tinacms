@@ -78,7 +78,11 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   }
 
   const clearActiveBlock = (event: any) => {
-    if (blockRef.current.contains(event.target) || index != activeBlock) {
+    if (
+      blockRef.current.contains(event.target) ||
+      blockMenuRef.current.contains(event.target) ||
+      index != activeBlock
+    ) {
       return
     }
     setActiveBlock(-1)
@@ -91,20 +95,26 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
       onClick={clickHandler}
     >
       <BlockMenu ref={blockMenuRef}>
-        <AddBlockMenu
-          addBlock={block => insert(index + 1, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-        />
-        <IconButton primary onClick={moveBlockUp} disabled={isFirst}>
-          <ChevronUpIcon />
-        </IconButton>
-        <IconButton primary onClick={moveBlockDown} disabled={isLast}>
-          <ChevronDownIcon />
-        </IconButton>
-        <IconButton primary onClick={removeBlock}>
-          <TrashIcon />
-        </IconButton>
-        <BlockSettings template={template} />
+        <BlockMenuLeft>
+          <AddBlockMenu
+            addBlock={block => insert(index + 1, block)}
+            templates={Object.entries(blocks).map(
+              ([, block]) => block.template
+            )}
+          />
+        </BlockMenuLeft>
+        <BlockMenuRight>
+          <IconButton primary onClick={moveBlockUp} disabled={isFirst}>
+            <ChevronUpIcon />
+          </IconButton>
+          <IconButton primary onClick={moveBlockDown} disabled={isLast}>
+            <ChevronDownIcon />
+          </IconButton>
+          <BlockSettings template={template} />
+          <IconButton primary onClick={removeBlock}>
+            <TrashIcon />
+          </IconButton>
+        </BlockMenuRight>
       </BlockMenu>
       {children}
     </BlockWrapper>
@@ -114,24 +124,41 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
 const BlockMenu = styled.div`
   position: absolute;
   top: -1.5rem;
-  right: -1rem;
-  display: flex;
+  right: -4px;
+  left: -4px;
+  display: grid;
   align-items: center;
-  justify-content: flex-end;
+  grid-template-areas: 'left right';
+  grid-template-columns: auto auto;
   opacity: 0;
   transform: translate3d(0, 0, 0);
   transition: all 120ms ease-out;
   z-index: 1001;
+
   ${Button} {
     height: 34px;
-    margin-left: 0.5rem;
+    margin: 0 4px;
   }
 
   ${IconButton} {
     width: 34px;
     height: 34px;
-    margin-left: 0.5rem;
+    margin: 0 4px;
   }
+`
+
+const BlockMenuLeft = styled.div`
+  grid-area: left;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`
+
+const BlockMenuRight = styled.div`
+  grid-area: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
 `
 
 export interface BlockWrapperProps {
