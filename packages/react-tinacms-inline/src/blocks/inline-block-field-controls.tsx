@@ -23,7 +23,12 @@ import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { BlockSettings } from './block-settings'
 import { Button, IconButton } from '@tinacms/styles'
-import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  TrashIcon,
+  CloseIcon,
+} from '@tinacms/icons'
 
 export interface BlocksControlsProps {
   children: any
@@ -44,32 +49,8 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { template } = useInlineBlock()
   const isFirst = index === 0
   const isLast = index === count - 1
-  const blockWrapperRef = React.useRef() as React.MutableRefObject<
-    HTMLDivElement
-  >
-  const addBlockRef = React.useRef()
 
   const removeBlock = () => remove(index)
-
-  React.useEffect(() => {
-    if (blockWrapperRef.current) {
-      document.addEventListener('mousedown', clearActiveBlock)
-    }
-    return () => {
-      document.removeEventListener('mousedown', clearActiveBlock)
-    }
-  }, [blockWrapperRef.current])
-
-  const clearActiveBlock = (event: any) => {
-    if (
-      blockWrapperRef.current.contains(event.target) ||
-      index != activeBlock
-    ) {
-      return
-    }
-    console.log(event.target)
-    setActiveBlock(-1)
-  }
 
   if (status === 'inactive') {
     return children
@@ -86,16 +67,17 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   }
 
   const blockWrapperClick = (event: React.MouseEvent) => {
-    event.preventDefault()
+    event.stopPropagation()
     setActiveBlock(index)
   }
 
+  const clearFocus = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    setActiveBlock(-1)
+  }
+
   return (
-    <BlockWrapper
-      ref={blockWrapperRef}
-      active={activeBlock === index}
-      onClick={blockWrapperClick}
-    >
+    <BlockWrapper active={activeBlock === index} onClick={blockWrapperClick}>
       <BlockMenu>
         <BlockMenuLeft>
           <AddBlockMenu
@@ -103,7 +85,6 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
             templates={Object.entries(blocks).map(
               ([, block]) => block.template
             )}
-            ref={addBlockRef}
           />
         </BlockMenuLeft>
         <BlockMenuRight>
@@ -116,6 +97,9 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
           <BlockSettings template={template} />
           <IconButton primary onClick={removeBlock}>
             <TrashIcon />
+          </IconButton>
+          <IconButton onClick={clearFocus}>
+            <CloseIcon />
           </IconButton>
         </BlockMenuRight>
       </BlockMenu>
