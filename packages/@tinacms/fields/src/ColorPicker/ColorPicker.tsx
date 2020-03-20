@@ -23,7 +23,6 @@ import { SketchPicker, BlockPicker } from 'react-color'
 
 import styled, { keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
-import { font, color, radius, shadow, timing } from '@tinacms/styles'
 
 type DivProps = any
 type WrappedFieldProps = any
@@ -55,9 +54,9 @@ export const Swatch = styled(
     </div>
   )
 )`
-  background: ${color.grey(2)};
-  border-radius: ${radius('big')};
-  box-shadow: ${shadow('small')};
+  background: var(--tina-color-grey-2);
+  border-radius: var(--tina-radius-big);
+  box-shadow: var(--tina-shadow-small);
   cursor: pointer;
   width: 100%;
   margin: 0;
@@ -67,19 +66,19 @@ export const Swatch = styled(
     align-items: center;
     justify-content: center;
 
-    font-size: ${font.size(1)};
+    font-size: var(--tina-font-size-1);
     font-weight: bold;
 
     width: 100%;
     height: 40px;
-    border-radius: ${radius('big')};
+    border-radius: var(--tina-radius-big);
     box-shadow: inset 0 0 1px 1px rgba(0, 0, 0, 0.075);
     background: ${props =>
       props.colorRGBA
         ? `rgba(${props.colorRGBA.r}, ${props.colorRGBA.g}, ${props.colorRGBA.b}, ${props.colorRGBA.a})`
         : `#fff`};
     color: ${props => GetTextColorForBackground(props.colorRGBA)};
-    transition: all ${timing('short')} ease-out;
+    transition: all var(--tina-timing-short) ease-out;
   }
 
   &:hover {

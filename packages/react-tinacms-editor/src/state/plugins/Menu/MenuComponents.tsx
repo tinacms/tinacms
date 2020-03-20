@@ -20,7 +20,6 @@ import * as React from 'react'
 import { useMemo } from 'react'
 
 import styled, { css } from 'styled-components'
-import { radius, color, padding } from '@tinacms/styles'
 import { useMenuPortal } from './MenuPortal'
 
 type MenuPlaceholderProps = {
@@ -67,9 +66,9 @@ export const MenuContainer = styled.div`
   top: 0;
   width: 100%;
   background-color: white;
-  border-radius: ${radius()};
+  border-radius: var(--tina-radius-large);
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  border: 1px solid ${color.grey(2)};
+  border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
   z-index: 100;
 `
@@ -87,9 +86,11 @@ export const MenuButton = styled.button<{
   ${MenuItem}
   background-color: ${p =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p => (p.active ? '#0084ff' : color.grey(8))};
-  fill: ${p => (p.active ? '#0084ff' : color.grey(8))};
-  border: 1px solid ${color.grey(2)};
+  color: ${p =>
+    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
+  fill: ${p =>
+    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
+  border: 1px solid var(--tina-color-grey-2);
   margin: -1px;
   outline: none;
   padding: 6px 4px;
@@ -102,8 +103,8 @@ export const MenuButton = styled.button<{
     background-color: rgba(53, 50, 50, 0.09);
   }
   &:active {
-    color: #0084ff;
-    fill: #0084ff;
+    color: var(--tina-color-primary);
+    fill: var(--tina-color-primary);
     background-color: rgba(53, 50, 50, 0.05);
   }
   svg {
@@ -113,8 +114,8 @@ export const MenuButton = styled.button<{
   ${props =>
     props.active &&
     css`
-      color: #0084ff;
-      fill: #0084ff;
+      color: var(--tina-color-primary);
+      fill: var(--tina-color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
   ${props =>
@@ -158,7 +159,7 @@ export const MenuButtonDropdown = styled(
     )
   }
 )`
-  border-radius: ${radius()};
+  border-radius: var(--tina-radius-big);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -193,25 +194,25 @@ export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
   transition: all 85ms ease-out;
   cursor: pointer;
   &:first-child {
-    padding-top: ${padding('small')};
+    padding-top: var(--tina-padding-small);
   }
   &:last-child {
-    padding-bottom: ${padding('small')};
+    padding-bottom: var(--tina-padding-small);
   }
   &:hover {
-    background-color: ${color.grey(1)};
-    color: ${color.primary()};
+    background-color: var(--tina-color-grey-1);
+    color: var(--tina-color-primary);
   }
   &:active {
-    color: ${color.primary()};
-    fill: ${color.primary()};
+    color: var(--tina-color-primary);
+    fill: var(--tina-color-primary);
     background-color: rgba(53, 50, 50, 0.05);
   }
   ${props =>
     props.active &&
     css`
-      color: #0084ff;
-      fill: #0084ff;
+      color: var(--tina-color-primary);
+      fill: var(--tina-color-primary);
       background-color: rgba(53, 50, 50, 0.05);
     `};
 `

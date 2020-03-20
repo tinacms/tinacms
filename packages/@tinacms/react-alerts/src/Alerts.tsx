@@ -18,9 +18,7 @@
 
 import React from 'react'
 import styled, { css, keyframes } from 'styled-components'
-
 import { Alerts as AlertsCollection, AlertLevel } from '@tinacms/alerts'
-import { color, radius, font, shadow } from '@tinacms/styles'
 import {
   AlertIcon,
   InfoIcon,
@@ -91,17 +89,17 @@ const AlertEntranceAnimation = keyframes`
 const Alert = styled.div<{ level: AlertLevel; index: number }>`
   text-align: center;
   border: 0;
-  border-radius: ${radius('small')};
-  box-shadow: ${shadow('small')};
-  background-color: ${color.grey(1)};
-  border: 1px solid ${color.grey(2)};
-  color: ${color.grey(9)};
-  fill: ${color.primary()};
+  border-radius: var(--tina-radius-small);
+  box-shadow: var(--tina-shadow-small);
+  background-color: var(--tina-color-grey-1);
+  border: 1px solid var(--tina-color-grey-2);
+  color: var(--tina-color-grey-9);
+  fill: var(--tina-color-primary);
   font-weight: 500;
   cursor: pointer;
-  font-size: ${font.size(2)};
+  font-size: var(--tina-font-size-2);
   padding: 8px 4px 8px 12px;
-  transition: all 85ms ease-out;
+  transition: all var(--tina-timing-short) ease-out;
   margin-bottom: 16px;
   display: flex;
   align-items: center;
@@ -130,29 +128,29 @@ const Alert = styled.div<{ level: AlertLevel; index: number }>`
   ${props =>
     props.level === 'info' &&
     css`
-      fill: ${color.primary()};
-      border-left: 6px solid ${color.primary()};
+      fill: var(--tina-color-primary);
+      border-left: 6px solid var(--tina-color-primary);
     `};
 
   ${props =>
     props.level === 'success' &&
     css`
-      fill: ${color.success()};
-      border-left: 6px solid ${color.success()};
+      fill: var(--tina-color-success);
+      border-left: 6px solid var(--tina-color-success);
     `};
 
   ${props =>
     props.level === 'warn' &&
     css`
-      fill: ${color.warning('dark')};
-      border-left: 6px solid ${color.warning()};
+      fill: var(--tina-color-warning-dark);
+      border-left: 6px solid var(--tina-color-warning);
     `};
 
   ${props =>
     props.level === 'error' &&
     css`
-      fill: ${color.error()};
-      border-left: 6px solid ${color.error()};
+      fill: var(--tina-color-error);
+      border-left: 6px solid var(--tina-color-error);
     `};
 `
 
@@ -168,7 +166,7 @@ const CloseAlert = styled(({ ...styleProps }) => {
   padding: 0;
   margin-left: 14px;
   outline: none;
-  fill: ${color.grey(5)};
+  fill: var(--tina-color-grey-5);
   display: flex;
   align-items: center;
 

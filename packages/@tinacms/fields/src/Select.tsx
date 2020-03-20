@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { padding, color, radius, font } from '@tinacms/styles'
 import styled from 'styled-components'
 
 interface SelectFieldProps {
@@ -68,15 +67,15 @@ const SelectElement = styled.div`
     display: block;
     font-family: inherit;
     max-width: 100%;
-    padding: ${padding('small')};
-    border-radius: ${radius('small')};
-    background: ${color.grey(0)};
-    font-size: ${font.size(2)};
+    padding: var(--tina-padding-small);
+    border-radius: var(--tina-radius-small);
+    background: var(--tina-color-grey-0);
+    font-size: var(--tina-font-size-2);
     line-height: 1.35;
     position: relative;
-    background-color: ${color.grey()};
+    background-color: var(--tina-color-grey-0);
     transition: all 85ms ease-out;
-    border: 1px solid ${color.grey(2)};
+    border: 1px solid var(--tina-color-grey-2);
     width: 100%;
     margin: 0;
     appearance: none;
