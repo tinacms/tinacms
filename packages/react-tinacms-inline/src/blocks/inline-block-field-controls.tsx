@@ -23,7 +23,12 @@ import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { BlockSettings } from './block-settings'
 import { Button, IconButton } from '@tinacms/styles'
-import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  TrashIcon,
+  CloseIcon,
+} from '@tinacms/icons'
 
 export interface BlocksControlsProps {
   children: any
@@ -44,32 +49,8 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { template } = useInlineBlock()
   const isFirst = index === 0
   const isLast = index === count - 1
-  const blockWrapperRef = React.useRef() as React.MutableRefObject<
-    HTMLDivElement
-  >
-  const addBlockRef = React.useRef()
 
   const removeBlock = () => remove(index)
-
-  React.useEffect(() => {
-    if (blockWrapperRef.current) {
-      document.addEventListener('mousedown', clearActiveBlock)
-    }
-    return () => {
-      document.removeEventListener('mousedown', clearActiveBlock)
-    }
-  }, [blockWrapperRef.current])
-
-  const clearActiveBlock = (event: any) => {
-    if (
-      blockWrapperRef.current.contains(event.target) ||
-      index != activeBlock
-    ) {
-      return
-    }
-    console.log(event.target)
-    setActiveBlock(-1)
-  }
 
   if (status === 'inactive') {
     return children
@@ -90,20 +71,20 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     setActiveBlock(index)
   }
 
+  const clearFocus = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    setActiveBlock(-1)
+  }
+
   return (
-    <BlockWrapper
-      ref={blockWrapperRef}
-      active={activeBlock === index}
-      onClick={handleSetActiveBlock}
-    >
-      <BlockMenu>
+    <BlockWrapper active={activeBlock === index} onClick={handleSetActiveBlock}>
+      <BlockMenu index={index}>
         <BlockMenuLeft>
           <AddBlockMenu
             addBlock={block => insert(index + 1, block)}
             templates={Object.entries(blocks).map(
               ([, block]) => block.template
             )}
-            ref={addBlockRef}
           />
         </BlockMenuLeft>
         <BlockMenuRight>
@@ -117,6 +98,9 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
           <IconButton primary onClick={removeBlock}>
             <TrashIcon />
           </IconButton>
+          <IconButton onClick={clearFocus}>
+            <CloseIcon />
+          </IconButton>
         </BlockMenuRight>
       </BlockMenu>
       {children}
@@ -124,7 +108,11 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   )
 }
 
-const BlockMenu = styled.div`
+interface BlockMenuProps {
+  index: number
+}
+
+const BlockMenu = styled.div<BlockMenuProps>`
   position: absolute;
   top: -1.5rem;
   right: -4px;
@@ -136,7 +124,7 @@ const BlockMenu = styled.div`
   opacity: 0;
   transform: translate3d(0, 0, 0);
   transition: all 120ms ease-out;
-  z-index: 1001;
+  z-index: calc(1000 - ${props => props.index});
 
   ${Button} {
     height: 34px;
@@ -170,7 +158,7 @@ export interface BlockWrapperProps {
 
 const BlockWrapper = styled.div<BlockWrapperProps>`
   position: relative;
-  z-index: 100;
+  /* z-index: 100; */
 
   &:hover {
     &:after {
@@ -190,7 +178,7 @@ const BlockWrapper = styled.div<BlockWrapperProps>`
     border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
-    z-index: 1000;
+    /* z-index: 1000; */
     transition: all var(--tina-timing-medium) ease-out;
   }
 
