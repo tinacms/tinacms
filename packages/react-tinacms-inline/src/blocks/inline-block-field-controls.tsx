@@ -22,7 +22,7 @@ import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { BlockSettings } from './block-settings'
-import { radius, color, Button, IconButton } from '@tinacms/styles'
+import { Button, IconButton } from '@tinacms/styles'
 import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
 
 export interface BlocksControlsProps {
@@ -182,12 +182,12 @@ const BlockWrapper = styled.div<BlockWrapperProps>`
     top: -16px;
     width: calc(100% + 2rem);
     height: calc(100% + 2rem);
-    border: 3px solid ${color.primary()};
-    border-radius: ${radius()};
+    border: 3px solid var(--tina-color-primary);
+    border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
     z-index: 1000;
-    transition: all 150ms ease-out;
+    transition: all var(--tina-timing-medium) ease-out;
   }
 
   ${p =>

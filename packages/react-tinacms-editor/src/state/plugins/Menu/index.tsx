@@ -26,7 +26,6 @@ interface MenuProps {
   editorView: { view: EditorView }
   translator: Translator
   bottom?: boolean
-  theme?: any
   sticky?: boolean
   imageUpload?: () => [Promise<string>]
 }
@@ -35,7 +34,6 @@ export default ({
   editorView,
   translator,
   bottom,
-  theme,
   sticky,
   imageUpload,
 }: MenuProps) => {
@@ -45,7 +43,6 @@ export default ({
         editorView={editorView}
         bottom={bottom}
         format="markdown"
-        theme={theme}
         sticky={sticky}
         imageUpload={imageUpload}
       />

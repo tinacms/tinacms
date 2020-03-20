@@ -16,12 +16,4 @@ limitations under the License.
 
 */
 
-export * from './inline-block-text'
-export * from './inline-field-blocks'
-export * from './inline-block-field-controls'
-export * from './inline-block-field'
-export * from './block'
-export * from './inline-block-textarea'
-export * from './block-settings'
-export * from './add-block-menu'
-export * from './inline-block-image'
+module.exports = require('../../../typedoc.js')(require('./package.json'))

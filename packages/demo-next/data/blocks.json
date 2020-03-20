@@ -9,6 +9,11 @@
       "_template": "cta",
       "text": "Log In",
       "url": "www.google.com"
+    },
+    {
+      "_template": "image",
+      "src": "/images/davisco-5E5N49RWtbA-unsplash.jpg",
+      "alt": "image alt text"
     }
   ],
   "hero_image": "/images/davisco-5E5N49RWtbA-unsplash.jpg"
