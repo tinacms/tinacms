@@ -49,15 +49,6 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
 
   const removeBlock = () => remove(index)
 
-  React.useEffect(() => {
-    if (blockRef.current) {
-      document.addEventListener('mousedown', clearActiveBlock)
-    }
-    return () => {
-      document.removeEventListener('mousedown', clearActiveBlock)
-    }
-  }, [blockRef.current])
-
   if (status === 'inactive') {
     return children
   }
@@ -75,17 +66,6 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   const clickHandler = (event: React.MouseEvent) => {
     event.preventDefault()
     setActiveBlock(index)
-  }
-
-  const clearActiveBlock = (event: any) => {
-    if (
-      blockRef.current.contains(event.target) ||
-      blockMenuRef.current.contains(event.target) ||
-      index != activeBlock
-    ) {
-      return
-    }
-    setActiveBlock(-1)
   }
 
   return (
