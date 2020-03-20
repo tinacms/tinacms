@@ -28,24 +28,24 @@ interface AddBlockMenuProps {
 }
 
 export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
-  const [isOpen, setOpen] = React.useState(false)
+  const [isOpen, setIsOpen] = React.useState(false)
 
-  const handleOpenMenu = (event: React.MouseEvent) => {
+  const handleOpenBlockMenu = (event: React.MouseEvent) => {
     event.stopPropagation()
-    setOpen(isOpen => !isOpen)
+    setIsOpen(isOpen => !isOpen)
   }
 
   React.useEffect(() => {
-    const setInactive = () => setOpen(false)
-    document.addEventListener('mouseup', setInactive, false)
-    return () => document.removeEventListener('mouseup', setInactive)
+    const inactivateBlockMenu = () => setIsOpen(false)
+    document.addEventListener('mouseup', inactivateBlockMenu, false)
+    return () => document.removeEventListener('mouseup', inactivateBlockMenu)
   }, [])
 
   templates = templates || []
 
   return (
     <AddBlockWrapper>
-      <AddBlockButton onClick={handleOpenMenu} isOpen={isOpen} primary>
+      <AddBlockButton onClick={handleOpenBlockMenu} isOpen={isOpen} primary>
         <AddIcon /> Add Block
       </AddBlockButton>
       <BlocksMenu isOpen={isOpen}>
@@ -117,7 +117,6 @@ const BlocksMenu = styled.div<AddMenuProps>`
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
-  /* z-index: 2000; */
 
   ${props =>
     props.isOpen &&
