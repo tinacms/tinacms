@@ -37,6 +37,7 @@ export default ({ editorView, imageUpload }: ImageMenu) => {
         const { state, dispatch } = editorView.view
         insertImage(state, dispatch, url)
       })
+      editorView.view.focus()
     })
   }
 
