@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { BlockTemplate } from 'tinacms'
-import { radius, color, Button, shadow, font } from '@tinacms/styles'
+import { Button } from '@tinacms/styles'
 import { AddIcon } from '@tinacms/icons'
 
 interface AddBlockMenuProps {
@@ -103,8 +103,8 @@ const AddBlockWrapper = styled.div`
 
 const BlocksMenu = styled.div<AddMenuProps>`
   min-width: 192px;
-  border-radius: ${radius()};
-  border: 1px solid ${color.grey(2)};
+  border-radius: var(--tina-radius-big);
+  border: 1px solid var(--tina-color-grey-2);
   display: block;
   position: absolute;
   top: 0;
@@ -114,7 +114,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
   pointer-events: none;
   transition: all 150ms ease-out;
   transform-origin: 50% 0;
-  box-shadow: ${shadow('big')};
+  box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
   ${props =>
@@ -130,7 +130,7 @@ const BlockOption = styled.button`
   font-family: 'Inter', sans-serif;
   position: relative;
   text-align: center;
-  font-size: ${font.size(0)};
+  font-size: var(--tina-font-size-1);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
@@ -141,7 +141,7 @@ const BlockOption = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color.primary()};
+    color: var(--tina-color-primary);
     background-color: #f6f6f9;
   }
   &:not(:last-child) {

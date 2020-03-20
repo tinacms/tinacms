@@ -23,7 +23,6 @@ import { useState } from 'react'
 import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
-import { padding } from '@tinacms/styles'
 
 /**
  * Blocks
@@ -169,6 +168,6 @@ export function useInlineBlock() {
 }
 
 const BlocksEmptyState = styled.div`
-  margin: ${padding()} 0;
+  margin: var(--tina-padding-big) 0;
   position: relative;
 `
