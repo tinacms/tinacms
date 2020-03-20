@@ -23,6 +23,30 @@ import { insertImage } from '../../../commands'
 
 export const imagePluginKey = new PluginKey('image')
 
+const insertImageFiles = (
+  editorView: EditorView,
+  data: DataTransfer,
+  uploadImages: (files: File[]) => Promise<string[]>
+) => {
+  const files = []
+  for (let i = 0; i < data.files.length; i++) {
+    const file = data.files[i]
+    if (file.type.match('image.*')) files.push(file)
+  }
+  if (files.length) {
+    const uploadPromise = uploadImages(files)
+    uploadPromise.then((urls = []) => {
+      urls.forEach(url => {
+        const { state, dispatch } = editorView
+        insertImage(state, dispatch, url)
+      })
+      editorView.focus()
+    })
+    return true
+  }
+  return false
+}
+
 export const imagePlugin = (
   uploadImages?: (files: File[]) => Promise<string[]>
 ) =>
@@ -83,21 +107,14 @@ export const imagePlugin = (
         event.preventDefault()
         const dataTransfer = (event as DragEvent).dataTransfer
         if (!dataTransfer) return false
-        const files = []
-        for (let i = 0; i < dataTransfer.files.length; i++) {
-          const file = dataTransfer.files[i]
-          if (file.type.match('image.*')) files.push(file)
-        }
-        if (files.length) {
-          const uploadPromise = uploadImages(files)
-          uploadPromise.then((urls = []) => {
-            urls.forEach(url => {
-              const { state, dispatch } = editorView
-              insertImage(state, dispatch, url)
-            })
-          })
-        }
-        return false
+        return insertImageFiles(editorView, dataTransfer, uploadImages)
+      },
+      handlePaste(editorView: EditorView, event: Event) {
+        if (!uploadImages) return false
+        event.preventDefault()
+        const clipboardData = (event as ClipboardEvent).clipboardData
+        if (!clipboardData) return false
+        return insertImageFiles(editorView, clipboardData, uploadImages)
       },
     },
   })
