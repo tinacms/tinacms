@@ -25,15 +25,13 @@ import { AddIcon } from '@tinacms/icons'
 interface AddBlockMenuProps {
   addBlock(data: any): void
   templates: BlockTemplate[]
-  ref?: any
 }
 
-export function AddBlockMenu({ templates, addBlock, ref }: AddBlockMenuProps) {
+export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
   const [isOpen, setOpen] = React.useState(false)
 
   const handleOpenMenu = (event: React.MouseEvent) => {
     event.stopPropagation()
-    event.preventDefault()
     setOpen(isOpen => !isOpen)
   }
 
@@ -46,7 +44,7 @@ export function AddBlockMenu({ templates, addBlock, ref }: AddBlockMenuProps) {
   templates = templates || []
 
   return (
-    <AddBlockWrapper ref={ref}>
+    <AddBlockWrapper>
       <AddBlockButton onClick={handleOpenMenu} isOpen={isOpen} primary>
         <AddIcon /> Add Block
       </AddBlockButton>
@@ -119,6 +117,8 @@ const BlocksMenu = styled.div<AddMenuProps>`
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
+  /* z-index: 2000; */
+
   ${props =>
     props.isOpen &&
     css`

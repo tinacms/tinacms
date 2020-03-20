@@ -45,7 +45,7 @@ export const InputFocusWrapper = styled.div`
     border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
-    z-index: 1000;
+    /* z-index: 1000; */
     transition: all var(--tina-timing-medium) ease-out;
   }
 `
