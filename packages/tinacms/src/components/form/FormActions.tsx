@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css, StyledComponent } from 'styled-components'
 import { EllipsisVerticalIcon } from '@tinacms/icons'
-import { padding, color, radius, font, shadow } from '@tinacms/styles'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { Form } from '@tinacms/forms'
@@ -59,8 +58,9 @@ const MoreActionsButton = styled(p => (
     <EllipsisVerticalIcon />
   </button>
 ))`
-  height: 100%;
+  height: 64px;
   width: 40px;
+  align-self: stretch;
   background-color: transparent;
   background-position: center;
   background-size: auto 18px;
@@ -74,25 +74,25 @@ const MoreActionsButton = styled(p => (
   justify-content: center;
   align-items: center;
   &:hover {
-    background-color: #f6f6f9;
-    fill: ${color.grey(8)};
+    background-color: var(--tina-color-grey-1);
+    fill: var(--tina-color-grey-8);
   }
 `
 
 const ActionsOverlay = styled.div<{ open: boolean }>`
   min-width: 192px;
-  border-radius: ${radius()};
+  border-radius: var(--tina-radius-big);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
-  bottom: ${padding()};
-  right: ${padding()};
+  bottom: var(--tina-padding-big);
+  right: var(--tina-padding-big);
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 85ms ease-out;
   transform-origin: 100% 100%;
-  box-shadow: ${shadow('big')};
+  box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: 950;
@@ -108,7 +108,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
 export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   position: relative;
   text-align: center;
-  font-size: ${font.size(0)};
+  font-size: var(--tina-font-size-0);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
@@ -119,8 +119,8 @@ export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   border: 0;
   transition: all 85ms ease-out;
   &:hover {
-    color: ${color.primary()};
-    background-color: #f6f6f9;
+    color: var(--tina-color-primary);
+    background-color: var(--tina-color-grey-1);
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
