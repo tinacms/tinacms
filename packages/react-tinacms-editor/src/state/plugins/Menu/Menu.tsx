@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { EditorView } from 'prosemirror-view'
-import * as React from 'react'
+import React from 'react'
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 import { markControl } from './markControl'
@@ -32,7 +32,6 @@ import { imagePluginKey } from '../Image'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
-import { ThemeProvider } from 'styled-components'
 import {
   BoldIcon,
   CodeIcon,
@@ -60,7 +59,6 @@ interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
   editorView: { view: EditorView }
-  theme: any
   sticky?: boolean | string
 }
 
@@ -99,7 +97,7 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { editorView, bottom = false, theme, sticky = true } = props
+  const { editorView, bottom = false, sticky = true } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
@@ -158,40 +156,38 @@ export const Menu = (props: Props) => {
 
   const { view } = editorView
   return (
-    <ThemeProvider theme={theme}>
-      <>
-        {menuFixed && (
-          <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
-        )}
-        <MenuWrapper
-          menuFixedTopOffset={menuFixedTopOffset}
-          menuFixed={menuFixed}
-          menuBoundingBox={menuBoundingBox}
-          ref={menuRef}
-        >
-          <MenuPortalProvider>
-            <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-              {supportBlocks && <FormattingDropdown view={view} />}
-              <BoldControl view={view} />
-              <ItalicControl view={view} />
-              <UnderlineControl view={view} />
-              <LinkControl view={view} />
-              {/* <ImageMenu editorView={editorView} imageUpload={imageUpload} /> */}
-              {supportBlocks && <TableControl view={view} bottom={bottom} />}
-              {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
-              {supportBlocks && <CodeControl view={view} bottom={bottom} />}
-              {supportBlocks && <BulletList view={view} bottom={bottom} />}
-              {supportBlocks && <OrderedList view={view} bottom={bottom} />}
-              <UndoControl view={view} />
-              <RedoControl view={view} />
-            </MenuContainer>
-          </MenuPortalProvider>
-        </MenuWrapper>
-        <FloatingTableMenu editorView={editorView} />
-        <FloatingImageMenu editorView={editorView} />
-        <FloatingLinkForm editorView={editorView} />
-      </>
-    </ThemeProvider>
+    <>
+      {menuFixed && (
+        <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
+      )}
+      <MenuWrapper
+        menuFixedTopOffset={menuFixedTopOffset}
+        menuFixed={menuFixed}
+        menuBoundingBox={menuBoundingBox}
+        ref={menuRef}
+      >
+        <MenuPortalProvider>
+          <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
+            {supportBlocks && <FormattingDropdown view={view} />}
+            <BoldControl view={view} />
+            <ItalicControl view={view} />
+            <UnderlineControl view={view} />
+            <LinkControl view={view} />
+            {/* <ImageMenu editorView={editorView} imageUpload={imageUpload} /> */}
+            {supportBlocks && <TableControl view={view} bottom={bottom} />}
+            {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
+            {supportBlocks && <CodeControl view={view} bottom={bottom} />}
+            {supportBlocks && <BulletList view={view} bottom={bottom} />}
+            {supportBlocks && <OrderedList view={view} bottom={bottom} />}
+            <UndoControl view={view} />
+            <RedoControl view={view} />
+          </MenuContainer>
+        </MenuPortalProvider>
+      </MenuWrapper>
+      <FloatingTableMenu editorView={editorView} />
+      <FloatingImageMenu editorView={editorView} />
+      <FloatingLinkForm editorView={editorView} />
+    </>
   )
 }
 

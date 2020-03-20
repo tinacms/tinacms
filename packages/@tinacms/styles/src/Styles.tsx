@@ -18,307 +18,98 @@ limitations under the License.
 
 import styled, { createGlobalStyle, css } from 'styled-components'
 
-export interface ThemeProps {
-  theme: {
-    tinacms?: Theme
+const theme = css`
+  :root {
+    --tina-color-primary-light: #2296fe;
+    --tina-color-primary: #2296fe;
+    --tina-color-primary-dark: #0574e4;
+    --tina-color-error-light: #eb6337;
+    --tina-color-error: #ec4815;
+    --tina-color-error-dark: #dc4419;
+    --tina-color-warning-light: #f5e06e;
+    --tina-color-warning: #e9d050;
+    --tina-color-warning-dark: #d3ba38;
+    --tina-color-success-light: #57c355;
+    --tina-color-success: #3cad3a;
+    --tina-color-success-dark: #249a21;
+    --tina-color-grey-0: #ffffff;
+    --tina-color-grey-1: #f6f6f9;
+    --tina-color-grey-2: #edecf3;
+    --tina-color-grey-3: #e1ddec;
+    --tina-color-grey-4: #b2adbe;
+    --tina-color-grey-5: #918c9e;
+    --tina-color-grey-6: #716c7f;
+    --tina-color-grey-7: #565165;
+    --tina-color-grey-8: #433e52;
+    --tina-color-grey-9: #363145;
+    --tina-color-grey-10: #282828;
+
+    --tina-radius-small: 5px;
+    --tina-radius-big: 24px;
+
+    --tina-padding-small: 12px;
+    --tina-padding-big: 20px;
+
+    --tina-font-size-0: 11px;
+    --tina-font-size-1: 13px;
+    --tina-font-size-2: 15px;
+    --tina-font-size-3: 16px;
+    --tina-font-size-4: 18px;
+    --tina-font-size-5: 20px;
+    --tina-font-size-6: 22px;
+    --tina-font-size-7: 26px;
+    --tina-font-size-8: 32px;
+
+    --tina-font-family: 'Inter', sans-serif;
+
+    --tina-font-weight-regular: 500;
+    --tina-font-weight-bold: 600;
+
+    --tina-shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.12),
+      0px 4px 8px rgba(48, 48, 48, 0.1);
+    --tina-shadow-small: 0px 2px 3px rgba(0, 0, 0, 0.12);
+
+    --tina-timing-short: 85ms;
+    --tina-timing-medium: 150ms;
+    --tina-timing-long: 250ms;
   }
-}
-
-export interface Theme {
-  color: {
-    primary: {
-      light: string
-      medium: string
-      dark: string
-    }
-    error: {
-      light: string
-      medium: string
-      dark: string
-    }
-    warning: {
-      light: string
-      medium: string
-      dark: string
-    }
-    success: {
-      light: string
-      medium: string
-      dark: string
-    }
-    grey: {
-      0: string
-      1: string
-      2: string
-      3: string
-      4: string
-      5: string
-      6: string
-      7: string
-      8: string
-      9: string
-    }
-  }
-  radius: {
-    small: string
-    big: string
-  }
-  padding: {
-    small: string
-    big: string
-  }
-  font: {
-    size: {
-      0: string
-      1: string
-      2: string
-      3: string
-      4: string
-      5: string
-      6: string
-    }
-    weight: {
-      regular: number
-      bold: number
-    }
-  }
-  shadow: {
-    small: string
-    big: string
-  }
-  timing: {
-    short: string
-    medium: string
-    long: string
-  }
-}
-
-export const DefaultTheme: Theme = {
-  color: {
-    primary: {
-      light: '#2296FE',
-      medium: '#0084ff',
-      dark: '#0574E4',
-    },
-    error: {
-      light: '#EB6337',
-      medium: '#EC4815',
-      dark: '#DC4419',
-    },
-    warning: {
-      light: '#F5E06E',
-      medium: '#E9D050',
-      dark: '#D3BA38',
-    },
-    success: {
-      light: '#57C355',
-      medium: '#3CAD3A',
-      dark: '#249A21',
-    },
-    grey: {
-      0: '#FFFFFF',
-      1: '#F6F6F9',
-      2: '#EDECF3',
-      3: '#E1DDEC',
-      4: '#B2ADBE',
-      5: '#918C9E',
-      6: '#716C7F',
-      7: '#565165',
-      8: '#433E52',
-      9: '#363145',
-    },
-  },
-  radius: {
-    small: '5px',
-    big: '24px',
-  },
-  padding: {
-    small: '12px',
-    big: '20px',
-  },
-  font: {
-    size: {
-      0: '11px',
-      1: '13px',
-      2: '15px',
-      3: '16px',
-      4: '18px',
-      5: '20px',
-      6: '22px',
-    },
-    weight: {
-      regular: 500,
-      bold: 600,
-    },
-  },
-  shadow: {
-    small: '0px 2px 3px rgba(0, 0, 0, 0.12)',
-    big: '0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1)',
-  },
-  timing: {
-    short: '85ms',
-    medium: '150ms',
-    long: '250ms',
-  },
-}
-
-/* Color Helpers */
-const tinacms = (props: ThemeProps): Theme => {
-  const tina = props.theme.tinacms
-  return tina || DefaultTheme
-}
-
-function primary(value: keyof Theme['color']['primary'] = 'medium') {
-  return (props: ThemeProps) => tinacms(props).color['primary'][value]
-}
-
-function grey(value: keyof Theme['color']['grey'] = 0) {
-  return (props: ThemeProps) => tinacms(props).color['grey'][value]
-}
-
-function error(value: keyof Theme['color']['error'] = 'medium') {
-  return (props: ThemeProps) => tinacms(props).color['error'][value]
-}
-
-function warning(value: keyof Theme['color']['warning'] = 'medium') {
-  return (props: ThemeProps) => tinacms(props).color['warning'][value]
-}
-
-function success(value: keyof Theme['color']['success'] = 'medium') {
-  return (props: ThemeProps) => tinacms(props).color['success'][value]
-}
-
-export const color = {
-  primary: primary,
-  grey: grey,
-  error: error,
-  warning: warning,
-  success: success,
-}
-
-/* Font Helpers */
-
-function size(value: keyof Theme['font']['size'] = 0) {
-  return (props: ThemeProps) => tinacms(props).font.size[value]
-}
-
-function weight(value: keyof Theme['font']['weight'] = 'regular') {
-  return (props: ThemeProps) => tinacms(props).font.weight[value]
-}
-
-export const font = {
-  size: size,
-  weight: weight,
-}
-
-/* Other Helpers */
-
-export const radius = function(size: keyof Theme['radius'] = 'big') {
-  return (props: ThemeProps) => tinacms(props).radius[size]
-}
-
-export const padding = function(size: keyof Theme['padding'] = 'big') {
-  return (props: ThemeProps) => tinacms(props).padding[size]
-}
-
-export const shadow = function(size: keyof Theme['shadow'] = 'big') {
-  return (props: ThemeProps) => tinacms(props).shadow[size]
-}
-
-export const timing = function(length: keyof Theme['timing']) {
-  return (props: ThemeProps) => tinacms(props).timing[length]
-}
+`
 
 export const GlobalStyles = createGlobalStyle`
+  ${theme};
   @import url('https://rsms.me/inter/inter.css');
 `
 
 export const TinaResetStyles = css`
-  font-family: 'Inter', sans-serif;
-  font-size: 100%;
-  -webkit-text-size-adjust: 100%;
-  box-sizing: border-box;
-  overflow: hidden;
-  -webkit-font-smoothing: antialiased;
-  -webkit-text-size-adjust: 100%;
-  backface-visibility: visible;
-  background-color: transparent;
-  background-image: none;
-  border-color: transparent;
-  border-image: initial;
-  border-radius: 0px;
-  border-style: none;
-  border-width: 0px;
-  bottom: auto;
-  box-shadow: none;
-  box-sizing: border-box;
-  caption-side: top;
-  clear: none;
-  clip: auto;
-  color: inherit;
-  cursor: auto;
-  direction: ltr;
-  display: inline;
-  float: none;
-  font-size: 16px;
-  font-stretch: normal;
-  font-style: normal;
-  font-variant: normal;
-  font-weight: normal;
-  height: auto;
-  left: auto;
-  letter-spacing: normal;
-  line-height: inherit;
-  margin: 0px;
-  max-height: none;
-  max-width: none;
-  min-height: 0px;
-  min-width: 0px;
-  opacity: 1;
-  outline-offset: 0px;
-  overflow-wrap: normal;
-  overflow: hidden;
-  padding: 0px;
-  perspective-origin: 50% 50%;
-  perspective: none;
-  pointer-events: auto;
-  position: static;
-  quotes: none;
-  resize: none;
-  right: auto;
-  size: auto;
-  table-layout: auto;
-  text-align-last: initial;
-  text-align: start;
-  text-decoration: none;
-  text-indent: 0px;
-  text-shadow: none;
-  text-transform: none;
-  top: auto;
-  transform-origin: 50% 50% 0px;
-  transform: none;
-  vertical-align: baseline;
-  white-space: normal;
-  word-break: normal;
-  word-spacing: normal;
-`
+  * {
+    font-family: 'Inter', sans-serif;
+    &::-webkit-scrollbar {
+      width: 8px;
+    }
+    ::-webkit-scrollbar-track {
+      background: transparent;
+      border-left: 1px solid var(--tina-color-grey-2);
+    }
+    &::-webkit-scrollbar-thumb {
+      background-color: var(--tina-color-grey-3);
+      border-radius: 0;
+      border: none;
+    }
+  }
 
-export const TinaReset = styled.div`
-  ${TinaResetStyles}
-
-  *, *:before, *:after {
-    box-sizing: inherit;
-    font-family: inherit;
-    font-size: inherit;
+  *,
+  *:before,
+  *:after {
+    box-sizing: border-box;
   }
 
   hr {
-    border-color: #edecf3;
-    color: #edecf3;
-    margin-bottom: 24px;
-    margin-left: -20px;
-    margin-right: -20px;
-    border-top: 1px solid #edecf3;
+    border-color: var(--tina-color-grey-2);
+    color: var(--tina-color-grey-2);
+    margin-bottom: var(--tina-padding-big);
+    margin-left: calc(var(--tina-padding-big) * -1);
+    margin-right: calc(var(--tina-padding-big) * -1);
+    border-top: 1px solid var(--tina-color-grey-2);
     border-bottom: none;
     height: 0;
     box-sizing: content-box;
@@ -330,11 +121,14 @@ export const TinaReset = styled.div`
   h5,
   h6,
   p {
-    &:first-child {
-      margin-top: 0;
-    }
-    &:last-child {
-      margin-bottom: 0;
+    :not([class]) {
+      font-family: 'Inter', sans-serif;
+      &:first-child {
+        margin-top: 0;
+      }
+      &:last-child {
+        margin-bottom: 0;
+      }
     }
   }
   td,
@@ -351,24 +145,30 @@ export const TinaReset = styled.div`
   h4,
   h5,
   h6 {
-    font-weight: bold;
+    :not([class]) {
+      font-weight: var(--tina-font-weight-bold);
+    }
   }
-  h1 {
-    font-size: 32px;
+  h1:not([class]) {
+    font-size: var(--tina-font-size-8);
   }
-  h2 {
-    font-size: 24px;
+  h2:not([class]) {
+    font-size: var(--tina-font-size-7);
   }
-  h3 {
-    font-size: 19px;
+  h3:not([class]) {
+    font-size: var(--tina-font-size-5);
   }
-  h4 {
-    font-size: 16px;
+  h4:not([class]) {
+    font-size: var(--tina-font-size-4);
   }
-  h5 {
-    font-size: 14px;
+  h5:not([class]) {
+    font-size: var(--tina-font-size-3);
   }
-  h6 {
-    font-size: 12px;
+  h6:not([class]) {
+    font-size: var(--tina-font-size-2);
   }
+`
+
+export const TinaReset = styled.div`
+  ${TinaResetStyles}
 `

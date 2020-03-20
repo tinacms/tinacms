@@ -30,7 +30,7 @@ import {
 } from 'tinacms'
 import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
-import { radius, color, Button, IconButton } from '@tinacms/styles'
+import { Button, IconButton } from '@tinacms/styles'
 import {
   AddIcon,
   ChevronUpIcon,
@@ -87,24 +87,24 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
 
 const BlockMenu = styled.div`
   position: absolute;
-  top: -1.5rem;
-  right: -1rem;
+  top: -24px;
+  right: -16px;
   display: flex;
   align-items: center;
   justify-content: flex-end;
   opacity: 0;
   transform: translate3d(0, 0, 0);
-  transition: all 120ms ease-out;
+  transition: all var(--tina-timing-medium) ease-out;
 
   ${Button} {
     height: 34px;
-    margin-left: 0.5rem;
+    margin-left: 8px;
   }
 
   ${IconButton} {
     width: 34px;
     height: 34px;
-    margin-left: 0.5rem;
+    margin-left: 8px;
   }
 `
 
@@ -136,12 +136,12 @@ const BlockWrapper = styled.div`
     top: -16px;
     width: calc(100% + 2rem);
     height: calc(100% + 2rem);
-    border: 3px solid ${color.primary()};
-    border-radius: ${radius()};
+    border: 3px solid var(--tina-color-primary);
+    border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
     z-index: 1000;
-    transition: all 150ms ease-out;
+    transition: all var(--tina-timing-medium) ease-out;
   }
 `
 
