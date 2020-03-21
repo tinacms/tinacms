@@ -17,31 +17,19 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
-
-import {
-  FieldsBuilder,
-  BlockTemplate,
-  Modal,
-  ModalPopup,
-  ModalHeader,
-  ModalBody,
-  ModalActions,
-} from 'tinacms'
+import styled, { css } from 'styled-components'
 import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
+import { AddBlockMenu } from './add-block-menu'
+import { BlockSettings } from './block-settings'
 import { Button, IconButton } from '@tinacms/styles'
 import {
-  AddIcon,
   ChevronUpIcon,
   ChevronDownIcon,
+  TrashIcon,
   CloseIcon,
 } from '@tinacms/icons'
 
-/**
- *
- * TODO: I think this should be defined in `tinacms` and not with the rest of the inline stuff?
- */
 export interface BlocksControlsProps {
   children: any
   index: number
@@ -49,80 +37,130 @@ export interface BlocksControlsProps {
 
 export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { status } = useInlineForm()
-  const { insert, move, remove, blocks, count } = useInlineBlocks()
+  const {
+    insert,
+    move,
+    remove,
+    blocks,
+    count,
+    activeBlock,
+    setActiveBlock,
+  } = useInlineBlocks()
   const { template } = useInlineBlock()
   const isFirst = index === 0
   const isLast = index === count - 1
 
   const removeBlock = () => remove(index)
-  const moveBlockUp = () => move(index, index - 1)
-  const moveBlockDown = () => move(index, index + 1)
 
   if (status === 'inactive') {
     return children
   }
 
+  const moveBlockUp = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    move(index, index - 1)
+  }
+
+  const moveBlockDown = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    move(index, index + 1)
+  }
+
+  const handleSetActiveBlock = (event: React.MouseEvent) => {
+    event.preventDefault()
+    setActiveBlock(index)
+  }
+
+  const clearFocus = (event: React.MouseEvent) => {
+    event.stopPropagation()
+    setActiveBlock(-1)
+  }
+
   return (
-    <BlockWrapper>
-      <BlockMenu>
-        <AddBlockMenu
-          addBlock={block => insert(index + 1, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-        />
-        <IconButton primary onClick={moveBlockUp} disabled={isFirst}>
-          <ChevronUpIcon />
-        </IconButton>
-        <IconButton primary onClick={moveBlockDown} disabled={isLast}>
-          <ChevronDownIcon />
-        </IconButton>
-        <IconButton onClick={removeBlock}>
-          <CloseIcon />
-        </IconButton>
-        <BlockSettings template={template} />
+    <BlockWrapper active={activeBlock === index} onClick={handleSetActiveBlock}>
+      <BlockMenu index={index}>
+        <BlockMenuLeft>
+          <AddBlockMenu
+            addBlock={block => insert(index + 1, block)}
+            templates={Object.entries(blocks).map(
+              ([, block]) => block.template
+            )}
+          />
+        </BlockMenuLeft>
+        <BlockMenuRight>
+          <IconButton primary onClick={moveBlockUp} disabled={isFirst}>
+            <ChevronUpIcon />
+          </IconButton>
+          <IconButton primary onClick={moveBlockDown} disabled={isLast}>
+            <ChevronDownIcon />
+          </IconButton>
+          <BlockSettings template={template} />
+          <IconButton primary onClick={removeBlock}>
+            <TrashIcon />
+          </IconButton>
+          <IconButton onClick={clearFocus}>
+            <CloseIcon />
+          </IconButton>
+        </BlockMenuRight>
       </BlockMenu>
       {children}
     </BlockWrapper>
   )
 }
 
-const BlockMenu = styled.div`
+interface BlockMenuProps {
+  index: number
+}
+
+const BlockMenu = styled.div<BlockMenuProps>`
   position: absolute;
-  top: -24px;
-  right: -16px;
-  display: flex;
+  top: -1.5rem;
+  right: -4px;
+  left: -4px;
+  display: grid;
   align-items: center;
-  justify-content: flex-end;
+  grid-template-areas: 'left right';
+  grid-template-columns: auto auto;
   opacity: 0;
   transform: translate3d(0, 0, 0);
-  transition: all var(--tina-timing-medium) ease-out;
+  transition: all 120ms ease-out;
+  z-index: calc(1000 - ${props => props.index});
 
   ${Button} {
     height: 34px;
-    margin-left: 8px;
+    margin: 0 4px;
   }
 
   ${IconButton} {
     width: 34px;
     height: 34px;
-    margin-left: 8px;
+    margin: 0 4px;
   }
 `
 
-const BlockWrapper = styled.div`
+const BlockMenuLeft = styled.div`
+  grid-area: left;
+  display: flex;
+  align-items: center;
+  justify-content: flex-start;
+`
+
+const BlockMenuRight = styled.div`
+  grid-area: right;
+  display: flex;
+  align-items: center;
+  justify-content: flex-end;
+`
+
+export interface BlockWrapperProps {
+  active: boolean
+}
+
+const BlockWrapper = styled.div<BlockWrapperProps>`
   position: relative;
+  /* z-index: 100; */
 
-  &:focus-within {
-    ${BlockMenu} {
-      transform: translate3d(0, -100%, 0);
-      opacity: 1;
-    }
-
-    &:after {
-      opacity: 1;
-    }
-  }
-
-  &:hover:not(:focus-within) {
+  &:hover {
     &:after {
       opacity: 0.3;
     }
@@ -140,80 +178,20 @@ const BlockWrapper = styled.div`
     border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
-    z-index: 1000;
+    /* z-index: 1000; */
     transition: all var(--tina-timing-medium) ease-out;
   }
+
+  ${p =>
+    p.active &&
+    css`
+      ${BlockMenu} {
+        transform: translate3d(0, -100%, 0);
+        opacity: 1;
+      }
+
+      &:after {
+        opacity: 1 !important;
+      }
+    `};
 `
-
-interface AddBlockMenu {
-  addBlock(data: any): void
-  templates: BlockTemplate[]
-}
-
-function AddBlockMenu({ templates, addBlock }: AddBlockMenu) {
-  return (
-    <>
-      {templates.map(template => {
-        return (
-          <IconButton
-            key={template.label}
-            primary
-            onClick={() => {
-              addBlock({
-                _template: template.type,
-                ...template.defaultItem,
-              })
-            }}
-          >
-            <AddIcon />
-          </IconButton>
-        )
-      })}
-    </>
-  )
-}
-
-interface BlockSettingsProps {
-  template: BlockTemplate
-}
-
-function BlockSettings({ template }: BlockSettingsProps) {
-  const [open, setOpen] = React.useState(false)
-  const noExtraFields = !(template.fields && template.fields.length)
-
-  if (noExtraFields) {
-    return null
-  }
-  return (
-    <>
-      <button onClick={() => setOpen(p => !p)}>Settings</button>
-      {open && (
-        <BlockSettingsModal template={template} close={() => setOpen(false)} />
-      )}
-    </>
-  )
-}
-
-function BlockSettingsModal({ template, close }: any) {
-  const { form } = useInlineForm()
-  const { name: blockName } = useInlineBlock()
-
-  const fields = template.fields.map((field: any) => ({
-    ...field,
-    name: `${blockName}.${field.name}`,
-  }))
-
-  return (
-    <Modal>
-      <ModalPopup>
-        <ModalHeader close={close}>Settings</ModalHeader>
-        <ModalBody>
-          <FieldsBuilder form={form} fields={fields} />
-        </ModalBody>
-        <ModalActions>
-          <Button onClick={close}>Cancel</Button>
-        </ModalActions>
-      </ModalPopup>
-    </Modal>
-  )
-}

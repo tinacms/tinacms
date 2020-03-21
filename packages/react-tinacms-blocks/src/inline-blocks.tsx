@@ -392,7 +392,7 @@ const BlocksActions = styled(
 )`
   display: flex;
   position: absolute;
-  z-index: 1000;
+  // z-index: 1000;
   top: -24px;
   right: -20px;
   transform: translate3d(0, calc(-100% + 16px), 0);

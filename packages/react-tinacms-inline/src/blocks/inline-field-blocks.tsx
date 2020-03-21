@@ -19,6 +19,10 @@ limitations under the License.
 import * as React from 'react'
 import { Block } from './block'
 import { InlineField } from '../inline-field'
+import { useState } from 'react'
+import { AddBlockMenu } from './add-block-menu'
+import { useInlineForm } from '../inline-form'
+import styled from 'styled-components'
 
 /**
  * Blocks
@@ -39,6 +43,8 @@ export interface InlineBlocksActions {
   blocks: {
     [key: string]: Block
   }
+  activeBlock: number | null
+  setActiveBlock: any
 }
 
 export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
@@ -56,12 +62,17 @@ export function useInlineBlocks() {
 }
 
 export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
+  const [activeBlock, setActiveBlock] = useState(-1)
+  const { status } = useInlineForm()
+
   return (
     <InlineField name={name}>
       {({ input, form }) => {
         const allData: { _template: string }[] = input.value || []
 
         const move = (from: number, to: number) => {
+          const movement = to - from
+          setActiveBlock(activeBlock => activeBlock + movement)
           form.mutators.move(name, from, to)
         }
 
@@ -75,8 +86,26 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
 
         return (
           <InlineBlocksContext.Provider
-            value={{ insert, move, remove, blocks, count: allData.length }}
+            value={{
+              insert,
+              move,
+              remove,
+              blocks,
+              count: allData.length,
+              activeBlock,
+              setActiveBlock,
+            }}
           >
+            {allData.length < 1 && status === 'inactive' && (
+              <BlocksEmptyState>
+                <AddBlockMenu
+                  addBlock={block => insert(1, block)}
+                  templates={Object.entries(blocks).map(
+                    ([, block]) => block.template
+                  )}
+                />
+              </BlocksEmptyState>
+            )}
             {allData.map((data, index) => {
               const Block = blocks[data._template]
 
@@ -138,3 +167,8 @@ export function useInlineBlock() {
 
   return inlineFormContext
 }
+
+const BlocksEmptyState = styled.div`
+  margin: var(--tina-padding-big) 0;
+  position: relative;
+`
