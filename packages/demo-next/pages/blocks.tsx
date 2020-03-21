@@ -51,7 +51,9 @@ export default function BlocksExample({ jsonFile }) {
             uploadDir={() => '/public/images/'}
           />
         </h1>
-        <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
+        <Wrap>
+          <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
+        </Wrap>
       </InlineForm>
     </ModalProvider>
   )
@@ -204,3 +206,8 @@ export function DiscardChanges() {
     </button>
   )
 }
+
+const Wrap = styled.div`
+  max-width: 800px;
+  margin: 0 auto;
+`
