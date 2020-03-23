@@ -28,7 +28,7 @@ import {
   BlocksControls,
   BlockText,
   BlockImage,
-  BlockTextArea,
+  BlockTextarea,
   useInlineForm,
 } from 'react-tinacms-inline'
 

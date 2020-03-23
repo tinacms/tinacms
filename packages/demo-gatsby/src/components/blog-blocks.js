@@ -21,7 +21,7 @@ import {
   InlineBlocks,
   BlocksControls,
   BlockText,
-  BlockTextArea,
+  BlockTextarea,
 } from "react-tinacms-inline"
 
 /*
