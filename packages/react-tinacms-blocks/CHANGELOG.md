@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.3.5...react-tinacms-blocks@0.4.0) (2020-03-23)
+
+
+### Features
+
+* move theme system to css custom properties ([ba3bb22](https://github.com/tinacms/tinacms/commit/ba3bb22))
+
+
+
+
+
 ## [0.3.5](https://github.com/tinacms/tinacms/compare/react-tinacms-blocks@0.3.4...react-tinacms-blocks@0.3.5) (2020-03-16)
 
 **Note:** Version bump only for package react-tinacms-blocks

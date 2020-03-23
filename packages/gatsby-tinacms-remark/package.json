@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.7.7",
+  "version": "0.7.8",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -34,8 +34,8 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
     "@types/js-yaml": "^3.12.1",
-    "gatsby-tinacms-git": "^0.4.1",
-    "tinacms": "^0.17.0"
+    "gatsby-tinacms-git": "^0.4.2",
+    "tinacms": "^0.18.0"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
@@ -46,7 +46,7 @@
     "gatsby": ">=2.15",
     "gatsby-tinacms-git": ">=0.4.2",
     "gatsby-transformer-remark": ">=2.1.1",
-    "tinacms": ">=0.11",
-    "react": ">=16.8"
+    "react": ">=16.8",
+    "tinacms": ">=0.11"
   }
 }

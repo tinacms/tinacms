@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.3.0...react-tinacms-inline@0.4.0) (2020-03-23)
+
+
+### Features
+
+* **react-tinacms-inline:** adds inline image field ([f35e263](https://github.com/tinacms/tinacms/commit/f35e263))
+* adds inline block image ([c216d44](https://github.com/tinacms/tinacms/commit/c216d44))
+* adds inline image field, needs work ([64b0531](https://github.com/tinacms/tinacms/commit/64b0531))
+
+
+
+
+
 # [0.3.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.2.1...react-tinacms-inline@0.3.0) (2020-03-16)
 
 

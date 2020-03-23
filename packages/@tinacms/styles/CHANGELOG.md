@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.3.0...@tinacms/styles@0.4.0) (2020-03-23)
+
+
+### Features
+
+* move theme system to css custom properties ([ba3bb22](https://github.com/tinacms/tinacms/commit/ba3bb22))
+
+
+
+
+
 # [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/styles@0.3.0-alpha.0...@tinacms/styles@0.3.0) (2020-03-09)
 
 **Note:** Version bump only for package @tinacms/styles

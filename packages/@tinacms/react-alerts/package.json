@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-alerts",
-  "version": "0.0.0",
+  "version": "0.1.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-alerts.esm.js",
@@ -21,12 +21,11 @@
     "lint": "tsdx lint",
     "docs": "npx typedoc"
   },
-  "dependencies": {},
   "devDependencies": {
-    "@tinacms/alerts": "^0.0.0",
+    "@tinacms/alerts": "^0.1.0",
     "@tinacms/icons": "^0.7.0",
     "@tinacms/react-core": "^0.2.9",
-    "@tinacms/styles": "^0.3.0"
+    "@tinacms/styles": "^0.4.0"
   },
   "peerDependencies": {
     "@tinacms/alerts": ">=0.1",

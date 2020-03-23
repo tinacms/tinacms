@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.8](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.7...gatsby-tinacms-remark@0.7.8) (2020-03-23)
+
+
+### Bug Fixes
+
+* move packages to peerDependencies ([8c9405a](https://github.com/tinacms/tinacms/commit/8c9405a))
+
+
+
+
+
 ## [0.7.7](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.6...gatsby-tinacms-remark@0.7.7) (2020-03-16)
 
 **Note:** Version bump only for package gatsby-tinacms-remark

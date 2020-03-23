@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-blocks",
-  "version": "0.3.5",
+  "version": "0.4.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-blocks.esm.js",
@@ -27,7 +27,7 @@
   },
   "devDependencies": {
     "@tinacms/icons": "^0.7.0",
-    "@tinacms/styles": "^0.3.0",
-    "tinacms": "^0.17.0"
+    "@tinacms/styles": "^0.4.0",
+    "tinacms": "^0.18.0"
   }
 }
