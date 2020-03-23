@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-forms",
-  "version": "0.1.0",
+  "version": "0.0.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-forms.esm.js",
@@ -21,15 +21,23 @@
     "lint": "tsdx lint",
     "docs": "npx typedoc"
   },
+  "dependencies": {
+    "@tinacms/form-builder": "^0.3.0",
+    "react-dismissible": "^1.1.5"
+  },
   "devDependencies": {
     "@tinacms/icons": "^0.7.0",
     "@tinacms/react-core": "^0.2.9",
-    "@tinacms/styles": "^0.4.0"
+    "@tinacms/styles": "^0.4.0",
+    "@tinacms/forms": "^0.3.0",
+    "@tinacms/react-modals": "^0.1.0"
   },
   "peerDependencies": {
     "@tinacms/icons": ">=0.7",
     "@tinacms/react-core": ">=0.2",
     "@tinacms/styles": ">=0.3",
+    "@tinacms/forms": ">=0.3",
+    "@tinacms/react-modals": ">=0.1",
     "react": ">=16.8",
     "styled-components": ">=4.1"
   }
