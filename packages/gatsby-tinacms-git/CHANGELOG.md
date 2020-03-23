@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.4.1...gatsby-tinacms-git@0.4.2) (2020-03-23)
+
+
+### Bug Fixes
+
+* move packages to peerDependencies ([8c9405a](https://github.com/tinacms/tinacms/commit/8c9405a))
+
+
+
+
+
 ## [0.4.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.4.0...gatsby-tinacms-git@0.4.1) (2020-03-16)
 
 **Note:** Version bump only for package gatsby-tinacms-git

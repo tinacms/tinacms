@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.13](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.12...gatsby-tinacms-json@0.8.13) (2020-03-23)
+
+
+### Bug Fixes
+
+* **gatsby-tinacms-json:** expose DeleteAction from gatsby-tinacms-git ([0454ff5](https://github.com/tinacms/tinacms/commit/0454ff5))
+* move packages to peerDependencies ([8c9405a](https://github.com/tinacms/tinacms/commit/8c9405a))
+
+
+
+
+
 ## [0.8.12](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.11...gatsby-tinacms-json@0.8.12) (2020-03-16)
 
 **Note:** Version bump only for package gatsby-tinacms-json

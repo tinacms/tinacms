@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.18.0](https://github.com/tinacms/tinacms/compare/tinacms@0.17.0...tinacms@0.18.0) (2020-03-23)
+
+
+### Bug Fixes
+
+* tinacms constructor accepts media.store ([3293fce](https://github.com/tinacms/tinacms/commit/3293fce))
+* **alerts:** use @tinacms/react-alerts ([6f94d6c](https://github.com/tinacms/tinacms/commit/6f94d6c))
+
+
+### Features
+
+* introduce @tinacms/alerts ([5f556b4](https://github.com/tinacms/tinacms/commit/5f556b4))
+* introduce @tinacms/media ([a1be1b6](https://github.com/tinacms/tinacms/commit/a1be1b6))
+* move theme system to css custom properties ([ba3bb22](https://github.com/tinacms/tinacms/commit/ba3bb22))
+
+
+
+
+
 # [0.17.0](https://github.com/tinacms/tinacms/compare/tinacms@0.16.0...tinacms@0.17.0) (2020-03-16)
 
 

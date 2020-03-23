@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.7](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.6...next-tinacms-markdown@0.2.7) (2020-03-23)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
 ## [0.2.6](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.5...next-tinacms-markdown@0.2.6) (2020-03-16)
 
 **Note:** Version bump only for package next-tinacms-markdown
