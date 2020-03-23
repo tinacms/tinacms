@@ -26,7 +26,7 @@ import { FormActionMenu } from './FormActions'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { LoadingDots } from './LoadingDots'
 import { ResetForm } from './ResetForm'
-import { useCMS } from '../../react-tinacms'
+import { useCMS } from '@tinacms/react-core'
 import { FormPortalProvider } from './FormPortal'
 
 export interface FormViewProps {
@@ -34,6 +34,8 @@ export interface FormViewProps {
 }
 export function FormView({ activeForm }: FormViewProps) {
   const cms = useCMS()
+  // @ts-ignore
+  const buttons = cms.sidebar.buttons
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
       if (!result.destination || !activeForm) return
@@ -77,7 +79,7 @@ export function FormView({ activeForm }: FormViewProps) {
                       await activeForm.reset!()
                     }}
                   >
-                    {cms.sidebar.buttons.reset}
+                    {buttons.reset}
                   </ResetForm>
                 )}
                 <Button
@@ -89,7 +91,7 @@ export function FormView({ activeForm }: FormViewProps) {
                   margin
                 >
                   {submitting && <LoadingDots />}
-                  {!submitting && cms.sidebar.buttons.save}
+                  {!submitting && buttons.save}
                 </Button>
                 {activeForm.actions.length > 0 && (
                   <FormActionMenu

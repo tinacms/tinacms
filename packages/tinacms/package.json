@@ -45,6 +45,7 @@
     "@tinacms/react-alerts": "^0.1.0",
     "@tinacms/react-core": "^0.2.9",
     "@tinacms/react-modals": "^0.1.0",
+    "@tinacms/react-forms": "^0.0.0",
     "@tinacms/styles": "^0.4.0",
     "@types/react-beautiful-dnd": "^11.0.3",
     "lodash.clonedeep": "^4.5.0",

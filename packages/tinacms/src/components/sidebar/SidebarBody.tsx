@@ -24,7 +24,7 @@ import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { Button } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-tinacms'
-import { FormView } from '../form/FormView'
+import { FormView } from '@tinacms/react-forms'
 import { LeftArrowIcon } from '@tinacms/icons'
 
 export const FormsView = () => {
