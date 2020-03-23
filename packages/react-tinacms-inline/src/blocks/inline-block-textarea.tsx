@@ -21,13 +21,7 @@ import { InlineTextFieldProps } from '../inline-field-text'
 import { BlockField } from './inline-block-field'
 import { InlineTextarea } from '../inline-field-textarea'
 
-/**
- * InlineTextAreaField
- */
-interface BlockTextArea {
-  name: string
-}
-export function BlockTextArea({ name, className }: InlineTextFieldProps) {
+export function BlockTextarea({ name, className }: InlineTextFieldProps) {
   return (
     <BlockField name={name}>
       {({ input, status }) => {
