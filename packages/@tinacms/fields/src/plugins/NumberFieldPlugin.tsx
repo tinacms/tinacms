@@ -15,20 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
 import * as React from 'react'
-import styled from 'styled-components'
-import { InputCss } from './Input'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { NumberInput as BaseNumberField, InputProps } from '../components'
+import { parse } from './numberFormat'
 
-type a = React.DetailedHTMLProps<
-  React.InputHTMLAttributes<HTMLInputElement>,
-  HTMLInputElement
->
-export interface TextFieldProps extends a {
-  error?: boolean
-  ref?: any
+export const NumberField = wrapFieldsWithMeta<{
+  step: string | number
+  input: InputProps
+}>(({ input, field }) => <BaseNumberField {...input} step={field.step} />)
+
+export default {
+  name: 'number',
+  Component: NumberField,
+  parse,
 }
-
-export const TextField = styled.input<TextFieldProps>`
-  ${InputCss}
-`

@@ -50,7 +50,7 @@ export { GlobalFormPlugin } from './plugins/screens'
 export { ScreenPlugin } from './plugins/screen-plugin'
 
 // Pre-registered Plugins
-export * from './plugins/fields'
+export * from '@tinacms/fields'
 
 /**
  * REACT COMPONENTS
