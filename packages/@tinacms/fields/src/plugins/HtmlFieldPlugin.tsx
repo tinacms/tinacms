@@ -16,5 +16,17 @@ limitations under the License.
 
 */
 
-export * from './components'
-export * from './plugins'
+import React from 'react'
+import { Wysiwyg } from 'react-tinacms-editor'
+import { parse } from './textFormat'
+import { wysiwygStyles } from './wysiwygStyles'
+
+export const HTMLField = wysiwygStyles(props => {
+  return <Wysiwyg {...props} sticky={false} format="html" />
+})
+
+export default {
+  name: 'html',
+  Component: HTMLField,
+  parse,
+}

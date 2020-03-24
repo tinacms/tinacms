@@ -16,5 +16,4 @@ limitations under the License.
 
 */
 
-export * from './components'
-export * from './plugins'
+export const parse = (value?: string) => value && +value

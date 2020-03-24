@@ -16,5 +16,23 @@ limitations under the License.
 
 */
 
-export * from './components'
-export * from './plugins'
+import * as React from 'react'
+import { BaseTextField, InputProps } from '../components'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { parse } from './textFormat'
+
+export const TextField = wrapFieldsWithMeta<
+  { placeholder: string },
+  InputProps
+>(({ input, field }) => (
+  <BaseTextField {...input} placeholder={field.placeholder} />
+))
+
+export default {
+  name: 'text',
+  Component: TextField,
+  validate(value: any, values: any, meta: any, field: any) {
+    if (field.required && !value) return 'Required'
+  },
+  parse,
+}

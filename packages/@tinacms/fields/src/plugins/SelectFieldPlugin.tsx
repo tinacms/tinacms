@@ -16,5 +16,15 @@ limitations under the License.
 
 */
 
-export * from './components'
-export * from './plugins'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { Select } from '../components'
+import { parse } from './textFormat'
+
+export const SelectField = wrapFieldsWithMeta(Select)
+
+export default {
+  name: 'select',
+  type: 'select',
+  Component: SelectField,
+  parse,
+}

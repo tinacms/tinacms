@@ -16,5 +16,13 @@ limitations under the License.
 
 */
 
-export * from './components'
-export * from './plugins'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { Toggle } from '../components'
+
+export const ToggleField = wrapFieldsWithMeta(Toggle)
+
+export default {
+  name: 'toggle',
+  type: 'checkbox',
+  Component: ToggleField,
+}
