@@ -54,12 +54,14 @@ import {
   MenuContainer,
 } from './MenuComponents'
 import { isMarkPresent } from '../../../utils'
+import ImageMenu from './Image/ImageMenu'
 
 interface Props {
   bottom?: boolean
   format: 'html' | 'markdown' | 'html-blocks'
   editorView: { view: EditorView }
   sticky?: boolean | string
+  uploadImages?: (files: File[]) => Promise<string[]>
 }
 
 const BoldControl = markControl({
@@ -97,7 +99,7 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { editorView, bottom = false, sticky = true } = props
+  const { editorView, bottom = false, sticky = true, uploadImages } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
@@ -173,7 +175,9 @@ export const Menu = (props: Props) => {
             <ItalicControl view={view} />
             <UnderlineControl view={view} />
             <LinkControl view={view} />
-            {/* <ImageMenu editorView={editorView} imageUpload={imageUpload} /> */}
+            {uploadImages && (
+              <ImageMenu editorView={editorView} uploadImages={uploadImages} />
+            )}
             {supportBlocks && <TableControl view={view} bottom={bottom} />}
             {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
             {supportBlocks && <CodeControl view={view} bottom={bottom} />}

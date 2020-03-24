@@ -63,6 +63,7 @@ export const Wysiwyg = styled(
             bottom={false}
             translator={translator}
             sticky={sticky}
+            uploadImages={imageProps && imageProps.upload}
           />
         )}
         <div {...styleProps} ref={prosemirrorEl as any} />

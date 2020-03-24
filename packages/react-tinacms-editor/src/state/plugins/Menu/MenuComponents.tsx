@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useMemo } from 'react'
+import { useEffect, useState } from 'react'
 
 import styled, { css } from 'styled-components'
 import { useMenuPortal } from './MenuPortal'
@@ -137,16 +137,21 @@ export const MenuDropdownWrapper = styled.div`
 `
 
 export const MenuButtonDropdown = styled(
-  ({ children, open, triggerRef, ...styleProps }) => {
+  ({ children, open, triggerRef, innerRef, ...styleProps }) => {
     const MenuPortal = useMenuPortal()
     const menuPortalRef = React.useRef<HTMLDivElement | null>(null)
 
-    const menuOffset = useMemo(() => {
-      if (!triggerRef.current || !menuPortalRef.current) return 0
+    const [menuOffset, setMenuOffset] = useState(0)
+    useEffect(() => {
+      if (!triggerRef.current || !menuPortalRef.current) return
       const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
-      const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
-      return menuDropdownBoundingBox.x - menuPortalBoundingBox.x
-    }, [triggerRef.current, menuPortalRef.current])
+      const menuPositionLeft =
+        menuDropdownBoundingBox.x < menuPortalRef.current.clientWidth / 2
+          ? menuDropdownBoundingBox.x
+          : menuPortalRef.current.clientWidth / 2 -
+            triggerRef.current.clientWidth / 2
+      setMenuOffset(menuDropdownBoundingBox.x - menuPositionLeft)
+    }, [!triggerRef.current, !menuPortalRef.current])
 
     return (
       <MenuPortal>

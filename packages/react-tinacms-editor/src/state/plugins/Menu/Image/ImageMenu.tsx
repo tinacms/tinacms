@@ -16,34 +16,204 @@ limitations under the License.
 
 */
 
-import React from 'react'
+import React, { useEffect, useState, ChangeEvent } from 'react'
+import styled from 'styled-components'
 import { EditorView } from 'prosemirror-view'
+
 import { MediaIcon } from '@tinacms/icons'
-import { MenuButton } from '../MenuComponents'
 import { insertImage } from '../../../../commands/image-commands'
+import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
 
 interface ImageMenu {
   editorView: { view: EditorView }
-  imageUpload?: () => Promise<string[]>
+  uploadImages: (files: File[]) => Promise<string[]>
 }
 
-export default ({ editorView, imageUpload }: ImageMenu) => {
-  if (!imageUpload) return null
+export default ({ editorView, uploadImages }: ImageMenu) => {
+  if (!uploadImages) return null
 
-  const uploadImageFn = () => {
-    const uploadPromise = imageUpload()
+  const [imageUrl, setImageUrl] = useState('')
+  const [showImageModal, setShowImageModal] = useState(false)
+  const [uploading, setUploading] = useState(false)
+  const menuButtonRef = React.createRef()
+  const wrapperRef = React.createRef() as any
+
+  useEffect(() => {
+    if (!wrapperRef.current) return
+    const handleMousedown = (event: MouseEvent) => {
+      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
+        setShowImageModal(false)
+      }
+    }
+    window.addEventListener('mousedown', handleMousedown)
+    return () => {
+      window.removeEventListener('mousedown', handleMousedown)
+    }
+  }, [wrapperRef])
+
+  const uploadImageFile = (file: File) => {
+    setUploading(true)
+    const uploadPromise = uploadImages([file])
     uploadPromise.then((urls = []) => {
-      urls.forEach(url => {
-        const { state, dispatch } = editorView.view
-        insertImage(state, dispatch, url)
-      })
-      editorView.view.focus()
+      setImageUrl(urls[0])
+      setUploading(false)
     })
   }
 
+  const insertImageInEditor = () => {
+    const { state, dispatch } = editorView.view
+    insertImage(state, dispatch, imageUrl)
+    editorView.view.focus()
+    setShowImageModal(false)
+    setImageUrl('')
+  }
+
+  const uploadSelectedImage = (event: ChangeEvent) => {
+    const { files } = event.target as any
+    if (files[0]) {
+      uploadImageFile(files[0])
+    }
+  }
+
+  const stopDefault = (evt: React.DragEvent<HTMLSpanElement>) => {
+    evt.preventDefault()
+    evt.stopPropagation()
+  }
+
+  // Check if property name is files or items
+  // IE uses 'files' instead of 'items'
+  const onImageDrop = (evt: React.DragEvent<HTMLSpanElement>) => {
+    stopDefault(evt)
+    const { items, files } = evt.dataTransfer
+    const data = items || files
+    const dataIsItems = !!items
+    for (let i = 0; i < data.length; i += 1) {
+      if (
+        (!dataIsItems || data[i].kind === 'file') &&
+        data[i].type.match('^image/')
+      ) {
+        const file = (dataIsItems ? data[i].getAsFile() : data[i]) as File
+        if (file) {
+          uploadImageFile(file)
+        }
+      }
+    }
+  }
+
+  const handleKeyDown = (event: KeyboardEvent) => {
+    if (event.key === 'Escape') setShowImageModal(false)
+  }
+
   return (
-    <MenuButton onClick={uploadImageFn}>
-      <MediaIcon />
-    </MenuButton>
+    <>
+      <MenuButton
+        onClick={() => {
+          setShowImageModal(!showImageModal)
+          setImageUrl('')
+        }}
+        ref={menuButtonRef}
+      >
+        <MediaIcon />
+      </MenuButton>
+      <MenuButtonDropdown
+        triggerRef={menuButtonRef}
+        open={showImageModal}
+        onKeyDown={handleKeyDown}
+      >
+        <div ref={wrapperRef}>
+          <div onMouseDown={evt => evt.stopPropagation()}>
+            url: <input onChange={evt => setImageUrl(evt.target.value)}></input>
+          </div>
+          <StyledLabel htmlFor="fileInput">
+            <FileUploadInput
+              id="fileInput"
+              onChange={uploadSelectedImage}
+              type="file"
+              accept="image/*"
+            />
+            <UploadSection
+              onDragEnter={stopDefault}
+              onDragOver={stopDefault}
+              onDrop={onImageDrop}
+              src={imageUrl}
+              uploading={uploading}
+            >
+              {imageUrl && (
+                <ImageWrapper>
+                  <StyledImage src={imageUrl} alt="uploaded_image" />
+                </ImageWrapper>
+              )}
+              <UploadLabel>
+                Drag and Drop the Image
+                <br />
+                or
+                <br />
+                Click to Upload
+              </UploadLabel>
+              {uploading && 'UPLOADING'}
+            </UploadSection>
+          </StyledLabel>
+          <button onClick={insertImageInEditor}>upload</button>
+        </div>
+      </MenuButtonDropdown>
+    </>
   )
 }
+
+const UploadSection = styled.span<{ uploading: boolean; src: string }>`
+  align-items: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+
+  margin: 28px auto 0 auto;
+  height: 80px;
+  min-width: 140px;
+  width: 140px;
+  padding: 20px;
+  position: relative;
+
+  background-repeat: no-repeat;
+  background-size: contain;
+  border: ${({ uploading, src }) =>
+    uploading || src ? `1px dashed blue` : `1px dashed black`};
+`
+
+const UploadLabel = styled.span`
+  margin-bottom: 10;
+  margin-top: 20;
+  text-align: center;
+  z-index: 1;
+`
+
+const StyledLabel = styled.label`
+  display: block;
+  height: 75%;
+  width: 100%;
+`
+
+const FileUploadInput = styled.input`
+  display: none;
+`
+
+const ImageWrapper = styled.span`
+  padding: 5px;
+  position: absolute;
+
+  height: calc(100% - 10px);
+  left: 0;
+  top: 0;
+  width: calc(100% - 10px);
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+`
+
+const StyledImage = styled.img`
+  height: auto;
+  width: auto;
+
+  max-height: 100%;
+  max-width: 100%;
+`
