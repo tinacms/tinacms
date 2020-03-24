@@ -29,7 +29,7 @@ export function insertImage(
   const nodeType = state.schema.nodes['image']
   const image = nodeType.createAndFill({ src, alt: '', title: '' })
   if (dispatch) {
-    dispatch(state.tr.replaceSelectionWith(image))
+    dispatch(state.tr.replaceSelectionWith(image).scrollIntoView())
   }
   return true
 }

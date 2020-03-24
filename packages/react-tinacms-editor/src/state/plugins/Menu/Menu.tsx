@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { EditorView } from 'prosemirror-view'
-import React, { useMemo } from 'react'
+import React from 'react'
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 import { markControl } from './markControl'
@@ -32,7 +32,6 @@ import { imagePluginKey } from '../Image'
 import { wrapIn, setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
-import styled, { css } from 'styled-components'
 import {
   BoldIcon,
   CodeIcon,
@@ -48,8 +47,12 @@ import { UndoControl, RedoControl } from './historyControl'
 import { MenuPortalProvider } from './MenuPortal'
 import { FloatingLinkForm } from '../links/FloatingLinkForm'
 import FloatingImageMenu from './Image/FloatingImageMenu'
-import ImageMenu from './Image/ImageMenu'
-import { useMenuPortal } from './MenuPortal'
+import {
+  MenuButton,
+  MenuPlaceholder,
+  MenuWrapper,
+  MenuContainer,
+} from './MenuComponents'
 import { isMarkPresent } from '../../../utils'
 
 interface Props {
@@ -57,7 +60,6 @@ interface Props {
   format: 'html' | 'markdown' | 'html-blocks'
   editorView: { view: EditorView }
   sticky?: boolean | string
-  imageUpload?: () => [Promise<string>]
 }
 
 const BoldControl = markControl({
@@ -95,7 +97,7 @@ const LinkControl = markControl({
 })
 
 export const Menu = (props: Props) => {
-  const { editorView, bottom = false, sticky = true, imageUpload } = props
+  const { editorView, bottom = false, sticky = true } = props
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef: any = useRef<HTMLDivElement>(null)
@@ -171,7 +173,7 @@ export const Menu = (props: Props) => {
             <ItalicControl view={view} />
             <UnderlineControl view={view} />
             <LinkControl view={view} />
-            <ImageMenu editorView={editorView} imageUpload={imageUpload} />
+            {/* <ImageMenu editorView={editorView} imageUpload={imageUpload} /> */}
             {supportBlocks && <TableControl view={view} bottom={bottom} />}
             {supportBlocks && <QuoteControl view={view} bottom={bottom} />}
             {supportBlocks && <CodeControl view={view} bottom={bottom} />}
@@ -275,198 +277,3 @@ const OrderedList = commandContrl(
   'Ordered List',
   'Ordered List'
 )
-
-type MenuPlaceholderProps = {
-  menuBoundingBox: any
-}
-
-const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
-  color: transparent;
-  background: transparent;
-  pointer-events: none;
-  position: relative;
-  display: block;
-  height: ${props => props.menuBoundingBox.height}px;
-  width: ${props => props.menuBoundingBox.width}px;
-`
-
-type MenuWrapperProps = {
-  menuFixed: boolean
-  menuBoundingBox: any
-  menuFixedTopOffset: string
-}
-
-const MenuWrapper = styled.div<MenuWrapperProps>`
-  position: relative;
-  margin-bottom: 14px;
-  z-index: 900;
-
-  ${props =>
-    props.menuFixed &&
-    css`
-      position: fixed;
-      width: ${props.menuBoundingBox.width}px;
-      top: ${props.menuFixedTopOffset};
-    `};
-`
-
-const MenuContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  position: relative;
-  top: 0;
-  width: 100%;
-  background-color: white;
-  border-radius: var(--tina-radius-big);
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  border: 1px solid var(--tina-color-grey-2);
-  overflow: hidden;
-  z-index: 100;
-`
-
-const MenuItem = css`
-  flex: 1 1 24px;
-`
-
-export const MenuButton = styled.button<{
-  active?: boolean
-  disabled?: boolean
-  bottom?: boolean
-  ref?: any
-}>`
-  ${MenuItem}
-  background-color: ${p =>
-    p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  fill: ${p =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  border: 1px solid var(--tina-color-grey-2);
-  margin: -1px;
-  outline: none;
-  padding: 6px 4px;
-  transition: all 85ms ease-out;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  &:hover {
-    background-color: rgba(53, 50, 50, 0.09);
-  }
-  &:active {
-    color: var(--tina-color-primary);
-    fill: var(--tina-color-primary);
-    background-color: rgba(53, 50, 50, 0.05);
-  }
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-  ${props =>
-    props.active &&
-    css`
-      color: var(--tina-color-primary);
-      fill: var(--tina-color-primary);
-      background-color: rgba(53, 50, 50, 0.05);
-    `};
-  ${props =>
-    props.disabled &&
-    css`
-      pointer-events: none;
-      color: #d1d1d1;
-      fill: #d1d1d1;
-    `};
-`
-
-export const MenuDropdownWrapper = styled.div`
-  ${MenuItem}
-  position: relative;
-
-  ${MenuButton} {
-    width: 100%;
-  }
-`
-
-export const MenuButtonDropdown = styled(
-  ({ children, open, triggerRef, ...styleProps }) => {
-    const MenuPortal = useMenuPortal()
-    const menuPortalRef = React.useRef<HTMLDivElement | null>(null)
-
-    const menuOffset = useMemo(() => {
-      if (!triggerRef.current || !menuPortalRef.current) return 0
-      const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
-      const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
-      return menuDropdownBoundingBox.x - menuPortalBoundingBox.x
-    }, [triggerRef.current, menuPortalRef.current])
-
-    return (
-      <MenuPortal>
-        <Offset offset={menuOffset}>
-          <div ref={menuPortalRef} {...styleProps}>
-            {children}
-          </div>
-        </Offset>
-      </MenuPortal>
-    )
-  }
-)`
-  border-radius: var(--tina-radius-big);
-  border: 1px solid #efefef;
-  display: block;
-  position: absolute;
-  bottom: -4px;
-  left: 0;
-  transform: translate3d(0, 100%, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 85ms ease-out;
-  transform-origin: 0 0;
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12), 0px 4px 8px rgba(48, 48, 48, 0.1);
-  background-color: white;
-  overflow: hidden;
-
-  ${props =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, 100%, 0) scale3d(1, 1, 1);
-    `};
-`
-
-const Offset = styled.div<{ offset: number }>`
-  position: absolute;
-  left: ${props => props.offset}px;
-`
-
-export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
-  display: block;
-  padding: 8px 16px;
-  transition: all 85ms ease-out;
-  cursor: pointer;
-  &:first-child {
-    padding-top: var(--tina-padding-small);
-  }
-  &:last-child {
-    padding-bottom: var(--tina-padding-small);
-  }
-  &:hover {
-    background-color: var(--tina-color-grey-1);
-    color: var(--tina-color-primary);
-  }
-  &:active {
-    color: var(--tina-color-primary);
-    fill: var(--tina-color-primary);
-    background-color: rgba(53, 50, 50, 0.05);
-  }
-  ${props =>
-    props.active &&
-    css`
-      color: var(--tina-color-primary);
-      fill: var(--tina-color-primary);
-      background-color: rgba(53, 50, 50, 0.05);
-    `};
-`
