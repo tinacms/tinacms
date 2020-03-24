@@ -20,6 +20,7 @@ limitations under the License.
  * TinaCMS Core Types & React Interfaces
  */
 export * from './react-tinacms'
+export { ActionButton } from '@tinacms/react-forms'
 
 /**
  * The Tina CMS Class
@@ -65,9 +66,6 @@ export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // Modal Components
 export * from '@tinacms/react-modals'
-
-// Form Actions Components
-export { ActionButton } from './components/form/FormActions'
 
 // Media Manager
 export * from './media'
