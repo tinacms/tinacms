@@ -23,14 +23,16 @@
   },
   "dependencies": {
     "@tinacms/form-builder": "^0.3.0",
-    "react-dismissible": "^1.1.5"
+    "react-dismissible": "^1.1.5",
+    "react-beautiful-dnd": "^11.0.5"
   },
   "devDependencies": {
     "@tinacms/icons": "^0.7.0",
     "@tinacms/react-core": "^0.2.9",
     "@tinacms/styles": "^0.4.0",
     "@tinacms/forms": "^0.3.0",
-    "@tinacms/react-modals": "^0.1.0"
+    "@tinacms/react-modals": "^0.1.0",
+    "@types/react-beautiful-dnd": "^11.0.3"
   },
   "peerDependencies": {
     "@tinacms/icons": ">=0.7",
@@ -39,6 +41,7 @@
     "@tinacms/forms": ">=0.3",
     "@tinacms/react-modals": ">=0.1",
     "react": ">=16.8",
+    "react-dom": ">=16.8",
     "styled-components": ">=4.1"
   }
 }
