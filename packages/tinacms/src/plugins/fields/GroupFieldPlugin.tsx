@@ -21,7 +21,7 @@ import { Field, Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
-import { useFormPortal } from '../../components/form/FormPortal'
+import { useFormPortal } from '@tinacms/react-forms'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
