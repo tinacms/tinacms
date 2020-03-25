@@ -11,7 +11,9 @@
     "gatsby-node.js",
     "gatsby-node.d.ts",
     "CHANGELOG.md",
-    "README.md"
+    "README.md",
+    "src/**/*.js",
+    "src/**/*.d.ts"
   ],
   "keywords": [
     "tinacms",
