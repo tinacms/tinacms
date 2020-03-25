@@ -4,19 +4,21 @@
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-56-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-## Getting Started
+## Helpful Links
 
 - [Website](https://tinacms.org/)
-- [Documentation](https://tinacms.org/docs/)
-- [Slack](https://tinacms.slack.com)
-- [Forum](https://community.tinacms.org/)
-- [Roadmap](./ROADMAP.md)
+  - [Blog](https://tinacms.org/docs/)
+  - [Docs](https://tinacms.org/docs/)
+- [Community](https://tinacms.org/docs/)
+  - [Slack](https://tinacms.slack.com)
+  - [Forum](https://community.tinacms.org/)
 - [Contributing](./CONTRIBUTING.md)
-  - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
-  - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
+  - [Current Projects](https://github.com/orgs/tinacms/projects)
+    - [Open Authoring with GitHub + Next.js](https://github.com/orgs/tinacms/projects/1)
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
 
@@ -161,6 +163,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
