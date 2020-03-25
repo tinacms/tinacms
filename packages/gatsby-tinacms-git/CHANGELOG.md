@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.3](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.4.2...gatsby-tinacms-git@0.4.3) (2020-03-25)
+
+
+### Bug Fixes
+
+* **gatsby-tinacms-git:** include src in npm package ([0611659](https://github.com/tinacms/tinacms/commit/0611659))
+
+
+
+
+
 ## [0.4.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.4.1...gatsby-tinacms-git@0.4.2) (2020-03-23)
 
 
