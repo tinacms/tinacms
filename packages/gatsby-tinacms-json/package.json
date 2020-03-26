@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-json",
-  "version": "0.8.13",
+  "version": "0.8.14",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -33,7 +33,7 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
-    "gatsby-tinacms-git": "^0.4.2",
+    "gatsby-tinacms-git": "^0.4.3",
     "tinacms": "^0.18.0"
   },
   "dependencies": {

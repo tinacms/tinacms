@@ -25,14 +25,14 @@ import { CodeMirrorCss } from './CodeMirrorCss'
 import { ProseMirrorCss } from './ProseMirrorCss'
 import { Format } from './Translator'
 import Menu from './state/plugins/Menu'
+import { ImageProps } from './types'
 
 export interface WysiwygProps {
   input: any
   plugins?: Plugin[]
   sticky?: boolean
   format?: Format
-  upload?: () => [Promise<string>]
-  previewUrl?: (url: string) => string
+  imageProps?: ImageProps
 }
 
 export const Wysiwyg = styled(
@@ -41,15 +41,14 @@ export const Wysiwyg = styled(
     plugins,
     sticky,
     format,
-    upload,
-    previewUrl,
+    imageProps,
     ...styleProps
   }: WysiwygProps) => {
     const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
       input,
       ALL_PLUGINS,
       format,
-      previewUrl
+      imageProps
     )
 
     return (
@@ -64,7 +63,6 @@ export const Wysiwyg = styled(
             bottom={false}
             translator={translator}
             sticky={sticky}
-            imageUpload={upload}
           />
         )}
         <div {...styleProps} ref={prosemirrorEl as any} />
