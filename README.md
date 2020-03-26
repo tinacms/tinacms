@@ -59,25 +59,9 @@ Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and in
 
 ## Release Process
 
-Tina has two main branches:
+TinaCMS packages are updated every Monday.
 
-- **master:** The bleeding edge of tinacms
-- **latest:** The current stable release
-
-The flow of changes therefore looks like:
-
-> `fix-some-bug` => `master` => `latest`
-
-This is a weekly process:
-
-- On Monday `master` is merged into `latest` which is then published to npm.
-- Hot fixes are cherry picked onto `latest` and then published.
-- Prereleases are created off of `master` whenever they're needed.
-
-With this process:
-
-- critical fixes are published as soon as possible
-- new features and minor fixes take 3-5 days to be published
+Checkout the [RELEASE](./RELEASE.md) file for the details.
 
 ## Contributors ✨
 
