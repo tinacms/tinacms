@@ -6,7 +6,7 @@
 
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/h_46/v1573166832/Tina_CMS_Wordmark.png)](https://tinacms.org) &nbsp;
+# ![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png)
 
 > Tina is an open-source toolkit for building content management directly into your website.
 
