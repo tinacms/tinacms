@@ -22,7 +22,7 @@ import { parse } from './textFormat'
 
 export const SelectField = wrapFieldsWithMeta(Select)
 
-export default {
+export const SelectFieldPlugin = {
   name: 'select',
   type: 'select',
   Component: SelectField,

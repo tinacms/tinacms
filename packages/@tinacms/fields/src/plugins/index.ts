@@ -17,11 +17,12 @@ limitations under the License.
 */
 
 export * from './BlocksFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
 export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
 export * from './GroupFieldPlugin'
 export * from './GroupListFieldPlugin'
+export * from './ImageFieldPlugin'
+export * from './NumberFieldPlugin'
+export * from './SelectFieldPlugin'
+export * from './TextareaFieldPlugin'
+export * from './TextFieldPlugin'
+export * from './ToggleFieldPlugin'

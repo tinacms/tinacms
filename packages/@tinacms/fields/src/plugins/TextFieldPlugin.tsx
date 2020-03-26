@@ -28,7 +28,7 @@ export const TextField = wrapFieldsWithMeta<
   <BaseTextField {...input} placeholder={field.placeholder} />
 ))
 
-export default {
+export const TextFieldPlugin = {
   name: 'text',
   Component: TextField,
   validate(value: any, values: any, meta: any, field: any) {

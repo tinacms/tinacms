@@ -28,7 +28,7 @@ export const NumberField = wrapFieldsWithMeta<{
   return <BaseNumberField {...input} step={field.step} />
 })
 
-export default {
+export const NumberFieldPlugin = {
   name: 'number',
   Component: NumberField,
   parse,

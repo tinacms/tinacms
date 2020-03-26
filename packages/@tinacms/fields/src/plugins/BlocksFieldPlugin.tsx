@@ -570,7 +570,7 @@ const Panel = function Panel({
   )
 }
 
-export default {
+export const BlocksFieldPlugin = {
   name: 'blocks',
   Component: Blocks,
 }

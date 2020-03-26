@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
-import { useCMS } from '../../react-tinacms'
+import { useCMS } from '@tinacms/react-core'
 import { parse } from './textFormat'
 
 type FieldProps = any
@@ -39,6 +39,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       previewSrc={props.field.previewSrc(props.form.getState().values, props)}
       onDrop={async ([file]: File[]) => {
         const directory = props.field.uploadDir(props.form.getState().values)
+        // @ts-ignore cms.media
         const [media] = await cms.media.store.persist([
           {
             directory,
@@ -62,7 +63,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   )
 })
 
-export default {
+export const ImageFieldPlugin = {
   name: 'image',
   Component: ImageField,
   parse,
