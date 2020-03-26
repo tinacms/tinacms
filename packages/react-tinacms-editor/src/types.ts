@@ -16,19 +16,7 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { BlockField } from './inline-block-field'
-import { InlineTextFieldProps, InlineText } from '../inline-field-text'
-
-export function BlockText({ name, className }: InlineTextFieldProps) {
-  return (
-    <BlockField name={name}>
-      {({ input, status }) => {
-        if (status === 'active') {
-          return <InlineText {...input} className={className} />
-        }
-        return <>{input.value}</>
-      }}
-    </BlockField>
-  )
+export interface ImageProps {
+  upload?: (files: File[]) => Promise<string[]>
+  previewUrl?: (url: string) => string
 }

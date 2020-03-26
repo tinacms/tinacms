@@ -1,7 +1,7 @@
 {
   "name": "gatsby-tinacms-git",
   "main": "index.js",
-  "version": "0.4.2",
+  "version": "0.4.3",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -11,7 +11,9 @@
     "gatsby-node.js",
     "gatsby-node.d.ts",
     "CHANGELOG.md",
-    "README.md"
+    "README.md",
+    "src/**/*.js",
+    "src/**/*.d.ts"
   ],
   "keywords": [
     "tinacms",
