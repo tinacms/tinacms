@@ -17,8 +17,8 @@
   - [Forum](https://community.tinacms.org/)
 - [Contributing](./CONTRIBUTING.md)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
-  - [Current Projects](https://github.com/orgs/tinacms/projects)
-    - [Open Authoring with GitHub + Next.js](https://github.com/orgs/tinacms/projects/1)
+- [Projects](https://github.com/orgs/tinacms/projects)
+  - [Open Authoring with GitHub + Next.js](https://github.com/orgs/tinacms/projects/1)
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
 
