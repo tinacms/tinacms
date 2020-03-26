@@ -219,7 +219,7 @@ export function GroupField(props: GroupFieldProps) {
   return <div>Subfield: {props.field.label || props.field.name}</div>
 }
 
-export default {
+export const GroupFieldPlugin = {
   name: 'group',
   Component: Group,
 }

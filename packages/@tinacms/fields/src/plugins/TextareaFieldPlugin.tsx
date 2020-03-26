@@ -24,7 +24,7 @@ import { parse } from './textFormat'
 export const TextareaField = wrapFieldsWithMeta<{ input: InputProps }>(
   ({ input }) => <TextArea {...input} />
 )
-export default {
+export const TextareaFieldPlugin = {
   name: 'textarea',
   Component: TextareaField,
   parse,

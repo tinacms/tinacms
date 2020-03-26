@@ -21,7 +21,7 @@ import { Toggle } from '../components'
 
 export const ToggleField = wrapFieldsWithMeta(Toggle)
 
-export default {
+export const ToggleFieldPlugin = {
   name: 'toggle',
   type: 'checkbox',
   Component: ToggleField,

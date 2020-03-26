@@ -39,7 +39,7 @@ export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
   }
 )
 
-export default {
+export const ColorFieldPlugin = {
   name: 'color',
   Component: ColorField,
   parse,

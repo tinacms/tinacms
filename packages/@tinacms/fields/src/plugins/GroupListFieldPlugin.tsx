@@ -406,7 +406,7 @@ interface GroupFieldProps {
   field: Field
 }
 
-export default {
+export const GroupListFieldPlugin = {
   name: 'group-list',
   Component: Group,
 }
