@@ -29,7 +29,7 @@ To get started:
 ```bash
 git clone git@github.com:tinacms/tinacms.git
 cd tinacms
-npm install && npm run bootstrap
+npm install
 npm run build
 
 # Start Gatsby demo
@@ -37,7 +37,7 @@ cd packages/demo-gatsby
 npm run start
 ```
 
-**Do not run `npm install` from inside the `packages` directory**
+**WARNING: Do not run `npm install` from inside the `packages` directory**
 
 TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
 
@@ -47,9 +47,9 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 | ---------------------------------- | --------------------------------------------- |
 | npm run bootstrap                  | Install dependencies and link local packages. |
 | npm run build                      | Build all packages.                           |
-| npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
+| lerna run watch --scope \<package> | Build a the \<package> in watch mode.         |
 
 ### Testing With External Projects
 
