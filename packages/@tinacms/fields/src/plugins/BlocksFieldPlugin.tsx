@@ -31,7 +31,7 @@ import {
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from 'react-dismissible'
 import { IconButton } from '@tinacms/styles'
-import { useFormPortal } from '../../components/form/FormPortal'
+import { useFormPortal } from '@tinacms/react-forms'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'

@@ -23,7 +23,10 @@ import { parse } from './numberFormat'
 export const NumberField = wrapFieldsWithMeta<{
   step: string | number
   input: InputProps
-}>(({ input, field }) => <BaseNumberField {...input} step={field.step} />)
+}>(({ input, field }) => {
+  // @ts-ignore field.step
+  return <BaseNumberField {...input} step={field.step} />
+})
 
 export default {
   name: 'number',

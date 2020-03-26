@@ -32,6 +32,9 @@
     "@babel/core": "^7.5.5",
     "@storybook/addon-info": "^5.1.9",
     "@storybook/react": "^5.1.9",
+    "@tinacms/forms": "^0.3.0",
+    "@tinacms/form-builder": "^0.3.0",
+    "@tinacms/react-forms": "^0.0.0",
     "@tinacms/scripts": "^0.1.13",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
@@ -56,6 +59,9 @@
     "react-dropzone": "10.1.8"
   },
   "peerDependencies": {
+    "@tinacms/forms": ">=0.3",
+    "@tinacms/form-builder": ">=0.3",
+    "@tinacms/react-forms": ">=0.0",
     "react": ">=16.8",
     "react-dom": ">=16.8",
     "styled-components": ">=4.1"
