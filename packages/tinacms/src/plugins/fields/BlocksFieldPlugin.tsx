@@ -111,9 +111,6 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        {field.description && (
-          <FieldDescription>{field.description}</FieldDescription>
-        )}
         <IconButton
           onClick={() => setVisible(true)}
           open={visible}
