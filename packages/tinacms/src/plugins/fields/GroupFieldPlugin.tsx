@@ -22,6 +22,7 @@ import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
 import { useFormPortal } from '@tinacms/react-forms'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -36,7 +37,7 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = function Group({ tinaForm, field }: GroupProps) {
+export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <>
@@ -52,7 +53,7 @@ export const Group = function Group({ tinaForm, field }: GroupProps) {
       />
     </>
   )
-}
+})
 
 interface PanelProps {
   setExpanded(next: boolean): void
