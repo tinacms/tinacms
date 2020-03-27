@@ -32,7 +32,12 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
 
   const handleOpenBlockMenu = (event: React.MouseEvent) => {
     event.stopPropagation()
-    setIsOpen(isOpen => !isOpen)
+    templates.length == 1
+      ? addBlock({
+          _template: templates[0].type,
+          ...templates[0].defaultItem,
+        })
+      : setIsOpen(isOpen => !isOpen)
   }
 
   React.useEffect(() => {
