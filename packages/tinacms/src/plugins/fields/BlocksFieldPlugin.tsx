@@ -32,6 +32,12 @@ import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from 'react-dismissible'
 import { IconButton } from '@tinacms/styles'
 import { useFormPortal } from '@tinacms/react-forms'
+import { FieldDescription } from './wrapFieldWithMeta'
+import {
+  GroupListHeader,
+  GroupListMeta,
+  GroupLabel,
+} from './GroupListFieldPlugin'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -78,7 +84,7 @@ interface BlockFieldProps {
   tinaForm: Form
 }
 
-const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
+const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
       let obj: any = {}
@@ -99,7 +105,15 @@ const Blocks = function({ tinaForm, form, field, input }: BlockFieldProps) {
   return (
     <>
       <GroupListHeader>
-        <GroupLabel>{field.label || field.name}</GroupLabel>
+        <GroupListMeta>
+          <GroupLabel>{field.label || field.name}</GroupLabel>
+          {field.description && (
+            <FieldDescription>{field.description}</FieldDescription>
+          )}
+        </GroupListMeta>
+        {field.description && (
+          <FieldDescription>{field.description}</FieldDescription>
+        )}
         <IconButton
           onClick={() => setVisible(true)}
           open={visible}
@@ -358,37 +372,6 @@ const ItemClickTarget = styled.div`
   justify-content: space-between;
   align-items: center;
   padding: 8px;
-`
-
-const GroupLabel = styled.span<{ error?: boolean }>`
-  margin: 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: 500;
-  flex: 1 1 auto;
-  white-space: nowrap;
-  overflow: hidden;
-  text-overflow: ellipsis;
-  color: inherit;
-  transition: all 85ms ease-out;
-  text-align: left;
-
-  ${props =>
-    props.error &&
-    css`
-      color: var(--tina-color-error) !important;
-    `};
-`
-
-const GroupListHeader = styled.div`
-  display: flex;
-  width: 100%;
-  justify-content: space-between;
-  align-items: center;
-  margin-bottom: 12px;
-  position: relative;
-  ${GroupLabel} {
-    font-size: var(--tina-font-size-3);
-  }
 `
 
 const GroupListPanel = styled.div`
