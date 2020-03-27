@@ -31,6 +31,7 @@ import {
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { useFormPortal } from '@tinacms/react-forms'
+import { FieldDescription } from './wrapFieldWithMeta'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -68,7 +69,7 @@ interface GroupProps {
   tinaForm: Form
 }
 
-const Group = function Group({ tinaForm, form, field, input }: GroupProps) {
+const Group = ({ tinaForm, form, field, input }: GroupProps) => {
   const addItem = React.useCallback(() => {
     let obj = {}
     if (typeof field.defaultItem === 'function') {
@@ -91,7 +92,12 @@ const Group = function Group({ tinaForm, form, field, input }: GroupProps) {
   return (
     <>
       <GroupListHeader>
-        <GroupLabel>{field.label || field.name}</GroupLabel>
+        <GroupListMeta>
+          <GroupLabel>{field.label || field.name}</GroupLabel>
+          {field.description && (
+            <FieldDescription>{field.description}</FieldDescription>
+          )}
+        </GroupListMeta>
         <IconButton onClick={addItem} primary small>
           <AddIcon />
         </IconButton>
@@ -189,28 +195,42 @@ const ItemClickTarget = styled.div`
   padding: 8px;
 `
 
-const GroupLabel = styled.span`
+export const GroupLabel = styled.span<{ error?: boolean }>`
   margin: 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: 500;
+  font-size: var(--tina-font-size-1);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
   flex: 1 1 auto;
   white-space: nowrap;
   overflow: hidden;
   text-overflow: ellipsis;
-  color: inherit;
+  color: var(--tina-color-grey-8);
   transition: all 85ms ease-out;
   text-align: left;
+
+  ${props =>
+    props.error &&
+    css`
+      color: var(--tina-color-error) !important;
+    `};
 `
 
-const GroupListHeader = styled.div`
+export const GroupListHeader = styled.div`
   display: flex;
   width: 100%;
   justify-content: space-between;
   align-items: center;
-  margin-bottom: 12px;
-  ${GroupLabel} {
-    font-size: var(--tina-font-size-3);
+  margin-bottom: 8px;
+  ${FieldDescription} {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
   }
+`
+
+export const GroupListMeta = styled.div`
+  line-height: 1;
 `
 
 const GroupListPanel = styled.div`
@@ -251,7 +271,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   font-weight: 500;
 
   ${GroupLabel} {
-    color: #282828;
+    color: var(--tina-color-grey-8);
     align-self: center;
     max-width: 100%;
   }
