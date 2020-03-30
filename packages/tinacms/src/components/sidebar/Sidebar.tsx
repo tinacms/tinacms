@@ -31,10 +31,32 @@ import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
 import { useSubscribable, useCMS } from '../../react-tinacms'
-import { SidebarState } from '../../tina-cms'
+import { SidebarState, SidebarPosition } from '../../tina-cms'
 import { ScreenPluginView } from './ScreenPluginModal'
 
-export const Sidebar = () => {
+export function SidebarProvider({ children, position, hidden, cms }: any) {
+  useSubscribable(cms.sidebar)
+
+  React.useEffect(() => {
+    if (typeof hidden !== 'undefined') {
+      cms.sidebar.hidden = hidden
+    }
+  }, [hidden])
+
+  return (
+    <>
+      <SiteWrapper
+        open={cms.sidebar.isOpen}
+        position={position || cms.sidebar.position}
+      >
+        {children}
+      </SiteWrapper>
+      {!cms.sidebar.hidden && <Sidebar />}
+    </>
+  )
+}
+
+const Sidebar = () => {
   const cms = useCMS()
   useSubscribable(cms.sidebar)
   useSubscribable(cms.screens)
@@ -94,6 +116,26 @@ export const Sidebar = () => {
       </SidebarContainer>
     </TinaReset>
   )
+}
+
+const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
+  opacity: 1 !important;
+  background-color: transparent !important;
+  background-image: none !important;
+  overflow: visible !important;
+  position: absolute !important;
+  top: 0 !important;
+  right: 0 !important;
+  height: 100% !important;
+  width: ${props =>
+    isFixed(props.position) && props.open
+      ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
+      : '100%'} !important;
+  transition: width ${props => (props.open ? 150 : 200)}ms ease-out !important;
+`
+
+function isFixed(position: SidebarPosition): boolean {
+  return position === 'fixed' || position === 'displace'
 }
 
 const Watermark = styled(({ ...styleProps }: any) => {
