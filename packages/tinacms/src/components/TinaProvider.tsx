@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { ModalProvider } from '@tinacms/react-modals'
 import styled from 'styled-components'
-import { TinaReset, GlobalStyles } from '@tinacms/styles'
+import { GlobalStyles } from '@tinacms/styles'
 import { Sidebar } from './sidebar/Sidebar'
 import { SIDEBAR_WIDTH } from '../Globals'
 import { TinaCMS, SidebarPosition } from '../tina-cms'
@@ -56,12 +56,10 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
         {children}
       </SiteWrapper>
       {!cms.sidebar.hidden && (
-        <TinaReset>
-          <ModalProvider>
-            <Alerts alerts={cms.alerts} />
-            <Sidebar />
-          </ModalProvider>
-        </TinaReset>
+        <ModalProvider>
+          <Alerts alerts={cms.alerts} />
+          <Sidebar />
+        </ModalProvider>
       )}
     </CMSContext.Provider>
   )

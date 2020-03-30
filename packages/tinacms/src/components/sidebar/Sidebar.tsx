@@ -26,6 +26,7 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
+import { TinaReset } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin } from '../../plugins/screen-plugin'
@@ -43,53 +44,55 @@ export const Sidebar = () => {
   const showMenu = allScreens.length > 0
 
   return (
-    <SidebarContainer open={cms.sidebar.isOpen}>
-      <SidebarWrapper open={cms.sidebar.isOpen}>
-        <SidebarHeader>
+    <TinaReset>
+      <SidebarContainer open={cms.sidebar.isOpen}>
+        <SidebarWrapper open={cms.sidebar.isOpen}>
+          <SidebarHeader>
+            {showMenu && (
+              <MenuToggle
+                onClick={() => setMenuVisibility(!menuIsVisible)}
+                open={menuIsVisible}
+              >
+                <HamburgerIcon />
+              </MenuToggle>
+            )}
+            <CreateContentMenu />
+          </SidebarHeader>
+          <FormsView />
           {showMenu && (
-            <MenuToggle
-              onClick={() => setMenuVisibility(!menuIsVisible)}
-              open={menuIsVisible}
-            >
-              <HamburgerIcon />
-            </MenuToggle>
+            <MenuPanel visible={menuIsVisible}>
+              <MenuWrapper>
+                <MenuList>
+                  {allScreens.map(view => {
+                    const Icon = view.Icon
+                    return (
+                      <MenuLink
+                        key={view.name}
+                        value={view.name}
+                        onClick={() => {
+                          setActiveView(view)
+                          setMenuVisibility(false)
+                        }}
+                      >
+                        <Icon /> {view.name}
+                      </MenuLink>
+                    )
+                  })}
+                </MenuList>
+              </MenuWrapper>
+              <Watermark />
+            </MenuPanel>
           )}
-          <CreateContentMenu />
-        </SidebarHeader>
-        <FormsView />
-        {showMenu && (
-          <MenuPanel visible={menuIsVisible}>
-            <MenuWrapper>
-              <MenuList>
-                {allScreens.map(view => {
-                  const Icon = view.Icon
-                  return (
-                    <MenuLink
-                      key={view.name}
-                      value={view.name}
-                      onClick={() => {
-                        setActiveView(view)
-                        setMenuVisibility(false)
-                      }}
-                    >
-                      <Icon /> {view.name}
-                    </MenuLink>
-                  )
-                })}
-              </MenuList>
-            </MenuWrapper>
-            <Watermark />
-          </MenuPanel>
-        )}
-        {activeScreen && (
-          <ScreenPluginView
-            screen={activeScreen}
-            close={() => setActiveView(null)}
-          />
-        )}
-      </SidebarWrapper>
-      <SidebarToggle sidebar={cms.sidebar} />
-    </SidebarContainer>
+          {activeScreen && (
+            <ScreenPluginView
+              screen={activeScreen}
+              close={() => setActiveView(null)}
+            />
+          )}
+        </SidebarWrapper>
+        <SidebarToggle sidebar={cms.sidebar} />
+      </SidebarContainer>
+    </TinaReset>
   )
 }
 
