@@ -572,6 +572,24 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "blaggacao",
+      "name": "David Arnold",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/7548295?v=4",
+      "profile": "https://xoe.solutions",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "limitlessloop",
+      "name": "Gavin McFarland",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/5551?v=4",
+      "profile": "https://gavinmcfarland.co.uk/",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

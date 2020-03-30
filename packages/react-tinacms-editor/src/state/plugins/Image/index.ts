@@ -18,55 +18,103 @@ limitations under the License.
 
 import { Plugin, PluginKey } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+import { Slice } from 'prosemirror-model'
+import { insertImage } from '../../../commands'
 
 export const imagePluginKey = new PluginKey('image')
 
-export const imagePlugin = new Plugin({
-  key: imagePluginKey,
+const insertImageFiles = (
+  editorView: EditorView,
+  data: DataTransfer,
+  uploadImages: (files: File[]) => Promise<string[]>
+) => {
+  const files = []
+  for (let i = 0; i < data.files.length; i++) {
+    const file = data.files[i]
+    if (file.type.match('image.*')) files.push(file)
+  }
+  if (files.length) {
+    const uploadPromise = uploadImages(files)
+    uploadPromise.then((urls = []) => {
+      urls.forEach(url => {
+        const { state, dispatch } = editorView
+        insertImage(state, dispatch, url)
+      })
+      editorView.focus()
+    })
+    return true
+  }
+  return false
+}
 
-  state: {
-    init: () => {
-      return { selectedImage: undefined }
+export const imagePlugin = (
+  uploadImages?: (files: File[]) => Promise<string[]>
+) =>
+  new Plugin({
+    key: imagePluginKey,
+
+    state: {
+      init: () => {
+        return { selectedImage: undefined }
+      },
+      apply(tr, prev) {
+        if (prev && prev.selectedImage) {
+          const { pos } = prev.selectedImage
+          if (!tr.doc.nodeAt(pos)) return {}
+        }
+        const selectedImage = tr.getMeta('image_clicked')
+        if (selectedImage) return { selectedImage }
+        if (selectedImage === false) return { selectedImage: undefined }
+        return prev
+      },
     },
-    apply(tr, prev) {
-      if (prev && prev.selectedImage) {
-        const { pos } = prev.selectedImage
-        if (!tr.doc.nodeAt(pos)) return {}
-      }
-      const selectedImage = tr.getMeta('image_clicked')
-      if (selectedImage) return { selectedImage }
-      if (selectedImage === false) return { selectedImage: undefined }
-      return prev
-    },
-  },
-  props: {
-    decorations(state) {
-      return (this as any).getState(state).deco
-    },
-    handleKeyDown(view: EditorView, event: KeyboardEvent) {
-      if (event.key === 'Escape') {
+    props: {
+      decorations(state) {
+        return (this as any).getState(state).deco
+      },
+      handleKeyDown(view: EditorView, event: KeyboardEvent) {
+        if (event.key === 'Escape') {
+          const { state, dispatch } = view
+          dispatch(state.tr.setMeta('image_clicked', false))
+        }
+        return false
+      },
+      handleClickOn(
+        view: EditorView,
+        _1: any,
+        node: any,
+        nodePos: number,
+        _2: any,
+        direct: boolean
+      ) {
+        if (!direct) return false
         const { state, dispatch } = view
-        dispatch(state.tr.setMeta('image_clicked', false))
-      }
-      return false
+        const { image } = view.state.schema.nodes
+        if (node.type === image) {
+          dispatch(state.tr.setMeta('image_clicked', { pos: nodePos, node }))
+        } else {
+          dispatch(state.tr.setMeta('image_clicked', false))
+        }
+        return false
+      },
+      handleDrop(
+        editorView: EditorView,
+        event: Event,
+        _: Slice,
+        moved: boolean
+      ) {
+        if (moved || !uploadImages) return false
+        event.preventDefault()
+        const dataTransfer = (event as DragEvent).dataTransfer
+        if (!dataTransfer) return false
+        return insertImageFiles(editorView, dataTransfer, uploadImages)
+      },
+      handlePaste(editorView: EditorView, event: Event) {
+        if (!uploadImages) return false
+        event.preventDefault()
+        const clipboardData = (event as ClipboardEvent).clipboardData
+        if (!clipboardData) return false
+        return insertImageFiles(editorView, clipboardData, uploadImages)
+      },
     },
-    handleClickOn(
-      view: EditorView,
-      _1: any,
-      node: any,
-      nodePos: number,
-      _2: any,
-      direct: boolean
-    ) {
-      if (!direct) return false
-      const { state, dispatch } = view
-      const { image } = view.state.schema.nodes
-      if (node.type === image) {
-        dispatch(state.tr.setMeta('image_clicked', { pos: nodePos, node }))
-      } else {
-        dispatch(state.tr.setMeta('image_clicked', false))
-      }
-      return false
-    },
-  },
-})
+  })

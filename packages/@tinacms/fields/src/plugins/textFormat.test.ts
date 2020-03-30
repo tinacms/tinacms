@@ -15,20 +15,22 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import * as React from 'react'
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { NumberInput as BaseNumberField, InputProps } from '@tinacms/fields'
-import { parse } from './numberFormat';
 
-export const NumberField = wrapFieldsWithMeta<
-  { step: string | number },
-  InputProps
->(({ input, field }) => (
-  <BaseNumberField {...input} step={field.step} />
-))
+import { parse } from './textFormat'
 
-export default {
-  name: 'number',
-  Component: NumberField,
-  parse,
-}
+describe('text format', () => {
+  describe('parse', () => {
+    it("returns text field's value", () => {
+      const value = 'this is a test value'
+      const result = parse(value)
+
+      expect(result).toEqual(value)
+    })
+
+    it('returns empty string if value is undefined', () => {
+      const result = parse()
+
+      expect(result).toEqual('')
+    })
+  })
+})

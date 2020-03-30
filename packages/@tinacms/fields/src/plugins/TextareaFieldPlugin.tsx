@@ -16,13 +16,16 @@ limitations under the License.
 
 */
 
+import * as React from 'react'
+import { TextArea, InputProps } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { Toggle } from '@tinacms/fields'
+import { parse } from './textFormat'
 
-export const ToggleField = wrapFieldsWithMeta(Toggle)
-
-export default {
-  name: 'toggle',
-  type: 'checkbox',
-  Component: ToggleField,
+export const TextareaField = wrapFieldsWithMeta<{ input: InputProps }>(
+  ({ input }) => <TextArea {...input} />
+)
+export const TextareaFieldPlugin = {
+  name: 'textarea',
+  Component: TextareaField,
+  parse,
 }

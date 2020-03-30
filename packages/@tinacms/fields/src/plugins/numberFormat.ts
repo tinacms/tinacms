@@ -16,15 +16,4 @@ limitations under the License.
 
 */
 
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { Select } from '@tinacms/fields'
-import { parse } from './textFormat'
-
-export const SelectField = wrapFieldsWithMeta(Select)
-
-export default {
-  name: 'select',
-  type: 'select',
-  Component: SelectField,
-  parse,
-}
+export const parse = (value?: string) => value && +value

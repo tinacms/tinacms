@@ -92,7 +92,7 @@ const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
     isFixed(props.position) && props.open
       ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
       : '100%'} !important;
-  transition: all ${props => (props.open ? 150 : 200)}ms ease-out !important;
+  transition: width ${props => (props.open ? 150 : 200)}ms ease-out !important;
 `
 
 function isFixed(position: SidebarPosition): boolean {

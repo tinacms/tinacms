@@ -20,6 +20,7 @@ limitations under the License.
  * TinaCMS Core Types & React Interfaces
  */
 export * from './react-tinacms'
+export { ActionButton } from '@tinacms/react-forms'
 
 /**
  * The Tina CMS Class
@@ -49,7 +50,7 @@ export { GlobalFormPlugin } from './plugins/screens'
 export { ScreenPlugin } from './plugins/screen-plugin'
 
 // Pre-registered Plugins
-export * from './plugins/fields'
+export * from '@tinacms/fields'
 
 /**
  * REACT COMPONENTS
@@ -59,15 +60,17 @@ export * from './plugins/fields'
 export * from '@tinacms/form-builder'
 
 // Field/Input Component
-export { Toggle, Select, NumberInput, Input } from '@tinacms/fields'
+export {
+  Toggle,
+  Select,
+  NumberInput,
+  Input,
+  wrapFieldsWithMeta,
+} from '@tinacms/fields'
 export { Wysiwyg } from 'react-tinacms-editor'
-export { FieldMeta } from './plugins/fields/wrapFieldWithMeta'
 
 // Modal Components
 export * from '@tinacms/react-modals'
-
-// Form Actions Components
-export { ActionButton } from './components/form/FormActions'
 
 // Media Manager
 export * from './media'

@@ -20,10 +20,6 @@ import * as React from 'react'
 import { BlockField } from './inline-block-field'
 import { InlineTextFieldProps, InlineText } from '../inline-field-text'
 
-export interface BlockText {
-  name: string
-}
-
 export function BlockText({ name, className }: InlineTextFieldProps) {
   return (
     <BlockField name={name}>
