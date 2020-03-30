@@ -116,45 +116,120 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
             setShowImageModal(false)
           }}
         >
-          <div onMouseDown={evt => evt.stopPropagation()}>
-            <Input onChange={evt => setImageUrl(evt.target.value)}></Input>
-          </div>
-          <StyledLabel htmlFor="fileInput">
-            <FileUploadInput
-              id="fileInput"
-              onChange={uploadSelectedImage}
-              type="file"
-              accept="image/*"
-            />
-            <UploadSection
-              onDragEnter={stopDefault}
-              onDragOver={stopDefault}
-              onDrop={onImageDrop}
-              src={imageUrl}
-              uploading={uploading}
-            >
-              {imageUrl && <img src={imageUrl} alt="uploaded_image" />}
-              drag and drop
-              {uploading && 'UPLOADING'}
-            </UploadSection>
-          </StyledLabel>
-          <Button
-            onClick={() => {
-              setShowImageModal(false)
-            }}
-          >
-            Cancel
-          </Button>
-          <Button primary onClick={insertImageInEditor}>
-            Upload
-          </Button>
+          <ImageModalContent>
+            {imageUrl && (
+              <>
+                <ImageInputLabel>Current Image</ImageInputLabel>
+                <CurrentImage src={imageUrl} alt="uploaded_image" />
+              </>
+            )}
+            <div onMouseDown={evt => evt.stopPropagation()}>
+              <ImageInputLabel>URL</ImageInputLabel>
+              <Input
+                small
+                onChange={evt => setImageUrl(evt.target.value)}
+              ></Input>
+            </div>
+            <StyledLabel htmlFor="fileInput">
+              <FileUploadInput
+                id="fileInput"
+                onChange={uploadSelectedImage}
+                type="file"
+                accept="image/*"
+              />
+              <UploadSection
+                onDragEnter={stopDefault}
+                onDragOver={stopDefault}
+                onDrop={onImageDrop}
+                uploading={uploading}
+              >
+                <UploadText>
+                  {!uploading && `Drag and drop or click to upload`}
+                  {uploading && 'Image uploading...'}
+                </UploadText>
+              </UploadSection>
+            </StyledLabel>
+            <ImageModalActions>
+              <Button
+                small
+                onClick={() => {
+                  setShowImageModal(false)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button primary small onClick={insertImageInEditor}>
+                Upload
+              </Button>
+            </ImageModalActions>
+          </ImageModalContent>
         </Dismissible>
       </MenuButtonDropdown>
     </>
   )
 }
 
-const UploadSection = styled.div<{ uploading: boolean; src: string }>``
+const CurrentImage = styled.img`
+  display: block;
+  width: 100%;
+  margin-bottom: var(--tina-padding-small);
+  border-radius: var(--tina-radius-small);
+  border: 3px dashed var(--tina-color-grey-2);
+`
+
+const ImageInputLabel = styled.label`
+  display: block;
+  font-size: var(--tina-font-size-1);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: var(--tina-color-grey-8);
+  margin-bottom: 8px;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
+`
+
+const ImageModalContent = styled.div`
+  background: var(--tina-color-grey-1);
+  padding: var(--tina-padding-small);
+  font-family: var(--tina-font-family);
+
+  * {
+    font-family: inherit;
+  }
+`
+
+const ImageModalActions = styled.div`
+  display: flex;
+  margin: 0 -4px;
+  width: calc(100% + 8px);
+
+  ${Button} {
+    flex: 1 0 auto;
+    margin: 0 4px;
+  }
+`
+
+const UploadText = styled.span`
+  font-size: var(--tina-font-size-2);
+  text-align: center;
+  line-height: 1.2;
+  color: var(--tina-color-grey-10);
+  max-width: 120px;
+  display: block;
+  margin: 0 auto;
+`
+
+const UploadSection = styled.div<{ uploading: boolean }>`
+  display: block;
+  width: 100%;
+  padding: var(--tina-padding-big) 0;
+  margin: var(--tina-padding-small) 0;
+  border-radius: var(--tina-radius-big);
+  border: 3px dashed var(--tina-color-grey-3);
+  cursor: pointer;
+`
 
 const FileUploadInput = styled.input`
   display: none;
