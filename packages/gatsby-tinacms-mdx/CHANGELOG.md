@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.6](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-mdx@0.1.5...gatsby-tinacms-mdx@0.1.6) (2020-03-30)
+
+**Note:** Version bump only for package gatsby-tinacms-mdx
+
+
+
+
+
 ## [0.1.5](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-mdx@0.1.4...gatsby-tinacms-mdx@0.1.5) (2020-03-25)
 
 **Note:** Version bump only for package gatsby-tinacms-mdx

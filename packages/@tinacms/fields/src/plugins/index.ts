@@ -16,7 +16,13 @@ limitations under the License.
 
 */
 
-export * from './components'
-export * from './plugins'
-// TODO: Move this into components
-export * from './plugins/wrapFieldWithMeta'
+export * from './BlocksFieldPlugin'
+export * from './ColorFieldPlugin'
+export * from './GroupFieldPlugin'
+export * from './GroupListFieldPlugin'
+export * from './ImageFieldPlugin'
+export * from './NumberFieldPlugin'
+export * from './SelectFieldPlugin'
+export * from './TextareaFieldPlugin'
+export * from './TextFieldPlugin'
+export * from './ToggleFieldPlugin'

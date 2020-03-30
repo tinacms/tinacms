@@ -581,6 +581,24 @@
       "contributions": [
         "ideas"
       ]
+    },
+    {
+      "login": "limitlessloop",
+      "name": "Gavin McFarland",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/5551?v=4",
+      "profile": "https://gavinmcfarland.co.uk/",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "blandfried",
+      "name": "blandfried",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/1953556?v=4",
+      "profile": "https://github.com/blandfried",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

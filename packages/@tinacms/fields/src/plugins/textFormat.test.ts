@@ -16,13 +16,21 @@ limitations under the License.
 
 */
 
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { Toggle } from '@tinacms/fields'
+import { parse } from './textFormat'
 
-export const ToggleField = wrapFieldsWithMeta(Toggle)
+describe('text format', () => {
+  describe('parse', () => {
+    it("returns text field's value", () => {
+      const value = 'this is a test value'
+      const result = parse(value)
 
-export default {
-  name: 'toggle',
-  type: 'checkbox',
-  Component: ToggleField,
-}
+      expect(result).toEqual(value)
+    })
+
+    it('returns empty string if value is undefined', () => {
+      const result = parse()
+
+      expect(result).toEqual('')
+    })
+  })
+})
