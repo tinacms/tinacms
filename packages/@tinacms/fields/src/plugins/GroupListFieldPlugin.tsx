@@ -20,6 +20,7 @@ import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { css } from 'styled-components'
 import { FieldsBuilder } from '@tinacms/form-builder'
+import { IconButton } from '@tinacms/styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import {
   AddIcon,
@@ -29,29 +30,13 @@ import {
   LeftArrowIcon,
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { Dismissible } from 'react-dismissible'
-import { IconButton } from '@tinacms/styles'
 import { useFormPortal } from '@tinacms/react-forms'
 import { FieldDescription } from './wrapFieldWithMeta'
-import {
-  GroupListHeader,
-  GroupListMeta,
-  GroupLabel,
-} from './GroupListFieldPlugin'
 
-export interface BlocksFieldDefinititon extends Field {
-  component: 'blocks'
-  templates: {
-    [key: string]: BlockTemplate
-  }
-}
-
-export interface BlockTemplate {
-  type: string
-  label: string
-  defaultItem?: object | (() => object)
-  key: string
+interface GroupFieldDefinititon extends Field {
+  component: 'group'
   fields: Field[]
+  defaultItem?: object | (() => object)
   /**
    * An optional function which generates `props` for
    * this items's `li`.
@@ -76,32 +61,34 @@ export interface BlockTemplate {
   }
 }
 
-interface BlockFieldProps {
+interface GroupProps {
   input: any
   meta: any
-  field: BlocksFieldDefinititon
+  field: GroupFieldDefinititon
   form: any
   tinaForm: Form
 }
 
-const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
-  const addItem = React.useCallback(
-    (name: string, template: BlockTemplate) => {
-      let obj: any = {}
-      if (typeof template.defaultItem === 'function') {
-        obj = template.defaultItem()
-      } else {
-        obj = template.defaultItem || {}
-      }
-      obj._template = name
-      form.mutators.insert(field.name, 0, obj)
-    },
-    [field.name, form.mutators]
-  )
+const Group = ({ tinaForm, form, field, input }: GroupProps) => {
+  const addItem = React.useCallback(() => {
+    let obj = {}
+    if (typeof field.defaultItem === 'function') {
+      obj = field.defaultItem()
+    } else {
+      obj = field.defaultItem || {}
+    }
+    form.mutators.insert(field.name, 0, obj)
+  }, [form, field])
 
   const items = input.value || []
+  const itemProps = React.useCallback(
+    (item: object) => {
+      if (!field.itemProps) return {}
+      return field.itemProps(item)
+    },
+    [field.itemProps]
+  )
 
-  const [visible, setVisible] = React.useState(false)
   return (
     <>
       <GroupListHeader>
@@ -111,76 +98,27 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
             <FieldDescription>{field.description}</FieldDescription>
           )}
         </GroupListMeta>
-        <IconButton
-          onClick={() => setVisible(true)}
-          open={visible}
-          primary
-          small
-        >
+        <IconButton onClick={addItem} primary small>
           <AddIcon />
         </IconButton>
-        <BlockMenu open={visible}>
-          <Dismissible
-            click
-            escape
-            onDismiss={() => setVisible(false)}
-            disabled={!visible}
-          >
-            <BlockMenuList>
-              {Object.entries(field.templates).map(([name, template]) => (
-                <BlockOption
-                  key={name}
-                  onClick={() => {
-                    addItem(name, template)
-                    setVisible(false)
-                  }}
-                >
-                  {template.label}
-                </BlockOption>
-              ))}
-            </BlockMenuList>
-          </Dismissible>
-        </BlockMenu>
       </GroupListHeader>
       <GroupListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
             {provider => (
-              <div ref={provider.innerRef} className="edit-page--list-parent">
+              <div ref={provider.innerRef}>
                 {items.length === 0 && <EmptyState />}
-                {items.map((block: any, index: any) => {
-                  const template = field.templates[block._template]
-
-                  if (!template) {
-                    return (
-                      <InvalidBlockListItem
-                        // NOTE: Supressing warnings, but not helping with render perf
-                        key={index}
-                        index={index}
-                        field={field}
-                        tinaForm={tinaForm}
-                      />
-                    )
-                  }
-
-                  const itemProps = (item: object) => {
-                    if (!template.itemProps) return {}
-                    return template.itemProps(item)
-                  }
-
-                  return (
-                    <BlockListItem
-                      // NOTE: Supressing warnings, but not helping with render perf
-                      key={index}
-                      block={block}
-                      template={template}
-                      index={index}
-                      field={field}
-                      tinaForm={tinaForm}
-                      {...itemProps(block)}
-                    />
-                  )
-                })}
+                {items.map((item: any, index: any) => (
+                  <Item
+                    // NOTE: Supressing warnings, but not helping with render perf
+                    key={index}
+                    tinaForm={tinaForm}
+                    field={field}
+                    item={item}
+                    index={index}
+                    {...itemProps(item)}
+                  />
+                ))}
                 {provider.placeholder}
               </div>
             )}
@@ -193,33 +131,23 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
 
 const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
-interface BlockListItemProps {
+interface ItemProps {
   tinaForm: Form
-  field: BlocksFieldDefinititon
+  field: GroupFieldDefinititon
   index: number
-  block: any
-  template: BlockTemplate
+  item: any
   label?: string
 }
 
-const BlockListItem = ({
-  label,
-  tinaForm,
-  field,
-  index,
-  template,
-  block,
-}: BlockListItemProps) => {
+const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   const FormPortal = useFormPortal()
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
-
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
-
+  const title = label || (field.label || field.name) + ' Item'
   return (
     <Draggable
-      key={index}
       type={field.name}
       draggableId={`${field.name}.${index}`}
       index={index}
@@ -231,10 +159,11 @@ const BlockListItem = ({
             isDragging={snapshot.isDragging}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
+            {...p}
           >
             <DragHandle />
             <ItemClickTarget onClick={() => setExpanded(true)}>
-              <GroupLabel>{label || template.label}</GroupLabel>
+              <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
@@ -245,11 +174,9 @@ const BlockListItem = ({
               isExpanded={isExpanded}
               setExpanded={setExpanded}
               field={field}
-              item={block}
               index={index}
               tinaForm={tinaForm}
-              label={label || template.label}
-              template={template}
+              itemTitle={title}
             />
           </FormPortal>
         </>
@@ -257,109 +184,6 @@ const BlockListItem = ({
     </Draggable>
   )
 }
-
-const InvalidBlockListItem = ({
-  tinaForm,
-  field,
-  index,
-}: {
-  tinaForm: Form
-  field: Field
-  index: number
-}) => {
-  const removeItem = React.useCallback(() => {
-    tinaForm.mutators.remove(field.name, index)
-  }, [tinaForm, field, index])
-
-  return (
-    <Draggable
-      key={index}
-      type={field.name}
-      draggableId={`${field.name}.${index}`}
-      index={index}
-    >
-      {(provider, snapshot) => (
-        <ItemHeader
-          ref={provider.innerRef}
-          isDragging={snapshot.isDragging}
-          {...provider.draggableProps}
-          {...provider.dragHandleProps}
-        >
-          <DragHandle />
-          <ItemClickTarget>
-            <GroupLabel error>Invalid Block</GroupLabel>
-          </ItemClickTarget>
-          <DeleteButton onClick={removeItem}>
-            <TrashIcon />
-          </DeleteButton>
-        </ItemHeader>
-      )}
-    </Draggable>
-  )
-}
-
-const EmptyList = styled.div`
-  text-align: center;
-  border-radius: var(--tina-radius-small);
-  background-color: var(--tina-color-grey-2);
-  color: var(--tina-color-grey-4);
-  line-height: 1.35;
-  padding: 12px 0;
-  font-size: var(--tina-font-size-2);
-  font-weight: 500;
-`
-
-const BlockMenu = styled.div<{ open: boolean }>`
-  min-width: 192px;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid #efefef;
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 150ms ease-out;
-  transform-origin: 100% 0;
-  box-shadow: var(--tina-shadow-big);
-  background-color: white;
-  overflow: hidden;
-  z-index: 950;
-  ${props =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, 36px, 0) scale3d(1, 1, 1);
-    `};
-`
-
-const BlockMenuList = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const BlockOption = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-0);
-  padding: var(--tina-padding-small);
-  font-weight: 500;
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: var(--tina-color-grey-1);
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
-  }
-`
 
 const ItemClickTarget = styled.div`
   flex: 1 1 0;
@@ -371,6 +195,44 @@ const ItemClickTarget = styled.div`
   padding: 8px;
 `
 
+export const GroupLabel = styled.span<{ error?: boolean }>`
+  margin: 0;
+  font-size: var(--tina-font-size-1);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  flex: 1 1 auto;
+  white-space: nowrap;
+  overflow: hidden;
+  text-overflow: ellipsis;
+  color: var(--tina-color-grey-8);
+  transition: all 85ms ease-out;
+  text-align: left;
+
+  ${props =>
+    props.error &&
+    css`
+      color: var(--tina-color-error) !important;
+    `};
+`
+
+export const GroupListHeader = styled.div`
+  display: flex;
+  width: 100%;
+  justify-content: space-between;
+  align-items: center;
+  margin-bottom: 8px;
+  ${FieldDescription} {
+    white-space: nowrap;
+    overflow: hidden;
+    text-overflow: ellipsis;
+  }
+`
+
+export const GroupListMeta = styled.div`
+  line-height: 1;
+`
+
 const GroupListPanel = styled.div`
   max-height: initial;
   position: relative;
@@ -378,6 +240,17 @@ const GroupListPanel = styled.div`
   margin-bottom: 24px;
   border-radius: var(--tina-radius-small);
   background-color: var(--tina-color-grey-2);
+`
+
+const EmptyList = styled.div`
+  text-align: center;
+  border-radius: var(--tina-radius-small);
+  background-color: var(--tina-color-grey-2);
+  color: var(--tina-color-grey-4);
+  line-height: 1.35;
+  padding: 12px 0;
+  font-size: var(--tina-font-size-2);
+  font-weight: 500;
 `
 
 const ItemList = styled.div``
@@ -398,7 +271,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   font-weight: 500;
 
   ${GroupLabel} {
-    color: var(--tina-color-grey-10);
+    color: var(--tina-color-grey-8);
     align-self: center;
     max-width: 100%;
   }
@@ -462,7 +335,10 @@ const DeleteButton = styled.button`
   cursor: pointer;
   padding: 12px 8px;
   margin: 0;
-  transition: all var(--tina-timing-short) ease-out;
+  transition: all 85ms ease-out;
+  svg {
+    transition: all 85ms ease-out;
+  }
   &:hover {
     background-color: var(--tina-color-grey-1);
   }
@@ -494,7 +370,7 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
     width: 20px;
     height: 20px;
     transform: translate3d(-50%, -50%, 0);
-    transition: all var(--tina-timing-short) ease-out;
+    transition: all 85ms ease-out;
   }
   svg:last-child {
     opacity: 0;
@@ -514,10 +390,8 @@ interface PanelProps {
   isExpanded: boolean
   tinaForm: Form
   index: number
-  field: BlocksFieldDefinititon
-  item: any
-  label: string
-  template: BlockTemplate
+  field: GroupFieldDefinititon
+  itemTitle: string
 }
 
 const Panel = function Panel({
@@ -526,31 +400,33 @@ const Panel = function Panel({
   tinaForm,
   field,
   index,
-  label,
-  template,
+  itemTitle,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
-    return template.fields.map((subField: any) => ({
+    return field.fields.map((subField: any) => ({
       ...subField,
       name: `${field.name}.${index}.${subField.name}`,
     }))
-  }, [field.name, index, template.fields])
+  }, [field.fields, field.name, index])
 
   return (
     <GroupPanel isExpanded={isExpanded}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
-        <GroupLabel>{label}</GroupLabel>
+        <GroupLabel>{itemTitle}</GroupLabel>
       </PanelHeader>
       <PanelBody>
-        {/* RENDER OPTIMIZATION: Only render fields of expanded fields.  */}
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
       </PanelBody>
     </GroupPanel>
   )
 }
 
-export default {
-  name: 'blocks',
-  Component: Blocks,
+interface GroupFieldProps {
+  field: Field
+}
+
+export const GroupListFieldPlugin = {
+  name: 'group-list',
+  Component: Group,
 }

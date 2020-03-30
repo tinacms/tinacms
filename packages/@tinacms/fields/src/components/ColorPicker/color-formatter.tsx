@@ -56,7 +56,7 @@ function ParseColorStr(color?: string): ColorRGBA | null {
 
   const colorDescriptor = getColor(color)
 
-  if (!colorDescriptor) return null;
+  if (!colorDescriptor) return null
   const colorVals = colorDescriptor.value
 
   return { r: colorVals[0], g: colorVals[1], b: colorVals[2], a: colorVals[3] }

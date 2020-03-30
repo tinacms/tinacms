@@ -14,12 +14,12 @@
     "directory": "packages/react-tinacms-blocks"
   },
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint",
-    "docs": "npx typedoc"
+    "watch": "echo 'deprecated'",
+    "build": "echo 'deprecated'",
+    "dev": "echo 'deprecated'",
+    "test": "echo 'deprecated'",
+    "lint": "echo 'deprecated'",
+    "docs": "echo 'deprecated'"
   },
   "peerDependencies": {
     "react": ">=16.8",
