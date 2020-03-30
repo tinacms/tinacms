@@ -19,7 +19,8 @@ limitations under the License.
 import React, { useState, ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { EditorView } from 'prosemirror-view'
-
+import { Button } from '@tinacms/styles'
+import { Input } from '@tinacms/fields'
 import { MediaIcon } from '@tinacms/icons'
 import { insertImage } from '../../../../commands/image-commands'
 import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
@@ -116,7 +117,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
           }}
         >
           <div onMouseDown={evt => evt.stopPropagation()}>
-            url: <input onChange={evt => setImageUrl(evt.target.value)}></input>
+            <Input onChange={evt => setImageUrl(evt.target.value)}></Input>
           </div>
           <StyledLabel htmlFor="fileInput">
             <FileUploadInput
@@ -132,82 +133,31 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
               src={imageUrl}
               uploading={uploading}
             >
-              {imageUrl && (
-                <ImageWrapper>
-                  <StyledImage src={imageUrl} alt="uploaded_image" />
-                </ImageWrapper>
-              )}
-              <UploadLabel>
-                Drag and Drop the Image
-                <br />
-                or
-                <br />
-                Click to Upload
-              </UploadLabel>
+              {imageUrl && <img src={imageUrl} alt="uploaded_image" />}
+              drag and drop
               {uploading && 'UPLOADING'}
             </UploadSection>
           </StyledLabel>
-          <button onClick={insertImageInEditor}>upload</button>
+          <Button
+            onClick={() => {
+              setShowImageModal(false)
+            }}
+          >
+            Cancel
+          </Button>
+          <Button primary onClick={insertImageInEditor}>
+            Upload
+          </Button>
         </Dismissible>
       </MenuButtonDropdown>
     </>
   )
 }
 
-const UploadSection = styled.span<{ uploading: boolean; src: string }>`
-  align-items: center;
-  display: flex;
-  flex-direction: column;
-  justify-content: center;
-
-  margin: 28px auto 0 auto;
-  height: 80px;
-  min-width: 140px;
-  width: 140px;
-  padding: 20px;
-  position: relative;
-
-  background-repeat: no-repeat;
-  background-size: contain;
-  border: ${({ uploading, src }) =>
-    uploading || src ? `1px dashed blue` : `1px dashed black`};
-`
-
-const UploadLabel = styled.span`
-  margin-bottom: 10;
-  margin-top: 20;
-  text-align: center;
-  z-index: 1;
-`
-
-const StyledLabel = styled.label`
-  display: block;
-  height: 75%;
-  width: 100%;
-`
+const UploadSection = styled.div<{ uploading: boolean; src: string }>``
 
 const FileUploadInput = styled.input`
   display: none;
 `
 
-const ImageWrapper = styled.span`
-  padding: 5px;
-  position: absolute;
-
-  height: calc(100% - 10px);
-  left: 0;
-  top: 0;
-  width: calc(100% - 10px);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const StyledImage = styled.img`
-  height: auto;
-  width: auto;
-
-  max-height: 100%;
-  max-width: 100%;
-`
+const StyledLabel = styled.label``

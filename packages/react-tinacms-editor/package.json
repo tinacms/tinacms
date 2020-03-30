@@ -45,6 +45,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.7.3",
+    "@tinacms/fields": "^0.9.1",
     "@tinacms/icons": "^0.7.0",
     "@tinacms/styles": "^0.4.0",
     "codemirror": "^5.42.2",
