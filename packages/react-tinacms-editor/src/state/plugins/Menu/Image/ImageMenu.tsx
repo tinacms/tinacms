@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import React, { useEffect, useState, ChangeEvent } from 'react'
+import React, { useState, ChangeEvent } from 'react'
 import styled from 'styled-components'
 import { EditorView } from 'prosemirror-view'
 
@@ -36,21 +36,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const menuButtonRef = React.createRef()
-  const wrapperRef = React.createRef() as any
-
-  useEffect(() => {
-    if (!wrapperRef.current) return
-    const handleMousedown = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setShowImageModal(false)
-      }
-    }
-    window.addEventListener('mousedown', handleMousedown)
-    return () => {
-      window.removeEventListener('mousedown', handleMousedown)
-    }
-  }, [wrapperRef])
+  const menuButtonRef = React.useRef()
 
   const uploadImageFile = (file: File) => {
     setUploading(true)
@@ -108,11 +94,11 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
   return (
     <>
       <MenuButton
+        ref={menuButtonRef}
         onClick={() => {
           setShowImageModal(!showImageModal)
           setImageUrl('')
         }}
-        ref={menuButtonRef}
       >
         <MediaIcon />
       </MenuButton>
@@ -129,42 +115,39 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
             setShowImageModal(false)
           }}
         >
-          <div ref={wrapperRef}>
-            <div onMouseDown={evt => evt.stopPropagation()}>
-              url:{' '}
-              <input onChange={evt => setImageUrl(evt.target.value)}></input>
-            </div>
-            <StyledLabel htmlFor="fileInput">
-              <FileUploadInput
-                id="fileInput"
-                onChange={uploadSelectedImage}
-                type="file"
-                accept="image/*"
-              />
-              <UploadSection
-                onDragEnter={stopDefault}
-                onDragOver={stopDefault}
-                onDrop={onImageDrop}
-                src={imageUrl}
-                uploading={uploading}
-              >
-                {imageUrl && (
-                  <ImageWrapper>
-                    <StyledImage src={imageUrl} alt="uploaded_image" />
-                  </ImageWrapper>
-                )}
-                <UploadLabel>
-                  Drag and Drop the Image
-                  <br />
-                  or
-                  <br />
-                  Click to Upload
-                </UploadLabel>
-                {uploading && 'UPLOADING'}
-              </UploadSection>
-            </StyledLabel>
-            <button onClick={insertImageInEditor}>upload</button>
+          <div onMouseDown={evt => evt.stopPropagation()}>
+            url: <input onChange={evt => setImageUrl(evt.target.value)}></input>
           </div>
+          <StyledLabel htmlFor="fileInput">
+            <FileUploadInput
+              id="fileInput"
+              onChange={uploadSelectedImage}
+              type="file"
+              accept="image/*"
+            />
+            <UploadSection
+              onDragEnter={stopDefault}
+              onDragOver={stopDefault}
+              onDrop={onImageDrop}
+              src={imageUrl}
+              uploading={uploading}
+            >
+              {imageUrl && (
+                <ImageWrapper>
+                  <StyledImage src={imageUrl} alt="uploaded_image" />
+                </ImageWrapper>
+              )}
+              <UploadLabel>
+                Drag and Drop the Image
+                <br />
+                or
+                <br />
+                Click to Upload
+              </UploadLabel>
+              {uploading && 'UPLOADING'}
+            </UploadSection>
+          </StyledLabel>
+          <button onClick={insertImageInEditor}>upload</button>
         </Dismissible>
       </MenuButtonDropdown>
     </>
