@@ -23,6 +23,7 @@ import { EditorView } from 'prosemirror-view'
 import { MediaIcon } from '@tinacms/icons'
 import { insertImage } from '../../../../commands/image-commands'
 import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
+import { Dismissible } from 'react-dismissible'
 
 interface ImageMenu {
   editorView: { view: EditorView }
@@ -120,41 +121,51 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
         open={showImageModal}
         onKeyDown={handleKeyDown}
       >
-        <div ref={wrapperRef}>
-          <div onMouseDown={evt => evt.stopPropagation()}>
-            url: <input onChange={evt => setImageUrl(evt.target.value)}></input>
+        <Dismissible
+          click
+          escape
+          disabled={!showImageModal}
+          onDismiss={() => {
+            setShowImageModal(false)
+          }}
+        >
+          <div ref={wrapperRef}>
+            <div onMouseDown={evt => evt.stopPropagation()}>
+              url:{' '}
+              <input onChange={evt => setImageUrl(evt.target.value)}></input>
+            </div>
+            <StyledLabel htmlFor="fileInput">
+              <FileUploadInput
+                id="fileInput"
+                onChange={uploadSelectedImage}
+                type="file"
+                accept="image/*"
+              />
+              <UploadSection
+                onDragEnter={stopDefault}
+                onDragOver={stopDefault}
+                onDrop={onImageDrop}
+                src={imageUrl}
+                uploading={uploading}
+              >
+                {imageUrl && (
+                  <ImageWrapper>
+                    <StyledImage src={imageUrl} alt="uploaded_image" />
+                  </ImageWrapper>
+                )}
+                <UploadLabel>
+                  Drag and Drop the Image
+                  <br />
+                  or
+                  <br />
+                  Click to Upload
+                </UploadLabel>
+                {uploading && 'UPLOADING'}
+              </UploadSection>
+            </StyledLabel>
+            <button onClick={insertImageInEditor}>upload</button>
           </div>
-          <StyledLabel htmlFor="fileInput">
-            <FileUploadInput
-              id="fileInput"
-              onChange={uploadSelectedImage}
-              type="file"
-              accept="image/*"
-            />
-            <UploadSection
-              onDragEnter={stopDefault}
-              onDragOver={stopDefault}
-              onDrop={onImageDrop}
-              src={imageUrl}
-              uploading={uploading}
-            >
-              {imageUrl && (
-                <ImageWrapper>
-                  <StyledImage src={imageUrl} alt="uploaded_image" />
-                </ImageWrapper>
-              )}
-              <UploadLabel>
-                Drag and Drop the Image
-                <br />
-                or
-                <br />
-                Click to Upload
-              </UploadLabel>
-              {uploading && 'UPLOADING'}
-            </UploadSection>
-          </StyledLabel>
-          <button onClick={insertImageInEditor}>upload</button>
-        </div>
+        </Dismissible>
       </MenuButtonDropdown>
     </>
   )
