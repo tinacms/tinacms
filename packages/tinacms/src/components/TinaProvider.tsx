@@ -38,6 +38,20 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
   hidden,
   position,
 }) => {
+  return (
+    <CMSContext.Provider value={cms}>
+      <ModalProvider>
+        <GlobalStyles />
+        <Alerts alerts={cms.alerts} />
+        <SiteSidebar hidden={hidden} position={position} cms={cms}>
+          {children}
+        </SiteSidebar>
+      </ModalProvider>
+    </CMSContext.Provider>
+  )
+}
+
+function SiteSidebar({ children, position, hidden, cms }: any) {
   useSubscribable(cms.sidebar)
 
   React.useEffect(() => {
@@ -47,19 +61,15 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
   }, [hidden])
 
   return (
-    <CMSContext.Provider value={cms}>
-      <ModalProvider>
-        <GlobalStyles />
-        <Alerts alerts={cms.alerts} />
-        <SiteWrapper
-          open={cms.sidebar.isOpen}
-          position={position || cms.sidebar.position}
-        >
-          {children}
-        </SiteWrapper>
-        {!cms.sidebar.hidden && <Sidebar />}
-      </ModalProvider>
-    </CMSContext.Provider>
+    <>
+      <SiteWrapper
+        open={cms.sidebar.isOpen}
+        position={position || cms.sidebar.position}
+      >
+        {children}
+      </SiteWrapper>
+      {!cms.sidebar.hidden && <Sidebar />}
+    </>
   )
 }
 
