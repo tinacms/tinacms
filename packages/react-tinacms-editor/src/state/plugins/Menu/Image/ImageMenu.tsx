@@ -201,6 +201,13 @@ const UrlInputTrigger = styled.button`
   border: none;
   outline: none;
   color: var(--tina-color-primary);
+  cursor: pointer;
+  transition: all 80ms ease-out;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--tina-color-primary-light);
+  }
 `
 
 const UrlInput = styled.div``
