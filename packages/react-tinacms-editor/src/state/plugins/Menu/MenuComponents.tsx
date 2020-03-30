@@ -135,7 +135,6 @@ export const MenuButtonDropdown = styled(
       if (!triggerRef.current || !menuPortalRef.current) return 0
       const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
       const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
-      console.log(triggerRef.current)
       return menuDropdownBoundingBox.x - menuPortalBoundingBox.x
     }, [triggerRef.current, menuPortalRef.current])
 
