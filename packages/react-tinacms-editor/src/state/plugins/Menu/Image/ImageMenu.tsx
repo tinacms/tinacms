@@ -21,7 +21,7 @@ import styled from 'styled-components'
 import { EditorView } from 'prosemirror-view'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
-import { MediaIcon } from '@tinacms/icons'
+import { MediaIcon, UploadIcon } from '@tinacms/icons'
 import { insertImage } from '../../../../commands/image-commands'
 import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
 import { Dismissible } from 'react-dismissible'
@@ -143,6 +143,9 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                 onDrop={onImageDrop}
                 uploading={uploading}
               >
+                <UploadIconWrapper>
+                  <UploadIcon />
+                </UploadIconWrapper>
                 <UploadText>
                   {!uploading && `Drag and drop or click to upload`}
                   {uploading && 'Image uploading...'}
@@ -168,6 +171,17 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
     </>
   )
 }
+
+const UploadIconWrapper = styled.div`
+  display: flex;
+  justify-content: center;
+  margin-top: -7px;
+  svg {
+    width: 50px;
+    height: auto;
+    fill: var(--tina-color-primary);
+  }
+`
 
 const CurrentImage = styled.img`
   display: block;
