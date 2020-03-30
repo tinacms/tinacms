@@ -19,19 +19,21 @@
 import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from './plugins/screen-plugin'
-import TextFieldPlugin from './plugins/fields/TextFieldPlugin'
-import TextareaFieldPlugin from './plugins/fields/TextareaFieldPlugin'
+import {
+  TextFieldPlugin,
+  TextareaFieldPlugin,
+  ImageFieldPlugin,
+  ColorFieldPlugin,
+  NumberFieldPlugin,
+  ToggleFieldPlugin,
+  SelectFieldPlugin,
+  GroupFieldPlugin,
+  GroupListFieldPlugin,
+  BlocksFieldPlugin,
+} from '@tinacms/fields'
 import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
-import ImageFieldPlugin from './plugins/fields/ImageFieldPlugin'
-import ColorFieldPlugin from './plugins/fields/ColorFieldPlugin'
-import NumberFieldPlugin from './plugins/fields/NumberFieldPlugin'
-import ToggleFieldPlugin from './plugins/fields/ToggleFieldPlugin'
-import SelectFieldPlugin from './plugins/fields/SelectFieldPlugin'
-import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
-import GroupFieldPlugin from './plugins/fields/GroupFieldPlugin'
-import GroupListFieldPlugin from './plugins/fields/GroupListFieldPlugin'
-import BlocksFieldPlugin from './plugins/fields/BlocksFieldPlugin'
 import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
+import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from './media'
 import { Alerts } from './tina-cms/alerts'

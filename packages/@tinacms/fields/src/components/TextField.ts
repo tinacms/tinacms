@@ -29,6 +29,6 @@ export interface TextFieldProps extends a {
   ref?: any
 }
 
-export const TextField = styled.input<TextFieldProps>`
+export const BaseTextField = styled.input<TextFieldProps>`
   ${InputCss}
 `

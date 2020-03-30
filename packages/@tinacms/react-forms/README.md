@@ -1,2 +1,2 @@
-# @tinacms/react-alerts
+# @tinacms/react-forms
 
