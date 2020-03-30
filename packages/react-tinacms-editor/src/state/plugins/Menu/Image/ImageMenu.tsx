@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React, { useState, ChangeEvent } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { EditorView } from 'prosemirror-view'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
@@ -34,6 +34,7 @@ interface ImageMenu {
 export default ({ editorView, uploadImages }: ImageMenu) => {
   if (!uploadImages) return null
 
+  const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
@@ -117,19 +118,6 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
           }}
         >
           <ImageModalContent>
-            {imageUrl && (
-              <>
-                <ImageInputLabel>Current Image</ImageInputLabel>
-                <CurrentImage src={imageUrl} alt="uploaded_image" />
-              </>
-            )}
-            <div onMouseDown={evt => evt.stopPropagation()}>
-              <ImageInputLabel>URL</ImageInputLabel>
-              <Input
-                small
-                onChange={evt => setImageUrl(evt.target.value)}
-              ></Input>
-            </div>
             <StyledLabel htmlFor="fileInput">
               <FileUploadInput
                 id="fileInput"
@@ -142,16 +130,48 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                 onDragOver={stopDefault}
                 onDrop={onImageDrop}
                 uploading={uploading}
+                imageUrl={imageUrl}
               >
-                <UploadIconWrapper>
-                  <UploadIcon />
-                </UploadIconWrapper>
-                <UploadText>
-                  {!uploading && `Drag and drop or click to upload`}
-                  {uploading && 'Image uploading...'}
-                </UploadText>
+                {imageUrl && (
+                  <CurrentImage src={imageUrl} alt="uploaded_image" />
+                )}
+                {!imageUrl && (
+                  <>
+                    <UploadIconWrapper>
+                      <UploadIcon />
+                    </UploadIconWrapper>
+                    <UploadText>
+                      {!uploading && `Drag and drop or click to upload`}
+                      {uploading && 'Image uploading...'}
+                    </UploadText>
+                  </>
+                )}
               </UploadSection>
             </StyledLabel>
+            <UrlInputWrapper>
+              {displayUrlInput && (
+                <>
+                  <UrlInput onMouseDown={evt => evt.stopPropagation()}>
+                    <ImageInputLabel>URL</ImageInputLabel>
+                    <Input
+                      small
+                      onChange={evt => setImageUrl(evt.target.value)}
+                    ></Input>
+                  </UrlInput>
+                </>
+              )}
+              {!displayUrlInput && (
+                <>
+                  <UrlInputTrigger
+                    onClick={() => {
+                      setDisplayUrlInput(true)
+                    }}
+                  >
+                    Enter Image URL
+                  </UrlInputTrigger>
+                </>
+              )}
+            </UrlInputWrapper>
             <ImageModalActions>
               <Button
                 small
@@ -172,6 +192,19 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
   )
 }
 
+const UrlInputWrapper = styled.div`
+  margin-bottom: var(--tina-padding-small);
+`
+
+const UrlInputTrigger = styled.button`
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--tina-color-primary);
+`
+
+const UrlInput = styled.div``
+
 const UploadIconWrapper = styled.div`
   display: flex;
   justify-content: center;
@@ -186,9 +219,7 @@ const UploadIconWrapper = styled.div`
 const CurrentImage = styled.img`
   display: block;
   width: 100%;
-  margin-bottom: var(--tina-padding-small);
-  border-radius: var(--tina-radius-small);
-  border: 3px dashed var(--tina-color-grey-2);
+  margin: 0;
 `
 
 const ImageInputLabel = styled.label`
@@ -235,7 +266,7 @@ const UploadText = styled.span`
   margin: 0 auto;
 `
 
-const UploadSection = styled.div<{ uploading: boolean }>`
+const UploadSection = styled.div<{ uploading: boolean; imageUrl: string }>`
   display: block;
   width: 100%;
   padding: var(--tina-padding-big) 0;
@@ -243,6 +274,15 @@ const UploadSection = styled.div<{ uploading: boolean }>`
   border-radius: var(--tina-radius-big);
   border: 3px dashed var(--tina-color-grey-3);
   cursor: pointer;
+
+  ${props =>
+    props.imageUrl !== '' &&
+    css`
+      padding: 0;
+      border: none;
+      border-radius: var(--tina-radius-small);
+      border: 1px solid var(--tina-color-grey-2);
+    `};
 `
 
 const FileUploadInput = styled.input`
