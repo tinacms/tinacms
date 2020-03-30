@@ -16,10 +16,9 @@ limitations under the License.
 
 */
 
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import styled from 'styled-components'
 import { FC } from 'react'
-import { InputCss } from '@tinacms/fields'
+import { InputCss, wrapFieldsWithMeta } from '@tinacms/fields'
 
 const lightMediumGrey = `rgb(200, 200, 200)`
 const darkGrey = 'rgb(40, 40, 40)'

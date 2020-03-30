@@ -17,15 +17,30 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { TextArea, InputProps } from '@tinacms/fields'
+import { ColorPicker, InputProps } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { parse } from './textFormat'
 
-export const TextareaField = wrapFieldsWithMeta<InputProps>(({ input }) => (
-  <TextArea {...input} />
-))
-export default {
-  name: 'textarea',
-  Component: TextareaField,
+export interface ColorFieldProps {
+  colorFormat: string
+  colors: string[]
+  widget?: 'sketch' | 'block'
+}
+export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
+  ({ input, field }) => {
+    return (
+      <ColorPicker
+        colorFormat={(field as any).colorFormat}
+        userColors={(field as any).colors}
+        widget={(field as any).widget}
+        input={input}
+      />
+    )
+  }
+)
+
+export const ColorFieldPlugin = {
+  name: 'color',
+  Component: ColorField,
   parse,
 }

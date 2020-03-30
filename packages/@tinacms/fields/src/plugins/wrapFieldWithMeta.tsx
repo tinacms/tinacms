@@ -83,7 +83,7 @@ const FieldLabel = styled.label`
   overflow: hidden;
 `
 
-const FieldDescription = styled.p`
+export const FieldDescription = styled.p`
   color: var(--tina-color-grey-6);
   font-size: var(--tina-font-size-0);
   font-style: italic;

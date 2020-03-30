@@ -15,8 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import * as React from 'react'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { NumberInput as BaseNumberField, InputProps } from '../components'
+import { parse } from './numberFormat'
 
-export * from './components'
-export * from './plugins'
-// TODO: Move this into components
-export * from './plugins/wrapFieldWithMeta'
+export const NumberField = wrapFieldsWithMeta<{
+  step: string | number
+  input: InputProps
+}>(({ input, field }) => {
+  // @ts-ignore field.step
+  return <BaseNumberField {...input} step={field.step} />
+})
+
+export const NumberFieldPlugin = {
+  name: 'number',
+  Component: NumberField,
+  parse,
+}

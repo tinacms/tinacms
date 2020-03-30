@@ -1,25 +1,28 @@
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/h_46/v1573166832/Tina_CMS_Wordmark.png)](https://tinacms.org) &nbsp; [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
-
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Build Status](https://img.shields.io/endpoint.svg?url=https%3A%2F%2Factions-badge.atrox.dev%2Ftinacms%2Ftinacms%2Fbadge&style=flat)](https://actions-badge.atrox.dev/tinacms/tinacms/goto)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-55-orange.svg?style=flat-square)](#contributors-)
-
+[![All Contributors](https://img.shields.io/badge/all_contributors-57-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-## Getting Started
+# ![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png)
 
-- [Website](https://tinacms.org/)
-- [Documentation](https://tinacms.org/docs/)
-- [Slack](https://tinacms.slack.com)
-- [Forum](https://community.tinacms.org/)
-- [Roadmap](./ROADMAP.md)
-- [Contributing](./CONTRIBUTING.md)
-  - [How to Contribute](./CONTRIBUTING.md#How-to-Contribute)
-  - [Creating Packages](./CONTRIBUTING.md#Creating-Packages)
-  - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
+> Tina is an open-source toolkit for building content management directly into your website.
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
+
+## Learn More
+
+- [Website](https://tinacms.org/)
+  - [Blog](https://tinacms.org/docs/)
+  - [Docs](https://tinacms.org/docs/)
+- [Community](https://tinacms.org/docs/)
+  - [Slack](https://tinacms.slack.com)
+  - [Forum](https://community.tinacms.org/)
+- [Contributing](./CONTRIBUTING.md)
+  - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
+- [Projects](https://github.com/orgs/tinacms/projects)
+  - [Open Authoring with GitHub + Next.js](https://github.com/orgs/tinacms/projects/1)
 
 ## Development
 
@@ -28,7 +31,7 @@ To get started:
 ```bash
 git clone git@github.com:tinacms/tinacms.git
 cd tinacms
-npm install && npm run bootstrap
+npm install
 npm run build
 
 # Start Gatsby demo
@@ -36,7 +39,7 @@ cd packages/demo-gatsby
 npm run start
 ```
 
-**Do not run `npm install` from inside the `packages` directory**
+**WARNING: Do not run `npm install` from inside the `packages` directory**
 
 TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
 
@@ -46,9 +49,9 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 | ---------------------------------- | --------------------------------------------- |
 | npm run bootstrap                  | Install dependencies and link local packages. |
 | npm run build                      | Build all packages.                           |
-| npm run watch                      | Watch all packages for rebuilds.              |
 | npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
+| lerna run watch --scope \<package> | Build a the \<package> in watch mode.         |
 
 ### Testing With External Projects
 
@@ -58,25 +61,9 @@ Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and in
 
 ## Release Process
 
-Tina has two main branches:
+TinaCMS packages are updated every Monday.
 
-- **master:** The bleeding edge of tinacms
-- **latest:** The current stable release
-
-The flow of changes therefore looks like:
-
-> `fix-some-bug` => `master` => `latest`
-
-This is a weekly process:
-
-- On Monday `master` is merged into `latest` which is then published to npm.
-- Hot fixes are cherry picked onto `latest` and then published.
-- Prereleases are created off of `master` whenever they're needed.
-
-With this process:
-
-- critical fixes are published as soon as possible
-- new features and minor fixes take 3-5 days to be published
+Checkout the [RELEASE](./RELEASE.md) file for the details.
 
 ## Contributors ✨
 
@@ -156,12 +143,15 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://forestry.io"><img src="https://avatars3.githubusercontent.com/u/5414297?v=4" width="100px;" alt=""/><br /><sub><b>Jeff See</b></sub></a><br /><a href="#infra-jeffsee55" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="https://github.com/blandfried-magellan"><img src="https://avatars3.githubusercontent.com/u/38441047?v=4" width="100px;" alt=""/><br /><sub><b>Brandon Landfried</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Ablandfried-magellan" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/chaddjohnson"><img src="https://avatars0.githubusercontent.com/u/676134?v=4" width="100px;" alt=""/><br /><sub><b>Chad Johnson</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Achaddjohnson" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://xoe.solutions"><img src="https://avatars0.githubusercontent.com/u/7548295?v=4" width="100px;" alt=""/><br /><sub><b>David Arnold</b></sub></a><br /><a href="#ideas-blaggacao" title="Ideas, Planning, & Feedback">🤔</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://gavinmcfarland.co.uk/"><img src="https://avatars1.githubusercontent.com/u/5551?v=4" width="100px;" alt=""/><br /><sub><b>Gavin McFarland</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Alimitlessloop" title="Bug reports">🐛</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
-
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
