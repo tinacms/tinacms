@@ -48,6 +48,7 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
 
   return (
     <CMSContext.Provider value={cms}>
+      <GlobalStyles />
       <SiteWrapper
         open={cms.sidebar.isOpen}
         position={position || cms.sidebar.position}
@@ -55,15 +56,12 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
         {children}
       </SiteWrapper>
       {!cms.sidebar.hidden && (
-        <>
-          <GlobalStyles />
-          <TinaReset>
-            <ModalProvider>
-              <Alerts alerts={cms.alerts} />
-              <Sidebar />
-            </ModalProvider>
-          </TinaReset>
-        </>
+        <TinaReset>
+          <ModalProvider>
+            <Alerts alerts={cms.alerts} />
+            <Sidebar />
+          </ModalProvider>
+        </TinaReset>
       )}
     </CMSContext.Provider>
   )
