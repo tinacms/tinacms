@@ -152,7 +152,13 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
               {displayUrlInput && (
                 <>
                   <UrlInput onMouseDown={evt => evt.stopPropagation()}>
-                    <ImageInputLabel>URL</ImageInputLabel>
+                    <ImageInputLabel
+                      onClick={() => {
+                        setDisplayUrlInput(false)
+                      }}
+                    >
+                      Enter Image URL
+                    </ImageInputLabel>
                     <Input
                       small
                       onChange={evt => setImageUrl(evt.target.value)}
@@ -167,7 +173,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                       setDisplayUrlInput(true)
                     }}
                   >
-                    Or enter a URL
+                    Enter Image URL
                   </UrlInputTrigger>
                 </>
               )}
@@ -193,6 +199,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
 }
 
 const UrlInputWrapper = styled.div`
+  display: flex;
   margin-bottom: var(--tina-padding-small);
 `
 
@@ -203,6 +210,11 @@ const UrlInputTrigger = styled.button`
   color: var(--tina-color-primary);
   cursor: pointer;
   transition: all 80ms ease-out;
+  font-size: var(--tina-font-size-1);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  padding: 0;
 
   &:hover {
     text-decoration: underline;
