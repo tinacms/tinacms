@@ -16,13 +16,15 @@ limitations under the License.
 
 */
 
-import React, { useEffect, useState, ChangeEvent } from 'react'
-import styled from 'styled-components'
+import React, { useState, ChangeEvent } from 'react'
+import styled, { css } from 'styled-components'
 import { EditorView } from 'prosemirror-view'
-
-import { MediaIcon } from '@tinacms/icons'
+import { Button } from '@tinacms/styles'
+import { Input } from '@tinacms/fields'
+import { MediaIcon, UploadIcon } from '@tinacms/icons'
 import { insertImage } from '../../../../commands/image-commands'
 import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
+import { Dismissible } from 'react-dismissible'
 
 interface ImageMenu {
   editorView: { view: EditorView }
@@ -32,24 +34,11 @@ interface ImageMenu {
 export default ({ editorView, uploadImages }: ImageMenu) => {
   if (!uploadImages) return null
 
+  const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const menuButtonRef = React.createRef()
-  const wrapperRef = React.createRef() as any
-
-  useEffect(() => {
-    if (!wrapperRef.current) return
-    const handleMousedown = (event: MouseEvent) => {
-      if (wrapperRef.current && !wrapperRef.current.contains(event.target)) {
-        setShowImageModal(false)
-      }
-    }
-    window.addEventListener('mousedown', handleMousedown)
-    return () => {
-      window.removeEventListener('mousedown', handleMousedown)
-    }
-  }, [wrapperRef])
+  const menuButtonRef = React.useRef()
 
   const uploadImageFile = (file: File) => {
     setUploading(true)
@@ -107,11 +96,11 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
   return (
     <>
       <MenuButton
+        ref={menuButtonRef}
         onClick={() => {
           setShowImageModal(!showImageModal)
           setImageUrl('')
         }}
-        ref={menuButtonRef}
       >
         <MediaIcon />
       </MenuButton>
@@ -120,100 +109,203 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
         open={showImageModal}
         onKeyDown={handleKeyDown}
       >
-        <div ref={wrapperRef}>
-          <div onMouseDown={evt => evt.stopPropagation()}>
-            url: <input onChange={evt => setImageUrl(evt.target.value)}></input>
-          </div>
-          <StyledLabel htmlFor="fileInput">
-            <FileUploadInput
-              id="fileInput"
-              onChange={uploadSelectedImage}
-              type="file"
-              accept="image/*"
-            />
-            <UploadSection
-              onDragEnter={stopDefault}
-              onDragOver={stopDefault}
-              onDrop={onImageDrop}
-              src={imageUrl}
-              uploading={uploading}
-            >
-              {imageUrl && (
-                <ImageWrapper>
-                  <StyledImage src={imageUrl} alt="uploaded_image" />
-                </ImageWrapper>
+        <Dismissible
+          click
+          escape
+          disabled={!showImageModal}
+          onDismiss={() => {
+            setShowImageModal(false)
+          }}
+        >
+          <ImageModalContent>
+            <StyledLabel htmlFor="fileInput">
+              <FileUploadInput
+                id="fileInput"
+                onChange={uploadSelectedImage}
+                type="file"
+                accept="image/*"
+              />
+              <UploadSection
+                onDragEnter={stopDefault}
+                onDragOver={stopDefault}
+                onDrop={onImageDrop}
+                uploading={uploading}
+                imageUrl={imageUrl}
+              >
+                {imageUrl && (
+                  <CurrentImage src={imageUrl} alt="uploaded_image" />
+                )}
+                {!imageUrl && (
+                  <>
+                    <UploadIconWrapper>
+                      <UploadIcon />
+                    </UploadIconWrapper>
+                    <UploadText>
+                      {!uploading && `Drag and drop or click to upload`}
+                      {uploading && 'Image uploading...'}
+                    </UploadText>
+                  </>
+                )}
+              </UploadSection>
+            </StyledLabel>
+            <UrlInputWrapper>
+              {displayUrlInput && (
+                <>
+                  <UrlInput onMouseDown={evt => evt.stopPropagation()}>
+                    <ImageInputLabel
+                      onClick={() => {
+                        setDisplayUrlInput(false)
+                      }}
+                    >
+                      Or Enter Image URL
+                    </ImageInputLabel>
+                    <Input
+                      small
+                      onChange={evt => setImageUrl(evt.target.value)}
+                    ></Input>
+                  </UrlInput>
+                </>
               )}
-              <UploadLabel>
-                Drag and Drop the Image
-                <br />
-                or
-                <br />
-                Click to Upload
-              </UploadLabel>
-              {uploading && 'UPLOADING'}
-            </UploadSection>
-          </StyledLabel>
-          <button onClick={insertImageInEditor}>upload</button>
-        </div>
+              {!displayUrlInput && (
+                <>
+                  <UrlInputTrigger
+                    onClick={() => {
+                      setDisplayUrlInput(true)
+                    }}
+                  >
+                    Or Enter Image URL
+                  </UrlInputTrigger>
+                </>
+              )}
+            </UrlInputWrapper>
+            <ImageModalActions>
+              <Button
+                small
+                onClick={() => {
+                  setShowImageModal(false)
+                }}
+              >
+                Cancel
+              </Button>
+              <Button primary small onClick={insertImageInEditor}>
+                Insert
+              </Button>
+            </ImageModalActions>
+          </ImageModalContent>
+        </Dismissible>
       </MenuButtonDropdown>
     </>
   )
 }
 
-const UploadSection = styled.span<{ uploading: boolean; src: string }>`
-  align-items: center;
+const UrlInputWrapper = styled.div`
   display: flex;
-  flex-direction: column;
+  margin-bottom: var(--tina-padding-small);
+`
+
+const UrlInputTrigger = styled.button`
+  background: none;
+  border: none;
+  outline: none;
+  color: var(--tina-color-primary);
+  cursor: pointer;
+  transition: all 80ms ease-out;
+  font-size: var(--tina-font-size-1);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  padding: 0;
+
+  &:hover {
+    text-decoration: underline;
+    text-decoration-color: var(--tina-color-primary-light);
+  }
+`
+
+const UrlInput = styled.div``
+
+const UploadIconWrapper = styled.div`
+  display: flex;
   justify-content: center;
-
-  margin: 28px auto 0 auto;
-  height: 80px;
-  min-width: 140px;
-  width: 140px;
-  padding: 20px;
-  position: relative;
-
-  background-repeat: no-repeat;
-  background-size: contain;
-  border: ${({ uploading, src }) =>
-    uploading || src ? `1px dashed blue` : `1px dashed black`};
+  margin-top: -7px;
+  svg {
+    width: 50px;
+    height: auto;
+    fill: var(--tina-color-primary);
+  }
 `
 
-const UploadLabel = styled.span`
-  margin-bottom: 10;
-  margin-top: 20;
-  text-align: center;
-  z-index: 1;
-`
-
-const StyledLabel = styled.label`
+const CurrentImage = styled.img`
   display: block;
-  height: 75%;
   width: 100%;
+  margin: 0;
+`
+
+const ImageInputLabel = styled.label`
+  display: block;
+  font-size: var(--tina-font-size-1);
+  font-weight: 600;
+  letter-spacing: 0.01em;
+  line-height: 1.35;
+  color: var(--tina-color-grey-8);
+  margin-bottom: 8px;
+  text-overflow: ellipsis;
+  width: 100%;
+  overflow: hidden;
+`
+
+const ImageModalContent = styled.div`
+  background: var(--tina-color-grey-1);
+  padding: var(--tina-padding-small);
+  font-family: var(--tina-font-family);
+
+  * {
+    font-family: inherit;
+  }
+`
+
+const ImageModalActions = styled.div`
+  display: flex;
+  margin: 0 -4px;
+  width: calc(100% + 8px);
+
+  ${Button} {
+    flex: 1 0 auto;
+    margin: 0 4px;
+  }
+`
+
+const UploadText = styled.span`
+  font-size: var(--tina-font-size-2);
+  text-align: center;
+  line-height: 1.2;
+  color: var(--tina-color-grey-10);
+  max-width: 120px;
+  display: block;
+  margin: 0 auto;
+`
+
+const UploadSection = styled.div<{ uploading: boolean; imageUrl: string }>`
+  display: block;
+  width: 100%;
+  padding: var(--tina-padding-big) 0;
+  margin: var(--tina-padding-small) 0;
+  border-radius: var(--tina-radius-big);
+  border: 3px dashed var(--tina-color-grey-3);
+  cursor: pointer;
+
+  ${props =>
+    props.imageUrl !== '' &&
+    css`
+      padding: 0;
+      border: none;
+      border-radius: var(--tina-radius-small);
+      border: 1px solid var(--tina-color-grey-2);
+    `};
 `
 
 const FileUploadInput = styled.input`
   display: none;
 `
 
-const ImageWrapper = styled.span`
-  padding: 5px;
-  position: absolute;
-
-  height: calc(100% - 10px);
-  left: 0;
-  top: 0;
-  width: calc(100% - 10px);
-
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
-
-const StyledImage = styled.img`
-  height: auto;
-  width: auto;
-
-  max-height: 100%;
-  max-width: 100%;
-`
+const StyledLabel = styled.label``
