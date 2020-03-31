@@ -93,15 +93,14 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
     if (event.key === 'Escape') setShowImageModal(false)
   }
 
+  const handleCloseModal = () => {
+    setImageUrl('')
+    setShowImageModal(!showImageModal)
+  }
+
   return (
     <>
-      <MenuButton
-        ref={menuButtonRef}
-        onClick={() => {
-          setShowImageModal(!showImageModal)
-          setImageUrl('')
-        }}
-      >
+      <MenuButton ref={menuButtonRef} onClick={handleCloseModal}>
         <MediaIcon />
       </MenuButton>
       <MenuButtonDropdown
@@ -134,7 +133,12 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
               >
                 {imageUrl && (
                   <>
-                    <ClearImageButton>
+                    <ClearImageButton
+                      onMouseDown={evt => {
+                        setImageUrl('')
+                        evt.stopPropagation()
+                      }}
+                    >
                       <CloseIcon />
                     </ClearImageButton>
                     <CurrentImage src={imageUrl} alt="uploaded_image" />
@@ -167,6 +171,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                     <Input
                       small
                       onChange={evt => setImageUrl(evt.target.value)}
+                      value={imageUrl}
                     ></Input>
                   </UrlInput>
                 </>
@@ -184,12 +189,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
               )}
             </UrlInputWrapper>
             <ImageModalActions>
-              <Button
-                small
-                onClick={() => {
-                  setShowImageModal(false)
-                }}
-              >
+              <Button small onClick={handleCloseModal}>
                 Cancel
               </Button>
               <Button primary small onClick={insertImageInEditor}>

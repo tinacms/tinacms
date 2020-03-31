@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-blocks",
-  "version": "0.4.0",
+  "version": "0.4.2",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-blocks.esm.js",
@@ -14,12 +14,12 @@
     "directory": "packages/react-tinacms-blocks"
   },
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint",
-    "docs": "npx typedoc"
+    "watch": "echo 'deprecated'",
+    "build": "echo 'deprecated'",
+    "dev": "echo 'deprecated'",
+    "test": "echo 'deprecated'",
+    "lint": "echo 'deprecated'",
+    "docs": "echo 'deprecated'"
   },
   "peerDependencies": {
     "react": ">=16.8",
@@ -28,6 +28,6 @@
   "devDependencies": {
     "@tinacms/icons": "^0.7.0",
     "@tinacms/styles": "^0.4.0",
-    "tinacms": "^0.18.0"
+    "tinacms": "^0.18.2"
   }
 }

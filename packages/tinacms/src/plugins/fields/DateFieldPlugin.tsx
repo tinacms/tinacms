@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InputProps } from '@tinacms/fields'
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { InputProps, wrapFieldsWithMeta } from '@tinacms/fields'
 import ReactDatetime from 'react-datetime'
 import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { DatetimepickerProps } from 'react-datetime'

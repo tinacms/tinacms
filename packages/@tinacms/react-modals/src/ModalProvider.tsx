@@ -21,7 +21,7 @@ import { useCallback, useState, ReactNode } from 'react'
 import { createPortal } from 'react-dom'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
-import { Button } from '@tinacms/styles'
+import { Button, TinaReset } from '@tinacms/styles'
 export const Z_INDEX = 2147000000
 
 interface Props {
@@ -79,9 +79,11 @@ export const Modal = ({
 
   return portalNode && portalNode
     ? (createPortal(
-        <ModalOverlay>
-          <div {...props} />
-        </ModalOverlay>,
+        <TinaReset>
+          <ModalOverlay>
+            <div {...props} />
+          </ModalOverlay>
+        </TinaReset>,
         portalNode
       ) as any)
     : null

@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.7.9",
+  "version": "0.7.11",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -34,8 +34,8 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
     "@types/js-yaml": "^3.12.1",
-    "gatsby-tinacms-git": "^0.4.3",
-    "tinacms": "^0.18.0"
+    "gatsby-tinacms-git": "^0.4.5",
+    "tinacms": "^0.18.2"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
