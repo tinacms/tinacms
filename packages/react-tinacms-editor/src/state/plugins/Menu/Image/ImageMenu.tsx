@@ -167,7 +167,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                       setDisplayUrlInput(true)
                     }}
                   >
-                    Enter Image URL
+                    Or enter a URL
                   </UrlInputTrigger>
                 </>
               )}
