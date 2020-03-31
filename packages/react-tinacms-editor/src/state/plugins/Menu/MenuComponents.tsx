@@ -73,7 +73,7 @@ export const MenuContainer = styled.div`
 `
 
 const MenuItem = css`
-  flex: 1 1 20px;
+  flex: 1 1 32px;
 `
 
 export const MenuButton = styled.button<{
