@@ -21,7 +21,7 @@ import styled, { css } from 'styled-components'
 import { EditorView } from 'prosemirror-view'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
-import { MediaIcon, UploadIcon } from '@tinacms/icons'
+import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
 import { insertImage } from '../../../../commands/image-commands'
 import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
 import { Dismissible } from 'react-dismissible'
@@ -133,7 +133,12 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                 imageUrl={imageUrl}
               >
                 {imageUrl && (
-                  <CurrentImage src={imageUrl} alt="uploaded_image" />
+                  <>
+                    <ClearImageButton>
+                      <CloseIcon />
+                    </ClearImageButton>
+                    <CurrentImage src={imageUrl} alt="uploaded_image" />
+                  </>
                 )}
                 {!imageUrl && (
                   <>
@@ -197,6 +202,37 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
     </>
   )
 }
+
+const ClearImageButton = styled.button`
+  background: none;
+  border: none;
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  outline: none;
+  width: 32px;
+  height: 32px;
+  padding: 0;
+  position: absolute;
+  top: 18px;
+  right: 18px;
+  border-radius: var(--tina-radius-big);
+  box-shadow: var(--tina-shadow-small);
+  background-color: var(--tina-color-grey-0);
+  border: 1px solid var(--tina-color-grey-2);
+  cursor: pointer;
+  transition: all 85ms ease-out;
+
+  &:hover {
+    background-color: var(--tina-color-grey-1);
+  }
+
+  svg {
+    fill: var(--tina-color-primary);
+    width: 22px;
+    height: 22px;
+  }
+`
 
 const UrlInputWrapper = styled.div`
   display: flex;
@@ -288,8 +324,9 @@ const UploadText = styled.span`
 const UploadSection = styled.div<{ uploading: boolean; imageUrl: string }>`
   display: block;
   width: 100%;
+  min-width: 200px;
   padding: var(--tina-padding-big) 0;
-  margin: var(--tina-padding-small) 0;
+  margin-bottom: var(--tina-padding-small);
   border-radius: var(--tina-radius-big);
   border: 3px dashed var(--tina-color-grey-3);
   cursor: pointer;
