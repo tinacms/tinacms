@@ -32,10 +32,11 @@ describe('Form', () => {
     })
   })
   describe('#onSubmit', () => {
+    const initialValues = { title: 'hello' }
+    const reinitialValues = { title: 'world' }
+
     describe('after a successful submission', () => {
       it('reinitializes the form with the new values', async () => {
-        const initialValues = { title: 'hello' }
-        const reinitialValues = { title: 'world' }
         const form = new Form({
           id: 'example',
           label: 'Example',
@@ -48,6 +49,28 @@ describe('Form', () => {
         await form.submit()
 
         expect(form.finalForm.getState().initialValues).toEqual(reinitialValues)
+      })
+    })
+
+    describe('after a failed submission', () => {
+      it('does not reinitialize the form', async () => {
+        const form = new Form({
+          id: 'example',
+          label: 'Example',
+          fields: [{ name: 'title', component: 'text' }],
+          onSubmit: jest.fn(() => {
+            throw new Error()
+          }),
+          initialValues,
+        })
+
+        form.finalForm.change('title', reinitialValues.title)
+
+        try {
+          await form.submit()
+        } catch (e) {}
+
+        expect(form.finalForm.getState().initialValues).toEqual(initialValues)
       })
     })
   })
