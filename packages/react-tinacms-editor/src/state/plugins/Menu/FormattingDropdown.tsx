@@ -25,11 +25,7 @@ import { Dismissible } from 'react-dismissible'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
-import {
-  MenuButton,
-  MenuButtonDropdown,
-  MenuDropdownWrapper,
-} from './MenuComponents'
+import { MenuButton, MenuButtonDropdown } from './MenuComponents'
 import styled, { css } from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
 import { EditorView } from 'prosemirror-view'
@@ -60,7 +56,7 @@ export class FormattingDropdown extends React.Component<
   render() {
     const { view } = this.props
     return (
-      <MenuDropdownWrapper>
+      <>
         <MenuButton
           ref={this.menuButtonRef}
           data-tooltip={'Heading'}
@@ -89,7 +85,7 @@ export class FormattingDropdown extends React.Component<
             <H6 view={view} onClick={this.toggle} />
           </Dismissible>
         </MenuButtonDropdown>
-      </MenuDropdownWrapper>
+      </>
     )
   }
 }

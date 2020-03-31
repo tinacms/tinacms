@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useMemo } from 'react'
 
 import styled, { css } from 'styled-components'
 import { useMenuPortal } from './MenuPortal'
@@ -66,7 +65,7 @@ export const MenuContainer = styled.div`
   top: 0;
   width: 100%;
   background-color: white;
-  border-radius: var(--tina-radius-large);
+  border-radius: var(--tina-radius-small);
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
@@ -74,7 +73,7 @@ export const MenuContainer = styled.div`
 `
 
 const MenuItem = css`
-  flex: 1 1 24px;
+  flex: 1 1 32px;
 `
 
 export const MenuButton = styled.button<{
@@ -127,21 +126,12 @@ export const MenuButton = styled.button<{
     `};
 `
 
-export const MenuDropdownWrapper = styled.div`
-  ${MenuItem}
-  position: relative;
-
-  ${MenuButton} {
-    width: 100%;
-  }
-`
-
 export const MenuButtonDropdown = styled(
-  ({ children, open, triggerRef, ...styleProps }) => {
+  ({ children, open, triggerRef, innerRef, ...styleProps }) => {
     const MenuPortal = useMenuPortal()
     const menuPortalRef = React.useRef<HTMLDivElement | null>(null)
 
-    const menuOffset = useMemo(() => {
+    const menuOffset = React.useMemo(() => {
       if (!triggerRef.current || !menuPortalRef.current) return 0
       const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
       const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
@@ -159,7 +149,7 @@ export const MenuButtonDropdown = styled(
     )
   }
 )`
-  border-radius: var(--tina-radius-big);
+  border-radius: var(--tina-radius-small);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
