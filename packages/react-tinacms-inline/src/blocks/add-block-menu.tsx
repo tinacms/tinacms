@@ -30,8 +30,7 @@ interface AddBlockMenuProps {
 export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
   const [isOpen, setIsOpen] = React.useState(false)
 
-  const handleOpenBlockMenu = (event: React.MouseEvent) => {
-    event.stopPropagation()
+  const handleOpenBlockMenu = () => {
     templates.length == 1
       ? addBlock({
           _template: templates[0].type,
