@@ -157,7 +157,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                         setDisplayUrlInput(false)
                       }}
                     >
-                      Enter Image URL
+                      Or Enter Image URL
                     </ImageInputLabel>
                     <Input
                       small
@@ -173,7 +173,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                       setDisplayUrlInput(true)
                     }}
                   >
-                    Enter Image URL
+                    Or Enter Image URL
                   </UrlInputTrigger>
                 </>
               )}
@@ -188,7 +188,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
                 Cancel
               </Button>
               <Button primary small onClick={insertImageInEditor}>
-                Upload
+                Insert
               </Button>
             </ImageModalActions>
           </ImageModalContent>
