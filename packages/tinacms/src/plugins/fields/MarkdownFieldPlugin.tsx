@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import { Wysiwyg } from 'react-tinacms-editor'
-import { parse } from './textFormat'
+import { TextFieldPlugin } from '@tinacms/fields'
 import { wysiwygStyles } from './wysiwygStyles'
 
 export const MarkdownField = wysiwygStyles(props => {
@@ -28,5 +28,5 @@ export const MarkdownField = wysiwygStyles(props => {
 export default {
   name: 'markdown',
   Component: MarkdownField,
-  parse,
+  parse: TextFieldPlugin.parse,
 }

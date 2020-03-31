@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ColorPicker, InputProps } from '@tinacms/fields'
+import { ColorPicker, InputProps } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { parse } from './textFormat'
 
@@ -39,7 +39,7 @@ export const ColorField = wrapFieldsWithMeta<InputProps, ColorFieldProps>(
   }
 )
 
-export default {
+export const ColorFieldPlugin = {
   name: 'color',
   Component: ColorField,
   parse,

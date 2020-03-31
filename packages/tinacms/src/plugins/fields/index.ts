@@ -16,15 +16,17 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
+export {
+  BlocksFieldPlugin,
+  ColorFieldPlugin,
+  GroupFieldPlugin,
+  GroupListFieldPlugin,
+  NumberFieldPlugin,
+  SelectFieldPlugin,
+  TextFieldPlugin,
+  TextareaFieldPlugin,
+  ToggleFieldPlugin,
+} from '@tinacms/fields'
 export * from './HtmlFieldPlugin'
-export * from './TextFieldPlugin'
 export * from './MarkdownFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './SelectFieldPlugin'
 export * from './DateFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'

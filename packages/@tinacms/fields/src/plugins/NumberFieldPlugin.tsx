@@ -15,17 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
 import * as React from 'react'
-import { TextArea, InputProps } from '@tinacms/fields'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { parse } from './textFormat'
+import { NumberInput as BaseNumberField, InputProps } from '../components'
+import { parse } from './numberFormat'
 
-export const TextareaField = wrapFieldsWithMeta<InputProps>(({ input }) => (
-  <TextArea {...input} />
-))
-export default {
-  name: 'textarea',
-  Component: TextareaField,
+export const NumberField = wrapFieldsWithMeta<{
+  step: string | number
+  input: InputProps
+}>(({ input, field }) => {
+  // @ts-ignore field.step
+  return <BaseNumberField {...input} step={field.step} />
+})
+
+export const NumberFieldPlugin = {
+  name: 'number',
+  Component: NumberField,
   parse,
 }
