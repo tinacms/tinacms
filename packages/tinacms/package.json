@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.18.1",
+  "version": "0.18.2",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [

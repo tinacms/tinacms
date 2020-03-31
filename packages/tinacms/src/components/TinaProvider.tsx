@@ -18,12 +18,10 @@ limitations under the License.
 
 import * as React from 'react'
 import { ModalProvider } from '@tinacms/react-modals'
-import styled from 'styled-components'
-import { TinaReset, GlobalStyles } from '@tinacms/styles'
-import { Sidebar } from './sidebar/Sidebar'
-import { SIDEBAR_WIDTH } from '../Globals'
+import { GlobalStyles } from '@tinacms/styles'
+import { SidebarProvider } from './sidebar/Sidebar'
 import { TinaCMS, SidebarPosition } from '../tina-cms'
-import { CMSContext, useSubscribable } from '../react-tinacms'
+import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
 
 export interface TinaProviderProps {
@@ -38,33 +36,15 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
   hidden,
   position,
 }) => {
-  useSubscribable(cms.sidebar)
-
-  React.useEffect(() => {
-    if (typeof hidden !== 'undefined') {
-      cms.sidebar.hidden = hidden
-    }
-  }, [hidden])
-
   return (
     <CMSContext.Provider value={cms}>
-      <SiteWrapper
-        open={cms.sidebar.isOpen}
-        position={position || cms.sidebar.position}
-      >
-        {children}
-      </SiteWrapper>
-      {!cms.sidebar.hidden && (
-        <>
-          <GlobalStyles />
-          <TinaReset>
-            <ModalProvider>
-              <Alerts alerts={cms.alerts} />
-              <Sidebar />
-            </ModalProvider>
-          </TinaReset>
-        </>
-      )}
+      <ModalProvider>
+        <GlobalStyles />
+        <Alerts alerts={cms.alerts} />
+        <SidebarProvider hidden={hidden} position={position} cms={cms}>
+          {children}
+        </SidebarProvider>
+      </ModalProvider>
     </CMSContext.Provider>
   )
 }
@@ -78,23 +58,3 @@ export const Tina = TinaProvider
  * @deprecated This has been renamed to `TinaProviderProps`.
  */
 export type TinaProps = TinaProviderProps
-
-const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
-  opacity: 1 !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  overflow: visible !important;
-  position: absolute !important;
-  top: 0 !important;
-  right: 0 !important;
-  height: 100% !important;
-  width: ${props =>
-    isFixed(props.position) && props.open
-      ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
-      : '100%'} !important;
-  transition: width ${props => (props.open ? 150 : 200)}ms ease-out !important;
-`
-
-function isFixed(position: SidebarPosition): boolean {
-  return position === 'fixed' || position === 'displace'
-}
