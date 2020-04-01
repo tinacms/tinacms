@@ -103,6 +103,10 @@ export class Form<S = any> implements Plugin {
     return this.finalForm.getState().initialValues
   }
 
+  get pristine() {
+    return this.finalForm.getState().pristine
+  }
+
   /**
    * Resets the values back to the initial values the form was initialized with.
    * Or empties all the values if the form was not initialized.
