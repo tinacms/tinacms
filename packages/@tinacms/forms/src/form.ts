@@ -57,14 +57,14 @@ interface FieldSubscription {
 }
 
 export class Form<S = any> implements Plugin {
+  private _reset?(): void
+
   __type: string
   id: any
   label: string
   fields: Field[]
   finalForm: FormApi<S>
   actions: any[]
-  initialValues: any
-  reset?(): void
   meta: { [key: string]: any }
 
   constructor({
@@ -103,9 +103,8 @@ export class Form<S = any> implements Plugin {
     })
 
     this.meta = options.meta || {}
-    this.reset = reset
+    this._reset = reset
     this.actions = actions || []
-    this.initialValues = initialValues
     this.updateFields(this.fields)
 
     if (loadInitialValues) {
@@ -115,8 +114,23 @@ export class Form<S = any> implements Plugin {
     }
   }
 
+  async reset() {
+    if (this._reset) {
+      await this._reset()
+    }
+    this.finalForm.reset()
+  }
+
   updateFields(fields: Field[]) {
     this.fields = fields
+  }
+
+  change(name: string, value?: any) {
+    return this.finalForm.change(name, value)
+  }
+
+  get initialValues() {
+    return this.finalForm.getState().initialValues
   }
 
   subscribe: FormApi<S>['subscribe'] = (cb, options) => {
