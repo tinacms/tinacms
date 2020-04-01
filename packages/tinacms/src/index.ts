@@ -25,9 +25,8 @@ export { ActionButton } from '@tinacms/react-forms'
 export { ScreenPlugin } from '@tinacms/react-screens'
 export * from '@tinacms/fields'
 export * from '@tinacms/form-builder'
-
-// TODO: move to @tinacms/forms and the components to @tinacms/react-forms
-export { AddContentPlugin } from './plugins/create-content-form-plugin'
+export { ContentCreatorPlugin as AddContentPlugin } from '@tinacms/forms'
+export { ContentCreatorPlugin } from '@tinacms/forms'
 
 /**
  * Export TinaCMS extensions
