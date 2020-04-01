@@ -18,7 +18,7 @@
 
 import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
-import { ScreenPlugin } from './plugins/screen-plugin'
+import { ScreenPlugin } from '@tinacms/react-screens'
 import {
   TextFieldPlugin,
   TextareaFieldPlugin,
