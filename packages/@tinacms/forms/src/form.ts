@@ -90,14 +90,7 @@ export class Form<S = any> implements Plugin {
         return response
       },
       mutators: {
-        /**
-         * TODO: Broken by `final-form@4.18.6`.
-         *
-         * Left comment in the docs
-         *
-         * https://github.com/final-form/final-form/pull/275#issuecomment-551132760
-         */
-        ...(arrayMutators as any),
+        ...arrayMutators,
         ...options.mutators,
       },
     })
@@ -114,6 +107,10 @@ export class Form<S = any> implements Plugin {
     }
   }
 
+  /**
+   * Resets the values back to the initial values the form was initialized with.
+   * Or empties all the values if the form was not initialized.
+   */
   async reset() {
     if (this._reset) {
       await this._reset()
@@ -121,22 +118,43 @@ export class Form<S = any> implements Plugin {
     this.finalForm.reset()
   }
 
+  /**
+   * @deprecated Unnecessary indirection
+   */
   updateFields(fields: Field[]) {
     this.fields = fields
   }
 
+  /**
+   * Changes the value of the given field.
+   *
+   * @param name
+   * @param value
+   */
   change(name: string, value?: any) {
     return this.finalForm.change(name, value)
   }
 
+  /**
+   * The values the form was initialized with.
+   */
   get initialValues() {
     return this.finalForm.getState().initialValues
   }
 
+  /**
+   * Subscribes to changes to the form. The subscriber will only be called when
+   * values specified in subscription change. A form can have many subscribers.
+   */
   subscribe: FormApi<S>['subscribe'] = (cb, options) => {
     return this.finalForm.subscribe(cb, options)
   }
 
+  /**
+   * Submits the form if there are currently no validation errors. It may
+   * return undefined or a Promise depending on the nature of the onSubmit
+   * configuration value given to the form when it was created.
+   */
   submit: FormApi<S>['submit'] = () => {
     return this.finalForm.submit()
   }
@@ -145,14 +163,33 @@ export class Form<S = any> implements Plugin {
     return this.finalForm.mutators
   }
 
+  /**
+   * Returns the current values of the form.
+   */
   get values() {
     return this.finalForm.getState().values
   }
 
+  /**
+   * A unique identifier for Forms.
+   *
+   * @alias id
+   */
   get name() {
     return this.id
   }
 
+  /**
+   * Updates multiple fields in the form.
+   *
+   * The updates are batched so that it only triggers one `onChange` event.
+   *
+   * In order to prevent disruptions to the user's editing experience this
+   * function will _not_ update the value of any field that is currently
+   * being edited.
+   *
+   * @param values
+   */
   updateValues(values: S) {
     this.finalForm.batch(() => {
       const activePath: string | undefined = this.finalForm.getState().active
@@ -165,6 +202,13 @@ export class Form<S = any> implements Plugin {
     })
   }
 
+  /**
+   * Replaces the initialValues of the form without deleting the current values.
+   *
+   * This function is helpful when the initialValues are loaded asynchronously.
+   *
+   * @param initialValues
+   */
   updateInitialValues(initialValues: S) {
     this.finalForm.batch(() => {
       const values = this.values
