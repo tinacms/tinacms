@@ -22,6 +22,7 @@ import { ModalBody, ModalActions, FieldMeta, useCMS } from 'tinacms'
 import styled from 'styled-components'
 import React, { useEffect, useState } from 'react'
 import { getHeadBranch } from '../../open-authoring/repository'
+import { AsyncButton } from '../../open-authoring-ui/components/AsyncButton'
 
 const BASE_BRANCH = process.env.BASE_BRANCH
 
@@ -38,8 +39,8 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
   const titleInput = React.createRef() as any
   const bodyInput = React.createRef() as any
 
-  const checkForPR = () => {
-    cms.api.github
+  const checkForPR = async () => {
+    await cms.api.github
       .fetchExistingPR(forkRepoFullName, getHeadBranch())
       .then(pull => {
         if (pull) {
@@ -48,23 +49,23 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
           setFetchedPR({ id: null })
         }
       })
-      .catch(err => {
+      .catch(() => {
         setPrError(`Could not fetch Pull Requests`)
       })
   }
 
   const createPR = () => {
-    cms.api.github
+    return cms.api.github
       .createPR(
         forkRepoFullName,
         getHeadBranch(),
         titleInput.current.value,
         bodyInput.current.value
       )
-      .then(response => {
+      .then(() => {
         checkForPR() // TODO - can we use PR from response instead of refetching?
       })
-      .catch(err => {
+      .catch(() => {
         setPrError(`Pull Request failed, are you sure you have any changes?`)
       })
   }
@@ -142,9 +143,7 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
       </PrModalBody>
       <ModalActions>
         {!fetchedPR.id && (
-          <TinaButton primary onClick={createPR}>
-            Create Pull Request
-          </TinaButton>
+          <AsyncButton primary name="Create Pull Request" action={createPR} />
         )}
         {fetchedPR && fetchedPR.html_url && (
           <>
