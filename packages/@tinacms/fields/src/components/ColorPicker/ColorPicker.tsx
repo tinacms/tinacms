@@ -103,7 +103,7 @@ export const Popover = styled.div`
   transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
   transform-origin: 50% -8px;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
-  z-index: 99999 !important;
+  z-index: var(--tina-z-index-2);
   &:before {
     content: '';
     position: absolute;
@@ -115,7 +115,7 @@ export const Popover = styled.div`
     height: 13px;
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     background-color: white;
-    z-index: 100;
+    z-index: var(--tina-z-index-1);
   }
 `
 
@@ -127,7 +127,7 @@ export const Cover = styled.div`
   left: 0;
   width: 100%;
   height: 100vh;
-  z-index: 800;
+  z-index: var(--tina-z-index-1);
 `
 
 interface Props {
