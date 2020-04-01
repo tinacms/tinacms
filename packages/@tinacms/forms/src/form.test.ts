@@ -16,19 +16,38 @@ limitations under the License.
 
 */
 
-import { Form } from './form'
+import { Form, FormOptions } from './form'
 
 describe('Form', () => {
-  describe('creating forms', () => {
+  let DEFAULTS: FormOptions<any>
+
+  beforeEach(() => {
+    DEFAULTS = {
+      id: 'example',
+      label: 'Example',
+      onSubmit: jest.fn(),
+      fields: [],
+    }
+  })
+
+  describe('new Form(...)', () => {
     describe('without initialValues', () => {
       it('is fine', () => {
-        new Form({
-          id: 'example',
-          label: 'Example',
-          onSubmit: jest.fn(),
-          fields: [],
-        })
+        new Form(DEFAULTS)
       })
+    })
+  })
+
+  describe('#change', () => {
+    it('changes the values', async () => {
+      const form = new Form({
+        ...DEFAULTS,
+        fields: [{ name: 'title', component: 'text' }],
+      })
+
+      form.change('title', 'Hello World')
+
+      expect(form.values.title).toBe('Hello World')
     })
   })
   describe('#onSubmit', () => {
@@ -38,39 +57,96 @@ describe('Form', () => {
     describe('after a successful submission', () => {
       it('reinitializes the form with the new values', async () => {
         const form = new Form({
-          id: 'example',
-          label: 'Example',
-          fields: [{ name: 'title', component: 'text' }],
-          onSubmit: jest.fn(),
+          ...DEFAULTS,
           initialValues,
+          fields: [{ name: 'title', component: 'text' }],
         })
 
-        form.finalForm.change('title', reinitialValues.title)
+        form.change('title', reinitialValues.title)
         await form.submit()
 
-        expect(form.finalForm.getState().initialValues).toEqual(reinitialValues)
+        expect(form.initialValues).toEqual(reinitialValues)
       })
     })
 
     describe('after a failed submission', () => {
       it('does not reinitialize the form', async () => {
         const form = new Form({
-          id: 'example',
-          label: 'Example',
+          ...DEFAULTS,
+          initialValues,
           fields: [{ name: 'title', component: 'text' }],
           onSubmit: jest.fn(() => {
             throw new Error()
           }),
-          initialValues,
         })
 
-        form.finalForm.change('title', reinitialValues.title)
+        form.change('title', reinitialValues.title)
 
         try {
           await form.submit()
         } catch (e) {}
 
-        expect(form.finalForm.getState().initialValues).toEqual(initialValues)
+        expect(form.initialValues).toEqual(initialValues)
+      })
+    })
+  })
+  describe('#reset', () => {
+    const initialValues = { title: 'hello' }
+    describe('when form has been changed', () => {
+      it('sets the form values to the initialValues', async () => {
+        const reinitialValues = { title: 'world' }
+        const form = new Form({
+          ...DEFAULTS,
+          initialValues,
+          fields: [{ name: 'title', component: 'text' }],
+        })
+        form.change('title', reinitialValues.title)
+
+        await form.reset()
+
+        expect(form.initialValues).toEqual(initialValues)
+      })
+      describe('if given a `reset` option', () => {
+        it('calls the user defined reset', async () => {
+          const reset = jest.fn()
+          const form = new Form({
+            ...DEFAULTS,
+            reset,
+          })
+          form.change('title', 'New Title')
+
+          await form.reset()
+
+          expect(reset).toHaveBeenCalled()
+        })
+        it('sets the form values to the initialValues', async () => {
+          const form = new Form({
+            ...DEFAULTS,
+            reset: jest.fn(),
+            initialValues,
+          })
+
+          form.change('title', 'A new title')
+
+          await form.reset()
+
+          expect(form.values).toEqual(initialValues)
+        })
+        it('sets does not the form values to the initialValues', async () => {
+          const form = new Form({
+            ...DEFAULTS,
+            reset: jest.fn(() => {
+              throw new Error()
+            }),
+          })
+          form.change('title', 'Updated Value')
+
+          try {
+            await form.reset()
+          } catch {}
+
+          expect(form.values).not.toEqual(initialValues)
+        })
       })
     })
   })
