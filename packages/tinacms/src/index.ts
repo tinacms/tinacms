@@ -65,4 +65,4 @@ export { Wysiwyg } from 'react-tinacms-editor'
 export * from '@tinacms/react-modals'
 
 // Media Manager
-export * from './media'
+export * from '@tinacms/media'
