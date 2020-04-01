@@ -29,7 +29,8 @@
   "peerDependencies": {
     "@tinacms/core": ">=0.7",
     "@tinacms/react-core": ">=0.2.9",
-    "@tinacms/react-modals": ">=0.1"
+    "@tinacms/react-modals": ">=0.1",
+    "react": ">=16.8"
   },
   "devDependencies": {
     "@tinacms/core": "^0.7.3",
