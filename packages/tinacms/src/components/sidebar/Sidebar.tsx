@@ -29,7 +29,7 @@ import {
 import { TinaReset } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from './CreateContentMenu'
-import { ScreenPlugin } from '../../plugins/screen-plugin'
+import { ScreenPlugin } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '../../react-tinacms'
 import { SidebarState, SidebarPosition } from '../../tina-cms'
 import { ScreenPluginView } from './ScreenPluginModal'
