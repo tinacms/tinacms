@@ -16,15 +16,15 @@ limitations under the License.
 
 */
 
-import {
-  ActionableModalOptions,
-  ActionableModal,
-} from '../misc/ActionableModal'
 import { useEffect, useState } from 'react'
 import { useCMS } from 'tinacms'
 import { useOpenAuthoring } from '../open-authoring/OpenAuthoringProvider'
 import { getModalProps } from './github-interpeter'
 import React from 'react'
+import {
+  ActionableModalOptions,
+  ActionableModal,
+} from '../open-authoring-ui/components/ActionableModal'
 
 interface OpenAuthoringError extends Error {
   status: number
