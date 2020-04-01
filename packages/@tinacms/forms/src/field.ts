@@ -16,11 +16,19 @@ limitations under the License.
 
 */
 
-import { CMS, Plugin } from '@tinacms/core'
-import { Field } from './field'
-
-export interface ContentCreatorPlugin<FormShape> extends Plugin {
-  __type: 'content-creator'
-  fields: Field[]
-  onSubmit(value: FormShape, cms: CMS): Promise<void> | void
+export interface Field {
+  name: string
+  label?: string
+  description?: string
+  component: React.FC<any> | string | null
+  parse?: (value: any, name: string, field: Field) => any
+  format?: (value: any, name: string, field: Field) => any
+  validate?(
+    value: any,
+    allValues: any,
+    meta: any,
+    field: Field
+  ): string | object | undefined
+  defaultValue?: any
+  fields?: Field[]
 }
