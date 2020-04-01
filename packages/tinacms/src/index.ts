@@ -47,7 +47,7 @@ export { useSidebar } from './components/sidebar/SidebarProvider'
 // Plugin Types
 export { AddContentPlugin } from './plugins/create-content-form-plugin'
 export { GlobalFormPlugin } from './plugins/screens'
-export { ScreenPlugin } from './plugins/screen-plugin'
+export { ScreenPlugin } from '@tinacms/react-screens'
 
 // Pre-registered Plugins
 export * from '@tinacms/fields'
