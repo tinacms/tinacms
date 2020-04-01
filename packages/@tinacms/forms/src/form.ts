@@ -29,9 +29,6 @@ export interface FormOptions<S> extends Config<S> {
   reset?(): void
   actions?: any[]
   loadInitialValues?: () => Promise<S>
-  meta?: {
-    [key: string]: string
-  }
 }
 
 export class Form<S = any> implements Plugin {
@@ -43,7 +40,6 @@ export class Form<S = any> implements Plugin {
   fields: Field[]
   finalForm: FormApi<S>
   actions: any[]
-  meta: { [key: string]: any }
 
   constructor({
     id,
@@ -73,7 +69,6 @@ export class Form<S = any> implements Plugin {
       },
     })
 
-    this.meta = options.meta || {}
     this._reset = reset
     this.actions = actions || []
     this.updateFields(this.fields)
