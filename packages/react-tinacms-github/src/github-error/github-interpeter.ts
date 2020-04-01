@@ -36,7 +36,7 @@ export const getModalProps = async (
     action: stopEditing,
   }
 
-  switch (error.code) {
+  switch (error.status) {
     case 401: {
       // Unauthorized
       return {
@@ -76,7 +76,7 @@ export const getModalProps = async (
   }
 
   return {
-    title: `Error  ${error.code}`,
+    title: `Error  ${error.status}`,
     message: error.message,
     actions: [cancelEditModeAction, reauthenticateAction],
   }
