@@ -187,7 +187,6 @@ export interface BlockWrapperProps {
 
 const BlockWrapper = styled.div<BlockWrapperProps>`
   position: relative;
-  /* z-index: 100; */
 
   &:hover {
     &:after {
@@ -207,7 +206,6 @@ const BlockWrapper = styled.div<BlockWrapperProps>`
     border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
-    /* z-index: 1000; */
     transition: all var(--tina-timing-medium) ease-out;
   }
 

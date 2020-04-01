@@ -325,7 +325,7 @@ const BlockMenu = styled.div<{ open: boolean }>`
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
-  z-index: 950;
+  z-index: var(--tina-z-index-1);
   ${props =>
     props.open &&
     css`
