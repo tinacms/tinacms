@@ -150,6 +150,7 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
           <>
             <TinaButton
               as="a"
+              // @ts-ignore
               href={`https://github.com/${baseRepoFullName}/compare/${BASE_BRANCH}...${
                 forkRepoFullName.split('/')[0]
               }:${getHeadBranch()}`}
@@ -160,6 +161,7 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
             <TinaButton
               as="a"
               primary
+              // @ts-ignore
               href={fetchedPR.html_url}
               target="_blank"
             >
