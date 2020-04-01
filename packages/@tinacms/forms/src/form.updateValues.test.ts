@@ -16,7 +16,8 @@ limitations under the License.
 
 */
 
-import { Form, Field } from './form'
+import { Form } from './form'
+import { Field } from './field'
 
 function makeForm(initialValues: any, fields: Field[] = []) {
   return new Form({
