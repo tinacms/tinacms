@@ -111,6 +111,10 @@ export class Form<S = any> implements Plugin {
     return this.finalForm.getState().dirty
   }
 
+  get submitting() {
+    return this.finalForm.getState().submitting
+  }
+
   /**
    * Resets the values back to the initial values the form was initialized with.
    * Or empties all the values if the form was not initialized.
