@@ -1,0 +1,38 @@
+{
+  "name": "@tinacms/react-screens",
+  "version": "0.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "Apache-2.0",
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "tinacms",
+    "cms"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/screens"
+  },
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "docs": "npx typedoc",
+    "build": "tinacms-scripts build"
+  },
+  "peerDependencies": {
+    "@tinacms/core": ">=0.7",
+    "@tinacms/react-core": ">=0.2.9"
+  },
+  "devDependencies": {
+    "@tinacms/core": "^0.7.3",
+    "@tinacms/react-core": "^0.2.9",
+    "@tinacms/scripts": "^0.1.13"
+  }
+}
