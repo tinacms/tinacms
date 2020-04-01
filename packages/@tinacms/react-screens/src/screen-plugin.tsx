@@ -68,7 +68,6 @@ export function createScreen<ExtraProps>({
 }: ScreenOptions<ExtraProps>): ScreenPlugin<ExtraProps> {
   return {
     __type: 'screen',
-    ...options,
     layout: 'popup',
     ...options,
     Component(screenProps) {
