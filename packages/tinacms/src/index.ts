@@ -26,6 +26,9 @@ export { ScreenPlugin } from '@tinacms/react-screens'
 export * from '@tinacms/fields'
 export * from '@tinacms/form-builder'
 
+// TODO: move to @tinacms/forms and the components to @tinacms/react-forms
+export { AddContentPlugin } from './plugins/create-content-form-plugin'
+
 /**
  * Export TinaCMS extensions
  */
@@ -38,9 +41,6 @@ export * from './react-tinacms'
 export { TinaCMS, TinaCMSConfig } from './tina-cms'
 export { TinaCMS as CMS } from './tina-cms'
 export { GlobalFormPlugin } from './plugins/screens'
-
-// @tinacms/react-sidebar
-export { useSidebar } from './components/sidebar/SidebarProvider'
 export {
   TinaProvider,
   TinaProviderProps,
@@ -48,6 +48,3 @@ export {
   Tina,
   TinaProps,
 } from './components/TinaProvider'
-
-// TODO: move to @tinacms/forms and the components to @tinacms/react-forms
-export { AddContentPlugin } from './plugins/create-content-form-plugin'
