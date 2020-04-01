@@ -17,8 +17,9 @@ limitations under the License.
 */
 
 import arrayMutators from 'final-form-arrays'
-import { FormApi, createForm, Config, Unsubscribe } from 'final-form'
+import { FormApi, createForm, Config } from 'final-form'
 import { Plugin } from '@tinacms/core'
+import { Field } from './field'
 
 export interface FormOptions<S> extends Config<S> {
   id: any
@@ -27,33 +28,10 @@ export interface FormOptions<S> extends Config<S> {
   __type?: string
   reset?(): void
   actions?: any[]
+  loadInitialValues?: () => Promise<S>
   meta?: {
     [key: string]: string
   }
-  loadInitialValues?: () => Promise<S>
-}
-
-export interface Field {
-  name: string
-  label?: string
-  description?: string
-  component: React.FC<any> | string | null
-  parse?: (value: any, name: string, field: Field) => any
-  format?: (value: any, name: string, field: Field) => any
-  validate?(
-    value: any,
-    allValues: any,
-    meta: any,
-    field: Field
-  ): string | object | undefined
-  defaultValue?: any
-  fields?: Field[]
-}
-
-interface FieldSubscription {
-  path: string
-  field: Field
-  unsubscribe: Unsubscribe
 }
 
 export class Form<S = any> implements Plugin {
