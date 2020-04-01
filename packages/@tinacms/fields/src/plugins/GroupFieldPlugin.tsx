@@ -188,7 +188,7 @@ export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  z-index: 950;
+  z-index: var(--tina-z-index-1);
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
 
   > * {

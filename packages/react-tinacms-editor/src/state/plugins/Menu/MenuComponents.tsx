@@ -44,7 +44,7 @@ type MenuWrapperProps = {
 export const MenuWrapper = styled.div<MenuWrapperProps>`
   position: relative;
   margin-bottom: 14px;
-  z-index: 900;
+  z-index: var(--tina-z-index-1);
 
   ${props =>
     props.menuFixed &&
@@ -69,7 +69,7 @@ export const MenuContainer = styled.div`
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
-  z-index: 100;
+  z-index: var(--tina-z-index-0);
 `
 
 const MenuItem = css`

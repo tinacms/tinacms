@@ -27,7 +27,7 @@ import {
   TinaIcon,
 } from '@tinacms/icons'
 import { TinaReset } from '@tinacms/styles'
-import { SIDEBAR_WIDTH, Z_INDEX, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
+import { SIDEBAR_WIDTH, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '../../react-tinacms'
@@ -229,7 +229,7 @@ const SidebarHeader = styled.div`
   display: grid;
   grid-template-areas: 'hamburger actions';
   align-items: center;
-  z-index: 1050;
+  z-index: var(--tina-z-index-2);
   height: ${SIDEBAR_HEADER_HEIGHT}px;
   width: 100%;
   padding: 0 var(--tina-padding-big);
@@ -311,7 +311,7 @@ const MenuWrapper = styled.div`
 
 const MenuPanel = styled.div<{ visible: boolean }>`
   background: var(--tina-color-grey-8);
-  z-index: 1000;
+  z-index: var(--tina-z-index-1);
   position: absolute;
   top: 0;
   left: 0;
@@ -419,7 +419,7 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
-  z-index: ${Z_INDEX} !important;
+  z-index: var(--tina-z-index-2);
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
   transform: translate3d(
     ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH + 'px')},
