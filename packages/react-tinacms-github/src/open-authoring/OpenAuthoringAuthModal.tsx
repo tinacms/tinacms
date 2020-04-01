@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import { useCallback, useState } from 'react'
 import { setForkName } from './repository'
 import {
   useCMS,
@@ -26,7 +25,8 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { TinaReset, Button as TinaButton } from '@tinacms/styles'
+import { TinaReset } from '@tinacms/styles'
+import { AsyncButton } from '../open-authoring-ui/components/AsyncButton'
 
 const OpenAuthoringAuthModal = ({
   onUpdateAuthState,
@@ -98,27 +98,6 @@ const OpenAuthoringAuthModal = ({
         </ModalPopup>
       </Modal>
     </TinaReset>
-  )
-}
-
-interface ButtonProps {
-  name: string
-  action(): Promise<void>
-  primary: boolean
-}
-const AsyncButton = ({ name, primary, action }: ButtonProps) => {
-  const [submitting, setSubmitting] = useState(false)
-
-  const onClick = useCallback(async () => {
-    setSubmitting(true)
-    await action()
-    setSubmitting(false)
-  }, [action, setSubmitting])
-
-  return (
-    <TinaButton primary={primary} onClick={onClick} busy={submitting}>
-      {name}
-    </TinaButton>
   )
 }
 
