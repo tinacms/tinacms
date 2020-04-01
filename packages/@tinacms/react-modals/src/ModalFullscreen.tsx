@@ -34,7 +34,7 @@ const ModalFullscreenKeyframes = keyframes`
 export const ModalFullscreen = styled.div`
   display: flex;
   flex-direction: column;
-  z-index: 1;
+  z-index: var(--tina-z-index-0);
   overflow: visible;
   background-color: #fff;
   border-radius: 0;

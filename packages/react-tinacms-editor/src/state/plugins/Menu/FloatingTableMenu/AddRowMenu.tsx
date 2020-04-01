@@ -117,7 +117,7 @@ const ColumnDivider = styled.div<
   position: absolute;
   background: #0574e4;
   left: ${-1 * borderWidth}px;
-  z-index: 1000;
+  z-index: var(--tina-z-index-1);
   bottom: ${-1 * borderWidth}px;
   height: ${2 * borderWidth}px;
   width: ${({ width }) => `${width + controlSize - borderWidth}px`};
