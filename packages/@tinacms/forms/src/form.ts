@@ -115,6 +115,10 @@ export class Form<S = any> implements Plugin {
     return this.finalForm.getState().submitting
   }
 
+  get valid() {
+    return this.finalForm.getState().valid
+  }
+
   /**
    * Resets the values back to the initial values the form was initialized with.
    * Or empties all the values if the form was not initialized.
