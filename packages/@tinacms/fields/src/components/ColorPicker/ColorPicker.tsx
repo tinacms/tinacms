@@ -103,7 +103,7 @@ export const Popover = styled.div`
   transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
   transform-origin: 50% -8px;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
-  z-index: 900;
+  z-index: 99999 !important;
   &:before {
     content: '';
     position: absolute;
