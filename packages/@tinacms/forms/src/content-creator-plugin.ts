@@ -16,6 +16,11 @@ limitations under the License.
 
 */
 
-export * from './form'
-export { ContentCreatorPlugin } from './content-creator-plugin'
-export { FormApi } from 'final-form'
+import { CMS, Plugin } from '@tinacms/core'
+import { Field } from './form'
+
+export interface ContentCreatorPlugin<FormShape> extends Plugin {
+  __type: 'content-creator'
+  fields: Field[]
+  onSubmit(value: FormShape, cms: CMS): Promise<void> | void
+}
