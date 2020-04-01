@@ -25,6 +25,11 @@
 
 ## Development
 
+**Disclaimer**: 
+
+- Tina is still a quickly moving project. Since it’s pre-1.0 the core team is not guaranteeing stability in it’s APIs.
+- Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
+
 To get started:
 
 ```bash
