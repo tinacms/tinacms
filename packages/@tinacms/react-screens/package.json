@@ -28,11 +28,13 @@
   },
   "peerDependencies": {
     "@tinacms/core": ">=0.7",
-    "@tinacms/react-core": ">=0.2.9"
+    "@tinacms/react-core": ">=0.2.9",
+    "@tinacms/react-modals": ">=0.1"
   },
   "devDependencies": {
     "@tinacms/core": "^0.7.3",
     "@tinacms/react-core": "^0.2.9",
+    "@tinacms/react-modals": "^0.1.0",
     "@tinacms/scripts": "^0.1.13"
   }
 }

@@ -25,37 +25,32 @@ import {
   ModalFullscreen,
   ModalPopup,
 } from '@tinacms/react-modals'
-import { ScreenPlugin } from '@tinacms/react-screens'
+import { ScreenPlugin } from '../screen-plugin'
 
-export interface ScreenPluginViewProps {
+export interface ScreenPluginModalProps {
   screen: ScreenPlugin
   close(): void
 }
 
-export const ScreenPluginView: FC<ScreenPluginViewProps> = ({
+export const ScreenPluginModal: FC<ScreenPluginModalProps> = ({
   screen,
   close,
 }) => {
   return (
-    <ScreenPluginModal name={screen.name} close={close} layout={screen.layout}>
+    <ModalLayout name={screen.name} close={close} layout={screen.layout}>
       <screen.Component close={close} />
-    </ScreenPluginModal>
+    </ModalLayout>
   )
 }
 
-interface ScreenPluginModalProps {
+interface ModalLayoutProps {
   children: any
   name: string
   close: any
   layout?: 'fullscreen' | 'popup'
 }
 
-const ScreenPluginModal = ({
-  children,
-  name,
-  close,
-  layout,
-}: ScreenPluginModalProps) => {
+const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
   let Wrapper
 
   switch (layout) {
