@@ -81,6 +81,29 @@ export class Form<S = any> implements Plugin {
   }
 
   /**
+   * A unique identifier for Forms.
+   *
+   * @alias id
+   */
+  get name() {
+    return this.id
+  }
+
+  /**
+   * Returns the current values of the form.
+   */
+  get values() {
+    return this.finalForm.getState().values
+  }
+
+  /**
+   * The values the form was initialized with.
+   */
+  get initialValues() {
+    return this.finalForm.getState().initialValues
+  }
+
+  /**
    * Resets the values back to the initial values the form was initialized with.
    * Or empties all the values if the form was not initialized.
    */
@@ -96,23 +119,6 @@ export class Form<S = any> implements Plugin {
    */
   updateFields(fields: Field[]) {
     this.fields = fields
-  }
-
-  /**
-   * Changes the value of the given field.
-   *
-   * @param name
-   * @param value
-   */
-  change(name: string, value?: any) {
-    return this.finalForm.change(name, value)
-  }
-
-  /**
-   * The values the form was initialized with.
-   */
-  get initialValues() {
-    return this.finalForm.getState().initialValues
   }
 
   /**
@@ -132,24 +138,18 @@ export class Form<S = any> implements Plugin {
     return this.finalForm.submit()
   }
 
+  /**
+   * Changes the value of the given field.
+   *
+   * @param name
+   * @param value
+   */
+  change(name: string, value?: any) {
+    return this.finalForm.change(name, value)
+  }
+
   get mutators() {
     return this.finalForm.mutators
-  }
-
-  /**
-   * Returns the current values of the form.
-   */
-  get values() {
-    return this.finalForm.getState().values
-  }
-
-  /**
-   * A unique identifier for Forms.
-   *
-   * @alias id
-   */
-  get name() {
-    return this.id
   }
 
   /**
