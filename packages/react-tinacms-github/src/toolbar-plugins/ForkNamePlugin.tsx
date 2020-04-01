@@ -18,7 +18,6 @@ limitations under the License.
 
 import { FieldMeta } from 'tinacms'
 import styled from 'styled-components'
-import { color } from '@tinacms/styles'
 import React from 'react'
 
 export const ForkNamePlugin = (forkName: string) => ({
@@ -35,7 +34,7 @@ const MetaLink = styled.a`
   overflow: hidden;
   text-overflow: ellipsis;
   font-size: 16px;
-  color: ${color.primary('dark')};
+  color: var(--tina-color-primary-dark);
 `
 
 const ForkInfo = ({ forkName }) => {
