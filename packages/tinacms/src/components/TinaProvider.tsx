@@ -42,7 +42,7 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
       <ModalProvider>
         <GlobalStyles />
         <Alerts alerts={cms.alerts} />
-        <ToolbarProvider hidden={hidden} />
+        <ToolbarProvider hidden={hidden} toolbar={cms.toolbar} />
         <SidebarProvider
           hidden={hidden}
           position={position}
