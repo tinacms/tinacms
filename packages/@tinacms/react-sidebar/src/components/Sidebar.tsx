@@ -54,8 +54,7 @@ export function SidebarProvider({
     }
   }, [hidden])
 
-  // TODO: Uncomment this
-  // if (sidebar.hidden) return children
+  if (sidebar.hidden) return children
 
   return (
     <>
