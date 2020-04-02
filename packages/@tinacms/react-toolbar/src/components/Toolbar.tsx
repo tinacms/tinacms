@@ -65,11 +65,11 @@ export const Toolbar = styled(({ ...styleProps }) => {
   useSubscribable(widgets)
 
   // TODO: Find a more accurate solution then this.
-  const inEditMode = widgets.all().length
+  // const inEditMode = widgets.all().length
 
-  if (!inEditMode) {
-    return null
-  }
+  // if (!inEditMode) {
+  //   return null
+  // }
   // TODO: Form#reset should always exist
   const reset = form && (form.reset || (() => form.finalForm.reset()))
   const submit = form && form.submit
@@ -87,12 +87,13 @@ export const Toolbar = styled(({ ...styleProps }) => {
           <CreateContentMenu />
         </Create>
         <WidgetsContainer>
-          {widgets
-            .all()
-            .sort((a: any, b: any) => a.weight - b.weight)
-            .map((widget: any) => (
-              <widget.component key={widget.name} {...widget.props} />
-            ))}
+          {widgets.all().length >= 1 &&
+            widgets
+              .all()
+              .sort((a: any, b: any) => a.weight - b.weight)
+              .map((widget: any) => (
+                <widget.component key={widget.name} {...widget.props} />
+              ))}
         </WidgetsContainer>
         <Status>
           <FormStatus dirty={!pristine} />
