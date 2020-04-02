@@ -20,7 +20,6 @@ import React from 'react'
 import App from 'next/app'
 import { Tina, TinaCMS, withTina } from 'tinacms'
 import { GitClient, GitMediaStore } from '@tinacms/git-client'
-import { Toolbar } from '@tinacms/react-toolbar'
 
 export default class Site extends App {
   constructor() {
@@ -39,8 +38,7 @@ export default class Site extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <Tina cms={this.cms}>
-        <Toolbar />
+      <Tina cms={this.cms} hidden={false}>
         <Component {...pageProps} />
       </Tina>
     )
