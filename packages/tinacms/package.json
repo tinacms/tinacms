@@ -49,7 +49,6 @@
     "@tinacms/react-screens": "^0.0.0",
     "@tinacms/react-sidebar": "^0.0.0",
     "@tinacms/styles": "^0.4.0",
-    "@types/react-beautiful-dnd": "^11.0.3",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "react-datetime": "^2.16.3",
