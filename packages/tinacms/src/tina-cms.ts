@@ -36,7 +36,7 @@ import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
 import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
-import { Alerts } from './tina-cms/alerts'
+import { Alerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 
 export interface TinaCMSConfig extends CMSConfig {
