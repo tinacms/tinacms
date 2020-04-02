@@ -1,0 +1,43 @@
+{
+  "name": "@tinacms/react-sidebar",
+  "version": "0.3.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "Apache-2.0",
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "tinacms",
+    "cms",
+    "react",
+    "forms"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/react-sidebar"
+  },
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "build": "tinacms-scripts build",
+    "docs": "npx typedoc"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "^0.1.13"
+  },
+  "dependencies": {
+    "@tinacms/forms": "^0.3.0",
+    "@tinacms/react-core": "^0.2.9"
+  },
+  "peerDependencies": {
+    "prop-types": ">15",
+    "react": ">=16.8",
+    "styled-components": ">=4.1"
+  }
+}
