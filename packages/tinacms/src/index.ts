@@ -22,7 +22,7 @@ limitations under the License.
 export * from '@tinacms/react-modals'
 export * from '@tinacms/media'
 export { ActionButton } from '@tinacms/react-forms'
-export { ScreenPlugin } from '@tinacms/react-screens'
+export { ScreenPlugin, useScreenPlugin } from '@tinacms/react-screens'
 export * from '@tinacms/fields'
 export * from '@tinacms/form-builder'
 export { ContentCreatorPlugin as AddContentPlugin } from '@tinacms/forms'
