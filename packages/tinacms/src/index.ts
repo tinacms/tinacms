@@ -17,20 +17,29 @@ limitations under the License.
 */
 
 /**
- * TinaCMS Core Types & React Interfaces
+ * Export @tinacms internal packages
+ */
+export * from '@tinacms/react-modals'
+export * from '@tinacms/media'
+export { ActionButton } from '@tinacms/react-forms'
+export { ScreenPlugin } from '@tinacms/react-screens'
+export * from '@tinacms/fields'
+export * from '@tinacms/form-builder'
+export { ContentCreatorPlugin as AddContentPlugin } from '@tinacms/forms'
+export { ContentCreatorPlugin } from '@tinacms/forms'
+
+/**
+ * Export TinaCMS extensions
+ */
+export { Wysiwyg } from 'react-tinacms-editor'
+
+/**
+ * Custom `tinacms` things
  */
 export * from './react-tinacms'
-export { ActionButton } from '@tinacms/react-forms'
-
-/**
- * The Tina CMS Class
- */
 export { TinaCMS, TinaCMSConfig } from './tina-cms'
 export { TinaCMS as CMS } from './tina-cms'
-
-/**
- * Tina Sidebar
- */
+export { GlobalFormPlugin } from './plugins/screens'
 export {
   TinaProvider,
   TinaProviderProps,
@@ -38,31 +47,3 @@ export {
   Tina,
   TinaProps,
 } from './components/TinaProvider'
-export { useSidebar } from './components/sidebar/SidebarProvider'
-
-/**
- * Plugins
- */
-
-// Plugin Types
-export { AddContentPlugin } from './plugins/create-content-form-plugin'
-export { GlobalFormPlugin } from './plugins/screens'
-export { ScreenPlugin } from './plugins/screen-plugin'
-
-// Pre-registered Plugins
-export * from '@tinacms/fields'
-
-/**
- * REACT COMPONENTS
- */
-
-// Inline Editing Components
-export * from '@tinacms/form-builder'
-
-export { Wysiwyg } from 'react-tinacms-editor'
-
-// Modal Components
-export * from '@tinacms/react-modals'
-
-// Media Manager
-export * from './media'

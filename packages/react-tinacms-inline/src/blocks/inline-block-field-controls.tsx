@@ -23,12 +23,7 @@ import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { BlockSettings } from './block-settings'
 import { Button, IconButton } from '@tinacms/styles'
-import {
-  ChevronUpIcon,
-  ChevronDownIcon,
-  TrashIcon,
-  CloseIcon,
-} from '@tinacms/icons'
+import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
 
 export interface BlocksControlsProps {
   children: any
@@ -49,36 +44,62 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   const { template } = useInlineBlock()
   const isFirst = index === 0
   const isLast = index === count - 1
+  const blockRef = React.useRef<HTMLDivElement>(null)
+  const blockMenuRef = React.useRef<HTMLDivElement>(null)
+  const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
+  const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
 
-  const removeBlock = () => remove(index)
+  React.useEffect(() => {
+    document.addEventListener('click', handleClickOutside, true)
+    return () => {
+      document.removeEventListener('click', handleClickOutside, true)
+    }
+  }, [blockRef.current, blockMenuRef.current])
 
   if (status === 'inactive') {
     return children
   }
 
-  const moveBlockUp = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    move(index, index - 1)
-  }
+  const removeBlock = () => remove(index)
 
-  const moveBlockDown = (event: React.MouseEvent) => {
-    event.stopPropagation()
-    move(index, index + 1)
-  }
-
-  const handleSetActiveBlock = (event: React.MouseEvent) => {
-    event.preventDefault()
-    setActiveBlock(index)
-  }
-
-  const clearFocus = (event: React.MouseEvent) => {
-    event.stopPropagation()
+  const handleClickOutside = (event: any) => {
+    if (
+      blockRef.current?.contains(event.target) ||
+      blockMenuRef.current?.contains(event.target)
+    ) {
+      return
+    }
     setActiveBlock(-1)
   }
 
+  const moveBlockUp = () => {
+    move(index, index - 1)
+    setActiveBlock(index - 1)
+  }
+
+  const moveBlockDown = () => {
+    move(index, index + 1)
+    setActiveBlock(index + 1)
+  }
+
+  const handleSetActiveBlock = (event: any) => {
+    if (
+      blockMoveUpRef.current?.contains(event.target) ||
+      blockMoveDownRef.current?.contains(event.target) ||
+      activeBlock === index
+    ) {
+      return
+    }
+    setActiveBlock(index)
+  }
+
   return (
-    <BlockWrapper active={activeBlock === index} onClick={handleSetActiveBlock}>
-      <BlockMenu index={index}>
+    <BlockWrapper
+      ref={blockRef}
+      active={activeBlock === index}
+      onClick={handleSetActiveBlock}
+    >
+      <BlockMenu ref={blockMenuRef} index={index}>
         <BlockMenuLeft>
           <AddBlockMenu
             addBlock={block => insert(index + 1, block)}
@@ -88,18 +109,25 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
           />
         </BlockMenuLeft>
         <BlockMenuRight>
-          <IconButton primary onClick={moveBlockUp} disabled={isFirst}>
+          <IconButton
+            ref={blockMoveUpRef}
+            primary
+            onClick={moveBlockUp}
+            disabled={isFirst}
+          >
             <ChevronUpIcon />
           </IconButton>
-          <IconButton primary onClick={moveBlockDown} disabled={isLast}>
+          <IconButton
+            ref={blockMoveDownRef}
+            primary
+            onClick={moveBlockDown}
+            disabled={isLast}
+          >
             <ChevronDownIcon />
           </IconButton>
           <BlockSettings template={template} />
           <IconButton primary onClick={removeBlock}>
             <TrashIcon />
-          </IconButton>
-          <IconButton onClick={clearFocus}>
-            <CloseIcon />
           </IconButton>
         </BlockMenuRight>
       </BlockMenu>
@@ -125,6 +153,7 @@ const BlockMenu = styled.div<BlockMenuProps>`
   transform: translate3d(0, 0, 0);
   transition: all 120ms ease-out;
   z-index: calc(1000 - ${props => props.index});
+  pointer-events: none;
 
   ${Button} {
     height: 34px;
@@ -158,7 +187,6 @@ export interface BlockWrapperProps {
 
 const BlockWrapper = styled.div<BlockWrapperProps>`
   position: relative;
-  /* z-index: 100; */
 
   &:hover {
     &:after {
@@ -178,7 +206,6 @@ const BlockWrapper = styled.div<BlockWrapperProps>`
     border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
-    /* z-index: 1000; */
     transition: all var(--tina-timing-medium) ease-out;
   }
 
@@ -188,6 +215,7 @@ const BlockWrapper = styled.div<BlockWrapperProps>`
       ${BlockMenu} {
         transform: translate3d(0, -100%, 0);
         opacity: 1;
+        pointer-events: all;
       }
 
       &:after {

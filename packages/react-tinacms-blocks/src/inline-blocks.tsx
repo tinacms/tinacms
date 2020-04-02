@@ -295,7 +295,7 @@ const BlocksMenu = styled.div<BlocksUIProps>`
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
-  z-index: 950;
+  z-index: var(--tina-z-index-1);
   ${props =>
     props.open &&
     css`
@@ -392,7 +392,6 @@ const BlocksActions = styled(
 )`
   display: flex;
   position: absolute;
-  // z-index: 1000;
   top: -24px;
   right: -20px;
   transform: translate3d(0, calc(-100% + 16px), 0);
@@ -458,7 +457,7 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
     border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
-    z-index: 1000;
+    z-index: var(--tina-z-index-1);
     transition: all 150ms ease-out;
     transition-delay: 300ms;
   }
@@ -475,7 +474,7 @@ const BlockFocusOutline = styled.div<BlocksUIProps>`
     width: auto;
     pointer-events: none;
     opacity: 0;
-    z-index: 1500;
+    z-index: var(--tina-z-index-2);
     transition: all 150ms ease-out;
     transition-delay: 300ms;
     margin: 0;

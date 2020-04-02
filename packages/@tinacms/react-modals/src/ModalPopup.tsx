@@ -32,7 +32,7 @@ const ModalPopupKeyframes = keyframes`
 
 export const ModalPopup: StyledComponent<'div', {}, {}> = styled.div`
   display: block;
-  z-index: 1;
+  z-index: var(--tina-z-index-0);
   overflow: visible; /* Keep this as "visible", select component needs to overflow */
   background-color: var(--tina-color-grey-1);
   border-radius: var(--tina-radius-small);

@@ -16,12 +16,7 @@ limitations under the License.
 
 */
 
-import { TinaCMS } from '../tina-cms'
-import { Plugin } from '@tinacms/core'
-import { Field } from '@tinacms/forms'
+const { createJestConfig } = require('@tinacms/scripts')
+const pack = require('./package')
 
-export interface AddContentPlugin<FormShape> extends Plugin {
-  __type: 'content-creator'
-  onSubmit(value: FormShape, cms: TinaCMS): Promise<void> | void
-  fields: Field[]
-}
+module.exports = createJestConfig(pack)
