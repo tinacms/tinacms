@@ -22,26 +22,7 @@ import { useCMS } from 'tinacms'
 import OpenAuthoringErrorModal from '../github-error/OpenAuthoringErrorModal'
 import OpenAuthoringAuthModal from './OpenAuthoringAuthModal'
 import { withOpenAuthoringErrorHandler } from '../errors'
-
-export interface OpenAuthoringContext {
-  enterEditMode: () => void
-  exitEditMode: () => void
-  setError: (err: any) => void
-}
-
-export const OpenAuthoringContext = React.createContext<OpenAuthoringContext | null>(
-  null
-)
-
-export function useOpenAuthoring() {
-  const openAuthoringContext = React.useContext(OpenAuthoringContext)
-
-  if (!openAuthoringContext) {
-    throw new Error('useOpenAuthoring must be within an OpenAuthoringContext')
-  }
-
-  return openAuthoringContext
-}
+import { OpenAuthoringContext } from './OpenAuthoringContext'
 
 interface ProviderProps {
   children: any
