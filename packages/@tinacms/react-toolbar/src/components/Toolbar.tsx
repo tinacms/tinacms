@@ -21,7 +21,7 @@ import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { Plugin } from '@tinacms/core'
 import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
-import { Button } from '@tinacms/styles'
+import { Button, TinaReset } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
 import styled, { css } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
@@ -80,7 +80,7 @@ export const Toolbar = styled(({ ...styleProps }) => {
   const submitting = disabled ? false : !!(formState && formState.submitting)
 
   return (
-    <>
+    <TinaReset>
       <ToolbarPlaceholder />
       <div {...styleProps}>
         <Create>
@@ -122,7 +122,7 @@ export const Toolbar = styled(({ ...styleProps }) => {
           </SaveButton>
         </Actions>
       </div>
-    </>
+    </TinaReset>
   )
 })`
   position: fixed;
