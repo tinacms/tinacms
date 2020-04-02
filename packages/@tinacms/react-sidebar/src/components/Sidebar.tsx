@@ -54,6 +54,9 @@ export function SidebarProvider({
     }
   }, [hidden])
 
+  // TODO: Uncomment this
+  // if (sidebar.hidden) return children
+
   return (
     <>
       <SiteWrapper
@@ -101,7 +104,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
             <MenuPanel visible={menuIsVisible}>
               <MenuWrapper>
                 <MenuList>
-                  {allScreens.map((view: any) => {
+                  {allScreens.map(view => {
                     const Icon = view.Icon
                     return (
                       <MenuLink
