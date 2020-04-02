@@ -20,8 +20,8 @@ import React, { useState } from 'react'
 import { Modal, ModalPopup, ModalHeader, ModalBody } from 'tinacms'
 import PrIconSvg from '../../ui/pr-icon.svg'
 import { PRModal } from './PRModal'
-import { DesktopLabel } from '../../ui/DesktopLabel'
-import { ToolbarButton } from '../../ui/ToolbarButton'
+import { ToolbarButton } from '../../open-authoring-ui/components/ToolbarButton'
+import { DesktopLabel } from '../../open-authoring-ui/components/DesktopLabel'
 
 interface PullRequestButtonOptions {
   baseRepoFullName: string

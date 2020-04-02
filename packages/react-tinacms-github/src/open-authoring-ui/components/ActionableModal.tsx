@@ -16,8 +16,7 @@ limitations under the License.
 
 */
 
-import React, { useState } from 'react'
-import styled from 'styled-components'
+import React from 'react'
 import { TinaReset, Button as TinaButton } from '@tinacms/styles'
 import {
   Modal,
@@ -62,9 +61,3 @@ export const ActionableModal = ({
     </TinaReset>
   )
 }
-
-const Center = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: center;
-`
