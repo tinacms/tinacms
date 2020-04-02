@@ -23,7 +23,7 @@ import { RightArrowIcon } from '@tinacms/icons'
 
 export interface FormsListProps {
   forms: Form[]
-  setActiveFormId(id?: string): void
+  setActiveFormId(id: string): void
   isEditing: Boolean
 }
 
