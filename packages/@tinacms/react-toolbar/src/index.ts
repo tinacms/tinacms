@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export * from './sidebar'
+export * from './toolbar'
 export * from './components'

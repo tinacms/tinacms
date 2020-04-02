@@ -18,49 +18,38 @@ limitations under the License.
 
 import { Subscribable } from '@tinacms/core'
 
-export interface SidebarStateOptions {
+export interface ToolbarStateOptions {
   hidden?: boolean
-  position?: SidebarPosition
-  buttons?: SidebarButtons
+  buttons?: ToolbarButtons
 }
 
-export interface SidebarButtons {
+export interface ToolbarButtons {
   save: string
   reset: string
 }
 
-export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
-
-export class SidebarState extends Subscribable {
-  private _isOpen: boolean = false
-
-  position: SidebarPosition = 'displace'
-  _hidden: boolean = false
-  buttons: SidebarButtons = {
+export class ToolbarState extends Subscribable {
+  _hidden: boolean = true
+  buttons: ToolbarButtons = {
     save: 'Save',
     reset: 'Reset',
   }
 
-  constructor(options: SidebarStateOptions = {}) {
+  constructor(options: ToolbarStateOptions = {}) {
     super()
-    this.position = options.position || 'displace'
-    this._hidden = !!options.hidden
+    this._hidden = !options.hidden
 
+    /*
+     ** TODO: Do we want to handle buttons
+     ** the same as sidebar? Or make them plugins?
+     ** maybe remove these
+     */
     if (options.buttons?.save) {
       this.buttons.save = options.buttons.save
     }
     if (options.buttons?.reset) {
       this.buttons.reset = options.buttons.reset
     }
-  }
-
-  get isOpen() {
-    return this._isOpen
-  }
-
-  set isOpen(nextValue: boolean) {
-    this._isOpen = nextValue
-    this.notifiySubscribers()
   }
 
   get hidden() {
