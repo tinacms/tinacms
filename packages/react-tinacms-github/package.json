@@ -12,16 +12,23 @@
   },
   "author": "",
   "license": "Apache-2.0",
-  "devDependencies": {
-    "@types/js-cookie": "^2.2.5"
-  },
-  "dependencies": {
-    "@tinacms/fields": "^0.9.1",
+  "peerDependencies": {
+    "react": ">=16.8",
     "@tinacms/styles": "^0.4.0",
-    "final-form-submit-listener": "^1.0.0",
+    "@tinacms/fields": "^0.9.1",
+    "styled-components": ">=4.1",
+    "tinacms": ">=0.13",
     "js-cookie": "^2.2.1",
-    "styled-components": "^5.0.1",
+    "final-form-submit-listener": "^1.0.0"
+  },
+  "devDependencies": {
+    "@types/js-cookie": "^2.2.5",
+    "@tinacms/styles": "^0.4.0",
+    "@tinacms/fields": "^0.9.1",
+    "@tinacms/react-forms": "^0.1.0",
+    "styled-components": ">=4.1",
     "tinacms": "^0.18.2",
-    "@tinacms/react-forms": "^0.1.0"
+    "js-cookie": "^2.2.1",
+    "final-form-submit-listener": "^1.0.0"
   }
 }
