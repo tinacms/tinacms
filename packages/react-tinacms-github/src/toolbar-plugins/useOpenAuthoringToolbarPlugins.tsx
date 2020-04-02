@@ -19,8 +19,9 @@ limitations under the License.
 import { Form, useCMS } from 'tinacms'
 import { useEffect } from 'react'
 import { getForkName } from '../open-authoring/repository'
-import PRPlugin from './pull-request'
+import { PRPlugin } from './pull-request'
 import { ForkNamePlugin } from './ForkNamePlugin'
+import { Plugin } from 'tinacms'
 
 export const useOpenAuthoringToolbarPlugins = (
   form: Form<any>,
@@ -31,9 +32,9 @@ export const useOpenAuthoringToolbarPlugins = (
   useEffect(() => {
     const forkName = getForkName()
     const plugins = [
-      ForkNamePlugin(forkName),
-      PRPlugin(process.env.REPO_FULL_NAME, forkName),
-    ] as any
+      ForkNamePlugin(forkName || ''),
+      PRPlugin(process.env.REPO_FULL_NAME || '', forkName || ''),
+    ] as Plugin[]
 
     const removePlugins = () => {
       plugins.forEach(plugin => cms.plugins.remove(plugin))

@@ -18,7 +18,8 @@ limitations under the License.
 
 import React, { useState } from 'react'
 import { Modal, ModalPopup, ModalHeader, ModalBody } from 'tinacms'
-import PrIconSvg from '../../ui/pr-icon.svg'
+//@ts-ignore
+// import PrIconSvg from '../../open-authoring-ui/pr-icon.svg'
 import { PRModal } from './PRModal'
 import { ToolbarButton } from '../../open-authoring-ui/components/ToolbarButton'
 import { DesktopLabel } from '../../open-authoring-ui/components/DesktopLabel'
@@ -51,7 +52,7 @@ function PullRequestButton({
   return (
     <>
       <ToolbarButton onClick={() => setOpened(p => !p)}>
-        <PrIconSvg />
+        {/* <PrIconSvg /> TODO - fix svg import*/}
         <DesktopLabel> Pull Request</DesktopLabel>
       </ToolbarButton>
       {opened && (

@@ -16,7 +16,13 @@ limitations under the License.
 
 */
 
-function popupWindow(url, title, window, w, h) {
+function popupWindow(
+  url: string,
+  title: string,
+  window: any,
+  w: number,
+  h: number
+): Window {
   const y = window.top.outerHeight / 2 + window.top.screenY - h / 2
   const x = window.top.outerWidth / 2 + window.top.screenX - w / 2
   return window.open(

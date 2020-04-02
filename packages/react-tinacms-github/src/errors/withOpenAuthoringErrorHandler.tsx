@@ -16,14 +16,15 @@ limitations under the License.
 
 */
 
-import { useEffect } from 'react'
+import * as React from 'react'
+import { useEffect, ReactType } from 'react'
 import { useOpenAuthoring } from '../open-authoring/OpenAuthoringProvider'
 
 interface Props {
   previewError: any
   children: any
 }
-export const withOpenAuthoringErrorHandler = BaseComponent => (
+export const withOpenAuthoringErrorHandler = (BaseComponent: ReactType) => (
   props: Props
 ) => {
   const openAuthoring = useOpenAuthoring()

@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export * from './PRPlugin'
-export * from './PRModal'
+export * from './authenticate'
+export * from './useGithubAuthRedirect'

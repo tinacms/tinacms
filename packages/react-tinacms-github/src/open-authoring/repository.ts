@@ -35,7 +35,7 @@ export const setHeadBranch = (val: string) => {
   setCookie(HEAD_BRANCH_COOKIE_KEY, val)
 }
 
-const getCookie = (cookieName: string) => {
+const getCookie = (cookieName: string): string | undefined => {
   return Cookies.get(cookieName)
 }
 
