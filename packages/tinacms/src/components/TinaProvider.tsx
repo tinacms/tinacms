@@ -19,8 +19,8 @@ limitations under the License.
 import * as React from 'react'
 import { ModalProvider } from '@tinacms/react-modals'
 import { GlobalStyles } from '@tinacms/styles'
-import { SidebarProvider } from './sidebar/Sidebar'
-import { TinaCMS, SidebarPosition } from '../tina-cms'
+import { SidebarProvider, SidebarPosition } from '@tinacms/react-sidebar'
+import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
 
