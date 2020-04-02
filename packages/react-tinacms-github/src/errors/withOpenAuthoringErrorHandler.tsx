@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useEffect, ReactType } from 'react'
-import { useOpenAuthoring } from '../open-authoring/OpenAuthoringProvider'
+import { useOpenAuthoring } from '../open-authoring/useOpenAuthoring'
 
 interface Props {
   previewError: any

@@ -19,7 +19,7 @@ limitations under the License.
 import { Form } from 'tinacms'
 import { useEffect } from 'react'
 import createDecorator from 'final-form-submit-listener'
-import { useOpenAuthoring } from '../open-authoring/OpenAuthoringProvider'
+import { useOpenAuthoring } from '../open-authoring/useOpenAuthoring'
 
 // Show success/fail feedback on form submission
 const useOpenAuthoringErrorListener = (form: Form) => {
