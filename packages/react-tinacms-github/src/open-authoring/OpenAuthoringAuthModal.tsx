@@ -27,13 +27,14 @@ import {
 } from 'tinacms'
 import { TinaReset } from '@tinacms/styles'
 import { AsyncButton } from '../open-authoring-ui/components/AsyncButton'
+import React from 'react'
 
 const OpenAuthoringAuthModal = ({
   onUpdateAuthState,
   close,
   authState,
   authenticate,
-}) => {
+}: any) => {
   let modalProps
 
   const cms = useCMS()
@@ -91,7 +92,7 @@ const OpenAuthoringAuthModal = ({
             <p>{modalProps.message}</p>
           </ModalBody>
           <ModalActions>
-            {modalProps.actions.map(action => (
+            {modalProps.actions.map((action: any) => (
               <AsyncButton {...action} />
             ))}
           </ModalActions>

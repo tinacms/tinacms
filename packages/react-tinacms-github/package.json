@@ -2,7 +2,7 @@
   "name": "react-tinacms-github",
   "version": "0.1.0",
   "description": "",
-  "main": "index.js",
+  "main": "dist/index.js",
   "scripts": {
     "watch": "tsdx watch",
     "build": "tsdx build",
@@ -12,6 +12,9 @@
   },
   "author": "",
   "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/js-cookie": "^2.2.5"
+  },
   "dependencies": {
     "@tinacms/fields": "^0.9.1",
     "@tinacms/styles": "^0.4.0",

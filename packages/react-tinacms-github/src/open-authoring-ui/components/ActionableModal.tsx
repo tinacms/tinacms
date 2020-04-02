@@ -45,7 +45,7 @@ export const ActionableModal = ({
     <TinaReset>
       <Modal>
         <ModalPopup>
-          <ModalHeader close={null}>{title}</ModalHeader>
+          <ModalHeader>{title}</ModalHeader>
           <ModalBody padded>
             <p>{message}</p>
           </ModalBody>

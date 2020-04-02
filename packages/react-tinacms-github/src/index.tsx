@@ -16,5 +16,8 @@ limitations under the License.
 
 */
 
-export * from './PRPlugin'
-export * from './PRModal'
+export * from './errors'
+export * from './github-auth'
+export * from './github-error'
+export * from './open-authoring'
+export * from './toolbar-plugins'

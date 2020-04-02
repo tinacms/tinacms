@@ -26,8 +26,9 @@ export const authenticate = (codeExchangeRoute: string): Promise<void> => {
   const url = `https://github.com/login/oauth/authorize?scope=public_repo&client_id=${process.env.GITHUB_CLIENT_ID}&state=${authState}`
 
   return new Promise(resolve => {
-    let authTab
-    window.addEventListener('storage', function(e) {
+    // @ts-ignore
+    let authTab: Window | undefined
+    window.addEventListener('storage', function(e: StorageEvent) {
       if (e.key == GITHUB_AUTH_CODE_KEY) {
         fetch(
           `${codeExchangeRoute}?code=${e.newValue}&state=${authState}`

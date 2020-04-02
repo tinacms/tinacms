@@ -27,7 +27,7 @@ const useOpenAuthoringErrorListener = (form: Form) => {
 
   useEffect(() => {
     const submitListener = createDecorator({
-      afterSubmitFailed: async failedForm => {
+      afterSubmitFailed: async (failedForm: any) => {
         openAuthoring.setError(failedForm.getState().submitError)
       },
     })

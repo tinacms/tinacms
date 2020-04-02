@@ -20,10 +20,10 @@ import { getForkName, getHeadBranch } from '../open-authoring/repository'
 import { ActionableModalOptions } from '../open-authoring-ui/components/ActionableModal'
 
 export const getModalProps = async (
-  error,
-  sourceProvider,
-  startEditing,
-  stopEditing
+  error: any,
+  sourceProvider: any,
+  startEditing: any,
+  stopEditing: any
 ): Promise<ActionableModalOptions> => {
   const reauthenticateAction = {
     name: 'Continue',

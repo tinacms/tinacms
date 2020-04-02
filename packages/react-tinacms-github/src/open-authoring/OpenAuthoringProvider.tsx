@@ -21,12 +21,12 @@ import { getForkName, getHeadBranch } from './repository'
 import { useCMS } from 'tinacms'
 import OpenAuthoringErrorModal from '../github-error/OpenAuthoringErrorModal'
 import OpenAuthoringAuthModal from './OpenAuthoringAuthModal'
-import { withOpenAuthoringErrorHandler } from '../errors/withOpenAuthoringErrorHandler'
+import { withOpenAuthoringErrorHandler } from '../errors'
 
 export interface OpenAuthoringContext {
   enterEditMode: () => void
   exitEditMode: () => void
-  setError: (err) => void
+  setError: (err: any) => void
 }
 
 export const OpenAuthoringContext = React.createContext<OpenAuthoringContext | null>(
@@ -63,9 +63,11 @@ export const OpenAuthoringProvider = ({
   authenticate,
   error: previewError,
 }: ProviderProps) => {
-  const [error, setError] = useState(null)
+  const [error, setError] = useState<any>(null)
   const cms = useCMS()
-  const [authorizingStatus, setAuthorizingStatus] = useState<AuthState>(null)
+  const [authorizingStatus, setAuthorizingStatus] = useState<AuthState | null>(
+    null
+  )
 
   const tryEnterEditMode = async () => {
     const authenticated =

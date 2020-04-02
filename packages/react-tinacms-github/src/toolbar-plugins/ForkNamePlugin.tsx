@@ -37,7 +37,7 @@ const MetaLink = styled.a`
   color: var(--tina-color-primary-dark);
 `
 
-const ForkInfo = ({ forkName }) => {
+const ForkInfo = ({ forkName }: { forkName: string }) => {
   return (
     <FieldMeta name={'Fork'}>
       <MetaLink target="_blank" href={`https://github.com/${forkName}`}>

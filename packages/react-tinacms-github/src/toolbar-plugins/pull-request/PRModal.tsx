@@ -33,7 +33,7 @@ interface Props {
 
 export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
   const [prError, setPrError] = useState('')
-  const [fetchedPR, setFetchedPR] = useState(undefined)
+  const [fetchedPR, setFetchedPR] = useState<any>(undefined)
   const cms = useCMS()
 
   const titleInput = React.createRef() as any
@@ -42,7 +42,7 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
   const checkForPR = async () => {
     await cms.api.github
       .fetchExistingPR(forkRepoFullName, getHeadBranch())
-      .then(pull => {
+      .then((pull: any) => {
         if (pull) {
           setFetchedPR(pull)
         } else {
