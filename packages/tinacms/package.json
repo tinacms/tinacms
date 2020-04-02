@@ -48,6 +48,7 @@
     "@tinacms/react-modals": "^0.1.0",
     "@tinacms/react-screens": "^0.0.0",
     "@tinacms/react-sidebar": "^0.0.0",
+    "@tinacms/react-toolbar": "^0.0.0",
     "@tinacms/styles": "^0.4.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
