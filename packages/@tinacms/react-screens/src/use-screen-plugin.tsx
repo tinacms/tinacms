@@ -15,12 +15,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { usePlugins } from '@tinacms/react-core'
+import { useMemo, DependencyList } from 'react'
+import { createScreen, ScreenOptions } from './screen-plugin'
 
-import { useCMS, useSubscribable } from '../../react-tinacms'
+export function useScreenPlugin(options: ScreenOptions, deps?: DependencyList) {
+  const memo = useMemo(() => {
+    return createScreen(options)
+  }, deps)
 
-export function useSidebar() {
-  const sidebar = useCMS().sidebar
-
-  useSubscribable(sidebar)
-  return sidebar
+  usePlugins(memo)
 }

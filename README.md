@@ -25,6 +25,11 @@
 
 ## Development
 
+**Disclaimer**: 
+
+- Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
+- Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
+
 To get started:
 
 ```bash
@@ -146,7 +151,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   </tr>
   <tr>
     <td align="center"><a href="https://gavinmcfarland.co.uk/"><img src="https://avatars1.githubusercontent.com/u/5551?v=4" width="100px;" alt=""/><br /><sub><b>Gavin McFarland</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Alimitlessloop" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://github.com/blandfried"><img src="https://avatars1.githubusercontent.com/u/1953556?v=4" width="100px;" alt=""/><br /><sub><b>blandfried</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Ablandfried" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/blandfried"><img src="https://avatars1.githubusercontent.com/u/1953556?v=4" width="100px;" alt=""/><br /><sub><b>blandfried</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Ablandfried" title="Bug reports">🐛</a> <a href="https://github.com/tinacms/tinacms/commits?author=blandfried" title="Code">💻</a></td>
   </tr>
 </table>
 

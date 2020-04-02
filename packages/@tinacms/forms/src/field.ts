@@ -15,15 +15,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import type { DependencyList } from "react"
-import { usePlugins } from '@tinacms/react-core'
-import { useMemo } from 'react'
-import { createScreen, ScreenOptions } from "../plugins/screen-plugin"
 
-export function useScreenPlugin(options: ScreenOptions, deps?: DependencyList ) {
-  const memo = useMemo(() => {
-    return createScreen(options)
-  }, deps)
-
-  usePlugins(memo)
+export interface Field {
+  name: string
+  label?: string
+  description?: string
+  component: React.FC<any> | string | null
+  parse?: (value: any, name: string, field: Field) => any
+  format?: (value: any, name: string, field: Field) => any
+  validate?(
+    value: any,
+    allValues: any,
+    meta: any,
+    field: Field
+  ): string | object | undefined
+  defaultValue?: any
+  fields?: Field[]
 }

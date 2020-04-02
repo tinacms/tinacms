@@ -31,13 +31,15 @@ export const ReactDateTimeContainer = styled.div`
   .rdtPicker {
     display: none;
     position: absolute;
-    width: 250px;
+    width: 100%;
+    max-width: 350px;
     padding: 4px;
-    margin-top: 1px;
+    margin-top: 4px;
     z-index: 99999 !important;
-    background: #fff;
-    box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
-    border: 1px solid #f9f9f9;
+    background: var(--tina-color-grey-0);
+    border-radius: var(--tina-radius-small);
+    box-shadow: var(--tina-shadow-big);
+    border: 1px solid var(--tina-color-grey-2);
   }
   .rdtOpen .rdtPicker {
     display: block;
@@ -66,12 +68,20 @@ export const ReactDateTimeContainer = styled.div`
   .rdtPicker td.rdtMinute:hover,
   .rdtPicker td.rdtSecond:hover,
   .rdtPicker .rdtTimeToggle:hover {
-    background: #eeeeee;
+    background: var(--tina-color-grey-2);
+    color: var(--tina-color-primary);
+    border-radius: var(--tina-radius-small);
     cursor: pointer;
+
+    &:active {
+      background: var(--tina-color-primary);
+      color: var(--tina-color-grey-0);
+      border-radius: var(--tina-radius-small);
+    }
   }
   .rdtPicker td.rdtOld,
   .rdtPicker td.rdtNew {
-    color: #999999;
+    color: var(--tina-color-grey-6);
   }
   .rdtPicker td.rdtToday {
     position: relative;
@@ -80,7 +90,8 @@ export const ReactDateTimeContainer = styled.div`
     content: '';
     display: inline-block;
     border-left: 7px solid transparent;
-    border-bottom: 7px solid #428bca;
+    border-bottom: 7px solid var(--tina-color-primary);
+    border-radius: 20px;
     border-top-color: rgba(0, 0, 0, 0.2);
     position: absolute;
     bottom: 4px;
@@ -88,30 +99,30 @@ export const ReactDateTimeContainer = styled.div`
   }
   .rdtPicker td.rdtActive,
   .rdtPicker td.rdtActive:hover {
-    background-color: #428bca;
-    color: #fff;
+    background-color: var(--tina-color-primary);
+    color: var(--tina-color-grey-0);
     text-shadow: 0 -1px 0 rgba(0, 0, 0, 0.25);
   }
   .rdtPicker td.rdtActive.rdtToday:before {
-    border-bottom-color: #fff;
+    border-bottom-color: var(--tina-color-grey-0);
   }
   .rdtPicker td.rdtDisabled,
   .rdtPicker td.rdtDisabled:hover {
     background: none;
-    color: #999999;
+    color: var(--tina-color-grey-6);
     cursor: not-allowed;
   }
   .rdtPicker td span.rdtOld {
-    color: #999999;
+    color: var(--tina-color-grey-6);
   }
   .rdtPicker td span.rdtDisabled,
   .rdtPicker td span.rdtDisabled:hover {
     background: none;
-    color: #999999;
+    color: var(--tina-color-grey-6);
     cursor: not-allowed;
   }
   .rdtPicker th {
-    border-bottom: 1px solid #f9f9f9;
+    border-bottom: 1px solid var(--tina-color-grey-1);
   }
   .rdtPicker .dow {
     width: 14.2857%;
@@ -139,17 +150,19 @@ export const ReactDateTimeContainer = styled.div`
   .rdtPicker th.rdtDisabled,
   .rdtPicker th.rdtDisabled:hover {
     background: none;
-    color: #999999;
+    color: var(--tina-color-grey-6);
     cursor: not-allowed;
   }
   .rdtPicker thead tr:first-child th {
     cursor: pointer;
   }
   .rdtPicker thead tr:first-child th:hover {
-    background: #eeeeee;
+    background: var(--tina-color-grey-2);
+    color: var(--tina-color-primary);
+    border-radius: var(--tina-radius-small);
   }
   .rdtPicker tfoot {
-    border-top: 1px solid #f9f9f9;
+    border-top: 1px solid var(--tina-color-grey-1);
   }
   .rdtPicker button {
     border: none;
@@ -157,7 +170,9 @@ export const ReactDateTimeContainer = styled.div`
     cursor: pointer;
   }
   .rdtPicker button:hover {
-    background-color: #eee;
+    background: var(--tina-color-grey-2);
+    color: var(--tina-color-primary);
+    border-radius: var(--tina-radius-small);
   }
   .rdtPicker thead button {
     width: 100%;
@@ -171,7 +186,9 @@ export const ReactDateTimeContainer = styled.div`
   }
   td.rdtMonth:hover,
   td.rdtYear:hover {
-    background: #eee;
+    background: var(--tina-color-grey-2);
+    color: var(--tina-color-primary);
+    border-radius: var(--tina-radius-small);
   }
   .rdtCounters {
     display: inline-block;
@@ -201,7 +218,9 @@ export const ReactDateTimeContainer = styled.div`
     user-select: none;
   }
   .rdtCounter .rdtBtn:hover {
-    background: #eee;
+    background: var(--tina-color-grey-2);
+    color: var(--tina-color-primary);
+    border-radius: var(--tina-radius-small);
   }
   .rdtCounter .rdtCount {
     height: 20%;

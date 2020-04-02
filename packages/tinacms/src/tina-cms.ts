@@ -18,7 +18,7 @@
 
 import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
-import { ScreenPlugin } from './plugins/screen-plugin'
+import { ScreenPlugin } from '@tinacms/react-screens'
 import {
   TextFieldPlugin,
   TextareaFieldPlugin,
@@ -35,7 +35,7 @@ import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
 import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
 import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import { Form } from '@tinacms/forms'
-import { MediaManager, MediaStore, MediaUploadOptions } from './media'
+import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
 import { Alerts } from './tina-cms/alerts'
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'

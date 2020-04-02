@@ -22,7 +22,6 @@ import { createPortal } from 'react-dom'
 import styled, { StyledComponent } from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 import { Button, TinaReset } from '@tinacms/styles'
-export const Z_INDEX = 2147000000
 
 interface Props {
   children: any
@@ -100,7 +99,7 @@ export const ModalOverlay = styled.div`
   background: rgba(0, 0, 0, 0.5);
   overflow: auto;
   padding: 0;
-  z-index: ${Z_INDEX + 100};
+  z-index: var(--tina-z-index-3);
 `
 
 const ModalTitle = styled.h2`
