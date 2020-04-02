@@ -16,13 +16,13 @@ limitations under the License.
 
 */
 
-import React, { useState } from 'react'
+import React, { useState, useEffect } from 'react'
 import { getForkName, getHeadBranch } from './repository'
 import { useCMS } from 'tinacms'
 import OpenAuthoringErrorModal from '../github-error/OpenAuthoringErrorModal'
 import OpenAuthoringAuthModal from './OpenAuthoringAuthModal'
-import { withOpenAuthoringErrorHandler } from '../errors'
 import { OpenAuthoringContext } from './OpenAuthoringContext'
+import { useOpenAuthoring } from './useOpenAuthoring'
 
 interface ProviderProps {
   children: any
@@ -93,4 +93,26 @@ export const OpenAuthoringProvider = ({
   )
 }
 
-const PreviewErrorBoundary: any = withOpenAuthoringErrorHandler(p => p.children)
+interface Props {
+  previewError: any
+  children: any
+}
+function PreviewErrorBoundary(props: Props) {
+  const openAuthoring = useOpenAuthoring()
+
+  useEffect(() => {
+    ;(async () => {
+      if (props.previewError) {
+        openAuthoring.setError(props.previewError)
+      }
+    })()
+  }, [props.previewError])
+
+  if (props.previewError) {
+    return null
+  }
+
+  // don't show content with initial content error
+  // because the data is likely missing
+  return props.children
+}

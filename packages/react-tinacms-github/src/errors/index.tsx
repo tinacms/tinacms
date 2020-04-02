@@ -17,4 +17,3 @@ limitations under the License.
 */
 
 export * from './useOpenAuthoringErrorListener'
-export * from './withOpenAuthoringErrorHandler'
