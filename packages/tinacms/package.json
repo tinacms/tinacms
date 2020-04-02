@@ -52,9 +52,7 @@
     "@types/react-beautiful-dnd": "^11.0.3",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
-    "react-beautiful-dnd": "^11.0.5",
     "react-datetime": "^2.16.3",
-    "react-dismissible": "^1.1.5",
     "react-tinacms-editor": "^0.3.0"
   },
   "peerDependencies": {
