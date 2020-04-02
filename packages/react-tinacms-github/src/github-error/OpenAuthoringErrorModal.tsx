@@ -16,11 +16,10 @@ limitations under the License.
 
 */
 
-import { useEffect, useState } from 'react'
+import React, { useEffect, useState } from 'react'
 import { useCMS } from 'tinacms'
 import { useOpenAuthoring } from '../open-authoring/useOpenAuthoring'
 import { getModalProps } from './github-interpeter'
-import React from 'react'
 import {
   ActionableModalOptions,
   ActionableModal,
