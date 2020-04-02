@@ -19,3 +19,4 @@ limitations under the License.
 export * from './OpenAuthoringAuthModal'
 export * from './OpenAuthoringProvider'
 export * from './repository'
+export * from './useOpenAuthoring'

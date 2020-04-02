@@ -22,7 +22,7 @@ import createDecorator from 'final-form-submit-listener'
 import { useOpenAuthoring } from '../open-authoring/useOpenAuthoring'
 
 // Show success/fail feedback on form submission
-const useOpenAuthoringErrorListener = (form: Form) => {
+export const useOpenAuthoringErrorListener = (form: Form) => {
   const openAuthoring = useOpenAuthoring()
 
   useEffect(() => {
@@ -37,5 +37,3 @@ const useOpenAuthoringErrorListener = (form: Form) => {
     return undecorateSaveListener
   }, [form])
 }
-
-export default useOpenAuthoringErrorListener
