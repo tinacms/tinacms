@@ -31,43 +31,60 @@ import { SIDEBAR_WIDTH, SIDEBAR_HEADER_HEIGHT } from './Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '@tinacms/react-core'
-import { SidebarState, SidebarPosition } from '../sidebar'
+import { SidebarState, SidebarPosition, SidebarStateOptions } from '../sidebar'
 
-export function SidebarProvider({ children, position, hidden, cms }: any) {
-  useSubscribable(cms.sidebar)
+export interface SidebarProviderProps {
+  children: any
+  sidebar: SidebarState
+  position?: SidebarStateOptions['position']
+  hidden?: boolean
+}
+
+export function SidebarProvider({
+  children,
+  position,
+  hidden,
+  sidebar,
+}: SidebarProviderProps) {
+  useSubscribable(sidebar)
 
   React.useEffect(() => {
     if (typeof hidden !== 'undefined') {
-      cms.sidebar.hidden = hidden
+      sidebar.hidden = hidden
     }
   }, [hidden])
 
   return (
     <>
       <SiteWrapper
-        open={cms.sidebar.isOpen}
-        position={position || cms.sidebar.position}
+        open={sidebar.isOpen}
+        position={position || sidebar.position}
       >
         {children}
       </SiteWrapper>
-      {!cms.sidebar.hidden && <Sidebar />}
+      {!sidebar.hidden && <Sidebar sidebar={sidebar} />}
     </>
   )
 }
 
-const Sidebar = () => {
-  const cms: any = useCMS()
-  useSubscribable(cms.sidebar)
-  useSubscribable(cms.screens)
+interface SidebarProps {
+  sidebar: SidebarState
+}
+
+const Sidebar = ({ sidebar }: SidebarProps) => {
+  const cms = useCMS()
+  const screens = cms.plugins.getType<ScreenPlugin>('screen')
+  useSubscribable(sidebar)
+  useSubscribable(screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const allScreens = cms.screens.all()
+  const allScreens = screens.all()
   const showMenu = allScreens.length > 0
 
   return (
     <TinaReset>
-      <SidebarContainer open={cms.sidebar.isOpen}>
-        <SidebarWrapper open={cms.sidebar.isOpen}>
+      <SidebarContainer open={sidebar.isOpen}>
+        <SidebarWrapper open={sidebar.isOpen}>
           <SidebarHeader>
             {showMenu && (
               <MenuToggle
@@ -111,7 +128,7 @@ const Sidebar = () => {
             />
           )}
         </SidebarWrapper>
-        <SidebarToggle sidebar={cms.sidebar} />
+        <SidebarToggle sidebar={sidebar} />
       </SidebarContainer>
     </TinaReset>
   )
