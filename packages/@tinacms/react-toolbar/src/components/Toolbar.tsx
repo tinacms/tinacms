@@ -276,4 +276,5 @@ const StatusMessage = styled.p`
   align-items: center;
   color: var(--tina-color-grey-6);
   padding-right: 4px;
+  margin-bottom: 0;
 `
