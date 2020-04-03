@@ -18,15 +18,12 @@ limitations under the License.
 
 import { Form, useCMS } from 'tinacms'
 import { useEffect } from 'react'
-import { getForkName } from '../open-authoring/repository'
+import { getForkName } from '../github-editing-context/repository'
 import { PRPlugin } from './pull-request'
 import { ForkNamePlugin } from './ForkNamePlugin'
 import { Plugin } from 'tinacms'
 
-export const useOpenAuthoringToolbarPlugins = (
-  form: Form<any>,
-  editMode: boolean
-) => {
+export const useGithubToolbarPlugins = (form: Form<any>, editMode: boolean) => {
   const cms = useCMS()
 
   useEffect(() => {

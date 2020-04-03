@@ -21,8 +21,8 @@ import { Modal, ModalPopup, ModalHeader, ModalBody } from 'tinacms'
 import { PullRequestIcon } from '@tinacms/icons'
 
 import { PRModal } from './PRModal'
-import { ToolbarButton } from '../../open-authoring-ui/components/ToolbarButton'
-import { DesktopLabel } from '../../open-authoring-ui/components/DesktopLabel'
+import { ToolbarButton } from '../../components/ToolbarButton'
+import { DesktopLabel } from '../../components/DesktopLabel'
 
 interface PullRequestButtonOptions {
   baseRepoFullName: string

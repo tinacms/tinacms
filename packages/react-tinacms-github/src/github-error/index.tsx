@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export * from './OpenAuthoringErrorModal'
+export * from './GithubErrorModal'

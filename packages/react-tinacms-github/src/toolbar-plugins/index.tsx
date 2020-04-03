@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export * from './useOpenAuthoringToolbarPlugins'
+export * from './useGithubToolbarPlugins'
 export * from './ForkNamePlugin'

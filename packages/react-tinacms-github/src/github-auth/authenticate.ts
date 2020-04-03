@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { GITHUB_AUTH_CODE_KEY } from './useGithubAuthRedirect'
-import popupWindow from '../open-authoring-ui/popupWindow'
+import popupWindow from './popupWindow'
 export const authenticate = (codeExchangeRoute: string): Promise<void> => {
   const authState = Math.random()
     .toString(36)

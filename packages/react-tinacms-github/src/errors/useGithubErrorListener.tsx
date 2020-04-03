@@ -19,16 +19,16 @@ limitations under the License.
 import { Form } from 'tinacms'
 import { useEffect } from 'react'
 import createDecorator from 'final-form-submit-listener'
-import { useOpenAuthoring } from '../open-authoring/useOpenAuthoring'
+import { useGithubEditing } from '../github-editing-context/useGithubEditing'
 
 // Show success/fail feedback on form submission
-export const useOpenAuthoringErrorListener = (form: Form) => {
-  const openAuthoring = useOpenAuthoring()
+export const useGithubErrorListener = (form: Form) => {
+  const github = useGithubEditing()
 
   useEffect(() => {
     const submitListener = createDecorator({
       afterSubmitFailed: async (failedForm: any) => {
-        openAuthoring.setError(failedForm.getState().submitError)
+        github.setError(failedForm.getState().submitError)
       },
     })
 

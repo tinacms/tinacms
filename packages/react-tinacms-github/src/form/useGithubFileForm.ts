@@ -21,7 +21,7 @@ import { GithubOptions } from './GithubOptions'
 import { Options } from 'next-tinacms-markdown'
 import { useCMS, useLocalForm } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
-import { getForkName } from '../open-authoring/repository'
+import { getForkName } from '../github-editing-context/repository'
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
   formOptions: Options,

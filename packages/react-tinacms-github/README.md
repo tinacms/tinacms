@@ -2,11 +2,11 @@
 
 ## Implementation:
 
-Add the root OpenAuthoringProvider component to our main layout. In this case, we will use Github Auth.
+Add the root GithubAuthenticationProvider component to our main layout. In this case, we will use Github Auth.
 ```ts
 // YourLayout.ts
 import { authenticate }  from '@tinacms/github-auth'
-import OpenAuthoringProvider from 'react-tinacms-github'
+import GithubAuthenticationProvider from 'react-tinacms-github'
 const enterEditMode = () =>
   fetch(`/api/preview`).then(() => {
     window.location.href = window.location.pathname
@@ -17,12 +17,12 @@ const exitEditMode = () => {
   })
 }
 const YourLayout = ({ Component, pageProps }) => {
-  return (<OpenAuthoringProvider
+  return (<GithubAuthenticationProvider
       authenticate={() => authenticate('/api/create-github-access-token')}
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}>
       {...children}
-    </OpenAuthoringProvider>)
+    </GithubAuthenticationProvider>)
 }
 ```
 
@@ -30,7 +30,7 @@ Add error handling to our forms which prompt Github-specific action when errors 
 ```ts
 // YourSiteForm.ts
 const YourSiteForm = ({ form, children }) => {
-  useOpenAuthoringErrorListener(form)
+  useGithubErrorListener(form)
   return (
     <FormLayout>
       {children}
@@ -57,13 +57,13 @@ export default function Authorizing() {
 
 ```ts
 //...EditLink.tsx
-import { useOpenAuthoring } from 'react-tinacms-github'
+import { useGithub } from 'react-tinacms-github'
 export const EditLink = ({ editMode }: EditLinkProps) => {
-  const openAuthoring = useOpenAuthoring()
+  const github = useGithub()
   return (
     <EditToggleButton
       onClick={
-        editMode ? openAuthoring.exitEditMode : openAuthoring.enterEditMode
+        editMode ? github.exitEditMode : github.enterEditMode
       }
     >
       {editMode ? 'Exit Edit Mode' : 'Edit This Site'}
