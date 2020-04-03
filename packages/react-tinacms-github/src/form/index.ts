@@ -16,9 +16,7 @@ limitations under the License.
 
 */
 
-export * from './errors'
-export * from './github-auth'
-export * from './github-error'
-export * from './open-authoring'
-export * from './toolbar-plugins'
-export * from './form'
+export * from './GithubOptions'
+export * from './useGithubFileForm'
+export * from './useGithubJsonForm'
+export * from './useGithubMarkdownForm'
