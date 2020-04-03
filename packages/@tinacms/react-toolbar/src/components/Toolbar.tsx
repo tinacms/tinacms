@@ -29,10 +29,6 @@ import { UndoIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
 import { LoadingDots } from '@tinacms/react-forms'
 
-const SaveButton = styled(ToolbarButton)`
-  padding: 0 2rem;
-`
-
 const useFormState = (form: Form | null, subscription: any): any => {
   const [state, setState] = React.useState<any>()
   React.useEffect(() => {
@@ -148,6 +144,30 @@ export const Toolbar = styled(({ ...styleProps }) => {
   }
 `
 
+interface FormStatusProps {
+  dirty: boolean
+}
+
+const FormStatus = ({ dirty }: FormStatusProps) => {
+  return (
+    <FieldMeta name={'Form Status'}>
+      {dirty ? (
+        <StatusMessage>
+          <StatusLight warning /> <DesktopLabel>Unsaved changes</DesktopLabel>
+        </StatusMessage>
+      ) : (
+        <StatusMessage>
+          <StatusLight /> <DesktopLabel>No changes</DesktopLabel>
+        </StatusMessage>
+      )}
+    </FieldMeta>
+  )
+}
+
+const SaveButton = styled(ToolbarButton)`
+  padding: 0 2rem;
+`
+
 const WidgetsContainer = styled.div`
   display: flex;
   align-items: center;
@@ -223,26 +243,6 @@ const ToolbarPlaceholder = styled.div`
   width: 100%;
   height: 62px;
 `
-
-interface FormStatusProps {
-  dirty: boolean
-}
-
-const FormStatus = ({ dirty }: FormStatusProps) => {
-  return (
-    <FieldMeta name={'Form Status'}>
-      {dirty ? (
-        <StatusMessage>
-          <StatusLight warning /> <DesktopLabel>Unsaved changes</DesktopLabel>
-        </StatusMessage>
-      ) : (
-        <StatusMessage>
-          <StatusLight /> <DesktopLabel>No changes</DesktopLabel>
-        </StatusMessage>
-      )}
-    </FieldMeta>
-  )
-}
 
 interface StatusLightProps {
   warning?: boolean
