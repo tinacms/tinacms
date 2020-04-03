@@ -20,7 +20,8 @@
     "tinacms": ">=0.13",
     "js-cookie": "^2.2.1",
     "final-form-submit-listener": "^1.0.0",
-    "@tinacms/icons": ">=0.7.0"
+    "@tinacms/icons": ">=0.7.0",
+    "next-tinacms-markdown": ">=0.2.9"
   },
   "devDependencies": {
     "@types/js-cookie": "^2.2.5",
@@ -31,6 +32,7 @@
     "tinacms": "^0.18.2",
     "js-cookie": "^2.2.1",
     "final-form-submit-listener": "^1.0.0",
-    "@tinacms/icons": "^0.7.0"
+    "@tinacms/icons": "^0.7.0",
+    "next-tinacms-markdown": "0.2.9"
   }
 }
