@@ -20,7 +20,6 @@ import React from 'react'
 import App from 'next/app'
 import { Tina, TinaCMS, withTina } from 'tinacms'
 import { GitClient, GitMediaStore } from '@tinacms/git-client'
-import { Toolbar } from '@tinacms/react-toolbar'
 
 export default class Site extends App {
   constructor() {
@@ -29,6 +28,9 @@ export default class Site extends App {
       sidebar: {
         position: 'overlay',
         hidden: process.env.NODE_ENV === 'production',
+      },
+      toolbar: {
+        hidden: false,
       },
     })
     const client = new GitClient('http://localhost:3000/___tina')
@@ -40,7 +42,6 @@ export default class Site extends App {
     const { Component, pageProps } = this.props
     return (
       <Tina cms={this.cms}>
-        <Toolbar />
         <Component {...pageProps} />
       </Tina>
     )

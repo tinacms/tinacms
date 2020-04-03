@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export * from './toolbar'
-export * from './components'
+export * from './ToolbarProvider'
+export * from './Toolbar'
