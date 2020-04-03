@@ -45,7 +45,7 @@ interface ToolbarWidgetPlugin<Props = any> extends Plugin {
   component(): React.ReactElement
 }
 
-export const Toolbar = styled(({ ...styleProps }) => {
+export const Toolbar = () => {
   const cms = useCMS()
   const widgets = cms.plugins.getType<ToolbarWidgetPlugin>('toolbar:widget')
 
@@ -78,7 +78,7 @@ export const Toolbar = styled(({ ...styleProps }) => {
   return (
     <TinaReset>
       <ToolbarPlaceholder />
-      <div {...styleProps}>
+      <ToolbarStyles>
         <Create>
           <CreateContentMenu />
         </Create>
@@ -118,10 +118,32 @@ export const Toolbar = styled(({ ...styleProps }) => {
             )}
           </SaveButton>
         </Actions>
-      </div>
+      </ToolbarStyles>
     </TinaReset>
   )
-})`
+}
+
+interface FormStatusProps {
+  dirty: boolean
+}
+
+const FormStatus = ({ dirty }: FormStatusProps) => {
+  return (
+    <FieldMeta name={'Form Status'}>
+      {dirty ? (
+        <StatusMessage>
+          <StatusLight warning /> <DesktopLabel>Unsaved changes</DesktopLabel>
+        </StatusMessage>
+      ) : (
+        <StatusMessage>
+          <StatusLight /> <DesktopLabel>No changes</DesktopLabel>
+        </StatusMessage>
+      )}
+    </FieldMeta>
+  )
+}
+
+const ToolbarStyles = styled.div`
   position: fixed;
   top: 0;
   left: 0;
@@ -143,26 +165,6 @@ export const Toolbar = styled(({ ...styleProps }) => {
     }
   }
 `
-
-interface FormStatusProps {
-  dirty: boolean
-}
-
-const FormStatus = ({ dirty }: FormStatusProps) => {
-  return (
-    <FieldMeta name={'Form Status'}>
-      {dirty ? (
-        <StatusMessage>
-          <StatusLight warning /> <DesktopLabel>Unsaved changes</DesktopLabel>
-        </StatusMessage>
-      ) : (
-        <StatusMessage>
-          <StatusLight /> <DesktopLabel>No changes</DesktopLabel>
-        </StatusMessage>
-      )}
-    </FieldMeta>
-  )
-}
 
 const SaveButton = styled(ToolbarButton)`
   padding: 0 2rem;
