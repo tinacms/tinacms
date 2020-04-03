@@ -26,10 +26,10 @@ import {
   ModalActions,
 } from 'tinacms'
 import { TinaReset } from '@tinacms/styles'
-import { AsyncButton } from '../open-authoring-ui/components/AsyncButton'
+import { AsyncButton } from '../components/AsyncButton'
 import React from 'react'
 
-const OpenAuthoringAuthModal = ({
+const GithubAuthModal = ({
   onUpdateAuthState,
   close,
   authState,
@@ -102,4 +102,4 @@ const OpenAuthoringAuthModal = ({
   )
 }
 
-export default OpenAuthoringAuthModal
+export default GithubAuthModal

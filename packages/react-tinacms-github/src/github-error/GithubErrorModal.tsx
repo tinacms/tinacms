@@ -18,32 +18,32 @@ limitations under the License.
 
 import React, { useEffect, useState } from 'react'
 import { useCMS } from 'tinacms'
-import { useOpenAuthoring } from '../open-authoring/useOpenAuthoring'
+import { useGithubEditing } from '../github-editing-context/useGithubEditing'
 import { getModalProps } from './github-interpeter'
 import {
   ActionableModalOptions,
   ActionableModal,
-} from '../open-authoring-ui/components/ActionableModal'
+} from '../components/ActionableModal'
 
-interface OpenAuthoringError extends Error {
+interface GithubError extends Error {
   status: number
   message: string
 }
 
 interface Props {
-  error: OpenAuthoringError
+  error: GithubError
 }
 
 // When an open authoring error is caught, we don't immedietly know the cause
 // We have to perform a few extra checks and render a modal with options
-const OpenAuthoringErrorModal = (props: Props) => {
+const GithubErrorModal = (props: Props) => {
   const [
     errorModalProps,
     setErrorModalProps,
   ] = useState<ActionableModalOptions | null>(null)
   const { github } = useCMS().api
 
-  const openAuthoring = useOpenAuthoring()
+  const githubEditing = useGithubEditing()
 
   useEffect(() => {
     ;(async () => {
@@ -51,15 +51,15 @@ const OpenAuthoringErrorModal = (props: Props) => {
         const modalProps = await getModalProps(
           props.error,
           github,
-          openAuthoring.enterEditMode,
-          openAuthoring.exitEditMode
+          githubEditing.enterEditMode,
+          githubEditing.exitEditMode
         )
         setErrorModalProps(modalProps)
       } else {
         setErrorModalProps(null)
       }
     })()
-  }, [props.error, openAuthoring.enterEditMode])
+  }, [props.error, githubEditing.enterEditMode])
 
   if (!errorModalProps) {
     return null
@@ -68,4 +68,4 @@ const OpenAuthoringErrorModal = (props: Props) => {
   return <ActionableModal {...errorModalProps} />
 }
 
-export default OpenAuthoringErrorModal
+export default GithubErrorModal

@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-export * from './OpenAuthoringAuthModal'
-export * from './OpenAuthoringProvider'
+export * from './GithubAuthModal'
+export * from './GithubAuthenticationProvider'
 export * from './repository'
-export * from './useOpenAuthoring'
+export * from './useGithubEditing'

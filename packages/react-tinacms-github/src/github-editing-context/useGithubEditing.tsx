@@ -17,13 +17,14 @@ limitations under the License.
 */
 
 import React from 'react'
+import { GithubEditingContext } from './GithubEditingContext'
 
-export interface OpenAuthoringProps {
-  enterEditMode: () => void
-  exitEditMode: () => void
-  setError: (err: any) => void
+export function useGithubEditing() {
+  const githubContext = React.useContext(GithubEditingContext)
+
+  if (!githubContext) {
+    throw new Error('useGithub must be within an GithubContext')
+  }
+
+  return githubContext
 }
-
-export const OpenAuthoringContext = React.createContext<OpenAuthoringProps | null>(
-  null
-)

@@ -19,10 +19,10 @@ limitations under the License.
 import React, { useState, useEffect } from 'react'
 import { getForkName, getHeadBranch } from './repository'
 import { useCMS } from 'tinacms'
-import OpenAuthoringErrorModal from '../github-error/OpenAuthoringErrorModal'
-import OpenAuthoringAuthModal from './OpenAuthoringAuthModal'
-import { OpenAuthoringContext } from './OpenAuthoringContext'
-import { useOpenAuthoring } from './useOpenAuthoring'
+import GithubErrorModal from '../github-error/GithubErrorModal'
+import GithubAuthModal from './GithubAuthModal'
+import { GithubEditingContext } from './GithubEditingContext'
+import { useGithubEditing } from './useGithubEditing'
 
 interface ProviderProps {
   children: any
@@ -37,7 +37,7 @@ interface AuthState {
   forkValid: true
 }
 
-export const OpenAuthoringProvider = ({
+export const GithubAuthenticationProvider = ({
   children,
   enterEditMode,
   exitEditMode,
@@ -68,16 +68,16 @@ export const OpenAuthoringProvider = ({
   }
 
   return (
-    <OpenAuthoringContext.Provider
+    <GithubEditingContext.Provider
       value={{
         enterEditMode: tryEnterEditMode,
         exitEditMode,
         setError,
       }}
     >
-      {error && <OpenAuthoringErrorModal error={error} />}
+      {error && <GithubErrorModal error={error} />}
       {authorizingStatus && (
-        <OpenAuthoringAuthModal
+        <GithubAuthModal
           onUpdateAuthState={tryEnterEditMode}
           authState={authorizingStatus}
           close={() => {
@@ -89,7 +89,7 @@ export const OpenAuthoringProvider = ({
       <PreviewErrorBoundary previewError={previewError}>
         {children}
       </PreviewErrorBoundary>
-    </OpenAuthoringContext.Provider>
+    </GithubEditingContext.Provider>
   )
 }
 
@@ -98,12 +98,12 @@ interface Props {
   children: any
 }
 function PreviewErrorBoundary(props: Props) {
-  const openAuthoring = useOpenAuthoring()
+  const github = useGithubEditing()
 
   useEffect(() => {
     ;(async () => {
       if (props.previewError) {
-        openAuthoring.setError(props.previewError)
+        github.setError(props.previewError)
       }
     })()
   }, [props.previewError])

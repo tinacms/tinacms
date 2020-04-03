@@ -21,8 +21,8 @@ import { Input, TextArea } from '@tinacms/fields'
 import { ModalBody, ModalActions, FieldMeta, useCMS } from 'tinacms'
 import styled from 'styled-components'
 import React, { useEffect, useState } from 'react'
-import { getHeadBranch } from '../../open-authoring/repository'
-import { AsyncButton } from '../../open-authoring-ui/components/AsyncButton'
+import { getHeadBranch } from '../../github-editing-context/repository'
+import { AsyncButton } from '../../components/AsyncButton'
 
 const BASE_BRANCH = process.env.BASE_BRANCH
 

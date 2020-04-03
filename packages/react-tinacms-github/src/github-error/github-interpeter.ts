@@ -16,8 +16,11 @@ limitations under the License.
 
 */
 
-import { getForkName, getHeadBranch } from '../open-authoring/repository'
-import { ActionableModalOptions } from '../open-authoring-ui/components/ActionableModal'
+import {
+  getForkName,
+  getHeadBranch,
+} from '../github-editing-context/repository'
+import { ActionableModalOptions } from '../components/ActionableModal'
 
 export const getModalProps = async (
   error: any,

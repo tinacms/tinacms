@@ -19,7 +19,7 @@ limitations under the License.
 export * from './errors'
 export * from './github-auth'
 export * from './github-error'
-export * from './open-authoring'
+export * from './github-editing-context'
 export * from './toolbar-plugins'
 export * from './form'
 export * from './github-client'
