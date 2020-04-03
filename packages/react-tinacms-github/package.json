@@ -19,7 +19,8 @@
     "styled-components": ">=4.1",
     "tinacms": ">=0.13",
     "js-cookie": "^2.2.1",
-    "final-form-submit-listener": "^1.0.0"
+    "final-form-submit-listener": "^1.0.0",
+    "@tinacms/icons": ">=0.7.0"
   },
   "devDependencies": {
     "@types/js-cookie": "^2.2.5",
@@ -29,6 +30,7 @@
     "styled-components": ">=4.1",
     "tinacms": "^0.18.2",
     "js-cookie": "^2.2.1",
-    "final-form-submit-listener": "^1.0.0"
+    "final-form-submit-listener": "^1.0.0",
+    "@tinacms/icons": "^0.7.0"
   }
 }
