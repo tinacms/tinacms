@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import App from 'next/app'
-import { Tina, TinaCMS, withTina } from 'tinacms'
+import { TinaProvider, TinaCMS, withTina } from 'tinacms'
 import { GitClient, GitMediaStore } from '@tinacms/git-client'
 
 export default class Site extends App {
@@ -41,9 +41,9 @@ export default class Site extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      <Tina cms={this.cms}>
+      <TinaProvider cms={this.cms}>
         <Component {...pageProps} />
-      </Tina>
+      </TinaProvider>
     )
   }
 }
