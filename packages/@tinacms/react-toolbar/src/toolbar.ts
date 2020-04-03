@@ -37,7 +37,8 @@ export class ToolbarState extends Subscribable {
 
   constructor(options: ToolbarStateOptions = {}) {
     super()
-    this._hidden = !options.hidden
+    // Defaults to 'hidden' if config property not set
+    this._hidden = options.hidden == undefined ? true : !!options.hidden
 
     /*
      ** TODO: Do we want to handle buttons
