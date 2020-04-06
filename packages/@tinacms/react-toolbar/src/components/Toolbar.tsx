@@ -21,11 +21,11 @@ import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { Plugin } from '@tinacms/core'
 import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
-import { Button, TinaReset } from '@tinacms/styles'
+import { Button, TinaResetStyles } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
 import styled, { css } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
-import { UndoIcon } from '@tinacms/icons'
+import { ResetIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
 import { LoadingDots } from '@tinacms/react-forms'
 
@@ -76,9 +76,9 @@ export const Toolbar = () => {
   const submitting = disabled ? false : !!(formState && formState.submitting)
 
   return (
-    <TinaReset>
+    <>
       <ToolbarPlaceholder />
-      <ToolbarStyles>
+      <StyledToolbar>
         <Create>
           <CreateContentMenu />
         </Create>
@@ -100,7 +100,7 @@ export const Toolbar = () => {
             //@ts-ignore
             onClick={reset}
           >
-            <UndoIcon />
+            <ResetIcon />
             <DesktopLabel> Discard</DesktopLabel>
           </ToolbarButton>
           <SaveButton
@@ -118,8 +118,8 @@ export const Toolbar = () => {
             )}
           </SaveButton>
         </Actions>
-      </ToolbarStyles>
-    </TinaReset>
+      </StyledToolbar>
+    </>
   )
 }
 
@@ -143,7 +143,9 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
   )
 }
 
-const ToolbarStyles = styled.div`
+const StyledToolbar = styled.div`
+  ${TinaResetStyles}
+
   position: fixed;
   top: 0;
   left: 0;
