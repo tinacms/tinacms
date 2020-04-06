@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.7.0...@tinacms/icons@0.8.0) (2020-04-06)
+
+
+### Features
+
+* add upload icon ([4dd0311](https://github.com/tinacms/tinacms/commit/4dd0311))
+
+
+
+
+
 # [0.7.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.7.0-alpha.0...@tinacms/icons@0.7.0) (2020-03-09)
 
 **Note:** Version bump only for package @tinacms/icons
