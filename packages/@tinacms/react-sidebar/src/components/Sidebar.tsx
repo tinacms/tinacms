@@ -26,7 +26,7 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import { TinaReset } from '@tinacms/styles'
+import { TinaResetStyles } from '@tinacms/styles'
 import { SIDEBAR_WIDTH, SIDEBAR_HEADER_HEIGHT } from './Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
@@ -84,72 +84,62 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
   const showMenu = allScreens.length > 0
 
   return (
-    <TinaReset>
-      <SidebarContainer open={sidebar.isOpen}>
-        <SidebarWrapper open={sidebar.isOpen}>
-          <SidebarHeader>
-            {showMenu && (
-              <MenuToggle
-                onClick={() => setMenuVisibility(!menuIsVisible)}
-                open={menuIsVisible}
-              >
-                <HamburgerIcon />
-              </MenuToggle>
-            )}
-            <CreateContentMenu />
-          </SidebarHeader>
-          <FormsView />
+    <SidebarContainer open={sidebar.isOpen}>
+      <SidebarWrapper open={sidebar.isOpen}>
+        <SidebarHeader>
           {showMenu && (
-            <MenuPanel visible={menuIsVisible}>
-              <MenuWrapper>
-                <MenuList>
-                  {allScreens.map(view => {
-                    const Icon = view.Icon
-                    return (
-                      <MenuLink
-                        key={view.name}
-                        value={view.name}
-                        onClick={() => {
-                          setActiveView(view)
-                          setMenuVisibility(false)
-                        }}
-                      >
-                        <Icon /> {view.name}
-                      </MenuLink>
-                    )
-                  })}
-                </MenuList>
-              </MenuWrapper>
-              <Watermark />
-            </MenuPanel>
+            <MenuToggle
+              onClick={() => setMenuVisibility(!menuIsVisible)}
+              open={menuIsVisible}
+            >
+              <HamburgerIcon />
+            </MenuToggle>
           )}
-          {activeScreen && (
-            <ScreenPluginModal
-              screen={activeScreen}
-              close={() => setActiveView(null)}
-            />
-          )}
-        </SidebarWrapper>
-        <SidebarToggle sidebar={sidebar} />
-      </SidebarContainer>
-    </TinaReset>
+          <CreateContentMenu />
+        </SidebarHeader>
+        <FormsView />
+        {showMenu && (
+          <MenuPanel visible={menuIsVisible}>
+            <MenuWrapper>
+              <MenuList>
+                {allScreens.map(view => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuLink
+                      key={view.name}
+                      value={view.name}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuVisibility(false)
+                      }}
+                    >
+                      <Icon /> {view.name}
+                    </MenuLink>
+                  )
+                })}
+              </MenuList>
+            </MenuWrapper>
+            <Watermark />
+          </MenuPanel>
+        )}
+        {activeScreen && (
+          <ScreenPluginModal
+            screen={activeScreen}
+            close={() => setActiveView(null)}
+          />
+        )}
+      </SidebarWrapper>
+      <SidebarToggle sidebar={sidebar} />
+    </SidebarContainer>
   )
 }
 
 const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
-  opacity: 1 !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  overflow: visible !important;
-  position: absolute !important;
-  top: 0 !important;
-  right: 0 !important;
-  height: 100% !important;
-  width: ${props =>
+  padding-left: ${props =>
     isFixed(props.position) && props.open
-      ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
-      : '100%'} !important;
-  transition: width ${props => (props.open ? 150 : 200)}ms ease-out !important;
+      ? SIDEBAR_WIDTH + 'px'
+      : '0'} !important;
+  transition: padding-left ${props => (props.open ? 150 : 200)}ms ease-out !important;
 `
 
 function isFixed(position: SidebarPosition): boolean {
@@ -428,6 +418,8 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
 `
 
 const SidebarContainer = styled.div<{ open: boolean }>`
+  ${TinaResetStyles}
+
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
