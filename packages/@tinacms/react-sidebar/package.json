@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-sidebar",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -40,8 +40,8 @@
     "@tinacms/react-forms": "^0.1.1",
     "@tinacms/react-modals": "^0.1.1",
     "@tinacms/react-screens": "^0.1.0",
-    "@tinacms/styles": "^0.4.1",
-    "@tinacms/scripts": "^0.1.13"
+    "@tinacms/scripts": "^0.1.13",
+    "@tinacms/styles": "^0.4.1"
   },
   "peerDependencies": {
     "@tinacms/form-builder": ">=0.3",

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-sidebar@0.1.0...@tinacms/react-sidebar@0.1.1) (2020-04-06)
+
+
+### Bug Fixes
+
+* styles dep and make react-based deps peers ([62bf2c1](https://github.com/tinacms/tinacms/commit/62bf2c1))
+
+
+
+
+
 # 0.1.0 (2020-04-06)
 
 
