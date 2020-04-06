@@ -82,15 +82,18 @@ export const Toolbar = () => {
         <Create>
           <CreateContentMenu />
         </Create>
-        <WidgetsContainer>
-          {widgets.all().length >= 1 &&
-            widgets
+
+        {widgets.all().length >= 1 && (
+          <WidgetsContainer>
+            {widgets
               .all()
               .sort((a: any, b: any) => a.weight - b.weight)
               .map((widget: any) => (
                 <widget.component key={widget.name} {...widget.props} />
               ))}
-        </WidgetsContainer>
+          </WidgetsContainer>
+        )}
+
         <Status>
           <FormStatus dirty={!pristine} />
         </Status>
