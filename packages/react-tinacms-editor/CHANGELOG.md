@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.4.0...react-tinacms-editor@0.4.1-alpha.0) (2020-04-06)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+# [0.4.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.3.0...react-tinacms-editor@0.4.0) (2020-04-06)
+
+
+### Bug Fixes
+
+* fix closing modal and clearing image ([8196da6](https://github.com/tinacms/tinacms/commit/8196da6))
+* not possible to come out of code mark which is at end of line ([5c5fc93](https://github.com/tinacms/tinacms/commit/5c5fc93))
+
+
+### Features
+
+* adding menu option and modal to upload images ([675613a](https://github.com/tinacms/tinacms/commit/675613a))
+
+
+
+
+
 # [0.3.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.2.0...react-tinacms-editor@0.3.0) (2020-03-30)
 
 

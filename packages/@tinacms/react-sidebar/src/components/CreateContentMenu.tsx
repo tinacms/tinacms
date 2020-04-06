@@ -31,7 +31,7 @@ import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
 import { IconButton, Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
-import { useCMS, useSubscribable } from '../../react-tinacms'
+import { useCMS, useSubscribable } from '@tinacms/react-core'
 
 export const CreateContentMenu = () => {
   const cms = useCMS()

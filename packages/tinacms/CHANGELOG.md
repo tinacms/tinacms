@@ -3,6 +3,29 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.18.3...tinacms@0.19.0-alpha.0) (2020-04-06)
+
+
+### Features
+
+* adds toolbar state to tinacms ([ff779c5](https://github.com/tinacms/tinacms/commit/ff779c5))
+* adds Toolbar to TinaProvider ([8acae8d](https://github.com/tinacms/tinacms/commit/8acae8d))
+
+
+
+
+
+## [0.18.3](https://github.com/tinacms/tinacms/compare/tinacms@0.18.2...tinacms@0.18.3) (2020-04-06)
+
+
+### Bug Fixes
+
+* removed unused useSidebar hook ([2165a3b](https://github.com/tinacms/tinacms/commit/2165a3b))
+
+
+
+
+
 ## [0.18.2](https://github.com/tinacms/tinacms/compare/tinacms@0.18.1...tinacms@0.18.2) (2020-03-30)
 
 
