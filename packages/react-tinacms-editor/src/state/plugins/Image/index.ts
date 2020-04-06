@@ -16,12 +16,26 @@ limitations under the License.
 
 */
 
-import { Plugin, PluginKey } from 'prosemirror-state'
+import {
+  Plugin,
+  PluginKey,
+  NodeSelection,
+  EditorState,
+  Transaction,
+} from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { Slice } from 'prosemirror-model'
 import { insertImage } from '../../../commands'
 
 export const imagePluginKey = new PluginKey('image')
+
+const setSelectionAtPos = (
+  state: EditorState,
+  dispatch: (tr: Transaction) => void,
+  pos: number
+) => {
+  dispatch(state.tr.setSelection(new NodeSelection(state.tr.doc.resolve(pos))))
+}
 
 const insertImageFiles = (
   editorView: EditorView,
@@ -73,9 +87,24 @@ export const imagePlugin = (
         return (this as any).getState(state).deco
       },
       handleKeyDown(view: EditorView, event: KeyboardEvent) {
+        const { state, dispatch } = view
+        const { selection, schema } = state
         if (event.key === 'Escape') {
-          const { state, dispatch } = view
           dispatch(state.tr.setMeta('image_clicked', false))
+        } else if (
+          event.key === 'Backspace' &&
+          selection.$to.nodeBefore &&
+          selection.$to.nodeBefore.type === schema.nodes.image
+        ) {
+          setSelectionAtPos(state, dispatch, selection.$to.pos - 1)
+          return true
+        } else if (
+          event.key === 'Delete' &&
+          selection.$to.nodeAfter &&
+          selection.$to.nodeAfter.type === schema.nodes.image
+        ) {
+          setSelectionAtPos(state, dispatch, selection.$to.pos)
+          return true
         }
         return false
       },
