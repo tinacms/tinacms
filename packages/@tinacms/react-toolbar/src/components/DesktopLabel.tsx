@@ -16,25 +16,11 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { TinaProvider, TinaCMS } from 'tinacms'
-import { GatsbyPluginTinacmsOptions } from './options'
+import styled from 'styled-components'
 
-exports.wrapRootElement = (
-  { element }: any,
-  options: GatsbyPluginTinacmsOptions
-) => {
-  if (options.manualInit) {
-    return element
+export const DesktopLabel = styled.span`
+  display: none;
+  @media (min-width: 1030px) {
+    display: inline;
   }
-  return <TinaProvider cms={window.tinacms}>{element}</TinaProvider>
-}
-
-declare let window: any
-
-exports.onClientEntry = (_: null, options: GatsbyPluginTinacmsOptions) => {
-  window.tinacms = new TinaCMS({
-    sidebar: options.sidebar,
-    toolbar: options.toolbar,
-  })
-}
+`

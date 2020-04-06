@@ -16,25 +16,36 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { TinaProvider, TinaCMS } from 'tinacms'
-import { GatsbyPluginTinacmsOptions } from './options'
+import styled from 'styled-components'
+import { Button } from '@tinacms/styles'
 
-exports.wrapRootElement = (
-  { element }: any,
-  options: GatsbyPluginTinacmsOptions
-) => {
-  if (options.manualInit) {
-    return element
+export const ToolbarButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  white-space: nowrap;
+  padding: 0 10px;
+
+  &:focus {
+    outline: none;
   }
-  return <TinaProvider cms={window.tinacms}>{element}</TinaProvider>
-}
 
-declare let window: any
+  svg {
+    fill: currentColor;
+    opacity: 0.7;
+    width: 2.5em;
+    height: 2.5em;
+  }
 
-exports.onClientEntry = (_: null, options: GatsbyPluginTinacmsOptions) => {
-  window.tinacms = new TinaCMS({
-    sidebar: options.sidebar,
-    toolbar: options.toolbar,
-  })
-}
+  &:disabled {
+    opacity: 0.6;
+    filter: grayscale(25%);
+  }
+
+  @media (min-width: 1030px) {
+    padding: 0 20px;
+
+    svg {
+      margin-right: 0.25rem;
+    }
+  }
+`

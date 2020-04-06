@@ -17,24 +17,22 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { TinaProvider, TinaCMS } from 'tinacms'
-import { GatsbyPluginTinacmsOptions } from './options'
+import { Toolbar } from './Toolbar'
+import { ToolbarState } from '../toolbar'
 
-exports.wrapRootElement = (
-  { element }: any,
-  options: GatsbyPluginTinacmsOptions
-) => {
-  if (options.manualInit) {
-    return element
-  }
-  return <TinaProvider cms={window.tinacms}>{element}</TinaProvider>
+interface ToolbarProviderProps {
+  toolbar: ToolbarState
+  hidden?: boolean
 }
 
-declare let window: any
+export function ToolbarProvider({ hidden, toolbar }: ToolbarProviderProps) {
+  React.useEffect(() => {
+    if (typeof hidden !== 'undefined') {
+      toolbar.hidden = hidden
+    }
+  }, [hidden])
 
-exports.onClientEntry = (_: null, options: GatsbyPluginTinacmsOptions) => {
-  window.tinacms = new TinaCMS({
-    sidebar: options.sidebar,
-    toolbar: options.toolbar,
-  })
+  if (toolbar.hidden) return null
+
+  return <Toolbar />
 }

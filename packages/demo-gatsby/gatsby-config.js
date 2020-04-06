@@ -40,6 +40,9 @@ module.exports = {
           hidden: process.env.NODE_ENV === "production",
           position: "displace",
         },
+        toolbar: {
+          hidden: false,
+        },
         plugins: [
           "gatsby-tinacms-teams",
           "gatsby-tinacms-json",

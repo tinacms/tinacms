@@ -16,25 +16,7 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { TinaProvider, TinaCMS } from 'tinacms'
-import { GatsbyPluginTinacmsOptions } from './options'
+const { createJestConfig } = require('@tinacms/scripts')
+const pack = require('./package')
 
-exports.wrapRootElement = (
-  { element }: any,
-  options: GatsbyPluginTinacmsOptions
-) => {
-  if (options.manualInit) {
-    return element
-  }
-  return <TinaProvider cms={window.tinacms}>{element}</TinaProvider>
-}
-
-declare let window: any
-
-exports.onClientEntry = (_: null, options: GatsbyPluginTinacmsOptions) => {
-  window.tinacms = new TinaCMS({
-    sidebar: options.sidebar,
-    toolbar: options.toolbar,
-  })
-}
+module.exports = createJestConfig(pack)
