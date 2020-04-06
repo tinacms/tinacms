@@ -210,7 +210,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
 const CreateButton = styled.button`
   position: relative;
   text-align: center;
-  font-size: var(--tina-font-size-0);
+  font-size: var(--tina-font-size-1);
   padding: 0 12px;
   height: 40px;
   font-weight: 500;
