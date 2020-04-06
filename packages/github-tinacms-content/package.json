@@ -12,12 +12,7 @@
   },
   "author": "",
   "license": "Apache-2.0",
-  "peerDependencies": {
-    "atob": ">=2.1.0",
-    "gray-matter": ">=4.0.0",
-    "axios": ">=0.19.0"
-  },
-  "devDependencies": {
+  "dependencies": {
     "atob": "2.1.2",
     "gray-matter": "4.0.2",
     "axios": "0.19.2"
