@@ -14,8 +14,8 @@
   "license": "Apache-2.0",
   "peerDependencies": {
     "react": ">=16.8",
-    "@tinacms/styles": "^0.4.0",
-    "@tinacms/fields": "^0.9.1",
+    "@tinacms/styles": ">=0.4",
+    "@tinacms/fields": ">=0.9",
     "styled-components": ">=4.1",
     "tinacms": ">=0.13",
     "js-cookie": "^2.2.1",
