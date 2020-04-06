@@ -38,26 +38,30 @@ import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
+import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
   media?: {
     store: MediaStore
   }
+  toolbar?: ToolbarStateOptions
 }
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
   media: MediaManager
+  toolbar: ToolbarState
   alerts = new Alerts()
 
-  constructor({ sidebar, media, ...config }: TinaCMSConfig = {}) {
+  constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
     super(config)
 
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
 
     this.sidebar = new SidebarState(sidebar)
+    this.toolbar = new ToolbarState(toolbar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
