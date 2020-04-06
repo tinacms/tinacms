@@ -21,11 +21,11 @@ import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { Plugin } from '@tinacms/core'
 import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
-import { Button, TinaReset } from '@tinacms/styles'
+import { Button, TinaResetStyles } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
 import styled, { css } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
-import { UndoIcon } from '@tinacms/icons'
+import { ResetIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
 import { LoadingDots } from '@tinacms/react-forms'
 
@@ -76,21 +76,24 @@ export const Toolbar = () => {
   const submitting = disabled ? false : !!(formState && formState.submitting)
 
   return (
-    <TinaReset>
+    <>
       <ToolbarPlaceholder />
-      <ToolbarStyles>
+      <StyledToolbar>
         <Create>
           <CreateContentMenu />
         </Create>
-        <WidgetsContainer>
-          {widgets.all().length >= 1 &&
-            widgets
+
+        {widgets.all().length >= 1 && (
+          <WidgetsContainer>
+            {widgets
               .all()
               .sort((a: any, b: any) => a.weight - b.weight)
               .map((widget: any) => (
                 <widget.component key={widget.name} {...widget.props} />
               ))}
-        </WidgetsContainer>
+          </WidgetsContainer>
+        )}
+
         <Status>
           <FormStatus dirty={!pristine} />
         </Status>
@@ -100,7 +103,7 @@ export const Toolbar = () => {
             //@ts-ignore
             onClick={reset}
           >
-            <UndoIcon />
+            <ResetIcon />
             <DesktopLabel> Discard</DesktopLabel>
           </ToolbarButton>
           <SaveButton
@@ -118,8 +121,8 @@ export const Toolbar = () => {
             )}
           </SaveButton>
         </Actions>
-      </ToolbarStyles>
-    </TinaReset>
+      </StyledToolbar>
+    </>
   )
 }
 
@@ -143,7 +146,9 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
   )
 }
 
-const ToolbarStyles = styled.div`
+const StyledToolbar = styled.div`
+  ${TinaResetStyles}
+
   position: fixed;
   top: 0;
   left: 0;
@@ -151,11 +156,11 @@ const ToolbarStyles = styled.div`
   width: 100%;
   height: 62px;
   background-color: #f6f6f9;
-  z-index: 10000;
+  z-index: var(--tina-z-index-2);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid #edecf3;
   display: grid;
-  grid-template-areas: 'create github status actions';
+  grid-template-areas: 'create widgets status actions';
   grid-template-columns: auto 1fr auto auto;
   align-items: stretch;
 
@@ -171,6 +176,7 @@ const SaveButton = styled(ToolbarButton)`
 `
 
 const WidgetsContainer = styled.div`
+  grid-area: widgets;
   display: flex;
   align-items: center;
   justify-self: end;
