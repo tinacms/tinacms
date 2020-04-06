@@ -37,7 +37,7 @@ interface AuthState {
   forkValid: true
 }
 
-export const GithubAuthenticationProvider = ({
+export const TinacmsGithubProvider = ({
   children,
   enterEditMode,
   exitEditMode,
