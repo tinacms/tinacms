@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { MediaStore, MediaUploadOptions, Media } from 'tinacms'
+import { MediaStore, MediaUploadOptions, Media } from '@tinacms/media'
 import { GitClient } from './git-client'
 
 export class GitMediaStore implements MediaStore {
