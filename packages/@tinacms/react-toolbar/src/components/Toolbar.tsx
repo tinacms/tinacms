@@ -160,7 +160,7 @@ const StyledToolbar = styled.div`
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid #edecf3;
   display: grid;
-  grid-template-areas: 'create github status actions';
+  grid-template-areas: 'create widgets status actions';
   grid-template-columns: auto 1fr auto auto;
   align-items: stretch;
 
@@ -176,6 +176,7 @@ const SaveButton = styled(ToolbarButton)`
 `
 
 const WidgetsContainer = styled.div`
+  grid-area: widgets;
   display: flex;
   align-items: center;
   justify-self: end;
