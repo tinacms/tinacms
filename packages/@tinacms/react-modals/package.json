@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-modals",
-  "version": "0.1.0",
+  "version": "0.1.1",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-modals.esm.js",
@@ -22,9 +22,9 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/icons": "^0.7.0",
-    "@tinacms/react-core": "^0.2.9",
-    "@tinacms/styles": "^0.4.0"
+    "@tinacms/icons": "^0.8.0",
+    "@tinacms/react-core": "^0.2.10",
+    "@tinacms/styles": "^0.4.1"
   },
   "peerDependencies": {
     "@tinacms/icons": ">=0.7",

@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.3.0...@tinacms/forms@0.4.0) (2020-04-06)
+
+
+### Features
+
+* add ContentCreatorPlugin interface ([315f9aa](https://github.com/tinacms/tinacms/commit/315f9aa))
+* form.dirty ([acceb8b](https://github.com/tinacms/tinacms/commit/acceb8b))
+* form.pristine tells you if the form changed ([f084084](https://github.com/tinacms/tinacms/commit/f084084))
+* form.submitting ([43c0193](https://github.com/tinacms/tinacms/commit/43c0193))
+* form.valid ([a771564](https://github.com/tinacms/tinacms/commit/a771564))
+
+
+
+
+
 # [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.2.1...@tinacms/forms@0.3.0) (2020-03-16)
 
 
