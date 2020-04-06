@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-toolbar",
-  "version": "0.1.0-alpha.0",
+  "version": "0.1.0-alpha.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
