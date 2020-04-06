@@ -12,13 +12,13 @@
   },
   "author": "",
   "license": "Apache-2.0",
-  "peerDependencies": {
-    "cookie": ">=0.4.0",
-    "qs": ">=6.9.0",
-    "axios": ">=0.19.0"
-  },
   "devDependencies": {
     "@types/cookie": "0.3.3",
+    "cookie": "0.4.0",
+    "qs": "6.9.3",
+    "axios": "0.19.2"
+  },
+  "dependencies": {
     "cookie": "0.4.0",
     "qs": "6.9.3",
     "axios": "0.19.2"
