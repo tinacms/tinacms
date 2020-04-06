@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, usePlugins, Field } from 'tinacms'
+import { FormOptions, Field } from 'tinacms'
 import { GitFile } from './useGitFileSha'
 import { GithubOptions } from './GithubOptions'
 import { useGithubFileForm } from './useGithubFileForm'
@@ -37,12 +37,5 @@ export function useGithubJsonForm(
   formOptions: Options,
   githubOptions: GithubOptions
 ) {
-  const [values, form] = useGithubFileForm(
-    jsonFile,
-    formOptions,
-    githubOptions,
-    serialize
-  )
-  usePlugins(form as any)
-  return [values, form]
+  return useGithubFileForm(jsonFile, formOptions, githubOptions, serialize)
 }

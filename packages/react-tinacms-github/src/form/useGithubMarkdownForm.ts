@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, usePlugins, Field } from 'tinacms'
+import { FormOptions, Field } from 'tinacms'
 import { GitFile } from './useGitFileSha'
 import { GithubOptions } from './GithubOptions'
 import { toMarkdownString } from 'next-tinacms-markdown'
@@ -33,12 +33,10 @@ export function useGithubMarkdownForm(
   formOptions: Options,
   githubOptions: GithubOptions
 ) {
-  const [values, form] = useGithubFileForm(
+  return useGithubFileForm(
     markdownFile,
     formOptions,
     githubOptions,
     toMarkdownString
   )
-  usePlugins(form as any)
-  return [values, form]
 }
