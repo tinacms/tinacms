@@ -151,12 +151,12 @@ const ContentMenu = styled.div<{ open: boolean }>`
   display: block;
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
-  transform-origin: 100% 0;
+  transform-origin: 0 0;
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
