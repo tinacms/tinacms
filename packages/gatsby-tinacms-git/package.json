@@ -45,6 +45,6 @@
     "@tinacms/git-client": "^0.6.6"
   },
   "devDependencies": {
-    "tinacms": "^0.18.4"
+    "tinacms": "^0.19.0-alpha.0"
   }
 }

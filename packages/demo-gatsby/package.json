@@ -48,7 +48,7 @@
     "react-tinacms-blocks": "^0.4.4",
     "react-tinacms-inline": "^0.4.4",
     "react-typography": "^0.16.19",
-    "tinacms": "^0.18.4",
+    "tinacms": "^0.19.0-alpha.0",
     "typeface-merriweather": "0.0.72",
     "typeface-montserrat": "0.0.75",
     "typography": "^0.16.19",

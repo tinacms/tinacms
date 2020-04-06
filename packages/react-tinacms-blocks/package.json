@@ -28,6 +28,6 @@
   "devDependencies": {
     "@tinacms/icons": "^0.8.0",
     "@tinacms/styles": "^0.4.1",
-    "tinacms": "^0.18.4"
+    "tinacms": "^0.19.0-alpha.0"
   }
 }

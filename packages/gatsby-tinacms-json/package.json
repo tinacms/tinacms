@@ -34,7 +34,7 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
     "gatsby-tinacms-git": "^0.4.7",
-    "tinacms": "^0.18.4"
+    "tinacms": "^0.19.0-alpha.0"
   },
   "dependencies": {
     "slash": "^3.0.0"

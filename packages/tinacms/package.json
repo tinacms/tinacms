@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.18.4",
+  "version": "0.19.0-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -48,6 +48,7 @@
     "@tinacms/react-modals": "^0.1.1",
     "@tinacms/react-screens": "^0.1.0",
     "@tinacms/react-sidebar": "^0.1.1",
+    "@tinacms/react-toolbar": "^0.1.0-alpha.0",
     "@tinacms/styles": "^0.4.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
