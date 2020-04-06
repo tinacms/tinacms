@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.9.2...@tinacms/fields@0.9.3-alpha.0) (2020-04-06)
+
+
+### Bug Fixes
+
+* field meta references correct name ([ac23508](https://github.com/tinacms/tinacms/commit/ac23508))
+
+
+
+
+
+## [0.9.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.9.1...@tinacms/fields@0.9.2) (2020-04-06)
+
+
+### Bug Fixes
+
+* color picker z-index ([8e404d4](https://github.com/tinacms/tinacms/commit/8e404d4))
+
+
+
+
+
 ## [0.9.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.9.0...@tinacms/fields@0.9.1) (2020-03-30)
 
 **Note:** Version bump only for package @tinacms/fields

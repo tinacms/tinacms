@@ -16,6 +16,5 @@ limitations under the License.
 
 */
 
-describe('it', () => {
-  it('is a smoke test', () => {})
-})
+export * from './sidebar'
+export { SidebarProvider } from './components/Sidebar'

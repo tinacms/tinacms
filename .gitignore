@@ -1,11 +1,17 @@
 *.log
 **/node_modules/
 **/build/
+**/dist/
 **/.rpt2_cache
 **/.rts2_cache
+**/.rts2_cache_cjs
+**/.rts2_cache_esm
+**/.rts2_cache_umd
+**/.rts2_cache_system
 *.swp
 packages/cli/forestry/.env
 *.tgz
 .DS_Store
 **/docs/
 .idea/
+**/.cache/

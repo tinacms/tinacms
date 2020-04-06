@@ -24,7 +24,10 @@ exports.wrapRootElement = (
   { element }: any,
   options: GatsbyPluginTinacmsOptions
 ) => {
-  const cms = new TinaCMS({ sidebar: options.sidebar })
+  const cms = new TinaCMS({
+    sidebar: options.sidebar,
+    toolbar: options.toolbar,
+  })
 
   return <TinaProvider cms={cms}>{element}</TinaProvider>
 }

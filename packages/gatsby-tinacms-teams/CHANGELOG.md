@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.5-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-teams@0.1.4...gatsby-tinacms-teams@0.1.5-alpha.0) (2020-04-06)
+
+**Note:** Version bump only for package gatsby-tinacms-teams
+
+
+
+
+
 ## [0.1.4](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-teams@0.1.4-alpha.1...gatsby-tinacms-teams@0.1.4) (2020-02-11)
 
 **Note:** Version bump only for package gatsby-tinacms-teams

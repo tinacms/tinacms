@@ -16,7 +16,7 @@
 
  */
 
-import { CMS, CMSConfig, PluginType, Subscribable } from '@tinacms/core'
+import { CMS, CMSConfig, PluginType } from '@tinacms/core'
 import { FieldPlugin } from '@tinacms/form-builder'
 import { ScreenPlugin } from '@tinacms/react-screens'
 import {
@@ -36,29 +36,32 @@ import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
 import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
-import { Alerts } from './tina-cms/alerts'
-
-export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
+import { Alerts } from '@tinacms/alerts'
+import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
+import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
   media?: {
     store: MediaStore
   }
+  toolbar?: ToolbarStateOptions
 }
 
 export class TinaCMS extends CMS {
   sidebar: SidebarState
   media: MediaManager
+  toolbar: ToolbarState
   alerts = new Alerts()
 
-  constructor({ sidebar, media, ...config }: TinaCMSConfig = {}) {
+  constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
     super(config)
 
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
 
     this.sidebar = new SidebarState(sidebar)
+    this.toolbar = new ToolbarState(toolbar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
@@ -84,59 +87,6 @@ export class TinaCMS extends CMS {
 
   get screens(): PluginType<ScreenPlugin> {
     return this.plugins.findOrCreateMap('screen')
-  }
-}
-
-interface SidebarStateOptions {
-  hidden?: boolean
-  position?: SidebarPosition
-  buttons?: SidebarButtons
-}
-
-interface SidebarButtons {
-  save: string
-  reset: string
-}
-
-export class SidebarState extends Subscribable {
-  private _isOpen: boolean = false
-
-  position: SidebarPosition = 'displace'
-  _hidden: boolean = false
-  buttons: SidebarButtons = {
-    save: 'Save',
-    reset: 'Reset',
-  }
-
-  constructor(options: SidebarStateOptions = {}) {
-    super()
-    this.position = options.position || 'displace'
-    this._hidden = !!options.hidden
-
-    if (options.buttons?.save) {
-      this.buttons.save = options.buttons.save
-    }
-    if (options.buttons?.reset) {
-      this.buttons.reset = options.buttons.reset
-    }
-  }
-
-  get isOpen() {
-    return this._isOpen
-  }
-
-  set isOpen(nextValue: boolean) {
-    this._isOpen = nextValue
-    this.notifiySubscribers()
-  }
-
-  get hidden() {
-    return this._hidden
-  }
-
-  set hidden(nextValue: boolean) {
-    this._hidden = nextValue
-    this.notifiySubscribers()
   }
 }
 

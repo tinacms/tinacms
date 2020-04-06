@@ -52,7 +52,7 @@ interface FieldMetaProps {
 export const FieldMeta: React.FC<FieldMetaProps> = props => {
   return (
     <FieldWrapper>
-      <FieldLabel htmlFor={name}>
+      <FieldLabel htmlFor={props.name}>
         {props.label || props.name}
         {props.description && (
           <FieldDescription>{props.description}</FieldDescription>

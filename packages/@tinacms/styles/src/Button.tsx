@@ -119,6 +119,7 @@ export const IconButton = styled(Button)`
   svg {
     width: 26px;
     height: 26px;
+    transition: all 150ms ease-out;
   }
 
   ${p =>
@@ -137,11 +138,13 @@ export const IconButton = styled(Button)`
   ${props =>
     props.open &&
     css`
-      transform: rotate(45deg);
       background-color: var(--tina-color-grey-0);
       border-color: var(--tina-color-grey-2);
       outline: none;
       fill: var(--tina-color-primary);
+      svg {
+        transform: rotate(45deg);
+      }
       &:hover {
         background-color: var(--tina-color-grey-1);
       }

@@ -23,13 +23,14 @@ import { useState } from 'react'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { Button } from '@tinacms/styles'
 import { FormList } from './FormList'
-import { useCMS, useSubscribable } from '../../react-tinacms'
+import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { FormView } from '@tinacms/react-forms'
 import { LeftArrowIcon } from '@tinacms/icons'
 
 export const FormsView = () => {
-  const [activeFormId, setActiveFormId] = useState<string>()
+  const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
+  const formPlugins = cms.plugins.getType<Form>('form')
 
   /**
    * If there's only one form, make it the active form.
@@ -40,8 +41,8 @@ export const FormsView = () => {
    */
 
   function setSingleActiveForm() {
-    if (cms.forms.all().length === 1) {
-      setActiveFormId(cms.forms.all()[0].id)
+    if (formPlugins.all().length === 1) {
+      setActiveFormId(formPlugins.all()[0].id)
     }
   }
 
@@ -49,7 +50,7 @@ export const FormsView = () => {
    ** Subscribes the forms to the CMS,
    ** passing a callback to set active form
    */
-  useSubscribable(cms.forms, () => {
+  useSubscribable(formPlugins, () => {
     setSingleActiveForm()
   })
 
@@ -60,9 +61,9 @@ export const FormsView = () => {
     setSingleActiveForm()
   }, [])
 
-  const forms = cms.forms.all()
+  const forms = formPlugins.all()
   const isMultiform = forms.length > 1
-  const activeForm = activeFormId ? cms.forms.find(activeFormId) : null
+  const activeForm: Form | undefined = formPlugins.find(activeFormId)
   const isEditing = !!activeForm
 
   /**
@@ -280,7 +281,7 @@ const FormWrapper = styled.div<FormWrapperProps>`
 
 export interface MultiformFormHeaderProps {
   activeForm: Form
-  setActiveFormId(id?: string): void
+  setActiveFormId(id: string): void
 }
 
 export const MultiformFormHeader = styled(
@@ -290,7 +291,7 @@ export const MultiformFormHeader = styled(
     ...styleProps
   }: MultiformFormHeaderProps) => {
     return (
-      <button {...styleProps} onClick={() => setActiveFormId()}>
+      <button {...styleProps} onClick={() => setActiveFormId('')}>
         <LeftArrowIcon />
         <span>{activeForm.label}</span>
       </button>

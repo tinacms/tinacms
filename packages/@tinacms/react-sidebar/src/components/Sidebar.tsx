@@ -26,111 +26,120 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import { TinaReset } from '@tinacms/styles'
-import { SIDEBAR_WIDTH, SIDEBAR_HEADER_HEIGHT } from '../../Globals'
+import { TinaResetStyles } from '@tinacms/styles'
+import { SIDEBAR_WIDTH, SIDEBAR_HEADER_HEIGHT } from './Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
-import { useSubscribable, useCMS } from '../../react-tinacms'
-import { SidebarState, SidebarPosition } from '../../tina-cms'
+import { useSubscribable, useCMS } from '@tinacms/react-core'
+import { SidebarState, SidebarPosition, SidebarStateOptions } from '../sidebar'
 
-export function SidebarProvider({ children, position, hidden, cms }: any) {
-  useSubscribable(cms.sidebar)
+export interface SidebarProviderProps {
+  children: any
+  sidebar: SidebarState
+  position?: SidebarStateOptions['position']
+  hidden?: boolean
+}
+
+export function SidebarProvider({
+  children,
+  position,
+  hidden,
+  sidebar,
+}: SidebarProviderProps) {
+  useSubscribable(sidebar)
 
   React.useEffect(() => {
     if (typeof hidden !== 'undefined') {
-      cms.sidebar.hidden = hidden
+      sidebar.hidden = hidden
     }
   }, [hidden])
+
+  if (sidebar.hidden) return children
 
   return (
     <>
       <SiteWrapper
-        open={cms.sidebar.isOpen}
-        position={position || cms.sidebar.position}
+        open={sidebar.isOpen}
+        position={position || sidebar.position}
       >
         {children}
       </SiteWrapper>
-      {!cms.sidebar.hidden && <Sidebar />}
+      {!sidebar.hidden && <Sidebar sidebar={sidebar} />}
     </>
   )
 }
 
-const Sidebar = () => {
+interface SidebarProps {
+  sidebar: SidebarState
+}
+
+const Sidebar = ({ sidebar }: SidebarProps) => {
   const cms = useCMS()
-  useSubscribable(cms.sidebar)
-  useSubscribable(cms.screens)
+  const screens = cms.plugins.getType<ScreenPlugin>('screen')
+  useSubscribable(sidebar)
+  useSubscribable(screens)
   const [menuIsVisible, setMenuVisibility] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
-  const allScreens = cms.screens.all()
+  const allScreens = screens.all()
   const showMenu = allScreens.length > 0
 
   return (
-    <TinaReset>
-      <SidebarContainer open={cms.sidebar.isOpen}>
-        <SidebarWrapper open={cms.sidebar.isOpen}>
-          <SidebarHeader>
-            {showMenu && (
-              <MenuToggle
-                onClick={() => setMenuVisibility(!menuIsVisible)}
-                open={menuIsVisible}
-              >
-                <HamburgerIcon />
-              </MenuToggle>
-            )}
-            <CreateContentMenu />
-          </SidebarHeader>
-          <FormsView />
+    <SidebarContainer open={sidebar.isOpen}>
+      <SidebarWrapper open={sidebar.isOpen}>
+        <SidebarHeader>
           {showMenu && (
-            <MenuPanel visible={menuIsVisible}>
-              <MenuWrapper>
-                <MenuList>
-                  {allScreens.map(view => {
-                    const Icon = view.Icon
-                    return (
-                      <MenuLink
-                        key={view.name}
-                        value={view.name}
-                        onClick={() => {
-                          setActiveView(view)
-                          setMenuVisibility(false)
-                        }}
-                      >
-                        <Icon /> {view.name}
-                      </MenuLink>
-                    )
-                  })}
-                </MenuList>
-              </MenuWrapper>
-              <Watermark />
-            </MenuPanel>
+            <MenuToggle
+              onClick={() => setMenuVisibility(!menuIsVisible)}
+              open={menuIsVisible}
+            >
+              <HamburgerIcon />
+            </MenuToggle>
           )}
-          {activeScreen && (
-            <ScreenPluginModal
-              screen={activeScreen}
-              close={() => setActiveView(null)}
-            />
-          )}
-        </SidebarWrapper>
-        <SidebarToggle sidebar={cms.sidebar} />
-      </SidebarContainer>
-    </TinaReset>
+          <CreateContentMenu />
+        </SidebarHeader>
+        <FormsView />
+        {showMenu && (
+          <MenuPanel visible={menuIsVisible}>
+            <MenuWrapper>
+              <MenuList>
+                {allScreens.map(view => {
+                  const Icon = view.Icon
+                  return (
+                    <MenuLink
+                      key={view.name}
+                      value={view.name}
+                      onClick={() => {
+                        setActiveView(view)
+                        setMenuVisibility(false)
+                      }}
+                    >
+                      <Icon /> {view.name}
+                    </MenuLink>
+                  )
+                })}
+              </MenuList>
+            </MenuWrapper>
+            <Watermark />
+          </MenuPanel>
+        )}
+        {activeScreen && (
+          <ScreenPluginModal
+            screen={activeScreen}
+            close={() => setActiveView(null)}
+          />
+        )}
+      </SidebarWrapper>
+      <SidebarToggle sidebar={sidebar} />
+    </SidebarContainer>
   )
 }
 
 const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
-  opacity: 1 !important;
-  background-color: transparent !important;
-  background-image: none !important;
-  overflow: visible !important;
-  position: absolute !important;
-  top: 0 !important;
-  right: 0 !important;
-  height: 100% !important;
-  width: ${props =>
+  padding-left: ${props =>
     isFixed(props.position) && props.open
-      ? 'calc(100% - ' + SIDEBAR_WIDTH + 'px)'
-      : '100%'} !important;
-  transition: width ${props => (props.open ? 150 : 200)}ms ease-out !important;
+      ? SIDEBAR_WIDTH + 'px'
+      : '0'} !important;
+  transition: padding-left ${props => (props.open ? 150 : 200)}ms ease-out !important;
 `
 
 function isFixed(position: SidebarPosition): boolean {
@@ -409,6 +418,8 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
 `
 
 const SidebarContainer = styled.div<{ open: boolean }>`
+  ${TinaResetStyles}
+
   position: fixed !important;
   top: 0 !important;
   left: 0 !important;
