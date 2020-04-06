@@ -18,7 +18,7 @@ limitations under the License.
 
 export class BrowserStorageApi {
   data: any = {}
-  timeout: NodeJS.Timeout | null = null
+  timeout: number | null = null
   namespace: string
   storage: Storage // should work with window.localStorage or window.sessionStorage
 
@@ -51,6 +51,7 @@ export class BrowserStorageApi {
 
   private debouncePersist() {
     this.timeout && clearTimeout(this.timeout)
+    //@ts-ignore
     this.timeout = setTimeout(this.persist.bind(this), 1000)
   }
 
