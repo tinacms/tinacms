@@ -2,11 +2,11 @@
 
 ## Implementation:
 
-Add the root GithubAuthenticationProvider component to our main layout. In this case, we will use Github Auth.
+Add the root TinacmsGithubProvider component to our main layout. In this case, we will use Github Auth.
 ```ts
 // YourLayout.ts
 import { authenticate }  from '@tinacms/github-auth'
-import GithubAuthenticationProvider from 'react-tinacms-github'
+import TinacmsGithubProvider from 'react-tinacms-github'
 const enterEditMode = () =>
   fetch(`/api/preview`).then(() => {
     window.location.href = window.location.pathname
@@ -17,12 +17,12 @@ const exitEditMode = () => {
   })
 }
 const YourLayout = ({ Component, pageProps }) => {
-  return (<GithubAuthenticationProvider
+  return (<TinacmsGithubProvider
       authenticate={() => authenticate('/api/create-github-access-token')}
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}>
       {...children}
-    </GithubAuthenticationProvider>)
+    </TinacmsGithubProvider>)
 }
 ```
 
