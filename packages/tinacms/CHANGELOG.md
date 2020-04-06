@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.18.4...tinacms@0.19.0-alpha.1) (2020-04-06)
+
+
+### Features
+
+* adds toolbar state to tinacms ([ff779c5](https://github.com/tinacms/tinacms/commit/ff779c5))
+* adds Toolbar to TinaProvider ([8acae8d](https://github.com/tinacms/tinacms/commit/8acae8d))
+
+
+
+
+
 ## [0.18.4](https://github.com/tinacms/tinacms/compare/tinacms@0.18.3...tinacms@0.18.4) (2020-04-06)
 
 **Note:** Version bump only for package tinacms
