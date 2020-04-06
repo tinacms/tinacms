@@ -153,7 +153,7 @@ const StyledToolbar = styled.div`
   width: 100%;
   height: 62px;
   background-color: #f6f6f9;
-  z-index: 10000;
+  z-index: var(--tina-z-index-2);
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid #edecf3;
   display: grid;
