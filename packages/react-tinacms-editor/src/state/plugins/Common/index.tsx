@@ -17,9 +17,29 @@ limitations under the License.
 */
 
 import { Plugin, PluginKey, Transaction } from 'prosemirror-state'
+import { EditorView } from 'prosemirror-view'
 
 interface CommonPluginState {
   editorFocused: boolean
+}
+
+const exitCodeMarkOnArrowRight = (view: EditorView, event: KeyboardEvent) => {
+  // If user is at end of current line and there is a code mark an arrow-right will
+  // take user out of the code mark.
+  if (event.key !== 'ArrowRight') return false
+  const { selection, schema } = view.state
+  const { code } = schema.marks
+  if (!code.isInSet(selection.$to.marks())) return false
+  const selectionIsAtEnd =
+    selection.$to.node().nodeSize - 2 === selection.$to.parentOffset
+  if (!selectionIsAtEnd) return false
+  const { state, dispatch } = view
+  dispatch(
+    state.tr
+      .insertText(' ', selection.$to.pos)
+      .removeMark(selection.$to.pos, selection.$to.pos + 1, code)
+  )
+  return true
 }
 
 export const commonPluginKey = new PluginKey('common')
@@ -61,6 +81,9 @@ export const commonPlugin = new Plugin({
         dispatch(state.tr.setMeta('editor_focused', false))
         return false
       },
+    },
+    handleKeyDown(view: EditorView, event: KeyboardEvent) {
+      return exitCodeMarkOnArrowRight(view, event)
     },
   },
 })
