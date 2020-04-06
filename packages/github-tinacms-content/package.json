@@ -1,0 +1,25 @@
+{
+  "name": "github-tinacms-content",
+  "version": "0.0.1-canary1",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "watch": "tsdx watch",
+    "build": "tsdx build",
+    "dev": "tsdx build",
+    "test": "tsdx test --env=jsdom --passWithNoTests",
+    "lint": "tsdx lint"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "peerDependencies": {
+    "atob": ">=2.1.0",
+    "gray-matter": ">=4.0.0",
+    "axios": ">=0.19.0"
+  },
+  "devDependencies": {
+    "atob": "2.1.2",
+    "gray-matter": "4.0.2",
+    "axios": "0.19.2"
+  }
+}
