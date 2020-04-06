@@ -29,9 +29,10 @@ import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
-import { IconButton, Button } from '@tinacms/styles'
+import { Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import { useCMS, useSubscribable } from '@tinacms/react-core'
+import { DesktopLabel } from './DesktopLabel'
 
 /*
  ** TODO: does this belong in react-forms?
@@ -48,9 +49,9 @@ export const CreateContentMenu = () => {
   if (contentCreatorPlugins.all().length) {
     return (
       <ContentMenuWrapper>
-        <IconButton onClick={() => setVisible(true)} open={visible} primary>
-          <AddIcon />
-        </IconButton>
+        <CreateToggleButton onClick={() => setVisible(true)} open={visible}>
+          <AddIcon /> <DesktopLabel>New</DesktopLabel>
+        </CreateToggleButton>
         <ContentMenu open={visible}>
           <Dismissible
             click
@@ -142,6 +143,41 @@ const ContentMenuWrapper = styled.div`
   position: relative;
   grid-area: actions;
   justify-self: end;
+`
+
+const CreateToggleButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  transition: all 150ms ease-out;
+  padding: 0 10px;
+
+  @media (min-width: 1030px) {
+    padding: 0 20px;
+  }
+
+  &:focus {
+    outline: none !important;
+  }
+
+  svg {
+    fill: currentColor;
+    opacity: 0.7;
+    width: 2em;
+    height: 2em;
+    margin-right: 0.25rem;
+    transform-origin: 50% 50%;
+    transition: all 150ms ease-out;
+  }
+
+  ${p =>
+    p.open &&
+    css`
+      background-color: transparent;
+
+      svg {
+        transform: rotate(45deg);
+      }
+    `};
 `
 
 const ContentMenu = styled.div<{ open: boolean }>`
