@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.18.3](https://github.com/tinacms/tinacms/compare/tinacms@0.18.2...tinacms@0.18.3) (2020-04-06)
+
+
+### Bug Fixes
+
+* removed unused useSidebar hook ([2165a3b](https://github.com/tinacms/tinacms/commit/2165a3b))
+
+
+
+
+
 ## [0.18.2](https://github.com/tinacms/tinacms/compare/tinacms@0.18.1...tinacms@0.18.2) (2020-03-30)
 
 
