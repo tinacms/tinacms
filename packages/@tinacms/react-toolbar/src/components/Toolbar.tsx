@@ -23,7 +23,7 @@ import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
 import { Button, TinaResetStyles } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
-import styled, { css } from 'styled-components'
+import styled, { css, createGlobalStyle } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
 import { ResetIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
@@ -77,6 +77,7 @@ export const Toolbar = () => {
 
   return (
     <>
+      <ToolbarGlobalStyles />
       <ToolbarPlaceholder />
       <StyledToolbar>
         <Create>
@@ -145,6 +146,12 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
     </FieldMeta>
   )
 }
+
+const ToolbarGlobalStyles = createGlobalStyle`
+  :root {
+    --tina-toolbar-height: 62px;
+  }
+`
 
 const StyledToolbar = styled.div`
   ${TinaResetStyles}
@@ -249,7 +256,7 @@ const ToolbarPlaceholder = styled.div`
   opacity: 0;
   display: block;
   width: 100%;
-  height: 62px;
+  height: var(--tina-toolbar-height);
 `
 
 interface StatusLightProps {
