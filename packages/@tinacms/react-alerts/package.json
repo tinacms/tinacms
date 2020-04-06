@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-alerts",
-  "version": "0.1.1",
+  "version": "0.1.2-alpha.0",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -21,10 +21,10 @@
   },
   "devDependencies": {
     "@tinacms/alerts": "^0.1.1",
-    "@tinacms/icons": "^0.8.0",
-    "@tinacms/react-core": "^0.2.10",
+    "@tinacms/icons": "^0.9.0-alpha.0",
+    "@tinacms/react-core": "^0.2.11-alpha.0",
     "@tinacms/scripts": "^0.1.13",
-    "@tinacms/styles": "^0.4.1"
+    "@tinacms/styles": "^0.4.2-alpha.0"
   },
   "peerDependencies": {
     "@tinacms/alerts": ">=0.1",

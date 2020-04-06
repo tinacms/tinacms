@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.9.2...@tinacms/fields@0.9.3-alpha.0) (2020-04-06)
+
+
+### Bug Fixes
+
+* field meta references correct name ([ac23508](https://github.com/tinacms/tinacms/commit/ac23508))
+
+
+
+
+
 ## [0.9.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.9.1...@tinacms/fields@0.9.2) (2020-04-06)
 
 
