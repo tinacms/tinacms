@@ -1,0 +1,25 @@
+{
+  "name": "next-tinacms-github",
+  "version": "0.0.2-canary4",
+  "description": "",
+  "main": "dist/index.js",
+  "scripts": {
+    "watch": "tsdx watch",
+    "build": "tsdx build",
+    "dev": "tsdx build",
+    "test": "tsdx test --env=jsdom --passWithNoTests",
+    "lint": "tsdx lint"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@types/cookie": "0.3.3"
+  },
+  "dependencies": {
+    "cookie": "0.4.0",
+    "qs": "6.9.3",
+    "axios": "0.19.2",
+    "atob": "2.1.2",
+    "gray-matter": "4.0.2"
+  }
+}
