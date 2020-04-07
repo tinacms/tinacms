@@ -20,5 +20,6 @@ import { TinaCMSConfig } from 'tinacms'
 
 export interface GatsbyPluginTinacmsOptions {
   sidebar: TinaCMSConfig['sidebar']
+  toolbar: TinaCMSConfig['toolbar']
   manualInit?: boolean
 }

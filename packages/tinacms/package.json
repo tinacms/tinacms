@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.18.2",
+  "version": "0.19.0-alpha.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -35,24 +35,25 @@
     "styled-components": ">=4.1"
   },
   "dependencies": {
-    "@tinacms/alerts": "^0.1.0",
-    "@tinacms/core": "^0.7.3",
-    "@tinacms/fields": "^0.9.1",
-    "@tinacms/form-builder": "^0.3.0",
-    "@tinacms/forms": "^0.3.0",
-    "@tinacms/icons": "^0.7.0",
+    "@tinacms/alerts": "^0.1.1",
+    "@tinacms/core": "^0.7.4",
+    "@tinacms/fields": "^0.9.3-alpha.0",
+    "@tinacms/form-builder": "^0.3.2-alpha.0",
+    "@tinacms/forms": "^0.4.0",
+    "@tinacms/icons": "^0.9.0-alpha.0",
     "@tinacms/media": "^0.1.0",
-    "@tinacms/react-alerts": "^0.1.0",
-    "@tinacms/react-core": "^0.2.9",
-    "@tinacms/react-forms": "^0.1.0",
-    "@tinacms/react-modals": "^0.1.0",
-    "@tinacms/react-screens": "^0.0.0",
-    "@tinacms/react-sidebar": "^0.0.0",
-    "@tinacms/styles": "^0.4.0",
+    "@tinacms/react-alerts": "0.1.2-alpha.0",
+    "@tinacms/react-core": "0.2.11-alpha.0",
+    "@tinacms/react-forms": "0.1.2-alpha.0",
+    "@tinacms/react-modals": "0.1.2-alpha.0",
+    "@tinacms/react-screens": "0.1.1-alpha.0",
+    "@tinacms/react-sidebar": "^0.1.2-alpha.0",
+    "@tinacms/react-toolbar": "^0.1.0-alpha.1",
+    "@tinacms/styles": "^0.4.2-alpha.0",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2",
     "react-datetime": "^2.16.3",
-    "react-tinacms-editor": "^0.3.0"
+    "react-tinacms-editor": "^0.4.1-alpha.0"
   },
   "peerDependencies": {
     "react": ">=16.8",

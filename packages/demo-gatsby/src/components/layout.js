@@ -95,7 +95,8 @@ class Layout extends React.Component {
         >
           © {new Date().getFullYear()}, Built with
           {` `}
-          <a href="https://www.gatsbyjs.org">Gatsby</a>
+          <a href="https://www.gatsbyjs.org">Gatsby</a> and{" "}
+          <a href="https://tinacms.org">TinaCMS</a>
         </footer>
       </div>
     )
@@ -114,8 +115,8 @@ const CreatePostPlugin = createRemarkButton({
         resolve({
           title,
           date: new Date(),
-          heading_color: "pink",
-          description: "My new post. ",
+          heading_color: "#e6faf8",
+          description: "A human friendy summary",
         })
       }, 1000)
     })

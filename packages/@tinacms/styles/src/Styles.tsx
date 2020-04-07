@@ -78,6 +78,10 @@ const theme = css`
     --tina-z-index-2: 1500;
     --tina-z-index-3: 2000;
     --tina-z-index-4: 2500;
+
+    --tina-sidebar-width: 0;
+    --tina-sidebar-header-height: 0;
+    --tina-toolbar-height: 0;
   }
 `
 

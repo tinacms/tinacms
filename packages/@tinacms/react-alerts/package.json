@@ -1,12 +1,11 @@
 {
   "name": "@tinacms/react-alerts",
-  "version": "0.1.0",
+  "version": "0.1.2-alpha.0",
   "license": "Apache-2.0",
-  "main": "dist/index.js",
-  "module": "dist/react-alerts.esm.js",
-  "typings": "dist/index.d.ts",
+  "main": "build/index.js",
+  "typings": "build/index.d.ts",
   "files": [
-    "dist"
+    "build"
   ],
   "repository": {
     "type": "git",
@@ -14,18 +13,18 @@
     "directory": "packages/@tinacms/react-alerts"
   },
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint",
-    "docs": "npx typedoc"
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "docs": "npx typedoc",
+    "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/alerts": "^0.1.0",
-    "@tinacms/icons": "^0.7.0",
-    "@tinacms/react-core": "^0.2.9",
-    "@tinacms/styles": "^0.4.0"
+    "@tinacms/alerts": "^0.1.1",
+    "@tinacms/icons": "^0.9.0-alpha.0",
+    "@tinacms/react-core": "^0.2.11-alpha.0",
+    "@tinacms/scripts": "^0.1.13",
+    "@tinacms/styles": "^0.4.2-alpha.0"
   },
   "peerDependencies": {
     "@tinacms/alerts": ">=0.1",

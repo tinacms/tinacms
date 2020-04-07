@@ -217,6 +217,7 @@ export const GroupLabel = styled.span<{ error?: boolean }>`
 `
 
 export const GroupListHeader = styled.div`
+  position: relative;
   display: flex;
   width: 100%;
   justify-content: space-between;

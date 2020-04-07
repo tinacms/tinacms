@@ -20,6 +20,7 @@ import * as React from 'react'
 import { ModalProvider } from '@tinacms/react-modals'
 import { GlobalStyles } from '@tinacms/styles'
 import { SidebarProvider, SidebarPosition } from '@tinacms/react-sidebar'
+import { ToolbarProvider } from '@tinacms/react-toolbar'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
@@ -41,6 +42,7 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
       <ModalProvider>
         <GlobalStyles />
         <Alerts alerts={cms.alerts} />
+        <ToolbarProvider hidden={hidden} toolbar={cms.toolbar} />
         <SidebarProvider
           hidden={hidden}
           position={position}

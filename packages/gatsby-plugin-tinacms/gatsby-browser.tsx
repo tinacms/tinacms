@@ -35,5 +35,6 @@ declare let window: any
 exports.onClientEntry = (_: null, options: GatsbyPluginTinacmsOptions) => {
   window.tinacms = new TinaCMS({
     sidebar: options.sidebar,
+    toolbar: options.toolbar,
   })
 }
