@@ -1,17 +1,17 @@
 ---
-title: A new Gatsby starter for Tina
-date: '2020-02-05T00:00:00.000Z'
-heading_color: pink
-description: 'My new post. '
+title: Gatsby starter with TinaCMS
+date: '2020-02-05'
+heading_color: '#e6faf8'
+description: Let's do some tests!
 blocks:
   - _template: heading
-    text: My first Tina post
+    text: Kitchen Sink
   - _template: image
-    alt: My kitchen
+    alt: A beautiful kitchen
     src: >-
       https://images.unsplash.com/photo-1556910096-6f5e72db6803?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80
 gallery:
-  - alt: Another photo
+  - alt: The same picture
     src: >-
       https://images.unsplash.com/photo-1556910096-6f5e72db6803?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80
     photographer:
@@ -20,17 +20,15 @@ gallery:
         - {}
 draft: false
 testNumber: 40
-cool: How cool!
+cool: A visual editing experience
 thumbnail: ../../assets/profile-pic.jpg
 ---
 
-![Beautiful kitchen ](https://images.unsplash.com/photo-1556910096-6f5e72db6803?ixlib=rb-1.2.1&ixid=eyJhcHBfaWQiOjEyMDd9&auto=format&fit=crop&w=2250&q=80 "A nice kitchen")
+Lorem ipsum dolor sit amet, consectetur adipisicing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Ut enim ad minim veniam, quis nostrud exercitation ullamco laboris nisi ut aliquip ex ea commodo consequat. Duis aute irure dolor in reprehenderit in voluptate velit esse cillum dolore eu fugiat nulla pariatur. Excepteur sint occaecat cupidatat non proident, sunt in culpa qui officia deserunt mollit anim id est laborum.
 
 ## Fun with Flags
 
-![Image result for flowers](https://hips.hearstapps.com/hmg-prod.s3.amazonaws.com/images/colorful-of-dahlia-pink-flower-in-beautiful-garden-royalty-free-image-825886130-1554743243.jpg?crop=0.669xw:1.00xh;0.331xw,0&resize=640:*)
-
-|  | Based in |
+| Name | Based in |
 | :---: | :---: |
 | Dan | 🇺🇸 |
 | DJ | 🇺🇸 |
