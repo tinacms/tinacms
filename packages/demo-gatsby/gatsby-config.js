@@ -21,12 +21,12 @@ const REPO_ABSOLUTE_PATH = path.join(process.cwd(), "../..")
 
 module.exports = {
   siteMetadata: {
-    title: `Gatsby Starter Blog`,
-    author: `Kyle Mathews`,
-    description: `A starter blog demonstrating what Gatsby can do.`,
+    title: `TinaCMS Starter Blog`,
+    author: `Nolan Philipps`,
+    description: `A starter blog demonstrating what TinaCMS can do.`,
     siteUrl: `https://gatsby-starter-blog-demo.netlify.com/`,
     social: {
-      twitter: `kylemathews`,
+      twitter: `ncphi`,
     },
   },
   plugins: [
