@@ -67,12 +67,12 @@ describe('Alerts', () => {
 
       expect(listener).not.toHaveBeenCalled()
     })
-    it('listener is called after `info` is called', () => {
+    it('listener is called after `add` is called', () => {
       const listener = jest.fn()
       const alerts = new Alerts()
       alerts.subscribe(listener)
 
-      alerts.info('Test')
+      alerts.add('info', 'Test')
 
       expect(listener).toHaveBeenCalled()
     })
