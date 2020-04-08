@@ -43,14 +43,14 @@ Helper for creating a preview function which will set the preview data from Gith
 
 import { createPreviewFn } from 'next-tinacms-github'
 
-const fork_full_name = 'https://github.com/username/reponame'
-const head_branch =  'master'
-const github_access_token = proces.env.GITHUB_ACCESS_TOKEN // Maybe?
+const forkFullName = 'https://github.com/username/reponame'
+const headBranch =  'master'
+const githubAccessToken = proces.env.GITHUB_ACCESS_TOKEN // Maybe?
 
 export default createPreviewFn(
-  fork_full_name,
-  head_branch,
-  github_access_token
+  forkFullName,
+  headBranch,
+  githubAccessToken
 )
 
 ```
