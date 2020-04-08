@@ -19,11 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useCallback, useState } from 'react'
 
-interface Props {
-  children: any
-}
-
-export const ModalProvider = ({ children }: Props) => {
+export const ModalProvider: React.FC = ({ children }) => {
   const [modalRootContainerRef, setModalRootContainerRef] = useState(
     null as Element | null
   )
@@ -40,7 +36,7 @@ export const ModalProvider = ({ children }: Props) => {
       <ModalContainerContext.Provider
         value={{ portalNode: modalRootContainerRef }}
       >
-        {...children}
+        {children}
       </ModalContainerContext.Provider>
     </>
   )
