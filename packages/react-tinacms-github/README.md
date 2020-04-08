@@ -18,7 +18,7 @@ const cms = new TinaCMS({
 })
 ```
 
-## Add the TinacmsGithubProvider to manage edit state
+## Managing "edit-mode" state
 
 Add the root `TinacmsGithubProvider` component to our main layout. We will supply it with handlers for authenticating and entering/exiting edit-mode.
 In this case, we will hit our `/api` server functions.
@@ -46,6 +46,8 @@ const YourLayout = ({ Component, pageProps, children }) => {
 }
 ```
 
+## Error Handling
+
 Add error handling to our forms which prompt Github-specific action when errors occur (e.g a fork no longer exists).
 ```ts
 // YourSiteForm.ts
@@ -62,9 +64,10 @@ const YourSiteForm = ({ form, children }) => {
 }
 ```
 
-You will also need a few Github Specific pages to handle auth...
+## Auth Redirects
 
-Github auth callback page. 
+We will also need a few Github Specific pages to redirect the user to while authenticating with Github
+
 ```ts
 //pages/github/authorizing.tsx
 // Our Github app redirects back to this page with auth code
@@ -77,6 +80,9 @@ export default function Authorizing() {
   )
 }
 ```
+
+## Entering / Exiting "edit-mode"
+
 
 We will need a way to enter/exit mode from our site. Let's create an "Edit Link" button.
 Ours will take `isEditing` as a parameter. 
@@ -106,7 +112,7 @@ In GitHub, within your account Settings, click [Oauth Apps](https://github.com/s
 
 click "New Oauth App".
 
-For the **Authorization callback URL**, enter the url for the "authorizing" page that you created above (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
+For the **Authorization callback URL**, enter the url for the "authorizing" page that [you created above](#auth-redirects) (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
 
 The generated **Client ID** will be used in your site (remember, we passed this value into the Github `authenticate` method earlier). 
 
