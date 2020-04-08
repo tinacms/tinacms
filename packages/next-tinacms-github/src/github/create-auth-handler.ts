@@ -22,7 +22,7 @@ const qs = require('qs')
 const axios = require('axios')
 import { serialize } from 'cookie'
 
-export const createCreateAccessTokenFn = (clientId: string, secret: string) => (
+export const createAuthHandler = (clientId: string, secret: string) => (
   req: any,
   res: any
 ) => {
