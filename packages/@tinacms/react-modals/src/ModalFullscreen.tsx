@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import styled, { keyframes } from 'styled-components'
-import { ModalBody } from './ModalProvider'
+import { ModalBody } from './Modal'
 
 const ModalFullscreenKeyframes = keyframes`
   0% {

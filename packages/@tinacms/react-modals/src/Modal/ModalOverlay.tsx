@@ -16,7 +16,18 @@ limitations under the License.
 
 */
 
-export * from './ModalProvider'
-export * from './Modal'
-export * from './ModalFullscreen'
-export * from './ModalPopup'
+import styled from 'styled-components'
+
+export const ModalOverlay = styled.div`
+  position: fixed;
+  top: 0;
+  right: 0;
+  bottom: 0;
+  left: 0;
+  width: 100vw;
+  height: 100vh;
+  background: rgba(0, 0, 0, 0.5);
+  overflow: auto;
+  padding: 0;
+  z-index: var(--tina-z-index-3);
+`
