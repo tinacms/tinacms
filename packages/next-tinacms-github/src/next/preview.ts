@@ -18,7 +18,7 @@ limitations under the License.
 
 import { ACCESS_TOKEN_KEY, FORK_KEY, HEAD_BRANCH_KEY } from '../constants'
 
-export const createPreviewFn = () => (req: any, res: any) => {
+export const previewHandler = (req: any, res: any) => {
   const previewData = {
     fork_full_name: req.cookies[FORK_KEY],
     github_access_token: req.cookies[ACCESS_TOKEN_KEY],
