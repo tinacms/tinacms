@@ -290,5 +290,5 @@ const StatusMessage = styled.p`
   color: var(--tina-color-grey-6);
   padding-right: 4px;
   line-height: 1.6;
-  margin-bottom: 0;
+  margin: 0;
 `
