@@ -15,17 +15,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { ACCESS_TOKEN_KEY } from '../constants'
 
 const axios = require('axios')
 
-export const createProxy = (authTokenKey: string) => (req: any, res: any) => {
+export const apiProxy = (req: any, res: any) => {
   const { headers, ...data } = JSON.parse(req.body)
 
   axios({
     ...data,
     headers: {
       ...headers,
-      Authorization: 'token ' + req.cookies[authTokenKey],
+      Authorization: 'token ' + req.cookies[ACCESS_TOKEN_KEY],
     },
   })
     .then((resp: any) => {
