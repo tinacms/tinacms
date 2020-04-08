@@ -130,7 +130,7 @@ click "New Oauth App".
 
 For the **Authorization callback URL**, enter the url for the "authorizing" page that you created above (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
 
-The generated **Client ID** & **Client Secret** will be consumed by the `createCreateAccessTokenFn` defined above.
+The generated **Client ID** & **Client Secret** will be consumed by the `createCreateAccessTokenFn` [defined above](#createcreateaccesstokenfn).
 
 ## Next steps
 
