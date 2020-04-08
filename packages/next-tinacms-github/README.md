@@ -3,17 +3,17 @@
 This package provides helpers for managing the github auth token on the server.
 When used with Next.js in the `pages/api` directory, these functions are mapped to `/api/*` endpoints.
 
-# `createCreateAccessTokenFn`
-Helper for creating a createCreateAccessToken server function.
+# `createAuthHandler`
+Helper for creating a handler to authenticate with GitHub.
 
 ## Implementation
 
 ```
 // pages/api/create-github-access-token.ts
 
-import { createCreateAccessTokenFn } from 'next-tinacms-github'
+import { createAuthHandler } from 'next-tinacms-github'
 
-export default createCreateAccessTokenFn(
+export default createAuthHandler(
   process.env.GITHUB_CLIENT_ID,
   process.env.GITHUB_CLIENT_SECRET
 )
