@@ -22,12 +22,12 @@ import { TinaReset } from '@tinacms/styles'
 import { useModalContainer } from '../ModalProvider'
 import { ModalOverlay } from './ModalOverlay'
 
-export const Modal = ({
-  ...props
-}: React.DetailedHTMLProps<
+export type ModalProps = React.DetailedHTMLProps<
   React.HTMLAttributes<HTMLDivElement>,
   HTMLDivElement
->) => {
+>
+
+export const Modal = (props: ModalProps) => {
   const { portalNode } = useModalContainer()
 
   if (!portalNode) return null
