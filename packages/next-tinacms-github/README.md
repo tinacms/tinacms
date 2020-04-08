@@ -19,8 +19,10 @@ export default createCreateAccessTokenFn(
 )
 ```
 
+See below for creating a Github Oauth App provides these **Client ID** & **Client Secret** variables.
+
 # `createProxy`
-Helper for creating a proxy which attaches this Github access token to the request
+Helper for creating a proxy which attaches the user's Github access token to each request
 
 ## Implementation
 
@@ -43,9 +45,9 @@ Helper for creating a preview function which will set the preview data from Gith
 
 import { createPreviewFn } from 'next-tinacms-github'
 
-const forkFullName = 'https://github.com/username/reponame'
-const headBranch =  'master'
-const githubAccessToken = proces.env.GITHUB_ACCESS_TOKEN // Maybe?
+const forkCookieKey = 'fork_full_name'
+const headBranchCookieKey =  'head_branch'
+const githubAccessTokenCookieKey = 'github_access_token'
 
 export default createPreviewFn(
   forkFullName,
@@ -54,3 +56,18 @@ export default createPreviewFn(
 )
 
 ```
+
+## Github Oauth App:
+
+In GitHub, within your account Settings, click [Oauth Apps](https://github.com/settings/developers) under Developer Settings.
+
+click "New Oauth App".
+
+For the **Authorization callback URL**, enter the url for the "authorizing" page that you created above (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
+
+The generated **Client ID** & **Client Secret** will be consumed by the `createCreateAccessTokenFn` defined above.
+
+## Next steps
+
+Now that we have configured our backend API functions to manage our Github authentication token, we will need to configure the front-end to use these endpoints.
+You may want to use the [next-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-github) package.
