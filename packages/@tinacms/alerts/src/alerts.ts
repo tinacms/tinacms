@@ -21,11 +21,7 @@ import { Subscribable } from '@tinacms/core'
 export class Alerts extends Subscribable {
   private alerts: Map<string, Alert> = new Map()
 
-  private add(
-    level: AlertLevel,
-    message: string,
-    timeout: number = 3000
-  ): () => void {
+  add(level: AlertLevel, message: string, timeout: number = 3000): () => void {
     const alert = {
       level,
       message,
