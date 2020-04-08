@@ -96,7 +96,7 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
               setActiveBlock,
             }}
           >
-            {allData.length < 1 && status === 'inactive' && (
+            {allData.length < 1 && status === 'active' && (
               <BlocksEmptyState>
                 <AddBlockMenu
                   addBlock={block => insert(1, block)}
