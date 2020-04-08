@@ -16,10 +16,10 @@ limitations under the License.
 
 */
 
-import styled, { StyledComponent } from 'styled-components'
+import styled from 'styled-components'
 import { Button } from '@tinacms/styles'
 
-export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
+export const ModalActions = styled.div`
   display: flex;
   justify-content: flex-end;
   border-radius: 0 0 5px 5px;
