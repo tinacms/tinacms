@@ -2,6 +2,24 @@
 
 ## Implementation:
 
+## Register the GithubClient 
+
+We will want to use the GithubClient to load/save our content using the Github API. Let's add it as an API plugin.
+
+```ts
+import { TinaCMS } from 'tinacms'
+import { GithubClient } from 'react-tinacms-github'
+
+const cms = new TinaCMS({
+  apis: {
+      github: new GithubClient('/api/proxy-github', process.env.REPO_FULL_NAME),
+  },
+  // ... any other tina config
+})
+```
+
+## Add the TinacmsGithubProvider to manage edit state
+
 Add the root `TinacmsGithubProvider` component to our main layout. We will supply it with handlers for authenticating and entering/exiting edit-mode.
 In this case, we will hit our `/api` server functions.
 
@@ -93,3 +111,37 @@ For the **Authorization callback URL**, enter the url for the "authorizing" page
 The generated **Client ID** will be used in your site (remember, we passed this value into the Github `authenticate` method earlier). 
 
 The **Client Secret** will likely be used by your backend.
+
+
+## Using Github Forms
+
+Any forms that we have on our site can be created with the `useGithubJsonForm` or `useGithubMarkdownForm` helpers
+
+```ts
+
+function BlogTemplate({
+  jsonFile, // content for this page
+  sourceProviderConnection, // repository details
+}) {
+  const formOptions = {
+    label: 'Blog Post',
+    fields: [],
+  }
+
+  // Registers a JSON Tina Form
+  const [data, form] = useGithubJsonForm(
+    jsonFile,
+    formOptions,
+    sourceProviderConnection
+  )
+
+  // ...
+}
+```
+
+`useGithubJsonForm` will use the `GithubClient` api that we registered earlier.
+
+## Next steps
+
+Now that we have configured our front-end to use Github, we will need to setup some backend functions to handle authentication.
+If you are using Nextjs, you may want to use the [next-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/next-tinacms-github) package.
