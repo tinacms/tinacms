@@ -19,8 +19,8 @@ export default createCreateAccessTokenFn(
 )
 ```
 
-# `createProxy`
-Helper for creating a proxy which attaches this Github access token to the request
+# `apiProxy`
+Proxies requests to GitHub, attaching the GitHub access token in the process
 
 ## Implementation
 
@@ -32,8 +32,8 @@ import { apiProxy } from 'next-tinacms-github'
 export default apiProxy
 ```
 
-# `createPreviewFn`
-Helper for creating a preview function which will set the preview data from Github cookies
+# `previewHandler`
+Handles setting the preview data from Github cookies
 
 ## Implementation
 
