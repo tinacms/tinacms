@@ -18,21 +18,24 @@ limitations under the License.
 
 import React from "react"
 import styled from "styled-components"
-import {
-  Button as TinaButton,
-  TinaResetStyles as TinaStyles,
-} from "@tinacms/styles"
+import { Button as TinaButton } from "@tinacms/styles"
 import { EditIcon } from "@tinacms/icons"
+import { useInlineForm } from "react-tinacms-inline"
 
-export const EditToggle = styled(
-  ({ isEditing, setIsEditing, ...styleProps }) => {
-    return (
-      <TinaButton onClick={() => setIsEditing(p => !p)} primary {...styleProps}>
-        <EditIcon /> {isEditing ? "Preview" : "Edit"}
-      </TinaButton>
-    )
-  }
-)`
+export const EditToggle = styled(({ ...styleProps }) => {
+  const { status, deactivate, activate } = useInlineForm()
+  return (
+    <TinaButton
+      onClick={() => {
+        status === "active" ? deactivate() : activate()
+      }}
+      primary
+      {...styleProps}
+    >
+      {status === "active" ? "Preview" : "Edit"}
+    </TinaButton>
+  )
+})`
   position: fixed;
   bottom: 46px;
   margin-left: 64px;
