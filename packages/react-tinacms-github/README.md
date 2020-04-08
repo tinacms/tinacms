@@ -29,6 +29,9 @@ const YourLayout = ({ Component, pageProps, children }) => {
 Add error handling to our forms which prompt Github-specific action when errors occur (e.g a fork no longer exists).
 ```ts
 // YourSiteForm.ts
+
+import { useGithubErrorListener } from 'react-tinacms-github'
+
 const YourSiteForm = ({ form, children }) => {
   useGithubErrorListener(form)
   return (
@@ -57,17 +60,17 @@ export default function Authorizing() {
 
 ```ts
 //...EditLink.tsx
-import { useGithub } from 'react-tinacms-github'
+import { useGithubEditing } from 'react-tinacms-github'
 export const EditLink = ({ editMode }: EditLinkProps) => {
-  const github = useGithub()
+  const github = useGithubEditing()
   return (
-    <EditToggleButton
+    <button
       onClick={
         editMode ? github.exitEditMode : github.enterEditMode
       }
     >
       {editMode ? 'Exit Edit Mode' : 'Edit This Site'}
-    </EditToggleButton>
+    </button>
   )
 }
 ```
