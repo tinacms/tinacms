@@ -27,10 +27,9 @@ Helper for creating a proxy which attaches this Github access token to the reque
 ```
 // pages/api/proxy-github.ts
 
-import { createProxy } from 'next-tinacms-github'
-import { GITHUB_ACCESS_TOKEN_COOKIE_KEY } from './constants'
+import { apiProxy } from 'next-tinacms-github'
 
-export default createProxy(GITHUB_ACCESS_TOKEN_COOKIE_KEY)
+export default apiProxy
 ```
 
 # `createPreviewFn`
@@ -41,12 +40,8 @@ Helper for creating a preview function which will set the preview data from Gith
 ```
 // pages/api/preview.ts
 
-import { createPreviewFn } from 'next-tinacms-github'
+import { previewHandler } from 'next-tinacms-github'
 
-export default createPreviewFn(
-  'fork_full_name',
-  'head_branch',
-  'github_access_token'
-)
+export default previewHandler
 
 ```

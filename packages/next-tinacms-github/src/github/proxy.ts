@@ -19,7 +19,7 @@ import { ACCESS_TOKEN_KEY } from '../constants'
 
 const axios = require('axios')
 
-export const createProxy = () => (req: any, res: any) => {
+export const apiProxy = (req: any, res: any) => {
   const { headers, ...data } = JSON.parse(req.body)
 
   axios({
