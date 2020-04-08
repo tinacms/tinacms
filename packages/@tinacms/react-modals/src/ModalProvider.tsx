@@ -42,15 +42,13 @@ export const ModalProvider: React.FC = ({ children }) => {
   )
 }
 
-interface ModalContainerProps {
+export interface ModalContext {
   portalNode: Element | null
 }
 
-const ModalContainerContext = React.createContext<ModalContainerProps | null>(
-  null
-)
+const ModalContainerContext = React.createContext<ModalContext | null>(null)
 
-export function useModalContainer(): ModalContainerProps {
+export function useModalContainer(): ModalContext {
   const modalContainer = React.useContext(ModalContainerContext)
 
   if (!modalContainer) {
