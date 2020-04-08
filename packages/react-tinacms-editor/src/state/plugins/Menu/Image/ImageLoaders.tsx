@@ -18,6 +18,8 @@ limitations under the License.
 
 import React from 'react'
 import ReactDOM from 'react-dom'
+import { LoadingDots } from '@tinacms/react-forms'
+import styled from 'styled-components'
 
 export default () => {
   const markerImageLoader = document.getElementsByClassName(
@@ -27,8 +29,23 @@ export default () => {
   const loaders = []
   for (let i = 0; i < markerImageLoader.length; i++) {
     loaders.push(
-      ReactDOM.createPortal(<div>IMAGE LOADER</div>, markerImageLoader[0])
+      ReactDOM.createPortal(<ImagePlaceholder />, markerImageLoader[0])
     )
   }
   return <>{loaders}</>
 }
+
+const ImagePlaceholder = styled(({ ...styleProps }) => {
+  return (
+    <div {...styleProps}>
+      <LoadingDots color={'var(--tina-color-primary)'} />
+    </div>
+  )
+})`
+  display: flex;
+  width: 100%;
+  align-items: center;
+  justify-content: center;
+  padding: 64px;
+  background-color: rgba(100, 100, 100, 0.07);
+`
