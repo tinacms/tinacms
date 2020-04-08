@@ -30,14 +30,14 @@ export const Modal = ({
 >) => {
   const { portalNode } = useModalContainer()
 
-  return portalNode && portalNode
-    ? (createPortal(
-        <TinaReset>
-          <ModalOverlay>
-            <div {...props} />
-          </ModalOverlay>
-        </TinaReset>,
-        portalNode
-      ) as any)
-    : null
+  if (!portalNode) return null
+
+  return createPortal(
+    <TinaReset>
+      <ModalOverlay>
+        <div {...props} />
+      </ModalOverlay>
+    </TinaReset>,
+    portalNode
+  )
 }
