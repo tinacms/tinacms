@@ -3,10 +3,9 @@
 This package provides helpers for managing the github auth token on the server.
 When used with Next.js in the `pages/api` directory, these functions are mapped to `/api/*` endpoints.
 
-# `createCreateAccessTokenFn`
-Helper for creating a createCreateAccessToken server function.
+## `createCreateAccessTokenFn`
 
-## Implementation
+Helper for creating a `createCreateAccessToken` server function.
 
 ```
 // pages/api/create-github-access-token.ts
@@ -19,12 +18,11 @@ export default createCreateAccessTokenFn(
 )
 ```
 
-See below for creating a Github Oauth App provides these **Client ID** & **Client Secret** variables.
+[See below](#github-oauth-app) for creating a Github Oauth App provides these **Client ID** & **Client Secret** variables.
 
-# `createProxy`
+## `createProxy`
+
 Helper for creating a proxy which attaches the user's Github access token to each request
-
-## Implementation
 
 ```
 // pages/api/proxy-github.ts
@@ -35,10 +33,9 @@ import { GITHUB_ACCESS_TOKEN_COOKIE_KEY } from './constants'
 export default createProxy(GITHUB_ACCESS_TOKEN_COOKIE_KEY)
 ```
 
-# `createPreviewFn`
-Helper for creating a preview function which will set the preview data from Github cookies
+## `createPreviewFn`
 
-## Implementation
+Helper for creating a preview function which will set the Nextjs [preview data](https://nextjs.org/docs/advanced-features/preview-mode) from your cookie data.
 
 ```
 // pages/api/preview.ts
@@ -54,8 +51,57 @@ export default createPreviewFn(
   headBranch,
   githubAccessToken
 )
-
 ```
+
+This preview data set from calling your [preview function](#createpreviewfn) will be accesible through `getStaticProps` throughout your app.
+
+```ts
+//Blog template [slug.ts]
+
+import {
+  getMarkdownFile as getGithubMarkdownFile,
+} from 'next-tinacms-github'
+
+// ...
+
+export const getStaticProps: GetStaticProps = async function({
+  preview,
+  previewData,
+  ...ctx
+}) {
+  const { slug } = ctx.params
+
+  let file = {}
+  const filePath = `content/blog/${slug}.md`
+
+  const sourceProviderConnection = {
+    forkFullName: previewData.fork_full_name,
+    headBranch: previewData.head_branch || 'master', 
+  }
+
+  if(preview)
+  {
+    file = await getGithubMarkdownFile(filePath,
+      sourceProviderConnection, 
+      previewData.accessToken)
+  }
+  else 
+  {
+    // Get your production content here
+    // when you are not in edit-mode
+     file = await readLocalMarkdownFile(filePath)
+  }
+
+  return {
+    props: {
+      sourceProviderConnection
+      editMode: !!preview,
+      file,
+    },
+  }
+}
+```
+
 
 ## Github Oauth App:
 
