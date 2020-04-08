@@ -18,12 +18,15 @@ limitations under the License.
 
 import { GITHUB_AUTH_CODE_KEY } from './useGithubAuthRedirect'
 import popupWindow from './popupWindow'
-export const authenticate = (codeExchangeRoute: string): Promise<void> => {
+export const authenticate = (
+  clientId: string,
+  codeExchangeRoute: string
+): Promise<void> => {
   const authState = Math.random()
     .toString(36)
     .substring(7)
 
-  const url = `https://github.com/login/oauth/authorize?scope=public_repo&client_id=${process.env.GITHUB_CLIENT_ID}&state=${authState}`
+  const url = `https://github.com/login/oauth/authorize?scope=public_repo&client_id=${clientId}&state=${authState}`
 
   return new Promise(resolve => {
     // @ts-ignore
