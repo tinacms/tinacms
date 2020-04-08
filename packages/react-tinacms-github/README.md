@@ -1,8 +1,22 @@
 # react-tinacms-github
 
-## Implementation:
+This package provides helpers for setting up TinaCMS to use the Github API, with Github authentication. 
 
-## Register the GithubClient 
+## Installation
+
+```
+npm install --save react-tinacms-github
+```
+
+or
+
+```
+yarn add react-tinacms-github
+```
+
+## Getting Started
+
+### Register the GithubClient 
 
 We will want to use the GithubClient to load/save our content using the Github API. Let's add it as an API plugin.
 
@@ -18,7 +32,7 @@ const cms = new TinaCMS({
 })
 ```
 
-## Managing "edit-mode" state
+### Managing "edit-mode" state
 
 Add the root `TinacmsGithubProvider` component to our main layout. We will supply it with handlers for authenticating and entering/exiting edit-mode.
 In this case, we will hit our `/api` server functions.
@@ -46,7 +60,7 @@ const YourLayout = ({ Component, pageProps, children }) => {
 }
 ```
 
-## Error Handling
+### Error Handling
 
 Add error handling to our forms which prompt Github-specific action when errors occur (e.g a fork no longer exists).
 ```ts
@@ -63,7 +77,7 @@ const YourSiteForm = ({ form, children }) => {
 }
 ```
 
-## Auth Redirects
+### Auth Redirects
 
 We will also need a few Github Specific pages to redirect the user to while authenticating with Github
 
@@ -80,7 +94,7 @@ export default function Authorizing() {
 }
 ```
 
-## Entering / Exiting "edit-mode"
+### Entering / Exiting "edit-mode"
 
 
 We will need a way to enter/exit mode from our site. Let's create an "Edit Link" button.
@@ -105,7 +119,7 @@ export const EditLink = ({ isEditing }: EditLinkProps) => {
 }
 ```
 
-## Github Oauth App:
+### Github Oauth App:
 
 In GitHub, within your account Settings, click [Oauth Apps](https://github.com/settings/developers) under Developer Settings.
 
@@ -118,7 +132,7 @@ The generated **Client ID** will be used in your site (remember, we passed this 
 The **Client Secret** will likely be used by your backend.
 
 
-## Using Github Forms
+### Using Github Forms
 
 Any forms that we have on our site can be created with the `useGithubJsonForm` or `useGithubMarkdownForm` helpers
 

@@ -1,9 +1,26 @@
 # next-tinacms-github
 
-This package provides helpers for managing the github auth token on the server.
-When used with Next.js in the `pages/api` directory, these functions are mapped to `/api/*` endpoints.
+This package provides helpers for managing the github auth token for requests, as well as
+providing helpers for loading content from the Github API.
 
-## `createCreateAccessTokenFn`
+## Installation
+
+```
+npm install --save next-tinacms-github
+```
+
+or
+
+```
+yarn add next-tinacms-github
+```
+
+## Getting Started
+
+Any functions in the `pages/api` directory are are mapped to `/api/*` endpoints.
+
+
+### `createCreateAccessTokenFn`
 
 Helper for creating a `createCreateAccessToken` server function.
 
@@ -20,7 +37,7 @@ export default createCreateAccessTokenFn(
 
 [See below](#github-oauth-app) for creating a Github Oauth App provides these **Client ID** & **Client Secret** variables.
 
-## `createProxy`
+### `createProxy`
 
 Helper for creating a proxy which attaches the user's Github access token to each request
 
@@ -33,7 +50,7 @@ import { GITHUB_ACCESS_TOKEN_COOKIE_KEY } from './constants'
 export default createProxy(GITHUB_ACCESS_TOKEN_COOKIE_KEY)
 ```
 
-## `createPreviewFn`
+### `createPreviewFn`
 
 Helper for creating a preview function which will set the Nextjs [preview data](https://nextjs.org/docs/advanced-features/preview-mode) from your cookie data.
 
@@ -52,6 +69,8 @@ export default createPreviewFn(
   githubAccessToken
 )
 ```
+
+### Loading content from Github
 
 This preview data set from calling your [preview function](#createpreviewfn) will be accesible through `getStaticProps` throughout your app.
 
@@ -103,7 +122,7 @@ export const getStaticProps: GetStaticProps = async function({
 ```
 
 
-## Github Oauth App:
+### Github Oauth App:
 
 In GitHub, within your account Settings, click [Oauth Apps](https://github.com/settings/developers) under Developer Settings.
 
