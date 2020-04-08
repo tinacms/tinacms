@@ -16,7 +16,21 @@ limitations under the License.
 
 */
 
-export * from './ModalProvider'
-export * from './Modal'
-export * from './ModalFullscreen'
-export * from './ModalPopup'
+import styled, { StyledComponent } from 'styled-components'
+import { Button } from '@tinacms/styles'
+
+export const ModalActions: StyledComponent<'div', {}, {}> = styled.div`
+  display: flex;
+  justify-content: flex-end;
+  border-radius: 0 0 5px 5px;
+  padding: 0 var(--tina-padding-big) var(--tina-padding-big)
+    var(--tina-padding-big);
+  ${Button} {
+    flex: 0 1 auto;
+    min-width: 128px;
+    margin: 0 var(--tina-padding-small) 0 0;
+    &:last-child {
+      margin-right: 0;
+    }
+  }
+`
