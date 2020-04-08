@@ -387,6 +387,8 @@ function checkDeps(tinaPackage: TinaPackage) {
       '@storybook/*',
       '@sambego/*',
       '@tinacms/scripts',
+      '@testing-library/react',
+      '@testing-library/dom',
     ],
   }
   const packagePath = path.resolve(
