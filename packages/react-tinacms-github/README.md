@@ -158,7 +158,7 @@ function BlogTemplate({
 }
 ```
 
-`useGithubJsonForm` will use the `GithubClient` api that we registered earlier.
+`useGithubJsonForm` will use the `GithubClient` api that we [registered earlier](register-the-githubclient).
 
 ## Next steps
 
