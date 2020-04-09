@@ -156,6 +156,7 @@ const ToolbarGlobalStyles = createGlobalStyle`
 const StyledToolbar = styled.div`
   ${TinaResetStyles}
 
+  font-family: 'Inter', sans-serif;
   position: fixed;
   top: 0;
   left: 0;
@@ -164,6 +165,7 @@ const StyledToolbar = styled.div`
   height: 62px;
   background-color: #f6f6f9;
   z-index: var(--tina-z-index-2);
+  box-sizing: border-box;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid #edecf3;
   display: grid;
@@ -290,5 +292,5 @@ const StatusMessage = styled.p`
   color: var(--tina-color-grey-6);
   padding-right: 4px;
   line-height: 1.6;
-  margin-bottom: 0;
+  margin: 0;
 `
