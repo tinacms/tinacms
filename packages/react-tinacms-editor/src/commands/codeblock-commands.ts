@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { EditorState, Selection } from 'prosemirror-state'
+import { EditorState, Selection, TextSelection } from 'prosemirror-state'
 
 export function exitCodeHard(state: EditorState, dispatch: any) {
   const { $head } = state.selection
@@ -63,16 +63,17 @@ export function deleteEmptyCodeblock(cm: any) {
 
     if (dispatch) {
       // I hate my life
+      const { schema, tr } = state
       dispatch(
-        (state.tr
+        (tr
           // Replace the entire codeblock with an empty paragraph
           .replaceRangeWith(
             $from.pos - 1,
             $from.pos + code.length + 1,
-            state.schema.nodes.paragraph.create()
+            schema.nodes.paragraph.create()
           ) as any)
           // Set the seleciton to be at the start of the paragram
-          .setSelection(Selection.near(state.doc.resolve($from.pos - 1)))
+          .setSelection(new TextSelection(tr.doc.resolve($from.pos)))
       )
     }
 
