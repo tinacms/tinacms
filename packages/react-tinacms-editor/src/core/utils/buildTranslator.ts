@@ -16,7 +16,13 @@ limitations under the License.
 
 */
 
-import { Translator } from '../../../Translator'
-import { createContext } from 'react'
+import { MarkdownTranslator, Format, DOMTranslator } from '../../Translator'
+import { Schema } from 'prosemirror-model'
 
-export const TranslatorContext = createContext<Translator | null>(null)
+export const buildTranslator = (
+  schema: Schema,
+  format: Format = 'markdown'
+) => {
+  if (format === 'html') return DOMTranslator.fromSchema(schema)
+  return MarkdownTranslator.fromSchema(schema)
+}

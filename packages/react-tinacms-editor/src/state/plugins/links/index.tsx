@@ -87,6 +87,7 @@ export function links(): Plugin {
         if (!isMarkPresent(state, schema.marks.link)) {
           dispatch(tr.setMeta('show_link_toolbar', false))
         }
+        return false
       },
     },
     // TODO: Fix pls

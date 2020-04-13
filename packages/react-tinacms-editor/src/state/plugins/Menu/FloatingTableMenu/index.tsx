@@ -17,22 +17,15 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { EditorView } from 'prosemirror-view'
 
 import FloatingTableColumnMenu from './FloatingTableColumnMenu'
 import FloatingTableAddMenu from './FloatingTableAddMenu'
 import TableOptionsMenu from './TableOptionsMenu'
 
-interface FloatingTableMenuProps {
-  editorView: { view: EditorView }
-}
-
-export const FloatingTableMenu = (props: FloatingTableMenuProps) => {
-  return (
-    <>
-      <FloatingTableColumnMenu {...props} />
-      <FloatingTableAddMenu {...props} />
-      <TableOptionsMenu {...props} />
-    </>
-  )
-}
+export const FloatingTableMenu = () => (
+  <>
+    <FloatingTableColumnMenu />
+    <FloatingTableAddMenu />
+    <TableOptionsMenu />
+  </>
+)

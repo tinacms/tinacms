@@ -17,15 +17,17 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Plugin } from '@tinacms/core'
-import { useProsemirror } from './useProsemirror'
-import { ALL_PLUGINS } from './default-plugins'
-import { CodeMirrorCss } from './CodeMirrorCss'
-import { ProseMirrorCss } from './ProseMirrorCss'
-import { Format } from './Translator'
-import Menu from './state/plugins/Menu'
-import { ImageProps } from './types'
+
+import { Menu } from '../state/plugins/Menu'
+import { Format } from '../Translator'
+import { ImageProps } from '../types'
+
+import { CodeMirrorCss } from './styles/CodeMirror'
+import { ProseMirrorCss } from './styles/ProseMirror'
+import { EditorStateProvider } from './context/editorState'
 
 export interface WysiwygProps {
   input: any
@@ -44,12 +46,13 @@ export const Wysiwyg = styled(
     imageProps,
     ...styleProps
   }: WysiwygProps) => {
-    const { elRef: prosemirrorEl, editorView, translator } = useProsemirror(
-      input,
-      ALL_PLUGINS,
-      format,
-      imageProps
-    )
+    const [el, setEl] = useState<HTMLDivElement>()
+    const editorRef = useRef<HTMLDivElement | null>(null)
+
+    useEffect(() => {
+      // State is updated with latest value of editorRef to trigger re-render
+      if (editorRef.current) setEl(editorRef.current)
+    }, [editorRef])
 
     return (
       <WysiwygWrapper className="wysiwyg-wrapper">
@@ -57,16 +60,19 @@ export const Wysiwyg = styled(
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
         />
-        {editorView && (
+        <EditorStateProvider
+          input={input}
+          el={el}
+          imageProps={imageProps}
+          format={format}
+        >
           <Menu
-            editorView={editorView}
             bottom={false}
-            translator={translator}
             sticky={sticky}
             uploadImages={imageProps && imageProps.upload}
           />
-        )}
-        <div {...styleProps} ref={prosemirrorEl as any} />
+        </EditorStateProvider>
+        <div {...styleProps} ref={editorRef} />
       </WysiwygWrapper>
     )
   }
