@@ -17,19 +17,14 @@ limitations under the License.
 */
 
 import { Plugin } from '@tinacms/core'
-import * as React from 'react'
 import { Schema } from 'prosemirror-model'
-import { SchemaNodePlugin, SchemaMarkPlugin } from './plugins'
+import { SchemaNodePlugin, SchemaMarkPlugin } from '..'
 
-export function useProsemirrorSchema(plugins: Plugin[]) {
-  const schema = React.useMemo(() => {
-    return new Schema({
-      nodes: getNodes(plugins as any),
-      marks: getMarks(plugins as any),
-    })
-  }, [plugins])
-
-  return [schema]
+export const buildSchema = (plugins: Plugin[]) => {
+  return new Schema({
+    nodes: getNodes(plugins as any),
+    marks: getMarks(plugins as any),
+  })
 }
 
 function getNodes(plugins: SchemaNodePlugin[]) {
