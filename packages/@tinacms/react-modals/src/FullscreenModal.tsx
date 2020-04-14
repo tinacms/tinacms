@@ -16,11 +16,12 @@ limitations under the License.
 
 */
 
-import styled, { keyframes, StyledComponent } from 'styled-components'
+import styled, { keyframes } from 'styled-components'
+import { ModalBody } from './Modal'
 
-const ModalPopupKeyframes = keyframes`
+const ModalFullscreenKeyframes = keyframes`
   0% {
-    transform: translate3d( 0, -2rem, 0 );
+    transform: translate3d( -2rem, 0, 0 );
     opacity: 0;
   }
 
@@ -30,14 +31,30 @@ const ModalPopupKeyframes = keyframes`
   }
 `
 
-export const ModalPopup: StyledComponent<'div', {}, {}> = styled.div`
-  display: block;
+export const FullscreenModal = styled.div`
+  display: flex;
+  flex-direction: column;
   z-index: var(--tina-z-index-0);
-  overflow: visible; /* Keep this as "visible", select component needs to overflow */
-  background-color: var(--tina-color-grey-1);
-  border-radius: var(--tina-radius-small);
-  margin: 40px auto;
-  width: 460px;
-  max-width: 90%;
-  animation: ${ModalPopupKeyframes} 150ms ease-out 1;
+  overflow: visible;
+  background-color: #fff;
+  border-radius: 0;
+  position: absolute;
+  top: 0;
+  left: 0;
+  width: calc(100% - 170px);
+  max-width: 1500px;
+  height: 100%;
+  animation: ${ModalFullscreenKeyframes} 150ms ease-out 1;
+
+  ${ModalBody} {
+    flex: 1 0 auto;
+    display: flex;
+    flex-direction: column;
+  }
 `
+
+/**
+ * @alias [FullscreenModal]
+ * @deprecated
+ */
+export const ModalFullscreen = FullscreenModal

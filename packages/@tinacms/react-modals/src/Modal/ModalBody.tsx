@@ -16,5 +16,21 @@ limitations under the License.
 
 */
 
-export { Blocks, BlocksProps } from './blocks'
-export { InlineBlocks, InlineBlocksProps, BlockWrapper, AddBlockMenu } from './inline-blocks'
+import styled from 'styled-components'
+
+export interface ModalBodyProps {
+  padded?: boolean
+}
+
+export const ModalBody = styled.div<ModalBodyProps>`
+  padding: ${p => (p.padded ? 'var(--tina-padding-big)' : '0')};
+  margin: 0;
+  overflow: hidden;
+  display: flex;
+  flex-direction: column;
+  min-height: 160px;
+
+  &:last-child {
+    border-radius: 0 0 5px 5px;
+  }
+`
