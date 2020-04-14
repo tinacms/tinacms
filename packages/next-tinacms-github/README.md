@@ -63,10 +63,10 @@ export default previewHandler
 
 ### Loading content from Github
 
-This preview data set from calling your [preview function](#createpreviewfn) will be accesible through `getStaticProps` throughout your app.
+The `preview` data, which gets set by calling your [preview function](#previewhandler), will be accesible through `getStaticProps` throughout your app.
 
 ```ts
-//Blog template [slug.ts]
+//Blog template [slug].ts
 
 import {
   getMarkdownFile as getGithubMarkdownFile,
@@ -115,7 +115,7 @@ export const getStaticProps: GetStaticProps = async function({
 
   return {
     props: {
-      sourceProviderConnection
+      sourceProviderConnection,
       editMode: !!preview,
       file,
       error
