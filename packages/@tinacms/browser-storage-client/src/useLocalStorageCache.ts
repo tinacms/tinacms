@@ -22,11 +22,11 @@ import { flattenFormData } from './flatten-form-data'
 
 // persist pending changes to localStorage,
 // and load from localstorage on boot
-export const useLocalStorageCache = (
+export function useLocalStorageCache(
   path: string,
   form: Form<any>,
   editMode: boolean
-) => {
+) {
   const cms = useCMS()
 
   const saveToStorage = useCallback(
