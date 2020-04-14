@@ -16,21 +16,15 @@ limitations under the License.
 
 */
 
-export type AnyField = Field & { [key: string]: any }
+import get from 'lodash.get'
 
-export interface Field<F extends Field = AnyField> {
-  name: string
-  label?: string
-  description?: string
-  component: React.FC<any> | string | null
-  parse?: (value: any, name: string, field: F) => any
-  format?: (value: any, name: string, field: F) => any
-  validate?(
-    value: any,
-    allValues: any,
-    meta: any,
-    field: Field
-  ): string | object | undefined
-  defaultValue?: any
-  fields?: F[]
+export function flattenFormData(form: any) {
+  let flatData: any = {}
+  let values = form.getState().values
+  form.getRegisteredFields().forEach((field: string | number) => {
+    let data = get(values, field)
+    if (typeof data === 'object') return
+    flatData[field] = data
+  })
+  return flatData
 }

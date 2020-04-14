@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.0.1-canary3.0",
+  "version": "0.0.1-canary3.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -14,6 +14,7 @@
   "license": "Apache-2.0",
   "peerDependencies": {
     "@tinacms/fields": ">=0.9",
+    "@tinacms/forms": ">=0.4",
     "@tinacms/icons": ">=0.7.0",
     "@tinacms/styles": ">=0.4",
     "final-form": ">=4.18.0",
@@ -23,19 +24,20 @@
     "tinacms": ">=0.19"
   },
   "devDependencies": {
-    "@tinacms/fields": "^0.9.3-alpha.1",
+    "@tinacms/fields": "^0.9.3-alpha.2",
+    "@tinacms/forms": "^0.4.1-alpha.0",
     "@tinacms/icons": "^0.9.0-alpha.1",
-    "@tinacms/react-forms": "^0.1.2-alpha.1",
+    "@tinacms/react-forms": "^0.1.2-alpha.2",
     "@tinacms/styles": "^0.4.2-alpha.1",
     "@types/js-cookie": "^2.2.5",
     "final-form": "^4.18.7",
     "final-form-submit-listener": "^1.0.0",
     "styled-components": ">=4.1",
-    "tinacms": "^0.19.0-alpha.2"
+    "tinacms": "^0.19.0-alpha.3"
   },
   "dependencies": {
     "btoa": "^1.2.1",
     "js-cookie": "^2.2.1",
-    "next-tinacms-markdown": "^0.2.12-alpha.1"
+    "next-tinacms-markdown": "^0.2.12-alpha.2"
   }
 }

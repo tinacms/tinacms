@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0-alpha.3](https://github.com/tinacms/tinacms/compare/tinacms@0.19.0-alpha.2...tinacms@0.19.0-alpha.3) (2020-04-14)
+
+
+### Bug Fixes
+
+* forms are more flexible with the shape of Fields ([90d8b0c](https://github.com/tinacms/tinacms/commit/90d8b0c))
+
+
+
+
+
 # [0.19.0-alpha.2](https://github.com/tinacms/tinacms/compare/tinacms@0.19.0-alpha.1...tinacms@0.19.0-alpha.2) (2020-04-07)
 
 **Note:** Version bump only for package tinacms

@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.2-alpha.2](https://github.com/tinacms/tinacms/compare/@tinacms/react-modals@0.1.2-alpha.1...@tinacms/react-modals@0.1.2-alpha.2) (2020-04-14)
+
+
+### Bug Fixes
+
+* add ModalContext interface ([b5a24da](https://github.com/tinacms/tinacms/commit/b5a24da))
+* introduce explicit ModalProps interface ([bc616af](https://github.com/tinacms/tinacms/commit/bc616af))
+
+
+
+
+
 ## [0.1.2-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-modals@0.1.2-alpha.0...@tinacms/react-modals@0.1.2-alpha.1) (2020-04-07)
 
 **Note:** Version bump only for package @tinacms/react-modals
