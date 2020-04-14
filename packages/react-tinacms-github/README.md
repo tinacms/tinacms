@@ -41,7 +41,7 @@ In this case, we will hit our `/api` server functions.
 
 ```ts
 // YourLayout.ts
-import { TinacmsGithubProvider, authenticate } from 'react-tinacms-github';
+import { TinacmsGithubProvider } from 'react-tinacms-github';
 
 const enterEditMode = () =>
   fetch(`/api/preview`).then(() => {
@@ -54,7 +54,8 @@ const exitEditMode = () => {
 }
 const YourLayout = ({ Component, pageProps, children }) => {
   return (<TinacmsGithubProvider
-      authenticate={() => authenticate(process.env.GITHUB_CLIENT_ID, '/api/create-github-access-token')}
+      clientId={process.env.GITHUB_CLIENT_ID}
+      authCallbackRoute: '/api/create-github-access-token'
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}
       error={pageProps.error}>
