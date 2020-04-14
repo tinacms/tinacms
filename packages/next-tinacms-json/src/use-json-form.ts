@@ -23,6 +23,7 @@ import {
   useCMS,
   FormOptions,
   Field,
+  Form,
 } from 'tinacms'
 import { generateFields } from './generate-fields'
 
@@ -46,7 +47,7 @@ export interface Options {
 export function useJsonForm<T = any>(
   jsonFile: JsonFile<T>,
   options: Options = {}
-) {
+): [T, Form] {
   const cms = useCMS()
 
   const id = options.id || jsonFile.fileRelativePath

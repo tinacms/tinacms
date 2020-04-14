@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { useJsonForm, JsonFile, Options } from './use-json-form'
-import { usePlugins } from 'tinacms'
+import { usePlugins, Form } from 'tinacms'
 
 /**
  * Registers a Local Form with TinaCMS for editing a Json File.
@@ -25,7 +25,7 @@ import { usePlugins } from 'tinacms'
 export function useLocalJsonForm<T = any>(
   jsonFile: JsonFile<T>,
   options?: Options
-) {
+): [T, Form] {
   const [values, form] = useJsonForm(jsonFile, options)
 
   usePlugins(form)
