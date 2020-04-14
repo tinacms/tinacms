@@ -35,7 +35,7 @@ export default createAuthHandler(
 )
 ```
 
-[See below](#github-oauth-app) for creating a Github Oauth App provides these **Client ID** & **Client Secret** variables.
+[See below](#github-oauth-app) for instructions on creating a Github OAuth App to generate these **Client ID** & **Client Secret** variables.
 
 ### `apiProxy`
 
