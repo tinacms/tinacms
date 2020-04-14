@@ -141,6 +141,7 @@ In GitHub, within your account Settings, click [Oauth Apps](https://github.com/s
 click "New Oauth App".
 
 For the **Authorization callback URL**, enter the url for the "authorizing" page that you created above (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
+_Note: If you are testing your app locally, you may need a separate development Github app (with a localhost redirect), and a production Github app._ 
 
 The generated **Client ID** & **Client Secret** will be consumed by the `createCreateAccessTokenFn` [defined above](#createcreateaccesstokenfn).
 
