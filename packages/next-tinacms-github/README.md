@@ -98,14 +98,12 @@ export const getStaticProps: GetStaticProps = async function({
     headBranch: previewData.head_branch || 'master', 
   }
 
-  if(preview)
-  {
+  if(preview) {
     file = await getGithubMarkdownFile(filePath,
       sourceProviderConnection, 
       previewData.accessToken)
   }
-  else 
-  {
+  else {
     // Get your production content here
     // when you are not in edit-mode
      file = await readLocalMarkdownFile(filePath)
