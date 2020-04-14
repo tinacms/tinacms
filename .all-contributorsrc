@@ -601,6 +601,15 @@
         "bug",
         "code"
       ]
+    },
+    {
+      "login": "marklawlor",
+      "name": "Mark Lawlor",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3946701?v=4",
+      "profile": "https://github.com/marklawlor",
+      "contributions": [
+        "ideas"
+      ]
     }
   ],
   "contributorsPerLine": 7,
