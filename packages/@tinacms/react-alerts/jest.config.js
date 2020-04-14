@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-export * from './ModalProvider'
-export * from './Modal'
-export * from './FullscreenModal'
-export * from './PopupModal'
+const { createJestConfig } = require('@tinacms/scripts')
+const pack = require('./package')
+
+module.exports = createJestConfig(pack)

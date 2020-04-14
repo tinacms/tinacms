@@ -17,6 +17,6 @@ limitations under the License.
 */
 
 export * from './next/preview'
-export * from './github/create-access-token'
+export * from './github/create-auth-handler'
 export * from './github/proxy'
 export * from './github/content'

@@ -35,32 +35,32 @@ export interface AlertsProps {
 export function Alerts({ alerts }: AlertsProps) {
   useSubscribable(alerts)
 
+  if (!alerts.all.length) {
+    return null
+  }
+
   return (
-    <>
-      {alerts.all.length > 0 && (
-        <AlertContainer>
-          {alerts.all.map((alert, i) => {
-            return (
-              <Alert
-                key={alert.id}
-                index={i}
-                level={alert.level}
-                onClick={() => {
-                  alerts.dismiss(alert)
-                }}
-              >
-                {alert.level === 'info' && <InfoIcon />}
-                {alert.level === 'success' && <AlertIcon />}
-                {alert.level === 'warn' && <WarningIcon />}
-                {alert.level === 'error' && <ErrorIcon />}
-                <p>{alert.message}</p>
-                <CloseAlert />
-              </Alert>
-            )
-          })}
-        </AlertContainer>
-      )}
-    </>
+    <AlertContainer>
+      {alerts.all.map((alert, i) => {
+        return (
+          <Alert
+            key={alert.id}
+            index={i}
+            level={alert.level}
+            onClick={() => {
+              alerts.dismiss(alert)
+            }}
+          >
+            {alert.level === 'info' && <InfoIcon />}
+            {alert.level === 'success' && <AlertIcon />}
+            {alert.level === 'warn' && <WarningIcon />}
+            {alert.level === 'error' && <ErrorIcon />}
+            <p>{alert.message}</p>
+            <CloseAlert />
+          </Alert>
+        )
+      })}
+    </AlertContainer>
   )
 }
 
