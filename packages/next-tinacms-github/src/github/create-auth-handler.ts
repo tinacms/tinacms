@@ -16,11 +16,13 @@ limitations under the License.
 
 */
 
+import { ACCESS_TOKEN_KEY } from '../constants'
+
 const qs = require('qs')
 const axios = require('axios')
 import { serialize } from 'cookie'
 
-export const createCreateAccessTokenFn = (clientId: string, secret: string) => (
+export const createAuthHandler = (clientId: string, secret: string) => (
   req: any,
   res: any
 ) => {
@@ -32,7 +34,7 @@ export const createCreateAccessTokenFn = (clientId: string, secret: string) => (
       } else {
         res.setHeader(
           'Set-Cookie',
-          serialize('github_access_token', access_token, {
+          serialize(ACCESS_TOKEN_KEY, access_token, {
             path: '/',
             httpOnly: true,
           })

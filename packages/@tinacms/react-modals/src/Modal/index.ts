@@ -15,8 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-export * from './ModalProvider'
 export * from './Modal'
-export * from './FullscreenModal'
-export * from './PopupModal'
+export * from './ModalActions'
+export * from './ModalBody'
+export * from './ModalHeader'
+export * from './ModalOverlay'

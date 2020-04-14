@@ -27,9 +27,9 @@ Helper for creating a `createCreateAccessToken` server function.
 ```
 // pages/api/create-github-access-token.ts
 
-import { createCreateAccessTokenFn } from 'next-tinacms-github'
+import { createAuthHandler } from 'next-tinacms-github'
 
-export default createCreateAccessTokenFn(
+export default createAuthHandler(
   process.env.GITHUB_CLIENT_ID,
   process.env.GITHUB_CLIENT_SECRET
 )
@@ -37,37 +37,28 @@ export default createCreateAccessTokenFn(
 
 [See below](#github-oauth-app) for creating a Github Oauth App provides these **Client ID** & **Client Secret** variables.
 
-### `createProxy`
+### `apiProxy`
 
-Helper for creating a proxy which attaches the user's Github access token to each request
+Proxies requests to GitHub, attaching the GitHub access token in the process
 
 ```
 // pages/api/proxy-github.ts
 
-import { createProxy } from 'next-tinacms-github'
-import { GITHUB_ACCESS_TOKEN_COOKIE_KEY } from './constants'
+import { apiProxy } from 'next-tinacms-github'
 
-export default createProxy(GITHUB_ACCESS_TOKEN_COOKIE_KEY)
+export default apiProxy
 ```
 
-### `createPreviewFn`
+### `previewHandler`
 
-Helper for creating a preview function which will set the Nextjs [preview data](https://nextjs.org/docs/advanced-features/preview-mode) from your cookie data.
+Handles setting the the Nextjs [preview data](https://nextjs.org/docs/advanced-features/preview-mode) from your cookie data.
 
 ```
 // pages/api/preview.ts
 
-import { createPreviewFn } from 'next-tinacms-github'
+import { previewHandler } from 'next-tinacms-github'
 
-const forkCookieKey = 'fork_full_name'
-const headBranchCookieKey =  'head_branch'
-const githubAccessTokenCookieKey = 'github_access_token'
-
-export default createPreviewFn(
-  forkFullName,
-  headBranch,
-  githubAccessToken
-)
+export default previewHandler
 ```
 
 ### Loading content from Github
