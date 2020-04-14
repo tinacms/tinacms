@@ -51,7 +51,9 @@ export const Toolbar = () => {
 
   const forms = cms.plugins.getType<Form>('form')
   const form = forms.all().length ? forms.all()[0] : null
-  // TODO: This doesn't return the correct value initially
+
+  const currentState = form?.finalForm.getState()
+  
   const formState = useFormState(form, {
     pristine: true,
     submitting: true,
@@ -72,8 +74,8 @@ export const Toolbar = () => {
   const disabled = !form
 
   // TODO: There's got to be a better way to get formState
-  const pristine = disabled ? true : formState && formState.pristine
-  const submitting = disabled ? false : !!(formState && formState.submitting)
+  const pristine = disabled ? true : formState && currentState?.pristine
+  const submitting = disabled ? false : !!(formState && currentState?.submitting)
 
   return (
     <>
