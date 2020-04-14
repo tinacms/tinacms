@@ -16,13 +16,15 @@ limitations under the License.
 
 */
 
-export interface Field {
+export type AnyField = Field & { [key: string]: any }
+
+export interface Field<F extends Field = AnyField> {
   name: string
   label?: string
   description?: string
   component: React.FC<any> | string | null
-  parse?: (value: any, name: string, field: Field) => any
-  format?: (value: any, name: string, field: Field) => any
+  parse?: (value: any, name: string, field: F) => any
+  format?: (value: any, name: string, field: F) => any
   validate?(
     value: any,
     allValues: any,
@@ -30,5 +32,5 @@ export interface Field {
     field: Field
   ): string | object | undefined
   defaultValue?: any
-  fields?: Field[]
+  fields?: F[]
 }
