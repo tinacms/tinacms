@@ -35,6 +35,8 @@ export default createAuthHandler(
 )
 ```
 
+_See [Next's documentation](https://nextjs.org/docs/api-reference/next.config.js/environment-variables) for adding environment variables_
+
 [See below](#github-oauth-app) for instructions on creating a Github OAuth App to generate these **Client ID** & **Client Secret** variables.
 
 ### `apiProxy`
