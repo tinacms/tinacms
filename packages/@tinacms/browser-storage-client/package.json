@@ -5,10 +5,6 @@
   "main": "dist/index.js",
   "author": "",
   "license": "Apache-2.0",
-  "dependencies": {
-    "lodash.get": "^4.4.2",
-    "tinacms": "^0.18.2"
-  },
   "files": [
     "dist"
   ],
@@ -19,8 +15,11 @@
     "test": "tsdx test --env=jsdom --passWithNoTests",
     "lint": "tsdx lint"
   },
+  "dependencies": {
+    "lodash.get": "^4.4.2"
+  },
   "devDependencies": {
-    "tinacms": "^0.18.2"
+    "tinacms": "0.19.0-alpha.2"
   },
   "peerDependencies": {
     "react": ">=16.8",
