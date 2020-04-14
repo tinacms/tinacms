@@ -24,9 +24,11 @@ We will want to use the GithubClient to load/save our content using the Github A
 import { TinaCMS } from 'tinacms'
 import { GithubClient } from 'react-tinacms-github'
 
+const REPO_FULL_NAME = process.env.REPO_FULL_NAME // e.g: tinacms/tinacms.org
+
 const cms = new TinaCMS({
   apis: {
-      github: new GithubClient('/api/proxy-github', process.env.REPO_FULL_NAME),
+      github: new GithubClient('/api/proxy-github', REPO_FULL_NAME),
   },
   // ... any other tina config
 })
