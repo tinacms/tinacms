@@ -54,7 +54,8 @@ const YourLayout = ({ Component, pageProps, children }) => {
   return (<TinacmsGithubProvider
       authenticate={() => authenticate(process.env.GITHUB_CLIENT_ID, '/api/create-github-access-token')}
       enterEditMode={enterEditMode}
-      exitEditMode={exitEditMode}>
+      exitEditMode={exitEditMode}
+      error={pageProps.error}>
       {children}
     </TinacmsGithubProvider>)
 }

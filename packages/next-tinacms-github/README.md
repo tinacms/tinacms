@@ -97,11 +97,24 @@ export const getStaticProps: GetStaticProps = async function({
     forkFullName: previewData.fork_full_name,
     headBranch: previewData.head_branch || 'master', 
   }
+  
+  let error = null
 
   if(preview) {
+    try {
     file = await getGithubMarkdownFile(filePath,
       sourceProviderConnection, 
       previewData.accessToken)
+    }
+    catch (e) {
+      // If there is an error initially loading the content from Github, we want to display an actionable error
+      // to the user. They may need to re-authenticate or create a new fork.
+      if (e instanceof GithubError) {
+        error = { ...e } //workaround since we cant return error as JSON
+      } else {
+        throw e
+      }
+    }
   }
   else {
     // Get your production content here
@@ -114,6 +127,7 @@ export const getStaticProps: GetStaticProps = async function({
       sourceProviderConnection
       editMode: !!preview,
       file,
+      error
     },
   }
 }
