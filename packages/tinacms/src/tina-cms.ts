@@ -77,7 +77,7 @@ export class TinaCMS extends CMS {
     this.fields.add(BlocksFieldPlugin)
   }
 
-  get forms() {
+  get forms(): PluginType<Form> {
     return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
   }
 

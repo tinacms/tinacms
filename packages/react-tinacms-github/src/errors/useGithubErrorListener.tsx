@@ -16,13 +16,13 @@ limitations under the License.
 
 */
 
-import { Form } from 'tinacms'
+import { Form } from '@tinacms/forms'
 import { useEffect } from 'react'
 import createDecorator from 'final-form-submit-listener'
 import { useGithubEditing } from '../github-editing-context/useGithubEditing'
 
 // Show success/fail feedback on form submission
-export const useGithubErrorListener = (form: Form) => {
+export function useGithubErrorListener(form: Form): void {
   const github = useGithubEditing()
 
   useEffect(() => {
