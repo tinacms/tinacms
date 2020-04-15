@@ -21,6 +21,8 @@ import { usePlugins, Form } from 'tinacms'
 
 /**
  * Registers a Local Form with TinaCMS for editing a Json File.
+ *
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
  */
 export function useLocalJsonForm<T = any>(
   jsonFile: JsonFile<T>,
