@@ -1,6 +1,6 @@
 # react-tinacms-github
 
-This package provides helpers for setting up TinaCMS to use the Github API, with Github authentication. 
+This package provides helpers for setting up TinaCMS to use the Github API, with Github authentication.
 
 ## Installation
 
@@ -16,7 +16,7 @@ yarn add react-tinacms-github
 
 ## Getting Started
 
-### Register the GithubClient 
+### Register the GithubClient
 
 We will want to use the GithubClient to load/save our content using the Github API. Let's add it as an API plugin.
 
@@ -39,34 +39,39 @@ const cms = new TinaCMS({
 Add the root `TinacmsGithubProvider` component to our main layout. We will supply it with handlers for authenticating and entering/exiting edit-mode.
 In this case, we will hit our `/api` server functions.
 
-```ts
-// YourLayout.ts
+```tsx
 import { TinacmsGithubProvider, authenticate } from 'react-tinacms-github';
 
-const enterEditMode = () =>
-  fetch(`/api/preview`).then(() => {
+const enterEditMode = () => {
+  return fetch(`/api/preview`).then(() => {
     window.location.href = window.location.pathname
   })
+}
+
 const exitEditMode = () => {
-  fetch(`/api/reset-preview`).then(() => {
+  return fetch(`/api/reset-preview`).then(() => {
     window.location.reload()
   })
 }
-const YourLayout = ({ Component, pageProps, children }) => {
-  return (<TinacmsGithubProvider
+
+const YourLayout = ({ error, children }) => {
+  return (
+    <TinacmsGithubProvider
       authenticate={() => authenticate(process.env.GITHUB_CLIENT_ID, '/api/create-github-access-token')}
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}
-      error={pageProps.error}>
+      error={error}>
       {children}
-    </TinacmsGithubProvider>)
+    </TinacmsGithubProvider>
+  )
 }
 ```
 
 ### Error Handling
 
 Add error handling to our forms which prompt Github-specific action when errors occur (e.g a fork no longer exists).
-```ts
+
+```tsx
 // YourSiteForm.ts
 import { useGithubErrorListener } from 'react-tinacms-github'
 
@@ -84,13 +89,14 @@ const YourSiteForm = ({ form, children }) => {
 
 We will also need a few Github Specific pages to redirect the user to while authenticating with Github
 
-```ts
+```tsx
 //pages/github/authorizing.tsx
 // Our Github app redirects back to this page with auth code
 import { useGithubAuthRedirect } from 'react-tinacms-github'
+
 export default function Authorizing() {
   // Let the main app know, that we receieved an auth code from the Github redirect
-  useGithubAuthRedirect() 
+  useGithubAuthRedirect()
   return (
       <h2>Authorizing with Github, Please wait...</h2>
   )
@@ -100,16 +106,21 @@ export default function Authorizing() {
 ### Entering / Exiting "edit-mode"
 
 
-We will need a way to enter/exit mode from our site. Let's create an "Edit Link" button.
-Ours will take `isEditing` as a parameter. 
+We will need a way to enter/exit mode from our site. Let's create an "Edit Link" button. Ours will take `isEditing` as a parameter.
 
 _If you are using Next.js's [preview-mode](https://nextjs.org/docs/advanced-features/preview-mode) for the editing environment, this `isEditing` value might get sent from your getStaticProps function._
 
-```ts
+```tsx
 //...EditLink.tsx
 import { useGithubEditing } from 'react-tinacms-github'
+
+export interface EditLinkProps {
+  isEditing: boolean
+}
+
 export const EditLink = ({ isEditing }: EditLinkProps) => {
   const github = useGithubEditing()
+
   return (
     <button
       onClick={
@@ -130,7 +141,7 @@ click "New Oauth App".
 
 For the **Authorization callback URL**, enter the url for the "authorizing" page that [you created above](#auth-redirects) (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
 
-The generated **Client ID** will be used in your site (remember, we passed this value into the Github `authenticate` method earlier). 
+The generated **Client ID** will be used in your site (remember, we passed this value into the Github `authenticate` method earlier).
 
 The **Client Secret** will likely be used by your backend.
 
@@ -139,8 +150,7 @@ The **Client Secret** will likely be used by your backend.
 
 Any forms that we have on our site can be created with the `useGithubJsonForm` or `useGithubMarkdownForm` helpers
 
-```ts
-
+```tsx
 function BlogTemplate({
   jsonFile, // content for this page
   sourceProviderConnection, // repository details
