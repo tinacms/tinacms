@@ -18,36 +18,49 @@ limitations under the License.
 import { GithubError } from './github/content/GithubError'
 import { getMarkdownFile } from './github/content/getMarkdownFile'
 import { getJsonFile } from './github/content/getJsonFile'
+import { SourceProviderConnection } from 'github/content'
 
 export interface PreviewMeta {
   github_access_token: string
   fork_full_name: string
   head_branch: string
-  file: {
-    relativePath: string
-    name?: string
-    format?: 'markdown' | 'json'
+  fileRelativePath: string
+  format?: 'markdown' | 'json'
+}
+
+export interface GithubFile {
+  sha: string
+  fileRelativePath: string
+  data: any
+}
+
+export interface GithubStaticProps {
+  props: {
+    preview: boolean
+    sourceProvider: SourceProviderConnection
+    file: GithubFile | null
+    error: GithubError | null
   }
 }
 
 export async function getGithubStaticProps(
   preview: boolean,
   options: PreviewMeta
-) {
+): Promise<GithubStaticProps> {
   const sourceProvider = {
     forkFullName: options.fork_full_name || '',
     headBranch: options.head_branch || 'master',
   }
   let error: GithubError | null = null
-  let file = {}
+  let file = null
 
   try {
     const accessToken = options.github_access_token
     const getParsedFile =
-      options.file.format === 'markdown' ? getMarkdownFile : getJsonFile
+      options.format === 'markdown' ? getMarkdownFile : getJsonFile
 
     file = await getParsedFile(
-      options.file.relativePath,
+      options.fileRelativePath,
       sourceProvider,
       accessToken
     )
@@ -61,7 +74,7 @@ export async function getGithubStaticProps(
 
   return {
     props: {
-      [options.file.name || 'file']: file,
+      file,
       sourceProvider,
       preview,
       error,
