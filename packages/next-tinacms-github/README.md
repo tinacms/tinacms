@@ -84,10 +84,8 @@ export const getStaticProps: GetStaticProps = async function({
   if (preview) {
     return getGithubStaticProps(preview, {
       ...previewData,
-      file: {
-        relativePath: 'src/content/home.json',
-        format: 'json'
-      }
+      fileRelativePath: 'src/content/home.json',
+      format: 'json'
     });
   }
   return {
@@ -96,7 +94,7 @@ export const getStaticProps: GetStaticProps = async function({
       previewError: null,
       preview,
       file: {
-        relativePath: 'src/content/home.json',
+        fileRelativePath: 'src/content/home.json',
         data: (await import('../content/home.json')).default,
       },
     },
