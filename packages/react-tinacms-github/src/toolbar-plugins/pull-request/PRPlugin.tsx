@@ -33,7 +33,7 @@ interface PullRequestButtonOptions {
 export const PRPlugin = (
   baseRepoFullName: string,
   forkRepoFullName: string,
-  baseBranch: string = 'master'
+  baseBranch: string
 ) => ({
   __type: 'toolbar:widget',
   name: 'create-pr',
