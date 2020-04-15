@@ -71,7 +71,7 @@ The `preview` data, which gets set by calling your [preview function](#previewha
 //Blog template [slug].ts
 
 import {
-  getGithubStaticProps
+  getGithubPreviewProps
 } from 'next-tinacms-github'
 
 // ...
@@ -82,7 +82,7 @@ export const getStaticProps: GetStaticProps = async function({
   ...ctx
 }) {
   if (preview) {
-    return getGithubStaticProps(preview, {
+    return getGithubPreviewProps({
       ...previewData,
       fileRelativePath: 'src/content/home.json',
       format: 'json'
