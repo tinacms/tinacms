@@ -22,6 +22,8 @@ import { GlobalFormPlugin, usePlugins, Form } from 'tinacms'
 
 /**
  * Registers a Global Form with TinaCMS for editing a Json File.
+ *
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
  */
 export function useGlobalJsonForm(
   jsonFile: JsonFile,
