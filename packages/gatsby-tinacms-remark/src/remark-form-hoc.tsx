@@ -36,6 +36,9 @@ export function remarkForm(Component: any, options: RemarkFormProps = {}) {
   }
 }
 
+/**
+ * @deprecated see `react-tinacms-inline`
+ */
 export function inlineRemarkForm(
   Component: any,
   options: RemarkFormProps = {}
@@ -62,11 +65,6 @@ export function inlineRemarkForm(
     )
   }
 }
-
-/**
- * @deprecated
- */
-export const liveRemarkForm = inlineRemarkForm
 
 export function globalRemarkForm(
   Component: any,
