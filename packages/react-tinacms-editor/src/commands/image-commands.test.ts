@@ -17,7 +17,12 @@ limitations under the License.
 */
 
 import { PMTestHarness } from '../prosemirror-test-utils'
-import { insertImage, alignImage, removeImage } from './image-commands'
+import {
+  insertImage,
+  insertImageList,
+  alignImage,
+  removeImage,
+} from './image-commands'
 import { defaultSchema } from '../default-schema'
 
 const { forDoc, doc, p, text, image } = new PMTestHarness(defaultSchema)
@@ -37,6 +42,33 @@ describe('insertImage', () => {
       .withTextSelection(5, 8)
       .apply(insertImage, 'test.jpg')
       .expect(doc(p(text('one '), image({ src: 'test.jpg' }), text(' three'))))
+  })
+})
+
+describe('insertImageList', () => {
+  it('should insert list of images with the given src', () => {
+    //         01
+    forDoc(doc(p()))
+      .withTextSelection(1)
+      .apply(insertImageList, ['test1.jpg', 'test2.jpg'])
+      .expect(doc(p(image({ src: 'test1.jpg' }), image({ src: 'test2.jpg' }))))
+  })
+
+  it('should replace selection with the image list', () => {
+    //         0       1234567890123
+    forDoc(doc(p(text('one two three'))))
+      .withTextSelection(5, 8)
+      .apply(insertImageList, ['test1.jpg', 'test2.jpg'])
+      .expect(
+        doc(
+          p(
+            text('one '),
+            image({ src: 'test1.jpg' }),
+            image({ src: 'test2.jpg' }),
+            text(' three')
+          )
+        )
+      )
   })
 })
 
