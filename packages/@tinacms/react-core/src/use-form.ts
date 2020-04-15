@@ -41,12 +41,6 @@ export function useLocalForm<FormShape = any>(
 }
 
 /**
- * @alias useLocalForm
- * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
- */
-export const useCMSForm = useLocalForm
-
-/**
  * A hook that creates a form and updates it's watched properties.
  */
 export function useForm<FormShape = any>(
