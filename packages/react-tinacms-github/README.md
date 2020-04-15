@@ -40,7 +40,8 @@ Add the root `TinacmsGithubProvider` component to our main layout. We will suppl
 In this case, we will hit our `/api` server functions.
 
 ```tsx
-import { TinacmsGithubProvider, authenticate } from 'react-tinacms-github';
+// YourLayout.ts
+import { TinacmsGithubProvider } from 'react-tinacms-github';
 
 const enterEditMode = () => {
   return fetch(`/api/preview`).then(() => {
@@ -57,7 +58,8 @@ const exitEditMode = () => {
 const YourLayout = ({ error, children }) => {
   return (
     <TinacmsGithubProvider
-      authenticate={() => authenticate(process.env.GITHUB_CLIENT_ID, '/api/create-github-access-token')}
+      clientId={process.env.GITHUB_CLIENT_ID}
+      authCallbackRoute='/api/create-github-access-token'
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}
       error={error}>
