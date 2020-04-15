@@ -91,7 +91,7 @@ export async function getGithubPreviewProps(
 
 interface GithubErrorMessageInfo {
   path: string
-  accessToken: string
+  accessToken?: string
   sourceProvider: SourceProviderConnection
 }
 const githubErrorMessage = ({
@@ -102,5 +102,5 @@ const githubErrorMessage = ({
 - file: \t${path}
 - repo: \t${sourceProvider.forkFullName}
 - branch: \t${sourceProvider.headBranch}
-- accessToken: \t${accessToken}
+- accessToken: \t${accessToken ? '******' : 'undefined'}
 `
