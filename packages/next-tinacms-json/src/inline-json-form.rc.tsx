@@ -34,6 +34,9 @@ export interface InlineJsonFormRenderProps {
   setIsEditing(value: boolean): void
 }
 
+/**
+ * @deprecated `react-tinacms-inline` is correct approach to inline editing
+ */
 export const InlineJsonForm: FC<InlineJsonFormProps> = props => {
   const { children, jsonFile, ...options } = props
   const [data, form] = useLocalJsonForm(jsonFile, options)
