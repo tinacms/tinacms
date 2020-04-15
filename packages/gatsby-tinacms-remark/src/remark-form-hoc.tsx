@@ -21,7 +21,7 @@ import { FormOptions, Form, TinaForm, usePlugin } from 'tinacms'
 import { useGlobalRemarkForm, useRemarkForm } from './useRemarkForm'
 import { ERROR_INVALID_QUERY_NAME } from './errors'
 
-interface RemarkFormProps extends Partial<FormOptions<any>> {
+export interface RemarkFormProps extends Partial<FormOptions<any>> {
   queryName?: string // Configure where we are pulling the initial form data from.
 }
 
@@ -70,6 +70,9 @@ export function inlineRemarkForm(
   }
 }
 
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function globalRemarkForm(
   Component: any,
   options: RemarkFormProps = {}
@@ -83,6 +86,7 @@ export function globalRemarkForm(
     return <Component {...props} data={{ ...props.data, markdownRemark }} />
   }
 }
+
 const getMarkdownRemark = (data: any, queryName: string = 'markdownRemark') => {
   const markdownRemark = data[queryName]
   if (!markdownRemark) {
