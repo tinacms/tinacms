@@ -71,7 +71,7 @@ The `preview` data, which gets set by calling your [preview function](#previewha
 //Blog template [slug].ts
 
 import {
-  getMarkdownFile as getGithubMarkdownFile,
+  getGithubStaticProps
 } from 'next-tinacms-github'
 
 // ...
@@ -81,48 +81,26 @@ export const getStaticProps: GetStaticProps = async function({
   previewData,
   ...ctx
 }) {
-  const { slug } = ctx.params
-
-  let file = {}
-  const filePath = `content/blog/${slug}.md`
-
-  const sourceProviderConnection = {
-    forkFullName: previewData.fork_full_name,
-    headBranch: previewData.head_branch || 'master', 
-  }
-  
-  let error = null
-
-  if(preview) {
-    try {
-    file = await getGithubMarkdownFile(filePath,
-      sourceProviderConnection, 
-      previewData.accessToken)
-    }
-    catch (e) {
-      // If there is an error initially loading the content from Github, we want to display an actionable error
-      // to the user. They may need to re-authenticate or create a new fork.
-      if (e instanceof GithubError) {
-        error = { ...e } //workaround since we cant return error as JSON
-      } else {
-        throw e
+  if (preview) {
+    return getGithubStaticProps(preview, {
+      ...previewData,
+      file: {
+        relativePath: 'src/content/home.json',
+        format: 'json'
       }
-    }
+    });
   }
-  else {
-    // Get your production content here
-    // when you are not in edit-mode
-     file = await readLocalMarkdownFile(filePath)
-  }
-
   return {
     props: {
-      sourceProviderConnection,
-      editMode: !!preview,
-      file,
-      error
+      sourceProvider: null,
+      previewError: null,
+      preview,
+      file: {
+        relativePath: 'src/content/home.json',
+        data: (await import('../content/home.json')).default,
+      },
     },
-  }
+  };
 }
 ```
 
@@ -134,7 +112,7 @@ In GitHub, within your account Settings, click [Oauth Apps](https://github.com/s
 click "New Oauth App".
 
 For the **Authorization callback URL**, enter the url for the "authorizing" page that you created above (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
-_Note: If you are testing your app locally, you may need a separate development Github app (with a localhost redirect), and a production Github app._ 
+_Note: If you are testing your app locally, you may need a separate development Github app (with a localhost redirect), and a production Github app._
 
 The generated **Client ID** & **Client Secret** will be consumed by the `createCreateAccessTokenFn` [defined above](#createcreateaccesstokenfn).
 
