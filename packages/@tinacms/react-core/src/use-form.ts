@@ -26,10 +26,6 @@ export interface WatchableFormValue {
   fields: FormOptions<any>['fields']
 }
 
-export function useFormPlugin(form: Form) {
-  usePlugins(form)
-}
-
 /**
  * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
  */
