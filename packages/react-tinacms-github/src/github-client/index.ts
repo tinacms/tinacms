@@ -44,7 +44,7 @@ export class GithubClient {
 
   createFork() {
     return this.req({
-      url: `https://api.github.com/repos/${process.env.REPO_FULL_NAME}/forks`,
+      url: `https://api.github.com/repos/${this.baseRepoFullName}/forks`,
       method: 'POST',
     })
   }
