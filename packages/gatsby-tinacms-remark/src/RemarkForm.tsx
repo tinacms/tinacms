@@ -16,9 +16,9 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form } from 'tinacms'
+import { FormOptions, Form, usePlugin } from 'tinacms'
 import { RemarkNode } from './remark-node'
-import { useLocalRemarkForm } from './useRemarkForm'
+import { useRemarkForm } from './useRemarkForm'
 
 interface RemarkFormProps extends Partial<FormOptions<any>> {
   remark: RemarkNode
@@ -27,7 +27,9 @@ interface RemarkFormProps extends Partial<FormOptions<any>> {
 }
 
 export function RemarkForm({ remark, render, ...options }: RemarkFormProps) {
-  const [markdownRemark, form] = useLocalRemarkForm(remark, options)
+  const [markdownRemark, form] = useRemarkForm(remark, options)
+
+  usePlugin(form || undefined)
 
   return render({ form: form as Form, markdownRemark })
 }
