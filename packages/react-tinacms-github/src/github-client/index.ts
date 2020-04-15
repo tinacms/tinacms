@@ -21,9 +21,15 @@ import { b64EncodeUnicode } from './base64'
 export class GithubClient {
   proxy: string
   baseRepoFullName: string
-  constructor(proxy: string, baseRepoFullName: string) {
+  baseBranch: string
+  constructor(
+    proxy: string,
+    baseRepoFullName: string,
+    baseBranch: string = 'master'
+  ) {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
+    this.baseBranch = baseBranch
   }
 
   async getUser() {
@@ -62,7 +68,7 @@ export class GithubClient {
         title: title ? title : 'Update from TinaCMS',
         body: body ? body : 'Please pull these awesome changes in!',
         head: `${forkRepoFullName.split('/')[0]}:${headBranch}`,
-        base: process.env.BASE_BRANCH,
+        base: this.baseBranch,
       },
     })
   }
