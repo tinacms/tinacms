@@ -26,6 +26,13 @@ export interface WatchableFormValue {
   fields: FormOptions<any>['fields']
 }
 
+export function useFormPlugin(form: Form) {
+  usePlugins(form)
+}
+
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function useLocalForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
@@ -39,6 +46,7 @@ export function useLocalForm<FormShape = any>(
 
 /**
  * @alias useLocalForm
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
  */
 export const useCMSForm = useLocalForm
 
