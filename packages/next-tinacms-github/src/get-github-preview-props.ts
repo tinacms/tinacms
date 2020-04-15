@@ -20,7 +20,7 @@ import { getMarkdownFile } from './github/content/getMarkdownFile'
 import { getJsonFile } from './github/content/getJsonFile'
 import { SourceProviderConnection } from 'github/content'
 
-export interface PreviewMeta {
+export interface PreviewData {
   github_access_token: string
   fork_full_name: string
   head_branch: string
@@ -34,7 +34,7 @@ export interface GithubFile {
   data: any
 }
 
-export interface GithubStaticProps {
+export interface GithubPreviewProps {
   props: {
     preview: boolean
     sourceProvider: SourceProviderConnection
@@ -43,10 +43,9 @@ export interface GithubStaticProps {
   }
 }
 
-export async function getGithubStaticProps(
-  preview: boolean,
-  options: PreviewMeta
-): Promise<GithubStaticProps> {
+export async function getGithubPreviewProps(
+  options: PreviewData
+): Promise<GithubPreviewProps> {
   const accessToken = options.github_access_token
   const sourceProvider = {
     forkFullName: options.fork_full_name || '',
@@ -84,7 +83,7 @@ export async function getGithubStaticProps(
     props: {
       file,
       sourceProvider,
-      preview,
+      preview: true,
       error,
     },
   }
