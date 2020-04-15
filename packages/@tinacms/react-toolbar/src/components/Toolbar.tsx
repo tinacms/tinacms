@@ -53,7 +53,7 @@ export const Toolbar = () => {
   const form = forms.all().length ? forms.all()[0] : null
 
   const currentState = form?.finalForm.getState()
-  
+
   const formState = useFormState(form, {
     pristine: true,
     submitting: true,
@@ -69,13 +69,26 @@ export const Toolbar = () => {
   //   return null
   // }
   // TODO: Form#reset should always exist
-  const reset = form && (form.reset || (() => form.finalForm.reset()))
+
+  const reset = () => {
+    if (form) {
+      if (form.reset) {
+        form.reset()
+      } else if (form.finalForm.reset) {
+        form.finalForm.reset()
+      }
+    }
+  }
+
+  //const reset = form && (form.reset || (() => form.finalForm.reset()))
   const submit = form && form.submit
   const disabled = !form
 
   // TODO: There's got to be a better way to get formState
   const pristine = disabled ? true : formState && currentState?.pristine
-  const submitting = disabled ? false : !!(formState && currentState?.submitting)
+  const submitting = disabled
+    ? false
+    : !!(formState && currentState?.submitting)
 
   return (
     <>
