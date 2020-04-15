@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.4.1-alpha.1...react-tinacms-editor@0.4.1-alpha.2) (2020-04-14)
+
+
+### Bug Fixes
+
+* deleting code block ([cdf4a1c](https://github.com/tinacms/tinacms/commit/cdf4a1c))
+
+
+
+
+
 ## [0.4.1-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.4.1-alpha.0...react-tinacms-editor@0.4.1-alpha.1) (2020-04-07)
 
 

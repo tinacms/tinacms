@@ -124,7 +124,7 @@ export function useJsonForm(
 export function useLocalJsonForm(
   jsonNode: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}
-) {
+): [any, Form | null] {
   const [values, form] = useJsonForm(jsonNode, formOptions)
   usePlugins(form as any)
   return [values, form]
@@ -133,7 +133,7 @@ export function useLocalJsonForm(
 export function useGlobalJsonForm(
   jsonNode: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}
-) {
+): [any, Form | null] {
   const [values, form] = useJsonForm(jsonNode, formOptions)
   usePlugins(
     React.useMemo(() => {
