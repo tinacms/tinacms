@@ -23,14 +23,19 @@ import { PRPlugin } from './pull-request'
 import { ForkNamePlugin } from './ForkNamePlugin'
 import { Plugin } from 'tinacms'
 
-export const useGithubToolbarPlugins = (form: Form<any>, editMode: boolean) => {
+export const useGithubToolbarPlugins = (
+  form: Form<any>,
+  editMode: boolean,
+  baseRepo: string,
+  baseBranch: string = 'master'
+) => {
   const cms = useCMS()
 
   useEffect(() => {
     const forkName = getForkName()
     const plugins = [
       ForkNamePlugin(forkName || ''),
-      PRPlugin(process.env.REPO_FULL_NAME || '', forkName || ''),
+      PRPlugin(baseRepo, forkName || '', baseBranch),
     ] as Plugin[]
 
     const removePlugins = () => {
