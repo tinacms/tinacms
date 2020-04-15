@@ -23,6 +23,9 @@ limitations under the License.
 
 export { useLocalForm, useForm, WatchableFormValue } from '@tinacms/react-core'
 
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function useGlobalForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
