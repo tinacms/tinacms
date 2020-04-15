@@ -47,6 +47,7 @@ export async function getGithubStaticProps(
   preview: boolean,
   options: PreviewMeta
 ): Promise<GithubStaticProps> {
+  const accessToken = options.github_access_token
   const sourceProvider = {
     forkFullName: options.fork_full_name || '',
     headBranch: options.head_branch || 'master',
@@ -55,7 +56,6 @@ export async function getGithubStaticProps(
   let file = null
 
   try {
-    const accessToken = options.github_access_token
     const getParsedFile =
       options.format === 'markdown' ? getMarkdownFile : getJsonFile
 
@@ -66,6 +66,14 @@ export async function getGithubStaticProps(
     )
   } catch (e) {
     if (e instanceof GithubError) {
+      console.error(
+        githubErrorMessage({
+          path: options.fileRelativePath,
+          sourceProvider,
+          accessToken,
+        })
+      )
+      console.error(e)
       error = { ...e } //workaround since we cant return error as JSON
     } else {
       throw e
@@ -81,3 +89,19 @@ export async function getGithubStaticProps(
     },
   }
 }
+
+interface GithubErrorMessageInfo {
+  path: string
+  accessToken: string
+  sourceProvider: SourceProviderConnection
+}
+const githubErrorMessage = ({
+  path,
+  accessToken,
+  sourceProvider,
+}: GithubErrorMessageInfo) => `next-tinacms-github: Failed to fetch file from GitHub
+- file: \t${path}
+- repo: \t${sourceProvider.forkFullName}
+- branch: \t${sourceProvider.headBranch}
+- accessToken: \t${accessToken}
+`
