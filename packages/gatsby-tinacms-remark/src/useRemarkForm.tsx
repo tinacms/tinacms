@@ -155,6 +155,9 @@ export function useRemarkForm(
   return [markdownRemark, form]
 }
 
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function useLocalRemarkForm(
   markdownRemark: RemarkNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
@@ -168,6 +171,9 @@ export function useLocalRemarkForm(
   return [values, form]
 }
 
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function useGlobalRemarkForm(
   markdownRemark: RemarkNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}

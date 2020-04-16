@@ -505,7 +505,8 @@
       "avatar_url": "https://avatars3.githubusercontent.com/u/18421761?v=4",
       "profile": "http://danitulp.nl",
       "contributions": [
-        "code"
+        "code",
+        "ideas"
       ]
     },
     {
@@ -599,6 +600,24 @@
       "contributions": [
         "bug",
         "code"
+      ]
+    },
+    {
+      "login": "marklawlor",
+      "name": "Mark Lawlor",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3946701?v=4",
+      "profile": "https://github.com/marklawlor",
+      "contributions": [
+        "ideas"
+      ]
+    },
+    {
+      "login": "BPScott",
+      "name": "Ben Scott",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/227292?v=4",
+      "profile": "https://github.com/BPScott",
+      "contributions": [
+        "review"
       ]
     }
   ],

@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.12-alpha.2](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.12-alpha.1...next-tinacms-json@0.3.12-alpha.2) (2020-04-14)
+
+
+### Bug Fixes
+
+* forms are more flexible with the shape of Fields ([90d8b0c](https://github.com/tinacms/tinacms/commit/90d8b0c))
+
+
+
+
+
+## [0.3.12-alpha.1](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.12-alpha.0...next-tinacms-json@0.3.12-alpha.1) (2020-04-07)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
 ## [0.3.12-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.11...next-tinacms-json@0.3.12-alpha.0) (2020-04-06)
 
 **Note:** Version bump only for package next-tinacms-json

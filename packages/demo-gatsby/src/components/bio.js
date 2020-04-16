@@ -26,8 +26,8 @@ limitations under the License.
 import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
-import { useLocalJsonForm } from "gatsby-tinacms-json"
-import { useCMS } from "tinacms"
+import { useJsonForm } from "gatsby-tinacms-json"
+import { useCMS, useFormScreenPlugin } from "tinacms"
 
 import { rhythm } from "../utils/typography"
 
@@ -78,15 +78,12 @@ const Bio = () => {
     }
   `)
 
-  const [author] = useLocalJsonForm(data.dataJson, {
+  const [author, authorForm] = useJsonForm(data.dataJson, {
     label: "Author",
     fields,
   })
 
-  /*
-    //for testing single / multiple forms
-   const author = data.dataJson
-  */
+  useFormScreenPlugin(authorForm)
 
   return (
     <div

@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { keyframes, css } from 'styled-components'
+import styled, { keyframes, css, createGlobalStyle } from 'styled-components'
 import { FormsView } from './SidebarBody'
 import {
   HamburgerIcon,
@@ -27,7 +27,6 @@ import {
   TinaIcon,
 } from '@tinacms/icons'
 import { TinaResetStyles } from '@tinacms/styles'
-import { SIDEBAR_WIDTH, SIDEBAR_HEADER_HEIGHT } from './Globals'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '@tinacms/react-core'
@@ -58,12 +57,11 @@ export function SidebarProvider({
 
   return (
     <>
-      <SiteWrapper
-        open={sidebar.isOpen}
-        position={position || sidebar.position}
-      >
-        {children}
-      </SiteWrapper>
+      {isFixed(position || sidebar.position) ? (
+        <SiteWrapper open={sidebar.isOpen}>{children}</SiteWrapper>
+      ) : (
+        children
+      )}
       {!sidebar.hidden && <Sidebar sidebar={sidebar} />}
     </>
   )
@@ -84,62 +82,69 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
   const showMenu = allScreens.length > 0
 
   return (
-    <SidebarContainer open={sidebar.isOpen}>
-      <SidebarWrapper open={sidebar.isOpen}>
-        <SidebarHeader>
+    <>
+      <SidebarGlobalStyles />
+      <SidebarContainer open={sidebar.isOpen}>
+        <SidebarWrapper open={sidebar.isOpen}>
+          <SidebarHeader>
+            {showMenu && (
+              <MenuToggle
+                onClick={() => setMenuVisibility(!menuIsVisible)}
+                open={menuIsVisible}
+              >
+                <HamburgerIcon />
+              </MenuToggle>
+            )}
+            <CreateContentMenu />
+          </SidebarHeader>
+          <FormsView />
           {showMenu && (
-            <MenuToggle
-              onClick={() => setMenuVisibility(!menuIsVisible)}
-              open={menuIsVisible}
-            >
-              <HamburgerIcon />
-            </MenuToggle>
+            <MenuPanel visible={menuIsVisible}>
+              <MenuWrapper>
+                <MenuList>
+                  {allScreens.map(view => {
+                    const Icon = view.Icon
+                    return (
+                      <MenuLink
+                        key={view.name}
+                        value={view.name}
+                        onClick={() => {
+                          setActiveView(view)
+                          setMenuVisibility(false)
+                        }}
+                      >
+                        <Icon /> {view.name}
+                      </MenuLink>
+                    )
+                  })}
+                </MenuList>
+              </MenuWrapper>
+              <Watermark />
+            </MenuPanel>
           )}
-          <CreateContentMenu />
-        </SidebarHeader>
-        <FormsView />
-        {showMenu && (
-          <MenuPanel visible={menuIsVisible}>
-            <MenuWrapper>
-              <MenuList>
-                {allScreens.map(view => {
-                  const Icon = view.Icon
-                  return (
-                    <MenuLink
-                      key={view.name}
-                      value={view.name}
-                      onClick={() => {
-                        setActiveView(view)
-                        setMenuVisibility(false)
-                      }}
-                    >
-                      <Icon /> {view.name}
-                    </MenuLink>
-                  )
-                })}
-              </MenuList>
-            </MenuWrapper>
-            <Watermark />
-          </MenuPanel>
-        )}
-        {activeScreen && (
-          <ScreenPluginModal
-            screen={activeScreen}
-            close={() => setActiveView(null)}
-          />
-        )}
-      </SidebarWrapper>
-      <SidebarToggle sidebar={sidebar} />
-    </SidebarContainer>
+          {activeScreen && (
+            <ScreenPluginModal
+              screen={activeScreen}
+              close={() => setActiveView(null)}
+            />
+          )}
+        </SidebarWrapper>
+        <SidebarToggle sidebar={sidebar} />
+      </SidebarContainer>
+    </>
   )
 }
 
-const SiteWrapper = styled.div<{ open: boolean; position: SidebarPosition }>`
-  padding-left: ${props =>
-    isFixed(props.position) && props.open
-      ? SIDEBAR_WIDTH + 'px'
-      : '0'} !important;
-  transition: padding-left ${props => (props.open ? 150 : 200)}ms ease-out !important;
+const SidebarGlobalStyles = createGlobalStyle`
+  :root {
+    --tina-sidebar-width: 340px;
+    --tina-sidebar-header-height: 60px;
+  }
+`
+
+const SiteWrapper = styled.div<{ open: boolean }>`
+  padding-left: ${props => (props.open ? 'var(--tina-sidebar-width)' : '0')};
+  transition: padding-left 150ms ease-out;
 `
 
 function isFixed(position: SidebarPosition): boolean {
@@ -239,7 +244,7 @@ const SidebarHeader = styled.div`
   grid-template-areas: 'hamburger actions';
   align-items: center;
   z-index: var(--tina-z-index-2);
-  height: ${SIDEBAR_HEADER_HEIGHT}px;
+  height: var(--tina-sidebar-header-height);
   width: 100%;
   padding: 0 var(--tina-padding-big);
 `
@@ -280,7 +285,7 @@ const MenuToggle = styled.button<{ open: boolean }>`
     props.open &&
     css<any>`
       svg {
-        fill: #f6f6f9;
+        fill: var(--tina-color-grey-1);
         &:hover {
           fill: var(--tina-color-grey-2);
         }
@@ -308,7 +313,7 @@ const MenuWrapper = styled.div`
   height: 100%;
   width: 100%;
   overflow: hidden;
-  padding: ${SIDEBAR_HEADER_HEIGHT}px var(--tina-padding-big)
+  padding: var(--tina-sidebar-header-height) var(--tina-padding-big)
     var(--tina-padding-big) var(--tina-padding-big);
   ul,
   li {
@@ -325,7 +330,7 @@ const MenuPanel = styled.div<{ visible: boolean }>`
   top: 0;
   left: 0;
   height: 100%;
-  width: ${SIDEBAR_WIDTH}px;
+  width: var(--tina-sidebar-width);
   transform: translate3d(${p => (p.visible ? '0' : '-100%')}, 0, 0);
   overflow: hidden;
   padding: var(--tina-padding-big);
@@ -352,7 +357,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   position: absolute;
   pointer-events: all;
   bottom: 44px;
-  left: ${SIDEBAR_WIDTH}px;
+  left: var(--tina-sidebar-width);
   box-shadow: 0px 1px 3px rgba(0, 0, 0, 0.1), 0px 2px 6px rgba(0, 0, 0, 0.2);
   border-radius: 0 24px 24px 0;
   width: 50px;
@@ -388,7 +393,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
   display: flex;
   flex-direction: column;
   flex-wrap: nowrap;
-  width: ${SIDEBAR_WIDTH}px;
+  width: var(--tina-sidebar-width);
   overflow: visible;
   height: 100%;
   left: 0;
@@ -426,14 +431,15 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   display: block !important;
   background: transparent !important;
   height: 100% !important;
-  width: ${SIDEBAR_WIDTH}px !important;
+  width: var(--tina-sidebar-width) !important;
   margin: 0 !important;
   padding: 0 !important;
   border: 0 !important;
+  box-sizing: border-box;
   z-index: var(--tina-z-index-2);
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
   transform: translate3d(
-    ${p => (p.open ? '0' : '-' + SIDEBAR_WIDTH + 'px')},
+    ${p => (p.open ? '0' : 'calc(var(--tina-sidebar-width) * -1)')},
     0,
     0
   ) !important;

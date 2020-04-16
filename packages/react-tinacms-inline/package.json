@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-inline",
-  "version": "0.4.5-alpha.0",
+  "version": "0.4.5-alpha.2",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-inline.esm.js",
@@ -15,20 +15,22 @@
     "test": "tsdx test --env=jsdom --passWithNoTests",
     "lint": "tsdx lint"
   },
+  "dependencies": {
+    "react-textarea-autosize": ">=7.1"
+  },
   "peerDependencies": {
     "react": ">=16.8",
     "react-dropzone": "10.2.1",
     "react-final-form": "^>=6",
-    "react-textarea-autosize": ">=7.1",
     "react-tinacms-editor": ">=0.0",
     "styled-components": ">=4.1",
     "tinacms": ">=0.13"
   },
   "devDependencies": {
-    "@tinacms/icons": "^0.9.0-alpha.0",
-    "@tinacms/styles": "^0.4.2-alpha.0",
+    "@tinacms/icons": "^0.9.0-alpha.1",
+    "@tinacms/styles": "^0.4.2-alpha.1",
     "react-dropzone": "10.1.8",
     "react-tinacms-editor": "^0.4.0",
-    "tinacms": "^0.19.0-alpha.1"
+    "tinacms": "^0.19.0-alpha.3"
   }
 }

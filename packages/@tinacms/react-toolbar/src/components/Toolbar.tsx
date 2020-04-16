@@ -23,7 +23,7 @@ import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
 import { Button, TinaResetStyles } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
-import styled, { css } from 'styled-components'
+import styled, { css, createGlobalStyle } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
 import { ResetIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
@@ -77,6 +77,7 @@ export const Toolbar = () => {
 
   return (
     <>
+      <ToolbarGlobalStyles />
       <ToolbarPlaceholder />
       <StyledToolbar>
         <Create>
@@ -146,9 +147,16 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
   )
 }
 
+const ToolbarGlobalStyles = createGlobalStyle`
+  :root {
+    --tina-toolbar-height: 62px;
+  }
+`
+
 const StyledToolbar = styled.div`
   ${TinaResetStyles}
 
+  font-family: 'Inter', sans-serif;
   position: fixed;
   top: 0;
   left: 0;
@@ -157,6 +165,7 @@ const StyledToolbar = styled.div`
   height: 62px;
   background-color: #f6f6f9;
   z-index: var(--tina-z-index-2);
+  box-sizing: border-box;
   box-shadow: 0 0 10px rgba(0, 0, 0, 0.15);
   border-bottom: 1px solid #edecf3;
   display: grid;
@@ -249,7 +258,7 @@ const ToolbarPlaceholder = styled.div`
   opacity: 0;
   display: block;
   width: 100%;
-  height: 62px;
+  height: var(--tina-toolbar-height);
 `
 
 interface StatusLightProps {
@@ -283,5 +292,5 @@ const StatusMessage = styled.p`
   color: var(--tina-color-grey-6);
   padding-right: 4px;
   line-height: 1.6;
-  margin-bottom: 0;
+  margin: 0;
 `

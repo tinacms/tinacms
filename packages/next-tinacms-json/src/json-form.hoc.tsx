@@ -14,9 +14,8 @@ limitations under the License.
 import React from 'react'
 import { FC } from 'react'
 import { NextPage } from 'next'
-import { Form } from 'tinacms'
-import { JsonFile, Options } from './use-json-form'
-import { useLocalJsonForm } from './use-local-json-form'
+import { Form, usePlugin } from 'tinacms'
+import { JsonFile, Options, useJsonForm } from './use-json-form'
 
 interface JsonFormProps {
   jsonFile: JsonFile
@@ -33,7 +32,9 @@ export function jsonForm(
 ): NextPage<JsonFormProps> {
   return function JsonForm(props: JsonFormProps) {
     const { jsonFile } = props
-    const [data, form] = useLocalJsonForm(jsonFile, options)
+    const [data, form] = useJsonForm(jsonFile, options)
+
+    usePlugin(form)
 
     return (
       <Component
