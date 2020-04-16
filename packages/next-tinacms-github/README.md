@@ -91,7 +91,7 @@ export const getStaticProps: GetStaticProps = async function({
   return {
     props: {
       sourceProvider: null,
-      previewError: null,
+      error: null,
       preview,
       file: {
         fileRelativePath: 'src/content/home.json',
