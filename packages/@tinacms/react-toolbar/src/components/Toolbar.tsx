@@ -72,11 +72,7 @@ export const Toolbar = () => {
 
   const reset = () => {
     if (form) {
-      if (form.reset) {
-        form.reset()
-      } else if (form.finalForm.reset) {
-        form.finalForm.reset()
-      }
+      form.reset()
     }
   }
 
