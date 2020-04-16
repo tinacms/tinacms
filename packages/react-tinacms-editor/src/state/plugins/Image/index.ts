@@ -16,12 +16,26 @@ limitations under the License.
 
 */
 
-import { Plugin, PluginKey } from 'prosemirror-state'
-import { EditorView } from 'prosemirror-view'
+import {
+  Plugin,
+  PluginKey,
+  NodeSelection,
+  EditorState,
+  Transaction,
+} from 'prosemirror-state'
+import { EditorView, DecorationSet, Decoration } from 'prosemirror-view'
 import { Slice } from 'prosemirror-model'
-import { insertImage } from '../../../commands'
+import { insertImageList } from '../../../commands'
 
 export const imagePluginKey = new PluginKey('image')
+
+const setSelectionAtPos = (
+  state: EditorState,
+  dispatch: (tr: Transaction) => void,
+  pos: number
+) => {
+  dispatch(state.tr.setSelection(new NodeSelection(state.tr.doc.resolve(pos))))
+}
 
 const insertImageFiles = (
   editorView: EditorView,
@@ -34,12 +48,12 @@ const insertImageFiles = (
     if (file.type.match('image.*')) files.push(file)
   }
   if (files.length) {
+    const { state, dispatch } = editorView
+    dispatch(state.tr.setMeta('loading_images', files.length))
     const uploadPromise = uploadImages(files)
     uploadPromise.then((urls = []) => {
-      urls.forEach(url => {
-        const { state, dispatch } = editorView
-        insertImage(state, dispatch, url)
-      })
+      dispatch(state.tr.setMeta('loading_images', 0))
+      insertImageList(state, dispatch, urls)
       editorView.focus()
     })
     return true
@@ -57,14 +71,40 @@ export const imagePlugin = (
       init: () => {
         return { selectedImage: undefined }
       },
-      apply(tr, prev) {
+      apply(tr, prev, _, newState) {
+        if (tr.getMeta('loading_images') > 0) {
+          const loadingImagesCount = tr.getMeta('loading_images')
+          const div = document.createElement('div')
+          for (let i = 0; i < loadingImagesCount; i++) {
+            const childElement = document.createElement('div')
+            childElement.classList.add('image_loading_indicator')
+            div.appendChild(childElement)
+          }
+          return {
+            ...prev,
+            deco: DecorationSet.create(newState.doc, [
+              Decoration.widget(newState.selection.$to.pos, div),
+            ]),
+          }
+        }
+        if (tr.getMeta('loading_images') === 0) {
+          return {
+            ...prev,
+            deco: undefined,
+          }
+        }
         if (prev && prev.selectedImage) {
           const { pos } = prev.selectedImage
-          if (!tr.doc.nodeAt(pos)) return {}
+          if (!tr.doc.nodeAt(pos))
+            return {
+              ...prev,
+              selectedImage: undefined,
+            }
         }
         const selectedImage = tr.getMeta('image_clicked')
-        if (selectedImage) return { selectedImage }
-        if (selectedImage === false) return { selectedImage: undefined }
+        if (selectedImage) return { ...prev, selectedImage }
+        if (selectedImage === false)
+          return { ...prev, selectedImage: undefined }
         return prev
       },
     },
@@ -73,9 +113,24 @@ export const imagePlugin = (
         return (this as any).getState(state).deco
       },
       handleKeyDown(view: EditorView, event: KeyboardEvent) {
+        const { state, dispatch } = view
+        const { selection, schema } = state
         if (event.key === 'Escape') {
-          const { state, dispatch } = view
           dispatch(state.tr.setMeta('image_clicked', false))
+        } else if (
+          event.key === 'Backspace' &&
+          selection.$to.nodeBefore &&
+          selection.$to.nodeBefore.type === schema.nodes.image
+        ) {
+          setSelectionAtPos(state, dispatch, selection.$to.pos - 1)
+          return true
+        } else if (
+          event.key === 'Delete' &&
+          selection.$to.nodeAfter &&
+          selection.$to.nodeAfter.type === schema.nodes.image
+        ) {
+          setSelectionAtPos(state, dispatch, selection.$to.pos)
+          return true
         }
         return false
       },

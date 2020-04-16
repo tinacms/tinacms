@@ -26,6 +26,9 @@ export interface WatchableFormValue {
   fields: FormOptions<any>['fields']
 }
 
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function useLocalForm<FormShape = any>(
   options: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
@@ -36,11 +39,6 @@ export function useLocalForm<FormShape = any>(
 
   return [values, form]
 }
-
-/**
- * @alias useLocalForm
- */
-export const useCMSForm = useLocalForm
 
 /**
  * A hook that creates a form and updates it's watched properties.

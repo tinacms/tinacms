@@ -55,6 +55,7 @@ import {
 } from './MenuComponents'
 import { isMarkPresent } from '../../../utils'
 import ImageMenu from './Image/ImageMenu'
+import ImageLoaders from './Image/ImageLoaders'
 
 interface Props {
   bottom?: boolean
@@ -189,6 +190,7 @@ export const Menu = (props: Props) => {
         </MenuPortalProvider>
       </MenuWrapper>
       <FloatingTableMenu editorView={editorView} />
+      <ImageLoaders />
       <FloatingImageMenu editorView={editorView} />
       <FloatingLinkForm editorView={editorView} />
     </>

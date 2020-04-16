@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.5-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.4.5-alpha.1...react-tinacms-inline@0.4.5-alpha.2) (2020-04-14)
+
+
+### Bug Fixes
+
+* dependend on react-textarea-autosize ([e1315d7](https://github.com/tinacms/tinacms/commit/e1315d7)), closes [#999](https://github.com/tinacms/tinacms/issues/999)
+* don't show add block btn when inline form is inactive ([e1d2a45](https://github.com/tinacms/tinacms/commit/e1d2a45))
+
+
+
+
+
+## [0.4.5-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.4.5-alpha.0...react-tinacms-inline@0.4.5-alpha.1) (2020-04-07)
+
+**Note:** Version bump only for package react-tinacms-inline
+
+
+
+
+
 ## [0.4.5-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.4.4...react-tinacms-inline@0.4.5-alpha.0) (2020-04-06)
 
 **Note:** Version bump only for package react-tinacms-inline

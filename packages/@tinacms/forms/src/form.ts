@@ -19,25 +19,25 @@ limitations under the License.
 import arrayMutators from 'final-form-arrays'
 import { FormApi, createForm, Config } from 'final-form'
 import { Plugin } from '@tinacms/core'
-import { Field } from './field'
+import { Field, AnyField } from './field'
 
-export interface FormOptions<S> extends Config<S> {
+export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   id: any
   label: string
-  fields: Field[]
+  fields: F[]
   __type?: string
   reset?(): void
   actions?: any[]
   loadInitialValues?: () => Promise<S>
 }
 
-export class Form<S = any> implements Plugin {
+export class Form<S = any, F extends Field = AnyField> implements Plugin {
   private _reset?(): void
 
   __type: string
   id: any
   label: string
-  fields: Field[]
+  fields: F[]
   finalForm: FormApi<S>
   actions: any[]
 
@@ -49,7 +49,7 @@ export class Form<S = any> implements Plugin {
     reset,
     loadInitialValues,
     ...options
-  }: FormOptions<S>) {
+  }: FormOptions<S, F>) {
     const initialValues = options.initialValues || ({} as S)
     this.__type = options.__type || 'form'
     this.id = id
@@ -133,7 +133,7 @@ export class Form<S = any> implements Plugin {
   /**
    * @deprecated Unnecessary indirection
    */
-  updateFields(fields: Field[]) {
+  updateFields(fields: F[]) {
     this.fields = fields
   }
 

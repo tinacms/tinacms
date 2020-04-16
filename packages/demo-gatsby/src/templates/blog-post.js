@@ -24,9 +24,10 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useLocalRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
+import { useRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { ModalProvider } from "tinacms"
+import { ModalProvider, usePlugin } from "tinacms"
+import { EditToggle } from "../components/edit-toggle"
 
 import {
   InlineForm,
@@ -48,16 +49,14 @@ function BlogPostTemplate(props) {
   const { previous, next } = props.pageContext
 
   const cms = useCMS()
-  const [post, form] = useLocalRemarkForm(
-    props.data.markdownRemark,
-    BlogPostForm
-  )
+
+  const [post, form] = useRemarkForm(props.data.markdownRemark, BlogPostForm)
+  usePlugin(form)
 
   return (
     <ModalProvider>
       <InlineForm form={form}>
         <Layout location={props.location} title={siteTitle}>
-          <EditToggle />
           <SEO
             title={post.frontmatter.title}
             description={post.frontmatter.description || post.excerpt}
@@ -188,6 +187,7 @@ function BlogPostTemplate(props) {
               />
             </InlineWysiwyg>
           </div>
+          <EditToggle />
           <div
             style={{
               marginBottom: rhythm(1),
@@ -363,23 +363,6 @@ const BlogPostForm = {
     //   },
     // },
   ],
-}
-
-/**
- * Toggle -------------------------------------------------------
- */
-export function EditToggle() {
-  const { status, deactivate, activate } = useInlineForm()
-
-  return (
-    <button
-      onClick={() => {
-        status === "active" ? deactivate() : activate()
-      }}
-    >
-      {status === "active" ? "Preview" : "Edit"}
-    </button>
-  )
 }
 
 export function DiscardChanges() {

@@ -1,7 +1,7 @@
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-58-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-60-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # ![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png)
@@ -25,7 +25,7 @@
 
 ## Development
 
-**Disclaimer**: 
+**Disclaimer**:
 
 - Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
 - Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
@@ -137,7 +137,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://www.nckweb.com.ar"><img src="https://avatars0.githubusercontent.com/u/174561?v=4" width="100px;" alt=""/><br /><sub><b>Nicolas Cisco</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=NickCis" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/commits?author=NickCis" title="Tests">⚠️</a></td>
     <td align="center"><a href="https://www.hungrybearstudio.com/"><img src="https://avatars1.githubusercontent.com/u/22930449?v=4" width="100px;" alt=""/><br /><sub><b>Hungry Bear Studio</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=molebox" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/alexbarbato"><img src="https://avatars1.githubusercontent.com/u/23562192?v=4" width="100px;" alt=""/><br /><sub><b>Alex Barbato</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=alexbarbato" title="Code">💻</a></td>
-    <td align="center"><a href="http://danitulp.nl"><img src="https://avatars3.githubusercontent.com/u/18421761?v=4" width="100px;" alt=""/><br /><sub><b>Dani Tulp</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=DaniTulp" title="Code">💻</a></td>
+    <td align="center"><a href="http://danitulp.nl"><img src="https://avatars3.githubusercontent.com/u/18421761?v=4" width="100px;" alt=""/><br /><sub><b>Dani Tulp</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=DaniTulp" title="Code">💻</a> <a href="#ideas-DaniTulp" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/PaulBunker"><img src="https://avatars1.githubusercontent.com/u/1537408?v=4" width="100px;" alt=""/><br /><sub><b>PaulBunker</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=PaulBunker" title="Code">💻</a></td>
   </tr>
   <tr>
@@ -152,6 +152,8 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://gavinmcfarland.co.uk/"><img src="https://avatars1.githubusercontent.com/u/5551?v=4" width="100px;" alt=""/><br /><sub><b>Gavin McFarland</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Alimitlessloop" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/blandfried"><img src="https://avatars1.githubusercontent.com/u/1953556?v=4" width="100px;" alt=""/><br /><sub><b>blandfried</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Ablandfried" title="Bug reports">🐛</a> <a href="https://github.com/tinacms/tinacms/commits?author=blandfried" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/marklawlor"><img src="https://avatars1.githubusercontent.com/u/3946701?v=4" width="100px;" alt=""/><br /><sub><b>Mark Lawlor</b></sub></a><br /><a href="#ideas-marklawlor" title="Ideas, Planning, & Feedback">🤔</a></td>
+    <td align="center"><a href="https://github.com/BPScott"><img src="https://avatars0.githubusercontent.com/u/227292?v=4" width="100px;" alt=""/><br /><sub><b>Ben Scott</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/pulls?q=is%3Apr+reviewed-by%3ABPScott" title="Reviewed Pull Requests">👀</a></td>
   </tr>
 </table>
 

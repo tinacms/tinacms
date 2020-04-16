@@ -18,12 +18,17 @@ limitations under the License.
 
 import { JsonFile, useJsonForm, Options } from './use-json-form'
 import { useMemo } from 'react'
-import { GlobalFormPlugin, usePlugins } from 'tinacms'
+import { GlobalFormPlugin, usePlugins, Form } from 'tinacms'
 
 /**
  * Registers a Global Form with TinaCMS for editing a Json File.
+ *
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
  */
-export function useGlobalJsonForm(jsonFile: JsonFile, options?: Options) {
+export function useGlobalJsonForm(
+  jsonFile: JsonFile,
+  options?: Options
+): [any, Form] {
   const [values, form] = useJsonForm(jsonFile, options)
   const globalFormPlugin = useMemo(() => {
     if (form) {

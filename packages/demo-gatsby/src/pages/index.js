@@ -23,14 +23,14 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useGlobalForm } from "tinacms"
+import { useForm, useFormScreenPlugin } from "tinacms"
 
 function BlogIndex(props) {
   const { data } = props
   const siteTitle = data.site.siteMetadata.title
   const posts = data.allMarkdownRemark.edges
 
-  const [styles] = useGlobalForm({
+  const [styles, stylesForm] = useForm({
     id: "blog-index-styles",
     label: "Blog Styles",
     initialValues: {
@@ -64,6 +64,8 @@ function BlogIndex(props) {
       alert("Saving doesn't do anything.")
     },
   })
+
+  useFormScreenPlugin(stylesForm)
 
   return (
     <Layout location={props.location} title={siteTitle}>

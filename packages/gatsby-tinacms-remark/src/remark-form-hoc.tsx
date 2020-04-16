@@ -17,34 +17,41 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FormOptions, Form, TinaForm } from 'tinacms'
-import { useLocalRemarkForm, useGlobalRemarkForm } from './useRemarkForm'
+import { FormOptions, Form, TinaForm, usePlugin } from 'tinacms'
+import { useGlobalRemarkForm, useRemarkForm } from './useRemarkForm'
 import { ERROR_INVALID_QUERY_NAME } from './errors'
 
-interface RemarkFormProps extends Partial<FormOptions<any>> {
+export interface RemarkFormProps extends Partial<FormOptions<any>> {
   queryName?: string // Configure where we are pulling the initial form data from.
 }
 
 export function remarkForm(Component: any, options: RemarkFormProps = {}) {
   return function RemarkForm(props: any) {
-    const [markdownRemark] = useLocalRemarkForm(
+    const [markdownRemark, form] = useRemarkForm(
       getMarkdownRemark(props.data, options.queryName),
       options
     )
+
+    usePlugin(form || undefined)
 
     return <Component {...props} data={{ ...props.data, markdownRemark }} />
   }
 }
 
+/**
+ * @deprecated see `react-tinacms-inline`
+ */
 export function inlineRemarkForm(
   Component: any,
   options: RemarkFormProps = {}
 ) {
   return function RemarkForm(props: any) {
-    const [markdownRemark, form] = useLocalRemarkForm(
+    const [markdownRemark, form] = useRemarkForm(
       getMarkdownRemark(props.data, options.queryName),
       options
     )
+
+    usePlugin(form || undefined)
 
     return (
       <TinaForm form={form as Form}>
@@ -64,10 +71,8 @@ export function inlineRemarkForm(
 }
 
 /**
- * @deprecated
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
  */
-export const liveRemarkForm = inlineRemarkForm
-
 export function globalRemarkForm(
   Component: any,
   options: RemarkFormProps = {}
@@ -81,6 +86,7 @@ export function globalRemarkForm(
     return <Component {...props} data={{ ...props.data, markdownRemark }} />
   }
 }
+
 const getMarkdownRemark = (data: any, queryName: string = 'markdownRemark') => {
   const markdownRemark = data[queryName]
   if (!markdownRemark) {
