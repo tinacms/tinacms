@@ -27,7 +27,7 @@ import React from "react"
 import { useStaticQuery, graphql } from "gatsby"
 import Image from "gatsby-image"
 import { useJsonForm } from "gatsby-tinacms-json"
-import { useCMS } from "tinacms"
+import { useCMS, useFormScreenPlugin } from "tinacms"
 
 import { rhythm } from "../utils/typography"
 
@@ -83,12 +83,7 @@ const Bio = () => {
     fields,
   })
 
-  usePlugin(authorForm)
-
-  /*
-    //for testing single / multiple forms
-   const author = data.dataJson
-  */
+  useFormScreenPlugin(authorForm)
 
   return (
     <div
