@@ -19,6 +19,5 @@ limitations under the License.
 export * from './ContentNotFoundError'
 export * from './getContent'
 export * from './getFiles'
-export * from './getJsonFile'
 export * from './GithubError'
 export * from './sourceProviderConnection'
