@@ -16,28 +16,7 @@ limitations under the License.
 
 */
 
-import { SourceProviderConnection } from './sourceProviderConnection'
 import matter from 'gray-matter'
-import getDecodedData from './getDecodedData'
-
-export const getMarkdownFile = async (
-  filePath: string,
-  sourceProviderConnection: SourceProviderConnection,
-  accessToken: string
-) => {
-  const response = await getDecodedData(
-    sourceProviderConnection.forkFullName,
-    sourceProviderConnection.headBranch || 'master',
-    filePath,
-    accessToken
-  )
-
-  return {
-    sha: response.sha,
-    fileRelativePath: filePath,
-    data: parseMarkdown(response.content),
-  }
-}
 
 export interface MarkdownData<Frontmatter> {
   frontmatter: Frontmatter
