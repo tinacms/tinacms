@@ -1,4 +1,5 @@
 /**
+ *
 
 Copyright 2019 Forestry.io Inc
 
@@ -16,37 +17,35 @@ limitations under the License.
 
 */
 import { GithubError } from './github/content/GithubError'
-import { parseMarkdown } from './parse-markdown'
-import { parseJson } from './parse-json'
 import { SourceProviderConnection } from 'github/content'
 import getDecodedData from './github/content/getDecodedData'
 
-export interface PreviewData {
+export interface PreviewData<Data> {
   github_access_token: string
   fork_full_name: string
   head_branch: string
   fileRelativePath: string
-  format?: 'markdown' | 'json'
+  parse(content: string): Data
 }
 
-export interface GithubFile {
+export interface GithubFile<Data> {
   sha: string
   fileRelativePath: string
-  data: any
+  data: Data
 }
 
-export interface GithubPreviewProps {
+export interface GithubPreviewProps<Data> {
   props: {
     preview: boolean
     sourceProvider: SourceProviderConnection
-    file: GithubFile | null
+    file: GithubFile<Data> | null
     error: GithubError | null
   }
 }
 
-export async function getGithubPreviewProps(
-  options: PreviewData
-): Promise<GithubPreviewProps> {
+export async function getGithubPreviewProps<Data = any>(
+  options: PreviewData<Data>
+): Promise<GithubPreviewProps<Data>> {
   const accessToken = options.github_access_token
   const sourceProvider = {
     forkFullName: options.fork_full_name || '',
@@ -63,12 +62,10 @@ export async function getGithubPreviewProps(
       accessToken
     )
 
-    const parse = options.format === 'markdown' ? parseMarkdown : parseJson
-
     file = {
       sha: response.sha,
       fileRelativePath: options.fileRelativePath,
-      data: parse(response.content),
+      data: options.parse(response.content),
     }
   } catch (e) {
     if (e instanceof GithubError) {
