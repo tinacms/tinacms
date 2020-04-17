@@ -71,7 +71,7 @@ export const TinacmsGithubProvider = ({
   }
 
   const authenticate = useCallback(() => {
-    githubAuthenticate(clientId, authCallbackRoute)
+    return githubAuthenticate(clientId, authCallbackRoute)
   }, [clientId, authCallbackRoute])
 
   return (
