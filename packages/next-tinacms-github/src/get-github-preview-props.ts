@@ -16,9 +16,10 @@ limitations under the License.
 
 */
 import { GithubError } from './github/content/GithubError'
-import { getMarkdownFile } from './github/content/getMarkdownFile'
-import { getJsonFile } from './github/content/getJsonFile'
+import { parseMarkdown } from './github/content/getMarkdownFile'
+import { parseJson } from './github/content/getJsonFile'
 import { SourceProviderConnection } from 'github/content'
+import getDecodedData from './github/content/getDecodedData'
 
 export interface PreviewData {
   github_access_token: string
@@ -55,14 +56,20 @@ export async function getGithubPreviewProps(
   let file = null
 
   try {
-    const getParsedFile =
-      options.format === 'markdown' ? getMarkdownFile : getJsonFile
-
-    file = await getParsedFile(
+    const response = await getDecodedData(
+      sourceProvider.forkFullName,
+      sourceProvider.headBranch || 'master',
       options.fileRelativePath,
-      sourceProvider,
       accessToken
     )
+
+    const parse = options.format === 'markdown' ? parseMarkdown : parseJson
+
+    file = {
+      sha: response.sha,
+      fileRelativePath: options.fileRelativePath,
+      data: parse(response.content),
+    }
   } catch (e) {
     if (e instanceof GithubError) {
       console.error(
