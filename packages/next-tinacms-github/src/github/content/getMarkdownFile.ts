@@ -32,11 +32,25 @@ export const getMarkdownFile = async (
     accessToken
   )
 
-  const { content: markdownBody, data: frontmatter } = matter(response.content)
-
   return {
     sha: response.sha,
     fileRelativePath: filePath,
-    data: { frontmatter, markdownBody },
+    data: parseMarkdown(response.content),
+  }
+}
+
+export interface MarkdownData<Frontmatter> {
+  frontmatter: Frontmatter
+  markdownBody: string
+}
+
+export function parseMarkdown<Frontmatter>(
+  content: string
+): MarkdownData<Frontmatter> {
+  const { content: markdownBody, data: frontmatter } = matter(content)
+
+  return {
+    markdownBody,
+    frontmatter: frontmatter as Frontmatter,
   }
 }
