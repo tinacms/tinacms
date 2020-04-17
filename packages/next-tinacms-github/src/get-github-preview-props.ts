@@ -17,7 +17,7 @@ limitations under the License.
 
 */
 import { GithubError } from './github/content/GithubError'
-import { SourceProviderConnection } from 'github/content'
+import { SourceProviderConnection } from './github/content'
 import getDecodedData from './github/content/getDecodedData'
 
 export interface PreviewData<Data> {
