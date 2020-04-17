@@ -17,7 +17,7 @@ limitations under the License.
 */
 import { GithubError } from './github/content/GithubError'
 import { parseMarkdown } from './parse-markdown'
-import { parseJson } from './github/content/getJsonFile'
+import { parseJson } from './parse-json'
 import { SourceProviderConnection } from 'github/content'
 import getDecodedData from './github/content/getDecodedData'
 
