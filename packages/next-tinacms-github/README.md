@@ -72,6 +72,7 @@ The `preview` data, which gets set by calling your [preview function](#previewha
 
 import {
   getGithubPreviewProps
+  parseMarkdown,
 } from 'next-tinacms-github'
 
 // ...
@@ -85,7 +86,7 @@ export const getStaticProps: GetStaticProps = async function({
     return getGithubPreviewProps({
       ...previewData,
       fileRelativePath: 'src/content/home.json',
-      format: 'json'
+      parse: parseMarkdown
     });
   }
   return {
