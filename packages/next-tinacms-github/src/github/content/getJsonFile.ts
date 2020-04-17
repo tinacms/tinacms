@@ -34,6 +34,10 @@ export const getJsonFile = async (
   return {
     sha: response.sha,
     fileRelativePath: filePath,
-    data: JSON.parse(response.content),
+    data: parseJson(response.content),
   }
+}
+
+export function parseJson<Data>(content: string): Data {
+  return JSON.parse(content)
 }
