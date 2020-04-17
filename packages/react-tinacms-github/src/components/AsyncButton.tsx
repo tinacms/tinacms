@@ -31,8 +31,12 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
 
   const onClick = useCallback(async () => {
     setSubmitting(true)
-    await action()
-    setSubmitting(false)
+    try {
+      await action()
+    } catch (e) {
+      setSubmitting(false)
+      throw e
+    }
   }, [action, setSubmitting])
 
   return (
