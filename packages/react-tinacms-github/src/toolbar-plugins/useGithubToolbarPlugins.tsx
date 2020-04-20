@@ -23,9 +23,11 @@ import { PRPlugin } from './pull-request'
 import { ForkNamePlugin } from './ForkNamePlugin'
 import { GithubClient } from '../github-client'
 import { Plugin } from 'tinacms'
+import { useGithubEditing } from 'github-editing-context'
 
-export const useGithubToolbarPlugins = (editMode: boolean) => {
+export const useGithubToolbarPlugins = () => {
   const cms = useCMS()
+  const { editMode } = useGithubEditing()
 
   useEffect(() => {
     const github: GithubClient = cms.api.github
