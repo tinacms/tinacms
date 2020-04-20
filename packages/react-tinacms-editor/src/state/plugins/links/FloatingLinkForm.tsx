@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import { EditorView } from 'prosemirror-view'
 import * as React from 'react'
 import { createRef, useState, useEffect } from 'react'
 
@@ -34,14 +33,15 @@ import {
 import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
 import { linkPluginKey } from './index'
+import { useEditorStateContext } from '../../../core/context/editorState'
 
 const width = 240
 
-export const FloatingLinkForm = ({
-  editorView,
-}: {
-  editorView: { view: EditorView }
-}) => {
+export const FloatingLinkForm = () => {
+  const { editorView } = useEditorStateContext()
+  const [position, setPosition] = useState<any>(undefined)
+
+  if (!editorView) return null
   const { view } = editorView
   const linkPluginState = linkPluginKey.getState(view.state)
   const { anchor, head } = view.state.selection
@@ -59,9 +59,9 @@ export const FloatingLinkForm = ({
     unmountLinkForm(view)
   }
 
-  const [position, setPosition] = useState<any>(undefined)
   const wrapperRef = createRef<any>()
 
+  // eslint-disable-next-line react-hooks/rules-of-hooks
   useEffect(() => {
     if (!clickTarget || !wrapperRef.current) {
       setPosition(undefined)

@@ -16,18 +16,10 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { MarkdownTranslator, Format, DOMTranslator } from './Translator'
-import { Schema } from 'prosemirror-model'
-
-export function useProsemirrorTranslator(
-  schema: Schema,
-  format: Format = 'markdown'
-) {
-  const translator = React.useMemo(() => {
-    if (format === 'html') return DOMTranslator.fromSchema(schema)
-    return MarkdownTranslator.fromSchema(schema)
-  }, [schema])
-
-  return [translator]
+/**
+ *
+ * @param content
+ */
+export function parseJson<Data>(content: string): Data {
+  return JSON.parse(content)
 }

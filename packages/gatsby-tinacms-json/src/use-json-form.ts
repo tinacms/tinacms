@@ -121,6 +121,9 @@ export function useJsonForm(
   return [jsonNode, form as Form]
 }
 
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function useLocalJsonForm(
   jsonNode: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}
@@ -130,6 +133,9 @@ export function useLocalJsonForm(
   return [values, form]
 }
 
+/**
+ * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ */
 export function useGlobalJsonForm(
   jsonNode: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}

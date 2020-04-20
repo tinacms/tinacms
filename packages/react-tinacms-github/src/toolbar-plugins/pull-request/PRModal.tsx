@@ -24,14 +24,17 @@ import React, { useEffect, useState } from 'react'
 import { getHeadBranch } from '../../github-editing-context/repository'
 import { AsyncButton } from '../../components/AsyncButton'
 
-const BASE_BRANCH = process.env.BASE_BRANCH
-
 interface Props {
   baseRepoFullName: string
+  baseBranch: string
   forkRepoFullName: string
 }
 
-export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
+export const PRModal = ({
+  forkRepoFullName,
+  baseRepoFullName,
+  baseBranch,
+}: Props) => {
   const [prError, setPrError] = useState('')
   const [fetchedPR, setFetchedPR] = useState<any>(undefined)
   const cms = useCMS()
@@ -106,12 +109,12 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
               </b>{' '}
               into{' '}
               <b>
-                {baseRepoFullName} - {BASE_BRANCH}
+                {baseRepoFullName} - {baseBranch}
               </b>
               .{' '}
               <a
                 target="_blank"
-                href={`https://github.com/${baseRepoFullName}/compare/${BASE_BRANCH}...${
+                href={`https://github.com/${baseRepoFullName}/compare/${baseBranch}...${
                   forkRepoFullName.split('/')[0]
                 }:${getHeadBranch()}`}
               >
@@ -135,7 +138,7 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
             </b>{' '}
             into{' '}
             <b>
-              {baseRepoFullName} - {BASE_BRANCH}
+              {baseRepoFullName} - {baseBranch}
             </b>
             .
           </ModalDescription>
@@ -150,7 +153,7 @@ export const PRModal = ({ forkRepoFullName, baseRepoFullName }: Props) => {
             <TinaButton
               as="a"
               // @ts-ignore
-              href={`https://github.com/${baseRepoFullName}/compare/${BASE_BRANCH}...${
+              href={`https://github.com/${baseRepoFullName}/compare/${baseBranch}...${
                 forkRepoFullName.split('/')[0]
               }:${getHeadBranch()}`}
               target="_blank"

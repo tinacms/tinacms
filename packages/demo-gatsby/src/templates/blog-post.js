@@ -24,9 +24,9 @@ import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
 import { rhythm } from "../utils/typography"
-import { useLocalRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
+import { useRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
-import { ModalProvider } from "tinacms"
+import { ModalProvider, usePlugin } from "tinacms"
 import { EditToggle } from "../components/edit-toggle"
 
 import {
@@ -49,10 +49,9 @@ function BlogPostTemplate(props) {
   const { previous, next } = props.pageContext
 
   const cms = useCMS()
-  const [post, form] = useLocalRemarkForm(
-    props.data.markdownRemark,
-    BlogPostForm
-  )
+
+  const [post, form] = useRemarkForm(props.data.markdownRemark, BlogPostForm)
+  usePlugin(form)
 
   return (
     <ModalProvider>

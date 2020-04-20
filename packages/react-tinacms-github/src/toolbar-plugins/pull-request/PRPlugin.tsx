@@ -27,11 +27,13 @@ import { DesktopLabel } from '../../components/DesktopLabel'
 interface PullRequestButtonOptions {
   baseRepoFullName: string
   forkRepoFullName: string
+  baseBranch: string
 }
 
 export const PRPlugin = (
   baseRepoFullName: string,
-  forkRepoFullName: string
+  forkRepoFullName: string,
+  baseBranch: string
 ) => ({
   __type: 'toolbar:widget',
   name: 'create-pr',
@@ -40,12 +42,14 @@ export const PRPlugin = (
   props: {
     baseRepoFullName,
     forkRepoFullName,
+    baseBranch,
   },
 })
 
 function PullRequestButton({
   baseRepoFullName,
   forkRepoFullName,
+  baseBranch,
 }: PullRequestButtonOptions) {
   const [opened, setOpened] = useState(false)
   const close = () => setOpened(false)
@@ -62,6 +66,7 @@ function PullRequestButton({
             <ModalBody>
               <PRModal
                 baseRepoFullName={baseRepoFullName}
+                baseBranch={baseBranch}
                 forkRepoFullName={forkRepoFullName}
               />
             </ModalBody>
