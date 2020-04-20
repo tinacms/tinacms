@@ -20,23 +20,14 @@ import { useCMS } from 'tinacms'
 import { useEffect } from 'react'
 import { PullRequestToolbarWidget } from './pull-request'
 import { ForkNameToolbarWidget } from './ForkNamePlugin'
-import { GithubClient } from '../github-client'
 import { Plugin } from 'tinacms'
 import { useGithubEditing } from 'github-editing-context'
 
 export const useGithubToolbarPlugins = () => {
   const cms = useCMS()
   const { editMode } = useGithubEditing()
-  const github: GithubClient = cms.api.github
-  const repo = github?.repoFullName
-  const baseRepo = github?.baseRepoFullName
-  const baseBranch = github?.baseBranch
 
   useEffect(() => {
-    if (!baseRepo || !baseBranch || !repo) {
-      // Warn dev appropriately
-    }
-
     const plugins = [
       ForkNameToolbarWidget,
       PullRequestToolbarWidget,
@@ -53,5 +44,5 @@ export const useGithubToolbarPlugins = () => {
     }
 
     return removePlugins
-  }, [editMode, repo, baseRepo, baseBranch])
+  }, [editMode])
 }
