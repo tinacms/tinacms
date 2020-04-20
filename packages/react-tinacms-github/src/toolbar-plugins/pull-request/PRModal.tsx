@@ -34,8 +34,8 @@ export const PRModal = () => {
   const bodyInput = React.createRef() as any
 
   const checkForPR = async () => {
-    await cms.api.github
-      .fetchExistingPR(github.repoFullName)
+    await github
+      .fetchExistingPR()
       .then((pull: any) => {
         if (pull) {
           setFetchedPR(pull)
@@ -49,7 +49,7 @@ export const PRModal = () => {
   }
 
   const createPR = () => {
-    return cms.api.github
+    return github
       .createPR(titleInput.current.value, bodyInput.current.value)
       .then(() => {
         checkForPR() // TODO - can we use PR from response instead of refetching?
