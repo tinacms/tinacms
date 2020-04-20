@@ -50,12 +50,7 @@ export const PRModal = () => {
 
   const createPR = () => {
     return cms.api.github
-      .createPR(
-        github.repoFullName,
-        github.branchName,
-        titleInput.current.value,
-        bodyInput.current.value
-      )
+      .createPR(titleInput.current.value, bodyInput.current.value)
       .then(() => {
         checkForPR() // TODO - can we use PR from response instead of refetching?
       })

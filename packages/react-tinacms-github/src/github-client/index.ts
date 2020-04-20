@@ -56,12 +56,10 @@ export class GithubClient {
     })
   }
 
-  createPR(
-    forkRepoFullName: string,
-    headBranch: string,
-    title: string,
-    body: string
-  ) {
+  createPR(title: string, body: string) {
+    const forkRepoFullName = this.repoFullName
+    const headBranch: string = this.branchName
+
     return this.req({
       url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'POST',
