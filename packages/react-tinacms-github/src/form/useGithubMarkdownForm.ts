@@ -31,5 +31,8 @@ export function useGithubMarkdownForm(
   markdownFile: GitFile,
   formOptions: Options
 ) {
-  return useGithubFileForm(markdownFile, formOptions, toMarkdownString)
+  return useGithubFileForm(markdownFile, {
+    ...formOptions,
+    serialize: toMarkdownString,
+  })
 }
