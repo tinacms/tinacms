@@ -81,17 +81,17 @@ const GithubAuthModal = ({
         {
           name: 'Create Fork',
           action: async () => {
-            let full_name: string = ''
             try {
-              full_name = (await cms.api.github.createFork()).full_name
+              const full_name = (await cms.api.github.createFork()).full_name
+              setForkName(full_name)
+              onUpdateAuthState()
             } catch (e) {
               setError(
                 'Forking repository failed. Are you sure you have access?'
               )
               throw e
             }
-            setForkName(full_name)
-            onUpdateAuthState()
+
           },
           primary: true,
         },

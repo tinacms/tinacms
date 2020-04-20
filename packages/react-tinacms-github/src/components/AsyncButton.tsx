@@ -33,6 +33,7 @@ export const AsyncButton = ({ name, primary, action }: ButtonProps) => {
     setSubmitting(true)
     try {
       await action()
+      setSubmitting(false)
     } catch (e) {
       setSubmitting(false)
       throw e
