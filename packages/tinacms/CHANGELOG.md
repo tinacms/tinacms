@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.19.0-alpha.4](https://github.com/tinacms/tinacms/compare/tinacms@0.19.0-alpha.3...tinacms@0.19.0-alpha.4) (2020-04-20)
+
+
+### Bug Fixes
+
+* add moment as dep to tinacms ([df5cc6f](https://github.com/tinacms/tinacms/commit/df5cc6f))
+* deprecated useGlobalForm ([6d79cca](https://github.com/tinacms/tinacms/commit/6d79cca))
+
+
+### Features
+
+* introduce useFormScreenPlugin ([b29c310](https://github.com/tinacms/tinacms/commit/b29c310))
+
+
+
+
+
 # [0.19.0-alpha.3](https://github.com/tinacms/tinacms/compare/tinacms@0.19.0-alpha.2...tinacms@0.19.0-alpha.3) (2020-04-14)
 
 
