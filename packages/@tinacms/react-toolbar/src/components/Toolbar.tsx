@@ -79,7 +79,7 @@ export const Toolbar = () => {
       } else if (form.finalForm.reset) {
         form.finalForm.reset()
       }
-      setState(0)
+      setState(0) // this refreshes the discard button to show the proper state
     }
 
   }
