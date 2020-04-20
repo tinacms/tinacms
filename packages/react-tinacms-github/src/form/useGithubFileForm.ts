@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { GitFile, useGitFileSha } from './useGitFileSha'
-import { GithubOptions } from './GithubOptions'
 import { Options } from 'next-tinacms-markdown'
 import { useCMS, useForm, usePlugin } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
@@ -26,7 +25,6 @@ import { GithubClient } from '../github-client'
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
   formOptions: Options,
-  githubOptions: GithubOptions,
   serialize: (data: T) => string
 ) => {
   const cms = useCMS()

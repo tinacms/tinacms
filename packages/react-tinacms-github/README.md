@@ -164,11 +164,7 @@ function BlogTemplate({
   }
 
   // Registers a JSON Tina Form
-  const [data, form] = useGithubJsonForm(
-    jsonFile,
-    formOptions,
-    sourceProviderConnection
-  )
+  const [data, form] = useGithubJsonForm(jsonFile, formOptions)
 
   // ...
 }
