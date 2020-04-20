@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.12-alpha.3](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.12-alpha.2...next-tinacms-json@0.3.12-alpha.3) (2020-04-20)
+
+
+### Bug Fixes
+
+* deprecate useGlobalJsonForm ([6bf0799](https://github.com/tinacms/tinacms/commit/6bf0799))
+* deprecate useLocalJsonForm ([e8ae5e8](https://github.com/tinacms/tinacms/commit/e8ae5e8))
+* deprecated InlineJsonForm ([bc4ab95](https://github.com/tinacms/tinacms/commit/bc4ab95))
+
+
+
+
+
 ## [0.3.12-alpha.2](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.12-alpha.1...next-tinacms-json@0.3.12-alpha.2) (2020-04-14)
 
 

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.4.1-alpha.2...react-tinacms-editor@0.5.0-alpha.0) (2020-04-20)
+
+
+### Bug Fixes
+
+* core editor related code cleanup ([5bc1818](https://github.com/tinacms/tinacms/commit/5bc1818))
+
+
+### Features
+
+* image loading indicators ([ee11519](https://github.com/tinacms/tinacms/commit/ee11519))
+
+
+
+
+
 ## [0.4.1-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.4.1-alpha.1...react-tinacms-editor@0.4.1-alpha.2) (2020-04-14)
 
 

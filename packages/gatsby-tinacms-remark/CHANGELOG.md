@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.14-alpha.3](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.14-alpha.2...gatsby-tinacms-remark@0.7.14-alpha.3) (2020-04-20)
+
+
+### Bug Fixes
+
+* deprecated globalRemarkForm ([c8d707e](https://github.com/tinacms/tinacms/commit/c8d707e))
+* deprecated inlineRemarkForm ([1d114b1](https://github.com/tinacms/tinacms/commit/1d114b1))
+* deprecated useLocalRemarkForm and useGlobalRemarkForm ([b678ed3](https://github.com/tinacms/tinacms/commit/b678ed3))
+
+
+
+
+
 ## [0.7.14-alpha.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.14-alpha.1...gatsby-tinacms-remark@0.7.14-alpha.2) (2020-04-14)
 
 **Note:** Version bump only for package gatsby-tinacms-remark

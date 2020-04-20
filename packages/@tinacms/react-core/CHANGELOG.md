@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.11-alpha.2](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.11-alpha.1...@tinacms/react-core@0.2.11-alpha.2) (2020-04-20)
+
+
+### Bug Fixes
+
+* deprecated useLocalForm ([3024720](https://github.com/tinacms/tinacms/commit/3024720))
+* remove alias useCMSForm ([1d6eadf](https://github.com/tinacms/tinacms/commit/1d6eadf))
+
+
+
+
+
 ## [0.2.11-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.11-alpha.0...@tinacms/react-core@0.2.11-alpha.1) (2020-04-14)
 
 **Note:** Version bump only for package @tinacms/react-core
