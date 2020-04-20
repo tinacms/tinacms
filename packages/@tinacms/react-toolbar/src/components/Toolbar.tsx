@@ -74,14 +74,9 @@ export const Toolbar = () => {
 
   const reset = () => {
     if (form) {
-      if (form.reset) {
-        form.reset()
-      } else if (form.finalForm.reset) {
-        form.finalForm.reset()
-      }
-      setState(0) // this refreshes the discard button to show the proper state
+      form.reset()
+      setState(0) // ugly fix
     }
-
   }
 
   //const reset = form && (form.reset || (() => form.finalForm.reset()))
