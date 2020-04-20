@@ -28,10 +28,7 @@ import {
   forEachCellInColumn,
   setCellAttrs,
 } from 'prosemirror-utils'
-
-interface FloatingTableDeleteMenuProps {
-  editorView: { view: EditorView }
-}
+import { useEditorStateContext } from '../../../../core/context/editorState'
 
 const alignColumn = (view: EditorView, alignValue: string) => {
   const { state, dispatch } = view
@@ -60,8 +57,10 @@ const alignColumn = (view: EditorView, alignValue: string) => {
   view.focus()
 }
 
-export default (props: FloatingTableDeleteMenuProps) => {
-  const { state, dispatch } = props.editorView.view
+export default () => {
+  const { editorView } = useEditorStateContext()
+  if (!editorView) return null
+  const { state, dispatch } = editorView.view
   const markerDivTable = document.getElementsByClassName(
     'tina_table_header_ext_top_left_selected'
   )[0]
@@ -80,31 +79,35 @@ export default (props: FloatingTableDeleteMenuProps) => {
       markerDivRow = markerDivRows[i]
   }
   if (!markerDivCol && !markerDivRow) return null
-  const { view } = props.editorView
+  const { view } = editorView
   return (
     <>
       {markerDivCol &&
         ReactDOM.createPortal(
           <IconWrapperCol>
-            <IconButton onClick={() => alignColumn(view, 'left')} small primary>
+            <IconButton
+              onMouseDown={() => alignColumn(view, 'left')}
+              small
+              primary
+            >
               <AlignLeft />
             </IconButton>
             <IconButton
-              onClick={() => alignColumn(view, 'center')}
+              onMouseDown={() => alignColumn(view, 'center')}
               small
               primary
             >
               <AlignCenter />
             </IconButton>
             <IconButton
-              onClick={() => alignColumn(view, 'right')}
+              onMouseDown={() => alignColumn(view, 'right')}
               small
               primary
             >
               <AlignRight />
             </IconButton>
             <IconButton
-              onClick={() => {
+              onMouseDown={() => {
                 deleteColumn(state, dispatch)
                 view.focus()
               }}
@@ -120,7 +123,7 @@ export default (props: FloatingTableDeleteMenuProps) => {
         ReactDOM.createPortal(
           <IconWrapperRow>
             <IconButton
-              onClick={() => {
+              onMouseDown={() => {
                 deleteRow(state, dispatch)
                 view.focus()
               }}

@@ -18,18 +18,16 @@ limitations under the License.
 
 import React from 'react'
 import ReactDOM from 'react-dom'
-import { EditorView } from 'prosemirror-view'
 import { deleteTable } from 'prosemirror-tables'
 import styled from 'styled-components'
 
 import { TrashIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
+import { useEditorStateContext } from '../../../../core/context/editorState'
 
-interface TableOptionsMenu {
-  editorView: { view: EditorView }
-}
-
-export default ({ editorView }: TableOptionsMenu) => {
+export default () => {
+  const { editorView } = useEditorStateContext()
+  if (!editorView) return null
   const { view } = editorView
   const deleteSelectedTable = () => {
     const { state, dispatch } = view
@@ -45,7 +43,7 @@ export default ({ editorView }: TableOptionsMenu) => {
   const { height, width } = tableElm.getBoundingClientRect()
   return ReactDOM.createPortal(
     <Wrapper height={height} width={width}>
-      <IconButton onClick={deleteSelectedTable} small primary>
+      <IconButton onMouseDown={deleteSelectedTable} small primary>
         <TrashIcon />
       </IconButton>
     </Wrapper>,

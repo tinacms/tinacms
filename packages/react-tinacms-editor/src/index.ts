@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 
-export * from './Wysiwyg'
+export * from './core'
