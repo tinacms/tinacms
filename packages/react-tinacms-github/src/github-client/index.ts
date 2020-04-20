@@ -130,13 +130,14 @@ export class GithubClient {
   }
 
   async save(
-    repo: string,
-    branch: string,
     filePath: string,
     sha: string,
     formData: string,
     message: string = 'Update from TinaCMS'
   ) {
+    const repo = this.repoFullName
+    const branch = this.branchName
+
     return this.req({
       url: `https://api.github.com/repos/${repo}/contents/${filePath}`,
       method: 'PUT',
