@@ -19,7 +19,7 @@ limitations under the License.
 import { FieldMeta, useCMS } from 'tinacms'
 import styled from 'styled-components'
 import React from 'react'
-import { GithubClient } from 'github-client'
+import { GithubClient } from '../github-client'
 
 const MetaLink = styled.a`
   display: block;
