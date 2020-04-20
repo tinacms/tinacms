@@ -21,7 +21,7 @@ import { useEffect } from 'react'
 import { PullRequestToolbarWidget } from './pull-request'
 import { ForkNameToolbarWidget } from './ForkNamePlugin'
 import { Plugin } from 'tinacms'
-import { useGithubEditing } from 'github-editing-context'
+import { useGithubEditing } from '../github-editing-context'
 
 export const useGithubToolbarPlugins = () => {
   const cms = useCMS()
