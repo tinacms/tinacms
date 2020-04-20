@@ -24,13 +24,7 @@ import React, { useEffect, useState } from 'react'
 import { AsyncButton } from '../../components/AsyncButton'
 import { GithubClient } from '../../github-client'
 
-interface Props {
-  baseRepoFullName: string
-  baseBranch: string
-  forkRepoFullName: string
-}
-
-export const PRModal = ({}: Props) => {
+export const PRModal = () => {
   const [prError, setPrError] = useState('')
   const [fetchedPR, setFetchedPR] = useState<any>(undefined)
   const cms = useCMS()
