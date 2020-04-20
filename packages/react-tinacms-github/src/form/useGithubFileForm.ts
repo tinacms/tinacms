@@ -17,41 +17,40 @@ limitations under the License.
 */
 
 import { GitFile, useGitFileSha } from './useGitFileSha'
-import { GithubOptions } from './GithubOptions'
-import { Options } from 'next-tinacms-markdown'
-import { useCMS, useForm, usePlugin } from 'tinacms'
+import { useCMS, useForm, usePlugin, FormOptions } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
-import { getForkName } from '../github-editing-context/repository'
+import { GithubClient } from '../github-client'
+
+export interface GithubFormOptions extends Partial<FormOptions<any>> {
+  serialize: (data: any) => string
+}
 import { useGithubErrorListener } from './useGithubErrorListener'
 
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
-  formOptions: Options,
-  githubOptions: GithubOptions,
-  serialize: (data: T) => string
+  options: GithubFormOptions
 ) => {
   const cms = useCMS()
   const [getSha, setSha] = useGitFileSha(file)
 
   const [formData, form] = useForm({
     id: file.fileRelativePath, // needs to be unique
-    label: formOptions.label || file.fileRelativePath,
+    label: options.label || file.fileRelativePath,
     initialValues: file.data,
-    fields: formOptions.fields || [],
+    fields: options.fields || [],
     // save & commit the file when the "save" button is pressed
     onSubmit(formData) {
-      return cms.api.github
-        .save(
-          githubOptions.forkFullName,
-          githubOptions.branch,
+      const github: GithubClient = cms.api.github
+      return github
+        .commit(
           file.fileRelativePath,
           getSha(),
-          serialize(formData),
+          options.serialize(formData),
           'Update from TinaCMS'
         )
         .then((response: { content: { sha: string } }) => {
           cms.alerts.success(
-            `Saved Successfully: Changes committed to ${getForkName()}`
+            `Saved Successfully: Changes committed to ${github.repoFullName}`
           )
           setSha(response.content.sha)
         })

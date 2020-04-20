@@ -16,26 +16,21 @@ limitations under the License.
 
 */
 
-import { Form, useCMS } from 'tinacms'
+import { useCMS } from 'tinacms'
 import { useEffect } from 'react'
-import { getForkName } from '../github-editing-context/repository'
-import { PRPlugin } from './pull-request'
-import { ForkNamePlugin } from './ForkNamePlugin'
+import { PullRequestToolbarWidget } from './pull-request'
+import { ForkNameToolbarWidget } from './ForkNamePlugin'
 import { Plugin } from 'tinacms'
+import { useGithubEditing } from '../github-editing-context'
 
-export const useGithubToolbarPlugins = (
-  form: Form<any>,
-  editMode: boolean,
-  baseRepo: string,
-  baseBranch: string = 'master'
-) => {
+export const useGithubToolbarPlugins = () => {
   const cms = useCMS()
+  const { editMode } = useGithubEditing()
 
   useEffect(() => {
-    const forkName = getForkName()
     const plugins = [
-      ForkNamePlugin(forkName || ''),
-      PRPlugin(baseRepo, forkName || '', baseBranch),
+      ForkNameToolbarWidget,
+      PullRequestToolbarWidget,
     ] as Plugin[]
 
     const removePlugins = () => {
@@ -49,5 +44,5 @@ export const useGithubToolbarPlugins = (
     }
 
     return removePlugins
-  }, [editMode, form])
+  }, [editMode])
 }
