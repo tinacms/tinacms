@@ -60,6 +60,7 @@ const YourLayout = ({ editMode, error, children }) => {
     <TinacmsGithubProvider
       clientId={process.env.GITHUB_CLIENT_ID}
       authCallbackRoute='/api/create-github-access-token'
+      editMode={editMode}
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}
       error={error}>
