@@ -18,5 +18,4 @@ limitations under the License.
 
 export * from './GithubAuthModal'
 export * from './TinacmsGithubProvider'
-export * from './repository'
 export * from './useGithubEditing'
