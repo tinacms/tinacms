@@ -22,7 +22,7 @@ import { Options } from 'next-tinacms-markdown'
 import { useCMS, useForm, usePlugin } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
 import { getForkName } from '../github-editing-context/repository'
-import { useGithubErrorListener } from 'errors'
+import { useGithubErrorListener } from './useGithubErrorListener'
 
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
