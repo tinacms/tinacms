@@ -154,10 +154,7 @@ The **Client Secret** will likely be used by your backend.
 Any forms that we have on our site can be created with the `useGithubJsonForm` or `useGithubMarkdownForm` helpers
 
 ```tsx
-function BlogTemplate({
-  jsonFile, // content for this page
-  sourceProviderConnection, // repository details
-}) {
+function BlogTemplate({ jsonFile }) {
   const formOptions = {
     label: 'Blog Post',
     fields: [],
