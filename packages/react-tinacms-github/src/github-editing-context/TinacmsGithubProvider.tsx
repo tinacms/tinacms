@@ -29,6 +29,7 @@ interface ProviderProps {
   children: any
   clientId: string
   authCallbackRoute: string
+  editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
   error?: any
@@ -41,6 +42,7 @@ interface AuthState {
 
 export const TinacmsGithubProvider = ({
   children,
+  editMode,
   enterEditMode,
   exitEditMode,
   authCallbackRoute,
@@ -77,6 +79,7 @@ export const TinacmsGithubProvider = ({
   return (
     <GithubEditingContext.Provider
       value={{
+        editMode,
         enterEditMode: tryEnterEditMode,
         exitEditMode,
         setError,

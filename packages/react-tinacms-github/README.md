@@ -55,7 +55,7 @@ const exitEditMode = () => {
   })
 }
 
-const YourLayout = ({ error, children }) => {
+const YourLayout = ({ editMode, error, children }) => {
   return (
     <TinacmsGithubProvider
       clientId={process.env.GITHUB_CLIENT_ID}
