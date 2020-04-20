@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Form, useCMS } from 'tinacms'
+import { useCMS } from 'tinacms'
 import { useEffect } from 'react'
 import { getForkName } from '../github-editing-context/repository'
 import { PRPlugin } from './pull-request'
@@ -24,7 +24,6 @@ import { ForkNamePlugin } from './ForkNamePlugin'
 import { Plugin } from 'tinacms'
 
 export const useGithubToolbarPlugins = (
-  form: Form<any>,
   editMode: boolean,
   baseRepo: string,
   baseBranch: string = 'master'
@@ -49,5 +48,5 @@ export const useGithubToolbarPlugins = (
     }
 
     return removePlugins
-  }, [editMode, form])
+  }, [editMode])
 }
