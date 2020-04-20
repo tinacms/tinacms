@@ -24,6 +24,7 @@ import { GithubClient } from '../github-client'
 export interface GithubFormOptions extends Partial<FormOptions<any>> {
   serialize: (data: any) => string
 }
+import { useGithubErrorListener } from './useGithubErrorListener'
 
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
@@ -60,6 +61,8 @@ export const useGithubFileForm = <T = any>(
   })
 
   usePlugin(form)
+
+  useGithubErrorListener(form)
 
   return [formData || file.data, form]
 }

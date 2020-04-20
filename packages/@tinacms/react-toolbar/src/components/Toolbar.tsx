@@ -51,11 +51,16 @@ export const Toolbar = () => {
 
   const forms = cms.plugins.getType<Form>('form')
   const form = forms.all().length ? forms.all()[0] : null
-  // TODO: This doesn't return the correct value initially
+
+  const currentState = form?.finalForm.getState()
+
   const formState = useFormState(form, {
     pristine: true,
     submitting: true,
   })
+
+  // this is used to refreshe the discard button to fix it not updating when pressed after the page loads
+  const [, setState] = React.useState(0)
 
   useSubscribable(forms)
   useSubscribable(widgets)
@@ -67,13 +72,23 @@ export const Toolbar = () => {
   //   return null
   // }
   // TODO: Form#reset should always exist
-  const reset = form && (form.reset || (() => form.finalForm.reset()))
+
+  const reset = () => {
+    if (form) {
+      form.reset()
+      setState(i => i++)
+    }
+  }
+
+  //const reset = form && (form.reset || (() => form.finalForm.reset()))
   const submit = form && form.submit
   const disabled = !form
 
   // TODO: There's got to be a better way to get formState
-  const pristine = disabled ? true : formState && formState.pristine
-  const submitting = disabled ? false : !!(formState && formState.submitting)
+  const pristine = disabled ? true : formState && currentState?.pristine
+  const submitting = disabled
+    ? false
+    : !!(formState && currentState?.submitting)
 
   return (
     <>
