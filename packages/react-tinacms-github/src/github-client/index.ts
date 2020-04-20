@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import { b64EncodeUnicode } from './base64'
+import { getForkName } from '../github-editing-context'
 
 export class GithubClient {
   proxy: string
@@ -71,6 +72,10 @@ export class GithubClient {
         base: this.baseBranch,
       },
     })
+  }
+
+  get repoFullName() {
+    return getForkName()
   }
 
   async fetchExistingPR(forkRepoFullName: string, headBranch: string) {
