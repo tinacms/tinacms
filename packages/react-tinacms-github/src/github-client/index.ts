@@ -129,11 +129,11 @@ export class GithubClient {
     // return // Bubble up error here?
   }
 
-  async save(
+  async commit(
     filePath: string,
     sha: string,
-    formData: string,
-    message: string = 'Update from TinaCMS'
+    fileContents: string,
+    commitMessage: string = 'Update from TinaCMS'
   ) {
     const repo = this.repoFullName
     const branch = this.branchName
@@ -142,8 +142,8 @@ export class GithubClient {
       url: `https://api.github.com/repos/${repo}/contents/${filePath}`,
       method: 'PUT',
       data: {
-        message,
-        content: b64EncodeUnicode(formData),
+        message: commitMessage,
+        content: b64EncodeUnicode(fileContents),
         sha,
         branch: branch,
       },
