@@ -58,7 +58,7 @@ export class GithubClient {
 
   createPR(title: string, body: string) {
     const forkRepoFullName = this.repoFullName
-    const headBranch: string = this.branchName
+    const headBranch = this.branchName
 
     return this.req({
       url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
@@ -80,7 +80,10 @@ export class GithubClient {
     return getHeadBranch()
   }
 
-  async fetchExistingPR(forkRepoFullName: string, headBranch: string) {
+  async fetchExistingPR() {
+    const forkRepoFullName = this.repoFullName
+    const headBranch = this.branchName
+
     const branches = await this.req({
       url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'GET',
