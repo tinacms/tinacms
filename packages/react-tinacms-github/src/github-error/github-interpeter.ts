@@ -16,10 +16,6 @@ limitations under the License.
 
 */
 
-import {
-  getForkName,
-  getHeadBranch,
-} from '../github-editing-context/repository'
 import { ActionableModalOptions } from '../components/ActionableModal'
 
 export const getModalProps = async (
@@ -50,7 +46,7 @@ export const getModalProps = async (
     }
     case 404: {
       // Not Found
-      if (await sourceProvider.getBranch(getForkName(), getHeadBranch())) {
+      if (await sourceProvider.getBranch()) {
         // drill down further in the future
         return {
           title: '404 Not Found',

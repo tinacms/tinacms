@@ -58,10 +58,8 @@ export const TinacmsGithubProvider = ({
 
   const tryEnterEditMode = async () => {
     const authenticated =
-      authorizingStatus?.authenticated || (await cms.api.github.getUser())
-    const forkValid =
-      authorizingStatus?.forkValid ||
-      (await cms.api.github.getBranch(github.repoFullName, github.branchName))
+      authorizingStatus?.authenticated || (await github.getUser())
+    const forkValid = authorizingStatus?.forkValid || (await github.getBranch())
 
     if (authenticated && forkValid) {
       enterEditMode()
