@@ -21,8 +21,8 @@ import { Input, TextArea } from '@tinacms/fields'
 import { ModalBody, ModalActions, FieldMeta, useCMS } from 'tinacms'
 import styled from 'styled-components'
 import React, { useEffect, useState } from 'react'
-import { getHeadBranch } from '../../github-editing-context/repository'
 import { AsyncButton } from '../../components/AsyncButton'
+import { GithubClient } from '../../github-client'
 
 interface Props {
   baseRepoFullName: string
@@ -38,13 +38,14 @@ export const PRModal = ({
   const [prError, setPrError] = useState('')
   const [fetchedPR, setFetchedPR] = useState<any>(undefined)
   const cms = useCMS()
+  const github: GithubClient = cms.api.github
 
   const titleInput = React.createRef() as any
   const bodyInput = React.createRef() as any
 
   const checkForPR = async () => {
     await cms.api.github
-      .fetchExistingPR(forkRepoFullName, getHeadBranch())
+      .fetchExistingPR(forkRepoFullName)
       .then((pull: any) => {
         if (pull) {
           setFetchedPR(pull)
@@ -61,7 +62,7 @@ export const PRModal = ({
     return cms.api.github
       .createPR(
         forkRepoFullName,
-        getHeadBranch(),
+        github.branchName,
         titleInput.current.value,
         bodyInput.current.value
       )
@@ -105,7 +106,7 @@ export const PRModal = ({
             <ModalDescription>
               Create a pull request from{' '}
               <b>
-                {forkRepoFullName} - {getHeadBranch()}
+                {forkRepoFullName} - {github.branchName}
               </b>{' '}
               into{' '}
               <b>
@@ -116,7 +117,7 @@ export const PRModal = ({
                 target="_blank"
                 href={`https://github.com/${baseRepoFullName}/compare/${baseBranch}...${
                   forkRepoFullName.split('/')[0]
-                }:${getHeadBranch()}`}
+                }:${github.branchName}`}
               >
                 View changes on GitHub
               </a>
@@ -134,7 +135,7 @@ export const PRModal = ({
           <ModalDescription>
             You've created a pull request from{' '}
             <b>
-              {forkRepoFullName} - {getHeadBranch()}
+              {forkRepoFullName} - {github.branchName}
             </b>{' '}
             into{' '}
             <b>
@@ -155,7 +156,7 @@ export const PRModal = ({
               // @ts-ignore
               href={`https://github.com/${baseRepoFullName}/compare/${baseBranch}...${
                 forkRepoFullName.split('/')[0]
-              }:${getHeadBranch()}`}
+              }:${github.branchName}`}
               target="_blank"
             >
               View Diff
