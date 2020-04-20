@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { Wysiwyg } from '../src/Wysiwyg'
+import { Wysiwyg } from '../src/core'
 
 const Basic = () => {
   const [value, setValue] = React.useState('')

@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import React, { useState, useRef, useEffect } from 'react'
-import { EditorView } from 'prosemirror-view'
 import debounce from 'lodash.debounce'
 import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
@@ -26,13 +25,11 @@ import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
 import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
+import { useEditorStateContext } from '../../../../core/context/editorState'
 
-interface FloatingImageMenu {
-  editorView: { view: EditorView }
-}
-
-export default (props: FloatingImageMenu) => {
-  const { view } = props.editorView
+export default () => {
+  const { editorView } = useEditorStateContext()
+  const view = editorView!.view
   const { selectedImage } = imagePluginKey.getState(view.state)
   if (!selectedImage) return null
   const { node, pos } = selectedImage

@@ -16,7 +16,20 @@ limitations under the License.
 
 */
 
-import { Translator } from '../../../Translator'
-import { createContext } from 'react'
+import matter from 'gray-matter'
 
-export const TranslatorContext = createContext<Translator | null>(null)
+export interface MarkdownData<Frontmatter> {
+  frontmatter: Frontmatter
+  markdownBody: string
+}
+
+export function parseMarkdown<Frontmatter>(
+  content: string
+): MarkdownData<Frontmatter> {
+  const { content: markdownBody, data: frontmatter } = matter(content)
+
+  return {
+    markdownBody,
+    frontmatter: frontmatter as Frontmatter,
+  }
+}

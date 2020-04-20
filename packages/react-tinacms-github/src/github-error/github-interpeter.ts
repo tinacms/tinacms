@@ -54,7 +54,7 @@ export const getModalProps = async (
         // drill down further in the future
         return {
           title: '404 Not Found',
-          message: 'Failed to get some content.',
+          message: 'Failed to fetch content.',
           actions: [
             {
               name: 'Continue',

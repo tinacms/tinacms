@@ -16,24 +16,13 @@ limitations under the License.
 
 */
 
-import { SourceProviderConnection } from './sourceProviderConnection'
-import getDecodedData from './getDecodedData'
+import { MarkdownTranslator, Format, DOMTranslator } from '../../Translator'
+import { Schema } from 'prosemirror-model'
 
-export const getJsonFile = async (
-  filePath: string,
-  sourceProviderConnection: SourceProviderConnection,
-  accessToken: string
+export const buildTranslator = (
+  schema: Schema,
+  format: Format = 'markdown'
 ) => {
-  const response = await getDecodedData(
-    sourceProviderConnection.forkFullName,
-    sourceProviderConnection.headBranch || 'master',
-    filePath,
-    accessToken
-  )
-
-  return {
-    sha: response.sha,
-    fileRelativePath: filePath,
-    data: JSON.parse(response.content),
-  }
+  if (format === 'html') return DOMTranslator.fromSchema(schema)
+  return MarkdownTranslator.fromSchema(schema)
 }

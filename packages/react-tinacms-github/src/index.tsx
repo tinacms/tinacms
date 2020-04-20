@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-export * from './errors'
 export * from './github-auth'
 export * from './github-error'
 export * from './github-editing-context'
