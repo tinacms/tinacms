@@ -59,7 +59,7 @@ export const Toolbar = () => {
     submitting: true,
   })
 
-  const [state, setState] = React.useState<any>()
+  const [, setState] = React.useState<any>()
 
   useSubscribable(forms)
   useSubscribable(widgets)
