@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import { setForkName } from './repository'
 import {
   useCMS,
   Modal,
@@ -82,8 +81,7 @@ const GithubAuthModal = ({
           name: 'Create Fork',
           action: async () => {
             try {
-              const full_name = (await cms.api.github.createFork()).full_name
-              setForkName(full_name)
+              await cms.api.github.createFork()
               onUpdateAuthState()
             } catch (e) {
               setError(
