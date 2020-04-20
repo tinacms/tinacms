@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { getHeadBranch } from './repository'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
 import GithubAuthModal from './GithubAuthModal'
@@ -62,7 +61,7 @@ export const TinacmsGithubProvider = ({
       authorizingStatus?.authenticated || (await cms.api.github.getUser())
     const forkValid =
       authorizingStatus?.forkValid ||
-      (await cms.api.github.getBranch(github.repoFullName, getHeadBranch()))
+      (await cms.api.github.getBranch(github.repoFullName, github.branchName))
 
     if (authenticated && forkValid) {
       enterEditMode()
