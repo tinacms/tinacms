@@ -41,9 +41,7 @@ export const useGithubFileForm = <T = any>(
     onSubmit(formData) {
       const github: GithubClient = cms.api.github
       return github
-        .save(
-          githubOptions.forkFullName,
-          githubOptions.branch,
+        .commit(
           file.fileRelativePath,
           getSha(),
           serialize(formData),
