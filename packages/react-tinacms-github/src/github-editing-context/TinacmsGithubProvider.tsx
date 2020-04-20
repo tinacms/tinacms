@@ -17,18 +17,19 @@ limitations under the License.
 */
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { getForkName, getHeadBranch } from './repository'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
 import GithubAuthModal from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
 import { authenticate as githubAuthenticate } from '../github-auth'
+import { GithubClient } from '../github-client'
 
 interface ProviderProps {
   children: any
   clientId: string
   authCallbackRoute: string
+  editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
   error?: any
@@ -41,6 +42,7 @@ interface AuthState {
 
 export const TinacmsGithubProvider = ({
   children,
+  editMode,
   enterEditMode,
   exitEditMode,
   authCallbackRoute,
@@ -49,16 +51,15 @@ export const TinacmsGithubProvider = ({
 }: ProviderProps) => {
   const [error, setError] = useState<any>(null)
   const cms = useCMS()
+  const github: GithubClient = cms.api.github
   const [authorizingStatus, setAuthorizingStatus] = useState<AuthState | null>(
     null
   )
 
   const tryEnterEditMode = async () => {
     const authenticated =
-      authorizingStatus?.authenticated || (await cms.api.github.getUser())
-    const forkValid =
-      authorizingStatus?.forkValid ||
-      (await cms.api.github.getBranch(getForkName(), getHeadBranch()))
+      authorizingStatus?.authenticated || (await github.getUser())
+    const forkValid = authorizingStatus?.forkValid || (await github.getBranch())
 
     if (authenticated && forkValid) {
       enterEditMode()
@@ -77,6 +78,7 @@ export const TinacmsGithubProvider = ({
   return (
     <GithubEditingContext.Provider
       value={{
+        editMode,
         enterEditMode: tryEnterEditMode,
         exitEditMode,
         setError,
