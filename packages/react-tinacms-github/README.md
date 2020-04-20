@@ -70,24 +70,6 @@ const YourLayout = ({ editMode, error, children }) => {
 }
 ```
 
-### Error Handling
-
-Add error handling to our forms which prompt Github-specific action when errors occur (e.g a fork no longer exists).
-
-```tsx
-// YourSiteForm.ts
-import { useGithubErrorListener } from 'react-tinacms-github'
-
-const YourSiteForm = ({ form, children }) => {
-  useGithubErrorListener(form)
-  return (
-    <FormLayout>
-      {children}
-    </FormLayout>
-  )
-}
-```
-
 ### Auth Redirects
 
 We will also need a few Github Specific pages to redirect the user to while authenticating with Github
