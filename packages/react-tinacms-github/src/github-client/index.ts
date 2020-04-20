@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { b64EncodeUnicode } from './base64'
-import { getForkName, getHeadBranch } from '../github-editing-context'
+import Cookies from 'js-cookie'
 
 export class GithubClient {
   proxy: string
@@ -73,7 +73,7 @@ export class GithubClient {
   }
 
   get repoFullName(): string {
-    const forkName = getForkName()
+    const forkName = getCookie(FORK_COOKIE_KEY)
 
     if (!forkName) {
       // TODO: Right now the client only works with forks. This should go away once it works with origin.
@@ -84,7 +84,7 @@ export class GithubClient {
   }
 
   get branchName() {
-    return getHeadBranch()
+    return getCookie(HEAD_BRANCH_COOKIE_KEY) || 'master'
   }
 
   async fetchExistingPR() {
@@ -186,3 +186,22 @@ class GithubError extends Error {
     this.status = status
   }
 }
+
+const FORK_COOKIE_KEY = 'fork_full_name'
+const HEAD_BRANCH_COOKIE_KEY = 'head_branch'
+
+// const setForkName = (val: string) => {
+//   setCookie(FORK_COOKIE_KEY, val)
+// }
+
+// const setHeadBranch = (val: string) => {
+//   setCookie(HEAD_BRANCH_COOKIE_KEY, val)
+// }
+
+const getCookie = (cookieName: string): string | undefined => {
+  return Cookies.get(cookieName)
+}
+
+// const setCookie = (cookieName: string, val: string) => {
+//   Cookies.set(cookieName, val, { sameSite: 'strict' })
+// }
