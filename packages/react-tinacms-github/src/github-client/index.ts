@@ -73,7 +73,14 @@ export class GithubClient {
   }
 
   get repoFullName(): string {
-    return getForkName() || this.baseRepoFullName
+    const forkName = getForkName()
+
+    if (!forkName) {
+      // TODO: Right now the client only works with forks. This should go away once it works with origin.
+      throw new Error('GithubClient cannot find name of fork')
+    }
+
+    return forkName
   }
 
   get branchName() {
