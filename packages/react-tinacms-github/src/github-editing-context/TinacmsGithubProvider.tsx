@@ -17,13 +17,14 @@ limitations under the License.
 */
 
 import React, { useState, useEffect, useCallback } from 'react'
-import { getForkName, getHeadBranch } from './repository'
+import { getHeadBranch } from './repository'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
 import GithubAuthModal from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
 import { authenticate as githubAuthenticate } from '../github-auth'
+import { GithubClient } from '../github-client'
 
 interface ProviderProps {
   children: any
@@ -51,6 +52,7 @@ export const TinacmsGithubProvider = ({
 }: ProviderProps) => {
   const [error, setError] = useState<any>(null)
   const cms = useCMS()
+  const github: GithubClient = cms.api.github
   const [authorizingStatus, setAuthorizingStatus] = useState<AuthState | null>(
     null
   )
@@ -60,7 +62,7 @@ export const TinacmsGithubProvider = ({
       authorizingStatus?.authenticated || (await cms.api.github.getUser())
     const forkValid =
       authorizingStatus?.forkValid ||
-      (await cms.api.github.getBranch(getForkName(), getHeadBranch()))
+      (await cms.api.github.getBranch(github.repoFullName, getHeadBranch()))
 
     if (authenticated && forkValid) {
       enterEditMode()
