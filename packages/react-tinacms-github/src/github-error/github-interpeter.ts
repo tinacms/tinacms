@@ -17,12 +17,13 @@ limitations under the License.
 */
 
 import { ActionableModalOptions } from '../components/ActionableModal'
+import { GithubClient } from '../github-client'
 
 export const getModalProps = async (
   error: any,
-  sourceProvider: any,
-  startEditing: any,
-  stopEditing: any
+  githubClient: GithubClient,
+  startEditing: () => void,
+  stopEditing: () => void
 ): Promise<ActionableModalOptions> => {
   const reauthenticateAction = {
     name: 'Continue',
@@ -46,7 +47,7 @@ export const getModalProps = async (
     }
     case 404: {
       // Not Found
-      if (await sourceProvider.getBranch()) {
+      if (await githubClient.getBranch()) {
         // drill down further in the future
         return {
           title: '404 Not Found',
