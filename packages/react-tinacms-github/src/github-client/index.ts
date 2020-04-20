@@ -74,8 +74,8 @@ export class GithubClient {
     })
   }
 
-  get repoFullName() {
-    return getForkName()
+  get repoFullName(): string {
+    return getForkName() || this.baseRepoFullName
   }
 
   get branchName() {
