@@ -28,14 +28,14 @@ import { useGithubEditing } from 'github-editing-context'
 export const useGithubToolbarPlugins = () => {
   const cms = useCMS()
   const { editMode } = useGithubEditing()
+  const github: GithubClient = cms.api.github
+  const baseRepo = github?.baseRepoFullName
+  const baseBranch = github?.baseBranch
 
   useEffect(() => {
-    const github: GithubClient = cms.api.github
-    if (!github) {
+    if (!baseRepo || !baseBranch) {
       // Warn dev appropriately
     }
-    const baseRepo = github.baseRepoFullName
-    const baseBranch = github.baseBranch
 
     const forkName = getForkName()
     const plugins = [
@@ -54,5 +54,5 @@ export const useGithubToolbarPlugins = () => {
     }
 
     return removePlugins
-  }, [editMode])
+  }, [editMode, baseRepo, baseBranch])
 }
