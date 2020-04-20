@@ -59,6 +59,8 @@ export const Toolbar = () => {
     submitting: true,
   })
 
+  const [state, setState] = React.useState<any>()
+
   useSubscribable(forms)
   useSubscribable(widgets)
 
@@ -77,7 +79,9 @@ export const Toolbar = () => {
       } else if (form.finalForm.reset) {
         form.finalForm.reset()
       }
+      setState(0)
     }
+
   }
 
   //const reset = form && (form.reset || (() => form.finalForm.reset()))
