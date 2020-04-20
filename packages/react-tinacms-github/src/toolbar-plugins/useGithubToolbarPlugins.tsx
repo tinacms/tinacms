@@ -21,16 +21,20 @@ import { useEffect } from 'react'
 import { getForkName } from '../github-editing-context/repository'
 import { PRPlugin } from './pull-request'
 import { ForkNamePlugin } from './ForkNamePlugin'
+import { GithubClient } from '../github-client'
 import { Plugin } from 'tinacms'
 
-export const useGithubToolbarPlugins = (
-  editMode: boolean,
-  baseRepo: string,
-  baseBranch: string = 'master'
-) => {
+export const useGithubToolbarPlugins = (editMode: boolean) => {
   const cms = useCMS()
 
   useEffect(() => {
+    const github: GithubClient = cms.api.github
+    if (!github) {
+      // Warn dev appropriately
+    }
+    const baseRepo = github.baseRepoFullName
+    const baseBranch = github.baseBranch
+
     const forkName = getForkName()
     const plugins = [
       ForkNamePlugin(forkName || ''),
