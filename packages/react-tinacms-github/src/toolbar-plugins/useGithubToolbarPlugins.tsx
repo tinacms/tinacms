@@ -18,7 +18,7 @@ limitations under the License.
 
 import { useCMS } from 'tinacms'
 import { useEffect } from 'react'
-import { PRPlugin } from './pull-request'
+import { PullRequestToolbarWidget } from './pull-request'
 import { ForkNamePlugin } from './ForkNamePlugin'
 import { GithubClient } from '../github-client'
 import { Plugin } from 'tinacms'
@@ -39,7 +39,7 @@ export const useGithubToolbarPlugins = () => {
 
     const plugins = [
       ForkNamePlugin(repo || ''),
-      PRPlugin(baseRepo, repo || '', baseBranch),
+      PullRequestToolbarWidget,
     ] as Plugin[]
 
     const removePlugins = () => {
