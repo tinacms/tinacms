@@ -30,11 +30,7 @@ interface Props {
   forkRepoFullName: string
 }
 
-export const PRModal = ({
-  forkRepoFullName,
-  baseRepoFullName,
-  baseBranch,
-}: Props) => {
+export const PRModal = ({}: Props) => {
   const [prError, setPrError] = useState('')
   const [fetchedPR, setFetchedPR] = useState<any>(undefined)
   const cms = useCMS()
@@ -45,7 +41,7 @@ export const PRModal = ({
 
   const checkForPR = async () => {
     await cms.api.github
-      .fetchExistingPR(forkRepoFullName)
+      .fetchExistingPR(github.repoFullName)
       .then((pull: any) => {
         if (pull) {
           setFetchedPR(pull)
@@ -61,7 +57,7 @@ export const PRModal = ({
   const createPR = () => {
     return cms.api.github
       .createPR(
-        forkRepoFullName,
+        github.repoFullName,
         github.branchName,
         titleInput.current.value,
         bodyInput.current.value
@@ -106,18 +102,18 @@ export const PRModal = ({
             <ModalDescription>
               Create a pull request from{' '}
               <b>
-                {forkRepoFullName} - {github.branchName}
+                {github.repoFullName} - {github.branchName}
               </b>{' '}
               into{' '}
               <b>
-                {baseRepoFullName} - {baseBranch}
+                {github.baseRepoFullName} - {github.baseBranch}
               </b>
               .{' '}
               <a
                 target="_blank"
-                href={`https://github.com/${baseRepoFullName}/compare/${baseBranch}...${
-                  forkRepoFullName.split('/')[0]
-                }:${github.branchName}`}
+                href={`https://github.com/${github.baseRepoFullName}/compare/${
+                  github.baseBranch
+                }...${github.repoFullName.split('/')[0]}:${github.branchName}`}
               >
                 View changes on GitHub
               </a>
@@ -135,11 +131,11 @@ export const PRModal = ({
           <ModalDescription>
             You've created a pull request from{' '}
             <b>
-              {forkRepoFullName} - {github.branchName}
+              {github.repoFullName} - {github.branchName}
             </b>{' '}
             into{' '}
             <b>
-              {baseRepoFullName} - {baseBranch}
+              {github.baseRepoFullName} - {github.baseBranch}
             </b>
             .
           </ModalDescription>
@@ -155,7 +151,7 @@ export const PRModal = ({
               as="a"
               // @ts-ignore
               href={`https://github.com/${baseRepoFullName}/compare/${baseBranch}...${
-                forkRepoFullName.split('/')[0]
+                github.repoFullName.split('/')[0]
               }:${github.branchName}`}
               target="_blank"
             >
