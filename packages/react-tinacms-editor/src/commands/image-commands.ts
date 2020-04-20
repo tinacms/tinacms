@@ -34,6 +34,23 @@ export function insertImage(
   return true
 }
 
+export function insertImageList(
+  state: EditorState,
+  dispatch: Dispatch | null,
+  imageSrc: string[]
+) {
+  if (dispatch) {
+    const nodeType = state.schema.nodes['image']
+    const { tr } = state
+    imageSrc.forEach(src => {
+      const image = nodeType.createAndFill({ src, alt: '', title: '' })
+      tr.replaceSelectionWith(image)
+    })
+    dispatch(tr.scrollIntoView())
+  }
+  return true
+}
+
 export function alignImage(
   state: EditorState,
   dispatch: Dispatch | null,

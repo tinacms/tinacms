@@ -26,7 +26,7 @@ import {
 } from './inline-json-form.rc'
 
 /**
- * inlineJsonForm
+ * @deprecated see `react-tinacms-inline` instead
  */
 export function inlineJsonForm(
   Component: FC<InlineJsonFormRenderProps>,
@@ -36,7 +36,7 @@ export function inlineJsonForm(
     return (
       <InlineJsonForm jsonFile={props.jsonFile} {...options}>
         {inlineProps => {
-          const combinedProps = {...props, ...inlineProps}
+          const combinedProps = { ...props, ...inlineProps }
           return <Component {...combinedProps} />
         }}
       </InlineJsonForm>

@@ -17,10 +17,9 @@ limitations under the License.
 */
 
 import React from 'react'
-import { TinaForm, Form } from 'tinacms'
+import { TinaForm, Form, usePlugin } from 'tinacms'
 import { FC } from 'react'
-import { JsonFile, Options } from './use-json-form'
-import { useLocalJsonForm } from './use-local-json-form'
+import { JsonFile, Options, useJsonForm } from './use-json-form'
 
 export interface InlineJsonFormProps extends Options {
   jsonFile: JsonFile
@@ -34,9 +33,13 @@ export interface InlineJsonFormRenderProps {
   setIsEditing(value: boolean): void
 }
 
+/**
+ * @deprecated `react-tinacms-inline` is correct approach to inline editing
+ */
 export const InlineJsonForm: FC<InlineJsonFormProps> = props => {
   const { children, jsonFile, ...options } = props
-  const [data, form] = useLocalJsonForm(jsonFile, options)
+  const [data, form] = useJsonForm(jsonFile, options)
+  usePlugin(form)
 
   return (
     <TinaForm form={form}>

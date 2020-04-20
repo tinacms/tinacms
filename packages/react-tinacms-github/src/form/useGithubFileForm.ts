@@ -19,9 +19,10 @@ limitations under the License.
 import { GitFile, useGitFileSha } from './useGitFileSha'
 import { GithubOptions } from './GithubOptions'
 import { Options } from 'next-tinacms-markdown'
-import { useCMS, useLocalForm } from 'tinacms'
+import { useCMS, useForm, usePlugin } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
 import { getForkName } from '../github-editing-context/repository'
+
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
   formOptions: Options,
@@ -31,7 +32,7 @@ export const useGithubFileForm = <T = any>(
   const cms = useCMS()
   const [getSha, setSha] = useGitFileSha(file)
 
-  const [formData, form] = useLocalForm({
+  const [formData, form] = useForm({
     id: file.fileRelativePath, // needs to be unique
     label: formOptions.label || file.fileRelativePath,
     initialValues: file.data,
@@ -58,6 +59,8 @@ export const useGithubFileForm = <T = any>(
         })
     },
   })
+
+  usePlugin(form)
 
   return [formData || file.data, form]
 }

@@ -17,77 +17,50 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { FunctionComponent, useRef, useState } from 'react'
 
-import { lift, wrapIn } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { blockTool } from './blockControl'
 import { Dismissible } from 'react-dismissible'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
+import { useEditorStateContext } from '../../../core/context/editorState'
 import { MenuButton, MenuButtonDropdown } from './MenuComponents'
 import styled, { css } from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'
 import { EditorView } from 'prosemirror-view'
 
-interface State {
-  active: boolean
-}
+export const FormattingDropdown: FunctionComponent = () => {
+  const [active, setActive] = useState(false)
+  const menuButtonRef = useRef()
+  const { editorView } = useEditorStateContext()
+  const view = editorView!.view
 
-export interface FormattingDropdownProps {
-  view: EditorView
-}
+  const toggle = () => setActive(!active)
 
-export class FormattingDropdown extends React.Component<
-  FormattingDropdownProps,
-  State
-> {
-  state = {
-    active: false,
-  }
-  menuButtonRef = React.createRef()
-  toggle = () => this.setState(({ active }) => ({ active: !active }))
-  blockQuote = () =>
-    wrapIn(this.props.view.state.schema.nodes.blockquote)(
-      this.props.view.state,
-      this.props.view.dispatch
-    )
-  lift = () => lift(this.props.view.state, this.props.view.dispatch)
-  render() {
-    const { view } = this.props
-    return (
-      <>
-        <MenuButton
-          ref={this.menuButtonRef}
-          data-tooltip={'Heading'}
-          onClick={this.toggle}
-          active={this.state.active}
-        >
-          <HeadingIcon />
-        </MenuButton>
-        <MenuButtonDropdown
-          triggerRef={this.menuButtonRef}
-          open={this.state.active}
-        >
-          <Dismissible
-            click
-            escape
-            disabled={!this.state.active}
-            onDismiss={() => {
-              this.toggle()
-            }}
-          >
-            <H1 view={view} onClick={this.toggle} />
-            <H2 view={view} onClick={this.toggle} />
-            <H3 view={view} onClick={this.toggle} />
-            <H4 view={view} onClick={this.toggle} />
-            <H5 view={view} onClick={this.toggle} />
-            <H6 view={view} onClick={this.toggle} />
-          </Dismissible>
-        </MenuButtonDropdown>
-      </>
-    )
-  }
+  return (
+    <>
+      <MenuButton
+        ref={menuButtonRef}
+        data-tooltip={'Heading'}
+        onClick={toggle}
+        active={active}
+      >
+        <HeadingIcon />
+      </MenuButton>
+      <MenuButtonDropdown triggerRef={menuButtonRef} open={active}>
+        <Dismissible click escape disabled={!active} onDismiss={toggle}>
+          <H1 view={view} onClick={toggle} />
+          <H2 view={view} onClick={toggle} />
+          <H3 view={view} onClick={toggle} />
+          <H4 view={view} onClick={toggle} />
+          <H5 view={view} onClick={toggle} />
+          <H6 view={view} onClick={toggle} />
+        </Dismissible>
+      </MenuButtonDropdown>
+    </>
+  )
 }
 
 function makeToggleHeader(level: number) {

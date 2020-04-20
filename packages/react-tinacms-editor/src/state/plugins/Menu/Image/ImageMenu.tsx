@@ -18,22 +18,22 @@ limitations under the License.
 
 import React, { useState, ChangeEvent } from 'react'
 import styled, { css } from 'styled-components'
-import { EditorView } from 'prosemirror-view'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
 import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
 import { insertImage } from '../../../../commands/image-commands'
 import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
 import { Dismissible } from 'react-dismissible'
+import { useEditorStateContext } from '../../../../core/context/editorState'
 
 interface ImageMenu {
-  editorView: { view: EditorView }
   uploadImages: (files: File[]) => Promise<string[]>
 }
 
-export default ({ editorView, uploadImages }: ImageMenu) => {
+export default ({ uploadImages }: ImageMenu) => {
   if (!uploadImages) return null
 
+  const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
@@ -50,6 +50,7 @@ export default ({ editorView, uploadImages }: ImageMenu) => {
   }
 
   const insertImageInEditor = () => {
+    if (!editorView) return
     const { state, dispatch } = editorView.view
     insertImage(state, dispatch, imageUrl)
     editorView.view.focus()

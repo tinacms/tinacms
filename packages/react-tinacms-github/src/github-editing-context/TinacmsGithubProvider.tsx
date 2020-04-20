@@ -16,17 +16,19 @@ limitations under the License.
 
 */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState, useEffect, useCallback } from 'react'
 import { getForkName, getHeadBranch } from './repository'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
 import GithubAuthModal from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
+import { authenticate as githubAuthenticate } from '../github-auth'
 
 interface ProviderProps {
   children: any
-  authenticate: () => Promise<void>
+  clientId: string
+  authCallbackRoute: string
   enterEditMode: () => void
   exitEditMode: () => void
   error?: any
@@ -41,7 +43,8 @@ export const TinacmsGithubProvider = ({
   children,
   enterEditMode,
   exitEditMode,
-  authenticate,
+  authCallbackRoute,
+  clientId,
   error: previewError,
 }: ProviderProps) => {
   const [error, setError] = useState<any>(null)
@@ -66,6 +69,10 @@ export const TinacmsGithubProvider = ({
       })
     }
   }
+
+  const authenticate = useCallback(() => {
+    return githubAuthenticate(clientId, authCallbackRoute)
+  }, [clientId, authCallbackRoute])
 
   return (
     <GithubEditingContext.Provider

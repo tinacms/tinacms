@@ -23,9 +23,9 @@ import {
   EditorState,
   Transaction,
 } from 'prosemirror-state'
-import { EditorView } from 'prosemirror-view'
+import { EditorView, DecorationSet, Decoration } from 'prosemirror-view'
 import { Slice } from 'prosemirror-model'
-import { insertImage } from '../../../commands'
+import { insertImageList } from '../../../commands'
 
 export const imagePluginKey = new PluginKey('image')
 
@@ -48,12 +48,12 @@ const insertImageFiles = (
     if (file.type.match('image.*')) files.push(file)
   }
   if (files.length) {
+    const { state, dispatch } = editorView
+    dispatch(state.tr.setMeta('loading_images', files.length))
     const uploadPromise = uploadImages(files)
     uploadPromise.then((urls = []) => {
-      urls.forEach(url => {
-        const { state, dispatch } = editorView
-        insertImage(state, dispatch, url)
-      })
+      dispatch(state.tr.setMeta('loading_images', 0))
+      insertImageList(state, dispatch, urls)
       editorView.focus()
     })
     return true
@@ -71,14 +71,40 @@ export const imagePlugin = (
       init: () => {
         return { selectedImage: undefined }
       },
-      apply(tr, prev) {
+      apply(tr, prev, _, newState) {
+        if (tr.getMeta('loading_images') > 0) {
+          const loadingImagesCount = tr.getMeta('loading_images')
+          const div = document.createElement('div')
+          for (let i = 0; i < loadingImagesCount; i++) {
+            const childElement = document.createElement('div')
+            childElement.classList.add('image_loading_indicator')
+            div.appendChild(childElement)
+          }
+          return {
+            ...prev,
+            deco: DecorationSet.create(newState.doc, [
+              Decoration.widget(newState.selection.$to.pos, div),
+            ]),
+          }
+        }
+        if (tr.getMeta('loading_images') === 0) {
+          return {
+            ...prev,
+            deco: undefined,
+          }
+        }
         if (prev && prev.selectedImage) {
           const { pos } = prev.selectedImage
-          if (!tr.doc.nodeAt(pos)) return {}
+          if (!tr.doc.nodeAt(pos))
+            return {
+              ...prev,
+              selectedImage: undefined,
+            }
         }
         const selectedImage = tr.getMeta('image_clicked')
-        if (selectedImage) return { selectedImage }
-        if (selectedImage === false) return { selectedImage: undefined }
+        if (selectedImage) return { ...prev, selectedImage }
+        if (selectedImage === false)
+          return { ...prev, selectedImage: undefined }
         return prev
       },
     },
