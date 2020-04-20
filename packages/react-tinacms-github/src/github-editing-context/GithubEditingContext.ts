@@ -19,6 +19,7 @@ limitations under the License.
 import React from 'react'
 
 export interface GithubEditingProps {
+  editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
   setError: (err: any) => void
