@@ -32,5 +32,8 @@ const serialize = (formData: any) => {
 }
 
 export function useGithubJsonForm(jsonFile: GitFile, formOptions: Options) {
-  return useGithubFileForm(jsonFile, formOptions, serialize)
+  return useGithubFileForm(jsonFile, {
+    ...formOptions,
+    serialize,
+  })
 }
