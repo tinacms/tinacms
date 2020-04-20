@@ -53,18 +53,22 @@ export class GithubClient {
     }
   }
 
-  createFork() {
-    return this.req({
+  async createFork() {
+    const fork = await this.req({
       url: `https://api.github.com/repos/${this.baseRepoFullName}/forks`,
       method: 'POST',
     })
+
+    this.setCookie(GithubClient.FORK_COOKIE_KEY, fork.full_name)
+
+    return fork
   }
 
-  async createPR(title: string, body: string) {
+  createPR(title: string, body: string) {
     const forkRepoFullName = this.repoFullName
     const headBranch = this.branchName
 
-    const pullRequest = await this.req({
+    return this.req({
       url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'POST',
       data: {
@@ -74,10 +78,6 @@ export class GithubClient {
         base: this.baseBranch,
       },
     })
-
-    this.setCookie(GithubClient.FORK_COOKIE_KEY, pullRequest.full_name)
-
-    return pullRequest
   }
 
   get repoFullName(): string {
