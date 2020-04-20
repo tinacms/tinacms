@@ -20,9 +20,13 @@ import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
 
 export class GithubClient {
+  static FORK_COOKIE_KEY = 'fork_full_name'
+  static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
+
   proxy: string
   baseRepoFullName: string
   baseBranch: string
+
   constructor(
     proxy: string,
     baseRepoFullName: string,
@@ -71,13 +75,13 @@ export class GithubClient {
       },
     })
 
-    setCookie(FORK_COOKIE_KEY, pullRequest.full_name)
+    this.setCookie(GithubClient.FORK_COOKIE_KEY, pullRequest.full_name)
 
     return pullRequest
   }
 
   get repoFullName(): string {
-    const forkName = getCookie(FORK_COOKIE_KEY)
+    const forkName = this.getCookie(GithubClient.FORK_COOKIE_KEY)
 
     if (!forkName) {
       // TODO: Right now the client only works with forks. This should go away once it works with origin.
@@ -88,7 +92,7 @@ export class GithubClient {
   }
 
   get branchName() {
-    return getCookie(HEAD_BRANCH_COOKIE_KEY) || 'master'
+    return this.getCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY) || 'master'
   }
 
   async fetchExistingPR() {
@@ -174,11 +178,22 @@ export class GithubClient {
     throw new GithubError(response.statusText, response.status)
   }
 
+  /**
+   * The methods below maybe don't belong on GitHub client, but it's fine for now.
+   */
   private proxyRequest(data: any) {
     return fetch(this.proxy, {
       method: 'POST',
       body: JSON.stringify(data),
     })
+  }
+
+  private getCookie(cookieName: string): string | undefined {
+    return Cookies.get(cookieName)
+  }
+
+  private setCookie(cookieName: string, val: string) {
+    Cookies.set(cookieName, val, { sameSite: 'strict' })
   }
 }
 
@@ -189,15 +204,4 @@ class GithubError extends Error {
     this.message = message
     this.status = status
   }
-}
-
-const FORK_COOKIE_KEY = 'fork_full_name'
-const HEAD_BRANCH_COOKIE_KEY = 'head_branch'
-
-const getCookie = (cookieName: string): string | undefined => {
-  return Cookies.get(cookieName)
-}
-
-const setCookie = (cookieName: string, val: string) => {
-  Cookies.set(cookieName, val, { sameSite: 'strict' })
 }
