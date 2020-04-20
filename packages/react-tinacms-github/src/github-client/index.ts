@@ -104,8 +104,11 @@ export class GithubClient {
     return
   }
 
-  async getBranch(repoFullName: string, branch: string) {
+  async getBranch() {
     try {
+      const repoFullName = this.repoFullName
+      const branch = this.branchName
+
       const data = await this.req({
         url: `https://api.github.com/repos/${repoFullName}/git/ref/heads/${branch}`,
         method: 'GET',
