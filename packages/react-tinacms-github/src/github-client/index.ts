@@ -56,11 +56,11 @@ export class GithubClient {
     })
   }
 
-  createPR(title: string, body: string) {
+  async createPR(title: string, body: string) {
     const forkRepoFullName = this.repoFullName
     const headBranch = this.branchName
 
-    return this.req({
+    const pullRequest = await this.req({
       url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'POST',
       data: {
@@ -70,6 +70,10 @@ export class GithubClient {
         base: this.baseBranch,
       },
     })
+
+    setCookie(FORK_COOKIE_KEY, pullRequest.full_name)
+
+    return pullRequest
   }
 
   get repoFullName(): string {
@@ -190,18 +194,10 @@ class GithubError extends Error {
 const FORK_COOKIE_KEY = 'fork_full_name'
 const HEAD_BRANCH_COOKIE_KEY = 'head_branch'
 
-// const setForkName = (val: string) => {
-//   setCookie(FORK_COOKIE_KEY, val)
-// }
-
-// const setHeadBranch = (val: string) => {
-//   setCookie(HEAD_BRANCH_COOKIE_KEY, val)
-// }
-
 const getCookie = (cookieName: string): string | undefined => {
   return Cookies.get(cookieName)
 }
 
-// const setCookie = (cookieName: string, val: string) => {
-//   Cookies.set(cookieName, val, { sameSite: 'strict' })
-// }
+const setCookie = (cookieName: string, val: string) => {
+  Cookies.set(cookieName, val, { sameSite: 'strict' })
+}
