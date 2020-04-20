@@ -40,7 +40,7 @@ export const useGithubFileForm = <T = any>(
     // save & commit the file when the "save" button is pressed
     onSubmit(formData) {
       const github: GithubClient = cms.api.github
-      return cms.api.github
+      return github
         .save(
           githubOptions.forkFullName,
           githubOptions.branch,
