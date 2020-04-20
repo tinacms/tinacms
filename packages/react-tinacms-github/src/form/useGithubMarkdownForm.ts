@@ -18,7 +18,6 @@ limitations under the License.
 
 import { FormOptions, Field } from 'tinacms'
 import { GitFile } from './useGitFileSha'
-import { GithubOptions } from './GithubOptions'
 import { toMarkdownString } from 'next-tinacms-markdown'
 import { useGithubFileForm } from './useGithubFileForm'
 interface Options {
@@ -30,13 +29,7 @@ interface Options {
 
 export function useGithubMarkdownForm(
   markdownFile: GitFile,
-  formOptions: Options,
-  githubOptions: GithubOptions
+  formOptions: Options
 ) {
-  return useGithubFileForm(
-    markdownFile,
-    formOptions,
-    githubOptions,
-    toMarkdownString
-  )
+  return useGithubFileForm(markdownFile, formOptions, toMarkdownString)
 }
