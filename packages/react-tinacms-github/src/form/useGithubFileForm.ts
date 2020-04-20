@@ -21,7 +21,7 @@ import { GithubOptions } from './GithubOptions'
 import { Options } from 'next-tinacms-markdown'
 import { useCMS, useForm, usePlugin } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
-import { getForkName } from '../github-editing-context/repository'
+import { GithubClient } from '../github-client'
 
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
@@ -39,6 +39,7 @@ export const useGithubFileForm = <T = any>(
     fields: formOptions.fields || [],
     // save & commit the file when the "save" button is pressed
     onSubmit(formData) {
+      const github: GithubClient = cms.api.github
       return cms.api.github
         .save(
           githubOptions.forkFullName,
@@ -50,7 +51,7 @@ export const useGithubFileForm = <T = any>(
         )
         .then((response: { content: { sha: string } }) => {
           cms.alerts.success(
-            `Saved Successfully: Changes committed to ${getForkName()}`
+            `Saved Successfully: Changes committed to ${github.repoFullName}`
           )
           setSha(response.content.sha)
         })
