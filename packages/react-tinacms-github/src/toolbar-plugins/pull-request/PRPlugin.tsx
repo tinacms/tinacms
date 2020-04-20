@@ -24,33 +24,14 @@ import { PRModal } from './PRModal'
 import { ToolbarButton } from '../../components/ToolbarButton'
 import { DesktopLabel } from '../../components/DesktopLabel'
 
-interface PullRequestButtonOptions {
-  baseRepoFullName: string
-  forkRepoFullName: string
-  baseBranch: string
-}
-
-export const PRPlugin = (
-  baseRepoFullName: string,
-  forkRepoFullName: string,
-  baseBranch: string
-) => ({
+export const PullRequestToolbarWidget = {
   __type: 'toolbar:widget',
   name: 'create-pr',
   weight: 5,
   component: PullRequestButton,
-  props: {
-    baseRepoFullName,
-    forkRepoFullName,
-    baseBranch,
-  },
-})
+}
 
-function PullRequestButton({
-  baseRepoFullName,
-  forkRepoFullName,
-  baseBranch,
-}: PullRequestButtonOptions) {
+function PullRequestButton() {
   const [opened, setOpened] = useState(false)
   const close = () => setOpened(false)
   return (
@@ -64,11 +45,7 @@ function PullRequestButton({
           <ModalPopup>
             <ModalHeader close={close}>Pull Request</ModalHeader>
             <ModalBody>
-              <PRModal
-                baseRepoFullName={baseRepoFullName}
-                baseBranch={baseBranch}
-                forkRepoFullName={forkRepoFullName}
-              />
+              <PRModal />
             </ModalBody>
           </ModalPopup>
         </Modal>

@@ -16,17 +16,10 @@ limitations under the License.
 
 */
 
-import { FieldMeta } from 'tinacms'
+import { FieldMeta, useCMS } from 'tinacms'
 import styled from 'styled-components'
 import React from 'react'
-
-export const ForkNamePlugin = (forkName: string) => ({
-  __type: 'toolbar:widget',
-  name: 'current-fork',
-  weight: 1,
-  props: { forkName },
-  component: ForkInfo,
-})
+import { GithubClient } from '../github-client'
 
 const MetaLink = styled.a`
   display: block;
@@ -37,12 +30,24 @@ const MetaLink = styled.a`
   color: var(--tina-color-primary-dark);
 `
 
-const ForkInfo = ({ forkName }: { forkName: string }) => {
+const ForkInfo = () => {
+  const cms = useCMS()
+  const github: GithubClient = cms.api.github
   return (
     <FieldMeta name={'Fork'}>
-      <MetaLink target="_blank" href={`https://github.com/${forkName}`}>
-        {forkName}
+      <MetaLink
+        target="_blank"
+        href={`https://github.com/${github.repoFullName}`}
+      >
+        {github.repoFullName}
       </MetaLink>
     </FieldMeta>
   )
+}
+
+export const ForkNameToolbarWidget = {
+  __type: 'toolbar:widget',
+  name: 'current-fork',
+  weight: 1,
+  component: ForkInfo,
 }

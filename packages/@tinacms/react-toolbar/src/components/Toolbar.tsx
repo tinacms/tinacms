@@ -59,7 +59,7 @@ export const Toolbar = () => {
     submitting: true,
   })
 
-  // this is used to refreshe the discard button to fix it not updating when pressed after the page loads 
+  // this is used to refreshe the discard button to fix it not updating when pressed after the page loads
   const [, setState] = React.useState(0)
 
   useSubscribable(forms)
@@ -76,7 +76,7 @@ export const Toolbar = () => {
   const reset = () => {
     if (form) {
       form.reset()
-      setState(i => i++) 
+      setState(i => i++)
     }
   }
 

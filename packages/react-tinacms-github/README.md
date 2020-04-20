@@ -55,11 +55,12 @@ const exitEditMode = () => {
   })
 }
 
-const YourLayout = ({ error, children }) => {
+const YourLayout = ({ editMode, error, children }) => {
   return (
     <TinacmsGithubProvider
       clientId={process.env.GITHUB_CLIENT_ID}
       authCallbackRoute='/api/create-github-access-token'
+      editMode={editMode}
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}
       error={error}>
@@ -135,21 +136,14 @@ The **Client Secret** will likely be used by your backend.
 Any forms that we have on our site can be created with the `useGithubJsonForm` or `useGithubMarkdownForm` helpers
 
 ```tsx
-function BlogTemplate({
-  jsonFile, // content for this page
-  sourceProviderConnection, // repository details
-}) {
+function BlogTemplate({ jsonFile }) {
   const formOptions = {
     label: 'Blog Post',
     fields: [],
   }
 
   // Registers a JSON Tina Form
-  const [data, form] = useGithubJsonForm(
-    jsonFile,
-    formOptions,
-    sourceProviderConnection
-  )
+  const [data, form] = useGithubJsonForm(jsonFile, formOptions)
 
   // ...
 }
