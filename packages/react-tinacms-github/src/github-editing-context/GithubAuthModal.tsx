@@ -87,11 +87,10 @@ const GithubAuthModal = ({
               onUpdateAuthState()
             } catch (e) {
               setError(
-                'Forking repository failed. Are you sure you have access?'
+                'Forking repository failed. Are you sure the repository is public?'
               )
               throw e
             }
-
           },
           primary: true,
         },
