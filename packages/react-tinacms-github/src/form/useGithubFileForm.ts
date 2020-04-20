@@ -17,24 +17,26 @@ limitations under the License.
 */
 
 import { GitFile, useGitFileSha } from './useGitFileSha'
-import { Options } from 'next-tinacms-markdown'
-import { useCMS, useForm, usePlugin } from 'tinacms'
+import { useCMS, useForm, usePlugin, FormOptions } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
 import { GithubClient } from '../github-client'
 
+export interface GithubFormOptions extends Partial<FormOptions<any>> {
+  serialize: (data: any) => string
+}
+
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
-  formOptions: Options,
-  serialize: (data: T) => string
+  options: GithubFormOptions
 ) => {
   const cms = useCMS()
   const [getSha, setSha] = useGitFileSha(file)
 
   const [formData, form] = useForm({
     id: file.fileRelativePath, // needs to be unique
-    label: formOptions.label || file.fileRelativePath,
+    label: options.label || file.fileRelativePath,
     initialValues: file.data,
-    fields: formOptions.fields || [],
+    fields: options.fields || [],
     // save & commit the file when the "save" button is pressed
     onSubmit(formData) {
       const github: GithubClient = cms.api.github
@@ -42,7 +44,7 @@ export const useGithubFileForm = <T = any>(
         .commit(
           file.fileRelativePath,
           getSha(),
-          serialize(formData),
+          options.serialize(formData),
           'Update from TinaCMS'
         )
         .then((response: { content: { sha: string } }) => {
