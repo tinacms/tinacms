@@ -27,7 +27,8 @@ import {
 } from 'tinacms'
 import { TinaReset } from '@tinacms/styles'
 import { AsyncButton } from '../components/AsyncButton'
-import React from 'react'
+import React, { useState, useEffect } from 'react'
+import styled from 'styled-components'
 
 const GithubAuthModal = ({
   onUpdateAuthState,
@@ -38,6 +39,15 @@ const GithubAuthModal = ({
   let modalProps
 
   const cms = useCMS()
+
+  const [error, setError] = useState<string | undefined>()
+
+  useEffect(() => {
+    //clear error when authState changes
+    if (error) {
+      setError(undefined)
+    }
+  }, [authState])
 
   if (!authState.authenticated) {
     modalProps = {
@@ -71,9 +81,16 @@ const GithubAuthModal = ({
         {
           name: 'Create Fork',
           action: async () => {
-            const { full_name } = await cms.api.github.createFork()
-            setForkName(full_name)
-            onUpdateAuthState()
+            try {
+              const full_name = (await cms.api.github.createFork()).full_name
+              setForkName(full_name)
+              onUpdateAuthState()
+            } catch (e) {
+              setError(
+                'Forking repository failed. Are you sure the repository is public?'
+              )
+              throw e
+            }
           },
           primary: true,
         },
@@ -90,6 +107,7 @@ const GithubAuthModal = ({
           <ModalHeader close={close}>{modalProps.title}</ModalHeader>
           <ModalBody padded>
             <p>{modalProps.message}</p>
+            {error && <ErrorLabel>{error}</ErrorLabel>}
           </ModalBody>
           <ModalActions>
             {modalProps.actions.map((action: any) => (
@@ -101,5 +119,9 @@ const GithubAuthModal = ({
     </TinaReset>
   )
 }
+
+export const ErrorLabel = styled.p`
+  color: var(--tina-color-error) !important;
+`
 
 export default GithubAuthModal
