@@ -32,7 +32,10 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
   return (
     <>
-      <MoreActionsButton onClick={() => setActionMenuVisibility(p => !p)} />
+      <MoreActionsButton
+        open={actionMenuVisibility}
+        onClick={() => setActionMenuVisibility(p => !p)}
+      />
       <ActionsOverlay open={actionMenuVisibility}>
         <Dismissible
           click
@@ -69,15 +72,35 @@ const MoreActionsButton = styled(p => (
   margin: 0 -12px 0 12px;
   outline: none;
   cursor: pointer;
-  transition: opacity 85ms ease-out;
+  transition: all 150ms ease-out;
   display: flex;
   justify-content: center;
   align-items: center;
   border-left: 1px solid var(--tina-color-grey-2);
   &:hover {
     background-color: var(--tina-color-grey-1);
-    fill: var(--tina-color-grey-8);
+    svg {
+      fill: var(--tina-color-primary);
+    }
   }
+  svg {
+    transition: all 150ms ease-out;
+  }
+
+  ${props =>
+    props.open &&
+    css`
+      background-color: var(--tina-color-grey-1);
+      box-shadow: inset 0px 2px 3px rgba(0, 0, 0, 0.06);
+      svg {
+        fill: var(--tina-color-primary);
+      }
+      &:hover {
+        svg {
+          fill: var(--tina-color-primary);
+        }
+      }
+    `};
 `
 
 const ActionsOverlay = styled.div<{ open: boolean }>`
@@ -91,7 +114,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
-  transition: all 85ms ease-out;
+  transition: all 150ms ease-out;
   transform-origin: 100% 0%;
   box-shadow: var(--tina-shadow-big);
   background-color: white;
@@ -118,7 +141,7 @@ export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   cursor: pointer;
   outline: none;
   border: 0;
-  transition: all 85ms ease-out;
+  transition: all 150ms ease-out;
   &:hover {
     color: var(--tina-color-primary);
     background-color: var(--tina-color-grey-1);
