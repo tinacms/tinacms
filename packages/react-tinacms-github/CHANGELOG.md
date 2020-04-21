@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-canary3.1](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.1.0-canary3.0...react-tinacms-github@0.1.0-canary3.1) (2020-04-21)
+
+
+### Bug Fixes
+
+* **Github:** fix incorrect property access in PRModal ([790f541](https://github.com/tinacms/tinacms/commit/790f541))
+
+
+
+
+
 # [0.1.0-canary3.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.0.1-canary3.1...react-tinacms-github@0.1.0-canary3.0) (2020-04-20)
 
 
