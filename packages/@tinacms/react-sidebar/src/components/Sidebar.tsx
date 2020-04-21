@@ -436,7 +436,7 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   padding: 0 !important;
   border: 0 !important;
   box-sizing: border-box;
-  z-index: var(--tina-z-index-2);
+  z-index: var(--tina-z-index-3);
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
   transform: translate3d(
     ${p => (p.open ? '0' : 'calc(var(--tina-sidebar-width) * -1)')},
