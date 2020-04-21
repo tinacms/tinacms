@@ -48,11 +48,11 @@ const GithubAuthModal = ({
     }
   }, [authState])
 
-  if (!cms.api.github.baseRepoFullName) {
+  if (!cms.api.github.baseRepoFullName || !authState.clientId) {
     modalProps = {
       title: 'GitHub Configuration Incomplete',
       message:
-        'The TinaCMS GitHub client was not configured completely. Please  make sure the REPO_FULL_NAME environment variable is set. For more information visit the docs.',
+        'The TinaCMS GitHub client was not configured completely. Please make sure the GITHUB_CLIENT_ID and REPO_FULL_NAME environment variables are set. For more information visit the docs.',
       actions: [
         {
           name: 'Cancel',
@@ -74,7 +74,7 @@ const GithubAuthModal = ({
     modalProps = {
       title: 'GitHub Authorization',
       message:
-        'To save edits, Tina requires GitHub authorization. On save, changes will get commited to GitHub using your account.',
+        'To save edits, Tina requires GitHub authorization. On save, changes will get committed to GitHub using your account.',
       actions: [
         {
           name: 'Cancel',

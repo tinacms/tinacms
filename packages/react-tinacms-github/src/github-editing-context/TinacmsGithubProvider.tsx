@@ -38,6 +38,7 @@ interface ProviderProps {
 interface AuthState {
   authenticated: true
   forkValid: true
+  clientId: string
 }
 
 export const TinacmsGithubProvider = ({
@@ -67,6 +68,7 @@ export const TinacmsGithubProvider = ({
       setAuthorizingStatus({
         authenticated,
         forkValid,
+        clientId,
       })
     }
   }
