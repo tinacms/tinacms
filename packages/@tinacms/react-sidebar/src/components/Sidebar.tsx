@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { keyframes, css, createGlobalStyle } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from './SidebarBody'
 import {
   HamburgerIcon,
@@ -83,7 +83,6 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
 
   return (
     <>
-      <SidebarGlobalStyles />
       <SidebarContainer open={sidebar.isOpen}>
         <SidebarWrapper open={sidebar.isOpen}>
           <SidebarHeader>
@@ -134,13 +133,6 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
     </>
   )
 }
-
-const SidebarGlobalStyles = createGlobalStyle`
-  :root {
-    --tina-sidebar-width: 340px;
-    --tina-sidebar-header-height: 60px;
-  }
-`
 
 const SiteWrapper = styled.div<{ open: boolean }>`
   padding-left: ${props => (props.open ? 'var(--tina-sidebar-width)' : '0')};
