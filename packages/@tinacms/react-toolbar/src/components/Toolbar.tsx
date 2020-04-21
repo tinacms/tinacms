@@ -29,6 +29,7 @@ import { ToolbarButton } from './ToolbarButton'
 import { ResetIcon, HamburgerIcon, TinaIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
 import { LoadingDots } from '@tinacms/react-forms'
+import { FormActionMenu } from './FormActions'
 
 const useFormState = (form: Form | null, subscription: any): any => {
   const [state, setState] = React.useState<any>()
@@ -156,6 +157,7 @@ export const Toolbar = () => {
                 </>
               )}
             </SaveButton>
+            {form && <FormActionMenu actions={form.actions} form={form} />}
           </Actions>
         </AlignRight>
       </StyledToolbar>
@@ -221,7 +223,7 @@ const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
   top: 0;
   left: ${p => (p.menuIsOpen ? 'var(--tina-sidebar-width)' : '0')};
   right: 0;
-  padding: 0 0.75rem;
+  padding: 0 12px;
   height: 62px;
   z-index: var(--tina-z-index-3);
   box-sizing: border-box;
@@ -242,7 +244,7 @@ const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
 `
 
 const SaveButton = styled(ToolbarButton)`
-  padding: 0 2rem;
+  padding: 0 32px;
 `
 
 const WidgetsContainer = styled.div`
@@ -250,18 +252,18 @@ const WidgetsContainer = styled.div`
   display: flex;
   align-items: center;
   justify-self: end;
-  padding-right: 0.75rem;
+  padding-right: 12px;
   border-right: 1px solid white;
   box-shadow: inset -1px 0 0 #e1ddec;
   background-image: linear-gradient(
     to left,
     rgba(0, 0, 0, 0.01),
-    transparent 3rem
+    transparent 48px
   );
 
   > * {
     margin-bottom: 0;
-    margin-left: 1rem;
+    margin-left: 16px;
   }
 
   > div {
@@ -313,7 +315,7 @@ const Actions = styled.div`
   align-items: center;
 
   ${Button} {
-    margin-left: 0.75rem;
+    margin-left: 12px;
   }
 `
 
@@ -361,7 +363,7 @@ const StatusMessage = styled.p`
 
 const MenuToggle = styled(Button)<{ open: boolean }>`
   position: relative;
-  margin-left: -0.75rem;
+  margin-left: -12px;
   border-top-left-radius: 0;
   border-bottom-left-radius: 0;
   margin-right: 0.5rem;
