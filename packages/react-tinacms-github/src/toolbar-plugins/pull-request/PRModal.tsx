@@ -139,9 +139,9 @@ export const PRModal = () => {
             <TinaButton
               as="a"
               // @ts-ignore
-              href={`https://github.com/${baseRepoFullName}/compare/${baseBranch}...${
-                github.repoFullName.split('/')[0]
-              }:${github.branchName}`}
+              href={`https://github.com/${github.baseRepoFullName}/compare/${
+                github.baseBranch
+              }...${github.repoFullName.split('/')[0]}:${github.branchName}`}
               target="_blank"
             >
               View Diff
