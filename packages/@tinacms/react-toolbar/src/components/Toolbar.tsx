@@ -72,7 +72,7 @@ export const Toolbar = () => {
   const [activeScreen, setActiveView] = React.useState<ScreenPlugin | null>(
     null
   )
-  const [menuIsVisible, setMenuVisibility] = React.useState(false)
+  const [menuIsOpen, setMenuIsOpen] = React.useState(false)
 
   useSubscribable(forms)
   useSubscribable(widgets)
@@ -105,12 +105,12 @@ export const Toolbar = () => {
   return (
     <>
       <ToolbarPlaceholder />
-      <StyledToolbar menuIsVisible={menuIsVisible}>
+      <StyledToolbar menuIsOpen={menuIsOpen}>
         <AlignLeft>
           {showMenu && (
             <MenuToggle
-              onClick={() => setMenuVisibility(!menuIsVisible)}
-              open={menuIsVisible}
+              onClick={() => setMenuIsOpen(!menuIsOpen)}
+              open={menuIsOpen}
             >
               <HamburgerIcon />
             </MenuToggle>
@@ -160,7 +160,7 @@ export const Toolbar = () => {
         </AlignRight>
       </StyledToolbar>
       {showMenu && (
-        <MenuPanel visible={menuIsVisible}>
+        <MenuPanel visible={menuIsOpen}>
           <MenuWrapper>
             <MenuList>
               {allScreens.map(view => {
@@ -171,7 +171,7 @@ export const Toolbar = () => {
                     value={view.name}
                     onClick={() => {
                       setActiveView(view)
-                      setMenuVisibility(false)
+                      setMenuIsOpen(false)
                     }}
                   >
                     <Icon /> {view.name}
@@ -213,13 +213,13 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
   )
 }
 
-const StyledToolbar = styled.div<{ menuIsVisible: boolean }>`
+const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
   ${TinaResetStyles}
 
   font-family: 'Inter', sans-serif;
   position: fixed;
   top: 0;
-  left: ${p => (p.menuIsVisible ? 'var(--tina-sidebar-width)' : '0')};
+  left: ${p => (p.menuIsOpen ? 'var(--tina-sidebar-width)' : '0')};
   right: 0;
   padding: 0 0.75rem;
   height: 62px;
