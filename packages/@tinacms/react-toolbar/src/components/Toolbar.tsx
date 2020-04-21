@@ -30,7 +30,6 @@ import { ResetIcon, HamburgerIcon, TinaIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
 import { LoadingDots } from '@tinacms/react-forms'
 import { FormActionMenu } from './FormActions'
-import { ExitAction } from './ExitAction'
 
 const useFormState = (form: Form | null, subscription: any): any => {
   const [state, setState] = React.useState<any>()
@@ -62,12 +61,6 @@ export const Toolbar = () => {
     pristine: true,
     submitting: true,
   })
-
-  React.useEffect(() => {
-    if (form) {
-      form.actions.push(ExitAction)
-    }
-  }, [form])
 
   // this is used to refreshe the discard button to fix it not updating when pressed after the page loads
   const [, setState] = React.useState(0)
