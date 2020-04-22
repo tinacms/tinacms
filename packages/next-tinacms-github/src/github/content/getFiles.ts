@@ -17,20 +17,20 @@ limitations under the License.
 */
 
 import { getContent } from './getContent'
-import { SourceProviderConnection } from './sourceProviderConnection'
 import { GithubError } from './GithubError'
 
 export const getFiles = async (
   filePath: string,
-  sourceProviderConnection: SourceProviderConnection,
+  repoFullName: string,
+  branch: string,
   accessToken: string
 ) => {
   let data
 
   try {
     ;({ data } = await getContent(
-      sourceProviderConnection.forkFullName,
-      sourceProviderConnection.headBranch || 'master',
+      repoFullName,
+      branch || 'master',
       filePath,
       accessToken
     ))
