@@ -53,8 +53,7 @@ export class GithubClient {
     this.authCallbackRoute = authCallbackRoute
   }
 
-  // @ts-ignore
-  authenticate(clientId: string, codeExchangeRoute: string) {
+  authenticate() {
     return authenticate(this.clientId, this.authCallbackRoute)
   }
 
