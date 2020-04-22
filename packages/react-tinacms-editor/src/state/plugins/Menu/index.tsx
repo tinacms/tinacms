@@ -56,7 +56,7 @@ import {
 import { isMarkPresent } from '../../../utils'
 import ImageMenu from './Image/ImageMenu'
 import ImageLoaders from './Image/ImageLoaders'
-import { useEditorStateContext } from '../../../core/context/editorState'
+import { useEditorStateContext } from '../../../context/editorState'
 
 interface Props {
   bottom?: boolean
