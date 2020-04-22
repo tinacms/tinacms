@@ -21,6 +21,12 @@ import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
 export * from './authenticate'
 
+export interface GithubClientOptions {
+  proxy: string
+  baseRepoFullName: string
+  baseBranch?: string
+}
+
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
@@ -29,11 +35,11 @@ export class GithubClient {
   baseRepoFullName: string
   baseBranch: string
 
-  constructor(
-    proxy: string,
-    baseRepoFullName: string,
-    baseBranch: string = 'master'
-  ) {
+  constructor({
+    proxy,
+    baseRepoFullName,
+    baseBranch = 'master',
+  }: GithubClientOptions) {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
     this.baseBranch = baseBranch
