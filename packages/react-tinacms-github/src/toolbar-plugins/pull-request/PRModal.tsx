@@ -95,14 +95,16 @@ export const PRModal = () => {
               </b>{' '}
               into{' '}
               <b>
-                {github.baseworkingRepoFullName} - {github.baseBranch}
+                {github.baseRepoFullName} - {github.baseBranch}
               </b>
               .{' '}
               <a
                 target="_blank"
-                href={`https://github.com/${github.baseworkingRepoFullName}/compare/${
+                href={`https://github.com/${github.baseRepoFullName}/compare/${
                   github.baseBranch
-                }...${github.workingRepoFullName.split('/')[0]}:${github.branchName}`}
+                }...${github.workingRepoFullName.split('/')[0]}:${
+                  github.branchName
+                }`}
               >
                 View changes on GitHub
               </a>
@@ -124,7 +126,7 @@ export const PRModal = () => {
             </b>{' '}
             into{' '}
             <b>
-              {github.baseworkingRepoFullName} - {github.baseBranch}
+              {github.baseRepoFullName} - {github.baseBranch}
             </b>
             .
           </ModalDescription>
@@ -139,9 +141,11 @@ export const PRModal = () => {
             <TinaButton
               as="a"
               // @ts-ignore
-              href={`https://github.com/${github.baseworkingRepoFullName}/compare/${
+              href={`https://github.com/${github.baseRepoFullName}/compare/${
                 github.baseBranch
-              }...${github.workingRepoFullName.split('/')[0]}:${github.branchName}`}
+              }...${github.workingRepoFullName.split('/')[0]}:${
+                github.branchName
+              }`}
               target="_blank"
             >
               View Diff
