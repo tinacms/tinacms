@@ -91,18 +91,18 @@ export const PRModal = () => {
             <ModalDescription>
               Create a pull request from{' '}
               <b>
-                {github.repoFullName} - {github.branchName}
+                {github.workingRepoFullName} - {github.branchName}
               </b>{' '}
               into{' '}
               <b>
-                {github.baseRepoFullName} - {github.baseBranch}
+                {github.baseworkingRepoFullName} - {github.baseBranch}
               </b>
               .{' '}
               <a
                 target="_blank"
-                href={`https://github.com/${github.baseRepoFullName}/compare/${
+                href={`https://github.com/${github.baseworkingRepoFullName}/compare/${
                   github.baseBranch
-                }...${github.repoFullName.split('/')[0]}:${github.branchName}`}
+                }...${github.workingRepoFullName.split('/')[0]}:${github.branchName}`}
               >
                 View changes on GitHub
               </a>
@@ -120,11 +120,11 @@ export const PRModal = () => {
           <ModalDescription>
             You've created a pull request from{' '}
             <b>
-              {github.repoFullName} - {github.branchName}
+              {github.workingRepoFullName} - {github.branchName}
             </b>{' '}
             into{' '}
             <b>
-              {github.baseRepoFullName} - {github.baseBranch}
+              {github.baseworkingRepoFullName} - {github.baseBranch}
             </b>
             .
           </ModalDescription>
@@ -139,9 +139,9 @@ export const PRModal = () => {
             <TinaButton
               as="a"
               // @ts-ignore
-              href={`https://github.com/${github.baseRepoFullName}/compare/${
+              href={`https://github.com/${github.baseworkingRepoFullName}/compare/${
                 github.baseBranch
-              }...${github.repoFullName.split('/')[0]}:${github.branchName}`}
+              }...${github.workingRepoFullName.split('/')[0]}:${github.branchName}`}
               target="_blank"
             >
               View Diff
