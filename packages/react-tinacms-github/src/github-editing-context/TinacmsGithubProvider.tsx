@@ -33,8 +33,8 @@ interface ProviderProps {
 }
 
 interface AuthState {
-  authenticated: true
-  forkValid: true
+  authenticated: boolean
+  forkValid: boolean
 }
 
 export const TinacmsGithubProvider = ({
