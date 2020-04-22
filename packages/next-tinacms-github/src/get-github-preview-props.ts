@@ -86,8 +86,8 @@ export async function getGithubPreviewProps<Data = any>(
   return {
     props: {
       file,
-      repoFullName,
-      branch,
+      repoFullName: workingRepoFullName,
+      branch: headBranch,
       preview: true,
       error,
     },
@@ -104,7 +104,7 @@ const githubErrorMessage = ({
   path,
   accessToken,
   repoFullName,
-  branch
+  branch,
 }: GithubErrorMessageInfo) => `next-tinacms-github: Failed to fetch file from GitHub
 - file: \t${path}
 - repo: \t${repoFullName}

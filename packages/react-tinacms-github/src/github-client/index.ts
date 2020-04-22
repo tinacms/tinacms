@@ -20,20 +20,20 @@ import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
 
 export class GithubClient {
-  static FORK_COOKIE_KEY = 'fork_full_name'
+  static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
 
   proxy: string
-  baseworkingRepoFullName: string
+  baseRepoFullName: string
   baseBranch: string
 
   constructor(
     proxy: string,
-    baseworkingRepoFullName: string,
+    baseRepoFullName: string,
     baseBranch: string = 'master'
   ) {
     this.proxy = proxy
-    this.baseworkingRepoFullName = baseworkingRepoFullName
+    this.baseRepoFullName = baseRepoFullName
     this.baseBranch = baseBranch
   }
 
@@ -55,33 +55,33 @@ export class GithubClient {
 
   async createFork() {
     const fork = await this.req({
-      url: `https://api.github.com/repos/${this.baseworkingRepoFullName}/forks`,
+      url: `https://api.github.com/repos/${this.baseRepoFullName}/forks`,
       method: 'POST',
     })
 
-    this.setCookie(GithubClient.FORK_COOKIE_KEY, fork.full_name)
+    this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, fork.full_name)
 
     return fork
   }
 
   createPR(title: string, body: string) {
-    const forkworkingRepoFullName = this.workingRepoFullName
+    const workingRepoFullName = this.workingRepoFullName
     const headBranch = this.branchName
 
     return this.req({
-      url: `https://api.github.com/repos/${this.baseworkingRepoFullName}/pulls`,
+      url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'POST',
       data: {
         title: title ? title : 'Update from TinaCMS',
         body: body ? body : 'Please pull these awesome changes in!',
-        head: `${forkworkingRepoFullName.split('/')[0]}:${headBranch}`,
+        head: `${workingRepoFullName.split('/')[0]}:${headBranch}`,
         base: this.baseBranch,
       },
     })
   }
 
   get workingRepoFullName(): string {
-    const forkName = this.getCookie(GithubClient.FORK_COOKIE_KEY)
+    const forkName = this.getCookie(GithubClient.WORKING_REPO_COOKIE_KEY)
 
     if (!forkName) {
       // TODO: Right now the client only works with forks. This should go away once it works with origin.
@@ -96,11 +96,11 @@ export class GithubClient {
   }
 
   async fetchExistingPR() {
-    const forkworkingRepoFullName = this.workingRepoFullName
+    const workingRepoFullName = this.workingRepoFullName
     const headBranch = this.branchName
 
     const branches = await this.req({
-      url: `https://api.github.com/repos/${this.baseworkingRepoFullName}/pulls`,
+      url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'GET',
     })
 
@@ -108,8 +108,8 @@ export class GithubClient {
       const pull = branches[i]
       if (headBranch === pull.head.ref) {
         if (
-          pull.head.repo?.full_name === forkworkingRepoFullName &&
-          pull.base.repo?.full_name === this.baseworkingRepoFullName
+          pull.head.repo?.full_name === workingRepoFullName &&
+          pull.base.repo?.full_name === this.baseRepoFullName
         ) {
           return pull // found matching PR
         }
