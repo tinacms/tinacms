@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 export interface GithubOptions {
-  baseRepoFullName: string
-  forkFullName: string
+  baseworkingRepoFullName: string
+  workingRepoFullName: string
   branch: string
 }

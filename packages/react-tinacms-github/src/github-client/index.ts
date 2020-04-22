@@ -24,16 +24,16 @@ export class GithubClient {
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
 
   proxy: string
-  baseRepoFullName: string
+  baseworkingRepoFullName: string
   baseBranch: string
 
   constructor(
     proxy: string,
-    baseRepoFullName: string,
+    baseworkingRepoFullName: string,
     baseBranch: string = 'master'
   ) {
     this.proxy = proxy
-    this.baseRepoFullName = baseRepoFullName
+    this.baseworkingRepoFullName = baseworkingRepoFullName
     this.baseBranch = baseBranch
   }
 
@@ -55,7 +55,7 @@ export class GithubClient {
 
   async createFork() {
     const fork = await this.req({
-      url: `https://api.github.com/repos/${this.baseRepoFullName}/forks`,
+      url: `https://api.github.com/repos/${this.baseworkingRepoFullName}/forks`,
       method: 'POST',
     })
 
@@ -65,22 +65,22 @@ export class GithubClient {
   }
 
   createPR(title: string, body: string) {
-    const forkRepoFullName = this.repoFullName
+    const forkworkingRepoFullName = this.workingRepoFullName
     const headBranch = this.branchName
 
     return this.req({
-      url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
+      url: `https://api.github.com/repos/${this.baseworkingRepoFullName}/pulls`,
       method: 'POST',
       data: {
         title: title ? title : 'Update from TinaCMS',
         body: body ? body : 'Please pull these awesome changes in!',
-        head: `${forkRepoFullName.split('/')[0]}:${headBranch}`,
+        head: `${forkworkingRepoFullName.split('/')[0]}:${headBranch}`,
         base: this.baseBranch,
       },
     })
   }
 
-  get repoFullName(): string {
+  get workingRepoFullName(): string {
     const forkName = this.getCookie(GithubClient.FORK_COOKIE_KEY)
 
     if (!forkName) {
@@ -96,11 +96,11 @@ export class GithubClient {
   }
 
   async fetchExistingPR() {
-    const forkRepoFullName = this.repoFullName
+    const forkworkingRepoFullName = this.workingRepoFullName
     const headBranch = this.branchName
 
     const branches = await this.req({
-      url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
+      url: `https://api.github.com/repos/${this.baseworkingRepoFullName}/pulls`,
       method: 'GET',
     })
 
@@ -108,8 +108,8 @@ export class GithubClient {
       const pull = branches[i]
       if (headBranch === pull.head.ref) {
         if (
-          pull.head.repo?.full_name === forkRepoFullName &&
-          pull.base.repo?.full_name === this.baseRepoFullName
+          pull.head.repo?.full_name === forkworkingRepoFullName &&
+          pull.base.repo?.full_name === this.baseworkingRepoFullName
         ) {
           return pull // found matching PR
         }
@@ -121,11 +121,11 @@ export class GithubClient {
 
   async getBranch() {
     try {
-      const repoFullName = this.repoFullName
+      const workingRepoFullName = this.workingRepoFullName
       const branch = this.branchName
 
       const data = await this.req({
-        url: `https://api.github.com/repos/${repoFullName}/git/ref/heads/${branch}`,
+        url: `https://api.github.com/repos/${workingRepoFullName}/git/ref/heads/${branch}`,
         method: 'GET',
       })
       return data
@@ -150,7 +150,7 @@ export class GithubClient {
     fileContents: string,
     commitMessage: string = 'Update from TinaCMS'
   ) {
-    const repo = this.repoFullName
+    const repo = this.workingRepoFullName
     const branch = this.branchName
 
     return this.req({
