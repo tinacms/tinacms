@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import styled, { keyframes, css, createGlobalStyle } from 'styled-components'
+import styled, { keyframes, css } from 'styled-components'
 import { FormsView } from './SidebarBody'
 import {
   HamburgerIcon,
@@ -76,21 +76,20 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
   const screens = cms.plugins.getType<ScreenPlugin>('screen')
   useSubscribable(sidebar)
   useSubscribable(screens)
-  const [menuIsVisible, setMenuVisibility] = useState(false)
+  const [menuIsOpen, setMenuIsOpen] = useState(false)
   const [activeScreen, setActiveView] = useState<ScreenPlugin | null>(null)
   const allScreens = screens.all()
   const showMenu = allScreens.length > 0
 
   return (
     <>
-      <SidebarGlobalStyles />
       <SidebarContainer open={sidebar.isOpen}>
         <SidebarWrapper open={sidebar.isOpen}>
           <SidebarHeader>
             {showMenu && (
               <MenuToggle
-                onClick={() => setMenuVisibility(!menuIsVisible)}
-                open={menuIsVisible}
+                onClick={() => setMenuIsOpen(!menuIsOpen)}
+                open={menuIsOpen}
               >
                 <HamburgerIcon />
               </MenuToggle>
@@ -99,7 +98,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
           </SidebarHeader>
           <FormsView />
           {showMenu && (
-            <MenuPanel visible={menuIsVisible}>
+            <MenuPanel visible={menuIsOpen}>
               <MenuWrapper>
                 <MenuList>
                   {allScreens.map(view => {
@@ -110,7 +109,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
                         value={view.name}
                         onClick={() => {
                           setActiveView(view)
-                          setMenuVisibility(false)
+                          setMenuIsOpen(false)
                         }}
                       >
                         <Icon /> {view.name}
@@ -134,13 +133,6 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
     </>
   )
 }
-
-const SidebarGlobalStyles = createGlobalStyle`
-  :root {
-    --tina-sidebar-width: 340px;
-    --tina-sidebar-header-height: 60px;
-  }
-`
 
 const SiteWrapper = styled.div<{ open: boolean }>`
   padding-left: ${props => (props.open ? 'var(--tina-sidebar-width)' : '0')};
@@ -436,7 +428,7 @@ const SidebarContainer = styled.div<{ open: boolean }>`
   padding: 0 !important;
   border: 0 !important;
   box-sizing: border-box;
-  z-index: var(--tina-z-index-2);
+  z-index: var(--tina-z-index-3);
   transition: all ${p => (p.open ? 150 : 200)}ms ease-out !important;
   transform: translate3d(
     ${p => (p.open ? '0' : 'calc(var(--tina-sidebar-width) * -1)')},
