@@ -18,6 +18,7 @@ limitations under the License.
 
 import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
+export * from './authenticate'
 
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
