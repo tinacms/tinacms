@@ -37,9 +37,9 @@ const ForkInfo = () => {
     <FieldMeta name={'Fork'}>
       <MetaLink
         target="_blank"
-        href={`https://github.com/${github.repoFullName}`}
+        href={`https://github.com/${github.workingRepoFullName}`}
       >
-        {github.repoFullName}
+        {github.workingRepoFullName}
       </MetaLink>
     </FieldMeta>
   )
