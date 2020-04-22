@@ -28,7 +28,10 @@ const REPO_FULL_NAME = process.env.REPO_FULL_NAME // e.g: tinacms/tinacms.org
 
 const cms = new TinaCMS({
   apis: {
-      github: new GithubClient('/api/proxy-github', REPO_FULL_NAME),
+    github: new GithubClient({
+      proxy: '/api/proxy-github',
+      baseRepoFullName: REPO_FULL_NAME,
+    }),
   },
   // ... any other tina config
 })
