@@ -26,8 +26,6 @@ import { GithubClient } from '../github-client'
 
 interface ProviderProps {
   children: any
-  clientId: string
-  authCallbackRoute: string
   editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
@@ -44,8 +42,6 @@ export const TinacmsGithubProvider = ({
   editMode,
   enterEditMode,
   exitEditMode,
-  authCallbackRoute,
-  clientId,
   error: previewError,
 }: ProviderProps) => {
   const [error, setError] = useState<any>(null)
@@ -71,8 +67,8 @@ export const TinacmsGithubProvider = ({
   }
 
   const authenticate = useCallback(() => {
-    return github.authenticate(clientId, authCallbackRoute)
-  }, [clientId, authCallbackRoute])
+    return github.authenticate()
+  }, [github])
 
   return (
     <GithubEditingContext.Provider
