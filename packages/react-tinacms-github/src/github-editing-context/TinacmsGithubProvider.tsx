@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
 import GithubAuthModal from './GithubAuthModal'
@@ -33,8 +33,8 @@ interface ProviderProps {
 }
 
 interface AuthState {
-  authenticated: boolean
-  forkValid: boolean
+  authenticated?: boolean
+  forkValid?: boolean
 }
 
 export const TinacmsGithubProvider = ({
@@ -51,19 +51,33 @@ export const TinacmsGithubProvider = ({
     null
   )
 
+  const openAuthModal = () => {
+    setAuthorizingStatus({
+      authenticated: false,
+    })
+  }
+
+  const openForkModal = () => {
+    setAuthorizingStatus({
+      authenticated: true,
+      forkValid: false,
+    })
+  }
+
   const tryEnterEditMode = async () => {
     const authenticated =
       authorizingStatus?.authenticated || (await github.getUser())
     const forkValid = authorizingStatus?.forkValid || (await github.getBranch())
 
-    if (authenticated && forkValid) {
-      enterEditMode()
-    } else {
-      setAuthorizingStatus({
-        authenticated,
-        forkValid,
-      })
+    if (!authenticated) {
+      return openAuthModal()
     }
+
+    if (!forkValid) {
+      return openForkModal()
+    }
+
+    enterEditMode()
   }
 
   return (
