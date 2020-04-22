@@ -30,6 +30,8 @@ const cms = new TinaCMS({
   apis: {
     github: new GithubClient({
       proxy: '/api/proxy-github',
+      clientId: process.env.GITHUB_CLIENT_ID,
+      authCallbackRoute: '/api/create-github-access-token'
       baseRepoFullName: REPO_FULL_NAME,
     }),
   },
@@ -61,8 +63,6 @@ const exitEditMode = () => {
 const YourLayout = ({ editMode, error, children }) => {
   return (
     <TinacmsGithubProvider
-      clientId={process.env.GITHUB_CLIENT_ID}
-      authCallbackRoute='/api/create-github-access-token'
       editMode={editMode}
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}
