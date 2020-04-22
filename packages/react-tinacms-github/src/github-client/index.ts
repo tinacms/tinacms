@@ -18,6 +18,7 @@ limitations under the License.
 
 import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
+import { authenticate } from './authenticate'
 export * from './authenticate'
 
 export class GithubClient {
@@ -36,6 +37,10 @@ export class GithubClient {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
     this.baseBranch = baseBranch
+  }
+
+  authenticate(clientId: string, codeExchangeRoute: string) {
+    return authenticate(clientId, codeExchangeRoute)
   }
 
   async getUser() {
