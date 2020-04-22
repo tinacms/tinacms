@@ -140,6 +140,11 @@ const SidebarGlobalStyles = createGlobalStyle`
     --tina-sidebar-width: 340px;
     --tina-sidebar-header-height: 60px;
   }
+  @media (max-width: 500px) {
+    :root {
+      --tina-sidebar-width: calc(100vw - 64px);
+    }
+  }
 `
 
 const SiteWrapper = styled.div<{ open: boolean }>`
