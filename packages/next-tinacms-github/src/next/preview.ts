@@ -16,11 +16,15 @@ limitations under the License.
 
 */
 
-import { ACCESS_TOKEN_KEY, FORK_KEY, HEAD_BRANCH_KEY } from '../constants'
+import {
+  ACCESS_TOKEN_KEY,
+  WORKING_REPO_KEY,
+  HEAD_BRANCH_KEY,
+} from '../constants'
 
 export const previewHandler = (req: any, res: any) => {
   const previewData = {
-    fork_full_name: req.cookies[FORK_KEY],
+    working_repo_full_name: req.cookies[WORKING_REPO_KEY],
     github_access_token: req.cookies[ACCESS_TOKEN_KEY],
     head_branch: req.cookies[HEAD_BRANCH_KEY] || 'master',
   }
