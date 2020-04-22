@@ -17,12 +17,11 @@ limitations under the License.
 
 */
 import { GithubError } from './github/content/GithubError'
-import { SourceProviderConnection } from './github/content'
 import getDecodedData from './github/content/getDecodedData'
 
 export interface PreviewData<Data> {
   github_access_token: string
-  fork_full_name: string
+  working_repo_full_name: string
   head_branch: string
   fileRelativePath: string
   parse(content: string): Data
@@ -37,7 +36,8 @@ export interface GithubFile<Data> {
 export interface GithubPreviewProps<Data> {
   props: {
     preview: boolean
-    sourceProvider: SourceProviderConnection
+    repoFullName: string
+    branch: string
     file: GithubFile<Data> | null
     error: GithubError | null
   }
@@ -47,17 +47,16 @@ export async function getGithubPreviewProps<Data = any>(
   options: PreviewData<Data>
 ): Promise<GithubPreviewProps<Data>> {
   const accessToken = options.github_access_token
-  const sourceProvider = {
-    forkFullName: options.fork_full_name || '',
-    headBranch: options.head_branch || 'master',
-  }
+  const workingRepoFullName = options.working_repo_full_name || ''
+  const headBranch = options.head_branch || 'master'
+
   let error: GithubError | null = null
   let file = null
 
   try {
     const response = await getDecodedData(
-      sourceProvider.forkFullName,
-      sourceProvider.headBranch || 'master',
+      workingRepoFullName,
+      headBranch,
       options.fileRelativePath,
       accessToken
     )
@@ -72,7 +71,8 @@ export async function getGithubPreviewProps<Data = any>(
       console.error(
         githubErrorMessage({
           path: options.fileRelativePath,
-          sourceProvider,
+          repoFullName: workingRepoFullName,
+          branch: headBranch,
           accessToken,
         })
       )
@@ -86,7 +86,8 @@ export async function getGithubPreviewProps<Data = any>(
   return {
     props: {
       file,
-      sourceProvider,
+      repoFullName: workingRepoFullName,
+      branch: headBranch,
       preview: true,
       error,
     },
@@ -96,15 +97,17 @@ export async function getGithubPreviewProps<Data = any>(
 interface GithubErrorMessageInfo {
   path: string
   accessToken?: string
-  sourceProvider: SourceProviderConnection
+  repoFullName: string
+  branch: string
 }
 const githubErrorMessage = ({
   path,
   accessToken,
-  sourceProvider,
+  repoFullName,
+  branch,
 }: GithubErrorMessageInfo) => `next-tinacms-github: Failed to fetch file from GitHub
 - file: \t${path}
-- repo: \t${sourceProvider.forkFullName}
-- branch: \t${sourceProvider.headBranch}
+- repo: \t${repoFullName}
+- branch: \t${branch}
 - accessToken: \t${accessToken ? '******' : 'undefined'}
 `
