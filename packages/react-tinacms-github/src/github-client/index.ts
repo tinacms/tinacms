@@ -23,6 +23,8 @@ export * from './authenticate'
 
 export interface GithubClientOptions {
   proxy: string
+  clientId: string
+  authCallbackRoute: string
   baseRepoFullName: string
   baseBranch?: string
 }
@@ -34,19 +36,26 @@ export class GithubClient {
   proxy: string
   baseRepoFullName: string
   baseBranch: string
+  clientId: string
+  authCallbackRoute: string
 
   constructor({
     proxy,
+    clientId,
+    authCallbackRoute,
     baseRepoFullName,
     baseBranch = 'master',
   }: GithubClientOptions) {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
     this.baseBranch = baseBranch
+    this.clientId = clientId
+    this.authCallbackRoute = authCallbackRoute
   }
 
+  // @ts-ignore
   authenticate(clientId: string, codeExchangeRoute: string) {
-    return authenticate(clientId, codeExchangeRoute)
+    return authenticate(this.clientId, this.authCallbackRoute)
   }
 
   async getUser() {
