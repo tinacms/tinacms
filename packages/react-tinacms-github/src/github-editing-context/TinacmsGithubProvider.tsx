@@ -22,7 +22,6 @@ import GithubErrorModal from '../github-error/GithubErrorModal'
 import GithubAuthModal from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
-import { authenticate as githubAuthenticate } from '../github-client'
 import { GithubClient } from '../github-client'
 
 interface ProviderProps {
@@ -72,7 +71,7 @@ export const TinacmsGithubProvider = ({
   }
 
   const authenticate = useCallback(() => {
-    return githubAuthenticate(clientId, authCallbackRoute)
+    return github.authenticate(clientId, authCallbackRoute)
   }, [clientId, authCallbackRoute])
 
   return (
