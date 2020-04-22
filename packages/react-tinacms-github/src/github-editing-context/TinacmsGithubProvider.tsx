@@ -66,10 +66,6 @@ export const TinacmsGithubProvider = ({
     }
   }
 
-  const authenticate = useCallback(() => {
-    return github.authenticate()
-  }, [github])
-
   return (
     <GithubEditingContext.Provider
       value={{
@@ -87,7 +83,6 @@ export const TinacmsGithubProvider = ({
           close={() => {
             setAuthorizingStatus(null)
           }}
-          authenticate={authenticate}
         />
       )}
       <PreviewErrorBoundary previewError={previewError}>
