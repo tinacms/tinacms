@@ -215,7 +215,6 @@ const NoFieldsPlaceholder = () => (
 export const Wrapper = styled.div`
   display: block;
   margin: 0 auto;
-  max-width: 500px;
   width: 100%;
 `
 

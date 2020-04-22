@@ -217,7 +217,6 @@ const NoFormsPlaceholder = () => (
 export const Wrapper = styled.div`
   display: block;
   margin: 0 auto;
-  max-width: 500px;
   width: 100%;
 `
 
@@ -229,7 +228,7 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   width: 100%;
   overflow: auto;
   border-top: 1px solid var(--tina-color-grey-2);
-  background-color: #f6f6f9;
+  background-color: var(--tina-color-grey-1);
 
   ${Wrapper} {
     height: 100%;
