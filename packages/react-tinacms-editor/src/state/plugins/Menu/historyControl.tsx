@@ -22,7 +22,7 @@ import { RedoIcon, UndoIcon } from '@tinacms/icons'
 import { undo, redo, undoDepth, redoDepth } from 'prosemirror-history'
 
 import { MenuButton } from './MenuComponents'
-import { useEditorStateContext } from '../../../core/context/editorState'
+import { useEditorStateContext } from '../../../context/editorState'
 
 export const UndoControl = () => {
   const { editorView } = useEditorStateContext()

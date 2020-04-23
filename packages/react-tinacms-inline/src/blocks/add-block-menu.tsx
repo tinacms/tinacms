@@ -111,6 +111,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
   border: 1px solid var(--tina-color-grey-2);
   display: block;
   position: absolute;
+  z-index: var(--tina-z-index-2);
   top: 0;
   left: 0;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
