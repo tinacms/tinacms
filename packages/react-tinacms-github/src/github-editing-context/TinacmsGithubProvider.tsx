@@ -33,8 +33,9 @@ interface ProviderProps {
 }
 
 interface AuthState {
+  validSetup?: boolean
   authenticated?: boolean
-  forkValid?: boolean
+  authorized?: boolean
 }
 
 export const TinacmsGithubProvider = ({
@@ -51,23 +52,35 @@ export const TinacmsGithubProvider = ({
     null
   )
 
+  const openInvalidSetupModal = () => {
+    setAuthorizingStatus({
+      validSetup: false,
+    })
+  }
+
   const openAuthModal = () => {
     setAuthorizingStatus({
+      validSetup: true,
       authenticated: false,
     })
   }
 
   const openForkModal = () => {
     setAuthorizingStatus({
+      validSetup: true,
       authenticated: true,
-      forkValid: false,
+      authorized: false,
     })
   }
 
   const tryEnterEditMode = async () => {
+    const validSetup =
+      authorizingStatus?.validSetup ||
+      (cms.api.github.baseRepoFullName && cms.api.github.clientId)
     const authenticated =
       authorizingStatus?.authenticated || (await github.getUser())
-    const forkValid = authorizingStatus?.forkValid || (await github.getBranch())
+    const forkValid =
+      authorizingStatus?.authorized || (await github.getBranch())
 
     if (!authenticated) {
       return openAuthModal()
@@ -75,6 +88,10 @@ export const TinacmsGithubProvider = ({
 
     if (!forkValid) {
       return openForkModal()
+    }
+
+    if (!validSetup) {
+      return openInvalidSetupModal()
     }
 
     enterEditMode()
