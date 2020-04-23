@@ -110,8 +110,8 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   display: block;
   position: absolute;
   top: 0;
-  right: 18px;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
+  right: 14px;
+  transform: translate3d(0, 23px, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
