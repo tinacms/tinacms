@@ -619,6 +619,16 @@
       "contributions": [
         "review"
       ]
+    },
+    {
+      "login": "mittonface",
+      "name": "Brent Mitton",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/5082908?v=4",
+      "profile": "https://github.com/mittonface",
+      "contributions": [
+        "code",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
