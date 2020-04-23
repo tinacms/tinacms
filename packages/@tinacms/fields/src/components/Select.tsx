@@ -64,7 +64,11 @@ function toProps(option: Option | string): Option {
 }
 
 function toComponent(option: Option) {
-  return <option value={option.value}>{option.label}</option>
+  return (
+    <option key={option.value} value={option.value}>
+      {option.label}
+    </option>
+  )
 }
 
 const SelectElement = styled.div`
