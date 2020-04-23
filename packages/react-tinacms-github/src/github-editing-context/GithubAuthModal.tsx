@@ -41,47 +41,6 @@ const GithubAuthModal = ({
 
   const [error, setError] = useState<string | undefined>()
 
-  const cancelAction = {
-    name: 'Cancel',
-    action: close,
-  }
-
-  const visitDocsAction = {
-    name: 'Visit the docs',
-    action: async () => {
-      window.open(
-        'https://tinacms.org/docs/nextjs/github-public-repo#setting-environment-variables',
-        '_blank'
-      )
-    },
-    primary: true,
-  }
-
-  const createForkAction = {
-    name: 'Create Fork',
-    action: async () => {
-      try {
-        await cms.api.github.createFork()
-        onUpdateAuthState()
-      } catch (e) {
-        setError(
-          'Forking repository failed. Are you sure the repository is public?'
-        )
-        throw e
-      }
-    },
-    primary: true,
-  }
-
-  const continueToGithubAction = {
-    name: 'Continue to GitHub',
-    action: async () => {
-      await authenticate()
-      onUpdateAuthState()
-    },
-    primary: true,
-  }
-
   useEffect(() => {
     //clear error when authState changes
     if (error) {
@@ -89,25 +48,73 @@ const GithubAuthModal = ({
     }
   }, [authState])
 
-  if (!cms.api.github.baseRepoFullName || !authState.clientId) {
+  if (!cms.api.github.baseRepoFullName) {
     modalProps = {
       title: 'GitHub Configuration Incomplete',
       message:
-        'The TinaCMS GitHub client was not configured completely. Please make sure the GITHUB_CLIENT_ID and REPO_FULL_NAME environment variables are set. For more information visit the docs.',
-      actions: [cancelAction, visitDocsAction],
+        'The TinaCMS GitHub client was not configured completely. Please  make sure the REPO_FULL_NAME environment variable is set. For more information visit the docs.',
+      actions: [
+        {
+          name: 'Cancel',
+          action: close,
+        },
+        {
+          name: 'Visit the docs',
+          action: async () => {
+            window.open(
+              'https://tinacms.org/docs/nextjs/github-public-repo#setting-environment-variables',
+              '_blank'
+            )
+          },
+          primary: true,
+        },
+      ],
     }
   } else if (!authState.authenticated) {
     modalProps = {
       title: 'GitHub Authorization',
       message:
-        'To save edits, Tina requires GitHub authorization. On save, changes will get committed to GitHub using your account.',
-      actions: [cancelAction, continueToGithubAction],
+        'To save edits, Tina requires GitHub authorization. On save, changes will get commited to GitHub using your account.',
+      actions: [
+        {
+          name: 'Cancel',
+          action: close,
+        },
+        {
+          name: 'Continue to GitHub',
+          action: async () => {
+            await authenticate()
+            onUpdateAuthState()
+          },
+          primary: true,
+        },
+      ],
     }
   } else if (!authState.forkValid) {
     modalProps = {
       title: 'GitHub Authorization',
       message: 'A fork of this website is required to save changes.',
-      actions: [cancelAction, createForkAction],
+      actions: [
+        {
+          name: 'Cancel',
+          action: close,
+        },
+        {
+          name: 'Create Fork',
+          action: async () => {
+            try {
+              await cms.api.github.createFork()
+              onUpdateAuthState()
+            } catch (e) {
+              setError(
+                'Forking repository failed. Are you sure the repository is public?'
+              )
+              throw e
+            }
+          },
+          primary: true,
+        },
+      ],
     }
   } else {
     return null
