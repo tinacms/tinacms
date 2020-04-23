@@ -157,7 +157,9 @@ export const Toolbar = () => {
                 </>
               )}
             </SaveButton>
-            {form && <FormActionMenu actions={form.actions} form={form} />}
+            {form && form.actions.length > 0 && (
+              <FormActionMenu actions={form.actions} form={form} />
+            )}
           </Actions>
         </AlignRight>
       </StyledToolbar>
