@@ -16,19 +16,16 @@ limitations under the License.
 
 */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
 import GithubAuthModal from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
-import { authenticate as githubAuthenticate } from '../github-auth'
 import { GithubClient } from '../github-client'
 
 interface ProviderProps {
   children: any
-  clientId: string
-  authCallbackRoute: string
   editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
@@ -36,8 +33,8 @@ interface ProviderProps {
 }
 
 interface AuthState {
-  authenticated: true
-  forkValid: true
+  authenticated?: boolean
+  forkValid?: boolean
 }
 
 export const TinacmsGithubProvider = ({
@@ -45,8 +42,6 @@ export const TinacmsGithubProvider = ({
   editMode,
   enterEditMode,
   exitEditMode,
-  authCallbackRoute,
-  clientId,
   error: previewError,
 }: ProviderProps) => {
   const [error, setError] = useState<any>(null)
@@ -56,24 +51,34 @@ export const TinacmsGithubProvider = ({
     null
   )
 
+  const openAuthModal = () => {
+    setAuthorizingStatus({
+      authenticated: false,
+    })
+  }
+
+  const openForkModal = () => {
+    setAuthorizingStatus({
+      authenticated: true,
+      forkValid: false,
+    })
+  }
+
   const tryEnterEditMode = async () => {
     const authenticated =
       authorizingStatus?.authenticated || (await github.getUser())
     const forkValid = authorizingStatus?.forkValid || (await github.getBranch())
 
-    if (authenticated && forkValid) {
-      enterEditMode()
-    } else {
-      setAuthorizingStatus({
-        authenticated,
-        forkValid,
-      })
+    if (!authenticated) {
+      return openAuthModal()
     }
-  }
 
-  const authenticate = useCallback(() => {
-    return githubAuthenticate(clientId, authCallbackRoute)
-  }, [clientId, authCallbackRoute])
+    if (!forkValid) {
+      return openForkModal()
+    }
+
+    enterEditMode()
+  }
 
   return (
     <GithubEditingContext.Provider
@@ -92,7 +97,6 @@ export const TinacmsGithubProvider = ({
           close={() => {
             setAuthorizingStatus(null)
           }}
-          authenticate={authenticate}
         />
       )}
       <PreviewErrorBoundary previewError={previewError}>

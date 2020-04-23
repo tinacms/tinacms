@@ -91,7 +91,7 @@ export const PRModal = () => {
             <ModalDescription>
               Create a pull request from{' '}
               <b>
-                {github.repoFullName} - {github.branchName}
+                {github.workingRepoFullName} - {github.branchName}
               </b>{' '}
               into{' '}
               <b>
@@ -102,7 +102,9 @@ export const PRModal = () => {
                 target="_blank"
                 href={`https://github.com/${github.baseRepoFullName}/compare/${
                   github.baseBranch
-                }...${github.repoFullName.split('/')[0]}:${github.branchName}`}
+                }...${github.workingRepoFullName.split('/')[0]}:${
+                  github.branchName
+                }`}
               >
                 View changes on GitHub
               </a>
@@ -120,7 +122,7 @@ export const PRModal = () => {
           <ModalDescription>
             You've created a pull request from{' '}
             <b>
-              {github.repoFullName} - {github.branchName}
+              {github.workingRepoFullName} - {github.branchName}
             </b>{' '}
             into{' '}
             <b>
@@ -141,7 +143,9 @@ export const PRModal = () => {
               // @ts-ignore
               href={`https://github.com/${github.baseRepoFullName}/compare/${
                 github.baseBranch
-              }...${github.repoFullName.split('/')[0]}:${github.branchName}`}
+              }...${github.workingRepoFullName.split('/')[0]}:${
+                github.branchName
+              }`}
               target="_blank"
             >
               View Diff

@@ -16,5 +16,4 @@ limitations under the License.
 
 */
 
-export * from './authenticate'
 export * from './useGithubAuthRedirect'
