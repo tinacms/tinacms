@@ -43,10 +43,10 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
     }
   }, [authState])
 
-  if (!authState.validSetup) {
+  if (authState === 'completeSetup') {
     modalProps = {
       title: 'GitHub Configuration Incomplete',
-      message: `The TinaCMS GitHub client was not configured completely. Please  make sure the GITHUB_CLIENT_ID AND REPO_FULL_NAME environment variables are set. For more information visit the docs.`,
+      message: `The TinaCMS GitHub client was not configured correctly. Please make sure the baseRepoFullName and clientId were passed to the GithubClient constructor.  For more information visit the docs.`,
       actions: [
         {
           name: 'Cancel',
@@ -64,7 +64,7 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
         },
       ],
     }
-  } else if (!authState.authenticated) {
+  } else if (authState === 'authenticate') {
     modalProps = {
       title: 'GitHub Authorization',
       message:
@@ -84,7 +84,7 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
         },
       ],
     }
-  } else if (!authState.forkValid) {
+  } else if (authState === 'createFork') {
     modalProps = {
       title: 'GitHub Authorization',
       message: 'A fork of this website is required to save changes.',

@@ -32,11 +32,7 @@ interface ProviderProps {
   error?: any
 }
 
-interface AuthState {
-  validSetup?: boolean
-  authenticated?: boolean
-  authorized?: boolean
-}
+type AuthState = null | 'completeSetup' | 'authenticate' | 'createFork'
 
 export const TinacmsGithubProvider = ({
   children,
@@ -48,39 +44,32 @@ export const TinacmsGithubProvider = ({
   const [error, setError] = useState<any>(null)
   const cms = useCMS()
   const github: GithubClient = cms.api.github
-  const [authorizingStatus, setAuthorizingStatus] = useState<AuthState | null>(
-    null
-  )
+  const [authorizingStatus, setAuthorizingStatus] = useState<AuthState>(null)
 
-  const openInvalidSetupModal = () => {
-    setAuthorizingStatus({
-      validSetup: false,
-    })
+  const openCompleteSetupModal = () => {
+    setAuthorizingStatus('completeSetup')
   }
 
   const openAuthModal = () => {
-    setAuthorizingStatus({
-      validSetup: true,
-      authenticated: false,
-    })
+    setAuthorizingStatus('authenticate')
   }
 
   const openForkModal = () => {
-    setAuthorizingStatus({
-      validSetup: true,
-      authenticated: true,
-      authorized: false,
-    })
+    setAuthorizingStatus('createFork')
   }
 
   const tryEnterEditMode = async () => {
     const validSetup =
-      authorizingStatus?.validSetup ||
-      (cms.api.github.baseRepoFullName && cms.api.github.clientId)
+      authorizingStatus === 'completeSetup' ||
+      (github.baseRepoFullName && github.clientId)
     const authenticated =
-      authorizingStatus?.authenticated || (await github.getUser())
+      authorizingStatus === 'authenticate' || (await github.getUser())
     const forkValid =
-      authorizingStatus?.authorized || (await github.getBranch())
+      authorizingStatus === 'createFork' || (await github.getBranch())
+
+    if (!validSetup) {
+      return openCompleteSetupModal()
+    }
 
     if (!authenticated) {
       return openAuthModal()
@@ -88,10 +77,6 @@ export const TinacmsGithubProvider = ({
 
     if (!forkValid) {
       return openForkModal()
-    }
-
-    if (!validSetup) {
-      return openInvalidSetupModal()
     }
 
     enterEditMode()
