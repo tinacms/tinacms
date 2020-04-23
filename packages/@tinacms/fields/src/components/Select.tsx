@@ -19,11 +19,18 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 
+type Option =
+  | string
+  | {
+      value: string
+      label: string
+    }
+
 interface SelectFieldProps {
   label?: string
   name: string
   component: string
-  options: string[]
+  options: Option[]
 }
 
 export interface SelectProps {
@@ -31,7 +38,7 @@ export interface SelectProps {
   input: any
   field: SelectFieldProps
   disabled?: boolean
-  options?: string[]
+  options?: Option[]
 }
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
@@ -46,11 +53,20 @@ export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
         {...input}
       >
         {selectOptions ? (
-          selectOptions.map(option => (
-            <option value={option} key={option}>
-              {option}
-            </option>
-          ))
+          selectOptions.map((option: Option) => {
+            if (typeof option === 'object') {
+              return (
+                <option value={option.value} key={option.value}>
+                  {option.label}
+                </option>
+              )
+            }
+            return (
+              <option value={option} key={option}>
+                {option}
+              </option>
+            )
+          })
         ) : (
           <option>{input.value}</option>
         )}
