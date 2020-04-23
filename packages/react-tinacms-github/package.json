@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.1.0-canary3.0",
+  "version": "0.1.0-canary3.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {

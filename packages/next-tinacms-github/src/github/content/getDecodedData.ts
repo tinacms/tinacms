@@ -35,7 +35,7 @@ const b64DecodeUnicode = (str: string) => {
 // TODO - this name kinda sucks,
 // Throw a formatted error on 404, and decode github data properly
 const getDecodedData = async (
-  repoFullName: string,
+  workingRepoFullName: string,
   headBranch: string,
   path: string,
   accessToken: string
@@ -43,7 +43,12 @@ const getDecodedData = async (
   let data = null
 
   try {
-    ;({ data } = await getContent(repoFullName, headBranch, path, accessToken))
+    ;({ data } = await getContent(
+      workingRepoFullName,
+      headBranch,
+      path,
+      accessToken
+    ))
   } catch (e) {
     const errorStatus = e.response?.status || 500
     throw new GithubError('Failed to get data.', errorStatus)
