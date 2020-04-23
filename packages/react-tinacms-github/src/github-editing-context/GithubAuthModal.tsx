@@ -43,11 +43,10 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
     }
   }, [authState])
 
-  if (!cms.api.github.baseRepoFullName) {
+  if (!authState.validSetup) {
     modalProps = {
       title: 'GitHub Configuration Incomplete',
-      message:
-        'The TinaCMS GitHub client was not configured completely. Please  make sure the REPO_FULL_NAME environment variable is set. For more information visit the docs.',
+      message: `The TinaCMS GitHub client was not configured completely. Please  make sure the GITHUB_CLIENT_ID AND REPO_FULL_NAME environment variables are set. For more information visit the docs.`,
       actions: [
         {
           name: 'Cancel',
