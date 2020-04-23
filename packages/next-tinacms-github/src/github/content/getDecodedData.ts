@@ -43,7 +43,12 @@ const getDecodedData = async (
   let data = null
 
   try {
-    ;({ data } = await getContent(workingRepoFullName, headBranch, path, accessToken))
+    ;({ data } = await getContent(
+      workingRepoFullName,
+      headBranch,
+      path,
+      accessToken
+    ))
   } catch (e) {
     const errorStatus = e.response?.status || 500
     throw new GithubError('Failed to get data.', errorStatus)
