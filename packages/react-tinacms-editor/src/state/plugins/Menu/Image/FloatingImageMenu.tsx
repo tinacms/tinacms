@@ -25,7 +25,7 @@ import { findElementOffsetTop, findElementOffsetLeft } from '../../../../utils'
 import { imagePluginKey } from '../../Image'
 import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
-import { useEditorStateContext } from '../../../../core/context/editorState'
+import { useEditorStateContext } from '../../../../context/editorState'
 
 export default () => {
   const { editorView } = useEditorStateContext()

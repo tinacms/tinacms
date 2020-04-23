@@ -20,7 +20,7 @@ import React from 'react'
 
 import AddColumnMenu from './AddColumnMenu'
 import AddRowMenu from './AddRowMenu'
-import { useEditorStateContext } from '../../../../core/context/editorState'
+import { useEditorStateContext } from '../../../../context/editorState'
 
 export default () => {
   const { editorView } = useEditorStateContext()

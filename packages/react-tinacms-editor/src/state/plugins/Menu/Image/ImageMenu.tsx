@@ -24,7 +24,7 @@ import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
 import { insertImage } from '../../../../commands/image-commands'
 import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
 import { Dismissible } from 'react-dismissible'
-import { useEditorStateContext } from '../../../../core/context/editorState'
+import { useEditorStateContext } from '../../../../context/editorState'
 
 interface ImageMenu {
   uploadImages: (files: File[]) => Promise<string[]>
