@@ -23,7 +23,7 @@ import styled from 'styled-components'
 
 import { TrashIcon } from '@tinacms/icons'
 import { IconButton } from '@tinacms/styles'
-import { useEditorStateContext } from '../../../../core/context/editorState'
+import { useEditorStateContext } from '../../../../context/editorState'
 
 export default () => {
   const { editorView } = useEditorStateContext()

@@ -33,7 +33,7 @@ import {
 import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
 import { linkPluginKey } from './index'
-import { useEditorStateContext } from '../../../core/context/editorState'
+import { useEditorStateContext } from '../../../context/editorState'
 
 const width = 240
 

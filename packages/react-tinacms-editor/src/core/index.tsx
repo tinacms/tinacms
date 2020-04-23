@@ -27,7 +27,7 @@ import { ImageProps } from '../types'
 
 import { CodeMirrorCss } from './styles/CodeMirror'
 import { ProseMirrorCss } from './styles/ProseMirror'
-import { EditorStateProvider } from './context/editorState'
+import { EditorStateProvider } from '../context/editorState'
 
 export interface WysiwygProps {
   input: any
