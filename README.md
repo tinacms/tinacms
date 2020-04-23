@@ -1,7 +1,7 @@
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-60-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-61-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # ![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png)
@@ -154,6 +154,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/blandfried"><img src="https://avatars1.githubusercontent.com/u/1953556?v=4" width="100px;" alt=""/><br /><sub><b>blandfried</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Ablandfried" title="Bug reports">🐛</a> <a href="https://github.com/tinacms/tinacms/commits?author=blandfried" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/marklawlor"><img src="https://avatars1.githubusercontent.com/u/3946701?v=4" width="100px;" alt=""/><br /><sub><b>Mark Lawlor</b></sub></a><br /><a href="#ideas-marklawlor" title="Ideas, Planning, & Feedback">🤔</a></td>
     <td align="center"><a href="https://github.com/BPScott"><img src="https://avatars0.githubusercontent.com/u/227292?v=4" width="100px;" alt=""/><br /><sub><b>Ben Scott</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/pulls?q=is%3Apr+reviewed-by%3ABPScott" title="Reviewed Pull Requests">👀</a></td>
+    <td align="center"><a href="https://github.com/mittonface"><img src="https://avatars2.githubusercontent.com/u/5082908?v=4" width="100px;" alt=""/><br /><sub><b>Brent Mitton</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=mittonface" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/commits?author=mittonface" title="Documentation">📖</a></td>
   </tr>
 </table>
 
