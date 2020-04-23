@@ -19,18 +19,16 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 
-type Option =
-  | string
-  | {
-      value: string
-      label: string
-    }
+type Option = {
+  value: string
+  label: string
+}
 
 interface SelectFieldProps {
   label?: string
   name: string
   component: string
-  options: Option[]
+  options: (Option | string)[]
 }
 
 export interface SelectProps {
@@ -38,12 +36,11 @@ export interface SelectProps {
   input: any
   field: SelectFieldProps
   disabled?: boolean
-  options?: Option[]
+  options?: (Option | string)[]
 }
 
 export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
   const selectOptions = options || field.options
-
   return (
     <SelectElement>
       <select
@@ -53,26 +50,21 @@ export const Select: React.FC<SelectProps> = ({ input, field, options }) => {
         {...input}
       >
         {selectOptions ? (
-          selectOptions.map((option: Option) => {
-            if (typeof option === 'object') {
-              return (
-                <option value={option.value} key={option.value}>
-                  {option.label}
-                </option>
-              )
-            }
-            return (
-              <option value={option} key={option}>
-                {option}
-              </option>
-            )
-          })
+          selectOptions.map(toProps).map(toComponent)
         ) : (
           <option>{input.value}</option>
         )}
       </select>
     </SelectElement>
   )
+}
+function toProps(option: Option | string): Option {
+  if (typeof option === 'object') return option
+  return { value: option, label: option }
+}
+
+function toComponent(option: Option) {
+  return <option value={option.value}>{option.label}</option>
 }
 
 const SelectElement = styled.div`
