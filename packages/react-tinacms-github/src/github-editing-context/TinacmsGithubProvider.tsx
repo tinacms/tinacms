@@ -32,7 +32,7 @@ interface ProviderProps {
   error?: any
 }
 
-type AuthState = null | 'completeSetup' | 'authenticate' | 'createFork'
+type AuthStep = null | 'completeSetup' | 'authenticate' | 'createFork'
 
 export const TinacmsGithubProvider = ({
   children,
@@ -44,39 +44,26 @@ export const TinacmsGithubProvider = ({
   const [error, setError] = useState<any>(null)
   const cms = useCMS()
   const github: GithubClient = cms.api.github
-  const [authorizingStatus, setAuthorizingStatus] = useState<AuthState>(null)
-
-  const openCompleteSetupModal = () => {
-    setAuthorizingStatus('completeSetup')
-  }
-
-  const openAuthModal = () => {
-    setAuthorizingStatus('authenticate')
-  }
-
-  const openForkModal = () => {
-    setAuthorizingStatus('createFork')
-  }
+  const [authStep, setAuthStep] = useState<AuthStep>(null)
 
   const tryEnterEditMode = async () => {
     const validSetup =
-      authorizingStatus === 'completeSetup' ||
+      authStep === 'completeSetup' ||
       (github.baseRepoFullName && github.clientId)
     const authenticated =
-      authorizingStatus === 'authenticate' || (await github.getUser())
-    const forkValid =
-      authorizingStatus === 'createFork' || (await github.getBranch())
+      authStep === 'authenticate' || (await github.getUser())
+    const forkValid = authStep === 'createFork' || (await github.getBranch())
 
     if (!validSetup) {
-      return openCompleteSetupModal()
+      return setAuthStep('completeSetup')
     }
 
     if (!authenticated) {
-      return openAuthModal()
+      return setAuthStep('authenticate')
     }
 
     if (!forkValid) {
-      return openForkModal()
+      return setAuthStep('createFork')
     }
 
     enterEditMode()
@@ -92,12 +79,12 @@ export const TinacmsGithubProvider = ({
       }}
     >
       {error && <GithubErrorModal error={error} />}
-      {authorizingStatus && (
+      {authStep && (
         <GithubAuthModal
           onUpdateAuthState={tryEnterEditMode}
-          authState={authorizingStatus}
+          authState={authStep}
           close={() => {
-            setAuthorizingStatus(null)
+            setAuthStep(null)
           }}
         />
       )}
