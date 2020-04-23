@@ -17,50 +17,133 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { EditorView } from 'prosemirror-view'
-import { MenuOption } from './MenuComponents'
+import { FunctionComponent, useRef, useState } from 'react'
 
-interface BlockTool {
-  Component: any
-  children: any
-  command: Function
-  typeName?: string
-  attrs?: any
+import { EditorState } from 'prosemirror-state'
+import { blockTool } from './blockTool'
+import { Dismissible } from 'react-dismissible'
+
+// TODO: Move this into this module?
+import { toggleHeader as th } from '../../../commands/heading-commands'
+import { useEditorStateContext } from '../../../context/editorState'
+import { MenuButton, MenuButtonDropdown } from './MenuComponents'
+import styled, { css } from 'styled-components'
+import { HeadingIcon } from '@tinacms/icons'
+import { EditorView } from 'prosemirror-view'
+
+export const BlockControl: FunctionComponent = () => {
+  const [active, setActive] = useState(false)
+  const menuButtonRef = useRef()
+  const { editorView } = useEditorStateContext()
+  const view = editorView!.view
+
+  const toggle = () => setActive(!active)
+
+  return (
+    <>
+      <MenuButton
+        ref={menuButtonRef}
+        data-tooltip={'Heading'}
+        onClick={toggle}
+        active={active}
+      >
+        <HeadingIcon />
+      </MenuButton>
+      <MenuButtonDropdown triggerRef={menuButtonRef} open={active}>
+        <Dismissible click escape disabled={!active} onDismiss={toggle}>
+          <H1 view={view} onClick={toggle} />
+          <H2 view={view} onClick={toggle} />
+          <H3 view={view} onClick={toggle} />
+          <H4 view={view} onClick={toggle} />
+          <H5 view={view} onClick={toggle} />
+          <H6 view={view} onClick={toggle} />
+        </Dismissible>
+      </MenuButtonDropdown>
+    </>
+  )
 }
 
-export function blockTool(options: BlockTool) {
-  const { Component, children, command, typeName, attrs } = options
-  return class extends React.Component<
-    { view: EditorView; onClick(): void },
-    any
-  > {
-    canDo = () => command(this.props.view.state)
-    onClick = () => {
-      command(this.props.view.state, this.props.view.dispatch)
-      this.props.view.focus()
-      this.props.onClick()
-    }
-    get active(): boolean {
-      if (!typeName) return false
+function makeToggleHeader(level: number) {
+  return function toggleHeader(
+    state: EditorState,
+    dispatch: typeof EditorView.prototype.dispatch
+  ) {
+    const tn = th(
+      state.schema.nodes.heading,
+      { level },
+      state.schema.nodes.paragraph,
+      null
+    )
 
-      const { state } = this.props.view
-      const $from = state.selection.$from
-      const node = $from.node($from.depth)
-      const correctNodeType = node.type.name === typeName
-      // Only works for Heading
-      const correctAttrs = attrs ? node.attrs.level === attrs.level : true
-      return correctNodeType && correctAttrs
-    }
-    render() {
-      return (
-        <MenuOption
-          onClick={this.onClick}
-          disabled={!this.canDo()}
-          active={this.active}
-        >
-          <Component>{children}</Component>
-        </MenuOption>
-      )
-    }
+    return tn(state, dispatch)
   }
 }
+
+const BaseHeading = css`
+  white-space: nowrap;
+  line-height: 1;
+  display: block;
+  margin: 0;
+`
+
+const HeadingOne = styled.h1`
+  ${BaseHeading}
+`
+const HeadingTwo = styled.h2`
+  ${BaseHeading}
+`
+const HeadingThree = styled.h3`
+  ${BaseHeading}
+`
+const HeadingFour = styled.h4`
+  ${BaseHeading}
+`
+const HeadingFive = styled.h5`
+  ${BaseHeading}
+`
+const HeadingSix = styled.h6`
+  ${BaseHeading}
+`
+
+const H1 = blockTool({
+  Component: HeadingOne,
+  children: 'Heading 1',
+  command: makeToggleHeader(1),
+  typeName: 'heading',
+  attrs: { level: 1 },
+})
+const H2 = blockTool({
+  Component: HeadingTwo,
+  children: 'Heading 2',
+  command: makeToggleHeader(2),
+  typeName: 'heading',
+  attrs: { level: 2 },
+})
+const H3 = blockTool({
+  Component: HeadingThree,
+  children: 'Heading 3',
+  command: makeToggleHeader(3),
+  typeName: 'heading',
+  attrs: { level: 3 },
+})
+const H4 = blockTool({
+  Component: HeadingFour,
+  children: 'Heading 4',
+  command: makeToggleHeader(4),
+  typeName: 'heading',
+  attrs: { level: 4 },
+})
+const H5 = blockTool({
+  Component: HeadingFive,
+  children: 'Heading 5',
+  command: makeToggleHeader(5),
+  typeName: 'heading',
+  attrs: { level: 5 },
+})
+const H6 = blockTool({
+  Component: HeadingSix,
+  children: 'Heading 6',
+  command: makeToggleHeader(6),
+  typeName: 'heading',
+  attrs: { level: 6 },
+})
