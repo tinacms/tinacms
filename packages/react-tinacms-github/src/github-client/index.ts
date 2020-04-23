@@ -51,6 +51,7 @@ export class GithubClient {
     this.baseBranch = baseBranch
     this.clientId = clientId
     this.authCallbackRoute = authCallbackRoute
+    this.validate()
   }
 
   authenticate() {
@@ -198,6 +199,29 @@ export class GithubClient {
     throw new GithubError(response.statusText, response.status)
   }
 
+  private validate(): void {
+    const errors = []
+    if (!this.proxy) {
+      errors.push('Missing `proxy` URL')
+    }
+    if (!this.authCallbackRoute) {
+      errors.push('Missing `authCallbackRoute`')
+    }
+    if (!this.baseRepoFullName) {
+      errors.push(
+        'Missing `baseRepoFullName`. It may not have been set in environment variables.'
+      )
+    }
+    if (!this.clientId) {
+      errors.push(
+        'Missing `clientId`. It may not have been set in environment variables.'
+      )
+    }
+    if (errors.length) {
+      throw new Error(createErrorMessage(errors))
+    }
+  }
+
   /**
    * The methods below maybe don't belong on GitHub client, but it's fine for now.
    */
@@ -225,3 +249,14 @@ class GithubError extends Error {
     this.status = status
   }
 }
+
+const createErrorMessage = (
+  errors: string[]
+) => `Failed to create the TinaCMS GithubClient
+
+${errors.map(error => `\t* ${error}`).join('\n')}
+
+Visit the setup guide for more information
+
+\thttps://tinacms.org/docs/nextjs/github-public-repo#setting-environment-variables
+`
