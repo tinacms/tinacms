@@ -16,7 +16,11 @@ limitations under the License.
 
 */
 
-import { ACCESS_TOKEN_KEY, WORKING_REPO_KEY, HEAD_BRANCH_KEY } from '../constants'
+import {
+  ACCESS_TOKEN_KEY,
+  WORKING_REPO_KEY,
+  HEAD_BRANCH_KEY,
+} from '../constants'
 
 export const previewHandler = (req: any, res: any) => {
   const previewData = {
