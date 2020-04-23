@@ -16,7 +16,13 @@ limitations under the License.
 
 */
 
-import React, { useState, ChangeEvent } from 'react'
+import React, {
+  useEffect,
+  useRef,
+  useState,
+  ChangeEvent,
+  MutableRefObject,
+} from 'react'
 import styled, { css } from 'styled-components'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
@@ -27,10 +33,10 @@ import { Dismissible } from 'react-dismissible'
 import { useEditorStateContext } from '../../../../context/editorState'
 
 interface ImageMenu {
-  uploadImages: (files: File[]) => Promise<string[]>
+  uploadImages?: (files: File[]) => Promise<string[]>
 }
 
-export default ({ uploadImages }: ImageMenu) => {
+export const ImageMenu = ({ uploadImages }: ImageMenu) => {
   if (!uploadImages) return null
 
   const { editorView } = useEditorStateContext()
@@ -38,7 +44,15 @@ export default ({ uploadImages }: ImageMenu) => {
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const menuButtonRef = React.useRef()
+  const menuButtonRef = useRef<HTMLDivElement | undefined>()
+  const [triggerRef, setTriggerRef] = useState<{
+    ref: MutableRefObject<HTMLDivElement | undefined>
+  }>({ ref: menuButtonRef })
+
+  // Ref is set to state here to initiate a re-render once ref is changed
+  useEffect(() => {
+    setTriggerRef({ ref: menuButtonRef })
+  }, [menuButtonRef])
 
   const uploadImageFile = (file: File) => {
     setUploading(true)
@@ -105,7 +119,7 @@ export default ({ uploadImages }: ImageMenu) => {
         <MediaIcon />
       </MenuButton>
       <MenuButtonDropdown
-        triggerRef={menuButtonRef}
+        triggerRef={triggerRef.ref}
         open={showImageModal}
         onKeyDown={handleKeyDown}
       >
