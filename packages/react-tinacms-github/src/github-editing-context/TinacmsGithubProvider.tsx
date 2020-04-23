@@ -32,7 +32,7 @@ interface ProviderProps {
   error?: any
 }
 
-type AuthStep = null | 'completeSetup' | 'authenticate' | 'createFork'
+type AuthStep = null | 'authenticate' | 'createFork'
 
 export const TinacmsGithubProvider = ({
   children,
@@ -47,16 +47,9 @@ export const TinacmsGithubProvider = ({
   const [authStep, setAuthStep] = useState<AuthStep>(null)
 
   const tryEnterEditMode = async () => {
-    const validSetup =
-      authStep === 'completeSetup' ||
-      (github.baseRepoFullName && github.clientId)
     const authenticated =
       authStep === 'authenticate' || (await github.getUser())
     const forkValid = authStep === 'createFork' || (await github.getBranch())
-
-    if (!validSetup) {
-      return setAuthStep('completeSetup')
-    }
 
     if (!authenticated) {
       return setAuthStep('authenticate')

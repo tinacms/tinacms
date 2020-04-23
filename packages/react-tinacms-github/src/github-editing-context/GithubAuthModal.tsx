@@ -43,28 +43,7 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
     }
   }, [authState])
 
-  if (authState === 'completeSetup') {
-    modalProps = {
-      title: 'GitHub Configuration Incomplete',
-      message: `The TinaCMS GitHub client was not configured correctly. Please make sure the baseRepoFullName and clientId were passed to the GithubClient constructor.  For more information visit the docs.`,
-      actions: [
-        {
-          name: 'Cancel',
-          action: close,
-        },
-        {
-          name: 'Visit the docs',
-          action: async () => {
-            window.open(
-              'https://tinacms.org/docs/nextjs/github-public-repo#setting-environment-variables',
-              '_blank'
-            )
-          },
-          primary: true,
-        },
-      ],
-    }
-  } else if (authState === 'authenticate') {
+  if (authState === 'authenticate') {
     modalProps = {
       title: 'GitHub Authorization',
       message:
