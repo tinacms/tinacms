@@ -29,12 +29,7 @@ import { AsyncButton } from '../components/AsyncButton'
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
 
-const GithubAuthModal = ({
-  onUpdateAuthState,
-  close,
-  authState,
-  authenticate,
-}: any) => {
+const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
   let modalProps
 
   const cms = useCMS()
@@ -83,7 +78,7 @@ const GithubAuthModal = ({
         {
           name: 'Continue to GitHub',
           action: async () => {
-            await authenticate()
+            await cms.api.github.authenticate()
             onUpdateAuthState()
           },
           primary: true,
