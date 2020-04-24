@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-toolbar",
-  "version": "0.1.0-alpha.4",
+  "version": "0.1.0-alpha.5",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.7.3",
-    "@tinacms/fields": "^0.9.3-alpha.3",
+    "@tinacms/fields": "^0.10.0-alpha.0",
     "@tinacms/forms": "^0.4.1-alpha.0",
     "react-dismissible": "^1.1.5"
   },
@@ -38,11 +38,11 @@
     "@tinacms/form-builder": "^0.3.2-alpha.2",
     "@tinacms/icons": "^0.9.0-alpha.1",
     "@tinacms/react-core": "^0.2.11-alpha.2",
-    "@tinacms/react-forms": "^0.1.2-alpha.3",
-    "@tinacms/react-modals": "^0.1.2-alpha.3",
-    "@tinacms/react-screens": "^0.1.1-alpha.3",
+    "@tinacms/react-forms": "^0.1.2-alpha.4",
+    "@tinacms/react-modals": "^0.1.2-alpha.4",
+    "@tinacms/react-screens": "^0.1.1-alpha.4",
     "@tinacms/scripts": "^0.1.13",
-    "@tinacms/styles": "^0.4.2-alpha.1"
+    "@tinacms/styles": "^0.4.2-alpha.2"
   },
   "peerDependencies": {
     "@tinacms/form-builder": ">=0.3",
