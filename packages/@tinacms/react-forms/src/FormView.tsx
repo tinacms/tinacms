@@ -202,10 +202,7 @@ const NoFieldsPlaceholder = () => (
     <Emoji>🤔</Emoji>
     <h3>Hey, you don't have any fields added to this form.</h3>
     <p>
-      <LinkButton
-        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
-        target="_blank"
-      >
+      <LinkButton href="https://tinacms.org/docs/fields" target="_blank">
         <Emoji>📖</Emoji> Field Setup Guide
       </LinkButton>
     </p>
@@ -215,7 +212,6 @@ const NoFieldsPlaceholder = () => (
 export const Wrapper = styled.div`
   display: block;
   margin: 0 auto;
-  max-width: 500px;
   width: 100%;
 `
 
@@ -224,15 +220,13 @@ export const FormBody: StyledComponent<'div', {}, {}> = styled.div`
   flex: 1 1 auto;
   display: flex;
   flex-direction: column;
-  scrollbar-width: none;
   width: 100%;
-  overflow: hidden;
+  overflow: auto;
   border-top: 1px solid var(--tina-color-grey-2);
   background-color: #f6f6f9;
 
   ${Wrapper} {
     height: 100%;
-    scrollbar-width: none;
   }
 `
 

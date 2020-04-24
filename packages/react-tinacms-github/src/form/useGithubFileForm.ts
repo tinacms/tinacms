@@ -50,7 +50,7 @@ export const useGithubFileForm = <T = any>(
         )
         .then((response: { content: { sha: string } }) => {
           cms.alerts.success(
-            `Saved Successfully: Changes committed to ${github.repoFullName}`
+            `Saved Successfully: Changes committed to ${github.workingRepoFullName}`
           )
           setSha(response.content.sha)
         })

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.0-alpha.0...react-tinacms-editor@0.5.0-alpha.1) (2020-04-24)
+
+
+### Bug Fixes
+
+* sticky menu useEffect dep list addition ([79f0f24](https://github.com/tinacms/tinacms/commit/79f0f24))
+
+
+
+
+
 # [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.4.1-alpha.2...react-tinacms-editor@0.5.0-alpha.0) (2020-04-20)
 
 

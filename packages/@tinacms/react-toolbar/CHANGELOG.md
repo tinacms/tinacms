@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.1.0-alpha.5](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.0-alpha.4...@tinacms/react-toolbar@0.1.0-alpha.5) (2020-04-24)
+
+
+### Features
+
+* add form actions to toolbar ([8e1fc34](https://github.com/tinacms/tinacms/commit/8e1fc34))
+
+
+
+
+
 # [0.1.0-alpha.4](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.0-alpha.3...@tinacms/react-toolbar@0.1.0-alpha.4) (2020-04-20)
 
 **Note:** Version bump only for package @tinacms/react-toolbar

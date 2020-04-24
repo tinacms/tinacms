@@ -20,7 +20,7 @@ import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 import { toggleMark } from 'prosemirror-commands'
 import { MenuButton } from './MenuComponents'
-import { useEditorStateContext } from '../../../core/context/editorState'
+import { useEditorStateContext } from '../../../context/editorState'
 
 export interface Options {
   mark: string

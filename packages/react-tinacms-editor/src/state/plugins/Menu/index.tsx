@@ -56,7 +56,7 @@ import {
 import { isMarkPresent } from '../../../utils'
 import ImageMenu from './Image/ImageMenu'
 import ImageLoaders from './Image/ImageLoaders'
-import { useEditorStateContext } from '../../../core/context/editorState'
+import { useEditorStateContext } from '../../../context/editorState'
 
 interface Props {
   bottom?: boolean
@@ -105,12 +105,13 @@ export const Menu = (props: Props) => {
   const menuRef: any = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
   const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
+  const { editorView } = useEditorStateContext()
 
   useEffect(() => {
     if (menuRef.current && sticky) {
       setMenuBoundingBox(menuRef.current.getBoundingClientRect())
     }
-  }, [menuRef])
+  }, [menuRef, editorView])
 
   useLayoutEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
@@ -156,8 +157,8 @@ export const Menu = (props: Props) => {
     e.preventDefault()
   }, [])
 
-  const { editorView } = useEditorStateContext()
   if (!editorView) return null
+
   return (
     <>
       {menuFixed && (

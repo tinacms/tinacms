@@ -24,6 +24,14 @@ With this process:
 
 i.e. `yarn add tinacms@next`
 
+### Script
+
+```sh
+scripts/prerelease.sh
+```
+
+### Manual
+
 1. **Checkout Master**
 
    ```
@@ -54,7 +62,7 @@ i.e. `yarn add tinacms@next`
    lerna publish from-package --dist-tag next
    ```
 
-1. **Push CHANGELOGs and git tags to Github:**
+1. **Push CHANGELOGs and git tags to GitHub:**
 
    ```
    git push && git push --tags
