@@ -29,27 +29,12 @@ import { AsyncButton } from '../components/AsyncButton'
 import React, { useState } from 'react'
 import styled from 'styled-components'
 
-const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
-  if (authState === 'authenticate') {
-    return (
-      <GithubAuthenticationModal
-        close={close}
-        onAuthSuccess={onUpdateAuthState}
-      />
-    )
-  } else if (authState === 'createFork') {
-    return <CreateForkModal onForkCreated={onUpdateAuthState} />
-  } else {
-    return null
-  }
-}
-
-interface GithubAuthenticationModalProps {
+export interface GithubAuthenticationModalProps {
   onAuthSuccess(): void
   close(): void
 }
 
-function GithubAuthenticationModal({
+export function GithubAuthenticationModal({
   onAuthSuccess,
   close,
 }: GithubAuthenticationModalProps) {
@@ -76,11 +61,11 @@ function GithubAuthenticationModal({
   )
 }
 
-interface CreateForkModalProps {
+export interface CreateForkModalProps {
   onForkCreated(): void
 }
 
-function CreateForkModal({ onForkCreated }: CreateForkModalProps) {
+export function CreateForkModal({ onForkCreated }: CreateForkModalProps) {
   const cms = useCMS()
   const [error, setError] = useState<string | undefined>()
   return (
@@ -120,7 +105,7 @@ interface ModalBuilderProps {
   actions: any[]
 }
 
-function ModalBuilder(modalProps: ModalBuilderProps) {
+export function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
     <TinaReset>
       <Modal>
@@ -144,5 +129,3 @@ function ModalBuilder(modalProps: ModalBuilderProps) {
 export const ErrorLabel = styled.p`
   color: var(--tina-color-error) !important;
 `
-
-export default GithubAuthModal
