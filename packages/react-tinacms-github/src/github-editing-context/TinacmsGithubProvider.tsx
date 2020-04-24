@@ -46,17 +46,31 @@ export const TinacmsGithubProvider = ({
   const github: GithubClient = cms.api.github
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
 
+  const beginAuth = async () => {
+    const authenticated = await github.getUser()
+
+    if (authenticated) {
+      onAuthSuccess()
+    } else {
+      setActiveModal('authenticate')
+    }
+  }
+
+  const onAuthSuccess = async () => {
+    const forkValid = await github.getBranch()
+
+    if (forkValid) {
+      enterEditMode()
+    } else {
+      setActiveModal('createFork')
+    }
+  }
+
   return (
     <GithubEditingContext.Provider
       value={{
         editMode,
-        enterEditMode: async () => {
-          const authenticated = await github.getUser()
-          if (authenticated) {
-            enterEditMode()
-          }
-          setActiveModal('authenticate')
-        },
+        enterEditMode: beginAuth,
         exitEditMode,
         setError,
       }}
@@ -65,15 +79,7 @@ export const TinacmsGithubProvider = ({
       {!error && activeModal === 'authenticate' && (
         <GithubAuthenticationModal
           close={close}
-          onAuthSuccess={async () => {
-            const forkValid = await github.getBranch()
-
-            if (forkValid) {
-              enterEditMode()
-            } else {
-              setActiveModal('createFork')
-            }
-          }}
+          onAuthSuccess={onAuthSuccess}
         />
       )}
       {!error && activeModal === 'createFork' && (
