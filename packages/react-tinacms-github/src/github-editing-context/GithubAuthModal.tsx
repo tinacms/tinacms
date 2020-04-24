@@ -63,9 +63,13 @@ export function GithubAuthenticationModal({
 
 export interface CreateForkModalProps {
   onForkCreated(): void
+  close(): void
 }
 
-export function CreateForkModal({ onForkCreated }: CreateForkModalProps) {
+export function CreateForkModal({
+  onForkCreated,
+  close,
+}: CreateForkModalProps) {
   const cms = useCMS()
   const [error, setError] = useState<string | undefined>()
   return (
