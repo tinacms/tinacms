@@ -19,7 +19,7 @@ limitations under the License.
 import React, { useState, useEffect } from 'react'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
-import GithubAuthModal from './GithubAuthModal'
+import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
 import { GithubClient } from '../github-client'
@@ -32,7 +32,7 @@ interface ProviderProps {
   error?: any
 }
 
-type AuthStep = null | 'authenticate' | 'createFork'
+type ModalNames = null | 'authenticate' | 'createFork'
 
 export const TinacmsGithubProvider = ({
   children,
@@ -44,42 +44,40 @@ export const TinacmsGithubProvider = ({
   const [error, setError] = useState<any>(null)
   const cms = useCMS()
   const github: GithubClient = cms.api.github
-  const [authStep, setAuthStep] = useState<AuthStep>(null)
-
-  const tryEnterEditMode = async () => {
-    const authenticated =
-      authStep === 'authenticate' || (await github.getUser())
-    const forkValid = authStep === 'createFork' || (await github.getBranch())
-
-    if (!authenticated) {
-      return setAuthStep('authenticate')
-    }
-
-    if (!forkValid) {
-      return setAuthStep('createFork')
-    }
-
-    enterEditMode()
-  }
+  const [activeModal, setActiveModal] = useState<ModalNames>(null)
 
   return (
     <GithubEditingContext.Provider
       value={{
         editMode,
-        enterEditMode: tryEnterEditMode,
+        enterEditMode: async () => {
+          const authenticated = await github.getUser()
+          if (authenticated) {
+            enterEditMode()
+          }
+          setActiveModal('authenticate')
+        },
         exitEditMode,
         setError,
       }}
     >
       {error && <GithubErrorModal error={error} />}
-      {authStep && (
-        <GithubAuthModal
-          onUpdateAuthState={tryEnterEditMode}
-          authState={authStep}
-          close={() => {
-            setAuthStep(null)
+      {!error && activeModal === 'authenticate' && (
+        <GithubAuthenticationModal
+          close={close}
+          onAuthSuccess={async () => {
+            const forkValid = await github.getBranch()
+
+            if (forkValid) {
+              enterEditMode()
+            } else {
+              setActiveModal('createFork')
+            }
           }}
         />
+      )}
+      {!error && activeModal === 'createFork' && (
+        <CreateForkModal onForkCreated={enterEditMode} />
       )}
       <PreviewErrorBoundary previewError={previewError}>
         {children}
