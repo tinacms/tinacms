@@ -79,21 +79,23 @@ export const MenuButtonDropdown = styled(
   ({ children, open, triggerRef, innerRef, ...styleProps }) => {
     const MenuPortal = useMenuPortal()
     const menuPortalRef = React.useRef<HTMLDivElement | null>(null)
+    const [menuOffset, setMenuOffset] = React.useState(0)
 
-    const menuOffset = React.useMemo(() => {
-      if (!triggerRef.current || !menuPortalRef.current) return 0
-      const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
-      const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
-      return menuDropdownBoundingBox.x - menuPortalBoundingBox.x
+    React.useEffect(() => {
+      if (triggerRef.current && menuPortalRef.current) {
+        const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
+        const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
+        setMenuOffset(menuDropdownBoundingBox.x - menuPortalBoundingBox.x)
+      }
     }, [triggerRef.current, menuPortalRef.current])
 
     return (
       <MenuPortal>
-        <Offset offset={menuOffset}>
-          <div ref={menuPortalRef} {...styleProps}>
-            {children}
-          </div>
-        </Offset>
+        <div ref={menuPortalRef}>
+          <Offset offset={menuOffset}>
+            <div {...styleProps}>{children}</div>
+          </Offset>
+        </div>
       </MenuPortal>
     )
   }
