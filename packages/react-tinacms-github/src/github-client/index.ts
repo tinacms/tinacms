@@ -62,6 +62,13 @@ export class GithubClient {
     return this.getUser()
   }
 
+  isAuthorized() {
+    // If this 404's they don't have access.
+    // This works for now but a different
+    // implementation will be needed.
+    return this.getBranch()
+  }
+
   async getUser() {
     try {
       const data = await this.req({

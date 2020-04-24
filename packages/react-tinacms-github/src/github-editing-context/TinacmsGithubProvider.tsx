@@ -55,9 +55,7 @@ export const TinacmsGithubProvider = ({
   }
 
   const onAuthSuccess = async () => {
-    const forkValid = await github.getBranch()
-
-    if (forkValid) {
+    if (await github.isAuthorized()) {
       enterEditMode()
     } else {
       setActiveModal('createFork')
