@@ -34,23 +34,23 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
     return (
       <GithubAuthenticationModal
         close={close}
-        onUpdateAuthState={onUpdateAuthState}
+        onAuthSuccess={onUpdateAuthState}
       />
     )
   } else if (authState === 'createFork') {
-    return <CreateForkModal onUpdateAuthState={onUpdateAuthState} />
+    return <CreateForkModal onForkCreated={onUpdateAuthState} />
   } else {
     return null
   }
 }
 
 interface GithubAuthenticationModalProps {
-  onUpdateAuthState(): void
+  onAuthSuccess(): void
   close(): void
 }
 
 function GithubAuthenticationModal({
-  onUpdateAuthState,
+  onAuthSuccess,
   close,
 }: GithubAuthenticationModalProps) {
   const cms = useCMS()
@@ -67,7 +67,7 @@ function GithubAuthenticationModal({
           name: 'Continue to GitHub',
           action: async () => {
             await cms.api.github.authenticate()
-            onUpdateAuthState()
+            onAuthSuccess()
           },
           primary: true,
         },
@@ -77,10 +77,10 @@ function GithubAuthenticationModal({
 }
 
 interface CreateForkModalProps {
-  onUpdateAuthState(): void
+  onForkCreated(): void
 }
 
-function CreateForkModal({ onUpdateAuthState }: CreateForkModalProps) {
+function CreateForkModal({ onForkCreated }: CreateForkModalProps) {
   const cms = useCMS()
   const [error, setError] = useState<string | undefined>()
   return (
@@ -97,7 +97,7 @@ function CreateForkModal({ onUpdateAuthState }: CreateForkModalProps) {
           action: async () => {
             try {
               await cms.api.github.createFork()
-              onUpdateAuthState()
+              onForkCreated()
             } catch (e) {
               setError(
                 'Forking repository failed. Are you sure the repository is public?'
