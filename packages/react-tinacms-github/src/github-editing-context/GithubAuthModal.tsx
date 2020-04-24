@@ -26,56 +26,63 @@ import {
 } from 'tinacms'
 import { TinaReset } from '@tinacms/styles'
 import { AsyncButton } from '../components/AsyncButton'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
 const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
-  const cms = useCMS()
-
-  const [error, setError] = useState<string | undefined>()
-
-  useEffect(() => {
-    //clear error when authState changes
-    if (error) {
-      setError(undefined)
-    }
-  }, [authState])
-
   if (authState === 'authenticate') {
     return (
-      <ModalBuilder
-        title="GitHub Authorization"
-        message="To save edits, Tina requires GitHub authorization. On save, changes will get commited to GitHub using your account."
-        actions={[
-          {
-            name: 'Cancel',
-            action: close,
-          },
-          {
-            name: 'Continue to GitHub',
-            action: async () => {
-              await cms.api.github.authenticate()
-              onUpdateAuthState()
-            },
-            primary: true,
-          },
-        ]}
-        error={error}
+      <GithubAuthenticationModal
+        close={close}
+        onUpdateAuthState={onUpdateAuthState}
       />
     )
   } else if (authState === 'createFork') {
-    return (
-      <CreateForkModal
-        onUpdateAuthState={onUpdateAuthState}
-        setError={setError}
-      />
-    )
+    return <CreateForkModal onUpdateAuthState={onUpdateAuthState} />
   } else {
     return null
   }
 }
 
-function CreateForkModal({ onUpdateAuthState, setError }: any) {
+interface GithubAuthenticationModalProps {
+  onUpdateAuthState(): void
+  close(): void
+}
+
+function GithubAuthenticationModal({
+  onUpdateAuthState,
+  close,
+}: GithubAuthenticationModalProps) {
+  const cms = useCMS()
+  return (
+    <ModalBuilder
+      title="GitHub Authorization"
+      message="To save edits, Tina requires GitHub authorization. On save, changes will get commited to GitHub using your account."
+      actions={[
+        {
+          name: 'Cancel',
+          action: close,
+        },
+        {
+          name: 'Continue to GitHub',
+          action: async () => {
+            await cms.api.github.authenticate()
+            onUpdateAuthState()
+          },
+          primary: true,
+        },
+      ]}
+    />
+  )
+}
+
+interface CreateForkModalProps {
+  onUpdateAuthState(): void
+}
+
+function CreateForkModal({ onUpdateAuthState }: CreateForkModalProps) {
+  const cms = useCMS()
+  const [error, setError] = useState<string | undefined>()
   return (
     <ModalBuilder
       title="GitHub Authorization"
