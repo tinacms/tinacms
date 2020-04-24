@@ -24,7 +24,7 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { TinaReset } from '@tinacms/styles'
+import { TinaReset, ButtonProps } from '@tinacms/styles'
 import { AsyncButton } from '../components/AsyncButton'
 import React, { useState, useEffect } from 'react'
 import styled from 'styled-components'
@@ -96,7 +96,14 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
   }
 }
 
-function ModalBuilder(modalProps: any) {
+interface ModalBuilderProps {
+  title: string
+  message: string
+  error?: string
+  actions: any[]
+}
+
+function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
     <TinaReset>
       <Modal>
