@@ -65,36 +65,45 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
     )
   } else if (authState === 'createFork') {
     return (
-      <ModalBuilder
-        title="GitHub Authorization"
-        message="A fork of this website is required to save changes."
-        actions={[
-          {
-            name: 'Cancel',
-            action: close,
-          },
-          {
-            name: 'Create Fork',
-            action: async () => {
-              try {
-                await cms.api.github.createFork()
-                onUpdateAuthState()
-              } catch (e) {
-                setError(
-                  'Forking repository failed. Are you sure the repository is public?'
-                )
-                throw e
-              }
-            },
-            primary: true,
-          },
-        ]}
-        error={error}
+      <CreateForkModal
+        onUpdateAuthState={onUpdateAuthState}
+        setError={setError}
       />
     )
   } else {
     return null
   }
+}
+
+function CreateForkModal({ onUpdateAuthState, setError }: any) {
+  return (
+    <ModalBuilder
+      title="GitHub Authorization"
+      message="A fork of this website is required to save changes."
+      actions={[
+        {
+          name: 'Cancel',
+          action: close,
+        },
+        {
+          name: 'Create Fork',
+          action: async () => {
+            try {
+              await cms.api.github.createFork()
+              onUpdateAuthState()
+            } catch (e) {
+              setError(
+                'Forking repository failed. Are you sure the repository is public?'
+              )
+              throw e
+            }
+          },
+          primary: true,
+        },
+      ]}
+      error={error}
+    />
+  )
 }
 
 interface ModalBuilderProps {
