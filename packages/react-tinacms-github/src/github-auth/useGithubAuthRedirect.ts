@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 import { useEffect } from 'react'
-
-export const GITHUB_AUTH_CODE_KEY = 'github_auth_code'
+import { GITHUB_AUTH_CODE_KEY } from '../github-client'
 
 export const useGithubAuthRedirect = () => {
   useEffect(() => {

@@ -18,6 +18,16 @@ limitations under the License.
 
 import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
+import { authenticate } from './authenticate'
+export * from './authenticate'
+
+export interface GithubClientOptions {
+  proxy: string
+  clientId: string
+  authCallbackRoute: string
+  baseRepoFullName: string
+  baseBranch?: string
+}
 
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
@@ -26,15 +36,37 @@ export class GithubClient {
   proxy: string
   baseRepoFullName: string
   baseBranch: string
+  clientId: string
+  authCallbackRoute: string
 
-  constructor(
-    proxy: string,
-    baseRepoFullName: string,
-    baseBranch: string = 'master'
-  ) {
+  constructor({
+    proxy,
+    clientId,
+    authCallbackRoute,
+    baseRepoFullName,
+    baseBranch = 'master',
+  }: GithubClientOptions) {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
     this.baseBranch = baseBranch
+    this.clientId = clientId
+    this.authCallbackRoute = authCallbackRoute
+    this.validate()
+  }
+
+  authenticate() {
+    return authenticate(this.clientId, this.authCallbackRoute)
+  }
+
+  isAuthenticated() {
+    return this.getUser()
+  }
+
+  isAuthorized() {
+    // If this 404's they don't have access.
+    // This works for now but a different
+    // implementation will be needed.
+    return this.getBranch()
   }
 
   async getUser() {
@@ -178,6 +210,29 @@ export class GithubClient {
     throw new GithubError(response.statusText, response.status)
   }
 
+  private validate(): void {
+    const errors = []
+    if (!this.proxy) {
+      errors.push('Missing `proxy` URL')
+    }
+    if (!this.authCallbackRoute) {
+      errors.push('Missing `authCallbackRoute`')
+    }
+    if (!this.baseRepoFullName) {
+      errors.push(
+        'Missing `baseRepoFullName`. It may not have been set in environment variables.'
+      )
+    }
+    if (!this.clientId) {
+      errors.push(
+        'Missing `clientId`. It may not have been set in environment variables.'
+      )
+    }
+    if (errors.length) {
+      throw new Error(createErrorMessage(errors))
+    }
+  }
+
   /**
    * The methods below maybe don't belong on GitHub client, but it's fine for now.
    */
@@ -205,3 +260,14 @@ class GithubError extends Error {
     this.status = status
   }
 }
+
+const createErrorMessage = (
+  errors: string[]
+) => `Failed to create the TinaCMS GithubClient
+
+${errors.map(error => `\t* ${error}`).join('\n')}
+
+Visit the setup guide for more information
+
+\thttps://tinacms.org/docs/nextjs/github-public-repo#setting-environment-variables
+`
