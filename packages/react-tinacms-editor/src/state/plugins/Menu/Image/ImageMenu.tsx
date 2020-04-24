@@ -16,13 +16,7 @@ limitations under the License.
 
 */
 
-import React, {
-  useEffect,
-  useRef,
-  useState,
-  ChangeEvent,
-  MutableRefObject,
-} from 'react'
+import React, { useRef, useState, ChangeEvent } from 'react'
 import styled, { css } from 'styled-components'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
@@ -39,20 +33,12 @@ interface ImageMenu {
 export const ImageMenu = ({ uploadImages }: ImageMenu) => {
   if (!uploadImages) return null
 
+  const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const menuButtonRef = useRef<HTMLDivElement | undefined>()
-  const [triggerRef, setTriggerRef] = useState<{
-    ref: MutableRefObject<HTMLDivElement | undefined>
-  }>({ ref: menuButtonRef })
-
-  // Ref is set to state here to initiate a re-render once ref is changed
-  useEffect(() => {
-    setTriggerRef({ ref: menuButtonRef })
-  }, [menuButtonRef])
 
   const uploadImageFile = (file: File) => {
     setUploading(true)
@@ -119,7 +105,7 @@ export const ImageMenu = ({ uploadImages }: ImageMenu) => {
         <MediaIcon />
       </MenuButton>
       <MenuButtonDropdown
-        triggerRef={triggerRef.ref}
+        triggerRef={menuButtonRef}
         open={showImageModal}
         onKeyDown={handleKeyDown}
       >
