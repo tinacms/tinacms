@@ -25,7 +25,7 @@ import { Dismissible } from 'react-dismissible'
 
 // TODO: Move this into this module?
 import { toggleHeader as th } from '../../../commands/heading-commands'
-import { useEditorStateContext } from '../../../core/context/editorState'
+import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton, MenuButtonDropdown } from './MenuComponents'
 import styled, { css } from 'styled-components'
 import { HeadingIcon } from '@tinacms/icons'

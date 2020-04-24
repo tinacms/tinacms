@@ -26,34 +26,24 @@ import {
 } from 'tinacms'
 import { TinaReset } from '@tinacms/styles'
 import { AsyncButton } from '../components/AsyncButton'
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import styled from 'styled-components'
 
-const GithubAuthModal = ({
-  onUpdateAuthState,
+export interface GithubAuthenticationModalProps {
+  onAuthSuccess(): void
+  close(): void
+}
+
+export function GithubAuthenticationModal({
+  onAuthSuccess,
   close,
-  authState,
-  authenticate,
-}: any) => {
-  let modalProps
-
+}: GithubAuthenticationModalProps) {
   const cms = useCMS()
-
-  const [error, setError] = useState<string | undefined>()
-
-  useEffect(() => {
-    //clear error when authState changes
-    if (error) {
-      setError(undefined)
-    }
-  }, [authState])
-
-  if (!authState.authenticated) {
-    modalProps = {
-      title: 'GitHub Authorization',
-      message:
-        'To save edits, Tina requires GitHub authorization. On save, changes will get commited to GitHub using your account.',
-      actions: [
+  return (
+    <ModalBuilder
+      title="GitHub Authorization"
+      message="To save edits, Tina requires GitHub authorization. On save, changes will get commited to GitHub using your account."
+      actions={[
         {
           name: 'Cancel',
           action: close,
@@ -61,18 +51,28 @@ const GithubAuthModal = ({
         {
           name: 'Continue to GitHub',
           action: async () => {
-            await authenticate()
-            onUpdateAuthState()
+            await cms.api.github.authenticate()
+            onAuthSuccess()
           },
           primary: true,
         },
-      ],
-    }
-  } else if (!authState.forkValid) {
-    modalProps = {
-      title: 'GitHub Authorization',
-      message: 'A fork of this website is required to save changes.',
-      actions: [
+      ]}
+    />
+  )
+}
+
+export interface CreateForkModalProps {
+  onForkCreated(): void
+}
+
+export function CreateForkModal({ onForkCreated }: CreateForkModalProps) {
+  const cms = useCMS()
+  const [error, setError] = useState<string | undefined>()
+  return (
+    <ModalBuilder
+      title="GitHub Authorization"
+      message="A fork of this website is required to save changes."
+      actions={[
         {
           name: 'Cancel',
           action: close,
@@ -82,7 +82,7 @@ const GithubAuthModal = ({
           action: async () => {
             try {
               await cms.api.github.createFork()
-              onUpdateAuthState()
+              onForkCreated()
             } catch (e) {
               setError(
                 'Forking repository failed. Are you sure the repository is public?'
@@ -92,12 +92,20 @@ const GithubAuthModal = ({
           },
           primary: true,
         },
-      ],
-    }
-  } else {
-    return null
-  }
+      ]}
+      error={error}
+    />
+  )
+}
 
+interface ModalBuilderProps {
+  title: string
+  message: string
+  error?: string
+  actions: any[]
+}
+
+export function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
     <TinaReset>
       <Modal>
@@ -105,7 +113,7 @@ const GithubAuthModal = ({
           <ModalHeader close={close}>{modalProps.title}</ModalHeader>
           <ModalBody padded>
             <p>{modalProps.message}</p>
-            {error && <ErrorLabel>{error}</ErrorLabel>}
+            {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
           </ModalBody>
           <ModalActions>
             {modalProps.actions.map((action: any) => (
@@ -121,5 +129,3 @@ const GithubAuthModal = ({
 export const ErrorLabel = styled.p`
   color: var(--tina-color-error) !important;
 `
-
-export default GithubAuthModal

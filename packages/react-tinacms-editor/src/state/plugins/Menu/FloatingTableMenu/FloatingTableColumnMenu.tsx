@@ -28,7 +28,7 @@ import {
   forEachCellInColumn,
   setCellAttrs,
 } from 'prosemirror-utils'
-import { useEditorStateContext } from '../../../../core/context/editorState'
+import { useEditorStateContext } from '../../../../context/editorState'
 
 const alignColumn = (view: EditorView, alignValue: string) => {
   const { state, dispatch } = view

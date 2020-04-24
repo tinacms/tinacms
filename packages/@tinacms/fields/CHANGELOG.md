@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.9.3-alpha.3...@tinacms/fields@0.10.0-alpha.0) (2020-04-24)
+
+
+### Features
+
+* added Option type for Select/SelectField ([#1047](https://github.com/tinacms/tinacms/issues/1047)) ([861c092](https://github.com/tinacms/tinacms/commit/861c092))
+
+
+
+
+
 ## [0.9.3-alpha.3](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.9.3-alpha.2...@tinacms/fields@0.9.3-alpha.3) (2020-04-20)
 
 **Note:** Version bump only for package @tinacms/fields

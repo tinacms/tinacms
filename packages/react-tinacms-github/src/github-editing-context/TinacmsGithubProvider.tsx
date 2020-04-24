@@ -16,84 +16,70 @@ limitations under the License.
 
 */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCMS } from 'tinacms'
 import GithubErrorModal from '../github-error/GithubErrorModal'
-import GithubAuthModal from './GithubAuthModal'
+import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
-import { authenticate as githubAuthenticate } from '../github-auth'
 import { GithubClient } from '../github-client'
 
 interface ProviderProps {
   children: any
-  clientId: string
-  authCallbackRoute: string
   editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
   error?: any
 }
 
-interface AuthState {
-  authenticated: true
-  forkValid: true
-}
+type ModalNames = null | 'authenticate' | 'createFork'
 
 export const TinacmsGithubProvider = ({
   children,
   editMode,
   enterEditMode,
   exitEditMode,
-  authCallbackRoute,
-  clientId,
   error: previewError,
 }: ProviderProps) => {
   const [error, setError] = useState<any>(null)
   const cms = useCMS()
   const github: GithubClient = cms.api.github
-  const [authorizingStatus, setAuthorizingStatus] = useState<AuthState | null>(
-    null
-  )
+  const [activeModal, setActiveModal] = useState<ModalNames>(null)
 
-  const tryEnterEditMode = async () => {
-    const authenticated =
-      authorizingStatus?.authenticated || (await github.getUser())
-    const forkValid = authorizingStatus?.forkValid || (await github.getBranch())
-
-    if (authenticated && forkValid) {
-      enterEditMode()
+  const beginAuth = async () => {
+    if (await github.isAuthenticated()) {
+      onAuthSuccess()
     } else {
-      setAuthorizingStatus({
-        authenticated,
-        forkValid,
-      })
+      setActiveModal('authenticate')
     }
   }
 
-  const authenticate = useCallback(() => {
-    return githubAuthenticate(clientId, authCallbackRoute)
-  }, [clientId, authCallbackRoute])
+  const onAuthSuccess = async () => {
+    if (await github.isAuthorized()) {
+      enterEditMode()
+    } else {
+      setActiveModal('createFork')
+    }
+  }
 
   return (
     <GithubEditingContext.Provider
       value={{
         editMode,
-        enterEditMode: tryEnterEditMode,
+        enterEditMode: beginAuth,
         exitEditMode,
         setError,
       }}
     >
       {error && <GithubErrorModal error={error} />}
-      {authorizingStatus && (
-        <GithubAuthModal
-          onUpdateAuthState={tryEnterEditMode}
-          authState={authorizingStatus}
-          close={() => {
-            setAuthorizingStatus(null)
-          }}
-          authenticate={authenticate}
+      {!error && activeModal === 'authenticate' && (
+        <GithubAuthenticationModal
+          close={close}
+          onAuthSuccess={onAuthSuccess}
         />
+      )}
+      {!error && activeModal === 'createFork' && (
+        <CreateForkModal onForkCreated={enterEditMode} />
       )}
       <PreviewErrorBoundary previewError={previewError}>
         {children}
