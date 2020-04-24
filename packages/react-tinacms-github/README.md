@@ -24,13 +24,15 @@ We will want to use the GithubClient to load/save our content using the Github A
 import { TinaCMS } from 'tinacms'
 import { GithubClient } from 'react-tinacms-github'
 
-const REPO_FULL_NAME = process.env.REPO_FULL_NAME // e.g: tinacms/tinacms.org
-
 const cms = new TinaCMS({
   apis: {
-      github: new GithubClient('/api/proxy-github', REPO_FULL_NAME),
-  },
-  // ... any other tina config
+    github: new GithubClient({
+      proxy: '/api/proxy-github',
+      authCallbackRoute: '/api/create-github-access-token'
+      clientId: process.env.GITHUB_CLIENT_ID,
+      baseRepoFullName: process.env.REPO_FULL_NAME // e.g: tinacms/tinacms.org,
+    })
+  }
 })
 ```
 
@@ -58,8 +60,6 @@ const exitEditMode = () => {
 const YourLayout = ({ editMode, error, children }) => {
   return (
     <TinacmsGithubProvider
-      clientId={process.env.GITHUB_CLIENT_ID}
-      authCallbackRoute='/api/create-github-access-token'
       editMode={editMode}
       enterEditMode={enterEditMode}
       exitEditMode={exitEditMode}

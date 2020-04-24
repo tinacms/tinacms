@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { GITHUB_AUTH_CODE_KEY } from './useGithubAuthRedirect'
 import popupWindow from './popupWindow'
+export const GITHUB_AUTH_CODE_KEY = 'github_auth_code'
 export const authenticate = (
   clientId: string,
   codeExchangeRoute: string
