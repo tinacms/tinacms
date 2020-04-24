@@ -58,6 +58,10 @@ export class GithubClient {
     return authenticate(this.clientId, this.authCallbackRoute)
   }
 
+  isAuthenticated() {
+    return this.getUser()
+  }
+
   async getUser() {
     try {
       const data = await this.req({

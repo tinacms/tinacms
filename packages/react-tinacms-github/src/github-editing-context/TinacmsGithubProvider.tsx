@@ -47,9 +47,7 @@ export const TinacmsGithubProvider = ({
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
 
   const beginAuth = async () => {
-    const authenticated = await github.getUser()
-
-    if (authenticated) {
+    if (await github.isAuthenticated()) {
       onAuthSuccess()
     } else {
       setActiveModal('authenticate')
