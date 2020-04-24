@@ -63,6 +63,7 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
         },
       ],
     }
+    return <ModalBuilder {...modalProps} error={error} />
   } else if (authState === 'createFork') {
     modalProps = {
       title: 'GitHub Authorization',
@@ -89,10 +90,13 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
         },
       ],
     }
+    return <ModalBuilder {...modalProps} error={error} />
   } else {
     return null
   }
+}
 
+function ModalBuilder(modalProps: any) {
   return (
     <TinaReset>
       <Modal>
@@ -100,7 +104,7 @@ const GithubAuthModal = ({ onUpdateAuthState, close, authState }: any) => {
           <ModalHeader close={close}>{modalProps.title}</ModalHeader>
           <ModalBody padded>
             <p>{modalProps.message}</p>
-            {error && <ErrorLabel>{error}</ErrorLabel>}
+            {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
           </ModalBody>
           <ModalActions>
             {modalProps.actions.map((action: any) => (
