@@ -21,7 +21,7 @@ import ReactDOM from 'react-dom'
 import { LoadingDots } from '@tinacms/react-forms'
 import styled from 'styled-components'
 
-export default () => {
+export const ImageLoaders = () => {
   const markerImageLoader = document.getElementsByClassName(
     'image_loading_indicator'
   )

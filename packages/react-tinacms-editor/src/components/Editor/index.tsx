@@ -21,13 +21,13 @@ import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Plugin } from '@tinacms/core'
 
-import { Menu } from '../state/plugins/Menu'
-import { Format } from '../Translator'
-import { ImageProps } from '../types'
+import { Menu } from '../Menu'
+import { Format } from '../../Translator'
+import { ImageProps } from '../../types'
 
 import { CodeMirrorCss } from './styles/CodeMirror'
 import { ProseMirrorCss } from './styles/ProseMirror'
-import { EditorStateProvider } from '../context/editorState'
+import { EditorStateProvider } from '../../context/editorState'
 
 export interface WysiwygProps {
   input: any
