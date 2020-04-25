@@ -46,7 +46,7 @@ export const TinacmsGithubProvider = ({
   const github: GithubClient = cms.api.github
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
 
-  const onClose = async () => {
+  const onClose = () => {
     setActiveModal(null)
   }
 
