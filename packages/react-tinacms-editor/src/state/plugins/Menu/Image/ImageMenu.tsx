@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import React, { useState, ChangeEvent } from 'react'
+import React, { useRef, useState, ChangeEvent } from 'react'
 import styled, { css } from 'styled-components'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
@@ -27,18 +27,18 @@ import { Dismissible } from 'react-dismissible'
 import { useEditorStateContext } from '../../../../context/editorState'
 
 interface ImageMenu {
-  uploadImages: (files: File[]) => Promise<string[]>
+  uploadImages?: (files: File[]) => Promise<string[]>
 }
 
-export default ({ uploadImages }: ImageMenu) => {
+export const ImageMenu = ({ uploadImages }: ImageMenu) => {
   if (!uploadImages) return null
 
+  const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
-  const menuButtonRef = React.useRef()
 
   const uploadImageFile = (file: File) => {
     setUploading(true)

@@ -24,7 +24,14 @@ import { undo, redo, undoDepth, redoDepth } from 'prosemirror-history'
 import { MenuButton } from './MenuComponents'
 import { useEditorStateContext } from '../../../context/editorState'
 
-export const UndoControl = () => {
+export const HistoryControl = () => (
+  <>
+    <UndoControl />
+    <RedoControl />
+  </>
+)
+
+const UndoControl = () => {
   const { editorView } = useEditorStateContext()
   const undoChange = () => {
     const { state, dispatch } = editorView!.view
@@ -43,7 +50,7 @@ export const UndoControl = () => {
   )
 }
 
-export const RedoControl = () => {
+const RedoControl = () => {
   const { editorView } = useEditorStateContext()
 
   const redoChange = () => {

@@ -16,4 +16,6 @@ limitations under the License.
 
 */
 
-export * from './components/Editor'
+export { FloatingImageMenu } from './FloatingImageMenu'
+export { ImageLoaders } from './ImageLoaders'
+export { ImageMenu } from './ImageMenu'
