@@ -265,6 +265,7 @@ const SelectOption = styled.button<SelectOptionProps>`
       font-weight: bold;
       color: var(--tina-color-primary);
       background-color: var(--tina-color-grey-1);
+      pointer-events: none;
     `};
 `
 
