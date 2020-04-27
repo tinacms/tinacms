@@ -22,11 +22,6 @@ interface Branch {
   locked: boolean
 }
 
-const testBranches: Branch[] = [
-  { name: 'master', locked: true },
-  { name: 'release-notes', locked: false },
-]
-
 interface BranchSwitcherProps {
   onBranchChange?(branch: string): void
 }
@@ -38,8 +33,11 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   const [createBranchOpen, setCreateBranchOpen] = React.useState(false)
   const [filterValue, setFilterValue] = React.useState('')
   const selectListRef = React.useRef<HTMLElement>()
-  const data = testBranches
-  const currentBranch = github.branchName
+
+  const [branches, setBranches] = React.useState<Branch[]>([])
+  React.useEffect(() => {
+    github.getBranchList().then(setBranches)
+  }, [])
 
   const closeDropdown = () => {
     setOpen(false)
@@ -59,7 +57,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
       <SelectWrapper>
         <SelectBox onClick={() => setOpen(!open)} open={open}>
           <SelectLabel>Branch</SelectLabel>
-          <SelectCurrent>{currentBranch}</SelectCurrent>
+          <SelectCurrent>{github.branchName}</SelectCurrent>
           <ChevronDownIcon />
         </SelectBox>
         <SelectDropdown open={open}>
@@ -72,14 +70,14 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
               />
             </DropdownHeader>
             <SelectList ref={selectListRef as any}>
-              {data
+              {branches
                 .filter(option => {
                   return option.name.includes(filterValue)
                 })
                 .map(option => (
                   <SelectOption
                     key={option.name}
-                    active={option.name === currentBranch}
+                    active={option.name === github.branchName}
                     onClick={() => {
                       cms.alerts.info('Switched to branch ' + option.name)
                       github.setWorkingBranch(option.name)
@@ -92,7 +90,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
                     {option.locked && <LockedIcon />} {option.name}
                   </SelectOption>
                 ))}
-              {data.filter(option => {
+              {branches.filter(option => {
                 return option.name.includes(filterValue)
               }).length === 0 && (
                 <SelectEmptyState>No branches to display.</SelectEmptyState>
@@ -108,6 +106,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
       </SelectWrapper>
       {createBranchOpen && (
         <CreateBranchModal
+          branches={branches}
           close={() => {
             setCreateBranchOpen(false)
           }}
@@ -117,10 +116,10 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   )
 }
 
-const CreateBranchModal = ({ close }: any) => {
+const CreateBranchModal = ({ close, branches }: any) => {
   const cms = useCMS()
 
-  const branchOptions = testBranches.map(function(branch) {
+  const branchOptions = branches.map(function(branch: Branch) {
     return branch.name
   })
 
