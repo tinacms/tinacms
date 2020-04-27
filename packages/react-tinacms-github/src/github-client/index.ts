@@ -180,6 +180,13 @@ export class GithubClient {
     // return // Bubble up error here?
   }
 
+  async getBranchList() {
+    return [
+      { name: 'master', locked: true },
+      { name: 'release-notes', locked: false },
+    ]
+  }
+
   async commit(
     filePath: string,
     sha: string,
