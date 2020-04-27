@@ -30,7 +30,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   const cms = useCMS()
   const github: GithubClient = cms.api.github
   const [open, setOpen] = React.useState(false)
-  const [createBranchOpen, setCreateBranchOpen] = React.useState(false)
+  const [createBranchProps, setCreateBranchProps] = React.useState<any>()
   const [filterValue, setFilterValue] = React.useState('')
   const selectListRef = React.useRef<HTMLElement>()
 
@@ -48,8 +48,8 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   }
 
   const openCreateBranchModal = () => {
+    setCreateBranchProps({ name: filterValue })
     closeDropdown()
-    setCreateBranchOpen(true)
   }
 
   return (
@@ -104,11 +104,12 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
           </Dismissible>
         </SelectDropdown>
       </SelectWrapper>
-      {createBranchOpen && (
+      {createBranchProps && (
         <CreateBranchModal
+          name={createBranchProps.name}
           onBranchChange={onBranchChange}
           close={() => {
-            setCreateBranchOpen(false)
+            setCreateBranchProps(null)
           }}
         />
       )}
@@ -116,15 +117,18 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   )
 }
 
-const CreateBranchModal = ({ onBranchChange, close }: any) => {
+const CreateBranchModal = ({ name, onBranchChange, close }: any) => {
   const cms = useCMS()
+  console.log({ name })
 
   const form: Form = React.useMemo(
     () =>
       new Form({
         label: 'create-branch',
         id: 'create-branch-id',
-        actions: [],
+        initialValues: {
+          name,
+        },
         fields: [{ label: 'Branch Name', name: 'name', component: 'text' }],
         async onSubmit({ name }) {
           await cms.api.github.createBranch(name)
