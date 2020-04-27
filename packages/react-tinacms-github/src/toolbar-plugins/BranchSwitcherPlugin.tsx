@@ -102,7 +102,9 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
             </DropdownHeader>
             <SelectList ref={selectListRef as any}>
               {branchStatus === 'pending' && (
-                <LoadingDots color="var(--tina-color-primary)" />
+                <SelectLoadingState>
+                  <LoadingDots color="var(--tina-color-primary)" />
+                </SelectLoadingState>
               )}
               {branchStatus === 'loaded' && (
                 <>
@@ -270,7 +272,7 @@ const DropdownHeader = styled.div`
 `
 
 const SelectEmptyState = styled.div`
-  display: lock;
+  display: block;
   border: none;
   outline: none;
   padding: var(--tina-padding-small);
@@ -281,6 +283,18 @@ const SelectEmptyState = styled.div`
   white-space: nowrap;
   width: 100%;
   transition: all 150ms ease-out;
+  flex: 0 0 auto;
+`
+
+const SelectLoadingState = styled.div`
+  display: flex;
+  border: none;
+  outline: none;
+  padding: var(--tina-padding-small);
+  background: transparent;
+  width: 100%;
+  justify-content: center;
+  align-items: center;
   flex: 0 0 auto;
 `
 
