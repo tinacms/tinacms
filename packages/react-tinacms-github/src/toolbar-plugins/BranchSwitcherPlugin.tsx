@@ -33,12 +33,13 @@ interface BranchSwitcherProps {
 
 const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   const cms = useCMS()
+  const github: GithubClient = cms.api.github
   const [open, setOpen] = React.useState(false)
   const [createBranchOpen, setCreateBranchOpen] = React.useState(false)
-  const [currentBranch, setCurrentBranch] = React.useState('branch-switcher')
   const [filterValue, setFilterValue] = React.useState('')
   const selectListRef = React.useRef<HTMLElement>()
   const data = testBranches
+  const currentBranch = github.branchName
 
   const closeDropdown = () => {
     setOpen(false)
@@ -81,9 +82,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
                     active={option.name === currentBranch}
                     onClick={() => {
                       cms.alerts.info('Switched to branch ' + option.name)
-                      const github: GithubClient = cms.api.github
                       github.setWorkingBranch(option.name)
-                      setCurrentBranch(option.name)
                       closeDropdown()
                       if (onBranchChange) {
                         onBranchChange(option.name)
