@@ -29,6 +29,11 @@ export interface GithubClientOptions {
   baseBranch?: string
 }
 
+export interface Branch {
+  name: string
+  protected: boolean
+}
+
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
@@ -180,7 +185,7 @@ export class GithubClient {
     // return // Bubble up error here?
   }
 
-  async getBranchList() {
+  async getBranchList(): Promise<Branch[]> {
     return await this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/branches`,
       method: 'GET',
