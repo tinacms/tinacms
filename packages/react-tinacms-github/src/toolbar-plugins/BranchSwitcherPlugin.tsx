@@ -174,7 +174,7 @@ const SelectFilter = styled(Input)`
   flex: 0 1 auto;
 
   ::placeholder {
-    color: var(--tina-color-grey-3);
+    color: var(--tina-color-grey-4);
   }
 `
 
