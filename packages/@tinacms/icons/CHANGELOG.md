@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.9.0-alpha.1...@tinacms/icons@0.9.0) (2020-04-27)
+
+**Note:** Version bump only for package @tinacms/icons
+
+
+
+
+
 # [0.9.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.9.0-alpha.0...@tinacms/icons@0.9.0-alpha.1) (2020-04-07)
 
 **Note:** Version bump only for package @tinacms/icons
