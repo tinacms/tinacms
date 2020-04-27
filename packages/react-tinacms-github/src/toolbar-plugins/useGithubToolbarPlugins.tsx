@@ -26,13 +26,18 @@ import { BranchSwitcherPlugin } from './BranchSwitcherPlugin'
 
 export const useGithubToolbarPlugins = () => {
   const cms = useCMS()
-  const { editMode } = useGithubEditing()
+  const { editMode, enterEditMode } = useGithubEditing()
 
   useEffect(() => {
     const plugins = [
       ForkNameToolbarWidget,
       PullRequestToolbarWidget,
-      BranchSwitcherPlugin,
+      {
+        ...BranchSwitcherPlugin,
+        props: {
+          onBranchChange: enterEditMode,
+        },
+      },
     ] as Plugin[]
 
     const removePlugins = () => {
