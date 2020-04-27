@@ -114,6 +114,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
                       active={option.name === github.branchName}
                       onClick={() => {
                         setConfirmSwitchProps(option)
+                        closeDropdown()
                       }}
                     >
                       {option.protected && <LockIcon />} {option.name}
