@@ -18,11 +18,8 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 import React from 'react'
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 import { markControl } from './markControl'
-import { FormattingDropdown } from './FormattingDropdown'
-import { FloatingTableMenu } from './FloatingTableMenu'
 import {
   toggleBulletList,
   toggleOrderedList,
@@ -43,43 +40,37 @@ import {
   UnderlineIcon,
   UnorderedListIcon,
 } from '@tinacms/icons'
-import { UndoControl, RedoControl } from './historyControl'
-import { MenuPortalProvider } from './MenuPortal'
-import { FloatingLinkForm } from '../links/FloatingLinkForm'
-import FloatingImageMenu from './Image/FloatingImageMenu'
-import {
-  MenuButton,
-  MenuPlaceholder,
-  MenuWrapper,
-  MenuContainer,
-} from './MenuComponents'
+import { MenuButton } from './MenuComponents'
 import { isMarkPresent } from '../../../utils'
-import ImageMenu from './Image/ImageMenu'
-import ImageLoaders from './Image/ImageLoaders'
 import { useEditorStateContext } from '../../../context/editorState'
 
-interface Props {
-  bottom?: boolean
-  sticky?: boolean | string
-  uploadImages?: (files: File[]) => Promise<string[]>
-}
+export const InlineControl = () => (
+  <>
+    <BoldControl />
+    <ItalicControl />
+    <UnderlineControl />
+  </>
+)
 
 const BoldControl = markControl({
   mark: 'strong',
   Icon: BoldIcon,
   tooltip: 'Bold',
 })
+
 const ItalicControl = markControl({
   mark: 'em',
   Icon: ItalicIcon,
   tooltip: 'Italic',
 })
+
 const UnderlineControl = markControl({
   mark: 'underline',
   Icon: UnderlineIcon,
   tooltip: 'Underline',
 })
-const LinkControl = markControl({
+
+export const LinkControl = markControl({
   mark: 'link',
   Icon: LinkIcon,
   tooltip: 'Link',
@@ -97,104 +88,6 @@ const LinkControl = markControl({
     return dispatch(state.tr.setMeta('show_link_toolbar', true))
   },
 })
-
-export const Menu = (props: Props) => {
-  const { bottom = false, sticky = true, uploadImages } = props
-  const [menuFixed, setMenuFixed] = useState(false)
-  const isBrowser = typeof window !== `undefined`
-  const menuRef: any = useRef<HTMLDivElement>(null)
-  const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
-  const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
-  const { editorView } = useEditorStateContext()
-
-  useEffect(() => {
-    if (menuRef.current && sticky) {
-      setMenuBoundingBox(menuRef.current.getBoundingClientRect())
-    }
-  }, [menuRef, editorView])
-
-  useLayoutEffect(() => {
-    if (!isBrowser || !menuRef.current || !sticky) {
-      return
-    }
-
-    const handleScroll = () => {
-      const wysiwygWrapper = menuRef.current.parentElement
-      const startPosition = wysiwygWrapper ? wysiwygWrapper.offsetTop : 0
-      const endPosition = wysiwygWrapper
-        ? startPosition + wysiwygWrapper.offsetHeight
-        : 0
-
-      if (window.scrollY > startPosition && window.scrollY < endPosition) {
-        setMenuFixed(true)
-      } else {
-        setMenuFixed(false)
-      }
-    }
-
-    const handleResize = () => {
-      if (menuRef.current) {
-        const wasMenuFixed = menuFixed
-        setMenuFixed(false)
-        setMenuBoundingBox(menuRef.current.getBoundingClientRect())
-        setMenuFixed(wasMenuFixed)
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [menuRef, menuBoundingBox])
-
-  const supportBlocks = true
-
-  const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
-    e.stopPropagation()
-    e.preventDefault()
-  }, [])
-
-  if (!editorView) return null
-
-  return (
-    <>
-      {menuFixed && (
-        <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
-      )}
-      <MenuWrapper
-        menuFixedTopOffset={menuFixedTopOffset}
-        menuFixed={menuFixed}
-        menuBoundingBox={menuBoundingBox}
-        ref={menuRef}
-      >
-        <MenuPortalProvider>
-          <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-            {supportBlocks && <FormattingDropdown />}
-            <BoldControl />
-            <ItalicControl />
-            <UnderlineControl />
-            <LinkControl />
-            {uploadImages && <ImageMenu uploadImages={uploadImages} />}
-            {supportBlocks && <TableControl bottom={bottom} />}
-            {supportBlocks && <QuoteControl bottom={bottom} />}
-            {supportBlocks && <CodeControl bottom={bottom} />}
-            {supportBlocks && <BulletList bottom={bottom} />}
-            {supportBlocks && <OrderedList bottom={bottom} />}
-            <UndoControl />
-            <RedoControl />
-          </MenuContainer>
-        </MenuPortalProvider>
-      </MenuWrapper>
-      <FloatingTableMenu />
-      <ImageLoaders />
-      <FloatingImageMenu />
-      <FloatingLinkForm />
-    </>
-  )
-}
 
 const commandContrl = (
   command: any,
@@ -254,27 +147,43 @@ function insertTableCmd(state: EditorState, dispatch: any) {
 function makeCodeBlock(state: EditorState, dispatch: any) {
   return setBlockType(state.schema.nodes.code_block)(state, dispatch)
 }
-const TableControl = commandContrl(insertTableCmd, TableIcon, 'Table', 'Table')
 
-const QuoteControl = commandContrl(
+export const TableControl = commandContrl(
+  insertTableCmd,
+  TableIcon,
+  'Table',
+  'Table'
+)
+
+export const QuoteControl = commandContrl(
   wrapInBlockquote,
   QuoteIcon,
   'Blockquote',
   'Blockquote'
 )
-const CodeControl = commandContrl(
+
+export const CodeControl = commandContrl(
   makeCodeBlock,
   CodeIcon,
   'Codeblock',
   'Codeblock',
   false
 ) //codeblock focusing messes with scroll
+
+export const ListControl = (props: any) => (
+  <>
+    <BulletList {...props} />
+    <OrderedList {...props} />
+  </>
+)
+
 const BulletList = commandContrl(
   toggleBulletList,
   UnorderedListIcon,
   'Unordered List',
   'Unordered List'
 )
+
 const OrderedList = commandContrl(
   toggleOrderedList,
   OrderedListIcon,

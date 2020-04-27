@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import React, { useState, useRef, useEffect } from 'react'
+import React, { useState, useRef, useEffect, FunctionComponent } from 'react'
 import debounce from 'lodash.debounce'
 import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
@@ -27,7 +27,7 @@ import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 import { useEditorStateContext } from '../../../../context/editorState'
 
-export default () => {
+export const FloatingImageMenu: FunctionComponent = () => {
   const { editorView } = useEditorStateContext()
   const view = editorView!.view
   const { selectedImage } = imagePluginKey.getState(view.state)

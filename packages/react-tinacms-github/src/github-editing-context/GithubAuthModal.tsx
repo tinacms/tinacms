@@ -43,6 +43,7 @@ export function GithubAuthenticationModal({
     <ModalBuilder
       title="GitHub Authorization"
       message="To save edits, Tina requires GitHub authorization. On save, changes will get commited to GitHub using your account."
+      close={close}
       actions={[
         {
           name: 'Cancel',
@@ -63,15 +64,20 @@ export function GithubAuthenticationModal({
 
 export interface CreateForkModalProps {
   onForkCreated(): void
+  close(): void
 }
 
-export function CreateForkModal({ onForkCreated }: CreateForkModalProps) {
+export function CreateForkModal({
+  onForkCreated,
+  close,
+}: CreateForkModalProps) {
   const cms = useCMS()
   const [error, setError] = useState<string | undefined>()
   return (
     <ModalBuilder
       title="GitHub Authorization"
       message="A fork of this website is required to save changes."
+      close={close}
       actions={[
         {
           name: 'Cancel',
@@ -103,6 +109,7 @@ interface ModalBuilderProps {
   message: string
   error?: string
   actions: any[]
+  close(): void
 }
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
@@ -110,7 +117,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
     <TinaReset>
       <Modal>
         <ModalPopup>
-          <ModalHeader close={close}>{modalProps.title}</ModalHeader>
+          <ModalHeader close={modalProps.close}>{modalProps.title}</ModalHeader>
           <ModalBody padded>
             <p>{modalProps.message}</p>
             {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}

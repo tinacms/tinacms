@@ -19,58 +19,7 @@ limitations under the License.
 import * as React from 'react'
 
 import styled, { css } from 'styled-components'
-import { useMenuPortal } from './MenuPortal'
-
-type MenuPlaceholderProps = {
-  menuBoundingBox: any
-}
-
-export const MenuPlaceholder = styled.div<MenuPlaceholderProps>`
-  color: transparent;
-  background: transparent;
-  pointer-events: none;
-  position: relative;
-  display: block;
-  height: ${props => props.menuBoundingBox.height}px;
-  width: ${props => props.menuBoundingBox.width}px;
-`
-
-type MenuWrapperProps = {
-  menuFixed: boolean
-  menuBoundingBox: any
-  menuFixedTopOffset: string
-}
-
-export const MenuWrapper = styled.div<MenuWrapperProps>`
-  position: relative;
-  margin-bottom: 14px;
-  z-index: var(--tina-z-index-1);
-
-  ${props =>
-    props.menuFixed &&
-    css`
-      position: fixed;
-      width: ${props.menuBoundingBox.width}px;
-      top: ${props.menuFixedTopOffset};
-    `};
-`
-
-export const MenuContainer = styled.div`
-  display: flex;
-  flex-direction: row;
-  justify-content: flex-start;
-  flex-wrap: wrap;
-  justify-content: space-between;
-  position: relative;
-  top: 0;
-  width: 100%;
-  background-color: white;
-  border-radius: var(--tina-radius-small);
-  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
-  border: 1px solid var(--tina-color-grey-2);
-  overflow: hidden;
-  z-index: var(--tina-z-index-0);
-`
+import { useMenuPortal } from '../../../context/MenuPortal'
 
 const MenuItem = css`
   flex: 1 1 32px;
@@ -130,21 +79,23 @@ export const MenuButtonDropdown = styled(
   ({ children, open, triggerRef, innerRef, ...styleProps }) => {
     const MenuPortal = useMenuPortal()
     const menuPortalRef = React.useRef<HTMLDivElement | null>(null)
+    const [menuOffset, setMenuOffset] = React.useState(0)
 
-    const menuOffset = React.useMemo(() => {
-      if (!triggerRef.current || !menuPortalRef.current) return 0
-      const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
-      const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
-      return menuDropdownBoundingBox.x - menuPortalBoundingBox.x
+    React.useEffect(() => {
+      if (triggerRef.current && menuPortalRef.current) {
+        const menuDropdownBoundingBox = triggerRef.current.getBoundingClientRect()
+        const menuPortalBoundingBox = menuPortalRef.current.getBoundingClientRect()
+        setMenuOffset(menuDropdownBoundingBox.x - menuPortalBoundingBox.x)
+      }
     }, [triggerRef.current, menuPortalRef.current])
 
     return (
       <MenuPortal>
-        <Offset offset={menuOffset}>
-          <div ref={menuPortalRef} {...styleProps}>
-            {children}
-          </div>
-        </Offset>
+        <div ref={menuPortalRef}>
+          <Offset offset={menuOffset}>
+            <div {...styleProps}>{children}</div>
+          </Offset>
+        </div>
       </MenuPortal>
     )
   }
