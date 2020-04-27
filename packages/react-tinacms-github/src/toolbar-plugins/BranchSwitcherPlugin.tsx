@@ -106,7 +106,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
       </SelectWrapper>
       {createBranchOpen && (
         <CreateBranchModal
-          branches={branches}
+          onBranchChange={onBranchChange}
           close={() => {
             setCreateBranchOpen(false)
           }}
@@ -116,16 +116,8 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   )
 }
 
-const CreateBranchModal = ({ close, branches }: any) => {
+const CreateBranchModal = ({ onBranchChange, close }: any) => {
   const cms = useCMS()
-
-  const branchOptions = branches.map(function(branch: Branch) {
-    return branch.name
-  })
-
-  const handleSubmit = () => {
-    return null
-  }
 
   const form: Form = React.useMemo(
     () =>
@@ -133,18 +125,13 @@ const CreateBranchModal = ({ close, branches }: any) => {
         label: 'create-branch',
         id: 'create-branch-id',
         actions: [],
-        fields: [
-          {
-            label: 'Base Branch',
-            name: 'base-branch',
-            component: 'select',
-            //@ts-ignore
-            options: branchOptions,
-          },
-          { label: 'Branch Name', name: 'branch-name', component: 'text' },
-        ],
-        onSubmit() {
-          handleSubmit()
+        fields: [{ label: 'Branch Name', name: 'name', component: 'text' }],
+        async onSubmit({ name }) {
+          await cms.api.github.createBranch(name)
+          cms.api.github.setWorkingBranch(name)
+          if (onBranchChange) {
+            onBranchChange(name)
+          }
         },
       }),
     [cms]
