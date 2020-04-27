@@ -181,10 +181,10 @@ export class GithubClient {
   }
 
   async getBranchList() {
-    return [
-      { name: 'master', locked: true },
-      { name: 'release-notes', locked: false },
-    ]
+    return await this.req({
+      url: `https://api.github.com/repos/${this.workingRepoFullName}/branches`,
+      method: 'GET',
+    })
   }
 
   async commit(
