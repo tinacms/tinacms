@@ -45,6 +45,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   const github: GithubClient = cms.api.github
 
   const [open, setOpen] = React.useState(false)
+  const [confirmSwitchProps, setConfirmSwitchProps] = React.useState<any>()
   const [createBranchProps, setCreateBranchProps] = React.useState<any>()
   const [filterValue, setFilterValue] = React.useState('')
   const selectListRef = React.useRef<HTMLElement>()
@@ -110,12 +111,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
                       key={option.name}
                       active={option.name === github.branchName}
                       onClick={() => {
-                        cms.alerts.info('Switched to branch ' + option.name)
-                        github.setWorkingBranch(option.name)
-                        closeDropdown()
-                        if (onBranchChange) {
-                          onBranchChange(option.name)
-                        }
+                        setConfirmSwitchProps(option)
                       }}
                     >
                       {option.protected && <LockIcon />} {option.name}
@@ -141,6 +137,22 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
           onBranchChange={onBranchChange}
           close={() => {
             setCreateBranchProps(null)
+          }}
+        />
+      )}
+      {confirmSwitchProps && (
+        <ConfirmSwitchBranchModal
+          name={confirmSwitchProps.name}
+          onBranchChange={() => {
+            cms.alerts.info('Switched to branch ' + confirmSwitchProps.name)
+            github.setWorkingBranch(confirmSwitchProps.name)
+            closeDropdown()
+            if (onBranchChange) {
+              onBranchChange(confirmSwitchProps.name)
+            }
+          }}
+          close={() => {
+            setConfirmSwitchProps(null)
           }}
         />
       )}
@@ -196,6 +208,31 @@ const CreateBranchModal = ({ name, onBranchChange, close }: any) => {
           )
         }}
       </FormBuilder>
+    </Modal>
+  )
+}
+
+const ConfirmSwitchBranchModal = ({ name, onBranchChange, close }: any) => {
+  return (
+    <Modal>
+      <ModalPopup>
+        <ModalHeader close={close}>Switch Branch</ModalHeader>
+        <ModalBody
+          onKeyPress={e =>
+            e.charCode === 13 ? (onBranchChange() as any) : null
+          }
+        >
+          <p>
+            Are you sure you want to switch to branch <b>{name}</b>?
+          </p>
+        </ModalBody>
+        <ModalActions>
+          <Button onClick={close}>Cancel</Button>
+          <Button onClick={onBranchChange} primary>
+            Switch Branch
+          </Button>
+        </ModalActions>
+      </ModalPopup>
     </Modal>
   )
 }
