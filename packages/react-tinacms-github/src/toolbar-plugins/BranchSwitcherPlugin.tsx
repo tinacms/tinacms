@@ -220,12 +220,14 @@ const ConfirmSwitchBranchModal = ({ name, onBranchChange, close }: any) => {
       <ModalPopup>
         <ModalHeader close={close}>Switch Branch</ModalHeader>
         <ModalBody
+          padded={true}
           onKeyPress={e =>
             e.charCode === 13 ? (onBranchChange() as any) : null
           }
         >
           <p>
-            Are you sure you want to switch to branch <b>{name}</b>?
+            Are you sure you want to switch to branch{' '}
+            <BranchName>{name}</BranchName>?
           </p>
         </ModalBody>
         <ModalActions>
@@ -258,6 +260,11 @@ const CreateButton = styled(Button)`
     margin-right: 4px;
     opacity: 0.7;
   }
+`
+
+const BranchName = styled.span`
+  font-weight: bold;
+  color: var(--tina-color-primary);
 `
 
 const DropdownActions = styled.div`
