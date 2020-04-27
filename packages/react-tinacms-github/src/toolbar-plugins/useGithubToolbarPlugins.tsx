@@ -22,6 +22,7 @@ import { PullRequestToolbarWidget } from './pull-request'
 import { ForkNameToolbarWidget } from './ForkNamePlugin'
 import { Plugin } from 'tinacms'
 import { useGithubEditing } from '../github-editing-context'
+import { BranchSwitcherPlugin } from './BranchSwitcherPlugin'
 
 export const useGithubToolbarPlugins = () => {
   const cms = useCMS()
@@ -31,6 +32,7 @@ export const useGithubToolbarPlugins = () => {
     const plugins = [
       ForkNameToolbarWidget,
       PullRequestToolbarWidget,
+      BranchSwitcherPlugin,
     ] as Plugin[]
 
     const removePlugins = () => {
