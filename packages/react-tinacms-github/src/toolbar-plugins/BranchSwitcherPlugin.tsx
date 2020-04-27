@@ -1,3 +1,21 @@
+/**
+
+Copyright 2019 Forestry.io Inc
+
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+
+    http://www.apache.org/licenses/LICENSE-2.0
+
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+
+*/
+
 import * as React from 'react'
 import {
   Form,
@@ -15,12 +33,8 @@ import { AddIcon, ChevronDownIcon, LockIcon } from '@tinacms/icons'
 import { Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import styled, { css } from 'styled-components'
-import { GithubClient } from '../github-client'
-
-interface Branch {
-  name: string
-  locked: boolean
-}
+import { GithubClient, Branch } from '../github-client'
+import { LoadingDots } from '@tinacms/react-forms'
 
 interface BranchSwitcherProps {
   onBranchChange?(branch: string): void
@@ -29,14 +43,26 @@ interface BranchSwitcherProps {
 const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   const cms = useCMS()
   const github: GithubClient = cms.api.github
+
   const [open, setOpen] = React.useState(false)
   const [createBranchProps, setCreateBranchProps] = React.useState<any>()
   const [filterValue, setFilterValue] = React.useState('')
   const selectListRef = React.useRef<HTMLElement>()
 
+  const [branchStatus, setBranchStatus] = React.useState<
+    'pending' | 'loaded' | 'error'
+  >('pending')
   const [branches, setBranches] = React.useState<Branch[]>([])
   React.useEffect(() => {
-    github.getBranchList().then(setBranches)
+    github
+      .getBranchList()
+      .then(branches => {
+        setBranches(branches)
+        setBranchStatus('loaded')
+      })
+      .catch(() => {
+        setBranchStatus('error')
+      })
   }, [])
 
   const closeDropdown = () => {
@@ -51,6 +77,10 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
     setCreateBranchProps({ name: filterValue })
     closeDropdown()
   }
+
+  const filteredBranches = branches.filter(option => {
+    return option.name.includes(filterValue)
+  })
 
   return (
     <>
@@ -70,30 +100,31 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
               />
             </DropdownHeader>
             <SelectList ref={selectListRef as any}>
-              {branches
-                .filter(option => {
-                  return option.name.includes(filterValue)
-                })
-                .map(option => (
-                  <SelectOption
-                    key={option.name}
-                    active={option.name === github.branchName}
-                    onClick={() => {
-                      cms.alerts.info('Switched to branch ' + option.name)
-                      github.setWorkingBranch(option.name)
-                      closeDropdown()
-                      if (onBranchChange) {
-                        onBranchChange(option.name)
-                      }
-                    }}
-                  >
-                    {option.locked && <LockIcon />} {option.name}
-                  </SelectOption>
-                ))}
-              {branches.filter(option => {
-                return option.name.includes(filterValue)
-              }).length === 0 && (
-                <SelectEmptyState>No branches to display.</SelectEmptyState>
+              {branchStatus === 'pending' && (
+                <LoadingDots color="var(--tina-color-primary)" />
+              )}
+              {branchStatus === 'loaded' && (
+                <>
+                  {filteredBranches.map(option => (
+                    <SelectOption
+                      key={option.name}
+                      active={option.name === github.branchName}
+                      onClick={() => {
+                        cms.alerts.info('Switched to branch ' + option.name)
+                        github.setWorkingBranch(option.name)
+                        closeDropdown()
+                        if (onBranchChange) {
+                          onBranchChange(option.name)
+                        }
+                      }}
+                    >
+                      {option.protected && <LockIcon />} {option.name}
+                    </SelectOption>
+                  ))}
+                  {filteredBranches.length === 0 && (
+                    <SelectEmptyState>No branches to display.</SelectEmptyState>
+                  )}
+                </>
               )}
             </SelectList>
             <DropdownActions>
