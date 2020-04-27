@@ -269,5 +269,5 @@ ${errors.map(error => `\t* ${error}`).join('\n')}
 
 Visit the setup guide for more information
 
-\thttps://tinacms.org/docs/nextjs/github-public-repo#setting-environment-variables
+\thttps://tinacms.org/guides/nextjs/github-open-authoring/configure-custom-app
 `
