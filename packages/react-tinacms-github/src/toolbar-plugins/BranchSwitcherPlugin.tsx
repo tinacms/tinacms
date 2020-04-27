@@ -15,12 +15,7 @@ import { AddIcon, ChevronDownIcon, LockIcon } from '@tinacms/icons'
 import { Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import styled, { css } from 'styled-components'
-import { GithubClient } from '../github-client'
-
-interface Branch {
-  name: string
-  locked: boolean
-}
+import { GithubClient, Branch } from '../github-client'
 
 interface BranchSwitcherProps {
   onBranchChange?(branch: string): void
@@ -87,7 +82,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
                       }
                     }}
                   >
-                    {option.locked && <LockIcon />} {option.name}
+                    {option.protected && <LockIcon />} {option.name}
                   </SelectOption>
                 ))}
               {branches.filter(option => {
