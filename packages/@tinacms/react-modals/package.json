@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-modals",
-  "version": "0.1.2-alpha.4",
+  "version": "0.1.2",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -20,10 +20,10 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/icons": "^0.9.0-alpha.1",
-    "@tinacms/react-core": "^0.2.11-alpha.2",
+    "@tinacms/icons": "^0.9.0",
+    "@tinacms/react-core": "^0.2.11",
     "@tinacms/scripts": "^0.1.13",
-    "@tinacms/styles": "^0.4.2-alpha.2"
+    "@tinacms/styles": "^0.4.2"
   },
   "peerDependencies": {
     "@tinacms/icons": ">=0.7",
