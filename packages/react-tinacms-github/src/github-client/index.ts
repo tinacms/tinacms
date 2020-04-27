@@ -127,6 +127,10 @@ export class GithubClient {
     return this.getCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY) || 'master'
   }
 
+  setWorkingBranch(branch: string) {
+    this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
+  }
+
   async fetchExistingPR() {
     const workingRepoFullName = this.workingRepoFullName
     const headBranch = this.branchName

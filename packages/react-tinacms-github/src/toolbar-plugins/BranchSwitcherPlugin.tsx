@@ -15,6 +15,7 @@ import { AddIcon, ChevronDownIcon } from '@tinacms/icons'
 import { Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import styled, { css } from 'styled-components'
+import { GithubClient } from '../github-client'
 
 interface Branch {
   name: string
@@ -25,7 +26,12 @@ const testBranches: Branch[] = [
   { name: 'master', locked: true },
   { name: 'release-notes', locked: false },
 ]
-const BranchSwitcher = () => {
+
+interface BranchSwitcherProps {
+  onBranchChange?(branch: string): void
+}
+
+const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   const cms = useCMS()
   const [open, setOpen] = React.useState(false)
   const [createBranchOpen, setCreateBranchOpen] = React.useState(false)
@@ -75,8 +81,13 @@ const BranchSwitcher = () => {
                     active={option.name === currentBranch}
                     onClick={() => {
                       cms.alerts.info('Switched to branch ' + option.name)
+                      const github: GithubClient = cms.api.github
+                      github.setWorkingBranch(option.name)
                       setCurrentBranch(option.name)
                       closeDropdown()
+                      if (onBranchChange) {
+                        onBranchChange(option.name)
+                      }
                     }}
                   >
                     {option.locked && <LockedIcon />} {option.name}
