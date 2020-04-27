@@ -136,6 +136,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
       </SelectWrapper>
       {createBranchProps && (
         <CreateBranchModal
+          current={github.branchName}
           name={createBranchProps.name}
           onBranchChange={onBranchChange}
           close={() => {
@@ -163,7 +164,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   )
 }
 
-const CreateBranchModal = ({ name, onBranchChange, close }: any) => {
+const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
   const cms = useCMS()
   console.log({ name })
 
@@ -195,11 +196,16 @@ const CreateBranchModal = ({ name, onBranchChange, close }: any) => {
             <ModalPopup>
               <ModalHeader close={close}>Create Branch</ModalHeader>
               <ModalBody
+                padded
                 onKeyPress={e =>
                   e.charCode === 13 ? (handleSubmit() as any) : null
                 }
               >
                 <FieldsBuilder form={form} fields={form.fields} />
+                <p>
+                  Create branch
+                  <BranchName>{name}</BranchName> from '{current}'
+                </p>
               </ModalBody>
               <ModalActions>
                 <Button onClick={close}>Cancel</Button>
