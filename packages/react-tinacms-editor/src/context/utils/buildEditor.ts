@@ -19,8 +19,8 @@ limitations under the License.
 import { EditorView } from 'prosemirror-view'
 import { Plugin } from '@tinacms/core'
 
-import { createEditorState } from '../../state'
-import { buildSchema } from '../../plugins/schema'
+import { createEditorState } from '../../plugins'
+import { buildSchema } from '../../schema'
 import { buildTranslator } from './buildTranslator'
 import { nodeViews } from '../../node-views'
 import { Format } from '../../Translator'

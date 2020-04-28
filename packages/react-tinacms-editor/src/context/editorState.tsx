@@ -20,7 +20,7 @@ import * as React from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { EditorView } from 'prosemirror-view'
 import { buildEditor } from './utils/buildEditor'
-import { ALL_PLUGINS } from '../default-plugins'
+import { ALL_PLUGINS } from '../plugins/default-plugins'
 
 const EditorStateContext = createContext<{
   editorView: { view: EditorView } | undefined

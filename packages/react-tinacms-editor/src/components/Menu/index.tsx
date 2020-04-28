@@ -20,10 +20,10 @@ import React from 'react'
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 //todo: all these inports should come for different plugins eventually
-import { BlockControl } from '../../state/plugins/Menu/blockControl'
-import { FloatingLinkForm } from '../../state/plugins/links/FloatingLinkForm'
-import { FloatingTableMenu } from '../../state/plugins/Menu/FloatingTableMenu'
-import { HistoryControl } from '../../state/plugins/Menu/historyControl'
+import { BlockControl } from '../../plugins/Menu/blockControl'
+import { FloatingLinkForm } from '../../plugins/links/FloatingLinkForm'
+import { FloatingTableMenu } from '../../plugins/Menu/FloatingTableMenu'
+import { HistoryControl } from '../../plugins/Menu/historyControl'
 import {
   InlineControl,
   LinkControl,
@@ -31,12 +31,12 @@ import {
   QuoteControl,
   CodeControl,
   ListControl,
-} from '../../state/plugins/Menu'
+} from '../../plugins/Menu'
 import {
   ImageMenu,
   FloatingImageMenu,
   ImageLoaders,
-} from '../../state/plugins/Menu/Image'
+} from '../../plugins/Menu/Image'
 import { useEditorStateContext } from '../../context/editorState'
 import { MenuPortalProvider } from '../../context/MenuPortal'
 

@@ -18,29 +18,44 @@ limitations under the License.
 
 import { Plugin } from '@tinacms/core'
 import { Schema } from 'prosemirror-model'
+import { EditorState } from 'prosemirror-state'
+import { dropCursor } from 'prosemirror-dropcursor'
+import { gapCursor } from 'prosemirror-gapcursor'
+import { history } from 'prosemirror-history'
+import { keymap } from 'prosemirror-keymap'
+import { tableEditing } from 'prosemirror-tables'
 
-export interface SchemaNodePlugin extends Plugin {
-  __type: 'wysiwyg:schema:node'
-  name: string
-  node: any // TODO
-}
+import { inputRules } from './input-rules'
+import { Translator } from '../Translator'
+import { buildKeymap } from './buildKeymap'
+import { links } from './links'
+import { tablePlugin } from './Table'
+import { imagePlugin } from './Image'
+import { commonPlugin } from './Common'
 
-export interface SchemaMarkPlugin extends Plugin {
-  __type: 'wysiwyg:schema:mark'
-  name: string
-  mark: any // TODO
-}
-
-export interface KeymapPlugin {
-  __type: 'wysiwyg:keymap'
-  name: string
-  command(schema: Schema): any // TODO Command
-  ifMark?: string
-  ifNode?: string
-  ifNodes?: string[]
-  ifMac?: boolean
-  unlessMac?: boolean
-  onCondition?(schema: Schema): boolean
+export function createEditorState(
+  schema: Schema,
+  translator: Translator,
+  plugins: Plugin[],
+  value: string,
+  uploadImages?: (files: File[]) => Promise<string[]>
+) {
+  return EditorState.create({
+    schema,
+    doc: translator.nodeFromString(value),
+    plugins: [
+      commonPlugin,
+      inputRules(schema),
+      keymap(buildKeymap(schema, plugins)),
+      history(),
+      links(),
+      dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
+      gapCursor(),
+      tableEditing(),
+      tablePlugin,
+      imagePlugin(uploadImages),
+    ],
+  })
 }
 
 function byType(__type: string) {

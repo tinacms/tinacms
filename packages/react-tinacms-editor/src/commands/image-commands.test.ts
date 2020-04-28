@@ -23,7 +23,7 @@ import {
   alignImage,
   removeImage,
 } from './image-commands'
-import { defaultSchema } from '../default-schema'
+import { defaultSchema } from '../schema/default-schema'
 
 const { forDoc, doc, p, text, image } = new PMTestHarness(defaultSchema)
 
