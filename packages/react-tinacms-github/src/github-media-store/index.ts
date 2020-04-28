@@ -34,13 +34,11 @@ export class GithubMediaStore implements MediaStore {
 
       try {
         const content = (await base64File(file)).toString().split(',')[1] // only need the data piece
-        const download_url = (
-          await this.githubClient.upload(path, content, 'Upload', true)
-        ).content.download_url
+        await this.githubClient.upload(path, content, 'Upload', true)
 
         uploaded.push({
-          directory: '',
-          filename: download_url,
+          directory: directory,
+          filename: file.name,
         })
       } catch (e) {
         console.warn('Failed to upload content to Github: ' + e)
