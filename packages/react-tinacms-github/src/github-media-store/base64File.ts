@@ -16,10 +16,16 @@ limitations under the License.
 
 */
 
-export * from './github-auth'
-export * from './github-error'
-export * from './github-editing-context'
-export * from './toolbar-plugins'
-export * from './form'
-export * from './github-client'
-export * from './github-media-store'
+export default function base64File(file: Blob): Promise<string | ArrayBuffer> {
+  return new Promise(resolve => {
+    const reader = new FileReader()
+    reader.readAsDataURL(file)
+    reader.onload = () => {
+      if (reader.result) {
+        resolve(reader.result)
+      } else {
+        throw new Error('base64File: No result')
+      }
+    }
+  })
+}
