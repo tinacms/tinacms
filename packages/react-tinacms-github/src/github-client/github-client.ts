@@ -237,6 +237,26 @@ export class GithubClient {
     })
   }
 
+  async upload(
+    path: string,
+    fileContents: string,
+    commitMessage: string = 'Update from TinaCMS',
+    encoded: boolean = false
+  ) {
+    const repo = this.workingRepoFullName
+    const branch = this.branchName
+
+    return this.req({
+      url: `https://api.github.com/repos/${repo}/contents/${path}`,
+      method: 'PUT',
+      data: {
+        message: commitMessage,
+        content: encoded ? fileContents : b64EncodeUnicode(fileContents),
+        branch: branch,
+      },
+    })
+  }
+
   private async req(data: any) {
     const response = await this.proxyRequest(data)
     return this.getGithubResponse(response)
