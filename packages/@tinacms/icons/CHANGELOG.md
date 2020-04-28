@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.9.0...@tinacms/icons@0.10.0-alpha.0) (2020-04-28)
+
+
+### Features
+
+* add lock icon ([f9df0f3](https://github.com/tinacms/tinacms/commit/f9df0f3))
+
+
+
+
+
 # [0.9.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.9.0-alpha.1...@tinacms/icons@0.9.0) (2020-04-27)
 
 **Note:** Version bump only for package @tinacms/icons
