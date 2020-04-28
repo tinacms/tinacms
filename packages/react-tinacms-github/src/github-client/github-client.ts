@@ -67,11 +67,14 @@ export class GithubClient {
     return this.getUser()
   }
 
-  isAuthorized() {
-    // If this 404's they don't have access.
-    // This works for now but a different
-    // implementation will be needed.
-    return this.getBranch()
+  get isFork() {
+    return this.workingRepoFullName !== this.baseRepoFullName
+  }
+
+  async isAuthorized() {
+    const repo = await this.getRepository()
+
+    return repo.permissions.push
   }
 
   async getUser() {
@@ -88,6 +91,12 @@ export class GithubClient {
       }
       throw e
     }
+  }
+
+  getRepository() {
+    return this.req({
+      url: `https://api.github.com/repos/${this.workingRepoFullName}`,
+    })
   }
 
   async createFork() {
@@ -120,12 +129,13 @@ export class GithubClient {
   get workingRepoFullName(): string {
     const forkName = this.getCookie(GithubClient.WORKING_REPO_COOKIE_KEY)
 
-    if (!forkName) {
-      // TODO: Right now the client only works with forks. This should go away once it works with origin.
-      throw new Error('GithubClient cannot find name of fork')
+    if (forkName) {
+      return forkName
     }
 
-    return forkName
+    this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, this.baseRepoFullName)
+
+    return this.baseRepoFullName
   }
 
   get branchName() {

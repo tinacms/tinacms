@@ -32,11 +32,11 @@ const MetaLink = styled.a`
   color: var(--tina-color-primary-dark);
 `
 
-const ForkInfo = () => {
+const RepoInfo = () => {
   const cms = useCMS()
   const github: GithubClient = cms.api.github
   return (
-    <FieldMeta name={'Fork'}>
+    <FieldMeta name={github.isFork ? 'Fork' : 'Repository'}>
       <MetaLink
         target="_blank"
         href={`https://github.com/${github.workingRepoFullName}`}
@@ -47,9 +47,9 @@ const ForkInfo = () => {
   )
 }
 
-export const ForkNameToolbarWidget = {
+export const RepoToolbarWidget = {
   __type: 'toolbar:widget',
-  name: 'current-fork',
+  name: 'repo-info',
   weight: 1,
-  component: ForkInfo,
+  component: RepoInfo,
 }

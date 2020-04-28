@@ -83,21 +83,24 @@ export const PRModal = () => {
     )
   }
 
+  let workingBranch = github.branchName
+  let baseBranch = github.baseBranch
+
+  if (github.isFork) {
+    const username = github.workingRepoFullName.split('/')[0]
+    const baseOwner = github.baseRepoFullName.split('/')[0]
+    workingBranch = `${username}:${workingBranch}`
+    baseBranch = `${baseOwner}:${baseBranch}`
+  }
+
   return (
     <>
       <PrModalBody>
         {!fetchedPR.id && (
           <>
             <ModalDescription>
-              Create a pull request from{' '}
-              <b>
-                {github.workingRepoFullName} - {github.branchName}
-              </b>{' '}
-              into{' '}
-              <b>
-                {github.baseRepoFullName} - {github.baseBranch}
-              </b>
-              .{' '}
+              Create a pull request from <b>{workingBranch}</b> into{' '}
+              <b>{baseBranch}</b>.{' '}
               <a
                 target="_blank"
                 href={`https://github.com/${github.baseRepoFullName}/compare/${
@@ -120,15 +123,8 @@ export const PRModal = () => {
         )}
         {fetchedPR.id && (
           <ModalDescription>
-            You've created a pull request from{' '}
-            <b>
-              {github.workingRepoFullName} - {github.branchName}
-            </b>{' '}
-            into{' '}
-            <b>
-              {github.baseRepoFullName} - {github.baseBranch}
-            </b>
-            .
+            You've created a pull request from <b>{workingBranch}</b> into{' '}
+            <b>{baseBranch}</b>.
           </ModalDescription>
         )}
       </PrModalBody>
