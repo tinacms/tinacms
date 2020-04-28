@@ -25,8 +25,10 @@ const MetaLink = styled.a`
   display: block;
   max-width: 250px;
   overflow: hidden;
+  white-space: nowrap;
   text-overflow: ellipsis;
-  font-size: 16px;
+  font-size: var(--tina-font-size-3);
+  line-height: 1.35;
   color: var(--tina-color-primary-dark);
 `
 
