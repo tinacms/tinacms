@@ -39,7 +39,7 @@ import { toggleBulletList, toggleOrderedList } from '../commands/list-commands'
 import { deleteEmptyHeading, toggleHeader } from '../commands/heading-commands'
 import { undo, redo } from 'prosemirror-history'
 import { undoInputRule } from 'prosemirror-inputrules'
-import { KeymapPlugin } from '.'
+import { KeymapPlugin } from '../types'
 
 const hardBreakCmd = (schema: Schema) => {
   const br = schema.nodes.hard_break
