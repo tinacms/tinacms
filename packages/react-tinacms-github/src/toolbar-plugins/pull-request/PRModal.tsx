@@ -93,6 +93,19 @@ export const PRModal = () => {
     baseBranch = `${baseOwner}:${baseBranch}`
   }
 
+  if (workingBranch === baseBranch) {
+    return (
+      <PrModalBody>
+        <ModalDescription>
+          <p>
+            You are currently on the base branch: <b>{baseBranch}</b>.
+          </p>
+          <p>To create a Pull Request you must first switch to a new branch.</p>
+        </ModalDescription>
+      </PrModalBody>
+    )
+  }
+
   return (
     <>
       <PrModalBody>
