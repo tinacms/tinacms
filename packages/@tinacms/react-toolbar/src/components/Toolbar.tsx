@@ -252,6 +252,7 @@ const SaveButton = styled(ToolbarButton)`
 const WidgetsContainer = styled.div`
   grid-area: widgets;
   display: flex;
+  align-self: stretch;
   align-items: center;
   justify-self: end;
   padding-right: 12px;
