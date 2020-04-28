@@ -125,6 +125,11 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
                   )}
                 </>
               )}
+              {branchStatus === 'error' && (
+                <SelectEmptyState>
+                  We had trouble loading branches. Please refresh to try again.
+                </SelectEmptyState>
+              )}
             </SelectList>
             <DropdownActions>
               <CreateButton onClick={openCreateBranchModal}>
@@ -293,8 +298,8 @@ const SelectEmptyState = styled.div`
   background: transparent;
   color: var(--tina-color-grey-4);
   text-align: left;
-  line-height: 17px;
-  white-space: nowrap;
+  font-size: var(--tina-font-size-2);
+  line-height: 1.4;
   width: 100%;
   transition: all 150ms ease-out;
   flex: 0 0 auto;
@@ -324,7 +329,8 @@ const SelectOption = styled.button<SelectOptionProps>`
   background: transparent;
   color: var(--tina-color-grey-6);
   text-align: left;
-  line-height: 17px;
+  font-size: var(--tina-font-size-2);
+  line-height: 1.2;
   white-space: nowrap;
   width: 100%;
   cursor: pointer;
