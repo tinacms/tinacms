@@ -201,16 +201,17 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
             <ModalPopup>
               <ModalHeader close={close}>Create Branch</ModalHeader>
               <ModalBody
-                padded
                 onKeyPress={e =>
                   e.charCode === 13 ? (handleSubmit() as any) : null
                 }
               >
                 <FieldsBuilder form={form} fields={form.fields} />
-                <p>
-                  Create branch
-                  <BranchName>{name}</BranchName> from '{current}'
-                </p>
+                <ModalText>
+                  <p>
+                    Create branch&nbsp;<BranchName>{name}</BranchName>&nbsp;from
+                    '{current}'
+                  </p>
+                </ModalText>
               </ModalBody>
               <ModalActions>
                 <Button onClick={close}>Cancel</Button>
@@ -252,6 +253,11 @@ const ConfirmSwitchBranchModal = ({ name, onBranchChange, close }: any) => {
     </Modal>
   )
 }
+
+const ModalText = styled.div`
+  padding: 0 var(--tina-padding-big) var(--tina-padding-big)
+    var(--tina-padding-big);
+`
 
 const SelectFilter = styled(Input)`
   height: 36px;
