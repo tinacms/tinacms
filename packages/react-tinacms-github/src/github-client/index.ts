@@ -207,7 +207,7 @@ export class GithubClient {
     const branch = this.branchName
 
     return this.req({
-      url: `https://api.github.com/repos/${repo}/${path}`,
+      url: `https://api.github.com/repos/${repo}/contents/${path}`,
       method: 'PUT',
       data: {
         message: commitMessage,
