@@ -19,7 +19,7 @@ limitations under the License.
 import { useCMS } from 'tinacms'
 import { useEffect } from 'react'
 import { PullRequestToolbarWidget } from './pull-request'
-import { ForkNameToolbarWidget } from './ForkNamePlugin'
+import { RepoToolbarWidget } from './RepoInfoPlugin'
 import { Plugin } from 'tinacms'
 import { useGithubEditing } from '../github-editing-context'
 import { BranchSwitcherPlugin } from './BranchSwitcherPlugin'
@@ -30,7 +30,7 @@ export const useGithubToolbarPlugins = () => {
 
   useEffect(() => {
     const plugins = [
-      ForkNameToolbarWidget,
+      RepoToolbarWidget,
       PullRequestToolbarWidget,
       {
         ...BranchSwitcherPlugin,
