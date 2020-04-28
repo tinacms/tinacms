@@ -129,6 +129,8 @@ export class GithubClient {
       return forkName
     }
 
+    this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, this.baseRepoFullName)
+
     return this.baseRepoFullName
   }
 
