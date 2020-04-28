@@ -67,6 +67,10 @@ export class GithubClient {
     return this.getUser()
   }
 
+  get isFork() {
+    return this.workingRepoFullName !== this.baseRepoFullName
+  }
+
   async isAuthorized() {
     const repo = await this.getRepository()
 
