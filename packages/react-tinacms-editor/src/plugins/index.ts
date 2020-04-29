@@ -38,7 +38,8 @@ export function createEditorState(
   translator: Translator,
   plugins: Plugin[],
   value: string,
-  uploadImages?: (files: File[]) => Promise<string[]>
+  uploadImages?: (files: File[]) => Promise<string[]>,
+  previewUrl?: (url: string) => string
 ) {
   return EditorState.create({
     schema,
@@ -53,7 +54,7 @@ export function createEditorState(
       gapCursor(),
       tableEditing(),
       tablePlugin,
-      imagePlugin(uploadImages),
+      imagePlugin(uploadImages, previewUrl),
     ],
   })
 }

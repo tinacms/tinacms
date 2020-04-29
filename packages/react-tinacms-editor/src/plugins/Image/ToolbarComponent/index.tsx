@@ -22,23 +22,23 @@ import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
 import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
 import { insertImage } from '../../../commands/image-commands'
-import { MenuButton, MenuButtonDropdown } from '../MenuComponents'
+import { MenuButton, MenuButtonDropdown } from '../../Menu/MenuComponents'
 import { Dismissible } from 'react-dismissible'
 import { useEditorStateContext } from '../../../context/editorState'
 
-interface ImageMenu {
+interface ToolbarComponentProps {
   uploadImages?: (files: File[]) => Promise<string[]>
 }
 
-export const ImageMenu = ({ uploadImages }: ImageMenu) => {
-  if (!uploadImages) return null
-
+export const ToolbarComponent = ({ uploadImages }: ToolbarComponentProps) => {
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
+
+  if (!uploadImages) return null
 
   const uploadImageFile = (file: File) => {
     setUploading(true)
