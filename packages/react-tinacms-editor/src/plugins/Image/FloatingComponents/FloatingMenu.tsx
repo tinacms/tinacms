@@ -22,12 +22,12 @@ import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
-import { imagePluginKey } from '../../Image'
+import { imagePluginKey } from '..'
 import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 import { useEditorStateContext } from '../../../context/editorState'
 
-export const FloatingImageMenu: FunctionComponent = () => {
+export const FloatingMenu: FunctionComponent = () => {
   const { editorView } = useEditorStateContext()
   const view = editorView!.view
   const { selectedImage } = imagePluginKey.getState(view.state)

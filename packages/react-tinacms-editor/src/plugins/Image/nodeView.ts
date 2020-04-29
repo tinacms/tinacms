@@ -24,19 +24,16 @@ const Identity = (str: string) => str
 export class ImageView implements NodeView {
   node: Node
   view: EditorView
-  getPos: () => number
   dom?: HTMLElement
   img?: HTMLImageElement
 
   constructor(
     node: Node,
     view: EditorView,
-    getPos: () => number,
     previewUrl: (url: string) => string = Identity
   ) {
     this.node = node
     this.view = view
-    this.getPos = getPos
 
     this.dom = document.createElement('span')
     this.dom.classList.add('tinacms-image-wrapper')

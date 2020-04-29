@@ -51,11 +51,18 @@ export const buildEditor = (
    * Create a new Prosemirror EditorView on in the DOM
    */
   const view = new EditorView(el, {
-    nodeViews: nodeViews(previewUrl) as any,
+    nodeViews: nodeViews() as any,
     /**
      * The initial state of the Wysiwyg
      */
-    state: createEditorState(schema, translator, plugins, input.value, upload),
+    state: createEditorState(
+      schema,
+      translator,
+      plugins,
+      input.value,
+      upload,
+      previewUrl
+    ),
     /**
      * Call input.onChange with the translated content after updating
      * the Prosemiror state.
