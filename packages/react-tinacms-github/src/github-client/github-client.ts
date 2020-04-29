@@ -138,8 +138,16 @@ export class GithubClient {
     return this.baseRepoFullName
   }
 
-  get branchName() {
-    return this.getCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY) || 'master'
+  get branchName(): string {
+    const branchName = this.getCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY)
+
+    if (branchName) {
+      return branchName
+    }
+
+    this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, this.baseBranch)
+
+    return this.branchName
   }
 
   setWorkingBranch(branch: string) {
