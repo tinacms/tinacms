@@ -16,13 +16,16 @@ limitations under the License.
 
 */
 
+import { Decoration, EditorView, NodeView } from 'prosemirror-view'
+import { EditorState } from 'prosemirror-state'
+import { Node } from 'prosemirror-model'
+import { Plugin } from '@tinacms/core'
+import { Schema } from 'prosemirror-model'
+
 export interface ImageProps {
   upload?: (files: File[]) => Promise<string[]>
   previewUrl?: (url: string) => string
 }
-
-import { Plugin } from '@tinacms/core'
-import { Schema } from 'prosemirror-model'
 
 export interface SchemaNodePlugin extends Plugin {
   __type: 'wysiwyg:schema:node'
@@ -46,4 +49,17 @@ export interface KeymapPlugin {
   ifMac?: boolean
   unlessMac?: boolean
   onCondition?(schema: Schema): boolean
+}
+
+export type NodeViews = {
+  [name: string]: (
+    node: Node,
+    view: EditorView,
+    getPos: () => number,
+    decorations: Decoration[]
+  ) => NodeView
+} | null
+
+export interface Command {
+  (state: EditorState, ...options: any[]): void
 }

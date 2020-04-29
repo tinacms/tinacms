@@ -16,26 +16,11 @@ limitations under the License.
 
 */
 
-import { Node } from 'prosemirror-model'
-import { Decoration, EditorView, NodeView } from 'prosemirror-view'
-
 import { CodeBlockView } from './CodeBlockView'
-import { ImageView } from './ImageView'
+import { NodeViews } from '../types'
 
-export type NodeViews = {
-  [name: string]: (
-    node: Node,
-    view: EditorView,
-    getPos: () => number,
-    decorations: Decoration[]
-  ) => NodeView
-} | null
-
-export const nodeViews = (previewUrl?: (url: string) => string): NodeViews => ({
+export const nodeViews = (): NodeViews => ({
   code_block(node, view, getPos) {
     return new CodeBlockView(node, view, getPos)
-  },
-  image(node, view, getPos) {
-    return new ImageView(node, view, getPos, previewUrl)
   },
 })

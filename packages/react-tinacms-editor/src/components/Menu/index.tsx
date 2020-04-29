@@ -33,10 +33,10 @@ import {
   ListControl,
 } from '../../plugins/Menu'
 import {
-  ImageMenu,
-  FloatingImageMenu,
-  ImageLoaders,
-} from '../../plugins/Menu/Image'
+  FloatingMenu as FloatingMenuImage,
+  Loaders as LoadersImage,
+  ToolbarComponent as ToolbarComponentImage,
+} from '../../plugins/Image'
 import { useEditorStateContext } from '../../context/editorState'
 import { MenuPortalProvider } from '../../context/MenuPortal'
 
@@ -125,7 +125,7 @@ export const Menu = ({
             <BlockControl />
             <InlineControl />
             <LinkControl />
-            <ImageMenu uploadImages={uploadImages} />
+            <ToolbarComponentImage uploadImages={uploadImages} />
             <TableControl bottom={bottom} />
             <QuoteControl bottom={bottom} />
             <CodeControl bottom={bottom} />
@@ -135,8 +135,8 @@ export const Menu = ({
         </MenuPortalProvider>
       </MenuWrapper>
       <FloatingTableMenu />
-      <ImageLoaders />
-      <FloatingImageMenu />
+      <LoadersImage />
+      <FloatingMenuImage />
       <FloatingLinkForm />
     </>
   )
