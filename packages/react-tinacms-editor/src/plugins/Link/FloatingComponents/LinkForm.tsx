@@ -19,25 +19,25 @@ limitations under the License.
 import * as React from 'react'
 import { createRef, useState, useEffect } from 'react'
 
-import { LinkForm } from './LinkForm'
+import { Form } from './Form'
 import {
   removeLinkBeingEdited,
   unmountLinkForm,
   updateLinkBeingEdited,
-} from '../../commands'
+} from '../../../commands'
 import {
   findElementOffsetTop,
   findElementOffsetLeft,
   getMarkPresent,
-} from '../../utils'
+} from '../../../utils'
 import styled from 'styled-components'
 import { TinaReset } from '@tinacms/styles'
-import { linkPluginKey } from './index'
-import { useEditorStateContext } from '../../context/editorState'
+import { linkPluginKey } from '../index'
+import { useEditorStateContext } from '../../../context/editorState'
 
 const width = 240
 
-export const FloatingLinkForm = () => {
+export const LinkForm = () => {
   const { editorView } = useEditorStateContext()
   const [position, setPosition] = useState<any>(undefined)
 
@@ -98,7 +98,7 @@ export const FloatingLinkForm = () => {
         <TinaReset>
           <LinkFormWrapper>
             <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
-            <LinkForm
+            <Form
               style={{
                 left,
                 top,
