@@ -37,7 +37,7 @@ interface State {
   title: string | null
 }
 
-export class LinkForm extends React.Component<Props, State> {
+export class Form extends React.Component<Props, State> {
   state = {
     href: this.props.href || '',
     title: this.props.title || '',
