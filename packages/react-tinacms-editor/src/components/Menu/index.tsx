@@ -19,14 +19,13 @@ limitations under the License.
 import React from 'react'
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
-//todo: all these inports should come for different plugins eventually
+// todo: all these inports should come for different plugins eventually
+// And thus can be replaced by just a loop on plugin collection
 import { BlockControl } from '../../plugins/Menu/blockControl'
-import { FloatingLinkForm } from '../../plugins/links/FloatingLinkForm'
 import { FloatingTableMenu } from '../../plugins/Menu/FloatingTableMenu'
 import { HistoryControl } from '../../plugins/Menu/historyControl'
 import {
   InlineControl,
-  LinkControl,
   TableControl,
   QuoteControl,
   CodeControl,
@@ -37,6 +36,10 @@ import {
   Loaders as LoadersImage,
   ToolbarComponent as ToolbarComponentImage,
 } from '../../plugins/Image'
+import {
+  LinkForm as FloatingLinkForm,
+  ToolbarComponent as ToolbarComponentLink,
+} from '../../plugins/Link'
 import { useEditorStateContext } from '../../context/editorState'
 import { MenuPortalProvider } from '../../context/MenuPortal'
 
@@ -124,7 +127,7 @@ export const Menu = ({
           <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
             <BlockControl />
             <InlineControl />
-            <LinkControl />
+            <ToolbarComponentLink />
             <ToolbarComponentImage uploadImages={uploadImages} />
             <TableControl bottom={bottom} />
             <QuoteControl bottom={bottom} />

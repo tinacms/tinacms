@@ -28,7 +28,7 @@ import { tableEditing } from 'prosemirror-tables'
 import { inputRules } from './input-rules'
 import { Translator } from '../Translator'
 import { buildKeymap } from './buildKeymap'
-import { links } from './links'
+import { linkPlugin } from './Link'
 import { tablePlugin } from './Table'
 import { imagePlugin } from './Image'
 import { commonPlugin } from './Common'
@@ -49,7 +49,7 @@ export function createEditorState(
       inputRules(schema),
       keymap(buildKeymap(schema, plugins)),
       history(),
-      links(),
+      linkPlugin(),
       dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
       gapCursor(),
       tableEditing(),
