@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { HTTP_LINK_REGEX } from './index'
+import { HTTP_LINK_REGEX } from './util'
 
 describe('link regex', () => {
   valid('http://google.com')
