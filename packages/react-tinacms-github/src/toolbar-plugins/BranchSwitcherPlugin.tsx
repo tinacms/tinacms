@@ -511,6 +511,7 @@ const SelectCurrent = styled.span`
   display: block;
   text-align: left;
   line-height: 20px;
+  font-size: var(--tina-font-size-3);
   text-overflow: ellipsis;
   max-width: 250px;
   white-space: nowrap;
