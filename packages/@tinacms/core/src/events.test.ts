@@ -9,12 +9,17 @@ class Listener {
   constructor(private callback: Callback, private events: string[] = []) {}
 
   handleEvent(event: CMSEvent) {
-    const watchAllEvents = !this.events.length
-    const watchesThisEvent = this.events.includes(event.type)
-
-    if (watchAllEvents || watchesThisEvent) {
+    if (this.watchesEvent(event)) {
       this.callback(event)
     }
+  }
+
+  watchesEvent(event: CMSEvent) {
+    if (!this.events.length) return true
+
+    const watchesThisEvent = this.events.includes(event.type)
+
+    return watchesThisEvent
   }
 }
 
@@ -46,35 +51,46 @@ describe('EventBus', () => {
 
 describe('Listener', () => {
   describe('handleEvent', () => {
-    describe('when no events are explicitly watched', () => {
-      it("calls it's callback", () => {
-        const cb = jest.fn()
-        const listener = new Listener(cb)
-        const event = { type: 'example' }
+    it("invokes it's callback if it watches the event", () => {
+      const cb = jest.fn()
+      const listener = new Listener(cb, ['example'])
+      const event = { type: 'example' }
 
-        listener.handleEvent(event)
+      listener.watchesEvent = jest.fn(() => true)
+      listener.handleEvent(event)
 
-        expect(cb).toHaveBeenCalledWith(event)
+      expect(cb).toHaveBeenCalledWith(event)
+    })
+    it('does not invoke callback if it does not watch the event', () => {
+      const cb = jest.fn()
+      const listener = new Listener(cb)
+      const event = { type: 'example' }
+
+      listener.watchesEvent = jest.fn(() => false)
+      listener.handleEvent(event)
+
+      expect(cb).not.toHaveBeenCalledWith(event)
+    })
+  })
+
+  describe('watchesEvent(event): boolean', () => {
+    describe('when no events specified', () => {
+      it('watches all events', () => {
+        const listener = new Listener(() => {})
+
+        expect(listener.watchesEvent({ type: 'whatever' })).toBeTruthy()
       })
     })
-    describe('when an event is explicitly watched', () => {
-      it("invokes it's callback when given that event", () => {
-        const cb = jest.fn()
-        const listener = new Listener(cb, ['example'])
-        const event = { type: 'example' }
+    describe('with events specified', () => {
+      it('is true if event is specified', () => {
+        const listener = new Listener(() => {}, ['test'])
 
-        listener.handleEvent(event)
-
-        expect(cb).toHaveBeenCalledWith(event)
+        expect(listener.watchesEvent({ type: 'test' })).toBeTruthy()
       })
-      it('does not invoke callback when given other event', () => {
-        const cb = jest.fn()
-        const listener = new Listener(cb, ['example'])
-        const event = { type: 'other' }
+      it('is false if event is not specified', () => {
+        const listener = new Listener(() => {}, ['test'])
 
-        listener.handleEvent(event)
-
-        expect(cb).not.toHaveBeenCalledWith(event)
+        expect(listener.watchesEvent({ type: 'something' })).toBeFalsy()
       })
     })
   })
