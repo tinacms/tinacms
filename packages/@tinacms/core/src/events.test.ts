@@ -18,10 +18,13 @@ class Listener {
     if (!this.events.length) return true
 
     const watchesThisEvent = !!this.events.find(name => {
-      return event.type.startsWith(name)
-    })
+      const eventParts = event.type.split(':')
+      const watchedParts = name.split(':')
 
-    console.log({ events: this.events, event, watchesThisEvent })
+      return watchedParts.reduce<boolean>((watching, part, index) => {
+        return watching && part === eventParts[index]
+      }, true)
+    })
 
     return watchesThisEvent
   }
@@ -85,21 +88,31 @@ describe('Listener', () => {
         expect(listener.watchesEvent({ type: 'whatever' })).toBeTruthy()
       })
     })
-    describe('with events specified', () => {
-      it('is true if event is specified', () => {
-        const listener = new Listener(() => {}, ['test'])
+    describe('with an event "foo" specified', () => {
+      it('is true when event is "foo"', () => {
+        const listener = new Listener(() => {}, ['foo'])
 
-        expect(listener.watchesEvent({ type: 'test' })).toBeTruthy()
+        expect(listener.watchesEvent({ type: 'foo' })).toBeTruthy()
       })
-      it('is false if event is not specified', () => {
-        const listener = new Listener(() => {}, ['test'])
+      it('is false when the event is not "foo"', () => {
+        const listener = new Listener(() => {}, ['foo'])
 
         expect(listener.watchesEvent({ type: 'something' })).toBeFalsy()
       })
-      it('is true for sub-events', () => {
+      it('is true for namespaced-event "foo:bar"', () => {
         const listener = new Listener(() => {}, ['foo'])
 
         expect(listener.watchesEvent({ type: 'foo:bar' })).toBeTruthy()
+      })
+      it('is true for namespaced-event "foo:bar:baz"', () => {
+        const listener = new Listener(() => {}, ['foo'])
+
+        expect(listener.watchesEvent({ type: 'foo:bar:baz' })).toBeTruthy()
+      })
+      it('is false for similarly named event "footsies"', () => {
+        const listener = new Listener(() => {}, ['foo'])
+
+        expect(listener.watchesEvent({ type: 'footsies' })).toBeFalsy()
       })
     })
   })
