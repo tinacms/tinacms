@@ -112,20 +112,20 @@ describe('Listener', () => {
         expect(listener.watchesEvent({ type: 'footsies' })).toBeFalsy()
       })
     })
-  })
-  describe('with a wildcard event "plugin:*:form" specified', () => {
-    const listener = new Listener(() => {}, ['plugin:*:form'])
+    describe('with a wildcard event "plugin:*:form" specified', () => {
+      const listener = new Listener(() => {}, ['plugin:*:form'])
 
-    it('is false for non-namespaced event "plugin"', () => {
-      expect(listener.watchesEvent({ type: 'plugin' })).toBeFalsy()
-    })
+      it('is false for non-namespaced event "plugin"', () => {
+        expect(listener.watchesEvent({ type: 'plugin' })).toBeFalsy()
+      })
 
-    it('is true for namespaced-event "plugin:add:form"', () => {
-      expect(listener.watchesEvent({ type: 'plugin:add:form' })).toBeTruthy()
-    })
+      it('is true for namespaced-event "plugin:add:form"', () => {
+        expect(listener.watchesEvent({ type: 'plugin:add:form' })).toBeTruthy()
+      })
 
-    it('is false for other namespaced-event "plugin:add:baz"', () => {
-      expect(listener.watchesEvent({ type: 'plugin:add:baz' })).toBeFalsy()
+      it('is false for other namespaced-event "plugin:add:baz"', () => {
+        expect(listener.watchesEvent({ type: 'plugin:add:baz' })).toBeFalsy()
+      })
     })
   })
 })
