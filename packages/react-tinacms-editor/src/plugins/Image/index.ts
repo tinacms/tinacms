@@ -16,9 +16,7 @@ limitations under the License.
 
 */
 
-import { imagePluginKey, imagePlugin } from './plugin'
-import { ToolbarComponent } from './ToolbarComponent'
-import { FloatingMenu } from './FloatingComponents/FloatingMenu'
-import { Loaders } from './FloatingComponents/Loaders'
-
-export { imagePluginKey, imagePlugin, ToolbarComponent, FloatingMenu, Loaders }
+export { imagePluginKey, imagePlugin } from './plugin'
+export { Menu } from './Menu'
+export { ImageEdit } from './Popups/Edit'
+export { Loader } from './Popups/Loader'

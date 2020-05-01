@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { PMTestHarness } from '../../../prosemirror-test-utils'
-import { defaultSchema } from '../../../schema/default-schema'
+import { defaultSchema } from '../../../prosemirror-test-utils/test-schema'
 import { liftBlockquote } from '.'
 
 const {

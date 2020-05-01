@@ -17,9 +17,9 @@ limitations under the License.
 */
 
 import { EditorState } from 'prosemirror-state'
-import { liftTarget } from 'prosemirror-transform'
-import { NodeType } from 'prosemirror-model'
 import { EditorView } from 'prosemirror-view'
+import { NodeType } from 'prosemirror-model'
+import { liftTarget } from 'prosemirror-transform'
 
 type Dispatch = typeof EditorView.prototype.dispatch
 

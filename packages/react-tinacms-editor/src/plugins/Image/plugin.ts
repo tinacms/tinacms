@@ -17,14 +17,15 @@ limitations under the License.
 */
 
 import {
+  EditorState,
+  NodeSelection,
   Plugin,
   PluginKey,
-  NodeSelection,
-  EditorState,
   Transaction,
 } from 'prosemirror-state'
 import { EditorView, DecorationSet, Decoration } from 'prosemirror-view'
 import { Slice } from 'prosemirror-model'
+
 import { insertImageList } from './commands'
 import { ImageView } from './nodeView'
 

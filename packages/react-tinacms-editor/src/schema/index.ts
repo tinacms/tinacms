@@ -16,37 +16,48 @@ limitations under the License.
 
 */
 
-import { Plugin } from '@tinacms/core'
 import { Schema } from 'prosemirror-model'
-import { SchemaNodePlugin, SchemaMarkPlugin } from '../types'
 
-export const buildSchema = (plugins: Plugin[]) => {
+import { code } from './marks/code'
+import { em } from './marks/em'
+import { link } from './marks/link'
+import { strong } from './marks/strong'
+
+import { doc } from './nodes/doc'
+import { blockquote } from './nodes/blockquote'
+import { bullet_list } from './nodes/list-bullet'
+import { code_block } from './nodes/code-block'
+import { hard_break } from './nodes/hard-break'
+import { heading } from './nodes/heading'
+import { horizontal_rule } from './nodes/hr'
+import { image } from './nodes/image'
+import { list_item } from './nodes/list-item'
+import { ordered_list } from './nodes/list-ordered'
+import { paragraph } from './nodes/paragraph'
+import { text } from './nodes/text'
+import { tables } from './nodes/tables'
+
+export const marks = { code, em, link, strong }
+
+export const nodes = {
+  doc,
+  paragraph,
+  blockquote,
+  bullet_list,
+  code_block,
+  hard_break,
+  heading,
+  horizontal_rule,
+  image,
+  list_item,
+  ordered_list,
+  text,
+  ...tables,
+}
+
+export const buildSchema = () => {
   return new Schema({
-    nodes: getNodes(plugins as any),
-    marks: getMarks(plugins as any),
-  })
-}
-
-function getNodes(plugins: SchemaNodePlugin[]) {
-  const nodes: any = {}
-
-  plugins
-    .filter(plugin => plugin.__type === 'wysiwyg:schema:node')
-    .forEach((plugin: SchemaNodePlugin) => {
-      nodes[plugin.name] = plugin.node
-    })
-
-  return nodes
-}
-
-function getMarks(plugins: SchemaMarkPlugin[]) {
-  const marks: any = {}
-
-  plugins
-    .filter(plugin => plugin.__type === 'wysiwyg:schema:mark')
-    .forEach((plugin: SchemaMarkPlugin) => {
-      marks[plugin.name] = plugin.mark
-    })
-
-  return marks
+    nodes,
+    marks,
+  } as any)
 }
