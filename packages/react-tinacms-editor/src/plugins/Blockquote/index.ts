@@ -16,4 +16,6 @@ limitations under the License.
 
 */
 
-export * from './horizontal-rule-commands'
+import { ToolbarComponent } from './ToolbarComponent'
+
+export { ToolbarComponent }

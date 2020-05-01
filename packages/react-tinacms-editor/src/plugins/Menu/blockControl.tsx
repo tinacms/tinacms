@@ -24,7 +24,7 @@ import { blockTool } from './blockTool'
 import { Dismissible } from 'react-dismissible'
 
 // TODO: Move this into this module?
-import { toggleHeader as th } from '../../commands/heading-commands'
+import { toggleHeader as th } from '../Block/commands'
 import { useEditorStateContext } from '../../context/editorState'
 import { MenuButton, MenuButtonDropdown } from './MenuComponents'
 import styled, { css } from 'styled-components'

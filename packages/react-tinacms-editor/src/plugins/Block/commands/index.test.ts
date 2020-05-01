@@ -16,9 +16,9 @@ limitations under the License.
 
 */
 
-import { deleteEmptyHeading, toggleHeader } from './heading-commands'
-import { PMTestHarness } from '../prosemirror-test-utils'
-import { defaultSchema } from '../schema/default-schema'
+import { deleteEmptyHeading, toggleHeader } from '.'
+import { PMTestHarness } from '../../../prosemirror-test-utils'
+import { defaultSchema } from '../../../schema/default-schema'
 
 const { forDoc, doc, p, text, strong, em, heading } = new PMTestHarness(
   defaultSchema

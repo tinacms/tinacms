@@ -24,7 +24,7 @@ import {
   removeLinkBeingEdited,
   unmountLinkForm,
   updateLinkBeingEdited,
-} from '../../../commands'
+} from '../commands'
 import {
   findElementOffsetTop,
   findElementOffsetLeft,

@@ -27,10 +27,10 @@ import { HistoryControl } from '../../plugins/Menu/historyControl'
 import {
   InlineControl,
   TableControl,
-  QuoteControl,
   CodeControl,
   ListControl,
 } from '../../plugins/Menu'
+import { ToolbarComponent as ToolbarComponentQuote } from '../../plugins/Blockquote'
 import {
   FloatingMenu as FloatingMenuImage,
   Loaders as LoadersImage,
@@ -130,7 +130,7 @@ export const Menu = ({
             <ToolbarComponentLink />
             <ToolbarComponentImage uploadImages={uploadImages} />
             <TableControl bottom={bottom} />
-            <QuoteControl bottom={bottom} />
+            <ToolbarComponentQuote bottom={bottom} />
             <CodeControl bottom={bottom} />
             <ListControl bottom={bottom} />
             <HistoryControl />
