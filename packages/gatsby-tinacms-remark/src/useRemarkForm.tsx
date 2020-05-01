@@ -43,13 +43,15 @@ export function useRemarkForm(
 ): [RemarkNode | null | undefined, Form | null | undefined] {
   const markdownRemark = usePersistentValue(_markdownRemark)
 
+  const TINA_DISABLED = process.env.NODE_ENV === 'production'
+
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks. In the case of the check for
    * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
    * will never change at runtime.
    */
-  if (!markdownRemark || process.env.NODE_ENV === 'production') {
+  if (!markdownRemark || TINA_DISABLED) {
     return [markdownRemark, null]
   }
 
