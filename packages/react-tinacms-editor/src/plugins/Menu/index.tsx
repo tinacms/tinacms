@@ -16,7 +16,6 @@ limitations under the License.
 
 */
 
-import { EditorView } from 'prosemirror-view'
 import React from 'react'
 
 import { markControl } from './markControl'
@@ -25,23 +24,19 @@ import {
   toggleOrderedList,
 } from '../../commands/list-commands'
 import { insertTable } from '../../commands/table-commands'
-import { imagePluginKey } from '../Image'
-import { wrapIn, setBlockType } from 'prosemirror-commands'
+import { setBlockType } from 'prosemirror-commands'
 import { EditorState } from 'prosemirror-state'
 import { findParentNodeOfType } from 'prosemirror-utils'
 import {
   BoldIcon,
   CodeIcon,
   ItalicIcon,
-  LinkIcon,
   OrderedListIcon,
-  QuoteIcon,
   TableIcon,
   UnderlineIcon,
   UnorderedListIcon,
 } from '@tinacms/icons'
 import { MenuButton } from './MenuComponents'
-import { isMarkPresent } from '../../utils'
 import { useEditorStateContext } from '../../context/editorState'
 
 export const InlineControl = () => (
@@ -70,26 +65,7 @@ const UnderlineControl = markControl({
   tooltip: 'Underline',
 })
 
-export const LinkControl = markControl({
-  mark: 'link',
-  Icon: LinkIcon,
-  tooltip: 'Link',
-  selectionOnly: true,
-  defaultAttrs: {
-    href: '',
-    title: '',
-  },
-  noMix: ['code'],
-  isDisabled: (view: EditorView) =>
-    isMarkPresent(view.state, view.state.schema.marks.link) ||
-    !!imagePluginKey.getState(view.state).selectedImage,
-  onClick: (view: EditorView) => {
-    const { state, dispatch } = view
-    return dispatch(state.tr.setMeta('show_link_toolbar', true))
-  },
-})
-
-const commandContrl = (
+export const commandContrl = (
   command: any,
   Icon: any, // Fix type
   _title: string,
@@ -121,22 +97,6 @@ const commandContrl = (
   )
 }
 
-function wrapInBlockquote(state: EditorState, dispatch: any) {
-  const { blockquote } = state.schema.nodes
-  const { start, node } =
-    findParentNodeOfType(blockquote)(state.selection) || {}
-  if (start && node) {
-    const { tr } = state
-    const nodeRange = tr.doc
-      .resolve(start + 1)
-      .blockRange(tr.doc.resolve(start + node.nodeSize - 2))
-    if (nodeRange) {
-      if (dispatch) return dispatch(tr.lift(nodeRange, 0))
-      else return true
-    }
-  }
-  return wrapIn(state.schema.nodes.blockquote)(state, dispatch)
-}
 function insertTableCmd(state: EditorState, dispatch: any) {
   const { table } = state.schema.nodes
   const { selection } = state
@@ -153,13 +113,6 @@ export const TableControl = commandContrl(
   TableIcon,
   'Table',
   'Table'
-)
-
-export const QuoteControl = commandContrl(
-  wrapInBlockquote,
-  QuoteIcon,
-  'Blockquote',
-  'Blockquote'
 )
 
 export const CodeControl = commandContrl(
