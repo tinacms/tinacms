@@ -1,4 +1,4 @@
-type Listener = Function
+type Callback = Function
 type Unsubscribe = Function
 
 interface CMSEvent {
@@ -6,10 +6,10 @@ interface CMSEvent {
 }
 
 class EventBus {
-  private listeners: Listener[] = []
+  private listeners: Callback[] = []
 
-  subscribe(listener: Listener): Unsubscribe {
-    this.listeners.push(listener)
+  subscribe(callback: Callback): Unsubscribe {
+    this.listeners.push(callback)
     return () => {}
   }
 
