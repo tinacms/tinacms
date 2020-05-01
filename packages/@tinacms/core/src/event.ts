@@ -25,9 +25,11 @@ export interface CMSEvent {
 export class EventBus {
   private listeners: Set<Listener> = new Set()
 
-  subscribe(callback: Callback): Unsubscribe {
-    const listener = new Listener(callback)
+  subscribe(callback: Callback, events?: string[]): Unsubscribe {
+    const listener = new Listener(callback, events)
+
     this.listeners.add(listener)
+
     return () => {
       this.listeners.delete(listener)
     }
