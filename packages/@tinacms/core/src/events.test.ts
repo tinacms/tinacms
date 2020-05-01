@@ -29,6 +29,19 @@ describe('EventBus', () => {
 
     expect(listener).toHaveBeenCalledWith(event)
   })
+  describe('after calling unsubscribe', () => {
+    it('does not invoke the listener', () => {
+      const listener = jest.fn()
+      const events = new EventBus()
+      const event = { type: 'example' }
+
+      const unsubscribe = events.subscribe(listener)
+      unsubscribe()
+      events.dispatch(event)
+
+      expect(listener).not.toHaveBeenCalled()
+    })
+  })
 })
 
 describe('Listener', () => {
