@@ -17,7 +17,11 @@ class Listener {
   watchesEvent(event: CMSEvent) {
     if (!this.events.length) return true
 
-    const watchesThisEvent = this.events.includes(event.type)
+    const watchesThisEvent = !!this.events.find(name => {
+      return event.type.startsWith(name)
+    })
+
+    console.log({ events: this.events, event, watchesThisEvent })
 
     return watchesThisEvent
   }
@@ -91,6 +95,11 @@ describe('Listener', () => {
         const listener = new Listener(() => {}, ['test'])
 
         expect(listener.watchesEvent({ type: 'something' })).toBeFalsy()
+      })
+      it('is true for sub-events', () => {
+        const listener = new Listener(() => {}, ['foo'])
+
+        expect(listener.watchesEvent({ type: 'foo:bar' })).toBeTruthy()
       })
     })
   })
