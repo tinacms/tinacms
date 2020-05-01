@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-export type Callback = Function
+export type Callback = (event: CMSEvent) => void
 export type Unsubscribe = Function
 
 export interface CMSEvent {
@@ -23,11 +23,14 @@ export interface CMSEvent {
 }
 
 export class EventBus {
-  private listeners: Listener[] = []
+  private listeners: Set<Listener> = new Set()
 
   subscribe(callback: Callback): Unsubscribe {
-    this.listeners.push(new Listener(callback))
-    return () => {}
+    const listener = new Listener(callback)
+    this.listeners.add(listener)
+    return () => {
+      this.listeners.delete(listener)
+    }
   }
 
   dispatch(event: CMSEvent) {
