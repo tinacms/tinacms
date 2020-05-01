@@ -115,5 +115,32 @@ describe('Listener', () => {
         expect(listener.watchesEvent({ type: 'footsies' })).toBeFalsy()
       })
     })
+    describe('with a namespaced event "foo:bar" specified', () => {
+      it('is false for non-namespaced event "foo"', () => {
+        const listener = new Listener(() => {}, ['foo:bar'])
+
+        expect(listener.watchesEvent({ type: 'foo' })).toBeFalsy()
+      })
+      it('is false when the event is not "foo"', () => {
+        const listener = new Listener(() => {}, ['foo:bar'])
+
+        expect(listener.watchesEvent({ type: 'something' })).toBeFalsy()
+      })
+      it('is true for namespaced-event "foo:bar"', () => {
+        const listener = new Listener(() => {}, ['foo:bar'])
+
+        expect(listener.watchesEvent({ type: 'foo:bar' })).toBeTruthy()
+      })
+      it('is true for namespaced-event "foo:bar:baz"', () => {
+        const listener = new Listener(() => {}, ['foo:bar'])
+
+        expect(listener.watchesEvent({ type: 'foo:bar:baz' })).toBeTruthy()
+      })
+      it('is false for similarly named event "footsies:barsies"', () => {
+        const listener = new Listener(() => {}, ['foo:bar'])
+
+        expect(listener.watchesEvent({ type: 'footsies' })).toBeFalsy()
+      })
+    })
   })
 })
