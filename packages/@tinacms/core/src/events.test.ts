@@ -76,35 +76,34 @@ describe('Listener', () => {
         expect(listener.watchesEvent({ type: 'whatever' })).toBeTruthy()
       })
     })
-    describe('with an event "foo" specified', () => {
-      it('is true when event is "foo"', () => {
-        const listener = new Listener(() => {}, ['foo'])
 
+    describe('with an event "foo" specified', () => {
+      const listener = new Listener(() => {}, ['foo'])
+
+      it('is true when event is "foo"', () => {
         expect(listener.watchesEvent({ type: 'foo' })).toBeTruthy()
       })
-      it('is false when the event is not "foo"', () => {
-        const listener = new Listener(() => {}, ['foo'])
 
+      it('is false when the event is not "foo"', () => {
         expect(listener.watchesEvent({ type: 'something' })).toBeFalsy()
       })
-      it('is true for namespaced-event "foo:bar"', () => {
-        const listener = new Listener(() => {}, ['foo'])
 
+      it('is true for namespaced-event "foo:bar"', () => {
         expect(listener.watchesEvent({ type: 'foo:bar' })).toBeTruthy()
       })
-      it('is true for namespaced-event "foo:bar:baz"', () => {
-        const listener = new Listener(() => {}, ['foo'])
 
+      it('is true for namespaced-event "foo:bar:baz"', () => {
         expect(listener.watchesEvent({ type: 'foo:bar:baz' })).toBeTruthy()
       })
-      it('is false for similarly named event "footsies"', () => {
-        const listener = new Listener(() => {}, ['foo'])
 
+      it('is false for similarly named event "footsies"', () => {
         expect(listener.watchesEvent({ type: 'footsies' })).toBeFalsy()
       })
     })
+
     describe('with a namespaced event "foo:bar" specified', () => {
       const listener = new Listener(() => {}, ['foo:bar'])
+
       it('is false for non-namespaced event "foo"', () => {
         expect(listener.watchesEvent({ type: 'foo' })).toBeFalsy()
       })
