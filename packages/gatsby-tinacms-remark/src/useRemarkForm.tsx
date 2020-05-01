@@ -105,43 +105,43 @@ export function useRemarkForm(
     return fields
   }, [formOverrrides.fields])
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useForm(
-    {
-      label,
-      id,
-      loadInitialValues() {
-        return cms.api.git
-          .show(id) // Load the contents of this file at HEAD
-          .then((git: any) => {
-            // Parse the content into the RemarkForm data structure and store it in state.
-            const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
-              git.content
-            )
-            return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
-          })
-      },
-      fields,
-      onSubmit(data: any) {
-        return cms.api.git.onSubmit!({
-          files: [data.fileRelativePath],
-          message: data.__commit_message || 'Tina commit',
-          name: data.__commit_name,
-          email: data.__commit_email,
+  const remarkFormOptions = {
+    label,
+    id,
+    loadInitialValues() {
+      return cms.api.git
+        .show(id) // Load the contents of this file at HEAD
+        .then((git: any) => {
+          // Parse the content into the RemarkForm data structure and store it in state.
+          const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
+            git.content
+          )
+          return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
         })
-      },
-      reset() {
-        return cms.api.git.reset({ files: [id] })
-      },
-      actions,
     },
-    // The Form will be updated if these values change.
-    {
-      label,
-      fields,
-      values: valuesOnDisk,
-    }
-  )
+    fields,
+    onSubmit(data: any) {
+      return cms.api.git.onSubmit!({
+        files: [data.fileRelativePath],
+        message: data.__commit_message || 'Tina commit',
+        name: data.__commit_name,
+        email: data.__commit_email,
+      })
+    },
+    reset() {
+      return cms.api.git.reset({ files: [id] })
+    },
+    actions,
+  }
+
+  const watchValuesForChange = {
+    label,
+    fields,
+    values: valuesOnDisk,
+  }
+
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
+  const [, form] = useForm(remarkFormOptions, watchValuesForChange)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = React.useCallback(formState => {
