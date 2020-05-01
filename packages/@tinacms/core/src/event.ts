@@ -22,6 +22,19 @@ export interface CMSEvent {
   type: string
 }
 
+export class EventBus {
+  private listeners: Listener[] = []
+
+  subscribe(callback: Callback): Unsubscribe {
+    this.listeners.push(new Listener(callback))
+    return () => {}
+  }
+
+  dispatch(event: CMSEvent) {
+    this.listeners.forEach(listener => listener.handleEvent(event))
+  }
+}
+
 export class Listener {
   constructor(private callback: Callback, private events: string[] = []) {}
 
@@ -57,17 +70,4 @@ function matchEventPattern(event: CMSEvent, pattern: string) {
   }
 
   return !ignoresEvent
-}
-
-export class EventBus {
-  private listeners: Listener[] = []
-
-  subscribe(callback: Callback): Unsubscribe {
-    this.listeners.push(new Listener(callback))
-    return () => {}
-  }
-
-  dispatch(event: CMSEvent) {
-    this.listeners.forEach(listener => listener.handleEvent(event))
-  }
 }
