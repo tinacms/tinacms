@@ -105,20 +105,22 @@ export function useRemarkForm(
     return fields
   }, [formOverrrides.fields])
 
+  function loadInitialValues() {
+    return cms.api.git
+      .show(id) // Load the contents of this file at HEAD
+      .then((git: any) => {
+        // Parse the content into the RemarkForm data structure and store it in state.
+        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
+          git.content
+        )
+        return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
+      })
+  }
+
   const remarkFormOptions = {
     label,
     id,
-    loadInitialValues() {
-      return cms.api.git
-        .show(id) // Load the contents of this file at HEAD
-        .then((git: any) => {
-          // Parse the content into the RemarkForm data structure and store it in state.
-          const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
-            git.content
-          )
-          return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
-        })
-    },
+    loadInitialValues,
     fields,
     onSubmit(data: any) {
       return cms.api.git.onSubmit!({
