@@ -5,16 +5,23 @@ interface CMSEvent {
   type: string
 }
 
+class Listener {
+  constructor(private callback: Callback) {}
+  handleEvent(event: CMSEvent) {
+    this.callback(event)
+  }
+}
+
 class EventBus {
-  private listeners: Callback[] = []
+  private listeners: Listener[] = []
 
   subscribe(callback: Callback): Unsubscribe {
-    this.listeners.push(callback)
+    this.listeners.push(new Listener(callback))
     return () => {}
   }
 
   dispatch(event: CMSEvent) {
-    this.listeners.forEach(listener => listener(event))
+    this.listeners.forEach(listener => listener.handleEvent(event))
   }
 }
 
