@@ -46,7 +46,7 @@ export function useJsonForm(
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks.
    */
-  if (!jsonNode || TINA_DISABLED) {
+  if (!jsonNode) {
     return [jsonNode, null]
   }
   validateJsonNode(jsonNode)
@@ -89,7 +89,7 @@ export function useJsonForm(
     id,
     label,
     fields,
-    loadInitialValues,
+    loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
     onSubmit(data: any) {
       return cms.api.git.onSubmit!({
         files: [data.jsonNode.fileRelativePath],
