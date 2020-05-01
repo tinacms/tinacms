@@ -17,14 +17,13 @@ limitations under the License.
 */
 
 import { EditorView } from 'prosemirror-view'
-import { Plugin } from '@tinacms/core'
 
-import { createEditorState } from '../../plugins'
 import { buildSchema } from '../../schema'
 import { buildTranslator } from './buildTranslator'
-import { nodeViews } from '../../node-views'
-import { Format } from '../../Translator'
+import { Format } from '../../translator'
 import { ImageProps } from '../../types'
+
+import { buildEditorState } from './buildEditorState'
 
 export interface Input {
   value: string
@@ -36,12 +35,11 @@ export interface Input {
 export const buildEditor = (
   input: Input,
   el: HTMLDivElement | undefined | null,
-  plugins: Plugin[] = [],
   imageProps: ImageProps = {},
   setEditorView: ({ view }: { view: EditorView }) => void,
   format?: Format
 ): { translator?: any } => {
-  const schema = buildSchema(plugins)
+  const schema = buildSchema()
   const { upload, previewUrl } = imageProps
   const translator = buildTranslator(schema, format)
 
@@ -51,14 +49,12 @@ export const buildEditor = (
    * Create a new Prosemirror EditorView on in the DOM
    */
   const view = new EditorView(el, {
-    nodeViews: nodeViews() as any,
     /**
      * The initial state of the Wysiwyg
      */
-    state: createEditorState(
+    state: buildEditorState(
       schema,
       translator,
-      plugins,
       input.value,
       upload,
       previewUrl
