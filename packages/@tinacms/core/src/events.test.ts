@@ -14,20 +14,32 @@ class Listener {
     }
   }
 
-  watchesEvent(event: CMSEvent) {
+  watchesEvent(currentEvent: CMSEvent) {
     if (!this.events.length) return true
 
-    const watchesThisEvent = !!this.events.find(name => {
-      const eventParts = event.type.split(':')
-      const watchedParts = name.split(':')
-
-      return watchedParts.reduce<boolean>((watching, part, index) => {
-        return watching && part === eventParts[index]
-      }, true)
+    const watchCurrentEvent = !!this.events.find(watchedEvent => {
+      return matchEventPattern(currentEvent, watchedEvent)
     })
 
-    return watchesThisEvent
+    return watchCurrentEvent
   }
+}
+
+function matchEventPattern(event: CMSEvent, pattern: string) {
+  const eventParts = event.type.split(':')
+  const patternParts = pattern.split(':')
+
+  let index = 0
+  let ignoresEvent = false
+
+  while (!ignoresEvent && index < patternParts.length) {
+    const wildcard = patternParts[index] === '*'
+    const matchingParts = patternParts[index] === eventParts[index]
+    ignoresEvent = !(wildcard || matchingParts)
+    index++
+  }
+
+  return !ignoresEvent
 }
 
 class EventBus {
@@ -136,6 +148,21 @@ describe('Listener', () => {
       it('is false for similarly named event "footsies:barsies"', () => {
         expect(listener.watchesEvent({ type: 'footsies' })).toBeFalsy()
       })
+    })
+  })
+  describe('with a wildcard event "plugin:*:form" specified', () => {
+    const listener = new Listener(() => {}, ['plugin:*:form'])
+
+    it('is false for non-namespaced event "plugin"', () => {
+      expect(listener.watchesEvent({ type: 'plugin' })).toBeFalsy()
+    })
+
+    it('is true for namespaced-event "plugin:add:form"', () => {
+      expect(listener.watchesEvent({ type: 'plugin:add:form' })).toBeTruthy()
+    })
+
+    it('is false for other namespaced-event "plugin:add:baz"', () => {
+      expect(listener.watchesEvent({ type: 'plugin:add:baz' })).toBeFalsy()
     })
   })
 })
