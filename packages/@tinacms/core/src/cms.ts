@@ -113,7 +113,7 @@ export class CMS {
    * @hidden
    */
   constructor(config: CMSConfig = {}) {
-    this.plugins = new PluginTypeManager()
+    this.plugins = new PluginTypeManager(this.events)
 
     if (config.plugins) {
       config.plugins.forEach(plugin => this.plugins.add(plugin))
