@@ -60,7 +60,7 @@ export class TinaCMS extends CMS {
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
 
-    this.sidebar = new SidebarState(sidebar)
+    this.sidebar = new SidebarState(this.events, sidebar)
     this.toolbar = new ToolbarState(toolbar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
