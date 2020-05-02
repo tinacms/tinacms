@@ -52,7 +52,7 @@ export class TinaCMS extends CMS {
   sidebar: SidebarState
   media: MediaManager
   toolbar: ToolbarState
-  alerts = new Alerts()
+  alerts = new Alerts(this.events)
 
   constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
     super(config)

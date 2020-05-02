@@ -19,6 +19,7 @@ export type Callback = (event: CMSEvent) => void
 
 export interface CMSEvent {
   type: string
+  [key: string]: any
 }
 
 export class EventBus {
