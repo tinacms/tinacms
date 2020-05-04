@@ -420,7 +420,9 @@
       "profile": "https://github.com/jpuri",
       "contributions": [
         "code",
-        "review"
+        "review",
+        "test",
+        "maintenance"
       ]
     },
     {
