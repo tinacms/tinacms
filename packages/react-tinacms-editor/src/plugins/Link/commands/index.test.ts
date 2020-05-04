@@ -16,13 +16,13 @@ limitations under the License.
 
 */
 
+import { PMTestHarness } from '../../../prosemirror-test-utils'
+import { defaultSchema } from '../../../prosemirror-test-utils/test-schema'
 import {
   removeLinkBeingEdited,
   updateLinkBeingEdited,
   insertLinkToFile,
 } from '.'
-import { PMTestHarness } from '../../../prosemirror-test-utils'
-import { defaultSchema } from '../../../schema/default-schema'
 
 const { forDoc, doc, p, link, text } = new PMTestHarness(defaultSchema)
 

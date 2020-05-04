@@ -21,20 +21,22 @@ import { SchemaMarkPlugin } from '../../types'
 /**
  * Emphasis
  */
+export const em = {
+  parseDOM: [
+    { tag: 'i' },
+    { tag: 'em' },
+    {
+      style: 'font-style',
+      getAttrs: (value: string): null | boolean => value === 'italic' && null,
+    },
+  ],
+  toDOM() {
+    return ['em']
+  },
+}
+
 export default {
   __type: 'wysiwyg:schema:mark',
   name: 'em',
-  mark: {
-    parseDOM: [
-      { tag: 'i' },
-      { tag: 'em' },
-      {
-        style: 'font-style',
-        getAttrs: (value: string): null | boolean => value === 'italic' && null,
-      },
-    ],
-    toDOM() {
-      return ['em']
-    },
-  },
+  mark: em,
 } as SchemaMarkPlugin

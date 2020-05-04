@@ -19,6 +19,7 @@ limitations under the License.
 import { Slice } from 'prosemirror-model'
 import { Plugin, Transaction, PluginKey, EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+
 import { commonPluginKey } from '../Common'
 import { isMarkPresent } from '../../utils'
 import { linkify } from './util'
