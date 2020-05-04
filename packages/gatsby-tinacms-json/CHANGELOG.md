@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.20](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.20-alpha.0...gatsby-tinacms-json@0.8.20) (2020-05-04)
+
+
+### Bug Fixes
+
+* usejsonform loads form in prod, doesn's load initial values ([6b521e2](https://github.com/tinacms/tinacms/commit/6b521e2))
+
+
+
+
+
 ## [0.8.20-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.19...gatsby-tinacms-json@0.8.20-alpha.0) (2020-04-28)
 
 **Note:** Version bump only for package gatsby-tinacms-json
