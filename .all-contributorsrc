@@ -422,7 +422,8 @@
         "code",
         "review",
         "test",
-        "maintenance"
+        "maintenance",
+        "bug"
       ]
     },
     {
