@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.15](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.15-alpha.0...gatsby-tinacms-remark@0.7.15) (2020-05-04)
+
+
+### Bug Fixes
+
+* returns form in prod, doesnt load initial values ([ae92702](https://github.com/tinacms/tinacms/commit/ae92702))
+
+
+
+
+
 ## [0.7.15-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.14...gatsby-tinacms-remark@0.7.15-alpha.0) (2020-04-28)
 
 **Note:** Version bump only for package gatsby-tinacms-remark
