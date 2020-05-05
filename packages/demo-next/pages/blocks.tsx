@@ -163,10 +163,10 @@ const PAGE_BUILDER_BLOCKS = {
     Component: HeroBlock,
     template: hero_template,
   },
-  image: {
-    Component: ImageBlock,
-    template: image_template,
-  },
+  // image: {
+  //   Component: ImageBlock,
+  //   template: image_template,
+  // },
 }
 
 /**
