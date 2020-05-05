@@ -50,12 +50,13 @@ export const Menubar = ({ sticky = true, uploadImages }: Props) => {
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
   const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
+  const { editorView } = useEditorStateContext()
 
   useEffect(() => {
     if (menuRef.current && sticky) {
       setMenuBoundingBox(menuRef.current.getBoundingClientRect())
     }
-  }, [menuRef])
+  }, [menuRef, editorView])
 
   useLayoutEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
@@ -99,8 +100,8 @@ export const Menubar = ({ sticky = true, uploadImages }: Props) => {
     e.preventDefault()
   }, [])
 
-  const { editorView } = useEditorStateContext()
   if (!editorView) return null
+
   return (
     <>
       {menuFixed && (
