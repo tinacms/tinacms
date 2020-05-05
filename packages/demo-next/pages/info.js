@@ -72,6 +72,9 @@ function Info(props) {
           </h1>
           <InlineImageField
             name="frontmatter.image"
+            previewSrc={formValues => {
+              return formValues.frontmatter.image
+            }}
             uploadDir={() => '/public/images/'}
             parse={filename => `/images/${filename}`}
           />
