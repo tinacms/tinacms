@@ -29,7 +29,7 @@ interface Options {
 
 export function useGithubMarkdownForm(
   markdownFile: GitFile,
-  formOptions: Options
+  formOptions?: Options
 ) {
   return useGithubFileForm(markdownFile, {
     ...formOptions,
