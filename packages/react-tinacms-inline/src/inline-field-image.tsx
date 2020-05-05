@@ -70,9 +70,9 @@ export function InlineImageField({
                 }}
                 {...input}
               >
-                {(props: any) =>
-                  children({ previewSrc: _previewSrc }, ...props)
-                }
+                {children &&
+                  ((props: any) =>
+                    children({ previewSrc: _previewSrc }, ...props))}
               </ImageUpload>
             </InputFocusWrapper>
           )
