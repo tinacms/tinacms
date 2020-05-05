@@ -43,13 +43,14 @@ export function useRemarkForm(
 ): [RemarkNode | null | undefined, Form | null | undefined] {
   const markdownRemark = usePersistentValue(_markdownRemark)
 
+  // NODE_ENV will never change at runtime
+  const TINA_DISABLED = process.env.NODE_ENV === 'production'
+
   /**
    * We're returning early here which means all the hooks called by this hook
-   * violate the rules of hooks. In the case of the check for
-   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
-   * will never change at runtime.
+   * violate the rules of hooks.
    */
-  if (!markdownRemark || process.env.NODE_ENV === 'production') {
+  if (!markdownRemark) {
     return [markdownRemark, null]
   }
 
@@ -103,43 +104,45 @@ export function useRemarkForm(
     return fields
   }, [formOverrrides.fields])
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useForm(
-    {
-      label,
-      id,
-      loadInitialValues() {
-        return cms.api.git
-          .show(id) // Load the contents of this file at HEAD
-          .then((git: any) => {
-            // Parse the content into the RemarkForm data structure and store it in state.
-            const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
-              git.content
-            )
-            return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
-          })
-      },
-      fields,
-      onSubmit(data: any) {
-        return cms.api.git.onSubmit!({
-          files: [data.fileRelativePath],
-          message: data.__commit_message || 'Tina commit',
-          name: data.__commit_name,
-          email: data.__commit_email,
-        })
-      },
-      reset() {
-        return cms.api.git.reset({ files: [id] })
-      },
-      actions,
+  function loadInitialValues() {
+    return cms.api.git
+      .show(id) // Load the contents of this file at HEAD
+      .then((git: any) => {
+        // Parse the content into the RemarkForm data structure and store it in state.
+        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
+          git.content
+        )
+        return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
+      })
+  }
+
+  const remarkFormOptions = {
+    label,
+    id,
+    loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
+    fields,
+    onSubmit(data: any) {
+      return cms.api.git.onSubmit!({
+        files: [data.fileRelativePath],
+        message: data.__commit_message || 'Tina commit',
+        name: data.__commit_name,
+        email: data.__commit_email,
+      })
     },
-    // The Form will be updated if these values change.
-    {
-      label,
-      fields,
-      values: valuesOnDisk,
-    }
-  )
+    reset() {
+      return cms.api.git.reset({ files: [id] })
+    },
+    actions,
+  }
+
+  const watchValuesForChange = {
+    label,
+    fields,
+    values: valuesOnDisk,
+  }
+
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
+  const [, form] = useForm(remarkFormOptions, watchValuesForChange)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = React.useCallback(formState => {
