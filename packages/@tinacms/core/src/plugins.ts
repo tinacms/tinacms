@@ -311,6 +311,6 @@ export class PluginType<T extends Plugin = Plugin> {
     return plugin
   }
   subscribe(cb: Callback): () => void {
-    return this.events.subscribe(cb, [`plugin:*:${this.__type}`])
+    return this.events.subscribe(`plugin:*:${this.__type}`, cb)
   }
 }

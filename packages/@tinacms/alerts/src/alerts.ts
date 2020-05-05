@@ -53,7 +53,7 @@ export class Alerts {
   }
 
   subscribe(cb: Callback) {
-    const unsub = this.events.subscribe(cb, ['alerts'])
+    const unsub = this.events.subscribe('alerts', cb)
 
     return () => unsub()
   }
