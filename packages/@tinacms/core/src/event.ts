@@ -47,7 +47,7 @@ export class EventBus {
 }
 
 export class Listener {
-  constructor(private eventPattern: string, private callback: Callback) {}
+  constructor(private matchEventPattern: string, private callback: Callback) {}
 
   handleEvent(event: CMSEvent) {
     if (this.watchesEvent(event)) {
@@ -58,9 +58,12 @@ export class Listener {
   }
 
   watchesEvent(currentEvent: CMSEvent) {
-    if (this.eventPattern === '*') return true
+    if (this.matchEventPattern === '*') return true
 
-    const watchCurrentEvent = matchEventPattern(currentEvent, this.eventPattern)
+    const watchCurrentEvent = matchEventPattern(
+      currentEvent,
+      this.matchEventPattern
+    )
 
     return watchCurrentEvent
   }
