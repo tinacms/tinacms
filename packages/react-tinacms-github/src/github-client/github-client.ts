@@ -27,12 +27,15 @@ export interface GithubClientOptions {
   authCallbackRoute: string
   baseRepoFullName: string
   baseBranch?: string
+  authScope?: AuthScope
 }
 
 export interface Branch {
   name: string
   protected: boolean
 }
+
+export type AuthScope = 'public_repo' | 'repo'
 
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
@@ -43,6 +46,7 @@ export class GithubClient {
   baseBranch: string
   clientId: string
   authCallbackRoute: string
+  authScope: AuthScope
 
   constructor({
     proxy,
@@ -50,17 +54,19 @@ export class GithubClient {
     authCallbackRoute,
     baseRepoFullName,
     baseBranch = 'master',
+    authScope = 'public_repo',
   }: GithubClientOptions) {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
     this.baseBranch = baseBranch
     this.clientId = clientId
     this.authCallbackRoute = authCallbackRoute
+    this.authScope = authScope
     this.validate()
   }
 
   authenticate() {
-    return authenticate(this.clientId, this.authCallbackRoute)
+    return authenticate(this.clientId, this.authCallbackRoute, this.authScope)
   }
 
   isAuthenticated() {
