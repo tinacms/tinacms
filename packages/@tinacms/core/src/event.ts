@@ -23,9 +23,9 @@ export interface CMSEvent {
 }
 
 export class EventBus {
-  private listeners: Set<Listener> = new Set()
+  private listeners = new Set<Listener>()
 
-  subscribe(callback: Callback, events?: string[]): () => void {
+  subscribe = (callback: Callback, events?: string[]): (() => void) => {
     const listener = new Listener(callback, events)
 
     this.listeners.add(listener)
@@ -35,8 +35,14 @@ export class EventBus {
     }
   }
 
-  dispatch(event: CMSEvent) {
-    this.listeners.forEach(listener => listener.handleEvent(event))
+  dispatch = (event: CMSEvent) => {
+    /**
+     * If the `listener` Set is modified during the dispatch then
+     * it can cause an infinite loop. Snapshot it and it's fine.
+     */
+    const listenerSnapshot = Array.from(this.listeners.values())
+
+    listenerSnapshot.forEach(listener => listener.handleEvent(event))
   }
 }
 
@@ -46,7 +52,9 @@ export class Listener {
   handleEvent(event: CMSEvent) {
     if (this.watchesEvent(event)) {
       this.callback(event)
+      return true
     }
+    return false
   }
 
   watchesEvent(currentEvent: CMSEvent) {
