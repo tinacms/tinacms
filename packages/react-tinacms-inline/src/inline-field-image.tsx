@@ -42,12 +42,14 @@ export function InlineImageField({
   return (
     <InlineField name={name}>
       {({ input, status, form }) => {
+        const _previewSrc = previewSrc(form.finalForm.getState().values)
+
         if (status === 'active') {
           return (
             <InputFocusWrapper>
               <ImageUpload
                 value={input.value}
-                previewSrc={previewSrc(form.finalForm.getState().values)}
+                previewSrc={_previewSrc}
                 onDrop={async ([file]: File[]) => {
                   const directory = uploadDir(form)
                   const [media] = await cms.media.store.persist([
@@ -59,18 +61,27 @@ export function InlineImageField({
                   if (media) {
                     input.onChange(parse(media.filename))
                   } else {
-                    // TODO Handle failure
+                    /**
+                     * TODO: Handle failure with events
+                     * or alerts here?
+                     */
                   }
                   return null
                 }}
                 {...input}
               >
-                {children}
+                {(props: any) =>
+                  children({ previewSrc: _previewSrc }, ...props)
+                }
               </ImageUpload>
             </InputFocusWrapper>
           )
         }
-        return children ? children : <img src={input.value} />
+        return children ? (
+          children({ previewSrc: _previewSrc })
+        ) : (
+          <img src={input.value} />
+        )
       }}
     </InlineField>
   )
@@ -83,12 +94,12 @@ interface ImageUploadProps {
   previewSrc?: string
 }
 
-export const ImageUpload = ({
+export function ImageUpload({
   onDrop,
   value,
   previewSrc,
   children,
-}: ImageUploadProps) => {
+}: ImageUploadProps) {
   const {
     getRootProps,
     getInputProps,
@@ -97,18 +108,23 @@ export const ImageUpload = ({
     isDragReject,
   } = useDropzone({ accept: 'image/*', onDrop })
 
+  if (!value) return <EmptyImageUpload />
+
   return (
     <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
-      {value ? (
-        <div>{children ? children : <img src={previewSrc || value} />}</div>
-      ) : (
-        <div>
-          Drag 'n' drop some files here,
-          <br />
-          or click to select files
-        </div>
-      )}
+      <div>{children ? children(previewSrc) : <img src={previewSrc} />}</div>
+    </div>
+  )
+}
+
+function EmptyImageUpload() {
+  // TODO: style this component
+  return (
+    <div>
+      Drag 'n' drop some files here,
+      <br />
+      or click to select files
     </div>
   )
 }
