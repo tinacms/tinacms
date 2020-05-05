@@ -19,8 +19,8 @@ limitations under the License.
 import * as React from 'react'
 import { createContext, useContext, useEffect, useState } from 'react'
 import { EditorView } from 'prosemirror-view'
+
 import { buildEditor } from './utils/buildEditor'
-import { ALL_PLUGINS } from '../default-plugins'
 
 const EditorStateContext = createContext<{
   editorView: { view: EditorView } | undefined
@@ -41,9 +41,7 @@ export const EditorStateProvider = ({
   const [translator, setTranslator] = useState<any>()
 
   useEffect(() => {
-    setTranslator(
-      buildEditor(input, el, ALL_PLUGINS, imageProps, setEditorView, format)
-    )
+    setTranslator(buildEditor(input, el, imageProps, setEditorView, format))
     return () => {
       editorView && editorView.view.destroy()
     }

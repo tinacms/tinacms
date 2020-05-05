@@ -419,7 +419,11 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/2182307?v=4",
       "profile": "https://github.com/jpuri",
       "contributions": [
-        "code"
+        "code",
+        "review",
+        "test",
+        "maintenance",
+        "bug"
       ]
     },
     {
@@ -448,7 +452,8 @@
       "avatar_url": "https://avatars1.githubusercontent.com/u/13934790?v=4",
       "profile": "https://github.com/cleitonper",
       "contributions": [
-        "bug"
+        "bug",
+        "ideas"
       ]
     },
     {
@@ -627,6 +632,15 @@
       "profile": "https://github.com/mittonface",
       "contributions": [
         "code",
+        "doc"
+      ]
+    },
+    {
+      "login": "clnmcgrw",
+      "name": "Colin McGraw",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/5896972?v=4",
+      "profile": "https://github.com/clnmcgrw",
+      "contributions": [
         "doc"
       ]
     }
