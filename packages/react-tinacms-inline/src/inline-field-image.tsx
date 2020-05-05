@@ -24,6 +24,7 @@ import { InputFocusWrapper } from './styles'
 
 export interface InlineImageProps {
   name: string
+  previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
   children?: any
@@ -31,6 +32,7 @@ export interface InlineImageProps {
 
 export function InlineImageField({
   name,
+  previewSrc,
   uploadDir,
   parse,
   children,
@@ -45,6 +47,7 @@ export function InlineImageField({
             <InputFocusWrapper>
               <ImageUpload
                 value={input.value}
+                previewSrc={previewSrc(form.finalForm.getState().values)}
                 onDrop={async ([file]: File[]) => {
                   const directory = uploadDir(form)
                   const [media] = await cms.media.store.persist([
@@ -77,9 +80,15 @@ interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
   children?: any
+  previewSrc?: string
 }
 
-export const ImageUpload = ({ onDrop, value, children }: ImageUploadProps) => {
+export const ImageUpload = ({
+  onDrop,
+  value,
+  previewSrc,
+  children,
+}: ImageUploadProps) => {
   const {
     getRootProps,
     getInputProps,
@@ -92,7 +101,7 @@ export const ImageUpload = ({ onDrop, value, children }: ImageUploadProps) => {
     <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
       {value ? (
-        <div>{children ? children : <img src={value} />}</div>
+        <div>{children ? children : <img src={previewSrc || value} />}</div>
       ) : (
         <div>
           Drag 'n' drop some files here,
