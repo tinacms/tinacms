@@ -20,13 +20,14 @@ import popupWindow from './popupWindow'
 export const GITHUB_AUTH_CODE_KEY = 'github_auth_code'
 export const authenticate = (
   clientId: string,
-  codeExchangeRoute: string
+  codeExchangeRoute: string,
+  scope: string = 'public_repo'
 ): Promise<void> => {
   const authState = Math.random()
     .toString(36)
     .substring(7)
 
-  const url = `https://github.com/login/oauth/authorize?scope=public_repo&client_id=${clientId}&state=${authState}`
+  const url = `https://github.com/login/oauth/authorize?scope=${scope}&client_id=${clientId}&state=${authState}`
 
   return new Promise(resolve => {
     // @ts-ignore
