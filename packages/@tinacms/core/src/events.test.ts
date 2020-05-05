@@ -24,7 +24,7 @@ describe('EventBus', () => {
     const events = new EventBus()
     const event = { type: 'example' }
 
-    events.subscribe(listener)
+    events.subscribe('*', listener)
     events.dispatch(event)
 
     expect(listener).toHaveBeenCalledWith(event)
@@ -35,7 +35,7 @@ describe('EventBus', () => {
       const events = new EventBus()
       const event = { type: 'example' }
 
-      const unsubscribe = events.subscribe(listener)
+      const unsubscribe = events.subscribe('*', listener)
       unsubscribe()
       events.dispatch(event)
 
@@ -48,7 +48,7 @@ describe('Listener', () => {
   describe('handleEvent', () => {
     it("invokes it's callback if it watches the event", () => {
       const cb = jest.fn()
-      const listener = new Listener(cb, ['example'])
+      const listener = new Listener('example', cb)
       const event = { type: 'example' }
 
       listener.watchesEvent = jest.fn(() => true)
@@ -71,14 +71,14 @@ describe('Listener', () => {
   describe('watchesEvent(event): boolean', () => {
     describe('when no events specified', () => {
       it('watches all events', () => {
-        const listener = new Listener(() => {})
+        const listener = new Listener('*', () => {})
 
         expect(listener.watchesEvent({ type: 'whatever' })).toBeTruthy()
       })
     })
 
     describe('with an event "foo" specified', () => {
-      const listener = new Listener(() => {}, ['foo'])
+      const listener = new Listener('foo', () => {})
 
       it('is true when event is "foo"', () => {
         expect(listener.watchesEvent({ type: 'foo' })).toBeTruthy()
@@ -102,7 +102,7 @@ describe('Listener', () => {
     })
 
     describe('with a namespaced event "foo:bar" specified', () => {
-      const listener = new Listener(() => {}, ['foo:bar'])
+      const listener = new Listener('foo:bar', () => {})
 
       it('is false for non-namespaced event "foo"', () => {
         expect(listener.watchesEvent({ type: 'foo' })).toBeFalsy()
@@ -125,7 +125,7 @@ describe('Listener', () => {
       })
     })
     describe('with a wildcard event "plugin:*:form" specified', () => {
-      const listener = new Listener(() => {}, ['plugin:*:form'])
+      const listener = new Listener('plugin:*:form', () => {})
 
       it('is false for non-namespaced event "plugin"', () => {
         expect(listener.watchesEvent({ type: 'plugin' })).toBeFalsy()
