@@ -25,8 +25,8 @@ export interface CMSEvent {
 export class EventBus {
   private listeners = new Set<Listener>()
 
-  subscribe = (callback: Callback, events?: string[]): (() => void) => {
-    const listener = new Listener(callback, events)
+  subscribe = (event: string, callback: Callback): (() => void) => {
+    const listener = new Listener(callback, event)
 
     this.listeners.add(listener)
 
@@ -47,7 +47,7 @@ export class EventBus {
 }
 
 export class Listener {
-  constructor(private callback: Callback, private events: string[] = []) {}
+  constructor(private callback: Callback, private eventPattern: string = '*') {}
 
   handleEvent(event: CMSEvent) {
     if (this.watchesEvent(event)) {
@@ -58,11 +58,9 @@ export class Listener {
   }
 
   watchesEvent(currentEvent: CMSEvent) {
-    if (!this.events.length) return true
+    if (this.eventPattern === '*') return true
 
-    const watchCurrentEvent = !!this.events.find(watchedEvent => {
-      return matchEventPattern(currentEvent, watchedEvent)
-    })
+    const watchCurrentEvent = matchEventPattern(currentEvent, this.eventPattern)
 
     return watchCurrentEvent
   }

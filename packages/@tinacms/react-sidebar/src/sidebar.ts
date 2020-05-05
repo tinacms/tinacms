@@ -90,7 +90,7 @@ export class SidebarState {
   }
 
   subscribe(callback: Callback): () => void {
-    const unsub = this.events.subscribe(callback, ['sidebar'])
+    const unsub = this.events.subscribe('sidebar', callback)
 
     return () => unsub()
   }
