@@ -17,4 +17,4 @@ limitations under the License.
 */
 
 export * from './useGithubToolbarPlugins'
-export * from './ForkNamePlugin'
+export * from './RepoInfoPlugin'

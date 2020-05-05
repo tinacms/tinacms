@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { MarkdownTranslator, Format, DOMTranslator } from '../../Translator'
 import { Schema } from 'prosemirror-model'
+import { MarkdownTranslator, Format, DOMTranslator } from '../../translator'
 
 export const buildTranslator = (
   schema: Schema,

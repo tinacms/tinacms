@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 type InputFieldType<ExtraFieldProps, InputProps> = FieldProps<InputProps> &
   ExtraFieldProps
@@ -44,30 +44,42 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
 
 interface FieldMetaProps {
   name: string
+  children: any
   label?: string
   description?: string
   error?: string
+  margin?: boolean
 }
 
-export const FieldMeta: React.FC<FieldMetaProps> = props => {
+export const FieldMeta = ({
+  name,
+  label,
+  description,
+  error,
+  margin = true,
+  children,
+}: FieldMetaProps) => {
   return (
-    <FieldWrapper>
-      <FieldLabel htmlFor={props.name}>
-        {props.label || props.name}
-        {props.description && (
-          <FieldDescription>{props.description}</FieldDescription>
-        )}
+    <FieldWrapper margin={margin}>
+      <FieldLabel htmlFor={name}>
+        {label || name}
+        {description && <FieldDescription>{description}</FieldDescription>}
       </FieldLabel>
-      {props.children}
-      {props.error && <FieldError>{props.error}</FieldError>}
+      {children}
+      {error && <FieldError>{error}</FieldError>}
     </FieldWrapper>
   )
 }
 
 // Styling
-const FieldWrapper = styled.div`
+const FieldWrapper = styled.div<{ margin: boolean }>`
   position: relative;
-  margin-bottom: 24px;
+
+  ${props =>
+    props.margin &&
+    css<any>`
+      margin-bottom: var(--tina-padding-big);
+    `};
 `
 
 const FieldLabel = styled.label`

@@ -3,6 +3,39 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.2.0-alpha.0...react-tinacms-github@0.2.0) (2020-05-04)
+
+
+### Bug Fixes
+
+* github-client branch name should default to base branch ([7ea6773](https://github.com/tinacms/tinacms/commit/7ea6773))
+
+
+
+
+
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.1.0...react-tinacms-github@0.2.0-alpha.0) (2020-04-28)
+
+
+### Bug Fixes
+
+* persist return directory and filename ([ec837a2](https://github.com/tinacms/tinacms/commit/ec837a2))
+
+
+### Features
+
+* add lock icon ([f9df0f3](https://github.com/tinacms/tinacms/commit/f9df0f3))
+* added GithubMediaStore ([133cdcc](https://github.com/tinacms/tinacms/commit/133cdcc))
+* create new branches ([1c557a2](https://github.com/tinacms/tinacms/commit/1c557a2))
+* github.getBranchList ([2a91a61](https://github.com/tinacms/tinacms/commit/2a91a61))
+* support working from the origin repository ([18df649](https://github.com/tinacms/tinacms/commit/18df649))
+* support working from the origin repository ([9d7398e](https://github.com/tinacms/tinacms/commit/9d7398e))
+* switch between existing branches ([c1bf9a0](https://github.com/tinacms/tinacms/commit/c1bf9a0))
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.1.0-canary3.2...react-tinacms-github@0.1.0) (2020-04-27)
 
 **Note:** Version bump only for package react-tinacms-github

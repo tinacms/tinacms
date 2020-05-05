@@ -16,33 +16,28 @@ limitations under the License.
 
 */
 
-import { useCMS } from 'tinacms'
-import { useEffect } from 'react'
+import { usePlugins } from 'tinacms'
+import { useMemo } from 'react'
 import { PullRequestToolbarWidget } from './pull-request'
-import { ForkNameToolbarWidget } from './ForkNamePlugin'
-import { Plugin } from 'tinacms'
+import { RepoToolbarWidget } from './RepoInfoPlugin'
 import { useGithubEditing } from '../github-editing-context'
+import { BranchSwitcherPlugin } from './BranchSwitcherPlugin'
 
 export const useGithubToolbarPlugins = () => {
-  const cms = useCMS()
-  const { editMode } = useGithubEditing()
+  const { enterEditMode } = useGithubEditing()
 
-  useEffect(() => {
-    const plugins = [
-      ForkNameToolbarWidget,
-      PullRequestToolbarWidget,
-    ] as Plugin[]
+  usePlugins([
+    RepoToolbarWidget,
+    PullRequestToolbarWidget,
+    useMemo(
+      () => ({
+        ...BranchSwitcherPlugin,
 
-    const removePlugins = () => {
-      plugins.forEach(plugin => cms.plugins.remove(plugin))
-    }
-
-    if (editMode) {
-      plugins.forEach(plugin => cms.plugins.add(plugin))
-    } else {
-      removePlugins()
-    }
-
-    return removePlugins
-  }, [editMode])
+        props: {
+          onBranchChange: enterEditMode,
+        },
+      }),
+      []
+    ),
+  ])
 }
