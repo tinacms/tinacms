@@ -26,7 +26,7 @@ export class EventBus {
   private listeners = new Set<Listener>()
 
   subscribe = (event: string, callback: Callback): (() => void) => {
-    const listener = new Listener(callback, event)
+    const listener = new Listener(event, callback)
 
     this.listeners.add(listener)
 
@@ -47,7 +47,7 @@ export class EventBus {
 }
 
 export class Listener {
-  constructor(private callback: Callback, private eventPattern: string = '*') {}
+  constructor(private eventPattern: string, private callback: Callback) {}
 
   handleEvent(event: CMSEvent) {
     if (this.watchesEvent(event)) {

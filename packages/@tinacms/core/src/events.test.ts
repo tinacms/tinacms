@@ -58,7 +58,7 @@ describe('Listener', () => {
     })
     it('does not invoke callback if it does not watch the event', () => {
       const cb = jest.fn()
-      const listener = new Listener(cb)
+      const listener = new Listener('something', cb)
       const event = { type: 'example' }
 
       listener.watchesEvent = jest.fn(() => false)
