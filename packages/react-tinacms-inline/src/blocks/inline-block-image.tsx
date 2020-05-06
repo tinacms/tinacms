@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { BlockField } from './inline-block-field'
-import { InlineImageProps, ImageUpload } from '../inline-field-image'
+import { InlineImageProps, InlineImageUpload } from '../inline-field-image'
 import { useCMS } from 'tinacms'
 
 export function BlockImage({
@@ -36,7 +36,7 @@ export function BlockImage({
 
         if (status === 'active') {
           return (
-            <ImageUpload
+            <InlineImageUpload
               value={input.value}
               previewSrc={_previewSrc}
               onDrop={async ([file]: File[]) => {
@@ -62,7 +62,7 @@ export function BlockImage({
               {children &&
                 ((props: any) =>
                   children({ previewSrc: _previewSrc }, ...props))}
-            </ImageUpload>
+            </InlineImageUpload>
           )
         }
         return children ? (
