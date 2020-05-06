@@ -80,11 +80,7 @@ export function InlineImageField({
             </InputFocusWrapper>
           )
         }
-        return children ? (
-          children({ previewSrc: _previewSrc })
-        ) : (
-          <img src={input.value} />
-        )
+        return children ? children() : <img src={input.value} />
       }}
     </InlineField>
   )
