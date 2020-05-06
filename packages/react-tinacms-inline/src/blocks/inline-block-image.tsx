@@ -24,6 +24,7 @@ import { useCMS } from 'tinacms'
 export function BlockImage({
   name,
   children,
+  previewSrc,
   parse,
   uploadDir,
 }: InlineImageProps) {
@@ -31,10 +32,13 @@ export function BlockImage({
   return (
     <BlockField name={name}>
       {({ input, status, form }) => {
+        const _previewSrc = previewSrc(form.finalForm.getState().values)
+
         if (status === 'active') {
           return (
             <ImageUpload
               value={input.value}
+              previewSrc={_previewSrc}
               onDrop={async ([file]: File[]) => {
                 const directory = uploadDir(form)
                 const [media] = await cms.media.store.persist([
@@ -46,17 +50,26 @@ export function BlockImage({
                 if (media) {
                   input.onChange(parse(media.filename))
                 } else {
-                  // TODO Handle failure
+                  /**
+                   * TODO: Handle failure with events
+                   * or alerts here?
+                   */
                 }
                 return null
               }}
               {...input}
             >
-              {children}
+              {children &&
+                ((props: any) =>
+                  children({ previewSrc: _previewSrc }, ...props))}
             </ImageUpload>
           )
         }
-        return children ? children : <img src={input.value} />
+        return children ? (
+          children({ previewSrc: _previewSrc })
+        ) : (
+          <img src={input.value} />
+        )
       }}
     </BlockField>
   )
