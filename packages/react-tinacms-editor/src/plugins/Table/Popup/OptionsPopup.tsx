@@ -44,7 +44,7 @@ export default () => {
   const { height, width } = tableElm.getBoundingClientRect()
   return ReactDOM.createPortal(
     <Wrapper height={height} width={width}>
-      <IconButton onMouseDown={deleteSelectedTable} small primary>
+      <IconButton onClick={deleteSelectedTable} small primary>
         <TrashIcon />
       </IconButton>
     </Wrapper>,
