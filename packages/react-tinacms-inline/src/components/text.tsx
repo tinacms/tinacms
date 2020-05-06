@@ -15,14 +15,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import styled from 'styled-components'
 
-export * from './inline-field-image'
-export * from './inline-field-text'
-export * from './inline-field-textarea'
-export * from './inline-field'
-export * from './inline-form'
-export * from './inline-wysiwyg'
-export * from './blocks'
-export * from './styles'
-import * as components from './components'
-export { components }
+export const InlineText = styled.input`
+  width: 100%;
+  display: block;
+  font-size: inherit;
+  font-family: inherit;
+  font-weight: inherit;
+  box-sizing: border-box;
+  color: inherit;
+  letter-spacing: inherit;
+  line-height: inherit;
+  max-width: inherit;
+  background-color: inherit;
+  text-align: inherit;
+  outline: none;
+  resize: none;
+  border: none;
+  overflow: visible;
+  position: relative;
+  -ms-overflow-style: none;
+`

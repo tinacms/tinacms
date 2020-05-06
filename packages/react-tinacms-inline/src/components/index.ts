@@ -15,14 +15,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-export * from './inline-field-image'
-export * from './inline-field-text'
-export * from './inline-field-textarea'
-export * from './inline-field'
-export * from './inline-form'
-export * from './inline-wysiwyg'
-export * from './blocks'
-export * from './styles'
-import * as components from './components'
-export { components }
+export * from './image-upload'
+export * from './text'
+export { InlineTextarea } from '../inline-field-textarea'

@@ -17,13 +17,10 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
 import { InlineField } from './inline-field'
 import { InputFocusWrapper } from './styles'
+import { InlineText } from './components'
 
-/**
- * InlineTextField
- */
 export interface InlineTextFieldProps {
   name: string
   className?: string
@@ -45,24 +42,3 @@ export function InlineTextField({ name, className }: InlineTextFieldProps) {
     </InlineField>
   )
 }
-
-export const InlineText = styled.input`
-  width: 100%;
-  display: block;
-  font-size: inherit;
-  font-family: inherit;
-  font-weight: inherit;
-  box-sizing: border-box;
-  color: inherit;
-  letter-spacing: inherit;
-  line-height: inherit;
-  max-width: inherit;
-  background-color: inherit;
-  text-align: inherit;
-  outline: none;
-  resize: none;
-  border: none;
-  overflow: visible;
-  position: relative;
-  -ms-overflow-style: none;
-`
