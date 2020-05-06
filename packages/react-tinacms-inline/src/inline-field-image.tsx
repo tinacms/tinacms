@@ -44,32 +44,35 @@ export function InlineImageField({
       {({ input, status, form }) => {
         const _previewSrc = previewSrc(form.finalForm.getState().values)
 
+        async function handleUploadImage([file]: File[]) {
+          const directory = uploadDir(form)
+          const [media] = await cms.media.store.persist([
+            {
+              directory,
+              file,
+            },
+          ])
+          if (media) {
+            input.onChange(parse(media.filename))
+          } else {
+            /**
+             * TODO: Handle failure with events
+             * or alerts here?
+             */
+          }
+          return null
+        }
+
         if (status === 'active') {
           return (
             <InputFocusWrapper>
               <InlineImageUpload
                 value={input.value}
                 previewSrc={_previewSrc}
-                onDrop={async ([file]: File[]) => {
-                  const directory = uploadDir(form)
-                  const [media] = await cms.media.store.persist([
-                    {
-                      directory,
-                      file,
-                    },
-                  ])
-                  if (media) {
-                    input.onChange(parse(media.filename))
-                  } else {
-                    /**
-                     * TODO: Handle failure with events
-                     * or alerts here?
-                     */
-                  }
-                  return null
-                }}
+                onDrop={handleUploadImage}
                 {...input}
               >
+                {/** If children, pass previewSrc to children */}
                 {children &&
                   ((props: any) =>
                     children({ previewSrc: _previewSrc }, ...props))}
@@ -108,7 +111,7 @@ export function InlineImageUpload({
     isDragReject,
   } = useDropzone({ accept: 'image/*', onDrop })
 
-  if (!value) return <ImageUploadPlaceholder />
+  if (!value) return <ImagePlaceholder />
 
   return (
     <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
@@ -118,7 +121,7 @@ export function InlineImageUpload({
   )
 }
 
-function ImageUploadPlaceholder() {
+function ImagePlaceholder() {
   // TODO: style this component
   return (
     <div>
