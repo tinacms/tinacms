@@ -73,7 +73,7 @@ export function InlineImageField({
   )
 }
 
-interface ImageUploadProps {
+export interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
   children?: any

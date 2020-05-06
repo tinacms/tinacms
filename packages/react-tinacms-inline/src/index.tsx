@@ -16,11 +16,25 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
+export {
+  InlineImageField,
+  InlineImageProps,
+  ImageUploadProps,
+} from './inline-field-image'
+export { InlineTextField, InlineTextFieldProps } from './inline-field-text'
+export { InlineTextareaField } from './inline-field-textarea'
 export * from './inline-field'
-export * from './inline-field-text'
-export * from './inline-field-textarea'
-export * from './inline-field-image'
+export * from './inline-form'
 export * from './inline-wysiwyg'
 export * from './blocks'
 export * from './styles'
+
+import { ImageUpload } from './inline-field-image'
+import { InlineText } from './inline-field-text'
+import { InlineTextarea } from './inline-field-textarea'
+
+export const inputs = {
+  ImageUpload,
+  InlineText,
+  InlineTextarea,
+}
