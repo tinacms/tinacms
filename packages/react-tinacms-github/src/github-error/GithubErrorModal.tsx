@@ -25,7 +25,7 @@ import {
   ActionableModal,
 } from '../components/ActionableModal'
 
-interface GithubError extends Error {
+export interface GithubError extends Error {
   status: number
   message: string
 }
