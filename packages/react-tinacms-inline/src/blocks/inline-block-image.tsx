@@ -34,29 +34,31 @@ export function BlockImage({
       {({ input, status, form }) => {
         const _previewSrc = previewSrc(form.finalForm.getState().values)
 
+        async function handleUploadImage([file]: File[]) {
+          const directory = uploadDir(form)
+          const [media] = await cms.media.store.persist([
+            {
+              directory,
+              file,
+            },
+          ])
+          if (media) {
+            input.onChange(parse(media.filename))
+          } else {
+            /**
+             * TODO: Handle failure with events
+             * or alerts here?
+             */
+          }
+          return null
+        }
+
         if (status === 'active') {
           return (
             <InlineImageUpload
               value={input.value}
               previewSrc={_previewSrc}
-              onDrop={async ([file]: File[]) => {
-                const directory = uploadDir(form)
-                const [media] = await cms.media.store.persist([
-                  {
-                    directory,
-                    file,
-                  },
-                ])
-                if (media) {
-                  input.onChange(parse(media.filename))
-                } else {
-                  /**
-                   * TODO: Handle failure with events
-                   * or alerts here?
-                   */
-                }
-                return null
-              }}
+              onDrop={handleUploadImage}
               {...input}
             >
               {children &&
