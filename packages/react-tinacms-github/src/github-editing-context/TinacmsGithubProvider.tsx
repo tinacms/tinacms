@@ -77,7 +77,6 @@ export const TinacmsGithubProvider = ({
         editMode,
         enterEditMode: beginAuth,
         exitEditMode,
-        setError,
       }}
     >
       {error && <GithubErrorModal error={error} />}

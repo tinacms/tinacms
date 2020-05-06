@@ -22,7 +22,6 @@ export interface GithubEditingProps {
   editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
-  setError: (err: any) => void
 }
 
 export const GithubEditingContext = React.createContext<GithubEditingProps | null>(
