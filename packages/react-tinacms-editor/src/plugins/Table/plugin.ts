@@ -32,14 +32,25 @@ export const tablePlugin = new Plugin({
     init: () => {
       return { deco: DecorationSet.empty }
     },
-    apply(tr, prev, _3, newState) {
+    apply(tr, prev, oldState, newState) {
       if (tr.getMeta('image_clicked') === false) return prev
       const { selection } = newState
       if (selection) {
         const { table } = newState.schema.nodes
         const tableNode = findParentNodeOfType(table)(selection)
+
         if (tableNode) {
+          const selectionNotChanged = selection === oldState.selection
+          const tableNotChanged =
+            (tableNode && tableNode.node.nodeSize) ===
+              (prev.selectedTable && prev.selectedTable.node.nodeSize) &&
+            (tableNode && tableNode.start) ===
+              (prev.selectedTable && prev.selectedTable.start)
+
+          if (selectionNotChanged && tableNotChanged) return prev
+
           const decorations = buildExtendedHeaders(tableNode, selection)
+
           if (decorations.length)
             return {
               deco: DecorationSet.create(newState.doc, decorations),
