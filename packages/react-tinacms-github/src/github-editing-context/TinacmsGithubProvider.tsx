@@ -18,7 +18,7 @@ limitations under the License.
 
 import React, { useState, useEffect } from 'react'
 import { useCMS } from 'tinacms'
-import GithubErrorModal from '../github-error/GithubErrorModal'
+import GithubErrorModal, { GithubError } from '../github-error/GithubErrorModal'
 import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
 import { useGithubEditing } from './useGithubEditing'
@@ -41,7 +41,7 @@ export const TinacmsGithubProvider = ({
   exitEditMode,
   error: previewError,
 }: ProviderProps) => {
-  const [error, setError] = useState<any>(null)
+  const [error, setError] = useState<GithubError>()
   const cms = useCMS()
   const github: GithubClient = cms.api.github
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
@@ -65,6 +65,12 @@ export const TinacmsGithubProvider = ({
       setActiveModal('createFork')
     }
   }
+
+  React.useEffect(() => {
+    return cms.events.subscribe('github:error', ({ error }) => {
+      setError(error)
+    })
+  })
 
   return (
     <GithubEditingContext.Provider
