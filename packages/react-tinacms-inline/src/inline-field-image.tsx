@@ -108,7 +108,7 @@ export function InlineImageUpload({
     isDragReject,
   } = useDropzone({ accept: 'image/*', onDrop })
 
-  if (!value) return <EmptyImageUpload />
+  if (!value) return <ImageUploadPlaceholder />
 
   return (
     <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
@@ -118,7 +118,7 @@ export function InlineImageUpload({
   )
 }
 
-function EmptyImageUpload() {
+function ImageUploadPlaceholder() {
   // TODO: style this component
   return (
     <div>
