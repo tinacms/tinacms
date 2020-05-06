@@ -21,7 +21,6 @@ import { useCMS } from 'tinacms'
 import GithubErrorModal, { GithubError } from '../github-error/GithubErrorModal'
 import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
-import { useGithubEditing } from './useGithubEditing'
 import { GithubClient } from '../github-client'
 
 interface ProviderProps {
@@ -41,7 +40,7 @@ export const TinacmsGithubProvider = ({
   exitEditMode,
   error: previewError,
 }: ProviderProps) => {
-  const [error, setError] = useState<GithubError>()
+  const [error, setError] = useState<GithubError>(previewError)
   const cms = useCMS()
   const github: GithubClient = cms.api.github
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
@@ -66,7 +65,7 @@ export const TinacmsGithubProvider = ({
     }
   }
 
-  React.useEffect(() => {
+  useEffect(() => {
     return cms.events.subscribe('github:error', ({ error }) => {
       setError(error)
     })
@@ -91,33 +90,7 @@ export const TinacmsGithubProvider = ({
       {!error && activeModal === 'createFork' && (
         <CreateForkModal close={onClose} onForkCreated={enterEditMode} />
       )}
-      <PreviewErrorBoundary previewError={previewError}>
-        {children}
-      </PreviewErrorBoundary>
+      {!previewError && children}
     </GithubEditingContext.Provider>
   )
-}
-
-interface Props {
-  previewError: any
-  children: any
-}
-function PreviewErrorBoundary(props: Props) {
-  const github = useGithubEditing()
-
-  useEffect(() => {
-    ;(async () => {
-      if (props.previewError) {
-        github.setError(props.previewError)
-      }
-    })()
-  }, [props.previewError])
-
-  if (props.previewError) {
-    return null
-  }
-
-  // don't show content with initial content error
-  // because the data is likely missing
-  return props.children
 }
