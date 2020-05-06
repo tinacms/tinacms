@@ -123,11 +123,12 @@ function ImageBlock({ index, data }) {
     <BlocksControls index={index}>
       <BlockImage
         name="src"
+        previewSrc={formValues => {
+          return formValues.blocks[index].src
+        }}
         parse={filename => `/images/${filename}`}
         uploadDir={() => '/public/images/'}
-      >
-        <img src={data.src} alt={data.alt} />
-      </BlockImage>
+      />
     </BlocksControls>
   )
 }
@@ -163,10 +164,10 @@ const PAGE_BUILDER_BLOCKS = {
     Component: HeroBlock,
     template: hero_template,
   },
-  // image: {
-  //   Component: ImageBlock,
-  //   template: image_template,
-  // },
+  image: {
+    Component: ImageBlock,
+    template: image_template,
+  },
 }
 
 /**
