@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.2.0...react-tinacms-github@0.3.0-alpha.0) (2020-05-06)
+
+
+### Bug Fixes
+
+* **use-github-format-forms:** the options are optional ([88ccd92](https://github.com/tinacms/tinacms/commit/88ccd92))
+
+
+### Features
+
+* **github-client:** optionally accept scope ([880a6b6](https://github.com/tinacms/tinacms/commit/880a6b6))
+
+
+
+
+
 # [0.2.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.2.0-alpha.0...react-tinacms-github@0.2.0) (2020-05-04)
 
 

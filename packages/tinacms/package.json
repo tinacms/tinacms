@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.19.1",
+  "version": "0.19.2-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -54,7 +54,7 @@
     "lodash.merge": "^4.6.2",
     "moment": ">=2 <=3",
     "react-datetime": "^2.16.3",
-    "react-tinacms-editor": "^0.5.1"
+    "react-tinacms-editor": "^0.5.2-alpha.0"
   },
   "peerDependencies": {
     "react": ">=16.8",

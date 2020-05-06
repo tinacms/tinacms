@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-editor",
-  "version": "0.5.1",
+  "version": "0.5.2-alpha.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-editor.esm.js",
