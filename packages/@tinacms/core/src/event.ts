@@ -47,7 +47,7 @@ export class EventBus {
 }
 
 export class Listener {
-  constructor(private matchEventPattern: string, private callback: Callback) {}
+  constructor(private eventPattern: string, private callback: Callback) {}
 
   handleEvent(event: CMSEvent) {
     if (this.watchesEvent(event)) {
@@ -58,30 +58,21 @@ export class Listener {
   }
 
   watchesEvent(currentEvent: CMSEvent) {
-    if (this.matchEventPattern === '*') return true
+    if (this.eventPattern === '*') return true
 
-    const watchCurrentEvent = matchEventPattern(
-      currentEvent,
-      this.matchEventPattern
-    )
+    const eventParts = currentEvent.type.split(':')
+    const patternParts = this.eventPattern.split(':')
 
-    return watchCurrentEvent
+    let index = 0
+    let ignoresEvent = false
+
+    while (!ignoresEvent && index < patternParts.length) {
+      const wildcard = patternParts[index] === '*'
+      const matchingParts = patternParts[index] === eventParts[index]
+      ignoresEvent = !(wildcard || matchingParts)
+      index++
+    }
+
+    return !ignoresEvent
   }
-}
-
-function matchEventPattern(event: CMSEvent, pattern: string) {
-  const eventParts = event.type.split(':')
-  const patternParts = pattern.split(':')
-
-  let index = 0
-  let ignoresEvent = false
-
-  while (!ignoresEvent && index < patternParts.length) {
-    const wildcard = patternParts[index] === '*'
-    const matchingParts = patternParts[index] === eventParts[index]
-    ignoresEvent = !(wildcard || matchingParts)
-    index++
-  }
-
-  return !ignoresEvent
 }
