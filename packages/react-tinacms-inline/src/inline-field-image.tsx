@@ -47,7 +47,7 @@ export function InlineImageField({
         if (status === 'active') {
           return (
             <InputFocusWrapper>
-              <ImageUpload
+              <InlineImageUpload
                 value={input.value}
                 previewSrc={_previewSrc}
                 onDrop={async ([file]: File[]) => {
@@ -73,7 +73,7 @@ export function InlineImageField({
                 {children &&
                   ((props: any) =>
                     children({ previewSrc: _previewSrc }, ...props))}
-              </ImageUpload>
+              </InlineImageUpload>
             </InputFocusWrapper>
           )
         }
@@ -87,19 +87,19 @@ export function InlineImageField({
   )
 }
 
-interface ImageUploadProps {
+interface InlineImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
   children?: any
   previewSrc?: string
 }
 
-export function ImageUpload({
+export function InlineImageUpload({
   onDrop,
   value,
   previewSrc,
   children,
-}: ImageUploadProps) {
+}: InlineImageUploadProps) {
   const {
     getRootProps,
     getInputProps,
