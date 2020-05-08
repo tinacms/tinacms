@@ -51,6 +51,27 @@ const HTMLFormat = () => {
   )
 }
 
+const WithInvalidLink = () => {
+  const [value, setValue] = React.useState(`
+[Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})
+  `)
+  return (
+    <Wysiwyg
+      input={{
+        value,
+        onChange: (val: string) => {
+          // Type anything to trigger this and see the following in the console:
+          // \[Hello\]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})
+          // The idea here would be to basically ignore the fact that this is invalid
+          // so the expected value would be:
+          // [Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})
+          console.log(val)
+          setValue(val)
+        },
+      }}
+    />
+  )
+}
 const WithImage = () => {
   const [value, setValue] = React.useState(
     `![alt text](https://i.imgur.com/2FCfbgg.jpg "Logo Title Text 1")
@@ -108,5 +129,6 @@ const WithTable = () => {
 storiesOf('Wysiwyg', module)
   .add('Basic', () => <Basic />)
   .add('HTML Format', () => <HTMLFormat />)
+  .add('WithInvalidLink', () => <WithInvalidLink />)
   .add('WithImage', () => <WithImage />)
   .add('WithTable', () => <WithTable />)
