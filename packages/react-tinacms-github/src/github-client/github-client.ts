@@ -142,6 +142,10 @@ export class GithubClient {
     return this.baseRepoFullName
   }
 
+  setWorkingRepoFullName(repoFullName: string) {
+    this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, repoFullName)
+  }
+
   get branchName(): string {
     const branchName = this.getCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY)
 
