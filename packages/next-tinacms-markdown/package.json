@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-markdown",
-  "version": "0.2.14-alpha.1",
+  "version": "0.2.14-alpha.2",
   "license": "Apache-2.0",
   "author": "Kendall Strautman",
   "main": "dist/index.js",
@@ -32,6 +32,6 @@
     "js-yaml": "^3.13.1"
   },
   "devDependencies": {
-    "tinacms": "^0.19.2-alpha.1"
+    "tinacms": "^0.19.2-alpha.2"
   }
 }
