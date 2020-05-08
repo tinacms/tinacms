@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-forms@0.1.3...@tinacms/react-forms@0.1.4-alpha.0) (2020-05-08)
+
+**Note:** Version bump only for package @tinacms/react-forms
+
+
+
+
+
 ## [0.1.3](https://github.com/tinacms/tinacms/compare/@tinacms/react-forms@0.1.3-alpha.0...@tinacms/react-forms@0.1.3) (2020-05-04)
 
 **Note:** Version bump only for package @tinacms/react-forms
