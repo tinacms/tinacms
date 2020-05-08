@@ -37,6 +37,7 @@ export const useGithubFileForm = <T = any>(
     label: options.label || file.fileRelativePath,
     initialValues: file.data,
     fields: options.fields || [],
+    actions: options.actions || [],
     // save & commit the file when the "save" button is pressed
     onSubmit(formData) {
       const github: GithubClient = cms.api.github
