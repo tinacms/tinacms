@@ -32,6 +32,8 @@
     "@babel/core": "^7.5.5",
     "@storybook/addon-info": "^5.1.9",
     "@storybook/react": "^5.1.9",
+    "@tinacms/icons": "^0.10.0",
+    "@tinacms/styles": "^0.4.2",
     "@tinacms/form-builder": "^0.3.3-alpha.0",
     "@tinacms/forms": "^0.4.2-alpha.0",
     "@tinacms/react-core": "^0.2.12-alpha.0",
@@ -51,8 +53,6 @@
   },
   "dependencies": {
     "@sambego/storybook-styles": "^1.0.0",
-    "@tinacms/icons": "^0.10.0",
-    "@tinacms/styles": "^0.4.2",
     "@types/react-select": "^2.0.11",
     "color-string": "^1.5.3",
     "react-color": "^2.17.3",
@@ -60,10 +60,6 @@
     "react-dropzone": "10.1.8"
   },
   "peerDependencies": {
-    "@tinacms/form-builder": ">=0.3",
-    "@tinacms/forms": ">=0.3",
-    "@tinacms/react-core": ">=0.2",
-    "@tinacms/react-forms": ">=0.0",
     "react": ">=16.8",
     "react-dom": ">=16.8",
     "styled-components": ">=4.1"
