@@ -139,8 +139,6 @@ export class GithubClient {
       return forkName
     }
 
-    this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, this.baseRepoFullName)
-
     return this.baseRepoFullName
   }
 
@@ -151,9 +149,7 @@ export class GithubClient {
       return branchName
     }
 
-    this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, this.baseBranch)
-
-    return this.branchName
+    return this.baseBranch
   }
 
   setWorkingBranch(branch: string) {
