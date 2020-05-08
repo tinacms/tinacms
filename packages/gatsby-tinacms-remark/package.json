@@ -5,7 +5,7 @@
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
   "files": [
-    "src",
+    "src/**/*.d.ts",
     "index.js",
     "gatsby-node.js"
   ],
