@@ -115,6 +115,7 @@ export const ImageEdit: FunctionComponent = () => {
     }).setSelection(new NodeSelection(tr.doc.resolve(pos)))
     dispatch(tr)
     closeImageSettings()
+    view.focus()
   }
 
   const closeImageSettings = () => {
@@ -124,6 +125,7 @@ export const ImageEdit: FunctionComponent = () => {
     setAlt('')
     setLinkTitle('')
     setLinkSrc('')
+    view.focus()
   }
 
   const handleKeyPress = (evt: React.KeyboardEvent) => {
