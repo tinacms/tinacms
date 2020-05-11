@@ -24,7 +24,6 @@ import { GithubClient } from '../github-client'
 export interface GithubFormOptions extends Partial<FormOptions<any>> {
   serialize: (data: any) => string
 }
-import { useGithubErrorListener } from './useGithubErrorListener'
 
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
@@ -38,6 +37,7 @@ export const useGithubFileForm = <T = any>(
     label: options.label || file.fileRelativePath,
     initialValues: file.data,
     fields: options.fields || [],
+    actions: options.actions || [],
     // save & commit the file when the "save" button is pressed
     onSubmit(formData) {
       const github: GithubClient = cms.api.github
@@ -54,15 +54,15 @@ export const useGithubFileForm = <T = any>(
           )
           setSha(response.content.sha)
         })
-        .catch((e: any) => {
-          return { [FORM_ERROR]: e }
+        .catch((error: any) => {
+          cms.events.dispatch({ type: 'github:error', error })
+
+          return { [FORM_ERROR]: error }
         })
     },
   })
 
   usePlugin(form)
-
-  useGithubErrorListener(form)
 
   return [formData || file.data, form]
 }

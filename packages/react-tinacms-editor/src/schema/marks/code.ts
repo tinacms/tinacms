@@ -21,7 +21,7 @@ import { SchemaMarkPlugin } from '../../types'
 /**
  * code
  */
-const code = {
+export const code = {
   parseDOM: [{ tag: 'code' }],
   toDOM() {
     return ['code']

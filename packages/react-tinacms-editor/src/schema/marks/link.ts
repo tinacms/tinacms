@@ -22,7 +22,7 @@ import { SchemaMarkPlugin } from '../../types'
 /**
  * Link
  */
-const link = {
+export const link = {
   attrs: {
     href: {},
     title: { default: null as any },
