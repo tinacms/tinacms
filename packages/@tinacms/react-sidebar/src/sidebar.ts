@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Subscribable } from '@tinacms/core'
+import { EventBus, Callback } from '@tinacms/core'
 
 export interface SidebarStateOptions {
   hidden?: boolean
@@ -31,7 +31,7 @@ export interface SidebarButtons {
 
 export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
-export class SidebarState extends Subscribable {
+export class SidebarState {
   private _isOpen: boolean = false
 
   position: SidebarPosition = 'displace'
@@ -41,8 +41,7 @@ export class SidebarState extends Subscribable {
     reset: 'Reset',
   }
 
-  constructor(options: SidebarStateOptions = {}) {
-    super()
+  constructor(private events: EventBus, options: SidebarStateOptions = {}) {
     this.position = options.position || 'displace'
     this._hidden = !!options.hidden
 
@@ -59,8 +58,17 @@ export class SidebarState extends Subscribable {
   }
 
   set isOpen(nextValue: boolean) {
+    if (this._isOpen === nextValue) {
+      return // No change.
+    }
+
     this._isOpen = nextValue
-    this.notifiySubscribers()
+
+    if (nextValue) {
+      this.events.dispatch({ type: 'sidebar:opened' })
+    } else {
+      this.events.dispatch({ type: 'sidebar:closed' })
+    }
   }
 
   get hidden() {
@@ -68,7 +76,22 @@ export class SidebarState extends Subscribable {
   }
 
   set hidden(nextValue: boolean) {
+    if (this._hidden === nextValue) {
+      return // No change.
+    }
+
     this._hidden = nextValue
-    this.notifiySubscribers()
+
+    if (nextValue) {
+      this.events.dispatch({ type: 'sidebar:disabled' })
+    } else {
+      this.events.dispatch({ type: 'sidebar:enabled' })
+    }
+  }
+
+  subscribe(callback: Callback): () => void {
+    const unsub = this.events.subscribe('sidebar', callback)
+
+    return () => unsub()
   }
 }

@@ -18,9 +18,9 @@ limitations under the License.
 
 import { Schema, DOMParser as PDOMParser, Node } from 'prosemirror-model'
 import { DOMSerializer } from './to_dom'
-import { Translator } from '../Translator'
+import { TranslatorClass } from '../TranslatorClass'
 
-export class DOMTranslator extends Translator {
+export class DOMTranslator extends TranslatorClass {
   schema: Schema
   parser: PDOMParser
   serializer: DOMSerializer

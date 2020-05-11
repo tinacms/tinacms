@@ -20,9 +20,9 @@ import { Schema, Node } from 'prosemirror-model'
 import { MarkdownParser } from './from_markdown'
 import { MarkdownSerializer } from './to_markdown'
 import { CommonMarkParser, CommonMarkSerializer } from './commonmark'
-import { Translator } from '../Translator'
+import { TranslatorClass } from '../TranslatorClass'
 
-export class MarkdownTranslator extends Translator {
+export class MarkdownTranslator extends TranslatorClass {
   schema: Schema
   parser: MarkdownParser | null = null
   serializer: MarkdownSerializer | null = null

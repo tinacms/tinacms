@@ -92,6 +92,7 @@ const proseMirrorTableStyles = `
     cursor: pointer;
     z-index: 1;
     user-select: none;
+    box-sizing: border-box;
   }
   .ProseMirror div.tina_table_header_ext_top_selected {
     background: #0084ff;
@@ -110,6 +111,7 @@ const proseMirrorTableStyles = `
     cursor: pointer;
     z-index: 1;
     user-select: none;
+    box-sizing: border-box;
   }
   .ProseMirror div.tina_table_header_ext_left_selected {
     background: #0084ff;
@@ -129,6 +131,7 @@ const proseMirrorTableStyles = `
     z-index: 1;
     cursor: pointer;
     user-select: none;
+    box-sizing: border-box;
   }
   .ProseMirror div.tina_table_header_ext_top_left_selected {
     background: #0084ff;

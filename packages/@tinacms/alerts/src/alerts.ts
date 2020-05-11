@@ -16,10 +16,12 @@
 
  */
 
-import { Subscribable } from '@tinacms/core'
+import { EventBus, Callback } from '@tinacms/core'
 
-export class Alerts extends Subscribable {
+export class Alerts {
   private alerts: Map<string, Alert> = new Map()
+
+  constructor(private events: EventBus) {}
 
   add(level: AlertLevel, message: string, timeout: number = 3000): () => void {
     const alert = {
@@ -31,7 +33,7 @@ export class Alerts extends Subscribable {
 
     this.alerts.set(alert.id, alert)
 
-    this.notifiySubscribers()
+    this.events.dispatch({ type: 'alerts:add', alert })
 
     let timeoutId: any = null
 
@@ -47,7 +49,13 @@ export class Alerts extends Subscribable {
 
   dismiss(alert: Alert) {
     this.alerts.delete(alert.id)
-    this.notifiySubscribers()
+    this.events.dispatch({ type: 'alerts:remove', alert })
+  }
+
+  subscribe(cb: Callback) {
+    const unsub = this.events.subscribe('alerts', cb)
+
+    return () => unsub()
   }
 
   get all() {
