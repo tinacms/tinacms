@@ -21,7 +21,6 @@
 - [Contributing](./CONTRIBUTING.md)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
 - [Projects](https://github.com/orgs/tinacms/projects)
-  - [Open Authoring with GitHub + Next.js](https://github.com/orgs/tinacms/projects/1)
 
 ## Development
 
