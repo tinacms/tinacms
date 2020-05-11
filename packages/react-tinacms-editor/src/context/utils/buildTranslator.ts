@@ -21,8 +21,9 @@ import { MarkdownTranslator, Format, DOMTranslator } from '../../translator'
 
 export const buildTranslator = (
   schema: Schema,
-  format: Format = 'markdown'
+  format: Format = 'markdown',
+  supportHugo: boolean
 ) => {
   if (format === 'html') return DOMTranslator.fromSchema(schema)
-  return MarkdownTranslator.fromSchema(schema)
+  return MarkdownTranslator.fromSchema(schema, supportHugo)
 }

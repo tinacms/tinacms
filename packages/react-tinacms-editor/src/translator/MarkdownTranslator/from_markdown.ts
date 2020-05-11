@@ -18,6 +18,7 @@ limitations under the License.
 
 import { Mark, MarkType, Node, NodeType, Schema } from 'prosemirror-model'
 import { Token } from './types'
+import { createHugoLinks } from './hugo-utils'
 
 function maybeMerge(a: any, b: any) {
   if (a.isText && b.isText && Mark.sameSet(a.marks, b.marks))
@@ -53,6 +54,19 @@ class MarkdownParseState {
   // Adds the given text to the current position in the document,
   // using the current marks as styling.
   addText(text: string) {
+    if (!text) return
+    const nodes = this.top().content,
+      last = nodes[nodes.length - 1],
+      node = this.schema.text(text, this.marks)
+
+    let merged
+
+    if (last && (merged = maybeMerge(last, node)))
+      nodes[nodes.length - 1] = merged
+    else nodes.push(node)
+  }
+
+  addLink(text: string) {
     if (!text) return
     const nodes = this.top().content,
       last = nodes[nodes.length - 1],
@@ -139,7 +153,11 @@ interface Hash<T> {
   [key: string]: T
 }
 
-function tokenHandlers(schema: THSchema, tokens: Hash<Token>) {
+function tokenHandlers(
+  schema: THSchema,
+  tokens: Hash<Token>,
+  supportHugo: boolean
+) {
   const handlers = Object.create(null)
   for (const type in tokens) {
     const spec = tokens[type]
@@ -187,8 +205,10 @@ function tokenHandlers(schema: THSchema, tokens: Hash<Token>) {
     }
   }
 
-  handlers.text = (state: MarkdownParseState, tok: Token) =>
-    state.addText(tok.content)
+  handlers.text = (state: MarkdownParseState, tok: Token) => {
+    if (supportHugo) createHugoLinks(state, tok, schema)
+    else state.addText(tok.content)
+  }
   handlers.inline = (state: MarkdownParseState, tok: Token) =>
     state.parseTokens(tok.children)
   handlers.softbreak = (state: MarkdownParseState) => state.addText('\n')
@@ -246,14 +266,19 @@ export class MarkdownParser {
   //
   // **`ignore`**`: ?bool`
   //   : When true, ignore content for the matched token.
-  constructor(schema: Schema, tokenizer: any, tokens: Hash<Token>) {
+  constructor(
+    schema: Schema,
+    tokenizer: any,
+    tokens: Hash<Token>,
+    supportHugo: boolean
+  ) {
     // :: Object The value of the `tokens` object used to construct
     // this parser. Can be useful to copy and modify to base other
     // parsers on.
     this.tokens = tokens
     this.schema = schema
     this.tokenizer = tokenizer
-    this.tokenHandlers = tokenHandlers(schema, tokens)
+    this.tokenHandlers = tokenHandlers(schema, tokens, supportHugo)
   }
 
   // :: (string) → Node
