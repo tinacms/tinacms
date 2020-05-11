@@ -643,6 +643,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "bshackelford",
+      "name": "Brandon Shackelford",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1447644?v=4",
+      "profile": "https://bshack.dev",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
