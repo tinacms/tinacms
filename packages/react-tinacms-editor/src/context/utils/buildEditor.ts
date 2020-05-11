@@ -20,7 +20,7 @@ import { EditorView } from 'prosemirror-view'
 
 import { buildSchema } from '../../schema'
 import { buildTranslator } from './buildTranslator'
-import { Format } from '../../translator'
+import { Format } from '../../Translator'
 import { ImageProps } from '../../types'
 
 import { buildEditorState } from './buildEditorState'
