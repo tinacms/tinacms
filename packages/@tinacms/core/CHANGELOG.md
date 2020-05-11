@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.8.0-alpha.0...@tinacms/core@0.8.0) (2020-05-11)
+
+**Note:** Version bump only for package @tinacms/core
+
+
+
+
+
 # [0.8.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.7.4...@tinacms/core@0.8.0-alpha.0) (2020-05-08)
 
 

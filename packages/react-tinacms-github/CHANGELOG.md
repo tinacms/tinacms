@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.3.0-alpha.3...react-tinacms-github@0.3.0) (2020-05-11)
+
+
+### Bug Fixes
+
+* use-github-form accepts actions ([9fb83bf](https://github.com/tinacms/tinacms/commit/9fb83bf))
+
+
+
+
+
 # [0.3.0-alpha.3](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.3.0-alpha.2...react-tinacms-github@0.3.0-alpha.3) (2020-05-08)
 
 **Note:** Version bump only for package react-tinacms-github

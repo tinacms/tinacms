@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2-alpha.3...react-tinacms-editor@0.5.2) (2020-05-11)
+
+
+### Bug Fixes
+
+* close image popup and hitting delete button should delete image ([7459e09](https://github.com/tinacms/tinacms/commit/7459e09))
+* link button should be disabled if selection is empty ([bef462c](https://github.com/tinacms/tinacms/commit/bef462c))
+
+
+
+
+
 ## [0.5.2-alpha.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2-alpha.2...react-tinacms-editor@0.5.2-alpha.3) (2020-05-08)
 
 **Note:** Version bump only for package react-tinacms-editor
