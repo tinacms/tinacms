@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.3.0",
+  "version": "0.3.1",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -31,11 +31,11 @@
     "@types/js-cookie": "^2.2.5",
     "final-form": "^4.18.7",
     "styled-components": ">=4.1",
-    "tinacms": "^0.19.2"
+    "tinacms": "^0.19.3"
   },
   "dependencies": {
     "btoa": "^1.2.1",
     "js-cookie": "^2.2.1",
-    "next-tinacms-markdown": "^0.2.14"
+    "next-tinacms-markdown": "^0.2.15"
   }
 }
