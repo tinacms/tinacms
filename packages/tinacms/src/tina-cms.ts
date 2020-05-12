@@ -32,8 +32,6 @@ import {
   BlocksFieldPlugin,
 } from '@tinacms/fields'
 import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
-import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
-import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
@@ -70,8 +68,6 @@ export class TinaCMS extends CMS {
     this.fields.add(NumberFieldPlugin)
     this.fields.add(ToggleFieldPlugin)
     this.fields.add(SelectFieldPlugin)
-    this.fields.add(MarkdownFieldPlugin)
-    this.fields.add(HtmlFieldPlugin)
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
