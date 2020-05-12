@@ -19,10 +19,10 @@ limitations under the License.
 import get from 'lodash.get'
 
 export function flattenFormData(form: any) {
-  let flatData: any = {}
-  let values = form.getState().values
+  const flatData: any = {}
+  const values = form.getState().values
   form.getRegisteredFields().forEach((field: string | number) => {
-    let data = get(values, field)
+    const data = get(values, field)
     if (typeof data === 'object') return
     flatData[field] = data
   })
