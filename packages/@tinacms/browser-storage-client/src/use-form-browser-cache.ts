@@ -24,18 +24,14 @@ import { flattenFormData } from './flatten-form-data'
 
 // persist pending changes to localStorage,
 // and load from localstorage on boot
-export function useLocalStorageCache(
-  path: string,
-  form: Form<any>,
-  editMode: boolean
-) {
+export function useFormBrowserCache(form: Form<any>, editing: boolean) {
   const cms = useCMS()
 
   const saveToStorage = useCallback(
     _formData => {
-      cms.api.storage.save(path, flattenFormData(form.finalForm))
+      cms.api.storage.save(form.id, flattenFormData(form.finalForm))
     },
-    [path]
+    [form.id]
   )
 
   // save to storage on change
@@ -43,11 +39,11 @@ export function useLocalStorageCache(
 
   // load from storage on boot
   useEffect(() => {
-    if (!editMode) return
+    if (!editing) return
 
-    const values = cms.api.storage.load(path)
+    const values = cms.api.storage.load(form.id)
     if (values) {
       form.updateValues(values)
     }
-  }, [form, editMode])
+  }, [form, editing])
 }
