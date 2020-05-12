@@ -16,8 +16,10 @@ limitations under the License.
 
 */
 
-import { Form, useCMS, useWatchFormValues } from 'tinacms'
 import { useCallback, useEffect } from 'react'
+import { Form } from '@tinacms/forms'
+import { useCMS, useWatchFormValues } from '@tinacms/react-core'
+
 import { flattenFormData } from './flatten-form-data'
 
 // persist pending changes to localStorage,

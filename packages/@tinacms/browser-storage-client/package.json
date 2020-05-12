@@ -1,9 +1,8 @@
 {
   "name": "@tinacms/browser-storage-client",
   "version": "1.0.3",
-  "description": "",
+  "description": "A TinaCMS adapter for backing up form data in browser storage",
   "main": "dist/index.js",
-  "author": "",
   "license": "Apache-2.0",
   "files": [
     "dist"
@@ -19,10 +18,7 @@
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
-    "tinacms": "^0.19.3"
-  },
-  "peerDependencies": {
-    "react": ">=16.8",
-    "tinacms": ">=0.15"
+    "@tinacms/react-core": "^0.2.12",
+    "@tinacms/forms": "^0.4.2"
   }
 }
