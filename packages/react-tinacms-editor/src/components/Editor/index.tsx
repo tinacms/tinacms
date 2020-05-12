@@ -21,7 +21,7 @@ import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 import { Plugin } from '@tinacms/core'
 
-import { Format } from '../../Translator'
+import { Format } from '../../translator'
 import { ImageProps } from '../../types'
 import { EditorStateProvider } from '../../context/editorState'
 import { Menubar } from '../Menubar'
