@@ -662,6 +662,15 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "samullman",
+      "name": "Sam Ullman",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10147333?v=4",
+      "profile": "http://samullman.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
