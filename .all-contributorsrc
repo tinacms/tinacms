@@ -652,6 +652,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "amykapernick",
+      "name": "Amy Kapernick",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/15953185?v=4",
+      "profile": "https://amyskapers.dev",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
