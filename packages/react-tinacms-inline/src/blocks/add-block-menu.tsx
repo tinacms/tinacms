@@ -139,7 +139,7 @@ const BlockOption = styled.button`
   font-size: var(--tina-font-size-1);
   padding: 0 12px;
   height: 34px;
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   width: 100%;
   background: none;
   cursor: pointer;

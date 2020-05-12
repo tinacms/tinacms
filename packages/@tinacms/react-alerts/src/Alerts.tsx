@@ -96,7 +96,7 @@ const Alert = styled.div<{ level: AlertLevel; index: number }>`
   border: 1px solid var(--tina-color-grey-2);
   color: var(--tina-color-grey-9);
   fill: var(--tina-color-primary);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   cursor: pointer;
   font-size: var(--tina-font-size-2);
   padding: 8px 4px 8px 12px;
