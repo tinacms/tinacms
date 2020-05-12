@@ -7,7 +7,8 @@
   "files": [
     "src/**/*.d.ts",
     "index.js",
-    "gatsby-node.js"
+    "gatsby-node.js",
+    "mdx-fragment.js"
   ],
   "keywords": [
     "tinacms",
