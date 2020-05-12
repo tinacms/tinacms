@@ -34,7 +34,10 @@ describe('Markdown Translators', () => {
     if (flavour !== 'commonmark') {
       return
     }
-    const translator = MarkdownTranslator.commonMarkFromSchema(defaultSchema)
+    const translator = MarkdownTranslator.commonMarkFromSchema(
+      defaultSchema,
+      false
+    )
 
     describe(flavour, () => {
       if (!isDirectory(flavour)) {
