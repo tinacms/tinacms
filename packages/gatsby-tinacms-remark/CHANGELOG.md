@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.18](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.17...gatsby-tinacms-remark@0.7.18) (2020-05-12)
+
+
+### Bug Fixes
+
+* fragment definitions ([23983f8](https://github.com/tinacms/tinacms/commit/23983f8))
+
+
+
+
+
 ## [0.7.17](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.16...gatsby-tinacms-remark@0.7.17) (2020-05-12)
 
 
