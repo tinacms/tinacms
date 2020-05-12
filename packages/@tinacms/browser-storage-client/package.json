@@ -8,16 +8,17 @@
     "dist"
   ],
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom --passWithNoTests",
-    "lint": "tsdx lint"
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "docs": "npx typedoc",
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch"
   },
   "dependencies": {
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
+    "@tinacms/scripts": "^0.1.13",
     "@tinacms/react-core": "^0.2.12",
     "@tinacms/forms": "^0.4.2"
   }
