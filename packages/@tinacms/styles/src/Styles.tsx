@@ -87,7 +87,6 @@ const theme = css`
 
 export const GlobalStyles = createGlobalStyle`
   ${theme};
-  @import url('https://rsms.me/inter/inter.css');
 `
 
 export const TinaResetStyles = css`
