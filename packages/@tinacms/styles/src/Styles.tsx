@@ -62,7 +62,7 @@ const theme = css`
 
     --tina-font-family: 'Inter', sans-serif;
 
-    --tina-font-weight-regular: 500;
+    --tina-font-weight-regular: 400;
     --tina-font-weight-bold: 600;
 
     --tina-shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.12),

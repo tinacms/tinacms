@@ -110,5 +110,5 @@ const FieldError = styled.span`
   color: red;
   font-size: var(--tina-font-size-1);
   margin-top: 8px;
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
 `
