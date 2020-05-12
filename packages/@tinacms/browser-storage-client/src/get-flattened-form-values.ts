@@ -17,11 +17,12 @@ limitations under the License.
 */
 
 import get from 'lodash.get'
+import { Form } from '@tinacms/forms'
 
-export function flattenFormData(form: any) {
+export function getFlattenedFormValues(form: Form) {
   const flatData: any = {}
-  const values = form.getState().values
-  form.getRegisteredFields().forEach((field: string | number) => {
+  const values = form.values
+  form.finalForm.getRegisteredFields().forEach((field: string | number) => {
     const data = get(values, field)
     if (typeof data === 'object') return
     flatData[field] = data

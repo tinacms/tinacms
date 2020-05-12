@@ -20,7 +20,7 @@ import { useCallback, useEffect } from 'react'
 import { Form } from '@tinacms/forms'
 import { useCMS, useWatchFormValues } from '@tinacms/react-core'
 
-import { flattenFormData } from './flatten-form-data'
+import { getFlattenedFormValues } from './get-flattened-form-values'
 
 // persist pending changes to localStorage,
 // and load from localstorage on boot
@@ -29,7 +29,7 @@ export function useFormBrowserCache(form: Form<any>, editing: boolean) {
 
   const saveToStorage = useCallback(
     _formData => {
-      cms.api.storage.save(form.id, flattenFormData(form.finalForm))
+      cms.api.storage.save(form.id, getFlattenedFormValues(form))
     },
     [form.id]
   )
