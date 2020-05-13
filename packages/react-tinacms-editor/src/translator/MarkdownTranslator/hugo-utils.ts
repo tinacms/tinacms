@@ -19,14 +19,14 @@ limitations under the License.
 import { Token } from './types'
 import { Schema } from 'prosemirror-model'
 
-const RELREF_LINK_REGEX = /\[(.+)\]\((\{\{\<\srelref ".*"\s>\}\}\))/g
+const HUGO_LINK_REGEX = /\[(.+)\]\((\{\{.*\}\})\)/g
 
 export const createHugoLinks = (state: any, tok: Token, schema: Schema) => {
   let match
   let start = 0
   const { link } = schema.marks
   const text = tok.content
-  while ((match = RELREF_LINK_REGEX.exec(text)) !== null) {
+  while ((match = HUGO_LINK_REGEX.exec(text)) !== null) {
     state.addText(text.substr(start, match.index))
     state.openMark(link.create({ href: match[2] }))
     state.addText(match[1])

@@ -53,22 +53,36 @@ const HTMLFormat = () => {
 
 const WithInvalidLink = () => {
   const [value, setValue] = React.useState(`
-[Hello](\{\{\< relref "post/5-raisons-de-tester-la-jamstack" \>\}\})
+
+[Random]({{ some random text }})
+
+==========================================================
+
+
+[Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})
 
 ==========================================================
 
 test1
-[Hello](\{\{\< relref "post/5-raisons-de-tester-la-jamstack" \>\}\})
+[Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})
 test2
 
 ==========================================================
 
-test1 [Hello](\{\{\< relref "post/5-raisons-de-tester-la-jamstack" \>\}\}) test2
+test1 [Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}}) test2
 
 ==========================================================
 
-test1[Hello](\{\{\< relref "post/5-raisons-de-tester-la-jamstack" \>\}\})test2
-  `)
+test1[Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})test2
+
+==========================================================
+
+[Hello]({{ "post/5-raisons-de-tester-la-jamstack" | absLangURL }})
+
+==========================================================
+
+[Hello]({{ "post/5-raisons-de-tester-la-jamstack" | relLangURL }})
+`)
   return (
     <Wysiwyg
       input={{
