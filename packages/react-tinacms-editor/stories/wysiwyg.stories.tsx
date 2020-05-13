@@ -96,6 +96,50 @@ test1[Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})test2
     />
   )
 }
+
+const WithCustomShortcodes = () => {
+  const [value, setValue] = React.useState(`
+## Benefits
+
+Tagline for this section
+
+{{% grid %}}
+{{% grid-item %}}
+{{< icon name="gears" >}}
+##### Benefit Title
+Benefit description
+{{% /grid-item %}}
+
+{{% grid-item %}}
+{{< icon name="analytics" >}}
+##### Benefit Title
+Benefit description
+{{% /grid-item %}}
+
+{{% grid-item %}}
+{{< icon name="security" >}}
+##### Benefit Title
+Benefit description
+{{% /grid-item %}}
+{{% /grid %}}
+  `)
+  return (
+    <Wysiwyg
+      input={{
+        value,
+        onChange: (val: string) => {
+          // Type anything to trigger this and see the following in the console:
+          // \[Hello\]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})
+          // The idea here would be to basically ignore the fact that this is invalid
+          // so the expected value would be:
+          // [Hello]({{< relref "post/5-raisons-de-tester-la-jamstack" >}})
+          console.log(val)
+          setValue(val)
+        },
+      }}
+    />
+  )
+}
 const WithImage = () => {
   const [value, setValue] = React.useState(
     `![alt text](https://i.imgur.com/2FCfbgg.jpg "Logo Title Text 1")
@@ -154,5 +198,6 @@ storiesOf('Wysiwyg', module)
   .add('Basic', () => <Basic />)
   .add('HTML Format', () => <HTMLFormat />)
   .add('WithInvalidLink', () => <WithInvalidLink />)
+  .add('WithCustomShortcodes', () => <WithCustomShortcodes />)
   .add('WithImage', () => <WithImage />)
   .add('WithTable', () => <WithTable />)
