@@ -19,3 +19,4 @@ limitations under the License.
 export * from './components/Editor'
 export * from './tinacms-plugins/HtmlFieldPlugin'
 export * from './tinacms-plugins/MarkdownFieldPlugin'
+export * from './tinacms-inline/inline-wysiwyg'

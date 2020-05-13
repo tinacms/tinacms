@@ -19,7 +19,6 @@ limitations under the License.
 import React from "react"
 import { Link, graphql } from "gatsby"
 
-import styled from "styled-components"
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -33,9 +32,6 @@ import {
   InlineForm,
   InlineBlocks,
   InlineTextareaField,
-  InlineWysiwyg,
-  InlineTextField,
-  useInlineForm,
   InlineImageField,
 } from "react-tinacms-inline"
 
@@ -43,6 +39,20 @@ import { BLOCKS } from "../components/blog-blocks"
 import { useCMS } from "tinacms"
 
 const get = require("lodash.get")
+
+function InlineWysiwyg(props) {
+  const [{ InlineWysiwyg }, setEditor] = React.useState({})
+
+  React.useEffect(() => {
+    import("react-tinacms-editor").then(setEditor)
+  }, [])
+
+  if (InlineWysiwyg) {
+    return <InlineWysiwyg {...props} />
+  }
+
+  return props.children
+}
 
 function BlogPostTemplate(props) {
   const siteTitle = props.data.site.siteMetadata.title
@@ -52,6 +62,11 @@ function BlogPostTemplate(props) {
 
   const [post, form] = useRemarkForm(props.data.markdownRemark, BlogPostForm)
   usePlugin(form)
+  React.useEffect(() => {
+    import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
+      cms.fields.add(MarkdownFieldPlugin)
+    })
+  }, [])
 
   return (
     <ModalProvider>
@@ -235,6 +250,7 @@ function BlogPostTemplate(props) {
 const BlogPostForm = {
   actions: [DeleteAction],
   fields: [
+    { name: "rawMarkdownBody", component: "markdown" },
     {
       label: "Gallery",
       name: "frontmatter.gallery",
