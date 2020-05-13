@@ -37,11 +37,12 @@ export const buildEditor = (
   el: HTMLDivElement | undefined | null,
   imageProps: ImageProps = {},
   setEditorView: ({ view }: { view: EditorView }) => void,
+  supportHugo: boolean,
   format?: Format
 ): { translator?: any } => {
   const schema = buildSchema()
   const { upload, previewUrl } = imageProps
-  const translator = buildTranslator(schema, format)
+  const translator = buildTranslator(schema, format, supportHugo)
 
   if (!el) return {}
 

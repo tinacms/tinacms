@@ -35,13 +35,16 @@ export const EditorStateProvider = ({
   input,
   el,
   imageProps,
+  supportHugo,
   format,
 }: any) => {
   const [editorView, setEditorView] = useState<{ view: EditorView }>()
   const [translator, setTranslator] = useState<any>()
 
   useEffect(() => {
-    setTranslator(buildEditor(input, el, imageProps, setEditorView, format))
+    setTranslator(
+      buildEditor(input, el, imageProps, setEditorView, supportHugo, format)
+    )
     return () => {
       editorView && editorView.view.destroy()
     }

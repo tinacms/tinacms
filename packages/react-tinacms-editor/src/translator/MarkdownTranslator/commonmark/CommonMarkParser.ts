@@ -24,9 +24,14 @@ import { buildTokensForSchema } from './tokens'
 
 const markdownit = require('markdown-it')
 
-export function CommonMarkParser(schema: Schema) {
+export function CommonMarkParser(schema: Schema, supportHugo: boolean) {
   const parser = markdownit({ html: false })
   parser.use(imsize)
   parser.use(link)
-  return new MarkdownParser(schema, parser, buildTokensForSchema(schema))
+  return new MarkdownParser(
+    schema,
+    parser,
+    buildTokensForSchema(schema),
+    supportHugo
+  )
 }

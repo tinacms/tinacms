@@ -24,21 +24,23 @@ import { TranslatorClass } from '../TranslatorClass'
 
 export class MarkdownTranslator extends TranslatorClass {
   schema: Schema
+  supportHugo: boolean
   parser: MarkdownParser | null = null
   serializer: MarkdownSerializer | null = null
 
-  constructor(schema: Schema) {
+  constructor(schema: Schema, supportHugo: boolean) {
     super()
     this.schema = schema
+    this.supportHugo = supportHugo
   }
 
-  static fromSchema(schema: Schema) {
-    return MarkdownTranslator.commonMarkFromSchema(schema)
+  static fromSchema(schema: Schema, supportHugo: boolean) {
+    return MarkdownTranslator.commonMarkFromSchema(schema, supportHugo)
   }
 
-  static commonMarkFromSchema(schema: Schema) {
-    const translator = new MarkdownTranslator(schema)
-    translator.parser = CommonMarkParser(schema)
+  static commonMarkFromSchema(schema: Schema, supportHugo: boolean) {
+    const translator = new MarkdownTranslator(schema, supportHugo)
+    translator.parser = CommonMarkParser(schema, supportHugo)
     translator.serializer = CommonMarkSerializer(schema)
     return translator
   }

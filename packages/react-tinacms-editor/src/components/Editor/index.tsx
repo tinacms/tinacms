@@ -35,6 +35,7 @@ export interface WysiwygProps {
   sticky?: boolean
   format?: Format
   imageProps?: ImageProps
+  supportHugo?: boolean
 }
 
 export const Wysiwyg = styled(
@@ -44,6 +45,7 @@ export const Wysiwyg = styled(
     sticky,
     format,
     imageProps,
+    supportHugo = false,
     ...styleProps
   }: WysiwygProps) => {
     const [el, setEl] = useState<HTMLDivElement>()
@@ -65,6 +67,7 @@ export const Wysiwyg = styled(
           el={el}
           imageProps={imageProps}
           format={format}
+          supportHugo={supportHugo}
         >
           <Menubar
             sticky={sticky}
