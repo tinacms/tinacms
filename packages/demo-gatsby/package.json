@@ -46,6 +46,7 @@
     "react-helmet": "^5.2.1",
     "react-textarea-autosize": "7.1.2",
     "react-tinacms-inline": "^0.4.8",
+    "react-tinacms-editor": "^0.5.3",
     "react-typography": "^0.16.19",
     "tinacms": "^0.19.3",
     "typeface-merriweather": "0.0.72",
