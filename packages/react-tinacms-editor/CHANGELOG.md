@@ -3,6 +3,64 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2...react-tinacms-editor@0.5.3) (2020-05-12)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.5.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2-alpha.3...react-tinacms-editor@0.5.2) (2020-05-11)
+
+
+### Bug Fixes
+
+* close image popup and hitting delete button should delete image ([7459e09](https://github.com/tinacms/tinacms/commit/7459e09))
+* link button should be disabled if selection is empty ([bef462c](https://github.com/tinacms/tinacms/commit/bef462c))
+
+
+
+
+
+## [0.5.2-alpha.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2-alpha.2...react-tinacms-editor@0.5.2-alpha.3) (2020-05-08)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.5.2-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2-alpha.1...react-tinacms-editor@0.5.2-alpha.2) (2020-05-08)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.5.2-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2-alpha.0...react-tinacms-editor@0.5.2-alpha.1) (2020-05-08)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.5.2-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.1...react-tinacms-editor@0.5.2-alpha.0) (2020-05-06)
+
+
+### Bug Fixes
+
+* build ([3f305a0](https://github.com/tinacms/tinacms/commit/3f305a0))
+* issue with table menu click event not trigerred ([5200514](https://github.com/tinacms/tinacms/commit/5200514))
+* sticky menu useEffect dep list addition ([cb6e3bf](https://github.com/tinacms/tinacms/commit/cb6e3bf))
+* table column row header style ([ea3fe97](https://github.com/tinacms/tinacms/commit/ea3fe97))
+
+
+
+
+
 ## [0.5.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.1-alpha.0...react-tinacms-editor@0.5.1) (2020-05-04)
 
 **Note:** Version bump only for package react-tinacms-editor

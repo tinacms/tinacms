@@ -3,6 +3,54 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.9.23](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.22...react-tinacms@0.9.23) (2020-05-12)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
+## [0.9.22](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.22-alpha.3...react-tinacms@0.9.22) (2020-05-11)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
+## [0.9.22-alpha.3](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.22-alpha.2...react-tinacms@0.9.22-alpha.3) (2020-05-08)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
+## [0.9.22-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.22-alpha.1...react-tinacms@0.9.22-alpha.2) (2020-05-08)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
+## [0.9.22-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.22-alpha.0...react-tinacms@0.9.22-alpha.1) (2020-05-08)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
+## [0.9.22-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.21...react-tinacms@0.9.22-alpha.0) (2020-05-06)
+
+**Note:** Version bump only for package react-tinacms
+
+
+
+
+
 ## [0.9.21](https://github.com/tinacms/tinacms/compare/react-tinacms@0.9.21-alpha.0...react-tinacms@0.9.21) (2020-05-04)
 
 **Note:** Version bump only for package react-tinacms

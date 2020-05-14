@@ -171,7 +171,6 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
 
 const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
   const cms = useCMS()
-  console.log({ name })
 
   const form: Form = React.useMemo(
     () =>
@@ -183,10 +182,14 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
         },
         fields: [{ label: 'Branch Name', name: 'name', component: 'text' }],
         async onSubmit({ name }) {
-          await cms.api.github.createBranch(name)
-          cms.api.github.setWorkingBranch(name)
-          if (onBranchChange) {
-            onBranchChange(name)
+          try {
+            await cms.api.github.createBranch(name)
+            cms.api.github.setWorkingBranch(name)
+            if (onBranchChange) {
+              onBranchChange(name)
+            }
+          } catch (error) {
+            cms.events.dispatch({ type: 'github:error', error })
           }
         },
       }),

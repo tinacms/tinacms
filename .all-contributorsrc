@@ -643,6 +643,34 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "bshackelford",
+      "name": "Brandon Shackelford",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1447644?v=4",
+      "profile": "https://bshack.dev",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "amykapernick",
+      "name": "Amy Kapernick",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/15953185?v=4",
+      "profile": "https://amyskapers.dev",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "samullman",
+      "name": "Sam Ullman",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10147333?v=4",
+      "profile": "http://samullman.com",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,

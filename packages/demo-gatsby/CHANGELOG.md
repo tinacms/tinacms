@@ -3,6 +3,62 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.8.12](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.11...demo-gatsby@1.8.12) (2020-05-12)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.8.11](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.10...demo-gatsby@1.8.11) (2020-05-12)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.8.10](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.10-alpha.3...demo-gatsby@1.8.10) (2020-05-11)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.8.10-alpha.3](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.10-alpha.2...demo-gatsby@1.8.10-alpha.3) (2020-05-08)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.8.10-alpha.2](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.10-alpha.1...demo-gatsby@1.8.10-alpha.2) (2020-05-08)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.8.10-alpha.1](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.10-alpha.0...demo-gatsby@1.8.10-alpha.1) (2020-05-08)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
+## [1.8.10-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.9...demo-gatsby@1.8.10-alpha.0) (2020-05-06)
+
+**Note:** Version bump only for package demo-gatsby
+
+
+
+
+
 ## [1.8.9](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.9-alpha.0...demo-gatsby@1.8.9) (2020-05-04)
 
 **Note:** Version bump only for package demo-gatsby

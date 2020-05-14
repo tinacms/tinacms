@@ -33,9 +33,13 @@ export const Menu = markControl({
     title: '',
   },
   noMix: ['code'],
-  isDisabled: (view: EditorView) =>
-    isMarkPresent(view.state, view.state.schema.marks.link) ||
-    !!imagePluginKey.getState(view.state).selectedImage,
+  isDisabled: (view: EditorView) => {
+    if (view.state.selection.empty) return true
+    return (
+      isMarkPresent(view.state, view.state.schema.marks.link) ||
+      !!imagePluginKey.getState(view.state).selectedImage
+    )
+  },
   onClick: (view: EditorView) => {
     const { state, dispatch } = view
     return dispatch(state.tr.setMeta('show_link_toolbar', true))

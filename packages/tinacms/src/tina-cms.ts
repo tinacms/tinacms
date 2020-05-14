@@ -52,7 +52,7 @@ export class TinaCMS extends CMS {
   sidebar: SidebarState
   media: MediaManager
   toolbar: ToolbarState
-  alerts = new Alerts()
+  alerts = new Alerts(this.events)
 
   constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
     super(config)
@@ -60,7 +60,7 @@ export class TinaCMS extends CMS {
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
 
-    this.sidebar = new SidebarState(sidebar)
+    this.sidebar = new SidebarState(this.events, sidebar)
     this.toolbar = new ToolbarState(toolbar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
