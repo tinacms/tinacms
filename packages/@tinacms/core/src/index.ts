@@ -17,5 +17,6 @@ limitations under the License.
 */
 
 export * from './cms'
+export * from './event'
 export * from './subscribable'
 export * from './plugins'

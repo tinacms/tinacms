@@ -43,7 +43,7 @@ limitations under the License.
  * @packageDocumentation
  */
 
-import { Subscribable } from './subscribable'
+import { EventBus, Callback } from './event'
 
 /**
  * An object used to extend or modify the behaviour of the content management system.
@@ -78,6 +78,8 @@ export class PluginTypeManager {
    */
   private plugins: Map<PluginType> = {}
 
+  constructor(private events: EventBus) {}
+
   /**
    * Gets the [[PluginType|collection of plugins]] for the given type.
    *
@@ -101,7 +103,7 @@ export class PluginTypeManager {
    */
   getType<P extends Plugin = Plugin>(type: P['__type']): PluginType<P> {
     return (this.plugins[type] =
-      this.plugins[type] || new PluginType(type)) as PluginType<P>
+      this.plugins[type] || new PluginType(type, this.events)) as PluginType<P>
   }
 
   /**
@@ -225,7 +227,7 @@ type PluginMap<T extends Plugin = Plugin> = Map<T>
 /**
  * A collection of plugins with the same `__type` value.
  */
-export class PluginType<T extends Plugin = Plugin> extends Subscribable {
+export class PluginType<T extends Plugin = Plugin> {
   /**
    * @ignore
    */
@@ -235,9 +237,7 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
    *
    * @param __type The `__type` of plugin being managed.
    */
-  constructor(private __type: string) {
-    super()
-  }
+  constructor(private __type: string, private events: EventBus) {}
 
   /**
    * Adds a new plugin to the collection.
@@ -264,7 +264,7 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
     }
 
     this.__plugins[p.name] = p
-    this.notifiySubscribers()
+    this.events.dispatch({ type: `plugin:add:${this.__type}` })
   }
 
   all(): T[] {
@@ -306,8 +306,11 @@ export class PluginType<T extends Plugin = Plugin> extends Subscribable {
     const plugin = this.__plugins[name]
 
     delete this.__plugins[name]
-    this.notifiySubscribers()
+    this.events.dispatch({ type: `plugin:remove:${this.__type}` })
 
     return plugin
+  }
+  subscribe(cb: Callback): () => void {
+    return this.events.subscribe(`plugin:*:${this.__type}`, cb)
   }
 }

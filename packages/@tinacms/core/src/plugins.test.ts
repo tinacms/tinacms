@@ -17,12 +17,13 @@ limitations under the License.
 */
 
 import { PluginTypeManager } from './plugins'
+import { EventBus } from './event'
 
 describe('PluginTypeManager', () => {
   describe('when nothing has been added', () => {
     describe('#all', () => {
       it('returns no items', () => {
-        const plugins = new PluginTypeManager()
+        const plugins = new PluginTypeManager(new EventBus())
 
         expect(plugins.all('test')).toHaveLength(0)
       })
@@ -32,7 +33,7 @@ describe('PluginTypeManager', () => {
     it('notifies the subscribers', () => {
       const listeners = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
       const p = { __type: 'test', name: 'Example' }
-      const plugins = new PluginTypeManager()
+      const plugins = new PluginTypeManager(new EventBus())
       listeners.forEach(listener =>
         plugins.findOrCreateMap('test').subscribe(listener)
       )
@@ -44,7 +45,7 @@ describe('PluginTypeManager', () => {
     describe('#all', () => {
       it('contains the plugin', () => {
         const p = { __type: 'test', name: 'Example' }
-        const plugins = new PluginTypeManager()
+        const plugins = new PluginTypeManager(new EventBus())
 
         plugins.add(p)
 
@@ -52,7 +53,7 @@ describe('PluginTypeManager', () => {
       })
       it('returns no items of a different type', () => {
         const p = { __type: 'test', name: 'Example' }
-        const plugins = new PluginTypeManager()
+        const plugins = new PluginTypeManager(new EventBus())
 
         plugins.add(p)
 
@@ -64,7 +65,7 @@ describe('PluginTypeManager', () => {
     it('notifies the subscribers', () => {
       const listeners = [jest.fn(), jest.fn(), jest.fn(), jest.fn()]
       const p = { __type: 'test', name: 'Example' }
-      const plugins = new PluginTypeManager()
+      const plugins = new PluginTypeManager(new EventBus())
       plugins.add(p)
 
       listeners.forEach(listener =>
@@ -78,7 +79,7 @@ describe('PluginTypeManager', () => {
     describe('#all', () => {
       it('no longer contains the plugin', () => {
         const p = { __type: 'test', name: 'Example' }
-        const plugins = new PluginTypeManager()
+        const plugins = new PluginTypeManager(new EventBus())
 
         plugins.add(p)
         expect(plugins.all('test')).toContain(p)

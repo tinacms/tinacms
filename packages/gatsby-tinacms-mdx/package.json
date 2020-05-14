@@ -1,13 +1,14 @@
 {
   "name": "gatsby-tinacms-mdx",
-  "version": "0.1.11",
+  "version": "0.1.14",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
   "files": [
-    "src",
+    "src/**/*.d.ts",
     "index.js",
-    "gatsby-node.js"
+    "gatsby-node.js",
+    "mdx-fragment.js"
   ],
   "keywords": [
     "tinacms",
@@ -32,11 +33,11 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
-    "@types/js-yaml": "^3.12.1",
-    "gatsby-tinacms-git": "^0.4.9",
-    "tinacms": "^0.19.1"
+    "gatsby-tinacms-git": "^0.4.11",
+    "tinacms": "^0.19.3"
   },
   "dependencies": {
+    "@types/js-yaml": "^3.12.3",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
     "slash": "^3.0.0"
