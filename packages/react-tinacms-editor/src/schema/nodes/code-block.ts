@@ -16,11 +16,6 @@ limitations under the License.
 
 */
 
-import { SchemaNodePlugin } from '../../types'
-
-/**
- * code_block
- */
 export const code_block = {
   content: 'text*',
   attrs: { params: { default: '' } },
@@ -32,9 +27,3 @@ export const code_block = {
     return ['pre', ['code', 0]]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'code_block',
-  node: code_block,
-} as SchemaNodePlugin
