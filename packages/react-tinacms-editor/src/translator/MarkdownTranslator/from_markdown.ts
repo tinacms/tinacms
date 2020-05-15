@@ -19,6 +19,10 @@ limitations under the License.
 import { Mark, MarkType, Node, NodeType, Schema } from 'prosemirror-model'
 import { Token } from './types'
 
+const MarkMapping: { [key: string]: any } = {
+  strike: 's',
+}
+
 function maybeMerge(a: any, b: any) {
   if (a.isText && b.isText && Mark.sameSet(a.marks, b.marks))
     return a.copy(a.text + b.text)
@@ -170,10 +174,13 @@ function tokenHandlers(schema: THSchema, tokens: Hash<Token>) {
           state.closeMark(markType)
         }
       } else {
-        handlers[type + '_open'] = (state: MarkdownParseState, tok: Token) =>
-          state.openMark(markType.create(attrs(spec, tok)))
-        handlers[type + '_close'] = (state: MarkdownParseState) =>
-          state.closeMark(markType)
+        handlers[(MarkMapping[type] || type) + '_open'] = (
+          state: MarkdownParseState,
+          tok: Token
+        ) => state.openMark(markType.create(attrs(spec, tok)))
+        handlers[(MarkMapping[type] || type) + '_close'] = (
+          state: MarkdownParseState
+        ) => state.closeMark(markType)
       }
     } else if (spec.ignore) {
       if (noOpenClose(type)) {
