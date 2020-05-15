@@ -39,13 +39,14 @@ export function useJsonForm(
 ): [JsonNode | null, Form | null] {
   const jsonNode = usePersistentValue(_jsonNode)
 
+  // NODE_ENV will never change at runtime.
+  const TINA_DISABLED = process.env.NODE_ENV === 'production'
+
   /**
    * We're returning early here which means all the hooks called by this hook
-   * violate the rules of hooks. In the case of the check for
-   * `NODE_ENV === 'production'` this should be a non-issue because NODE_ENV
-   * will never change at runtime.
+   * violate the rules of hooks.
    */
-  if (!jsonNode || process.env.NODE_ENV === 'production') {
+  if (!jsonNode) {
     return [jsonNode, null]
   }
   validateJsonNode(jsonNode)
@@ -74,37 +75,39 @@ export function useJsonForm(
   // TODO: This may not be necessary.
   fields.push({ name: 'jsonNode', component: null })
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useForm(
-    {
-      id,
-      label,
-      fields,
-      loadInitialValues() {
-        return cms.api.git
-          .show(id) // Load the contents of this file at HEAD
-          .then((git: any) => {
-            // Parse the JSON into a JsonForm data structure and store it in state.
-            const rawJson = JSON.parse(git.content)
-            return { jsonNode, rawJson }
-          })
-      },
-      onSubmit(data: any) {
-        return cms.api.git.onSubmit!({
-          files: [data.jsonNode.fileRelativePath],
-          message: data.__commit_message || 'Tina commit',
-          name: data.__commit_name,
-          email: data.__commit_email,
-        })
-      },
-      reset() {
-        return cms.api.git.reset({ files: [id] })
-      },
-      ...formOptions,
+  function loadInitialValues() {
+    return cms.api.git
+      .show(id) // Load the contents of this file at HEAD
+      .then((git: any) => {
+        // Parse the JSON into a JsonForm data structure and store it in state.
+        const rawJson = JSON.parse(git.content)
+        return { jsonNode, rawJson }
+      })
+  }
+
+  const jsonFormOptions = {
+    id,
+    label,
+    fields,
+    loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
+    onSubmit(data: any) {
+      return cms.api.git.onSubmit!({
+        files: [data.jsonNode.fileRelativePath],
+        message: data.__commit_message || 'Tina commit',
+        name: data.__commit_name,
+        email: data.__commit_email,
+      })
     },
-    // The Form will be updated if these values change.
-    { values: valuesOnDisk, label, fields }
-  )
+    reset() {
+      return cms.api.git.reset({ files: [id] })
+    },
+    ...formOptions,
+  }
+
+  const watchValuesForChange = { values: valuesOnDisk, label, fields }
+
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
+  const [, form] = useForm(jsonFormOptions, watchValuesForChange)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = useCallback(formState => {

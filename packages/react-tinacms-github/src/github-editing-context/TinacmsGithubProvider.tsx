@@ -16,112 +16,81 @@ limitations under the License.
 
 */
 
-import React, { useState, useEffect, useCallback } from 'react'
+import React, { useState, useEffect } from 'react'
 import { useCMS } from 'tinacms'
-import GithubErrorModal from '../github-error/GithubErrorModal'
-import GithubAuthModal from './GithubAuthModal'
+import GithubErrorModal, { GithubError } from '../github-error/GithubErrorModal'
+import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubEditingContext } from './GithubEditingContext'
-import { useGithubEditing } from './useGithubEditing'
-import { authenticate as githubAuthenticate } from '../github-auth'
 import { GithubClient } from '../github-client'
 
 interface ProviderProps {
   children: any
-  clientId: string
-  authCallbackRoute: string
   editMode: boolean
   enterEditMode: () => void
   exitEditMode: () => void
   error?: any
 }
 
-interface AuthState {
-  authenticated: true
-  forkValid: true
-}
+type ModalNames = null | 'authenticate' | 'createFork'
 
 export const TinacmsGithubProvider = ({
   children,
   editMode,
   enterEditMode,
   exitEditMode,
-  authCallbackRoute,
-  clientId,
   error: previewError,
 }: ProviderProps) => {
-  const [error, setError] = useState<any>(null)
+  const [error, setError] = useState<GithubError>(previewError)
   const cms = useCMS()
   const github: GithubClient = cms.api.github
-  const [authorizingStatus, setAuthorizingStatus] = useState<AuthState | null>(
-    null
-  )
+  const [activeModal, setActiveModal] = useState<ModalNames>(null)
 
-  const tryEnterEditMode = async () => {
-    const authenticated =
-      authorizingStatus?.authenticated || (await github.getUser())
-    const forkValid = authorizingStatus?.forkValid || (await github.getBranch())
+  const onClose = () => {
+    setActiveModal(null)
+  }
 
-    if (authenticated && forkValid) {
-      enterEditMode()
+  const beginAuth = async () => {
+    if (await github.isAuthenticated()) {
+      onAuthSuccess()
     } else {
-      setAuthorizingStatus({
-        authenticated,
-        forkValid,
-      })
+      setActiveModal('authenticate')
     }
   }
 
-  const authenticate = useCallback(() => {
-    return githubAuthenticate(clientId, authCallbackRoute)
-  }, [clientId, authCallbackRoute])
+  const onAuthSuccess = async () => {
+    if (await github.isAuthorized()) {
+      github.setWorkingRepoFullName(github.baseRepoFullName)
+      enterEditMode()
+    } else {
+      setActiveModal('createFork')
+    }
+  }
+
+  useEffect(() => {
+    return cms.events.subscribe('github:error', ({ error }) => {
+      setError(error)
+    })
+  })
 
   return (
     <GithubEditingContext.Provider
       value={{
         editMode,
-        enterEditMode: tryEnterEditMode,
+        enterEditMode: beginAuth,
         exitEditMode,
-        setError,
       }}
     >
       {error && <GithubErrorModal error={error} />}
-      {authorizingStatus && (
-        <GithubAuthModal
-          onUpdateAuthState={tryEnterEditMode}
-          authState={authorizingStatus}
-          close={() => {
-            setAuthorizingStatus(null)
-          }}
-          authenticate={authenticate}
+      {!error && activeModal === 'authenticate' && (
+        <GithubAuthenticationModal
+          close={onClose}
+          onAuthSuccess={onAuthSuccess}
         />
       )}
-      <PreviewErrorBoundary previewError={previewError}>
-        {children}
-      </PreviewErrorBoundary>
+      {!error && activeModal === 'createFork' && (
+        <CreateForkModal close={onClose} onForkCreated={enterEditMode} />
+      )}
+      {!previewError && children}
     </GithubEditingContext.Provider>
   )
-}
-
-interface Props {
-  previewError: any
-  children: any
-}
-function PreviewErrorBoundary(props: Props) {
-  const github = useGithubEditing()
-
-  useEffect(() => {
-    ;(async () => {
-      if (props.previewError) {
-        github.setError(props.previewError)
-      }
-    })()
-  }, [props.previewError])
-
-  if (props.previewError) {
-    return null
-  }
-
-  // don't show content with initial content error
-  // because the data is likely missing
-  return props.children
 }

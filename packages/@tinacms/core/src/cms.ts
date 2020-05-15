@@ -24,6 +24,7 @@ limitations under the License.
  */
 
 import { Plugin, PluginTypeManager } from './plugins'
+import { EventBus } from './event'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -32,6 +33,8 @@ import { Plugin, PluginTypeManager } from './plugins'
  *
  * - [[Plugin|Plugins]] which extend or change the behaviour of the content management system..
  * - [[api|APIs]] which allow the CMS to integrate with third party services.
+ * - [[EventBus|events]] which provide a way to communicate information about events happening
+ *   between decoupled parts of the CMS.
  *
  * The name [[CMS]] is a bit misleading. This object knows nothing of the user
  * interface or the data storage layer. The purpose of a [[CMS]] instance is to
@@ -104,11 +107,13 @@ export class CMS {
    */
   api: { [key: string]: any } = {}
 
+  events = new EventBus()
+
   /**
    * @hidden
    */
   constructor(config: CMSConfig = {}) {
-    this.plugins = new PluginTypeManager()
+    this.plugins = new PluginTypeManager(this.events)
 
     if (config.plugins) {
       config.plugins.forEach(plugin => this.plugins.add(plugin))

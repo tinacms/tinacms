@@ -3,6 +3,89 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.22](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.21...gatsby-tinacms-json@0.8.22) (2020-05-12)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.21](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.21-alpha.3...gatsby-tinacms-json@0.8.21) (2020-05-11)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.21-alpha.3](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.21-alpha.2...gatsby-tinacms-json@0.8.21-alpha.3) (2020-05-08)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.21-alpha.2](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.21-alpha.1...gatsby-tinacms-json@0.8.21-alpha.2) (2020-05-08)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.21-alpha.1](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.21-alpha.0...gatsby-tinacms-json@0.8.21-alpha.1) (2020-05-08)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.21-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.20...gatsby-tinacms-json@0.8.21-alpha.0) (2020-05-06)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.20](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.20-alpha.0...gatsby-tinacms-json@0.8.20) (2020-05-04)
+
+
+### Bug Fixes
+
+* usejsonform loads form in prod, doesn's load initial values ([6b521e2](https://github.com/tinacms/tinacms/commit/6b521e2))
+
+
+
+
+
+## [0.8.20-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.19...gatsby-tinacms-json@0.8.20-alpha.0) (2020-04-28)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.19](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.19-alpha.4...gatsby-tinacms-json@0.8.19) (2020-04-27)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
+## [0.8.19-alpha.4](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.19-alpha.3...gatsby-tinacms-json@0.8.19-alpha.4) (2020-04-24)
+
+**Note:** Version bump only for package gatsby-tinacms-json
+
+
+
+
+
 ## [0.8.19-alpha.3](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.19-alpha.2...gatsby-tinacms-json@0.8.19-alpha.3) (2020-04-20)
 
 
