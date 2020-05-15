@@ -203,7 +203,7 @@ interface FormStatusProps {
 
 const FormStatus = ({ dirty }: FormStatusProps) => {
   return (
-    <FieldMeta name={'Form Status'}>
+    <FieldMeta name={'Form Status'} margin={false}>
       {dirty ? (
         <StatusMessage>
           <StatusLight warning /> <DesktopLabel>Unsaved changes</DesktopLabel>
@@ -252,6 +252,7 @@ const SaveButton = styled(ToolbarButton)`
 const WidgetsContainer = styled.div`
   grid-area: widgets;
   display: flex;
+  align-self: stretch;
   align-items: center;
   justify-self: end;
   padding-right: 12px;
@@ -266,10 +267,6 @@ const WidgetsContainer = styled.div`
   > * {
     margin-bottom: 0;
     margin-left: 16px;
-  }
-
-  > div {
-    display: none;
   }
 
   label {
@@ -354,12 +351,12 @@ const StatusLight = styled.span<StatusLightProps>`
 `
 
 const StatusMessage = styled.p`
-  font-size: 16px;
+  font-size: var(--tina-font-size-3);
   display: flex;
   align-items: center;
   color: var(--tina-color-grey-6);
   padding-right: 4px;
-  line-height: 1.6;
+  line-height: 1.35;
   margin: 0;
 `
 

@@ -3,6 +3,86 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.30](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.29...demo-cra@1.0.30) (2020-05-12)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.29](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.29-alpha.3...demo-cra@1.0.29) (2020-05-11)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.29-alpha.3](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.29-alpha.2...demo-cra@1.0.29-alpha.3) (2020-05-08)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.29-alpha.2](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.29-alpha.1...demo-cra@1.0.29-alpha.2) (2020-05-08)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.29-alpha.1](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.29-alpha.0...demo-cra@1.0.29-alpha.1) (2020-05-08)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.29-alpha.0](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.28...demo-cra@1.0.29-alpha.0) (2020-05-06)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.28](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.28-alpha.0...demo-cra@1.0.28) (2020-05-04)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.28-alpha.0](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.27...demo-cra@1.0.28-alpha.0) (2020-04-28)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.27](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.27-alpha.4...demo-cra@1.0.27) (2020-04-27)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
+## [1.0.27-alpha.4](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.27-alpha.3...demo-cra@1.0.27-alpha.4) (2020-04-24)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
 ## [1.0.27-alpha.3](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.27-alpha.2...demo-cra@1.0.27-alpha.3) (2020-04-20)
 
 **Note:** Version bump only for package demo-cra

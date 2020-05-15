@@ -419,7 +419,11 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/2182307?v=4",
       "profile": "https://github.com/jpuri",
       "contributions": [
-        "code"
+        "code",
+        "review",
+        "test",
+        "maintenance",
+        "bug"
       ]
     },
     {
@@ -448,7 +452,8 @@
       "avatar_url": "https://avatars1.githubusercontent.com/u/13934790?v=4",
       "profile": "https://github.com/cleitonper",
       "contributions": [
-        "bug"
+        "bug",
+        "ideas"
       ]
     },
     {
@@ -628,6 +633,43 @@
       "contributions": [
         "code",
         "doc"
+      ]
+    },
+    {
+      "login": "clnmcgrw",
+      "name": "Colin McGraw",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/5896972?v=4",
+      "profile": "https://github.com/clnmcgrw",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "bshackelford",
+      "name": "Brandon Shackelford",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/1447644?v=4",
+      "profile": "https://bshack.dev",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "amykapernick",
+      "name": "Amy Kapernick",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/15953185?v=4",
+      "profile": "https://amyskapers.dev",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "samullman",
+      "name": "Sam Ullman",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10147333?v=4",
+      "profile": "http://samullman.com",
+      "contributions": [
+        "bug"
       ]
     }
   ],

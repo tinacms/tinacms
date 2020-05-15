@@ -202,10 +202,7 @@ const NoFieldsPlaceholder = () => (
     <Emoji>🤔</Emoji>
     <h3>Hey, you don't have any fields added to this form.</h3>
     <p>
-      <LinkButton
-        href="https://tinacms.org/docs/gatsby/markdown/#creating-remark-forms"
-        target="_blank"
-      >
+      <LinkButton href="https://tinacms.org/docs/fields" target="_blank">
         <Emoji>📖</Emoji> Field Setup Guide
       </LinkButton>
     </p>
