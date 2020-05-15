@@ -18,11 +18,7 @@ limitations under the License.
 
 import { Node } from 'prosemirror-model'
 import { getAttrsWith, docAttrs, domAttrs } from './utils'
-import { SchemaNodePlugin } from '../../types'
 
-/**
- * heading
- */
 export const heading = {
   attrs: {
     level: { default: 1 },
@@ -50,9 +46,3 @@ export const heading = {
     return ['h' + level, domAttrs(other), 0]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'heading',
-  node: heading,
-} as SchemaNodePlugin

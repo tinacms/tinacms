@@ -16,11 +16,6 @@ limitations under the License.
 
 */
 
-import { SchemaNodePlugin } from '../../types'
-
-/**
- * hard_break
- */
 export const hard_break = {
   inline: true,
   group: 'inline',
@@ -30,9 +25,3 @@ export const hard_break = {
     return ['br']
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'hard_break',
-  node: hard_break,
-} as SchemaNodePlugin
