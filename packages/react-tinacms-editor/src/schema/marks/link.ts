@@ -17,11 +17,7 @@ limitations under the License.
 */
 
 import { Node } from 'prosemirror-model'
-import { SchemaMarkPlugin } from '../../types'
 
-/**
- * Link
- */
 export const link = {
   attrs: {
     href: {},
@@ -46,9 +42,3 @@ export const link = {
     return ['a', node.attrs]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:mark',
-  name: 'link',
-  mark: link,
-} as SchemaMarkPlugin

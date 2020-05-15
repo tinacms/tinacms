@@ -16,11 +16,6 @@ limitations under the License.
 
 */
 
-import { SchemaMarkPlugin } from '../../types'
-
-/**
- * Emphasis
- */
 export const em = {
   parseDOM: [
     { tag: 'i' },
@@ -34,9 +29,3 @@ export const em = {
     return ['em']
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:mark',
-  name: 'em',
-  mark: em,
-} as SchemaMarkPlugin

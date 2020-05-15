@@ -17,11 +17,7 @@ limitations under the License.
 */
 
 import { Node } from 'prosemirror-model'
-import { SchemaNodePlugin } from '../../types'
 
-/**
- * bullet_list
- */
 export const bullet_list = {
   content: 'list_item+',
   group: 'block',
@@ -36,9 +32,3 @@ export const bullet_list = {
     return ['ul', { 'data-tight': node.attrs.tight ? 'true' : null }, 0]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'bullet_list',
-  node: bullet_list,
-} as SchemaNodePlugin

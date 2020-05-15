@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { Node } from 'prosemirror-model'
-import { SchemaNodePlugin } from '../../types'
 
 export const image = {
   inline: true,
@@ -75,9 +74,3 @@ export function getAlignFromDOM(image: HTMLElement) {
 
   return null
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'image',
-  node: image,
-} as SchemaNodePlugin

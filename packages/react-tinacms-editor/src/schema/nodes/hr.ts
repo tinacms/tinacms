@@ -16,11 +16,6 @@ limitations under the License.
 
 */
 
-import { SchemaNodePlugin } from '../../types'
-
-/**
- * horizontal_rule
- */
 export const horizontal_rule = {
   group: 'block',
   allowGapCursor: true,
@@ -29,9 +24,3 @@ export const horizontal_rule = {
     return ['hr']
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'horizontal_rule',
-  node: horizontal_rule,
-} as SchemaNodePlugin
