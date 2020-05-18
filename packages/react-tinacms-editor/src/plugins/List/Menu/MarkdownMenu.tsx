@@ -16,6 +16,26 @@ limitations under the License.
 
 */
 
-export { linkPluginKey, linkPlugin } from './plugin'
-export * from './Menu'
-export { LinkForm } from './Popups/Form'
+import * as React from 'react'
+import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
+
+import { MenuButton } from '../../../components/MenuHelpers'
+
+export const MarkdownMenu = (props: any) => (
+  <>
+    <BulletList {...props} />
+    <OrderedList {...props} />
+  </>
+)
+
+const BulletList = () => (
+  <MenuButton data-tooltip="Unordered List" disabled>
+    <UnorderedListIcon />
+  </MenuButton>
+)
+
+const OrderedList = () => (
+  <MenuButton data-tooltip="Ordered List" disabled>
+    <OrderedListIcon />
+  </MenuButton>
+)

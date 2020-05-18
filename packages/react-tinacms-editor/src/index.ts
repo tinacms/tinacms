@@ -17,3 +17,4 @@ limitations under the License.
 */
 
 export * from './components/Editor'
+export * from './components/RawModeEditor'
