@@ -16,6 +16,17 @@ limitations under the License.
 
 */
 
-export { linkPluginKey, linkPlugin } from './plugin'
-export * from './Menu'
-export { LinkForm } from './Popups/Form'
+import * as React from 'react'
+import { FunctionComponent } from 'react'
+
+import { HeadingIcon } from '@tinacms/icons'
+
+import { MenuButton } from '../../../components/MenuHelpers'
+
+export const MarkdownMenu: FunctionComponent = () => {
+  return (
+    <MenuButton data-tooltip={'Heading'} disabled>
+      <HeadingIcon />
+    </MenuButton>
+  )
+}

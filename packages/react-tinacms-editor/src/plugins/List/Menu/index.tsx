@@ -16,29 +16,5 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
-
-import { commandControl } from '../../../components/MenuHelpers'
-import { toggleBulletList, toggleOrderedList } from '../commands'
-
-export const Menu = (props: any) => (
-  <>
-    <BulletList {...props} />
-    <OrderedList {...props} />
-  </>
-)
-
-const BulletList = commandControl(
-  toggleBulletList,
-  UnorderedListIcon,
-  'Unordered List',
-  'Unordered List'
-)
-
-const OrderedList = commandControl(
-  toggleOrderedList,
-  OrderedListIcon,
-  'Ordered List',
-  'Ordered List'
-)
+export { WysiwygMenu } from './WysiwygMenu'
+export { MarkdownMenu } from './MarkdownMenu'

@@ -16,6 +16,22 @@ limitations under the License.
 
 */
 
-export { linkPluginKey, linkPlugin } from './plugin'
-export * from './Menu'
-export { LinkForm } from './Popups/Form'
+import * as React from 'react'
+
+import { MarkdownIcon } from '@tinacms/icons'
+import { MenuButton } from '../MenuHelpers'
+
+export const EditorModeMenu = ({
+  toggleEditorMode,
+}: {
+  toggleEditorMode: () => void
+}) => {
+  return (
+    <MenuButton
+      data-tooltip={'Markdown mode'}
+      onClick={() => toggleEditorMode()}
+    >
+      <MarkdownIcon />
+    </MenuButton>
+  )
+}
