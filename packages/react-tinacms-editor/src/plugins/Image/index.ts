@@ -17,6 +17,6 @@ limitations under the License.
 */
 
 export { imagePluginKey, imagePlugin } from './plugin'
-export { Menu } from './Menu'
+export * from './Menu'
 export { ImageEdit } from './Popups/Edit'
 export { Loader } from './Popups/Loader'

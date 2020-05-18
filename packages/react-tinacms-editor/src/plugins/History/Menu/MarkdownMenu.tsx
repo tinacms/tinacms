@@ -16,6 +16,26 @@ limitations under the License.
 
 */
 
-export { linkPluginKey, linkPlugin } from './plugin'
-export * from './Menu'
-export { LinkForm } from './Popups/Form'
+import * as React from 'react'
+import { RedoIcon, UndoIcon } from '@tinacms/icons'
+
+import { MenuButton } from '../../../components/MenuHelpers'
+
+export const MarkdownMenu = () => (
+  <>
+    <UndoControl />
+    <RedoControl />
+  </>
+)
+
+const UndoControl = () => (
+  <MenuButton data-tooltip="Undo" data-side="top" disabled>
+    <UndoIcon />
+  </MenuButton>
+)
+
+const RedoControl = () => (
+  <MenuButton data-tooltip="Redo" data-side="top" disabled>
+    <RedoIcon />
+  </MenuButton>
+)

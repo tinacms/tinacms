@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { storiesOf } from '@storybook/react'
-import { Wysiwyg } from '../src'
+import { Wysiwyg, RawModeEditor } from '../src'
 
 const Basic = () => {
   const [value, setValue] = React.useState('')
@@ -105,8 +105,22 @@ const WithTable = () => {
   )
 }
 
+const RawModeEdit = () => {
+  const [value, setValue] = React.useState<string>('')
+  return (
+    <RawModeEditor
+      defaultValue={value}
+      onChange={(val: string) => {
+        console.log(val)
+        setValue(val)
+      }}
+    />
+  )
+}
+
 storiesOf('Wysiwyg', module)
   .add('Basic', () => <Basic />)
   .add('HTML Format', () => <HTMLFormat />)
   .add('WithImage', () => <WithImage />)
   .add('WithTable', () => <WithTable />)
+  .add('RawModeEditor', () => <RawModeEdit />)
