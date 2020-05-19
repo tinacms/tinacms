@@ -18,7 +18,6 @@ limitations under the License.
 
 import { Node } from 'prosemirror-model'
 import { docAttrs, getAttrs, domAttrs } from './utils'
-import { SchemaNodePlugin } from '../../types'
 
 export const paragraph = {
   content: 'inline*',
@@ -36,9 +35,3 @@ export const paragraph = {
     return ['p', domAttrs(node.attrs), 0]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'paragraph',
-  node: paragraph,
-} as SchemaNodePlugin
