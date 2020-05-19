@@ -23,10 +23,10 @@ import content from './home.json'
 import { useForm, usePlugins } from 'tinacms'
 
 const App: React.FC = () => {
+  const editMode = true
   const [tinaContent, form] = useForm({
     id: 'home-content',
     label: 'Content',
-    initialValues: content,
     onSubmit: async () => {
       alert('Saving...')
     },
@@ -37,6 +37,13 @@ const App: React.FC = () => {
         component: 'text',
       },
     ],
+    loadInitialValues: async () => {
+      if (editMode) {
+        const res = await fetch('/api/test')
+        return await res.json()
+      }
+      return content
+    },
   })
   usePlugins(form)
   return (
