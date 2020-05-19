@@ -19,15 +19,31 @@ limitations under the License.
 import React from 'react'
 import logo from './logo.svg'
 import './App.css'
+import content from './home.json'
+import { useForm, usePlugins } from 'tinacms'
 
 const App: React.FC = () => {
+  const [tinaContent, form] = useForm({
+    id: 'home-content',
+    label: 'Content',
+    initialValues: content,
+    onSubmit: async () => {
+      alert('Saving...')
+    },
+    fields: [
+      {
+        name: 'title',
+        label: 'Title',
+        component: 'text',
+      },
+    ],
+  })
+  usePlugins(form)
   return (
     <div className="App">
       <header className="App-header">
         <img src={logo} className="App-logo" alt="logo" />
-        <p>
-          Edit <code>src/App.tsx</code> and save to reload.
-        </p>
+        <p>{tinaContent.title}</p>
         <a
           className="App-link"
           href="https://reactjs.org"
