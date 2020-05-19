@@ -1,3 +1,24 @@
+# Tina Create-React-App Demo
+
+This demo is being used to develop a vendor-agnostic GitHub workflow.
+
+## Serverless Routes
+
+Add routes to `api/foo.ts` and access them on the frontend from `/api/foo`
+
+### Testing Serverless Routes
+
+1. Install `now` on your system: `npm install -g now`
+2. Connect project to Vercel: `now`
+   - Connect it to your personal account, not to the Tina org account (this will allow you to run the dev server even if you don't have org access)
+   - **Note:** don't worry if the build fails. It just needs a connection in order to run the dev server
+3. Run the project with serverless route emulation: `now dev`
+
+
+---
+---
+
+
 This project was bootstrapped with [Create React App](https://github.com/facebook/create-react-app).
 
 ## Available Scripts
