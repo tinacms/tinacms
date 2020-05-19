@@ -16,8 +16,18 @@ limitations under the License.
 
 */
 
-export { DeleteAction } from 'gatsby-tinacms-git'
-export * from './useRemarkForm'
-export * from './remark-form-hoc'
-export * from './RemarkForm'
-export * from './remark-creator-plugin'
+/**
+ * strikethrough
+ */
+export const strike = {
+  parseDOM: [
+    { tag: 'strike' },
+    { tag: 's' },
+    { tag: 'del' },
+    {
+      style: 'text-decoration',
+      getAttrs: (value: string) => value === 'line-through' && null,
+    },
+  ],
+  toDOM: () => ['s', 0],
+}

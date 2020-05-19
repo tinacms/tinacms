@@ -21,6 +21,7 @@ import { Schema } from 'prosemirror-model'
 import { code } from './marks/code'
 import { em } from './marks/em'
 import { link } from './marks/link'
+import { strike } from './marks/strike'
 import { strong } from './marks/strong'
 
 import { doc } from './nodes/doc'
@@ -37,7 +38,7 @@ import { paragraph } from './nodes/paragraph'
 import { text } from './nodes/text'
 import { tables } from './nodes/tables'
 
-export const marks = { code, em, link, strong }
+export const marks = { code, em, link, strike, strong }
 
 export const nodes = {
   doc,
