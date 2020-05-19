@@ -56,7 +56,7 @@ describe('date format', () => {
     describe('with moment input', () => {
       it('returns properly formatted string', () => {
         const date = moment(dateString, dateFormat)
-        const result = format(date, 'date', { dateFormat: 'MM YYYY' })
+        const result = parse(date, 'date', { dateFormat: 'MM YYYY' })
         expect(result).toEqual('03 1972')
       })
     })
@@ -64,7 +64,7 @@ describe('date format', () => {
     describe('with date string input', () => {
       it('returns properly formatted string', () => {
         const dateString = '03 02 1972'
-        const result = format(dateString, 'date', { dateFormat: 'MM YYYY' })
+        const result = parse(dateString, 'date', { dateFormat: 'MM YYYY' })
         expect(result).toEqual('03 1972')
       })
     })
