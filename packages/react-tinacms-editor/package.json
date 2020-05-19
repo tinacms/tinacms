@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-editor",
-  "version": "0.5.3",
+  "version": "0.6.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-editor.esm.js",
@@ -45,8 +45,8 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.8.0",
-    "@tinacms/fields": "^0.10.2",
-    "@tinacms/icons": "^0.10.0",
+    "@tinacms/fields": "^0.10.3",
+    "@tinacms/icons": "^0.11.0",
     "@tinacms/react-forms": "0.1.2-alpha.0",
     "@tinacms/styles": "^0.4.2",
     "codemirror": "^5.42.2",

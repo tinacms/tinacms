@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.19.4](https://github.com/tinacms/tinacms/compare/tinacms@0.19.3...tinacms@0.19.4) (2020-05-19)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
 ## [0.19.3](https://github.com/tinacms/tinacms/compare/tinacms@0.19.2...tinacms@0.19.3) (2020-05-12)
 
 **Note:** Version bump only for package tinacms

@@ -58,7 +58,7 @@ export function buildInputRules(schema: Schema) {
     rules.push(strongStarRule(mark))
     rules.push(strongUnderRule(mark))
   }
-  if ((mark = schema.marks.s)) {
+  if ((mark = schema.marks.strike)) {
     rules.push(strikethroughRule(mark))
   }
   if ((mark = schema.marks.em)) {

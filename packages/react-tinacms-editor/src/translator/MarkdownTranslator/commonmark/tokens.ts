@@ -103,7 +103,7 @@ const TOKENS = {
   },
   hardbreak: { node: 'hard_break' },
   em: { mark: 'em' },
-  s: { mark: 's' },
+  strike: { mark: 'strike' },
   strong: { mark: 'strong' },
   link: {
     mark: 'link',
@@ -290,7 +290,7 @@ const MARKS = {
       )
     },
   },
-  s: {
+  strike: {
     open: '~~',
     close: '~~',
     mixable: true,
@@ -332,7 +332,7 @@ export function buildTokensForSchema(schema: Schema): Hash<Token> {
   if (schema.marks.strong) tokens.strong = TOKENS.strong
   if (schema.marks.link) tokens.link = TOKENS.link
   if (schema.marks.code) tokens.code_inline = TOKENS.code_inline
-  if (schema.marks.s) tokens.s = TOKENS.s
+  if (schema.marks.strike) tokens.strike = TOKENS.strike
 
   return tokens
 }
