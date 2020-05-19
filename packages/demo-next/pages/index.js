@@ -60,6 +60,7 @@ const formOptions = {
   label: 'Home Page',
   fields: [
     {
+      label: 'Tags',
       name: 'tags',
       component: 'tags',
     },
