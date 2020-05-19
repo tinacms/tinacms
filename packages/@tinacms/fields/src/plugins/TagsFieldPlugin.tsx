@@ -21,7 +21,7 @@ import { InputProps, BaseTextField } from '../components'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { parse } from './textFormat'
 import styled from 'styled-components'
-import { TrashIcon } from '@tinacms/icons'
+import { CloseIcon } from '@tinacms/icons'
 
 export const TagsField = wrapFieldsWithMeta<
   { placeholder: string },
@@ -70,11 +70,17 @@ const DeleteButton = styled.button`
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 0;
-  margin: 0;
+  padding: 6px;
+  margin: 0 calc(var(--tina-padding-small) * -1) 0 6px;
+  display: flex;
+  align-items: center;
   transition: all 85ms ease-out;
+
   svg {
     transition: all 85ms ease-out;
+    width: 16px;
+    height: auto;
+    fill: var(--tina-color-grey-8);
   }
   &:hover {
     background-color: var(--tina-color-grey-1);
@@ -84,7 +90,7 @@ const DeleteButton = styled.button`
 const TagGrid = styled.span`
   display: flex;
   flex-wrap: wrap;
-  margin: 0 -0.25rem;
+  margin: 4px -4px 0 -4px;
 `
 
 const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
@@ -93,10 +99,10 @@ const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
   }, [tinaForm, field, index])
   return (
     <span {...styleProps}>
-      <DeleteButton onClick={removeItem}>
-        <TrashIcon />
-      </DeleteButton>
       <span>{children}</span>
+      <DeleteButton onClick={removeItem}>
+        <CloseIcon />
+      </DeleteButton>
     </span>
   )
 })`
@@ -104,18 +110,18 @@ const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
   box-shadow: var(--tina-shadow-small);
   background-color: var(--tina-color-grey-0);
   border: 1px solid var(--tina-color-grey-2);
-  display: block;
+  display: flex;
+  align-items: center;
   font-size: var(--tina-font-size-2);
   font-weight: 600;
   letter-spacing: 0.01em;
   line-height: 1.35;
   color: var(--tina-color-grey-8);
   padding: 0 var(--tina-padding-small);
-  display: flex;
-  align-items: center;
-  margin: 0.25rem;
+  margin: 4px;
   text-overflow: ellipsis;
   overflow: hidden;
+
   span {
     max-width: calc(var(--tina-sidebar-width) - 50px);
     flex-shrink: 1;
