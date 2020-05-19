@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-json",
-  "version": "0.3.15",
+  "version": "0.3.16",
   "license": "Apache-2.0",
   "author": "Nolan Phillips",
   "main": "dist/index.js",
@@ -28,6 +28,6 @@
     "tinacms": ">=0.11"
   },
   "devDependencies": {
-    "tinacms": "^0.19.3"
+    "tinacms": "^0.19.4"
   }
 }

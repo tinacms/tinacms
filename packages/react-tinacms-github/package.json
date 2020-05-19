@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.3.1",
+  "version": "0.3.2",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -23,19 +23,19 @@
     "tinacms": ">=0.19"
   },
   "devDependencies": {
-    "@tinacms/fields": "^0.10.2",
+    "@tinacms/fields": "^0.10.3",
     "@tinacms/forms": "^0.4.2",
-    "@tinacms/icons": "^0.10.0",
-    "@tinacms/react-forms": "^0.1.4",
+    "@tinacms/icons": "^0.11.0",
+    "@tinacms/react-forms": "^0.1.5",
     "@tinacms/styles": "^0.4.2",
     "@types/js-cookie": "^2.2.5",
     "final-form": "^4.18.7",
     "styled-components": ">=4.1",
-    "tinacms": "^0.19.3"
+    "tinacms": "^0.19.4"
   },
   "dependencies": {
     "btoa": "^1.2.1",
     "js-cookie": "^2.2.1",
-    "next-tinacms-markdown": "^0.2.15"
+    "next-tinacms-markdown": "^0.2.16"
   }
 }

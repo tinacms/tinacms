@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-forms",
-  "version": "0.1.4",
+  "version": "0.1.5",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -26,9 +26,9 @@
   },
   "devDependencies": {
     "@tinacms/forms": "^0.4.2",
-    "@tinacms/icons": "^0.10.0",
+    "@tinacms/icons": "^0.11.0",
     "@tinacms/react-core": "^0.2.12",
-    "@tinacms/react-modals": "^0.1.4",
+    "@tinacms/react-modals": "^0.1.5",
     "@tinacms/scripts": "^0.1.13",
     "@tinacms/styles": "^0.4.2",
     "@types/react-beautiful-dnd": "^11.0.3"

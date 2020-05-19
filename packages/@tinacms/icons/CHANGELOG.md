@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.11.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.10.0...@tinacms/icons@0.11.0) (2020-05-19)
+
+
+### Features
+
+* add strikethrough icon ([468b30c](https://github.com/tinacms/tinacms/commit/468b30c))
+
+
+
+
+
 # [0.10.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.10.0-alpha.0...@tinacms/icons@0.10.0) (2020-05-04)
 
 **Note:** Version bump only for package @tinacms/icons
