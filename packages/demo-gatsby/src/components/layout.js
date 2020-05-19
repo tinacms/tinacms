@@ -117,6 +117,7 @@ const CreatePostPlugin = createRemarkButton({
           date: new Date(),
           heading_color: "#e6faf8",
           description: "A human friendy summary",
+          thumbnail: "../../assets/profile-pic.jpg",
         })
       }, 1000)
     })
