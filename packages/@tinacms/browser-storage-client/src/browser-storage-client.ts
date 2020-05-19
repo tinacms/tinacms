@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-export class BrowserStorageApi {
+export class BrowserStorageClient {
   data: any = {}
   timeout: number | null = null
   namespace: string
