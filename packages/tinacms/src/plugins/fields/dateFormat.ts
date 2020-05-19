@@ -30,7 +30,8 @@ export const format = (
 ): string => {
   const dateFormat = parseDateFormat(field.dateFormat)
   const timeFormat = parseTimeFormat(field.timeFormat)
-  const combinedFormat = `${dateFormat} ${timeFormat}`
+  const combinedFormat =
+    typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat
 
   if (typeof val === 'string') {
     const date = moment(val)
@@ -48,18 +49,19 @@ export const parse = (
   return format(val, _name, field)
 }
 
-function parseDateFormat(format: string | boolean | undefined) {
+function parseDateFormat(format: string | boolean | undefined): string {
   if (typeof format === 'string') {
     return format
   }
   return DEFAULT_DATE_DISPLAY_FORMAT
 }
 
-function parseTimeFormat(format: string | boolean | undefined) {
+function parseTimeFormat(
+  format: string | boolean | undefined
+): string | undefined {
   if (typeof format === 'string') {
     return format
   } else if (format) {
     return DEFAULT_TIME_DISPLAY_FORMAT
   }
-  return ''
 }
