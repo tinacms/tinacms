@@ -671,6 +671,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "pixelmord",
+      "name": "Andreas Adam",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/224168?v=4",
+      "profile": "https://pixelmord.github.io",
+      "contributions": [
+        "ideas",
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
