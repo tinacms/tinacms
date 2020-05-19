@@ -16,20 +16,9 @@ limitations under the License.
 
 */
 
-import { SchemaMarkPlugin } from '../../types'
-
-/**
- * code
- */
 export const code = {
   parseDOM: [{ tag: 'code' }],
   toDOM() {
     return ['code']
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:mark',
-  name: 'code',
-  mark: code,
-} as SchemaMarkPlugin

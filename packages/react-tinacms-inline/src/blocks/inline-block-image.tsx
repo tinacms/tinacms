@@ -18,12 +18,13 @@ limitations under the License.
 
 import * as React from 'react'
 import { BlockField } from './inline-block-field'
-import { InlineImageProps, ImageUpload } from '../inline-field-image'
+import { InlineImageProps, InlineImageUpload } from '../inline-field-image'
 import { useCMS } from 'tinacms'
 
 export function BlockImage({
   name,
   children,
+  previewSrc,
   parse,
   uploadDir,
 }: InlineImageProps) {
@@ -31,32 +32,42 @@ export function BlockImage({
   return (
     <BlockField name={name}>
       {({ input, status, form }) => {
+        const _previewSrc = previewSrc(form.finalForm.getState().values)
+
+        async function handleUploadImage([file]: File[]) {
+          const directory = uploadDir(form)
+          const [media] = await cms.media.store.persist([
+            {
+              directory,
+              file,
+            },
+          ])
+          if (media) {
+            input.onChange(parse(media.filename))
+          } else {
+            /**
+             * TODO: Handle failure with events
+             * or alerts here?
+             */
+          }
+          return null
+        }
+
         if (status === 'active') {
           return (
-            <ImageUpload
+            <InlineImageUpload
               value={input.value}
-              onDrop={async ([file]: File[]) => {
-                const directory = uploadDir(form)
-                const [media] = await cms.media.store.persist([
-                  {
-                    directory,
-                    file,
-                  },
-                ])
-                if (media) {
-                  input.onChange(parse(media.filename))
-                } else {
-                  // TODO Handle failure
-                }
-                return null
-              }}
+              previewSrc={_previewSrc}
+              onDrop={handleUploadImage}
               {...input}
             >
-              {children}
-            </ImageUpload>
+              {children &&
+                ((props: any) =>
+                  children({ previewSrc: _previewSrc }, ...props))}
+            </InlineImageUpload>
           )
         }
-        return children ? children : <img src={input.value} />
+        return children ? children() : <img src={input.value} />
       }}
     </BlockField>
   )
