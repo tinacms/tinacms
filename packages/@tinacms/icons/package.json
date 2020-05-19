@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/icons",
-  "version": "0.10.0",
+  "version": "0.11.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",

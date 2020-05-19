@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.3...react-tinacms-editor@0.6.0) (2020-05-19)
+
+
+### Features
+
+* add strikethrough icon ([468b30c](https://github.com/tinacms/tinacms/commit/468b30c))
+* support for strike in wysiwym ([c34b85b](https://github.com/tinacms/tinacms/commit/c34b85b))
+
+
+
+
+
 ## [0.5.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2...react-tinacms-editor@0.5.3) (2020-05-12)
 
 **Note:** Version bump only for package react-tinacms-editor
