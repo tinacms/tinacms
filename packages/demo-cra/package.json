@@ -3,6 +3,7 @@
   "version": "1.0.31",
   "private": true,
   "dependencies": {
+    "@now/node": "^1.6.1",
     "tinacms": "^0.19.4"
   },
   "devDependencies": {
