@@ -40,7 +40,9 @@ export const format = (
   return val.format(combinedFormat)
 }
 
-// Format datepicker value for export
+/**
+ * @deprecated use "format" instead
+ */
 export const parse = (
   val: moment.Moment | string,
   _name: string,
