@@ -46,7 +46,7 @@ export const TagsField = wrapFieldsWithMeta<
         onChange={event => setValue(event.target.value)}
         placeholder={field.placeholder}
         onKeyPress={event => {
-          if (event.key === ' ') {
+          if (event.key === ' ' || event.key === 'Enter') {
             event.preventDefault()
             addTag(value)
             return
