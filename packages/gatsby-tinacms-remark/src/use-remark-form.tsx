@@ -92,7 +92,7 @@ export function useRemarkForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, form] = useGitForm(
-    valuesOnDisk,
+    node.fileRelativePath,
     {
       ...formOptions,
       label,
