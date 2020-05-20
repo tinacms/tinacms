@@ -55,7 +55,6 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 | npm run build                      | Build all packages.                           |
 | npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
-| lerna run watch --scope \<package> | Build a the \<package> in watch mode.         |
 
 ### Testing With External Projects
 
