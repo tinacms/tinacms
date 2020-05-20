@@ -75,20 +75,7 @@ export function useJsonForm(
 
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
 
-  function loadInitialValues() {
-    return cms.api.git
-      .show(id) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        const file = parseContent(git.content)
-
-        return {
-          fileRelativePath: node?.fileRelativePath,
-          ...file,
-        }
-      })
-  }
-
-  function parseContent(content: string) {
+  function fromJsonString(content: string) {
     return {
       rawJson: JSON.parse(content),
     }
@@ -97,13 +84,14 @@ export function useJsonForm(
   const jsonFormOptions = {
     label,
     fields,
-    loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
-
     actions,
-    ...formOptions,
   }
 
-  const watchValuesForChange = { values: valuesOnDisk, label, fields }
+  const watchValuesForChange = {
+    label,
+    fields,
+    values: valuesOnDisk,
+  }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   return useGitForm(
@@ -111,18 +99,34 @@ export function useJsonForm(
     {
       ...jsonFormOptions,
       format: toJsonString,
+      parse: fromJsonString,
     },
     watchValuesForChange
   )
 }
 
 function useGitForm(node: any, options: any, watch: any): [any, Form] {
-  const { format, ...formOptions } = options
+  // NODE_ENV will never change at runtime
+  const TINA_DISABLED = process.env.NODE_ENV === 'production'
+
+  const { format, parse, ...formOptions } = options
   const cms = useCMS()
+
+  function loadInitialValues() {
+    return cms.api.git
+      .show(node.fileRelativePath) // Load the contents of this file at HEAD
+      .then((git: any) => {
+        const file = parse(git.content)
+
+        return { fileRelativePath: node?.fileRelativePath, ...file }
+      })
+  }
+
   const [values, form] = useForm(
     {
       ...formOptions,
       id: node.fileRelativePath,
+      loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
       onSubmit(data: any) {
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],

@@ -43,9 +43,6 @@ export function useRemarkForm(
 ): [RemarkNode | null | undefined, Form | null | undefined] {
   const node = usePersistentValue(_node)
 
-  // NODE_ENV will never change at runtime
-  const TINA_DISABLED = process.env.NODE_ENV === 'production'
-
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks.
@@ -106,26 +103,14 @@ export function useRemarkForm(
     return fields
   }, [formOptions.fields])
 
-  function loadInitialValues() {
-    return cms.api.git
-      .show(id) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        const file = parseContent(git.content)
-
-        return { fileRelativePath: node?.fileRelativePath, ...file }
-      })
-  }
-
-  function parseContent(content: string) {
+  function fromMarkdownString(content: string) {
     const { content: rawMarkdownBody, data: rawFrontmatter } = matter(content)
     return { rawFrontmatter, rawMarkdownBody }
   }
 
   const remarkFormOptions = {
     label,
-    loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
     fields,
-
     actions,
   }
 
@@ -141,18 +126,34 @@ export function useRemarkForm(
     {
       ...remarkFormOptions,
       format: toMarkdownString,
+      parse: fromMarkdownString,
     },
     watchValuesForChange
   )
 }
 
 function useGitForm(node: any, options: any, watch: any): [any, Form] {
-  const { format, ...formOptions } = options
+  // NODE_ENV will never change at runtime
+  const TINA_DISABLED = process.env.NODE_ENV === 'production'
+
+  const { format, parse, ...formOptions } = options
   const cms = useCMS()
+
+  function loadInitialValues() {
+    return cms.api.git
+      .show(node.fileRelativePath) // Load the contents of this file at HEAD
+      .then((git: any) => {
+        const file = parse(git.content)
+
+        return { fileRelativePath: node?.fileRelativePath, ...file }
+      })
+  }
+
   const [values, form] = useForm(
     {
       ...formOptions,
       id: node.fileRelativePath,
+      loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
       onSubmit(data: any) {
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],
