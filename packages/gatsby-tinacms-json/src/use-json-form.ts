@@ -112,6 +112,7 @@ export function useJsonForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   return useGitForm(
+    node,
     {
       ...jsonFormOptions,
       format: toJsonString,
@@ -120,7 +121,7 @@ export function useJsonForm(
   )
 }
 
-function useGitForm(options: any, watch: any): [any, Form] {
+function useGitForm(node: any, options: any, watch: any): [any, Form] {
   const { format, ...formOptions } = options
   const cms = useCMS()
   const [values, form] = useForm(
