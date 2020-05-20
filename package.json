@@ -11,7 +11,6 @@
     "nuke": "./scripts/nuke.sh",
     "hard-reset": "npm run nuke && npm run bs && npm run build",
     "test": "lerna run test --reject-cycles",
-    "watch": "lerna run watch --parallel --reject-cycles",
     "docs": "lerna run docs"
   },
   "devDependencies": {
