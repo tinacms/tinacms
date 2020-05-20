@@ -68,7 +68,6 @@ export function useJsonForm(
       // Common Props
       fileRelativePath: node.fileRelativePath,
       // Json Specific
-      jsonNode: node,
       rawJson: JSON.parse(node.rawJson),
     }),
     [node.rawJson]
@@ -76,16 +75,16 @@ export function useJsonForm(
 
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
 
-  // TODO: This may not be necessary.
-  fields.push({ name: 'jsonNode', component: null })
-
   function loadInitialValues() {
     return cms.api.git
       .show(id) // Load the contents of this file at HEAD
       .then((git: any) => {
         // Parse the JSON into a JsonForm data structure and store it in state.
         const rawJson = JSON.parse(git.content)
-        return { jsonNode: node, rawJson }
+        return {
+          fileRelativePath: id,
+          rawJson,
+        }
       })
   }
 
@@ -96,7 +95,7 @@ export function useJsonForm(
     loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
     onSubmit(data: any) {
       return cms.api.git.onSubmit!({
-        files: [data.jsonNode.fileRelativePath],
+        files: [data.fileRelativePath],
         message: data.__commit_message || 'Tina commit',
         name: data.__commit_name,
         email: data.__commit_email,
@@ -116,10 +115,9 @@ export function useJsonForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = useCallback(formState => {
-    const { rawJson, jsonNode } = formState.values
     cms.api.git.onChange!({
-      fileRelativePath: jsonNode.fileRelativePath,
-      content: JSON.stringify(rawJson, null, 2),
+      fileRelativePath: formState.values.fileRelativePath,
+      content: toJsonString(formState.values),
     })
   }, [])
 
@@ -127,6 +125,10 @@ export function useJsonForm(
   useWatchFormValues(form, writeToDisk)
 
   return [node, form as Form]
+}
+
+function toJsonString(values: JsonNode) {
+  return JSON.stringify(values.rawJson, null, 2)
 }
 
 /**
