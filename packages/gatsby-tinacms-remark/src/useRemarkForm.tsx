@@ -144,18 +144,16 @@ export function useRemarkForm(
   }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useGitForm(
+  return useGitForm(
     {
       ...remarkFormOptions,
       format: toMarkdownString,
     },
     watchValuesForChange
   )
-
-  return [node, form]
 }
 
-function useGitForm(options: any, watch: any) {
+function useGitForm(options: any, watch: any): [any, Form] {
   const cms = useCMS()
   const [values, form] = useForm(options, watch)
 
