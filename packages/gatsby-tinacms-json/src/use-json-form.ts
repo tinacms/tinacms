@@ -65,10 +65,13 @@ export function useJsonForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
+      // Common Props
+      fileRelativePath: node.fileRelativePath,
+      // Json Specific
       jsonNode: node,
       rawJson: JSON.parse(node.rawJson),
     }),
-    [node]
+    [node.rawJson]
   )
 
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
