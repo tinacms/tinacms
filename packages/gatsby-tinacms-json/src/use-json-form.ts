@@ -55,6 +55,7 @@ export function useJsonForm(
   const cms = useCMS()
   const label = formOptions.label || node.fileRelativePath
   const id = node.fileRelativePath
+  const actions = formOptions.actions
 
   /**
    * The state of the JsonForm, generated from the contents of the
@@ -101,6 +102,7 @@ export function useJsonForm(
     reset() {
       return cms.api.git.reset({ files: [id] })
     },
+    actions,
     ...formOptions,
   }
 
