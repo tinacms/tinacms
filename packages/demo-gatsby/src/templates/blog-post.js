@@ -62,11 +62,6 @@ function BlogPostTemplate(props) {
 
   const [post, form] = useRemarkForm(props.data.markdownRemark, BlogPostForm)
   usePlugin(form)
-  React.useEffect(() => {
-    import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
-      cms.fields.add(MarkdownFieldPlugin)
-    })
-  }, [])
 
   return (
     <ModalProvider>

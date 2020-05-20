@@ -37,6 +37,7 @@ import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
+import { MarkdownFieldPlaceholder } from './plugins/fields/markdown'
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
@@ -71,6 +72,7 @@ export class TinaCMS extends CMS {
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
+    this.fields.add(MarkdownFieldPlaceholder)
   }
 
   get forms(): PluginType<Form> {
