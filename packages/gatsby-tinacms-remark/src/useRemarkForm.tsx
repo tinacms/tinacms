@@ -110,12 +110,15 @@ export function useRemarkForm(
     return cms.api.git
       .show(id) // Load the contents of this file at HEAD
       .then((git: any) => {
-        // Parse the content into the RemarkForm data structure and store it in state.
-        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
-          git.content
-        )
-        return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
+        const file = parseContent(git.content)
+
+        return { fileRelativePath: node?.fileRelativePath, ...file }
       })
+  }
+
+  function parseContent(content: string) {
+    const { content: rawMarkdownBody, data: rawFrontmatter } = matter(content)
+    return { rawFrontmatter, rawMarkdownBody }
   }
 
   const remarkFormOptions = {
