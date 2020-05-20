@@ -99,7 +99,7 @@ export function useRemarkForm(
   }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  return useGitForm(
+  const [, form] = useGitForm(
     node,
     {
       ...formOptions,
@@ -110,6 +110,8 @@ export function useRemarkForm(
     },
     watchValuesForChange
   )
+
+  return [node, form]
 }
 
 function fromMarkdownString(content: string) {
