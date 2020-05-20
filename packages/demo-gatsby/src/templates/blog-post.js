@@ -109,11 +109,20 @@ function BlogPostTemplate(props) {
 
                       return postDirectory
                     }}
+                    previewSrc={formValues => {
+                      const preview =
+                        formValues.frontmatter.thumbnail.childImageSharp.fluid
+                          .src
+                      return preview
+                    }}
                   >
-                    <Img
-                      fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
-                      alt="Gatsby can't find me"
-                    />
+                    {props => (
+                      <Img
+                        fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                        alt="Gatsby can't find me"
+                        {...props}
+                      />
+                    )}
                   </InlineImageField>
                   {/* <Img
                     fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
@@ -336,32 +345,34 @@ const BlogPostForm = {
       colors: ["#ff0000", "#ffff00", "#00ff00", "#0000ff"],
       widget: "sketch",
     },
-    // {
-    //   name: "frontmatter.thumbnail",
-    //   label: "Thumbnail",
-    //   component: "image",
-    //   // Generate the frontmatter value based on the filename
-    //   parse: filename => (filename ? `./${filename}` : null),
+    {
+      name: "frontmatter.thumbnail",
+      label: "Thumbnail",
+      component: "image",
+      // Generate the frontmatter value based on the filename
+      parse: filename => (filename ? `./${filename}` : null),
 
-    //   // Decide the file upload directory for the post
-    //   uploadDir: blogPost => {
-    //     let postPathParts = blogPost.fileRelativePath.split("/")
+      // Decide the file upload directory for the post
+      uploadDir: blogPost => {
+        let postPathParts = blogPost.fileRelativePath.split("/")
 
-    //     let postDirectory = postPathParts
-    //       .splice(0, postPathParts.length - 1)
-    //       .join("/")
+        let postDirectory = postPathParts
+          .splice(0, postPathParts.length - 1)
+          .join("/")
 
-    //     return postDirectory
-    //   },
+        return postDirectory
+      },
 
-    //   // Generate the src attribute for the preview image.
-    //   previewSrc: (formValues, { input }) => {
-    //     let path = input.name.replace("rawFrontmatter", "frontmatter")
-    //     let gastbyImageNode = get(formValues, path)
-    //     if (!gastbyImageNode) return ""
-    //     return gastbyImageNode.childImageSharp.fluid.src
-    //   },
-    // },
+      // Generate the src attribute for the preview image.
+      previewSrc: (formValues, { input }) => {
+        let path = input.name.replace("rawFrontmatter", "frontmatter")
+        console.log({ path })
+        let gastbyImageNode = get(formValues, path)
+        console.log({ gastbyImageNode })
+        if (!gastbyImageNode) return ""
+        return gastbyImageNode.childImageSharp.fluid.src
+      },
+    },
   ],
 }
 
