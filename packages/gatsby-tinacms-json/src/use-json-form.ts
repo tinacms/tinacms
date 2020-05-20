@@ -89,21 +89,10 @@ export function useJsonForm(
   }
 
   const jsonFormOptions = {
-    id,
     label,
     fields,
     loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
-    onSubmit(data: any) {
-      return cms.api.git.onSubmit!({
-        files: [data.fileRelativePath],
-        message: data.__commit_message || 'Tina commit',
-        name: data.__commit_name,
-        email: data.__commit_email,
-      })
-    },
-    reset() {
-      return cms.api.git.reset({ files: [id] })
-    },
+
     actions,
     ...formOptions,
   }
@@ -127,6 +116,18 @@ function useGitForm(node: any, options: any, watch: any): [any, Form] {
   const [values, form] = useForm(
     {
       ...formOptions,
+      id: node.fileRelativePath,
+      onSubmit(data: any) {
+        return cms.api.git.onSubmit!({
+          files: [data.fileRelativePath],
+          message: data.__commit_message || 'Tina commit',
+          name: data.__commit_name,
+          email: data.__commit_email,
+        })
+      },
+      reset() {
+        return cms.api.git.reset({ files: [node.fileRelativePath] })
+      },
     },
     watch
   )
