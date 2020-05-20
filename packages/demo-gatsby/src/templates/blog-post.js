@@ -33,6 +33,7 @@ import {
   InlineBlocks,
   InlineTextareaField,
   InlineImageField,
+  useInlineForm,
 } from "react-tinacms-inline"
 
 import { BLOCKS } from "../components/blog-blocks"
@@ -41,11 +42,14 @@ import { useCMS } from "tinacms"
 const get = require("lodash.get")
 
 function InlineWysiwyg(props) {
+  const { status } = useInlineForm()
   const [{ InlineWysiwyg }, setEditor] = React.useState({})
 
   React.useEffect(() => {
-    import("react-tinacms-editor").then(setEditor)
-  }, [])
+    if (!InlineWysiwyg && status === "active") {
+      import("react-tinacms-editor").then(setEditor)
+    }
+  }, [status])
 
   if (InlineWysiwyg) {
     return <InlineWysiwyg {...props} />
