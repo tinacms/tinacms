@@ -22,7 +22,7 @@ import { DatetimepickerProps } from 'react-datetime'
 const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY'
 const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A'
 
-// Format date for display
+// formats a function from default datetime format to given format
 export const format = (
   val: moment.Moment | string,
   _name: string,
@@ -40,6 +40,7 @@ export const format = (
   return moment.utc(val).format(combinedFormat)
 }
 
+// parses a function from the given format to default datetime format
 export const parse = (
   val: moment.Moment | string,
   _name: string,
@@ -52,9 +53,9 @@ export const parse = (
 
   if (typeof val === 'string') {
     const date = moment.utc(val, combinedFormat)
-    return date.isValid() ? date.toDate() : val
+    return date.isValid() ? date.format() : val
   }
-  return val.toDate()
+  return moment.utc(val).format()
 }
 
 function parseDateFormat(format: string | boolean | undefined): string {
