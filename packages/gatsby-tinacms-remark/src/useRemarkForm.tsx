@@ -16,15 +16,7 @@ limitations under the License.
 
 */
 
-import {
-  FormOptions,
-  Form,
-  GlobalFormPlugin,
-  useCMS,
-  useWatchFormValues,
-  useForm,
-  usePlugins,
-} from 'tinacms'
+import { FormOptions, Form, GlobalFormPlugin, usePlugins } from 'tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -35,6 +27,7 @@ import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
+import { useGitForm } from 'gatsby-tinacms-git'
 const matter = require('gray-matter')
 
 export function useRemarkForm(
@@ -52,12 +45,6 @@ export function useRemarkForm(
   }
 
   validateMarkdownRemark(node)
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const cms = useCMS()
-  const label = formOptions.label || node.frontmatter.title
-  const id = node.fileRelativePath
-  const actions = formOptions.actions
 
   /**
    * The state of the RemarkForm, generated from the contents of the
@@ -103,16 +90,7 @@ export function useRemarkForm(
     return fields
   }, [formOptions.fields])
 
-  function fromMarkdownString(content: string) {
-    const { content: rawMarkdownBody, data: rawFrontmatter } = matter(content)
-    return { rawFrontmatter, rawMarkdownBody }
-  }
-
-  const remarkFormOptions = {
-    label,
-    fields,
-    actions,
-  }
+  const label = formOptions.label || node.frontmatter.title
 
   const watchValuesForChange = {
     label,
@@ -124,7 +102,9 @@ export function useRemarkForm(
   return useGitForm(
     node,
     {
-      ...remarkFormOptions,
+      ...formOptions,
+      label,
+      fields,
       format: toMarkdownString,
       parse: fromMarkdownString,
     },
@@ -132,53 +112,9 @@ export function useRemarkForm(
   )
 }
 
-function useGitForm(node: any, options: any, watch: any): [any, Form] {
-  // NODE_ENV will never change at runtime
-  const TINA_DISABLED = process.env.NODE_ENV === 'production'
-
-  const { format, parse, ...formOptions } = options
-  const cms = useCMS()
-
-  function loadInitialValues() {
-    return cms.api.git
-      .show(node.fileRelativePath) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        const file = parse(git.content)
-
-        return { fileRelativePath: node?.fileRelativePath, ...file }
-      })
-  }
-
-  const [values, form] = useForm(
-    {
-      ...formOptions,
-      id: node.fileRelativePath,
-      loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
-      onSubmit(data: any) {
-        return cms.api.git.onSubmit!({
-          files: [data.fileRelativePath],
-          message: data.__commit_message || 'Tina commit',
-          name: data.__commit_name,
-          email: data.__commit_email,
-        })
-      },
-      reset() {
-        return cms.api.git.reset({ files: [node.fileRelativePath] })
-      },
-    },
-    watch
-  )
-
-  const writeToDisk = React.useCallback(formState => {
-    cms.api.git.onChange!({
-      fileRelativePath: formState.values.fileRelativePath,
-      content: format(formState.values),
-    })
-  }, [])
-
-  useWatchFormValues(form, writeToDisk)
-
-  return [values, form]
+function fromMarkdownString(content: string) {
+  const { content: rawMarkdownBody, data: rawFrontmatter } = matter(content)
+  return { rawFrontmatter, rawMarkdownBody }
 }
 
 /**
