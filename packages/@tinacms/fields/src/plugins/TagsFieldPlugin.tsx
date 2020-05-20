@@ -36,7 +36,7 @@ export const TagsField = wrapFieldsWithMeta<
       form.mutators.insert(field.name, 0, tag)
       setValue('')
     },
-    [form, field]
+    [form, field.name]
   )
   const items = input.value || []
   return (
