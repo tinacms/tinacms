@@ -16,11 +16,31 @@ limitations under the License.
 
 */
 
-import { useCMS, useForm, Form, useWatchFormValues } from 'tinacms'
+import {
+  useCMS,
+  useForm,
+  Form,
+  useWatchFormValues,
+  FormOptions,
+  WatchableFormValue,
+} from 'tinacms'
 import React from 'react'
 
-export function useGitForm(node: any, options: any, watch: any): [any, Form] {
-  // NODE_ENV will never change at runtime
+export interface GitFile {
+  fileRelativePath: string
+}
+
+export interface GitFormOptions<File extends GitFile>
+  extends Partial<FormOptions<File>> {
+  format(file: File): string
+  parse(content: string): File
+}
+
+export function useGitForm<File extends GitFile>(
+  file: File,
+  options: GitFormOptions<File>,
+  watch: WatchableFormValue
+): [File, Form] {
   const TINA_DISABLED = process.env.NODE_ENV === 'production'
 
   const { format, parse, ...formOptions } = options
@@ -28,18 +48,19 @@ export function useGitForm(node: any, options: any, watch: any): [any, Form] {
 
   function loadInitialValues() {
     return cms.api.git
-      .show(node.fileRelativePath) // Load the contents of this file at HEAD
+      .show(file.fileRelativePath) // Load the contents of this file at HEAD
       .then((git: any) => {
         const file = parse(git.content)
 
-        return { fileRelativePath: node?.fileRelativePath, ...file }
+        return { fileRelativePath: file?.fileRelativePath, ...file }
       })
   }
 
   const [values, form] = useForm(
     {
-      ...formOptions,
-      id: node.fileRelativePath,
+      id: file.fileRelativePath,
+      label: formOptions.label || '',
+      fields: formOptions.fields || [],
       loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
       onSubmit(data: any) {
         return cms.api.git.onSubmit!({
@@ -50,16 +71,17 @@ export function useGitForm(node: any, options: any, watch: any): [any, Form] {
         })
       },
       reset() {
-        return cms.api.git.reset({ files: [node.fileRelativePath] })
+        return cms.api.git.reset({ files: [file.fileRelativePath] })
       },
+      ...formOptions,
     },
     watch
   )
 
-  const writeToDisk = React.useCallback(formState => {
+  const writeToDisk = React.useCallback(({ values }) => {
     cms.api.git.onChange!({
-      fileRelativePath: formState.values.fileRelativePath,
-      content: format(formState.values),
+      fileRelativePath: values.fileRelativePath,
+      content: format(values),
     })
   }, [])
 
