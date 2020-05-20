@@ -71,7 +71,7 @@ export function useJsonForm(
   }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  return useGitForm(
+  const [, form] = useGitForm(
     node,
     {
       ...formOptions,
@@ -82,6 +82,7 @@ export function useJsonForm(
     },
     watchValuesForChange
   )
+  return [node, form]
 }
 function fromJsonString(content: string) {
   return {
