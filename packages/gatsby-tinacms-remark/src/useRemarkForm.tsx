@@ -154,13 +154,19 @@ export function useRemarkForm(
 }
 
 function useGitForm(options: any, watch: any): [any, Form] {
+  const { format, ...formOptions } = options
   const cms = useCMS()
-  const [values, form] = useForm(options, watch)
+  const [values, form] = useForm(
+    {
+      ...formOptions,
+    },
+    watch
+  )
 
   const writeToDisk = React.useCallback(formState => {
     cms.api.git.onChange!({
       fileRelativePath: formState.values.fileRelativePath,
-      content: options.format(formState.values),
+      content: format(formState.values),
     })
   }, [])
 
