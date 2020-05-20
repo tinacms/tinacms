@@ -111,18 +111,16 @@ export function useJsonForm(
   const watchValuesForChange = { values: valuesOnDisk, label, fields }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useGitForm(
+  return useGitForm(
     {
       ...jsonFormOptions,
       format: toJsonString,
     },
     watchValuesForChange
   )
-
-  return [node, form as Form]
 }
 
-function useGitForm(options: any, watch: any) {
+function useGitForm(options: any, watch: any): [any, Form] {
   const cms = useCMS()
   const [values, form] = useForm(options, watch)
 
