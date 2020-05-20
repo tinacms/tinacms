@@ -111,7 +111,7 @@ export function useJsonForm(
   const watchValuesForChange = { values: valuesOnDisk, label, fields }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useForm(jsonFormOptions, watchValuesForChange)
+  const [, form] = useGitForm(jsonFormOptions, watchValuesForChange)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = useCallback(formState => {
@@ -125,6 +125,12 @@ export function useJsonForm(
   useWatchFormValues(form, writeToDisk)
 
   return [node, form as Form]
+}
+
+function useGitForm(options: any, watch: any) {
+  const [values, form] = useForm(options, watch)
+
+  return [values, form]
 }
 
 function toJsonString(values: JsonNode) {
