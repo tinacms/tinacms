@@ -49,7 +49,6 @@ export const TagsField = wrapFieldsWithMeta<
           if (event.key === ' ' || event.key === 'Enter') {
             event.preventDefault()
             addTag(value)
-            return
           }
         }}
       />
