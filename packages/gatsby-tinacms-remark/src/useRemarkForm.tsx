@@ -38,10 +38,10 @@ import * as React from 'react'
 const matter = require('gray-matter')
 
 export function useRemarkForm(
-  _markdownRemark: RemarkNode | null | undefined,
+  _node: RemarkNode | null | undefined,
   formOverrrides: Partial<FormOptions<any>> = {}
 ): [RemarkNode | null | undefined, Form | null | undefined] {
-  const markdownRemark = usePersistentValue(_markdownRemark)
+  const node = usePersistentValue(_node)
 
   // NODE_ENV will never change at runtime
   const TINA_DISABLED = process.env.NODE_ENV === 'production'
@@ -50,16 +50,16 @@ export function useRemarkForm(
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks.
    */
-  if (!markdownRemark) {
-    return [markdownRemark, null]
+  if (!node) {
+    return [node, null]
   }
 
-  validateMarkdownRemark(markdownRemark)
+  validateMarkdownRemark(node)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
-  const label = formOverrrides.label || markdownRemark.frontmatter.title
-  const id = markdownRemark.fileRelativePath
+  const label = formOverrrides.label || node.frontmatter.title
+  const id = node.fileRelativePath
   const actions = formOverrrides.actions
 
   /**
@@ -70,12 +70,12 @@ export function useRemarkForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
-      fileRelativePath: markdownRemark.fileRelativePath,
-      frontmatter: markdownRemark.frontmatter,
-      rawMarkdownBody: markdownRemark.rawMarkdownBody,
-      rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
+      fileRelativePath: node.fileRelativePath,
+      frontmatter: node.frontmatter,
+      rawMarkdownBody: node.rawMarkdownBody,
+      rawFrontmatter: JSON.parse(node.rawFrontmatter),
     }),
-    [markdownRemark.rawFrontmatter, markdownRemark.rawMarkdownBody]
+    [node.rawFrontmatter, node.rawMarkdownBody]
   )
 
   /**
@@ -155,7 +155,7 @@ export function useRemarkForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useWatchFormValues(form, writeToDisk)
 
-  return [markdownRemark, form]
+  return [node, form]
 }
 
 /**
