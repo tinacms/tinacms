@@ -54,9 +54,7 @@ export function useRemarkForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
-      // Common Props
       fileRelativePath: node.fileRelativePath,
-      // Remark Specific
       frontmatter: node.frontmatter,
       rawMarkdownBody: node.rawMarkdownBody,
       rawFrontmatter: JSON.parse(node.rawFrontmatter),
@@ -92,15 +90,9 @@ export function useRemarkForm(
 
   const label = formOptions.label || node.frontmatter.title
 
-  const watchValuesForChange = {
-    label,
-    fields,
-    values: valuesOnDisk,
-  }
-
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, form] = useGitForm(
-    node,
+    valuesOnDisk,
     {
       ...formOptions,
       label,
@@ -108,7 +100,11 @@ export function useRemarkForm(
       format: toMarkdownString,
       parse: fromMarkdownString,
     },
-    watchValuesForChange
+    {
+      label,
+      fields,
+      values: valuesOnDisk,
+    }
   )
 
   return [node, form]
