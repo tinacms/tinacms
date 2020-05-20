@@ -1,28 +1,25 @@
 {
   "name": "@tinacms/browser-storage-client",
-  "version": "1.0.3",
-  "description": "",
+  "version": "1.0.4",
+  "description": "A TinaCMS adapter for backing up form data in browser storage",
   "main": "dist/index.js",
-  "author": "",
   "license": "Apache-2.0",
   "files": [
     "dist"
   ],
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom --passWithNoTests",
-    "lint": "tsdx lint"
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "docs": "npx typedoc",
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch"
   },
   "dependencies": {
     "lodash.get": "^4.4.2"
   },
   "devDependencies": {
-    "tinacms": "^0.19.3"
-  },
-  "peerDependencies": {
-    "react": ">=16.8",
-    "tinacms": ">=0.15"
+    "@tinacms/scripts": "^0.1.13",
+    "@tinacms/react-core": "^0.2.12",
+    "@tinacms/forms": "^0.4.2"
   }
 }

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.4](https://github.com/tinacms/tinacms/compare/@tinacms/browser-storage-client@1.0.3...@tinacms/browser-storage-client@1.0.4) (2020-05-19)
+
+**Note:** Version bump only for package @tinacms/browser-storage-client
+
+
+
+
+
 ## [1.0.3](https://github.com/tinacms/tinacms/compare/@tinacms/browser-storage-client@1.0.2...@tinacms/browser-storage-client@1.0.3) (2020-05-12)
 
 **Note:** Version bump only for package @tinacms/browser-storage-client
