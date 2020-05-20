@@ -43,9 +43,6 @@ export function useJsonForm(
   }
   validateJsonNode(node)
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const label = formOptions.label || node.fileRelativePath
-
   /**
    * The state of the JsonForm, generated from the contents of the
    * Json file currently on disk. This state will contain any
@@ -54,25 +51,18 @@ export function useJsonForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
-      // Common Props
       fileRelativePath: node.fileRelativePath,
-      // Json Specific
       rawJson: JSON.parse(node.rawJson),
     }),
     [node.rawJson]
   )
 
+  const label = formOptions.label || node.fileRelativePath
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
-
-  const watchValuesForChange = {
-    label,
-    fields,
-    values: valuesOnDisk,
-  }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, form] = useGitForm(
-    node,
+    valuesOnDisk,
     {
       ...formOptions,
       label,
@@ -80,10 +70,16 @@ export function useJsonForm(
       format: toJsonString,
       parse: fromJsonString,
     },
-    watchValuesForChange
+    {
+      label,
+      fields,
+      values: valuesOnDisk,
+    }
   )
+
   return [node, form]
 }
+
 function fromJsonString(content: string) {
   return {
     rawJson: JSON.parse(content),

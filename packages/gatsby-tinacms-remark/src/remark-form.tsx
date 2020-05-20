@@ -18,7 +18,7 @@ limitations under the License.
 
 import { FormOptions, Form, usePlugin } from 'tinacms'
 import { RemarkNode } from './remark-node'
-import { useRemarkForm } from './useRemarkForm'
+import { useRemarkForm } from './use-remark-form'
 
 interface RemarkFormProps extends Partial<FormOptions<any>> {
   remark: RemarkNode
