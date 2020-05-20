@@ -132,8 +132,5 @@ const Tag = styled(({ tinaForm, field, index, children, ...styleProps }) => {
 export const TagsFieldPlugin = {
   name: 'tags',
   Component: TagsField,
-  validate(value: any, values: any, meta: any, field: any) {
-    if (field.required && !value) return 'Required'
-  },
   parse,
 }
