@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { BoldIcon, ItalicIcon, UnderlineIcon } from '@tinacms/icons'
+import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
 
 import { markControl } from '../../../components/MenuHelpers'
 
@@ -25,7 +25,7 @@ export const Menu = () => (
   <>
     <BoldControl />
     <ItalicControl />
-    <UnderlineControl />
+    <StrikeControl />
   </>
 )
 
@@ -41,8 +41,8 @@ const ItalicControl = markControl({
   tooltip: 'Italic',
 })
 
-const UnderlineControl = markControl({
-  mark: 'underline',
-  Icon: UnderlineIcon,
-  tooltip: 'Underline',
+const StrikeControl = markControl({
+  mark: 'strike',
+  Icon: StrikethroughIcon,
+  tooltip: 'Strike',
 })

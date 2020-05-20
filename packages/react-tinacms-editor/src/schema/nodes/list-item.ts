@@ -16,11 +16,6 @@ limitations under the License.
 
 */
 
-import { SchemaNodePlugin } from '../../types'
-
-/**
- * list_item
- */
 export const list_item = {
   content: 'paragraph block*',
   defining: true,
@@ -29,9 +24,3 @@ export const list_item = {
     return ['li', 0]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'list_item',
-  node: list_item,
-} as SchemaNodePlugin

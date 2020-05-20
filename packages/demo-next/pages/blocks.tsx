@@ -36,7 +36,7 @@ import {
  * This is an example page that uses Blocks from Json
  */
 export default function BlocksExample({ jsonFile }) {
-  const [, form] = useJsonForm(jsonFile)
+  const [data, form] = useJsonForm(jsonFile)
 
   return (
     <ModalProvider>
@@ -47,9 +47,12 @@ export default function BlocksExample({ jsonFile }) {
           <InlineTextField name="title" />
           <InlineImageField
             name="hero_image"
+            previewSrc={formValues => formValues.hero_image}
             parse={filename => `/images/${filename}`}
             uploadDir={() => '/public/images/'}
-          />
+          >
+            {props => <ChildImage src={data.hero_image} {...props} />}
+          </InlineImageField>
         </h1>
         <Wrap>
           <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
@@ -57,6 +60,10 @@ export default function BlocksExample({ jsonFile }) {
       </InlineForm>
     </ModalProvider>
   )
+}
+
+function ChildImage(props) {
+  return <img src={props.previewSrc || props.src} />
 }
 
 /**
@@ -116,11 +123,12 @@ function ImageBlock({ index, data }) {
     <BlocksControls index={index}>
       <BlockImage
         name="src"
+        previewSrc={formValues => {
+          return formValues.blocks[index].src
+        }}
         parse={filename => `/images/${filename}`}
         uploadDir={() => '/public/images/'}
-      >
-        <img src={data.src} alt={data.alt} />
-      </BlockImage>
+      />
     </BlocksControls>
   )
 }

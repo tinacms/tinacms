@@ -24,6 +24,7 @@ import { InputFocusWrapper } from './styles'
 
 export interface InlineImageProps {
   name: string
+  previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
   children?: any
@@ -31,6 +32,7 @@ export interface InlineImageProps {
 
 export function InlineImageField({
   name,
+  previewSrc,
   uploadDir,
   parse,
   children,
@@ -40,46 +42,63 @@ export function InlineImageField({
   return (
     <InlineField name={name}>
       {({ input, status, form }) => {
+        const _previewSrc = previewSrc(form.finalForm.getState().values)
+
+        async function handleUploadImage([file]: File[]) {
+          const directory = uploadDir(form)
+          const [media] = await cms.media.store.persist([
+            {
+              directory,
+              file,
+            },
+          ])
+          if (media) {
+            input.onChange(parse(media.filename))
+          } else {
+            /**
+             * TODO: Handle failure with events
+             * or alerts here?
+             */
+          }
+          return null
+        }
+
         if (status === 'active') {
           return (
             <InputFocusWrapper>
-              <ImageUpload
+              <InlineImageUpload
                 value={input.value}
-                onDrop={async ([file]: File[]) => {
-                  const directory = uploadDir(form)
-                  const [media] = await cms.media.store.persist([
-                    {
-                      directory,
-                      file,
-                    },
-                  ])
-                  if (media) {
-                    input.onChange(parse(media.filename))
-                  } else {
-                    // TODO Handle failure
-                  }
-                  return null
-                }}
+                previewSrc={_previewSrc}
+                onDrop={handleUploadImage}
                 {...input}
               >
-                {children}
-              </ImageUpload>
+                {/** If children, pass previewSrc to children */}
+                {children &&
+                  ((props: any) =>
+                    children({ previewSrc: _previewSrc }, ...props))}
+              </InlineImageUpload>
             </InputFocusWrapper>
           )
         }
-        return children ? children : <img src={input.value} />
+        return children ? children() : <img src={input.value} />
       }}
     </InlineField>
   )
 }
 
-interface ImageUploadProps {
+interface InlineImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   value?: string
   children?: any
+  previewSrc?: string
 }
 
-export const ImageUpload = ({ onDrop, value, children }: ImageUploadProps) => {
+export function InlineImageUpload({
+  onDrop,
+  value,
+  previewSrc,
+  children,
+}: InlineImageUploadProps) {
   const {
     getRootProps,
     getInputProps,
@@ -88,18 +107,23 @@ export const ImageUpload = ({ onDrop, value, children }: ImageUploadProps) => {
     isDragReject,
   } = useDropzone({ accept: 'image/*', onDrop })
 
+  if (!value) return <ImagePlaceholder />
+
   return (
     <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
       <input {...getInputProps()} />
-      {value ? (
-        <div>{children ? children : <img src={value} />}</div>
-      ) : (
-        <div>
-          Drag 'n' drop some files here,
-          <br />
-          or click to select files
-        </div>
-      )}
+      <div>{children ? children(previewSrc) : <img src={previewSrc} />}</div>
+    </div>
+  )
+}
+
+function ImagePlaceholder() {
+  // TODO: style this component
+  return (
+    <div>
+      Drag 'n' drop some files here,
+      <br />
+      or click to select files
     </div>
   )
 }

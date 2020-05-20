@@ -16,8 +16,6 @@ limitations under the License.
 
 */
 
-import { SchemaNodePlugin } from '../../types'
-
 export const blockquote = {
   content: 'block+',
   group: 'block',
@@ -27,9 +25,3 @@ export const blockquote = {
     return ['blockquote', 0]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'blockquote',
-  node: blockquote,
-} as SchemaNodePlugin

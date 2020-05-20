@@ -16,26 +16,18 @@ limitations under the License.
 
 */
 
-export const strong = {
+/**
+ * strikethrough
+ */
+export const strike = {
   parseDOM: [
-    { tag: 'strong' },
-    // This works around a Google Docs misbehavior where
-    // pasted content will be inexplicably wrapped in `<b>`
-    // tags with a font-weight normal.
+    { tag: 'strike' },
+    { tag: 's' },
+    { tag: 'del' },
     {
-      tag: 'b',
-      getAttrs: (node: HTMLElement) => {
-        return node.style.fontWeight != 'normal' && null
-      },
-    },
-    {
-      style: 'font-weight',
-      getAttrs: (value: string) => {
-        return /^(bold(er)?|[5-9]\d{2,})$/.test(value) && null
-      },
+      style: 'text-decoration',
+      getAttrs: (value: string) => value === 'line-through' && null,
     },
   ],
-  toDOM() {
-    return ['strong']
-  },
+  toDOM: () => ['s', 0],
 }
