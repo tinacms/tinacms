@@ -62,7 +62,7 @@ export function useJsonForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, form] = useGitForm(
-    node.fileRelativePath,
+    node,
     {
       ...formOptions,
       label,
