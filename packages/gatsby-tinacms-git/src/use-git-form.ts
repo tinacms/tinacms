@@ -26,21 +26,21 @@ import {
 } from 'tinacms'
 import React from 'react'
 
-export interface GitFile {
+export interface GitNode {
   fileRelativePath: string
 }
 
-export interface GitFormOptions<File extends GitFile>
+export interface GitFormOptions<File extends GitNode>
   extends Partial<FormOptions<File>> {
   format(file: File): string
   parse(content: string): File
 }
 
-export function useGitForm<File extends GitFile>(
-  fileRelativePath: string,
-  options: GitFormOptions<File>,
+export function useGitForm<N extends GitNode>(
+  node: N,
+  options: GitFormOptions<N>,
   watch: WatchableFormValue
-): [File, Form] {
+): [N, Form] {
   const TINA_DISABLED = process.env.NODE_ENV === 'production'
 
   const { format, parse, ...formOptions } = options
@@ -48,11 +48,11 @@ export function useGitForm<File extends GitFile>(
 
   function loadInitialValues() {
     return cms.api.git
-      .show(fileRelativePath) // Load the contents of this file at HEAD
+      .show(node.fileRelativePath) // Load the contents of this file at HEAD
       .then((git: any) => {
         const file = parse(git.content)
 
-        return { fileRelativePath: file?.fileRelativePath, ...file }
+        return { ...node, ...file }
       })
   }
 
@@ -70,10 +70,10 @@ export function useGitForm<File extends GitFile>(
         })
       },
       reset() {
-        return cms.api.git.reset({ files: [fileRelativePath] })
+        return cms.api.git.reset({ files: [node.fileRelativePath] })
       },
       ...formOptions,
-      id: fileRelativePath,
+      id: node.fileRelativePath,
     },
     watch
   )
