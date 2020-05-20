@@ -37,7 +37,7 @@ export interface GitFormOptions<File extends GitFile>
 }
 
 export function useGitForm<File extends GitFile>(
-  file: File,
+  fileRelativePath: string,
   options: GitFormOptions<File>,
   watch: WatchableFormValue
 ): [File, Form] {
@@ -48,7 +48,7 @@ export function useGitForm<File extends GitFile>(
 
   function loadInitialValues() {
     return cms.api.git
-      .show(file.fileRelativePath) // Load the contents of this file at HEAD
+      .show(fileRelativePath) // Load the contents of this file at HEAD
       .then((git: any) => {
         const file = parse(git.content)
 
@@ -58,7 +58,6 @@ export function useGitForm<File extends GitFile>(
 
   const [values, form] = useForm(
     {
-      id: file.fileRelativePath,
       label: formOptions.label || '',
       fields: formOptions.fields || [],
       loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
@@ -71,9 +70,10 @@ export function useGitForm<File extends GitFile>(
         })
       },
       reset() {
-        return cms.api.git.reset({ files: [file.fileRelativePath] })
+        return cms.api.git.reset({ files: [fileRelativePath] })
       },
       ...formOptions,
+      id: fileRelativePath,
     },
     watch
   )
