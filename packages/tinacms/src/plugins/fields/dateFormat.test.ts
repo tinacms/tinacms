@@ -50,22 +50,36 @@ describe('date format', () => {
   })
 
   describe('parse', () => {
-    const dateString = '03 02 1972'
+    const dateString = '07 02 1972'
     const dateFormat = 'MM DD YYYY'
 
     describe('with moment input', () => {
-      it('returns properly formatted string', () => {
+      it('returns correct date', () => {
         const date = moment(dateString, dateFormat)
-        const result = parse(date, 'date', { dateFormat: 'MM YYYY' })
-        expect(result).toEqual('03 1972')
+        const result = parse(date, 'date', { dateFormat: 'MM YYYY' }) as Date
+
+        console.log('mmm ' + result)
+        console.log('month: ' + result.getMonth())
+        expect(result.getMonth()).toEqual(6)
+        expect(result.getFullYear()).toEqual(1972)
       })
     })
 
     describe('with date string input', () => {
-      it('returns properly formatted string', () => {
-        const dateString = '03 02 1972'
-        const result = parse(dateString, 'date', { dateFormat: 'MM YYYY' })
-        expect(result).toEqual('03 1972')
+      it('returns correct date', () => {
+        const result = parse('07/02/1992', 'date', {
+          dateFormat: 'MM/DD/YYYY', // should match date
+        }) as Date
+
+        expect(result.getMonth()).toEqual(6)
+        expect(result.getFullYear()).toEqual(1992)
+      })
+    })
+
+    describe('with non-date string input', () => {
+      it('returns input string', () => {
+        const result = parse('hello!', 'date', { dateFormat: 'MM YYYY' })
+        expect(result).toEqual('hello!')
       })
     })
   })
