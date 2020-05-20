@@ -34,10 +34,10 @@ interface JsonNode {
 }
 
 export function useJsonForm(
-  _jsonNode: JsonNode | null,
+  _node: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}
 ): [JsonNode | null, Form | null] {
-  const jsonNode = usePersistentValue(_jsonNode)
+  const node = usePersistentValue(_node)
 
   // NODE_ENV will never change at runtime.
   const TINA_DISABLED = process.env.NODE_ENV === 'production'
@@ -46,15 +46,15 @@ export function useJsonForm(
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks.
    */
-  if (!jsonNode) {
-    return [jsonNode, null]
+  if (!node) {
+    return [node, null]
   }
-  validateJsonNode(jsonNode)
+  validateJsonNode(node)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
-  const label = formOptions.label || jsonNode.fileRelativePath
-  const id = jsonNode.fileRelativePath
+  const label = formOptions.label || node.fileRelativePath
+  const id = node.fileRelativePath
 
   /**
    * The state of the JsonForm, generated from the contents of the
@@ -64,10 +64,10 @@ export function useJsonForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
-      jsonNode: jsonNode,
-      rawJson: JSON.parse(jsonNode.rawJson),
+      jsonNode: node,
+      rawJson: JSON.parse(node.rawJson),
     }),
-    [jsonNode]
+    [node]
   )
 
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
@@ -81,7 +81,7 @@ export function useJsonForm(
       .then((git: any) => {
         // Parse the JSON into a JsonForm data structure and store it in state.
         const rawJson = JSON.parse(git.content)
-        return { jsonNode, rawJson }
+        return { jsonNode: node, rawJson }
       })
   }
 
@@ -121,7 +121,7 @@ export function useJsonForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   useWatchFormValues(form, writeToDisk)
 
-  return [jsonNode, form as Form]
+  return [node, form as Form]
 }
 
 /**
