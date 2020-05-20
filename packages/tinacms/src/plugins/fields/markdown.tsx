@@ -17,6 +17,7 @@ limitations under the License.
 */
 import React from 'react'
 import { FieldMeta } from '@tinacms/fields'
+import styled from 'styled-components'
 
 export const MarkdownFieldPlaceholder = {
   __type: 'field',
@@ -24,14 +25,25 @@ export const MarkdownFieldPlaceholder = {
   Component: MarkdownPlaceholder,
 }
 
+const PlaceholderParagraph = styled.p`
+  white-space: normal;
+  font-size: var(--tina-font-size-2);
+  margin: 8px 0 0 0;
+
+  a {
+    color: var(--tina-color-primary);
+    text-decoration: underline;
+  }
+`
+
 function MarkdownPlaceholder(props: any) {
   return (
     <FieldMeta name={props.input.name} label="Deprecated: Markdown Field">
-      <p>
+      <PlaceholderParagraph>
         In order to help improve bundle sizes the Markdown Field has been
         removed from the set of default fields.
-      </p>
-      <p>
+      </PlaceholderParagraph>
+      <PlaceholderParagraph>
         See the docs to learn how to{' '}
         <a
           // TODO: Add actual link
@@ -42,8 +54,8 @@ function MarkdownPlaceholder(props: any) {
           add the Markdown plugin
         </a>{' '}
         to your CMS.
-      </p>
-      <p>
+      </PlaceholderParagraph>
+      <PlaceholderParagraph>
         Visit the{' '}
         <a
           href="https://github.com/tinacms/tinacms/pull/1134"
@@ -53,7 +65,7 @@ function MarkdownPlaceholder(props: any) {
           Pull Request
         </a>{' '}
         to learn more about why this change was made.
-      </p>
+      </PlaceholderParagraph>
     </FieldMeta>
   )
 }
