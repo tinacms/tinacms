@@ -144,7 +144,7 @@ export function useRemarkForm(
   }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useForm(remarkFormOptions, watchValuesForChange)
+  const [, form] = useGitForm(remarkFormOptions, watchValuesForChange)
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const writeToDisk = React.useCallback(formState => {
@@ -158,6 +158,12 @@ export function useRemarkForm(
   useWatchFormValues(form, writeToDisk)
 
   return [node, form]
+}
+
+function useGitForm(options: any, watch: any) {
+  const [values, form] = useForm(options, watch)
+
+  return [values, form]
 }
 
 /**
