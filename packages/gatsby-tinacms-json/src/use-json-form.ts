@@ -111,25 +111,29 @@ export function useJsonForm(
   const watchValuesForChange = { values: valuesOnDisk, label, fields }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useGitForm(jsonFormOptions, watchValuesForChange)
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const writeToDisk = useCallback(formState => {
-    cms.api.git.onChange!({
-      fileRelativePath: formState.values.fileRelativePath,
-      content: toJsonString(formState.values),
-    })
-  }, [])
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
+  const [, form] = useGitForm(
+    {
+      ...jsonFormOptions,
+      format: toJsonString,
+    },
+    watchValuesForChange
+  )
 
   return [node, form as Form]
 }
 
 function useGitForm(options: any, watch: any) {
+  const cms = useCMS()
   const [values, form] = useForm(options, watch)
 
+  const writeToDisk = React.useCallback(formState => {
+    cms.api.git.onChange!({
+      fileRelativePath: formState.values.fileRelativePath,
+      content: options.format(formState.values),
+    })
+  }, [])
+
+  useWatchFormValues(form, writeToDisk)
   return [values, form]
 }
 

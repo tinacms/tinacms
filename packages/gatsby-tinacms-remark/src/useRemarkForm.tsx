@@ -144,24 +144,29 @@ export function useRemarkForm(
   }
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useGitForm(remarkFormOptions, watchValuesForChange)
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const writeToDisk = React.useCallback(formState => {
-    cms.api.git.onChange!({
-      fileRelativePath: formState.values.fileRelativePath,
-      content: toMarkdownString(formState.values),
-    })
-  }, [])
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
+  const [, form] = useGitForm(
+    {
+      ...remarkFormOptions,
+      format: toMarkdownString,
+    },
+    watchValuesForChange
+  )
 
   return [node, form]
 }
 
 function useGitForm(options: any, watch: any) {
+  const cms = useCMS()
   const [values, form] = useForm(options, watch)
+
+  const writeToDisk = React.useCallback(formState => {
+    cms.api.git.onChange!({
+      fileRelativePath: formState.values.fileRelativePath,
+      content: options.format(formState.values),
+    })
+  }, [])
+
+  useWatchFormValues(form, writeToDisk)
 
   return [values, form]
 }
