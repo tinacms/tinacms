@@ -30,6 +30,7 @@ import {
   GroupFieldPlugin,
   GroupListFieldPlugin,
   BlocksFieldPlugin,
+  TagsFieldPlugin,
 } from '@tinacms/fields'
 import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
 import { Form } from '@tinacms/forms'
@@ -77,6 +78,7 @@ export class TinaCMS extends CMS {
     this.fields.add(BlocksFieldPlugin)
     this.fields.add(MarkdownFieldPlaceholder)
     this.fields.add(HtmlFieldPlaceholder)
+    this.fields.add(TagsFieldPlugin)
   }
 
   get forms(): PluginType<Form> {
