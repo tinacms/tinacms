@@ -39,7 +39,7 @@ const matter = require('gray-matter')
 
 export function useRemarkForm(
   _node: RemarkNode | null | undefined,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOptions: Partial<FormOptions<any>> = {}
 ): [RemarkNode | null | undefined, Form | null | undefined] {
   const node = usePersistentValue(_node)
 
@@ -58,9 +58,9 @@ export function useRemarkForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
-  const label = formOverrrides.label || node.frontmatter.title
+  const label = formOptions.label || node.frontmatter.title
   const id = node.fileRelativePath
-  const actions = formOverrrides.actions
+  const actions = formOptions.actions
 
   /**
    * The state of the RemarkForm, generated from the contents of the
@@ -83,7 +83,7 @@ export function useRemarkForm(
    */
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const fields = React.useMemo(() => {
-    let fields = formOverrrides.fields || generateFields(valuesOnDisk)
+    let fields = formOptions.fields || generateFields(valuesOnDisk)
     fields = fields.map(field => {
       /**
        * Treat the field.name prefix `frontmatter` as an alias to
@@ -102,7 +102,7 @@ export function useRemarkForm(
     })
 
     return fields
-  }, [formOverrrides.fields])
+  }, [formOptions.fields])
 
   function loadInitialValues() {
     return cms.api.git
