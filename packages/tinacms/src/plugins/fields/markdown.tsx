@@ -22,7 +22,13 @@ import styled from 'styled-components'
 export const MarkdownFieldPlaceholder = {
   __type: 'field',
   name: 'markdown',
-  Component: MarkdownPlaceholder,
+  Component: createPlaceholder('Markdown'),
+}
+
+export const HtmlFieldPlaceholder = {
+  __type: 'field',
+  name: 'html',
+  Component: createPlaceholder('HTML'),
 }
 
 const PlaceholderParagraph = styled.p`
@@ -32,40 +38,41 @@ const PlaceholderParagraph = styled.p`
 
   a {
     color: var(--tina-color-primary);
-    text-decoration: underline;
   }
 `
 
-function MarkdownPlaceholder(props: any) {
-  return (
-    <FieldMeta name={props.input.name} label="Deprecated: Markdown Field">
-      <PlaceholderParagraph>
-        In order to help improve bundle sizes the Markdown Field has been
-        removed from the set of default fields.
-      </PlaceholderParagraph>
-      <PlaceholderParagraph>
-        See the docs to learn how to{' '}
-        <a
-          // TODO: Add actual link
-          href="https://tinacms.org/docs"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          add the Markdown plugin
-        </a>{' '}
-        to your CMS.
-      </PlaceholderParagraph>
-      <PlaceholderParagraph>
-        Visit the{' '}
-        <a
-          href="https://github.com/tinacms/tinacms/pull/1134"
-          target="_blank"
-          rel="noreferrer noopener"
-        >
-          Pull Request
-        </a>{' '}
-        to learn more about why this change was made.
-      </PlaceholderParagraph>
-    </FieldMeta>
-  )
+function createPlaceholder(name: string) {
+  return (props: any) => {
+    return (
+      <FieldMeta name={props.input.name} label={`Deprecated: ${name} Field`}>
+        <PlaceholderParagraph>
+          In order to help improve bundle sizes the {name} Field has been
+          removed from the set of default fields.
+        </PlaceholderParagraph>
+        <PlaceholderParagraph>
+          See the docs to learn how to{' '}
+          <a
+            // TODO: Add actual link
+            href="https://tinacms.org/docs"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            add the {name} plugin
+          </a>{' '}
+          to your CMS.
+        </PlaceholderParagraph>
+        <PlaceholderParagraph>
+          Visit the{' '}
+          <a
+            href="https://github.com/tinacms/tinacms/pull/1134"
+            target="_blank"
+            rel="noreferrer noopener"
+          >
+            Pull Request
+          </a>{' '}
+          to learn more about why this change was made.
+        </PlaceholderParagraph>
+      </FieldMeta>
+    )
+  }
 }
