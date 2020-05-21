@@ -18,12 +18,14 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
+import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { BlockSettings } from './block-settings'
 import { Button, IconButton } from '@tinacms/styles'
 import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
+import { InlineFieldContext } from './inline-field-context'
+import { useContext } from 'react'
 
 export interface BlocksControlsProps {
   children: any
@@ -41,7 +43,7 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     activeBlock,
     setActiveBlock,
   } = useInlineBlocks()
-  const { template } = useInlineBlock()
+  const { template } = useContext(InlineFieldContext)
   const isFirst = index === 0
   const isLast = index === count - 1
   const blockRef = React.useRef<HTMLDivElement>(null)
