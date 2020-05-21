@@ -20,7 +20,7 @@ import * as React from 'react'
 import { useContext } from 'react'
 import { Field, FieldRenderProps } from 'react-final-form'
 import { InlineFormState, useInlineForm } from './inline-form'
-import { InlineFieldContext } from './blocks/inline-field-context'
+import { InlineFieldContext } from './inline-field-context'
 
 export interface InlineFieldProps {
   name: string
