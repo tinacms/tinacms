@@ -18,9 +18,12 @@ limitations under the License.
 
 export * from './inline-form'
 export * from './inline-field'
-export * from './fields/inline-text-field'
-export * from './fields/inline-textarea-field'
-export * from './fields/inline-image-field'
+export {
+  InlineTextField,
+  InlineTextFieldProps,
+} from './fields/inline-text-field'
+export { InlineTextareaField } from './fields/inline-textarea-field'
+export { InlineImageField, InlineImageProps } from './fields/inline-image-field'
 export * from './inline-wysiwyg'
 export * from './blocks'
 export * from './styles'
