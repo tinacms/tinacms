@@ -26,7 +26,7 @@ import {
   InlineTextField,
   InlineBlocks,
   BlocksControls,
-  BlockText,
+  InlineText,
   BlockImage,
   BlockTextarea,
   useInlineForm,
@@ -147,7 +147,7 @@ const image_template: BlockTemplate = {
 
 // Testing the block styled component override
 
-const StyledBlockText = styled(BlockText)`
+const StyledBlockText = styled(InlineText)`
   color: green;
 `
 
