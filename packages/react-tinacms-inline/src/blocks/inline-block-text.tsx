@@ -17,18 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { BlockField } from './inline-block-field'
-import { InlineTextFieldProps, InlineText } from '../inline-field-text'
+import { InlineTextFieldProps, InlineTextField } from '../inline-field-text'
 
-export function BlockText({ name, className }: InlineTextFieldProps) {
-  return (
-    <BlockField name={name}>
-      {({ input, status }) => {
-        if (status === 'active') {
-          return <InlineText {...input} className={className} />
-        }
-        return <>{input.value}</>
-      }}
-    </BlockField>
-  )
+/**
+ * @deprecated
+ */
+export function BlockText(props: InlineTextFieldProps) {
+  return <InlineTextField {...props} focusRing={false} />
 }

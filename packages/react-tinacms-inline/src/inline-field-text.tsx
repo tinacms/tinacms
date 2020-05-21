@@ -27,13 +27,22 @@ import { InputFocusWrapper } from './styles'
 export interface InlineTextFieldProps {
   name: string
   className?: string
+  focusRing?: boolean
 }
 
-export function InlineTextField({ name, className }: InlineTextFieldProps) {
+export function InlineTextField({
+  name,
+  className,
+  focusRing = true,
+}: InlineTextFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
+          if (!focusRing) {
+            return <InlineText type="text" {...input} className={className} />
+          }
+
           return (
             <InputFocusWrapper>
               <InlineText type="text" {...input} className={className} />
