@@ -55,7 +55,7 @@ export function InlineTextField({
   )
 }
 
-export const InlineText = styled.input`
+const InlineText = styled.input`
   width: 100%;
   display: block;
   font-size: inherit;

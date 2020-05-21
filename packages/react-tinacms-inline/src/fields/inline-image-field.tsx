@@ -109,7 +109,7 @@ interface InlineImageUploadProps {
   previewSrc?: string
 }
 
-export function InlineImageUpload({
+function InlineImageUpload({
   onDrop,
   value,
   previewSrc,

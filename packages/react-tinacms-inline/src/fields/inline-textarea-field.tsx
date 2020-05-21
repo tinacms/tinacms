@@ -48,7 +48,7 @@ export function InlineTextareaField({
   )
 }
 
-export const InlineTextarea = styled(TextareaAutosize)`
+const InlineTextarea = styled(TextareaAutosize)`
   width: 100%;
   word-wrap: break-word;
   display: block;
