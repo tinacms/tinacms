@@ -1,3 +1,8 @@
 {
-  "title": "Tina + CRA Demo"
+  "title": "Tina + CRA Demo",
+  "spin": "clockwise",
+  "link": {
+    "url": "https://reactjs.org",
+    "text": "Learn React"
+  }
 }

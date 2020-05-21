@@ -16,14 +16,13 @@ limitations under the License.
 
 */
 
-import React from 'react'
+import React, { useMemo, useState, useEffect } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import content from './home.json'
-import { useForm, usePlugins } from 'tinacms'
+import { useForm, usePlugins, useCMS } from 'tinacms'
 
 const App: React.FC = () => {
-  const editMode = true
   const [tinaContent, form] = useForm({
     id: 'home-content',
     label: 'Content',
@@ -36,28 +35,64 @@ const App: React.FC = () => {
         label: 'Title',
         component: 'text',
       },
+      {
+        name: 'spin',
+        label: 'Spin Direction',
+        component: 'select',
+        options: ['clockwise', 'counter-clockwise'],
+      },
+      {
+        name: 'link',
+        label: 'Link',
+        component: 'group',
+        fields: [
+          {
+            name: 'url',
+            label: 'URL',
+            component: 'text',
+          },
+          {
+            name: 'text',
+            label: 'Text',
+            component: 'text',
+          },
+        ],
+      },
     ],
     loadInitialValues: async () => {
-      if (editMode) {
-        const res = await fetch('/api/test')
-        return await res.json()
+      let apiValues = {}
+      const res = await fetch('/api/test')
+      apiValues = await res.json()
+      return {
+        ...content,
+        ...apiValues,
       }
-      return content
     },
   })
   usePlugins(form)
+  const layoutContent = useMemo(() => {
+    if (Object.keys(tinaContent).length > 0) {
+      return tinaContent
+    }
+    return content
+  }, [content, tinaContent])
   return (
     <div className="App">
       <header className="App-header">
-        <img src={logo} className="App-logo" alt="logo" />
-        <p>{tinaContent.title}</p>
+        <img
+          src={logo}
+          className="App-logo"
+          data-spin={layoutContent.spin}
+          alt="logo"
+        />
+        <p>{layoutContent.title}</p>
         <a
           className="App-link"
-          href="https://reactjs.org"
+          href={layoutContent.link.url}
           target="_blank"
           rel="noopener noreferrer"
         >
-          Learn React
+          {layoutContent.link.text}
         </a>
       </header>
     </div>
