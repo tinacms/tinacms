@@ -24,7 +24,7 @@ import { AddBlockMenu } from './add-block-menu'
 import { BlockSettings } from './block-settings'
 import { Button, IconButton } from '@tinacms/styles'
 import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
-import { InlineFieldContext } from './inline-field-context'
+import { InlineFieldContext } from '../inline-field-context'
 import { useContext } from 'react'
 
 export interface BlocksControlsProps {

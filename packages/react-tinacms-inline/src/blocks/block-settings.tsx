@@ -30,7 +30,7 @@ import { useContext } from 'react'
 import { useInlineForm } from '../inline-form'
 import { Button, IconButton } from '@tinacms/styles'
 import { SettingsIcon } from '@tinacms/icons'
-import { InlineFieldContext } from './inline-field-context'
+import { InlineFieldContext } from '../inline-field-context'
 
 interface BlockSettingsProps {
   template: BlockTemplate

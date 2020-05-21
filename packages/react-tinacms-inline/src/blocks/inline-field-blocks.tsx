@@ -23,7 +23,7 @@ import { useState } from 'react'
 import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
-import { InlineFieldContext } from './inline-field-context'
+import { InlineFieldContext } from '../inline-field-context'
 
 /**
  * Blocks
