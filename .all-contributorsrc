@@ -681,6 +681,15 @@
         "ideas",
         "doc"
       ]
+    },
+    {
+      "login": "grncdr",
+      "name": "Stephen Sugden",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/82634?v=4",
+      "profile": "http://stephensugden.com",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
