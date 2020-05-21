@@ -18,18 +18,11 @@ limitations under the License.
 
 import * as React from 'react'
 import { InlineTextFieldProps } from '../inline-field-text'
-import { BlockField } from './inline-block-field'
-import { InlineTextarea } from '../inline-field-textarea'
+import { InlineTextareaField } from '../inline-field-textarea'
 
-export function BlockTextarea({ name, className }: InlineTextFieldProps) {
-  return (
-    <BlockField name={name}>
-      {({ input, status }) => {
-        if (status === 'active') {
-          return <InlineTextarea {...input} className={className} />
-        }
-        return <>{input.value}</>
-      }}
-    </BlockField>
-  )
+/**
+ * @deprecated
+ */
+export function BlockTextarea(props: InlineTextFieldProps) {
+  return <InlineTextareaField {...props} focusRing={false} />
 }

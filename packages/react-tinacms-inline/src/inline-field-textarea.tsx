@@ -23,11 +23,19 @@ import TextareaAutosize from 'react-textarea-autosize'
 import { InlineTextFieldProps } from './inline-field-text'
 import { InputFocusWrapper } from './styles'
 
-export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
+export function InlineTextareaField({
+  name,
+  className,
+  focusRing,
+}: InlineTextFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
+          if (!focusRing) {
+            return <InlineTextarea className={className} {...input} rows={1} />
+          }
+
           return (
             <InputFocusWrapper>
               <InlineTextarea className={className} {...input} rows={1} />
