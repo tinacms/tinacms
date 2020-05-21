@@ -26,10 +26,9 @@ import {
   InlineTextField,
   InlineBlocks,
   BlocksControls,
-  InlineText,
   BlockImage,
-  BlockTextarea,
   useInlineForm,
+  InlineTextareaField,
 } from 'react-tinacms-inline'
 
 /**
@@ -147,7 +146,7 @@ const image_template: BlockTemplate = {
 
 // Testing the block styled component override
 
-const StyledBlockText = styled(InlineText)`
+const StyledBlockText = styled(InlineTextareaField)`
   color: green;
 `
 
