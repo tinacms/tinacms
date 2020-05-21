@@ -27,6 +27,7 @@ export interface InlineImageProps {
   previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
+  focusRing?: boolean
   children?: any
 }
 
@@ -36,6 +37,7 @@ export function InlineImageField({
   uploadDir,
   parse,
   children,
+  focusRing = true,
 }: InlineImageProps) {
   const cms = useCMS()
 
@@ -64,6 +66,20 @@ export function InlineImageField({
         }
 
         if (status === 'active') {
+          if (!focusRing) {
+            return (
+              <InlineImageUpload
+                value={input.value}
+                previewSrc={_previewSrc}
+                onDrop={handleUploadImage}
+                {...input}
+              >
+                {children &&
+                  ((props: any) =>
+                    children({ previewSrc: _previewSrc }, ...props))}
+              </InlineImageUpload>
+            )
+          }
           return (
             <InputFocusWrapper>
               <InlineImageUpload
