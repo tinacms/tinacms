@@ -17,8 +17,8 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineTextFieldProps } from '../inline-field-text'
-import { InlineTextareaField } from '../inline-field-textarea'
+import { InlineTextFieldProps } from '../fields/inline-text-field'
+import { InlineTextareaField } from '../fields/inline-textarea-field'
 
 /**
  * @deprecated

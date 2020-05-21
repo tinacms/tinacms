@@ -17,11 +17,11 @@ limitations under the License.
 */
 
 import React from 'react'
-import { InlineField } from './inline-field'
+import { InlineField } from '../inline-field'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-textarea-autosize'
-import { InlineTextFieldProps } from './inline-field-text'
-import { InputFocusWrapper } from './styles'
+import { InlineTextFieldProps } from './inline-text-field'
+import { InputFocusWrapper } from '../styles'
 
 export function InlineTextareaField({
   name,

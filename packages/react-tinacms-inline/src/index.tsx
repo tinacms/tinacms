@@ -18,9 +18,9 @@ limitations under the License.
 
 export * from './inline-form'
 export * from './inline-field'
-export * from './inline-field-text'
-export * from './inline-field-textarea'
-export * from './inline-field-image'
+export * from './fields/inline-text-field'
+export * from './fields/inline-textarea-field'
+export * from './fields/inline-image-field'
 export * from './inline-wysiwyg'
 export * from './blocks'
 export * from './styles'

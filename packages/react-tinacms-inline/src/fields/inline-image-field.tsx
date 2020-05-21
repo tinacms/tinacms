@@ -17,10 +17,10 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineField } from './inline-field'
+import { InlineField } from '../inline-field'
 import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
-import { InputFocusWrapper } from './styles'
+import { InputFocusWrapper } from '../styles'
 
 export interface InlineImageProps {
   name: string
