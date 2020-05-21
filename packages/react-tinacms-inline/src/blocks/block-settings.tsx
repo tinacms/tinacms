@@ -26,10 +26,11 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { useInlineBlock } from './inline-field-blocks'
+import { useContext } from 'react'
 import { useInlineForm } from '../inline-form'
 import { Button, IconButton } from '@tinacms/styles'
 import { SettingsIcon } from '@tinacms/icons'
+import { InlineFieldContext } from './inline-field-context'
 
 interface BlockSettingsProps {
   template: BlockTemplate
@@ -56,7 +57,7 @@ export function BlockSettings({ template }: BlockSettingsProps) {
 
 function BlockSettingsModal({ template, close }: any) {
   const { form } = useInlineForm()
-  const { name: blockName } = useInlineBlock()
+  const { name: blockName } = useContext(InlineFieldContext)
 
   const fields = template.fields.map((field: any) => ({
     ...field,
