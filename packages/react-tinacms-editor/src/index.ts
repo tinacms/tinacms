@@ -16,5 +16,13 @@ limitations under the License.
 
 */
 
+// Base Components
 export * from './components/Editor'
 export * from './components/RawModeEditor'
+
+// Field Plugins
+export * from './tinacms-plugins/HtmlFieldPlugin'
+export * from './tinacms-plugins/MarkdownFieldPlugin'
+
+// Inline Editing
+export * from './tinacms-inline/inline-wysiwyg'
