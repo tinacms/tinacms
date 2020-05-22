@@ -20,7 +20,7 @@ import React, { useMemo } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import content from './home.json'
-import { useForm, usePlugins, useCMS } from 'tinacms'
+import { useForm, usePlugins } from 'tinacms'
 import { useEditMode } from './components/EditMode'
 
 const App: React.FC = () => {
