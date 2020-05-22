@@ -16,14 +16,21 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export {
-  InlineTextField,
-  InlineTextFieldProps,
-} from './fields/inline-text-field'
-export { InlineTextareaField } from './fields/inline-textarea-field'
-export { InlineImageField, InlineImageProps } from './fields/inline-image-field'
-export * from './inline-group'
-export * from './blocks'
-export * from './styles'
+import * as React from 'react'
+import { Field } from 'tinacms'
+import { InlineFieldContext } from '../inline-field-context'
+
+interface InlineGroupProps {
+  name?: string
+  fields: Field[]
+  // TODO: children type should be more specific
+  children?: any
+}
+
+export function InlineGroup({ name, children, fields }: InlineGroupProps) {
+  return (
+    <InlineFieldContext.Provider value={{ name, fields }}>
+      {children}
+    </InlineFieldContext.Provider>
+  )
+}
