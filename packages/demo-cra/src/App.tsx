@@ -16,14 +16,17 @@ limitations under the License.
 
 */
 
-import React, { useMemo, useState, useEffect } from 'react'
+import React, { useMemo } from 'react'
 import logo from './logo.svg'
 import './App.css'
 import content from './home.json'
 import { useForm, usePlugins, useCMS } from 'tinacms'
+import { useEditMode } from './components/EditMode'
 
 const App: React.FC = () => {
-  const [tinaContent, form] = useForm({
+  const [editMode, setEditMode] = useEditMode()
+
+  const formConfig = {
     id: 'home-content',
     label: 'Content',
     onSubmit: async () => {
@@ -60,6 +63,9 @@ const App: React.FC = () => {
       },
     ],
     loadInitialValues: async () => {
+      if (!editMode) {
+        return content
+      }
       let apiValues = {}
       const res = await fetch('/api/test')
       apiValues = await res.json()
@@ -68,14 +74,16 @@ const App: React.FC = () => {
         ...apiValues,
       }
     },
-  })
+  }
+
+  const [tinaContent, form] = useForm(formConfig)
   usePlugins(form)
   const layoutContent = useMemo(() => {
     if (Object.keys(tinaContent).length > 0) {
       return tinaContent
     }
     return content
-  }, [content, tinaContent])
+  }, [tinaContent])
   return (
     <div className="App">
       <header className="App-header">
@@ -94,6 +102,20 @@ const App: React.FC = () => {
         >
           {layoutContent.link.text}
         </a>
+        <button
+          type="button"
+          style={{
+            marginTop: '2rem',
+            padding: '0.5rem 1rem',
+            fontSize: '1.2rem',
+          }}
+          onClick={e => {
+            e.preventDefault()
+            setEditMode(!editMode)
+          }}
+        >
+          {editMode ? 'Exit' : 'Enter'} Edit Mode
+        </button>
       </header>
     </div>
   )

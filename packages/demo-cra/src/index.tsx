@@ -16,19 +16,35 @@ limitations under the License.
 
 */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import ReactDOM from 'react-dom'
 import './index.css'
 import App from './App'
 import * as serviceWorker from './serviceWorker'
 import { TinaProvider, TinaCMS } from 'tinacms'
+import { EditModeProvider, useEditMode } from './components/EditMode'
 
-const cms = new TinaCMS()
+const CMSWrapper = ({ children }: { children: any }) => {
+  const [editMode] = useEditMode()
+  const cms = useMemo(() => {
+    return new TinaCMS({
+      sidebar: {
+        hidden: !editMode,
+      },
+      toolbar: {
+        hidden: !editMode,
+      },
+    })
+  }, [editMode])
+  return <TinaProvider cms={cms}>{children}</TinaProvider>
+}
 
 ReactDOM.render(
-  <TinaProvider cms={cms}>
-    <App />
-  </TinaProvider>,
+  <EditModeProvider value={false}>
+    <CMSWrapper>
+      <App />
+    </CMSWrapper>
+  </EditModeProvider>,
   document.getElementById('root')
 )
 
