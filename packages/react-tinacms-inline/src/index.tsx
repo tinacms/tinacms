@@ -24,6 +24,5 @@ export {
 } from './fields/inline-text-field'
 export { InlineTextareaField } from './fields/inline-textarea-field'
 export { InlineImageField, InlineImageProps } from './fields/inline-image-field'
-export * from './inline-wysiwyg'
 export * from './blocks'
 export * from './styles'

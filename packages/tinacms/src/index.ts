@@ -29,11 +29,6 @@ export { ContentCreatorPlugin as AddContentPlugin } from '@tinacms/forms'
 export { ContentCreatorPlugin } from '@tinacms/forms'
 
 /**
- * Export TinaCMS extensions
- */
-export { Wysiwyg } from 'react-tinacms-editor'
-
-/**
  * Custom `tinacms` things
  */
 export * from './react-tinacms'

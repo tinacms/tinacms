@@ -17,27 +17,25 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineField } from './inline-field'
-import { Wysiwyg, WysiwygProps } from 'react-tinacms-editor'
+import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
 
-interface InlineWysiwygFieldProps extends Omit<WysiwygProps, 'input'> {
-  name: string
-  children: any
-}
+import { MenuButton } from '../../../components/MenuHelpers'
 
-export function InlineWysiwyg({
-  name,
-  children,
-  ...wysiwygProps
-}: InlineWysiwygFieldProps) {
-  return (
-    <InlineField name={name}>
-      {({ input, status }: any) => {
-        if (status === 'active') {
-          return <Wysiwyg input={input} {...wysiwygProps} />
-        }
-        return <>{children}</>
-      }}
-    </InlineField>
-  )
-}
+export const MarkdownMenu = (props: any) => (
+  <>
+    <BulletList {...props} />
+    <OrderedList {...props} />
+  </>
+)
+
+const BulletList = () => (
+  <MenuButton data-tooltip="Unordered List" disabled>
+    <UnorderedListIcon />
+  </MenuButton>
+)
+
+const OrderedList = () => (
+  <MenuButton data-tooltip="Ordered List" disabled>
+    <OrderedListIcon />
+  </MenuButton>
+)
