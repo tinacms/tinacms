@@ -250,6 +250,22 @@ export class GithubClient {
       },
     })
   }
+  async fetchFile(filePath: string, sha: string, decoded: boolean = true) {
+    const repo = this.workingRepoFullName
+    const branch = this.branchName
+    const request = await this.req({
+      url: `https://api.github.com/repos/${repo}/contents/${filePath}`,
+      method: 'GET',
+      data: {
+        sha,
+        branch: branch,
+      },
+    })
+
+    // decode using base64 decoding (https://developer.mozilla.org/en-US/docs/Glossary/Base64)
+    request.content = decoded ? atob(request.content || '') : request.content
+    return request
+  }
 
   async upload(
     path: string,
@@ -271,12 +287,12 @@ export class GithubClient {
     })
   }
 
-  private async req(data: any) {
+  protected async req(data: any) {
     const response = await this.proxyRequest(data)
     return this.getGithubResponse(response)
   }
 
-  private async getGithubResponse(response: Response) {
+  protected async getGithubResponse(response: Response) {
     const data = await response.json()
     //2xx status codes
     if (response.status.toString()[0] == '2') return data
