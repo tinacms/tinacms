@@ -52,8 +52,7 @@ function createPlaceholder(name: string) {
         <PlaceholderParagraph>
           See the docs to learn how to{' '}
           <a
-            // TODO: Add actual link
-            href="https://tinacms.org/docs"
+            href="https://tinacms.org/docs/cms/plugins#adding-plugins"
             target="_blank"
             rel="noreferrer noopener"
           >
