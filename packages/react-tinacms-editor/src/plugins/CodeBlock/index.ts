@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export { Menu } from './Menu'
+export * from './Menu'
 export { codeBlockPlugin } from './plugin'
