@@ -690,6 +690,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "logan-anderson",
+      "name": "Logan Anderson",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/43075109?v=4",
+      "profile": "https://www.logan.bio",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
