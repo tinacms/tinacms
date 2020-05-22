@@ -16,6 +16,13 @@ limitations under the License.
 
 */
 
-export { linkPluginKey, linkPlugin } from './plugin'
-export * from './Menu'
-export { LinkForm } from './Popups/Form'
+import React from 'react'
+import { CodeIcon } from '@tinacms/icons'
+
+import { MenuButton } from '../../../components/MenuHelpers'
+
+export const MarkdownMenu = () => (
+  <MenuButton data-tooltip="Codeblock" data-side="top" disabled>
+    <CodeIcon />
+  </MenuButton>
+)
