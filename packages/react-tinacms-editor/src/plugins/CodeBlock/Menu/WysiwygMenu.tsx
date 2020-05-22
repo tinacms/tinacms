@@ -16,6 +16,21 @@ limitations under the License.
 
 */
 
-export { linkPluginKey, linkPlugin } from './plugin'
-export * from './Menu'
-export { LinkForm } from './Popups/Form'
+import { setBlockType } from 'prosemirror-commands'
+import { EditorState } from 'prosemirror-state'
+
+import { CodeIcon } from '@tinacms/icons'
+
+import { commandControl } from '../../../components/MenuHelpers'
+
+function makeCodeBlock(state: EditorState, dispatch: any) {
+  return setBlockType(state.schema.nodes.code_block)(state, dispatch)
+}
+
+export const WysiwygMenu = commandControl(
+  makeCodeBlock,
+  CodeIcon,
+  'Codeblock',
+  'Codeblock',
+  false
+) //codeblock focusing messes with scroll

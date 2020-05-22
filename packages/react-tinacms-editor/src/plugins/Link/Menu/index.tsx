@@ -16,32 +16,5 @@ limitations under the License.
 
 */
 
-import { EditorView } from 'prosemirror-view'
-import { LinkIcon } from '@tinacms/icons'
-
-import { markControl } from '../../../components/MenuHelpers'
-import { isMarkPresent } from '../../../utils'
-import { imagePluginKey } from '../../Image'
-
-export const Menu = markControl({
-  mark: 'link',
-  Icon: LinkIcon,
-  tooltip: 'Link',
-  selectionOnly: true,
-  defaultAttrs: {
-    href: '',
-    title: '',
-  },
-  noMix: ['code'],
-  isDisabled: (view: EditorView) => {
-    if (view.state.selection.empty) return true
-    return (
-      isMarkPresent(view.state, view.state.schema.marks.link) ||
-      !!imagePluginKey.getState(view.state).selectedImage
-    )
-  },
-  onClick: (view: EditorView) => {
-    const { state, dispatch } = view
-    return dispatch(state.tr.setMeta('show_link_toolbar', true))
-  },
-})
+export { WysiwygMenu } from './WysiwygMenu'
+export { MarkdownMenu } from './MarkdownMenu'
