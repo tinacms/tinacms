@@ -17,16 +17,15 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { TextFieldPlugin } from '@tinacms/fields'
+import { Wysiwyg } from '../components/Editor'
 import { wysiwygStyles } from './wysiwygStyles'
 
-export const MarkdownField = wysiwygStyles(props => {
+const MarkdownField = wysiwygStyles(props => {
   return <Wysiwyg {...props} sticky={false} format="markdown" />
 })
 
-export default {
+export const MarkdownFieldPlugin = {
   name: 'markdown',
   Component: MarkdownField,
-  parse: TextFieldPlugin.parse,
+  parse: (value: string) => value || '',
 }

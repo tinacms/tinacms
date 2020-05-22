@@ -19,7 +19,6 @@ limitations under the License.
 import React from "react"
 import { Link, graphql } from "gatsby"
 
-import styled from "styled-components"
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -33,16 +32,31 @@ import {
   InlineForm,
   InlineBlocks,
   InlineTextareaField,
-  InlineWysiwyg,
-  InlineTextField,
-  useInlineForm,
   InlineImageField,
+  useInlineForm,
 } from "react-tinacms-inline"
 
 import { BLOCKS } from "../components/blog-blocks"
 import { useCMS } from "tinacms"
 
 const get = require("lodash.get")
+
+function InlineWysiwyg(props) {
+  const { status } = useInlineForm()
+  const [{ InlineWysiwyg }, setEditor] = React.useState({})
+
+  React.useEffect(() => {
+    if (!InlineWysiwyg && status === "active") {
+      import("react-tinacms-editor").then(setEditor)
+    }
+  }, [status])
+
+  if (InlineWysiwyg) {
+    return <InlineWysiwyg {...props} />
+  }
+
+  return props.children
+}
 
 function BlogPostTemplate(props) {
   const siteTitle = props.data.site.siteMetadata.title
@@ -244,6 +258,7 @@ function BlogPostTemplate(props) {
 const BlogPostForm = {
   actions: [DeleteAction],
   fields: [
+    { name: "rawMarkdownBody", component: "markdown" },
     {
       label: "Gallery",
       name: "frontmatter.gallery",
