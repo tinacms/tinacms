@@ -18,7 +18,7 @@ import { useCMS } from 'tinacms'
 import {
   InlineForm,
   InlineTextField,
-  InlineWysiwyg,
+  // InlineWysiwyg,
   InlineImageField,
   InlineGroup,
   InlineGroupControls,
@@ -93,9 +93,9 @@ function Info(props) {
             uploadDir={() => '/public/images/'}
             parse={filename => `/images/${filename}`}
           />
-          <InlineWysiwyg name="markdownBody">
+          {/* <InlineWysiwyg name="markdownBody">
             <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-          </InlineWysiwyg>
+          </InlineWysiwyg> */}
         </section>
         <style jsx>
           {`
