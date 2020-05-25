@@ -17,15 +17,17 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Wysiwyg } from '../components/Wysiwyg'
-import { wysiwygStyles } from './wysiwygStyles'
+import { render } from '@testing-library/react'
 
-const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
+import { EditorModeMenu } from './index'
+
+jest.mock('../../context/editorState')
+
+describe('EditorModeMenu', () => {
+  it('should render a menu option', () => {
+    const { findByTestId } = render(
+      <EditorModeMenu toggleEditorMode={() => {}} />
+    )
+    expect(findByTestId('markdown-toggle')).toBeDefined()
+  })
 })
-
-export const HtmlFieldPlugin = {
-  name: 'html',
-  Component: HTMLField,
-  parse: (value: string) => value || '',
-}

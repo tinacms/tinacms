@@ -21,16 +21,9 @@ import { EditorView } from 'prosemirror-view'
 import { buildSchema } from '../../schema'
 import { buildTranslator } from './buildTranslator'
 import { Format } from '../../translator'
-import { ImageProps } from '../../types'
+import { ImageProps, Input } from '../../types'
 
 import { buildEditorState } from './buildEditorState'
-
-export interface Input {
-  value: string
-  onChange(value: string): void
-  onFocus(): void
-  onBlur(): void
-}
 
 export const buildEditor = (
   input: Input,

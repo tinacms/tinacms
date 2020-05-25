@@ -18,34 +18,34 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import { Plugin } from '@tinacms/core'
 
-import { ImageProps } from '../../types'
-import { Wysiwyg as WysiwygEditor } from '../Editor'
+import { EditorModeMenu } from '../EditorModeMenu'
+import { EditorProps } from '../../types'
 import { MarkdownEditor } from '../MarkdownEditor'
+import { ProsemirrorEditor } from '../ProsemirrorEditor'
 
-export interface RawModeEditorProps {
-  defaultValue: string
-  imageProps?: ImageProps
-  onChange: (value: string) => void
-  plugins?: Plugin[]
-  sticky?: boolean
-}
+const modeTogglePlugin = (setMode: (mode: string) => void) => ({
+  name: 'wysiwygModeToggle',
+  MenuItem: () => <EditorModeMenu toggleEditorMode={() => setMode('raw')} />,
+})
 
-export const RawModeEditor = ({
-  defaultValue,
+export const Wysiwyg = ({
   imageProps,
-  onChange,
-  plugins,
+  input,
+  plugins = [],
+  format = 'markdown',
   sticky,
-}: RawModeEditorProps) => {
+}: EditorProps) => {
   const [mode, setMode] = useState('wysiwyg')
-  const [value, setValue] = useState(defaultValue)
+  const [value, setValue] = useState(input.value)
 
   const handleChange = (value: string) => {
     setValue(value)
-    onChange(value)
+    input.onChange(value)
   }
+
+  const pluginList =
+    format === 'markdown' ? [...plugins, modeTogglePlugin(setMode)] : plugins
 
   return (
     <>
@@ -57,16 +57,15 @@ export const RawModeEditor = ({
           toggleEditorMode={() => setMode('wysiwyg')}
         />
       ) : (
-        <WysiwygEditor
+        <ProsemirrorEditor
           input={{
             value,
             onChange: handleChange,
           }}
-          plugins={plugins}
+          plugins={pluginList}
           sticky={sticky}
-          format="markdown"
+          format={format}
           imageProps={imageProps}
-          toggleEditorMode={() => setMode('raw')}
         />
       )}
     </>
