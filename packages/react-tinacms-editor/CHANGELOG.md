@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.6.0...react-tinacms-editor@0.7.0) (2020-05-25)
+
+
+### Features
+
+* add tinacms field plugins ([20c9d0c](https://github.com/tinacms/tinacms/commit/20c9d0c))
+* inline-wysiwyg component ([547a2d8](https://github.com/tinacms/tinacms/commit/547a2d8))
+* raw mode implementation ([f8dcad7](https://github.com/tinacms/tinacms/commit/f8dcad7))
+
+
+
+
+
 # [0.6.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.3...react-tinacms-editor@0.6.0) (2020-05-19)
 
 

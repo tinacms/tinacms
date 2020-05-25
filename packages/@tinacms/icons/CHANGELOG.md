@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.11.0...@tinacms/icons@0.12.0) (2020-05-25)
+
+
+### Features
+
+* raw mode implementation ([f8dcad7](https://github.com/tinacms/tinacms/commit/f8dcad7))
+
+
+
+
+
 # [0.11.0](https://github.com/tinacms/tinacms/compare/@tinacms/icons@0.10.0...@tinacms/icons@0.11.0) (2020-05-19)
 
 
