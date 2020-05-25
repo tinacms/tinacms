@@ -16,48 +16,56 @@ limitations under the License.
 
 */
 
-import React, { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import React from 'react'
+import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
-import { MarkdownMenu as BlockMenu } from '../../plugins/Block'
-import { MarkdownMenu as InlineMenu } from '../../plugins/Inline'
-import { MarkdownMenu as LinkMenu } from '../../plugins/Link'
-import { MarkdownMenu as ImageMenu } from '../../plugins/Image'
-import { MarkdownMenu as TableMenu } from '../../plugins/Table'
-import { MarkdownMenu as QuoteMenu } from '../../plugins/Blockquote'
-import { MarkdownMenu as CodeBlockMenu } from '../../plugins/CodeBlock'
-import { MarkdownMenu as ListMenu } from '../../plugins/List'
-import { MarkdownMenu as HistoryMenu } from '../../plugins/History'
-import { MenuPortalProvider } from '../../context/MenuPortal'
-import { ImageProps } from '../../types'
+import { TablePopups } from '../../../plugins/Table/Popup'
+import { MenuItem as BlockMenu } from '../../../plugins/Block'
+import { MenuItem as CodeBlockMenu } from '../../../plugins/CodeBlock'
+import { MenuItem as HistoryMenu } from '../../../plugins/History'
+import { MenuItem as InlineMenu } from '../../../plugins/Inline'
+import { MenuItem as ListMenu } from '../../../plugins/List'
+import { MenuItem as QuoteMenu } from '../../../plugins/Blockquote'
+import { MenuItem as TableMenu } from '../../../plugins/Table'
+import {
+  ImageEdit as ImageEditPopup,
+  Loader as ImageLoader,
+  MenuItem as ImageMenu,
+} from '../../../plugins/Image'
+import {
+  LinkForm as LinkFormPopup,
+  MenuItem as LinkMenu,
+} from '../../../plugins/Link'
+
+import { useEditorStateContext } from '../../../context/editorState'
+import { MenuPortalProvider } from '../../../context/MenuPortal'
+import { Plugin } from '../../../types'
+
 import {
   MenuPlaceholder,
   MenuWrapper,
   MenuContainer,
-} from '../MenuHelpers/styledComponents'
-import { EditorModeMenu } from '../EditorModeMenu'
+} from '../../MenuHelpers/styledComponents'
 
 interface Props {
   sticky?: boolean | string
-  toggleEditorMode: () => void
-  imageProps?: ImageProps
+  uploadImages?: (files: File[]) => Promise<string[]>
+  plugins?: Plugin[]
 }
 
-export const Menubar = ({
-  sticky = true,
-  toggleEditorMode,
-  imageProps,
-}: Props) => {
+export const Menubar = ({ sticky = true, uploadImages, plugins }: Props) => {
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
   const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
+  const { editorView } = useEditorStateContext()
 
   useEffect(() => {
     if (menuRef.current && sticky) {
       setMenuBoundingBox(menuRef.current.getBoundingClientRect())
     }
-  }, [menuRef])
+  }, [menuRef, editorView])
 
   useLayoutEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
@@ -96,10 +104,12 @@ export const Menubar = ({
     }
   }, [menuRef, menuBoundingBox])
 
-  const stopEvent = React.useCallback((e: any) => {
+  const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
     e.stopPropagation()
     e.preventDefault()
   }, [])
+
+  if (!editorView) return null
 
   return (
     <>
@@ -113,20 +123,28 @@ export const Menubar = ({
         ref={menuRef}
       >
         <MenuPortalProvider>
-          <MenuContainer onMouseDown={stopEvent}>
+          <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
             <BlockMenu />
             <InlineMenu />
             <LinkMenu />
-            {imageProps && <ImageMenu />}
+            <ImageMenu uploadImages={uploadImages} />
             <TableMenu />
             <QuoteMenu />
             <CodeBlockMenu />
             <ListMenu />
             <HistoryMenu />
-            <EditorModeMenu toggleEditorMode={toggleEditorMode} />
+            {plugins?.map(({ MenuItem }) => (
+              <MenuItem />
+            ))}
           </MenuContainer>
         </MenuPortalProvider>
       </MenuWrapper>
+      <TablePopups />
+      <ImageEditPopup />
+      <LinkFormPopup />
+      <ImageLoader />
     </>
   )
 }
+
+// todo: sub-menus to return null if schema does not have related type of node / mark.

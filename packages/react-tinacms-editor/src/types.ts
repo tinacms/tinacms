@@ -18,8 +18,11 @@ limitations under the License.
 
 import { Decoration, EditorView, NodeView } from 'prosemirror-view'
 import { EditorState } from 'prosemirror-state'
+import { ElementType } from 'react'
 import { Node } from 'prosemirror-model'
 import { Schema } from 'prosemirror-model'
+
+import { Format } from './translator'
 
 export interface ImageProps {
   upload?: (files: File[]) => Promise<string[]>
@@ -49,4 +52,24 @@ export type NodeViews = {
 
 export interface Command {
   (state: EditorState, ...options: any[]): void
+}
+
+export interface Plugin {
+  name: string
+  MenuItem: ElementType
+}
+
+export interface Input {
+  value: string
+  onChange: (value: string) => void
+  onFocus?: () => void
+  onBlur?: () => void
+}
+
+export interface EditorProps {
+  input: Input
+  plugins?: Plugin[]
+  sticky?: boolean
+  format?: Format
+  imageProps?: ImageProps
 }

@@ -16,24 +16,29 @@ limitations under the License.
 
 */
 
-import { EditorState } from 'prosemirror-state'
-import { findParentNodeOfType } from 'prosemirror-utils'
-import { TableIcon } from '@tinacms/icons'
+import * as React from 'react'
+import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
-import { insertTable } from '../commands'
+import { toggleBulletList, toggleOrderedList } from '../commands'
 
-function insertTableCmd(state: EditorState, dispatch: any) {
-  const { table } = state.schema.nodes
-  const { selection } = state
-  const tableParent = findParentNodeOfType(table)(selection)
-  if (tableParent) return false
-  return insertTable(state, dispatch)
-}
+export const MenuItem = (props: any) => (
+  <>
+    <BulletList {...props} />
+    <OrderedList {...props} />
+  </>
+)
 
-export const WysiwygMenu = commandControl(
-  insertTableCmd,
-  TableIcon,
-  'Table',
-  'Table'
+const BulletList = commandControl(
+  toggleBulletList,
+  UnorderedListIcon,
+  'Unordered List',
+  'Unordered List'
+)
+
+const OrderedList = commandControl(
+  toggleOrderedList,
+  OrderedListIcon,
+  'Ordered List',
+  'Ordered List'
 )

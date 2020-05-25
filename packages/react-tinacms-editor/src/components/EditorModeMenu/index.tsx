@@ -19,19 +19,18 @@ limitations under the License.
 import * as React from 'react'
 
 import { MarkdownIcon } from '@tinacms/icons'
-import { MenuButton } from '../MenuHelpers'
+import { MenuButton } from '../MenuHelpers/MenuButton'
 
 export const EditorModeMenu = ({
   toggleEditorMode,
 }: {
   toggleEditorMode: () => void
-}) => {
-  return (
-    <MenuButton
-      data-tooltip={'Markdown mode'}
-      onClick={() => toggleEditorMode()}
-    >
-      <MarkdownIcon />
-    </MenuButton>
-  )
-}
+}) => (
+  <MenuButton
+    data-testid="markdown-toggle"
+    data-tooltip={'Markdown mode'}
+    onClick={() => toggleEditorMode()}
+  >
+    <MarkdownIcon />
+  </MenuButton>
+)
