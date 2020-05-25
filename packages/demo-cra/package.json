@@ -4,6 +4,7 @@
   "private": true,
   "dependencies": {
     "@now/node": "^1.6.1",
+    "next-tinacms-github": "^0.1.1",
     "tinacms": "^0.19.4"
   },
   "devDependencies": {
