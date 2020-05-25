@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.9.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.13...demo-gatsby@1.9.0) (2020-05-25)
+
+
+### Bug Fixes
+
+* add previewSrc and render props to blog thumbnail ([1a4c1de](https://github.com/gatsbyjs/gatsby-starter-blog/commit/1a4c1de))
+
+
+### Features
+
+* inline-wysiwyg component ([547a2d8](https://github.com/gatsbyjs/gatsby-starter-blog/commit/547a2d8))
+
+
+
+
+
 ## [1.8.13](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.8.12...demo-gatsby@1.8.13) (2020-05-19)
 
 **Note:** Version bump only for package demo-gatsby

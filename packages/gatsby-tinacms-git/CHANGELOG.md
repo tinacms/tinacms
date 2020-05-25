@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.4.12...gatsby-tinacms-git@0.5.0) (2020-05-25)
+
+
+### Features
+
+* add use-git-form hook ([666aba3](https://github.com/tinacms/tinacms/commit/666aba3))
+
+
+
+
+
 ## [0.4.12](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.4.11...gatsby-tinacms-git@0.4.12) (2020-05-19)
 
 **Note:** Version bump only for package gatsby-tinacms-git
