@@ -60,6 +60,7 @@ export const MarkdownEditor = ({
     <>
       <Menubar toggleEditorMode={toggleEditorMode} imageProps={imageProps} />
       <EditingSection
+        data-testid="markdown-editing-textarea"
         ref={inputRef}
         autoFocus
         value={value}

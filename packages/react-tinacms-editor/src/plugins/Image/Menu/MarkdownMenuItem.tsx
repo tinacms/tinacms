@@ -22,7 +22,12 @@ import { MediaIcon } from '@tinacms/icons'
 import { MenuButton } from '../../../components/MenuHelpers'
 
 export const MarkdownMenuItem = () => (
-  <MenuButton data-tooltip="Image" data-side="top" disabled>
+  <MenuButton
+    data-testid="image-menu"
+    data-tooltip="Image"
+    data-side="top"
+    disabled
+  >
     <MediaIcon />
   </MenuButton>
 )
