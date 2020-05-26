@@ -54,13 +54,13 @@ export function InlineImageField({
               file,
             },
           ])
-          if (media) {
+          if (media?.filename) {
             input.onChange(parse(media.filename))
           } else {
-            /**
-             * TODO: Handle failure with events
-             * or alerts here?
-             */
+            console.error(
+              'TinaCMS Image Upload Failed: This could be due to media store configuration, file size, or if the image is a duplicate (has already been uploaded).'
+            )
+            cms.alerts.error('Image Upload Failed.')
           }
           return null
         }
