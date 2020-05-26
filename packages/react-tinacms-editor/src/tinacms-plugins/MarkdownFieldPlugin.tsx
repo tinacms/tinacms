@@ -25,6 +25,7 @@ const MarkdownField = wysiwygStyles(props => {
 })
 
 export const MarkdownFieldPlugin = {
+  __type: 'field',
   name: 'markdown',
   Component: MarkdownField,
   parse: (value: string) => value || '',
