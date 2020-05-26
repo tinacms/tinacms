@@ -79,7 +79,7 @@ function Info(props) {
           >
             <InlineGroupControls>
               <h1>
-                <InlineTextField name="name" />
+                <InlineTextField focusRing={false} name="name" />
               </h1>
               GROUP!!!!
             </InlineGroupControls>
