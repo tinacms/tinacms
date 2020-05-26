@@ -29,7 +29,7 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   reset?(): void
   actions?: any[]
   loadInitialValues?: () => Promise<S>
-  onChange(values: FormState<S>): void
+  onChange?(values: FormState<S>): void
 }
 
 export class Form<S = any, F extends Field = AnyField> implements Plugin {
