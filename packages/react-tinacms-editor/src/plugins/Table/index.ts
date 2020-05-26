@@ -17,4 +17,4 @@ limitations under the License.
 */
 
 export { tablePlugin } from './plugin'
-export { Menu } from './Menu'
+export * from './Menu'

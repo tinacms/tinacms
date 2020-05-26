@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { FormOptions, Form, TinaForm, usePlugin } from 'tinacms'
-import { useGlobalRemarkForm, useRemarkForm } from './useRemarkForm'
+import { useGlobalRemarkForm, useRemarkForm } from './use-remark-form'
 import { ERROR_INVALID_QUERY_NAME } from './errors'
 
 export interface RemarkFormProps extends Partial<FormOptions<any>> {

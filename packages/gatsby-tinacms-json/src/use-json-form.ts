@@ -16,15 +16,10 @@ limitations under the License.
 
 */
 import { Form, FormOptions, Field } from 'tinacms'
-import {
-  useCMS,
-  useWatchFormValues,
-  usePlugins,
-  useForm,
-  GlobalFormPlugin,
-} from 'tinacms'
-import { useMemo, useCallback } from 'react'
+import { usePlugins, GlobalFormPlugin } from 'tinacms'
+import { useMemo } from 'react'
 import * as React from 'react'
+import { useGitForm } from 'gatsby-tinacms-git'
 
 interface JsonNode {
   id: string
@@ -34,27 +29,19 @@ interface JsonNode {
 }
 
 export function useJsonForm(
-  _jsonNode: JsonNode | null,
+  _node: JsonNode | null,
   formOptions: Partial<FormOptions<any>> = {}
 ): [JsonNode | null, Form | null] {
-  const jsonNode = usePersistentValue(_jsonNode)
-
-  // NODE_ENV will never change at runtime.
-  const TINA_DISABLED = process.env.NODE_ENV === 'production'
+  const node = usePersistentValue(_node)
 
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks.
    */
-  if (!jsonNode) {
-    return [jsonNode, null]
+  if (!node) {
+    return [node, null]
   }
-  validateJsonNode(jsonNode)
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const cms = useCMS()
-  const label = formOptions.label || jsonNode.fileRelativePath
-  const id = jsonNode.fileRelativePath
+  validateJsonNode(node)
 
   /**
    * The state of the JsonForm, generated from the contents of the
@@ -64,64 +51,43 @@ export function useJsonForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
-      jsonNode: jsonNode,
-      rawJson: JSON.parse(jsonNode.rawJson),
+      fileRelativePath: node.fileRelativePath,
+      rawJson: JSON.parse(node.rawJson),
     }),
-    [jsonNode]
+    [node.rawJson]
   )
 
+  const label = formOptions.label || node.fileRelativePath
   const fields = formOptions.fields || generateFields(valuesOnDisk.rawJson)
 
-  // TODO: This may not be necessary.
-  fields.push({ name: 'jsonNode', component: null })
-
-  function loadInitialValues() {
-    return cms.api.git
-      .show(id) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        // Parse the JSON into a JsonForm data structure and store it in state.
-        const rawJson = JSON.parse(git.content)
-        return { jsonNode, rawJson }
-      })
-  }
-
-  const jsonFormOptions = {
-    id,
-    label,
-    fields,
-    loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
-    onSubmit(data: any) {
-      return cms.api.git.onSubmit!({
-        files: [data.jsonNode.fileRelativePath],
-        message: data.__commit_message || 'Tina commit',
-        name: data.__commit_name,
-        email: data.__commit_email,
-      })
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
+  const [, form] = useGitForm(
+    node,
+    {
+      ...formOptions,
+      label,
+      fields,
+      format: toJsonString,
+      parse: fromJsonString,
     },
-    reset() {
-      return cms.api.git.reset({ files: [id] })
-    },
-    ...formOptions,
+    {
+      label,
+      fields,
+      values: valuesOnDisk,
+    }
+  )
+
+  return [node, form]
+}
+
+function fromJsonString(content: string) {
+  return {
+    rawJson: JSON.parse(content),
   }
+}
 
-  const watchValuesForChange = { values: valuesOnDisk, label, fields }
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useForm(jsonFormOptions, watchValuesForChange)
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const writeToDisk = useCallback(formState => {
-    const { rawJson, jsonNode } = formState.values
-    cms.api.git.onChange!({
-      fileRelativePath: jsonNode.fileRelativePath,
-      content: JSON.stringify(rawJson, null, 2),
-    })
-  }, [])
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
-
-  return [jsonNode, form as Form]
+function toJsonString(values: JsonNode) {
+  return JSON.stringify(values.rawJson, null, 2)
 }
 
 /**
