@@ -45,7 +45,7 @@ export const ProsemirrorEditor = styled(
     }, [editorRef])
 
     return (
-      <WysiwygWrapper className="wysiwyg-wrapper">
+      <WysiwygWrapper className="wysiwyg-wrapper" data-testid="wysiwyg-editor">
         <link
           rel="stylesheet"
           href="https://codemirror.net/lib/codemirror.css"
