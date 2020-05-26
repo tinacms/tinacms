@@ -45,6 +45,7 @@
     "prismjs": "^1.16.0",
     "react-helmet": "^5.2.1",
     "react-textarea-autosize": "7.1.2",
+    "react-tinacms-editor": "^0.6.0",
     "react-tinacms-inline": "^0.4.9",
     "react-typography": "^0.16.19",
     "tinacms": "^0.19.4",

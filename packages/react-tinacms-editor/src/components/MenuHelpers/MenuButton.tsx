@@ -43,6 +43,8 @@ export const MenuButton = styled.button<{
   display: flex;
   justify-content: center;
   align-items: center;
+  font-size: 12px;
+  font-weight: 600;
   &:hover {
     background-color: rgba(53, 50, 50, 0.09);
   }

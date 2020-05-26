@@ -26,7 +26,8 @@ export const previewHandler = (req: any, res: any) => {
   const previewData = {
     working_repo_full_name: req.cookies[WORKING_REPO_KEY],
     github_access_token: req.cookies[ACCESS_TOKEN_KEY],
-    head_branch: req.cookies[HEAD_BRANCH_KEY] || 'master',
+    head_branch:
+      req.cookies[HEAD_BRANCH_KEY] || process.env.BASE_BRANCH || 'master',
   }
   res.setPreviewData(previewData)
   res.status(200).end()
