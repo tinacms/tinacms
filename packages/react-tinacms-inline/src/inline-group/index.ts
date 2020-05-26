@@ -16,15 +16,5 @@ limitations under the License.
 
 */
 
-import { InlineField, InlineFieldRenderProps } from '../inline-field'
-
-export interface BlockFieldProps {
-  name: string
-  children(props: BlockFieldRenderProps): any
-}
-
-interface BlockFieldRenderProps extends InlineFieldRenderProps {
-  name: string
-}
-
-export const BlockField = InlineField
+export { InlineGroup } from './inline-group'
+export { InlineGroupControls } from './inline-group-controls'

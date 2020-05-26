@@ -17,16 +17,17 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineField } from './inline-field'
+import { InlineField } from '../inline-field'
 import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
-import { InputFocusWrapper } from './styles'
+import { InputFocusWrapper } from '../styles'
 
 export interface InlineImageProps {
   name: string
   previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
+  focusRing?: boolean
   children?: any
 }
 
@@ -36,6 +37,7 @@ export function InlineImageField({
   uploadDir,
   parse,
   children,
+  focusRing = true,
 }: InlineImageProps) {
   const cms = useCMS()
 
@@ -64,6 +66,20 @@ export function InlineImageField({
         }
 
         if (status === 'active') {
+          if (!focusRing) {
+            return (
+              <InlineImageUpload
+                value={input.value}
+                previewSrc={_previewSrc}
+                onDrop={handleUploadImage}
+                {...input}
+              >
+                {children &&
+                  ((props: any) =>
+                    children({ previewSrc: _previewSrc }, ...props))}
+              </InlineImageUpload>
+            )
+          }
           return (
             <InputFocusWrapper>
               <InlineImageUpload
@@ -93,7 +109,7 @@ interface InlineImageUploadProps {
   previewSrc?: string
 }
 
-export function InlineImageUpload({
+function InlineImageUpload({
   onDrop,
   value,
   previewSrc,

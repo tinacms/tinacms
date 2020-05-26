@@ -16,15 +16,21 @@ limitations under the License.
 
 */
 
-import { InlineField, InlineFieldRenderProps } from '../inline-field'
+import * as React from 'react'
+import { Field } from 'tinacms'
+import { InlineFieldContext } from '../inline-field-context'
 
-export interface BlockFieldProps {
-  name: string
-  children(props: BlockFieldRenderProps): any
+interface InlineGroupProps {
+  name?: string
+  fields: Field[]
+  // TODO: children type should be more specific
+  children?: any
 }
 
-interface BlockFieldRenderProps extends InlineFieldRenderProps {
-  name: string
+export function InlineGroup({ name, children, fields }: InlineGroupProps) {
+  return (
+    <InlineFieldContext.Provider value={{ name, fields }}>
+      {children}
+    </InlineFieldContext.Provider>
+  )
 }
-
-export const BlockField = InlineField

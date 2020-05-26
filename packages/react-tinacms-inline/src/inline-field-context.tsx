@@ -1,3 +1,5 @@
+import React from 'react'
+
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -15,16 +17,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-import { InlineField, InlineFieldRenderProps } from '../inline-field'
-
-export interface BlockFieldProps {
-  name: string
-  children(props: BlockFieldRenderProps): any
+export interface InlineFieldState {
+  name?: string
+  [key: string]: any
 }
 
-interface BlockFieldRenderProps extends InlineFieldRenderProps {
-  name: string
-}
-
-export const BlockField = InlineField
+export const InlineFieldContext = React.createContext<InlineFieldState>({})
