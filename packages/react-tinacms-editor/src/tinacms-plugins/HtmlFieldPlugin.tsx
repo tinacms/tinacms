@@ -25,6 +25,7 @@ const HTMLField = wysiwygStyles(props => {
 })
 
 export const HtmlFieldPlugin = {
+  __type: 'field',
   name: 'html',
   Component: HTMLField,
   parse: (value: string) => value || '',
