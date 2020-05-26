@@ -19,18 +19,18 @@ limitations under the License.
 import React from 'react'
 import { render } from '@testing-library/react'
 
-import { Menubar } from './index'
+import { Wysiwyg } from './index'
 
-jest.mock('../../../context/editorState')
-
-describe('MenuBar', () => {
-  it('should render Menubar', () => {
-    render(<Menubar toggleEditorMode={() => {}} />)
-    expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
-  })
-
-  it('should have markdown toggle option present', () => {
-    const { findByTestId } = render(<Menubar toggleEditorMode={() => {}} />)
-    expect(findByTestId('markdown-toggle')).toBeDefined()
+describe('Wysiwyg', () => {
+  it('should render RawModeEditor', () => {
+    const { getByTestId } = render(
+      <Wysiwyg
+        input={{
+          onChange: () => {},
+          value: '',
+        }}
+      />
+    )
+    expect(getByTestId('wysiwyg-editor')).toBeDefined()
   })
 })
