@@ -16,29 +16,29 @@ limitations under the License.
 
 */
 
+/*
+ ** TODO: refactor to make this agnostic for both blocks and group fields
+ */
 import * as React from 'react'
 import {
   FieldsBuilder,
-  BlockTemplate,
   Modal,
   ModalPopup,
   ModalHeader,
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { useContext } from 'react'
 import { useInlineForm } from '../inline-form'
 import { Button, IconButton } from '@tinacms/styles'
 import { SettingsIcon } from '@tinacms/icons'
+import { Field } from 'tinacms'
 import { InlineFieldContext } from '../inline-field-context'
 
-interface BlockSettingsProps {
-  template: BlockTemplate
-}
-
-export function BlockSettings({ template }: BlockSettingsProps) {
+export function InlineGroupSettings() {
   const [open, setOpen] = React.useState(false)
-  const noExtraFields = !(template.fields && template.fields.length)
+  const { name, fields } = React.useContext(InlineFieldContext)
+
+  const noExtraFields = !(fields && fields.length)
 
   if (noExtraFields) {
     return null
@@ -49,27 +49,40 @@ export function BlockSettings({ template }: BlockSettingsProps) {
         <SettingsIcon />
       </IconButton>
       {open && (
-        <BlockSettingsModal template={template} close={() => setOpen(false)} />
+        <SettingsModal
+          fields={fields}
+          name={name}
+          close={() => setOpen(false)}
+        />
       )}
     </>
   )
 }
 
-function BlockSettingsModal({ template, close }: any) {
-  const { form } = useInlineForm()
-  const { name: blockName } = useContext(InlineFieldContext)
+interface SettingsModalProps {
+  fields: Field[]
+  name?: string
+  close(): void
+}
 
-  const fields = template.fields.map((field: any) => ({
-    ...field,
-    name: `${blockName}.${field.name}`,
-  }))
+function SettingsModal({ fields, close, name }: SettingsModalProps) {
+  const { form } = useInlineForm()
+
+  let formFields = fields
+
+  if (name) {
+    formFields = fields.map((field: any) => ({
+      ...field,
+      name: `${name}.${field.name}`,
+    }))
+  }
 
   return (
     <Modal>
       <ModalPopup>
         <ModalHeader close={close}>Settings</ModalHeader>
         <ModalBody>
-          <FieldsBuilder form={form} fields={fields} />
+          <FieldsBuilder form={form} fields={formFields} />
         </ModalBody>
         <ModalActions>
           <Button onClick={close}>Cancel</Button>

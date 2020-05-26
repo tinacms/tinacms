@@ -17,58 +17,14 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { BlockField } from './inline-block-field'
-import { InlineImageProps, InlineImageUpload } from '../inline-field-image'
-import { useCMS } from 'tinacms'
+import {
+  InlineImageProps,
+  InlineImageField,
+} from '../fields/inline-image-field'
 
-export function BlockImage({
-  name,
-  children,
-  previewSrc,
-  parse,
-  uploadDir,
-}: InlineImageProps) {
-  const cms = useCMS()
-  return (
-    <BlockField name={name}>
-      {({ input, status, form }) => {
-        const _previewSrc = previewSrc(form.finalForm.getState().values)
-
-        async function handleUploadImage([file]: File[]) {
-          const directory = uploadDir(form)
-          const [media] = await cms.media.store.persist([
-            {
-              directory,
-              file,
-            },
-          ])
-          if (media) {
-            input.onChange(parse(media.filename))
-          } else {
-            /**
-             * TODO: Handle failure with events
-             * or alerts here?
-             */
-          }
-          return null
-        }
-
-        if (status === 'active') {
-          return (
-            <InlineImageUpload
-              value={input.value}
-              previewSrc={_previewSrc}
-              onDrop={handleUploadImage}
-              {...input}
-            >
-              {children &&
-                ((props: any) =>
-                  children({ previewSrc: _previewSrc }, ...props))}
-            </InlineImageUpload>
-          )
-        }
-        return children ? children() : <img src={input.value} />
-      }}
-    </BlockField>
-  )
+/**
+ * @deprecated
+ */
+export function BlockImage(props: InlineImageProps) {
+  return <InlineImageField {...props} focusRing={false} />
 }

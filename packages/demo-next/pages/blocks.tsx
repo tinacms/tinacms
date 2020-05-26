@@ -26,10 +26,8 @@ import {
   InlineTextField,
   InlineBlocks,
   BlocksControls,
-  BlockText,
-  BlockImage,
-  BlockTextarea,
   useInlineForm,
+  InlineTextareaField,
 } from 'react-tinacms-inline'
 
 /**
@@ -121,7 +119,7 @@ function HeroBlock({ index }) {
 function ImageBlock({ index, data }) {
   return (
     <BlocksControls index={index}>
-      <BlockImage
+      <InlineImageField
         name="src"
         previewSrc={formValues => {
           return formValues.blocks[index].src
@@ -147,7 +145,7 @@ const image_template: BlockTemplate = {
 
 // Testing the block styled component override
 
-const StyledBlockText = styled(BlockText)`
+const StyledBlockText = styled(InlineTextareaField)`
   color: green;
 `
 

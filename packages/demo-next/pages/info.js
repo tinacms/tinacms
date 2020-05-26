@@ -18,8 +18,10 @@ import { useCMS } from 'tinacms'
 import {
   InlineForm,
   InlineTextField,
-  InlineWysiwyg,
+  // InlineWysiwyg,
   InlineImageField,
+  InlineGroup,
+  InlineGroupControls,
 } from 'react-tinacms-inline'
 import { EditToggle, DiscardChanges } from './blocks'
 
@@ -67,9 +69,22 @@ function Info(props) {
           </div>
           <EditToggle />
           <DiscardChanges />
-          <h1>
-            <InlineTextField name="frontmatter.name" />
-          </h1>
+
+          <InlineGroup
+            name="frontmatter"
+            fields={[
+              { name: 'name', component: 'text' },
+              { name: 'hometown', component: 'text' },
+            ]}
+          >
+            <InlineGroupControls>
+              <h1>
+                <InlineTextField focusRing={false} name="name" />
+              </h1>
+              GROUP!!!!
+            </InlineGroupControls>
+          </InlineGroup>
+
           <InlineImageField
             name="frontmatter.image"
             previewSrc={formValues => {
@@ -78,9 +93,9 @@ function Info(props) {
             uploadDir={() => '/public/images/'}
             parse={filename => `/images/${filename}`}
           />
-          <InlineWysiwyg name="markdownBody">
+          {/* <InlineWysiwyg name="markdownBody">
             <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-          </InlineWysiwyg>
+          </InlineWysiwyg> */}
         </section>
         <style jsx>
           {`
