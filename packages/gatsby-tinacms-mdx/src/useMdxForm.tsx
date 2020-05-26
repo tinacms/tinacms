@@ -131,6 +131,12 @@ export function useMdxForm(
       reset() {
         return cms.api.git.reset({ files: [id] })
       },
+      onChange(formState) {
+        cms.api.git.onChange!({
+          fileRelativePath: formState.values.fileRelativePath,
+          content: toMdxString(formState.values),
+        })
+      },
       actions,
     },
     // The Form will be updated if these values change.
@@ -140,17 +146,6 @@ export function useMdxForm(
       values: valuesOnDisk,
     }
   )
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const writeToDisk = React.useCallback(formState => {
-    cms.api.git.onChange!({
-      fileRelativePath: formState.values.fileRelativePath,
-      content: toMdxString(formState.values),
-    })
-  }, [])
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
 
   return [mdx, form]
 }

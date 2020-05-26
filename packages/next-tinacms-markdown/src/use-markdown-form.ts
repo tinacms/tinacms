@@ -16,17 +16,10 @@ limitations under the License.
 
 */
 
-import { useCallback } from 'react'
 const matter = require('gray-matter')
-import * as yaml from 'js-yaml'
 
-import {
-  useWatchFormValues,
-  useForm,
-  useCMS,
-  FormOptions,
-  Field,
-} from 'tinacms'
+import * as yaml from 'js-yaml'
+import { useForm, useCMS, FormOptions, Field } from 'tinacms'
 import { generateFields } from './generate-fields'
 
 /**
@@ -95,21 +88,18 @@ export function useMarkdownForm(
       reset() {
         return cms.api.git.reset({ files: [id] })
       },
+      onChange(formState) {
+        cms.api.git.writeToDisk({
+          fileRelativePath: formState.values.fileRelativePath,
+          content: toMarkdownString(formState.values),
+        })
+      },
     },
     {
       values: valuesOnDisk,
       label,
     }
   )
-
-  const writeToDisk = useCallback(formState => {
-    cms.api.git.writeToDisk({
-      fileRelativePath: formState.values.fileRelativePath,
-      content: toMarkdownString(formState.values),
-    })
-  }, [])
-
-  useWatchFormValues(form, writeToDisk)
 
   return [values || markdownFile, form]
 }
