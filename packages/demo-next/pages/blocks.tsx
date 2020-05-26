@@ -26,7 +26,6 @@ import {
   InlineTextField,
   InlineBlocks,
   BlocksControls,
-  BlockImage,
   useInlineForm,
   InlineTextareaField,
 } from 'react-tinacms-inline'
@@ -120,7 +119,7 @@ function HeroBlock({ index }) {
 function ImageBlock({ index, data }) {
   return (
     <BlocksControls index={index}>
-      <BlockImage
+      <InlineImageField
         name="src"
         previewSrc={formValues => {
           return formValues.blocks[index].src
