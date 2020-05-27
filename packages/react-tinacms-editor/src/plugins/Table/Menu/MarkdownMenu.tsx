@@ -17,16 +17,12 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { TextFieldPlugin } from '@tinacms/fields'
-import { wysiwygStyles } from './wysiwygStyles'
+import { TableIcon } from '@tinacms/icons'
 
-export const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
-})
+import { MenuButton } from '../../../components/MenuHelpers'
 
-export default {
-  name: 'html',
-  Component: HTMLField,
-  parse: TextFieldPlugin.parse,
-}
+export const MarkdownMenu = () => (
+  <MenuButton data-tooltip="Table" disabled>
+    <TableIcon />
+  </MenuButton>
+)

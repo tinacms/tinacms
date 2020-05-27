@@ -232,9 +232,7 @@ function checkForNpmScripts({ packageJson }: TinaPackage) {
   let scripts = packageJson.scripts || {}
 
   let requiredScripts: (keyof TinaPackage['packageJson']['scripts'])[] = [
-    'dev',
     'build',
-    'watch',
   ]
 
   requiredScripts.forEach(scriptName => {

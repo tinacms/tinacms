@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { tableNodes } from 'prosemirror-tables'
-import { SchemaNodePlugin } from '../../types'
 import { Node } from 'prosemirror-model'
 
 const tables = tableNodes({
@@ -53,11 +52,3 @@ tables.table_header = {
 } as any
 
 export { tables }
-
-const plugins: SchemaNodePlugin[] = Object.keys(tables).map(name => ({
-  __type: 'wysiwyg:schema:node',
-  name,
-  node: (tables as any)[name],
-}))
-
-export default plugins

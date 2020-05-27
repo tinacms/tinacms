@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.4.9...react-tinacms-inline@0.5.0) (2020-05-25)
+
+
+### Features
+
+* inline block image handles preview src ([46e09b6](https://github.com/tinacms/tinacms/commit/46e09b6))
+* inline-wysiwyg component ([547a2d8](https://github.com/tinacms/tinacms/commit/547a2d8))
+
+
+
+
+
+## [0.4.9](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.4.8...react-tinacms-inline@0.4.9) (2020-05-19)
+
+**Note:** Version bump only for package react-tinacms-inline
+
+
+
+
+
 ## [0.4.8](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.4.7...react-tinacms-inline@0.4.8) (2020-05-12)
 
 **Note:** Version bump only for package react-tinacms-inline

@@ -59,6 +59,11 @@ function Index(props) {
 const formOptions = {
   label: 'Home Page',
   fields: [
+    {
+      label: 'Tags',
+      name: 'tags',
+      component: 'tags',
+    },
     { label: 'Name', name: 'name', component: 'text' },
     {
       name: 'body',

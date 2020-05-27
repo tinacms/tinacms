@@ -16,20 +16,16 @@ limitations under the License.
 
 */
 
-import { FormOptions, Form, usePlugin } from 'tinacms'
-import { RemarkNode } from './remark-node'
-import { useRemarkForm } from './useRemarkForm'
+import get from 'lodash.get'
+import { Form } from '@tinacms/forms'
 
-interface RemarkFormProps extends Partial<FormOptions<any>> {
-  remark: RemarkNode
-  render(renderProps: { form: Form; markdownRemark: any }): JSX.Element
-  timeout?: number
-}
-
-export function RemarkForm({ remark, render, ...options }: RemarkFormProps) {
-  const [markdownRemark, form] = useRemarkForm(remark, options)
-
-  usePlugin(form || undefined)
-
-  return render({ form: form as Form, markdownRemark })
+export function getFlattenedFormValues(form: Form) {
+  const flatData: any = {}
+  const values = form.values
+  form.finalForm.getRegisteredFields().forEach((field: string | number) => {
+    const data = get(values, field)
+    if (typeof data === 'object') return
+    flatData[field] = data
+  })
+  return flatData
 }

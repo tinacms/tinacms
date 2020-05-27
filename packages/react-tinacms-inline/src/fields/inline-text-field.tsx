@@ -16,21 +16,36 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { InlineField } from './inline-field'
+import * as React from 'react'
 import styled from 'styled-components'
-import TextareaAutosize from 'react-textarea-autosize'
-import { InlineTextFieldProps } from './inline-field-text'
-import { InputFocusWrapper } from './styles'
+import { InlineField } from '../inline-field'
+import { InputFocusWrapper } from '../styles'
 
-export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
+/**
+ * InlineTextField
+ */
+export interface InlineTextFieldProps {
+  name: string
+  className?: string
+  focusRing?: boolean
+}
+
+export function InlineTextField({
+  name,
+  className,
+  focusRing = true,
+}: InlineTextFieldProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
+          if (!focusRing) {
+            return <InlineText type="text" {...input} className={className} />
+          }
+
           return (
             <InputFocusWrapper>
-              <InlineTextarea className={className} {...input} rows={1} />
+              <InlineText type="text" {...input} className={className} />
             </InputFocusWrapper>
           )
         }
@@ -40,9 +55,8 @@ export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
   )
 }
 
-export const InlineTextarea = styled(TextareaAutosize)`
+const InlineText = styled.input`
   width: 100%;
-  word-wrap: break-word;
   display: block;
   font-size: inherit;
   font-family: inherit;
@@ -51,7 +65,6 @@ export const InlineTextarea = styled(TextareaAutosize)`
   color: inherit;
   letter-spacing: inherit;
   line-height: inherit;
-  margin: 0 auto;
   max-width: inherit;
   background-color: inherit;
   text-align: inherit;
@@ -61,8 +74,4 @@ export const InlineTextarea = styled(TextareaAutosize)`
   overflow: visible;
   position: relative;
   -ms-overflow-style: none;
-
-  ::-webkit-scrollbar {
-    display: none;
-  }
 `
