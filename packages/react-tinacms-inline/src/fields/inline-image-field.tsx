@@ -31,7 +31,13 @@ export interface InlineImageProps {
   children?: any
 }
 
-export function InlineImageField({
+/**
+ * @deprecated
+ * @alias InlineImage
+ */
+export const InlineImageField = InlineImage
+
+export function InlineImage({
   name,
   previewSrc,
   uploadDir,

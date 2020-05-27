@@ -25,10 +25,6 @@ import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
 
-/**
- * Blocks
- */
-
 export interface InlineBlocksProps {
   name: string
   blocks: {
