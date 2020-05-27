@@ -21,7 +21,7 @@ import { NextPage } from 'next'
 import { MarkdownFile, useLocalMarkdownForm } from 'next-tinacms-markdown'
 import {
   InlineForm,
-  InlineTextField,
+  InlineText,
   InlineField,
   useInlineForm,
 } from 'react-tinacms-inline'
@@ -59,7 +59,7 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
           <SaveButton />
           <ResetButton />
           <h1>
-            <InlineTextField name="frontmatter.title" />
+            <InlineText name="frontmatter.title" />
           </h1>
         </header>
         <InlineField name="markdownBody">
