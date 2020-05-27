@@ -35,6 +35,7 @@ export interface WysiwygProps {
   sticky?: boolean
   format?: Format
   imageProps?: ImageProps
+  toggleEditorMode?: () => void
 }
 
 export const Wysiwyg = styled(
@@ -44,6 +45,7 @@ export const Wysiwyg = styled(
     sticky,
     format,
     imageProps,
+    toggleEditorMode,
     ...styleProps
   }: WysiwygProps) => {
     const [el, setEl] = useState<HTMLDivElement>()
@@ -69,6 +71,7 @@ export const Wysiwyg = styled(
           <Menubar
             sticky={sticky}
             uploadImages={imageProps && imageProps.upload}
+            toggleEditorMode={toggleEditorMode}
           />
         </EditorStateProvider>
         <div {...styleProps} ref={editorRef} />

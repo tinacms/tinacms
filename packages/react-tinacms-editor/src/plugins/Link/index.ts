@@ -17,5 +17,5 @@ limitations under the License.
 */
 
 export { linkPluginKey, linkPlugin } from './plugin'
-export { Menu } from './Menu'
+export * from './Menu'
 export { LinkForm } from './Popups/Form'

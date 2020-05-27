@@ -23,6 +23,7 @@ import { useState } from 'react'
 import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
+import { InlineFieldContext } from '../inline-field-context'
 
 /**
  * Blocks
@@ -143,29 +144,13 @@ export interface InlineBlockProps {
   data: any
   block: Block
 }
+
 export function InlineBlock({ name, data, block, index }: InlineBlockProps) {
   return (
-    <InlineBlockContext.Provider value={{ name, ...block }}>
+    <InlineFieldContext.Provider value={{ name, ...block }}>
       <block.Component data={data} index={index} />
-    </InlineBlockContext.Provider>
+    </InlineFieldContext.Provider>
   )
-}
-
-export interface InlineBlockContext extends Block {
-  name: string
-}
-export const InlineBlockContext = React.createContext<InlineBlockContext | null>(
-  null
-)
-
-export function useInlineBlock() {
-  const inlineFormContext = React.useContext(InlineBlockContext)
-
-  if (!inlineFormContext) {
-    throw new Error('useInlineBlock must be within an InlineBlockContext')
-  }
-
-  return inlineFormContext
 }
 
 const BlocksEmptyState = styled.div`

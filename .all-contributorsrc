@@ -671,6 +671,34 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "pixelmord",
+      "name": "Andreas Adam",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/224168?v=4",
+      "profile": "https://pixelmord.github.io",
+      "contributions": [
+        "ideas",
+        "doc"
+      ]
+    },
+    {
+      "login": "grncdr",
+      "name": "Stephen Sugden",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/82634?v=4",
+      "profile": "http://stephensugden.com",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "logan-anderson",
+      "name": "Logan Anderson",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/43075109?v=4",
+      "profile": "https://www.logan.bio",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,

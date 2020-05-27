@@ -16,11 +16,6 @@ limitations under the License.
 
 */
 
-import { SchemaMarkPlugin } from '../../types'
-
-/**
- * strong
- */
 export const strong = {
   parseDOM: [
     { tag: 'strong' },
@@ -44,9 +39,3 @@ export const strong = {
     return ['strong']
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:mark',
-  name: 'strong',
-  mark: strong,
-} as SchemaMarkPlugin

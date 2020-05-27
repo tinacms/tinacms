@@ -16,15 +16,7 @@ limitations under the License.
 
 */
 
-import {
-  FormOptions,
-  Form,
-  GlobalFormPlugin,
-  useCMS,
-  useWatchFormValues,
-  useForm,
-  usePlugins,
-} from 'tinacms'
+import { FormOptions, Form, GlobalFormPlugin, usePlugins } from 'tinacms'
 import {
   ERROR_MISSING_REMARK_PATH,
   ERROR_MISSING_REMARK_RAW_MARKDOWN,
@@ -35,32 +27,24 @@ import { RemarkNode } from './remark-node'
 import { toMarkdownString } from './to-markdown'
 import { generateFields } from './generate-fields'
 import * as React from 'react'
+import { useGitForm } from 'gatsby-tinacms-git'
 const matter = require('gray-matter')
 
 export function useRemarkForm(
-  _markdownRemark: RemarkNode | null | undefined,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  _node: RemarkNode | null | undefined,
+  formOptions: Partial<FormOptions<any>> = {}
 ): [RemarkNode | null | undefined, Form | null | undefined] {
-  const markdownRemark = usePersistentValue(_markdownRemark)
-
-  // NODE_ENV will never change at runtime
-  const TINA_DISABLED = process.env.NODE_ENV === 'production'
+  const node = usePersistentValue(_node)
 
   /**
    * We're returning early here which means all the hooks called by this hook
    * violate the rules of hooks.
    */
-  if (!markdownRemark) {
-    return [markdownRemark, null]
+  if (!node) {
+    return [node, null]
   }
 
-  validateMarkdownRemark(markdownRemark)
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const cms = useCMS()
-  const label = formOverrrides.label || markdownRemark.frontmatter.title
-  const id = markdownRemark.fileRelativePath
-  const actions = formOverrrides.actions
+  validateMarkdownRemark(node)
 
   /**
    * The state of the RemarkForm, generated from the contents of the
@@ -70,12 +54,12 @@ export function useRemarkForm(
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const valuesOnDisk = useMemo(
     () => ({
-      fileRelativePath: markdownRemark.fileRelativePath,
-      frontmatter: markdownRemark.frontmatter,
-      rawMarkdownBody: markdownRemark.rawMarkdownBody,
-      rawFrontmatter: JSON.parse(markdownRemark.rawFrontmatter),
+      fileRelativePath: node.fileRelativePath,
+      frontmatter: node.frontmatter,
+      rawMarkdownBody: node.rawMarkdownBody,
+      rawFrontmatter: JSON.parse(node.rawFrontmatter),
     }),
-    [markdownRemark.rawFrontmatter, markdownRemark.rawMarkdownBody]
+    [node.rawFrontmatter, node.rawMarkdownBody]
   )
 
   /**
@@ -83,7 +67,7 @@ export function useRemarkForm(
    */
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const fields = React.useMemo(() => {
-    let fields = formOverrrides.fields || generateFields(valuesOnDisk)
+    let fields = formOptions.fields || generateFields(valuesOnDisk)
     fields = fields.map(field => {
       /**
        * Treat the field.name prefix `frontmatter` as an alias to
@@ -102,60 +86,33 @@ export function useRemarkForm(
     })
 
     return fields
-  }, [formOverrrides.fields])
+  }, [formOptions.fields])
 
-  function loadInitialValues() {
-    return cms.api.git
-      .show(id) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        // Parse the content into the RemarkForm data structure and store it in state.
-        const { content: rawMarkdownBody, data: rawFrontmatter } = matter(
-          git.content
-        )
-        return { ...valuesOnDisk, rawFrontmatter, rawMarkdownBody }
-      })
-  }
+  const label = formOptions.label || node.frontmatter.title
 
-  const remarkFormOptions = {
-    label,
-    id,
-    loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
-    fields,
-    onSubmit(data: any) {
-      return cms.api.git.onSubmit!({
-        files: [data.fileRelativePath],
-        message: data.__commit_message || 'Tina commit',
-        name: data.__commit_name,
-        email: data.__commit_email,
-      })
+  /* eslint-disable-next-line react-hooks/rules-of-hooks */
+  const [, form] = useGitForm(
+    node,
+    {
+      ...formOptions,
+      label,
+      fields,
+      format: toMarkdownString,
+      parse: fromMarkdownString,
     },
-    reset() {
-      return cms.api.git.reset({ files: [id] })
-    },
-    actions,
-  }
+    {
+      label,
+      fields,
+      values: valuesOnDisk,
+    }
+  )
 
-  const watchValuesForChange = {
-    label,
-    fields,
-    values: valuesOnDisk,
-  }
+  return [node, form]
+}
 
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useForm(remarkFormOptions, watchValuesForChange)
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const writeToDisk = React.useCallback(formState => {
-    cms.api.git.onChange!({
-      fileRelativePath: formState.values.fileRelativePath,
-      content: toMarkdownString(formState.values),
-    })
-  }, [])
-
-  /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  useWatchFormValues(form, writeToDisk)
-
-  return [markdownRemark, form]
+function fromMarkdownString(content: string) {
+  const { content: rawMarkdownBody, data: rawFrontmatter } = matter(content)
+  return { rawFrontmatter, rawMarkdownBody }
 }
 
 /**
