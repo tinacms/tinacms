@@ -22,12 +22,12 @@ import { useJsonForm } from 'next-tinacms-json'
 import { ModalProvider, BlockTemplate } from 'tinacms'
 import {
   InlineForm,
-  InlineImageField,
-  InlineTextField,
+  InlineImage,
+  InlineText,
   InlineBlocks,
   BlocksControls,
   useInlineForm,
-  InlineTextareaField,
+  InlineTextarea,
 } from 'react-tinacms-inline'
 
 /**
@@ -42,15 +42,15 @@ export default function BlocksExample({ jsonFile }) {
         <EditToggle />
         <DiscardChanges />
         <h1>
-          <InlineTextField name="title" />
-          <InlineImageField
+          <InlineText name="title" />
+          <InlineImage
             name="hero_image"
             previewSrc={formValues => formValues.hero_image}
             parse={filename => `/images/${filename}`}
             uploadDir={() => '/public/images/'}
           >
             {props => <ChildImage src={data.hero_image} {...props} />}
-          </InlineImageField>
+          </InlineImage>
         </h1>
         <Wrap>
           <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
@@ -119,7 +119,7 @@ function HeroBlock({ index }) {
 function ImageBlock({ index, data }) {
   return (
     <BlocksControls index={index}>
-      <InlineImageField
+      <InlineImage
         name="src"
         previewSrc={formValues => {
           return formValues.blocks[index].src
@@ -145,7 +145,7 @@ const image_template: BlockTemplate = {
 
 // Testing the block styled component override
 
-const StyledBlockText = styled(InlineTextareaField)`
+const StyledBlockText = styled(InlineTextarea)`
   color: green;
 `
 

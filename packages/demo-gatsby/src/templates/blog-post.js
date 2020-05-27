@@ -31,8 +31,8 @@ import { EditToggle } from "../components/edit-toggle"
 import {
   InlineForm,
   InlineBlocks,
-  InlineTextareaField,
-  InlineImageField,
+  InlineTextarea,
+  InlineImage,
   useInlineForm,
 } from "react-tinacms-inline"
 
@@ -95,7 +95,7 @@ function BlogPostTemplate(props) {
                   marginTop: rhythm(2),
                 }}
               >
-                <InlineTextareaField name="rawFrontmatter.title" />
+                <InlineTextarea name="rawFrontmatter.title" />
               </h1>
               <div
                 style={{
@@ -107,7 +107,7 @@ function BlogPostTemplate(props) {
               >
                 <Bio />
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <InlineImageField
+                  <InlineImage
                     name="rawFrontmatter.thumbnail"
                     // Generate the frontmatter value based on the filename
                     parse={filename => (filename ? `./${filename}` : null)}
@@ -137,7 +137,7 @@ function BlogPostTemplate(props) {
                         {...props}
                       />
                     )}
-                  </InlineImageField>
+                  </InlineImage>
                   {/* <Img
                     fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
                     alt="Gatsby can't find me"
