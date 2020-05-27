@@ -21,7 +21,6 @@ import {
   Form,
   GlobalFormPlugin,
   useCMS,
-  useWatchFormValues,
   useForm,
   usePlugins,
 } from 'tinacms'
