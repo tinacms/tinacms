@@ -8,6 +8,7 @@
     "src/**/*.d.ts",
     "index.js",
     "gatsby-node.js",
+    "gatsby-browser.js",
     "remark-fragment.js"
   ],
   "keywords": [
@@ -41,6 +42,8 @@
     "@types/js-yaml": "^3.12.3",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
+    "react-tinacms-editor": "^0.7.1",
+    "react-tinacms-inline": "^0.5.0",
     "slash": "^3.0.0"
   },
   "peerDependencies": {
