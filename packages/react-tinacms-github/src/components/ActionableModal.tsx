@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { TinaReset, Button as TinaButton } from '@tinacms/styles'
+import { StyleReset, Button as TinaButton } from '@tinacms/styles'
 import {
   Modal,
   ModalPopup,
@@ -42,7 +42,7 @@ export const ActionableModal = ({
   }
 
   return (
-    <TinaReset>
+    <StyleReset>
       <Modal>
         <ModalPopup>
           <ModalHeader>{title}</ModalHeader>
@@ -58,6 +58,6 @@ export const ActionableModal = ({
           </ModalActions>
         </ModalPopup>
       </Modal>
-    </TinaReset>
+    </StyleReset>
   )
 }

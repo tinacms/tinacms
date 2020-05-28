@@ -178,7 +178,7 @@ const SaveLink = styled.button`
   box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
   background-color: #0084ff;
   color: white;
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   cursor: pointer;
   transition: all 85ms ease-out;
   font-size: var(--tina-font-size-0);
