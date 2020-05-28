@@ -69,11 +69,17 @@ import { EventBus } from './event'
  * ```
  */
 export interface CMSConfig {
+  enabled?: boolean
   plugins?: Array<Plugin>
   apis?: { [key: string]: any }
 }
 
 export class CMS {
+  static ENABLED = { type: 'cms:enable' }
+  static DISABLED = { type: 'cms:disable' }
+
+  private _enabled: boolean = false
+
   /**
    * An object for managing CMSs plugins.
    *
@@ -124,6 +130,10 @@ export class CMS {
         this.registerApi(name, api)
       )
     }
+
+    if (config.enabled) {
+      this.enable()
+    }
   }
 
   /**
@@ -144,5 +154,23 @@ export class CMS {
   registerApi(name: string, api: any): void {
     // TODO: Make sure we're not overwriting an existing API.
     this.api[name] = api
+  }
+
+  get enabled(): boolean {
+    return this._enabled
+  }
+
+  get disabled(): boolean {
+    return !this._enabled
+  }
+
+  enable(): void {
+    this._enabled = true
+    this.events.dispatch(CMS.ENABLED)
+  }
+
+  disable(): void {
+    this._enabled = true
+    this.events.dispatch(CMS.DISABLED)
   }
 }

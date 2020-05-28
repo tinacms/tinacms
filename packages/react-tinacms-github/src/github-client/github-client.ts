@@ -218,8 +218,7 @@ export class GithubClient {
 
   async createBranch(name: string) {
     const currentBranch = await this.getBranch()
-    console.log({ currentBranch })
-    let sha = currentBranch.object.sha
+    const sha = currentBranch.object.sha
     return this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/git/refs`,
       method: 'POST',
