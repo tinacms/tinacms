@@ -186,3 +186,9 @@ export const tina_reset_styles = css`
 export const StyleReset = styled.div`
   ${tina_reset_styles}
 `
+
+/**
+ * @alias StyleReset
+ * @deprecated
+ */
+export const TinaReset = StyleReset

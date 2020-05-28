@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { createRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { TinaReset } from '@tinacms/styles'
+import { StyleReset } from '@tinacms/styles'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import {
@@ -95,7 +95,7 @@ export const LinkForm = () => {
   return (
     <div ref={wrapperRef} style={{ position: 'absolute' }}>
       {position && (
-        <TinaReset>
+        <StyleReset>
           <LinkFormWrapper>
             <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
             <InnerForm
@@ -111,7 +111,7 @@ export const LinkForm = () => {
               cancel={onCancel}
             />
           </LinkFormWrapper>
-        </TinaReset>
+        </StyleReset>
       )}
     </div>
   )
