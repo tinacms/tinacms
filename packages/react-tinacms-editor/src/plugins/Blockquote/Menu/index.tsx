@@ -16,33 +16,5 @@ limitations under the License.
 
 */
 
-import { wrapIn } from 'prosemirror-commands'
-import { EditorState } from 'prosemirror-state'
-import { findParentNodeOfType } from 'prosemirror-utils'
-import { QuoteIcon } from '@tinacms/icons'
-
-import { commandControl } from '../../../components/MenuHelpers'
-
-function wrapInBlockquote(state: EditorState, dispatch: any) {
-  const { blockquote } = state.schema.nodes
-  const { start, node } =
-    findParentNodeOfType(blockquote)(state.selection) || {}
-  if (start && node) {
-    const { tr } = state
-    const nodeRange = tr.doc
-      .resolve(start + 1)
-      .blockRange(tr.doc.resolve(start + node.nodeSize - 2))
-    if (nodeRange) {
-      if (dispatch) return dispatch(tr.lift(nodeRange, 0))
-      else return true
-    }
-  }
-  return wrapIn(state.schema.nodes.blockquote)(state, dispatch)
-}
-
-export const Menu = commandControl(
-  wrapInBlockquote,
-  QuoteIcon,
-  'Blockquote',
-  'Blockquote'
-)
+export { WysiwygMenu } from './WysiwygMenu'
+export { MarkdownMenu } from './MarkdownMenu'

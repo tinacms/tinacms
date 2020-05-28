@@ -118,4 +118,4 @@ The generated **Client ID** & **Client Secret** will be consumed by the `createC
 ## Next steps
 
 Now that we have configured our backend API functions to manage our Github authentication token, we will need to configure the front-end to use these endpoints.
-You may want to use the [next-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-github) package.
+You may want to use the [react-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-github) package.

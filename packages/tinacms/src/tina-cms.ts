@@ -30,15 +30,18 @@ import {
   GroupFieldPlugin,
   GroupListFieldPlugin,
   BlocksFieldPlugin,
+  TagsFieldPlugin,
 } from '@tinacms/fields'
 import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
-import HtmlFieldPlugin from './plugins/fields/HtmlFieldPlugin'
-import MarkdownFieldPlugin from './plugins/fields/MarkdownFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
+import {
+  MarkdownFieldPlaceholder,
+  HtmlFieldPlaceholder,
+} from './plugins/fields/markdown'
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
@@ -70,11 +73,12 @@ export class TinaCMS extends CMS {
     this.fields.add(NumberFieldPlugin)
     this.fields.add(ToggleFieldPlugin)
     this.fields.add(SelectFieldPlugin)
-    this.fields.add(MarkdownFieldPlugin)
-    this.fields.add(HtmlFieldPlugin)
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
+    this.fields.add(MarkdownFieldPlaceholder)
+    this.fields.add(HtmlFieldPlaceholder)
+    this.fields.add(TagsFieldPlugin)
   }
 
   get forms(): PluginType<Form> {

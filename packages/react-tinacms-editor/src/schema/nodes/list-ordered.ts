@@ -17,11 +17,7 @@ limitations under the License.
 */
 
 import { Node } from 'prosemirror-model'
-import { SchemaNodePlugin } from '../../types'
 
-/**
- * Ordered List
- */
 export const ordered_list = {
   content: 'list_item+',
   group: 'block',
@@ -50,9 +46,3 @@ export const ordered_list = {
     ]
   },
 }
-
-export default {
-  __type: 'wysiwyg:schema:node',
-  name: 'ordered_list',
-  node: ordered_list,
-} as SchemaNodePlugin

@@ -26,7 +26,7 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import { TinaResetStyles } from '@tinacms/styles'
+import { tina_reset_styles } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '@tinacms/react-core'
@@ -426,7 +426,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
 `
 
 const SidebarContainer = styled.div<{ open: boolean }>`
-  ${TinaResetStyles}
+  ${tina_reset_styles}
 
   position: fixed !important;
   top: 0 !important;

@@ -650,6 +650,53 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/1447644?v=4",
       "profile": "https://bshack.dev",
       "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "amykapernick",
+      "name": "Amy Kapernick",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/15953185?v=4",
+      "profile": "https://amyskapers.dev",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "samullman",
+      "name": "Sam Ullman",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10147333?v=4",
+      "profile": "http://samullman.com",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "pixelmord",
+      "name": "Andreas Adam",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/224168?v=4",
+      "profile": "https://pixelmord.github.io",
+      "contributions": [
+        "ideas",
+        "doc"
+      ]
+    },
+    {
+      "login": "grncdr",
+      "name": "Stephen Sugden",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/82634?v=4",
+      "profile": "http://stephensugden.com",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "logan-anderson",
+      "name": "Logan Anderson",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/43075109?v=4",
+      "profile": "https://www.logan.bio",
+      "contributions": [
         "code"
       ]
     }

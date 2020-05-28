@@ -16,56 +16,5 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { undo, redo, undoDepth, redoDepth } from 'prosemirror-history'
-
-import { RedoIcon, UndoIcon } from '@tinacms/icons'
-
-import { useEditorStateContext } from '../../../context/editorState'
-import { MenuButton } from '../../../components/MenuHelpers'
-
-export const Menu = () => (
-  <>
-    <UndoControl />
-    <RedoControl />
-  </>
-)
-
-const UndoControl = () => {
-  const { editorView } = useEditorStateContext()
-  const undoChange = () => {
-    const { state, dispatch } = editorView!.view
-    undo(state, dispatch)
-  }
-
-  return (
-    <MenuButton
-      data-tooltip="Undo"
-      data-side="top"
-      onClick={undoChange}
-      disabled={undoDepth(editorView!.view.state) < 1}
-    >
-      <UndoIcon />
-    </MenuButton>
-  )
-}
-
-const RedoControl = () => {
-  const { editorView } = useEditorStateContext()
-
-  const redoChange = () => {
-    const { state, dispatch } = editorView!.view
-    redo(state, dispatch)
-  }
-
-  return (
-    <MenuButton
-      data-tooltip="Redo"
-      data-side="top"
-      onClick={redoChange}
-      disabled={redoDepth(editorView!.view.state) < 1}
-    >
-      <RedoIcon />
-    </MenuButton>
-  )
-}
+export { WysiwygMenu } from './WysiwygMenu'
+export { MarkdownMenu } from './MarkdownMenu'

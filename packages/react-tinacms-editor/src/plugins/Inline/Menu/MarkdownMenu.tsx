@@ -16,15 +16,21 @@ limitations under the License.
 
 */
 
-import get from 'lodash.get'
+import * as React from 'react'
+import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
 
-export function flattenFormData(form: any) {
-  let flatData: any = {}
-  let values = form.getState().values
-  form.getRegisteredFields().forEach((field: string | number) => {
-    let data = get(values, field)
-    if (typeof data === 'object') return
-    flatData[field] = data
-  })
-  return flatData
-}
+import { MenuButton } from '../../../components/MenuHelpers'
+
+export const MarkdownMenu = () => (
+  <>
+    <MenuButton data-tooltip="Bold" data-side="top" disabled>
+      <BoldIcon />
+    </MenuButton>
+    <MenuButton data-tooltip="Italic" data-side="top" disabled>
+      <ItalicIcon />
+    </MenuButton>
+    <MenuButton data-tooltip="Strike" data-side="top" disabled>
+      <StrikethroughIcon />
+    </MenuButton>
+  </>
+)

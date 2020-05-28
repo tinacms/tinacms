@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.20.0](https://github.com/tinacms/tinacms/compare/tinacms@0.19.4...tinacms@0.20.0) (2020-05-25)
+
+
+### Bug Fixes
+
+* remove wysiwyg export from tinacms ([6d4cd7e](https://github.com/tinacms/tinacms/commit/6d4cd7e))
+
+
+### Features
+
+* added TagsFieldPlugin ([8b447e5](https://github.com/tinacms/tinacms/commit/8b447e5))
+* remove markdown editor from tinacms default plugins ([c1c36f8](https://github.com/tinacms/tinacms/commit/c1c36f8))
+
+
+
+
+
+## [0.19.4](https://github.com/tinacms/tinacms/compare/tinacms@0.19.3...tinacms@0.19.4) (2020-05-19)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
 ## [0.19.3](https://github.com/tinacms/tinacms/compare/tinacms@0.19.2...tinacms@0.19.3) (2020-05-12)
 
 **Note:** Version bump only for package tinacms

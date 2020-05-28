@@ -11,6 +11,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export * from './useLocalStorageCache'
-export * from './flatten-form-data'
-export * from './BrowserStorageApi'
+export * from './browser-storage-client'
+export * from './use-form-browser-cache'

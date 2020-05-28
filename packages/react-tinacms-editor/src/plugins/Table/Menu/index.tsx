@@ -16,19 +16,5 @@ limitations under the License.
 
 */
 
-import { EditorState } from 'prosemirror-state'
-import { findParentNodeOfType } from 'prosemirror-utils'
-import { TableIcon } from '@tinacms/icons'
-
-import { commandControl } from '../../../components/MenuHelpers'
-import { insertTable } from '../commands'
-
-function insertTableCmd(state: EditorState, dispatch: any) {
-  const { table } = state.schema.nodes
-  const { selection } = state
-  const tableParent = findParentNodeOfType(table)(selection)
-  if (tableParent) return false
-  return insertTable(state, dispatch)
-}
-
-export const Menu = commandControl(insertTableCmd, TableIcon, 'Table', 'Table')
+export { WysiwygMenu } from './WysiwygMenu'
+export { MarkdownMenu } from './MarkdownMenu'

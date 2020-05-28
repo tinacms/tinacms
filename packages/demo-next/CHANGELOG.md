@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.4.0...nextjs-blog-starter@0.4.1-alpha.0) (2020-05-28)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+# [0.4.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.3.10...nextjs-blog-starter@0.4.0) (2020-05-25)
+
+
+### Features
+
+* added TagsFieldPlugin ([8b447e5](https://github.com/kendallstrautman/nextjs-blog-starter/commit/8b447e5))
+
+
+
+
+
+## [0.3.10](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.3.9...nextjs-blog-starter@0.3.10) (2020-05-19)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
 ## [0.3.9](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.3.8...nextjs-blog-starter@0.3.9) (2020-05-12)
 
 **Note:** Version bump only for package nextjs-blog-starter

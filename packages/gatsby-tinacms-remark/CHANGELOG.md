@@ -3,6 +3,44 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.20...gatsby-tinacms-remark@0.8.0-alpha.0) (2020-05-28)
+
+
+### Features
+
+* register markdown and html fields ([769de39](https://github.com/tinacms/tinacms/commit/769de39))
+
+
+
+
+
+## [0.7.20](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.19...gatsby-tinacms-remark@0.7.20) (2020-05-25)
+
+**Note:** Version bump only for package gatsby-tinacms-remark
+
+
+
+
+
+## [0.7.19](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.18...gatsby-tinacms-remark@0.7.19) (2020-05-19)
+
+**Note:** Version bump only for package gatsby-tinacms-remark
+
+
+
+
+
+## [0.7.18](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.17...gatsby-tinacms-remark@0.7.18) (2020-05-12)
+
+
+### Bug Fixes
+
+* fragment definitions ([23983f8](https://github.com/tinacms/tinacms/commit/23983f8))
+
+
+
+
+
 ## [0.7.17](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.7.16...gatsby-tinacms-remark@0.7.17) (2020-05-12)
 
 

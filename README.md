@@ -1,7 +1,8 @@
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-63-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-68-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # ![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png)
@@ -54,7 +55,6 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 | npm run build                      | Build all packages.                           |
 | npm run test                       | Run tests for all packages.                   |
 | lerna run build --scope \<package> | Build only \<package>.                        |
-| lerna run watch --scope \<package> | Build a the \<package> in watch mode.         |
 
 ### Testing With External Projects
 
@@ -155,12 +155,20 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/BPScott"><img src="https://avatars0.githubusercontent.com/u/227292?v=4" width="100px;" alt=""/><br /><sub><b>Ben Scott</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/pulls?q=is%3Apr+reviewed-by%3ABPScott" title="Reviewed Pull Requests">👀</a></td>
     <td align="center"><a href="https://github.com/mittonface"><img src="https://avatars2.githubusercontent.com/u/5082908?v=4" width="100px;" alt=""/><br /><sub><b>Brent Mitton</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=mittonface" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/commits?author=mittonface" title="Documentation">📖</a></td>
     <td align="center"><a href="https://github.com/clnmcgrw"><img src="https://avatars2.githubusercontent.com/u/5896972?v=4" width="100px;" alt=""/><br /><sub><b>Colin McGraw</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=clnmcgrw" title="Documentation">📖</a></td>
-    <td align="center"><a href="https://bshack.dev"><img src="https://avatars0.githubusercontent.com/u/1447644?v=4" width="100px;" alt=""/><br /><sub><b>Brandon Shackelford</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=bshackelford" title="Code">💻</a></td>
+    <td align="center"><a href="https://bshack.dev"><img src="https://avatars0.githubusercontent.com/u/1447644?v=4" width="100px;" alt=""/><br /><sub><b>Brandon Shackelford</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=bshackelford" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Abshackelford" title="Bug reports">🐛</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://amyskapers.dev"><img src="https://avatars2.githubusercontent.com/u/15953185?v=4" width="100px;" alt=""/><br /><sub><b>Amy Kapernick</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Aamykapernick" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="http://samullman.com"><img src="https://avatars3.githubusercontent.com/u/10147333?v=4" width="100px;" alt=""/><br /><sub><b>Sam Ullman</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Asamullman" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://pixelmord.github.io"><img src="https://avatars2.githubusercontent.com/u/224168?v=4" width="100px;" alt=""/><br /><sub><b>Andreas Adam</b></sub></a><br /><a href="#ideas-pixelmord" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/tinacms/tinacms/commits?author=pixelmord" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://stephensugden.com"><img src="https://avatars3.githubusercontent.com/u/82634?v=4" width="100px;" alt=""/><br /><sub><b>Stephen Sugden</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=grncdr" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://www.logan.bio"><img src="https://avatars2.githubusercontent.com/u/43075109?v=4" width="100px;" alt=""/><br /><sub><b>Logan Anderson</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=logan-anderson" title="Code">💻</a></td>
   </tr>
 </table>
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
