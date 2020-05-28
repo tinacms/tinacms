@@ -193,7 +193,7 @@ const MenuList = styled.div`
 const MenuLink = styled.div<{ value: string }>`
   color: var(--tina-color-grey-1);
   font-size: var(--tina-font-size-4);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   padding: var(--tina-padding-big) var(--tina-padding-big)
     var(--tina-padding-big) 64px;
   position: relative;

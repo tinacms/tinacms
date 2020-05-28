@@ -169,7 +169,7 @@ const LinkButton = styled.a`
   border-radius: var(--tina-radius-big);
   border: 1px solid var(--tina-color-grey-2);
   box-shadow: var(--tina-shadow-small);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   cursor: pointer;
   font-size: var(--tina-font-size-0);
   transition: all var(--tina-timing-short) ease-out;
