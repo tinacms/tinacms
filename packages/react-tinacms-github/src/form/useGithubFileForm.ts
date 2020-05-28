@@ -62,7 +62,5 @@ export const useGithubFileForm = <T = any>(
     },
   })
 
-  usePlugin(form)
-
   return [formData || file.data, form]
 }
