@@ -22,7 +22,7 @@ import styled from 'styled-components'
 import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 
-import { TinaReset } from '@tinacms/styles'
+import { StyleReset } from '@tinacms/styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
 import { useEditorStateContext } from '../../../context/editorState'
@@ -134,7 +134,7 @@ export const ImageEdit: FunctionComponent = () => {
   }
 
   return (
-    <TinaReset>
+    <StyleReset>
       <LinkPopup
         top={modalTop}
         left={modalLeft}
@@ -198,7 +198,7 @@ export const ImageEdit: FunctionComponent = () => {
           <SaveLink onClick={updateNodeAttrs}>Save</SaveLink>
         </LinkActions>
       </LinkPopup>
-    </TinaReset>
+    </StyleReset>
   )
 }
 

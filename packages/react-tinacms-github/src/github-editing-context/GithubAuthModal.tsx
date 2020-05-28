@@ -24,7 +24,7 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { TinaReset } from '@tinacms/styles'
+import { StyleReset } from '@tinacms/styles'
 import { AsyncButton } from '../components/AsyncButton'
 import React, { useState } from 'react'
 import styled from 'styled-components'
@@ -114,7 +114,7 @@ interface ModalBuilderProps {
 
 export function ModalBuilder(modalProps: ModalBuilderProps) {
   return (
-    <TinaReset>
+    <StyleReset>
       <Modal>
         <ModalPopup>
           <ModalHeader close={modalProps.close}>{modalProps.title}</ModalHeader>
@@ -129,7 +129,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
           </ModalActions>
         </ModalPopup>
       </Modal>
-    </TinaReset>
+    </StyleReset>
   )
 }
 
