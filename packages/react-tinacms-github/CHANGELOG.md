@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.0...react-tinacms-github@0.4.1-alpha.0) (2020-05-28)
+
+
+### Bug Fixes
+
+* use-github-file-form no longer registers the form plugin ([0ad8b40](https://github.com/tinacms/tinacms/commit/0ad8b40))
+
+
+
+
+
 # [0.4.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.3.2...react-tinacms-github@0.4.0) (2020-05-25)
 
 
