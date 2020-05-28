@@ -17,14 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import {
-  InlineTextFieldProps,
-  InlineTextField,
-} from '../fields/inline-text-field'
+import { InlineTextProps, InlineText } from '../fields/inline-text-field'
 
 /**
  * @deprecated
  */
-export function BlockText(props: InlineTextFieldProps) {
-  return <InlineTextField {...props} focusRing={false} />
+export function BlockText(props: InlineTextProps) {
+  return <InlineText {...props} focusRing={false} />
 }
