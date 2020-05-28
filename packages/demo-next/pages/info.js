@@ -17,9 +17,9 @@ import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
   InlineForm,
-  InlineTextField,
+  InlineText,
   // InlineWysiwyg,
-  InlineImageField,
+  InlineImage,
   InlineGroup,
   InlineGroupControls,
 } from 'react-tinacms-inline'
@@ -79,13 +79,13 @@ function Info(props) {
           >
             <InlineGroupControls>
               <h1>
-                <InlineTextField focusRing={false} name="name" />
+                <InlineText focusRing={false} name="name" />
               </h1>
               GROUP!!!!
             </InlineGroupControls>
           </InlineGroup>
 
-          <InlineImageField
+          <InlineImage
             name="frontmatter.image"
             previewSrc={formValues => {
               return formValues.frontmatter.image

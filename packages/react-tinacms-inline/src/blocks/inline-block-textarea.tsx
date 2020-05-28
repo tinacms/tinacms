@@ -17,12 +17,12 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineTextFieldProps } from '../fields/inline-text-field'
-import { InlineTextareaField } from '../fields/inline-textarea-field'
+import { InlineTextProps } from '../fields/inline-text-field'
+import { InlineTextarea } from '../fields/inline-textarea-field'
 
 /**
  * @deprecated
  */
-export function BlockTextarea(props: InlineTextFieldProps) {
-  return <InlineTextareaField {...props} focusRing={false} />
+export function BlockTextarea(props: InlineTextProps) {
+  return <InlineTextarea {...props} focusRing={false} />
 }

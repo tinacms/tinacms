@@ -19,11 +19,19 @@ limitations under the License.
 export * from './inline-form'
 export * from './inline-field'
 export {
+  InlineText,
   InlineTextField,
-  InlineTextFieldProps,
+  InlineTextProps,
 } from './fields/inline-text-field'
-export { InlineTextareaField } from './fields/inline-textarea-field'
-export { InlineImageField, InlineImageProps } from './fields/inline-image-field'
+export {
+  InlineTextarea,
+  InlineTextareaField,
+} from './fields/inline-textarea-field'
+export {
+  InlineImage,
+  InlineImageField,
+  InlineImageProps,
+} from './fields/inline-image-field'
 export * from './inline-group'
 export * from './blocks'
 export * from './styles'
