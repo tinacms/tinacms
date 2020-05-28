@@ -29,6 +29,7 @@ export interface TinaProviderProps {
   cms: TinaCMS
   hidden?: boolean
   position?: SidebarPosition
+  styled?: boolean
 }
 
 export const TinaProvider: React.FC<TinaProviderProps> = ({
@@ -36,11 +37,12 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
   children,
   hidden,
   position,
+  styled = true,
 }) => {
   return (
     <CMSContext.Provider value={cms}>
       <ModalProvider>
-        <StyleProvider />
+        <StyleProvider active={styled} />
         <Alerts alerts={cms.alerts} />
         <ToolbarProvider hidden={hidden} toolbar={cms.toolbar} />
         <SidebarProvider
