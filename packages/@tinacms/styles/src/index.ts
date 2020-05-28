@@ -19,4 +19,3 @@ limitations under the License.
 export * from './Styles'
 export * from './Button'
 export * from './FontLoader'
-export { StyleProvider } from './StyleProvider'
