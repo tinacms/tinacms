@@ -17,6 +17,7 @@
     "@tinacms/api-git": "^0.7.0",
     "@tinacms/form-builder": "^0.3.3",
     "@tinacms/git-client": "^0.6.7",
+    "@tinacms/styles": "0.4.2",
     "cors": "^2.8.5",
     "dotenv": "^8.2.0",
     "express": "^4.17.1",

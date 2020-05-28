@@ -251,7 +251,7 @@ const EmptyList = styled.div`
   line-height: 1.35;
   padding: 12px 0;
   font-size: var(--tina-font-size-2);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
 `
 
 const ItemList = styled.div``
@@ -269,7 +269,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   line-height: 1.35;
   padding: 0;
   font-size: var(--tina-font-size-2);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
 
   ${GroupLabel} {
     color: var(--tina-color-grey-8);

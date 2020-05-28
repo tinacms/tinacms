@@ -306,7 +306,7 @@ const EmptyList = styled.div`
   line-height: 1.35;
   padding: 12px 0;
   font-size: var(--tina-font-size-2);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
 `
 
 const BlockMenu = styled.div<{ open: boolean }>`
@@ -345,7 +345,7 @@ const BlockOption = styled.button`
   text-align: center;
   font-size: var(--tina-font-size-0);
   padding: var(--tina-padding-small);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   width: 100%;
   background: none;
   cursor: pointer;
@@ -395,7 +395,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   line-height: 1.35;
   padding: 0;
   font-size: var(--tina-font-size-2);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
 
   ${GroupLabel} {
     color: var(--tina-color-grey-10);

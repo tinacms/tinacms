@@ -17,6 +17,17 @@ limitations under the License.
 */
 
 import styled, { createGlobalStyle, css } from 'styled-components'
+import * as React from 'react'
+import { FontLoader } from './FontLoader'
+
+export function Theme() {
+  return (
+    <>
+      <FontLoader />
+      <GlobalStyles />
+    </>
+  )
+}
 
 const theme = css`
   :root {
@@ -62,7 +73,7 @@ const theme = css`
 
     --tina-font-family: 'Inter', sans-serif;
 
-    --tina-font-weight-regular: 500;
+    --tina-font-weight-regular: 400;
     --tina-font-weight-bold: 600;
 
     --tina-shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.12),
@@ -87,10 +98,9 @@ const theme = css`
 
 export const GlobalStyles = createGlobalStyle`
   ${theme};
-  @import url('https://rsms.me/inter/inter.css');
 `
 
-export const TinaResetStyles = css`
+export const tina_reset_styles = css`
   * {
     font-family: 'Inter', sans-serif;
     &::-webkit-scrollbar {
@@ -179,6 +189,12 @@ export const TinaResetStyles = css`
   }
 `
 
-export const TinaReset = styled.div`
-  ${TinaResetStyles}
+export const StyleReset = styled.div`
+  ${tina_reset_styles}
 `
+
+/**
+ * @alias StyleReset
+ * @deprecated
+ */
+export const TinaReset = StyleReset

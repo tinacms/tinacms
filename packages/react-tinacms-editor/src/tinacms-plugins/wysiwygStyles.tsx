@@ -237,7 +237,7 @@ export function wysiwygStyles(component: FC<any>) {
       &:before {
         font-size: 14px;
         text-align: left;
-        font-weight: 500;
+        font-weight: var(--tina-font-weight-regular);
         color: ${lightMediumGrey};
         position: absolute;
         left: -35px;
