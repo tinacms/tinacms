@@ -20,7 +20,7 @@ import React from 'react'
 import App from 'next/app'
 import { TinaProvider, TinaCMS, withTina } from 'tinacms'
 import { GitClient, GitMediaStore } from '@tinacms/git-client'
-import { TinaGlobalStyles } from '@tinacms/styles'
+import { TinaTheme } from '@tinacms/styles'
 
 export default class Site extends App {
   constructor() {
@@ -44,7 +44,7 @@ export default class Site extends App {
     return (
       // Example: this config doesn't load external 'Inter' Font
       <TinaProvider cms={this.cms} styled={false}>
-        <TinaGlobalStyles />
+        <TinaTheme />
         <Component {...pageProps} />
       </TinaProvider>
     )
