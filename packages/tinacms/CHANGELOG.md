@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.21.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.20.0...tinacms@0.21.0-alpha.0) (2020-05-28)
+
+
+### Bug Fixes
+
+* default format now being passed to ReactDateTime ([bc4e1bd](https://github.com/tinacms/tinacms/commit/bc4e1bd))
+* parse function returns string in default datetime format ([beafd0b](https://github.com/tinacms/tinacms/commit/beafd0b))
+* time parsing & formatting should always deal in UTC ([9a04621](https://github.com/tinacms/tinacms/commit/9a04621))
+* we weren't handling time formatting in any way ([6a72ce6](https://github.com/tinacms/tinacms/commit/6a72ce6))
+
+
+### Features
+
+* add font loader ([4f37605](https://github.com/tinacms/tinacms/commit/4f37605))
+* tina provider accepts 'styled' prop ([c581595](https://github.com/tinacms/tinacms/commit/c581595))
+
+
+
+
+
 # [0.20.0](https://github.com/tinacms/tinacms/compare/tinacms@0.19.4...tinacms@0.20.0) (2020-05-25)
 
 

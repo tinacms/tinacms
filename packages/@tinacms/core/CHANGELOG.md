@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.8.0...@tinacms/core@0.9.0-alpha.0) (2020-05-28)
+
+
+### Features
+
+* **cms:** add new first-class enabled state ([0b4a000](https://github.com/tinacms/tinacms/commit/0b4a000))
+
+
+
+
+
 # [0.8.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.8.0-alpha.0...@tinacms/core@0.8.0) (2020-05-11)
 
 **Note:** Version bump only for package @tinacms/core
