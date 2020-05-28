@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.0...react-tinacms-github@0.4.1-alpha.1) (2020-05-28)
+
+
+### Bug Fixes
+
+* github error uses message from response ([2499773](https://github.com/tinacms/tinacms/commit/2499773))
+* set working branch to branchName ([fbfab5a](https://github.com/tinacms/tinacms/commit/fbfab5a))
+
+
+
+
+
 ## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.0...react-tinacms-github@0.4.1-alpha.0) (2020-05-28)
 
 
