@@ -42,7 +42,7 @@ export default class Site extends App {
   render() {
     const { Component, pageProps } = this.props
     return (
-      // This config doesn't load external 'Inter' Font
+      // Example: this config doesn't load external 'Inter' Font
       <TinaProvider cms={this.cms} styled={false}>
         <TinaGlobalStyles />
         <Component {...pageProps} />
