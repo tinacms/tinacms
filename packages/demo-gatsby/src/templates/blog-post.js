@@ -19,7 +19,6 @@ limitations under the License.
 import React from "react"
 import { Link, graphql } from "gatsby"
 
-import styled from "styled-components"
 import Bio from "../components/bio"
 import Layout from "../components/layout"
 import SEO from "../components/seo"
@@ -32,17 +31,32 @@ import { EditToggle } from "../components/edit-toggle"
 import {
   InlineForm,
   InlineBlocks,
-  InlineTextareaField,
-  InlineWysiwyg,
-  InlineTextField,
+  InlineTextarea,
+  InlineImage,
   useInlineForm,
-  InlineImageField,
 } from "react-tinacms-inline"
 
 import { BLOCKS } from "../components/blog-blocks"
 import { useCMS } from "tinacms"
 
 const get = require("lodash.get")
+
+function InlineWysiwyg(props) {
+  const { status } = useInlineForm()
+  const [{ InlineWysiwyg }, setEditor] = React.useState({})
+
+  React.useEffect(() => {
+    if (!InlineWysiwyg && status === "active") {
+      import("react-tinacms-editor").then(setEditor)
+    }
+  }, [status])
+
+  if (InlineWysiwyg) {
+    return <InlineWysiwyg {...props} />
+  }
+
+  return props.children
+}
 
 function BlogPostTemplate(props) {
   const siteTitle = props.data.site.siteMetadata.title
@@ -81,7 +95,7 @@ function BlogPostTemplate(props) {
                   marginTop: rhythm(2),
                 }}
               >
-                <InlineTextareaField name="rawFrontmatter.title" />
+                <InlineTextarea name="rawFrontmatter.title" />
               </h1>
               <div
                 style={{
@@ -93,7 +107,7 @@ function BlogPostTemplate(props) {
               >
                 <Bio />
                 <div style={{ display: "flex", flexDirection: "column" }}>
-                  <InlineImageField
+                  <InlineImage
                     name="rawFrontmatter.thumbnail"
                     // Generate the frontmatter value based on the filename
                     parse={filename => (filename ? `./${filename}` : null)}
@@ -109,12 +123,21 @@ function BlogPostTemplate(props) {
 
                       return postDirectory
                     }}
+                    previewSrc={formValues => {
+                      const preview =
+                        formValues.frontmatter.thumbnail.childImageSharp.fluid
+                          .src
+                      return preview
+                    }}
                   >
-                    <Img
-                      fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
-                      alt="Gatsby can't find me"
-                    />
-                  </InlineImageField>
+                    {props => (
+                      <Img
+                        fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                        alt="Gatsby can't find me"
+                        {...props}
+                      />
+                    )}
+                  </InlineImage>
                   {/* <Img
                     fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
                     alt="Gatsby can't find me"
@@ -235,6 +258,7 @@ function BlogPostTemplate(props) {
 const BlogPostForm = {
   actions: [DeleteAction],
   fields: [
+    { name: "rawMarkdownBody", component: "markdown" },
     {
       label: "Gallery",
       name: "frontmatter.gallery",
@@ -336,32 +360,34 @@ const BlogPostForm = {
       colors: ["#ff0000", "#ffff00", "#00ff00", "#0000ff"],
       widget: "sketch",
     },
-    // {
-    //   name: "frontmatter.thumbnail",
-    //   label: "Thumbnail",
-    //   component: "image",
-    //   // Generate the frontmatter value based on the filename
-    //   parse: filename => (filename ? `./${filename}` : null),
+    {
+      name: "frontmatter.thumbnail",
+      label: "Thumbnail",
+      component: "image",
+      // Generate the frontmatter value based on the filename
+      parse: filename => (filename ? `./${filename}` : null),
 
-    //   // Decide the file upload directory for the post
-    //   uploadDir: blogPost => {
-    //     let postPathParts = blogPost.fileRelativePath.split("/")
+      // Decide the file upload directory for the post
+      uploadDir: blogPost => {
+        let postPathParts = blogPost.fileRelativePath.split("/")
 
-    //     let postDirectory = postPathParts
-    //       .splice(0, postPathParts.length - 1)
-    //       .join("/")
+        let postDirectory = postPathParts
+          .splice(0, postPathParts.length - 1)
+          .join("/")
 
-    //     return postDirectory
-    //   },
+        return postDirectory
+      },
 
-    //   // Generate the src attribute for the preview image.
-    //   previewSrc: (formValues, { input }) => {
-    //     let path = input.name.replace("rawFrontmatter", "frontmatter")
-    //     let gastbyImageNode = get(formValues, path)
-    //     if (!gastbyImageNode) return ""
-    //     return gastbyImageNode.childImageSharp.fluid.src
-    //   },
-    // },
+      // Generate the src attribute for the preview image.
+      previewSrc: (formValues, { input }) => {
+        let path = input.name.replace("rawFrontmatter", "frontmatter")
+        console.log({ path })
+        let gastbyImageNode = get(formValues, path)
+        console.log({ gastbyImageNode })
+        if (!gastbyImageNode) return ""
+        return gastbyImageNode.childImageSharp.fluid.src
+      },
+    },
   ],
 }
 

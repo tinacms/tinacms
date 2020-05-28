@@ -17,20 +17,34 @@ limitations under the License.
 */
 
 import React from 'react'
-import { InlineField } from './inline-field'
+import { InlineField } from '../inline-field'
 import styled from 'styled-components'
 import TextareaAutosize from 'react-textarea-autosize'
-import { InlineTextFieldProps } from './inline-field-text'
-import { InputFocusWrapper } from './styles'
+import { InlineTextProps } from './inline-text-field'
+import { InputFocusWrapper } from '../styles'
 
-export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
+/**
+ * @deprecated
+ * @alias InlineTextarea
+ */
+export const InlineTextareaField = InlineTextarea
+
+export function InlineTextarea({
+  name,
+  className,
+  focusRing,
+}: InlineTextProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
+          if (!focusRing) {
+            return <Textarea className={className} {...input} rows={1} />
+          }
+
           return (
             <InputFocusWrapper>
-              <InlineTextarea className={className} {...input} rows={1} />
+              <Textarea className={className} {...input} rows={1} />
             </InputFocusWrapper>
           )
         }
@@ -40,7 +54,7 @@ export function InlineTextareaField({ name, className }: InlineTextFieldProps) {
   )
 }
 
-export const InlineTextarea = styled(TextareaAutosize)`
+const Textarea = styled(TextareaAutosize)`
   width: 100%;
   word-wrap: break-word;
   display: block;

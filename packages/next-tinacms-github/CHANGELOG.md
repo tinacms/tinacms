@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.1](https://github.com/tinacms/tinacms/compare/next-tinacms-github@0.1.0...next-tinacms-github@0.1.1) (2020-05-25)
+
+
+### Bug Fixes
+
+* fixed setting github working branch ([59b8c81](https://github.com/tinacms/tinacms/commit/59b8c81))
+
+
+
+
+
 # [0.1.0](https://github.com/tinacms/tinacms/compare/next-tinacms-github@0.1.0-canary4.1...next-tinacms-github@0.1.0) (2020-04-27)
 
 **Note:** Version bump only for package next-tinacms-github

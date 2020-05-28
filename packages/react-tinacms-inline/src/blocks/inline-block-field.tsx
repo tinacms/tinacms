@@ -16,9 +16,7 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
 import { InlineField, InlineFieldRenderProps } from '../inline-field'
-import { useInlineBlock } from './inline-field-blocks'
 
 export interface BlockFieldProps {
   name: string
@@ -29,8 +27,4 @@ interface BlockFieldRenderProps extends InlineFieldRenderProps {
   name: string
 }
 
-export function BlockField({ name, children }: BlockFieldProps) {
-  const block = useInlineBlock()
-  const fieldName = `${block.name}.${name}`
-  return <InlineField name={fieldName}>{children}</InlineField>
-}
+export const BlockField = InlineField

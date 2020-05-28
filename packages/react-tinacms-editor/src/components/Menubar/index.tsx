@@ -20,31 +20,44 @@ import React from 'react'
 import { useState, useRef, useEffect, useLayoutEffect } from 'react'
 
 import { TablePopups } from '../../plugins/Table/Popup'
-import { Menu as BlockMenu } from '../../plugins/Block'
-import { Menu as CodeBlockMenu } from '../../plugins/CodeBlock'
-import { Menu as HistoryMenu } from '../../plugins/History'
-import { Menu as InlineMenu } from '../../plugins/Inline'
-import { Menu as ListMenu } from '../../plugins/List'
-import { Menu as QuoteMenu } from '../../plugins/Blockquote'
-import { Menu as TableMenu } from '../../plugins/Table'
+import { WysiwygMenu as BlockMenu } from '../../plugins/Block'
+import { WysiwygMenu as CodeBlockMenu } from '../../plugins/CodeBlock'
+import { WysiwygMenu as HistoryMenu } from '../../plugins/History'
+import { WysiwygMenu as InlineMenu } from '../../plugins/Inline'
+import { WysiwygMenu as ListMenu } from '../../plugins/List'
+import { WysiwygMenu as QuoteMenu } from '../../plugins/Blockquote'
+import { WysiwygMenu as TableMenu } from '../../plugins/Table'
 import {
   ImageEdit as ImageEditPopup,
   Loader as ImageLoader,
-  Menu as ImageMenu,
+  WysiwygMenu as ImageMenu,
 } from '../../plugins/Image'
-import { LinkForm as LinkFormPopup, Menu as LinkMenu } from '../../plugins/Link'
+import {
+  LinkForm as LinkFormPopup,
+  WysiwygMenu as LinkMenu,
+} from '../../plugins/Link'
 
 import { useEditorStateContext } from '../../context/editorState'
 import { MenuPortalProvider } from '../../context/MenuPortal'
+import { EditorModeMenu } from '../EditorModeMenu'
 
-import { MenuPlaceholder, MenuWrapper, MenuContainer } from './styledComponents'
+import {
+  MenuPlaceholder,
+  MenuWrapper,
+  MenuContainer,
+} from '../MenuHelpers/styledComponents'
 
 interface Props {
   sticky?: boolean | string
   uploadImages?: (files: File[]) => Promise<string[]>
+  toggleEditorMode?: () => void
 }
 
-export const Menubar = ({ sticky = true, uploadImages }: Props) => {
+export const Menubar = ({
+  sticky = true,
+  uploadImages,
+  toggleEditorMode,
+}: Props) => {
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef = useRef<HTMLDivElement>(null)
@@ -124,6 +137,9 @@ export const Menubar = ({ sticky = true, uploadImages }: Props) => {
             <CodeBlockMenu />
             <ListMenu />
             <HistoryMenu />
+            {toggleEditorMode && (
+              <EditorModeMenu toggleEditorMode={toggleEditorMode} />
+            )}
           </MenuContainer>
         </MenuPortalProvider>
       </MenuWrapper>

@@ -17,9 +17,11 @@ import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
   InlineForm,
-  InlineTextField,
-  InlineWysiwyg,
-  InlineImageField,
+  InlineText,
+  // InlineWysiwyg,
+  InlineImage,
+  InlineGroup,
+  InlineGroupControls,
 } from 'react-tinacms-inline'
 import { EditToggle, DiscardChanges } from './blocks'
 
@@ -67,17 +69,33 @@ function Info(props) {
           </div>
           <EditToggle />
           <DiscardChanges />
-          <h1>
-            <InlineTextField name="frontmatter.name" />
-          </h1>
-          <InlineImageField
+
+          <InlineGroup
+            name="frontmatter"
+            fields={[
+              { name: 'name', component: 'text' },
+              { name: 'hometown', component: 'text' },
+            ]}
+          >
+            <InlineGroupControls>
+              <h1>
+                <InlineText focusRing={false} name="name" />
+              </h1>
+              GROUP!!!!
+            </InlineGroupControls>
+          </InlineGroup>
+
+          <InlineImage
             name="frontmatter.image"
+            previewSrc={formValues => {
+              return formValues.frontmatter.image
+            }}
             uploadDir={() => '/public/images/'}
             parse={filename => `/images/${filename}`}
           />
-          <InlineWysiwyg name="markdownBody">
+          {/* <InlineWysiwyg name="markdownBody">
             <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-          </InlineWysiwyg>
+          </InlineWysiwyg> */}
         </section>
         <style jsx>
           {`

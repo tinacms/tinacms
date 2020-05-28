@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { createPortal } from 'react-dom'
-import { TinaReset } from '@tinacms/styles'
+import { StyleReset } from '@tinacms/styles'
 import { useModalContainer } from '../ModalProvider'
 import { ModalOverlay } from './ModalOverlay'
 
@@ -33,11 +33,11 @@ export const Modal = (props: ModalProps) => {
   if (!portalNode) return null
 
   return createPortal(
-    <TinaReset>
+    <StyleReset>
       <ModalOverlay>
         <div {...props} />
       </ModalOverlay>
-    </TinaReset>,
+    </StyleReset>,
     portalNode
   )
 }

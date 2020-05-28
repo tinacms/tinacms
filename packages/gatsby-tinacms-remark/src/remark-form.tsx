@@ -16,17 +16,20 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { TextFieldPlugin } from '@tinacms/fields'
-import { wysiwygStyles } from './wysiwygStyles'
+import { FormOptions, Form, usePlugin } from 'tinacms'
+import { RemarkNode } from './remark-node'
+import { useRemarkForm } from './use-remark-form'
 
-export const MarkdownField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="markdown" />
-})
+interface RemarkFormProps extends Partial<FormOptions<any>> {
+  remark: RemarkNode
+  render(renderProps: { form: Form; markdownRemark: any }): JSX.Element
+  timeout?: number
+}
 
-export default {
-  name: 'markdown',
-  Component: MarkdownField,
-  parse: TextFieldPlugin.parse,
+export function RemarkForm({ remark, render, ...options }: RemarkFormProps) {
+  const [markdownRemark, form] = useRemarkForm(remark, options)
+
+  usePlugin(form || undefined)
+
+  return render({ form: form as Form, markdownRemark })
 }

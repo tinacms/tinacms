@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { GitFile, useGitFileSha } from './useGitFileSha'
-import { useCMS, useForm, usePlugin, FormOptions } from 'tinacms'
+import { useCMS, useForm, FormOptions } from 'tinacms'
 import { FORM_ERROR } from 'final-form'
 import { GithubClient } from '../github-client'
 
@@ -61,8 +61,6 @@ export const useGithubFileForm = <T = any>(
         })
     },
   })
-
-  usePlugin(form)
 
   return [formData || file.data, form]
 }

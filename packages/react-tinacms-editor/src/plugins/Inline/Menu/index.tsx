@@ -16,33 +16,5 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { BoldIcon, ItalicIcon, UnderlineIcon } from '@tinacms/icons'
-
-import { markControl } from '../../../components/MenuHelpers'
-
-export const Menu = () => (
-  <>
-    <BoldControl />
-    <ItalicControl />
-    <UnderlineControl />
-  </>
-)
-
-const BoldControl = markControl({
-  mark: 'strong',
-  Icon: BoldIcon,
-  tooltip: 'Bold',
-})
-
-const ItalicControl = markControl({
-  mark: 'em',
-  Icon: ItalicIcon,
-  tooltip: 'Italic',
-})
-
-const UnderlineControl = markControl({
-  mark: 'underline',
-  Icon: UnderlineIcon,
-  tooltip: 'Underline',
-})
+export { WysiwygMenu } from './WysiwygMenu'
+export { MarkdownMenu } from './MarkdownMenu'

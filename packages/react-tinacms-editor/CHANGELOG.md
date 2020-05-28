@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.7.2-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.7.1...react-tinacms-editor@0.7.2-alpha.0) (2020-05-28)
+
+
+### Bug Fixes
+
+* add __type to field plugins ([4d1fb9f](https://github.com/tinacms/tinacms/commit/4d1fb9f))
+
+
+
+
+
+## [0.7.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.7.0...react-tinacms-editor@0.7.1) (2020-05-25)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+# [0.7.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.6.0...react-tinacms-editor@0.7.0) (2020-05-25)
+
+
+### Features
+
+* add tinacms field plugins ([20c9d0c](https://github.com/tinacms/tinacms/commit/20c9d0c))
+* inline-wysiwyg component ([547a2d8](https://github.com/tinacms/tinacms/commit/547a2d8))
+* raw mode implementation ([f8dcad7](https://github.com/tinacms/tinacms/commit/f8dcad7))
+
+
+
+
+
+# [0.6.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.3...react-tinacms-editor@0.6.0) (2020-05-19)
+
+
+### Features
+
+* add strikethrough icon ([468b30c](https://github.com/tinacms/tinacms/commit/468b30c))
+* support for strike in wysiwym ([c34b85b](https://github.com/tinacms/tinacms/commit/c34b85b))
+
+
+
+
+
 ## [0.5.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.5.2...react-tinacms-editor@0.5.3) (2020-05-12)
 
 **Note:** Version bump only for package react-tinacms-editor

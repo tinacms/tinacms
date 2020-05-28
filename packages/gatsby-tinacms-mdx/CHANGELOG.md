@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.16](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-mdx@0.1.15...gatsby-tinacms-mdx@0.1.16) (2020-05-25)
+
+**Note:** Version bump only for package gatsby-tinacms-mdx
+
+
+
+
+
+## [0.1.15](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-mdx@0.1.14...gatsby-tinacms-mdx@0.1.15) (2020-05-19)
+
+**Note:** Version bump only for package gatsby-tinacms-mdx
+
+
+
+
+
+## [0.1.14](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-mdx@0.1.13...gatsby-tinacms-mdx@0.1.14) (2020-05-12)
+
+
+### Bug Fixes
+
+* fragment definitions ([23983f8](https://github.com/tinacms/tinacms/commit/23983f8))
+
+
+
+
+
 ## [0.1.13](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-mdx@0.1.12...gatsby-tinacms-mdx@0.1.13) (2020-05-12)
 
 

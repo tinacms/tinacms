@@ -18,25 +18,37 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { InlineField } from './inline-field'
-import { InputFocusWrapper } from './styles'
+import { InlineField } from '../inline-field'
+import { InputFocusWrapper } from '../styles'
 
-/**
- * InlineTextField
- */
-export interface InlineTextFieldProps {
+export interface InlineTextProps {
   name: string
   className?: string
+  focusRing?: boolean
 }
 
-export function InlineTextField({ name, className }: InlineTextFieldProps) {
+/**
+ * @deprecated
+ * @alias InlineText
+ */
+export const InlineTextField = InlineText
+
+export function InlineText({
+  name,
+  className,
+  focusRing = true,
+}: InlineTextProps) {
   return (
     <InlineField name={name}>
       {({ input, status }) => {
         if (status === 'active') {
+          if (!focusRing) {
+            return <Input type="text" {...input} className={className} />
+          }
+
           return (
             <InputFocusWrapper>
-              <InlineText type="text" {...input} className={className} />
+              <Input type="text" {...input} className={className} />
             </InputFocusWrapper>
           )
         }
@@ -46,7 +58,7 @@ export function InlineTextField({ name, className }: InlineTextFieldProps) {
   )
 }
 
-export const InlineText = styled.input`
+const Input = styled.input`
   width: 100%;
   display: block;
   font-size: inherit;

@@ -85,11 +85,16 @@ const theme = css`
   }
 `
 
-export const GlobalStyles = createGlobalStyle`
+export const TinaGlobalStyles = createGlobalStyle`
   ${theme};
 `
+/**
+ * @alias TinaGlobalStyles
+ * @deprecated
+ */
+export const GlobalStyles = TinaGlobalStyles
 
-export const TinaResetStyles = css`
+export const tina_reset_styles = css`
   * {
     font-family: 'Inter', sans-serif;
     &::-webkit-scrollbar {
@@ -178,6 +183,12 @@ export const TinaResetStyles = css`
   }
 `
 
-export const TinaReset = styled.div`
-  ${TinaResetStyles}
+export const StyleReset = styled.div`
+  ${tina_reset_styles}
 `
+
+/**
+ * @alias StyleReset
+ * @deprecated
+ */
+export const TinaReset = StyleReset
