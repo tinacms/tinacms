@@ -296,7 +296,7 @@ export class GithubClient {
     //2xx status codes
     if (response.status.toString()[0] == '2') return data
 
-    throw new GithubError(response.statusText, response.status)
+    throw new GithubError(data.message || response.statusText, response.status)
   }
 
   private validate(): void {
