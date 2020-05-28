@@ -2,7 +2,13 @@ import * as React from 'react'
 import { TinaGlobalStyles } from './Styles'
 import { FontLoader } from './FontLoader'
 
-export function StyleProvider() {
+interface StyleProviderProps {
+  active: boolean
+}
+
+export function StyleProvider({ active }: StyleProviderProps) {
+  if (!active) return null
+
   return (
     <>
       <FontLoader active={true} />
