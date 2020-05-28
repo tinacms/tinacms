@@ -11,7 +11,7 @@ export function StyleProvider({ active }: StyleProviderProps) {
 
   return (
     <>
-      <FontLoader active={true} />
+      <FontLoader load={true} />
       <TinaGlobalStyles />
     </>
   )

@@ -18,7 +18,11 @@ limitations under the License.
 
 import * as React from 'react'
 
-export const FontLoader = ({ active }: any) => {
+interface FontLoaderProps {
+  load: boolean
+}
+
+export const FontLoader = ({ load }: FontLoaderProps) => {
   const [fontLoaded, setFontLoaded] = React.useState(false)
 
   const WebFontConfig = {
@@ -31,11 +35,11 @@ export const FontLoader = ({ active }: any) => {
   }
 
   React.useEffect(() => {
-    if (active && !fontLoaded) {
+    if (load && !fontLoaded) {
       const WebFont = require('webfontloader')
       WebFont.load(WebFontConfig)
     }
-  }, [active])
+  }, [load])
 
   return null
 }
