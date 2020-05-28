@@ -20,11 +20,11 @@ import styled, { createGlobalStyle, css } from 'styled-components'
 import * as React from 'react'
 import { FontLoader } from './FontLoader'
 
-export function GlobalStyles() {
+export function Theme() {
   return (
     <>
       <FontLoader />
-      <TinaTheme />
+      <GlobalStyles />
     </>
   )
 }
@@ -96,7 +96,7 @@ const theme = css`
   }
 `
 
-export const TinaTheme = createGlobalStyle`
+export const GlobalStyles = createGlobalStyle`
   ${theme};
 `
 
