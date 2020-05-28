@@ -17,6 +17,17 @@ limitations under the License.
 */
 
 import styled, { createGlobalStyle, css } from 'styled-components'
+import * as React from 'react'
+import { FontLoader } from './FontLoader'
+
+export function GlobalStyles() {
+  return (
+    <>
+      <FontLoader />
+      <TinaTheme />
+    </>
+  )
+}
 
 const theme = css`
   :root {
@@ -85,14 +96,9 @@ const theme = css`
   }
 `
 
-export const TinaGlobalStyles = createGlobalStyle`
+export const TinaTheme = createGlobalStyle`
   ${theme};
 `
-/**
- * @alias TinaGlobalStyles
- * @deprecated
- */
-export const GlobalStyles = TinaGlobalStyles
 
 export const tina_reset_styles = css`
   * {
