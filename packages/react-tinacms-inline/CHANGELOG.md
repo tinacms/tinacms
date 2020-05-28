@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.5.0...react-tinacms-inline@0.6.0-alpha.0) (2020-05-28)
+
+
+### Features
+
+* adds inline group ([885307a](https://github.com/tinacms/tinacms/commit/885307a))
+
+
+
+
+
 # [0.5.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.4.9...react-tinacms-inline@0.5.0) (2020-05-25)
 
 
