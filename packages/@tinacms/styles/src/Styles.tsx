@@ -85,9 +85,14 @@ const theme = css`
   }
 `
 
-export const GlobalStyles = createGlobalStyle`
+export const TinaGlobalStyles = createGlobalStyle`
   ${theme};
 `
+/**
+ * @alias TinaGlobalStyles
+ * @deprecated
+ */
+export const GlobalStyles = TinaGlobalStyles
 
 export const TinaResetStyles = css`
   * {
