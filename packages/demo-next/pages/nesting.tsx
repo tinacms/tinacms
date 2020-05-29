@@ -25,6 +25,33 @@ export default function Nesting() {
         { _template: 'post', title: 'Post #1' },
         { _template: 'post', title: 'Post #2' },
       ],
+      builder: [
+        {
+          _template: 'row',
+          items: [
+            {
+              _template: 'col',
+              items: [
+                {
+                  _template: 'heading',
+                  text: 'A Page Builder',
+                  color: 'green',
+                },
+              ],
+            },
+            {
+              _template: 'col',
+              items: [
+                {
+                  _template: 'paragraph',
+                  text: 'This is a paragraph in my page builder',
+                },
+              ],
+            },
+          ],
+        },
+        { _template: 'row', items: [] },
+      ],
     },
     label: 'Nesting',
     fields: [],
@@ -71,6 +98,9 @@ export default function Nesting() {
       </InlineGroup>
 
       <InlineBlocks name="posts" blocks={POSTS} />
+      <hr />
+      <h2>Stuff</h2>
+      <InlineBlocks name="builder" blocks={PAGE_BUILDER} />
     </InlineForm>
   )
 }
@@ -124,4 +154,100 @@ const COLORS = {
       )
     },
   },
+}
+
+const ROW = {
+  template: {
+    type: 'row',
+    label: 'Row',
+    key: undefined,
+    defaultItem: {
+      items: [],
+    },
+    fields: [],
+  },
+  Component({ index, data }) {
+    return (
+      <BlocksControls index={index}>
+        <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <InlineBlocks
+            name="items"
+            blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+          />
+        </div>
+      </BlocksControls>
+    )
+  },
+}
+
+const COL = {
+  template: {
+    type: 'col',
+    label: 'Col',
+    key: undefined,
+    defaultItem: {
+      items: [],
+    },
+    fields: [],
+  },
+  Component({ index, data }) {
+    return (
+      <BlocksControls index={index}>
+        <div style={{ display: 'flex', flexDirection: 'column' }}>
+          <InlineBlocks
+            name="items"
+            blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
+          />
+        </div>
+      </BlocksControls>
+    )
+  },
+}
+
+const HEADING = {
+  template: {
+    type: 'heading',
+    label: 'Heading',
+    key: undefined,
+    defaultItem: {
+      text: 'New Heading',
+      color: 'black',
+    },
+    fields: [{ name: 'color', component: 'color' }],
+  },
+  Component({ index, data }) {
+    return (
+      <BlocksControls index={index}>
+        <h3 style={{ color: data.color }}>
+          <InlineTextarea name="text" />
+        </h3>
+      </BlocksControls>
+    )
+  },
+}
+
+const PARAGRAPH = {
+  template: {
+    type: 'heading',
+    label: 'Heading',
+    key: undefined,
+    defaultItem: {
+      text: 'New Paragraph',
+      color: 'black',
+    },
+    fields: [],
+  },
+  Component({ index, data }) {
+    return (
+      <BlocksControls index={index}>
+        <p>
+          <InlineTextarea name="text" />
+        </p>
+      </BlocksControls>
+    )
+  },
+}
+
+const PAGE_BUILDER = {
+  row: ROW,
 }
