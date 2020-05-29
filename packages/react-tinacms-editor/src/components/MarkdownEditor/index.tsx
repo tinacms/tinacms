@@ -21,23 +21,23 @@ import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
 import { useBrowserFocusContext } from '../../context/browserFocus'
-import { ImageProps } from '../../types'
+import { ImageProps, Plugin } from '../../types'
 import { Menubar } from './Menubar'
 
 export interface MarkdownEditorProps {
-  toggleEditorMode: () => void
   imageProps?: ImageProps
   onChange: (value: string) => void
   value: string
+  plugins?: Plugin[]
 }
 
 const inputLineHeight = 20
 
 export const MarkdownEditor = ({
-  toggleEditorMode,
   imageProps,
   onChange,
   value,
+  plugins,
 }: MarkdownEditorProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const [val, setVal] = useState(value)
@@ -68,7 +68,7 @@ export const MarkdownEditor = ({
 
   return (
     <>
-      <Menubar toggleEditorMode={toggleEditorMode} imageProps={imageProps} />
+      <Menubar uploadImages={imageProps?.upload} plugins={plugins} />
       <EditingSection
         data-testid="markdown-editing-textarea"
         ref={inputRef}

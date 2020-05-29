@@ -24,6 +24,7 @@ import { Format } from '../../../translator'
 import { ImageProps, Input } from '../../../types'
 
 import { buildEditorState } from './buildEditorState'
+import { TextSelection } from 'prosemirror-state'
 
 export const buildEditor = (
   input: Input,
@@ -62,6 +63,11 @@ export const buildEditor = (
     },
   })
 
+  const { state, dispatch } = view
+  const { tr, doc } = state
+  dispatch(
+    tr.setSelection(new TextSelection(doc.resolve(doc.content.size) || 0))
+  )
   view.focus()
 
   setEditorView({ view })

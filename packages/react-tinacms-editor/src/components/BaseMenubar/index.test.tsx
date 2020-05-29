@@ -17,20 +17,13 @@ limitations under the License.
 */
 
 import React from 'react'
-import { renderWithProviders } from '../../../test-utils/renderWithProviders'
 
-import { Menubar } from './index'
+import { renderWithProviders } from '../../test-utils/renderWithProviders'
+import { BaseMenubar } from './index'
 
 describe('MenuBar', () => {
   it('should render Menubar', () => {
-    renderWithProviders(<Menubar />)
-    expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
-  })
-
-  it('should have markdown toggle option present', () => {
-    const { findByTestId } = renderWithProviders(
-      <Menubar uploadImages={(() => {}) as any} />
-    )
-    expect(findByTestId('markdown-toggle')).toBeDefined()
+    const { getByTestId } = renderWithProviders(<BaseMenubar />)
+    expect(getByTestId('base-menubar')).toBeDefined()
   })
 })

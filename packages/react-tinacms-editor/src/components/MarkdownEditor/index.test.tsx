@@ -17,42 +17,29 @@ limitations under the License.
 */
 
 import React from 'react'
-import { render } from '@testing-library/react'
+import { renderWithProviders } from '../../test-utils/renderWithProviders'
 
 import { MarkdownEditor } from './index'
 
-jest.mock('../../context/editorState')
-
 describe('MarkdownEditor', () => {
   it('should render MarkdownEditor', () => {
-    const { getByTestId } = render(
-      <MarkdownEditor
-        onChange={() => {}}
-        toggleEditorMode={() => {}}
-        value=""
-      />
+    const { getByTestId } = renderWithProviders(
+      <MarkdownEditor onChange={() => {}} value="" />
     )
     expect(getByTestId('markdown-editing-textarea')).toBeDefined()
   })
 
   it('should include Menubar', () => {
-    render(
-      <MarkdownEditor
-        onChange={() => {}}
-        toggleEditorMode={() => {}}
-        value=""
-      />
-    )
+    renderWithProviders(<MarkdownEditor onChange={() => {}} value="" />)
     expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
   })
 
   it('should include image menu option if imageProps are defined', () => {
-    const { getByTestId } = render(
+    const { getByTestId } = renderWithProviders(
       <MarkdownEditor
         onChange={() => {}}
-        toggleEditorMode={() => {}}
         value=""
-        imageProps={{}}
+        imageProps={{ upload: (() => {}) as any }}
       />
     )
     expect(getByTestId('image-menu')).toBeDefined()

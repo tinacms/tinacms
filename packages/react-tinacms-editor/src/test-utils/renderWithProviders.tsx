@@ -17,17 +17,20 @@ limitations under the License.
 */
 
 import React from 'react'
-import { MediaIcon } from '@tinacms/icons'
+import { render } from '@testing-library/react'
 
-import { MenuButton } from '../../../components/MenuHelpers'
+import { EditorModeProvider } from '../context/editorMode'
+import { BrowserFocusProvider } from '../context/browserFocus'
+import { EditorStateProvider } from '../context/editorState'
 
-export const MarkdownMenuItem = () => (
-  <MenuButton
-    data-testid="image-menu"
-    data-tooltip="Image"
-    data-side="top"
-    disabled
-  >
-    <MediaIcon />
-  </MenuButton>
-)
+export const renderWithProviders = (component: React.ReactElement) => {
+  return render(
+    <EditorModeProvider>
+      <BrowserFocusProvider>
+        <EditorStateProvider editorView={{} as any} translator={{} as any}>
+          {component}
+        </EditorStateProvider>
+      </BrowserFocusProvider>
+    </EditorModeProvider>
+  )
+}

@@ -16,21 +16,21 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { renderWithProviders } from '../../../test-utils/renderWithProviders'
+import { setBlockType } from 'prosemirror-commands'
+import { EditorState } from 'prosemirror-state'
 
-import { Menubar } from './index'
+import { CodeIcon } from '@tinacms/icons'
 
-describe('MenuBar', () => {
-  it('should render Menubar', () => {
-    renderWithProviders(<Menubar />)
-    expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
-  })
+import { commandControl } from '../../../components/MenuHelpers'
 
-  it('should have markdown toggle option present', () => {
-    const { findByTestId } = renderWithProviders(
-      <Menubar uploadImages={(() => {}) as any} />
-    )
-    expect(findByTestId('markdown-toggle')).toBeDefined()
-  })
-})
+function makeCodeBlock(state: EditorState, dispatch: any) {
+  return setBlockType(state.schema.nodes.code_block)(state, dispatch)
+}
+
+export const ProsemirrorMenu = commandControl(
+  makeCodeBlock,
+  CodeIcon,
+  'Codeblock',
+  'Codeblock',
+  false
+) //codeblock focusing messes with scroll

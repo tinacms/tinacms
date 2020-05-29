@@ -16,13 +16,26 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { LinkIcon } from '@tinacms/icons'
+import * as React from 'react'
+import { RedoIcon, UndoIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem = () => (
-  <MenuButton data-tooltip="Link" data-side="top" disabled>
-    <LinkIcon />
+export const MarkdownMenu = () => (
+  <>
+    <UndoControl />
+    <RedoControl />
+  </>
+)
+
+const UndoControl = () => (
+  <MenuButton data-tooltip="Undo" data-side="top" disabled>
+    <UndoIcon />
+  </MenuButton>
+)
+
+const RedoControl = () => (
+  <MenuButton data-tooltip="Redo" data-side="top" disabled>
+    <RedoIcon />
   </MenuButton>
 )

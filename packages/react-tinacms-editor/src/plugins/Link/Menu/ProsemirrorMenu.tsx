@@ -23,7 +23,7 @@ import { markControl } from '../../../components/MenuHelpers'
 import { isMarkPresent } from '../../../utils'
 import { imagePluginKey } from '../../Image'
 
-export const MenuItem = markControl({
+export const ProsemirrorMenu = markControl({
   mark: 'link',
   Icon: LinkIcon,
   tooltip: 'Link',
