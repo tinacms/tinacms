@@ -50,7 +50,6 @@ export interface BlockTemplate {
   type: string
   label: string
   defaultItem?: object | (() => object)
-  key: string
   fields?: Field[]
   /**
    * An optional function which generates `props` for
