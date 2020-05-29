@@ -17,25 +17,32 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { RedoIcon, UndoIcon } from '@tinacms/icons'
+import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
 
-import { MenuButton } from '../../../components/MenuHelpers'
+import { markControl } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem = () => (
+export const ProsemirrorMenu = () => (
   <>
-    <UndoControl />
-    <RedoControl />
+    <BoldControl />
+    <ItalicControl />
+    <StrikeControl />
   </>
 )
 
-const UndoControl = () => (
-  <MenuButton data-tooltip="Undo" data-side="top" disabled>
-    <UndoIcon />
-  </MenuButton>
-)
+const BoldControl = markControl({
+  mark: 'strong',
+  Icon: BoldIcon,
+  tooltip: 'Bold',
+})
 
-const RedoControl = () => (
-  <MenuButton data-tooltip="Redo" data-side="top" disabled>
-    <RedoIcon />
-  </MenuButton>
-)
+const ItalicControl = markControl({
+  mark: 'em',
+  Icon: ItalicIcon,
+  tooltip: 'Italic',
+})
+
+const StrikeControl = markControl({
+  mark: 'strike',
+  Icon: StrikethroughIcon,
+  tooltip: 'Strike',
+})

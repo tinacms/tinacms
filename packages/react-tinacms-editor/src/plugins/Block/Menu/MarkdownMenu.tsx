@@ -23,10 +23,8 @@ import { HeadingIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem: FunctionComponent = () => {
-  return (
-    <MenuButton data-tooltip={'Heading'} disabled>
-      <HeadingIcon />
-    </MenuButton>
-  )
-}
+export const MarkdownMenu: FunctionComponent = () => (
+  <MenuButton data-tooltip="Heading" disabled>
+    <HeadingIcon />
+  </MenuButton>
+)

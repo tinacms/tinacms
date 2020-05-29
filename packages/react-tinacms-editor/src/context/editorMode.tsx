@@ -17,26 +17,29 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { useState } from 'react'
+import { createContext, useContext } from 'react'
 
-import { MarkdownIcon } from '@tinacms/icons'
-import { MenuButton } from '../MenuHelpers/MenuButton'
-import { useEditorModeContext } from '../../context/editorMode'
+const EditorModeContext = createContext<{
+  mode: string
+  setMode: (mode: string) => void
+}>({
+  mode: 'wysiwyg',
+  setMode: () => {},
+})
 
-export const EditorModeMenu = () => {
-  const { mode, setMode } = useEditorModeContext()
-
-  const toggleMode = () => {
-    if (mode === 'markdown') setMode('wysiwyg')
-    else setMode('markdown')
-  }
+export const EditorModeProvider = ({ children }: any) => {
+  const [mode, setMode] = useState('wysiwyg')
 
   return (
-    <MenuButton
-      data-testid="markdown-toggle"
-      data-tooltip={'Markdown mode'}
-      onClick={toggleMode}
-    >
-      <MarkdownIcon />
-    </MenuButton>
+    <EditorModeContext.Provider value={{ mode, setMode }}>
+      {children}
+    </EditorModeContext.Provider>
   )
 }
+
+export const EditorModeConsumer = EditorModeContext.Consumer
+
+export const useEditorModeContext = () => ({
+  ...useContext(EditorModeContext),
+})
