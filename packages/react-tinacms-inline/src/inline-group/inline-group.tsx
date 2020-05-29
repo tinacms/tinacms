@@ -22,12 +22,12 @@ import { InlineFieldContext } from '../inline-field-context'
 
 interface InlineGroupProps {
   name?: string
-  fields: Field[]
+  fields?: Field[]
   // TODO: children type should be more specific
   children?: any
 }
 
-export function InlineGroup({ name, children, fields }: InlineGroupProps) {
+export function InlineGroup({ name, children, fields = [] }: InlineGroupProps) {
   return (
     <InlineFieldContext.Provider value={{ name, fields }}>
       {children}
