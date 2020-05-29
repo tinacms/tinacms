@@ -15,11 +15,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-/*
- ** TODO: refactor to make this agnostic for both blocks and group fields
- */
 import * as React from 'react'
+import { Field } from 'tinacms'
 import {
   FieldsBuilder,
   Modal,
@@ -28,15 +25,20 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { useInlineForm } from '../inline-form'
 import { Button, IconButton } from '@tinacms/styles'
 import { SettingsIcon } from '@tinacms/icons'
-import { Field } from 'tinacms'
-import { InlineFieldContext } from '../inline-field-context'
 
-export function InlineGroupSettings() {
+import { InlineFieldContext } from './inline-field-context'
+import { useInlineForm } from './inline-form'
+
+interface InlineSettingsProps {
+  fields?: Field[]
+}
+
+export function InlineSettings(props: InlineSettingsProps) {
   const [open, setOpen] = React.useState(false)
-  const { name, fields } = React.useContext(InlineFieldContext)
+  const { name, fields: _fields } = React.useContext(InlineFieldContext)
+  const fields = props.fields || _fields
 
   const noExtraFields = !(fields && fields.length)
 

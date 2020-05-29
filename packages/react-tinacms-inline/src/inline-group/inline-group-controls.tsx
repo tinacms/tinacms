@@ -18,9 +18,10 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { InlineGroupSettings } from './inline-group-settings'
-import { useInlineForm } from '../inline-form'
 import { Button, IconButton } from '@tinacms/styles'
+
+import { InlineSettings } from '../inline-settings'
+import { useInlineForm } from '../inline-form'
 import { FocusRing } from '../styles'
 
 interface InlineGroupControls {
@@ -71,7 +72,7 @@ export function InlineGroupControls({ children, offset, borderRadius }: any) {
       borderRadius={borderRadius}
     >
       <GroupMenu ref={groupMenuRef} active={active}>
-        <InlineGroupSettings />
+        <InlineSettings />
       </GroupMenu>
       {children}
     </FocusRing>
