@@ -51,7 +51,7 @@ export interface BlockTemplate {
   label: string
   defaultItem?: object | (() => object)
   key: string
-  fields: Field[]
+  fields?: Field[]
   /**
    * An optional function which generates `props` for
    * this items's `li`.
@@ -530,6 +530,8 @@ const Panel = function Panel({
   template,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
+    if (!template.fields) return []
+
     return template.fields.map((subField: any) => ({
       ...subField,
       name: `${field.name}.${index}.${subField.name}`,
