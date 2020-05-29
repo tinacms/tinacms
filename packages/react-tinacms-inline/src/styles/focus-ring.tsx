@@ -19,37 +19,40 @@ import styled, { css } from 'styled-components'
 
 interface FocusRingProps {
   active: boolean
+  offset?: number
+  borderRadius?: number
 }
 
-export const FocusRing = styled.div<FocusRingProps>`
-  position: relative;
+export const FocusRing = styled.div<FocusRingProps>(
+  p => css`
+    position: relative;
 
-  &:hover {
-    &:after {
-      opacity: 0.3;
-    }
-  }
-
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -16px;
-    top: -16px;
-    width: calc(100% + 2rem);
-    height: calc(100% + 2rem);
-    border: 3px solid var(--tina-color-primary);
-    border-radius: var(--tina-radius-big);
-    opacity: 0;
-    pointer-events: none;
-    transition: all var(--tina-timing-medium) ease-out;
-  }
-
-  ${p =>
-    p.active &&
-    css`
+    &:hover {
       &:after {
-        opacity: 1 !important;
+        opacity: 0.3;
       }
-    `};
-`
+    }
+
+    &:after {
+      content: '';
+      display: block;
+      position: absolute;
+      left: calc(-1 * ${p.offset ? p.offset : '16'}px);
+      top: calc(-1 * ${p.offset ? p.offset : '16'}px);
+      width: calc(100% + ${p.offset !== undefined ? p.offset * 2 : '32'}px);
+      height: calc(100% + ${p.offset !== undefined ? p.offset * 2 : '32'}px);
+      border: 1px solid var(--tina-color-primary);
+      border-radius: ${p.borderRadius !== undefined ? p.borderRadius : `10`}px;
+      opacity: 0;
+      pointer-events: none;
+      transition: all var(--tina-timing-medium) ease-out;
+    }
+
+    ${p.active &&
+      css`
+        &:after {
+          opacity: 1;
+        }
+      `};
+  `
+)
