@@ -31,7 +31,11 @@ interface InlineGroupControls {
 }
 
 // TODO: children type should be more specific
-export function InlineGroupControls({ children, offset, borderRadius }: any) {
+export function InlineGroupControls({
+  children,
+  offset,
+  borderRadius,
+}: InlineGroupControls) {
   const { status } = useInlineForm()
   const [active, setActive] = React.useState(false)
   const groupRef = React.useRef<HTMLDivElement>(null)
