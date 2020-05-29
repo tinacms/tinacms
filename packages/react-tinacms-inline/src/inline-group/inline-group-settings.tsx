@@ -36,7 +36,7 @@ import { Field } from 'tinacms'
 
 import { InlineFieldContext } from '../inline-field-context'
 import { useInlineForm } from '../inline-form'
-import { FormPortalProvider, useFormPortal } from '@tinacms/react-forms'
+import { FormPortalProvider } from '@tinacms/react-forms'
 
 export function InlineGroupSettings() {
   const [open, setOpen] = React.useState(false)
