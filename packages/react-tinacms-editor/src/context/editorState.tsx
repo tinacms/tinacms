@@ -17,53 +17,24 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { createContext, useContext, useEffect, useState } from 'react'
+import { createContext, useContext, ReactElement } from 'react'
 import { EditorView } from 'prosemirror-view'
 
-import { buildEditor } from './utils/buildEditor'
-import { buildEditorState } from './utils/buildEditorState'
-
-const EditorStateContext = createContext<{
+interface EditorStateIntf {
   editorView: { view: EditorView } | undefined
   translator: any
-}>({
+}
+
+const EditorStateContext = createContext<EditorStateIntf>({
   editorView: undefined,
   translator: undefined,
 })
 
 export const EditorStateProvider = ({
   children,
-  input,
-  el,
-  imageProps,
-  format,
-}: any) => {
-  const [editorView, setEditorView] = useState<{ view: EditorView }>()
-  const [translator, setTranslator] = useState<any>()
-  const { browserFocused } = useBrowserFocusContext()
-
-  useEffect(() => {
-    const { translator: translatorObj } = buildEditor(
-      input,
-      el,
-      imageProps,
-      setEditorView,
-      format
-    )
-    setTranslator(translatorObj)
-    return () => {
-      editorView && editorView.view.destroy()
-    }
-  }, [el])
-
-  useEffect(() => {
-    const view = editorView && editorView.view
-    if (!view || view.hasFocus()) return
-    view.updateState(
-      buildEditorState(view.state.schema, translator, input.value, imageProps)
-    )
-  }, [input.value])
-
+  editorView,
+  translator,
+}: EditorStateIntf & { children?: ReactElement }) => {
   return (
     <EditorStateContext.Provider value={{ editorView, translator }}>
       {children}
