@@ -26,7 +26,7 @@ import { TinaReset } from '@tinacms/styles'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
 import { useEditorStateContext } from '../../../context/editorState'
-import { imagePluginKey } from '..'
+import { imagePluginKey } from '../plugin'
 
 export const ImageEdit: FunctionComponent = () => {
   const { editorView } = useEditorStateContext()

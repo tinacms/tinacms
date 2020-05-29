@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { EditorState } from 'prosemirror-state'
-import { Plugin } from '@tinacms/core'
 import { Schema } from 'prosemirror-model'
 import { dropCursor } from 'prosemirror-dropcursor'
 import { gapCursor } from 'prosemirror-gapcursor'
@@ -60,12 +59,4 @@ export function buildEditorState(
       codeBlockPlugin,
     ],
   })
-}
-
-function byType(__type: string) {
-  return (plugin: Plugin) => plugin.__type === __type
-}
-
-export function findPlugins<P extends Plugin>(type: string, plugins: Plugin[]) {
-  return plugins.filter(byType(type)) as P[]
 }
