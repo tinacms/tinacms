@@ -37,8 +37,8 @@ export const FocusRing = styled.div<FocusRingProps>(
       content: '';
       display: block;
       position: absolute;
-      left: calc(-1 * ${p.offset ? p.offset : '16'}px);
-      top: calc(-1 * ${p.offset ? p.offset : '16'}px);
+      left: calc(-1 * ${p.offset !== undefined ? p.offset : '16'}px);
+      top: calc(-1 * ${p.offset !== undefined ? p.offset : '16'}px);
       width: calc(100% + ${p.offset !== undefined ? p.offset * 2 : '32'}px);
       height: calc(100% + ${p.offset !== undefined ? p.offset * 2 : '32'}px);
       border: 1px solid var(--tina-color-primary);
