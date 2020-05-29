@@ -31,9 +31,16 @@ import { FocusRing } from '../styles'
 export interface BlocksControlsProps {
   children: any
   index: number
+  offset?: number
+  borderRadius?: number
 }
 
-export function BlocksControls({ children, index }: BlocksControlsProps) {
+export function BlocksControls({
+  children,
+  index,
+  offset,
+  borderRadius,
+}: BlocksControlsProps) {
   const { status } = useInlineForm()
   const {
     insert,
@@ -101,6 +108,8 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
       ref={blockRef}
       active={activeBlock === index}
       onClick={handleSetActiveBlock}
+      offset={offset}
+      borderRadius={borderRadius}
     >
       <BlockMenu
         ref={blockMenuRef}
