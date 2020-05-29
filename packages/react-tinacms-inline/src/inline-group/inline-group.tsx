@@ -25,7 +25,6 @@ import { InlineGroupControls } from './inline-group-controls'
 interface InlineGroupProps {
   name?: string
   fields: Field[]
-  focusRing?: boolean
   controls?: boolean
   offset?: number
   borderRadius?: number
@@ -37,22 +36,17 @@ export function InlineGroup({
   children,
   fields,
   controls = true,
-  focusRing = true,
   offset,
   borderRadius,
 }: InlineGroupProps) {
   return (
     <InlineFieldContext.Provider value={{ name, fields }}>
       {controls ? (
-        <InlineGroupControls
-          focusRing={focusRing}
-          offset={offset}
-          borderRadius={borderRadius}
-        >
+        <InlineGroupControls offset={offset} borderRadius={borderRadius}>
           {children}
         </InlineGroupControls>
       ) : (
-        { children }
+        <>{children}</>
       )}
     </InlineFieldContext.Provider>
   )

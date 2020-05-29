@@ -29,14 +29,12 @@ interface InlineGroupControls {
   children: any
   offset?: number
   borderRadius?: number
-  focusRing?: boolean
 }
 
 export function InlineGroupControls({
   children,
   offset,
   borderRadius,
-  focusRing,
 }: InlineGroupControls) {
   const { status } = useInlineForm()
   const [active, setActive] = React.useState(false)
@@ -71,29 +69,18 @@ export function InlineGroupControls({
   }
 
   return (
-    <>
-      {!focusRing ? (
-        <>
-          <GroupMenu ref={groupMenuRef} active={active}>
-            <InlineSettings fields={fields} />
-          </GroupMenu>
-          {children}
-        </>
-      ) : (
-        <FocusRing
-          ref={groupRef}
-          active={active}
-          onClick={handleSetActive}
-          offset={offset}
-          borderRadius={borderRadius}
-        >
-          <GroupMenu ref={groupMenuRef} active={active}>
-            <InlineSettings fields={fields} />
-          </GroupMenu>
-          {children}
-        </FocusRing>
-      )}
-    </>
+    <FocusRing
+      ref={groupRef}
+      active={active}
+      onClick={handleSetActive}
+      offset={offset}
+      borderRadius={borderRadius}
+    >
+      <GroupMenu ref={groupMenuRef} active={active}>
+        <InlineSettings fields={fields} />
+      </GroupMenu>
+      {children}
+    </FocusRing>
   )
 }
 
