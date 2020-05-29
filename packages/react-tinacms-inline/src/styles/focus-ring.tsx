@@ -46,10 +46,12 @@ export const FocusRing = styled.div<FocusRingProps>(
       opacity: 0;
       pointer-events: none;
       transition: all var(--tina-timing-medium) ease-out;
+      box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
     }
 
     ${p.active &&
       css`
+        &:hover:after,
         &:after {
           opacity: 1;
         }
