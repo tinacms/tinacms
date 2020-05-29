@@ -17,12 +17,22 @@ limitations under the License.
 */
 
 import React from 'react'
-import { QuoteIcon } from '@tinacms/icons'
+import { MediaIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem = () => (
-  <MenuButton data-tooltip="Quote" data-side="top" disabled>
-    <QuoteIcon />
-  </MenuButton>
-)
+interface Props {
+  uploadImages?: (files: File[]) => Promise<string[]>
+}
+
+export const MarkdownMenu: React.FC<Props> = ({ uploadImages }) =>
+  uploadImages ? (
+    <MenuButton
+      data-testid="image-menu"
+      data-tooltip="Image"
+      data-side="top"
+      disabled
+    >
+      <MediaIcon />
+    </MenuButton>
+  ) : null
