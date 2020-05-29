@@ -32,43 +32,35 @@ import { InlineFieldContext } from './inline-field-context'
 import { useInlineForm } from './inline-form'
 
 interface InlineSettingsProps {
-  fields?: Field[]
+  fields: Field[]
 }
 
-export function InlineSettings(props: InlineSettingsProps) {
+export function InlineSettings({ fields }: InlineSettingsProps) {
   const [open, setOpen] = React.useState(false)
-  const { name, fields: _fields } = React.useContext(InlineFieldContext)
-  const fields = props.fields || _fields
-
   const noExtraFields = !(fields && fields.length)
 
   if (noExtraFields) {
     return null
   }
+
   return (
     <>
       <IconButton primary onClick={() => setOpen(p => !p)}>
         <SettingsIcon />
       </IconButton>
-      {open && (
-        <SettingsModal
-          fields={fields}
-          name={name}
-          close={() => setOpen(false)}
-        />
-      )}
+      {open && <SettingsModal fields={fields} close={() => setOpen(false)} />}
     </>
   )
 }
 
 interface SettingsModalProps {
   fields: Field[]
-  name?: string
   close(): void
 }
 
-function SettingsModal({ fields, close, name }: SettingsModalProps) {
+function SettingsModal({ fields, close }: SettingsModalProps) {
   const { form } = useInlineForm()
+  const { name } = React.useContext(InlineFieldContext)
 
   let formFields = fields
 
