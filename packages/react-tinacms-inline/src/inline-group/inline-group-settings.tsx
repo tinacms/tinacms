@@ -19,6 +19,7 @@ limitations under the License.
 /*
  ** TODO: refactor to make this agnostic for both blocks and group fields
  */
+import styled from 'styled-components'
 import * as React from 'react'
 import {
   FieldsBuilder,
@@ -35,6 +36,7 @@ import { Field } from 'tinacms'
 
 import { InlineFieldContext } from '../inline-field-context'
 import { useInlineForm } from '../inline-form'
+import { FormPortalProvider, useFormPortal } from '@tinacms/react-forms'
 
 export function InlineGroupSettings() {
   const [open, setOpen] = React.useState(false)
@@ -86,14 +88,17 @@ function SettingsModal({ fields, close, name }: SettingsModalProps) {
     },
     [form]
   )
-
   return (
     <Modal>
       <ModalPopup>
         <ModalHeader close={close}>Settings</ModalHeader>
         <ModalBody>
           <DragDropContext onDragEnd={moveArrayItem}>
-            <FieldsBuilder form={form} fields={formFields} />
+            <Wrapper>
+              <FormPortalProvider>
+                <FieldsBuilder form={form} fields={formFields} />
+              </FormPortalProvider>
+            </Wrapper>
           </DragDropContext>
         </ModalBody>
         <ModalActions>
@@ -103,3 +108,9 @@ function SettingsModal({ fields, close, name }: SettingsModalProps) {
     </Modal>
   )
 }
+
+const Wrapper = styled.div`
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+`
