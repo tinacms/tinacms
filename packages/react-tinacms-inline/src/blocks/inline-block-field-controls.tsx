@@ -26,13 +26,21 @@ import { Button, IconButton } from '@tinacms/styles'
 import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
 import { InlineFieldContext } from '../inline-field-context'
 import { useContext } from 'react'
+import { FocusRing } from '../styles'
 
 export interface BlocksControlsProps {
   children: any
   index: number
+  offset?: number
+  borderRadius?: number
 }
 
-export function BlocksControls({ children, index }: BlocksControlsProps) {
+export function BlocksControls({
+  children,
+  index,
+  offset,
+  borderRadius,
+}: BlocksControlsProps) {
   const { status } = useInlineForm()
   const {
     insert,
@@ -96,12 +104,18 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
   }
 
   return (
-    <BlockWrapper
+    <FocusRing
       ref={blockRef}
       active={activeBlock === index}
       onClick={handleSetActiveBlock}
+      offset={offset}
+      borderRadius={borderRadius}
     >
-      <BlockMenu ref={blockMenuRef} index={index}>
+      <BlockMenu
+        ref={blockMenuRef}
+        index={index}
+        active={activeBlock === index}
+      >
         <BlockMenuLeft>
           <AddBlockMenu
             addBlock={block => insert(index + 1, block)}
@@ -134,12 +148,13 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
         </BlockMenuRight>
       </BlockMenu>
       {children}
-    </BlockWrapper>
+    </FocusRing>
   )
 }
 
 interface BlockMenuProps {
   index: number
+  active: boolean
 }
 
 const BlockMenu = styled.div<BlockMenuProps>`
@@ -167,6 +182,13 @@ const BlockMenu = styled.div<BlockMenuProps>`
     height: 34px;
     margin: 0 4px;
   }
+  ${p =>
+    p.active &&
+    css`
+      transform: translate3d(0, -100%, 0);
+      opacity: 1;
+      pointer-events: all;
+    `}
 `
 
 const BlockMenuLeft = styled.div`
@@ -181,47 +203,4 @@ const BlockMenuRight = styled.div`
   display: flex;
   align-items: center;
   justify-content: flex-end;
-`
-
-export interface BlockWrapperProps {
-  active: boolean
-}
-
-const BlockWrapper = styled.div<BlockWrapperProps>`
-  position: relative;
-
-  &:hover {
-    &:after {
-      opacity: 0.3;
-    }
-  }
-
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -16px;
-    top: -16px;
-    width: calc(100% + 2rem);
-    height: calc(100% + 2rem);
-    border: 3px solid var(--tina-color-primary);
-    border-radius: var(--tina-radius-big);
-    opacity: 0;
-    pointer-events: none;
-    transition: all var(--tina-timing-medium) ease-out;
-  }
-
-  ${p =>
-    p.active &&
-    css`
-      ${BlockMenu} {
-        transform: translate3d(0, -100%, 0);
-        opacity: 1;
-        pointer-events: all;
-      }
-
-      &:after {
-        opacity: 1 !important;
-      }
-    `};
 `

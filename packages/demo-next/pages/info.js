@@ -77,7 +77,7 @@ function Info(props) {
               { name: 'hometown', component: 'text' },
             ]}
           >
-            <InlineGroupControls>
+            <InlineGroupControls offset={0} borderRadius={0}>
               <h1>
                 <InlineText focusRing={false} name="name" />
               </h1>
