@@ -21,7 +21,7 @@ import { TableIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem = () => (
+export const MarkdownMenu = () => (
   <MenuButton data-tooltip="Table" disabled>
     <TableIcon />
   </MenuButton>

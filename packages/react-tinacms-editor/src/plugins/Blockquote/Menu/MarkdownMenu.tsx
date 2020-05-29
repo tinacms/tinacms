@@ -16,21 +16,13 @@ limitations under the License.
 
 */
 
-import { setBlockType } from 'prosemirror-commands'
-import { EditorState } from 'prosemirror-state'
+import React from 'react'
+import { QuoteIcon } from '@tinacms/icons'
 
-import { CodeIcon } from '@tinacms/icons'
+import { MenuButton } from '../../../components/MenuHelpers'
 
-import { commandControl } from '../../../components/MenuHelpers'
-
-function makeCodeBlock(state: EditorState, dispatch: any) {
-  return setBlockType(state.schema.nodes.code_block)(state, dispatch)
-}
-
-export const MenuItem = commandControl(
-  makeCodeBlock,
-  CodeIcon,
-  'Codeblock',
-  'Codeblock',
-  false
-) //codeblock focusing messes with scroll
+export const MarkdownMenu = () => (
+  <MenuButton data-tooltip="Quote" data-side="top" disabled>
+    <QuoteIcon />
+  </MenuButton>
+)
