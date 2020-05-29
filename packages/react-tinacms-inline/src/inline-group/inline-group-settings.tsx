@@ -28,11 +28,13 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { useInlineForm } from '../inline-form'
+import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button, IconButton } from '@tinacms/styles'
 import { SettingsIcon } from '@tinacms/icons'
 import { Field } from 'tinacms'
+
 import { InlineFieldContext } from '../inline-field-context'
+import { useInlineForm } from '../inline-form'
 
 export function InlineGroupSettings() {
   const [open, setOpen] = React.useState(false)
@@ -76,13 +78,23 @@ function SettingsModal({ fields, close, name }: SettingsModalProps) {
       name: `${name}.${field.name}`,
     }))
   }
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      if (!result.destination || !form) return
+      const name = result.type
+      form.mutators.move(name, result.source.index, result.destination.index)
+    },
+    [form]
+  )
 
   return (
     <Modal>
       <ModalPopup>
         <ModalHeader close={close}>Settings</ModalHeader>
         <ModalBody>
-          <FieldsBuilder form={form} fields={formFields} />
+          <DragDropContext onDragEnd={moveArrayItem}>
+            <FieldsBuilder form={form} fields={formFields} />
+          </DragDropContext>
         </ModalBody>
         <ModalActions>
           <Button onClick={close}>Cancel</Button>
