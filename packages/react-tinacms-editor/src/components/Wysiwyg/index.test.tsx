@@ -19,12 +19,12 @@ limitations under the License.
 import React from 'react'
 import { render } from '@testing-library/react'
 
-import { RawModeEditor } from './index'
+import { Wysiwyg } from './index'
 
-describe('RawModeEditor', () => {
+describe('Wysiwyg', () => {
   it('should render RawModeEditor', () => {
     const { getByTestId } = render(
-      <RawModeEditor
+      <Wysiwyg
         input={{
           onChange: () => {},
           value: '',
