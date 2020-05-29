@@ -18,19 +18,42 @@ limitations under the License.
 
 import * as React from 'react'
 import { Field } from 'tinacms'
+
 import { InlineFieldContext } from '../inline-field-context'
+import { InlineGroupControls } from './inline-group-controls'
 
 interface InlineGroupProps {
   name?: string
   fields: Field[]
-  // TODO: children type should be more specific
+  focusRing?: boolean
+  controls?: boolean
+  offset?: number
+  borderRadius?: number
   children?: any
 }
 
-export function InlineGroup({ name, children, fields }: InlineGroupProps) {
+export function InlineGroup({
+  name,
+  children,
+  fields,
+  controls = true,
+  focusRing = true,
+  offset,
+  borderRadius,
+}: InlineGroupProps) {
   return (
     <InlineFieldContext.Provider value={{ name, fields }}>
-      {children}
+      {controls ? (
+        <InlineGroupControls
+          focusRing={focusRing}
+          offset={offset}
+          borderRadius={borderRadius}
+        >
+          {children}
+        </InlineGroupControls>
+      ) : (
+        { children }
+      )}
     </InlineFieldContext.Provider>
   )
 }
