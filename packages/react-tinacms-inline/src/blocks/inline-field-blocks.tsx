@@ -65,6 +65,7 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
   return (
     <InlineField name={name}>
       {({ input, form }) => {
+        const name = input.name
         const allData: { _template: string }[] = input.value || []
 
         const move = (from: number, to: number) => {
