@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { EditorState } from 'prosemirror-state'
-import { Plugin } from '@tinacms/core'
 import { Schema } from 'prosemirror-model'
 import { dropCursor } from 'prosemirror-dropcursor'
 import { gapCursor } from 'prosemirror-gapcursor'
@@ -25,21 +24,21 @@ import { history } from 'prosemirror-history'
 import { keymap } from 'prosemirror-keymap'
 import { tableEditing } from 'prosemirror-tables'
 
-import { TranslatorClass } from '../../translator'
-import { commonPlugin } from '../../plugins/Common'
-import { buildKeymap } from '../../plugins/Common/buildKeymap'
-import { inputRules } from '../../plugins/Common/input-rules'
-import { imagePlugin } from '../../plugins/Image'
-import { codeBlockPlugin } from '../../plugins/CodeBlock'
-import { inlinePlugin } from '../../plugins/Inline'
-import { linkPlugin } from '../../plugins/Link'
-import { tablePlugin } from '../../plugins/Table'
+import { TranslatorClass } from '../../../translator'
+import { commonPlugin } from '../../../plugins/Common'
+import { buildKeymap } from '../../../plugins/Common/buildKeymap'
+import { inputRules } from '../../../plugins/Common/input-rules'
+import { imagePlugin } from '../../../plugins/Image'
+import { codeBlockPlugin } from '../../../plugins/CodeBlock'
+import { inlinePlugin } from '../../../plugins/Inline'
+import { linkPlugin } from '../../../plugins/Link'
+import { tablePlugin } from '../../../plugins/Table'
 
 export function buildEditorState(
   schema: Schema,
   translator: TranslatorClass,
   value: string,
-  imageProps: {
+  imageProps?: {
     upload?: (files: File[]) => Promise<string[]>
     previewUrl?: (url: string) => string
   }
@@ -64,12 +63,4 @@ export function buildEditorState(
       codeBlockPlugin,
     ],
   })
-}
-
-function byType(__type: string) {
-  return (plugin: Plugin) => plugin.__type === __type
-}
-
-export function findPlugins<P extends Plugin>(type: string, plugins: Plugin[]) {
-  return plugins.filter(byType(type)) as P[]
 }
