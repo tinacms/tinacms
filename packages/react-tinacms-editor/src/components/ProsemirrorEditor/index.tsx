@@ -23,8 +23,8 @@ import { EditorView } from 'prosemirror-view'
 
 import { EditorProps } from '../../types'
 import { EditorStateProvider } from '../../context/editorState'
-import { buildEditor } from '../../context/utils/buildEditor'
 
+import { buildEditor } from './utils/buildEditor'
 import { Menubar } from './Menubar'
 import { CodeMirrorCss } from './styles/CodeMirror'
 import { ProseMirrorCss } from './styles/ProseMirror'

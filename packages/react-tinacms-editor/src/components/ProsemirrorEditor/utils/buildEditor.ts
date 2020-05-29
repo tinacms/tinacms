@@ -18,10 +18,10 @@ limitations under the License.
 
 import { EditorView } from 'prosemirror-view'
 
-import { buildSchema } from '../../schema'
+import { buildSchema } from '../../../schema'
 import { buildTranslator } from './buildTranslator'
-import { Format } from '../../translator'
-import { ImageProps, Input } from '../../types'
+import { Format } from '../../../translator'
+import { ImageProps, Input } from '../../../types'
 
 import { buildEditorState } from './buildEditorState'
 
