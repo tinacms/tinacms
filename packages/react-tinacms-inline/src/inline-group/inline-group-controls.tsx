@@ -27,15 +27,16 @@ import { InlineFieldContext } from '../inline-field-context'
 
 interface InlineGroupControls {
   children: any
-  offset: number
-  borderRadius: number
+  offset?: number
+  borderRadius?: number
+  focusRing?: boolean
 }
 
-// TODO: children type should be more specific
 export function InlineGroupControls({
   children,
   offset,
   borderRadius,
+  focusRing,
 }: InlineGroupControls) {
   const { status } = useInlineForm()
   const [active, setActive] = React.useState(false)
@@ -70,18 +71,29 @@ export function InlineGroupControls({
   }
 
   return (
-    <FocusRing
-      ref={groupRef}
-      active={active}
-      onClick={handleSetActive}
-      offset={offset}
-      borderRadius={borderRadius}
-    >
-      <GroupMenu ref={groupMenuRef} active={active}>
-        <InlineSettings fields={fields} />
-      </GroupMenu>
-      {children}
-    </FocusRing>
+    <>
+      {!focusRing ? (
+        <>
+          <GroupMenu ref={groupMenuRef} active={active}>
+            <InlineSettings fields={fields} />
+          </GroupMenu>
+          {children}
+        </>
+      ) : (
+        <FocusRing
+          ref={groupRef}
+          active={active}
+          onClick={handleSetActive}
+          offset={offset}
+          borderRadius={borderRadius}
+        >
+          <GroupMenu ref={groupMenuRef} active={active}>
+            <InlineSettings fields={fields} />
+          </GroupMenu>
+          {children}
+        </FocusRing>
+      )}
+    </>
   )
 }
 
