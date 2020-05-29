@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components'
 import { InlineGroupSettings } from './inline-group-settings'
 import { useInlineForm } from '../inline-form'
 import { Button, IconButton } from '@tinacms/styles'
+import { FocusRing } from '../styles'
 
 // TODO: children type should be more specific
 export function InlineGroupControls({ children }: any) {
@@ -56,59 +57,20 @@ export function InlineGroupControls({ children }: any) {
   }
 
   return (
-    <GroupWrapper ref={groupRef} active={active} onClick={handleSetActive}>
-      <GroupMenu ref={groupMenuRef}>
+    <FocusRing ref={groupRef} active={active} onClick={handleSetActive}>
+      <GroupMenu ref={groupMenuRef} active={active}>
         <InlineGroupSettings />
       </GroupMenu>
       {children}
-    </GroupWrapper>
+    </FocusRing>
   )
 }
 
-export interface GroupWrapperProps {
+interface GroupMenuProps {
   active: boolean
 }
 
-const GroupWrapper = styled.div<GroupWrapperProps>`
-  position: relative;
-
-  &:hover {
-    &:after {
-      opacity: 0.3;
-    }
-  }
-
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -16px;
-    top: -16px;
-    width: calc(100% + 2rem);
-    height: calc(100% + 2rem);
-    border: 3px solid var(--tina-color-primary);
-    border-radius: var(--tina-radius-big);
-    opacity: 0;
-    pointer-events: none;
-    transition: all var(--tina-timing-medium) ease-out;
-  }
-
-  ${p =>
-    p.active &&
-    css`
-      ${GroupMenu} {
-        transform: translate3d(0, -100%, 0);
-        opacity: 1;
-        pointer-events: all;
-      }
-
-      &:after {
-        opacity: 1 !important;
-      }
-    `};
-`
-
-const GroupMenu = styled.div`
+const GroupMenu = styled.div<GroupMenuProps>`
   position: absolute;
   top: -1.5rem;
   right: -4px;
@@ -131,4 +93,12 @@ const GroupMenu = styled.div`
     height: 34px;
     margin: 0 4px;
   }
+
+  ${p =>
+    p.active &&
+    css`
+      transform: translate3d(0, -100%, 0);
+      opacity: 1;
+      pointer-events: all;
+    `}
 `
