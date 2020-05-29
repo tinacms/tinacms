@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.1-alpha.0...@tinacms/fields@0.11.1-alpha.1) (2020-05-29)
+
+
+### Bug Fixes
+
+* fields are optional for block templates ([bf320fe](https://github.com/tinacms/tinacms/commit/bf320fe))
+* remove unnecessary `key` prop from block template ([0c316ce](https://github.com/tinacms/tinacms/commit/0c316ce))
+
+
+
+
+
 ## [0.11.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.0...@tinacms/fields@0.11.1-alpha.0) (2020-05-28)
 
 **Note:** Version bump only for package @tinacms/fields

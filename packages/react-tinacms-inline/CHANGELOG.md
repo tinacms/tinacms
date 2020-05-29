@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.6.0-alpha.1...react-tinacms-inline@0.6.0-alpha.2) (2020-05-29)
+
+
+### Bug Fixes
+
+* group supports blocks and group-list ([009e944](https://github.com/tinacms/tinacms/commit/009e944))
+* inline blocks works inside of groups ([a2b17d8](https://github.com/tinacms/tinacms/commit/a2b17d8))
+* inline group does not require fields ([8c8536c](https://github.com/tinacms/tinacms/commit/8c8536c))
+* opening blocks in settings modals ([d0ff8b9](https://github.com/tinacms/tinacms/commit/d0ff8b9))
+
+
+### Features
+
+* focus ring accepts offset and borderradius props ([36afdd9](https://github.com/tinacms/tinacms/commit/36afdd9))
+
+
+
+
+
 # [0.6.0-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.6.0-alpha.0...react-tinacms-inline@0.6.0-alpha.1) (2020-05-28)
 
 **Note:** Version bump only for package react-tinacms-inline
