@@ -23,6 +23,7 @@ import { Button, IconButton } from '@tinacms/styles'
 import { InlineSettings } from '../inline-settings'
 import { useInlineForm } from '../inline-form'
 import { FocusRing } from '../styles'
+import { InlineFieldContext } from '../inline-field-context'
 
 interface InlineGroupControls {
   children: any
@@ -40,6 +41,7 @@ export function InlineGroupControls({
   const [active, setActive] = React.useState(false)
   const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
+  const { fields } = React.useContext(InlineFieldContext)
 
   React.useEffect(() => {
     document.addEventListener('click', handleClickOutside, true)
@@ -76,7 +78,7 @@ export function InlineGroupControls({
       borderRadius={borderRadius}
     >
       <GroupMenu ref={groupMenuRef} active={active}>
-        <InlineSettings />
+        <InlineSettings fields={fields} />
       </GroupMenu>
       {children}
     </FocusRing>
