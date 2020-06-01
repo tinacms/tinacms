@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { BlockTemplate } from 'tinacms'
-import { Button } from '@tinacms/styles'
+import { IconButton } from '@tinacms/styles'
 import { AddIcon } from '@tinacms/icons'
 
 interface AddBlockMenuProps {
@@ -29,8 +29,25 @@ interface AddBlockMenuProps {
 
 export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
   const [isOpen, setIsOpen] = React.useState(false)
+  const addBlockButtonRef = React.useRef<HTMLButtonElement>(null)
+  const [openTop, setOpenTop] = React.useState(false)
 
   const handleOpenBlockMenu = () => {
+    const addBlockButtonElem = addBlockButtonRef.current
+
+    if (addBlockButtonElem !== null) {
+      const menuBounding = addBlockButtonElem.getBoundingClientRect()
+      const halfWindowHeight =
+        (window.innerHeight || document.documentElement.clientHeight) / 2
+      const offsetTop = menuBounding.top - window.scrollY
+
+      if (offsetTop < halfWindowHeight) {
+        setOpenTop(false)
+      } else {
+        setOpenTop(true)
+      }
+    }
+
     templates.length == 1
       ? addBlock({
           _template: templates[0].type,
@@ -49,10 +66,15 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
 
   return (
     <AddBlockWrapper>
-      <AddBlockButton onClick={handleOpenBlockMenu} isOpen={isOpen} primary>
-        <AddIcon /> Add Block
+      <AddBlockButton
+        ref={addBlockButtonRef}
+        onClick={handleOpenBlockMenu}
+        isOpen={isOpen}
+        primary
+      >
+        <AddIcon />
       </AddBlockButton>
-      <BlocksMenu isOpen={isOpen}>
+      <BlocksMenu openTop={openTop} isOpen={isOpen}>
         {templates.map((template: BlockTemplate) => (
           <BlockOption
             key={template.label}
@@ -74,9 +96,10 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
 interface AddMenuProps {
   isOpen?: boolean
   active?: boolean
+  openTop?: boolean
 }
 
-const AddBlockButton = styled(Button)<AddMenuProps>`
+const AddBlockButton = styled(IconButton)<AddMenuProps>`
   font-family: 'Inter', sans-serif;
   display: flex;
   align-items: center;
@@ -86,9 +109,6 @@ const AddBlockButton = styled(Button)<AddMenuProps>`
   }
 
   svg {
-    height: 70%;
-    width: auto;
-    margin-right: 0.5em;
     transition: all 150ms ease-out;
   }
 
@@ -112,9 +132,9 @@ const BlocksMenu = styled.div<AddMenuProps>`
   display: block;
   position: absolute;
   z-index: var(--tina-z-index-2);
-  top: 0;
-  left: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
+  top: 5px;
+  left: 50%;
+  transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
@@ -128,7 +148,20 @@ const BlocksMenu = styled.div<AddMenuProps>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, 41px, 0) scale3d(1, 1, 1);
+      transform: translate3d(-50%, 41px, 0) scale3d(1, 1, 1);
+    `};
+
+  ${props =>
+    props.openTop &&
+    css`
+      top: auto;
+      bottom: 5px;
+      transform-origin: 50% 100%;
+
+      ${props.isOpen &&
+        css`
+          transform: translate3d(-50%, -41px, 0) scale3d(1, 1, 1);
+        `};
     `};
 `
 
