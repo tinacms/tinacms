@@ -17,7 +17,7 @@ TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.
 
 ### Creating Packages
 
-Packages in Tina are organized according to thier name
+Packages in Tina are organized according to their name
 
 | Type                    | Naming Convention  | Example Path           |
 | ----------------------- | ------------------ | ---------------------- |
