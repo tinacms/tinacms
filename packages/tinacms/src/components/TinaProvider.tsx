@@ -24,6 +24,7 @@ import { ToolbarProvider } from '@tinacms/react-toolbar'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
+import { useState, useEffect } from 'react'
 
 export interface TinaProviderProps {
   cms: TinaCMS
@@ -35,21 +36,24 @@ export interface TinaProviderProps {
 export const TinaProvider: React.FC<TinaProviderProps> = ({
   cms,
   children,
-  hidden,
   position,
   styled = true,
 }) => {
+  const [enabled, setEnabled] = useState(cms.enabled)
+
+  useEffect(() => {
+    return cms.events.subscribe('cms', () => {
+      setEnabled(cms.enabled)
+    })
+  }, [])
+
   return (
     <CMSContext.Provider value={cms}>
       <ModalProvider>
-        {cms.enabled && styled && <Theme />}
         <Alerts alerts={cms.alerts} />
-        <ToolbarProvider hidden={hidden} toolbar={cms.toolbar} />
-        <SidebarProvider
-          hidden={hidden}
-          position={position}
-          sidebar={cms.sidebar}
-        >
+        {enabled && styled && <Theme />}
+        {enabled && <ToolbarProvider toolbar={cms.toolbar} />}
+        <SidebarProvider position={position} sidebar={cms.sidebar}>
           {children}
         </SidebarProvider>
       </ModalProvider>
