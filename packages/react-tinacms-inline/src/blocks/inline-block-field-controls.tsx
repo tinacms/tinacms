@@ -116,7 +116,7 @@ export function BlocksControls({
         offset={offset}
       >
         <AddBlockMenu
-          addBlock={block => insert(index - 1, block)}
+          addBlock={block => insert(index, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
         />
       </AddBeforeMenu>
@@ -212,9 +212,8 @@ export const BlockAction = styled.div<BlockActionProps>`
     p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
   fill: ${p =>
     p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  border: 1px solid var(--tina-color-grey-2);
-  margin: -1px;
   outline: none;
+  border: none;
   padding: 4px 6px;
   transition: all 85ms ease-out;
   cursor: pointer;
@@ -231,6 +230,9 @@ export const BlockAction = styled.div<BlockActionProps>`
     color: var(--tina-color-primary);
     fill: var(--tina-color-primary);
     background-color: rgba(53, 50, 50, 0.05);
+  }
+  &:not(:last-child) {
+    border-right: 1px solid var(--tina-color-grey-2);
   }
   svg {
     width: 26px;
