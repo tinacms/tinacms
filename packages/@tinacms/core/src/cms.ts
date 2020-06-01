@@ -170,7 +170,7 @@ export class CMS {
   }
 
   disable(): void {
-    this._enabled = true
+    this._enabled = false
     this.events.dispatch(CMS.DISABLED)
   }
 }
