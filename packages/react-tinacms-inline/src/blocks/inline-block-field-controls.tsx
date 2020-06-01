@@ -110,26 +110,22 @@ export function BlocksControls({
       offset={offset}
       borderRadius={borderRadius}
     >
-      <AddBeforeMenu
+      <AddBlockMenu
+        addBlock={block => insert(index, block)}
+        templates={Object.entries(blocks).map(([, block]) => block.template)}
         index={index}
         active={activeBlock === index}
         offset={offset}
-      >
-        <AddBlockMenu
-          addBlock={block => insert(index, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-        />
-      </AddBeforeMenu>
-      <AddAfterMenu
+        position="top"
+      />
+      <AddBlockMenu
+        addBlock={block => insert(index + 1, block)}
+        templates={Object.entries(blocks).map(([, block]) => block.template)}
         index={index}
         active={activeBlock === index}
         offset={offset}
-      >
-        <AddBlockMenu
-          addBlock={block => insert(index + 1, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-        />
-      </AddAfterMenu>
+        position="bottom"
+      />
       <BlockMenuWrapper
         ref={blockMenuRef}
         index={index}
@@ -255,47 +251,3 @@ export const BlockAction = styled.div<BlockActionProps>`
       fill: #d1d1d1;
     `};
 `
-
-interface AddMenuProps {
-  active: boolean
-  index: number
-  offset?: number
-}
-
-const AddBeforeMenu = styled.div<AddMenuProps>(
-  p => css`
-    position: absolute;
-    top: -${p.offset !== undefined ? p.offset : `16`}px;
-    left: 50%;
-    transform: translate3d(-50%, -50%, 0);
-    opacity: 0;
-    transition: all 120ms ease-out;
-    pointer-events: none;
-    z-index: calc(var(--tina-z-index-1) - ${p.index});
-
-    ${p.active &&
-      css`
-        opacity: 1;
-        pointer-events: all;
-      `}
-  `
-)
-
-const AddAfterMenu = styled.div<AddMenuProps>(
-  p => css`
-    position: absolute;
-    bottom: -${p.offset !== undefined ? p.offset : `16`}px;
-    left: 50%;
-    transform: translate3d(-50%, 50%, 0);
-    opacity: 0;
-    transition: all 120ms ease-out;
-    pointer-events: none;
-    z-index: calc(var(--tina-z-index-1) - ${p.index});
-
-    ${p.active &&
-      css`
-        opacity: 1;
-        pointer-events: all;
-      `}
-  `
-)

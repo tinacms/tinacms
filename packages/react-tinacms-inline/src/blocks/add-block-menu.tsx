@@ -26,9 +26,20 @@ import { Dismissible } from 'react-dismissible'
 interface AddBlockMenuProps {
   addBlock(data: any): void
   templates: BlockTemplate[]
+  active: boolean
+  position: 'top' | 'bottom'
+  index: number
+  offset?: number
 }
 
-export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
+export function AddBlockMenu({
+  templates,
+  addBlock,
+  active,
+  position,
+  index,
+  offset,
+}: AddBlockMenuProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const addBlockButtonRef = React.useRef<HTMLButtonElement>(null)
   const [openTop, setOpenTop] = React.useState(false)
@@ -66,7 +77,13 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
   templates = templates || []
 
   return (
-    <AddBlockWrapper>
+    <AddBlockWrapper
+      active={active}
+      index={index}
+      offset={offset}
+      position={position}
+      isOpen={isOpen}
+    >
       <AddBlockButton
         ref={addBlockButtonRef}
         onClick={handleOpenBlockMenu}
@@ -130,9 +147,47 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
     `};
 `
 
-const AddBlockWrapper = styled.div`
-  position: relative;
+interface AddBlockWrapperProps {
+  active: boolean
+  index: number
+  offset?: number
+  position: 'top' | 'bottom'
+  isOpen: boolean
+}
+
+const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
+  p => css`
+  position: absolute;
+  left: 50%;
+  opacity: 0;
+  transition: all 120ms ease-out;
+  pointer-events: none;
+  z-index: calc(var(--tina-z-index-1) - ${p.index});
+
+  ${p.position == 'top' &&
+    css`
+      top: -${p.offset !== undefined ? p.offset : `16`}px;
+      transform: translate3d(-50%, -50%, 0);
+    `}
+
+  ${p.position == 'bottom' &&
+    css`
+      bottom: -${p.offset !== undefined ? p.offset : `16`}px;
+      transform: translate3d(-50%, 50%, 0);
+    `}
+
+  ${p.isOpen &&
+    css`
+      z-index: calc(1 + var(--tina-z-index-1) - ${p.index});
+    `}
+
+  ${p.active &&
+    css`
+      opacity: 1;
+      pointer-events: all;
+    `}
 `
+)
 
 const BlocksMenu = styled.div<AddMenuProps>`
   min-width: 192px;
