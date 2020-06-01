@@ -77,10 +77,14 @@ export class GithubClient {
     return this.workingRepoFullName !== this.baseRepoFullName
   }
 
-  async isAuthorized() {
-    const repo = await this.getRepository()
+  async isAuthorized(): Promise<boolean> {
+    try {
+      const repo = await this.getRepository()
 
-    return repo.permissions.push
+      return repo.permissions.push
+    } catch {
+      return false
+    }
   }
 
   async getUser() {

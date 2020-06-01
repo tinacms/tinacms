@@ -36,24 +36,17 @@ export interface SidebarProviderProps {
   children: any
   sidebar: SidebarState
   position?: SidebarStateOptions['position']
-  hidden?: boolean
 }
 
 export function SidebarProvider({
   children,
   position,
-  hidden,
   sidebar,
 }: SidebarProviderProps) {
+  const cms = useCMS()
   useSubscribable(sidebar)
 
-  React.useEffect(() => {
-    if (typeof hidden !== 'undefined') {
-      sidebar.hidden = hidden
-    }
-  }, [hidden])
-
-  if (sidebar.hidden) return children
+  if (cms.disabled || sidebar.hidden) return children
 
   return (
     <>
