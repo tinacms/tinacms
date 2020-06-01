@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import styled from 'styled-components'
 import { Field } from 'tinacms'
 
 import { InlineFieldContext } from '../inline-field-context'
@@ -46,8 +47,16 @@ export function InlineGroup({
           {children}
         </InlineGroupControls>
       ) : (
-        <>{children}</>
+        <Wrapper>{children}</Wrapper>
       )}
     </InlineFieldContext.Provider>
   )
 }
+
+/**
+ * TODO: This needs to emulate focusRing behavior
+ * for consistency in edit versus preview mode
+ */
+const Wrapper = styled.div`
+  width: 100%;
+`
