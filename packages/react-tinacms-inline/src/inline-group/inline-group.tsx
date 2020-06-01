@@ -25,7 +25,7 @@ import { InlineGroupControls } from './inline-group-controls'
 
 interface InlineGroupProps {
   name?: string
-  fields: Field[]
+  fields?: Field[]
   controls?: boolean
   offset?: number
   borderRadius?: number
@@ -35,7 +35,7 @@ interface InlineGroupProps {
 export function InlineGroup({
   name,
   children,
-  fields,
+  fields = [],
   controls = true,
   offset,
   borderRadius,

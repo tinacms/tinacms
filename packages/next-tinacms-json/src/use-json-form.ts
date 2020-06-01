@@ -16,15 +16,7 @@ limitations under the License.
 
 */
 
-import { useCallback } from 'react'
-import {
-  useWatchFormValues,
-  useForm,
-  useCMS,
-  FormOptions,
-  Field,
-  Form,
-} from 'tinacms'
+import { useForm, useCMS, FormOptions, Field, Form } from 'tinacms'
 import { generateFields } from './generate-fields'
 
 /**
@@ -78,21 +70,15 @@ export function useJsonForm<T = any>(
       reset() {
         return cms.api.git.reset({ files: [id] })
       },
+      onChange: formState => {
+        cms.api.git.writeToDisk({
+          fileRelativePath: jsonFile.fileRelativePath,
+          content: JSON.stringify(formState.values, null, 2),
+        })
+      },
     },
     { values: jsonFile.data, label }
   )
-
-  const writeToDisk = useCallback(
-    formState => {
-      cms.api.git.writeToDisk({
-        fileRelativePath: jsonFile.fileRelativePath,
-        content: JSON.stringify(formState.values, null, 2),
-      })
-    },
-    [jsonFile.fileRelativePath]
-  )
-
-  useWatchFormValues(form, writeToDisk)
 
   return [values || jsonFile.data, form]
 }
