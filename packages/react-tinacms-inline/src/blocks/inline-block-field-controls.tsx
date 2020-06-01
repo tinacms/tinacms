@@ -162,7 +162,7 @@ export function BlocksControls({
 }
 
 interface BlockMenuWrapperProps {
-  index: number
+  index?: number
   active: boolean
   offset?: number
 }
@@ -174,7 +174,7 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
     right: calc(-${p.offset !== undefined ? p.offset : `16`}px - 1px);
     opacity: 0;
     transition: all 120ms ease-out;
-    z-index: calc(var(--tina-z-index-1) - ${p.index});
+    z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
     pointer-events: none;
     transform: translate3d(0, -100%, 0);
 

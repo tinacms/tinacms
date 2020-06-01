@@ -17,13 +17,15 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css } from 'styled-components'
-import { Button, IconButton } from '@tinacms/styles'
 
 import { InlineSettings } from '../inline-settings'
 import { useInlineForm } from '../inline-form'
 import { FocusRing } from '../styles'
 import { InlineFieldContext } from '../inline-field-context'
+import {
+  BlockMenu,
+  BlockMenuWrapper,
+} from '../blocks/inline-block-field-controls'
 
 interface InlineGroupControls {
   children: any
@@ -76,47 +78,12 @@ export function InlineGroupControls({
       offset={offset}
       borderRadius={borderRadius}
     >
-      <GroupMenu ref={groupMenuRef} active={active}>
-        <InlineSettings fields={fields} />
-      </GroupMenu>
+      <BlockMenuWrapper ref={groupMenuRef} offset={offset} active={active}>
+        <BlockMenu>
+          <InlineSettings fields={fields} />
+        </BlockMenu>
+      </BlockMenuWrapper>
       {children}
     </FocusRing>
   )
 }
-
-interface GroupMenuProps {
-  active: boolean
-}
-
-const GroupMenu = styled.div<GroupMenuProps>`
-  position: absolute;
-  top: -1.5rem;
-  right: -4px;
-  left: -4px;
-  display: flex;
-  justify-content: flex-end;
-  align-items: center;
-  opacity: 0;
-  transform: translate3d(0, 0, 0);
-  transition: all 120ms ease-out;
-  pointer-events: none;
-
-  ${Button} {
-    height: 34px;
-    margin: 0 4px;
-  }
-
-  ${IconButton} {
-    width: 34px;
-    height: 34px;
-    margin: 0 4px;
-  }
-
-  ${p =>
-    p.active &&
-    css`
-      transform: translate3d(0, -100%, 0);
-      opacity: 1;
-      pointer-events: all;
-    `}
-`
