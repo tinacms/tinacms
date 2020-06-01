@@ -6,7 +6,7 @@ import { CMS } from '@tinacms/core'
 
 describe('TinaProvider', () => {
   describe('when passed an instance of CMS', () => {
-    it('throws no error', () => {
+    it('throws error', () => {
       const t = () => {
         render(<TinaProvider cms={new CMS() as any} />)
       }
