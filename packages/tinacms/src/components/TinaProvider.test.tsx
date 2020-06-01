@@ -1,12 +1,17 @@
 import { render } from '@testing-library/react'
 import React from 'react'
-import { TinaProvider, CMS } from '../../build'
-import { TinaCMS } from '..'
+import { TinaProvider, INVALID_CMS_ERROR } from './TinaProvider'
+import { TinaCMS } from '../tina-cms'
+import { CMS } from '@tinacms/core'
 
 describe('TinaProvider', () => {
   describe('when passed an instance of CMS', () => {
     it('throws no error', () => {
-      render(<TinaProvider cms={new CMS()} />)
+      const t = () => {
+        render(<TinaProvider cms={new CMS() as any} />)
+      }
+
+      expect(t).toThrowError(INVALID_CMS_ERROR)
     })
   })
   describe('when passed an instance of TinaCMS', () => {
@@ -20,7 +25,7 @@ describe('TinaProvider', () => {
         render(<TinaProvider cms={{} as any} />)
       }
 
-      expect(t).toThrowError('Prop cms is not an instance of CMS.')
+      expect(t).toThrowError(INVALID_CMS_ERROR)
     })
   })
 })
