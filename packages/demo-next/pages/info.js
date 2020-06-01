@@ -22,6 +22,8 @@ import {
   InlineImage,
   InlineGroup,
   InlineGroupControls,
+  InlineSettings,
+  InlineTextarea,
 } from 'react-tinacms-inline'
 import { EditToggle, DiscardChanges } from './blocks'
 
@@ -73,16 +75,39 @@ function Info(props) {
           <InlineGroup
             name="frontmatter"
             fields={[
-              { name: 'name', component: 'text' },
-              { name: 'hometown', component: 'text' },
+              { label: 'Name', name: 'name', component: 'text' },
+              { label: 'Hometown', name: 'hometown', component: 'text' },
             ]}
+            offset={0}
+            borderRadius={0}
           >
+            <h1>
+              <InlineText focusRing={false} name="name" />
+            </h1>
+            <p>
+              <InlineText focusRing={false} name="hometown" />
+            </p>
+            <h4>Group with fields, name provided</h4>
+          </InlineGroup>
+          <InlineGroup controls={false}>
             <InlineGroupControls offset={0} borderRadius={0}>
-              <h1>
-                <InlineText focusRing={false} name="name" />
-              </h1>
-              GROUP!!!!
+              <p>
+                <InlineTextarea
+                  focusRing={false}
+                  name="frontmatter.description"
+                />
+              </p>
+              <h4>Group sources from the root, no fields, controls = false</h4>
             </InlineGroupControls>
+          </InlineGroup>
+          <InlineGroup controls={false}>
+            <p>
+              <InlineTextarea
+                focusRing={false}
+                name="frontmatter.description"
+              />
+            </p>
+            <h4>Group without inline controls, to test style consistency</h4>
           </InlineGroup>
 
           <InlineImage
