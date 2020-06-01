@@ -45,11 +45,15 @@ export const TinacmsGithubProvider = ({
   const github: GithubClient = cms.api.github
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
 
-  const onClose = () => {
+  const onClose = async () => {
     setActiveModal(null)
+    if (!(await github.isAuthorized())) {
+      cms.disable()
+    }
   }
 
   const beginAuth = async () => {
+    cms.enable()
     if (await github.isAuthenticated()) {
       onAuthSuccess()
     } else {
