@@ -19,6 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { Toolbar } from './Toolbar'
 import { ToolbarState } from '../toolbar'
+import { useSubscribable } from '@tinacms/react-core'
 
 interface ToolbarProviderProps {
   toolbar: ToolbarState
@@ -26,6 +27,7 @@ interface ToolbarProviderProps {
 }
 
 export function ToolbarProvider({ hidden, toolbar }: ToolbarProviderProps) {
+  useSubscribable(toolbar)
   React.useEffect(() => {
     if (typeof hidden !== 'undefined') {
       toolbar.hidden = hidden
