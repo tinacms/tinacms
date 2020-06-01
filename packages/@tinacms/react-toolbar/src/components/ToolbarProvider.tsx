@@ -23,16 +23,10 @@ import { useSubscribable } from '@tinacms/react-core'
 
 interface ToolbarProviderProps {
   toolbar: ToolbarState
-  hidden?: boolean
 }
 
-export function ToolbarProvider({ hidden, toolbar }: ToolbarProviderProps) {
+export function ToolbarProvider({ toolbar }: ToolbarProviderProps) {
   useSubscribable(toolbar)
-  React.useEffect(() => {
-    if (typeof hidden !== 'undefined') {
-      toolbar.hidden = hidden
-    }
-  }, [hidden])
 
   if (toolbar.hidden) return null
 
