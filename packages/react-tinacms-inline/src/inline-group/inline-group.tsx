@@ -17,20 +17,46 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import styled from 'styled-components'
 import { Field } from 'tinacms'
+
 import { InlineFieldContext } from '../inline-field-context'
+import { InlineGroupControls } from './inline-group-controls'
 
 interface InlineGroupProps {
   name?: string
   fields?: Field[]
-  // TODO: children type should be more specific
+  controls?: boolean
+  offset?: number
+  borderRadius?: number
   children?: any
 }
 
-export function InlineGroup({ name, children, fields = [] }: InlineGroupProps) {
+export function InlineGroup({
+  name,
+  children,
+  fields = [],
+  controls = true,
+  offset,
+  borderRadius,
+}: InlineGroupProps) {
   return (
     <InlineFieldContext.Provider value={{ name, fields }}>
-      {children}
+      {controls ? (
+        <InlineGroupControls offset={offset} borderRadius={borderRadius}>
+          {children}
+        </InlineGroupControls>
+      ) : (
+        <Wrapper>{children}</Wrapper>
+      )}
     </InlineFieldContext.Provider>
   )
 }
+
+/**
+ * TODO: This needs to emulate focusRing behavior
+ * for consistency in edit versus preview mode
+ */
+const Wrapper = styled.div`
+  width: 100%;
+`

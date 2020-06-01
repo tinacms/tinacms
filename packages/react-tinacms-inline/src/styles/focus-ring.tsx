@@ -26,6 +26,7 @@ interface FocusRingProps {
 export const FocusRing = styled.div<FocusRingProps>(
   p => css`
     position: relative;
+    width: 100%;
 
     &:hover {
       &:after {
