@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1-alpha.3](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.2...react-tinacms-github@0.4.1-alpha.3) (2020-06-01)
+
+
+### Bug Fixes
+
+* is-authorized defaults to false ([f675d9d](https://github.com/tinacms/tinacms/commit/f675d9d))
+* toggle cms when entering/exiting authentication flow ([6f72fa0](https://github.com/tinacms/tinacms/commit/6f72fa0))
+
+
+
+
+
 ## [0.4.1-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.1...react-tinacms-github@0.4.1-alpha.2) (2020-05-29)
 
 
