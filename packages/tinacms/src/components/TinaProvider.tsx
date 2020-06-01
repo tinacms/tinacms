@@ -36,7 +36,6 @@ export interface TinaProviderProps {
 export const TinaProvider: React.FC<TinaProviderProps> = ({
   cms,
   children,
-  hidden,
   position,
   styled = true,
 }) => {
