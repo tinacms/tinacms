@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms",
-  "version": "0.9.26",
+  "version": "0.9.27",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
