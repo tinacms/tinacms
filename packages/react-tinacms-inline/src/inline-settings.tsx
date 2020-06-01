@@ -16,7 +16,8 @@ limitations under the License.
 
 */
 import * as React from 'react'
-import { Field } from 'tinacms'
+import styled from 'styled-components'
+
 import {
   FieldsBuilder,
   Modal,
@@ -25,8 +26,11 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
+import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button, IconButton } from '@tinacms/styles'
 import { SettingsIcon } from '@tinacms/icons'
+import { Field } from 'tinacms'
+import { FormPortalProvider } from '@tinacms/react-forms'
 
 import { InlineFieldContext } from './inline-field-context'
 import { useInlineForm } from './inline-form'
@@ -70,13 +74,26 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
       name: `${name}.${field.name}`,
     }))
   }
-
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      if (!result.destination || !form) return
+      const name = result.type
+      form.mutators.move(name, result.source.index, result.destination.index)
+    },
+    [form]
+  )
   return (
     <Modal>
       <ModalPopup>
         <ModalHeader close={close}>Settings</ModalHeader>
         <ModalBody>
-          <FieldsBuilder form={form} fields={formFields} />
+          <DragDropContext onDragEnd={moveArrayItem}>
+            <Wrapper>
+              <FormPortalProvider>
+                <FieldsBuilder form={form} fields={formFields} />
+              </FormPortalProvider>
+            </Wrapper>
+          </DragDropContext>
         </ModalBody>
         <ModalActions>
           <Button onClick={close}>Cancel</Button>
@@ -85,3 +102,9 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
     </Modal>
   )
 }
+
+const Wrapper = styled.div`
+  display: block;
+  margin: 0 auto;
+  width: 100%;
+`
