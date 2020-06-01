@@ -25,6 +25,7 @@ import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
 import { useState, useEffect } from 'react'
+import { CMS } from '@tinacms/core'
 
 export interface TinaProviderProps {
   cms: TinaCMS
@@ -46,6 +47,10 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
       setEnabled(cms.enabled)
     })
   }, [])
+
+  if (!(cms instanceof CMS)) {
+    throw new Error('prop cms is not an instance of CMS')
+  }
 
   return (
     <CMSContext.Provider value={cms}>
