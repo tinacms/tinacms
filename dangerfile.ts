@@ -290,7 +290,7 @@ function isMissingHeader(content: string) {
  * ### Modified Packages
  *
  * * `@tinacms/fields`
- * * `react-tinacms`
+ * * `react-tinacms-github`
  * ```
  */
 function listTouchedPackages(modifiedPackages: TinaPackage[]) {
