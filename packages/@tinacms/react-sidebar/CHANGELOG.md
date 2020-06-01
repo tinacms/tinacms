@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.7](https://github.com/tinacms/tinacms/compare/@tinacms/react-sidebar@0.1.7-alpha.2...@tinacms/react-sidebar@0.1.7) (2020-06-01)
+
+**Note:** Version bump only for package @tinacms/react-sidebar
+
+
+
+
+
 ## [0.1.7-alpha.2](https://github.com/tinacms/tinacms/compare/@tinacms/react-sidebar@0.1.7-alpha.1...@tinacms/react-sidebar@0.1.7-alpha.2) (2020-06-01)
 
 
