@@ -72,6 +72,7 @@ export function AddBlockMenu({ templates, addBlock }: AddBlockMenuProps) {
         onClick={handleOpenBlockMenu}
         isOpen={isOpen}
         primary
+        small
       >
         <AddIcon />
       </AddBlockButton>
@@ -140,7 +141,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
   display: block;
   position: absolute;
   z-index: var(--tina-z-index-2);
-  top: 5px;
+  top: 4px;
   left: 50%;
   transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
@@ -156,19 +157,19 @@ const BlocksMenu = styled.div<AddMenuProps>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(-50%, 41px, 0) scale3d(1, 1, 1);
+      transform: translate3d(-50%, 32px, 0) scale3d(1, 1, 1);
     `};
 
   ${props =>
     props.openTop &&
     css`
       top: auto;
-      bottom: 5px;
+      bottom: 4px;
       transform-origin: 50% 100%;
 
       ${props.isOpen &&
         css`
-          transform: translate3d(-50%, -41px, 0) scale3d(1, 1, 1);
+          transform: translate3d(-50%, -32px, 0) scale3d(1, 1, 1);
         `};
     `};
 `

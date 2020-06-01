@@ -27,11 +27,11 @@ import {
   ModalActions,
 } from 'tinacms'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Button, IconButton } from '@tinacms/styles'
-import { SettingsIcon } from '@tinacms/icons'
+import { Button } from '@tinacms/styles'
+import { EditIcon } from '@tinacms/icons'
 import { Field } from 'tinacms'
 import { FormPortalProvider } from '@tinacms/react-forms'
-
+import { BlockAction } from './blocks/inline-block-field-controls'
 import { InlineFieldContext } from './inline-field-context'
 import { useInlineForm } from './inline-form'
 
@@ -49,9 +49,9 @@ export function InlineSettings({ fields }: InlineSettingsProps) {
 
   return (
     <>
-      <IconButton primary onClick={() => setOpen(p => !p)}>
-        <SettingsIcon />
-      </IconButton>
+      <BlockAction onClick={() => setOpen(p => !p)}>
+        <EditIcon />
+      </BlockAction>
       {open && <SettingsModal fields={fields} close={() => setOpen(false)} />}
     </>
   )

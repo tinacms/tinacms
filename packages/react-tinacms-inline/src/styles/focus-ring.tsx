@@ -36,6 +36,7 @@ export const FocusRing = styled.div<FocusRingProps>(
 
     &:after {
       content: '';
+      box-sizing: border-box;
       display: block;
       position: absolute;
       left: calc(-1 * ${p.offset !== undefined ? p.offset : '16'}px);
