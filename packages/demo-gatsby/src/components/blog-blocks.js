@@ -68,7 +68,6 @@ const heading_template = {
   defaultItem: {
     text: "",
   },
-  key: undefined,
   fields: [],
 }
 
@@ -81,7 +80,6 @@ const image_template = {
   defaultItem: {
     text: "",
   },
-  key: undefined,
   fields: [
     { name: "src", component: "text", label: "Source URL" },
     { name: "alt", component: "text", label: "Alt Text" },
