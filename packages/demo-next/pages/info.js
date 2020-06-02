@@ -128,7 +128,6 @@ function Info(props) {
               flex-direction: column;
               text-align: center;
               padding: 3rem;
-              margin-top: 4rem;
             }
 
             div.group {
