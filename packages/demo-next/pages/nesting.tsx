@@ -76,7 +76,12 @@ export default function Nesting() {
     fields: [],
     onSubmit() {},
   })
+
+  /**
+   * To test data in the browser
+   */
   console.log('NESTING', values)
+
   return (
     <Layout>
       <InlineForm form={form} initialStatus="active">
@@ -209,6 +214,11 @@ const COLORS = {
   },
 }
 
+/**
+ * Outlined the columns pink and rows green for now
+ * so we can get a better visual of the grid.
+ */
+
 const ROW = {
   template: {
     type: 'row',
@@ -220,16 +230,26 @@ const ROW = {
   },
   Component({ index, data }) {
     return (
-      <div className="row">
+      <>
         <BlocksControls index={index}>
-          <div style={{ display: 'flex', flexDirection: 'row' }}>
+          <div className="row">
             <InlineBlocks
               name="items"
               blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
             />
           </div>
         </BlocksControls>
-      </div>
+        <style jsx>
+          {`
+            div.row {
+              border: 0.5px solid lightpink;
+              margin: 1rem 0;
+              display: flex;
+              flex-direction: row;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
@@ -245,14 +265,27 @@ const COL = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <InlineBlocks
-            name="items"
-            blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
-          />
-        </div>
-      </BlocksControls>
+      <>
+        <BlocksControls index={index} offset={0} borderRadius={0}>
+          <div className="col">
+            <InlineBlocks
+              name="items"
+              blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
+            />
+          </div>
+        </BlocksControls>
+        <style jsx>
+          {`
+            div.col {
+              border: 0.5px solid lightgreen;
+              margin: 0 1rem;
+              display: flex;
+              flex-direction: column;
+              height: 100%;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
@@ -269,19 +302,29 @@ const HEADING = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <h3 style={{ color: data.color }}>
-          <InlineTextarea name="text" />
-        </h3>
-      </BlocksControls>
+      <>
+        <BlocksControls index={index}>
+          <h3 className="block-heading">
+            <InlineTextarea name="text" />
+          </h3>
+        </BlocksControls>
+        <style jsx>
+          {`
+            h3.block-heading {
+              color: ${data.color};
+              padding: 0.5rem 0;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
 
 const PARAGRAPH = {
   template: {
-    type: 'heading',
-    label: 'Heading',
+    type: 'paragraph',
+    label: 'Paragraph',
     defaultItem: {
       text: 'New Paragraph',
       color: 'black',
@@ -290,11 +333,20 @@ const PARAGRAPH = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <p>
-          <InlineTextarea name="text" />
-        </p>
-      </BlocksControls>
+      <>
+        <BlocksControls index={index}>
+          <p className="block-paragraph">
+            <InlineTextarea name="text" />
+          </p>
+        </BlocksControls>
+        <style jsx>
+          {`
+            p {
+              padding: 0.5rem 0;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
