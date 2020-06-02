@@ -22,7 +22,6 @@ import { EditorView } from 'prosemirror-view'
 
 import { buildEditor } from './utils/buildEditor'
 import { buildEditorState } from './utils/buildEditorState'
-import { useBrowserFocusContext } from './browserFocus'
 
 const EditorStateContext = createContext<{
   editorView: { view: EditorView } | undefined
@@ -60,14 +59,6 @@ export const EditorStateProvider = ({
   useEffect(() => {
     const view = editorView && editorView.view
     if (!view || view.hasFocus()) return
-    view.updateState(
-      buildEditorState(view.state.schema, translator, input.value, imageProps)
-    )
-  }, [input.value])
-
-  useEffect(() => {
-    const view = editorView && editorView.view
-    if (!view || (view.hasFocus() && browserFocused)) return
     view.updateState(
       buildEditorState(view.state.schema, translator, input.value, imageProps)
     )
