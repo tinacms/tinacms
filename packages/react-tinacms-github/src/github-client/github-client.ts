@@ -253,7 +253,7 @@ export class GithubClient {
       },
     })
   }
-  async fetchFile(filePath: string, sha: string, decoded: boolean = true) {
+  async fetchFile(filePath: string, decoded: boolean = true) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
     const request = await this.req({
