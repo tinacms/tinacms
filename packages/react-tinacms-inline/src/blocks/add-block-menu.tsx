@@ -26,16 +26,14 @@ import { Dismissible } from 'react-dismissible'
 interface AddBlockMenuProps {
   addBlock(data: any): void
   templates: BlockTemplate[]
-  active: boolean
-  position: 'top' | 'bottom'
-  index: number
+  position?: 'top' | 'bottom'
+  index?: number
   offset?: number
 }
 
 export function AddBlockMenu({
   templates,
   addBlock,
-  active,
   position,
   index,
   offset,
@@ -78,7 +76,6 @@ export function AddBlockMenu({
 
   return (
     <AddBlockWrapper
-      active={active}
       index={index}
       offset={offset}
       position={position}
@@ -148,10 +145,9 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
 `
 
 interface AddBlockWrapperProps {
-  active: boolean
-  index: number
+  index?: number
   offset?: number
-  position: 'top' | 'bottom'
+  position?: 'top' | 'bottom'
   isOpen: boolean
 }
 
@@ -159,10 +155,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   p => css`
   position: absolute;
   left: 50%;
-  opacity: 0;
-  transition: all 120ms ease-out;
-  pointer-events: none;
-  z-index: calc(var(--tina-z-index-1) - ${p.index});
+  z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
 
   ${p.position == 'top' &&
     css`
@@ -176,15 +169,19 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
       transform: translate3d(-50%, 50%, 0);
     `}
 
-  ${p.isOpen &&
+  ${p.position == undefined &&
     css`
-      z-index: calc(1 + var(--tina-z-index-1) - ${p.index});
+      position: relative;
+      left: 0;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      width: 100%;
     `}
 
-  ${p.active &&
+  ${p.isOpen &&
     css`
-      opacity: 1;
-      pointer-events: all;
+      z-index: calc(1 + var(--tina-z-index-1) - ${p.index ? p.index : 0});
     `}
 `
 )
