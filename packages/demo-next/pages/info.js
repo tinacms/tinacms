@@ -18,13 +18,13 @@ import { useCMS } from 'tinacms'
 import {
   InlineForm,
   InlineText,
-  // InlineWysiwyg,
   InlineImage,
   InlineGroup,
   InlineGroupControls,
   InlineSettings,
   InlineTextarea,
 } from 'react-tinacms-inline'
+import { InlineWysiwyg } from 'react-tinacms-editor'
 import { EditToggle, DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'
@@ -91,12 +91,17 @@ function Info(props) {
           </InlineGroup>
           <InlineGroup controls={false}>
             <InlineGroupControls offset={0} borderRadius={0}>
-              <p>
-                <InlineTextarea
-                  focusRing={false}
-                  name="frontmatter.description"
-                />
-              </p>
+              <InlineImage
+                name="frontmatter.image"
+                previewSrc={formValues => {
+                  return formValues.frontmatter.image
+                }}
+                uploadDir={() => '/public/images/'}
+                parse={filename => `/images/${filename}`}
+              />
+              <InlineWysiwyg name="markdownBody">
+                <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+              </InlineWysiwyg>
               <h4>Group sources from the root, no fields, controls = false</h4>
             </InlineGroupControls>
           </InlineGroup>
@@ -109,18 +114,6 @@ function Info(props) {
             </p>
             <h4>Group without inline controls, to test style consistency</h4>
           </InlineGroup>
-
-          <InlineImage
-            name="frontmatter.image"
-            previewSrc={formValues => {
-              return formValues.frontmatter.image
-            }}
-            uploadDir={() => '/public/images/'}
-            parse={filename => `/images/${filename}`}
-          />
-          {/* <InlineWysiwyg name="markdownBody">
-            <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-          </InlineWysiwyg> */}
         </section>
         <style jsx>
           {`
