@@ -18,7 +18,13 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  TrashIcon,
+} from '@tinacms/icons'
 
 import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
@@ -58,6 +64,7 @@ export function BlocksControls({
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
   const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
+
   const addBeforePosition =
     layout === 'vertical' ? 'top' : layout === 'horizontal' ? 'left' : 'top'
   const addAfterPosition =
@@ -146,14 +153,16 @@ export function BlocksControls({
             onClick={moveBlockUp}
             disabled={isFirst}
           >
-            <ChevronUpIcon />
+            {layout === 'vertical' && <ChevronUpIcon />}
+            {layout === 'horizontal' && <ChevronLeftIcon />}
           </BlockAction>
           <BlockAction
             ref={blockMoveDownRef}
             onClick={moveBlockDown}
             disabled={isLast}
           >
-            <ChevronDownIcon />
+            {layout === 'vertical' && <ChevronDownIcon />}
+            {layout === 'horizontal' && <ChevronRightIcon />}
           </BlockAction>
           <InlineSettings fields={template.fields} />
           <BlockAction onClick={removeBlock}>

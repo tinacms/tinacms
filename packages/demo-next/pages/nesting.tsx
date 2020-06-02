@@ -186,6 +186,7 @@ const ROW = {
         <div style={{ display: 'flex', flexDirection: 'row' }}>
           <InlineBlocks
             name="items"
+            layout="horizontal"
             blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
           />
         </div>
