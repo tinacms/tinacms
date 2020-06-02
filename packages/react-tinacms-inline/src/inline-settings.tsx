@@ -67,6 +67,11 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
   const { name } = React.useContext(InlineFieldContext)
   const [initialValues] = React.useState(form.values)
 
+  function handleCancel() {
+    form.updateValues(initialValues)
+    close()
+  }
+
   let formFields = fields
 
   if (name) {
@@ -97,9 +102,7 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
           </DragDropContext>
         </ModalBody>
         <ModalActions>
-          <Button onClick={() => form.updateValues(initialValues)}>
-            Cancel
-          </Button>
+          <Button onClick={handleCancel}>Cancel</Button>
         </ModalActions>
       </ModalPopup>
     </Modal>
