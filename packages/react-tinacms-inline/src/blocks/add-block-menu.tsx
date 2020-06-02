@@ -169,7 +169,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
       transform: translate3d(-50%, 50%, 0);
     `}
 
-  ${p.position == 'bottom' &&
+  ${p.position == 'right' &&
     css`
       top: 50%;
       right: -${p.offset !== undefined ? p.offset : `16`}px;
