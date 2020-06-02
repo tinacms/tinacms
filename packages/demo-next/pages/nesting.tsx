@@ -127,7 +127,6 @@ const POSTS = {
     template: {
       type: 'post',
       label: 'Post',
-      key: undefined,
       fields: [{ name: 'summary', component: 'textarea' }],
       defaultItem: {
         title: 'Post #?',
@@ -152,7 +151,6 @@ const COLORS = {
     template: {
       type: 'color',
       label: 'Color',
-      key: undefined,
       itemProps: item => ({
         label: `${item.name} – ${item.color}`,
       }),
@@ -177,7 +175,6 @@ const ROW = {
   template: {
     type: 'row',
     label: 'Row',
-    key: undefined,
     defaultItem: {
       items: [],
     },
@@ -201,7 +198,6 @@ const COL = {
   template: {
     type: 'col',
     label: 'Col',
-    key: undefined,
     defaultItem: {
       items: [],
     },
@@ -225,7 +221,6 @@ const HEADING = {
   template: {
     type: 'heading',
     label: 'Heading',
-    key: undefined,
     defaultItem: {
       text: 'New Heading',
       color: 'black',
@@ -247,7 +242,6 @@ const PARAGRAPH = {
   template: {
     type: 'heading',
     label: 'Heading',
-    key: undefined,
     defaultItem: {
       text: 'New Paragraph',
       color: 'black',

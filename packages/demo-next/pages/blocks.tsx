@@ -71,7 +71,6 @@ const cta_template: BlockTemplate = {
   type: 'cta',
   label: 'Call to Action',
   defaultItem: { url: '', text: 'Signup!' },
-  key: undefined,
   fields: [
     { name: 'text', label: 'Text', component: 'text' },
     { name: 'url', label: 'URL', component: 'text' },
@@ -98,7 +97,6 @@ const hero_template: BlockTemplate = {
   type: 'hero',
   label: 'Hero',
   defaultItem: { text: 'Spiderman' },
-  key: undefined,
   fields: [],
 }
 
@@ -139,7 +137,6 @@ const image_template: BlockTemplate = {
     src: '/images/davisco-5E5N49RWtbA-unsplash.jpg',
     alt: 'image alt text',
   },
-  key: undefined,
   fields: [{ name: 'alt', label: 'Image Alt', component: 'text' }],
 }
 
