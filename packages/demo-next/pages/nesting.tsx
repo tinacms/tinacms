@@ -183,7 +183,16 @@ const ROW = {
   Component({ index, data }) {
     return (
       <BlocksControls index={index}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'row',
+            padding: '0.5rem',
+            margin: '0.25rem',
+            background: 'var(--tina-color-grey-4)',
+          }}
+        >
+          <h3>Row</h3>
           <InlineBlocks
             name="items"
             blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
@@ -206,7 +215,16 @@ const COL = {
   Component({ index, data }) {
     return (
       <BlocksControls index={index}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
+        <div
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+            padding: '0.5rem',
+            margin: '0.25rem',
+            background: 'var(--tina-color-grey-2)',
+          }}
+        >
+          <h3>Column</h3>
           <InlineBlocks
             name="items"
             blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
@@ -230,7 +248,14 @@ const HEADING = {
   Component({ index, data }) {
     return (
       <BlocksControls index={index}>
-        <h3 style={{ color: data.color }}>
+        <h3
+          style={{
+            color: data.color,
+            padding: '0.5rem',
+            margin: '0.5rem',
+            background: 'var(--tina-color-grey-1)',
+          }}
+        >
           <InlineTextarea name="text" />
         </h3>
       </BlocksControls>
@@ -251,7 +276,13 @@ const PARAGRAPH = {
   Component({ index, data }) {
     return (
       <BlocksControls index={index}>
-        <p>
+        <p
+          style={{
+            padding: '0.5rem',
+            margin: '0.5rem',
+            background: 'var(--tina-color-grey-1)',
+          }}
+        >
           <InlineTextarea name="text" />
         </p>
       </BlocksControls>
