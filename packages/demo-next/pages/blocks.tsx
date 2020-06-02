@@ -30,6 +30,8 @@ import {
   InlineTextarea,
 } from 'react-tinacms-inline'
 
+import Layout from '../components/Layout'
+
 /**
  * This is an example page that uses Blocks from Json
  */
@@ -38,24 +40,26 @@ export default function BlocksExample({ jsonFile }) {
 
   return (
     <ModalProvider>
-      <InlineForm form={form}>
-        <EditToggle />
-        <DiscardChanges />
-        <h1>
-          <InlineText name="title" />
-          <InlineImage
-            name="hero_image"
-            previewSrc={formValues => formValues.hero_image}
-            parse={filename => `/images/${filename}`}
-            uploadDir={() => '/public/images/'}
-          >
-            {props => <ChildImage src={data.hero_image} {...props} />}
-          </InlineImage>
-        </h1>
-        <Wrap>
-          <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
-        </Wrap>
-      </InlineForm>
+      <Layout>
+        <InlineForm form={form}>
+          <EditToggle />
+          <DiscardChanges />
+          <h1>
+            <InlineText name="title" />
+            <InlineImage
+              name="hero_image"
+              previewSrc={formValues => formValues.hero_image}
+              parse={filename => `/images/${filename}`}
+              uploadDir={() => '/public/images/'}
+            >
+              {props => <ChildImage src={data.hero_image} {...props} />}
+            </InlineImage>
+          </h1>
+          <Wrap>
+            <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
+          </Wrap>
+        </InlineForm>
+      </Layout>
     </ModalProvider>
   )
 }
