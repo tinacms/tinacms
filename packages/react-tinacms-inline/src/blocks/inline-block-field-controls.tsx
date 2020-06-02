@@ -49,6 +49,7 @@ export function BlocksControls({
     count,
     activeBlock,
     setActiveBlock,
+    layout,
   } = useInlineBlocks()
   const { template } = React.useContext(InlineFieldContext)
   const isFirst = index === 0
@@ -57,6 +58,14 @@ export function BlocksControls({
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
   const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
+  const addBeforePosition =
+    layout === 'vertical' ? 'top' : layout === 'horizontal' ? 'left' : 'top'
+  const addAfterPosition =
+    layout === 'vertical'
+      ? 'bottom'
+      : layout === 'horizontal'
+      ? 'right'
+      : 'bottom'
 
   React.useEffect(() => {
     document.addEventListener('click', handleClickOutside, true)
@@ -116,14 +125,14 @@ export function BlocksControls({
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}
-          position="top"
+          position={addBeforePosition}
         />
         <AddBlockMenu
           addBlock={block => insert(index + 1, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}
-          position="bottom"
+          position={addAfterPosition}
         />
       </AddBlockMenuWrapper>
       <BlockMenuWrapper

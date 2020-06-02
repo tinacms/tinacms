@@ -30,18 +30,20 @@ export interface InlineBlocksProps {
   blocks: {
     [key: string]: Block
   }
+  layout?: 'vertical' | 'horizontal'
 }
 
 export interface InlineBlocksActions {
   count: number
   insert(index: number, data: any): void
-  move(froom: number, to: number): void
+  move(from: number, to: number): void
   remove(index: number): void
   blocks: {
     [key: string]: Block
   }
   activeBlock: number | null
   setActiveBlock: any
+  layout: 'vertical' | 'horizontal'
 }
 
 export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
@@ -58,7 +60,11 @@ export function useInlineBlocks() {
   return inlineBlocksContext
 }
 
-export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
+export function InlineBlocks({
+  name,
+  blocks,
+  layout = 'vertical',
+}: InlineBlocksProps) {
   const [activeBlock, setActiveBlock] = useState(-1)
   const { status } = useInlineForm()
 
@@ -92,6 +98,7 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
               count: allData.length,
               activeBlock,
               setActiveBlock,
+              layout,
             }}
           >
             {allData.length < 1 && status === 'active' && (
