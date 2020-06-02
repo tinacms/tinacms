@@ -102,10 +102,14 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
           </DragDropContext>
         </ModalBody>
         <ModalActions>
-          <Button onClick={close} disabled={form.values === initialValues}>
+          <Button onClick={handleCancel}>Cancel</Button>
+          <Button
+            onClick={close}
+            disabled={form.values === initialValues}
+            primary
+          >
             Confirm
           </Button>
-          <Button onClick={handleCancel}>Cancel</Button>
         </ModalActions>
       </ModalPopup>
     </Modal>
