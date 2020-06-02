@@ -147,7 +147,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   p => css`
   position: absolute;
   left: 50%;
-  z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
+  z-index: calc(var(--tina-z-index-1) - ${p.index !== undefined ? p.index : 0});
 
   ${p.position == 'top' &&
     css`
