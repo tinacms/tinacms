@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import matter from 'gray-matter'
-import { useLocalMarkdownForm, markdownForm } from 'next-tinacms-markdown'
+import { useLocalMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
@@ -21,7 +21,6 @@ import {
   InlineImage,
   InlineGroup,
   InlineGroupControls,
-  InlineSettings,
   InlineTextarea,
 } from 'react-tinacms-inline'
 import { InlineWysiwyg } from 'react-tinacms-editor'
@@ -35,11 +34,7 @@ function Info(props) {
 
   return (
     <InlineForm form={form}>
-      <Layout
-        pathname="/"
-        siteTitle={props.title}
-        siteDescription={props.description}
-      >
+      <Layout siteTitle={props.title} siteDescription={props.description}>
         <section>
           <div>
             <button
