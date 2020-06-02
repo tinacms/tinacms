@@ -19,6 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
+import { Dismissible } from 'react-dismissible'
 
 export interface InlineFormProps {
   form: Form
@@ -37,6 +38,8 @@ export type InlineFormRenderChildOptions = InlineFormState &
 
 export interface InlineFormState {
   form: Form
+  focussedField: string
+  setFocussedField(field: string): void
   status: InlineFormStatus
   activate(): void
   deactivate(): void
@@ -49,31 +52,38 @@ export function InlineForm({
   children,
   initialStatus = 'inactive',
 }: InlineFormProps) {
+  const [focussedField, setFocussedField] = React.useState<string>('')
   const [status, setStatus] = React.useState<InlineFormStatus>(initialStatus)
 
   const inlineFormState = React.useMemo(() => {
     return {
       form,
       status,
+      focussedField,
+      setFocussedField,
       activate: () => setStatus('active'),
       deactivate: () => setStatus('inactive'),
     }
-  }, [form, status])
+  }, [form, status, focussedField])
 
   return (
     <InlineFormContext.Provider value={inlineFormState}>
-      <FormBuilder form={form}>
-        {({ form, ...formProps }) => {
-          if (typeof children !== 'function') {
-            return children
-          }
+      <Dismissible click onDismiss={() => setFocussedField('')}>
+        <div onClick={() => setFocussedField('')}>
+          <FormBuilder form={form}>
+            {({ form, ...formProps }) => {
+              if (typeof children !== 'function') {
+                return children
+              }
 
-          return children({
-            ...formProps,
-            ...inlineFormState,
-          })
-        }}
-      </FormBuilder>
+              return children({
+                ...formProps,
+                ...inlineFormState,
+              })
+            }}
+          </FormBuilder>
+        </div>
+      </Dismissible>
     </InlineFormContext.Provider>
   )
 }

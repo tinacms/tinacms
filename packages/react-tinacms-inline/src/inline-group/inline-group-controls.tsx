@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import styled, { css } from 'styled-components'
 
 import { InlineSettings } from '../inline-settings'
 import { useInlineForm } from '../inline-form'
@@ -38,36 +39,23 @@ export function InlineGroupControls({
   offset,
   borderRadius,
 }: InlineGroupControls) {
-  const { status } = useInlineForm()
-  const [active, setActive] = React.useState(false)
+  const { status, focussedField, setFocussedField } = useInlineForm()
   const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
   const { fields } = React.useContext(InlineFieldContext)
-
-  React.useEffect(() => {
-    document.addEventListener('click', handleClickOutside, true)
-    return () => {
-      document.removeEventListener('click', handleClickOutside, true)
-    }
-  }, [groupRef.current, groupMenuRef.current])
 
   if (status === 'inactive') {
     return children
   }
 
-  const handleClickOutside = (event: any) => {
-    if (
-      groupRef.current?.contains(event.target) ||
-      groupMenuRef.current?.contains(event.target)
-    ) {
-      return
-    }
-    setActive(false)
-  }
+  const active = !!(focussedField && name === focussedField)
+  const childIsActive = focussedField.startsWith(name)
 
-  const handleSetActive = () => {
-    if (active) return
-    setActive(true)
+  const handleSetActive = (event: any) => {
+    if (active || childIsActive) return
+    setFocussedField('test')
+    event.stopPropagation()
+    event.preventDefault()
   }
 
   return (
@@ -83,7 +71,13 @@ export function InlineGroupControls({
           <InlineSettings fields={fields} />
         </BlockMenu>
       </BlockMenuWrapper>
-      {children}
+      <GroupChildren disableClick={name && !active}>{children}</GroupChildren>
     </FocusRing>
   )
 }
+
+const GroupChildren = styled.div<{ disableClick: boolean }>(
+  ({ disableClick }) => css`
+    ${disableClick && `pointer-events: none;`};
+  `
+)
