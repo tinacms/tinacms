@@ -21,6 +21,8 @@ import { createContext, useContext, useEffect, useState } from 'react'
 import { EditorView } from 'prosemirror-view'
 
 import { buildEditor } from './utils/buildEditor'
+import { buildEditorState } from './utils/buildEditorState'
+import { useBrowserFocusContext } from './browserFocus'
 
 const EditorStateContext = createContext<{
   editorView: { view: EditorView } | undefined
@@ -39,13 +41,37 @@ export const EditorStateProvider = ({
 }: any) => {
   const [editorView, setEditorView] = useState<{ view: EditorView }>()
   const [translator, setTranslator] = useState<any>()
+  const { browserFocused } = useBrowserFocusContext()
 
   useEffect(() => {
-    setTranslator(buildEditor(input, el, imageProps, setEditorView, format))
+    const { translator: translatorObj } = buildEditor(
+      input,
+      el,
+      imageProps,
+      setEditorView,
+      format
+    )
+    setTranslator(translatorObj)
     return () => {
       editorView && editorView.view.destroy()
     }
   }, [el])
+
+  useEffect(() => {
+    const view = editorView && editorView.view
+    if (!view || view.hasFocus()) return
+    view.updateState(
+      buildEditorState(view.state.schema, translator, input.value, imageProps)
+    )
+  }, [input.value])
+
+  useEffect(() => {
+    const view = editorView && editorView.view
+    if (!view || (view.hasFocus() && browserFocused)) return
+    view.updateState(
+      buildEditorState(view.state.schema, translator, input.value, imageProps)
+    )
+  }, [input.value])
 
   return (
     <EditorStateContext.Provider value={{ editorView, translator }}>

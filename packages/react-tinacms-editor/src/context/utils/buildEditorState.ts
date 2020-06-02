@@ -39,9 +39,13 @@ export function buildEditorState(
   schema: Schema,
   translator: TranslatorClass,
   value: string,
-  uploadImages?: (files: File[]) => Promise<string[]>,
-  previewUrl?: (url: string) => string
+  imageProps: {
+    upload?: (files: File[]) => Promise<string[]>
+    previewUrl?: (url: string) => string
+  }
 ) {
+  const { upload, previewUrl } = imageProps || {}
+
   return EditorState.create({
     schema,
     doc: translator.nodeFromString(value),
@@ -56,7 +60,7 @@ export function buildEditorState(
       gapCursor(),
       tableEditing(),
       tablePlugin,
-      imagePlugin(uploadImages, previewUrl),
+      imagePlugin(upload, previewUrl),
       codeBlockPlugin,
     ],
   })
