@@ -84,13 +84,14 @@ export default function Nesting() {
       <br />
 
       {/* Grouped Top-Level Field */}
-      <InlineGroup fields={[{ name: 'description', component: 'textarea' }]}>
-        <InlineGroupControls>
-          <h1>
-            <InlineTextarea name="title" focusRing />
-          </h1>
-          <p>{values.description}</p>
-        </InlineGroupControls>
+      <InlineGroup
+        fields={[{ name: 'description', component: 'textarea' }]}
+        controls
+      >
+        <h1>
+          <InlineTextarea name="title" focusRing />
+        </h1>
+        <p>{values.description}</p>
       </InlineGroup>
 
       {/* Grouped Fields */}
@@ -105,13 +106,12 @@ export default function Nesting() {
             templates: { color: COLORS.color.template },
           },
         ]}
+        controls
       >
-        <InlineGroupControls>
-          <h2>Author</h2>
-          <InlineText name="name" />
-          <p>{values.author.description}</p>
-          <InlineBlocks name="colors" blocks={COLORS} />
-        </InlineGroupControls>
+        <h2>Author</h2>
+        <InlineText name="name" />
+        <p>{values.author.description}</p>
+        <InlineBlocks name="colors" blocks={COLORS} />
       </InlineGroup>
 
       <InlineBlocks name="posts" blocks={POSTS} />
