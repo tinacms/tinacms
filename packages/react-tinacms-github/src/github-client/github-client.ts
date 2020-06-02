@@ -259,10 +259,6 @@ export class GithubClient {
     const request = await this.req({
       url: `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`,
       method: 'GET',
-      data: {
-        sha,
-        branch: branch,
-      },
     })
 
     // decode using base64 decoding (https://developer.mozilla.org/en-US/docs/Glossary/Base64)
