@@ -33,7 +33,6 @@ export const buildEditor = (
   format?: Format
 ): { translator?: any } => {
   const schema = buildSchema()
-  const { upload, previewUrl } = imageProps
   const translator = buildTranslator(schema, format)
 
   if (!el) return {}
@@ -45,13 +44,7 @@ export const buildEditor = (
     /**
      * The initial state of the Wysiwyg
      */
-    state: buildEditorState(
-      schema,
-      translator,
-      input.value,
-      upload,
-      previewUrl
-    ),
+    state: buildEditorState(schema, translator, input.value, imageProps),
     /**
      * Call input.onChange with the translated content after updating
      * the Prosemiror state.
@@ -68,6 +61,8 @@ export const buildEditor = (
       }
     },
   })
+
+  view.focus()
 
   setEditorView({ view })
 

@@ -19,6 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { useState } from 'react'
 
+import { BrowserFocusProvider } from '../../context/browserFocus'
 import { EditorModeMenu } from '../EditorModeMenu'
 import { EditorProps } from '../../types'
 import { MarkdownEditor } from '../MarkdownEditor'
@@ -37,22 +38,17 @@ export const Wysiwyg = ({
   sticky,
 }: EditorProps) => {
   const [mode, setMode] = useState('wysiwyg')
-  const [value, setValue] = useState(input.value)
-
-  const handleChange = (value: string) => {
-    setValue(value)
-    input.onChange(value)
-  }
+  const { value, onChange } = input
 
   const pluginList =
     format === 'markdown' ? [...plugins, modeTogglePlugin(setMode)] : plugins
 
   return (
-    <>
+    <BrowserFocusProvider>
       {mode === 'raw' ? (
         <MarkdownEditor
           value={value}
-          onChange={handleChange}
+          onChange={onChange}
           imageProps={imageProps}
           toggleEditorMode={() => setMode('wysiwyg')}
         />
@@ -60,7 +56,7 @@ export const Wysiwyg = ({
         <ProsemirrorEditor
           input={{
             value,
-            onChange: handleChange,
+            onChange: onChange,
           }}
           plugins={pluginList}
           sticky={sticky}
@@ -68,6 +64,6 @@ export const Wysiwyg = ({
           imageProps={imageProps}
         />
       )}
-    </>
+    </BrowserFocusProvider>
   )
 }
