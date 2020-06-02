@@ -21,7 +21,6 @@ import styled, { css } from 'styled-components'
 import { BlockTemplate } from 'tinacms'
 import { IconButton } from '@tinacms/styles'
 import { AddIcon } from '@tinacms/icons'
-import { Dismissible } from 'react-dismissible'
 
 interface AddBlockMenuProps {
   addBlock(data: any): void
@@ -91,26 +90,19 @@ export function AddBlockMenu({
         <AddIcon />
       </AddBlockButton>
       <BlocksMenu openTop={openTop} isOpen={isOpen}>
-        <Dismissible
-          click
-          escape
-          onDismiss={() => setIsOpen(false)}
-          disabled={!isOpen}
-        >
-          {templates.map((template: BlockTemplate) => (
-            <BlockOption
-              key={template.label}
-              onClick={() => {
-                addBlock({
-                  _template: template.type,
-                  ...template.defaultItem,
-                })
-              }}
-            >
-              {template.label}
-            </BlockOption>
-          ))}
-        </Dismissible>
+        {templates.map((template: BlockTemplate) => (
+          <BlockOption
+            key={template.label}
+            onClick={() => {
+              addBlock({
+                _template: template.type,
+                ...template.defaultItem,
+              })
+            }}
+          >
+            {template.label}
+          </BlockOption>
+        ))}
       </BlocksMenu>
     </AddBlockWrapper>
   )
