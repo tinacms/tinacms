@@ -67,6 +67,7 @@ export function InlineGroupControls({
       onClick={handleSetActive}
       offset={offset}
       borderRadius={borderRadius}
+      disableHover={childIsActive}
     >
       <BlockMenuWrapper ref={groupMenuRef} offset={offset} active={active}>
         <BlockMenu>

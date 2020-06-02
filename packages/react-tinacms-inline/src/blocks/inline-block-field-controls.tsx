@@ -114,6 +114,7 @@ export function BlocksControls({
       onClick={handleSetActiveBlock}
       offset={offset}
       borderRadius={borderRadius}
+      disableHover={childIsActive}
     >
       <AddBlockMenuWrapper active={isActive}>
         <AddBlockMenu
