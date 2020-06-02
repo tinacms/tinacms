@@ -73,7 +73,9 @@ export function InlineGroupControls({
           <InlineSettings fields={fields} />
         </BlockMenu>
       </BlockMenuWrapper>
-      <GroupChildren disableClick={!name || !active}>{children}</GroupChildren>
+      <GroupChildren disableClick={!name || (!active && !childIsActive)}>
+        {children}
+      </GroupChildren>
     </FocusRing>
   )
 }
