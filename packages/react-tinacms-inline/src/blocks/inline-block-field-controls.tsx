@@ -93,6 +93,7 @@ export function BlocksControls({
   }
 
   const isActive = name === focussedField
+  const childIsActive = focussedField.startsWith(name!)
 
   const handleSetActiveBlock = (event: any) => {
     if (
@@ -152,14 +153,16 @@ export function BlocksControls({
           </BlockAction>
         </BlockMenu>
       </BlockMenuWrapper>
-      <BlockChildren disableClick={isActive}>{children}</BlockChildren>
+      <BlockChildren disableClick={!isActive && !childIsActive}>
+        {children}
+      </BlockChildren>
     </FocusRing>
   )
 }
 
 const BlockChildren = styled.div<{ disableClick: boolean }>(
   ({ disableClick }) => css`
-    ${!disableClick && `pointer-events: none;`};
+    ${disableClick && `pointer-events: none;`};
   `
 )
 
