@@ -65,6 +65,7 @@ interface SettingsModalProps {
 function SettingsModal({ fields, close }: SettingsModalProps) {
   const { form } = useInlineForm()
   const { name } = React.useContext(InlineFieldContext)
+  const [initialValues] = React.useState(form.values)
 
   let formFields = fields
 
@@ -96,7 +97,9 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
           </DragDropContext>
         </ModalBody>
         <ModalActions>
-          <Button onClick={close}>Cancel</Button>
+          <Button onClick={() => form.updateValues(initialValues)}>
+            Cancel
+          </Button>
         </ModalActions>
       </ModalPopup>
     </Modal>
