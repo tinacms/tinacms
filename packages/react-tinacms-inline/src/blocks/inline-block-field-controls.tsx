@@ -110,22 +110,22 @@ export function BlocksControls({
       offset={offset}
       borderRadius={borderRadius}
     >
-      <AddBlockMenu
-        addBlock={block => insert(index, block)}
-        templates={Object.entries(blocks).map(([, block]) => block.template)}
-        index={index}
-        active={activeBlock === index}
-        offset={offset}
-        position="top"
-      />
-      <AddBlockMenu
-        addBlock={block => insert(index + 1, block)}
-        templates={Object.entries(blocks).map(([, block]) => block.template)}
-        index={index}
-        active={activeBlock === index}
-        offset={offset}
-        position="bottom"
-      />
+      <AddBlockMenuWrapper active={activeBlock === index}>
+        <AddBlockMenu
+          addBlock={block => insert(index, block)}
+          templates={Object.entries(blocks).map(([, block]) => block.template)}
+          index={index}
+          offset={offset}
+          position="top"
+        />
+        <AddBlockMenu
+          addBlock={block => insert(index + 1, block)}
+          templates={Object.entries(blocks).map(([, block]) => block.template)}
+          index={index}
+          offset={offset}
+          position="bottom"
+        />
+      </AddBlockMenuWrapper>
       <BlockMenuWrapper
         ref={blockMenuRef}
         index={index}
@@ -156,6 +156,24 @@ export function BlocksControls({
     </FocusRing>
   )
 }
+
+interface AddBlockMenuWrapperProps {
+  active: boolean
+}
+
+const AddBlockMenuWrapper = styled.div<AddBlockMenuWrapperProps>(
+  p => css`
+    opacity: 0;
+    transition: all 120ms ease-out;
+    pointer-events: none;
+
+    ${p.active &&
+      css`
+        opacity: 1;
+        pointer-events: all;
+      `}
+  `
+)
 
 interface BlockMenuWrapperProps {
   index?: number
