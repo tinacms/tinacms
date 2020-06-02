@@ -18,23 +18,29 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { InlineGroupSettings } from './inline-group-settings'
-import { useInlineForm } from '../inline-form'
 import { Button, IconButton } from '@tinacms/styles'
+
+import { InlineSettings } from '../inline-settings'
+import { useInlineForm } from '../inline-form'
 import { FocusRing } from '../styles'
+import { InlineFieldContext } from '../inline-field-context'
 
 interface InlineGroupControls {
   children: any
-  offset: number
-  borderRadius: number
+  offset?: number
+  borderRadius?: number
 }
 
-// TODO: children type should be more specific
-export function InlineGroupControls({ children, offset, borderRadius }: any) {
+export function InlineGroupControls({
+  children,
+  offset,
+  borderRadius,
+}: InlineGroupControls) {
   const { status } = useInlineForm()
   const [active, setActive] = React.useState(false)
   const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
+  const { fields } = React.useContext(InlineFieldContext)
 
   React.useEffect(() => {
     document.addEventListener('click', handleClickOutside, true)
@@ -71,7 +77,7 @@ export function InlineGroupControls({ children, offset, borderRadius }: any) {
       borderRadius={borderRadius}
     >
       <GroupMenu ref={groupMenuRef} active={active}>
-        <InlineGroupSettings />
+        <InlineSettings fields={fields} />
       </GroupMenu>
       {children}
     </FocusRing>

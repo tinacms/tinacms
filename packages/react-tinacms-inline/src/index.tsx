@@ -33,5 +33,6 @@ export {
   InlineImageProps,
 } from './fields/inline-image-field'
 export * from './inline-group'
+export { InlineSettings } from './inline-settings'
 export * from './blocks'
 export * from './styles'
