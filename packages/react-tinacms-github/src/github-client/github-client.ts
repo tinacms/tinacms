@@ -257,7 +257,7 @@ export class GithubClient {
     const repo = this.workingRepoFullName
     const branch = this.branchName
     const request = await this.req({
-      url: `https://api.github.com/repos/${repo}/contents/${filePath}`,
+      url: `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`,
       method: 'GET',
       data: {
         sha,
