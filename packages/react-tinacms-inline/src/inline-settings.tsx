@@ -15,12 +15,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
-/*
- ** TODO: refactor to make this agnostic for both blocks and group fields
- */
-import styled from 'styled-components'
 import * as React from 'react'
+import styled from 'styled-components'
+
 import {
   FieldsBuilder,
   Modal,
@@ -33,44 +30,41 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button, IconButton } from '@tinacms/styles'
 import { SettingsIcon } from '@tinacms/icons'
 import { Field } from 'tinacms'
-
-import { InlineFieldContext } from '../inline-field-context'
-import { useInlineForm } from '../inline-form'
 import { FormPortalProvider } from '@tinacms/react-forms'
 
-export function InlineGroupSettings() {
-  const [open, setOpen] = React.useState(false)
-  const { name, fields } = React.useContext(InlineFieldContext)
+import { InlineFieldContext } from './inline-field-context'
+import { useInlineForm } from './inline-form'
 
+interface InlineSettingsProps {
+  fields: Field[]
+}
+
+export function InlineSettings({ fields }: InlineSettingsProps) {
+  const [open, setOpen] = React.useState(false)
   const noExtraFields = !(fields && fields.length)
 
   if (noExtraFields) {
     return null
   }
+
   return (
     <>
       <IconButton primary onClick={() => setOpen(p => !p)}>
         <SettingsIcon />
       </IconButton>
-      {open && (
-        <SettingsModal
-          fields={fields}
-          name={name}
-          close={() => setOpen(false)}
-        />
-      )}
+      {open && <SettingsModal fields={fields} close={() => setOpen(false)} />}
     </>
   )
 }
 
 interface SettingsModalProps {
   fields: Field[]
-  name?: string
   close(): void
 }
 
-function SettingsModal({ fields, close, name }: SettingsModalProps) {
+function SettingsModal({ fields, close }: SettingsModalProps) {
   const { form } = useInlineForm()
+  const { name } = React.useContext(InlineFieldContext)
 
   let formFields = fields
 
