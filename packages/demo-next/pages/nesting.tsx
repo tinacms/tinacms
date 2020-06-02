@@ -88,10 +88,9 @@ export default function Nesting() {
             >
               <InlineGroupControls>
                 <h1>
-                  <InlineTextarea name="title" focusRing />
+                  <InlineTextarea name="title" focusRing={false} />
                 </h1>
                 <p>{values.description}</p>
-                <hr />
               </InlineGroupControls>
             </InlineGroup>
           </div>
@@ -112,18 +111,22 @@ export default function Nesting() {
             >
               <InlineGroupControls>
                 <h2>Author</h2>
-                <InlineText name="name" />
+                <InlineText name="name" focusRing={false} />
                 <p>{values.author.description}</p>
                 <InlineBlocks name="colors" blocks={COLORS} />
-                <hr />
               </InlineGroupControls>
             </InlineGroup>
           </div>
 
-          <InlineBlocks name="posts" blocks={POSTS} />
+          <div className="group">
+            <h2>Posts</h2>
+            <InlineBlocks name="posts" blocks={POSTS} />
+          </div>
 
-          <h2>Stuff</h2>
-          <InlineBlocks name="builder" blocks={PAGE_BUILDER} />
+          <div className="group">
+            <h2>Page Builder</h2>
+            <InlineBlocks name="builder" blocks={PAGE_BUILDER} />
+          </div>
         </section>
         <style jsx>
           {`
@@ -139,6 +142,8 @@ export default function Nesting() {
             div.group {
               margin-top: 2rem;
               padding: 1rem;
+              width: 100%;
+              border-bottom: 1px solid #ebebeb;
             }
           `}
         </style>
@@ -160,12 +165,20 @@ const POSTS = {
     },
     Component({ index, data }) {
       return (
-        <BlocksControls index={index}>
-          <h3>
-            <InlineTextarea name="title" />
-          </h3>
-          <p>{data.summary}</p>
-        </BlocksControls>
+        <div className="post">
+          <BlocksControls index={index}>
+            <h3>
+              <InlineTextarea name="title" />
+            </h3>
+            <p>{data.summary}</p>
+          </BlocksControls>
+          <style jsx>{`
+            div.post {
+              margin: 2rem 0;
+              width: 100%;
+            }
+          `}</style>
+        </div>
       )
     },
   },
@@ -207,14 +220,16 @@ const ROW = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <InlineBlocks
-            name="items"
-            blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
-          />
-        </div>
-      </BlocksControls>
+      <div className="row">
+        <BlocksControls index={index}>
+          <div style={{ display: 'flex', flexDirection: 'row' }}>
+            <InlineBlocks
+              name="items"
+              blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+            />
+          </div>
+        </BlocksControls>
+      </div>
     )
   },
 }
