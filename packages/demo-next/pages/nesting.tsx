@@ -26,6 +26,8 @@ import {
   BlocksControls,
 } from 'react-tinacms-inline'
 
+import Layout from '../components/Layout'
+
 export default function Nesting() {
   const [values, form] = useForm({
     id: 'nesting-example',
@@ -76,49 +78,72 @@ export default function Nesting() {
   })
   console.log('NESTING', values)
   return (
-    <InlineForm form={form} initialStatus="active">
-      {/* #web-design */}
-      <br />
-      <br />
-      <br />
-      <br />
+    <Layout>
+      <InlineForm form={form} initialStatus="active">
+        <section>
+          {/* Grouped Top-Level Field */}
+          <div className="group">
+            <InlineGroup
+              fields={[{ name: 'description', component: 'textarea' }]}
+            >
+              <InlineGroupControls>
+                <h1>
+                  <InlineTextarea name="title" focusRing />
+                </h1>
+                <p>{values.description}</p>
+                <hr />
+              </InlineGroupControls>
+            </InlineGroup>
+          </div>
 
-      {/* Grouped Top-Level Field */}
-      <InlineGroup fields={[{ name: 'description', component: 'textarea' }]}>
-        <InlineGroupControls>
-          <h1>
-            <InlineTextarea name="title" focusRing />
-          </h1>
-          <p>{values.description}</p>
-        </InlineGroupControls>
-      </InlineGroup>
+          {/* Grouped Fields */}
+          <div className="group">
+            <InlineGroup
+              name="author"
+              fields={[
+                { name: 'description', component: 'textarea' },
+                {
+                  name: 'colors',
+                  component: 'blocks',
+                  // @ts-ignore
+                  templates: { color: COLORS.color.template },
+                },
+              ]}
+            >
+              <InlineGroupControls>
+                <h2>Author</h2>
+                <InlineText name="name" />
+                <p>{values.author.description}</p>
+                <InlineBlocks name="colors" blocks={COLORS} />
+                <hr />
+              </InlineGroupControls>
+            </InlineGroup>
+          </div>
 
-      {/* Grouped Fields */}
-      <InlineGroup
-        name="author"
-        fields={[
-          { name: 'description', component: 'textarea' },
-          {
-            name: 'colors',
-            component: 'blocks',
-            // @ts-ignore
-            templates: { color: COLORS.color.template },
-          },
-        ]}
-      >
-        <InlineGroupControls>
-          <h2>Author</h2>
-          <InlineText name="name" />
-          <p>{values.author.description}</p>
-          <InlineBlocks name="colors" blocks={COLORS} />
-        </InlineGroupControls>
-      </InlineGroup>
+          <InlineBlocks name="posts" blocks={POSTS} />
 
-      <InlineBlocks name="posts" blocks={POSTS} />
-      <hr />
-      <h2>Stuff</h2>
-      <InlineBlocks name="builder" blocks={PAGE_BUILDER} />
-    </InlineForm>
+          <h2>Stuff</h2>
+          <InlineBlocks name="builder" blocks={PAGE_BUILDER} />
+        </section>
+        <style jsx>
+          {`
+            section {
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-direction: column;
+              padding: 3rem;
+            }
+
+            div.group {
+              margin-top: 2rem;
+              padding: 1rem;
+            }
+          `}
+        </style>
+      </InlineForm>
+    </Layout>
   )
 }
 
