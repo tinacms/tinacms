@@ -29,6 +29,7 @@
     "raw-loader": "^3.0.0",
     "react-markdown": "^4.1.0",
     "react-tinacms-inline": "^0.6.0",
+    "react-tinacms-editor": "0.7.2",
     "tinacms": "^0.21.0",
     "webpack": "^4.41.5"
   },

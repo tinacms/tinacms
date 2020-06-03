@@ -26,6 +26,8 @@ import {
   BlocksControls,
 } from 'react-tinacms-inline'
 
+import Layout from '../components/Layout'
+
 export default function Nesting() {
   const [values, form] = useForm({
     id: 'nesting-example',
@@ -74,51 +76,84 @@ export default function Nesting() {
     fields: [],
     onSubmit() {},
   })
+
+  /**
+   * To test data in the browser
+   */
   console.log('NESTING', values)
+
   return (
-    <InlineForm form={form} initialStatus="active">
-      {/* #web-design */}
-      <br />
-      <br />
-      <br />
-      <br />
+    <Layout>
+      <InlineForm form={form} initialStatus="active">
+        <section>
+          {/* Grouped Top-Level Field */}
+          <div className="group">
+            <InlineGroup
+              fields={[{ name: 'description', component: 'textarea' }]}
+            >
+              <InlineGroupControls>
+                <h1>
+                  <InlineTextarea name="title" focusRing={false} />
+                </h1>
+                <p>{values.description}</p>
+              </InlineGroupControls>
+            </InlineGroup>
+          </div>
 
-      {/* Grouped Top-Level Field */}
-      <InlineGroup fields={[{ name: 'description', component: 'textarea' }]}>
-        <InlineGroupControls>
-          <h1>
-            <InlineTextarea name="title" focusRing />
-          </h1>
-          <p>{values.description}</p>
-        </InlineGroupControls>
-      </InlineGroup>
+          {/* Grouped Fields */}
+          <div className="group">
+            <InlineGroup
+              name="author"
+              fields={[
+                { name: 'description', component: 'textarea' },
+                {
+                  name: 'colors',
+                  component: 'blocks',
+                  // @ts-ignore
+                  templates: { color: COLORS.color.template },
+                },
+              ]}
+            >
+              <InlineGroupControls>
+                <h2>Author</h2>
+                <InlineText name="name" focusRing={false} />
+                <p>{values.author.description}</p>
+                <InlineBlocks name="colors" blocks={COLORS} />
+              </InlineGroupControls>
+            </InlineGroup>
+          </div>
 
-      {/* Grouped Fields */}
-      <InlineGroup
-        name="author"
-        fields={[
-          { name: 'description', component: 'textarea' },
-          {
-            name: 'colors',
-            component: 'blocks',
-            // @ts-ignore
-            templates: { color: COLORS.color.template },
-          },
-        ]}
-      >
-        <InlineGroupControls>
-          <h2>Author</h2>
-          <InlineText name="name" />
-          <p>{values.author.description}</p>
-          <InlineBlocks name="colors" blocks={COLORS} />
-        </InlineGroupControls>
-      </InlineGroup>
+          <div className="group">
+            <h2>Posts</h2>
+            <InlineBlocks name="posts" blocks={POSTS} />
+          </div>
 
-      <InlineBlocks name="posts" blocks={POSTS} />
-      <hr />
-      <h2>Stuff</h2>
-      <InlineBlocks name="builder" blocks={PAGE_BUILDER} />
-    </InlineForm>
+          <div className="group">
+            <h2>Page Builder</h2>
+            <InlineBlocks name="builder" blocks={PAGE_BUILDER} />
+          </div>
+        </section>
+        <style jsx>
+          {`
+            section {
+              width: 100%;
+              display: flex;
+              justify-content: center;
+              align-items: center;
+              flex-direction: column;
+              padding: 3rem;
+            }
+
+            div.group {
+              margin-top: 2rem;
+              padding: 1rem;
+              width: 100%;
+              border-bottom: 1px solid #ebebeb;
+            }
+          `}
+        </style>
+      </InlineForm>
+    </Layout>
   )
 }
 
@@ -135,12 +170,20 @@ const POSTS = {
     },
     Component({ index, data }) {
       return (
-        <BlocksControls index={index}>
-          <h3>
-            <InlineTextarea name="title" />
-          </h3>
-          <p>{data.summary}</p>
-        </BlocksControls>
+        <div className="post">
+          <BlocksControls index={index}>
+            <h3>
+              <InlineTextarea name="title" />
+            </h3>
+            <p>{data.summary}</p>
+          </BlocksControls>
+          <style jsx>{`
+            div.post {
+              margin: 2rem 0;
+              width: 100%;
+            }
+          `}</style>
+        </div>
       )
     },
   },
@@ -171,6 +214,11 @@ const COLORS = {
   },
 }
 
+/**
+ * Outlined the columns pink and rows green for now
+ * so we can get a better visual of the grid.
+ */
+
 const ROW = {
   template: {
     type: 'row',
@@ -182,15 +230,27 @@ const ROW = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <div style={{ display: 'flex', flexDirection: 'row' }}>
-          <InlineBlocks
-            name="items"
-            direction="row"
-            blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
-          />
-        </div>
-      </BlocksControls>
+      <>
+        <BlocksControls index={index}>
+          <div className="row">
+            <InlineBlocks
+              name="items"
+              blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+              direction="row"
+            />
+          </div>
+        </BlocksControls>
+        <style jsx>
+          {`
+            div.row {
+              border: 0.5px solid lightpink;
+              margin: 1rem 0;
+              display: flex;
+              flex-direction: row;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
@@ -206,14 +266,27 @@ const COL = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <div style={{ display: 'flex', flexDirection: 'column' }}>
-          <InlineBlocks
-            name="items"
-            blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
-          />
-        </div>
-      </BlocksControls>
+      <>
+        <BlocksControls index={index} offset={0} borderRadius={0}>
+          <div className="col">
+            <InlineBlocks
+              name="items"
+              blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
+            />
+          </div>
+        </BlocksControls>
+        <style jsx>
+          {`
+            div.col {
+              border: 0.5px solid lightgreen;
+              margin: 0 1rem;
+              display: flex;
+              flex-direction: column;
+              height: 100%;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
@@ -230,19 +303,29 @@ const HEADING = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <h3 style={{ color: data.color }}>
-          <InlineTextarea name="text" />
-        </h3>
-      </BlocksControls>
+      <>
+        <BlocksControls index={index}>
+          <h3 className="block-heading">
+            <InlineTextarea name="text" />
+          </h3>
+        </BlocksControls>
+        <style jsx>
+          {`
+            h3.block-heading {
+              color: ${data.color};
+              padding: 0.5rem 0;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
 
 const PARAGRAPH = {
   template: {
-    type: 'heading',
-    label: 'Heading',
+    type: 'paragraph',
+    label: 'Paragraph',
     defaultItem: {
       text: 'New Paragraph',
       color: 'black',
@@ -251,11 +334,20 @@ const PARAGRAPH = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index}>
-        <p>
-          <InlineTextarea name="text" />
-        </p>
-      </BlocksControls>
+      <>
+        <BlocksControls index={index}>
+          <p className="block-paragraph">
+            <InlineTextarea name="text" />
+          </p>
+        </BlocksControls>
+        <style jsx>
+          {`
+            p {
+              padding: 0.5rem 0;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }
