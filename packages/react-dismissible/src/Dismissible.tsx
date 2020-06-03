@@ -46,6 +46,12 @@ export interface Props {
    * Used when the dismissible area is inside of an iframe.
    */
   document?: Document
+
+  /**
+   * Adding this flag allows click events outside of the
+   * dismissible area to propagate to their intended target.
+   */
+  allowClickPropagation?: boolean
 }
 
 export const Dismissible: React.FC<Props> = ({
@@ -53,6 +59,7 @@ export const Dismissible: React.FC<Props> = ({
   escape = false,
   click = false,
   disabled = false,
+  allowClickPropagation = false,
   document: customDocument,
   ...props
 }) => {
@@ -73,7 +80,9 @@ export const Dismissible: React.FC<Props> = ({
       if (disabled) return
 
       if (!area.current.contains(event.target)) {
-        stopAndPrevent(event)
+        if (!allowClickPropagation) {
+          stopAndPrevent(event)
+        }
         onDismiss(event)
       }
     }
