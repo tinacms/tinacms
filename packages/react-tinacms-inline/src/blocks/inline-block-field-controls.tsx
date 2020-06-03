@@ -55,7 +55,7 @@ export function BlocksControls({
     count,
     activeBlock,
     setActiveBlock,
-    layout,
+    direction,
   } = useInlineBlocks()
   const { template } = React.useContext(InlineFieldContext)
   const isFirst = index === 0
@@ -66,13 +66,9 @@ export function BlocksControls({
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
 
   const addBeforePosition =
-    layout === 'vertical' ? 'top' : layout === 'horizontal' ? 'left' : 'top'
+    direction === 'column' ? 'top' : direction === 'row' ? 'left' : 'top'
   const addAfterPosition =
-    layout === 'vertical'
-      ? 'bottom'
-      : layout === 'horizontal'
-      ? 'right'
-      : 'bottom'
+    direction === 'column' ? 'bottom' : direction === 'row' ? 'right' : 'bottom'
 
   React.useEffect(() => {
     document.addEventListener('click', handleClickOutside, true)
@@ -153,16 +149,16 @@ export function BlocksControls({
             onClick={moveBlockUp}
             disabled={isFirst}
           >
-            {layout === 'vertical' && <ChevronUpIcon />}
-            {layout === 'horizontal' && <ChevronLeftIcon />}
+            {direction === 'column' && <ChevronUpIcon />}
+            {direction === 'row' && <ChevronLeftIcon />}
           </BlockAction>
           <BlockAction
             ref={blockMoveDownRef}
             onClick={moveBlockDown}
             disabled={isLast}
           >
-            {layout === 'vertical' && <ChevronDownIcon />}
-            {layout === 'horizontal' && <ChevronRightIcon />}
+            {direction === 'column' && <ChevronDownIcon />}
+            {direction === 'row' && <ChevronRightIcon />}
           </BlockAction>
           <InlineSettings fields={template.fields} />
           <BlockAction onClick={removeBlock}>
