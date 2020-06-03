@@ -24,6 +24,7 @@ export interface ButtonProps {
   grow?: boolean
   open?: boolean
   busy?: boolean
+  disabled?: boolean
 }
 
 export const Button = styled.button<ButtonProps>`
