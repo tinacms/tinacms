@@ -32,9 +32,11 @@ export default function Nesting() {
   const [values, form] = useForm({
     id: 'nesting-example',
     initialValues: {
-      title: 'Nesting Example',
-      description:
-        'This page has a bunch of examples of inline fields in various states of being nested.',
+      hero: {
+        title: 'Nesting Example',
+        description:
+          'This page has a bunch of examples of inline fields in various states of being nested.',
+      },
       author: {
         name: 'Nolan',
         description: 'He likes coding in the sun',
@@ -90,14 +92,13 @@ export default function Nesting() {
           {/* Grouped Top-Level Field */}
           <div className="group">
             <InlineGroup
+              name="hero"
               fields={[{ name: 'description', component: 'textarea' }]}
             >
-              <InlineGroupControls>
-                <h1>
-                  <InlineTextarea name="title" focusRing={false} />
-                </h1>
-                <p>{values.description}</p>
-              </InlineGroupControls>
+              <h1>
+                <InlineTextarea name="title" focusRing={false} />
+              </h1>
+              <p>{values.hero.description}</p>
             </InlineGroup>
           </div>
 
@@ -115,12 +116,10 @@ export default function Nesting() {
                 },
               ]}
             >
-              <InlineGroupControls>
-                <h2>Author</h2>
-                <InlineText name="name" focusRing={false} />
-                <p>{values.author.description}</p>
-                <InlineBlocks name="colors" blocks={COLORS} />
-              </InlineGroupControls>
+              <h2>Author</h2>
+              <InlineText name="name" focusRing={false} />
+              <p>{values.author.description}</p>
+              <InlineBlocks name="colors" blocks={COLORS} />
             </InlineGroup>
           </div>
 
