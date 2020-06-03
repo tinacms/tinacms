@@ -73,6 +73,8 @@ function Info(props) {
                 { label: 'Name', name: 'name', component: 'text' },
                 { label: 'Hometown', name: 'hometown', component: 'text' },
               ]}
+              offset={10}
+              borderRadius={5}
             >
               <h1>
                 <InlineText focusRing={false} name="name" />
@@ -80,42 +82,21 @@ function Info(props) {
               <p>
                 <InlineText focusRing={false} name="hometown" />
               </p>
-              <aside>Group with fields, name provided</aside>
             </InlineGroup>
           </div>
           <div className="group">
-            <InlineGroup controls={false}>
-              <InlineGroupControls offset={10} borderRadius={5}>
-                <InlineImage
-                  name="frontmatter.image"
-                  previewSrc={formValues => {
-                    return formValues.frontmatter.image
-                  }}
-                  uploadDir={() => '/public/images/'}
-                  parse={filename => `/images/${filename}`}
-                  focusRing={false}
-                />
-                <InlineWysiwyg name="markdownBody">
-                  <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-                </InlineWysiwyg>
-                <aside>
-                  Group sources from the root, no fields, controls = false
-                </aside>
-              </InlineGroupControls>
-            </InlineGroup>
-          </div>
-          <div className="group">
-            <InlineGroup controls={false}>
-              <p>
-                <InlineTextarea
-                  focusRing={false}
-                  name="frontmatter.description"
-                />
-              </p>
-              <aside>
-                Group without inline controls, to test style consistency
-              </aside>
-            </InlineGroup>
+            <InlineImage
+              name="frontmatter.image"
+              previewSrc={formValues => {
+                return formValues.frontmatter.image
+              }}
+              uploadDir={() => '/public/images/'}
+              parse={filename => `/images/${filename}`}
+            />
+
+            <InlineWysiwyg name="markdownBody">
+              <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+            </InlineWysiwyg>
           </div>
         </section>
         <style jsx>
