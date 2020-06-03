@@ -34,6 +34,7 @@ interface InlineGroupControls {
   offset?: number
   borderRadius?: number
   insetControls?: boolean
+  focusRing?: boolean
 }
 
 export function InlineGroupControls({
@@ -42,6 +43,7 @@ export function InlineGroupControls({
   offset,
   borderRadius,
   insetControls,
+  focusRing = true,
 }: InlineGroupControls) {
   const { status, focussedField, setFocussedField } = useInlineForm()
   const groupRef = React.useRef<HTMLDivElement>(null)
@@ -65,11 +67,11 @@ export function InlineGroupControls({
   return (
     <FocusRing
       ref={groupRef}
-      active={active}
+      active={focusRing && active}
       onClick={handleSetActive}
       offset={offset}
       borderRadius={borderRadius}
-      disableHover={childIsActive}
+      disableHover={!focusRing ? true : childIsActive}
     >
       <BlockMenuWrapper
         ref={groupMenuRef}
