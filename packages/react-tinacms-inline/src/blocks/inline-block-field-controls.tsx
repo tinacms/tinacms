@@ -72,7 +72,11 @@ export function BlocksControls({
     return children
   }
 
-  const removeBlock = () => remove(index)
+  const removeBlock = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
+    remove(index)
+  }
 
   const handleClickOutside = (event: any) => {
     if (
@@ -85,20 +89,12 @@ export function BlocksControls({
 
   const moveBlockUp = (event: any) => {
     move(index, index - 1)
-    const nameParts = name!.split('.')
-    nameParts[nameParts.length - 1] = '' + (~~index - 1)
-    const nextFocus = nameParts.join('.')
-    setFocussedField(nextFocus)
     event.stopPropagation()
     event.preventDefault()
   }
 
   const moveBlockDown = (event: any) => {
     move(index, index + 1)
-    const nameParts = name!.split('.')
-    nameParts[nameParts.length - 1] = '' + (~~index + 1)
-    const nextFocus = nameParts.join('.')
-    setFocussedField(nextFocus)
     event.stopPropagation()
     event.preventDefault()
   }
