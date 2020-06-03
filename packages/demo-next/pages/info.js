@@ -12,19 +12,18 @@ limitations under the License.
 */
 
 import matter from 'gray-matter'
-import { useLocalMarkdownForm, markdownForm } from 'next-tinacms-markdown'
+import { useLocalMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
   InlineForm,
   InlineText,
-  // InlineWysiwyg,
   InlineImage,
   InlineGroup,
   InlineGroupControls,
-  InlineSettings,
   InlineTextarea,
 } from 'react-tinacms-inline'
+import { InlineWysiwyg } from 'react-tinacms-editor'
 import { EditToggle, DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'
@@ -35,11 +34,7 @@ function Info(props) {
 
   return (
     <InlineForm form={form}>
-      <Layout
-        pathname="/"
-        siteTitle={props.title}
-        siteDescription={props.description}
-      >
+      <Layout siteTitle={props.title} siteDescription={props.description}>
         <section>
           <div>
             <button
@@ -71,68 +66,74 @@ function Info(props) {
           </div>
           <EditToggle />
           <DiscardChanges />
-
-          <InlineGroup
-            name="frontmatter"
-            fields={[
-              { label: 'Name', name: 'name', component: 'text' },
-              { label: 'Hometown', name: 'hometown', component: 'text' },
-            ]}
-            offset={0}
-            borderRadius={0}
-          >
-            <h1>
-              <InlineText focusRing={false} name="name" />
-            </h1>
-            <p>
-              <InlineText focusRing={false} name="hometown" />
-            </p>
-            <h4>Group with fields, name provided</h4>
-          </InlineGroup>
-          <InlineGroup controls={false}>
-            <InlineGroupControls offset={0} borderRadius={0}>
+          <div className="group">
+            <InlineGroup
+              name="frontmatter"
+              fields={[
+                { label: 'Name', name: 'name', component: 'text' },
+                { label: 'Hometown', name: 'hometown', component: 'text' },
+              ]}
+            >
+              <h1>
+                <InlineText focusRing={false} name="name" />
+              </h1>
+              <p>
+                <InlineText focusRing={false} name="hometown" />
+              </p>
+              <aside>Group with fields, name provided</aside>
+            </InlineGroup>
+          </div>
+          <div className="group">
+            <InlineGroup controls={false}>
+              <InlineGroupControls offset={10} borderRadius={5}>
+                <InlineImage
+                  name="frontmatter.image"
+                  previewSrc={formValues => {
+                    return formValues.frontmatter.image
+                  }}
+                  uploadDir={() => '/public/images/'}
+                  parse={filename => `/images/${filename}`}
+                  focusRing={false}
+                />
+                <InlineWysiwyg name="markdownBody">
+                  <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+                </InlineWysiwyg>
+                <aside>
+                  Group sources from the root, no fields, controls = false
+                </aside>
+              </InlineGroupControls>
+            </InlineGroup>
+          </div>
+          <div className="group">
+            <InlineGroup controls={false}>
               <p>
                 <InlineTextarea
                   focusRing={false}
                   name="frontmatter.description"
                 />
               </p>
-              <h4>Group sources from the root, no fields, controls = false</h4>
-            </InlineGroupControls>
-          </InlineGroup>
-          <InlineGroup controls={false}>
-            <p>
-              <InlineTextarea
-                focusRing={false}
-                name="frontmatter.description"
-              />
-            </p>
-            <h4>Group without inline controls, to test style consistency</h4>
-          </InlineGroup>
-
-          <InlineImage
-            name="frontmatter.image"
-            previewSrc={formValues => {
-              return formValues.frontmatter.image
-            }}
-            uploadDir={() => '/public/images/'}
-            parse={filename => `/images/${filename}`}
-          />
-          {/* <InlineWysiwyg name="markdownBody">
-            <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-          </InlineWysiwyg> */}
+              <aside>
+                Group without inline controls, to test style consistency
+              </aside>
+            </InlineGroup>
+          </div>
         </section>
         <style jsx>
           {`
             section {
               width: 100%;
-              height: 100vh;
               display: flex;
               justify-content: center;
               align-items: center;
               flex-direction: column;
               text-align: center;
               padding: 3rem;
+              margin-top: 4rem;
+            }
+
+            div.group {
+              margin-top: 2rem;
+              padding: 1rem;
             }
           `}
         </style>

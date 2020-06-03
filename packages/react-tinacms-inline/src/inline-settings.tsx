@@ -65,6 +65,12 @@ interface SettingsModalProps {
 function SettingsModal({ fields, close }: SettingsModalProps) {
   const { form } = useInlineForm()
   const { name } = React.useContext(InlineFieldContext)
+  const [initialValues] = React.useState(form.values)
+
+  function handleCancel() {
+    form.updateValues(initialValues)
+    close()
+  }
 
   let formFields = fields
 
@@ -96,7 +102,14 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
           </DragDropContext>
         </ModalBody>
         <ModalActions>
-          <Button onClick={close}>Cancel</Button>
+          <Button onClick={handleCancel}>Cancel</Button>
+          <Button
+            onClick={close}
+            disabled={form.values === initialValues}
+            primary
+          >
+            Confirm
+          </Button>
         </ModalActions>
       </ModalPopup>
     </Modal>
