@@ -32,7 +32,6 @@ import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
 import { FocusRing } from '../styles'
-import { BlockTemplate } from 'tinacms'
 
 export interface BlocksControlsProps {
   children: any
@@ -88,10 +87,6 @@ export function BlocksControls({
     }
   }
 
-  const insertBlock = (index: number, block: BlockTemplate) => {
-    insert(index, block)
-  }
-
   const moveBlockUp = (event: any) => {
     move(index, index - 1)
     event.stopPropagation()
@@ -130,14 +125,14 @@ export function BlocksControls({
     >
       <AddBlockMenuWrapper active={isActive}>
         <AddBlockMenu
-          addBlock={block => insertBlock(index, block)}
+          addBlock={block => insert(index, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}
           position={addBeforePosition}
         />
         <AddBlockMenu
-          addBlock={block => insertBlock(index + 1, block)}
+          addBlock={block => insert(index + 1, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}
