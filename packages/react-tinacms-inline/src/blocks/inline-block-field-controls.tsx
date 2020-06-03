@@ -32,6 +32,7 @@ import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
 import { FocusRing } from '../styles'
+import { BlockTemplate } from 'tinacms'
 
 export interface BlocksControlsProps {
   children: any
@@ -72,7 +73,11 @@ export function BlocksControls({
     return children
   }
 
-  const removeBlock = () => remove(index)
+  const removeBlock = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
+    remove(index)
+  }
 
   const handleClickOutside = (event: any) => {
     if (
@@ -83,22 +88,18 @@ export function BlocksControls({
     }
   }
 
+  const insertBlock = (index: number, block: BlockTemplate) => {
+    insert(index, block)
+  }
+
   const moveBlockUp = (event: any) => {
     move(index, index - 1)
-    const nameParts = name!.split('.')
-    nameParts[nameParts.length - 1] = '' + (~~index - 1)
-    const nextFocus = nameParts.join('.')
-    setFocussedField(nextFocus)
     event.stopPropagation()
     event.preventDefault()
   }
 
   const moveBlockDown = (event: any) => {
     move(index, index + 1)
-    const nameParts = name!.split('.')
-    nameParts[nameParts.length - 1] = '' + (~~index + 1)
-    const nextFocus = nameParts.join('.')
-    setFocussedField(nextFocus)
     event.stopPropagation()
     event.preventDefault()
   }
@@ -129,14 +130,14 @@ export function BlocksControls({
     >
       <AddBlockMenuWrapper active={isActive}>
         <AddBlockMenu
-          addBlock={block => insert(index, block)}
+          addBlock={block => insertBlock(index, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}
           position={addBeforePosition}
         />
         <AddBlockMenu
-          addBlock={block => insert(index + 1, block)}
+          addBlock={block => insertBlock(index + 1, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}

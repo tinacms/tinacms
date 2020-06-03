@@ -41,7 +41,9 @@ export function AddBlockMenu({
   const addBlockButtonRef = React.useRef<HTMLButtonElement>(null)
   const [openTop, setOpenTop] = React.useState(false)
 
-  const handleOpenBlockMenu = () => {
+  const handleOpenBlockMenu = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
     const addBlockButtonElem = addBlockButtonRef.current
 
     if (addBlockButtonElem !== null) {
@@ -93,7 +95,9 @@ export function AddBlockMenu({
         {templates.map((template: BlockTemplate) => (
           <BlockOption
             key={template.label}
-            onClick={() => {
+            onClick={event => {
+              event.stopPropagation()
+              event.preventDefault()
               addBlock({
                 _template: template.type,
                 ...template.defaultItem,
