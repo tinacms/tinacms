@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { useForm } from 'tinacms'
+import { useForm, usePlugin } from 'tinacms'
 import {
   InlineForm,
   InlineGroup,
@@ -81,6 +81,7 @@ export default function Nesting() {
    * To test data in the browser
    */
   console.log('NESTING', values)
+  usePlugin(form)
 
   return (
     <Layout>
@@ -242,7 +243,7 @@ const ROW = {
         <style jsx>
           {`
             div.row {
-              border: 0.5px solid lightpink;
+              background: lightpink;
               margin: 1rem 0;
               display: flex;
               flex-direction: row;
@@ -277,7 +278,7 @@ const COL = {
         <style jsx>
           {`
             div.col {
-              border: 0.5px solid lightgreen;
+              background: lightgreen;
               margin: 0 1rem;
               display: flex;
               flex-direction: column;
@@ -327,7 +328,6 @@ const PARAGRAPH = {
     label: 'Paragraph',
     defaultItem: {
       text: 'New Paragraph',
-      color: 'black',
     },
     fields: [],
   },
