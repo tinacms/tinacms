@@ -39,6 +39,7 @@ export interface BlocksControlsProps {
   offset?: number
   borderRadius?: number
   insetControls?: boolean
+  focusRing?: boolean
 }
 
 export function BlocksControls({
@@ -47,6 +48,7 @@ export function BlocksControls({
   offset,
   borderRadius,
   insetControls,
+  focusRing = true,
 }: BlocksControlsProps) {
   const { status, focussedField, setFocussedField } = useInlineForm()
   const { name, template } = React.useContext(InlineFieldContext)
@@ -119,11 +121,11 @@ export function BlocksControls({
   return (
     <FocusRing
       ref={blockRef}
-      active={isActive}
+      active={focusRing && isActive}
       onClick={handleSetActiveBlock}
       offset={offset}
       borderRadius={borderRadius}
-      disableHover={childIsActive}
+      disableHover={!focusRing ? true : childIsActive}
     >
       <AddBlockMenuWrapper active={isActive}>
         <AddBlockMenu
