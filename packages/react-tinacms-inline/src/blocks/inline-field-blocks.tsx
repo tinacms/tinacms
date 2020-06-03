@@ -66,7 +66,7 @@ export function InlineBlocks({
   direction = 'column',
 }: InlineBlocksProps) {
   const [activeBlock, setActiveBlock] = useState(-1)
-  const { status } = useInlineForm()
+  const { status, setFocussedField } = useInlineForm()
 
   return (
     <InlineField name={name}>
@@ -78,14 +78,27 @@ export function InlineBlocks({
           const movement = to - from
           setActiveBlock(activeBlock => activeBlock + movement)
           form.mutators.move(name, from, to)
+          setFocussedField(`${name}.${to}`)
         }
 
         const remove = (index: number) => {
           form.mutators.remove(name, index)
+
+          const isOnlyItem = input.value.length === 1
+          const isLastItem = input.value.length - 1 === index
+
+          if (isOnlyItem) {
+            setFocussedField('')
+          } else if (isLastItem) {
+            setFocussedField(`${input.name}.${index - 1}`)
+          } else {
+            setFocussedField(`${input.name}.${index}`)
+          }
         }
 
         const insert = (index: number, block: any) => {
           form.mutators.insert(name, index, block)
+          setFocussedField(`${name}.${index}`)
         }
 
         return (
@@ -104,7 +117,7 @@ export function InlineBlocks({
             {allData.length < 1 && status === 'active' && (
               <BlocksEmptyState>
                 <AddBlockMenu
-                  addBlock={block => insert(1, block)}
+                  addBlock={block => insert(0, block)}
                   templates={Object.entries(blocks).map(
                     ([, block]) => block.template
                   )}
