@@ -21,6 +21,7 @@ interface FocusRingProps {
   active: boolean
   offset?: number
   borderRadius?: number
+  disableHover?: boolean
 }
 
 export const FocusRing = styled.div<FocusRingProps>(
@@ -28,11 +29,14 @@ export const FocusRing = styled.div<FocusRingProps>(
     position: relative;
     width: 100%;
 
-    &:hover {
-      &:after {
-        opacity: 0.3;
-      }
-    }
+    ${!p.disableHover &&
+      css`
+        &:hover {
+          &:after {
+            opacity: 0.3;
+          }
+        }
+      `}
 
     &:after {
       content: '';
