@@ -38,6 +38,7 @@ export interface BlocksControlsProps {
   index: number
   offset?: number
   borderRadius?: number
+  insetControls?: boolean
 }
 
 export function BlocksControls({
@@ -45,6 +46,7 @@ export function BlocksControls({
   index,
   offset,
   borderRadius,
+  insetControls,
 }: BlocksControlsProps) {
   const { status, focussedField, setFocussedField } = useInlineForm()
   const { name, template } = React.useContext(InlineFieldContext)
@@ -139,7 +141,13 @@ export function BlocksControls({
           position={addAfterPosition}
         />
       </AddBlockMenuWrapper>
-      <BlockMenuWrapper ref={blockMenuRef} index={index} active={isActive}>
+      <BlockMenuWrapper
+        offset={offset}
+        ref={blockMenuRef}
+        index={index}
+        active={isActive}
+        inset={insetControls}
+      >
         <BlockMenu>
           <BlockAction
             ref={blockMoveUpRef}
@@ -197,6 +205,7 @@ const AddBlockMenuWrapper = styled.div<AddBlockMenuWrapperProps>(
 interface BlockMenuWrapperProps {
   index?: number
   active: boolean
+  inset?: boolean
   offset?: number
 }
 
@@ -210,6 +219,13 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
     z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
     pointer-events: none;
     transform: translate3d(0, -100%, 0);
+
+    ${p.inset &&
+      css`
+        top: calc(14px - ${p.offset !== undefined ? p.offset : `16`}px);
+        right: calc(14px - ${p.offset !== undefined ? p.offset : `16`}px);
+        transform: translate3d(0, 0, 0);
+      `}
 
     ${p.active &&
       css`
