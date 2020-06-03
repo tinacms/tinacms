@@ -25,7 +25,7 @@ import { AddIcon } from '@tinacms/icons'
 interface AddBlockMenuProps {
   addBlock(data: any): void
   templates: BlockTemplate[]
-  position?: 'top' | 'bottom'
+  position?: 'top' | 'bottom' | 'left' | 'right'
   index?: number
   offset?: number
 }
@@ -139,26 +139,41 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
 interface AddBlockWrapperProps {
   index?: number
   offset?: number
-  position?: 'top' | 'bottom'
+  position?: 'top' | 'bottom' | 'left' | 'right'
   isOpen: boolean
 }
 
 const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   p => css`
   position: absolute;
-  left: 50%;
   z-index: calc(var(--tina-z-index-1) - ${p.index !== undefined ? p.index : 0});
 
   ${p.position == 'top' &&
     css`
       top: -${p.offset !== undefined ? p.offset : `16`}px;
+      left: 50%;
+      transform: translate3d(-50%, -50%, 0);
+    `}
+
+  ${p.position == 'left' &&
+    css`
+      top: 50%;
+      left: -${p.offset !== undefined ? p.offset : `16`}px;
       transform: translate3d(-50%, -50%, 0);
     `}
 
   ${p.position == 'bottom' &&
     css`
       bottom: -${p.offset !== undefined ? p.offset : `16`}px;
+      left: 50%;
       transform: translate3d(-50%, 50%, 0);
+    `}
+
+  ${p.position == 'right' &&
+    css`
+      top: 50%;
+      right: -${p.offset !== undefined ? p.offset : `16`}px;
+      transform: translate3d(50%, -50%, 0);
     `}
 
   ${p.position == undefined &&
