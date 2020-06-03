@@ -57,11 +57,12 @@ export const Dismissible: React.FC<Props> = ({
   ...props
 }) => {
   const area: any = useRef()
-  const documents: any[] = customDocument
-    ? [document, customDocument]
-    : [document]
 
   useEffect(() => {
+    const documents: any[] = customDocument
+      ? [document, customDocument]
+      : [document]
+
     const stopAndPrevent = (event: MouseEvent) => {
       event.stopPropagation()
       event.stopImmediatePropagation()
@@ -82,7 +83,7 @@ export const Dismissible: React.FC<Props> = ({
 
       if (event.keyCode === 27) {
         event.stopPropagation()
-        onDismiss(event)       
+        onDismiss(event)
       }
     }
 
@@ -104,7 +105,7 @@ export const Dismissible: React.FC<Props> = ({
         document.removeEventListener('keydown', handleEscape)
       })
     }
-  }, [click, document, customDocument, escape, disabled, onDismiss])
+  }, [click, customDocument, escape, disabled, onDismiss])
 
   return <div ref={area} {...props} />
 }
