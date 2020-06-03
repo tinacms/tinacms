@@ -237,6 +237,7 @@ const ROW = {
             <InlineBlocks
               name="items"
               blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+              direction="row"
             />
           </div>
         </BlocksControls>

@@ -18,7 +18,13 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  TrashIcon,
+} from '@tinacms/icons'
 
 import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
@@ -41,14 +47,19 @@ export function BlocksControls({
   borderRadius,
 }: BlocksControlsProps) {
   const { status, focussedField, setFocussedField } = useInlineForm()
-  const { insert, move, remove, blocks, count } = useInlineBlocks()
   const { name, template } = React.useContext(InlineFieldContext)
+  const { insert, move, remove, blocks, count, direction } = useInlineBlocks()
   const isFirst = index === 0
   const isLast = index === count - 1
   const blockRef = React.useRef<HTMLDivElement>(null)
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
   const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
+
+  const addBeforePosition =
+    direction === 'column' ? 'top' : direction === 'row' ? 'left' : 'top'
+  const addAfterPosition =
+    direction === 'column' ? 'bottom' : direction === 'row' ? 'right' : 'bottom'
 
   React.useEffect(() => {
     document.addEventListener('click', handleClickOutside, true)
@@ -122,14 +133,14 @@ export function BlocksControls({
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}
-          position="top"
+          position={addBeforePosition}
         />
         <AddBlockMenu
           addBlock={block => insert(index + 1, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
           index={index}
           offset={offset}
-          position="bottom"
+          position={addAfterPosition}
         />
       </AddBlockMenuWrapper>
       <BlockMenuWrapper ref={blockMenuRef} index={index} active={isActive}>
@@ -139,14 +150,16 @@ export function BlocksControls({
             onClick={moveBlockUp}
             disabled={isFirst}
           >
-            <ChevronUpIcon />
+            {direction === 'column' && <ChevronUpIcon />}
+            {direction === 'row' && <ChevronLeftIcon />}
           </BlockAction>
           <BlockAction
             ref={blockMoveDownRef}
             onClick={moveBlockDown}
             disabled={isLast}
           >
-            <ChevronDownIcon />
+            {direction === 'column' && <ChevronDownIcon />}
+            {direction === 'row' && <ChevronRightIcon />}
           </BlockAction>
           <InlineSettings fields={template.fields} />
           <BlockAction onClick={removeBlock}>
