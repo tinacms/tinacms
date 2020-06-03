@@ -28,6 +28,7 @@ interface InlineGroupProps {
   offset?: number
   borderRadius?: number
   insetControls?: boolean
+  focusRing?: boolean
   children?: any
 }
 
@@ -38,6 +39,7 @@ export function InlineGroup({
   offset,
   borderRadius,
   insetControls,
+  focusRing,
 }: InlineGroupProps) {
   return (
     <InlineFieldContext.Provider value={{ name, fields }}>
@@ -46,6 +48,7 @@ export function InlineGroup({
         offset={offset}
         borderRadius={borderRadius}
         insetControls={insetControls}
+        focusRing={focusRing}
       >
         {children}
       </InlineGroupControls>
