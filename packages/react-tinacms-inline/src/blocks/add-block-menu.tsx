@@ -201,7 +201,10 @@ const BlocksMenu = styled.div<AddMenuProps>`
   min-width: 192px;
   border-radius: var(--tina-radius-big);
   border: 1px solid var(--tina-color-grey-2);
-  display: block;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
   position: absolute;
   z-index: var(--tina-z-index-2);
   top: 4px;
