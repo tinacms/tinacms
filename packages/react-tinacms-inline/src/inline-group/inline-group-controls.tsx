@@ -33,6 +33,7 @@ interface InlineGroupControls {
   children: any
   offset?: number
   borderRadius?: number
+  insetControls?: boolean
 }
 
 export function InlineGroupControls({
@@ -40,6 +41,7 @@ export function InlineGroupControls({
   children,
   offset,
   borderRadius,
+  insetControls,
 }: InlineGroupControls) {
   const { status, focussedField, setFocussedField } = useInlineForm()
   const groupRef = React.useRef<HTMLDivElement>(null)
@@ -69,7 +71,12 @@ export function InlineGroupControls({
       borderRadius={borderRadius}
       disableHover={childIsActive}
     >
-      <BlockMenuWrapper ref={groupMenuRef} offset={offset} active={active}>
+      <BlockMenuWrapper
+        ref={groupMenuRef}
+        offset={offset}
+        inset={insetControls}
+        active={active}
+      >
         <BlockMenu>
           <InlineSettings fields={fields} />
         </BlockMenu>
