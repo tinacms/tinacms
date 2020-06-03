@@ -115,6 +115,8 @@ export default function Nesting() {
                   templates: { color: COLORS.color.template },
                 },
               ]}
+              offset={24}
+              insetControls={true}
             >
               <h2>Author</h2>
               <InlineText name="name" focusRing={false} />
