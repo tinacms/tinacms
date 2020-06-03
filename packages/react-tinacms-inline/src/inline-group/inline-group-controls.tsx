@@ -27,21 +27,21 @@ import {
   BlockMenu,
   BlockMenuWrapper,
 } from '../blocks/inline-block-field-controls'
-import { useContext } from 'react'
 
 interface InlineGroupControls {
+  name: string
   children: any
   offset?: number
   borderRadius?: number
 }
 
 export function InlineGroupControls({
+  name,
   children,
   offset,
   borderRadius,
 }: InlineGroupControls) {
   const { status, focussedField, setFocussedField } = useInlineForm()
-  const { name = '' } = useContext(InlineFieldContext)
   const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
   const { fields } = React.useContext(InlineFieldContext)
@@ -50,11 +50,11 @@ export function InlineGroupControls({
     return children
   }
 
-  const active = !!(focussedField && name && name === focussedField)
+  const active = name === focussedField
   const childIsActive = focussedField.startsWith(name)
 
   const handleSetActive = (event: any) => {
-    if (!name || active || childIsActive) return
+    if (active || childIsActive) return
     setFocussedField(name)
     event.stopPropagation()
     event.preventDefault()
@@ -74,7 +74,7 @@ export function InlineGroupControls({
           <InlineSettings fields={fields} />
         </BlockMenu>
       </BlockMenuWrapper>
-      <GroupChildren disableClick={!name || (!active && !childIsActive)}>
+      <GroupChildren disableClick={!active && !childIsActive}>
         {children}
       </GroupChildren>
     </FocusRing>
