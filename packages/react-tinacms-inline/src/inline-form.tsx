@@ -68,7 +68,12 @@ export function InlineForm({
 
   return (
     <InlineFormContext.Provider value={inlineFormState}>
-      <Dismissible click onDismiss={() => setFocussedField('')}>
+      <Dismissible
+        disabled={!focussedField}
+        click
+        allowClickPropagation
+        onDismiss={() => setFocussedField('')}
+      >
         <div onClick={() => setFocussedField('')}>
           <FormBuilder form={form}>
             {({ form, ...formProps }) => {
