@@ -16,6 +16,7 @@
     "lint": "tsdx lint"
   },
   "dependencies": {
+    "react-dismissible": "^1.1.5",
     "react-textarea-autosize": ">=7.1"
   },
   "peerDependencies": {

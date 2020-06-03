@@ -46,18 +46,9 @@ export function BlocksControls({
   offset,
   borderRadius,
 }: BlocksControlsProps) {
-  const { status } = useInlineForm()
-  const {
-    insert,
-    move,
-    remove,
-    blocks,
-    count,
-    activeBlock,
-    setActiveBlock,
-    direction,
-  } = useInlineBlocks()
-  const { template } = React.useContext(InlineFieldContext)
+  const { status, focussedField, setFocussedField } = useInlineForm()
+  const { name, template } = React.useContext(InlineFieldContext)
+  const { insert, move, remove, blocks, count, direction } = useInlineBlocks()
   const isFirst = index === 0
   const isLast = index === count - 1
   const blockRef = React.useRef<HTMLDivElement>(null)
@@ -90,39 +81,53 @@ export function BlocksControls({
     ) {
       return
     }
-    setActiveBlock(-1)
   }
 
-  const moveBlockUp = () => {
+  const moveBlockUp = (event: any) => {
     move(index, index - 1)
-    setActiveBlock(index - 1)
+    const nameParts = name!.split('.')
+    nameParts[nameParts.length - 1] = '' + (~~index - 1)
+    const nextFocus = nameParts.join('.')
+    setFocussedField(nextFocus)
+    event.stopPropagation()
+    event.preventDefault()
   }
 
-  const moveBlockDown = () => {
+  const moveBlockDown = (event: any) => {
     move(index, index + 1)
-    setActiveBlock(index + 1)
+    const nameParts = name!.split('.')
+    nameParts[nameParts.length - 1] = '' + (~~index + 1)
+    const nextFocus = nameParts.join('.')
+    setFocussedField(nextFocus)
+    event.stopPropagation()
+    event.preventDefault()
   }
+
+  const isActive = name === focussedField
+  const childIsActive = focussedField.startsWith(name!)
 
   const handleSetActiveBlock = (event: any) => {
     if (
       blockMoveUpRef.current?.contains(event.target) ||
-      blockMoveDownRef.current?.contains(event.target) ||
-      activeBlock === index
+      blockMoveDownRef.current?.contains(event.target)
     ) {
       return
     }
-    setActiveBlock(index)
+    event.stopPropagation()
+    event.preventDefault()
+    setFocussedField(name!)
   }
 
   return (
     <FocusRing
       ref={blockRef}
-      active={activeBlock === index}
+      active={isActive}
       onClick={handleSetActiveBlock}
       offset={offset}
       borderRadius={borderRadius}
+      disableHover={childIsActive}
     >
-      <AddBlockMenuWrapper active={activeBlock === index}>
+      <AddBlockMenuWrapper active={isActive}>
         <AddBlockMenu
           addBlock={block => insert(index, block)}
           templates={Object.entries(blocks).map(([, block]) => block.template)}
@@ -138,11 +143,7 @@ export function BlocksControls({
           position={addAfterPosition}
         />
       </AddBlockMenuWrapper>
-      <BlockMenuWrapper
-        ref={blockMenuRef}
-        index={index}
-        active={activeBlock === index}
-      >
+      <BlockMenuWrapper ref={blockMenuRef} index={index} active={isActive}>
         <BlockMenu>
           <BlockAction
             ref={blockMoveUpRef}
@@ -166,10 +167,18 @@ export function BlocksControls({
           </BlockAction>
         </BlockMenu>
       </BlockMenuWrapper>
-      {children}
+      <BlockChildren disableClick={!isActive && !childIsActive}>
+        {children}
+      </BlockChildren>
     </FocusRing>
   )
 }
+
+const BlockChildren = styled.div<{ disableClick: boolean }>(
+  ({ disableClick }) => css`
+    ${disableClick && `pointer-events: none;`};
+  `
+)
 
 interface AddBlockMenuWrapperProps {
   active: boolean
