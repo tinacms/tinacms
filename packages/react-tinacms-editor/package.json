@@ -19,7 +19,7 @@
   "devDependencies": {
     "@sambego/storybook-styles": "^1.0.0",
     "@storybook/addon-info": "^5.1.9",
-    "@storybook/react": "^5.1.9",
+    "@storybook/react": "^5.3.19",
     "@tinacms/core": "^0.9.0",
     "@tinacms/fields": "^0.11.1",
     "@tinacms/icons": "^0.12.0",

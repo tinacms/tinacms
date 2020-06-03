@@ -31,7 +31,7 @@
   "devDependencies": {
     "@babel/core": "^7.5.5",
     "@storybook/addon-info": "^5.1.9",
-    "@storybook/react": "^5.1.9",
+    "@storybook/react": "^5.3.19",
     "@tinacms/form-builder": "^0.3.4",
     "@tinacms/forms": "^0.5.0",
     "@tinacms/icons": "^0.12.0",
