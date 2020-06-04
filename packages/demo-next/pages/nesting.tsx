@@ -115,7 +115,9 @@ export default function Nesting() {
                   templates: { color: COLORS.color.template },
                 },
               ]}
-              offset={24}
+              focusRing={{
+                offset: 24,
+              }}
               insetControls={true}
             >
               <h2>Author</h2>
@@ -269,7 +271,10 @@ const COL = {
   Component({ index, data }) {
     return (
       <>
-        <BlocksControls index={index} offset={0} borderRadius={0}>
+        <BlocksControls
+          index={index}
+          focusRing={{ offset: 0, borderRadius: 0 }}
+        >
           <div className="col">
             <InlineBlocks
               name="items"
