@@ -19,6 +19,7 @@ limitations under the License.
 import { FormOptions, Form, Field } from '@tinacms/forms'
 import * as React from 'react'
 import { usePlugins } from './use-plugin'
+import { useCMS } from './use-cms'
 
 export interface WatchableFormValue {
   values: any
@@ -47,6 +48,7 @@ export function useForm<FormShape = any>(
   { loadInitialValues, ...options }: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form] {
+  const cms = useCMS()
   /**
    * `initialValues` will be usually be undefined if `loadInitialValues` is used.
    *
@@ -80,7 +82,7 @@ export function useForm<FormShape = any>(
   )
 
   React.useEffect(() => {
-    if (loadInitialValues) {
+    if (cms.enabled && loadInitialValues) {
       loadInitialValues().then((values: any) => {
         form.updateInitialValues(values)
       })
