@@ -170,7 +170,7 @@ export function InlineBlock({ name, data, block, index }: InlineBlockProps) {
   )
 }
 
-const BlocksEmptyState = styled.div`
+export const BlocksEmptyState = styled.div`
   padding: var(--tina-padding-small);
   position: relative;
   width: 100%;
