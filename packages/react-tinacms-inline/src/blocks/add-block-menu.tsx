@@ -185,11 +185,6 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   ${p.position == undefined &&
     css`
       position: relative;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
     `}
 
   ${p.isOpen &&
