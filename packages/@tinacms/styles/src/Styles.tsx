@@ -76,8 +76,8 @@ const theme = css`
     --tina-font-weight-regular: 400;
     --tina-font-weight-bold: 600;
 
-    --tina-shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.12),
-      0px 4px 8px rgba(48, 48, 48, 0.1);
+    --tina-shadow-big: 0px 2px 3px rgba(0, 0, 0, 0.05),
+      0 4px 12px rgba(0, 0, 0, 0.1);
     --tina-shadow-small: 0px 2px 3px rgba(0, 0, 0, 0.12);
 
     --tina-timing-short: 85ms;
