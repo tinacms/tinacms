@@ -152,7 +152,7 @@ interface AddBlockWrapperProps {
 const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   p => css`
   position: absolute;
-  z-index: calc(var(--tina-z-index-1) - ${p.index !== undefined ? p.index : 0});
+  z-index: calc(var(--tina-z-index-2) - ${p.index !== undefined ? p.index : 0});
 
   ${p.position == 'top' &&
     css`
@@ -194,7 +194,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
 
   ${p.isOpen &&
     css`
-      z-index: calc(1 + var(--tina-z-index-1) - ${p.index ? p.index : 0});
+      z-index: calc(1 + var(--tina-z-index-2) - ${p.index ? p.index : 0});
     `}
 `
 )
