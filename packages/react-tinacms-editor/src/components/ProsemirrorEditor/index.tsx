@@ -19,35 +19,23 @@ limitations under the License.
 import * as React from 'react'
 import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
-import { Plugin } from '@tinacms/core'
 
-import { Format } from '../../translator'
-import { ImageProps } from '../../types'
+import { EditorProps } from '../../types'
 import { EditorStateProvider } from '../../context/editorState'
-import { Menubar } from '../Menubar'
+import { Menubar } from './Menubar'
 
 import { CodeMirrorCss } from './styles/CodeMirror'
 import { ProseMirrorCss } from './styles/ProseMirror'
 
-export interface WysiwygProps {
-  input: any
-  plugins?: Plugin[]
-  sticky?: boolean
-  format?: Format
-  imageProps?: ImageProps
-  toggleEditorMode?: () => void
-}
-
-export const Wysiwyg = styled(
+export const ProsemirrorEditor = styled(
   ({
     input,
     plugins,
     sticky,
     format,
     imageProps,
-    toggleEditorMode,
     ...styleProps
-  }: WysiwygProps) => {
+  }: EditorProps) => {
     const [el, setEl] = useState<HTMLDivElement>()
     const editorRef = useRef<HTMLDivElement | null>(null)
 
@@ -71,7 +59,7 @@ export const Wysiwyg = styled(
           <Menubar
             sticky={sticky}
             uploadImages={imageProps && imageProps.upload}
-            toggleEditorMode={toggleEditorMode}
+            plugins={plugins}
           />
         </EditorStateProvider>
         <div {...styleProps} ref={editorRef} />

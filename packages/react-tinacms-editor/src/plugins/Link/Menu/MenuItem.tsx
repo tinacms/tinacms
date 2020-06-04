@@ -23,7 +23,7 @@ import { markControl } from '../../../components/MenuHelpers'
 import { isMarkPresent } from '../../../utils'
 import { imagePluginKey } from '../../Image'
 
-export const WysiwygMenu = markControl({
+export const MenuItem = markControl({
   mark: 'link',
   Icon: LinkIcon,
   tooltip: 'Link',

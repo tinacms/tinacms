@@ -17,12 +17,12 @@ limitations under the License.
 */
 
 import React from 'react'
-import { QuoteIcon } from '@tinacms/icons'
+import { CodeIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenu = () => (
-  <MenuButton data-tooltip="Quote" data-side="top" disabled>
-    <QuoteIcon />
+export const MarkdownMenuItem = () => (
+  <MenuButton data-tooltip="Codeblock" data-side="top" disabled>
+    <CodeIcon />
   </MenuButton>
 )

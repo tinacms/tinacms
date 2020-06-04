@@ -32,7 +32,7 @@ interface MenuProps {
   uploadImages?: (files: File[]) => Promise<string[]>
 }
 
-export const WysiwygMenu = ({ uploadImages }: MenuProps) => {
+export const MenuItem = ({ uploadImages }: MenuProps) => {
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)

@@ -16,26 +16,16 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
+import React from 'react'
+import { render } from '@testing-library/react'
 
-import { MenuButton } from '../../../components/MenuHelpers'
+import { Menubar } from './index'
 
-export const MarkdownMenu = (props: any) => (
-  <>
-    <BulletList {...props} />
-    <OrderedList {...props} />
-  </>
-)
+jest.mock('../../../context/editorState')
 
-const BulletList = () => (
-  <MenuButton data-tooltip="Unordered List" disabled>
-    <UnorderedListIcon />
-  </MenuButton>
-)
-
-const OrderedList = () => (
-  <MenuButton data-tooltip="Ordered List" disabled>
-    <OrderedListIcon />
-  </MenuButton>
-)
+describe('MenuBar', () => {
+  it('should render Menubar', () => {
+    render(<Menubar toggleEditorMode={() => {}} />)
+    expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
+  })
+})
