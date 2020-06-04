@@ -32,23 +32,20 @@ import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
 import { FocusRing } from '../styles'
+import { FocusRingProps } from '../inline-group'
 
 export interface BlocksControlsProps {
   children: any
   index: number
-  offset?: number
-  borderRadius?: number
   insetControls?: boolean
-  focusRing?: boolean
+  focusRing?: false | FocusRingProps
 }
 
 export function BlocksControls({
   children,
   index,
-  offset,
-  borderRadius,
   insetControls,
-  focusRing = true,
+  focusRing = {},
 }: BlocksControlsProps) {
   const { status, focussedField, setFocussedField } = useInlineForm()
   const { name, template } = React.useContext(InlineFieldContext)
@@ -118,14 +115,18 @@ export function BlocksControls({
     setFocussedField(name!)
   }
 
+  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
+
   return (
     <FocusRing
       ref={blockRef}
       active={focusRing && isActive}
       onClick={handleSetActiveBlock}
       offset={offset}
-      borderRadius={borderRadius}
-      disableHover={!focusRing ? true : childIsActive}
+      borderRadius={
+        typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+      }
+      disableHover={focusRing === false ? true : childIsActive}
     >
       <AddBlockMenuWrapper active={isActive}>
         <AddBlockMenu

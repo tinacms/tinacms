@@ -17,4 +17,4 @@ limitations under the License.
 */
 
 export { InlineGroup } from './inline-group'
-export { InlineGroupControls } from './inline-group-controls'
+export * from './inline-group-controls'
