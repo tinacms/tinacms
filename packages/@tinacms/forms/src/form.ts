@@ -28,6 +28,7 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   __type?: string
   reset?(): void
   actions?: any[]
+  values?: S
   loadInitialValues?: () => Promise<S>
   onChange?(values: FormState<S>): void
 }
@@ -50,9 +51,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     reset,
     loadInitialValues,
     onChange,
+    values,
     ...options
   }: FormOptions<S, F>) {
-    const initialValues = options.initialValues || ({} as S)
+    const initialValues = options.initialValues || values || ({} as S)
     this.__type = options.__type || 'form'
     this.id = id
     this.label = label
@@ -79,6 +81,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       loadInitialValues().then(initialValues => {
         this.updateInitialValues(initialValues)
       })
+    }
+
+    if (values) {
+      this.updateValues(values)
     }
 
     if (onChange) {

@@ -36,6 +36,46 @@ describe('Form', () => {
         new Form(DEFAULTS)
       })
     })
+    describe('with initialValues', () => {
+      it('has initialValues for form.values', () => {
+        const initialValues = { title: 'Hello World' }
+
+        const form = new Form({
+          ...DEFAULTS,
+          initialValues,
+        })
+
+        expect(form.values).toEqual(initialValues)
+      })
+      describe('with values', () => {
+        it('has the values set for form.values', () => {
+          const initialValues = { title: 'Hello World' }
+          const values = { title: 'The new kid on the block' }
+
+          const form = new Form({
+            ...DEFAULTS,
+            initialValues,
+            values,
+          })
+
+          expect(form.values).toEqual(values)
+        })
+        it('can be reset to the initialValues', () => {
+          const initialValues = { title: 'Hello World' }
+          const values = { title: 'The new kid on the block' }
+
+          const form = new Form({
+            ...DEFAULTS,
+            initialValues,
+            values,
+          })
+
+          form.reset()
+
+          expect(form.values).toEqual(initialValues)
+        })
+      })
+    })
   })
 
   describe('#change', () => {
