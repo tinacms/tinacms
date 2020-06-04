@@ -77,10 +77,14 @@ export class GithubClient {
     return this.workingRepoFullName !== this.baseRepoFullName
   }
 
-  async isAuthorized() {
-    const repo = await this.getRepository()
+  async isAuthorized(): Promise<boolean> {
+    try {
+      const repo = await this.getRepository()
 
-    return repo.permissions.push
+      return repo.permissions.push
+    } catch {
+      return false
+    }
   }
 
   async getUser() {
@@ -218,8 +222,7 @@ export class GithubClient {
 
   async createBranch(name: string) {
     const currentBranch = await this.getBranch()
-    console.log({ currentBranch })
-    let sha = currentBranch.object.sha
+    const sha = currentBranch.object.sha
     return this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/git/refs`,
       method: 'POST',
@@ -250,16 +253,12 @@ export class GithubClient {
       },
     })
   }
-  async fetchFile(filePath: string, sha: string, decoded: boolean = true) {
+  async fetchFile(filePath: string, decoded: boolean = true) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
     const request = await this.req({
-      url: `https://api.github.com/repos/${repo}/contents/${filePath}`,
+      url: `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`,
       method: 'GET',
-      data: {
-        sha,
-        branch: branch,
-      },
     })
 
     // decode using base64 decoding (https://developer.mozilla.org/en-US/docs/Glossary/Base64)
@@ -297,7 +296,7 @@ export class GithubClient {
     //2xx status codes
     if (response.status.toString()[0] == '2') return data
 
-    throw new GithubError(response.statusText, response.status)
+    throw new GithubError(data.message || response.statusText, response.status)
   }
 
   private validate(): void {

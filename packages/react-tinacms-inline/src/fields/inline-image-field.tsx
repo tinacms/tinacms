@@ -17,25 +17,33 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineField } from './inline-field'
+import { InlineField } from '../inline-field'
 import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
-import { InputFocusWrapper } from './styles'
+import { InputFocusWrapper } from '../styles'
 
 export interface InlineImageProps {
   name: string
   previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
+  focusRing?: boolean
   children?: any
 }
 
-export function InlineImageField({
+/**
+ * @deprecated
+ * @alias InlineImage
+ */
+export const InlineImageField = InlineImage
+
+export function InlineImage({
   name,
   previewSrc,
   uploadDir,
   parse,
   children,
+  focusRing = true,
 }: InlineImageProps) {
   const cms = useCMS()
 
@@ -52,18 +60,32 @@ export function InlineImageField({
               file,
             },
           ])
-          if (media) {
+          if (media?.filename) {
             input.onChange(parse(media.filename))
           } else {
-            /**
-             * TODO: Handle failure with events
-             * or alerts here?
-             */
+            console.error(
+              'TinaCMS Image Upload Failed: This could be due to media store configuration, file size, or if the image is a duplicate (has already been uploaded).'
+            )
+            cms.alerts.error('Image Upload Failed.')
           }
           return null
         }
 
         if (status === 'active') {
+          if (!focusRing) {
+            return (
+              <InlineImageUpload
+                value={input.value}
+                previewSrc={_previewSrc}
+                onDrop={handleUploadImage}
+                {...input}
+              >
+                {children &&
+                  ((props: any) =>
+                    children({ previewSrc: _previewSrc }, ...props))}
+              </InlineImageUpload>
+            )
+          }
           return (
             <InputFocusWrapper>
               <InlineImageUpload
@@ -93,7 +115,7 @@ interface InlineImageUploadProps {
   previewSrc?: string
 }
 
-export function InlineImageUpload({
+function InlineImageUpload({
   onDrop,
   value,
   previewSrc,

@@ -56,7 +56,9 @@ describe('date format', () => {
     describe('with moment input', () => {
       it('returns correct date', () => {
         const date = moment(dateString, dateFormat)
-        const result = parse(date, 'date', { dateFormat: 'MM YYYY' }) as Date
+        const result = moment(
+          parse(date, 'date', { dateFormat: 'MM YYYY' })
+        ).toDate() as Date
 
         console.log('mmm ' + result)
         console.log('month: ' + result.getMonth())
@@ -67,9 +69,11 @@ describe('date format', () => {
 
     describe('with date string input', () => {
       it('returns correct date', () => {
-        const result = parse('07/02/1992', 'date', {
-          dateFormat: 'MM/DD/YYYY', // should match date
-        }) as Date
+        const result = moment(
+          parse('07/02/1992', 'date', {
+            dateFormat: 'MM/DD/YYYY', // should match date
+          })
+        ).toDate() as Date
 
         expect(result.getMonth()).toEqual(6)
         expect(result.getFullYear()).toEqual(1992)

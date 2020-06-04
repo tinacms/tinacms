@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.7.19",
+  "version": "0.8.0",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -8,6 +8,7 @@
     "src/**/*.d.ts",
     "index.js",
     "gatsby-node.js",
+    "gatsby-browser.js",
     "remark-fragment.js"
   ],
   "keywords": [
@@ -34,13 +35,15 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13",
-    "gatsby-tinacms-git": "^0.4.12",
-    "tinacms": "^0.19.4"
+    "gatsby-tinacms-git": "^0.5.1",
+    "tinacms": "^0.21.0"
   },
   "dependencies": {
     "@types/js-yaml": "^3.12.3",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
+    "react-tinacms-editor": "^0.7.2",
+    "react-tinacms-inline": "^0.6.0",
     "slash": "^3.0.0"
   },
   "peerDependencies": {

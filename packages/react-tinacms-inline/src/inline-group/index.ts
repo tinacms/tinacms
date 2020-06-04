@@ -16,7 +16,5 @@ limitations under the License.
 
 */
 
-const { createJestConfig } = require('@tinacms/scripts')
-const pack = require('./package')
-
-module.exports = createJestConfig(pack)
+export { InlineGroup } from './inline-group'
+export { InlineGroupControls } from './inline-group-controls'

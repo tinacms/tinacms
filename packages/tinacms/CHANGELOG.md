@@ -3,6 +3,67 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.21.0](https://github.com/tinacms/tinacms/compare/tinacms@0.21.0-alpha.2...tinacms@0.21.0) (2020-06-01)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+# [0.21.0-alpha.2](https://github.com/tinacms/tinacms/compare/tinacms@0.21.0-alpha.1...tinacms@0.21.0-alpha.2) (2020-06-01)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+# [0.21.0-alpha.1](https://github.com/tinacms/tinacms/compare/tinacms@0.21.0-alpha.0...tinacms@0.21.0-alpha.1) (2020-05-29)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+# [0.21.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.20.0...tinacms@0.21.0-alpha.0) (2020-05-28)
+
+
+### Bug Fixes
+
+* default format now being passed to ReactDateTime ([bc4e1bd](https://github.com/tinacms/tinacms/commit/bc4e1bd))
+* parse function returns string in default datetime format ([beafd0b](https://github.com/tinacms/tinacms/commit/beafd0b))
+* time parsing & formatting should always deal in UTC ([9a04621](https://github.com/tinacms/tinacms/commit/9a04621))
+* we weren't handling time formatting in any way ([6a72ce6](https://github.com/tinacms/tinacms/commit/6a72ce6))
+
+
+### Features
+
+* add font loader ([4f37605](https://github.com/tinacms/tinacms/commit/4f37605))
+* tina provider accepts 'styled' prop ([c581595](https://github.com/tinacms/tinacms/commit/c581595))
+
+
+
+
+
+# [0.20.0](https://github.com/tinacms/tinacms/compare/tinacms@0.19.4...tinacms@0.20.0) (2020-05-25)
+
+
+### Bug Fixes
+
+* remove wysiwyg export from tinacms ([6d4cd7e](https://github.com/tinacms/tinacms/commit/6d4cd7e))
+
+
+### Features
+
+* added TagsFieldPlugin ([8b447e5](https://github.com/tinacms/tinacms/commit/8b447e5))
+* remove markdown editor from tinacms default plugins ([c1c36f8](https://github.com/tinacms/tinacms/commit/c1c36f8))
+
+
+
+
+
 ## [0.19.4](https://github.com/tinacms/tinacms/compare/tinacms@0.19.3...tinacms@0.19.4) (2020-05-19)
 
 **Note:** Version bump only for package tinacms

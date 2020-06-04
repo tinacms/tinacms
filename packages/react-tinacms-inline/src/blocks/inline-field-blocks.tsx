@@ -23,28 +23,27 @@ import { useState } from 'react'
 import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
-
-/**
- * Blocks
- */
+import { InlineFieldContext } from '../inline-field-context'
 
 export interface InlineBlocksProps {
   name: string
   blocks: {
     [key: string]: Block
   }
+  direction?: 'column' | 'row'
 }
 
 export interface InlineBlocksActions {
   count: number
   insert(index: number, data: any): void
-  move(froom: number, to: number): void
+  move(from: number, to: number): void
   remove(index: number): void
   blocks: {
     [key: string]: Block
   }
   activeBlock: number | null
   setActiveBlock: any
+  direction: 'column' | 'row'
 }
 
 export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
@@ -61,27 +60,45 @@ export function useInlineBlocks() {
   return inlineBlocksContext
 }
 
-export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
+export function InlineBlocks({
+  name,
+  blocks,
+  direction = 'column',
+}: InlineBlocksProps) {
   const [activeBlock, setActiveBlock] = useState(-1)
-  const { status } = useInlineForm()
+  const { status, setFocussedField } = useInlineForm()
 
   return (
     <InlineField name={name}>
       {({ input, form }) => {
+        const name = input.name
         const allData: { _template: string }[] = input.value || []
 
         const move = (from: number, to: number) => {
           const movement = to - from
           setActiveBlock(activeBlock => activeBlock + movement)
           form.mutators.move(name, from, to)
+          setFocussedField(`${name}.${to}`)
         }
 
         const remove = (index: number) => {
           form.mutators.remove(name, index)
+
+          const isOnlyItem = input.value.length === 1
+          const isLastItem = input.value.length - 1 === index
+
+          if (isOnlyItem) {
+            setFocussedField('')
+          } else if (isLastItem) {
+            setFocussedField(`${input.name}.${index - 1}`)
+          } else {
+            setFocussedField(`${input.name}.${index}`)
+          }
         }
 
         const insert = (index: number, block: any) => {
           form.mutators.insert(name, index, block)
+          setFocussedField(`${name}.${index}`)
         }
 
         return (
@@ -94,12 +111,13 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
               count: allData.length,
               activeBlock,
               setActiveBlock,
+              direction,
             }}
           >
             {allData.length < 1 && status === 'active' && (
               <BlocksEmptyState>
                 <AddBlockMenu
-                  addBlock={block => insert(1, block)}
+                  addBlock={block => insert(0, block)}
                   templates={Object.entries(blocks).map(
                     ([, block]) => block.template
                   )}
@@ -143,29 +161,13 @@ export interface InlineBlockProps {
   data: any
   block: Block
 }
+
 export function InlineBlock({ name, data, block, index }: InlineBlockProps) {
   return (
-    <InlineBlockContext.Provider value={{ name, ...block }}>
+    <InlineFieldContext.Provider value={{ name, ...block }}>
       <block.Component data={data} index={index} />
-    </InlineBlockContext.Provider>
+    </InlineFieldContext.Provider>
   )
-}
-
-export interface InlineBlockContext extends Block {
-  name: string
-}
-export const InlineBlockContext = React.createContext<InlineBlockContext | null>(
-  null
-)
-
-export function useInlineBlock() {
-  const inlineFormContext = React.useContext(InlineBlockContext)
-
-  if (!inlineFormContext) {
-    throw new Error('useInlineBlock must be within an InlineBlockContext')
-  }
-
-  return inlineFormContext
 }
 
 const BlocksEmptyState = styled.div`

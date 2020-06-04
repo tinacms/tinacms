@@ -3,6 +3,41 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.5.0-alpha.1...@tinacms/forms@0.5.0) (2020-06-01)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
+# [0.5.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.5.0-alpha.0...@tinacms/forms@0.5.0-alpha.1) (2020-06-01)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
+# [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.4.3-alpha.0...@tinacms/forms@0.5.0-alpha.0) (2020-05-29)
+
+
+### Features
+
+* **form:** on-change can be passed to constructor ([144eecd](https://github.com/tinacms/tinacms/commit/144eecd))
+
+
+
+
+
+## [0.4.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.4.2...@tinacms/forms@0.4.3-alpha.0) (2020-05-28)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
 ## [0.4.2](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.4.2-alpha.0...@tinacms/forms@0.4.2) (2020-05-11)
 
 **Note:** Version bump only for package @tinacms/forms

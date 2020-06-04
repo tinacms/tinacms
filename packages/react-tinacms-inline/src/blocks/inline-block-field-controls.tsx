@@ -18,36 +18,50 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { useInlineBlock, useInlineBlocks } from './inline-field-blocks'
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  TrashIcon,
+} from '@tinacms/icons'
+
+import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
-import { BlockSettings } from './block-settings'
-import { Button, IconButton } from '@tinacms/styles'
-import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
+import { InlineSettings } from '../inline-settings'
+import { InlineFieldContext } from '../inline-field-context'
+import { FocusRing } from '../styles'
 
 export interface BlocksControlsProps {
   children: any
   index: number
+  offset?: number
+  borderRadius?: number
+  insetControls?: boolean
 }
 
-export function BlocksControls({ children, index }: BlocksControlsProps) {
-  const { status } = useInlineForm()
-  const {
-    insert,
-    move,
-    remove,
-    blocks,
-    count,
-    activeBlock,
-    setActiveBlock,
-  } = useInlineBlocks()
-  const { template } = useInlineBlock()
+export function BlocksControls({
+  children,
+  index,
+  offset,
+  borderRadius,
+  insetControls,
+}: BlocksControlsProps) {
+  const { status, focussedField, setFocussedField } = useInlineForm()
+  const { name, template } = React.useContext(InlineFieldContext)
+  const { insert, move, remove, blocks, count, direction } = useInlineBlocks()
   const isFirst = index === 0
   const isLast = index === count - 1
   const blockRef = React.useRef<HTMLDivElement>(null)
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
   const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
+
+  const addBeforePosition =
+    direction === 'column' ? 'top' : direction === 'row' ? 'left' : 'top'
+  const addAfterPosition =
+    direction === 'column' ? 'bottom' : direction === 'row' ? 'right' : 'bottom'
 
   React.useEffect(() => {
     document.addEventListener('click', handleClickOutside, true)
@@ -60,7 +74,11 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     return children
   }
 
-  const removeBlock = () => remove(index)
+  const removeBlock = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
+    remove(index)
+  }
 
   const handleClickOutside = (event: any) => {
     if (
@@ -69,157 +87,220 @@ export function BlocksControls({ children, index }: BlocksControlsProps) {
     ) {
       return
     }
-    setActiveBlock(-1)
   }
 
-  const moveBlockUp = () => {
+  const moveBlockUp = (event: any) => {
     move(index, index - 1)
-    setActiveBlock(index - 1)
+    event.stopPropagation()
+    event.preventDefault()
   }
 
-  const moveBlockDown = () => {
+  const moveBlockDown = (event: any) => {
     move(index, index + 1)
-    setActiveBlock(index + 1)
+    event.stopPropagation()
+    event.preventDefault()
   }
+
+  const isActive = name === focussedField
+  const childIsActive = focussedField.startsWith(name!)
 
   const handleSetActiveBlock = (event: any) => {
     if (
       blockMoveUpRef.current?.contains(event.target) ||
-      blockMoveDownRef.current?.contains(event.target) ||
-      activeBlock === index
+      blockMoveDownRef.current?.contains(event.target)
     ) {
       return
     }
-    setActiveBlock(index)
+    event.stopPropagation()
+    event.preventDefault()
+    setFocussedField(name!)
   }
 
   return (
-    <BlockWrapper
+    <FocusRing
       ref={blockRef}
-      active={activeBlock === index}
+      active={isActive}
       onClick={handleSetActiveBlock}
+      offset={offset}
+      borderRadius={borderRadius}
+      disableHover={childIsActive}
     >
-      <BlockMenu ref={blockMenuRef} index={index}>
-        <BlockMenuLeft>
-          <AddBlockMenu
-            addBlock={block => insert(index + 1, block)}
-            templates={Object.entries(blocks).map(
-              ([, block]) => block.template
-            )}
-          />
-        </BlockMenuLeft>
-        <BlockMenuRight>
-          <IconButton
+      <AddBlockMenuWrapper active={isActive}>
+        <AddBlockMenu
+          addBlock={block => insert(index, block)}
+          templates={Object.entries(blocks).map(([, block]) => block.template)}
+          index={index}
+          offset={offset}
+          position={addBeforePosition}
+        />
+        <AddBlockMenu
+          addBlock={block => insert(index + 1, block)}
+          templates={Object.entries(blocks).map(([, block]) => block.template)}
+          index={index}
+          offset={offset}
+          position={addAfterPosition}
+        />
+      </AddBlockMenuWrapper>
+      <BlockMenuWrapper
+        offset={offset}
+        ref={blockMenuRef}
+        index={index}
+        active={isActive}
+        inset={insetControls}
+      >
+        <BlockMenu>
+          <BlockAction
             ref={blockMoveUpRef}
-            primary
             onClick={moveBlockUp}
             disabled={isFirst}
           >
-            <ChevronUpIcon />
-          </IconButton>
-          <IconButton
+            {direction === 'column' && <ChevronUpIcon />}
+            {direction === 'row' && <ChevronLeftIcon />}
+          </BlockAction>
+          <BlockAction
             ref={blockMoveDownRef}
-            primary
             onClick={moveBlockDown}
             disabled={isLast}
           >
-            <ChevronDownIcon />
-          </IconButton>
-          <BlockSettings template={template} />
-          <IconButton primary onClick={removeBlock}>
+            {direction === 'column' && <ChevronDownIcon />}
+            {direction === 'row' && <ChevronRightIcon />}
+          </BlockAction>
+          <InlineSettings fields={template.fields} />
+          <BlockAction onClick={removeBlock}>
             <TrashIcon />
-          </IconButton>
-        </BlockMenuRight>
-      </BlockMenu>
-      {children}
-    </BlockWrapper>
+          </BlockAction>
+        </BlockMenu>
+      </BlockMenuWrapper>
+      <BlockChildren disableClick={!isActive && !childIsActive}>
+        {children}
+      </BlockChildren>
+    </FocusRing>
   )
 }
 
-interface BlockMenuProps {
-  index: number
-}
+const BlockChildren = styled.div<{ disableClick: boolean }>(
+  ({ disableClick }) => css`
+    ${disableClick && `pointer-events: none;`};
+  `
+)
 
-const BlockMenu = styled.div<BlockMenuProps>`
-  position: absolute;
-  top: -1.5rem;
-  right: -4px;
-  left: -4px;
-  display: grid;
-  align-items: center;
-  grid-template-areas: 'left right';
-  grid-template-columns: auto auto;
-  opacity: 0;
-  transform: translate3d(0, 0, 0);
-  transition: all 120ms ease-out;
-  z-index: calc(1000 - ${props => props.index});
-  pointer-events: none;
-
-  ${Button} {
-    height: 34px;
-    margin: 0 4px;
-  }
-
-  ${IconButton} {
-    width: 34px;
-    height: 34px;
-    margin: 0 4px;
-  }
-`
-
-const BlockMenuLeft = styled.div`
-  grid-area: left;
-  display: flex;
-  align-items: center;
-  justify-content: flex-start;
-`
-
-const BlockMenuRight = styled.div`
-  grid-area: right;
-  display: flex;
-  align-items: center;
-  justify-content: flex-end;
-`
-
-export interface BlockWrapperProps {
+interface AddBlockMenuWrapperProps {
   active: boolean
 }
 
-const BlockWrapper = styled.div<BlockWrapperProps>`
-  position: relative;
-
-  &:hover {
-    &:after {
-      opacity: 0.3;
-    }
-  }
-
-  &:after {
-    content: '';
-    display: block;
-    position: absolute;
-    left: -16px;
-    top: -16px;
-    width: calc(100% + 2rem);
-    height: calc(100% + 2rem);
-    border: 3px solid var(--tina-color-primary);
-    border-radius: var(--tina-radius-big);
+const AddBlockMenuWrapper = styled.div<AddBlockMenuWrapperProps>(
+  p => css`
     opacity: 0;
+    transition: all 120ms ease-out;
     pointer-events: none;
-    transition: all var(--tina-timing-medium) ease-out;
-  }
 
-  ${p =>
-    p.active &&
-    css`
-      ${BlockMenu} {
-        transform: translate3d(0, -100%, 0);
+    ${p.active &&
+      css`
         opacity: 1;
         pointer-events: all;
-      }
+      `}
+  `
+)
 
-      &:after {
-        opacity: 1 !important;
-      }
+interface BlockMenuWrapperProps {
+  index?: number
+  active: boolean
+  inset?: boolean
+  offset?: number
+}
+
+export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
+  p => css`
+    position: absolute;
+    top: calc(-${p.offset !== undefined ? p.offset : `16`}px - 16px);
+    right: calc(-${p.offset !== undefined ? p.offset : `16`}px - 1px);
+    opacity: 0;
+    transition: all 120ms ease-out;
+    z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
+    pointer-events: none;
+    transform: translate3d(0, -100%, 0);
+
+    ${p.inset &&
+      css`
+        top: calc(14px - ${p.offset !== undefined ? p.offset : `16`}px);
+        right: calc(14px - ${p.offset !== undefined ? p.offset : `16`}px);
+        transform: translate3d(0, 0, 0);
+      `}
+
+    ${p.active &&
+      css`
+        opacity: 1;
+        pointer-events: all;
+      `}
+  `
+)
+
+export const BlockMenu = styled.div`
+  display: flex;
+  flex-direction: row;
+  position: relative;
+  top: 0;
+  background-color: white;
+  border-radius: var(--tina-radius-small);
+  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  border: 1px solid var(--tina-color-grey-2);
+  overflow: hidden;
+`
+
+interface BlockActionProps {
+  active?: boolean
+  disabled?: boolean
+  onClick?: any
+  ref?: any
+}
+
+export const BlockAction = styled.div<BlockActionProps>`
+  background-color: ${p =>
+    p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
+  color: ${p =>
+    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
+  fill: ${p =>
+    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
+  outline: none;
+  border: none;
+  padding: 4px 6px;
+  transition: all 85ms ease-out;
+  cursor: pointer;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+  font-size: 12px;
+  font-weight: 600;
+
+  &:hover {
+    background-color: rgba(53, 50, 50, 0.09);
+  }
+  &:active {
+    color: var(--tina-color-primary);
+    fill: var(--tina-color-primary);
+    background-color: rgba(53, 50, 50, 0.05);
+  }
+  &:not(:last-child) {
+    border-right: 1px solid var(--tina-color-grey-2);
+  }
+  svg {
+    width: 26px;
+    height: auto;
+  }
+
+  ${props =>
+    props.active &&
+    css`
+      color: var(--tina-color-primary);
+      fill: var(--tina-color-primary);
+      background-color: rgba(53, 50, 50, 0.05);
+    `};
+
+  ${props =>
+    props.disabled &&
+    css`
+      pointer-events: none;
+      color: #d1d1d1;
+      fill: #d1d1d1;
     `};
 `

@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.5](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.5-alpha.2...@tinacms/react-toolbar@0.1.5) (2020-06-01)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+## [0.1.5-alpha.2](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.5-alpha.1...@tinacms/react-toolbar@0.1.5-alpha.2) (2020-06-01)
+
+
+### Bug Fixes
+
+* remove hidden prop ([92d4b63](https://github.com/tinacms/tinacms/commit/92d4b63))
+* toolbar provider subscribes to changes in state ([abfbed1](https://github.com/tinacms/tinacms/commit/abfbed1))
+
+
+
+
+
+## [0.1.5-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.5-alpha.0...@tinacms/react-toolbar@0.1.5-alpha.1) (2020-05-29)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+## [0.1.5-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.4...@tinacms/react-toolbar@0.1.5-alpha.0) (2020-05-28)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+## [0.1.4](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.3...@tinacms/react-toolbar@0.1.4) (2020-05-25)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
 ## [0.1.3](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.2...@tinacms/react-toolbar@0.1.3) (2020-05-19)
 
 **Note:** Version bump only for package @tinacms/react-toolbar

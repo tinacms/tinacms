@@ -19,6 +19,7 @@ limitations under the License.
 import { TinaCMSConfig } from 'tinacms'
 
 export interface GatsbyPluginTinacmsOptions {
+  enabled?: boolean
   sidebar: TinaCMSConfig['sidebar']
   toolbar: TinaCMSConfig['toolbar']
   manualInit?: boolean

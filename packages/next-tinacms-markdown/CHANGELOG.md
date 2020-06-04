@@ -3,6 +3,46 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.18](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.18-alpha.2...next-tinacms-markdown@0.2.18) (2020-06-01)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
+## [0.2.18-alpha.2](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.18-alpha.1...next-tinacms-markdown@0.2.18-alpha.2) (2020-06-01)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
+## [0.2.18-alpha.1](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.18-alpha.0...next-tinacms-markdown@0.2.18-alpha.1) (2020-05-29)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
+## [0.2.18-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.17...next-tinacms-markdown@0.2.18-alpha.0) (2020-05-28)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
+## [0.2.17](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.16...next-tinacms-markdown@0.2.17) (2020-05-25)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
 ## [0.2.16](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.15...next-tinacms-markdown@0.2.16) (2020-05-19)
 
 **Note:** Version bump only for package next-tinacms-markdown

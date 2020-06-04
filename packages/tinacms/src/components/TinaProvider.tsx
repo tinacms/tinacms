@@ -18,36 +18,49 @@ limitations under the License.
 
 import * as React from 'react'
 import { ModalProvider } from '@tinacms/react-modals'
-import { GlobalStyles } from '@tinacms/styles'
+import { Theme } from '@tinacms/styles'
 import { SidebarProvider, SidebarPosition } from '@tinacms/react-sidebar'
 import { ToolbarProvider } from '@tinacms/react-toolbar'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
+import { useState, useEffect } from 'react'
 
 export interface TinaProviderProps {
   cms: TinaCMS
   hidden?: boolean
   position?: SidebarPosition
+  styled?: boolean
 }
+
+export const INVALID_CMS_ERROR =
+  'The `cms` prop must be an instance of `TinaCMS`.'
 
 export const TinaProvider: React.FC<TinaProviderProps> = ({
   cms,
   children,
-  hidden,
   position,
+  styled = true,
 }) => {
+  const [enabled, setEnabled] = useState(cms.enabled)
+
+  useEffect(() => {
+    return cms.events.subscribe('cms', () => {
+      setEnabled(cms.enabled)
+    })
+  }, [])
+
+  if (!(cms instanceof TinaCMS)) {
+    throw new Error(INVALID_CMS_ERROR)
+  }
+
   return (
     <CMSContext.Provider value={cms}>
       <ModalProvider>
-        <GlobalStyles />
         <Alerts alerts={cms.alerts} />
-        <ToolbarProvider hidden={hidden} toolbar={cms.toolbar} />
-        <SidebarProvider
-          hidden={hidden}
-          position={position}
-          sidebar={cms.sidebar}
-        >
+        {enabled && styled && <Theme />}
+        {enabled && <ToolbarProvider toolbar={cms.toolbar} />}
+        <SidebarProvider position={position} sidebar={cms.sidebar}>
           {children}
         </SidebarProvider>
       </ModalProvider>

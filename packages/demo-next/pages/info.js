@@ -12,15 +12,18 @@ limitations under the License.
 */
 
 import matter from 'gray-matter'
-import { useLocalMarkdownForm, markdownForm } from 'next-tinacms-markdown'
+import { useLocalMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
   InlineForm,
-  InlineTextField,
-  InlineWysiwyg,
-  InlineImageField,
+  InlineText,
+  InlineImage,
+  InlineGroup,
+  InlineGroupControls,
+  InlineTextarea,
 } from 'react-tinacms-inline'
+import { InlineWysiwyg } from 'react-tinacms-editor'
 import { EditToggle, DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'
@@ -31,11 +34,7 @@ function Info(props) {
 
   return (
     <InlineForm form={form}>
-      <Layout
-        pathname="/"
-        siteTitle={props.title}
-        siteDescription={props.description}
-      >
+      <Layout siteTitle={props.title} siteDescription={props.description}>
         <section>
           <div>
             <button
@@ -67,32 +66,55 @@ function Info(props) {
           </div>
           <EditToggle />
           <DiscardChanges />
-          <h1>
-            <InlineTextField name="frontmatter.name" />
-          </h1>
-          <InlineImageField
-            name="frontmatter.image"
-            previewSrc={formValues => {
-              return formValues.frontmatter.image
-            }}
-            uploadDir={() => '/public/images/'}
-            parse={filename => `/images/${filename}`}
-          />
-          <InlineWysiwyg name="markdownBody">
-            <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-          </InlineWysiwyg>
+          <div className="group">
+            <InlineGroup
+              name="frontmatter"
+              fields={[
+                { label: 'Name', name: 'name', component: 'text' },
+                { label: 'Hometown', name: 'hometown', component: 'text' },
+              ]}
+              offset={10}
+              borderRadius={5}
+            >
+              <h1>
+                <InlineText focusRing={false} name="name" />
+              </h1>
+              <p>
+                <InlineText focusRing={false} name="hometown" />
+              </p>
+            </InlineGroup>
+          </div>
+          <div className="group">
+            <InlineImage
+              name="frontmatter.image"
+              previewSrc={formValues => {
+                return formValues.frontmatter.image
+              }}
+              uploadDir={() => '/public/images/'}
+              parse={filename => `/images/${filename}`}
+            />
+
+            <InlineWysiwyg name="markdownBody">
+              <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+            </InlineWysiwyg>
+          </div>
         </section>
         <style jsx>
           {`
             section {
               width: 100%;
-              height: 100vh;
               display: flex;
               justify-content: center;
               align-items: center;
               flex-direction: column;
               text-align: center;
               padding: 3rem;
+              margin-top: 4rem;
+            }
+
+            div.group {
+              margin-top: 2rem;
+              padding: 1rem;
             }
           `}
         </style>

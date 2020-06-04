@@ -46,7 +46,7 @@ const ImgPlaceholder = styled.div`
   line-height: 1.35;
   padding: 12px 0;
   font-size: var(--tina-font-size-2);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   transition: all 85ms ease-out;
   &:hover {
     opacity: 0.6;

@@ -41,7 +41,7 @@ export const InputFocusWrapper = styled.div`
     top: -16px;
     width: calc(100% + 32px);
     height: calc(100% + 32px);
-    border: 3px solid var(--tina-color-primary);
+    border: 1px solid var(--tina-color-primary);
     border-radius: var(--tina-radius-big);
     opacity: 0;
     pointer-events: none;
