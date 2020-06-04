@@ -50,7 +50,7 @@ export function AddBlockMenu({
       const menuBounding = addBlockButtonElem.getBoundingClientRect()
       const halfWindowHeight =
         (window.innerHeight || document.documentElement.clientHeight) / 2
-      const offsetTop = menuBounding.top - window.scrollY
+      const offsetTop = menuBounding.top
 
       if (offsetTop < halfWindowHeight) {
         setOpenTop(false)
@@ -134,6 +134,8 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
   ${props =>
     props.isOpen &&
     css`
+      pointer-events: none;
+
       svg {
         transform: rotate(45deg);
       }
@@ -150,7 +152,7 @@ interface AddBlockWrapperProps {
 const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   p => css`
   position: absolute;
-  z-index: calc(var(--tina-z-index-1) - ${p.index !== undefined ? p.index : 0});
+  z-index: calc(var(--tina-z-index-2) - ${p.index !== undefined ? p.index : 0});
 
   ${p.position == 'top' &&
     css`
@@ -183,16 +185,11 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   ${p.position == undefined &&
     css`
       position: relative;
-      left: 0;
-      display: flex;
-      align-items: center;
-      justify-content: center;
-      width: 100%;
     `}
 
   ${p.isOpen &&
     css`
-      z-index: calc(1 + var(--tina-z-index-1) - ${p.index ? p.index : 0});
+      z-index: calc(1 + var(--tina-z-index-2) - ${p.index ? p.index : 0});
     `}
 `
 )
@@ -207,7 +204,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
   justify-content: flex-start;
   position: absolute;
   z-index: var(--tina-z-index-2);
-  top: 4px;
+  top: 20px;
   left: 50%;
   transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
@@ -223,19 +220,19 @@ const BlocksMenu = styled.div<AddMenuProps>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(-50%, 32px, 0) scale3d(1, 1, 1);
+      transform: translate3d(-50%, 16px, 0) scale3d(1, 1, 1);
     `};
 
   ${props =>
     props.openTop &&
     css`
       top: auto;
-      bottom: 4px;
+      bottom: 20px;
       transform-origin: 50% 100%;
 
       ${props.isOpen &&
         css`
-          transform: translate3d(-50%, -32px, 0) scale3d(1, 1, 1);
+          transform: translate3d(-50%, -16px, 0) scale3d(1, 1, 1);
         `};
     `};
 `
@@ -254,6 +251,8 @@ const BlockOption = styled.button`
   outline: none;
   border: 0;
   transition: all 85ms ease-out;
+  user-select: none;
+
   &:hover {
     color: var(--tina-color-primary);
     background-color: #f6f6f9;

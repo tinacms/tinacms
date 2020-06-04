@@ -26,7 +26,7 @@ import {
   TrashIcon,
 } from '@tinacms/icons'
 
-import { useInlineBlocks } from './inline-field-blocks'
+import { useInlineBlocks, BlocksEmptyState } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
@@ -179,8 +179,16 @@ export function BlocksControls({
 }
 
 const BlockChildren = styled.div<{ disableClick: boolean }>(
-  ({ disableClick }) => css`
-    ${disableClick && `pointer-events: none;`};
+  p => css`
+    ${p.disableClick &&
+      css`
+        pointer-events: none;
+
+        ${BlocksEmptyState} {
+          opacity: 0;
+          pointer-events: none;
+        }
+      `}
   `
 )
 
@@ -242,7 +250,7 @@ export const BlockMenu = styled.div`
   top: 0;
   background-color: white;
   border-radius: var(--tina-radius-small);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--tina-shadow-big);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
 `
