@@ -134,6 +134,8 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
   ${props =>
     props.isOpen &&
     css`
+      pointer-events: none;
+
       svg {
         transform: rotate(45deg);
       }
