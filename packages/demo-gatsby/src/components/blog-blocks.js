@@ -20,8 +20,7 @@ import {
   InlineForm,
   InlineBlocks,
   BlocksControls,
-  BlockText,
-  BlockTextarea,
+  InlineTextarea,
 } from "react-tinacms-inline"
 
 /*
@@ -45,7 +44,7 @@ function EditableHeading(props) {
   return (
     <BlocksControls index={props.index}>
       <h1>
-        <BlockText name="text" />
+        <InlineTextarea name="text" />
       </h1>
     </BlocksControls>
   )
@@ -69,7 +68,6 @@ const heading_template = {
   defaultItem: {
     text: "",
   },
-  key: undefined,
   fields: [],
 }
 
@@ -82,7 +80,6 @@ const image_template = {
   defaultItem: {
     text: "",
   },
-  key: undefined,
   fields: [
     { name: "src", component: "text", label: "Source URL" },
     { name: "alt", component: "text", label: "Alt Text" },

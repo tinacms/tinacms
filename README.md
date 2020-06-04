@@ -29,6 +29,8 @@
 - Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
 - Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
 
+_Recommended: use the lts/dubnium version of node (v 10.20.1)_
+
 To get started:
 
 ```bash
@@ -106,7 +108,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://www.prskavec.net"><img src="https://avatars3.githubusercontent.com/u/100356?v=4" width="100px;" alt=""/><br /><sub><b>Ladislav Prskavec</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=abtris" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/bolariin"><img src="https://avatars1.githubusercontent.com/u/24629960?v=4" width="100px;" alt=""/><br /><sub><b>Bolarinwa Balogun</b></sub></a><br /><a href="#infra-bolariin" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>
     <td align="center"><a href="http://metamas.com"><img src="https://avatars2.githubusercontent.com/u/2520253?v=4" width="100px;" alt=""/><br /><sub><b>Mason Medeiros</b></sub></a><br /><a href="#userTesting-metamas" title="User Testing">📓</a></td>
-    <td align="center"><a href="https://github.com/IronSean"><img src="https://avatars3.githubusercontent.com/u/1960190?v=4" width="100px;" alt=""/><br /><sub><b>ironsean</b></sub></a><br /><a href="#userTesting-IronSean" title="User Testing">📓</a></td>
+    <td align="center"><a href="https://github.com/IronSean"><img src="https://avatars3.githubusercontent.com/u/1960190?v=4" width="100px;" alt=""/><br /><sub><b>ironsean</b></sub></a><br /><a href="#userTesting-IronSean" title="User Testing">📓</a> <a href="https://github.com/tinacms/tinacms/commits?author=IronSean" title="Documentation">📖</a> <a href="https://github.com/tinacms/tinacms/commits?author=IronSean" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/kypp"><img src="https://avatars1.githubusercontent.com/u/4457071?v=4" width="100px;" alt=""/><br /><sub><b>kyp</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Akypp" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/smashercosmo"><img src="https://avatars0.githubusercontent.com/u/273283?v=4" width="100px;" alt=""/><br /><sub><b>Vladislav Shkodin</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Asmashercosmo" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/maciekgrzybek"><img src="https://avatars2.githubusercontent.com/u/16546428?v=4" width="100px;" alt=""/><br /><sub><b>maciek_grzybek</b></sub></a><br /><a href="#ideas-maciekgrzybek" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/tinacms/tinacms/commits?author=maciekgrzybek" title="Code">💻</a> <a href="#infra-maciekgrzybek" title="Infrastructure (Hosting, Build-Tools, etc)">🚇</a></td>

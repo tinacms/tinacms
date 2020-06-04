@@ -24,6 +24,7 @@ export interface ButtonProps {
   grow?: boolean
   open?: boolean
   busy?: boolean
+  disabled?: boolean
 }
 
 export const Button = styled.button<ButtonProps>`
@@ -35,7 +36,7 @@ export const Button = styled.button<ButtonProps>`
   border: 1px solid var(--tina-color-grey-2);
   color: var(--tina-color-primary);
   fill: var(--tina-color-primary);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   cursor: pointer;
   font-size: var(--tina-font-size-1);
   height: 40px;

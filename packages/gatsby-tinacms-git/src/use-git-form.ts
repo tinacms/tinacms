@@ -16,15 +16,7 @@ limitations under the License.
 
 */
 
-import {
-  useCMS,
-  useForm,
-  Form,
-  useWatchFormValues,
-  FormOptions,
-  WatchableFormValue,
-} from 'tinacms'
-import React from 'react'
+import { useCMS, useForm, Form, FormOptions, WatchableFormValue } from 'tinacms'
 
 export interface GitNode {
   fileRelativePath: string
@@ -56,7 +48,7 @@ export function useGitForm<N extends GitNode>(
       })
   }
 
-  const [values, form] = useForm(
+  return useForm(
     {
       label: formOptions.label || '',
       fields: formOptions.fields || [],
@@ -72,20 +64,15 @@ export function useGitForm<N extends GitNode>(
       reset() {
         return cms.api.git.reset({ files: [node.fileRelativePath] })
       },
+      onChange({ values }) {
+        cms.api.git.onChange!({
+          fileRelativePath: values.fileRelativePath,
+          content: format(values),
+        })
+      },
       ...formOptions,
       id: node.fileRelativePath,
     },
     watch
   )
-
-  const writeToDisk = React.useCallback(({ values }) => {
-    cms.api.git.onChange!({
-      fileRelativePath: values.fileRelativePath,
-      content: format(values),
-    })
-  }, [])
-
-  useWatchFormValues(form, writeToDisk)
-
-  return [values, form]
 }

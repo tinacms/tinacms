@@ -35,7 +35,7 @@ export const useGitFileSha = <T = any>(
 
   useEffect(() => {
     setSha(file.sha)
-  }, [])
+  }, [file.fileRelativePath])
 
   return [() => getCachedFormData(file.fileRelativePath).sha, setSha]
 }

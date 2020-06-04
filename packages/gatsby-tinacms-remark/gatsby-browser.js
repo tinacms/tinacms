@@ -16,14 +16,11 @@ limitations under the License.
 
 */
 
-export {
-  useCMS,
-  useForm,
-  useLocalForm,
-  usePlugins,
-  useSubscribable,
-  useWatchFormValues,
-  ERROR_MISSING_CMS,
-  CMSContext,
-  withPlugins,
-} from 'tinacms'
+exports.onClientEntry = () => {
+  import('react-tinacms-editor').then(
+    ({ HtmlFieldPlugin, MarkdownFieldPlugin }) => {
+      window.tinacms.fields.add(HtmlFieldPlugin)
+      window.tinacms.fields.add(MarkdownFieldPlugin)
+    }
+  )
+}

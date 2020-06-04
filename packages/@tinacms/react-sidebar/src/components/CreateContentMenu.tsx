@@ -173,7 +173,7 @@ const CreateButton = styled.button`
   font-size: var(--tina-font-size-0);
   padding: 0 12px;
   height: 40px;
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   width: 100%;
   background: none;
   cursor: pointer;

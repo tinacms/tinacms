@@ -21,7 +21,7 @@ import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { Plugin } from '@tinacms/core'
 import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
-import { Button, TinaResetStyles } from '@tinacms/styles'
+import { Button, tina_reset_styles } from '@tinacms/styles'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { CreateContentMenu } from './CreateContentMenu'
 import styled, { css } from 'styled-components'
@@ -218,7 +218,7 @@ const FormStatus = ({ dirty }: FormStatusProps) => {
 }
 
 const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
-  ${TinaResetStyles}
+  ${tina_reset_styles}
 
   font-family: 'Inter', sans-serif;
   position: fixed;
@@ -421,7 +421,7 @@ const MenuList = styled.div`
 const MenuLink = styled.div<{ value: string }>`
   color: var(--tina-color-grey-1);
   font-size: var(--tina-font-size-4);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   padding: var(--tina-padding-big) var(--tina-padding-big)
     var(--tina-padding-big) 64px;
   position: relative;
@@ -487,7 +487,7 @@ const MenuWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
-  ${TinaResetStyles}
+  ${tina_reset_styles}
   background: var(--tina-color-grey-8);
   position: fixed;
   top: 0;

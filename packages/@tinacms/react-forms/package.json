@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-forms",
-  "version": "0.1.5",
+  "version": "0.1.7",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -20,17 +20,17 @@
     "build": "tinacms-scripts build"
   },
   "dependencies": {
-    "@tinacms/form-builder": "^0.3.3",
+    "@tinacms/form-builder": "^0.3.4",
     "react-beautiful-dnd": "^11.0.5",
     "react-dismissible": "^1.1.5"
   },
   "devDependencies": {
-    "@tinacms/forms": "^0.4.2",
-    "@tinacms/icons": "^0.11.0",
-    "@tinacms/react-core": "^0.2.12",
-    "@tinacms/react-modals": "^0.1.5",
+    "@tinacms/forms": "^0.5.0",
+    "@tinacms/icons": "^0.12.0",
+    "@tinacms/react-core": "^0.2.13",
+    "@tinacms/react-modals": "^0.1.7",
     "@tinacms/scripts": "^0.1.13",
-    "@tinacms/styles": "^0.4.2",
+    "@tinacms/styles": "^0.5.0",
     "@types/react-beautiful-dnd": "^11.0.3"
   },
   "peerDependencies": {

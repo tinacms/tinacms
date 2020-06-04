@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/core",
-  "version": "0.8.0",
+  "version": "0.9.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",

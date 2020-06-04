@@ -26,7 +26,7 @@ import {
   EditIcon,
   TinaIcon,
 } from '@tinacms/icons'
-import { TinaResetStyles } from '@tinacms/styles'
+import { tina_reset_styles } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '@tinacms/react-core'
@@ -36,24 +36,17 @@ export interface SidebarProviderProps {
   children: any
   sidebar: SidebarState
   position?: SidebarStateOptions['position']
-  hidden?: boolean
 }
 
 export function SidebarProvider({
   children,
   position,
-  hidden,
   sidebar,
 }: SidebarProviderProps) {
+  const cms = useCMS()
   useSubscribable(sidebar)
 
-  React.useEffect(() => {
-    if (typeof hidden !== 'undefined') {
-      sidebar.hidden = hidden
-    }
-  }, [hidden])
-
-  if (sidebar.hidden) return children
+  if (cms.disabled || sidebar.hidden) return children
 
   return (
     <>
@@ -193,7 +186,7 @@ const MenuList = styled.div`
 const MenuLink = styled.div<{ value: string }>`
   color: var(--tina-color-grey-1);
   font-size: var(--tina-font-size-4);
-  font-weight: 500;
+  font-weight: var(--tina-font-weight-regular);
   padding: var(--tina-padding-big) var(--tina-padding-big)
     var(--tina-padding-big) 64px;
   position: relative;
@@ -426,7 +419,7 @@ const SidebarWrapper = styled.div<{ open: boolean }>`
 `
 
 const SidebarContainer = styled.div<{ open: boolean }>`
-  ${TinaResetStyles}
+  ${tina_reset_styles}
 
   position: fixed !important;
   top: 0 !important;

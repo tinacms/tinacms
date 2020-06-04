@@ -3,6 +3,59 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.11.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.1-alpha.2...@tinacms/fields@0.11.1) (2020-06-01)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+## [0.11.1-alpha.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.1-alpha.1...@tinacms/fields@0.11.1-alpha.2) (2020-06-01)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+## [0.11.1-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.1-alpha.0...@tinacms/fields@0.11.1-alpha.1) (2020-05-29)
+
+
+### Bug Fixes
+
+* fields are optional for block templates ([bf320fe](https://github.com/tinacms/tinacms/commit/bf320fe))
+* remove unnecessary `key` prop from block template ([0c316ce](https://github.com/tinacms/tinacms/commit/0c316ce))
+
+
+
+
+
+## [0.11.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.0...@tinacms/fields@0.11.1-alpha.0) (2020-05-28)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+# [0.11.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.10.3...@tinacms/fields@0.11.0) (2020-05-25)
+
+
+### Bug Fixes
+
+* added key back to option ([cdafdc1](https://github.com/tinacms/tinacms/commit/cdafdc1))
+
+
+### Features
+
+* added Option type for Select/SelectField ([409a552](https://github.com/tinacms/tinacms/commit/409a552)), closes [#1044](https://github.com/tinacms/tinacms/issues/1044)
+* added TagsFieldPlugin ([8b447e5](https://github.com/tinacms/tinacms/commit/8b447e5))
+
+
+
+
+
 ## [0.10.3](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.10.2...@tinacms/fields@0.10.3) (2020-05-19)
 
 **Note:** Version bump only for package @tinacms/fields

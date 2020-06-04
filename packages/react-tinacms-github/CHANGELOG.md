@@ -3,6 +3,77 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.1](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.3...react-tinacms-github@0.4.1) (2020-06-01)
+
+**Note:** Version bump only for package react-tinacms-github
+
+
+
+
+
+## [0.4.1-alpha.3](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.2...react-tinacms-github@0.4.1-alpha.3) (2020-06-01)
+
+
+### Bug Fixes
+
+* is-authorized defaults to false ([f675d9d](https://github.com/tinacms/tinacms/commit/f675d9d))
+* toggle cms when entering/exiting authentication flow ([6f72fa0](https://github.com/tinacms/tinacms/commit/6f72fa0))
+
+
+
+
+
+## [0.4.1-alpha.2](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.1...react-tinacms-github@0.4.1-alpha.2) (2020-05-29)
+
+
+### Bug Fixes
+
+* set sha for new files ([fc06337](https://github.com/tinacms/tinacms/commit/fc06337)), closes [#1172](https://github.com/tinacms/tinacms/issues/1172)
+
+
+
+
+
+## [0.4.1-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.0...react-tinacms-github@0.4.1-alpha.1) (2020-05-28)
+
+
+### Bug Fixes
+
+* github error uses message from response ([2499773](https://github.com/tinacms/tinacms/commit/2499773))
+* set working branch to branchName ([fbfab5a](https://github.com/tinacms/tinacms/commit/fbfab5a))
+
+
+
+
+
+## [0.4.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.0...react-tinacms-github@0.4.1-alpha.0) (2020-05-28)
+
+
+### Bug Fixes
+
+* use-github-file-form no longer registers the form plugin ([0ad8b40](https://github.com/tinacms/tinacms/commit/0ad8b40))
+
+
+
+
+
+# [0.4.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.3.2...react-tinacms-github@0.4.0) (2020-05-25)
+
+
+### Bug Fixes
+
+* fixed setting github working branch ([59b8c81](https://github.com/tinacms/tinacms/commit/59b8c81))
+* media persist conditionally removes first '/' ([7cb5335](https://github.com/tinacms/tinacms/commit/7cb5335))
+
+
+### Features
+
+* added a fetch file method to the github client ([03e12f6](https://github.com/tinacms/tinacms/commit/03e12f6))
+
+
+
+
+
 ## [0.3.2](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.3.1...react-tinacms-github@0.3.2) (2020-05-19)
 
 **Note:** Version bump only for package react-tinacms-github
