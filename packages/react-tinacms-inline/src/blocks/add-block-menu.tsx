@@ -50,7 +50,7 @@ export function AddBlockMenu({
       const menuBounding = addBlockButtonElem.getBoundingClientRect()
       const halfWindowHeight =
         (window.innerHeight || document.documentElement.clientHeight) / 2
-      const offsetTop = menuBounding.top - window.scrollY
+      const offsetTop = menuBounding.top
 
       if (offsetTop < halfWindowHeight) {
         setOpenTop(false)
