@@ -72,4 +72,5 @@ export interface EditorProps {
   sticky?: boolean
   format?: Format
   imageProps?: ImageProps
+  className?: string
 }

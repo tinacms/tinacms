@@ -36,6 +36,7 @@ export const Wysiwyg = ({
   plugins = [],
   format = 'markdown',
   sticky,
+  className,
 }: EditorProps) => {
   const [mode, setMode] = useState('wysiwyg')
   const { value, onChange } = input
@@ -62,6 +63,7 @@ export const Wysiwyg = ({
           sticky={sticky}
           format={format}
           imageProps={imageProps}
+          className={className}
         />
       )}
     </BrowserFocusProvider>
