@@ -209,7 +209,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
   justify-content: flex-start;
   position: absolute;
   z-index: var(--tina-z-index-2);
-  top: 4px;
+  top: 20px;
   left: 50%;
   transform: translate3d(-50%, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
@@ -225,19 +225,19 @@ const BlocksMenu = styled.div<AddMenuProps>`
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(-50%, 32px, 0) scale3d(1, 1, 1);
+      transform: translate3d(-50%, 16px, 0) scale3d(1, 1, 1);
     `};
 
   ${props =>
     props.openTop &&
     css`
       top: auto;
-      bottom: 4px;
+      bottom: 20px;
       transform-origin: 50% 100%;
 
       ${props.isOpen &&
         css`
-          transform: translate3d(-50%, -32px, 0) scale3d(1, 1, 1);
+          transform: translate3d(-50%, -16px, 0) scale3d(1, 1, 1);
         `};
     `};
 `
@@ -256,6 +256,8 @@ const BlockOption = styled.button`
   outline: none;
   border: 0;
   transition: all 85ms ease-out;
+  user-select: none;
+
   &:hover {
     color: var(--tina-color-primary);
     background-color: #f6f6f9;
