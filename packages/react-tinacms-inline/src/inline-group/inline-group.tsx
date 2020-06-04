@@ -20,15 +20,13 @@ import * as React from 'react'
 import { Field } from 'tinacms'
 
 import { InlineFieldContext } from '../inline-field-context'
-import { InlineGroupControls } from './inline-group-controls'
+import { InlineGroupControls, FocusRingProps } from './inline-group-controls'
 
 interface InlineGroupProps {
   name: string
   fields?: Field[]
-  offset?: number
-  borderRadius?: number
   insetControls?: boolean
-  focusRing?: boolean
+  focusRing?: FocusRingProps
   children?: any
 }
 
@@ -36,8 +34,6 @@ export function InlineGroup({
   name,
   children,
   fields = [],
-  offset,
-  borderRadius,
   insetControls,
   focusRing,
 }: InlineGroupProps) {
@@ -45,8 +41,6 @@ export function InlineGroup({
     <InlineFieldContext.Provider value={{ name, fields }}>
       <InlineGroupControls
         name={name}
-        offset={offset}
-        borderRadius={borderRadius}
         insetControls={insetControls}
         focusRing={focusRing}
       >
