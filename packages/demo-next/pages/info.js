@@ -73,8 +73,9 @@ function Info(props) {
                 { label: 'Name', name: 'name', component: 'text' },
                 { label: 'Hometown', name: 'hometown', component: 'text' },
               ]}
-              offset={10}
-              borderRadius={5}
+              focusRing={{
+                offset: 0,
+              }}
             >
               <h1>
                 <InlineText focusRing={false} name="name" />
