@@ -171,6 +171,10 @@ export function InlineBlock({ name, data, block, index }: InlineBlockProps) {
 }
 
 const BlocksEmptyState = styled.div`
-  margin: var(--tina-padding-big) 0;
+  padding: var(--tina-padding-small);
   position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `
