@@ -19,18 +19,30 @@ limitations under the License.
 import * as React from 'react'
 import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
 
-import { MenuButton } from '../../../components/MenuHelpers'
+import { markControl } from '../../../components/MenuHelpers'
 
-export const MarkdownMenu = () => (
+export const MenuItem = () => (
   <>
-    <MenuButton data-tooltip="Bold" data-side="top" disabled>
-      <BoldIcon />
-    </MenuButton>
-    <MenuButton data-tooltip="Italic" data-side="top" disabled>
-      <ItalicIcon />
-    </MenuButton>
-    <MenuButton data-tooltip="Strike" data-side="top" disabled>
-      <StrikethroughIcon />
-    </MenuButton>
+    <BoldControl />
+    <ItalicControl />
+    <StrikeControl />
   </>
 )
+
+const BoldControl = markControl({
+  mark: 'strong',
+  Icon: BoldIcon,
+  tooltip: 'Bold',
+})
+
+const ItalicControl = markControl({
+  mark: 'em',
+  Icon: ItalicIcon,
+  tooltip: 'Italic',
+})
+
+const StrikeControl = markControl({
+  mark: 'strike',
+  Icon: StrikethroughIcon,
+  tooltip: 'Strike',
+})

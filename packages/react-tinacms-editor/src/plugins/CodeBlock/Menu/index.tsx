@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export { WysiwygMenu } from './WysiwygMenu'
-export { MarkdownMenu } from './MarkdownMenu'
+export { MenuItem } from './MenuItem'
+export { MarkdownMenuItem } from './MarkdownMenuItem'

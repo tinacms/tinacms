@@ -17,9 +17,10 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
+import { useBrowserFocusContext } from '../../context/browserFocus'
 import { ImageProps } from '../../types'
 import { Menubar } from './Menubar'
 
@@ -39,6 +40,8 @@ export const MarkdownEditor = ({
   value,
 }: MarkdownEditorProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [val, setVal] = useState(value)
+  const { browserFocused } = useBrowserFocusContext()
 
   // Code below put focus to end of content in text area as component is mounted.
   useEffect(() => {
@@ -56,14 +59,25 @@ export const MarkdownEditor = ({
     inputElm.style.height = inputElm.scrollHeight + inputLineHeight + 'px'
   })
 
+  // Code below update component content if new value is received when editor is not focused.
+  useEffect(() => {
+    const editorElementFocused = inputRef.current === document.activeElement
+    if (browserFocused && editorElementFocused) return
+    setVal(value)
+  }, [value])
+
   return (
     <>
       <Menubar toggleEditorMode={toggleEditorMode} imageProps={imageProps} />
       <EditingSection
         ref={inputRef}
         autoFocus
-        value={value}
-        onChange={evt => onChange(evt.target.value)}
+        value={val}
+        onChange={evt => {
+          const v = evt.target.value
+          setVal(v)
+          onChange(v)
+        }}
       />
     </>
   )
