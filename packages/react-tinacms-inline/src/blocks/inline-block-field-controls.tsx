@@ -242,7 +242,7 @@ export const BlockMenu = styled.div`
   top: 0;
   background-color: white;
   border-radius: var(--tina-radius-small);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--tina-shadow-big);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
 `
