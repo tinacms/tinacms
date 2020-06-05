@@ -21,11 +21,12 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
 import { useCMS } from '@tinacms/react-core'
 import { parse } from './textFormat'
+import { useState, useEffect } from 'react'
 
 type FieldProps = any
 interface ImageProps {
   path: string
-  previewSrc(form: any, field: FieldProps): string
+  previewSrc(form: any, field: FieldProps): string | Promise<string>
   uploadDir(form: any): string
   clearable?: boolean // defaults to true
 }
@@ -33,10 +34,25 @@ interface ImageProps {
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   const cms = useCMS()
 
+  const [srcIsLoading, setSrcIsLoading] = useState(true)
+  const [src, setSrc] = useState('')
+  useEffect(() => {
+    ;(async () => {
+      setSrcIsLoading(true)
+      const imageSrc = await props.field.previewSrc(
+        props.form.getState().values,
+        props
+      )
+      setSrc(imageSrc)
+      setSrcIsLoading(false)
+    })()
+  }, [props, props.form.getState().values])
+
   return (
     <ImageUpload
       value={props.input.value}
-      previewSrc={props.field.previewSrc(props.form.getState().values, props)}
+      previewSrc={src}
+      loading={srcIsLoading}
       onDrop={async ([file]: File[]) => {
         const directory = props.field.uploadDir(props.form.getState().values)
         // @ts-ignore cms.media
