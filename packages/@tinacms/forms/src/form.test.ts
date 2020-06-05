@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import { Form, FormOptions } from './form'
+import { wait } from '@testing-library/react'
 
 describe('Form', () => {
   let DEFAULTS: FormOptions<any>
@@ -34,6 +35,67 @@ describe('Form', () => {
     describe('without initialValues', () => {
       it('is fine', () => {
         new Form(DEFAULTS)
+      })
+    })
+    describe('without loadInitialValues', () => {
+      it('is not loading', () => {
+        const form = new Form(DEFAULTS)
+
+        expect(form.loading).toBeFalsy()
+      })
+    })
+    describe('with loadInitialValues', () => {
+      describe('before promise resolves', () => {
+        it('is is loading', () => {
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () => new Promise(() => {}),
+          })
+
+          expect(form.loading).toBeTruthy()
+        })
+        it('has values === undefined', () => {
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () => new Promise(() => {}),
+          })
+
+          expect(form.values).toBeUndefined()
+        })
+      })
+      describe('after promise resolves', () => {
+        it('is not loading once resolved', async () => {
+          let resolve: () => void | null
+
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () =>
+              new Promise(r => {
+                resolve = r
+              }),
+          })
+
+          await wait(() => {
+            resolve()
+            expect(form.loading).toBeFalsy()
+          })
+        })
+        it('has values resolved values', async () => {
+          let resolve: () => void | null
+          const initialValues = { title: 'Big Banana' }
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () =>
+              new Promise(r => {
+                resolve = () => r(initialValues)
+              }),
+          })
+
+          await wait(() => {
+            resolve()
+            expect(form.initialValues).toEqual(initialValues)
+          })
+        })
       })
     })
   })

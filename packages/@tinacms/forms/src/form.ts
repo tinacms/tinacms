@@ -114,9 +114,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 
   /**
    * Returns the current values of the form.
+   *
+   * if the form is still loading it returns `undefined`.
    */
-  get values() {
-    return this.finalForm.getState().values
+  get values(): S | undefined {
+    if (this.loading) {
+      return undefined
+    }
+    return this.finalForm.getState().values || this.initialValues
   }
 
   /**
@@ -207,9 +212,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       const activePath: string | undefined = this.finalForm.getState().active
 
       if (!activePath) {
-        updateEverything(this.finalForm, values)
+        updateEverything<S>(this.finalForm, values)
       } else {
-        updateSelectively(this.finalForm, values)
+        updateSelectively<S>(this.finalForm, values)
       }
     })
   }
@@ -223,26 +228,26 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   updateInitialValues(initialValues: S) {
     this.finalForm.batch(() => {
-      const values = this.values
+      const values = this.values || ({} as S)
       this.finalForm.initialize(initialValues)
       const activePath: string | undefined = this.finalForm.getState().active
 
       if (!activePath) {
-        updateEverything(this.finalForm, values)
+        updateEverything<S>(this.finalForm, values)
       } else {
-        updateSelectively(this.finalForm, values)
+        updateSelectively<S>(this.finalForm, values)
       }
     })
   }
 }
 
-function updateEverything(form: FormApi<any>, values: any) {
+function updateEverything<S>(form: FormApi<any>, values: S) {
   Object.entries(values).forEach(([path, value]) => {
     form.change(path, value)
   })
 }
 
-function updateSelectively(form: FormApi<any>, values: any, prefix?: string) {
+function updateSelectively<S>(form: FormApi<any>, values: S, prefix?: string) {
   const activePath: string = form.getState().active!
 
   Object.entries(values).forEach(([name, value]) => {
