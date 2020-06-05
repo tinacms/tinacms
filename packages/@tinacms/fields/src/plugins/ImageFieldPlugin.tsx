@@ -48,6 +48,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
         )
       } catch (e) {
         if (!canceled) {
+          setSrc('')
           // @ts-ignore cms.alerts
           cms.alerts.error(
             `Failed to generate preview for '${props.field.name}': ${e.message}`
