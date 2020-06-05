@@ -42,6 +42,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   finalForm: FormApi<S>
   actions: any[]
 
+  loading: boolean = false
+
   constructor({
     id,
     label,
@@ -76,9 +78,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.updateFields(this.fields)
 
     if (loadInitialValues) {
-      loadInitialValues().then(initialValues => {
-        this.updateInitialValues(initialValues)
-      })
+      this.loading = true
+      loadInitialValues()
+        .then(initialValues => {
+          this.updateInitialValues(initialValues)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     }
 
     if (onChange) {
