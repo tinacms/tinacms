@@ -39,14 +39,23 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   useEffect(() => {
     ;(async () => {
       setSrcIsLoading(true)
-      const imageSrc = await props.field.previewSrc(
-        props.form.getState().values,
-        props
-      )
+      let imageSrc = ''
+      try {
+        imageSrc = await props.field.previewSrc(
+          props.form.getState().values,
+          props
+        )
+      } catch (e) {
+        // @ts-ignore cms.alerts
+        cms.alerts.error(
+          `Failed to generate preview for '${props.field.name}': ${e.message}`
+        )
+      }
       setSrc(imageSrc)
+
       setSrcIsLoading(false)
     })()
-  }, [props, props.form.getState().values])
+  }, [props.input.value])
 
   return (
     <ImageUpload
