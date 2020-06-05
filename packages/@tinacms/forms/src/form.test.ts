@@ -112,9 +112,30 @@ describe('Form', () => {
       expect(form.values.title).toBe('Hello World')
     })
   })
-  describe('#onSubmit', () => {
+  describe('#submit', () => {
     const initialValues = { title: 'hello' }
     const reinitialValues = { title: 'world' }
+
+    it('calls #onSubmit', async () => {
+      const form = new Form(DEFAULTS)
+
+      await form.submit()
+
+      expect(DEFAULTS.onSubmit).toHaveBeenCalled()
+    })
+
+    describe('after changing the #onSubmit', () => {
+      it('calls the second #onSubmit and not the first', async () => {
+        const form = new Form(DEFAULTS)
+        const newSubmit = jest.fn()
+        form.onSubmit = newSubmit
+
+        await form.submit()
+
+        expect(DEFAULTS.onSubmit).not.toHaveBeenCalled()
+        expect(newSubmit).toHaveBeenCalled()
+      })
+    })
 
     describe('after a successful submission', () => {
       it('reinitializes the form with the new values', async () => {
