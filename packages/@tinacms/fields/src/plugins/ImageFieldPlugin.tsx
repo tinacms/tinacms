@@ -63,7 +63,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
     return () => {
       canceled = true
     }
-  }, [props.input.value, props.form.getState().values])
+  }, [props.input.value])
 
   return (
     <ImageUpload
