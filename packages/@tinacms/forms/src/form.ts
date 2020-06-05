@@ -59,14 +59,11 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.id = id
     this.label = label
     this.fields = fields
+    this.onSubmit = options.onSubmit
     this.finalForm = createForm<S>({
       ...options,
       initialValues,
-      async onSubmit(values, form, cb) {
-        const response = await options.onSubmit(values, form, cb)
-        form.initialize(values)
-        return response
-      },
+      onSubmit: this.handleSubmit,
       mutators: {
         ...arrayMutators,
         ...options.mutators,
@@ -171,6 +168,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   subscribe: FormApi<S>['subscribe'] = (cb, options) => {
     return this.finalForm.subscribe(cb, options)
+  }
+
+  onSubmit: Config<S>['onSubmit']
+
+  private handleSubmit: Config<S>['onSubmit'] = async (values, form, cb) => {
+    const response = await this.onSubmit(values, form, cb)
+    form.initialize(values)
+    return response
   }
 
   /**
