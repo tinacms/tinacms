@@ -55,6 +55,7 @@ export const Wysiwyg = ({
                 onChange={onChange}
                 imageProps={imageProps}
                 plugins={pluginList}
+                sticky={sticky}
               />
             ) : (
               <ProsemirrorEditor

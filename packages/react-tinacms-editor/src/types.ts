@@ -69,7 +69,7 @@ export interface Input {
 export interface EditorProps {
   input: Input
   plugins?: Plugin[]
-  sticky?: boolean
+  sticky?: boolean | string
   format?: Format
   imageProps?: ImageProps
 }
