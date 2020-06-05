@@ -29,6 +29,7 @@ export interface MarkdownEditorProps {
   onChange: (value: string) => void
   value: string
   plugins?: Plugin[]
+  sticky?: boolean | string
 }
 
 const inputLineHeight = 20
@@ -38,6 +39,7 @@ export const MarkdownEditor = ({
   onChange,
   value,
   plugins,
+  sticky,
 }: MarkdownEditorProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
   const [val, setVal] = useState(value)
@@ -68,7 +70,11 @@ export const MarkdownEditor = ({
 
   return (
     <>
-      <Menubar uploadImages={imageProps?.upload} plugins={plugins} />
+      <Menubar
+        sticky={sticky}
+        uploadImages={imageProps?.upload}
+        plugins={plugins}
+      />
       <EditingSection
         data-testid="markdown-editing-textarea"
         ref={inputRef}
