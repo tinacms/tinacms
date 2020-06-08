@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.27](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.26...gatsby-tinacms-json@0.8.27) (2020-06-08)
+
+
+### Bug Fixes
+
+* git form parsing ([388fff5](https://github.com/tinacms/tinacms/commit/388fff5))
+
+
+
+
+
 ## [0.8.26](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.25...gatsby-tinacms-json@0.8.26) (2020-06-08)
 
 **Note:** Version bump only for package gatsby-tinacms-json
