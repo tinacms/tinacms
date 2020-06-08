@@ -91,7 +91,10 @@ function fromJsonString(content: string) {
 }
 
 function toJsonString(values: JsonNode) {
-  return JSON.stringify(values.rawJson, null, 2)
+  // @ts-ignore it's actually an object
+  const rawJson = { ...values.rawJson }
+  delete rawJson['__gatsby_resolved']
+  return JSON.stringify(rawJson, null, 2)
 }
 
 /**
