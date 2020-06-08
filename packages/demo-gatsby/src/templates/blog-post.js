@@ -46,7 +46,7 @@ function InlineWysiwyg(props) {
   const [{ InlineWysiwyg }, setEditor] = React.useState({})
 
   React.useEffect(() => {
-    if (!InlineWysiwyg && status === "active") {
+    if (!InlineWysiwyg && cms.enabled) {
       import("react-tinacms-editor").then(setEditor)
     }
   }, [cms.enabled])
