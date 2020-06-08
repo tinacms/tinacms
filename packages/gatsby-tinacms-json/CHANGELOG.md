@@ -6,6 +6,12 @@ See [Conventional Commits](https://conventionalcommits.org) for commit guideline
 ## [0.8.27-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.26...gatsby-tinacms-json@0.8.27-alpha.0) (2020-06-08)
 
 **Note:** Version bump only for package gatsby-tinacms-json
+## [0.8.27](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-json@0.8.26...gatsby-tinacms-json@0.8.27) (2020-06-08)
+
+
+### Bug Fixes
+
+* git form parsing ([388fff5](https://github.com/tinacms/tinacms/commit/388fff5))
 
 
 
