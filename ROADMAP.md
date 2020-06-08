@@ -12,16 +12,14 @@ The TinaCMS core team follows an 8 week development cycle:
 - 2 week cooldown.
 
 TinaCMS is a toolkit for building content management systems. In
-order to improve this toolkit, the core team works in an 8 week
-development cycle on projects that directly or indirectly push
-TinaCMS forward. Thsee projects are pitched to the team in well
-scoped documents that describe their value to the TinaCMS open
-source toolkit and it's sponsors. The team chooses the projects
-it wants to take on for the next 6 weeks. Any improvements that
-are made to the `tinacms/tinacms` repository during that time
-will be part of the regular weekly release. At the end of that 6
-weeks the team takes 2 weeks to step back, gain perspective, and
-plan the next 6 week period.
+order to improve this toolkit, the core team works on various
+projects to directly or indirectly push TinaCMS forward. These
+projects are pitched to the team in well scoped documents that
+describe their value to the TinaCMS open source toolkit and it's
+sponsors. The team chooses the projects it wants to take on for
+the next 6 weeks. Any improvements that are made to the `tinacms/tinacms` repository during that time will be part of the regular weekly release.
+At the end of that 6 weeks the team takes 2 weeks to step back, gain
+perspective, and plan the next 6 week period.
 
 ## Cycles
 
