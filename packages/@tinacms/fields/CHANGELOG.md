@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.12.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.2...@tinacms/fields@0.12.0-alpha.0) (2020-06-08)
+
+
+### Features
+
+* **ImageFieldPlugin:** support async previewSrc ([d5312bb](https://github.com/tinacms/tinacms/commit/d5312bb))
+
+
+
+
+
 ## [0.11.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.1...@tinacms/fields@0.11.2) (2020-06-08)
 
 **Note:** Version bump only for package @tinacms/fields
