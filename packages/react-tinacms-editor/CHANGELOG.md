@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.7.2...react-tinacms-editor@0.8.0) (2020-06-08)
+
+
+### Bug Fixes
+
+* making editor hybrid controlled ([0045700](https://github.com/tinacms/tinacms/commit/0045700))
+
+
+### Features
+
+* creating plugin for mode toggle menu component ([12255c8](https://github.com/tinacms/tinacms/commit/12255c8))
+
+
+
+
+
 ## [0.7.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.7.2-alpha.3...react-tinacms-editor@0.7.2) (2020-06-01)
 
 **Note:** Version bump only for package react-tinacms-editor

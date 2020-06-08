@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [1.2.0](https://github.com/tinacms/tinacms/compare/react-dismissible@1.1.5...react-dismissible@1.2.0) (2020-06-08)
+
+
+### Bug Fixes
+
+* **Dismissible:** works with SSR ([6a757a2](https://github.com/tinacms/tinacms/commit/6a757a2))
+
+
+### Features
+
+* **allowClickPropagation:** an optional prop which allows click events to propagate to the intended target ([44d58ee](https://github.com/tinacms/tinacms/commit/44d58ee))
+
+
+
+
+
 ## [1.1.5](https://github.com/tinacms/tinacms/compare/react-dismissible@1.1.5-alpha.0...react-dismissible@1.1.5) (2020-03-09)
 
 **Note:** Version bump only for package react-dismissible

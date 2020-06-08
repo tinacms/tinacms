@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.13...@tinacms/react-core@0.3.0) (2020-06-08)
+
+
+### Features
+
+* **useForm:** only call loadInitialValues if cms.enabled ([e95f842](https://github.com/tinacms/tinacms/commit/e95f842))
+
+
+
+
+
 ## [0.2.13](https://github.com/tinacms/tinacms/compare/@tinacms/react-core@0.2.13-alpha.2...@tinacms/react-core@0.2.13) (2020-06-01)
 
 **Note:** Version bump only for package @tinacms/react-core
