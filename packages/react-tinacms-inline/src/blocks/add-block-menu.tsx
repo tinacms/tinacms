@@ -156,7 +156,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
 
   ${p.position == 'top' &&
     css`
-      top: -${p.offset !== undefined ? p.offset : `16`}px;
+      top: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
       left: 50%;
       transform: translate3d(-50%, -50%, 0);
     `}
@@ -164,13 +164,13 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   ${p.position == 'left' &&
     css`
       top: 50%;
-      left: -${p.offset !== undefined ? p.offset : `16`}px;
+      left: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
       transform: translate3d(-50%, -50%, 0);
     `}
 
   ${p.position == 'bottom' &&
     css`
-      bottom: -${p.offset !== undefined ? p.offset : `16`}px;
+      bottom: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
       left: 50%;
       transform: translate3d(-50%, 50%, 0);
     `}
@@ -178,7 +178,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
   ${p.position == 'right' &&
     css`
       top: 50%;
-      right: -${p.offset !== undefined ? p.offset : `16`}px;
+      right: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
       transform: translate3d(50%, -50%, 0);
     `}
 
