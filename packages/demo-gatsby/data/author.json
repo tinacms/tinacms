@@ -1,11 +1,8 @@
 {
   "firstName": "Nolan",
-  "lastName": "Philipps",
+  "lastName": "Phillips",
   "location": "Charlottetown, CA",
   "social": {
     "twitter": "ncphi"
-  },
-  "__gatsby_resolved": {
-    "fileRelativePath": "/data/author.json"
   }
 }

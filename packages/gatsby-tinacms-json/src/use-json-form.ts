@@ -53,6 +53,7 @@ export function useJsonForm(
     () => ({
       fileRelativePath: node.fileRelativePath,
       rawJson: JSON.parse(node.rawJson),
+      jsonNode: _node,
     }),
     [node.rawJson]
   )
@@ -68,7 +69,10 @@ export function useJsonForm(
       label,
       fields,
       format: toJsonString,
-      parse: fromJsonString,
+      parse: content => ({
+        jsonNode: _node,
+        ...fromJsonString(content),
+      }),
     },
     {
       label,
@@ -87,11 +91,27 @@ function fromJsonString(content: string) {
 }
 
 function toJsonString(values: JsonNode) {
-  return JSON.stringify(values.rawJson, null, 2)
+  // @ts-ignore it's actually an object
+  const rawJson = { ...values.rawJson }
+  delete rawJson['__gatsby_resolved']
+  return JSON.stringify(rawJson, null, 2)
 }
 
 /**
- * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ * @deprecated
+ *
+ * Instead you should now do this:
+ *
+ * ```jsx
+ * import { usePlugin } from "tinacms"
+ * import { useJsonForm } from "gatsby-tinacms-json"
+ *
+ * export function BlogTemplate(...) {
+ *    const [ values, form] = useJsonForm(...)
+ *
+ *    usePlugin(form)
+ *
+ * ```
  */
 export function useLocalJsonForm(
   jsonNode: JsonNode | null,
@@ -103,7 +123,18 @@ export function useLocalJsonForm(
 }
 
 /**
- * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ * @deprecated
+ *
+ * Instead you should now do this:
+ *
+ * ```jsx
+ * import { useFormScreenPlugin } from "tinacms"
+ * import { useJsonForm } from "gatsby-tinacms-json"
+ *
+ * export function BlogTemplate(...) {
+ *     const [values, form] = useJsonForm(...)
+ *
+ *     useFormScreenPlugin(form)
  */
 export function useGlobalJsonForm(
   jsonNode: JsonNode | null,
