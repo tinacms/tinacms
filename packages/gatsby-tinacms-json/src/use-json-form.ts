@@ -95,7 +95,20 @@ function toJsonString(values: JsonNode) {
 }
 
 /**
- * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ * @deprecated
+ *
+ * Instead you should now do this:
+ *
+ * ```jsx
+ * import { usePlugin } from "tinacms"
+ * import { useJsonForm } from "gatsby-tinacms-json"
+ *
+ * export function BlogTemplate(...) {
+ *    const [ values, form] = useJsonForm(...)
+ *
+ *    usePlugin(form)
+ *
+ * ```
  */
 export function useLocalJsonForm(
   jsonNode: JsonNode | null,
@@ -107,7 +120,18 @@ export function useLocalJsonForm(
 }
 
 /**
- * @deprecated See https://github.com/tinacms/rfcs/blob/master/0006-form-hook-conventions.md
+ * @deprecated
+ *
+ * Instead you should now do this:
+ *
+ * ```jsx
+ * import { useFormScreenPlugin } from "tinacms"
+ * import { useJsonForm } from "gatsby-tinacms-json"
+ *
+ * export function BlogTemplate(...) {
+ *     const [values, form] = useJsonForm(...)
+ *
+ *     useFormScreenPlugin(form)
  */
 export function useGlobalJsonForm(
   jsonNode: JsonNode | null,
