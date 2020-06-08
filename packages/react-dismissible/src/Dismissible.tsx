@@ -56,13 +56,32 @@ export interface Props {
 
 export const Dismissible: React.FC<Props> = ({
   onDismiss,
+  escape,
+  click,
+  disabled,
+  allowClickPropagation,
+  document,
+  ...props
+}) => {
+  const area = useDismissible({
+    onDismiss,
+    escape,
+    click,
+    disabled,
+    allowClickPropagation,
+    document,
+  })
+  return <div ref={area} {...props} />
+}
+
+export function useDismissible({
+  onDismiss,
   escape = false,
   click = false,
   disabled = false,
   allowClickPropagation = false,
   document: customDocument,
-  ...props
-}) => {
+}: Props) {
   const area: any = useRef()
 
   useEffect(() => {
@@ -116,5 +135,5 @@ export const Dismissible: React.FC<Props> = ({
     }
   }, [click, customDocument, escape, disabled, onDismiss])
 
-  return <div ref={area} {...props} />
+  return area
 }
