@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.6.0...react-tinacms-inline@0.7.0) (2020-06-08)
+
+
+### Bug Fixes
+
+* only one block/group is focussed at a time ([8d78a2b](https://github.com/tinacms/tinacms/commit/8d78a2b))
+* **InlineGroup:** name is required and it always has controls ([a485e40](https://github.com/tinacms/tinacms/commit/a485e40))
+
+
+### Features
+
+* adds confirm button to inline settings ([3c87589](https://github.com/tinacms/tinacms/commit/3c87589))
+* adds focus ring prop to inline groups and inline blocks ([764cb78](https://github.com/tinacms/tinacms/commit/764cb78))
+* inline group renders controls by default ([33eaebf](https://github.com/tinacms/tinacms/commit/33eaebf))
+* inline settings cancel btn reverts form values ([5445c51](https://github.com/tinacms/tinacms/commit/5445c51))
+
+
+
+
+
 # [0.6.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.6.0-alpha.3...react-tinacms-inline@0.6.0) (2020-06-01)
 
 **Note:** Version bump only for package react-tinacms-inline

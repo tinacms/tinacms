@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.4.2](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1...react-tinacms-github@0.4.2) (2020-06-08)
+
+
+### Bug Fixes
+
+* cleaned github client fetch method ([8ae661d](https://github.com/tinacms/tinacms/commit/8ae661d))
+* github client fetch file works on any branch ([d35e07b](https://github.com/tinacms/tinacms/commit/d35e07b))
+* removed sha param in github clients fetch file ([6060d0f](https://github.com/tinacms/tinacms/commit/6060d0f))
+
+
+
+
+
 ## [0.4.1](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.1-alpha.3...react-tinacms-github@0.4.1) (2020-06-01)
 
 **Note:** Version bump only for package react-tinacms-github
