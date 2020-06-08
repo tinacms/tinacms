@@ -26,7 +26,7 @@ import {
   useInlineForm,
 } from 'react-tinacms-inline'
 import grayMatter from 'gray-matter'
-import { Wysiwyg } from 'tinacms'
+import { Wysiwyg, CMS, useCMS } from 'tinacms'
 import Link from 'next/link'
 
 const Post: NextPage<{ post: MarkdownFile }> = props => {
@@ -55,7 +55,6 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
       </nav>
       <article>
         <header>
-          <EditToggle />
           <SaveButton />
           <ResetButton />
           <h1>
@@ -94,25 +93,10 @@ Post.getInitialProps = async function(ctx) {
 
 export default Post
 
-function EditToggle() {
-  const { status, activate, deactivate } = useInlineForm()
-  const editing = status === 'active'
-  return (
-    <button
-      onClick={() => {
-        if (editing) deactivate()
-        else activate()
-      }}
-    >
-      {editing ? 'Preview' : 'Edit'}
-    </button>
-  )
-}
-
 function SaveButton() {
-  const { status, form } = useInlineForm()
-  const editing = status === 'active'
-  if (!editing) return null
+  const cms = useCMS()
+  const { form } = useInlineForm()
+  if (cms.disabled) return null
   return (
     <button
       onClick={() => {
@@ -125,9 +109,9 @@ function SaveButton() {
 }
 
 function ResetButton() {
-  const { status, form } = useInlineForm()
-  const editing = status === 'active'
-  if (!editing) return null
+  const { form } = useInlineForm()
+  const cms = useCMS()
+  if (cms.disabled) return null
   return (
     <button
       onClick={() => {

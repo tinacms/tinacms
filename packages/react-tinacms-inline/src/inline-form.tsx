@@ -24,7 +24,6 @@ import { Dismissible } from 'react-dismissible'
 export interface InlineFormProps {
   form: Form
   children: React.ReactElement | React.ReactElement[] | InlineFormRenderChild
-  initialStatus?: InlineFormStatus
 }
 
 export interface InlineFormRenderChild {
@@ -40,29 +39,16 @@ export interface InlineFormState {
   form: Form
   focussedField: string
   setFocussedField(field: string): void
-  status: InlineFormStatus
-  activate(): void
-  deactivate(): void
 }
 
-export type InlineFormStatus = 'active' | 'inactive'
-
-export function InlineForm({
-  form,
-  children,
-  initialStatus = 'inactive',
-}: InlineFormProps) {
+export function InlineForm({ form, children }: InlineFormProps) {
   const [focussedField, setFocussedField] = React.useState<string>('')
-  const [status, setStatus] = React.useState<InlineFormStatus>(initialStatus)
 
   const inlineFormState = React.useMemo(() => {
     return {
       form,
-      status,
       focussedField,
       setFocussedField,
-      activate: () => setStatus('active'),
-      deactivate: () => setStatus('inactive'),
     }
   }, [form, status, focussedField])
 
