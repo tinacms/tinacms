@@ -53,6 +53,7 @@ export function useJsonForm(
     () => ({
       fileRelativePath: node.fileRelativePath,
       rawJson: JSON.parse(node.rawJson),
+      jsonNode: _node,
     }),
     [node.rawJson]
   )
@@ -68,7 +69,10 @@ export function useJsonForm(
       label,
       fields,
       format: toJsonString,
-      parse: fromJsonString,
+      parse: content => ({
+        jsonNode: _node,
+        ...fromJsonString(content),
+      }),
     },
     {
       label,
