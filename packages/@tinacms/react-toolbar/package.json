@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-toolbar",
-  "version": "0.1.6",
+  "version": "0.1.7-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -30,7 +30,7 @@
   },
   "dependencies": {
     "@tinacms/core": "^0.9.0",
-    "@tinacms/fields": "^0.11.2",
+    "@tinacms/fields": "^0.12.0-alpha.0",
     "@tinacms/forms": "^0.6.0",
     "react-dismissible": "^1.2.0"
   },
