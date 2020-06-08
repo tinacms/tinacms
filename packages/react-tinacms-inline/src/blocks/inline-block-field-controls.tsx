@@ -25,6 +25,7 @@ import {
   ChevronRightIcon,
   TrashIcon,
 } from '@tinacms/icons'
+import { useCMS } from 'tinacms'
 
 import { useInlineBlocks, BlocksEmptyState } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
@@ -47,7 +48,8 @@ export function BlocksControls({
   insetControls,
   focusRing = {},
 }: BlocksControlsProps) {
-  const { status, focussedField, setFocussedField } = useInlineForm()
+  const cms = useCMS()
+  const { focussedField, setFocussedField } = useInlineForm()
   const { name, template } = React.useContext(InlineFieldContext)
   const { insert, move, remove, blocks, count, direction } = useInlineBlocks()
   const isFirst = index === 0
@@ -69,7 +71,7 @@ export function BlocksControls({
     }
   }, [blockRef.current, blockMenuRef.current])
 
-  if (status === 'inactive') {
+  if (cms.disabled) {
     return children
   }
 

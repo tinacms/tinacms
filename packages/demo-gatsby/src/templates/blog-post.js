@@ -42,14 +42,14 @@ import { useCMS } from "tinacms"
 const get = require("lodash.get")
 
 function InlineWysiwyg(props) {
-  const { status } = useInlineForm()
+  const cms = useCMS()
   const [{ InlineWysiwyg }, setEditor] = React.useState({})
 
   React.useEffect(() => {
     if (!InlineWysiwyg && status === "active") {
       import("react-tinacms-editor").then(setEditor)
     }
-  }, [status])
+  }, [cms.enabled])
 
   if (InlineWysiwyg) {
     return <InlineWysiwyg {...props} />

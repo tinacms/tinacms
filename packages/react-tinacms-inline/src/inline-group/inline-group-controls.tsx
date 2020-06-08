@@ -27,6 +27,7 @@ import {
   BlockMenu,
   BlockMenuWrapper,
 } from '../blocks/inline-block-field-controls'
+import { useCMS } from 'tinacms'
 
 interface InlineGroupControls {
   name: string
@@ -46,12 +47,13 @@ export function InlineGroupControls({
   insetControls,
   focusRing = {},
 }: InlineGroupControls) {
-  const { status, focussedField, setFocussedField } = useInlineForm()
+  const cms = useCMS()
+  const { focussedField, setFocussedField } = useInlineForm()
   const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
   const { fields } = React.useContext(InlineFieldContext)
 
-  if (status === 'inactive') {
+  if (cms.disabled) {
     return children
   }
 
