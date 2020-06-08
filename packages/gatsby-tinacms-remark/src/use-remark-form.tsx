@@ -98,7 +98,10 @@ export function useRemarkForm(
       label,
       fields,
       format: toMarkdownString,
-      parse: fromMarkdownString,
+      parse: content => ({
+        ..._node,
+        ...fromMarkdownString(content),
+      }),
     },
     {
       label,
