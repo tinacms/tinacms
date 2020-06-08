@@ -40,9 +40,7 @@ export function useGitForm<N extends GitNode>(
     return cms.api.git
       .show(node.fileRelativePath) // Load the contents of this file at HEAD
       .then((git: any) => {
-        const file = parse(git.content)
-
-        return { ...node, ...file }
+        return parse(git.content)
       })
   }
 
