@@ -24,6 +24,7 @@ import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
+import { useCMS } from 'tinacms'
 
 export interface InlineBlocksProps {
   name: string
@@ -65,8 +66,9 @@ export function InlineBlocks({
   blocks,
   direction = 'column',
 }: InlineBlocksProps) {
+  const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
-  const { status, setFocussedField } = useInlineForm()
+  const { setFocussedField } = useInlineForm()
 
   return (
     <InlineField name={name}>
@@ -114,7 +116,7 @@ export function InlineBlocks({
               direction,
             }}
           >
-            {allData.length < 1 && status === 'active' && (
+            {allData.length < 1 && cms.enabled && (
               <BlocksEmptyState>
                 <AddBlockMenu
                   addBlock={block => insert(0, block)}
