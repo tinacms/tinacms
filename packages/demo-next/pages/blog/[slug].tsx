@@ -26,7 +26,8 @@ import {
   useInlineForm,
 } from 'react-tinacms-inline'
 import grayMatter from 'gray-matter'
-import { Wysiwyg, CMS, useCMS } from 'tinacms'
+import { useCMS } from 'tinacms'
+import { Wysiwyg } from 'react-tinacms-editor'
 import Link from 'next/link'
 
 const Post: NextPage<{ post: MarkdownFile }> = props => {
@@ -39,6 +40,7 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
   })
 
   if (!form) return null
+  const cms = useCMS()
 
   return (
     <InlineForm form={form}>
@@ -62,9 +64,9 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
           </h1>
         </header>
         <InlineField name="markdownBody">
-          {({ input, meta, status }) => {
-            if (status === 'active') {
-              return <Wysiwyg input={input} meta={meta} />
+          {({ input }) => {
+            if (cms.enabled) {
+              return <Wysiwyg input={input} />
             }
 
             return <ReactMarkdown>{input.value}</ReactMarkdown>
