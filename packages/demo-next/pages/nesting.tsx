@@ -235,21 +235,13 @@ const ROW = {
   },
   Component({ index, data }) {
     return (
-      <>
-        <BlocksControls index={index}>
-          <InlineBlocksRow
-            name="items"
-            blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
-            direction="row"
-          />
-        </BlocksControls>
-        <style jsx>
-          {`
-            div.row {
-            }
-          `}
-        </style>
-      </>
+      <BlocksControls index={index}>
+        <InlineBlocksRow
+          name="items"
+          blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+          direction="row"
+        />
+      </BlocksControls>
     )
   },
 }
@@ -280,23 +272,12 @@ const COL = {
   },
   Component({ index, data }) {
     return (
-      <>
-        <BlocksControls
-          index={index}
-          focusRing={{ offset: 0, borderRadius: 0 }}
-        >
-          <InlineBlocksColumn
-            name="items"
-            blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
-          />
-        </BlocksControls>
-        <style jsx>
-          {`
-            div.col {
-            }
-          `}
-        </style>
-      </>
+      <BlocksControls index={index} focusRing={{ offset: 0, borderRadius: 0 }}>
+        <InlineBlocksColumn
+          name="items"
+          blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
+        />
+      </BlocksControls>
     )
   },
 }
