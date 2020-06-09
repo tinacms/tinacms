@@ -121,18 +121,15 @@ function InlineImageUpload({
   previewSrc,
   children,
 }: InlineImageUploadProps) {
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({ accept: 'image/*', onDrop })
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop,
+  })
 
   if (!value) return <ImagePlaceholder />
 
   return (
-    <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
       <div>{children ? children(previewSrc) : <img src={previewSrc} />}</div>
     </div>
