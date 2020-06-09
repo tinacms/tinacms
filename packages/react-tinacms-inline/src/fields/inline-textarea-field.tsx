@@ -17,8 +17,9 @@ limitations under the License.
 */
 
 import React from 'react'
-import { InlineField } from '../inline-field'
 import styled from 'styled-components'
+import { useCMS } from 'tinacms'
+import { InlineField } from '../inline-field'
 import TextareaAutosize from 'react-textarea-autosize'
 import { InlineTextProps } from './inline-text-field'
 import { InputFocusWrapper } from '../styles'
@@ -34,10 +35,12 @@ export function InlineTextarea({
   className,
   focusRing,
 }: InlineTextProps) {
+  const cms = useCMS()
+
   return (
     <InlineField name={name}>
-      {({ input, status }) => {
-        if (status === 'active') {
+      {({ input }) => {
+        if (cms.enabled) {
           if (!focusRing) {
             return <Textarea className={className} {...input} rows={1} />
           }
