@@ -49,7 +49,7 @@ export function InlineImage({
 
   return (
     <InlineField name={name}>
-      {({ input, status, form }) => {
+      {({ input, form }) => {
         const _previewSrc = previewSrc(form.finalForm.getState().values)
 
         async function handleUploadImage([file]: File[]) {
@@ -71,7 +71,7 @@ export function InlineImage({
           return null
         }
 
-        if (status === 'active') {
+        if (cms.enabled) {
           if (!focusRing) {
             return (
               <InlineImageUpload
