@@ -97,4 +97,10 @@ const SelectElement = styled.div`
     background-position: right 0.7em top 50%;
     background-size: 0.65em auto;
   }
+
+  select:-moz-focusring,
+  select::-moz-focus-inner {
+    color: transparent;
+    text-shadow: 0 0 0 #000;
+  }
 `
