@@ -25,6 +25,7 @@ import {
   InlineBlocks,
   BlocksControls,
 } from 'react-tinacms-inline'
+import styled from 'styled-components'
 
 import Layout from '../components/Layout'
 
@@ -236,21 +237,15 @@ const ROW = {
     return (
       <>
         <BlocksControls index={index}>
-          <div className="row">
-            <InlineBlocks
-              name="items"
-              blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
-              direction="row"
-            />
-          </div>
+          <InlineBlocksRow
+            name="items"
+            blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+            direction="row"
+          />
         </BlocksControls>
         <style jsx>
           {`
             div.row {
-              background: lightpink;
-              margin: 1rem 0;
-              display: flex;
-              flex-direction: row;
             }
           `}
         </style>
@@ -258,6 +253,21 @@ const ROW = {
     )
   },
 }
+
+const InlineBlocksRow = styled(InlineBlocks)`
+  background: lightpink;
+  margin: 1rem 0;
+  display: flex;
+  flex-direction: row;
+`
+
+const InlineBlocksColumn = styled(InlineBlocks)`
+  background: lightgreen;
+  margin: 0 1rem;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`
 
 const COL = {
   template: {
@@ -275,21 +285,14 @@ const COL = {
           index={index}
           focusRing={{ offset: 0, borderRadius: 0 }}
         >
-          <div className="col">
-            <InlineBlocks
-              name="items"
-              blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
-            />
-          </div>
+          <InlineBlocksColumn
+            name="items"
+            blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
+          />
         </BlocksControls>
         <style jsx>
           {`
             div.col {
-              background: lightgreen;
-              margin: 0 1rem;
-              display: flex;
-              flex-direction: column;
-              height: 100%;
             }
           `}
         </style>
