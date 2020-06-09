@@ -28,7 +28,7 @@ import {
 import { useCMS } from 'tinacms'
 import { Draggable } from 'react-beautiful-dnd'
 
-import { useInlineBlocks, BlocksEmptyState } from './inline-field-blocks'
+import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
@@ -122,6 +122,7 @@ export function BlocksControls({
             }
             disableHover={focusRing === false ? true : childIsActive}
             {...provider.draggableProps}
+            disableChildren={!isActive && !childIsActive}
           >
             <AddBlockMenuWrapper active={isActive}>
               <AddBlockMenu
@@ -174,29 +175,13 @@ export function BlocksControls({
                 <BlockAction {...provider.dragHandleProps}>Move</BlockAction>
               </BlockMenu>
             </BlockMenuWrapper>
-            <BlockChildren disableClick={!isActive && !childIsActive}>
-              {children}
-            </BlockChildren>
+            {children}
           </FocusRing>
         )
       }}
     </Draggable>
   )
 }
-
-const BlockChildren = styled.div<{ disableClick: boolean }>(
-  p => css`
-    ${p.disableClick &&
-      css`
-        pointer-events: none;
-
-        ${BlocksEmptyState} {
-          opacity: 0;
-          pointer-events: none;
-        }
-      `}
-  `
-)
 
 interface AddBlockMenuWrapperProps {
   active: boolean

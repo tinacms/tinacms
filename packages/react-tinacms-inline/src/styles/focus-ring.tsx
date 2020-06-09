@@ -22,7 +22,14 @@ interface FocusRingProps {
   offset?: number
   borderRadius?: number
   disableHover?: boolean
+  disableChildren?: boolean
 }
+
+// Maybe put in disableChildren
+// ${BlocksEmptyState} {
+//   opacity: 0;
+//   pointer-events: none;
+// }
 
 export const FocusRing = styled.div<FocusRingProps>(
   p => css`
@@ -35,6 +42,13 @@ export const FocusRing = styled.div<FocusRingProps>(
           &:after {
             opacity: 0.3;
           }
+        }
+      `}
+
+    ${p.disableChildren &&
+      css`
+        > * {
+          pointer-events: none;
         }
       `}
 
