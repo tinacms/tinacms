@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { useCMS } from 'tinacms'
 import { InlineField } from 'react-tinacms-inline'
 import { Wysiwyg } from '../components/Wysiwyg'
 import { EditorProps } from '../types'
@@ -31,10 +32,11 @@ export function InlineWysiwyg({
   children,
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
+  const cms = useCMS()
   return (
     <InlineField name={name}>
-      {({ input, status }: any) => {
-        if (status === 'active') {
+      {({ input }: any) => {
+        if (cms.enabled) {
           return <Wysiwyg input={input} {...wysiwygProps} />
         }
         return <>{children}</>
