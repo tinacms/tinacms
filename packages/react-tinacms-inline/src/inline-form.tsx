@@ -50,7 +50,7 @@ export function InlineForm({ form, children }: InlineFormProps) {
       focussedField,
       setFocussedField,
     }
-  }, [form, status, focussedField])
+  }, [form, focussedField])
 
   return (
     <InlineFormContext.Provider value={inlineFormState}>
