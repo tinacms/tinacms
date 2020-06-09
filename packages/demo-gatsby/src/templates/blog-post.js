@@ -26,7 +26,6 @@ import { rhythm } from "../utils/typography"
 import { useRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { ModalProvider, usePlugin } from "tinacms"
-import { EditToggle } from "../components/edit-toggle"
 
 import {
   InlineForm,
@@ -210,7 +209,6 @@ function BlogPostTemplate(props) {
               />
             </InlineWysiwyg>
           </div>
-          <EditToggle />
           <div
             style={{
               marginBottom: rhythm(1),
