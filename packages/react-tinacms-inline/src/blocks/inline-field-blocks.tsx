@@ -25,6 +25,7 @@ import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
 import { useCMS } from 'tinacms'
+import { Droppable } from 'react-beautiful-dnd'
 
 export interface InlineBlocksProps {
   name: string
@@ -126,27 +127,40 @@ export function InlineBlocks({
                 />
               </BlocksEmptyState>
             )}
-            {allData.map((data, index) => {
-              const Block = blocks[data._template]
 
-              if (!Block) {
-                console.warn('Unrecognized Block of type:', data._template)
-                return null
-              }
+            <Droppable
+              droppableId={name}
+              type={name}
+              direction={direction === 'column' ? 'vertical' : 'horizontal'}
+            >
+              {provider => (
+                <div ref={provider.innerRef} className="edit-page--list-parent">
+                  {allData.map((data, index) => {
+                    const Block = blocks[data._template]
 
-              const blockName = `${input.name}.${index}`
+                    if (!Block) {
+                      console.warn(
+                        'Unrecognized Block of type:',
+                        data._template
+                      )
+                      return null
+                    }
 
-              return (
-                <InlineBlock
-                  // NOTE: Supressing warnings, but not helping with render perf
-                  key={index}
-                  index={index}
-                  name={blockName}
-                  data={data}
-                  block={Block}
-                />
-              )
-            })}
+                    const blockName = `${input.name}.${index}`
+
+                    return (
+                      <InlineBlock
+                        index={index}
+                        name={blockName}
+                        data={data}
+                        block={Block}
+                      />
+                    )
+                  })}
+                  {provider.placeholder}
+                </div>
+              )}
+            </Droppable>
           </InlineBlocksContext.Provider>
         )
       }}
