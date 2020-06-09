@@ -42,7 +42,6 @@ export default function BlocksExample({ jsonFile }) {
     <ModalProvider>
       <Layout>
         <InlineForm form={form}>
-          <EditToggle />
           <DiscardChanges />
           <h1>
             <InlineText name="title" />
@@ -222,23 +221,6 @@ BlocksExample.getInitialProps = async function() {
       data: blocksData.default,
     },
   }
-}
-
-/**
- * Toggle
- */
-export function EditToggle() {
-  const { status, deactivate, activate } = useInlineForm()
-
-  return (
-    <button
-      onClick={() => {
-        status === 'active' ? deactivate() : activate()
-      }}
-    >
-      {status === 'active' ? 'Preview' : 'Edit'}
-    </button>
-  )
 }
 
 export function DiscardChanges() {

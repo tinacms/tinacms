@@ -87,7 +87,7 @@ export default function Nesting() {
 
   return (
     <Layout>
-      <InlineForm form={form} initialStatus="active">
+      <InlineForm form={form}>
         <section>
           {/* Grouped Top-Level Field */}
           <div className="group">
