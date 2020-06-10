@@ -18,18 +18,20 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css, StyledComponent } from 'styled-components'
-import { EllipsisVerticalIcon } from '@tinacms/icons'
+import { EllipsisVerticalIcon, ExitIcon } from '@tinacms/icons'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { Form } from '@tinacms/forms'
+import { useCMS } from '@tinacms/react-core'
 
 export interface FormActionMenuProps {
-  form: Form
-  actions: any[]
+  form: Form | null
 }
 
-export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
+export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
+  const cms = useCMS()
+
   return (
     <>
       <MoreActionsButton onClick={() => setActionMenuVisibility(p => !p)} />
@@ -42,11 +44,13 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
             setActionMenuVisibility(p => !p)
           }}
         >
-          {actions.map((Action, i) => (
-            // TODO: `i` will suppress warnings but this indicates that maybe
-            //        Actions should just be componets
-            <Action form={form} key={i} />
-          ))}
+          {form?.actions &&
+            form.actions.map((Action, i) => (
+              // TODO: `i` will suppress warnings but this indicates that maybe
+              //        Actions should just be componets
+              <Action form={form} key={i} />
+            ))}
+          <ExitAction />
         </Dismissible>
       </ActionsOverlay>
     </>
@@ -108,7 +112,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
 export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   position: relative;
   text-align: center;
-  font-size: var(--tina-font-size-0);
+  font-size: var(--tina-font-size-1);
   padding: 0 12px;
   height: 40px;
   font-weight: var(--tina-font-weight-regular);
@@ -117,12 +121,40 @@ export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   cursor: pointer;
   outline: none;
   border: 0;
-  transition: all 85ms ease-out;
+  transition: all var(--tina-timing-medium) ease-out;
   &:hover {
     color: var(--tina-color-primary);
     background-color: var(--tina-color-grey-1);
   }
   &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
+    border-bottom: 1px solid var(--tina-color-grey-2);
   }
 `
+
+export const ExitButton = styled(ActionButton)`
+  height: 32px;
+  background-color: var(--tina-color-grey-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  border-top: 2px solid var(--tina-color-grey-2);
+
+  svg {
+    fill: currentColor;
+    width: 24px;
+    margin-right: 2px;
+  }
+`
+
+export const ExitAction = () => {
+  const cms = useCMS()
+  return (
+    <ExitButton
+      onClick={() => {
+        cms.disable()
+      }}
+    >
+      <ExitIcon /> Exit Tina
+    </ExitButton>
+  )
+}
