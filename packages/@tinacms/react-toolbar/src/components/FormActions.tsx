@@ -18,11 +18,11 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { EllipsisVerticalIcon } from '@tinacms/icons'
+import { EllipsisVerticalIcon, ExitIcon } from '@tinacms/icons'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { Form } from '@tinacms/forms'
-import { ExitAction } from '@tinacms/react-forms'
+import { ActionButton } from '@tinacms/react-forms'
 import { useCMS } from '@tinacms/react-core'
 
 export interface FormActionMenuProps {
@@ -132,3 +132,34 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
       transform: translate3d(0, 55px, 0) scale3d(1, 1, 1);
     `};
 `
+
+export const ExitButton = styled(ActionButton)`
+  height: 32px;
+  background-color: var(--tina-color-grey-1);
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  &:not(:first-child) {
+    border-top: 2px solid var(--tina-color-grey-2);
+  }
+
+  svg {
+    fill: currentColor;
+    width: 24px;
+    margin-right: 2px;
+  }
+`
+
+export const ExitAction = () => {
+  const cms = useCMS()
+  return (
+    <ExitButton
+      onClick={() => {
+        cms.disable()
+      }}
+    >
+      <ExitIcon /> Exit Tina
+    </ExitButton>
+  )
+}
