@@ -17,8 +17,10 @@ limitations under the License.
 */
 
 import Link from 'next/link'
+import { useCMS } from 'tinacms'
 
 export default function Header(props) {
+  const cms = useCMS()
   return (
     <header className="header">
       <nav className="nav" role="navigation" aria-label="main navigation">
@@ -58,11 +60,15 @@ export default function Header(props) {
           }
           @media (min-width: 768px) {
             .header {
-              height: calc(100% - 62px);
+              ${cms.enabled
+                ? `
+    height: calc(100% - 62px);
+    margin-top: 62px;
+`
+                : `height: 100%;`}
               position: fixed;
               left: 0;
               top: 0;
-              margin-top: 62px;
             }
             .nav {
               padding: 2rem;
