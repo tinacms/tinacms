@@ -16,4 +16,4 @@ limitations under the License.
 
 */
 export * from './input-focus-wrapper'
-export { FocusRing } from './focus-ring'
+export * from './focus-ring'
