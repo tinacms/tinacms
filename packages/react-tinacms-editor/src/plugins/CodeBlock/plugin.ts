@@ -26,7 +26,7 @@ export const codeBlockPlugin = new Plugin({
 
   props: {
     nodeViews: {
-      image(node, view, getPos) {
+      code_block(node, view, getPos) {
         return new CodeBlockView(node, view, getPos as any)
       },
     },
