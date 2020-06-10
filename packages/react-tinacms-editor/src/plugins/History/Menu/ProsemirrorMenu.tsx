@@ -24,7 +24,7 @@ import { RedoIcon, UndoIcon } from '@tinacms/icons'
 import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MenuItem = () => (
+export const ProsemirrorMenu = () => (
   <>
     <UndoControl />
     <RedoControl />

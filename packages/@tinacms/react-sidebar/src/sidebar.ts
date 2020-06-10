@@ -17,11 +17,13 @@ limitations under the License.
 */
 
 import { EventBus, Callback } from '@tinacms/core'
+import * as React from 'react'
 
 export interface SidebarStateOptions {
   hidden?: boolean
   position?: SidebarPosition
   buttons?: SidebarButtons
+  emptyState?: React.ElementType
 }
 
 export interface SidebarButtons {
@@ -33,6 +35,7 @@ export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
 export class SidebarState {
   private _isOpen: boolean = false
+  emptyState?: React.ElementType
 
   position: SidebarPosition = 'displace'
   _hidden: boolean = false
@@ -44,6 +47,7 @@ export class SidebarState {
   constructor(private events: EventBus, options: SidebarStateOptions = {}) {
     this.position = options.position || 'displace'
     this._hidden = !!options.hidden
+    this.emptyState = options.emptyState
 
     if (options.buttons?.save) {
       this.buttons.save = options.buttons.save

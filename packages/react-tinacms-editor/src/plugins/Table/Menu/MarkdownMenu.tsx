@@ -17,12 +17,12 @@ limitations under the License.
 */
 
 import React from 'react'
-import { MediaIcon } from '@tinacms/icons'
+import { TableIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem = () => (
-  <MenuButton data-tooltip="Image" data-side="top" disabled>
-    <MediaIcon />
+export const MarkdownMenu = () => (
+  <MenuButton data-tooltip="Table" disabled>
+    <TableIcon />
   </MenuButton>
 )

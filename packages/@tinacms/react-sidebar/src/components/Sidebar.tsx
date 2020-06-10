@@ -90,7 +90,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
             )}
             <CreateContentMenu />
           </SidebarHeader>
-          <FormsView />
+          <FormsView CustomEmptyState={sidebar.emptyState} />
           {showMenu && (
             <MenuPanel visible={menuIsOpen}>
               <MenuWrapper>

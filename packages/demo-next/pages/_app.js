@@ -22,11 +22,16 @@ import { TinaProvider, TinaCMS, withTina } from 'tinacms'
 import { GitClient, GitMediaStore } from '@tinacms/git-client'
 import { GlobalStyles as TinaCustomStyles } from '@tinacms/styles'
 
+function Empty() {
+  return <span>Hello from a custom empty state Component</span>
+}
+
 export default class Site extends App {
   constructor() {
     super()
     this.cms = new TinaCMS({
       sidebar: {
+        emptyState: Empty,
         position: 'overlay',
         hidden: process.env.NODE_ENV === 'production',
       },

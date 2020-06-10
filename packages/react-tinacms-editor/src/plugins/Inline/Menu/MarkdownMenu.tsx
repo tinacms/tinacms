@@ -17,25 +17,20 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
+import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem = (props: any) => (
+export const MarkdownMenu = () => (
   <>
-    <BulletList {...props} />
-    <OrderedList {...props} />
+    <MenuButton data-tooltip="Bold" data-side="top" disabled>
+      <BoldIcon />
+    </MenuButton>
+    <MenuButton data-tooltip="Italic" data-side="top" disabled>
+      <ItalicIcon />
+    </MenuButton>
+    <MenuButton data-tooltip="Strike" data-side="top" disabled>
+      <StrikethroughIcon />
+    </MenuButton>
   </>
-)
-
-const BulletList = () => (
-  <MenuButton data-tooltip="Unordered List" disabled>
-    <UnorderedListIcon />
-  </MenuButton>
-)
-
-const OrderedList = () => (
-  <MenuButton data-tooltip="Ordered List" disabled>
-    <OrderedListIcon />
-  </MenuButton>
 )

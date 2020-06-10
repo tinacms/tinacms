@@ -25,12 +25,14 @@ import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
 import { useCMS } from 'tinacms'
+import { Droppable } from 'react-beautiful-dnd'
 
 export interface InlineBlocksProps {
   name: string
   blocks: {
     [key: string]: Block
   }
+  className?: string
   direction?: 'column' | 'row'
 }
 
@@ -64,6 +66,7 @@ export function useInlineBlocks() {
 export function InlineBlocks({
   name,
   blocks,
+  className,
   direction = 'column',
 }: InlineBlocksProps) {
   const cms = useCMS()
@@ -104,50 +107,65 @@ export function InlineBlocks({
         }
 
         return (
-          <InlineBlocksContext.Provider
-            value={{
-              insert,
-              move,
-              remove,
-              blocks,
-              count: allData.length,
-              activeBlock,
-              setActiveBlock,
-              direction,
-            }}
+          <Droppable
+            droppableId={name}
+            type={name}
+            direction={direction === 'column' ? 'vertical' : 'horizontal'}
           >
-            {allData.length < 1 && cms.enabled && (
-              <BlocksEmptyState>
-                <AddBlockMenu
-                  addBlock={block => insert(0, block)}
-                  templates={Object.entries(blocks).map(
-                    ([, block]) => block.template
-                  )}
-                />
-              </BlocksEmptyState>
+            {provider => (
+              <div ref={provider.innerRef} className={className}>
+                {
+                  <InlineBlocksContext.Provider
+                    value={{
+                      insert,
+                      move,
+                      remove,
+                      blocks,
+                      count: allData.length,
+                      activeBlock,
+                      setActiveBlock,
+                      direction,
+                    }}
+                  >
+                    {allData.length < 1 && cms.enabled && (
+                      <BlocksEmptyState>
+                        <AddBlockMenu
+                          addBlock={block => insert(0, block)}
+                          templates={Object.entries(blocks).map(
+                            ([, block]) => block.template
+                          )}
+                        />
+                      </BlocksEmptyState>
+                    )}
+
+                    {allData.map((data, index) => {
+                      const Block = blocks[data._template]
+
+                      if (!Block) {
+                        console.warn(
+                          'Unrecognized Block of type:',
+                          data._template
+                        )
+                        return null
+                      }
+
+                      const blockName = `${input.name}.${index}`
+
+                      return (
+                        <InlineBlock
+                          index={index}
+                          name={blockName}
+                          data={data}
+                          block={Block}
+                        />
+                      )
+                    })}
+                    {provider.placeholder}
+                  </InlineBlocksContext.Provider>
+                }
+              </div>
             )}
-            {allData.map((data, index) => {
-              const Block = blocks[data._template]
-
-              if (!Block) {
-                console.warn('Unrecognized Block of type:', data._template)
-                return null
-              }
-
-              const blockName = `${input.name}.${index}`
-
-              return (
-                <InlineBlock
-                  // NOTE: Supressing warnings, but not helping with render perf
-                  key={index}
-                  index={index}
-                  name={blockName}
-                  data={data}
-                  block={Block}
-                />
-              )
-            })}
-          </InlineBlocksContext.Provider>
+          </Droppable>
         )
       }}
     </InlineField>

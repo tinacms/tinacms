@@ -28,11 +28,11 @@ import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
 import { useEditorStateContext } from '../../../context/editorState'
 import { insertImage } from '../commands'
 
-interface MenuProps {
+export interface MenuProps {
   uploadImages?: (files: File[]) => Promise<string[]>
 }
 
-export const MenuItem = ({ uploadImages }: MenuProps) => {
+export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)

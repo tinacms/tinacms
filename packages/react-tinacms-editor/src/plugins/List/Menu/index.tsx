@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export { MenuItem } from './MenuItem'
-export { MarkdownMenuItem } from './MarkdownMenuItem'
+export { ProsemirrorMenu } from './ProsemirrorMenu'
+export { MarkdownMenu } from './MarkdownMenu'
