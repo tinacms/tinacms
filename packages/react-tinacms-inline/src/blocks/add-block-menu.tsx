@@ -27,7 +27,7 @@ interface AddBlockMenuProps {
   templates: BlockTemplate[]
   position?: 'top' | 'bottom' | 'left' | 'right'
   index?: number
-  offset?: number
+  offset?: number | { x: number; y: number }
 }
 
 export function AddBlockMenu({

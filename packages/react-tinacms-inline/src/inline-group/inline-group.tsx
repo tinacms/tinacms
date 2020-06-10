@@ -20,13 +20,14 @@ import * as React from 'react'
 import { Field } from 'tinacms'
 
 import { InlineFieldContext } from '../inline-field-context'
-import { InlineGroupControls, FocusRingProps } from './inline-group-controls'
+import { InlineGroupControls } from './inline-group-controls'
+import { FocusRingStyleProps } from '../styles'
 
 interface InlineGroupProps {
   name: string
   fields?: Field[]
   insetControls?: boolean
-  focusRing?: false | FocusRingProps
+  focusRing?: false | FocusRingStyleProps
   children?: any
 }
 

@@ -33,13 +33,13 @@ import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
 import { FocusRing } from '../styles'
-import { FocusRingProps } from '../inline-group'
+import { FocusRingStyleProps, getOffset } from '../styles'
 
 export interface BlocksControlsProps {
   children: any
   index: number
   insetControls?: boolean
-  focusRing?: false | FocusRingProps
+  focusRing?: false | FocusRingStyleProps
 }
 
 export function BlocksControls({
@@ -219,7 +219,7 @@ interface BlockMenuWrapperProps {
   index?: number
   active: boolean
   inset?: boolean
-  offset?: number
+  offset?: number | { x: number; y: number }
 }
 
 export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
