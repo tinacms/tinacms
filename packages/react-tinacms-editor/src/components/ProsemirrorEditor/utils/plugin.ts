@@ -16,21 +16,12 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { renderWithProviders } from '../../../test-utils/renderWithProviders'
+import { Plugin } from '@tinacms/core'
 
-import { Menubar } from './index'
+function byType(__type: string) {
+  return (plugin: Plugin) => plugin.__type === __type
+}
 
-describe('MenuBar', () => {
-  it('should render Menubar', () => {
-    renderWithProviders(<Menubar />)
-    expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
-  })
-
-  it('should have markdown toggle option present', () => {
-    const { findByTestId } = renderWithProviders(
-      <Menubar uploadImages={(() => {}) as any} />
-    )
-    expect(findByTestId('markdown-toggle')).toBeDefined()
-  })
-})
+export function findPlugins<P extends Plugin>(type: string, plugins: Plugin[]) {
+  return plugins.filter(byType(type)) as P[]
+}

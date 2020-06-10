@@ -17,35 +17,27 @@ limitations under the License.
 */
 
 import React from 'react'
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+
+import { ProsemirrorMenu as BlockMenu } from '../../../plugins/Block'
+import { ProsemirrorMenu as CodeBlockMenu } from '../../../plugins/CodeBlock'
+import { ProsemirrorMenu as HistoryMenu } from '../../../plugins/History'
+import { ProsemirrorMenu as InlineMenu } from '../../../plugins/Inline'
+import { ProsemirrorMenu as ListMenu } from '../../../plugins/List'
+import { ProsemirrorMenu as QuoteMenu } from '../../../plugins/Blockquote'
+import { ProsemirrorMenu as TableMenu } from '../../../plugins/Table'
+import { ProsemirrorMenu as ImageMenu } from '../../../plugins/Image'
+import { ProsemirrorMenu as LinkMenu } from '../../../plugins/Link'
 
 import { TablePopups } from '../../../plugins/Table/Popup'
-import { MenuItem as BlockMenu } from '../../../plugins/Block'
-import { MenuItem as CodeBlockMenu } from '../../../plugins/CodeBlock'
-import { MenuItem as HistoryMenu } from '../../../plugins/History'
-import { MenuItem as InlineMenu } from '../../../plugins/Inline'
-import { MenuItem as ListMenu } from '../../../plugins/List'
-import { MenuItem as QuoteMenu } from '../../../plugins/Blockquote'
-import { MenuItem as TableMenu } from '../../../plugins/Table'
 import {
   ImageEdit as ImageEditPopup,
   Loader as ImageLoader,
-  MenuItem as ImageMenu,
 } from '../../../plugins/Image'
-import {
-  LinkForm as LinkFormPopup,
-  MenuItem as LinkMenu,
-} from '../../../plugins/Link'
+import { LinkForm as LinkFormPopup } from '../../../plugins/Link'
 
-import { useEditorStateContext } from '../../../context/editorState'
-import { MenuPortalProvider } from '../../../context/MenuPortal'
 import { Plugin } from '../../../types'
-
-import {
-  MenuPlaceholder,
-  MenuWrapper,
-  MenuContainer,
-} from '../../MenuHelpers/styledComponents'
+import { useEditorStateContext } from '../../../context/editorState'
+import { BaseMenubar } from '../../BaseMenubar'
 
 interface Props {
   sticky?: boolean | string
@@ -53,98 +45,32 @@ interface Props {
   plugins?: Plugin[]
 }
 
-export const Menubar = ({ sticky = true, uploadImages, plugins }: Props) => {
-  const [menuFixed, setMenuFixed] = useState(false)
-  const isBrowser = typeof window !== `undefined`
-  const menuRef = useRef<HTMLDivElement>(null)
-  const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
-  const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
+export const Menubar = ({ plugins, uploadImages, ...rest }: Props) => {
   const { editorView } = useEditorStateContext()
-
-  useEffect(() => {
-    if (menuRef.current && sticky) {
-      setMenuBoundingBox(menuRef.current.getBoundingClientRect())
-    }
-  }, [menuRef, editorView])
-
-  useLayoutEffect(() => {
-    if (!isBrowser || !menuRef.current || !sticky) {
-      return
-    }
-
-    const handleScroll = () => {
-      const wysiwygWrapper = menuRef.current!.parentElement
-      const startPosition = wysiwygWrapper ? wysiwygWrapper.offsetTop : 0
-      const endPosition = wysiwygWrapper
-        ? startPosition + wysiwygWrapper.offsetHeight
-        : 0
-
-      if (window.scrollY > startPosition && window.scrollY < endPosition) {
-        setMenuFixed(true)
-      } else {
-        setMenuFixed(false)
-      }
-    }
-
-    const handleResize = () => {
-      if (menuRef.current) {
-        const wasMenuFixed = menuFixed
-        setMenuFixed(false)
-        setMenuBoundingBox(menuRef.current.getBoundingClientRect())
-        setMenuFixed(wasMenuFixed)
-      }
-    }
-
-    window.addEventListener('scroll', handleScroll)
-    window.addEventListener('resize', handleResize)
-
-    return () => {
-      window.removeEventListener('scroll', handleScroll)
-      window.removeEventListener('resize', handleResize)
-    }
-  }, [menuRef, menuBoundingBox])
-
-  const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
-    e.stopPropagation()
-    e.preventDefault()
-  }, [])
 
   if (!editorView) return null
 
   return (
-    <>
-      {menuFixed && (
-        <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
-      )}
-      <MenuWrapper
-        menuFixedTopOffset={menuFixedTopOffset}
-        menuFixed={menuFixed}
-        menuBoundingBox={menuBoundingBox}
-        ref={menuRef}
-      >
-        <MenuPortalProvider>
-          <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-            <BlockMenu />
-            <InlineMenu />
-            <LinkMenu />
-            <ImageMenu uploadImages={uploadImages} />
-            <TableMenu />
-            <QuoteMenu />
-            <CodeBlockMenu />
-            <ListMenu />
-            <HistoryMenu />
-            {plugins?.map(({ MenuItem }) => (
-              <MenuItem />
-            ))}
-          </MenuContainer>
-        </MenuPortalProvider>
-      </MenuWrapper>
-      <TablePopups />
-      <ImageEditPopup />
-      <LinkFormPopup />
-      <ImageLoader />
-    </>
+    <BaseMenubar
+      {...rest}
+      menus={[
+        <BlockMenu />,
+        <InlineMenu />,
+        <LinkMenu />,
+        <ImageMenu uploadImages={uploadImages} />,
+        <TableMenu />,
+        <QuoteMenu />,
+        <CodeBlockMenu />,
+        <ListMenu />,
+        <HistoryMenu />,
+      ]}
+      popups={[
+        <TablePopups />,
+        <ImageEditPopup />,
+        <LinkFormPopup />,
+        <ImageLoader />,
+      ]}
+      plugins={plugins}
+    />
   )
 }
-
-// todo: sub-menus to return null if schema does not have related type of node / mark.

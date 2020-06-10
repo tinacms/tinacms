@@ -30,7 +30,7 @@ import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
 import { toggleHeader as th } from '../commands'
 import { blockTool } from './blockTool'
 
-export const MenuItem: FunctionComponent = () => {
+export const ProsemirrorMenu: FunctionComponent = () => {
   const [active, setActive] = useState(false)
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()

@@ -22,12 +22,14 @@ import { BlockTemplate } from 'tinacms'
 import { IconButton } from '@tinacms/styles'
 import { AddIcon } from '@tinacms/icons'
 
+import { getOffset, getOffsetX, getOffsetY } from '../styles'
+
 interface AddBlockMenuProps {
   addBlock(data: any): void
   templates: BlockTemplate[]
   position?: 'top' | 'bottom' | 'left' | 'right'
   index?: number
-  offset?: number
+  offset?: number | { x: number; y: number }
 }
 
 export function AddBlockMenu({
@@ -144,45 +146,48 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
 
 interface AddBlockWrapperProps {
   index?: number
-  offset?: number
+  offset?: number | { x: number; y: number }
   position?: 'top' | 'bottom' | 'left' | 'right'
   isOpen: boolean
 }
 
-const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
-  p => css`
+const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
+  const offset = getOffset(p.offset)
+
+  return css`
   position: absolute;
   z-index: calc(var(--tina-z-index-2) - ${p.index !== undefined ? p.index : 0});
 
-  ${p.position == 'top' &&
+
+  ${p.position === 'top' &&
     css`
-      top: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
+      top: calc(-1 * ${getOffsetY(offset)}px);
       left: 50%;
       transform: translate3d(-50%, -50%, 0);
     `}
 
-  ${p.position == 'left' &&
+  ${p.position === 'left' &&
     css`
       top: 50%;
-      left: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
+      left: calc(-1 * ${getOffsetX(offset)}px);
       transform: translate3d(-50%, -50%, 0);
     `}
 
-  ${p.position == 'bottom' &&
+  ${p.position === 'bottom' &&
     css`
-      bottom: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
+      bottom: calc(-1 * ${getOffsetY(offset)}px);
       left: 50%;
       transform: translate3d(-50%, 50%, 0);
     `}
 
-  ${p.position == 'right' &&
+  ${p.position === 'right' &&
     css`
       top: 50%;
-      right: calc(-1 * ${p.offset !== undefined ? p.offset : `16`}px);
+      right: calc(-1 * ${getOffsetX(offset)}px);
       transform: translate3d(50%, -50%, 0);
     `}
 
-  ${p.position == undefined &&
+  ${p.position === undefined &&
     css`
       position: relative;
     `}
@@ -192,7 +197,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(
       z-index: calc(1 + var(--tina-z-index-2) - ${p.index ? p.index : 0});
     `}
 `
-)
+})
 
 const BlocksMenu = styled.div<AddMenuProps>`
   min-width: 192px;

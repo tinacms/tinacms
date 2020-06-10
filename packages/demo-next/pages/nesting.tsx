@@ -15,11 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { useForm, usePlugin } from 'tinacms'
+import { useForm, usePlugin, ActionButton } from 'tinacms'
 import {
   InlineForm,
   InlineGroup,
-  InlineGroupControls,
   InlineText,
   InlineTextarea,
   InlineBlocks,
@@ -28,6 +27,30 @@ import {
 import styled from 'styled-components'
 
 import Layout from '../components/Layout'
+
+const TestAction = () => {
+  return (
+    <ActionButton
+      onClick={() => {
+        alert('nailed it')
+      }}
+    >
+      Test Action
+    </ActionButton>
+  )
+}
+
+const AnotherAction = () => {
+  return (
+    <ActionButton
+      onClick={() => {
+        alert('nailed it')
+      }}
+    >
+      Another Action
+    </ActionButton>
+  )
+}
 
 export default function Nesting() {
   const [values, form] = useForm({
@@ -77,6 +100,7 @@ export default function Nesting() {
     },
     label: 'Nesting',
     fields: [],
+    actions: [TestAction, AnotherAction],
     onSubmit() {},
   })
 
@@ -117,7 +141,11 @@ export default function Nesting() {
                 },
               ]}
               focusRing={{
-                offset: 24,
+                offset: {
+                  x: 18,
+                  y: 32,
+                },
+                borderRadius: 10,
               }}
               insetControls={true}
             >
@@ -284,14 +312,30 @@ const COL = {
   },
   Component({ index, data }) {
     return (
-      <BlocksControls index={index} focusRing={{ offset: 0, borderRadius: 0 }}>
-        <BlockPadding>
-          <InlineBlocksColumn
-            name="items"
-            blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
-          />
-        </BlockPadding>
-      </BlocksControls>
+      <>
+        <BlocksControls
+          index={index}
+          focusRing={{ offset: { x: -8, y: 10 }, borderRadius: 0 }}
+        >
+          <div className="col">
+            <InlineBlocks
+              name="items"
+              blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
+            />
+          </div>
+        </BlocksControls>
+        <style jsx>
+          {`
+            div.col {
+              background: lightgreen;
+              margin: 0 1rem;
+              display: flex;
+              flex-direction: column;
+              height: 100%;
+            }
+          `}
+        </style>
+      </>
     )
   },
 }

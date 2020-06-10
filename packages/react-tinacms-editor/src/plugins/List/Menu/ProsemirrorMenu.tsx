@@ -22,7 +22,7 @@ import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
 import { commandControl } from '../../../components/MenuHelpers'
 import { toggleBulletList, toggleOrderedList } from '../commands'
 
-export const MenuItem = (props: any) => (
+export const ProsemirrorMenu = (props: any) => (
   <>
     <BulletList {...props} />
     <OrderedList {...props} />
