@@ -27,7 +27,11 @@ import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { FormView } from '@tinacms/react-forms'
 import { LeftArrowIcon } from '@tinacms/icons'
 
-export const FormsView = () => {
+export const FormsView = ({
+  CustomEmptyState,
+}: {
+  CustomEmptyState?: React.ElementType
+}) => {
   const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
   const formPlugins = cms.plugins.getType<Form>('form')
@@ -70,7 +74,10 @@ export const FormsView = () => {
    * No Forms
    */
   if (!forms.length) {
-    return <NoFormsPlaceholder />
+    if (!CustomEmptyState) {
+      return <NoFormsPlaceholder />
+    }
+    return <CustomEmptyState />
   }
 
   if (isMultiform && !activeForm) {
