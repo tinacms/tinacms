@@ -96,6 +96,14 @@ const SelectElement = styled.div`
     background-repeat: no-repeat;
     background-position: right 0.7em top 50%;
     background-size: 0.65em auto;
+
+    &:hover {
+      box-shadow: 0 0 0 2px var(--tina-color-grey-3);
+    }
+
+    &:focus {
+      box-shadow: 0 0 0 2px var(--tina-color-primary);
+    }
   }
 
   select:-moz-focusring,
