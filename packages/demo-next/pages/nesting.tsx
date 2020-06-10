@@ -116,7 +116,11 @@ export default function Nesting() {
                 },
               ]}
               focusRing={{
-                offset: 24,
+                offset: {
+                  x: 18,
+                  y: 32,
+                },
+                borderRadius: 10,
               }}
               insetControls={true}
             >
@@ -273,7 +277,7 @@ const COL = {
       <>
         <BlocksControls
           index={index}
-          focusRing={{ offset: 0, borderRadius: 0 }}
+          focusRing={{ offset: { x: -8, y: 10 }, borderRadius: 0 }}
         >
           <div className="col">
             <InlineBlocks
