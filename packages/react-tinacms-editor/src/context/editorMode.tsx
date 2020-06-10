@@ -40,6 +40,4 @@ export const EditorModeProvider = ({ children }: any) => {
 
 export const EditorModeConsumer = EditorModeContext.Consumer
 
-export const useEditorModeContext = () => ({
-  ...useContext(EditorModeContext),
-})
+export const useEditorModeContext = () => useContext(EditorModeContext)
