@@ -63,6 +63,9 @@ export const ProsemirrorEditor = styled(
     useEffect(() => {
       const view = editorView && editorView.view
       if (!view || (view.hasFocus() && browserFocused)) return
+      const childElementFocused =
+        editorRef.current && editorRef.current.contains(document.activeElement)
+      if (childElementFocused) return
       view.updateState(
         buildEditorState(view.state.schema, translator, input.value, imageProps)
       )
