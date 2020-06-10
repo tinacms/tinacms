@@ -175,20 +175,26 @@ const POSTS = {
     },
     Component({ index, data }) {
       return (
-        <div className="post">
-          <BlocksControls index={index}>
+        <BlocksControls index={index} focusRing={{ offset: 8 }}>
+          <div className="post">
             <h3>
               <InlineTextarea name="title" />
             </h3>
-            <p>{data.summary}</p>
-          </BlocksControls>
+            {data.summary && <p>{data.summary}</p>}
+          </div>
           <style jsx>{`
+            h3:last-child {
+              margin-bottom: 0;
+            }
+            p {
+              margin-bottom: 0;
+            }
             div.post {
-              margin: 2rem 0;
+              padding: 0.5rem 0;
               width: 100%;
             }
           `}</style>
-        </div>
+        </BlocksControls>
       )
     },
   },
@@ -236,26 +242,32 @@ const ROW = {
   Component({ index, data }) {
     return (
       <BlocksControls index={index}>
-        <InlineBlocksRow
-          name="items"
-          blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
-          direction="row"
-        />
+        <BlockPadding>
+          <InlineBlocksRow
+            name="items"
+            blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+            direction="row"
+          />
+        </BlockPadding>
       </BlocksControls>
     )
   },
 }
 
+const BlockPadding = styled.div`
+  padding: 0.5rem 0;
+`
+
 const InlineBlocksRow = styled(InlineBlocks)`
   background: lightpink;
-  margin: 1rem 0;
+  margin: 0;
   display: flex;
   flex-direction: row;
 `
 
 const InlineBlocksColumn = styled(InlineBlocks)`
   background: lightgreen;
-  margin: 0 1rem;
+  margin: 0;
   display: flex;
   flex-direction: column;
   height: 100%;
@@ -273,10 +285,12 @@ const COL = {
   Component({ index, data }) {
     return (
       <BlocksControls index={index} focusRing={{ offset: 0, borderRadius: 0 }}>
-        <InlineBlocksColumn
-          name="items"
-          blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
-        />
+        <BlockPadding>
+          <InlineBlocksColumn
+            name="items"
+            blocks={{ row: ROW, heading: HEADING, paragraph: PARAGRAPH }}
+          />
+        </BlockPadding>
       </BlocksControls>
     )
   },
