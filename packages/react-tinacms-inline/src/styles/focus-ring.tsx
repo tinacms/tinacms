@@ -27,8 +27,10 @@ interface FocusRingProps extends FocusRingStyleProps {
   disableHover?: boolean
 }
 
-export const FocusRing = styled.div<FocusRingProps>(
-  p => css`
+export const FocusRing = styled.div<FocusRingProps>(p => {
+  const offset = getOffset(p.offset)
+
+  return css`
     position: relative;
     width: 100%;
 
@@ -46,10 +48,20 @@ export const FocusRing = styled.div<FocusRingProps>(
       box-sizing: border-box;
       display: block;
       position: absolute;
-      left: calc(-1 * ${p.offset !== undefined ? p.offset : '16'}px);
-      top: calc(-1 * ${p.offset !== undefined ? p.offset : '16'}px);
-      width: calc(100% + ${p.offset !== undefined ? p.offset * 2 : '32'}px);
-      height: calc(100% + ${p.offset !== undefined ? p.offset * 2 : '32'}px);
+      left: calc(-1 * ${typeof offset === 'object' ? offset.x : offset}px);
+      top: calc(-1 * ${typeof offset === 'object' ? offset.y : offset}px);
+      width: calc(
+        100% +
+          ${typeof offset === 'object'
+            ? offset.x * 2
+            : typeof offset === 'number' && offset * 2}px
+      );
+      height: calc(
+        100% +
+          ${typeof offset === 'object'
+            ? offset.y * 2
+            : typeof offset === 'number' && offset * 2}px
+      );
       border: 1px solid var(--tina-color-primary);
       border-radius: ${p.borderRadius !== undefined ? p.borderRadius : `10`}px;
       opacity: 0;
@@ -66,4 +78,22 @@ export const FocusRing = styled.div<FocusRingProps>(
         }
       `};
   `
-)
+})
+
+export function getOffset(
+  offset: number | undefined | { x: number; y: number }
+): number | { x: number; y: number } {
+  const fallback: number = 16
+  let result: number | { x: number; y: number } = fallback
+  const axis = { x: fallback, y: fallback }
+
+  if (typeof offset === 'number') {
+    result = offset
+  } else if (typeof offset === 'object') {
+    axis.x = offset.x
+    axis.y = offset.y
+    result = axis
+  }
+
+  return result
+}
