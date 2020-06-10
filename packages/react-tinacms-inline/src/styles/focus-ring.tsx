@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 import styled, { css } from 'styled-components'
+import { BlocksEmptyState } from '../blocks/inline-field-blocks'
 
 export interface FocusRingStyleProps {
   offset?: number | { x: number; y: number }
@@ -25,6 +26,7 @@ export interface FocusRingStyleProps {
 interface FocusRingProps extends FocusRingStyleProps {
   active: boolean
   disableHover?: boolean
+  disableChildren?: boolean
 }
 
 export const FocusRing = styled.div<FocusRingProps>(p => {
@@ -40,6 +42,18 @@ export const FocusRing = styled.div<FocusRingProps>(p => {
           &:after {
             opacity: 0.3;
           }
+        }
+      `}
+
+    ${p.disableChildren &&
+      css`
+        > * {
+          pointer-events: none;
+        }
+
+        ${BlocksEmptyState} {
+          opacity: 0;
+          pointer-events: none;
         }
       `}
 
