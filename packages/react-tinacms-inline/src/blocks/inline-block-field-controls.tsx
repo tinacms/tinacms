@@ -24,10 +24,13 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   TrashIcon,
+  ReorderIcon,
+  ReorderRowIcon,
 } from '@tinacms/icons'
 import { useCMS } from 'tinacms'
+import { Draggable } from 'react-beautiful-dnd'
 
-import { useInlineBlocks, BlocksEmptyState } from './inline-field-blocks'
+import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
@@ -59,7 +62,6 @@ export function BlocksControls({
   const { insert, move, remove, blocks, count, direction } = useInlineBlocks()
   const isFirst = index === 0
   const isLast = index === count - 1
-  const blockRef = React.useRef<HTMLDivElement>(null)
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
   const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
@@ -69,13 +71,6 @@ export function BlocksControls({
   const addAfterPosition =
     direction === 'column' ? 'bottom' : direction === 'row' ? 'right' : 'bottom'
 
-  React.useEffect(() => {
-    document.addEventListener('click', handleClickOutside, true)
-    return () => {
-      document.removeEventListener('click', handleClickOutside, true)
-    }
-  }, [blockRef.current, blockMenuRef.current])
-
   if (cms.disabled) {
     return children
   }
@@ -84,15 +79,6 @@ export function BlocksControls({
     event.stopPropagation()
     event.preventDefault()
     remove(index)
-  }
-
-  const handleClickOutside = (event: any) => {
-    if (
-      blockRef.current?.contains(event.target) ||
-      blockMenuRef.current?.contains(event.target)
-    ) {
-      return
-    }
   }
 
   const moveBlockUp = (event: any) => {
@@ -124,83 +110,88 @@ export function BlocksControls({
 
   const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
 
+  const parentName = name!
+    .split('.')
+    .slice(0, -1)
+    .join('.')
+
   return (
-    <FocusRing
-      ref={blockRef}
-      active={focusRing && isActive}
-      onClick={handleSetActiveBlock}
-      offset={offset}
-      borderRadius={
-        typeof focusRing === 'object' ? focusRing.borderRadius : undefined
-      }
-      disableHover={focusRing === false ? true : childIsActive}
-    >
-      <AddBlockMenuWrapper active={isActive}>
-        <AddBlockMenu
-          addBlock={block => insert(index, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-          index={index}
-          offset={offset}
-          position={addBeforePosition}
-        />
-        <AddBlockMenu
-          addBlock={block => insert(index + 1, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-          index={index}
-          offset={offset}
-          position={addAfterPosition}
-        />
-      </AddBlockMenuWrapper>
-      <BlockMenuWrapper
-        offset={offset}
-        ref={blockMenuRef}
-        index={index}
-        active={isActive}
-        inset={insetControls}
-      >
-        <BlockMenu>
-          <BlockAction
-            ref={blockMoveUpRef}
-            onClick={moveBlockUp}
-            disabled={isFirst}
+    <Draggable type={parentName} draggableId={name!} index={index}>
+      {provider => {
+        return (
+          <FocusRing
+            ref={provider.innerRef}
+            active={focusRing && isActive}
+            onClick={handleSetActiveBlock}
+            offset={offset}
+            borderRadius={
+              typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+            }
+            disableHover={focusRing === false ? true : childIsActive}
+            {...provider.draggableProps}
+            disableChildren={!isActive && !childIsActive}
           >
-            {direction === 'column' && <ChevronUpIcon />}
-            {direction === 'row' && <ChevronLeftIcon />}
-          </BlockAction>
-          <BlockAction
-            ref={blockMoveDownRef}
-            onClick={moveBlockDown}
-            disabled={isLast}
-          >
-            {direction === 'column' && <ChevronDownIcon />}
-            {direction === 'row' && <ChevronRightIcon />}
-          </BlockAction>
-          <InlineSettings fields={template.fields} />
-          <BlockAction onClick={removeBlock}>
-            <TrashIcon />
-          </BlockAction>
-        </BlockMenu>
-      </BlockMenuWrapper>
-      <BlockChildren disableClick={!isActive && !childIsActive}>
-        {children}
-      </BlockChildren>
-    </FocusRing>
+            <AddBlockMenuWrapper active={isActive}>
+              <AddBlockMenu
+                addBlock={block => insert(index, block)}
+                templates={Object.entries(blocks).map(
+                  ([, block]) => block.template
+                )}
+                index={index}
+                offset={offset}
+                position={addBeforePosition}
+              />
+              <AddBlockMenu
+                addBlock={block => insert(index + 1, block)}
+                templates={Object.entries(blocks).map(
+                  ([, block]) => block.template
+                )}
+                index={index}
+                offset={offset}
+                position={addAfterPosition}
+              />
+            </AddBlockMenuWrapper>
+            <BlockMenuWrapper
+              offset={offset}
+              ref={blockMenuRef}
+              index={index}
+              active={isActive}
+              inset={insetControls}
+            >
+              <BlockMenu>
+                <BlockAction
+                  ref={blockMoveUpRef}
+                  onClick={moveBlockUp}
+                  disabled={isFirst}
+                >
+                  {direction === 'column' && <ChevronUpIcon />}
+                  {direction === 'row' && <ChevronLeftIcon />}
+                </BlockAction>
+                <BlockAction
+                  ref={blockMoveDownRef}
+                  onClick={moveBlockDown}
+                  disabled={isLast}
+                >
+                  {direction === 'column' && <ChevronDownIcon />}
+                  {direction === 'row' && <ChevronRightIcon />}
+                </BlockAction>
+                <BlockAction {...provider.dragHandleProps}>
+                  {direction === 'column' && <ReorderIcon />}
+                  {direction === 'row' && <ReorderRowIcon />}
+                </BlockAction>
+                <InlineSettings fields={template.fields} />
+                <BlockAction onClick={removeBlock}>
+                  <TrashIcon />
+                </BlockAction>
+              </BlockMenu>
+            </BlockMenuWrapper>
+            {children}
+          </FocusRing>
+        )
+      }}
+    </Draggable>
   )
 }
-
-const BlockChildren = styled.div<{ disableClick: boolean }>(
-  p => css`
-    ${p.disableClick &&
-      css`
-        pointer-events: none;
-
-        ${BlocksEmptyState} {
-          opacity: 0;
-          pointer-events: none;
-        }
-      `}
-  `
-)
 
 interface AddBlockMenuWrapperProps {
   active: boolean
