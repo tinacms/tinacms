@@ -17,10 +17,13 @@ limitations under the License.
 */
 import styled, { css } from 'styled-components'
 
-interface FocusRingProps {
-  active: boolean
-  offset?: number
+export interface FocusRingStyleProps {
+  offset?: number | { x: number; y: number }
   borderRadius?: number
+}
+
+interface FocusRingProps extends FocusRingStyleProps {
+  active: boolean
   disableHover?: boolean
 }
 

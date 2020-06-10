@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
+import { useCMS } from 'tinacms'
 
 import { InlineSettings } from '../inline-settings'
 import { useInlineForm } from '../inline-form'
@@ -27,18 +28,13 @@ import {
   BlockMenu,
   BlockMenuWrapper,
 } from '../blocks/inline-block-field-controls'
-import { useCMS } from 'tinacms'
+import { FocusRingStyleProps } from '../styles'
 
 interface InlineGroupControls {
   name: string
   children: any
   insetControls?: boolean
-  focusRing?: false | FocusRingProps
-}
-
-export interface FocusRingProps {
-  offset?: number
-  borderRadius?: number
+  focusRing?: false | FocusRingStyleProps
 }
 
 export function InlineGroupControls({
