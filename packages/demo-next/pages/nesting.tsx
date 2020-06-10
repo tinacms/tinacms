@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { useForm, usePlugin } from 'tinacms'
+import { useForm, usePlugin, ActionButton } from 'tinacms'
 import {
   InlineForm,
   InlineGroup,
@@ -27,6 +27,30 @@ import {
 } from 'react-tinacms-inline'
 
 import Layout from '../components/Layout'
+
+const TestAction = () => {
+  return (
+    <ActionButton
+      onClick={() => {
+        alert('nailed it')
+      }}
+    >
+      Test Action
+    </ActionButton>
+  )
+}
+
+const AnotherAction = () => {
+  return (
+    <ActionButton
+      onClick={() => {
+        alert('nailed it')
+      }}
+    >
+      Another Action
+    </ActionButton>
+  )
+}
 
 export default function Nesting() {
   const [values, form] = useForm({
@@ -76,6 +100,7 @@ export default function Nesting() {
     },
     label: 'Nesting',
     fields: [],
+    actions: [TestAction, AnotherAction],
     onSubmit() {},
   })
 
