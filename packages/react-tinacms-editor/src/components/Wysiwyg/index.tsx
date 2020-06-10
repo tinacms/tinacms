@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import styled from 'styled-components'
 
 import { BrowserFocusProvider } from '../../context/browserFocus'
 import { EditorModeMenu } from '../EditorModeMenu'
@@ -50,30 +51,37 @@ export const Wysiwyg = ({
       <EditorModeConsumer>
         {({ mode }) => (
           <BrowserFocusProvider>
-            {mode === 'markdown' ? (
-              <MarkdownEditor
-                value={value}
-                onChange={onChange}
-                imageProps={imageProps}
-                plugins={pluginList}
-                sticky={sticky}
-              />
-            ) : (
-              <ProsemirrorEditor
-                input={{
-                  value,
-                  onChange: onChange,
-                }}
-                plugins={pluginList}
-                sticky={sticky}
-                format={format}
-                imageProps={imageProps}
-                className={className}
-              />
-            )}
+            <Wrapper>
+              {mode === 'markdown' ? (
+                <MarkdownEditor
+                  value={value}
+                  onChange={onChange}
+                  imageProps={imageProps}
+                  plugins={pluginList}
+                  sticky={sticky}
+                />
+              ) : (
+                <ProsemirrorEditor
+                  input={{
+                    value,
+                    onChange: onChange,
+                  }}
+                  plugins={pluginList}
+                  sticky={sticky}
+                  format={format}
+                  imageProps={imageProps}
+                  className={className}
+                />
+              )}
+            </Wrapper>
           </BrowserFocusProvider>
         )}
       </EditorModeConsumer>
     </EditorModeProvider>
   )
 }
+
+const Wrapper = styled.div`
+  display: block;
+  min-height: 100px;
+`
