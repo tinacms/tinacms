@@ -17,20 +17,22 @@ limitations under the License.
 */
 
 import React from 'react'
-import { renderWithProviders } from '../../../test-utils/renderWithProviders'
+import { MediaIcon } from '@tinacms/icons'
 
-import { Menubar } from './index'
+import { MenuButton } from '../../../components/MenuHelpers'
 
-describe('MenuBar', () => {
-  it('should render Menubar', () => {
-    renderWithProviders(<Menubar />)
-    expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
-  })
+interface Props {
+  uploadImages?: (files: File[]) => Promise<string[]>
+}
 
-  it('should have markdown toggle option present', () => {
-    const { findByTestId } = renderWithProviders(
-      <Menubar uploadImages={(() => {}) as any} />
-    )
-    expect(findByTestId('markdown-toggle')).toBeDefined()
-  })
-})
+export const MarkdownMenu: React.FC<Props> = ({ uploadImages }) =>
+  uploadImages ? (
+    <MenuButton
+      data-testid="image-menu"
+      data-tooltip="Image"
+      data-side="top"
+      disabled
+    >
+      <MediaIcon />
+    </MenuButton>
+  ) : null

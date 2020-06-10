@@ -186,6 +186,7 @@ function BlogPostTemplate(props) {
             ></InlineBlocks>
 
             <InlineWysiwyg
+              sticky="74px"
               name="rawMarkdownBody"
               imageProps={{
                 async upload(files) {

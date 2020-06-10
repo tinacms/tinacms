@@ -17,20 +17,20 @@ limitations under the License.
 */
 
 import React from 'react'
-import { renderWithProviders } from '../../../test-utils/renderWithProviders'
+import { render } from '@testing-library/react'
 
-import { Menubar } from './index'
+import { Wysiwyg } from './index'
 
-describe('MenuBar', () => {
-  it('should render Menubar', () => {
-    renderWithProviders(<Menubar />)
-    expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
-  })
-
-  it('should have markdown toggle option present', () => {
-    const { findByTestId } = renderWithProviders(
-      <Menubar uploadImages={(() => {}) as any} />
+describe('Wysiwyg', () => {
+  it('should render RawModeEditor', () => {
+    const { getByTestId } = render(
+      <Wysiwyg
+        input={{
+          onChange: () => {},
+          value: '',
+        }}
+      />
     )
-    expect(findByTestId('markdown-toggle')).toBeDefined()
+    expect(getByTestId('wysiwyg-editor')).toBeDefined()
   })
 })

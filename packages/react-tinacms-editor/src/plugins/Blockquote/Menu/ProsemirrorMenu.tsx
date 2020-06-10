@@ -40,7 +40,7 @@ function wrapInBlockquote(state: EditorState, dispatch: any) {
   return wrapIn(state.schema.nodes.blockquote)(state, dispatch)
 }
 
-export const MenuItem = commandControl(
+export const ProsemirrorMenu = commandControl(
   wrapInBlockquote,
   QuoteIcon,
   'Blockquote',
