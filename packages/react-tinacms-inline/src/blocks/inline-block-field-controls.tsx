@@ -222,11 +222,12 @@ interface BlockMenuWrapperProps {
   offset?: number | { x: number; y: number }
 }
 
-export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
-  p => css`
+export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
+  const offset = getOffset(p.offset)
+  return css`
     position: absolute;
-    top: calc(-${p.offset !== undefined ? p.offset : `16`}px - 16px);
-    right: calc(-${p.offset !== undefined ? p.offset : `16`}px - 1px);
+    top: calc(-${typeof offset === 'object' ? offset.y : offset}px - 16px);
+    right: calc(-${typeof offset === 'object' ? offset.x : offset}px - 1px);
     opacity: 0;
     transition: all 120ms ease-out;
     z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
@@ -235,8 +236,8 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
 
     ${p.inset &&
       css`
-        top: calc(14px - ${p.offset !== undefined ? p.offset : `16`}px);
-        right: calc(14px - ${p.offset !== undefined ? p.offset : `16`}px);
+        top: calc(14px - ${typeof offset === 'object' ? offset.y : offset}px);
+        right: calc(14px - ${typeof offset === 'object' ? offset.x : offset}px);
         transform: translate3d(0, 0, 0);
       `}
 
@@ -246,7 +247,7 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
         pointer-events: all;
       `}
   `
-)
+})
 
 export const BlockMenu = styled.div`
   display: flex;
