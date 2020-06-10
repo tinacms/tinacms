@@ -33,7 +33,12 @@ import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
 import { FocusRing } from '../styles'
-import { FocusRingStyleProps, getOffset } from '../styles'
+import {
+  FocusRingStyleProps,
+  getOffset,
+  getOffsetX,
+  getOffsetY,
+} from '../styles'
 
 export interface BlocksControlsProps {
   children: any
@@ -226,8 +231,8 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
   const offset = getOffset(p.offset)
   return css`
     position: absolute;
-    top: calc(-${typeof offset === 'object' ? offset.y : offset}px - 16px);
-    right: calc(-${typeof offset === 'object' ? offset.x : offset}px - 1px);
+    top: calc(-${getOffsetY(offset)}px - 16px);
+    right: calc(-${getOffsetX(offset)}px - 1px);
     opacity: 0;
     transition: all 120ms ease-out;
     z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
@@ -236,8 +241,8 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
 
     ${p.inset &&
       css`
-        top: calc(14px - ${typeof offset === 'object' ? offset.y : offset}px);
-        right: calc(14px - ${typeof offset === 'object' ? offset.x : offset}px);
+        top: calc(14px - ${getOffsetY(offset)}px);
+        right: calc(14px - ${getOffsetX(offset)}px);
         transform: translate3d(0, 0, 0);
       `}
 
