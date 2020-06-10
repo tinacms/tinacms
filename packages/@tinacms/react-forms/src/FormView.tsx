@@ -93,12 +93,7 @@ export function FormView({ activeForm }: FormViewProps) {
                   {submitting && <LoadingDots />}
                   {!submitting && buttons.save}
                 </Button>
-                {activeForm.actions.length > 0 && (
-                  <FormActionMenu
-                    actions={activeForm.actions}
-                    form={activeForm}
-                  />
-                )}
+                <FormActionMenu form={activeForm} />
               </Wrapper>
             </FormFooter>
           </DragDropContext>
