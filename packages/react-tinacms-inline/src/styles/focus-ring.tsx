@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 import styled, { css } from 'styled-components'
+import { BlocksEmptyState } from '../blocks/inline-field-blocks'
 
 interface FocusRingProps {
   active: boolean
@@ -24,12 +25,6 @@ interface FocusRingProps {
   disableHover?: boolean
   disableChildren?: boolean
 }
-
-// Maybe put in disableChildren
-// ${BlocksEmptyState} {
-//   opacity: 0;
-//   pointer-events: none;
-// }
 
 export const FocusRing = styled.div<FocusRingProps>(
   p => css`
@@ -48,6 +43,11 @@ export const FocusRing = styled.div<FocusRingProps>(
     ${p.disableChildren &&
       css`
         > * {
+          pointer-events: none;
+        }
+
+        ${BlocksEmptyState} {
+          opacity: 0;
           pointer-events: none;
         }
       `}
