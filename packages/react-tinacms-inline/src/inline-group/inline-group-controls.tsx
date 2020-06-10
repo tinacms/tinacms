@@ -78,7 +78,7 @@ export function InlineGroupControls({
       borderRadius={
         typeof focusRing === 'object' ? focusRing.borderRadius : undefined
       }
-      disableHover={focusRing === false ? true : childIsActive}
+      disableHover={!focusRing && childIsActive}
     >
       <BlockMenuWrapper
         ref={groupMenuRef}
