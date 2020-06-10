@@ -137,7 +137,10 @@ export const ExitButton = styled(ActionButton)`
   display: flex;
   align-items: center;
   justify-content: center;
-  border-top: 2px solid var(--tina-color-grey-2);
+
+  &:not(:first-child) {
+    border-top: 2px solid var(--tina-color-grey-2);
+  }
 
   svg {
     fill: currentColor;
