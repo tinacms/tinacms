@@ -49,7 +49,7 @@ export const MarkdownEditor = ({
   useEffect(() => {
     const inputElm = inputRef.current
     if (!inputElm) return
-    inputElm.focus()
+    inputElm.focus({ preventScroll: true })
     inputElm.setSelectionRange(inputElm.value.length, inputElm.value.length)
   }, [])
 
@@ -78,12 +78,15 @@ export const MarkdownEditor = ({
       <EditingSection
         data-testid="markdown-editing-textarea"
         ref={inputRef}
-        autoFocus
         value={val}
         onChange={evt => {
           const v = evt.target.value
           setVal(v)
           onChange(v)
+        }}
+        onFocus={e => {
+          e.preventDefault()
+          e.target.focus({ preventScroll: true })
         }}
       />
     </>

@@ -56,7 +56,7 @@ export const BaseMenubar = ({
       setMenuBoundingBox(menuRef.current.getBoundingClientRect())
     }
     // todo: cleanup use of editor view here
-  }, [menuRef, editorView])
+  }, [menuRef, editorView, mode])
 
   useLayoutEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
@@ -86,6 +86,7 @@ export const BaseMenubar = ({
       }
     }
 
+    handleScroll()
     window.addEventListener('scroll', handleScroll)
     window.addEventListener('resize', handleResize)
 
