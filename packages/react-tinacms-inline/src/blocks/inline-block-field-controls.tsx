@@ -24,6 +24,8 @@ import {
   ChevronLeftIcon,
   ChevronRightIcon,
   TrashIcon,
+  ReorderIcon,
+  ReorderRowIcon,
 } from '@tinacms/icons'
 import { useCMS } from 'tinacms'
 import { Draggable } from 'react-beautiful-dnd'
@@ -168,11 +170,14 @@ export function BlocksControls({
                   {direction === 'column' && <ChevronDownIcon />}
                   {direction === 'row' && <ChevronRightIcon />}
                 </BlockAction>
+                <BlockAction {...provider.dragHandleProps}>
+                  {direction === 'column' && <ReorderIcon />}
+                  {direction === 'row' && <ReorderRowIcon />}
+                </BlockAction>
                 <InlineSettings fields={template.fields} />
                 <BlockAction onClick={removeBlock}>
                   <TrashIcon />
                 </BlockAction>
-                <BlockAction {...provider.dragHandleProps}>Move</BlockAction>
               </BlockMenu>
             </BlockMenuWrapper>
             {children}
