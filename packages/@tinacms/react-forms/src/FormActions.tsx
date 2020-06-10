@@ -18,11 +18,10 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css, StyledComponent } from 'styled-components'
-import { EllipsisVerticalIcon, ExitIcon } from '@tinacms/icons'
+import { EllipsisVerticalIcon } from '@tinacms/icons'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { Form } from '@tinacms/forms'
-import { useCMS } from '@tinacms/react-core'
 
 export interface FormActionMenuProps {
   form: Form
@@ -31,7 +30,6 @@ export interface FormActionMenuProps {
 
 export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
-  const cms = useCMS()
 
   return (
     <>
