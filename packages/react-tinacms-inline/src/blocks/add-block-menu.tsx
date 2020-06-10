@@ -22,7 +22,7 @@ import { BlockTemplate } from 'tinacms'
 import { IconButton } from '@tinacms/styles'
 import { AddIcon } from '@tinacms/icons'
 
-import { getOffset } from '../styles'
+import { getOffset, getOffsetX, getOffsetY } from '../styles'
 
 interface AddBlockMenuProps {
   addBlock(data: any): void
@@ -161,7 +161,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
 
   ${p.position === 'top' &&
     css`
-      top: calc(-1 * ${typeof offset === 'object' ? offset.y : offset}px);
+      top: calc(-1 * ${getOffsetY(offset)}px);
       left: 50%;
       transform: translate3d(-50%, -50%, 0);
     `}
@@ -169,13 +169,13 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
   ${p.position === 'left' &&
     css`
       top: 50%;
-      left: calc(-1 * ${typeof offset === 'object' ? offset.x : offset}px);
+      left: calc(-1 * ${getOffsetX(offset)}px);
       transform: translate3d(-50%, -50%, 0);
     `}
 
   ${p.position === 'bottom' &&
     css`
-      bottom: calc(-1 * ${typeof offset === 'object' ? offset.y : offset}px);
+      bottom: calc(-1 * ${getOffsetY(offset)}px);
       left: 50%;
       transform: translate3d(-50%, 50%, 0);
     `}
@@ -183,7 +183,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
   ${p.position === 'right' &&
     css`
       top: 50%;
-      right: calc(-1 * ${typeof offset === 'object' ? offset.x : offset}px);
+      right: calc(-1 * ${getOffsetX(offset)}px);
       transform: translate3d(50%, -50%, 0);
     `}
 
