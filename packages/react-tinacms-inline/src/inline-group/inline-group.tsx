@@ -26,7 +26,7 @@ interface InlineGroupProps {
   name: string
   fields?: Field[]
   insetControls?: boolean
-  focusRing?: FocusRingProps
+  focusRing?: false | FocusRingProps
   children?: any
 }
 
