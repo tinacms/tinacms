@@ -25,10 +25,11 @@ import { Form } from '@tinacms/forms'
 import { useCMS } from '@tinacms/react-core'
 
 export interface FormActionMenuProps {
-  form: Form | null
+  form: Form
+  actions: any[]
 }
 
-export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
+export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
   const cms = useCMS()
 
@@ -44,13 +45,11 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
             setActionMenuVisibility(p => !p)
           }}
         >
-          {form?.actions &&
-            form.actions.map((Action, i) => (
-              // TODO: `i` will suppress warnings but this indicates that maybe
-              //        Actions should just be componets
-              <Action form={form} key={i} />
-            ))}
-          <ExitAction />
+          {actions.map((Action, i) => (
+            // TODO: `i` will suppress warnings but this indicates that maybe
+            //        Actions should just be componets
+            <Action form={form} key={i} />
+          ))}
         </Dismissible>
       </ActionsOverlay>
     </>
@@ -130,34 +129,3 @@ export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
     border-bottom: 1px solid var(--tina-color-grey-2);
   }
 `
-
-export const ExitButton = styled(ActionButton)`
-  height: 32px;
-  background-color: var(--tina-color-grey-1);
-  display: flex;
-  align-items: center;
-  justify-content: center;
-
-  &:not(:first-child) {
-    border-top: 2px solid var(--tina-color-grey-2);
-  }
-
-  svg {
-    fill: currentColor;
-    width: 24px;
-    margin-right: 2px;
-  }
-`
-
-export const ExitAction = () => {
-  const cms = useCMS()
-  return (
-    <ExitButton
-      onClick={() => {
-        cms.disable()
-      }}
-    >
-      <ExitIcon /> Exit Tina
-    </ExitButton>
-  )
-}
