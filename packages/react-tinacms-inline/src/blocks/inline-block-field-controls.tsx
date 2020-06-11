@@ -134,18 +134,14 @@ export function BlocksControls({
             <AddBlockMenuWrapper active={isActive}>
               <AddBlockMenu
                 addBlock={block => insert(index, block)}
-                templates={Object.entries(blocks).map(
-                  ([, block]) => block.template
-                )}
+                blocks={blocks}
                 index={index}
                 offset={offset}
                 position={addBeforePosition}
               />
               <AddBlockMenu
                 addBlock={block => insert(index + 1, block)}
-                templates={Object.entries(blocks).map(
-                  ([, block]) => block.template
-                )}
+                blocks={blocks}
                 index={index}
                 offset={offset}
                 position={addAfterPosition}
