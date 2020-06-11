@@ -131,9 +131,7 @@ export function InlineBlocks({
                       <BlocksEmptyState>
                         <AddBlockMenu
                           addBlock={block => insert(0, block)}
-                          templates={Object.entries(blocks).map(
-                            ([, block]) => block.template
-                          )}
+                          blocks={blocks}
                         />
                       </BlocksEmptyState>
                     )}
