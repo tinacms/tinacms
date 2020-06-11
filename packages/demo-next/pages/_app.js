@@ -31,7 +31,7 @@ export default class Site extends App {
     super()
     this.cms = new TinaCMS({
       sidebar: {
-        placeholder: <Empty />,
+        placeholder: Empty,
         position: 'overlay',
         hidden: process.env.NODE_ENV === 'production',
       },
