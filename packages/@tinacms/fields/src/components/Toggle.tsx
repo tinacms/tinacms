@@ -46,10 +46,10 @@ export const Toggle: FC<ToggleProps> = props => {
 }
 
 const ToggleElement = styled.div`
-  display: inline-block;
+  display: block;
   position: relative;
-  width: 40px;
-  height: 20px;
+  width: 48px;
+  height: 28px;
   margin: 0;
 `
 
@@ -102,6 +102,7 @@ const ToggleInput = styled.input`
   opacity: 0;
   margin: 0;
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  pointer-events: auto;
 
   &:hover {
     + ${ToggleLabel} ${ToggleSwitch} {
