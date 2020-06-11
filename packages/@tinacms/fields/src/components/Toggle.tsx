@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { FC } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import * as React from 'react'
 
 export interface ToggleProps {
@@ -81,9 +81,15 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
     width: calc(28px - 6px);
     height: calc(28px - 6px);
     background: ${p =>
-      p.checked ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-3)'};
+      p.checked ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-4)'};
+    border: 1px solid
+      ${p =>
+        p.checked
+          ? 'var(--tina-color-primary-dark)'
+          : 'var(--tina-color-grey-5)'};
     transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
+    box-shadow: var(--tina-shadow-big);
   }
 `
 
@@ -96,4 +102,16 @@ const ToggleInput = styled.input`
   opacity: 0;
   margin: 0;
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+
+  &:hover {
+    + ${ToggleLabel} ${ToggleSwitch} {
+      box-shadow: 0 0 0 2px var(--tina-color-grey-3);
+    }
+  }
+
+  &:focus {
+    + ${ToggleLabel} ${ToggleSwitch} {
+      box-shadow: 0 0 0 2px var(--tina-color-primary);
+    }
+  }
 `
