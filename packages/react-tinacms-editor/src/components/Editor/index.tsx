@@ -32,7 +32,7 @@ import { ProseMirrorCss } from './styles/ProseMirror'
 export interface WysiwygProps {
   input: any
   plugins?: Plugin[]
-  sticky?: boolean
+  sticky?: boolean | string
   format?: Format
   imageProps?: ImageProps
   toggleEditorMode?: () => void
