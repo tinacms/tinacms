@@ -24,7 +24,7 @@ export interface SidebarStateOptions {
   hidden?: boolean
   position?: SidebarPosition
   buttons?: SidebarButtons
-  placeholder?: React.ReactNode
+  placeholder?: React.FC
 }
 
 export interface SidebarButtons {
@@ -36,7 +36,7 @@ export declare type SidebarPosition = 'fixed' | 'float' | 'displace' | 'overlay'
 
 export class SidebarState {
   private _isOpen: boolean = false
-  placeholder: React.ReactNode
+  placeholder: React.FC
 
   position: SidebarPosition = 'displace'
   _hidden: boolean = false
@@ -48,8 +48,7 @@ export class SidebarState {
   constructor(private events: EventBus, options: SidebarStateOptions = {}) {
     this.position = options.position || 'displace'
     this._hidden = !!options.hidden
-    this.placeholder =
-      options.placeholder || React.createElement(NoFormsPlaceholder)
+    this.placeholder = options.placeholder || NoFormsPlaceholder
 
     if (options.buttons?.save) {
       this.buttons.save = options.buttons.save
