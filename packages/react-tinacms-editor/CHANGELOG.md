@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.1-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.1-alpha.0...react-tinacms-editor@0.8.1-alpha.1) (2020-06-12)
+
+
+### Bug Fixes
+
+* circular dependencies ([b4de165](https://github.com/tinacms/tinacms/commit/b4de165))
+* code block node view ([295b69b](https://github.com/tinacms/tinacms/commit/295b69b))
+* code mark should not exist with other marks ([480d21e](https://github.com/tinacms/tinacms/commit/480d21e))
+* editor scrolling while changing mode ([da135d8](https://github.com/tinacms/tinacms/commit/da135d8))
+* hybrid controlled behaviour for code-mirror editor within wysiwyg ([99b87f3](https://github.com/tinacms/tinacms/commit/99b87f3))
+* making editor hybrid controlled ([11d034b](https://github.com/tinacms/tinacms/commit/11d034b))
+
+
+
+
+
 ## [0.8.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.0...react-tinacms-editor@0.8.1-alpha.0) (2020-06-08)
 
 **Note:** Version bump only for package react-tinacms-editor

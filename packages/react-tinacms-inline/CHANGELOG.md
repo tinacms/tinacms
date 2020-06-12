@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.8.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.7.1-alpha.0...react-tinacms-inline@0.8.0-alpha.0) (2020-06-12)
+
+
+### Bug Fixes
+
+* block/group panels now stay within the settings modal ([89f9ee5](https://github.com/tinacms/tinacms/commit/89f9ee5))
+* inline group accepts false for focus ring ([8c69c60](https://github.com/tinacms/tinacms/commit/8c69c60))
+
+
+### Features
+
+* adds x & y config on offset ([685aa30](https://github.com/tinacms/tinacms/commit/685aa30))
+* export field context ([8a1d3d4](https://github.com/tinacms/tinacms/commit/8a1d3d4))
+
+
+
+
+
 ## [0.7.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.7.0...react-tinacms-inline@0.7.1-alpha.0) (2020-06-08)
 
 **Note:** Version bump only for package react-tinacms-inline
