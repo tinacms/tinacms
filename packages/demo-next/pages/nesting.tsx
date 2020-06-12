@@ -118,7 +118,10 @@ export default function Nesting() {
           <div className="group">
             <InlineGroup
               name="hero"
-              fields={[{ name: 'description', component: 'textarea' }]}
+              fields={[
+                { name: 'description', component: 'textarea' },
+                { name: 'toggle', component: 'toggle' },
+              ]}
             >
               <h1>
                 <InlineTextarea name="title" focusRing={false} />
