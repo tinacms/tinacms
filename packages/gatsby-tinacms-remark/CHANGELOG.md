@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.3-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.8.2...gatsby-tinacms-remark@0.8.3-alpha.0) (2020-06-12)
+
+
+### Bug Fixes
+
+* git form parsing ([88ff373](https://github.com/tinacms/tinacms/commit/88ff373))
+
+
+
+
+
 ## [0.8.2-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.8.1...gatsby-tinacms-remark@0.8.2-alpha.0) (2020-06-08)
 
 **Note:** Version bump only for package gatsby-tinacms-remark

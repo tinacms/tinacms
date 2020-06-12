@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-sidebar@0.1.8...@tinacms/react-sidebar@0.2.0-alpha.0) (2020-06-12)
+
+
+### Features
+
+* allow a custom empty state component to be added ([abe9479](https://github.com/tinacms/tinacms/commit/abe9479))
+
+
+
+
+
 ## [0.1.8](https://github.com/tinacms/tinacms/compare/@tinacms/react-sidebar@0.1.7...@tinacms/react-sidebar@0.1.8) (2020-06-08)
 
 **Note:** Version bump only for package @tinacms/react-sidebar

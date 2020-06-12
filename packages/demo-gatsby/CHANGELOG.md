@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.9.5-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.9.4...demo-gatsby@1.9.5-alpha.0) (2020-06-12)
+
+
+### Bug Fixes
+
+* git form parsing ([88ff373](https://github.com/gatsbyjs/gatsby-starter-blog/commit/88ff373))
+
+
+
+
+
 ## [1.9.4-alpha.0](https://github.com/gatsbyjs/gatsby-starter-blog/compare/demo-gatsby@1.9.3...demo-gatsby@1.9.4-alpha.0) (2020-06-08)
 
 **Note:** Version bump only for package demo-gatsby
