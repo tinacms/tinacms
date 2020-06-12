@@ -33,7 +33,7 @@ export const InlineTextareaField = InlineTextarea
 export function InlineTextarea({
   name,
   className,
-  focusRing,
+  focusRing = true,
 }: InlineTextProps) {
   const cms = useCMS()
 
