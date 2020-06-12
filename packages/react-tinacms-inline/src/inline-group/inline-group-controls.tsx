@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css } from 'styled-components'
 import { useCMS } from 'tinacms'
 
 import { InlineSettings } from '../inline-settings'
@@ -75,6 +74,7 @@ export function InlineGroupControls({
         typeof focusRing === 'object' ? focusRing.borderRadius : undefined
       }
       disableHover={!focusRing && childIsActive}
+      disableChildren={focusRing && !active && !childIsActive}
     >
       <BlockMenuWrapper
         ref={groupMenuRef}
@@ -86,15 +86,7 @@ export function InlineGroupControls({
           <InlineSettings fields={fields} />
         </BlockMenu>
       </BlockMenuWrapper>
-      <GroupChildren disableClick={!active && !childIsActive}>
-        {children}
-      </GroupChildren>
+      {children}
     </FocusRing>
   )
 }
-
-const GroupChildren = styled.div<{ disableClick: boolean }>(
-  ({ disableClick }) => css`
-    ${disableClick && `pointer-events: none;`};
-  `
-)
