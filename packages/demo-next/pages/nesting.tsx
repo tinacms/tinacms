@@ -236,7 +236,10 @@ const COLORS = {
       itemProps: item => ({
         label: `${item.name} – ${item.color}`,
       }),
-      fields: [{ name: 'color', component: 'color' }],
+      fields: [
+        { name: 'color', component: 'color' },
+        { name: 'toggle', component: 'toggle' },
+      ],
       defaultItem: {
         name: 'Red',
         color: 'fff',
