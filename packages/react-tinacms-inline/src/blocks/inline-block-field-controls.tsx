@@ -98,6 +98,7 @@ export function BlocksControls({
 
   const handleSetActiveBlock = (event: any) => {
     if (
+      blockMenuRef.current?.contains(event.target) ||
       blockMoveUpRef.current?.contains(event.target) ||
       blockMoveDownRef.current?.contains(event.target)
     ) {
