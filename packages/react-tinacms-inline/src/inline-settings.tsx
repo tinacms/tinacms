@@ -89,7 +89,7 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
     [form]
   )
   return (
-    <Modal>
+    <Modal onClick={e => e.stopPropagation()}>
       <ModalPopup>
         <ModalHeader close={close}>Settings</ModalHeader>
         <ModalBody>
