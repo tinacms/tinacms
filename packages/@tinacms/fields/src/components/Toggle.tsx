@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { FC } from 'react'
-import styled, { css } from 'styled-components'
+import styled from 'styled-components'
 import * as React from 'react'
 
 export interface ToggleProps {
