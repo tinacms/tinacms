@@ -33,6 +33,9 @@ export const TagsField = wrapFieldsWithMeta<
       if (form.getFieldState(field.name)?.value?.includes(tag)) {
         return
       }
+      if (!tag.length) {
+        return
+      }
       form.mutators.insert(field.name, 0, tag)
       setValue('')
     },
