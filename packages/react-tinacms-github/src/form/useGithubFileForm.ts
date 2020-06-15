@@ -32,8 +32,12 @@ export const useGithubFileForm = <T = any>(
   const cms = useCMS()
   const [getSha, setSha] = useGitFileSha(file)
 
+  const github: GithubClient = cms.api.github
+
+  const branch = github.branchName
+
   const [formData, form] = useForm({
-    id: file.fileRelativePath, // needs to be unique
+    id: `${branch}:${file.fileRelativePath}`, // needs to be unique
     label: options.label || file.fileRelativePath,
     initialValues: file.data,
     fields: options.fields || [],
@@ -61,6 +65,9 @@ export const useGithubFileForm = <T = any>(
         })
     },
   })
+
+  // @ts-ignore
+  window.form = form
 
   return [formData || file.data, form]
 }
