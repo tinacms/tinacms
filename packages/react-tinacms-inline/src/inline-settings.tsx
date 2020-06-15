@@ -89,16 +89,16 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
     [form]
   )
   return (
-    <Modal>
+    <Modal onClick={e => e.stopPropagation()}>
       <ModalPopup>
         <ModalHeader close={close}>Settings</ModalHeader>
         <ModalBody>
           <DragDropContext onDragEnd={moveArrayItem}>
-            <Wrapper>
-              <FormPortalProvider>
+            <FormBody>
+              <Wrapper>
                 <FieldsBuilder form={form} fields={formFields} />
-              </FormPortalProvider>
-            </Wrapper>
+              </Wrapper>
+            </FormBody>
           </DragDropContext>
         </ModalBody>
         <ModalActions>
@@ -115,6 +115,17 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
     </Modal>
   )
 }
+
+const FormBody = styled(FormPortalProvider)`
+  position: relative;
+  flex: 1 1 auto;
+  display: flex;
+  flex-direction: column;
+  width: 100%;
+  overflow: auto;
+  border-top: 1px solid var(--tina-color-grey-2);
+  background-color: #f6f6f9;
+`
 
 const Wrapper = styled.div`
   display: block;

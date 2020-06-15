@@ -26,7 +26,8 @@ import {
   useInlineForm,
 } from 'react-tinacms-inline'
 import grayMatter from 'gray-matter'
-import { Wysiwyg } from 'tinacms'
+import { useCMS } from 'tinacms'
+import { Wysiwyg } from 'react-tinacms-editor'
 import Link from 'next/link'
 
 const Post: NextPage<{ post: MarkdownFile }> = props => {
@@ -39,6 +40,7 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
   })
 
   if (!form) return null
+  const cms = useCMS()
 
   return (
     <InlineForm form={form}>
@@ -55,7 +57,6 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
       </nav>
       <article>
         <header>
-          <EditToggle />
           <SaveButton />
           <ResetButton />
           <h1>
@@ -63,9 +64,9 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
           </h1>
         </header>
         <InlineField name="markdownBody">
-          {({ input, meta, status }) => {
-            if (status === 'active') {
-              return <Wysiwyg input={input} meta={meta} />
+          {({ input }) => {
+            if (cms.enabled) {
+              return <Wysiwyg input={input} />
             }
 
             return <ReactMarkdown>{input.value}</ReactMarkdown>
@@ -94,25 +95,10 @@ Post.getInitialProps = async function(ctx) {
 
 export default Post
 
-function EditToggle() {
-  const { status, activate, deactivate } = useInlineForm()
-  const editing = status === 'active'
-  return (
-    <button
-      onClick={() => {
-        if (editing) deactivate()
-        else activate()
-      }}
-    >
-      {editing ? 'Preview' : 'Edit'}
-    </button>
-  )
-}
-
 function SaveButton() {
-  const { status, form } = useInlineForm()
-  const editing = status === 'active'
-  if (!editing) return null
+  const cms = useCMS()
+  const { form } = useInlineForm()
+  if (cms.disabled) return null
   return (
     <button
       onClick={() => {
@@ -125,9 +111,9 @@ function SaveButton() {
 }
 
 function ResetButton() {
-  const { status, form } = useInlineForm()
-  const editing = status === 'active'
-  if (!editing) return null
+  const { form } = useInlineForm()
+  const cms = useCMS()
+  if (cms.disabled) return null
   return (
     <button
       onClick={() => {

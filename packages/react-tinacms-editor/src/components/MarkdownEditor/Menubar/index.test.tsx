@@ -17,15 +17,20 @@ limitations under the License.
 */
 
 import React from 'react'
-import { render } from '@testing-library/react'
+import { renderWithProviders } from '../../../test-utils/renderWithProviders'
 
 import { Menubar } from './index'
 
-jest.mock('../../../context/editorState')
-
 describe('MenuBar', () => {
   it('should render Menubar', () => {
-    render(<Menubar toggleEditorMode={() => {}} />)
+    renderWithProviders(<Menubar />)
     expect(document.getElementsByTagName('button').length).toBeGreaterThan(0)
+  })
+
+  it('should have markdown toggle option present', () => {
+    const { findByTestId } = renderWithProviders(
+      <Menubar uploadImages={(() => {}) as any} />
+    )
+    expect(findByTestId('markdown-toggle')).toBeDefined()
   })
 })

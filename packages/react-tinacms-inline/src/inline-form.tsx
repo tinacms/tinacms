@@ -20,11 +20,11 @@ import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
+import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 
 export interface InlineFormProps {
   form: Form
   children: React.ReactElement | React.ReactElement[] | InlineFormRenderChild
-  initialStatus?: InlineFormStatus
 }
 
 export interface InlineFormRenderChild {
@@ -40,31 +40,31 @@ export interface InlineFormState {
   form: Form
   focussedField: string
   setFocussedField(field: string): void
-  status: InlineFormStatus
-  activate(): void
-  deactivate(): void
 }
 
-export type InlineFormStatus = 'active' | 'inactive'
-
-export function InlineForm({
-  form,
-  children,
-  initialStatus = 'inactive',
-}: InlineFormProps) {
+export function InlineForm({ form, children }: InlineFormProps) {
   const [focussedField, setFocussedField] = React.useState<string>('')
-  const [status, setStatus] = React.useState<InlineFormStatus>(initialStatus)
 
   const inlineFormState = React.useMemo(() => {
     return {
       form,
-      status,
       focussedField,
       setFocussedField,
-      activate: () => setStatus('active'),
-      deactivate: () => setStatus('inactive'),
     }
-  }, [form, status, focussedField])
+  }, [form, focussedField])
+
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      if (!result.destination || !form) return
+      const name = result.type
+      const from = result.source.index
+      const to = result.destination.index
+
+      setFocussedField(`${name}.${to}`)
+      form.mutators.move(name, from, to)
+    },
+    [form]
+  )
 
   return (
     <InlineFormContext.Provider value={inlineFormState}>
@@ -74,20 +74,22 @@ export function InlineForm({
         allowClickPropagation
         onDismiss={() => setFocussedField('')}
       >
-        <div onClick={() => setFocussedField('')}>
-          <FormBuilder form={form}>
-            {({ form, ...formProps }) => {
-              if (typeof children !== 'function') {
-                return children
-              }
+        <DragDropContext onDragEnd={moveArrayItem}>
+          <div onClick={() => setFocussedField('')}>
+            <FormBuilder form={form}>
+              {({ form, ...formProps }) => {
+                if (typeof children !== 'function') {
+                  return children
+                }
 
-              return children({
-                ...formProps,
-                ...inlineFormState,
-              })
-            }}
-          </FormBuilder>
-        </div>
+                return children({
+                  ...formProps,
+                  ...inlineFormState,
+                })
+              }}
+            </FormBuilder>
+          </div>
+        </DragDropContext>
       </Dismissible>
     </InlineFormContext.Provider>
   )

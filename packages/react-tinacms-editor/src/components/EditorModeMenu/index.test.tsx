@@ -17,17 +17,13 @@ limitations under the License.
 */
 
 import React from 'react'
-import { render } from '@testing-library/react'
+import { renderWithProviders } from '../../test-utils/renderWithProviders'
 
 import { EditorModeMenu } from './index'
 
-jest.mock('../../context/editorState')
-
 describe('EditorModeMenu', () => {
   it('should render a menu option', () => {
-    const { findByTestId } = render(
-      <EditorModeMenu toggleEditorMode={() => {}} />
-    )
+    const { findByTestId } = renderWithProviders(<EditorModeMenu />)
     expect(findByTestId('markdown-toggle')).toBeDefined()
   })
 })

@@ -17,16 +17,25 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FunctionComponent } from 'react'
-
-import { HeadingIcon } from '@tinacms/icons'
+import { RedoIcon, UndoIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenuItem: FunctionComponent = () => {
-  return (
-    <MenuButton data-tooltip={'Heading'} disabled>
-      <HeadingIcon />
-    </MenuButton>
-  )
-}
+export const MarkdownMenu = () => (
+  <>
+    <UndoControl />
+    <RedoControl />
+  </>
+)
+
+const UndoControl = () => (
+  <MenuButton data-tooltip="Undo" data-side="top" disabled>
+    <UndoIcon />
+  </MenuButton>
+)
+
+const RedoControl = () => (
+  <MenuButton data-tooltip="Redo" data-side="top" disabled>
+    <RedoIcon />
+  </MenuButton>
+)

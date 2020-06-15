@@ -49,7 +49,7 @@ export function InlineImage({
 
   return (
     <InlineField name={name}>
-      {({ input, status, form }) => {
+      {({ input, form }) => {
         const _previewSrc = previewSrc(form.finalForm.getState().values)
 
         async function handleUploadImage([file]: File[]) {
@@ -71,7 +71,7 @@ export function InlineImage({
           return null
         }
 
-        if (status === 'active') {
+        if (cms.enabled) {
           if (!focusRing) {
             return (
               <InlineImageUpload
@@ -121,18 +121,15 @@ function InlineImageUpload({
   previewSrc,
   children,
 }: InlineImageUploadProps) {
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({ accept: 'image/*', onDrop })
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop,
+  })
 
   if (!value) return <ImagePlaceholder />
 
   return (
-    <div {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+    <div {...getRootProps()}>
       <input {...getInputProps()} />
       <div>{children ? children(previewSrc) : <img src={previewSrc} />}</div>
     </div>
