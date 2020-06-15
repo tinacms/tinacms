@@ -25,27 +25,23 @@ export const previewHandler = (signingKey: string) => (req: any, res: any) => {
   // Parse out the amalgamated token
   const token = (req.headers['authorization'] || '').split(' ')[1] || null
 
-  var verifiedAuthToken: string | null = null
-
   if (token && expectedCSRFToken) {
     const decryptedToken = AES.decrypt(token, signingKey).toString(enc.Utf8)
 
     const [csrfToken, authToken] = decryptedToken.split('.')
 
     if (csrfToken == expectedCSRFToken) {
-      verifiedAuthToken = authToken
+      const previewData = {
+        working_repo_full_name: req.cookies[WORKING_REPO_KEY],
+        github_access_token: authToken,
+        head_branch:
+          req.cookies[HEAD_BRANCH_KEY] || process.env.BASE_BRANCH || 'master',
+      }
+      res.setPreviewData(previewData)
+      res.status(200).end()
+    } else {
+      res.status(400).json('Bad Credentials')
     }
-  }
-
-  if (verifiedAuthToken) {
-    const previewData = {
-      working_repo_full_name: req.cookies[WORKING_REPO_KEY],
-      github_access_token: verifiedAuthToken,
-      head_branch:
-        req.cookies[HEAD_BRANCH_KEY] || process.env.BASE_BRANCH || 'master',
-    }
-    res.setPreviewData(previewData)
-    res.status(200).end()
   } else {
     res.status(400).json('Bad Credentials')
   }
