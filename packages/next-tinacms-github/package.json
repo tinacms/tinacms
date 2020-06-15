@@ -13,13 +13,17 @@
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
-    "@types/cookie": "0.3.3"
+    "@types/cookie": "0.3.3",
+    "@types/crypto-js": "^3.1.47",
+    "@types/uuid": "^8.0.0"
   },
   "dependencies": {
     "atob": "2.1.2",
     "axios": "0.19.2",
     "cookie": "0.4.0",
+    "crypto-js": "^4.0.0",
     "gray-matter": "4.0.2",
-    "qs": "6.9.3"
+    "qs": "6.9.3",
+    "uuid": "^8.1.0"
   }
 }
