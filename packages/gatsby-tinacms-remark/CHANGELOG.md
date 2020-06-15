@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.3](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.8.3-alpha.0...gatsby-tinacms-remark@0.8.3) (2020-06-15)
+
+**Note:** Version bump only for package gatsby-tinacms-remark
+
+
+
+
+
 ## [0.8.3-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-remark@0.8.2...gatsby-tinacms-remark@0.8.3-alpha.0) (2020-06-12)
 
 
