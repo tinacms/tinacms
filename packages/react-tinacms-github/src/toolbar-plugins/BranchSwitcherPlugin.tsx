@@ -166,6 +166,10 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
             }
             setConfirmSwitchProps(null)
             setCreateBranchProps(null)
+            cms.events.dispatch({
+              type: 'github:branch:checkout',
+              branchName: confirmSwitchProps.name,
+            })
           }}
           close={() => {
             setConfirmSwitchProps(null)
