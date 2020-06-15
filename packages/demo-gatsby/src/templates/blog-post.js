@@ -26,7 +26,6 @@ import { rhythm } from "../utils/typography"
 import { useRemarkForm, DeleteAction } from "gatsby-tinacms-remark"
 import Img from "gatsby-image"
 import { ModalProvider, usePlugin } from "tinacms"
-import { EditToggle } from "../components/edit-toggle"
 
 import {
   InlineForm,
@@ -42,14 +41,14 @@ import { useCMS } from "tinacms"
 const get = require("lodash.get")
 
 function InlineWysiwyg(props) {
-  const { status } = useInlineForm()
+  const cms = useCMS()
   const [{ InlineWysiwyg }, setEditor] = React.useState({})
 
   React.useEffect(() => {
-    if (!InlineWysiwyg && status === "active") {
+    if (!InlineWysiwyg && cms.enabled) {
       import("react-tinacms-editor").then(setEditor)
     }
-  }, [status])
+  }, [cms.enabled])
 
   if (InlineWysiwyg) {
     return <InlineWysiwyg {...props} />
@@ -187,6 +186,7 @@ function BlogPostTemplate(props) {
             ></InlineBlocks>
 
             <InlineWysiwyg
+              sticky="74px"
               name="rawMarkdownBody"
               imageProps={{
                 async upload(files) {
@@ -210,7 +210,6 @@ function BlogPostTemplate(props) {
               />
             </InlineWysiwyg>
           </div>
-          <EditToggle />
           <div
             style={{
               marginBottom: rhythm(1),

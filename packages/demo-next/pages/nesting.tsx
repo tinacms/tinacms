@@ -15,18 +15,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { useForm, usePlugin } from 'tinacms'
+import { useForm, usePlugin, ActionButton } from 'tinacms'
 import {
   InlineForm,
   InlineGroup,
-  InlineGroupControls,
   InlineText,
   InlineTextarea,
   InlineBlocks,
   BlocksControls,
 } from 'react-tinacms-inline'
+import styled from 'styled-components'
 
 import Layout from '../components/Layout'
+
+const TestAction = () => {
+  return (
+    <ActionButton
+      onClick={() => {
+        alert('nailed it')
+      }}
+    >
+      Test Action
+    </ActionButton>
+  )
+}
+
+const AnotherAction = () => {
+  return (
+    <ActionButton
+      onClick={() => {
+        alert('nailed it')
+      }}
+    >
+      Another Action
+    </ActionButton>
+  )
+}
 
 export default function Nesting() {
   const [values, form] = useForm({
@@ -76,6 +100,7 @@ export default function Nesting() {
     },
     label: 'Nesting',
     fields: [],
+    actions: [TestAction, AnotherAction],
     onSubmit() {},
   })
 
@@ -87,13 +112,16 @@ export default function Nesting() {
 
   return (
     <Layout>
-      <InlineForm form={form} initialStatus="active">
+      <InlineForm form={form}>
         <section>
           {/* Grouped Top-Level Field */}
           <div className="group">
             <InlineGroup
               name="hero"
-              fields={[{ name: 'description', component: 'textarea' }]}
+              fields={[
+                { name: 'description', component: 'textarea' },
+                { name: 'toggle', component: 'toggle' },
+              ]}
             >
               <h1>
                 <InlineTextarea name="title" focusRing={false} />
@@ -116,7 +144,11 @@ export default function Nesting() {
                 },
               ]}
               focusRing={{
-                offset: 24,
+                offset: {
+                  x: 18,
+                  y: 32,
+                },
+                borderRadius: 10,
               }}
               insetControls={true}
             >
@@ -174,20 +206,26 @@ const POSTS = {
     },
     Component({ index, data }) {
       return (
-        <div className="post">
-          <BlocksControls index={index}>
+        <BlocksControls index={index} focusRing={{ offset: 8 }}>
+          <div className="post">
             <h3>
               <InlineTextarea name="title" />
             </h3>
-            <p>{data.summary}</p>
-          </BlocksControls>
+            {data.summary && <p>{data.summary}</p>}
+          </div>
           <style jsx>{`
+            h3:last-child {
+              margin-bottom: 0;
+            }
+            p {
+              margin-bottom: 0;
+            }
             div.post {
-              margin: 2rem 0;
+              padding: 0.5rem 0;
               width: 100%;
             }
           `}</style>
-        </div>
+        </BlocksControls>
       )
     },
   },
@@ -201,7 +239,10 @@ const COLORS = {
       itemProps: item => ({
         label: `${item.name} – ${item.color}`,
       }),
-      fields: [{ name: 'color', component: 'color' }],
+      fields: [
+        { name: 'color', component: 'color' },
+        { name: 'toggle', component: 'toggle' },
+      ],
       defaultItem: {
         name: 'Red',
         color: 'fff',
@@ -234,30 +275,37 @@ const ROW = {
   },
   Component({ index, data }) {
     return (
-      <>
-        <BlocksControls index={index}>
-          <div className="row">
-            <InlineBlocks
-              name="items"
-              blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
-              direction="row"
-            />
-          </div>
-        </BlocksControls>
-        <style jsx>
-          {`
-            div.row {
-              background: lightpink;
-              margin: 1rem 0;
-              display: flex;
-              flex-direction: row;
-            }
-          `}
-        </style>
-      </>
+      <BlocksControls index={index}>
+        <BlockPadding>
+          <InlineBlocksRow
+            name="items"
+            blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
+            direction="row"
+          />
+        </BlockPadding>
+      </BlocksControls>
     )
   },
 }
+
+const BlockPadding = styled.div`
+  padding: 0.5rem 0;
+`
+
+const InlineBlocksRow = styled(InlineBlocks)`
+  background: lightpink;
+  margin: 0;
+  display: flex;
+  flex-direction: row;
+`
+
+const InlineBlocksColumn = styled(InlineBlocks)`
+  background: lightgreen;
+  margin: 0;
+  display: flex;
+  flex-direction: column;
+  height: 100%;
+`
 
 const COL = {
   template: {
@@ -273,7 +321,7 @@ const COL = {
       <>
         <BlocksControls
           index={index}
-          focusRing={{ offset: 0, borderRadius: 0 }}
+          focusRing={{ offset: { x: -8, y: 10 }, borderRadius: 0 }}
         >
           <div className="col">
             <InlineBlocks

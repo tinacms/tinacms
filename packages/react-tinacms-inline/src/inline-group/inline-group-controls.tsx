@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { css } from 'styled-components'
+import { useCMS } from 'tinacms'
 
 import { InlineSettings } from '../inline-settings'
 import { useInlineForm } from '../inline-form'
@@ -27,17 +27,13 @@ import {
   BlockMenu,
   BlockMenuWrapper,
 } from '../blocks/inline-block-field-controls'
+import { FocusRingStyleProps } from '../styles'
 
 interface InlineGroupControls {
   name: string
   children: any
   insetControls?: boolean
-  focusRing?: false | FocusRingProps
-}
-
-export interface FocusRingProps {
-  offset?: number
-  borderRadius?: number
+  focusRing?: false | FocusRingStyleProps
 }
 
 export function InlineGroupControls({
@@ -46,12 +42,13 @@ export function InlineGroupControls({
   insetControls,
   focusRing = {},
 }: InlineGroupControls) {
-  const { status, focussedField, setFocussedField } = useInlineForm()
+  const cms = useCMS()
+  const { focussedField, setFocussedField } = useInlineForm()
   const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
   const { fields } = React.useContext(InlineFieldContext)
 
-  if (status === 'inactive') {
+  if (cms.disabled) {
     return children
   }
 
@@ -76,7 +73,8 @@ export function InlineGroupControls({
       borderRadius={
         typeof focusRing === 'object' ? focusRing.borderRadius : undefined
       }
-      disableHover={focusRing === false ? true : childIsActive}
+      disableHover={!focusRing && childIsActive}
+      disableChildren={focusRing && !active && !childIsActive}
     >
       <BlockMenuWrapper
         ref={groupMenuRef}
@@ -88,15 +86,7 @@ export function InlineGroupControls({
           <InlineSettings fields={fields} />
         </BlockMenu>
       </BlockMenuWrapper>
-      <GroupChildren disableClick={!active && !childIsActive}>
-        {children}
-      </GroupChildren>
+      {children}
     </FocusRing>
   )
 }
-
-const GroupChildren = styled.div<{ disableClick: boolean }>(
-  ({ disableClick }) => css`
-    ${disableClick && `pointer-events: none;`};
-  `
-)

@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
+import { useCMS, CMS } from 'tinacms'
 import { InlineField } from '../inline-field'
 import { InputFocusWrapper } from '../styles'
 
@@ -38,10 +39,12 @@ export function InlineText({
   className,
   focusRing = true,
 }: InlineTextProps) {
+  const cms: CMS = useCMS()
+
   return (
     <InlineField name={name}>
-      {({ input, status }) => {
-        if (status === 'active') {
+      {({ input }) => {
+        if (cms.enabled) {
           if (!focusRing) {
             return <Input type="text" {...input} className={className} />
           }

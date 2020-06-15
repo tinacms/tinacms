@@ -85,7 +85,7 @@ function runChecksOnPullRequest() {
   allFiles.filter(fileNeedsLicense).forEach(checkFileForLicenseHeader)
 
   // Packages
-  let modifiedPackages = getModifiedPackages(allFiles)
+  const modifiedPackages = getModifiedPackages(allFiles)
 
   // modifiedPackages.forEach(warnIfMissingTestChanges)
   modifiedPackages.forEach(checkForNpmScripts)
@@ -145,7 +145,7 @@ Update Docs for tinacms#${danger.github.pr.number}
   )}&body=${updateDocBody(changes)}">Create Issue</a>
 `)
 
-const updateDocTitle = (changes: [string, Dep][]) =>
+const updateDocTitle = (_changes: [string, Dep][]) =>
   encodeURIComponent(`Update Docs for tinacms#${danger.github.pr.number}`)
 
 const updateDocBody = (changes: [string, Dep][]) =>
@@ -174,11 +174,9 @@ const fileLink = (file: string) => {
  */
 function checkForMilestone() {
   // @ts-ignore
-  if (danger.github.pr.milestone) {
-    // @ts-ignore
-    let milestone: Milestone = danger.github.pr.milestone
+  const milestone: Milestone = danger.github.pr.milestone
+  if (milestone) {
     message(
-      // @ts-ignore
       `You can expect the changes in this PR to be published on ${formatDate(
         new Date(milestone.due_on)
       )}`
@@ -210,7 +208,7 @@ function formatDate(date: Date) {
  * ```
  */
 function listTouchedWorkflows(allFiles: string[]) {
-  let touchedWorkflows = allFiles.filter(
+  const touchedWorkflows = allFiles.filter(
     filepath =>
       filepath.startsWith('.github/workflows/') ||
       filepath.endsWith('dangerfile.ts')
@@ -229,9 +227,9 @@ function checkForNpmScripts({ packageJson }: TinaPackage) {
   if (packageJson.name === '@tinacms/scripts') {
     return
   }
-  let scripts = packageJson.scripts || {}
+  const scripts = packageJson.scripts || {}
 
-  let requiredScripts: (keyof TinaPackage['packageJson']['scripts'])[] = [
+  const requiredScripts: (keyof TinaPackage['packageJson']['scripts'])[] = [
     'build',
   ]
 
@@ -246,7 +244,7 @@ function checkForNpmScripts({ packageJson }: TinaPackage) {
  *
  */
 function checkForLicense({ packageJson }: TinaPackage) {
-  let license = 'Apache-2.0'
+  const license = 'Apache-2.0'
   if (packageJson.license !== license) {
     fail(`${packageJson.name} package.json is missing the license: ${license}`)
   }
@@ -264,7 +262,7 @@ function fileNeedsLicense(filepath: string) {
  */
 function checkFileForLicenseHeader(filepath: string) {
   try {
-    let content = fs.readFileSync(path.resolve(`./${filepath}`), {
+    const content = fs.readFileSync(path.resolve(`./${filepath}`), {
       encoding: 'utf8',
     })
 
@@ -305,27 +303,11 @@ The following packages were modified by this pull request:
 }
 
 /**
- * Example Output:
- *
- * ```
- * `@tinacms/core` may need new tests.
- * ```
- */
-function warnIfMissingTestChanges({ path, packageJson }: TinaPackage) {
-  const hasTestChanges = !!danger.git.modified_files.find(p =>
-    p.match(/.*.test.tsx?/)
-  )
-  if (!hasTestChanges) {
-    warn(`\`${packageJson.name}\` may need new tests.`)
-  }
-}
-
-/**
  * Lists all packages modified by this PR.
  */
 function getModifiedPackages(allFiles: string[]) {
-  let packageList: TinaPackage[] = []
-  let paths = new Set(
+  const packageList: TinaPackage[] = []
+  const paths = new Set(
     allFiles
       .filter(filepath => filepath.startsWith('packages/'))
       .filter(filepath => !filepath.startsWith('packages/demo'))
@@ -357,7 +339,7 @@ function getModifiedPackages(allFiles: string[]) {
 
   paths.forEach(path => {
     try {
-      let packageJson = require(`./${path}/package.json`)
+      const packageJson = require(`./${path}/package.json`)
 
       packageList.push({
         path,
@@ -401,11 +383,6 @@ function checkDeps(tinaPackage: TinaPackage) {
         warnAboutUnused(tinaPackage, type, results[type])
       }
     })
-
-    const missingDeps = Object.keys(results.missing)
-    if (missingDeps.length > 0) {
-      warnAboutMissingDeps(tinaPackage, missingDeps)
-    }
   })
 }
 
@@ -415,12 +392,6 @@ const warnAboutUnused = (
   deps: string[]
 ) =>
   warn(`${packageJson.name} has unused ${type}
-
-${deps.map(dep => `* ${dep}`).join('\n')}\n
-`)
-
-const warnAboutMissingDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
-  warn(`${packageJson.name} is missing dependencies for the following packages:
 
 ${deps.map(dep => `* ${dep}`).join('\n')}\n
 `)

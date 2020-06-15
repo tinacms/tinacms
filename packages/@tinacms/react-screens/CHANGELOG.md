@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.8](https://github.com/tinacms/tinacms/compare/@tinacms/react-screens@0.1.8-alpha.0...@tinacms/react-screens@0.1.8) (2020-06-15)
+
+**Note:** Version bump only for package @tinacms/react-screens
+
+
+
+
+
+## [0.1.8-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-screens@0.1.7...@tinacms/react-screens@0.1.8-alpha.0) (2020-06-12)
+
+**Note:** Version bump only for package @tinacms/react-screens
+
+
+
+
+
 ## [0.1.7](https://github.com/tinacms/tinacms/compare/@tinacms/react-screens@0.1.6...@tinacms/react-screens@0.1.7) (2020-06-08)
 
 **Note:** Version bump only for package @tinacms/react-screens
