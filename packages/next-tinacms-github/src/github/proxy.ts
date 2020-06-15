@@ -27,32 +27,28 @@ export const apiProxy = (signingKey: string) => (req: any, res: any) => {
 
   const expectedCSRFToken = req.cookies[CSRF_TOKEN_KEY]
 
-  var verifiedAuthToken: string | null = null
-
   if (token && expectedCSRFToken) {
     const decryptedToken = AES.decrypt(token, signingKey).toString(enc.Utf8)
 
     const [csrfToken, authToken] = decryptedToken.split('.')
 
     if (csrfToken == expectedCSRFToken) {
-      verifiedAuthToken = authToken
+      axios({
+        ...data,
+        headers: {
+          ...headers,
+          Authorization: 'token ' + authToken,
+        },
+      })
+        .then((resp: any) => {
+          res.status(resp.status).json(resp.data)
+        })
+        .catch((err: any) => {
+          res.status(err.response.status).json(err.response.data)
+        })
+    } else {
+      res.status(400).json('Bad Credentials')
     }
-  }
-
-  if (verifiedAuthToken) {
-    axios({
-      ...data,
-      headers: {
-        ...headers,
-        Authorization: 'token ' + verifiedAuthToken,
-      },
-    })
-      .then((resp: any) => {
-        res.status(resp.status).json(resp.data)
-      })
-      .catch((err: any) => {
-        res.status(err.response.status).json(err.response.data)
-      })
   } else {
     res.status(400).json('Bad Credentials')
   }
