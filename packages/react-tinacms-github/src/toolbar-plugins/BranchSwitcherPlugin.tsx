@@ -143,7 +143,12 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
         <CreateBranchModal
           current={github.branchName}
           name={createBranchProps.name}
-          onBranchChange={onBranchChange}
+          onBranchChange={(name: string) => {
+            if (onBranchChange) {
+              onBranchChange(name)
+            }
+            setCreateBranchProps(null)
+          }}
           close={() => {
             setCreateBranchProps(null)
           }}
@@ -159,6 +164,8 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
             if (onBranchChange) {
               onBranchChange(confirmSwitchProps.name)
             }
+            setConfirmSwitchProps(null)
+            setCreateBranchProps(null)
           }}
           close={() => {
             setConfirmSwitchProps(null)
