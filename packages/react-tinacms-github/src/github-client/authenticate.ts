@@ -43,7 +43,7 @@ export const authenticate = (
               localStorage.setItem('token', token)
             } else {
               console.warn(
-                'Deprecation Notice: You are using an old authentication flow, please migrate to the new one (see https://tinacms.org/blog/the-new-github-auth-flow)'
+                'Deprecation Notice: You are using an old authentication flow, please migrate to the new one (see https://tinacms.org/blog/upgrade-notice-tinacms-github-packages)'
               )
             }
             if (authTab) {
