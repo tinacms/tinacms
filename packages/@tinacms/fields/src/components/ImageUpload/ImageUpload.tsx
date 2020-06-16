@@ -107,16 +107,13 @@ export const ImageUpload = ({
   previewSrc,
   loading,
 }: ImageUploadProps) => {
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({ accept: 'image/*', onDrop })
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop,
+  })
 
   return (
-    <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+    <DropArea {...getRootProps()}>
       <input {...getInputProps()} />
       {value ? (
         <StyledImageContainer>

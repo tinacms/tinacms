@@ -21,7 +21,7 @@ import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
 
 import { markControl } from '../../../components/MenuHelpers'
 
-export const MenuItem = () => (
+export const ProsemirrorMenu = () => (
   <>
     <BoldControl />
     <ItalicControl />
