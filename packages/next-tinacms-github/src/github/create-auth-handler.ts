@@ -16,30 +16,42 @@ limitations under the License.
 
 */
 
-import { ACCESS_TOKEN_KEY } from '../constants'
-
-const qs = require('qs')
-const axios = require('axios')
+import { CSRF_TOKEN_KEY } from '../constants'
+import { v4 as uuidv4 } from 'uuid'
+import { AES } from 'crypto-js'
+import qs from 'qs'
+import axios from 'axios'
 import { serialize } from 'cookie'
 
-export const createAuthHandler = (clientId: string, secret: string) => (
-  req: any,
-  res: any
-) => {
+export const createAuthHandler = (
+  clientId: string,
+  secret: string,
+  signingKey: string
+) => (req: any, res: any) => {
   createAccessToken(clientId, secret, req.query.code, req.query.state).then(
     (tokenResp: any) => {
       const { access_token, error } = qs.parse(tokenResp.data)
       if (error) {
         res.status(400).json({ error })
       } else {
+        // Generate the csrf token
+        const csrfToken = uuidv4()
+
+        // Sign the amalgamated token
+        const unsignedToken = `${csrfToken}.${access_token}`
+        const signedToken = AES.encrypt(unsignedToken, signingKey).toString()
+
+        // Set the csrf token as an httpOnly cookie
         res.setHeader(
           'Set-Cookie',
-          serialize(ACCESS_TOKEN_KEY, access_token, {
+          serialize(CSRF_TOKEN_KEY, csrfToken, {
             path: '/',
             httpOnly: true,
           })
         )
-        res.status(200).json({})
+
+        // Return the amalgamated token
+        res.status(200).json({ signedToken })
       }
     }
   )
