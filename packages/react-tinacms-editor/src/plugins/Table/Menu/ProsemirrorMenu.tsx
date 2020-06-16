@@ -31,7 +31,7 @@ function insertTableCmd(state: EditorState, dispatch: any) {
   return insertTable(state, dispatch)
 }
 
-export const MenuItem = commandControl(
+export const ProsemirrorMenu = commandControl(
   insertTableCmd,
   TableIcon,
   'Table',

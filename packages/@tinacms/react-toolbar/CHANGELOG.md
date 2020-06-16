@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.2.0-alpha.0...@tinacms/react-toolbar@0.2.0) (2020-06-15)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.7-alpha.0...@tinacms/react-toolbar@0.2.0-alpha.0) (2020-06-12)
+
+
+### Features
+
+* add exit tina button to form actions ([4c38a00](https://github.com/tinacms/tinacms/commit/4c38a00))
+
+
+
+
+
 ## [0.1.7-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.6...@tinacms/react-toolbar@0.1.7-alpha.0) (2020-06-08)
 
 **Note:** Version bump only for package @tinacms/react-toolbar

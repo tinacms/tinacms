@@ -26,7 +26,7 @@ import {
 import { Schema } from 'prosemirror-model'
 
 import { KeymapPlugin } from '../../types'
-import { findPlugins } from '../../context/utils/buildEditorState'
+import { findPlugins } from '../../components/ProsemirrorEditor/utils/plugin'
 import { KEYMAP_PLUGINS } from './keymap'
 
 const mac =

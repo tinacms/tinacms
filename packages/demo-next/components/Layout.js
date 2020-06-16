@@ -45,6 +45,7 @@ export default function Layout(props) {
             padding: 0 2rem;
             min-height: 100vh;
             margin-top 2rem;
+            overflow: hidden;
           }
           @media (min-width: 768px) {
             .layout {

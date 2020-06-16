@@ -17,25 +17,27 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { RedoIcon, UndoIcon } from '@tinacms/icons'
+import { useState } from 'react'
+import { createContext, useContext } from 'react'
 
-import { MenuButton } from '../../../components/MenuHelpers'
+const EditorModeContext = createContext<{
+  mode: string
+  setMode: (mode: string) => void
+}>({
+  mode: 'wysiwyg',
+  setMode: () => {},
+})
 
-export const MarkdownMenuItem = () => (
-  <>
-    <UndoControl />
-    <RedoControl />
-  </>
-)
+export const EditorModeProvider = ({ children }: any) => {
+  const [mode, setMode] = useState('wysiwyg')
 
-const UndoControl = () => (
-  <MenuButton data-tooltip="Undo" data-side="top" disabled>
-    <UndoIcon />
-  </MenuButton>
-)
+  return (
+    <EditorModeContext.Provider value={{ mode, setMode }}>
+      {children}
+    </EditorModeContext.Provider>
+  )
+}
 
-const RedoControl = () => (
-  <MenuButton data-tooltip="Redo" data-side="top" disabled>
-    <RedoIcon />
-  </MenuButton>
-)
+export const EditorModeConsumer = EditorModeContext.Consumer
+
+export const useEditorModeContext = () => useContext(EditorModeContext)

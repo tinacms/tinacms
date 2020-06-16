@@ -20,11 +20,10 @@ import {
   InlineText,
   InlineImage,
   InlineGroup,
-  InlineGroupControls,
   InlineTextarea,
 } from 'react-tinacms-inline'
 import { InlineWysiwyg } from 'react-tinacms-editor'
-import { EditToggle, DiscardChanges } from './blocks'
+import { DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'
 
@@ -64,7 +63,6 @@ function Info(props) {
               Error
             </button>
           </div>
-          <EditToggle />
           <DiscardChanges />
           <div className="group">
             <InlineGroup

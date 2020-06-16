@@ -16,13 +16,13 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { LinkIcon } from '@tinacms/icons'
+import { Schema } from 'prosemirror-model'
+import { MarkdownTranslator, Format, DOMTranslator } from '../../../translator'
 
-import { MenuButton } from '../../../components/MenuHelpers'
-
-export const MarkdownMenuItem = () => (
-  <MenuButton data-tooltip="Link" data-side="top" disabled>
-    <LinkIcon />
-  </MenuButton>
-)
+export const buildTranslator = (
+  schema: Schema,
+  format: Format = 'markdown'
+) => {
+  if (format === 'html') return DOMTranslator.fromSchema(schema)
+  return MarkdownTranslator.fromSchema(schema)
+}

@@ -30,6 +30,7 @@ export interface FormActionMenuProps {
 
 export const FormActionMenu: FC<FormActionMenuProps> = ({ actions, form }) => {
   const [actionMenuVisibility, setActionMenuVisibility] = useState(false)
+
   return (
     <>
       <MoreActionsButton onClick={() => setActionMenuVisibility(p => !p)} />
@@ -108,7 +109,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
 export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   position: relative;
   text-align: center;
-  font-size: var(--tina-font-size-0);
+  font-size: var(--tina-font-size-1);
   padding: 0 12px;
   height: 40px;
   font-weight: var(--tina-font-weight-regular);
@@ -117,12 +118,12 @@ export const ActionButton: StyledComponent<'button', {}, {}> = styled.button`
   cursor: pointer;
   outline: none;
   border: 0;
-  transition: all 85ms ease-out;
+  transition: all var(--tina-timing-medium) ease-out;
   &:hover {
     color: var(--tina-color-primary);
     background-color: var(--tina-color-grey-1);
   }
   &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
+    border-bottom: 1px solid var(--tina-color-grey-2);
   }
 `
