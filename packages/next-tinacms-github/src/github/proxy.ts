@@ -47,9 +47,9 @@ export const apiProxy = (signingKey: string) => (req: any, res: any) => {
           res.status(err.response.status).json(err.response.data)
         })
     } else {
-      res.status(400).json('Bad Credentials')
+      res.status(401).json({ message: 'Invalid CSRF Token: Please try again' })
     }
   } else {
-    res.status(400).json('Bad Credentials')
+    res.status(401).json({ message: 'Missing Credentials: Please try again' })
   }
 }
