@@ -41,6 +41,10 @@ export const authenticate = (
             if (token) {
               // for implementations using the csrf mitigation
               localStorage.setItem('token', token)
+            } else {
+              console.warn(
+                'Deprecation Notice: You are using an old authentication flow, please migrate to the new one (see https://tinacms.org/blog/the-new-auth-flow)'
+              )
             }
             if (authTab) {
               authTab.close()
