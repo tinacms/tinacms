@@ -34,17 +34,25 @@ export const authenticate = (
     let authTab: Window | undefined
     window.addEventListener('storage', function(e: StorageEvent) {
       if (e.key == GITHUB_AUTH_CODE_KEY) {
-        fetch(
-          `${codeExchangeRoute}?code=${e.newValue}&state=${authState}`
-        ).then(() => {
-          if (authTab) {
-            authTab.close()
-          }
-          resolve()
-        })
+        fetch(`${codeExchangeRoute}?code=${e.newValue}&state=${authState}`)
+          .then(response => response.json())
+          .then(data => {
+            const token = data.signedToken || null
+            if (token) {
+              // for implementations using the csrf mitigation
+              localStorage.setItem('token', token)
+            } else {
+              console.warn(
+                'Deprecation Notice: You are using an old authentication flow, please migrate to the new one (see https://tinacms.org/blog/upgrade-notice-tinacms-github-packages)'
+              )
+            }
+            if (authTab) {
+              authTab.close()
+            }
+            resolve()
+          })
       }
     })
-
     authTab = popupWindow(url, '_blank', window, 1000, 700)
   })
 }

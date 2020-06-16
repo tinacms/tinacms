@@ -326,8 +326,22 @@ export class GithubClient {
    * The methods below maybe don't belong on GitHub client, but it's fine for now.
    */
   private proxyRequest(data: any) {
+    // For implementations using the csrf mitigation
+    const token = localStorage.getItem('token') || null
+
+    const headers = new Headers()
+
+    if (token) {
+      headers.append('Authorization', 'Bearer ' + token)
+    } else {
+      console.warn(
+        'Deprecation Notice: You are using an old authentication flow, please migrate to the new one (see https://tinacms.org/blog/upgrade-notice-tinacms-github-packages)'
+      )
+    }
+
     return fetch(this.proxy, {
       method: 'POST',
+      headers: headers,
       body: JSON.stringify(data),
     })
   }
