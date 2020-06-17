@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.10.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.9.0...@tinacms/core@0.10.0-alpha.0) (2020-06-17)
+
+
+### Features
+
+* add cms.toggle to make togling the cms.enabled prop easier ([2f3c288](https://github.com/tinacms/tinacms/commit/2f3c288))
+
+
+
+
+
 # [0.9.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.9.0-alpha.1...@tinacms/core@0.9.0) (2020-06-01)
 
 **Note:** Version bump only for package @tinacms/core

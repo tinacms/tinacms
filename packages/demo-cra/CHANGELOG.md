@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [1.0.36-alpha.0](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.35...demo-cra@1.0.36-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package demo-cra
+
+
+
+
+
 ## [1.0.35](https://github.com/tinacms/tinacms/compare/demo-cra@1.0.35-alpha.1...demo-cra@1.0.35) (2020-06-15)
 
 **Note:** Version bump only for package demo-cra
