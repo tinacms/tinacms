@@ -17,14 +17,43 @@ limitations under the License.
 */
 
 import { setBlockType } from 'prosemirror-commands'
-import { EditorState } from 'prosemirror-state'
+import { EditorState, TextSelection } from 'prosemirror-state'
 
 import { CodeIcon } from '@tinacms/icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
 
 function makeCodeBlock(state: EditorState, dispatch: any) {
-  return setBlockType(state.schema.nodes.code_block)(state, dispatch)
+  const { code_block, paragraph } = state.schema.nodes
+  const { selection, tr } = state
+  const currentNode = selection.$to.node(selection.$to.depth)
+  if (currentNode.type === code_block)
+    return setBlockType(paragraph)(state, dispatch)
+  if (!dispatch || selection.empty)
+    return setBlockType(code_block)(state, dispatch)
+
+  let content = ``
+  let startPos: number | undefined = undefined
+  let endPos: number | undefined = undefined
+  state.doc.nodesBetween(selection.from, selection.to - 1, (node, pos) => {
+    if (node.isTextblock) {
+      if (startPos === undefined) startPos = pos
+      if (content.length)
+        content += `
+`
+      content += node.textContent
+      endPos = pos + node.textContent.length + 1
+    }
+  })
+  const codeBlock = code_block.createChecked()
+  return dispatch(
+    tr
+      .replaceRangeWith(startPos!, endPos! + 1, codeBlock)
+      .insertText(content, startPos! + 1)
+      .setSelection(
+        new TextSelection(tr.doc.resolve(startPos! + content.length + 1))
+      )
+  )
 }
 
 export const ProsemirrorMenu = commandControl(
@@ -32,5 +61,5 @@ export const ProsemirrorMenu = commandControl(
   CodeIcon,
   'Codeblock',
   'Codeblock',
-  false
+  true
 ) //codeblock focusing messes with scroll

@@ -24,8 +24,10 @@ import { commandControl } from '../../../components/MenuHelpers'
 import { insertTable } from '../commands'
 
 function insertTableCmd(state: EditorState, dispatch: any) {
-  const { table } = state.schema.nodes
+  const { table, code_block } = state.schema.nodes
   const { selection } = state
+  const currentNode = selection.$to.node(selection.$to.depth)
+  if (currentNode && currentNode.type === code_block) return false
   const tableParent = findParentNodeOfType(table)(selection)
   if (tableParent) return false
   return insertTable(state, dispatch)
