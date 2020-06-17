@@ -151,6 +151,7 @@ export function InlineBlocks({
 
                       return (
                         <InlineBlock
+                          key={index}
                           index={index}
                           name={blockName}
                           data={data}
