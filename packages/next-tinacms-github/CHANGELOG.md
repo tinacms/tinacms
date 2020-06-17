@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-github@0.1.1...next-tinacms-github@0.2.0-alpha.0) (2020-06-17)
+
+
+### Features
+
+* reworked api calls to work with the new auth flow ([a494f8f](https://github.com/tinacms/tinacms/commit/a494f8f))
+
+
+
+
+
 ## [0.1.1](https://github.com/tinacms/tinacms/compare/next-tinacms-github@0.1.0...next-tinacms-github@0.1.1) (2020-05-25)
 
 

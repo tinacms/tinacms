@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.0...@tinacms/fields@0.12.1-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
 # [0.12.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.0-alpha.1...@tinacms/fields@0.12.0) (2020-06-15)
 
 

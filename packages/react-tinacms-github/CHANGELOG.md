@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.5.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.3...react-tinacms-github@0.5.0-alpha.0) (2020-06-17)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** close modal after auth success ([127ee29](https://github.com/tinacms/tinacms/commit/127ee29))
+* **react-tinacms-github:** close modal after branch change ([c29ba29](https://github.com/tinacms/tinacms/commit/c29ba29))
+
+
+### Features
+
+* react-tinacms-github supports the new auth flow ([31f510d](https://github.com/tinacms/tinacms/commit/31f510d))
+* **react-tinacms-github:** fire event on branch change ([6f3267c](https://github.com/tinacms/tinacms/commit/6f3267c))
+
+
+
+
+
 ## [0.4.3](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.4.3-alpha.1...react-tinacms-github@0.4.3) (2020-06-15)
 
 **Note:** Version bump only for package react-tinacms-github
