@@ -327,7 +327,7 @@ export class GithubClient {
    */
   private proxyRequest(data: any) {
     // For implementations using the csrf mitigation
-    const token = localStorage.getItem('token') || null
+    const token = localStorage.getItem('tinacms-github-token') || null
 
     const headers = new Headers()
 
@@ -335,7 +335,7 @@ export class GithubClient {
       headers.append('Authorization', 'Bearer ' + token)
     } else {
       console.warn(
-        'Deprecation Notice: You are using an old authentication flow, please migrate to the new one (see https://tinacms.org/blog/upgrade-notice-tinacms-github-packages)'
+        'Deprecation Notice: You are using an old authentication flow, please migrate to the new one (see https://tinacms.org/blog/upgrade-notice-improved-github-security)'
       )
     }
 
