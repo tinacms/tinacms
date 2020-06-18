@@ -67,9 +67,7 @@ export function BlocksControls({
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
 
   const addBeforePosition =
-    direction === 'vertical'
-      ? 'top'
-      : direction === 'horizontal'
+    direction === 'horizontal'
       ? 'left'
       : 'top'
   const addAfterPosition =
