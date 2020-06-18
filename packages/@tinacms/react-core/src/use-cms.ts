@@ -33,7 +33,7 @@ export function useCMS(): CMS {
   const [, setEnabled] = React.useState(cms.enabled)
 
   React.useEffect(() => {
-    cms.events.subscribe('cms', () => {
+    return cms.events.subscribe('cms', () => {
       setEnabled(cms.enabled)
     })
   }, [cms])
