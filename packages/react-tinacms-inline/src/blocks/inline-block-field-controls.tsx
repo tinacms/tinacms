@@ -73,9 +73,7 @@ export function BlocksControls({
       ? 'left'
       : 'top'
   const addAfterPosition =
-    direction === 'vertical'
-      ? 'bottom'
-      : direction === 'horizontal'
+    direction === 'horizontal'
       ? 'right'
       : 'bottom'
 
