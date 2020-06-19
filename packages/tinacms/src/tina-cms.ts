@@ -32,7 +32,6 @@ import {
   BlocksFieldPlugin,
   TagsFieldPlugin,
 } from '@tinacms/fields'
-import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
@@ -67,7 +66,6 @@ export class TinaCMS extends CMS {
     this.toolbar = new ToolbarState(toolbar)
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
-    this.fields.add(DateFieldPlugin)
     this.fields.add(ImageFieldPlugin)
     this.fields.add(ColorFieldPlugin)
     this.fields.add(NumberFieldPlugin)
