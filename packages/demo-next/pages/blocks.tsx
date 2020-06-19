@@ -83,7 +83,6 @@ function ChildImage(props) {
  * CallToAction template + Component
  */
 const cta_template: BlockTemplate = {
-  type: 'cta',
   label: 'Call to Action',
   defaultItem: { url: '', text: 'Signup!' },
   fields: [
@@ -118,7 +117,6 @@ function CallToActionBlock({ data, index }) {
  * Hero template + Component
  */
 const hero_template: BlockTemplate = {
-  type: 'hero',
   label: 'Hero',
   defaultItem: { text: 'Spiderman' },
   fields: [],
@@ -173,7 +171,6 @@ function ImageBlock({ index, data }) {
 }
 
 const image_template: BlockTemplate = {
-  type: 'image',
   label: 'Image',
   defaultItem: {
     _template: 'image',
