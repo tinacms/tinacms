@@ -26,6 +26,10 @@
     "test": "jest --passWithNoTests",
     "docs": "npx typedoc"
   },
+  "dependencies": {
+    "moment": ">=2 <=3",
+    "react-datetime": "^2.16.3"
+  },
   "devDependencies": {
     "@tinacms/scripts": "^0.1.13"
   }
