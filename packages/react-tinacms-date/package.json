@@ -1,0 +1,32 @@
+{
+  "name": "react-tinacms-date",
+  "version": "0.0.0",
+  "main": "build/index.js",
+  "types": "build/index.d.ts",
+  "license": "Apache-2.0",
+  "keywords": [
+    "react"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/react-tinacms-date"
+  },
+  "files": [
+    "README.md",
+    "build"
+  ],
+  "scripts": {
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jest --passWithNoTests",
+    "docs": "npx typedoc"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "^0.1.13"
+  }
+}
