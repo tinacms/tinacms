@@ -17,13 +17,13 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InputProps, wrapFieldsWithMeta } from '@tinacms/fields'
-import ReactDatetime from 'react-datetime'
-import { ReactDateTimeContainer } from '../../tinacms/src/plugins/fields/reactDatetimeStyles'
-import { DatetimepickerProps } from 'react-datetime'
 import { useEffect, useState, useRef } from 'react'
 import styled from 'styled-components'
-import { InputCss } from '@tinacms/fields'
+import { InputProps, wrapFieldsWithMeta, InputCss } from '@tinacms/fields'
+import ReactDatetime from 'react-datetime'
+import { DatetimepickerProps } from 'react-datetime'
+
+import { ReactDateTimeContainer } from './reactDatetimeStyles'
 import { format, parse } from './dateFormat'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
@@ -73,7 +73,8 @@ const DatetimeContainer = styled.div`
   }
 `
 
-export default {
+export const DateFieldPlugin = {
+  __type: 'field',
   name: 'date',
   Component: DateField,
   format,
