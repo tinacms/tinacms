@@ -34,6 +34,12 @@ export interface InlineBlocksProps {
   }
   className?: string
   direction?: 'vertical' | 'horizontal'
+  /**
+   * object will be spread to every block child element
+   */
+  itemProps?: {
+    [key: string]: any
+  }
 }
 
 export interface InlineBlocksActions {
@@ -68,6 +74,7 @@ export function InlineBlocks({
   blocks,
   className,
   direction = 'vertical',
+  itemProps,
 }: InlineBlocksProps) {
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
@@ -147,6 +154,7 @@ export function InlineBlocks({
 
                       return (
                         <InlineBlock
+                          itemProps={itemProps}
                           key={index}
                           index={index}
                           name={blockName}
@@ -175,12 +183,21 @@ export interface InlineBlockProps {
   name: string
   data: any
   block: Block
+  itemProps?: {
+    [key: string]: any
+  }
 }
 
-export function InlineBlock({ name, data, block, index }: InlineBlockProps) {
+export function InlineBlock({
+  name,
+  data,
+  block,
+  index,
+  itemProps,
+}: InlineBlockProps) {
   return (
     <InlineFieldContext.Provider value={{ name, ...block }}>
-      <block.Component data={data} index={index} />
+      <block.Component data={data} index={index} {...itemProps} />
     </InlineFieldContext.Provider>
   )
 }
