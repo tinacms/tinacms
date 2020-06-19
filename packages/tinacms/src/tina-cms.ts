@@ -40,6 +40,7 @@ import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
+  DateFieldPlaceholder,
 } from './plugins/fields/markdown'
 
 export interface TinaCMSConfig extends CMSConfig {
@@ -75,6 +76,7 @@ export class TinaCMS extends CMS {
     this.fields.add(GroupListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
     this.fields.add(MarkdownFieldPlaceholder)
+    this.fields.add(DateFieldPlaceholder)
     this.fields.add(HtmlFieldPlaceholder)
     this.fields.add(TagsFieldPlugin)
   }

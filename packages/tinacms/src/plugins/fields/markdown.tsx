@@ -19,6 +19,12 @@ import React from 'react'
 import { FieldMeta } from '@tinacms/fields'
 import styled from 'styled-components'
 
+export const DateFieldPlaceholder = {
+  __type: 'field',
+  name: 'date',
+  Component: createPlaceholder('Date'),
+}
+
 export const MarkdownFieldPlaceholder = {
   __type: 'field',
   name: 'markdown',
