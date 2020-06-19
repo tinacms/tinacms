@@ -154,7 +154,7 @@ export function InlineBlocks({
 
                       return (
                         <InlineBlock
-                          {...itemProps}
+                          itemProps={itemProps}
                           key={index}
                           index={index}
                           name={blockName}
@@ -183,12 +183,21 @@ export interface InlineBlockProps {
   name: string
   data: any
   block: Block
+  itemProps?: {
+    [key: string]: any
+  }
 }
 
-export function InlineBlock({ name, data, block, index }: InlineBlockProps) {
+export function InlineBlock({
+  name,
+  data,
+  block,
+  index,
+  itemProps,
+}: InlineBlockProps) {
   return (
     <InlineFieldContext.Provider value={{ name, ...block }}>
-      <block.Component data={data} index={index} />
+      <block.Component data={data} index={index} {...itemProps} />
     </InlineFieldContext.Provider>
   )
 }
