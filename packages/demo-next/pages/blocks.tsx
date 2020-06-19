@@ -56,7 +56,13 @@ export default function BlocksExample({ jsonFile }) {
           </InlineImage>
           <hr />
           <Wrap>
-            <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
+            <InlineBlocks
+              name="blocks"
+              blocks={PAGE_BUILDER_BLOCKS}
+              itemProps={{
+                style: { backgroundColor: 'red' },
+              }}
+            />
           </Wrap>
         </InlineForm>
       </Layout>
@@ -91,9 +97,9 @@ const cta_template: BlockTemplate = {
   ],
 }
 
-function CallToActionBlock({ data, index }) {
+function CallToActionBlock({ index, data, style }) {
   return (
-    <div className="block">
+    <div className="block" style={style}>
       <BlocksControls index={index}>
         <button
           onClick={() => window.open(data.url, '_blank')}
