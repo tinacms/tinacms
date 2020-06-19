@@ -43,6 +43,23 @@ import {
   DateFieldPlaceholder,
 } from './plugins/fields/markdown'
 
+const DEFAULT_FIELDS = [
+  TextFieldPlugin,
+  TextareaFieldPlugin,
+  ImageFieldPlugin,
+  ColorFieldPlugin,
+  NumberFieldPlugin,
+  ToggleFieldPlugin,
+  SelectFieldPlugin,
+  GroupFieldPlugin,
+  GroupListFieldPlugin,
+  BlocksFieldPlugin,
+  TagsFieldPlugin,
+  MarkdownFieldPlaceholder,
+  HtmlFieldPlaceholder,
+  DateFieldPlaceholder,
+]
+
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
   media?: {
@@ -65,20 +82,12 @@ export class TinaCMS extends CMS {
 
     this.sidebar = new SidebarState(this.events, sidebar)
     this.toolbar = new ToolbarState(toolbar)
-    this.fields.add(TextFieldPlugin)
-    this.fields.add(TextareaFieldPlugin)
-    this.fields.add(ImageFieldPlugin)
-    this.fields.add(ColorFieldPlugin)
-    this.fields.add(NumberFieldPlugin)
-    this.fields.add(ToggleFieldPlugin)
-    this.fields.add(SelectFieldPlugin)
-    this.fields.add(GroupFieldPlugin)
-    this.fields.add(GroupListFieldPlugin)
-    this.fields.add(BlocksFieldPlugin)
-    this.fields.add(MarkdownFieldPlaceholder)
-    this.fields.add(DateFieldPlaceholder)
-    this.fields.add(HtmlFieldPlaceholder)
-    this.fields.add(TagsFieldPlugin)
+
+    DEFAULT_FIELDS.forEach(field => {
+      if (!this.fields.find(field.name)) {
+        this.fields.add(field)
+      }
+    })
   }
 
   get forms(): PluginType<Form> {
