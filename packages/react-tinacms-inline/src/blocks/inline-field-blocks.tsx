@@ -33,7 +33,7 @@ export interface InlineBlocksProps {
     [key: string]: Block
   }
   className?: string
-  direction?: 'column' | 'row'
+  direction?: 'vertical' | 'horizontal'
 }
 
 export interface InlineBlocksActions {
@@ -46,7 +46,7 @@ export interface InlineBlocksActions {
   }
   activeBlock: number | null
   setActiveBlock: any
-  direction: 'column' | 'row'
+  direction: 'vertical' | 'horizontal'
 }
 
 export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
@@ -67,7 +67,7 @@ export function InlineBlocks({
   name,
   blocks,
   className,
-  direction = 'column',
+  direction = 'vertical',
 }: InlineBlocksProps) {
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
@@ -107,11 +107,7 @@ export function InlineBlocks({
         }
 
         return (
-          <Droppable
-            droppableId={name}
-            type={name}
-            direction={direction === 'column' ? 'vertical' : 'horizontal'}
-          >
+          <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
               <div ref={provider.innerRef} className={className}>
                 {
