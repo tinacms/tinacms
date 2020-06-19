@@ -37,7 +37,7 @@ export interface InlineBlocksProps {
   /**
    * object will be spread to every block child element
    */
-  blockProps?: {
+  itemProps?: {
     [key: string]: any
   }
 }
@@ -74,7 +74,7 @@ export function InlineBlocks({
   blocks,
   className,
   direction = 'column',
-  blockProps,
+  itemProps,
 }: InlineBlocksProps) {
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
@@ -158,7 +158,7 @@ export function InlineBlocks({
 
                       return (
                         <InlineBlock
-                          {...blockProps}
+                          {...itemProps}
                           key={index}
                           index={index}
                           name={blockName}
