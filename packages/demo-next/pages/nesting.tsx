@@ -280,7 +280,7 @@ const ROW = {
           <InlineBlocksRow
             name="items"
             blocks={{ col: COL, heading: HEADING, paragraph: PARAGRAPH }}
-            direction="row"
+            direction="horizontal"
           />
         </BlockPadding>
       </BlocksControls>

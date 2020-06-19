@@ -67,9 +67,13 @@ export function BlocksControls({
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
 
   const addBeforePosition =
-    direction === 'column' ? 'top' : direction === 'row' ? 'left' : 'top'
+    direction === 'horizontal'
+      ? 'left'
+      : 'top'
   const addAfterPosition =
-    direction === 'column' ? 'bottom' : direction === 'row' ? 'right' : 'bottom'
+    direction === 'horizontal'
+      ? 'right'
+      : 'bottom'
 
   if (cms.disabled) {
     return children
@@ -161,20 +165,20 @@ export function BlocksControls({
                   onClick={moveBlockUp}
                   disabled={isFirst}
                 >
-                  {direction === 'column' && <ChevronUpIcon />}
-                  {direction === 'row' && <ChevronLeftIcon />}
+                  {direction === 'vertical' && <ChevronUpIcon />}
+                  {direction === 'horizontal' && <ChevronLeftIcon />}
                 </BlockAction>
                 <BlockAction
                   ref={blockMoveDownRef}
                   onClick={moveBlockDown}
                   disabled={isLast}
                 >
-                  {direction === 'column' && <ChevronDownIcon />}
-                  {direction === 'row' && <ChevronRightIcon />}
+                  {direction === 'vertical' && <ChevronDownIcon />}
+                  {direction === 'horizontal' && <ChevronRightIcon />}
                 </BlockAction>
                 <BlockAction {...provider.dragHandleProps}>
-                  {direction === 'column' && <ReorderIcon />}
-                  {direction === 'row' && <ReorderRowIcon />}
+                  {direction === 'vertical' && <ReorderIcon />}
+                  {direction === 'horizontal' && <ReorderRowIcon />}
                 </BlockAction>
                 <InlineSettings fields={template.fields} />
                 <BlockAction onClick={removeBlock}>
