@@ -15,8 +15,7 @@
 - [Website](https://tinacms.org/)
   - [Blog](https://tinacms.org/docs/)
   - [Docs](https://tinacms.org/docs/)
-- [Community](https://tinacms.org/docs/)
-  - [Slack](https://tinacms.slack.com)
+- [Community](https://tinacms.org/docs/)\
   - [Forum](https://community.tinacms.org/)
 - [Contributing](./CONTRIBUTING.md)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
