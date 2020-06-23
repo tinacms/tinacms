@@ -33,8 +33,8 @@ import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { useFormPortal } from '@tinacms/react-forms'
 import { FieldDescription } from './wrapFieldWithMeta'
 
-interface GroupFieldDefinititon extends Field {
-  component: 'group'
+interface ListFieldDefinititon extends Field {
+  component: 'list'
   defaultItem?: object | (() => object)
   itemField: any
   /**
@@ -61,15 +61,15 @@ interface GroupFieldDefinititon extends Field {
   }
 }
 
-interface GroupProps {
+interface ListProps {
   input: any
   meta: any
-  field: GroupFieldDefinititon
+  field: ListFieldDefinititon
   form: any
   tinaForm: Form
 }
 
-const Group = ({ tinaForm, form, field, input }: GroupProps) => {
+const List = ({ tinaForm, form, field, input }: ListProps) => {
   const addItem = React.useCallback(() => {
     let obj = {}
     if (typeof field.defaultItem === 'function') {
@@ -91,18 +91,18 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
 
   return (
     <>
-      <GroupListHeader>
-        <GroupListMeta>
-          <GroupLabel>{field.label || field.name}</GroupLabel>
+      <ListHeader>
+        <ListMeta>
+          <Label>{field.label || field.name}</Label>
           {field.description && (
             <FieldDescription>{field.description}</FieldDescription>
           )}
-        </GroupListMeta>
+        </ListMeta>
         <IconButton onClick={addItem} primary small>
           <AddIcon />
         </IconButton>
-      </GroupListHeader>
-      <GroupListPanel>
+      </ListHeader>
+      <ListPanel>
         <ItemList>
           <Droppable droppableId={field.name} type={field.name}>
             {provider => (
@@ -124,7 +124,7 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
             )}
           </Droppable>
         </ItemList>
-      </GroupListPanel>
+      </ListPanel>
     </>
   )
 }
@@ -133,7 +133,7 @@ const EmptyState = () => <EmptyList>There are no items</EmptyList>
 
 interface ItemProps {
   tinaForm: Form
-  field: GroupFieldDefinititon
+  field: ListFieldDefinititon
   index: number
   item: any
   label?: string
@@ -163,7 +163,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
           >
             <DragHandle />
             <ItemClickTarget onClick={() => setExpanded(true)}>
-              <GroupLabel>{title}</GroupLabel>
+              <Label>{title}</Label>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
               <TrashIcon />
@@ -196,7 +196,7 @@ const ItemClickTarget = styled.div`
   padding: 8px;
 `
 
-const GroupLabel = styled.span<{ error?: boolean }>`
+const Label = styled.span<{ error?: boolean }>`
   overflow: hidden;
   text-overflow: ellipsis;
   white-space: nowrap;
@@ -220,7 +220,7 @@ const GroupLabel = styled.span<{ error?: boolean }>`
     `};
 `
 
-const GroupListHeader = styled.div`
+const ListHeader = styled.div`
   position: relative;
   display: flex;
   width: 100%;
@@ -234,11 +234,11 @@ const GroupListHeader = styled.div`
   }
 `
 
-const GroupListMeta = styled.div`
+const ListMeta = styled.div`
   line-height: 1;
 `
 
-const GroupListPanel = styled.div`
+const ListPanel = styled.div`
   max-height: initial;
   position: relative;
   height: auto;
@@ -275,7 +275,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
   font-size: var(--tina-font-size-2);
   font-weight: var(--tina-font-weight-regular);
 
-  ${GroupLabel} {
+  ${Label} {
     color: var(--tina-color-grey-8);
     align-self: center;
     max-width: 100%;
@@ -292,7 +292,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
     svg {
       fill: var(--tina-color-grey-8);
     }
-    ${GroupLabel} {
+    ${Label} {
       color: var(--tina-color-primary);
     }
   }
@@ -317,7 +317,7 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
       svg {
         fill: var(--tina-color-grey-8);
       }
-      ${GroupLabel} {
+      ${Label} {
         color: var(--tina-color-primary);
       }
 
@@ -396,7 +396,7 @@ interface PanelProps {
   tinaForm: Form
   index: number
   value: string
-  field: GroupFieldDefinititon
+  field: ListFieldDefinititon
   itemTitle: string
 }
 
@@ -424,7 +424,7 @@ const Panel = function Panel({
     <GroupPanel isExpanded={isExpanded}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
-        <GroupLabel>{itemTitle}</GroupLabel>
+        <Label>{itemTitle}</Label>
       </PanelHeader>
       <PanelBody>
         {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
@@ -435,5 +435,5 @@ const Panel = function Panel({
 
 export const ListFieldPlugin = {
   name: 'list',
-  Component: Group,
+  Component: List,
 }
