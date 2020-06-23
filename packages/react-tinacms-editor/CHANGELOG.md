@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.2-alpha.0...react-tinacms-editor@0.8.2) (2020-06-23)
+
+
+### Bug Fixes
+
+* code block breaking heading dropdown ([93419b4](https://github.com/tinacms/tinacms/commit/93419b4))
+* improvements in code block ([9f2f853](https://github.com/tinacms/tinacms/commit/9f2f853))
+
+
+
+
+
 ## [0.8.2-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.1...react-tinacms-editor@0.8.2-alpha.0) (2020-06-17)
 
 **Note:** Version bump only for package react-tinacms-editor
