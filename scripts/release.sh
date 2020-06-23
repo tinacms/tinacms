@@ -32,3 +32,8 @@ lerna publish from-package --yes
 
 # 6. Push CHANGELOGs and tags to GitHub
 git push && git push --tags
+
+# 7. Backmerge to master
+git checkout master
+git merge latest
+git push
