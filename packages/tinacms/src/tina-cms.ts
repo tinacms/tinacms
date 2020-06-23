@@ -29,6 +29,7 @@ import {
   SelectFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,
+  ListFieldPlugin,
   BlocksFieldPlugin,
   TagsFieldPlugin,
 } from '@tinacms/fields'
@@ -75,6 +76,7 @@ export class TinaCMS extends CMS {
     this.fields.add(SelectFieldPlugin)
     this.fields.add(GroupFieldPlugin)
     this.fields.add(GroupListFieldPlugin)
+    this.fields.add(ListFieldPlugin)
     this.fields.add(BlocksFieldPlugin)
     this.fields.add(MarkdownFieldPlaceholder)
     this.fields.add(HtmlFieldPlaceholder)
