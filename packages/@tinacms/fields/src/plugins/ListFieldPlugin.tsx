@@ -36,7 +36,10 @@ import { FieldDescription } from './wrapFieldWithMeta'
 interface ListFieldDefinititon extends Field {
   component: 'list'
   defaultItem?: object | (() => object)
-  itemField: any
+  itemField: {
+    label?: string
+    component: string
+  }
   /**
    * An optional function which generates `props` for
    * this items's `li`.
