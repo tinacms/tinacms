@@ -31,7 +31,6 @@ import {
 } from '@tinacms/icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { useFormPortal } from '@tinacms/react-forms'
-import { BaseTextField } from '../components'
 import { FieldDescription } from './wrapFieldWithMeta'
 
 interface GroupFieldDefinititon extends Field {
@@ -406,7 +405,6 @@ const Panel = function Panel({
   isExpanded,
   tinaForm,
   field,
-  value,
   index,
   itemTitle,
 }: PanelProps) {
@@ -433,10 +431,6 @@ const Panel = function Panel({
       </PanelBody>
     </GroupPanel>
   )
-}
-
-interface GroupFieldProps {
-  field: Field
 }
 
 export const ListFieldPlugin = {
