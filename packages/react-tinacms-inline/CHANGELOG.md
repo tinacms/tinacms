@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.9.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.8.1-alpha.0...react-tinacms-inline@0.9.0) (2020-06-23)
+
+
+### Bug Fixes
+
+* changed inline block field controls to use vertical and horizontal ([1fe1c01](https://github.com/tinacms/tinacms/commit/1fe1c01))
+* changed the direction of inline blocks from row and col to vertical and horizontal ([03eaeb9](https://github.com/tinacms/tinacms/commit/03eaeb9))
+* rename to itemprops ([209df7b](https://github.com/tinacms/tinacms/commit/209df7b))
+* use kep prop ([bfda51f](https://github.com/tinacms/tinacms/commit/bfda51f))
+
+
+### Features
+
+* add a blockProps prop which spreads props to child elements ([f02bcee](https://github.com/tinacms/tinacms/commit/f02bcee))
+
+
+
+
+
 ## [0.8.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.8.0...react-tinacms-inline@0.8.1-alpha.0) (2020-06-17)
 
 **Note:** Version bump only for package react-tinacms-inline
