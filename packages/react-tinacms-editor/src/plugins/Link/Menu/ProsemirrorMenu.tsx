@@ -34,10 +34,14 @@ export const ProsemirrorMenu = markControl({
   },
   noMix: ['code'],
   isDisabled: (view: EditorView) => {
-    if (view.state.selection.empty) return true
+    const { schema, selection } = view.state
+    const { marks, nodes } = schema
+    if (selection.empty) return true
+    const selectedNode = selection.$from.node()
     return (
-      isMarkPresent(view.state, view.state.schema.marks.link) ||
-      !!imagePluginKey.getState(view.state).selectedImage
+      isMarkPresent(view.state, marks.link) ||
+      !!imagePluginKey.getState(view.state).selectedImage ||
+      (selectedNode && selectedNode.type === nodes.code_block)
     )
   },
   onClick: (view: EditorView) => {
