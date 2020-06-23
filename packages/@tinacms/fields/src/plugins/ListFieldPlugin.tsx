@@ -412,11 +412,7 @@ const Panel = function Panel({
     {
       ...field.itemField,
       label: 'Value',
-      name:
-        field.name +
-        '.' +
-        index +
-        (field.itemField.name ? '.' + field.itemField.name : ''),
+      name: field.name + '.' + index,
     },
   ]
 
