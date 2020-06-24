@@ -39,6 +39,7 @@
     "@tinacms/react-forms": "^0.2.1",
     "@tinacms/scripts": "^0.1.13",
     "@tinacms/styles": "^0.5.1",
+    "@tinacms/react-modals": "^0.1.1",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
     "@types/lodash.debounce": "^4.0.6",
