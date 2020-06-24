@@ -45,10 +45,10 @@ import {
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
+  toolbar?: ToolbarStateOptions
   media?: {
     store: MediaStore
   }
-  toolbar?: ToolbarStateOptions
 }
 
 export class TinaCMS extends CMS {
