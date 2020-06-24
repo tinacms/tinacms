@@ -46,7 +46,7 @@ export function SidebarProvider({
   const cms = useCMS()
   useSubscribable(sidebar)
 
-  if (cms.disabled || sidebar.hidden) return children
+  if (cms.disabled) return children
 
   return (
     <>
@@ -55,7 +55,7 @@ export function SidebarProvider({
       ) : (
         children
       )}
-      {!sidebar.hidden && <Sidebar sidebar={sidebar} />}
+      <Sidebar sidebar={sidebar} />
     </>
   )
 }
