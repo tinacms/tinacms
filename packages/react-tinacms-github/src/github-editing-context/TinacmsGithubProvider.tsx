@@ -20,14 +20,12 @@ import React, { useState, useEffect } from 'react'
 import { useCMS } from 'tinacms'
 import GithubErrorModal, { GithubError } from '../github-error/GithubErrorModal'
 import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
-import { GithubEditingContext } from './GithubEditingContext'
 import { GithubClient } from '../github-client'
 
 interface ProviderProps {
   children: any
-  editMode: boolean
-  enterEditMode: () => void
-  exitEditMode: () => void
+  onLogin: () => void
+  onLogout: () => void
   error?: any
 }
 
@@ -35,9 +33,8 @@ type ModalNames = null | 'authenticate' | 'createFork'
 
 export const TinacmsGithubProvider = ({
   children,
-  editMode,
-  enterEditMode,
-  exitEditMode,
+  onLogin,
+  onLogout,
   error: previewError,
 }: ProviderProps) => {
   const [error, setError] = useState<GithubError>(previewError)
@@ -53,7 +50,6 @@ export const TinacmsGithubProvider = ({
   }
 
   const beginAuth = async () => {
-    cms.enable()
     if (await github.isAuthenticated()) {
       onAuthSuccess()
     } else {
@@ -65,27 +61,20 @@ export const TinacmsGithubProvider = ({
     if (await github.isAuthorized()) {
       github.setWorkingRepoFullName(github.baseRepoFullName)
       github.setWorkingBranch(github.branchName)
-      enterEditMode()
+      onLogin()
       setActiveModal(null)
     } else {
       setActiveModal('createFork')
     }
   }
 
-  useEffect(() => {
-    return cms.events.subscribe('github:error', ({ error }) => {
-      setError(error)
-    })
-  })
+  useCMSEvent('cms:enable', beginAuth, [])
+  useCMSEvent('cms:disable', onLogout, [])
+  useCMSEvent('github:branch:checkout', onLogin, [])
+  useCMSEvent('github:error', ({ error }: any) => setError(error), [])
 
   return (
-    <GithubEditingContext.Provider
-      value={{
-        editMode,
-        enterEditMode: beginAuth,
-        exitEditMode,
-      }}
-    >
+    <>
       {error && <GithubErrorModal error={error} />}
       {!error && activeModal === 'authenticate' && (
         <GithubAuthenticationModal
@@ -94,9 +83,16 @@ export const TinacmsGithubProvider = ({
         />
       )}
       {!error && activeModal === 'createFork' && (
-        <CreateForkModal close={onClose} onForkCreated={enterEditMode} />
+        <CreateForkModal close={onClose} onForkCreated={onLogin} />
       )}
       {!previewError && children}
-    </GithubEditingContext.Provider>
+    </>
   )
+}
+
+function useCMSEvent(event: string, callback: any, deps: React.DependencyList) {
+  const cms = useCMS()
+  useEffect(function() {
+    return cms.events.subscribe(event, callback)
+  }, deps)
 }
