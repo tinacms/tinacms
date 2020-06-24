@@ -70,6 +70,7 @@ function Info(props) {
               fields={[
                 { label: 'Name', name: 'name', component: 'text' },
                 { label: 'Hometown', name: 'hometown', component: 'text' },
+                { label: 'color', name: 'color', component: 'color' },
               ]}
               focusRing={{
                 offset: 0,
