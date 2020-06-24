@@ -59,21 +59,23 @@ export function BlocksControls({
   const cms = useCMS()
   const { focussedField, setFocussedField } = useInlineForm()
   const { name, template } = React.useContext(InlineFieldContext)
-  const { insert, move, remove, blocks, count, direction } = useInlineBlocks()
+  const {
+    insert,
+    move,
+    remove,
+    blocks,
+    count,
+    direction,
+    limits,
+  } = useInlineBlocks()
   const isFirst = index === 0
   const isLast = index === count - 1
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
   const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
 
-  const addBeforePosition =
-    direction === 'horizontal'
-      ? 'left'
-      : 'top'
-  const addAfterPosition =
-    direction === 'horizontal'
-      ? 'right'
-      : 'bottom'
+  const addBeforePosition = direction === 'horizontal' ? 'left' : 'top'
+  const addAfterPosition = direction === 'horizontal' ? 'right' : 'bottom'
 
   if (cms.disabled) {
     return children
@@ -120,6 +122,22 @@ export function BlocksControls({
     .slice(0, -1)
     .join('.')
 
+  function isRangeLimited() {
+    return limits?.max === count && limits?.min === count
+  }
+
+  function showAddBlock() {
+    if (!limits) return true
+
+    return !(limits.max === count || isRangeLimited())
+  }
+
+  function showTrashIcon() {
+    if (!limits) return true
+
+    return !(limits.min === count || isRangeLimited())
+  }
+
   return (
     <Draggable type={parentName} draggableId={name!} index={index}>
       {provider => {
@@ -136,22 +154,24 @@ export function BlocksControls({
             {...provider.draggableProps}
             disableChildren={!isActive && !childIsActive}
           >
-            <AddBlockMenuWrapper active={isActive}>
-              <AddBlockMenu
-                addBlock={block => insert(index, block)}
-                blocks={blocks}
-                index={index}
-                offset={offset}
-                position={addBeforePosition}
-              />
-              <AddBlockMenu
-                addBlock={block => insert(index + 1, block)}
-                blocks={blocks}
-                index={index}
-                offset={offset}
-                position={addAfterPosition}
-              />
-            </AddBlockMenuWrapper>
+            {showAddBlock() && (
+              <AddBlockMenuWrapper active={isActive}>
+                <AddBlockMenu
+                  addBlock={block => insert(index, block)}
+                  blocks={blocks}
+                  index={index}
+                  offset={offset}
+                  position={addBeforePosition}
+                />
+                <AddBlockMenu
+                  addBlock={block => insert(index + 1, block)}
+                  blocks={blocks}
+                  index={index}
+                  offset={offset}
+                  position={addAfterPosition}
+                />
+              </AddBlockMenuWrapper>
+            )}
             <BlockMenuWrapper
               offset={offset}
               ref={blockMenuRef}
@@ -181,9 +201,11 @@ export function BlocksControls({
                   {direction === 'horizontal' && <ReorderRowIcon />}
                 </BlockAction>
                 <InlineSettings fields={template.fields} />
-                <BlockAction onClick={removeBlock}>
-                  <TrashIcon />
-                </BlockAction>
+                {showTrashIcon() && (
+                  <BlockAction onClick={removeBlock}>
+                    <TrashIcon />
+                  </BlockAction>
+                )}
               </BlockMenu>
             </BlockMenuWrapper>
             {children}
