@@ -22,19 +22,28 @@ import styled from 'styled-components'
 export const DateFieldPlaceholder = {
   __type: 'field',
   name: 'date',
-  Component: createPlaceholder('Date'),
+  Component: createPlaceholder(
+    'Date',
+    'https://github.com/tinacms/tinacms/pull/1281'
+  ),
 }
 
 export const MarkdownFieldPlaceholder = {
   __type: 'field',
   name: 'markdown',
-  Component: createPlaceholder('Markdown'),
+  Component: createPlaceholder(
+    'Markdown',
+    'https://github.com/tinacms/tinacms/pull/1134'
+  ),
 }
 
 export const HtmlFieldPlaceholder = {
   __type: 'field',
   name: 'html',
-  Component: createPlaceholder('HTML'),
+  Component: createPlaceholder(
+    'HTML',
+    'https://github.com/tinacms/tinacms/pull/1134'
+  ),
 }
 
 const PlaceholderParagraph = styled.p`
@@ -47,7 +56,7 @@ const PlaceholderParagraph = styled.p`
   }
 `
 
-function createPlaceholder(name: string) {
+function createPlaceholder(name: string, pr: string) {
   return (props: any) => {
     return (
       <FieldMeta name={props.input.name} label={`Deprecated: ${name} Field`}>
@@ -68,11 +77,7 @@ function createPlaceholder(name: string) {
         </PlaceholderParagraph>
         <PlaceholderParagraph>
           Visit the{' '}
-          <a
-            href="https://github.com/tinacms/tinacms/pull/1134"
-            target="_blank"
-            rel="noreferrer noopener"
-          >
+          <a href={pr} target="_blank" rel="noreferrer noopener">
             Pull Request
           </a>{' '}
           to learn more about why this change was made.
