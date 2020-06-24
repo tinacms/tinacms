@@ -61,17 +61,17 @@ const DEFAULT_FIELDS = [
 ]
 
 export interface TinaCMSConfig extends CMSConfig {
-  sidebar?: SidebarStateOptions
+  sidebar?: SidebarStateOptions | boolean
+  toolbar?: ToolbarStateOptions | boolean
   media?: {
     store: MediaStore
   }
-  toolbar?: ToolbarStateOptions
 }
 
 export class TinaCMS extends CMS {
-  sidebar: SidebarState
+  sidebar?: SidebarState
+  toolbar?: ToolbarState
   media: MediaManager
-  toolbar: ToolbarState
   alerts = new Alerts(this.events)
 
   constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
@@ -80,8 +80,15 @@ export class TinaCMS extends CMS {
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
 
-    this.sidebar = new SidebarState(this.events, sidebar)
-    this.toolbar = new ToolbarState(toolbar)
+    if (sidebar) {
+      const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
+      this.sidebar = new SidebarState(this.events, sidebarConfig)
+    }
+
+    if (toolbar) {
+      const toolbarConfig = typeof toolbar === 'object' ? toolbar : undefined
+      this.toolbar = new ToolbarState(toolbarConfig)
+    }
 
     DEFAULT_FIELDS.forEach(field => {
       if (!this.fields.find(field.name)) {
