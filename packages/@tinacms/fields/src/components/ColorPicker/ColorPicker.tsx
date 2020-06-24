@@ -22,7 +22,7 @@ import { Dismissible } from 'react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
 import styled, { css, keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
-import { useModalPortal } from '@tinacms/react-modals'
+import { useFormPortal } from '@tinacms/react-forms'
 
 type DivProps = any
 type WrappedFieldProps = any
@@ -254,7 +254,7 @@ export const ColorPicker: React.FC<Props> = ({
   widget = 'sketch',
   input,
 }) => {
-  const ModalPortal = useModalPortal()
+  const FormPortal = useFormPortal()
   const triggerRef = React.useRef<HTMLDivElement | null>(null)
   const [triggerBoundingBox, setTriggerBoundingBox] = useState<any>(null)
   const [openTop, setOpenTop] = useState<boolean>(false)
@@ -333,7 +333,7 @@ export const ColorPicker: React.FC<Props> = ({
         colorFormat={getColorFormat}
       />
       {displayColorPicker && (
-        <ModalPortal>
+        <FormPortal>
           <Popover openTop={openTop} triggerBoundingBox={triggerBoundingBox}>
             <Dismissible
               click
@@ -350,7 +350,7 @@ export const ColorPicker: React.FC<Props> = ({
               />
             </Dismissible>
           </Popover>
-        </ModalPortal>
+        </FormPortal>
       )}
     </ColorPickerWrapper>
   )
