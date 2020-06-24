@@ -20,7 +20,7 @@ import * as React from 'react'
 import { ModalProvider } from '@tinacms/react-modals'
 import { Theme } from '@tinacms/styles'
 import { SidebarProvider, SidebarPosition } from '@tinacms/react-sidebar'
-import { ToolbarProvider } from '@tinacms/react-toolbar'
+import { Toolbar } from '@tinacms/react-toolbar'
 import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
@@ -59,7 +59,7 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
       <ModalProvider>
         <Alerts alerts={cms.alerts} />
         {enabled && styled && <Theme />}
-        {enabled && cms.toolbar && <ToolbarProvider toolbar={cms.toolbar} />}
+        {enabled && cms.toolbar && <Toolbar />}
         {cms.sidebar ? (
           <SidebarProvider position={position} sidebar={cms.sidebar}>
             {children}
