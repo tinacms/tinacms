@@ -50,6 +50,15 @@ const fields = [
     description: "Enter where they're based",
     component: "text",
   },
+  {
+    name: "rawJson.bullet_points",
+    label: "Bullet Points",
+    component: "list",
+    itemField: {
+      label: "Bullet Points Item",
+      component: "text",
+    },
+  },
 ]
 const Bio = () => {
   const cms = useCMS()
@@ -69,6 +78,7 @@ const Bio = () => {
         firstName
         lastName
         location
+        bullet_points
         social {
           twitter
         }
