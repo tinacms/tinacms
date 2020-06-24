@@ -16,14 +16,4 @@ limitations under the License.
 
 */
 
-export {
-  BlocksFieldPlugin,
-  ColorFieldPlugin,
-  GroupFieldPlugin,
-  GroupListFieldPlugin,
-  NumberFieldPlugin,
-  SelectFieldPlugin,
-  TextFieldPlugin,
-  TextareaFieldPlugin,
-  ToggleFieldPlugin,
-} from '@tinacms/fields'
+module.exports = require('../../typedoc.js')(require('./package.json'))
