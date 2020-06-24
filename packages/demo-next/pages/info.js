@@ -132,6 +132,7 @@ const formOptions = {
       label: 'Home Page Content',
       component: 'markdown',
     },
+    { label: 'color', name: 'frontmatter.color', component: 'color' },
   ],
 }
 
