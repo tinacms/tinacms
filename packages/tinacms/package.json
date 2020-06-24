@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.21.3",
+  "version": "0.22.0-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -47,8 +47,8 @@
     "@tinacms/react-forms": "^0.2.1",
     "@tinacms/react-modals": "^0.1.10",
     "@tinacms/react-screens": "^0.1.9",
-    "@tinacms/react-sidebar": "^0.2.1",
-    "@tinacms/react-toolbar": "^0.2.1",
+    "@tinacms/react-sidebar": "^0.3.0-alpha.0",
+    "@tinacms/react-toolbar": "^0.3.0-alpha.0",
     "@tinacms/styles": "^0.5.1",
     "lodash.clonedeep": "^4.5.0",
     "lodash.merge": "^4.6.2"

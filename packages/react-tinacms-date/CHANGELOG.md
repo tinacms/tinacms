@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# 0.1.0-alpha.0 (2020-06-24)
+
+
+### Features
+
+* date field is no longer a default plugin ([8ef7a98](https://github.com/tinacms/tinacms/commit/8ef7a98)), closes [#771](https://github.com/tinacms/tinacms/issues/771)
+
+
+
+
+
 # [1.3.0](https://github.com/tinacms/tinacms/compare/react-dismissible@1.3.0-alpha.0...react-dismissible@1.3.0) (2020-06-15)
 
 **Note:** Version bump only for package react-dismissible

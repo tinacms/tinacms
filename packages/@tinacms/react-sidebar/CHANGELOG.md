@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-sidebar@0.2.1...@tinacms/react-sidebar@0.3.0-alpha.0) (2020-06-24)
+
+
+### Features
+
+* sidebar no longer tracks it's visibility ([78ccadf](https://github.com/tinacms/tinacms/commit/78ccadf))
+
+
+
+
+
 ## [0.2.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-sidebar@0.2.1-alpha.0...@tinacms/react-sidebar@0.2.1) (2020-06-23)
 
 **Note:** Version bump only for package @tinacms/react-sidebar
