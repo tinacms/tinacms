@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.22.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.21.3...tinacms@0.22.0-alpha.0) (2020-06-24)
+
+
+### Bug Fixes
+
+* only register default fields if one hasn't been added yet ([7b40d2f](https://github.com/tinacms/tinacms/commit/7b40d2f))
+
+
+### Features
+
+* date field is no longer a default plugin ([8ef7a98](https://github.com/tinacms/tinacms/commit/8ef7a98)), closes [#771](https://github.com/tinacms/tinacms/issues/771)
+* sidebar config can be a boolean to simplify setup ([d6ca564](https://github.com/tinacms/tinacms/commit/d6ca564))
+* the toolbar and sidebar ui are both opt-in ([92c50b3](https://github.com/tinacms/tinacms/commit/92c50b3))
+* toolbar config can be a boolean ([4e8def5](https://github.com/tinacms/tinacms/commit/4e8def5))
+
+
+
+
+
 ## [0.21.3](https://github.com/tinacms/tinacms/compare/tinacms@0.21.3-alpha.0...tinacms@0.21.3) (2020-06-23)
 
 **Note:** Version bump only for package tinacms
