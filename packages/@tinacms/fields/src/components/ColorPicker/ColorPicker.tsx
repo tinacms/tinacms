@@ -339,7 +339,7 @@ export const ColorPicker: React.FC<Props> = ({
               click
               escape
               disabled={!displayColorPicker}
-              onDismiss={() => setDisplayColorPicker(false)}
+              onDismiss={toggleColorPicker}
             >
               <Widget
                 presetColors={[...userColors, nullColor]}
