@@ -43,10 +43,7 @@ export function SidebarProvider({
   position,
   sidebar,
 }: SidebarProviderProps) {
-  const cms = useCMS()
   useSubscribable(sidebar)
-
-  if (cms.disabled) return children
 
   return (
     <>
