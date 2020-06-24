@@ -62,6 +62,10 @@ export default function BlocksExample({ jsonFile }) {
               itemProps={{
                 style: { backgroundColor: 'red' },
               }}
+              limits={{
+                min: 2,
+                max: 4,
+              }}
             />
           </Wrap>
         </InlineForm>
