@@ -17,27 +17,14 @@ limitations under the License.
 */
 
 import { usePlugins } from 'tinacms'
-import { useMemo } from 'react'
 import { PullRequestToolbarWidget } from './pull-request'
 import { RepoToolbarWidget } from './RepoInfoPlugin'
-import { useGithubEditing } from '../github-editing-context'
 import { BranchSwitcherPlugin } from './BranchSwitcherPlugin'
 
 export const useGithubToolbarPlugins = () => {
-  const { enterEditMode } = useGithubEditing()
-
   usePlugins([
     RepoToolbarWidget,
     PullRequestToolbarWidget,
-    useMemo(
-      () => ({
-        ...BranchSwitcherPlugin,
-
-        props: {
-          onBranchChange: enterEditMode,
-        },
-      }),
-      []
-    ),
+    BranchSwitcherPlugin,
   ])
 }
