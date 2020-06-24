@@ -59,10 +59,14 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
       <ModalProvider>
         <Alerts alerts={cms.alerts} />
         {enabled && styled && <Theme />}
-        {enabled && <ToolbarProvider toolbar={cms.toolbar} />}
-        <SidebarProvider position={position} sidebar={cms.sidebar}>
-          {children}
-        </SidebarProvider>
+        {enabled && cms.toolbar && <ToolbarProvider toolbar={cms.toolbar} />}
+        {cms.sidebar ? (
+          <SidebarProvider position={position} sidebar={cms.sidebar}>
+            {children}
+          </SidebarProvider>
+        ) : (
+          children
+        )}
       </ModalProvider>
     </CMSContext.Provider>
   )

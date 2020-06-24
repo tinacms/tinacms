@@ -52,9 +52,9 @@ export interface TinaCMSConfig extends CMSConfig {
 }
 
 export class TinaCMS extends CMS {
-  sidebar: SidebarState
+  sidebar?: SidebarState
+  toolbar?: ToolbarState
   media: MediaManager
-  toolbar: ToolbarState
   alerts = new Alerts(this.events)
 
   constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
@@ -63,8 +63,14 @@ export class TinaCMS extends CMS {
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
 
-    this.sidebar = new SidebarState(this.events, sidebar)
-    this.toolbar = new ToolbarState(toolbar)
+    if (sidebar) {
+      this.sidebar = new SidebarState(this.events, sidebar)
+    }
+
+    if (toolbar) {
+      this.toolbar = new ToolbarState(toolbar)
+    }
+
     this.fields.add(TextFieldPlugin)
     this.fields.add(TextareaFieldPlugin)
     this.fields.add(DateFieldPlugin)
