@@ -16,7 +16,7 @@
 - [Website](https://tinacms.org/)
   - [Blog](https://tinacms.org/docs/)
   - [Docs](https://tinacms.org/docs/)
-- [Community](https://community.tinacms.org/)
+- [Community Forum](https://community.tinacms.org/)
 - [Contributing](./CONTRIBUTING.md)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
 - [Projects](https://github.com/orgs/tinacms/projects)
