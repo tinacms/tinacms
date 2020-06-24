@@ -44,7 +44,7 @@ import {
 } from './plugins/fields/markdown'
 
 export interface TinaCMSConfig extends CMSConfig {
-  sidebar?: SidebarStateOptions
+  sidebar?: SidebarStateOptions | boolean
   toolbar?: ToolbarStateOptions | boolean
   media?: {
     store: MediaStore
@@ -64,12 +64,13 @@ export class TinaCMS extends CMS {
     this.media = new MediaManager(mediaStore)
 
     if (sidebar) {
-      this.sidebar = new SidebarState(this.events, sidebar)
+      const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
+      this.sidebar = new SidebarState(this.events, sidebarConfig)
     }
 
     if (toolbar) {
-      const config = typeof toolbar === 'object' ? toolbar : undefined
-      this.toolbar = new ToolbarState(config)
+      const toolbarConfig = typeof toolbar === 'object' ? toolbar : undefined
+      this.toolbar = new ToolbarState(toolbarConfig)
     }
 
     this.fields.add(TextFieldPlugin)
