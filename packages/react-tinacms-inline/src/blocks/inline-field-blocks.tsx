@@ -41,8 +41,8 @@ export interface InlineBlocksProps {
     [key: string]: any
   }
   limits?: {
-    min: number
-    max: number
+    min?: number
+    max?: number
   }
 }
 
@@ -58,8 +58,8 @@ export interface InlineBlocksActions {
   setActiveBlock: any
   direction: 'vertical' | 'horizontal'
   limits?: {
-    min: number
-    max: number
+    min?: number
+    max?: number
   }
 }
 
