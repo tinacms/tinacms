@@ -45,7 +45,7 @@ import {
 
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions
-  toolbar?: ToolbarStateOptions
+  toolbar?: ToolbarStateOptions | boolean
   media?: {
     store: MediaStore
   }
@@ -68,7 +68,8 @@ export class TinaCMS extends CMS {
     }
 
     if (toolbar) {
-      this.toolbar = new ToolbarState(toolbar)
+      const config = typeof toolbar === 'object' ? toolbar : undefined
+      this.toolbar = new ToolbarState(config)
     }
 
     this.fields.add(TextFieldPlugin)
