@@ -123,20 +123,10 @@ export function BlocksControls({
     .slice(0, -1)
     .join('.')
 
-  function isRangeLimited() {
-    return limits?.max === count && limits?.min === count
-  }
+  function withinLimit(limit: number | undefined) {
+    if (!limit) return true
 
-  function showAddBlock() {
-    if (!limits) return true
-
-    return !(limits.max === count || isRangeLimited())
-  }
-
-  function showTrashIcon() {
-    if (!limits) return true
-
-    return !(limits.min === count || isRangeLimited())
+    return !(limit === count || (max === count && min === count))
   }
 
   return (
@@ -155,7 +145,7 @@ export function BlocksControls({
             {...provider.draggableProps}
             disableChildren={!isActive && !childIsActive}
           >
-            {showAddBlock() && (
+            {withinLimit(max) && (
               <AddBlockMenuWrapper active={isActive}>
                 <AddBlockMenu
                   addBlock={block => insert(index, block)}
@@ -202,7 +192,7 @@ export function BlocksControls({
                   {direction === 'horizontal' && <ReorderRowIcon />}
                 </BlockAction>
                 <InlineSettings fields={template.fields} />
-                {showTrashIcon() && (
+                {withinLimit(min) && (
                   <BlockAction onClick={removeBlock}>
                     <TrashIcon />
                   </BlockAction>
