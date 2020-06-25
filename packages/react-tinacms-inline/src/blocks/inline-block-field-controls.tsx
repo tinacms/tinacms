@@ -66,7 +66,8 @@ export function BlocksControls({
     blocks,
     count,
     direction,
-    limits,
+    min,
+    max,
   } = useInlineBlocks()
   const isFirst = index === 0
   const isLast = index === count - 1
