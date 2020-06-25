@@ -40,10 +40,8 @@ export interface InlineBlocksProps {
   itemProps?: {
     [key: string]: any
   }
-  limits?: {
-    min?: number
-    max?: number
-  }
+  min?: number
+  max?: number
 }
 
 export interface InlineBlocksActions {
@@ -57,10 +55,8 @@ export interface InlineBlocksActions {
   activeBlock: number | null
   setActiveBlock: any
   direction: 'vertical' | 'horizontal'
-  limits?: {
-    min?: number
-    max?: number
-  }
+  min?: number
+  max?: number
 }
 
 export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
@@ -83,7 +79,8 @@ export function InlineBlocks({
   className,
   direction = 'vertical',
   itemProps,
-  limits,
+  min,
+  max,
 }: InlineBlocksProps) {
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
@@ -137,7 +134,8 @@ export function InlineBlocks({
                       activeBlock,
                       setActiveBlock,
                       direction,
-                      limits,
+                      min,
+                      max,
                     }}
                   >
                     {allData.length < 1 && cms.enabled && (
