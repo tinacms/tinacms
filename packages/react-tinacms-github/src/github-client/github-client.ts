@@ -253,6 +253,12 @@ export class GithubClient {
       },
     })
   }
+
+  async getDownloadUrl(path: string) {
+    const res = await this.fetchFile(path, false)
+    return res.download_url
+  }
+
   async fetchFile(filePath: string, decoded: boolean = true) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
