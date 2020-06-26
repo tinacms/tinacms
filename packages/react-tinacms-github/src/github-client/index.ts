@@ -17,3 +17,4 @@ limitations under the License.
 */
 
 export * from './github-client'
+export * from './GithubFile'
