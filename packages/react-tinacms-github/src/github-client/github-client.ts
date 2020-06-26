@@ -280,6 +280,8 @@ export class GithubClient {
   ) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
+    const currentBranch = await this.getBranch()
+    const sha = currentBranch.object.sha
 
     return this.req({
       url: `https://api.github.com/repos/${repo}/contents/${path}`,
@@ -288,6 +290,7 @@ export class GithubClient {
         message: commitMessage,
         content: encoded ? fileContents : b64EncodeUnicode(fileContents),
         branch: branch,
+        sha,
       },
     })
   }
