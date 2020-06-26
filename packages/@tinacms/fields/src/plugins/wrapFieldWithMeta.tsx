@@ -83,6 +83,8 @@ const FieldWrapper = styled.div<{ margin: boolean }>`
 `
 
 const FieldLabel = styled.label`
+  all: unset;
+  font-family: 'Inter', sans-serif;
   display: block;
   font-size: var(--tina-font-size-1);
   font-weight: 600;
@@ -95,11 +97,14 @@ const FieldLabel = styled.label`
   overflow: hidden;
 `
 
-export const FieldDescription = styled.p`
-  color: var(--tina-color-grey-6);
+export const FieldDescription = styled.span`
+  all: unset;
+  display: block;
+  font-family: 'Inter', sans-serif;
   font-size: var(--tina-font-size-0);
   font-style: italic;
   font-weight: lighter;
+  color: var(--tina-color-grey-6);
   padding-top: 4px;
   white-space: normal;
   margin: 0;
