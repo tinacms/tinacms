@@ -20,9 +20,9 @@ import * as React from 'react'
 import { useState } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
-
-import styled, { keyframes } from 'styled-components'
+import styled, { css, keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'
+import { useFormPortal } from '@tinacms/react-forms'
 
 type DivProps = any
 type WrappedFieldProps = any
@@ -90,21 +90,53 @@ export const Swatch = styled(
 
 const ColorPopupKeyframes = keyframes`
   0% {
-    transform: translate3d(-50%, 5px, 0) scale3d(0.5,0.5,1)
+    transform: translate3d(-50%, 0, 0) scale3d(0.5,0.5,1)
   }
   100% {
-    transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
+    transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
   }
 `
 
-export const Popover = styled.div`
-  position: absolute;
-  left: 50%;
-  transform: translate3d(-50%, 5px, 0) scale3d(1, 1, 1);
-  transform-origin: 50% -8px;
+const ColorPopupOpenTopKeyframes = keyframes`
+  0% {
+    transform: translate3d(-50%, -100%, 0) scale3d(0.5,0.5,1)
+  }
+  100% {
+    transform: translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1);
+  }
+`
+
+export const Popover = styled.div<{
+  triggerBoundingBox: any
+  openTop: boolean
+}>`
+  position: fixed;
+  top: ${props =>
+    props.triggerBoundingBox ? props.triggerBoundingBox.bottom : '0'}px;
+  left: ${props =>
+    props.triggerBoundingBox
+      ? props.triggerBoundingBox.left + props.triggerBoundingBox.width / 2
+      : '0'}px;
+  transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
+  transform-origin: 50% 0;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
-  z-index: var(--tina-z-index-2);
+  z-index: var(--tina-z-index-4);
+
   &:before {
+    content: '';
+    position: absolute;
+    top: 0;
+    left: 50%;
+    margin-top: 1px;
+    transform: translate3d(-50%, -100%, 0);
+    width: 18px;
+    height: 14px;
+    clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
+    background-color: var(--tina-color-grey-3);
+    z-index: var(--tina-z-index-1);
+  }
+
+  &:after {
     content: '';
     position: absolute;
     top: 0;
@@ -115,8 +147,35 @@ export const Popover = styled.div`
     height: 13px;
     clip-path: polygon(50% 0%, 0% 100%, 100% 100%);
     background-color: white;
-    z-index: var(--tina-z-index-1);
+    z-index: var(--tina-z-index-2);
   }
+
+  ${props =>
+    props.openTop &&
+    css`
+      top: ${props.triggerBoundingBox ? props.triggerBoundingBox.top : '0'}px;
+      transform: translate3d(-50%, calc(-100% - 8px), 0) scale3d(1, 1, 1);
+      animation: ${ColorPopupOpenTopKeyframes} 85ms ease-out both 1;
+      transform-origin: 50% 100%;
+
+      &:before,
+      &:after {
+        top: auto;
+        bottom: 0;
+        transform: translate3d(-50%, 100%, 0);
+        clip-path: polygon(0% 0%, 100% 0%, 50% 100%);
+      }
+
+      &:before {
+        margin-top: 0;
+        margin-bottom: 1px;
+      }
+
+      &:after {
+        margin-top: 0;
+        margin-bottom: 2px;
+      }
+    `};
 `
 
 export const Cover = styled.div`
@@ -128,6 +187,10 @@ export const Cover = styled.div`
   width: 100%;
   height: 100vh;
   z-index: var(--tina-z-index-1);
+`
+
+const ColorPickerWrapper = styled.div`
+  position: relative;
 `
 
 interface Props {
@@ -191,6 +254,50 @@ export const ColorPicker: React.FC<Props> = ({
   widget = 'sketch',
   input,
 }) => {
+  const FormPortal = useFormPortal()
+  const triggerRef = React.useRef<HTMLDivElement | null>(null)
+  const [triggerBoundingBox, setTriggerBoundingBox] = useState<any>(null)
+  const [openTop, setOpenTop] = useState<boolean>(false)
+
+  const updateTriggerBoundingBox = () => {
+    if (triggerRef.current) {
+      setTriggerBoundingBox(triggerRef.current.getBoundingClientRect())
+    }
+  }
+
+  React.useEffect(() => {
+    if (triggerBoundingBox) {
+      const triggerOffsetTop =
+        triggerBoundingBox.top + triggerBoundingBox.height / 2
+      const windowHeight = window.innerHeight
+      if (triggerOffsetTop > windowHeight / 2) {
+        setOpenTop(true)
+      } else {
+        setOpenTop(false)
+      }
+    }
+  }, [triggerBoundingBox])
+
+  React.useEffect(() => {
+    const delay = 100
+    let timeout: any = false
+
+    setTimeout(() => {
+      updateTriggerBoundingBox()
+    }, delay)
+
+    const handleResize = () => {
+      clearTimeout(timeout)
+      timeout = setTimeout(updateTriggerBoundingBox, delay)
+    }
+
+    window.addEventListener('resize', handleResize)
+
+    return () => {
+      window.removeEventListener('resize', handleResize)
+    }
+  }, [triggerRef.current])
+
   const Widget = WIDGETS[widget]
   if (!Widget) throw new Error('You must specify a widget type.')
 
@@ -210,31 +317,41 @@ export const ColorPicker: React.FC<Props> = ({
     )
   }
 
+  const toggleColorPicker = () => {
+    const display = !displayColorPicker
+    setDisplayColorPicker(display)
+    if (display) {
+      updateTriggerBoundingBox()
+    }
+  }
+
   return (
-    <>
+    <ColorPickerWrapper ref={triggerRef}>
       <Swatch
-        onClick={() => setDisplayColorPicker(!displayColorPicker)}
+        onClick={toggleColorPicker}
         colorRGBA={getColorRGBA}
         colorFormat={getColorFormat}
       />
       {displayColorPicker && (
-        <Popover>
-          <Dismissible
-            click
-            escape
-            disabled={!displayColorPicker}
-            onDismiss={() => setDisplayColorPicker(false)}
-          >
-            <Widget
-              presetColors={[...userColors, nullColor]}
-              color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
-              onChange={handleChange}
-              disableAlpha={true}
-              width={'240px'}
-            />
-          </Dismissible>
-        </Popover>
+        <FormPortal>
+          <Popover openTop={openTop} triggerBoundingBox={triggerBoundingBox}>
+            <Dismissible
+              click
+              escape
+              disabled={!displayColorPicker}
+              onDismiss={toggleColorPicker}
+            >
+              <Widget
+                presetColors={[...userColors, nullColor]}
+                color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+                onChange={handleChange}
+                disableAlpha={true}
+                width={'240px'}
+              />
+            </Dismissible>
+          </Popover>
+        </FormPortal>
       )}
-    </>
+    </ColorPickerWrapper>
   )
 }
