@@ -61,7 +61,7 @@ const theme = css`
     --tina-padding-small: 12px;
     --tina-padding-big: 20px;
 
-    --tina-font-size-0: 11px;
+    --tina-font-size-0: 12px;
     --tina-font-size-1: 13px;
     --tina-font-size-2: 15px;
     --tina-font-size-3: 16px;
