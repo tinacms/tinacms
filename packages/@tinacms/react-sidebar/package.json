@@ -51,7 +51,7 @@
     "@tinacms/react-modals": ">=0.1",
     "@tinacms/react-screens": ">=0.1",
     "@tinacms/styles": ">=0.4",
-    "prop-types": ">15",
+    "prop-types": ">=15",
     "react": ">=16.8",
     "styled-components": ">=4.1"
   }

@@ -37,7 +37,7 @@
     "react-final-form": "^6.3.0"
   },
   "peerDependencies": {
-    "prop-types": ">15",
+    "prop-types": ">=15",
     "react": ">=16.8",
     "styled-components": ">=4.1"
   }
