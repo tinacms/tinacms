@@ -30,9 +30,8 @@
   },
   "devDependencies": {
     "@tinacms/media": "^0.1.0",
+    "@tinacms/core": "^0.10.0",
     "@tinacms/scripts": "^0.1.13"
   },
-  "peerDependencies": {
-    "tinacms": ">=0.1"
-  }
+  "peerDependencies": {}
 }
