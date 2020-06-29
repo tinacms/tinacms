@@ -1,0 +1,55 @@
+{
+  "name": "react-tinacms-strapi",
+  "version": "0.0.0",
+  "description": "",
+  "main": "build/index.js",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "build": "tinacms-scripts build"
+  },
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/react-tinacms-strapi"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "files": [
+    "build"
+  ],
+  "keywords": [
+    "tinacms",
+    "strapi"
+  ],
+  "bugs": {
+    "url": "https://github.com/tinacms/tinacms/issues"
+  },
+  "peerDependencies": {
+    "@tinacms/fields": "^0.12.0",
+    "@tinacms/media": "^0.1.0",
+    "@tinacms/react-forms": "^0.2.0",
+    "@tinacms/styles": "^0.5.1",
+    "react": "^16.13.1",
+    "react-final-form": "^6.5.0",
+    "tinacms": "^0.21.2"
+  },
+  "dependencies": {
+    "js-cookie": "^2.2.1",
+    "styled-components": "^5.1.1"
+  },
+  "devDependencies": {
+    "@tinacms/fields": "^0.12.0",
+    "@tinacms/media": "^0.1.0",
+    "@tinacms/react-forms": "^0.2.0",
+    "@tinacms/styles": "^0.5.1",
+    "@types/js-cookie": "^2.2.6",
+    "@types/react": "^16.9.36",
+    "react-final-form": "^6.5.0",
+    "tinacms": "^0.21.2",
+    "tsdx": "^0.13.2",
+    "typescript": "^3.9.5",
+    "@tinacms/scripts": "^0.1.13"
+  }
+}
