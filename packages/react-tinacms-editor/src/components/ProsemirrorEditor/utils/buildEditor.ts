@@ -57,7 +57,7 @@ export const buildEditor = (
       view.updateState(nextState as any)
       setEditorView({ view })
 
-      if (tr.docChanged) {
+      if (tr.docChanged && !tr.getMeta('input-update')) {
         input.onChange(translator!.stringFromNode(tr.doc))
       }
     },
