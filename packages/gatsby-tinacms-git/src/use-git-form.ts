@@ -17,6 +17,8 @@ limitations under the License.
 */
 
 import { useCMS, useForm, Form, FormOptions, WatchableFormValue } from 'tinacms'
+import { useMemo } from 'react'
+import { GitFile } from '@tinacms/git-client'
 
 export interface GitNode {
   fileRelativePath: string
@@ -33,42 +35,40 @@ export function useGitForm<N extends GitNode>(
   options: GitFormOptions<N>,
   watch: WatchableFormValue
 ): [N, Form] {
-  const { format, parse, ...formOptions } = options
-  const cms = useCMS()
+  const { format, parse, ...config } = options
+  const gitFile = useGitFile(node.fileRelativePath, format, parse)
 
-  function loadInitialValues() {
-    return cms.api.git
-      .show(node.fileRelativePath) // Load the contents of this file at HEAD
-      .then((git: any) => {
-        return parse(git.content)
-      })
+  const defaultConfig = {
+    label: '',
+    fields: [],
+    loadInitialValues: gitFile.show,
+    onSubmit: gitFile.commit,
+    reset: gitFile.reset,
+    onChange({ values }: any) {
+      return gitFile.write(values)
+    },
   }
 
   return useForm(
     {
-      label: formOptions.label || '',
-      fields: formOptions.fields || [],
-      loadInitialValues,
-      onSubmit(data: any) {
-        return cms.api.git.onSubmit!({
-          files: [data.fileRelativePath],
-          message: data.__commit_message || 'Tina commit',
-          name: data.__commit_name,
-          email: data.__commit_email,
-        })
-      },
-      reset() {
-        return cms.api.git.reset({ files: [node.fileRelativePath] })
-      },
-      onChange({ values }) {
-        cms.api.git.onChange!({
-          fileRelativePath: values.fileRelativePath,
-          content: format(values),
-        })
-      },
-      ...formOptions,
-      id: node.fileRelativePath,
+      ...defaultConfig,
+      ...config,
+      id: gitFile.relativePath,
     },
     watch
   )
+}
+
+function useGitFile(
+  relativePath: string,
+  format: (file: any) => string,
+  parse: (content: string) => any
+) {
+  const cms = useCMS()
+  return useMemo(() => new GitFile(cms, relativePath, format, parse), [
+    cms,
+    relativePath,
+    format,
+    parse,
+  ])
 }
