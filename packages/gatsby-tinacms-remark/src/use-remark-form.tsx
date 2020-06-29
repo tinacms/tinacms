@@ -90,25 +90,23 @@ export function useRemarkForm(
 
   const label = formOptions.label || node.frontmatter.title
 
+  const config = {
+    ...formOptions,
+    label,
+    fields,
+    format: toMarkdownString,
+    parse: (content: string) => ({
+      ..._node,
+      ...fromMarkdownString(content),
+    }),
+  }
+
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
-  const [, form] = useGitForm(
-    node,
-    {
-      ...formOptions,
-      label,
-      fields,
-      format: toMarkdownString,
-      parse: content => ({
-        ..._node,
-        ...fromMarkdownString(content),
-      }),
-    },
-    {
-      label,
-      fields,
-      values: valuesOnDisk,
-    }
-  )
+  const [, form] = useGitForm(node, config, {
+    label,
+    fields,
+    values: valuesOnDisk,
+  })
 
   return [node, form]
 }
