@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.1...@tinacms/fields@0.12.2) (2020-06-29)
+
+
+### Bug Fixes
+
+* use modal portal for color popup ([7b64d9f](https://github.com/tinacms/tinacms/commit/7b64d9f))
+
+
+
+
+
 ## [0.12.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.1-alpha.0...@tinacms/fields@0.12.1) (2020-06-23)
 
 **Note:** Version bump only for package @tinacms/fields

@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.7](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.3.6...@tinacms/form-builder@0.3.7) (2020-06-29)
+
+**Note:** Version bump only for package @tinacms/form-builder
+
+
+
+
+
 ## [0.3.6](https://github.com/tinacms/tinacms/compare/@tinacms/form-builder@0.3.6-alpha.0...@tinacms/form-builder@0.3.6) (2020-06-23)
 
 **Note:** Version bump only for package @tinacms/form-builder
