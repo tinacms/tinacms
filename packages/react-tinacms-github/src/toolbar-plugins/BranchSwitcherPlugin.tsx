@@ -206,6 +206,10 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
               branchName: name,
             })
             cms.api.github.setWorkingBranch(name)
+            cms.events.dispatch({
+              type: 'github:branch:checkout',
+              branchName: name,
+            })
             if (onBranchChange) {
               onBranchChange(name)
             }
