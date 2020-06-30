@@ -16,14 +16,7 @@ limitations under the License.
 
 */
 
-import React from 'react'
+const { createJestConfig } = require('@tinacms/scripts')
+const pack = require('./package')
 
-export interface GithubEditingProps {
-  editMode: boolean
-  enterEditMode: () => void
-  exitEditMode: () => void
-}
-
-export const GithubEditingContext = React.createContext<GithubEditingProps | null>(
-  null
-)
+module.exports = createJestConfig(pack)

@@ -285,13 +285,25 @@ const SaveLink = styled.button`
   }
 `
 
-const CancelLink = styled(SaveLink)`
-  background-color: white;
+const CancelLink = styled.button`
+  text-align: center;
   border: 1px solid var(--tina-color-grey-2);
+  border-radius: var(--tina-radius-big);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
+  background-color: white;
   color: var(--tina-color-primary);
+  font-weight: var(--tina-font-weight-regular);
+  cursor: pointer;
+  transition: all 85ms ease-out;
+  font-size: var(--tina-font-size-0);
+  padding: 8px 20px;
+  margin-left: 8px;
   &:hover {
     background-color: var(--tina-color-grey-1);
     opacity: 1;
+  }
+  &:active {
+    background-color: var(--tina-color-primary-dark);
   }
 `
 

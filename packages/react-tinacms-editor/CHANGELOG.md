@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.3-alpha.0...react-tinacms-editor@0.8.3) (2020-06-29)
+
+
+### Bug Fixes
+
+* extra paragraphs created while inserting table ([c369c18](https://github.com/tinacms/tinacms/commit/c369c18))
+
+
+
+
+
+## [0.8.3-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.2...react-tinacms-editor@0.8.3-alpha.0) (2020-06-24)
+
+
+### Bug Fixes
+
+* fenced code blocks ([c666e49](https://github.com/tinacms/tinacms/commit/c666e49))
+
+
+
+
+
 ## [0.8.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.2-alpha.0...react-tinacms-editor@0.8.2) (2020-06-23)
 
 

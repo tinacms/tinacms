@@ -18,7 +18,6 @@ limitations under the License.
 
 import React, { useEffect, useState } from 'react'
 import { useCMS } from 'tinacms'
-import { useGithubEditing } from '../github-editing-context/useGithubEditing'
 import { getModalProps } from './github-interpeter'
 import {
   ActionableModalOptions,
@@ -43,7 +42,7 @@ const GithubErrorModal = (props: Props) => {
   ] = useState<ActionableModalOptions | null>(null)
   const { github } = useCMS().api
 
-  const githubEditing = useGithubEditing()
+  const cms = useCMS()
 
   useEffect(() => {
     ;(async () => {
@@ -51,15 +50,15 @@ const GithubErrorModal = (props: Props) => {
         const modalProps = await getModalProps(
           props.error,
           github,
-          githubEditing.enterEditMode,
-          githubEditing.exitEditMode
+          cms.enable,
+          cms.disable
         )
         setErrorModalProps(modalProps)
       } else {
         setErrorModalProps(null)
       }
     })()
-  }, [props.error, githubEditing.enterEditMode])
+  }, [props.error, cms.enable])
 
   if (!errorModalProps) {
     return null
