@@ -17,10 +17,12 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { useCMS } from 'tinacms'
 import { InlineField } from 'react-tinacms-inline'
-import { Wysiwyg, WysiwygProps } from '../components/Editor'
+import { Wysiwyg } from '../components/Wysiwyg'
+import { EditorProps } from '../types'
 
-export interface InlineWysiwygFieldProps extends Omit<WysiwygProps, 'input'> {
+export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
   children: any
 }
@@ -30,10 +32,11 @@ export function InlineWysiwyg({
   children,
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
+  const cms = useCMS()
   return (
     <InlineField name={name}>
-      {({ input, status }: any) => {
-        if (status === 'active') {
+      {({ input }: any) => {
+        if (cms.enabled) {
           return <Wysiwyg input={input} {...wysiwygProps} />
         }
         return <>{children}</>

@@ -157,9 +157,7 @@ export const Toolbar = () => {
                 </>
               )}
             </SaveButton>
-            {form && form.actions.length > 0 && (
-              <FormActionMenu actions={form.actions} form={form} />
-            )}
+            <FormActionMenu form={form} />
           </Actions>
         </AlignRight>
       </StyledToolbar>
@@ -487,7 +485,9 @@ const MenuWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
+  all: unset;
   ${tina_reset_styles}
+  box-sizing: border-box;
   background: var(--tina-color-grey-8);
   position: fixed;
   top: 0;

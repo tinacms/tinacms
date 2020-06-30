@@ -42,6 +42,8 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   finalForm: FormApi<S>
   actions: any[]
 
+  loading: boolean = false
+
   constructor({
     id,
     label,
@@ -57,14 +59,11 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.id = id
     this.label = label
     this.fields = fields
+    this.onSubmit = options.onSubmit
     this.finalForm = createForm<S>({
       ...options,
       initialValues,
-      async onSubmit(values, form, cb) {
-        const response = await options.onSubmit(values, form, cb)
-        form.initialize(values)
-        return response
-      },
+      onSubmit: this.handleSubmit,
       mutators: {
         ...arrayMutators,
         ...options.mutators,
@@ -76,9 +75,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.updateFields(this.fields)
 
     if (loadInitialValues) {
-      loadInitialValues().then(initialValues => {
-        this.updateInitialValues(initialValues)
-      })
+      this.loading = true
+      loadInitialValues()
+        .then(initialValues => {
+          this.updateInitialValues(initialValues)
+        })
+        .finally(() => {
+          this.loading = false
+        })
     }
 
     if (onChange) {
@@ -107,9 +111,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 
   /**
    * Returns the current values of the form.
+   *
+   * if the form is still loading it returns `undefined`.
    */
-  get values() {
-    return this.finalForm.getState().values
+  get values(): S | undefined {
+    if (this.loading) {
+      return undefined
+    }
+    return this.finalForm.getState().values || this.initialValues
   }
 
   /**
@@ -161,6 +170,14 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     return this.finalForm.subscribe(cb, options)
   }
 
+  onSubmit: Config<S>['onSubmit']
+
+  private handleSubmit: Config<S>['onSubmit'] = async (values, form, cb) => {
+    const response = await this.onSubmit(values, form, cb)
+    form.initialize(values)
+    return response
+  }
+
   /**
    * Submits the form if there are currently no validation errors. It may
    * return undefined or a Promise depending on the nature of the onSubmit
@@ -200,9 +217,9 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       const activePath: string | undefined = this.finalForm.getState().active
 
       if (!activePath) {
-        updateEverything(this.finalForm, values)
+        updateEverything<S>(this.finalForm, values)
       } else {
-        updateSelectively(this.finalForm, values)
+        updateSelectively<S>(this.finalForm, values)
       }
     })
   }
@@ -216,26 +233,26 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   updateInitialValues(initialValues: S) {
     this.finalForm.batch(() => {
-      const values = this.values
+      const values = this.values || ({} as S)
       this.finalForm.initialize(initialValues)
       const activePath: string | undefined = this.finalForm.getState().active
 
       if (!activePath) {
-        updateEverything(this.finalForm, values)
+        updateEverything<S>(this.finalForm, values)
       } else {
-        updateSelectively(this.finalForm, values)
+        updateSelectively<S>(this.finalForm, values)
       }
     })
   }
 }
 
-function updateEverything(form: FormApi<any>, values: any) {
+function updateEverything<S>(form: FormApi<any>, values: S) {
   Object.entries(values).forEach(([path, value]) => {
     form.change(path, value)
   })
 }
 
-function updateSelectively(form: FormApi<any>, values: any, prefix?: string) {
+function updateSelectively<S>(form: FormApi<any>, values: S, prefix?: string) {
   const activePath: string = form.getState().active!
 
   Object.entries(values).forEach(([name, value]) => {

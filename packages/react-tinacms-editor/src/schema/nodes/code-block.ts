@@ -16,14 +16,24 @@ limitations under the License.
 
 */
 
+import { Node } from 'prosemirror-model'
+
 export const code_block = {
   content: 'text*',
   attrs: { params: { default: '' } },
   group: 'block',
   code: true,
   defining: true,
-  parseDOM: [{ tag: 'pre', preserveWhitespace: 'full' }],
-  toDOM() {
-    return ['pre', ['code', 0]]
+  parseDOM: [
+    {
+      tag: 'pre',
+      preserveWhitespace: 'full',
+      getAttrs: (dom: Element) => ({
+        params: dom.getAttribute('data-params'),
+      }),
+    },
+  ],
+  toDOM(node: Node) {
+    return ['pre', { 'data-params': node.attrs.params }, ['code', 0]]
   },
 }

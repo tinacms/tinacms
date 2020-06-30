@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 // Base Components
-export * from './components/Editor'
-export * from './components/RawModeEditor'
+export * from './components/Wysiwyg'
 
 // Field Plugins
 export * from './tinacms-plugins/HtmlFieldPlugin'

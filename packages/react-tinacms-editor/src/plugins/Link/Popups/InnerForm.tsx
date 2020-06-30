@@ -192,12 +192,24 @@ const SaveLink = styled.button`
   }
 `
 
-const DeleteLink = styled(SaveLink)`
-  background-color: white;
+const DeleteLink = styled.button`
+  text-align: center;
   border: 1px solid var(--tina-color-grey-2);
+  border-radius: var(--tina-radius-big);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
+  background-color: white;
   color: #0084ff;
+  font-weight: var(--tina-font-weight-regular);
+  cursor: pointer;
+  transition: all 85ms ease-out;
+  font-size: var(--tina-font-size-0);
+  padding: 8px 20px;
+  margin-left: 8px;
   &:hover {
     background-color: #f6f6f9;
     opacity: 1;
+  }
+  &:active {
+    background-color: #0574e4;
   }
 `

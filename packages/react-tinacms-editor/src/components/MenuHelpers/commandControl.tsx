@@ -42,7 +42,15 @@ export const commandControl = (
   const canDo = () => command(editorView!.view.state)
 
   return (
-    <MenuButton data-tooltip={tooltip} onClick={onClick} disabled={!canDo()}>
+    <MenuButton
+      data-tooltip={tooltip}
+      onClick={onClick}
+      disabled={!canDo()}
+      onMouseDown={evt => {
+        evt.preventDefault()
+        evt.stopPropagation()
+      }}
+    >
       <Icon />
     </MenuButton>
   )

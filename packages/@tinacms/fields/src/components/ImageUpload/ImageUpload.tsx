@@ -21,12 +21,14 @@ import { useDropzone } from 'react-dropzone'
 import styled, { css } from 'styled-components'
 import { IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
+import { LoadingDots } from '@tinacms/react-forms'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   onClear?: () => void
   value?: string
   previewSrc?: string
+  loading?: boolean
 }
 
 const DropArea = styled.div`
@@ -103,30 +105,34 @@ export const ImageUpload = ({
   onClear,
   value,
   previewSrc,
+  loading,
 }: ImageUploadProps) => {
-  const {
-    getRootProps,
-    getInputProps,
-    isDragActive,
-    isDragAccept,
-    isDragReject,
-  } = useDropzone({ accept: 'image/*', onDrop })
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop,
+  })
 
   return (
-    <DropArea {...getRootProps({ isDragActive, isDragAccept, isDragReject })}>
+    <DropArea {...getRootProps()}>
       <input {...getInputProps()} />
       {value ? (
         <StyledImageContainer>
-          <StyledImage src={previewSrc} />
-          {onClear && (
-            <DeleteButton
-              onClick={e => {
-                e.stopPropagation()
-                onClear()
-              }}
-            >
-              <TrashIcon />
-            </DeleteButton>
+          {loading ? (
+            <ImageLoadingIndicator />
+          ) : (
+            <>
+              <StyledImage src={previewSrc} />
+              {onClear && (
+                <DeleteButton
+                  onClick={e => {
+                    e.stopPropagation()
+                    onClear()
+                  }}
+                >
+                  <TrashIcon />
+                </DeleteButton>
+              )}
+            </>
           )}
         </StyledImageContainer>
       ) : (
@@ -139,3 +145,19 @@ export const ImageUpload = ({
     </DropArea>
   )
 }
+
+const ImageLoadingIndicator = () => (
+  <ImageLoaderWrapper>
+    <LoadingDots />
+  </ImageLoaderWrapper>
+)
+
+const ImageLoaderWrapper = styled.div`
+  padding: 1rem;
+  width: 100%;
+  min-height: 6rem;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  align-items: center;
+`

@@ -3,6 +3,70 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.3.22](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.22-alpha.0...next-tinacms-json@0.3.22) (2020-06-29)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
+## [0.3.22-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.21...next-tinacms-json@0.3.22-alpha.0) (2020-06-24)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
+## [0.3.21](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.21-alpha.0...next-tinacms-json@0.3.21) (2020-06-23)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
+## [0.3.21-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.20...next-tinacms-json@0.3.21-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
+## [0.3.20](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.20-alpha.1...next-tinacms-json@0.3.20) (2020-06-15)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
+## [0.3.20-alpha.1](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.20-alpha.0...next-tinacms-json@0.3.20-alpha.1) (2020-06-12)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
+## [0.3.20-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.19...next-tinacms-json@0.3.20-alpha.0) (2020-06-08)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
+## [0.3.19](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.18...next-tinacms-json@0.3.19) (2020-06-08)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
 ## [0.3.18](https://github.com/tinacms/tinacms/compare/next-tinacms-json@0.3.18-alpha.2...next-tinacms-json@0.3.18) (2020-06-01)
 
 **Note:** Version bump only for package next-tinacms-json

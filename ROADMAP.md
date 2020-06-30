@@ -4,38 +4,32 @@ The TinaCMS core team is a part of Forestry.io. The purpose of
 this document is to communicate to the greater community how the
 TinaCMS core team will prioritize upcoming development.
 
-**Current Goal: 100 live sites with _very_ happy users**
+## Process
 
-Over the next few months, the TinaCMS core team will focus
-development efforts on getting 100 production website using
-TinaCMS, with _very_ happy editors.
+The TinaCMS core team follows an 8 week development cycle:
 
-Two high-level sets of issues have been identified:
+- 6 weeks of development
+- 2 week cooldown.
 
-1. High impact issues that will likely be necessary for people to successfully
-   use TinaCMS in production; and
-2. Medium impact issues that would be nice to have, but probably not necessary.
+TinaCMS is a toolkit for building content management systems. In
+order to improve this toolkit, the core team works on various
+projects to directly or indirectly push TinaCMS forward. These
+projects are pitched to the team in well scoped documents that
+describe their value to the TinaCMS open source toolkit and it's
+sponsors. The team chooses the projects it wants to take on for
+the next 6 weeks. Any improvements that are made to the `tinacms/tinacms` repository during that time will be part of the regular weekly release.
+At the end of that 6 weeks the team takes 2 weeks to step back, gain
+perspective, and plan the next 6 week period.
 
-**High Impact**
+## Cycles
 
-- Collaboration
-  - Identifying commit authors
-  - Locking forms
-- Media management
-- Better media support in the markdown wysiwyg
-- Improving the inline editing experience
-- Select Field Plugin
-- Next.js Support
-- Netlify Notification Plugin
-- Global Forms
+### Cycle 1: May 18th to June 26th
 
-**Medium Impact**
+| Begins        | Ends           |
+| ------------- | -------------- |
+| May 18th 2020 | June 26th 2020 |
 
-- Tags Field Plugin
-- Number Field Plugin
-- Sortable List Field Plugin
-- Conditionally show fields
-- How to manage menus
-- Adding a core notification system
-- Adding other backends
-- Notification system
+**Projects**
+
+- Improving the Inline Editing Experience
+- Github Based Authoring with `create-react-app`

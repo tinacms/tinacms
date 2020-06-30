@@ -3,6 +3,96 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.3-alpha.0...react-tinacms-editor@0.8.3) (2020-06-29)
+
+
+### Bug Fixes
+
+* extra paragraphs created while inserting table ([c369c18](https://github.com/tinacms/tinacms/commit/c369c18))
+
+
+
+
+
+## [0.8.3-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.2...react-tinacms-editor@0.8.3-alpha.0) (2020-06-24)
+
+
+### Bug Fixes
+
+* fenced code blocks ([c666e49](https://github.com/tinacms/tinacms/commit/c666e49))
+
+
+
+
+
+## [0.8.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.2-alpha.0...react-tinacms-editor@0.8.2) (2020-06-23)
+
+
+### Bug Fixes
+
+* code block breaking heading dropdown ([93419b4](https://github.com/tinacms/tinacms/commit/93419b4))
+* improvements in code block ([9f2f853](https://github.com/tinacms/tinacms/commit/9f2f853))
+
+
+
+
+
+## [0.8.2-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.1...react-tinacms-editor@0.8.2-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.8.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.1-alpha.1...react-tinacms-editor@0.8.1) (2020-06-15)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.8.1-alpha.1](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.1-alpha.0...react-tinacms-editor@0.8.1-alpha.1) (2020-06-12)
+
+
+### Bug Fixes
+
+* circular dependencies ([b4de165](https://github.com/tinacms/tinacms/commit/b4de165))
+* code block node view ([295b69b](https://github.com/tinacms/tinacms/commit/295b69b))
+* code mark should not exist with other marks ([480d21e](https://github.com/tinacms/tinacms/commit/480d21e))
+* editor scrolling while changing mode ([da135d8](https://github.com/tinacms/tinacms/commit/da135d8))
+* hybrid controlled behaviour for code-mirror editor within wysiwyg ([99b87f3](https://github.com/tinacms/tinacms/commit/99b87f3))
+* making editor hybrid controlled ([11d034b](https://github.com/tinacms/tinacms/commit/11d034b))
+
+
+
+
+
+## [0.8.1-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.0...react-tinacms-editor@0.8.1-alpha.0) (2020-06-08)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+# [0.8.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.7.2...react-tinacms-editor@0.8.0) (2020-06-08)
+
+
+### Bug Fixes
+
+* making editor hybrid controlled ([0045700](https://github.com/tinacms/tinacms/commit/0045700))
+
+
+### Features
+
+* creating plugin for mode toggle menu component ([12255c8](https://github.com/tinacms/tinacms/commit/12255c8))
+
+
+
+
+
 ## [0.7.2](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.7.2-alpha.3...react-tinacms-editor@0.7.2) (2020-06-01)
 
 **Note:** Version bump only for package react-tinacms-editor

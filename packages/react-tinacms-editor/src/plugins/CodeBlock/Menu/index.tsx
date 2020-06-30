@@ -16,5 +16,5 @@ limitations under the License.
 
 */
 
-export { WysiwygMenu } from './WysiwygMenu'
+export { ProsemirrorMenu } from './ProsemirrorMenu'
 export { MarkdownMenu } from './MarkdownMenu'

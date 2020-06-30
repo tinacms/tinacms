@@ -16,22 +16,28 @@ limitations under the License.
 
 */
 
-import Link from "next/link";
+import Link from 'next/link'
+import { useCMS } from 'tinacms'
 
 export default function Header(props) {
+  const cms = useCMS()
   return (
     <header className="header">
-      <nav
-        className="nav"
-        role="navigation"
-        aria-label="main navigation"
-      >
+      <nav className="nav" role="navigation" aria-label="main navigation">
         <Link href="/">
-          <h1>{props.siteTitle}</h1>
+          <h1>Home</h1>
         </Link>
-        <Link href="/info">
-          <h1>Info</h1>
-        </Link>
+        <section>
+          <Link href="/info">
+            <h1>Info</h1>
+          </Link>
+          <Link href="/blocks">
+            <h1>Blocks</h1>
+          </Link>
+          <Link href="/nesting">
+            <h1>Nesting</h1>
+          </Link>
+        </section>
       </nav>
       <style jsx>
         {`
@@ -49,16 +55,24 @@ export default function Header(props) {
             flex-direction: row;
             align-items: center;
           }
+          section h1 {
+            margin-top: 1rem;
+          }
           @media (min-width: 768px) {
             .header {
-              height: 100vh;
+              ${cms.enabled
+                ? `
+    height: calc(100% - 62px);
+    margin-top: 62px;
+`
+                : `height: 100%;`}
               position: fixed;
               left: 0;
               top: 0;
             }
             .nav {
               padding: 2rem;
-              width: 30vw;
+              width: 20vw;
               height: 100%;
               border-right: 1px solid #ebebeb;
               border-bottom: none;
@@ -69,6 +83,5 @@ export default function Header(props) {
         `}
       </style>
     </header>
-  );
+  )
 }
-

@@ -3,6 +3,71 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.1...@tinacms/fields@0.12.2) (2020-06-29)
+
+
+### Bug Fixes
+
+* use modal portal for color popup ([7b64d9f](https://github.com/tinacms/tinacms/commit/7b64d9f))
+
+
+
+
+
+## [0.12.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.1-alpha.0...@tinacms/fields@0.12.1) (2020-06-23)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+## [0.12.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.0...@tinacms/fields@0.12.1-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+# [0.12.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.0-alpha.1...@tinacms/fields@0.12.0) (2020-06-15)
+
+
+### Bug Fixes
+
+* prevents empty tag field registering ([17801bf](https://github.com/tinacms/tinacms/commit/17801bf))
+
+
+
+
+
+# [0.12.0-alpha.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.0-alpha.0...@tinacms/fields@0.12.0-alpha.1) (2020-06-12)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
+# [0.12.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.2...@tinacms/fields@0.12.0-alpha.0) (2020-06-08)
+
+
+### Features
+
+* **ImageFieldPlugin:** support async previewSrc ([d5312bb](https://github.com/tinacms/tinacms/commit/d5312bb))
+
+
+
+
+
+## [0.11.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.1...@tinacms/fields@0.11.2) (2020-06-08)
+
+**Note:** Version bump only for package @tinacms/fields
+
+
+
+
+
 ## [0.11.1](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.11.1-alpha.2...@tinacms/fields@0.11.1) (2020-06-01)
 
 **Note:** Version bump only for package @tinacms/fields

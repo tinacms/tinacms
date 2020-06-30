@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Wysiwyg } from '../components/Editor'
+import { Wysiwyg } from '../components/Wysiwyg'
 import { wysiwygStyles } from './wysiwygStyles'
 
 const MarkdownField = wysiwygStyles(props => {

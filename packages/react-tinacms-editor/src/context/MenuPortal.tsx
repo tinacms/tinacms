@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { useContext } from 'react'
 import { createPortal } from 'react-dom'
-import styled from 'styled-components'
 
 export type MenuPortal = React.FC<{}>
 
@@ -44,9 +43,7 @@ export const MenuPortalProvider: React.FC = ({ children }) => {
 
   return (
     <MenuPortalContext.Provider value={MenuPortal}>
-      <MenuPortalWrapper ref={wrapperRef}>{children}</MenuPortalWrapper>
+      <div ref={wrapperRef}>{children}</div>
     </MenuPortalContext.Provider>
   )
 }
-
-const MenuPortalWrapper = styled.div``

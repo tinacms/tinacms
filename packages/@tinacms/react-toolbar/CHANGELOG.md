@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.3.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.3.0-alpha.0...@tinacms/react-toolbar@0.3.0) (2020-06-29)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+# [0.3.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.2.1...@tinacms/react-toolbar@0.3.0-alpha.0) (2020-06-24)
+
+
+### Features
+
+* removed ToolbarProvider as toolbar state no longer tracks "hidden" ([4805449](https://github.com/tinacms/tinacms/commit/4805449))
+
+
+
+
+
+## [0.2.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.2.1-alpha.0...@tinacms/react-toolbar@0.2.1) (2020-06-23)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+## [0.2.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.2.0...@tinacms/react-toolbar@0.2.1-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+# [0.2.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.2.0-alpha.0...@tinacms/react-toolbar@0.2.0) (2020-06-15)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+# [0.2.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.7-alpha.0...@tinacms/react-toolbar@0.2.0-alpha.0) (2020-06-12)
+
+
+### Features
+
+* add exit tina button to form actions ([4c38a00](https://github.com/tinacms/tinacms/commit/4c38a00))
+
+
+
+
+
+## [0.1.7-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.6...@tinacms/react-toolbar@0.1.7-alpha.0) (2020-06-08)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
+## [0.1.6](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.5...@tinacms/react-toolbar@0.1.6) (2020-06-08)
+
+**Note:** Version bump only for package @tinacms/react-toolbar
+
+
+
+
+
 ## [0.1.5](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.1.5-alpha.2...@tinacms/react-toolbar@0.1.5) (2020-06-01)
 
 **Note:** Version bump only for package @tinacms/react-toolbar

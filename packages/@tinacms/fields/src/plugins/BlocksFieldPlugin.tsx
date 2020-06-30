@@ -47,7 +47,6 @@ export interface BlocksFieldDefinititon extends Field {
 }
 
 export interface BlockTemplate {
-  type: string
   label: string
   defaultItem?: object | (() => object)
   fields?: Field[]

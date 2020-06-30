@@ -38,4 +38,5 @@ export const strong = {
   toDOM() {
     return ['strong']
   },
+  excludes: 'code',
 }

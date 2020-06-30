@@ -21,8 +21,18 @@ import { MediaIcon } from '@tinacms/icons'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 
-export const MarkdownMenu = () => (
-  <MenuButton data-tooltip="Image" data-side="top" disabled>
-    <MediaIcon />
-  </MenuButton>
-)
+interface Props {
+  uploadImages?: (files: File[]) => Promise<string[]>
+}
+
+export const MarkdownMenu: React.FC<Props> = ({ uploadImages }) =>
+  uploadImages ? (
+    <MenuButton
+      data-testid="image-menu"
+      data-tooltip="Image"
+      data-side="top"
+      disabled
+    >
+      <MediaIcon />
+    </MenuButton>
+  ) : null

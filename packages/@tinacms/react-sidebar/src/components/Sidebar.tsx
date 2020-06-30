@@ -43,10 +43,7 @@ export function SidebarProvider({
   position,
   sidebar,
 }: SidebarProviderProps) {
-  const cms = useCMS()
   useSubscribable(sidebar)
-
-  if (cms.disabled || sidebar.hidden) return children
 
   return (
     <>
@@ -55,7 +52,7 @@ export function SidebarProvider({
       ) : (
         children
       )}
-      {!sidebar.hidden && <Sidebar sidebar={sidebar} />}
+      <Sidebar sidebar={sidebar} />
     </>
   )
 }
@@ -90,7 +87,9 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
             )}
             <CreateContentMenu />
           </SidebarHeader>
-          <FormsView />
+          <FormsView>
+            <sidebar.placeholder />
+          </FormsView>
           {showMenu && (
             <MenuPanel visible={menuIsOpen}>
               <MenuWrapper>

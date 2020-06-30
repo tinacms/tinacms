@@ -21,4 +21,5 @@ export const code = {
   toDOM() {
     return ['code']
   },
+  excludes: 'em strong strike',
 }

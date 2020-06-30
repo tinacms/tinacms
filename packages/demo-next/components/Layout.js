@@ -16,43 +16,49 @@ limitations under the License.
 
 */
 
-import Header from "./Header";
+import Header from './Header'
 import Meta from './Meta'
 
 export default function Layout(props) {
   return (
-    <section
-      className="layout"
-    >
-    <Meta 
-      siteTitle={props.siteTitle || "Site Title"} 
-      description={props.siteDescription} 
-    />
-    <Header siteTitle={props.siteTitle || "Site Title"} />
-    <div className="content">{props.children}</div>
-    <style jsx>
-      {`
-        .layout {
-          overflow-x: hidden;
-          display: flex;
-          flex-direction: column;
-          min-height: 100vh;
-        }
-        .content {
-          flex-grow: 1;
-        }
-        @media (min-width: 768px) {
+    <section className="layout">
+      <Meta
+        siteTitle={props.siteTitle || 'Site Title'}
+        description={props.siteDescription}
+      />
+      <Header siteTitle={props.siteTitle || 'Site Title'} />
+      <div className="content">{props.children}</div>
+      <style jsx>
+        {`
           .layout {
-            display: block;
+            overflow-x: hidden;
+            display: flex;
+            flex-direction: column;
+            min-height: 100vh;
           }
-          .content {
-            flex-grow: none;
-            width: 70vw;
-            margin-left: 30vw;
+          div.content {
+            flex-grow: 1;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            padding: 0 2rem;
+            min-height: 100vh;
+            margin-top 2rem;
+            overflow: hidden;
           }
-        }
-      `}
-    </style>
-  </section>
-  );
+          @media (min-width: 768px) {
+            .layout {
+              display: block;
+            }
+            .content {
+              flex-grow: none;
+              width: 80vw;
+              margin-left: 20vw;
+            }
+          }
+        `}
+      </style>
+    </section>
+  )
 }
