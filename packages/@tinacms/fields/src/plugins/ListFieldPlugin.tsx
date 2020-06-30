@@ -19,19 +19,11 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { css } from 'styled-components'
-import { FieldsBuilder } from '@tinacms/form-builder'
+import { FieldsBuilder, FieldsGroup } from '@tinacms/form-builder'
 import { IconButton } from '@tinacms/styles'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
-import {
-  AddIcon,
-  DragIcon,
-  ReorderIcon,
-  TrashIcon,
-  LeftArrowIcon,
-} from '@tinacms/icons'
-import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { useFormPortal } from '@tinacms/react-forms'
-import { FieldDescription } from './wrapFieldWithMeta'
+import { AddIcon, ReorderIcon, TrashIcon } from '@tinacms/icons'
+import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
 
 interface ListFieldDefinititon extends Field {
   component: 'list'
@@ -143,12 +135,17 @@ interface ItemProps {
 }
 
 const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
-  const FormPortal = useFormPortal()
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
   const removeItem = React.useCallback(() => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
-  const title = label || (field.label || field.name) + ' Item'
+  const fields = [
+    {
+      ...field.itemField,
+      label: 'Value',
+      name: field.name + '.' + index,
+    },
+  ]
+
   return (
     <Draggable
       type={field.name}
@@ -157,46 +154,44 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
     >
       {(provider, snapshot) => (
         <>
-          <ItemHeader
+          <ListItem
             ref={provider.innerRef}
             isDragging={snapshot.isDragging}
             {...provider.draggableProps}
             {...provider.dragHandleProps}
             {...p}
           >
-            <DragHandle />
-            <ItemClickTarget onClick={() => setExpanded(true)}>
-              <Label>{title}</Label>
-            </ItemClickTarget>
-            <DeleteButton onClick={removeItem}>
-              <TrashIcon />
-            </DeleteButton>
-          </ItemHeader>
-          <FormPortal>
-            <Panel
-              isExpanded={isExpanded}
-              setExpanded={setExpanded}
-              field={field}
-              value={item}
-              index={index}
-              tinaForm={tinaForm}
-              itemTitle={title}
-            />
-          </FormPortal>
+            <ItemField>
+              <FieldsBuilder form={tinaForm} fields={fields} />
+            </ItemField>
+            <ItemActions>
+              <DragHandle />
+              <DeleteButton onClick={removeItem}>
+                <TrashIcon />
+              </DeleteButton>
+            </ItemActions>
+          </ListItem>
         </>
       )}
     </Draggable>
   )
 }
 
-const ItemClickTarget = styled.div`
-  flex: 1 1 0;
-  min-width: 0;
-  position: relative;
+const ItemField = styled.div`
+  flex: 1 0 auto;
   display: flex;
-  justify-content: space-between;
   align-items: center;
-  padding: 8px;
+
+  label {
+    display: none;
+  }
+`
+
+const ItemActions = styled.div`
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
+  max-height: 84px;
 `
 
 const Label = styled.span<{ error?: boolean }>`
@@ -263,7 +258,7 @@ const EmptyList = styled.div`
 
 const ItemList = styled.div``
 
-const ItemHeader = styled.div<{ isDragging: boolean }>`
+const ListItem = styled.div<{ isDragging: boolean }>`
   position: relative;
   cursor: pointer;
   display: flex;
@@ -284,10 +279,20 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
     max-width: 100%;
   }
 
+  ${FieldsGroup} {
+    padding: var(--tina-padding-small) calc(var(--tina-padding-small) / 2)
+      var(--tina-padding-small) var(--tina-padding-small);
+    display: flex;
+    align-items: center;
+  }
+
+  ${FieldWrapper} {
+    margin: 0;
+    flex: 1 0 auto;
+  }
+
   svg {
-    fill: var(--tina-color-grey-3);
-    width: 20px;
-    height: auto;
+    fill: var(--tina-color-grey-4);
     transition: fill 85ms ease-out;
   }
 
@@ -337,14 +342,18 @@ const ItemHeader = styled.div<{ isDragging: boolean }>`
 
 const DeleteButton = styled.button`
   text-align: center;
-  flex: 0 0 auto;
+  flex: 1 0 auto;
   border: 0;
   background: transparent;
   cursor: pointer;
-  padding: 12px 8px;
+  width: 38px;
+  height: 36px;
+  padding: 0 4px 5px 0;
   margin: 0;
   transition: all 85ms ease-out;
   svg {
+    width: 24px;
+    height: 24px;
     transition: all 85ms ease-out;
   }
   &:hover {
@@ -355,82 +364,31 @@ const DeleteButton = styled.button`
 const DragHandle = styled(function DragHandle({ ...styleProps }) {
   return (
     <div {...styleProps}>
-      <DragIcon />
       <ReorderIcon />
     </div>
   )
 })`
   margin: 0;
-  flex: 0 0 auto;
-  width: 32px;
+  flex: 1 0 auto;
+  width: 38px;
+  height: 36px;
+  padding: 5px 4px 0 0;
+  display: flex;
+  align-items: center;
+  justify-content: center;
   position: relative;
   fill: inherit;
-  padding: 12px 0;
   transition: all 85ms ease-out;
   &:hover {
     background-color: var(--tina-color-grey-1);
     cursor: grab;
   }
   svg {
-    position: absolute;
-    left: 50%;
-    top: 50%;
-    width: 20px;
-    height: 20px;
-    transform: translate3d(-50%, -50%, 0);
+    width: 24px;
+    height: 24px;
     transition: all 85ms ease-out;
   }
-  svg:last-child {
-    opacity: 0;
-  }
-  *:hover > & {
-    svg:first-child {
-      opacity: 0;
-    }
-    svg:last-child {
-      opacity: 1;
-    }
-  }
 `
-
-interface PanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  index: number
-  value: string
-  field: ListFieldDefinititon
-  itemTitle: string
-}
-
-const Panel = function Panel({
-  setExpanded,
-  isExpanded,
-  tinaForm,
-  field,
-  index,
-  itemTitle,
-}: PanelProps) {
-  const fields = [
-    {
-      ...field.itemField,
-      label: 'Value',
-      name: field.name + '.' + index,
-    },
-  ]
-
-  return (
-    <GroupPanel isExpanded={isExpanded}>
-      <PanelHeader onClick={() => setExpanded(false)}>
-        <LeftArrowIcon />
-        <Label>{itemTitle}</Label>
-      </PanelHeader>
-      <PanelBody>
-        {isExpanded ? <FieldsBuilder form={tinaForm} fields={fields} /> : null}
-      </PanelBody>
-    </GroupPanel>
-  )
-}
 
 export const ListFieldPlugin = {
   name: 'list',
