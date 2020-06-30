@@ -30,6 +30,8 @@ import {
   InlineTextarea,
 } from 'react-tinacms-inline'
 
+import Layout from '../components/Layout'
+
 /**
  * This is an example page that uses Blocks from Json
  */
@@ -38,11 +40,12 @@ export default function BlocksExample({ jsonFile }) {
 
   return (
     <ModalProvider>
-      <InlineForm form={form}>
-        <EditToggle />
-        <DiscardChanges />
-        <h1>
-          <InlineText name="title" />
+      <Layout>
+        <InlineForm form={form}>
+          <DiscardChanges />
+          <h1>
+            <InlineText name="title" />
+          </h1>
           <InlineImage
             name="hero_image"
             previewSrc={formValues => formValues.hero_image}
@@ -51,11 +54,31 @@ export default function BlocksExample({ jsonFile }) {
           >
             {props => <ChildImage src={data.hero_image} {...props} />}
           </InlineImage>
-        </h1>
-        <Wrap>
-          <InlineBlocks name="blocks" blocks={PAGE_BUILDER_BLOCKS} />
-        </Wrap>
-      </InlineForm>
+          <hr />
+          <Wrap>
+            <InlineBlocks
+              name="blocks"
+              blocks={PAGE_BUILDER_BLOCKS}
+              itemProps={{
+                style: { backgroundColor: 'red' },
+              }}
+              min={2}
+              max={4}
+            />
+          </Wrap>
+        </InlineForm>
+      </Layout>
+      <style jsx>
+        {`
+          h1 {
+            margin-top: 1.5rem;
+          }
+
+          hr {
+            width: 3rem;
+          }
+        `}
+      </style>
     </ModalProvider>
   )
 }
@@ -68,7 +91,6 @@ function ChildImage(props) {
  * CallToAction template + Component
  */
 const cta_template: BlockTemplate = {
-  type: 'cta',
   label: 'Call to Action',
   defaultItem: { url: '', text: 'Signup!' },
   fields: [
@@ -77,16 +99,25 @@ const cta_template: BlockTemplate = {
   ],
 }
 
-function CallToActionBlock({ data, index }) {
+function CallToActionBlock({ index, data, style }) {
   return (
-    <BlocksControls index={index}>
-      <button
-        onClick={() => window.open(data.url, '_blank')}
-        style={{ display: 'block', background: 'pink' }}
-      >
-        {data.text}
-      </button>
-    </BlocksControls>
+    <div className="block" style={style}>
+      <BlocksControls index={index}>
+        <button
+          onClick={() => window.open(data.url, '_blank')}
+          style={{ display: 'block', background: 'pink' }}
+        >
+          {data.text}
+        </button>
+      </BlocksControls>
+      <style jsx>
+        {`
+          div.block {
+            margin: 2rem 0;
+          }
+        `}
+      </style>
+    </div>
   )
 }
 
@@ -94,7 +125,6 @@ function CallToActionBlock({ data, index }) {
  * Hero template + Component
  */
 const hero_template: BlockTemplate = {
-  type: 'hero',
   label: 'Hero',
   defaultItem: { text: 'Spiderman' },
   fields: [],
@@ -102,11 +132,20 @@ const hero_template: BlockTemplate = {
 
 function HeroBlock({ index }) {
   return (
-    <BlocksControls index={index}>
-      <h2>
-        My Hero: <StyledBlockText name="text" />
-      </h2>
-    </BlocksControls>
+    <div className="block">
+      <BlocksControls index={index}>
+        <h2>
+          My Hero: <StyledBlockText name="text" />
+        </h2>
+      </BlocksControls>
+      <style jsx>
+        {`
+          div.block {
+            margin: 2rem 0;
+          }
+        `}
+      </style>
+    </div>
   )
 }
 
@@ -116,21 +155,30 @@ function HeroBlock({ index }) {
 
 function ImageBlock({ index, data }) {
   return (
-    <BlocksControls index={index}>
-      <InlineImage
-        name="src"
-        previewSrc={formValues => {
-          return formValues.blocks[index].src
-        }}
-        parse={filename => `/images/${filename}`}
-        uploadDir={() => '/public/images/'}
-      />
-    </BlocksControls>
+    <div className="block">
+      <BlocksControls index={index}>
+        <InlineImage
+          name="src"
+          previewSrc={formValues => {
+            return formValues.blocks[index].src
+          }}
+          parse={filename => `/images/${filename}`}
+          uploadDir={() => '/public/images/'}
+          focusRing={false}
+        />
+      </BlocksControls>
+      <style jsx>
+        {`
+          div.block {
+            margin: 2rem 0;
+          }
+        `}
+      </style>
+    </div>
   )
 }
 
 const image_template: BlockTemplate = {
-  type: 'image',
   label: 'Image',
   defaultItem: {
     _template: 'image',
@@ -144,6 +192,7 @@ const image_template: BlockTemplate = {
 
 const StyledBlockText = styled(InlineTextarea)`
   color: green;
+  margin: 2rem 0;
 `
 
 /**
@@ -177,23 +226,6 @@ BlocksExample.getInitialProps = async function() {
       data: blocksData.default,
     },
   }
-}
-
-/**
- * Toggle
- */
-export function EditToggle() {
-  const { status, deactivate, activate } = useInlineForm()
-
-  return (
-    <button
-      onClick={() => {
-        status === 'active' ? deactivate() : activate()
-      }}
-    >
-      {status === 'active' ? 'Preview' : 'Edit'}
-    </button>
-  )
 }
 
 export function DiscardChanges() {

@@ -19,7 +19,7 @@ limitations under the License.
 import * as fs from 'fs'
 import * as path from 'path'
 import eol from 'eol'
-import { defaultSchema } from '../../prosemirror-test-utils/test-schema'
+import { defaultSchema } from '../../test-utils/test-schema'
 import { MarkdownTranslator } from './index'
 
 const pathOf = (...files: string[]) => path.resolve(__dirname, ...files)

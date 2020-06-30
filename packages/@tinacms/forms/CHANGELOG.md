@@ -3,6 +3,43 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.6.2](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.6.1...@tinacms/forms@0.6.2) (2020-06-29)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
+## [0.6.1](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.6.1-alpha.0...@tinacms/forms@0.6.1) (2020-06-23)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
+## [0.6.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.6.0...@tinacms/forms@0.6.1-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
+# [0.6.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.5.0...@tinacms/forms@0.6.0) (2020-06-08)
+
+
+### Features
+
+* **Form:** loading attr tells us if initial values are loaded ([6c55a01](https://github.com/tinacms/tinacms/commit/6c55a01))
+* **Form:** onSubmit can be replaced ([646cda0](https://github.com/tinacms/tinacms/commit/646cda0))
+* **Form#values:** returns undefined when form is loading ([97facf4](https://github.com/tinacms/tinacms/commit/97facf4))
+
+
+
+
+
 # [0.5.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.5.0-alpha.1...@tinacms/forms@0.5.0) (2020-06-01)
 
 **Note:** Version bump only for package @tinacms/forms

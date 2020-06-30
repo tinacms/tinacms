@@ -46,10 +46,10 @@ export const Toggle: FC<ToggleProps> = props => {
 }
 
 const ToggleElement = styled.div`
-  display: inline-block;
+  display: block;
   position: relative;
-  width: 40px;
-  height: 20px;
+  width: 48px;
+  height: 28px;
   margin: 0;
 `
 
@@ -81,9 +81,15 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
     width: calc(28px - 6px);
     height: calc(28px - 6px);
     background: ${p =>
-      p.checked ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-3)'};
+      p.checked ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-4)'};
+    border: 1px solid
+      ${p =>
+        p.checked
+          ? 'var(--tina-color-primary-dark)'
+          : 'var(--tina-color-grey-5)'};
     transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
+    box-shadow: var(--tina-shadow-big);
   }
 `
 
@@ -96,4 +102,17 @@ const ToggleInput = styled.input`
   opacity: 0;
   margin: 0;
   cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  pointer-events: auto;
+
+  &:hover {
+    + ${ToggleLabel} ${ToggleSwitch} {
+      box-shadow: 0 0 0 2px var(--tina-color-grey-3);
+    }
+  }
+
+  &:focus {
+    + ${ToggleLabel} ${ToggleSwitch} {
+      box-shadow: 0 0 0 2px var(--tina-color-primary);
+    }
+  }
 `

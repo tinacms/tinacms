@@ -16,19 +16,33 @@ limitations under the License.
 
 */
 
-import {
-  ACCESS_TOKEN_KEY,
-  WORKING_REPO_KEY,
-  HEAD_BRANCH_KEY,
-} from '../constants'
+import { CSRF_TOKEN_KEY, WORKING_REPO_KEY, HEAD_BRANCH_KEY } from '../constants'
+import { AES, enc } from 'crypto-js'
 
-export const previewHandler = (req: any, res: any) => {
-  const previewData = {
-    working_repo_full_name: req.cookies[WORKING_REPO_KEY],
-    github_access_token: req.cookies[ACCESS_TOKEN_KEY],
-    head_branch:
-      req.cookies[HEAD_BRANCH_KEY] || process.env.BASE_BRANCH || 'master',
+export const previewHandler = (signingKey: string) => (req: any, res: any) => {
+  const expectedCSRFToken = req.cookies[CSRF_TOKEN_KEY]
+
+  // Parse out the amalgamated token
+  const token = (req.headers['authorization'] || '').split(' ')[1] || null
+
+  if (token && expectedCSRFToken) {
+    const decryptedToken = AES.decrypt(token, signingKey).toString(enc.Utf8)
+
+    const [csrfToken, authToken] = decryptedToken.split('.')
+
+    if (csrfToken == expectedCSRFToken) {
+      const previewData = {
+        working_repo_full_name: req.cookies[WORKING_REPO_KEY],
+        github_access_token: authToken,
+        head_branch:
+          req.cookies[HEAD_BRANCH_KEY] || process.env.BASE_BRANCH || 'master',
+      }
+      res.setPreviewData(previewData)
+      res.status(200).end()
+    } else {
+      res.status(401).json({ message: 'Invalid CSRF Token: Please try again' })
+    }
+  } else {
+    res.status(401).json({ message: 'Missing Credentials: Please try again' })
   }
-  res.setPreviewData(previewData)
-  res.status(200).end()
 }

@@ -21,11 +21,12 @@ import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
 import { useCMS } from '@tinacms/react-core'
 import { parse } from './textFormat'
+import { useState, useEffect } from 'react'
 
 type FieldProps = any
 interface ImageProps {
   path: string
-  previewSrc(form: any, field: FieldProps): string
+  previewSrc(form: any, field: FieldProps): string | Promise<string>
   uploadDir(form: any): string
   clearable?: boolean // defaults to true
 }
@@ -33,10 +34,42 @@ interface ImageProps {
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   const cms = useCMS()
 
+  const [srcIsLoading, setSrcIsLoading] = useState(true)
+  const [src, setSrc] = useState('')
+  useEffect(() => {
+    let canceled = false
+    ;(async () => {
+      setSrcIsLoading(true)
+      let imageSrc = ''
+      try {
+        imageSrc = await props.field.previewSrc(
+          props.form.getState().values,
+          props
+        )
+      } catch (e) {
+        if (!canceled) {
+          setSrc('')
+          // @ts-ignore cms.alerts
+          cms.alerts.error(
+            `Failed to generate preview for '${props.field.name}': ${e.message}`
+          )
+        }
+      }
+      if (!canceled) {
+        setSrc(imageSrc)
+      }
+      setSrcIsLoading(false)
+    })()
+    return () => {
+      canceled = true
+    }
+  }, [props.input.value])
+
   return (
     <ImageUpload
       value={props.input.value}
-      previewSrc={props.field.previewSrc(props.form.getState().values, props)}
+      previewSrc={src}
+      loading={srcIsLoading}
       onDrop={async ([file]: File[]) => {
         const directory = props.field.uploadDir(props.form.getState().values)
         // @ts-ignore cms.media

@@ -30,4 +30,5 @@ export const strike = {
     },
   ],
   toDOM: () => ['s', 0],
+  excludes: 'code',
 }

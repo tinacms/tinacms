@@ -28,4 +28,5 @@ export const em = {
   toDOM() {
     return ['em']
   },
+  excludes: 'code',
 }

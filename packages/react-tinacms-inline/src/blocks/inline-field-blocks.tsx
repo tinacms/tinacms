@@ -24,24 +24,39 @@ import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
+import { useCMS } from 'tinacms'
+import { Droppable } from 'react-beautiful-dnd'
 
 export interface InlineBlocksProps {
   name: string
   blocks: {
     [key: string]: Block
   }
+  className?: string
+  direction?: 'vertical' | 'horizontal'
+  /**
+   * object will be spread to every block child element
+   */
+  itemProps?: {
+    [key: string]: any
+  }
+  min?: number
+  max?: number
 }
 
 export interface InlineBlocksActions {
   count: number
   insert(index: number, data: any): void
-  move(froom: number, to: number): void
+  move(from: number, to: number): void
   remove(index: number): void
   blocks: {
     [key: string]: Block
   }
   activeBlock: number | null
   setActiveBlock: any
+  direction: 'vertical' | 'horizontal'
+  min?: number
+  max?: number
 }
 
 export const InlineBlocksContext = React.createContext<InlineBlocksActions | null>(
@@ -58,9 +73,18 @@ export function useInlineBlocks() {
   return inlineBlocksContext
 }
 
-export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
+export function InlineBlocks({
+  name,
+  blocks,
+  className,
+  direction = 'vertical',
+  itemProps,
+  min,
+  max,
+}: InlineBlocksProps) {
+  const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
-  const { status } = useInlineForm()
+  const { setFocussedField } = useInlineForm()
 
   return (
     <InlineField name={name}>
@@ -72,60 +96,87 @@ export function InlineBlocks({ name, blocks }: InlineBlocksProps) {
           const movement = to - from
           setActiveBlock(activeBlock => activeBlock + movement)
           form.mutators.move(name, from, to)
+          setFocussedField(`${name}.${to}`)
         }
 
         const remove = (index: number) => {
           form.mutators.remove(name, index)
+
+          const isOnlyItem = input.value.length === 1
+          const isLastItem = input.value.length - 1 === index
+
+          if (isOnlyItem) {
+            setFocussedField('')
+          } else if (isLastItem) {
+            setFocussedField(`${input.name}.${index - 1}`)
+          } else {
+            setFocussedField(`${input.name}.${index}`)
+          }
         }
 
         const insert = (index: number, block: any) => {
           form.mutators.insert(name, index, block)
+          setFocussedField(`${name}.${index}`)
         }
 
         return (
-          <InlineBlocksContext.Provider
-            value={{
-              insert,
-              move,
-              remove,
-              blocks,
-              count: allData.length,
-              activeBlock,
-              setActiveBlock,
-            }}
-          >
-            {allData.length < 1 && status === 'active' && (
-              <BlocksEmptyState>
-                <AddBlockMenu
-                  addBlock={block => insert(1, block)}
-                  templates={Object.entries(blocks).map(
-                    ([, block]) => block.template
-                  )}
-                />
-              </BlocksEmptyState>
+          <Droppable droppableId={name} type={name} direction={direction}>
+            {provider => (
+              <div ref={provider.innerRef} className={className}>
+                {
+                  <InlineBlocksContext.Provider
+                    value={{
+                      insert,
+                      move,
+                      remove,
+                      blocks,
+                      count: allData.length,
+                      activeBlock,
+                      setActiveBlock,
+                      direction,
+                      min,
+                      max,
+                    }}
+                  >
+                    {allData.length < 1 && cms.enabled && (
+                      <BlocksEmptyState>
+                        <AddBlockMenu
+                          addBlock={block => insert(0, block)}
+                          blocks={blocks}
+                        />
+                      </BlocksEmptyState>
+                    )}
+
+                    {allData.map((data, index) => {
+                      const Block = blocks[data._template]
+
+                      if (!Block) {
+                        console.warn(
+                          'Unrecognized Block of type:',
+                          data._template
+                        )
+                        return null
+                      }
+
+                      const blockName = `${input.name}.${index}`
+
+                      return (
+                        <InlineBlock
+                          itemProps={itemProps}
+                          key={index}
+                          index={index}
+                          name={blockName}
+                          data={data}
+                          block={Block}
+                        />
+                      )
+                    })}
+                    {provider.placeholder}
+                  </InlineBlocksContext.Provider>
+                }
+              </div>
             )}
-            {allData.map((data, index) => {
-              const Block = blocks[data._template]
-
-              if (!Block) {
-                console.warn('Unrecognized Block of type:', data._template)
-                return null
-              }
-
-              const blockName = `${input.name}.${index}`
-
-              return (
-                <InlineBlock
-                  // NOTE: Supressing warnings, but not helping with render perf
-                  key={index}
-                  index={index}
-                  name={blockName}
-                  data={data}
-                  block={Block}
-                />
-              )
-            })}
-          </InlineBlocksContext.Provider>
+          </Droppable>
         )
       }}
     </InlineField>
@@ -140,17 +191,30 @@ export interface InlineBlockProps {
   name: string
   data: any
   block: Block
+  itemProps?: {
+    [key: string]: any
+  }
 }
 
-export function InlineBlock({ name, data, block, index }: InlineBlockProps) {
+export function InlineBlock({
+  name,
+  data,
+  block,
+  index,
+  itemProps,
+}: InlineBlockProps) {
   return (
     <InlineFieldContext.Provider value={{ name, ...block }}>
-      <block.Component data={data} index={index} />
+      <block.Component data={data} index={index} {...itemProps} />
     </InlineFieldContext.Provider>
   )
 }
 
-const BlocksEmptyState = styled.div`
-  margin: var(--tina-padding-big) 0;
+export const BlocksEmptyState = styled.div`
+  padding: var(--tina-padding-small);
   position: relative;
+  width: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 `

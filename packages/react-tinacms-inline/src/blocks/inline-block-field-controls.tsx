@@ -18,7 +18,17 @@ limitations under the License.
 
 import * as React from 'react'
 import styled, { css } from 'styled-components'
-import { ChevronUpIcon, ChevronDownIcon, TrashIcon } from '@tinacms/icons'
+import {
+  ChevronUpIcon,
+  ChevronDownIcon,
+  ChevronLeftIcon,
+  ChevronRightIcon,
+  TrashIcon,
+  ReorderIcon,
+  ReorderRowIcon,
+} from '@tinacms/icons'
+import { useCMS } from 'tinacms'
+import { Draggable } from 'react-beautiful-dnd'
 
 import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
@@ -26,134 +36,174 @@ import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
 import { FocusRing } from '../styles'
+import {
+  FocusRingStyleProps,
+  getOffset,
+  getOffsetX,
+  getOffsetY,
+} from '../styles'
 
 export interface BlocksControlsProps {
   children: any
   index: number
-  offset?: number
-  borderRadius?: number
+  insetControls?: boolean
+  focusRing?: false | FocusRingStyleProps
 }
 
 export function BlocksControls({
   children,
   index,
-  offset,
-  borderRadius,
+  insetControls,
+  focusRing = {},
 }: BlocksControlsProps) {
-  const { status } = useInlineForm()
+  const cms = useCMS()
+  const { focussedField, setFocussedField } = useInlineForm()
+  const { name, template } = React.useContext(InlineFieldContext)
   const {
     insert,
     move,
     remove,
     blocks,
     count,
-    activeBlock,
-    setActiveBlock,
+    direction,
+    min,
+    max,
   } = useInlineBlocks()
-  const { template } = React.useContext(InlineFieldContext)
   const isFirst = index === 0
   const isLast = index === count - 1
-  const blockRef = React.useRef<HTMLDivElement>(null)
   const blockMenuRef = React.useRef<HTMLDivElement>(null)
   const blockMoveUpRef = React.useRef<HTMLButtonElement>(null)
   const blockMoveDownRef = React.useRef<HTMLButtonElement>(null)
 
-  React.useEffect(() => {
-    document.addEventListener('click', handleClickOutside, true)
-    return () => {
-      document.removeEventListener('click', handleClickOutside, true)
-    }
-  }, [blockRef.current, blockMenuRef.current])
+  const addBeforePosition = direction === 'horizontal' ? 'left' : 'top'
+  const addAfterPosition = direction === 'horizontal' ? 'right' : 'bottom'
 
-  if (status === 'inactive') {
+  if (cms.disabled) {
     return children
   }
 
-  const removeBlock = () => remove(index)
-
-  const handleClickOutside = (event: any) => {
-    if (
-      blockRef.current?.contains(event.target) ||
-      blockMenuRef.current?.contains(event.target)
-    ) {
-      return
-    }
-    setActiveBlock(-1)
+  const removeBlock = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
+    remove(index)
   }
 
-  const moveBlockUp = () => {
+  const moveBlockUp = (event: any) => {
     move(index, index - 1)
-    setActiveBlock(index - 1)
+    event.stopPropagation()
+    event.preventDefault()
   }
 
-  const moveBlockDown = () => {
+  const moveBlockDown = (event: any) => {
     move(index, index + 1)
-    setActiveBlock(index + 1)
+    event.stopPropagation()
+    event.preventDefault()
   }
+
+  const isActive = name === focussedField
+  const childIsActive = focussedField.startsWith(name!)
 
   const handleSetActiveBlock = (event: any) => {
     if (
+      blockMenuRef.current?.contains(event.target) ||
       blockMoveUpRef.current?.contains(event.target) ||
-      blockMoveDownRef.current?.contains(event.target) ||
-      activeBlock === index
+      blockMoveDownRef.current?.contains(event.target)
     ) {
       return
     }
-    setActiveBlock(index)
+    event.stopPropagation()
+    event.preventDefault()
+    setFocussedField(name!)
+  }
+
+  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
+
+  const parentName = name!
+    .split('.')
+    .slice(0, -1)
+    .join('.')
+
+  function withinLimit(limit: number | undefined) {
+    if (!limit) return true
+
+    return !(limit === count || (max === count && min === count))
   }
 
   return (
-    <FocusRing
-      ref={blockRef}
-      active={activeBlock === index}
-      onClick={handleSetActiveBlock}
-      offset={offset}
-      borderRadius={borderRadius}
-    >
-      <AddBlockMenuWrapper active={activeBlock === index}>
-        <AddBlockMenu
-          addBlock={block => insert(index, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-          index={index}
-          offset={offset}
-          position="top"
-        />
-        <AddBlockMenu
-          addBlock={block => insert(index + 1, block)}
-          templates={Object.entries(blocks).map(([, block]) => block.template)}
-          index={index}
-          offset={offset}
-          position="bottom"
-        />
-      </AddBlockMenuWrapper>
-      <BlockMenuWrapper
-        ref={blockMenuRef}
-        index={index}
-        active={activeBlock === index}
-      >
-        <BlockMenu>
-          <BlockAction
-            ref={blockMoveUpRef}
-            onClick={moveBlockUp}
-            disabled={isFirst}
+    <Draggable type={parentName} draggableId={name!} index={index}>
+      {provider => {
+        return (
+          <FocusRing
+            ref={provider.innerRef}
+            active={focusRing && isActive}
+            onClick={handleSetActiveBlock}
+            offset={offset}
+            borderRadius={
+              typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+            }
+            disableHover={focusRing === false ? true : childIsActive}
+            {...provider.draggableProps}
+            disableChildren={!isActive && !childIsActive}
           >
-            <ChevronUpIcon />
-          </BlockAction>
-          <BlockAction
-            ref={blockMoveDownRef}
-            onClick={moveBlockDown}
-            disabled={isLast}
-          >
-            <ChevronDownIcon />
-          </BlockAction>
-          <InlineSettings fields={template.fields} />
-          <BlockAction onClick={removeBlock}>
-            <TrashIcon />
-          </BlockAction>
-        </BlockMenu>
-      </BlockMenuWrapper>
-      {children}
-    </FocusRing>
+            {withinLimit(max) && (
+              <AddBlockMenuWrapper active={isActive}>
+                <AddBlockMenu
+                  addBlock={block => insert(index, block)}
+                  blocks={blocks}
+                  index={index}
+                  offset={offset}
+                  position={addBeforePosition}
+                />
+                <AddBlockMenu
+                  addBlock={block => insert(index + 1, block)}
+                  blocks={blocks}
+                  index={index}
+                  offset={offset}
+                  position={addAfterPosition}
+                />
+              </AddBlockMenuWrapper>
+            )}
+            <BlockMenuWrapper
+              offset={offset}
+              ref={blockMenuRef}
+              index={index}
+              active={isActive}
+              inset={insetControls}
+            >
+              <BlockMenu>
+                <BlockAction
+                  ref={blockMoveUpRef}
+                  onClick={moveBlockUp}
+                  disabled={isFirst}
+                >
+                  {direction === 'vertical' && <ChevronUpIcon />}
+                  {direction === 'horizontal' && <ChevronLeftIcon />}
+                </BlockAction>
+                <BlockAction
+                  ref={blockMoveDownRef}
+                  onClick={moveBlockDown}
+                  disabled={isLast}
+                >
+                  {direction === 'vertical' && <ChevronDownIcon />}
+                  {direction === 'horizontal' && <ChevronRightIcon />}
+                </BlockAction>
+                <BlockAction {...provider.dragHandleProps}>
+                  {direction === 'vertical' && <ReorderIcon />}
+                  {direction === 'horizontal' && <ReorderRowIcon />}
+                </BlockAction>
+                <InlineSettings fields={template.fields} />
+                {withinLimit(min) && (
+                  <BlockAction onClick={removeBlock}>
+                    <TrashIcon />
+                  </BlockAction>
+                )}
+              </BlockMenu>
+            </BlockMenuWrapper>
+            {children}
+          </FocusRing>
+        )
+      }}
+    </Draggable>
   )
 }
 
@@ -178,19 +228,28 @@ const AddBlockMenuWrapper = styled.div<AddBlockMenuWrapperProps>(
 interface BlockMenuWrapperProps {
   index?: number
   active: boolean
-  offset?: number
+  inset?: boolean
+  offset?: number | { x: number; y: number }
 }
 
-export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
-  p => css`
+export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
+  const offset = getOffset(p.offset)
+  return css`
     position: absolute;
-    top: calc(-${p.offset !== undefined ? p.offset : `16`}px - 16px);
-    right: calc(-${p.offset !== undefined ? p.offset : `16`}px - 1px);
+    top: calc(-${getOffsetY(offset)}px - 16px);
+    right: calc(-${getOffsetX(offset)}px - 1px);
     opacity: 0;
     transition: all 120ms ease-out;
     z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
     pointer-events: none;
     transform: translate3d(0, -100%, 0);
+
+    ${p.inset &&
+      css`
+        top: calc(14px - ${getOffsetY(offset)}px);
+        right: calc(14px - ${getOffsetX(offset)}px);
+        transform: translate3d(0, 0, 0);
+      `}
 
     ${p.active &&
       css`
@@ -198,7 +257,7 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(
         pointer-events: all;
       `}
   `
-)
+})
 
 export const BlockMenu = styled.div`
   display: flex;
@@ -207,7 +266,7 @@ export const BlockMenu = styled.div`
   top: 0;
   background-color: white;
   border-radius: var(--tina-radius-small);
-  box-shadow: 0 4px 12px rgba(0, 0, 0, 0.15);
+  box-shadow: var(--tina-shadow-big);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
 `

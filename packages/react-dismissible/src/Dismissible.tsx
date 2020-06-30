@@ -46,22 +46,49 @@ export interface Props {
    * Used when the dismissible area is inside of an iframe.
    */
   document?: Document
+
+  /**
+   * Adding this flag allows click events outside of the
+   * dismissible area to propagate to their intended target.
+   */
+  allowClickPropagation?: boolean
 }
 
 export const Dismissible: React.FC<Props> = ({
   onDismiss,
+  escape,
+  click,
+  disabled,
+  allowClickPropagation,
+  document,
+  ...props
+}) => {
+  const area = useDismissible({
+    onDismiss,
+    escape,
+    click,
+    disabled,
+    allowClickPropagation,
+    document,
+  })
+  return <div ref={area} {...props} />
+}
+
+export function useDismissible({
+  onDismiss,
   escape = false,
   click = false,
   disabled = false,
+  allowClickPropagation = false,
   document: customDocument,
-  ...props
-}) => {
+}: Props) {
   const area: any = useRef()
-  const documents: any[] = customDocument
-    ? [document, customDocument]
-    : [document]
 
   useEffect(() => {
+    const documents: any[] = customDocument
+      ? [document, customDocument]
+      : [document]
+
     const stopAndPrevent = (event: MouseEvent) => {
       event.stopPropagation()
       event.stopImmediatePropagation()
@@ -72,7 +99,9 @@ export const Dismissible: React.FC<Props> = ({
       if (disabled) return
 
       if (!area.current.contains(event.target)) {
-        stopAndPrevent(event)
+        if (!allowClickPropagation) {
+          stopAndPrevent(event)
+        }
         onDismiss(event)
       }
     }
@@ -82,7 +111,7 @@ export const Dismissible: React.FC<Props> = ({
 
       if (event.keyCode === 27) {
         event.stopPropagation()
-        onDismiss(event)       
+        onDismiss(event)
       }
     }
 
@@ -104,7 +133,7 @@ export const Dismissible: React.FC<Props> = ({
         document.removeEventListener('keydown', handleEscape)
       })
     }
-  }, [click, document, customDocument, escape, disabled, onDismiss])
+  }, [click, customDocument, escape, disabled, onDismiss])
 
-  return <div ref={area} {...props} />
+  return area
 }

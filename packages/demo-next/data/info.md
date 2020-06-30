@@ -1,6 +1,7 @@
 ---
 name: Kendall Strautman
 hometown: 'Bend, OR'
+color: '#A23232'
 description: >-
   Dispassionate extraterrestrial observer colonies cosmos shores of the cosmic
   ocean Sea of Tranquility the sky calls to us. Culture muse about intelligent

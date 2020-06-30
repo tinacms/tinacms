@@ -32,7 +32,7 @@ import {
   unmountLinkForm,
   updateLinkBeingEdited,
 } from '../commands'
-import { linkPluginKey } from '../index'
+import { linkPluginKey } from '../plugin'
 import { InnerForm } from './InnerForm'
 
 const width = 240

@@ -115,11 +115,11 @@ describe('Form#updateValues', () => {
         })
 
         it('changes the "name"', () => {
-          expect(form.values.author.name).toEqual(nextValues.author.name)
+          expect(form.values!.author.name).toEqual(nextValues.author.name)
         })
 
         it('does not changes the "age"', () => {
-          expect(form.values.author.age).toEqual(initialValues.author.age)
+          expect(form.values!.author.age).toEqual(initialValues.author.age)
         })
       })
       describe('when only the "age" is changed', () => {
@@ -134,11 +134,11 @@ describe('Form#updateValues', () => {
         })
 
         it('does not change the "name"', () => {
-          expect(form.values.author.name).toEqual(initialValues.author.name)
+          expect(form.values!.author.name).toEqual(initialValues.author.name)
         })
 
         it('changes the "age"', () => {
-          expect(form.values.author.age).toEqual(nextValues.author.age)
+          expect(form.values!.author.age).toEqual(nextValues.author.age)
         })
       })
       describe('when both the "name" and "age" are changed', () => {
@@ -154,11 +154,11 @@ describe('Form#updateValues', () => {
         })
 
         it('changes the "name"', () => {
-          expect(form.values.author.name).toEqual(nextValues.author.name)
+          expect(form.values!.author.name).toEqual(nextValues.author.name)
         })
 
         it('changes the "age"', () => {
-          expect(form.values.author.age).toEqual(nextValues.author.age)
+          expect(form.values!.author.age).toEqual(nextValues.author.age)
         })
       })
     })
@@ -178,11 +178,11 @@ describe('Form#updateValues', () => {
         })
 
         it('does not change the "name"', () => {
-          expect(form.values.author.name).toEqual(initialValues.author.name)
+          expect(form.values!.author.name).toEqual(initialValues.author.name)
         })
 
         it('does not change the "age"', () => {
-          expect(form.values.author.age).toEqual(initialValues.author.age)
+          expect(form.values!.author.age).toEqual(initialValues.author.age)
         })
       })
       describe('when only the "age" is changed', () => {
@@ -203,7 +203,7 @@ describe('Form#updateValues', () => {
         })
 
         it('does not change the "name"', () => {
-          expect(form.values.author.name).toEqual(initialValues.author.name)
+          expect(form.values!.author.name).toEqual(initialValues.author.name)
         })
       })
       describe('when both the "name" and "age" are changed', () => {
@@ -219,11 +219,11 @@ describe('Form#updateValues', () => {
         })
 
         it('changes the "age"', () => {
-          expect(form.values.author.age).toEqual(nextValues.author.age)
+          expect(form.values!.author.age).toEqual(nextValues.author.age)
         })
 
         it('does not change the "name"', () => {
-          expect(form.values.author.name).toEqual(initialValues.author.name)
+          expect(form.values!.author.name).toEqual(initialValues.author.name)
         })
       })
     })

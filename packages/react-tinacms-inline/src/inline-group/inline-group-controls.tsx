@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { useCMS } from 'tinacms'
 
 import { InlineSettings } from '../inline-settings'
 import { useInlineForm } from '../inline-form'
@@ -26,59 +27,61 @@ import {
   BlockMenu,
   BlockMenuWrapper,
 } from '../blocks/inline-block-field-controls'
+import { FocusRingStyleProps } from '../styles'
 
 interface InlineGroupControls {
+  name: string
   children: any
-  offset?: number
-  borderRadius?: number
+  insetControls?: boolean
+  focusRing?: false | FocusRingStyleProps
 }
 
 export function InlineGroupControls({
+  name,
   children,
-  offset,
-  borderRadius,
+  insetControls,
+  focusRing = {},
 }: InlineGroupControls) {
-  const { status } = useInlineForm()
-  const [active, setActive] = React.useState(false)
+  const cms = useCMS()
+  const { focussedField, setFocussedField } = useInlineForm()
   const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
   const { fields } = React.useContext(InlineFieldContext)
 
-  React.useEffect(() => {
-    document.addEventListener('click', handleClickOutside, true)
-    return () => {
-      document.removeEventListener('click', handleClickOutside, true)
-    }
-  }, [groupRef.current, groupMenuRef.current])
-
-  if (status === 'inactive') {
+  if (cms.disabled) {
     return children
   }
 
-  const handleClickOutside = (event: any) => {
-    if (
-      groupRef.current?.contains(event.target) ||
-      groupMenuRef.current?.contains(event.target)
-    ) {
-      return
-    }
-    setActive(false)
+  const active = name === focussedField
+  const childIsActive = focussedField.startsWith(name)
+
+  const handleSetActive = (event: any) => {
+    if (active || childIsActive) return
+    setFocussedField(name)
+    event.stopPropagation()
+    event.preventDefault()
   }
 
-  const handleSetActive = () => {
-    if (active) return
-    setActive(true)
-  }
+  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
 
   return (
     <FocusRing
       ref={groupRef}
-      active={active}
+      active={focusRing && active}
       onClick={handleSetActive}
       offset={offset}
-      borderRadius={borderRadius}
+      borderRadius={
+        typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+      }
+      disableHover={!focusRing && childIsActive}
+      disableChildren={focusRing && !active && !childIsActive}
     >
-      <BlockMenuWrapper ref={groupMenuRef} offset={offset} active={active}>
+      <BlockMenuWrapper
+        ref={groupMenuRef}
+        offset={offset}
+        inset={insetControls}
+        active={active}
+      >
         <BlockMenu>
           <InlineSettings fields={fields} />
         </BlockMenu>

@@ -12,20 +12,18 @@ limitations under the License.
 */
 
 import matter from 'gray-matter'
-import { useLocalMarkdownForm, markdownForm } from 'next-tinacms-markdown'
+import { useLocalMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
   InlineForm,
   InlineText,
-  // InlineWysiwyg,
   InlineImage,
   InlineGroup,
-  InlineGroupControls,
-  InlineSettings,
   InlineTextarea,
 } from 'react-tinacms-inline'
-import { EditToggle, DiscardChanges } from './blocks'
+import { InlineWysiwyg } from 'react-tinacms-editor'
+import { DiscardChanges } from './blocks'
 
 import Layout from '../components/Layout'
 
@@ -35,11 +33,7 @@ function Info(props) {
 
   return (
     <InlineForm form={form}>
-      <Layout
-        pathname="/"
-        siteTitle={props.title}
-        siteDescription={props.description}
-      >
+      <Layout siteTitle={props.title} siteDescription={props.description}>
         <section>
           <div>
             <button
@@ -69,70 +63,58 @@ function Info(props) {
               Error
             </button>
           </div>
-          <EditToggle />
           <DiscardChanges />
-
-          <InlineGroup
-            name="frontmatter"
-            fields={[
-              { label: 'Name', name: 'name', component: 'text' },
-              { label: 'Hometown', name: 'hometown', component: 'text' },
-            ]}
-            offset={0}
-            borderRadius={0}
-          >
-            <h1>
-              <InlineText focusRing={false} name="name" />
-            </h1>
-            <p>
-              <InlineText focusRing={false} name="hometown" />
-            </p>
-            <h4>Group with fields, name provided</h4>
-          </InlineGroup>
-          <InlineGroup controls={false}>
-            <InlineGroupControls offset={0} borderRadius={0}>
+          <div className="group">
+            <InlineGroup
+              name="frontmatter"
+              fields={[
+                { label: 'Name', name: 'name', component: 'text' },
+                { label: 'Hometown', name: 'hometown', component: 'text' },
+                { label: 'color', name: 'color', component: 'color' },
+              ]}
+              focusRing={{
+                offset: 0,
+              }}
+            >
+              <h1>
+                <InlineText focusRing={false} name="name" />
+              </h1>
               <p>
-                <InlineTextarea
-                  focusRing={false}
-                  name="frontmatter.description"
-                />
+                <InlineText focusRing={false} name="hometown" />
               </p>
-              <h4>Group sources from the root, no fields, controls = false</h4>
-            </InlineGroupControls>
-          </InlineGroup>
-          <InlineGroup controls={false}>
-            <p>
-              <InlineTextarea
-                focusRing={false}
-                name="frontmatter.description"
-              />
-            </p>
-            <h4>Group without inline controls, to test style consistency</h4>
-          </InlineGroup>
+            </InlineGroup>
+          </div>
+          <div className="group">
+            <InlineImage
+              name="frontmatter.image"
+              previewSrc={formValues => {
+                return formValues.frontmatter.image
+              }}
+              uploadDir={() => '/public/images/'}
+              parse={filename => `/images/${filename}`}
+            />
 
-          <InlineImage
-            name="frontmatter.image"
-            previewSrc={formValues => {
-              return formValues.frontmatter.image
-            }}
-            uploadDir={() => '/public/images/'}
-            parse={filename => `/images/${filename}`}
-          />
-          {/* <InlineWysiwyg name="markdownBody">
-            <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-          </InlineWysiwyg> */}
+            <InlineWysiwyg name="markdownBody">
+              <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+            </InlineWysiwyg>
+          </div>
         </section>
         <style jsx>
           {`
             section {
               width: 100%;
-              height: 100vh;
               display: flex;
               justify-content: center;
               align-items: center;
               flex-direction: column;
               text-align: center;
               padding: 3rem;
+              margin-top: 4rem;
+            }
+
+            div.group {
+              margin-top: 2rem;
+              padding: 1rem;
             }
           `}
         </style>
@@ -150,6 +132,7 @@ const formOptions = {
       label: 'Home Page Content',
       component: 'markdown',
     },
+    { label: 'color', name: 'frontmatter.color', component: 'color' },
   ],
 }
 

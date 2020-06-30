@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import { Form, FormOptions } from './form'
+import { wait } from '@testing-library/react'
 
 describe('Form', () => {
   let DEFAULTS: FormOptions<any>
@@ -36,6 +37,67 @@ describe('Form', () => {
         new Form(DEFAULTS)
       })
     })
+    describe('without loadInitialValues', () => {
+      it('is not loading', () => {
+        const form = new Form(DEFAULTS)
+
+        expect(form.loading).toBeFalsy()
+      })
+    })
+    describe('with loadInitialValues', () => {
+      describe('before promise resolves', () => {
+        it('is is loading', () => {
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () => new Promise(() => {}),
+          })
+
+          expect(form.loading).toBeTruthy()
+        })
+        it('has values === undefined', () => {
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () => new Promise(() => {}),
+          })
+
+          expect(form.values).toBeUndefined()
+        })
+      })
+      describe('after promise resolves', () => {
+        it('is not loading once resolved', async () => {
+          let resolve: () => void | null
+
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () =>
+              new Promise(r => {
+                resolve = r
+              }),
+          })
+
+          await wait(() => {
+            resolve()
+            expect(form.loading).toBeFalsy()
+          })
+        })
+        it('has values resolved values', async () => {
+          let resolve: () => void | null
+          const initialValues = { title: 'Big Banana' }
+          const form = new Form({
+            ...DEFAULTS,
+            loadInitialValues: () =>
+              new Promise(r => {
+                resolve = () => r(initialValues)
+              }),
+          })
+
+          await wait(() => {
+            resolve()
+            expect(form.initialValues).toEqual(initialValues)
+          })
+        })
+      })
+    })
   })
 
   describe('#change', () => {
@@ -50,9 +112,30 @@ describe('Form', () => {
       expect(form.values.title).toBe('Hello World')
     })
   })
-  describe('#onSubmit', () => {
+  describe('#submit', () => {
     const initialValues = { title: 'hello' }
     const reinitialValues = { title: 'world' }
+
+    it('calls #onSubmit', async () => {
+      const form = new Form(DEFAULTS)
+
+      await form.submit()
+
+      expect(DEFAULTS.onSubmit).toHaveBeenCalled()
+    })
+
+    describe('after changing the #onSubmit', () => {
+      it('calls the second #onSubmit and not the first', async () => {
+        const form = new Form(DEFAULTS)
+        const newSubmit = jest.fn()
+        form.onSubmit = newSubmit
+
+        await form.submit()
+
+        expect(DEFAULTS.onSubmit).not.toHaveBeenCalled()
+        expect(newSubmit).toHaveBeenCalled()
+      })
+    })
 
     describe('after a successful submission', () => {
       it('reinitializes the form with the new values', async () => {

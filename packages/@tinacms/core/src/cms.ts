@@ -175,4 +175,12 @@ export class CMS {
     this._enabled = false
     this.events.dispatch(CMS.DISABLED)
   }
+
+  toggle(): void {
+    if (this.enabled) {
+      this.disable()
+    } else {
+      this.enable()
+    }
+  }
 }

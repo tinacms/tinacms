@@ -3,6 +3,76 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.5.2](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.5.2-alpha.0...nextjs-blog-starter@0.5.2) (2020-06-29)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+## [0.5.2-alpha.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.5.1...nextjs-blog-starter@0.5.2-alpha.0) (2020-06-24)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+## [0.5.1](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.5.1-alpha.0...nextjs-blog-starter@0.5.1) (2020-06-23)
+
+
+### Bug Fixes
+
+* changed the direction of inline blocks from row and col to vertical and horizontal ([03eaeb9](https://github.com/kendallstrautman/nextjs-blog-starter/commit/03eaeb9))
+
+
+
+
+
+## [0.5.1-alpha.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.5.0...nextjs-blog-starter@0.5.1-alpha.0) (2020-06-17)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+# [0.5.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.5.0-alpha.0...nextjs-blog-starter@0.5.0) (2020-06-15)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+# [0.5.0-alpha.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.4.3-alpha.0...nextjs-blog-starter@0.5.0-alpha.0) (2020-06-12)
+
+
+### Features
+
+* allow a custom empty state component to be added ([abe9479](https://github.com/kendallstrautman/nextjs-blog-starter/commit/abe9479))
+
+
+
+
+
+## [0.4.3-alpha.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.4.2...nextjs-blog-starter@0.4.3-alpha.0) (2020-06-08)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+## [0.4.2](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.4.1...nextjs-blog-starter@0.4.2) (2020-06-08)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
 ## [0.4.1](https://github.com/kendallstrautman/nextjs-blog-starter/compare/nextjs-blog-starter@0.4.1-alpha.3...nextjs-blog-starter@0.4.1) (2020-06-01)
 
 **Note:** Version bump only for package nextjs-blog-starter

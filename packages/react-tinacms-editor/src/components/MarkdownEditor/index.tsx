@@ -17,34 +17,39 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useEffect, useRef } from 'react'
+import { useEffect, useRef, useState } from 'react'
 import styled from 'styled-components'
 
-import { ImageProps } from '../../types'
+import { useBrowserFocusContext } from '../../context/browserFocus'
+import { ImageProps, Plugin } from '../../types'
 import { Menubar } from './Menubar'
 
 export interface MarkdownEditorProps {
-  toggleEditorMode: () => void
   imageProps?: ImageProps
   onChange: (value: string) => void
   value: string
+  plugins?: Plugin[]
+  sticky?: boolean | string
 }
 
 const inputLineHeight = 20
 
 export const MarkdownEditor = ({
-  toggleEditorMode,
   imageProps,
   onChange,
   value,
+  plugins,
+  sticky,
 }: MarkdownEditorProps) => {
   const inputRef = useRef<HTMLTextAreaElement>(null)
+  const [val, setVal] = useState(value)
+  const { browserFocused } = useBrowserFocusContext()
 
   // Code below put focus to end of content in text area as component is mounted.
   useEffect(() => {
     const inputElm = inputRef.current
     if (!inputElm) return
-    inputElm.focus()
+    inputElm.focus({ preventScroll: true })
     inputElm.setSelectionRange(inputElm.value.length, inputElm.value.length)
   }, [])
 
@@ -56,14 +61,33 @@ export const MarkdownEditor = ({
     inputElm.style.height = inputElm.scrollHeight + inputLineHeight + 'px'
   })
 
+  // Code below update component content if new value is received when editor is not focused.
+  useEffect(() => {
+    const editorElementFocused = inputRef.current === document.activeElement
+    if (browserFocused && editorElementFocused) return
+    setVal(value)
+  }, [value])
+
   return (
     <>
-      <Menubar toggleEditorMode={toggleEditorMode} imageProps={imageProps} />
+      <Menubar
+        sticky={sticky}
+        uploadImages={imageProps?.upload}
+        plugins={plugins}
+      />
       <EditingSection
+        data-testid="markdown-editing-textarea"
         ref={inputRef}
-        autoFocus
-        value={value}
-        onChange={evt => onChange(evt.target.value)}
+        value={val}
+        onChange={evt => {
+          const v = evt.target.value
+          setVal(v)
+          onChange(v)
+        }}
+        onFocus={e => {
+          e.preventDefault()
+          e.target.focus({ preventScroll: true })
+        }}
       />
     </>
   )

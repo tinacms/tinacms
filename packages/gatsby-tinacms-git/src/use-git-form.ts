@@ -33,8 +33,6 @@ export function useGitForm<N extends GitNode>(
   options: GitFormOptions<N>,
   watch: WatchableFormValue
 ): [N, Form] {
-  const TINA_DISABLED = process.env.NODE_ENV === 'production'
-
   const { format, parse, ...formOptions } = options
   const cms = useCMS()
 
@@ -42,9 +40,7 @@ export function useGitForm<N extends GitNode>(
     return cms.api.git
       .show(node.fileRelativePath) // Load the contents of this file at HEAD
       .then((git: any) => {
-        const file = parse(git.content)
-
-        return { ...node, ...file }
+        return parse(git.content)
       })
   }
 
@@ -52,7 +48,7 @@ export function useGitForm<N extends GitNode>(
     {
       label: formOptions.label || '',
       fields: formOptions.fields || [],
-      loadInitialValues: TINA_DISABLED ? undefined : loadInitialValues,
+      loadInitialValues,
       onSubmit(data: any) {
         return cms.api.git.onSubmit!({
           files: [data.fileRelativePath],
