@@ -53,7 +53,7 @@ Proxies requests to GitHub, attaching the GitHub access token in the process
 
 import { apiProxy } from 'next-tinacms-github'
 
-export default apiProxy
+export default apiProxy(process.env.SIGNING_KEY)
 ```
 
 ### `previewHandler`
@@ -65,7 +65,7 @@ Handles setting the the Nextjs [preview data](https://nextjs.org/docs/advanced-f
 
 import { previewHandler } from 'next-tinacms-github'
 
-export default previewHandler
+export default previewHandler(process.env.SIGNING_KEY)
 ```
 
 ### Loading content from Github
