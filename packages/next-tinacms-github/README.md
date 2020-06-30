@@ -31,13 +31,18 @@ import { createAuthHandler } from 'next-tinacms-github'
 
 export default createAuthHandler(
   process.env.GITHUB_CLIENT_ID,
-  process.env.GITHUB_CLIENT_SECRET
+  process.env.GITHUB_CLIENT_SECRET,
+  process.env.SIGNING_KEY
 )
 ```
 
 _See [Next's documentation](https://nextjs.org/docs/api-reference/next.config.js/environment-variables) for adding environment variables_
 
 [See below](#github-oauth-app) for instructions on creating a Github OAuth App to generate these **Client ID** & **Client Secret** variables.
+
+The Signing Key should be a random 256-bit key, used server-side to encrypt and decrypt authentication tokens sent to the client.
+
+You can generate a key by running `openssl rand -base64 32` in your terminal, using the output as your Signing Key. You can read more on the topic [here](https://tinacms.org/blog/upgrade-notice-improved-github-security).
 
 ### `apiProxy`
 
