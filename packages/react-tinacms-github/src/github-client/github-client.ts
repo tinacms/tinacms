@@ -291,8 +291,11 @@ export class GithubClient {
   ) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
-    const currentBranch = await this.getBranch()
-    const sha = currentBranch.object.sha
+
+    let sha = null
+    try {
+      ;({ sha } = await this.fetchFile(path))
+    } catch (e) {}
 
     return this.req({
       url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
