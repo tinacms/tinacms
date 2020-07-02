@@ -52,9 +52,7 @@ export class GithubFile {
         message
       )
       this.sha = response.content.sha
-      this.cms.alerts.success(
-        `Saved Successfully: Changes committed to ${this.cms.api.github.workingRepoFullName}`
-      )
+      this.cms.events.dispatch({ type: 'github:commit', response })
       return response
     } catch (error) {
       if (error.status == 409 && retryOnConflict) {
