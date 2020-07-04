@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.12.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.2...@tinacms/fields@0.12.3-alpha.0) (2020-07-04)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** trigger update on upload when filename doesn't change ([acdaa18](https://github.com/tinacms/tinacms/commit/acdaa18))
+
+
+
+
+
 ## [0.12.2](https://github.com/tinacms/tinacms/compare/@tinacms/fields@0.12.1...@tinacms/fields@0.12.2) (2020-06-29)
 
 
