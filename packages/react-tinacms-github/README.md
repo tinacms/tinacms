@@ -55,10 +55,10 @@ const enterEditMode = async () => {
   }
 
   const response = await fetch(`/api/preview`, { headers })
-  const data = await resp.json()
+  const data = await response.json()
 
   if (response.status === 200) {
-    window.location.href = window.location.pathname
+    window.location.reload()
   } else {
     throw new Error(data.message)
   }
