@@ -43,6 +43,11 @@ export const previewHandler = (signingKey: string) => (req: any, res: any) => {
       res.status(401).json({ message: 'Invalid CSRF Token: Please try again' })
     }
   } else {
-    res.status(401).json({ message: 'Missing Credentials: Please try again' })
+    res
+      .status(401)
+      .json({
+        message:
+          'Missing Credentials: see https://github.com/tinacms/tinacms/tree/master/packages/next-tinacms-github for implementation',
+      })
   }
 }
