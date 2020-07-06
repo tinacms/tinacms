@@ -46,8 +46,19 @@ In this case, we will hit our `/api` server functions.
 import { TinacmsGithubProvider } from 'react-tinacms-github';
 
 const enterEditMode = () => {
-  return fetch(`/api/preview`).then(() => {
-    window.location.href = window.location.pathname
+  const token = localStorage.getItem('tinacms-github-token') || null
+  const headers = new Headers()
+
+  if (token) {
+    headers.append('Authorization', 'Bearer ' + token)
+  }
+
+  return fetch(`/api/preview`, { headers }).then(({ status, statusText }) => {
+    if (status === 200) {
+      window.location.href = window.location.pathname
+    } else {
+      throw new Error(statusText)
+    }
   })
 }
 
@@ -57,12 +68,11 @@ const exitEditMode = () => {
   })
 }
 
-const YourLayout = ({ editMode, error, children }) => {
+const YourLayout = ({ error, children }) => {
   return (
     <TinacmsGithubProvider
-      editMode={editMode}
-      enterEditMode={enterEditMode}
-      exitEditMode={exitEditMode}
+      onLogin={enterEditMode}
+      onLogout={exitEditMode}
       error={error}>
       {children}
     </TinacmsGithubProvider>
@@ -88,31 +98,22 @@ export default function Authorizing() {
 }
 ```
 
-### Entering / Exiting "edit-mode"
+### Enabling the CMS
 
 
-We will need a way to enter/exit mode from our site. Let's create an "Edit Link" button. Ours will take `isEditing` as a parameter.
-
-_If you are using Next.js's [preview-mode](https://nextjs.org/docs/advanced-features/preview-mode) for the editing environment, this `isEditing` value might get sent from your getStaticProps function._
+We will need a way to enable the CMS from our site. Let's create an "Edit Link" button.
 
 ```tsx
 //...EditLink.tsx
-import { useGithubEditing } from 'react-tinacms-github'
+import { useCMS } from 'react-tinacms-github'
 
-export interface EditLinkProps {
-  isEditing: boolean
-}
 
-export const EditLink = ({ isEditing }: EditLinkProps) => {
-  const github = useGithubEditing()
+export const EditLink = () => {
+  const github = useCMS()
 
   return (
-    <button
-      onClick={
-        isEditing ? github.exitEditMode : github.enterEditMode
-      }
-    >
-      {isEditing ? 'Exit Edit Mode' : 'Edit This Site'}
+    <button onClick={() => cms.toggle()}>
+      {cms.enabled ? 'Exit Edit Mode' : 'Edit This Site'}
     </button>
   )
 }
