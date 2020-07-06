@@ -39,13 +39,14 @@ const cms = new TinaCMS({
 ### Managing "edit-mode" state
 
 Add the root `TinacmsGithubProvider` component to our main layout. We will supply it with handlers for authenticating and entering/exiting edit-mode.
+
 In this case, we will hit our `/api` server functions.
 
 ```tsx
 // YourLayout.ts
 import { TinacmsGithubProvider } from 'react-tinacms-github';
 
-const enterEditMode = () => {
+const enterEditMode = async () => {
   const token = localStorage.getItem('tinacms-github-token') || null
   const headers = new Headers()
 
@@ -53,13 +54,14 @@ const enterEditMode = () => {
     headers.append('Authorization', 'Bearer ' + token)
   }
 
-  return fetch(`/api/preview`, { headers }).then(({ status, statusText }) => {
-    if (status === 200) {
-      window.location.href = window.location.pathname
-    } else {
-      throw new Error(statusText)
-    }
-  })
+  const response = await fetch(`/api/preview`, { headers })
+  const data = await resp.json()
+
+  if (response.status === 200) {
+    window.location.href = window.location.pathname
+  } else {
+    throw new Error(data.message)
+  }
 }
 
 const exitEditMode = () => {
