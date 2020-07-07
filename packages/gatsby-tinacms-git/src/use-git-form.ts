@@ -50,7 +50,7 @@ export function useGitForm<N extends GitNode>(
       fields: formOptions.fields || [],
       loadInitialValues,
       onSubmit(data: any) {
-        return cms.api.git.onSubmit!({
+        return cms.api.git.commit!({
           files: [data.fileRelativePath],
           message: data.__commit_message || 'Tina commit',
           name: data.__commit_name,

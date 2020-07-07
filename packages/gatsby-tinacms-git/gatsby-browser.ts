@@ -29,7 +29,7 @@ exports.onClientEntry = () => {
     port != '80' ? `:${port}` : ''
   }/___tina`
 
-  const client = new GitClient(baseUrl)
+  const client = new GitClient(baseUrl, window.tinacms)
   window.tinacms.registerApi('git', client)
   window.tinacms.media.store = new GitMediaStore(client)
 }
