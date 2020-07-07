@@ -15,10 +15,10 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { TinaCMS } from 'tinacms'
 
 export class GitClient {
-  constructor(private baseUrl: string) {}
-
+  constructor(private baseUrl: string, private cms?: TinaCMS) {}
   /**
    * An alias to `commit`
    *
@@ -63,21 +63,26 @@ export class GitClient {
    * TODO: Add return type.
    * TODO: Remove `catch`
    */
-  commit(data: {
+  async commit(data: {
     files: string[]
     message?: string
     name?: string
     email?: string
   }): Promise<any> {
-    return fetch(`${this.baseUrl}/commit`, {
-      method: 'POST',
-      headers: {
-        'Content-Type': 'application/json; charset=utf-8',
-      },
-      body: JSON.stringify(data),
-    }).catch(e => {
-      console.error(e)
-    })
+    try {
+      const response = await fetch(`${this.baseUrl}/commit`, {
+        method: 'POST',
+        headers: {
+          'Content-Type': 'application/json; charset=utf-8',
+        },
+        body: JSON.stringify(data),
+      })
+      //@ts-ignore
+      this.cms?.events.dispatch({ type: 'git:commit', response })
+      return response
+    } catch (error) {
+      console.error(error)
+    }
   }
 
   /**
