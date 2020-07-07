@@ -26,7 +26,7 @@ import { EditorStateProvider } from '../../context/editorState'
 import { useBrowserFocusContext } from '../../context/browserFocus'
 
 import { buildEditor } from './utils/buildEditor'
-import { buildEditorState } from './utils/buildEditorState'
+import { updateEditorState } from './utils/updateEditorState'
 import { Menubar } from './Menubar'
 import { CodeMirrorCss } from './styles/CodeMirror'
 import { ProseMirrorCss } from './styles/ProseMirror'
@@ -70,9 +70,7 @@ export const ProsemirrorEditor = styled(
           browserFocused)
       )
         return
-      view.updateState(
-        buildEditorState(view.state.schema, translator, input.value, imageProps)
-      )
+      updateEditorState(view, translator, input.value)
     }, [input.value])
 
     return (

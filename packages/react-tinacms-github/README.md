@@ -39,16 +39,29 @@ const cms = new TinaCMS({
 ### Managing "edit-mode" state
 
 Add the root `TinacmsGithubProvider` component to our main layout. We will supply it with handlers for authenticating and entering/exiting edit-mode.
+
 In this case, we will hit our `/api` server functions.
 
 ```tsx
 // YourLayout.ts
 import { TinacmsGithubProvider } from 'react-tinacms-github';
 
-const enterEditMode = () => {
-  return fetch(`/api/preview`).then(() => {
-    window.location.href = window.location.pathname
-  })
+const enterEditMode = async () => {
+  const token = localStorage.getItem('tinacms-github-token') || null
+  const headers = new Headers()
+
+  if (token) {
+    headers.append('Authorization', 'Bearer ' + token)
+  }
+
+  const response = await fetch(`/api/preview`, { headers })
+  const data = await response.json()
+
+  if (response.status === 200) {
+    window.location.reload()
+  } else {
+    throw new Error(data.message)
+  }
 }
 
 const exitEditMode = () => {
@@ -57,12 +70,11 @@ const exitEditMode = () => {
   })
 }
 
-const YourLayout = ({ editMode, error, children }) => {
+const YourLayout = ({ error, children }) => {
   return (
     <TinacmsGithubProvider
-      editMode={editMode}
-      enterEditMode={enterEditMode}
-      exitEditMode={exitEditMode}
+      onLogin={enterEditMode}
+      onLogout={exitEditMode}
       error={error}>
       {children}
     </TinacmsGithubProvider>
@@ -88,31 +100,22 @@ export default function Authorizing() {
 }
 ```
 
-### Entering / Exiting "edit-mode"
+### Enabling the CMS
 
 
-We will need a way to enter/exit mode from our site. Let's create an "Edit Link" button. Ours will take `isEditing` as a parameter.
-
-_If you are using Next.js's [preview-mode](https://nextjs.org/docs/advanced-features/preview-mode) for the editing environment, this `isEditing` value might get sent from your getStaticProps function._
+We will need a way to enable the CMS from our site. Let's create an "Edit Link" button.
 
 ```tsx
 //...EditLink.tsx
-import { useGithubEditing } from 'react-tinacms-github'
+import { useCMS } from 'react-tinacms-github'
 
-export interface EditLinkProps {
-  isEditing: boolean
-}
 
-export const EditLink = ({ isEditing }: EditLinkProps) => {
-  const github = useGithubEditing()
+export const EditLink = () => {
+  const github = useCMS()
 
   return (
-    <button
-      onClick={
-        isEditing ? github.exitEditMode : github.enterEditMode
-      }
-    >
-      {isEditing ? 'Exit Edit Mode' : 'Edit This Site'}
+    <button onClick={() => cms.toggle()}>
+      {cms.enabled ? 'Exit Edit Mode' : 'Edit This Site'}
     </button>
   )
 }
