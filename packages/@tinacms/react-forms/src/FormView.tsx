@@ -18,7 +18,6 @@ limitations under the License.
 
 import * as React from 'react'
 import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
-import { SidebarState } from '@tinacms/react-sidebar'
 
 import { Form } from '@tinacms/forms'
 import styled, { keyframes, StyledComponent } from 'styled-components'
