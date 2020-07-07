@@ -16,9 +16,8 @@ limitations under the License.
 
 */
 
-import { useCMS, useForm, Form, FormOptions, WatchableFormValue } from 'tinacms'
-import { useMemo } from 'react'
-import { GitFile } from '@tinacms/git-client'
+import { useForm, Form, FormOptions, WatchableFormValue } from 'tinacms'
+import { useGitFile } from '@tinacms/git-client'
 
 export interface GitNode {
   fileRelativePath: string
@@ -57,18 +56,4 @@ export function useGitForm<N extends GitNode>(
     },
     watch
   )
-}
-
-function useGitFile(
-  relativePath: string,
-  format: (file: any) => string,
-  parse: (content: string) => any
-) {
-  const cms = useCMS()
-  return useMemo(() => new GitFile(cms, relativePath, format, parse), [
-    cms,
-    relativePath,
-    format,
-    parse,
-  ])
 }
