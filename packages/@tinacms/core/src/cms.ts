@@ -158,25 +158,40 @@ export class CMS {
     this.api[name] = api
   }
 
+  /**
+   * When `true` the CMS is enabled and content can be edited.
+   */
   get enabled(): boolean {
     return this._enabled
   }
 
+  /**
+   * When `true` the CMS is disabled and content cannot be edited.
+   */
   get disabled(): boolean {
     return !this._enabled
   }
 
-  enable(): void {
+  /**
+   * Enable the CMS so content can be edited.
+   */
+  enable = (): void => {
     this._enabled = true
     this.events.dispatch(CMS.ENABLED)
   }
 
-  disable(): void {
+  /**
+   * Disable the CMS so content can no longer be edited.
+   */
+  disable = (): void => {
     this._enabled = false
     this.events.dispatch(CMS.DISABLED)
   }
 
-  toggle(): void {
+  /**
+   * Toggles the enabled/disabled state of the CMS .
+   */
+  toggle = (): void => {
     if (this.enabled) {
       this.disable()
     } else {
