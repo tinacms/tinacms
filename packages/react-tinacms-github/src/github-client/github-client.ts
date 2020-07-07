@@ -327,7 +327,7 @@ export class GithubClient {
   async delete(
     path: string,
     fileContents: string,
-    commitMessage: string = 'Update from TinaCMS',
+    commitMessage: string = `Deleted ${path} using TinaCMS`,
     encoded: boolean = false
   ) {
     return this.githubFileApi(
