@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.6.0-alpha.0...react-tinacms-github@0.6.0) (2020-07-07)
+
+
+### Bug Fixes
+
+* send json message on succesful preview handling ([3b0cbee](https://github.com/tinacms/tinacms/commit/3b0cbee))
+
+
+
+
+
 # [0.6.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.5.1...react-tinacms-github@0.6.0-alpha.0) (2020-07-04)
 
 
