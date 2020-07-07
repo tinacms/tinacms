@@ -326,17 +326,9 @@ export class GithubClient {
 
   async delete(
     path: string,
-    fileContents: string,
-    commitMessage: string = `Deleted ${path} using TinaCMS`,
-    encoded: boolean = false
+    commitMessage: string = `Deleted ${path} using TinaCMS`
   ) {
-    return this.githubFileApi(
-      path,
-      fileContents,
-      commitMessage,
-      encoded,
-      'DELETE'
-    )
+    return this.githubFileApi(path, '', commitMessage, false, 'DELETE')
   }
 
   protected async req(data: any) {
