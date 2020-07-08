@@ -15,8 +15,21 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import { useMemo } from 'react'
+import { useCMS } from '@tinacms/react-core'
+import { GitFile } from './git-file'
 
-export * from './git-client'
-export * from './git-file'
-export * from './use-git-file'
-export * from './git-media-store'
+export function useGitFile(
+  relativePath: string,
+  format: (file: any) => string,
+  parse: (content: string) => any
+) {
+  const cms = useCMS()
+
+  return useMemo(() => new GitFile(cms, relativePath, format, parse), [
+    cms,
+    relativePath,
+    format,
+    parse,
+  ])
+}
