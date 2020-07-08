@@ -485,7 +485,9 @@ const MenuWrapper = styled.div`
 `
 
 const MenuPanel = styled.div<{ visible: boolean }>`
+  all: unset;
   ${tina_reset_styles}
+  box-sizing: border-box;
   background: var(--tina-color-grey-8);
   position: fixed;
   top: 0;

@@ -16,19 +16,4 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
-import { Toolbar } from './Toolbar'
-import { ToolbarState } from '../toolbar'
-import { useSubscribable } from '@tinacms/react-core'
-
-interface ToolbarProviderProps {
-  toolbar: ToolbarState
-}
-
-export function ToolbarProvider({ toolbar }: ToolbarProviderProps) {
-  useSubscribable(toolbar)
-
-  if (toolbar.hidden) return null
-
-  return <Toolbar />
-}
+export { DateFieldPlugin } from './DateFieldPlugin'
