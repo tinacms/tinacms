@@ -28,9 +28,9 @@ import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
 interface ListFieldDefinititon extends Field {
   component: 'list'
   defaultItem?: object | (() => object)
-  itemField: {
+  field: {
     label?: string
-    component: string
+    component: 'text' | 'textarea' | 'number' | 'select'
   }
   /**
    * An optional function which generates `props` for
@@ -140,7 +140,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
   }, [tinaForm, field, index])
   const fields = [
     {
-      ...field.itemField,
+      ...field.field,
       label: 'Value',
       name: field.name + '.' + index,
     },
