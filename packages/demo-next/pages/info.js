@@ -137,8 +137,8 @@ const formOptions = {
       label: 'Lunch Options',
       name: 'frontmatter.lunch',
       component: 'list',
+      defaultItem: 'turkey',
       field: {
-        label: 'Lunch Options',
         component: 'text',
       },
     },
