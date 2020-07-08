@@ -283,11 +283,15 @@ export class GithubClient {
     return request
   }
 
-  async upload(
+  /*
+  added or deletes files from github
+  */
+  async githubFileApi(
     path: string,
     fileContents: string,
     commitMessage: string = 'Update from TinaCMS',
-    encoded: boolean = false
+    encoded: boolean = false,
+    method: 'PUT' | 'DELETE'
   ) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
@@ -301,7 +305,7 @@ export class GithubClient {
       url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
         path
       )}`,
-      method: 'PUT',
+      method,
       data: {
         message: commitMessage,
         content: encoded ? fileContents : b64EncodeUnicode(fileContents),
@@ -309,6 +313,22 @@ export class GithubClient {
         sha,
       },
     })
+  }
+
+  async upload(
+    path: string,
+    fileContents: string,
+    commitMessage: string = 'Update from TinaCMS',
+    encoded: boolean = false
+  ) {
+    return this.githubFileApi(path, fileContents, commitMessage, encoded, 'PUT')
+  }
+
+  async delete(
+    path: string,
+    commitMessage: string = `Deleted ${path} using TinaCMS`
+  ) {
+    return this.githubFileApi(path, '', commitMessage, false, 'DELETE')
   }
 
   protected async req(data: any) {

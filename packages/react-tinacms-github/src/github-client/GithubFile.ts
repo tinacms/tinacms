@@ -59,6 +59,7 @@ export class GithubFile {
         await this.fetchFile() // update sha
         await this.commit(data, message, false) // try one more time
       } else {
+        this.cms.events.dispatch({ type: 'github:error', error })
         throw error
       }
     }
