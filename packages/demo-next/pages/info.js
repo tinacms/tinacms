@@ -137,7 +137,7 @@ const formOptions = {
       label: 'Lunch Options',
       name: 'frontmatter.lunch',
       component: 'list',
-      itemField: {
+      field: {
         label: 'Lunch Options',
         component: 'text',
       },
