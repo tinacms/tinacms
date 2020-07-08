@@ -43,6 +43,7 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
           click
           escape
           disabled={!actionMenuVisibility}
+          allowClickPropagation
           onDismiss={() => {
             setActionMenuVisibility(p => !p)
           }}
