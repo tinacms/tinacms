@@ -29,7 +29,6 @@ interface ListFieldDefinititon extends Field {
   component: 'list'
   defaultItem?: string | number | (() => string | number)
   field: {
-    label?: string
     component: 'text' | 'textarea' | 'number' | 'select'
   }
   /**
@@ -49,10 +48,6 @@ interface ListFieldDefinititon extends Field {
      * * https://reactjs.org/docs/lists-and-keys.html
      */
     key?: string
-    /**
-     * The label to be display on the list item.
-     */
-    label?: string
   }
 }
 
