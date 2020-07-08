@@ -54,7 +54,8 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
     'pending' | 'loaded' | 'error'
   >('pending')
   const [branches, setBranches] = React.useState<Branch[]>([])
-  React.useEffect(() => {
+
+  const updateBranchList = React.useCallback(() => {
     github
       .getBranchList()
       .then(branches => {
@@ -64,6 +65,11 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
       .catch(() => {
         setBranchStatus('error')
       })
+  }, [github, setBranches, setBranchStatus])
+
+  React.useEffect(() => {
+    updateBranchList()
+    cms.events.subscribe('github:branch:create', updateBranchList)
   }, [])
 
   const closeDropdown = () => {
@@ -195,7 +201,15 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
         async onSubmit({ name }) {
           try {
             await cms.api.github.createBranch(name)
+            cms.events.dispatch({
+              type: 'github:branch:create',
+              branchName: name,
+            })
             cms.api.github.setWorkingBranch(name)
+            cms.events.dispatch({
+              type: 'github:branch:checkout',
+              branchName: name,
+            })
             if (onBranchChange) {
               onBranchChange(name)
             }

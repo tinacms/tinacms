@@ -35,7 +35,10 @@ export interface FormViewProps {
 export function FormView({ activeForm }: FormViewProps) {
   const cms = useCMS()
   // @ts-ignore
-  const buttons = cms.sidebar.buttons
+  const buttons = cms.sidebar?.buttons || {
+    save: 'Save',
+    reset: 'Reset',
+  }
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
       if (!result.destination || !activeForm) return

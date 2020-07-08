@@ -3,6 +3,37 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.6.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.6.0-alpha.0...react-tinacms-github@0.6.0) (2020-07-07)
+
+
+### Bug Fixes
+
+* send json message on succesful preview handling ([3b0cbee](https://github.com/tinacms/tinacms/commit/3b0cbee))
+
+
+
+
+
+# [0.6.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.5.1...react-tinacms-github@0.6.0-alpha.0) (2020-07-04)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** allow overwriting uploaded media ([5c6e768](https://github.com/tinacms/tinacms/commit/5c6e768))
+* **react-tinacms-github:** allow overwriting when uploading ([8fb4a86](https://github.com/tinacms/tinacms/commit/8fb4a86))
+* **react-tinacms-github:** fire checkout event after branch create ([634345c](https://github.com/tinacms/tinacms/commit/634345c))
+* **react-tinacms-github:** update branch list on branch create ([4537de1](https://github.com/tinacms/tinacms/commit/4537de1))
+
+
+### Features
+
+* **react-tinacms-github:** add GitClient#getDownloadUrl ([06b3261](https://github.com/tinacms/tinacms/commit/06b3261))
+* **react-tinacms-github:** add GithubFile and useGithubFile ([c6b0535](https://github.com/tinacms/tinacms/commit/c6b0535))
+
+
+
+
+
 ## [0.5.1](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.5.1-alpha.1...react-tinacms-github@0.5.1) (2020-06-29)
 
 **Note:** Version bump only for package react-tinacms-github

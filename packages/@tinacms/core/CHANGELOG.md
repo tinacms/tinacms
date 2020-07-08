@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.10.1](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.10.1-alpha.0...@tinacms/core@0.10.1) (2020-07-07)
+
+**Note:** Version bump only for package @tinacms/core
+
+
+
+
+
+## [0.10.1-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.10.0...@tinacms/core@0.10.1-alpha.0) (2020-07-04)
+
+
+### Bug Fixes
+
+* the enable and disable are now lamdas ([e3185b0](https://github.com/tinacms/tinacms/commit/e3185b0))
+
+
+
+
+
 # [0.10.0](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.10.0-alpha.0...@tinacms/core@0.10.0) (2020-06-23)
 
 **Note:** Version bump only for package @tinacms/core

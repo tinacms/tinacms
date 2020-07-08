@@ -37,6 +37,13 @@ export interface Branch {
 
 export type AuthScope = 'public_repo' | 'repo'
 
+function removeLeadingSlash(path: string) {
+  if (path.charAt(0) === '/') {
+    return path.substring(1)
+  }
+  return path
+}
+
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
@@ -243,7 +250,9 @@ export class GithubClient {
     const branch = this.branchName
 
     return this.req({
-      url: `https://api.github.com/repos/${repo}/contents/${filePath}`,
+      url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
+        filePath
+      )}`,
       method: 'PUT',
       data: {
         message: commitMessage,
@@ -253,11 +262,19 @@ export class GithubClient {
       },
     })
   }
+
+  async getDownloadUrl(path: string) {
+    const res = await this.fetchFile(path, false)
+    return res.download_url
+  }
+
   async fetchFile(filePath: string, decoded: boolean = true) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
     const request = await this.req({
-      url: `https://api.github.com/repos/${repo}/contents/${filePath}?ref=${branch}`,
+      url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
+        filePath
+      )}?ref=${branch}`,
       method: 'GET',
     })
 
@@ -266,24 +283,52 @@ export class GithubClient {
     return request
   }
 
+  /*
+  added or deletes files from github
+  */
+  async githubFileApi(
+    path: string,
+    fileContents: string,
+    commitMessage: string = 'Update from TinaCMS',
+    encoded: boolean = false,
+    method: 'PUT' | 'DELETE'
+  ) {
+    const repo = this.workingRepoFullName
+    const branch = this.branchName
+
+    let sha = null
+    try {
+      ;({ sha } = await this.fetchFile(path))
+    } catch (e) {}
+
+    return this.req({
+      url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
+        path
+      )}`,
+      method,
+      data: {
+        message: commitMessage,
+        content: encoded ? fileContents : b64EncodeUnicode(fileContents),
+        branch: branch,
+        sha,
+      },
+    })
+  }
+
   async upload(
     path: string,
     fileContents: string,
     commitMessage: string = 'Update from TinaCMS',
     encoded: boolean = false
   ) {
-    const repo = this.workingRepoFullName
-    const branch = this.branchName
+    return this.githubFileApi(path, fileContents, commitMessage, encoded, 'PUT')
+  }
 
-    return this.req({
-      url: `https://api.github.com/repos/${repo}/contents/${path}`,
-      method: 'PUT',
-      data: {
-        message: commitMessage,
-        content: encoded ? fileContents : b64EncodeUnicode(fileContents),
-        branch: branch,
-      },
-    })
+  async delete(
+    path: string,
+    commitMessage: string = `Deleted ${path} using TinaCMS`
+  ) {
+    return this.githubFileApi(path, '', commitMessage, false, 'DELETE')
   }
 
   protected async req(data: any) {
