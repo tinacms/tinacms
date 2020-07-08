@@ -83,6 +83,16 @@ const Bio = () => {
     fields,
   })
 
+  React.useEffect(() => {
+    cms.events.subscribe("git:commit", function handleCommitAlerts(event) {
+      if (!event.response.ok) {
+        cms.alerts.error("Something went wrong! Changes weren't saved")
+      } else {
+        cms.alerts.info("Content saved successfully!")
+      }
+    })
+  }, [])
+
   useFormScreenPlugin(authorForm)
 
   return (
