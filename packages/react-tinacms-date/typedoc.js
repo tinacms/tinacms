@@ -16,15 +16,4 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { GithubEditingContext } from './GithubEditingContext'
-
-export function useGithubEditing() {
-  const githubContext = React.useContext(GithubEditingContext)
-
-  if (!githubContext) {
-    throw new Error('useGithub must be within an GithubContext')
-  }
-
-  return githubContext
-}
+module.exports = require('../../typedoc.js')(require('./package.json'))

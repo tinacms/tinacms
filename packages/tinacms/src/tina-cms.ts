@@ -33,7 +33,6 @@ import {
   BlocksFieldPlugin,
   TagsFieldPlugin,
 } from '@tinacms/fields'
-import DateFieldPlugin from './plugins/fields/DateFieldPlugin'
 import { Form } from '@tinacms/forms'
 import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
@@ -42,20 +41,39 @@ import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
+  DateFieldPlaceholder,
 } from './plugins/fields/markdown'
 
+const DEFAULT_FIELDS = [
+  TextFieldPlugin,
+  TextareaFieldPlugin,
+  ImageFieldPlugin,
+  ColorFieldPlugin,
+  NumberFieldPlugin,
+  ToggleFieldPlugin,
+  SelectFieldPlugin,
+  GroupFieldPlugin,
+  GroupListFieldPlugin,
+  ListFieldPlugin,
+  BlocksFieldPlugin,
+  TagsFieldPlugin,
+  MarkdownFieldPlaceholder,
+  HtmlFieldPlaceholder,
+  DateFieldPlaceholder,
+]
+
 export interface TinaCMSConfig extends CMSConfig {
-  sidebar?: SidebarStateOptions
+  sidebar?: SidebarStateOptions | boolean
+  toolbar?: ToolbarStateOptions | boolean
   media?: {
     store: MediaStore
   }
-  toolbar?: ToolbarStateOptions
 }
 
 export class TinaCMS extends CMS {
-  sidebar: SidebarState
+  sidebar?: SidebarState
+  toolbar?: ToolbarState
   media: MediaManager
-  toolbar: ToolbarState
   alerts = new Alerts(this.events)
 
   constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
@@ -64,23 +82,21 @@ export class TinaCMS extends CMS {
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
 
-    this.sidebar = new SidebarState(this.events, sidebar)
-    this.toolbar = new ToolbarState(toolbar)
-    this.fields.add(TextFieldPlugin)
-    this.fields.add(TextareaFieldPlugin)
-    this.fields.add(DateFieldPlugin)
-    this.fields.add(ImageFieldPlugin)
-    this.fields.add(ColorFieldPlugin)
-    this.fields.add(NumberFieldPlugin)
-    this.fields.add(ToggleFieldPlugin)
-    this.fields.add(SelectFieldPlugin)
-    this.fields.add(GroupFieldPlugin)
-    this.fields.add(GroupListFieldPlugin)
-    this.fields.add(ListFieldPlugin)
-    this.fields.add(BlocksFieldPlugin)
-    this.fields.add(MarkdownFieldPlaceholder)
-    this.fields.add(HtmlFieldPlaceholder)
-    this.fields.add(TagsFieldPlugin)
+    if (sidebar) {
+      const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
+      this.sidebar = new SidebarState(this.events, sidebarConfig)
+    }
+
+    if (toolbar) {
+      const toolbarConfig = typeof toolbar === 'object' ? toolbar : undefined
+      this.toolbar = new ToolbarState(toolbarConfig)
+    }
+
+    DEFAULT_FIELDS.forEach(field => {
+      if (!this.fields.find(field.name)) {
+        this.fields.add(field)
+      }
+    })
   }
 
   get forms(): PluginType<Form> {

@@ -27,4 +27,3 @@ export {
   TextareaFieldPlugin,
   ToggleFieldPlugin,
 } from '@tinacms/fields'
-export * from './DateFieldPlugin'

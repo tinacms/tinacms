@@ -21,7 +21,6 @@ import { NoFormsPlaceholder } from './components/NoFormsPlaceHolder'
 import * as React from 'react'
 
 export interface SidebarStateOptions {
-  hidden?: boolean
   position?: SidebarPosition
   buttons?: SidebarButtons
   placeholder?: React.FC
@@ -39,7 +38,6 @@ export class SidebarState {
   placeholder: React.FC
 
   position: SidebarPosition = 'displace'
-  _hidden: boolean = false
   buttons: SidebarButtons = {
     save: 'Save',
     reset: 'Reset',
@@ -47,7 +45,6 @@ export class SidebarState {
 
   constructor(private events: EventBus, options: SidebarStateOptions = {}) {
     this.position = options.position || 'displace'
-    this._hidden = !!options.hidden
     this.placeholder = options.placeholder || NoFormsPlaceholder
 
     if (options.buttons?.save) {
@@ -73,24 +70,6 @@ export class SidebarState {
       this.events.dispatch({ type: 'sidebar:opened' })
     } else {
       this.events.dispatch({ type: 'sidebar:closed' })
-    }
-  }
-
-  get hidden() {
-    return this._hidden
-  }
-
-  set hidden(nextValue: boolean) {
-    if (this._hidden === nextValue) {
-      return // No change.
-    }
-
-    this._hidden = nextValue
-
-    if (nextValue) {
-      this.events.dispatch({ type: 'sidebar:disabled' })
-    } else {
-      this.events.dispatch({ type: 'sidebar:enabled' })
     }
   }
 

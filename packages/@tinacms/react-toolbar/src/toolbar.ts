@@ -16,10 +16,7 @@ limitations under the License.
 
 */
 
-import { Subscribable } from '@tinacms/core'
-
 export interface ToolbarStateOptions {
-  hidden?: boolean
   buttons?: ToolbarButtons
 }
 
@@ -28,18 +25,13 @@ export interface ToolbarButtons {
   reset: string
 }
 
-export class ToolbarState extends Subscribable {
-  _hidden: boolean = true
+export class ToolbarState {
   buttons: ToolbarButtons = {
     save: 'Save',
     reset: 'Reset',
   }
 
   constructor(options: ToolbarStateOptions = {}) {
-    super()
-    // Defaults to 'hidden' if config property not set
-    this._hidden = options.hidden == undefined ? true : !!options.hidden
-
     /*
      ** TODO: Do we want to handle buttons
      ** the same as sidebar? Or make them plugins?
@@ -51,14 +43,5 @@ export class ToolbarState extends Subscribable {
     if (options.buttons?.reset) {
       this.buttons.reset = options.buttons.reset
     }
-  }
-
-  get hidden() {
-    return this._hidden
-  }
-
-  set hidden(nextValue: boolean) {
-    this._hidden = nextValue
-    this.notifiySubscribers()
   }
 }
