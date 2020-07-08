@@ -11,19 +11,19 @@ import {
 } from 'tinacms'
 import { Button } from '@tinacms/styles'
 
-const getTitleTest = (form: Form) => {
+const getTitleDefault = (form: Form) => {
   return form.name
 }
 
 interface options {
   getTitle: (form: Form) => string
-  getFileName: (form: Form) => string
+  getFilePath: (form: Form) => string
 }
 
-export const createDeleteAction = (
-  { getTitle, getFileName }: options = {
-    getTitle: getTitleTest,
-    getFileName: getTitleTest,
+export const createMarkdownDeleteAction = (
+  { getTitle, getFilePath }: options = {
+    getTitle: getTitleDefault,
+    getFilePath: getTitleDefault,
   }
 ) => {
   const DeleteAction = ({ form }: { form: Form }) => {
@@ -32,7 +32,7 @@ export const createDeleteAction = (
     const open = () => setActive(true)
     const close = () => setActive(false)
     const title = getTitle(form)
-    const fileName = getFileName(form)
+    const filePath = getFilePath(form)
 
     return (
       <div>
@@ -49,11 +49,11 @@ export const createDeleteAction = (
                   onClick={async () => {
                     try {
                       close()
-                      await cms.api.github.delete!(fileName)
-                      await cms.alerts.info(`${fileName} was deleted`)
+                      await cms.api.github.delete!(filePath)
+                      await cms.alerts.info(`${filePath} was deleted`)
                     } catch (error) {
                       close()
-                      cms.alerts.error(`Error in deleting ${fileName}`)
+                      cms.alerts.error(`Error in deleting ${filePath}`)
                       console.error(error)
                     } finally {
                       window.history.back()
