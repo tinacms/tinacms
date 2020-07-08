@@ -27,7 +27,7 @@ import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
 
 interface ListFieldDefinititon extends Field {
   component: 'list'
-  defaultItem?: object | (() => object)
+  defaultItem?: string | number | (() => string | number)
   field: {
     label?: string
     component: 'text' | 'textarea' | 'number' | 'select'
@@ -70,7 +70,7 @@ const List = ({ tinaForm, form, field, input }: ListProps) => {
     if (typeof field.defaultItem === 'function') {
       obj = field.defaultItem()
     } else {
-      obj = field.defaultItem || {}
+      obj = field.defaultItem || ''
     }
     form.mutators.insert(field.name, 0, obj)
   }, [form, field])
