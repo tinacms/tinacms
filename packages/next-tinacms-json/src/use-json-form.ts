@@ -32,6 +32,7 @@ export interface Options {
   label?: string
   fields?: Field[]
   actions?: FormOptions<any>['actions']
+  buttons?: FormOptions<any>['buttons']
 }
 /**
  * Creates a TinaCMS Form for editing a JsonFile in Git
@@ -46,12 +47,14 @@ export function useJsonForm<T = any>(
   const label = options.label || jsonFile.fileRelativePath
   const fields = options.fields || generateFields(jsonFile)
   const actions = options.actions || []
+  const buttons = options.buttons
   const [values, form] = useForm(
     {
       id,
       label,
       fields,
       actions,
+      buttons,
       loadInitialValues() {
         return cms.api.git
           .show(jsonFile.fileRelativePath) // Load the contents of this file at HEAD
