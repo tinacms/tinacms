@@ -256,6 +256,10 @@ function BlogPostTemplate(props) {
  */
 const BlogPostForm = {
   actions: [DeleteAction],
+  buttons: {
+    save: "Save Form",
+    reset: "Discard",
+  },
   fields: [
     { name: "rawMarkdownBody", component: "markdown" },
     {
