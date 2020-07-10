@@ -93,6 +93,15 @@ export const Toolbar = () => {
     }
   }
 
+  /**
+   * TODO: decide best button defaults
+   * Should match defaults in form.ts
+   */
+  const buttons = form?.buttons || {
+    save: 'Save',
+    reset: 'Reset',
+  }
+
   //const reset = form && (form.reset || (() => form.finalForm.reset()))
   const submit = form && form.submit
   const disabled = !form
@@ -141,7 +150,7 @@ export const Toolbar = () => {
               onClick={reset}
             >
               <ResetIcon />
-              <DesktopLabel> Discard</DesktopLabel>
+              <DesktopLabel>{buttons.reset}</DesktopLabel>
             </ToolbarButton>
             <SaveButton
               primary
@@ -153,7 +162,7 @@ export const Toolbar = () => {
               {submitting && <LoadingDots />}
               {!submitting && (
                 <>
-                  Save <DesktopLabel>&nbsp;Page</DesktopLabel>
+                  <DesktopLabel>{buttons.save}</DesktopLabel>
                 </>
               )}
             </SaveButton>
