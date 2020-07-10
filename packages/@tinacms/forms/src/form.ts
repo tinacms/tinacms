@@ -28,6 +28,10 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   __type?: string
   reset?(): void
   actions?: any[]
+  buttons?: {
+    save: string
+    reset: string
+  }
   loadInitialValues?: () => Promise<S>
   onChange?(values: FormState<S>): void
 }
@@ -41,7 +45,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   fields: F[]
   finalForm: FormApi<S>
   actions: any[]
-
+  buttons: {
+    save: string
+    reset: string
+  }
   loading: boolean = false
 
   constructor({
@@ -49,6 +56,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     label,
     fields,
     actions,
+    buttons,
     reset,
     loadInitialValues,
     onChange,
@@ -72,6 +80,10 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
 
     this._reset = reset
     this.actions = actions || []
+    this.buttons = buttons || {
+      save: 'Save',
+      reset: 'Reset',
+    }
     this.updateFields(this.fields)
 
     if (loadInitialValues) {
