@@ -97,10 +97,12 @@ export const Toolbar = () => {
    * TODO: decide best button defaults
    * Should match defaults in form.ts
    */
-  const buttons = form?.buttons || {
-    save: 'Save',
-    reset: 'Reset',
-  }
+  // @ts-ignore
+  const buttons = cms.toolbar?.buttons ||
+    form?.buttons || {
+      save: 'Save',
+      reset: 'Reset',
+    }
 
   //const reset = form && (form.reset || (() => form.finalForm.reset()))
   const submit = form && form.submit
