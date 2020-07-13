@@ -25,9 +25,11 @@ import { Droppable, Draggable } from 'react-beautiful-dnd'
 import { AddIcon, ReorderIcon, TrashIcon } from '@tinacms/icons'
 import { FieldDescription, FieldWrapper } from './wrapFieldWithMeta'
 
+type DefaultItem = string | number | (() => string | number)
+
 interface ListFieldDefinititon extends Field {
   component: 'list'
-  defaultItem?: string | number | (() => string | number)
+  defaultItem?: DefaultItem
   field: {
     component: 'text' | 'textarea' | 'number' | 'select'
   }
@@ -61,13 +63,13 @@ interface ListProps {
 
 const List = ({ tinaForm, form, field, input }: ListProps) => {
   const addItem = React.useCallback(() => {
-    let obj = {}
+    let newItem: DefaultItem = ''
     if (typeof field.defaultItem === 'function') {
-      obj = field.defaultItem()
-    } else {
-      obj = field.defaultItem || ''
+      newItem = field.defaultItem()
+    } else if (typeof field.defaultItem !== 'undefined') {
+      newItem = field.defaultItem
     }
-    form.mutators.insert(field.name, 0, obj)
+    form.mutators.insert(field.name, 0, newItem)
   }, [form, field])
 
   const items = input.value || []
