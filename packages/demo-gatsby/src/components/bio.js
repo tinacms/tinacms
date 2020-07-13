@@ -52,11 +52,24 @@ const fields = [
   },
   {
     name: "rawJson.bullet_points",
-    label: "Bullet Points",
+    label: "Best Beatles Albums",
     component: "list",
-    itemField: {
-      label: "Bullet Points Item",
-      component: "text",
+    defaultItem: "Abbey Road",
+    field: {
+      component: "select",
+      options: [
+        "Let It Be",
+        "Abbey Road",
+        "Yellow Submarine",
+        "The Beatles(White Album)",
+        "Magical Mystery Tour",
+        "Sgt. Pepper's Lonely Hearts Club Band",
+        "Revolver",
+        "Yesterday...and Today",
+        "Rubber Soul",
+        "Help!",
+        "A Hard Day's Night",
+      ],
     },
   },
 ]
