@@ -18,16 +18,16 @@ limitations under the License.
 
 import * as React from 'react'
 import {
-  ActionButton,
-  useCMS,
-  Form,
   Modal,
   ModalPopup,
   ModalHeader,
   ModalBody,
   ModalActions,
-} from 'tinacms'
+} from '@tinacms/react-modals'
+import { ActionButton } from '@tinacms/react-forms'
+import { useCMS } from '@tinacms/react-core'
 import { Button } from '@tinacms/styles'
+import { Form } from '@tinacms/forms'
 
 const getTitleDefault = (form: Form) => {
   return form.name
@@ -38,7 +38,27 @@ interface options {
   getFilePath?: (form: Form) => string
 }
 
-export const createMarkdownDeleteAction = (
+/**
+ * This function returns an action that can but used in a form to delete files in github.
+ *
+ * Options
+ * getTitle: a function that takes in a form and returns a title of the file to be deleted (optional)
+ * getFilePath: a function that takes in a form and returns a the file path in github (optional)
+ *
+ * EXAMPLE
+ * const deleteAction = createGithubDeleteAction()
+ *
+ * const formOptions = {
+ *    actions: [deleteAction, ...]
+ *    //..
+ * }
+ * const [data, form] = useGithubJsonForm(file, formOptions);
+ * usePlugin(form);
+ *
+ * NOTE: this will delete the entire file that is used to store the form data. The primary use case would be dynamic page content like blog posts.
+ *
+ */
+export const createGithubDeleteAction = (
   { getTitle = getTitleDefault, getFilePath = getTitleDefault }: options = {
     getTitle: getTitleDefault,
     getFilePath: getTitleDefault,
@@ -53,7 +73,7 @@ export const createMarkdownDeleteAction = (
     const filePath = getFilePath!(form)
 
     return (
-      <div>
+      <React.Fragment>
         <ActionButton onClick={open}>{`Delete ${title}`}</ActionButton>
         {active && (
           <Modal>
@@ -68,10 +88,8 @@ export const createMarkdownDeleteAction = (
                     try {
                       close()
                       await cms.api.github.delete!(filePath)
-                      await cms.alerts.info(`${filePath} was deleted`)
                     } catch (error) {
                       close()
-                      cms.alerts.error(`Error in deleting ${filePath}`)
                       console.error(error)
                     } finally {
                       window.history.back()
@@ -85,7 +103,7 @@ export const createMarkdownDeleteAction = (
             </ModalPopup>
           </Modal>
         )}
-      </div>
+      </React.Fragment>
     )
   }
 
