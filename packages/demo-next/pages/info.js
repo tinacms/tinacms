@@ -133,6 +133,15 @@ const formOptions = {
       component: 'markdown',
     },
     { label: 'color', name: 'frontmatter.color', component: 'color' },
+    {
+      label: 'Lunch Options',
+      name: 'frontmatter.lunch',
+      component: 'list',
+      defaultItem: 'turkey',
+      field: {
+        component: 'text',
+      },
+    },
   ],
 }
 

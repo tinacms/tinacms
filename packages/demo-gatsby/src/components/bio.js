@@ -50,6 +50,28 @@ const fields = [
     description: "Enter where they're based",
     component: "text",
   },
+  {
+    name: "rawJson.bullet_points",
+    label: "Best Beatles Albums",
+    component: "list",
+    defaultItem: "Abbey Road",
+    field: {
+      component: "select",
+      options: [
+        "Let It Be",
+        "Abbey Road",
+        "Yellow Submarine",
+        "The Beatles(White Album)",
+        "Magical Mystery Tour",
+        "Sgt. Pepper's Lonely Hearts Club Band",
+        "Revolver",
+        "Yesterday...and Today",
+        "Rubber Soul",
+        "Help!",
+        "A Hard Day's Night",
+      ],
+    },
+  },
 ]
 const Bio = () => {
   const cms = useCMS()
@@ -69,6 +91,7 @@ const Bio = () => {
         firstName
         lastName
         location
+        bullet_points
         social {
           twitter
         }
