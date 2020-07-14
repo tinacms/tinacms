@@ -20,6 +20,7 @@
 - [Contributing](./CONTRIBUTING.md)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
 - [Projects](https://github.com/orgs/tinacms/projects)
+- [Change proposals(RFCs)](https://github.com/tinacms/rfcs)
 
 ## Development
 
