@@ -71,6 +71,10 @@ const formOptions = {
       component: 'markdown',
     },
   ],
+  buttons: {
+    save: 'capture',
+    reset: 'discard',
+  },
 }
 
 const EditableIndex = inlineJsonForm(Index, formOptions)

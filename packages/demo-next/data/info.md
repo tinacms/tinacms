@@ -8,6 +8,11 @@ description: >-
   beings two ghostly white figures in coveralls and helmets are softly dancing
   laws of physics network of wormholes.
 image: /images/davisco-5E5N49RWtbA-unsplash.jpg
+lunch:
+  - hotdogs
+  - tacos
+  - falafel
+  - sliders
 ---
 ## This blog was created using [TinaCMS](https://tinacms.org) & [NextJS](https://nextjs.org/)
 
