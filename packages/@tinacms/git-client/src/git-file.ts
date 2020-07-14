@@ -36,7 +36,7 @@ export class GitFile {
   }
 
   commit = () => {
-    return this.cms.api.git.commit!({
+    return this.git.commit!({
       files: [this.relativePath],
     }).then((response: Response) =>
       this.cms.events.dispatch({ type: 'git:commit', response })
@@ -48,7 +48,7 @@ export class GitFile {
   }
 
   write = (values: any) => {
-    this.cms.api.git.writeToDisk!({
+    this.git.writeToDisk!({
       fileRelativePath: this.relativePath,
       content: this.format(values),
     })
