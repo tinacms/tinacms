@@ -38,7 +38,9 @@ export class GitFile {
   commit = () => {
     return this.git.commit!({
       files: [this.relativePath],
-    })
+    }).then((response: Response) =>
+      this.cms.events.dispatch({ type: 'git:commit', response })
+    )
   }
 
   reset = () => {
