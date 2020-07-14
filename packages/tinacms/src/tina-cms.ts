@@ -29,6 +29,7 @@ import {
   SelectFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,
+  ListFieldPlugin,
   BlocksFieldPlugin,
   TagsFieldPlugin,
 } from '@tinacms/fields'
@@ -53,6 +54,7 @@ const DEFAULT_FIELDS = [
   SelectFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,
+  ListFieldPlugin,
   BlocksFieldPlugin,
   TagsFieldPlugin,
   MarkdownFieldPlaceholder,
