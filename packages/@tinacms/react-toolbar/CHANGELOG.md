@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.4.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.3.1...@tinacms/react-toolbar@0.4.0-alpha.0) (2020-07-15)
+
+
+### Bug Fixes
+
+* toolbar accepts button options from cms config ([980476d](https://github.com/tinacms/tinacms/commit/980476d))
+
+
+### Features
+
+* toolbar uses form buttons ([cfa3029](https://github.com/tinacms/tinacms/commit/cfa3029))
+
+
+
+
+
 ## [0.3.1](https://github.com/tinacms/tinacms/compare/@tinacms/react-toolbar@0.3.1-alpha.0...@tinacms/react-toolbar@0.3.1) (2020-07-07)
 
 **Note:** Version bump only for package @tinacms/react-toolbar

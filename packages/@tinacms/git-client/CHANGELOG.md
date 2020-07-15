@@ -3,6 +3,24 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/git-client@0.6.7...@tinacms/git-client@0.7.0-alpha.0) (2020-07-15)
+
+
+### Bug Fixes
+
+* git file to use cms.api.git ([00926af](https://github.com/tinacms/tinacms/commit/00926af))
+
+
+### Features
+
+* add useGitFile hook ([c996343](https://github.com/tinacms/tinacms/commit/c996343))
+* added GitFile class to make changing individual files easier ([a29b701](https://github.com/tinacms/tinacms/commit/a29b701))
+* adds git:commit event ([f9a7f11](https://github.com/tinacms/tinacms/commit/f9a7f11))
+
+
+
+
+
 ## [0.6.7](https://github.com/tinacms/tinacms/compare/@tinacms/git-client@0.6.7-alpha.0...@tinacms/git-client@0.6.7) (2020-04-27)
 
 **Note:** Version bump only for package @tinacms/git-client

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.6.0...react-tinacms-github@0.7.0-alpha.0) (2020-07-15)
+
+
+### Features
+
+* added ability to delete files with github client ([8ccc956](https://github.com/tinacms/tinacms/commit/8ccc956))
+
+
+
+
+
 # [0.6.0](https://github.com/tinacms/tinacms/compare/react-tinacms-github@0.6.0-alpha.0...react-tinacms-github@0.6.0) (2020-07-07)
 
 

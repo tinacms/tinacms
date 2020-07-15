@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.2.4-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-forms@0.2.3...@tinacms/react-forms@0.2.4-alpha.0) (2020-07-15)
+
+
+### Bug Fixes
+
+* provides default form view buttons value ([59bfb2f](https://github.com/tinacms/tinacms/commit/59bfb2f))
+
+
+
+
+
 ## [0.2.3](https://github.com/tinacms/tinacms/compare/@tinacms/react-forms@0.2.3-alpha.0...@tinacms/react-forms@0.2.3) (2020-07-07)
 
 **Note:** Version bump only for package @tinacms/react-forms
