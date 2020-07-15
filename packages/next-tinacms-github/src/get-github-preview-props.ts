@@ -17,7 +17,7 @@ limitations under the License.
 
 */
 import { GithubError } from './github/content/GithubError'
-import getDecodedData from './github/content/getDecodedData'
+import { GithubFile, getGithubFile } from './get-github-file'
 
 export interface PreviewData<Data> {
   github_access_token: string
@@ -25,12 +25,6 @@ export interface PreviewData<Data> {
   head_branch: string
   fileRelativePath: string
   parse(content: string): Data
-}
-
-export interface GithubFile<Data> {
-  sha: string
-  fileRelativePath: string
-  data: Data
 }
 
 export interface GithubPreviewProps<Data> {
@@ -47,32 +41,27 @@ export async function getGithubPreviewProps<Data = any>(
   options: PreviewData<Data>
 ): Promise<GithubPreviewProps<Data>> {
   const accessToken = options.github_access_token
-  const workingRepoFullName = options.working_repo_full_name || ''
-  const headBranch = options.head_branch || 'master'
+  const repoFullName = options.working_repo_full_name || ''
+  const branch = options.head_branch || 'master'
 
   let error: GithubError | null = null
   let file = null
 
   try {
-    const response = await getDecodedData(
-      workingRepoFullName,
-      headBranch,
-      options.fileRelativePath,
-      accessToken
-    )
-
-    file = {
-      sha: response.sha,
+    file = await getGithubFile({
+      repoFullName,
+      branch,
       fileRelativePath: options.fileRelativePath,
-      data: options.parse(response.content),
-    }
+      accessToken,
+      parse: options.parse,
+    })
   } catch (e) {
     if (e instanceof GithubError) {
       console.error(
         githubErrorMessage({
           path: options.fileRelativePath,
-          repoFullName: workingRepoFullName,
-          branch: headBranch,
+          repoFullName,
+          branch,
           accessToken,
         })
       )
@@ -86,8 +75,8 @@ export async function getGithubPreviewProps<Data = any>(
   return {
     props: {
       file,
-      repoFullName: workingRepoFullName,
-      branch: headBranch,
+      repoFullName,
+      branch,
       preview: true,
       error,
     },
