@@ -70,6 +70,8 @@ export default previewHandler(process.env.SIGNING_KEY)
 
 ### Loading content from Github
 
+#### `getGithubPreviewProps`
+
 The `preview` data, which gets set by calling your [preview function](#previewhandler), will be accesible through `getStaticProps` throughout your app.
 
 ```ts
@@ -96,7 +98,6 @@ export const getStaticProps: GetStaticProps = async function({
   }
   return {
     props: {
-      sourceProvider: null,
       error: null,
       preview,
       file: {
@@ -108,6 +109,47 @@ export const getStaticProps: GetStaticProps = async function({
 }
 ```
 
+#### `getGithubFile`
+
+In some cases you'll need to load multiple files from Github. For this reason the underlying `getGithubFile` function is exposed.
+
+```ts
+import {
+  getGithubFile,
+  parseJson,
+  parseMarkdown,
+} from 'next-tinacms-github'
+
+export const getStaticProps: GetStaticProps = async function({
+  preview,
+  previewData,
+  ...ctx
+}) {
+  const githubOptions = {
+    repoFullName: previewData.working_repo_full_name,
+    branch: previewData.head_branch ,
+    accessToken: previewData.github_access_token,
+  }
+
+  const homeFile = await getGithubFile({
+    ...githubOptions,
+    fileRelativePath: "content/index.md
+    parse: parseMarkdown
+  })
+
+  const navigationFile = await getGithubFile({
+    ...githubOptions,
+    fileRelativePath: "data/navigation.json
+    parse: parseJson
+  })
+
+  return {
+    preview,
+    homeFile,
+    navigationFile,
+  }
+}
+```
 
 ### Github Oauth App:
 
