@@ -58,7 +58,7 @@ Typical structure of a plugin:
 
 `commands` defines the [prosemirror commands](https://prosemirror.net/docs/ref/#commands) related to the plugin.
 
-Currently all the `keyboard shortcuts` and prosemirror `input rules` are combined in `common plugin` it is required to refactor these into their respective plugins.
+Currently all the [keyboard shortcuts](https://prosemirror.net/docs/ref/#keymap) and [input rules](https://prosemirror.net/docs/ref/#inputrules) are combined in the `common plugin`. Future work will move these into their respective plugins.
 
 ### Markdown Editor
 
