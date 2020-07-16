@@ -45,6 +45,10 @@ export class GithubFile {
   ) => {
     const serializedContent = this.serialize ? this.serialize(data) : data
     try {
+      if (!this.sha) {
+        const res = await this.cms.api.github.fetchFile(this.path)
+        this.sha = res.sha
+      }
       const response = await this.cms.api.github.commit(
         this.path,
         this.sha,
