@@ -62,7 +62,7 @@ Currently all the [keyboard shortcuts](https://prosemirror.net/docs/ref/#keymap)
 
 ### Markdown Editor
 
-[This](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-editor/src/components/MarkdownEditor) editor is simple textarea where editor content can be edited a plain text. Currently menubar options are not enabled in this editor.
+The [Markdown Editor](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-editor/src/components/MarkdownEditor) is simple textarea where editor content can be edited a plain text. Currently menubar options are not enabled in this editor.
 
 ### Menubar
 
