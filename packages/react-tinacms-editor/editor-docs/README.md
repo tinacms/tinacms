@@ -54,7 +54,7 @@ Typical structure of a plugin:
 
 `nodeView` is used to create a custom view for the prosemirror node. This is used for code block and image nodes.
 
-`plugin` is prosemirror [plugin](https://prosemirror.net/docs/ref/#state.Plugin_System) object. It helps maintain state for plugin for instance for links and images it helps to keep information when user is currently editing link or image. It also enables other functionality like attaching event listeners, creation editor decorations, etc.
+`plugin` is prosemirror [plugin](https://prosemirror.net/docs/ref/#state.Plugin_System) object. It helps maintain state for plugins, such as whether or not the user is currently editing a link or image. The `plugin` also enables other functionality like attaching event listeners, creation editor decorations, etc.
 
 `commands` defines the [prosemirror commands](https://prosemirror.net/docs/ref/#commands) related to the plugin.
 
