@@ -52,7 +52,7 @@ Typical structure of a plugin:
 
 `Popups` folder has various Popup components. For instance image and link have Popup components used for editing. These components should take care for show / hide themselves conditionally.
 
-`nodeView` is used to create customized vide for prosemirror node, this is used for code block and image nodes.
+`nodeView` is used to create a custom view for the prosemirror node. This is used for code block and image nodes.
 
 `plugin` is prosemirror [plugin](https://prosemirror.net/docs/ref/#state.Plugin_System) object. It helps maintain state for plugin for instance for links and images it helps to keep information when user is currently editing link or image. It also enables other functionality like attaching event listeners, creation editor decorations, etc.
 
