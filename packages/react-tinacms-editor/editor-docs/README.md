@@ -56,7 +56,7 @@ Typical structure of a plugin:
 
 `plugin` is prosemirror [plugin](https://prosemirror.net/docs/ref/#state.Plugin_System) object. It helps maintain state for plugin for instance for links and images it helps to keep information when user is currently editing link or image. It also enables other functionality like attaching event listeners, creation editor decorations, etc.
 
-`commands` keeping commands related to the plugin together.
+`commands` defines the [prosemirror commands](https://prosemirror.net/docs/ref/#commands) related to the plugin.
 
 Currently all the `keyboard shortcuts` and prosemirror `input rules` are combined in `common plugin` it is required to refactor these into their respective plugins.
 
