@@ -1,7 +1,7 @@
 {
   "name": "gatsby-tinacms-teams",
   "main": "index.js",
-  "version": "0.1.5",
+  "version": "0.24.0",
   "license": "Apache-2.0",
   "files": [
     "index.js",
@@ -33,7 +33,7 @@
     "docs": "npx typedoc"
   },
   "dependencies": {
-    "@tinacms/teams": "^0.2.2",
+    "@tinacms/teams": "^0.24.0",
     "cookie-parser": "^1.2.0",
     "dotenv": "^8.2.0",
     "express": "^4.17.1"
