@@ -85,11 +85,11 @@ export const LinkForm = () => {
   const { arrowOffset, left, top } = position || {}
   const { state, dispatch } = view
   let href = ''
-  let title = ''
+  // let title = ''
   const linkMark = getMarkPresent(state, state.schema.marks.link)
   if (linkMark) {
     href = linkMark.attrs.href
-    title = linkMark.attrs.title
+    // title = linkMark.attrs.title
   }
 
   return (
@@ -107,7 +107,7 @@ export const LinkForm = () => {
               removeLink={() => removeLinkBeingEdited(state, dispatch)}
               onChange={onChange}
               href={href}
-              title={title}
+              // title={title}
               cancel={onCancel}
             />
           </LinkFormWrapper>
