@@ -1,6 +1,6 @@
 # gatsby-tinacms-remark
 
-A Gatsby/Tina plugin for editing Markdown files stored in git.
+A Gatsby/Tina plugin for **editing Markdown files stored in git**.
 
 **What is Tina?**
 
