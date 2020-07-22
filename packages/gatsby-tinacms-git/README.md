@@ -1,4 +1,4 @@
-# gatsby-tinacms-git
+# _gatsby-tinacms-git_
 
 A Gatsby/Tina plugin for **editing content/data files stored in git**.
 
