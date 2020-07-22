@@ -16,11 +16,10 @@ distributed under the License is distributed on an "AS IS" BASIS,
 
 */
 
-import { useEffect, useState } from 'react'
-
 import React from 'react'
+import { useEffect, useState } from 'react'
+import { useCMS } from '@tinacms/react-core'
 import { StrapiAuthenticationModal } from './strapi-auth-modal'
-import { useCMS } from 'tinacms'
 
 interface ProviderProps {
   children: any
