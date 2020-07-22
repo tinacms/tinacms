@@ -16,15 +16,15 @@ export const StrapiProvider = ({
 }: ProviderProps) => {
   const [activeModal, setActiveModal] = useState('none')
 
-  const beginAuth = async () => {
+  const beginAuth = () => {
     setActiveModal('authenticate')
   }
 
-  const onClose = async () => {
+  const onClose = () => {
     setActiveModal('none')
   }
 
-  const onAuthSuccess = async () => {
+  const onAuthSuccess = () => {
     onLogin()
     setActiveModal('none')
   }
