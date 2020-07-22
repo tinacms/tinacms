@@ -279,3 +279,174 @@ export const pageQuery = graphql`
   }
 `
 ```
+
+## Customizing the Form
+
+### `remarkForm` HOC Example
+
+The `remarkForm` HOC and `useRemarkForm` hook both accept an optional `config` object as the second argument.
+
+```jsx
+/*
+ ** src/templates/blog-post.js
+ */
+
+import { remarkForm } from 'gatsby-tinacms-remark'
+
+function BlogPostTemplate(props) {
+  return (
+    <>
+      <h1>{props.markdownRemark.frontmatter.title}</h1>
+      <p>{props.markdownRemark.frontmatter.description}</p>
+    </>
+  )
+}
+
+// 1. Define the form config
+const BlogPostForm = {
+  label: 'Blog Post',
+  fields: [
+    {
+      label: 'Title',
+      name: 'frontmatter.title',
+      description: 'Enter the title of the post here',
+      component: 'text',
+    },
+    {
+      label: 'Description',
+      name: 'frontmatter.description',
+      description: 'Enter the post description',
+      component: 'textarea',
+    },
+  ],
+}
+
+// 2. Pass it as a the second argument to `remarkForm`
+export default remarkForm(BlogPostTemplate, BlogPostForm)
+```
+
+### `useRemarkForm` Hook Example
+
+```js
+import { useRemarkForm } from 'gatsby-tinacms-remark'
+
+function BlogPostTemplate(props) {
+  // 1. Define the form
+  const BlogPostForm = {
+    label: 'Blog Post',
+    fields: [
+      {
+        label: 'Title',
+        name: 'frontmatter.title',
+        description: 'Enter the title of the post here',
+        component: 'text',
+      },
+      {
+        label: 'Description',
+        name: 'frontmatter.description',
+        description: 'Enter the post description',
+        component: 'textarea',
+      },
+    ],
+  }
+
+  // 2. Pass the form as the second argument
+  const [markdownRemark, form] = useRemarkForm(
+    props.markdownRemark,
+    BlogPostForm
+  )
+
+  // 3. Register the form as a plugin
+  usePlugin(form)
+
+  return (
+    <>
+      <h1>{markdownRemark.frontmatter.title}</h1>
+      <p>{markdownRemark.frontmatter.description}</p>
+    </>
+  )
+}
+
+export default BlogPostTemplate
+```
+
+### `RemarkForm` Render Props Example
+
+For the `RemarkForm`component, you pass in the config options individually as props to the render function.
+
+```js
+import { RemarkForm } from 'gatsby-tinacms-remark'
+
+class BlogPostTemplate extends React.Component {
+  render() {
+    return (
+      <RemarkForm
+        remark={this.props.data.markdownRemark}
+        render={({ markdownRemark }) => {
+          return (
+            <>
+              <h1>{markdownRemark.frontmatter.title}</h1>
+              <p>{markdownRemark.frontmatter.description}</p>
+            </>
+          )
+        }}
+        label="Blog Post"
+        fields={[
+          {
+            label: 'Title',
+            name: 'frontmatter.title',
+            description: 'Enter the title of the post here',
+            component: 'text',
+          },
+          {
+            label: 'Description',
+            name: 'frontmatter.description',
+            description: 'Enter the post description',
+            component: 'textarea',
+          },
+        ]}
+      />
+    )
+  }
+}
+
+export default BlogPostTemplate
+```
+
+## Content Creators
+
+
+The `RemarkCreatorPlugin`: Constructs a `content-creator` plugin for Markdown files.
+
+```javascript
+interface RemarkCreatorPlugin{
+     label: string
+     fields: Field[]
+     filename(form: any): Promise<string>
+     frontmatter?(form: any): Promise<any>
+     body?(form: any): Promise<string>
+}
+```
+**Example**
+
+```javascript
+import { RemarkCreatorPlugin } from 'gatsby-tinacms-remark'
+
+const CreatePostPlugin = new RemarkCreatorPlugin({
+  label: 'New Blog Post',
+  filename: form => {
+    return form.filename
+  },
+  fields: [
+    {
+      name: 'filename',
+      component: 'text',
+      label: 'Filename',
+      placeholder: 'content/blog/hello-world/index.md',
+      description:
+        'The full path to the new Markdown file, relative to the repository root.',
+    },
+  ],
+})
+```
+
