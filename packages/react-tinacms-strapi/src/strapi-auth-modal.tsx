@@ -166,11 +166,12 @@ export function startProviderAuth({
 
   // poll the cookie value for a change. close the auth window on change
   // there are no native JS events that support this behaviour
-  window.setInterval(() => {
+  const cookiePollInterval = window.setInterval(() => {
     const currentCookie = Cookies.get(STRAPI_JWT)
     if (currentCookie && currentCookie != previousCookie) {
       if (authTab) authTab.close()
       onAuthSuccess()
+      clearInterval(cookiePollInterval)
     }
   }, 1000)
 
