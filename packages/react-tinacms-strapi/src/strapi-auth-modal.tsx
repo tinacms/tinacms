@@ -64,7 +64,6 @@ export function StrapiAuthenticationModal({
             .then(async (response: Response) => {
               if (response.status != 200) {
                 cms.events.dispatch({ type: 'strapi:error' })
-                console.log(response)
                 const responseJson = await response.json()
 
                 setError(
