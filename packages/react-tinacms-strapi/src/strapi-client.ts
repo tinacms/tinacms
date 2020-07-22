@@ -16,16 +16,58 @@ distributed under the License is distributed on an "AS IS" BASIS,
 
 */
 
+import Cookies from 'js-cookie'
+import popupWindow from './popupWindow'
+
+export interface ProviderAuthProps {
+  provider: string
+  onAuthSuccess(): void
+}
+
 export const STRAPI_JWT = 'tina_strapi_jwt'
 
 export class StrapiClient {
   constructor(public strapiUrl: string) {}
 
   async authenticate(username: string, password: string) {
-    return fetch(`${this.strapiUrl}/auth/local`, {
+    const response = await fetch(`${this.strapiUrl}/auth/local`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier: username, password: password }),
     })
+
+    if (response.status === 200) {
+      const responseJson = await response.json()
+      Cookies.set(STRAPI_JWT, responseJson.jwt)
+    }
+
+    return response
+  }
+
+  startProviderAuth({ provider, onAuthSuccess }: ProviderAuthProps) {
+    const previousCookie = this.jwt
+
+    // poll the cookie value for a change. close the auth window on change
+    // there are no native JS events that support this behaviour
+    const cookiePollInterval = window.setInterval(() => {
+      const currentCookie = this.jwt
+      if (currentCookie && currentCookie != previousCookie) {
+        if (authTab) authTab.close()
+        onAuthSuccess()
+        clearInterval(cookiePollInterval)
+      }
+    }, 1000)
+
+    const authTab = popupWindow(
+      `${this.strapiUrl}/connect/${provider}`,
+      '_blank',
+      window,
+      1000,
+      700
+    )
+  }
+
+  get jwt(): string {
+    return Cookies.get(STRAPI_JWT) || ''
   }
 }
