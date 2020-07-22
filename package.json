@@ -31,7 +31,7 @@
     "eslint-plugin-react-hooks": "^2.0.1",
     "husky": "^4.2.3",
     "jest": "^24.9.0",
-    "lerna": "^3.16.4",
+    "lerna": "^3.22.1",
     "next": "^9.2.0",
     "pretty-quick": "^2.0.1",
     "react": "16.12.0",
