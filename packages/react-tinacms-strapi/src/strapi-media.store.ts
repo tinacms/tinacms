@@ -26,6 +26,9 @@ export class StrapiMediaStore {
   accept = '*'
 
   constructor(strapiUrl: string) {
+    if (!strapiUrl) {
+      throw new Error('Missing strapiURL in StrapiMediaStore')
+    }
     this.strapiUrl = strapiUrl
   }
 
@@ -69,6 +72,6 @@ export class StrapiMediaStore {
   }
 
   getAbsolutePath(fileUrl: string): string {
-    return process.env.STRAPI_URL + fileUrl
+    return this.strapiUrl + fileUrl
   }
 }

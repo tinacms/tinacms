@@ -27,7 +27,13 @@ export interface ProviderAuthProps {
 export const STRAPI_JWT = 'tina_strapi_jwt'
 
 export class StrapiClient {
-  constructor(public strapiUrl: string) {}
+  strapiUrl: string
+  constructor(strapiUrl: string) {
+    if (!strapiUrl) {
+      throw new Error('Missing strapiURL in StrapiClient constructor')
+    }
+    this.strapiUrl = strapiUrl
+  }
 
   get jwt(): string {
     return Cookies.get(STRAPI_JWT) || ''
