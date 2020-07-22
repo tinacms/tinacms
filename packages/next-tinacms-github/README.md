@@ -1,32 +1,23 @@
-# next-tinacms-github
+# _next-tinacms-github_
 
-This package provides helpers for managing the github auth token for requests, as well as
-providing helpers for loading content from the Github API.
+This package provides helpers for managing the **GitHub auth token** for requests, as well as
+providing helpers for **loading content from the Github API**.
 
 ## Installation
 
-```
-npm install --save next-tinacms-github
-```
-
-or
-
-```
+```bash
 yarn add next-tinacms-github
 ```
 
-## Getting Started
+Any functions in the `pages/api` directory are mapped to `/api/*` endpoints. The below helpers tend to be added to the `pages/api` directory in a Next.js project.
 
-Any functions in the `pages/api` directory are are mapped to `/api/*` endpoints.
+### `authHandler`
 
+Helper for creating a `authHandler` server function.
 
-### `createCreateAccessTokenFn`
+**pages/api/create-github-access-token.ts**
 
-Helper for creating a `createCreateAccessToken` server function.
-
-```
-// pages/api/create-github-access-token.ts
-
+```js
 import { createAuthHandler } from 'next-tinacms-github'
 
 export default createAuthHandler(
@@ -38,19 +29,15 @@ export default createAuthHandler(
 
 _See [Next's documentation](https://nextjs.org/docs/api-reference/next.config.js/environment-variables) for adding environment variables_
 
-[See below](#github-oauth-app) for instructions on creating a Github OAuth App to generate these **Client ID** & **Client Secret** variables.
-
-The Signing Key should be a random 256-bit key, used server-side to encrypt and decrypt authentication tokens sent to the client.
-
-You can generate a key by running `openssl rand -base64 32` in your terminal, using the output as your Signing Key. You can read more on the topic [here](https://tinacms.org/blog/upgrade-notice-improved-github-security).
+[See here](https://tinacms.org/guides/nextjs/github-open-authoring/github-oauth-app) for instructions on creating a Github OAuth App to generate these **Client ID** & **Client Secret** variables and setting up the **Signing Key**.
 
 ### `apiProxy`
 
-Proxies requests to GitHub, attaching the GitHub access token in the process
+Proxies requests to GitHub, attaching the GitHub access token in the process.
 
-```
-// pages/api/proxy-github.ts
+**pages/api/proxy-github.ts**
 
+```ts
 import { apiProxy } from 'next-tinacms-github'
 
 export default apiProxy(process.env.SIGNING_KEY)
@@ -60,9 +47,9 @@ export default apiProxy(process.env.SIGNING_KEY)
 
 Handles setting the the Nextjs [preview data](https://nextjs.org/docs/advanced-features/preview-mode) from your cookie data.
 
-```
-// pages/api/preview.ts
+**pages/api/preview.ts**
 
+```ts
 import { previewHandler } from 'next-tinacms-github'
 
 export default previewHandler(process.env.SIGNING_KEY)
@@ -70,11 +57,13 @@ export default previewHandler(process.env.SIGNING_KEY)
 
 ### Loading content from Github
 
-The `preview` data, which gets set by calling your [preview function](#previewhandler), will be accesible through `getStaticProps` throughout your app.
+The `preview` data, which gets set by calling your [preview function](#previewhandler), will be accessible through `getStaticProps` throughout your app.
+
+Below is an example of the conditional data fetching, from the local environment or _Working GitHub Repository_ based on the preview environment:
+
+**/blog/slug.ts**
 
 ```ts
-//Blog template [slug].ts
-
 import {
   getGithubPreviewProps
   parseMarkdown,
@@ -108,19 +97,36 @@ export const getStaticProps: GetStaticProps = async function({
 }
 ```
 
+### _getGithubPreviewProps_
 
-### Github Oauth App:
+The `getGithubPreviewProps` function accepts this preview data:
 
-In GitHub, within your account Settings, click [Oauth Apps](https://github.com/settings/developers) under Developer Settings.
+```ts
+interface PreviewData<Data> {
+  github_access_token: string
+  working_repo_full_name: string
+  head_branch: string
+  fileRelativePath: string
+  parse(content: string): Data
+}
+```
 
-click "New Oauth App".
+It then fetches the content from the _Working GitHub Repository_ and returns a `props` object with this shape:
 
-For the **Authorization callback URL**, enter the url for the "authorizing" page that you created above (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
-_Note: If you are testing your app locally, you may need a separate development Github app (with a localhost redirect), and a production Github app._
+```js
+return {
+  props: {
+    file,
+    repoFullName: workingRepoFullName,
+    branch: headBranch,
+    preview: true,
+    error,
+  },
+}
+```
 
-The generated **Client ID** & **Client Secret** will be consumed by the `createCreateAccessTokenFn` [defined above](#createcreateaccesstokenfn).
+### Parsing Data
 
-## Next steps
+`next-tinacms-github` provides two content parsing options available, for Markdown — `parseMarkdown` or JSON — `parseJson`. Or you could pass in a custom parser.
 
-Now that we have configured our backend API functions to manage our Github authentication token, we will need to configure the front-end to use these endpoints.
-You may want to use the [react-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-github) package.
+<!-- TODO: add media store info >
