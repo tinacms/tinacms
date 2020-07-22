@@ -27,6 +27,7 @@
     "url": "https://github.com/tinacms/tinacms/issues"
   },
   "peerDependencies": {
+    "@tinacms/core": "^0.24.0",
     "@tinacms/fields": "^0.24.0",
     "@tinacms/media": "^0.24.0",
     "@tinacms/react-forms": "^0.24.0",
@@ -42,6 +43,7 @@
     "styled-components": ">4.5"
   },
   "devDependencies": {
+    "@tinacms/core": "^0.24.0",
     "@tinacms/fields": "^0.24.0",
     "@tinacms/media": "^0.24.0",
     "@tinacms/react-forms": "^0.24.0",
