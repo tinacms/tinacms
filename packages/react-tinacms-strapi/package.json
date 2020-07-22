@@ -27,26 +27,28 @@
     "url": "https://github.com/tinacms/tinacms/issues"
   },
   "peerDependencies": {
-    "@tinacms/fields": "^0.12.2",
-    "@tinacms/media": "^0.1.0",
-    "@tinacms/react-forms": "^0.2.0",
-    "@tinacms/styles": "^0.5.1",
-    "react": "^16.13.1",
-    "react-final-form": "^6.3.0",
-    "tinacms": ">=0.22"
+    "@tinacms/fields": "^0.24.0",
+    "@tinacms/media": "^0.24.0",
+    "@tinacms/react-forms": "^0.24.0",
+    "@tinacms/react-modals": "^0.24.0",
+    "@tinacms/react-core": "^0.24.0",
+    "@tinacms/styles": "^0.24.0",
+    "react": ">=16.8",
+    "react-final-form": "^6.3.0"
   },
   "dependencies": {
+    "@types/js-cookie": "^2.2.5",
     "js-cookie": "^2.2.1",
     "styled-components": ">4.5"
   },
   "devDependencies": {
-    "@tinacms/fields": "^0.12.2",
-    "@tinacms/media": "^0.1.0",
-    "@tinacms/react-forms": "^0.2.0",
-    "@tinacms/styles": "^0.5.1",
-    "@types/js-cookie": "^2.2.5",
-    "react-final-form": "^6.3.0",
-    "tinacms": "^0.22.0",
-    "@tinacms/scripts": "^0.1.13"
+    "@tinacms/fields": "^0.24.0",
+    "@tinacms/media": "^0.24.0",
+    "@tinacms/react-forms": "^0.24.0",
+    "@tinacms/react-modals": "^0.24.0",
+    "@tinacms/react-core": "^0.24.0",
+    "@tinacms/styles": "^0.24.0",
+    "@tinacms/scripts": "^0.24.0",
+    "react-final-form": "^6.3.0"
   }
 }
