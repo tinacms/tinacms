@@ -29,6 +29,14 @@ export const STRAPI_JWT = 'tina_strapi_jwt'
 export class StrapiClient {
   constructor(public strapiUrl: string) {}
 
+  get jwt(): string {
+    return Cookies.get(STRAPI_JWT) || ''
+  }
+
+  set jwt(value: string) {
+    Cookies.set(STRAPI_JWT, value)
+  }
+
   async authenticate(username: string, password: string) {
     const response = await fetch(`${this.strapiUrl}/auth/local`, {
       method: 'post',
@@ -38,7 +46,8 @@ export class StrapiClient {
 
     if (response.status === 200) {
       const responseJson = await response.json()
-      Cookies.set(STRAPI_JWT, responseJson.jwt)
+
+      this.jwt = responseJson.jwt
     }
 
     return response
@@ -67,7 +76,26 @@ export class StrapiClient {
     )
   }
 
-  get jwt(): string {
-    return Cookies.get(STRAPI_JWT) || ''
+  async fetchGraphql(query: string, variables = {}) {
+    const jwt = this.jwt
+    const headers: any = {
+      'Content-Type': 'application/json',
+    }
+
+    if (jwt) headers['Authorization'] = `Bearer ${jwt}`
+
+    const response = await fetch(`${this.strapiUrl}/graphql`, {
+      method: 'post',
+      headers: {
+        ...headers,
+      },
+      body: JSON.stringify({ query: query, variables: variables }),
+    })
+
+    return response.json()
   }
+}
+
+export function fetchGraphql(url: string, query: string, variables = {}) {
+  return new StrapiClient(url).fetchGraphql(query, variables)
 }
