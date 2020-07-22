@@ -134,3 +134,38 @@ class DataTemplate extends React.Component {
 }
 ```
 
+## Content Creator
+
+`JsonCreatorPlugin`: contstructs a `content-creator` plugin for JSON files.
+
+```typescript
+interface JsonCreatorPlugin {
+  label: string
+  fields: Field[]
+  filename(form: any): Promise<string>
+  data?(form: any): Promise<any>
+}
+```
+
+**Example**
+
+```javascript
+import { JsonCreatorPlugin } from 'gatsby-tinacms-json'
+
+const CreatePostPlugin = new JsonCreatorPlugin({
+  label: 'New JSON File',
+  filename: form => {
+    return form.filename
+  },
+  fields: [
+    {
+      name: 'filename',
+      component: 'text',
+      label: 'Filename',
+      placeholder: 'content/data/puppies.json',
+      description:
+        'The full path to the new Markdown file, relative to the repository root.',
+    },
+  ],
+})
+```
