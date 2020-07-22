@@ -12,19 +12,19 @@ This package assumes you have a Strapi server available with the GraphQL plugin 
 yarn add react-tinacms-strapi
 ```
 
-The package relies on having a `STRAPI_URL` environment variable that points to the root URI of your Strapi server.
-
-
 ## Getting Started
-We'll use the `TinaStrapiClient` and the `StrapiMediaStore` to fetch/save data and media through the Strapi API.
+
+We'll use the `StrapiClient` and the `StrapiMediaStore` to fetch/save data and media through the Strapi API.
 
 ```js
+import { StrapiClient, StrapiMediaStore } from 'react-tinacms-strapi'
+
 export default function MyApp({ Component, pageProps }) {
   const cms = useMemo(
     () =>
       new TinaCMS({
         apis: {
-          strapi: new TinaStrapiClient(),
+          strapi: new StrapiClient("http://localhost:1337/"),
         },
         media: {
           store: new StrapiMediaStore(),

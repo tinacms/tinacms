@@ -17,7 +17,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 */
 
 import Cookies from 'js-cookie'
-import { STRAPI_JWT } from './tina-strapi-client'
+import { STRAPI_JWT } from './strapi-client'
 
 export async function fetchGraphql(query: string, variables = {}) {
   const jwt = Cookies.get(STRAPI_JWT)

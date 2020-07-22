@@ -19,7 +19,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 import { Media, MediaUploadOptions } from '@tinacms/media'
 
 import Cookies from 'js-cookie'
-import { STRAPI_JWT } from './tina-strapi-client'
+import { STRAPI_JWT } from './strapi-client'
 
 export class StrapiMediaStore {
   strapiUrl: string
