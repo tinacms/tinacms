@@ -20,30 +20,11 @@ import * as React from 'react'
 import { TinaProvider } from '../components/TinaProvider'
 import { TinaCMS, TinaCMSConfig } from '../tina-cms'
 
-function mergeDefaultConfig(config?: TinaCMSConfig) {
-  // TODO maybe use lodash/fp/defaultsDeep
-  // Using lodash/fp libs requires installing all of lodash so requires consideration
-  const merge = require('lodash.merge')
-  const cloneDeep = require('lodash.clonedeep')
-  return merge(
-    {
-      plugins: [],
-      apis: {},
-      sidebar: {
-        position: 'displace',
-        hidden: false,
-      },
-    },
-    cloneDeep(config)
-  )
-}
-
 export function withTina(Component: any, config?: TinaCMSConfig) {
   return (props: any) => {
-    const safeConfig = React.useMemo(() => mergeDefaultConfig(config), [config])
-    const cms = React.useMemo(() => new TinaCMS(safeConfig), [safeConfig])
+    const cms = React.useMemo(() => new TinaCMS(config), [config])
     return (
-      <TinaProvider cms={cms} {...safeConfig.sidebar}>
+      <TinaProvider cms={cms}>
         <Component {...props} />
       </TinaProvider>
     )

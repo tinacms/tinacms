@@ -72,7 +72,7 @@ export const FieldMeta = ({
 }
 
 // Styling
-const FieldWrapper = styled.div<{ margin: boolean }>`
+export const FieldWrapper = styled.div<{ margin: boolean }>`
   position: relative;
 
   ${props =>
@@ -82,7 +82,7 @@ const FieldWrapper = styled.div<{ margin: boolean }>`
     `};
 `
 
-const FieldLabel = styled.label`
+export const FieldLabel = styled.label`
   all: unset;
   font-family: 'Inter', sans-serif;
   display: block;

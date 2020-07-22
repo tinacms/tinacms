@@ -1,9 +1,7 @@
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
 [![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
 [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-70-orange.svg?style=flat-square)](#contributors-)
-
-<!-- ALL-CONTRIBUTORS-BADGE:END -->
+[![All Contributors](https://img.shields.io/badge/all_contributors-70-orange.svg?style=flat-square)](#contributors-)<!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # ![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png)
 
@@ -19,7 +17,8 @@
 - [Community Forum](https://community.tinacms.org/)
 - [Contributing](./CONTRIBUTING.md)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
-- [Projects](https://github.com/orgs/tinacms/projects)
+- [Change proposals (RFCs)](https://github.com/tinacms/rfcs)
+- [The core team's development process](./ROADMAP.md)
 
 ## Development
 
@@ -38,9 +37,9 @@ cd tinacms
 npm install
 npm run build
 
-# Start Gatsby demo
-cd packages/demo-gatsby
-npm run start
+# Start Next.js Demo
+cd packages/demonext-
+npm run dev
 ```
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**
@@ -164,7 +163,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://stephensugden.com"><img src="https://avatars3.githubusercontent.com/u/82634?v=4" width="100px;" alt=""/><br /><sub><b>Stephen Sugden</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=grncdr" title="Documentation">📖</a></td>
     <td align="center"><a href="https://www.logan.bio"><img src="https://avatars2.githubusercontent.com/u/43075109?v=4" width="100px;" alt=""/><br /><sub><b>Logan Anderson</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=logan-anderson" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/isabellabrookes"><img src="https://avatars1.githubusercontent.com/u/12928252?v=4" width="100px;" alt=""/><br /><sub><b>Isabella Brookes</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=isabellabrookes" title="Code">💻</a></td>
-    <td align="center"><a href="https://github.com/sakulstra"><img src="https://avatars3.githubusercontent.com/u/4396533?v=4" width="100px;" alt=""/><br /><sub><b>Lukas Strassel</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=sakulstra" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/sakulstra"><img src="https://avatars3.githubusercontent.com/u/4396533?v=4" width="100px;" alt=""/><br /><sub><b>Lukas Strassel</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=sakulstra" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/commits?author=sakulstra" title="Documentation">📖</a></td>
   </tr>
 </table>
 

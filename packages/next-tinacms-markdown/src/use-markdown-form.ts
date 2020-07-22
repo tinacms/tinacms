@@ -37,6 +37,7 @@ export interface Options {
   label?: string
   fields?: Field[]
   actions?: FormOptions<any>['actions']
+  buttons?: FormOptions<any>['buttons']
 }
 
 export function toMarkdownString(markdownFile: MarkdownFile) {
@@ -62,12 +63,14 @@ export function useMarkdownForm(
   const label = options.label || markdownFile.fileRelativePath
   const fields = options.fields || generateFields(markdownFile)
   const actions = options.actions || []
+  const buttons = options.buttons
   const [values, form] = useForm(
     {
       id,
       label,
       fields,
       actions,
+      buttons,
       loadInitialValues() {
         return cms.api.git
           .show(markdownFile.fileRelativePath) // Load the contents of this file at HEAD

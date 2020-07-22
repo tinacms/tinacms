@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.7.0-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.6.3...@tinacms/forms@0.7.0-alpha.0) (2020-07-15)
+
+
+### Features
+
+* adds buttons to form options ([304f371](https://github.com/tinacms/tinacms/commit/304f371))
+
+
+
+
+
+## [0.6.3](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.6.3-alpha.0...@tinacms/forms@0.6.3) (2020-07-07)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
+## [0.6.3-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.6.2...@tinacms/forms@0.6.3-alpha.0) (2020-07-04)
+
+**Note:** Version bump only for package @tinacms/forms
+
+
+
+
+
 ## [0.6.2](https://github.com/tinacms/tinacms/compare/@tinacms/forms@0.6.1...@tinacms/forms@0.6.2) (2020-06-29)
 
 **Note:** Version bump only for package @tinacms/forms

@@ -26,6 +26,11 @@ export interface SidebarStateOptions {
   placeholder?: React.FC
 }
 
+/**
+ * @deprecated
+ * `buttons` set on the form directly
+ * via form config options
+ */
 export interface SidebarButtons {
   save: string
   reset: string

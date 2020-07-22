@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.1.13-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-modals@0.1.12...@tinacms/react-modals@0.1.13-alpha.0) (2020-07-15)
+
+**Note:** Version bump only for package @tinacms/react-modals
+
+
+
+
+
+## [0.1.12](https://github.com/tinacms/tinacms/compare/@tinacms/react-modals@0.1.12-alpha.0...@tinacms/react-modals@0.1.12) (2020-07-07)
+
+**Note:** Version bump only for package @tinacms/react-modals
+
+
+
+
+
+## [0.1.12-alpha.0](https://github.com/tinacms/tinacms/compare/@tinacms/react-modals@0.1.11...@tinacms/react-modals@0.1.12-alpha.0) (2020-07-04)
+
+**Note:** Version bump only for package @tinacms/react-modals
+
+
+
+
+
 ## [0.1.11](https://github.com/tinacms/tinacms/compare/@tinacms/react-modals@0.1.10...@tinacms/react-modals@0.1.11) (2020-06-29)
 
 **Note:** Version bump only for package @tinacms/react-modals

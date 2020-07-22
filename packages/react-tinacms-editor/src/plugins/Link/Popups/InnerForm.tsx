@@ -22,7 +22,7 @@ import styled, { keyframes } from 'styled-components'
 type E = React.ChangeEvent<HTMLInputElement>
 
 interface Props {
-  title: string | null
+  // title: string | null
   href: string | null
   onChange(attrs: any): void
   removeLink(): void
@@ -34,29 +34,31 @@ interface Props {
 
 interface State {
   href: string | null
-  title: string | null
+  // title: string | null
 }
 
 export class InnerForm extends React.Component<Props, State> {
   state = {
     href: this.props.href || '',
-    title: this.props.title || '',
+    // title: this.props.title || '',
   }
+
   componentDidMount() {
     document.addEventListener('keydown', this.onEscapeCancel)
   }
+
   componentWillUnmount() {
     document.removeEventListener('keydown', this.onEscapeCancel)
   }
-  componentWillReceiveProps(props: Props) {
-    const { href, title } = props
 
-    this.setState(() => ({ href, title }))
+  componentDidUpdate(prevProps: Props) {
+    const { href } = this.props
+    if (href !== prevProps.href) this.setState(() => ({ href }))
   }
 
   setHref = ({ target: { value } }: E) => this.setState(() => ({ href: value }))
-  setTitle = ({ target: { value } }: E) =>
-    this.setState(() => ({ title: value }))
+  // setTitle = ({ target: { value } }: E) =>
+  //   this.setState(() => ({ title: value }))
 
   save = () => this.props.onChange(this.state)
 
@@ -65,28 +67,30 @@ export class InnerForm extends React.Component<Props, State> {
       this.save()
     }
   }
+
   onEscapeCancel = (e: KeyboardEvent) => {
     if (e.keyCode === 27) {
       this.props.cancel()
     }
   }
+
   render() {
     const { removeLink, style = {} } = this.props
-    const { href, title } = this.state
+    const { href } = this.state
     return (
       <LinkPopup
         style={{
           ...style,
         }}
       >
-        <LinkLabel>Title</LinkLabel>
-        <LinkInput
+        {/*<LinkLabel>Title</LinkLabel>
+         <LinkInput
           placeholder="Enter Title"
           type={'text'}
           value={title}
           onChange={this.setTitle}
           onKeyPress={this.onEnterSave as any}
-        />
+        /> */}
         <LinkLabel>URL</LinkLabel>
         <LinkInput
           placeholder="Enter URL"

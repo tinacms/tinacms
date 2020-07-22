@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.8.5-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.4...react-tinacms-editor@0.8.5-alpha.0) (2020-07-15)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.8.4](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.4-alpha.0...react-tinacms-editor@0.8.4) (2020-07-07)
+
+**Note:** Version bump only for package react-tinacms-editor
+
+
+
+
+
+## [0.8.4-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.3...react-tinacms-editor@0.8.4-alpha.0) (2020-07-04)
+
+
+### Bug Fixes
+
+* on updating editor state when new content is received and editor is not focused, editor histor should not be lost ([5c2e84d](https://github.com/tinacms/tinacms/commit/5c2e84d))
+
+
+
+
+
 ## [0.8.3](https://github.com/tinacms/tinacms/compare/react-tinacms-editor@0.8.3-alpha.0...react-tinacms-editor@0.8.3) (2020-06-29)
 
 
