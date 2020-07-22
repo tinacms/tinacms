@@ -1,14 +1,6 @@
 # gatsby-tinacms-git
 
-A Gatsby/Tina plugin for editing content/data files stored in git.
-
-**What is Tina?**
-
-Tina is a lightweight but powerful toolkit for creating a site editing ui with javascript components. Tina surfaces superpowers for dev’s to create, expand on and customize a simple yet intuitive ui for editing content.
-
-Tina is optimized for nextgen JAMstack tools. It is based in javascript and is extensible enough to be configured with many different frameworks. Right now we have explored using Tina with Gatsby, Create-React-App & Next.js, with plans to dive into Vue.
-
-[Visit the website to learn more!](https://tinacms.org/docs/)
+A Gatsby/Tina plugin for **editing content/data files stored in git**.
 
 ## Installation
 
