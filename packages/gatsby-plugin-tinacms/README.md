@@ -1,6 +1,6 @@
-# gatsby-plugin-tinacms
+# _gatsby-plugin-tinacms_
 
-A Gatsby plugin for adding Tina to your website.
+A Gatsby plugin for adding Tina to your website. This plugin wraps your site in a `TinaProvider` and instantiates the CMS.
 
 ## Installation
 
