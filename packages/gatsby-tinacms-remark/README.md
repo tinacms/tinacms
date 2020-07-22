@@ -1,4 +1,4 @@
-# gatsby-tinacms-remark
+# _gatsby-tinacms-remark_
 
 A Gatsby/Tina plugin for **editing Markdown files stored in git**.
 
