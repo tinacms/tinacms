@@ -27,7 +27,7 @@ export default function MyApp({ Component, pageProps }) {
           strapi: new StrapiClient("http://localhost:1337/"),
         },
         media: {
-          store: new StrapiMediaStore(),
+          store: new StrapiMediaStore("http://localhost:1337/"),
         },
       }),
     []
