@@ -26,12 +26,10 @@ import {
   ModalPopup,
 } from '@tinacms/react-modals'
 import React, { useState } from 'react'
-import { STRAPI_JWT, StrapiClient } from './strapi-client'
+import { StrapiClient } from './strapi-client'
 
 import { Button } from '@tinacms/styles'
-import Cookies from 'js-cookie'
 import { Input } from '@tinacms/fields'
-import popupWindow from './popupWindow'
 import styled from 'styled-components'
 
 export interface StrapiAuthenticationModalProps {
@@ -70,19 +68,14 @@ export function StrapiAuthenticationModal({
                   `Login failed: ${responseJson.data[0].messages[0].message}`
                 )
               } else {
-                const responseJson = await response.json()
-                Cookies.set(STRAPI_JWT, responseJson.jwt)
                 onAuthSuccess()
               }
             })
-            .catch((e: Error) => {
-              cms.events.dispatch({ type: 'strapi:error', error: e })
+            .catch(error => {
+              cms.events.dispatch({ type: 'strapi:error', error })
             })
         }}
       />
-      {/* Providers can be added to this modal by adding buttons that make a call such as
-      `startProviderAuth({ provider: "github", onAuthSuccess })`
-      */}
     </ModalBuilder>
   )
 }
@@ -149,38 +142,6 @@ export function StrapiLoginForm({ onSubmit, close, error }: LoginFormProps) {
         )}
       ></Form>
     </FormWrapper>
-  )
-}
-
-interface ProviderAuthProps {
-  provider: string
-  onAuthSuccess(): void
-}
-
-export function startProviderAuth({
-  provider,
-  onAuthSuccess,
-}: ProviderAuthProps) {
-  let authTab: Window | undefined
-  const previousCookie = Cookies.get(STRAPI_JWT)
-
-  // poll the cookie value for a change. close the auth window on change
-  // there are no native JS events that support this behaviour
-  const cookiePollInterval = window.setInterval(() => {
-    const currentCookie = Cookies.get(STRAPI_JWT)
-    if (currentCookie && currentCookie != previousCookie) {
-      if (authTab) authTab.close()
-      onAuthSuccess()
-      clearInterval(cookiePollInterval)
-    }
-  }, 1000)
-
-  authTab = popupWindow(
-    `${process.env.STRAPI_URL}/connect/${provider}`,
-    '_blank',
-    window,
-    1000,
-    700
   )
 }
 
