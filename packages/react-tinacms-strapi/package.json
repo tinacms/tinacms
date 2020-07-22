@@ -45,10 +45,8 @@
     "@tinacms/react-forms": "^0.2.0",
     "@tinacms/styles": "^0.5.1",
     "@types/js-cookie": "^2.2.5",
-    "@types/react": "^16.8.23",
     "react-final-form": "^6.3.0",
     "tinacms": "^0.22.0",
-    "typescript": "^3.8.2",
     "@tinacms/scripts": "^0.1.13"
   }
 }
