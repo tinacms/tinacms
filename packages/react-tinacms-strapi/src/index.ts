@@ -19,6 +19,6 @@ distributed under the License is distributed on an "AS IS" BASIS,
 export * from './AsyncButton'
 export * from './popupWindow'
 export * from './strapi-auth-modal'
-export * from './strapi-media.store'
+export * from './strapi-media-store'
 export * from './strapi-provider'
 export * from './strapi-client'
