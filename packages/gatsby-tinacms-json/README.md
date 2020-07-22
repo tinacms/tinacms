@@ -1,6 +1,6 @@
 # _gatsby-tinacms-json_
 
-A Gatsby/Tina plugin for editing JSON files stored in git.
+A Gatsby/Tina plugin for **editing JSON files stored in git**.
 
 ## Installation
 
