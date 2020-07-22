@@ -19,8 +19,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 export const STRAPI_JWT = 'tina_strapi_jwt'
 
 export class TinaStrapiClient {
+  strapiUrl: string
+
+  constructor(strapiUrl: string) {
+    this.strapiUrl = strapiUrl
+  }
+
   async authenticate(username: string, password: string) {
-    return fetch(`${process.env.STRAPI_URL}/auth/local`, {
+    return fetch(`${this.strapiUrl}/auth/local`, {
       method: 'post',
       headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify({ identifier: username, password: password }),
