@@ -17,14 +17,14 @@ distributed under the License is distributed on an "AS IS" BASIS,
 */
 
 import { Field, Form } from 'react-final-form'
+import { useCMS } from '@tinacms/react-core'
 import {
   Modal,
   ModalActions,
   ModalBody,
   ModalHeader,
   ModalPopup,
-  useCMS,
-} from 'tinacms'
+} from '@tinacms/react-modals'
 import React, { useState } from 'react'
 import { STRAPI_JWT, TinaStrapiClient } from './tina-strapi-client'
 
