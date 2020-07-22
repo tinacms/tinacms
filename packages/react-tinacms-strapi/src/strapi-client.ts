@@ -18,7 +18,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 
 export const STRAPI_JWT = 'tina_strapi_jwt'
 
-export class TinaStrapiClient {
+export class StrapiClient {
   constructor(public strapiUrl: string) {}
 
   async authenticate(username: string, password: string) {

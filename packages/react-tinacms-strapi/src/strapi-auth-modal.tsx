@@ -26,7 +26,7 @@ import {
   ModalPopup,
 } from '@tinacms/react-modals'
 import React, { useState } from 'react'
-import { STRAPI_JWT, TinaStrapiClient } from './tina-strapi-client'
+import { STRAPI_JWT, StrapiClient } from './strapi-client'
 
 import { Button } from '@tinacms/styles'
 import Cookies from 'js-cookie'
@@ -45,7 +45,7 @@ export function StrapiAuthenticationModal({
 }: StrapiAuthenticationModalProps) {
   const cms = useCMS()
   const [error, setError] = useState<string | undefined>()
-  const strapi: TinaStrapiClient = cms.api.strapi
+  const strapi: StrapiClient = cms.api.strapi
 
   return (
     <ModalBuilder
