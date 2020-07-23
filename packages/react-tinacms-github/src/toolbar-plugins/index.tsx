@@ -18,3 +18,4 @@ limitations under the License.
 
 export * from './useGithubToolbarPlugins'
 export * from './RepoInfoPlugin'
+export * from './createGithubDeleteAction'

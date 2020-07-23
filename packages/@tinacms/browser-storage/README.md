@@ -1,4 +1,4 @@
-# @tinacms/browser-storage-client
+# @tinacms/browser-storage
 
 Provides a TinaCMS adapter api for browser storage.
 
@@ -8,7 +8,7 @@ so it's not lost when refreshing the page.
 **Adding BrowserStorage to a CMS**
 
 ```ts
-import { BrowserStorageClient } from "@tinacms/browser-storage-client"
+import { BrowserStorageClient } from "@tinacms/browser-storage"
 
 cms.api.storage = new BrowserStorageClient(window.localStorage)
 ```
@@ -17,7 +17,7 @@ cms.api.storage = new BrowserStorageClient(window.localStorage)
 
 ```tsx
 import { useForm } from "@tinacms/react-core"
-import { useFormBrowserCache } from "@tinacms/browser-storage-client"
+import { useFormBrowserCache } from "@tinacms/browser-storage"
 
 function MyComponent({ editing }) {
   const [, form] = useForm(...)

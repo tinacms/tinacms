@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/icons",
-  "version": "0.14.0",
+  "version": "0.24.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -28,6 +28,6 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.13"
+    "@tinacms/scripts": "^0.24.0"
   }
 }
