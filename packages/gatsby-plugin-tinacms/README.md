@@ -46,4 +46,6 @@ export interface GatsbyPluginTinacmsOptions {
 }
 ```
 
+> Checkout the [UI documentation](https://tinacms.org/docs/ui) for more context on the Sidebar & Toolbar Config options.
+
 Visit the [Using Gatsby with a Git Backend](/guides/gatsby/git/installation) guide for step-by-step instructions on using this package in concert with other Tina+Gatsby plugins. 
