@@ -142,9 +142,9 @@ export const getStaticProps: GetStaticProps = async function({
   ...ctx
 }) {
   const githubOptions = {
-    repoFullName: previewData.working_repo_full_name,
-    branch: previewData.head_branch ,
-    accessToken: previewData.github_access_token,
+    repoFullName: previewData?.working_repo_full_name || 'https://github.com/youre/respository',
+    branch: previewData?.head_branch || 'master',
+    accessToken: previewData?.github_access_token || '',
   }
 
   const homeFile = await getGithubFile({

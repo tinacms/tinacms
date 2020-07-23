@@ -25,25 +25,25 @@ export interface GithubFile<Data> {
 }
 
 export interface GetGithubFileOptions<Data> {
-  repoFullName: string
-  branch: string
   fileRelativePath: string
-  accessToken: string
+  github_access_token: string
+  working_repo_full_name: string
+  head_branch: string
   parse(content: string): Data
 }
 
 export async function getGithubFile<Data = any>({
-  repoFullName,
-  branch,
+  working_repo_full_name,
+  head_branch,
   fileRelativePath,
-  accessToken,
+  github_access_token,
   parse,
 }: GetGithubFileOptions<Data>): Promise<GithubFile<Data>> {
   const response = await getDecodedData(
-    repoFullName,
-    branch,
+    working_repo_full_name,
+    head_branch,
     fileRelativePath,
-    accessToken
+    github_access_token
   )
 
   return {
