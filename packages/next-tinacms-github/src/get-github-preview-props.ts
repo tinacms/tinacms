@@ -17,7 +17,7 @@ limitations under the License.
 
 */
 import { GithubError } from './github/content/GithubError'
-import getDecodedData from './github/content/getDecodedData'
+import { GithubFile, getGithubFile } from './get-github-file'
 
 export interface PreviewData<Data> {
   github_access_token: string
@@ -27,17 +27,9 @@ export interface PreviewData<Data> {
   parse(content: string): Data
 }
 
-export interface GithubFile<Data> {
-  sha: string
-  fileRelativePath: string
-  data: Data
-}
-
 export interface GithubPreviewProps<Data> {
   props: {
     preview: boolean
-    repoFullName: string
-    branch: string
     file: GithubFile<Data> | null
     error: GithubError | null
   }
@@ -46,34 +38,31 @@ export interface GithubPreviewProps<Data> {
 export async function getGithubPreviewProps<Data = any>(
   options: PreviewData<Data>
 ): Promise<GithubPreviewProps<Data>> {
-  const accessToken = options.github_access_token
-  const workingRepoFullName = options.working_repo_full_name || ''
-  const headBranch = options.head_branch || 'master'
+  const fileRelativePath = options.fileRelativePath
+  const github_access_token = options.github_access_token
+  const working_repo_full_name = options.working_repo_full_name || ''
+  const head_branch = options.head_branch || 'master'
+  const parse = options.parse
 
   let error: GithubError | null = null
   let file = null
 
   try {
-    const response = await getDecodedData(
-      workingRepoFullName,
-      headBranch,
-      options.fileRelativePath,
-      accessToken
-    )
-
-    file = {
-      sha: response.sha,
-      fileRelativePath: options.fileRelativePath,
-      data: options.parse(response.content),
-    }
+    file = await getGithubFile({
+      fileRelativePath,
+      working_repo_full_name,
+      github_access_token,
+      head_branch,
+      parse,
+    })
   } catch (e) {
     if (e instanceof GithubError) {
       console.error(
         githubErrorMessage({
-          path: options.fileRelativePath,
-          repoFullName: workingRepoFullName,
-          branch: headBranch,
-          accessToken,
+          path: fileRelativePath,
+          repoFullName: working_repo_full_name,
+          branch: head_branch,
+          accessToken: github_access_token,
         })
       )
       console.error(e)
@@ -86,8 +75,6 @@ export async function getGithubPreviewProps<Data = any>(
   return {
     props: {
       file,
-      repoFullName: workingRepoFullName,
-      branch: headBranch,
       preview: true,
       error,
     },
