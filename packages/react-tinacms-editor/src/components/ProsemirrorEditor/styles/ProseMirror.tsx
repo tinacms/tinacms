@@ -61,6 +61,9 @@ const proseMirrorTableStyles = `
   .ProseMirror:focus {
     outline: 0px solid transparent;
   }
+  .ProseMirror p {
+    min-height: 18px;
+  }
   .ProseMirror table {
     border-collapse: collapse;
     table-layout: fixed;
@@ -71,6 +74,9 @@ const proseMirrorTableStyles = `
   }
   .ProseMirror th {
     background-color: #F6F6F9;
+  }
+  .ProseMirror tr {
+    height: 40px;
   }
   .ProseMirror table td,
   .ProseMirror table th {

@@ -36,7 +36,7 @@ export default () => {
     view.focus()
   }
   const markerDivTable = document.getElementsByClassName(
-    'tina_table_header_ext_top_left'
+    'tina_table_header_ext_top_left_selected'
   )
   if (!markerDivTable.length) return null
   const tableElm = markerDivTable[0].closest('table')

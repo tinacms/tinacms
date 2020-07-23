@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/teams",
-  "version": "0.2.2",
+  "version": "0.24.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -28,7 +28,7 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.1.13",
+    "@tinacms/scripts": "^0.24.0",
     "@types/express": "^4.17.0",
     "@types/jsonwebtoken": "8.3.5"
   },
