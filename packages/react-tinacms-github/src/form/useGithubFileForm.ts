@@ -35,26 +35,29 @@ export const useGithubFileForm = <T = any>(
     serialize: options.serialize,
   })
 
-  const [formData, form] = useForm({
-    id: file.fileRelativePath, // needs to be unique
-    label: options.label || file.fileRelativePath,
-    initialValues: file.data,
-    fields: options.fields || [],
-    actions: options.actions || [],
-    onSubmit(formData) {
-      const github: GithubClient = cms.api.github
-      return githubFile
-        .commit(formData)
-        .then(() => {
-          cms.alerts.success(
-            `Saved Successfully: Changes committed to ${github.workingRepoFullName}`
-          )
-        })
-        .catch((error: any) => {
-          return { [FORM_ERROR]: error }
-        })
+  const [formData, form] = useForm(
+    {
+      id: file.fileRelativePath, // needs to be unique
+      label: options.label || file.fileRelativePath,
+      initialValues: file.data,
+      fields: options.fields || [],
+      actions: options.actions || [],
+      onSubmit(formData) {
+        const github: GithubClient = cms.api.github
+        return githubFile
+          .commit(formData)
+          .then(() => {
+            cms.alerts.success(
+              `Saved Successfully: Changes committed to ${github.workingRepoFullName}`
+            )
+          })
+          .catch((error: any) => {
+            return { [FORM_ERROR]: error }
+          })
+      },
     },
-  })
+    [file.fileRelativePath]
+  )
 
   return [formData || file.data, form]
 }
