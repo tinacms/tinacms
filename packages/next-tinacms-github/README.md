@@ -85,7 +85,6 @@ export const getStaticProps: GetStaticProps = async function({
   }
   return {
     props: {
-      sourceProvider: null,
       error: null,
       preview,
       file: {
@@ -122,6 +121,49 @@ return {
     preview: true,
     error,
   },
+}
+```
+
+
+#### _getGithubFile
+
+In some cases you'll need to load multiple files from Github. For this reason the underlying `getGithubFile` function is exposed.
+
+```ts
+import {
+  getGithubFile,
+  parseJson,
+  parseMarkdown,
+} from 'next-tinacms-github'
+
+export const getStaticProps: GetStaticProps = async function({
+  preview,
+  previewData,
+  ...ctx
+}) {
+  const githubOptions = {
+    repoFullName: previewData?.working_repo_full_name || 'https://github.com/youre/respository',
+    branch: previewData?.head_branch || 'master',
+    accessToken: previewData?.github_access_token || '',
+  }
+
+  const homeFile = await getGithubFile({
+    ...githubOptions,
+    fileRelativePath: "content/index.md
+    parse: parseMarkdown
+  })
+
+  const navigationFile = await getGithubFile({
+    ...githubOptions,
+    fileRelativePath: "data/navigation.json
+    parse: parseJson
+  })
+
+  return {
+    preview,
+    homeFile,
+    navigationFile,
+  }
 }
 ```
 
