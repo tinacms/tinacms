@@ -40,7 +40,7 @@ module.exports = {
 ```ts
 export interface GatsbyPluginTinacmsOptions {
   enabled?: boolean
-  [sidebar: TinaCMSConfig['sidebar']](https://tinacms.org/docs/ui#enabling-the-user-interface)
+  sidebar: TinaCMSConfig['sidebar']
   toolbar: TinaCMSConfig['toolbar']
   manualInit?: boolean
 }
