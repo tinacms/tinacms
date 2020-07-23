@@ -48,13 +48,7 @@ export async function getGithubPreviewProps<Data = any>(
   let file = null
 
   try {
-    file = await getGithubFile({
-      repoFullName,
-      branch,
-      fileRelativePath: options.fileRelativePath,
-      accessToken,
-      parse: options.parse,
-    })
+    file = await getGithubFile(options)
   } catch (e) {
     if (e instanceof GithubError) {
       console.error(
