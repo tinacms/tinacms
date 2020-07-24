@@ -169,7 +169,8 @@ This is a delete action for [the github client](https://tinacms.org/docs/package
 
 It will **delete the entire form file**. So the primary use case would be dynamic pages like blog pages or docs pages. (Commonly used with markdown files but could be any file format)
 
-![](/img/delete-action-github.png)
+![](https://tinacms.org/img/delete-action-ex.png)
+
 
 #### Options
 
