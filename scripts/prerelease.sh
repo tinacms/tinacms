@@ -21,8 +21,11 @@ lerna version \
   --no-changelog \
   --no-push \
   --allow-branch master \
-  -m "chore(publish): prerelease" \
   --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
+
+# 4. Commit Version Updates
+git add .
+git commit -m "chore(publish): prerelease version bumps"
 
 # 4. Publish to NPM
 lerna publish from-package \

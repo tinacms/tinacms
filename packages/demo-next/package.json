@@ -3,7 +3,7 @@
   "private": true,
   "description": "A simple starter to get up and developing quickly with Next.js",
   "license": "Apache-2.0",
-  "version": "0.24.1-alpha.0",
+  "version": "0.25.0-alpha.0",
   "author": "Kendall Strautman",
   "scripts": {
     "dev-next": "next",
@@ -28,7 +28,7 @@
     "prop-types": "^15.7.2",
     "raw-loader": "^3.0.0",
     "react-markdown": "^4.1.0",
-    "react-tinacms-editor": "^0.24.1-alpha.0",
+    "react-tinacms-editor": "^0.25.0-alpha.0",
     "react-tinacms-inline": "^0.24.0",
     "tinacms": "^0.24.0",
     "webpack": "^4.41.5"
