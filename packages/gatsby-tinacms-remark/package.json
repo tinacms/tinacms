@@ -1,6 +1,6 @@
 {
   "name": "gatsby-tinacms-remark",
-  "version": "0.24.1-alpha.0",
+  "version": "0.25.0-alpha.0",
   "main": "index.js",
   "types": "src/index.d.ts",
   "license": "Apache-2.0",
@@ -42,7 +42,7 @@
     "@types/js-yaml": "^3.12.3",
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.13.1",
-    "react-tinacms-editor": "^0.24.1-alpha.0",
+    "react-tinacms-editor": "^0.25.0-alpha.0",
     "react-tinacms-inline": "^0.24.0",
     "slash": "^3.0.0"
   },
