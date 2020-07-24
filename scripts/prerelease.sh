@@ -17,15 +17,19 @@ lerna version \
   --yes \
   --conventional-commits \
   --conventional-prerelease \
+  --no-changelog \
   --no-push \
   --allow-branch master \
   -m "chore(publish): prerelease" \
   --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
 
-# 4. Publish to NPM
+# 4. Delete pre-release tags
+git tag -d $(git describe --abbrev=0)
+
+# 5. Publish to NPM
 lerna publish from-package \
   --yes \
   --dist-tag next
 
-# 5. Push CHANGELOGs and tags to GitHub
-git push && git push --tags
+# 6. Push any changes
+git push
