@@ -2,6 +2,8 @@
 
 This package provides a [Field Plugin](https://tinacms.org/docs/plugins/fields) for editing dates on websites built with [TinaCMS](https://tinacms.org).
 
+![tinacms-date-field](https://tinacms.org/img/fields/date.jpg)
+
 ## Installation
 
 
