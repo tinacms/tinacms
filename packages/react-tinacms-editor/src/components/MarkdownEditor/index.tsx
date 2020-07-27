@@ -100,7 +100,10 @@ const EditingSection = styled.textarea`
   margin: 10px 0;
   resize: none;
   width: 100%;
+  border: 1px solid transparent;
   &:focus {
     outline: none;
+    border: 1px solid #2296fe;
+    border-radius: 10px;
   }
 `

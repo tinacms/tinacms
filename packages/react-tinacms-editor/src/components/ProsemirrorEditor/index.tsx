@@ -86,7 +86,11 @@ export const ProsemirrorEditor = styled(
             plugins={plugins}
           />
         </EditorStateProvider>
-        <div {...styleProps} ref={editorRef} />
+        <EditingArea
+          {...styleProps}
+          ref={editorRef}
+          focused={!!editorView && browserFocused && editorView.view.hasFocus()}
+        />
       </WysiwygWrapper>
     )
   }
@@ -96,4 +100,10 @@ export const ProsemirrorEditor = styled(
 
 const WysiwygWrapper = styled.div`
   position: relative;
+`
+
+const EditingArea = styled.div<{ focused: boolean }>`
+  border-radius: 10px;
+  padding: 0 4px;
+  border: 1px solid ${({ focused }) => (focused ? '#2296fe' : 'transparent')};
 `
