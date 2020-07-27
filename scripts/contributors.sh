@@ -5,6 +5,6 @@ set -e
 
 git checkout master
 
-DIFF="tinacms@$1..tinacms@$2"
+DIFF="$1..$2"
 
 git shortlog $DIFF -sn --no-merges
