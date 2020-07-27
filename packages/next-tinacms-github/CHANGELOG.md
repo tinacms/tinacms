@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.25.0](https://github.com/tinacms/tinacms/compare/v0.24.0...v0.25.0) (2020-07-27)
+
+
+### Features
+
+* getGithubFile let's you fetch and parse a file without the entire preview props ([17cb428](https://github.com/tinacms/tinacms/commit/17cb42840b080a671d69ca91ee2b85a57fec6db9))
+
+
+
+
+
 ## [0.2.1](https://github.com/tinacms/tinacms/compare/next-tinacms-github@0.2.1-alpha.0...next-tinacms-github@0.2.1) (2020-07-07)
 
 
