@@ -17,6 +17,7 @@
 - [Community Forum](https://community.tinacms.org/)
 - [Contributing](./CONTRIBUTING.md)
   - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
+- [CHANGELOG](./CHANGELOG.md)
 - [Change proposals (RFCs)](https://github.com/tinacms/rfcs)
 - [The core team's development process](./ROADMAP.md)
 
