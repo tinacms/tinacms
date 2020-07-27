@@ -87,23 +87,12 @@ function runChecksOnPullRequest() {
   // Packages
   const modifiedPackages = getModifiedPackages(allFiles)
 
-  // modifiedPackages.forEach(warnIfMissingTestChanges)
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
   modifiedPackages.forEach(checkDeps)
   modifiedPackages.forEach(checkForGlobalDeps)
 
-  modifiedPackages.forEach(pkg => {
-    const packageFiles = allFiles.filter(file => file.startsWith(pkg.path))
-
-    const hasReadme = packageFiles.find(file => file.endsWith('README.md'))
-
-    if (!hasReadme) {
-      warn(
-        `\`${pkg.path}\` was modified but it's README.md was not updated. Please check if any changes should be reflected in the documentation.`
-      )
-    }
-  })
+  modifiedPackages.forEach(pkg => checkForReadmeChanges(pkg, allFiles))
 
   listTouchedPackages(modifiedPackages)
 
@@ -116,6 +105,18 @@ function runChecksOnPullRequest() {
   }
 
   checkForDocsChanges(allFiles)
+}
+
+function checkForReadmeChanges(pkg: TinaPackage, allFiles: string[]) {
+  const packageFiles = allFiles.filter(file => file.startsWith(pkg.path))
+
+  const hasReadme = packageFiles.find(file => file.endsWith('README.md'))
+
+  if (!hasReadme) {
+    warn(
+      `\`${pkg.path}\` was modified but it's README.md was not updated. Please check if any changes should be reflected in the documentation.`
+    )
+  }
 }
 
 interface Consumers {
