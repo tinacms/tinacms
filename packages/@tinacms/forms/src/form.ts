@@ -32,6 +32,7 @@ export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
     save: string
     reset: string
   }
+  loadValues?: () => Promise<S>
   loadInitialValues?: () => Promise<S>
   onChange?(values: FormState<S>): void
 }
@@ -58,6 +59,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     actions,
     buttons,
     reset,
+    loadValues,
     loadInitialValues,
     onChange,
     ...options
@@ -85,6 +87,20 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       reset: 'Reset',
     }
     this.updateFields(this.fields)
+
+    if (loadValues) {
+      this.loading = true
+
+      loadValues()
+        .then(values => {
+          console.log({ values })
+
+          return this.finalForm.batch(() =>
+            updateEverything(this.finalForm, values)
+          )
+        })
+        .finally(() => (this.loading = false))
+    }
 
     if (loadInitialValues) {
       this.loading = true
