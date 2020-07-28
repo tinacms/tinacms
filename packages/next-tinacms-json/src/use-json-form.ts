@@ -55,7 +55,8 @@ export function useJsonForm<T = any>(
       fields,
       actions,
       buttons,
-      loadInitialValues() {
+      async loadInitialValues() {
+        if (cms.disabled) return jsonFile.data
         return cms.api.git
           .show(jsonFile.fileRelativePath) // Load the contents of this file at HEAD
           .then((git: { content: string }) => {
