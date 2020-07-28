@@ -44,6 +44,60 @@ describe('Form', () => {
         expect(form.loading).toBeFalsy()
       })
     })
+    describe('with loadValues', () => {
+      describe('before promise resolves', () => {
+        it('is is loading', () => {
+          const form = new Form({
+            ...DEFAULTS,
+            loadValues: () => new Promise(() => {}),
+          })
+
+          expect(form.loading).toBeTruthy()
+        })
+        it('has values === undefined', () => {
+          const form = new Form({
+            ...DEFAULTS,
+            loadValues: () => new Promise(() => {}),
+          })
+
+          expect(form.values).toBeUndefined()
+        })
+      })
+      describe('after promise resolves', () => {
+        it('is not loading once resolved', async () => {
+          let resolve: () => void | null
+
+          const form = new Form({
+            ...DEFAULTS,
+            loadValues: () =>
+              new Promise(r => {
+                resolve = () => r({})
+              }),
+          })
+
+          await wait(() => {
+            resolve()
+            expect(form.loading).toBeFalsy()
+          })
+        })
+        it('has values resolved values', async () => {
+          let resolve: () => void | null
+          const values = { title: 'Big Banana' }
+          const form = new Form({
+            ...DEFAULTS,
+            loadValues: () =>
+              new Promise(r => {
+                resolve = () => r(values)
+              }),
+          })
+
+          await wait(() => {
+            resolve()
+            expect(form.values).toEqual(values)
+          })
+        })
+      })
+    })
     describe('with loadInitialValues', () => {
       describe('before promise resolves', () => {
         it('is is loading', () => {
