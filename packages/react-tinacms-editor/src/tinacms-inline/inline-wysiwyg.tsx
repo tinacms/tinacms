@@ -18,28 +18,63 @@ limitations under the License.
 
 import * as React from 'react'
 import { useCMS } from 'tinacms'
-import { InlineField } from 'react-tinacms-inline'
+import { InlineField, FocusRing, useInlineForm } from 'react-tinacms-inline'
+import { FocusRingStyleProps } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
 import { EditorProps } from '../types'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
   children: any
+  focusRing?: false | FocusRingStyleProps
 }
 
 export function InlineWysiwyg({
   name,
   children,
+  focusRing = false,
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   const cms = useCMS()
+  const [active, setActive] = React.useState(false)
+  const { focussedField, setFocussedField } = useInlineForm()
+  const focusRingRef = React.useRef<HTMLDivElement>(null)
+
+  React.useEffect(() => {
+    setActive(name === focussedField)
+  }, [active, focussedField])
+
+  if (cms.disabled) {
+    return children
+  }
+
+  const handleSetActive = (event: any) => {
+    if (active) return
+    setFocussedField(name)
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
+
   return (
     <InlineField name={name}>
       {({ input }: any) => {
-        if (cms.enabled) {
-          return <Wysiwyg input={input} {...wysiwygProps} />
-        }
-        return <>{children}</>
+        return (
+          <FocusRing
+            ref={focusRingRef}
+            active={active}
+            onClick={handleSetActive}
+            offset={offset}
+            borderRadius={
+              typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+            }
+            disableHover={!focusRing}
+            disableChildren={false}
+          >
+            <Wysiwyg input={input} {...wysiwygProps} />
+          </FocusRing>
+        )
       }}
     </InlineField>
   )
