@@ -27,11 +27,10 @@ import {
 } from 'react-tinacms-inline'
 import grayMatter from 'gray-matter'
 import { useCMS } from 'tinacms'
-import { Wysiwyg } from 'react-tinacms-editor'
+import { InlineWysiwyg } from 'react-tinacms-editor'
 import Link from 'next/link'
 
 const Post: NextPage<{ post: MarkdownFile }> = props => {
-  console.log(props)
   const [post, form] = useLocalMarkdownForm(props.post, {
     fields: [
       { name: 'frontmatter.title', component: 'text' },
@@ -44,7 +43,7 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
 
   return (
     <InlineForm form={form}>
-      <nav>
+      <nav style={{ padding: '2rem' }}>
         <Link as="/blog/apple" href="/blog/[slug]">
           <a>Apple</a>
         </Link>
@@ -55,7 +54,7 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
           <a>Cake</a>
         </Link>
       </nav>
-      <article>
+      <article style={{ padding: '2rem' }}>
         <header>
           <SaveButton />
           <ResetButton />
@@ -63,15 +62,9 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
             <InlineText name="frontmatter.title" />
           </h1>
         </header>
-        <InlineField name="markdownBody">
-          {({ input }) => {
-            if (cms.enabled) {
-              return <Wysiwyg input={input} />
-            }
-
-            return <ReactMarkdown>{input.value}</ReactMarkdown>
-          }}
-        </InlineField>
+        <InlineWysiwyg name="markdownBody">
+          <ReactMarkdown source={post.markdownBody} />
+        </InlineWysiwyg>
       </article>
     </InlineForm>
   )

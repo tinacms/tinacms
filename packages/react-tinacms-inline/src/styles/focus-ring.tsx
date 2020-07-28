@@ -19,7 +19,7 @@ import styled, { css } from 'styled-components'
 import { BlocksEmptyState } from '../blocks/inline-field-blocks'
 
 export interface FocusRingStyleProps {
-  offset?: number | { x: number; y: number }
+  offset?: number | { x: number; y: number } | undefined
   borderRadius?: number
 }
 
