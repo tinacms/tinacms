@@ -36,7 +36,7 @@ export const useGithubFileForm = <T = any>(
   })
 
   const [formData, form] = useForm({
-    id: file.fileRelativePath, // needs to be unique
+    id: file.fileRelativePath,
     label: options.label || file.fileRelativePath,
     initialValues: file.data,
     fields: options.fields || [],
