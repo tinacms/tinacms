@@ -82,7 +82,7 @@ export function useForm<FormShape = any>(
   )
 
   React.useEffect(() => {
-    if (cms.enabled && loadInitialValues) {
+    if (loadInitialValues) {
       loadInitialValues().then((values: any) => {
         form.updateInitialValues(values)
       })
