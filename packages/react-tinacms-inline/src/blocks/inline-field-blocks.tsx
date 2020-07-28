@@ -42,6 +42,7 @@ export interface InlineBlocksProps {
   }
   min?: number
   max?: number
+  children?: React.FunctionComponent<any>
 }
 
 export interface InlineBlocksActions {
@@ -81,10 +82,14 @@ export function InlineBlocks({
   itemProps,
   min,
   max,
+  children,
 }: InlineBlocksProps) {
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
   const { setFocussedField } = useInlineForm()
+  const ProvidedWrapper = children
+
+  console.log('this is working --jkljkl;jkl;j;ljlk;j;lk')
 
   return (
     <InlineField name={name}>
@@ -118,11 +123,41 @@ export function InlineBlocks({
           form.mutators.insert(name, index, block)
           setFocussedField(`${name}.${index}`)
         }
+        const DefaultWrapper: React.FunctionComponent<{
+          ref: any
+          className: string
+          children: React.ReactNode
+        }> = ({ ref, className, children }) => {
+          return (
+            <div ref={ref} className={className}>
+              {children}
+            </div>
+          )
+        }
+
+        const Wrapper: React.FunctionComponent<{
+          ref: any
+          className: string
+          children: React.ReactNode
+        }> = ({ ref, className, children }) => {
+          if (typeof ProvidedWrapper === 'function') {
+            return (
+              <ProvidedWrapper ref={ref} className={className}>
+                {children}
+              </ProvidedWrapper>
+            )
+          }
+          return (
+            <DefaultWrapper ref={ref} className={className}>
+              {children}
+            </DefaultWrapper>
+          )
+        }
 
         return (
           <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
-              <div ref={provider.innerRef} className={className}>
+              <Wrapper ref={provider.innerRef} className={className || ''}>
                 {
                   <InlineBlocksContext.Provider
                     value={{
@@ -174,7 +209,7 @@ export function InlineBlocks({
                     {provider.placeholder}
                   </InlineBlocksContext.Provider>
                 }
-              </div>
+              </Wrapper>
             )}
           </Droppable>
         )
