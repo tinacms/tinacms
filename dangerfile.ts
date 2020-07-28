@@ -114,7 +114,7 @@ function checkForReadmeChanges(pkg: TinaPackage, allFiles: string[]) {
 
   if (!hasReadme) {
     warn(
-      `\`${pkg.path}\` was modified but it's README.md was not updated. Please check if any changes should be reflected in the documentation.`
+      `\`${pkg.path}\` was modified but its README.md was not updated. Please check if any changes should be reflected in the documentation.`
     )
   }
 }
