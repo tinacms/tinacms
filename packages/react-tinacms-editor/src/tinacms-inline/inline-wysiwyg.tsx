@@ -18,60 +18,34 @@ limitations under the License.
 
 import * as React from 'react'
 import { useCMS } from 'tinacms'
-import { InlineField, FocusRing, useInlineForm } from 'react-tinacms-inline'
-import { FocusRingStyleProps } from 'react-tinacms-inline/src/styles'
+import { InlineField, FocusRing } from 'react-tinacms-inline'
+import { FocusRingOptions } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
 import { EditorProps } from '../types'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
   children: any
-  focusRing?: boolean | FocusRingStyleProps
+  focusRing?: boolean | FocusRingOptions
 }
 
 export function InlineWysiwyg({
   name,
   children,
-  focusRing = false,
+  focusRing = true,
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   const cms = useCMS()
-  const [active, setActive] = React.useState(false)
-  const { focussedField, setFocussedField } = useInlineForm()
-  const focusRingRef = React.useRef<HTMLDivElement>(null)
-  const borderRadius =
-    typeof focusRing === 'object' ? focusRing.borderRadius : undefined
-  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
-
-  React.useEffect(() => {
-    if (!focusRing) return
-    setActive(name === focussedField)
-  }, [active, focusRing, focussedField])
 
   if (cms.disabled) {
     return children
-  }
-
-  const updateFocusedField = (event: any) => {
-    if (active) return
-    setFocussedField(name)
-    event.stopPropagation()
-    event.preventDefault()
   }
 
   return (
     <InlineField name={name}>
       {({ input }: any) => {
         return (
-          <FocusRing
-            ref={focusRingRef}
-            active={active}
-            onClick={updateFocusedField}
-            offset={offset}
-            borderRadius={borderRadius}
-            disableHover={!focusRing}
-            disableChildren={false}
-          >
+          <FocusRing name={name} options={focusRing}>
             <Wysiwyg input={input} {...wysiwygProps} />
           </FocusRing>
         )

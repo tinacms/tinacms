@@ -23,7 +23,6 @@ import { InlineField } from '../inline-field'
 import TextareaAutosize from 'react-textarea-autosize'
 import { InlineTextProps } from './inline-text-field'
 import { FocusRing } from '../styles'
-import { useInlineForm } from '..'
 
 /**
  * @deprecated
@@ -37,24 +36,6 @@ export function InlineTextarea({
   focusRing = true,
 }: InlineTextProps) {
   const cms = useCMS()
-  const [active, setActive] = React.useState(false)
-  const { focussedField, setFocussedField } = useInlineForm()
-  const focusRingRef = React.useRef<HTMLDivElement>(null)
-  const borderRadius =
-    typeof focusRing === 'object' ? focusRing.borderRadius : undefined
-  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
-
-  React.useEffect(() => {
-    if (!focusRing) return
-    setActive(name === focussedField)
-  }, [active, focusRing, focussedField])
-
-  const updateFocusedField = (event: any) => {
-    if (active) return
-    setFocussedField(name)
-    event.stopPropagation()
-    event.preventDefault()
-  }
 
   return (
     <InlineField name={name}>
@@ -65,15 +46,7 @@ export function InlineTextarea({
           }
 
           return (
-            <FocusRing
-              ref={focusRingRef}
-              active={active}
-              onClick={updateFocusedField}
-              offset={offset}
-              borderRadius={borderRadius}
-              disableHover={!focusRing}
-              disableChildren={false}
-            >
+            <FocusRing name={name} options={focusRing}>
               <Textarea className={className} {...input} rows={1} />
             </FocusRing>
           )
