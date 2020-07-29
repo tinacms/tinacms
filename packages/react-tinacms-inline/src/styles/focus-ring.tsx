@@ -40,10 +40,6 @@ export interface FocusRingProps {
   options?: boolean | FocusRingOptions
 }
 
-export const FocusRingContext = React.createContext<any>({
-  active: false,
-})
-
 export const FocusRing = ({ name, options, children }: FocusRingProps) => {
   const [active, setActive] = React.useState(false)
   const [childActive, setChildActive] = React.useState(false)
@@ -77,11 +73,7 @@ export const FocusRing = ({ name, options, children }: FocusRingProps) => {
       disableHover={!options || childActive}
       disableChildren={nestedFocus && !active && !childActive}
     >
-      <FocusRingContext.Provider
-        value={{ active: active, offset: offset, borderRadius: borderRadius }}
-      >
-        {children}
-      </FocusRingContext.Provider>
+      {children}
     </StyledFocusRing>
   )
 }
