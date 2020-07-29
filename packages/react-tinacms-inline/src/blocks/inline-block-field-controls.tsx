@@ -137,6 +137,7 @@ export function BlocksControls({
             offset={offset}
             borderRadius={borderRadius}
             {...provider.draggableProps}
+            disableHover={focusRing === false ? true : childIsActive}
             disableChildren={!isActive && !childIsActive}
           >
             {withinLimit(max) && (
