@@ -20,20 +20,19 @@ import * as React from 'react'
 import { useCMS } from 'tinacms'
 
 import { InlineSettings } from '../inline-settings'
-import { useInlineForm } from '../inline-form'
 import { FocusRing } from '../styles'
 import { InlineFieldContext } from '../inline-field-context'
 import {
   BlockMenu,
   BlockMenuWrapper,
 } from '../blocks/inline-block-field-controls'
-import { FocusRingStyleProps } from '../styles'
+import { FocusRingOptions, FocusRingContext } from '../styles'
 
 interface InlineGroupControls {
   name: string
   children: any
   insetControls?: boolean
-  focusRing?: false | FocusRingStyleProps
+  focusRing?: boolean | FocusRingOptions
 }
 
 export function InlineGroupControls({
@@ -43,8 +42,7 @@ export function InlineGroupControls({
   focusRing = {},
 }: InlineGroupControls) {
   const cms = useCMS()
-  const { focussedField, setFocussedField } = useInlineForm()
-  const groupRef = React.useRef<HTMLDivElement>(null)
+  const focusContext = React.useContext(FocusRingContext)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
   const { fields } = React.useContext(InlineFieldContext)
 
@@ -52,35 +50,13 @@ export function InlineGroupControls({
     return children
   }
 
-  const active = name === focussedField
-  const childIsActive = focussedField.startsWith(name)
-
-  const handleSetActive = (event: any) => {
-    if (active || childIsActive) return
-    setFocussedField(name)
-    event.stopPropagation()
-    event.preventDefault()
-  }
-
-  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
-
   return (
-    <FocusRing
-      ref={groupRef}
-      active={focusRing && active}
-      onClick={handleSetActive}
-      offset={offset}
-      borderRadius={
-        typeof focusRing === 'object' ? focusRing.borderRadius : undefined
-      }
-      disableHover={!focusRing && childIsActive}
-      disableChildren={focusRing && !active && !childIsActive}
-    >
+    <FocusRing name={name} options={focusRing}>
       <BlockMenuWrapper
         ref={groupMenuRef}
-        offset={offset}
+        offset={focusContext.offset}
         inset={insetControls}
-        active={active}
+        active={focusContext.active}
       >
         <BlockMenu>
           <InlineSettings fields={fields} />
