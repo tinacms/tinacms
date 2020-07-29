@@ -48,7 +48,6 @@ export function useForm<FormShape = any>(
   { loadInitialValues, ...options }: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
 ): [FormShape, Form] {
-  const cms = useCMS()
   /**
    * `initialValues` will be usually be undefined if `loadInitialValues` is used.
    *
