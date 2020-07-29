@@ -73,8 +73,16 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
   const { name } = React.useContext(InlineFieldContext)
   const [initialValues] = React.useState(form.values)
 
-  function handleCancel() {
+  function handleCancel(event: any) {
+    event.stopPropagation()
+    event.preventDefault()
     form.updateValues(initialValues)
+    close()
+  }
+
+  function handleClose(event: any) {
+    event.stopPropagation()
+    event.preventDefault()
     close()
   }
 
@@ -110,7 +118,7 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
         <ModalActions>
           <Button onClick={handleCancel}>Cancel</Button>
           <Button
-            onClick={close}
+            onClick={handleClose}
             disabled={form.values === initialValues}
             primary
           >
