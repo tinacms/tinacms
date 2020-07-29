@@ -19,7 +19,6 @@ limitations under the License.
 import { FormOptions, Form, Field } from '@tinacms/forms'
 import * as React from 'react'
 import { usePlugins } from './use-plugin'
-import { useCMS } from './use-cms'
 
 export interface WatchableFormValue {
   values: any
