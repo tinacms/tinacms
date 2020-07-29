@@ -15,21 +15,78 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
+import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { BlocksEmptyState } from '../blocks/inline-field-blocks'
+import { useInlineForm } from '..'
 
-export interface FocusRingStyleProps {
-  offset?: number | { x: number; y: number } | undefined
+export interface FocusRingOptions {
+  offset?: number | { x: number; y: number }
   borderRadius?: number
+  nestedFocus?: boolean
 }
 
-interface FocusRingProps extends FocusRingStyleProps {
+export interface StyledFocusRingProps {
+  offset?: number | { x: number; y: number }
+  borderRadius?: number
   active: boolean
   disableHover?: boolean
   disableChildren?: boolean
 }
 
-export const FocusRing = styled.div<FocusRingProps>(p => {
+export interface FocusRingProps {
+  name?: string
+  children?: any
+  options?: boolean | FocusRingOptions
+}
+
+export const FocusRingContext = React.createContext<any>({
+  active: false,
+})
+
+export const FocusRing = ({ name, options, children }: FocusRingProps) => {
+  const [active, setActive] = React.useState(false)
+  const [childActive, setChildActive] = React.useState(false)
+  const { focussedField, setFocussedField } = useInlineForm()
+  const focusRingRef = React.useRef<HTMLDivElement>(null)
+  const borderRadius =
+    typeof options === 'object' ? options.borderRadius : undefined
+  const offset = typeof options === 'object' ? options.offset : undefined
+  const nestedFocus = typeof options === 'object' ? options.nestedFocus : false
+
+  React.useEffect(() => {
+    if (!options || !name) return
+    setActive(name === focussedField)
+    setChildActive(focussedField.startsWith(name!))
+  }, [name, options, focussedField])
+
+  const updateFocusedField = (event: any) => {
+    if (active || !name) return
+    setFocussedField(name)
+    event.stopPropagation()
+    event.preventDefault()
+  }
+
+  return (
+    <StyledFocusRing
+      ref={focusRingRef}
+      active={active}
+      onClick={updateFocusedField}
+      offset={offset}
+      borderRadius={borderRadius}
+      disableHover={!options || childActive}
+      disableChildren={nestedFocus && !active && !childActive}
+    >
+      <FocusRingContext.Provider
+        value={{ active: active, offset: offset, borderRadius: borderRadius }}
+      >
+        {children}
+      </FocusRingContext.Provider>
+    </StyledFocusRing>
+  )
+}
+
+export const StyledFocusRing = styled.div<StyledFocusRingProps>(p => {
   const offset = getOffset(p.offset)
 
   return css`
