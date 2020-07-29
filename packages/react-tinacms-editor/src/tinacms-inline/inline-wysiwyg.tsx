@@ -26,7 +26,7 @@ import { EditorProps } from '../types'
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
   children: any
-  focusRing?: false | FocusRingStyleProps
+  focusRing?: boolean | FocusRingStyleProps
 }
 
 export function InlineWysiwyg({
@@ -41,8 +41,9 @@ export function InlineWysiwyg({
   const focusRingRef = React.useRef<HTMLDivElement>(null)
 
   React.useEffect(() => {
+    if (!focusRing) return
     setActive(name === focussedField)
-  }, [active, focussedField])
+  }, [active, focusRing, focussedField])
 
   if (cms.disabled) {
     return children
