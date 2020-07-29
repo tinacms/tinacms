@@ -62,7 +62,7 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
             <InlineText name="frontmatter.title" />
           </h1>
         </header>
-        <InlineWysiwyg name="markdownBody">
+        <InlineWysiwyg name="markdownBody" focusRing={true}>
           <ReactMarkdown source={post.markdownBody} />
         </InlineWysiwyg>
       </article>
