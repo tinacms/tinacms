@@ -19,13 +19,13 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 import { useCMS, CMS } from 'tinacms'
-import { InlineField } from '../inline-field'
-import { InputFocusWrapper } from '../styles'
+import { FocusRingStyleProps, FocusRing } from '../styles'
+import { InlineField, useInlineForm } from '..'
 
 export interface InlineTextProps {
   name: string
   className?: string
-  focusRing?: boolean
+  focusRing?: boolean | FocusRingStyleProps
 }
 
 /**
@@ -40,6 +40,24 @@ export function InlineText({
   focusRing = true,
 }: InlineTextProps) {
   const cms: CMS = useCMS()
+  const [active, setActive] = React.useState(false)
+  const { focussedField, setFocussedField } = useInlineForm()
+  const focusRingRef = React.useRef<HTMLDivElement>(null)
+  const borderRadius =
+    typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
+
+  React.useEffect(() => {
+    if (!focusRing) return
+    setActive(name === focussedField)
+  }, [active, focusRing, focussedField])
+
+  const updateFocusedField = (event: any) => {
+    if (active) return
+    setFocussedField(name)
+    event.stopPropagation()
+    event.preventDefault()
+  }
 
   return (
     <InlineField name={name}>
@@ -50,9 +68,17 @@ export function InlineText({
           }
 
           return (
-            <InputFocusWrapper>
+            <FocusRing
+              ref={focusRingRef}
+              active={active}
+              onClick={updateFocusedField}
+              offset={offset}
+              borderRadius={borderRadius}
+              disableHover={!focusRing}
+              disableChildren={false}
+            >
               <Input type="text" {...input} className={className} />
-            </InputFocusWrapper>
+            </FocusRing>
           )
         }
         return <>{input.value}</>
