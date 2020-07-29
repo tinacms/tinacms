@@ -43,13 +43,19 @@ export function InlineSettings({ fields }: InlineSettingsProps) {
   const [open, setOpen] = React.useState(false)
   const noExtraFields = !(fields && fields.length)
 
+  const toggleOpen = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
+    setOpen(!open)
+  }
+
   if (noExtraFields) {
     return null
   }
 
   return (
     <>
-      <BlockAction onClick={() => setOpen(p => !p)}>
+      <BlockAction onClick={toggleOpen}>
         <EditIcon />
       </BlockAction>
       {open && <SettingsModal fields={fields} close={() => setOpen(false)} />}
