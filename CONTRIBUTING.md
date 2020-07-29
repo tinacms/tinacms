@@ -15,18 +15,23 @@ The following is a set of guidelines and tips for contributing to the TinaCMS an
 
 TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/) to generate CHANGELOG entries. Please make sure your commits follow this convention.
 
+Please include the package name in the [scope](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#commit-message-with-scope) of your commit. For example:
+
+```
+fix(react-tinacms-editor): table row add and delete icons no longer overlap
+```
+
 ### Creating Packages
 
 Packages in Tina are organized according to their name
 
-| Type                    | Naming Convention  | Example Path           |
-| ----------------------- | ------------------ | ---------------------- |
-| Internal packages       | `@tinacms/*`       | `@tinacms/core`        |
-| Node API extensions     | `@tinacms/api-*`   | `@tinacms/api-git`     |
-| React specific packages | `react-tinacms-*`  | `react-tinacms-remark` |
-| Gatsby plugins          | `gatsby-tinacms-*` | `gatsby-tinacms-json`  |
-| Next.js helpers         | `next-tinacms-*`   | `next-tinacms-json`    |
-| Demo Projects           | `demo-*`           | `demo-gatsby`          |
+| Type      | Naming Convention  | Example Path           |
+| --------- | ------------------ | ---------------------- |
+| Core Tina | `@tinacms/*`       | `@tinacms/core`        |
+| React     | `react-tinacms-*`  | `react-tinacms-remark` |
+| Next.js   | `next-tinacms-*`   | `next-tinacms-json`    |
+| Gatsby    | `gatsby-tinacms-*` | `gatsby-tinacms-json`  |
+| Demos     | `demo-*`           | `demo-gatsby`          |
 
 ## Troubleshooting in Development
 
