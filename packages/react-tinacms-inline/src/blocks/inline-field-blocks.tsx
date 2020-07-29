@@ -87,9 +87,6 @@ export function InlineBlocks({
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
   const { setFocussedField } = useInlineForm()
-  const ProvidedWrapper = children
-
-  console.log('this is working --jkljkl;jkl;j;ljlk;j;lk')
 
   return (
     <InlineField name={name}>
@@ -123,41 +120,34 @@ export function InlineBlocks({
           form.mutators.insert(name, index, block)
           setFocussedField(`${name}.${index}`)
         }
-        const DefaultWrapper: React.FunctionComponent<{
-          ref: any
-          className: string
-          children: React.ReactNode
-        }> = ({ ref, className, children }) => {
-          return (
-            <div ref={ref} className={className}>
-              {children}
-            </div>
-          )
-        }
 
+        const ProvidedWrapper = children
         const Wrapper: React.FunctionComponent<{
-          ref: any
+          providerRef: any
           className: string
           children: React.ReactNode
-        }> = ({ ref, className, children }) => {
-          if (typeof ProvidedWrapper === 'function') {
+        }> = ({ providerRef, className, children }) => {
+          if (ProvidedWrapper !== undefined) {
             return (
-              <ProvidedWrapper ref={ref} className={className}>
+              <ProvidedWrapper providedRef={providerRef} className={className}>
                 {children}
               </ProvidedWrapper>
             )
           }
           return (
-            <DefaultWrapper ref={ref} className={className}>
+            <div ref={providerRef} className={className}>
               {children}
-            </DefaultWrapper>
+            </div>
           )
         }
 
         return (
           <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
-              <Wrapper ref={provider.innerRef} className={className || ''}>
+              <Wrapper
+                providerRef={provider.innerRef}
+                className={className || ''}
+              >
                 {
                   <InlineBlocksContext.Provider
                     value={{
