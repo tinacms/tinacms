@@ -39,6 +39,9 @@ export function InlineWysiwyg({
   const [active, setActive] = React.useState(false)
   const { focussedField, setFocussedField } = useInlineForm()
   const focusRingRef = React.useRef<HTMLDivElement>(null)
+  const borderRadius =
+    typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
 
   React.useEffect(() => {
     if (!focusRing) return
@@ -49,14 +52,12 @@ export function InlineWysiwyg({
     return children
   }
 
-  const handleSetActive = (event: any) => {
+  const updateFocusedField = (event: any) => {
     if (active) return
     setFocussedField(name)
     event.stopPropagation()
     event.preventDefault()
   }
-
-  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
 
   return (
     <InlineField name={name}>
@@ -65,11 +66,9 @@ export function InlineWysiwyg({
           <FocusRing
             ref={focusRingRef}
             active={active}
-            onClick={handleSetActive}
+            onClick={updateFocusedField}
             offset={offset}
-            borderRadius={
-              typeof focusRing === 'object' ? focusRing.borderRadius : undefined
-            }
+            borderRadius={borderRadius}
             disableHover={!focusRing}
             disableChildren={false}
           >
