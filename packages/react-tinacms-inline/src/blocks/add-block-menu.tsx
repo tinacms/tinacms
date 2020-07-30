@@ -97,21 +97,28 @@ export function AddBlockMenu({
       <BlocksMenu openTop={openTop} isOpen={isOpen}>
         {Object.keys(blocks).map((key: string) => {
           const template = blocks[key].template
-          return (
-            <BlockOption
-              key={template.label}
-              onClick={event => {
-                event.stopPropagation()
-                event.preventDefault()
-                addBlock({
-                  _template: key,
-                  ...template.defaultItem,
-                })
-              }}
-            >
-              {template.label}
-            </BlockOption>
-          )
+
+          if (!template) {
+            console.error(`No template for ${key} block exists`)
+
+            return null
+          } else {
+            return (
+              <BlockOption
+                key={template?.label}
+                onClick={event => {
+                  event.stopPropagation()
+                  event.preventDefault()
+                  addBlock({
+                    _template: key,
+                    ...template?.defaultItem,
+                  })
+                }}
+              >
+                {template?.label}
+              </BlockOption>
+            )
+          }
         })}
       </BlocksMenu>
     </AddBlockWrapper>
