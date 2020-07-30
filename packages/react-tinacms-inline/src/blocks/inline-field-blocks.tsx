@@ -42,7 +42,12 @@ export interface InlineBlocksProps {
   }
   min?: number
   max?: number
-  children?: React.FunctionComponent<any>
+  children?: React.FunctionComponent<InlineBlockRenderFunctionProps>
+}
+
+export interface InlineBlockRenderFunctionProps {
+  providedRef: any
+  className: string
 }
 
 export interface InlineBlocksActions {
@@ -122,20 +127,20 @@ export function InlineBlocks({
         }
 
         const ProvidedWrapper = children
-        const Wrapper: React.FunctionComponent<{
-          providerRef: any
-          className: string
-          children: React.ReactNode
-        }> = ({ providerRef, className, children }) => {
-          if (ProvidedWrapper !== undefined) {
+        const Wrapper: React.FunctionComponent<InlineBlockRenderFunctionProps> = ({
+          providedRef,
+          className,
+          children,
+        }) => {
+          if (ProvidedWrapper && typeof ProvidedWrapper === 'function') {
             return (
-              <ProvidedWrapper providedRef={providerRef} className={className}>
+              <ProvidedWrapper providedRef={providedRef} className={className}>
                 {children}
               </ProvidedWrapper>
             )
           }
           return (
-            <div ref={providerRef} className={className}>
+            <div ref={providedRef} className={className}>
               {children}
             </div>
           )
@@ -145,7 +150,7 @@ export function InlineBlocks({
           <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
               <Wrapper
-                providerRef={provider.innerRef}
+                providedRef={provider.innerRef}
                 className={className || ''}
               >
                 {
