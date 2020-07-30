@@ -25,8 +25,44 @@ describe('CMS', () => {
 
       expect(cms).toBeInstanceOf(CMS)
     })
+    it('is disabled', () => {
+      const cms = new CMS()
+
+      expect(cms.disabled).toBe(true)
+    })
   })
   describe('when constructed with options', () => {
+    describe('without enabled set', () => {
+      it('is disabled', () => {
+        const options = {}
+
+        const cms = new CMS(options)
+
+        expect(cms.disabled).toBe(true)
+      })
+    })
+    describe('with enabled set to `true`', () => {
+      it('is enabled ', () => {
+        const options = {
+          enabled: true,
+        }
+
+        const cms = new CMS(options)
+
+        expect(cms.enabled).toBe(true)
+      })
+    })
+    describe('with enabled set to `false`', () => {
+      it('is enabled ', () => {
+        const options = {
+          enabled: false,
+        }
+
+        const cms = new CMS(options)
+
+        expect(cms.disabled).toBe(true)
+      })
+    })
     describe('containing a plugin', () => {
       it('will have the plugin', () => {
         const plugin = { __type: 'test', name: 'Example' }
