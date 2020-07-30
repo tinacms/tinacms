@@ -19,31 +19,37 @@ limitations under the License.
 import { CMS } from './cms'
 
 describe('CMS', () => {
-  describe('When instantiated with no arguments', () => {
+  describe('when constructed without options', () => {
     it('instantiates without error', () => {
       const cms = new CMS()
+
       expect(cms).toBeInstanceOf(CMS)
     })
   })
-  describe('When configured with a plugin', () => {
-    it('instantiates with the plugin', () => {
-      const p = { __type: 'test', name: 'Example' }
-      const cms = new CMS({
-        plugins: [p],
+  describe('when constructed with options', () => {
+    describe('containing a plugin', () => {
+      it('will have the plugin', () => {
+        const plugin = { __type: 'test', name: 'Example' }
+
+        const cms = new CMS({
+          plugins: [plugin],
+        })
+
+        expect(cms.plugins.all('test')).toContain(plugin)
       })
-      expect(cms).toBeInstanceOf(CMS)
-      expect(cms.plugins.all('test')).toContain(p)
     })
-  })
-  describe('When configured with an api', () => {
-    it('instantiates with the api', () => {
-      const cms = new CMS({
-        apis: {
-          test: { foo: 'bar' },
-        },
+    describe('containing an api', () => {
+      it('will have that api', () => {
+        const test = { foo: 'bar' }
+
+        const cms = new CMS({
+          apis: {
+            test,
+          },
+        })
+
+        expect(cms.api.test).toBe(test)
       })
-      expect(cms).toBeInstanceOf(CMS)
-      expect(cms.api.test).toHaveProperty('foo')
     })
   })
 })
