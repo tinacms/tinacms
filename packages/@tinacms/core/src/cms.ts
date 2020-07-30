@@ -131,7 +131,7 @@ export class CMS {
       )
     }
 
-    if (config.enabled || typeof config.enabled === 'undefined') {
+    if (config.enabled) {
       this.enable()
     } else {
       this.disable()
