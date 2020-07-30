@@ -721,6 +721,15 @@
         "code",
         "doc"
       ]
+    },
+    {
+      "login": "laurenclark",
+      "name": "Lauren Clark",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/5822683?v=4",
+      "profile": "http://laurenclark.io",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
