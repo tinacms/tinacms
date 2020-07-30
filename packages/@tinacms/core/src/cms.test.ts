@@ -53,7 +53,7 @@ describe('CMS', () => {
       })
     })
     describe('with enabled set to `false`', () => {
-      it('is enabled ', () => {
+      it('is disabled', () => {
         const options = {
           enabled: false,
         }
