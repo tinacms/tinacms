@@ -7,12 +7,14 @@ jobs:
     strategy:
       matrix:
         os: [ubuntu-latest, macOS-latest, windows-latest]
+        node-version: [10.x, 12.x]
     runs-on: ${{ matrix.os }}
     steps:
       - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
+      - name: Use Node.js ${{ matrix.node-version }}
+        uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: ${{ matrix.node-version }}
 
       - if: matrix.os == 'windows-latest'
         run: |
