@@ -1,10 +1,11 @@
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20saweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
-[![Slack](https://img.shields.io/badge/slack-tinacms-blue.svg?logo=slack)](https://tinacms.slack.com)
-[![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![GitHub license](https://img.shields.io/badge/license-MIT-blue.svg)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint/badge.svg) [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-71-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# ![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png)
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
+[![Forum](https://img.shields.io/badge/forum-tinacms-blue.svg?logo=discourse)](https://community.tinacms.org/) 
+
+# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png "Visit tinacms.org")](https://tinacms.org/)
 
 > Tina is an open-source toolkit for building content management directly into your website.
 
@@ -13,7 +14,7 @@
 ## Learn More
 
 - [Website](https://tinacms.org/)
-  - [Blog](https://tinacms.org/docs/)
+  - [Blog](https://tinacms.org/blog/)
   - [Docs](https://tinacms.org/docs/)
 - [Community Forum](https://community.tinacms.org/)
 - [Contributing](./CONTRIBUTING.md)
