@@ -19,33 +19,73 @@ limitations under the License.
 import { CMS } from './cms'
 
 describe('CMS', () => {
-    describe('When instantiated with no arguments', () => {
-        it('instantiates without error', () => {
-            const cms = new CMS()
-            expect(cms).toBeInstanceOf(CMS)
-        })
+  describe('when constructed without options', () => {
+    it('instantiates without error', () => {
+      const cms = new CMS()
+
+      expect(cms).toBeInstanceOf(CMS)
     })
-    describe('When configured with a plugin', () => {
-        it('instantiates with the plugin', () => {
-            const p =  { __type: 'test', name: 'Example' }
-            const cms = new CMS({
-                plugins: [
-                   p
-                ]
-            })
-            expect(cms).toBeInstanceOf(CMS)
-            expect(cms.plugins.all('test')).toContain(p)
-        })
+    it('is disabled', () => {
+      const cms = new CMS()
+
+      expect(cms.disabled).toBe(true)
     })
-    describe('When configured with an api', () => {
-        it('instantiates with the api', () => {
-            const cms = new CMS({
-                apis: {
-                    test: { foo: 'bar' }
-                }
-            })
-            expect(cms).toBeInstanceOf(CMS)
-            expect(cms.api.test).toHaveProperty('foo')
-        })
+  })
+  describe('when constructed with options', () => {
+    describe('without enabled set', () => {
+      it('is disabled', () => {
+        const options = {}
+
+        const cms = new CMS(options)
+
+        expect(cms.disabled).toBe(true)
+      })
     })
+    describe('with enabled set to `true`', () => {
+      it('is enabled ', () => {
+        const options = {
+          enabled: true,
+        }
+
+        const cms = new CMS(options)
+
+        expect(cms.enabled).toBe(true)
+      })
+    })
+    describe('with enabled set to `false`', () => {
+      it('is disabled', () => {
+        const options = {
+          enabled: false,
+        }
+
+        const cms = new CMS(options)
+
+        expect(cms.disabled).toBe(true)
+      })
+    })
+    describe('containing a plugin', () => {
+      it('will have the plugin', () => {
+        const plugin = { __type: 'test', name: 'Example' }
+
+        const cms = new CMS({
+          plugins: [plugin],
+        })
+
+        expect(cms.plugins.all('test')).toContain(plugin)
+      })
+    })
+    describe('containing an api', () => {
+      it('will have that api', () => {
+        const test = { foo: 'bar' }
+
+        const cms = new CMS({
+          apis: {
+            test,
+          },
+        })
+
+        expect(cms.api.test).toBe(test)
+      })
+    })
+  })
 })

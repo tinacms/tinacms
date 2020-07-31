@@ -78,7 +78,7 @@ export class CMS {
   static ENABLED = { type: 'cms:enable' }
   static DISABLED = { type: 'cms:disable' }
 
-  private _enabled: boolean = true
+  private _enabled: boolean = false
 
   /**
    * An object for managing CMSs plugins.
@@ -131,10 +131,8 @@ export class CMS {
       )
     }
 
-    if (config.enabled || typeof config.enabled === 'undefined') {
+    if (config.enabled) {
       this.enable()
-    } else {
-      this.disable()
     }
   }
 
