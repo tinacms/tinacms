@@ -20,6 +20,7 @@ import * as React from 'react'
 import { BoldIcon, ItalicIcon, StrikethroughIcon } from '@tinacms/icons'
 
 import { markControl } from '../../../components/MenuHelpers'
+import { formatKeymap } from '../../../utils'
 
 export const ProsemirrorMenu = () => (
   <>
@@ -32,13 +33,13 @@ export const ProsemirrorMenu = () => (
 const BoldControl = markControl({
   mark: 'strong',
   Icon: BoldIcon,
-  tooltip: 'Bold',
+  tooltip: formatKeymap('Bold Mod-B'),
 })
 
 const ItalicControl = markControl({
   mark: 'em',
   Icon: ItalicIcon,
-  tooltip: 'Italic',
+  tooltip: formatKeymap('Italic Mod-I'),
 })
 
 const StrikeControl = markControl({

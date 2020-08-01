@@ -44,6 +44,7 @@ export const commandControl = (
   return (
     <MenuButton
       data-tooltip={tooltip}
+      title={tooltip}
       onClick={onClick}
       disabled={!canDo()}
       onMouseDown={evt => {

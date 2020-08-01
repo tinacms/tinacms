@@ -23,6 +23,7 @@ import { RedoIcon, UndoIcon } from '@tinacms/icons'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton } from '../../../components/MenuHelpers'
+import { formatKeymap } from '../../../utils'
 
 export const ProsemirrorMenu = () => (
   <>
@@ -38,9 +39,12 @@ const UndoControl = () => {
     undo(state, dispatch)
   }
 
+  const tooltip = formatKeymap('Undo Mod-Z')
+
   return (
     <MenuButton
-      data-tooltip="Undo"
+      data-tooltip={tooltip}
+      title={tooltip}
       data-side="top"
       onClick={undoChange}
       disabled={undoDepth(editorView!.view.state) < 1}
@@ -58,9 +62,12 @@ const RedoControl = () => {
     redo(state, dispatch)
   }
 
+  const tooltip = formatKeymap('Redo Mod-Shift-Z')
+
   return (
     <MenuButton
-      data-tooltip="Redo"
+      data-tooltip={tooltip}
+      title={tooltip}
       data-side="top"
       onClick={redoChange}
       disabled={redoDepth(editorView!.view.state) < 1}
