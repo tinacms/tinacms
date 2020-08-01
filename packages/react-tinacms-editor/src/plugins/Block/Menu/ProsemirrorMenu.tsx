@@ -27,6 +27,7 @@ import { HeadingIcon } from '@tinacms/icons'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
+import { formatKeymap } from '../../../utils'
 import { toggleHeader as th } from '../commands'
 import { blockTool } from './blockTool'
 
@@ -42,7 +43,7 @@ export const ProsemirrorMenu: FunctionComponent = () => {
     <>
       <MenuButton
         ref={menuButtonRef}
-        data-tooltip={'Heading'}
+        data-tooltip="Heading"
         onClick={toggle}
         active={active}
       >
@@ -110,6 +111,7 @@ const H1 = blockTool({
   command: makeToggleHeader(1),
   typeName: 'heading',
   attrs: { level: 1 },
+  title: formatKeymap('Mod-Alt-1'),
 })
 const H2 = blockTool({
   Component: HeadingTwo,
@@ -117,6 +119,7 @@ const H2 = blockTool({
   command: makeToggleHeader(2),
   typeName: 'heading',
   attrs: { level: 2 },
+  title: formatKeymap('Mod-Alt-2'),
 })
 const H3 = blockTool({
   Component: HeadingThree,
@@ -124,6 +127,7 @@ const H3 = blockTool({
   command: makeToggleHeader(3),
   typeName: 'heading',
   attrs: { level: 3 },
+  title: formatKeymap('Mod-Alt-3'),
 })
 const H4 = blockTool({
   Component: HeadingFour,
@@ -131,6 +135,7 @@ const H4 = blockTool({
   command: makeToggleHeader(4),
   typeName: 'heading',
   attrs: { level: 4 },
+  title: formatKeymap('Mod-Alt-4'),
 })
 const H5 = blockTool({
   Component: HeadingFive,
@@ -138,6 +143,7 @@ const H5 = blockTool({
   command: makeToggleHeader(5),
   typeName: 'heading',
   attrs: { level: 5 },
+  title: formatKeymap('Mod-Alt-5'),
 })
 const H6 = blockTool({
   Component: HeadingSix,
@@ -145,4 +151,5 @@ const H6 = blockTool({
   command: makeToggleHeader(6),
   typeName: 'heading',
   attrs: { level: 6 },
+  title: formatKeymap('Mod-Alt-6'),
 })
