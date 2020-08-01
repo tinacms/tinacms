@@ -112,6 +112,7 @@ export function markControl({
       <MenuButton
         data-tooltip={tooltip}
         data-side="top"
+        title={tooltip}
         onClick={onOptionClick}
         active={!isOptionDisabled() && isActive()}
         disabled={isOptionDisabled()}
