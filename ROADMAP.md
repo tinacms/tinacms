@@ -27,7 +27,7 @@ perspective, and plan the next 6 week period.
 
 | Begins        | Ends           |
 | ------------- | -------------- |
-| May 18th 2020 | June 26th 2020 |
+| July 13th 2020 | August 21st 2020 |
 
 As the project has grown the website's structure has proved problematic for contributors.
 Deciding where to put new docs and where to look for files to be changed has been
