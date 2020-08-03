@@ -1,6 +1,6 @@
-# _next-tinacms-markdown_
+# next-tinacms-markdown
 
-The `next-tinacms-markdown` package provides a set of methods for editing content sourced from Markdown files.
+The `next-tinacms-markdown` package provides a set of methods for editing content sourced from Markdown files in a [Git-based workflow](https://tinacms.org/guides/nextjs/git/getting-started).
 
 ## Installation
 
