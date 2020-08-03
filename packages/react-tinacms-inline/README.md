@@ -68,6 +68,10 @@ interface InlineFormState {
 
 ### _useInlineForm_
 
+```ts
+useInlineForm(): InlineFormState
+```
+
 The `useInlineForm` [hook](https://reactjs.org/docs/hooks-intro.html) can be used to access the inline editing context. It must be used within a child component of `InlineForm`.
 
 ## Inline Field
@@ -241,6 +245,10 @@ interface InlineBlocksActions {
 ```
 
 ### _useInlineBlocks_
+
+```ts
+useInlineBlocks(): InlineBlocksActions
+```
 
 `useInlineBlocks` is a hook that can be used to access the _Inline Blocks Context_ when creating custom controls.
 
