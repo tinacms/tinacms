@@ -10,10 +10,16 @@ yarn add next-tinacms-json
 
 ## Helpers
 
-- `useJsonForm( jsonFile, options? ):[values, form]`: A React Hook that creates a Git form
-- `jsonForm( Component, options? ): Component`: An HOC that creates and registers a Git form
-- `useLocalJsonForm`(deprecated)
-- `useGlobalJsonForm`(deprecated)
+```ts
+useJsonForm( jsonFile, options? ):[values, form]
+```
+`useJsonForm` is a [React Hook](https://reactjs.org/docs/hooks-intro.html) that creates a Git form
+
+```ts
+jsonForm( Component, options? ): Component
+```
+`jsonForm` is a [React Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) that creates and registers a Git form
+
 
 ### _useJsonForm_ hook
 
