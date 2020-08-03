@@ -39,7 +39,7 @@ import { StyledFocusRing } from '../styles'
 import { FocusRingOptions, getOffset, getOffsetX, getOffsetY } from '../styles'
 
 export interface BlocksControlsProps {
-  children: any
+  children: React.ReactNode
   index: number
   insetControls?: boolean
   focusRing?: boolean | FocusRingOptions
