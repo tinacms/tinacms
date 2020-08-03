@@ -296,13 +296,103 @@ interface BlockTemplate {
 }
 ```
 
+**Block Component**
+
+| Key           |                                                                                                                Purpose |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------: |
+| `index`       |                                                                                                Position in the block array. |
+| `data` |                                                                   The source data. |
+
+**Block Template**
+
 | Key           |                                                                                                                Purpose |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------: |
 | `label`       |                                                                                                A human readable label. |
 | `defaultItem` |                                                                   _Optional_ — Populates new blocks with default data. |
 | `fields`      | _Optional_ — Populates fields in the [Settings Modal](/docs/ui/inline-editing/inline-blocks#using-the-settings-modal). |
 
-### Example
+### Examples
+
+Block Components can render _Inline Fields_ to expose the data for editing. When using Inline Fields within a block, the `name` property should be _relative to the block object_ in the source data.
+
+For example: 
+
+```js
+function FeatureList({ index }) {
+  return (
+    <BlocksControls index={index} focusRing={{ offset: 0 }} insetControls>
+      <div className="wrapper">
+        <InlineBlocks name="features_blocks" blocks={FEATURE_BLOCKS} />
+      </div>
+    </BlocksControls>
+  )
+}
+
+function Feature({ index }) {
+  return (
+    <BlocksControls index={index}>
+      <div className="feature">
+        <h3>
+        {/**
+        * The `name` property is relative to individual 
+        * `features_blocks` array items (blocks). The full path
+        * in the source file (example below) would be 
+        *  `features_blocks[index].heading`
+        */}
+          <InlineTextarea name="heading" focusRing={false} />
+        </h3>
+        <p>
+          <InlineTextarea name="supporting_copy" focusRing={false} />
+        </p>
+      </div>
+    </BlocksControls>
+  )
+}
+
+const featureBlock = {
+  Component: Feature,
+  template: {
+    label: 'Feature',
+    defaultItem: {
+      _template: 'feature',
+      heading: 'Marie Skłodowska Curie',
+      supporting_copy:
+        'Muse about vastness.',
+    },
+    fields: [],
+  },
+}
+
+const FEATURE_BLOCKS = {
+    featureBlock
+}
+```
+
+**Example JSON data*
+
+```json
+{
+    "features_blocks": [
+        {
+            "_template": "feature",
+            "heading": "Drake Equation",
+            "supporting_copy": "Light years gathered by gravity Rig Veda.."
+        },
+        {
+            "_template": "feature",
+            "heading": "Jean-François Champollion",
+            "supporting_copy": "Not a sunrise but a galaxyrise."
+        },
+        {
+            "_template": "feature",
+            "heading": "Sea of Tranquility",
+            "supporting_copy": "Bits of moving fluff take root and flourish."
+        }
+    ]
+}
+```
+
+Below is another example using `InlineBlocks` with multiple block definitions:
 
 ```js
 import { useJsonForm } from 'next-tinacms-json'
@@ -342,13 +432,45 @@ const headingBlock = {
     template: heading_template
 }
 
+/**
+ * Example Paragraph Block
+ * Component + template
+*/
+
+function Paragraph({ index }) {
+  return (
+    <BlocksControls index={index} focusRing={{ offset: 0 }} insetControls>
+      <div className="paragraph__background">
+        <div className="wrapper wrapper--narrow">
+          <p className="paragraph__text">
+            <InlineTextarea name="text" focusRing={false} />
+          </p>
+        </div>
+      </div>
+    </BlocksControls>
+  );
+}
+
+const paragraphBlock = {
+  Component: Paragraph,
+  // template defined inline
+  template: {
+    label: 'Paragraph',
+    defaultItem: {
+      text:
+        'Take root and flourish quis nostrum exercitationem ullam',
+    },
+    fields: [],
+  },
+};
+
 /** 
  * Available blocks passed to InlineBlocks to render 
- * Only one defined here, but there can be many blocks
 */
 
 const PAGE_BLOCKS = {
-    headingBlock
+    headingBlock,
+    paragraphBlock
 }
 ```
 
