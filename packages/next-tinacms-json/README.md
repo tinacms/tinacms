@@ -1,6 +1,6 @@
-# _next-tinacms-json_
+# next-tinacms-json
 
-The `next-tinacms-json` package provides helpers to make local JSON content editable. This package is intended to be used with a Git-based workflow.
+The `next-tinacms-json` package provides helpers to make local JSON content editable. This package is intended to be used with a [Git-based workflow](https://tinacms.org/guides/nextjs/git/getting-started).
 
 ## Installation
 
