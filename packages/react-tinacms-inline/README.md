@@ -326,13 +326,23 @@ Block Components can render _Inline Fields_ to expose the data for editing. When
 For example: 
 
 ```js
-function FeatureList({ index }) {
+import { useForm } from 'tinacms'
+import { InlineForm, InlineBlocks, BlocksControls, InlineTextarea } from 'react-tinacms-inline'
+
+function FeaturePage({ data }) {
+  const [ , form ] = useForm({
+    id: 'my-features-id',
+    label: 'Edit Features',
+    fields: [],
+    initialValues: data,
+  })
+
   return (
-    <BlocksControls index={index} focusRing={{ offset: 0 }} insetControls>
+    <InlineForm form={form}>
       <div className="wrapper">
         <InlineBlocks name="features_blocks" blocks={FEATURE_BLOCKS} />
       </div>
-    </BlocksControls>
+    </InlineForm>
   )
 }
 
@@ -376,7 +386,7 @@ const FEATURE_BLOCKS = {
 }
 ```
 
-**Example JSON data*
+**Example JSON data**
 
 ```json
 {
