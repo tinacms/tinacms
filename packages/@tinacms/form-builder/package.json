@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/form-builder",
-  "version": "0.24.0",
+  "version": "0.26.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -29,11 +29,11 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.24.0"
+    "@tinacms/scripts": "^0.26.0"
   },
   "dependencies": {
-    "@tinacms/forms": "^0.24.0",
-    "@tinacms/react-core": "^0.24.0",
+    "@tinacms/forms": "^0.26.0",
+    "@tinacms/react-core": "^0.26.0",
     "react-final-form": "^6.3.0"
   },
   "peerDependencies": {
