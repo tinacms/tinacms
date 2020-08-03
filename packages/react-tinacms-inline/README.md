@@ -179,7 +179,7 @@ You would only use these options if you were creating custom inline fields and w
 
 **Focus Ring Options**
 
-These options are passed to default [inline fields](https://tinacms.org/docs/ui/inline-editing#all-inline-fields) or inline block fields via the `focusRing` prop on most default inline fields. The options are configurable by the developer setting up the inline form & fields. Refer to individual [inline field documentation](https://tinacms.org/docs/ui/inline-editing#all-inline-fields) for examples.
+These options are passed to default [inline fields](https://tinacms.org/docs/ui/inline-editing#all-inline-fields) or inline block fields via the `focusRing` prop on most default inline fields. The options are configurable by the developer setting up the inline form & fields. Refer to individual [inline field documentation](https://tinacms.org/docs/ui/inline-editing#all-inline-fields) for additional examples.
 
 | Key           | Description                                                                                                                                    |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------------------------------- |
@@ -189,7 +189,35 @@ These options are passed to default [inline fields](https://tinacms.org/docs/ui/
 
 ## Inline Blocks
 
-[Inline Blocks](https://tinacms.org/docs/ui/inline-editing/inline-blocks#inlineblocks-interface) consist of an array of [Blocks](https://tinacms.org/blog/what-are-blocks) to render in an Inline Form. Refer to the Inline Blocks Documentation for [code examples]().
+[Inline Blocks](https://tinacms.org/docs/ui/inline-editing/inline-blocks#inlineblocks-interface) consist of an array of [Blocks](https://tinacms.org/blog/what-are-blocks) to render in an Inline Form. Refer to the Inline Blocks [Documentation](https://tinacms.org/docs/ui/inline-editing/inline-blocks) or [Guide](https://tinacms.org/guides/general/inline-blocks/overview) for code examples on creating Inline Blocks.
+
+**Interface**
+
+```ts
+export interface InlineBlocksProps {
+  name: string
+  blocks: {
+    [key: string]: Block
+  }
+  className?: string
+  direction?: 'vertical' | 'horizontal'
+  itemProps?: {
+    [key: string]: any
+  }
+  min?: number
+  max?: number
+}
+```
+
+| Key         |                                                                                                                                    Purpose |
+| ----------- | -----------------------------------------------------------------------------------------------------------------------------------------: |
+| `name`      |                                                                                            The path to the **source data** for the blocks. |
+| `blocks`    |                                         An object composed of individual [Blocks](/docs/ui/inline-editing/inline-blocks#creating-a-block). |
+| `className` | _Optional_ — To set styles directly on the input or extend via [styled components](/docs/ui/inline-editing#extending-inline-field-styles). |
+| `direction` |                                                    _Optional_ — Sets the orientation of the drag direction and `AddBlock` button position. |
+| `itemProps` |                                                          _Optional_ — An object that passes additional props to every block child element. |
+| `min`       |                         _Optional_ — Controls the minimum number of blocks. Once reached, blocks won't be able to be removed. _(Optional)_ |
+| `max`       |                   _Optional_ — Controls the maximum number of blocks allowed. Once reached, blocks won't be able to be added. _(Optional)_ |
 
 ### Actions
 
@@ -216,14 +244,113 @@ interface InlineBlocksActions {
 
 `useInlineBlocks` is a hook that can be used to access the _Inline Blocks Context_ when creating custom controls.
 
-## Inline Block Field Controls
+### Inline Block Field Controls
 
 Editors can add / delete / rearrange blocks with the [blocks controls](https://tinacms.org/docs/ui/inline-editing/inline-blocks#blocks-controls-options). They can also access additional fields in a [Settings Modal](https://tinacms.org/docs/ui/inline-editing/inline-blocks#using-the-settings-modal).
 
+**Interface**
 
-## Inline Block Definition
+```ts
+interface BlocksControlsProps {
+  index: number
+  insetControls?: boolean
+  focusRing?: false | FocusRingProps
+  children: React.ReactNode
+}
+
+interface FocusRingProps {
+  offset?: number | { x: number; y: number }
+  borderRadius?: number
+}
+```
+
+| Key             | Description                                                                                                                                                                                                                                                                                                                        |
+| --------------- | ---------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------------- |
+| `index`         | The index of the block associated with these controls.                                                                                                                                                                                                                                                                             |
+| `insetControls` | A boolean to denote whether the group controls display within or outside the group.                                                                                                                                                                                                                                                |
+| `focusRing`     | Either an object to style the focus ring or `false`, which hides the focus ring entirely. For styles, `offset` (in pixels) controls the distance from the ring to the edge of the group; `borderRadius`(in pixels) controls the [rounding](https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius) edge of the focus ring. |
+| `children`      | Any child components, typically inline field(s).                                                                                                                                                                                                                                                                                   |
+
+
+### Block Definition
 
 A block is made of two parts: a [component](https://tinacms.org/docs/ui/inline-editing/inline-blocks#part-1-block-component) that renders in edit mode, and a [template](https://tinacms.org/docs/ui/inline-editing/inline-blocks#part-2-block-template) to configure fields, defaults and other required data.
+
+**Interface**
+
+```ts
+interface Block {
+  Component: React.FC<BlockComponentProps>
+  template: BlockTemplate
+}
+
+interface BlockComponentProps {
+  index: number
+  data: any
+}
+
+interface BlockTemplate {
+  label: string
+  defaultItem?: object | (() => object)
+  fields?: Field[]
+}
+```
+
+| Key           |                                                                                                                Purpose |
+| ------------- | ---------------------------------------------------------------------------------------------------------------------: |
+| `label`       |                                                                                                A human readable label. |
+| `defaultItem` |                                                                   _Optional_ — Populates new blocks with default data. |
+| `fields`      | _Optional_ — Populates fields in the [Settings Modal](/docs/ui/inline-editing/inline-blocks#using-the-settings-modal). |
+
+### Example
+
+```js
+import { useJsonForm } from 'next-tinacms-json'
+import { InlineForm, InlineBlocks, BlocksControls, InlineTextarea } from 'react-tinacms-inline'
+
+export default function PageBlocks({ jsonFile }) {
+  const [, form] = useJsonForm(jsonFile)
+
+  return (
+    <InlineForm form={form}>
+      <InlineBlocks name="my_blocks" blocks={PAGE_BLOCKS} />
+    </InlineForm>
+  )
+}
+
+/** Example Heading Block Definition
+ * Component + template 
+*/
+function Heading({ index }) {
+  return (
+    <BlocksControls index={index}>
+      <InlineTextarea name="text" />
+    </BlocksControls>
+  )
+}
+
+const heading_template = {
+  label: 'Heading',
+  defaultItem: {
+    text: 'At vero eos et accusamus',
+  },
+  fields: [],
+}
+
+const headingBlock = {
+    Component: Heading,
+    template: heading_template
+}
+
+/** 
+ * Available blocks passed to InlineBlocks to render 
+ * Only one defined here, but there can be many blocks
+*/
+
+const PAGE_BLOCKS = {
+    headingBlock
+}
+```
 
 
 > Checkout this guide to learn more on using [Inline Blocks](https://tinacms.org/guides/general/inline-blocks/overview).
