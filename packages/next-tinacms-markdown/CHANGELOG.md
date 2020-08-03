@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](https://github.com/tinacms/tinacms/compare/v0.25.0...v0.26.0) (2020-08-03)
+
+
+### Bug Fixes
+
+* **next-tinacms-markdown:** useMarkdownForm#loadInitialValues does not run when cms is disabled ([3292bf4](https://github.com/tinacms/tinacms/commit/3292bf4bae15ee3c47f474ce46555a1491249d56))
+
+
+
+
+
 ## [0.2.24-alpha.0](https://github.com/tinacms/tinacms/compare/next-tinacms-markdown@0.2.23...next-tinacms-markdown@0.2.24-alpha.0) (2020-07-15)
 
 **Note:** Version bump only for package next-tinacms-markdown

@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](https://github.com/tinacms/tinacms/compare/v0.25.0...v0.26.0) (2020-08-03)
+
+
+### Features
+
+* add focus ring to inline wysiwyg ([2768afd](https://github.com/tinacms/tinacms/commit/2768afd1b69bdef2a3dce38dab6b71d002ddbad6))
+
+
+
+
+
 ## [0.10.2-alpha.0](https://github.com/tinacms/tinacms/compare/react-tinacms-inline@0.10.1...react-tinacms-inline@0.10.2-alpha.0) (2020-07-15)
 
 **Note:** Version bump only for package react-tinacms-inline
