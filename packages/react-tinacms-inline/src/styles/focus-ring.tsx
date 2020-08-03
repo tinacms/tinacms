@@ -26,9 +26,8 @@ export interface FocusRingOptions {
   nestedFocus?: boolean
 }
 
-export interface StyledFocusRingProps {
-  offset?: number | { x: number; y: number }
-  borderRadius?: number
+export interface StyledFocusRingProps
+  extends Omit<FocusRingOptions, 'nestedFocus'> {
   active: boolean
   disableHover?: boolean
   disableChildren?: boolean
@@ -36,7 +35,7 @@ export interface StyledFocusRingProps {
 
 export interface FocusRingProps {
   name?: string
-  children?: any
+  children?: React.ReactNode
   options?: boolean | FocusRingOptions
 }
 
@@ -56,7 +55,7 @@ export const FocusRing = ({ name, options, children }: FocusRingProps) => {
     setChildActive(focussedField.startsWith(name!))
   }, [name, options, focussedField])
 
-  const updateFocusedField = (event: any) => {
+  const updateFocusedField = (event: React.MouseEvent<HTMLElement>) => {
     if (active || !name) return
     setFocussedField(name)
     event.stopPropagation()
