@@ -10,10 +10,17 @@ yarn add next-tinacms-markdown
 
 ## Helpers
 
-- `useMarkdownForm( markdownFile, options? ):[values, form]` - A [React Hook](https://reactjs.org/docs/hooks-intro.html) for registering local forms with [function components](https://reactjs.org/docs/components-and-props.html#function-and-class-components).
-- `markdownForm( Component, options? ): Component` - A [React Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) for registering local forms with class or function components.
-- `useLocalMarkdownForm`(deprecated)
-- `useGlobalMarkdownForm`(deprecated)
+```ts
+useMarkdownForm( markdownFile, options? ):[values, form]
+```
+A [React Hook](https://reactjs.org/docs/hooks-intro.html) for registering local forms with [function components](https://reactjs.org/docs/components-and-props.html#function-and-class-components).
+
+```ts
+markdownForm( Component, options? ): Component
+```
+
+A [React Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) for registering local forms with class or function components.
+
 
 **Arguments**
 
