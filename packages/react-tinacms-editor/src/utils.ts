@@ -80,6 +80,8 @@ export const getMarkPresent = (state: EditorState, markType: MarkType) => {
 }
 
 const getOS = () => {
+  // @ts-ignore
+  if (typeof global['navigator'] === 'undefined') return 'Windows'
   const nAgt = navigator.userAgent
   const clientStrings = [
     { s: 'Windows', r: /Win16/ },
