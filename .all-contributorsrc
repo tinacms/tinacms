@@ -730,6 +730,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "Nazeh",
+      "name": "Ar Nazeh",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/40009100?v=4",
+      "profile": "http://Nazeh.me",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
