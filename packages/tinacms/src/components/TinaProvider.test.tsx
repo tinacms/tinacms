@@ -119,11 +119,8 @@ describe('TinaProvider', () => {
           sidebar: true,
         })
         const onMount = jest.fn()
-        const Child = () => {
-          useEffect(() => {
-            onMount()
-          }, [])
-
+        function Child() {
+          useEffect(onMount, [])
           return null
         }
         render(
