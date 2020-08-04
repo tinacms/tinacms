@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { render } from '@testing-library/react'
-import React from 'react'
+import { render, act } from '@testing-library/react'
+import React, { useEffect } from 'react'
 import { TinaProvider, INVALID_CMS_ERROR } from './TinaProvider'
 import { TinaCMS } from '../tina-cms'
 import { CMS } from '@tinacms/core'
@@ -112,6 +112,31 @@ describe('TinaProvider', () => {
 
         const sidebarButton = app.queryByLabelText('toggles cms sidebar')
         expect(sidebarButton).toBeNull()
+      })
+      it('does not remount children when cms is toggled', () => {
+        const cms = new TinaCMS({
+          enabled: false,
+          sidebar: true,
+        })
+        const onMount = jest.fn()
+        const Child = () => {
+          useEffect(() => {
+            onMount()
+          }, [])
+
+          return null
+        }
+        render(
+          <TinaProvider cms={cms}>
+            <Child />
+          </TinaProvider>
+        )
+
+        act(() => {
+          cms.enable()
+        })
+
+        expect(onMount).toHaveBeenCalledTimes(1)
       })
     })
     describe('when sidebar is false', () => {
