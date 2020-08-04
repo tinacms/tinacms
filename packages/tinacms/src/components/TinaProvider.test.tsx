@@ -91,4 +91,50 @@ describe('TinaProvider', () => {
       })
     })
   })
+  describe('when the CMS is disabled', () => {
+    describe('when sidebar is true', () => {
+      const cms = new TinaCMS({
+        enabled: false,
+        sidebar: true,
+      })
+
+      it('renders children', () => {
+        const app = render(
+          <TinaProvider cms={cms}>
+            <span>something</span>
+          </TinaProvider>
+        )
+
+        app.getByText('something')
+      })
+      it('does not render the "toggle cms" sidebar button', () => {
+        const app = render(<TinaProvider cms={cms} />)
+
+        const sidebarButton = app.queryByLabelText('toggles cms sidebar')
+        expect(sidebarButton).toBeNull()
+      })
+    })
+    describe('when sidebar is false', () => {
+      const cms = new TinaCMS({
+        enabled: false,
+        sidebar: false,
+      })
+
+      it('renders children', () => {
+        const app = render(
+          <TinaProvider cms={cms}>
+            <span>something</span>
+          </TinaProvider>
+        )
+
+        app.getByText('something')
+      })
+      it('does not render the "toggle cms" sidebar button', () => {
+        const app = render(<TinaProvider cms={cms} />)
+
+        const sidebarButton = app.queryByLabelText('toggles cms sidebar')
+        expect(sidebarButton).toBeNull()
+      })
+    })
+  })
 })
