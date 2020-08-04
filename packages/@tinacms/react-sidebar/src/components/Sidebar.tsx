@@ -170,6 +170,7 @@ const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
     <SidebarToggleButton
       onClick={() => (sidebar.isOpen = !sidebar.isOpen)}
       open={sidebar.isOpen}
+      aria-label="toggles cms sidebar"
     >
       {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
     </SidebarToggleButton>
