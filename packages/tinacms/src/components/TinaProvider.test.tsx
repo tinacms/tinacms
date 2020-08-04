@@ -46,4 +46,30 @@ describe('TinaProvider', () => {
       expect(t).toThrowError(INVALID_CMS_ERROR)
     })
   })
+  describe('when the CMS is enabled', () => {
+    describe('when sidebar is true', () => {
+      it('renders children', () => {
+        const cms = new TinaCMS({
+          enabled: true,
+          sidebar: true,
+        })
+        const app = render(
+          <TinaProvider cms={cms}>
+            <span>something</span>
+          </TinaProvider>
+        )
+        app.getByText('something')
+      })
+      it('renders the "toggle cms" sidebar button', () => {
+        const cms = new TinaCMS({
+          enabled: true,
+          sidebar: true,
+        })
+
+        const app = render(<TinaProvider cms={cms} />)
+
+        app.getByLabelText('toggles cms sidebar')
+      })
+    })
+  })
 })
