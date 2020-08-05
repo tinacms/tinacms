@@ -99,7 +99,7 @@ interface InlineWysiwygConfig {
 
 interface WysiwygImageProps {
   upload?: (files: File[]) => Promise<string[]>
-  previewUrl?: (url: string) => string
+  previewUrl?: (url: string) => string | Promise<string>
 }
 ```
 
