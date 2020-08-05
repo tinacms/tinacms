@@ -1,4 +1,5 @@
 import { apiProxy } from './proxy'
+import { ReqStub, ResStub } from '../test-helpers'
 
 describe('apiProxy', () => {
   describe('without a signing key', () => {
@@ -23,9 +24,15 @@ describe('apiProxy', () => {
       expect(res.json).toHaveBeenCalled()
     })
   })
-})
+  describe('when CSRF token is not in the request cookies ', () => {
+    it('responds with status 401', async () => {
+      const handler = apiProxy('example-signing-key')
+      const req = new ReqStub()
+      const res = new ResStub()
 
-class ResStub {
-  status = jest.fn(() => this)
-  json = jest.fn()
-}
+      await handler(req, res)
+
+      expect(res.status).toHaveBeenCalledWith(401)
+    })
+  })
+})
