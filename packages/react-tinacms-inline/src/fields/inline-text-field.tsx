@@ -26,6 +26,7 @@ export interface InlineTextProps {
   name: string
   className?: string
   focusRing?: boolean | FocusRingOptions
+  placeholder?: string
 }
 
 /**
@@ -38,6 +39,7 @@ export function InlineText({
   name,
   className,
   focusRing = true,
+  placeholder,
 }: InlineTextProps) {
   const cms: CMS = useCMS()
 
@@ -46,16 +48,28 @@ export function InlineText({
       {({ input }) => {
         if (cms.enabled) {
           if (!focusRing) {
-            return <Input type="text" {...input} className={className} />
+            return (
+              <Input
+                type="text"
+                {...input}
+                placeholder={placeholder}
+                className={className}
+              />
+            )
           }
 
           return (
             <FocusRing name={name} options={focusRing}>
-              <Input type="text" {...input} className={className} />
+              <Input
+                type="text"
+                {...input}
+                placeholder={placeholder}
+                className={className}
+              />
             </FocusRing>
           )
         }
-        return <>{input.value}</>
+        return <>{input.value || placeholder}</>
       }}
     </InlineField>
   )
