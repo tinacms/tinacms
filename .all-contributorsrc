@@ -739,6 +739,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "davidroyer",
+      "name": "David Royer",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/8834693?v=4",
+      "profile": "https://www.davidroyer.me/",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
