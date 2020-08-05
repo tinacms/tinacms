@@ -171,6 +171,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="http://laurenclark.io"><img src="https://avatars1.githubusercontent.com/u/5822683?v=4" width="100px;" alt=""/><br /><sub><b>Lauren Clark</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=laurenclark" title="Documentation">📖</a></td>
     <td align="center"><a href="http://Nazeh.me"><img src="https://avatars0.githubusercontent.com/u/40009100?v=4" width="100px;" alt=""/><br /><sub><b>Ar Nazeh</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Nazeh" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://www.davidroyer.me/"><img src="https://avatars3.githubusercontent.com/u/8834693?v=4" width="100px;" alt=""/><br /><sub><b>David Royer</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=davidroyer" title="Documentation">📖</a></td>
     <td align="center"><a href="http://heytulsiprasad.now.sh"><img src="https://avatars2.githubusercontent.com/u/52394293?v=4" width="100px;" alt=""/><br /><sub><b>Tulsi Prasad</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=heytulsiprasad" title="Documentation">📖</a></td>
   </tr>
 </table>
