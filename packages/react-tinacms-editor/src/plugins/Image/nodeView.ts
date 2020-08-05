@@ -30,7 +30,7 @@ export class ImageView implements NodeView {
   constructor(
     node: Node,
     view: EditorView,
-    previewSrc: (url: string) => string = Identity
+    private previewSrc: (src: string) => string = Identity
   ) {
     this.node = node
     this.view = view
@@ -39,13 +39,18 @@ export class ImageView implements NodeView {
     this.dom.classList.add('tinacms-image-wrapper')
     this.img = document.createElement('img')
     const { src, align, alt, title, width, height } = node.attrs
-    this.img.src = previewSrc(src)
+    this.updateImgSrc(src)
     if (height) this.img.style.height = height
     if (width) this.img.style.width = width
     if (align) this.img.classList.add(`align-${align}`)
     if (alt) this.img.alt = alt
     if (title) this.img.title = title
     this.dom.appendChild(this.img)
+  }
+  async updateImgSrc(src: string) {
+    if (this.img) {
+      this.img.src = await this.previewSrc(src)
+    }
   }
 
   update(node: Node) {
