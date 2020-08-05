@@ -18,6 +18,7 @@ limitations under the License.
 
 import { Node } from 'prosemirror-model'
 import { EditorView, NodeView } from 'prosemirror-view'
+import { ImageProps } from '../../types'
 
 const Identity = (str: string) => str
 
@@ -30,7 +31,7 @@ export class ImageView implements NodeView {
   constructor(
     node: Node,
     view: EditorView,
-    private previewSrc: (src: string) => string = Identity
+    private previewSrc: ImageProps['previewUrl'] = Identity
   ) {
     this.node = node
     this.view = view
@@ -49,7 +50,7 @@ export class ImageView implements NodeView {
   }
   async updateImgSrc(src: string) {
     if (this.img) {
-      this.img.src = await this.previewSrc(src)
+      this.img.src = await this.previewSrc!(src)
     }
   }
 
