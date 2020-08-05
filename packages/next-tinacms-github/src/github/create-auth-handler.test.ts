@@ -1,4 +1,5 @@
 import { createAuthHandler } from './create-auth-handler'
+import { ResStub } from '../test-helpers'
 
 describe('createAuthHandler', () => {
   describe('without a signing key', () => {
@@ -24,8 +25,3 @@ describe('createAuthHandler', () => {
     })
   })
 })
-
-class ResStub {
-  status = jest.fn(() => this)
-  json = jest.fn()
-}
