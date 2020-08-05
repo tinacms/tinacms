@@ -21,10 +21,10 @@ import axios from 'axios'
 
 export const apiProxy = (signingKey: string) => (req: any, res: any) => {
   if (!signingKey) {
-    return res.status(500).json({
-      message:
-        'next-tinacms-github: the apiProxy was created without a signing key.',
-    })
+    const message =
+      'next-tinacms-github: the apiProxy was created without a signing key.'
+    console.error(message)
+    return res.status(500).json({ message })
   }
   const { headers, ...data } = JSON.parse(req.body)
 

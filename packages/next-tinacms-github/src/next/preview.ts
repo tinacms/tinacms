@@ -21,10 +21,11 @@ import { AES, enc } from 'crypto-js'
 
 export const previewHandler = (signingKey: string) => (req: any, res: any) => {
   if (!signingKey) {
-    return res.status(500).json({
-      message:
-        'next-tinacms-github: previewHandler was created without a signing key.',
-    })
+    const message =
+      'next-tinacms-github: previewHandler was created without a signing key.'
+
+    console.error(message)
+    return res.status(500).json({ message })
   }
   const expectedCSRFToken = req.cookies[CSRF_TOKEN_KEY]
 
