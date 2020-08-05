@@ -1,5 +1,5 @@
 [![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint/badge.svg) [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-72-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-73-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 [![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
@@ -171,6 +171,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="http://laurenclark.io"><img src="https://avatars1.githubusercontent.com/u/5822683?v=4" width="100px;" alt=""/><br /><sub><b>Lauren Clark</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=laurenclark" title="Documentation">📖</a></td>
     <td align="center"><a href="http://Nazeh.me"><img src="https://avatars0.githubusercontent.com/u/40009100?v=4" width="100px;" alt=""/><br /><sub><b>Ar Nazeh</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Nazeh" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://heytulsiprasad.now.sh"><img src="https://avatars2.githubusercontent.com/u/52394293?v=4" width="100px;" alt=""/><br /><sub><b>Tulsi Prasad</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=heytulsiprasad" title="Documentation">📖</a></td>
   </tr>
 </table>
 
