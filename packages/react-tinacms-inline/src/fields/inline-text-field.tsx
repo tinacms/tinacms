@@ -21,11 +21,13 @@ import styled from 'styled-components'
 import { useCMS, CMS } from 'tinacms'
 import { FocusRing, FocusRingOptions } from '../styles'
 import { InlineField } from '..'
+import { InlineFieldProps } from '../inline-field'
 
 export interface InlineTextProps {
   name: string
   className?: string
   focusRing?: boolean | FocusRingOptions
+  children?: InlineFieldProps['children']
 }
 
 /**
@@ -55,7 +57,7 @@ export function InlineText({
             </FocusRing>
           )
         }
-        return <>{input.value}</>
+        return <>{children ?? input.value}</>
       }}
     </InlineField>
   )
