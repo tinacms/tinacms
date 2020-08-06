@@ -40,16 +40,15 @@ export function InlineWysiwyg({
 
   const imageProps: ImageProps = React.useMemo(() => {
     return {
-      upload: async (files: File[]) => {
-        // TODO: ensure `directory` ends in `/`
-        const response = await cms.media.store.persist(
+      async upload(files: File[]) {
+        const allMedia = await cms.media.store.persist(
           files.map(file => ({
             directory: passedInImageProps?.directory || '',
             file,
           }))
         )
 
-        return response.map(media => `${media.directory}${media.filename}`)
+        return allMedia.map(media => `${media.directory}${media.filename}`)
       },
       ...passedInImageProps,
     }
