@@ -21,7 +21,7 @@ import { useCMS } from 'tinacms'
 import { InlineField, FocusRing } from 'react-tinacms-inline'
 import { FocusRingOptions } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
-import { EditorProps } from '../types'
+import { EditorProps, ImageProps } from '../types'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
@@ -33,9 +33,27 @@ export function InlineWysiwyg({
   name,
   children,
   focusRing = true,
+  imageProps: passedInImageProps,
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   const cms = useCMS()
+
+  const imageProps: ImageProps = React.useMemo(() => {
+    return {
+      upload: async (files: File[]) => {
+        // TODO: ensure `directory` ends in `/`
+        const response = await cms.media.store.persist(
+          files.map(file => ({
+            directory: passedInImageProps?.directory || '',
+            file,
+          }))
+        )
+
+        return response.map(media => `${media.directory}${media.filename}`)
+      },
+      ...passedInImageProps,
+    }
+  }, [cms.media.store])
 
   if (cms.disabled) {
     return children
@@ -46,7 +64,7 @@ export function InlineWysiwyg({
       {({ input }: any) => {
         return (
           <FocusRing name={name} options={focusRing}>
-            <Wysiwyg input={input} {...wysiwygProps} />
+            <Wysiwyg input={input} {...wysiwygProps} imageProps={imageProps} />
           </FocusRing>
         )
       }}
