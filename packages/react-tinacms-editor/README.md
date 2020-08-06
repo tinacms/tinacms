@@ -89,15 +89,16 @@ The `InlineWysiwyg` is a React [inline editing component](https://tinacms.org/do
 ### InlineWysiwyg Interface
 
 ```typescript
-interface InlineWysiwygConfig {
+interface InlineWysiwygProps {
   name: string
   children: any
-  sticky?: boolean
+  sticky?: boolean | string
   format?: 'markdown' | 'html'
-  imageProps?: WysiwysImageProps
+  imageProps?: ImageProps
 }
 
-interface WysiwygImageProps {
+interface ImageProps {
+  directory?: string
   upload?: (files: File[]) => Promise<string[]>
   previewUrl?: (url: string) => string | Promise<string>
 }
@@ -111,7 +112,7 @@ interface WysiwygImageProps {
 | `format?`     | This value denotes whether Markdown or HTML will be rendered.                                |
 | `imageProps?` | Configures how images in the Wysiwyg are uploaded and rendered.
 
-### Example: Basic Usage
+### Basic Usage
 
 Below is an example of how an `InlineWysiwyg` field could be defined in an [Inline Form](/docs/ui/inline-editing).
 
@@ -135,7 +136,27 @@ export function Page(props) {
 }
 ```
 
-### Example: Dynamic Imports
+### Sticky Menu
+
+When editing long content it is likely that the editor will scroll past the wysiwyg menu.
+
+By adding the `sticky` property the menu will follow the user as they scroll through the page.
+
+```jsx
+<InlineWysiwyg name="markdownBody" format="markdown" sticky>
+  <ReactMarkdown source={data.markdownBody} />
+</InlineWysiwyg>
+```
+
+Alternatively you can pass a string to set the exact offset of the menu.
+
+```jsx
+<InlineWysiwyg name="markdownBody" format="markdown" sticky="2rem">
+  <ReactMarkdown source={data.markdownBody} />
+</InlineWysiwyg>
+```
+
+### Dynamic Imports
 
 The `react-tinacms-editor` is a large package so it is recommended that you make sure it's only being loaded when necessary. The example below will make sure that the editor is only loaded _if_ the CMS is actually enabled, saving the visistors to your website from the extra load time.
 
