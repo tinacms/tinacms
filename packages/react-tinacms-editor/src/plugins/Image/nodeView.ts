@@ -49,8 +49,11 @@ export class ImageView implements NodeView {
     this.dom.appendChild(this.img)
   }
   async updateImgSrc(src: string) {
-    if (this.img) {
+    if (!this.img) return
+    try {
       this.img.src = await this.previewSrc!(src)
+    } catch {
+      this.img.src = src
     }
   }
 
