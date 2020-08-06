@@ -35,7 +35,6 @@
     "styled-components": ">=4.1"
   },
   "dependencies": {
-    "@scarf/scarf": "^1.0.6",
     "@tinacms/alerts": "^0.26.0",
     "@tinacms/core": "^0.26.0",
     "@tinacms/fields": "^0.26.0",
