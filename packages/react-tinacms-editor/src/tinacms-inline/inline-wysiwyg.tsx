@@ -22,7 +22,6 @@ import { InlineField, FocusRing } from 'react-tinacms-inline'
 import { FocusRingOptions } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
 import { EditorProps, ImageProps } from '../types'
-import { image } from 'schema/nodes/image'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
