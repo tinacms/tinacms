@@ -263,7 +263,7 @@ export class GithubClient {
     })
   }
 
-  async getDownloadUrl(path: string) {
+  async getDownloadUrl(path: string): Promise<string> {
     const res = await this.fetchFile(path, false)
     return res.download_url
   }
