@@ -74,7 +74,7 @@ export function BlocksControls({
   const addAfterPosition = direction === 'horizontal' ? 'right' : 'bottom'
 
   if (cms.disabled) {
-    return children || null
+    return <>{children}</>
   }
 
   const removeBlock = (event: any) => {
