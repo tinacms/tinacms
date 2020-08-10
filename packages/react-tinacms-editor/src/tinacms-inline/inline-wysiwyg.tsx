@@ -22,6 +22,7 @@ import { InlineField, FocusRing } from 'react-tinacms-inline'
 import { FocusRingOptions } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
 import { EditorProps, ImageProps } from '../types'
+import { image } from 'schema/nodes/image'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
@@ -33,7 +34,7 @@ export function InlineWysiwyg({
   name,
   children,
   focusRing = true,
-  imageProps: passedInImageProps,
+  imageProps: passedInImageProps = {},
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   const cms = useCMS()
@@ -52,7 +53,12 @@ export function InlineWysiwyg({
       },
       ...passedInImageProps,
     }
-  }, [cms.media.store])
+  }, [
+    cms.media.store,
+    passedInImageProps.directory,
+    passedInImageProps.previewUrl,
+    passedInImageProps.upload,
+  ])
 
   if (cms.disabled) {
     return children
