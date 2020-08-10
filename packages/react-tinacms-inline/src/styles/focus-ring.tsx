@@ -35,7 +35,7 @@ export interface StyledFocusRingProps
 
 export interface FocusRingProps {
   name?: string
-  children?: React.ReactNode
+  children?: React.ReactChild
   options?: boolean | FocusRingOptions
 }
 
