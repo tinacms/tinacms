@@ -1,6 +1,6 @@
 # react-tinacms-inline
 
-This package provides the components and helpers for [Inline Editing](https://tinacms.org/docs/ui/inline-editing). 
+This package provides the components and helpers for [Inline Editing](https://tinacms.org/docs/ui/inline-editing).
 
 ## Install
 
@@ -25,7 +25,7 @@ export function Page(props) {
     <InlineForm form={form}>
       <main>
         {
-            //... 
+            //...
         }
       </main>
     </InlineForm>
@@ -33,7 +33,7 @@ export function Page(props) {
 }
 ```
 
-### Interface 
+### Interface
 
 ```ts
 interface InlineFormProps {
@@ -76,9 +76,9 @@ The `useInlineForm` [hook](https://reactjs.org/docs/hooks-intro.html) can be use
 
 ## Inline Field
 
-Inline Fields should provide basic inputs for editing data on the page and account for both [enabled / disabled CMS states](https://tinacms.org/docs/cms#disabling--enabling-the-cms). All Inline Fields must be children of an `InlineForm`. 
+Inline Fields should provide basic inputs for editing data on the page and account for both [enabled / disabled CMS states](https://tinacms.org/docs/cms#disabling--enabling-the-cms). All Inline Fields must be children of an `InlineForm`.
 
-### Interface 
+### Interface
 
 ```ts
 export interface InlineFieldProps {
@@ -100,7 +100,7 @@ export interface InlineFieldRenderProps<V = any>
 
 See the full list of [inline fields](https://tinacms.org/docs/ui/inline-editing#all-inline-fields) or learn how to make [custom inline fields](https://tinacms.org/docs/ui/inline-editing#creating-custom-inline-fields).
 
-Below is a list of fields provided by the `react-tinacms-inline` package: 
+Below is a list of fields provided by the `react-tinacms-inline` package:
 - [Inline Text](https://tinacms.org/docs/ui/inline-editing/inline-text)
 - [InlineTextarea](https://tinacms.org/docs/ui/inline-editing/inline-textarea)
 - [Inline Group](https://tinacms.org/docs/ui/inline-editing/inline-group)
@@ -149,18 +149,18 @@ export function InlineText({
 }
 ```
 
-`Input` is a styled-component with some [base styling](https://github.com/tinacms/tinacms/blob/master/packages/react-tinacms-inline/src/fields/inline-text-field.tsx#L64) aimed at making this component mesh well with the surrounding site. If you ever need to override default Inline Field styles, read about this workaround to [extend styles](https://tinacms.org/docs/ui/inline-editing#extending-inline-field-styles). 
+`Input` is a styled-component with some [base styling](https://github.com/tinacms/tinacms/blob/master/packages/react-tinacms-inline/src/fields/inline-text-field.tsx#L64) aimed at making this component mesh well with the surrounding site. If you ever need to override default Inline Field styles, read about this workaround to [extend styles](https://tinacms.org/docs/ui/inline-editing#extending-inline-field-styles).
 
 ### Focus Ring
 
-The common UI element on all Inline Fields is the `FocusRing`. The focus ring provides context to which field is active / available to edit. 
+The common UI element on all Inline Fields is the `FocusRing`. The focus ring provides context to which field is active / available to edit.
 
 **Interface**
 
 ```ts
 interface FocusRingProps {
   name?: string
-  children?:  React.ReactNode
+  children?:  React.ReactChild
   options?: boolean | FocusRingOptions
 }
 
@@ -263,7 +263,7 @@ interface BlocksControlsProps {
   index: number
   insetControls?: boolean
   focusRing?: false | FocusRingProps
-  children: React.ReactNode
+  children: React.ReactChild
 }
 
 interface FocusRingProps {
@@ -323,7 +323,7 @@ interface BlockTemplate {
 
 Block Components can render _Inline Fields_ to expose the data for editing. When using Inline Fields within a block, the `name` property should be _relative to the block object_ in the source data.
 
-For example: 
+For example:
 
 ```js
 import { useForm } from 'tinacms'
@@ -352,9 +352,9 @@ function Feature({ index }) {
       <div className="feature">
         <h3>
         {/**
-        * The `name` property is relative to individual 
+        * The `name` property is relative to individual
         * `features_blocks` array items (blocks). The full path
-        * in the source file (example below) would be 
+        * in the source file (example below) would be
         *  `features_blocks[index].heading`
         */}
           <InlineTextarea name="heading" focusRing={false} />
@@ -427,7 +427,7 @@ export default function PageBlocks({ jsonFile }) {
 }
 
 /** Example Heading Block Definition
- * Component + template 
+ * Component + template
 */
 function Heading({ index }) {
   return (
@@ -482,8 +482,8 @@ const paragraphBlock = {
   },
 };
 
-/** 
- * Available blocks passed to InlineBlocks to render 
+/**
+ * Available blocks passed to InlineBlocks to render
 */
 
 const PAGE_BLOCKS = {
