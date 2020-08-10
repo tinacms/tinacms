@@ -50,6 +50,9 @@ export function InlineWysiwyg({
 
         return allMedia.map(media => `${media.directory}${media.filename}`)
       },
+      previewUrl(src) {
+        return cms.media.store.previewSrc(src)
+      },
       ...passedInImageProps,
     }
   }, [
