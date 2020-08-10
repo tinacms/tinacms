@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-forms",
-  "version": "0.26.0",
+  "version": "0.27.1",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -28,7 +28,7 @@
     "@tinacms/forms": "^0.26.0",
     "@tinacms/icons": "^0.26.0",
     "@tinacms/react-core": "^0.26.0",
-    "@tinacms/react-modals": "^0.26.0",
+    "@tinacms/react-modals": "^0.27.1",
     "@tinacms/scripts": "^0.26.0",
     "@tinacms/styles": "^0.26.0",
     "@types/react-beautiful-dnd": "^11.0.3"
