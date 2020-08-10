@@ -25,13 +25,10 @@ lerna version \
   --allow-branch latest \
   --create-release github \
   -m "chore(publish): latest" \
-  --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
+  --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'A
 
 # 5. Publish to NPM
 lerna publish from-package --yes
-
-# 6. Push CHANGELOGs and tags to GitHub
-git push && git push --tags
 
 # 7. Backmerge to master
 git checkout master
