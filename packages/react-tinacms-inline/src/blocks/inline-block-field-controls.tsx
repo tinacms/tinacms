@@ -39,7 +39,7 @@ import { StyledFocusRing } from '../styles'
 import { FocusRingOptions, getOffset, getOffsetX, getOffsetY } from '../styles'
 
 export interface BlocksControlsProps {
-  children?: React.ReactChild
+  children: React.ReactChild
   index: number
   insetControls?: boolean
   focusRing?: boolean | FocusRingOptions
@@ -74,7 +74,7 @@ export function BlocksControls({
   const addAfterPosition = direction === 'horizontal' ? 'right' : 'bottom'
 
   if (cms.disabled) {
-    return children
+    return children || null
   }
 
   const removeBlock = (event: any) => {
