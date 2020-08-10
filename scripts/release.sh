@@ -14,8 +14,6 @@ git merge master
 
 # 3. Run a Fresh Build
 npm run hard-reset
-git add .
-git commit -am "chore: package-lock"
 
 # 4. Generate CHANGELOGs and Git Tags
 #    You must have GH_TOKEN in your environment variables
