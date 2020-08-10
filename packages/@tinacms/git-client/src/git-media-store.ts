@@ -44,4 +44,7 @@ export class GitMediaStore implements MediaStore {
 
     return uploaded
   }
+  async previewSrc(src: string) {
+    return src
+  }
 }
