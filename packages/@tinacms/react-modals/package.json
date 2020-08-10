@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-modals",
-  "version": "0.26.0",
+  "version": "0.27.1",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",

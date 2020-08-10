@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/fields",
-  "version": "0.26.0",
+  "version": "0.27.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -36,8 +36,8 @@
     "@tinacms/forms": "^0.26.0",
     "@tinacms/icons": "^0.26.0",
     "@tinacms/react-core": "^0.26.0",
-    "@tinacms/react-forms": "^0.26.0",
-    "@tinacms/react-modals": "^0.26.0",
+    "@tinacms/react-forms": "^0.27.1",
+    "@tinacms/react-modals": "^0.27.1",
     "@tinacms/scripts": "^0.26.0",
     "@tinacms/styles": "^0.26.0",
     "@types/codemirror": "^0.0.71",
