@@ -41,22 +41,27 @@ export function buildEditorState(
   value: string,
   imageProps?: ImageProps
 ) {
+  const plugins = [
+    commonPlugin,
+    inlinePlugin,
+    inputRules(schema),
+    keymap(buildKeymap(schema)),
+    history(),
+    linkPlugin(),
+    dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
+    gapCursor(),
+    tableEditing(),
+    tablePlugin,
+    codeBlockPlugin,
+  ]
+
+  if (imageProps) {
+    plugins.push(imagePlugin(imageProps))
+  }
+
   return EditorState.create({
     schema,
     doc: translator.nodeFromString(value),
-    plugins: [
-      commonPlugin,
-      inlinePlugin,
-      inputRules(schema),
-      keymap(buildKeymap(schema)),
-      history(),
-      linkPlugin(),
-      dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
-      gapCursor(),
-      tableEditing(),
-      tablePlugin,
-      imagePlugin(imageProps || {}),
-      codeBlockPlugin,
-    ],
+    plugins,
   })
 }
