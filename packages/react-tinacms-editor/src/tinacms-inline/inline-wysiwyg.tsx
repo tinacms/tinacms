@@ -51,7 +51,7 @@ export function InlineWysiwyg({
 
         return allMedia.map(media => passedInImageProps.parse(media.filename))
       },
-      previewUrl(src) {
+      previewSrc(src) {
         return cms.media.store.previewSrc(src)
       },
       ...passedInImageProps,
@@ -59,7 +59,7 @@ export function InlineWysiwyg({
   }, [
     cms.media.store,
     passedInImageProps?.directory,
-    passedInImageProps?.previewUrl,
+    passedInImageProps?.previewSrc,
     passedInImageProps?.upload,
   ])
 
