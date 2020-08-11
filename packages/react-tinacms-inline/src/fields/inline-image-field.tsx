@@ -27,7 +27,7 @@ export interface InlineImageProps {
   name: string
   parse(filename: string): string
   uploadDir(form: Form): string
-  previewSrc?(formValues: any): string
+  previewSrc?(formValues: any): string | Promise<string>
   focusRing?: boolean | FocusRingOptions
   children?: any
 }
