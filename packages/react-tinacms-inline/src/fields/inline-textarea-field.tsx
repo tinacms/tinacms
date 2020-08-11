@@ -33,6 +33,7 @@ export const InlineTextareaField = InlineTextarea
 export function InlineTextarea({
   name,
   className,
+  placeholder,
   focusRing = true,
 }: InlineTextProps) {
   const cms = useCMS()
@@ -42,12 +43,24 @@ export function InlineTextarea({
       {({ input }) => {
         if (cms.enabled) {
           if (!focusRing) {
-            return <Textarea className={className} {...input} rows={1} />
+            return (
+              <Textarea
+                className={className}
+                {...input}
+                rows={1}
+                placeholder={placeholder}
+              />
+            )
           }
 
           return (
             <FocusRing name={name} options={focusRing}>
-              <Textarea className={className} {...input} rows={1} />
+              <Textarea
+                className={className}
+                {...input}
+                rows={1}
+                placeholder={placeholder}
+              />
             </FocusRing>
           )
         }
