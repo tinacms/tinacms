@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import { CMS } from './cms'
+import { CMSEvent, EventBus } from './event'
 
 describe('CMS', () => {
   describe('when constructed without options', () => {
@@ -85,6 +86,22 @@ describe('CMS', () => {
         })
 
         expect(cms.api.test).toBe(test)
+      })
+    })
+  })
+
+  describe('#registerApi', () => {
+    describe('when the API has `events` of type EventBus', () => {
+      it('events dispatched to the API are also sent through the CMS', () => {
+        const listener = jest.fn()
+        const event: CMSEvent = { type: 'api:example' }
+        const example = { events: new EventBus() }
+        const cms = new CMS({ apis: { example } })
+        cms.events.subscribe('*', listener)
+
+        cms.api.example.events.dispatch(event)
+
+        expect(listener).toHaveBeenCalledWith(event)
       })
     })
   })
