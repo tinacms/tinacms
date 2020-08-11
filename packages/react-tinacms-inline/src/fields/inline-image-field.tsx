@@ -21,6 +21,7 @@ import { InlineField } from '../inline-field'
 import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
 import { FocusRing, FocusRingOptions } from '../styles'
+import { useState, useEffect } from 'react'
 
 export interface InlineImageProps {
   name: string
@@ -69,7 +70,40 @@ function EditableImage({
   focusRing = true,
 }: EditableImageProps) {
   const cms = useCMS()
-  const _previewSrc = previewSrc(form.finalForm.getState().values)
+
+  // TODO: Use this
+  const [, setSrcIsLoading] = useState(true)
+  const [_previewSrc, setSrc] = useState('')
+  useEffect(() => {
+    let canceled = false
+    ;(async () => {
+      setSrcIsLoading(true)
+      let imageSrc = ''
+      try {
+        if (previewSrc) {
+          imageSrc = await previewSrc(form.getState().values)
+        } else {
+          // @ts-ignore cms.alerts
+          imageSrc = await cms.media.store.previewSrc(props.input.value)
+        }
+      } catch (e) {
+        if (!canceled) {
+          setSrc('')
+          // @ts-ignore cms.alerts
+          cms.alerts.error(
+            `Failed to generate preview for '${name}': ${e.message}`
+          )
+        }
+      }
+      if (!canceled) {
+        setSrc(imageSrc)
+      }
+      setSrcIsLoading(false)
+    })()
+    return () => {
+      canceled = true
+    }
+  }, [input.value])
 
   async function handleUploadImage([file]: File[]) {
     const directory = uploadDir(form)
