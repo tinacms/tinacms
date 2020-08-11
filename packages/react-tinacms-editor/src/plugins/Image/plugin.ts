@@ -64,7 +64,7 @@ const insertImageFiles = (
   return false
 }
 
-export const imagePlugin = ({ previewUrl, upload: uploadImages }: ImageProps) =>
+export const imagePlugin = ({ previewSrc, upload: uploadImages }: ImageProps) =>
   new Plugin({
     key: imagePluginKey,
 
@@ -112,7 +112,7 @@ export const imagePlugin = ({ previewUrl, upload: uploadImages }: ImageProps) =>
     props: {
       nodeViews: {
         image(node, view) {
-          return new ImageView(node, view, previewUrl)
+          return new ImageView(node, view, previewSrc)
         },
       },
       decorations(state) {

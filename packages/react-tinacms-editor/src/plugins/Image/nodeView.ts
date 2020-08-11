@@ -31,7 +31,7 @@ export class ImageView implements NodeView {
   constructor(
     node: Node,
     view: EditorView,
-    private previewSrc: ImageProps['previewUrl'] = Identity
+    private previewSrc: ImageProps['previewSrc'] = Identity
   ) {
     this.node = node
     this.view = view
