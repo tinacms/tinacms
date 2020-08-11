@@ -34,6 +34,7 @@ export function InlineTextarea({
   name,
   className,
   placeholder,
+  children,
   focusRing = true,
 }: InlineTextProps) {
   const cms = useCMS()
@@ -64,7 +65,7 @@ export function InlineTextarea({
             </FocusRing>
           )
         }
-        return <>{input.value}</>
+        return <>{children || input.value}</>
       }}
     </InlineField>
   )
