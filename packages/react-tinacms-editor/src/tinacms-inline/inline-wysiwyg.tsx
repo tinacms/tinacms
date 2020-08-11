@@ -29,17 +29,17 @@ export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   focusRing?: boolean | FocusRingOptions
 }
 
-const parse = (filename: string) => filename
 export function InlineWysiwyg({
   name,
   children,
   focusRing = true,
-  imageProps: passedInImageProps = { parse },
+  imageProps: passedInImageProps,
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   const cms = useCMS()
 
-  const imageProps: ImageProps = React.useMemo(() => {
+  const imageProps: ImageProps | undefined = React.useMemo(() => {
+    if (!passedInImageProps) return
     return {
       async upload(files: File[]) {
         const allMedia = await cms.media.store.persist(
@@ -58,9 +58,9 @@ export function InlineWysiwyg({
     }
   }, [
     cms.media.store,
-    passedInImageProps.directory,
-    passedInImageProps.previewUrl,
-    passedInImageProps.upload,
+    passedInImageProps?.directory,
+    passedInImageProps?.previewUrl,
+    passedInImageProps?.upload,
   ])
 
   if (cms.disabled) {
