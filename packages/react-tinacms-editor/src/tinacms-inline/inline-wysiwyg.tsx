@@ -29,11 +29,12 @@ export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   focusRing?: boolean | FocusRingOptions
 }
 
+const parse = (filename: string) => filename
 export function InlineWysiwyg({
   name,
   children,
   focusRing = true,
-  imageProps: passedInImageProps = {},
+  imageProps: passedInImageProps = { parse },
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   const cms = useCMS()
@@ -48,7 +49,7 @@ export function InlineWysiwyg({
           }))
         )
 
-        return allMedia.map(media => `${media.directory}${media.filename}`)
+        return allMedia.map(media => passedInImageProps.parse(media.filename))
       },
       previewUrl(src) {
         return cms.media.store.previewSrc(src)
