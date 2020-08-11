@@ -25,9 +25,9 @@ import { useState, useEffect } from 'react'
 
 export interface InlineImageProps {
   name: string
-  previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
+  previewSrc?(formValues: any): string
   focusRing?: boolean | FocusRingOptions
   children?: any
 }
