@@ -30,7 +30,7 @@ import { insertImageList } from './commands'
 import { ImageView } from './nodeView'
 import { ImageProps } from '../../types'
 
-export const imagePluginKey = new PluginKey('image')
+export const imagePluginKey = new PluginKey<{ selectedImage: any }>('image')
 
 const setSelectionAtPos = (
   state: EditorState,
