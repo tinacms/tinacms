@@ -27,6 +27,7 @@ export interface InlineTextProps {
   className?: string
   focusRing?: boolean | FocusRingOptions
   placeholder?: string
+  children?: React.ReactChild
 }
 
 /**
@@ -40,6 +41,7 @@ export function InlineText({
   className,
   focusRing = true,
   placeholder,
+  children,
 }: InlineTextProps) {
   const cms: CMS = useCMS()
 
@@ -69,7 +71,7 @@ export function InlineText({
             </FocusRing>
           )
         }
-        return <>{input.value || placeholder}</>
+        return <>{children || input.value}</>
       }}
     </InlineField>
   )
