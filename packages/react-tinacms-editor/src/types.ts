@@ -25,6 +25,7 @@ import { Schema } from 'prosemirror-model'
 import { Format } from './translator'
 
 export interface ImageProps {
+  parse(filename: string): string
   directory?: string
   upload?: (files: File[]) => Promise<string[]>
   previewUrl?: (url: string) => string | Promise<string>
