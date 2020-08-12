@@ -745,15 +745,24 @@
       "name": "David Royer",
       "avatar_url": "https://avatars3.githubusercontent.com/u/8834693?v=4",
       "profile": "https://www.davidroyer.me/",
-        "contributions": [
+      "contributions": [
         "doc"
       ]
     },
-     {
+    {
       "login": "heytulsiprasad",
       "name": "Tulsi Prasad",
       "avatar_url": "https://avatars2.githubusercontent.com/u/52394293?v=4",
       "profile": "http://heytulsiprasad.now.sh",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "jnv",
+      "name": "Jan Vlnas",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/616767?v=4",
+      "profile": "https://jan.vlnas.cz/",
       "contributions": [
         "doc"
       ]
