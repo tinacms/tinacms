@@ -27,7 +27,11 @@ import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { FormView } from '@tinacms/react-forms'
 import { LeftArrowIcon } from '@tinacms/icons'
 
-export const FormsView = ({ children }: { children?: React.ReactNode }) => {
+export const FormsView = ({
+  children,
+}: {
+  children?: React.ReactChild | React.ReactChild[]
+}) => {
   const [activeFormId, setActiveFormId] = useState<string>('')
   const cms = useCMS()
   const formPlugins = cms.plugins.getType<Form>('form')

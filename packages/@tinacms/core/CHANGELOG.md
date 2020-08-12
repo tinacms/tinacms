@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.26.0](https://github.com/tinacms/tinacms/compare/v0.25.0...v0.26.0) (2020-08-03)
+
+
+### Features
+
+* **@tinacms/react-core:** a new CMS is disabled by default ([ef3ac08](https://github.com/tinacms/tinacms/commit/ef3ac08d2a701cd1b123cf303b69371f16bf81cc))
+
+
+
+
+
 ## [0.10.1](https://github.com/tinacms/tinacms/compare/@tinacms/core@0.10.1-alpha.0...@tinacms/core@0.10.1) (2020-07-07)
 
 **Note:** Version bump only for package @tinacms/core

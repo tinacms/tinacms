@@ -35,19 +35,14 @@ import { useInlineForm } from '../inline-form'
 import { AddBlockMenu } from './add-block-menu'
 import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
-import { FocusRing } from '../styles'
-import {
-  FocusRingStyleProps,
-  getOffset,
-  getOffsetX,
-  getOffsetY,
-} from '../styles'
+import { StyledFocusRing } from '../styles'
+import { FocusRingOptions, getOffset, getOffsetX, getOffsetY } from '../styles'
 
 export interface BlocksControlsProps {
-  children: any
+  children: React.ReactChild | React.ReactChild[]
   index: number
   insetControls?: boolean
-  focusRing?: false | FocusRingStyleProps
+  focusRing?: boolean | FocusRingOptions
 }
 
 export function BlocksControls({
@@ -79,7 +74,7 @@ export function BlocksControls({
   const addAfterPosition = direction === 'horizontal' ? 'right' : 'bottom'
 
   if (cms.disabled) {
-    return children
+    return <>{children}</>
   }
 
   const removeBlock = (event: any) => {
@@ -117,6 +112,8 @@ export function BlocksControls({
   }
 
   const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
+  const borderRadius =
+    typeof focusRing === 'object' ? focusRing.borderRadius : undefined
 
   const parentName = name!
     .split('.')
@@ -133,16 +130,14 @@ export function BlocksControls({
     <Draggable type={parentName} draggableId={name!} index={index}>
       {provider => {
         return (
-          <FocusRing
+          <StyledFocusRing
             ref={provider.innerRef}
             active={focusRing && isActive}
             onClick={handleSetActiveBlock}
             offset={offset}
-            borderRadius={
-              typeof focusRing === 'object' ? focusRing.borderRadius : undefined
-            }
-            disableHover={focusRing === false ? true : childIsActive}
+            borderRadius={borderRadius}
             {...provider.draggableProps}
+            disableHover={focusRing === false ? true : childIsActive}
             disableChildren={!isActive && !childIsActive}
           >
             {withinLimit(max) && (
@@ -200,7 +195,7 @@ export function BlocksControls({
               </BlockMenu>
             </BlockMenuWrapper>
             {children}
-          </FocusRing>
+          </StyledFocusRing>
         )
       }}
     </Draggable>

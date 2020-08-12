@@ -100,9 +100,9 @@ function runChecksOnPullRequest() {
   listTouchedWorkflows(allFiles)
 
   // Pull Request
-  if (modifiedPackages.length > 0) {
-    checkForMilestone()
-  }
+  // if (modifiedPackages.length > 0) {
+  //   checkForMilestone()
+  // }
 
   checkForDocsChanges(allFiles)
 }

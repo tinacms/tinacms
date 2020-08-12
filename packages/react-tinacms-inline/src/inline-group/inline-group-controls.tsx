@@ -20,20 +20,19 @@ import * as React from 'react'
 import { useCMS } from 'tinacms'
 
 import { InlineSettings } from '../inline-settings'
-import { useInlineForm } from '../inline-form'
-import { FocusRing } from '../styles'
 import { InlineFieldContext } from '../inline-field-context'
 import {
   BlockMenu,
   BlockMenuWrapper,
 } from '../blocks/inline-block-field-controls'
-import { FocusRingStyleProps } from '../styles'
+import { FocusRingOptions, StyledFocusRing } from '../styles'
+import { useInlineForm } from '..'
 
 interface InlineGroupControls {
   name: string
   children: any
   insetControls?: boolean
-  focusRing?: false | FocusRingStyleProps
+  focusRing?: boolean | FocusRingOptions
 }
 
 export function InlineGroupControls({
@@ -43,38 +42,42 @@ export function InlineGroupControls({
   focusRing = {},
 }: InlineGroupControls) {
   const cms = useCMS()
-  const { focussedField, setFocussedField } = useInlineForm()
-  const groupRef = React.useRef<HTMLDivElement>(null)
   const groupMenuRef = React.useRef<HTMLDivElement>(null)
   const { fields } = React.useContext(InlineFieldContext)
+  const [active, setActive] = React.useState(false)
+  const [childActive, setChildActive] = React.useState(false)
+  const { focussedField, setFocussedField } = useInlineForm()
+  const focusRingRef = React.useRef<HTMLDivElement>(null)
+  const borderRadius =
+    typeof focusRing === 'object' ? focusRing.borderRadius : undefined
+  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
 
-  if (cms.disabled) {
-    return children
-  }
+  React.useEffect(() => {
+    if (!focusRing || !name) return
+    setActive(name === focussedField)
+    setChildActive(focussedField.startsWith(name!))
+  }, [name, focusRing, focussedField])
 
-  const active = name === focussedField
-  const childIsActive = focussedField.startsWith(name)
-
-  const handleSetActive = (event: any) => {
-    if (active || childIsActive) return
+  const updateFocusedField = (event: any) => {
+    if (active || !name) return
     setFocussedField(name)
     event.stopPropagation()
     event.preventDefault()
   }
 
-  const offset = typeof focusRing === 'object' ? focusRing.offset : undefined
+  if (cms.disabled) {
+    return children
+  }
 
   return (
-    <FocusRing
-      ref={groupRef}
+    <StyledFocusRing
+      ref={focusRingRef}
       active={focusRing && active}
-      onClick={handleSetActive}
+      onClick={updateFocusedField}
       offset={offset}
-      borderRadius={
-        typeof focusRing === 'object' ? focusRing.borderRadius : undefined
-      }
-      disableHover={!focusRing && childIsActive}
-      disableChildren={focusRing && !active && !childIsActive}
+      borderRadius={borderRadius}
+      disableHover={focusRing === false ? true : childActive}
+      disableChildren={!active && !childActive}
     >
       <BlockMenuWrapper
         ref={groupMenuRef}
@@ -87,6 +90,6 @@ export function InlineGroupControls({
         </BlockMenu>
       </BlockMenuWrapper>
       {children}
-    </FocusRing>
+    </StyledFocusRing>
   )
 }

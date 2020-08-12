@@ -25,8 +25,9 @@ import { Schema } from 'prosemirror-model'
 import { Format } from './translator'
 
 export interface ImageProps {
+  directory?: string
   upload?: (files: File[]) => Promise<string[]>
-  previewUrl?: (url: string) => string
+  previewUrl?: (url: string) => string | Promise<string>
 }
 
 export interface KeymapPlugin {

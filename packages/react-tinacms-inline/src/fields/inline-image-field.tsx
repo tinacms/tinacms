@@ -20,14 +20,14 @@ import * as React from 'react'
 import { InlineField } from '../inline-field'
 import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
-import { InputFocusWrapper } from '../styles'
+import { FocusRing, FocusRingOptions } from '../styles'
 
 export interface InlineImageProps {
   name: string
   previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
-  focusRing?: boolean
+  focusRing?: boolean | FocusRingOptions
   children?: any
 }
 
@@ -72,22 +72,8 @@ export function InlineImage({
         }
 
         if (cms.enabled) {
-          if (!focusRing) {
-            return (
-              <InlineImageUpload
-                value={input.value}
-                previewSrc={_previewSrc}
-                onDrop={handleUploadImage}
-                {...input}
-              >
-                {children &&
-                  ((props: any) =>
-                    children({ previewSrc: _previewSrc }, ...props))}
-              </InlineImageUpload>
-            )
-          }
           return (
-            <InputFocusWrapper>
+            <FocusRing name={name} options={focusRing}>
               <InlineImageUpload
                 value={input.value}
                 previewSrc={_previewSrc}
@@ -99,7 +85,7 @@ export function InlineImage({
                   ((props: any) =>
                     children({ previewSrc: _previewSrc }, ...props))}
               </InlineImageUpload>
-            </InputFocusWrapper>
+            </FocusRing>
           )
         }
         return children ? children() : <img src={input.value} />

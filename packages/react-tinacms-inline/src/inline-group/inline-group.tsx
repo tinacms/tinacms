@@ -21,13 +21,13 @@ import { Field } from 'tinacms'
 
 import { InlineFieldContext } from '../inline-field-context'
 import { InlineGroupControls } from './inline-group-controls'
-import { FocusRingStyleProps } from '../styles'
+import { FocusRingOptions } from '../styles'
 
 interface InlineGroupProps {
   name: string
   fields?: Field[]
   insetControls?: boolean
-  focusRing?: false | FocusRingStyleProps
+  focusRing?: boolean | FocusRingOptions
   children?: any
 }
 

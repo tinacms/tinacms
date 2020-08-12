@@ -43,8 +43,11 @@ export class InnerForm extends React.Component<Props, State> {
     // title: this.props.title || '',
   }
 
+  inputRef = React.createRef<HTMLInputElement>()
+
   componentDidMount() {
     document.addEventListener('keydown', this.onEscapeCancel)
+    if (this.inputRef.current) this.inputRef.current.focus()
   }
 
   componentWillUnmount() {
@@ -54,6 +57,13 @@ export class InnerForm extends React.Component<Props, State> {
   componentDidUpdate(prevProps: Props) {
     const { href } = this.props
     if (href !== prevProps.href) this.setState(() => ({ href }))
+  }
+
+  closeModal() {
+    const { href } = this.state
+    const { cancel, removeLink, href: originalHref } = this.props
+    if (!href && !originalHref) removeLink()
+    cancel()
   }
 
   setHref = ({ target: { value } }: E) => this.setState(() => ({ href: value }))
@@ -70,7 +80,7 @@ export class InnerForm extends React.Component<Props, State> {
 
   onEscapeCancel = (e: KeyboardEvent) => {
     if (e.keyCode === 27) {
-      this.props.cancel()
+      this.closeModal()
     }
   }
 
@@ -93,6 +103,7 @@ export class InnerForm extends React.Component<Props, State> {
         /> */}
         <LinkLabel>URL</LinkLabel>
         <LinkInput
+          ref={this.inputRef}
           placeholder="Enter URL"
           type={'text'}
           value={href}
@@ -101,7 +112,9 @@ export class InnerForm extends React.Component<Props, State> {
         />
         <LinkActions>
           <DeleteLink onClick={removeLink}>Delete</DeleteLink>
-          <SaveLink onClick={this.save}>Save</SaveLink>
+          <SaveLink onClick={this.save} disabled={!href}>
+            Save
+          </SaveLink>
         </LinkActions>
       </LinkPopup>
     )
@@ -193,6 +206,10 @@ const SaveLink = styled.button`
   }
   &:active {
     background-color: #0574e4;
+  }
+  &:disabled {
+    background-color: #d1d1d1;
+    box-shadow: none;
   }
 `
 

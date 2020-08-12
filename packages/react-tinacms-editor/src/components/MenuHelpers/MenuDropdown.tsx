@@ -61,6 +61,7 @@ export const MenuDropdown = styled(
   background-color: white;
   overflow: hidden;
   z-index: 10;
+  white-space: nowrap;
 
   ${props =>
     props.open &&
