@@ -18,9 +18,11 @@ limitations under the License.
 
 import { ActionableModalOptions } from '../components/ActionableModal'
 import { GithubClient } from '../github-client'
+import { TinaCMS } from 'tinacms'
 
 export const getModalProps = async (
   error: any,
+  cms: TinaCMS,
   githubClient: GithubClient,
   startEditing: () => void,
   stopEditing: () => void
@@ -46,9 +48,8 @@ export const getModalProps = async (
       }
     }
     case 404: {
-      // Not Found
       if (await githubClient.getBranch()) {
-        // drill down further in the future
+        // Branch exists; but the content doesn't
         return {
           title: '404 Not Found',
           message: 'Failed to fetch content.',
@@ -56,6 +57,29 @@ export const getModalProps = async (
             {
               name: 'Continue',
               action: stopEditing,
+            },
+          ],
+        }
+      }
+      if (await githubClient.isAuthorized()) {
+        return {
+          title: 'Missing Branch ',
+          message: 'The branch that you were editing has been deleted. Press.',
+          actions: [
+            {
+              name: 'Stop Editing',
+              action: stopEditing,
+            },
+            {
+              name: `Switch to ${githubClient.baseBranch}`,
+              primary: true,
+              action: () => {
+                githubClient.setWorkingBranch(githubClient.baseBranch)
+                cms.events.dispatch({
+                  type: 'github:branch:checkout',
+                  branchName: githubClient.baseBranch,
+                })
+              },
             },
           ],
         }
