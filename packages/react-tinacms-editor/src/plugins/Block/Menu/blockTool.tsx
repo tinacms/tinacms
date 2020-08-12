@@ -20,6 +20,7 @@ import * as React from 'react'
 import { EditorView } from 'prosemirror-view'
 
 import { MenuOption } from '../../../components/MenuHelpers'
+import styled from 'styled-components'
 
 interface BlockTool {
   Component: any
@@ -27,10 +28,11 @@ interface BlockTool {
   command: Function
   typeName?: string
   attrs?: any
+  title?: string
 }
 
 export function blockTool(options: BlockTool) {
-  const { Component, children, command, typeName, attrs } = options
+  const { Component, children, command, typeName, attrs, title } = options
   return class extends React.Component<
     { view: EditorView; onClick(): void },
     any
@@ -59,9 +61,23 @@ export function blockTool(options: BlockTool) {
           disabled={!this.canDo()}
           active={this.active}
         >
-          <Component>{children}</Component>
+          <Content>
+            <Component>{children}</Component>
+            <TitleText>{title}</TitleText>
+          </Content>
         </MenuOption>
       )
     }
   }
 }
+
+const Content = styled.div`
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+`
+
+const TitleText = styled.span`
+  color: #d1d1d1;
+  font-size: 12px;
+`

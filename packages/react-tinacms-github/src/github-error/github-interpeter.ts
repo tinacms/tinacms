@@ -18,9 +18,11 @@ limitations under the License.
 
 import { ActionableModalOptions } from '../components/ActionableModal'
 import { GithubClient } from '../github-client'
+import { TinaCMS } from 'tinacms'
 
 export const getModalProps = async (
   error: any,
+  cms: TinaCMS,
   githubClient: GithubClient,
   startEditing: () => void,
   stopEditing: () => void
@@ -35,6 +37,17 @@ export const getModalProps = async (
     primary: false,
     action: stopEditing,
   }
+  const switchToMaster = {
+    name: `Switch to ${githubClient.baseBranch}`,
+    primary: true,
+    action: () => {
+      githubClient.setWorkingBranch(githubClient.baseBranch)
+      cms.events.dispatch({
+        type: 'github:branch:checkout',
+        branchName: githubClient.baseBranch,
+      })
+    },
+  }
 
   switch (error.status) {
     case 401: {
@@ -46,24 +59,57 @@ export const getModalProps = async (
       }
     }
     case 404: {
-      // Not Found
-      if (await githubClient.getBranch()) {
-        // drill down further in the future
-        return {
-          title: '404 Not Found',
-          message: 'Failed to fetch content.',
-          actions: [
-            {
-              name: 'Continue',
-              action: stopEditing,
-            },
-          ],
+      /**
+       * This case checks all the reasons there may have been a 404:
+       * - Unauthorized
+       *   - Private Repo
+       *   - Missing Repo
+       * - Missing Branch
+       * - Missing Repo
+       */
+
+      // Is the user authorized to edit this repo?
+      if (!(await githubClient.isAuthorized())) {
+        // Is the repo public?
+        if (githubClient.authScope === 'public_repo') {
+          return {
+            title: `Create a Fork of ${githubClient.baseRepoFullName}`,
+            message:
+              `You do not have permission to make changes to ${githubClient.baseRepoFullName}.` +
+              `Press the button below to fork this site and begin editing. `,
+            actions: [
+              cancelEditModeAction,
+              {
+                name: 'Create a Fork',
+                primary: true,
+                action: startEditing,
+              },
+            ],
+          }
+        } else {
+          return {
+            title: 'Unauthorized',
+            message: `You do not have permission to make changes to ${githubClient.baseRepoFullName}.`,
+            actions: [cancelEditModeAction],
+          }
         }
       }
+
+      // Does the branch exist?
+      if (await githubClient.getBranch()) {
+        return {
+          title: 'Missing Branch ',
+          message: 'The branch that you were editing has been deleted. Press.',
+          actions: [cancelEditModeAction, switchToMaster],
+        }
+      }
+
+      // The file is missing
       return {
-        title: '404 Not Found',
-        message: 'You are missing a fork.',
-        actions: [cancelEditModeAction, reauthenticateAction],
+        title: 'Content Not Found.',
+        message:
+          'The file you are trying to access is missing. Maybe it lives on a different branch?',
+        actions: [cancelEditModeAction, switchToMaster],
       }
     }
     case 500: {

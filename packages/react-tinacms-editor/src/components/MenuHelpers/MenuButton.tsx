@@ -23,6 +23,7 @@ const MenuItem = css`
 `
 
 export const MenuButton = styled.button<{
+  title?: string
   active?: boolean
   disabled?: boolean
   ref?: any

@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.1](https://github.com/tinacms/tinacms/compare/v0.27.0...v0.27.1) (2020-08-10)
+
+**Note:** Version bump only for package gatsby-tinacms-mdx
+
+
+
+
+
+# [0.27.0](https://github.com/tinacms/tinacms/compare/v0.26.0...v0.27.0) (2020-08-10)
+
+**Note:** Version bump only for package gatsby-tinacms-mdx
+
+
+
+
+
+# [0.26.0](https://github.com/tinacms/tinacms/compare/v0.25.0...v0.26.0) (2020-08-03)
+
+
+### Bug Fixes
+
+* **gatsby-tinacms-mdx:** useMdxForm#loadInitialValues does not run in production ([e0c2275](https://github.com/tinacms/tinacms/commit/e0c227542970b0a42be60ec8573216d7a54e9c1e))
+
+
+
+
+
 ## [0.1.24-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-mdx@0.1.23...gatsby-tinacms-mdx@0.1.24-alpha.0) (2020-07-15)
 
 **Note:** Version bump only for package gatsby-tinacms-mdx

@@ -14,24 +14,21 @@ git merge master
 
 # 3. Run a Fresh Build
 npm run hard-reset
-git add .
-git commit -am "chore: package-lock"
 
 # 4. Generate CHANGELOGs and Git Tags
+#    You must have GH_TOKEN in your environment variables
 lerna version \
   --yes \
   --conventional-commits \
   --conventional-graduate \
   --no-push \
   --allow-branch latest \
+  --create-release github \
   -m "chore(publish): latest" \
-  --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
+  --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'A
 
 # 5. Publish to NPM
 lerna publish from-package --yes
-
-# 6. Push CHANGELOGs and tags to GitHub
-git push && git push --tags
 
 # 7. Backmerge to master
 git checkout master

@@ -20,6 +20,13 @@ import { CSRF_TOKEN_KEY, WORKING_REPO_KEY, HEAD_BRANCH_KEY } from '../constants'
 import { AES, enc } from 'crypto-js'
 
 export const previewHandler = (signingKey: string) => (req: any, res: any) => {
+  if (!signingKey) {
+    const message =
+      'next-tinacms-github: previewHandler was created without a signing key.'
+
+    console.error(message)
+    return res.status(500).json({ message })
+  }
   const expectedCSRFToken = req.cookies[CSRF_TOKEN_KEY]
 
   // Parse out the amalgamated token

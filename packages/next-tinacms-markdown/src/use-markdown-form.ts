@@ -71,7 +71,8 @@ export function useMarkdownForm(
       fields,
       actions,
       buttons,
-      loadInitialValues() {
+      async loadInitialValues() {
+        if (cms.disabled) return valuesOnDisk
         return cms.api.git
           .show(markdownFile.fileRelativePath) // Load the contents of this file at HEAD
           .then((git: { content: string }) => {

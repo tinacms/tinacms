@@ -1,6 +1,9 @@
-name: Build, Test, Lint
+name: Build, Test, Lint for Master
 
-on: push
+on:
+  push:
+    branches:
+      - master
 
 jobs:
   build:
