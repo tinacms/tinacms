@@ -76,7 +76,7 @@ export const getModalProps = async (
             title: `Create a Fork of ${githubClient.baseRepoFullName}`,
             message:
               `You do not have permission to make changes to ${githubClient.baseRepoFullName}.` +
-              `Press the button below to fork this site and begi editing. `,
+              `Press the button below to fork this site and begin editing. `,
             actions: [
               cancelEditModeAction,
               {
@@ -108,7 +108,7 @@ export const getModalProps = async (
       return {
         title: 'Content Not Found.',
         message:
-          'The file your are trying to access is missing. Maybe it lives on a different branch?',
+          'The file you are trying to access is missing. Maybe it lives on a different branch?',
         actions: [cancelEditModeAction, switchToMaster],
       }
     }
