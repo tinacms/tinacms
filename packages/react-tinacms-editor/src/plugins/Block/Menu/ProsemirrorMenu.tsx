@@ -44,6 +44,7 @@ export const ProsemirrorMenu: FunctionComponent = () => {
       <MenuButton
         ref={menuButtonRef}
         data-tooltip="Heading"
+        title="Heading"
         onClick={toggle}
         active={active}
       >
