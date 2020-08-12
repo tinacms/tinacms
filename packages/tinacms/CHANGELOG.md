@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.1](https://github.com/tinacms/tinacms/compare/v0.27.0...v0.27.1) (2020-08-10)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
+# [0.27.0](https://github.com/tinacms/tinacms/compare/v0.26.0...v0.27.0) (2020-08-10)
+
+
+### Bug Fixes
+
+* **tinacms:** enabling cms with sidebar doesn't remount children ([1188dbf](https://github.com/tinacms/tinacms/commit/1188dbfa5bcaeb0ae9b832b15ad299b5c1ea4c01))
+
+
+
+
+
+# [0.26.0](https://github.com/tinacms/tinacms/compare/v0.25.0...v0.26.0) (2020-08-03)
+
+**Note:** Version bump only for package tinacms
+
+
+
+
+
 # [0.23.0-alpha.0](https://github.com/tinacms/tinacms/compare/tinacms@0.22.1...tinacms@0.23.0-alpha.0) (2020-07-15)
 
 

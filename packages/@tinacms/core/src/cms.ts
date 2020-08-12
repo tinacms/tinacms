@@ -78,7 +78,7 @@ export class CMS {
   static ENABLED = { type: 'cms:enable' }
   static DISABLED = { type: 'cms:disable' }
 
-  private _enabled: boolean = true
+  private _enabled: boolean = false
 
   /**
    * An object for managing CMSs plugins.
@@ -131,10 +131,8 @@ export class CMS {
       )
     }
 
-    if (config.enabled || typeof config.enabled === 'undefined') {
+    if (config.enabled) {
       this.enable()
-    } else {
-      this.disable()
     }
   }
 
@@ -142,7 +140,6 @@ export class CMS {
    * Registers a new external API with the CMS.
    *
    * #### Example
-   *
    *
    * ```ts
    * import { CoolApi } from "cool-api"
@@ -152,9 +149,15 @@ export class CMS {
    *
    * @param name The name used to lookup the external API.
    * @param api An object for interacting with an external API.
+   *
+   * ### Additional Resources
+   *
+   * * https://github.com/tinacms/rfcs/blob/master/0010-api-events.md
    */
   registerApi(name: string, api: any): void {
-    // TODO: Make sure we're not overwriting an existing API.
+    if (api.events instanceof EventBus) {
+      ;(api.events as EventBus).subscribe('*', this.events.dispatch)
+    }
     this.api[name] = api
   }
 

@@ -3,6 +3,49 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.3](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.27.2...v0.27.3) (2020-08-10)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+## [0.27.2](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.27.1...v0.27.2) (2020-08-10)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+## [0.27.1](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.27.0...v0.27.1) (2020-08-10)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+# [0.27.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.26.0...v0.27.0) (2020-08-10)
+
+**Note:** Version bump only for package nextjs-blog-starter
+
+
+
+
+
+# [0.26.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.25.0...v0.26.0) (2020-08-03)
+
+
+### Features
+
+* add focus ring to inline wysiwyg ([2768afd](https://github.com/kendallstrautman/nextjs-blog-starter/commit/2768afd1b69bdef2a3dce38dab6b71d002ddbad6))
+
+
+
+
+
 # [0.25.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.24.0...v0.25.0) (2020-07-27)
 
 **Note:** Version bump only for package nextjs-blog-starter

@@ -28,6 +28,13 @@ export const createAuthHandler = (
   secret: string,
   signingKey: string
 ) => (req: any, res: any) => {
+  if (!signingKey) {
+    const message =
+      'next-tinacms-github: createAuthHandler was called without a signing key.'
+    console.error(message)
+    return res.status(500).json({ message })
+  }
+
   createAccessToken(clientId, secret, req.query.code, req.query.state).then(
     (tokenResp: any) => {
       const { access_token, error } = qs.parse(tokenResp.data)

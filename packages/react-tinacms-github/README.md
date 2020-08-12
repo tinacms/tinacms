@@ -24,14 +24,19 @@ We will want to use the GithubClient to load/save our content using the Github A
 import { TinaCMS } from 'tinacms'
 import { GithubClient } from 'react-tinacms-github'
 
+const github = new GithubClient({
+  proxy: '/api/proxy-github',
+  authCallbackRoute: '/api/create-github-access-token'
+  clientId: process.env.GITHUB_CLIENT_ID,
+  baseRepoFullName: process.env.REPO_FULL_NAME // e.g: tinacms/tinacms.org,
+})
+
 const cms = new TinaCMS({
   apis: {
-    github: new GithubClient({
-      proxy: '/api/proxy-github',
-      authCallbackRoute: '/api/create-github-access-token'
-      clientId: process.env.GITHUB_CLIENT_ID,
-      baseRepoFullName: process.env.REPO_FULL_NAME // e.g: tinacms/tinacms.org,
-    })
+    github
+  },
+  media: {
+    store: new GithubMediaStore(github)
   }
 })
 ```

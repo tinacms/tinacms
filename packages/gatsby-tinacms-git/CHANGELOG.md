@@ -3,6 +3,33 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.27.1](https://github.com/tinacms/tinacms/compare/v0.27.0...v0.27.1) (2020-08-10)
+
+**Note:** Version bump only for package gatsby-tinacms-git
+
+
+
+
+
+# [0.27.0](https://github.com/tinacms/tinacms/compare/v0.26.0...v0.27.0) (2020-08-10)
+
+**Note:** Version bump only for package gatsby-tinacms-git
+
+
+
+
+
+# [0.26.0](https://github.com/tinacms/tinacms/compare/v0.25.0...v0.26.0) (2020-08-03)
+
+
+### Bug Fixes
+
+* **gatsby-tinacms-git:** useGitForm#loadInitialValues does not run in production ([a42d50c](https://github.com/tinacms/tinacms/commit/a42d50c041941a06770551b66353c82b72cfddd5))
+
+
+
+
+
 ## [0.5.8-alpha.0](https://github.com/tinacms/tinacms/compare/gatsby-tinacms-git@0.5.7...gatsby-tinacms-git@0.5.8-alpha.0) (2020-07-15)
 
 **Note:** Version bump only for package gatsby-tinacms-git

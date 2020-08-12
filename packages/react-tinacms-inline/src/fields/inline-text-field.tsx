@@ -19,13 +19,15 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 import { useCMS, CMS } from 'tinacms'
-import { InlineField } from '../inline-field'
-import { InputFocusWrapper } from '../styles'
+import { FocusRing, FocusRingOptions } from '../styles'
+import { InlineField } from '..'
 
 export interface InlineTextProps {
   name: string
   className?: string
-  focusRing?: boolean
+  focusRing?: boolean | FocusRingOptions
+  placeholder?: string
+  children?: React.ReactChild
 }
 
 /**
@@ -38,6 +40,8 @@ export function InlineText({
   name,
   className,
   focusRing = true,
+  placeholder,
+  children,
 }: InlineTextProps) {
   const cms: CMS = useCMS()
 
@@ -46,16 +50,28 @@ export function InlineText({
       {({ input }) => {
         if (cms.enabled) {
           if (!focusRing) {
-            return <Input type="text" {...input} className={className} />
+            return (
+              <Input
+                type="text"
+                {...input}
+                placeholder={placeholder}
+                className={className}
+              />
+            )
           }
 
           return (
-            <InputFocusWrapper>
-              <Input type="text" {...input} className={className} />
-            </InputFocusWrapper>
+            <FocusRing name={name} options={focusRing}>
+              <Input
+                type="text"
+                {...input}
+                placeholder={placeholder}
+                className={className}
+              />
+            </FocusRing>
           )
         }
-        return <>{input.value}</>
+        return <>{children || input.value}</>
       }}
     </InlineField>
   )
