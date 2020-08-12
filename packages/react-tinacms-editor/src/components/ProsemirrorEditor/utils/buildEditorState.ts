@@ -33,18 +33,14 @@ import { codeBlockPlugin } from '../../../plugins/CodeBlock'
 import { inlinePlugin } from '../../../plugins/Inline'
 import { linkPlugin } from '../../../plugins/Link'
 import { tablePlugin } from '../../../plugins/Table'
+import { ImageProps } from '../../../types'
 
 export function buildEditorState(
   schema: Schema,
   translator: TranslatorClass,
   value: string,
-  imageProps?: {
-    upload?: (files: File[]) => Promise<string[]>
-    previewUrl?: (url: string) => string
-  }
+  imageProps?: ImageProps
 ) {
-  const { upload, previewUrl } = imageProps || {}
-
   return EditorState.create({
     schema,
     doc: translator.nodeFromString(value),
@@ -59,7 +55,7 @@ export function buildEditorState(
       gapCursor(),
       tableEditing(),
       tablePlugin,
-      imagePlugin(upload, previewUrl),
+      imagePlugin(imageProps || {}),
       codeBlockPlugin,
     ],
   })

@@ -22,6 +22,7 @@ import { EditorState, TextSelection } from 'prosemirror-state'
 import { CodeIcon } from '@tinacms/icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
+import { formatKeymap } from '../../../utils'
 
 function makeCodeBlock(state: EditorState, dispatch: any) {
   const { code_block, paragraph } = state.schema.nodes
@@ -60,6 +61,6 @@ export const ProsemirrorMenu = commandControl(
   makeCodeBlock,
   CodeIcon,
   'Codeblock',
-  'Codeblock',
+  formatKeymap('Codeblock Mod-Alt-0'),
   true
 ) //codeblock focusing messes with scroll

@@ -20,7 +20,7 @@ import styled, { css } from 'styled-components'
 
 export const MenuOption = styled.div<{ disabled: boolean; active: boolean }>`
   display: block;
-  padding: 8px 16px;
+  padding: 8px 12px;
   transition: all 85ms ease-out;
   cursor: pointer;
   &:first-child {

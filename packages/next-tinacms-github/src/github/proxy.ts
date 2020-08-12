@@ -20,6 +20,12 @@ import { AES, enc } from 'crypto-js'
 import axios from 'axios'
 
 export const apiProxy = (signingKey: string) => (req: any, res: any) => {
+  if (!signingKey) {
+    const message =
+      'next-tinacms-github: the apiProxy was created without a signing key.'
+    console.error(message)
+    return res.status(500).json({ message })
+  }
   const { headers, ...data } = JSON.parse(req.body)
 
   // Parse out the amalgamated token

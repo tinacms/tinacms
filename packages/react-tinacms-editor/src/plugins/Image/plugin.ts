@@ -28,6 +28,7 @@ import { Slice } from 'prosemirror-model'
 
 import { insertImageList } from './commands'
 import { ImageView } from './nodeView'
+import { ImageProps } from '../../types'
 
 export const imagePluginKey = new PluginKey('image')
 
@@ -63,10 +64,7 @@ const insertImageFiles = (
   return false
 }
 
-export const imagePlugin = (
-  uploadImages?: (files: File[]) => Promise<string[]>,
-  previewUrl?: (url: string) => string
-) =>
+export const imagePlugin = ({ previewUrl, upload: uploadImages }: ImageProps) =>
   new Plugin({
     key: imagePluginKey,
 

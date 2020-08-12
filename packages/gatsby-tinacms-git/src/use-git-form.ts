@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { useForm, Form, FormOptions, WatchableFormValue } from 'tinacms'
+import { useForm, Form, FormOptions, WatchableFormValue, useCMS } from 'tinacms'
 import { useGitFile } from '@tinacms/git-client'
 
 export interface GitNode {
@@ -34,13 +34,17 @@ export function useGitForm<N extends GitNode>(
   options: GitFormOptions<N>,
   watch: WatchableFormValue
 ): [N, Form] {
+  const cms = useCMS()
   const { format, parse, ...config } = options
   const gitFile = useGitFile(node.fileRelativePath, format, parse)
 
   const defaultConfig = {
     label: '',
     fields: [],
-    loadInitialValues: gitFile.show,
+    async loadInitialValues() {
+      if (cms.disabled) return watch.values
+      return gitFile.show()
+    },
     onSubmit: gitFile.commit,
     reset: gitFile.reset,
     onChange({ values }: any) {
