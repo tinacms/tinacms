@@ -58,8 +58,8 @@ export const insertTable = (
   const newTable = table.createChecked(null, rows)
   const { selection, tr } = state
   const { $from, $to } = selection
-  dispatch(
-    tr.replaceWith($from.pos - 1, $to.pos + 1, newTable).scrollIntoView()
-  )
+  const start = $from.pos - 1
+  const end = $to.pos < state.doc.content.size ? $to.pos + 1 : $to.pos
+  dispatch(tr.replaceWith(start, end, newTable).scrollIntoView())
   return true
 }
