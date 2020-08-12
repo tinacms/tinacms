@@ -21,7 +21,7 @@ import styled from 'styled-components'
 import { CloseIcon } from '@tinacms/icons'
 
 export interface ModalHeaderProps {
-  children: React.ReactChild
+  children: React.ReactChild | React.ReactChild[]
   close?(): void
 }
 
