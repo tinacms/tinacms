@@ -42,14 +42,20 @@ export function InlineWysiwyg({
     if (!passedInImageProps) return
     return {
       async upload(files: File[]) {
-        const allMedia = await cms.media.store.persist(
-          files.map(file => ({
-            directory: passedInImageProps?.directory || '',
-            file,
-          }))
-        )
+        const filesToUpload = files.map(file => ({
+          directory: passedInImageProps?.directory || '',
+          file,
+        }))
 
-        return allMedia.map(media => passedInImageProps.parse(media.filename))
+        const allMedia = await cms.media.store.persist(filesToUpload)
+
+        return allMedia.map(media => {
+          if (passedInImageProps.parse) {
+            return passedInImageProps.parse(media.filename)
+          } else {
+            return media.filename
+          }
+        })
       },
       previewSrc(src) {
         return cms.media.store.previewSrc(src)
