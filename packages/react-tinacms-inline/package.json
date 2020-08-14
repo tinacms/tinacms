@@ -29,6 +29,7 @@
   "devDependencies": {
     "@tinacms/icons": "^0.26.0",
     "@tinacms/react-forms": "^0.27.1",
+    "@tinacms/scripts": "^0.26.0",
     "@tinacms/styles": "^0.26.0",
     "react-dropzone": "10.1.8",
     "react-tinacms-editor": "^0.4.0",
