@@ -60,7 +60,7 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
         <Alerts alerts={cms.alerts} />
         {enabled && styled && <Theme />}
         {enabled && cms.toolbar && <Toolbar />}
-        {enabled && cms.sidebar ? (
+        {cms.sidebar ? (
           <SidebarProvider position={position} sidebar={cms.sidebar}>
             {children}
           </SidebarProvider>

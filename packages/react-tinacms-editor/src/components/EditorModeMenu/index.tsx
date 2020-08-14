@@ -33,7 +33,8 @@ export const EditorModeMenu = () => {
   return (
     <MenuButton
       data-testid="markdown-toggle"
-      data-tooltip={'Markdown mode'}
+      data-tooltip="Markdown mode"
+      title="Toggle Markdown mode"
       onClick={toggleMode}
     >
       <MarkdownIcon />

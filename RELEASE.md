@@ -22,100 +22,28 @@ With this process:
 
 ## Prerelease
 
-i.e. `yarn add tinacms@next`
+> i.e. `yarn add tinacms@next`
 
-### Script
+From the terminal run:
 
 ```sh
 scripts/prerelease.sh
 ```
 
-### Manual
+View it's [source](./scripts/prerelease.sh) if you want to run the steps manually.
 
-1. **Checkout Master**
-
-   ```
-   git checkout master
-   ```
-
-1. **Build the source files:**
-
-   ```
-   npm run hard-reset
-   ```
-
-1. **Generate CHANGELOGs and git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --conventional-prerelease \
-     --no-push \
-     --allow-branch master \
-     -m "chore(publish): prerelease" \
-     --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
-   ```
-
-1. **Publish to NPM:**
-
-   ```
-   lerna publish from-package --dist-tag next
-   ```
-
-1. **Push CHANGELOGs and git tags to GitHub:**
-
-   ```
-   git push && git push --tags
-   ```
 
 ## Release
 
-i.e `yarn add tinacms` or `yarn add tinacms@latest`
+> i.e. `yarn add tinacms`
 
-1. **Merge Changes**
+From the terminal run:
 
-   ```
-   git checkout latest
-   git merge master
-   git push
-   ```
+```sh
+scripts/release.sh
+```
 
-1. **Build the source files:**
-
-   ```
-   npm run hard-reset
-   ```
-
-1. **Generate CHANGELOGs and git tags:**
-
-   ```
-   lerna version \
-     --conventional-commits \
-     --conventional-graduate \
-     --no-push \
-     --allow-branch latest \
-     -m "chore(publish): latest" \
-     --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
-   ```
-
-1) **Publish to NPM:**
-
-   ```
-   lerna publish from-package
-   ```
-
-1) **Push CHANGELOGs and git tags to Github:**
-   ```
-   git push && git push --tags
-   ```
-
-1. **Backmerge to `master`**
-
-   ```
-   git checkout master
-   git merge latest
-   git push
-   ```
+View it's [source](./scripts/release.sh) if you want to run the steps manually.
 
 ## Listing Contributors
 

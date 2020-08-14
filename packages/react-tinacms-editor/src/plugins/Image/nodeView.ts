@@ -18,6 +18,7 @@ limitations under the License.
 
 import { Node } from 'prosemirror-model'
 import { EditorView, NodeView } from 'prosemirror-view'
+import { ImageProps } from '../../types'
 
 const Identity = (str: string) => str
 
@@ -30,7 +31,7 @@ export class ImageView implements NodeView {
   constructor(
     node: Node,
     view: EditorView,
-    previewUrl: (url: string) => string = Identity
+    private previewSrc: ImageProps['previewSrc'] = Identity
   ) {
     this.node = node
     this.view = view
@@ -39,13 +40,21 @@ export class ImageView implements NodeView {
     this.dom.classList.add('tinacms-image-wrapper')
     this.img = document.createElement('img')
     const { src, align, alt, title, width, height } = node.attrs
-    this.img.src = previewUrl(src)
+    this.updateImgSrc(src)
     if (height) this.img.style.height = height
     if (width) this.img.style.width = width
     if (align) this.img.classList.add(`align-${align}`)
     if (alt) this.img.alt = alt
     if (title) this.img.title = title
     this.dom.appendChild(this.img)
+  }
+  async updateImgSrc(src: string) {
+    if (!this.img) return
+    try {
+      this.img.src = await this.previewSrc!(src)
+    } catch {
+      this.img.src = src
+    }
   }
 
   update(node: Node) {
