@@ -44,6 +44,7 @@ export function SidebarProvider({
   sidebar,
 }: SidebarProviderProps) {
   useSubscribable(sidebar)
+  const cms = useCMS()
 
   return (
     <>
@@ -52,7 +53,7 @@ export function SidebarProvider({
       ) : (
         children
       )}
-      <Sidebar sidebar={sidebar} />
+      {cms.enabled && <Sidebar sidebar={sidebar} />}
     </>
   )
 }
@@ -170,6 +171,7 @@ const SidebarToggle = ({ sidebar }: { sidebar: SidebarState }) => {
     <SidebarToggleButton
       onClick={() => (sidebar.isOpen = !sidebar.isOpen)}
       open={sidebar.isOpen}
+      aria-label="toggles cms sidebar"
     >
       {sidebar.isOpen ? <LeftArrowIcon /> : <EditIcon />}
     </SidebarToggleButton>

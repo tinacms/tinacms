@@ -20,13 +20,13 @@ import { EditorView } from 'prosemirror-view'
 import { LinkIcon } from '@tinacms/icons'
 
 import { markControl } from '../../../components/MenuHelpers'
-import { isMarkPresent } from '../../../utils'
+import { isMarkPresent, formatKeymap } from '../../../utils'
 import { imagePluginKey } from '../../Image'
 
 export const ProsemirrorMenu = markControl({
   mark: 'link',
   Icon: LinkIcon,
-  tooltip: 'Link',
+  tooltip: formatKeymap('Link Mod-K'),
   selectionOnly: true,
   defaultAttrs: {
     href: '',
@@ -38,9 +38,10 @@ export const ProsemirrorMenu = markControl({
     const { marks, nodes } = schema
     if (selection.empty) return true
     const selectedNode = selection.$from.node()
+    const imagePluginState = imagePluginKey.getState(view.state)
     return (
       isMarkPresent(view.state, marks.link) ||
-      !!imagePluginKey.getState(view.state).selectedImage ||
+      !!imagePluginState!.selectedImage ||
       (selectedNode && selectedNode.type === nodes.code_block)
     )
   },

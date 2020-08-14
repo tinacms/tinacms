@@ -29,8 +29,8 @@ import { TextSelection } from 'prosemirror-state'
 export const buildEditor = (
   input: Input,
   el: HTMLDivElement | undefined | null,
-  imageProps: ImageProps = {},
   setEditorView: ({ view }: { view: EditorView }) => void,
+  imageProps?: ImageProps,
   format?: Format
 ): { translator?: any } => {
   const schema = buildSchema()

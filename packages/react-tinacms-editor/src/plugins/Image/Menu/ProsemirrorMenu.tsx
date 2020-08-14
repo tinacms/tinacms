@@ -103,7 +103,7 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
 
   return (
     <>
-      <MenuButton ref={menuButtonRef} onClick={handleCloseModal}>
+      <MenuButton title="Image" ref={menuButtonRef} onClick={handleCloseModal}>
         <MediaIcon />
       </MenuButton>
       <MenuDropdown

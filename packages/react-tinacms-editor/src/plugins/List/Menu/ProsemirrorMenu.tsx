@@ -20,6 +20,7 @@ import * as React from 'react'
 import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
 
 import { commandControl } from '../../../components/MenuHelpers'
+import { formatKeymap } from '../../../utils'
 import { toggleBulletList, toggleOrderedList } from '../commands'
 
 export const ProsemirrorMenu = (props: any) => (
@@ -33,12 +34,12 @@ const BulletList = commandControl(
   toggleBulletList,
   UnorderedListIcon,
   'Unordered List',
-  'Unordered List'
+  formatKeymap('Unordered List Mod-Alt-8')
 )
 
 const OrderedList = commandControl(
   toggleOrderedList,
   OrderedListIcon,
   'Ordered List',
-  'Ordered List'
+  formatKeymap('Ordered List Mod-Alt-7')
 )

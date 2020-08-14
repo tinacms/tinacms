@@ -28,8 +28,9 @@ import { Slice } from 'prosemirror-model'
 
 import { insertImageList } from './commands'
 import { ImageView } from './nodeView'
+import { ImageProps } from '../../types'
 
-export const imagePluginKey = new PluginKey('image')
+export const imagePluginKey = new PluginKey<{ selectedImage: any }>('image')
 
 const setSelectionAtPos = (
   state: EditorState,
@@ -63,10 +64,7 @@ const insertImageFiles = (
   return false
 }
 
-export const imagePlugin = (
-  uploadImages?: (files: File[]) => Promise<string[]>,
-  previewUrl?: (url: string) => string
-) =>
+export const imagePlugin = ({ previewSrc, upload: uploadImages }: ImageProps) =>
   new Plugin({
     key: imagePluginKey,
 
@@ -114,7 +112,7 @@ export const imagePlugin = (
     props: {
       nodeViews: {
         image(node, view) {
-          return new ImageView(node, view, previewUrl)
+          return new ImageView(node, view, previewSrc)
         },
       },
       decorations(state) {

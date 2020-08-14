@@ -22,7 +22,7 @@ import { useCMS } from 'tinacms'
 import { InlineField } from '../inline-field'
 import TextareaAutosize from 'react-textarea-autosize'
 import { InlineTextProps } from './inline-text-field'
-import { InputFocusWrapper } from '../styles'
+import { FocusRing } from '../styles'
 
 /**
  * @deprecated
@@ -33,6 +33,8 @@ export const InlineTextareaField = InlineTextarea
 export function InlineTextarea({
   name,
   className,
+  placeholder,
+  children,
   focusRing = true,
 }: InlineTextProps) {
   const cms = useCMS()
@@ -42,16 +44,28 @@ export function InlineTextarea({
       {({ input }) => {
         if (cms.enabled) {
           if (!focusRing) {
-            return <Textarea className={className} {...input} rows={1} />
+            return (
+              <Textarea
+                className={className}
+                {...input}
+                rows={1}
+                placeholder={placeholder}
+              />
+            )
           }
 
           return (
-            <InputFocusWrapper>
-              <Textarea className={className} {...input} rows={1} />
-            </InputFocusWrapper>
+            <FocusRing name={name} options={focusRing}>
+              <Textarea
+                className={className}
+                {...input}
+                rows={1}
+                placeholder={placeholder}
+              />
+            </FocusRing>
           )
         }
-        return <>{input.value}</>
+        return <>{children || input.value}</>
       }}
     </InlineField>
   )

@@ -33,34 +33,35 @@ import { codeBlockPlugin } from '../../../plugins/CodeBlock'
 import { inlinePlugin } from '../../../plugins/Inline'
 import { linkPlugin } from '../../../plugins/Link'
 import { tablePlugin } from '../../../plugins/Table'
+import { ImageProps } from '../../../types'
 
 export function buildEditorState(
   schema: Schema,
   translator: TranslatorClass,
   value: string,
-  imageProps?: {
-    upload?: (files: File[]) => Promise<string[]>
-    previewUrl?: (url: string) => string
-  }
+  imageProps?: ImageProps
 ) {
-  const { upload, previewUrl } = imageProps || {}
+  const plugins = [
+    commonPlugin,
+    inlinePlugin,
+    inputRules(schema),
+    keymap(buildKeymap(schema)),
+    history(),
+    linkPlugin(),
+    dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
+    gapCursor(),
+    tableEditing(),
+    tablePlugin,
+    codeBlockPlugin,
+  ]
+
+  if (imageProps) {
+    plugins.push(imagePlugin(imageProps))
+  }
 
   return EditorState.create({
     schema,
     doc: translator.nodeFromString(value),
-    plugins: [
-      commonPlugin,
-      inlinePlugin,
-      inputRules(schema),
-      keymap(buildKeymap(schema)),
-      history(),
-      linkPlugin(),
-      dropCursor({ width: 2, color: 'rgb(0, 132, 255)' }),
-      gapCursor(),
-      tableEditing(),
-      tablePlugin,
-      imagePlugin(upload, previewUrl),
-      codeBlockPlugin,
-    ],
+    plugins,
   })
 }

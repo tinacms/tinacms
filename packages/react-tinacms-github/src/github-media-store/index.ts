@@ -50,4 +50,12 @@ export class GithubMediaStore implements MediaStore {
 
     return uploaded
   }
+
+  async previewSrc(src: string) {
+    try {
+      return this.githubClient.getDownloadUrl(src)
+    } catch {
+      return src
+    }
+  }
 }

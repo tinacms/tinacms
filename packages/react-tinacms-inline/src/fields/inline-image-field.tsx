@@ -20,14 +20,15 @@ import * as React from 'react'
 import { InlineField } from '../inline-field'
 import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
-import { InputFocusWrapper } from '../styles'
+import { FocusRing, FocusRingOptions } from '../styles'
+import { useState, useEffect } from 'react'
 
 export interface InlineImageProps {
   name: string
-  previewSrc(formValues: any): string
   parse(filename: string): string
   uploadDir(form: Form): string
-  focusRing?: boolean
+  previewSrc?(formValues: any): string | Promise<string>
+  focusRing?: boolean | FocusRingOptions
   children?: any
 }
 
@@ -37,74 +38,105 @@ export interface InlineImageProps {
  */
 export const InlineImageField = InlineImage
 
-export function InlineImage({
+export function InlineImage(props: InlineImageProps) {
+  const cms = useCMS()
+
+  return (
+    <InlineField name={props.name}>
+      {({ input, form }) => {
+        if (cms.enabled) {
+          return <EditableImage {...props} input={input} form={form} />
+        }
+
+        return props.children ? props.children() : <img src={input.value} />
+      }}
+    </InlineField>
+  )
+}
+
+interface EditableImageProps extends InlineImageProps {
+  input: any
+  form: any
+}
+
+function EditableImage({
+  form,
+  input,
   name,
   previewSrc,
   uploadDir,
   parse,
   children,
   focusRing = true,
-}: InlineImageProps) {
+}: EditableImageProps) {
   const cms = useCMS()
 
-  return (
-    <InlineField name={name}>
-      {({ input, form }) => {
-        const _previewSrc = previewSrc(form.finalForm.getState().values)
-
-        async function handleUploadImage([file]: File[]) {
-          const directory = uploadDir(form)
-          const [media] = await cms.media.store.persist([
-            {
-              directory,
-              file,
-            },
-          ])
-          if (media?.filename) {
-            input.onChange(parse(media.filename))
-          } else {
-            console.error(
-              'TinaCMS Image Upload Failed: This could be due to media store configuration, file size, or if the image is a duplicate (has already been uploaded).'
-            )
-            cms.alerts.error('Image Upload Failed.')
-          }
-          return null
+  // TODO: Use this
+  const [, setSrcIsLoading] = useState(true)
+  const [_previewSrc, setSrc] = useState('')
+  useEffect(() => {
+    let canceled = false
+    ;(async () => {
+      setSrcIsLoading(true)
+      let imageSrc = ''
+      try {
+        if (previewSrc) {
+          imageSrc = await previewSrc(form.getState().values)
+        } else {
+          // @ts-ignore cms.alerts
+          imageSrc = await cms.media.store.previewSrc(props.input.value)
         }
-
-        if (cms.enabled) {
-          if (!focusRing) {
-            return (
-              <InlineImageUpload
-                value={input.value}
-                previewSrc={_previewSrc}
-                onDrop={handleUploadImage}
-                {...input}
-              >
-                {children &&
-                  ((props: any) =>
-                    children({ previewSrc: _previewSrc }, ...props))}
-              </InlineImageUpload>
-            )
-          }
-          return (
-            <InputFocusWrapper>
-              <InlineImageUpload
-                value={input.value}
-                previewSrc={_previewSrc}
-                onDrop={handleUploadImage}
-                {...input}
-              >
-                {/** If children, pass previewSrc to children */}
-                {children &&
-                  ((props: any) =>
-                    children({ previewSrc: _previewSrc }, ...props))}
-              </InlineImageUpload>
-            </InputFocusWrapper>
+      } catch (e) {
+        if (!canceled) {
+          setSrc('')
+          // @ts-ignore cms.alerts
+          cms.alerts.error(
+            `Failed to generate preview for '${name}': ${e.message}`
           )
         }
-        return children ? children() : <img src={input.value} />
-      }}
-    </InlineField>
+      }
+      if (!canceled) {
+        setSrc(imageSrc)
+      }
+      setSrcIsLoading(false)
+    })()
+    return () => {
+      canceled = true
+    }
+  }, [input.value])
+
+  async function handleUploadImage([file]: File[]) {
+    const directory = uploadDir(form)
+    const [media] = await cms.media.store.persist([
+      {
+        directory,
+        file,
+      },
+    ])
+    if (media?.filename) {
+      input.onChange(parse(media.filename))
+    } else {
+      console.error(
+        'TinaCMS Image Upload Failed: This could be due to media store configuration, file size, or if the image is a duplicate (has already been uploaded).'
+      )
+      cms.alerts.error('Image Upload Failed.')
+    }
+    return null
+  }
+
+  return (
+    <FocusRing name={name} options={focusRing}>
+      <InlineImageUpload
+        value={input.value}
+        previewSrc={_previewSrc}
+        onDrop={handleUploadImage}
+        {...input}
+      >
+        {/** If children, pass previewSrc to children */}
+        {children &&
+          ((props: any) => children({ previewSrc: _previewSrc }, ...props))}
+      </InlineImageUpload>
+    </FocusRing>
   )
 }
 

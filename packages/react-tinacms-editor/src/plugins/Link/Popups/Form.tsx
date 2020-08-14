@@ -78,7 +78,7 @@ export const LinkForm = () => {
     setPosition({ arrowOffset, left, top })
   }, [linkPluginState])
 
-  if (!linkPluginState.show_link_toolbar) {
+  if (!linkPluginState!.show_link_toolbar) {
     return null
   }
 

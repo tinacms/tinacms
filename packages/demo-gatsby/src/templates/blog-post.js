@@ -201,6 +201,13 @@ function BlogPostTemplate(props) {
 
                   return media.map(m => `/images/${m.filename}`)
                 },
+                previewUrl(src) {
+                  return new Promise(resolve => {
+                    setTimeout(() => {
+                      resolve(src)
+                    }, 3000)
+                  })
+                },
               }}
             >
               <div
