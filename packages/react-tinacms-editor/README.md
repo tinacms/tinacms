@@ -95,6 +95,7 @@ interface InlineWysiwygProps {
   sticky?: boolean | string
   format?: 'markdown' | 'html'
   imageProps?: ImageProps
+  focusRing?: boolean | FocusRingProps
 }
 
 interface ImageProps {
@@ -102,6 +103,11 @@ interface ImageProps {
   directory?: string
   upload?: (files: File[]) => Promise<string[]>
   previewSrc?: (url: string) => string | Promise<string>
+}
+
+interface FocusRingProps {
+  offset?: number | { x: number; y: number }
+  borderRadius?: number
 }
 ```
 
@@ -111,7 +117,8 @@ interface ImageProps {
 | `children`    | Child components to render.                                                                  |
 | `sticky?`     | A boolean determining whether the Wysiwyg Toolbar 'sticks' to the top of the page on scroll. |
 | `format?`     | This value denotes whether Markdown or HTML will be rendered.                                |
-| `imageProps?` | Configures how images in the Wysiwyg are uploaded and rendered. Images are disabled when undefined.|
+| `imageProps?` | An object that configures how images in the Wysiwyg are uploaded and rendered. Images are disabled when undefined.|
+| `focusRing?`   | Either an object to style the focus ring or a boolean to show/hide the focus ring. Defaults to `true` which displays the focus ring with default styles. For style options, `offset` (in pixels) sets the distance from the ring to the edge of the component, and `borderRadius` (in pixels) controls the [rounded corners](https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius) of the focus ring. |
 
 ### Basic Usage
 
