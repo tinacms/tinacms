@@ -122,4 +122,7 @@ class DummyMediaStore implements MediaStore {
       filename: file.name,
     }))
   }
+  async previewSrc(filename: string) {
+    return filename
+  }
 }

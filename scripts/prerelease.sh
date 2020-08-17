@@ -9,8 +9,6 @@ git pull
 
 # 2. Run a Fresh Build
 npm run hard-reset
-git add .
-git commit -am "chore: package-lock"
 
 # 3. Generate CHANGELOGs and Git Tags
 lerna version \

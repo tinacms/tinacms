@@ -98,9 +98,10 @@ interface InlineWysiwygProps {
 }
 
 interface ImageProps {
+  parse: (filename: string) => string
   directory?: string
   upload?: (files: File[]) => Promise<string[]>
-  previewUrl?: (url: string) => string | Promise<string>
+  previewSrc?: (url: string) => string | Promise<string>
 }
 ```
 
@@ -110,7 +111,7 @@ interface ImageProps {
 | `children`    | Child components to render.                                                                  |
 | `sticky?`     | A boolean determining whether the Wysiwyg Toolbar 'sticks' to the top of the page on scroll. |
 | `format?`     | This value denotes whether Markdown or HTML will be rendered.                                |
-| `imageProps?` | Configures how images in the Wysiwyg are uploaded and rendered.
+| `imageProps?` | Configures how images in the Wysiwyg are uploaded and rendered. Images are disabled when undefined.|
 
 ### Basic Usage
 
