@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.28.0](https://github.com/tinacms/tinacms/compare/v0.27.3...v0.28.0) (2020-08-17)
+
+
+### Features
+
+* **@tinacms/fields:** ImageFieldPlugin will default to useing cms.media.store for previewSrc ([a4f377c](https://github.com/tinacms/tinacms/commit/a4f377c90f7fc8b895c9e116a56a2752d8a9ae93))
+
+
+
+
+
 ## [0.27.1](https://github.com/tinacms/tinacms/compare/v0.27.0...v0.27.1) (2020-08-10)
 
 **Note:** Version bump only for package @tinacms/fields
