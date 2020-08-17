@@ -144,6 +144,33 @@ export function Page(props) {
 }
 ```
 
+### With _imageProps_
+
+To upload and manage images in the Wysiwyg, you'll need to configure `imageProps`. 
+
+| Key           | Description                                                                                  |
+| ------------- | -------------------------------------------------------------------------------------------- |
+| `parse`        | Defines how the actual front matter or data value gets populated on upload. The name of the file gets passed as an argument. _Defaults to `filename`_.                                           |
+| `directory?`    | Defines the upload directory.                                                                 |
+| `upload?`     | An asynchronous function that handles image upload. By default, this calls the `persist` function on the [media store](https://tinacms.org/docs/media). |
+| `previewSrc?`     | 	An asynchronous function that returns the path or url for the image `src` in preview or edit mode. By default, this calls the `previewSrc` function on the [media store](https://tinacms.org/docs/media)_.                             |
+
+```jsx
+<InlineWysiwyg
+  name="rawMarkdownBody"
+  imageProps={{
+    parse: (filename) => `images/about/${filename}`
+    directory: 'public/images/about/',
+  }}
+>
+  <div
+    dangerouslySetInnerHTML={{
+      __html: props.data.markdownRemark.html,
+    }}
+  />
+</InlineWysiwyg>
+```
+
 ### Sticky Menu
 
 When editing long content it is likely that the editor will scroll past the wysiwyg menu.
