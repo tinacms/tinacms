@@ -57,6 +57,12 @@ export interface MediaStore {
    * for those files.
    */
   persist(files: MediaUploadOptions[]): Promise<Media[]>
+
+  /**
+   * Given a `src` string it returns a url for previewing that content.
+   * This is helpful in cases where the file may not be available in production yet.
+   */
+  previewSrc(src: string): Promise<string>
 }
 
 /**

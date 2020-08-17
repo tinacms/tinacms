@@ -79,7 +79,7 @@ const WithImage = () => {
             }, 250)
           })
         },
-        previewUrl: (str: string) => str,
+        previewSrc: (str: string) => str,
       }}
     />
   )

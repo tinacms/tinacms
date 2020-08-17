@@ -63,6 +63,10 @@ export class StrapiMediaStore {
     return uploadResponse.json()
   }
 
+  async previewSrc(src: string) {
+    return this.strapiUrl + this.getFilePath(src)
+  }
+
   getFilePath(fileUrl: string): string {
     return fileUrl.split('?')[0]
   }
