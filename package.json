@@ -36,22 +36,15 @@
     "pretty-quick": "^2.0.1",
     "react": "16.12.0",
     "react-dom": "16.12.0",
-    "rollup": "^1.21.4",
-    "rollup-plugin-commonjs": "^10.0.1",
-    "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-typescript2": "^0.22.0",
-    "rollup-plugin-uglify": "^6.0.4",
     "ts-jest": "^24.3.0",
     "tsdx": "^0.12.3",
     "tslib": "^1.10.0",
     "typedoc": "^0.16.2",
-    "typescript": "^3.8.2",
-    "typescript-plugin-styled-components": "^1.4.4"
+    "typescript": "^3.8.2"
   },
   "dependencies": {
     "danger": "^9.2.0",
-    "depcheck": "^0.9.1",
-    "tinacms": "^0.18.2"
+    "depcheck": "^0.9.1"
   },
   "husky": {
     "hooks": {
