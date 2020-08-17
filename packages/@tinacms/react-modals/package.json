@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-modals",
-  "version": "0.28.0-alpha.0",
+  "version": "0.28.0-alpha.1",
   "license": "Apache-2.0",
   "main": "build/index.js",
   "typings": "build/index.d.ts",
@@ -21,7 +21,7 @@
   },
   "devDependencies": {
     "@tinacms/icons": "^0.26.0",
-    "@tinacms/react-core": "^0.28.0-alpha.0",
+    "@tinacms/react-core": "^0.28.0-alpha.1",
     "@tinacms/scripts": "^0.26.0",
     "@tinacms/styles": "^0.26.0"
   },
