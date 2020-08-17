@@ -126,11 +126,11 @@ export const EditLink = () => {
 }
 ```
 
-### Github Oauth App:
+### Github OAuth App:
 
-In GitHub, within your account Settings, click [Oauth Apps](https://github.com/settings/developers) under Developer Settings.
+In GitHub, within your account Settings, click [OAuth Apps](https://github.com/settings/developers) under Developer Settings.
 
-click "New Oauth App".
+click "New OAuth App".
 
 For the **Authorization callback URL**, enter the url for the "authorizing" page that [you created above](#auth-redirects) (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
 
