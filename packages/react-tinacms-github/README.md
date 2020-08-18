@@ -119,7 +119,7 @@ const cms = new TinaCMS({
 
 The `TinacmsGithubProvider` component controls edit access to your site and will send unauthenticated users through the authentication flow.
 
-`TinacmsGithubProvider` can be configured with custom handlers that run after a user has logged in / logged out successfully. The below example uses cust `onLogin` / `onLogout` handlers to hit custom API routes that trigger Next.js Preview Mode:
+`TinacmsGithubProvider` can be configured with custom handlers that run after a user has logged in / logged out successfully. The below example uses custom `onLogin` / `onLogout` handlers to hit custom API routes that trigger Next.js Preview Mode:
 
 ```tsx
 import { TinacmsGithubProvider } from 'react-tinacms-github';
