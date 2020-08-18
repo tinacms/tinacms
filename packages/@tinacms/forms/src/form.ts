@@ -24,7 +24,7 @@ import { Field, AnyField } from './field'
 export interface FormOptions<S, F extends Field = AnyField> extends Config<S> {
   id: any
   label: string
-  fields: F[]
+  fields?: F[]
   __type?: string
   reset?(): void
   actions?: any[]
@@ -66,7 +66,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.__type = options.__type || 'form'
     this.id = id
     this.label = label
-    this.fields = fields
+    this.fields = fields || []
     this.onSubmit = options.onSubmit
     this.finalForm = createForm<S>({
       ...options,
