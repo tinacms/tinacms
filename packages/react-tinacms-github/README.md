@@ -174,7 +174,7 @@ This is a delete action for [the github client](https://tinacms.org/docs/package
 
 It will **delete the entire form file**. So the primary use case would be dynamic pages like blog pages or docs pages. (Commonly used with markdown files but could be any file format)
 
-![](https://tinacms.org/img/delete-action-ex.png)
+![Form Actions panel with Delete button](https://tinacms.org/img/delete-action-ex.png)
 
 
 #### Options
@@ -313,7 +313,7 @@ import { useGithubFile } from 'react-tinacms-github'
 import { useForm, usePlugin } from 'tinacms'
 
 export function Page(props) => {
-  
+
   const { fetchFile, commit } = useGithubFile({
     path: 'content/home-page.json',
     parse: JSON.parse,
