@@ -1,6 +1,6 @@
 # react-tinacms-github
 
-This package provides helpers for setting up TinaCMS to use the Github API, with Github authentication.
+This package provides helpers for setting up TinaCMS to use the Github OAuth API.
 
 ## Installation
 
@@ -14,41 +14,114 @@ or
 yarn add react-tinacms-github
 ```
 
-## Getting Started
 
-### Register the GithubClient
+## _GithubClient_
 
-We will want to use the GithubClient to load/save our content using the Github API. Let's add it as an API plugin.
+The `GithubClient` class is used to interact with the GitHub API on the frontend, and is intended to be registered with the CMS as an [External API](https://tinacms.org/docs/apis). `GithubClient` takes an object of configuration data with the following structure:
+
+```ts
+interface GithubClientArgs {
+  proxy: string             // URL to the API Proxy (see next-tinacms-github for an example)
+  authCallbackRoute: string // OAuth Callback URL (see next-tinacms-github for an example)
+  clientId: string          // Client ID for GitHub OAuth App
+  baseRepoFullName: string  // Path to the GitHub repo where content is stored in the format {user}/{repo}, e.g. tinacms/tinacms.org
+}
+```
+
+We can create and register an instance of `GithubClient` as follows:
 
 ```ts
 import { TinaCMS } from 'tinacms'
 import { GithubClient } from 'react-tinacms-github'
 
-const github = new GithubClient({
+const githubClient = new GithubClient({
   proxy: '/api/proxy-github',
   authCallbackRoute: '/api/create-github-access-token'
   clientId: process.env.GITHUB_CLIENT_ID,
-  baseRepoFullName: process.env.REPO_FULL_NAME // e.g: tinacms/tinacms.org,
+  baseRepoFullName: process.env.REPO_FULL_NAME
 })
 
 const cms = new TinaCMS({
   apis: {
-    github
-  },
-  media: {
-    store: new GithubMediaStore(github)
+    github: githubClient // equivalent to cms.registerApi('github', github)
   }
 })
 ```
 
-### Managing "edit-mode" state
+### Available Properties
 
-Add the root `TinacmsGithubProvider` component to our main layout. We will supply it with handlers for authenticating and entering/exiting edit-mode.
+| property | descripton |
+| --- | --- |
+| `isFork` | Returns `true` if the repo being edited was forked from the base repo configured for the site. |
+| `workingRepoFullName` | The full name of the repo currently being edited (will refer to the fork if `isFork` is `true`) |
+| `branchName` | Name of the branch currently being edited
 
-In this case, we will hit our `/api` server functions.
+### Available Methods
+
+> See also the [GithubFile](#githubfile-and-usegithubfile) for easier-to-use wrappers around `commit` and `fetchFile`.
+
+| method | description |
+| --- | --- |
+| `async commit(filePath, sha, fileContents, commitMessage)` | Creates a new commit |
+| `async fetchFile(filepath, decoded)` | Retrieves the contents of a file from the currently edited repo and branch |
+| `async getDownloadUrl(path)` | Returns a URL to download the specified file; used to display images in the CMS |
+| `async upload(path, contents, commitMessage, encoded)` | Uploads a file |
+| `async delete(path, commitMessage)` | Deletes a file |
+| `async isAuthenticated()` | Returns `true` if the user has been authenticated with GitHub, `false` otherwise |
+| `async isAuthorized()` | Returns `true` if the logged-in user has permission to push to the repository, `false` otherwise |
+| `async getUser()` | Retrieves data about the currently logged-in user |
+| `async getRepository()` | Retrieves data about the currently edited repository. |
+| `async createFork()` | Forks the base repo |
+| `async createPR(title, body)` | Creates a new pull request against the base repo |
+| `setWorkingRepoFullName(name)` | Changes the current repo being edited |
+| `setWorkingBranch(branch)` | changes the current branch being edited |
+| `async fetchExistingPR()` | Retrieves data about an open pull request for the current fork/branch if it exists |
+| `async getBranchList()` | Retrieves a list of all branches in the current repo |
+| `async createBranch(name)` | Creates a new branch |
+
+
+
+
+
+## _GithubMediaStore_
+
+`GithubMediaStore` is used to manage media over the Github API, and satisfies [the MediaStore interface](https://tinacms.org/docs/media#creating-a-media-store). `GithubMediaStore` should be passed an instance of `GithubClient` when it is created:
+
+```ts
+import { TinaCMS } from 'tinacms'
+import { GithubClient, GithubMediaStore } from 'react-tinacms-github'
+
+const githubClient = new GithubClient({
+  proxy: '/api/proxy-github',
+  authCallbackRoute: '/api/create-github-access-token'
+  clientId: process.env.GITHUB_CLIENT_ID,
+  baseRepoFullName: process.env.REPO_FULL_NAME
+})
+
+const mediaStore = new GithubMediaStore(githubClient)
+
+const cms = new TinaCMS({
+  apis: {
+    github: githubClient // equivalent to cms.registerApi('github', githubClient)
+  },
+  media: {
+    store: mediaStore
+  }
+})
+```
+
+## Authentication
+
+> For a detailed guide on setting up authentication with react-tinacms-github on a Next.js site, take a look at our [Next.js + GitHub guide](https://tinacms.org/guides/nextjs/github/initial-setup).
+
+
+### _TinacmsGithubProvider_
+
+The `TinacmsGithubProvider` component controls edit access to your site and will send unauthenticated users through the authentication flow.
+
+`TinacmsGithubProvider` can be configured with custom handlers that run after a user has logged in / logged out successfully. The below example uses cust `onLogin` / `onLogout` handlers to hit custom API routes that trigger Next.js Preview Mode:
 
 ```tsx
-// YourLayout.ts
 import { TinacmsGithubProvider } from 'react-tinacms-github';
 
 const enterEditMode = async () => {
@@ -87,13 +160,14 @@ const YourLayout = ({ error, children }) => {
 }
 ```
 
-### Auth Redirects
+### _useGithubAuthRedirect_
 
-We will also need a few Github Specific pages to redirect the user to while authenticating with Github
+GitHub's OAuth flow involves redirecting a user to a page on your website that will receive their authentication token payload. The `useGithubAuthRedirect` hook can be used to automatically receive this payload and make it available to the GitHub Client.
 
 ```tsx
-//pages/github/authorizing.tsx
+// pages/github/authorizing.tsx
 // Our Github app redirects back to this page with auth code
+
 import { useGithubAuthRedirect } from 'react-tinacms-github'
 
 export default function Authorizing() {
@@ -105,43 +179,9 @@ export default function Authorizing() {
 }
 ```
 
-### Enabling the CMS
+## Using GitHub Forms
 
-
-We will need a way to enable the CMS from our site. Let's create an "Edit Link" button.
-
-```tsx
-//...EditLink.tsx
-import { useCMS } from 'react-tinacms-github'
-
-
-export const EditLink = () => {
-  const github = useCMS()
-
-  return (
-    <button onClick={() => cms.toggle()}>
-      {cms.enabled ? 'Exit Edit Mode' : 'Edit This Site'}
-    </button>
-  )
-}
-```
-
-### Github OAuth App:
-
-In GitHub, within your account Settings, click [OAuth Apps](https://github.com/settings/developers) under Developer Settings.
-
-click "New OAuth App".
-
-For the **Authorization callback URL**, enter the url for the "authorizing" page that [you created above](#auth-redirects) (e.g https://your-url/github/authorizing). Fill out the other fields with your custom values.
-
-The generated **Client ID** will be used in your site (remember, we passed this value into the Github `authenticate` method earlier).
-
-The **Client Secret** will likely be used by your backend.
-
-
-### Using Github Forms
-
-Any forms that we have on our site can be created with the `useGithubJsonForm` or `useGithubMarkdownForm` helpers
+Any forms that we have on our site can be created with the `useGithubJsonForm` or `useGithubMarkdownForm` helpers.
 
 ```tsx
 function BlogTemplate({ jsonFile }) {
@@ -157,18 +197,9 @@ function BlogTemplate({ jsonFile }) {
 }
 ```
 
-`useGithubJsonForm` will use the `GithubClient` api that we [registered earlier](#register-the-githubclient).
+`useGithubJsonForm` requires the `GithubClient` api to be registered with the CMS on the `github` namespace.
 
-## Next steps
-
-Now that we have configured our front-end to use Github, we will need to setup some backend functions to handle authentication.
-If you are using Next.js, you may want to use the [next-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/next-tinacms-github) package.
-
-
-
-## Toolbar and form plugins
-
-### GitHub Delete Action
+## GitHub Delete Action
 
 This is a delete action for the GitHub client.
 
@@ -177,7 +208,7 @@ It will **delete the entire form file**. So the primary use case would be dynami
 ![Form Actions panel with Delete button](https://tinacms.org/img/delete-action-ex.png)
 
 
-#### Options
+### Options
 
 ```ts
 interface options {
@@ -191,7 +222,7 @@ interface options {
 | getTitle    | This function takes in the form as its parameter and returns the title that will displayed in the delete action _(Optional)_                      |
 | getFilePath | This function takes in the form as its parameter and returns the github file path that will be used when deleting the file in github _(Optional)_ |
 
-#### Example
+### Example
 
 ```js
 import { CreateGithubDeleteAction } from 'tinacms-react-github'
@@ -335,4 +366,3 @@ export function Page(props) => {
   //...
 }
 ```
-
