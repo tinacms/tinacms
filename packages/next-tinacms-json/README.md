@@ -8,52 +8,59 @@ The `next-tinacms-json` package provides helpers to make local JSON content edit
 yarn add next-tinacms-json
 ```
 
-## Helpers
+## API
+
+| Export | Description|
+| --- | --- |
+| `JsonFile` | A interface representing a JSON file stored on the local filesystem in Git.|
+| `useJsonForm` | [React Hook](https://reactjs.org/docs/hooks-intro.html) that creates a [TinaCMS Form Plugin](https://tinacms.org/docs/plugins/forms) for editing a `JsonFile`.|
+
+
+### _JsonFile_
+The `JsonFile` interface represents a JSON file stored on the local filesystem in Git.
 
 ```ts
-useJsonForm( jsonFile, options? ):[values, form]
-```
-`useJsonForm` is a [React Hook](https://reactjs.org/docs/hooks-intro.html) that creates a Git form
-
-```ts
-jsonForm( Component, options? ): Component
-```
-`jsonForm` is a [React Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) that creates and registers a Git form
-
-
-### _useJsonForm_ hook
-
-```js
-const [data, form] = useJsonForm(jsonFile, formOptions)
-```
-
-As the first argument, this hook expects an object matching the following interface:
-
-```typescript
-// A datastructure representing a JSON file stored in Git
-interface JsonFile<T = any> {
+export interface JsonFile {
   fileRelativePath: string
-  data: T
+  data: any
 }
 ```
 
-As with other Tina form helpers, this hook also accepts a second, optional argument — a [form configuration](/docs/plugins/forms#form-configuration) object.
+| Name | Description |
+| --- | --- |
+| `fileRelativePath` | The path to the file relative to the root of the Git repository. |
+| `data`| The parsed data from the JSON file.|
 
-**/pages/index.js**
+### _useJsonForm_
+
+The `useJsonForm` function is a [React Hook](https://reactjs.org/docs/hooks-intro.html) creates a [TinaCMS Form Plugin](https://tinacms.org/docs/plugins/forms) for editing a `JsonFile`.
+
+```ts
+import { Form, FormOptions } from "tinacms"
+
+export function useJsonForm(
+  jsonFile: JsonFile,
+  options?: FormOptions
+):[any, Form]
+```
+
+The `useJsonForm` hook accepts a [JsonFile](#jsonfile) and an optional [FormOptions](/docs/plugins/forms#form-configuration) object. It returns an array with containing the current values aand the Form.
+
+
+**Example: pages/index.js**
 
 ```js
-import * as React from 'react'
 import { usePlugin } from 'tinacms'
 import { useJsonForm } from 'next-tinacms-json'
 
 export default function Index({ jsonFile }) {
   // Create the Form
-  const [post, form] = useJsonForm(jsonFile)
+  const [homePage, homePageForm] = useJsonForm(jsonFile)
 
   // Register it with the CMS
-  usePlugin(form)
+  usePlugin(homePageForm)
 
-  return <h1>{post.title}</h1>
+  return <h1>{homePage.title}</h1>
 }
 
 export async function getStaticProps() {
@@ -63,61 +70,6 @@ export async function getStaticProps() {
     props: {
       jsonFile: {
         fileRelativePath: `/content/index.json`,
-        data: content.default,
-      },
-    },
-  }
-}
-```
-
-### _jsonForm_ HOC
-
-`jsonForm` accepts two arguments: _a component and an optional [form configuration object](/docs/plugins/forms#form-configuration)_. The component being passed is expected to receive data as props that matches the `jsonFile` interface outlined below.
-
-```typescript
-// A datastructure representing a JSON file stored in Git
-interface JsonFile<T = any> {
-  fileRelativePath: string
-  data: T
-}
-```
-
-`jsonForm` returns the original component connected with a new JSON form registered with Tina. Below is the same example from `useJsonForm`, but refactored to use the `jsonForm` HOC.
-
-**/pages/index.js**
-
-```js
-/**
- * 1. import jsonForm
- */
-import { jsonForm } from 'next-tinacms-json'
-import * as React from 'react'
-
-function Index(props) {
-  const post = props.jsonFile
-
-  return (
-    <>
-      <h1>{post.title}</h1>
-    </>
-  )
-}
-
-/**
- * 2. Wrap and export the Page component with jsonForm
- */
-export default jsonForm(Page)
-
-export async function getStaticProps() {
-  const content = await import(`../../posts/index.json`)
-
-  return {
-    props: {
-      /**
-       * 3. Make sure your return object matches this shape
-       */
-      jsonFile: {
-        fileRelativePath: `/posts/index.json`,
         data: content.default,
       },
     },
