@@ -228,3 +228,111 @@ const formOptions = {
      //...
 }
 ```
+
+## _GithubFile_ and _useGithubFile_
+
+The `GithubFile` class is a helper class to provide methods for manipulating a single file in your GitHub repo.
+
+### Signature
+
+```ts
+type parseFn = (content: string) => any
+type serializeFn = (data: any) => string
+
+interface GithubFileArgs {
+  private cms: TinaCMS
+  private path: string
+  private parse?: parseFn
+  private serialize?: serializeFn
+}
+
+const file = new GithubFile(args: GithubFileArgs)
+```
+
+| argument | description |
+| --- | --- |
+| cms | An instance of TinaCMS |
+| path | Filepath, relative to repository root |
+| parse | Function to deserialize file contents into an object |
+| serialize | Function to serialize data object into a string |
+
+### Methods
+
+The `GithubFile` class has two public methods:
+
+| method | description |
+| --- | --- |
+| fetchFile | Wraps `GithubClient#fetchFile`; async function to retrieve file contents from GitHub API |
+| commit | Wraps `GithubClient#commit`; async function to commit changes to a file |
+
+
+
+### Usage Example
+
+```ts
+import { GithubFile } from 'react-tinacms-github'
+
+async function example() {
+  const navigationFile = new GithubFile(
+    cms,
+    'content/navigation.json',
+    JSON.parse,
+    JSON.stringify
+  )
+
+  // get file contents from GitHub
+  const navigation = await navigationFile.fetchFile()
+
+  // modify the file data
+  navigation.push({ url: 'https://tinacms.org', title: 'TinaCMS' })
+
+  // commit the updated file data
+  await navigationFile.commit(navigation, 'Update navigation')
+}
+
+```
+
+### _useGithubFile_
+
+`useGithubFile` wraps the `GithubFile` class and is designed to be used from inside a Function Component.
+
+```ts
+interface UseGithubFileArgs {
+  path: string
+  parse?: parseFn
+  serialize?: serializeFn
+}
+
+function useGithubFile(args: UseGithubFileArgs): GithubFile
+```
+
+`useGithubFile` is intended to provide a more flexible abstraction than the form helpers, giving you file manipulation methods that you can use in conjunction with `useForm`.
+
+```ts
+import { useGithubFile } from 'react-tinacms-github'
+import { useForm, usePlugin } from 'tinacms'
+
+export function Page(props) => {
+  
+  const { fetchFile, commit } = useGithubFile({
+    path: 'content/home-page.json',
+    parse: JSON.parse,
+    stringify: JSON.stringify
+  })
+
+  const [homepageData, homepageForm] = useForm({
+    loadInitialValues: fetchFile,
+    onSubmit: commit,
+
+    id: 'home-page',
+    label: 'Home Page',
+    fields: [
+      //...
+    ],
+  })
+  usePlugin(homepageForm)
+
+  //...
+}
+```
+
