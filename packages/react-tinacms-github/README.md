@@ -162,15 +162,15 @@ function BlogTemplate({ jsonFile }) {
 ## Next steps
 
 Now that we have configured our front-end to use Github, we will need to setup some backend functions to handle authentication.
-If you are using Nextjs, you may want to use the [next-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/next-tinacms-github) package.
+If you are using Next.js, you may want to use the [next-tinacms-github](https://github.com/tinacms/tinacms/tree/master/packages/next-tinacms-github) package.
 
 
 
 ## Toolbar and form plugins
 
-### Github Delete Action
+### GitHub Delete Action
 
-This is a delete action for [the github client](https://tinacms.org/docs/packages/github-client).
+This is a delete action for the GitHub client.
 
 It will **delete the entire form file**. So the primary use case would be dynamic pages like blog pages or docs pages. (Commonly used with markdown files but could be any file format)
 
