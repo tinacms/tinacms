@@ -266,19 +266,7 @@ The `GithubFile` class is a helper class to provide methods for manipulating a s
 
 ### Signature
 
-```ts
-type parseFn = (content: string) => any
-type serializeFn = (data: any) => string
-
-interface GithubFileArgs {
-  private cms: TinaCMS
-  private path: string
-  private parse?: parseFn
-  private serialize?: serializeFn
-}
-
-const file = new GithubFile(args: GithubFileArgs)
-```
+The `GithubFile` constructor takes four parameters: `cms`, `path`, `parse`, and `serialize`.
 
 | argument | description |
 | --- | --- |
