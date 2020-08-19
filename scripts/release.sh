@@ -21,7 +21,6 @@ lerna version \
   --yes \
   --conventional-commits \
   --conventional-graduate \
-  --no-push \
   --allow-branch latest \
   --create-release github \
   -m "chore(publish): latest" \

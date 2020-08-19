@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/git-client",
-  "version": "0.28.0-alpha.0",
+  "version": "0.28.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -29,9 +29,9 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.28.0-alpha.0",
-    "@tinacms/media": "^0.28.0-alpha.0",
-    "@tinacms/react-core": "^0.28.0-alpha.0",
+    "@tinacms/core": "^0.28.0",
+    "@tinacms/media": "^0.28.0",
+    "@tinacms/react-core": "^0.28.0",
     "@tinacms/scripts": "^0.26.0"
   }
 }
