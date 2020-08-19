@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.28.0](https://github.com/tinacms/tinacms/compare/v0.27.3...v0.28.0) (2020-08-17)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** an authorized user trying access a deleted branch will be prompted to switch back to the base branch ([137b5ee](https://github.com/tinacms/tinacms/commit/137b5ee01ef289cf3a26ceae2e2d0c327fd9b1ea))
+* **react-tinacms-github:** improved error modals on 404s ([4a998fc](https://github.com/tinacms/tinacms/commit/4a998fc79436b504fcfada4c80de1249b34a899a))
+
+
+### Features
+
+* **react-tinacms-github:** GithubMediaStore implements previewSrc ([325fdb4](https://github.com/tinacms/tinacms/commit/325fdb4ddda710c5b7baf2e0ab3ac4027f572905))
+
+
+
+
+
 ## [0.27.1](https://github.com/tinacms/tinacms/compare/v0.27.0...v0.27.1) (2020-08-10)
 
 

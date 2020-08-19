@@ -3,6 +3,32 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.28.0](https://github.com/tinacms/tinacms/compare/v0.27.3...v0.28.0) (2020-08-17)
+
+### Bug Fixes
+
+- multiple instances of components not accepting multiple child elements ([cbbb03d](https://github.com/tinacms/tinacms/commit/cbbb03df7d1c98450355b93e1189cda8811aa5a3))
+- **react-tinacms-editor:** prosemirror image plugin is only added if imageProps was was defined ([c29cc4c](https://github.com/tinacms/tinacms/commit/c29cc4c18e1a6b3ca3395cf51f3d274af2be58fb))
+- **react-tinacms-editor:** renamed previewUrl to previewSrc to make it consistent with InlineImage component and ImageFieldPlugin ([db55a85](https://github.com/tinacms/tinacms/commit/db55a852ab445f7553b68bf1a9a62d5484afcb9f))
+- **react-tinacms-editor:** seevral UX issues addressed for tables, headings, and the link modal ([#1393](https://github.com/tinacms/tinacms/issues/1393)) ([28cfaec](https://github.com/tinacms/tinacms/commit/28cfaec04cfdb63376b04e23113911af00ddad9c))
+- **react-tinacms-editor:** when InlineWysiwyg is not given imageProps then images are disabled ([ebefdf1](https://github.com/tinacms/tinacms/commit/ebefdf1a914cdb9a2e2bd0f8ffbfc1dfea2fef52))
+- **react-tinacms-github:** an authorized user trying access a deleted branch will be prompted to switch back to the base branch ([137b5ee](https://github.com/tinacms/tinacms/commit/137b5ee01ef289cf3a26ceae2e2d0c327fd9b1ea))
+- **react-tinacms-github:** improved error modals on 404s ([4a998fc](https://github.com/tinacms/tinacms/commit/4a998fc79436b504fcfada4c80de1249b34a899a))
+
+### Features
+
+- **@tinacms/core:** events from APIs are dispatched to the entire CMS ([1a47d0b](https://github.com/tinacms/tinacms/commit/1a47d0b85ac0aedc65a26caed5fea6dc5d0f7f2a))
+- **@tinacms/fields:** ImageFieldPlugin will default to useing cms.media.store for previewSrc ([a4f377c](https://github.com/tinacms/tinacms/commit/a4f377c90f7fc8b895c9e116a56a2752d8a9ae93))
+- **@tinacms/media:** MediaStore's can have an optional previewSrc method ([e4024d2](https://github.com/tinacms/tinacms/commit/e4024d2404dd833617fed5715c3d1f8fb397ee46))
+- **react-tinacms-editor:** by default InlineWysiwyg will use cms.media.store for the previewUrl ([d7dbda7](https://github.com/tinacms/tinacms/commit/d7dbda72954a28c3e990790b3656485e89004c37))
+- **react-tinacms-editor:** InlineWysiwyg expects imageProps.parse to modify the filename before inserting the img tag ([1738671](https://github.com/tinacms/tinacms/commit/17386712e449c21355e44b928f7b06f9bf90c222))
+- **react-tinacms-github:** GithubMediaStore implements previewSrc ([325fdb4](https://github.com/tinacms/tinacms/commit/325fdb4ddda710c5b7baf2e0ab3ac4027f572905))
+- **react-tinacms-inline:** InlineImage defaults to using cms.media.store.previewSrc ([d050e63](https://github.com/tinacms/tinacms/commit/d050e6301bc2a7e38681d1fb72b31b36283bf920))
+- **react-tinacms-inline:** InlineImage now works with an async previewSrc ([91b8995](https://github.com/tinacms/tinacms/commit/91b8995f4741f3aed8aee2fd045242623bc86221))
+- **react-tinacms-inline:** InlineText and InlineTextarea will render children instead of input.value when cms.disabled ([1ee29ab](https://github.com/tinacms/tinacms/commit/1ee29abaf526168b06af232ff31bf1fc5bbc01e3))
+- **react-tinacms-inline:** InlineTextarea now accepts placeholder ([1be2566](https://github.com/tinacms/tinacms/commit/1be2566a5177cdbf4a439d80ba0ff8d048528d76))
+- **react-tinacms-strapi:** StrapiMediaStore implements previewSrc ([fe5df7d](https://github.com/tinacms/tinacms/commit/fe5df7d804d2c0d1b8f21283dd56ab7132d1414d))
+
 ## [0.27.3](https://github.com/tinacms/tinacms/compare/v0.27.2...v0.27.3) (2020-08-10)
 
 ### Bug Fixes
