@@ -1,6 +1,6 @@
 # next-tinacms-markdown
 
-The `next-tinacms-markdown` package provides a set of methods for editing content sourced from Markdown files in a [Git-based workflow](https://tinacms.org/guides/nextjs/git/getting-started).
+The `next-tinacms-markdown` package provides helpers to make local Markdown files editable. This package is intended to be used with a [TinaCMS Git-based workflow](https://tinacms.org/guides/nextjs/git/getting-started).
 
 ## Installation
 
@@ -8,26 +8,18 @@ The `next-tinacms-markdown` package provides a set of methods for editing conten
 yarn add next-tinacms-markdown
 ```
 
-## Helpers
+## API
+
+| Export | Description|
+| --- | --- |
+| `MarkdownFile` | A interface representing a Markdown file stored on the local filesystem in Git.|
+| `useMarkdownForm` | [React Hook](https://reactjs.org/docs/hooks-intro.html) that creates a [TinaCMS Form Plugin](https://tinacms.org/docs/plugins/forms) for editing a `MarkdownFile`.|
+
+
+### _MarkdownFile_
+The `MarkdownFile` interface represents a Markdown file stored on the local filesystem in Git.
 
 ```ts
-useMarkdownForm( markdownFile, options? ):[values, form]
-```
-A [React Hook](https://reactjs.org/docs/hooks-intro.html) for registering local forms with [function components](https://reactjs.org/docs/components-and-props.html#function-and-class-components).
-
-```ts
-markdownForm( Component, options? ): Component
-```
-
-A [React Higher-Order Component](https://reactjs.org/docs/higher-order-components.html) for registering local forms with class or function components.
-
-
-**Arguments**
-
-- `markdownFile`: These helper functions expect an object as the first argument that matches the following interface:
-
-```typescript
-// A datastructure representing a MarkdownFile file stored in Git
 export interface MarkdownFile {
   fileRelativePath: string
   frontmatter: any
@@ -35,156 +27,70 @@ export interface MarkdownFile {
 }
 ```
 
-- `options`: The second argument is an _optional configuration object_ that can include [options](/guides/gatsby/git/customize-form) to customize the form.
+| Name | Description |
+| --- | --- |
+| `fileRelativePath` | The path to the file relative to the root of the Git repository. |
+| `markdownBody`| The content body of from the Markdown file.|
+| `frontmatter`| The parsed frontmatter data from the Markdown file.|
 
-**Return Values**
+### _useMarkdownForm_
 
-- `values`: An object containing the current values from `frontmatter` and `markdownBody`. You can use these values to render content.
-- `form`: A reference to the `Form` registered to the CMS. Most of the time you won't need to work directly with the `Form`, so you won't see it used in the example.
+The `useMarkdownForm` function is a [React Hook](https://reactjs.org/docs/hooks-intro.html) creates a [TinaCMS Form Plugin](https://tinacms.org/docs/plugins/forms) for editing a `MarkdownFile`.
 
-### _useMarkdownForm_ hook
+```ts
+import { Form, FormOptions } from "tinacms"
 
-The `useMarkdownForm` hook will connect the return data from `getStaticProps` with Tina, then return the `frontmatter` and `markdownBody` values to be rendered.
-
-**pages/info.js**
-
-```jsx
-/*
-** 1. Import `useMarkdownForm` and `usePlugin`
-*/
-import { useMarkdownForm } from 'next-tinacms-markdown'
-import { usePlugin } from 'tinacms'
-import matter from 'gray-matter'
-import ReactMarkdown from 'react-markdown'
-import Layout from '../components/Layout'
-
-export default function Info(props) {
-
-  /*
-  ** Optional — define an options object
-  ** to customize the form
-  */
-  const formOptions = {
-    label: 'Info Page',
-    fields: [
-      { label: 'Name', name: 'frontmatter.name', component: 'text' },
-      {
-        name: 'markdownBody',
-        label: 'Info Page Content',
-        component: 'markdown',
-      },
-    ],
-  }
-  /*
-  ** 2. Call `useMarkdownForm` and pass in the
-  **    `data` object returned from `getStaticProps`,
-  **    along with any form options.
-  */
-  const [data, form] = useMarkdownForm(props.markdownFile, formOptions)
-
-  /*
-  ** 3. Register the form with the CMS
-  */
-  usePlugin(form)
-
-  /*
-  **  4. Render content from your Markdown source file
-  **     with the props returned from getStaticProps
-  */
-  return (
-    <Layout>
-      <section>
-        <h1>{data.frontmatter.name}</h1>
-        <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-      </section>
-    </Layout>
-  )
-}
-
-export async function getStaticProps() {
-  const infoData = await import(`../data/info.md`)
-  const data = matter(infoData.default)
-
-  return {
-    props: {
-    markdownFile: {
-      fileRelativePath: `data/info.md`,
-      frontmatter: data.data,
-      markdownBody: data.content,
-    },
-  }
-}
+export function useMarkdownForm(
+  markdownFile: MarkdownFile,
+  options?: FormOptions
+):[any, Form]
 ```
 
-> You can use [`gray-matter`](https://github.com/jonschlinkert/gray-matter) to parse the YAML frontmatter when importing a raw Markdown file.
+The `useMarkdownForm` hook accepts a [MarkdownFile](#markdownfile) and an optional [FormOptions](/docs/plugins/forms#form-configuration) object. It returns an array with containing the current values aand the Form.
 
-### _markdownForm_ HOC
 
-`markdownForm` accepts two arguments: _a component and an [form configuration object](/guides/gatsby/git/customize-form)_. The component being passed is expected to receive data as props that matches the `markdownFile` interface outlined below.
+## Usage
 
-```typescript
-// A datastructure representing a MarkdownFile file stored in Git
-export interface MarkdownFile {
-  fileRelativePath: string
-  frontmatter: any
-  markdownBody: string
-}
+This package does not handle rendering the markdown content on the page. You can bring your own renderer or use `react-markdown`:
+
+```bash
+yarn add react-markdown
 ```
 
-`markdownForm` returns the original component with a Git form registered with Tina. Below is the same example from `useMarkdownForm`, but refactored to use the HOC.
+**Example: pages/index.js**
 
-**pages/info.js**
 
 ```js
-/*
-** 1. import `markdownForm`
-*/
-import { markdownForm } from 'next-tinacms-markdown'
+import { usePlugin } from 'tinacms'
+import { useMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
-import matter from 'gray-matter'
-import Layout from '../components/Layout'
 
-function Info(props) {
-  const data = props.markdownFile
+export default function Index({ markdownFile }) {
+  // Create the Form
+  const [homePage, homePageForm] = useMarkdownForm(markdownFile)
+
+  // Register it with the CMS
+  usePlugin(homePageForm)
+
   return (
-    <Layout>
-      <section>
-        <h1>{data.frontmatter.name}</h1>
-        <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-      </section>
-    </Layout>
+    <>
+      <h1>{homePage.title}</h1>
+      <ReactMarkdown>{homePage.markdownBody}</ReactMarkdown>
+    </>
   )
 }
 
-/*
-** Optional — define an options object
-** to customize the form
-*/
-const formOptions = {
-  //...
-}
-
-/*
- ** 2. Wrap your component with `markdownForm`,
- **    pass in optional form field config object
- */
-export default markdownForm(Info, formOptions)
-
 export async function getStaticProps() {
-  const infoData = await import(`../data/info.md`)
+  const infoData = await import(`../content/info.md`)
   const data = matter(infoData.default)
 
   return {
     props: {
-    /*
-    ** 3. Structure your return object with this shape.
-    **    Make sure to use the `markdownFile`
-    **    property name
-    */
-    markdownFile: {
-      fileRelativePath: `data/info.md`,
-      frontmatter: data.data,
-      markdownBody: data.content,
+      markdownFile: {
+        fileRelativePath: `content/info.md`,
+        frontmatter: data.data,
+        markdownBody: data.content,
+      }
     },
   }
 }

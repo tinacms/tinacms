@@ -1,10 +1,9 @@
 {
   "name": "react-tinacms-inline",
-  "version": "0.27.3",
+  "version": "0.28.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
-  "module": "dist/react-tinacms-inline.esm.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/src/index.d.ts",
   "files": [
     "dist"
   ],
@@ -28,10 +27,11 @@
   },
   "devDependencies": {
     "@tinacms/icons": "^0.26.0",
-    "@tinacms/react-forms": "^0.27.1",
+    "@tinacms/react-forms": "^0.28.0",
+    "@tinacms/scripts": "^0.26.0",
     "@tinacms/styles": "^0.26.0",
     "react-dropzone": "10.1.8",
     "react-tinacms-editor": "^0.4.0",
-    "tinacms": "^0.27.1"
+    "tinacms": "^0.28.0"
   }
 }

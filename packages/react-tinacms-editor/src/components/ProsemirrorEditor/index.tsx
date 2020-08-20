@@ -50,8 +50,8 @@ export const ProsemirrorEditor = styled(
       const { translator: translatorObj } = buildEditor(
         input,
         editorRef.current,
-        imageProps,
         setEditorView,
+        imageProps,
         format
       )
       setTranslator(translatorObj)
