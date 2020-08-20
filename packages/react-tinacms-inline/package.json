@@ -3,8 +3,7 @@
   "version": "0.28.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
-  "module": "dist/react-tinacms-inline.esm.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/src/index.d.ts",
   "files": [
     "dist"
   ],
