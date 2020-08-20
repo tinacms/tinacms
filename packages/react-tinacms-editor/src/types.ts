@@ -71,7 +71,7 @@ export interface Input {
 export interface EditorProps {
   input: Input
   plugins?: Plugin[]
-  sticky?: boolean | string
+  sticky?: string
   format?: Format
   imageProps?: ImageProps
   className?: string
