@@ -30,6 +30,7 @@ export default class Site extends App {
   constructor() {
     super()
     this.cms = new TinaCMS({
+      enabled: true,
       sidebar: {
         placeholder: Empty,
         position: 'overlay',

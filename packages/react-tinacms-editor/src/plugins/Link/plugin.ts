@@ -26,9 +26,10 @@ import { linkify } from './util'
 
 interface LinkPluginState {
   showLinkForm: boolean
+  show_link_toolbar: boolean
 }
 
-export const linkPluginKey = new PluginKey('image')
+export const linkPluginKey = new PluginKey<LinkPluginState>('image')
 
 export function linkPlugin(): Plugin {
   let shiftKey: boolean
