@@ -776,6 +776,15 @@
         "doc",
         "bug"
       ]
+    },
+    {
+      "login": "kedskeds",
+      "name": "Kelsey Edelstein",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/19883983?v=4",
+      "profile": "https://kedskeds.herokuapp.com",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
