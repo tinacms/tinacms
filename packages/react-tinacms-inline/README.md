@@ -500,7 +500,7 @@ This can be an issue if your styles require direct inheritance, such as a flexbo
 
 ```html
 <div class="row">
-  <div class="column>
+  <div class="column">
   </div>
 </div>
 ```
