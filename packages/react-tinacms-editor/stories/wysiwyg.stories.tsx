@@ -80,6 +80,7 @@ const WithImage = () => {
           })
         },
         previewSrc: (str: string) => str,
+        parse: src => src,
       }}
     />
   )
