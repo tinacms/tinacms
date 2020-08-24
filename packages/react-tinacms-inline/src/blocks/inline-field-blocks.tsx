@@ -48,11 +48,13 @@ export interface InlineBlocksProps {
 }
 
 export interface BlocksContainerProps {
-  ref: React.Ref<any>
+  innerRef: React.Ref<any>
   className: string
 }
 
-const DefaultContainer = (props: BlocksContainerProps) => <div {...props} />
+const DefaultContainer = (props: BlocksContainerProps) => (
+  <div ref={props.innerRef} {...props} />
+)
 
 export interface InlineBlocksActions {
   count: number
@@ -135,7 +137,7 @@ export function InlineBlocks({
         return (
           <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
-              <Container ref={provider.innerRef} className={className}>
+              <Container innerRef={provider.innerRef} className={className}>
                 {
                   <InlineBlocksContext.Provider
                     value={{
