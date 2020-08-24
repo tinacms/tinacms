@@ -46,7 +46,7 @@ export interface InlineBlocksProps {
 }
 
 export interface InlineBlockRenderFunctionProps {
-  providedRef: any
+  ref: React.Ref<HTMLElement>
   className: string
 }
 
@@ -79,10 +79,12 @@ export function useInlineBlocks() {
   return inlineBlocksContext
 }
 
+const Div = (props: any) => <div {...props} />
+
 export function InlineBlocks({
   name,
   blocks,
-  className,
+  className = '',
   direction = 'vertical',
   itemProps,
   min,
@@ -126,33 +128,12 @@ export function InlineBlocks({
           setFocussedField(`${name}.${index}`)
         }
 
-        const ProvidedWrapper = children
-        const Wrapper: React.FunctionComponent<InlineBlockRenderFunctionProps> = ({
-          providedRef,
-          className,
-          children,
-        }) => {
-          if (ProvidedWrapper && typeof ProvidedWrapper === 'function') {
-            return (
-              <ProvidedWrapper providedRef={providedRef} className={className}>
-                {children}
-              </ProvidedWrapper>
-            )
-          }
-          return (
-            <div ref={providedRef} className={className}>
-              {children}
-            </div>
-          )
-        }
+        const Wrapper = typeof children === 'function' ? children : Div
 
         return (
           <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
-              <Wrapper
-                providedRef={provider.innerRef}
-                className={className || ''}
-              >
+              <Wrapper ref={provider.innerRef} className={className}>
                 {
                   <InlineBlocksContext.Provider
                     value={{
