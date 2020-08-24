@@ -41,7 +41,7 @@ export const ProsemirrorMenu = markControl({
     const imagePluginState = imagePluginKey.getState(view.state)
     return (
       isMarkPresent(view.state, marks.link) ||
-      !!imagePluginState!.selectedImage ||
+      !!imagePluginState?.selectedImage ||
       (selectedNode && selectedNode.type === nodes.code_block)
     )
   },
