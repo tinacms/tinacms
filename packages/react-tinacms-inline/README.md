@@ -511,17 +511,24 @@ To handle this, you can pass a "render function" as the child of the `InlineBloc
 import { useJsonForm } from 'next-tinacms-json'
 import { InlineForm, InlineBlocks, BlocksControls, InlineTextarea } from 'react-tinacms-inline'
 
+const MyBlocksContainer = ({ref, children}) => (
+  <div ref={ref}>
+    {children}
+  </div>
+)
+
 export default function PageBlocks({ jsonFile }) {
   const [, form] = useJsonForm(jsonFile)
 
   return (
     <InlineForm form={form}>
-      <InlineBlocks name="my_blocks" blocks={PAGE_BLOCKS}>
-        {({ref, children}) => (
-          <div ref={ref}>
-            {children}
-          </div>
-        )}
+      <InlineBlocks
+        name="my_blocks"
+        blocks={PAGE_BLOCKS}
+        components={{
+          Container: MyBlocksContainer
+        }}
+      />
     </InlineForm>
   )
 }
