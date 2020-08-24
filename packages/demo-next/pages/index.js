@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { inlineJsonForm } from 'next-tinacms-json'
-import { useScreenPlugin } from 'tinacms'
+import { useJsonForm } from 'next-tinacms-json'
+import { useScreenPlugin, usePlugin } from 'tinacms'
 
 import Layout from '../components/Layout'
 import BlogList from '../components/BlogList'
@@ -42,6 +42,8 @@ function Index(props) {
   const title = 'Example Screen'
 
   useGasPlugin({ title }, [title])
+  const [data, form] = useJsonForm(props.jsonFile, formOptions)
+  usePlugin(form)
 
   return (
     <Layout
@@ -50,7 +52,7 @@ function Index(props) {
       siteDescription={props.description}
     >
       <section>
-        <BlogList data={props.jsonFile} />
+        <BlogList data={data} />
       </section>
     </Layout>
   )
@@ -77,11 +79,9 @@ const formOptions = {
   },
 }
 
-const EditableIndex = inlineJsonForm(Index, formOptions)
+export default Index
 
-export default EditableIndex
-
-EditableIndex.getInitialProps = async function() {
+Index.getInitialProps = async function() {
   const configData = await import(`../data/config.json`)
   const indexData = await import(`../data/index.json`)
   return {

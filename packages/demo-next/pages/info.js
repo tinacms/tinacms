@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import matter from 'gray-matter'
-import { useLocalMarkdownForm } from 'next-tinacms-markdown'
+import { useMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
@@ -29,7 +29,7 @@ import Layout from '../components/Layout'
 
 function Info(props) {
   const cms = useCMS()
-  const [data, form] = useLocalMarkdownForm(props.markdownFile, formOptions)
+  const [data, form] = useMarkdownForm(props.markdownFile, formOptions)
 
   return (
     <InlineForm form={form}>
