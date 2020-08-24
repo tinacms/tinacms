@@ -514,7 +514,7 @@ To handle this, you can pass a "render function" as the child of the `InlineBloc
 
 ```ts
 interface BlocksContainerProps {
-  ref: React.Ref<any>
+  innerRef: React.Ref<any>
   className?: string
 }
 ```
@@ -525,8 +525,8 @@ interface BlocksContainerProps {
 import { useJsonForm } from 'next-tinacms-json'
 import { InlineForm, InlineBlocks, BlocksControls, InlineTextarea } from 'react-tinacms-inline'
 
-const MyBlocksContainer = ({ref, children}) => (
-  <div ref={ref}>
+const MyBlocksContainer = ({innerRef, children}) => (
+  <div ref={innerRef}>
     {children}
   </div>
 )
