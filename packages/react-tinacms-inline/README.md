@@ -210,6 +210,9 @@ export interface InlineBlocksProps {
   }
   min?: number
   max?: number
+  components?: {
+    Container?: React.FunctionComponent<BlocksContainerProps>
+  }
 }
 ```
 
@@ -492,7 +495,7 @@ const PAGE_BLOCKS = {
 }
 ```
 
-**Configuring the drag and drop wrapper**
+**Configuring the drag and drop Container**
 
 `InlineBlocks` wraps your blocks with a `<div>` element that informs the drag and drop functionality of what can be dragged and dropped.
 
@@ -505,7 +508,18 @@ This can be an issue if your styles require direct inheritance, such as a flexbo
 </div>
 ```
 
-To handle this, you can pass a "render function" as the child of the `InlineBlocks` component to control where that div is rendered:
+To handle this, you can pass a "render function" as the child of the `InlineBlocks` component to control the container that renders the the child blocks. 
+
+**Interface**
+
+```ts
+interface BlocksContainerProps {
+  ref: React.Ref<any>
+  className: string
+}
+```
+
+**Example** 
 
 ```js
 import { useJsonForm } from 'next-tinacms-json'
