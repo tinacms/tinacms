@@ -49,7 +49,7 @@ export interface InlineBlocksProps {
 
 export interface BlocksContainerProps {
   ref: React.Ref<any>
-  className: string
+  className?: string
 }
 
 const DefaultContainer = (props: BlocksContainerProps) => <div {...props} />
