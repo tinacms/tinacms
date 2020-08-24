@@ -81,7 +81,7 @@ function EditableImage({
       let imageSrc = ''
       try {
         if (previewSrc) {
-          imageSrc = await previewSrc(form.getState().values)
+          imageSrc = await previewSrc(form.values)
         } else {
           // @ts-ignore cms.alerts
           imageSrc = await cms.media.store.previewSrc(props.input.value)
@@ -89,6 +89,7 @@ function EditableImage({
       } catch (e) {
         if (!canceled) {
           setSrc('')
+          console.error(e)
           // @ts-ignore cms.alerts
           cms.alerts.error(
             `Failed to generate preview for '${name}': ${e.message}`
