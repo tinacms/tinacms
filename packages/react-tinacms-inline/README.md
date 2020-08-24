@@ -515,7 +515,7 @@ To handle this, you can pass a "render function" as the child of the `InlineBloc
 ```ts
 interface BlocksContainerProps {
   ref: React.Ref<any>
-  className: string
+  className?: string
 }
 ```
 
