@@ -42,13 +42,17 @@ export interface InlineBlocksProps {
   }
   min?: number
   max?: number
-  children?: React.FunctionComponent<InlineBlockRenderFunctionProps>
+  components?: {
+    Container?: React.FunctionComponent<BlocksContainerProps>
+  }
 }
 
-export interface InlineBlockRenderFunctionProps {
-  ref: React.Ref<HTMLElement>
+export interface BlocksContainerProps {
+  ref: React.Ref<any>
   className: string
 }
+
+const DefaultContainer = (props: BlocksContainerProps) => <div {...props} />
 
 export interface InlineBlocksActions {
   count: number
@@ -79,8 +83,6 @@ export function useInlineBlocks() {
   return inlineBlocksContext
 }
 
-const Div = (props: any) => <div {...props} />
-
 export function InlineBlocks({
   name,
   blocks,
@@ -89,7 +91,7 @@ export function InlineBlocks({
   itemProps,
   min,
   max,
-  children,
+  components = {},
 }: InlineBlocksProps) {
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
@@ -128,12 +130,12 @@ export function InlineBlocks({
           setFocussedField(`${name}.${index}`)
         }
 
-        const Wrapper = typeof children === 'function' ? children : Div
+        const Container = components.Container || DefaultContainer
 
         return (
           <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
-              <Wrapper ref={provider.innerRef} className={className}>
+              <Container ref={provider.innerRef} className={className}>
                 {
                   <InlineBlocksContext.Provider
                     value={{
@@ -185,7 +187,7 @@ export function InlineBlocks({
                     {provider.placeholder}
                   </InlineBlocksContext.Provider>
                 }
-              </Wrapper>
+              </Container>
             )}
           </Droppable>
         )
