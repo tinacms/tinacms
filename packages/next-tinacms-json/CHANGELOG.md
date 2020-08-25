@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
+
+
+### Features
+
+* **next-tinacms-json:** remove deprecated apis ([0a03345](https://github.com/tinacms/tinacms/commit/0a033450d6b6a1137b5a1865daf77c1e24032534))
+
+
+
+
+
 # [0.28.0](https://github.com/tinacms/tinacms/compare/v0.27.3...v0.28.0) (2020-08-17)
 
 **Note:** Version bump only for package next-tinacms-json

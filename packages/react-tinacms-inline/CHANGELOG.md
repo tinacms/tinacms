@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
+
+
+### Bug Fixes
+
+* **react-tinacms-inline:** preview src passes form values ([e376424](https://github.com/tinacms/tinacms/commit/e37642482c78182d72bf74eb34e3f1a2a311675f))
+
+
+
+
+
 # [0.28.0](https://github.com/tinacms/tinacms/compare/v0.27.3...v0.28.0) (2020-08-17)
 
 

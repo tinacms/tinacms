@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
+
+
+### Features
+
+* **next-tinacms-markdown:** sunset outdated APIs ([8b6e90a](https://github.com/tinacms/tinacms/commit/8b6e90a0405cc031ec46da39dc5e8e640c36d5c6))
+
+
+
+
+
 # [0.28.0](https://github.com/tinacms/tinacms/compare/v0.27.3...v0.28.0) (2020-08-17)
 
 **Note:** Version bump only for package next-tinacms-markdown
