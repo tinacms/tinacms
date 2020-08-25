@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/media",
-  "version": "0.28.0",
+  "version": "0.29.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -28,6 +28,6 @@
     "build": "tinacms-scripts build"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.26.0"
+    "@tinacms/scripts": "^0.29.0"
   }
 }
