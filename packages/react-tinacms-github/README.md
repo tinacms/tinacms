@@ -79,9 +79,28 @@ const cms = new TinaCMS({
 | `async getBranchList()` | Retrieves a list of all branches in the current repo |
 | `async createBranch(name)` | Creates a new branch |
 
+## _useGithubClient_
 
 
+`useGithubClient` returns the `GithubClient` instance registered with the CMS.
 
+```ts
+function useGithubFile(): GithubClient
+```
+
+```ts
+import { useGithubClient} from 'react-tinacms-github'
+
+export function Page(props) => {
+  const github = useGithubClient()
+
+  React.useEffect(() => {
+    console.log("Reading content from ", github.branchName)
+  },[])
+
+  //...
+}
+```
 
 ## _GithubMediaStore_
 
