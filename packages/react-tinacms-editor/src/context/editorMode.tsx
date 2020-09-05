@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useState } from 'react'
+import { useEffect, useState } from 'react'
 import { createContext, useContext } from 'react'
 
 const EditorModeContext = createContext<{
@@ -30,6 +30,18 @@ const EditorModeContext = createContext<{
 
 export const EditorModeProvider = ({ children }: any) => {
   const [mode, setMode] = useState('wysiwyg')
+
+  useEffect(() => {
+    document.addEventListener('keydown', event => {
+      if (
+        event.altKey &&
+        event.shiftKey &&
+        event.metaKey &&
+        event.keyCode === 77
+      )
+        setMode(mode === 'wysiwyg' ? 'markdown' : 'wysiwyg')
+    })
+  })
 
   return (
     <EditorModeContext.Provider value={{ mode, setMode }}>
