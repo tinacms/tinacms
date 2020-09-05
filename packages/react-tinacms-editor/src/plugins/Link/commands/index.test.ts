@@ -18,63 +18,9 @@ limitations under the License.
 
 import { PMTestHarness } from '../../../test-utils'
 import { defaultSchema } from '../../../test-utils/test-schema'
-import {
-  removeLinkBeingEdited,
-  updateLinkBeingEdited,
-  insertLinkToFile,
-} from '.'
+import { removeLinkBeingEdited, updateLinkBeingEdited } from '.'
 
 const { forDoc, doc, p, link, text } = new PMTestHarness(defaultSchema)
-
-describe('insertLinkToFile', () => {
-  it('should replace text with new link', () => {
-    forDoc(doc(p(text('one'))))
-      .withTextSelection(0, 4)
-      .apply(insertLinkToFile, 'http://www.google.ca')
-      .expect(
-        doc(
-          p(
-            link('www.google.ca', {
-              href: 'http://www.google.ca',
-              title: 'www.google.ca',
-            })
-          )
-        )
-      )
-  })
-
-  it('should use friendly display name', () => {
-    forDoc(doc(p(text('one'))))
-      .withTextSelection(0, 4)
-      .apply(insertLinkToFile, 'http://www.google.ca/nice_name.jpg')
-      .expect(
-        doc(
-          p(
-            link('nice_name.jpg', {
-              href: 'http://www.google.ca/nice_name.jpg',
-              title: 'nice_name.jpg',
-            })
-          )
-        )
-      )
-  })
-
-  it('should remove spaces from title', () => {
-    forDoc(doc(p(text('one'))))
-      .withTextSelection(0, 4)
-      .apply(insertLinkToFile, 'http://www.google.ca/nice%20name.jpg')
-      .expect(
-        doc(
-          p(
-            link('nice name.jpg', {
-              href: 'http://www.google.ca/nice%20name.jpg',
-              title: 'nice name.jpg',
-            })
-          )
-        )
-      )
-  })
-})
 
 /**
  * removeLinkBeingEdited(state, dispatch)

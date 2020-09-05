@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { EditorState } from 'prosemirror-state'
+import { EditorState, TextSelection } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 import { NodeType, Fragment, Node } from 'prosemirror-model'
 
@@ -60,6 +60,11 @@ export const insertTable = (
   const { $from, $to } = selection
   const start = $from.pos - 1
   const end = $to.pos < state.doc.content.size ? $to.pos + 1 : $to.pos
-  dispatch(tr.replaceWith(start, end, newTable).scrollIntoView())
+  dispatch(
+    tr
+      .replaceWith(start, end, newTable)
+      .setSelection(new TextSelection(tr.doc.resolve($from.pos + 1)))
+      .scrollIntoView()
+  )
   return true
 }
