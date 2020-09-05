@@ -33,6 +33,7 @@ export interface Options {
   noMix?: string[]
   isDisabled?: (view: EditorView) => boolean
   onClick?: (view: EditorView) => void
+  onMenuOptionClick?: (view: EditorView) => void
 }
 
 export function markControl({
@@ -44,6 +45,7 @@ export function markControl({
   noMix = [],
   isDisabled,
   onClick,
+  onMenuOptionClick,
 }: Options) {
   return () => {
     const { editorView } = useEditorStateContext()
@@ -94,6 +96,9 @@ export function markControl({
     const onOptionClick = () => {
       if (onClick) {
         onClick(view)
+      }
+      if (onMenuOptionClick) {
+        return onMenuOptionClick(view)
       }
       if (isOptionDisabled()) return
       const { state, dispatch } = view

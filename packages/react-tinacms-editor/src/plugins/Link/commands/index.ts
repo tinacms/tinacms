@@ -60,24 +60,6 @@ function markExtend($cursor: ResolvedPos, markType: MarkType) {
   return { from: startPos, to: endPos, mark }
 }
 
-export function insertLinkToFile(
-  state: EditorState,
-  dispatch: Dispatch | null,
-  url: string
-) {
-  if (dispatch) {
-    url = url || ''
-    const filenamePath = url.split('/')
-    const filename =
-      decodeURI(filenamePath[filenamePath.length - 1]) || 'Download File'
-    const attrs = { title: filename, href: url }
-    const schema = state.schema
-    const node = schema.text(attrs.title, [schema.marks.link.create(attrs)])
-    dispatch(state.tr.replaceSelectionWith(node, false))
-  }
-  return true
-}
-
 export function unmountLinkForm(view: EditorView) {
   const { dispatch, state } = view
   dispatch(state.tr.setMeta('show_link_toolbar', false))

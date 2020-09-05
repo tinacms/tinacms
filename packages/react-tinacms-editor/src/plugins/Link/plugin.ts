@@ -17,11 +17,9 @@ limitations under the License.
 */
 
 import { Slice } from 'prosemirror-model'
-import { Plugin, Transaction, PluginKey, EditorState } from 'prosemirror-state'
+import { Plugin, Transaction, PluginKey } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
 
-import { commonPluginKey } from '../Common'
-import { isMarkPresent } from '../../utils'
 import { linkify } from './util'
 
 interface LinkPluginState {
@@ -39,12 +37,7 @@ export function linkPlugin(): Plugin {
       init: () => {
         return { showLinkForm: false }
       },
-      apply(
-        tr: Transaction,
-        prev: LinkPluginState,
-        _: any,
-        state: EditorState
-      ) {
+      apply(tr: Transaction, prev: LinkPluginState, _: any) {
         if (tr.getMeta('show_link_toolbar') === false) {
           return {
             show_link_toolbar: false,
@@ -54,17 +47,6 @@ export function linkPlugin(): Plugin {
         if (tr.getMeta('show_link_toolbar')) {
           return {
             show_link_toolbar: true,
-          }
-        }
-
-        const { editorFocused } = commonPluginKey.getState(state)
-        if (isMarkPresent(state, state.schema.marks.link)) {
-          return {
-            show_link_toolbar: true,
-          }
-        } else if (editorFocused) {
-          return {
-            show_link_toolbar: false,
           }
         }
 
@@ -84,11 +66,8 @@ export function linkPlugin(): Plugin {
       },
       handleClickOn(view: EditorView, _1: any) {
         const { dispatch, state } = view
-        const { tr, schema } = state
-        if (!isMarkPresent(state, schema.marks.link)) {
-          dispatch(tr.setMeta('show_link_toolbar', false))
-        }
-        return false
+        const { tr } = state
+        dispatch(tr.setMeta('show_link_toolbar', false))
       },
     },
     // TODO: Fix pls
