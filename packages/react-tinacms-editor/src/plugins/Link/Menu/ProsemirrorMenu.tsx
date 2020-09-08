@@ -22,6 +22,7 @@ import { LinkIcon } from '@tinacms/icons'
 import { markControl } from '../../../components/MenuHelpers'
 import { isMarkPresent, formatKeymap } from '../../../utils'
 import { imagePluginKey } from '../../Image'
+import { openLinkPopup } from '../commands'
 
 export const ProsemirrorMenu = markControl({
   mark: 'link',
@@ -42,20 +43,6 @@ export const ProsemirrorMenu = markControl({
   },
   onMenuOptionClick: (view: EditorView) => {
     const { state, dispatch } = view
-    const tr = state.tr.setMeta('show_link_toolbar', true)
-
-    const { marks } = state.schema
-    if (!isMarkPresent(view.state, marks.link)) {
-      const { $to, $from } = state.selection
-      tr.addMark(
-        $from.pos,
-        $to.pos,
-        marks.link.create({
-          href: '',
-          title: '',
-        })
-      )
-    }
-    return dispatch(tr)
+    return openLinkPopup(state, dispatch)
   },
 })
