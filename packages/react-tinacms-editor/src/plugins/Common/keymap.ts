@@ -41,6 +41,7 @@ import { liftBlockquote } from '../Blockquote/commands'
 import { toggleBulletList, toggleOrderedList } from '../List/commands'
 import { deleteEmptyHeading, toggleHeader } from '../Block/commands'
 import { insertHr } from './commands'
+import { openLinkPopup } from '../../plugins/Link/commands'
 
 const hardBreakCmd = (schema: Schema) => {
   const br = schema.nodes.hard_break
@@ -83,17 +84,9 @@ export const KEYMAP_PLUGINS: KeymapPlugin[] = [
     __type: 'wysiwyg:keymap',
     name: 'Mod-k',
     ifMark: 'link',
-    command: schema => {
-      const toggleLink = toggleMark(schema.marks.link, {
-        href: '',
-        title: '',
-      })
-
+    command: () => {
       return function(state: any, dispatch: any) {
-        if (!(state.selection as any).$cursor) {
-          return toggleLink(state as any, dispatch)
-        }
-        return false
+        return openLinkPopup(state, dispatch)
       }
     },
   },

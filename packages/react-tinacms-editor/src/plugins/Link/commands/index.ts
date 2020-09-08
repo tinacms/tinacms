@@ -19,6 +19,7 @@ limitations under the License.
 import { MarkType, ResolvedPos } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+import { isMarkPresent } from '../../../utils'
 
 type Dispatch = typeof EditorView.prototype.dispatch
 
@@ -103,4 +104,24 @@ export function removeLinkBeingEdited(
     dispatch(tr)
   }
   return true
+}
+
+export const openLinkPopup = (state: EditorState, dispatch: Dispatch) => {
+  const { schema, selection } = state
+  const { marks } = schema
+  if (selection.empty && !isMarkPresent(state, marks.link)) return false
+
+  const tr = state.tr.setMeta('show_link_toolbar', true)
+  if (!isMarkPresent(state, marks.link)) {
+    const { $to, $from } = selection
+    tr.addMark(
+      $from.pos,
+      $to.pos,
+      marks.link.create({
+        href: '',
+        title: '',
+      })
+    )
+  }
+  return dispatch(tr)
 }
