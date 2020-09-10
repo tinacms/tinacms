@@ -16,7 +16,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 
 */
 
-import { Media, MediaUploadOptions } from '@tinacms/media'
+import { Media, MediaUploadOptions, ListOptions } from '@tinacms/media'
 
 import Cookies from 'js-cookie'
 import { STRAPI_JWT } from './strapi-client'
@@ -65,6 +65,39 @@ export class StrapiMediaStore {
 
   async previewSrc(src: string) {
     return this.strapiUrl + this.getFilePath(src)
+  }
+
+  async list(options: ListOptions) {
+    const offset = options?.offset ?? 0
+    const limit = options?.limit ?? 50
+
+    const authToken = Cookies.get(STRAPI_JWT)
+    const response: Response = await fetch(`${this.strapiUrl}/upload/files`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+
+    if (response.status != 200) {
+      throw Error(response.statusText)
+    }
+    const mediaData = await response.json()
+    const nextOffset = offset + limit
+
+    return {
+      items: mediaData.slice(offset, limit + offset).map((item: any) => {
+        return {
+          filename: item.name,
+          directory: '/',
+          type: 'file',
+        }
+      }),
+      limit,
+      offset,
+      totalCount: mediaData.length,
+      nextOffset: nextOffset < mediaData.length ? nextOffset : undefined,
+    }
   }
 
   getFilePath(fileUrl: string): string {
