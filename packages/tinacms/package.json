@@ -29,8 +29,6 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.29.0",
-    "@types/lodash.merge": "^4.6.6",
-    "@types/react-beautiful-dnd": "^11.0.3",
     "@types/styled-components": "4.1.8",
     "styled-components": ">=4.1"
   },
@@ -49,9 +47,7 @@
     "@tinacms/react-screens": "^0.29.0",
     "@tinacms/react-sidebar": "^0.29.0",
     "@tinacms/react-toolbar": "^0.29.0",
-    "@tinacms/styles": "^0.29.0",
-    "lodash.clonedeep": "^4.5.0",
-    "lodash.merge": "^4.6.2"
+    "@tinacms/styles": "^0.29.0"
   },
   "peerDependencies": {
     "react": ">=16.8",
