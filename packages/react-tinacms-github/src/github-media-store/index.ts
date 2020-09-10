@@ -40,6 +40,7 @@ export class GithubMediaStore implements MediaStore {
         await this.githubClient.upload(path, content, 'Upload', true)
 
         uploaded.push({
+          type: 'file',
           directory: directory,
           filename: file.name,
         })
