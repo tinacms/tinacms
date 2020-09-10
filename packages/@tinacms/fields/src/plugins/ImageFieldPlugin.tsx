@@ -49,7 +49,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
           )
         } else {
           // @ts-ignore cms.alerts
-          imageSrc = await cms.media.store.previewSrc(props.input.value)
+          imageSrc = await cms.media.previewSrc(props.input.value)
         }
       } catch (e) {
         if (!canceled) {
@@ -78,7 +78,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       onDrop={async ([file]: File[]) => {
         const directory = props.field.uploadDir(props.form.getState().values)
         // @ts-ignore cms.media
-        const [media] = await cms.media.store.persist([
+        const [media] = await cms.media.persist([
           {
             directory,
             file,
