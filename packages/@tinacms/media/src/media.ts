@@ -20,6 +20,7 @@ limitations under the License.
  * Represents an individual file in the MediaStore
  */
 export interface Media {
+  type: 'file' | 'dir'
   /**
    * The directory where the file is stored.
    */
