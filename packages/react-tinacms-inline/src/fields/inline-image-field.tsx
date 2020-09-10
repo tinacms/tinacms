@@ -84,7 +84,7 @@ function EditableImage({
           imageSrc = await previewSrc(form.values)
         } else {
           // @ts-ignore cms.alerts
-          imageSrc = await cms.media.store.previewSrc(props.input.value)
+          imageSrc = await cms.media.previewSrc(props.input.value)
         }
       } catch (e) {
         if (!canceled) {
@@ -108,7 +108,7 @@ function EditableImage({
 
   async function handleUploadImage([file]: File[]) {
     const directory = uploadDir(form)
-    const [media] = await cms.media.store.persist([
+    const [media] = await cms.media.persist([
       {
         directory,
         file,
