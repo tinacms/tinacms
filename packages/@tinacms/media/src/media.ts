@@ -80,6 +80,18 @@ export interface MediaStore {
  * })
  * ```
  */
-export class MediaManager {
+export class MediaManager implements MediaStore {
   constructor(public store: MediaStore) {}
+
+  get accept() {
+    return this.store.accept
+  }
+
+  persist(files: MediaUploadOptions[]): Promise<Media[]> {
+    return this.store.persist(files)
+  }
+
+  previewSrc(src: string): Promise<string> {
+    return this.store.previewSrc(src)
+  }
 }
