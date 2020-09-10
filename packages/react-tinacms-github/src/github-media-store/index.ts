@@ -16,7 +16,13 @@ limitations under the License.
 
 */
 
-import { MediaStore, MediaUploadOptions, Media } from 'tinacms'
+import {
+  MediaStore,
+  MediaUploadOptions,
+  Media,
+  MediaList,
+  ListOptions,
+} from 'tinacms'
 import { GithubClient } from '../github-client'
 import base64File from './base64File'
 
@@ -58,4 +64,49 @@ export class GithubMediaStore implements MediaStore {
       return src
     }
   }
+
+  async list(options?: ListOptions): Promise<MediaList> {
+    const directory = options?.directory ?? ''
+    const offset = options?.offset ?? 0
+    const limit = options?.limit ?? 50
+
+    const unfilteredItems: GithubMedia[] = await this.githubClient.fetchFile(
+      directory
+    )
+
+    const items = unfilteredItems.filter(function filterByAccept() {
+      // TODO
+      return true
+    })
+
+    return {
+      items: items
+        .map(item => ({
+          filename: item.name,
+          directory: item.path.slice(0, item.path.length - item.name.length),
+          type: item.type,
+        }))
+        .slice(offset, offset + limit),
+      offset,
+      limit,
+      nextOffset: nextOffset(offset, limit, items.length),
+      totalCount: items.length,
+    }
+  }
+}
+
+const nextOffset = (offset: number, limit: number, count: number) => {
+  if (offset + limit < count) return offset + limit
+  return undefined
+}
+
+interface GithubMedia {
+  name: string
+  path: string // directory + name
+  size: number
+  type: 'file' | 'dir'
+  url: string
+  download_url: string // For Previewing
+  git_url: string
+  html_url: string
 }
