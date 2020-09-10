@@ -63,6 +63,31 @@ export interface MediaStore {
    * This is helpful in cases where the file may not be available in production yet.
    */
   previewSrc(src: string): Promise<string>
+
+  /**
+   * Lists all media in a specific directory.
+   */
+  list(options?: ListOptions): Promise<MediaList>
+}
+
+/**
+ * The options available when listing media.
+ */
+export interface ListOptions {
+  directory?: string
+  limit?: number
+  offset?: number
+}
+
+/**
+ * The response returned from listing media.
+ */
+export interface MediaList {
+  items: Media[]
+  limit?: number
+  offset?: number
+  nextOffset?: number
+  totalCount: number
 }
 
 /**
@@ -92,5 +117,9 @@ export class MediaManager implements MediaStore {
 
   previewSrc(src: string): Promise<string> {
     return this.store.previewSrc(src)
+  }
+
+  list(options: ListOptions): Promise<MediaList> {
+    return this.store.list(options)
   }
 }
