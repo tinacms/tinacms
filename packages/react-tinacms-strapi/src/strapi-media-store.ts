@@ -38,6 +38,7 @@ export class StrapiMediaStore {
     for (const { file } of files) {
       const upload = await this.uploadFile(file)
       uploaded.push({
+        type: 'file',
         directory: '/uploads',
         filename: upload[0].hash + upload[0].ext + `?${upload[0].id}`,
       })
