@@ -34,7 +34,12 @@ import {
   TagsFieldPlugin,
 } from '@tinacms/fields'
 import { Form } from '@tinacms/forms'
-import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
+import {
+  MediaManager,
+  MediaStore,
+  MediaUploadOptions,
+  Media,
+} from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
@@ -114,10 +119,11 @@ export class TinaCMS extends CMS {
 
 class DummyMediaStore implements MediaStore {
   accept = '*'
-  async persist(files: MediaUploadOptions[]) {
+  async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     alert('UPLOADING FILES')
     console.log(files)
     return files.map(({ directory, file }) => ({
+      type: 'file',
       directory,
       filename: file.name,
     }))
