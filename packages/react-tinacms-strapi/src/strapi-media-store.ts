@@ -92,6 +92,7 @@ export class StrapiMediaStore {
           filename: item.name,
           directory: '/',
           type: 'file',
+          previewSrc: this.strapiUrl + item.url,
         }
       }),
       limit,
