@@ -15,7 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { MediaStore, MediaUploadOptions, Media } from '@tinacms/media'
+import {
+  MediaStore,
+  MediaUploadOptions,
+  Media,
+  ListOptions,
+  MediaList,
+} from '@tinacms/media'
 import { GitClient } from './git-client'
 
 export class GitMediaStore implements MediaStore {
@@ -47,5 +53,8 @@ export class GitMediaStore implements MediaStore {
   }
   async previewSrc(src: string) {
     return src
+  }
+  async list(_options?: ListOptions): Promise<MediaList> {
+    throw new Error('Not implemented')
   }
 }
