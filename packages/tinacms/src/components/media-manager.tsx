@@ -112,8 +112,9 @@ export function MediaPicker({ onSelect, ...props }: MediaRequest) {
           >
             <img
               src={
-                item.previewSrc ||
-                'http://fordesigner.com/imguploads/Image/cjbc/zcool/png20080526/1211755375.png'
+                item.type === 'file'
+                  ? item.previewSrc
+                  : 'http://fordesigner.com/imguploads/Image/cjbc/zcool/png20080526/1211755375.png'
               }
               style={{ width: '100px', marginRight: '1rem' }}
             />
