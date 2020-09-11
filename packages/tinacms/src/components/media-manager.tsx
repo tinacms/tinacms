@@ -79,7 +79,7 @@ export function MediaPicker({ onSelect, ...props }: MediaRequest) {
   }
 
   return (
-    <div>
+    <div style={{ height: '90vh', paddingBottom: '5rem' }}>
       <h3>Breadcrumbs</h3>
       <button onClick={() => setDirectory('')}>ROOT</button>/
       {directory &&
@@ -93,53 +93,66 @@ export function MediaPicker({ onSelect, ...props }: MediaRequest) {
           </button>
         ))}
       <h3>Items</h3>
-      <ul style={{ display: 'flex', flexDirection: 'column' }}>
-        {list.items.map(item => (
-          <li
-            style={{
-              display: 'flex',
-              alignItems: 'center',
-              maxWidth: '800px',
-              margin: '0.5rem',
-              border: '1px solid pink',
-            }}
-            onClick={() => {
-              if (item.type === 'dir') {
-                setDirectory(path.join(item.directory, item.filename))
-                setOffset(0)
-              }
-            }}
-          >
-            <img
-              src={
-                item.type === 'file'
-                  ? item.previewSrc
-                  : 'http://fordesigner.com/imguploads/Image/cjbc/zcool/png20080526/1211755375.png'
-              }
-              style={{ width: '100px', marginRight: '1rem' }}
-            />
-            <span style={{ flexGrow: 1 }}>
-              {item.filename}
-              {item.type === 'dir' && '/'}
-            </span>
-            {onSelect && item.type === 'file' && (
-              <div style={{ minWidth: '100px' }}>
-                <button
-                  style={{
-                    border: '1px solid aquamarine',
-                    padding: '0.25rem 0.5rem',
-                  }}
-                  onClick={() => {
-                    onSelect(item)
-                  }}
-                >
-                  Insert
-                </button>
-              </div>
-            )}
-          </li>
-        ))}
-      </ul>
+      <div
+        style={{
+          padding: '2rem 0',
+          height: '100%',
+          overflowY: 'scroll',
+        }}
+      >
+        <ul
+          style={{
+            display: 'flex',
+            flexDirection: 'column',
+          }}
+        >
+          {list.items.map(item => (
+            <li
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                maxWidth: '800px',
+                margin: '0.5rem',
+                border: '1px solid pink',
+              }}
+              onClick={() => {
+                if (item.type === 'dir') {
+                  setDirectory(path.join(item.directory, item.filename))
+                  setOffset(0)
+                }
+              }}
+            >
+              <img
+                src={
+                  item.type === 'file'
+                    ? item.previewSrc
+                    : 'http://fordesigner.com/imguploads/Image/cjbc/zcool/png20080526/1211755375.png'
+                }
+                style={{ width: '100px', marginRight: '1rem' }}
+              />
+              <span style={{ flexGrow: 1 }}>
+                {item.filename}
+                {item.type === 'dir' && '/'}
+              </span>
+              {onSelect && item.type === 'file' && (
+                <div style={{ minWidth: '100px' }}>
+                  <button
+                    style={{
+                      border: '1px solid aquamarine',
+                      padding: '0.25rem 0.5rem',
+                    }}
+                    onClick={() => {
+                      onSelect(item)
+                    }}
+                  >
+                    Insert
+                  </button>
+                </div>
+              )}
+            </li>
+          ))}
+        </ul>
+      </div>
       {pageLinks}
       <h4>Page Size</h4>
       {[5, 10, 50, 100].map(size => {
