@@ -39,6 +39,8 @@ import {
   MediaStore,
   MediaUploadOptions,
   Media,
+  ListOptions,
+  MediaList,
 } from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
@@ -130,5 +132,8 @@ class DummyMediaStore implements MediaStore {
   }
   async previewSrc(filename: string) {
     return filename
+  }
+  async list(_options?: ListOptions): Promise<MediaList> {
+    throw new Error('Not implemented')
   }
 }
