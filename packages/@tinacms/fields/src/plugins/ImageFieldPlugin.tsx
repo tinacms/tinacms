@@ -88,7 +88,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
           if (media.filename == props.input.value) {
             props.input.onChange('') // trigger rerender
           }
-          props.input.onChange(media.filename)
+          props.input.onChange(media)
         } else {
           // TODO Handle failure
         }
