@@ -21,14 +21,22 @@ limitations under the License.
  */
 export interface Media {
   type: 'file' | 'dir'
+
   /**
-   * The directory where the file is stored.
+   * A unique identifier for this file.
    */
-  directory: string
+  id: string
+
   /**
    * The name of the file.
    */
   filename: string
+
+  /**
+   * The directory where the file is stored.
+   */
+
+  directory: string
 
   /**
    * A url that provides an image preview of the media file
