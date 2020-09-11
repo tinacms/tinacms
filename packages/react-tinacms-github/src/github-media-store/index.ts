@@ -86,6 +86,7 @@ export class GithubMediaStore implements MediaStore {
           filename: item.name,
           directory: item.path.slice(0, item.path.length - item.name.length),
           type: item.type,
+          previewSrc: item.download_url,
         }))
         .slice(offset, offset + limit),
       offset,
