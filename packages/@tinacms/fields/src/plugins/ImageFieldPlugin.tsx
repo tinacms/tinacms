@@ -75,6 +75,17 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       value={props.input.value}
       previewSrc={src}
       loading={srcIsLoading}
+      onClick={() => {
+        cms.events.dispatch({
+          type: 'media:open',
+          onSelect(media: any) {
+            if (media.filename == props.input.value) {
+              props.input.onChange('') // trigger rerender
+            }
+            props.input.onChange(media)
+          },
+        })
+      }}
       onDrop={async ([file]: File[]) => {
         const directory = props.field.uploadDir(props.form.getState().values)
         // @ts-ignore cms.media
