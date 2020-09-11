@@ -29,6 +29,11 @@ export interface Media {
    * The name of the file.
    */
   filename: string
+
+  /**
+   * A url that provides an image preview of the media file
+   */
+  previewSrc?: string
 }
 
 export interface MediaUploadOptions {
