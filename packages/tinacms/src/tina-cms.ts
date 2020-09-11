@@ -125,6 +125,7 @@ class DummyMediaStore implements MediaStore {
     alert('UPLOADING FILES')
     console.log(files)
     return files.map(({ directory, file }) => ({
+      id: file.name,
       type: 'file',
       directory,
       filename: file.name,

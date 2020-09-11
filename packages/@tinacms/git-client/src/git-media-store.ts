@@ -43,6 +43,8 @@ export class GitMediaStore implements MediaStore {
       const { filename }: { filename: string } = await response.json()
 
       uploaded.push({
+        // TODO: Implement correctly
+        id: filename,
         type: 'file',
         directory,
         filename,
