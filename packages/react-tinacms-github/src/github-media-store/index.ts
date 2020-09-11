@@ -43,13 +43,14 @@ export class GithubMediaStore implements MediaStore {
 
       try {
         const content = (await base64File(file)).toString().split(',')[1] // only need the data piece
-        await this.githubClient.upload(path, content, 'Upload', true)
+        const uploadResponse: GithubUploadResposne = await this.githubClient.upload(
+          path,
+          content,
+          'Upload',
+          true
+        )
 
-        uploaded.push({
-          type: 'file',
-          directory: directory,
-          filename: file.name,
-        })
+        uploaded.push(contentToMedia(uploadResponse.content))
       } catch (e) {
         console.warn('Failed to upload content to Github: ' + e)
       }
@@ -71,7 +72,7 @@ export class GithubMediaStore implements MediaStore {
     const offset = options?.offset ?? 0
     const limit = options?.limit ?? 50
 
-    const unfilteredItems: GithubMedia[] = await this.githubClient.fetchFile(
+    const unfilteredItems: GithubContent[] = await this.githubClient.fetchFile(
       directory
     )
 
@@ -81,14 +82,7 @@ export class GithubMediaStore implements MediaStore {
     })
 
     return {
-      items: items
-        .map(item => ({
-          filename: item.name,
-          directory: item.path.slice(0, item.path.length - item.name.length),
-          type: item.type,
-          previewSrc: item.download_url,
-        }))
-        .slice(offset, offset + limit),
+      items: items.map(contentToMedia).slice(offset, offset + limit),
       offset,
       limit,
       nextOffset: nextOffset(offset, limit, items.length),
@@ -102,7 +96,19 @@ const nextOffset = (offset: number, limit: number, count: number) => {
   return undefined
 }
 
-interface GithubMedia {
+const contentToMedia = (item: GithubContent): Media => ({
+  id: item.path,
+  filename: item.name,
+  directory: item.path.slice(0, item.path.length - item.name.length),
+  type: item.type,
+  previewSrc: item.download_url,
+})
+
+interface GithubUploadResposne {
+  content: GithubContent
+}
+
+interface GithubContent {
   name: string
   path: string // directory + name
   size: number

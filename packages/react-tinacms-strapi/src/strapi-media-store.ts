@@ -36,11 +36,14 @@ export class StrapiMediaStore {
     const uploaded: Media[] = []
 
     for (const { file } of files) {
-      const upload = await this.uploadFile(file)
+      const [item] = await this.uploadFile(file)
+
       uploaded.push({
+        id: item.id,
         type: 'file',
         directory: '/uploads',
-        filename: upload[0].hash + upload[0].ext + `?${upload[0].id}`,
+        filename: item.hash + item.ext + `?${item.id}`,
+        previewSrc: this.strapiUrl + item.url,
       })
     }
     return uploaded
@@ -89,8 +92,9 @@ export class StrapiMediaStore {
     return {
       items: mediaData.slice(offset, limit + offset).map((item: any) => {
         return {
+          id: item.id,
           filename: item.name,
-          directory: '/',
+          directory: '/uploads',
           type: 'file',
           previewSrc: this.strapiUrl + item.url,
         }
