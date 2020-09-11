@@ -14,6 +14,7 @@ export interface MediaRequest {
   limit?: number
   directory?: string
   onSelect?(media: Media): void
+  close?(): void
 }
 
 export function MediaManager() {
@@ -29,19 +30,21 @@ export function MediaManager() {
 
   if (!request) return null
 
+  const close = () => setRequest(undefined)
+
   return (
     <Modal>
       <ModalFullscreen>
-        <ModalHeader close={() => setRequest(undefined)}>Media</ModalHeader>
+        <ModalHeader close={close}>Media</ModalHeader>
         <ModalBody padded={true}>
-          <MediaPicker {...request} />
+          <MediaPicker {...request} close={close} />
         </ModalBody>
       </ModalFullscreen>
     </Modal>
   )
 }
 
-export function MediaPicker({ onSelect, ...props }: MediaRequest) {
+export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
   )
@@ -143,6 +146,7 @@ export function MediaPicker({ onSelect, ...props }: MediaRequest) {
                     }}
                     onClick={() => {
                       onSelect(item)
+                      if (close) close()
                     }}
                   >
                     Insert
