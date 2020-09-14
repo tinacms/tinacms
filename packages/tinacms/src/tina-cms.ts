@@ -42,7 +42,7 @@ import {
   ListOptions,
   MediaList,
 } from '@tinacms/media'
-import { Alerts } from '@tinacms/alerts'
+import { Alerts, EventsToAlerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 import {
@@ -75,19 +75,27 @@ export interface TinaCMSConfig extends CMSConfig {
   media?: {
     store: MediaStore
   }
+  alerts?: EventsToAlerts
 }
 
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   toolbar?: ToolbarState
   media: MediaManager
-  alerts = new Alerts(this.events)
+  alerts: Alerts
 
-  constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
+  constructor({
+    sidebar,
+    media,
+    toolbar,
+    alerts,
+    ...config
+  }: TinaCMSConfig = {}) {
     super(config)
 
     const mediaStore = media?.store || new DummyMediaStore()
     this.media = new MediaManager(mediaStore)
+    this.alerts = new Alerts(this.events, alerts)
 
     if (sidebar) {
       const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
