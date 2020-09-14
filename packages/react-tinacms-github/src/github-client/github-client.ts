@@ -250,7 +250,7 @@ export class GithubClient {
   async createBranch(name: string) {
     const currentBranch = await this.getBranch()
     const sha = currentBranch.object.sha
-    const response = this.req({
+    const response = await this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/git/refs`,
       method: 'POST',
       data: {
@@ -275,8 +275,7 @@ export class GithubClient {
   ) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
-
-    return this.req({
+    const response = await this.req({
       url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
         filePath
       )}`,
@@ -288,6 +287,8 @@ export class GithubClient {
         branch: branch,
       },
     })
+    this.events.dispatch({ type: COMMIT, response })
+    return response
   }
 
   async getDownloadUrl(path: string): Promise<string> {
