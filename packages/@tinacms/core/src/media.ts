@@ -83,13 +83,13 @@ export interface MediaStore {
   /**
    * Lists all media in a specific directory.
    */
-  list(options?: ListOptions): Promise<MediaList>
+  list(options?: MediaListOptions): Promise<MediaList>
 }
 
 /**
  * The options available when listing media.
  */
-export interface ListOptions {
+export interface MediaListOptions {
   directory?: string
   limit?: number
   offset?: number
@@ -166,7 +166,7 @@ export class MediaManager implements MediaStore {
     }
   }
 
-  async list(options: ListOptions): Promise<MediaList> {
+  async list(options: MediaListOptions): Promise<MediaList> {
     try {
       this.events.dispatch({ type: 'media:list:start', ...options })
       const media = await this.store.list(options)
