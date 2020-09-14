@@ -20,7 +20,7 @@ limitations under the License.
  * Export @tinacms internal packages
  */
 export * from '@tinacms/react-modals'
-export * from '@tinacms/media'
+export * from '@tinacms/core'
 export { ActionButton } from '@tinacms/react-forms'
 export { ScreenPlugin, useScreenPlugin } from '@tinacms/react-screens'
 export * from '@tinacms/fields'

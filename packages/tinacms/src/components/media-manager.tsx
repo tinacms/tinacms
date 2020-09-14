@@ -7,7 +7,7 @@ import {
   ModalBody,
   ModalFullscreen,
 } from '@tinacms/react-modals'
-import { MediaList, Media } from '@tinacms/media'
+import { MediaList, Media } from '@tinacms/core'
 import path from 'path'
 
 export interface MediaRequest {
