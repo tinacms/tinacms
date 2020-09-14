@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { GitFile } from './useGitFileSha'
-import { useCMS, useForm, FormOptions } from 'tinacms'
+import { useForm, FormOptions } from 'tinacms'
 import { useGithubFile } from '../github-client'
 
 export interface GithubFormOptions extends Partial<FormOptions<any>> {
