@@ -43,10 +43,6 @@ export const getModalProps = async (
     primary: true,
     action: () => {
       githubClient.setWorkingBranch(githubClient.baseBranch)
-      cms.events.dispatch({
-        type: CHECKOUT_BRANCH,
-        branchName: githubClient.baseBranch,
-      })
     },
   }
 
