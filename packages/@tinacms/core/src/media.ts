@@ -16,6 +16,8 @@ limitations under the License.
 
 */
 
+import { EventBus } from './event'
+
 /**
  * Represents an individual file in the MediaStore
  */
@@ -119,7 +121,14 @@ export interface MediaList {
  * ```
  */
 export class MediaManager implements MediaStore {
-  constructor(public store: MediaStore) {}
+  constructor(public store: MediaStore, private events: EventBus) {}
+
+  open(options: SelectMediaOptions = {}) {
+    this.events.dispatch({
+      type: 'media:open',
+      ...options,
+    })
+  }
 
   get accept() {
     return this.store.accept
@@ -136,4 +145,8 @@ export class MediaManager implements MediaStore {
   list(options: ListOptions): Promise<MediaList> {
     return this.store.list(options)
   }
+}
+
+export interface SelectMediaOptions {
+  onSelect?(media: Media): void
 }
