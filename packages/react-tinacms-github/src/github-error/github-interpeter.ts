@@ -18,12 +18,9 @@ limitations under the License.
 
 import { ActionableModalOptions } from '../components/ActionableModal'
 import { GithubClient } from '../github-client'
-import { TinaCMS } from 'tinacms'
-import { CHECKOUT_BRANCH } from '../events'
 
 export const getModalProps = async (
   error: any,
-  cms: TinaCMS,
   githubClient: GithubClient,
   startEditing: () => void,
   stopEditing: () => void
