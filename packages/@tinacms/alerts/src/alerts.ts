@@ -19,12 +19,12 @@
 import { EventBus, Callback, CMSEvent } from '@tinacms/core'
 
 export interface EventsToAlerts {
-  [key: string]: ToAlert
+  [key: string]: ToAlert | AlertArgs
 }
 
-export type ToAlert = (
-  event: CMSEvent
-) => {
+export type ToAlert = (event: CMSEvent) => AlertArgs
+
+export interface AlertArgs {
   level: AlertLevel
   message: string
   timeout?: number
@@ -38,7 +38,14 @@ export class Alerts {
       const toAlert = this.map[event.type]
 
       if (toAlert) {
-        const { level, message, timeout } = toAlert(event)
+        let getArgs: ToAlert
+        if (typeof toAlert === 'function') {
+          getArgs = toAlert
+        } else {
+          getArgs = () => toAlert
+        }
+
+        const { level, message, timeout } = getArgs(event)
 
         this.add(level, message, timeout)
       }
