@@ -18,14 +18,14 @@ limitations under the License.
 
 import * as React from 'react'
 import { InlineField } from '../inline-field'
-import { useCMS, Form, Media } from 'tinacms'
+import { useCMS, Form } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
 import { FocusRing, FocusRingOptions } from '../styles'
 import { useState, useEffect } from 'react'
 
 export interface InlineImageProps {
   name: string
-  parse(media: Media): string
+  parse(filename: string): string
   uploadDir(form: Form): string
   previewSrc?(formValues: any): string | Promise<string>
   focusRing?: boolean | FocusRingOptions
@@ -42,7 +42,7 @@ export function InlineImage(props: InlineImageProps) {
   const cms = useCMS()
 
   return (
-    <InlineField name={props.name} parse={props.parse}>
+    <InlineField name={props.name}>
       {({ input, form }) => {
         if (cms.enabled) {
           return <EditableImage {...props} input={input} form={form} />
@@ -65,6 +65,7 @@ function EditableImage({
   name,
   previewSrc,
   uploadDir,
+  parse,
   children,
   focusRing = true,
 }: EditableImageProps) {
@@ -111,8 +112,8 @@ function EditableImage({
         file,
       },
     ])
-    if (media) {
-      input.onChange(media)
+    if (media?.filename) {
+      input.onChange(parse(media.filename))
     } else {
       console.error(
         'TinaCMS Image Upload Failed: This could be due to media store configuration, file size, or if the image is a duplicate (has already been uploaded).'
@@ -128,6 +129,16 @@ function EditableImage({
         value={input.value}
         previewSrc={_previewSrc}
         onDrop={handleUploadImage}
+        onClick={() =>
+          cms.media.open({
+            onSelect(media: any) {
+              if (media.filename == input.value) {
+                input.onChange('') // trigger rerender
+              }
+              input.onChange(media)
+            },
+          })
+        }
         {...input}
       >
         {/** If children, pass previewSrc to children */}
@@ -143,6 +154,7 @@ interface InlineImageUploadProps {
   value?: string
   children?: any
   previewSrc?: string
+  onClick: () => void
 }
 
 function InlineImageUpload({
@@ -150,16 +162,18 @@ function InlineImageUpload({
   value,
   previewSrc,
   children,
+  onClick,
 }: InlineImageUploadProps) {
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
     onDrop,
+    noClick: !!onClick,
   })
 
   if (!value) return <ImagePlaceholder />
 
   return (
-    <div {...getRootProps()}>
+    <div {...getRootProps()} onClick={onClick}>
       <input {...getInputProps()} />
       <div>{children ? children(previewSrc) : <img src={previewSrc} />}</div>
     </div>
