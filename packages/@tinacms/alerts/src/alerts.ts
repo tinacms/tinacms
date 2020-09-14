@@ -33,23 +33,25 @@ export interface AlertArgs {
 export class Alerts {
   private alerts: Map<string, Alert> = new Map()
 
-  constructor(private events: EventBus, private map: EventsToAlerts = {}) {
-    this.events.subscribe('*', event => {
-      const toAlert = this.map[event.type]
+  private mapEventToAlert = (event: CMSEvent) => {
+    const toAlert = this.map[event.type]
 
-      if (toAlert) {
-        let getArgs: ToAlert
-        if (typeof toAlert === 'function') {
-          getArgs = toAlert
-        } else {
-          getArgs = () => toAlert
-        }
-
-        const { level, message, timeout } = getArgs(event)
-
-        this.add(level, message, timeout)
+    if (toAlert) {
+      let getArgs: ToAlert
+      if (typeof toAlert === 'function') {
+        getArgs = toAlert
+      } else {
+        getArgs = () => toAlert
       }
-    })
+
+      const { level, message, timeout } = getArgs(event)
+
+      this.add(level, message, timeout)
+    }
+  }
+
+  constructor(private events: EventBus, private map: EventsToAlerts = {}) {
+    this.events.subscribe('*', this.mapEventToAlert)
   }
   setMap(eventsToAlerts: EventsToAlerts) {
     this.map = {
