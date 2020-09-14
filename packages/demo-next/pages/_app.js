@@ -40,10 +40,10 @@ export default class Site extends App {
         hidden: false,
       },
       alerts: {
-        'plugin:add:form': () => ({
+        'plugin:add:form': {
           level: 'info',
           message: 'You can now edit the page',
-        }),
+        },
       },
     })
     const client = new GitClient('http://localhost:3000/___tina')
