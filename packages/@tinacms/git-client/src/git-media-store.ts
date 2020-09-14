@@ -19,7 +19,7 @@ import {
   MediaStore,
   MediaUploadOptions,
   Media,
-  ListOptions,
+  MediaListOptions,
   MediaList,
 } from '@tinacms/core'
 import { GitClient } from './git-client'
@@ -56,7 +56,7 @@ export class GitMediaStore implements MediaStore {
   async previewSrc(src: string) {
     return src
   }
-  async list(_options?: ListOptions): Promise<MediaList> {
+  async list(_options?: MediaListOptions): Promise<MediaList> {
     throw new Error('Not implemented')
   }
 }
