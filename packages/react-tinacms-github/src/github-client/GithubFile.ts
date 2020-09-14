@@ -57,7 +57,6 @@ export class GithubFile {
         message
       )
       this.sha = response.content.sha
-      this.cms.events.dispatch({ type: COMMIT, response })
       return response
     } catch (error) {
       if (error.status == 409 && retryOnConflict) {
