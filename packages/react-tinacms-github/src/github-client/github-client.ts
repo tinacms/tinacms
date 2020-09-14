@@ -100,6 +100,9 @@ export class GithubClient {
     return this.workingRepoFullName !== this.baseRepoFullName
   }
 
+  /**
+   * ...
+   */
   async isAuthorized(): Promise<boolean> {
     try {
       const repo = await this.getRepository()
@@ -110,6 +113,9 @@ export class GithubClient {
     }
   }
 
+  /**
+   * ...
+   */
   async getUser() {
     try {
       const data = await this.req({
@@ -126,12 +132,22 @@ export class GithubClient {
     }
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   getRepository() {
     return this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}`,
     })
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async createFork() {
     const fork = await this.req({
       url: `https://api.github.com/repos/${this.baseRepoFullName}/forks`,
@@ -143,6 +159,12 @@ export class GithubClient {
     return fork
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws BranchNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   createPR(title: string, body: string) {
     const workingRepoFullName = this.workingRepoFullName
     const headBranch = this.branchName
@@ -191,6 +213,11 @@ export class GithubClient {
     })
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async fetchExistingPR() {
     const workingRepoFullName = this.workingRepoFullName
     const headBranch = this.branchName
@@ -215,6 +242,12 @@ export class GithubClient {
     return
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws BranchNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async getBranch() {
     try {
       const workingRepoFullName = this.workingRepoFullName
@@ -240,6 +273,11 @@ export class GithubClient {
     // return // Bubble up error here?
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticated
+   */
   async getBranchList(): Promise<Branch[]> {
     return await this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/branches`,
@@ -247,6 +285,12 @@ export class GithubClient {
     })
   }
 
+  /**
+   *
+   * @throws RepositoryNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async createBranch(name: string) {
     const currentBranch = await this.getBranch()
     const sha = currentBranch.object.sha
@@ -267,6 +311,13 @@ export class GithubClient {
     return response
   }
 
+  /**
+   *
+   * @throws RepositoryNotFound
+   * @throws BranchNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async commit(
     filePath: string,
     sha: string,
@@ -291,11 +342,25 @@ export class GithubClient {
     return response
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws BranchNotFound
+   * @throws FileNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async getDownloadUrl(path: string): Promise<string> {
     const res = await this.fetchFile(path, false)
     return res.download_url
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws BranchNotFound
+   * @throws FileNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async fetchFile(filePath: string, decoded: boolean = true) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
@@ -343,6 +408,12 @@ export class GithubClient {
     })
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws BranchNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async upload(
     path: string,
     fileContents: string,
@@ -352,6 +423,13 @@ export class GithubClient {
     return this.githubFileApi(path, fileContents, commitMessage, encoded, 'PUT')
   }
 
+  /**
+   * @throws RepositoryNotFound
+   * @throws BranchNotFound
+   * @throws FileNotFound
+   * @throws Unauthorized
+   * @throws Unauthenticate
+   */
   async delete(
     path: string,
     commitMessage: string = `Deleted ${path} using TinaCMS`
