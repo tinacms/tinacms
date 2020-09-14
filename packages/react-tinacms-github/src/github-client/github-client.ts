@@ -185,6 +185,10 @@ export class GithubClient {
 
   setWorkingBranch(branch: string) {
     this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
+    this.events.dispatch({
+      type: CHECKOUT_BRANCH,
+      branchName: branch,
+    })
   }
 
   async fetchExistingPR() {
