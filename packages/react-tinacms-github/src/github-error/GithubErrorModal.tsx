@@ -49,7 +49,6 @@ const GithubErrorModal = (props: Props) => {
       if (props.error) {
         const modalProps = await getModalProps(
           props.error,
-          cms,
           github,
           cms.enable,
           cms.disable
