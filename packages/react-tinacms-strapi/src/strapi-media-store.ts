@@ -16,7 +16,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 
 */
 
-import { Media, MediaUploadOptions, ListOptions } from '@tinacms/core'
+import { Media, MediaUploadOptions, MediaListOptions } from '@tinacms/core'
 
 import Cookies from 'js-cookie'
 import { STRAPI_JWT } from './strapi-client'
@@ -71,7 +71,7 @@ export class StrapiMediaStore {
     return this.strapiUrl + this.getFilePath(src)
   }
 
-  async list(options: ListOptions) {
+  async list(options: MediaListOptions) {
     const offset = options?.offset ?? 0
     const limit = options?.limit ?? 50
 

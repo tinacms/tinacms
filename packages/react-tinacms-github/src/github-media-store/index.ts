@@ -21,7 +21,7 @@ import {
   MediaUploadOptions,
   Media,
   MediaList,
-  ListOptions,
+  MediaListOptions,
 } from 'tinacms'
 import { GithubClient } from '../github-client'
 import base64File from './base64File'
@@ -67,7 +67,7 @@ export class GithubMediaStore implements MediaStore {
     }
   }
 
-  async list(options?: ListOptions): Promise<MediaList> {
+  async list(options?: MediaListOptions): Promise<MediaList> {
     const directory = options?.directory ?? ''
     const offset = options?.offset ?? 0
     const limit = options?.limit ?? 50

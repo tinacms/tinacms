@@ -83,13 +83,13 @@ export interface MediaStore {
   /**
    * Lists all media in a specific directory.
    */
-  list(options?: ListOptions): Promise<MediaList>
+  list(options?: MediaListOptions): Promise<MediaList>
 }
 
 /**
  * The options available when listing media.
  */
-export interface ListOptions {
+export interface MediaListOptions {
   directory?: string
   limit?: number
   offset?: number
@@ -142,7 +142,7 @@ export class MediaManager implements MediaStore {
     return this.store.previewSrc(src)
   }
 
-  list(options: ListOptions): Promise<MediaList> {
+  list(options: MediaListOptions): Promise<MediaList> {
     return this.store.list(options)
   }
 }
