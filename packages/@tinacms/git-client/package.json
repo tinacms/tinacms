@@ -30,7 +30,6 @@
   },
   "devDependencies": {
     "@tinacms/core": "^0.29.0",
-    "@tinacms/media": "^0.29.0",
     "@tinacms/react-core": "^0.29.0",
     "@tinacms/scripts": "^0.29.0"
   }

@@ -39,7 +39,6 @@
     "@tinacms/form-builder": "^0.29.0",
     "@tinacms/forms": "^0.29.0",
     "@tinacms/icons": "^0.29.0",
-    "@tinacms/media": "^0.29.0",
     "@tinacms/react-alerts": "^0.29.0",
     "@tinacms/react-core": "^0.29.0",
     "@tinacms/react-forms": "^0.29.0",
