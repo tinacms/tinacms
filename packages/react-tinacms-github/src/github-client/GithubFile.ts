@@ -18,6 +18,7 @@ limitations under the License.
 
 import { useMemo } from 'react'
 import { useCMS } from '@tinacms/react-core'
+import { COMMIT, ERROR } from '../events'
 
 type parseFn = (content: string) => any
 type serializeFn = (data: any) => string
@@ -56,14 +57,14 @@ export class GithubFile {
         message
       )
       this.sha = response.content.sha
-      this.cms.events.dispatch({ type: 'github:commit', response })
+      this.cms.events.dispatch({ type: COMMIT, response })
       return response
     } catch (error) {
       if (error.status == 409 && retryOnConflict) {
         await this.fetchFile() // update sha
         await this.commit(data, message, false) // try one more time
       } else {
-        this.cms.events.dispatch({ type: 'github:error', error })
+        this.cms.events.dispatch({ type: ERROR, error })
         throw error
       }
     }
