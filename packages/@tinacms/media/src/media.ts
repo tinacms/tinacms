@@ -23,7 +23,7 @@ export {
   Media,
   MediaUploadOptions,
   MediaStore,
-  ListOptions,
+  MediaListOptions,
   MediaList,
   MediaManager,
 } from '@tinacms/core'

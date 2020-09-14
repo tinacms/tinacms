@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { useCMS, CMS } from 'tinacms'
+import { useCMS, TinaCMS } from 'tinacms'
 import { FocusRing, FocusRingOptions } from '../styles'
 import { InlineField } from '..'
 
@@ -43,7 +43,7 @@ export function InlineText({
   placeholder,
   children,
 }: InlineTextProps) {
-  const cms: CMS = useCMS()
+  const cms: TinaCMS = useCMS()
 
   return (
     <InlineField name={name}>
