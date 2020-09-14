@@ -76,8 +76,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       previewSrc={src}
       loading={srcIsLoading}
       onClick={() => {
-        cms.events.dispatch({
-          type: 'media:open',
+        cms.media.open({
           onSelect(media: any) {
             if (media.filename == props.input.value) {
               props.input.onChange('') // trigger rerender

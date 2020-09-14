@@ -118,7 +118,7 @@ export class CMS {
 
   events = new EventBus()
 
-  media = new MediaManager(new DummyMediaStore())
+  media = new MediaManager(new DummyMediaStore(), this.events)
 
   /**
    * @hidden
