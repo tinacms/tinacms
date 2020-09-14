@@ -114,6 +114,13 @@ export class TinaCMS extends CMS {
     })
   }
 
+  registerApi(name: string, api: any) {
+    if (api.alerts) {
+      this.alerts.setMap(api.alerts)
+    }
+    super.registerApi(name, api)
+  }
+
   get forms(): PluginType<Form> {
     return this.plugins.findOrCreateMap<Form & { __type: string }>('form')
   }
