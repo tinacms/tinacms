@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { toMarkdownString } from './to-markdown'
-import { CMS, Field, AddContentPlugin } from 'tinacms'
+import { TinaCMS, Field, AddContentPlugin } from 'tinacms'
 
 type MaybePromise<T> = Promise<T> | T
 
@@ -77,7 +77,7 @@ export class RemarkCreatorPlugin<FormShape = any, FrontmatterShape = any>
     this.body = options.body || (() => '')
   }
 
-  async onSubmit(form: FormShape, cms: CMS) {
+  async onSubmit(form: FormShape, cms: TinaCMS) {
     const fileRelativePath = await this.filename(form)
     const rawFrontmatter = await this.frontmatter(form)
     const rawMarkdownBody = await this.body(form)
