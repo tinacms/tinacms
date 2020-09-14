@@ -16,10 +16,12 @@ limitations under the License.
 
 */
 
-import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
+import { EventsToAlerts } from 'tinacms/node_modules/@tinacms/alerts'
 export * from './authenticate'
+import { CHECKOUT_BRANCH, COMMIT } from '../events'
+import { b64EncodeUnicode } from './base64'
 
 export interface GithubClientOptions {
   proxy: string
@@ -47,6 +49,17 @@ function removeLeadingSlash(path: string) {
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
+
+  alerts: EventsToAlerts = {
+    [COMMIT]: () => ({
+      level: 'success',
+      message: `Saved Successfully: Changes committed to ${this.workingRepoFullName}`,
+    }),
+    [CHECKOUT_BRANCH]: event => ({
+      level: 'info',
+      message: 'Switched to branch ' + event.branchName,
+    }),
+  }
 
   proxy: string
   baseRepoFullName: string
