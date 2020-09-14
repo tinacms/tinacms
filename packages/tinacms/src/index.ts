@@ -20,7 +20,14 @@ limitations under the License.
  * Export @tinacms internal packages
  */
 export * from '@tinacms/react-modals'
-export * from '@tinacms/core'
+export {
+  Media,
+  MediaUploadOptions,
+  MediaStore,
+  ListOptions,
+  MediaList,
+  MediaManager,
+} from '@tinacms/core'
 export { ActionButton } from '@tinacms/react-forms'
 export { ScreenPlugin, useScreenPlugin } from '@tinacms/react-screens'
 export * from '@tinacms/fields'
@@ -33,7 +40,6 @@ export { ContentCreatorPlugin } from '@tinacms/forms'
  */
 export * from './react-tinacms'
 export { TinaCMS, TinaCMSConfig } from './tina-cms'
-export { TinaCMS as CMS } from './tina-cms'
 export { GlobalFormPlugin } from './plugins/screens'
 export {
   TinaProvider,
