@@ -20,8 +20,9 @@ import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
 import { EventsToAlerts } from 'tinacms/node_modules/@tinacms/alerts'
 export * from './authenticate'
-import { CHECKOUT_BRANCH, COMMIT } from '../events'
+import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH } from '../events'
 import { b64EncodeUnicode } from './base64'
+import { EventBus } from 'tinacms/node_modules/@tinacms/core'
 
 export interface GithubClientOptions {
   proxy: string
@@ -49,6 +50,8 @@ function removeLeadingSlash(path: string) {
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
+
+  events = new EventBus()
 
   alerts: EventsToAlerts = {
     [COMMIT]: () => ({
@@ -243,7 +246,7 @@ export class GithubClient {
   async createBranch(name: string) {
     const currentBranch = await this.getBranch()
     const sha = currentBranch.object.sha
-    return this.req({
+    const response = this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/git/refs`,
       method: 'POST',
       data: {
@@ -251,6 +254,13 @@ export class GithubClient {
         sha,
       },
     })
+
+    this.events.dispatch({
+      type: CREATE_BRANCH,
+      branchName: name,
+    })
+
+    return response
   }
 
   async commit(
