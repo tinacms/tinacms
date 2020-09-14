@@ -201,10 +201,6 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
         async onSubmit({ name }) {
           try {
             await cms.api.github.createBranch(name)
-            cms.events.dispatch({
-              type: CREATE_BRANCH,
-              branchName: name,
-            })
             cms.api.github.setWorkingBranch(name)
             cms.events.dispatch({
               type: CHECKOUT_BRANCH,
