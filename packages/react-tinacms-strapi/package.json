@@ -27,7 +27,7 @@
     "url": "https://github.com/tinacms/tinacms/issues"
   },
   "peerDependencies": {
-    "@tinacms/core": "^0.24.0",
+    "@tinacms/core": "^0.29.0",
     "@tinacms/fields": "^0.24.0",
     "@tinacms/media": "^0.24.0",
     "@tinacms/react-core": "^0.24.0",
