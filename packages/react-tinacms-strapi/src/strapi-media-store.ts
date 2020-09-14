@@ -16,7 +16,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 
 */
 
-import { Media, MediaUploadOptions, ListOptions } from '@tinacms/media'
+import { Media, MediaUploadOptions, ListOptions } from '@tinacms/core'
 
 import Cookies from 'js-cookie'
 import { STRAPI_JWT } from './strapi-client'

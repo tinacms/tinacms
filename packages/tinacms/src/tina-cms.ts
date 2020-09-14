@@ -34,14 +34,6 @@ import {
   TagsFieldPlugin,
 } from '@tinacms/fields'
 import { Form } from '@tinacms/forms'
-import {
-  MediaManager,
-  MediaStore,
-  MediaUploadOptions,
-  Media,
-  ListOptions,
-  MediaList,
-} from '@tinacms/media'
 import { Alerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
@@ -72,22 +64,15 @@ const DEFAULT_FIELDS = [
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
   toolbar?: ToolbarStateOptions | boolean
-  media?: {
-    store: MediaStore
-  }
 }
 
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   toolbar?: ToolbarState
-  media: MediaManager
   alerts = new Alerts(this.events)
 
-  constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
+  constructor({ sidebar, toolbar, ...config }: TinaCMSConfig = {}) {
     super(config)
-
-    const mediaStore = media?.store || new DummyMediaStore()
-    this.media = new MediaManager(mediaStore)
 
     if (sidebar) {
       const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
@@ -116,25 +101,5 @@ export class TinaCMS extends CMS {
 
   get screens(): PluginType<ScreenPlugin> {
     return this.plugins.findOrCreateMap('screen')
-  }
-}
-
-class DummyMediaStore implements MediaStore {
-  accept = '*'
-  async persist(files: MediaUploadOptions[]): Promise<Media[]> {
-    alert('UPLOADING FILES')
-    console.log(files)
-    return files.map(({ directory, file }) => ({
-      id: file.name,
-      type: 'file',
-      directory,
-      filename: file.name,
-    }))
-  }
-  async previewSrc(filename: string) {
-    return filename
-  }
-  async list(_options?: ListOptions): Promise<MediaList> {
-    throw new Error('Not implemented')
   }
 }
