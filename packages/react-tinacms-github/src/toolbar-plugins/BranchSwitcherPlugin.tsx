@@ -35,7 +35,7 @@ import { Dismissible } from 'react-dismissible'
 import styled, { css } from 'styled-components'
 import { GithubClient, Branch } from '../github-client'
 import { LoadingDots } from '@tinacms/react-forms'
-import { CREATE_BRANCH, CHECKOUT_BRANCH, ERROR } from '../events'
+import { CREATE_BRANCH, ERROR } from '../events'
 
 interface BranchSwitcherProps {
   onBranchChange?(branch: string): void

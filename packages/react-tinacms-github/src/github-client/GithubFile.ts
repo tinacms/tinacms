@@ -18,7 +18,7 @@ limitations under the License.
 
 import { useMemo } from 'react'
 import { useCMS } from '@tinacms/react-core'
-import { COMMIT, ERROR } from '../events'
+import { ERROR } from '../events'
 
 type parseFn = (content: string) => any
 type serializeFn = (data: any) => string
