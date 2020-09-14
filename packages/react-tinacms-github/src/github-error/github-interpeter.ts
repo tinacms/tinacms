@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { ActionableModalOptions } from '../components/ActionableModal'
-import { GithubClient } from '../github-client'
+import { GithubClient, UnauthenticatedError } from '../github-client'
 
 export const getModalProps = async (
   error: any,
@@ -43,15 +43,15 @@ export const getModalProps = async (
     },
   }
 
-  switch (error.status) {
-    case 401: {
-      // Unauthorized
-      return {
-        title: '401 Unauthenticated',
-        message: 'Authentication is invalid',
-        actions: [cancelEditModeAction, reauthenticateAction],
-      }
+  if (error instanceof UnauthenticatedError) {
+    return {
+      title: '401 Unauthenticated',
+      message: 'Authentication is invalid',
+      actions: [cancelEditModeAction, reauthenticateAction],
     }
+  }
+
+  switch (error.status) {
     case 404: {
       /**
        * This case checks all the reasons there may have been a 404:

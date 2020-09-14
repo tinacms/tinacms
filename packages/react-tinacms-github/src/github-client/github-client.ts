@@ -369,7 +369,20 @@ export class GithubClient {
     //2xx status codes
     if (response.status.toString()[0] == '2') return data
 
-    throw new GithubError(data.message || response.statusText, response.status)
+    let error: GithubError
+
+    switch (response.status) {
+      case 401:
+        error = new UnauthenticatedError()
+        break
+      default:
+        error = new GithubError(
+          data.message || response.statusText,
+          response.status
+        )
+    }
+
+    throw error
   }
 
   private validate(): void {
@@ -434,6 +447,12 @@ class GithubError extends Error {
     super(message)
     this.message = message
     this.status = status
+  }
+}
+
+export class UnauthenticatedError extends GithubError {
+  constructor() {
+    super('Unauthenticated.', 401)
   }
 }
 
