@@ -18,7 +18,7 @@ limitations under the License.
 
 import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
-import { EventsToAlerts } from 'tinacms/node_modules/@tinacms/alerts'
+import { EventsToAlerts } from '@tinacms/alerts'
 export * from './authenticate'
 import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH } from '../events'
 import { b64EncodeUnicode } from './base64'
