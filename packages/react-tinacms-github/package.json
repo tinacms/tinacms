@@ -26,6 +26,7 @@
     "@tinacms/fields": "^0.29.0",
     "@tinacms/forms": "^0.29.0",
     "@tinacms/icons": "^0.29.0",
+    "@tinacms/alerts": "^0.29.0",
     "@tinacms/react-forms": "^0.29.0",
     "@tinacms/styles": "^0.29.0",
     "@types/js-cookie": "^2.2.5",
