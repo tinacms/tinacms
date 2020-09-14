@@ -22,7 +22,13 @@ export interface EventsToAlerts {
   [key: string]: ToAlert
 }
 
-export type ToAlert = (event: CMSEvent) => Alert
+export type ToAlert = (
+  event: CMSEvent
+) => {
+  level: AlertLevel
+  message: string
+  timeout?: number
+}
 
 export class Alerts {
   private alerts: Map<string, Alert> = new Map()
