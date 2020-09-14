@@ -65,7 +65,6 @@ function EditableImage({
   name,
   previewSrc,
   uploadDir,
-  parse,
   children,
   focusRing = true,
 }: EditableImageProps) {
