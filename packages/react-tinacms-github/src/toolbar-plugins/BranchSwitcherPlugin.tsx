@@ -172,10 +172,6 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
             }
             setConfirmSwitchProps(null)
             setCreateBranchProps(null)
-            cms.events.dispatch({
-              type: CHECKOUT_BRANCH,
-              branchName: confirmSwitchProps.name,
-            })
           }}
           close={() => {
             setConfirmSwitchProps(null)
@@ -202,10 +198,6 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
           try {
             await cms.api.github.createBranch(name)
             cms.api.github.setWorkingBranch(name)
-            cms.events.dispatch({
-              type: CHECKOUT_BRANCH,
-              branchName: name,
-            })
             if (onBranchChange) {
               onBranchChange(name)
             }
