@@ -18,14 +18,14 @@ limitations under the License.
 
 import * as React from 'react'
 import { InlineField } from '../inline-field'
-import { useCMS, Form } from 'tinacms'
+import { useCMS, Form, Media } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
 import { FocusRing, FocusRingOptions } from '../styles'
 import { useState, useEffect } from 'react'
 
 export interface InlineImageProps {
   name: string
-  parse(filename: string): string
+  parse(media: Media): string
   uploadDir(form: Form): string
   previewSrc?(formValues: any): string | Promise<string>
   focusRing?: boolean | FocusRingOptions
@@ -42,7 +42,7 @@ export function InlineImage(props: InlineImageProps) {
   const cms = useCMS()
 
   return (
-    <InlineField name={props.name}>
+    <InlineField name={props.name} parse={props.parse}>
       {({ input, form }) => {
         if (cms.enabled) {
           return <EditableImage {...props} input={input} form={form} />
@@ -65,7 +65,6 @@ function EditableImage({
   name,
   previewSrc,
   uploadDir,
-  parse,
   children,
   focusRing = true,
 }: EditableImageProps) {
@@ -83,14 +82,12 @@ function EditableImage({
         if (previewSrc) {
           imageSrc = await previewSrc(form.values)
         } else {
-          // @ts-ignore cms.alerts
-          imageSrc = await cms.media.previewSrc(props.input.value)
+          imageSrc = await cms.media.previewSrc(input.value)
         }
       } catch (e) {
         if (!canceled) {
           setSrc('')
           console.error(e)
-          // @ts-ignore cms.alerts
           cms.alerts.error(
             `Failed to generate preview for '${name}': ${e.message}`
           )
@@ -114,8 +111,8 @@ function EditableImage({
         file,
       },
     ])
-    if (media?.filename) {
-      input.onChange(parse(media.filename))
+    if (media) {
+      input.onChange(media)
     } else {
       console.error(
         'TinaCMS Image Upload Failed: This could be due to media store configuration, file size, or if the image is a duplicate (has already been uploaded).'
