@@ -19,6 +19,7 @@ limitations under the License.
 import { ActionableModalOptions } from '../components/ActionableModal'
 import { GithubClient } from '../github-client'
 import { TinaCMS } from 'tinacms'
+import { CHECKOUT_BRANCH } from '../events'
 
 export const getModalProps = async (
   error: any,
@@ -43,7 +44,7 @@ export const getModalProps = async (
     action: () => {
       githubClient.setWorkingBranch(githubClient.baseBranch)
       cms.events.dispatch({
-        type: 'github:branch:checkout',
+        type: CHECKOUT_BRANCH,
         branchName: githubClient.baseBranch,
       })
     },

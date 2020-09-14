@@ -35,6 +35,7 @@ import { Dismissible } from 'react-dismissible'
 import styled, { css } from 'styled-components'
 import { GithubClient, Branch } from '../github-client'
 import { LoadingDots } from '@tinacms/react-forms'
+import { CREATE_BRANCH, CHECKOUT_BRANCH, ERROR } from '../events'
 
 interface BranchSwitcherProps {
   onBranchChange?(branch: string): void
@@ -69,7 +70,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
 
   React.useEffect(() => {
     updateBranchList()
-    cms.events.subscribe('github:branch:create', updateBranchList)
+    cms.events.subscribe(CREATE_BRANCH, updateBranchList)
   }, [])
 
   const closeDropdown = () => {
@@ -164,7 +165,6 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
         <ConfirmSwitchBranchModal
           name={confirmSwitchProps.name}
           onBranchChange={() => {
-            cms.alerts.info('Switched to branch ' + confirmSwitchProps.name)
             github.setWorkingBranch(confirmSwitchProps.name)
             closeDropdown()
             if (onBranchChange) {
@@ -173,7 +173,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
             setConfirmSwitchProps(null)
             setCreateBranchProps(null)
             cms.events.dispatch({
-              type: 'github:branch:checkout',
+              type: CHECKOUT_BRANCH,
               branchName: confirmSwitchProps.name,
             })
           }}
@@ -202,19 +202,19 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
           try {
             await cms.api.github.createBranch(name)
             cms.events.dispatch({
-              type: 'github:branch:create',
+              type: CREATE_BRANCH,
               branchName: name,
             })
             cms.api.github.setWorkingBranch(name)
             cms.events.dispatch({
-              type: 'github:branch:checkout',
+              type: CHECKOUT_BRANCH,
               branchName: name,
             })
             if (onBranchChange) {
               onBranchChange(name)
             }
           } catch (error) {
-            cms.events.dispatch({ type: 'github:error', error })
+            cms.events.dispatch({ type: ERROR, error })
           }
         },
       }),
