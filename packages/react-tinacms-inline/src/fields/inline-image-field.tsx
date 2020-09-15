@@ -84,13 +84,9 @@ function EditableImage({
         } else {
           imageSrc = await cms.media.previewSrc(input.value)
         }
-      } catch (e) {
+      } catch {
         if (!canceled) {
           setSrc('')
-          console.error(e)
-          cms.alerts.error(
-            `Failed to generate preview for '${name}': ${e.message}`
-          )
         }
       }
       if (!canceled) {
@@ -105,20 +101,18 @@ function EditableImage({
 
   async function handleUploadImage([file]: File[]) {
     const directory = uploadDir(form)
+
     const [media] = await cms.media.persist([
       {
         directory,
         file,
       },
     ])
+
     if (media) {
       input.onChange(media)
-    } else {
-      console.error(
-        'TinaCMS Image Upload Failed: This could be due to media store configuration, file size, or if the image is a duplicate (has already been uploaded).'
-      )
-      cms.alerts.error('Image Upload Failed.')
     }
+
     return null
   }
 

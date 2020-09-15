@@ -48,16 +48,11 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
             props
           )
         } else {
-          // @ts-ignore cms.alerts
           imageSrc = await cms.media.previewSrc(props.input.value)
         }
-      } catch (e) {
+      } catch {
         if (!canceled) {
           setSrc('')
-          // @ts-ignore cms.alerts
-          cms.alerts.error(
-            `Failed to generate preview for '${props.field.name}': ${e.message}`
-          )
         }
       }
       if (!canceled) {
