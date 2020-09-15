@@ -17,10 +17,11 @@ limitations under the License.
 */
 
 import React, { useState, useEffect } from 'react'
-import { useCMS } from 'tinacms'
+import { TinaCMS, useCMS } from 'tinacms'
 import GithubErrorModal, { GithubError } from '../github-error/GithubErrorModal'
 import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubClient } from '../github-client'
+import { CHECKOUT_BRANCH, ERROR } from '../events'
 
 interface ProviderProps {
   children: any
@@ -68,10 +69,10 @@ export const TinacmsGithubProvider = ({
     }
   }
 
-  useCMSEvent('cms:enable', beginAuth, [])
-  useCMSEvent('cms:disable', onLogout, [])
-  useCMSEvent('github:branch:checkout', onLogin, [])
-  useCMSEvent('github:error', ({ error }: any) => setError(error), [])
+  useCMSEvent(TinaCMS.ENABLED.type, beginAuth, [])
+  useCMSEvent(TinaCMS.DISABLED.type, onLogout, [])
+  useCMSEvent(CHECKOUT_BRANCH, onLogin, [])
+  useCMSEvent(ERROR, ({ error }: any) => setError(error), [])
 
   return (
     <>

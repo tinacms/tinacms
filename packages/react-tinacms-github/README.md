@@ -373,3 +373,21 @@ export function Page(props) => {
   //...
 }
 ```
+
+## Events and Alerts
+
+The `GithubClient` defines several events:
+
+| Event Name | Description |
+| --- | --- |
+| `github:commit` | A commit has been made to a file. |
+| `github:error` | An error was encountered when interacting with the GitHub API. |
+| `github:branch:checkout` | The client switched to a new branch. |
+| `github:branch:create` | A new branch was created in GitHub. |
+
+### Alerts
+
+| Event | Level |  Default Message |
+| --- | --- | --- |
+| `github:commit` | Success | `Saved Successfully: Changes committed to {repo}` |
+| `github:branch:checkout` | Info | `Switched to branch {name}`|

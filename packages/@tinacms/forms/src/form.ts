@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import arrayMutators from 'final-form-arrays'
-import { FormApi, createForm, Config, FormState } from 'final-form'
+import { FormApi, createForm, Config, FormState, FORM_ERROR } from 'final-form'
 import { Plugin } from '@tinacms/core'
 import { Field, AnyField } from './field'
 
@@ -185,9 +185,13 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
   onSubmit: Config<S>['onSubmit']
 
   private handleSubmit: Config<S>['onSubmit'] = async (values, form, cb) => {
-    const response = await this.onSubmit(values, form, cb)
-    form.initialize(values)
-    return response
+    try {
+      const response = await this.onSubmit(values, form, cb)
+      form.initialize(values)
+      return response
+    } catch (error) {
+      return { [FORM_ERROR]: error }
+    }
   }
 
   /**

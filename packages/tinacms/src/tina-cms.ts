@@ -34,7 +34,7 @@ import {
   TagsFieldPlugin,
 } from '@tinacms/fields'
 import { Form } from '@tinacms/forms'
-import { Alerts } from '@tinacms/alerts'
+import { Alerts, EventsToAlerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 import {
@@ -64,15 +64,18 @@ const DEFAULT_FIELDS = [
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
   toolbar?: ToolbarStateOptions | boolean
+  alerts?: EventsToAlerts
 }
 
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   toolbar?: ToolbarState
-  alerts = new Alerts(this.events)
+  alerts: Alerts
 
-  constructor({ sidebar, toolbar, ...config }: TinaCMSConfig = {}) {
+  constructor({ sidebar, toolbar, alerts, ...config }: TinaCMSConfig = {}) {
     super(config)
+
+    this.alerts = new Alerts(this.events, alerts)
 
     if (sidebar) {
       const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
@@ -89,6 +92,13 @@ export class TinaCMS extends CMS {
         this.fields.add(field)
       }
     })
+  }
+
+  registerApi(name: string, api: any) {
+    if (api.alerts) {
+      this.alerts.setMap(api.alerts)
+    }
+    super.registerApi(name, api)
   }
 
   get forms(): PluginType<Form> {
