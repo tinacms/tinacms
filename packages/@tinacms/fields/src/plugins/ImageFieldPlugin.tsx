@@ -19,21 +19,25 @@ limitations under the License.
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
+import { MediaStore } from '@tinacms/core'
 import { useCMS } from '@tinacms/react-core'
 import { parse } from './textFormat'
 import { useState, useEffect } from 'react'
 
-type FieldProps = any
 interface ImageProps {
   path: string
-  previewSrc?(form: any, field: FieldProps): string | Promise<string>
+  previewSrc?: MediaStore['previewSrc']
   uploadDir(form: any): string
   clearable?: boolean // defaults to true
 }
 
-export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
+export function usePreviewSrc(
+  value: string,
+  name: string,
+  values: any,
+  previewSrc?: MediaStore['previewSrc']
+): [string, boolean] {
   const cms = useCMS()
-
   const [srcIsLoading, setSrcIsLoading] = useState(true)
   const [src, setSrc] = useState('')
   useEffect(() => {
@@ -42,47 +46,58 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       setSrcIsLoading(true)
       let imageSrc = ''
       try {
-        if (props.field.previewSrc) {
-          imageSrc = await props.field.previewSrc(
-            props.form.getState().values,
-            props
-          )
-        } else {
-          imageSrc = await cms.media.previewSrc(props.input.value)
-        }
-      } catch {
-        if (!canceled) {
-          setSrc('')
-        }
-      }
+        const getSrc = previewSrc || cms.media.previewSrc
+
+        imageSrc = await getSrc(value, name, values)
+      } catch {}
+
       if (!canceled) {
         setSrc(imageSrc)
+        setSrcIsLoading(false)
       }
-      setSrcIsLoading(false)
     })()
+
     return () => {
       canceled = true
     }
-  }, [props.input.value])
+  }, [value])
+
+  return [src, srcIsLoading]
+}
+
+export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
+  const cms = useCMS()
+  const { form, field } = props
+  const { name, value, onChange } = props.input
+  const [src, srcIsLoading] = usePreviewSrc(
+    value,
+    name,
+    form.getState().values,
+    field.previewSrc
+  )
+
+  let onClear: any
+  if (props.field.clearable) {
+    onClear = () => onChange('')
+  }
 
   return (
     <ImageUpload
-      value={props.input.value}
+      value={value}
       previewSrc={src}
       loading={srcIsLoading}
       onClick={() => {
         cms.media.open({
           onSelect(media: any) {
-            if (media.filename == props.input.value) {
-              props.input.onChange('') // trigger rerender
+            if (media.filename == value) {
+              onChange('') // trigger rerender
             }
-            props.input.onChange(media)
+            onChange(media)
           },
         })
       }}
       onDrop={async ([file]: File[]) => {
         const directory = props.field.uploadDir(props.form.getState().values)
-        // @ts-ignore cms.media
         const [media] = await cms.media.persist([
           {
             directory,
@@ -90,21 +105,12 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
           },
         ])
         if (media) {
-          if (media.filename == props.input.value) {
-            props.input.onChange('') // trigger rerender
-          }
-          props.input.onChange(media)
-        } else {
+          if (media.filename == value) onChange('') // trigger rerender
+          onChange(media)
           // TODO Handle failure
         }
       }}
-      onClear={
-        props.field.clearable === false
-          ? undefined
-          : () => {
-              props.input.onChange('')
-            }
-      }
+      onClear={onClear}
     />
   )
 })
