@@ -18,6 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import { useEffect, useState } from 'react'
+import styled, { css } from 'styled-components'
 import { useCMS } from '../react-tinacms'
 import {
   Modal,
@@ -27,6 +28,8 @@ import {
 } from '@tinacms/react-modals'
 import { MediaList, Media } from '@tinacms/core'
 import path from 'path'
+import { Folder, File } from '@tinacms/icons'
+import { Button } from '@tinacms/styles'
 
 export interface MediaRequest {
   limit?: number
@@ -53,7 +56,7 @@ export function MediaManager() {
   return (
     <Modal>
       <ModalFullscreen>
-        <ModalHeader close={close}>Media</ModalHeader>
+        <ModalHeader close={close}>Media Manager</ModalHeader>
         <ModalBody padded={true}>
           <MediaPicker {...request} close={close} />
         </ModalBody>
@@ -99,16 +102,9 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
   }
 
   return (
-    <div style={{ height: '90vh', paddingBottom: '5rem' }}>
+    <MediaPickerWrap>
       <Breadcrumb directory={directory} setDirectory={setDirectory} />
-      <h3>Items</h3>
-      <div
-        style={{
-          padding: '2rem 0',
-          height: '100%',
-          overflowY: 'scroll',
-        }}
-      >
+      <div>
         <ul
           style={{
             display: 'flex',
@@ -125,9 +121,16 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
         </ul>
       </div>
       <PageLinks list={list} setOffset={setOffset} />
-    </div>
+    </MediaPickerWrap>
   )
 }
+
+const MediaPickerWrap = styled.div`
+  height: 90vh;
+  padding-bottom: 5rem;
+  overflow-y: scroll;
+  color: var(--tina-color-grey-9);
+`
 
 interface BreadcrumbProps {
   directory?: string
@@ -136,22 +139,40 @@ interface BreadcrumbProps {
 
 function Breadcrumb({ directory, setDirectory }: BreadcrumbProps) {
   return (
-    <>
-      <h3>Breadcrumbs</h3>
-      <button onClick={() => setDirectory('')}>ROOT</button>/
+    <BreadcrumbWrapper>
+      {/**TODO: find a better label for 'Root'
+       * Maybe it should be the directory name if its set
+       */}
+      <button onClick={() => setDirectory('')}>Root</button>
+      <span>/</span>
       {directory &&
         directory.split('/').map((part, index, parts) => (
-          <button
-            onClick={() => {
-              setDirectory(parts.slice(0, index + 1).join('/'))
-            }}
-          >
-            {part}/
-          </button>
+          <>
+            <button
+              onClick={() => {
+                setDirectory(parts.slice(0, index + 1).join('/'))
+              }}
+            >
+              {part}
+            </button>
+            <span>/</span>
+          </>
         ))}
-    </>
+    </BreadcrumbWrapper>
   )
 }
+
+const BreadcrumbWrapper = styled.div`
+  width: 100%;
+  display: flex;
+  padding-bottom: var(--tina-padding-small);
+  color: var(--tina-color-grey-4);
+  font-size: var(--tina-font-size-2);
+
+  > *:not(:first-child) {
+    padding-left: 8px;
+  }
+`
 
 interface MediaListItemProps {
   item: Media
@@ -161,50 +182,86 @@ interface MediaListItemProps {
 
 function MediaListItem({ item, onClick, onSelect }: MediaListItemProps) {
   return (
-    <li
-      style={{
-        display: 'flex',
-        alignItems: 'center',
-        maxWidth: '800px',
-        margin: '0.5rem',
-        border: '1px solid pink',
-      }}
-      onClick={() => onClick(item)}
-    >
-      <img
-        src={
-          item.type === 'file'
-            ? item.previewSrc
-            : 'http://fordesigner.com/imguploads/Image/cjbc/zcool/png20080526/1211755375.png'
-        }
-        style={{ width: '100px', marginRight: '1rem' }}
-      />
+    <ListItem onClick={() => onClick(item)}>
+      <ItemPreview>
+        <MediaPreview src={item.previewSrc} item={item} />
+      </ItemPreview>
       <span style={{ flexGrow: 1 }}>
         {item.filename}
         {item.type === 'dir' && '/'}
       </span>
       {onSelect && item.type === 'file' && (
         <div style={{ minWidth: '100px' }}>
-          <button
-            style={{
-              border: '1px solid aquamarine',
-              padding: '0.25rem 0.5rem',
-            }}
-            onClick={() => onSelect(item)}
-          >
+          <Button small onClick={() => onSelect(item)}>
             Insert
-          </button>
+          </Button>
         </div>
       )}
-    </li>
+    </ListItem>
   )
 }
+
+function MediaPreview({
+  src = '',
+  item,
+}: {
+  src: string | undefined
+  item: Media
+}) {
+  const isValidImg = /\.(jpe?g|png)$/.test(src)
+  const icon = item.type === 'file' ? <File /> : <Folder />
+
+  return isValidImg ? <img src={src} /> : icon
+}
+
+const ListItem = styled.li`
+  display: flex;
+  align-items: center;
+  padding: var(--tina-padding-big) var(--tina-padding-small);
+  background-color: transparent;
+  transition: background-color 300ms ease;
+  border-bottom: 1px solid var(--tina-color-grey-2);
+
+  > *:not(:first-child) {
+    margin-left: var(--tina-padding-big);
+  }
+
+  &:hover {
+    background-color: var(--tina-color-grey-1);
+    border-radius: var(--tina-radius-small);
+    cursor: pointer;
+  }
+`
+
+const ItemPreview = styled.div`
+  width: 56px;
+  border-radius: var(--tina-radius-small);
+  overflow: hidden;
+  display: flex;
+  justify-content: center;
+
+  > img {
+    min-height: 56px;
+    object-fit: cover;
+  }
+
+  > svg {
+    width: 47%;
+    height: 100%;
+    fill: var(--tina-color-grey-4);
+  }
+`
 
 interface PageLinksProps {
   list: MediaList
   setOffset: (offset: number) => void
 }
 
+/**
+ * TODO:
+ * add next / prev page link arrow icons
+ * if there's just one page, should we even show the page links?
+ *  */
 function PageLinks({ list, setOffset }: PageLinksProps) {
   const limit = list.limit || 10
   const numPages = Math.ceil(list.totalCount / limit)
@@ -215,19 +272,33 @@ function PageLinks({ list, setOffset }: PageLinksProps) {
   for (let i = 1; i <= numPages; i++) {
     const active = i === currentPageIndex
     pageLinks.push(
-      <button
-        style={{
-          padding: '0.5rem',
-          margin: '0 0.5rem',
-          background: active ? 'black' : '',
-          color: active ? 'white' : '',
-        }}
-        onClick={() => setOffset(i * limit)}
-      >
+      <PageNumber active={active} onClick={() => setOffset(i * limit)}>
         {i}
-      </button>
+      </PageNumber>
     )
   }
 
-  return <>{pageLinks}</>
+  return <PageLinksWrap>{pageLinks}</PageLinksWrap>
 }
+
+const PageLinksWrap = styled.div`
+  width: 100%;
+  display: flex;
+  justify-content: flex-end;
+  margin: 0 var(--tina-padding-big);
+`
+
+const PageNumber = styled.button<{ active: boolean }>`
+  padding: 0 0.15rem;
+  margin: var(--tina-padding-small);
+  transition: border 180ms ease;
+
+  ${p =>
+      !p.active &&
+      css`
+        color: var(--tina-color-grey-4);
+      `}
+    :hover {
+    border-bottom: 1px solid var(--tina-color-grey-9);
+  }
+`
