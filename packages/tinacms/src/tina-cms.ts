@@ -70,12 +70,17 @@ export interface TinaCMSConfig extends CMSConfig {
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   toolbar?: ToolbarState
-  alerts: Alerts
+  _alerts?: Alerts
 
-  constructor({ sidebar, toolbar, alerts, ...config }: TinaCMSConfig = {}) {
+  constructor({
+    sidebar,
+    toolbar,
+    alerts = {},
+    ...config
+  }: TinaCMSConfig = {}) {
     super(config)
 
-    this.alerts = new Alerts(this.events, alerts)
+    this.alerts.setMap(alerts)
 
     if (sidebar) {
       const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
@@ -92,6 +97,13 @@ export class TinaCMS extends CMS {
         this.fields.add(field)
       }
     })
+  }
+
+  get alerts() {
+    if (!this._alerts) {
+      this._alerts = new Alerts(this.events)
+    }
+    return this._alerts
   }
 
   registerApi(name: string, api: any) {
