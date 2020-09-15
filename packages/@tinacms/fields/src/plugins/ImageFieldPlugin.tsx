@@ -33,37 +33,38 @@ interface ImageProps {
 
 export function usePreviewSrc(
   value: string,
-  name: string,
-  values: any,
-  previewSrc?: MediaStore['previewSrc']
+  fieldName: string,
+  formValues: any,
+  getPreviewSrc?: MediaStore['previewSrc']
 ): [string, boolean] {
   const cms = useCMS()
-  const [srcIsLoading, setSrcIsLoading] = useState(true)
-  const [src, setSrc] = useState('')
+  const getSrc = getPreviewSrc || cms.media.previewSrc
+  const [{ src, loading }, setState] = useState({
+    src: '',
+    loading: true,
+  })
 
   useEffect(() => {
-    let canceled = false
-    ;(async () => {
-      setSrcIsLoading(true)
-      let imageSrc = ''
-      try {
-        const getSrc = previewSrc || cms.media.previewSrc
+    let componentUnmounted = false
+    let tmpSrc = ''
 
-        imageSrc = await getSrc(value, name, values)
-      } catch {}
+    getSrc(value, fieldName, formValues)
+      .then((src: string) => (tmpSrc = src))
+      .finally(() => {
+        if (componentUnmounted) return
 
-      if (!canceled) {
-        setSrc(imageSrc)
-        setSrcIsLoading(false)
-      }
-    })()
+        setState({
+          src: tmpSrc,
+          loading: false,
+        })
+      })
 
     return () => {
-      canceled = true
+      componentUnmounted = true
     }
   }, [value])
 
-  return [src, srcIsLoading]
+  return [src, loading]
 }
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
