@@ -16,12 +16,49 @@
 
  */
 
-import { EventBus, Callback } from '@tinacms/core'
+import { EventBus, Callback, CMSEvent } from '@tinacms/core'
+
+export interface EventsToAlerts {
+  [key: string]: ToAlert | AlertArgs
+}
+
+export type ToAlert = (event: CMSEvent) => AlertArgs
+
+export interface AlertArgs {
+  level: AlertLevel
+  message: string
+  timeout?: number
+}
 
 export class Alerts {
   private alerts: Map<string, Alert> = new Map()
 
-  constructor(private events: EventBus) {}
+  private mapEventToAlert = (event: CMSEvent) => {
+    const toAlert = this.map[event.type]
+
+    if (toAlert) {
+      let getArgs: ToAlert
+      if (typeof toAlert === 'function') {
+        getArgs = toAlert
+      } else {
+        getArgs = () => toAlert
+      }
+
+      const { level, message, timeout } = getArgs(event)
+
+      this.add(level, message, timeout)
+    }
+  }
+
+  constructor(private events: EventBus, private map: EventsToAlerts = {}) {
+    this.events.subscribe('*', this.mapEventToAlert)
+  }
+  setMap(eventsToAlerts: EventsToAlerts) {
+    this.map = {
+      ...this.map,
+      ...eventsToAlerts,
+    }
+  }
 
   add(level: AlertLevel, message: string, timeout: number = 3000): () => void {
     const alert = {

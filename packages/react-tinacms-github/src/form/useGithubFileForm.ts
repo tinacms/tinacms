@@ -17,9 +17,8 @@ limitations under the License.
 */
 
 import { GitFile } from './useGitFileSha'
-import { useCMS, useForm, FormOptions } from 'tinacms'
-import { FORM_ERROR } from 'final-form'
-import { GithubClient, useGithubFile } from '../github-client'
+import { useForm, FormOptions } from 'tinacms'
+import { useGithubFile } from '../github-client'
 
 export interface GithubFormOptions extends Partial<FormOptions<any>> {
   serialize: (data: any) => string
@@ -29,7 +28,6 @@ export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
   options: GithubFormOptions
 ) => {
-  const cms = useCMS()
   const githubFile = useGithubFile({
     path: file.fileRelativePath,
     serialize: options.serialize,
@@ -42,17 +40,7 @@ export const useGithubFileForm = <T = any>(
     fields: options.fields || [],
     actions: options.actions || [],
     onSubmit(formData) {
-      const github: GithubClient = cms.api.github
-      return githubFile
-        .commit(formData)
-        .then(() => {
-          cms.alerts.success(
-            `Saved Successfully: Changes committed to ${github.workingRepoFullName}`
-          )
-        })
-        .catch((error: any) => {
-          return { [FORM_ERROR]: error }
-        })
+      return githubFile.commit(formData)
     },
   })
 

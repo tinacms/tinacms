@@ -16,10 +16,13 @@ limitations under the License.
 
 */
 
-import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
+import { EventsToAlerts } from '@tinacms/alerts'
 export * from './authenticate'
+import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH } from '../events'
+import { b64EncodeUnicode } from './base64'
+import { EventBus } from 'tinacms/node_modules/@tinacms/core'
 
 export interface GithubClientOptions {
   proxy: string
@@ -47,6 +50,19 @@ function removeLeadingSlash(path: string) {
 export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
+
+  events = new EventBus()
+
+  alerts: EventsToAlerts = {
+    [COMMIT]: () => ({
+      level: 'success',
+      message: `Saved Successfully: Changes committed to ${this.workingRepoFullName}`,
+    }),
+    [CHECKOUT_BRANCH]: event => ({
+      level: 'info',
+      message: 'Switched to branch ' + event.branchName,
+    }),
+  }
 
   proxy: string
   baseRepoFullName: string
@@ -169,6 +185,10 @@ export class GithubClient {
 
   setWorkingBranch(branch: string) {
     this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
+    this.events.dispatch({
+      type: CHECKOUT_BRANCH,
+      branchName: branch,
+    })
   }
 
   async fetchExistingPR() {
@@ -230,7 +250,7 @@ export class GithubClient {
   async createBranch(name: string) {
     const currentBranch = await this.getBranch()
     const sha = currentBranch.object.sha
-    return this.req({
+    const response = await this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/git/refs`,
       method: 'POST',
       data: {
@@ -238,6 +258,13 @@ export class GithubClient {
         sha,
       },
     })
+
+    this.events.dispatch({
+      type: CREATE_BRANCH,
+      branchName: name,
+    })
+
+    return response
   }
 
   async commit(
@@ -248,8 +275,7 @@ export class GithubClient {
   ) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
-
-    return this.req({
+    const response = await this.req({
       url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
         filePath
       )}`,
@@ -261,6 +287,8 @@ export class GithubClient {
         branch: branch,
       },
     })
+    this.events.dispatch({ type: COMMIT, response })
+    return response
   }
 
   async getDownloadUrl(path: string): Promise<string> {
