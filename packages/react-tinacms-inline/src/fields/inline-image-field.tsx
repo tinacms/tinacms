@@ -18,16 +18,15 @@ limitations under the License.
 
 import * as React from 'react'
 import { InlineField } from '../inline-field'
-import { useCMS, Form, Media } from 'tinacms'
+import { useCMS, Form, Media, MediaStore, usePreviewSrc } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
 import { FocusRing, FocusRingOptions } from '../styles'
-import { useState, useEffect } from 'react'
 
 export interface InlineImageProps {
   name: string
   parse(media: Media): string
   uploadDir(form: Form): string
-  previewSrc?(formValues: any): string | Promise<string>
+  previewSrc?: MediaStore['previewSrc']
   focusRing?: boolean | FocusRingOptions
   children?: any
 }
@@ -70,34 +69,12 @@ function EditableImage({
 }: EditableImageProps) {
   const cms = useCMS()
 
-  // TODO: Use this
-  const [, setSrcIsLoading] = useState(true)
-  const [_previewSrc, setSrc] = useState('')
-  useEffect(() => {
-    let canceled = false
-    ;(async () => {
-      setSrcIsLoading(true)
-      let imageSrc = ''
-      try {
-        if (previewSrc) {
-          imageSrc = await previewSrc(form.values)
-        } else {
-          imageSrc = await cms.media.previewSrc(input.value)
-        }
-      } catch {
-        if (!canceled) {
-          setSrc('')
-        }
-      }
-      if (!canceled) {
-        setSrc(imageSrc)
-      }
-      setSrcIsLoading(false)
-    })()
-    return () => {
-      canceled = true
-    }
-  }, [input.value])
+  const [_previewSrc] = usePreviewSrc(
+    input.value,
+    name,
+    form.values,
+    previewSrc
+  )
 
   async function handleUploadImage([file]: File[]) {
     const directory = uploadDir(form)
