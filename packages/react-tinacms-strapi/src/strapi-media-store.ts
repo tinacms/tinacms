@@ -67,7 +67,7 @@ export class StrapiMediaStore {
     return uploadResponse.json()
   }
 
-  async previewSrc(id: Media) {
+  async previewSrc(id: string) {
     const authToken = Cookies.get(STRAPI_JWT)
     const response = await fetch(`${this.strapiUrl}/upload/files/${id}`, {
       method: 'GET',
