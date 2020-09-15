@@ -36,15 +36,9 @@ export class StrapiMediaStore {
     const uploaded: Media[] = []
 
     for (const { file } of files) {
-      const [item] = await this.uploadFile(file)
+      const [item]: StrapiMedia[] = await this.uploadFile(file)
 
-      uploaded.push({
-        id: item.id,
-        type: 'file',
-        directory: '/uploads',
-        filename: item.hash + item.ext + `?${item.id}`,
-        previewSrc: this.strapiUrl + item.url,
-      })
+      uploaded.push(this.strapiToTina(item))
     }
     return uploaded
   }
@@ -98,15 +92,7 @@ export class StrapiMediaStore {
     const nextOffset = offset + limit
 
     return {
-      items: mediaData.slice(offset, limit + offset).map((item: any) => {
-        return {
-          id: item.id,
-          filename: item.name,
-          directory: '/uploads',
-          type: 'file',
-          previewSrc: this.strapiUrl + item.url,
-        }
-      }),
+      items: mediaData.slice(offset, limit + offset).map(this.strapiToTina),
       limit,
       offset,
       totalCount: mediaData.length,
@@ -125,4 +111,21 @@ export class StrapiMediaStore {
   getAbsolutePath(fileUrl: string): string {
     return this.strapiUrl + fileUrl
   }
+
+  private strapiToTina = (item: StrapiMedia): Media => {
+    return {
+      id: '' + item.id, // Media["id"] should probably be `string | number`
+      type: 'file',
+      directory: '/uploads',
+      filename: item.hash + item.ext + `?${item.id}`,
+      previewSrc: this.strapiUrl + item.url,
+    }
+  }
+}
+
+interface StrapiMedia {
+  id: number
+  hash: string
+  ext: string
+  url: string
 }
