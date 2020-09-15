@@ -78,7 +78,7 @@ export interface MediaStore {
    * Given a `src` string it returns a url for previewing that content.
    * This is helpful in cases where the file may not be available in production yet.
    */
-  previewSrc(src: string): Promise<string>
+  previewSrc(src: string, fieldPath: string, formValues: any): Promise<string>
 
   /**
    * Lists all media in a specific directory.
@@ -154,14 +154,35 @@ export class MediaManager implements MediaStore {
     }
   }
 
-  async previewSrc(src: string): Promise<string> {
+  previewSrc = async (
+    src: string,
+    fieldName: string,
+    formValues: any
+  ): Promise<string> => {
     try {
-      this.events.dispatch({ type: 'media:preview:start', src })
-      const url = await this.store.previewSrc(src)
-      this.events.dispatch({ type: 'media:preview:success', src, url })
+      this.events.dispatch({
+        type: 'media:preview:start',
+        src,
+        fieldName,
+        formValues,
+      })
+      const url = await this.store.previewSrc(src, fieldName, formValues)
+      this.events.dispatch({
+        type: 'media:preview:success',
+        src,
+        url,
+        fieldName,
+        formValues,
+      })
       return url
     } catch (error) {
-      this.events.dispatch({ type: 'media:preview:failure', src, error })
+      this.events.dispatch({
+        type: 'media:preview:failure',
+        src,
+        error,
+        fieldName,
+        formValues,
+      })
       throw error
     }
   }
