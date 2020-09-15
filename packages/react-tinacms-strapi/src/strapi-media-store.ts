@@ -67,8 +67,16 @@ export class StrapiMediaStore {
     return uploadResponse.json()
   }
 
-  async previewSrc(src: string) {
-    return this.strapiUrl + this.getFilePath(src)
+  async previewSrc(id: Media) {
+    const authToken = Cookies.get(STRAPI_JWT)
+    const response = await fetch(`${this.strapiUrl}/upload/files/${id}`, {
+      method: 'GET',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+    const data = await response.json()
+    return this.strapiUrl + data.url
   }
 
   async list(options: MediaListOptions) {
