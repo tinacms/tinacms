@@ -134,16 +134,48 @@ export class MediaManager implements MediaStore {
     return this.store.accept
   }
 
-  persist(files: MediaUploadOptions[]): Promise<Media[]> {
-    return this.store.persist(files)
+  async persist(files: MediaUploadOptions[]): Promise<Media[]> {
+    try {
+      this.events.dispatch({ type: 'media:upload:start', uploaded: files })
+      const media = await this.store.persist(files)
+      this.events.dispatch({
+        type: 'media:upload:success',
+        uploaded: files,
+        media,
+      })
+      return media
+    } catch (error) {
+      this.events.dispatch({
+        type: 'media:upload:failure',
+        uploaded: files,
+        error,
+      })
+      throw error
+    }
   }
 
-  previewSrc(src: string): Promise<string> {
-    return this.store.previewSrc(src)
+  async previewSrc(src: string): Promise<string> {
+    try {
+      this.events.dispatch({ type: 'media:preview:start', src })
+      const url = await this.store.previewSrc(src)
+      this.events.dispatch({ type: 'media:preview:success', src, url })
+      return url
+    } catch (error) {
+      this.events.dispatch({ type: 'media:preview:failure', src, error })
+      throw error
+    }
   }
 
-  list(options: MediaListOptions): Promise<MediaList> {
-    return this.store.list(options)
+  async list(options: MediaListOptions): Promise<MediaList> {
+    try {
+      this.events.dispatch({ type: 'media:list:start', ...options })
+      const media = await this.store.list(options)
+      this.events.dispatch({ type: 'media:list:success', ...options, media })
+      return media
+    } catch (error) {
+      this.events.dispatch({ type: 'media:list:failure', ...options, error })
+      throw error
+    }
   }
 }
 
