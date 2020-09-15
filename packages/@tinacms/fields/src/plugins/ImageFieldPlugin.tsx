@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
-import { MediaStore } from '@tinacms/core'
+import { Media, MediaStore } from '@tinacms/core'
 import { useCMS } from '@tinacms/react-core'
 import { parse } from './textFormat'
 import { useState, useEffect } from 'react'
@@ -40,6 +40,7 @@ export function usePreviewSrc(
   const cms = useCMS()
   const [srcIsLoading, setSrcIsLoading] = useState(true)
   const [src, setSrc] = useState('')
+
   useEffect(() => {
     let canceled = false
     ;(async () => {
@@ -68,7 +69,7 @@ export function usePreviewSrc(
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   const cms = useCMS()
   const { form, field } = props
-  const { name, value, onChange } = props.input
+  const { name, value } = props.input
   const [src, srcIsLoading] = usePreviewSrc(
     value,
     name,
@@ -78,7 +79,14 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
 
   let onClear: any
   if (props.field.clearable) {
-    onClear = () => onChange('')
+    onClear = () => onChange()
+  }
+
+  function onChange(media?: Media) {
+    if (media) {
+      props.input.onChange('')
+      props.input.onChange(media)
+    }
   }
 
   return (
@@ -88,27 +96,20 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       loading={srcIsLoading}
       onClick={() => {
         cms.media.open({
-          onSelect(media: any) {
-            if (media.filename == value) {
-              onChange('') // trigger rerender
-            }
-            onChange(media)
-          },
+          onSelect: onChange,
         })
       }}
       onDrop={async ([file]: File[]) => {
         const directory = props.field.uploadDir(props.form.getState().values)
+
         const [media] = await cms.media.persist([
           {
             directory,
             file,
           },
         ])
-        if (media) {
-          if (media.filename == value) onChange('') // trigger rerender
-          onChange(media)
-          // TODO Handle failure
-        }
+
+        onChange(media)
       }}
       onClear={onClear}
     />
