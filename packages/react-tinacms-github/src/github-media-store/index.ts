@@ -37,15 +37,15 @@ export class GithubMediaStore implements MediaStore {
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     const uploaded: Media[] = []
     for (const { file, directory } of files) {
-      const path =
-        directory.charAt(0) === '/'
-          ? (directory + file.name).slice(1) // drop the first '/'
-          : directory + file.name
+      let mediaPath = path.join(directory, file.name)
+      if (mediaPath.charAt(0) === '/') {
+        mediaPath = mediaPath.slice(1)
+      }
 
       try {
         const content = (await base64File(file)).toString().split(',')[1] // only need the data piece
         const uploadResponse: GithubUploadResposne = await this.githubClient.upload(
-          path,
+          mediaPath,
           content,
           'Upload',
           true
