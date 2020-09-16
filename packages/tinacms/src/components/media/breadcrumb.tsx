@@ -27,13 +27,7 @@ interface BreadcrumbProps {
 export function Breadcrumb({ directory, setDirectory }: BreadcrumbProps) {
   return (
     <BreadcrumbWrapper>
-      {/**TODO: find a better label for 'Root'
-       * Maybe it should be the directory name if its set
-       *  Insert / with ::after?
-       */}
       <button onClick={() => setDirectory('')}>Root</button>
-
-      <span>/</span>
       {directory &&
         directory.split('/').map((part, index, parts) => (
           <>
@@ -44,7 +38,6 @@ export function Breadcrumb({ directory, setDirectory }: BreadcrumbProps) {
             >
               {part}
             </button>
-            <span>/</span>
           </>
         ))}
     </BreadcrumbWrapper>
@@ -54,9 +47,12 @@ export function Breadcrumb({ directory, setDirectory }: BreadcrumbProps) {
 const BreadcrumbWrapper = styled.div`
   width: 100%;
   display: flex;
-  padding-bottom: var(--tina-padding-small);
   color: var(--tina-color-grey-4);
   font-size: var(--tina-font-size-2);
+
+  > *::after {
+    content: ' / ';
+  }
 
   > *:not(:first-child) {
     padding-left: 8px;
