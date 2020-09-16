@@ -257,17 +257,16 @@ interface PageLinksProps {
   setOffset: (offset: number) => void
 }
 
-/**
- * TODO:
- * add next / prev page link arrow icons
- * if there's just one page, should we even show the page links?
- *  */
 function PageLinks({ list, setOffset }: PageLinksProps) {
   const limit = list.limit || 10
   const numPages = Math.ceil(list.totalCount / limit)
   const lastItemIndexOnPage = list.offset + limit
   const currentPageIndex = lastItemIndexOnPage / limit
   let pageLinks = []
+
+  if (numPages <= 1) {
+    return null
+  }
 
   for (let i = 1; i <= numPages; i++) {
     const active = i === currentPageIndex
@@ -285,7 +284,6 @@ const PageLinksWrap = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
-  margin: 0 var(--tina-padding-big);
 `
 
 const PageNumber = styled.button<{ active: boolean }>`
