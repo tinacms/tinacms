@@ -226,8 +226,9 @@ function MediaListItem({
   onDelete,
 }: MediaListItemProps) {
   const confirmDelete = (item: Media) => {
-    // TODO: Actually confirm delete.
-    onDelete(item)
+    if (confirm('Are you sure you want to delete this file?')) {
+      onDelete(item)
+    }
   }
   return (
     <ListItem onClick={() => onClick(item)}>
