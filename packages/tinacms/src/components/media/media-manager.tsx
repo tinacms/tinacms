@@ -19,7 +19,7 @@ limitations under the License.
 import React from 'react'
 import { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
-import { useCMS } from '../react-tinacms'
+import { useCMS } from '../../react-tinacms'
 import {
   Modal,
   ModalHeader,
