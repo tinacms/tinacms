@@ -60,6 +60,13 @@ export class GithubMediaStore implements MediaStore {
     return uploaded
   }
 
+  async delete(media: Media) {
+    await this.githubClient.delete(
+      path.join(media.directory, media.filename),
+      `Deleted ${media.filename}`
+    )
+  }
+
   async previewSrc(src: string) {
     try {
       return this.githubClient.getDownloadUrl(src)
