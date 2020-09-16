@@ -80,9 +80,17 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
   })
   const cms = useCMS()
 
-  useEffect(() => {
+  const loadMedia = () => {
     cms.media.list({ offset, limit, directory }).then(setList)
-  }, [offset, limit, directory])
+  }
+
+  useEffect(loadMedia, [offset, limit, directory])
+
+  useEffect(() => cms.events.subscribe('media:upload:success', loadMedia), [
+    offset,
+    limit,
+    directory,
+  ])
 
   if (!list) return <div>Loading...</div>
 
