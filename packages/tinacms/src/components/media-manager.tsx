@@ -30,6 +30,7 @@ import { MediaList, Media } from '@tinacms/core'
 import path from 'path'
 import { Folder, File } from '@tinacms/icons'
 import { Button } from '@tinacms/styles'
+import { useDropzone } from 'react-dropzone'
 
 export interface MediaRequest {
   limit?: number
@@ -101,10 +102,28 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
     }
   }
 
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+
+    onDrop: async ([file]) => {
+      //@ts-ignore
+      await cms.media.persist([
+        {
+          directory: directory || '/',
+          file,
+        },
+      ])
+    },
+  })
+
+  const { onClick, ...rootProps } = getRootProps()
+
   return (
     <MediaPickerWrap>
       <Breadcrumb directory={directory} setDirectory={setDirectory} />
-      <div>
+      <div {...rootProps}>
+        <input {...getInputProps()} />
+        <Button onClick={onClick}>Upload</Button>
         <ul
           style={{
             display: 'flex',
