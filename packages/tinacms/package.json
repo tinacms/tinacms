@@ -46,7 +46,8 @@
     "@tinacms/react-screens": "^0.29.0",
     "@tinacms/react-sidebar": "^0.29.0",
     "@tinacms/react-toolbar": "^0.29.0",
-    "@tinacms/styles": "^0.29.0"
+    "@tinacms/styles": "^0.29.0",
+    "react-dropzone": "^11.1.0"
   },
   "peerDependencies": {
     "react": ">=16.8",
