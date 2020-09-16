@@ -100,8 +100,8 @@ export interface MediaListOptions {
  */
 export interface MediaList {
   items: Media[]
-  limit?: number
-  offset?: number
+  limit: number
+  offset: number
   nextOffset?: number
   totalCount: number
 }
