@@ -70,7 +70,7 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
     props.directory
   )
   const [offset, setOffset] = useState(0)
-  const [limit, setLimit] = useState(props.limit || 50)
+  const [limit] = useState(props.limit || 50)
   const [list, setList] = useState<MediaList>({
     limit,
     offset,
