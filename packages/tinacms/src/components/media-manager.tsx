@@ -24,7 +24,7 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalFullscreen,
+  FullscreenModal,
 } from '@tinacms/react-modals'
 import { MediaList, Media } from '@tinacms/core'
 import path from 'path'
@@ -55,12 +55,12 @@ export function MediaManager() {
 
   return (
     <Modal>
-      <ModalFullscreen>
+      <FullscreenModal>
         <ModalHeader close={close}>Media Manager</ModalHeader>
         <ModalBody padded={true}>
           <MediaPicker {...request} close={close} />
         </ModalBody>
-      </ModalFullscreen>
+      </FullscreenModal>
     </Modal>
   )
 }
