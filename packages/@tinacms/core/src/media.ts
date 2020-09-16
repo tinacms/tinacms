@@ -75,6 +75,11 @@ export interface MediaStore {
   persist(files: MediaUploadOptions[]): Promise<Media[]>
 
   /**
+   * Delete a media object from the store.
+   */
+  delete(media: Media): Promise<void>
+
+  /**
    * Given a `src` string it returns a url for previewing that content.
    * This is helpful in cases where the file may not be available in production yet.
    */
@@ -148,6 +153,24 @@ export class MediaManager implements MediaStore {
       this.events.dispatch({
         type: 'media:upload:failure',
         uploaded: files,
+        error,
+      })
+      throw error
+    }
+  }
+
+  async delete(media: Media): Promise<void> {
+    try {
+      this.events.dispatch({ type: 'media:delete:start', media })
+      await this.store.delete(media)
+      this.events.dispatch({
+        type: 'media:delete:success',
+        media,
+      })
+    } catch (error) {
+      this.events.dispatch({
+        type: 'media:delete:failure',
+        media,
         error,
       })
       throw error
