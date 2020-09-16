@@ -58,7 +58,7 @@ export function MediaManager() {
     <Modal>
       <FullscreenModal>
         <ModalHeader close={close}>Media Manager</ModalHeader>
-        <ModalBody padded={true}>
+        <ModalBody>
           <MediaPicker {...request} close={close} />
         </ModalBody>
       </FullscreenModal>
@@ -137,35 +137,55 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
   const { onClick, ...rootProps } = getRootProps()
 
   return (
-    <MediaPickerWrap>
-      <Breadcrumb directory={directory} setDirectory={setDirectory} />
-      <div {...rootProps}>
-        <input {...getInputProps()} />
-        <Button onClick={onClick}>Upload</Button>
-        <ul
-          style={{
-            display: 'flex',
-            flexDirection: 'column',
-          }}
-        >
-          {list.items.map((item: Media) => (
-            <MediaItem
-              item={item}
-              onClick={onClickMediaItem}
-              onSelect={selectMediaItem}
-              onDelete={deleteMediaItem}
-            />
-          ))}
-        </ul>
-      </div>
+    <MediaPickerWrap {...rootProps}>
+      <Header>
+        <Breadcrumb directory={directory} setDirectory={setDirectory} />
+        <Button primary onClick={onClick}>
+          Upload
+        </Button>
+      </Header>
+      <input {...getInputProps()} />
+      <List>
+        {list.items.map((item: Media) => (
+          <MediaItem
+            item={item}
+            onClick={onClickMediaItem}
+            onSelect={selectMediaItem}
+            onDelete={deleteMediaItem}
+          />
+        ))}
+      </List>
+
       <PageLinks list={list} setOffset={setOffset} />
     </MediaPickerWrap>
   )
 }
 
 const MediaPickerWrap = styled.div`
-  height: 90vh;
+  height: 100%;
   padding-bottom: 5rem;
   overflow-y: scroll;
   color: var(--tina-color-grey-9);
+  display: flex;
+  flex-direction: column;
+  position: relative;
+  background-color: var(--tina-color-grey-1);
+  padding: var(--tina-padding-big);
+`
+
+const Header = styled.div`
+  display: flex;
+  align-items: center;
+  background: var(--tina-color-grey-1);
+  padding: 0 var(--tina-padding-small) var(--tina-padding-big)
+    var(--tina-padding-small);
+  border-radius: var(--tina-radius-small);
+  position: sticky;
+  top: 0;
+`
+
+const List = styled.ul`
+  display: flex;
+  flex-direction: column;
+  height: 100%;
 `
