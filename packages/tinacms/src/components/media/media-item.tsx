@@ -40,7 +40,7 @@ export function MediaItem({
     }
   }
   return (
-    <ListItem onClick={() => onClick(item)}>
+    <ListItem onClick={() => onClick(item)} type={item.type}>
       <ItemPreview>
         {item.previewSrc ? (
           <img src={item.previewSrc} alt={item.filename} />
@@ -48,24 +48,19 @@ export function MediaItem({
           <FileIcon type={item.type} />
         )}
       </ItemPreview>
-      <span style={{ flexGrow: 1 }}>
-        {item.filename}
-        {item.type === 'dir' && '/'}
-      </span>
-      {onSelect && item.type === 'file' && (
-        <div style={{ minWidth: '100px' }}>
+      <Filename type={item.type}>{item.filename}</Filename>
+      <ActionButtons>
+        {onSelect && item.type === 'file' && (
           <Button small onClick={() => onSelect(item)}>
             Insert
           </Button>
-        </div>
-      )}
-      {item.type === 'file' && (
-        <div style={{ minWidth: '100px' }}>
+        )}
+        {item.type === 'file' && (
           <Button small onClick={() => confirmDelete(item)}>
             Delete
           </Button>
-        </div>
-      )}
+        )}
+      </ActionButtons>
     </ListItem>
   )
 }
@@ -74,40 +69,63 @@ function FileIcon({ type }: { type: Media['type'] }) {
   return type === 'dir' ? <Folder /> : <File />
 }
 
-const ListItem = styled.li`
+interface ListItemProps {
+  type: Media['type']
+}
+
+const ListItem = styled.li<ListItemProps>`
   display: flex;
   align-items: center;
   padding: var(--tina-padding-big) var(--tina-padding-small);
-  background-color: transparent;
-  transition: background-color 300ms ease;
+  background-color: white;
+  filter: drop-shadow(0 0 0 transparent);
+  transition: filter 300ms ease;
   border-bottom: 1px solid var(--tina-color-grey-2);
+  margin-bottom: var(--tina-padding-small);
+  border-radius: var(--tina-radius-small);
 
-  > *:not(:first-child) {
-    margin-left: var(--tina-padding-big);
+  > :first-child {
+    margin-right: var(--tina-padding-big);
   }
 
   &:hover {
-    background-color: var(--tina-color-grey-1);
-    border-radius: var(--tina-radius-small);
-    cursor: pointer;
+    filter: drop-shadow(var(--tina-shadow-small));
+    ${p => p.type === 'dir' && 'cursor: pointer;'}
   }
 `
 
 const ItemPreview = styled.div`
   width: 56px;
+  height: 56px;
   border-radius: var(--tina-radius-small);
   overflow: hidden;
   display: flex;
   justify-content: center;
 
   > img {
-    min-height: 56px;
     object-fit: cover;
+    width: 100%;
+    min-height: 100%;
+    object-position: center;
   }
 
   > svg {
     width: 47%;
     height: 100%;
     fill: var(--tina-color-grey-4);
+  }
+`
+
+const Filename = styled.span<ListItemProps>`
+  flex-grow: 1;
+  ::after {
+    ${p => p.type === 'dir' && "content: ' / '"}
+  }
+`
+
+const ActionButtons = styled.span`
+  display: flex;
+  > * {
+    margin-left: var(--tina-padding-small);
   }
 `
