@@ -35,11 +35,15 @@ export class DummyMediaStore implements MediaStore {
   }
   async list(): Promise<MediaList> {
     const items: Media[] = []
+    alert('A media store was not added to the CMS.')
     return {
       items,
       offset: 0,
       limit: 10,
       totalCount: 0,
     }
+  }
+  async delete() {
+    // Unnecessary
   }
 }
