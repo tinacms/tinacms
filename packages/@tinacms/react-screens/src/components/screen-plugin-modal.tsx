@@ -69,7 +69,7 @@ const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
     <Modal>
       <Wrapper>
         <ModalHeader close={close}>{name}</ModalHeader>
-        <ModalBody>{children}</ModalBody>
+        <ModalBody padded>{children}</ModalBody>
       </Wrapper>
     </Modal>
   )
