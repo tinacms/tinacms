@@ -43,6 +43,16 @@ export class StrapiMediaStore {
     return uploaded
   }
 
+  async delete(media: Media) {
+    const authToken = Cookies.get(STRAPI_JWT)
+    await fetch(`${this.strapiUrl}/upload/files/${media.id}`, {
+      method: 'DELETE',
+      headers: {
+        Authorization: `Bearer ${authToken}`,
+      },
+    })
+  }
+
   async uploadFile(file: File) {
     const authToken = Cookies.get(STRAPI_JWT)
     const formData = new FormData()
