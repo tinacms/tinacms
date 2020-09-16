@@ -22,7 +22,7 @@ import {
   Media,
   MediaList,
   MediaListOptions,
-} from 'tinacms'
+} from '@tinacms/core'
 import { GithubClient } from '../github-client'
 import base64File from './base64File'
 import path from 'path'
@@ -106,7 +106,7 @@ const contentToMedia = (item: GithubContent): Media => {
     type: item.type,
   }
 
-  if (previewable.includes(path.extname(item.name))) {
+  if (previewable.includes(path.extname(item.name).toLowerCase())) {
     mediaItem.previewSrc = item.download_url
   }
 
