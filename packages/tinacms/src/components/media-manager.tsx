@@ -184,7 +184,11 @@ function MediaListItem({ item, onClick, onSelect }: MediaListItemProps) {
   return (
     <ListItem onClick={() => onClick(item)}>
       <ItemPreview>
-        <MediaPreview src={item.previewSrc} item={item} />
+        {item.previewSrc ? (
+          <img src={item.previewSrc} alt={item.filename} />
+        ) : (
+          <FileIcon type={item.type} />
+        )}
       </ItemPreview>
       <span style={{ flexGrow: 1 }}>
         {item.filename}
@@ -201,17 +205,8 @@ function MediaListItem({ item, onClick, onSelect }: MediaListItemProps) {
   )
 }
 
-function MediaPreview({
-  src = '',
-  item,
-}: {
-  src: string | undefined
-  item: Media
-}) {
-  const isValidImg = /\.(jpe?g|png)$/.test(src)
-  const icon = item.type === 'file' ? <File /> : <Folder />
-
-  return isValidImg ? <img src={src} /> : icon
+function FileIcon({ type }: { type: Media['type'] }) {
+  return type === 'dir' ? <Folder /> : <File />
 }
 
 const ListItem = styled.li`
