@@ -42,6 +42,7 @@ import {
   HtmlFieldPlaceholder,
   DateFieldPlaceholder,
 } from './plugins/fields/markdown'
+import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -97,6 +98,7 @@ export class TinaCMS extends CMS {
         this.fields.add(field)
       }
     })
+    this.plugins.add(MediaManagerScreenPlugin)
   }
 
   get alerts() {
