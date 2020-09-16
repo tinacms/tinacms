@@ -92,6 +92,12 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
     directory,
   ])
 
+  useEffect(() => cms.events.subscribe('media:delete:success', loadMedia), [
+    offset,
+    limit,
+    directory,
+  ])
+
   if (!list) return <div>Loading...</div>
 
   const onClickMediaItem = (item: Media) => {
@@ -99,6 +105,10 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
       setDirectory(path.join(item.directory, item.filename))
       setOffset(0)
     }
+  }
+
+  const deleteMediaItem = (item: Media) => {
+    cms.media.delete(item)
   }
 
   let selectMediaItem: any
@@ -143,6 +153,7 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
               item={item}
               onClick={onClickMediaItem}
               onSelect={selectMediaItem}
+              onDelete={deleteMediaItem}
             />
           ))}
         </ul>
@@ -205,9 +216,19 @@ interface MediaListItemProps {
   item: Media
   onClick: (item: Media) => void
   onSelect: (item: Media) => void
+  onDelete: (item: Media) => void
 }
 
-function MediaListItem({ item, onClick, onSelect }: MediaListItemProps) {
+function MediaListItem({
+  item,
+  onClick,
+  onSelect,
+  onDelete,
+}: MediaListItemProps) {
+  const confirmDelete = (item: Media) => {
+    // TODO: Actually confirm delete.
+    onDelete(item)
+  }
   return (
     <ListItem onClick={() => onClick(item)}>
       <ItemPreview>
@@ -225,6 +246,13 @@ function MediaListItem({ item, onClick, onSelect }: MediaListItemProps) {
         <div style={{ minWidth: '100px' }}>
           <Button small onClick={() => onSelect(item)}>
             Insert
+          </Button>
+        </div>
+      )}
+      {item.type === 'file' && (
+        <div style={{ minWidth: '100px' }}>
+          <Button small onClick={() => confirmDelete(item)}>
+            Delete
           </Button>
         </div>
       )}
