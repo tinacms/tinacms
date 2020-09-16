@@ -25,6 +25,7 @@ import {
 } from 'tinacms'
 import { GithubClient } from '../github-client'
 import base64File from './base64File'
+import path from 'path'
 
 export class GithubMediaStore implements MediaStore {
   accept = '*'
@@ -96,13 +97,21 @@ const nextOffset = (offset: number, limit: number, count: number) => {
   return undefined
 }
 
-const contentToMedia = (item: GithubContent): Media => ({
-  id: item.path,
-  filename: item.name,
-  directory: item.path.slice(0, item.path.length - item.name.length),
-  type: item.type,
-  previewSrc: item.download_url,
-})
+const contentToMedia = (item: GithubContent): Media => {
+  const previewable = ['.jpg', '.jpeg', '.png', '.webp']
+  const mediaItem: Media = {
+    id: item.path,
+    filename: item.name,
+    directory: item.path.slice(0, item.path.length - item.name.length),
+    type: item.type,
+  }
+
+  if (previewable.includes(path.extname(item.name))) {
+    mediaItem.previewSrc = item.download_url
+  }
+
+  return mediaItem
+}
 
 interface GithubUploadResposne {
   content: GithubContent
