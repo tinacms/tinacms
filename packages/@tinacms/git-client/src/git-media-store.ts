@@ -59,4 +59,7 @@ export class GitMediaStore implements MediaStore {
   async list(_options?: MediaListOptions): Promise<MediaList> {
     throw new Error('Not implemented')
   }
+  async delete(_media: Media): Promise<void> {
+    throw new Error('Not implemented')
+  }
 }
