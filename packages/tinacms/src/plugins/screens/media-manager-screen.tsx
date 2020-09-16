@@ -1,6 +1,6 @@
 import { Folder } from '@tinacms/icons'
 import { ScreenPlugin } from '@tinacms/react-screens'
-import { MediaPicker } from '../../components/media-manager'
+import { MediaPicker } from '../../components/media'
 
 export const MediaManagerScreenPlugin: ScreenPlugin = {
   __type: 'screen',
