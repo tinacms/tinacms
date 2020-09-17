@@ -181,7 +181,8 @@ const MediaPickerWrap = styled.div`
   flex-direction: column;
   position: relative;
   background-color: var(--tina-color-grey-1);
-  padding: var(--tina-padding-big);
+  padding: 0 var(--tina-padding-big) var(--tina-padding-big)
+    var(--tina-padding-big);
 
   *:active,
   *:focus {
@@ -193,11 +194,11 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   background: var(--tina-color-grey-1);
-  padding: 0 var(--tina-padding-small) var(--tina-padding-big)
-    var(--tina-padding-small);
+  padding: var(--tina-padding-big) var(--tina-padding-small);
   border-radius: var(--tina-radius-small);
   position: sticky;
   top: 0;
+  z-index: 1;
 `
 
 const List = styled.ul`
