@@ -27,7 +27,7 @@ import { useState, useEffect } from 'react'
 interface ImageProps {
   path: string
   previewSrc?: MediaStore['previewSrc']
-  uploadDir(form: any): string
+  uploadDir?(form: any): string
   clearable?: boolean // defaults to true
 }
 
@@ -90,6 +90,8 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
     }
   }
 
+  const uploadDir = props.field.uploadDir || (() => '')
+
   return (
     <ImageUpload
       value={value}
@@ -101,7 +103,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
         })
       }}
       onDrop={async ([file]: File[]) => {
-        const directory = props.field.uploadDir(props.form.getState().values)
+        const directory = uploadDir(props.form.getState().values)
 
         const [media] = await cms.media.persist([
           {
