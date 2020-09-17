@@ -47,7 +47,7 @@ export const FullscreenModal = styled.div`
   animation: ${ModalFullscreenKeyframes} 150ms ease-out 1;
 
   ${ModalBody} {
-    flex: 1 0 auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
   }
