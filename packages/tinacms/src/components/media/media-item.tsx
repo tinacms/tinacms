@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 import React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Media } from '@tinacms/core'
 import { Folder, File } from '@tinacms/icons'
 import { Button, IconButton } from '@tinacms/styles'
@@ -91,7 +91,11 @@ const ListItem = styled.li<ListItemProps>`
 
   &:hover {
     filter: drop-shadow(var(--tina-shadow-small));
-    ${p => p.type === 'dir' && 'cursor: pointer;'}
+    ${p =>
+      p.type === 'dir' &&
+      css`
+        cursor: pointer;
+      `}
   }
 `
 
@@ -122,7 +126,12 @@ const Filename = styled.span<ListItemProps>`
   font-size: var(--tina-font-size-2);
 
   ::after {
-    ${p => p.type === 'dir' && "content: ' / '"}
+    ${p =>
+      p.type === 'dir' &&
+      css`
+        content: ' / ';
+        text-transform: capitalize;
+      `}
   }
 `
 
