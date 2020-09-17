@@ -137,15 +137,15 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
   const { onClick, ...rootProps } = getRootProps()
 
   return (
-    <MediaPickerWrap {...rootProps}>
+    <MediaPickerWrap>
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
         <Button primary onClick={onClick}>
           Upload
         </Button>
       </Header>
-      <input {...getInputProps()} />
-      <List>
+      <List {...rootProps}>
+        <input {...getInputProps()} />
         {list.items.map((item: Media) => (
           <MediaItem
             item={item}
@@ -171,6 +171,11 @@ const MediaPickerWrap = styled.div`
   position: relative;
   background-color: var(--tina-color-grey-1);
   padding: var(--tina-padding-big);
+
+  *:active,
+  *:focus {
+    outline: none;
+  }
 `
 
 const Header = styled.div`
