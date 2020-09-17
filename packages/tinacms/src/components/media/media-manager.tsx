@@ -86,23 +86,18 @@ export function MediaPicker({
   })
   const cms = useCMS()
 
-  const loadMedia = () => {
-    cms.media.list({ offset, limit, directory }).then(setList)
-  }
+  useEffect(() => {
+    function loadMedia() {
+      cms.media.list({ offset, limit, directory }).then(setList)
+    }
 
-  useEffect(loadMedia, [offset, limit, directory])
+    loadMedia()
 
-  useEffect(() => cms.events.subscribe('media:upload:success', loadMedia), [
-    offset,
-    limit,
-    directory,
-  ])
-
-  useEffect(() => cms.events.subscribe('media:delete:success', loadMedia), [
-    offset,
-    limit,
-    directory,
-  ])
+    return cms.events.subscribe(
+      ['media:upload:success', 'media:delete:success'],
+      loadMedia
+    )
+  }, [offset, limit, directory])
 
   if (!list) return <div>Loading...</div>
 
