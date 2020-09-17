@@ -64,6 +64,10 @@ const BreadcrumbWrapper = styled.div`
   color: var(--tina-color-grey-4);
   font-size: var(--tina-font-size-2);
 
+  button {
+    text-transform: capitalize;
+  }
+
   svg {
     width: 20px;
     height: 20px;
