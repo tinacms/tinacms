@@ -76,7 +76,7 @@ const ListItem = styled.li<ListItemProps>`
   background-color: white;
   filter: drop-shadow(0 0 0 transparent);
   transition: filter 300ms ease;
-  border-bottom: 1px solid var(--tina-color-grey-2);
+  border: 1px solid var(--tina-color-grey-2);
   margin-bottom: var(--tina-padding-small);
   border-radius: var(--tina-radius-small);
 
@@ -124,10 +124,6 @@ const Filename = styled.span<ListItemProps>`
     p.type === 'dir' &&
     css`
       text-transform: capitalize;
-
-      ::after {
-        content: ' / ';
-      }
     `}
 `
 
