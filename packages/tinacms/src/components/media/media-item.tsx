@@ -19,7 +19,8 @@ import React from 'react'
 import styled from 'styled-components'
 import { Media } from '@tinacms/core'
 import { Folder, File } from '@tinacms/icons'
-import { Button } from '@tinacms/styles'
+import { Button, IconButton } from '@tinacms/styles'
+import { TrashIcon } from '@tinacms/icons'
 
 interface MediaItemProps {
   item: Media
@@ -56,9 +57,9 @@ export function MediaItem({
           </Button>
         )}
         {item.type === 'file' && (
-          <Button small onClick={() => confirmDelete(item)}>
-            Delete
-          </Button>
+          <IconButton small onClick={() => confirmDelete(item)}>
+            <TrashIcon />
+          </IconButton>
         )}
       </ActionButtons>
     </ListItem>
