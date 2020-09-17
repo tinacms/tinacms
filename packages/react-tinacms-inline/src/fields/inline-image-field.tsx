@@ -25,7 +25,7 @@ import { FocusRing, FocusRingOptions } from '../styles'
 export interface InlineImageProps {
   name: string
   parse(media: Media): string
-  uploadDir(form: Form): string
+  uploadDir?(form: Form): string
   previewSrc?: MediaStore['previewSrc']
   focusRing?: boolean | FocusRingOptions
   children?: any
@@ -77,7 +77,7 @@ function EditableImage({
   )
 
   async function handleUploadImage([file]: File[]) {
-    const directory = uploadDir(form)
+    const directory = uploadDir ? uploadDir(form) : ''
 
     const [media] = await cms.media.persist([
       {
