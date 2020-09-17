@@ -18,28 +18,41 @@ limitations under the License.
 
 import React from 'react'
 import styled from 'styled-components'
+import { LeftArrowIcon } from '@tinacms/icons'
 
 interface BreadcrumbProps {
   directory?: string
   setDirectory: (directory: string) => void
 }
 
-export function Breadcrumb({ directory, setDirectory }: BreadcrumbProps) {
+export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
+  const dirArr = directory.split('/')
+  dirArr.pop()
+  const prevDir = dirArr.join('/')
+
   return (
     <BreadcrumbWrapper>
-      <button onClick={() => setDirectory('')}>Root</button>
+      {directory !== '' && (
+        <span onClick={() => setDirectory(prevDir)}>
+          <LeftArrowIcon />
+        </span>
+      )}
+      <button onClick={() => setDirectory('')}>Media</button>
       {directory &&
-        directory.split('/').map((part, index, parts) => (
-          <>
-            <button
-              onClick={() => {
-                setDirectory(parts.slice(0, index + 1).join('/'))
-              }}
-            >
-              {part}
-            </button>
-          </>
-        ))}
+        directory
+          .replace(/^\//, '')
+          .split('/')
+          .map((part, index, parts) => (
+            <>
+              <button
+                onClick={() => {
+                  setDirectory(parts.slice(0, index + 1).join('/'))
+                }}
+              >
+                {part}
+              </button>
+            </>
+          ))}
     </BreadcrumbWrapper>
   )
 }
@@ -47,11 +60,24 @@ export function Breadcrumb({ directory, setDirectory }: BreadcrumbProps) {
 const BreadcrumbWrapper = styled.div`
   width: 100%;
   display: flex;
+  align-items: center;
   color: var(--tina-color-grey-4);
   font-size: var(--tina-font-size-2);
 
-  > *::after {
-    content: ' / ';
+  svg {
+    width: 20px;
+    height: 20px;
+    fill: var(--tina-color-grey-4);
+    margin-left: -3px;
+  }
+
+  svg:hover {
+    cursor: pointer;
+  }
+
+  *:not(span)::after {
+    content: '/';
+    padding-left: 8px;
   }
 
   > *:not(:first-child) {
