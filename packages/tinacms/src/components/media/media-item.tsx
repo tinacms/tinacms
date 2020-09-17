@@ -120,14 +120,15 @@ const Filename = styled.span<ListItemProps>`
   flex-grow: 1;
   font-size: var(--tina-font-size-2);
 
-  ::after {
-    ${p =>
-      p.type === 'dir' &&
-      css`
+  ${p =>
+    p.type === 'dir' &&
+    css`
+      text-transform: capitalize;
+
+      ::after {
         content: ' / ';
-        text-transform: capitalize;
-      `}
-  }
+      }
+    `}
 `
 
 const ActionButtons = styled.span`
