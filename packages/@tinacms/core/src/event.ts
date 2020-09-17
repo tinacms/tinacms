@@ -25,13 +25,21 @@ export interface CMSEvent {
 export class EventBus {
   private listeners = new Set<Listener>()
 
-  subscribe = (event: string, callback: Callback): (() => void) => {
-    const listener = new Listener(event, callback)
+  subscribe = (event: string | string[], callback: Callback): (() => void) => {
+    let events: string[]
 
-    this.listeners.add(listener)
+    if (typeof event === 'string') {
+      events = [event]
+    } else {
+      events = event
+    }
+
+    const newListeners = events.map(event => new Listener(event, callback))
+
+    newListeners.forEach(newListener => this.listeners.add(newListener))
 
     return () => {
-      this.listeners.delete(listener)
+      newListeners.forEach(listener => this.listeners.delete(listener))
     }
   }
 
