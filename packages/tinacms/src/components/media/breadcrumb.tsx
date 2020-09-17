@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { LeftArrowIcon } from '@tinacms/icons'
 
 interface BreadcrumbProps {
@@ -31,12 +31,10 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   const prevDir = dirArr.join('/')
 
   return (
-    <BreadcrumbWrapper>
-      {directory !== '' && (
-        <span onClick={() => setDirectory(prevDir)}>
-          <LeftArrowIcon />
-        </span>
-      )}
+    <BreadcrumbWrapper showArrow={directory !== ''}>
+      <span onClick={() => setDirectory(prevDir)}>
+        <LeftArrowIcon />
+      </span>
       <button onClick={() => setDirectory('')}>Media</button>
       {directory &&
         directory
@@ -57,26 +55,50 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   )
 }
 
-const BreadcrumbWrapper = styled.div`
+interface BreadcrumbWrapperProps {
+  showArrow: boolean
+}
+
+const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
   width: 100%;
   display: flex;
   align-items: center;
   color: var(--tina-color-grey-4);
   font-size: var(--tina-font-size-2);
+  margin-left: -12px;
 
   button {
     text-transform: capitalize;
+    transition: color 180ms ease;
   }
 
   svg {
     width: 20px;
     height: 20px;
     fill: var(--tina-color-grey-4);
-    margin-left: -3px;
+    margin-left: -8px;
+    transform: translateX(6px);
+    opacity: 0;
+    transition: opacity 200ms ease, transform 300ms ease-out;
   }
+
+  ${p =>
+    p.showArrow &&
+    css`
+      svg {
+        opacity: 1;
+        transform: translateX(-4px);
+        transition: opacity 180ms ease, transform 300ms ease-in;
+      }
+    `}
 
   svg:hover {
     cursor: pointer;
+    fill: var(--tina-color-grey-9);
+  }
+
+  button:hover {
+    color: var(--tina-color-grey-9);
   }
 
   *:not(span)::after {
@@ -84,7 +106,7 @@ const BreadcrumbWrapper = styled.div`
     padding-left: 8px;
   }
 
-  > *:not(:first-child) {
+  > *:not(:first-of-type) {
     padding-left: 8px;
   }
 `

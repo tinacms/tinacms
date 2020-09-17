@@ -181,8 +181,7 @@ const MediaPickerWrap = styled.div`
   flex-direction: column;
   position: relative;
   background-color: var(--tina-color-grey-1);
-  padding: 0 var(--tina-padding-big) var(--tina-padding-big)
-    var(--tina-padding-big);
+  padding: 0 1.125rem var(--tina-padding-big) 1.125rem;
 
   *:active,
   *:focus {
@@ -194,7 +193,7 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   background: var(--tina-color-grey-1);
-  padding: var(--tina-padding-big) var(--tina-padding-small);
+  padding: var(--tina-padding-big) 1.125rem;
   border-radius: var(--tina-radius-small);
   position: sticky;
   top: 0;
