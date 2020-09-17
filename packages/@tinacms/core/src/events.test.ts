@@ -29,6 +29,19 @@ describe('EventBus', () => {
 
     expect(listener).toHaveBeenCalledWith(event)
   })
+  test('for an array of eventscalls listeners and passes it the dispatched event', () => {
+    const listener = jest.fn()
+    const events = new EventBus()
+    const one = { type: 'one' }
+    const two = { type: 'two' }
+
+    events.subscribe(['one', 'two'], listener)
+    events.dispatch(one)
+    events.dispatch(two)
+
+    expect(listener).toHaveBeenCalledWith(two)
+    expect(listener).toHaveBeenCalledWith(one)
+  })
   describe('after calling unsubscribe', () => {
     it('does not invoke the listener', () => {
       const listener = jest.fn()
