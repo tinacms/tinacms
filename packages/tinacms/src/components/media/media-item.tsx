@@ -76,7 +76,7 @@ interface ListItemProps {
 const ListItem = styled.li<ListItemProps>`
   display: flex;
   align-items: center;
-  padding: var(--tina-padding-big) var(--tina-padding-small);
+  padding: 1.125rem;
   background-color: white;
   filter: drop-shadow(0 0 0 transparent);
   transition: filter 300ms ease;
@@ -118,6 +118,8 @@ const ItemPreview = styled.div`
 
 const Filename = styled.span<ListItemProps>`
   flex-grow: 1;
+  font-size: var(--tina-font-size-2);
+
   ::after {
     ${p => p.type === 'dir' && "content: ' / '"}
   }
