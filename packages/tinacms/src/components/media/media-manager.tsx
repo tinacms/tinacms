@@ -37,6 +37,7 @@ export interface MediaRequest {
   directory?: string
   onSelect?(media: Media): void
   close?(): void
+  allowDelete?: boolean
 }
 
 export function MediaManager() {
@@ -66,7 +67,12 @@ export function MediaManager() {
   )
 }
 
-export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
+export function MediaPicker({
+  allowDelete,
+  onSelect,
+  close,
+  ...props
+}: MediaRequest) {
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
   )
@@ -107,8 +113,13 @@ export function MediaPicker({ onSelect, close, ...props }: MediaRequest) {
     }
   }
 
-  const deleteMediaItem = (item: Media) => {
-    cms.media.delete(item)
+  let deleteMediaItem: any
+  if (allowDelete) {
+    deleteMediaItem = (item: Media) => {
+      if (confirm('Are you sure you want to delete this file?')) {
+        cms.media.delete(item)
+      }
+    }
   }
 
   let selectMediaItem: any

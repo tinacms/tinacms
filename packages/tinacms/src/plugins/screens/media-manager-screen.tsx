@@ -17,14 +17,16 @@ limitations under the License.
 */
 
 import { Folder } from '@tinacms/icons'
-import { ScreenPlugin } from '@tinacms/react-screens'
+import { createScreen } from '@tinacms/react-screens'
 import { MediaPicker } from '../../components/media'
 
-export const MediaManagerScreenPlugin: ScreenPlugin = {
-  __type: 'screen',
+export const MediaManagerScreenPlugin = createScreen({
   name: 'Media Manager',
   Component: MediaPicker,
   // TODO: New Icon with a landscape
   Icon: Folder,
   layout: 'fullscreen',
-}
+  props: {
+    allowDelete: true,
+  },
+})
