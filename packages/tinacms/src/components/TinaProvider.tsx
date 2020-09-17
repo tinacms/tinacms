@@ -25,7 +25,7 @@ import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
 import { useState, useEffect } from 'react'
-import { MediaManager } from './media-manager'
+import { MediaManager } from './media'
 
 export interface TinaProviderProps {
   cms: TinaCMS
