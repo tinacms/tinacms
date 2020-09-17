@@ -147,6 +147,17 @@ export function MediaPicker({
 
   const { onClick, ...rootProps } = getRootProps()
 
+  function disableScrollBody() {
+    const body = document?.body
+    body.style.overflow = 'hidden'
+
+    return () => {
+      body.style.overflow = 'auto'
+    }
+  }
+
+  useEffect(disableScrollBody, [])
+
   return (
     <MediaPickerWrap>
       <Header>
@@ -193,7 +204,7 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   background: var(--tina-color-grey-1);
-  padding: var(--tina-padding-big) 1.125rem;
+  padding: var(--tina-padding-big) 1rem var(--tina-padding-big) 1.125rem;
   border-radius: var(--tina-radius-small);
   position: sticky;
   top: 0;
