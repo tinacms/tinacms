@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import { useEffect, useState } from 'react'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms'
 import {
   Modal,
@@ -126,7 +126,7 @@ export function MediaPicker({
     }
   }
 
-  const { getRootProps, getInputProps } = useDropzone({
+  const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: 'image/*',
 
     onDrop: async ([file]) => {
@@ -150,7 +150,7 @@ export function MediaPicker({
           Upload
         </Button>
       </Header>
-      <List {...rootProps}>
+      <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
         {list.items.map((item: Media) => (
           <MediaItem
@@ -196,8 +196,21 @@ const Header = styled.div`
   z-index: 1;
 `
 
-const List = styled.ul`
+interface ListProps {
+  dragActive: boolean
+}
+
+const List = styled.ul<ListProps>`
   display: flex;
   flex-direction: column;
+  padding-bottom: 2rem;
   height: 100%;
+  overflow: scroll;
+
+  ${p =>
+    p.dragActive &&
+    css`
+      border: 2px solid var(--tina-color-primary);
+      border-radius: var(--tina-radius-small);
+    `}
 `
