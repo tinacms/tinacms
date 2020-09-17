@@ -24,9 +24,9 @@ import { TrashIcon } from '@tinacms/icons'
 
 interface MediaItemProps {
   item: Media
-  onClick: (item: Media) => void
-  onSelect: (item: Media) => void
-  onDelete: (item: Media) => void
+  onClick(item: Media): void
+  onSelect?(item: Media): void
+  onDelete?(item: Media): void
 }
 
 export function MediaItem({
@@ -35,11 +35,6 @@ export function MediaItem({
   onSelect,
   onDelete,
 }: MediaItemProps) {
-  const confirmDelete = (item: Media) => {
-    if (confirm('Are you sure you want to delete this file?')) {
-      onDelete(item)
-    }
-  }
   return (
     <ListItem onClick={() => onClick(item)} type={item.type}>
       <ItemPreview>
@@ -56,8 +51,8 @@ export function MediaItem({
             Insert
           </Button>
         )}
-        {item.type === 'file' && (
-          <IconButton small onClick={() => confirmDelete(item)}>
+        {onDelete && item.type === 'file' && (
+          <IconButton small onClick={() => onDelete(item)}>
             <TrashIcon />
           </IconButton>
         )}
