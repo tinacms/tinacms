@@ -117,7 +117,7 @@ export function MediaPicker({
     }
   }
 
-  let selectMediaItem: any
+  let selectMediaItem: (item: Media) => void
 
   if (onSelect) {
     selectMediaItem = (item: Media) => {
