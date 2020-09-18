@@ -108,7 +108,7 @@ export function MediaPicker({
     }
   }
 
-  let deleteMediaItem: any
+  let deleteMediaItem: (item: Media) => void
   if (allowDelete) {
     deleteMediaItem = (item: Media) => {
       if (confirm('Are you sure you want to delete this file?')) {
