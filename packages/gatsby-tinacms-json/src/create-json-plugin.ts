@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { CMS, Field, AddContentPlugin } from 'tinacms'
+import { TinaCMS, Field, AddContentPlugin } from 'tinacms'
 
 type MaybePromise<T> = Promise<T> | T
 
@@ -60,7 +60,7 @@ export class JsonCreatorPlugin<FormShape = any, FrontmatterShape = any>
     this.data = options.data || (() => ({} as FrontmatterShape))
   }
 
-  async onSubmit(form: FormShape, cms: CMS) {
+  async onSubmit(form: FormShape, cms: TinaCMS) {
     const fileRelativePath = await this.filename(form)
     const content = await this.data(form)
 

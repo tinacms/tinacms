@@ -25,6 +25,8 @@ limitations under the License.
 
 import { Plugin, PluginTypeManager } from './plugins'
 import { EventBus } from './event'
+import { MediaManager, MediaStore } from './media'
+import { DummyMediaStore } from './media-store.default'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -72,6 +74,7 @@ export interface CMSConfig {
   enabled?: boolean
   plugins?: Array<Plugin>
   apis?: { [key: string]: any }
+  media?: MediaStore
 }
 
 export class CMS {
@@ -115,11 +118,17 @@ export class CMS {
 
   events = new EventBus()
 
+  media = new MediaManager(new DummyMediaStore(), this.events)
+
   /**
    * @hidden
    */
   constructor(config: CMSConfig = {}) {
     this.plugins = new PluginTypeManager(this.events)
+
+    if (config.media) {
+      this.media.store = config.media
+    }
 
     if (config.plugins) {
       config.plugins.forEach(plugin => this.plugins.add(plugin))

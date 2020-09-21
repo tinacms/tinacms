@@ -41,15 +41,19 @@ export const FullscreenModal = styled.div`
   position: absolute;
   top: 0;
   left: 0;
-  width: calc(100% - 170px);
+  width: 100%;
   max-width: 1500px;
   height: 100%;
   animation: ${ModalFullscreenKeyframes} 150ms ease-out 1;
 
   ${ModalBody} {
-    flex: 1 0 auto;
+    height: 100%;
     display: flex;
     flex-direction: column;
+  }
+
+  @media (min-width: 721px) {
+    width: calc(100% - 170px);
   }
 `
 

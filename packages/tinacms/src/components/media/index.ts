@@ -16,8 +16,7 @@ limitations under the License.
 
 */
 
-export * from './cms'
-export * from './event'
-export * from './subscribable'
-export * from './plugins'
-export * from './media'
+export * from './media-manager'
+export { MediaItem } from './media-item'
+export { Breadcrumb } from './breadcrumb'
+export { PageLinks } from './pagination'

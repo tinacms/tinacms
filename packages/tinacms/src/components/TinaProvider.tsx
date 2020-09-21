@@ -25,6 +25,7 @@ import { TinaCMS } from '../tina-cms'
 import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
 import { useState, useEffect } from 'react'
+import { MediaManager } from './media'
 
 export interface TinaProviderProps {
   cms: TinaCMS
@@ -60,6 +61,7 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
         <Alerts alerts={cms.alerts} />
         {enabled && styled && <Theme />}
         {enabled && cms.toolbar && <Toolbar />}
+        <MediaManager />
         {cms.sidebar ? (
           <SidebarProvider position={position} sidebar={cms.sidebar}>
             {children}

@@ -34,6 +34,7 @@
     "@storybook/react": "^5.3.19",
     "@tinacms/form-builder": "^0.29.0",
     "@tinacms/forms": "^0.29.0",
+    "@tinacms/core": "^0.29.0",
     "@tinacms/icons": "^0.29.0",
     "@tinacms/react-core": "^0.29.0",
     "@tinacms/react-forms": "^0.29.0",
