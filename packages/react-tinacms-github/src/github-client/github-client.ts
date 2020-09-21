@@ -22,7 +22,7 @@ import { EventsToAlerts } from '@tinacms/alerts'
 export * from './authenticate'
 import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH } from '../events'
 import { b64EncodeUnicode } from './base64'
-import { EventBus } from 'tinacms/node_modules/@tinacms/core'
+import { EventBus } from '@tinacms/core'
 
 export interface GithubClientOptions {
   proxy: string
