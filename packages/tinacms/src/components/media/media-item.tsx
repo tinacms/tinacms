@@ -72,7 +72,7 @@ interface ListItemProps {
 const ListItem = styled.li<ListItemProps>`
   display: flex;
   align-items: center;
-  padding: 1.125rem;
+  padding: 1rem;
   background-color: white;
   filter: drop-shadow(0 0 0 transparent);
   transition: filter 300ms ease;
@@ -81,7 +81,7 @@ const ListItem = styled.li<ListItemProps>`
   border-radius: var(--tina-radius-small);
 
   > :first-child {
-    margin-right: var(--tina-padding-big);
+    margin-right: var(--tina-padding-small);
   }
 
   &:hover {
@@ -92,6 +92,14 @@ const ListItem = styled.li<ListItemProps>`
         cursor: pointer;
       `}
   }
+
+  @media screen and (min-width: 720px) {
+    padding: 1.125rem;
+
+    > :first-child {
+      margin-right: var(--tina-padding-big);
+    }
+  }
 `
 
 const ItemPreview = styled.div`
@@ -101,6 +109,7 @@ const ItemPreview = styled.div`
   overflow: hidden;
   display: flex;
   justify-content: center;
+  flex-shrink: 0;
 
   > img {
     object-fit: cover;
@@ -119,6 +128,11 @@ const ItemPreview = styled.div`
 const Filename = styled.span<ListItemProps>`
   flex-grow: 1;
   font-size: var(--tina-font-size-2);
+  overflow: hidden;
+  width: 100%;
+  overflow-wrap: break-word;
+  white-space: nowrap;
+  text-overflow: ellipsis;
 
   ${p =>
     p.type === 'dir' &&

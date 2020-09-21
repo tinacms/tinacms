@@ -64,7 +64,7 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
   display: flex;
   align-items: center;
   color: var(--tina-color-grey-4);
-  font-size: var(--tina-font-size-2);
+  font-size: var(--tina-font-size-3);
   margin-left: -12px;
 
   button {
@@ -76,7 +76,6 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
     width: 20px;
     height: 20px;
     fill: var(--tina-color-grey-4);
-    margin-left: -8px;
     transform: translateX(6px);
     opacity: 0;
     transition: opacity 200ms ease, transform 300ms ease-out;
@@ -87,7 +86,7 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
     css`
       svg {
         opacity: 1;
-        transform: translateX(-4px);
+        transform: translateX(0px);
         transition: opacity 180ms ease, transform 300ms ease-in;
       }
     `}
@@ -101,6 +100,14 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
     color: var(--tina-color-grey-9);
   }
 
+  > :not(:last-child) {
+    display: none;
+  }
+
+  > :first-child {
+    display: inline;
+  }
+
   *:not(span)::after {
     content: '/';
     padding-left: 8px;
@@ -108,5 +115,29 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
 
   > *:not(:first-of-type) {
     padding-left: 8px;
+  }
+
+  @media (min-width: 720px) {
+    font-size: var(--tina-font-size-2);
+
+    svg {
+      margin-left: -8px;
+    }
+
+    ${p =>
+      p.showArrow &&
+      css`
+        svg {
+          transform: translateX(-4px);
+        }
+      `}
+
+    > :not(:last-child) {
+      display: inline;
+    }
+
+    > *:not(:first-of-type) {
+      padding-left: 8px;
+    }
   }
 `
