@@ -180,18 +180,21 @@ export function MediaPicker({
 
 const MediaPickerWrap = styled.div`
   height: 100%;
-  padding-bottom: 5rem;
   overflow-y: scroll;
   color: var(--tina-color-grey-9);
   display: flex;
   flex-direction: column;
   position: relative;
   background-color: var(--tina-color-grey-1);
-  padding: 0 1.125rem var(--tina-padding-big) 1.125rem;
+  padding: 0 1rem var(--tina-padding-big) 1rem;
 
   *:active,
   *:focus {
     outline: none;
+  }
+
+  @media (min-width: 720px) {
+    padding: 0 1.125rem var(--tina-padding-big) 1.125rem;
   }
 `
 
@@ -199,11 +202,15 @@ const Header = styled.div`
   display: flex;
   align-items: center;
   background: var(--tina-color-grey-1);
-  padding: var(--tina-padding-big) 1rem var(--tina-padding-big) 1.125rem;
+  padding: var(--tina-padding-big) 0.75rem;
   border-radius: var(--tina-radius-small);
   position: sticky;
   top: 0;
   z-index: 1;
+
+  @media (min-width: 720px) {
+    padding: var(--tina-padding-big) 1rem var(--tina-padding-big) 1.125rem;
+  }
 `
 
 interface ListProps {
