@@ -169,6 +169,11 @@ export class GithubClient {
     return this.baseRepoFullName
   }
 
+  checkout(branch: string, repo?: string) {
+    if (repo) this.setWorkingRepoFullName(repo)
+    this.setWorkingBranch(branch)
+  }
+
   setWorkingRepoFullName(repoFullName: string) {
     this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, repoFullName)
   }
