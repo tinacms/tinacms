@@ -174,6 +174,9 @@ export class GithubClient {
     this.setWorkingBranch(branch)
   }
 
+  /**
+   * @deprecated Call GithubClient#checkout instead
+   */
   setWorkingRepoFullName(repoFullName: string) {
     this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, repoFullName)
   }
@@ -188,6 +191,9 @@ export class GithubClient {
     return this.baseBranch
   }
 
+  /**
+   * @deprecated Call GithubClient#checkout instead
+   */
   setWorkingBranch(branch: string) {
     this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
     this.events.dispatch({
