@@ -70,6 +70,14 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
   button {
     text-transform: capitalize;
     transition: color 180ms ease;
+    border: 0;
+    background-color: transparent;
+    font-size: inherit;
+    color: inherit;
+  }
+
+  > span {
+    display: flex;
   }
 
   svg {
@@ -79,6 +87,7 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
     transform: translateX(6px);
     opacity: 0;
     transition: opacity 200ms ease, transform 300ms ease-out;
+    align-self: center;
   }
 
   ${p =>
