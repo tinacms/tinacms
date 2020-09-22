@@ -188,6 +188,10 @@ const MediaPickerWrap = styled.div`
   background-color: var(--tina-color-grey-1);
   padding: 0 1rem var(--tina-padding-big) 1rem;
 
+  ::-webkit-scrollbar {
+    width: 0;
+  }
+
   *:active,
   *:focus {
     outline: none;
@@ -222,7 +226,8 @@ const List = styled.ul<ListProps>`
   flex-direction: column;
   padding-bottom: 2rem;
   height: 100%;
-  overflow: scroll;
+  overflow-y: scroll;
+  overflow-x: hidden;
 
   ${p =>
     p.dragActive &&
