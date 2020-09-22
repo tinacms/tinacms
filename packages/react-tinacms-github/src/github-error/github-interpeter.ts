@@ -39,7 +39,7 @@ export const getModalProps = async (
     name: `Switch to ${githubClient.baseBranch}`,
     primary: true,
     action: () => {
-      githubClient.setWorkingBranch(githubClient.baseBranch)
+      githubClient.checkout(githubClient.baseBranch)
     },
   }
 

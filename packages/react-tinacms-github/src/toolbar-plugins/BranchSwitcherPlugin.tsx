@@ -165,7 +165,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
         <ConfirmSwitchBranchModal
           name={confirmSwitchProps.name}
           onBranchChange={() => {
-            github.setWorkingBranch(confirmSwitchProps.name)
+            github.checkout(confirmSwitchProps.name)
             closeDropdown()
             if (onBranchChange) {
               onBranchChange(confirmSwitchProps.name)
@@ -197,7 +197,7 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
         async onSubmit({ name }) {
           try {
             await cms.api.github.createBranch(name)
-            cms.api.github.setWorkingBranch(name)
+            cms.api.github.checkout(name)
             if (onBranchChange) {
               onBranchChange(name)
             }
