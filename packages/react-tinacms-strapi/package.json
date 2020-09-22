@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-strapi",
-  "version": "0.31.0-alpha.2",
+  "version": "0.31.0-alpha.3",
   "description": "",
   "main": "build/index.js",
   "scripts": {
@@ -43,12 +43,12 @@
     "styled-components": ">4.5"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.31.0-alpha.2",
-    "@tinacms/fields": "^0.31.0-alpha.2",
-    "@tinacms/media": "^0.31.0-alpha.2",
-    "@tinacms/react-core": "^0.31.0-alpha.2",
-    "@tinacms/react-forms": "^0.31.0-alpha.2",
-    "@tinacms/react-modals": "^0.31.0-alpha.2",
+    "@tinacms/core": "^0.31.0-alpha.3",
+    "@tinacms/fields": "^0.31.0-alpha.3",
+    "@tinacms/media": "^0.31.0-alpha.3",
+    "@tinacms/react-core": "^0.31.0-alpha.3",
+    "@tinacms/react-forms": "^0.31.0-alpha.3",
+    "@tinacms/react-modals": "^0.31.0-alpha.3",
     "@tinacms/scripts": "^0.29.0",
     "@tinacms/styles": "^0.29.0",
     "react-final-form": "^6.3.0"
