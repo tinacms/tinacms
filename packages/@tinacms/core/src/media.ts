@@ -83,7 +83,7 @@ export interface MediaStore {
    * Given a `src` string it returns a url for previewing that content.
    * This is helpful in cases where the file may not be available in production yet.
    */
-  previewSrc(src: string, fieldPath: string, formValues: any): Promise<string>
+  previewSrc(src: string, fieldPath?: string, formValues?: any): Promise<string>
 
   /**
    * Lists all media in a specific directory.
