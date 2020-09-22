@@ -79,6 +79,7 @@ const ListItem = styled.li<ListItemProps>`
   border: 1px solid var(--tina-color-grey-2);
   margin-bottom: var(--tina-padding-small);
   border-radius: var(--tina-radius-small);
+  min-height: 90px;
 
   > :first-child {
     margin-right: var(--tina-padding-small);
