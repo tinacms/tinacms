@@ -60,8 +60,7 @@ export const TinacmsGithubProvider = ({
 
   const onAuthSuccess = async () => {
     if (await github.isAuthorized()) {
-      github.setWorkingRepoFullName(github.baseRepoFullName)
-      github.setWorkingBranch(github.branchName)
+      github.checkout(github.branchName, github.baseRepoFullName)
       setActiveModal(null)
     } else {
       setActiveModal('createFork')
