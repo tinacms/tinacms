@@ -48,7 +48,6 @@ export default function BlocksExample({ jsonFile }) {
           </h1>
           <InlineImage
             name="hero_image"
-            previewSrc={formValues => formValues.hero_image}
             parse={filename => `/images/${filename}`}
             uploadDir={() => '/public/images/'}
           >
@@ -159,9 +158,6 @@ function ImageBlock({ index, data }) {
       <BlocksControls index={index}>
         <InlineImage
           name="src"
-          previewSrc={formValues => {
-            return formValues.blocks[index].src
-          }}
           parse={filename => `/images/${filename}`}
           uploadDir={() => '/public/images/'}
           focusRing={false}
