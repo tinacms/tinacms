@@ -30,6 +30,7 @@ export interface InlineImageProps {
   previewSrc?: MediaStore['previewSrc']
   focusRing?: boolean | FocusRingOptions
   className?: string
+  alt?: string
   children?: ImageRenderChildren
 }
 
@@ -53,6 +54,7 @@ export function InlineImage(props: InlineImageProps) {
           <NonEditableImage
             children={props.children}
             src={input.value}
+            alt={props.alt}
             className={props.className}
           />
         )
@@ -74,6 +76,7 @@ function EditableImage({
   uploadDir,
   children,
   focusRing = true,
+  alt = '',
   className,
 }: EditableImageProps) {
   const cms = useCMS()
@@ -106,6 +109,7 @@ function EditableImage({
     <FocusRing name={name} options={focusRing}>
       <InlineImageUpload
         src={_previewSrc}
+        alt={alt}
         onDrop={handleUploadImage}
         onClick={() =>
           cms.media.open({
@@ -133,6 +137,7 @@ type ImageRenderChildren = (props: ImageRenderChildrenProps) => React.ReactNode
 
 interface InlineImageUploadProps {
   src?: string
+  alt?: string
   className?: string
   onClick(): void
   onDrop(acceptedFiles: any[]): void
@@ -141,6 +146,7 @@ interface InlineImageUploadProps {
 
 function InlineImageUpload({
   src,
+  alt,
   className,
   onClick,
   onDrop,
@@ -157,21 +163,27 @@ function InlineImageUpload({
   return (
     <Container {...getRootProps()} onClick={onClick} className={className}>
       <input {...getInputProps()} />
-      {children ? children({ src }) : <img src={src} />}
+      {children ? children({ src }) : <img src={src} alt={alt} />}
     </Container>
   )
 }
 
 interface NonEditableImageProps {
   src?: string
+  alt?: string
   className?: string
   children?: ImageRenderChildren
 }
 
-function NonEditableImage({ children, src, className }: NonEditableImageProps) {
+function NonEditableImage({
+  src,
+  alt,
+  className,
+  children,
+}: NonEditableImageProps) {
   return (
     <Container className={className}>
-      {children ? children({ src }) : <img src={src} />}
+      {children ? children({ src }) : <img src={src} alt={alt} />}
     </Container>
   )
 }
