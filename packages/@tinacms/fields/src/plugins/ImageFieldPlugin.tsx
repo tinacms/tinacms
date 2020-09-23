@@ -47,17 +47,18 @@ export function usePreviewSrc(
   useEffect(() => {
     let componentUnmounted = false
     let tmpSrc = ''
+    ;(async () => {
+      try {
+        tmpSrc = await getSrc(value, fieldName, formValues)
+      } catch {}
 
-    getSrc(value, fieldName, formValues)
-      .then((src: string) => (tmpSrc = src))
-      .finally(() => {
-        if (componentUnmounted) return
+      if (componentUnmounted) return
 
-        setState({
-          src: tmpSrc,
-          loading: false,
-        })
+      setState({
+        src: tmpSrc,
+        loading: false,
       })
+    })()
 
     return () => {
       componentUnmounted = true
