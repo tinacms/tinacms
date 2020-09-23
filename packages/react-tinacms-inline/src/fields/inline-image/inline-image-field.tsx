@@ -18,10 +18,10 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { InlineField } from '../inline-field'
+import { InlineField } from '../../inline-field'
 import { useCMS, Form, Media, MediaStore, usePreviewSrc } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
-import { FocusRing, FocusRingOptions } from '../styles'
+import { FocusRing, FocusRingOptions } from '../../styles'
 
 export interface InlineImageProps {
   name: string
