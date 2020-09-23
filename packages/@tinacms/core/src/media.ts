@@ -179,8 +179,8 @@ export class MediaManager implements MediaStore {
 
   previewSrc = async (
     src: string,
-    fieldName: string,
-    formValues: any
+    fieldName: string = '',
+    formValues: any = {}
   ): Promise<string> => {
     try {
       this.events.dispatch({
