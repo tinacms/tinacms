@@ -91,6 +91,7 @@ function Info(props) {
               uploadDir={() => '/public/images/'}
               parse={media => media.id}
               className="inline-img"
+              alt="blue-orange"
             />
             <h1>INLINE IMAGE WITH CHILDREN</h1>
             <StyledInlineImage
