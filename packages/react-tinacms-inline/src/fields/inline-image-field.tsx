@@ -28,7 +28,11 @@ export interface InlineImageProps {
   uploadDir?(form: Form): string
   previewSrc?: MediaStore['previewSrc']
   focusRing?: boolean | FocusRingOptions
-  children?: any
+  children?(props: InlineImageRenderProps): React.ReactNode
+}
+
+interface InlineImageRenderProps {
+  src: string
 }
 
 /**
@@ -47,7 +51,11 @@ export function InlineImage(props: InlineImageProps) {
           return <EditableImage {...props} input={input} form={form} />
         }
 
-        return props.children ? props.children() : <img src={input.value} />
+        return props.children ? (
+          props.children({ src: input.value })
+        ) : (
+          <img src={input.value} />
+        )
       }}
     </InlineField>
   )
@@ -96,8 +104,7 @@ function EditableImage({
   return (
     <FocusRing name={name} options={focusRing}>
       <InlineImageUpload
-        value={input.value}
-        previewSrc={_previewSrc}
+        src={_previewSrc}
         onDrop={handleUploadImage}
         onClick={() =>
           cms.media.open({
@@ -111,28 +118,24 @@ function EditableImage({
         }
         {...input}
       >
-        {/** If children, pass previewSrc to children */}
-        {children &&
-          ((props: any) => children({ previewSrc: _previewSrc }, ...props))}
+        {children}
       </InlineImageUpload>
     </FocusRing>
   )
 }
 
 interface InlineImageUploadProps {
-  onDrop: (acceptedFiles: any[]) => void
-  value?: string
-  children?: any
-  previewSrc?: string
-  onClick: () => void
+  src?: string
+  onClick(): void
+  onDrop(acceptedFiles: any[]): void
+  children?(props: InlineImageRenderProps): React.ReactNode
 }
 
 function InlineImageUpload({
-  onDrop,
-  value,
-  previewSrc,
-  children,
+  src,
   onClick,
+  onDrop,
+  children,
 }: InlineImageUploadProps) {
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
@@ -140,12 +143,12 @@ function InlineImageUpload({
     noClick: !!onClick,
   })
 
-  if (!value) return <ImagePlaceholder />
+  if (!src) return <ImagePlaceholder />
 
   return (
     <div {...getRootProps()} onClick={onClick}>
       <input {...getInputProps()} />
-      <div>{children ? children(previewSrc) : <img src={previewSrc} />}</div>
+      {children ? children({ src }) : <img src={src} />}
     </div>
   )
 }

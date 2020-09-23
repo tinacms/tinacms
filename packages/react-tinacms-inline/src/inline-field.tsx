@@ -26,7 +26,7 @@ export interface InlineFieldProps {
   name: string
   parse?(value: any): any
   format?(value: any): any
-  children(fieldProps: InlineFieldRenderProps): React.ReactElement
+  children(fieldProps: InlineFieldRenderProps): React.ReactNode
 }
 
 export interface InlineFieldRenderProps<V = any>
