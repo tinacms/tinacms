@@ -17,11 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled from 'styled-components'
 import { InlineField } from '../../inline-field'
-import { useCMS, Form, Media, MediaStore, usePreviewSrc } from 'tinacms'
-import { useDropzone } from 'react-dropzone'
-import { FocusRing, FocusRingOptions } from '../../styles'
+import { useCMS, Form, Media, MediaStore } from 'tinacms'
+import { FocusRingOptions } from '../../styles'
+import { NonEditableImage } from './non-editable-image'
+import { EditableImage } from './editable-image'
 
 export interface InlineImageProps {
   name: string
@@ -33,6 +33,14 @@ export interface InlineImageProps {
   alt?: string
   children?: ImageRenderChildren
 }
+
+interface ImageRenderChildrenProps {
+  src?: string
+}
+
+export type ImageRenderChildren = (
+  props: ImageRenderChildrenProps
+) => React.ReactNode
 
 /**
  * @deprecated
@@ -62,144 +70,3 @@ export function InlineImage(props: InlineImageProps) {
     </InlineField>
   )
 }
-
-interface EditableImageProps extends InlineImageProps {
-  input: any
-  form: Form
-}
-
-function EditableImage({
-  form,
-  input,
-  name,
-  previewSrc,
-  uploadDir,
-  children,
-  focusRing = true,
-  alt = '',
-  className,
-}: EditableImageProps) {
-  const cms = useCMS()
-
-  const [_previewSrc] = usePreviewSrc(
-    input.value,
-    name,
-    form.values,
-    previewSrc
-  )
-
-  async function handleUploadImage([file]: File[]) {
-    const directory = uploadDir ? uploadDir(form) : ''
-
-    const [media] = await cms.media.persist([
-      {
-        directory,
-        file,
-      },
-    ])
-
-    if (media) {
-      input.onChange(media)
-    }
-
-    return null
-  }
-
-  return (
-    <FocusRing name={name} options={focusRing}>
-      <InlineImageUpload
-        src={_previewSrc}
-        alt={alt}
-        onDrop={handleUploadImage}
-        onClick={() =>
-          cms.media.open({
-            onSelect(media: any) {
-              if (media.filename == input.value) {
-                input.onChange('') // trigger rerender
-              }
-              input.onChange(media)
-            },
-          })
-        }
-        className={className}
-      >
-        {children}
-      </InlineImageUpload>
-    </FocusRing>
-  )
-}
-
-interface ImageRenderChildrenProps {
-  src?: string
-}
-
-type ImageRenderChildren = (props: ImageRenderChildrenProps) => React.ReactNode
-
-interface InlineImageUploadProps {
-  src?: string
-  alt?: string
-  className?: string
-  onClick(): void
-  onDrop(acceptedFiles: any[]): void
-  children?: ImageRenderChildren
-}
-
-function InlineImageUpload({
-  src,
-  alt,
-  className,
-  onClick,
-  onDrop,
-  children,
-}: InlineImageUploadProps) {
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
-    onDrop,
-    noClick: !!onClick,
-  })
-
-  if (!src) return <ImagePlaceholder />
-
-  return (
-    <Container {...getRootProps()} onClick={onClick} className={className}>
-      <input {...getInputProps()} />
-      {children ? children({ src }) : <img src={src} alt={alt} />}
-    </Container>
-  )
-}
-
-interface NonEditableImageProps {
-  src?: string
-  alt?: string
-  className?: string
-  children?: ImageRenderChildren
-}
-
-function NonEditableImage({
-  src,
-  alt,
-  className,
-  children,
-}: NonEditableImageProps) {
-  return (
-    <Container className={className}>
-      {children ? children({ src }) : <img src={src} alt={alt} />}
-    </Container>
-  )
-}
-
-function ImagePlaceholder() {
-  // TODO: style this component
-  return (
-    <div>
-      Drag 'n' drop some files here,
-      <br />
-      or click to select files
-    </div>
-  )
-}
-
-const Container = styled.div`
-  width: inherit;
-  height: inherit;
-`
