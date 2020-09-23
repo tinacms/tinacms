@@ -16,20 +16,8 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-context'
 export {
-  InlineText,
-  InlineTextField,
-  InlineTextProps,
-} from './fields/inline-text-field'
-export {
-  InlineTextarea,
-  InlineTextareaField,
-} from './fields/inline-textarea-field'
-export * from './fields/inline-image'
-export * from './inline-group'
-export { InlineSettings } from './inline-settings'
-export * from './blocks'
-export * from './styles'
+  InlineImage,
+  InlineImageField,
+  InlineImageProps,
+} from './inline-image-field'
