@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import styled from 'styled-components'
 import { InlineField } from '../inline-field'
 import { useCMS, Form, Media, MediaStore, usePreviewSrc } from 'tinacms'
 import { useDropzone } from 'react-dropzone'
@@ -28,6 +29,7 @@ export interface InlineImageProps {
   uploadDir?(form: Form): string
   previewSrc?: MediaStore['previewSrc']
   focusRing?: boolean | FocusRingOptions
+  className?: string
   children?: ImageRenderChildren
 }
 
@@ -47,7 +49,13 @@ export function InlineImage(props: InlineImageProps) {
           return <EditableImage {...props} input={input} form={form} />
         }
 
-        return <NonEditableImage children={props.children} src={input.value} />
+        return (
+          <NonEditableImage
+            children={props.children}
+            src={input.value}
+            className={props.className}
+          />
+        )
       }}
     </InlineField>
   )
@@ -66,6 +74,7 @@ function EditableImage({
   uploadDir,
   children,
   focusRing = true,
+  className,
 }: EditableImageProps) {
   const cms = useCMS()
 
@@ -108,7 +117,7 @@ function EditableImage({
             },
           })
         }
-        {...input}
+        className={className}
       >
         {children}
       </InlineImageUpload>
@@ -124,6 +133,7 @@ type ImageRenderChildren = (props: ImageRenderChildrenProps) => React.ReactNode
 
 interface InlineImageUploadProps {
   src?: string
+  className?: string
   onClick(): void
   onDrop(acceptedFiles: any[]): void
   children?: ImageRenderChildren
@@ -131,6 +141,7 @@ interface InlineImageUploadProps {
 
 function InlineImageUpload({
   src,
+  className,
   onClick,
   onDrop,
   children,
@@ -144,20 +155,25 @@ function InlineImageUpload({
   if (!src) return <ImagePlaceholder />
 
   return (
-    <div {...getRootProps()} onClick={onClick}>
+    <Container {...getRootProps()} onClick={onClick} className={className}>
       <input {...getInputProps()} />
       {children ? children({ src }) : <img src={src} />}
-    </div>
+    </Container>
   )
 }
 
 interface NonEditableImageProps {
   src?: string
+  className?: string
   children?: ImageRenderChildren
 }
 
-function NonEditableImage({ children, src }: NonEditableImageProps) {
-  return <div>{children ? children({ src }) : <img src={src} />}</div>
+function NonEditableImage({ children, src, className }: NonEditableImageProps) {
+  return (
+    <Container className={className}>
+      {children ? children({ src }) : <img src={src} />}
+    </Container>
+  )
 }
 
 function ImagePlaceholder() {
@@ -170,3 +186,8 @@ function ImagePlaceholder() {
     </div>
   )
 }
+
+const Container = styled.div`
+  width: inherit;
+  height: inherit;
+`
