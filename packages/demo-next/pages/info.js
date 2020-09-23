@@ -87,13 +87,17 @@ function Info(props) {
           <div className="group">
             <InlineImage
               name="frontmatter.image"
-              previewSrc={formValues => {
-                return formValues.frontmatter.image
-              }}
               uploadDir={() => '/public/images/'}
-              parse={filename => `/images/${filename}`}
+              parse={media => media.id}
             />
-
+            <h1>INLINE IMAGE WITH CHILDREN</h1>
+            <InlineImage
+              name="frontmatter.image"
+              uploadDir={() => '/public/images/'}
+              parse={media => media.id}
+            >
+              {props => <img src={props.src} />}
+            </InlineImage>
             <InlineWysiwyg name="markdownBody">
               <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
             </InlineWysiwyg>
