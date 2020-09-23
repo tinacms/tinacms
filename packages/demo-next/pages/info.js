@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import matter from 'gray-matter'
+import styled from 'styled-components'
 import { useMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
@@ -89,15 +90,16 @@ function Info(props) {
               name="frontmatter.image"
               uploadDir={() => '/public/images/'}
               parse={media => media.id}
+              className="inline-img"
             />
             <h1>INLINE IMAGE WITH CHILDREN</h1>
-            <InlineImage
+            <StyledInlineImage
               name="frontmatter.image"
               uploadDir={() => '/public/images/'}
               parse={media => media.id}
             >
               {props => <img src={props.src} />}
-            </InlineImage>
+            </StyledInlineImage>
             <InlineWysiwyg name="markdownBody">
               <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
             </InlineWysiwyg>
@@ -119,6 +121,10 @@ function Info(props) {
             div.group {
               margin-top: 2rem;
               padding: 1rem;
+            }
+
+            .inline-img {
+              background: pink;
             }
           `}
         </style>
@@ -168,3 +174,7 @@ Info.getInitialProps = async function() {
     },
   }
 }
+
+const StyledInlineImage = styled(InlineImage)`
+  background-color: red;
+`
