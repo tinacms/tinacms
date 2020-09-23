@@ -58,8 +58,7 @@ export function InlineWysiwyg({
         })
       },
       previewSrc(src) {
-        // TODO: Implement formValues correctly
-        return cms.media.previewSrc(src, name, {})
+        return cms.media.previewSrc(src)
       },
       ...passedInImageProps,
     }
