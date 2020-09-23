@@ -28,11 +28,7 @@ export interface InlineImageProps {
   uploadDir?(form: Form): string
   previewSrc?: MediaStore['previewSrc']
   focusRing?: boolean | FocusRingOptions
-  children?(props: InlineImageRenderProps): React.ReactNode
-}
-
-interface InlineImageRenderProps {
-  src: string
+  children?: ImageRenderChildren
 }
 
 /**
@@ -51,11 +47,7 @@ export function InlineImage(props: InlineImageProps) {
           return <EditableImage {...props} input={input} form={form} />
         }
 
-        return props.children ? (
-          props.children({ src: input.value })
-        ) : (
-          <img src={input.value} />
-        )
+        return <NonEditableImage children={props.children} src={input.value} />
       }}
     </InlineField>
   )
@@ -63,7 +55,7 @@ export function InlineImage(props: InlineImageProps) {
 
 interface EditableImageProps extends InlineImageProps {
   input: any
-  form: any
+  form: Form
 }
 
 function EditableImage({
@@ -124,11 +116,17 @@ function EditableImage({
   )
 }
 
+interface ImageRenderChildrenProps {
+  src?: string
+}
+
+type ImageRenderChildren = (props: ImageRenderChildrenProps) => React.ReactNode
+
 interface InlineImageUploadProps {
   src?: string
   onClick(): void
   onDrop(acceptedFiles: any[]): void
-  children?(props: InlineImageRenderProps): React.ReactNode
+  children?: ImageRenderChildren
 }
 
 function InlineImageUpload({
@@ -151,6 +149,15 @@ function InlineImageUpload({
       {children ? children({ src }) : <img src={src} />}
     </div>
   )
+}
+
+interface NonEditableImageProps {
+  src?: string
+  children?: ImageRenderChildren
+}
+
+function NonEditableImage({ children, src }: NonEditableImageProps) {
+  return <div>{children ? children({ src }) : <img src={src} />}</div>
 }
 
 function ImagePlaceholder() {
