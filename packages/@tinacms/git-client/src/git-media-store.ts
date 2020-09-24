@@ -67,7 +67,9 @@ export class GitMediaStore implements MediaStore {
       nextOffset: undefined,
     }
   }
-  async delete(_media: Media): Promise<void> {
-    throw new Error('Not implemented')
+  async delete(media: Media): Promise<void> {
+    return this.client.deleteFromDisk({
+      relPath: media.id,
+    })
   }
 }
