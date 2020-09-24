@@ -228,5 +228,6 @@ export class MediaManager implements MediaStore {
 }
 
 export interface SelectMediaOptions {
+  directory?: string
   onSelect?(media: Media): void
 }
