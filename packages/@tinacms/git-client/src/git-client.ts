@@ -159,6 +159,19 @@ export class GitClient {
   }
 
   /**
+   * Get the contents of a file or directory on disk.
+   */
+  getFile(fileRelativePath: string) {
+    return fetch(`${this.baseUrl}/${encodeURIComponent(fileRelativePath)}`, {
+      headers: {
+        'Content-Type': 'application/json; charset=utf-8',
+      },
+    }).then(response => {
+      return response.json()
+    })
+  }
+
+  /**
    * Get the contents of a file for the most recent commit.
    */
   show(fileRelativePath: string) {
