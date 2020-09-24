@@ -56,8 +56,16 @@ export class GitMediaStore implements MediaStore {
   async previewSrc(src: string) {
     return src
   }
-  async list(_options?: MediaListOptions): Promise<MediaList> {
-    throw new Error('Not implemented')
+  async list(options?: MediaListOptions): Promise<MediaList> {
+    const { file } = await this.client.getFile(options?.directory || '')
+
+    return {
+      items: file.content,
+      totalCount: 0,
+      offset: 0,
+      limit: 100,
+      nextOffset: undefined,
+    }
   }
   async delete(_media: Media): Promise<void> {
     throw new Error('Not implemented')
