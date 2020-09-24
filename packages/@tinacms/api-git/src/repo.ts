@@ -81,7 +81,16 @@ export class Repo {
 
       if (stats.isDirectory()) {
         // TODO: Get list of files in the directory
-        return {}
+        const dir = fs.readdirSync(absolutePath, { withFileTypes: true })
+        return {
+          path: relPath,
+          contents: dir.map(file => ({
+            id: path.join(relPath, file.name),
+            filename: file.name,
+            directory: relPath,
+            type: file.isFile() ? 'file' : 'dir',
+          })),
+        }
       }
 
       // TODO: Return file contents like in getFileAtHead

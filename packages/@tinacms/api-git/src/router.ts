@@ -79,7 +79,7 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
        * if file return file contents
        * if directory
        */
-      res.json({ status: 'success', path, file })
+      res.json({ status: 'success', file })
     } catch {
       res.status(500).json({ status: 'error' })
     }
