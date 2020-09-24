@@ -70,8 +70,10 @@ export function EditableImage({
         src={_previewSrc}
         alt={alt}
         onDrop={handleUploadImage}
-        onClick={() =>
+        onClick={() => {
+          const directory = uploadDir ? uploadDir(form) : ''
           cms.media.open({
+            directory,
             onSelect(media: any) {
               if (media.filename == input.value) {
                 input.onChange('') // trigger rerender
@@ -79,7 +81,7 @@ export function EditableImage({
               input.onChange(media)
             },
           })
-        }
+        }}
         className={className}
       >
         {children}
