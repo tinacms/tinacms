@@ -785,6 +785,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "CodeItQuick",
+      "name": "CodeItQuick",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10291643?v=4",
+      "profile": "https://github.com/CodeItQuick",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
