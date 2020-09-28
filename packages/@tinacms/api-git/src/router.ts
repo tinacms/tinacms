@@ -70,6 +70,25 @@ export function router(repo: Repo, config: Partial<GitRouterConfig> = {}) {
   const router = express.Router()
   router.use(express.json())
 
+  router.get('/', getGitFile)
+  router.get('/:relPath', getGitFile)
+
+  async function getGitFile(req: any, res: any) {
+    try {
+      const path = decodeURIComponent(req.params.relPath || '/')
+
+      const file = await repo.getFile(path)
+      /**
+       * if file return file contents
+       * if directory
+       */
+      res.json({ status: 'success', file })
+    } catch (e) {
+      console.error(e)
+      res.status(500).json({ status: 'error' })
+    }
+  }
+
   router.delete('/:relPath', async (req: any, res) => {
     try {
       const user = req.user || {}

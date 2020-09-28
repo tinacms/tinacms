@@ -26,6 +26,8 @@ interface BreadcrumbProps {
 }
 
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
+  directory = directory.replace(/^\/|\/$/g, '')
+
   const dirArr = directory.split('/')
   dirArr.pop()
   const prevDir = dirArr.join('/')
@@ -37,20 +39,15 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
       </span>
       <button onClick={() => setDirectory('')}>Media</button>
       {directory &&
-        directory
-          .replace(/^\//, '')
-          .split('/')
-          .map((part, index, parts) => (
-            <>
-              <button
-                onClick={() => {
-                  setDirectory(parts.slice(0, index + 1).join('/'))
-                }}
-              >
-                {part}
-              </button>
-            </>
-          ))}
+        directory.split('/').map((part, index, parts) => (
+          <button
+            onClick={() => {
+              setDirectory(parts.slice(0, index + 1).join('/'))
+            }}
+          >
+            {part}
+          </button>
+        ))}
     </BreadcrumbWrapper>
   )
 }

@@ -73,6 +73,38 @@ export class Repo {
     }
   }
 
+  async getFile(relPath: string) {
+    const absolutePath = this.fileAbsolutePath(relPath)
+
+    if (this.fileIsInRepo(absolutePath)) {
+      const stats = fs.statSync(absolutePath)
+
+      if (stats.isDirectory()) {
+        // TODO: Get list of files in the directory
+        const dir = fs.readdirSync(absolutePath, { withFileTypes: true })
+        return {
+          path: relPath,
+          content: dir.map(file => ({
+            id: path.join(relPath, file.name),
+            filename: file.name,
+            directory: relPath,
+            type: file.isFile() ? 'file' : 'dir',
+          })),
+        }
+      }
+
+      // TODO: Return file contents like in getFileAtHead
+      return {
+        contents: [],
+        stats,
+      }
+    } else {
+      throw new Error(
+        `Failed to list files in: ${relPath} \nCannot list outside of the content directory.`
+      )
+    }
+  }
+
   async deleteFiles(filepath: string, commitOptions: CommitOptions) {
     const fileAbsolutePath = this.fileAbsolutePath(filepath)
     if (this.fileIsInRepo(fileAbsolutePath)) {

@@ -27,5 +27,6 @@ export function checkFilePathIsInParent(filepath: string, parent: string) {
   } else {
     repopath = path.resolve(parent).replace(/\/+$/, '') + '/'
   }
-  return fullpath.startsWith(repopath)
+
+  return fullpath.startsWith(repopath) || fullpath === repopath.slice(0, -1)
 }
