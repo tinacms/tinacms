@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-inline",
-  "version": "0.31.0-alpha.3",
+  "version": "0.31.0-alpha.4",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "typings": "dist/src/index.d.ts",
@@ -26,12 +26,12 @@
     "tinacms": ">=0.13"
   },
   "devDependencies": {
-    "@tinacms/icons": "^0.31.0-alpha.3",
-    "@tinacms/react-forms": "^0.31.0-alpha.3",
+    "@tinacms/icons": "^0.31.0-alpha.4",
+    "@tinacms/react-forms": "^0.31.0-alpha.4",
     "@tinacms/scripts": "^0.29.0",
     "@tinacms/styles": "^0.29.0",
     "react-dropzone": "10.1.8",
     "react-tinacms-editor": "^0.4.0",
-    "tinacms": "^0.31.0-alpha.3"
+    "tinacms": "^0.31.0-alpha.4"
   }
 }
