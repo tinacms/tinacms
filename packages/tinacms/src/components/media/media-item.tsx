@@ -44,7 +44,7 @@ export function MediaItem({
           <FileIcon type={item.type} />
         )}
       </ItemPreview>
-      <Filename type={item.type}>{item.filename}</Filename>
+      <Filename>{item.filename}</Filename>
       <ActionButtons>
         {onSelect && item.type === 'file' && (
           <Button small onClick={() => onSelect(item)}>
@@ -126,7 +126,7 @@ const ItemPreview = styled.div`
   }
 `
 
-const Filename = styled.span<ListItemProps>`
+const Filename = styled.span`
   flex-grow: 1;
   font-size: var(--tina-font-size-2);
   overflow: hidden;
@@ -134,12 +134,6 @@ const Filename = styled.span<ListItemProps>`
   overflow-wrap: break-word;
   white-space: nowrap;
   text-overflow: ellipsis;
-
-  ${p =>
-    p.type === 'dir' &&
-    css`
-      text-transform: capitalize;
-    `}
 `
 
 const ActionButtons = styled.span`
