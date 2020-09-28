@@ -1,4 +1,3 @@
-import { getNodeText } from '@testing-library/react'
 /**
 
 Copyright 2019 Forestry.io Inc
