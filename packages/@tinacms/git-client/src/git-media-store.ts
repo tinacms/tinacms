@@ -1,3 +1,4 @@
+import { getNodeText } from '@testing-library/react'
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -57,14 +58,17 @@ export class GitMediaStore implements MediaStore {
     return src
   }
   async list(options?: MediaListOptions): Promise<MediaList> {
-    const { file } = await this.client.getFile(options?.directory || '')
+    const directory = options?.directory ?? ''
+    const offset = options?.offset ?? 0
+    const limit = options?.limit ?? 50
+    const { file } = await this.client.getFile(directory)
 
     return {
-      items: file.content,
-      totalCount: 0,
-      offset: 0,
-      limit: 100,
-      nextOffset: undefined,
+      items: file.content.slice(offset, offset + limit),
+      totalCount: file.content.length,
+      offset,
+      limit,
+      nextOffset: nextOffset(offset, limit, file.content.length),
     }
   }
   async delete(media: Media): Promise<void> {
@@ -72,4 +76,9 @@ export class GitMediaStore implements MediaStore {
       relPath: media.id,
     })
   }
+}
+
+const nextOffset = (offset: number, limit: number, count: number) => {
+  if (offset + limit < count) return offset + limit
+  return undefined
 }
