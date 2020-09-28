@@ -31,6 +31,7 @@ export interface GithubClientOptions {
   baseRepoFullName: string
   baseBranch?: string
   authScope?: AuthScope
+  defaultCommitMsg?: string
 }
 
 export interface Branch {
@@ -70,6 +71,7 @@ export class GithubClient {
   clientId: string
   authCallbackRoute: string
   authScope: AuthScope
+  defaultCommitMsg: string
 
   constructor({
     proxy,
@@ -78,6 +80,7 @@ export class GithubClient {
     baseRepoFullName,
     baseBranch = 'master',
     authScope = 'public_repo',
+    defaultCommitMsg = 'Update from TinaCMS',
   }: GithubClientOptions) {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
@@ -85,6 +88,7 @@ export class GithubClient {
     this.clientId = clientId
     this.authCallbackRoute = authCallbackRoute
     this.authScope = authScope
+    this.defaultCommitMsg = defaultCommitMsg
     this.validate()
   }
 
@@ -151,7 +155,7 @@ export class GithubClient {
       url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'POST',
       data: {
-        title: title ? title : 'Update from TinaCMS',
+        title: title ? title : this.defaultCommitMsg,
         body: body ? body : 'Please pull these awesome changes in!',
         head: `${workingRepoFullName.split('/')[0]}:${headBranch}`,
         base: this.baseBranch,
@@ -282,7 +286,7 @@ export class GithubClient {
     filePath: string,
     sha: string,
     fileContents: string,
-    commitMessage: string = 'Update from TinaCMS'
+    commitMessage: string = this.defaultCommitMsg
   ) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
@@ -328,7 +332,7 @@ export class GithubClient {
   async githubFileApi(
     path: string,
     fileContents: string,
-    commitMessage: string = 'Update from TinaCMS',
+    commitMessage: string = this.defaultCommitMsg,
     encoded: boolean = false,
     method: 'PUT' | 'DELETE'
   ) {
@@ -357,7 +361,7 @@ export class GithubClient {
   async upload(
     path: string,
     fileContents: string,
-    commitMessage: string = 'Update from TinaCMS',
+    commitMessage: string = this.defaultCommitMsg,
     encoded: boolean = false
   ) {
     return this.githubFileApi(path, fileContents, commitMessage, encoded, 'PUT')
