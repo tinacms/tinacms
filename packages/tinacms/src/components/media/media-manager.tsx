@@ -224,7 +224,8 @@ interface ListProps {
 const List = styled.ul<ListProps>`
   display: flex;
   flex-direction: column;
-  padding-bottom: 2rem;
+  padding: 0 0 2rem 0;
+  margin: 0;
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
