@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-github",
-  "version": "0.29.0",
+  "version": "0.31.0-alpha.5",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -18,14 +18,14 @@
     "@types/uuid": "^8.0.0"
   },
   "dependencies": {
-    "@tinacms/core": "^0.31.0-alpha.3",
+    "@tinacms/core": "^0.31.0-alpha.5",
     "atob": "2.1.2",
     "axios": "0.19.2",
     "cookie": "0.4.0",
     "crypto-js": "^4.0.0",
     "gray-matter": "4.0.2",
     "qs": "6.9.3",
-    "react-tinacms-github": "^0.31.0-alpha.3",
+    "react-tinacms-github": "^0.31.0-alpha.5",
     "uuid": "^8.1.0"
   }
 }
