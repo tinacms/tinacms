@@ -21,6 +21,7 @@ import App from 'next/app'
 import { TinaProvider, TinaCMS, withTina } from 'tinacms'
 import { GitClient, GitMediaStore } from '@tinacms/git-client'
 import { GlobalStyles as TinaCustomStyles } from '@tinacms/styles'
+import { NextGitMediaStore } from '../next-git-media-store'
 
 function Empty() {
   return <span>Hello from a custom empty state Component</span>
@@ -48,7 +49,7 @@ export default class Site extends App {
     })
     const client = new GitClient('http://localhost:3000/___tina')
     this.cms.registerApi('git', client)
-    this.cms.media.store = new GitMediaStore(client)
+    this.cms.media.store = new NextGitMediaStore(client)
   }
 
   render() {
