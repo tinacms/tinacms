@@ -142,7 +142,7 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
       `}
 
     > :not(:last-child) {
-      display: inline;
+      display: flex;
     }
 
     > *:not(:first-of-type) {
