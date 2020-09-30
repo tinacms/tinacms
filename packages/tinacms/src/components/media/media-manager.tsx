@@ -31,7 +31,6 @@ import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, PageLinks } from './index'
-import { File } from '@tinacms/icons'
 
 export interface MediaRequest {
   limit?: number
