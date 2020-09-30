@@ -31,6 +31,7 @@ import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, PageLinks } from './index'
+import { File } from '@tinacms/icons'
 
 export interface MediaRequest {
   limit?: number
@@ -171,6 +172,7 @@ export function MediaPicker({
             onDelete={deleteMediaItem}
           />
         ))}
+        {list.items.length === 0 ? <Empty /> : null}
       </List>
 
       <PageLinks list={list} setOffset={setOffset} />
@@ -236,4 +238,13 @@ const List = styled.ul<ListProps>`
       border: 2px solid var(--tina-color-primary);
       border-radius: var(--tina-radius-small);
     `}
+`
+
+const Empty = styled(props => {
+  return <div {...props}>Drag and Drop assets here</div>
+})`
+  font-size: 1.5rem;
+  opacity: 50%;
+  padding: 3rem;
+  text-align: center;
 `
