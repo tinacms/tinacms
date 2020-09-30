@@ -54,21 +54,21 @@ export const Menubar = ({ plugins, uploadImages, ...rest }: Props) => {
     <BaseMenubar
       {...rest}
       menus={[
-        <BlockMenu />,
-        <InlineMenu />,
-        <LinkMenu />,
-        <ImageMenu uploadImages={uploadImages} />,
-        <TableMenu />,
-        <QuoteMenu />,
-        <CodeBlockMenu />,
-        <ListMenu />,
-        <HistoryMenu />,
+        <BlockMenu key="BlockMenu" />,
+        <InlineMenu key="InlineMenu" />,
+        <LinkMenu key="LinkMenu" />,
+        <ImageMenu key="ImageMenu" uploadImages={uploadImages} />,
+        <TableMenu key="TableMenu" />,
+        <QuoteMenu key="QuoteMenu" />,
+        <CodeBlockMenu key="CodeBlockMenu" />,
+        <ListMenu key="ListMenu" />,
+        <HistoryMenu key="HistoryMenu" />,
       ]}
       popups={[
-        <TablePopups />,
-        <ImageEditPopup />,
-        <LinkFormPopup />,
-        <ImageLoader />,
+        <TablePopups key="TablePopups" />,
+        <ImageEditPopup key="ImageEditPopup" />,
+        <LinkFormPopup key="LinkFormPopup" />,
+        <ImageLoader key="ImageLoader" />,
       ]}
       plugins={plugins}
     />
