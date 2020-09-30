@@ -163,15 +163,21 @@ export function MediaPicker({
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
-        {list.items.map((item: Media) => (
-          <MediaItem
-            item={item}
-            onClick={onClickMediaItem}
-            onSelect={selectMediaItem}
-            onDelete={deleteMediaItem}
-          />
-        ))}
-        {list.items.length === 0 ? <Empty /> : null}
+        {cms.media.isConfigured ? (
+          <>
+            {list.items.map((item: Media) => (
+              <MediaItem
+                item={item}
+                onClick={onClickMediaItem}
+                onSelect={selectMediaItem}
+                onDelete={deleteMediaItem}
+              />
+            ))}
+            {list.items.length === 0 ? <Empty /> : null}
+          </>
+        ) : (
+          <SetupMediaManager />
+        )}
       </List>
 
       <PageLinks list={list} setOffset={setOffset} />
@@ -246,4 +252,27 @@ const Empty = styled(props => {
   opacity: 50%;
   padding: 3rem;
   text-align: center;
+`
+
+const SetupMediaManager = styled(props => {
+  return (
+    <div {...props}>
+      <h2>Please Setup Media</h2>
+      <div>
+        {' '}
+        Visit the{' '}
+        <a href="https://tinacms.org/docs/media" rel="noreferrer noopener">
+          docs
+        </a>{' '}
+        to learn more about setting up the Media Manager for your CMS.
+      </div>
+    </div>
+  )
+})`
+  text-align: center;
+  a {
+    color: black;
+    text-decoration: underline;
+    font-weight: bold;
+  }
 `
