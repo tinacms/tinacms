@@ -4,11 +4,10 @@
   "description": "",
   "main": "dist/index.js",
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom --passWithNoTests",
-    "lint": "tsdx lint"
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jestest --env=jsdom --passWithNoTests"
   },
   "author": "",
   "license": "Apache-2.0",
@@ -24,6 +23,7 @@
     "tinacms": ">=0.19"
   },
   "devDependencies": {
+    "@tinacms/scripts": "^0.29.0",
     "@tinacms/alerts": "^0.31.0-alpha.5",
     "@tinacms/core": "^0.31.0-alpha.5",
     "@tinacms/fields": "^0.31.0-alpha.5",

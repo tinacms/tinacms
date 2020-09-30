@@ -15,11 +15,10 @@
     "directory": "packages/next-tinacms-markdown"
   },
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom",
-    "lint": "tsdx lint",
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jestest --env=jsdom --passWithNoTests",
     "docs": "npx typedoc"
   },
   "peerDependencies": {
@@ -32,6 +31,7 @@
     "js-yaml": "^3.13.1"
   },
   "devDependencies": {
+    "@tinacms/scripts": "^0.29.0",
     "tinacms": "^0.31.0-alpha.5"
   }
 }
