@@ -105,7 +105,7 @@ const nextOffset = (offset: number, limit: number, count: number) => {
 }
 
 const contentToMedia = (item: GithubContent): Media => {
-  const previewable = ['.jpg', '.jpeg', '.png', '.webp']
+  const previewable = ['.jpg', '.jpeg', '.png', '.webp', '.svg']
   const mediaItem: Media = {
     id: item.path,
     filename: item.name,
