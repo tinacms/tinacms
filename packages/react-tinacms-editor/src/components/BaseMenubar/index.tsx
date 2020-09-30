@@ -116,8 +116,8 @@ export const BaseMenubar = ({
         <MenuPortalProvider>
           <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
             {menus}
-            {plugins?.map(({ MenuItem }, i) => (
-              <MenuItem key={i} mode={mode} editorView={editorView} />
+            {plugins?.map(({ name, MenuItem }) => (
+              <MenuItem key={name} mode={mode} editorView={editorView} />
             ))}
           </MenuContainer>
         </MenuPortalProvider>
