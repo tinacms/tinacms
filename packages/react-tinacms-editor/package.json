@@ -9,14 +9,14 @@
     "dist"
   ],
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
     "storybook": "start-storybook -p 9001 -c .storybook",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom --passWithNoTests",
-    "lint": "tsdx lint"
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jestest --env=jsdom --passWithNoTests"
   },
   "devDependencies": {
+    "@tinacms/scripts": "^0.29.0",
     "@sambego/storybook-styles": "^1.0.0",
     "@storybook/addon-info": "^5.1.9",
     "@storybook/react": "^5.3.19",
