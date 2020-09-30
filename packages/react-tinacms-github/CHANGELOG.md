@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.30.0](https://github.com/tinacms/tinacms/compare/v0.29.0...v0.30.0) (2020-09-10)
+
+
+### Features
+
+* **react-tinacms-github:** introduce useGithubClient hook ([2111d70](https://github.com/tinacms/tinacms/commit/2111d70c289684d06eec3aeff89e7a76bd618a23)), closes [#1436](https://github.com/tinacms/tinacms/issues/1436)
+
+
+
+
+
+# [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
+
+**Note:** Version bump only for package react-tinacms-github
+
+
+
+
+
 # [0.28.0](https://github.com/tinacms/tinacms/compare/v0.27.3...v0.28.0) (2020-08-17)
 
 

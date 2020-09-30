@@ -12,7 +12,8 @@ limitations under the License.
 */
 
 import matter from 'gray-matter'
-import { useLocalMarkdownForm } from 'next-tinacms-markdown'
+import styled from 'styled-components'
+import { useMarkdownForm } from 'next-tinacms-markdown'
 import ReactMarkdown from 'react-markdown'
 import { useCMS } from 'tinacms'
 import {
@@ -29,7 +30,7 @@ import Layout from '../components/Layout'
 
 function Info(props) {
   const cms = useCMS()
-  const [data, form] = useLocalMarkdownForm(props.markdownFile, formOptions)
+  const [data, form] = useMarkdownForm(props.markdownFile, formOptions)
 
   return (
     <InlineForm form={form}>
@@ -87,13 +88,19 @@ function Info(props) {
           <div className="group">
             <InlineImage
               name="frontmatter.image"
-              previewSrc={formValues => {
-                return formValues.frontmatter.image
-              }}
               uploadDir={() => '/public/images/'}
-              parse={filename => `/images/${filename}`}
+              parse={media => media.id}
+              className="inline-img"
+              alt="blue-orange"
             />
-
+            <h1>INLINE IMAGE WITH CHILDREN</h1>
+            <StyledInlineImage
+              name="frontmatter.image"
+              uploadDir={() => '/public/images/'}
+              parse={media => media.id}
+            >
+              {props => <img src={props.src} />}
+            </StyledInlineImage>
             <InlineWysiwyg name="markdownBody">
               <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
             </InlineWysiwyg>
@@ -115,6 +122,10 @@ function Info(props) {
             div.group {
               margin-top: 2rem;
               padding: 1rem;
+            }
+
+            .inline-img {
+              background: pink;
             }
           `}
         </style>
@@ -164,3 +175,7 @@ Info.getInitialProps = async function() {
     },
   }
 }
+
+const StyledInlineImage = styled(InlineImage)`
+  background-color: red;
+`

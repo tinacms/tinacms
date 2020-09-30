@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/scripts",
-  "version": "0.26.0",
+  "version": "0.29.0",
   "license": "Apache-2.0",
   "main": "index.js",
   "repository": {

@@ -19,6 +19,7 @@ limitations under the License.
 import { MarkType, ResolvedPos } from 'prosemirror-model'
 import { EditorState } from 'prosemirror-state'
 import { EditorView } from 'prosemirror-view'
+import { isMarkPresent } from '../../../utils'
 
 type Dispatch = typeof EditorView.prototype.dispatch
 
@@ -58,24 +59,6 @@ function markExtend($cursor: ResolvedPos, markType: MarkType) {
   }
 
   return { from: startPos, to: endPos, mark }
-}
-
-export function insertLinkToFile(
-  state: EditorState,
-  dispatch: Dispatch | null,
-  url: string
-) {
-  if (dispatch) {
-    url = url || ''
-    const filenamePath = url.split('/')
-    const filename =
-      decodeURI(filenamePath[filenamePath.length - 1]) || 'Download File'
-    const attrs = { title: filename, href: url }
-    const schema = state.schema
-    const node = schema.text(attrs.title, [schema.marks.link.create(attrs)])
-    dispatch(state.tr.replaceSelectionWith(node, false))
-  }
-  return true
 }
 
 export function unmountLinkForm(view: EditorView) {
@@ -121,4 +104,24 @@ export function removeLinkBeingEdited(
     dispatch(tr)
   }
   return true
+}
+
+export const openLinkPopup = (state: EditorState, dispatch: Dispatch) => {
+  const { schema, selection } = state
+  const { marks } = schema
+  if (selection.empty && !isMarkPresent(state, marks.link)) return false
+
+  const tr = state.tr.setMeta('show_link_toolbar', true)
+  if (!isMarkPresent(state, marks.link)) {
+    const { $to, $from } = selection
+    tr.addMark(
+      $from.pos,
+      $to.pos,
+      marks.link.create({
+        href: '',
+        title: '',
+      })
+    )
+  }
+  return dispatch(tr)
 }

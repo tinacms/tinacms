@@ -120,7 +120,10 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
           }}
         >
           <ImageModalContent>
-            <StyledLabel htmlFor="fileInput">
+            <StyledLabel
+              htmlFor="fileInput"
+              onClick={evt => evt.stopPropagation()}
+            >
               <FileUploadInput
                 id="fileInput"
                 onChange={uploadSelectedImage}
@@ -319,7 +322,8 @@ const UploadText = styled.span`
   text-align: center;
   line-height: 1.2;
   color: var(--tina-color-grey-10);
-  max-width: 120px;
+  max-width: 140px;
+  white-space: break-spaces;
   display: block;
   margin: 0 auto;
 `
@@ -348,4 +352,6 @@ const FileUploadInput = styled.input`
   display: none;
 `
 
-const StyledLabel = styled.label``
+const StyledLabel = styled.label`
+  display: block;
+`

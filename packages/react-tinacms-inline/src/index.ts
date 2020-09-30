@@ -16,21 +16,20 @@ limitations under the License.
 
 */
 
-import React from 'react'
-import { render } from '@testing-library/react'
-
-import { Wysiwyg } from './index'
-
-describe('Wysiwyg', () => {
-  it('should render RawModeEditor', () => {
-    const { getByTestId } = render(
-      <Wysiwyg
-        input={{
-          onChange: () => {},
-          value: '',
-        }}
-      />
-    )
-    expect(getByTestId('wysiwyg-editor')).toBeDefined()
-  })
-})
+export * from './inline-form'
+export * from './inline-field'
+export * from './inline-field-context'
+export {
+  InlineText,
+  InlineTextField,
+  InlineTextProps,
+} from './fields/inline-text-field'
+export {
+  InlineTextarea,
+  InlineTextareaField,
+} from './fields/inline-textarea-field'
+export * from './fields/inline-image'
+export * from './inline-group'
+export { InlineSettings } from './inline-settings'
+export * from './blocks'
+export * from './styles'

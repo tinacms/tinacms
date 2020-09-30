@@ -34,8 +34,7 @@ import {
   TagsFieldPlugin,
 } from '@tinacms/fields'
 import { Form } from '@tinacms/forms'
-import { MediaManager, MediaStore, MediaUploadOptions } from '@tinacms/media'
-import { Alerts } from '@tinacms/alerts'
+import { Alerts, EventsToAlerts } from '@tinacms/alerts'
 import { SidebarState, SidebarStateOptions } from '@tinacms/react-sidebar'
 import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 import {
@@ -43,6 +42,7 @@ import {
   HtmlFieldPlaceholder,
   DateFieldPlaceholder,
 } from './plugins/fields/markdown'
+import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -65,22 +65,23 @@ const DEFAULT_FIELDS = [
 export interface TinaCMSConfig extends CMSConfig {
   sidebar?: SidebarStateOptions | boolean
   toolbar?: ToolbarStateOptions | boolean
-  media?: {
-    store: MediaStore
-  }
+  alerts?: EventsToAlerts
 }
 
 export class TinaCMS extends CMS {
   sidebar?: SidebarState
   toolbar?: ToolbarState
-  media: MediaManager
-  alerts = new Alerts(this.events)
+  _alerts?: Alerts
 
-  constructor({ sidebar, media, toolbar, ...config }: TinaCMSConfig = {}) {
+  constructor({
+    sidebar,
+    toolbar,
+    alerts = {},
+    ...config
+  }: TinaCMSConfig = {}) {
     super(config)
 
-    const mediaStore = media?.store || new DummyMediaStore()
-    this.media = new MediaManager(mediaStore)
+    this.alerts.setMap(alerts)
 
     if (sidebar) {
       const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined
@@ -97,6 +98,21 @@ export class TinaCMS extends CMS {
         this.fields.add(field)
       }
     })
+    this.plugins.add(MediaManagerScreenPlugin)
+  }
+
+  get alerts() {
+    if (!this._alerts) {
+      this._alerts = new Alerts(this.events)
+    }
+    return this._alerts
+  }
+
+  registerApi(name: string, api: any) {
+    if (api.alerts) {
+      this.alerts.setMap(api.alerts)
+    }
+    super.registerApi(name, api)
   }
 
   get forms(): PluginType<Form> {
@@ -109,20 +125,5 @@ export class TinaCMS extends CMS {
 
   get screens(): PluginType<ScreenPlugin> {
     return this.plugins.findOrCreateMap('screen')
-  }
-}
-
-class DummyMediaStore implements MediaStore {
-  accept = '*'
-  async persist(files: MediaUploadOptions[]) {
-    alert('UPLOADING FILES')
-    console.log(files)
-    return files.map(({ directory, file }) => ({
-      directory,
-      filename: file.name,
-    }))
-  }
-  async previewSrc(filename: string) {
-    return filename
   }
 }

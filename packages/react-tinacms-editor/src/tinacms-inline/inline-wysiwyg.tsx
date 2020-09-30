@@ -47,7 +47,7 @@ export function InlineWysiwyg({
           file,
         }))
 
-        const allMedia = await cms.media.store.persist(filesToUpload)
+        const allMedia = await cms.media.persist(filesToUpload)
 
         return allMedia.map(media => {
           if (passedInImageProps.parse) {
@@ -58,7 +58,7 @@ export function InlineWysiwyg({
         })
       },
       previewSrc(src) {
-        return cms.media.store.previewSrc(src)
+        return cms.media.previewSrc(src)
       },
       ...passedInImageProps,
     }

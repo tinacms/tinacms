@@ -682,7 +682,8 @@
       "profile": "https://pixelmord.github.io",
       "contributions": [
         "ideas",
-        "doc"
+        "doc",
+        "code"
       ]
     },
     {
@@ -775,6 +776,33 @@
       "contributions": [
         "doc",
         "bug"
+      ]
+    },
+    {
+      "login": "kedskeds",
+      "name": "Kelsey Edelstein",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/19883983?v=4",
+      "profile": "https://kedskeds.herokuapp.com",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "CodeItQuick",
+      "name": "CodeItQuick",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/10291643?v=4",
+      "profile": "https://github.com/CodeItQuick",
+      "contributions": [
+        "bug"
+      ]
+    },
+    {
+      "login": "mixja",
+      "name": "Justin Menga",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3351083?v=4",
+      "profile": "https://github.com/mixja",
+      "contributions": [
+        "code"
       ]
     }
   ],

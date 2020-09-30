@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-strapi",
-  "version": "0.28.0",
+  "version": "0.31.0-alpha.5",
   "description": "",
   "main": "build/index.js",
   "scripts": {
@@ -27,7 +27,7 @@
     "url": "https://github.com/tinacms/tinacms/issues"
   },
   "peerDependencies": {
-    "@tinacms/core": "^0.24.0",
+    "@tinacms/core": "^0.29.0",
     "@tinacms/fields": "^0.24.0",
     "@tinacms/media": "^0.24.0",
     "@tinacms/react-core": "^0.24.0",
@@ -43,14 +43,14 @@
     "styled-components": ">4.5"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.28.0",
-    "@tinacms/fields": "^0.28.0",
-    "@tinacms/media": "^0.28.0",
-    "@tinacms/react-core": "^0.28.0",
-    "@tinacms/react-forms": "^0.28.0",
-    "@tinacms/react-modals": "^0.28.0",
-    "@tinacms/scripts": "^0.26.0",
-    "@tinacms/styles": "^0.26.0",
+    "@tinacms/core": "^0.31.0-alpha.5",
+    "@tinacms/fields": "^0.31.0-alpha.5",
+    "@tinacms/media": "^0.31.0-alpha.5",
+    "@tinacms/react-core": "^0.31.0-alpha.5",
+    "@tinacms/react-forms": "^0.31.0-alpha.5",
+    "@tinacms/react-modals": "^0.31.0-alpha.5",
+    "@tinacms/scripts": "^0.29.0",
+    "@tinacms/styles": "^0.29.0",
     "react-final-form": "^6.3.0"
   }
 }

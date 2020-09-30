@@ -22,31 +22,27 @@ import { LinkIcon } from '@tinacms/icons'
 import { markControl } from '../../../components/MenuHelpers'
 import { isMarkPresent, formatKeymap } from '../../../utils'
 import { imagePluginKey } from '../../Image'
+import { openLinkPopup } from '../commands'
 
 export const ProsemirrorMenu = markControl({
   mark: 'link',
   Icon: LinkIcon,
   tooltip: formatKeymap('Link Mod-K'),
   selectionOnly: true,
-  defaultAttrs: {
-    href: '',
-    title: '',
-  },
   noMix: ['code'],
   isDisabled: (view: EditorView) => {
     const { schema, selection } = view.state
     const { marks, nodes } = schema
-    if (selection.empty) return true
+    if (selection.empty && !isMarkPresent(view.state, marks.link)) return true
     const selectedNode = selection.$from.node()
     const imagePluginState = imagePluginKey.getState(view.state)
     return (
-      isMarkPresent(view.state, marks.link) ||
       !!imagePluginState?.selectedImage ||
       (selectedNode && selectedNode.type === nodes.code_block)
     )
   },
-  onClick: (view: EditorView) => {
+  onMenuOptionClick: (view: EditorView) => {
     const { state, dispatch } = view
-    return dispatch(state.tr.setMeta('show_link_toolbar', true))
+    return openLinkPopup(state, dispatch)
   },
 })

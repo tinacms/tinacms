@@ -16,10 +16,13 @@ limitations under the License.
 
 */
 
-import { b64EncodeUnicode } from './base64'
 import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
+import { EventsToAlerts } from '@tinacms/alerts'
 export * from './authenticate'
+import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH } from '../events'
+import { b64EncodeUnicode } from './base64'
+import { EventBus } from '@tinacms/core'
 
 export interface GithubClientOptions {
   proxy: string
@@ -28,6 +31,7 @@ export interface GithubClientOptions {
   baseRepoFullName: string
   baseBranch?: string
   authScope?: AuthScope
+  defaultCommitMessage?: string
 }
 
 export interface Branch {
@@ -48,12 +52,26 @@ export class GithubClient {
   static WORKING_REPO_COOKIE_KEY = 'working_repo_full_name'
   static HEAD_BRANCH_COOKIE_KEY = 'head_branch'
 
+  events = new EventBus()
+
+  alerts: EventsToAlerts = {
+    [COMMIT]: () => ({
+      level: 'success',
+      message: `Saved Successfully: Changes committed to ${this.workingRepoFullName}`,
+    }),
+    [CHECKOUT_BRANCH]: event => ({
+      level: 'info',
+      message: 'Switched to branch ' + event.branchName,
+    }),
+  }
+
   proxy: string
   baseRepoFullName: string
   baseBranch: string
   clientId: string
   authCallbackRoute: string
   authScope: AuthScope
+  defaultCommitMessage: string
 
   constructor({
     proxy,
@@ -62,6 +80,7 @@ export class GithubClient {
     baseRepoFullName,
     baseBranch = 'master',
     authScope = 'public_repo',
+    defaultCommitMessage = 'Update from TinaCMS',
   }: GithubClientOptions) {
     this.proxy = proxy
     this.baseRepoFullName = baseRepoFullName
@@ -69,6 +88,7 @@ export class GithubClient {
     this.clientId = clientId
     this.authCallbackRoute = authCallbackRoute
     this.authScope = authScope
+    this.defaultCommitMessage = defaultCommitMessage
     this.validate()
   }
 
@@ -135,7 +155,7 @@ export class GithubClient {
       url: `https://api.github.com/repos/${this.baseRepoFullName}/pulls`,
       method: 'POST',
       data: {
-        title: title ? title : 'Update from TinaCMS',
+        title: title ? title : this.defaultCommitMessage,
         body: body ? body : 'Please pull these awesome changes in!',
         head: `${workingRepoFullName.split('/')[0]}:${headBranch}`,
         base: this.baseBranch,
@@ -153,6 +173,14 @@ export class GithubClient {
     return this.baseRepoFullName
   }
 
+  checkout(branch: string, repo?: string) {
+    if (repo) this.setWorkingRepoFullName(repo)
+    this.setWorkingBranch(branch)
+  }
+
+  /**
+   * @deprecated Call GithubClient#checkout instead
+   */
   setWorkingRepoFullName(repoFullName: string) {
     this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, repoFullName)
   }
@@ -167,8 +195,15 @@ export class GithubClient {
     return this.baseBranch
   }
 
+  /**
+   * @deprecated Call GithubClient#checkout instead
+   */
   setWorkingBranch(branch: string) {
     this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
+    this.events.dispatch({
+      type: CHECKOUT_BRANCH,
+      branchName: branch,
+    })
   }
 
   async fetchExistingPR() {
@@ -230,7 +265,7 @@ export class GithubClient {
   async createBranch(name: string) {
     const currentBranch = await this.getBranch()
     const sha = currentBranch.object.sha
-    return this.req({
+    const response = await this.req({
       url: `https://api.github.com/repos/${this.workingRepoFullName}/git/refs`,
       method: 'POST',
       data: {
@@ -238,18 +273,24 @@ export class GithubClient {
         sha,
       },
     })
+
+    this.events.dispatch({
+      type: CREATE_BRANCH,
+      branchName: name,
+    })
+
+    return response
   }
 
   async commit(
     filePath: string,
     sha: string,
     fileContents: string,
-    commitMessage: string = 'Update from TinaCMS'
+    commitMessage: string = this.defaultCommitMessage
   ) {
     const repo = this.workingRepoFullName
     const branch = this.branchName
-
-    return this.req({
+    const response = await this.req({
       url: `https://api.github.com/repos/${repo}/contents/${removeLeadingSlash(
         filePath
       )}`,
@@ -261,6 +302,8 @@ export class GithubClient {
         branch: branch,
       },
     })
+    this.events.dispatch({ type: COMMIT, response })
+    return response
   }
 
   async getDownloadUrl(path: string): Promise<string> {
@@ -289,7 +332,7 @@ export class GithubClient {
   async githubFileApi(
     path: string,
     fileContents: string,
-    commitMessage: string = 'Update from TinaCMS',
+    commitMessage: string = this.defaultCommitMessage,
     encoded: boolean = false,
     method: 'PUT' | 'DELETE'
   ) {
@@ -318,7 +361,7 @@ export class GithubClient {
   async upload(
     path: string,
     fileContents: string,
-    commitMessage: string = 'Update from TinaCMS',
+    commitMessage: string = this.defaultCommitMessage,
     encoded: boolean = false
   ) {
     return this.githubFileApi(path, fileContents, commitMessage, encoded, 'PUT')

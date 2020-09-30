@@ -19,66 +19,11 @@ limitations under the License.
 /**
  * Represents an individual file in the MediaStore
  */
-export interface Media {
-  /**
-   * The directory where the file is stored.
-   */
-  directory: string
-  /**
-   * The name of the file.
-   */
-  filename: string
-}
-
-export interface MediaUploadOptions {
-  /**
-   * The directory where the file should be stored.
-   */
-  directory: string
-  /**
-   * The File to be uploaded.
-   */
-  file: File
-}
-
-/**
- * Represents some external service for storing and
- * managing media.
- */
-export interface MediaStore {
-  /**
-   * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)
-   * that describes what kind of files the Media Store will accept.
-   */
-  accept: string
-  /**
-   * Uploads a set of files to the Media Store and
-   * returns a Promise containing the Media objects
-   * for those files.
-   */
-  persist(files: MediaUploadOptions[]): Promise<Media[]>
-
-  /**
-   * Given a `src` string it returns a url for previewing that content.
-   * This is helpful in cases where the file may not be available in production yet.
-   */
-  previewSrc(src: string): Promise<string>
-}
-
-/**
- * The central object for all things media.
- *
- * Meant to be placed directly on the `cms`
- *
- * ```ts
- * cms.media = new MediaManager({
- *   accept: '*',
- *   async persist(files) {
- *     // do something
- *   }
- * })
- * ```
- */
-export class MediaManager {
-  constructor(public store: MediaStore) {}
-}
+export {
+  Media,
+  MediaUploadOptions,
+  MediaStore,
+  MediaListOptions,
+  MediaList,
+  MediaManager,
+} from '@tinacms/core'

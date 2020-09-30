@@ -16,9 +16,16 @@ limitations under the License.
 
 */
 
-import { MediaStore, MediaUploadOptions, Media } from 'tinacms'
+import {
+  MediaStore,
+  MediaUploadOptions,
+  Media,
+  MediaList,
+  MediaListOptions,
+} from '@tinacms/core'
 import { GithubClient } from '../github-client'
 import base64File from './base64File'
+import path from 'path'
 
 export class GithubMediaStore implements MediaStore {
   accept = '*'
@@ -30,25 +37,34 @@ export class GithubMediaStore implements MediaStore {
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     const uploaded: Media[] = []
     for (const { file, directory } of files) {
-      const path =
-        directory.charAt(0) === '/'
-          ? (directory + file.name).slice(1) // drop the first '/'
-          : directory + file.name
+      let mediaPath = path.join(directory, file.name)
+      if (mediaPath.charAt(0) === '/') {
+        mediaPath = mediaPath.slice(1)
+      }
 
       try {
         const content = (await base64File(file)).toString().split(',')[1] // only need the data piece
-        await this.githubClient.upload(path, content, 'Upload', true)
+        const uploadResponse: GithubUploadResposne = await this.githubClient.upload(
+          mediaPath,
+          content,
+          'Upload',
+          true
+        )
 
-        uploaded.push({
-          directory: directory,
-          filename: file.name,
-        })
+        uploaded.push(contentToMedia(uploadResponse.content))
       } catch (e) {
         console.warn('Failed to upload content to Github: ' + e)
       }
     }
 
     return uploaded
+  }
+
+  async delete(media: Media) {
+    await this.githubClient.delete(
+      path.join(media.directory, media.filename),
+      `Deleted ${media.filename}`
+    )
   }
 
   async previewSrc(src: string) {
@@ -58,4 +74,63 @@ export class GithubMediaStore implements MediaStore {
       return src
     }
   }
+
+  async list(options?: MediaListOptions): Promise<MediaList> {
+    const directory = options?.directory ?? ''
+    const offset = options?.offset ?? 0
+    const limit = options?.limit ?? 50
+
+    const unfilteredItems: GithubContent[] = await this.githubClient.fetchFile(
+      directory
+    )
+
+    const items = unfilteredItems.filter(function filterByAccept() {
+      // TODO
+      return true
+    })
+
+    return {
+      items: items.map(contentToMedia).slice(offset, offset + limit),
+      offset,
+      limit,
+      nextOffset: nextOffset(offset, limit, items.length),
+      totalCount: items.length,
+    }
+  }
+}
+
+const nextOffset = (offset: number, limit: number, count: number) => {
+  if (offset + limit < count) return offset + limit
+  return undefined
+}
+
+const contentToMedia = (item: GithubContent): Media => {
+  const previewable = ['.jpg', '.jpeg', '.png', '.webp']
+  const mediaItem: Media = {
+    id: item.path,
+    filename: item.name,
+    directory: item.path.slice(0, item.path.length - item.name.length),
+    type: item.type,
+  }
+
+  if (previewable.includes(path.extname(item.name).toLowerCase())) {
+    mediaItem.previewSrc = item.download_url
+  }
+
+  return mediaItem
+}
+
+interface GithubUploadResposne {
+  content: GithubContent
+}
+
+interface GithubContent {
+  name: string
+  path: string // directory + name
+  size: number
+  type: 'file' | 'dir'
+  url: string
+  download_url: string // For Previewing
+  git_url: string
+  html_url: string
 }

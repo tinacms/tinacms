@@ -42,6 +42,19 @@ export interface InlineBlocksProps {
   }
   min?: number
   max?: number
+  components?: {
+    Container?: React.FunctionComponent<BlocksContainerProps>
+  }
+}
+
+export interface BlocksContainerProps {
+  innerRef: React.Ref<any>
+  className?: string
+}
+
+const DefaultContainer = (props: BlocksContainerProps) => {
+  const { innerRef, ...otherProps } = props
+  return <div ref={innerRef} {...otherProps} />
 }
 
 export interface InlineBlocksActions {
@@ -76,11 +89,12 @@ export function useInlineBlocks() {
 export function InlineBlocks({
   name,
   blocks,
-  className,
+  className = '',
   direction = 'vertical',
   itemProps,
   min,
   max,
+  components = {},
 }: InlineBlocksProps) {
   const cms = useCMS()
   const [activeBlock, setActiveBlock] = useState(-1)
@@ -119,10 +133,12 @@ export function InlineBlocks({
           setFocussedField(`${name}.${index}`)
         }
 
+        const Container = components.Container || DefaultContainer
+
         return (
           <Droppable droppableId={name} type={name} direction={direction}>
             {provider => (
-              <div ref={provider.innerRef} className={className}>
+              <Container innerRef={provider.innerRef} className={className}>
                 {
                   <InlineBlocksContext.Provider
                     value={{
@@ -174,7 +190,7 @@ export function InlineBlocks({
                     {provider.placeholder}
                   </InlineBlocksContext.Provider>
                 }
-              </div>
+              </Container>
             )}
           </Droppable>
         )

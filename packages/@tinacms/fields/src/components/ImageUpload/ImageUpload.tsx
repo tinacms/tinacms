@@ -26,6 +26,7 @@ import { LoadingDots } from '@tinacms/react-forms'
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
   onClear?: () => void
+  onClick?: () => void
   value?: string
   previewSrc?: string
   loading?: boolean
@@ -103,6 +104,7 @@ const StyledImageContainer = styled.div`
 export const ImageUpload = ({
   onDrop,
   onClear,
+  onClick,
   value,
   previewSrc,
   loading,
@@ -110,10 +112,11 @@ export const ImageUpload = ({
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
     onDrop,
+    noClick: !!onClick,
   })
 
   return (
-    <DropArea {...getRootProps()}>
+    <DropArea {...getRootProps()} onClick={onClick}>
       <input {...getInputProps()} />
       {value ? (
         <StyledImageContainer>

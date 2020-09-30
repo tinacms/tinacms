@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { InlineImageProps, InlineImage } from '../fields/inline-image-field'
+import { InlineImageProps, InlineImage } from '../fields/inline-image'
 
 /**
  * @deprecated

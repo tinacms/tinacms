@@ -210,6 +210,9 @@ export interface InlineBlocksProps {
   }
   min?: number
   max?: number
+  components?: {
+    Container?: React.FunctionComponent<BlocksContainerProps>
+  }
 }
 ```
 
@@ -492,5 +495,57 @@ const PAGE_BLOCKS = {
 }
 ```
 
+**Configuring the drag and drop Container**
+
+`InlineBlocks` wraps your blocks with a `<div>` element that informs the drag and drop functionality of what can be dragged and dropped.
+
+This can be an issue if your styles require direct inheritance, such as a flexbox grid:
+
+```html
+<div class="row">
+  <div class="column">
+  </div>
+</div>
+```
+
+To handle this, you can pass a "render function" as the child of the `InlineBlocks` component to control the container that renders the the child blocks. 
+
+**Interface**
+
+```ts
+interface BlocksContainerProps {
+  innerRef: React.Ref<any>
+  className?: string
+}
+```
+
+**Example** 
+
+```js
+import { useJsonForm } from 'next-tinacms-json'
+import { InlineForm, InlineBlocks, BlocksControls, InlineTextarea } from 'react-tinacms-inline'
+
+const MyBlocksContainer = ({innerRef, children}) => (
+  <div ref={innerRef}>
+    {children}
+  </div>
+)
+
+export default function PageBlocks({ jsonFile }) {
+  const [, form] = useJsonForm(jsonFile)
+
+  return (
+    <InlineForm form={form}>
+      <InlineBlocks
+        name="my_blocks"
+        blocks={PAGE_BLOCKS}
+        components={{
+          Container: MyBlocksContainer
+        }}
+      />
+    </InlineForm>
+  )
+}
+```
 
 > Checkout this guide to learn more on using [Inline Blocks](https://tinacms.org/guides/general/inline-blocks/overview).

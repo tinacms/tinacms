@@ -24,14 +24,21 @@ import { InlineFieldContext } from './inline-field-context'
 
 export interface InlineFieldProps {
   name: string
-  children(fieldProps: InlineFieldRenderProps): React.ReactElement
+  parse?(value: any): any
+  format?(value: any): any
+  children(fieldProps: InlineFieldRenderProps): React.ReactNode
 }
 
 export interface InlineFieldRenderProps<V = any>
   extends FieldRenderProps<V>,
     InlineFormState {}
 
-export function InlineField({ name, children }: InlineFieldProps) {
+export function InlineField({
+  name,
+  parse,
+  format,
+  children,
+}: InlineFieldProps) {
   const formState = useInlineForm()
 
   let fieldName = name
@@ -43,7 +50,7 @@ export function InlineField({ name, children }: InlineFieldProps) {
   }
 
   return (
-    <Field name={fieldName}>
+    <Field name={fieldName} parse={parse} format={format}>
       {fieldProps => {
         return children({
           ...fieldProps,

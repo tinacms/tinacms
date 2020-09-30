@@ -16,24 +16,16 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-context'
-export {
-  InlineText,
-  InlineTextField,
-  InlineTextProps,
-} from './fields/inline-text-field'
-export {
-  InlineTextarea,
-  InlineTextareaField,
-} from './fields/inline-textarea-field'
-export {
-  InlineImage,
-  InlineImageField,
-  InlineImageProps,
-} from './fields/inline-image-field'
-export * from './inline-group'
-export { InlineSettings } from './inline-settings'
-export * from './blocks'
-export * from './styles'
+import { MediaIcon } from '@tinacms/icons'
+import { createScreen } from '@tinacms/react-screens'
+import { MediaPicker } from '../../components/media'
+
+export const MediaManagerScreenPlugin = createScreen({
+  name: 'Media Manager',
+  Component: MediaPicker,
+  Icon: MediaIcon,
+  layout: 'fullscreen',
+  props: {
+    allowDelete: true,
+  },
+})

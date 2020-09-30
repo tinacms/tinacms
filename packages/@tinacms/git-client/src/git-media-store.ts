@@ -15,7 +15,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-import { MediaStore, MediaUploadOptions, Media } from '@tinacms/media'
+import {
+  MediaStore,
+  MediaUploadOptions,
+  Media,
+  MediaListOptions,
+  MediaList,
+} from '@tinacms/core'
 import { GitClient } from './git-client'
 
 export class GitMediaStore implements MediaStore {
@@ -37,6 +43,9 @@ export class GitMediaStore implements MediaStore {
       const { filename }: { filename: string } = await response.json()
 
       uploaded.push({
+        // TODO: Implement correctly
+        id: filename,
+        type: 'file',
         directory,
         filename,
       })
@@ -47,4 +56,32 @@ export class GitMediaStore implements MediaStore {
   async previewSrc(src: string) {
     return src
   }
+  async list(options?: MediaListOptions): Promise<MediaList> {
+    const directory = options?.directory ?? ''
+    const offset = options?.offset ?? 0
+    const limit = options?.limit ?? 50
+    const { file } = await this.client.getFile(directory)
+
+    return {
+      items: file.content.slice(offset, offset + limit).map((media: Media) => ({
+        ...media,
+        previewSrc:
+          media.type === 'file' ? this.previewSrc(media.id) : undefined,
+      })),
+      totalCount: file.content.length,
+      offset,
+      limit,
+      nextOffset: nextOffset(offset, limit, file.content.length),
+    }
+  }
+  async delete(media: Media): Promise<void> {
+    return this.client.deleteFromDisk({
+      relPath: media.id,
+    })
+  }
+}
+
+const nextOffset = (offset: number, limit: number, count: number) => {
+  if (offset + limit < count) return offset + limit
+  return undefined
 }

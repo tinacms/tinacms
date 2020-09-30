@@ -19,87 +19,105 @@ limitations under the License.
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import { InputProps, ImageUpload } from '../components'
+import { Media, MediaStore } from '@tinacms/core'
 import { useCMS } from '@tinacms/react-core'
 import { parse } from './textFormat'
 import { useState, useEffect } from 'react'
 
-type FieldProps = any
 interface ImageProps {
   path: string
-  previewSrc?(form: any, field: FieldProps): string | Promise<string>
-  uploadDir(form: any): string
+  previewSrc?: MediaStore['previewSrc']
+  uploadDir?(form: any): string
   clearable?: boolean // defaults to true
+}
+
+export function usePreviewSrc(
+  value: string,
+  fieldName: string,
+  formValues: any,
+  getPreviewSrc?: MediaStore['previewSrc']
+): [string, boolean] {
+  const cms = useCMS()
+  const getSrc = getPreviewSrc || cms.media.previewSrc
+  const [{ src, loading }, setState] = useState({
+    src: '',
+    loading: true,
+  })
+
+  useEffect(() => {
+    let componentUnmounted = false
+    let tmpSrc = ''
+    ;(async () => {
+      try {
+        tmpSrc = await getSrc(value, fieldName, formValues)
+      } catch {}
+
+      if (componentUnmounted) return
+
+      setState({
+        src: tmpSrc,
+        loading: false,
+      })
+    })()
+
+    return () => {
+      componentUnmounted = true
+    }
+  }, [value])
+
+  return [src, loading]
 }
 
 export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   const cms = useCMS()
+  const { form, field } = props
+  const { name, value } = props.input
+  const [src, srcIsLoading] = usePreviewSrc(
+    value,
+    name,
+    form.getState().values,
+    field.previewSrc
+  )
 
-  const [srcIsLoading, setSrcIsLoading] = useState(true)
-  const [src, setSrc] = useState('')
-  useEffect(() => {
-    let canceled = false
-    ;(async () => {
-      setSrcIsLoading(true)
-      let imageSrc = ''
-      try {
-        if (props.field.previewSrc) {
-          imageSrc = await props.field.previewSrc(
-            props.form.getState().values,
-            props
-          )
-        } else {
-          // @ts-ignore cms.alerts
-          imageSrc = await cms.media.store.previewSrc(props.input.value)
-        }
-      } catch (e) {
-        if (!canceled) {
-          setSrc('')
-          // @ts-ignore cms.alerts
-          cms.alerts.error(
-            `Failed to generate preview for '${props.field.name}': ${e.message}`
-          )
-        }
-      }
-      if (!canceled) {
-        setSrc(imageSrc)
-      }
-      setSrcIsLoading(false)
-    })()
-    return () => {
-      canceled = true
+  let onClear: any
+  if (props.field.clearable) {
+    onClear = () => onChange()
+  }
+
+  function onChange(media?: Media) {
+    if (media) {
+      props.input.onChange('')
+      props.input.onChange(media)
     }
-  }, [props.input.value])
+  }
+
+  const uploadDir = props.field.uploadDir || (() => '')
 
   return (
     <ImageUpload
-      value={props.input.value}
+      value={value}
       previewSrc={src}
       loading={srcIsLoading}
+      onClick={() => {
+        const directory = uploadDir(props.form.getState().values)
+        cms.media.open({
+          directory,
+          onSelect: onChange,
+        })
+      }}
       onDrop={async ([file]: File[]) => {
-        const directory = props.field.uploadDir(props.form.getState().values)
-        // @ts-ignore cms.media
-        const [media] = await cms.media.store.persist([
+        const directory = uploadDir(props.form.getState().values)
+
+        const [media] = await cms.media.persist([
           {
             directory,
             file,
           },
         ])
-        if (media) {
-          if (media.filename == props.input.value) {
-            props.input.onChange('') // trigger rerender
-          }
-          props.input.onChange(media.filename)
-        } else {
-          // TODO Handle failure
-        }
+
+        onChange(media)
       }}
-      onClear={
-        props.field.clearable === false
-          ? undefined
-          : () => {
-              props.input.onChange('')
-            }
-      }
+      onClear={onClear}
     />
   )
 })

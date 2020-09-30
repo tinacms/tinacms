@@ -3,6 +3,8 @@
 # Deletes all node_modules
 lerna clean -y
 
+rm -rf node_modules
+
 # Directories to be deleted
 declare -a build_dirs
 

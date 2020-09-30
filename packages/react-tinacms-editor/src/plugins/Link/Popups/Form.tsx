@@ -53,10 +53,12 @@ export const LinkForm = () => {
 
   const onChange = (attrs: any) => {
     updateLinkBeingEdited(view.state, view.dispatch, attrs)
+    view.focus()
   }
 
   const onCancel = () => {
     unmountLinkForm(view)
+    view.focus()
   }
 
   const wrapperRef = createRef<any>()
