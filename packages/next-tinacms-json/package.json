@@ -18,7 +18,7 @@
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jestest --env=jsdom --passWithNoTests",
+    "test": "jest --env=jsdom --passWithNoTests",
     "docs": "npx typedoc"
   },
   "peerDependencies": {

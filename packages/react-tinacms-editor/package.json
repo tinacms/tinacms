@@ -13,7 +13,7 @@
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
-    "test": "jestest --env=jsdom --passWithNoTests"
+    "test": "jest --env=jsdom --passWithNoTests"
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.29.0",
