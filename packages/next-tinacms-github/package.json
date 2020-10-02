@@ -3,18 +3,19 @@
   "version": "0.31.0-alpha.5",
   "description": "",
   "main": "dist/index.js",
+  "types": "dist/index.d.ts",
   "scripts": {
-    "watch": "tsdx watch",
-    "build": "tsdx build",
-    "dev": "tsdx build",
-    "test": "tsdx test --env=jsdom --passWithNoTests",
-    "lint": "tsdx lint"
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jest --env=jsdom --passWithNoTests"
   },
   "author": "",
   "license": "Apache-2.0",
   "devDependencies": {
     "@types/cookie": "0.3.3",
     "@types/crypto-js": "^3.1.47",
+    "@tinacms/scripts": "^0.29.0",
     "@types/uuid": "^8.0.0"
   },
   "dependencies": {
