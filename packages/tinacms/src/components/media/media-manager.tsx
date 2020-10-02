@@ -163,14 +163,21 @@ export function MediaPicker({
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
-        {list.items.map((item: Media) => (
-          <MediaItem
-            item={item}
-            onClick={onClickMediaItem}
-            onSelect={selectMediaItem}
-            onDelete={deleteMediaItem}
-          />
-        ))}
+        {cms.media.isConfigured ? (
+          <>
+            {list.items.map((item: Media) => (
+              <MediaItem
+                item={item}
+                onClick={onClickMediaItem}
+                onSelect={selectMediaItem}
+                onDelete={deleteMediaItem}
+              />
+            ))}
+            {list.items.length === 0 ? <Empty /> : null}
+          </>
+        ) : (
+          <SetupMediaManager />
+        )}
       </List>
 
       <PageLinks list={list} setOffset={setOffset} />
@@ -224,7 +231,8 @@ interface ListProps {
 const List = styled.ul<ListProps>`
   display: flex;
   flex-direction: column;
-  padding-bottom: 2rem;
+  padding: 0 0 2rem 0;
+  margin: 0;
   height: 100%;
   overflow-y: scroll;
   overflow-x: hidden;
@@ -235,4 +243,36 @@ const List = styled.ul<ListProps>`
       border: 2px solid var(--tina-color-primary);
       border-radius: var(--tina-radius-small);
     `}
+`
+
+const Empty = styled(props => {
+  return <div {...props}>Drag and Drop assets here</div>
+})`
+  font-size: 1.5rem;
+  opacity: 50%;
+  padding: 3rem;
+  text-align: center;
+`
+
+const SetupMediaManager = styled(props => {
+  return (
+    <div {...props}>
+      <h2>Please Setup Media</h2>
+      <div>
+        {' '}
+        Visit the{' '}
+        <a href="https://tinacms.org/docs/media" rel="noreferrer noopener">
+          docs
+        </a>{' '}
+        to learn more about setting up the Media Manager for your CMS.
+      </div>
+    </div>
+  )
+})`
+  text-align: center;
+  a {
+    color: black;
+    text-decoration: underline;
+    font-weight: bold;
+  }
 `

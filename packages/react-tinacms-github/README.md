@@ -123,9 +123,7 @@ const cms = new TinaCMS({
   apis: {
     github: githubClient // equivalent to cms.registerApi('github', githubClient)
   },
-  media: {
-    store: mediaStore
-  }
+  media: mediaStore
 })
 ```
 

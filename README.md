@@ -1,6 +1,5 @@
 [![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg) [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-77-orange.svg?style=flat-square)](#contributors-)
-
+[![All Contributors](https://img.shields.io/badge/all_contributors-79-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tinacms.org/)
@@ -137,7 +136,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="https://amyskapers.dev"><img src="https://avatars2.githubusercontent.com/u/15953185?v=4" width="100px;" alt=""/><br /><sub><b>Amy Kapernick</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Aamykapernick" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://samullman.com"><img src="https://avatars3.githubusercontent.com/u/10147333?v=4" width="100px;" alt=""/><br /><sub><b>Sam Ullman</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Asamullman" title="Bug reports">🐛</a></td>
-    <td align="center"><a href="https://pixelmord.github.io"><img src="https://avatars2.githubusercontent.com/u/224168?v=4" width="100px;" alt=""/><br /><sub><b>Andreas Adam</b></sub></a><br /><a href="#ideas-pixelmord" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/tinacms/tinacms/commits?author=pixelmord" title="Documentation">📖</a></td>
+    <td align="center"><a href="https://pixelmord.github.io"><img src="https://avatars2.githubusercontent.com/u/224168?v=4" width="100px;" alt=""/><br /><sub><b>Andreas Adam</b></sub></a><br /><a href="#ideas-pixelmord" title="Ideas, Planning, & Feedback">🤔</a> <a href="https://github.com/tinacms/tinacms/commits?author=pixelmord" title="Documentation">📖</a> <a href="https://github.com/tinacms/tinacms/commits?author=pixelmord" title="Code">💻</a></td>
     <td align="center"><a href="http://stephensugden.com"><img src="https://avatars3.githubusercontent.com/u/82634?v=4" width="100px;" alt=""/><br /><sub><b>Stephen Sugden</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=grncdr" title="Documentation">📖</a></td>
     <td align="center"><a href="https://www.logan.bio"><img src="https://avatars2.githubusercontent.com/u/43075109?v=4" width="100px;" alt=""/><br /><sub><b>Logan Anderson</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=logan-anderson" title="Code">💻</a></td>
     <td align="center"><a href="https://github.com/isabellabrookes"><img src="https://avatars1.githubusercontent.com/u/12928252?v=4" width="100px;" alt=""/><br /><sub><b>Isabella Brookes</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=isabellabrookes" title="Code">💻</a></td>
@@ -151,6 +150,10 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://jan.vlnas.cz/"><img src="https://avatars3.githubusercontent.com/u/616767?v=4" width="100px;" alt=""/><br /><sub><b>Jan Vlnas</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=jnv" title="Documentation">📖</a></td>
     <td align="center"><a href="http://www.omarcostahamido.com"><img src="https://avatars0.githubusercontent.com/u/18335360?v=4" width="100px;" alt=""/><br /><sub><b>Omar Costa Hamido</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=omarcostahamido" title="Documentation">📖</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Aomarcostahamido" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://kedskeds.herokuapp.com"><img src="https://avatars3.githubusercontent.com/u/19883983?v=4" width="100px;" alt=""/><br /><sub><b>Kelsey Edelstein</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=kedskeds" title="Documentation">📖</a></td>
+  </tr>
+  <tr>
+    <td align="center"><a href="https://github.com/CodeItQuick"><img src="https://avatars3.githubusercontent.com/u/10291643?v=4" width="100px;" alt=""/><br /><sub><b>CodeItQuick</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3ACodeItQuick" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/mixja"><img src="https://avatars1.githubusercontent.com/u/3351083?v=4" width="100px;" alt=""/><br /><sub><b>Justin Menga</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=mixja" title="Code">💻</a></td>
   </tr>
 </table>
 

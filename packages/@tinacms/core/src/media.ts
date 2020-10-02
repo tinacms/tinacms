@@ -1,3 +1,4 @@
+import { DummyMediaStore } from './media-store.default'
 /**
 
 Copyright 2019 Forestry.io Inc
@@ -132,6 +133,10 @@ export interface MediaList {
 export class MediaManager implements MediaStore {
   constructor(public store: MediaStore, private events: EventBus) {}
 
+  get isConfigured() {
+    return !(this.store instanceof DummyMediaStore)
+  }
+
   open(options: SelectMediaOptions = {}) {
     this.events.dispatch({
       type: 'media:open',
@@ -228,5 +233,6 @@ export class MediaManager implements MediaStore {
 }
 
 export interface SelectMediaOptions {
+  directory?: string
   onSelect?(media: Media): void
 }

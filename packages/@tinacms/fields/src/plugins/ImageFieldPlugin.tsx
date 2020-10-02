@@ -99,7 +99,9 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       previewSrc={src}
       loading={srcIsLoading}
       onClick={() => {
+        const directory = uploadDir(props.form.getState().values)
         cms.media.open({
+          directory,
           onSelect: onChange,
         })
       }}
