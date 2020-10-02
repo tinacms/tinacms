@@ -121,7 +121,6 @@ There are two reasons this error might occur:
 
    This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
 
-##
 
 ## Release Process
 
