@@ -31,6 +31,7 @@ import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, PageLinks } from './index'
+import { LoadingDots } from '@tinacms/react-forms'
 
 export interface MediaRequest {
   limit?: number
@@ -67,12 +68,19 @@ export function MediaManager() {
   )
 }
 
+type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured'
+
 export function MediaPicker({
   allowDelete,
   onSelect,
   close,
   ...props
 }: MediaRequest) {
+  const cms = useCMS()
+  const [listState, setListState] = useState<MediaListState>(() => {
+    if (cms.media.isConfigured) return 'loading'
+    return 'not-configured'
+  })
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
   )
@@ -84,11 +92,18 @@ export function MediaPicker({
     items: [],
     totalCount: 0,
   })
-  const cms = useCMS()
 
   useEffect(() => {
     function loadMedia() {
-      cms.media.list({ offset, limit, directory }).then(setList)
+      cms.media
+        .list({ offset, limit, directory })
+        .then(list => {
+          setList(list)
+          setListState('loaded')
+        })
+        .catch(() => {
+          setListState('error')
+        })
     }
 
     loadMedia()
@@ -98,8 +113,6 @@ export function MediaPicker({
       loadMedia
     )
   }, [offset, limit, directory])
-
-  if (!list) return <div>Loading...</div>
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
@@ -153,6 +166,18 @@ export function MediaPicker({
 
   useEffect(disableScrollBody, [])
 
+  if (listState === 'loading') {
+    return <LoadingMediaList />
+  }
+
+  if (listState === 'not-configured') {
+    return <DocsLink title="Please Setup Media" />
+  }
+
+  if (listState === 'error') {
+    return <DocsLink title="Failed to Load Media" />
+  }
+
   return (
     <MediaPickerWrap>
       <Header>
@@ -163,27 +188,40 @@ export function MediaPicker({
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
-        {cms.media.isConfigured ? (
-          <>
-            {list.items.map((item: Media) => (
-              <MediaItem
-                item={item}
-                onClick={onClickMediaItem}
-                onSelect={selectMediaItem}
-                onDelete={deleteMediaItem}
-              />
-            ))}
-            {list.items.length === 0 ? <Empty /> : null}
-          </>
-        ) : (
-          <SetupMediaManager />
+
+        {listState === 'loaded' && list.items.length === 0 && (
+          <EmptyMediaList />
         )}
+
+        {list.items.map((item: Media) => (
+          <MediaItem
+            item={item}
+            onClick={onClickMediaItem}
+            onSelect={selectMediaItem}
+            onDelete={deleteMediaItem}
+          />
+        ))}
       </List>
 
       <PageLinks list={list} setOffset={setOffset} />
     </MediaPickerWrap>
   )
 }
+
+const LoadingMediaList = styled(props => {
+  return (
+    <div {...props}>
+      <LoadingDots color={'var(--tina-color-primary)'} />
+    </div>
+  )
+})`
+  width: 100%;
+  height: 75%;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+  justify-content: center;
+`
 
 const MediaPickerWrap = styled.div`
   height: 100%;
@@ -245,7 +283,7 @@ const List = styled.ul<ListProps>`
     `}
 `
 
-const Empty = styled(props => {
+const EmptyMediaList = styled(props => {
   return <div {...props}>Drag and Drop assets here</div>
 })`
   font-size: 1.5rem;
@@ -254,10 +292,10 @@ const Empty = styled(props => {
   text-align: center;
 `
 
-const SetupMediaManager = styled(props => {
+const DocsLink = styled(({ title, ...props }) => {
   return (
     <div {...props}>
-      <h2>Please Setup Media</h2>
+      <h2>{title}</h2>
       <div>
         {' '}
         Visit the{' '}
@@ -269,7 +307,11 @@ const SetupMediaManager = styled(props => {
     </div>
   )
 })`
+  height: 75%;
   text-align: center;
+  display: flex;
+  flex-direction: column;
+  justify-content: center;
   a {
     color: black;
     text-decoration: underline;
