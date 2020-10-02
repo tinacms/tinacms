@@ -43,7 +43,7 @@ Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/
 - Nolan Phillips ([@ncphi](https://twitter.com/ncphi)) – Forestry.io
 - Kendall Strautman ([@KendallStraut](https://twitter.com/KendallStraut)) – Forestry.io
 - DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
-- Scott Byrne ([@ncphi](https://twitter.com/scottpbyrne)) – Forestry.io
+- Scott Byrne ([@scottpbyrne](https://twitter.com/scottpbyrne)) – Forestry.io
 
 ### All Contributors ✨
 
