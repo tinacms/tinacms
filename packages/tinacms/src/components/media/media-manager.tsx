@@ -143,13 +143,16 @@ export function MediaPicker({
     accept: 'image/*',
 
     onDrop: async ([file]) => {
-      //@ts-ignore
-      await cms.media.persist([
-        {
-          directory: directory || '/',
-          file,
-        },
-      ])
+      try {
+        await cms.media.persist([
+          {
+            directory: directory || '/',
+            file,
+          },
+        ])
+      } catch {
+        // TODO: Events get dispatched already. Does anything else need to happen?
+      }
     },
   })
 
