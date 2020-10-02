@@ -2,75 +2,49 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-79-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
-[![Forum](https://img.shields.io/badge/forum-tinacms-blue.svg?logo=discourse)](https://community.tinacms.org/) 
-
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png "Visit tinacms.org")](https://tinacms.org/)
+# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tinacms.org/)
 
 > Tina is an open-source toolkit for building content management directly into your website.
 
 [![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
 
-## Learn More
-
-- [Website](https://tinacms.org/)
-  - [Blog](https://tinacms.org/blog/)
-  - [Docs](https://tinacms.org/docs/)
 - [Community Forum](https://community.tinacms.org/)
-- [Contributing](./CONTRIBUTING.md)
-  - [Troubleshooting in Development](./CONTRIBUTING.md#Troubleshooting-in-Development)
-- [CHANGELOG](./CHANGELOG.md)
-- [Change proposals (RFCs)](https://github.com/tinacms/rfcs)
-- [The core team's development process](./ROADMAP.md)
 
-## Development
+## Getting Started
 
-**Disclaimer**:
+Checkout the [tutorial](https://tinacms.org/docs/getting-started/introduction/) to get started with TinaCMS.
 
-- Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
-- Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
+## Documentation
 
-_Recommended: use the lts/dubnium version of node (v 10.20.1)_
+Visit https://tinacms.org/docs/ to view the full documentation.
 
-To get started:
+## Development Process
 
-```bash
-git clone git@github.com:tinacms/tinacms.git
-cd tinacms
-npm install
-npm run build
+See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/master/ROADMAP.md) to learn how the maintainers work.
 
-# Start Next.js Demo
-cd packages/demonext-
-npm run dev
-```
+## Questions?
 
-**WARNING: Do not run `npm install` from inside the `packages` directory**
+[![Tweet](https://img.shields.io/twitter/url/http/shields.io.svg?style=social)](https://twitter.com/intent/tweet?url=https%3A%2F%2Ftinacms.org&text=I%20just%20checked%20out%20@tina_cms%20on%20GitHub%20and%20it%20is%20sweet%21&hashtags=TinaCMS%2Cjamstack%2Cheadlesscms)
+[![Forum](https://img.shields.io/badge/forum-tinacms-blue.svg?logo=discourse)](https://community.tinacms.org/)
 
-TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
+Visit the [community forum](https://community.tinacms.org/) to ask questions or look us up on on Twitter at [@tina_cms](https://twitter.com/tina_cms).
 
-### Commands
+## Changelog
 
-| Commands                           | Description                                   |
-| ---------------------------------- | --------------------------------------------- |
-| npm run bootstrap                  | Install dependencies and link local packages. |
-| npm run build                      | Build all packages.                           |
-| npm run test                       | Run tests for all packages.                   |
-| lerna run build --scope \<package> | Build only \<package>.                        |
+Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.
 
-### Testing With External Projects
+## Contributing
 
-Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and introduce inconsistencies with module resolution. If multiple modules rely on the same package you can easily end up with multiple instances of that package, this is problematic for packages like `react` which expect only one instance.
+Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/CONTRIBUTING.md)
 
-[`@tinacms/webpack-helpers`](./packages/@tinacms/webpack-helpers) provides tools and instructions for testing local TinaCMS changes on external websites.
+### Maintainers
 
-## Release Process
+- Nolan Phillips ([@ncphi](https://twitter.com/ncphi)) – Forestry.io
+- Kendall Strautman ([@KendallStraut](https://twitter.com/KendallStraut)) – Forestry.io
+- DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
+- Scott Byrne ([@scottpbyrne](https://twitter.com/scottpbyrne)) – Forestry.io
 
-TinaCMS packages are updated every Monday.
-
-Checkout the [RELEASE](./RELEASE.md) file for the details.
-
-## Contributors ✨
+### All Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
 
@@ -185,6 +159,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
 
 <!-- markdownlint-enable -->
 <!-- prettier-ignore-end -->
+
 <!-- ALL-CONTRIBUTORS-LIST:END -->
 
 This project follows the [all-contributors](https://github.com/all-contributors/all-contributors) specification. Contributions of any kind welcome!
