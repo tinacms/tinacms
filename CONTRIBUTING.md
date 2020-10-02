@@ -20,7 +20,7 @@ npm install
 npm run build
 
 # Start Next.js Demo
-cd packages/demonext-
+cd packages/demo-next
 npm run dev
 ```
 
