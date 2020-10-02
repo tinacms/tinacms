@@ -16,12 +16,12 @@ limitations under the License.
 
 */
 
-export * from './next/preview'
-export * from './github/create-auth-handler'
-export * from './github/proxy'
-export * from './github/content'
-export * from './get-github-file'
-export * from './get-github-preview-props'
-export * from './parse-markdown'
-export * from './parse-json'
-export * from './next-github-media-store'
+import { GitMediaStore } from '@tinacms/git-client'
+
+export class NextGitMediaStore extends GitMediaStore {
+  previewSrc(src) {
+    return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
+      ? src.replace('/public', '')
+      : null
+  }
+}

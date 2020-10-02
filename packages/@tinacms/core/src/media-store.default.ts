@@ -21,8 +21,6 @@ import { Media, MediaStore, MediaUploadOptions, MediaList } from './media'
 export class DummyMediaStore implements MediaStore {
   accept = '*'
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
-    alert('UPLOADING FILES')
-    console.log(files)
     return files.map(({ directory, file }) => ({
       id: file.name,
       type: 'file',
@@ -35,7 +33,6 @@ export class DummyMediaStore implements MediaStore {
   }
   async list(): Promise<MediaList> {
     const items: Media[] = []
-    alert('Add a media store to the CMS.')
     return {
       items,
       offset: 0,

@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.31.0-alpha.3",
+  "version": "0.31.0-alpha.5",
   "description": "",
   "main": "dist/index.js",
   "scripts": {
@@ -24,21 +24,21 @@
     "tinacms": ">=0.19"
   },
   "devDependencies": {
-    "@tinacms/alerts": "^0.31.0-alpha.3",
-    "@tinacms/core": "^0.31.0-alpha.3",
-    "@tinacms/fields": "^0.31.0-alpha.3",
-    "@tinacms/forms": "^0.31.0-alpha.3",
-    "@tinacms/icons": "^0.31.0-alpha.3",
-    "@tinacms/react-forms": "^0.31.0-alpha.3",
+    "@tinacms/alerts": "^0.31.0-alpha.5",
+    "@tinacms/core": "^0.31.0-alpha.5",
+    "@tinacms/fields": "^0.31.0-alpha.5",
+    "@tinacms/forms": "^0.31.0-alpha.5",
+    "@tinacms/icons": "^0.31.0-alpha.5",
+    "@tinacms/react-forms": "^0.31.0-alpha.5",
     "@tinacms/styles": "^0.29.0",
     "@types/js-cookie": "^2.2.5",
     "final-form": "^4.18.7",
     "styled-components": ">=4.1",
-    "tinacms": "^0.31.0-alpha.3"
+    "tinacms": "^0.31.0-alpha.5"
   },
   "dependencies": {
     "btoa": "^1.2.1",
     "js-cookie": "^2.2.1",
-    "next-tinacms-markdown": "^0.31.0-alpha.3"
+    "next-tinacms-markdown": "^0.31.0-alpha.5"
   }
 }

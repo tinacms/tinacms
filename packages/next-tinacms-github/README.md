@@ -171,4 +171,31 @@ export const getStaticProps: GetStaticProps = async function({
 
 `next-tinacms-github` provides two content parsing options available, for Markdown — `parseMarkdown` or JSON — `parseJson`. Or you could pass in a custom parser.
 
-<!-- TODO: add media store info >
+## _NextGithubMediaStore_
+
+`next-tinacms-github` includes a media store for managing media files with GitHub. Based on [GithubMediaStore](https://tinacms.org/packages/react-tinacms-github/#githubmediastore), it includes logic for serving uploads from the `public/` directory.
+
+This media store is initialized similar to `GithubMediaStore`:
+
+```ts
+import { TinaCMS } from 'tinacms'
+import { GithubClient } from 'react-tinacms-github'
+import { NextGithubMediaStore } from 'next-tinacms-github'
+
+const githubClient = new GithubClient({
+  proxy: '/api/proxy-github',
+  authCallbackRoute: '/api/create-github-access-token'
+  clientId: process.env.GITHUB_CLIENT_ID,
+  baseRepoFullName: process.env.REPO_FULL_NAME
+})
+
+const mediaStore = new NextGithubMediaStore(githubClient)
+
+const cms = new TinaCMS({
+  apis: {
+    github: githubClient // equivalent to cms.registerApi('github', githubClient)
+  },
+  media: mediaStore
+})
+
+```
