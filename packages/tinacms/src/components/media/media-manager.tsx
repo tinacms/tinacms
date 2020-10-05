@@ -187,7 +187,7 @@ export function MediaPicker({
 
 const MediaPickerWrap = styled.div`
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   color: var(--tina-color-grey-9);
   display: flex;
   flex-direction: column;
@@ -234,7 +234,7 @@ const List = styled.ul<ListProps>`
   padding: 0 0 2rem 0;
   margin: 0;
   height: 100%;
-  overflow-y: scroll;
+  overflow-y: auto;
   overflow-x: hidden;
 
   ${p =>
