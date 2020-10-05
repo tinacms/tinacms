@@ -60,16 +60,26 @@ export function InlineImageUpload({
   )
 }
 
-function ImagePlaceholder() {
-  // TODO: style this component
+const ImagePlaceholder = styled(styleProps => {
   return (
-    <div>
+    <div {...styleProps}>
       Drag 'n' drop some files here,
       <br />
       or click to select files
     </div>
   )
-}
+})`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  input:active,
+  input:focus {
+    outline: none;
+  }
+`
 
 export const Container = styled.div`
   width: inherit;
