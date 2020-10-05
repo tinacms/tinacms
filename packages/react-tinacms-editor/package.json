@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-editor",
-  "version": "0.31.0-alpha.5",
+  "version": "0.31.0-alpha.6",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-editor.esm.js",
@@ -16,14 +16,14 @@
     "test": "jest --env=jsdom --passWithNoTests"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.29.0",
     "@sambego/storybook-styles": "^1.0.0",
     "@storybook/addon-info": "^5.1.9",
     "@storybook/react": "^5.3.19",
-    "@tinacms/core": "^0.31.0-alpha.5",
-    "@tinacms/fields": "^0.31.0-alpha.5",
-    "@tinacms/icons": "^0.31.0-alpha.5",
-    "@tinacms/react-forms": "^0.31.0-alpha.5",
+    "@tinacms/core": "^0.31.0-alpha.6",
+    "@tinacms/fields": "^0.31.0-alpha.6",
+    "@tinacms/icons": "^0.31.0-alpha.6",
+    "@tinacms/react-forms": "^0.31.0-alpha.6",
+    "@tinacms/scripts": "^0.29.0",
     "@tinacms/styles": "^0.29.0",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
@@ -47,8 +47,8 @@
     "eol": "^0.9.0",
     "react-docgen-typescript-loader": "^3.1.0",
     "react-docgen-typescript-webpack-plugin": "^1.1.0",
-    "react-tinacms-inline": "^0.31.0-alpha.5",
-    "tinacms": "^0.31.0-alpha.5"
+    "react-tinacms-inline": "^0.31.0-alpha.6",
+    "tinacms": "^0.31.0-alpha.6"
   },
   "dependencies": {
     "codemirror": "^5.42.2",

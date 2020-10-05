@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/react-screens",
-  "version": "0.31.0-alpha.5",
+  "version": "0.31.0-alpha.6",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
@@ -33,9 +33,9 @@
     "react": ">=16.8"
   },
   "devDependencies": {
-    "@tinacms/core": "^0.31.0-alpha.5",
-    "@tinacms/react-core": "^0.31.0-alpha.5",
-    "@tinacms/react-modals": "^0.31.0-alpha.5",
+    "@tinacms/core": "^0.31.0-alpha.6",
+    "@tinacms/react-core": "^0.31.0-alpha.6",
+    "@tinacms/react-modals": "^0.31.0-alpha.6",
     "@tinacms/scripts": "^0.29.0"
   }
 }
