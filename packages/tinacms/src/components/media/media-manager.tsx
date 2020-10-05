@@ -174,7 +174,7 @@ export function MediaPicker({
   }
 
   if (listState === 'not-configured') {
-    return <DocsLink title="Please Setup a Media Store" />
+    return <DocsLink title="Please Set up a Media Store" />
   }
 
   if (listState === 'error') {
