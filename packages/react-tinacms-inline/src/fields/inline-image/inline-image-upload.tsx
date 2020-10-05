@@ -44,7 +44,13 @@ export function InlineImageUpload({
     noClick: !!onClick,
   })
 
-  if (!src) return <ImagePlaceholder />
+  if (!src)
+    return (
+      <Container {...getRootProps()} onClick={onClick} className={className}>
+        <input {...getInputProps()} />
+        <ImagePlaceholder />
+      </Container>
+    )
 
   return (
     <Container {...getRootProps()} onClick={onClick} className={className}>
