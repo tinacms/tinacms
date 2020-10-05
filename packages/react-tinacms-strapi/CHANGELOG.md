@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
+
+
+### Bug Fixes
+
+* **@tinacms/media:** deprecated since these interfaces were graduated to core ([39f1a72](https://github.com/tinacms/tinacms/commit/39f1a729a112fbab24af4c1e319cdc94867325aa))
+
+
+### Features
+
+* **react-tinacms-strapi:** the StrapiMediaStore implements MediaStore#delete ([157d1fc](https://github.com/tinacms/tinacms/commit/157d1fcc7f86e5a1064875d68cad743cb4c1a08d))
+* **react-tinacms-strapi:** the StrapiMediaStore now implements MediaStore#list ([d851296](https://github.com/tinacms/tinacms/commit/d851296fb899e87394c358bba20c436a74e5c238))
+
+
+
+
+
 # [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
 
 **Note:** Version bump only for package react-tinacms-strapi
