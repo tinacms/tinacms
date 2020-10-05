@@ -95,6 +95,7 @@ export function MediaPicker({
 
   useEffect(() => {
     function loadMedia() {
+      setListState('loading')
       cms.media
         .list({ offset, limit, directory })
         .then(list => {
