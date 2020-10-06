@@ -17,25 +17,37 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ImageRenderChildren } from './inline-image-field'
-import { Container } from './dropzone-wrapper'
+import styled from 'styled-components'
+import { useDropzone } from 'react-dropzone'
 
-interface NonEditableImageProps {
-  src?: string
-  alt?: string
+interface DropzoneProps {
   className?: string
-  children?: ImageRenderChildren
+  onClick(): void
+  onDrop(acceptedFiles: any[]): void
+  children: React.ReactNode
 }
 
-export function NonEditableImage({
-  src,
-  alt,
+export function DropzoneWrapper({
+  onDrop,
+  onClick,
   className,
   children,
-}: NonEditableImageProps) {
+}: DropzoneProps) {
+  const { getRootProps, getInputProps } = useDropzone({
+    accept: 'image/*',
+    onDrop,
+    noClick: !!onClick,
+  })
+
   return (
-    <Container className={className}>
-      {children ? children({ src }) : <img src={src} alt={alt} />}
+    <Container {...getRootProps()} onClick={onClick} className={className}>
+      <input {...getInputProps()} />
+      {children}
     </Container>
   )
 }
+
+export const Container = styled.div`
+  width: inherit;
+  height: inherit;
+`
