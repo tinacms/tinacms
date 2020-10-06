@@ -51,7 +51,7 @@ export function InlineWysiwyg({
 
         return allMedia.map(media => {
           if (passedInImageProps.parse) {
-            return passedInImageProps.parse(media.filename)
+            return passedInImageProps.parse(media)
           } else {
             return media.filename
           }
