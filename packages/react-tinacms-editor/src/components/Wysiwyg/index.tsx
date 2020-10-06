@@ -19,13 +19,14 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 
+import { TinaCMS, useCMS } from 'tinacms'
 import { BrowserFocusProvider } from '../../context/browserFocus'
 import { EditorModeMenu } from '../EditorModeMenu'
 import {
   EditorModeProvider,
   EditorModeConsumer,
 } from '../../context/editorMode'
-import { EditorProps } from '../../types'
+import { EditorProps, ImageProps } from '../../types'
 import { MarkdownEditor } from '../MarkdownEditor'
 import { ProsemirrorEditor } from '../ProsemirrorEditor'
 
@@ -35,16 +36,27 @@ const modeTogglePlugin = {
 }
 
 export const Wysiwyg = ({
-  imageProps,
+  imageProps: passedInImageProps,
   input,
   plugins = [],
   format = 'markdown',
   sticky,
   className,
 }: EditorProps) => {
+  const cms = useCMS()
   const { value, onChange } = input
   const pluginList =
     format === 'markdown' ? [...plugins, modeTogglePlugin] : plugins
+
+  const imageProps: ImageProps | undefined = React.useMemo(
+    () => generateImageProps(cms, passedInImageProps),
+    [
+      cms.media.store,
+      passedInImageProps?.directory,
+      passedInImageProps?.previewSrc,
+      passedInImageProps?.upload,
+    ]
+  )
 
   return (
     <EditorModeProvider>
@@ -85,3 +97,29 @@ const Wrapper = styled.div`
   display: block;
   min-height: 100px;
 `
+
+function generateImageProps(cms: TinaCMS, passedInImageProps?: ImageProps) {
+  if (!passedInImageProps) return
+  return {
+    async upload(files: File[]) {
+      const filesToUpload = files.map(file => ({
+        directory: passedInImageProps?.directory || '',
+        file,
+      }))
+
+      const allMedia = await cms.media.persist(filesToUpload)
+
+      return allMedia.map(media => {
+        if (passedInImageProps.parse) {
+          return passedInImageProps.parse(media)
+        } else {
+          return media.filename
+        }
+      })
+    },
+    previewSrc(src: string) {
+      return cms.media.previewSrc(src)
+    },
+    ...passedInImageProps,
+  }
+}
