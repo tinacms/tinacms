@@ -17,6 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
+import { Media } from 'tinacms'
 import { storiesOf } from '@storybook/react'
 import { Wysiwyg } from '../src/components/Wysiwyg'
 
@@ -80,7 +81,7 @@ const WithImage = () => {
           })
         },
         previewSrc: (str: string) => str,
-        parse: src => src,
+        parse: (media: Media) => media.filename,
       }}
     />
   )
