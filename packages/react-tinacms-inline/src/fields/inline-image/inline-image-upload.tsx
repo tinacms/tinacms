@@ -18,8 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { useDropzone } from 'react-dropzone'
 import { ImageRenderChildren } from './inline-image-field'
+import { DropzoneWrapper } from './dropzone-wrapper'
 
 interface InlineImageUploadProps {
   src?: string
@@ -38,25 +38,17 @@ export function InlineImageUpload({
   onDrop,
   children,
 }: InlineImageUploadProps) {
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
-    onDrop,
-    noClick: !!onClick,
-  })
-
   if (!src)
     return (
-      <Container {...getRootProps()} onClick={onClick} className={className}>
-        <input {...getInputProps()} />
+      <DropzoneWrapper onClick={onClick} onDrop={onDrop} className={className}>
         <ImagePlaceholder />
-      </Container>
+      </DropzoneWrapper>
     )
 
   return (
-    <Container {...getRootProps()} onClick={onClick} className={className}>
-      <input {...getInputProps()} />
+    <DropzoneWrapper onClick={onClick} onDrop={onDrop} className={className}>
       {children ? children({ src }) : <img src={src} alt={alt} />}
-    </Container>
+    </DropzoneWrapper>
   )
 }
 
@@ -79,9 +71,4 @@ const ImagePlaceholder = styled(styleProps => {
   input:focus {
     outline: none;
   }
-`
-
-export const Container = styled.div`
-  width: inherit;
-  height: inherit;
 `
