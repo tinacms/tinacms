@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { TinaCMS, useCMS } from 'tinacms'
+import { TinaCMS, useCMS, Form } from 'tinacms'
 import { BrowserFocusProvider } from '../../context/browserFocus'
 import { EditorModeMenu } from '../EditorModeMenu'
 import {
@@ -38,6 +38,7 @@ const modeTogglePlugin = {
 export const Wysiwyg = ({
   imageProps: passedInImageProps,
   input,
+  form,
   plugins = [],
   format = 'markdown',
   sticky,
@@ -49,10 +50,10 @@ export const Wysiwyg = ({
     format === 'markdown' ? [...plugins, modeTogglePlugin] : plugins
 
   const imageProps: ImageProps | undefined = React.useMemo(
-    () => generateImageProps(cms, passedInImageProps),
+    () => generateImageProps(cms, form, passedInImageProps),
     [
       cms.media.store,
-      passedInImageProps?.directory,
+      passedInImageProps?.uploadDir,
       passedInImageProps?.previewSrc,
       passedInImageProps?.upload,
     ]
@@ -98,20 +99,27 @@ const Wrapper = styled.div`
   min-height: 100px;
 `
 
-function generateImageProps(cms: TinaCMS, passedInImageProps?: ImageProps) {
+function generateImageProps(
+  cms: TinaCMS,
+  form?: Form,
+  passedInImageProps?: ImageProps
+) {
   if (!passedInImageProps) return
+  const { uploadDir, parse } = passedInImageProps
+  const directory = uploadDir && form ? uploadDir(form) : ''
+
   return {
     async upload(files: File[]) {
       const filesToUpload = files.map(file => ({
-        directory: passedInImageProps?.directory || '',
+        directory,
         file,
       }))
 
       const allMedia = await cms.media.persist(filesToUpload)
 
       return allMedia.map(media => {
-        if (passedInImageProps.parse) {
-          return passedInImageProps.parse(media)
+        if (parse) {
+          return parse(media)
         } else {
           return media.filename
         }

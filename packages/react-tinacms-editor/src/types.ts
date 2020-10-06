@@ -23,11 +23,11 @@ import { Node } from 'prosemirror-model'
 import { Schema } from 'prosemirror-model'
 
 import { Format } from './translator'
-import { Media } from 'tinacms'
+import { Form, Media } from 'tinacms'
 
 export interface ImageProps {
   parse(media: Media): string
-  directory?: string
+  uploadDir?(form: Form): string
   upload?: (files: File[]) => Promise<string[]>
   previewSrc?: (url: string) => string | Promise<string>
 }
@@ -71,6 +71,7 @@ export interface Input {
 
 export interface EditorProps {
   input: Input
+  form?: Form
   plugins?: Plugin[]
   sticky?: boolean | string
   format?: Format

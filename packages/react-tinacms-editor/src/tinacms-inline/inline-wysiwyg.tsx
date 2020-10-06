@@ -17,16 +17,21 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCMS } from 'tinacms'
+import { useCMS, Form } from 'tinacms'
 import { InlineField, FocusRing } from 'react-tinacms-inline'
 import { FocusRingOptions } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
-import { EditorProps } from '../types'
+import { EditorProps, Input } from '../types'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
   children: any
   focusRing?: boolean | FocusRingOptions
+}
+
+interface InlineWysiwygRenderProps {
+  input: Input
+  form: Form
 }
 
 export function InlineWysiwyg({
@@ -44,10 +49,15 @@ export function InlineWysiwyg({
 
   return (
     <InlineField name={name}>
-      {({ input }: any) => {
+      {({ input, form }: InlineWysiwygRenderProps) => {
         return (
           <FocusRing name={name} options={focusRing}>
-            <Wysiwyg input={input} {...wysiwygProps} imageProps={imageProps} />
+            <Wysiwyg
+              input={input}
+              imageProps={imageProps}
+              form={form}
+              {...wysiwygProps}
+            />
           </FocusRing>
         )
       }}
