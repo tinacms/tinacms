@@ -55,7 +55,12 @@ export function InlineTextarea({
           }
 
           return (
-            <FocusRing name={name} options={focusRing}>
+            /**
+             * Note: We use `input.name` not `name` here because
+             * the given name is only relative to the block, not
+             * the absolute path in the form.
+             */
+            <FocusRing name={input.name} options={focusRing}>
               <Textarea
                 className={className}
                 {...input}
