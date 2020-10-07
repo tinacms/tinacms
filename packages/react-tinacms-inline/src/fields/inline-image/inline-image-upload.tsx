@@ -18,8 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
-import { useDropzone } from 'react-dropzone'
 import { ImageRenderChildren } from './inline-image-field'
+import { DropzoneWrapper } from './dropzone-wrapper'
 
 interface InlineImageUploadProps {
   src?: string
@@ -38,34 +38,37 @@ export function InlineImageUpload({
   onDrop,
   children,
 }: InlineImageUploadProps) {
-  const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
-    onDrop,
-    noClick: !!onClick,
-  })
-
-  if (!src) return <ImagePlaceholder />
+  if (!src)
+    return (
+      <DropzoneWrapper onClick={onClick} onDrop={onDrop} className={className}>
+        <ImagePlaceholder />
+      </DropzoneWrapper>
+    )
 
   return (
-    <Container {...getRootProps()} onClick={onClick} className={className}>
-      <input {...getInputProps()} />
+    <DropzoneWrapper onClick={onClick} onDrop={onDrop} className={className}>
       {children ? children({ src }) : <img src={src} alt={alt} />}
-    </Container>
+    </DropzoneWrapper>
   )
 }
 
-function ImagePlaceholder() {
-  // TODO: style this component
+const ImagePlaceholder = styled(styleProps => {
   return (
-    <div>
+    <div {...styleProps}>
       Drag 'n' drop some files here,
       <br />
       or click to select files
     </div>
   )
-}
+})`
+  width: 100%;
+  height: 100%;
+  display: flex;
+  justify-content: center;
+  align-items: center;
 
-export const Container = styled.div`
-  width: inherit;
-  height: inherit;
+  input:active,
+  input:focus {
+    outline: none;
+  }
 `
