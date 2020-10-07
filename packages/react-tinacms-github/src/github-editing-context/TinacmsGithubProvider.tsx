@@ -16,12 +16,13 @@ limitations under the License.
 
 */
 
-import React, { useState, useEffect } from 'react'
+import React, { useState } from 'react'
 import { TinaCMS, useCMS } from 'tinacms'
 import GithubErrorModal, { GithubError } from '../github-error/GithubErrorModal'
 import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubClient } from '../github-client'
 import { CHECKOUT_BRANCH, ERROR } from '../events'
+import { useCMSEvent } from 'tinacms'
 
 interface ProviderProps {
   children: any
@@ -87,11 +88,4 @@ export const TinacmsGithubProvider = ({
       {!previewError && children}
     </>
   )
-}
-
-function useCMSEvent(event: string, callback: any, deps: React.DependencyList) {
-  const cms = useCMS()
-  useEffect(function() {
-    return cms.events.subscribe(event, callback)
-  }, deps)
 }
