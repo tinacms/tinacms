@@ -99,8 +99,8 @@ interface InlineWysiwygProps {
 }
 
 interface ImageProps {
-  parse: (media: Media) => string
-  directory?: string
+  parse(media: Media): string
+  uploadDir?(form: Form): string
   upload?: (files: File[]) => Promise<string[]>
   previewSrc?: (url: string) => string | Promise<string>
 }
@@ -151,7 +151,7 @@ To upload and manage images in the Wysiwyg, you'll need to configure `imageProps
 | Key           | Description                                                                                  |
 | ------------- | -------------------------------------------------------------------------------------------- |
 | `parse`        | Defines how the actual front matter or data value gets populated on upload. The media object gets passed as an argument. _Defaults to `filename`_.                                           |
-| `directory?`    | Defines the upload directory.                                                                 |
+| `uploadDir?`    | Defines the upload directory. This function is passed the current form values.                                                                  |
 | `upload?`     | An asynchronous function that handles image upload. By default, this calls the `persist` function on the [media store](https://tinacms.org/docs/media). |
 | `previewSrc?`     | 	An asynchronous function that returns the path or url for the image `src` in preview or edit mode. By default, this calls the `previewSrc` function on the [media store](https://tinacms.org/docs/media)_.                             |
 
@@ -160,7 +160,7 @@ To upload and manage images in the Wysiwyg, you'll need to configure `imageProps
   name="rawMarkdownBody"
   imageProps={{
     parse: (media) => `images/about/${media.filename}`
-    directory: 'public/images/about/',
+    uploadDir: () => 'public/images/about/',
   }}
 >
   <div
