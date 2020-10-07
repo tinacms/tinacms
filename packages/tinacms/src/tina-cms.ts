@@ -81,7 +81,17 @@ export class TinaCMS extends CMS {
   }: TinaCMSConfig = {}) {
     super(config)
 
-    this.alerts.setMap(alerts)
+    this.alerts.setMap({
+      'media:upload:failure': () => ({
+        level: 'error',
+        message: 'Failed to upload file.',
+      }),
+      'media:delete:failure': () => ({
+        level: 'error',
+        message: 'Failed to delete file.',
+      }),
+      ...alerts,
+    })
 
     if (sidebar) {
       const sidebarConfig = typeof sidebar === 'object' ? sidebar : undefined

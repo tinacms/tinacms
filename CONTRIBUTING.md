@@ -2,14 +2,46 @@
 
 The following is a set of guidelines and tips for contributing to the TinaCMS and its packages.
 
-## How to Contribute
+## Development
 
-- **Reporting Bugs**
-- **Suggesting Enhancements**
-- **Writing Docs, Guides, or Blog Posts**
-- **Volunteering for User Testing**
+**Disclaimer**:
 
-## Contributing Code
+- Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
+- Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
+
+_Recommended: use the lts/dubnium version of node (v 10.20.1)_
+
+To get started:
+
+```bash
+git clone git@github.com:tinacms/tinacms.git
+cd tinacms
+npm install
+npm run build
+
+# Start Next.js Demo
+cd packages/demo-next
+npm run dev
+```
+
+**WARNING: Do not run `npm install` from inside the `packages` directory**
+
+TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
+
+### Commands
+
+| Commands                           | Description                                   |
+| ---------------------------------- | --------------------------------------------- |
+| npm run bootstrap                  | Install dependencies and link local packages. |
+| npm run build                      | Build all packages.                           |
+| npm run test                       | Run tests for all packages.                   |
+| lerna run build --scope \<package> | Build only \<package>.                        |
+
+### Testing With External Projects
+
+Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and introduce inconsistencies with module resolution. If multiple modules rely on the same package you can easily end up with multiple instances of that package, this is problematic for packages like `react` which expect only one instance.
+
+[`@tinacms/webpack-helpers`](./packages/@tinacms/webpack-helpers) provides tools and instructions for testing local TinaCMS changes on external websites.
 
 ### Making Commits
 
@@ -89,6 +121,13 @@ There are two reasons this error might occur:
 
    This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
 
+
 ## Release Process
 
-The TinaCMS core team releases frequently. Checkout the [RELEASE.md](./RELEASE.md) file to see how to create a release.
+TinaCMS packages are updated every Monday.
+
+Checkout the [RELEASE](./RELEASE.md) file for the details.
+
+## RFC Process
+
+See the [tinacms/rfcs](https://github.com/tinacms/rfcs) repo for more info on how new changes are proposed to the tinacms core packages.

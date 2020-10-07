@@ -804,6 +804,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "lukedigby",
+      "name": "Luke Digby",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/8407264?v=4",
+      "profile": "https://github.com/lukedigby",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,

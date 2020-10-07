@@ -16,12 +16,7 @@ limitations under the License.
 
 */
 
-import { GitMediaStore } from '@tinacms/git-client'
+const { createJestConfig } = require('@tinacms/scripts')
+const pack = require('./package')
 
-export class NextGitMediaStore extends GitMediaStore {
-  previewSrc(src) {
-    return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
-      ? src.replace('/public', '')
-      : null
-  }
-}
+module.exports = createJestConfig(pack)

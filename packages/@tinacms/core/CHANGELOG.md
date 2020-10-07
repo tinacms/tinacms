@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
+
+
+### Features
+
+* **@tinacms/core:** add cms.media.open top make showing the media manager easier ([eea3081](https://github.com/tinacms/tinacms/commit/eea3081ce8ad65b773b6843d60604bb4cd389576))
+* **@tinacms/core:** cms.media async methods dispatch events ([9196bdf](https://github.com/tinacms/tinacms/commit/9196bdff6723f64e18426f90208837bfb1a93ec1))
+* **@tinacms/core:** MediaStore#previewSrc accepts fieldPath and formValues ([e2bf27b](https://github.com/tinacms/tinacms/commit/e2bf27b436b6fc6b5e0b359142fed352c10fb2e0))
+* **@tinacms/core:** promoted @tinacms/media classes to core ([5288dc1](https://github.com/tinacms/tinacms/commit/5288dc175db068a2b3cf5800bee66aa180369d92))
+* **@tinacms/core:** the MediaStore interface has a delete method ([4c1cf5a](https://github.com/tinacms/tinacms/commit/4c1cf5af1b2b10143bf5c2aa4858b108507b3028))
+* **@tinacms/events:** EventBus#subscribe can accept an array of event names ([63ef4db](https://github.com/tinacms/tinacms/commit/63ef4dbd5b17ccbae655b4d9f4962d08b288467f))
+
+
+
+
+
 # [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
 
 **Note:** Version bump only for package @tinacms/core

@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
+
+
+### Bug Fixes
+
+* svg attribute names ([7e06179](https://github.com/tinacms/tinacms/commit/7e06179fb1c54e04e286af946a618513fdeca19d))
+
+
+### Features
+
+* **@tinacms/icons:** adds media mgr folder & file icons ([81f1191](https://github.com/tinacms/tinacms/commit/81f1191886088288b71a957c4c984983eaa0dfdd))
+
+
+
+
+
 # [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
 
 **Note:** Version bump only for package @tinacms/icons

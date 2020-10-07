@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
+
+
+### Features
+
+* **react-tinacms-github:** add GithubClient#commit(branch, repo?) ([d62bc3b](https://github.com/tinacms/tinacms/commit/d62bc3bc5cd5dd06935ec8237005039eb817bfee))
+* **react-tinacms-github:** GithubMediaStore implements MediaStore#delete ([1c5ded9](https://github.com/tinacms/tinacms/commit/1c5ded9334749ac7905068546eec397a886a9063))
+* **react-tinacms-github:** GithubMediaStore implements MediaStore#list ([a963189](https://github.com/tinacms/tinacms/commit/a963189740e9ded9d753fb5bec95a7011350b3a7))
+
+
+
+
+
 # [0.30.0](https://github.com/tinacms/tinacms/compare/v0.29.0...v0.30.0) (2020-09-10)
 
 

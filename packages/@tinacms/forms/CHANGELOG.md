@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
+
+
+### Bug Fixes
+
+* **@tinacms/forms:** catch errors after submit ([2550a81](https://github.com/tinacms/tinacms/commit/2550a816ca7c4e99ea4965a179431510a9ca333f))
+* **@tinacms/forms:** the Form#fields array is now optional ([e3d71bf](https://github.com/tinacms/tinacms/commit/e3d71bf426e0d8e40076fc1e161350f9fe469543))
+
+
+
+
+
 # [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
 
 **Note:** Version bump only for package @tinacms/forms

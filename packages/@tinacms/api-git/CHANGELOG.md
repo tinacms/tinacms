@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
+
+
+### Features
+
+* **@tinacms/api-git:** GET /:relPath returns content list for directories ([c613b20](https://github.com/tinacms/tinacms/commit/c613b208b6387f5e2e31c70dd1bc747dd6ddb491))
+* **@tinacms/api-git:** the GET /:relPath endpoint returns contents of directories ([9fa7bf8](https://github.com/tinacms/tinacms/commit/9fa7bf8c59a3cba99238138860a9bc2d52dee5d5))
+
+
+
+
+
 # [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
 
 **Note:** Version bump only for package @tinacms/api-git

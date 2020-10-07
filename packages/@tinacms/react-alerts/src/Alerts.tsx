@@ -73,7 +73,7 @@ const AlertContainer = styled.div`
   display: flex;
   flex-direction: column;
   align-items: center;
-  z-index: var(--tina-z-index-3);
+  z-index: 999999;
 `
 
 const AlertEntranceAnimation = keyframes`

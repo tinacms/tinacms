@@ -3,6 +3,21 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
+
+
+### Features
+
+* **@tinacms/core:** add cms.media.open top make showing the media manager easier ([eea3081](https://github.com/tinacms/tinacms/commit/eea3081ce8ad65b773b6843d60604bb4cd389576))
+* **@tinacms/fields:** clicking on ImageField opens the media picker ui ([7bb8fdb](https://github.com/tinacms/tinacms/commit/7bb8fdb91f482ab5ec307bbffdbc31f4fcc16e08))
+* **@tinacms/fields:** ImageFieldPlugin matches new MediaStore#previewSrc api ([76e5b04](https://github.com/tinacms/tinacms/commit/76e5b04151582087ec6538ebadf65fe6ad2ca5b7))
+* **@tinacms/fields:** ImageUpload parse returns the whole media object ([94ee917](https://github.com/tinacms/tinacms/commit/94ee917e19061828ddbbb857dc1513eb61da49f5)), closes [#1453](https://github.com/tinacms/tinacms/issues/1453)
+* **@tinacms/fields:** the uploadDir function is now optional for image fields ([6095caf](https://github.com/tinacms/tinacms/commit/6095caf5355c811f6bbb9cdd2a7e640b82ae4735))
+
+
+
+
+
 # [0.29.0](https://github.com/tinacms/tinacms/compare/v0.28.0...v0.29.0) (2020-08-25)
 
 **Note:** Version bump only for package @tinacms/fields
