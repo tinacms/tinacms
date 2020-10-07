@@ -23,6 +23,7 @@ export * from './use-subscribable'
 export * from './use-watch-form-values'
 export * from './with-plugin'
 export * from './with-tina'
+export { useCMSEvent } from '@tinacms/react-core'
 
 export { Plugin } from '@tinacms/core'
 export { Form, FormOptions, Field } from '@tinacms/forms'
