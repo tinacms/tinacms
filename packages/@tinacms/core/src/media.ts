@@ -233,6 +233,7 @@ export class MediaManager implements MediaStore {
 }
 
 export interface SelectMediaOptions {
+  allowDelete?: boolean
   directory?: string
   onSelect?(media: Media): void
 }
