@@ -73,6 +73,7 @@ export function EditableImage({
         onClick={() => {
           const directory = uploadDir ? uploadDir(form) : ''
           cms.media.open({
+            allowDelete: true,
             directory,
             onSelect(media: any) {
               if (media.filename == input.value) {
