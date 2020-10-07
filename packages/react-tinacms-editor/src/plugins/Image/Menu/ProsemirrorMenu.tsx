@@ -64,7 +64,6 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
   }
 
   function onMediaSelect(media?: Media) {
-    console.log({ media })
     if (media) {
       setImageUrl('')
       setImageUrl(media.previewSrc || media.id)
