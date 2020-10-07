@@ -16,10 +16,11 @@ limitations under the License.
 
 */
 
-import React, { useRef, useState, ChangeEvent } from 'react'
+import React, { useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { Dismissible } from 'react-dismissible'
 
+import { useCMS, Media } from 'tinacms'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
 import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
@@ -33,10 +34,12 @@ export interface MenuProps {
 }
 
 export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
+  const cms = useCMS()
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
+  const [mediaSelected, setMediaSelected] = useState(false)
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
 
@@ -60,12 +63,21 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
     setImageUrl('')
   }
 
-  const uploadSelectedImage = (event: ChangeEvent) => {
-    const { files } = event.target as any
-    if (files[0]) {
-      uploadImageFile(files[0])
+  function onMediaSelect(media?: Media) {
+    console.log({ media })
+    if (media) {
+      setImageUrl('')
+      setImageUrl(media.previewSrc || media.id)
+      setMediaSelected(true)
     }
   }
+
+  React.useEffect(() => {
+    if (mediaSelected) {
+      insertImageInEditor()
+      setMediaSelected(false)
+    }
+  }, [mediaSelected])
 
   const stopDefault = (evt: React.DragEvent<HTMLSpanElement>) => {
     evt.preventDefault()
@@ -120,49 +132,46 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
           }}
         >
           <ImageModalContent>
-            <StyledLabel
-              htmlFor="fileInput"
-              onClick={evt => evt.stopPropagation()}
+            <UploadSection
+              onClick={() => {
+                // TODO: get uploadDir here
+                const directory = '/'
+                cms.media.open({
+                  directory,
+                  onSelect: onMediaSelect,
+                })
+              }}
+              onDragEnter={stopDefault}
+              onDragOver={stopDefault}
+              onDrop={onImageDrop}
+              uploading={uploading}
+              imageUrl={imageUrl}
             >
-              <FileUploadInput
-                id="fileInput"
-                onChange={uploadSelectedImage}
-                type="file"
-                accept="image/*"
-              />
-              <UploadSection
-                onDragEnter={stopDefault}
-                onDragOver={stopDefault}
-                onDrop={onImageDrop}
-                uploading={uploading}
-                imageUrl={imageUrl}
-              >
-                {imageUrl && (
-                  <>
-                    <ClearImageButton
-                      onMouseDown={evt => {
-                        setImageUrl('')
-                        evt.stopPropagation()
-                      }}
-                    >
-                      <CloseIcon />
-                    </ClearImageButton>
-                    <CurrentImage src={imageUrl} alt="uploaded_image" />
-                  </>
-                )}
-                {!imageUrl && (
-                  <>
-                    <UploadIconWrapper>
-                      <UploadIcon />
-                    </UploadIconWrapper>
-                    <UploadText>
-                      {!uploading && `Drag and drop or click to upload`}
-                      {uploading && 'Image uploading...'}
-                    </UploadText>
-                  </>
-                )}
-              </UploadSection>
-            </StyledLabel>
+              {imageUrl && (
+                <>
+                  <ClearImageButton
+                    onMouseDown={evt => {
+                      setImageUrl('')
+                      evt.stopPropagation()
+                    }}
+                  >
+                    <CloseIcon />
+                  </ClearImageButton>
+                  <CurrentImage src={imageUrl} alt="uploaded_image" />
+                </>
+              )}
+              {!imageUrl && (
+                <>
+                  <UploadIconWrapper>
+                    <UploadIcon />
+                  </UploadIconWrapper>
+                  <UploadText>
+                    {!uploading && `Drag and drop or click to upload`}
+                    {uploading && 'Image uploading...'}
+                  </UploadText>
+                </>
+              )}
+            </UploadSection>
             <UrlInputWrapper>
               {displayUrlInput && (
                 <>
@@ -346,12 +355,4 @@ const UploadSection = styled.div<{ uploading: boolean; imageUrl: string }>`
       border-radius: var(--tina-radius-small);
       border: 1px solid var(--tina-color-grey-2);
     `};
-`
-
-const FileUploadInput = styled.input`
-  display: none;
-`
-
-const StyledLabel = styled.label`
-  display: block;
 `
