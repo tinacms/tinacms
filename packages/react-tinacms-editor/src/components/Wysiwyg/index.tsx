@@ -49,14 +49,10 @@ export const Wysiwyg = ({
   const pluginList =
     format === 'markdown' ? [...plugins, modeTogglePlugin] : plugins
 
-  const imageProps: ImageProps | undefined = React.useMemo(
-    () => generateImageProps(cms, form, passedInImageProps),
-    [
-      cms.media.store,
-      passedInImageProps?.uploadDir,
-      passedInImageProps?.previewSrc,
-      passedInImageProps?.upload,
-    ]
+  const imageProps: ImageProps | undefined = useImageProps(
+    cms,
+    form,
+    passedInImageProps
   )
 
   return (
@@ -99,35 +95,46 @@ const Wrapper = styled.div`
   min-height: 100px;
 `
 
-function generateImageProps(
+function useImageProps(
   cms: TinaCMS,
   form?: Form,
   passedInImageProps?: ImageProps
-) {
-  if (!passedInImageProps) return
-  const { uploadDir, parse } = passedInImageProps
-  const directory = uploadDir && form ? uploadDir(form) : ''
+): ImageProps | undefined {
+  const [imageProps, setImageProps] = React.useState<ImageProps | undefined>()
 
-  return {
-    async upload(files: File[]) {
-      const filesToUpload = files.map(file => ({
-        directory,
-        file,
-      }))
+  React.useMemo(() => {
+    if (!passedInImageProps) return
+    const { uploadDir, parse } = passedInImageProps
+    const directory = uploadDir && form ? uploadDir(form) : ''
 
-      const allMedia = await cms.media.persist(filesToUpload)
+    setImageProps({
+      async upload(files: File[]): Promise<string[]> {
+        const filesToUpload = files.map(file => ({
+          directory,
+          file,
+        }))
 
-      return allMedia.map(media => {
-        if (parse) {
-          return parse(media)
-        } else {
-          return media.filename
-        }
-      })
-    },
-    previewSrc(src: string) {
-      return cms.media.previewSrc(src)
-    },
-    ...passedInImageProps,
-  }
+        const allMedia = await cms.media.persist(filesToUpload)
+
+        return allMedia.map(media => {
+          if (parse) {
+            return parse(media)
+          } else {
+            return media.filename
+          }
+        })
+      },
+      previewSrc(src: string) {
+        return cms.media.previewSrc(src)
+      },
+      ...passedInImageProps,
+    })
+  }, [
+    cms.media.store,
+    passedInImageProps?.uploadDir,
+    passedInImageProps?.previewSrc,
+    passedInImageProps?.upload,
+  ])
+
+  return imageProps
 }
