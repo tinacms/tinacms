@@ -61,7 +61,12 @@ export function InlineText({
           }
 
           return (
-            <FocusRing name={name} options={focusRing}>
+            /**
+             * Note: We use `input.name` not `name` here because
+             * the given name is only relative to the block, not
+             * the absolute path in the form.
+             */
+            <FocusRing name={input.name} options={focusRing}>
               <Input
                 type="text"
                 {...input}
