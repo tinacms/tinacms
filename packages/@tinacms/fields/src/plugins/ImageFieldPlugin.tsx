@@ -101,6 +101,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
       onClick={() => {
         const directory = uploadDir(props.form.getState().values)
         cms.media.open({
+          allowDelete: true,
           directory,
           onSelect: onChange,
         })
