@@ -65,8 +65,6 @@ export interface InlineBlocksActions {
   blocks: {
     [key: string]: Block
   }
-  activeBlock: number | null
-  setActiveBlock: any
   direction: 'vertical' | 'horizontal'
   min?: number
   max?: number
@@ -97,7 +95,6 @@ export function InlineBlocks({
   components = {},
 }: InlineBlocksProps) {
   const cms = useCMS()
-  const [activeBlock, setActiveBlock] = useState(-1)
   const { setFocussedField } = useInlineForm()
 
   return (
@@ -108,7 +105,6 @@ export function InlineBlocks({
 
         const move = (from: number, to: number) => {
           const movement = to - from
-          setActiveBlock(activeBlock => activeBlock + movement)
           form.mutators.move(name, from, to)
           setFocussedField(`${name}.${to}`)
         }
@@ -147,8 +143,6 @@ export function InlineBlocks({
                       remove,
                       blocks,
                       count: allData.length,
-                      activeBlock,
-                      setActiveBlock,
                       direction,
                       min,
                       max,
@@ -221,7 +215,7 @@ export function InlineBlock({
 }: InlineBlockProps) {
   return (
     <InlineFieldContext.Provider value={{ name, ...block }}>
-      <block.Component data={data} index={index} {...itemProps} />
+      <block.Component data={data} name={name} index={index} {...itemProps} />
     </InlineFieldContext.Provider>
   )
 }
