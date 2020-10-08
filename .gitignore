@@ -15,3 +15,5 @@ packages/cli/forestry/.env
 **/docs/
 .idea/
 **/.cache/
+**/package-lock.json
+**/yarn.lock
