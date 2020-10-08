@@ -99,8 +99,8 @@ interface InlineWysiwygProps {
 }
 
 interface ImageProps {
-  parse: (filename: string) => string
-  directory?: string
+  parse(media: Media): string
+  uploadDir?(form: Form): string
   upload?: (files: File[]) => Promise<string[]>
   previewSrc?: (url: string) => string | Promise<string>
 }
@@ -150,8 +150,8 @@ To upload and manage images in the Wysiwyg, you'll need to configure `imageProps
 
 | Key           | Description                                                                                  |
 | ------------- | -------------------------------------------------------------------------------------------- |
-| `parse`        | Defines how the actual front matter or data value gets populated on upload. The name of the file gets passed as an argument. _Defaults to `filename`_.                                           |
-| `directory?`    | Defines the upload directory.                                                                 |
+| `parse`        | Defines how the actual front matter or data value gets populated on upload. The media object gets passed as an argument. _Defaults to `filename`_.                                           |
+| `uploadDir?`    | Defines the upload directory. This function is passed the current form values.                                                                  |
 | `upload?`     | An asynchronous function that handles image upload. By default, this calls the `persist` function on the [media store](https://tinacms.org/docs/media). |
 | `previewSrc?`     | 	An asynchronous function that returns the path or url for the image `src` in preview or edit mode. By default, this calls the `previewSrc` function on the [media store](https://tinacms.org/docs/media)_.                             |
 
@@ -159,8 +159,8 @@ To upload and manage images in the Wysiwyg, you'll need to configure `imageProps
 <InlineWysiwyg
   name="rawMarkdownBody"
   imageProps={{
-    parse: (filename) => `images/about/${filename}`
-    directory: 'public/images/about/',
+    parse: (media) => `images/about/${media.filename}`
+    uploadDir: () => 'public/images/about/',
   }}
 >
   <div
@@ -222,3 +222,7 @@ export function InlineWysiwyg(props) {
 
 > #### Why do I have to load the editor dynamically myself?
 > Code splitting and dynamic imports are handled by the website's JavaScript bundlers (e.g. rollup, webpack, etc.). Since the package does not load itself into the application, it is unfortunately not possible to provide this behaviour in the package itself.
+
+## Contributing 
+
+For a deeper understanding of the Wysiwyg editor and inner-workings of the `react-tinacms-editor` package, checkout the [contributor documentation](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-editor/editor-docs)
