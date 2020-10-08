@@ -21,7 +21,7 @@ import { useCMS, Form } from 'tinacms'
 import { InlineField, FocusRing } from 'react-tinacms-inline'
 import { FocusRingOptions } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
-import { EditorProps, Input } from '../types'
+import { EditorProps } from '../types'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
@@ -30,7 +30,7 @@ export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
 }
 
 interface InlineWysiwygRenderProps {
-  input: Input
+  input: any
   form: Form
 }
 
@@ -46,6 +46,11 @@ export function InlineWysiwyg({
   if (cms.disabled) {
     return children
   }
+  /**
+   * Note: We use `input.name` not `name` on FocusRing because
+   * the given name is only relative to the block, not
+   * the absolute path in the form.
+   */
 
   return (
     <InlineField name={name}>
@@ -58,13 +63,6 @@ export function InlineWysiwyg({
               form={form}
               {...wysiwygProps}
             />
-          /**
-           * Note: We use `input.name` not `name` here because
-           * the given name is only relative to the block, not
-           * the absolute path in the form.
-           */
-          <FocusRing name={input.name} options={focusRing}>
-            <Wysiwyg input={input} {...wysiwygProps} imageProps={imageProps} />
           </FocusRing>
         )
       }}
