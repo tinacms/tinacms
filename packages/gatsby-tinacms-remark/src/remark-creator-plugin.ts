@@ -82,13 +82,18 @@ export class RemarkCreatorPlugin<FormShape = any, FrontmatterShape = any>
     const rawFrontmatter = await this.frontmatter(form)
     const rawMarkdownBody = await this.body(form)
 
-    cms.api.git!.onChange!({
+    await cms.api.git!.onChange!({
       fileRelativePath,
       content: toMarkdownString({
         fileRelativePath,
         rawFrontmatter,
         rawMarkdownBody,
       }),
+    })
+
+    await cms.api.git.commit({
+      files: [fileRelativePath],
+      message: `Commit from Tina: Created ${fileRelativePath}`,
     })
   }
 }
