@@ -10,6 +10,7 @@
     "dev": "lerna run dev --reject-cycles",
     "nuke": "./scripts/nuke.sh",
     "hard-reset": "npm run nuke && npm run bs && npm run build",
+    "rebuild-lockfiles": "./scripts/rebuild-lockfiles.sh",
     "test": "lerna run test --reject-cycles",
     "docs": "lerna run docs"
   },
