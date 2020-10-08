@@ -17,11 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCMS } from 'tinacms'
+import { useCMS, Form } from 'tinacms'
 import { InlineField, FocusRing } from 'react-tinacms-inline'
 import { FocusRingOptions } from 'react-tinacms-inline/src/styles'
 import { Wysiwyg } from '../components/Wysiwyg'
-import { EditorProps, ImageProps } from '../types'
+import { EditorProps } from '../types'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
@@ -29,61 +29,40 @@ export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   focusRing?: boolean | FocusRingOptions
 }
 
+interface InlineWysiwygRenderProps {
+  input: any
+  form: Form
+}
+
 export function InlineWysiwyg({
   name,
   children,
   focusRing = true,
-  imageProps: passedInImageProps,
+  imageProps,
   ...wysiwygProps
 }: InlineWysiwygFieldProps) {
   const cms = useCMS()
 
-  const imageProps: ImageProps | undefined = React.useMemo(() => {
-    if (!passedInImageProps) return
-    return {
-      async upload(files: File[]) {
-        const filesToUpload = files.map(file => ({
-          directory: passedInImageProps?.directory || '',
-          file,
-        }))
-
-        const allMedia = await cms.media.persist(filesToUpload)
-
-        return allMedia.map(media => {
-          if (passedInImageProps.parse) {
-            return passedInImageProps.parse(media.filename)
-          } else {
-            return media.filename
-          }
-        })
-      },
-      previewSrc(src) {
-        return cms.media.previewSrc(src)
-      },
-      ...passedInImageProps,
-    }
-  }, [
-    cms.media.store,
-    passedInImageProps?.directory,
-    passedInImageProps?.previewSrc,
-    passedInImageProps?.upload,
-  ])
-
   if (cms.disabled) {
     return children
   }
+  /**
+   * Note: We use `input.name` not `name` on FocusRing because
+   * the given name is only relative to the block, not
+   * the absolute path in the form.
+   */
 
   return (
     <InlineField name={name}>
-      {({ input }: any) => {
+      {({ input, form }: InlineWysiwygRenderProps) => {
         return (
-          /**
-           * Note: We use `input.name` not `name` here because
-           * the given name is only relative to the block, not
-           * the absolute path in the form.
-           */
           <FocusRing name={input.name} options={focusRing}>
-            <Wysiwyg input={input} {...wysiwygProps} imageProps={imageProps} />
+            <Wysiwyg
+              input={input}
+              imageProps={imageProps}
+              form={form}
+              {...wysiwygProps}
+            />
           </FocusRing>
         )
       }}

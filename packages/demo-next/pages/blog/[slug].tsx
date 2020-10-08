@@ -18,7 +18,7 @@ limitations under the License.
 import * as React from 'react'
 import ReactMarkdown from 'react-markdown'
 import { NextPage } from 'next'
-import { MarkdownFile, useLocalMarkdownForm } from 'next-tinacms-markdown'
+import { MarkdownFile, useMarkdownForm } from 'next-tinacms-markdown'
 import {
   InlineForm,
   InlineText,
@@ -26,20 +26,20 @@ import {
   useInlineForm,
 } from 'react-tinacms-inline'
 import grayMatter from 'gray-matter'
-import { useCMS } from 'tinacms'
+import { useCMS, usePlugin } from 'tinacms'
 import { InlineWysiwyg } from 'react-tinacms-editor'
 import Link from 'next/link'
 
 const Post: NextPage<{ post: MarkdownFile }> = props => {
-  const [post, form] = useLocalMarkdownForm(props.post, {
+  const [post, form] = useMarkdownForm(props.post, {
     fields: [
       { name: 'frontmatter.title', component: 'text' },
       { name: 'markdownBody', component: 'markdown' },
     ],
   })
+  usePlugin(form)
 
   if (!form) return null
-  const cms = useCMS()
 
   return (
     <InlineForm form={form}>
@@ -62,7 +62,14 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
             <InlineText name="frontmatter.title" />
           </h1>
         </header>
-        <InlineWysiwyg name="markdownBody" focusRing={true}>
+        <InlineWysiwyg
+          name="markdownBody"
+          focusRing={true}
+          imageProps={{
+            parse: media => `/images/${media.filename}`,
+            uploadDir: () => 'public/images',
+          }}
+        >
           <ReactMarkdown source={post.markdownBody} />
         </InlineWysiwyg>
       </article>

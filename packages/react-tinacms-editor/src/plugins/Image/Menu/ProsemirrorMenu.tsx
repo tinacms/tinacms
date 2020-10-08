@@ -16,10 +16,11 @@ limitations under the License.
 
 */
 
-import React, { useRef, useState, ChangeEvent } from 'react'
+import React, { useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { Dismissible } from 'react-dismissible'
 
+import { useCMS, Media } from 'tinacms'
 import { Button } from '@tinacms/styles'
 import { Input } from '@tinacms/fields'
 import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
@@ -33,6 +34,7 @@ export interface MenuProps {
 }
 
 export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
+  const cms = useCMS()
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)
@@ -51,20 +53,17 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
     })
   }
 
-  const insertImageInEditor = () => {
+  const insertImageInEditor = (src: string) => {
     if (!editorView) return
     const { state, dispatch } = editorView.view
-    insertImage(state, dispatch, imageUrl)
+    insertImage(state, dispatch, src)
     editorView.view.focus()
     setShowImageModal(false)
     setImageUrl('')
   }
 
-  const uploadSelectedImage = (event: ChangeEvent) => {
-    const { files } = event.target as any
-    if (files[0]) {
-      uploadImageFile(files[0])
-    }
+  function onMediaSelect(media?: Media): void {
+    if (media) insertImageInEditor(media.previewSrc || media.id)
   }
 
   const stopDefault = (evt: React.DragEvent<HTMLSpanElement>) => {
@@ -120,49 +119,46 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
           }}
         >
           <ImageModalContent>
-            <StyledLabel
-              htmlFor="fileInput"
-              onClick={evt => evt.stopPropagation()}
+            <UploadSection
+              onClick={() => {
+                // TODO: get uploadDir here
+                const directory = '/'
+                cms.media.open({
+                  directory,
+                  onSelect: onMediaSelect,
+                })
+              }}
+              onDragEnter={stopDefault}
+              onDragOver={stopDefault}
+              onDrop={onImageDrop}
+              uploading={uploading}
+              imageUrl={imageUrl}
             >
-              <FileUploadInput
-                id="fileInput"
-                onChange={uploadSelectedImage}
-                type="file"
-                accept="image/*"
-              />
-              <UploadSection
-                onDragEnter={stopDefault}
-                onDragOver={stopDefault}
-                onDrop={onImageDrop}
-                uploading={uploading}
-                imageUrl={imageUrl}
-              >
-                {imageUrl && (
-                  <>
-                    <ClearImageButton
-                      onMouseDown={evt => {
-                        setImageUrl('')
-                        evt.stopPropagation()
-                      }}
-                    >
-                      <CloseIcon />
-                    </ClearImageButton>
-                    <CurrentImage src={imageUrl} alt="uploaded_image" />
-                  </>
-                )}
-                {!imageUrl && (
-                  <>
-                    <UploadIconWrapper>
-                      <UploadIcon />
-                    </UploadIconWrapper>
-                    <UploadText>
-                      {!uploading && `Drag and drop or click to upload`}
-                      {uploading && 'Image uploading...'}
-                    </UploadText>
-                  </>
-                )}
-              </UploadSection>
-            </StyledLabel>
+              {imageUrl && (
+                <>
+                  <ClearImageButton
+                    onMouseDown={evt => {
+                      setImageUrl('')
+                      evt.stopPropagation()
+                    }}
+                  >
+                    <CloseIcon />
+                  </ClearImageButton>
+                  <CurrentImage src={imageUrl} alt="uploaded_image" />
+                </>
+              )}
+              {!imageUrl && (
+                <>
+                  <UploadIconWrapper>
+                    <UploadIcon />
+                  </UploadIconWrapper>
+                  <UploadText>
+                    {!uploading && `Drag and drop or click to upload`}
+                    {uploading && 'Image uploading...'}
+                  </UploadText>
+                </>
+              )}
+            </UploadSection>
             <UrlInputWrapper>
               {displayUrlInput && (
                 <>
@@ -198,7 +194,11 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
               <Button small onClick={handleCloseModal}>
                 Cancel
               </Button>
-              <Button primary small onClick={insertImageInEditor}>
+              <Button
+                primary
+                small
+                onClick={() => insertImageInEditor(imageUrl)}
+              >
                 Insert
               </Button>
             </ImageModalActions>
@@ -346,12 +346,4 @@ const UploadSection = styled.div<{ uploading: boolean; imageUrl: string }>`
       border-radius: var(--tina-radius-small);
       border: 1px solid var(--tina-color-grey-2);
     `};
-`
-
-const FileUploadInput = styled.input`
-  display: none;
-`
-
-const StyledLabel = styled.label`
-  display: block;
 `
