@@ -72,7 +72,17 @@ export function InlineForm({ form, children }: InlineFormProps) {
         disabled={!focussedField}
         click
         allowClickPropagation
-        onDismiss={() => setFocussedField('')}
+        onDismiss={() => {
+          const settingsModalIsOpen = document.getElementById(
+            'tinacms-inline-settings'
+          )
+
+          if (settingsModalIsOpen) {
+            return
+          }
+
+          setFocussedField('')
+        }}
       >
         <DragDropContext onDragEnd={moveArrayItem}>
           <div onClick={() => setFocussedField('')}>

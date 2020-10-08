@@ -16,14 +16,18 @@ limitations under the License.
 
 */
 
-export * from './use-cms'
-export * from './use-form'
-export * from './use-plugin'
-export * from './use-subscribable'
-export * from './use-watch-form-values'
-export * from './with-plugin'
-export * from './with-tina'
-export { useCMSEvent } from '@tinacms/react-core'
+import * as React from 'react'
+import { Callback } from '@tinacms/core'
+import { useCMS } from './use-cms'
 
-export { Plugin } from '@tinacms/core'
-export { Form, FormOptions, Field } from '@tinacms/forms'
+export function useCMSEvent(
+  event: string | string[],
+  callback: Callback,
+  deps: React.DependencyList
+) {
+  const cms = useCMS()
+
+  React.useEffect(function() {
+    return cms.events.subscribe(event, callback)
+  }, deps)
+}

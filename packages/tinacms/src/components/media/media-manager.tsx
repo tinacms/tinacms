@@ -140,11 +140,13 @@ export function MediaPicker({
     }
   }
 
+  const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: 'image/*',
 
     onDrop: async ([file]) => {
       try {
+        setUploading(true)
         await cms.media.persist([
           {
             directory: directory || '/',
@@ -154,6 +156,7 @@ export function MediaPicker({
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
       }
+      setUploading(false)
     },
   })
 
@@ -186,9 +189,7 @@ export function MediaPicker({
     <MediaPickerWrap>
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
-        <Button primary onClick={onClick}>
-          Upload
-        </Button>
+        <UploadButton onClick={onClick} uploading={uploading} />
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
@@ -209,6 +210,19 @@ export function MediaPicker({
 
       <PageLinks list={list} setOffset={setOffset} />
     </MediaPickerWrap>
+  )
+}
+
+const UploadButton = ({ onClick, uploading }: any) => {
+  return (
+    <Button
+      style={{ minWidth: '5rem' }}
+      primary
+      busy={uploading}
+      onClick={onClick}
+    >
+      {uploading ? <LoadingDots /> : 'Upload'}
+    </Button>
   )
 }
 

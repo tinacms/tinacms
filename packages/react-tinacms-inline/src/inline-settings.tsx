@@ -103,7 +103,7 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
     [form]
   )
   return (
-    <Modal onClick={e => e.stopPropagation()}>
+    <Modal id="tinacms-inline-settings" onClick={e => e.stopPropagation()}>
       <ModalPopup>
         <ModalHeader close={close}>Settings</ModalHeader>
         <ModalBody>
