@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { Block } from './block'
 import { InlineField } from '../inline-field'
-import { useState } from 'react'
 import { AddBlockMenu } from './add-block-menu'
 import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
