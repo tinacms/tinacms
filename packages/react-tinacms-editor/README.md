@@ -222,3 +222,7 @@ export function InlineWysiwyg(props) {
 
 > #### Why do I have to load the editor dynamically myself?
 > Code splitting and dynamic imports are handled by the website's JavaScript bundlers (e.g. rollup, webpack, etc.). Since the package does not load itself into the application, it is unfortunately not possible to provide this behaviour in the package itself.
+
+## Contributing 
+
+For a deeper understanding of the Wysiwyg editor and inner-workings of the `react-tinacms-editor` package, checkout the [contributor documentation](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-editor/editor-docs)
