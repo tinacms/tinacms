@@ -64,9 +64,14 @@ export class JsonCreatorPlugin<FormShape = any, FrontmatterShape = any>
     const fileRelativePath = await this.filename(form)
     const content = await this.data(form)
 
-    cms.api.git!.onChange!({
+    await cms.api.git!.onChange!({
       fileRelativePath,
       content: JSON.stringify(content, null, 2),
+    })
+
+    await cms.api.git.commit({
+      files: [fileRelativePath],
+      message: `Commit from Tina: Created ${fileRelativePath}`,
     })
   }
 }
