@@ -17,8 +17,8 @@ distributed under the License is distributed on an "AS IS" BASIS,
 */
 
 import React from 'react'
-import { useEffect, useState } from 'react'
-import { useCMS } from '@tinacms/react-core'
+import { useState } from 'react'
+import { useCMSEvent } from '@tinacms/react-core'
 import { StrapiAuthenticationModal } from './strapi-auth-modal'
 
 interface ProviderProps {
@@ -60,11 +60,4 @@ export const StrapiProvider = ({
       {children}
     </>
   )
-}
-
-function useCMSEvent(event: string, callback: any, deps: React.DependencyList) {
-  const cms = useCMS()
-  useEffect(function() {
-    return cms.events.subscribe(event, callback)
-  }, deps)
 }

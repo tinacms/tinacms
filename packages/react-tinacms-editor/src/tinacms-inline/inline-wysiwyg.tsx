@@ -51,13 +51,20 @@ export function InlineWysiwyg({
     <InlineField name={name}>
       {({ input, form }: InlineWysiwygRenderProps) => {
         return (
-          <FocusRing name={name} options={focusRing}>
+          <FocusRing name={input.name} options={focusRing}>
             <Wysiwyg
               input={input}
               imageProps={imageProps}
               form={form}
               {...wysiwygProps}
             />
+          /**
+           * Note: We use `input.name` not `name` here because
+           * the given name is only relative to the block, not
+           * the absolute path in the form.
+           */
+          <FocusRing name={input.name} options={focusRing}>
+            <Wysiwyg input={input} {...wysiwygProps} imageProps={imageProps} />
           </FocusRing>
         )
       }}
