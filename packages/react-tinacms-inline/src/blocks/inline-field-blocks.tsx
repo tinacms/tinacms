@@ -103,7 +103,6 @@ export function InlineBlocks({
         const allData: { _template: string }[] = input.value || []
 
         const move = (from: number, to: number) => {
-          const movement = to - from
           form.mutators.move(name, from, to)
           setFocussedField(`${name}.${to}`)
         }
