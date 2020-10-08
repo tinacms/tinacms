@@ -39,7 +39,6 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
   const { editorView } = useEditorStateContext()
   const [displayUrlInput, setDisplayUrlInput] = useState(false)
   const [imageUrl, setImageUrl] = useState('')
-  const [mediaSelected, setMediaSelected] = useState(false)
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
 
@@ -54,29 +53,18 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
     })
   }
 
-  const insertImageInEditor = () => {
+  const insertImageInEditor = (src: string) => {
     if (!editorView) return
     const { state, dispatch } = editorView.view
-    insertImage(state, dispatch, imageUrl)
+    insertImage(state, dispatch, src)
     editorView.view.focus()
     setShowImageModal(false)
     setImageUrl('')
   }
 
-  function onMediaSelect(media?: Media) {
-    if (media) {
-      setImageUrl('')
-      setImageUrl(media.previewSrc || media.id)
-      setMediaSelected(true)
-    }
+  function onMediaSelect(media?: Media): void {
+    if (media) insertImageInEditor(media.previewSrc || media.id)
   }
-
-  React.useEffect(() => {
-    if (mediaSelected) {
-      insertImageInEditor()
-      setMediaSelected(false)
-    }
-  }, [mediaSelected])
 
   const stopDefault = (evt: React.DragEvent<HTMLSpanElement>) => {
     evt.preventDefault()
@@ -206,7 +194,11 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
               <Button small onClick={handleCloseModal}>
                 Cancel
               </Button>
-              <Button primary small onClick={insertImageInEditor}>
+              <Button
+                primary
+                small
+                onClick={() => insertImageInEditor(imageUrl)}
+              >
                 Insert
               </Button>
             </ImageModalActions>
