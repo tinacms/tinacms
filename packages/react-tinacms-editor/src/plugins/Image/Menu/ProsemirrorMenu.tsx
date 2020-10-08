@@ -62,8 +62,11 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
     setImageUrl('')
   }
 
-  function onMediaSelect(media?: Media): void {
-    if (media) insertImageInEditor(media.previewSrc || media.id)
+  async function onMediaSelect(media?: Media) {
+    if (media) {
+      const previewSrc = await cms.media.previewSrc(media.id)
+      insertImageInEditor(previewSrc)
+    }
   }
 
   const stopDefault = (evt: React.DragEvent<HTMLSpanElement>) => {
