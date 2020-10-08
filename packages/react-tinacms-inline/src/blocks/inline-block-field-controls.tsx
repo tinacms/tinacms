@@ -98,7 +98,7 @@ export function BlocksControls({
   const isActive = name === focussedField
   const childIsActive = focussedField.startsWith(name!)
 
-  const handleSetActiveBlock = (event: any) => {
+  const focusOnBlock = (event: any) => {
     if (
       blockMenuRef.current?.contains(event.target) ||
       blockMoveUpRef.current?.contains(event.target) ||
@@ -133,7 +133,7 @@ export function BlocksControls({
           <StyledFocusRing
             ref={provider.innerRef}
             active={focusRing && isActive}
-            onClick={handleSetActiveBlock}
+            onClick={focusOnBlock}
             offset={offset}
             borderRadius={borderRadius}
             {...provider.draggableProps}
