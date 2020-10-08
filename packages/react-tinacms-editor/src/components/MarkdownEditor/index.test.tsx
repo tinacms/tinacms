@@ -39,7 +39,10 @@ describe('MarkdownEditor', () => {
       <MarkdownEditor
         onChange={() => {}}
         value=""
-        imageProps={{ parse: filename => filename, upload: (() => {}) as any }}
+        imageProps={{
+          parse: media => media.filename,
+          upload: (() => {}) as any,
+        }}
       />
     )
     expect(getByTestId('image-menu')).toBeDefined()
