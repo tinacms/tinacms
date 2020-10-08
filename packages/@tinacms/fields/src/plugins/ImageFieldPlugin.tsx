@@ -27,7 +27,7 @@ import { useState, useEffect } from 'react'
 interface ImageProps {
   path: string
   previewSrc?: MediaStore['previewSrc']
-  uploadDir?(form: any): string
+  uploadDir?(formValues: any): string
   clearable?: boolean // defaults to true
 }
 
