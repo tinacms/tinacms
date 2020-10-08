@@ -48,7 +48,7 @@ export function EditableImage({
   )
 
   async function handleUploadImage([file]: File[]) {
-    const directory = uploadDir ? uploadDir(form) : ''
+    const directory = uploadDir ? uploadDir(form.values) : ''
 
     const [media] = await cms.media.persist([
       {
@@ -71,7 +71,7 @@ export function EditableImage({
         alt={alt}
         onDrop={handleUploadImage}
         onClick={() => {
-          const directory = uploadDir ? uploadDir(form) : ''
+          const directory = uploadDir ? uploadDir(form.values) : ''
           cms.media.open({
             allowDelete: true,
             directory,
