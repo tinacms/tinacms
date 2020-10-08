@@ -105,7 +105,7 @@ function useImageProps(
   React.useMemo(() => {
     if (!passedInImageProps) return
     const { uploadDir, parse } = passedInImageProps
-    const directory = uploadDir && form ? uploadDir(form) : ''
+    const directory = uploadDir && form ? uploadDir(form.values) : ''
 
     setImageProps({
       async upload(files: File[]): Promise<string[]> {

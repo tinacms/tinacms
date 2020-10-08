@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { InlineField } from '../../inline-field'
-import { useCMS, Form, Media, MediaStore } from 'tinacms'
+import { useCMS, Media, MediaStore } from 'tinacms'
 import { FocusRingOptions } from '../../styles'
 import { NonEditableImage } from './non-editable-image'
 import { EditableImage } from './editable-image'
@@ -26,7 +26,7 @@ import { EditableImage } from './editable-image'
 export interface InlineImageProps {
   name: string
   parse(media: Media): string
-  uploadDir?(form: Form): string
+  uploadDir?(formValues: any): string
   previewSrc?: MediaStore['previewSrc']
   focusRing?: boolean | FocusRingOptions
   className?: string
