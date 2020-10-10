@@ -16,12 +16,30 @@ limitations under the License.
 
 */
 
-import { GitMediaStore } from '@tinacms/git-client'
+import { GitMediaStore, nextOffset } from '@tinacms/git-client'
 
 export class NextGitMediaStore extends GitMediaStore {
   previewSrc(src) {
     return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
       ? src.replace('/public', '')
       : null
+  }
+  async list(options) {
+    const directory = options.directory ?? ''
+    const offset = options.offset ?? 0
+    const limit = options.limit ?? 50
+    const { file } = await this.client.getFile(directory)
+
+    return {
+      items: file.content.slice(offset, offset + limit).map(media => ({
+        ...media,
+        previewSrc:
+          media.type === 'file' ? this.previewSrc(media.id) : undefined,
+      })),
+      totalCount: file.content.length,
+      offset,
+      limit,
+      nextOffset: nextOffset(offset, limit, file.content.length),
+    }
   }
 }
