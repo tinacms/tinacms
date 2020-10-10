@@ -63,11 +63,7 @@ export class GitMediaStore implements MediaStore {
     const { file } = await this.client.getFile(directory)
 
     return {
-      items: file.content.slice(offset, offset + limit).map((media: Media) => ({
-        ...media,
-        previewSrc:
-          media.type === 'file' ? this.previewSrc(media.id) : undefined,
-      })),
+      items: file.content.slice(offset, offset + limit),
       totalCount: file.content.length,
       offset,
       limit,
@@ -81,7 +77,7 @@ export class GitMediaStore implements MediaStore {
   }
 }
 
-const nextOffset = (offset: number, limit: number, count: number) => {
+export const nextOffset = (offset: number, limit: number, count: number) => {
   if (offset + limit < count) return offset + limit
   return undefined
 }
