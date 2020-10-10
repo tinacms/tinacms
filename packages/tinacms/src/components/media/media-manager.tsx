@@ -102,7 +102,8 @@ export function MediaPicker({
           setList(list)
           setListState('loaded')
         })
-        .catch(() => {
+        .catch(e => {
+          console.error(e)
           setListState('error')
         })
     }
