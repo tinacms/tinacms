@@ -296,6 +296,7 @@ interface Block {
 }
 
 interface BlockComponentProps {
+  name: string
   index: number
   data: any
 }
@@ -311,6 +312,7 @@ interface BlockTemplate {
 
 | Key           |                                                                                                                Purpose |
 | ------------- | ---------------------------------------------------------------------------------------------------------------------: |
+| `name`       |                                                                                                A unique identifier and pseudo-path to the block from the parent blocks array. e.g. the first child would be 'blocks.0' |
 | `index`       |                                                                                                Position in the block array. |
 | `data` |                                                                   The source data. |
 
