@@ -24,4 +24,15 @@ export class NextGitMediaStore extends GitMediaStore {
       ? src.replace('/public', '')
       : null
   }
+  async list(options) {
+    const listItems = await super.list(options)
+    return {
+      ...listItems,
+      items: listItems.items.map(media => ({
+        ...media,
+        previewSrc:
+          media.type === 'file' ? this.previewSrc(media.id) : undefined,
+      })),
+    }
+  }
 }
