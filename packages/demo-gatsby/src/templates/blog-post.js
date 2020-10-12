@@ -203,7 +203,7 @@ function BlogPostTemplate(props) {
                   return postDirectory
                 },
                 previewSrc(src) {
-                  const formattedSrc = src.replace(/\/public|\/static/, "")
+                  const formattedSrc = src.replace(/^\/public|\/static/, "")
                   return formattedSrc
                 },
               }}
