@@ -28,12 +28,14 @@ import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
 import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
 import { useEditorStateContext } from '../../../context/editorState'
 import { insertImage } from '../commands'
+import { ImageProps } from '../../../types'
 
 export interface MenuProps {
   uploadImages?: (files: File[]) => Promise<string[]>
+  uploadDir?: ImageProps['uploadDir']
 }
 
-export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
+export const ProsemirrorMenu = ({ uploadImages, uploadDir }: MenuProps) => {
   const cms = useCMS()
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
@@ -121,10 +123,8 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
           <ImageModalContent>
             <UploadSection
               onClick={() => {
-                // TODO: get uploadDir here
-                const directory = '/'
                 cms.media.open({
-                  directory,
+                  directory: typeof uploadDir === 'string' ? uploadDir : '/',
                   onSelect: onMediaSelect,
                 })
               }}

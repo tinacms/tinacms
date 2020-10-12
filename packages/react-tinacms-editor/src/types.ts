@@ -27,7 +27,7 @@ import { Form, Media } from 'tinacms'
 
 export interface ImageProps {
   parse(media: Media): string
-  uploadDir?(formValues: any): string
+  uploadDir?: ((formValues: any) => string) | string
   upload?: (files: File[]) => Promise<string[]>
   previewSrc?: (url: string) => string | Promise<string>
 }
