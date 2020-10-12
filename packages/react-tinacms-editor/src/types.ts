@@ -33,7 +33,7 @@ export interface PassedImageProps {
 }
 
 export interface ImageProps extends PassedImageProps {
-  mediaDir?: string
+  mediaDir: string
 }
 
 export interface KeymapPlugin {
