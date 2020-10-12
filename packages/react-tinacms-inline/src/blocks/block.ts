@@ -26,6 +26,7 @@ export interface Block {
 }
 
 export interface BlockComponentProps {
+  name: string
   index: number
   data: any
 }
