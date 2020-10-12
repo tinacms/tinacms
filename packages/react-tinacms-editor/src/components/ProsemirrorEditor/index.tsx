@@ -83,6 +83,11 @@ export const ProsemirrorEditor = styled(
           <Menubar
             sticky={sticky}
             uploadImages={imageProps && imageProps.upload}
+            uploadDir={
+              imageProps && typeof imageProps.uploadDir === 'string'
+                ? imageProps.uploadDir
+                : undefined
+            }
             plugins={plugins}
           />
         </EditorStateProvider>

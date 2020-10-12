@@ -38,14 +38,21 @@ import { LinkForm as LinkFormPopup } from '../../../plugins/Link'
 import { Plugin } from '../../../types'
 import { useEditorStateContext } from '../../../context/editorState'
 import { BaseMenubar } from '../../BaseMenubar'
+import { ImageProps } from '../../../types'
 
 interface Props {
   sticky?: boolean | string
   uploadImages?: (files: File[]) => Promise<string[]>
+  uploadDir?: ImageProps['uploadDir']
   plugins?: Plugin[]
 }
 
-export const Menubar = ({ plugins, uploadImages, ...rest }: Props) => {
+export const Menubar = ({
+  plugins,
+  uploadImages,
+  uploadDir,
+  ...rest
+}: Props) => {
   const { editorView } = useEditorStateContext()
 
   if (!editorView) return null
@@ -57,7 +64,11 @@ export const Menubar = ({ plugins, uploadImages, ...rest }: Props) => {
         <BlockMenu key="BlockMenu" />,
         <InlineMenu key="InlineMenu" />,
         <LinkMenu key="LinkMenu" />,
-        <ImageMenu key="ImageMenu" uploadImages={uploadImages} />,
+        <ImageMenu
+          key="ImageMenu"
+          uploadImages={uploadImages}
+          uploadDir={uploadDir}
+        />,
         <TableMenu key="TableMenu" />,
         <QuoteMenu key="QuoteMenu" />,
         <CodeBlockMenu key="CodeBlockMenu" />,
