@@ -40,9 +40,9 @@ import { useEditorStateContext } from '../../../context/editorState'
 import { BaseMenubar } from '../../BaseMenubar'
 
 interface Props {
+  mediaDir: string
   sticky?: boolean | string
   uploadImages?: (files: File[]) => Promise<string[]>
-  mediaDir?: string
   plugins?: Plugin[]
 }
 
