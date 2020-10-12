@@ -26,7 +26,7 @@ import {
   EditorModeProvider,
   EditorModeConsumer,
 } from '../../context/editorMode'
-import { EditorProps, ImageProps } from '../../types'
+import { EditorProps, PassedImageProps, ImageProps } from '../../types'
 import { MarkdownEditor } from '../MarkdownEditor'
 import { ProsemirrorEditor } from '../ProsemirrorEditor'
 
@@ -98,17 +98,14 @@ const Wrapper = styled.div`
 function useImageProps(
   cms: TinaCMS,
   form?: Form,
-  passedInImageProps?: ImageProps
+  passedInImageProps?: PassedImageProps
 ): ImageProps | undefined {
   const [imageProps, setImageProps] = React.useState<ImageProps | undefined>()
 
   React.useMemo(() => {
     if (!passedInImageProps) return
     const { uploadDir, parse } = passedInImageProps
-    const _uploadDir: string =
-      uploadDir && form && typeof uploadDir !== 'string'
-        ? uploadDir(form.values)
-        : ''
+    const _uploadDir: string = uploadDir && form ? uploadDir(form.values) : ''
 
     setImageProps({
       async upload(files: File[]): Promise<string[]> {
@@ -130,7 +127,7 @@ function useImageProps(
       previewSrc(src: string) {
         return cms.media.previewSrc(src)
       },
-      uploadDir: _uploadDir,
+      mediaDir: _uploadDir,
       ...passedInImageProps,
     })
   }, [
