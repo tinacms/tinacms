@@ -20,7 +20,7 @@ import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
 import { EventsToAlerts } from '@tinacms/alerts'
 export * from './authenticate'
-import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH } from '../events'
+import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH, ERROR } from '../events'
 import { b64EncodeUnicode } from './base64'
 import { EventBus } from '@tinacms/core'
 
@@ -62,6 +62,10 @@ export class GithubClient {
     [CHECKOUT_BRANCH]: event => ({
       level: 'info',
       message: 'Switched to branch ' + event.branchName,
+    }),
+    [ERROR]: event => ({
+      level: 'error',
+      message: event.message,
     }),
   }
 
@@ -353,7 +357,7 @@ export class GithubClient {
         message: commitMessage,
         content: encoded ? fileContents : b64EncodeUnicode(fileContents),
         branch: branch,
-        sha,
+        sha: sha || '',
       },
     })
   }
@@ -371,7 +375,14 @@ export class GithubClient {
     path: string,
     commitMessage: string = `Deleted ${path} using TinaCMS`
   ) {
-    return this.githubFileApi(path, '', commitMessage, false, 'DELETE')
+    try {
+      return await this.githubFileApi(path, '', commitMessage, false, 'DELETE')
+    } catch (e) {
+      this.events.dispatch({
+        type: ERROR,
+        message: `Failed to delete: ${e.message}`,
+      })
+    }
   }
 
   protected async req(data: any) {
