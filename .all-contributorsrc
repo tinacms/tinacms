@@ -813,6 +813,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "kud",
+      "name": "Erwann Mest",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/655838?v=4",
+      "profile": "http://kud.io",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
