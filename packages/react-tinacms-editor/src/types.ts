@@ -25,11 +25,15 @@ import { Schema } from 'prosemirror-model'
 import { Format } from './translator'
 import { Form, Media } from 'tinacms'
 
-export interface ImageProps {
+export interface PassedImageProps {
   parse(media: Media): string
-  uploadDir?: ((formValues: any) => string) | string
+  uploadDir?(formValues: any): string
   upload?: (files: File[]) => Promise<string[]>
   previewSrc?: (url: string) => string | Promise<string>
+}
+
+export interface ImageProps extends PassedImageProps {
+  mediaDir?: string
 }
 
 export interface KeymapPlugin {
