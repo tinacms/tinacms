@@ -18,6 +18,7 @@ limitations under the License.
 
 import React from "react"
 import { Link, graphql } from "gatsby"
+import path from "path"
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
@@ -194,13 +195,9 @@ function BlogPostTemplate(props) {
 
                 // Decide the file upload directory for the post
                 uploadDir: blogPost => {
-                  const postPathParts = blogPost.fileRelativePath.split("/")
-
-                  const postDirectory = postPathParts
-                    .splice(0, postPathParts.length - 1)
-                    .join("/")
-
-                  return postDirectory
+                  return blogPost.fileRelativePath
+                    ? path.dirname(blogPost.fileRelativePath)
+                    : "/"
                 },
                 previewSrc(src) {
                   const formattedSrc = src.replace(/^\/public|\/static/, "")
