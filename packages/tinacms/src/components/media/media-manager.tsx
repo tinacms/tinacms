@@ -216,7 +216,7 @@ export function MediaPicker({
 const UploadButton = ({ onClick, uploading }: any) => {
   return (
     <Button
-      style={{ minWidth: '5rem' }}
+      style={{ minWidth: '5.3rem' }}
       primary
       busy={uploading}
       onClick={onClick}
