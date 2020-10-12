@@ -18,6 +18,7 @@ limitations under the License.
 
 import React from "react"
 import { Link, graphql } from "gatsby"
+import path from "path"
 
 import Bio from "../components/bio"
 import Layout from "../components/layout"
@@ -109,7 +110,7 @@ function BlogPostTemplate(props) {
                   <InlineImage
                     name="rawFrontmatter.thumbnail"
                     // Generate the frontmatter value based on the filename
-                    parse={filename => (filename ? `./${filename}` : null)}
+                    parse={media => `./${media.filename}`}
                     // Decide the file upload directory for the post
                     uploadDir={blogPost => {
                       const postPathParts = blogPost.initialValues.fileRelativePath.split(
@@ -122,7 +123,7 @@ function BlogPostTemplate(props) {
 
                       return postDirectory
                     }}
-                    previewSrc={formValues => {
+                    previewSrc={(src, path, formValues) => {
                       const preview =
                         formValues.frontmatter.thumbnail.childImageSharp.fluid
                           .src
@@ -189,24 +190,18 @@ function BlogPostTemplate(props) {
               sticky="74px"
               name="rawMarkdownBody"
               imageProps={{
-                async upload(files) {
-                  const directory = "/static/images/"
+                // Generate the frontmatter value based on the filename
+                parse: media => `./${media.filename}`,
 
-                  let media = await cms.media.store.persist(
-                    files.map(file => ({
-                      directory,
-                      file,
-                    }))
-                  )
-
-                  return media.map(m => `/images/${m.filename}`)
+                // Decide the file upload directory for the post
+                uploadDir: blogPost => {
+                  return blogPost.fileRelativePath
+                    ? path.dirname(blogPost.fileRelativePath)
+                    : "/"
                 },
-                previewUrl(src) {
-                  return new Promise(resolve => {
-                    setTimeout(() => {
-                      resolve(src)
-                    }, 3000)
-                  })
+                previewSrc(src) {
+                  const formattedSrc = src.replace(/^\/public|\/static/, "")
+                  return formattedSrc
                 },
               }}
             >
@@ -375,7 +370,7 @@ const BlogPostForm = {
       label: "Thumbnail",
       component: "image",
       // Generate the frontmatter value based on the filename
-      parse: filename => (filename ? `./${filename}` : null),
+      parse: media => `./${media.filename}`,
 
       // Decide the file upload directory for the post
       uploadDir: blogPost => {
@@ -389,13 +384,8 @@ const BlogPostForm = {
       },
 
       // Generate the src attribute for the preview image.
-      previewSrc: (formValues, { input }) => {
-        let path = input.name.replace("rawFrontmatter", "frontmatter")
-        console.log({ path })
-        let gastbyImageNode = get(formValues, path)
-        console.log({ gastbyImageNode })
-        if (!gastbyImageNode) return ""
-        return gastbyImageNode.childImageSharp.fluid.src
+      previewSrc: (src, path, formValues) => {
+        return formValues.frontmatter.thumbnail.childImageSharp.fluid.src
       },
     },
   ],
