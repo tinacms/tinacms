@@ -30,6 +30,7 @@ export interface ImageProps {
   uploadDir?(formValues: any): string
   upload?: (files: File[]) => Promise<string[]>
   previewSrc?: (url: string) => string | Promise<string>
+  mediaDir?: string
 }
 
 export interface KeymapPlugin {
