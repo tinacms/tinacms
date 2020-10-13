@@ -31,9 +31,10 @@ import { insertImage } from '../commands'
 
 export interface MenuProps {
   uploadImages?: (files: File[]) => Promise<string[]>
+  mediaDir?: string
 }
 
-export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
+export const ProsemirrorMenu = ({ uploadImages, mediaDir }: MenuProps) => {
   const cms = useCMS()
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
@@ -124,10 +125,8 @@ export const ProsemirrorMenu = ({ uploadImages }: MenuProps) => {
           <ImageModalContent>
             <UploadSection
               onClick={() => {
-                // TODO: get uploadDir here
-                const directory = '/'
                 cms.media.open({
-                  directory,
+                  directory: mediaDir || '/',
                   onSelect: onMediaSelect,
                 })
               }}

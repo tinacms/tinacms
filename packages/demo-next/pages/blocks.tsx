@@ -98,9 +98,9 @@ const cta_template: BlockTemplate = {
   ],
 }
 
-function CallToActionBlock({ index, data, style }) {
+function CallToActionBlock({ index, data }) {
   return (
-    <div className="block" style={style}>
+    <div className="block">
       <BlocksControls index={index}>
         <button
           onClick={() => window.open(data.url, '_blank')}
