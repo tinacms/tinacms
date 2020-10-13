@@ -47,6 +47,7 @@ export const BaseMenubar = ({
   const isBrowser = typeof window !== `undefined`
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
+  const [menuStartPos, setMenuStartPos] = useState<number | null>(null)
   const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
   const { editorView } = useEditorStateContext()
   const { mode } = useEditorModeContext()
@@ -63,17 +64,20 @@ export const BaseMenubar = ({
       return
     }
 
-    const handleScroll = () => {
+    const handleStickyMenuScroll = () => {
       const wysiwygWrapper = menuRef.current!.parentElement
-      const startPosition = wysiwygWrapper ? wysiwygWrapper.offsetTop : 0
-      const endPosition = wysiwygWrapper
-        ? startPosition + wysiwygWrapper.offsetHeight
-        : 0
+      if (wysiwygWrapper && menuStartPos === null) {
+        setMenuStartPos(wysiwygWrapper?.getBoundingClientRect().top)
+      } else if (typeof menuStartPos === 'number') {
+        const endPosition = wysiwygWrapper
+          ? menuStartPos + wysiwygWrapper.offsetHeight
+          : 0
 
-      if (window.scrollY > startPosition && window.scrollY < endPosition) {
-        setMenuFixed(true)
-      } else {
-        setMenuFixed(false)
+        if (window.scrollY > menuStartPos && window.scrollY < endPosition) {
+          setMenuFixed(true)
+        } else {
+          setMenuFixed(false)
+        }
       }
     }
 
@@ -86,12 +90,12 @@ export const BaseMenubar = ({
       }
     }
 
-    handleScroll()
-    window.addEventListener('scroll', handleScroll)
+    handleStickyMenuScroll()
+    window.addEventListener('scroll', handleStickyMenuScroll)
     window.addEventListener('resize', handleResize)
 
     return () => {
-      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('scroll', handleStickyMenuScroll)
       window.removeEventListener('resize', handleResize)
     }
   }, [menuRef, menuBoundingBox])
