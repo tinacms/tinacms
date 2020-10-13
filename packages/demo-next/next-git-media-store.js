@@ -21,7 +21,7 @@ import { GitMediaStore } from '@tinacms/git-client'
 export class NextGitMediaStore extends GitMediaStore {
   previewSrc(src) {
     return /jpg|jpeg|png|svg|gif$/.test(src.toLowerCase())
-      ? src.replace('/public', '')
+      ? src.replace(/\/?public/, '')
       : null
   }
 }
