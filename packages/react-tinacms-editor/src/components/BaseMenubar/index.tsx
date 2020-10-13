@@ -67,7 +67,7 @@ export const BaseMenubar = ({
     const handleStickyMenuScroll = () => {
       const wysiwygWrapper = menuRef.current!.parentElement
       if (wysiwygWrapper && menuStartPos === null) {
-        setMenuStartPos(wysiwygWrapper?.getBoundingClientRect().top)
+        setMenuStartPos(wysiwygWrapper.getBoundingClientRect().top)
       } else if (typeof menuStartPos === 'number') {
         const endPosition = wysiwygWrapper
           ? menuStartPos + wysiwygWrapper.offsetHeight
