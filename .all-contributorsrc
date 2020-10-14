@@ -822,6 +822,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "franknoirot",
+      "name": "Frank Noirot",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/23481541?v=4",
+      "profile": "https://franknoirot.co",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
