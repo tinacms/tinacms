@@ -81,7 +81,7 @@ export const BaseMenubar = ({
       return
     }
     const wysiwygWrapper = menuRef.current!.parentElement
-    const stickyTopOffset = parseInt(menuFixedTopOffset.replace(/px$/, ''))
+    const stickyTopOffset = parseInt(menuFixedTopOffset, 10)
     const distance = getOffsetTop(wysiwygWrapper)
 
     menuOffsetTop === null && setMenuOffsetTop(distance)
