@@ -37,6 +37,22 @@ interface Props {
   popups?: ReactElement[]
 }
 
+function getOffsetTop(el: any) {
+  let distance = 0
+  /**
+   * traverses the dom up to get the true distance
+   * of an element from the top of the document
+   */
+  if (el.offsetParent) {
+    do {
+      distance += el.offsetTop
+      el = el.offsetParent
+    } while (el)
+  }
+
+  return distance < 0 ? 0 : distance
+}
+
 export const BaseMenubar = ({
   sticky = true,
   menus,
@@ -51,23 +67,6 @@ export const BaseMenubar = ({
   const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
   const { editorView } = useEditorStateContext()
   const { mode } = useEditorModeContext()
-
-  function getOffsetTop(el: any) {
-    let distance = 0
-    /**
-     * traverses the dom up to get the true distance
-     * of an element from the top of the document
-     */
-
-    if (el.offsetParent) {
-      do {
-        distance += el.offsetTop
-        el = el.offsetParent
-      } while (el)
-    }
-
-    return distance < 0 ? 0 : distance
-  }
 
   useEffect(() => {
     if (menuRef.current && sticky) {
