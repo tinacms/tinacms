@@ -47,10 +47,27 @@ export const BaseMenubar = ({
   const isBrowser = typeof window !== `undefined`
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
-  const [menuStartPos, setMenuStartPos] = useState<number | null>(null)
+  const [menuOffsetTop, setMenuOffsetTop] = useState<number | null>(null)
   const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
   const { editorView } = useEditorStateContext()
   const { mode } = useEditorModeContext()
+
+  function getOffsetTop(el: any) {
+    let distance = 0
+    /**
+     * traverses the dom up to get the true distance
+     * of an element from the top of the document
+     */
+
+    if (el.offsetParent) {
+      do {
+        distance += el.offsetTop
+        el = el.offsetParent
+      } while (el)
+    }
+
+    return distance < 0 ? 0 : distance
+  }
 
   useEffect(() => {
     if (menuRef.current && sticky) {
@@ -63,17 +80,18 @@ export const BaseMenubar = ({
     if (!isBrowser || !menuRef.current || !sticky) {
       return
     }
+    const wysiwygWrapper = menuRef.current!.parentElement
+    const stickyTopOffset = parseInt(menuFixedTopOffset.replace(/px$/, ''))
+    const distance = getOffsetTop(wysiwygWrapper)
+
+    menuOffsetTop === null && setMenuOffsetTop(distance)
 
     const handleStickyMenuScroll = () => {
-      const wysiwygWrapper = menuRef.current!.parentElement
-      if (wysiwygWrapper && menuStartPos === null) {
-        setMenuStartPos(wysiwygWrapper?.getBoundingClientRect().top)
-      } else if (typeof menuStartPos === 'number') {
-        const endPosition = wysiwygWrapper
-          ? menuStartPos + wysiwygWrapper.offsetHeight
-          : 0
+      if (typeof menuOffsetTop === 'number') {
+        const topBound = menuOffsetTop - stickyTopOffset
+        const btmBound = topBound + (wysiwygWrapper?.offsetHeight || 0)
 
-        if (window.scrollY > menuStartPos && window.scrollY < endPosition) {
+        if (window.scrollY > topBound && window.scrollY < btmBound) {
           setMenuFixed(true)
         } else {
           setMenuFixed(false)
