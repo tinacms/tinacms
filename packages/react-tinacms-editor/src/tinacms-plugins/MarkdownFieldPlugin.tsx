@@ -21,7 +21,14 @@ import { Wysiwyg } from '../components/Wysiwyg'
 import { wysiwygStyles } from './wysiwygStyles'
 
 const MarkdownField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="markdown" />
+  return (
+    <Wysiwyg
+      {...props}
+      sticky={false}
+      format="markdown"
+      imageProps={props.field.imageProps}
+    />
+  )
 })
 
 export const MarkdownFieldPlugin = {
