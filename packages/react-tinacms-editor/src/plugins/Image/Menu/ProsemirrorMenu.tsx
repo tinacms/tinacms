@@ -65,8 +65,7 @@ export const ProsemirrorMenu = ({ uploadImages, mediaDir }: MenuProps) => {
 
   async function onMediaSelect(media?: Media) {
     if (media) {
-      const previewSrc = await cms.media.previewSrc(media.id)
-      insertImageInEditor(previewSrc)
+      insertImageInEditor(media.id)
     }
   }
 
