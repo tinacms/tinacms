@@ -31,7 +31,7 @@ import { insertImage } from '../commands'
 import { ImageProps } from '../../../types'
 
 export interface MenuProps {
-  imageProps: ImageProps | undefined
+  imageProps?: ImageProps
 }
 
 export const ProsemirrorMenu = ({ imageProps }: MenuProps) => {
