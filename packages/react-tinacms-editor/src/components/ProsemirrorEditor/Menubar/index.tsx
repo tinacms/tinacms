@@ -41,7 +41,7 @@ import { BaseMenubar } from '../../BaseMenubar'
 
 interface Props {
   sticky?: boolean | string
-  imageProps: ImageProps | undefined
+  imageProps?: ImageProps
   plugins?: Plugin[]
 }
 
