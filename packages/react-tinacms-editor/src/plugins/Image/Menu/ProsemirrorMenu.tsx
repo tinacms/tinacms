@@ -28,13 +28,13 @@ import { MediaIcon, UploadIcon, CloseIcon } from '@tinacms/icons'
 import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
 import { useEditorStateContext } from '../../../context/editorState'
 import { insertImage } from '../commands'
+import { ImageProps } from '../../../types'
 
 export interface MenuProps {
-  uploadImages?: (files: File[]) => Promise<string[]>
-  mediaDir?: string
+  imageProps?: ImageProps
 }
 
-export const ProsemirrorMenu = ({ uploadImages, mediaDir }: MenuProps) => {
+export const ProsemirrorMenu = ({ imageProps }: MenuProps) => {
   const cms = useCMS()
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
@@ -43,11 +43,13 @@ export const ProsemirrorMenu = ({ uploadImages, mediaDir }: MenuProps) => {
   const [showImageModal, setShowImageModal] = useState(false)
   const [uploading, setUploading] = useState(false)
 
-  if (!uploadImages) return null
+  if (!imageProps || !imageProps.upload) return null
+
+  const { upload, parse, mediaDir } = imageProps
 
   const uploadImageFile = (file: File) => {
     setUploading(true)
-    const uploadPromise = uploadImages([file])
+    const uploadPromise = upload([file])
     uploadPromise.then((urls = []) => {
       setImageUrl(urls[0])
       setUploading(false)
@@ -65,8 +67,7 @@ export const ProsemirrorMenu = ({ uploadImages, mediaDir }: MenuProps) => {
 
   async function onMediaSelect(media?: Media) {
     if (media) {
-      const previewSrc = await cms.media.previewSrc(media.id)
-      insertImageInEditor(previewSrc)
+      insertImageInEditor(parse(media))
     }
   }
 
