@@ -24,18 +24,20 @@ import { MediaIcon } from '@tinacms/icons'
 import { MenuButton } from '../../../components/MenuHelpers'
 import { useEditorStateContext } from '../../../context/editorState'
 import { insertImage } from '../commands'
+import { ImageProps } from '../../../types'
 
 export interface MenuProps {
-  uploadImages?: (files: File[]) => Promise<string[]>
-  mediaDir?: string
+  imageProps?: ImageProps
 }
 
-export const ProsemirrorMenu = ({ uploadImages, mediaDir }: MenuProps) => {
+export const ProsemirrorMenu = ({ imageProps }: MenuProps) => {
   const cms = useCMS()
   const menuButtonRef = useRef()
   const { editorView } = useEditorStateContext()
 
-  if (!uploadImages) return null
+  if (!imageProps || !imageProps.upload) return null
+
+  const { parse, mediaDir } = imageProps
 
   const insertImageInEditor = (src: string) => {
     if (!editorView) return
@@ -46,8 +48,7 @@ export const ProsemirrorMenu = ({ uploadImages, mediaDir }: MenuProps) => {
 
   async function onMediaSelect(media?: Media) {
     if (media) {
-      const previewSrc = await cms.media.previewSrc(media.id)
-      insertImageInEditor(previewSrc)
+      insertImageInEditor(parse(media))
     }
   }
 
