@@ -80,12 +80,7 @@ export const ProsemirrorEditor = styled(
           href="https://codemirror.net/lib/codemirror.css"
         />
         <EditorStateProvider translator={translator} editorView={editorView}>
-          <Menubar
-            sticky={sticky}
-            uploadImages={imageProps && imageProps.upload}
-            mediaDir={imageProps?.mediaDir}
-            plugins={plugins}
-          />
+          <Menubar sticky={sticky} imageProps={imageProps} plugins={plugins} />
         </EditorStateProvider>
         <div {...styleProps} ref={editorRef} />
       </WysiwygWrapper>
