@@ -16,8 +16,14 @@ limitations under the License.
 
 */
 
-import React, { ReactElement } from 'react'
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import React, {
+  ReactElement,
+  useState,
+  useRef,
+  useEffect,
+  useLayoutEffect,
+} from 'react'
+import debounce from 'lodash.debounce'
 
 import { useEditorStateContext } from '../../context/editorState'
 import { useEditorModeContext } from '../../context/editorMode'
@@ -64,6 +70,8 @@ export const BaseMenubar = ({
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
   const [menuOffsetTop, setMenuOffsetTop] = useState<number | null>(null)
+  const scrollY = useRef<number>(0)
+  const scrollAnimationRef = useRef<number>(0)
   const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
   const { editorView } = useEditorStateContext()
   const { mode } = useEditorModeContext()
@@ -75,27 +83,27 @@ export const BaseMenubar = ({
     // todo: cleanup use of editor view here
   }, [menuRef, editorView, mode])
 
+  // calculates sticky menu position on scroll & resize
   useLayoutEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
       return
     }
     const wysiwygWrapper = menuRef.current!.parentElement
     const stickyTopOffset = parseInt(menuFixedTopOffset, 10)
-    const distance = getOffsetTop(wysiwygWrapper)
+    let ticking = false
 
-    menuOffsetTop === null && setMenuOffsetTop(distance)
-
-    const handleStickyMenuScroll = () => {
+    const handleFixMenu = () => {
       if (typeof menuOffsetTop === 'number') {
         const topBound = menuOffsetTop - stickyTopOffset
         const btmBound = topBound + (wysiwygWrapper?.offsetHeight || 0)
 
-        if (window.scrollY > topBound && window.scrollY < btmBound) {
+        if (scrollY.current > topBound && scrollY.current < btmBound) {
           setMenuFixed(true)
         } else {
           setMenuFixed(false)
         }
       }
+      scrollAnimationRef.current = requestAnimationFrame(handleFixMenu)
     }
 
     const handleResize = () => {
@@ -107,15 +115,44 @@ export const BaseMenubar = ({
       }
     }
 
-    handleStickyMenuScroll()
-    window.addEventListener('scroll', handleStickyMenuScroll)
+    /**
+     * ensures the animation frames start and stop while
+     * actively scrolling. To avoid unnecessary layout calcs
+     *  */
+    const handleScrollStart = debounce(
+      () => {
+        scrollY.current = window.scrollY
+        requestTick()
+      },
+      10,
+      { leading: true, trailing: false }
+    )
+
+    const handleScrollStop = debounce(() => {
+      cancelAnimationFrame(scrollAnimationRef.current)
+      ticking = false
+    }, 10)
+
+    function requestTick() {
+      if (!ticking) {
+        scrollAnimationRef.current = requestAnimationFrame(handleFixMenu)
+      }
+      ticking = true
+    }
+
+    // ensures the offset is calculated once images load
+    window.onload = () => setMenuOffsetTop(getOffsetTop(wysiwygWrapper))
+    window.addEventListener('scroll', handleScrollStart)
+    window.addEventListener('scroll', handleScrollStop)
     window.addEventListener('resize', handleResize)
 
     return () => {
-      window.removeEventListener('scroll', handleStickyMenuScroll)
+      window.removeEventListener('scroll', handleScrollStart)
+      window.removeEventListener('scroll', handleScrollStop)
       window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(scrollAnimationRef.current)
     }
-  }, [menuRef, menuBoundingBox])
+  }, [menuRef, menuBoundingBox, menuOffsetTop])
 
   const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
     e.stopPropagation()
