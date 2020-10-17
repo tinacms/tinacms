@@ -21,7 +21,14 @@ import { Wysiwyg } from '../components/Wysiwyg'
 import { wysiwygStyles } from './wysiwygStyles'
 
 const HTMLField = wysiwygStyles(props => {
-  return <Wysiwyg {...props} sticky={false} format="html" />
+  return (
+    <Wysiwyg
+      {...props}
+      sticky={false}
+      format="html"
+      imageProps={props.field.imageProps}
+    />
+  )
 })
 
 export const HtmlFieldPlugin = {
