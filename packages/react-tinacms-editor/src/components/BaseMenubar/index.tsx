@@ -43,7 +43,7 @@ interface Props {
   popups?: ReactElement[]
 }
 
-function getOffsetTop(el: any) {
+function getOffsetTop(el: any, stickyOffset: string) {
   let distance = 0
   /**
    * traverses the dom up to get the true distance
@@ -56,7 +56,9 @@ function getOffsetTop(el: any) {
     } while (el)
   }
 
-  return distance < 0 ? 0 : distance
+  const _stickyOffset = parseInt(stickyOffset, 10)
+
+  return distance < 0 ? 0 : distance - _stickyOffset
 }
 
 export const BaseMenubar = ({
@@ -70,9 +72,9 @@ export const BaseMenubar = ({
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
   const [menuOffsetTop, setMenuOffsetTop] = useState<number | null>(null)
+  const stickyOffset = typeof sticky === 'string' ? sticky : '0'
   const scrollY = useRef<number>(0)
   const scrollAnimationRef = useRef<number>(0)
-  const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
   const { editorView } = useEditorStateContext()
   const { mode } = useEditorModeContext()
 
@@ -83,27 +85,24 @@ export const BaseMenubar = ({
     // todo: cleanup use of editor view here
   }, [menuRef, editorView, mode])
 
-  // calculates sticky menu position on scroll & resize
   useLayoutEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
       return
     }
     const wysiwygWrapper = menuRef.current!.parentElement
-    const stickyTopOffset = parseInt(menuFixedTopOffset, 10)
     let ticking = false
 
-    const handleFixMenu = () => {
+    const handleStickyMenu = () => {
       if (typeof menuOffsetTop === 'number') {
-        const topBound = menuOffsetTop - stickyTopOffset
-        const btmBound = topBound + (wysiwygWrapper?.offsetHeight || 0)
+        const btmBound = menuOffsetTop + (wysiwygWrapper?.offsetHeight || 0)
 
-        if (scrollY.current > topBound && scrollY.current < btmBound) {
+        if (scrollY.current > menuOffsetTop && scrollY.current < btmBound) {
           setMenuFixed(true)
         } else {
           setMenuFixed(false)
         }
       }
-      scrollAnimationRef.current = requestAnimationFrame(handleFixMenu)
+      scrollAnimationRef.current = requestAnimationFrame(handleStickyMenu)
     }
 
     const handleResize = () => {
@@ -135,13 +134,14 @@ export const BaseMenubar = ({
 
     function requestTick() {
       if (!ticking) {
-        scrollAnimationRef.current = requestAnimationFrame(handleFixMenu)
+        scrollAnimationRef.current = requestAnimationFrame(handleStickyMenu)
       }
       ticking = true
     }
 
     // ensures the offset is calculated once images load
-    window.onload = () => setMenuOffsetTop(getOffsetTop(wysiwygWrapper))
+    window.onload = () =>
+      setMenuOffsetTop(getOffsetTop(wysiwygWrapper, stickyOffset))
     window.addEventListener('scroll', handleScrollStart)
     window.addEventListener('scroll', handleScrollStop)
     window.addEventListener('resize', handleResize)
@@ -165,7 +165,7 @@ export const BaseMenubar = ({
         <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
       )}
       <MenuWrapper
-        menuFixedTopOffset={menuFixedTopOffset}
+        menuFixedTopOffset={stickyOffset}
         menuFixed={menuFixed}
         menuBoundingBox={menuBoundingBox}
         ref={menuRef}
