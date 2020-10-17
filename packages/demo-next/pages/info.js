@@ -101,7 +101,7 @@ function Info(props) {
             >
               {props => <img src={props.src} />}
             </StyledInlineImage>
-            <InlineWysiwyg name="markdownBody">
+            <InlineWysiwyg name="markdownBody" sticky="62px">
               <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
             </InlineWysiwyg>
           </div>
