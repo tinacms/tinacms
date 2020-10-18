@@ -50,8 +50,12 @@ export const ActionableModal = ({
             <p>{message}</p>
           </ModalBody>
           <ModalActions>
-            {actions.map(action => (
-              <TinaButton primary={action.primary} onClick={action.action}>
+            {actions.map((action) => (
+              <TinaButton
+                key="name"
+                primary={action.primary}
+                onClick={action.action}
+              >
                 {action.name}
               </TinaButton>
             ))}
