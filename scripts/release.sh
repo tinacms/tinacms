@@ -25,6 +25,7 @@ lerna version \
   --create-release github \
   -m "chore(publish): latest" \
   --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
+  --no-granular-pathspec
 
 # 5. Publish to NPM
 lerna publish from-package --yes
