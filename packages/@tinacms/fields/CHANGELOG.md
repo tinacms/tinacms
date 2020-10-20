@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
+
+
+### Bug Fixes
+
+* **@tinacms/fields:** image field allows media to be deleted from media manager ([7dfbb5e](https://github.com/tinacms/tinacms/commit/7dfbb5eb0a551c429ec2a5f8564b1bd626cd893f))
+
+
+
+
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 

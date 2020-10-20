@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
+
+
+### Bug Fixes
+
+* **@tinacms/core:** cms.media.open accepts the allowDelete prop ([9364732](https://github.com/tinacms/tinacms/commit/9364732f80baf29dabaf4f2a315c8a04b5ac5dc2))
+
+
+
+
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 

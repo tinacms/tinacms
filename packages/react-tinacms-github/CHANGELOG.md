@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** dispatch event on delete failurecloses [#1493](https://github.com/tinacms/tinacms/issues/1493) ([12d92dc](https://github.com/tinacms/tinacms/commit/12d92dc2220ec326e1e3ec7a59a8d6ab96e9f988))
+
+
+
+
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 

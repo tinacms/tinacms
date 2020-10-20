@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
+
+
+### Bug Fixes
+
+* **react-tinacms-inline:** empty inline img to click/drag ([c879441](https://github.com/tinacms/tinacms/commit/c879441541a955d3e3d33c4f30c35a2b8cfbf92a))
+* **react-tinacms-inline:** field focus is not lost when editing settings ([8a078b4](https://github.com/tinacms/tinacms/commit/8a078b4f9b5138c7821f859511cc53d618b93366))
+* **react-tinacms-inline:** inline image field allows media to be deleted from media manager ([352284f](https://github.com/tinacms/tinacms/commit/352284f8fdeb13b145ce54d0b3359a7076353284))
+* **react-tinacms-inline:** some fields were mis-handling focus ([5d7318c](https://github.com/tinacms/tinacms/commit/5d7318c0ccdfe89709f2e8bc7d1c8f8d3a115019)), closes [#1516](https://github.com/tinacms/tinacms/issues/1516)
+* **react-tinacms-inline:** uploadDir passes formValues ([99de78a](https://github.com/tinacms/tinacms/commit/99de78acd9768358fc2b43ba0f52d63b07db9988))
+
+
+### Features
+
+* **react-tinacms-inline:** block components are given their name ([8d42e9a](https://github.com/tinacms/tinacms/commit/8d42e9abbfb98bd50bd7dc1913fa3d8bc799972c)), closes [#1536](https://github.com/tinacms/tinacms/issues/1536)
+
+
+
+
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 
