@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
+
+
+### Bug Fixes
+
+* **gatsby-tinacms-json:** JsonCreator commits files after writing ([a252c13](https://github.com/tinacms/tinacms/commit/a252c1389b2b93743c4f8ee8d4abe8fabbd6dd56))
+
+
+
+
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 **Note:** Version bump only for package gatsby-tinacms-json

@@ -3,6 +3,36 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
+
+### Bug Fixes
+
+- **@tinacms/core:** cms.media.open accepts the allowDelete prop ([9364732](https://github.com/tinacms/tinacms/commit/9364732f80baf29dabaf4f2a315c8a04b5ac5dc2))
+- **@tinacms/fields:** image field allows media to be deleted from media manager ([7dfbb5e](https://github.com/tinacms/tinacms/commit/7dfbb5eb0a551c429ec2a5f8564b1bd626cd893f))
+- **gatsby-tinacms-json:** JsonCreator commits files after writing ([a252c13](https://github.com/tinacms/tinacms/commit/a252c1389b2b93743c4f8ee8d4abe8fabbd6dd56))
+- **gatsby-tinacms-remark:** RemarkCreator commits files after writing ([2b8780c](https://github.com/tinacms/tinacms/commit/2b8780cb0050aaeef2add51b26f96f36680750ba))
+- **react-tinacms-github:** dispatch event on delete failurecloses [#1493](https://github.com/tinacms/tinacms/issues/1493) ([12d92dc](https://github.com/tinacms/tinacms/commit/12d92dc2220ec326e1e3ec7a59a8d6ab96e9f988))
+- **react-tinacms-inline:** empty inline img to click/drag ([c879441](https://github.com/tinacms/tinacms/commit/c879441541a955d3e3d33c4f30c35a2b8cfbf92a))
+- **react-tinacms-inline:** field focus is not lost when editing settings ([8a078b4](https://github.com/tinacms/tinacms/commit/8a078b4f9b5138c7821f859511cc53d618b93366))
+- **react-tinacms-inline:** inline image field allows media to be deleted from media manager ([352284f](https://github.com/tinacms/tinacms/commit/352284f8fdeb13b145ce54d0b3359a7076353284))
+- **react-tinacms-inline:** some fields were mis-handling focus ([5d7318c](https://github.com/tinacms/tinacms/commit/5d7318c0ccdfe89709f2e8bc7d1c8f8d3a115019)), closes [#1516](https://github.com/tinacms/tinacms/issues/1516)
+- **react-tinacms-inline:** uploadDir passes formValues ([99de78a](https://github.com/tinacms/tinacms/commit/99de78acd9768358fc2b43ba0f52d63b07db9988))
+- **tinacms:** media manager upload button is busy while uploading ([3ab978c](https://github.com/tinacms/tinacms/commit/3ab978c43a11ba64f9db2122e94431f48d1b93c3))
+
+### Features
+
+- **@tinacms/react-core:** useCMSEvent makes subscribing to events easier ([2a276bf](https://github.com/tinacms/tinacms/commit/2a276bf531b4b863cce4740bde18f31d8be3289f))
+- **react-tinacms-editor:** image directory prop --> uploadDir func ([67fc8d9](https://github.com/tinacms/tinacms/commit/67fc8d97befbea7e08751d5625103d8d3553046d))
+- **react-tinacms-editor:** markdown & html fields accept image props ([06d92e1](https://github.com/tinacms/tinacms/commit/06d92e138365bd73cae2daa20d8a116d7da6f4e0))
+- **react-tinacms-editor:** media mgr opens from uploadDir ([7e1b133](https://github.com/tinacms/tinacms/commit/7e1b1330d8fe777469d13fe65f43c75259c9e288))
+- **react-tinacms-editor:** parse accepts media object ([f6cf123](https://github.com/tinacms/tinacms/commit/f6cf123039669c477aef6176cdc4187b80eaf19d))
+- **react-tinacms-editor:** wysiwyg menu opens media mgr ([026e633](https://github.com/tinacms/tinacms/commit/026e633d97d5462f4d020ce87ca15735c3c08cc7))
+- **react-tinacms-inline:** block components are given their name ([8d42e9a](https://github.com/tinacms/tinacms/commit/8d42e9abbfb98bd50bd7dc1913fa3d8bc799972c)), closes [#1536](https://github.com/tinacms/tinacms/issues/1536)
+
+### Reverts
+
+- Revert "chore(react-tinacms-editor): mediaDir not optional" ([af20d84](https://github.com/tinacms/tinacms/commit/af20d849d11da5c93b453b8a63f9e6d9bee92363))
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 ### Bug Fixes

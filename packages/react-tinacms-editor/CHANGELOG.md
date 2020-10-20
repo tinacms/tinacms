@@ -3,6 +3,31 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
+
+
+### Bug Fixes
+
+* **react-tinacms-inline:** some fields were mis-handling focus ([5d7318c](https://github.com/tinacms/tinacms/commit/5d7318c0ccdfe89709f2e8bc7d1c8f8d3a115019)), closes [#1516](https://github.com/tinacms/tinacms/issues/1516)
+
+
+### Features
+
+* **react-tinacms-editor:** image directory prop --> uploadDir func ([67fc8d9](https://github.com/tinacms/tinacms/commit/67fc8d97befbea7e08751d5625103d8d3553046d))
+* **react-tinacms-editor:** markdown & html fields accept image props ([06d92e1](https://github.com/tinacms/tinacms/commit/06d92e138365bd73cae2daa20d8a116d7da6f4e0))
+* **react-tinacms-editor:** media mgr opens from uploadDir ([7e1b133](https://github.com/tinacms/tinacms/commit/7e1b1330d8fe777469d13fe65f43c75259c9e288))
+* **react-tinacms-editor:** parse accepts media object ([f6cf123](https://github.com/tinacms/tinacms/commit/f6cf123039669c477aef6176cdc4187b80eaf19d))
+* **react-tinacms-editor:** wysiwyg menu opens media mgr ([026e633](https://github.com/tinacms/tinacms/commit/026e633d97d5462f4d020ce87ca15735c3c08cc7))
+
+
+### Reverts
+
+* Revert "chore(react-tinacms-editor): mediaDir not optional" ([af20d84](https://github.com/tinacms/tinacms/commit/af20d849d11da5c93b453b8a63f9e6d9bee92363))
+
+
+
+
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 
