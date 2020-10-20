@@ -24,7 +24,7 @@ lerna version \
   --allow-branch latest \
   --create-release github \
   -m "chore(publish): latest" \
-  --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'A
+  --ignore-changes '**/*.md' '**/*.test.tsx?' '**/package-lock.json' '**/tsconfig.json'
 
 # 5. Publish to NPM
 lerna publish from-package --yes
