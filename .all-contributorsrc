@@ -831,6 +831,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "matthaias",
+      "name": "Matthias",
+      "avatar_url": "https://avatars3.githubusercontent.com/u/1446082?v=4",
+      "profile": "https://peerigon.com",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
