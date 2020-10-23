@@ -16,13 +16,7 @@ limitations under the License.
 
 */
 
-import React, {
-  ReactElement,
-  useState,
-  useRef,
-  useEffect,
-  useLayoutEffect,
-} from 'react'
+import React, { ReactElement, useState, useRef, useLayoutEffect } from 'react'
 import debounce from 'lodash.debounce'
 
 import { useEditorStateContext } from '../../context/editorState'
@@ -70,20 +64,12 @@ export const BaseMenubar = ({
   const [menuFixed, setMenuFixed] = useState(false)
   const isBrowser = typeof window !== `undefined`
   const menuRef = useRef<HTMLDivElement>(null)
-  const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
   const [menuOffsetTop, setMenuOffsetTop] = useState<number | null>(null)
   const stickyOffset = typeof sticky === 'string' ? sticky : '0'
   const scrollY = useRef<number>(0)
   const scrollAnimationRef = useRef<number>(0)
   const { editorView } = useEditorStateContext()
   const { mode } = useEditorModeContext()
-
-  useEffect(() => {
-    if (menuRef.current && sticky) {
-      setMenuBoundingBox(menuRef.current.getBoundingClientRect())
-    }
-    // todo: cleanup use of editor view here
-  }, [menuRef, editorView, mode])
 
   useLayoutEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
@@ -103,15 +89,6 @@ export const BaseMenubar = ({
         }
       }
       scrollAnimationRef.current = requestAnimationFrame(handleStickyMenu)
-    }
-
-    const handleResize = () => {
-      if (menuRef.current) {
-        const wasMenuFixed = menuFixed
-        setMenuFixed(false)
-        setMenuBoundingBox(menuRef.current.getBoundingClientRect())
-        setMenuFixed(wasMenuFixed)
-      }
     }
 
     /**
@@ -144,15 +121,13 @@ export const BaseMenubar = ({
       setMenuOffsetTop(getOffsetTop(wysiwygWrapper, stickyOffset))
     window.addEventListener('scroll', handleScrollStart)
     window.addEventListener('scroll', handleScrollStop)
-    window.addEventListener('resize', handleResize)
 
     return () => {
       window.removeEventListener('scroll', handleScrollStart)
       window.removeEventListener('scroll', handleScrollStop)
-      window.removeEventListener('resize', handleResize)
       cancelAnimationFrame(scrollAnimationRef.current)
     }
-  }, [menuRef, menuBoundingBox, menuOffsetTop])
+  }, [menuRef, menuOffsetTop])
 
   const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
     e.stopPropagation()
@@ -161,25 +136,28 @@ export const BaseMenubar = ({
 
   return (
     <>
-      {menuFixed && (
-        <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
-      )}
-      <MenuWrapper
-        menuFixedTopOffset={stickyOffset}
-        menuFixed={menuFixed}
-        menuBoundingBox={menuBoundingBox}
-        ref={menuRef}
-        data-testid="base-menubar"
-      >
-        <MenuPortalProvider>
-          <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
-            {menus}
-            {plugins?.map(({ name, MenuItem }) => (
-              <MenuItem key={name} mode={mode} editorView={editorView} />
-            ))}
-          </MenuContainer>
-        </MenuPortalProvider>
-      </MenuWrapper>
+      <div ref={menuRef}>
+        {menuFixed && (
+          <MenuPlaceholder
+            menuBoundingBox={menuRef.current?.getBoundingClientRect()}
+          ></MenuPlaceholder>
+        )}
+        <MenuWrapper
+          menuFixedTopOffset={stickyOffset}
+          menuFixed={menuFixed}
+          menuBoundingBox={menuRef.current?.getBoundingClientRect()}
+          data-testid="base-menubar"
+        >
+          <MenuPortalProvider>
+            <MenuContainer onMouseDown={preventProsemirrorFocusLoss}>
+              {menus}
+              {plugins?.map(({ name, MenuItem }) => (
+                <MenuItem key={name} mode={mode} editorView={editorView} />
+              ))}
+            </MenuContainer>
+          </MenuPortalProvider>
+        </MenuWrapper>
+      </div>
       {popups}
     </>
   )
