@@ -28,7 +28,7 @@ export const findElementOffsetTop = (
     target = target.offsetParent as HTMLElement
     offsetTop += target.offsetTop
   }
-  return offsetTop
+  return offsetTop < 0 ? 0 : offsetTop
 }
 
 export const findElementOffsetLeft = (
