@@ -29,6 +29,7 @@ import { useEditorStateContext } from '../../context/editorState'
 import { useEditorModeContext } from '../../context/editorMode'
 import { MenuPortalProvider } from '../../context/MenuPortal'
 import { Plugin } from '../../types'
+import { findElementOffsetTop } from '../../utils'
 
 import {
   MenuPlaceholder,
@@ -41,24 +42,6 @@ interface Props {
   menus?: ReactElement[]
   plugins?: Plugin[]
   popups?: ReactElement[]
-}
-
-function getOffsetTop(el: any, stickyOffset: string) {
-  let distance = 0
-  /**
-   * traverses the dom up to get the true distance
-   * of an element from the top of the document
-   */
-  if (el.offsetParent) {
-    do {
-      distance += el.offsetTop
-      el = el.offsetParent
-    } while (el)
-  }
-
-  const _stickyOffset = parseInt(stickyOffset, 10)
-
-  return distance < 0 ? 0 : distance - _stickyOffset
 }
 
 export const BaseMenubar = ({
@@ -140,8 +123,15 @@ export const BaseMenubar = ({
     }
 
     // ensures the offset is calculated once images load
-    window.onload = () =>
-      setMenuOffsetTop(getOffsetTop(wysiwygWrapper, stickyOffset))
+    window.onload = () => {
+      if (wysiwygWrapper) {
+        const stickyOffsetInt = parseInt(stickyOffset, 10)
+        const offsetTop = findElementOffsetTop(wysiwygWrapper) - stickyOffsetInt
+
+        setMenuOffsetTop(offsetTop)
+      }
+    }
+
     window.addEventListener('scroll', handleScrollStart)
     window.addEventListener('scroll', handleScrollStop)
     window.addEventListener('resize', handleResize)
