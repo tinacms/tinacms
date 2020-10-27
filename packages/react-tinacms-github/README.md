@@ -127,6 +127,10 @@ const cms = new TinaCMS({
 })
 ```
 
+### Image formats for preview
+
+Currently, the media manager and GitHub media store only supports previews for image files of the following formats: '.jpg', '.jpeg', '.png', '.webp', '.svg'. Other file types will show a file icon instead of an image preview in the media manager. 
+
 ## Authentication
 
 > For a detailed guide on setting up authentication with react-tinacms-github on a Next.js site, take a look at our [Next.js + GitHub guide](https://tinacms.org/guides/nextjs/github/initial-setup).
