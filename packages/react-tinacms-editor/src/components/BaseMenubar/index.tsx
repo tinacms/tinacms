@@ -131,7 +131,7 @@ export const BaseMenubar = ({
 
     document.readyState !== 'complete'
       ? window.addEventListener('load', calculateOffset)
-      : calculateOffset()
+      : setTimeout(calculateOffset, 10) // handles slight discrepancy with load event in chrome
     window.addEventListener('scroll', handleScrollStart)
     window.addEventListener('scroll', handleScrollStop)
     window.addEventListener('resize', handleResize)
