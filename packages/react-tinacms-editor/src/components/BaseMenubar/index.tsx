@@ -16,13 +16,7 @@ limitations under the License.
 
 */
 
-import React, {
-  ReactElement,
-  useState,
-  useRef,
-  useEffect,
-  useLayoutEffect,
-} from 'react'
+import React, { ReactElement, useState, useRef, useEffect } from 'react'
 import debounce from 'lodash.debounce'
 
 import { useEditorStateContext } from '../../context/editorState'
@@ -68,7 +62,7 @@ export const BaseMenubar = ({
     // todo: cleanup use of editor view here
   }, [menuRef, editorView, mode])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
       return
     }
@@ -85,7 +79,9 @@ export const BaseMenubar = ({
           setMenuFixed(false)
         }
       }
-      scrollAnimationRef.current = requestAnimationFrame(handleStickyMenu)
+      scrollAnimationRef.current = window.requestAnimationFrame(
+        handleStickyMenu
+      )
     }
 
     const handleResize = () => {
@@ -117,13 +113,14 @@ export const BaseMenubar = ({
 
     function requestTick() {
       if (!ticking) {
-        scrollAnimationRef.current = requestAnimationFrame(handleStickyMenu)
+        scrollAnimationRef.current = window.requestAnimationFrame(
+          handleStickyMenu
+        )
       }
       ticking = true
     }
 
-    // ensures the offset is calculated once images load
-    window.onload = () => {
+    function calculateOffset() {
       if (wysiwygWrapper) {
         const stickyOffsetInt = parseInt(stickyOffset, 10)
         const offsetTop = findElementOffsetTop(wysiwygWrapper) - stickyOffsetInt
@@ -132,6 +129,9 @@ export const BaseMenubar = ({
       }
     }
 
+    document.readyState !== 'complete'
+      ? window.addEventListener('load', calculateOffset)
+      : calculateOffset()
     window.addEventListener('scroll', handleScrollStart)
     window.addEventListener('scroll', handleScrollStop)
     window.addEventListener('resize', handleResize)
