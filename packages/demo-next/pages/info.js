@@ -104,6 +104,7 @@ function Info(props) {
             </StyledInlineImage>
             <InlineWysiwyg
               name="markdownBody"
+              sticky="62px"
               imageProps={{
                 uploadDir: () => '/public/images',
                 parse: media => {

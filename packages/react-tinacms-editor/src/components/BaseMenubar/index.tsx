@@ -16,13 +16,14 @@ limitations under the License.
 
 */
 
-import React, { ReactElement } from 'react'
-import { useState, useRef, useEffect, useLayoutEffect } from 'react'
+import React, { ReactElement, useState, useRef, useEffect } from 'react'
+import debounce from 'lodash.debounce'
 
 import { useEditorStateContext } from '../../context/editorState'
 import { useEditorModeContext } from '../../context/editorMode'
 import { MenuPortalProvider } from '../../context/MenuPortal'
 import { Plugin } from '../../types'
+import { findElementOffsetTop } from '../../utils'
 
 import {
   MenuPlaceholder,
@@ -47,7 +48,10 @@ export const BaseMenubar = ({
   const isBrowser = typeof window !== `undefined`
   const menuRef = useRef<HTMLDivElement>(null)
   const [menuBoundingBox, setMenuBoundingBox] = useState<any>(null)
-  const menuFixedTopOffset = typeof sticky === 'string' ? sticky : '0'
+  const [menuOffsetTop, setMenuOffsetTop] = useState<number | null>(null)
+  const stickyOffset = typeof sticky === 'string' ? sticky : '0'
+  const scrollY = useRef<number>(0)
+  const scrollAnimationRef = useRef<number>(0)
   const { editorView } = useEditorStateContext()
   const { mode } = useEditorModeContext()
 
@@ -58,23 +62,26 @@ export const BaseMenubar = ({
     // todo: cleanup use of editor view here
   }, [menuRef, editorView, mode])
 
-  useLayoutEffect(() => {
+  useEffect(() => {
     if (!isBrowser || !menuRef.current || !sticky) {
       return
     }
+    const wysiwygWrapper = menuRef.current!.parentElement
+    let ticking = false
 
-    const handleScroll = () => {
-      const wysiwygWrapper = menuRef.current!.parentElement
-      const startPosition = wysiwygWrapper ? wysiwygWrapper.offsetTop : 0
-      const endPosition = wysiwygWrapper
-        ? startPosition + wysiwygWrapper.offsetHeight
-        : 0
+    const handleStickyMenu = () => {
+      if (typeof menuOffsetTop === 'number') {
+        const btmBound = menuOffsetTop + (wysiwygWrapper?.offsetHeight || 0)
 
-      if (window.scrollY > startPosition && window.scrollY < endPosition) {
-        setMenuFixed(true)
-      } else {
-        setMenuFixed(false)
+        if (scrollY.current > menuOffsetTop && scrollY.current < btmBound) {
+          setMenuFixed(true)
+        } else {
+          setMenuFixed(false)
+        }
       }
+      scrollAnimationRef.current = window.requestAnimationFrame(
+        handleStickyMenu
+      )
     }
 
     const handleResize = () => {
@@ -86,15 +93,56 @@ export const BaseMenubar = ({
       }
     }
 
-    handleScroll()
-    window.addEventListener('scroll', handleScroll)
+    /**
+     * ensures the animation frames start and stop while
+     * actively scrolling. To avoid unnecessary layout calcs
+     *  */
+    const handleScrollStart = debounce(
+      () => {
+        scrollY.current = window.scrollY
+        requestTick()
+      },
+      10,
+      { leading: true, trailing: false }
+    )
+
+    const handleScrollStop = debounce(() => {
+      cancelAnimationFrame(scrollAnimationRef.current)
+      ticking = false
+    }, 10)
+
+    function requestTick() {
+      if (!ticking) {
+        scrollAnimationRef.current = window.requestAnimationFrame(
+          handleStickyMenu
+        )
+      }
+      ticking = true
+    }
+
+    function calculateOffset() {
+      if (wysiwygWrapper) {
+        const stickyOffsetInt = parseInt(stickyOffset, 10)
+        const offsetTop = findElementOffsetTop(wysiwygWrapper) - stickyOffsetInt
+
+        setMenuOffsetTop(offsetTop)
+      }
+    }
+
+    document.readyState !== 'complete'
+      ? window.addEventListener('load', calculateOffset)
+      : setTimeout(calculateOffset, 10) // handles slight discrepancy with load event in chrome
+    window.addEventListener('scroll', handleScrollStart)
+    window.addEventListener('scroll', handleScrollStop)
     window.addEventListener('resize', handleResize)
 
     return () => {
-      window.removeEventListener('scroll', handleScroll)
+      window.removeEventListener('scroll', handleScrollStart)
+      window.removeEventListener('scroll', handleScrollStop)
       window.removeEventListener('resize', handleResize)
+      cancelAnimationFrame(scrollAnimationRef.current)
     }
-  }, [menuRef, menuBoundingBox])
+  }, [menuRef, menuBoundingBox, menuOffsetTop])
 
   const preventProsemirrorFocusLoss = React.useCallback((e: any) => {
     e.stopPropagation()
@@ -107,7 +155,7 @@ export const BaseMenubar = ({
         <MenuPlaceholder menuBoundingBox={menuBoundingBox}></MenuPlaceholder>
       )}
       <MenuWrapper
-        menuFixedTopOffset={menuFixedTopOffset}
+        menuFixedTopOffset={stickyOffset}
         menuFixed={menuFixed}
         menuBoundingBox={menuBoundingBox}
         ref={menuRef}
