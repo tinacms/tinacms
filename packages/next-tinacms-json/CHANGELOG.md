@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.1](https://github.com/tinacms/tinacms/compare/v0.32.0...v0.32.1) (2020-10-29)
+
+
+### Bug Fixes
+
+* **next-tinacms-github:** fix build artifacts ([771c03f](https://github.com/tinacms/tinacms/commit/771c03faf3d7e498842c943b8c063dc9c3bbee9f))
+
+
+
+
+
 # [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
 
 **Note:** Version bump only for package next-tinacms-json
