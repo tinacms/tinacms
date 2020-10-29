@@ -840,6 +840,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "croutonn",
+      "name": "crouton",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/68943932?v=4",
+      "profile": "https://github.com/croutonn",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
