@@ -4,8 +4,7 @@
   "license": "Apache-2.0",
   "author": "Nolan Phillips",
   "main": "dist/index.js",
-  "module": "dist/next-tinacms-json.esm.js",
-  "typings": "dist/index.d.ts",
+  "typings": "dist/src/index.d.ts",
   "files": [
     "dist"
   ],
