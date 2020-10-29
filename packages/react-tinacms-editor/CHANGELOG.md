@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.32.1](https://github.com/tinacms/tinacms/compare/v0.32.0...v0.32.1) (2020-10-29)
+
+
+### Bug Fixes
+
+* **react-tinacms-editor:** correct typedef path ([064e5fe](https://github.com/tinacms/tinacms/commit/064e5fe33365a4daddbedcfe6505ac62d6185d38))
+* **react-tinacms-editor:** fixes menu jumping to top on scroll ([47fb08f](https://github.com/tinacms/tinacms/commit/47fb08fe8ef1a592ba5384c3f6d37f8227cec46f))
+
+
+
+
+
 # [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
 
 
