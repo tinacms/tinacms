@@ -29,34 +29,64 @@ export interface ToggleProps {
   input: any
   checked?: boolean
   disabled?: boolean
+  toggleLabels?:
+    | boolean
+    | {
+        true: string
+        false: string
+      }
 }
 
 export const Toggle: FC<ToggleProps> = props => {
   const checked = !!(props.input.value || props.input.checked)
+  const labels = {
+    true: props.toggleLabels === true ? 'Yes' : null,
+    false: props.toggleLabels === true ? 'No' : null,
+  }
+
+  if (typeof props.toggleLabels === 'object' && 'true' in props.toggleLabels) {
+    labels.true = props.toggleLabels['true']
+    labels.false = props.toggleLabels['false']
+  }
+
+  const hasToggleLabels =
+    typeof labels.true !== null || typeof labels.false !== null
+
   return (
     <ToggleElement>
+      {labels.false && <span>{labels.false}</span>}
       <ToggleInput id={props.name} type="checkbox" {...props.input} />
-      <ToggleLabel htmlFor={props.name} role="switch" disabled={props.disabled}>
+      <ToggleLabel
+        htmlFor={props.name}
+        role="switch"
+        disabled={props.disabled}
+        hasToggleLabels={hasToggleLabels}
+      >
         <ToggleSwitch checked={checked}>
           <span></span>
         </ToggleSwitch>
       </ToggleLabel>
+      {labels.true && <span>{labels.true}</span>}
     </ToggleElement>
   )
 }
 
 const ToggleElement = styled.div`
-  display: block;
+  display: flex;
   position: relative;
   width: 48px;
   height: 28px;
   margin: 0;
+  align-items: center;
 `
 
-const ToggleLabel = styled.label<{ disabled?: boolean }>`
+const ToggleLabel = styled.label<{
+  disabled?: boolean
+  hasToggleLabels?: boolean
+}>`
   background: none;
   color: inherit;
-  padding: 0;
+  padding: ${props => (props.hasToggleLabels ? '0 10px' : '0')};
   opacity: ${props => (props.disabled ? '0.4' : '1')};
   outline: none;
   width: 48px;
