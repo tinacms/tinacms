@@ -63,12 +63,17 @@ export function InlineSettings({ fields }: InlineSettingsProps) {
   )
 }
 
-interface SettingsModalProps {
+export interface SettingsModalProps {
+  title?: string
   fields: Field[]
   close(): void
 }
 
-function SettingsModal({ fields, close }: SettingsModalProps) {
+export function SettingsModal({
+  title = 'Settings',
+  fields,
+  close,
+}: SettingsModalProps) {
   const { form } = useInlineForm()
   const { name } = React.useContext(InlineFieldContext)
   const [initialValues] = React.useState(form.values)
@@ -105,7 +110,7 @@ function SettingsModal({ fields, close }: SettingsModalProps) {
   return (
     <Modal id="tinacms-inline-settings" onClick={e => e.stopPropagation()}>
       <ModalPopup>
-        <ModalHeader close={close}>Settings</ModalHeader>
+        <ModalHeader close={close}>{title}</ModalHeader>
         <ModalBody>
           <DragDropContext onDragEnd={moveArrayItem}>
             <FormBody>
