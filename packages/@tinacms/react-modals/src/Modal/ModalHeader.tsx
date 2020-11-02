@@ -49,9 +49,13 @@ export const ModalHeader = styled(
 `
 
 const ModalTitle = styled.h2`
+  all: unset;
+  color: var(--tina-color-grey-10);
+  font-weight: var(--tina-font-weight-regular);
+  font-family: var(--tina-font-family);
   font-size: var(--tina-font-size-4);
   font-weight: var(--tina-font-weight-regular);
-  line-height: normal;
+  line-height: 1;
   margin: 0;
 `
 

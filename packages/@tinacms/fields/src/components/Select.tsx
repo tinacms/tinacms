@@ -76,13 +76,17 @@ const SelectElement = styled.div`
   position: relative;
 
   select {
+    all: unset;
+    box-sizing: border-box;
     display: block;
     font-family: inherit;
     max-width: 100%;
+    color: var(--tina-color-grey-10);
     padding: var(--tina-padding-small);
     border-radius: var(--tina-radius-small);
     background: var(--tina-color-grey-0);
     font-size: var(--tina-font-size-2);
+    font-weight: var(--tina-font-weight-regular);
     line-height: 1.35;
     position: relative;
     background-color: var(--tina-color-grey-0);
