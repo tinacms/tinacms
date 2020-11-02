@@ -23,6 +23,17 @@ perspective, and plan the next 6 week period.
 
 ## Cycles
 
+### Cycle 4: Nov 2nd to Dec 11th
+
+| Begins        | Ends           |
+| ------------- | -------------- |
+| November 2nd 2020 | December 11th 2020 |
+
+For this cycle, we don't have any specific features planned. We are dogfooding Tina by working on a flexible, blocks-based starter project with what we believe are the best practices for using Tina right now. We expect some improvements to come to Tina in the process, with a particular focus on:
+- Inline Editing
+- Using Tina with a componentized design system
+- Minimizing the impact of Tina on page weight when not editing
+
 ### Cycle 3: Sept 7th to October 16th
 
 | Begins        | Ends           |
