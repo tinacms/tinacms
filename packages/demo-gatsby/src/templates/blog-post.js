@@ -132,7 +132,9 @@ function BlogPostTemplate(props) {
                   >
                     {props => (
                       <Img
-                        fluid={post.frontmatter.thumbnail.childImageSharp.fluid}
+                        fluid={
+                          post.frontmatter.thumbnail?.childImageSharp.fluid
+                        }
                         alt="Gatsby can't find me"
                         {...props}
                       />
@@ -369,6 +371,7 @@ const BlogPostForm = {
       name: "frontmatter.thumbnail",
       label: "Thumbnail",
       component: "image",
+      clearable: true,
       // Generate the frontmatter value based on the filename
       parse: media => `./${media.filename}`,
 
