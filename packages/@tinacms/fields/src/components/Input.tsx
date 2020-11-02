@@ -26,12 +26,15 @@ export interface InputProps {
 }
 
 export const InputCss = css<InputProps>`
+  all: unset;
+  box-sizing: border-box;
   padding: var(--tina-padding-small);
   border-radius: var(--tina-radius-small);
   background: var(--tina-color-grey-0);
   font-size: var(--tina-font-size-2);
   line-height: 1.35;
   position: relative;
+  color: var(--tina-color-grey-10);
   background-color: var(--tina-color-grey-0);
   transition: all 85ms ease-out;
   border: 1px solid var(--tina-color-grey-2);
