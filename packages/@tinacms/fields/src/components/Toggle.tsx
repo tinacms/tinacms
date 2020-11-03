@@ -19,21 +19,20 @@ limitations under the License.
 import { FC } from 'react'
 import styled from 'styled-components'
 import * as React from 'react'
+import { Field } from '@tinacms/forms'
 
 export interface ToggleProps {
   name: string
   input: any
-  field: ToggleFieldProps
+  field: ToggleFieldDefinition
   disabled?: boolean
   onBlur: <T>(event?: React.FocusEvent<T>) => void
   onChange: <T>(event: React.ChangeEvent<T> | any) => void
   onFocus: <T>(event?: React.FocusEvent<T>) => void
 }
 
-interface ToggleFieldProps {
-  name: string
-  component: string
-  label?: string
+interface ToggleFieldDefinition extends Field {
+  component: 'toggle'
   toggleLabels?: boolean | FieldLabels
 }
 
