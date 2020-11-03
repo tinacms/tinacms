@@ -23,7 +23,7 @@ import { EventBus } from './event'
  * Represents an individual file in the MediaStore
  */
 export interface Media {
-  type: 'file' | 'dir'
+  type: 'image' | 'video' | 'dir'
 
   /**
    * A unique identifier for this file.
@@ -234,6 +234,7 @@ export class MediaManager implements MediaStore {
 
 export interface SelectMediaOptions {
   allowDelete?: boolean
+  filter?: string
   directory?: string
   onSelect?(media: Media): void
 }
