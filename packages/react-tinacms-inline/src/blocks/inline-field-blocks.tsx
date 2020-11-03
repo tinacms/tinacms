@@ -211,10 +211,20 @@ export function InlineBlock({
   index,
   itemProps,
 }: InlineBlockProps) {
-  return (
-    <InlineFieldContext.Provider value={{ name, ...block }}>
-      <block.Component data={data} name={name} index={index} {...itemProps} />
-    </InlineFieldContext.Provider>
+  return React.useMemo(
+    () => (
+      <InlineFieldContext.Provider value={{ name, ...block }}>
+        <block.Component data={data} name={name} index={index} {...itemProps} />
+      </InlineFieldContext.Provider>
+    ),
+    [
+      name,
+      // h/t Dan Abramov https://twitter.com/dan_abramov/status/1104414272753487872?s=20
+      JSON.stringify(data),
+      block,
+      index,
+      JSON.stringify(itemProps),
+    ]
   )
 }
 
