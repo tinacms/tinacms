@@ -99,7 +99,13 @@ export default function Nesting() {
       ],
     },
     label: 'Nesting',
-    fields: [],
+    fields: [
+      {
+        name: 'toggle',
+        component: 'toggle',
+        toggleLabels: true,
+      },
+    ],
     actions: [TestAction, AnotherAction],
     onSubmit() {},
   })
