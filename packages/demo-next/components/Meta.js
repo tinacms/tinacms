@@ -81,6 +81,9 @@ export default function Meta(props) {
           p {
             margin-bottom: 1.45rem;
           }
+          video {
+            max-width: 100%;
+          }
           img {
             max-width: 100%;
           }

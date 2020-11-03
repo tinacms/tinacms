@@ -23,6 +23,7 @@ import { ModalProvider, BlockTemplate } from 'tinacms'
 import {
   InlineForm,
   InlineImage,
+  InlineVideo,
   InlineText,
   InlineBlocks,
   BlocksControls,
@@ -46,6 +47,17 @@ export default function BlocksExample({ jsonFile }) {
           <h1>
             <InlineText name="title" />
           </h1>
+          <InlineVideo
+            name="hero_video"
+            parse={media => {
+              return media.previewSrc
+            }}
+            previewSrc={formValues => {
+              return formValues
+            }}
+          >
+            {/* {props => <ChildImage src={data.hero_image} {...props} />} */}
+          </InlineVideo>
           <InlineImage
             name="hero_image"
             parse={media => media.id.replace('public/', '')}
