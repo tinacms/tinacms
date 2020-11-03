@@ -46,34 +46,36 @@ export const Toggle: FC<ToggleProps> = ({
   disabled = false,
 }) => {
   const checked = !!(input.value || input.checked)
-  const labels = {
-    true: field.toggleLabels === true ? 'Yes' : null,
-    false: field.toggleLabels === true ? 'No' : null,
-  }
+  let labels: null | FieldLabels = null
 
-  if (typeof field.toggleLabels === 'object' && 'true' in field.toggleLabels) {
-    labels.true = field.toggleLabels['true']
-    labels.false = field.toggleLabels['false']
-  }
+  if (field.toggleLabels) {
+    const fieldLabels =
+      typeof field.toggleLabels === 'object' &&
+      'true' in field.toggleLabels &&
+      'false' in field.toggleLabels &&
+      field.toggleLabels
 
-  const hasToggleLabels =
-    typeof labels.true !== null || typeof labels.false !== null
+    labels = {
+      true: fieldLabels ? fieldLabels['true'] : 'Yes',
+      false: fieldLabels ? fieldLabels['false'] : 'No',
+    }
+  }
 
   return (
     <ToggleElement>
-      {labels.false && <span>{labels.false}</span>}
+      {labels && <span>{labels.false}</span>}
       <ToggleInput id={name} type="checkbox" {...input} />
       <ToggleLabel
         htmlFor={name}
         role="switch"
         disabled={disabled}
-        hasToggleLabels={hasToggleLabels}
+        hasToggleLabels={labels !== null}
       >
         <ToggleSwitch checked={checked}>
           <span></span>
         </ToggleSwitch>
       </ToggleLabel>
-      {labels.true && <span>{labels.true}</span>}
+      {labels && <span>{labels.true}</span>}
     </ToggleElement>
   )
 }
