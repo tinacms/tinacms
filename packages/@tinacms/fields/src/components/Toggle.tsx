@@ -62,40 +62,43 @@ export const Toggle: FC<ToggleProps> = ({
   }
 
   return (
-    <ToggleElement>
+    <ToggleWrap>
       {labels && <span>{labels.false}</span>}
-      <ToggleInput id={name} type="checkbox" {...input} />
-      <ToggleLabel
-        htmlFor={name}
-        role="switch"
-        disabled={disabled}
-        hasToggleLabels={labels !== null}
-      >
-        <ToggleSwitch checked={checked}>
-          <span></span>
-        </ToggleSwitch>
-      </ToggleLabel>
+      <ToggleElement hasToggleLabels={labels !== null}>
+        <ToggleInput id={name} type="checkbox" {...input} />
+        <ToggleLabel htmlFor={name} role="switch" disabled={disabled}>
+          <ToggleSwitch checked={checked}>
+            <span></span>
+          </ToggleSwitch>
+        </ToggleLabel>
+      </ToggleElement>
       {labels && <span>{labels.true}</span>}
-    </ToggleElement>
+    </ToggleWrap>
   )
 }
 
-const ToggleElement = styled.div`
+const ToggleWrap = styled.div`
   display: flex;
+  align-items: center;
+
+  > span {
+    color: var(--tina-color-grey-8);
+  }
+`
+
+const ToggleElement = styled.div<{ hasToggleLabels?: boolean }>`
   position: relative;
   width: 48px;
   height: 28px;
-  margin: 0;
-  align-items: center;
+  margin: ${props => (props.hasToggleLabels ? '0 10px' : '0')};
 `
 
 const ToggleLabel = styled.label<{
   disabled?: boolean
-  hasToggleLabels?: boolean
 }>`
   background: none;
   color: inherit;
-  padding: ${props => (props.hasToggleLabels ? '0 10px' : '0')};
+  padding: 0;
   opacity: ${props => (props.disabled ? '0.4' : '1')};
   outline: none;
   width: 48px;
