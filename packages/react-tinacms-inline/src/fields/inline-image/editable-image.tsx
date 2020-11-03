@@ -75,6 +75,7 @@ export function EditableImage({
           cms.media.open({
             allowDelete: true,
             directory,
+            filter: 'image',
             onSelect(media: any) {
               if (media.filename == input.value) {
                 input.onChange('') // trigger rerender
