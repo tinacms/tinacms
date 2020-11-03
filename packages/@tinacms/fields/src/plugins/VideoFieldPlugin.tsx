@@ -18,20 +18,20 @@ limitations under the License.
 
 import * as React from 'react'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
-import { InputProps, ImageUpload } from '../components'
+import { InputProps, VideoUpload } from '../components'
 import { Media, MediaStore } from '@tinacms/core'
 import { useCMS } from '@tinacms/react-core'
 import { parse } from './textFormat'
 import { useState, useEffect } from 'react'
 
-interface ImageProps {
+interface VideoProps {
   path: string
   previewSrc?: MediaStore['previewSrc']
   uploadDir?(formValues: any): string
   clearable?: boolean // defaults to true
 }
 
-export function usePreviewSrc(
+export function useVideoPreviewSrc(
   value: string,
   fieldName: string,
   formValues: any,
@@ -68,11 +68,11 @@ export function usePreviewSrc(
   return [src, loading]
 }
 
-export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
+export const VideoField = wrapFieldsWithMeta<InputProps, VideoProps>(props => {
   const cms = useCMS()
   const { form, field } = props
   const { name, value } = props.input
-  const [src, srcIsLoading] = usePreviewSrc(
+  const [src, srcIsLoading] = useVideoPreviewSrc(
     value,
     name,
     form.getState().values,
@@ -94,7 +94,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   const uploadDir = props.field.uploadDir || (() => '')
 
   return (
-    <ImageUpload
+    <VideoUpload
       value={value}
       previewSrc={src}
       loading={srcIsLoading}
@@ -102,7 +102,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
         const directory = uploadDir(props.form.getState().values)
         cms.media.open({
           allowDelete: true,
-          filter: 'image',
+          filter: 'video',
           directory,
           onSelect: onChange,
         })
@@ -124,8 +124,8 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
   )
 })
 
-export const ImageFieldPlugin = {
-  name: 'image',
-  Component: ImageField,
+export const VideoFieldPlugin = {
+  name: 'video',
+  Component: VideoField,
   parse,
 }

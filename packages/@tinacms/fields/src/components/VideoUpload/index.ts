@@ -16,16 +16,4 @@ limitations under the License.
 
 */
 
-export * from './BlocksFieldPlugin'
-export * from './ColorFieldPlugin'
-export * from './GroupFieldPlugin'
-export * from './GroupListFieldPlugin'
-export * from './ListFieldPlugin'
-export * from './ImageFieldPlugin'
-export * from './VideoFieldPlugin'
-export * from './NumberFieldPlugin'
-export * from './SelectFieldPlugin'
-export * from './TextareaFieldPlugin'
-export * from './TextFieldPlugin'
-export * from './ToggleFieldPlugin'
-export * from './TagsFieldPlugin'
+export * from './VideoUpload'
