@@ -35,6 +35,7 @@ import { LoadingDots } from '@tinacms/react-forms'
 
 export interface MediaRequest {
   limit?: number
+  filter?: string
   directory?: string
   onSelect?(media: Media): void
   close?(): void
@@ -72,6 +73,7 @@ type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured'
 
 export function MediaPicker({
   allowDelete,
+  filter,
   onSelect,
   close,
   ...props
@@ -143,7 +145,7 @@ export function MediaPicker({
 
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: 'image/*',
+    accept: ['image/*', 'video/*'],
 
     onDrop: async ([file]) => {
       try {
@@ -170,6 +172,11 @@ export function MediaPicker({
     return () => {
       body.style.overflow = 'auto'
     }
+  }
+
+  function filterMedia(item: Media) {
+    if (!filter) return true
+    return filter === item.type
   }
 
   useEffect(disableScrollBody, [])
@@ -199,7 +206,7 @@ export function MediaPicker({
           <EmptyMediaList />
         )}
 
-        {list.items.map((item: Media) => (
+        {list.items.filter(filterMedia).map((item: Media) => (
           <MediaItem
             item={item}
             onClick={onClickMediaItem}

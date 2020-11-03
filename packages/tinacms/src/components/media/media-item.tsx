@@ -37,21 +37,15 @@ export function MediaItem({
 }: MediaItemProps) {
   return (
     <ListItem onClick={() => onClick(item)} type={item.type}>
-      <ItemPreview>
-        {item.previewSrc ? (
-          <img src={item.previewSrc} alt={item.filename} />
-        ) : (
-          <FileIcon type={item.type} />
-        )}
-      </ItemPreview>
+      <ItemPreview>{renderPreview(item)}</ItemPreview>
       <Filename>{item.filename}</Filename>
       <ActionButtons>
-        {onSelect && item.type === 'file' && (
+        {onSelect && item.type !== 'dir' && (
           <Button small onClick={() => onSelect(item)}>
             Insert
           </Button>
         )}
-        {onDelete && item.type === 'file' && (
+        {onDelete && item.type !== 'dir' && (
           <IconButton small onClick={() => onDelete(item)}>
             <TrashIcon />
           </IconButton>
@@ -59,6 +53,17 @@ export function MediaItem({
       </ActionButtons>
     </ListItem>
   )
+}
+
+function renderPreview(item: Media) {
+  if (item.previewSrc) {
+    if (item.type === 'image') {
+      return <img src={item.previewSrc} alt={item.filename} />
+    } else if (item.type === 'video') {
+      return <video src={item.previewSrc} />
+    }
+  }
+  return <FileIcon type={item.type} />
 }
 
 function FileIcon({ type }: { type: Media['type'] }) {
