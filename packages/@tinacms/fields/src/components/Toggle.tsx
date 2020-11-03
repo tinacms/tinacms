@@ -22,31 +22,38 @@ import * as React from 'react'
 
 export interface ToggleProps {
   name: string
+  input: any
+  field: ToggleFieldProps
+  disabled?: boolean
   onBlur: <T>(event?: React.FocusEvent<T>) => void
   onChange: <T>(event: React.ChangeEvent<T> | any) => void
   onFocus: <T>(event?: React.FocusEvent<T>) => void
-  value: any
-  input: any
-  checked?: boolean
-  disabled?: boolean
-  toggleLabels?:
-    | boolean
-    | {
-        true: string
-        false: string
-      }
 }
 
-export const Toggle: FC<ToggleProps> = props => {
-  const checked = !!(props.input.value || props.input.checked)
+interface ToggleFieldProps {
+  name: string
+  component: string
+  label?: string
+  toggleLabels?: boolean | FieldLabels
+}
+
+type FieldLabels = { true: string; false: string }
+
+export const Toggle: FC<ToggleProps> = ({
+  input,
+  field,
+  name,
+  disabled = false,
+}) => {
+  const checked = !!(input.value || input.checked)
   const labels = {
-    true: props.toggleLabels === true ? 'Yes' : null,
-    false: props.toggleLabels === true ? 'No' : null,
+    true: field.toggleLabels === true ? 'Yes' : null,
+    false: field.toggleLabels === true ? 'No' : null,
   }
 
-  if (typeof props.toggleLabels === 'object' && 'true' in props.toggleLabels) {
-    labels.true = props.toggleLabels['true']
-    labels.false = props.toggleLabels['false']
+  if (typeof field.toggleLabels === 'object' && 'true' in field.toggleLabels) {
+    labels.true = field.toggleLabels['true']
+    labels.false = field.toggleLabels['false']
   }
 
   const hasToggleLabels =
@@ -55,11 +62,11 @@ export const Toggle: FC<ToggleProps> = props => {
   return (
     <ToggleElement>
       {labels.false && <span>{labels.false}</span>}
-      <ToggleInput id={props.name} type="checkbox" {...props.input} />
+      <ToggleInput id={name} type="checkbox" {...input} />
       <ToggleLabel
-        htmlFor={props.name}
+        htmlFor={name}
         role="switch"
-        disabled={props.disabled}
+        disabled={disabled}
         hasToggleLabels={hasToggleLabels}
       >
         <ToggleSwitch checked={checked}>
