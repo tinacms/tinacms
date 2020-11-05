@@ -518,6 +518,7 @@ To handle this, you can pass a "render function" as the child of the `InlineBloc
 interface BlocksContainerProps {
   innerRef: React.Ref<any>
   className?: string
+  children?: React.ReactNode
 }
 ```
 
