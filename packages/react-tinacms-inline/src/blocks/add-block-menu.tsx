@@ -254,6 +254,9 @@ const BlocksMenu = styled.div<AddMenuProps>`
 `
 
 const BlockOption = styled.button`
+  all: unset;
+  box-sizing: border-box;
+  color: var(--tina-color-grey-8);
   font-family: 'Inter', sans-serif;
   position: relative;
   text-align: center;
