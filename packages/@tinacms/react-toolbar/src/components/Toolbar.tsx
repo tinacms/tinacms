@@ -236,7 +236,7 @@ const StyledToolbar = styled.div<{ menuIsOpen: boolean }>`
   right: 0;
   padding: 0 12px;
   height: 62px;
-  z-index: var(--tina-z-index-3);
+  z-index: var(--tina-z-index-4);
   box-sizing: border-box;
   display: grid;
   grid-template-areas: 'left right';
