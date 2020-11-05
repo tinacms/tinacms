@@ -19,41 +19,82 @@ limitations under the License.
 import { FC } from 'react'
 import styled from 'styled-components'
 import * as React from 'react'
+import { Field } from '@tinacms/forms'
 
 export interface ToggleProps {
   name: string
+  input: any
+  field: ToggleFieldDefinition
+  disabled?: boolean
   onBlur: <T>(event?: React.FocusEvent<T>) => void
   onChange: <T>(event: React.ChangeEvent<T> | any) => void
   onFocus: <T>(event?: React.FocusEvent<T>) => void
-  value: any
-  input: any
-  checked?: boolean
-  disabled?: boolean
 }
 
-export const Toggle: FC<ToggleProps> = props => {
-  const checked = !!(props.input.value || props.input.checked)
+interface ToggleFieldDefinition extends Field {
+  component: 'toggle'
+  toggleLabels?: boolean | FieldLabels
+}
+
+type FieldLabels = { true: string; false: string }
+
+export const Toggle: FC<ToggleProps> = ({
+  input,
+  field,
+  name,
+  disabled = false,
+}) => {
+  const checked = !!(input.value || input.checked)
+  let labels: null | FieldLabels = null
+
+  if (field.toggleLabels) {
+    const fieldLabels =
+      typeof field.toggleLabels === 'object' &&
+      'true' in field.toggleLabels &&
+      'false' in field.toggleLabels &&
+      field.toggleLabels
+
+    labels = {
+      true: fieldLabels ? fieldLabels['true'] : 'Yes',
+      false: fieldLabels ? fieldLabels['false'] : 'No',
+    }
+  }
+
   return (
-    <ToggleElement>
-      <ToggleInput id={props.name} type="checkbox" {...props.input} />
-      <ToggleLabel htmlFor={props.name} role="switch" disabled={props.disabled}>
-        <ToggleSwitch checked={checked}>
-          <span></span>
-        </ToggleSwitch>
-      </ToggleLabel>
-    </ToggleElement>
+    <ToggleWrap>
+      {labels && <span>{labels.false}</span>}
+      <ToggleElement hasToggleLabels={labels !== null}>
+        <ToggleInput id={name} type="checkbox" {...input} />
+        <ToggleLabel htmlFor={name} role="switch" disabled={disabled}>
+          <ToggleSwitch checked={checked}>
+            <span></span>
+          </ToggleSwitch>
+        </ToggleLabel>
+      </ToggleElement>
+      {labels && <span>{labels.true}</span>}
+    </ToggleWrap>
   )
 }
 
-const ToggleElement = styled.div`
-  display: block;
+const ToggleWrap = styled.div`
+  display: flex;
+  align-items: center;
+
+  > span {
+    color: var(--tina-color-grey-8);
+  }
+`
+
+const ToggleElement = styled.div<{ hasToggleLabels?: boolean }>`
   position: relative;
   width: 48px;
   height: 28px;
-  margin: 0;
+  margin: ${props => (props.hasToggleLabels ? '0 10px' : '0')};
 `
 
-const ToggleLabel = styled.label<{ disabled?: boolean }>`
+const ToggleLabel = styled.label<{
+  disabled?: boolean
+}>`
   background: none;
   color: inherit;
   padding: 0;
