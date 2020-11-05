@@ -49,6 +49,7 @@ export interface InlineBlocksProps {
 export interface BlocksContainerProps {
   innerRef: React.Ref<any>
   className?: string
+  children?: React.ReactNode
 }
 
 const DefaultContainer = (props: BlocksContainerProps) => {
