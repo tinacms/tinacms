@@ -149,6 +149,13 @@ const formOptions = {
   fields: [
     { label: 'Name', name: 'frontmatter.name', component: 'text' },
     {
+      name: 'frontmatter.image',
+      component: 'image',
+      uploadDir: () => '/public/images/',
+      parse: media => media.id,
+      clearable: true,
+    },
+    {
       name: 'markdownBody',
       label: 'Home Page Content',
       component: 'markdown',
