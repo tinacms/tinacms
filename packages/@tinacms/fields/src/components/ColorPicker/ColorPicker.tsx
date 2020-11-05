@@ -120,7 +120,7 @@ export const Popover = styled.div<{
   transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
   transform-origin: 50% 0;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
-  z-index: var(--tina-z-index-4);
+  z-index: var(--tina-z-index-5);
 
   &:before {
     content: '';

@@ -121,6 +121,7 @@ export const StyledFocusRing = styled.div<StyledFocusRingProps>(p => {
       pointer-events: none;
       transition: all var(--tina-timing-medium) ease-out;
       box-shadow: var(--tina-shadow-big);
+      z-index: var(--tina-z-index-2);
     }
 
     ${p.active &&
