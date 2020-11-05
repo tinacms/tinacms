@@ -28,7 +28,7 @@ interface ImageProps {
   path: string
   previewSrc?: MediaStore['previewSrc']
   uploadDir?(formValues: any): string
-  clearable?: boolean // defaults to true
+  clearable?: boolean
 }
 
 export function usePreviewSrc(
@@ -81,7 +81,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
 
   let onClear: any
   if (props.field.clearable) {
-    onClear = () => onChange()
+    onClear = () => props.input.onChange('')
   }
 
   function onChange(media?: Media) {
