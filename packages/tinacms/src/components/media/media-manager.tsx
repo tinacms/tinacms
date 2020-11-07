@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import React from 'react'
+import React, { useMemo } from 'react'
 import { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms'
@@ -26,7 +26,7 @@ import {
   ModalBody,
   FullscreenModal,
 } from '@tinacms/react-modals'
-import { MediaList, Media } from '@tinacms/core'
+import { MediaList, Media, MediaAction } from '@tinacms/core'
 import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
@@ -77,6 +77,20 @@ export function MediaPicker({
   ...props
 }: MediaRequest) {
   const cms = useCMS()
+  const { globalActions, singleActions, multiActions } = useMemo(
+    () => ({
+      globalActions: cms.media.actions.filter(
+        action => action.type === 'global'
+      ) as MediaAction<'global'>[],
+      singleActions: cms.media.actions.filter(
+        action => action.type === 'single'
+      ) as MediaAction<'single'>[],
+      multiActions: cms.media.actions.filter(
+        action => action.type === 'multi'
+      ) as MediaAction<'multi'>[],
+    }),
+    [cms.media.actions]
+  )
   const [listState, setListState] = useState<MediaListState>(() => {
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
@@ -191,6 +205,11 @@ export function MediaPicker({
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
         <UploadButton onClick={onClick} uploading={uploading} />
+        {globalActions.map((action, i) => (
+          <Button onClick={() => action.action([])} key={i}>
+            {action.label}
+          </Button>
+        ))}
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
@@ -205,6 +224,7 @@ export function MediaPicker({
             onClick={onClickMediaItem}
             onSelect={selectMediaItem}
             onDelete={deleteMediaItem}
+            actions={singleActions}
           />
         ))}
       </List>

@@ -17,13 +17,14 @@ limitations under the License.
 */
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { Media } from '@tinacms/core'
+import { Media, MediaAction } from '@tinacms/core'
 import { Folder, File } from '@tinacms/icons'
 import { Button, IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
 
 interface MediaItemProps {
   item: Media
+  actions: MediaAction<'single'>[]
   onClick(item: Media): void
   onSelect?(item: Media): void
   onDelete?(item: Media): void
@@ -31,6 +32,7 @@ interface MediaItemProps {
 
 export function MediaItem({
   item,
+  actions,
   onClick,
   onSelect,
   onDelete,
@@ -56,6 +58,11 @@ export function MediaItem({
             <TrashIcon />
           </IconButton>
         )}
+        {actions.map((action, i) => (
+          <Button small onClick={() => action.action(item)} key={i}>
+            {action.label}
+          </Button>
+        ))}
       </ActionButtons>
     </ListItem>
   )
