@@ -58,11 +58,26 @@ export interface MediaUploadOptions {
   file: File
 }
 
+export type MediaActionType = 'global' | 'single' | 'multi'
+
+export type MediaAction<Type = MediaActionType> = {
+  label: string
+  type: MediaActionType
+  action: Type extends 'single'
+    ? (media: Media) => void
+    : (media: Media[]) => void
+}
+
 /**
  * Represents some external service for storing and
  * managing media.
  */
 export interface MediaStore {
+  /**
+   * Specifies custom actions to be displayed in the media manager UI
+   */
+  actions?: MediaAction[]
+
   /**
    * The [input accept string](https://developer.mozilla.org/en-US/docs/Web/HTML/Element/input/file#accept)
    * that describes what kind of files the Media Store will accept.
@@ -132,6 +147,10 @@ export interface MediaList {
  */
 export class MediaManager implements MediaStore {
   constructor(public store: MediaStore, private events: EventBus) {}
+
+  get actions() {
+    return this.store.actions ?? []
+  }
 
   get isConfigured() {
     return !(this.store instanceof DummyMediaStore)
