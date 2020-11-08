@@ -16,10 +16,9 @@ limitations under the License.
 
 */
 
-import React from 'react'
+import React, { ChangeEvent } from 'react'
 import styled, { css } from 'styled-components'
 import { MediaList } from '@tinacms/core'
-import { Media } from 'tinacms'
 
 interface PageLinksProps {
   list: MediaList
@@ -114,21 +113,10 @@ const AdvancedPageLinks = ({
 
   if (pages.length !== numPages) {
     let i = 0
-    while (pages.length < numPages) {
+    while (pages.length <= numPages) {
       pages.push(i++)
     }
   }
-
-  console.log({
-    offset: list.offset,
-    limit,
-    numPages,
-    currentPageIndex,
-    previousOffset,
-    nextOffset,
-    lastOffset,
-    total: list.totalCount,
-  })
 
   return (
     <>
@@ -143,10 +131,14 @@ const AdvancedPageLinks = ({
       </PageButton>
       <PageLinksText>
         Showing page
-        <PageSelector onChange={(val: any) => console.log(val)}>
+        <PageSelector
+          onChange={(event: ChangeEvent<any>) =>
+            event?.target?.value ? setOffset(event.target.value * limit) : null
+          }
+        >
           {pages.map(page => (
             <option
-              value={page + 1}
+              value={page}
               selected={page + 1 === currentPageIndex}
               key={page}
             >
