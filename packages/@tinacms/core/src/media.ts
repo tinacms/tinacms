@@ -61,11 +61,10 @@ export interface MediaUploadOptions {
 export type MediaActionType = 'global' | 'single' | 'multi'
 
 export type MediaAction<Type = MediaActionType> = {
-  label: string
   type: MediaActionType
   action: Type extends 'single'
-    ? (media: Media) => void
-    : (media: Media[]) => void
+    ? React.FC<{ media: Media }>
+    : React.FC<{ media: Media[] }>
 }
 
 /**

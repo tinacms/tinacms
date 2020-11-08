@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import React, { useMemo } from 'react'
+import React, { useMemo, useRef } from 'react'
 import { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms'
@@ -32,6 +32,7 @@ import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, PageLinks } from './index'
 import { LoadingDots } from '@tinacms/react-forms'
+import { MediaActionMenu } from './media-actions'
 
 export interface MediaRequest {
   limit?: number
@@ -77,20 +78,6 @@ export function MediaPicker({
   ...props
 }: MediaRequest) {
   const cms = useCMS()
-  const { globalActions, singleActions, multiActions } = useMemo(
-    () => ({
-      globalActions: cms.media.actions.filter(
-        action => action.type === 'global'
-      ) as MediaAction<'global'>[],
-      singleActions: cms.media.actions.filter(
-        action => action.type === 'single'
-      ) as MediaAction<'single'>[],
-      multiActions: cms.media.actions.filter(
-        action => action.type === 'multi'
-      ) as MediaAction<'multi'>[],
-    }),
-    [cms.media.actions]
-  )
   const [listState, setListState] = useState<MediaListState>(() => {
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
@@ -106,6 +93,12 @@ export function MediaPicker({
     items: [],
     totalCount: 0,
   })
+  const onClickMediaItem = (item: Media) => {
+    if (item.type === 'dir') {
+      setDirectory(path.join(item.directory, item.filename))
+      setOffset(0)
+    }
+  }
 
   useEffect(() => {
     function loadMedia() {
@@ -130,13 +123,6 @@ export function MediaPicker({
     )
   }, [offset, limit, directory])
 
-  const onClickMediaItem = (item: Media) => {
-    if (item.type === 'dir') {
-      setDirectory(path.join(item.directory, item.filename))
-      setOffset(0)
-    }
-  }
-
   let deleteMediaItem: (item: Media) => void
   if (allowDelete) {
     deleteMediaItem = (item: Media) => {
@@ -147,7 +133,6 @@ export function MediaPicker({
   }
 
   let selectMediaItem: (item: Media) => void
-
   if (onSelect) {
     selectMediaItem = (item: Media) => {
       onSelect(item)
@@ -174,10 +159,24 @@ export function MediaPicker({
       setUploading(false)
     },
   })
-
   const { onClick, ...rootProps } = getRootProps()
+  // TODO: use multiActions w/ globalActions once we enable bulk management of media
+  const { globalActions, singleActions, multiActions } = useMemo(
+    () => ({
+      globalActions: cms.media.actions.filter(
+        action => action.type === 'global'
+      ) as MediaAction<'global'>[],
+      singleActions: cms.media.actions.filter(
+        action => action.type === 'single'
+      ) as MediaAction<'single'>[],
+      multiActions: cms.media.actions.filter(
+        action => action.type === 'multi'
+      ) as MediaAction<'multi'>[],
+    }),
+    [cms.media.actions]
+  )
 
-  function disableScrollBody() {
+  const disableScrollBody = () => {
     const body = document?.body
     body.style.overflow = 'hidden'
 
@@ -185,7 +184,6 @@ export function MediaPicker({
       body.style.overflow = 'auto'
     }
   }
-
   useEffect(disableScrollBody, [])
 
   if (listState === 'loading') {
@@ -205,11 +203,9 @@ export function MediaPicker({
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
         <UploadButton onClick={onClick} uploading={uploading} />
-        {globalActions.map((action, i) => (
-          <Button onClick={() => action.action([])} key={i}>
-            {action.label}
-          </Button>
-        ))}
+        {globalActions.length > 0 && (
+          <MediaActionMenu actions={globalActions} media={list.items} />
+        )}
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />

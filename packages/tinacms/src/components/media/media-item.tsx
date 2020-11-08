@@ -21,6 +21,7 @@ import { Media, MediaAction } from '@tinacms/core'
 import { Folder, File } from '@tinacms/icons'
 import { Button, IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
+import { MediaActionMenu } from './media-actions'
 
 interface MediaItemProps {
   item: Media
@@ -58,11 +59,9 @@ export function MediaItem({
             <TrashIcon />
           </IconButton>
         )}
-        {actions.map((action, i) => (
-          <Button small onClick={() => action.action(item)} key={i}>
-            {action.label}
-          </Button>
-        ))}
+        {actions.length > 0 && (
+          <MediaActionMenu actions={actions} media={item} />
+        )}
       </ActionButtons>
     </ListItem>
   )
@@ -79,6 +78,7 @@ interface ListItemProps {
 const ListItem = styled.li<ListItemProps>`
   display: flex;
   align-items: center;
+  justify-items: center;
   padding: 1rem;
   background-color: white;
   filter: drop-shadow(0 0 0 transparent);
@@ -145,6 +145,9 @@ const Filename = styled.span`
 
 const ActionButtons = styled.span`
   display: flex;
+  align-items: center;
+  justify-items: center;
+
   > * {
     margin-left: var(--tina-padding-small);
   }
