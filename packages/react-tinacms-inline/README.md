@@ -160,7 +160,7 @@ The common UI element on all Inline Fields is the `FocusRing`. The focus ring pr
 ```ts
 interface FocusRingProps {
   name?: string
-  children?:  React.ReactChild
+  children: React.ReactNode | ((active: boolean) => React.ReactNode)
   options?: boolean | FocusRingOptions
 }
 
@@ -180,6 +180,23 @@ You would only use these options if you were creating custom inline fields and w
 | `children`    | _Optional_: Child elements to render.                                                                    |
 | `name`        | _Optional_: This value is used to set the focused / active field.                            |
 | `options`     | _Optional_: The `FocusRingOptions` outlined below.                                           |
+
+<br />
+
+> **Focus Ring Children**
+>
+> `FocusRing` optionally accepts [render prop](https://reactjs.org/docs/render-props.html#using-props-other-than-render) patterned children, which receive the `active` state and can be used to conditionally render elements based on whether the `FocusRing` currently has focus.
+>
+> ```jsx
+><FocusRing>
+>  {active => {
+>    if (active) {
+>      return <ComplicatedEditableComponent />
+>    }
+>    return <SimpleDisplayComponent />
+>  }}
+></FocusRing>
+> ```
 
 **Focus Ring Options**
 
