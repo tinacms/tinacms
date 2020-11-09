@@ -35,7 +35,7 @@ export interface StyledFocusRingProps
 
 export interface FocusRingProps {
   name?: string
-  children: React.ReactChild | React.ReactChild[]
+  children: React.ReactNode | ((active: boolean) => React.ReactNode)
   options?: boolean | FocusRingOptions
 }
 
@@ -56,10 +56,10 @@ export const FocusRing = ({ name, options, children }: FocusRingProps) => {
   }, [name, options, focussedField])
 
   const updateFocusedField = (event: React.MouseEvent<HTMLElement>) => {
-    if (active || !name) return
-    setFocussedField(name)
     event.stopPropagation()
     event.preventDefault()
+    if (active || !name) return
+    setFocussedField(name)
   }
 
   return (
@@ -72,7 +72,7 @@ export const FocusRing = ({ name, options, children }: FocusRingProps) => {
       disableHover={!options || childActive}
       disableChildren={nestedFocus && !active && !childActive}
     >
-      {children}
+      {typeof children === 'function' ? children(active) : children}
     </StyledFocusRing>
   )
 }
