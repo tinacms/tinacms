@@ -59,10 +59,10 @@ export const FocusRing = ({ name, options, children }: FocusRingProps) => {
   }, [name, options, focussedField])
 
   const updateFocusedField = (event: React.MouseEvent<HTMLElement>) => {
-    if (active || !name) return
-    setFocussedField(name)
     event.stopPropagation()
     event.preventDefault()
+    if (active || !name) return
+    setFocussedField(name)
   }
 
   return (

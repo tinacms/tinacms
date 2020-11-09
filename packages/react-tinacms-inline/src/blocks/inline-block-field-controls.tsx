@@ -99,6 +99,8 @@ export function BlocksControls({
   const childIsActive = focussedField.startsWith(name!)
 
   const focusOnBlock = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
     if (
       blockMenuRef.current?.contains(event.target) ||
       blockMoveUpRef.current?.contains(event.target) ||
@@ -106,8 +108,6 @@ export function BlocksControls({
     ) {
       return
     }
-    event.stopPropagation()
-    event.preventDefault()
     setFocussedField(name!)
   }
 
