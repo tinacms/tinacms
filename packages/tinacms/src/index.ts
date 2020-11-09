@@ -48,3 +48,8 @@ export {
   Tina,
   TinaProps,
 } from './components/TinaProvider'
+export {
+  MediaPaginatorPlugin,
+  BaseMediaPaginator,
+  MediaPaginatorProps,
+} from './components/media'

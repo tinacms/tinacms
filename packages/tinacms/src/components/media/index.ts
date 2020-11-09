@@ -19,4 +19,9 @@ limitations under the License.
 export * from './media-manager'
 export { MediaItem } from './media-item'
 export { Breadcrumb } from './breadcrumb'
-export { PageLinks } from './pagination'
+export {
+  PageLinks,
+  MediaPaginatorProps,
+  MediaPaginatorPlugin,
+  BaseMediaPaginator,
+} from './pagination'

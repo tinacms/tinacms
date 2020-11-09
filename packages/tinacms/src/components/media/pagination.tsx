@@ -18,14 +18,24 @@ limitations under the License.
 
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { MediaList } from '@tinacms/core'
+import { MediaList, Plugin } from '@tinacms/core'
 
-interface PageLinksProps {
+export interface MediaPaginatorProps {
   list: MediaList
   setOffset: (offset: number) => void
 }
 
-export function PageLinks({ list, setOffset }: PageLinksProps) {
+export interface MediaPaginatorPlugin extends Plugin {
+  Component: React.ComponentType<MediaPaginatorProps>
+}
+
+export const BaseMediaPaginator: MediaPaginatorPlugin = {
+  __type: 'media:ui',
+  name: 'paginator',
+  Component: PageLinks,
+}
+
+export function PageLinks({ list, setOffset }: MediaPaginatorProps) {
   const limit = list.limit || 10
   const numPages = Math.ceil(list.totalCount / limit)
   const lastItemIndexOnPage = list.offset + limit
