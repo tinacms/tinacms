@@ -202,10 +202,12 @@ export function MediaPicker({
     <MediaPickerWrap>
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
-        <UploadButton onClick={onClick} uploading={uploading} />
-        {globalActions.length > 0 && (
-          <MediaActionMenu actions={globalActions} media={list.items} />
-        )}
+        <GlobalActionsWrapper>
+          <UploadButton onClick={onClick} uploading={uploading} />
+          {globalActions.length > 0 && (
+            <MediaActionMenu actions={globalActions} media={list.items} />
+          )}
+        </GlobalActionsWrapper>
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
@@ -352,4 +354,11 @@ const DocsLink = styled(({ title, ...props }) => {
     text-decoration: underline;
     font-weight: bold;
   }
+`
+
+const GlobalActionsWrapper = styled.div`
+  position: relative;
+  display: flex;
+  justify-content: flex-end;
+  align-items: center;
 `

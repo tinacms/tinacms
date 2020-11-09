@@ -98,12 +98,13 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   background-color: white;
   overflow: hidden;
   z-index: var(--tina-z-index-1);
+
   ${props =>
     props.open &&
     css`
       opacity: 1;
       pointer-events: all;
-      transform: translate3d(0, -28px, 0) scale3d(1, 1, 1);
+      transform: translate3d(0, 0.5rem, 0) scale3d(1, 1, 1);
     `};
 `
 

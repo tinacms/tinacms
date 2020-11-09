@@ -144,11 +144,12 @@ const Filename = styled.span`
 `
 
 const ActionButtons = styled.span`
+  position: relative;
   display: flex;
   align-items: center;
   justify-items: center;
 
-  > * {
+  > button {
     margin-left: var(--tina-padding-small);
   }
 `
