@@ -59,10 +59,10 @@ export function InlineGroupControls({
   }, [name, focusRing, focussedField])
 
   const updateFocusedField = (event: any) => {
-    if (active || !name) return
-    setFocussedField(name)
     event.stopPropagation()
     event.preventDefault()
+    if (active || !name) return
+    setFocussedField(name)
   }
 
   if (cms.disabled) {
