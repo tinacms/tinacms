@@ -57,12 +57,19 @@ export function InlineWysiwyg({
       {({ input, form }: InlineWysiwygRenderProps) => {
         return (
           <FocusRing name={input.name} options={focusRing}>
-            <Wysiwyg
-              input={input}
-              imageProps={imageProps}
-              form={form}
-              {...wysiwygProps}
-            />
+            {active => {
+              if (active) {
+                return (
+                  <Wysiwyg
+                    input={input}
+                    imageProps={imageProps}
+                    form={form}
+                    {...wysiwygProps}
+                  />
+                )
+              }
+              return children
+            }}
           </FocusRing>
         )
       }}

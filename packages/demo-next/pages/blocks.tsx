@@ -29,6 +29,7 @@ import {
   useInlineForm,
   InlineTextarea,
 } from 'react-tinacms-inline'
+import { InlineWysiwyg } from 'react-tinacms-editor'
 
 import Layout from '../components/Layout'
 
@@ -184,6 +185,14 @@ const image_template: BlockTemplate = {
   fields: [{ name: 'alt', label: 'Image Alt', component: 'text' }],
 }
 
+const wysi_template: BlockTemplate = {
+  label: 'Content',
+  defaultItem: {
+    _template: 'wysiwyg',
+    content: '# Hello World',
+  },
+}
+
 // Testing the block styled component override
 
 const StyledBlockText = styled(InlineTextarea)`
@@ -207,6 +216,12 @@ const PAGE_BUILDER_BLOCKS = {
   image: {
     Component: ImageBlock,
     template: image_template,
+  },
+  wysiwyg: {
+    Component: ({ data }) => {
+      return <InlineWysiwyg name="content">{data.content}</InlineWysiwyg>
+    },
+    template: wysi_template,
   },
 }
 

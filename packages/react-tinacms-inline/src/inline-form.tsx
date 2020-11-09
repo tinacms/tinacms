@@ -51,7 +51,7 @@ export function InlineForm({ form, children }: InlineFormProps) {
       focussedField,
       setFocussedField,
     }
-  }, [form, focussedField])
+  }, [form, focussedField, setFocussedField])
 
   const moveArrayItem = React.useCallback(
     (result: DropResult) => {
