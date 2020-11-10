@@ -115,6 +115,7 @@ export class CMS {
    *
    */
   api: { [key: string]: any } = {}
+  private unsubscribeHooks: { [key: string]: () => void } = {}
 
   events = new EventBus()
 
@@ -164,8 +165,14 @@ export class CMS {
    * * https://github.com/tinacms/rfcs/blob/master/0010-api-events.md
    */
   registerApi(name: string, api: any): void {
+    if (this.unsubscribeHooks[name]) {
+      this.unsubscribeHooks[name]()
+    }
     if (api.events instanceof EventBus) {
-      ;(api.events as EventBus).subscribe('*', this.events.dispatch)
+      this.unsubscribeHooks[name] = (api.events as EventBus).subscribe(
+        '*',
+        this.events.dispatch
+      )
     }
     this.api[name] = api
   }
