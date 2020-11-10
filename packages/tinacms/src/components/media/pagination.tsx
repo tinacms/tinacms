@@ -18,14 +18,24 @@ limitations under the License.
 
 import React from 'react'
 import styled, { css } from 'styled-components'
-import { MediaList } from '@tinacms/core'
+import { MediaList, Plugin } from '@tinacms/core'
 
-interface PageLinksProps {
+export interface MediaPaginatorProps {
   list: MediaList
   setOffset: (offset: number) => void
 }
 
-export function PageLinks({ list, setOffset }: PageLinksProps) {
+export interface MediaPaginatorPlugin extends Plugin {
+  Component: React.ComponentType<MediaPaginatorProps>
+}
+
+export const BaseMediaPaginator: MediaPaginatorPlugin = {
+  __type: 'media:ui',
+  name: 'paginator',
+  Component: PageLinks,
+}
+
+export function PageLinks({ list, setOffset }: MediaPaginatorProps) {
   const limit = list.limit || 10
   const numPages = Math.ceil(list.totalCount / limit)
   const lastItemIndexOnPage = list.offset + limit
@@ -52,19 +62,24 @@ const PageLinksWrap = styled.div`
   width: 100%;
   display: flex;
   justify-content: flex-end;
+  margin-top: var(--tina-padding-small);
 `
 
 const PageNumber = styled.button<{ active: boolean }>`
   padding: 0 0.15rem;
   margin: var(--tina-padding-small);
-  transition: border 180ms ease;
+  transition: box-shadow 180ms ease;
+  background-color: transparent;
+  border: none;
+
+  :hover {
+    cursor: pointer;
+    box-shadow: 0 1px 0 var(--tina-color-grey-9);
+  }
 
   ${p =>
-      !p.active &&
-      css`
-        color: var(--tina-color-grey-4);
-      `}
-    :hover {
-    border-bottom: 1px solid var(--tina-color-grey-9);
-  }
+    !p.active &&
+    css`
+      color: var(--tina-color-grey-4);
+    `}
 `

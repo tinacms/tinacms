@@ -23,6 +23,7 @@ import { GitClient, GitMediaStore } from '@tinacms/git-client'
 import { GlobalStyles as TinaCustomStyles } from '@tinacms/styles'
 import { NextGitMediaStore } from '../next-git-media-store'
 import { MarkdownFieldPlugin } from 'react-tinacms-editor'
+//import { CustomPaginatorPlugin } from '../plugins/CustomPaginator'
 
 function Empty() {
   return <span>Hello from a custom empty state Component</span>
@@ -47,6 +48,7 @@ export default class Site extends App {
           message: 'You can now edit the page',
         },
       },
+      //plugins: [CustomPaginatorPlugin],
     })
     const client = new GitClient('http://localhost:3000/___tina')
     this.cms.registerApi('git', client)
