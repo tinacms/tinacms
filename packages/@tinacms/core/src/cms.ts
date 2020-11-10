@@ -115,7 +115,7 @@ export class CMS {
    *
    */
   api: { [key: string]: any } = {}
-  unsubscribeHooks: { [key: string]: () => void } = {}
+  private unsubscribeHooks: { [key: string]: () => void } = {}
 
   events = new EventBus()
 
