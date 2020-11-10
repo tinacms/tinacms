@@ -43,6 +43,7 @@ import {
   DateFieldPlaceholder,
 } from './plugins/fields/markdown'
 import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
+import { BaseMediaPaginator } from './components/media/pagination'
 
 const DEFAULT_FIELDS = [
   TextFieldPlugin,
@@ -109,6 +110,9 @@ export class TinaCMS extends CMS {
       }
     })
     this.plugins.add(MediaManagerScreenPlugin)
+    if (!this.plugins.getType('media:ui').find('paginator')) {
+      this.plugins.add(BaseMediaPaginator)
+    }
   }
 
   get alerts() {
