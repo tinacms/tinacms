@@ -23,7 +23,7 @@ import { EventBus } from './event'
  * Represents an individual file in the MediaStore
  */
 export interface Media {
-  type: 'image' | 'video' | 'dir'
+  type: 'file' | 'image' | 'video' | 'dir'
 
   /**
    * A unique identifier for this file.
