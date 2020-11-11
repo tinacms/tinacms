@@ -57,7 +57,7 @@ export function MediaItem({
 
 function renderPreview(item: Media) {
   if (item.previewSrc) {
-    if (item.type === 'image') {
+    if (item.type === 'image' || item.type === 'file') {
       return <img src={item.previewSrc} alt={item.filename} />
     } else if (item.type === 'video') {
       return <video src={item.previewSrc} />
