@@ -38,10 +38,16 @@ export function InlineGroup({
   insetControls,
   focusRing,
 }: InlineGroupProps) {
+  let fieldName = name
+  const parentField = React.useContext(InlineFieldContext)
+  if (parentField.name) {
+    fieldName = `${parentField.name}.${name}`
+  }
+
   return (
-    <InlineFieldContext.Provider value={{ name, fields }}>
+    <InlineFieldContext.Provider value={{ name: fieldName, fields }}>
       <InlineGroupControls
-        name={name}
+        name={fieldName}
         insetControls={insetControls}
         focusRing={focusRing}
       >
