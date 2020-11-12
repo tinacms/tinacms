@@ -41,6 +41,11 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
       {directory &&
         directory.split('/').map((part, index, parts) => (
           <button
+            /** since these can't be reordered, using
+             * index as a part of key in case of dirs
+             * with the same name
+             * */
+            key={`${part}-${index}`}
             onClick={() => {
               setDirectory(parts.slice(0, index + 1).join('/'))
             }}

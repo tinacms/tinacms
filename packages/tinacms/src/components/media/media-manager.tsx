@@ -206,6 +206,7 @@ export function MediaPicker({
 
         {list.items.map((item: Media) => (
           <MediaItem
+            key={item.id}
             item={item}
             onClick={onClickMediaItem}
             onSelect={selectMediaItem}
