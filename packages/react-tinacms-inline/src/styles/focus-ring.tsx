@@ -84,6 +84,7 @@ export const StyledFocusRing = styled.div<StyledFocusRingProps>(p => {
     position: relative;
     width: 100%;
     height: 100%;
+    min-height: var(--tina-font-size-0);
 
     ${!p.disableHover &&
       css`
