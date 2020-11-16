@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.33.0](https://github.com/tinacms/tinacms/compare/v0.32.1...v0.33.0) (2020-11-16)
+
+
+### Bug Fixes
+
+* **@tinacms/core:** unsubscribe from events when replacing api ([5ad8dee](https://github.com/tinacms/tinacms/commit/5ad8dee27eddd81b347baeb033f366c443471186))
+
+
+
+
+
 # [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
 
 

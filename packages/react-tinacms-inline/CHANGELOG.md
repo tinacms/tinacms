@@ -3,6 +3,30 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.33.0](https://github.com/tinacms/tinacms/compare/v0.32.1...v0.33.0) (2020-11-16)
+
+
+### Bug Fixes
+
+* **react-tinacms-inline:** better control InlineBlocks rerenders ([611fc70](https://github.com/tinacms/tinacms/commit/611fc70eaba95168db9531f35d283d69dfe56e05))
+* **react-tinacms-inline:** stop focus event bubble before returning early ([698e0b5](https://github.com/tinacms/tinacms/commit/698e0b5d1573087068ed5517d22a7f3cede5ac74))
+
+
+### Features
+
+* **react-tinacms-inline:** Export SettingsModal ([ba5e03e](https://github.com/tinacms/tinacms/commit/ba5e03e8403d52b0b9ffcc068af7e3cbf845cfa6))
+* **react-tinacms-inline:** FocusRing accepts render-child ([e1cc04c](https://github.com/tinacms/tinacms/commit/e1cc04c76898a800e2a792ba210e305bddbc9771))
+* **react-tinacms-inline:** InlineGroup field names are relative ([57bcb3d](https://github.com/tinacms/tinacms/commit/57bcb3d2f70deec3f96437054d678b2551a559e6))
+
+
+### Performance Improvements
+
+* **react-tinacms-inline:** don't render block menu when block not active ([2b26b8a](https://github.com/tinacms/tinacms/commit/2b26b8a5c7a64b64e10f4faebc8712c0832218a5))
+
+
+
+
+
 # [0.32.0](https://github.com/tinacms/tinacms/compare/v0.31.0...v0.32.0) (2020-10-20)
 
 
