@@ -24,6 +24,7 @@ import {
   InlineBlocks,
   BlocksControls,
 } from 'react-tinacms-inline'
+import { TinaIcon } from '@tinacms/icons'
 import styled from 'styled-components'
 
 import Layout from '../components/Layout'
@@ -256,7 +257,15 @@ const COLORS = {
     },
     Component({ index, data }) {
       return (
-        <BlocksControls index={index}>
+        <BlocksControls
+          index={index}
+          customActions={[
+            {
+              icon: <TinaIcon />,
+              onClick: () => alert('Hello from a custom Block Action!'),
+            },
+          ]}
+        >
           <InlineTextarea name="name" />
           <p>{data.color}</p>
         </BlocksControls>
