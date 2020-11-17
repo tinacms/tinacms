@@ -283,12 +283,18 @@ interface BlocksControlsProps {
   index: number
   insetControls?: boolean
   focusRing?: false | FocusRingProps
-  children: React.ReactChild
+  children: React.ReactChild | React.ReactChild[]
+  customActions?: BlocksControlActionItem[]
 }
 
 interface FocusRingProps {
   offset?: number | { x: number; y: number }
   borderRadius?: number
+}
+
+export interface BlocksControlActionItem {
+  icon: React.ReactNode
+  onClick: React.MouseEventHandler<HTMLElement>
 }
 ```
 
@@ -298,6 +304,7 @@ interface FocusRingProps {
 | `insetControls` | A boolean to denote whether the group controls display within or outside the group.                                                                                                                                                                                                                                                |
 | `focusRing`     | Either an object to style the focus ring or `false`, which hides the focus ring entirely. For styles, `offset` (in pixels) controls the distance from the ring to the edge of the group; `borderRadius`(in pixels) controls the [rounding](https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius) edge of the focus ring. |
 | `children`      | Any child components, typically inline field(s).                                                                                                                                                                                                                                                                                   |
+| `customActions` | An array of objects containing custom block action configuration. `icon` is the component to render in the toolbar. `onClick` handles the action behavior.                                                                                                                                                                                                                                                                                    |
 
 
 ### Block Definition
