@@ -46,7 +46,7 @@ export function useLocalForm<FormShape = any>(
 export function useForm<FormShape = any>(
   { loadInitialValues, ...options }: FormOptions<any>,
   watch: Partial<WatchableFormValue> = {}
-): [FormShape, Form] {
+): [FormShape, Form, boolean] {
   /**
    * `initialValues` will be usually be undefined if `loadInitialValues` is used.
    *
@@ -79,11 +79,19 @@ export function useForm<FormShape = any>(
     [options.id]
   )
 
+  const [formIsLoading, setFormIsLoading] = React.useState(() =>
+    loadInitialValues ? true : false
+  )
   React.useEffect(() => {
     if (loadInitialValues) {
-      loadInitialValues().then((values: any) => {
-        form.updateInitialValues(values)
-      })
+      setFormIsLoading(true)
+      loadInitialValues()
+        .then((values: any) => {
+          form.updateInitialValues(values)
+        })
+        .finally(() => {
+          setFormIsLoading(false)
+        })
     }
   }, [form])
 
@@ -91,7 +99,7 @@ export function useForm<FormShape = any>(
   useUpdateFormLabel(form, watch.label)
   useUpdateFormValues(form, watch.values)
 
-  return [form ? form.values : options.initialValues, form]
+  return [form ? form.values : options.initialValues, form, formIsLoading]
 }
 
 function createForm(options: FormOptions<any>, handleChange: any): Form {
