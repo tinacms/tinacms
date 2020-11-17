@@ -19,6 +19,7 @@ limitations under the License.
 import { FormOptions, Form, Field } from '@tinacms/forms'
 import * as React from 'react'
 import { usePlugins } from './use-plugin'
+import { useCMSEvent } from './use-cms-event'
 
 export interface WatchableFormValue {
   values: any
@@ -82,10 +83,10 @@ export function useForm<FormShape = any>(
   const [formIsLoading, setFormIsLoading] = React.useState(() =>
     loadInitialValues ? true : false
   )
-  React.useEffect(() => {
+  const loadFormData = React.useCallback(async () => {
     if (loadInitialValues) {
       setFormIsLoading(true)
-      loadInitialValues()
+      await loadInitialValues()
         .then((values: any) => {
           form.updateInitialValues(values)
         })
@@ -93,7 +94,18 @@ export function useForm<FormShape = any>(
           setFormIsLoading(false)
         })
     }
-  }, [form])
+  }, [form, setFormIsLoading])
+  React.useEffect(() => {
+    loadFormData()
+  }, [form, loadFormData])
+  useCMSEvent(
+    'unstable:reload-form-data',
+    async () => {
+      await loadFormData()
+      await form.reset()
+    },
+    [loadFormData, form]
+  )
 
   useUpdateFormFields(form, watch.fields)
   useUpdateFormLabel(form, watch.label)

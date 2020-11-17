@@ -208,6 +208,9 @@ export class GithubClient {
       type: CHECKOUT_BRANCH,
       branchName: branch,
     })
+    this.events.dispatch({
+      type: 'unstable:reload-form-data',
+    })
   }
 
   async fetchExistingPR() {
