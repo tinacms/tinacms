@@ -38,11 +38,17 @@ import { InlineFieldContext } from '../inline-field-context'
 import { StyledFocusRing } from '../styles'
 import { FocusRingOptions, getOffset, getOffsetX, getOffsetY } from '../styles'
 
+export interface BlocksControlActionItem {
+  icon: React.ReactNode
+  onClick: React.MouseEventHandler<HTMLElement>
+}
+
 export interface BlocksControlsProps {
   children: React.ReactChild | React.ReactChild[]
   index: number
   insetControls?: boolean
   focusRing?: boolean | FocusRingOptions
+  customActions?: BlocksControlActionItem[]
 }
 
 export function BlocksControls({
@@ -50,6 +56,7 @@ export function BlocksControls({
   index,
   insetControls,
   focusRing = {},
+  customActions = [],
 }: BlocksControlsProps) {
   const cms = useCMS()
   const { focussedField, setFocussedField } = useInlineForm()
@@ -188,6 +195,11 @@ export function BlocksControls({
                       {direction === 'vertical' && <ReorderIcon />}
                       {direction === 'horizontal' && <ReorderRowIcon />}
                     </BlockAction>
+                    {customActions.map((x, i) => (
+                      <BlockAction key={i} onClick={x.onClick}>
+                        {x.icon}
+                      </BlockAction>
+                    ))}
                     <InlineSettings fields={template.fields} />
                     {withinLimit(min) && (
                       <BlockAction onClick={removeBlock}>
