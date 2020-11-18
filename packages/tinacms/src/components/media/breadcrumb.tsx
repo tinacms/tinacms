@@ -41,20 +41,19 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
       </span>
       <button onClick={() => setDirectory('')}>Media</button>
       {directory &&
-        directory.split('/').map((part, index, parts) => (
-          <button
-            /** since these can't be reordered, using
-             * index as a part of key in case of dirs
-             * with the same name
-             * */
-            key={`${part}-${index}`}
-            onClick={() => {
-              setDirectory(parts.slice(0, index + 1).join('/'))
-            }}
-          >
-            {part}
-          </button>
-        ))}
+        directory.split('/').map((part, index, parts) => {
+          const currentDir = parts.slice(0, index + 1).join('/')
+          return (
+            <button
+              key={currentDir}
+              onClick={() => {
+                setDirectory(currentDir)
+              }}
+            >
+              {part}
+            </button>
+          )
+        })}
     </BreadcrumbWrapper>
   )
 }
