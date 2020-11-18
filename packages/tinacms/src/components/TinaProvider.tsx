@@ -26,12 +26,18 @@ import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
 import { useState, useEffect } from 'react'
 import { MediaManager } from './media'
+import { Plugin } from '@tinacms/core'
 
 export interface TinaProviderProps {
   cms: TinaCMS
   hidden?: boolean
   position?: SidebarPosition
   styled?: boolean
+}
+
+export interface WrapperPlugin extends Plugin {
+  __type: 'unstable:wrapper'
+  wrap: (children: React.ReactNode) => JSX.Element
 }
 
 export const INVALID_CMS_ERROR =
@@ -55,6 +61,20 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
     throw new Error(INVALID_CMS_ERROR)
   }
 
+  const [wrappers, setWrappers] = React.useState(() =>
+    cms.plugins.getType<WrapperPlugin>('unstable:wrapper').all()
+  )
+  React.useEffect(() => {
+    return cms.events.subscribe('plugin:add:unstable:wrapper', () => {
+      setWrappers(cms.plugins.getType<WrapperPlugin>('unstable:wrapper').all())
+    })
+  }, [])
+
+  const componentStack = React.useMemo(
+    () => wrappers.reduce((stack, wrapper) => wrapper.wrap(stack), children),
+    [wrappers, children]
+  )
+
   return (
     <CMSContext.Provider value={cms}>
       <ModalProvider>
@@ -64,10 +84,10 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
         <MediaManager />
         {cms.sidebar ? (
           <SidebarProvider position={position} sidebar={cms.sidebar}>
-            {children}
+            {componentStack}
           </SidebarProvider>
         ) : (
-          children
+          componentStack
         )}
       </ModalProvider>
     </CMSContext.Provider>
