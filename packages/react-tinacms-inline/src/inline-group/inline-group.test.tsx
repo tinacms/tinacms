@@ -20,39 +20,36 @@ import { render, screen } from '@testing-library/react'
 import * as React from 'react'
 import { InlineGroup } from '.'
 import { InlineForm, InlineText } from '../'
-import { TinaProvider, TinaCMS, useForm } from 'tinacms'
+import { withTina, useForm } from 'tinacms'
 
 describe('Inline Group', () => {
-  const cms = new TinaCMS({
-    enabled: true,
-    toolbar: {
-      buttons: {
-        save: 'inline-group-test-save',
-        reset: 'reset',
-      },
-    },
-  })
-
-  const Wrapper = ({ children }: { children: React.ReactElement }) => {
-    const [, form] = useForm({
-      id: 'test-inline-group',
-      label: 'inline group',
-      initialValues: {
-        parent: {
-          child: {
-            child_text: 'inline group text test',
+  const Wrapper = withTina(
+    ({ children }: { children: React.ReactElement }) => {
+      const [, form] = useForm({
+        id: 'test-inline-group',
+        label: 'inline group',
+        initialValues: {
+          parent: {
+            child: {
+              child_text: 'inline group text test',
+            },
           },
         },
-      },
-      onSubmit: () => {},
-    })
+        onSubmit: () => {},
+      })
 
-    return (
-      <TinaProvider cms={cms}>
-        <InlineForm form={form}>{children}</InlineForm>
-      </TinaProvider>
-    )
-  }
+      return <InlineForm form={form}>{children}</InlineForm>
+    },
+    {
+      enabled: true,
+      toolbar: {
+        buttons: {
+          save: 'inline-group-test-save',
+          reset: 'reset',
+        },
+      },
+    }
+  )
 
   it('renders children', () => {
     render(
