@@ -203,10 +203,15 @@ export class GithubClient {
    * @deprecated Call GithubClient#checkout instead
    */
   setWorkingBranch(branch: string) {
+    if (this.branchName === branch) return
+
     this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
     this.events.dispatch({
       type: CHECKOUT_BRANCH,
       branchName: branch,
+    })
+    this.events.dispatch({
+      type: 'unstable:reload-form-data',
     })
   }
 
