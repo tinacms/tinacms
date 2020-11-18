@@ -264,7 +264,7 @@ export class PluginType<T extends Plugin = Plugin> {
     }
 
     this.__plugins[p.name] = p
-    this.events.dispatch({ type: `plugin:add:${this.__type}` })
+    this.events.dispatch({ type: `plugin:add:${this.__type}`, plugin })
   }
 
   all(): T[] {
@@ -306,7 +306,7 @@ export class PluginType<T extends Plugin = Plugin> {
     const plugin = this.__plugins[name]
 
     delete this.__plugins[name]
-    this.events.dispatch({ type: `plugin:remove:${this.__type}` })
+    this.events.dispatch({ type: `plugin:remove:${this.__type}`, plugin })
 
     return plugin
   }
