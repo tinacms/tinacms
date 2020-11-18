@@ -205,7 +205,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
 
   ${p.isOpen &&
     css`
-      z-index: calc(1 + var(--tina-z-index-2) - ${p.index ? p.index : 0});
+      z-index: calc(1 + var(--tina-z-index-3) - ${p.index ? p.index : 0});
     `}
 `
 })
