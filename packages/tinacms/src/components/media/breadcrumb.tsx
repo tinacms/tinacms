@@ -19,6 +19,7 @@ limitations under the License.
 import React from 'react'
 import styled, { css } from 'styled-components'
 import { LeftArrowIcon } from '@tinacms/icons'
+import path from 'path'
 
 interface BreadcrumbProps {
   directory?: string
@@ -28,9 +29,10 @@ interface BreadcrumbProps {
 export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
   directory = directory.replace(/^\/|\/$/g, '')
 
-  const dirArr = directory.split('/')
-  dirArr.pop()
-  const prevDir = dirArr.join('/')
+  let prevDir = path.dirname(directory)
+  if (prevDir === '.') {
+    prevDir = ''
+  }
 
   return (
     <BreadcrumbWrapper showArrow={directory !== ''}>
@@ -39,15 +41,19 @@ export function Breadcrumb({ directory = '', setDirectory }: BreadcrumbProps) {
       </span>
       <button onClick={() => setDirectory('')}>Media</button>
       {directory &&
-        directory.split('/').map((part, index, parts) => (
-          <button
-            onClick={() => {
-              setDirectory(parts.slice(0, index + 1).join('/'))
-            }}
-          >
-            {part}
-          </button>
-        ))}
+        directory.split('/').map((part, index, parts) => {
+          const currentDir = parts.slice(0, index + 1).join('/')
+          return (
+            <button
+              key={currentDir}
+              onClick={() => {
+                setDirectory(currentDir)
+              }}
+            >
+              {part}
+            </button>
+          )
+        })}
     </BreadcrumbWrapper>
   )
 }
