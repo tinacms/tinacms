@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
+
+
+### Bug Fixes
+
+* **@tinacms/fields:** input doesn't unset all styles ([8386e4f](https://github.com/tinacms/tinacms/commit/8386e4f5a0cb1701c0a807d62f40c7144d0b3561))
+
+
+
+
+
 # [0.33.0](https://github.com/tinacms/tinacms/compare/v0.32.1...v0.33.0) (2020-11-16)
 
 
