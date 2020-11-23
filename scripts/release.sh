@@ -1,15 +1,47 @@
 #!/bin/bash
 
+require_clean_work_tree () {
+    # Update the index
+    git update-index -q --ignore-submodules --refresh
+    err=0
+
+    # Disallow unstaged changes in the working tree
+    if ! git diff-files --quiet --ignore-submodules --
+    then
+        echo >&2 "cannot $1: you have unstaged changes."
+        git diff-files --name-status -r --ignore-submodules -- >&2
+        err=1
+    fi
+
+    # Disallow uncommitted changes in the index
+    if ! git diff-index --cached --quiet HEAD --ignore-submodules --
+    then
+        echo >&2 "cannot $1: your index contains uncommitted changes."
+        git diff-index --cached --name-status -r --ignore-submodules HEAD -- >&2
+        err=1
+    fi
+
+    if [ $err = 1 ]
+    then
+        echo >&2 "Please commit or stash them."
+        exit 1
+    fi
+}
+
+
 # Terminate after the first line that fails (returns nonzero exit code)
 set -e
 
-# 0. Confirm Action
+# 0.1. Confirm Action
 read -p "Are you sure you wish to create a new release? Type the word 'release' to confirm: "
 if [[ ! $REPLY =~ ^release$ ]]
 then
   echo "release canceled."
   exit 1
 fi
+
+#0.2. Ensure no uncommitted changes
+require_clean_work_tree
 
 # 1. Update Matser
 git checkout master
