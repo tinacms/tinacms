@@ -33,10 +33,10 @@ require_clean_work_tree () {
 set -e
 
 # 0.1. Confirm Action
-read -p "Are you sure you wish to create a new release? Type the word 'release' to confirm: "
+read -p "Create a new release? Type the word 'release' to confirm: "
 if [[ ! $REPLY =~ ^release$ ]]
 then
-  echo "release canceled."
+  echo "Release canceled."
   exit 1
 fi
 
