@@ -196,7 +196,7 @@ export function BlocksControls({
                       {direction === 'horizontal' && <ReorderRowIcon />}
                     </BlockAction>
                     {customActions.map((x, i) => (
-                      <BlockAction key={i} onClick={x.onClick}>
+                      <BlockAction key={i} onClick={() => x.onClick()}>
                         {x.icon}
                       </BlockAction>
                     ))}

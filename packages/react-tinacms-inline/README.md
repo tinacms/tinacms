@@ -294,7 +294,7 @@ interface FocusRingProps {
 
 export interface BlocksControlActionItem {
   icon: React.ReactNode
-  onClick: React.MouseEventHandler<HTMLElement>
+  onClick: () => void
 }
 ```
 
