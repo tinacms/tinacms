@@ -868,6 +868,15 @@
         "code",
         "ideas"
       ]
+    },
+    {
+      "login": "yannvanhalewyn",
+      "name": "Yann Vanhalewyn",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/11170603?v=4",
+      "profile": "https://github.com/yannvanhalewyn",
+      "contributions": [
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
