@@ -3,6 +3,14 @@
 # Terminate after the first line that fails (returns nonzero exit code)
 set -e
 
+# 0. Confirm Action
+read -p "Are you sure you wish to create a new release? Type the word 'release' to confirm: "
+if [[ ! $REPLY =~ ^release$ ]]
+then
+  echo "release canceled."
+  exit 1
+fi
+
 # 1. Update Matser
 git checkout master
 git pull
