@@ -21,7 +21,7 @@ npm run build
 
 # Start Next.js Demo
 cd packages/demo-next
-npm run dev
+npm run dev-next
 ```
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**
@@ -120,7 +120,6 @@ There are two reasons this error might occur:
 1. **`some-tinacms-package` was not built.**
 
    This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
-
 
 ## Release Process
 
