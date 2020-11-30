@@ -42,6 +42,7 @@ export interface BlocksControlsProps {
   children: React.ReactChild | React.ReactChild[]
   index: number
   insetControls?: boolean
+  label?: boolean
   focusRing?: boolean | FocusRingOptions
 }
 
@@ -49,6 +50,7 @@ export function BlocksControls({
   children,
   index,
   insetControls,
+  label = true,
   focusRing = {},
 }: BlocksControlsProps) {
   const cms = useCMS()
@@ -140,9 +142,15 @@ export function BlocksControls({
             disableHover={focusRing === false ? true : childIsActive}
             disableChildren={!isActive && !childIsActive}
           >
-            <BlockLabel offset={offset} inset={insetControls} active={isActive}>
-              {template.label}
-            </BlockLabel>
+            {label && (
+              <BlockLabel
+                offset={offset}
+                inset={insetControls}
+                active={isActive}
+              >
+                {template.label}
+              </BlockLabel>
+            )}
             {isActive ? (
               <>
                 {withinLimit(max) && (
