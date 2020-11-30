@@ -158,9 +158,6 @@ export default function Nesting() {
               }}
               insetControls={true}
             >
-              <h2>Author</h2>
-              <InlineText name="name" focusRing={false} />
-              <p>{values.author.description}</p>
               <InlineBlocks name="colors" blocks={COLORS} />
             </InlineGroup>
           </div>
@@ -367,7 +364,7 @@ const HEADING = {
       <>
         <BlocksControls index={index}>
           <h3 className="block-heading">
-            <InlineTextarea name="text" />
+            <InlineTextarea name="text" focusRing={false} />
           </h3>
         </BlocksControls>
         <style jsx>
@@ -397,7 +394,7 @@ const PARAGRAPH = {
       <>
         <BlocksControls index={index}>
           <p className="block-paragraph">
-            <InlineTextarea name="text" />
+            <InlineTextarea name="text" focusRing={false} />
           </p>
         </BlocksControls>
         <style jsx>
