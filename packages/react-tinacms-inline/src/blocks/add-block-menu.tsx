@@ -43,6 +43,10 @@ export function AddBlockMenu({
   const addBlockButtonRef = React.useRef<HTMLButtonElement>(null)
   const [openTop, setOpenTop] = React.useState(false)
 
+  const getDefaultProps = (defaultItem: any) => {
+    return typeof defaultItem === 'function' ? defaultItem() : defaultItem
+  }
+
   const handleOpenBlockMenu = (event: any) => {
     event.stopPropagation()
     event.preventDefault()
@@ -65,7 +69,7 @@ export function AddBlockMenu({
       const blockId = Object.keys(blocks)[0]
       addBlock({
         _template: blockId,
-        ...blocks[blockId].template.defaultItem,
+        ...getDefaultProps(blocks[blockId].template.defaultItem),
       })
     } else {
       setIsOpen(isOpen => !isOpen)
@@ -111,7 +115,7 @@ export function AddBlockMenu({
                   event.preventDefault()
                   addBlock({
                     _template: key,
-                    ...template?.defaultItem,
+                    ...getDefaultProps(template?.defaultItem),
                   })
                 }}
               >
