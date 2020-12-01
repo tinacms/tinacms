@@ -142,15 +142,6 @@ export function BlocksControls({
             disableHover={focusRing === false ? true : childIsActive}
             disableChildren={!isActive && !childIsActive}
           >
-            {label && (
-              <BlockLabel
-                offset={offset}
-                inset={insetControls}
-                active={isActive}
-              >
-                {template.label}
-              </BlockLabel>
-            )}
             {isActive ? (
               <>
                 {withinLimit(max) && (
@@ -178,6 +169,8 @@ export function BlocksControls({
                   active={isActive}
                   inset={insetControls}
                 >
+                  {label && <BlockLabel>{template.label}</BlockLabel>}
+                  <BlockMenuSpacer></BlockMenuSpacer>
                   <BlockMenu>
                     <BlockAction
                       ref={blockMoveUpRef}
@@ -249,8 +242,12 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
   const offset = getOffset(p.offset)
   return css`
     position: absolute;
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
     top: calc(-1 * ${getOffsetY(offset)}px - 16px);
     right: calc(-1 * ${getOffsetX(offset)}px - 1px);
+    left: calc(-1 * ${getOffsetX(offset)}px - 1px);
     opacity: 0;
     transition: all var(--tina-timing-medium) ease-out;
     z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
@@ -272,50 +269,25 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
   `
 })
 
-interface BlockLabelProps {
-  active: boolean
-  inset?: boolean
-  offset?: number | { x: number; y: number }
-}
+export const BlockMenuSpacer = styled.div`
+  flex: 1 1 auto;
+`
 
-export const BlockLabel = styled.div<BlockLabelProps>(p => {
-  const offset = getOffset(p.offset)
-  return css`
-    position: absolute;
-    display: flex;
-    align-items: center;
-    top: calc(-1 * ${getOffsetY(offset)}px - 16px);
-    left: calc(-1 * ${getOffsetX(offset)}px - 1px);
-    opacity: 0;
-    transition: all var(--tina-timing-medium) ease-out;
-    z-index: var(--tina-z-index-1);
-    pointer-events: none;
-    transform: translate3d(0, -100%, 0);
-    font-family: var(--tina-font-family);
-    font-size: var(--tina-font-size-1);
-    background-color: white;
-    border-radius: var(--tina-radius-small);
-    box-shadow: var(--tina-shadow-big);
-    border: 1px solid var(--tina-color-grey-2);
-    padding: 0 var(--tina-padding-small);
-    color: var(--tina-color-grey-8);
-    font-weight: 500;
-    height: 36px;
-
-    ${p.inset &&
-      css`
-        top: calc(14px - ${getOffsetY(offset)}px);
-        right: calc(14px - ${getOffsetX(offset)}px);
-        transform: translate3d(0, 0, 0);
-      `}
-
-    ${p.active &&
-      css`
-        opacity: 1;
-        pointer-events: all;
-      `}
-  `
-})
+export const BlockLabel = styled.div`
+  display: flex;
+  align-items: center;
+  z-index: var(--tina-z-index-1);
+  pointer-events: none;
+  font-family: var(--tina-font-family);
+  font-size: var(--tina-font-size-1);
+  background-color: white;
+  border-radius: var(--tina-radius-small);
+  box-shadow: var(--tina-shadow-big);
+  border: 1px solid var(--tina-color-grey-2);
+  padding: 0 var(--tina-padding-small);
+  color: var(--tina-color-grey-8);
+  font-weight: 500;
+`
 
 export const BlockMenu = styled.div`
   display: flex;
