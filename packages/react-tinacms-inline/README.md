@@ -283,6 +283,7 @@ interface BlocksControlsProps {
   index: number
   insetControls?: boolean
   focusRing?: false | FocusRingProps
+  label?: boolean
   children: React.ReactChild
 }
 
@@ -297,6 +298,7 @@ interface FocusRingProps {
 | `index`         | The index of the block associated with these controls.                                                                                                                                                                                                                                                                             |
 | `insetControls` | A boolean to denote whether the group controls display within or outside the group.                                                                                                                                                                                                                                                |
 | `focusRing`     | Either an object to style the focus ring or `false`, which hides the focus ring entirely. For styles, `offset` (in pixels) controls the distance from the ring to the edge of the group; `borderRadius`(in pixels) controls the [rounding](https://developer.mozilla.org/en-US/docs/Web/CSS/border-radius) edge of the focus ring. |
+| `label`     | A boolean to control whether or not a block label is rendered.              |
 | `children`      | Any child components, typically inline field(s).                                                                                                                                                                                                                                                                                   |
 
 
