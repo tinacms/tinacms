@@ -158,6 +158,9 @@ export default function Nesting() {
               }}
               insetControls={true}
             >
+              <h2>Author</h2>
+              <InlineText name="name" focusRing={false} />
+              <p>{values.author.description}</p>
               <InlineBlocks name="colors" blocks={COLORS} />
             </InlineGroup>
           </div>
