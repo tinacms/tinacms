@@ -40,7 +40,7 @@ import { FocusRingOptions, getOffset, getOffsetX, getOffsetY } from '../styles'
 
 export interface BlocksControlActionItem {
   icon: React.ReactNode
-  onClick: React.MouseEventHandler<HTMLElement>
+  onClick: () => void
 }
 
 export interface BlocksControlsProps {
