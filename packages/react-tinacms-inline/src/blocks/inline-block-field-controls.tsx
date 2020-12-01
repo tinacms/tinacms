@@ -270,11 +270,12 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
 })
 
 export const BlockMenuSpacer = styled.div`
-  flex: 1 1 auto;
+  flex: 1 0 var(--tina-padding-small);
 `
 
 export const BlockLabel = styled.div`
   display: flex;
+  flex: 0 0 auto;
   align-items: center;
   z-index: var(--tina-z-index-1);
   pointer-events: none;
@@ -291,6 +292,7 @@ export const BlockLabel = styled.div`
 
 export const BlockMenu = styled.div`
   display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   position: relative;
   top: 0;
