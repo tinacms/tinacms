@@ -24,6 +24,7 @@ import { InlineFieldContext } from '../inline-field-context'
 import {
   BlockMenu,
   BlockMenuWrapper,
+  BlockMenuSpacer,
 } from '../blocks/inline-block-field-controls'
 import { FocusRingOptions, StyledFocusRing } from '../styles'
 import { useInlineForm } from '..'
@@ -85,6 +86,7 @@ export function InlineGroupControls({
         inset={insetControls}
         active={active}
       >
+        <BlockMenuSpacer></BlockMenuSpacer>
         <BlockMenu>
           <InlineSettings fields={fields} />
         </BlockMenu>
