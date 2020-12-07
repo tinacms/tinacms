@@ -21,7 +21,7 @@ import { TinaCMS, useCMS } from 'tinacms'
 import GithubErrorModal, { GithubError } from '../github-error/GithubErrorModal'
 import { CreateForkModal, GithubAuthenticationModal } from './GithubAuthModal'
 import { GithubClient } from '../github-client'
-import { CHECKOUT_BRANCH, ERROR } from '../events'
+import { ERROR } from '../events'
 import { useCMSEvent } from 'tinacms'
 
 interface ProviderProps {
@@ -63,6 +63,7 @@ export const TinacmsGithubProvider = ({
     if (await github.isAuthorized()) {
       github.checkout(github.branchName, github.baseRepoFullName)
       setActiveModal(null)
+      onLogin()
     } else {
       setActiveModal('createFork')
     }
@@ -70,7 +71,6 @@ export const TinacmsGithubProvider = ({
 
   useCMSEvent(TinaCMS.ENABLED.type, beginAuth, [])
   useCMSEvent(TinaCMS.DISABLED.type, onLogout, [])
-  useCMSEvent(CHECKOUT_BRANCH, onLogin, [])
   useCMSEvent(ERROR, ({ error }: any) => setError(error), [])
 
   return (
