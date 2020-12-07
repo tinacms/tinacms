@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
+
+### Bug Fixes
+
+- **@tinacms/fields:** input doesn't unset all styles ([8386e4f](https://github.com/tinacms/tinacms/commit/8386e4f5a0cb1701c0a807d62f40c7144d0b3561))
+- **@tinacms/react-core:** useForm refreshes data on github branch change ([d16ef76](https://github.com/tinacms/tinacms/commit/d16ef762d75d2b7845049357431c125ed9ce55ff))
+- **react-tinacms-github:** only send branchchange event when branch actually changes ([6580c8a](https://github.com/tinacms/tinacms/commit/6580c8afa247e3d6a1beb9d7e4967b45c130fa1e))
+
+### Features
+
+- **@tinacms/react-core:** useForm returns its loading state ([f287275](https://github.com/tinacms/tinacms/commit/f28727510520d44eee82fa1c1a0f7fb466ec2cbd))
+- **tinacms:** media manager dropzone accepts multiple files ([179eec6](https://github.com/tinacms/tinacms/commit/179eec60ff25366d10e2657784dab32a1b900ea1))
+
 # [0.33.0](https://github.com/tinacms/tinacms/compare/v0.32.1...v0.33.0) (2020-11-16)
 
 ### Bug Fixes

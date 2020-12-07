@@ -148,15 +148,17 @@ export function MediaPicker({
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: 'image/*',
 
-    onDrop: async ([file]) => {
+    onDrop: async files => {
       try {
         setUploading(true)
-        await cms.media.persist([
-          {
-            directory: directory || '/',
-            file,
-          },
-        ])
+        await cms.media.persist(
+          files.map(file => {
+            return {
+              directory: directory || '/',
+              file,
+            }
+          })
+        )
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
       }
@@ -204,6 +206,7 @@ export function MediaPicker({
 
         {list.items.map((item: Media) => (
           <MediaItem
+            key={item.id}
             item={item}
             onClick={onClickMediaItem}
             onSelect={selectMediaItem}

@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/browser-storage",
-  "version": "0.33.0",
+  "version": "0.34.0",
   "description": "A TinaCMS adapter for backing up form data in browser storage",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -20,7 +20,7 @@
   },
   "devDependencies": {
     "@tinacms/forms": "^0.33.0",
-    "@tinacms/react-core": "^0.33.0",
+    "@tinacms/react-core": "^0.34.0",
     "@tinacms/scripts": "^0.29.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"

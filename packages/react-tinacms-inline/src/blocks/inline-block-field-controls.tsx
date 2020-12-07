@@ -47,6 +47,7 @@ export interface BlocksControlsProps {
   children: React.ReactChild | React.ReactChild[]
   index: number
   insetControls?: boolean
+  label?: boolean
   focusRing?: boolean | FocusRingOptions
   customActions?: BlocksControlActionItem[]
 }
@@ -55,6 +56,7 @@ export function BlocksControls({
   children,
   index,
   insetControls,
+  label = true,
   focusRing = {},
   customActions = [],
 }: BlocksControlsProps) {
@@ -174,6 +176,8 @@ export function BlocksControls({
                   active={isActive}
                   inset={insetControls}
                 >
+                  {label && <BlockLabel>{template.label}</BlockLabel>}
+                  <BlockMenuSpacer></BlockMenuSpacer>
                   <BlockMenu>
                     <BlockAction
                       ref={blockMoveUpRef}
@@ -228,7 +232,7 @@ interface AddBlockMenuWrapperProps {
 const AddBlockMenuWrapper = styled.div<AddBlockMenuWrapperProps>(
   p => css`
     opacity: 0;
-    transition: all 120ms ease-out;
+    transition: all var(--tina-timing-medium) ease-out;
     pointer-events: none;
 
     ${p.active &&
@@ -250,10 +254,14 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
   const offset = getOffset(p.offset)
   return css`
     position: absolute;
-    top: calc(-${getOffsetY(offset)}px - 16px);
-    right: calc(-${getOffsetX(offset)}px - 1px);
+    display: flex;
+    align-items: stretch;
+    justify-content: space-between;
+    top: calc(-1 * ${getOffsetY(offset)}px - 16px);
+    right: calc(-1 * ${getOffsetX(offset)}px - 1px);
+    left: calc(-1 * ${getOffsetX(offset)}px - 1px);
     opacity: 0;
-    transition: all 120ms ease-out;
+    transition: all var(--tina-timing-medium) ease-out;
     z-index: calc(var(--tina-z-index-1) - ${p.index ? p.index : 0});
     pointer-events: none;
     transform: translate3d(0, -100%, 0);
@@ -273,8 +281,30 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
   `
 })
 
+export const BlockMenuSpacer = styled.div`
+  flex: 1 0 var(--tina-padding-small);
+`
+
+export const BlockLabel = styled.div`
+  display: flex;
+  flex: 0 0 auto;
+  align-items: center;
+  z-index: var(--tina-z-index-1);
+  pointer-events: none;
+  font-family: var(--tina-font-family);
+  font-size: var(--tina-font-size-1);
+  background-color: white;
+  border-radius: var(--tina-radius-small);
+  box-shadow: var(--tina-shadow-big);
+  border: 1px solid var(--tina-color-grey-2);
+  padding: 0 var(--tina-padding-small);
+  color: var(--tina-color-grey-8);
+  font-weight: 500;
+`
+
 export const BlockMenu = styled.div`
   display: flex;
+  flex: 0 0 auto;
   flex-direction: row;
   position: relative;
   top: 0;

@@ -33,7 +33,7 @@ export function useGitForm<N extends GitNode>(
   node: N,
   options: GitFormOptions<N>,
   watch: WatchableFormValue
-): [N, Form] {
+): [N, Form, boolean] {
   const cms = useCMS()
   const { format, parse, ...config } = options
   const gitFile = useGitFile(node.fileRelativePath, format, parse)
