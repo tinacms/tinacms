@@ -65,9 +65,12 @@ export class GithubClient {
       level: 'success',
       message: `Saved Successfully: Changes committed to ${this.workingRepoFullName}`,
     }),
-    [CHECKOUT_BRANCH]: event => ({
+    [CHECKOUT]: event => ({
       level: 'info',
-      message: 'Switched to branch ' + event.branchName,
+      message:
+        'Switched to branch ' + event.branchName + event.repoName
+          ? ' on repo ' + event.repoName
+          : '',
     }),
     [ERROR]: event => ({
       level: 'error',
