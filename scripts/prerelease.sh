@@ -3,6 +3,10 @@
 # Terminate after the first line that fails (returns nonzero exit code)
 set -e
 
+# 0. Ensure no uncommitted changes
+source $(dirname $0)/require_clean_work_tree.sh
+require_clean_work_tree
+
 # 1. Checkout Matser
 git checkout master
 git pull

@@ -376,7 +376,7 @@ const HEADING = {
       <>
         <BlocksControls index={index}>
           <h3 className="block-heading">
-            <InlineTextarea name="text" />
+            <InlineTextarea name="text" focusRing={false} />
           </h3>
         </BlocksControls>
         <style jsx>
@@ -406,7 +406,7 @@ const PARAGRAPH = {
       <>
         <BlocksControls index={index}>
           <p className="block-paragraph">
-            <InlineTextarea name="text" />
+            <InlineTextarea name="text" focusRing={false} />
           </p>
         </BlocksControls>
         <style jsx>

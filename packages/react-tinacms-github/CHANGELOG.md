@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
+
+
+### Bug Fixes
+
+* **@tinacms/react-core:** useForm refreshes data on github branch change ([d16ef76](https://github.com/tinacms/tinacms/commit/d16ef762d75d2b7845049357431c125ed9ce55ff))
+* **react-tinacms-github:** only send branchchange event when branch actually changes ([6580c8a](https://github.com/tinacms/tinacms/commit/6580c8afa247e3d6a1beb9d7e4967b45c130fa1e))
+
+
+
+
+
 # [0.33.0](https://github.com/tinacms/tinacms/compare/v0.32.1...v0.33.0) (2020-11-16)
 
 **Note:** Version bump only for package react-tinacms-github

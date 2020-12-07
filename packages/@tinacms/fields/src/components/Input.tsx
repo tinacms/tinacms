@@ -26,7 +26,6 @@ export interface InputProps {
 }
 
 export const InputCss = css<InputProps>`
-  all: unset;
   box-sizing: border-box;
   padding: var(--tina-padding-small);
   border-radius: var(--tina-radius-small);
