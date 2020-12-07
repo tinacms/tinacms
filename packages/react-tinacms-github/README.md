@@ -385,6 +385,7 @@ The `GithubClient` defines several events:
 | `github:commit` | A commit has been made to a file. |
 | `github:error` | An error was encountered when interacting with the GitHub API. |
 | `github:branch:checkout` | The client switched to a new branch. |
+| `github:checkout` | The client switched to a new branch, or switched to a fork. |
 | `github:branch:create` | A new branch was created in GitHub. |
 
 ### Alerts
@@ -392,4 +393,4 @@ The `GithubClient` defines several events:
 | Event | Level |  Default Message |
 | --- | --- | --- |
 | `github:commit` | Success | `Saved Successfully: Changes committed to {repo}` |
-| `github:branch:checkout` | Info | `Switched to branch {name}`|
+| `github:checkout` | Info | `Switched to branch {name} [on repo {repo}]`|
