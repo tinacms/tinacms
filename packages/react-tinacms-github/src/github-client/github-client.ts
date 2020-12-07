@@ -20,7 +20,13 @@ import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
 import { EventsToAlerts } from '@tinacms/alerts'
 export * from './authenticate'
-import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH, ERROR } from '../events'
+import {
+  CHECKOUT,
+  CHECKOUT_BRANCH,
+  COMMIT,
+  CREATE_BRANCH,
+  ERROR,
+} from '../events'
 import { b64EncodeUnicode } from './base64'
 import { EventBus } from '@tinacms/core'
 
@@ -180,6 +186,7 @@ export class GithubClient {
   checkout(branch: string, repo?: string) {
     if (repo) this.setWorkingRepoFullName(repo)
     this.setWorkingBranch(branch)
+    this.events.dispatch({ type: CHECKOUT, branchName: branch, repoName: repo })
   }
 
   /**
