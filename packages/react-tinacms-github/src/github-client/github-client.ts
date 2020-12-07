@@ -152,7 +152,7 @@ export class GithubClient {
       method: 'POST',
     })
 
-    this.setCookie(GithubClient.WORKING_REPO_COOKIE_KEY, fork.full_name)
+    this.checkout(fork.full_name)
 
     return fork
   }
