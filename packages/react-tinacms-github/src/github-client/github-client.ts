@@ -187,8 +187,18 @@ export class GithubClient {
   }
 
   checkout(branch: string, repo?: string) {
-    if (repo) this.setWorkingRepoFullName(repo)
+    if (
+      this.branchName === branch &&
+      (!repo || this.baseRepoFullName === repo)
+    ) {
+      return
+    }
+
+    if (repo) {
+      this.setWorkingRepoFullName(repo)
+    }
     this.setWorkingBranch(branch)
+
     this.events.dispatch({ type: CHECKOUT, branchName: branch, repoName: repo })
   }
 
@@ -213,8 +223,6 @@ export class GithubClient {
    * @deprecated Call GithubClient#checkout instead
    */
   setWorkingBranch(branch: string) {
-    if (this.branchName === branch) return
-
     this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
     this.events.dispatch({
       type: CHECKOUT_BRANCH,
