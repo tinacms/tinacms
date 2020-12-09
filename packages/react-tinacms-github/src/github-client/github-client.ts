@@ -189,7 +189,7 @@ export class GithubClient {
   checkout(branch: string, repo?: string) {
     if (
       this.branchName === branch &&
-      (!repo || this.baseRepoFullName === repo)
+      (!repo || this.workingRepoFullName === repo)
     ) {
       return
     }
