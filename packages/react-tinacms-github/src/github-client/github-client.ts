@@ -200,6 +200,9 @@ export class GithubClient {
     this.setWorkingBranch(branch)
 
     this.events.dispatch({ type: CHECKOUT, branchName: branch, repoName: repo })
+    this.events.dispatch({
+      type: 'unstable:reload-form-data',
+    })
   }
 
   /**
@@ -227,9 +230,6 @@ export class GithubClient {
     this.events.dispatch({
       type: CHECKOUT_BRANCH,
       branchName: branch,
-    })
-    this.events.dispatch({
-      type: 'unstable:reload-form-data',
     })
   }
 
