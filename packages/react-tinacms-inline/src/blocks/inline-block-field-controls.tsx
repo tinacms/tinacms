@@ -269,6 +269,7 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
     ${p.inset &&
       css`
         top: calc(14px - ${getOffsetY(offset)}px);
+        left: calc(14px - ${getOffsetX(offset)}px);
         right: calc(14px - ${getOffsetX(offset)}px);
         transform: translate3d(0, 0, 0);
       `}
