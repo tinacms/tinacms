@@ -886,6 +886,16 @@
       "contributions": [
         "bug"
       ]
+    },
+    {
+      "login": "sneyed",
+      "name": "Lachlan McKay",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/14341953?v=4",
+      "profile": "http://lachlanmckay.com",
+      "contributions": [
+        "code",
+        "bug"
+      ]
     }
   ],
   "contributorsPerLine": 7,
