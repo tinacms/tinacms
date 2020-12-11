@@ -277,12 +277,13 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
     ${p.active &&
       css`
         opacity: 1;
-        pointer-events: all;
       `}
   `
 })
 
 export const BlockMenuSpacer = styled.div`
+  pointer-events: none;
+  visibility: hidden;
   flex: 1 0 var(--tina-padding-small);
 `
 
@@ -314,6 +315,7 @@ export const BlockMenu = styled.div`
   box-shadow: var(--tina-shadow-big);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
+  pointer-events: all;
 `
 
 interface BlockActionProps {
