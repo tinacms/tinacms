@@ -1,6 +1,6 @@
 {
   "name": "demo-cra",
-  "version": "0.35.0-alpha.2",
+  "version": "0.35.0-alpha.3",
   "private": true,
   "dependencies": {
     "tinacms": "^0.34.0"

@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/teams",
-  "version": "0.35.0-alpha.2",
+  "version": "0.35.0-alpha.3",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "license": "Apache-2.0",
