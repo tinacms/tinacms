@@ -173,7 +173,7 @@ export const getStaticProps: GetStaticProps = async function({
 
 ## _NextGithubMediaStore_
 
-`next-tinacms-github` includes a media store for managing media files with GitHub. Based on [GithubMediaStore](https://tinacms.org/packages/react-tinacms-github/#githubmediastore), it includes logic for serving uploads from the `public/` directory.
+`next-tinacms-github` includes a media store for managing media files with GitHub. Based on [GithubMediaStore](https://tinacms.org/packages/react-tinacms-github/#githubmediastore), it includes **logic for serving uploads from the `public/` directory**.
 
 This media store is initialized similar to `GithubMediaStore`:
 
@@ -199,3 +199,32 @@ const cms = new TinaCMS({
 })
 
 ```
+
+### _previewSrc_
+
+_NextGithubMediaStore_ handles `previewSrc` so you **shouldn't need to set this** on individual image fields. However, if you do need to override `previewSrc` for a specific field, you need to get the full url to the source GitHub repository. The return value should connect to an actual path in a GitHub repo where the image is hosted. 
+
+```js
+// Exmaple image field config
+const formOptions = {
+  fields: [
+    {
+      label: 'Hero Image',
+      name: 'frontmatter.hero_image',
+      component: 'image',
+      parse: media => `/${media.filename}`,
+      uploadDir: () => '/public/',
+      previewSrc: fieldValue => {
+        const githubClient = useGithubClient()
+
+        return githubClient.getDownloadUrl(path.join('public', fieldValue))
+      },
+    },
+  ],
+  //...
+}
+```
+
+> The reason why the full GitHub url needs to be provided is that new images are uploaded to the repository on a particular branch. If you are working locally, this can be a bit confusing because the path saved to the source file will be different than this `previewSrc` url. Remember when developing locally with this package that `previewSrc` urls are connecting to GitHub repository and not your local file paths. 
+
+You still need to set uploadDir to 'public' if you want the media manager to open directly from that folder, otherwise it will open from and upload to the repository root. 
