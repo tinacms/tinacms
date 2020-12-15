@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.35.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.34.0...v0.35.0) (2020-12-15)
+
+
+### Features
+
+* Use custom actions in BlocksControls ([d01e14a](https://github.com/kendallstrautman/nextjs-blog-starter/commit/d01e14a56db03ad2484527fdbb14ec58a5de52f3))
+
+
+
+
+
 # [0.34.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.33.0...v0.34.0) (2020-11-23)
 
 **Note:** Version bump only for package nextjs-blog-starter

@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.35.0](https://github.com/tinacms/tinacms/compare/v0.34.0...v0.35.0) (2020-12-15)
+
+
+### Bug Fixes
+
+* **react-tinacms-inline:** [#1640](https://github.com/tinacms/tinacms/issues/1640) support defaultItem as a function in add-block-menu.tsx ([85acb9d](https://github.com/tinacms/tinacms/commit/85acb9d493a0ea4f7d7df839f69ab0fbb2deecad))
+
+
+### Features
+
+* add inline block label ([af24e52](https://github.com/tinacms/tinacms/commit/af24e52754082354fe9297d7b5204f6dcc5f2647))
+* Use custom actions in BlocksControls ([d01e14a](https://github.com/tinacms/tinacms/commit/d01e14a56db03ad2484527fdbb14ec58a5de52f3))
+
+
+
+
+
 # [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
 
 **Note:** Version bump only for package react-tinacms-inline
