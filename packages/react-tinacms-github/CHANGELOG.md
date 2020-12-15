@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.35.0](https://github.com/tinacms/tinacms/compare/v0.34.0...v0.35.0) (2020-12-15)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** restore original functionality for github:branch:checkout ([8060075](https://github.com/tinacms/tinacms/commit/806007583c7d5ed2aa3ac3fc65f15776c6cefadc))
+
+
+
+
+
 # [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
 
 
