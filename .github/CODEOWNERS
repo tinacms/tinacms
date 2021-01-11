@@ -2,6 +2,9 @@
 # Default Owner
 * @tinacms/maintainers
 
+# Reviewers outside of OSS team
+* @tinacms/oss-reviewers
+
 # Tina Teams
 packages/@tinacms/teams/* @jamespohalloran
 packages/gatsby-tinacms-teams/* @jamespohalloran
