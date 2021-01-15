@@ -127,7 +127,7 @@ return {
 
 #### _getGithubFile
 
-In some cases you'll need to load multiple files from Github. For this reason the underlying `getGithubFile` function is exposed.
+In some cases you'll need to load multiple files from Github. For this reason the underlying `getGithubFile` function is exposed, which uses the same interface as `getGithubPreviewProps`.
 
 ```ts
 import {
@@ -142,9 +142,9 @@ export const getStaticProps: GetStaticProps = async function({
   ...ctx
 }) {
   const githubOptions = {
-    repoFullName: previewData?.working_repo_full_name || 'https://github.com/youre/respository',
-    branch: previewData?.head_branch || 'master',
-    accessToken: previewData?.github_access_token || '',
+    working_repo_full_name: previewData?.working_repo_full_name || 'https://github.com/youre/respository',
+    head_branch: previewData?.head_branch || 'master',
+    github_access_token: previewData?.github_access_token || '',
   }
 
   const homeFile = await getGithubFile({
