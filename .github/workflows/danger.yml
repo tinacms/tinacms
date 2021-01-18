@@ -4,6 +4,7 @@ on: [pull_request]
 jobs:
   build:
     runs-on: ubuntu-latest
+    environment: test
 
     steps:
       - uses: actions/checkout@v1
@@ -13,3 +14,4 @@ jobs:
         uses: danger/danger-js@9.1.6
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DANGER_GITHUB_API_TOKEN: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
