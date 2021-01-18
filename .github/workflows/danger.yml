@@ -11,7 +11,7 @@ jobs:
       - name: Install
         run: npm ci
       - name: Danger
-        uses: danger/danger-js@9.1.6
+        uses: danger/danger-js@10.5.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           DANGER_GITHUB_API_TOKEN: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
