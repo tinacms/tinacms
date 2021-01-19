@@ -49,7 +49,7 @@
     "typescript-plugin-styled-components": "^1.4.4"
   },
   "dependencies": {
-    "danger": "^9.2.0",
+    "danger": "^10.5.4",
     "depcheck": "^0.9.1",
     "tinacms": "^0.18.2"
   },

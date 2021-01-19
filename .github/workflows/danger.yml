@@ -2,14 +2,16 @@ name: 'Danger JS'
 on: [pull_request]
 
 jobs:
-  build:
+  danger:
     runs-on: ubuntu-latest
+    environment: test
 
     steps:
       - uses: actions/checkout@v1
       - name: Install
         run: npm ci
       - name: Danger
-        uses: danger/danger-js@9.1.6
+        uses: danger/danger-js@10.5.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
+          DANGER_GITHUB_API_TOKEN: ${{ secrets.DANGER_GITHUB_API_TOKEN }}
