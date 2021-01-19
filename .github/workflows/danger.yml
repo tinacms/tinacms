@@ -2,7 +2,7 @@ name: 'Danger JS'
 on: [pull_request]
 
 jobs:
-  build:
+  danger:
     runs-on: ubuntu-latest
     environment: test
 
