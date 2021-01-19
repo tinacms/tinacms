@@ -20,18 +20,18 @@ import { FormOptions, Field } from 'tinacms'
 import { GitFile } from './useGitFileSha'
 import { toMarkdownString } from 'next-tinacms-markdown'
 import { useGithubFileForm } from './useGithubFileForm'
-interface Options {
+interface Options<T = any> {
   id?: string
   label?: string
   fields?: Field[]
-  actions?: FormOptions<any>['actions']
+  actions?: FormOptions<T>['actions']
 }
 
-export function useGithubMarkdownForm(
-  markdownFile: GitFile,
-  formOptions?: Options
+export function useGithubMarkdownForm<T = any>(
+  markdownFile: GitFile<T>,
+  formOptions?: Options<T>
 ) {
-  return useGithubFileForm(markdownFile, {
+  return useGithubFileForm<T>(markdownFile, {
     ...formOptions,
     serialize: toMarkdownString,
   })

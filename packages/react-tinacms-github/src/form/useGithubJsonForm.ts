@@ -20,19 +20,19 @@ import { FormOptions, Field } from 'tinacms'
 import { GitFile } from './useGitFileSha'
 import { useGithubFileForm } from './useGithubFileForm'
 
-interface Options {
+interface Options<T = any> {
   id?: string
   label?: string
   fields?: Field[]
-  actions?: FormOptions<any>['actions']
+  actions?: FormOptions<T>['actions']
 }
 
 const serialize = (formData: any) => {
   return JSON.stringify(formData, null, 2)
 }
 
-export function useGithubJsonForm(jsonFile: GitFile, formOptions?: Options) {
-  return useGithubFileForm(jsonFile, {
+export function useGithubJsonForm<T = any>(jsonFile: GitFile<T>, formOptions?: Options<T>) {
+  return useGithubFileForm<T>(jsonFile, {
     ...formOptions,
     serialize,
   })
