@@ -23,6 +23,7 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  DuplicateIcon,
   TrashIcon,
   ReorderIcon,
   ReorderRowIcon,
@@ -65,6 +66,7 @@ export function BlocksControls({
   const { name, template } = React.useContext(InlineFieldContext)
   const {
     insert,
+    duplicate,
     move,
     remove,
     blocks,
@@ -90,6 +92,12 @@ export function BlocksControls({
     event.stopPropagation()
     event.preventDefault()
     remove(index)
+  }
+
+  const duplicateBlock = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
+    duplicate(index, index + 1)
   }
 
   const moveBlockUp = (event: any) => {
@@ -204,6 +212,11 @@ export function BlocksControls({
                         {x.icon}
                       </BlockAction>
                     ))}
+                    {withinLimit(max) && (
+                      <BlockAction onClick={duplicateBlock}>
+                        <DuplicateIcon />
+                      </BlockAction>
+                    )}
                     <InlineSettings fields={template.fields} />
                     {withinLimit(min) && (
                       <BlockAction onClick={removeBlock}>
