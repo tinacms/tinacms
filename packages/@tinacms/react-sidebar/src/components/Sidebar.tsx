@@ -138,8 +138,9 @@ const SidebarGlobalStyles = createGlobalStyle`
 
 const SiteWrapper = styled.div<{ open: boolean }>`
   @media (min-width: 840px) {
-    padding-left: ${props => (props.open ? 'var(--tina-sidebar-width)' : '0')};
-    transition: padding-left 150ms ease-out;
+    margin-left: ${props => (props.open ? 'var(--tina-sidebar-width)' : '0')};
+    transition: margin-left 150ms ease-out;
+    transform: translate(0);
   }
 `
 
