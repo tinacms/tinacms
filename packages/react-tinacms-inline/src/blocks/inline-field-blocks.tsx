@@ -60,6 +60,7 @@ const DefaultContainer = (props: BlocksContainerProps) => {
 export interface InlineBlocksActions {
   count: number
   insert(index: number, data: any): void
+  duplicate(sourceIndex: number, targetIndex: number): void
   move(from: number, to: number): void
   remove(index: number): void
   blocks: {
@@ -128,6 +129,11 @@ export function InlineBlocks({
           setFocussedField(`${name}.${index}`)
         }
 
+        const duplicate = (sourceIndex: number, targetIndex: number) => {
+          form.mutators.insert(name, targetIndex, allData[sourceIndex])
+          setFocussedField(`${name}.${targetIndex}`)
+        }
+
         const Container = components.Container || DefaultContainer
 
         return (
@@ -138,6 +144,7 @@ export function InlineBlocks({
                   <InlineBlocksContext.Provider
                     value={{
                       insert,
+                      duplicate,
                       move,
                       remove,
                       blocks,
