@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.35.1](https://github.com/tinacms/tinacms/compare/v0.35.0...v0.35.1) (2021-01-19)
+
+### Bug Fixes
+
+- **react-tinacms-github:** Fix types for form hooks ([b937ed1](https://github.com/tinacms/tinacms/commit/b937ed1a4c201cfab6621bcf4f6f706e7efb33ad))
+
 # [0.35.0](https://github.com/tinacms/tinacms/compare/v0.34.0...v0.35.0) (2020-12-15)
 
 ### Bug Fixes
