@@ -191,6 +191,14 @@ Alternatively you can pass a string to set the exact offset of the menu.
 </InlineWysiwyg>
 ```
 
+If you're using Tina's toolbar, you can pass 'var(--tina-toolbar-height)' to ensure the toolbar does not cover the WYSIWYG menu.
+
+```jsx
+<InlineWysiwyg name="markdownBody" format="markdown" sticky="var(--tina-toolbar-height)">
+  <ReactMarkdown source={data.markdownBody} />
+</InlineWysiwyg>
+```
+
 ### Dynamic Imports
 
 The `react-tinacms-editor` is a large package so it is recommended that you make sure it's only being loaded when necessary. The example below will make sure that the editor is only loaded _if_ the CMS is actually enabled, saving the visistors to your website from the extra load time.
