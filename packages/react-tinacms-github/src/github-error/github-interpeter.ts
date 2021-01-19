@@ -90,7 +90,7 @@ export const getModalProps = async (
       }
 
       // Does the branch exist?
-      if (await githubClient.getBranch()) {
+      if (!(await githubClient.getBranch())) {
         return {
           title: 'Missing Branch ',
           message: 'The branch that you were editing has been deleted. Press.',
