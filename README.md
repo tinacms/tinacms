@@ -1,5 +1,5 @@
 [![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg) [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-90-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-91-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tinacms.org/)
@@ -166,6 +166,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://github.com/c58"><img src="https://avatars2.githubusercontent.com/u/1871220?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Artem Artemyev</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/issues?q=author%3Ac58" title="Bug reports">🐛</a></td>
     <td align="center"><a href="http://lachlanmckay.com"><img src="https://avatars0.githubusercontent.com/u/14341953?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Lachlan McKay</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=sneyed" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Asneyed" title="Bug reports">🐛</a></td>
     <td align="center"><a href="https://github.com/zenflow"><img src="https://avatars1.githubusercontent.com/u/3198597?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Matthew Francis Brunetti</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=zenflow" title="Code">💻</a></td>
+    <td align="center"><a href="https://joeinn.es"><img src="https://avatars2.githubusercontent.com/u/4704069?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Joe Innes</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=joeinnes" title="Documentation">📖</a></td>
   </tr>
 </table>
 
