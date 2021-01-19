@@ -905,6 +905,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "joeinnes",
+      "name": "Joe Innes",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/4704069?v=4",
+      "profile": "https://joeinn.es",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
