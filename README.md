@@ -40,7 +40,6 @@ Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/
 ### Maintainers
 
 - Scott Byrne ([@scottpbyrne](https://twitter.com/scottpbyrne)) – Forestry.io
-- Kendall Strautman ([@KendallStraut](https://twitter.com/KendallStraut)) – Forestry.io
 - DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
 
 ### All Contributors ✨
