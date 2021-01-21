@@ -20,7 +20,6 @@ import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 
 export interface InlineFormProps {
   form: Form
@@ -53,19 +52,6 @@ export function InlineForm({ form, children }: InlineFormProps) {
     }
   }, [form, focussedField, setFocussedField])
 
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      if (!result.destination || !form) return
-      const name = result.type
-      const from = result.source.index
-      const to = result.destination.index
-
-      setFocussedField(`${name}.${to}`)
-      form.mutators.move(name, from, to)
-    },
-    [form]
-  )
-
   return (
     <InlineFormContext.Provider value={inlineFormState}>
       <Dismissible
@@ -84,22 +70,18 @@ export function InlineForm({ form, children }: InlineFormProps) {
           setFocussedField('')
         }}
       >
-        <DragDropContext onDragEnd={moveArrayItem}>
-          <div onClick={() => setFocussedField('')}>
-            <FormBuilder form={form}>
-              {({ form, ...formProps }) => {
-                if (typeof children !== 'function') {
-                  return children
-                }
+        <FormBuilder form={form}>
+          {({ form, ...formProps }) => {
+            if (typeof children !== 'function') {
+              return children
+            }
 
-                return children({
-                  ...formProps,
-                  ...inlineFormState,
-                })
-              }}
-            </FormBuilder>
-          </div>
-        </DragDropContext>
+            return children({
+              ...formProps,
+              ...inlineFormState,
+            })
+          }}
+        </FormBuilder>
       </Dismissible>
     </InlineFormContext.Provider>
   )
