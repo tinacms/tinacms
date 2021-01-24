@@ -174,6 +174,19 @@ const formOptions = {
         component: 'text',
       },
     },
+    {
+      label: 'Page Width',
+      name: 'frontmatter.pagewidth',
+      component: 'radio-group',
+      variant: 'button',
+      options: [
+        { value: 'xs', label: 'XS' },
+        { value: 'sm', label: 'SM' },
+        { value: 'md', label: 'MD' },
+        { value: 'lg', label: 'LG' },
+        { value: 'xl', label: 'XL' },
+      ],
+    },
   ],
 }
 

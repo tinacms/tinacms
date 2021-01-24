@@ -16,12 +16,12 @@ limitations under the License.
 
 */
 
-export * from './TextField'
-export * from './TextArea'
-export * from './ColorPicker'
-export * from './Toggle'
-export * from './Select'
-export * from './RadioGroup'
-export * from './NumberInput'
-export * from './ImageUpload'
-export * from './Input'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { RadioGroup } from '../components'
+
+export const RadioGroupField = wrapFieldsWithMeta(RadioGroup)
+
+export const RadioGroupFieldPlugin = {
+  name: 'radio-group',
+  Component: RadioGroupField,
+}
