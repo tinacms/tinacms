@@ -277,9 +277,10 @@ async function checkFileForLicenseHeader(filepath: string) {
   try {
     let content
     if (!danger.github) {
-      content = fs.readFileSync(path.resolve(`./${filepath}`), {
-        encoding: 'utf8',
-      })
+      content = LICENSE_HEADER.join('\n')
+      // content = fs.readFileSync(path.resolve(`./${filepath}`), {
+      //   encoding: 'utf8',
+      // })
     } else {
       const octokit = danger.github.api
       const { owner, repo } = danger.github.thisPR
