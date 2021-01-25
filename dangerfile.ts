@@ -20,6 +20,7 @@ import { markdown, danger, warn, fail, message } from 'danger'
 import depcheck from 'depcheck'
 import * as fs from 'fs'
 import * as path from 'path'
+import { Buffer } from 'buffer'
 
 const LICENSE_HEADER: string[] = [
   `Copyright 2019 Forestry.io Inc`,
@@ -33,6 +34,31 @@ const LICENSE_HEADER: string[] = [
   `See the License for the specific language governing permissions and`,
   `limitations under the License.`,
 ]
+
+async function getLocalFileContents(filepath: string) {
+  return fs.readFileSync(path.resolve(`./${filepath}`), {
+    encoding: 'utf8',
+  })
+}
+
+async function getRemoteFileContents(filepath: string) {
+  const octokit = danger.github.api
+  const { data }: any = await octokit.repos.getContents({
+    owner: 'tinacms',
+    repo: 'tinacms',
+    path: filepath,
+    ref: `refs/pull/${danger.github.thisPR.number}/merge`,
+  })
+  return Buffer.from(data.content, 'base64').toString()
+}
+
+async function getFileContents(filepath: string) {
+  if (!danger.github) {
+    return getLocalFileContents(filepath)
+  } else {
+    return getRemoteFileContents(filepath)
+  }
+}
 
 const failAboutIllegalDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
   fail(`
@@ -275,21 +301,7 @@ function fileNeedsLicense(filepath: string) {
  */
 async function checkFileForLicenseHeader(filepath: string) {
   try {
-    let content
-    if (!danger.github) {
-      content = fs.readFileSync(path.resolve(`./${filepath}`), {
-        encoding: 'utf8',
-      })
-    } else {
-      const octokit = danger.github.api
-      const { data }: any = await octokit.repos.getContents({
-        owner: 'tinacms',
-        repo: 'tinacms',
-        path: filepath,
-        ref: `refs/pull/${danger.github.thisPR.number}/merge`,
-      })
-      content = atob(data.content)
-    }
+    const content = await getFileContents(filepath)
 
     if (isMissingHeader(content)) {
       fail(`${filepath} is missing the license header`)
