@@ -273,11 +273,24 @@ function fileNeedsLicense(filepath: string) {
 /**
  *
  */
-function checkFileForLicenseHeader(filepath: string) {
+async function checkFileForLicenseHeader(filepath: string) {
   try {
-    const content = fs.readFileSync(path.resolve(`./${filepath}`), {
-      encoding: 'utf8',
-    })
+    let content
+    if (!danger.github) {
+      content = fs.readFileSync(path.resolve(`./${filepath}`), {
+        encoding: 'utf8',
+      })
+    } else {
+      const octokit = danger.github.api
+      const { owner, repo } = danger.github.thisPR
+      const { data }: any = await octokit.repos.getContents({
+        owner,
+        repo,
+        path: filepath,
+        ref: 'tbd',
+      })
+      content = atob(data.content)
+    }
 
     if (isMissingHeader(content)) {
       fail(`${filepath} is missing the license header`)
