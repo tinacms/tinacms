@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** Fix reversed error messages for 404 errors ([7e3ba86](https://github.com/tinacms/tinacms/commit/7e3ba861a176f7289791391f3c1a70f38ca54240))
+
+
+### Features
+
+* **react-tinacms-github:** GithubFile: Support committing newly created files ([d13eb76](https://github.com/tinacms/tinacms/commit/d13eb761d805e212cd498f69bc72270efd3115f0))
+
+
+
+
+
 ## [0.35.1](https://github.com/tinacms/tinacms/compare/v0.35.0...v0.35.1) (2021-01-19)
 
 
