@@ -282,12 +282,11 @@ async function checkFileForLicenseHeader(filepath: string) {
       })
     } else {
       const octokit = danger.github.api
-      const { owner, repo } = danger.github.thisPR
       const { data }: any = await octokit.repos.getContents({
-        owner,
-        repo,
+        owner: 'tinacms',
+        repo: 'tinacms',
         path: filepath,
-        ref: 'tbd',
+        ref: `refs/pull/${danger.github.thisPR.number}/head`,
       })
       content = atob(data.content)
     }
