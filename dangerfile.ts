@@ -379,7 +379,7 @@ async function getModifiedPackages(allFiles: string[]) {
   for (let path of pathArray) {
     try {
       // get file contents + JSON decode
-      await getFileContents(`./${path}/package.json`)
+      await getFileContents(`${path}/package.json`)
         .then(JSON.parse)
         .then(packageJson => {
           packageList.push({
@@ -388,7 +388,7 @@ async function getModifiedPackages(allFiles: string[]) {
           })
         })
     } catch (e) {
-      warn(`Could not find package: ${path}`)
+      warn(`Could not find package: ${path}: ${e.message}`)
     }
   }
 
