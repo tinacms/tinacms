@@ -100,7 +100,7 @@ interface TinaPackage {
 /**
  * Executes all checks for the Pull Request.
  */
-function runChecksOnPullRequest() {
+async function runChecksOnPullRequest() {
   const allFiles = [
     ...danger.git.created_files,
     ...danger.git.deleted_files,
@@ -108,10 +108,10 @@ function runChecksOnPullRequest() {
   ]
 
   // Files
-  allFiles.filter(fileNeedsLicense).forEach(checkFileForLicenseHeader)
+  await allFiles.filter(fileNeedsLicense).forEach(checkFileForLicenseHeader)
 
   // Packages
-  const modifiedPackages = getModifiedPackages(allFiles)
+  const modifiedPackages = await getModifiedPackages(allFiles)
 
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
@@ -343,7 +343,7 @@ The following packages were modified by this pull request:
 /**
  * Lists all packages modified by this PR.
  */
-function getModifiedPackages(allFiles: string[]) {
+async function getModifiedPackages(allFiles: string[]) {
   const packageList: TinaPackage[] = []
   const paths = new Set(
     allFiles
@@ -375,18 +375,23 @@ function getModifiedPackages(allFiles: string[]) {
       })
   )
 
-  paths.forEach(path => {
+  const pathArray = Array.from(paths) // typescript doesn't like iterables
+  for (let path of pathArray) {
     try {
-      const packageJson = require(`./${path}/package.json`)
-
-      packageList.push({
-        path,
-        packageJson,
-      })
+      // get file contents + JSON decode
+      await getFileContents(`./${path}/package.json`)
+        .then(JSON.parse)
+        .then(packageJson => {
+          packageList.push({
+            path,
+            packageJson,
+          })
+        })
     } catch (e) {
       warn(`Could not find package: ${path}`)
     }
-  })
+  }
+
   return packageList
 }
 
