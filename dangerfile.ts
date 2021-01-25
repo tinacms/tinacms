@@ -286,7 +286,7 @@ async function checkFileForLicenseHeader(filepath: string) {
         owner: 'tinacms',
         repo: 'tinacms',
         path: filepath,
-        ref: `refs/pull/${danger.github.thisPR.number}/head`,
+        ref: `refs/pull/${danger.github.thisPR.number}/merge`,
       })
       content = atob(data.content)
     }
@@ -294,7 +294,8 @@ async function checkFileForLicenseHeader(filepath: string) {
     if (isMissingHeader(content)) {
       fail(`${filepath} is missing the license header`)
     }
-  } catch {
+  } catch (e) {
+    fail(e.message)
     // The file was deleted. That's okay.
   }
 }
