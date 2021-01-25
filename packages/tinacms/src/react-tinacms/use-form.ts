@@ -51,7 +51,7 @@ export function useFormScreenPlugin(form: Form, icon?: any, layout?: "fullscreen
     if (!form) return
 
     return new GlobalFormPlugin(form, icon, layout)
-  }, [form])
+  }, [form, icon, layout])
 
   usePlugins(GlobalForm)
 }
