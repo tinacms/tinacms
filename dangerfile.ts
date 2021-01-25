@@ -54,7 +54,8 @@ async function getRemoteFileContents(filepath: string) {
 
 async function getFileContents(filepath: string) {
   if (!danger.github) {
-    return getLocalFileContents(filepath)
+    return LICENSE_HEADER.join('\n')
+    //return getLocalFileContents(filepath)
   } else {
     return getRemoteFileContents(filepath)
   }
