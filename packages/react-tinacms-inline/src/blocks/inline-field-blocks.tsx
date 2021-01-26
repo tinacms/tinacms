@@ -24,7 +24,6 @@ import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
 import { useCMS } from 'tinacms'
-import { Droppable } from 'react-beautiful-dnd'
 
 export interface InlineBlocksProps {
   name: string
@@ -47,14 +46,12 @@ export interface InlineBlocksProps {
 }
 
 export interface BlocksContainerProps {
-  innerRef: React.Ref<any>
   className?: string
   children?: React.ReactNode
 }
 
 const DefaultContainer = (props: BlocksContainerProps) => {
-  const { innerRef, ...otherProps } = props
-  return <div ref={innerRef} {...otherProps} />
+  return <div {...props} />
 }
 
 export interface InlineBlocksActions {
@@ -137,62 +134,52 @@ export function InlineBlocks({
         const Container = components.Container || DefaultContainer
 
         return (
-          <Droppable droppableId={name} type={name} direction={direction}>
-            {provider => (
-              <Container innerRef={provider.innerRef} className={className}>
-                {
-                  <InlineBlocksContext.Provider
-                    value={{
-                      insert,
-                      duplicate,
-                      move,
-                      remove,
-                      blocks,
-                      count: allData.length,
-                      direction,
-                      min,
-                      max,
-                    }}
-                  >
-                    {allData.length < 1 && cms.enabled && (
-                      <BlocksEmptyState>
-                        <AddBlockMenu
-                          addBlock={block => insert(0, block)}
-                          blocks={blocks}
-                        />
-                      </BlocksEmptyState>
-                    )}
+          <Container className={className}>
+            <InlineBlocksContext.Provider
+              value={{
+                insert,
+                duplicate,
+                move,
+                remove,
+                blocks,
+                count: allData.length,
+                direction,
+                min,
+                max,
+              }}
+            >
+              {allData.length < 1 && cms.enabled && (
+                <BlocksEmptyState>
+                  <AddBlockMenu
+                    addBlock={block => insert(0, block)}
+                    blocks={blocks}
+                  />
+                </BlocksEmptyState>
+              )}
 
-                    {allData.map((data, index) => {
-                      const Block = blocks[data._template]
+              {allData.map((data, index) => {
+                const Block = blocks[data._template]
 
-                      if (!Block) {
-                        console.warn(
-                          'Unrecognized Block of type:',
-                          data._template
-                        )
-                        return null
-                      }
-
-                      const blockName = `${input.name}.${index}`
-
-                      return (
-                        <InlineBlock
-                          itemProps={itemProps}
-                          key={index}
-                          index={index}
-                          name={blockName}
-                          data={data}
-                          block={Block}
-                        />
-                      )
-                    })}
-                    {provider.placeholder}
-                  </InlineBlocksContext.Provider>
+                if (!Block) {
+                  console.warn('Unrecognized Block of type:', data._template)
+                  return null
                 }
-              </Container>
-            )}
-          </Droppable>
+
+                const blockName = `${input.name}.${index}`
+
+                return (
+                  <InlineBlock
+                    itemProps={itemProps}
+                    key={index}
+                    index={index}
+                    name={blockName}
+                    data={data}
+                    block={Block}
+                  />
+                )
+              })}
+            </InlineBlocksContext.Provider>
+          </Container>
         )
       }}
     </InlineField>
