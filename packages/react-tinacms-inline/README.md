@@ -238,7 +238,7 @@ export interface InlineBlocksProps {
 | `name`      |                                                                                            The path to the **source data** for the blocks. |
 | `blocks`    |                                         An object composed of individual [Blocks](/docs/ui/inline-editing/inline-blocks#creating-a-block). |
 | `className` | _Optional_ — To set styles directly on the input or extend via [styled components](/docs/ui/inline-editing#extending-inline-field-styles). |
-| `direction` |                                                    _Optional_ — Sets the orientation of the drag direction and `AddBlock` button position. |
+| `direction` |                                                    _Optional_ — Sets the orientation of the `AddBlock` button position. |
 | `itemProps` |                                                          _Optional_ — An object that passes additional props to every block child element. |
 | `min`       |                         _Optional_ — Controls the minimum number of blocks. Once reached, blocks won't be able to be removed. _(Optional)_ |
 | `max`       |                   _Optional_ — Controls the maximum number of blocks allowed. Once reached, blocks won't be able to be added. _(Optional)_ |
@@ -523,11 +523,9 @@ const PAGE_BLOCKS = {
 }
 ```
 
-**Configuring the drag and drop Container**
+**Configuring the Container**
 
-`InlineBlocks` wraps your blocks with a `<div>` element that informs the drag and drop functionality of what can be dragged and dropped.
-
-This can be an issue if your styles require direct inheritance, such as a flexbox grid:
+`InlineBlocks` wraps your blocks with a `<div>` element by default. This can be an issue if your styles require direct inheritance, such as a flexbox grid:
 
 ```html
 <div class="row">
@@ -536,13 +534,12 @@ This can be an issue if your styles require direct inheritance, such as a flexbo
 </div>
 ```
 
-To handle this, you can pass a "render function" as the child of the `InlineBlocks` component to control the container that renders the the child blocks. 
+To handle this, you can pass a custom container component to `InlineBlocks`.
 
 **Interface**
 
 ```ts
-interface BlocksContainerProps {
-  innerRef: React.Ref<any>
+interface BlocksContainerProps {s
   className?: string
   children?: React.ReactNode
 }
@@ -554,8 +551,8 @@ interface BlocksContainerProps {
 import { useJsonForm } from 'next-tinacms-json'
 import { InlineForm, InlineBlocks, BlocksControls, InlineTextarea } from 'react-tinacms-inline'
 
-const MyBlocksContainer = ({innerRef, children}) => (
-  <div ref={innerRef}>
+const MyBlocksContainer = (children}) => (
+  <div>
     {children}
   </div>
 )
