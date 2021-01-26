@@ -106,9 +106,15 @@ async function runChecksOnPullRequest() {
     ...danger.git.deleted_files,
     ...danger.git.modified_files,
   ]
+  const existingFiles = [
+    ...danger.git.created_files,
+    ...danger.git.modified_files,
+  ]
 
   // Files
-  await allFiles.filter(fileNeedsLicense).forEach(checkFileForLicenseHeader)
+  await existingFiles
+    .filter(fileNeedsLicense)
+    .forEach(checkFileForLicenseHeader)
 
   // Packages
   const modifiedPackages = await getModifiedPackages(allFiles)
@@ -308,7 +314,6 @@ async function checkFileForLicenseHeader(filepath: string) {
     }
   } catch (e) {
     fail(e.message)
-    // The file was deleted. That's okay.
   }
 }
 
