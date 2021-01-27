@@ -21,6 +21,7 @@ import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
 import { useMap } from 'react-use'
+import { InlineText } from 'fields/inline-text-field'
 
 type useMapObject<mapValue> = { [key: string]: mapValue }
 
@@ -34,6 +35,7 @@ type useMapActions<mapValue> = {
 export interface InlineFormProps {
   form: Form
   children: React.ReactElement | React.ReactElement[] | InlineFormRenderChild
+  fieldRefs?: any
 }
 
 export interface InlineFormRenderChild {
@@ -67,6 +69,18 @@ export function InlineForm({ form, children }: InlineFormProps) {
     }
   }, [form, focussedField, setFocussedField])
 
+  React.useEffect(() => {
+    let memoOpacity: any = null
+    // @ts-ignore
+    const focusRef = fieldRefs[focussedField] as any
+    if (focusRef && focusRef.current) {
+      memoOpacity = focusRef.current.style.opacity
+      focusRef.current.style.opacity = 0.2
+      return () => (focusRef.current.style.opacity = memoOpacity || 1)
+    }
+    return
+  }, [focussedField, fieldRefs])
+
   return (
     <InlineFormContext.Provider value={inlineFormState}>
       <Dismissible
@@ -91,14 +105,66 @@ export function InlineForm({ form, children }: InlineFormProps) {
               return children
             }
 
-            return children({
-              ...formProps,
-              ...inlineFormState,
-            })
+            return (
+              <>
+                {children({
+                  ...formProps,
+                  ...inlineFormState,
+                })}
+                {Object.entries(fieldRefs).map(([field, ref]) => (
+                  <FieldOverlay targetRef={ref}>
+                    {focussedField === field ? (
+                      <InlineText name={field}></InlineText>
+                    ) : (
+                      <FieldTarget onClick={() => setFocussedField(field)} />
+                    )}
+                  </FieldOverlay>
+                ))}
+              </>
+            )
           }}
         </FormBuilder>
       </Dismissible>
     </InlineFormContext.Provider>
+  )
+}
+
+function FieldOverlay({
+  targetRef,
+  children,
+}: {
+  targetRef: any
+  children: any
+}) {
+  return (
+    <div
+      style={{
+        position: 'absolute',
+        top: targetRef?.current.offsetTop,
+        left: targetRef?.current.offsetLeft,
+        width: targetRef?.current.offsetWidth,
+        height: targetRef?.current.offsetHeight,
+      }}
+    >
+      {children}
+    </div>
+  )
+}
+
+function FieldTarget({ onClick }: { onClick: () => void }) {
+  const [opacity, setOpacity] = React.useState(0)
+  return (
+    <div
+      onClick={onClick}
+      onMouseOver={() => setOpacity(1.0)}
+      onMouseLeave={() => setOpacity(0.0)}
+      style={{
+        width: '100%',
+        height: '100%',
+        border: '5px solid red',
+        opacity,
+      }}
+    ></div>
   )
 }
 
