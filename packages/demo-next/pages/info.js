@@ -22,6 +22,7 @@ import {
   InlineImage,
   InlineGroup,
   InlineTextarea,
+  useFieldRef,
 } from 'react-tinacms-inline'
 import { InlineWysiwyg } from 'react-tinacms-editor'
 import { DiscardChanges } from './blocks'
@@ -35,111 +36,117 @@ function Info(props) {
 
   return (
     <InlineForm form={form}>
-      <Layout siteTitle={props.title} siteDescription={props.description}>
-        <section>
-          <div>
-            <button
-              onClick={() => cms.alerts.info(`This is some info ${new Date()}`)}
-            >
-              Info
-            </button>
-            <button
-              onClick={() => cms.alerts.success(`Hoorayyyy ${new Date()}`)}
-            >
-              Success
-            </button>
-            <button
-              onClick={() =>
-                cms.alerts.warn(
-                  `You really shouldnt do that friend ${new Date()}`
-                )
-              }
-            >
-              Warn
-            </button>
-            <button
-              onClick={() =>
-                cms.alerts.error(`Everything went wrong ${new Date()}`)
-              }
-            >
-              Error
-            </button>
-          </div>
-          <DiscardChanges />
-          <div className="group">
-            <InlineGroup
-              name="frontmatter"
-              fields={[
-                { label: 'Name', name: 'name', component: 'text' },
-                { label: 'Hometown', name: 'hometown', component: 'text' },
-                { label: 'color', name: 'color', component: 'color' },
-              ]}
-              focusRing={{
-                offset: 0,
-              }}
-            >
-              <h1>
-                <InlineText focusRing={false} name="name" />
-              </h1>
-              <p>
-                <InlineText focusRing={false} name="hometown" />
-              </p>
-            </InlineGroup>
-          </div>
-          <div className="group">
-            <InlineImage
-              name="frontmatter.image"
-              uploadDir={() => '/public/images/'}
-              parse={media => media.id}
-              className="inline-img"
-              alt="blue-orange"
-            />
-            <h1>INLINE IMAGE WITH CHILDREN</h1>
-            <StyledInlineImage
-              name="frontmatter.image"
-              uploadDir={() => '/public/images/'}
-              parse={media => media.id}
-            >
-              {props => <img src={props.src} />}
-            </StyledInlineImage>
-            <InlineWysiwyg
-              name="markdownBody"
-              sticky="62px"
-              imageProps={{
-                uploadDir: () => '/public/images',
-                parse: media => {
-                  return `/images/${media.filename}`
-                },
-              }}
-            >
-              <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
-            </InlineWysiwyg>
-          </div>
-        </section>
-        <style jsx>
-          {`
-            section {
-              width: 100%;
-              display: flex;
-              justify-content: center;
-              align-items: center;
-              flex-direction: column;
-              text-align: center;
-              padding: 3rem;
-              margin-top: 4rem;
-            }
+      {_inlineFormData => {
+        const nameRef = useFieldRef('frontmatter.name')
 
-            div.group {
-              margin-top: 2rem;
-              padding: 1rem;
-            }
+        return (
+          <Layout siteTitle={props.title} siteDescription={props.description}>
+            <section>
+              <div>
+                <button
+                  onClick={() =>
+                    cms.alerts.info(`This is some info ${new Date()}`)
+                  }
+                >
+                  Info
+                </button>
+                <button
+                  onClick={() => cms.alerts.success(`Hoorayyyy ${new Date()}`)}
+                >
+                  Success
+                </button>
+                <button
+                  onClick={() =>
+                    cms.alerts.warn(
+                      `You really shouldnt do that friend ${new Date()}`
+                    )
+                  }
+                >
+                  Warn
+                </button>
+                <button
+                  onClick={() =>
+                    cms.alerts.error(`Everything went wrong ${new Date()}`)
+                  }
+                >
+                  Error
+                </button>
+              </div>
+              <DiscardChanges />
+              <h1 ref={nameRef}>{data.frontmatter.name}</h1>
+              <div className="group">
+                <InlineGroup
+                  name="frontmatter"
+                  fields={[
+                    //{ label: 'Name', name: 'name', component: 'text' },
+                    { label: 'Hometown', name: 'hometown', component: 'text' },
+                    { label: 'color', name: 'color', component: 'color' },
+                  ]}
+                  focusRing={{
+                    offset: 0,
+                  }}
+                >
+                  <p>
+                    <InlineText focusRing={false} name="hometown" />
+                  </p>
+                </InlineGroup>
+              </div>
+              <div className="group">
+                <InlineImage
+                  name="frontmatter.image"
+                  uploadDir={() => '/public/images/'}
+                  parse={media => media.id}
+                  className="inline-img"
+                  alt="blue-orange"
+                />
+                <h1>INLINE IMAGE WITH CHILDREN</h1>
+                <StyledInlineImage
+                  name="frontmatter.image"
+                  uploadDir={() => '/public/images/'}
+                  parse={media => media.id}
+                >
+                  {props => <img src={props.src} />}
+                </StyledInlineImage>
+                <InlineWysiwyg
+                  name="markdownBody"
+                  sticky="62px"
+                  imageProps={{
+                    uploadDir: () => '/public/images',
+                    parse: media => {
+                      return `/images/${media.filename}`
+                    },
+                  }}
+                >
+                  <ReactMarkdown>{data.markdownBody}</ReactMarkdown>
+                </InlineWysiwyg>
+              </div>
+            </section>
+            <style jsx>
+              {`
+                section {
+                  width: 100%;
+                  display: flex;
+                  justify-content: center;
+                  align-items: center;
+                  flex-direction: column;
+                  text-align: center;
+                  padding: 3rem;
+                  margin-top: 4rem;
+                }
 
-            .inline-img {
-              background: pink;
-            }
-          `}
-        </style>
-      </Layout>
+                div.group {
+                  margin-top: 2rem;
+                  padding: 1rem;
+                }
+
+                .inline-img {
+                  background: pink;
+                }
+              `}
+            </style>
+          </Layout>
+        )
+      }}
     </InlineForm>
   )
 }
@@ -147,7 +154,12 @@ function Info(props) {
 const formOptions = {
   label: 'Home Page',
   fields: [
-    { label: 'Name', name: 'frontmatter.name', component: 'text' },
+    {
+      label: 'Name',
+      name: 'frontmatter.name',
+      component: 'text',
+      inlineComponent: 'text',
+    },
     {
       name: 'frontmatter.image',
       component: 'image',
