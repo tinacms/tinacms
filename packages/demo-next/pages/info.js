@@ -158,7 +158,11 @@ const formOptions = {
       label: 'Name',
       name: 'frontmatter.name',
       component: 'text',
-      inlineComponent: 'text',
+      inlineComponent: ({ name }) => (
+        <h1>
+          <InlineText name={name} />
+        </h1>
+      ),
     },
     {
       name: 'frontmatter.image',

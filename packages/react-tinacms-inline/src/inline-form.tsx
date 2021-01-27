@@ -21,7 +21,6 @@ import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
 import { useMap } from 'react-use'
-import { InlineText } from 'fields/inline-text-field'
 
 type useMapObject<mapValue> = { [key: string]: mapValue }
 
@@ -75,7 +74,7 @@ export function InlineForm({ form, children }: InlineFormProps) {
     const focusRef = fieldRefs[focussedField] as any
     if (focusRef && focusRef.current) {
       memoOpacity = focusRef.current.style.opacity
-      focusRef.current.style.opacity = 0.2
+      focusRef.current.style.opacity = 0.0
       return () => (focusRef.current.style.opacity = memoOpacity || 1)
     }
     return
@@ -114,7 +113,10 @@ export function InlineForm({ form, children }: InlineFormProps) {
                 {Object.entries(fieldRefs).map(([field, ref]) => (
                   <FieldOverlay targetRef={ref}>
                     {focussedField === field ? (
-                      <InlineText name={field}></InlineText>
+                      <InlineComponent
+                        form={inlineFormState.form}
+                        field={field}
+                      />
                     ) : (
                       <FieldTarget onClick={() => setFocussedField(field)} />
                     )}
@@ -127,6 +129,13 @@ export function InlineForm({ form, children }: InlineFormProps) {
       </Dismissible>
     </InlineFormContext.Provider>
   )
+}
+
+function InlineComponent({ form, field }: any) {
+  const fieldConfig = form.fields.find(
+    (formField: any) => formField.name === field
+  )
+  return fieldConfig.inlineComponent({ name: field })
 }
 
 function FieldOverlay({
