@@ -20,6 +20,16 @@ import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
+import { useMap } from 'react-use'
+
+type useMapObject<mapValue> = { [key: string]: mapValue }
+
+type useMapActions<mapValue> = {
+  set(key: string, value: mapValue): void
+  setAll(data: useMapObject<mapValue>): void
+  remove(key: string): void
+  reset(): void
+}
 
 export interface InlineFormProps {
   form: Form
@@ -39,16 +49,21 @@ export interface InlineFormState {
   form: Form
   focussedField: string
   setFocussedField(field: string): void
+  fieldRefs: useMapObject<React.Ref<any>>
+  fieldRefActions: useMapActions<React.Ref<any>>
 }
 
 export function InlineForm({ form, children }: InlineFormProps) {
   const [focussedField, setFocussedField] = React.useState<string>('')
+  const [fieldRefs, fieldRefActions] = useMap({})
 
   const inlineFormState = React.useMemo(() => {
     return {
       form,
       focussedField,
       setFocussedField,
+      fieldRefs,
+      fieldRefActions,
     }
   }, [form, focussedField, setFocussedField])
 
