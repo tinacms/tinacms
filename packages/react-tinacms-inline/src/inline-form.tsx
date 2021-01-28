@@ -149,10 +149,10 @@ function FieldOverlay({
     <div
       style={{
         position: 'absolute',
-        top: targetRef?.current.offsetTop,
-        left: targetRef?.current.offsetLeft,
-        width: targetRef?.current.offsetWidth,
-        height: targetRef?.current.offsetHeight,
+        top: targetRef?.current?.offsetTop,
+        left: targetRef?.current?.offsetLeft,
+        width: targetRef?.current?.offsetWidth,
+        height: targetRef?.current?.offsetHeight,
       }}
     >
       {children}
