@@ -20,7 +20,7 @@
   "peerDependencies": {
     "react": ">=16.8",
     "react-dropzone": "10.2.1",
-    "react-final-form": "^>=6",
+    "react-final-form": ">=6",
     "react-tinacms-editor": ">=0.0",
     "styled-components": ">=4.1",
     "tinacms": ">=0.13"
