@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import * as React from 'react'
+import * as React, { SyntheticEvent } from 'react'
 import { useState } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
@@ -317,7 +317,8 @@ export const ColorPicker: React.FC<Props> = ({
     )
   }
 
-  const toggleColorPicker = () => {
+  const toggleColorPicker = (event: SyntheticEvent) => {
+    event.stopPropagation()
     const display = !displayColorPicker
     setDisplayColorPicker(display)
     if (display) {
