@@ -924,6 +924,16 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "pristas-peter",
+      "name": "pristas-peter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9489687?v=4",
+      "profile": "https://twitter.com/pristas_peter",
+      "contributions": [
+        "bug",
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
