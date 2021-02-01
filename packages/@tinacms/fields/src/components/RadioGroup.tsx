@@ -57,9 +57,9 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
   const radioOptions = options || field.options
   const radioRefs: RadioRefsInterface = {}
 
-  React.useEffect(() => setActiveRadioRef(radioRefs[`radio_${input.value}`]), [
-    input.value,
-  ])
+  React.useEffect(() => {
+    setActiveRadioRef(radioRefs[`radio_${input.value}`])
+  }, [input.value])
 
   const toProps = (option: Option | string): Option => {
     if (typeof option === 'object') return option
