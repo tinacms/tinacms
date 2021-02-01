@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.1](https://github.com/tinacms/tinacms/compare/v0.36.0...v0.36.1) (2021-02-01)
+
+### Bug Fixes
+
+- **react-tinacms-inline:** dep constraint syntax ([c9c3f05](https://github.com/tinacms/tinacms/commit/c9c3f057ffc3ed0dc54f5ee469cf70dab8885d4f))
+
 # [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
 
 ### Bug Fixes
