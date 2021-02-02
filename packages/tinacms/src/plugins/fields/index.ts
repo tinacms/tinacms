@@ -23,6 +23,7 @@ export {
   GroupListFieldPlugin,
   NumberFieldPlugin,
   SelectFieldPlugin,
+  RadioGroupFieldPlugin,
   TextFieldPlugin,
   TextareaFieldPlugin,
   ToggleFieldPlugin,
