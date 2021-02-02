@@ -70,18 +70,20 @@ export function InlineForm({ form, children }: InlineFormProps) {
           setFocussedField('')
         }}
       >
-        <FormBuilder form={form}>
-          {({ form, ...formProps }) => {
-            if (typeof children !== 'function') {
-              return children
-            }
+        <div onClick={() => setFocussedField('')}>
+          <FormBuilder form={form}>
+            {({ form, ...formProps }) => {
+              if (typeof children !== 'function') {
+                return children
+              }
 
-            return children({
-              ...formProps,
-              ...inlineFormState,
-            })
-          }}
-        </FormBuilder>
+              return children({
+                ...formProps,
+                ...inlineFormState,
+              })
+            }}
+          </FormBuilder>
+        </div>
       </Dismissible>
     </InlineFormContext.Provider>
   )
