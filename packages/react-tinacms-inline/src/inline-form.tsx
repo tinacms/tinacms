@@ -21,6 +21,7 @@ import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
 import { useMap } from 'react-use'
+import { FieldOverlay, FieldTarget } from './ref-fields'
 
 type useMapObject<mapValue> = { [key: string]: mapValue }
 
@@ -136,45 +137,6 @@ function InlineComponent({ form, field }: any) {
     (formField: any) => formField.name === field
   )
   return fieldConfig.inlineComponent({ name: field })
-}
-
-function FieldOverlay({
-  targetRef,
-  children,
-}: {
-  targetRef: any
-  children: any
-}) {
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        top: targetRef?.current?.offsetTop,
-        left: targetRef?.current?.offsetLeft,
-        width: targetRef?.current?.offsetWidth,
-        height: targetRef?.current?.offsetHeight,
-      }}
-    >
-      {children}
-    </div>
-  )
-}
-
-function FieldTarget({ onClick }: { onClick: () => void }) {
-  const [opacity, setOpacity] = React.useState(0)
-  return (
-    <div
-      onClick={onClick}
-      onMouseOver={() => setOpacity(1.0)}
-      onMouseLeave={() => setOpacity(0.0)}
-      style={{
-        width: '100%',
-        height: '100%',
-        border: '5px solid red',
-        opacity,
-      }}
-    ></div>
-  )
 }
 
 export const InlineFormContext = React.createContext<InlineFormState | null>(
