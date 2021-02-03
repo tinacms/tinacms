@@ -78,18 +78,16 @@ export function InlineForm({ form, children }: InlineFormProps) {
 
     const focusRef = fieldRefs[focussedField]
 
-    const cleanup = () => {
-      if (focusRef && focusRef.current) {
-        focusRef.current.style.opacity = memoOpacity
-      }
-    }
-
     if (focusRef && focusRef.current) {
       memoOpacity = focusRef.current.style.opacity
       focusRef.current.style.opacity = '0.0'
     }
 
-    return cleanup
+    return () => {
+      if (focusRef && focusRef.current) {
+        focusRef.current.style.opacity = memoOpacity
+      }
+    }
   }, [focussedField, fieldRefs])
 
   return (
