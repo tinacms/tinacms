@@ -21,9 +21,7 @@ import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
 import { useMap } from 'react-use'
-import { FieldOverlay, FieldTarget } from './ref-fields'
-
-type FieldRefType = React.RefObject<HTMLElement | null>
+import { FieldOverlay, FieldTarget, FieldRefType } from './ref-fields'
 
 type useMapObject<T> = { [key: string]: T }
 
@@ -40,7 +38,7 @@ export interface InlineFormProps {
   form: Form
   children: React.ReactElement | React.ReactElement[] | InlineFormRenderChild
   fieldRefs?: {
-    [key: string]: React.Ref<HTMLElement | null>
+    [key: string]: FieldRefType
   }
 }
 
