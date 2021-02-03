@@ -23,19 +23,25 @@ import { Dismissible } from 'react-dismissible'
 import { useMap } from 'react-use'
 import { FieldOverlay, FieldTarget } from './ref-fields'
 
-type useMapObject<mapValue> = { [key: string]: mapValue }
+type FieldRefType = React.RefObject<HTMLElement | null>
 
-type useMapActions<mapValue> = {
-  set(key: string, value: mapValue): void
-  setAll(data: useMapObject<mapValue>): void
+type useMapObject<T> = { [key: string]: T }
+
+type useMapActions<T> = {
+  set(key: string, value: T): void
+  setAll(data: useMapObject<T>): void
   remove(key: string): void
   reset(): void
 }
 
+type useMapType<T> = [useMapObject<T>, useMapActions<T>]
+
 export interface InlineFormProps {
   form: Form
   children: React.ReactElement | React.ReactElement[] | InlineFormRenderChild
-  fieldRefs?: any
+  fieldRefs?: {
+    [key: string]: React.Ref<HTMLElement | null>
+  }
 }
 
 export interface InlineFormRenderChild {
@@ -51,13 +57,13 @@ export interface InlineFormState {
   form: Form
   focussedField: string
   setFocussedField(field: string): void
-  fieldRefs: useMapObject<React.Ref<any>>
-  fieldRefActions: useMapActions<React.Ref<any>>
+  fieldRefs: useMapObject<FieldRefType>
+  fieldRefActions: useMapActions<FieldRefType>
 }
 
 export function InlineForm({ form, children }: InlineFormProps) {
   const [focussedField, setFocussedField] = React.useState<string>('')
-  const [fieldRefs, fieldRefActions] = useMap({})
+  const [fieldRefs, fieldRefActions]: useMapType<FieldRefType> = useMap({})
 
   const inlineFormState = React.useMemo(() => {
     return {
@@ -70,15 +76,22 @@ export function InlineForm({ form, children }: InlineFormProps) {
   }, [form, focussedField, setFocussedField])
 
   React.useEffect(() => {
-    let memoOpacity: any = null
-    // @ts-ignore
-    const focusRef = fieldRefs[focussedField] as any
+    let memoOpacity = '1.0'
+
+    const focusRef = fieldRefs[focussedField]
+
+    const cleanup = () => {
+      if (focusRef && focusRef.current) {
+        focusRef.current.style.opacity = memoOpacity
+      }
+    }
+
     if (focusRef && focusRef.current) {
       memoOpacity = focusRef.current.style.opacity
-      focusRef.current.style.opacity = 0.0
-      return () => (focusRef.current.style.opacity = memoOpacity || 1)
+      focusRef.current.style.opacity = '0.0'
     }
-    return
+
+    return cleanup
   }, [focussedField, fieldRefs])
 
   return (
