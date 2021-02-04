@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
-import { FormBuilder, Form } from 'tinacms'
+import { FormBuilder, Form, Field } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
 import { useMap } from 'react-use'
 import { FieldOverlay, FieldTarget, FieldRefType } from './ref-fields'
@@ -122,7 +122,7 @@ export function InlineForm({ form, children }: InlineFormProps) {
                 })}
                 {Object.entries(fieldRefs).map(([fieldName, ref]) => {
                   const fieldConfig = inlineFormState.form.fields.find(
-                    (formField: any) => formField.name === fieldName
+                    (formField: Field) => formField.name === fieldName
                   )
                   if (!fieldConfig) return null
                   return (

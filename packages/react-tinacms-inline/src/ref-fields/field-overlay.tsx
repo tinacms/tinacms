@@ -1,11 +1,12 @@
 import * as React from 'react'
+import { FieldRefType } from './use-field-ref'
 
 export function FieldOverlay({
   targetRef,
   children,
 }: {
-  targetRef: any
-  children: any
+  targetRef: FieldRefType
+  children: JSX.Element
 }) {
   return (
     <div
