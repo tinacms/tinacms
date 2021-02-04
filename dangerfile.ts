@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { markdown, danger, warn, fail, message } from 'danger'
+import { markdown, danger, warn, fail, message, GitHubPRDSL } from 'danger'
 import depcheck from 'depcheck'
 import * as fs from 'fs'
 import * as path from 'path'
@@ -41,13 +41,19 @@ async function getLocalFileContents(filepath: string) {
   })
 }
 
+interface GithubDraftablePRDSL extends GitHubPRDSL {
+  draft: Boolean
+}
+
 async function getRemoteFileContents(filepath: string) {
   const octokit = danger.github.api
+  const pr = danger.github.pr as GithubDraftablePRDSL
+  const refType = pr.draft ? 'head' : 'merge'
   const { data }: any = await octokit.repos.getContents({
     owner: 'tinacms',
     repo: 'tinacms',
     path: filepath,
-    ref: `refs/pull/${danger.github.thisPR.number}/merge`,
+    ref: `refs/pull/${danger.github.thisPR.number}/${refType}`,
   })
   return Buffer.from(data.content, 'base64').toString()
 }
