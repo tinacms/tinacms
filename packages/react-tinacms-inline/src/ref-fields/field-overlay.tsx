@@ -19,6 +19,13 @@ limitations under the License.
 import * as React from 'react'
 import { FieldRefType } from './use-field-ref'
 
+function useWindowResize(handler: () => void) {
+  React.useEffect(() => {
+    window.addEventListener('resize', handler)
+    return () => window.removeEventListener('resize', handler)
+  }, [])
+}
+
 export function FieldOverlay({
   targetRef,
   children,
@@ -26,6 +33,8 @@ export function FieldOverlay({
   targetRef: FieldRefType
   children: JSX.Element
 }) {
+  const [, setState] = React.useState(0)
+  useWindowResize(() => setState(s => s + 1))
   return (
     <div
       style={{
