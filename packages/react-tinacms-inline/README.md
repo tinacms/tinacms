@@ -575,3 +575,64 @@ export default function PageBlocks({ jsonFile }) {
 ```
 
 > Checkout this guide to learn more on using [Inline Blocks](https://tinacms.org/guides/general/inline-blocks/overview).
+
+---
+
+## _useFieldRef_
+
+`useFieldRef` is the first part of an experimental new API for creating an inline editing experience with Tina. With `useFieldRef`, inline editing components are defined in the form configuration, and you assign a [ref](https://reactjs.org/docs/refs-and-the-dom.html) to the component in your layout that the field should attach to.
+
+Inline fields created in this fashion will be absolutely positioned on top of the referenced component and conform to its dimensions. This makes it possible for the field to appear as if it were replacing the layout component in the DOM without altering the markup.
+
+### Setting up ref-based inline editing
+
+Adding inline editing with this API is done in two steps:
+
+#### 1. Add an `inlineComponent` to your form field definition
+
+Similar to how you would configure a sidebar field via that field's `component` key, you can configure an inline field via the `inlineComponent` key.
+
+> Unlike the sidebar `component`s, `inlineComponent`s must be defined as a React component and not a string. In the future, `inlineComponent` will accept a string as well and components can be registered via the plugin system.
+
+```jsx
+function MyPageComponent() {
+  const [data, form] = useForm({
+    //...
+    fields: [
+      //...
+      {
+        name: 'title',
+        component: 'text',
+        inlineComponent: ({ name }) => (
+          <h1><InlineText name={name} /></h1>
+        )
+      }
+    ]
+  })
+  //...
+}
+```
+
+#### 2. Call `useFieldRef` and attach the ref to the component that you want to be editable
+
+`useFieldRef` depends on the context provided by `InlineForm`, so it needs to be called in a child component of `InlineForm`. In the below example, we are using `InlineForm`'s render-child syntax to call `useFieldRef` in a place where we have access to that context. You can just as easily call `useFieldRef` inside of a component nested inside of an `InlineForm`.
+
+```jsx
+function MyPageComponent() {
+  const [data, form] = useForm({
+    //...
+  })
+  return (
+    <InlineForm form={form}>
+    {() => {
+      const titleRef = useFieldRef('title')
+      return (
+        <main>
+          <h1 ref={titleRef}>{data.title}</h1>
+        </main>
+      )
+    }}
+    </InlineForm>
+  )
+}
+```
