@@ -18,7 +18,11 @@ limitations under the License.
 
 import * as React from 'react'
 
-export function FieldTarget({ onClick }: { onClick: () => void }) {
+export function FieldTarget({
+  onClick,
+}: {
+  onClick: (event: React.SyntheticEvent) => void
+}) {
   const [opacity, setOpacity] = React.useState('0.0')
   return (
     <div

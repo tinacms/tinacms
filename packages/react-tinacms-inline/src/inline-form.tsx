@@ -131,12 +131,17 @@ export function InlineForm({ form, children }: InlineFormProps) {
                         {focussedField === fieldName &&
                         fieldConfig.inlineComponent ? (
                           <fieldConfig.inlineComponent
-                            form={inlineFormState.form}
-                            field={fieldConfig}
+                            name={fieldConfig.name}
+                            // form={inlineFormState.form}
+                            // field={fieldConfig}
                           />
                         ) : (
                           <FieldTarget
-                            onClick={() => setFocussedField(fieldName)}
+                            onClick={e => {
+                              e.preventDefault()
+                              e.stopPropagation()
+                              setFocussedField(fieldName)
+                            }}
                           />
                         )}
                       </FieldOverlay>
