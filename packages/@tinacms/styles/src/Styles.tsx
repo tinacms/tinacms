@@ -56,6 +56,7 @@ const theme = css`
     --tina-color-grey-10: #282828;
 
     --tina-radius-small: 5px;
+    --tina-radius-medium: 10px;
     --tina-radius-big: 24px;
 
     --tina-padding-small: 12px;
