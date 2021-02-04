@@ -120,18 +120,27 @@ export function InlineForm({ form, children }: InlineFormProps) {
                   ...formProps,
                   ...inlineFormState,
                 })}
-                {Object.entries(fieldRefs).map(([field, ref]) => (
-                  <FieldOverlay targetRef={ref}>
-                    {focussedField === field ? (
-                      <InlineComponent
-                        form={inlineFormState.form}
-                        field={field}
-                      />
-                    ) : (
-                      <FieldTarget onClick={() => setFocussedField(field)} />
-                    )}
-                  </FieldOverlay>
-                ))}
+                {Object.entries(fieldRefs).map(([fieldName, ref]) => {
+                  const fieldConfig = inlineFormState.form.fields.find(
+                    (formField: any) => formField.name === fieldName
+                  )
+                  if (!fieldConfig) return null
+                  return (
+                    <FieldOverlay targetRef={ref}>
+                      {focussedField === fieldName &&
+                      fieldConfig.inlineComponent ? (
+                        <fieldConfig.inlineComponent
+                          form={inlineFormState.form}
+                          field={fieldConfig}
+                        />
+                      ) : (
+                        <FieldTarget
+                          onClick={() => setFocussedField(fieldName)}
+                        />
+                      )}
+                    </FieldOverlay>
+                  )
+                })}
               </>
             )
           }}
@@ -139,13 +148,6 @@ export function InlineForm({ form, children }: InlineFormProps) {
       </Dismissible>
     </InlineFormContext.Provider>
   )
-}
-
-function InlineComponent({ form, field }: any) {
-  const fieldConfig = form.fields.find(
-    (formField: any) => formField.name === field
-  )
-  return fieldConfig.inlineComponent({ name: field })
 }
 
 export const InlineFormContext = React.createContext<InlineFormState | null>(
