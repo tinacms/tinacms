@@ -5,12 +5,18 @@ export function FieldTarget({ onClick }: { onClick: () => void }) {
   return (
     <div
       onClick={onClick}
-      onMouseOver={() => setOpacity('1.0')}
+      onMouseOver={() => setOpacity('0.3')}
       onMouseLeave={() => setOpacity('0.0')}
       style={{
-        width: '100%',
-        height: '100%',
-        border: '5px solid red',
+        position: 'absolute',
+        cursor: 'pointer',
+        width: 'calc(100% + 32px)',
+        height: 'calc(100% + 32px)',
+        top: '-16px',
+        left: '-16px',
+        border: '1px solid var(--tina-color-primary)',
+        borderRadius: 'var(--tina-radius-medium)',
+        boxShadow: 'var(--tina-shadow-big)',
         opacity,
       }}
     ></div>
