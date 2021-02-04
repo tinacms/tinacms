@@ -216,6 +216,7 @@ export function InlineWysiwyg(props) {
     if (!InlineWysiwyg && cms.enabled) {
       import('react-tinacms-editor').then(setEditor)
     }
+    return () => (InlineWysiwyg ? setEditor(null) : null)
   }, [cms.enabled])
 
   if (InlineWysiwyg) {

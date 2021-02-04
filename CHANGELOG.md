@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.1](https://github.com/tinacms/tinacms/compare/v0.36.0...v0.36.1) (2021-02-01)
+
+### Bug Fixes
+
+- **react-tinacms-inline:** dep constraint syntax ([c9c3f05](https://github.com/tinacms/tinacms/commit/c9c3f057ffc3ed0dc54f5ee469cf70dab8885d4f))
+
+# [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
+
+### Bug Fixes
+
+- **@tinacms/react-sidebar:** fixed site elements relative to SiteWrapper ([2f5c75c](https://github.com/tinacms/tinacms/commit/2f5c75c1323d94c033d30c195370254eb5fcffc2))
+- **@tinacms/react-sidebar:** fixed site elements relative to SiteWrapper ([de2e1f7](https://github.com/tinacms/tinacms/commit/de2e1f711c87803cf9d161891ea0eb056796b25e))
+- **react-tinacms-github:** Fix reversed error messages for 404 errors ([7e3ba86](https://github.com/tinacms/tinacms/commit/7e3ba861a176f7289791391f3c1a70f38ca54240))
+
+### Features
+
+- **react-tinacms-github:** GithubFile: Support committing newly created files ([d13eb76](https://github.com/tinacms/tinacms/commit/d13eb761d805e212cd498f69bc72270efd3115f0))
+- **react-tinacms-inline:** inline block duplicate action ([0b79ecf](https://github.com/tinacms/tinacms/commit/0b79ecf468b7ad9c35cb5cd9696e144ffc456a4f))
+
 ## [0.35.1](https://github.com/tinacms/tinacms/compare/v0.35.0...v0.35.1) (2021-01-19)
 
 ### Bug Fixes

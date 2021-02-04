@@ -41,7 +41,7 @@ const formConfig = {
   fields: [
     {
       name: "created_at",
-      label: "Craeted At",
+      label: "Created At",
       component: "date",
       dateFormat: 'MMMM DD YYYY',
       timeFormat: false,

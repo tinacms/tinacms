@@ -3,6 +3,26 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.36.1](https://github.com/tinacms/tinacms/compare/v0.36.0...v0.36.1) (2021-02-01)
+
+**Note:** Version bump only for package @tinacms/react-sidebar
+
+
+
+
+
+# [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
+
+
+### Bug Fixes
+
+* **@tinacms/react-sidebar:** fixed site elements relative to SiteWrapper ([2f5c75c](https://github.com/tinacms/tinacms/commit/2f5c75c1323d94c033d30c195370254eb5fcffc2))
+* **@tinacms/react-sidebar:** fixed site elements relative to SiteWrapper ([de2e1f7](https://github.com/tinacms/tinacms/commit/de2e1f711c87803cf9d161891ea0eb056796b25e))
+
+
+
+
+
 # [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
 
 **Note:** Version bump only for package @tinacms/react-sidebar

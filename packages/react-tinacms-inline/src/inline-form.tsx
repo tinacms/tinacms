@@ -108,43 +108,45 @@ export function InlineForm({ form, children }: InlineFormProps) {
           setFocussedField('')
         }}
       >
-        <FormBuilder form={form}>
-          {({ form, ...formProps }) => {
-            if (typeof children !== 'function') {
-              return children
-            }
+        <div onClick={() => setFocussedField('')}>
+          <FormBuilder form={form}>
+            {({ form, ...formProps }) => {
+              if (typeof children !== 'function') {
+                return children
+              }
 
-            return (
-              <>
-                {children({
-                  ...formProps,
-                  ...inlineFormState,
-                })}
-                {Object.entries(fieldRefs).map(([fieldName, ref]) => {
-                  const fieldConfig = inlineFormState.form.fields.find(
-                    (formField: Field) => formField.name === fieldName
-                  )
-                  if (!fieldConfig) return null
-                  return (
-                    <FieldOverlay targetRef={ref}>
-                      {focussedField === fieldName &&
-                      fieldConfig.inlineComponent ? (
-                        <fieldConfig.inlineComponent
-                          form={inlineFormState.form}
-                          field={fieldConfig}
-                        />
-                      ) : (
-                        <FieldTarget
-                          onClick={() => setFocussedField(fieldName)}
-                        />
-                      )}
-                    </FieldOverlay>
-                  )
-                })}
-              </>
-            )
-          }}
-        </FormBuilder>
+              return (
+                <>
+                  {children({
+                    ...formProps,
+                    ...inlineFormState,
+                  })}
+                  {Object.entries(fieldRefs).map(([fieldName, ref]) => {
+                    const fieldConfig = inlineFormState.form.fields.find(
+                      (formField: Field) => formField.name === fieldName
+                    )
+                    if (!fieldConfig) return null
+                    return (
+                      <FieldOverlay targetRef={ref}>
+                        {focussedField === fieldName &&
+                        fieldConfig.inlineComponent ? (
+                          <fieldConfig.inlineComponent
+                            form={inlineFormState.form}
+                            field={fieldConfig}
+                          />
+                        ) : (
+                          <FieldTarget
+                            onClick={() => setFocussedField(fieldName)}
+                          />
+                        )}
+                      </FieldOverlay>
+                    )
+                  })}
+                </>
+              )
+            }}
+          </FormBuilder>
+        </div>
       </Dismissible>
     </InlineFormContext.Provider>
   )

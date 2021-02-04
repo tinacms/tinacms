@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
+
+
+### Features
+
+* **react-tinacms-inline:** inline block duplicate action ([0b79ecf](https://github.com/tinacms/tinacms/commit/0b79ecf468b7ad9c35cb5cd9696e144ffc456a4f))
+
+
+
+
+
 # [0.31.0](https://github.com/tinacms/tinacms/compare/v0.30.0...v0.31.0) (2020-10-05)
 
 

@@ -317,7 +317,8 @@ export const ColorPicker: React.FC<Props> = ({
     )
   }
 
-  const toggleColorPicker = () => {
+  const toggleColorPicker = (event: React.SyntheticEvent) => {
+    event.stopPropagation()
     const display = !displayColorPicker
     setDisplayColorPicker(display)
     if (display) {

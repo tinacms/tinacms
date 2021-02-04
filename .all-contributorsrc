@@ -903,7 +903,8 @@
       "avatar_url": "https://avatars1.githubusercontent.com/u/3198597?v=4",
       "profile": "https://github.com/zenflow",
       "contributions": [
-        "code"
+        "code",
+        "bug"
       ]
     },
     {
@@ -912,7 +913,8 @@
       "avatar_url": "https://avatars2.githubusercontent.com/u/4704069?v=4",
       "profile": "https://joeinn.es",
       "contributions": [
-        "doc"
+        "doc",
+        "code"
       ]
     },
     {
@@ -921,6 +923,17 @@
       "avatar_url": "https://avatars0.githubusercontent.com/u/806104?v=4",
       "profile": "http://www.austincondiff.com",
       "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "pristas-peter",
+      "name": "pristas-peter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9489687?v=4",
+      "profile": "https://twitter.com/pristas_peter",
+      "contributions": [
+        "bug",
         "code"
       ]
     }
