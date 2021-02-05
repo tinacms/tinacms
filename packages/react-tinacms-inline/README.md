@@ -595,6 +595,8 @@ Similar to how you would configure a sidebar field via that field's `component` 
 > Unlike the sidebar `component`s, `inlineComponent`s must be defined as a React component and not a string. In the future, `inlineComponent` will accept a string as well and components can be registered via the plugin system.
 
 ```jsx
+import { useForm } from 'tinacms'
+
 function MyPageComponent() {
   const [data, form] = useForm({
     //...
@@ -618,6 +620,9 @@ function MyPageComponent() {
 `useFieldRef` depends on the context provided by `InlineForm`, so it needs to be called in a child component of `InlineForm`. In the below example, we are using `InlineForm`'s render-child syntax to call `useFieldRef` in a place where we have access to that context. You can just as easily call `useFieldRef` inside of a component nested inside of an `InlineForm`.
 
 ```jsx
+import { useForm } from 'tinacms'
+import { useFieldRef } from 'react-tinacms-inline'
+
 function MyPageComponent() {
   const [data, form] = useForm({
     //...
