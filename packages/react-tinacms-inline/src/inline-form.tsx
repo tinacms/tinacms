@@ -21,7 +21,7 @@ import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form, Field } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
 import { useMap } from 'react-use'
-import { FieldOverlay, FieldTarget, FieldRefType } from './ref-fields'
+import { FieldOverlay, FieldRefType } from './ref-fields'
 
 type useMapObject<T> = { [key: string]: T }
 
@@ -76,19 +76,27 @@ export function InlineForm({ form, children }: InlineFormProps) {
   React.useEffect(() => {
     let memoOpacity = '1.0'
 
-    const focusRef = fieldRefs[focussedField]
+    const focusRef = fieldRefs[focussedField] as any
 
-    if (focusRef && focusRef.current) {
-      memoOpacity = focusRef.current.style.opacity
-      focusRef.current.style.opacity = '0.0'
+    if (focusRef) {
+      memoOpacity = focusRef.style.opacity
+      focusRef.style.opacity = '0.0'
     }
 
     return () => {
-      if (focusRef && focusRef.current) {
-        focusRef.current.style.opacity = memoOpacity
+      if (focusRef) {
+        focusRef.style.opacity = memoOpacity
       }
     }
   }, [focussedField, fieldRefs])
+
+  const [currentField, setCurrentField] = React.useState(null) as any
+  React.useEffect(() => {
+    const field = inlineFormState.form.fields.find(
+      (formField: Field) => formField.name === focussedField
+    )
+    setCurrentField(field)
+  }, [focussedField])
 
   return (
     <InlineFormContext.Provider value={inlineFormState}>
@@ -121,32 +129,12 @@ export function InlineForm({ form, children }: InlineFormProps) {
                     ...formProps,
                     ...inlineFormState,
                   })}
-                  {Object.entries(fieldRefs).map(([fieldName, ref]) => {
-                    const fieldConfig = inlineFormState.form.fields.find(
-                      (formField: Field) => formField.name === fieldName
-                    )
-                    if (!fieldConfig) return null
-                    return (
-                      <FieldOverlay targetRef={ref}>
-                        {focussedField === fieldName &&
-                        fieldConfig.inlineComponent ? (
-                          <fieldConfig.inlineComponent
-                            name={fieldConfig.name}
-                            // form={inlineFormState.form}
-                            // field={fieldConfig}
-                          />
-                        ) : (
-                          <FieldTarget
-                            onClick={e => {
-                              e.preventDefault()
-                              e.stopPropagation()
-                              setFocussedField(fieldName)
-                            }}
-                          />
-                        )}
-                      </FieldOverlay>
-                    )
-                  })}
+
+                  {currentField && (
+                    <FieldOverlay targetNode={fieldRefs[currentField.name]}>
+                      <currentField.inlineComponent name={currentField.name} />
+                    </FieldOverlay>
+                  )}
                 </>
               )
             }}

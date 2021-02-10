@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FieldRefType } from './use-field-ref'
 
 function useWindowResize(handler: () => void) {
   React.useEffect(() => {
@@ -27,22 +26,23 @@ function useWindowResize(handler: () => void) {
 }
 
 export function FieldOverlay({
-  targetRef,
+  targetNode,
   children,
 }: {
-  targetRef: FieldRefType
+  targetNode: any
   children: JSX.Element
 }) {
   const [, setState] = React.useState(0)
   useWindowResize(() => setState(s => s + 1))
+  //if (!targetNode) return null
   return (
     <div
       style={{
         position: 'absolute',
-        top: targetRef?.current?.offsetTop,
-        left: targetRef?.current?.offsetLeft,
-        width: targetRef?.current?.offsetWidth,
-        height: targetRef?.current?.offsetHeight,
+        top: targetNode?.offsetTop,
+        left: targetNode?.offsetLeft,
+        width: targetNode?.offsetWidth,
+        height: targetNode?.offsetHeight,
       }}
     >
       {children}

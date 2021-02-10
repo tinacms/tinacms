@@ -21,12 +21,39 @@ import { useInlineForm } from 'inline-form'
 
 export type FieldRefType = React.RefObject<HTMLElement | null>
 
-export function useFieldRef(fieldName: string) {
-  const ref: FieldRefType = React.useRef(null)
-  const { fieldRefActions } = useInlineForm()
-  React.useEffect(() => {
-    fieldRefActions.set(fieldName, ref)
-  }, [fieldName, ref])
+const outlineCSS = 'solid'
 
-  return ref
+export function useFieldRef(fieldName: string) {
+  const [node, setNode] = React.useState(null) as any
+
+  const { setFocussedField, fieldRefActions } = useInlineForm()
+
+  React.useEffect(() => {
+    fieldRefActions.set(fieldName, node)
+    if (!node) return
+
+    const handleClick = (e: React.MouseEvent<any>) => {
+      e.preventDefault()
+      e.stopPropagation()
+      setFocussedField(fieldName)
+    }
+    const beginHover = () => {
+      node.style.outline = outlineCSS
+    }
+    const endHover = () => {
+      node.style.outline = 'none'
+    }
+    node.addEventListener('click', handleClick)
+    node.addEventListener('mouseover', beginHover)
+    node.addEventListener('mouseout', endHover)
+    return () => {
+      node.removeEventListener('click', handleClick)
+      node.removeEventListener('mouseover', beginHover)
+      node.removeEventListener('mouseout', endHover)
+    }
+  }, [node, fieldRefActions.set])
+
+  return React.useCallback((newNode: HTMLElement | null) => {
+    setNode(newNode)
+  }, [])
 }
