@@ -21,7 +21,7 @@ import { useInlineForm } from 'inline-form'
 
 export type FieldRefType = React.RefObject<HTMLElement | null>
 
-const outlineCSS = 'solid'
+const outlineCSS = '1px solid rgba(34,150,254, 0.5)'
 
 export function useFieldRef(fieldName: string) {
   const [node, setNode] = React.useState(null) as any
