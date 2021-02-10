@@ -65,7 +65,7 @@ function RefDemo(props) {
       {() => {
         const inlineTextRef = useFieldRef('frontmatter.title')
         const customInlineTextRef = useFieldRef('frontmatter.subtitle')
-        const contentEditableRef = useFieldRef('frontmatter.description')
+        const inlineTextareaRef = useFieldRef('frontmatter.description')
         return (
           <Layout>
             <section>
@@ -85,9 +85,9 @@ function RefDemo(props) {
             <hr />
             <hr />
             <section>
-              <label>useContentEditableRef</label>
+              <label>useFieldRef with InlineTextArea</label>
               <hr />
-              <div ref={contentEditableRef}>{data.frontmatter.description}</div>
+              <div ref={inlineTextareaRef}>{data.frontmatter.description}</div>
             </section>
           </Layout>
         )
