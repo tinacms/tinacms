@@ -1,0 +1,30 @@
+{
+  "name": "@tinacms/rbie",
+  "version": "0.36.0",
+  "license": "Apache-2.0",
+  "main": "build/index.js",
+  "typings": "build/index.d.ts",
+  "files": [
+    "build"
+  ],
+  "repository": {
+    "type": "git",
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/@tinacms/rbie"
+  },
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "watch": "tinacms-scripts watch",
+    "dev": "tinacms-scripts dev",
+    "docs": "npx typedoc",
+    "build": "tinacms-scripts build"
+  },
+  "devDependencies": {
+    "@tinacms/scripts": "^0.29.0"
+  },
+  "peerDependencies": {
+    "react": ">=16.8",
+    "tinacms": "*"
+  },
+  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+}
