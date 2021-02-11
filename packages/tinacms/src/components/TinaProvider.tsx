@@ -26,6 +26,7 @@ import { CMSContext } from '../react-tinacms'
 import { Alerts } from '@tinacms/react-alerts'
 import { useState, useEffect } from 'react'
 import { MediaManager } from './media'
+import { CMSEnabledContext } from '@tinacms/react-anywhere'
 
 export interface TinaProviderProps {
   cms: TinaCMS
@@ -57,19 +58,21 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
 
   return (
     <CMSContext.Provider value={cms}>
-      <ModalProvider>
-        <Alerts alerts={cms.alerts} />
-        {enabled && styled && <Theme />}
-        {enabled && cms.toolbar && <Toolbar />}
-        <MediaManager />
-        {cms.sidebar ? (
-          <SidebarProvider position={position} sidebar={cms.sidebar}>
-            {children}
-          </SidebarProvider>
-        ) : (
-          children
-        )}
-      </ModalProvider>
+      <CMSEnabledContext.Provider value={cms.enabled}>
+        <ModalProvider>
+          <Alerts alerts={cms.alerts} />
+          {enabled && styled && <Theme />}
+          {enabled && cms.toolbar && <Toolbar />}
+          <MediaManager />
+          {cms.sidebar ? (
+            <SidebarProvider position={position} sidebar={cms.sidebar}>
+              {children}
+            </SidebarProvider>
+          ) : (
+            children
+          )}
+        </ModalProvider>
+      </CMSEnabledContext.Provider>
     </CMSContext.Provider>
   )
 }
