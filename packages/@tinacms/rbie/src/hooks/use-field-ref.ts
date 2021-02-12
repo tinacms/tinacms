@@ -1,12 +1,19 @@
 import * as React from 'react'
 import { useCMS, useCMSEvent } from 'tinacms'
 
-// TODO don't pass `node`, that needs to be registered elsewhere
 export const useFieldRef = (formId: string, fieldName: string) => {
   const [node, setNode] = React.useState(null) as any
   const [initialOpacity, setInitialOpacity] = React.useState('1.0')
 
+  const cms = useCMS() // this is one instance where we need an "anywhere event bus" https://github.com/tinacms/rfcs/blob/ddb360eec21f91f1331ee18f49fc64cc4a69a2e7/0013-tina-anywhere.md#event-bus-as-the-primary-thing-doer
+
   React.useEffect(() => {
+    cms.events.dispatch({
+      type: `form:${formId}:ref:${fieldName}`,
+      field: fieldName,
+      form: formId,
+      node,
+    })
     if (node) {
       setInitialOpacity(node.style.opacity || '1.0')
     }
@@ -24,8 +31,6 @@ export const useFieldRef = (formId: string, fieldName: string) => {
     [node, formId, fieldName]
   )
 
-  const cms = useCMS() // this is one instance where we need an "anywhere event bus" https://github.com/tinacms/rfcs/blob/ddb360eec21f91f1331ee18f49fc64cc4a69a2e7/0013-tina-anywhere.md#event-bus-as-the-primary-thing-doer
-
   const handleClick = React.useCallback(
     (e: React.MouseEvent<any>) => {
       e.preventDefault()
@@ -34,10 +39,9 @@ export const useFieldRef = (formId: string, fieldName: string) => {
         type: `form:${formId}:fields:${fieldName}:focus`,
         form: formId,
         field: fieldName,
-        node,
       })
     },
-    [cms.events, formId, fieldName, node]
+    [cms.events, formId, fieldName]
   )
 
   const handleHoverStart = React.useCallback(
@@ -48,10 +52,9 @@ export const useFieldRef = (formId: string, fieldName: string) => {
         type: `form:${formId}:fields:${fieldName}:attentionStart`,
         form: formId,
         field: fieldName,
-        node,
       })
     },
-    [cms.events, formId, fieldName, node]
+    [cms.events, formId, fieldName]
   )
 
   const handleHoverEnd = React.useCallback(
@@ -62,10 +65,9 @@ export const useFieldRef = (formId: string, fieldName: string) => {
         type: `form:${formId}:fields:${fieldName}:attentionEnd`,
         form: formId,
         field: fieldName,
-        node,
       })
     },
-    [cms.events, formId, fieldName, node]
+    [cms.events, formId, fieldName]
   )
 
   React.useEffect(() => {

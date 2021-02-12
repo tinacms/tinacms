@@ -9,50 +9,63 @@ interface FieldNode {
 }
 
 const FormFieldRenderer = ({ form }: { form: any }) => {
-  const [focusedField, setFocusedField] = React.useState<FieldNode>({
-    field: '',
-    node: null,
-  })
+  const [fieldNodes, fieldNodeActions] = useMap<{ [key: string]: any }>({})
+  const [focusedField, setFocusedField] = React.useState('')
   const [attentionFields, attentionFieldActions] = useMap<{
     [key: string]: any
   }>({})
 
   useCMSEvent(
-    `form:${form.id}:fields:*:focus`,
+    `form:${form.id}:ref:*`,
     ({ field, node }) => {
-      setFocusedField({ field, node })
+      fieldNodeActions.set(field, node)
     },
-    [form.id, setFocusedField, Math.random()]
+    [fieldNodeActions.set]
+  )
+
+  useCMSEvent(
+    `form:${form.id}:fields:*:focus`,
+    ({ field }) => {
+      setFocusedField(field)
+    },
+    [setFocusedField]
   )
 
   useCMSEvent(
     `form:${form.id}:fields:*:attentionStart`,
-    ({ field, node }) => {
-      attentionFieldActions.set(field, node)
+    ({ field }) => {
+      attentionFieldActions.set(field, true)
     },
-    []
+    [attentionFieldActions.set]
   )
 
   useCMSEvent(
     `form:${form.id}:fields:*:attentionEnd`,
     ({ field }) => {
-      attentionFieldActions.set(field, null)
+      attentionFieldActions.set(field, false)
     },
-    []
+    [attentionFieldActions.set]
   )
 
   const field = React.useMemo(() => {
-    return form.fields.find((field: any) => field.name === focusedField.field)
-  }, [form.id, focusedField.field])
+    return form.fields.find((field: any) => field.name === focusedField)
+  }, [form.id, focusedField])
 
   return (
     <>
-      {Object.entries(attentionFields).map(([, node]) => {
-        return <FieldOverlay targetNode={node} attention={true}></FieldOverlay>
-      })}
+      {Object.entries(attentionFields)
+        .filter(([, hasAttention]) => hasAttention)
+        .map(([field]) => {
+          return (
+            <FieldOverlay
+              targetNode={fieldNodes[field]}
+              attention={true}
+            ></FieldOverlay>
+          )
+        })}
       {focusedField ? (
         <FieldOverlay
-          targetNode={focusedField.node}
+          targetNode={fieldNodes[focusedField]}
           attention={!(field && field.inlineComponent)}
         >
           {field && field.inlineComponent ? (
