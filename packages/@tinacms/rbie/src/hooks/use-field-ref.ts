@@ -1,6 +1,7 @@
 import * as React from 'react'
 import { useCMS } from 'tinacms'
 
+// TODO don't pass `node`, that needs to be registered elsewhere
 export const useFieldRef = (formId: string, fieldName: string) => {
   const [node, setNode] = React.useState(null) as any
 
@@ -14,9 +15,10 @@ export const useFieldRef = (formId: string, fieldName: string) => {
         type: `form:${formId}:fields:${fieldName}:focus`,
         form: formId,
         field: fieldName,
+        node,
       })
     },
-    [cms.events, formId, fieldName]
+    [cms.events, formId, fieldName, node]
   )
 
   const handleHoverStart = React.useCallback(
@@ -27,9 +29,10 @@ export const useFieldRef = (formId: string, fieldName: string) => {
         type: `form:${formId}:fields:${fieldName}:attentionStart`,
         form: formId,
         field: fieldName,
+        node,
       })
     },
-    [cms.events, formId, fieldName]
+    [cms.events, formId, fieldName, node]
   )
 
   const handleHoverEnd = React.useCallback(
@@ -40,9 +43,10 @@ export const useFieldRef = (formId: string, fieldName: string) => {
         type: `form:${formId}:fields:${fieldName}:attentionEnd`,
         form: formId,
         field: fieldName,
+        node,
       })
     },
-    [cms.events, formId, fieldName]
+    [cms.events, formId, fieldName, node]
   )
 
   React.useEffect(() => {

@@ -23,8 +23,11 @@
     "@tinacms/scripts": "^0.29.0"
   },
   "peerDependencies": {
-    "react": ">=16.8",
-    "tinacms": "*"
+    "react": ">=16.8"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd",
+  "dependencies": {
+    "react-use": "^17.1.1",
+    "tinacms": "^0.37.0"
+  }
 }
