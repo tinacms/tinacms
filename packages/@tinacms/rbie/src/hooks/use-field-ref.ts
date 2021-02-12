@@ -1,9 +1,28 @@
 import * as React from 'react'
-import { useCMS } from 'tinacms'
+import { useCMS, useCMSEvent } from 'tinacms'
 
 // TODO don't pass `node`, that needs to be registered elsewhere
 export const useFieldRef = (formId: string, fieldName: string) => {
   const [node, setNode] = React.useState(null) as any
+  const [initialOpacity, setInitialOpacity] = React.useState('1.0')
+
+  React.useEffect(() => {
+    if (node) {
+      setInitialOpacity(node.style.opacity || '1.0')
+    }
+  }, [node])
+
+  useCMSEvent(
+    `form:${formId}:fields:*:focus`,
+    ({ field }) => {
+      if (field === fieldName) {
+        node.style.opacity = '0.0'
+      } else {
+        node.style.opacity = initialOpacity
+      }
+    },
+    [node, formId, fieldName]
+  )
 
   const cms = useCMS() // this is one instance where we need an "anywhere event bus" https://github.com/tinacms/rfcs/blob/ddb360eec21f91f1331ee18f49fc64cc4a69a2e7/0013-tina-anywhere.md#event-bus-as-the-primary-thing-doer
 
