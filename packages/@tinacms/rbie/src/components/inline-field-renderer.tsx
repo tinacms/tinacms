@@ -17,14 +17,9 @@ const FormFieldRenderer = ({ form }: { form: string }) => {
     [key: string]: any
   }>({})
 
-  React.useEffect(() => {
-    console.log(attentionFields)
-  }, [attentionFields])
-
   useCMSEvent(
     `form:${form}:fields:*:focus`,
     ({ field, node }) => {
-      console.log(`focus: ${field}`)
       setFocusedField({ field, node })
     },
     [form, setFocusedField, Math.random()]
@@ -33,7 +28,6 @@ const FormFieldRenderer = ({ form }: { form: string }) => {
   useCMSEvent(
     `form:${form}:fields:*:attentionStart`,
     ({ field, node }) => {
-      console.log('attentionStart')
       attentionFieldActions.set(field, node)
     },
     []
@@ -42,7 +36,6 @@ const FormFieldRenderer = ({ form }: { form: string }) => {
   useCMSEvent(
     `form:${form}:fields:*:attentionEnd`,
     ({ field }) => {
-      console.log('attentionEnd')
       attentionFieldActions.set(field, null)
     },
     []
