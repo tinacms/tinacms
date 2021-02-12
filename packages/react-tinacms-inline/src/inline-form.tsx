@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
-import { FormBuilder, Form } from 'tinacms'
+import { FormBuilder, Form, useCMS } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
 
 export interface InlineFormProps {
@@ -43,6 +43,8 @@ export interface InlineFormState {
 
 export function InlineForm({ form, children }: InlineFormProps) {
   const [focussedField, setFocussedField] = React.useState<string>('')
+
+  const cms = useCMS()
 
   const inlineFormState = React.useMemo(() => {
     return {
@@ -70,7 +72,16 @@ export function InlineForm({ form, children }: InlineFormProps) {
           setFocussedField('')
         }}
       >
-        <div onClick={() => setFocussedField('')}>
+        <div
+          onClick={() => {
+            cms.events.dispatch({
+              type: `form:${form.id}:fields::focus`,
+              form: form.id,
+              field: '',
+            })
+            setFocussedField('')
+          }}
+        >
           <FormBuilder form={form}>
             {({ form, ...formProps }) => {
               if (typeof children !== 'function') {
