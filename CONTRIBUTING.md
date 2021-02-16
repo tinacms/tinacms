@@ -2,6 +2,10 @@
 
 The following is a set of guidelines and tips for contributing to the TinaCMS and its packages.
 
+## Contributor License Agreement
+
+Before a Pull Request can be accepted, all contributors must sign the [Contributor License Agreement](https://cla-assistant.io/tinacms/tinacms). A GitHub Action runs against all Pull Requests to ensure that **all commit authors** on the associated Pull Request have signed the agreement.
+
 ## Development
 
 **Disclaimer**:
