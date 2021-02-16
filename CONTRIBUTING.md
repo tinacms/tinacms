@@ -25,7 +25,7 @@ npm run build
 
 # Start Next.js Demo
 cd packages/demo-next
-npm run dev
+npm run develop
 ```
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**
