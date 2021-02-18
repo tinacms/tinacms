@@ -23,7 +23,7 @@ export interface Field<F extends Field = AnyField> {
   label?: string
   description?: string
   component: React.FC<any> | string | null
-  inlineComponent?: React.FC<F['name']>
+  inlineComponent?: React.FC<any>
   parse?: (value: any, name: string, field: F) => any
   format?: (value: any, name: string, field: F) => any
   validate?(
