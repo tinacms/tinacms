@@ -16,21 +16,18 @@ limitations under the License.
 
 */
 
-export * from './inline-form'
-export * from './inline-field'
-export * from './inline-field-context'
-export {
-  InlineText,
-  InlineTextField,
-  InlineTextProps,
-} from './fields/inline-text-field'
-export {
-  InlineTextarea,
-  InlineTextareaField,
-} from './fields/inline-textarea-field'
-export * from './fields/inline-image'
-export * from './inline-group'
-export { InlineSettings } from './inline-settings'
-export * from './blocks'
-export * from './styles'
-export * from './rbie'
+export interface RBIEPluginConfig {
+  active?: boolean
+}
+
+export class RBIEPlugin {
+  public __type = 'unstable_featureflag'
+  public name = 'ref-based-inline-editor'
+  public active = true
+
+  constructor(config?: RBIEPluginConfig) {
+    if (config?.active) {
+      this.active = config.active
+    }
+  }
+}
