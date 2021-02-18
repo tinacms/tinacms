@@ -3,6 +3,22 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.37.0](https://github.com/tinacms/tinacms/compare/v0.36.1...v0.37.0) (2021-02-08)
+
+
+### Bug Fixes
+
+* radio group name attr ([996c468](https://github.com/tinacms/tinacms/commit/996c468030a9e1f00dc91b8d4e05ba1d5bad1de1))
+
+
+### Features
+
+* radio group field ([7b53a64](https://github.com/tinacms/tinacms/commit/7b53a649edd35b50522ec70b1ea968bc8e8f6c99))
+
+
+
+
+
 # [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
 
 **Note:** Version bump only for package @tinacms/fields

@@ -2,6 +2,10 @@
 
 The following is a set of guidelines and tips for contributing to the TinaCMS and its packages.
 
+## Contributor License Agreement
+
+Before a Pull Request can be accepted, all contributors must sign the [Contributor License Agreement](https://cla-assistant.io/tinacms/tinacms). A GitHub Action runs against all Pull Requests to ensure that **all commit authors** on the associated Pull Request have signed the agreement.
+
 ## Development
 
 **Disclaimer**:
@@ -9,7 +13,7 @@ The following is a set of guidelines and tips for contributing to the TinaCMS an
 - Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
 - Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
 
-_Recommended: use the lts/dubnium version of node (v 10.20.1)_
+_Recommended: use the [active LTS version of Node.js](https://nodejs.org/en/about/releases/)_
 
 To get started:
 
@@ -21,7 +25,7 @@ npm run build
 
 # Start Next.js Demo
 cd packages/demo-next
-npm run dev
+npm run develop
 ```
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**

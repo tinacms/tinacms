@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.37.0](https://github.com/tinacms/tinacms/compare/v0.36.1...v0.37.0) (2021-02-08)
+
+### Bug Fixes
+
+- check if cleanup is needed before cleaning up ([bbdc166](https://github.com/tinacms/tinacms/commit/bbdc166190446311ea3374e1db92246beae24da9))
+- **react-tinacms-inline:** Fix ability to clear field selection, closes [#1725](https://github.com/tinacms/tinacms/issues/1725) ([3e8aab4](https://github.com/tinacms/tinacms/commit/3e8aab4f324454752e2a88d99e9bdf869c26447f))
+- radio group name attr ([996c468](https://github.com/tinacms/tinacms/commit/996c468030a9e1f00dc91b8d4e05ba1d5bad1de1))
+
+### Features
+
+- radio group field ([7b53a64](https://github.com/tinacms/tinacms/commit/7b53a649edd35b50522ec70b1ea968bc8e8f6c99))
+
 ## [0.36.1](https://github.com/tinacms/tinacms/compare/v0.36.0...v0.36.1) (2021-02-01)
 
 ### Bug Fixes
