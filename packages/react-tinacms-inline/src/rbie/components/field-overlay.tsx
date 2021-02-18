@@ -37,17 +37,33 @@ export function FieldOverlay({
   const [, setState] = React.useState(0)
   useWindowResize(() => setState(s => s + 1))
   if (!targetNode) return null
-  return (
-    <div
-      style={{
-        position: 'absolute',
-        zIndex: 400,
+
+  const styles = attention
+    ? {
+        pointerEvents: 'none',
+        border: '1px solid var(--tina-color-primary)',
+        borderRadius: '10px',
+        boxShadow: 'var(--tina-shadow-big)',
+        opacity: '0.3',
+        cursor: 'pointer',
+        width: targetNode?.offsetWidth + 32,
+        height: targetNode?.offsetHeight + 32,
+        top: targetNode?.offsetTop - 16,
+        left: targetNode?.offsetLeft - 16,
+      }
+    : {
         top: targetNode?.offsetTop,
         left: targetNode?.offsetLeft,
         width: targetNode?.offsetWidth,
         height: targetNode?.offsetHeight,
-        border: attention ? '1px solid var(--tina-color-primary)' : 'none',
-        pointerEvents: attention ? 'none' : 'initial',
+      }
+  return (
+    <div
+      className="FieldOverlay"
+      style={{
+        position: 'absolute',
+        zIndex: 400,
+        ...(styles as any),
       }}
     >
       {children}
