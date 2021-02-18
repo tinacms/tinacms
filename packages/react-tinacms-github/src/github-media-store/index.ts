@@ -44,7 +44,7 @@ export class GithubMediaStore implements MediaStore {
 
       try {
         const content = (await base64File(file)).toString().split(',')[1] // only need the data piece
-        const uploadResponse: GithubUploadResposne = await this.githubClient.upload(
+        const uploadResponse: GithubUploadResponse = await this.githubClient.upload(
           mediaPath,
           content,
           'Upload',
@@ -120,7 +120,7 @@ const contentToMedia = (item: GithubContent): Media => {
   return mediaItem
 }
 
-interface GithubUploadResposne {
+interface GithubUploadResponse {
   content: GithubContent
 }
 
