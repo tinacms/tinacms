@@ -17,20 +17,21 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { useCMS, useCMSEvent } from 'tinacms'
+import { useCMS, useCMSEvent, Form, Field } from 'tinacms'
 import { FieldOverlay } from './field-overlay'
 import { useMap } from 'react-use'
 
-// interface FieldNode {
-//   field: string
-//   node: any
-// }
+interface FormFieldRendererProps {
+  form: Form
+}
 
-const FormFieldRenderer = ({ form }: { form: any }) => {
-  const [fieldNodes, fieldNodeActions] = useMap<{ [key: string]: any }>({})
+const FormFieldRenderer = ({ form }: FormFieldRendererProps) => {
+  const [fieldNodes, fieldNodeActions] = useMap<{
+    [key: string]: HTMLElement | null
+  }>({})
   const [focusedField, setFocusedField] = React.useState('')
   const [attentionFields, attentionFieldActions] = useMap<{
-    [key: string]: any
+    [key: string]: boolean
   }>({})
 
   useCMSEvent(
@@ -66,7 +67,7 @@ const FormFieldRenderer = ({ form }: { form: any }) => {
   )
 
   const field = React.useMemo(() => {
-    return form.fields.find((field: any) => field.name === focusedField)
+    return form.fields.find((field: Field) => field.name === focusedField)
   }, [form.id, focusedField])
 
   return (
@@ -97,9 +98,9 @@ const FormFieldRenderer = ({ form }: { form: any }) => {
   )
 }
 
-export const InlineFieldRenderer = () => {
+export const InlineFieldsRenderer = () => {
   const cms = useCMS()
-  const forms = cms.plugins.getType<any>('form').all()
+  const forms = cms.plugins.getType<Form>('form').all()
 
   return (
     <>

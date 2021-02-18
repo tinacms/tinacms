@@ -20,7 +20,7 @@ import * as React from 'react'
 import { useCMS, useCMSEvent } from 'tinacms'
 
 export const useFieldRef = (formId: string, fieldName: string) => {
-  const [node, setNode] = React.useState(null) as any
+  const [node, setNode] = React.useState<HTMLElement | null>(null)
   const [initialOpacity, setInitialOpacity] = React.useState('1.0')
 
   const cms = useCMS() // this is one instance where we need an "anywhere event bus" https://github.com/tinacms/rfcs/blob/ddb360eec21f91f1331ee18f49fc64cc4a69a2e7/0013-tina-anywhere.md#event-bus-as-the-primary-thing-doer
@@ -41,16 +41,16 @@ export const useFieldRef = (formId: string, fieldName: string) => {
     `form:${formId}:fields:*:focus`,
     ({ field }) => {
       if (field === fieldName) {
-        node.style.opacity = '0.0'
+        node!.style.opacity = '0.0'
       } else {
-        node.style.opacity = initialOpacity
+        node!.style.opacity = initialOpacity
       }
     },
     [node, formId, fieldName]
   )
 
   const handleClick = React.useCallback(
-    (e: React.MouseEvent<any>) => {
+    (e: MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
       cms.events.dispatch({
@@ -63,7 +63,7 @@ export const useFieldRef = (formId: string, fieldName: string) => {
   )
 
   const handleHoverStart = React.useCallback(
-    (e: React.MouseEvent<any>) => {
+    (e: MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
       cms.events.dispatch({
@@ -76,7 +76,7 @@ export const useFieldRef = (formId: string, fieldName: string) => {
   )
 
   const handleHoverEnd = React.useCallback(
-    (e: React.MouseEvent<any>) => {
+    (e: MouseEvent) => {
       e.preventDefault()
       e.stopPropagation()
       cms.events.dispatch({
