@@ -13,7 +13,7 @@ Before a Pull Request can be accepted, all contributors must sign the [Contribut
 - Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
 - Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
 
-_Recommended: use the lts/dubnium version of node (v 10.20.1)_
+_Recommended: use the [active LTS version of Node.js](https://nodejs.org/en/about/releases/)_
 
 To get started:
 
