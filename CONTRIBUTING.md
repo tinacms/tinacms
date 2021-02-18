@@ -71,6 +71,7 @@ This section contains solutions to various problems you may run into when develo
 
 - [I pulled down changes and now the packages won't build](#I-pulled-down-changes-and-now-my-packages-won't-build)
 - [I can't add dependencies to a package](#I-can't-add-dependencies-to-a-package)
+- [Run Development Packages ](#Run-Development-Packages)
 
 ### I pulled down changes and now my packages won't build
 
@@ -121,6 +122,17 @@ There are two reasons this error might occur:
 
    This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
 
+### Run Development Packages
+
+After installing the development setup you can run demo applications contained in the _packages_ directory **demo-cra**, **demo-gatsby** and **demo-next**.
+
+These projects can be used as a development environment for Tina packages, you can edit any other package contained within Tina packages.
+
+When editing the packages of tina we can execute the command `npm run dev` to execute an development build on the repository packages.
+
+This command will build all Tina packages. This will reflect in the references of the tina demo packages, thus updating the demo packages according to the changes made.
+
+This way you can change the tinacms packages and test the changes in the demo packages as a development environment.
 
 ## Release Process
 
