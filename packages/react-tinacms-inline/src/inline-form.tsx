@@ -20,6 +20,8 @@ import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
 import { FormBuilder, Form, useCMS } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
+import { RBIEPlugin } from './rbie/plugins/rbie-plugin'
+import { InlineFieldsRenderer } from './rbie/components/inline-fields-renderer'
 
 export interface InlineFormProps {
   form: Form
@@ -45,6 +47,11 @@ export function InlineForm({ form, children }: InlineFormProps) {
   const [focussedField, setFocussedField] = React.useState<string>('')
 
   const cms = useCMS()
+  const rbie = React.useMemo(() => {
+    return cms.plugins
+      .getType<RBIEPlugin>('unstable_featureflag')
+      .find('ref-based-inline-editor')
+  }, [cms.plugins])
 
   const inlineFormState = React.useMemo(() => {
     return {
@@ -82,17 +89,18 @@ export function InlineForm({ form, children }: InlineFormProps) {
             setFocussedField('')
           }}
         >
-          <FormBuilder form={form}>
-            {({ form, ...formProps }) => {
-              if (typeof children !== 'function') {
-                return children
-              }
-
-              return children({
-                ...formProps,
-                ...inlineFormState,
-              })
-            }}
+          <FormBuilder form={form as any}>
+            {({ form, ...formProps }) => (
+              <>
+                {typeof children !== 'function'
+                  ? children
+                  : children({
+                      ...formProps,
+                      ...inlineFormState,
+                    })}
+                {rbie?.active && <InlineFieldsRenderer />}
+              </>
+            )}
           </FormBuilder>
         </div>
       </Dismissible>
