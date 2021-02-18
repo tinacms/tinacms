@@ -17,4 +17,4 @@ limitations under the License.
 */
 
 export * from './field-overlay'
-export * from './inline-field-renderer'
+export * from './inline-fields-renderer'
