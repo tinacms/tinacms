@@ -18,34 +18,11 @@ limitations under the License.
 
 import { render, act } from '@testing-library/react'
 import React, { useEffect } from 'react'
-import { TinaProvider, INVALID_CMS_ERROR } from './TinaProvider'
+import { TinaCMSProvider } from './TinaCMSProvider'
+import { TinaUI } from './TinaUI'
 import { TinaCMS } from '../tina-cms'
-import { CMS } from '@tinacms/core'
 
-describe('TinaProvider', () => {
-  describe('when passed an instance of CMS', () => {
-    it('throws error', () => {
-      const t = () => {
-        render(<TinaProvider cms={new CMS() as any} />)
-      }
-
-      expect(t).toThrowError(INVALID_CMS_ERROR)
-    })
-  })
-  describe('when passed an instance of TinaCMS', () => {
-    it('throws no error', () => {
-      render(<TinaProvider cms={new TinaCMS()} />)
-    })
-  })
-  describe('when passed an empty object', () => {
-    it('throws an Error', () => {
-      const t = () => {
-        render(<TinaProvider cms={{} as any} />)
-      }
-
-      expect(t).toThrowError(INVALID_CMS_ERROR)
-    })
-  })
+describe('TinaUI', () => {
   describe('when the CMS is enabled', () => {
     describe('when sidebar is true', () => {
       const cms = new TinaCMS({
@@ -55,15 +32,21 @@ describe('TinaProvider', () => {
 
       it('renders children', () => {
         const app = render(
-          <TinaProvider cms={cms}>
-            <span>something</span>
-          </TinaProvider>
+          <TinaCMSProvider cms={cms}>
+            <TinaUI>
+              <span>something</span>
+            </TinaUI>
+          </TinaCMSProvider>
         )
 
         app.getByText('something')
       })
       it('renders the "toggle cms" sidebar button', () => {
-        const app = render(<TinaProvider cms={cms} />)
+        const app = render(
+          <TinaCMSProvider cms={cms}>
+            <TinaUI />
+          </TinaCMSProvider>
+        )
 
         app.getByLabelText('toggles cms sidebar')
       })
@@ -76,15 +59,21 @@ describe('TinaProvider', () => {
 
       it('renders children', () => {
         const app = render(
-          <TinaProvider cms={cms}>
-            <span>something</span>
-          </TinaProvider>
+          <TinaCMSProvider cms={cms}>
+            <TinaUI>
+              <span>something</span>
+            </TinaUI>
+          </TinaCMSProvider>
         )
 
         app.getByText('something')
       })
       it('does not render the "toggle cms" sidebar button', () => {
-        const app = render(<TinaProvider cms={cms} />)
+        const app = render(
+          <TinaCMSProvider cms={cms}>
+            <TinaUI />
+          </TinaCMSProvider>
+        )
 
         const sidebarButton = app.queryByLabelText('toggles cms sidebar')
         expect(sidebarButton).toBeNull()
@@ -100,15 +89,21 @@ describe('TinaProvider', () => {
 
       it('renders children', () => {
         const app = render(
-          <TinaProvider cms={cms}>
-            <span>something</span>
-          </TinaProvider>
+          <TinaCMSProvider cms={cms}>
+            <TinaUI>
+              <span>something</span>
+            </TinaUI>
+          </TinaCMSProvider>
         )
 
         app.getByText('something')
       })
       it('does not render the "toggle cms" sidebar button', () => {
-        const app = render(<TinaProvider cms={cms} />)
+        const app = render(
+          <TinaCMSProvider cms={cms}>
+            <TinaUI />
+          </TinaCMSProvider>
+        )
 
         const sidebarButton = app.queryByLabelText('toggles cms sidebar')
         expect(sidebarButton).toBeNull()
@@ -124,9 +119,11 @@ describe('TinaProvider', () => {
           return null
         }
         render(
-          <TinaProvider cms={cms}>
-            <Child />
-          </TinaProvider>
+          <TinaCMSProvider cms={cms}>
+            <TinaUI>
+              <Child />
+            </TinaUI>
+          </TinaCMSProvider>
         )
 
         act(() => {
@@ -144,15 +141,21 @@ describe('TinaProvider', () => {
 
       it('renders children', () => {
         const app = render(
-          <TinaProvider cms={cms}>
-            <span>something</span>
-          </TinaProvider>
+          <TinaCMSProvider cms={cms}>
+            <TinaUI>
+              <span>something</span>
+            </TinaUI>
+          </TinaCMSProvider>
         )
 
         app.getByText('something')
       })
       it('does not render the "toggle cms" sidebar button', () => {
-        const app = render(<TinaProvider cms={cms} />)
+        const app = render(
+          <TinaCMSProvider cms={cms}>
+            <TinaUI />
+          </TinaCMSProvider>
+        )
 
         const sidebarButton = app.queryByLabelText('toggles cms sidebar')
         expect(sidebarButton).toBeNull()
