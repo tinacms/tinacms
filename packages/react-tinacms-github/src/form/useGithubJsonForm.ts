@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, Field } from 'tinacms'
+import { FormOptions, Field, WatchableFormValue } from 'tinacms'
 import { GitFile } from './useGitFileSha'
 import { useGithubFileForm } from './useGithubFileForm'
 
@@ -31,9 +31,17 @@ const serialize = (formData: any) => {
   return JSON.stringify(formData, null, 2)
 }
 
-export function useGithubJsonForm<T = any>(jsonFile: GitFile<T>, formOptions?: Options<T>) {
-  return useGithubFileForm<T>(jsonFile, {
-    ...formOptions,
-    serialize,
-  })
+export function useGithubJsonForm<T = any>(
+  jsonFile: GitFile<T>,
+  formOptions?: Options<T>,
+  watch?: Partial<WatchableFormValue>
+) {
+  return useGithubFileForm<T>(
+    jsonFile,
+    {
+      ...formOptions,
+      serialize,
+    },
+    watch
+  )
 }
