@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { FormOptions, Field } from 'tinacms'
+import { FormOptions, Field, WatchableFormValue } from 'tinacms'
 import { GitFile } from './useGitFileSha'
 import { toMarkdownString } from 'next-tinacms-markdown'
 import { useGithubFileForm } from './useGithubFileForm'
@@ -29,10 +29,15 @@ interface Options<T = any> {
 
 export function useGithubMarkdownForm<T = any>(
   markdownFile: GitFile<T>,
-  formOptions?: Options<T>
+  formOptions?: Options<T>,
+  watch?: Partial<WatchableFormValue>
 ) {
-  return useGithubFileForm<T>(markdownFile, {
-    ...formOptions,
-    serialize: toMarkdownString,
-  })
+  return useGithubFileForm<T>(
+    markdownFile,
+    {
+      ...formOptions,
+      serialize: toMarkdownString,
+    },
+    watch
+  )
 }

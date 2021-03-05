@@ -17,33 +17,37 @@ limitations under the License.
 */
 
 import { GitFile } from './useGitFileSha'
-import { useForm, FormOptions } from 'tinacms'
+import { useForm, FormOptions, WatchableFormValue } from 'tinacms'
 import { useGithubFile } from '../github-client'
 import { Form } from '@tinacms/forms'
 
-export interface GithubFormOptions <T = any> extends Partial<FormOptions<T>> {
+export interface GithubFormOptions<T = any> extends Partial<FormOptions<T>> {
   serialize: (data: any) => string
 }
 
 export const useGithubFileForm = <T = any>(
   file: GitFile<T>,
-  options: GithubFormOptions<T>
+  options: GithubFormOptions<T>,
+  watch?: Partial<WatchableFormValue>
 ): [T, Form] => {
   const githubFile = useGithubFile({
     path: file.fileRelativePath,
     serialize: options.serialize,
   })
 
-  const [formData, form] = useForm<T>({
-    id: file.fileRelativePath,
-    label: options.label || file.fileRelativePath,
-    initialValues: file.data,
-    fields: options.fields || [],
-    actions: options.actions || [],
-    onSubmit(formData) {
-      return githubFile.commit(formData)
+  const [formData, form] = useForm<T>(
+    {
+      id: file.fileRelativePath,
+      label: options.label || file.fileRelativePath,
+      initialValues: file.data,
+      fields: options.fields || [],
+      actions: options.actions || [],
+      onSubmit(formData) {
+        return githubFile.commit(formData)
+      },
     },
-  })
+    watch
+  )
 
   return [formData || file.data, form]
 }
