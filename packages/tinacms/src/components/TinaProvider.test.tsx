@@ -18,7 +18,7 @@ limitations under the License.
 
 import { render, act } from '@testing-library/react'
 import React, { useEffect } from 'react'
-import { TinaProvider, INVALID_CMS_ERROR } from './TinaProvider'
+import { TinaProvider, INVALID_CMS_ERROR, WrapperPlugin } from './TinaProvider'
 import { TinaCMS } from '../tina-cms'
 import { CMS } from '@tinacms/core'
 
@@ -156,6 +156,51 @@ describe('TinaProvider', () => {
 
         const sidebarButton = app.queryByLabelText('toggles cms sidebar')
         expect(sidebarButton).toBeNull()
+      })
+    })
+    describe('wrapper plugins', () => {
+      const testPlugin: WrapperPlugin = {
+        __type: 'unstable:wrapper',
+        name: 'test-wrapper',
+        wrap: (children: React.ReactNode) => (
+          <div>
+            <span data-testid="wrapper">app is wrapped</span>
+            {children}
+          </div>
+        ),
+      }
+
+      describe('when a wrapper plugin is registered', () => {
+        it('renders the wrapper', () => {
+          const cms = new TinaCMS({
+            enabled: false,
+          })
+          cms.plugins.add(testPlugin)
+          const app = render(
+            <TinaProvider cms={cms}>
+              <span>something</span>
+            </TinaProvider>
+          )
+          expect(app.getByTestId('wrapper').textContent).toEqual(
+            'app is wrapped'
+          )
+        })
+        describe('when a wrapper plugin is removed', () => {
+          const cms = new TinaCMS({
+            enabled: false,
+          })
+          cms.plugins.add(testPlugin)
+          const app = render(
+            <TinaProvider cms={cms}>
+              <span>something</span>
+            </TinaProvider>
+          )
+          cms.plugins.remove(testPlugin)
+          it('no longer renders the wrapper', () => {
+            cms.plugins.remove(testPlugin)
+            expect(app.queryByTestId('wrapper')).toBeFalsy()
+          })
+        })
       })
     })
   })

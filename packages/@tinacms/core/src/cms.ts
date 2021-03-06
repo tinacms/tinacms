@@ -28,6 +28,12 @@ import { EventBus } from './event'
 import { MediaManager, MediaStore } from './media'
 import { DummyMediaStore } from './media-store.default'
 
+export interface InitializerPlugin extends Plugin {
+  __type: 'unstable:initializer'
+  init: (cms: CMS) => void
+  deinit: (cms: CMS) => void
+}
+
 /**
  * A [[CMS]] is the core object of any content management system.
  *
@@ -134,6 +140,17 @@ export class CMS {
     if (config.plugins) {
       config.plugins.forEach(plugin => this.plugins.add(plugin))
     }
+
+    this.events.subscribe('plugin:add:unstable:initializer', ({ plugin }) => {
+      plugin.init(this)
+    })
+
+    this.events.subscribe(
+      'plugin:remove:unstable:initializer',
+      ({ plugin }) => {
+        plugin.deinit(this)
+      }
+    )
 
     if (config.apis) {
       Object.entries(config.apis).forEach(([name, api]) =>

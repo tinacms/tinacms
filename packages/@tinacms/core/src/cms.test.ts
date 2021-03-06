@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { CMS } from './cms'
+import { CMS, InitializerPlugin } from './cms'
 import { CMSEvent, EventBus } from './event'
 
 describe('CMS', () => {
@@ -103,6 +103,32 @@ describe('CMS', () => {
 
         expect(listener).toHaveBeenCalledWith(event)
       })
+    })
+  })
+})
+
+describe('initializer plugins', () => {
+  const initialize = jest.fn()
+  const deinitialize = jest.fn()
+  const plugin: InitializerPlugin = {
+    __type: 'unstable:initializer',
+    name: 'test-initializer',
+    init: initialize,
+    deinit: deinitialize,
+  }
+  const cms = new CMS()
+
+  describe('when an initializer plugin is added', () => {
+    it("calls the plugin's `init` method", () => {
+      cms.plugins.add(plugin)
+      expect(initialize).toHaveBeenCalledWith(cms)
+    })
+  })
+  describe('when an initializer plugin is removed', () => {
+    it("calls the plugin's `deinit` method", () => {
+      cms.plugins.add(plugin)
+      cms.plugins.remove(plugin)
+      expect(deinitialize).toHaveBeenCalledWith(cms)
     })
   })
 })
