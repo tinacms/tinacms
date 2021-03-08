@@ -954,6 +954,15 @@
       "contributions": [
         "doc"
       ]
+    },
+    {
+      "login": "travismiller",
+      "name": "Travis Miller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/494017?v=4",
+      "profile": "https://travismiller.com/",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
