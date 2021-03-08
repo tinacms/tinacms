@@ -17,25 +17,10 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { ModalProvider } from '@tinacms/react-modals'
-import { Theme } from '@tinacms/styles'
-import { SidebarProvider, SidebarPosition } from '@tinacms/react-sidebar'
-import { Toolbar } from '@tinacms/react-toolbar'
-import { TinaCMS } from '../tina-cms'
-import { CMSContext } from '../react-tinacms'
-import { Alerts } from '@tinacms/react-alerts'
-import { useState, useEffect } from 'react'
-import { MediaManager } from './media'
+import { TinaCMSProvider, TinaCMSProviderProps } from './TinaCMSProvider'
+import { TinaUI, TinaUIProps } from './TinaUI'
 
-export interface TinaProviderProps {
-  cms: TinaCMS
-  hidden?: boolean
-  position?: SidebarPosition
-  styled?: boolean
-}
-
-export const INVALID_CMS_ERROR =
-  'The `cms` prop must be an instance of `TinaCMS`.'
+export interface TinaProviderProps extends TinaCMSProviderProps, TinaUIProps {}
 
 export const TinaProvider: React.FC<TinaProviderProps> = ({
   cms,
@@ -43,34 +28,12 @@ export const TinaProvider: React.FC<TinaProviderProps> = ({
   position,
   styled = true,
 }) => {
-  const [enabled, setEnabled] = useState(cms.enabled)
-
-  useEffect(() => {
-    return cms.events.subscribe('cms', () => {
-      setEnabled(cms.enabled)
-    })
-  }, [])
-
-  if (!(cms instanceof TinaCMS)) {
-    throw new Error(INVALID_CMS_ERROR)
-  }
-
   return (
-    <CMSContext.Provider value={cms}>
-      <ModalProvider>
-        <Alerts alerts={cms.alerts} />
-        {enabled && styled && <Theme />}
-        {enabled && cms.toolbar && <Toolbar />}
-        <MediaManager />
-        {cms.sidebar ? (
-          <SidebarProvider position={position} sidebar={cms.sidebar}>
-            {children}
-          </SidebarProvider>
-        ) : (
-          children
-        )}
-      </ModalProvider>
-    </CMSContext.Provider>
+    <TinaCMSProvider cms={cms}>
+      <TinaUI position={position} styled={styled}>
+        {children}
+      </TinaUI>
+    </TinaCMSProvider>
   )
 }
 

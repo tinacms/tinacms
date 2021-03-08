@@ -49,6 +49,11 @@ export {
   TinaProps,
 } from './components/TinaProvider'
 export {
+  TinaCMSProvider,
+  TinaCMSProviderProps,
+} from './components/TinaCMSProvider'
+export { TinaUI, TinaUIProps } from './components/TinaUI'
+export {
   MediaPaginatorPlugin,
   BaseMediaPaginator,
   MediaPaginatorProps,
