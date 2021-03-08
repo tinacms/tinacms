@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.38.0](https://github.com/tinacms/tinacms/compare/v0.37.0...v0.38.0) (2021-03-08)
+
+
+### Features
+
+* **react-tinacms-inline:** add RBIE feature flag plugin ([cc63851](https://github.com/tinacms/tinacms/commit/cc63851430c5e0c2555504d9f726233a47011c8d))
+
+
+
+
+
 # [0.37.0](https://github.com/tinacms/tinacms/compare/v0.36.1...v0.37.0) (2021-02-08)
 
 
