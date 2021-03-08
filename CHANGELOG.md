@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.38.0](https://github.com/tinacms/tinacms/compare/v0.37.0...v0.38.0) (2021-03-08)
+
+### Bug Fixes
+
+- typo in GithubUploadResponse type ([1c14cff](https://github.com/tinacms/tinacms/commit/1c14cffae83eade3887d865fc33783dd6c9f53d7))
+
+### Features
+
+- **react-tinacms-inline:** add RBIE feature flag plugin ([cc63851](https://github.com/tinacms/tinacms/commit/cc63851430c5e0c2555504d9f726233a47011c8d))
+- **react-tinacms-inline:** add useFieldRef hook ([49be9d2](https://github.com/tinacms/tinacms/commit/49be9d210f2ea6d61afd218a0dbf0a6e98e896f8))
+
 # [0.37.0](https://github.com/tinacms/tinacms/compare/v0.36.1...v0.37.0) (2021-02-08)
 
 ### Bug Fixes
