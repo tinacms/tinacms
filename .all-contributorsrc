@@ -945,6 +945,15 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "hirvin-faria",
+      "name": "Hirvin Faria",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42902087?v=4",
+      "profile": "https://hirvinfaria.dev",
+      "contributions": [
+        "doc"
+      ]
     }
   ],
   "contributorsPerLine": 7,
