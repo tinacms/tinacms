@@ -94,7 +94,7 @@ export function useMarkdownForm(
       },
       onChange(formState) {
         cms.api.git.writeToDisk({
-          fileRelativePath: formState.values.fileRelativePath,
+          fileRelativePath: markdownFile.fileRelativePath,
           content: toMarkdownString(formState.values),
         })
       },
