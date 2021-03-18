@@ -22,5 +22,6 @@ import { Field } from './field'
 export interface ContentCreatorPlugin<FormShape> extends Plugin {
   __type: 'content-creator'
   fields: Field[]
+  initialValues?: FormShape
   onSubmit(value: FormShape, cms: CMS): Promise<void> | void
 }

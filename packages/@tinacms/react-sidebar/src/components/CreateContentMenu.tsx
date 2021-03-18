@@ -98,6 +98,7 @@ const FormModal = ({ plugin, close }: any) => {
         id: 'create-form-id',
         actions: [],
         fields: plugin.fields,
+        initialValues: plugin.initialValues || {},
         onSubmit(values) {
           plugin.onSubmit(values, cms).then(() => {
             close()
