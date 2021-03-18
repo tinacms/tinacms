@@ -15,7 +15,7 @@ git pull
 npm run hard-reset
 
 # 3. Generate CHANGELOGs and Git Tags
-lerna version \
+npm run lerna version \
   --yes \
   --conventional-commits \
   --conventional-prerelease \
