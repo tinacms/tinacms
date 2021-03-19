@@ -30,6 +30,7 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.29.0",
     "@types/webfontloader": "^1.6.29",
+    "@types/styled-components": "^5.1.9",
     "styled-components": ">=4.1"
   },
   "peerDependencies": {

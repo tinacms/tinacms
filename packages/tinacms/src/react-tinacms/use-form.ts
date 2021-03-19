@@ -46,7 +46,11 @@ export function useGlobalForm<FormShape = any>(
 /**
  * Creates and registers ScreenPlugin that renders the given Form.
  */
-export function useFormScreenPlugin(form: Form, icon?: any, layout?: "fullscreen" | "popup") {
+export function useFormScreenPlugin(
+  form: Form,
+  icon?: any,
+  layout?: 'fullscreen' | 'popup'
+) {
   const GlobalForm = useMemo(() => {
     if (!form) return
 

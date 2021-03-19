@@ -10,6 +10,7 @@
     "dev": "lerna run dev --reject-cycles",
     "nuke": "./scripts/nuke.sh",
     "lerna": "lerna",
+    "tsup": "tsup",
     "hard-reset": "npm run nuke && npm run bs && npm run build",
     "test": "lerna run test --reject-cycles",
     "docs": "lerna run docs"
@@ -40,18 +41,21 @@
     "rollup": "^1.21.4",
     "rollup-plugin-commonjs": "^10.0.1",
     "rollup-plugin-replace": "^2.2.0",
-    "rollup-plugin-typescript2": "^0.22.0",
+    "rollup-plugin-typescript2": "^0.30.0",
     "rollup-plugin-uglify": "^6.0.4",
     "ts-jest": "^24.3.0",
     "tsdx": "^0.12.3",
-    "tslib": "^1.10.0",
+    "tslib": "^2.1.0",
     "typedoc": "^0.16.2",
     "typescript": "^3.8.2",
     "typescript-plugin-styled-components": "^1.4.4"
   },
   "dependencies": {
+    "chalk": "^4.1.0",
+    "chokidar": "^3.5.1",
     "danger": "^10.5.4",
     "depcheck": "^0.9.1",
+    "fast-glob": "^3.2.5",
     "tinacms": "^0.18.2"
   },
   "husky": {

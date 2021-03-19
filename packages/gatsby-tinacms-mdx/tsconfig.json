@@ -2,7 +2,7 @@
   "compilerOptions": {
     "strict": true,
     "declaration": true,
-    "target": "es5",
+    "target": "es6",
     "esModuleInterop": true,
     "jsx": "react",
     "lib": ["esnext", "dom"]

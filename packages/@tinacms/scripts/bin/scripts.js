@@ -22,6 +22,7 @@ const rollup = require('rollup')
 const rollupTypescript = require('rollup-plugin-typescript2')
 const rollupReplace = require('rollup-plugin-replace')
 const rollupCommonJs = require('rollup-plugin-commonjs')
+const tsup = require('tsup')
 const typescript = require('typescript')
 const { uglify } = require('rollup-plugin-uglify')
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components')
@@ -51,13 +52,32 @@ program
 
 const COMMANDS = {
   build() {
-    build(createBuildOptions({ uglify: true, debug: false }))
+    const options = createBuildOptions({ uglify: false, debug: true })
+    console.log(path.dirname(options.outputOptions.file))
+    tsup.build({
+      entryPoints: [options.inputOptions.input],
+      outDir: path.dirname(options.outputOptions.file),
+      dts: true,
+      format: ['cjs'],
+    })
+    // build(createBuildOptions({ uglify: true, debug: false }))
   },
   dev() {
     build(createBuildOptions({ uglify: false, debug: true }))
   },
   watch() {
-    watch(createBuildOptions({ uglify: false, debug: true }))
+    const options = createBuildOptions({ uglify: false, debug: true })
+    const dirname = path.dirname(options.outputOptions.file)
+    tsup.build({
+      entryPoints: [options.inputOptions.input],
+      dts: true,
+      outDir: dirname,
+      // tsup/chokidar gets mixed up between absolute and relative, so give both
+      ignoreWatch: [dirname, path.basename(dirname)],
+      watch: true,
+      format: ['cjs'],
+    })
+    // watch(createBuildOptions({ uglify: false, debug: true }))
   },
 }
 

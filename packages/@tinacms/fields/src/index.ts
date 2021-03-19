@@ -20,3 +20,11 @@ export * from './components'
 export * from './plugins'
 // TODO: Move this into components
 export * from './plugins/wrapFieldWithMeta'
+/**
+ *
+ * wrapFieldsWithMeta uses this type under the hood, but it doesn't
+ * export it so downstream compilations don't know what FieldProps is
+ *
+ * see discussion: https://github.com/microsoft/TypeScript/issues/5711#issuecomment-157793294
+ */
+export { FieldProps } from './plugins/fieldProps'
