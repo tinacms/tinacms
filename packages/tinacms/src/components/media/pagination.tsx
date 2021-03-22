@@ -48,8 +48,13 @@ export function PageLinks({ list, setOffset }: MediaPaginatorProps) {
 
   for (let i = 1; i <= numPages; i++) {
     const active = i === currentPageIndex
+    const nextOffset = (i - 1) * limit
     pageLinks.push(
-      <PageNumber active={active} onClick={() => setOffset(i * limit)}>
+      <PageNumber
+        key={`page-${i}`}
+        active={active}
+        onClick={() => setOffset(nextOffset)}
+      >
         {i}
       </PageNumber>
     )
