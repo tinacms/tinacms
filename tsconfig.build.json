@@ -1,0 +1,18 @@
+{
+  "$schema": "https://json.schemastore.org/tsconfig",
+  "compilerOptions": {
+    "strict": true,
+    "declaration": true,
+    "esModuleInterop": true,
+    "moduleResolution": "node",
+    "module": "commonjs",
+    "importHelpers": true,
+    "jsx": "react",
+    "outDir": "scripts",
+    "skipLibCheck": true,
+    "target": "es2020",
+    "lib": ["es2020"]
+  },
+  "include": ["./build-all.ts"],
+  "exclude": ["./node_modules"]
+}

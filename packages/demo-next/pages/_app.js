@@ -29,6 +29,8 @@ function Empty() {
   return <span>Hello from a custom empty state Component</span>
 }
 
+console.log('ttt', TinaCMS)
+
 export default class Site extends App {
   constructor() {
     super()

@@ -1,20 +1,15 @@
 #!/usr/bin/env node
 /**
-
 Copyright 2019 Forestry.io Inc
-
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
-
     http://www.apache.org/licenses/LICENSE-2.0
-
 Unless required by applicable law or agreed to in writing, software
 distributed under the License is distributed on an "AS IS" BASIS,
 WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
 See the License for the specific language governing permissions and
 limitations under the License.
-
 */
 
 const path = require('path')
@@ -22,7 +17,6 @@ const rollup = require('rollup')
 const rollupTypescript = require('rollup-plugin-typescript2')
 const rollupReplace = require('rollup-plugin-replace')
 const rollupCommonJs = require('rollup-plugin-commonjs')
-const tsup = require('tsup')
 const typescript = require('typescript')
 const { uglify } = require('rollup-plugin-uglify')
 const createStyledComponentsTransformer = require('typescript-plugin-styled-components')
@@ -52,32 +46,13 @@ program
 
 const COMMANDS = {
   build() {
-    const options = createBuildOptions({ uglify: false, debug: true })
-    console.log(path.dirname(options.outputOptions.file))
-    tsup.build({
-      entryPoints: [options.inputOptions.input],
-      outDir: path.dirname(options.outputOptions.file),
-      dts: true,
-      format: ['cjs'],
-    })
-    // build(createBuildOptions({ uglify: true, debug: false }))
+    build(createBuildOptions({ uglify: true, debug: false }))
   },
   dev() {
     build(createBuildOptions({ uglify: false, debug: true }))
   },
   watch() {
-    const options = createBuildOptions({ uglify: false, debug: true })
-    const dirname = path.dirname(options.outputOptions.file)
-    tsup.build({
-      entryPoints: [options.inputOptions.input],
-      dts: true,
-      outDir: dirname,
-      // tsup/chokidar gets mixed up between absolute and relative, so give both
-      ignoreWatch: [dirname, path.basename(dirname)],
-      watch: true,
-      format: ['cjs'],
-    })
-    // watch(createBuildOptions({ uglify: false, debug: true }))
+    watch(createBuildOptions({ uglify: false, debug: true }))
   },
 }
 
