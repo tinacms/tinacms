@@ -15,7 +15,6 @@ import { spawnSync } from 'child_process'
 const createBuildOptions = () => {
   const absolutePath = process.cwd()
 
-  console.log('ap', absolutePath)
   const pkg = require(path.join(absolutePath, 'package.json'))
   console.log(`Building Package: ${pkg.name}@${pkg.version}`)
 
@@ -24,12 +23,14 @@ const createBuildOptions = () => {
 
   const inputOptions: rollup.InputOptions = {
     input: path.join(absolutePath, 'src', 'index.ts'),
+    // WIP - these warnings should mostly not show up, we need to fix some of our missing dependencies
     external: [...dependencyKeys, ...peerDependencyKeys],
     plugins: [
       rollupTypescript({
         typescript,
         tsconfig: path.join(absolutePath, 'tsconfig.json'),
-        cacheRoot: path.join(absolutePath, '.rts2_cache'),
+        // without clean: true the cache blows up on multiple saves of the same file
+        clean: true,
         include: [
           path.join(absolutePath, 'src', '*.ts+(|x)'),
           path.join(absolutePath, 'src', '**/*.ts+(|x)'),
@@ -61,8 +62,13 @@ const createBuildOptions = () => {
   }
 }
 
-// @ts-ignore
-async function build({ inputOptions, outputOptions }) {
+async function build({
+  inputOptions,
+  outputOptions,
+}: {
+  inputOptions: rollup.InputOptions
+  outputOptions: rollup.OutputOptions
+}) {
   const bundle = await rollup.rollup(inputOptions)
 
   await bundle.generate(outputOptions)
@@ -96,10 +102,8 @@ const sequential = async <A, B>(
   return accum
 }
 
-// @ts-ignore
-const findParentPkgDesc = async (directory: string) => {
-  if (!directory) {
-    // @ts-ignore
+const findParentPkgDesc = async (directory: string): Promise<null | string> => {
+  if (!directory && module.parent) {
     directory = path.dirname(module.parent.filename)
   }
   const file = path.resolve(directory, 'package.json')
@@ -113,7 +117,7 @@ const findParentPkgDesc = async (directory: string) => {
   return findParentPkgDesc(parent)
 }
 
-const getLernaPackages = async () => {
+const getLernaPackages = async (): Promise<{ location: string }[]> => {
   const child = await spawnSync('npm', [
     'run',
     'lerna',
@@ -131,12 +135,13 @@ const getLernaPackages = async () => {
   const lernaPackages = JSON.parse(cleanedString)
   return lernaPackages
 }
+
 const run = async (skipInitialBuild: boolean = false) => {
+  console.log('running build', 'skip initial:', skipInitialBuild)
   const pkgs = await getLernaPackages()
   const origPwd = process.cwd()
   if (!skipInitialBuild) {
     sequential(pkgs, async pkg => {
-      // @ts-ignore
       process.chdir(pkg.location)
       try {
         await build(createBuildOptions())
@@ -147,7 +152,6 @@ const run = async (skipInitialBuild: boolean = false) => {
     })
   }
   const watcher = watch(
-    // @ts-ignore
     pkgs.map(entry => `${entry.location}/src/**/*`),
     {
       ignoreInitial: true,
@@ -155,19 +159,26 @@ const run = async (skipInitialBuild: boolean = false) => {
       ignored: ['**/{.git,node_modules}/**', 'build', 'dist'],
     }
   )
+
+  console.log('watching for changes')
   watcher.on('all', async (type, file) => {
-    const packageLocation = path.dirname(
-      await findParentPkgDesc(path.dirname(file))
-    )
+    const changedPkg = await findParentPkgDesc(file)
+    if (!changedPkg) {
+      console.log(
+        'Unable to find package associated with the change, not sure what happened there...'
+      )
+      return
+    }
+    const packageLocation = path.dirname(changedPkg)
+    console.log(`Detected change in ${packageLocation}, rebuilding...`)
+    // Change process.cwd() so the rollup process works as if it was running in that directory
     process.chdir(packageLocation)
-    // FIXME: For some reason this fails when watching with an error about one the files inside not existing
-    await fs.emptyDirSync(path.join(packageLocation, '.rts2_cache'))
-    console.log('changing to ', packageLocation)
     try {
       await build(createBuildOptions())
     } catch (e) {
       console.error(e)
     }
+    // Change it back to the pwd that the process was actually started in.
     process.chdir(origPwd)
   })
 }

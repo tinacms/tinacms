@@ -24,19 +24,20 @@ const child_process_1 = require('child_process')
  */
 const createBuildOptions = () => {
   const absolutePath = process.cwd()
-  console.log('ap', absolutePath)
   const pkg = require(path_1.default.join(absolutePath, 'package.json'))
   console.log(`Building Package: ${pkg.name}@${pkg.version}`)
   const dependencyKeys = Object.keys(pkg.dependencies || {})
   const peerDependencyKeys = Object.keys(pkg.peerDependencies || {})
   const inputOptions = {
     input: path_1.default.join(absolutePath, 'src', 'index.ts'),
+    // WIP - these warnings should mostly not show up, we need to fix some of our missing dependencies
     external: [...dependencyKeys, ...peerDependencyKeys],
     plugins: [
       rollup_plugin_typescript2_1.default({
         typescript: typescript_1.default,
         tsconfig: path_1.default.join(absolutePath, 'tsconfig.json'),
-        cacheRoot: path_1.default.join(absolutePath, '.rts2_cache'),
+        // without clean: true the cache blows up on multiple saves of the same file
+        clean: true,
         include: [
           path_1.default.join(absolutePath, 'src', '*.ts+(|x)'),
           path_1.default.join(absolutePath, 'src', '**/*.ts+(|x)'),
@@ -65,7 +66,6 @@ const createBuildOptions = () => {
     outputOptions,
   }
 }
-// @ts-ignore
 async function build({ inputOptions, outputOptions }) {
   const bundle = await rollup.rollup(inputOptions)
   await bundle.generate(outputOptions)
@@ -89,10 +89,8 @@ const sequential = async (items, callback) => {
   }
   return accum
 }
-// @ts-ignore
 const findParentPkgDesc = async directory => {
-  if (!directory) {
-    // @ts-ignore
+  if (!directory && module.parent) {
     directory = path_1.default.dirname(module.parent.filename)
   }
   const file = path_1.default.resolve(directory, 'package.json')
@@ -126,11 +124,11 @@ const getLernaPackages = async () => {
   return lernaPackages
 }
 const run = async (skipInitialBuild = false) => {
+  console.log('running build', 'skip initial:', skipInitialBuild)
   const pkgs = await getLernaPackages()
   const origPwd = process.cwd()
   if (!skipInitialBuild) {
     sequential(pkgs, async pkg => {
-      // @ts-ignore
       process.chdir(pkg.location)
       try {
         await build(createBuildOptions())
@@ -141,7 +139,6 @@ const run = async (skipInitialBuild = false) => {
     })
   }
   const watcher = chokidar_1.watch(
-    // @ts-ignore
     pkgs.map(entry => `${entry.location}/src/**/*`),
     {
       ignoreInitial: true,
@@ -149,21 +146,25 @@ const run = async (skipInitialBuild = false) => {
       ignored: ['**/{.git,node_modules}/**', 'build', 'dist'],
     }
   )
+  console.log('watching for changes')
   watcher.on('all', async (type, file) => {
-    const packageLocation = path_1.default.dirname(
-      await findParentPkgDesc(path_1.default.dirname(file))
-    )
+    const changedPkg = await findParentPkgDesc(file)
+    if (!changedPkg) {
+      console.log(
+        'Unable to find package associated with the change, not sure what happened there...'
+      )
+      return
+    }
+    const packageLocation = path_1.default.dirname(changedPkg)
+    console.log(`Detected change in ${packageLocation}, rebuilding...`)
+    // Change process.cwd() so the rollup process works as if it was running in that directory
     process.chdir(packageLocation)
-    // FIXME: For some reason this fails when watching with an error about one the files inside not existing
-    await fs_extra_1.default.emptyDirSync(
-      path_1.default.join(packageLocation, '.rts2_cache')
-    )
-    console.log('changing to ', packageLocation)
     try {
       await build(createBuildOptions())
     } catch (e) {
       console.error(e)
     }
+    // Change it back to the pwd that the process was actually started in.
     process.chdir(origPwd)
   })
 }
