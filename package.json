@@ -14,7 +14,9 @@
     "tsup": "tsup",
     "hard-reset": "npm run nuke && npm run bs && npm run build",
     "test": "lerna run test --reject-cycles",
-    "docs": "lerna run docs"
+    "docs": "lerna run docs",
+    "watch": "node packages/@tinacms/scripts/bin/scripts.js watchAll",
+    "watch:skip-initial": "node packages/@tinacms/scripts/bin/scripts.js watchAllSkipInitial"
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
