@@ -77,10 +77,9 @@ export function SettingsModal({
   const { form } = useInlineForm()
   const { name } = React.useContext(InlineFieldContext)
   const [initialValues] = React.useState(form.values)
+  console.log(form, name)
 
-  function handleCancel(event: any) {
-    event.stopPropagation()
-    event.preventDefault()
+  function handleCancel() {
     form.updateValues(initialValues)
     close()
   }
@@ -110,7 +109,7 @@ export function SettingsModal({
   return (
     <Modal id="tinacms-inline-settings" onClick={e => e.stopPropagation()}>
       <ModalPopup>
-        <ModalHeader close={close}>{title}</ModalHeader>
+        <ModalHeader close={handleCancel}>{title}</ModalHeader>
         <ModalBody>
           <DragDropContext onDragEnd={moveArrayItem}>
             <FormBody>
