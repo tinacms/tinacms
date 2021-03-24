@@ -77,7 +77,6 @@ export function SettingsModal({
   const { form } = useInlineForm()
   const { name } = React.useContext(InlineFieldContext)
   const [initialValues] = React.useState(form.values)
-  console.log(form, name)
 
   function handleCancel() {
     form.updateValues(initialValues)
