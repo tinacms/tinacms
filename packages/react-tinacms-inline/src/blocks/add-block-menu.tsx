@@ -216,7 +216,8 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
 
 const BlocksMenu = styled.div<AddMenuProps>`
   min-width: 192px;
-  border-radius: var(--tina-radius-big);
+  max-height: 25vh;
+  border-radius: var(--tina-radius-small);
   border: 1px solid var(--tina-color-grey-2);
   display: flex;
   flex-direction: column;
@@ -233,7 +234,31 @@ const BlocksMenu = styled.div<AddMenuProps>`
   transform-origin: 50% 0;
   box-shadow: var(--tina-shadow-big);
   background-color: white;
-  overflow: hidden;
+  overflow: auto;
+  background:
+		/* Shadow covers */ linear-gradient(
+      white 30%,
+      rgba(255, 255, 255, 0)
+    ),
+    linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,
+    /* Shadows */
+      linear-gradient(
+        to bottom,
+        var(--tina-color-grey-3),
+        var(--tina-color-grey-1),
+        rgba(0, 0, 0, 0)
+      ),
+    linear-gradient(
+        to top,
+        var(--tina-color-grey-3),
+        var(--tina-color-grey-1),
+        rgba(0, 0, 0, 0)
+      )
+      0 100%;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 100% 40px, 100% 40px, 100% 28px, 100% 28px;
+  background-attachment: local, local, scroll, scroll;
 
   ${props =>
     props.isOpen &&
@@ -267,6 +292,7 @@ const BlockOption = styled.button`
   font-size: var(--tina-font-size-1);
   padding: 0 12px;
   height: 34px;
+  flex: 0 0 auto;
   font-weight: var(--tina-font-weight-regular);
   width: 100%;
   background: none;
@@ -278,9 +304,9 @@ const BlockOption = styled.button`
 
   &:hover {
     color: var(--tina-color-primary);
-    background-color: #f6f6f9;
+    background-color: rgba(0, 0, 0, 0.03);
   }
   &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
+    border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   }
 `
