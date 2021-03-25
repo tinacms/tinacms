@@ -79,12 +79,6 @@ export function AddBlockMenu({
     }
   }
 
-  // React.useEffect(() => {
-  //   const inactivateBlockMenu = () => setIsOpen(false)
-  //   document.addEventListener('mouseup', inactivateBlockMenu, false)
-  //   return () => document.removeEventListener('mouseup', inactivateBlockMenu)
-  // }, [])
-
   return (
     <AddBlockWrapper
       index={index}
