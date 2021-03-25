@@ -94,7 +94,9 @@ export function AddBlockMenu({
     >
       <AddBlockButton
         ref={addBlockButtonRef}
-        onClick={handleOpenBlockMenu}
+        onClick={(event: any) => {
+          isOpen ? setIsOpen(false) : handleOpenBlockMenu(event)
+        }}
         isOpen={isOpen}
         primary
         small
@@ -118,12 +120,12 @@ export function AddBlockMenu({
         <BlocksMenuOptions>
           {Object.keys(blocks).filter(key => {
             const label = blocks[key].template.label
-            return label.includes(filterValue)
+            return label.toLowerCase().includes(filterValue.toLowerCase())
           }).length > 0 ? (
             Object.keys(blocks)
               .filter(key => {
                 const label = blocks[key].template.label
-                return label.includes(filterValue)
+                return label.toLowerCase().includes(filterValue.toLowerCase())
               })
               .map((key: string) => {
                 const template = blocks[key].template
@@ -151,7 +153,7 @@ export function AddBlockMenu({
                 }
               })
           ) : (
-            <BlockOption disabled>No blocks to display.</BlockOption>
+            <BlockOption disabled>No blocks to display</BlockOption>
           )}
         </BlocksMenuOptions>
       </BlocksMenu>
@@ -181,8 +183,6 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
   ${props =>
     props.isOpen &&
     css`
-      pointer-events: none;
-
       svg {
         transform: rotate(45deg);
       }
@@ -355,6 +355,7 @@ const BlockOption = styled.button`
     props.disabled &&
     css`
       pointer-events: none;
+      color: var(--tina-color-grey-5);
       background: var(--tina-color-grey-1);
 
       &:hover {
