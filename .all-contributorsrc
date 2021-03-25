@@ -963,6 +963,18 @@
       "contributions": [
         "code"
       ]
+    },
+    {
+      "login": "Enigmatical",
+      "name": "Chris Davis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1699544?v=4",
+      "profile": "https://github.com/Enigmatical",
+      "contributions": [
+        "code",
+        "maintenance",
+        "test",
+        "review"
+      ]
     }
   ],
   "contributorsPerLine": 7,
