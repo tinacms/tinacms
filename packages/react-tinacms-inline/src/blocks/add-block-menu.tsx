@@ -21,6 +21,7 @@ import styled, { css } from 'styled-components'
 import { BlockTemplate } from 'tinacms'
 import { IconButton } from '@tinacms/styles'
 import { AddIcon } from '@tinacms/icons'
+import { Input } from 'tinacms'
 
 import { getOffset, getOffsetX, getOffsetY } from '../styles'
 
@@ -42,6 +43,7 @@ export function AddBlockMenu({
   const [isOpen, setIsOpen] = React.useState(false)
   const addBlockButtonRef = React.useRef<HTMLButtonElement>(null)
   const [openTop, setOpenTop] = React.useState(false)
+  const [filterValue, setFilterValue] = React.useState('')
 
   const getDefaultProps = (defaultItem: any) => {
     return typeof defaultItem === 'function' ? defaultItem() : defaultItem
@@ -51,6 +53,7 @@ export function AddBlockMenu({
     event.stopPropagation()
     event.preventDefault()
     const addBlockButtonElem = addBlockButtonRef.current
+    setFilterValue('')
 
     if (addBlockButtonElem !== null) {
       const menuBounding = addBlockButtonElem.getBoundingClientRect()
@@ -76,11 +79,11 @@ export function AddBlockMenu({
     }
   }
 
-  React.useEffect(() => {
-    const inactivateBlockMenu = () => setIsOpen(false)
-    document.addEventListener('mouseup', inactivateBlockMenu, false)
-    return () => document.removeEventListener('mouseup', inactivateBlockMenu)
-  }, [])
+  // React.useEffect(() => {
+  //   const inactivateBlockMenu = () => setIsOpen(false)
+  //   document.addEventListener('mouseup', inactivateBlockMenu, false)
+  //   return () => document.removeEventListener('mouseup', inactivateBlockMenu)
+  // }, [])
 
   return (
     <AddBlockWrapper
@@ -99,31 +102,58 @@ export function AddBlockMenu({
         <AddIcon />
       </AddBlockButton>
       <BlocksMenu openTop={openTop} isOpen={isOpen}>
-        {Object.keys(blocks).map((key: string) => {
-          const template = blocks[key].template
+        {Object.keys(blocks).length > 9 && (
+          <DropdownHeader>
+            <SelectFilter
+              placeholder="Filter"
+              onChange={event => setFilterValue(event.target.value)}
+              onClick={(event: any) => {
+                event.preventDefault()
+                event.stopPropagation()
+              }}
+              value={filterValue}
+            />
+          </DropdownHeader>
+        )}
+        <BlocksMenuOptions>
+          {Object.keys(blocks).filter(key => {
+            const label = blocks[key].template.label
+            return label.includes(filterValue)
+          }).length > 0 ? (
+            Object.keys(blocks)
+              .filter(key => {
+                const label = blocks[key].template.label
+                return label.includes(filterValue)
+              })
+              .map((key: string) => {
+                const template = blocks[key].template
 
-          if (!template) {
-            console.error(`No template for ${key} block exists`)
+                if (!template) {
+                  console.error(`No template for ${key} block exists`)
 
-            return null
-          } else {
-            return (
-              <BlockOption
-                key={template?.label}
-                onClick={event => {
-                  event.stopPropagation()
-                  event.preventDefault()
-                  addBlock({
-                    _template: key,
-                    ...getDefaultProps(template?.defaultItem),
-                  })
-                }}
-              >
-                {template?.label}
-              </BlockOption>
-            )
-          }
-        })}
+                  return null
+                } else {
+                  return (
+                    <BlockOption
+                      key={template?.label}
+                      onClick={event => {
+                        event.stopPropagation()
+                        event.preventDefault()
+                        addBlock({
+                          _template: key,
+                          ...getDefaultProps(template?.defaultItem),
+                        })
+                      }}
+                    >
+                      {template?.label}
+                    </BlockOption>
+                  )
+                }
+              })
+          ) : (
+            <BlockOption disabled>No blocks to display.</BlockOption>
+          )}
+        </BlocksMenuOptions>
       </BlocksMenu>
     </AddBlockWrapper>
   )
@@ -216,9 +246,9 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
 
 const BlocksMenu = styled.div<AddMenuProps>`
   min-width: 192px;
-  max-height: 25vh;
   border-radius: var(--tina-radius-small);
   border: 1px solid var(--tina-color-grey-2);
+  border-bottom-color: var(--tina-color-grey-3);
   display: flex;
   flex-direction: column;
   align-items: stretch;
@@ -234,31 +264,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
   transform-origin: 50% 0;
   box-shadow: var(--tina-shadow-big);
   background-color: white;
-  overflow: auto;
-  background:
-		/* Shadow covers */ linear-gradient(
-      white 30%,
-      rgba(255, 255, 255, 0)
-    ),
-    linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,
-    /* Shadows */
-      linear-gradient(
-        to bottom,
-        var(--tina-color-grey-3),
-        var(--tina-color-grey-1),
-        rgba(0, 0, 0, 0)
-      ),
-    linear-gradient(
-        to top,
-        var(--tina-color-grey-3),
-        var(--tina-color-grey-1),
-        rgba(0, 0, 0, 0)
-      )
-      0 100%;
-  background-repeat: no-repeat;
-  background-color: white;
-  background-size: 100% 40px, 100% 40px, 100% 28px, 100% 28px;
-  background-attachment: local, local, scroll, scroll;
+  overflow: hidden;
 
   ${props =>
     props.isOpen &&
@@ -280,6 +286,41 @@ const BlocksMenu = styled.div<AddMenuProps>`
           transform: translate3d(-50%, -16px, 0) scale3d(1, 1, 1);
         `};
     `};
+`
+
+const BlocksMenuOptions = styled.div<AddMenuProps>`
+  min-width: 192px;
+  max-height: 25vh;
+  display: flex;
+  flex-direction: column;
+  align-items: stretch;
+  justify-content: flex-start;
+  background-color: white;
+  overflow: auto;
+  background:
+		/* Shadow covers */ linear-gradient(
+      white 30%,
+      rgba(255, 255, 255, 0)
+    ),
+    linear-gradient(rgba(255, 255, 255, 0), white 70%) 0 100%,
+    /* Shadows */
+      linear-gradient(
+        to bottom,
+        var(--tina-color-grey-2),
+        var(--tina-color-grey-1),
+        rgba(0, 0, 0, 0)
+      ),
+    linear-gradient(
+        to top,
+        var(--tina-color-grey-3),
+        var(--tina-color-grey-1),
+        rgba(0, 0, 0, 0)
+      )
+      0 100%;
+  background-repeat: no-repeat;
+  background-color: white;
+  background-size: 100% 84px, 100% 84px, 100% 28px, 100% 28px;
+  background-attachment: local, local, scroll, scroll;
 `
 
 const BlockOption = styled.button`
@@ -308,5 +349,34 @@ const BlockOption = styled.button`
   }
   &:not(:last-child) {
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
+  }
+
+  ${props =>
+    props.disabled &&
+    css`
+      pointer-events: none;
+      background: var(--tina-color-grey-1);
+
+      &:hover {
+        color: var(--tina-color-grey-8);
+        background-color: var(--tina-color-grey-1);
+      }
+    `};
+`
+
+const DropdownHeader = styled.div`
+  position: sticky;
+  top: 0;
+  padding: 10px;
+  background-color: var(--tina-color-grey-1);
+  border-bottom: 1px solid var(--tina-color-grey-2);
+`
+
+const SelectFilter = styled(Input)`
+  height: 36px;
+  flex: 0 1 auto;
+
+  ::placeholder {
+    color: var(--tina-color-grey-4);
   }
 `
