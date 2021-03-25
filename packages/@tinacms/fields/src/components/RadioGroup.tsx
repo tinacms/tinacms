@@ -83,7 +83,8 @@ export const RadioGroup: React.FC<RadioGroupProps> = ({
           id={optionId}
           name={input.name}
           value={option.value}
-          onChange={input.onChange}
+          // https://github.com/final-form/react-final-form/issues/392#issuecomment-543118944
+          onChange={event => input.onChange(event.target.value)}
           checked={checked}
         />
         <RadioOption
