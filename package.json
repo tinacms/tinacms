@@ -9,6 +9,7 @@
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
     "nuke": "./scripts/nuke.sh",
+    "lerna": "lerna",
     "hard-reset": "npm run nuke && npm run bs && npm run build",
     "test": "lerna run test --reject-cycles",
     "docs": "lerna run docs"
