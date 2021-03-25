@@ -110,7 +110,11 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
           )}
         </GroupListMeta>
         <IconButton
-          onClick={() => setVisible(true)}
+          onClick={(event: any) => {
+            event.stopPropagation()
+            event.preventDefault()
+            setVisible(true)
+          }}
           open={visible}
           primary
           small
