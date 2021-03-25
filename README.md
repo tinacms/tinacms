@@ -40,7 +40,9 @@ Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/
 ### Maintainers
 
 - Scott Byrne ([@scottpbyrne](https://twitter.com/scottpbyrne)) – Forestry.io
+- Chris Davis ([@Enigmatical](https://github.com/Enigmatical) – Forestry.io
 - DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
+- Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
 
 ### All Contributors ✨
 
