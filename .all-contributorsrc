@@ -561,7 +561,11 @@
       "avatar_url": "https://avatars3.githubusercontent.com/u/5414297?v=4",
       "profile": "http://forestry.io",
       "contributions": [
-        "infra"
+        "infra",
+        "code",
+        "maintenance",
+        "test",
+        "review"
       ]
     },
     {
