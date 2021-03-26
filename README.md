@@ -1,5 +1,5 @@
 [![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg) [![Lerna](https://img.shields.io/badge/maintained%20with-lerna-cc00ff.svg)](https://lerna.js.org/)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-96-orange.svg?style=flat-square)](#contributors-)
+[![All Contributors](https://img.shields.io/badge/all_contributors-97-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tinacms.org/)
@@ -175,6 +175,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="http://www.danbeaven.com"><img src="https://avatars.githubusercontent.com/u/6131721?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Dan Beaven</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Pingid" title="Code">💻</a></td>
     <td align="center"><a href="https://hirvinfaria.dev"><img src="https://avatars.githubusercontent.com/u/42902087?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Hirvin Faria</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=hirvin-faria" title="Documentation">📖</a></td>
     <td align="center"><a href="https://travismiller.com/"><img src="https://avatars.githubusercontent.com/u/494017?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Travis Miller</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=travismiller" title="Code">💻</a></td>
+    <td align="center"><a href="https://github.com/Enigmatical"><img src="https://avatars.githubusercontent.com/u/1699544?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Chris Davis</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Enigmatical" title="Code">💻</a> <a href="#maintenance-Enigmatical" title="Maintenance">🚧</a> <a href="https://github.com/tinacms/tinacms/commits?author=Enigmatical" title="Tests">⚠️</a> <a href="https://github.com/tinacms/tinacms/pulls?q=is%3Apr+reviewed-by%3AEnigmatical" title="Reviewed Pull Requests">👀</a></td>
   </tr>
 </table>
 
