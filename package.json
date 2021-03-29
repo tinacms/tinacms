@@ -1,5 +1,6 @@
 {
   "name": "root",
+  "description": "test",
   "private": true,
   "scripts": {
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
