@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,19 +16,19 @@ limitations under the License.
 
 */
 
-module.exports = ({
+module.exports = {
   webpack: function(config) {
     config.module.rules.push({
       test: /\.md$/,
-      use: "raw-loader"
-    });
-    return config;
+      use: 'raw-loader',
+    })
+    return config
   },
-   exportPathMap: async function() {
+  exportPathMap: async function() {
     const routes = {
-      '/': { page : '/'},
+      '/': { page: '/' },
     }
-  
+
     return routes
-  }
-});
+  },
+}
