@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -15,13 +15,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-const { GraphQLString } = require("gatsby/graphql");
-const slash = require("slash");
+const { GraphQLString } = require('gatsby/graphql')
+const slash = require('slash')
 
 exports.setFieldsOnGraphQLNodeType = ({ type }) => {
-  const pathRoot = slash(process.cwd());
+  const pathRoot = slash(process.cwd())
 
-  const hasMarkdown = !!type.nodes.find(node => node.internal.owner === 'gatsby-transformer-remark')
+  const hasMarkdown = !!type.nodes.find(
+    node => node.internal.owner === 'gatsby-transformer-remark'
+  )
 
   if (hasMarkdown) {
     return {
@@ -34,7 +36,7 @@ exports.setFieldsOnGraphQLNodeType = ({ type }) => {
       fileRelativePath: {
         type: GraphQLString,
         resolve: source => {
-          return source.fileAbsolutePath.replace(pathRoot, "")
+          return source.fileAbsolutePath.replace(pathRoot, '')
         },
       },
     }
