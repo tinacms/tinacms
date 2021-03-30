@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.39.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.38.0...v0.39.0) (2021-03-30)
+
+
+### Bug Fixes
+
+* copyright ([c916b63](https://github.com/kendallstrautman/nextjs-blog-starter/commit/c916b63531e7f16bfaf282917e8026815f491ea1)), closes [#1778](https://github.com/kendallstrautman/nextjs-blog-starter/issues/1778)
+
+
+
+
+
 # [0.38.0](https://github.com/kendallstrautman/nextjs-blog-starter/compare/v0.37.0...v0.38.0) (2021-03-08)
 
 **Note:** Version bump only for package nextjs-blog-starter
