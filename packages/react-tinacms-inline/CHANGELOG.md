@@ -3,6 +3,25 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
+
+
+### Bug Fixes
+
+* close on click outside ([462e09f](https://github.com/tinacms/tinacms/commit/462e09f57ed2fa63c13120356d6c36e7f8f78ba5))
+* copyright ([e4323c2](https://github.com/tinacms/tinacms/commit/e4323c25b7e893005bffad1827018b523b7f6939)), closes [#1778](https://github.com/tinacms/tinacms/issues/1778)
+* inline group click event  bug ([15c8675](https://github.com/tinacms/tinacms/commit/15c8675b600b882f8812f6d83c7b1a5c8f94dd01))
+* modal x button cancels changes ([258d190](https://github.com/tinacms/tinacms/commit/258d19006ba4518fae3ab97b27e95fea19c1ffe9))
+
+
+### Features
+
+* inline block search ([3080eac](https://github.com/tinacms/tinacms/commit/3080eacbe85bfa8fbe7ab7a284c294dce26fd4e9))
+
+
+
+
+
 # [0.38.0](https://github.com/tinacms/tinacms/compare/v0.37.0...v0.38.0) (2021-03-08)
 
 

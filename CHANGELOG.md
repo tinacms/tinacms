@@ -3,6 +3,28 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
+
+### Bug Fixes
+
+- close on click outside ([462e09f](https://github.com/tinacms/tinacms/commit/462e09f57ed2fa63c13120356d6c36e7f8f78ba5))
+- **dangerfile:** Updates dangerfile ([7badcb5](https://github.com/tinacms/tinacms/commit/7badcb591485985becc1641e4f3afa4f835b0418))
+- copyright ([e4323c2](https://github.com/tinacms/tinacms/commit/e4323c25b7e893005bffad1827018b523b7f6939)), closes [#1778](https://github.com/tinacms/tinacms/issues/1778)
+- copyright ([c916b63](https://github.com/tinacms/tinacms/commit/c916b63531e7f16bfaf282917e8026815f491ea1)), closes [#1778](https://github.com/tinacms/tinacms/issues/1778)
+- **@tinacms/fields:** Fix Radio Final Form Warning ([03cf71b](https://github.com/tinacms/tinacms/commit/03cf71bc5dd04364727e8d54ff65cbf60e3da675))
+- modal x button cancels changes ([258d190](https://github.com/tinacms/tinacms/commit/258d19006ba4518fae3ab97b27e95fea19c1ffe9))
+- **@tinacms/react-sidebar:** Allows initialValues for ContentCreator Plugins ([7562809](https://github.com/tinacms/tinacms/commit/756280929033e885955f5de4d6653d6efa553bc4))
+- **next-tinacms-markdown:** Fixes fileRelativePath for useMarkdownForm ([6ce43fc](https://github.com/tinacms/tinacms/commit/6ce43fc609bb38b67fbeaf192846e3aa4d1e4856))
+- **react-tinacms-github:** fix missing unique "key" prop in modal actions ([475bafa](https://github.com/tinacms/tinacms/commit/475bafae0a825e909bcf88bb826d913b960a0c4f))
+- **tinacms:** Fixes pagination for MediaStore ([5e51cbe](https://github.com/tinacms/tinacms/commit/5e51cbe9086df2540453295c86bb12575574a2ad))
+- inline group click event bug ([15c8675](https://github.com/tinacms/tinacms/commit/15c8675b600b882f8812f6d83c7b1a5c8f94dd01))
+
+### Features
+
+- inline block search ([3080eac](https://github.com/tinacms/tinacms/commit/3080eacbe85bfa8fbe7ab7a284c294dce26fd4e9))
+- **react-tinacms-github:** Add WatchableFormValues argument to useGithubFileForm, useGithubJsonForm, useGithubMarkdownForm ([51ce6f3](https://github.com/tinacms/tinacms/commit/51ce6f3301b0487219611430849ab54ad39fcb25))
+- **tinacms:** export independent components for CMS provider and UI ([c8bd31e](https://github.com/tinacms/tinacms/commit/c8bd31efdd5966af0dffa3d36e3618cf6ea3e02a))
+
 # [0.38.0](https://github.com/tinacms/tinacms/compare/v0.37.0...v0.38.0) (2021-03-08)
 
 ### Bug Fixes
