@@ -15,7 +15,7 @@ git pull
 npm run hard-reset
 
 # 3. Generate CHANGELOGs and Git Tags
-npm run lerna version \
+npm run lerna -- version \
   --yes \
   --conventional-commits \
   --conventional-prerelease \
@@ -30,7 +30,7 @@ git add .
 git commit -m "chore(publish): prerelease version bumps"
 
 # 4. Publish to NPM
-lerna publish from-package \
+npm run lerna -- publish from-package \
   --yes \
   --dist-tag next
 
