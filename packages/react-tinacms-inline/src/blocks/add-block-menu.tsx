@@ -102,9 +102,7 @@ export function AddBlockMenu({
     >
       <AddBlockButton
         ref={addBlockButtonRef}
-        onClick={(event: any) => {
-          isOpen ? setIsOpen(false) : handleOpenBlockMenu(event)
-        }}
+        onClick={handleOpenBlockMenu}
         isOpen={isOpen}
         primary
         small
@@ -191,6 +189,8 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
   ${props =>
     props.isOpen &&
     css`
+      pointer-events: none;
+
       svg {
         transform: rotate(45deg);
       }
