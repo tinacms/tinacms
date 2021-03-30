@@ -1,7 +1,7 @@
 #!/bin/bash
 
 # Deletes all node_modules
-npm run lerna clean -y
+npm run lerna -- clean -y
 
 # rm -rf node_modules
 
