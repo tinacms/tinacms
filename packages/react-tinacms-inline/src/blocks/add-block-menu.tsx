@@ -42,6 +42,7 @@ export function AddBlockMenu({
 }: AddBlockMenuProps) {
   const [isOpen, setIsOpen] = React.useState(false)
   const addBlockButtonRef = React.useRef<HTMLButtonElement>(null)
+  const addBlockMenuRef = React.useRef<HTMLDivElement>(null)
   const [openTop, setOpenTop] = React.useState(false)
   const [filterValue, setFilterValue] = React.useState('')
 
@@ -79,6 +80,19 @@ export function AddBlockMenu({
     }
   }
 
+  React.useEffect(() => {
+    const inactivateBlockMenu = (event: any) => {
+      if (
+        addBlockMenuRef.current &&
+        !addBlockMenuRef.current.contains(event.target)
+      ) {
+        setIsOpen(false)
+      }
+    }
+    document.addEventListener('mousedown', inactivateBlockMenu)
+    return () => document.removeEventListener('mousedown', inactivateBlockMenu)
+  }, [addBlockButtonRef])
+
   return (
     <AddBlockWrapper
       index={index}
@@ -88,16 +102,14 @@ export function AddBlockMenu({
     >
       <AddBlockButton
         ref={addBlockButtonRef}
-        onClick={(event: any) => {
-          isOpen ? setIsOpen(false) : handleOpenBlockMenu(event)
-        }}
+        onClick={handleOpenBlockMenu}
         isOpen={isOpen}
         primary
         small
       >
         <AddIcon />
       </AddBlockButton>
-      <BlocksMenu openTop={openTop} isOpen={isOpen}>
+      <BlocksMenu openTop={openTop} isOpen={isOpen} ref={addBlockMenuRef}>
         {Object.keys(blocks).length > 9 && (
           <DropdownHeader>
             <SelectFilter
@@ -177,6 +189,8 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
   ${props =>
     props.isOpen &&
     css`
+      pointer-events: none;
+
       svg {
         transform: rotate(45deg);
       }
