@@ -30,7 +30,7 @@ npm run hard-reset
 
 # 4. Generate CHANGELOGs and Git Tags
 #    You must have GH_TOKEN in your environment variables
-npm run lerna version \
+npm run lerna -- version \
   --yes \
   --conventional-commits \
   --conventional-graduate \
@@ -41,7 +41,7 @@ npm run lerna version \
   --no-granular-pathspec
 
 # 5. Publish to NPM
-npm run lerna publish from-package --yes
+npm run lerna -- publish from-package --yes
 
 # 7. Backmerge to master
 git checkout master
