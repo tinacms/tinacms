@@ -34,12 +34,12 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 
 ### Commands
 
-| Commands                                   | Description                                   |
-| ------------------------------------------ | --------------------------------------------- |
-| npm run bootstrap                          | Install dependencies and link local packages. |
-| npm run build                              | Build all packages.                           |
-| npm run test                               | Run tests for all packages.                   |
-| npm run lerna run build --scope \<package> | Build only \<package>.                        |
+| Commands                                      | Description                                   |
+| --------------------------------------------- | --------------------------------------------- |
+| npm run bootstrap                             | Install dependencies and link local packages. |
+| npm run build                                 | Build all packages.                           |
+| npm run test                                  | Run tests for all packages.                   |
+| npm run lerna run build -- --scope \<package> | Build only \<package>.                        |
 
 ### Testing With External Projects
 
