@@ -34,12 +34,12 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 
 ### Commands
 
-| Commands                                   | Description                                   |
-| ------------------------------------------ | --------------------------------------------- |
-| npm run bootstrap                          | Install dependencies and link local packages. |
-| npm run build                              | Build all packages.                           |
-| npm run test                               | Run tests for all packages.                   |
-| npm run lerna run build --scope \<package> | Build only \<package>.                        |
+| Commands                                      | Description                                   |
+| --------------------------------------------- | --------------------------------------------- |
+| npm run bootstrap                             | Install dependencies and link local packages. |
+| npm run build                                 | Build all packages.                           |
+| npm run test                                  | Run tests for all packages.                   |
+| npm run lerna -- run build --scope \<package> | Build only \<package>.                        |
 
 ### Testing With External Projects
 
@@ -97,7 +97,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    You can use lerna to add new dependencies to a package from the root of the repository:
 
    ```
-   npm run lerna add react --scope react-cms
+   npm run lerna -- add react --scope react-cms
    ```
 
    The downside of this approach is you can only add one dependency at a time. If you need to add many packages, you can use the next method.
@@ -108,7 +108,7 @@ Linking prevents running `npm install` from directly inside a package from worki
 
 3. **When I run `npm run bs` it deletes the contents of a package?**
 
-   This sucks. Try running `npm run lerna clean` and then running `npm run bs` again.
+   This sucks. Try running `npm run lerna -- clean` and then running `npm run bs` again.
 
 ### Failed to Compile: Module not found: Can't resolve 'some-tinacms-package'
 
