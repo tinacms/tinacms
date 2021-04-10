@@ -78,8 +78,11 @@ const Panel = function Panel({
 
   return (
     <FormPortal>
-      {({ zIndex }) => (
-        <GroupPanel isExpanded={isExpanded} zIndex={zIndex}>
+      {({ zIndexShift }) => (
+        <GroupPanel
+          isExpanded={isExpanded}
+          style={{ zIndex: zIndexShift + 1000 }}
+        >
           <PanelHeader onClick={() => setExpanded(false)}>
             <LeftArrowIcon /> <span>{field.label || field.name}</span>
           </PanelHeader>
@@ -180,10 +183,7 @@ const GroupPanelKeyframes = keyframes`
   }
 `
 
-export const GroupPanel = styled.div<{
-  isExpanded: boolean
-  zIndex: number
-}>`
+export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   position: absolute;
   width: 100%;
   top: 0;
@@ -193,7 +193,7 @@ export const GroupPanel = styled.div<{
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  z-index: ${zIndex};
+  z-index: var(--tina-z-index-1);
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
 
   > * {

@@ -243,9 +243,9 @@ const BlockListItem = ({
             </DeleteButton>
           </ItemHeader>
           <FormPortal>
-            {({ zIndex }) => (
+            {({ zIndexShift }) => (
               <Panel
-                zIndex={zIndex}
+                zIndexShift={zIndexShift}
                 isExpanded={isExpanded}
                 setExpanded={setExpanded}
                 field={field}
@@ -523,7 +523,7 @@ interface PanelProps {
   item: any
   label: string
   template: BlockTemplate
-  zIndex: number
+  zIndexShift: number
 }
 
 const Panel = function Panel({
@@ -534,7 +534,7 @@ const Panel = function Panel({
   index,
   label,
   template,
-  zIndex,
+  zIndexShift,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
     if (!template.fields) return []
@@ -546,7 +546,7 @@ const Panel = function Panel({
   }, [field.name, index, template.fields])
 
   return (
-    <GroupPanel isExpanded={isExpanded} zIndex={zIndex}>
+    <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
         <GroupLabel>{label}</GroupLabel>
