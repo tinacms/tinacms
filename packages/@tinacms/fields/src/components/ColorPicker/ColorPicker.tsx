@@ -109,7 +109,6 @@ const ColorPopupOpenTopKeyframes = keyframes`
 export const Popover = styled.div<{
   triggerBoundingBox: any
   openTop: boolean
-  zIndex: number
 }>`
   position: fixed;
   top: ${props =>
@@ -121,7 +120,7 @@ export const Popover = styled.div<{
   transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
   transform-origin: 50% 0;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
-  z-index: ${zIndex + 3000};
+  z-index: var(--tina-z-index-5);
 
   &:before {
     content: '';
@@ -336,11 +335,11 @@ export const ColorPicker: React.FC<Props> = ({
       />
       {displayColorPicker && (
         <FormPortal>
-          {({ zIndex }) => (
+          {({ zIndexShift }) => (
             <Popover
               openTop={openTop}
               triggerBoundingBox={triggerBoundingBox}
-              zIndex={zIndex}
+              style={{ zIndex: 5000 + zIndexShift }}
             >
               <Dismissible
                 click
@@ -358,6 +357,7 @@ export const ColorPicker: React.FC<Props> = ({
               </Dismissible>
             </Popover>
           )}
+        </FormPortal>
       )}
     </ColorPickerWrapper>
   )
