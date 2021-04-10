@@ -40,7 +40,7 @@ export const FormPortalProvider: React.FC = styled(
         if (!wrapperRef.current) return null
         return createPortal(props.children, wrapperRef.current)
       },
-      [wrapperRef.current]
+      [wrapperRef]
     )
 
     return (
