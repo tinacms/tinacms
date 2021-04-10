@@ -78,16 +78,18 @@ const Panel = function Panel({
 
   return (
     <FormPortal>
-      <GroupPanel isExpanded={isExpanded}>
-        <PanelHeader onClick={() => setExpanded(false)}>
-          <LeftArrowIcon /> <span>{field.label || field.name}</span>
-        </PanelHeader>
-        <PanelBody>
-          {isExpanded ? (
-            <FieldsBuilder form={tinaForm} fields={fields} />
-          ) : null}
-        </PanelBody>
-      </GroupPanel>
+      {({ zIndex }) => (
+        <GroupPanel isExpanded={isExpanded} zIndex={zIndex}>
+          <PanelHeader onClick={() => setExpanded(false)}>
+            <LeftArrowIcon /> <span>{field.label || field.name}</span>
+          </PanelHeader>
+          <PanelBody>
+            {isExpanded ? (
+              <FieldsBuilder form={tinaForm} fields={fields} />
+            ) : null}
+          </PanelBody>
+        </GroupPanel>
+      )}
     </FormPortal>
   )
 }
@@ -178,7 +180,10 @@ const GroupPanelKeyframes = keyframes`
   }
 `
 
-export const GroupPanel = styled.div<{ isExpanded: boolean }>`
+export const GroupPanel = styled.div<{
+  isExpanded: boolean
+  zIndex: number
+}>`
   position: absolute;
   width: 100%;
   top: 0;
@@ -188,7 +193,7 @@ export const GroupPanel = styled.div<{ isExpanded: boolean }>`
   flex-direction: column;
   justify-content: space-between;
   overflow: hidden;
-  z-index: var(--tina-z-index-1);
+  z-index: ${zIndex};
   pointer-events: ${p => (p.isExpanded ? 'all' : 'none')};
 
   > * {

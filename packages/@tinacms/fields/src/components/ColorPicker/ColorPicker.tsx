@@ -109,6 +109,7 @@ const ColorPopupOpenTopKeyframes = keyframes`
 export const Popover = styled.div<{
   triggerBoundingBox: any
   openTop: boolean
+  zIndex: number
 }>`
   position: fixed;
   top: ${props =>
@@ -120,7 +121,7 @@ export const Popover = styled.div<{
   transform: translate3d(-50%, 8px, 0) scale3d(1, 1, 1);
   transform-origin: 50% 0;
   animation: ${ColorPopupKeyframes} 85ms ease-out both 1;
-  z-index: var(--tina-z-index-5);
+  z-index: ${zIndex + 3000};
 
   &:before {
     content: '';
@@ -335,23 +336,28 @@ export const ColorPicker: React.FC<Props> = ({
       />
       {displayColorPicker && (
         <FormPortal>
-          <Popover openTop={openTop} triggerBoundingBox={triggerBoundingBox}>
-            <Dismissible
-              click
-              escape
-              disabled={!displayColorPicker}
-              onDismiss={toggleColorPicker}
+          {({ zIndex }) => (
+            <Popover
+              openTop={openTop}
+              triggerBoundingBox={triggerBoundingBox}
+              zIndex={zIndex}
             >
-              <Widget
-                presetColors={[...userColors, nullColor]}
-                color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
-                onChange={handleChange}
-                disableAlpha={true}
-                width={'240px'}
-              />
-            </Dismissible>
-          </Popover>
-        </FormPortal>
+              <Dismissible
+                click
+                escape
+                disabled={!displayColorPicker}
+                onDismiss={toggleColorPicker}
+              >
+                <Widget
+                  presetColors={[...userColors, nullColor]}
+                  color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+                  onChange={handleChange}
+                  disableAlpha={true}
+                  width={'240px'}
+                />
+              </Dismissible>
+            </Popover>
+          )}
       )}
     </ColorPickerWrapper>
   )

@@ -170,14 +170,17 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             </DeleteButton>
           </ItemHeader>
           <FormPortal>
-            <Panel
-              isExpanded={isExpanded}
-              setExpanded={setExpanded}
-              field={field}
-              index={index}
-              tinaForm={tinaForm}
-              itemTitle={title}
-            />
+            {({ zIndex }) => (
+              <Panel
+                isExpanded={isExpanded}
+                setExpanded={setExpanded}
+                field={field}
+                index={index}
+                tinaForm={tinaForm}
+                itemTitle={title}
+                zIndex={zIndex}
+              />
+            )}
           </FormPortal>
         </>
       )}
@@ -393,6 +396,7 @@ interface PanelProps {
   index: number
   field: GroupFieldDefinititon
   itemTitle: string
+  zIndex: number
 }
 
 const Panel = function Panel({
@@ -402,6 +406,7 @@ const Panel = function Panel({
   field,
   index,
   itemTitle,
+  zIndex,
 }: PanelProps) {
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
@@ -411,7 +416,7 @@ const Panel = function Panel({
   }, [field.fields, field.name, index])
 
   return (
-    <GroupPanel isExpanded={isExpanded}>
+    <GroupPanel isExpanded={isExpanded} zIndex={zIndex}>
       <PanelHeader onClick={() => setExpanded(false)}>
         <LeftArrowIcon />
         <GroupLabel>{itemTitle}</GroupLabel>
