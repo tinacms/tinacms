@@ -2,6 +2,10 @@
 
 The following is a set of guidelines and tips for contributing to the TinaCMS and its packages.
 
+## Contributor License Agreement
+
+Before a Pull Request can be accepted, all contributors must sign the [Contributor License Agreement](https://cla-assistant.io/tinacms/tinacms). A GitHub Action runs against all Pull Requests to ensure that **all commit authors** on the associated Pull Request have signed the agreement. The contributor license agreement helps us ensure that the code being contributed was written by the contributor and that we have proper license to use the contribution.
+
 ## Development
 
 **Disclaimer**:
@@ -9,7 +13,7 @@ The following is a set of guidelines and tips for contributing to the TinaCMS an
 - Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
 - Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
 
-_Recommended: use the lts/dubnium version of node (v 10.20.1)_
+_Recommended: use the [active LTS version of Node.js](https://nodejs.org/en/about/releases/)_
 
 To get started:
 
@@ -21,7 +25,7 @@ npm run build
 
 # Start Next.js Demo
 cd packages/demo-next
-npm run dev
+npm run develop
 ```
 
 **WARNING: Do not run `npm install` from inside the `packages` directory**
@@ -30,12 +34,12 @@ TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developi
 
 ### Commands
 
-| Commands                           | Description                                   |
-| ---------------------------------- | --------------------------------------------- |
-| npm run bootstrap                  | Install dependencies and link local packages. |
-| npm run build                      | Build all packages.                           |
-| npm run test                       | Run tests for all packages.                   |
-| lerna run build --scope \<package> | Build only \<package>.                        |
+| Commands                                      | Description                                   |
+| --------------------------------------------- | --------------------------------------------- |
+| npm run bootstrap                             | Install dependencies and link local packages. |
+| npm run build                                 | Build all packages.                           |
+| npm run test                                  | Run tests for all packages.                   |
+| npm run lerna -- run build --scope \<package> | Build only \<package>.                        |
 
 ### Testing With External Projects
 
@@ -71,6 +75,7 @@ This section contains solutions to various problems you may run into when develo
 
 - [I pulled down changes and now the packages won't build](#I-pulled-down-changes-and-now-my-packages-won't-build)
 - [I can't add dependencies to a package](#I-can't-add-dependencies-to-a-package)
+- [Run Development Packages ](#Run-Development-Packages)
 
 ### I pulled down changes and now my packages won't build
 
@@ -92,7 +97,7 @@ Linking prevents running `npm install` from directly inside a package from worki
    You can use lerna to add new dependencies to a package from the root of the repository:
 
    ```
-   lerna add react --scope react-cms
+   npm run lerna -- add react --scope react-cms
    ```
 
    The downside of this approach is you can only add one dependency at a time. If you need to add many packages, you can use the next method.
@@ -103,7 +108,7 @@ Linking prevents running `npm install` from directly inside a package from worki
 
 3. **When I run `npm run bs` it deletes the contents of a package?**
 
-   This sucks. Try running `lerna clean` and then running `npm run bs` again.
+   This sucks. Try running `npm run lerna -- clean` and then running `npm run bs` again.
 
 ### Failed to Compile: Module not found: Can't resolve 'some-tinacms-package'
 
@@ -121,6 +126,17 @@ There are two reasons this error might occur:
 
    This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
 
+### Run Development Packages
+
+After installing the development setup you can run demo applications contained in the _packages_ directory **demo-cra**, **demo-gatsby** and **demo-next**.
+
+These projects can be used as a development environment for Tina packages, you can edit any other package contained within Tina packages.
+
+When editing the packages of tina we can execute the command `npm run dev` to execute an development build on the repository packages.
+
+This command will build all Tina packages. This will reflect in the references of the tina demo packages, thus updating the demo packages according to the changes made.
+
+This way you can change the tinacms packages and test the changes in the demo packages as a development environment.
 
 ## Release Process
 

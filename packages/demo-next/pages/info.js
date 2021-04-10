@@ -1,5 +1,5 @@
 /**
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
 You may obtain a copy of the License at
@@ -173,6 +173,19 @@ const formOptions = {
       field: {
         component: 'text',
       },
+    },
+    {
+      label: 'Page Width',
+      name: 'frontmatter.pagewidth',
+      component: 'radio-group',
+      variant: 'button',
+      options: [
+        { value: 'xs', label: 'XS' },
+        { value: 'sm', label: 'SM' },
+        { value: 'md', label: 'MD' },
+        { value: 'lg', label: 'LG' },
+        { value: 'xl', label: 'XL' },
+      ],
     },
   ],
 }

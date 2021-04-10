@@ -238,7 +238,7 @@ export interface InlineBlocksProps {
 | `name`      |                                                                                            The path to the **source data** for the blocks. |
 | `blocks`    |                                         An object composed of individual [Blocks](/docs/ui/inline-editing/inline-blocks#creating-a-block). |
 | `className` | _Optional_ — To set styles directly on the input or extend via [styled components](/docs/ui/inline-editing#extending-inline-field-styles). |
-| `direction` |                                                    _Optional_ — Sets the orientation of the drag direction and `AddBlock` button position. |
+| `direction` |                                                    _Optional_ — Sets the orientation of the `AddBlock` button position. |
 | `itemProps` |                                                          _Optional_ — An object that passes additional props to every block child element. |
 | `min`       |                         _Optional_ — Controls the minimum number of blocks. Once reached, blocks won't be able to be removed. _(Optional)_ |
 | `max`       |                   _Optional_ — Controls the maximum number of blocks allowed. Once reached, blocks won't be able to be added. _(Optional)_ |
@@ -523,11 +523,9 @@ const PAGE_BLOCKS = {
 }
 ```
 
-**Configuring the drag and drop Container**
+**Configuring the Container**
 
-`InlineBlocks` wraps your blocks with a `<div>` element that informs the drag and drop functionality of what can be dragged and dropped.
-
-This can be an issue if your styles require direct inheritance, such as a flexbox grid:
+`InlineBlocks` wraps your blocks with a `<div>` element by default. This can be an issue if your styles require direct inheritance, such as a flexbox grid:
 
 ```html
 <div class="row">
@@ -536,13 +534,12 @@ This can be an issue if your styles require direct inheritance, such as a flexbo
 </div>
 ```
 
-To handle this, you can pass a "render function" as the child of the `InlineBlocks` component to control the container that renders the the child blocks. 
+To handle this, you can pass a custom container component to `InlineBlocks`.
 
 **Interface**
 
 ```ts
-interface BlocksContainerProps {
-  innerRef: React.Ref<any>
+interface BlocksContainerProps {s
   className?: string
   children?: React.ReactNode
 }
@@ -554,8 +551,8 @@ interface BlocksContainerProps {
 import { useJsonForm } from 'next-tinacms-json'
 import { InlineForm, InlineBlocks, BlocksControls, InlineTextarea } from 'react-tinacms-inline'
 
-const MyBlocksContainer = ({innerRef, children}) => (
-  <div ref={innerRef}>
+const MyBlocksContainer = (children}) => (
+  <div>
     {children}
   </div>
 )
@@ -578,3 +575,81 @@ export default function PageBlocks({ jsonFile }) {
 ```
 
 > Checkout this guide to learn more on using [Inline Blocks](https://tinacms.org/guides/general/inline-blocks/overview).
+
+---
+
+## _useFieldRef_: Ref-Based Inline Editing
+
+`useFieldRef` is the first part of an experimental new API for creating an inline editing experience with Tina. With `useFieldRef`, inline editing components are defined in the form configuration, and you assign a [ref](https://reactjs.org/docs/refs-and-the-dom.html) to the component in your layout that the field should attach to.
+
+Inline fields created in this fashion will be absolutely positioned on top of the referenced component and conform to its dimensions. This makes it possible for the field to appear as if it were replacing the layout component in the DOM without altering the markup.
+
+### Setting up ref-based inline editing
+
+Adding inline editing with this API is done in three steps:
+
+#### 1. Add the `RBIEPlugin`
+
+This feature is experimental for now, so in order to enable it, you need to add it as a plugin to your CMS config.
+
+```js
+import { TinaCMS } from 'tinacms'
+import { RBIEPlugin } from 'react-tinacms-inline'
+
+const cms = new TinaCMS({
+  //...
+  plugins: [
+    new RBIEPlugin()
+  ]
+})
+```
+
+#### 2. Add an `inlineComponent` to your form field definition
+
+Similar to how you would configure a sidebar field via that field's `component` key, you can configure an inline field via the `inlineComponent` key.
+
+> Unlike the sidebar `component`s, `inlineComponent`s must be defined as a React component and not a string. In the future, `inlineComponent` will accept a string as well and components can be registered via the plugin system.
+
+```jsx
+import { useForm } from 'tinacms'
+
+function MyPageComponent() {
+  const [data, form] = useForm({
+    //...
+    fields: [
+      //...
+      {
+        name: 'title',
+        component: 'text',
+        inlineComponent: ({ name }) => (
+          <h1><InlineText name={name} /></h1>
+        )
+      }
+    ]
+  })
+  //...
+}
+```
+
+#### 3. Call `useFieldRef` and attach the ref to the component that you want to be editable
+
+`useFieldRef` requires the ID of the form that it corresponds to, as well as the name of the field that it should be editing.
+
+```jsx
+import { useForm } from 'tinacms'
+import { useFieldRef } from 'react-tinacms-inline'
+
+function MyPageComponent() {
+  const [data, form] = useForm({
+    //...
+  })
+  const titleRef = useFieldRef(form.id, 'title')
+  return (
+    <InlineForm form={form}>
+      <main>
+        <h1 ref={titleRef}>{data.title}</h1>
+      </main>
+    </InlineForm>
+  )
+}
+```

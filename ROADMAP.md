@@ -23,6 +23,20 @@ perspective, and plan the next 6 week period.
 
 ## Cycles
 
+### Cycle 5: Jan 11th to Feb 19th
+
+
+| Begins        | Ends           |
+| ------------- | -------------- |
+| January 11th 2021 | February 19th 2021 |
+
+As a result of last cycle's dogfooding, we have identified some specific things that we want to improve with how inline editing is used. We will be focused on two priorities:
+
+1. HTML markup between edit mode and production should be as similar as possible
+2. Configuring sidebar forms and inline forms should not feel like two different things and require two different mental models.
+
+For elaboration on our thinking regarding these priorities, checkout [our cycle kickoff blog post](https://tina.io/blog/more-changes-coming-to-inline-editing/).
+
 ### Cycle 4: Nov 2nd to Dec 11th
 
 | Begins        | Ends           |

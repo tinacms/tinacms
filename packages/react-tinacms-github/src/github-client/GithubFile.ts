@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,11 +45,20 @@ export class GithubFile {
     retryOnConflict = true
   ) => {
     const serializedContent = this.serialize ? this.serialize(data) : data
-    try {
-      if (!this.sha) {
+    if (!this.sha) {
+      try {
         const res = await this.cms.api.github.fetchFile(this.path)
         this.sha = res.sha
+      } catch (error) {
+        if (error.status === 404) {
+          this.sha = ''
+        } else {
+          this.cms.events.dispatch({ type: ERROR, error })
+          throw error
+        }
       }
+    }
+    try {
       const response = await this.cms.api.github.commit(
         this.path,
         this.sha,

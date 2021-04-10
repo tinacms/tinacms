@@ -1,8 +1,8 @@
 name: 'Danger JS'
-on: [pull_request]
+on: [pull_request_target]
 
 jobs:
-  build:
+  danger:
     runs-on: ubuntu-latest
 
     steps:
@@ -10,6 +10,6 @@ jobs:
       - name: Install
         run: npm ci
       - name: Danger
-        uses: danger/danger-js@9.1.6
+        uses: danger/danger-js@10.5.4
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}

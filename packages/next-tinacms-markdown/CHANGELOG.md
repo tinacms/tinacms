@@ -3,6 +3,50 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
+
+
+### Bug Fixes
+
+* copyright ([e4323c2](https://github.com/tinacms/tinacms/commit/e4323c25b7e893005bffad1827018b523b7f6939)), closes [#1778](https://github.com/tinacms/tinacms/issues/1778)
+* **next-tinacms-markdown:** Fixes fileRelativePath for useMarkdownForm ([6ce43fc](https://github.com/tinacms/tinacms/commit/6ce43fc609bb38b67fbeaf192846e3aa4d1e4856))
+
+
+
+
+
+# [0.38.0](https://github.com/tinacms/tinacms/compare/v0.37.0...v0.38.0) (2021-03-08)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
+# [0.37.0](https://github.com/tinacms/tinacms/compare/v0.36.1...v0.37.0) (2021-02-08)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
+## [0.36.1](https://github.com/tinacms/tinacms/compare/v0.36.0...v0.36.1) (2021-02-01)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
+# [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
+
+**Note:** Version bump only for package next-tinacms-markdown
+
+
+
+
+
 # [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
 
 **Note:** Version bump only for package next-tinacms-markdown

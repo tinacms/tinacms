@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -22,4 +22,4 @@ import { TextField } from '../src/TextField'
 
 storiesOf('Textfield', module)
   .add('with text', () => <TextField />)
-  .add('with button', () => <TextField  />)
+  .add('with button', () => <TextField />)

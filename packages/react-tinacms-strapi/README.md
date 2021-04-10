@@ -4,7 +4,7 @@ This package provides helpers for setting up TinaCMS with Strapi's GraphQL API.
 
 ## Requirements
 
-This package assumes you have a Strapi server available with the GraphQL plugin installed. See [Strapi's Docs](https://strapi.io/documentation/v3.x/getting-started/quick-start.html) and the docs for the [GraphQL Plugin](https://strapi.io/documentation/v3.x/plugins/graphql.html#usage)
+This package assumes you have a Strapi server available with the GraphQL plugin installed. See [Strapi's Docs](https://strapi.io/documentation/v3.x/getting-started/quick-start.html) and the docs for the [GraphQL Plugin](https://strapi.io/documentation/developer-docs/latest/development/plugins/graphql.html#graphql)
 
 ## Installation
 

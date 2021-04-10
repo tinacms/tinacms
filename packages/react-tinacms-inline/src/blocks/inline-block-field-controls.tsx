@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,12 +23,10 @@ import {
   ChevronDownIcon,
   ChevronLeftIcon,
   ChevronRightIcon,
+  DuplicateIcon,
   TrashIcon,
-  ReorderIcon,
-  ReorderRowIcon,
 } from '@tinacms/icons'
 import { useCMS } from 'tinacms'
-import { Draggable } from 'react-beautiful-dnd'
 
 import { useInlineBlocks } from './inline-field-blocks'
 import { useInlineForm } from '../inline-form'
@@ -65,6 +63,7 @@ export function BlocksControls({
   const { name, template } = React.useContext(InlineFieldContext)
   const {
     insert,
+    duplicate,
     move,
     remove,
     blocks,
@@ -90,6 +89,12 @@ export function BlocksControls({
     event.stopPropagation()
     event.preventDefault()
     remove(index)
+  }
+
+  const duplicateBlock = (event: any) => {
+    event.stopPropagation()
+    event.preventDefault()
+    duplicate(index, index + 1)
   }
 
   const moveBlockUp = (event: any) => {
@@ -124,11 +129,6 @@ export function BlocksControls({
   const borderRadius =
     typeof focusRing === 'object' ? focusRing.borderRadius : undefined
 
-  const parentName = name!
-    .split('.')
-    .slice(0, -1)
-    .join('.')
-
   function withinLimit(limit: number | undefined) {
     if (!limit) return true
 
@@ -136,92 +136,82 @@ export function BlocksControls({
   }
 
   return (
-    <Draggable type={parentName} draggableId={name!} index={index}>
-      {provider => {
-        return (
-          <StyledFocusRing
-            ref={provider.innerRef}
-            active={focusRing && isActive}
-            onClick={focusOnBlock}
+    <StyledFocusRing
+      active={focusRing && isActive}
+      onClick={focusOnBlock}
+      offset={offset}
+      borderRadius={borderRadius}
+      disableHover={focusRing === false ? true : childIsActive}
+      disableChildren={!isActive && !childIsActive}
+    >
+      {isActive && (
+        <>
+          {withinLimit(max) && (
+            <AddBlockMenuWrapper active={isActive}>
+              <AddBlockMenu
+                addBlock={block => insert(index, block)}
+                blocks={blocks}
+                index={index}
+                offset={offset}
+                position={addBeforePosition}
+              />
+              <AddBlockMenu
+                addBlock={block => insert(index + 1, block)}
+                blocks={blocks}
+                index={index}
+                offset={offset}
+                position={addAfterPosition}
+              />
+            </AddBlockMenuWrapper>
+          )}
+          <BlockMenuWrapper
             offset={offset}
-            borderRadius={borderRadius}
-            {...provider.draggableProps}
-            disableHover={focusRing === false ? true : childIsActive}
-            disableChildren={!isActive && !childIsActive}
+            ref={blockMenuRef}
+            index={index}
+            active={isActive}
+            inset={insetControls}
           >
-            {isActive ? (
-              <>
-                {withinLimit(max) && (
-                  <AddBlockMenuWrapper active={isActive}>
-                    <AddBlockMenu
-                      addBlock={block => insert(index, block)}
-                      blocks={blocks}
-                      index={index}
-                      offset={offset}
-                      position={addBeforePosition}
-                    />
-                    <AddBlockMenu
-                      addBlock={block => insert(index + 1, block)}
-                      blocks={blocks}
-                      index={index}
-                      offset={offset}
-                      position={addAfterPosition}
-                    />
-                  </AddBlockMenuWrapper>
-                )}
-                <BlockMenuWrapper
-                  offset={offset}
-                  ref={blockMenuRef}
-                  index={index}
-                  active={isActive}
-                  inset={insetControls}
-                >
-                  {label && <BlockLabel>{template.label}</BlockLabel>}
-                  <BlockMenuSpacer></BlockMenuSpacer>
-                  <BlockMenu>
-                    <BlockAction
-                      ref={blockMoveUpRef}
-                      onClick={moveBlockUp}
-                      disabled={isFirst}
-                    >
-                      {direction === 'vertical' && <ChevronUpIcon />}
-                      {direction === 'horizontal' && <ChevronLeftIcon />}
-                    </BlockAction>
-                    <BlockAction
-                      ref={blockMoveDownRef}
-                      onClick={moveBlockDown}
-                      disabled={isLast}
-                    >
-                      {direction === 'vertical' && <ChevronDownIcon />}
-                      {direction === 'horizontal' && <ChevronRightIcon />}
-                    </BlockAction>
-                    <BlockAction {...provider.dragHandleProps}>
-                      {direction === 'vertical' && <ReorderIcon />}
-                      {direction === 'horizontal' && <ReorderRowIcon />}
-                    </BlockAction>
-                    {customActions.map((x, i) => (
-                      <BlockAction key={i} onClick={() => x.onClick()}>
-                        {x.icon}
-                      </BlockAction>
-                    ))}
-                    <InlineSettings fields={template.fields} />
-                    {withinLimit(min) && (
-                      <BlockAction onClick={removeBlock}>
-                        <TrashIcon />
-                      </BlockAction>
-                    )}
-                  </BlockMenu>
-                </BlockMenuWrapper>
-              </>
-            ) : (
-              // dummy element; react-beautiful-dnd complains when dragHandleProps isn't present
-              <div {...provider.dragHandleProps}></div>
-            )}
-            {children}
-          </StyledFocusRing>
-        )
-      }}
-    </Draggable>
+            {label && <BlockLabel>{template.label}</BlockLabel>}
+            <BlockMenuSpacer></BlockMenuSpacer>
+            <BlockMenu>
+              <BlockAction
+                ref={blockMoveUpRef}
+                onClick={moveBlockUp}
+                disabled={isFirst}
+              >
+                {direction === 'vertical' && <ChevronUpIcon />}
+                {direction === 'horizontal' && <ChevronLeftIcon />}
+              </BlockAction>
+              <BlockAction
+                ref={blockMoveDownRef}
+                onClick={moveBlockDown}
+                disabled={isLast}
+              >
+                {direction === 'vertical' && <ChevronDownIcon />}
+                {direction === 'horizontal' && <ChevronRightIcon />}
+              </BlockAction>
+              {customActions.map((x, i) => (
+                <BlockAction key={i} onClick={() => x.onClick()}>
+                  {x.icon}
+                </BlockAction>
+              ))}
+              {withinLimit(max) && (
+                <BlockAction onClick={duplicateBlock}>
+                  <DuplicateIcon />
+                </BlockAction>
+              )}
+              <InlineSettings fields={template.fields} />
+              {withinLimit(min) && (
+                <BlockAction onClick={removeBlock}>
+                  <TrashIcon />
+                </BlockAction>
+              )}
+            </BlockMenu>
+          </BlockMenuWrapper>
+        </>
+      )}
+      {children}
+    </StyledFocusRing>
   )
 }
 
@@ -277,6 +267,7 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
     ${p.active &&
       css`
         opacity: 1;
+        pointer-events: all;
       `}
   `
 })
@@ -315,7 +306,6 @@ export const BlockMenu = styled.div`
   box-shadow: var(--tina-shadow-big);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
-  pointer-events: all;
 `
 
 interface BlockActionProps {

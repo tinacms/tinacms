@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -45,14 +45,14 @@ export function usePlugins(plugins?: Plugin | Plugin[]) {
   React.useEffect(() => {
     pluginArray.forEach(plugin => {
       if (plugin) {
-        cms.plugins.add(plugin);
+        cms.plugins.add(plugin)
       }
     })
 
     return () => {
       pluginArray.forEach(plugin => {
         if (plugin) {
-          cms.plugins.remove(plugin);
+          cms.plugins.remove(plugin)
         }
       })
     }

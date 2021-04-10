@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -90,7 +90,7 @@ export const getModalProps = async (
       }
 
       // Does the branch exist?
-      if (await githubClient.getBranch()) {
+      if (!(await githubClient.getBranch())) {
         return {
           title: 'Missing Branch ',
           message: 'The branch that you were editing has been deleted. Press.',

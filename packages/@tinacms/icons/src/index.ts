@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -28,6 +28,7 @@ export * from './ChevronDown'
 export * from './ChevronUp'
 export * from './ChevronLeft'
 export * from './ChevronRight'
+export * from './Duplicate'
 export * from './Drag'
 export * from './LeftArrow'
 export * from './RightArrow'

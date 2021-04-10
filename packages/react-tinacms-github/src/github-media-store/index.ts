@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -44,7 +44,7 @@ export class GithubMediaStore implements MediaStore {
 
       try {
         const content = (await base64File(file)).toString().split(',')[1] // only need the data piece
-        const uploadResponse: GithubUploadResposne = await this.githubClient.upload(
+        const uploadResponse: GithubUploadResponse = await this.githubClient.upload(
           mediaPath,
           content,
           'Upload',
@@ -120,7 +120,7 @@ const contentToMedia = (item: GithubContent): Media => {
   return mediaItem
 }
 
-interface GithubUploadResposne {
+interface GithubUploadResponse {
   content: GithubContent
 }
 
