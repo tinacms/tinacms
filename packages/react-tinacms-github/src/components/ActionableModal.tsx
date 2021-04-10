@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -20,10 +20,10 @@ import React from 'react'
 import { StyleReset, Button as TinaButton } from '@tinacms/styles'
 import {
   Modal,
-  ModalPopup,
   ModalBody,
   ModalActions,
   ModalHeader,
+  PopupModal,
 } from 'tinacms'
 
 export interface ActionableModalOptions {
@@ -44,19 +44,23 @@ export const ActionableModal = ({
   return (
     <StyleReset>
       <Modal>
-        <ModalPopup>
+        <PopupModal>
           <ModalHeader>{title}</ModalHeader>
           <ModalBody padded>
             <p>{message}</p>
           </ModalBody>
           <ModalActions>
-            {actions.map(action => (
-              <TinaButton primary={action.primary} onClick={action.action}>
+            {actions.map((action, index) => (
+              <TinaButton
+                key={index}
+                primary={action.primary}
+                onClick={action.action}
+              >
                 {action.name}
               </TinaButton>
             ))}
           </ModalActions>
-        </ModalPopup>
+        </PopupModal>
       </Modal>
     </StyleReset>
   )

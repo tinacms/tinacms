@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -317,7 +317,8 @@ export const ColorPicker: React.FC<Props> = ({
     )
   }
 
-  const toggleColorPicker = () => {
+  const toggleColorPicker = (event: React.SyntheticEvent) => {
+    event.stopPropagation()
     const display = !displayColorPicker
     setDisplayColorPicker(display)
     if (display) {

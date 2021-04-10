@@ -9,6 +9,7 @@
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
     "nuke": "./scripts/nuke.sh",
+    "lerna": "lerna",
     "hard-reset": "npm run nuke && npm run bs && npm run build",
     "test": "lerna run test --reject-cycles",
     "docs": "lerna run docs"
@@ -49,7 +50,7 @@
     "typescript-plugin-styled-components": "^1.4.4"
   },
   "dependencies": {
-    "danger": "^9.2.0",
+    "danger": "^10.5.4",
     "depcheck": "^0.9.1",
     "tinacms": "^0.18.2"
   },

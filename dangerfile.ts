@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,13 +16,14 @@ limitations under the License.
 
 */
 
-import { markdown, danger, warn, fail, message } from 'danger'
+import { markdown, danger, warn, fail, message, GitHubPRDSL } from 'danger'
 import depcheck from 'depcheck'
 import * as fs from 'fs'
 import * as path from 'path'
+import { Buffer } from 'buffer'
 
 const LICENSE_HEADER: string[] = [
-  `Copyright 2019 Forestry.io Inc`,
+  `Copyright 2021 Forestry.io Holdings, Inc.`,
   `Licensed under the Apache License, Version 2.0 (the "License");`,
   `you may not use this file except in compliance with the License.`,
   `You may obtain a copy of the License at`,
@@ -33,6 +34,37 @@ const LICENSE_HEADER: string[] = [
   `See the License for the specific language governing permissions and`,
   `limitations under the License.`,
 ]
+
+async function getLocalFileContents(filepath: string) {
+  return fs.readFileSync(path.resolve(`./${filepath}`), {
+    encoding: 'utf8',
+  })
+}
+
+interface GithubDraftablePRDSL extends GitHubPRDSL {
+  draft: Boolean
+}
+
+async function getRemoteFileContents(filepath: string) {
+  const octokit = danger.github.api
+  const pr = danger.github.pr as GithubDraftablePRDSL
+  const refType = pr.draft ? 'head' : 'merge'
+  const { data }: any = await octokit.repos.getContents({
+    owner: 'tinacms',
+    repo: 'tinacms',
+    path: filepath,
+    ref: `refs/pull/${danger.github.thisPR.number}/${refType}`,
+  })
+  return Buffer.from(data.content, 'base64').toString()
+}
+
+async function getFileContents(filepath: string) {
+  if (!danger.github) {
+    return getLocalFileContents(filepath)
+  } else {
+    return getRemoteFileContents(filepath)
+  }
+}
 
 const failAboutIllegalDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
   fail(`
@@ -74,18 +106,24 @@ interface TinaPackage {
 /**
  * Executes all checks for the Pull Request.
  */
-function runChecksOnPullRequest() {
+async function runChecksOnPullRequest() {
   const allFiles = [
     ...danger.git.created_files,
     ...danger.git.deleted_files,
     ...danger.git.modified_files,
   ]
+  const existingFiles = [
+    ...danger.git.created_files,
+    ...danger.git.modified_files,
+  ]
 
   // Files
-  allFiles.filter(fileNeedsLicense).forEach(checkFileForLicenseHeader)
+  await existingFiles
+    .filter(fileNeedsLicense)
+    .forEach(checkFileForLicenseHeader)
 
   // Packages
-  const modifiedPackages = getModifiedPackages(allFiles)
+  const modifiedPackages = await getModifiedPackages(allFiles)
 
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
@@ -273,17 +311,15 @@ function fileNeedsLicense(filepath: string) {
 /**
  *
  */
-function checkFileForLicenseHeader(filepath: string) {
+async function checkFileForLicenseHeader(filepath: string) {
   try {
-    const content = fs.readFileSync(path.resolve(`./${filepath}`), {
-      encoding: 'utf8',
-    })
+    const content = await getFileContents(filepath)
 
     if (isMissingHeader(content)) {
       fail(`${filepath} is missing the license header`)
     }
-  } catch {
-    // The file was deleted. That's okay.
+  } catch (e) {
+    fail(e.message)
   }
 }
 
@@ -318,7 +354,7 @@ The following packages were modified by this pull request:
 /**
  * Lists all packages modified by this PR.
  */
-function getModifiedPackages(allFiles: string[]) {
+async function getModifiedPackages(allFiles: string[]) {
   const packageList: TinaPackage[] = []
   const paths = new Set(
     allFiles
@@ -350,18 +386,23 @@ function getModifiedPackages(allFiles: string[]) {
       })
   )
 
-  paths.forEach(path => {
+  const pathArray = Array.from(paths) // typescript doesn't like iterables
+  for (let path of pathArray) {
     try {
-      const packageJson = require(`./${path}/package.json`)
-
-      packageList.push({
-        path,
-        packageJson,
-      })
+      // get file contents + JSON decode
+      await getFileContents(`${path}/package.json`)
+        .then(JSON.parse)
+        .then(packageJson => {
+          packageList.push({
+            path,
+            packageJson,
+          })
+        })
     } catch (e) {
-      warn(`Could not find package: ${path}`)
+      warn(`Could not find package: ${path}: ${e.message}`)
     }
-  })
+  }
+
   return packageList
 }
 

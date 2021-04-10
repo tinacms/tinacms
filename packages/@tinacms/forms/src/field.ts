@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -23,6 +23,7 @@ export interface Field<F extends Field = AnyField> {
   label?: string
   description?: string
   component: React.FC<any> | string | null
+  inlineComponent?: React.FC<any>
   parse?: (value: any, name: string, field: F) => any
   format?: (value: any, name: string, field: F) => any
   validate?(

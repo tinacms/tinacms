@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,6 +24,7 @@ export * from './ListFieldPlugin'
 export * from './ImageFieldPlugin'
 export * from './NumberFieldPlugin'
 export * from './SelectFieldPlugin'
+export * from './RadioGroupFieldPlugin'
 export * from './TextareaFieldPlugin'
 export * from './TextFieldPlugin'
 export * from './ToggleFieldPlugin'

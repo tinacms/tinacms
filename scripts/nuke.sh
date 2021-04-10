@@ -1,9 +1,9 @@
 #!/bin/bash
 
 # Deletes all node_modules
-lerna clean -y
+npm run lerna -- clean -y
 
-rm -rf node_modules
+# rm -rf node_modules
 
 # Directories to be deleted
 declare -a build_dirs

@@ -3,6 +3,88 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
+
+
+### Bug Fixes
+
+* copyright ([e4323c2](https://github.com/tinacms/tinacms/commit/e4323c25b7e893005bffad1827018b523b7f6939)), closes [#1778](https://github.com/tinacms/tinacms/issues/1778)
+* **react-tinacms-github:** fix missing unique "key" prop in modal actions ([475bafa](https://github.com/tinacms/tinacms/commit/475bafae0a825e909bcf88bb826d913b960a0c4f))
+
+
+### Features
+
+* **react-tinacms-github:** Add WatchableFormValues argument to useGithubFileForm, useGithubJsonForm, useGithubMarkdownForm ([51ce6f3](https://github.com/tinacms/tinacms/commit/51ce6f3301b0487219611430849ab54ad39fcb25))
+
+
+
+
+
+# [0.38.0](https://github.com/tinacms/tinacms/compare/v0.37.0...v0.38.0) (2021-03-08)
+
+
+### Bug Fixes
+
+* typo in GithubUploadResponse type ([1c14cff](https://github.com/tinacms/tinacms/commit/1c14cffae83eade3887d865fc33783dd6c9f53d7))
+
+
+
+
+
+# [0.37.0](https://github.com/tinacms/tinacms/compare/v0.36.1...v0.37.0) (2021-02-08)
+
+**Note:** Version bump only for package react-tinacms-github
+
+
+
+
+
+## [0.36.1](https://github.com/tinacms/tinacms/compare/v0.36.0...v0.36.1) (2021-02-01)
+
+**Note:** Version bump only for package react-tinacms-github
+
+
+
+
+
+# [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** Fix reversed error messages for 404 errors ([7e3ba86](https://github.com/tinacms/tinacms/commit/7e3ba861a176f7289791391f3c1a70f38ca54240))
+
+
+### Features
+
+* **react-tinacms-github:** GithubFile: Support committing newly created files ([d13eb76](https://github.com/tinacms/tinacms/commit/d13eb761d805e212cd498f69bc72270efd3115f0))
+
+
+
+
+
+## [0.35.1](https://github.com/tinacms/tinacms/compare/v0.35.0...v0.35.1) (2021-01-19)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** Fix types for form hooks ([b937ed1](https://github.com/tinacms/tinacms/commit/b937ed1a4c201cfab6621bcf4f6f706e7efb33ad))
+
+
+
+
+
+# [0.35.0](https://github.com/tinacms/tinacms/compare/v0.34.0...v0.35.0) (2020-12-15)
+
+
+### Bug Fixes
+
+* **react-tinacms-github:** restore original functionality for github:branch:checkout ([8060075](https://github.com/tinacms/tinacms/commit/806007583c7d5ed2aa3ac3fc65f15776c6cefadc))
+
+
+
+
+
 # [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
 
 

@@ -5,7 +5,7 @@ import { useForm, WatchableFormValue, usePlugins } from '@tinacms/react-core'
 
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -46,12 +46,16 @@ export function useGlobalForm<FormShape = any>(
 /**
  * Creates and registers ScreenPlugin that renders the given Form.
  */
-export function useFormScreenPlugin(form: Form) {
+export function useFormScreenPlugin(
+  form: Form,
+  icon?: any,
+  layout?: 'fullscreen' | 'popup'
+) {
   const GlobalForm = useMemo(() => {
     if (!form) return
 
-    return new GlobalFormPlugin(form)
-  }, [form])
+    return new GlobalFormPlugin(form, icon, layout)
+  }, [form, icon, layout])
 
   usePlugins(GlobalForm)
 }

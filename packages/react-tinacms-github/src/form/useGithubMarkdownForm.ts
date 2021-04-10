@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,23 +16,28 @@ limitations under the License.
 
 */
 
-import { FormOptions, Field } from 'tinacms'
+import { FormOptions, Field, WatchableFormValue } from 'tinacms'
 import { GitFile } from './useGitFileSha'
 import { toMarkdownString } from 'next-tinacms-markdown'
 import { useGithubFileForm } from './useGithubFileForm'
-interface Options {
+interface Options<T = any> {
   id?: string
   label?: string
   fields?: Field[]
-  actions?: FormOptions<any>['actions']
+  actions?: FormOptions<T>['actions']
 }
 
-export function useGithubMarkdownForm(
-  markdownFile: GitFile,
-  formOptions?: Options
+export function useGithubMarkdownForm<T = any>(
+  markdownFile: GitFile<T>,
+  formOptions?: Options<T>,
+  watch?: Partial<WatchableFormValue>
 ) {
-  return useGithubFileForm(markdownFile, {
-    ...formOptions,
-    serialize: toMarkdownString,
-  })
+  return useGithubFileForm<T>(
+    markdownFile,
+    {
+      ...formOptions,
+      serialize: toMarkdownString,
+    },
+    watch
+  )
 }

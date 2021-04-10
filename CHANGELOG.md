@@ -3,6 +3,92 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
+
+### Bug Fixes
+
+- close on click outside ([462e09f](https://github.com/tinacms/tinacms/commit/462e09f57ed2fa63c13120356d6c36e7f8f78ba5))
+- **dangerfile:** Updates dangerfile ([7badcb5](https://github.com/tinacms/tinacms/commit/7badcb591485985becc1641e4f3afa4f835b0418))
+- copyright ([e4323c2](https://github.com/tinacms/tinacms/commit/e4323c25b7e893005bffad1827018b523b7f6939)), closes [#1778](https://github.com/tinacms/tinacms/issues/1778)
+- copyright ([c916b63](https://github.com/tinacms/tinacms/commit/c916b63531e7f16bfaf282917e8026815f491ea1)), closes [#1778](https://github.com/tinacms/tinacms/issues/1778)
+- **@tinacms/fields:** Fix Radio Final Form Warning ([03cf71b](https://github.com/tinacms/tinacms/commit/03cf71bc5dd04364727e8d54ff65cbf60e3da675))
+- modal x button cancels changes ([258d190](https://github.com/tinacms/tinacms/commit/258d19006ba4518fae3ab97b27e95fea19c1ffe9))
+- **@tinacms/react-sidebar:** Allows initialValues for ContentCreator Plugins ([7562809](https://github.com/tinacms/tinacms/commit/756280929033e885955f5de4d6653d6efa553bc4))
+- **next-tinacms-markdown:** Fixes fileRelativePath for useMarkdownForm ([6ce43fc](https://github.com/tinacms/tinacms/commit/6ce43fc609bb38b67fbeaf192846e3aa4d1e4856))
+- **react-tinacms-github:** fix missing unique "key" prop in modal actions ([475bafa](https://github.com/tinacms/tinacms/commit/475bafae0a825e909bcf88bb826d913b960a0c4f))
+- **tinacms:** Fixes pagination for MediaStore ([5e51cbe](https://github.com/tinacms/tinacms/commit/5e51cbe9086df2540453295c86bb12575574a2ad))
+- inline group click event bug ([15c8675](https://github.com/tinacms/tinacms/commit/15c8675b600b882f8812f6d83c7b1a5c8f94dd01))
+
+### Features
+
+- inline block search ([3080eac](https://github.com/tinacms/tinacms/commit/3080eacbe85bfa8fbe7ab7a284c294dce26fd4e9))
+- **react-tinacms-github:** Add WatchableFormValues argument to useGithubFileForm, useGithubJsonForm, useGithubMarkdownForm ([51ce6f3](https://github.com/tinacms/tinacms/commit/51ce6f3301b0487219611430849ab54ad39fcb25))
+- **tinacms:** export independent components for CMS provider and UI ([c8bd31e](https://github.com/tinacms/tinacms/commit/c8bd31efdd5966af0dffa3d36e3618cf6ea3e02a))
+
+# [0.38.0](https://github.com/tinacms/tinacms/compare/v0.37.0...v0.38.0) (2021-03-08)
+
+### Bug Fixes
+
+- typo in GithubUploadResponse type ([1c14cff](https://github.com/tinacms/tinacms/commit/1c14cffae83eade3887d865fc33783dd6c9f53d7))
+
+### Features
+
+- **react-tinacms-inline:** add RBIE feature flag plugin ([cc63851](https://github.com/tinacms/tinacms/commit/cc63851430c5e0c2555504d9f726233a47011c8d))
+- **react-tinacms-inline:** add useFieldRef hook ([49be9d2](https://github.com/tinacms/tinacms/commit/49be9d210f2ea6d61afd218a0dbf0a6e98e896f8))
+
+# [0.37.0](https://github.com/tinacms/tinacms/compare/v0.36.1...v0.37.0) (2021-02-08)
+
+### Bug Fixes
+
+- check if cleanup is needed before cleaning up ([bbdc166](https://github.com/tinacms/tinacms/commit/bbdc166190446311ea3374e1db92246beae24da9))
+- **react-tinacms-inline:** Fix ability to clear field selection, closes [#1725](https://github.com/tinacms/tinacms/issues/1725) ([3e8aab4](https://github.com/tinacms/tinacms/commit/3e8aab4f324454752e2a88d99e9bdf869c26447f))
+- radio group name attr ([996c468](https://github.com/tinacms/tinacms/commit/996c468030a9e1f00dc91b8d4e05ba1d5bad1de1))
+
+### Features
+
+- radio group field ([7b53a64](https://github.com/tinacms/tinacms/commit/7b53a649edd35b50522ec70b1ea968bc8e8f6c99))
+
+## [0.36.1](https://github.com/tinacms/tinacms/compare/v0.36.0...v0.36.1) (2021-02-01)
+
+### Bug Fixes
+
+- **react-tinacms-inline:** dep constraint syntax ([c9c3f05](https://github.com/tinacms/tinacms/commit/c9c3f057ffc3ed0dc54f5ee469cf70dab8885d4f))
+
+# [0.36.0](https://github.com/tinacms/tinacms/compare/v0.35.1...v0.36.0) (2021-01-25)
+
+### Bug Fixes
+
+- **@tinacms/react-sidebar:** fixed site elements relative to SiteWrapper ([2f5c75c](https://github.com/tinacms/tinacms/commit/2f5c75c1323d94c033d30c195370254eb5fcffc2))
+- **@tinacms/react-sidebar:** fixed site elements relative to SiteWrapper ([de2e1f7](https://github.com/tinacms/tinacms/commit/de2e1f711c87803cf9d161891ea0eb056796b25e))
+- **react-tinacms-github:** Fix reversed error messages for 404 errors ([7e3ba86](https://github.com/tinacms/tinacms/commit/7e3ba861a176f7289791391f3c1a70f38ca54240))
+
+### Features
+
+- **react-tinacms-github:** GithubFile: Support committing newly created files ([d13eb76](https://github.com/tinacms/tinacms/commit/d13eb761d805e212cd498f69bc72270efd3115f0))
+- **react-tinacms-inline:** inline block duplicate action ([0b79ecf](https://github.com/tinacms/tinacms/commit/0b79ecf468b7ad9c35cb5cd9696e144ffc456a4f))
+
+## [0.35.1](https://github.com/tinacms/tinacms/compare/v0.35.0...v0.35.1) (2021-01-19)
+
+### Bug Fixes
+
+- **react-tinacms-github:** Fix types for form hooks ([b937ed1](https://github.com/tinacms/tinacms/commit/b937ed1a4c201cfab6621bcf4f6f706e7efb33ad))
+
+# [0.35.0](https://github.com/tinacms/tinacms/compare/v0.34.0...v0.35.0) (2020-12-15)
+
+### Bug Fixes
+
+- **react-tinacms-github:** restore original functionality for github:branch:checkout ([8060075](https://github.com/tinacms/tinacms/commit/806007583c7d5ed2aa3ac3fc65f15776c6cefadc))
+- **react-tinacms-inline:** [#1640](https://github.com/tinacms/tinacms/issues/1640) support defaultItem as a function in add-block-menu.tsx ([85acb9d](https://github.com/tinacms/tinacms/commit/85acb9d493a0ea4f7d7df839f69ab0fbb2deecad))
+
+### Features
+
+- add inline block label ([af24e52](https://github.com/tinacms/tinacms/commit/af24e52754082354fe9297d7b5204f6dcc5f2647))
+- Use custom actions in BlocksControls ([d01e14a](https://github.com/tinacms/tinacms/commit/d01e14a56db03ad2484527fdbb14ec58a5de52f3))
+
+### Reverts
+
+- Revert "docs: update/fix demo run command" ([d386ea4](https://github.com/tinacms/tinacms/commit/d386ea4db4cde95bf83c146a0a4b4930de756592))
+
 # [0.34.0](https://github.com/tinacms/tinacms/compare/v0.33.0...v0.34.0) (2020-11-23)
 
 ### Bug Fixes

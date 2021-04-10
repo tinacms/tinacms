@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -203,13 +203,15 @@ export class GithubClient {
    * @deprecated Call GithubClient#checkout instead
    */
   setWorkingBranch(branch: string) {
+    const originalBranch = this.branchName
+
     this.setCookie(GithubClient.HEAD_BRANCH_COOKIE_KEY, branch)
     this.events.dispatch({
       type: CHECKOUT_BRANCH,
       branchName: branch,
     })
 
-    if (this.branchName !== branch) {
+    if (originalBranch !== branch) {
       this.events.dispatch({
         type: 'unstable:reload-form-data',
       })

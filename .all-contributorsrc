@@ -561,7 +561,11 @@
       "avatar_url": "https://avatars3.githubusercontent.com/u/5414297?v=4",
       "profile": "http://forestry.io",
       "contributions": [
-        "infra"
+        "infra",
+        "code",
+        "maintenance",
+        "test",
+        "review"
       ]
     },
     {
@@ -895,6 +899,94 @@
       "contributions": [
         "code",
         "bug"
+      ]
+    },
+    {
+      "login": "zenflow",
+      "name": "Matthew Francis Brunetti",
+      "avatar_url": "https://avatars1.githubusercontent.com/u/3198597?v=4",
+      "profile": "https://github.com/zenflow",
+      "contributions": [
+        "code",
+        "bug"
+      ]
+    },
+    {
+      "login": "joeinnes",
+      "name": "Joe Innes",
+      "avatar_url": "https://avatars2.githubusercontent.com/u/4704069?v=4",
+      "profile": "https://joeinn.es",
+      "contributions": [
+        "doc",
+        "code"
+      ]
+    },
+    {
+      "login": "austincondiff",
+      "name": "Austin Condiff",
+      "avatar_url": "https://avatars0.githubusercontent.com/u/806104?v=4",
+      "profile": "http://www.austincondiff.com",
+      "contributions": [
+        "code",
+        "ideas"
+      ]
+    },
+    {
+      "login": "pristas-peter",
+      "name": "pristas-peter",
+      "avatar_url": "https://avatars.githubusercontent.com/u/9489687?v=4",
+      "profile": "https://twitter.com/pristas_peter",
+      "contributions": [
+        "bug",
+        "code"
+      ]
+    },
+    {
+      "login": "Pingid",
+      "name": "Dan Beaven",
+      "avatar_url": "https://avatars.githubusercontent.com/u/6131721?v=4",
+      "profile": "http://www.danbeaven.com",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "hirvin-faria",
+      "name": "Hirvin Faria",
+      "avatar_url": "https://avatars.githubusercontent.com/u/42902087?v=4",
+      "profile": "https://hirvinfaria.dev",
+      "contributions": [
+        "doc"
+      ]
+    },
+    {
+      "login": "travismiller",
+      "name": "Travis Miller",
+      "avatar_url": "https://avatars.githubusercontent.com/u/494017?v=4",
+      "profile": "https://travismiller.com/",
+      "contributions": [
+        "code"
+      ]
+    },
+    {
+      "login": "Enigmatical",
+      "name": "Chris Davis",
+      "avatar_url": "https://avatars.githubusercontent.com/u/1699544?v=4",
+      "profile": "https://github.com/Enigmatical",
+      "contributions": [
+        "code",
+        "maintenance",
+        "test",
+        "review"
+      ]
+    },
+    {
+      "login": "saintmalik",
+      "name": "SaintMalik",
+      "avatar_url": "https://avatars.githubusercontent.com/u/37118134?v=4",
+      "profile": "https://saintmalik.me",
+      "contributions": [
+        "doc"
       ]
     }
   ],

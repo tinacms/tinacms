@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -78,9 +78,7 @@ export function SettingsModal({
   const { name } = React.useContext(InlineFieldContext)
   const [initialValues] = React.useState(form.values)
 
-  function handleCancel(event: any) {
-    event.stopPropagation()
-    event.preventDefault()
+  function handleCancel() {
     form.updateValues(initialValues)
     close()
   }
@@ -110,7 +108,7 @@ export function SettingsModal({
   return (
     <Modal id="tinacms-inline-settings" onClick={e => e.stopPropagation()}>
       <ModalPopup>
-        <ModalHeader close={close}>{title}</ModalHeader>
+        <ModalHeader close={handleCancel}>{title}</ModalHeader>
         <ModalBody>
           <DragDropContext onDragEnd={moveArrayItem}>
             <FormBody>

@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -24,7 +24,6 @@ import { useInlineForm } from '../inline-form'
 import styled from 'styled-components'
 import { InlineFieldContext } from '../inline-field-context'
 import { useCMS } from 'tinacms'
-import { Droppable } from 'react-beautiful-dnd'
 
 export interface InlineBlocksProps {
   name: string
@@ -47,19 +46,18 @@ export interface InlineBlocksProps {
 }
 
 export interface BlocksContainerProps {
-  innerRef: React.Ref<any>
   className?: string
   children?: React.ReactNode
 }
 
 const DefaultContainer = (props: BlocksContainerProps) => {
-  const { innerRef, ...otherProps } = props
-  return <div ref={innerRef} {...otherProps} />
+  return <div {...props} />
 }
 
 export interface InlineBlocksActions {
   count: number
   insert(index: number, data: any): void
+  duplicate(sourceIndex: number, targetIndex: number): void
   move(from: number, to: number): void
   remove(index: number): void
   blocks: {
@@ -128,64 +126,60 @@ export function InlineBlocks({
           setFocussedField(`${name}.${index}`)
         }
 
+        const duplicate = (sourceIndex: number, targetIndex: number) => {
+          form.mutators.insert(name, targetIndex, allData[sourceIndex])
+          setFocussedField(`${name}.${targetIndex}`)
+        }
+
         const Container = components.Container || DefaultContainer
 
         return (
-          <Droppable droppableId={name} type={name} direction={direction}>
-            {provider => (
-              <Container innerRef={provider.innerRef} className={className}>
-                {
-                  <InlineBlocksContext.Provider
-                    value={{
-                      insert,
-                      move,
-                      remove,
-                      blocks,
-                      count: allData.length,
-                      direction,
-                      min,
-                      max,
-                    }}
-                  >
-                    {allData.length < 1 && cms.enabled && (
-                      <BlocksEmptyState>
-                        <AddBlockMenu
-                          addBlock={block => insert(0, block)}
-                          blocks={blocks}
-                        />
-                      </BlocksEmptyState>
-                    )}
+          <Container className={className}>
+            <InlineBlocksContext.Provider
+              value={{
+                insert,
+                duplicate,
+                move,
+                remove,
+                blocks,
+                count: allData.length,
+                direction,
+                min,
+                max,
+              }}
+            >
+              {allData.length < 1 && cms.enabled && (
+                <BlocksEmptyState>
+                  <AddBlockMenu
+                    addBlock={block => insert(0, block)}
+                    blocks={blocks}
+                  />
+                </BlocksEmptyState>
+              )}
 
-                    {allData.map((data, index) => {
-                      const Block = blocks[data._template]
+              {allData.map((data, index) => {
+                const Block = blocks[data._template]
 
-                      if (!Block) {
-                        console.warn(
-                          'Unrecognized Block of type:',
-                          data._template
-                        )
-                        return null
-                      }
-
-                      const blockName = `${input.name}.${index}`
-
-                      return (
-                        <InlineBlock
-                          itemProps={itemProps}
-                          key={index}
-                          index={index}
-                          name={blockName}
-                          data={data}
-                          block={Block}
-                        />
-                      )
-                    })}
-                    {provider.placeholder}
-                  </InlineBlocksContext.Provider>
+                if (!Block) {
+                  console.warn('Unrecognized Block of type:', data._template)
+                  return null
                 }
-              </Container>
-            )}
-          </Droppable>
+
+                const blockName = `${input.name}.${index}`
+
+                return (
+                  <InlineBlock
+                    itemProps={itemProps}
+                    key={index}
+                    index={index}
+                    name={blockName}
+                    data={data}
+                    block={Block}
+                  />
+                )
+              })}
+            </InlineBlocksContext.Provider>
+          </Container>
         )
       }}
     </InlineField>

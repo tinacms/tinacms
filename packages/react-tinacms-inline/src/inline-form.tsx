@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -18,9 +18,10 @@ limitations under the License.
 
 import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
-import { FormBuilder, Form } from 'tinacms'
+import { FormBuilder, Form, useCMS } from 'tinacms'
 import { Dismissible } from 'react-dismissible'
-import { DragDropContext, DropResult } from 'react-beautiful-dnd'
+import { RBIEPlugin } from './rbie/plugins/rbie-plugin'
+import { InlineFieldsRenderer } from './rbie/components/inline-fields-renderer'
 
 export interface InlineFormProps {
   form: Form
@@ -45,6 +46,13 @@ export interface InlineFormState {
 export function InlineForm({ form, children }: InlineFormProps) {
   const [focussedField, setFocussedField] = React.useState<string>('')
 
+  const cms = useCMS()
+  const rbie = React.useMemo(() => {
+    return cms.plugins
+      .getType<RBIEPlugin>('unstable_featureflag')
+      .find('ref-based-inline-editor')
+  }, [cms.plugins])
+
   const inlineFormState = React.useMemo(() => {
     return {
       form,
@@ -52,19 +60,6 @@ export function InlineForm({ form, children }: InlineFormProps) {
       setFocussedField,
     }
   }, [form, focussedField, setFocussedField])
-
-  const moveArrayItem = React.useCallback(
-    (result: DropResult) => {
-      if (!result.destination || !form) return
-      const name = result.type
-      const from = result.source.index
-      const to = result.destination.index
-
-      setFocussedField(`${name}.${to}`)
-      form.mutators.move(name, from, to)
-    },
-    [form]
-  )
 
   return (
     <InlineFormContext.Provider value={inlineFormState}>
@@ -84,22 +79,30 @@ export function InlineForm({ form, children }: InlineFormProps) {
           setFocussedField('')
         }}
       >
-        <DragDropContext onDragEnd={moveArrayItem}>
-          <div onClick={() => setFocussedField('')}>
-            <FormBuilder form={form}>
-              {({ form, ...formProps }) => {
-                if (typeof children !== 'function') {
-                  return children
-                }
-
-                return children({
-                  ...formProps,
-                  ...inlineFormState,
-                })
-              }}
-            </FormBuilder>
-          </div>
-        </DragDropContext>
+        <div
+          onClick={() => {
+            cms.events.dispatch({
+              type: `form:${form.id}:fields::focus`,
+              form: form.id,
+              field: '',
+            })
+            setFocussedField('')
+          }}
+        >
+          <FormBuilder form={form as any}>
+            {({ form, ...formProps }) => (
+              <>
+                {typeof children !== 'function'
+                  ? children
+                  : children({
+                      ...formProps,
+                      ...inlineFormState,
+                    })}
+                {rbie?.active && <InlineFieldsRenderer />}
+              </>
+            )}
+          </FormBuilder>
+        </div>
       </Dismissible>
     </InlineFormContext.Provider>
   )

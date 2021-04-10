@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-inline",
-  "version": "0.35.0-alpha.3",
+  "version": "0.39.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "typings": "dist/src/index.d.ts",
@@ -15,26 +15,27 @@
   },
   "dependencies": {
     "react-dismissible": "^1.3.0",
-    "react-textarea-autosize": ">=7.1"
+    "react-textarea-autosize": ">=7.1",
+    "react-use": "^17.1.1"
   },
   "peerDependencies": {
     "react": ">=16.8",
     "react-dropzone": "10.2.1",
-    "react-final-form": "^>=6",
+    "react-final-form": ">=6",
     "react-tinacms-editor": ">=0.0",
     "styled-components": ">=4.1",
     "tinacms": ">=0.13"
   },
   "devDependencies": {
     "@testing-library/react": "^11.1.2",
-    "@tinacms/icons": "^0.31.0",
-    "@tinacms/react-forms": "^0.34.0",
-    "@tinacms/scripts": "^0.29.0",
-    "@tinacms/styles": "^0.33.0",
+    "@tinacms/icons": "^0.39.0",
+    "@tinacms/react-forms": "^0.39.0",
+    "@tinacms/scripts": "^0.39.0",
+    "@tinacms/styles": "^0.39.0",
     "jest": "^26.6.3",
     "react-dropzone": "10.1.8",
     "react-tinacms-editor": "^0.4.0",
-    "tinacms": "^0.34.0"
+    "tinacms": "^0.39.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }

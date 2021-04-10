@@ -1,6 +1,6 @@
 /**
 
-Copyright 2019 Forestry.io Inc
+Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -21,6 +21,7 @@ export * from './TextArea'
 export * from './ColorPicker'
 export * from './Toggle'
 export * from './Select'
+export * from './RadioGroup'
 export * from './NumberInput'
 export * from './ImageUpload'
 export * from './Input'
