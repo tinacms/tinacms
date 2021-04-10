@@ -38,7 +38,7 @@ export const MenuPortalProvider: React.FC = ({ children }) => {
       if (!wrapperRef.current) return null
       return createPortal(props.children, wrapperRef.current)
     },
-    [wrapperRef.current]
+    [wrapperRef]
   )
 
   return (
