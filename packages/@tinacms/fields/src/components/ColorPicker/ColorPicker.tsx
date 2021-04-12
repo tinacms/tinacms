@@ -335,22 +335,28 @@ export const ColorPicker: React.FC<Props> = ({
       />
       {displayColorPicker && (
         <FormPortal>
-          <Popover openTop={openTop} triggerBoundingBox={triggerBoundingBox}>
-            <Dismissible
-              click
-              escape
-              disabled={!displayColorPicker}
-              onDismiss={toggleColorPicker}
+          {({ zIndexShift }) => (
+            <Popover
+              openTop={openTop}
+              triggerBoundingBox={triggerBoundingBox}
+              style={{ zIndex: 5000 + zIndexShift }}
             >
-              <Widget
-                presetColors={[...userColors, nullColor]}
-                color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
-                onChange={handleChange}
-                disableAlpha={true}
-                width={'240px'}
-              />
-            </Dismissible>
-          </Popover>
+              <Dismissible
+                click
+                escape
+                disabled={!displayColorPicker}
+                onDismiss={toggleColorPicker}
+              >
+                <Widget
+                  presetColors={[...userColors, nullColor]}
+                  color={getColorRGBA || { r: 0, g: 0, b: 0, a: 0 }}
+                  onChange={handleChange}
+                  disableAlpha={true}
+                  width={'240px'}
+                />
+              </Dismissible>
+            </Popover>
+          )}
         </FormPortal>
       )}
     </ColorPickerWrapper>
