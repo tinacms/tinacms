@@ -78,16 +78,21 @@ const Panel = function Panel({
 
   return (
     <FormPortal>
-      <GroupPanel isExpanded={isExpanded}>
-        <PanelHeader onClick={() => setExpanded(false)}>
-          <LeftArrowIcon /> <span>{field.label || field.name}</span>
-        </PanelHeader>
-        <PanelBody>
-          {isExpanded ? (
-            <FieldsBuilder form={tinaForm} fields={fields} />
-          ) : null}
-        </PanelBody>
-      </GroupPanel>
+      {({ zIndexShift }) => (
+        <GroupPanel
+          isExpanded={isExpanded}
+          style={{ zIndex: zIndexShift + 1000 }}
+        >
+          <PanelHeader onClick={() => setExpanded(false)}>
+            <LeftArrowIcon /> <span>{field.label || field.name}</span>
+          </PanelHeader>
+          <PanelBody>
+            {isExpanded ? (
+              <FieldsBuilder form={tinaForm} fields={fields} />
+            ) : null}
+          </PanelBody>
+        </GroupPanel>
+      )}
     </FormPortal>
   )
 }

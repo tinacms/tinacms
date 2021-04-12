@@ -21,7 +21,9 @@ import { useContext } from 'react'
 import { createPortal } from 'react-dom'
 import styled from 'styled-components'
 
-export type FormPortal = React.FC<{}>
+export type FormPortal = React.FC<{
+  children(props: { zIndexShift: number }): React.ReactNode | null
+}>
 
 const FormPortalContext = React.createContext<FormPortal>(() => {
   return null
@@ -34,13 +36,24 @@ export function useFormPortal() {
 export const FormPortalProvider: React.FC = styled(
   ({ children, ...styleProps }) => {
     const wrapperRef = React.useRef<HTMLDivElement | null>(null)
+    const zIndexRef = React.useRef<number>(0)
 
     const FormPortal = React.useCallback(
       (props: any) => {
+        const portalZIndex = React.useMemo<number>(() => {
+          const value = zIndexRef.current
+          zIndexRef.current += 1
+          return value
+        }, [])
+
         if (!wrapperRef.current) return null
-        return createPortal(props.children, wrapperRef.current)
+
+        return createPortal(
+          props.children({ zIndexShift: portalZIndex }),
+          wrapperRef.current
+        )
       },
-      [wrapperRef.current]
+      [wrapperRef, zIndexRef]
     )
 
     return (
