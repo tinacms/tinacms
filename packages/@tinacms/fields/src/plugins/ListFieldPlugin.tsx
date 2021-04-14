@@ -175,7 +175,7 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
 }
 
 const ItemField = styled.div`
-  flex: 1 0 auto;
+  flex: 1;
   display: flex;
   align-items: center;
 
@@ -285,7 +285,7 @@ const ListItem = styled.div<{ isDragging: boolean }>`
 
   ${FieldWrapper} {
     margin: 0;
-    flex: 1 0 auto;
+    flex: 1;
   }
 
   svg {
