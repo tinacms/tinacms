@@ -30,6 +30,7 @@ import { tina_reset_styles } from '@tinacms/styles'
 import { CreateContentMenu } from './CreateContentMenu'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '@tinacms/react-core'
+import { ResizeHandle } from './ResizeHandle'
 import { SidebarState, SidebarPosition, SidebarStateOptions } from '../sidebar'
 
 export interface SidebarProviderProps {
@@ -121,6 +122,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
               close={() => setActiveView(null)}
             />
           )}
+          <ResizeHandle />
         </SidebarWrapper>
         <SidebarToggle sidebar={sidebar} />
       </SidebarContainer>
@@ -369,7 +371,7 @@ const SidebarToggleButton = styled.button<{ open: boolean }>`
   background-color: var(--tina-color-primary);
   background-repeat: no-repeat;
   background-position: center;
-  transition: all 150ms ease-out;
+  transition: background-color 150ms ease-out;
   cursor: pointer;
   animation: ${SidebarToggleAnimation} 200ms 300ms ease-out 1 both;
   &:hover {
