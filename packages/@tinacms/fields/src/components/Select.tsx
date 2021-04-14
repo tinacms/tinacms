@@ -100,7 +100,7 @@ const SelectElement = styled.div`
     background-repeat: no-repeat;
     background-position: right 0.7em top 50%;
     background-size: 0.65em auto;
-    padding-right: 30px;
+    padding-right: 1.5rem;
     overflow: hidden;
     text-overflow: ellipsis;
 
