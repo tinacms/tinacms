@@ -74,6 +74,7 @@ const AlertContainer = styled.div`
   flex-direction: column;
   align-items: center;
   z-index: 999999;
+  pointer-events: none;
 `
 
 const AlertEntranceAnimation = keyframes`
@@ -97,6 +98,7 @@ const Alert = styled.div<{ level: AlertLevel; index: number }>`
   color: var(--tina-color-grey-9);
   fill: var(--tina-color-primary);
   font-weight: var(--tina-font-weight-regular);
+  pointer-events: all;
   cursor: pointer;
   font-size: var(--tina-font-size-2);
   padding: 8px 4px 8px 12px;
