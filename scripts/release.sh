@@ -1,5 +1,12 @@
 #!/bin/bash
 
+# Check for $GH_TOKEN
+if [[ -z $GH_TOKEN ]]
+then
+  echo "ENV '\$GH_TOKEN' is required to proceed; learn more at https://github.com/lerna/lerna/blob/main/commands/version/README.md#--create-release-type"
+  exit 1
+fi
+
 # Terminate after the first line that fails (returns nonzero exit code)
 set -e
 
