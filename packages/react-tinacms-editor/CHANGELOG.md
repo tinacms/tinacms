@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.40.0](https://github.com/tinacms/tinacms/compare/v0.39.0...v0.40.0) (2021-04-19)
+
+
+### Bug Fixes
+
+* the same mistake with MenuPortal ([94690b3](https://github.com/tinacms/tinacms/commit/94690b33c210f85b051d090d84c5f675f53ce87c))
+
+
+
+
+
 # [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
 
 

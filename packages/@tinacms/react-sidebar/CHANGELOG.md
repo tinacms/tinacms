@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.40.0](https://github.com/tinacms/tinacms/compare/v0.39.0...v0.40.0) (2021-04-19)
+
+
+### Features
+
+* drag to resize sidebar ([5c6b370](https://github.com/tinacms/tinacms/commit/5c6b3700b0a165a0af600ec3bb21c9f271374fd4))
+
+
+
+
+
 # [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
 
 
