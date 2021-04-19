@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.40.0](https://github.com/tinacms/tinacms/compare/v0.39.0...v0.40.0) (2021-04-19)
+
+### Bug Fixes
+
+- alert container click blocking ([4d3f8ed](https://github.com/tinacms/tinacms/commit/4d3f8ed285a04f6dd75bdc707fbd8bb5a0fe06ba))
+- Changes 30px to 1.5rem ([63e7f71](https://github.com/tinacms/tinacms/commit/63e7f716e7a957577c33dd642df2e68dd7f07888))
+- Check for \$GH_TOKEN when releasing ([c8c8fc9](https://github.com/tinacms/tinacms/commit/c8c8fc988a98299bc62dc3e74f365b509438149f))
+- **@tinacms/fields:** Fixes width for list selects ([2d0f991](https://github.com/tinacms/tinacms/commit/2d0f991d235ac9d9a959326dcad28ad64d0f8fde))
+- do not recreate FormPortal on a ref value change ([7fade9a](https://github.com/tinacms/tinacms/commit/7fade9a7aed39e27f1ec8d440fca25f1b1976e76))
+- Docs & Nuke.sh ([da36b61](https://github.com/tinacms/tinacms/commit/da36b619789dc8caa8041871b11291b64d80fcb7))
+- switched to style prop to set zIndex ([3376dcd](https://github.com/tinacms/tinacms/commit/3376dcdd5023fdc51d217287fdfa9728dc20a668))
+- the same mistake with MenuPortal ([94690b3](https://github.com/tinacms/tinacms/commit/94690b33c210f85b051d090d84c5f675f53ce87c))
+
+### Features
+
+- drag to resize sidebar ([5c6b370](https://github.com/tinacms/tinacms/commit/5c6b3700b0a165a0af600ec3bb21c9f271374fd4))
+
 # [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
 
 ### Bug Fixes
