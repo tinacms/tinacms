@@ -29,8 +29,32 @@ import grayMatter from 'gray-matter'
 import { useCMS, usePlugin } from 'tinacms'
 import { InlineWysiwyg } from 'react-tinacms-editor'
 import Link from 'next/link'
+import { ContentCreatorPlugin } from '@tinacms/forms'
+
+const addBlogPlugin: ContentCreatorPlugin<any> = {
+  __type: 'content-creator',
+  name: 'add-blog-post',
+  fields: [
+    {
+      name: 'title',
+      component: 'text',
+    },
+  ],
+  onSubmit: () =>
+    new Promise((resolve, reject) => {
+      setTimeout(() => {
+        reject()
+        alert('rejected')
+      }, 3000)
+    }),
+}
 
 const Post: NextPage<{ post: MarkdownFile }> = props => {
+  const cms = useCMS()
+  React.useEffect(() => {
+    cms.plugins.add(addBlogPlugin)
+  }, [cms])
+
   const [post, form] = useMarkdownForm(props.post, {
     fields: [
       { name: 'frontmatter.title', component: 'text' },
