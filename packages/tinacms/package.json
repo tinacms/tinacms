@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.40.0",
+  "version": "0.40.1-alpha.0",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -44,7 +44,7 @@
     "@tinacms/react-forms": "^0.40.0",
     "@tinacms/react-modals": "^0.40.0",
     "@tinacms/react-screens": "^0.40.0",
-    "@tinacms/react-sidebar": "^0.40.0",
+    "@tinacms/react-sidebar": "^0.40.1-alpha.0",
     "@tinacms/react-toolbar": "^0.40.0",
     "@tinacms/styles": "^0.40.0",
     "react-dropzone": "^11.1.0"
