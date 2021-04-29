@@ -26,8 +26,10 @@ import ReactDatetime from 'react-datetime'
 import { DatetimepickerProps } from 'react-datetime'
 import { format, parse } from './dateFormat'
 
+const DEFAULT_DATE_FORMAT = 'MMM DD, YYYY'
+
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
-  ({ input, field }) => {
+  ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
     const [isOpen, setIsOpen] = useState(false)
     const area = useRef<HTMLDivElement>(null!)
 
@@ -56,10 +58,10 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
             onFocus={input.onFocus}
             onChange={input.onChange}
             open={isOpen}
-            dateFormat="MMM DD, YYYY"
-            timeFormat={false}
+            dateFormat={dateFormat || DEFAULT_DATE_FORMAT}
+            timeFormat={timeFormat || false}
             utc // https://github.com/tinacms/tinacms/pull/326#issuecomment-543836469
-            {...field}
+            {...rest}
           />
         </ReactDateTimeContainer>
       </DatetimeContainer>
