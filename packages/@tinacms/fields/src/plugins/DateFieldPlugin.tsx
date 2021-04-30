@@ -26,7 +26,7 @@ import ReactDatetime from 'react-datetime'
 import { DatetimepickerProps } from 'react-datetime'
 import { format, parse } from './dateFormat'
 
-const DEFAULT_DATE_FORMAT = 'MMM DD, YYYY'
+const DEFAULT_DATE_FORMAT = 'MMM dd, yyyy'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
