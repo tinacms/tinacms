@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.40.1](https://github.com/tinacms/tinacms/compare/v0.40.0...v0.40.1) (2021-05-05)
+
+
+### Bug Fixes
+
+* **@tinacms/react-sidebar:** disable "create" button while waiting for submit response ([1acc297](https://github.com/tinacms/tinacms/commit/1acc297d6d61adc8ddde930ebe562711d82a608c))
+
+
+
+
+
 # [0.40.0](https://github.com/tinacms/tinacms/compare/v0.39.0...v0.40.0) (2021-04-19)
 
 
