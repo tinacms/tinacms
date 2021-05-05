@@ -103,31 +103,47 @@ const FormModal = ({ plugin, close }: any) => {
         id: 'create-form-id',
         actions: [],
         fields: plugin.fields,
-        onSubmit(values) {
-          plugin.onSubmit(values, cms).then(() => {
+        initialValues: plugin.initialValues || {},
+        onSubmit: async values => {
+          await plugin.onSubmit(values, cms).then(() => {
             close()
           })
         },
       }),
     [close, cms, plugin]
   )
+
+  const [busy, setBusy] = React.useState(false)
+
   return (
     <Modal>
       <FormBuilder form={form}>
         {({ handleSubmit }) => {
+          const awaitedHandleSubmit = () => {
+            setBusy(true)
+            handleSubmit()?.finally(() => {
+              setBusy(false)
+            })
+          }
           return (
             <ModalPopup>
               <ModalHeader close={close}>{plugin.name}</ModalHeader>
               <ModalBody
                 onKeyPress={e =>
-                  e.charCode === 13 ? (handleSubmit() as any) : null
+                  e.charCode === 13 && !busy
+                    ? (awaitedHandleSubmit() as any)
+                    : null
                 }
               >
                 <FieldsBuilder form={form} fields={form.fields} />
               </ModalBody>
               <ModalActions>
                 <Button onClick={close}>Cancel</Button>
-                <Button onClick={handleSubmit as any} primary>
+                <Button
+                  disabled={busy}
+                  onClick={awaitedHandleSubmit as any}
+                  primary
+                >
                   Create
                 </Button>
               </ModalActions>
