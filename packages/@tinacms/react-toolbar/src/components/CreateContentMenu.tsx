@@ -103,8 +103,9 @@ const FormModal = ({ plugin, close }: any) => {
         id: 'create-form-id',
         actions: [],
         fields: plugin.fields,
-        onSubmit(values) {
-          plugin.onSubmit(values, cms).then(() => {
+        initialValues: plugin.initialValues || {},
+        onSubmit: async values => {
+          await plugin.onSubmit(values, cms).then(() => {
             close()
           })
         },
@@ -138,7 +139,11 @@ const FormModal = ({ plugin, close }: any) => {
               </ModalBody>
               <ModalActions>
                 <Button onClick={close}>Cancel</Button>
-                <Button onClick={awaitedHandleSubmit as any} primary>
+                <Button
+                  disabled={busy}
+                  onClick={awaitedHandleSubmit as any}
+                  primary
+                >
                   Create
                 </Button>
               </ModalActions>
