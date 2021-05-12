@@ -179,7 +179,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
     <td align="center"><a href="https://saintmalik.me"><img src="https://avatars.githubusercontent.com/u/37118134?v=4?s=100" width="100px;" alt=""/><br /><sub><b>SaintMalik</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=saintmalik" title="Documentation">📖</a></td>
   </tr>
   <tr>
-    <td align="center"><a href="http://greenash.net.au/"><img src="https://avatars.githubusercontent.com/u/79373?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jeremy Epstein</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Jaza" title="Documentation">📖</a></td>
+    <td align="center"><a href="http://greenash.net.au/"><img src="https://avatars.githubusercontent.com/u/79373?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jeremy Epstein</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Jaza" title="Documentation">📖</a> <a href="https://github.com/tinacms/tinacms/commits?author=Jaza" title="Code">💻</a> <a href="#plugin-Jaza" title="Plugin/utility libraries">🔌</a></td>
   </tr>
 </table>
 
