@@ -2,6 +2,10 @@
 
 This package provides a [Field Plugin](https://tinacms.org/docs/plugins/fields) for editing dates on websites built with [TinaCMS](https://tinacms.org).
 
+> **As of TinaCMS v0.40.1+, `DateFieldPlugin` is now a default plugin**.  
+This package is **deprecated** and should only be used for previous versions of TinaCMS.  
+You can learn more about this change and reasons for it [here](https://github.com/tinacms/tinacms/issues/1806).
+
 ![tinacms-date-field](https://tinacms.org/img/fields/date.jpg)
 
 ## Installation
