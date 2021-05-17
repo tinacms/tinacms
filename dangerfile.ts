@@ -424,6 +424,7 @@ function checkDeps(tinaPackage: TinaPackage) {
       '@testing-library/react',
       '@testing-library/dom',
     ],
+    package: tinaPackage.packageJson,
   }
   const packagePath = path.resolve(
     tinaPackage.path.replace('/package.json', '')
