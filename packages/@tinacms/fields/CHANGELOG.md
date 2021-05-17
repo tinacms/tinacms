@@ -3,6 +3,23 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.41.0](https://github.com/tinacms/tinacms/compare/v0.40.1...v0.41.0) (2021-05-17)
+
+
+### Bug Fixes
+
+* **@tinacms/fields:** Better handling for default formats ([af3496d](https://github.com/tinacms/tinacms/commit/af3496d47b865e2d2e08693cff5b7270aea8eebd))
+
+
+### Features
+
+* Updates default format to be more standards compliant ([3617ea6](https://github.com/tinacms/tinacms/commit/3617ea67c07be2d155a8bd5ba2b2a21ed9923006))
+* **@tinacms/fields:** Adds date field to default plugins ([8ac27d1](https://github.com/tinacms/tinacms/commit/8ac27d12bcc488a73f75b214b718da111e185d28))
+
+
+
+
+
 # [0.40.0](https://github.com/tinacms/tinacms/compare/v0.39.0...v0.40.0) (2021-04-19)
 
 
