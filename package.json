@@ -51,7 +51,6 @@
   },
   "dependencies": {
     "danger": "^10.6.4",
-    "depcheck": "^1.4.0",
     "tinacms": "^0.18.2"
   },
   "husky": {
