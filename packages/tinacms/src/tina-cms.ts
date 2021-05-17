@@ -33,6 +33,7 @@ import {
   ListFieldPlugin,
   BlocksFieldPlugin,
   TagsFieldPlugin,
+  DateFieldPlugin,
 } from '@tinacms/fields'
 import { Form } from '@tinacms/forms'
 import { Alerts, EventsToAlerts } from '@tinacms/alerts'
@@ -41,7 +42,6 @@ import { ToolbarStateOptions, ToolbarState } from '@tinacms/react-toolbar'
 import {
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
-  DateFieldPlaceholder,
 } from './plugins/fields/markdown'
 import { MediaManagerScreenPlugin } from './plugins/screens/media-manager-screen'
 import { BaseMediaPaginator } from './components/media/pagination'
@@ -60,9 +60,9 @@ const DEFAULT_FIELDS = [
   ListFieldPlugin,
   BlocksFieldPlugin,
   TagsFieldPlugin,
+  DateFieldPlugin,
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
-  DateFieldPlaceholder,
 ]
 
 export interface TinaCMSConfig extends CMSConfig {
