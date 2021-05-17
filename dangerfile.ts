@@ -126,7 +126,6 @@ async function runChecksOnPullRequest() {
 
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
-  modifiedPackages.forEach(checkDeps)
   modifiedPackages.forEach(checkForGlobalDeps)
 
   modifiedPackages.forEach(pkg => checkForReadmeChanges(pkg, allFiles))
