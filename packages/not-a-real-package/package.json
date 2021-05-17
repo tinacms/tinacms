@@ -29,5 +29,9 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.39.0"
   },
-  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
+  "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd",
+  "dependencies": {
+    "axios": "^0.21.1",
+    "moment": "^2.29.1"
+  }
 }
