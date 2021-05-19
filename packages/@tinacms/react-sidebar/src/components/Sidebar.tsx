@@ -27,7 +27,7 @@ import {
   TinaIcon,
 } from '@tinacms/icons'
 import { tina_reset_styles } from '@tinacms/styles'
-import { CreateContentMenu } from './CreateContentMenu'
+import { CreateContentMenu } from '@tinacms/react-forms'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
 import { useSubscribable, useCMS } from '@tinacms/react-core'
 import { ResizeHandle } from './ResizeHandle'
@@ -87,7 +87,7 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
                 <HamburgerIcon />
               </MenuToggle>
             )}
-            <CreateContentMenu />
+            <CreateContentMenu sidebar={true} />
           </SidebarHeader>
           <FormsView>
             <sidebar.placeholder />
