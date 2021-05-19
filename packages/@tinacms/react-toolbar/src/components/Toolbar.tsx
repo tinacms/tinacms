@@ -23,12 +23,11 @@ import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
 import { Button, tina_reset_styles } from '@tinacms/styles'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
-import { CreateContentMenu } from './CreateContentMenu'
 import styled, { css } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
 import { ResetIcon, HamburgerIcon, TinaIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
-import { LoadingDots } from '@tinacms/react-forms'
+import { LoadingDots, CreateContentMenu } from '@tinacms/react-forms'
 import { FormActionMenu } from './FormActions'
 
 const useFormState = (form: Form | null, subscription: any): any => {
@@ -127,7 +126,7 @@ export const Toolbar = () => {
               <HamburgerIcon />
             </MenuToggle>
           )}
-          <CreateContentMenu />
+          <CreateContentMenu sidebar={false} />
         </AlignLeft>
 
         <AlignRight>

@@ -33,7 +33,13 @@ import { IconButton, Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import { useCMS, useSubscribable } from '@tinacms/react-core'
 
-export const CreateContentMenu = () => {
+export interface CreateContentMenuProps {
+  sidebar: boolean
+}
+
+export const CreateContentMenu: React.FC<CreateContentMenuProps> = ({
+  sidebar,
+}) => {
   const cms = useCMS()
   const [visible, setVisible] = React.useState(false)
 
@@ -44,9 +50,16 @@ export const CreateContentMenu = () => {
   if (contentCreatorPlugins.all().length) {
     return (
       <ContentMenuWrapper>
-        <IconButton onClick={() => setVisible(true)} open={visible} primary>
-          <AddIcon />
-        </IconButton>
+        {sidebar ? (
+          <IconButton onClick={() => setVisible(true)} open={visible} primary>
+            <AddIcon />
+          </IconButton>
+        ) : (
+          <CreateToggleButton onClick={() => setVisible(true)} open={visible}>
+            <AddIcon /> <DesktopLabel>New</DesktopLabel>
+          </CreateToggleButton>
+        )}
+
         <ContentMenu open={visible}>
           <Dismissible
             click
@@ -156,6 +169,41 @@ const ContentMenuWrapper = styled.div`
   justify-self: end;
 `
 
+const CreateToggleButton = styled(Button)`
+  display: flex;
+  align-items: center;
+  transition: all 150ms ease-out;
+  padding: 0 10px;
+
+  @media (min-width: 1030px) {
+    padding: 0 20px;
+  }
+
+  &:focus {
+    outline: none !important;
+  }
+
+  svg {
+    fill: currentColor;
+    opacity: 0.7;
+    width: 2em;
+    height: 2em;
+    margin-right: 0.25rem;
+    transform-origin: 50% 50%;
+    transition: all 150ms ease-out;
+  }
+
+  ${p =>
+    p.open &&
+    css`
+      background-color: transparent;
+
+      svg {
+        transform: rotate(45deg);
+      }
+    `};
+`
+
 const ContentMenu = styled.div<{ open: boolean }>`
   min-width: 192px;
   border-radius: var(--tina-radius-big);
@@ -163,12 +211,12 @@ const ContentMenu = styled.div<{ open: boolean }>`
   display: block;
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
-  transform-origin: 100% 0;
+  transform-origin: 0 0;
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
@@ -186,7 +234,7 @@ const ContentMenu = styled.div<{ open: boolean }>`
 const CreateButton = styled.button`
   position: relative;
   text-align: center;
-  font-size: var(--tina-font-size-0);
+  font-size: var(--tina-font-size-1);
   padding: 0 12px;
   height: 40px;
   font-weight: var(--tina-font-weight-regular);
@@ -202,5 +250,12 @@ const CreateButton = styled.button`
   }
   &:not(:last-child) {
     border-bottom: 1px solid #efefef;
+  }
+`
+
+export const DesktopLabel = styled.span`
+  display: none;
+  @media (min-width: 1030px) {
+    display: inline;
   }
 `
