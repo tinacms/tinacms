@@ -126,7 +126,7 @@ const FormModal = ({ plugin, close }: any) => {
   return (
     <Modal>
       <FormBuilder form={form}>
-        {({ handleSubmit }) => {
+        {({ handleSubmit, invalid }) => {
           const awaitedHandleSubmit = () => {
             setBusy(true)
             handleSubmit()?.finally(() => {
@@ -148,7 +148,7 @@ const FormModal = ({ plugin, close }: any) => {
               <ModalActions>
                 <Button onClick={close}>Cancel</Button>
                 <Button
-                  disabled={busy}
+                  disabled={busy || invalid}
                   onClick={awaitedHandleSubmit as any}
                   primary
                 >
