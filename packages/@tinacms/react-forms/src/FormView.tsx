@@ -51,7 +51,7 @@ export function FormView({ activeForm }: FormViewProps) {
 
   return (
     <FormBuilder form={activeForm as any}>
-      {({ handleSubmit, pristine, form, submitting }) => {
+      {({ handleSubmit, pristine, invalid, form, submitting }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
             <FormBody>
@@ -84,7 +84,7 @@ export function FormView({ activeForm }: FormViewProps) {
                 )}
                 <Button
                   onClick={() => handleSubmit()}
-                  disabled={pristine}
+                  disabled={pristine || invalid}
                   busy={submitting}
                   primary
                   grow
