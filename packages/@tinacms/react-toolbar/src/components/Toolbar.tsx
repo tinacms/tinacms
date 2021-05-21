@@ -60,6 +60,7 @@ export const Toolbar = () => {
   const formState = useFormState(form, {
     pristine: true,
     submitting: true,
+    invalid: true,
   })
 
   // this is used to refreshe the discard button to fix it not updating when pressed after the page loads
@@ -113,6 +114,7 @@ export const Toolbar = () => {
   const submitting = disabled
     ? false
     : !!(formState && currentState?.submitting)
+  const invalid = formState && currentState?.invalid
 
   return (
     <>
@@ -159,7 +161,7 @@ export const Toolbar = () => {
               //@ts-ignore
               onClick={submit}
               busy={submitting}
-              disabled={disabled || pristine}
+              disabled={disabled || pristine || invalid}
             >
               {submitting && <LoadingDots />}
               {!submitting && (

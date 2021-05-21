@@ -1,5 +1,5 @@
 ---
-title: Apple
+title: 'apple'
 ---
 ![](/images/pup.jpeg)
 
