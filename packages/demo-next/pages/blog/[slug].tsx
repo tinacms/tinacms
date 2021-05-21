@@ -38,6 +38,13 @@ const addBlogPlugin: ContentCreatorPlugin<any> = {
     {
       name: 'title',
       component: 'text',
+      validate: value => {
+        if (!value) {
+          return 'required'
+        } else {
+          return undefined
+        }
+      },
     },
   ],
   onSubmit: () =>
