@@ -57,7 +57,17 @@ const Post: NextPage<{ post: MarkdownFile }> = props => {
 
   const [post, form] = useMarkdownForm(props.post, {
     fields: [
-      { name: 'frontmatter.title', component: 'text' },
+      {
+        name: 'frontmatter.title',
+        component: 'text',
+        validate: value => {
+          if (!value) {
+            return 'required'
+          } else {
+            return undefined
+          }
+        },
+      },
       { name: 'markdownBody', component: 'markdown' },
     ],
   })
