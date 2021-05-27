@@ -997,7 +997,9 @@
       "avatar_url": "https://avatars.githubusercontent.com/u/79373?v=4",
       "profile": "http://greenash.net.au/",
       "contributions": [
-        "doc"
+        "doc",
+        "code",
+        "plugin"
       ]
     }
   ],
