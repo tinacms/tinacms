@@ -16,6 +16,7 @@ limitations under the License.
 
 */
 
+export * from './CreateContentMenu'
 export * from './FormActions'
 export * from './FormPortal'
 export * from './FormView'
