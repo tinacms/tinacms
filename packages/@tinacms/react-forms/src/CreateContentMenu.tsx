@@ -60,7 +60,7 @@ export const CreateContentMenu: React.FC<CreateContentMenuProps> = ({
           </CreateToggleButton>
         )}
 
-        <ContentMenu open={visible}>
+        <ContentMenu open={visible} direction={sidebar ? 'left' : 'right'}>
           <Dismissible
             click
             escape
@@ -204,7 +204,7 @@ const CreateToggleButton = styled(Button)`
     `};
 `
 
-const ContentMenu = styled.div<{ open: boolean }>`
+const ContentMenu = styled.div<{ open: boolean; direction: 'left' | 'right' }>`
   min-width: 192px;
   border-radius: var(--tina-radius-big);
   border: 1px solid var(--tina-color-grey-2);
@@ -221,6 +221,19 @@ const ContentMenu = styled.div<{ open: boolean }>`
   background-color: white;
   overflow: hidden;
   z-index: var(--tina-z-index-1);
+
+  ${props =>
+    props.direction === 'left' &&
+    css`
+      right: 0;
+      transform-origin: 100% 0;
+    `}
+  ${props =>
+    props.direction === 'right' &&
+    css`
+      left: 0;
+      transform-origin: 0 0;
+    `}
 
   ${props =>
     props.open &&
