@@ -23,7 +23,7 @@ import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
 import { Button, tina_reset_styles } from '@tinacms/styles'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
-import { CreateContentMenu } from './CreateContentMenu'
+import { CreateContentMenu } from '@tinacms/react-forms'
 import styled, { css } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
 import { ResetIcon, HamburgerIcon, TinaIcon } from '@tinacms/icons'
@@ -103,6 +103,7 @@ export const Toolbar = () => {
     form?.buttons || {
       save: 'Save',
       reset: 'Reset',
+      invalid: true,
     }
 
   //const reset = form && (form.reset || (() => form.finalForm.reset()))
@@ -129,7 +130,7 @@ export const Toolbar = () => {
               <HamburgerIcon />
             </MenuToggle>
           )}
-          <CreateContentMenu />
+          <CreateContentMenu sidebar={false} />
         </AlignLeft>
 
         <AlignRight>
