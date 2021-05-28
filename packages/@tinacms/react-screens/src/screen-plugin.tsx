@@ -43,6 +43,8 @@ export interface ScreenPlugin<ExtraProps = {}> extends Plugin {
  */
 export interface ScreenComponentProps {
   close(): void
+  currentTab?: number
+  setAllTabs?: (tabsArray: string[]) => void
 }
 
 /**
@@ -59,6 +61,8 @@ export interface ScreenOptions<ExtraProps = {}> {
 /**
  * Creates screen plugins.
  *
+ * @param Component
+ * @param props
  * @param options
  */
 export function createScreen<ExtraProps>({
