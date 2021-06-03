@@ -23,7 +23,7 @@ import { Form } from '@tinacms/forms'
 import { FieldMeta } from '@tinacms/fields'
 import { Button, tina_reset_styles } from '@tinacms/styles'
 import { ScreenPlugin, ScreenPluginModal } from '@tinacms/react-screens'
-import { CreateContentMenu } from './CreateContentMenu'
+import { CreateContentMenu } from '@tinacms/react-forms'
 import styled, { css } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
 import { ResetIcon, HamburgerIcon, TinaIcon } from '@tinacms/icons'
@@ -41,7 +41,7 @@ const useFormState = (form: Form | null, subscription: any): any => {
   return state
 }
 
-interface ToolbarWidgetPlugin<Props = any> extends Plugin {
+export interface ToolbarWidgetPlugin<Props = any> extends Plugin {
   weight: number
   props?: Props
   component(): React.ReactElement
@@ -60,6 +60,7 @@ export const Toolbar = () => {
   const formState = useFormState(form, {
     pristine: true,
     submitting: true,
+    invalid: true,
   })
 
   // this is used to refreshe the discard button to fix it not updating when pressed after the page loads
@@ -102,6 +103,7 @@ export const Toolbar = () => {
     form?.buttons || {
       save: 'Save',
       reset: 'Reset',
+      invalid: true,
     }
 
   //const reset = form && (form.reset || (() => form.finalForm.reset()))
@@ -113,6 +115,7 @@ export const Toolbar = () => {
   const submitting = disabled
     ? false
     : !!(formState && currentState?.submitting)
+  const invalid = formState && currentState?.invalid
 
   return (
     <>
@@ -127,7 +130,7 @@ export const Toolbar = () => {
               <HamburgerIcon />
             </MenuToggle>
           )}
-          <CreateContentMenu />
+          <CreateContentMenu sidebar={false} />
         </AlignLeft>
 
         <AlignRight>
@@ -159,7 +162,7 @@ export const Toolbar = () => {
               //@ts-ignore
               onClick={submit}
               busy={submitting}
-              disabled={disabled || pristine}
+              disabled={disabled || pristine || invalid}
             >
               {submitting && <LoadingDots />}
               {!submitting && (

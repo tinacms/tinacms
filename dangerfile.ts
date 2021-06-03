@@ -17,7 +17,6 @@ limitations under the License.
 */
 
 import { markdown, danger, warn, fail, message, GitHubPRDSL } from 'danger'
-import depcheck from 'depcheck'
 import * as fs from 'fs'
 import * as path from 'path'
 import { Buffer } from 'buffer'
@@ -127,7 +126,6 @@ async function runChecksOnPullRequest() {
 
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
-  modifiedPackages.forEach(checkDeps)
   modifiedPackages.forEach(checkForGlobalDeps)
 
   modifiedPackages.forEach(pkg => checkForReadmeChanges(pkg, allFiles))
@@ -405,50 +403,6 @@ async function getModifiedPackages(allFiles: string[]) {
 
   return packageList
 }
-
-function checkDeps(tinaPackage: TinaPackage) {
-  const DEPCHECK_OPTIONS = {
-    ignoreMatches: [
-      '@babel/*',
-      '@types/*',
-      'jest',
-      'tsdx',
-      'ts-jest',
-      'tslib',
-      'typescript',
-      '*-loader',
-      '*-webpack-plugin',
-      '@storybook/*',
-      '@sambego/*',
-      '@tinacms/scripts',
-      '@testing-library/react',
-      '@testing-library/dom',
-    ],
-  }
-  const packagePath = path.resolve(
-    tinaPackage.path.replace('/package.json', '')
-  )
-
-  // Intentionally cast to any
-  depcheck(packagePath, DEPCHECK_OPTIONS, (results: any) => {
-    const unusedDependencies = ['dependencies', 'devDependencies']
-    unusedDependencies.forEach(type => {
-      if (results[type].length) {
-        warnAboutUnused(tinaPackage, type, results[type])
-      }
-    })
-  })
-}
-
-const warnAboutUnused = (
-  { packageJson }: TinaPackage,
-  type: string,
-  deps: string[]
-) =>
-  warn(`${packageJson.name} has unused ${type}
-
-${deps.map(dep => `* ${dep}`).join('\n')}\n
-`)
 
 function checkForGlobalDeps(tinaPackage: TinaPackage) {
   const deps = Object.keys(tinaPackage.packageJson.dependencies || {})
