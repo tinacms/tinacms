@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.41.1-alpha.0",
+  "version": "0.41.1-alpha.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -35,17 +35,17 @@
   "dependencies": {
     "@tinacms/alerts": "^0.39.0",
     "@tinacms/core": "^0.39.0",
-    "@tinacms/fields": "^0.41.1-alpha.0",
+    "@tinacms/fields": "^0.41.1-alpha.1",
     "@tinacms/form-builder": "^0.39.0",
     "@tinacms/forms": "^0.39.0",
     "@tinacms/icons": "^0.39.0",
     "@tinacms/react-alerts": "^0.40.0",
     "@tinacms/react-core": "^0.39.0",
-    "@tinacms/react-forms": "^0.41.1-alpha.0",
+    "@tinacms/react-forms": "^0.41.1-alpha.1",
     "@tinacms/react-modals": "^0.40.0",
     "@tinacms/react-screens": "^0.40.0",
-    "@tinacms/react-sidebar": "^0.41.1-alpha.0",
-    "@tinacms/react-toolbar": "^0.41.1-alpha.0",
+    "@tinacms/react-sidebar": "^0.41.1-alpha.1",
+    "@tinacms/react-toolbar": "^0.41.1-alpha.1",
     "@tinacms/styles": "^0.40.0",
     "react-dropzone": "^11.1.0"
   },
