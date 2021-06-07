@@ -41,7 +41,7 @@ const useFormState = (form: Form | null, subscription: any): any => {
   return state
 }
 
-interface ToolbarWidgetPlugin<Props = any> extends Plugin {
+export interface ToolbarWidgetPlugin<Props = any> extends Plugin {
   weight: number
   props?: Props
   component(): React.ReactElement
