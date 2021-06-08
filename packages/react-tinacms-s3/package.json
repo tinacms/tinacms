@@ -1,0 +1,32 @@
+{
+  "name": "react-tinacms-s3",
+  "version": "0.40.1",
+  "description": "",
+  "main": "dist/index.js",
+  "types": "dist/src/index.d.ts",
+  "scripts": {
+    "watch": "tinacms-scripts watch",
+    "build": "tinacms-scripts build",
+    "dev": "tinacms-scripts dev",
+    "test": "jest --env=jsdom --passWithNoTests"
+  },
+  "author": "",
+  "license": "Apache-2.0",
+  "devDependencies": {
+    "@tinacms/core": "^0.39.0",
+    "@tinacms/fields": "^0.41.1-alpha.0",
+    "@tinacms/media": "^0.39.0",
+    "@tinacms/react-core": "^0.39.0",
+    "@tinacms/react-forms": "^0.41.1-alpha.0",
+    "@tinacms/react-modals": "^0.40.0",
+    "@tinacms/scripts": "^0.39.0",
+    "@tinacms/styles": "^0.40.0",
+    "react-final-form": "^6.3.0"
+  },
+  "dependencies": {
+    "@types/js-cookie": "^2.2.5",
+    "js-cookie": "^2.2.1",
+    "styled-components": ">4.5",
+    "aws-sdk": "^2.903.0"
+  }
+}
