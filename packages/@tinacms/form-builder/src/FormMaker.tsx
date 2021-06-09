@@ -45,7 +45,6 @@ const NoFieldsPlaceholder = () => (
 )
 
 export const FormMaker: FC<FormMakerProps> = ({ form: tinaForm }) => {
-  const cms = useCMS()
   /**
    * > Why is a `key` being set when this isn't an array?
    *

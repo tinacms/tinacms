@@ -14,12 +14,9 @@ limitations under the License.
 import * as React from 'react'
 import { FormMaker } from '@tinacms/form-builder'
 import { Form } from '@tinacms/forms'
-import { useCMS } from '@tinacms/react-core'
 export interface FormViewProps {
   activeForm: Form
 }
 export function FormView({ activeForm }: FormViewProps) {
-  const cms = useCMS()
-
   return <FormMaker form={activeForm as any} />
 }
