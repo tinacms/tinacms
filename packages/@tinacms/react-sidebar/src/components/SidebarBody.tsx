@@ -24,8 +24,8 @@ import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { Button } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '@tinacms/react-core'
-import { FormView } from '@tinacms/react-forms'
 import { LeftArrowIcon } from '@tinacms/icons'
+import { FormView } from '@tinacms/react-forms'
 
 export const FormsView = ({
   children,
@@ -267,7 +267,7 @@ export const FormHeader = styled(
 `
 
 export const SaveButton: StyledComponent<typeof Button, {}, {}> = styled(
-  Button
+  Button as any
 )`
   flex: 1.5 0 auto;
   padding: 12px 24px;
