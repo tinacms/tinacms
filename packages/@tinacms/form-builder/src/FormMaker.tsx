@@ -14,7 +14,6 @@ limitations under the License.
 import * as React from 'react'
 import styled, { keyframes } from 'styled-components'
 import { FC } from 'react'
-import { useCMS } from '@tinacms/react-core'
 import { Form } from '@tinacms/forms'
 import { Form as FinalForm } from 'react-final-form'
 import {
