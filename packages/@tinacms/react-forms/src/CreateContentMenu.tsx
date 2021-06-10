@@ -19,7 +19,7 @@ import {
   ModalBody,
   ModalPopup,
 } from '@tinacms/react-modals'
-import { FormMaker } from '@tinacms/form-builder'
+import { FormBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
@@ -120,7 +120,7 @@ const FormModal = ({ plugin, close }: any) => {
       <ModalPopup>
         <ModalHeader close={close}>{plugin.name}</ModalHeader>
         <ModalBody>
-          <FormMaker form={form} />
+          <FormBuilder form={form} />
         </ModalBody>
       </ModalPopup>
     </Modal>

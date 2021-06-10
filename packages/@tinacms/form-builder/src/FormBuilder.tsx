@@ -27,7 +27,7 @@ import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button } from '@tinacms/styles'
 import { ModalProvider } from '@tinacms/react-modals'
 
-export interface FormMakerProps {
+export interface FormBuilderProps {
   form: Form
 }
 
@@ -43,7 +43,7 @@ const NoFieldsPlaceholder = () => (
   </EmptyState>
 )
 
-export const FormMaker: FC<FormMakerProps> = ({ form: tinaForm }) => {
+export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
   /**
    * > Why is a `key` being set when this isn't an array?
    *
@@ -85,28 +85,23 @@ export const FormMaker: FC<FormMakerProps> = ({ form: tinaForm }) => {
       >
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
-            <div className="form-wrapper">
-              <DragDropContext onDragEnd={moveArrayItem}>
-                <FormBody
-                  className="form-body"
-                  onKeyPress={e =>
-                    e.charCode === 13 && !submitting ? handleSubmit() : null
-                  }
-                >
-                  <FormPortalProvider>
-                    <Wrapper>
-                      {tinaForm && tinaForm.fields.length ? (
-                        <FieldsBuilder
-                          form={tinaForm}
-                          fields={tinaForm.fields}
-                        />
-                      ) : (
-                        <NoFieldsPlaceholder />
-                      )}
-                    </Wrapper>
-                  </FormPortalProvider>
-                </FormBody>
-              </DragDropContext>
+            <DragDropContext onDragEnd={moveArrayItem}>
+              <FormBody
+                className="form-body"
+                onKeyPress={e =>
+                  e.charCode === 13 && !submitting ? handleSubmit() : null
+                }
+              >
+                <FormPortalProvider>
+                  <Wrapper>
+                    {tinaForm && tinaForm.fields.length ? (
+                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    )}
+                  </Wrapper>
+                </FormPortalProvider>
+              </FormBody>
               <FormFooter className="form-footer">
                 <Wrapper>
                   {tinaForm.reset && (
@@ -139,7 +134,7 @@ export const FormMaker: FC<FormMakerProps> = ({ form: tinaForm }) => {
                   )}
                 </Wrapper>
               </FormFooter>
-            </div>
+            </DragDropContext>
           )
         }}
       </FinalForm>

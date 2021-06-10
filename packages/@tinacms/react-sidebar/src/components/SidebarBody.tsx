@@ -25,7 +25,7 @@ import { Button } from '@tinacms/styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '@tinacms/react-core'
 import { LeftArrowIcon } from '@tinacms/icons'
-import { FormView } from '@tinacms/react-forms'
+import { FormBuilder } from '@tinacms/form-builder'
 
 export const FormsView = ({
   children,
@@ -100,7 +100,7 @@ export const FormsView = ({
           {!isMultiform && activeForm.label && (
             <FormHeader activeForm={activeForm} />
           )}
-          <FormView activeForm={activeForm} />
+          <FormBuilder form={activeForm as any} />
         </FormWrapper>
       )}
     </>
