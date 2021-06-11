@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.41.1](https://github.com/tinacms/tinacms/compare/v0.41.0...v0.41.1) (2021-06-11)
+
+### Bug Fixes
+
+- **bug:** disables form save button if field fails validation ([e829ffa](https://github.com/tinacms/tinacms/commit/e829ffa6756a22b58c9de9403895d76696d224fe))
+
 # [0.41.0](https://github.com/tinacms/tinacms/compare/v0.40.1...v0.41.0) (2021-05-17)
 
 ### Bug Fixes
