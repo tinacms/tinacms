@@ -6,12 +6,18 @@
   "types": "dist/src/index.d.ts",
   "author": "",
   "license": "Apache-2.0",
+  "scripts": {
+    "test": "jest --passWithNoTests",
+    "build": "tinacms-scripts build"
+  },
   "devDependencies": {
+    "@tinacms/scripts": "^0.39.0",
     "@types/cookie": "0.3.3",
     "@types/crypto-js": "^3.1.47",
     "@types/uuid": "^8.0.0"
   },
   "dependencies": {
+    "@tinacms/core": "^0.39.0",
     "cloudinary": "^1.25.2",
     "cloudinary-core": "^2.11.4",
     "multer": "^1.4.2",
