@@ -12,3 +12,4 @@ limitations under the License.
 */
 
 export * from './cloudinary-media-store'
+export * from './handlers'

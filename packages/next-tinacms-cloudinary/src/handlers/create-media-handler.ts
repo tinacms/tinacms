@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import { v2 as cloudinary } from 'cloudinary'
-import { Media, MediaListOptions } from 'tinacms'
+import { Media, MediaListOptions } from '@tinacms/core'
 import path from 'path'
 import { NextApiRequest, NextApiResponse } from 'next'
 import multer from 'multer'
@@ -49,20 +49,21 @@ async function uploadMedia(req: NextApiRequest, res: NextApiResponse) {
   const upload = promisify(
     multer({
       storage: multer.diskStorage({
-        directory: (req, file, cb) => {
+        destination: (_req, _file, cb) => {
           cb(null, '/tmp')
         },
-        filename: (req, file, cb) => {
+        filename: (_req, file, cb) => {
           cb(null, file.originalname)
         },
       }),
     }).single('file')
   )
 
-  await upload(req, res)
+  //@ts-ignore
+  await upload(req, res, null)
 
   const { directory } = req.body
-
+  //@ts-ignore
   const result = await cloudinary.uploader.upload(req.file.path, {
     folder: directory.replace(/^\//, ''),
     use_filename: true,
@@ -111,6 +112,7 @@ async function listMedia(req: NextApiRequest, res: NextApiResponse) {
     })
 
     res.json({
+      //@ts-ignore
       items: [...folders, ...files],
     })
   } catch (e) {

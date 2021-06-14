@@ -11,12 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import {
-  mediaHandlerConfig,
-  createMediaHandler,
-} from '../../../next-tinacms-cloudinary/handlers'
+import { createMediaHandler } from 'next-tinacms-cloudinary'
 
-export const config = mediaHandlerConfig
+export const config = {
+  api: {
+    bodyParser: false,
+  },
+}
 
 // TODO: make this route secure
 export default createMediaHandler({

@@ -23,7 +23,7 @@ export const signSignatureHandler: NextApiHandler = (req, res) => {
       ...params,
       timestamp: timestamp,
     },
-    process.env.CLOUDINARY_API_SECRET
+    process.env.CLOUDINARY_API_SECRET || 'Missing Cloudinary API secret'
   )
   res.json({ signature, timestamp })
 }

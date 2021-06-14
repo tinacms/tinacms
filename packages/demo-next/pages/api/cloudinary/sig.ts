@@ -11,6 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { signSignatureHandler } from '../../../next-tinacms-cloudinary/handlers'
+import { signSignatureHandler } from 'next-tinacms-cloudinary'
 
 export default signSignatureHandler
