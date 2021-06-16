@@ -101,11 +101,14 @@ const FormModal = ({ plugin, close }: any) => {
   const form: Form = useMemo(
     () =>
       new Form({
-        label: 'create-form',
         id: 'create-form-id',
-        actions: [],
+        label: 'create-form',
         fields: plugin.fields,
+        actions: plugin.actions,
+        buttons: plugin.buttons,
         initialValues: plugin.initialValues || {},
+        reset: plugin.reset,
+        onChange: plugin.onChange,
         onSubmit: async values => {
           await plugin.onSubmit(values, cms).then(() => {
             close()

@@ -42,6 +42,9 @@ export const useGithubFileForm = <T = any>(
       initialValues: file.data,
       fields: options.fields || [],
       actions: options.actions || [],
+      buttons: options.buttons,
+      reset: options.reset,
+      onChange: options.onChange,
       onSubmit(formData) {
         return githubFile.commit(formData)
       },
