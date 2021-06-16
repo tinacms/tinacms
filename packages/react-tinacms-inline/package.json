@@ -24,7 +24,7 @@
     "react-final-form": ">=6",
     "react-tinacms-editor": ">=0.0",
     "styled-components": ">=4.1",
-    "tinacms": ">=0.13"
+    "tinacms": ">=0.39"
   },
   "devDependencies": {
     "@testing-library/react": "^11.1.2",

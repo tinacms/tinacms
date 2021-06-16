@@ -89,7 +89,7 @@ export function InlineForm({ form, children }: InlineFormProps) {
             setFocussedField('')
           }}
         >
-          <FormBuilder form={form as any}>
+          <FormBuilder form={form}>
             {({ form, ...formProps }) => (
               <>
                 {typeof children !== 'function'
