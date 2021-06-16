@@ -38,7 +38,7 @@ const matter = require('gray-matter')
 
 export function useMdxForm(
   _mdx: MdxNode | null | undefined,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrides: Partial<FormOptions<any>> = {}
 ): [MdxNode | null | undefined, Form | null | undefined] {
   const mdx = usePersistentValue(_mdx)
 
@@ -56,9 +56,9 @@ export function useMdxForm(
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const cms = useCMS()
-  const label = formOverrrides.label || mdx.frontmatter.title
+  const label = formOverrides.label || mdx.frontmatter.title
   const id = mdx.fileRelativePath
-  const actions = formOverrrides.actions
+  const actions = formOverrides.actions
 
   /**
    * The state of the MdxForm, generated from the contents of the
@@ -81,7 +81,7 @@ export function useMdxForm(
    */
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const fields = React.useMemo(() => {
-    let fields = formOverrrides.fields || generateFields(valuesOnDisk)
+    let fields = formOverrides.fields || generateFields(valuesOnDisk)
     fields = fields.map(field => {
       /**
        * Treat the field.name prefix `frontmatter` as an alias to
@@ -100,7 +100,7 @@ export function useMdxForm(
     })
 
     return fields
-  }, [formOverrrides.fields])
+  }, [formOverrides.fields])
 
   /* eslint-disable-next-line react-hooks/rules-of-hooks */
   const [, form] = useForm(
@@ -152,9 +152,9 @@ export function useMdxForm(
 
 export function useLocalMdxForm(
   mdx: MdxNode | null | undefined,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrides: Partial<FormOptions<any>> = {}
 ): [MdxNode | null | undefined, Form | string | null | undefined] {
-  const [values, form] = useMdxForm(mdx, formOverrrides)
+  const [values, form] = useMdxForm(mdx, formOverrides)
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore form can be `null` and usePlugins doesn't like that.
@@ -165,9 +165,9 @@ export function useLocalMdxForm(
 
 export function useGlobalMdxForm(
   mdx: MdxNode | null | undefined,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrides: Partial<FormOptions<any>> = {}
 ): [MdxNode | null | undefined, Form | string | null | undefined] {
-  const [values, form] = useMdxForm(mdx, formOverrrides)
+  const [values, form] = useMdxForm(mdx, formOverrides)
 
   usePlugins(
     React.useMemo(() => {

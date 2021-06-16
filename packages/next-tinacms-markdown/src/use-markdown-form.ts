@@ -19,7 +19,7 @@ limitations under the License.
 const matter = require('gray-matter')
 
 import * as yaml from 'js-yaml'
-import { useForm, useCMS, FormOptions, Field } from 'tinacms'
+import { useForm, useCMS, FormOptions } from 'tinacms'
 import { generateFields } from './generate-fields'
 
 /**
@@ -30,14 +30,6 @@ export interface MarkdownFile {
   fileRelativePath: string
   frontmatter: any
   markdownBody: string
-}
-
-export interface Options {
-  id?: string
-  label?: string
-  fields?: Field[]
-  actions?: FormOptions<any>['actions']
-  buttons?: FormOptions<any>['buttons']
 }
 
 export function toMarkdownString(markdownFile: MarkdownFile) {
@@ -53,7 +45,7 @@ export function toMarkdownString(markdownFile: MarkdownFile) {
  */
 export function useMarkdownForm(
   markdownFile: MarkdownFile,
-  options: Options = {}
+  options: Partial<FormOptions<any>> = {}
 ) {
   const cms = useCMS()
 
@@ -90,9 +82,15 @@ export function useMarkdownForm(
         })
       },
       reset() {
+        if (options.reset) {
+          options.reset()
+        }
         return cms.api.git.reset({ files: [id] })
       },
       onChange(formState) {
+        if (options.onChange) {
+          options.onChange(formState.values)
+        }
         cms.api.git.writeToDisk({
           fileRelativePath: markdownFile.fileRelativePath,
           content: toMarkdownString(formState.values),
