@@ -45,7 +45,7 @@ export function FormView({ activeForm }: FormViewProps) {
   )
 
   return (
-    <FormBuilder form={activeForm as any}>
+    <FormBuilder form={activeForm}>
       {({ handleSubmit, pristine, invalid, form, submitting }) => {
         return (
           <DragDropContext onDragEnd={moveArrayItem}>
