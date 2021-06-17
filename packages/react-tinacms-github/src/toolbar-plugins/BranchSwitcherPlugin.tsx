@@ -27,6 +27,7 @@ import {
   ModalBody,
   ModalActions,
   FormBuilder,
+  FieldsBuilder,
 } from 'tinacms'
 import { AddIcon, ChevronDownIcon, LockIcon } from '@tinacms/icons'
 import { Button } from '@tinacms/styles'
@@ -102,7 +103,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
             <DropdownHeader>
               <SelectFilter
                 placeholder="Filter"
-                onChange={(event: any) => setFilterValue(event.target.value)}
+                onChange={event => setFilterValue(event.target.value)}
                 value={filterValue}
               />
             </DropdownHeader>
@@ -210,18 +211,34 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
 
   return (
     <Modal>
-      <ModalPopup>
-        <ModalHeader close={close}>Create Branch</ModalHeader>
-        <ModalBody>
-          <FormBuilder form={form} />
-          <ModalText>
-            <p>
-              Create branch&nbsp;<BranchName>{name}</BranchName>&nbsp;from '
-              {current}'
-            </p>
-          </ModalText>
-        </ModalBody>
-      </ModalPopup>
+      <FormBuilder form={form}>
+        {({ handleSubmit }) => {
+          return (
+            <ModalPopup>
+              <ModalHeader close={close}>Create Branch</ModalHeader>
+              <ModalBody
+                onKeyPress={e =>
+                  e.charCode === 13 ? (handleSubmit() as any) : null
+                }
+              >
+                <FieldsBuilder form={form} fields={form.fields} />
+                <ModalText>
+                  <p>
+                    Create branch&nbsp;<BranchName>{name}</BranchName>&nbsp;from
+                    '{current}'
+                  </p>
+                </ModalText>
+              </ModalBody>
+              <ModalActions>
+                <Button onClick={close}>Cancel</Button>
+                <Button onClick={handleSubmit} primary>
+                  Create
+                </Button>
+              </ModalActions>
+            </ModalPopup>
+          )
+        }}
+      </FormBuilder>
     </Modal>
   )
 }
@@ -258,7 +275,7 @@ const ModalText = styled.div`
     var(--tina-padding-big);
 `
 
-const SelectFilter = styled(Input as any)`
+const SelectFilter = styled(Input)`
   height: 36px;
   flex: 0 1 auto;
 
@@ -267,7 +284,7 @@ const SelectFilter = styled(Input as any)`
   }
 `
 
-const CreateButton = styled(Button as any)`
+const CreateButton = styled(Button)`
   display: flex;
   align-items: center;
   height: 36px;
