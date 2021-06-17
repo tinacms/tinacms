@@ -20,7 +20,7 @@ import * as React from 'react'
 import { useState, useContext } from 'react'
 import PropTypes from 'prop-types'
 import { Form } from '@tinacms/forms'
-import { FormBuilder } from './form-builder'
+import { FormLegacy } from './FormLegacy'
 import { Field } from 'react-final-form'
 
 interface RenderProps {
@@ -47,11 +47,11 @@ export function TinaForm({ form, children }: Props) {
 
   return (
     <EditingContext.Provider value={isEditing}>
-      <FormBuilder form={form}>
+      <FormLegacy form={form}>
         {() => {
           return children({ isEditing, setIsEditing })
         }}
-      </FormBuilder>
+      </FormLegacy>
     </EditingContext.Provider>
   )
 }
