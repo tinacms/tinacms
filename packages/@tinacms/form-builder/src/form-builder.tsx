@@ -21,14 +21,14 @@ import { Form } from '@tinacms/forms'
 import { Form as FinalForm, FormRenderProps } from 'react-final-form'
 import { FC } from 'react'
 
-export interface FormLegacyProps {
+export interface FormBuilderProps {
   form: Form
   children(props: FormRenderProps<string>): any
 }
 
 const FF: any = FinalForm
 
-export const FormLegacy: FC<FormLegacyProps> = ({ form, children }) => {
+export const FormBuilder: FC<FormBuilderProps> = ({ form, children }) => {
   const [i, setI] = React.useState(0)
   React.useEffect(() => {
     setI(i => i + 1)
