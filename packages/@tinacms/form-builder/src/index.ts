@@ -17,8 +17,7 @@ limitations under the License.
 */
 
 export * from './field-plugin'
+export * from './form-builder'
 export * from './fields-builder'
 export * from './Form'
-export * from './FormBuilder'
-export * from './FormLegacy'
 export { FieldRenderProps } from 'react-final-form'
