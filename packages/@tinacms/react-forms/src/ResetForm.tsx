@@ -86,6 +86,6 @@ const ResetModal = ({ close, reset }: ResetModalProps) => {
   )
 }
 
-const ResetButton = styled(Button as any)`
+const ResetButton = styled(Button)`
   flex: 0 0 96px;
 `
