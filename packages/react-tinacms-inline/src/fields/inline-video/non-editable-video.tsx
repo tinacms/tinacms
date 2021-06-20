@@ -1,6 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
+Copyright 2019 Forestry.io Inc
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -16,13 +16,25 @@ limitations under the License.
 
 */
 
-export * from './TextField'
-export * from './TextArea'
-export * from './ColorPicker'
-export * from './Toggle'
-export * from './Select'
-export * from './RadioGroup'
-export * from './NumberInput'
-export * from './ImageUpload'
-export * from './VideoUpload'
-export * from './Input'
+import * as React from 'react'
+import { VideoRenderChildren } from './inline-video-field'
+import { Container } from './dropzone-wrapper'
+
+interface NonEditableVideoProps {
+  src?: string
+  alt?: string
+  className?: string
+  children?: VideoRenderChildren
+}
+
+export function NonEditableVideo({
+  src,
+  className,
+  children,
+}: NonEditableVideoProps) {
+  return (
+    <Container className={className}>
+      {children ? children({ src }) : <video src={src} controls />}
+    </Container>
+  )
+}

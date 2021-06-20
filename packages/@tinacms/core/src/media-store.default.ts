@@ -23,7 +23,7 @@ export class DummyMediaStore implements MediaStore {
   async persist(files: MediaUploadOptions[]): Promise<Media[]> {
     return files.map(({ directory, file }) => ({
       id: file.name,
-      type: 'file',
+      type: 'image',
       directory,
       filename: file.name,
     }))

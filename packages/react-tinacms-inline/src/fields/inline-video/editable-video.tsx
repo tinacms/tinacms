@@ -1,6 +1,6 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
+Copyright 2019 Forestry.io Inc
 
 Licensed under the Apache License, Version 2.0 (the "License");
 you may not use this file except in compliance with the License.
@@ -17,17 +17,17 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { usePreviewSrc, Form, useCMS } from 'tinacms'
+import { useVideoPreviewSrc, Form, useCMS } from 'tinacms'
 import { FocusRing } from '../../styles'
-import { InlineImageProps } from './inline-image-field'
-import { InlineImageUpload } from './inline-image-upload'
+import { InlineVideoProps } from './inline-video-field'
+import { InlineVideoUpload } from './inline-video-upload'
 
-interface EditableImageProps extends InlineImageProps {
+interface EditableVideoProps extends InlineVideoProps {
   input: any
   form: Form
 }
 
-export function EditableImage({
+export function EditableVideo({
   form,
   input,
   name,
@@ -37,17 +37,17 @@ export function EditableImage({
   focusRing = true,
   alt = '',
   className,
-}: EditableImageProps) {
+}: EditableVideoProps) {
   const cms = useCMS()
 
-  const [_previewSrc] = usePreviewSrc(
+  const [_previewSrc] = useVideoPreviewSrc(
     input.value,
     name,
     form.values,
     previewSrc
   )
 
-  async function handleUploadImage([file]: File[]) {
+  async function handleUploadVideo([file]: File[]) {
     const directory = uploadDir ? uploadDir(form.values) : ''
 
     const [media] = await cms.media.persist([
@@ -66,16 +66,16 @@ export function EditableImage({
 
   return (
     <FocusRing name={name} options={focusRing}>
-      <InlineImageUpload
+      <InlineVideoUpload
         src={_previewSrc}
         alt={alt}
-        onDrop={handleUploadImage}
+        onDrop={handleUploadVideo}
         onClick={() => {
           const directory = uploadDir ? uploadDir(form.values) : ''
           cms.media.open({
             allowDelete: true,
             directory,
-            filter: 'image',
+            filter: 'video',
             onSelect(media: any) {
               if (media.filename == input.value) {
                 input.onChange('') // trigger rerender
@@ -87,7 +87,7 @@ export function EditableImage({
         className={className}
       >
         {children}
-      </InlineImageUpload>
+      </InlineVideoUpload>
     </FocusRing>
   )
 }
