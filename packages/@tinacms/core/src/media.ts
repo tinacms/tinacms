@@ -96,13 +96,14 @@ export interface MediaStore {
   list(options?: MediaListOptions): Promise<MediaList>
 }
 
+export declare type MediaListOffset = string | number
 /**
  * The options available when listing media.
  */
 export interface MediaListOptions {
   directory?: string
   limit?: number
-  offset?: number
+  offset?: MediaListOffset
 }
 
 /**
@@ -110,10 +111,7 @@ export interface MediaListOptions {
  */
 export interface MediaList {
   items: Media[]
-  limit: number
-  offset: number
-  nextOffset?: number
-  totalCount: number
+  nextOffset?: MediaListOffset
 }
 
 /**

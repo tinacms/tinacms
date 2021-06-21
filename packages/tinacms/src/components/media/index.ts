@@ -20,7 +20,7 @@ export * from './media-manager'
 export { MediaItem } from './media-item'
 export { Breadcrumb } from './breadcrumb'
 export {
-  PageLinks,
+  CursorPaginator,
   MediaPaginatorProps,
   MediaPaginatorPlugin,
   BaseMediaPaginator,
