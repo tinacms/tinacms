@@ -26,7 +26,7 @@ import {
   ModalBody,
   FullscreenModal,
 } from '@tinacms/react-modals'
-import { MediaList, Media } from '@tinacms/core'
+import { MediaList, Media, MediaListOffset } from '@tinacms/core'
 import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
@@ -87,14 +87,31 @@ export function MediaPicker({
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
   )
-  const [offset, setOffset] = useState(0)
-  const [limit] = useState(props.limit || 50)
+
+  const [limit] = useState(props.limit || 10)
   const [list, setList] = useState<MediaList>({
-    limit,
-    offset,
     items: [],
-    totalCount: 0,
+    nextOffset: undefined,
   })
+
+  const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
+  const offset = offsetHistory[offsetHistory.length - 1]
+  const resetOffset = () => setOffsetHistory([])
+  const navigateNext = () => {
+    if (!list.nextOffset) return
+    setOffsetHistory([...offsetHistory, list.nextOffset])
+  }
+  const navigatePrev = () => {
+    const offsets = offsetHistory.slice(0, offsetHistory.length - 1)
+    setOffsetHistory(offsets)
+  }
+  const hasPrev = offsetHistory.length > 0
+  const hasNext = !!list.nextOffset
+
+  /**
+   * current offset is last element in offsetHistory[]
+   * control offset by pushing/popping to offsetHistory
+   */
 
   useEffect(() => {
     function loadMedia() {
@@ -122,7 +139,7 @@ export function MediaPicker({
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
       setDirectory(path.join(item.directory, item.filename))
-      setOffset(0)
+      resetOffset()
     }
   }
 
@@ -215,7 +232,13 @@ export function MediaPicker({
         ))}
       </List>
 
-      <Paginator.Component list={list} setOffset={setOffset} />
+      <Paginator.Component
+        currentOffset={offset}
+        hasNext={hasNext}
+        navigateNext={navigateNext}
+        hasPrev={hasPrev}
+        navigatePrev={navigatePrev}
+      />
     </MediaPickerWrap>
   )
 }
