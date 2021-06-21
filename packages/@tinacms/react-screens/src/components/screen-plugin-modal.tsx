@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { FC } from 'react'
+import { FC, useState } from 'react'
 import {
   Modal,
   ModalHeader,
@@ -36,9 +36,11 @@ export const ScreenPluginModal: FC<ScreenPluginModalProps> = ({
   screen,
   close,
 }) => {
+  const [currentTab, setCurrentTab] = useState<number>(0)
+  const [allTabs, setAllTabs] = useState<string[]>([])
   return (
-    <ModalLayout name={screen.name} close={close} layout={screen.layout}>
-      <screen.Component close={close} />
+    <ModalLayout name={screen.name} close={close} layout={screen.layout} updateCurrentTab={setCurrentTab} allTabs={allTabs}>
+      <screen.Component close={close} currentTab={currentTab} setAllTabs={setAllTabs}/>
     </ModalLayout>
   )
 }
@@ -48,9 +50,11 @@ interface ModalLayoutProps {
   name: string
   close: any
   layout?: 'fullscreen' | 'popup'
+  updateCurrentTab?: (tab:number) => void
+  allTabs?: string[]
 }
 
-const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
+const ModalLayout = ({ children, name, close, layout, updateCurrentTab, allTabs }: ModalLayoutProps) => {
   let Wrapper
 
   switch (layout) {
@@ -68,7 +72,7 @@ const ModalLayout = ({ children, name, close, layout }: ModalLayoutProps) => {
   return (
     <Modal>
       <Wrapper>
-        <ModalHeader close={close}>{name}</ModalHeader>
+        <ModalHeader close={close} updateCurrentTab={updateCurrentTab} allTabs={allTabs}>{name}</ModalHeader>
         <ModalBody>{children}</ModalBody>
       </Wrapper>
     </Modal>
