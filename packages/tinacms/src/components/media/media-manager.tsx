@@ -39,6 +39,8 @@ export interface MediaRequest {
   onSelect?(media: Media): void
   close?(): void
   allowDelete?: boolean
+  currentTab?: number
+  setAllTabs?: (tabsArray: string[]) => void
 }
 
 export function MediaManager() {
@@ -74,6 +76,9 @@ export function MediaPicker({
   allowDelete,
   onSelect,
   close,
+  currentTab,
+  setAllTabs,
+
   ...props
 }: MediaRequest) {
   const cms = useCMS()
@@ -97,10 +102,22 @@ export function MediaPicker({
   })
 
   useEffect(() => {
+    setOffset(0)
+  }, [currentTab])
+
+
+  useEffect(() => {
+    if (setAllTabs) {
+      setAllTabs(['client', 's3', 'einstein'])
+    }
+  }, [setAllTabs])
+
+
+  useEffect(() => {
     function loadMedia() {
       setListState('loading')
       cms.media
-        .list({ offset, limit, directory })
+        .list({ offset, limit, directory, currentList: currentTab })
         .then(list => {
           setList(list)
           setListState('loaded')
@@ -117,13 +134,14 @@ export function MediaPicker({
       ['media:upload:success', 'media:delete:success'],
       loadMedia
     )
-  }, [offset, limit, directory])
+  }, [offset, limit, directory, currentTab])
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
       setDirectory(path.join(item.directory, item.filename))
       setOffset(0)
     }
+    console.log('on click')
   }
 
   let deleteMediaItem: (item: Media) => void
@@ -138,7 +156,7 @@ export function MediaPicker({
   let selectMediaItem: (item: Media) => void
 
   if (onSelect) {
-    selectMediaItem = (item: Media) => {
+    selectMediaItem = (item) => {
       onSelect(item)
       if (close) close()
     }
@@ -157,7 +175,7 @@ export function MediaPicker({
               directory: directory || '/',
               file,
             }
-          })
+          }), currentTab
         )
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?

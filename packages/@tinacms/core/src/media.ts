@@ -73,7 +73,7 @@ export interface MediaStore {
    * returns a Promise containing the Media objects
    * for those files.
    */
-  persist(files: MediaUploadOptions[]): Promise<Media[]>
+  persist(files: MediaUploadOptions[], currentTab?: number): Promise<Media[]>
 
   /**
    * Delete a media object from the store.
@@ -103,6 +103,7 @@ export interface MediaListOptions {
   directory?: string
   limit?: number
   offset?: number
+  currentList?: number
 }
 
 /**
@@ -148,10 +149,10 @@ export class MediaManager implements MediaStore {
     return this.store.accept
   }
 
-  async persist(files: MediaUploadOptions[]): Promise<Media[]> {
+  async persist(files: MediaUploadOptions[], currentTab?: number): Promise<Media[]> {
     try {
       this.events.dispatch({ type: 'media:upload:start', uploaded: files })
-      const media = await this.store.persist(files)
+      const media = await this.store.persist(files, currentTab || 0)
       this.events.dispatch({
         type: 'media:upload:success',
         uploaded: files,
