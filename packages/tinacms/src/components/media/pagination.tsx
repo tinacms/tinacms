@@ -21,9 +21,9 @@ import styled from 'styled-components'
 import { MediaListOffset, Plugin } from '@tinacms/core'
 
 export interface MediaPaginatorProps {
-  currentOffset?: MediaListOffset
-  navigateNext?: () => void
-  navigatePrev?: () => void
+  currentOffset: MediaListOffset
+  navigateNext: () => void
+  navigatePrev: () => void
   hasNext: boolean
   hasPrev: boolean
 }
