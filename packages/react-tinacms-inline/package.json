@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-inline",
-  "version": "0.41.1",
+  "version": "0.41.2-alpha.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "typings": "dist/src/index.d.ts",
