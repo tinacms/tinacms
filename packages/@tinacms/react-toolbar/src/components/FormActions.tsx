@@ -22,7 +22,7 @@ import { EllipsisVerticalIcon, ExitIcon } from '@tinacms/icons'
 import { useState, FC } from 'react'
 import { Dismissible } from 'react-dismissible'
 import { Form } from '@tinacms/forms'
-import { ActionButton } from '@tinacms/react-forms'
+import { ActionButton } from '@tinacms/form-builder'
 import { useCMS } from '@tinacms/react-core'
 
 export interface FormActionMenuProps {

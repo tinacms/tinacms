@@ -24,7 +24,7 @@ import {
   ModalBody,
   ModalActions,
 } from '@tinacms/react-modals'
-import { ActionButton } from '@tinacms/react-forms'
+import { ActionButton } from '@tinacms/form-builder'
 import { useCMS } from '@tinacms/react-core'
 import { Button } from '@tinacms/styles'
 import { Form } from '@tinacms/forms'

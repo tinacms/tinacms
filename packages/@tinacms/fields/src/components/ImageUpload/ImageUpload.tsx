@@ -21,7 +21,7 @@ import { useDropzone } from 'react-dropzone'
 import styled, { css } from 'styled-components'
 import { IconButton } from '@tinacms/styles'
 import { TrashIcon } from '@tinacms/icons'
-import { LoadingDots } from '@tinacms/react-forms'
+import { LoadingDots } from '@tinacms/form-builder'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
