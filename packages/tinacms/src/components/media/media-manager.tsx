@@ -34,7 +34,6 @@ import { MediaItem, Breadcrumb, MediaPaginatorPlugin } from './index'
 import { LoadingDots } from '@tinacms/react-forms'
 
 export interface MediaRequest {
-  limit?: number
   directory?: string
   onSelect?(media: Media): void
   close?(): void
@@ -88,12 +87,15 @@ export function MediaPicker({
     props.directory
   )
 
-  const [limit] = useState(props.limit || 10)
   const [list, setList] = useState<MediaList>({
     items: [],
     nextOffset: undefined,
   })
 
+  /**
+   * current offset is last element in offsetHistory[]
+   * control offset by pushing/popping to offsetHistory
+   */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
@@ -108,16 +110,11 @@ export function MediaPicker({
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
 
-  /**
-   * current offset is last element in offsetHistory[]
-   * control offset by pushing/popping to offsetHistory
-   */
-
   useEffect(() => {
     function loadMedia() {
       setListState('loading')
       cms.media
-        .list({ offset, limit, directory })
+        .list({ offset, limit: cms.media.pageSize, directory })
         .then(list => {
           setList(list)
           setListState('loaded')
@@ -131,10 +128,10 @@ export function MediaPicker({
     loadMedia()
 
     return cms.events.subscribe(
-      ['media:upload:success', 'media:delete:success'],
+      ['media:upload:success', 'media:delete:success', 'media:pageSize'],
       loadMedia
     )
-  }, [offset, limit, directory])
+  }, [offset, directory])
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
