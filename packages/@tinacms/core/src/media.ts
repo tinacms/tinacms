@@ -129,10 +129,24 @@ export interface MediaList {
  * ```
  */
 export class MediaManager implements MediaStore {
+  private _pageSize: number = 20
+
   constructor(public store: MediaStore, private events: EventBus) {}
 
   get isConfigured() {
     return !(this.store instanceof DummyMediaStore)
+  }
+
+  get pageSize() {
+    return this._pageSize
+  }
+
+  set pageSize(pageSize) {
+    this._pageSize = pageSize
+    this.events.dispatch({
+      type: 'media:pageSize',
+      pageSize: pageSize,
+    })
   }
 
   open(options: SelectMediaOptions = {}) {
