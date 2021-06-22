@@ -16,16 +16,15 @@ import styled, { keyframes } from 'styled-components'
 import { FC } from 'react'
 import { Form } from '@tinacms/forms'
 import { Form as FinalForm } from 'react-final-form'
-import {
-  FormPortalProvider,
-  ResetForm,
-  LoadingDots,
-  FormActionMenu,
-} from '@tinacms/react-forms'
-import { FieldsBuilder } from './fields-builder'
+
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
 import { Button } from '@tinacms/styles'
 import { ModalProvider } from '@tinacms/react-modals'
+import { LoadingDots } from './LoadingDots'
+import { FormPortalProvider } from './FormPortal'
+import { FieldsBuilder } from './fields-builder'
+import { ResetForm } from './ResetForm'
+import { FormActionMenu } from './FormActions'
 
 export interface FormBuilderProps {
   form: Form

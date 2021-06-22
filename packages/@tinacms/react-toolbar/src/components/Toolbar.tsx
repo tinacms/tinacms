@@ -28,7 +28,7 @@ import styled, { css } from 'styled-components'
 import { ToolbarButton } from './ToolbarButton'
 import { ResetIcon, HamburgerIcon, TinaIcon } from '@tinacms/icons'
 import { DesktopLabel } from './DesktopLabel'
-import { LoadingDots } from '@tinacms/react-forms'
+import { LoadingDots } from '@tinacms/form-builder'
 import { FormActionMenu } from './FormActions'
 
 const useFormState = (form: Form | null, subscription: any): any => {

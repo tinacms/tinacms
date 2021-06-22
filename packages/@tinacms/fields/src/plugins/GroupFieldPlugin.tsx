@@ -19,9 +19,8 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { FieldsBuilder } from '@tinacms/form-builder'
+import { FieldsBuilder, useFormPortal } from '@tinacms/form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '@tinacms/icons'
-import { useFormPortal } from '@tinacms/react-forms'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
 export interface GroupFieldDefinititon extends Field {

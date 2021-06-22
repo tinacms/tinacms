@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '@tinacms/forms'
 import styled, { css } from 'styled-components'
-import { FieldsBuilder } from '@tinacms/form-builder'
+import { FieldsBuilder, useFormPortal } from '@tinacms/form-builder'
 import { Droppable, Draggable } from 'react-beautiful-dnd'
 import {
   AddIcon,
@@ -31,7 +31,6 @@ import {
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { Dismissible } from 'react-dismissible'
 import { IconButton } from '@tinacms/styles'
-import { useFormPortal } from '@tinacms/react-forms'
 import { FieldDescription } from './wrapFieldWithMeta'
 import {
   GroupListHeader,
