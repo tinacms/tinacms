@@ -58,15 +58,12 @@ export class GitMediaStore implements MediaStore {
   }
   async list(options?: MediaListOptions): Promise<MediaList> {
     const directory = options?.directory ?? ''
-    const offset = options?.offset ?? 0
+    const offset = (options?.offset as number) ?? 0
     const limit = options?.limit ?? 50
     const { file } = await this.client.getFile(directory)
 
     return {
       items: file.content.slice(offset, offset + limit),
-      totalCount: file.content.length,
-      offset,
-      limit,
       nextOffset: nextOffset(offset, limit, file.content.length),
     }
   }
