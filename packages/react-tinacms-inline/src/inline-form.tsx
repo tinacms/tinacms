@@ -94,10 +94,9 @@ export function InlineForm({ form, children }: InlineFormProps) {
               <>
                 {typeof children !== 'function'
                   ? children
-                  : children({
-                      ...formProps,
-                      ...inlineFormState,
-                    })}
+                  : //
+                    // @ts-ignore
+                    children({ ...formProps, ...inlineFormState })}
                 {rbie?.active && <InlineFieldsRenderer />}
               </>
             )}
