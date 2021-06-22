@@ -30,7 +30,7 @@ import { MediaList, Media, MediaListOffset } from '@tinacms/core'
 import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
-import { MediaItem, Breadcrumb, MediaPaginatorPlugin } from './index'
+import { MediaItem, Breadcrumb, CursorPaginator } from './index'
 import { LoadingDots } from '@tinacms/react-forms'
 
 export interface MediaRequest {
@@ -76,9 +76,6 @@ export function MediaPicker({
   ...props
 }: MediaRequest) {
   const cms = useCMS()
-  const Paginator = cms.plugins
-    .getType('media:ui')
-    .find('paginator') as MediaPaginatorPlugin
   const [listState, setListState] = useState<MediaListState>(() => {
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
@@ -229,7 +226,7 @@ export function MediaPicker({
         ))}
       </List>
 
-      <Paginator.Component
+      <CursorPaginator
         currentOffset={offset}
         hasNext={hasNext}
         navigateNext={navigateNext}
