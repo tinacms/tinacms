@@ -19,6 +19,7 @@ limitations under the License.
 import React from 'react'
 import styled from 'styled-components'
 import { MediaListOffset } from '@tinacms/core'
+import { Button } from '@tinacms/styles'
 
 export interface MediaPaginatorProps {
   currentOffset: MediaListOffset
@@ -36,12 +37,12 @@ export function CursorPaginator({
 }: MediaPaginatorProps) {
   return (
     <PageLinksWrap>
-      <button disabled={!hasPrev} onClick={navigatePrev}>
-        Previous
-      </button>
-      <button disabled={!hasNext} onClick={navigateNext}>
-        Next
-      </button>
+      <Button small disabled={!hasPrev} onClick={navigatePrev}>
+        &laquo; Previous
+      </Button>
+      <Button small disabled={!hasNext} onClick={navigateNext}>
+        Next &raquo;
+      </Button>
     </PageLinksWrap>
   )
 }
