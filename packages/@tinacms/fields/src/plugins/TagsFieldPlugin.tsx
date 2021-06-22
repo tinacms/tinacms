@@ -26,6 +26,7 @@ import { CloseIcon } from '@tinacms/icons'
 export const TagsField = wrapFieldsWithMeta<
   { placeholder: string },
   InputProps
+  // @ts-ignore
 >(({ input, field, form, tinaForm }) => {
   const [value, setValue] = React.useState<string>('')
   const addTag = React.useCallback(

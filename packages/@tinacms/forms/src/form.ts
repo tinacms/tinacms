@@ -72,6 +72,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
       ...options,
       initialValues,
       onSubmit: this.handleSubmit,
+      // @ts-ignore
       mutators: {
         ...arrayMutators,
         ...options.mutators,
@@ -130,6 +131,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     if (this.loading) {
       return undefined
     }
+    // @ts-ignore
     return this.finalForm.getState().values || this.initialValues
   }
 
@@ -209,7 +211,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    * @param name
    * @param value
    */
-  change(name: string, value?: any) {
+  change(name: keyof S, value?: any) {
     return this.finalForm.change(name, value)
   }
 
@@ -230,7 +232,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
    */
   updateValues(values: S) {
     this.finalForm.batch(() => {
-      const activePath: string | undefined = this.finalForm.getState().active
+      const activePath = this.finalForm.getState().active
 
       if (!activePath) {
         updateEverything<S>(this.finalForm, values)
@@ -251,7 +253,7 @@ export class Form<S = any, F extends Field = AnyField> implements Plugin {
     this.finalForm.batch(() => {
       const values = this.values || ({} as S)
       this.finalForm.initialize(initialValues)
-      const activePath: string | undefined = this.finalForm.getState().active
+      const activePath = this.finalForm.getState().active
 
       if (!activePath) {
         updateEverything<S>(this.finalForm, values)
@@ -269,13 +271,13 @@ function updateEverything<S>(form: FormApi<any>, values: S) {
 }
 
 function updateSelectively<S>(form: FormApi<any>, values: S, prefix?: string) {
-  const activePath: string = form.getState().active!
+  const activePath = form.getState().active!
 
   Object.entries(values).forEach(([name, value]) => {
     const path = prefix ? `${prefix}.${name}` : name
 
     if (typeof value === 'object') {
-      if (activePath.startsWith(path)) {
+      if (typeof activePath === 'string' && activePath.startsWith(path)) {
         updateSelectively(form, value, path)
       } else {
         form.change(path, value)
