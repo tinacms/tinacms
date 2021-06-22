@@ -35,9 +35,7 @@ export class DummyMediaStore implements MediaStore {
     const items: Media[] = []
     return {
       items,
-      offset: 0,
-      limit: 10,
-      totalCount: 0,
+      nextOffset: 0,
     }
   }
   async delete() {
