@@ -18,7 +18,7 @@ limitations under the License.
 
 import React from 'react'
 import styled from 'styled-components'
-import { MediaListOffset, Plugin } from '@tinacms/core'
+import { MediaListOffset } from '@tinacms/core'
 
 export interface MediaPaginatorProps {
   currentOffset: MediaListOffset
@@ -26,16 +26,6 @@ export interface MediaPaginatorProps {
   navigatePrev: () => void
   hasNext: boolean
   hasPrev: boolean
-}
-
-export interface MediaPaginatorPlugin extends Plugin {
-  Component: React.ComponentType<MediaPaginatorProps>
-}
-
-export const BaseMediaPaginator: MediaPaginatorPlugin = {
-  __type: 'media:ui',
-  name: 'paginator',
-  Component: CursorPaginator,
 }
 
 export function CursorPaginator({
