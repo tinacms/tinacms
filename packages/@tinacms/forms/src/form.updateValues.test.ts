@@ -168,7 +168,7 @@ describe('Form#updateValues', () => {
         const initialValues = { author: { name: 'Ella', age: 23 } }
         const nextValues = { author: { name: 'Georgina', age: 23 } }
 
-        let form: Form<S>
+        let form: Form
 
         beforeEach(() => {
           form = makeForm(initialValues)
@@ -189,7 +189,7 @@ describe('Form#updateValues', () => {
         const initialValues = { author: { name: 'Ella', age: 50 } }
         const nextValues = { author: { name: 'Ella', age: 5 } }
 
-        let form: Form<S>
+        let form: Form
 
         beforeEach(() => {
           form = makeForm(initialValues)
@@ -207,7 +207,7 @@ describe('Form#updateValues', () => {
         })
       })
       describe('when both the "name" and "age" are changed', () => {
-        let form: Form<S>
+        let form: Form
         const initialValues = { author: { name: 'Steve', age: 50 } }
         const nextValues = { author: { name: 'Ellen', age: 42 } }
 
