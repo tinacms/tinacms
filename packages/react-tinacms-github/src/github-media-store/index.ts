@@ -77,7 +77,7 @@ export class GithubMediaStore implements MediaStore {
 
   async list(options?: MediaListOptions): Promise<MediaList> {
     const directory = options?.directory ?? ''
-    const offset = options?.offset ?? 0
+    const offset = (options?.offset as number) ?? 0
     const limit = options?.limit ?? 50
 
     const unfilteredItems: GithubContent[] = await this.githubClient.fetchFile(
@@ -91,10 +91,7 @@ export class GithubMediaStore implements MediaStore {
 
     return {
       items: items.map(contentToMedia).slice(offset, offset + limit),
-      offset,
-      limit,
       nextOffset: nextOffset(offset, limit, items.length),
-      totalCount: items.length,
     }
   }
 }

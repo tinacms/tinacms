@@ -84,7 +84,7 @@ export class StrapiMediaStore {
   }
 
   async list(options: MediaListOptions) {
-    const offset = options?.offset ?? 0
+    const offset = (options?.offset as number) ?? 0
     const limit = options?.limit ?? 50
 
     const authToken = Cookies.get(STRAPI_JWT)
@@ -103,9 +103,6 @@ export class StrapiMediaStore {
 
     return {
       items: mediaData.slice(offset, limit + offset).map(this.strapiToTina),
-      limit,
-      offset,
-      totalCount: mediaData.length,
       nextOffset: nextOffset < mediaData.length ? nextOffset : undefined,
     }
   }
