@@ -75,6 +75,13 @@ export interface CMSConfig {
   plugins?: Array<Plugin>
   apis?: { [key: string]: any }
   media?: MediaStore
+  /**
+   * Might potentially make more sense to consolidate both media.store and mediaOptions.pageSize
+   * under the 'media' config namespace, but that's a breaking change.
+   */
+  mediaOptions?: {
+    pageSize?: number
+  }
 }
 
 export class CMS {
@@ -129,6 +136,9 @@ export class CMS {
 
     if (config.media) {
       this.media.store = config.media
+    }
+    if (config.mediaOptions && config.mediaOptions.pageSize) {
+      this.media.pageSize = config.mediaOptions.pageSize
     }
 
     if (config.plugins) {
