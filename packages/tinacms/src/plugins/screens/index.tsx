@@ -20,7 +20,7 @@ import * as React from 'react'
 import { SettingsIcon } from '@tinacms/icons'
 import { Form } from '@tinacms/forms'
 import { ScreenPlugin } from '@tinacms/react-screens'
-import { FormView } from '@tinacms/react-forms'
+import { FormBuilder } from '@tinacms/form-builder'
 
 export class GlobalFormPlugin implements ScreenPlugin {
   __type: ScreenPlugin['__type'] = 'screen'
@@ -38,7 +38,7 @@ export class GlobalFormPlugin implements ScreenPlugin {
     this.Icon = icon || SettingsIcon
     this.layout = layout || 'popup'
     this.Component = () => {
-      return <FormView activeForm={form} />
+      return <FormBuilder form={form as any} />
     }
   }
 }

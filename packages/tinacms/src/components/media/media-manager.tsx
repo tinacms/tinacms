@@ -31,7 +31,7 @@ import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
-import { LoadingDots } from '@tinacms/react-forms'
+import { LoadingDots } from '@tinacms/form-builder'
 
 export interface MediaRequest {
   directory?: string
