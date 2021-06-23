@@ -36,7 +36,7 @@
     "@tinacms/react-core": "^0.42.0-alpha.0",
     "react-final-form": "^6.3.0",
     "@tinacms/styles": "^0.40.0",
-    "@tinacms/react-modals": "^0.40.0",
+    "@tinacms/react-modals": "^0.42.0-alpha.0",
     "@tinacms/icons": "^0.39.0"
   },
   "peerDependencies": {
