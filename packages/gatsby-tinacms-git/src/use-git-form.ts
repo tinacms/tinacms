@@ -46,8 +46,16 @@ export function useGitForm<N extends GitNode>(
       return gitFile.show()
     },
     onSubmit: gitFile.commit,
-    reset: gitFile.reset,
+    reset: () => {
+      if (options.reset) {
+        options.reset()
+      }
+      return gitFile.reset()
+    },
     onChange({ values }: any) {
+      if (options.onChange) {
+        options.onChange(values)
+      }
       return gitFile.write(values)
     },
   }

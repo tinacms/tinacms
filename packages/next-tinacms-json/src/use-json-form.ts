@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { useForm, useCMS, FormOptions, Field, Form } from 'tinacms'
+import { useForm, useCMS, FormOptions, Form } from 'tinacms'
 import { generateFields } from './generate-fields'
 
 /**
@@ -27,19 +27,12 @@ export interface JsonFile<T = any> {
   data: T
 }
 
-export interface Options {
-  id?: string
-  label?: string
-  fields?: Field[]
-  actions?: FormOptions<any>['actions']
-  buttons?: FormOptions<any>['buttons']
-}
 /**
  * Creates a TinaCMS Form for editing a JsonFile in Git
  */
 export function useJsonForm<T = any>(
   jsonFile: JsonFile<T>,
-  options: Options = {}
+  options: Partial<FormOptions<any>> = {}
 ): [T, Form] {
   const cms = useCMS()
 
@@ -72,9 +65,15 @@ export function useJsonForm<T = any>(
         })
       },
       reset() {
+        if (options.reset) {
+          options.reset()
+        }
         return cms.api.git.reset({ files: [id] })
       },
       onChange: formState => {
+        if (options.onChange) {
+          options.onChange(formState.values)
+        }
         cms.api.git.writeToDisk({
           fileRelativePath: jsonFile.fileRelativePath,
           content: JSON.stringify(formState.values, null, 2),
