@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+
+### Features
+
+* **tinacms:** configure media mgr page size via mediaOptions.pageSize ([5d7890f](https://github.com/tinacms/tinacms/commit/5d7890f5312e5efa08a07cd7fc4e3967d71eccf3))
+* **tinacms:** use cursor-based pagination in media manager ([7a94b97](https://github.com/tinacms/tinacms/commit/7a94b97e228ffd490a68159d458130e089dd6c87))
+
+
+
+
+
 # [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
 
 
