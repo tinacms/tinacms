@@ -3,6 +3,19 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+### Features
+
+- Unifies FormOptions across all useForm(...) variations ([ff3c058](https://github.com/tinacms/tinacms/commit/ff3c058496ab0b0979540e49a1391a506f4a34a3))
+- **@tinacms/form-builder,@tinacms/react-forms:** Combines FormView and FormBuilder ([8b1e194](https://github.com/tinacms/tinacms/commit/8b1e1942c956f822c39b47873661248fb808d893))
+- **@tinacms/git-client:** Migrate GitMediaStore to cursor-based pagination ([8d2146c](https://github.com/tinacms/tinacms/commit/8d2146ccb36516b42bbe8b01bb5e31eb955b0635))
+- **react-tinacms-github:** Migrate GithubMediaStore to cursor-based pagination ([5163fad](https://github.com/tinacms/tinacms/commit/5163fad6023ac133668736262c5c9732dfdd2c6d))
+- **react-tinacms-strapi:** Migrate StrapiMediaStore to cursor-based pagination ([646151f](https://github.com/tinacms/tinacms/commit/646151f73d65a8b862827a1e2eb241ff8df856a6))
+- **tinacms:** configure media mgr page size via mediaOptions.pageSize ([5d7890f](https://github.com/tinacms/tinacms/commit/5d7890f5312e5efa08a07cd7fc4e3967d71eccf3))
+- **tinacms:** remove pluggable pagination ([846b516](https://github.com/tinacms/tinacms/commit/846b51621aa85520724817192f8d8ade19c1b02a))
+- **tinacms:** use cursor-based pagination in media manager ([7a94b97](https://github.com/tinacms/tinacms/commit/7a94b97e228ffd490a68159d458130e089dd6c87))
+
 ## [0.41.1](https://github.com/tinacms/tinacms/compare/v0.41.0...v0.41.1) (2021-06-11)
 
 ### Bug Fixes

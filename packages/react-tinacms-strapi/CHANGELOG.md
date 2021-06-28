@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+
+### Features
+
+* **react-tinacms-strapi:** Migrate StrapiMediaStore to cursor-based pagination ([646151f](https://github.com/tinacms/tinacms/commit/646151f73d65a8b862827a1e2eb241ff8df856a6))
+
+
+
+
+
 ## [0.41.1](https://github.com/tinacms/tinacms/compare/v0.41.0...v0.41.1) (2021-06-11)
 
 **Note:** Version bump only for package react-tinacms-strapi

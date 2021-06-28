@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+
+### Features
+
+* Unifies FormOptions across all useForm(...) variations ([ff3c058](https://github.com/tinacms/tinacms/commit/ff3c058496ab0b0979540e49a1391a506f4a34a3))
+* **@tinacms/form-builder,@tinacms/react-forms:** Combines FormView and FormBuilder ([8b1e194](https://github.com/tinacms/tinacms/commit/8b1e1942c956f822c39b47873661248fb808d893))
+
+
+
+
+
 ## [0.41.1](https://github.com/tinacms/tinacms/compare/v0.41.0...v0.41.1) (2021-06-11)
 
 

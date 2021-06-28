@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
+
+
+### Features
+
+* **@tinacms/git-client:** Migrate GitMediaStore to cursor-based pagination ([8d2146c](https://github.com/tinacms/tinacms/commit/8d2146ccb36516b42bbe8b01bb5e31eb955b0635))
+
+
+
+
+
 # [0.39.0](https://github.com/tinacms/tinacms/compare/v0.38.0...v0.39.0) (2021-03-30)
 
 
