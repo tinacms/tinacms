@@ -17,50 +17,34 @@ limitations under the License.
 */
 
 import React from 'react'
-import styled, { css } from 'styled-components'
-import { MediaList, Plugin } from '@tinacms/core'
+import styled from 'styled-components'
+import { MediaListOffset } from '@tinacms/core'
+import { Button } from '@tinacms/styles'
 
 export interface MediaPaginatorProps {
-  list: MediaList
-  setOffset: (offset: number) => void
+  currentOffset: MediaListOffset
+  navigateNext: () => void
+  navigatePrev: () => void
+  hasNext: boolean
+  hasPrev: boolean
 }
 
-export interface MediaPaginatorPlugin extends Plugin {
-  Component: React.ComponentType<MediaPaginatorProps>
-}
-
-export const BaseMediaPaginator: MediaPaginatorPlugin = {
-  __type: 'media:ui',
-  name: 'paginator',
-  Component: PageLinks,
-}
-
-export function PageLinks({ list, setOffset }: MediaPaginatorProps) {
-  const limit = list.limit || 10
-  const numPages = Math.ceil(list.totalCount / limit)
-  const lastItemIndexOnPage = list.offset + limit
-  const currentPageIndex = lastItemIndexOnPage / limit
-  let pageLinks = []
-
-  if (numPages <= 1) {
-    return null
-  }
-
-  for (let i = 1; i <= numPages; i++) {
-    const active = i === currentPageIndex
-    const nextOffset = (i - 1) * limit
-    pageLinks.push(
-      <PageNumber
-        key={`page-${i}`}
-        active={active}
-        onClick={() => setOffset(nextOffset)}
-      >
-        {i}
-      </PageNumber>
-    )
-  }
-
-  return <PageLinksWrap>{pageLinks}</PageLinksWrap>
+export function CursorPaginator({
+  navigateNext,
+  navigatePrev,
+  hasNext,
+  hasPrev,
+}: MediaPaginatorProps) {
+  return (
+    <PageLinksWrap>
+      <Button small disabled={!hasPrev} onClick={navigatePrev}>
+        &laquo; Previous
+      </Button>
+      <Button small disabled={!hasNext} onClick={navigateNext}>
+        Next &raquo;
+      </Button>
+    </PageLinksWrap>
+  )
 }
 
 const PageLinksWrap = styled.div`
@@ -68,23 +52,4 @@ const PageLinksWrap = styled.div`
   display: flex;
   justify-content: flex-end;
   margin-top: var(--tina-padding-small);
-`
-
-const PageNumber = styled.button<{ active: boolean }>`
-  padding: 0 0.15rem;
-  margin: var(--tina-padding-small);
-  transition: box-shadow 180ms ease;
-  background-color: transparent;
-  border: none;
-
-  :hover {
-    cursor: pointer;
-    box-shadow: 0 1px 0 var(--tina-color-grey-9);
-  }
-
-  ${p =>
-    !p.active &&
-    css`
-      color: var(--tina-color-grey-4);
-    `}
 `

@@ -28,7 +28,6 @@ export {
   MediaList,
   MediaManager,
 } from '@tinacms/core'
-export { ActionButton } from '@tinacms/react-forms'
 export { ScreenPlugin, useScreenPlugin } from '@tinacms/react-screens'
 export * from '@tinacms/fields'
 export * from '@tinacms/form-builder'
@@ -53,8 +52,3 @@ export {
   TinaCMSProviderProps,
 } from './components/TinaCMSProvider'
 export { TinaUI, TinaUIProps } from './components/TinaUI'
-export {
-  MediaPaginatorPlugin,
-  BaseMediaPaginator,
-  MediaPaginatorProps,
-} from './components/media'

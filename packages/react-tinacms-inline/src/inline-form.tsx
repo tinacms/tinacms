@@ -18,7 +18,8 @@ limitations under the License.
 
 import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
-import { FormBuilder, Form, useCMS } from 'tinacms'
+import { Form, useCMS } from 'tinacms'
+import { FormLegacy } from '@tinacms/form-builder'
 import { Dismissible } from 'react-dismissible'
 import { RBIEPlugin } from './rbie/plugins/rbie-plugin'
 import { InlineFieldsRenderer } from './rbie/components/inline-fields-renderer'
@@ -89,19 +90,18 @@ export function InlineForm({ form, children }: InlineFormProps) {
             setFocussedField('')
           }}
         >
-          <FormBuilder form={form as any}>
+          <FormLegacy form={form as any}>
             {({ form, ...formProps }) => (
               <>
                 {typeof children !== 'function'
                   ? children
-                  : children({
-                      ...formProps,
-                      ...inlineFormState,
-                    })}
+                  : //
+                    // @ts-ignore
+                    children({ ...formProps, ...inlineFormState })}
                 {rbie?.active && <InlineFieldsRenderer />}
               </>
             )}
-          </FormBuilder>
+          </FormLegacy>
         </div>
       </Dismissible>
     </InlineFormContext.Provider>

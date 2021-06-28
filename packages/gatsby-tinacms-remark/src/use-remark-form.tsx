@@ -121,9 +121,9 @@ function fromMarkdownString(content: string) {
  */
 export function useLocalRemarkForm(
   markdownRemark: RemarkNode | null | undefined,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrides: Partial<FormOptions<any>> = {}
 ): [RemarkNode | null | undefined, Form | string | null | undefined] {
-  const [values, form] = useRemarkForm(markdownRemark, formOverrrides)
+  const [values, form] = useRemarkForm(markdownRemark, formOverrides)
 
   // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
   // @ts-ignore form can be `null` and usePlugins doesn't like that.
@@ -137,9 +137,9 @@ export function useLocalRemarkForm(
  */
 export function useGlobalRemarkForm(
   markdownRemark: RemarkNode | null | undefined,
-  formOverrrides: Partial<FormOptions<any>> = {}
+  formOverrides: Partial<FormOptions<any>> = {}
 ): [RemarkNode | null | undefined, Form | string | null | undefined] {
-  const [values, form] = useRemarkForm(markdownRemark, formOverrrides)
+  const [values, form] = useRemarkForm(markdownRemark, formOverrides)
 
   usePlugins(
     React.useMemo(() => {

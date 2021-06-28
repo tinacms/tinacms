@@ -26,15 +26,14 @@ import {
   ModalBody,
   FullscreenModal,
 } from '@tinacms/react-modals'
-import { MediaList, Media } from '@tinacms/core'
+import { MediaList, Media, MediaListOffset } from '@tinacms/core'
 import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
-import { MediaItem, Breadcrumb, MediaPaginatorPlugin } from './index'
-import { LoadingDots } from '@tinacms/react-forms'
+import { MediaItem, Breadcrumb, CursorPaginator } from './index'
+import { LoadingDots } from '@tinacms/form-builder'
 
 export interface MediaRequest {
-  limit?: number
   directory?: string
   onSelect?(media: Media): void
   close?(): void
@@ -82,9 +81,6 @@ export function MediaPicker({
   ...props
 }: MediaRequest) {
   const cms = useCMS()
-  const Paginator = cms.plugins
-    .getType('media:ui')
-    .find('paginator') as MediaPaginatorPlugin
   const [listState, setListState] = useState<MediaListState>(() => {
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
@@ -92,18 +88,30 @@ export function MediaPicker({
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
   )
-  const [offset, setOffset] = useState(0)
-  const [limit] = useState(props.limit || 50)
+
   const [list, setList] = useState<MediaList>({
-    limit,
-    offset,
     items: [],
-    totalCount: 0,
+    nextOffset: undefined,
   })
 
-  useEffect(() => {
-    setOffset(0)
-  }, [currentTab])
+  /**
+   * current offset is last element in offsetHistory[]
+   * control offset by pushing/popping to offsetHistory
+   */
+  const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
+  const offset = offsetHistory[offsetHistory.length - 1]
+  const resetOffset = () => setOffsetHistory([])
+  const navigateNext = () => {
+    if (!list.nextOffset) return
+    setOffsetHistory([...offsetHistory, list.nextOffset])
+  }
+  const navigatePrev = () => {
+    const offsets = offsetHistory.slice(0, offsetHistory.length - 1)
+    setOffsetHistory(offsets)
+  }
+  const hasPrev = offsetHistory.length > 0
+  const hasNext = !!list.nextOffset
+
 
 
   useEffect(() => {
@@ -117,7 +125,7 @@ export function MediaPicker({
     function loadMedia() {
       setListState('loading')
       cms.media
-        .list({ offset, limit, directory, currentList: currentTab })
+        .list({ offset, limit: cms.media.pageSize, directory,  currentList: currentTab })
         .then(list => {
           setList(list)
           setListState('loaded')
@@ -131,15 +139,15 @@ export function MediaPicker({
     loadMedia()
 
     return cms.events.subscribe(
-      ['media:upload:success', 'media:delete:success'],
+      ['media:upload:success', 'media:delete:success', 'media:pageSize'],
       loadMedia
     )
-  }, [offset, limit, directory, currentTab])
+  }, [offset, directory, currentTab])
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
       setDirectory(path.join(item.directory, item.filename))
-      setOffset(0)
+      resetOffset()
     }
     console.log('on click')
   }
@@ -156,7 +164,7 @@ export function MediaPicker({
   let selectMediaItem: (item: Media) => void
 
   if (onSelect) {
-    selectMediaItem = (item) => {
+    selectMediaItem = (item: Media) => {
       onSelect(item)
       if (close) close()
     }
@@ -233,7 +241,13 @@ export function MediaPicker({
         ))}
       </List>
 
-      <Paginator.Component list={list} setOffset={setOffset} />
+      <CursorPaginator
+        currentOffset={offset}
+        hasNext={hasNext}
+        navigateNext={navigateNext}
+        hasPrev={hasPrev}
+        navigatePrev={navigatePrev}
+      />
     </MediaPickerWrap>
   )
 }

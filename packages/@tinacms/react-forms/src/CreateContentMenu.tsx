@@ -17,10 +17,9 @@ import {
   Modal,
   ModalHeader,
   ModalBody,
-  ModalActions,
   ModalPopup,
 } from '@tinacms/react-modals'
-import { FormBuilder, FieldsBuilder } from '@tinacms/form-builder'
+import { FormBuilder } from '@tinacms/form-builder'
 import { useMemo } from 'react'
 import { Form } from '@tinacms/forms'
 import { AddIcon } from '@tinacms/icons'
@@ -102,11 +101,14 @@ const FormModal = ({ plugin, close }: any) => {
   const form: Form = useMemo(
     () =>
       new Form({
-        label: 'create-form',
         id: 'create-form-id',
-        actions: [],
+        label: 'create-form',
         fields: plugin.fields,
+        actions: plugin.actions,
+        buttons: plugin.buttons,
         initialValues: plugin.initialValues || {},
+        reset: plugin.reset,
+        onChange: plugin.onChange,
         onSubmit: async values => {
           await plugin.onSubmit(values, cms).then(() => {
             close()
@@ -116,44 +118,14 @@ const FormModal = ({ plugin, close }: any) => {
     [close, cms, plugin]
   )
 
-  const [busy, setBusy] = React.useState(false)
-
   return (
     <Modal>
-      <FormBuilder form={form}>
-        {({ handleSubmit, invalid }) => {
-          const awaitedHandleSubmit = () => {
-            setBusy(true)
-            handleSubmit()?.finally(() => {
-              setBusy(false)
-            })
-          }
-          return (
-            <ModalPopup>
-              <ModalHeader close={close}>{plugin.name}</ModalHeader>
-              <ModalBody
-                onKeyPress={e =>
-                  e.charCode === 13 && !busy
-                    ? (awaitedHandleSubmit() as any)
-                    : null
-                }
-              >
-                <FieldsBuilder form={form} fields={form.fields} />
-              </ModalBody>
-              <ModalActions>
-                <Button onClick={close}>Cancel</Button>
-                <Button
-                  disabled={busy || invalid}
-                  onClick={awaitedHandleSubmit as any}
-                  primary
-                >
-                  Create
-                </Button>
-              </ModalActions>
-            </ModalPopup>
-          )
-        }}
-      </FormBuilder>
+      <ModalPopup>
+        <ModalHeader close={close}>{plugin.name}</ModalHeader>
+        <ModalBody>
+          <FormBuilder form={form} />
+        </ModalBody>
+      </ModalPopup>
     </Modal>
   )
 }
@@ -164,7 +136,7 @@ const ContentMenuWrapper = styled.div`
   justify-self: end;
 `
 
-const CreateToggleButton = styled(Button)`
+const CreateToggleButton = styled(Button as any)`
   display: flex;
   align-items: center;
   transition: all 150ms ease-out;

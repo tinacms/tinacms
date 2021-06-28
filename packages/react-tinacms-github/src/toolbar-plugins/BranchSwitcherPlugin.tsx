@@ -27,14 +27,13 @@ import {
   ModalBody,
   ModalActions,
   FormBuilder,
-  FieldsBuilder,
 } from 'tinacms'
 import { AddIcon, ChevronDownIcon, LockIcon } from '@tinacms/icons'
 import { Button } from '@tinacms/styles'
 import { Dismissible } from 'react-dismissible'
 import styled, { css } from 'styled-components'
 import { GithubClient, Branch } from '../github-client'
-import { LoadingDots } from '@tinacms/react-forms'
+import { LoadingDots } from '@tinacms/form-builder'
 import { CREATE_BRANCH, ERROR } from '../events'
 
 interface BranchSwitcherProps {
@@ -103,7 +102,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
             <DropdownHeader>
               <SelectFilter
                 placeholder="Filter"
-                onChange={event => setFilterValue(event.target.value)}
+                onChange={(event: any) => setFilterValue(event.target.value)}
                 value={filterValue}
               />
             </DropdownHeader>
@@ -211,34 +210,18 @@ const CreateBranchModal = ({ current, name, onBranchChange, close }: any) => {
 
   return (
     <Modal>
-      <FormBuilder form={form}>
-        {({ handleSubmit }) => {
-          return (
-            <ModalPopup>
-              <ModalHeader close={close}>Create Branch</ModalHeader>
-              <ModalBody
-                onKeyPress={e =>
-                  e.charCode === 13 ? (handleSubmit() as any) : null
-                }
-              >
-                <FieldsBuilder form={form} fields={form.fields} />
-                <ModalText>
-                  <p>
-                    Create branch&nbsp;<BranchName>{name}</BranchName>&nbsp;from
-                    '{current}'
-                  </p>
-                </ModalText>
-              </ModalBody>
-              <ModalActions>
-                <Button onClick={close}>Cancel</Button>
-                <Button onClick={handleSubmit} primary>
-                  Create
-                </Button>
-              </ModalActions>
-            </ModalPopup>
-          )
-        }}
-      </FormBuilder>
+      <ModalPopup>
+        <ModalHeader close={close}>Create Branch</ModalHeader>
+        <ModalBody>
+          <FormBuilder form={form} />
+          <ModalText>
+            <p>
+              Create branch&nbsp;<BranchName>{name}</BranchName>&nbsp;from '
+              {current}'
+            </p>
+          </ModalText>
+        </ModalBody>
+      </ModalPopup>
     </Modal>
   )
 }
@@ -275,7 +258,7 @@ const ModalText = styled.div`
     var(--tina-padding-big);
 `
 
-const SelectFilter = styled(Input)`
+const SelectFilter = styled(Input as any)`
   height: 36px;
   flex: 0 1 auto;
 
@@ -284,7 +267,7 @@ const SelectFilter = styled(Input)`
   }
 `
 
-const CreateButton = styled(Button)`
+const CreateButton = styled(Button as any)`
   display: flex;
   align-items: center;
   height: 36px;

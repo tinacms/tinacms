@@ -96,13 +96,14 @@ export interface MediaStore {
   list(options?: MediaListOptions): Promise<MediaList>
 }
 
+export declare type MediaListOffset = string | number
 /**
  * The options available when listing media.
  */
 export interface MediaListOptions {
   directory?: string
   limit?: number
-  offset?: number
+  offset?: MediaListOffset
   currentList?: number
 }
 
@@ -111,10 +112,7 @@ export interface MediaListOptions {
  */
 export interface MediaList {
   items: Media[]
-  limit: number
-  offset: number
-  nextOffset?: number
-  totalCount: number
+  nextOffset?: MediaListOffset
 }
 
 /**
@@ -132,10 +130,24 @@ export interface MediaList {
  * ```
  */
 export class MediaManager implements MediaStore {
+  private _pageSize: number = 20
+
   constructor(public store: MediaStore, private events: EventBus) {}
 
   get isConfigured() {
     return !(this.store instanceof DummyMediaStore)
+  }
+
+  get pageSize() {
+    return this._pageSize
+  }
+
+  set pageSize(pageSize) {
+    this._pageSize = pageSize
+    this.events.dispatch({
+      type: 'media:pageSize',
+      pageSize: pageSize,
+    })
   }
 
   open(options: SelectMediaOptions = {}) {

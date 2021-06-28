@@ -50,8 +50,7 @@
     "typescript-plugin-styled-components": "^1.4.4"
   },
   "dependencies": {
-    "danger": "^10.6.4",
-    "tinacms": "^0.18.2"
+    "danger": "^10.6.4"
   },
   "husky": {
     "hooks": {

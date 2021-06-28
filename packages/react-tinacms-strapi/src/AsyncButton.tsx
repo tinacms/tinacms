@@ -19,7 +19,7 @@ limitations under the License.
 import React, { useCallback, useState } from 'react'
 
 import { Button } from '@tinacms/styles'
-import { LoadingDots } from '@tinacms/react-forms'
+import { LoadingDots } from '@tinacms/form-builder'
 
 interface ButtonProps {
   name: string
