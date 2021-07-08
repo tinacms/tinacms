@@ -32,6 +32,7 @@ import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
 import { MediaItem, Breadcrumb, CursorPaginator } from './index'
 import { LoadingDots } from '@tinacms/form-builder'
+import { MediaListErrorPlugin } from '../../plugins/media-ui/list-error'
 
 export interface MediaRequest {
   directory?: string
@@ -69,6 +70,20 @@ export function MediaManager() {
 
 type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured'
 
+const DefaultErrorComponent = () => <DocsLink title="Error Loading Media" />
+
+const usePluggableErrorComponent = () => {
+  const cms = useCMS()
+  const ErrorComponentPlugin = cms.plugins
+    .getType<MediaListErrorPlugin>('media:ui')
+    .find('list-error')
+
+  if (ErrorComponentPlugin && ErrorComponentPlugin.Component) {
+    return ErrorComponentPlugin.Component
+  }
+  return DefaultErrorComponent
+}
+
 export function MediaPicker({
   allowDelete,
   onSelect,
@@ -80,6 +95,10 @@ export function MediaPicker({
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
   })
+  const [listError, setListError] = useState<Error>(
+    () => new Error('Error fetching media')
+  )
+
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
   )
@@ -118,6 +137,7 @@ export function MediaPicker({
         })
         .catch(e => {
           console.error(e)
+          setListError(e)
           setListState('error')
         })
     }
@@ -189,6 +209,7 @@ export function MediaPicker({
   }
 
   useEffect(disableScrollBody, [])
+  const ErrorComponent = usePluggableErrorComponent()
 
   if (listState === 'loading') {
     return <LoadingMediaList />
@@ -199,7 +220,7 @@ export function MediaPicker({
   }
 
   if (listState === 'error') {
-    return <DocsLink title="Failed to Load Media" />
+    return <ErrorComponent error={listError} />
   }
 
   return (

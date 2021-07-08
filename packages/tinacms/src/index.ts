@@ -40,6 +40,7 @@ export { ContentCreatorPlugin } from '@tinacms/forms'
 export * from './react-tinacms'
 export { TinaCMS, TinaCMSConfig } from './tina-cms'
 export { GlobalFormPlugin } from './plugins/screens'
+export { MediaListErrorPlugin } from './plugins/media-ui/list-error'
 export {
   TinaProvider,
   TinaProviderProps,
