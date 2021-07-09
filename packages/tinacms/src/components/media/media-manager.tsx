@@ -26,7 +26,12 @@ import {
   ModalBody,
   FullscreenModal,
 } from '@tinacms/react-modals'
-import { MediaList, Media, MediaListOffset } from '@tinacms/core'
+import {
+  MediaList,
+  Media,
+  MediaListOffset,
+  MediaListError,
+} from '@tinacms/core'
 import path from 'path'
 import { Button } from '@tinacms/styles'
 import { useDropzone } from 'react-dropzone'
@@ -69,6 +74,12 @@ export function MediaManager() {
 
 type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured'
 
+const defaultListError = new MediaListError({
+  title: 'Error fetching media',
+  message: 'Something went wrong while requesting the resource.',
+  docsLink: 'https://tina.io/docs/media/#media-store',
+})
+
 export function MediaPicker({
   allowDelete,
   onSelect,
@@ -80,6 +91,8 @@ export function MediaPicker({
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
   })
+
+  const [listError, setListError] = useState<MediaListError>(defaultListError)
   const [directory, setDirectory] = useState<string | undefined>(
     props.directory
   )
@@ -108,6 +121,7 @@ export function MediaPicker({
   const hasNext = !!list.nextOffset
 
   useEffect(() => {
+    if (!cms.media.isConfigured) return
     function loadMedia() {
       setListState('loading')
       cms.media
@@ -118,17 +132,21 @@ export function MediaPicker({
         })
         .catch(e => {
           console.error(e)
+          if (e.ERR_TYPE === 'MediaListError') {
+            setListError(e)
+          } else {
+            setListError(defaultListError)
+          }
           setListState('error')
         })
     }
-
     loadMedia()
 
     return cms.events.subscribe(
       ['media:upload:success', 'media:delete:success', 'media:pageSize'],
       loadMedia
     )
-  }, [offset, directory])
+  }, [offset, directory, cms.media.isConfigured])
 
   const onClickMediaItem = (item: Media) => {
     if (item.type === 'dir') {
@@ -195,11 +213,18 @@ export function MediaPicker({
   }
 
   if (listState === 'not-configured') {
-    return <DocsLink title="Please Set up a Media Store" />
+    return (
+      <DocsLink
+        title="No Media Store Configured"
+        message="To use the media manager, you need to configure a Media Store."
+        docsLink="https://tina.io/docs/media/"
+      />
+    )
   }
 
   if (listState === 'error') {
-    return <DocsLink title="Failed to Load Media" />
+    const { title, message, docsLink } = listError
+    return <DocsLink title={title} message={message} docsLink={docsLink} />
   }
 
   return (
@@ -334,18 +359,19 @@ const EmptyMediaList = styled(props => {
   text-align: center;
 `
 
-const DocsLink = styled(({ title, ...props }) => {
+const DocsLink = styled(({ title, message, docsLink, ...props }) => {
   return (
     <div {...props}>
       <h2>{title}</h2>
-      <div>
-        {' '}
-        Visit the{' '}
-        <a href="https://tinacms.org/docs/media" rel="noreferrer noopener">
-          docs
-        </a>{' '}
-        to learn more about setting up the Media Manager for your CMS.
-      </div>
+      <div>{message}</div>
+      <a
+        style={{ marginTop: '1rem' }}
+        href={docsLink}
+        target="_blank"
+        rel="noreferrer noopener"
+      >
+        Learn More
+      </a>
     </div>
   )
 })`

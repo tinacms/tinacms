@@ -249,3 +249,21 @@ export interface SelectMediaOptions {
   directory?: string
   onSelect?(media: Media): void
 }
+
+interface MediaListErrorConfig {
+  title: string
+  message: string
+  docsLink: string
+}
+
+export class MediaListError extends Error {
+  public ERR_TYPE = 'MediaListError'
+  public title: string
+  public docsLink: string
+
+  constructor(config: MediaListErrorConfig) {
+    super(config.message)
+    this.title = config.title
+    this.docsLink = config.docsLink
+  }
+}
