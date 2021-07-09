@@ -4,12 +4,15 @@ on: [pull_request]
 
 jobs:
   build:
+    strategy:
+      matrix:
+        node-version: [14.x, 16.x]
     runs-on: ubuntu-latest
     steps:
       - uses: actions/checkout@v1
       - uses: actions/setup-node@v1
         with:
-          node-version: '10.x'
+          node-version: ${{ matrix.node-version }}
 
       - name: Install
         run: |
