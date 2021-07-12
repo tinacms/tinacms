@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.43.0-alpha.1",
+  "version": "0.43.0",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/src/index.d.ts",
@@ -26,26 +26,26 @@
     "tinacms": ">=0.19"
   },
   "devDependencies": {
-    "@tinacms/alerts": "^0.43.0-alpha.1",
-    "@tinacms/core": "^0.43.0-alpha.1",
-    "@tinacms/fields": "^0.43.0-alpha.1",
-    "@tinacms/forms": "^0.43.0-alpha.1",
+    "@tinacms/alerts": "^0.43.0",
+    "@tinacms/core": "^0.43.0",
+    "@tinacms/fields": "^0.43.0",
+    "@tinacms/forms": "^0.43.0",
     "@tinacms/icons": "^0.42.1",
-    "@tinacms/react-core": "^0.43.0-alpha.1",
-    "@tinacms/react-forms": "^0.43.0-alpha.1",
+    "@tinacms/react-core": "^0.43.0",
+    "@tinacms/react-forms": "^0.43.0",
     "@tinacms/react-modals": "^0.39.0",
     "@tinacms/scripts": "^0.42.1",
     "@tinacms/styles": "^0.42.1",
     "@types/js-cookie": "^2.2.5",
     "final-form": "^4.18.7",
     "styled-components": ">=4.1",
-    "tinacms": "^0.43.0-alpha.1"
+    "tinacms": "^0.43.0"
   },
   "dependencies": {
     "@tinacms/form-builder": "^0.39.0",
     "btoa": "^1.2.1",
     "js-cookie": "^2.2.1",
-    "next-tinacms-markdown": "^0.43.0-alpha.1"
+    "next-tinacms-markdown": "^0.43.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
