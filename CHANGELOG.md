@@ -3,6 +3,18 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
+
+### Bug Fixes
+
+- **react-tinacms-editor:** fixing FocusRingOptions import path ([7096add](https://github.com/tinacms/tinacms/commit/7096add5f5915ac69f90682d00d73dc1e739ffd5))
+- **react-tinacmseditor:** fixing FocusRingOptions import path ([6c231e3](https://github.com/tinacms/tinacms/commit/6c231e3b7b6f7221e691ca8aae3ee2d96634bff6))
+
+### Features
+
+- **react-tinacms-inline:** InlineBlocks children ([00d5804](https://github.com/tinacms/tinacms/commit/00d580492370714096c051761b90cea013dc7644))
+- **tinacms:** customize list error message by throwing a MediaListError ([5aff1da](https://github.com/tinacms/tinacms/commit/5aff1da8e725ad4046bf1888fa83599c3ef0a4c5))
+
 # [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
 
 ### Features

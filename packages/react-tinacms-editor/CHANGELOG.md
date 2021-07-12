@@ -3,6 +3,17 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+# [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
+
+
+### Bug Fixes
+
+* **react-tinacms-editor:** fixing FocusRingOptions import path ([7096add](https://github.com/tinacms/tinacms/commit/7096add5f5915ac69f90682d00d73dc1e739ffd5))
+
+
+
+
+
 # [0.42.0](https://github.com/tinacms/tinacms/compare/v0.41.1...v0.42.0) (2021-06-28)
 
 **Note:** Version bump only for package react-tinacms-editor
