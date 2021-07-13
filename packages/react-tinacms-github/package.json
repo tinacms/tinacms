@@ -35,6 +35,7 @@
     "@tinacms/react-core": "^0.43.0",
     "@tinacms/react-forms": "^0.43.0",
     "@tinacms/react-modals": "^0.39.0",
+    "@tinacms/form-builder": ">=0.39",
     "@tinacms/scripts": "^0.42.1",
     "@tinacms/styles": "^0.42.1",
     "@types/js-cookie": "^2.2.5",
