@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.1](https://github.com/tinacms/tinacms/compare/v0.43.0...v0.43.1) (2021-07-13)
+
+### Bug Fixes
+
+- **react-tinacms-github:** Makes form-builder a peerDependency ([0e2174c](https://github.com/tinacms/tinacms/commit/0e2174ceef97ecd507e0a13d1f6a23cc7e843064))
+
 # [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
 
 ### Bug Fixes
