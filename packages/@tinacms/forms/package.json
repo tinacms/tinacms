@@ -29,7 +29,9 @@
   },
   "devDependencies": {
     "@tinacms/core": "^0.43.0",
-    "@tinacms/scripts": "^0.42.1"
+    "@tinacms/scripts": "^0.42.1",
+    "@types/react": "^16.8.23",
+    "tslib": "^1.10.0"
   },
   "dependencies": {
     "final-form": "^4.20.2",
