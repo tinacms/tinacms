@@ -306,11 +306,31 @@ function fileNeedsLicense(filepath: string) {
   return new RegExp(/\.(js|tsx?)$/).test(filepath)
 }
 
+const licenseIgnoreList = [
+  'tina-graphql-gateway/.pnp.js',
+  'tina-graphql-gateway/apps/demo/.tina/__generated__/types.ts',
+  'tina-graphql-gateway/apps/test/.tina/__generated__/types.ts',
+  'tina-graphql-gateway/examples/tina-cloud-starter/.tina/__generated__/types.ts',
+  'tina-graphql-gateway/examples/tina-cloud-starter-experimental/.tina/__generated__/types.ts',
+  'tina-graphql-gateway/examples/tina-tailwind-sidebar-demo/.tina/__generated__/types.ts',
+  'tina-graphql-gateway/.yarn/plugins/@yarnpkg/plugin-workspace-tools.js',
+  'tina-graphql-gateway/examples/tina-cloud-starter/.tina/generated/types.ts',
+  'tina-graphql-gateway/examples/tina-cloud-starter-experimental/.tina/generated/types.ts',
+  'tina-graphql-gateway/.yarn/sdks/typescript/lib/tsserver.js',
+  'tina-graphql-gateway/.yarn/sdks/typescript/lib/typescript.js',
+  'tina-graphql-gateway/.yarn/sdks/typescript/lib/tsc.js',
+  'tina-graphql-gateway/.yarn/sdks/prettier/index.js',
+  'tina-graphql-gateway/.yarn/sdks/eslint/lib/api.js',
+  'tina-graphql-gateway/.yarn/sdks/eslint/bin/eslint.js',
+]
+
 /**
  *
  */
 async function checkFileForLicenseHeader(filepath: string) {
   try {
+    if (licenseIgnoreList.includes(filepath)) return
+
     const content = await getFileContents(filepath)
 
     if (isMissingHeader(content)) {
