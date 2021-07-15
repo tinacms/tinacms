@@ -1,11 +1,15 @@
 {
   "name": "root",
   "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "examples/*"
+  ],
   "scripts": {
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "build": "lerna run build --reject-cycles",
     "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
-    "postinstall": "npm run bootstrap",
     "bs": "npm run bootstrap",
     "dev": "lerna run dev --reject-cycles",
     "nuke": "./scripts/nuke.sh",
@@ -50,7 +54,8 @@
     "typescript-plugin-styled-components": "^1.4.4"
   },
   "dependencies": {
-    "danger": "^10.6.4"
+    "danger": "^10.6.4",
+    "prettier": "^2.3.2"
   },
   "husky": {
     "hooks": {
