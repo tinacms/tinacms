@@ -330,6 +330,9 @@ const licenseIgnoreList = [
 async function checkFileForLicenseHeader(filepath: string) {
   try {
     if (licenseIgnoreList.includes(filepath)) return
+    if (filepath.startsWith('tina-graphql-gateway')) {
+      return
+    }
 
     const content = await getFileContents(filepath)
 
