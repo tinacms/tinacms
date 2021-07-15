@@ -29,7 +29,19 @@
     "docs": "npx typedoc"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1"
+    "@tinacms/scripts": "^0.42.1",
+    "@types/prop-types": "15.7.4",
+    "@types/react": "^16.8.23",
+    "@types/react-beautiful-dnd": "^11.0.3",
+    "@types/react-dom": "^16.9.4",
+    "@types/styled-components": "4.1.8",
+    "prop-types": "15.7.2",
+    "react": "16.12.0",
+    "react-beautiful-dnd": "^11.0.5",
+    "react-dismissible": "1.3.0",
+    "react-dom": "16.12.0",
+    "styled-components": ">=4.1",
+    "tslib": "^1.10.0"
   },
   "dependencies": {
     "@tinacms/forms": "^0.43.0",
@@ -42,6 +54,8 @@
   "peerDependencies": {
     "prop-types": ">=15",
     "react": ">=16.8",
+    "react-beautiful-dnd": "^11.0.5",
+    "react-dismissible": "1.3.0",
     "styled-components": ">=4.1"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"

@@ -67,7 +67,7 @@ const StyledImage = styled.img`
   background-size: auto;
   background-position: center center;
   background-repeat: no-repeat;
-  ${props =>
+  ${(props) =>
     props.src && (props.src.includes('png') || props.src.includes('svg'))
       ? css`
           background-image: none;
@@ -77,6 +77,8 @@ const StyledImage = styled.img`
         `}
 `
 
+// Type of property 'defaultProps' circularly references itself in mapped type
+// @ts-ignore
 const DeleteButton = styled(IconButton)`
   top: 8px;
   right: 8px;
@@ -127,7 +129,7 @@ export const ImageUpload = ({
               <StyledImage src={previewSrc} />
               {onClear && (
                 <DeleteButton
-                  onClick={e => {
+                  onClick={(e) => {
                     e.stopPropagation()
                     onClear()
                   }}

@@ -51,7 +51,7 @@ export const Button = styled.button<ButtonProps>`
     outline: none;
   }
 
-  ${p =>
+  ${(p) =>
     p.disabled &&
     css`
       opacity: 0.3;
@@ -59,7 +59,7 @@ export const Button = styled.button<ButtonProps>`
       pointer-events: none;
     `};
 
-  ${p =>
+  ${(p) =>
     p.primary &&
     css`
       background-color: var(--tina-color-primary);
@@ -74,7 +74,7 @@ export const Button = styled.button<ButtonProps>`
       }
     `};
 
-  ${p =>
+  ${(p) =>
     p.small &&
     css`
       height: 32px;
@@ -82,7 +82,7 @@ export const Button = styled.button<ButtonProps>`
       padding: 0 var(--tina-padding-big);
     `};
 
-  ${p =>
+  ${(p) =>
     p.margin &&
     css`
       &:not(:first-child) {
@@ -90,19 +90,21 @@ export const Button = styled.button<ButtonProps>`
       }
     `};
 
-  ${p =>
+  ${(p) =>
     p.grow &&
     css`
       flex-grow: 1;
     `};
 
-  ${p =>
+  ${(p) =>
     p.busy &&
     css`
       cursor: wait;
     `};
 `
 
+// Type of property 'defaultProps' circularly references itself in mapped type
+// @ts-ignore
 export const IconButton = styled(Button)`
   padding: 0;
   width: 32px;
@@ -123,7 +125,7 @@ export const IconButton = styled(Button)`
     transition: all 150ms ease-out;
   }
 
-  ${p =>
+  ${(p) =>
     p.small &&
     css`
       width: 28px;
@@ -136,7 +138,7 @@ export const IconButton = styled(Button)`
       }
     `};
 
-  ${props =>
+  ${(props) =>
     props.open &&
     css`
       background-color: var(--tina-color-grey-0);

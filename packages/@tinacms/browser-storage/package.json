@@ -21,7 +21,14 @@
   "devDependencies": {
     "@tinacms/forms": "^0.43.0",
     "@tinacms/react-core": "^0.43.0",
-    "@tinacms/scripts": "^0.42.1"
+    "@tinacms/react-forms": "^0.43.0",
+    "@tinacms/scripts": "^0.42.1",
+    "@types/lodash.get": "^4.4.6",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.9.4",
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "tslib": "^1.10.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }

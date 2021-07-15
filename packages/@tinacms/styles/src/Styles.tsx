@@ -97,6 +97,8 @@ const theme = css`
   }
 `
 
+// Type of property 'defaultProps' circularly references itself in mapped type
+// @ts-ignore
 export const GlobalStyles = createGlobalStyle`
   ${theme};
 `
