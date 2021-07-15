@@ -75,13 +75,13 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
                 : undefined
             }
             defaultValue={defaultValue}
-            validate={(value, values, meta) => {
+            validate={(value: any, values: any, meta: any) => {
               if (validate) {
                 return validate(value, values, meta, field)
               }
             }}
           >
-            {fieldProps => {
+            {(fieldProps) => {
               if (
                 typeof field.component !== 'string' &&
                 field.component !== null

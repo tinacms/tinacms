@@ -57,7 +57,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
    */
   const [i, setI] = React.useState(0)
   React.useEffect(() => {
-    setI(i => i + 1)
+    setI((i) => i + 1)
   }, [tinaForm])
 
   const finalForm = tinaForm.finalForm
@@ -82,12 +82,14 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
         key={`${i}: ${tinaForm.id}`}
         onSubmit={tinaForm.onSubmit}
       >
+        {/* FIXME: Typescript says these don't exist, maybe they dont? */}
+        {/* @ts-ignore */}
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
               <FormBody
                 className="form-body"
-                onKeyPress={e =>
+                onKeyPress={(e) =>
                   e.charCode === 13 && !submitting ? handleSubmit() : null
                 }
               >
