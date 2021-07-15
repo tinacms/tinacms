@@ -329,11 +329,11 @@ const licenseIgnoreList = [
  */
 async function checkFileForLicenseHeader(filepath: string) {
   try {
+    console.log('attempting to ignreo files')
+    console.log('ignore list:', licenseIgnoreList)
     if (licenseIgnoreList.includes(filepath)) return
-    if (filepath.startsWith('tina-graphql-gateway')) {
-      return
-    }
 
+    console.log('did not ignore file:', filepath)
     const content = await getFileContents(filepath)
 
     if (isMissingHeader(content)) {
