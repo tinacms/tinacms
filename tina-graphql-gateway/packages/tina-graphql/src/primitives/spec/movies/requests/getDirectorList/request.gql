@@ -1,0 +1,11 @@
+query {
+  getDirectorList {
+    edges {
+      node {
+        data {
+          name
+        }
+      }
+    }
+  }
+}

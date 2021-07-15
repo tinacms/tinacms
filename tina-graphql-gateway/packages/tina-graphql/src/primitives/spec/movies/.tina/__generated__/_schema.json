@@ -1,0 +1,112 @@
+{
+  "collections": [
+    {
+      "label": "Movie",
+      "name": "movie",
+      "path": "content/movies",
+      "fields": [
+        {
+          "name": "title",
+          "label": "Title",
+          "type": "string",
+          "namespace": [
+            "movie",
+            "title"
+          ]
+        },
+        {
+          "name": "genre",
+          "label": "Genre",
+          "type": "string",
+          "options": [
+            "scifi",
+            "mystery",
+            "drama",
+            "comedy",
+            "action"
+          ],
+          "namespace": [
+            "movie",
+            "genre"
+          ]
+        },
+        {
+          "type": "reference",
+          "label": "Director",
+          "name": "director",
+          "collections": [
+            "director"
+          ],
+          "namespace": [
+            "movie",
+            "director"
+          ]
+        },
+        {
+          "type": "reference",
+          "label": "Actors",
+          "name": "actors",
+          "list": true,
+          "collections": [
+            "actor"
+          ],
+          "namespace": [
+            "movie",
+            "actors"
+          ]
+        }
+      ],
+      "namespace": [
+        "movie"
+      ]
+    },
+    {
+      "label": "Director",
+      "name": "director",
+      "path": "content/directors",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Name",
+          "name": "name",
+          "namespace": [
+            "director",
+            "name"
+          ]
+        }
+      ],
+      "namespace": [
+        "director"
+      ]
+    },
+    {
+      "label": "Actor",
+      "name": "actor",
+      "path": "content/actors",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Name",
+          "name": "name",
+          "namespace": [
+            "actor",
+            "name"
+          ]
+        },
+        {
+          "type": "text",
+          "label": "Body",
+          "name": "body",
+          "namespace": [
+            "actor",
+            "body"
+          ]
+        }
+      ],
+      "namespace": [
+        "actor"
+      ]
+    }
+  ],
+  "namespace": []
+}

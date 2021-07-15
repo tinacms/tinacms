@@ -1,0 +1,84 @@
+{
+  "name": "tina-graphql-gateway",
+  "version": "0.3.0",
+  "main": "dist/index.js",
+  "files": [
+    "dist/*"
+  ],
+  "typings": "dist/index.d.ts",
+  "license": "Apache-2.0",
+  "scripts": {
+    "build": "yarn tsup src/index.ts --format cjs --dts",
+    "watch": "yarn tsup src/index.ts --watch --format cjs --dts",
+    "tar": "yarn pack --out ../../builds/%s-%v.tgz",
+    "graphiql": "next dev -p 3001"
+  },
+  "dependencies": {
+    "@graphql-codegen/core": "^1.15.4",
+    "@graphql-codegen/typescript": "^1.15.4",
+    "@graphql-codegen/typescript-operations": "^1.15.4",
+    "@types/lodash": "^4.14.169",
+    "@types/node": "^14.0.13",
+    "@types/react": "^16.9.38",
+    "@types/yup": "^0.29.10",
+    "@xstate/react": "^1.1.0",
+    "codemirror": "^5.55.0",
+    "cors": "^2.8.5",
+    "crypto-js": "^4.0.0",
+    "final-form": "4.20.1",
+    "final-form-arrays": "^3.0.2",
+    "graphql": "^15.1.0",
+    "graphql-tag": "^2.11.0",
+    "immer": "^9.0.3",
+    "isomorphic-unfetch": "^3.0.0",
+    "lodash.get": "^4.4.2",
+    "lodash.has": "^4.5.2",
+    "lodash.merge": "^4.6.2",
+    "lodash.set": "^4.3.2",
+    "next": "9.4.2",
+    "node-fetch": "^2.6.0",
+    "prop-types": "15.7.2",
+    "tina-graphql-helpers": "workspace:*",
+    "tsup": "^3.7.0",
+    "typescript": "^3.9.5",
+    "xstate": "^4.15.1",
+    "yup": "^0.32.0"
+  },
+  "devDependencies": {
+    "@tinacms/core": "^0.31.0",
+    "@tinacms/forms": "^0.38.0",
+    "@tinacms/icons": "^0.7",
+    "@tinacms/react-core": "^0.2",
+    "@tinacms/react-forms": "^0.31.0",
+    "@tinacms/react-modals": "^0.1",
+    "@tinacms/styles": "^0.29.0",
+    "@types/crypto-js": "^3.1.47",
+    "@types/styled-components": "^5.1.3",
+    "next": "9.4.2",
+    "react": "16.13.1",
+    "react-dom": "16.13.1",
+    "styled-components": "^5.2.0",
+    "tinacms": "^0.31.0"
+  },
+  "peerDependencies": {
+    "@tinacms/core": "^0.31.0",
+    "@tinacms/forms": "^0.38.0",
+    "@tinacms/icons": "^0.7",
+    "@tinacms/react-core": "^0.2",
+    "@tinacms/react-forms": "^0.32.0",
+    "@tinacms/react-modals": "^0.1",
+    "@tinacms/styles": "^0.29.0",
+    "react": ">=16.8",
+    "react-dom": ">=16.8",
+    "react-is": "^16.13.1 || <18.0.0",
+    "styled-components": "*",
+    "tinacms": "^0.31.0"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tina-graphql-gateway.git",
+    "directory": "packages/tina-graphql-gateway"
+  }
+}

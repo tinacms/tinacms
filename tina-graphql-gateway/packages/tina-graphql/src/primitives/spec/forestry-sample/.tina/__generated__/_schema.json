@@ -1,0 +1,98 @@
+{
+  "collections": [
+    {
+      "label": "Author",
+      "name": "author",
+      "path": "content/authors",
+      "templates": [
+        {
+          "name": "author",
+          "label": "Author",
+          "fields": [
+            {
+              "name": "name",
+              "label": "Name",
+              "type": "string",
+              "namespace": [
+                "author",
+                "author",
+                "name"
+              ]
+            }
+          ],
+          "namespace": [
+            "author",
+            "author"
+          ]
+        }
+      ],
+      "namespace": [
+        "author"
+      ]
+    },
+    {
+      "label": "Post",
+      "name": "post",
+      "path": "content/posts",
+      "templates": [
+        {
+          "name": "post",
+          "label": "Post",
+          "fields": [
+            {
+              "type": "string",
+              "label": "Title",
+              "name": "title",
+              "namespace": [
+                "post",
+                "post",
+                "title"
+              ]
+            },
+            {
+              "type": "text",
+              "label": "Body",
+              "name": "body",
+              "namespace": [
+                "post",
+                "post",
+                "body"
+              ]
+            },
+            {
+              "type": "reference",
+              "label": "Author",
+              "name": "author",
+              "collections": [
+                "author"
+              ],
+              "reverseLookup": {
+                "name": "posts",
+                "label": "Blog Posts",
+                "namespace": [
+                  "post",
+                  "post",
+                  "author",
+                  "posts"
+                ]
+              },
+              "namespace": [
+                "post",
+                "post",
+                "author"
+              ]
+            }
+          ],
+          "namespace": [
+            "post",
+            "post"
+          ]
+        }
+      ],
+      "namespace": [
+        "post"
+      ]
+    }
+  ],
+  "namespace": []
+}

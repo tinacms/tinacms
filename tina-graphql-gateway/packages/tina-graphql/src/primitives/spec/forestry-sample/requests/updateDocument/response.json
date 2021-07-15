@@ -1,0 +1,13 @@
+{
+  "data": {
+    "updateDocument": {
+      "data": {
+        "author": {
+          "data": {
+            "name": "Marge Simpson"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,6 @@
+{
+  "name": "prettier",
+  "version": "2.0.4-pnpify",
+  "main": "./index.js",
+  "type": "commonjs"
+}

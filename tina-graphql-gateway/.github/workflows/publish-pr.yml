@@ -1,0 +1,17 @@
+name: Publish PR as tagged release
+on:
+  pull_request:
+    branches:
+      - jeff
+
+jobs:
+  build:
+    runs-on: ubuntu-latest
+    steps:
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn install
+      - name: Build
+        run: yarn ci:build
+      - name: Test
+        run: yarn ci:test

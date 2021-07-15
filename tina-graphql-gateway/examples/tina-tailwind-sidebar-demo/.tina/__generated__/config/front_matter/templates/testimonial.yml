@@ -1,0 +1,24 @@
+---
+name: testimonial
+label: Testimonial
+fields:
+  - name: quote
+    label: Quote
+    type: textarea
+  - name: author
+    label: Author
+    type: text
+  - name: style
+    label: Style
+    type: field_group
+    fields:
+      - name: color
+        label: Color
+        type: select
+        config:
+          source:
+            type: simple
+          options:
+            - default
+            - tint
+            - primary

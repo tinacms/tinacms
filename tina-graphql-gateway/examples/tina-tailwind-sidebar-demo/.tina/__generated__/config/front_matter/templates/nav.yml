@@ -1,0 +1,17 @@
+---
+name: nav
+label: Foooter nav
+fields:
+  - name: title
+    label: Title
+    type: text
+  - name: items
+    label: Nav Items
+    type: field_group_list
+    fields:
+      - name: label
+        label: Label
+        type: text
+      - name: link
+        label: Link
+        type: text

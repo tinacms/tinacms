@@ -1,0 +1,20 @@
+---
+sections:
+  - label: Authors
+    name: authors
+    path: content/authors
+    templates:
+      - author
+    type: directory
+    create: documents
+    match: '**/*.md'
+    new_doc_ext: md
+  - label: Posts
+    name: posts
+    path: content/posts
+    templates:
+      - post
+    type: directory
+    create: documents
+    match: '**/*.md'
+    new_doc_ext: md

@@ -1,0 +1,70 @@
+---
+name: hero
+label: Hero
+fields:
+  - name: tagline
+    label: Tagline
+    type: text
+  - name: headline
+    label: Headline
+    type: text
+  - name: paragraph
+    label: Paragraph
+    type: text
+  - name: text
+    label: Text
+    type: field_group
+    fields:
+      - name: color
+        label: Color
+        type: select
+        config:
+          source:
+            type: simple
+          options:
+            - default
+            - tint
+            - primary
+  - name: image
+    label: Image
+    type: field_group
+    fields:
+      - name: src
+        label: Image Source
+        type: text
+      - name: alt
+        label: Alt Text
+        type: text
+  - label: Actions
+    name: actions
+    type: field_group_list
+    fields:
+      - label: Label
+        name: label
+        type: text
+      - name: type
+        label: Type
+        type: select
+        config:
+          source:
+            type: simple
+          options:
+            - button
+            - link
+      - label: Icon
+        name: icon
+        type: boolean
+  - name: style
+    label: Style
+    type: field_group
+    fields:
+      - name: color
+        label: Color
+        type: select
+        config:
+          source:
+            type: simple
+          options:
+            - default
+            - tint
+            - primary

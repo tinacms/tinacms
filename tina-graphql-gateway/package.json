@@ -1,0 +1,54 @@
+{
+  "name": "sc",
+  "private": true,
+  "workspaces": [
+    "packages/*",
+    "apps/*",
+    "examples/*"
+  ],
+  "scripts": {
+    "build": "yarn ci:build",
+    "watch": "yarn workspaces foreach --no-private -p -i --verbose run watch",
+    "test": "yarn workspaces foreach run test",
+    "apply": "yarn version apply --all --json",
+    "apply:workspaces": "yarn version apply --all",
+    "license:add": "$PWD/scripts/add-license.sh",
+    "license:delete": "$PWD/scripts/delete-license.sh",
+    "ci:version-check": "yarn version check",
+    "ci:build": "yarn workspaces foreach --no-private -pt --topological-dev run build",
+    "ci:test": "yarn workspaces foreach --no-private --verbose run test",
+    "ci:publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
+    "ci:publish-dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
+    "ci:publish-beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
+    "format": "prettier --write .",
+    "postinstall": "husky install"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "type": "git",
+    "url": "ssh://git@github.com:tinacms/tina-graphql-gateway.git"
+  },
+  "dependencies": {
+    "@changesets/cli": "^2.16.0",
+    "@yarnpkg/pnpify": "^2.0.0-rc.20",
+    "danger": "^10.6.0",
+    "eslint": "^6.8.0",
+    "typescript": "^3.8.3",
+    "workspace": "^0.0.1-preview.1"
+  },
+  "dependenciesMeta": {
+    "remark-mdx": {
+      "unplugged": true
+    },
+    "rmark-mdx": {
+      "unplugged": true
+    }
+  },
+  "devDependencies": {
+    "husky": "^6.0.0",
+    "prettier": "^2.3.0",
+    "pretty-quick": "^3.1.0"
+  }
+}

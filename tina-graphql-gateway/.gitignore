@@ -1,0 +1,26 @@
+env.sh
+.DS_Store
+dist
+node_modules
+.cache
+
+.yarn/*
+!.yarn/cache
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+# .pnp.*
+package.tgz
+
+# ENV FILES
+.env
+.env.local
+
+builds/*
+!builds/.gitkeep
+
+out
+
+.next
+apps/tmp/*

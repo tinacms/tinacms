@@ -1,0 +1,24 @@
+query {
+  getPageDocument(relativePath: "home.md") {
+    id
+    data {
+      title
+      seo {
+        seoTitle
+        ogImage
+        ogDescription
+      }
+      blocks {
+        __typename
+        ... on PageBlocksHero {
+          backgroundImage
+          description
+        }
+        ... on PageBlocksCta {
+          ctaText
+          ctaStyle
+        }
+      }
+    }
+  }
+}

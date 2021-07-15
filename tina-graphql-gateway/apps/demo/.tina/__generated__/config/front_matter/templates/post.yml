@@ -1,0 +1,17 @@
+---
+label: Post
+name: post
+fields:
+  - name: title
+    label: Title
+    type: text
+  - name: image
+    label: Image
+    type: text
+  - name: author
+    label: Author
+    type: select
+    config:
+      source:
+        type: pages
+        section: authors

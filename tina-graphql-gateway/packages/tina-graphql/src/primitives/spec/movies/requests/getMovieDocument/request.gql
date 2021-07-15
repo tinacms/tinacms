@@ -1,0 +1,39 @@
+query {
+  getMovieDocument(relativePath: "star-wars.md") {
+    id
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+      template
+      collection {
+        name
+      }
+    }
+    data {
+      title
+      genre
+      body
+      rating
+      director {
+        ... on DirectorDocument {
+          data {
+            name
+          }
+        }
+      }
+      actors {
+        edges {
+          node {
+            ... on ActorDocument {
+              id
+            }
+          }
+        }
+      }
+    }
+  }
+}

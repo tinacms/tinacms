@@ -1,0 +1,103 @@
+---
+name: features
+label: Features
+fields:
+  - label: Features
+    name: items
+    type: field_group_list
+    fields:
+      - label: Icon
+        name: icon
+        type: field_group
+        fields:
+          - name: color
+            label: Color
+            type: select
+            config:
+              source:
+                type: simple
+              options:
+                - primary
+                - blue
+                - teal
+                - green
+                - red
+                - pink
+                - purple
+                - orange
+                - yellow
+          - name: name
+            label: Icon
+            type: select
+            config:
+              source:
+                type: simple
+              options:
+                - random
+                - Aperture
+                - BiCodeBlock
+                - BiLike
+                - BiMapAlt
+                - BiPalette
+                - BiPieChartAlt2
+                - BiPin
+                - BiShield
+                - BiSlider
+                - BiStore
+                - BiTennisBall
+                - BiTestTube
+                - BiTrophy
+                - BiUserCircle
+                - BiBeer
+                - BiChat
+                - BiCloud
+                - BiCoffeeTogo
+                - BiWorld
+          - name: style
+            label: Style
+            type: select
+            config:
+              source:
+                type: simple
+              options:
+                - circle
+                - float
+      - name: title
+        label: Title
+        type: text
+      - name: text
+        label: Text
+        type: text
+      - label: Actions
+        name: actions
+        type: field_group_list
+        fields:
+          - label: Label
+            name: label
+            type: text
+          - name: type
+            label: Type
+            type: select
+            config:
+              source:
+                type: simple
+              options:
+                - button
+                - link
+          - label: Icon
+            name: icon
+            type: boolean
+  - name: style
+    label: Style
+    type: field_group
+    fields:
+      - name: color
+        label: Color
+        type: select
+        config:
+          source:
+            type: simple
+          options:
+            - default
+            - tint
+            - primary

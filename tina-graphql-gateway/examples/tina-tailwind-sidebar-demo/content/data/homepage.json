@@ -1,0 +1,186 @@
+{
+  "nav": {
+    "wordmark": {
+      "icon": {
+        "color": "primary",
+        "name": "BiUserCircle",
+        "style": "float"
+      },
+      "name": "WORDMARK"
+    },
+    "items": [
+      {
+        "label": "Pricing",
+        "link": "#"
+      },
+      {
+        "label": "Contact"
+      },
+      {
+        "label": "Services"
+      }
+    ]
+  },
+  "blocks": [
+    {
+      "template": "hero",
+      "tagline": "TAGLINE ABOVE TEXT",
+      "headline": "This is a large display heading.",
+      "paragraph": "Aliquam eu dapibus nisl. Suspendisse rhoncus nec nunc id blandit. Curabitur cursus ligula massa, non gravida sapien accumsan et. Ut lacus metus, aliquet eu nibh a, gravida convallis mauris. Duis et venenatis mi, sed vestibulum nisl. Sed aliquet, nunc et pharetra pellentesque, purus massa ultrices nisl, eu pellentesque felis nunc in lorem. ",
+      "text": {
+        "color": "default"
+      },
+      "image": {
+        "src": "https://images.unsplash.com/photo-1599979724544-fc7b5c69f029?ixid=MnwxMjA3fDB8MHx0b3BpYy1mZWVkfDIyfDZzTVZqVExTa2VRfHxlbnwwfHx8fA%3D%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=500&q=60",
+        "alt": "Photo from Unsplash"
+      },
+      "actions": [
+        {
+          "label": "Primary Action",
+          "type": "button",
+          "icon": true
+        },
+        {
+          "label": "Learn More",
+          "type": "link"
+        }
+      ],
+      "style": {
+        "color": "tint"
+      }
+    },
+    {
+      "template": "testimonial",
+      "quote": "Lorem ipsum dolor sit amet, consectetur adipiscing elit. Suspendisse vehicula nunc diam. Nunc ut eros blandit, tristique tortor sit amet, elementum du",
+      "author": "Stone, John",
+      "style": {
+        "color": "primary"
+      }
+    },
+    {
+      "template": "features",
+      "items": [
+        {
+          "icon": {
+            "color": "red",
+            "name": "BiCoffeeTogo",
+            "style": "float"
+          },
+          "title": "Amazing Feature",
+          "text": "Connect to any data source, edit with Tina. Designed for the Jamstack with a focus on React-based sites. ",
+          "actions": [
+            {
+              "label": "Learn More",
+              "type": "link",
+              "icon": true
+            }
+          ]
+        },
+        {
+          "icon": {
+            "color": "primary",
+            "name": "BiCloud",
+            "style": "circle"
+          },
+          "title": "Another Great Thing",
+          "text": "Connect to any data source, edit with Tina. Designed for the Jamstack with a focus on React-based sites. ",
+          "actions": [
+            {
+              "label": "Learn More",
+              "type": "link",
+              "icon": true
+            }
+          ]
+        },
+        {
+          "icon": {
+            "color": "yellow",
+            "name": "BiMapAlt",
+            "style": "circle"
+          },
+          "title": "Three To Round It Out",
+          "text": "Connect to any data source, edit with Tina. Designed for the Jamstack with a focus on React-based sites. ",
+          "actions": [
+            {
+              "label": "Learn More",
+              "type": "link",
+              "icon": true
+            }
+          ]
+        }
+      ]
+    }
+  ],
+  "navlist": [
+    {
+      "template": "nav",
+      "title": "Company",
+      "items": [
+        {
+          "label": "About"
+        },
+        {
+          "label": "Carriers"
+        },
+        {
+          "label": "Pricing"
+        },
+        {
+          "label": "Security"
+        },
+        {
+          "label": "Contact us"
+        }
+      ]
+    },
+    {
+      "template": "nav",
+      "title": "Legal",
+      "items": [
+        {
+          "label": "Privacy Policy"
+        },
+        {
+          "label": "Terms Of Service"
+        },
+        {
+          "label": "Trademark Policy"
+        },
+        {
+          "label": "Inactive Policy"
+        }
+      ]
+    },
+    {
+      "template": "nav",
+      "title": "Product",
+      "items": [
+        {
+          "label": "Form Templates",
+          "link": "#"
+        },
+        {
+          "label": "Landing Page",
+          "link": "#"
+        },
+        {
+          "label": "Figma Files",
+          "link": "#"
+        },
+        {
+          "label": "Background Info",
+          "link": "#"
+        }
+      ]
+    }
+  ],
+  "footer": {
+    "social": {
+      "facebook": "jkl",
+      "twitter": "jl",
+      "instagram": "jkl.",
+      "github": "jkl."
+    }
+  },
+  "_template": "homepage"
+}

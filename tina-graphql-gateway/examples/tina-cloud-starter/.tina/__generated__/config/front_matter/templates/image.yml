@@ -1,0 +1,13 @@
+---
+name: image
+label: Image
+fields:
+  - type: text
+    label: Heading
+    name: heading
+  - type: textarea
+    label: Image Description
+    name: imgDescription
+  - type: text
+    label: Image src
+    name: src

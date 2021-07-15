@@ -1,0 +1,16 @@
+{
+  "data": {
+    "getDocument": {
+      "id": "content/movies/star-wars.md",
+      "data": {
+        "title": "Star Wars",
+        "genre": "scifi",
+        "director": {
+          "data": {
+            "name": "George Lucas"
+          }
+        }
+      }
+    }
+  }
+}

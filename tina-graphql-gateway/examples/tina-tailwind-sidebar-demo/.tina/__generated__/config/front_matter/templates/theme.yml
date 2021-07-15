@@ -1,0 +1,29 @@
+---
+name: theme
+label: Theme
+fields:
+  - name: color
+    label: Primary Color
+    type: select
+    config:
+      source:
+        type: simple
+      options:
+        - blue
+        - teal
+        - green
+        - red
+        - pink
+        - purple
+        - orange
+        - yellow
+  - name: btnStyle
+    label: Button Style
+    type: select
+    config:
+      source:
+        type: simple
+      options:
+        - round
+        - rounded
+        - square

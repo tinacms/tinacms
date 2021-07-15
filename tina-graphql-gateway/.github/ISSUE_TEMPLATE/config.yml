@@ -1,0 +1,4 @@
+contact_links:
+  - name: Website Issues
+    url: https://github.com/tinacms/tina-graphql-gateway/issues/new
+    about: If you're reporting on our website, blog, or documentation please visit the tinacms.org repository.

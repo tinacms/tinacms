@@ -1,0 +1,10 @@
+---
+name: message
+label: Message
+fields:
+  - type: text
+    label: Message Header
+    name: messageHeader
+  - type: textarea
+    label: Message Body
+    name: messageBody
