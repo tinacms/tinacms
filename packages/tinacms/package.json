@@ -29,8 +29,13 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.42.1",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.9.4",
     "@types/styled-components": "4.1.8",
-    "styled-components": ">=4.1"
+    "react": "16.12.0",
+    "react-dom": "16.12.0",
+    "styled-components": ">=4.1",
+    "tslib": "^1.10.0"
   },
   "dependencies": {
     "@tinacms/alerts": "^0.43.0",
