@@ -2,9 +2,9 @@
   "name": "root",
   "private": true,
   "workspaces": [
-    "packages/*",
-    "apps/*",
-    "examples/*"
+    "packages/@testing/*",
+    "packages/@tinacms/*",
+    "packages/[!@]*"
   ],
   "scripts": {
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
