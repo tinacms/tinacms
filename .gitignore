@@ -17,3 +17,11 @@ packages/cli/forestry/.env
 **/.cache/
 **/package-lock.json
 **/yarn.lock
+
+.yarn/*
+!.yarn/patches
+!.yarn/releases
+!.yarn/plugins
+!.yarn/sdks
+!.yarn/versions
+.pnp.*
