@@ -34,6 +34,7 @@ import {
   BlocksFieldPlugin,
   TagsFieldPlugin,
   DateFieldPlugin,
+  CheckboxGroupFieldPlugin,
 } from '@tinacms/fields'
 import { Form } from '@tinacms/forms'
 import { Alerts, EventsToAlerts } from '@tinacms/alerts'
@@ -62,6 +63,7 @@ const DEFAULT_FIELDS = [
   DateFieldPlugin,
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
+  CheckboxGroupFieldPlugin,
 ]
 
 export interface TinaCMSConfig extends CMSConfig {
