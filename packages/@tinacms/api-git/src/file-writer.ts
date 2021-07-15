@@ -63,23 +63,17 @@ export function deleteFile(path: string) {
 }
 
 function cacheCommand(filepath: string, data: any) {
-  if (DEBUG) {
-    console.info(`caching ${count}: start`)
-  }
+  console.info(`caching ${count}: start`)
   queue.addFileChange({ filepath, content: data })
-  if (DEBUG) console.info(`caching ${count}: end`)
 }
 
 function tryToWrite() {
   if (!queue.length) {
-    if (DEBUG) console.info(`nothing to write.`)
     return
   }
 
   const curr = count
-  if (DEBUG) console.info(`write ${curr}: start`)
   if (waitingForBuild) {
-    if (DEBUG) console.info(`write ${curr}: waiting for gatsby`)
     return
   }
 
@@ -97,11 +91,9 @@ function tryToWrite() {
 
   fs.writeFile(filepath, content, (err: any) => {
     if (err) {
-      if (DEBUG) console.info(`write ${curr}: end; failure`)
       console.error(err)
       waitingForBuild = false
     } else {
-      if (DEBUG) console.info(`write ${curr}: end; success`)
       waitingForBuild = true
       // Temp solution; we haven't figured out how to
       // call `buildFinished` when Gatsby's build actually
@@ -114,7 +106,6 @@ function tryToWrite() {
 }
 
 function buildFinished() {
-  if (DEBUG) console.info(`build finished`)
   waitingForBuild = false
   tryToWrite()
 }
