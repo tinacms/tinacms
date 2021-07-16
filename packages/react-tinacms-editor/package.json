@@ -81,8 +81,11 @@
   },
   "peerDependencies": {
     "@tinacms/form-builder": ">=0.39",
+    "final-form": ">=4.20.2",
     "react": ">=16.8",
     "react-dom": ">=16.8",
+    "react-final-form": ">=6",
+    "react-is": "^17.0.2",
     "react-tinacms-inline": ">=0.29",
     "styled-components": ">=4.1",
     "tinacms": ">=0.13"

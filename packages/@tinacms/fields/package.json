@@ -69,9 +69,12 @@
     "react-dropzone": "10.1.8"
   },
   "peerDependencies": {
+    "final-form": ">=4.20.2",
     "react": ">=16.8",
     "react-beautiful-dnd": "^11.0.5",
     "react-dom": ">=16.8",
+    "react-final-form": ">6.0.0",
+    "react-is": "^17.0.2",
     "styled-components": ">=4.1"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
