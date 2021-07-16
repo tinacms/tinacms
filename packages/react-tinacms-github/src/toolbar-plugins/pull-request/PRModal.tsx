@@ -175,6 +175,8 @@ export const PRModal = () => {
   )
 }
 
+// Type of property 'defaultProps' circularly references itself in mapped type
+// @ts-ignore
 const TinaButton = styled(RawTinaButton)`
   height: auto;
   padding-top: 0.8125rem;

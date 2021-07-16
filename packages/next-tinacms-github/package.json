@@ -16,7 +16,11 @@
     "@tinacms/scripts": "^0.42.1",
     "@types/cookie": "0.3.3",
     "@types/crypto-js": "^3.1.47",
-    "@types/uuid": "^8.0.0"
+    "@types/node": "^16.3.2",
+    "@types/qs": "^6.9.7",
+    "@types/uuid": "^8.0.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.8.2"
   },
   "dependencies": {
     "@tinacms/core": "^0.43.0",

@@ -32,7 +32,9 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.42.1",
-    "tinacms": "^0.43.0"
+    "@types/js-yaml": "^4.0.2",
+    "tinacms": "^0.43.0",
+    "tslib": "^1.10.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
