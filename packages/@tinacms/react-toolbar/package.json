@@ -59,8 +59,11 @@
     "@tinacms/react-modals": ">=0.1",
     "@tinacms/react-screens": ">=0.1",
     "@tinacms/styles": ">=0.4",
+    "final-form": ">=4.20.2",
     "prop-types": ">=15",
     "react": ">=16.8",
+    "react-final-form": ">6.0.0",
+    "react-is": "^17.0.2",
     "styled-components": ">=4.1"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"

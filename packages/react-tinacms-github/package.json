@@ -24,6 +24,7 @@
     "final-form": ">=4.18.0",
     "react": ">=16.8",
     "react-dismissible": "^1.3.0",
+    "react-is": "^17.0.2",
     "styled-components": ">=4.1",
     "tinacms": ">=0.19"
   },

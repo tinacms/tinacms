@@ -32,6 +32,7 @@
     "@tinacms/media": "^0.24.0",
     "@tinacms/react-core": "^0.24.0",
     "@tinacms/styles": "^0.24.0",
+    "final-form": ">=4.20.2",
     "react": ">=16.8",
     "react-final-form": "^6.3.0"
   },
