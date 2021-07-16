@@ -76,7 +76,7 @@ export function AddBlockMenu({
         ...getDefaultProps(blocks[blockId].template.defaultItem),
       })
     } else {
-      setIsOpen(isOpen => !isOpen)
+      setIsOpen((isOpen) => !isOpen)
     }
   }
 
@@ -114,7 +114,7 @@ export function AddBlockMenu({
           <DropdownHeader>
             <SelectFilter
               placeholder="Filter"
-              onChange={event => setFilterValue(event.target.value)}
+              onChange={(event) => setFilterValue(event.target.value)}
               onClick={(event: any) => {
                 event.preventDefault()
                 event.stopPropagation()
@@ -124,12 +124,12 @@ export function AddBlockMenu({
           </DropdownHeader>
         )}
         <BlocksMenuOptions>
-          {Object.keys(blocks).filter(key => {
+          {Object.keys(blocks).filter((key) => {
             const label = blocks[key].template.label
             return label.toLowerCase().includes(filterValue.toLowerCase())
           }).length > 0 ? (
             Object.keys(blocks)
-              .filter(key => {
+              .filter((key) => {
                 const label = blocks[key].template.label
                 return label.toLowerCase().includes(filterValue.toLowerCase())
               })
@@ -144,7 +144,7 @@ export function AddBlockMenu({
                   return (
                     <BlockOption
                       key={template?.label}
-                      onClick={event => {
+                      onClick={(event) => {
                         event.stopPropagation()
                         event.preventDefault()
                         addBlock({
@@ -173,6 +173,8 @@ interface AddMenuProps {
   openTop?: boolean
 }
 
+// Type of property 'defaultProps' circularly references itself in mapped type
+// @ts-ignore
 const AddBlockButton = styled(IconButton)<AddMenuProps>`
   font-family: 'Inter', sans-serif;
   display: flex;
@@ -186,7 +188,7 @@ const AddBlockButton = styled(IconButton)<AddMenuProps>`
     transition: all 150ms ease-out;
   }
 
-  ${props =>
+  ${(props) =>
     props.isOpen &&
     css`
       pointer-events: none;
@@ -204,22 +206,23 @@ interface AddBlockWrapperProps {
   isOpen: boolean
 }
 
-const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
+const AddBlockWrapper = styled.div<AddBlockWrapperProps>((p) => {
   const offset = getOffset(p.offset)
 
   return css`
-  position: absolute;
-  z-index: calc(var(--tina-z-index-3) - ${p.index !== undefined ? p.index : 0});
+    position: absolute;
+    z-index: calc(
+      var(--tina-z-index-3) - ${p.index !== undefined ? p.index : 0}
+    );
 
-
-  ${p.position === 'top' &&
+    ${p.position === 'top' &&
     css`
       top: calc(-1 * ${getOffsetY(offset)}px);
       left: 50%;
       transform: translate3d(-50%, -50%, 0);
     `}
 
-  ${p.position === 'left' &&
+    ${p.position === 'left' &&
     css`
       top: 50%;
       left: calc(-1 * ${getOffsetX(offset)}px);
@@ -249,7 +252,7 @@ const AddBlockWrapper = styled.div<AddBlockWrapperProps>(p => {
     css`
       z-index: calc(1 + var(--tina-z-index-3) - ${p.index ? p.index : 0});
     `}
-`
+  `
 })
 
 const BlocksMenu = styled.div<AddMenuProps>`
@@ -274,7 +277,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
   background-color: white;
   overflow: hidden;
 
-  ${props =>
+  ${(props) =>
     props.isOpen &&
     css`
       opacity: 1;
@@ -282,7 +285,7 @@ const BlocksMenu = styled.div<AddMenuProps>`
       transform: translate3d(-50%, 16px, 0) scale3d(1, 1, 1);
     `};
 
-  ${props =>
+  ${(props) =>
     props.openTop &&
     css`
       top: auto;
@@ -290,9 +293,9 @@ const BlocksMenu = styled.div<AddMenuProps>`
       transform-origin: 50% 100%;
 
       ${props.isOpen &&
-        css`
-          transform: translate3d(-50%, -16px, 0) scale3d(1, 1, 1);
-        `};
+      css`
+        transform: translate3d(-50%, -16px, 0) scale3d(1, 1, 1);
+      `};
     `};
 `
 
@@ -359,7 +362,7 @@ const BlockOption = styled.button`
     border-bottom: 1px solid rgba(0, 0, 0, 0.05);
   }
 
-  ${props =>
+  ${(props) =>
     props.disabled &&
     css`
       pointer-events: none;

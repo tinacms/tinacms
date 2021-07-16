@@ -33,8 +33,12 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "^0.42.1",
+    "@types/react": "^16.8.23",
     "gatsby-tinacms-git": "^0.43.0",
-    "tinacms": "^0.43.0"
+    "react": "16.12.0",
+    "tinacms": "^0.43.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.8.2"
   },
   "dependencies": {
     "@types/js-yaml": "^3.12.3",

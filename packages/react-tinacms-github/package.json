@@ -23,6 +23,7 @@
     "@tinacms/styles": ">=0.4",
     "final-form": ">=4.18.0",
     "react": ">=16.8",
+    "react-dismissible": "^1.3.0",
     "styled-components": ">=4.1",
     "tinacms": ">=0.19"
   },
@@ -39,9 +40,17 @@
     "@tinacms/scripts": "^0.42.1",
     "@tinacms/styles": "^0.42.1",
     "@types/js-cookie": "^2.2.5",
+    "@types/react": "^16.8.23",
+    "@types/react-dom": "^16.9.4",
+    "@types/styled-components": "4.1.8",
     "final-form": "^4.18.7",
+    "react": "16.12.0",
+    "react-dismissible": "^1.3.0",
+    "react-dom": "16.12.0",
     "styled-components": ">=4.1",
-    "tinacms": "^0.43.0"
+    "tinacms": "^0.43.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.8.2"
   },
   "dependencies": {
     "btoa": "^1.2.1",

@@ -45,7 +45,11 @@
     "@tinacms/git-client": "^0.43.0"
   },
   "devDependencies": {
-    "tinacms": "^0.43.0"
+    "@types/react": "^16.8.23",
+    "react": "16.12.0",
+    "tinacms": "^0.43.0",
+    "tslib": "^1.10.0",
+    "typescript": "^3.8.2"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
