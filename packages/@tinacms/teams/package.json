@@ -30,7 +30,8 @@
   "devDependencies": {
     "@tinacms/scripts": "^0.42.1",
     "@types/express": "^4.17.0",
-    "@types/jsonwebtoken": "8.3.5"
+    "@types/jsonwebtoken": "8.3.5",
+    "tslib": "^1.10.0"
   },
   "dependencies": {
     "express": "^4.17.1",

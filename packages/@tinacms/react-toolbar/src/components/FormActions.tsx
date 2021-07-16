@@ -36,7 +36,7 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
     <>
       <MoreActionsButton
         open={actionMenuVisibility}
-        onClick={() => setActionMenuVisibility(p => !p)}
+        onClick={() => setActionMenuVisibility((p) => !p)}
       />
       <ActionsOverlay open={actionMenuVisibility}>
         <Dismissible
@@ -45,7 +45,7 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
           disabled={!actionMenuVisibility}
           allowClickPropagation
           onDismiss={() => {
-            setActionMenuVisibility(p => !p)
+            setActionMenuVisibility((p) => !p)
           }}
         >
           {form?.actions &&
@@ -61,7 +61,7 @@ export const FormActionMenu: FC<FormActionMenuProps> = ({ form }) => {
   )
 }
 
-const MoreActionsButton = styled(p => (
+const MoreActionsButton = styled((p) => (
   <button {...p}>
     <EllipsisVerticalIcon />
   </button>
@@ -92,7 +92,7 @@ const MoreActionsButton = styled(p => (
     transition: all 150ms ease-out;
   }
 
-  ${props =>
+  ${(props) =>
     props.open &&
     css`
       background-color: var(--tina-color-grey-1);
@@ -125,7 +125,7 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
   background-color: white;
   overflow: hidden;
   z-index: var(--tina-z-index-1);
-  ${props =>
+  ${(props) =>
     props.open &&
     css`
       opacity: 1;
@@ -134,6 +134,8 @@ const ActionsOverlay = styled.div<{ open: boolean }>`
     `};
 `
 
+// Type of property 'defaultProps' circularly references itself in mapped type
+// @ts-ignore
 export const ExitButton = styled(ActionButton)`
   height: 32px;
   background-color: var(--tina-color-grey-1);

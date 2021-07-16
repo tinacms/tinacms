@@ -30,7 +30,8 @@
   },
   "devDependencies": {
     "@tinacms/core": "^0.43.0",
-    "@tinacms/scripts": "^0.42.1"
+    "@tinacms/scripts": "^0.42.1",
+    "tslib": "^1.10.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
