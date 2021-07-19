@@ -1,0 +1,10 @@
+---
+label: Author
+name: author
+fields:
+  - type: text
+    label: Name
+    name: name
+  - type: text
+    label: Avatar
+    name: avatar

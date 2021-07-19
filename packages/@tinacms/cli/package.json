@@ -30,8 +30,7 @@
     "@types/prompts": "^2.0.13",
     "@types/yup": "^0.29.11",
     "jest": "26.1.0",
-    "ts-jest": "^26.5.3",
-    "tsup": "^4.6.1"
+    "ts-jest": "^26.5.3"
   },
   "scripts": {
     "build": "yarn tsup src/index.ts --format cjs --dts",
@@ -66,7 +65,7 @@
     "normalize-path": "^3.0.0",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
-    "tsup": "4.12.5",
+    "tsup": "4.6.1",
     "typescript": "^4.3.5",
     "yup": "^0.32.9"
   },

@@ -25,8 +25,9 @@ interface Options {
   command?: string
   experimental?: boolean
 }
+console.log('require', require)
 
-const gqlPackageFile = require.resolve('tina-graphql')
+const gqlPackageFile = require.resolve('@tinacms/graphql')
 
 export async function startServer(
   _ctx,
@@ -41,7 +42,7 @@ export async function startServer(
       const ps = childProcess.spawn(firstCommand, args, {
         stdio: 'inherit',
       })
-      ps.on('close', (code) => {
+      ps.on('close', code => {
         logger.info(`child process exited with code ${code}`)
         process.exit(code)
       })
@@ -106,7 +107,7 @@ export async function startServer(
       logger.info(`Started Filesystem GraphQL server on port: ${port}`)
       logger.info(`Visit the playground at http://localhost:${port}/altair/`)
     })
-    state.server.on('connection', (socket) => {
+    state.server.on('connection', socket => {
       state.sockets.push(socket)
     })
   }
@@ -115,7 +116,7 @@ export async function startServer(
     logger.info('Detected change to gql package, restarting...')
     delete require.cache[gqlPackageFile]
 
-    state.sockets.forEach((socket) => {
+    state.sockets.forEach(socket => {
       if (socket.destroyed === false) {
         socket.destroy()
       }

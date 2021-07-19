@@ -1,0 +1,29 @@
+---
+sections:
+  - label: Blog Posts
+    name: posts
+    path: content/posts
+    templates:
+      - article
+    type: directory
+    create: documents
+    match: '**/*.md'
+    new_doc_ext: md
+  - label: Authors
+    name: authors
+    path: content/authors
+    templates:
+      - author
+    type: directory
+    create: documents
+    match: '**/*.md'
+    new_doc_ext: md
+  - label: Marketing Pages
+    name: marketingPages
+    path: content/marketing-pages
+    templates:
+      - landingPage
+    type: directory
+    create: documents
+    match: '**/*.md'
+    new_doc_ext: md
