@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/toolkit",
-  "version": "0.43.0-beta.3",
+  "version": "0.43.1",
   "main": "build/index.js",
   "types": "build/index.d.ts",
   "keywords": [
@@ -28,6 +28,7 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
+    "@tinacms/tina-build": "workspace:*",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
     "@types/lodash.debounce": "^4.0.6",
@@ -46,6 +47,7 @@
   },
   "dependencies": {
     "@sambego/storybook-styles": "^1.0.0",
+    "@types/prop-types": "^15.7.4",
     "atob": "2.1.2",
     "color-string": "^1.5.3",
     "cors": "^2.8.5",

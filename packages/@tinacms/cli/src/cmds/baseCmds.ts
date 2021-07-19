@@ -19,11 +19,7 @@ import { compile } from './compile'
 import { initTina, installDeps, tinaSetup, successMessage } from './init'
 
 export const CMD_GEN_TYPES = 'schema:types'
-export const CMD_AUDIT = 'schema:audit'
-export const CMD_DUMP = 'schema:dump'
-export const CMD_MIGRATE = 'schema:migrate'
 export const CMD_START_SERVER = 'server:start'
-export const CMD_START_PLAYGROUND = 'server:playground'
 export const CMD_COMPILE_MODELS = 'schema:compile'
 export const INIT = 'init'
 
@@ -62,32 +58,32 @@ export const baseCmds: Command[] = [
     command: CMD_START_SERVER,
     description: 'Start Filesystem Graphql Server',
     options: [startServerPortOption, subCommand, experimentalCommand],
-    action: (options) => chain([startServer], options),
+    action: options => chain([startServer], options),
   },
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
     options: [experimentalCommand],
-    action: (options) => chain([compile], options),
+    action: options => chain([compile], options),
   },
   {
     command: CMD_GEN_TYPES,
     description:
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
     options: [experimentalCommand],
-    action: (options) => chain([attachSchema, genTypes], options),
+    action: options => chain([attachSchema, genTypes], options),
   },
   {
     command: INIT,
     options: [experimentalCommand],
     description: 'Add Tina Cloud to an existing project',
-    action: (options) =>
+    action: options =>
       chain(
         [
           initTina,
           installDeps,
           async (_ctx, next) => {
-            await compile(_ctx, next, options)
+            await compile(_ctx, next)
             next()
           },
           attachSchema,
@@ -98,25 +94,4 @@ export const baseCmds: Command[] = [
         options
       ),
   },
-  /**
-   * These have become outdated and it's not clear if we'll bring them forward.
-   */
-  // {
-  //   command: CMD_AUDIT,
-  //   description: "Audit .tina schema",
-  //   options: [auditFixOption],
-  //   action: (options) => chain([audit], options),
-  // },
-  // {
-  //   command: CMD_MIGRATE,
-  //   description: "Migrate .forestry to .tina",
-  //   options: [migrateDryRunOption],
-  //   action: (options) => chain([migrate], options),
-  // },
-  // {
-  //   command: CMD_DUMP,
-  //   description: "Dump JSON schema into specified path",
-  //   options: [schemaDumpOption],
-  //   action: (options) => chain([dump], options),
-  // },
 ]

@@ -8,19 +8,14 @@
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
   "scripts": {
-    "build": "yarn tsup src/index.ts src/edit-state.tsx src/toolkit.tsx --format cjs --dts",
-    "watch": "yarn tsup src/index.ts src/edit-state.tsx src/toolkit.tsx --watch --format cjs --dts"
+    "build": "yarn tsup src/index.ts src/edit-state.tsx --format cjs --dts",
+    "watch": "yarn tsup src/index.ts src/edit-state.tsx --watch --format cjs --dts"
   },
   "dependencies": {
     "@graphql-codegen/core": "^1.15.4",
     "@graphql-codegen/typescript": "^1.15.4",
     "@graphql-codegen/typescript-operations": "^1.15.4",
-    "@tinacms/graphql-helpers": "workspace:*",
     "@tinacms/toolkit": "workspace:*",
-    "@types/lodash": "^4.14.169",
-    "@types/node": "^14.0.13",
-    "@types/react": "^16.9.38",
-    "@types/yup": "^0.29.10",
     "@xstate/react": "^1.1.0",
     "codemirror": "^5.55.0",
     "cors": "^2.8.5",
@@ -38,16 +33,21 @@
     "node-fetch": "^2.6.0",
     "prop-types": "15.7.2",
     "ts-jest": "^26.5.3",
-    "tsup": "4.12.5",
-    "typescript": "^4.3.5",
     "xstate": "^4.15.1",
     "yup": "^0.32.0"
   },
   "devDependencies": {
+    "@tinacms/tina-build": "workspace:*",
+    "@types/lodash": "^4.14.169",
+    "@types/node": "^14.0.13",
+    "@types/react": "^16.9.38",
+    "@types/yup": "^0.29.10",
     "next": "9.4.2",
     "react": "16.13.1",
     "react-dom": "16.13.1",
-    "styled-components": "^5.2.0"
+    "styled-components": "^5.2.0",
+    "tsup": "4.12.5",
+    "typescript": "^4.3.5"
   },
   "peerDependencies": {
     "react": ">=16.8",

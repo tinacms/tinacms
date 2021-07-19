@@ -13,7 +13,7 @@ limitations under the License.
 
 import childProcess from 'child_process'
 import path from 'path'
-import { buildSchema, unstable_buildSchema } from '@tinacms/graphql'
+import { buildSchema } from '@tinacms/graphql'
 import { genTypes } from '../query-gen'
 import { compile } from '../compile'
 import chokidar from 'chokidar'
@@ -82,13 +82,8 @@ export async function startServer(
   }
 
   const build = async () => {
-    await compile(null, null, { experimental })
-    let schema
-    if (experimental) {
-      schema = await unstable_buildSchema(rootPath)
-    } else {
-      schema = await buildSchema(rootPath)
-    }
+    await compile(null, null)
+    const schema = await buildSchema(rootPath)
     await genTypes({ schema }, () => {}, {})
   }
 

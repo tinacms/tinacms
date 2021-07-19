@@ -6,21 +6,10 @@ jobs:
   build:
     runs-on: ubuntu-latest
     steps:
-      - uses: actions/checkout@v1
-      - uses: actions/setup-node@v1
-        with:
-          node-version: '10.x'
-
-      - name: Install
-        run: |
-          npm ci
-          npm run bs
-
+      - uses: actions/checkout@v2
+      - name: Install dependencies
+        run: yarn install
       - name: Build
-        run: npm run build
-
+        run: yarn build
       - name: Test
-        run: npm run test
-
-      - name: Lint
-        run: npm run lint
+        run: yarn test

@@ -20,9 +20,8 @@ import {
   print,
 } from 'graphql'
 
-import { formify } from '@tinacms/graphql-helpers'
+import { formify } from './formify'
 import gql from 'graphql-tag'
-import { transformPayload } from './transform-payload'
 
 interface ServerOptions {
   organizationId: string
@@ -65,7 +64,7 @@ export class Client {
 
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
-        this.getToken = function () {
+        this.getToken = function() {
           const tokens = localStorage.getItem(AUTH_TOKEN_KEY) || null
           if (tokens) {
             return JSON.parse(tokens)
@@ -77,12 +76,12 @@ export class Client {
             }
           }
         }
-        this.setToken = function (token) {
+        this.setToken = function(token) {
           localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token, null, 2))
         }
         break
       case 'MEMORY':
-        this.getToken = function () {
+        this.getToken = function() {
           if (_this.token) {
             return JSON.parse(_this.token)
           } else {
@@ -93,7 +92,7 @@ export class Client {
             }
           }
         }
-        this.setToken = function (token) {
+        this.setToken = function(token) {
           _this.token = JSON.stringify(token, null, 2)
         }
         break
@@ -108,7 +107,7 @@ export class Client {
     }
   }
 
-  addPendingContent = async (props) => {
+  addPendingContent = async props => {
     const mutation = `#graphql
 mutation addPendingDocumentMutation(
   $relativePath: String!
@@ -152,36 +151,6 @@ mutation addPendingDocumentMutation(
     return this.schema
   }
 
-  prepareVariables = async ({
-    mutationString,
-    relativePath,
-    values,
-    sys,
-  }: {
-    mutationString: string
-    relativePath: string
-    values: object
-    sys: {
-      template: string
-      collection: {
-        slug: string
-      }
-    }
-  }) => {
-    const schema = await this.getSchema()
-    const params = transformPayload({
-      mutation: mutationString,
-      values: values,
-      sys,
-      schema,
-    })
-
-    return {
-      relativePath,
-      params,
-    }
-  }
-
   async requestWithForm<ReturnType>(
     query: (gqlTag: typeof gql) => DocumentNode,
     { variables }: { variables }
@@ -212,7 +181,7 @@ mutation addPendingDocumentMutation(
     if (json.errors) {
       throw new Error(
         `Unable to fetch, errors: \n\t${json.errors
-          .map((error) => error.message)
+          .map(error => error.message)
           .join('\n')}`
       )
       return json

@@ -11,30 +11,20 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export const defaultSchema = `
-import { defineSchema } from "@tinacms/cli";
+import { NextApiHandler } from 'next'
+import { isAuthorized } from '@tinacms/auth'
+const test: NextApiHandler = async (req, res) => {
+  const user = await isAuthorized(req)
+  console.log({ user })
+  if (user && user.verified) {
+    console.log('this is a good user')
+  } else {
+    console.log('this is a bad user')
+  }
+  res.json({
+    asdf: 'asdf',
+    user: user,
+  })
+}
 
-export default defineSchema({
-  collections: [
-    {
-      label: "Blog Posts",
-      name: "posts",
-      path: "content/posts",
-      templates: [
-        {
-          label: "Article",
-          name: "article",
-          fields: [
-            {
-              type: "string",
-              label: "Title",
-              name: "title",
-            },
-          ],
-        },
-      ],
-    },
-  ],
-});
-
-`
+export default test

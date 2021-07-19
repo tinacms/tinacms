@@ -19,7 +19,7 @@ import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
 
-const gqlServer = async (experimental: boolean = false) => {
+const gqlServer = async () => {
   // This is lazily required so we can update the module
   // without having to restart the server
   const gqlPackage = require('@tinacms/graphql')
@@ -32,43 +32,33 @@ const gqlServer = async (experimental: boolean = false) => {
   app.use(
     '/altair',
     altairExpress({
-      baseURL: '/altair',
+      baseURL: '/graphql',
       initialQuery: `# Welcome to Tina!
-# We've got a simple query set up for you to get started
-# but there's plenty more for you to explore on your own!
-query MyQuery {
-  getCollections {
-    documents {
-      id
-      sys {
-        filename
-        extension
-      }
-    }
-  }
-}`,
+      # We've got a simple query set up for you to get started
+      # but there's plenty more for you to explore on your own!
+      query MyQuery {
+        getCollections {
+          documents {
+            id
+            sys {
+              filename
+              extension
+            }
+          }
+        }
+      }`,
     })
   )
 
   const rootPath = path.join(process.cwd())
   app.post('/graphql', async (req, res) => {
-    if (experimental) {
-      const { query, variables } = req.body
-      const result = await gqlPackage.unstable_gql({
-        rootPath,
-        query,
-        variables,
-      })
-      return res.json(result)
-    } else {
-      const { query, variables } = req.body
-      const result = await gqlPackage.gql({
-        projectRoot: rootPath,
-        query,
-        variables,
-      })
-      return res.json(result)
-    }
+    const { query, variables } = req.body
+    const result = await gqlPackage.gql({
+      rootPath,
+      query,
+      variables,
+    })
+    return res.json(result)
   })
 
   return server

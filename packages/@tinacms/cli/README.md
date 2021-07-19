@@ -196,7 +196,7 @@ When you use Tina's GraphQL forms, we know about all of the relationships in you
 #### Start the server
 
 ```
-yarn run tina-gql server:start
+yarn run tinacms server:start
 ```
 
 #### Query the content
