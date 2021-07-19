@@ -1,0 +1,11 @@
+mutation {
+  updateDocument(
+    collection: "author"
+    relativePath: "homer.md"
+    params: { author: { author: { name: "Homer J Simpson" } } }
+  ) {
+    ... on AuthorDocument {
+      id
+    }
+  }
+}

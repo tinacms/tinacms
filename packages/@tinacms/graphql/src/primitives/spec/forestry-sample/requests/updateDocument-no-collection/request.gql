@@ -1,0 +1,27 @@
+mutation {
+  updateDocument(
+    collection: "some-fake-collection"
+    relativePath: "hello-world.md"
+    params: {
+      post: {
+        post: { title: "Hello, again!", author: "content/authors/marge.md" }
+      }
+    }
+  ) {
+    ... on PostDocument {
+      data {
+        ... on PostPost {
+          author {
+            ... on AuthorDocument {
+              data {
+                ... on AuthorAuthor {
+                  name
+                }
+              }
+            }
+          }
+        }
+      }
+    }
+  }
+}

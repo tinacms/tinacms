@@ -2,21 +2,12 @@
   "name": "root",
   "private": true,
   "workspaces": [
-    "packages/@testing/*",
     "packages/@tinacms/*",
-    "packages/[!@]*"
+    "packages/next-tinacms-cloudinary",
+    "packages/tinacms"
   ],
   "scripts": {
-    "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
-    "build": "lerna run build --reject-cycles",
-    "bootstrap": "lerna bootstrap --hoist --reject-cycles --force-local",
-    "bs": "npm run bootstrap",
-    "dev": "lerna run dev --reject-cycles",
-    "nuke": "./scripts/nuke.sh",
-    "lerna": "lerna",
-    "hard-reset": "npm run nuke && npm run bs && npm run build",
-    "test": "lerna run test --reject-cycles",
-    "docs": "lerna run docs"
+    "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
   },
   "devDependencies": {
     "@commitlint/cli": "^8.3.5",
@@ -36,7 +27,6 @@
     "eslint-plugin-react-hooks": "^2.0.1",
     "husky": "^4.2.3",
     "jest": "^24.9.0",
-    "lerna": "^3.22.1",
     "next": "^9.2.0",
     "pretty-quick": "^2.0.1",
     "react": "16.12.0",

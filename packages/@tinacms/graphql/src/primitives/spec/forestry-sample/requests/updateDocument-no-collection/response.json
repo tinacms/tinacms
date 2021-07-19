@@ -1,0 +1,15 @@
+{
+  "data": null,
+  "errors": [
+    {
+      "message": "\"collection\" must be one of: [author, post] but got some-fake-collection",
+      "locations": [
+        {
+          "column": 3,
+          "line": 2
+        }
+      ],
+      "path": ["updateDocument"]
+    }
+  ]
+}
