@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { AddContentPlugin, Field, TinaCMS } from '@tinacms/toolkit'
+import { AddContentPlugin, TinaCMS } from 'tinacms'
 
 type CollectionShape = {
   label: string
@@ -71,7 +71,7 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
   ) {
     try {
       const selectedCollection = this.collections.find(
-        (collectionItem) => collectionItem.slug === collection
+        collectionItem => collectionItem.slug === collection
       )
       const collectionFormat = selectedCollection.format
 
@@ -101,7 +101,7 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
       try {
         const res = await cms.api.tina.addPendingContent(payload)
         if (res.errors) {
-          res.errors.map((e) => {
+          res.errors.map(e => {
             cms.alerts.error(e.message)
           })
         } else {

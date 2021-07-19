@@ -17,15 +17,13 @@ import { version, name } from '../package.json'
 import { Command } from './command'
 import { baseCmds as baseCommands } from './cmds/baseCmds'
 import { logText } from './utils/theme'
-export { defineSchema, unstable_defineSchema } from './cmds/compile'
+export { defineSchema } from './cmds/compile'
 import { logger } from './logger'
 export type {
-  TinaCloudTemplate,
   TinaCloudSchema,
   TinaCloudCollection,
-  TinaCloudSection,
-  TinaField,
-} from './cmds/compile'
+  TinaField
+} from '@tinacms/graphql'
 
 const program = new commander.Command(name)
 const registerCommands = (commands: Command[], noHelp: boolean = false) => {

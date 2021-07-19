@@ -1,11 +1,7 @@
-"""
-References another document, used as a foreign key
-"""
+"""References another document, used as a foreign key"""
 scalar Reference
 
-"""
-
-"""
+""""""
 scalar JSON
 
 type SystemInfo {
@@ -26,16 +22,18 @@ type PageInfo {
   endCursor: String!
 }
 
-"""
-
-"""
+""""""
 interface Node {
   id: ID!
 }
 
-"""
-A relay-compliant pagination connection
-"""
+""""""
+interface Document {
+  sys: SystemInfo
+  id: ID!
+}
+
+"""A relay-compliant pagination connection"""
 interface Connection {
   totalCount: Int!
 }
@@ -45,19 +43,9 @@ type Query {
   getCollections: [Collection!]!
   node(id: String): Node!
   getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): DocumentConnection!
+  getDocumentList(before: String, after: String, first: Int, last: Int): DocumentConnection!
   getPageDocument(relativePath: String): PageDocument!
-  getPageList(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): PageConnection!
+  getPageList(before: String, after: String, first: Int, last: Int): PageConnection!
 }
 
 type DocumentConnectionEdges {
@@ -80,12 +68,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): DocumentConnection!
+  documents(before: String, after: String, first: Int, last: Int): DocumentConnection!
 }
 
 union DocumentNode = PageDocument
@@ -114,7 +97,7 @@ type Page {
   blocks: [PageBlocks]
 }
 
-type PageDocument implements Node {
+type PageDocument implements Node & Document {
   id: ID!
   sys: SystemInfo!
   data: Page!
@@ -135,20 +118,9 @@ type PageConnection implements Connection {
 }
 
 type Mutation {
-  addPendingDocument(
-    collection: String!
-    relativePath: String!
-    template: String
-  ): DocumentNode!
-  updateDocument(
-    collection: String!
-    relativePath: String!
-    params: DocumentMutation!
-  ): DocumentNode!
-  updatePageDocument(
-    relativePath: String!
-    params: PageMutation!
-  ): PageDocument!
+  addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
+  updateDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
 }
 
 input DocumentMutation {

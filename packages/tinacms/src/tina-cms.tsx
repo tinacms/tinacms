@@ -13,19 +13,18 @@ limitations under the License.
 
 import React from 'react'
 import { useGraphqlForms, formifyCallback } from './hooks/use-graphql-forms'
-import { useGraphqlForms as unstable_useGraphqlForms } from './hooks/unstable-use-graphql-forms'
-import { useDocumentCreatorPlugin as unstable_useDocumentCreatorPlugin } from './hooks/unstable-use-graphql-forms'
+import { useDocumentCreatorPlugin } from './hooks/use-graphql-forms'
 import { TinaCloudProvider } from './auth'
 import { TinaCMS, useCMS } from '@tinacms/toolkit'
 
-const SetupHooksUnstable = (props) => {
+const SetupHooksUnstable = props => {
   const cms = useCMS()
-  const [payload, isLoading] = unstable_useGraphqlForms({
-    query: (gql) => gql(props.query),
+  const [payload, isLoading] = useGraphqlForms({
+    query: gql => gql(props.query),
     variables: props.variables || {},
-    formify: (args) => props.formify(args, cms),
+    formify: args => props.formify(args, cms),
   })
-  unstable_useDocumentCreatorPlugin()
+  useDocumentCreatorPlugin()
 
   return (
     <ErrorBoundary>
@@ -39,12 +38,12 @@ const SetupHooksUnstable = (props) => {
   )
 }
 
-const SetupHooks = (props) => {
+const SetupHooks = props => {
   const cms = useCMS()
   const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => gql(props.query),
+    query: gql => gql(props.query),
     variables: props.variables || {},
-    formify: (args) => props.formify(args, cms),
+    formify: args => props.formify(args, cms),
   })
 
   return (

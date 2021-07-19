@@ -53,7 +53,7 @@ export async function initTina(ctx: any, next: () => void, options) {
   logger.info(successText('Setting up Tina...'))
   next()
 }
-const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
+const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
 
 export async function installDeps(ctx: any, next: () => void, options) {
   const bar = new Progress(
@@ -151,9 +151,9 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
       ...pack,
       scripts: {
         ...oldScripts,
-        'tina-dev': 'yarn tina-gql server:start -c "next dev"',
-        'tina-build': 'yarn tina-gql server:start -c "next build"',
-        'tina-start': 'yarn tina-gql server:start -c "next start"',
+        'tina-dev': 'yarn tinacms server:start -c "next dev"',
+        'tina-build': 'yarn tinacms server:start -c "next build"',
+        'tina-start': 'yarn tinacms server:start -c "next start"',
       },
     },
     null,

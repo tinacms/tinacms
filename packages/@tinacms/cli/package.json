@@ -10,7 +10,7 @@
   ],
   "license": "Apache-2.0",
   "bin": {
-    "tina-gql": "bin/tina-gql"
+    "tinacms": "bin/tinacms"
   },
   "devDependencies": {
     "@types/clear": "0.1.0",
@@ -44,9 +44,8 @@
     "@graphql-codegen/typescript": "^1.17.0",
     "@graphql-codegen/typescript-operations": "^1.17.0",
     "@tinacms/graphql": "workspace:*",
-    "@tinacms/graphql-helpers": "workspace:*",
     "ajv": "^6.12.3",
-    "altair-express-middleware": "^4.0.6",
+    "altair-express-middleware": "4.0.6",
     "axios": "0.19.0",
     "body-parser": "^1.19.0",
     "chalk": "^2.4.2",

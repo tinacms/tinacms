@@ -1,11 +1,7 @@
-"""
-References another document, used as a foreign key
-"""
+"""References another document, used as a foreign key"""
 scalar Reference
 
-"""
-
-"""
+""""""
 scalar JSON
 
 type SystemInfo {
@@ -26,16 +22,18 @@ type PageInfo {
   endCursor: String!
 }
 
-"""
-
-"""
+""""""
 interface Node {
   id: ID!
 }
 
-"""
-A relay-compliant pagination connection
-"""
+""""""
+interface Document {
+  sys: SystemInfo
+  id: ID!
+}
+
+"""A relay-compliant pagination connection"""
 interface Connection {
   totalCount: Int!
 }
@@ -45,33 +43,13 @@ type Query {
   getCollections: [Collection!]!
   node(id: String): Node!
   getDocument(collection: String, relativePath: String): DocumentNode!
-  getDocumentList(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): DocumentConnection!
+  getDocumentList(before: String, after: String, first: Int, last: Int): DocumentConnection!
   getMovieDocument(relativePath: String): MovieDocument!
-  getMovieList(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): MovieConnection!
+  getMovieList(before: String, after: String, first: Int, last: Int): MovieConnection!
   getDirectorDocument(relativePath: String): DirectorDocument!
-  getDirectorList(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): DirectorConnection!
+  getDirectorList(before: String, after: String, first: Int, last: Int): DirectorConnection!
   getActorDocument(relativePath: String): ActorDocument!
-  getActorList(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): ActorConnection!
+  getActorList(before: String, after: String, first: Int, last: Int): ActorConnection!
 }
 
 type DocumentConnectionEdges {
@@ -94,12 +72,7 @@ type Collection {
   matches: String
   templates: [JSON]
   fields: [JSON]
-  documents(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): DocumentConnection!
+  documents(before: String, after: String, first: Int, last: Int): DocumentConnection!
 }
 
 union DocumentNode = MovieDocument | DirectorDocument | ActorDocument
@@ -126,16 +99,11 @@ type Movie {
   archived: Boolean
   genre: String
   director: MovieDirectorDocument
-  actors(
-    before: String
-    after: String
-    first: Int
-    last: Int
-  ): MovieActorsConnection!
+  actors(before: String, after: String, first: Int, last: Int): MovieActorsConnection!
   body: String
 }
 
-type MovieDocument implements Node {
+type MovieDocument implements Node & Document {
   id: ID!
   sys: SystemInfo!
   data: Movie!
@@ -159,7 +127,7 @@ type Director {
   name: String
 }
 
-type DirectorDocument implements Node {
+type DirectorDocument implements Node & Document {
   id: ID!
   sys: SystemInfo!
   data: Director!
@@ -184,7 +152,7 @@ type Actor {
   body: String
 }
 
-type ActorDocument implements Node {
+type ActorDocument implements Node & Document {
   id: ID!
   sys: SystemInfo!
   data: Actor!
@@ -205,28 +173,11 @@ type ActorConnection implements Connection {
 }
 
 type Mutation {
-  addPendingDocument(
-    collection: String!
-    relativePath: String!
-    template: String
-  ): DocumentNode!
-  updateDocument(
-    collection: String!
-    relativePath: String!
-    params: DocumentMutation!
-  ): DocumentNode!
-  updateMovieDocument(
-    relativePath: String!
-    params: MovieMutation!
-  ): MovieDocument!
-  updateDirectorDocument(
-    relativePath: String!
-    params: DirectorMutation!
-  ): DirectorDocument!
-  updateActorDocument(
-    relativePath: String!
-    params: ActorMutation!
-  ): ActorDocument!
+  addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
+  updateDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
+  updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
+  updateActorDocument(relativePath: String!, params: ActorMutation!): ActorDocument!
 }
 
 input DocumentMutation {

@@ -13,14 +13,13 @@ limitations under the License.
 
 export * from './client'
 export * from './auth'
-export * from './hooks/use-graphql-forms'
-export { useDocumentCreatorPlugin as unstable_useDocumentCreatorPlugin } from './hooks/unstable-use-content-creator'
-export { useGraphqlForms as unstable_useGraphQLForms } from './hooks/unstable-use-graphql-forms'
 export * from './utils'
 export * from './tina-cms'
-import { TinaCMSProvider2 as TinaCMSProvider } from './tina-cms'
+export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
+export { useGraphqlForms } from './hooks/use-graphql-forms'
+import { TinaCMSProvider2 } from './tina-cms'
 
-export default TinaCMSProvider
+export default TinaCMSProvider2
 
 /**
  * A passthru function which allows editors
