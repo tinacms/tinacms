@@ -25,7 +25,6 @@ interface Options {
   command?: string
   experimental?: boolean
 }
-console.log('require', require)
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
 

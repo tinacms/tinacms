@@ -31,3 +31,5 @@ function graphql(strings: TemplateStringsArray) {
   return strings[0]
 }
 export { graphql }
+
+export * from '@tinacms/toolkit'

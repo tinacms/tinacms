@@ -11,7 +11,13 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaCloudProvider, unstable_useGraphQLForms } from 'tinacms'
+import {
+  TinaCloudProvider,
+  unstable_useGraphQLForms,
+  Form,
+  useCMS,
+  GlobalFormPlugin,
+} from 'tinacms'
 import React from 'react'
 import { LoadingPage } from './Spinner'
 
@@ -38,10 +44,20 @@ const TinaWrapper = props => {
 }
 
 const Inner = props => {
+  const cms = useCMS()
   const [payload, isLoading] = unstable_useGraphQLForms({
     query: gql => gql(props.query),
     variables: props.variables || {},
+    formify: args => {
+      if (args.formConfig.id === 'getPostsDocument') {
+        const form = new Form(args.formConfig)
+        cms.plugins.add(new GlobalFormPlugin(form))
+        return args.skip()
+      }
+      return args.createForm(args.formConfig)
+    },
   })
+  console.log(Form)
   return (
     <>
       {isLoading ? (
