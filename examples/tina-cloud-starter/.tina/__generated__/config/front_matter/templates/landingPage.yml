@@ -1,0 +1,10 @@
+---
+label: Landing Page
+name: landingPage
+fields:
+  - name: blocks
+    label: Blocks
+    type: blocks
+    template_types:
+      - message
+      - image
