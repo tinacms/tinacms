@@ -1,0 +1,10 @@
+mutation {
+  addPendingDocument(
+    collection: "movie"
+    relativePath: "empire-strikes-back.md"
+  ) {
+    ... on MovieDocument {
+      id
+    }
+  }
+}

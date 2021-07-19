@@ -1,0 +1,10 @@
+{
+  "data": {
+    "getDirectorDocument": {
+      "id": "content/directors/george.md",
+      "data": {
+        "name": "George Lucas"
+      }
+    }
+  }
+}

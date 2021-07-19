@@ -1,1 +1,0 @@
-# `@tinacms/react-sidebar`

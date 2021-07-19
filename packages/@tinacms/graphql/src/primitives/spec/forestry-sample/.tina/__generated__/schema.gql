@@ -1,0 +1,210 @@
+"""
+References another document, used as a foreign key
+"""
+scalar Reference
+
+"""
+
+"""
+scalar JSON
+
+type SystemInfo {
+  filename: String!
+  basename: String!
+  breadcrumbs(excludeExtension: Boolean): [String!]!
+  path: String!
+  relativePath: String!
+  extension: String!
+  template: String!
+  collection: Collection!
+}
+
+type PageInfo {
+  hasPreviousPage: Boolean!
+  hasNextPage: Boolean!
+  startCursor: String!
+  endCursor: String!
+}
+
+"""
+
+"""
+interface Node {
+  id: ID!
+}
+
+"""
+A relay-compliant pagination connection
+"""
+interface Connection {
+  totalCount: Int!
+}
+
+type Query {
+  getCollection(collection: String): Collection!
+  getCollections: [Collection!]!
+  node(id: String): Node!
+  getDocument(collection: String, relativePath: String): DocumentNode!
+  getDocumentList(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DocumentConnection!
+  getAuthorDocument(relativePath: String): AuthorDocument!
+  getAuthorList(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): AuthorConnection!
+  getPostDocument(relativePath: String): PostDocument!
+  getPostList(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): PostConnection!
+}
+
+type DocumentConnectionEdges {
+  cursor: String
+  node: DocumentNode
+}
+
+type DocumentConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [DocumentConnectionEdges]
+}
+
+type Collection {
+  name: String!
+  slug: String!
+  label: String!
+  path: String!
+  format: String
+  matches: String
+  templates: [JSON]
+  fields: [JSON]
+  documents(
+    before: String
+    after: String
+    first: Int
+    last: Int
+  ): DocumentConnection!
+}
+
+union DocumentNode = AuthorDocument | PostDocument
+
+type AuthorAuthorSocialMedia {
+  platform: String
+  handle: String
+}
+
+type AuthorAuthor {
+  name: String
+  socialMedia: [AuthorAuthorSocialMedia]
+}
+
+union Author = AuthorAuthor
+
+type AuthorDocument implements Node {
+  id: ID!
+  sys: SystemInfo!
+  data: Author!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type AuthorConnectionEdges {
+  cursor: String
+  node: AuthorDocument
+}
+
+type AuthorConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [AuthorConnectionEdges]
+}
+
+union PostPostAuthorDocument = AuthorDocument
+
+type PostPost {
+  title: String
+  body: String
+  author: PostPostAuthorDocument
+}
+
+union Post = PostPost
+
+type PostDocument implements Node {
+  id: ID!
+  sys: SystemInfo!
+  data: Post!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type PostConnectionEdges {
+  cursor: String
+  node: PostDocument
+}
+
+type PostConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [PostConnectionEdges]
+}
+
+type Mutation {
+  addPendingDocument(
+    collection: String!
+    relativePath: String!
+    template: String
+  ): DocumentNode!
+  updateDocument(
+    collection: String!
+    relativePath: String!
+    params: DocumentMutation!
+  ): DocumentNode!
+  updateAuthorDocument(
+    relativePath: String!
+    params: AuthorMutation!
+  ): AuthorDocument!
+  updatePostDocument(
+    relativePath: String!
+    params: PostMutation!
+  ): PostDocument!
+}
+
+input DocumentMutation {
+  author: AuthorMutation
+  post: PostMutation
+}
+
+input AuthorAuthorSocialMediaMutation {
+  platform: String
+  handle: String
+}
+
+input AuthorAuthorMutation {
+  name: String
+  socialMedia: [AuthorAuthorSocialMediaMutation]
+}
+
+input AuthorMutation {
+  author: AuthorAuthorMutation
+}
+
+input PostPostMutation {
+  title: String
+  body: String
+  author: String
+}
+
+input PostMutation {
+  post: PostPostMutation
+}

@@ -1,0 +1,9 @@
+{
+  "inputFiles": ["./src"],
+  "out": "doc",
+  "mode": "modules",
+  "ignoreCompilerErrors": true,
+  "categorizeByGroup": true,
+  "exclude": "**/*.spec.ts",
+  "excludeNotExported": false
+}

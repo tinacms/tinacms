@@ -1,0 +1,53 @@
+{
+  "name": "@tinacms/graphql-helpers",
+  "version": "0.1.2",
+  "main": "dist/index.js",
+  "files": [
+    "dist/*"
+  ],
+  "license": "Apache-2.0",
+  "typings": "dist/index.d.ts",
+  "bin": {
+    "forestry:serve": "./dist/index.js"
+  },
+  "scripts": {
+    "build": "yarn tsup src/index.ts src/test-util.ts --format cjs --dts",
+    "watch": "yarn tsup src/index.ts src/test-util.ts --watch --format cjs --dts",
+    "tar": "yarn pack --out ../../builds/%s-%v.tgz",
+    "serve": "yarn nodemon dist/index.js",
+    "test": "jest --passWithNoTests"
+  },
+  "dependencies": {
+    "@types/lodash.get": "^4.4.6",
+    "@types/lodash.kebabcase": "^4.1.6",
+    "@types/lodash.set": "^4.3.6",
+    "@types/prettier": "^2.2.1",
+    "graphql": "^15.3.0",
+    "lodash.camelcase": "^4.3.0",
+    "lodash.get": "^4.4.2",
+    "lodash.kebabcase": "^4.1.1",
+    "lodash.set": "^4.3.2",
+    "lodash.snakecase": "^4.1.1",
+    "lodash.upperfirst": "^4.3.1",
+    "object-visit": "^1.0.1",
+    "prettier": "^2.2.1",
+    "tslib": "^1.11.1",
+    "tsup": "4.12.5",
+    "typescript": "^4.3.5"
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/graphql"
+  },
+  "devDependencies": {
+    "@types/jest": "^26.0.4",
+    "@types/lodash.camelcase": "^4.3.6",
+    "@types/lodash.upperfirst": "^4.3.6",
+    "@types/node": "^14.14.31",
+    "jest": "^26.6.3",
+    "ts-jest": "^26.5.3"
+  }
+}
