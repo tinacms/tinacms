@@ -57,7 +57,6 @@ const Inner = props => {
       return args.createForm(args.formConfig)
     },
   })
-  console.log(Form)
   return (
     <>
       {isLoading ? (
