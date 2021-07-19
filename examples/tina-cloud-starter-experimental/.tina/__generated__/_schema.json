@@ -1,0 +1,275 @@
+{
+  "collections": [
+    {
+      "label": "Blog Posts",
+      "name": "posts",
+      "path": "content/posts",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title",
+          "namespace": [
+            "posts",
+            "title"
+          ]
+        },
+        {
+          "type": "datetime",
+          "label": "Created At",
+          "name": "createdAt",
+          "dateFormat": "M DD YYYY",
+          "timeFormat": "",
+          "ui": {
+            "dateFormat": "MMMM DD YYYY",
+            "timeFormat": false
+          },
+          "namespace": [
+            "posts",
+            "createdAt"
+          ]
+        },
+        {
+          "type": "boolean",
+          "label": "Published",
+          "name": "published",
+          "namespace": [
+            "posts",
+            "published"
+          ]
+        },
+        {
+          "name": "hero",
+          "type": "image",
+          "label": "Hero",
+          "namespace": [
+            "posts",
+            "hero"
+          ]
+        },
+        {
+          "type": "reference",
+          "label": "Author",
+          "name": "author",
+          "collections": [
+            "authors"
+          ],
+          "namespace": [
+            "posts",
+            "author"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Body",
+          "name": "body",
+          "isBody": true,
+          "ui": {
+            "component": "textarea"
+          },
+          "namespace": [
+            "posts",
+            "body"
+          ]
+        }
+      ],
+      "namespace": [
+        "posts"
+      ]
+    },
+    {
+      "label": "Authors",
+      "name": "authors",
+      "path": "content/authors",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Name",
+          "name": "name",
+          "namespace": [
+            "authors",
+            "name"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Avatar",
+          "name": "avatar",
+          "namespace": [
+            "authors",
+            "avatar"
+          ]
+        }
+      ],
+      "namespace": [
+        "authors"
+      ]
+    },
+    {
+      "label": "Marketing Pages",
+      "name": "marketingPages",
+      "path": "content/marketing-pages",
+      "fields": [
+        {
+          "type": "object",
+          "name": "blocks",
+          "label": "Blocks",
+          "list": true,
+          "templates": [
+            {
+              "name": "message",
+              "label": "Message",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Message Header",
+                  "name": "messageHeader",
+                  "namespace": [
+                    "marketingPages",
+                    "blocks",
+                    "message",
+                    "messageHeader"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Message Body",
+                  "name": "messageBody",
+                  "namespace": [
+                    "marketingPages",
+                    "blocks",
+                    "message",
+                    "messageBody"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "label": "Seo",
+                  "name": "seo",
+                  "list": true,
+                  "fields": [
+                    {
+                      "type": "string",
+                      "label": "SEO title",
+                      "name": "seoTitle",
+                      "namespace": [
+                        "marketingPages",
+                        "blocks",
+                        "message",
+                        "seo",
+                        "seoTitle"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "marketingPages",
+                    "blocks",
+                    "message",
+                    "seo"
+                  ]
+                },
+                {
+                  "type": "object",
+                  "label": "Nested Page",
+                  "name": "nestedPage",
+                  "list": true,
+                  "templates": [
+                    {
+                      "name": "hero",
+                      "label": "Hero",
+                      "fields": [
+                        {
+                          "type": "string",
+                          "label": "Hero title",
+                          "name": "herotitle",
+                          "namespace": [
+                            "marketingPages",
+                            "blocks",
+                            "message",
+                            "nestedPage",
+                            "hero",
+                            "herotitle"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "marketingPages",
+                        "blocks",
+                        "message",
+                        "nestedPage",
+                        "hero"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "marketingPages",
+                    "blocks",
+                    "message",
+                    "nestedPage"
+                  ]
+                }
+              ],
+              "namespace": [
+                "marketingPages",
+                "blocks",
+                "message"
+              ]
+            },
+            {
+              "name": "image",
+              "label": "Image",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Heading",
+                  "name": "heading",
+                  "namespace": [
+                    "marketingPages",
+                    "blocks",
+                    "image",
+                    "heading"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Image Description",
+                  "name": "imgDescription",
+                  "namespace": [
+                    "marketingPages",
+                    "blocks",
+                    "image",
+                    "imgDescription"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Image src",
+                  "name": "src",
+                  "namespace": [
+                    "marketingPages",
+                    "blocks",
+                    "image",
+                    "src"
+                  ]
+                }
+              ],
+              "namespace": [
+                "marketingPages",
+                "blocks",
+                "image"
+              ]
+            }
+          ],
+          "namespace": [
+            "marketingPages",
+            "blocks"
+          ]
+        }
+      ],
+      "namespace": [
+        "marketingPages"
+      ]
+    }
+  ],
+  "namespace": []
+}

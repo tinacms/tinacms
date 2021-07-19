@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import _ from 'lodash'
 import { sequential, assertShape } from '../../util'
 import { templateTypeName } from '@tinacms/graphql-helpers'
 

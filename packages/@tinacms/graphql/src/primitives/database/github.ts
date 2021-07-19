@@ -61,7 +61,7 @@ export class GithubBridge implements Bridge {
   private generateKey = (key: string) => {
     return `${this.repoConfig.owner}/${this.repoConfig.repo}/${this.repoConfig.ref}/${key}`
   }
-  private readDir = async (filepath: string): Promise<string | string[]> => {
+  private readDir = async (filepath: string): Promise<string[]> => {
     const fullPath = path.join(this.rootPath, filepath)
     return _.flatten(
       (
@@ -72,14 +72,14 @@ export class GithubBridge implements Bridge {
               ...this.repoConfig,
               path: fullPath,
             })
-            .then(async (response) => {
+            .then(async response => {
               if (Array.isArray(response.data)) {
                 return await Promise.all(
-                  await response.data.map(async (d) => {
+                  await response.data.map(async d => {
                     if (d.type === 'dir') {
                       const nestedItems = await this.readDir(d.path)
                       if (Array.isArray(nestedItems)) {
-                        return nestedItems.map((nestedItem) => {
+                        return nestedItems.map(nestedItem => {
                           return path.join(d.path, nestedItem)
                         })
                       } else {
@@ -105,7 +105,7 @@ export class GithubBridge implements Bridge {
   public glob = async (pattern: string) => {
     const results = await this.readDir(pattern)
     // Remove rootPath and any surround slashes
-    return results.map((item) =>
+    return results.map(item =>
       item.replace(this.rootPath, '').replace(/^\/|\/$/g, '')
     )
   }
@@ -118,10 +118,10 @@ export class GithubBridge implements Bridge {
           ...this.repoConfig,
           path: realpath,
         })
-        .then((response) => {
+        .then(response => {
           return Buffer.from(response.data.content, 'base64').toString()
         })
-        .catch((e) => {
+        .catch(e => {
           if (e.status === 401) {
             throw new GraphQLError(
               `Unauthorized request to Github for repo ${this.repoConfig.owner}/${this.repoConfig.repo} please ensure your access token is valid.`
@@ -159,7 +159,7 @@ export class GithubBridge implements Bridge {
 
 const cache = new LRU<string, string | string[]>({
   max: 1000,
-  length: function (v: string, key) {
+  length: function(v: string) {
     return v.length
   },
 })

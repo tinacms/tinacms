@@ -1,0 +1,68 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "posts",
+      "authors",
+      "marketingPages"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument"
+  },
+  "PostsAuthorDocument": {
+    "type": "PostsAuthorDocument",
+    "resolveType": "multiCollectionDocument"
+  },
+  "PostsDocument": {
+    "type": "PostsDocument",
+    "resolveType": "collectionDocument",
+    "collection": "posts"
+  },
+  "PostsConnection": {
+    "type": "PostsConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "posts"
+  },
+  "AuthorsDocument": {
+    "type": "AuthorsDocument",
+    "resolveType": "collectionDocument",
+    "collection": "authors"
+  },
+  "AuthorsConnection": {
+    "type": "AuthorsConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "authors"
+  },
+  "MarketingPagesBlocksMessageNestedPage": {
+    "type": "MarketingPagesBlocksMessageNestedPage",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "MarketingPagesBlocksMessageNestedPageHero"
+    }
+  },
+  "MarketingPagesBlocks": {
+    "type": "MarketingPagesBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "message": "MarketingPagesBlocksMessage",
+      "image": "MarketingPagesBlocksImage"
+    }
+  },
+  "MarketingPagesDocument": {
+    "type": "MarketingPagesDocument",
+    "resolveType": "collectionDocument",
+    "collection": "marketingPages"
+  },
+  "MarketingPagesConnection": {
+    "type": "MarketingPagesConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "marketingPages"
+  }
+}

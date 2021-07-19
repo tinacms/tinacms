@@ -1,0 +1,155 @@
+{
+  "collections": [
+    {
+      "label": "Blog Posts",
+      "name": "posts",
+      "path": "content/posts",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title"
+        },
+        {
+          "type": "datetime",
+          "label": "Created At",
+          "name": "createdAt",
+          "dateFormat": "M DD YYYY",
+          "timeFormat": "",
+          "ui": {
+            "dateFormat": "MMMM DD YYYY",
+            "timeFormat": false
+          }
+        },
+        {
+          "type": "boolean",
+          "label": "Published",
+          "name": "published"
+        },
+        {
+          "name": "hero",
+          "type": "image",
+          "label": "Hero"
+        },
+        {
+          "type": "reference",
+          "label": "Author",
+          "name": "author",
+          "collections": [
+            "authors"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Body",
+          "name": "body",
+          "isBody": true,
+          "ui": {
+            "component": "textarea"
+          }
+        }
+      ]
+    },
+    {
+      "label": "Authors",
+      "name": "authors",
+      "path": "content/authors",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Name",
+          "name": "name"
+        },
+        {
+          "type": "string",
+          "label": "Avatar",
+          "name": "avatar"
+        }
+      ]
+    },
+    {
+      "label": "Marketing Pages",
+      "name": "marketingPages",
+      "path": "content/marketing-pages",
+      "fields": [
+        {
+          "type": "object",
+          "name": "blocks",
+          "label": "Blocks",
+          "list": true,
+          "templates": [
+            {
+              "name": "message",
+              "label": "Message",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Message Header",
+                  "name": "messageHeader"
+                },
+                {
+                  "type": "string",
+                  "label": "Message Body",
+                  "name": "messageBody"
+                },
+                {
+                  "type": "object",
+                  "label": "Seo",
+                  "name": "seo",
+                  "list": true,
+                  "fields": [
+                    {
+                      "type": "string",
+                      "label": "SEO title",
+                      "name": "seoTitle"
+                    }
+                  ]
+                },
+                {
+                  "type": "object",
+                  "label": "Nested Page",
+                  "name": "nestedPage",
+                  "list": true,
+                  "templates": [
+                    {
+                      "name": "hero",
+                      "label": "Hero",
+                      "fields": [
+                        {
+                          "type": "string",
+                          "label": "Hero title",
+                          "name": "herotitle"
+                        }
+                      ]
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "name": "image",
+              "label": "Image",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Heading",
+                  "name": "heading"
+                },
+                {
+                  "type": "string",
+                  "label": "Image Description",
+                  "name": "imgDescription"
+                },
+                {
+                  "type": "string",
+                  "label": "Image src",
+                  "name": "src"
+                }
+              ]
+            }
+          ]
+        }
+      ]
+    }
+  ]
+}
