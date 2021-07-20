@@ -68,62 +68,69 @@ export function usePreviewSrc(
   return [src, loading]
 }
 
-export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
-  (props) => {
-    const cms = useCMS()
-    const { form, field } = props
-    const { name, value } = props.input
-    const [src, srcIsLoading] = usePreviewSrc(
-      value,
-      name,
-      form.getState().values,
-      field.previewSrc
-    )
+export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(props => {
+  const cms = useCMS()
+  const { form, field } = props
+  const { name, value } = props.input
+  const [src, srcIsLoading] = usePreviewSrc(
+    value,
+    name,
+    form.getState().values,
+    field.previewSrc
+  )
 
-    let onClear: any
-    if (props.field.clearable) {
-      onClear = () => props.input.onChange('')
-    }
-
-    function onChange(media?: Media) {
-      if (media) {
-        props.input.onChange('')
-        props.input.onChange(media)
-      }
-    }
-
-    const uploadDir = props.field.uploadDir || (() => '')
-
-    return (
-      <ImageUpload
-        value={value}
-        previewSrc={src}
-        loading={srcIsLoading}
-        onClick={() => {
-          const directory = uploadDir(props.form.getState().values)
-          cms.media.open({
-            allowDelete: true,
-            directory,
-            onSelect: onChange,
-          })
-        }}
-        onDrop={async ([file]: File[]) => {
-          const directory = uploadDir(props.form.getState().values)
-
-          const [media] = await cms.media.persist([
-            {
-              directory,
-              file,
-            },
-          ])
-
-          onChange(media)
-        }}
-        onClear={onClear}
-      />
-    )
+  let onClear: any
+  if (props.field.clearable) {
+    onClear = () => props.input.onChange('')
   }
-)
+
+  function onChange(media?: Media) {
+    if (media) {
+      const mediaParse = cms.media.store
+
+      const parsedValue =
+        // @ts-ignore
+        typeof cms?.media?.store?.parse === 'function'
+          ? // @ts-ignore
+            cms.media.store.parse(media)
+          : // @ts-ignore
+            mediaParse.parse(media)
+      props.input.onChange('')
+      props.input.onChange(parsedValue)
+    }
+  }
+
+  const uploadDir = props.field.uploadDir || (() => '')
+
+  return (
+    <ImageUpload
+      value={value}
+      previewSrc={src}
+      loading={srcIsLoading}
+      onClick={() => {
+        const directory = uploadDir(props.form.getState().values)
+        cms.media.open({
+          allowDelete: true,
+          directory,
+          onSelect: onChange,
+        })
+      }}
+      onDrop={async ([file]: File[]) => {
+        const directory = uploadDir(props.form.getState().values)
+
+        const [media] = await cms.media.persist([
+          {
+            directory,
+            file,
+          },
+        ])
+
+        onChange(media)
+      }}
+      onClear={onClear}
+    />
+  )
+})
 
 export const ImageFieldPlugin = {
   name: 'image',
