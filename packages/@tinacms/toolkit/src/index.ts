@@ -28,7 +28,9 @@ export {
   MediaList,
   MediaManager,
   MediaListError,
+  EventBus,
 } from './packages/core'
+export * from './packages/alerts'
 export * from './packages/styles'
 export { ScreenPlugin, useScreenPlugin } from './packages/react-screens'
 export * from './packages/fields'

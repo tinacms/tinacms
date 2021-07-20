@@ -16,8 +16,8 @@ limitations under the License.
 
 */
 
-import { Button as RawTinaButton } from '@tinacms/styles'
-import { Input, TextArea } from '@tinacms/fields'
+import { Button as RawTinaButton } from '@tinacms/toolkit'
+import { Input, TextArea } from 'tinacms'
 import { ModalBody, ModalActions, FieldMeta, useCMS } from 'tinacms'
 import styled from 'styled-components'
 import React, { useEffect, useState } from 'react'
