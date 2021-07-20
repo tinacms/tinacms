@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.2](https://github.com/tinacms/tinacms/compare/v0.43.1...v0.43.2) (2021-07-20)
+
+### Bug Fixes
+
+- **react-tinacms-editor,react-tinacms-inline:** Fixes deps ([d60eb84](https://github.com/tinacms/tinacms/commit/d60eb8400595de3f0286f0236bba52b02b01cb51))
+
 ## [0.43.1](https://github.com/tinacms/tinacms/compare/v0.43.0...v0.43.1) (2021-07-13)
 
 ### Bug Fixes
