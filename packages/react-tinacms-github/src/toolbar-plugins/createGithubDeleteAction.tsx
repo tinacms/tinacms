@@ -23,11 +23,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
-} from '@tinacms/react-modals'
-import { ActionButton } from '@tinacms/form-builder'
-import { useCMS } from '@tinacms/react-core'
-import { Button } from '@tinacms/styles'
-import { Form } from '@tinacms/forms'
+  ActionButton,
+  useCMS,
+  Form,
+} from 'tinacms'
+import { Button } from '@tinacms/toolkit'
 
 const getTitleDefault = (form: Form) => {
   return form.name

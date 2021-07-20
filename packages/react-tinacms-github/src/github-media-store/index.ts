@@ -22,7 +22,7 @@ import {
   Media,
   MediaList,
   MediaListOptions,
-} from '@tinacms/core'
+} from 'tinacms'
 import { GithubClient } from '../github-client'
 import base64File from './base64File'
 import path from 'path'
@@ -44,12 +44,8 @@ export class GithubMediaStore implements MediaStore {
 
       try {
         const content = (await base64File(file)).toString().split(',')[1] // only need the data piece
-        const uploadResponse: GithubUploadResponse = await this.githubClient.upload(
-          mediaPath,
-          content,
-          'Upload',
-          true
-        )
+        const uploadResponse: GithubUploadResponse =
+          await this.githubClient.upload(mediaPath, content, 'Upload', true)
 
         uploaded.push(contentToMedia(uploadResponse.content))
       } catch (e) {

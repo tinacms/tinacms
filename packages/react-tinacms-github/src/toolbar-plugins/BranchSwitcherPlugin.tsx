@@ -27,13 +27,12 @@ import {
   ModalBody,
   ModalActions,
   FormBuilder,
+  LoadingDots,
 } from 'tinacms'
-import { AddIcon, ChevronDownIcon, LockIcon } from '@tinacms/icons'
-import { Button } from '@tinacms/styles'
+import { AddIcon, ChevronDownIcon, LockIcon, Button } from '@tinacms/toolkit'
 import { Dismissible } from 'react-dismissible'
 import styled, { css } from 'styled-components'
 import { GithubClient, Branch } from '../github-client'
-import { LoadingDots } from '@tinacms/form-builder'
 import { CREATE_BRANCH, ERROR } from '../events'
 
 interface BranchSwitcherProps {
@@ -58,7 +57,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
   const updateBranchList = React.useCallback(() => {
     github
       .getBranchList()
-      .then(branches => {
+      .then((branches) => {
         setBranches(branches)
         setBranchStatus('loaded')
       })
@@ -85,7 +84,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
     closeDropdown()
   }
 
-  const filteredBranches = branches.filter(option => {
+  const filteredBranches = branches.filter((option) => {
     return option.name.includes(filterValue)
   })
 
@@ -114,7 +113,7 @@ const BranchSwitcher = ({ onBranchChange }: BranchSwitcherProps) => {
               )}
               {branchStatus === 'loaded' && (
                 <>
-                  {filteredBranches.map(option => (
+                  {filteredBranches.map((option) => (
                     <SelectOption
                       key={option.name}
                       active={option.name === github.branchName}
@@ -233,7 +232,7 @@ const ConfirmSwitchBranchModal = ({ name, onBranchChange, close }: any) => {
         <ModalHeader close={close}>Switch Branch</ModalHeader>
         <ModalBody
           padded={true}
-          onKeyPress={e =>
+          onKeyPress={(e) =>
             e.charCode === 13 ? (onBranchChange() as any) : null
           }
         >
@@ -366,7 +365,7 @@ const SelectOption = styled.button<SelectOptionProps>`
     background-color: var(--tina-color-grey-1);
   }
 
-  ${p =>
+  ${(p) =>
     p.active &&
     css`
       font-weight: bold;
@@ -437,7 +436,7 @@ const SelectDropdown = styled.div<SelectDropdownProps>`
     border-bottom: 10px solid white;
   }
 
-  ${p =>
+  ${(p) =>
     p.open &&
     css`
       opacity: 1;
@@ -477,7 +476,7 @@ const SelectBox = styled.button<SelectBoxProps>`
     height: auto;
   }
 
-  ${p =>
+  ${(p) =>
     p.open &&
     css`
       background-color: var(--tina-color-grey-1);
