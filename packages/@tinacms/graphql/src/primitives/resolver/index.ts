@@ -521,6 +521,11 @@ export class Resolver {
           ...extraFields,
         }
       case 'image':
+        return {
+          component: 'image',
+          ...field,
+          ...extraFields,
+        }
       case 'string':
         if (field.options) {
           if (field.list) {

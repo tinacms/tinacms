@@ -23,8 +23,7 @@
   ],
   "scripts": {
     "build": "yarn tinacms-scripts build",
-    "build2": "yarn tsup src/index.ts --format cjs --dts --outDir build",
-    "watch2": "yarn tsup src/index.ts --watch --format cjs --dts --outDir build"
+    "watch": "yarn tinacms-scripts watch"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
