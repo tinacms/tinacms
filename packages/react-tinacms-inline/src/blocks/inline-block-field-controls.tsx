@@ -25,7 +25,7 @@ import {
   ChevronRightIcon,
   DuplicateIcon,
   TrashIcon,
-} from '@tinacms/icons'
+} from '@tinacms/toolkit'
 import { useCMS } from 'tinacms'
 
 import { useInlineBlocks } from './inline-field-blocks'
@@ -149,14 +149,14 @@ export function BlocksControls({
           {withinLimit(max) && (
             <AddBlockMenuWrapper active={isActive}>
               <AddBlockMenu
-                addBlock={block => insert(index, block)}
+                addBlock={(block) => insert(index, block)}
                 blocks={blocks}
                 index={index}
                 offset={offset}
                 position={addBeforePosition}
               />
               <AddBlockMenu
-                addBlock={block => insert(index + 1, block)}
+                addBlock={(block) => insert(index + 1, block)}
                 blocks={blocks}
                 index={index}
                 offset={offset}
@@ -220,16 +220,16 @@ interface AddBlockMenuWrapperProps {
 }
 
 const AddBlockMenuWrapper = styled.div<AddBlockMenuWrapperProps>(
-  p => css`
+  (p) => css`
     opacity: 0;
     transition: all var(--tina-timing-medium) ease-out;
     pointer-events: none;
 
     ${p.active &&
-      css`
-        opacity: 1;
-        pointer-events: all;
-      `}
+    css`
+      opacity: 1;
+      pointer-events: all;
+    `}
   `
 )
 
@@ -240,7 +240,7 @@ interface BlockMenuWrapperProps {
   offset?: number | { x: number; y: number }
 }
 
-export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
+export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>((p) => {
   const offset = getOffset(p.offset)
   return css`
     position: absolute;
@@ -257,18 +257,18 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
     transform: translate3d(0, -100%, 0);
 
     ${p.inset &&
-      css`
-        top: calc(14px - ${getOffsetY(offset)}px);
-        left: calc(14px - ${getOffsetX(offset)}px);
-        right: calc(14px - ${getOffsetX(offset)}px);
-        transform: translate3d(0, 0, 0);
-      `}
+    css`
+      top: calc(14px - ${getOffsetY(offset)}px);
+      left: calc(14px - ${getOffsetX(offset)}px);
+      right: calc(14px - ${getOffsetX(offset)}px);
+      transform: translate3d(0, 0, 0);
+    `}
 
     ${p.active &&
-      css`
-        opacity: 1;
-        pointer-events: all;
-      `}
+    css`
+      opacity: 1;
+      pointer-events: all;
+    `}
   `
 })
 
@@ -316,11 +316,11 @@ interface BlockActionProps {
 }
 
 export const BlockAction = styled.div<BlockActionProps>`
-  background-color: ${p =>
+  background-color: ${(p) =>
     p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p =>
+  color: ${(p) =>
     p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  fill: ${p =>
+  fill: ${(p) =>
     p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
   outline: none;
   border: none;
@@ -349,7 +349,7 @@ export const BlockAction = styled.div<BlockActionProps>`
     height: auto;
   }
 
-  ${props =>
+  ${(props) =>
     props.active &&
     css`
       color: var(--tina-color-primary);
@@ -357,7 +357,7 @@ export const BlockAction = styled.div<BlockActionProps>`
       background-color: rgba(53, 50, 50, 0.05);
     `};
 
-  ${props =>
+  ${(props) =>
     props.disabled &&
     css`
       pointer-events: none;
