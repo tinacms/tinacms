@@ -4,8 +4,7 @@
   "workspaces": [
     "packages/@tinacms/*",
     "examples/*",
-    "packages/next-tinacms-cloudinary",
-    "packages/tinacms"
+    "packages/[^@]*"
   ],
   "scripts": {
     "build": "yarn workspaces foreach --no-private -p --topological-dev run build",
