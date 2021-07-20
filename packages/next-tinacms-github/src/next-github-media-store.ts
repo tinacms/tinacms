@@ -18,7 +18,7 @@ limitations under the License.
 
 import path from 'path'
 import { GithubMediaStore } from 'react-tinacms-github'
-import { Media, MediaListOptions, MediaUploadOptions } from '@tinacms/core'
+import { Media, MediaListOptions, MediaUploadOptions } from 'tinacms'
 
 export class NextGithubMediaStore extends GithubMediaStore {
   previewSrc(fieldValue: string) {
@@ -31,7 +31,7 @@ export class NextGithubMediaStore extends GithubMediaStore {
         ...options,
         directory: path.join('public', options.directory || ''),
       })
-      .then(list => {
+      .then((list) => {
         return {
           ...list,
           items: normalizeMediaItems(list.items),
@@ -42,7 +42,7 @@ export class NextGithubMediaStore extends GithubMediaStore {
   persist(files: MediaUploadOptions[]) {
     return super
       .persist(
-        files.map(file => {
+        files.map((file) => {
           return {
             ...file,
             directory: path.join('public', file.directory),
@@ -61,7 +61,7 @@ export class NextGithubMediaStore extends GithubMediaStore {
 }
 
 function normalizeMediaItems(items: Media[]) {
-  return items.map(item => {
+  return items.map((item) => {
     return {
       ...item,
       directory: item.directory.replace('public', ''),

@@ -30,8 +30,8 @@
     "tinacms": ">=0.39"
   },
   "devDependencies": {
-    "@tinacms/scripts": "workspace:packages/@tinacms/scripts",
     "@testing-library/react": "^11.1.2",
+    "@tinacms/scripts": "workspace:packages/@tinacms/scripts",
     "@types/react": "^16.8.23",
     "@types/react-beautiful-dnd": "^11.0.3",
     "@types/react-dom": "^16.9.4",
