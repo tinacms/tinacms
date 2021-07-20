@@ -36,6 +36,7 @@ export * from './packages/form-builder'
 export { ContentCreatorPlugin as AddContentPlugin } from './packages/forms'
 export { ContentCreatorPlugin } from './packages/forms'
 export * from './packages/forms'
+export * from './packages/icons'
 
 /**
  * Custom `tinacms` things

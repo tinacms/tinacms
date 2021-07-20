@@ -19,8 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { BlockTemplate } from 'tinacms'
-import { IconButton } from '@tinacms/styles'
-import { AddIcon } from '@tinacms/icons'
+import { IconButton, AddIcon } from '@tinacms/toolkit'
 import { Input } from 'tinacms'
 
 import { getOffset, getOffsetX, getOffsetY } from '../styles'

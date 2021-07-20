@@ -25,12 +25,11 @@ import {
   ModalHeader,
   ModalBody,
   ModalActions,
+  Field,
+  FormPortalProvider,
 } from 'tinacms'
+import { Button, EditIcon } from '@tinacms/toolkit'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { Button } from '@tinacms/styles'
-import { EditIcon } from '@tinacms/icons'
-import { Field } from 'tinacms'
-import { FormPortalProvider } from '@tinacms/form-builder'
 import { BlockAction } from './blocks/inline-block-field-controls'
 import { InlineFieldContext } from './inline-field-context'
 import { useInlineForm } from './inline-form'
@@ -106,7 +105,7 @@ export function SettingsModal({
     [form]
   )
   return (
-    <Modal id="tinacms-inline-settings" onClick={e => e.stopPropagation()}>
+    <Modal id="tinacms-inline-settings" onClick={(e) => e.stopPropagation()}>
       <ModalPopup>
         <ModalHeader close={handleCancel}>{title}</ModalHeader>
         <ModalBody>
