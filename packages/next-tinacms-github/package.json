@@ -12,6 +12,9 @@
   },
   "author": "",
   "license": "Apache-2.0",
+  "peerDependencies": {
+    "tinacms": "*"
+  },
   "devDependencies": {
     "@tinacms/scripts": "^0.42.1",
     "@types/cookie": "0.3.3",
@@ -19,18 +22,18 @@
     "@types/node": "^16.3.2",
     "@types/qs": "^6.9.7",
     "@types/uuid": "^8.0.0",
+    "tinacms": "workspace:*",
     "tslib": "^1.10.0",
     "typescript": "^3.8.2"
   },
   "dependencies": {
-    "@tinacms/core": "^0.43.0",
     "atob": "2.1.2",
     "axios": "0.21.1",
     "cookie": "0.4.0",
     "crypto-js": "^4.0.0",
     "gray-matter": "4.0.2",
     "qs": "6.9.3",
-    "react-tinacms-github": "^0.43.1",
+    "react-tinacms-github": "workspace:*",
     "uuid": "^8.1.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
