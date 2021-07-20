@@ -51,18 +51,13 @@ export interface TinaCloudUser {
 export const isAuthorized = async (
   req: NextApiRequest
 ): Promise<TinaCloudUser | undefined> => {
-  const org = req.query.org
   const clientID = req.query.clientID
   const token = req.headers.authorization
-  if (
-    typeof org === 'string' &&
-    typeof clientID === 'string' &&
-    typeof token === 'string'
-  ) {
+  if (typeof clientID === 'string' && typeof token === 'string') {
     try {
       // fetch identity from content server
       const tinaCloudRes = await fetch(
-        `https://identity.tinajs.io/realm/${org}/${clientID}/currentUser`,
+        `https://identity.tinajs.io/v2/apps/${clientID}/currentUser`,
         {
           headers: new Headers({
             'Content-Type': 'application/json',
@@ -81,9 +76,8 @@ export const isAuthorized = async (
     }
   }
   const errorMessage = (queryParam: string) => {
-    return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?org=orgID&clientID=YourClientID')`
+    return `An ${queryParam} query param is required for isAuthorized function but not found please use cms.api.tina.fetchWithToken('/api/something?clientID=YourClientID')`
   }
-  !org && console.error(errorMessage('org'))
   !clientID && console.error(errorMessage('clientID'))
   !token &&
     console.error(
