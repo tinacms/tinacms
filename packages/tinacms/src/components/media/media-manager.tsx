@@ -116,7 +116,7 @@ export function MediaPicker({
 
   useEffect(() => {
     if (setAllTabs) {
-      setAllTabs(['client', 's3', 'einstein'])
+      setAllTabs(['Client', 'Einstein', 'Files'])
     }
   }, [setAllTabs])
 
@@ -169,10 +169,9 @@ export function MediaPicker({
       if (close) close()
     }
   }
-
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: 'image/*',
+    accept: currentTab === 2 ? ['.pdf', '.mp4', '.avi', '.docx'] : 'image/*',
 
     onDrop: async files => {
       try {
