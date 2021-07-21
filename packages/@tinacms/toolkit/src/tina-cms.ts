@@ -34,6 +34,7 @@ import {
   BlocksFieldPlugin,
   TagsFieldPlugin,
   DateFieldPlugin,
+  CheckboxGroupFieldPlugin,
 } from './packages/fields'
 import { Form } from './packages/forms'
 import { Alerts, EventsToAlerts } from './packages/alerts'
@@ -62,6 +63,7 @@ const DEFAULT_FIELDS = [
   DateFieldPlugin,
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
+  CheckboxGroupFieldPlugin,
 ]
 
 export interface TinaCMSConfig extends CMSConfig {
@@ -105,7 +107,7 @@ export class TinaCMS extends CMS {
       this.toolbar = new ToolbarState(toolbarConfig)
     }
 
-    DEFAULT_FIELDS.forEach((field) => {
+    DEFAULT_FIELDS.forEach(field => {
       if (!this.fields.find(field.name)) {
         this.fields.add(field)
       }
