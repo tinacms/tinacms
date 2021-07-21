@@ -18,7 +18,8 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { BlocksEmptyState } from '../blocks/inline-field-blocks'
-import { useInlineForm } from '..'
+import { useInlineForm } from '../inline-form'
+import { getOffset, getOffsetX, getOffsetY } from './get-offset'
 
 export interface FocusRingOptions {
   offset?: number | { x: number; y: number }
@@ -77,7 +78,7 @@ export const FocusRing = ({ name, options, children }: FocusRingProps) => {
   )
 }
 
-export const StyledFocusRing = styled.div<StyledFocusRingProps>(p => {
+export const StyledFocusRing = styled.div<StyledFocusRingProps>((p) => {
   const offset = getOffset(p.offset)
 
   return css`
@@ -87,25 +88,25 @@ export const StyledFocusRing = styled.div<StyledFocusRingProps>(p => {
     min-height: var(--tina-font-size-0);
 
     ${!p.disableHover &&
-      css`
-        &:hover {
-          &:after {
-            opacity: 0.3;
-          }
+    css`
+      &:hover {
+        &:after {
+          opacity: 0.3;
         }
-      `}
+      }
+    `}
 
     ${p.disableChildren &&
-      css`
-        > * {
-          pointer-events: none;
-        }
+    css`
+      > * {
+        pointer-events: none;
+      }
 
-        ${BlocksEmptyState} {
-          opacity: 0;
-          pointer-events: none;
-        }
-      `}
+      ${BlocksEmptyState} {
+        opacity: 0;
+        pointer-events: none;
+      }
+    `}
 
     &:after {
       content: '';
@@ -126,35 +127,11 @@ export const StyledFocusRing = styled.div<StyledFocusRingProps>(p => {
     }
 
     ${p.active &&
-      css`
-        &:hover:after,
-        &:after {
-          opacity: 1;
-        }
-      `};
+    css`
+      &:hover:after,
+      &:after {
+        opacity: 1;
+      }
+    `};
   `
 })
-
-export function getOffset(
-  offset: number | undefined | { x: number; y: number }
-): number | { x: number; y: number } {
-  const DEFAULT_OFFSET: number = 16
-  let result: number | { x: number; y: number } = DEFAULT_OFFSET
-  const axis = { x: DEFAULT_OFFSET, y: DEFAULT_OFFSET }
-
-  if (typeof offset === 'number') {
-    result = offset
-  } else if (typeof offset === 'object') {
-    axis.x = offset.x
-    axis.y = offset.y
-    result = axis
-  }
-
-  return result
-}
-
-export const getOffsetX = (offset: number | { x: number; y: number }): number =>
-  typeof offset === 'object' ? offset.x : offset
-
-export const getOffsetY = (offset: number | { x: number; y: number }): number =>
-  typeof offset === 'object' ? offset.y : offset
