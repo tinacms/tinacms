@@ -26,7 +26,7 @@
     "tinacms": ">=0.11"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
+    "@tinacms/scripts": "workspace:*",
     "tinacms": "^0.43.0",
     "tslib": "^1.10.0"
   },
