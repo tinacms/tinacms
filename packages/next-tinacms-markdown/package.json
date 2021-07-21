@@ -34,7 +34,7 @@
     "@tinacms/scripts": "workspace:*",
     "@types/js-yaml": "^4.0.2",
     "@types/node": "^16.3.3",
-    "tinacms": "^0.43.0",
+    "tinacms": "workspace:*",
     "tslib": "^1.10.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
