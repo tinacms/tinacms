@@ -21,7 +21,7 @@ import { ModalProvider } from '../packages/react-modals'
 import { Theme } from '../packages/styles'
 import { SidebarProvider, SidebarPosition } from '../packages/react-sidebar'
 import { Toolbar } from '../packages/react-toolbar'
-import { useCMS } from '../react-tinacms'
+import { useCMS } from '../react-tinacms/use-cms'
 import { Alerts } from '../packages/react-alerts'
 import { MediaManager } from './media'
 
