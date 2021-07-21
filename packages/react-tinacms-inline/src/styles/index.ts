@@ -16,3 +16,4 @@ limitations under the License.
 
 */
 export * from './focus-ring'
+export * from './get-offset'

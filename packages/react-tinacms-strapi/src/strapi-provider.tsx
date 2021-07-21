@@ -18,7 +18,7 @@ distributed under the License is distributed on an "AS IS" BASIS,
 
 import React from 'react'
 import { useState } from 'react'
-import { useCMSEvent } from '@tinacms/react-core'
+import { useCMSEvent } from 'tinacms'
 import { StrapiAuthenticationModal } from './strapi-auth-modal'
 
 interface ProviderProps {

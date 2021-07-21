@@ -19,7 +19,7 @@ limitations under the License.
 import { setBlockType } from 'prosemirror-commands'
 import { EditorState, TextSelection } from 'prosemirror-state'
 
-import { CodeIcon } from '@tinacms/icons'
+import { CodeIcon } from '@tinacms/toolkit'
 
 import { commandControl } from '../../../components/MenuHelpers'
 import { formatKeymap } from '../../../utils'

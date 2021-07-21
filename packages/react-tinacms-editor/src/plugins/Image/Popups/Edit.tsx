@@ -22,7 +22,7 @@ import styled from 'styled-components'
 import { NodeSelection } from 'prosemirror-state'
 import { Mark } from 'prosemirror-model'
 
-import { StyleReset } from '@tinacms/styles'
+import { StyleReset } from '@tinacms/toolkit'
 
 import { findElementOffsetTop, findElementOffsetLeft } from '../../../utils'
 import { useEditorStateContext } from '../../../context/editorState'
@@ -147,14 +147,14 @@ export const ImageEdit: FunctionComponent = () => {
           type={'text'}
           ref={inputRef}
           value={title}
-          onChange={evt => setTitle(evt.target.value)}
+          onChange={(evt) => setTitle(evt.target.value)}
         />
         <LinkLabel>Alt</LinkLabel>
         <LinkInput
           placeholder="Enter Alt Text"
           type={'text'}
           value={alt}
-          onChange={evt => setAlt(evt.target.value)}
+          onChange={(evt) => setAlt(evt.target.value)}
         />
         <ToggleElement>
           <ToggleInput
@@ -182,14 +182,14 @@ export const ImageEdit: FunctionComponent = () => {
               placeholder="Enter Link Title"
               type={'text'}
               value={linkTitle}
-              onChange={evt => setLinkTitle(evt.target.value)}
+              onChange={(evt) => setLinkTitle(evt.target.value)}
             />
             <LinkLabel>Link URL</LinkLabel>
             <LinkInput
               placeholder="Enter Link URL"
               type={'text'}
               value={linkSrc}
-              onChange={evt => setLinkSrc(evt.target.value)}
+              onChange={(evt) => setLinkSrc(evt.target.value)}
             />
           </>
         )}
@@ -317,10 +317,10 @@ const ToggleLabel = styled.label<{ disabled?: boolean }>`
   background: none;
   color: inherit;
   padding: 0;
-  opacity: ${props => (props.disabled ? '0.4' : '1')};
+  opacity: ${(props) => (props.disabled ? '0.4' : '1')};
   outline: none;
   height: 28px;
-  pointer-events: ${props => (props.disabled ? 'none' : 'inherit')};
+  pointer-events: ${(props) => (props.disabled ? 'none' : 'inherit')};
   font-size: var(--tina-font-size-1);
   font-weight: 600;
   letter-spacing: 0.01em;
@@ -344,9 +344,9 @@ const ToggleSwitch = styled.div<{ checked: boolean }>`
     top: 50%;
     width: calc(28px - 6px);
     height: calc(28px - 6px);
-    background: ${p =>
+    background: ${(p) =>
       p.checked ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-3)'};
-    transform: translate3d(${p => (p.checked ? '20px' : '0')}, -50%, 0);
+    transform: translate3d(${(p) => (p.checked ? '20px' : '0')}, -50%, 0);
     transition: all 150ms ease-out;
   }
 `
@@ -359,5 +359,5 @@ const ToggleInput = styled.input`
   height: 28px;
   opacity: 0;
   margin: 0;
-  cursor: ${props => (props.disabled ? 'not-allowed' : 'pointer')};
+  cursor: ${(props) => (props.disabled ? 'not-allowed' : 'pointer')};
 `

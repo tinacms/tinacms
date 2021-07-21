@@ -25,7 +25,7 @@ import {
   ChevronRightIcon,
   DuplicateIcon,
   TrashIcon,
-} from '@tinacms/icons'
+} from '@tinacms/toolkit'
 import { useCMS } from 'tinacms'
 
 import { useInlineBlocks } from './inline-field-blocks'
@@ -35,6 +35,7 @@ import { InlineSettings } from '../inline-settings'
 import { InlineFieldContext } from '../inline-field-context'
 import { StyledFocusRing } from '../styles'
 import { FocusRingOptions, getOffset, getOffsetX, getOffsetY } from '../styles'
+import { BlockAction } from './block-action'
 
 export interface BlocksControlActionItem {
   icon: React.ReactNode
@@ -149,14 +150,14 @@ export function BlocksControls({
           {withinLimit(max) && (
             <AddBlockMenuWrapper active={isActive}>
               <AddBlockMenu
-                addBlock={block => insert(index, block)}
+                addBlock={(block) => insert(index, block)}
                 blocks={blocks}
                 index={index}
                 offset={offset}
                 position={addBeforePosition}
               />
               <AddBlockMenu
-                addBlock={block => insert(index + 1, block)}
+                addBlock={(block) => insert(index + 1, block)}
                 blocks={blocks}
                 index={index}
                 offset={offset}
@@ -220,16 +221,16 @@ interface AddBlockMenuWrapperProps {
 }
 
 const AddBlockMenuWrapper = styled.div<AddBlockMenuWrapperProps>(
-  p => css`
+  (p) => css`
     opacity: 0;
     transition: all var(--tina-timing-medium) ease-out;
     pointer-events: none;
 
     ${p.active &&
-      css`
-        opacity: 1;
-        pointer-events: all;
-      `}
+    css`
+      opacity: 1;
+      pointer-events: all;
+    `}
   `
 )
 
@@ -240,7 +241,7 @@ interface BlockMenuWrapperProps {
   offset?: number | { x: number; y: number }
 }
 
-export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
+export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>((p) => {
   const offset = getOffset(p.offset)
   return css`
     position: absolute;
@@ -257,18 +258,18 @@ export const BlockMenuWrapper = styled.div<BlockMenuWrapperProps>(p => {
     transform: translate3d(0, -100%, 0);
 
     ${p.inset &&
-      css`
-        top: calc(14px - ${getOffsetY(offset)}px);
-        left: calc(14px - ${getOffsetX(offset)}px);
-        right: calc(14px - ${getOffsetX(offset)}px);
-        transform: translate3d(0, 0, 0);
-      `}
+    css`
+      top: calc(14px - ${getOffsetY(offset)}px);
+      left: calc(14px - ${getOffsetX(offset)}px);
+      right: calc(14px - ${getOffsetX(offset)}px);
+      transform: translate3d(0, 0, 0);
+    `}
 
     ${p.active &&
-      css`
-        opacity: 1;
-        pointer-events: all;
-      `}
+    css`
+      opacity: 1;
+      pointer-events: all;
+    `}
   `
 })
 
@@ -306,62 +307,4 @@ export const BlockMenu = styled.div`
   box-shadow: var(--tina-shadow-big);
   border: 1px solid var(--tina-color-grey-2);
   overflow: hidden;
-`
-
-interface BlockActionProps {
-  active?: boolean
-  disabled?: boolean
-  onClick?: any
-  ref?: any
-}
-
-export const BlockAction = styled.div<BlockActionProps>`
-  background-color: ${p =>
-    p.active ? 'rgba(53, 50, 50, 0.05)' : 'transparent'};
-  color: ${p =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  fill: ${p =>
-    p.active ? 'var(--tina-color-primary)' : 'var(--tina-color-grey-8)'};
-  outline: none;
-  border: none;
-  padding: 4px 6px;
-  transition: all 85ms ease-out;
-  cursor: pointer;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  font-size: 12px;
-  font-weight: 600;
-
-  &:hover {
-    background-color: rgba(53, 50, 50, 0.09);
-  }
-  &:active {
-    color: var(--tina-color-primary);
-    fill: var(--tina-color-primary);
-    background-color: rgba(53, 50, 50, 0.05);
-  }
-  &:not(:last-child) {
-    border-right: 1px solid var(--tina-color-grey-2);
-  }
-  svg {
-    width: 26px;
-    height: auto;
-  }
-
-  ${props =>
-    props.active &&
-    css`
-      color: var(--tina-color-primary);
-      fill: var(--tina-color-primary);
-      background-color: rgba(53, 50, 50, 0.05);
-    `};
-
-  ${props =>
-    props.disabled &&
-    css`
-      pointer-events: none;
-      color: #d1d1d1;
-      fill: #d1d1d1;
-    `};
 `

@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { RedoIcon, UndoIcon } from '@tinacms/icons'
+import { RedoIcon, UndoIcon } from '@tinacms/toolkit'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 

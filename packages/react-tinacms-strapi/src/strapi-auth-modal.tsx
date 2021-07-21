@@ -17,19 +17,19 @@ distributed under the License is distributed on an "AS IS" BASIS,
 */
 
 import { Field, Form } from 'react-final-form'
-import { useCMS } from '@tinacms/react-core'
 import {
+  useCMS,
   Modal,
   ModalActions,
   ModalBody,
   ModalHeader,
   ModalPopup,
-} from '@tinacms/react-modals'
+  Input,
+} from 'tinacms'
+import { Button } from '@tinacms/toolkit'
 import React, { useState } from 'react'
 import { StrapiClient } from './strapi-client'
 
-import { Button } from '@tinacms/styles'
-import { Input } from '@tinacms/fields'
 import styled from 'styled-components'
 
 export interface StrapiAuthenticationModalProps {
@@ -71,7 +71,7 @@ export function StrapiAuthenticationModal({
                 onAuthSuccess()
               }
             })
-            .catch(error => {
+            .catch((error) => {
               cms.events.dispatch({ type: 'strapi:error', error })
             })
         }}

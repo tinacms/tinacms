@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { StyleReset, Button as TinaButton } from '@tinacms/styles'
+import { StyleReset, Button as TinaButton } from '@tinacms/toolkit'
 import {
   Modal,
   ModalBody,

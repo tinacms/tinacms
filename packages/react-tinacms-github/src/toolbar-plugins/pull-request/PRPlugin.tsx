@@ -18,7 +18,7 @@ limitations under the License.
 
 import React, { useState } from 'react'
 import { Modal, ModalPopup, ModalHeader, ModalBody } from 'tinacms'
-import { PullRequestIcon } from '@tinacms/icons'
+import { PullRequestIcon } from '@tinacms/toolkit'
 
 import { PRModal } from './PRModal'
 import { ToolbarButton } from '../../components/ToolbarButton'
@@ -36,7 +36,7 @@ function PullRequestButton() {
   const close = () => setOpened(false)
   return (
     <>
-      <ToolbarButton onClick={() => setOpened(p => !p)}>
+      <ToolbarButton onClick={() => setOpened((p) => !p)}>
         <PullRequestIcon />
         <DesktopLabel> Pull Request</DesktopLabel>
       </ToolbarButton>

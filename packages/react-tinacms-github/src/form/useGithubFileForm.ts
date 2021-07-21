@@ -17,9 +17,8 @@ limitations under the License.
 */
 
 import { GitFile } from './useGitFileSha'
-import { useForm, FormOptions, WatchableFormValue } from 'tinacms'
+import { useForm, FormOptions, WatchableFormValue, Form } from 'tinacms'
 import { useGithubFile } from '../github-client'
-import { Form } from '@tinacms/forms'
 
 export interface GithubFormOptions<T = any> extends Partial<FormOptions<T>> {
   serialize: (data: any) => string
