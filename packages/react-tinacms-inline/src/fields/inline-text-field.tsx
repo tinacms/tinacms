@@ -20,7 +20,7 @@ import * as React from 'react'
 import styled from 'styled-components'
 import { useCMS, TinaCMS } from 'tinacms'
 import { FocusRing, FocusRingOptions } from '../styles'
-import { InlineField } from '..'
+import { InlineField } from '../inline-field'
 
 export interface InlineTextProps {
   name: string

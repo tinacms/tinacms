@@ -22,7 +22,7 @@ import { BlockTemplate } from 'tinacms'
 import { IconButton, AddIcon } from '@tinacms/toolkit'
 import { Input } from 'tinacms'
 
-import { getOffset, getOffsetX, getOffsetY } from '../styles'
+import { getOffset, getOffsetX, getOffsetY } from '../styles/get-offset'
 
 interface AddBlockMenuProps {
   addBlock(data: any): void

@@ -30,7 +30,7 @@ import {
 } from 'tinacms'
 import { Button, EditIcon } from '@tinacms/toolkit'
 import { DragDropContext, DropResult } from 'react-beautiful-dnd'
-import { BlockAction } from './blocks/inline-block-field-controls'
+import { BlockAction } from './blocks/block-action'
 import { InlineFieldContext } from './inline-field-context'
 import { useInlineForm } from './inline-form'
 
