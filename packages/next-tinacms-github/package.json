@@ -16,7 +16,7 @@
     "tinacms": "*"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
+    "@tinacms/scripts": "workspace:*",
     "@types/cookie": "0.3.3",
     "@types/crypto-js": "^3.1.47",
     "@types/node": "^16.3.2",

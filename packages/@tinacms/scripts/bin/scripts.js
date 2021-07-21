@@ -24,14 +24,14 @@ const rollupReplace = require('rollup-plugin-replace')
 const rollupCommonJs = require('rollup-plugin-commonjs')
 const typescript = require('typescript')
 const { uglify } = require('rollup-plugin-uglify')
-const createStyledComponentsTransformer = require('typescript-plugin-styled-components')
-  .default
-
+const createStyledComponentsTransformer =
+  require('typescript-plugin-styled-components').default
+const builtins = require('rollup-plugin-node-builtins')
 // Source https://github.com/facebook/create-react-app/blob/master/packages/react-scripts/bin/react-scripts.js#L11-L16
 // Makes the script crash on unhandled rejections instead of silently
 // ignoring them. In the future, promise rejections that are not handled will
 // terminate the Node.js process with a non-zero exit code.
-process.on('unhandledRejection', err => {
+process.on('unhandledRejection', (err) => {
   throw err
 })
 
@@ -46,7 +46,7 @@ let commandName
 program
   .version(version)
   .arguments('<cmd>')
-  .action(cmd => (commandName = cmd))
+  .action((cmd) => (commandName = cmd))
   .parse(process.argv)
 
 const COMMANDS = {
@@ -110,6 +110,7 @@ function createBuildOptions(options = {}) {
       rollupCommonJs({
         sourceMap: true,
       }),
+      builtins(),
     ],
   }
 

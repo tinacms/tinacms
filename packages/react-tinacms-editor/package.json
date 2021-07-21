@@ -19,7 +19,7 @@
     "@sambego/storybook-styles": "^1.0.0",
     "@storybook/addon-info": "^5.1.9",
     "@storybook/react": "^5.3.19",
-    "@tinacms/scripts": "^0.42.1",
+    "@tinacms/scripts": "workspace:*",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
     "@types/lodash.debounce": "^4.0.6",

@@ -44,6 +44,7 @@
     "tslib": "^1.10.0"
   },
   "devDependencies": {
+    "@tinacms/scripts": "workspace:*",
     "react-final-form": "^6.3.0",
     "tinacms": "workspace:*"
   },

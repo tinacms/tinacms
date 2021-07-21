@@ -21,7 +21,7 @@
     "tinacms": ">=0.19"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
+    "@tinacms/scripts": "workspace:*",
     "@types/js-cookie": "^2.2.5",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.9.4",
