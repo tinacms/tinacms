@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { createRef, useState, useEffect } from 'react'
 import styled from 'styled-components'
-import { StyleReset } from '@tinacms/styles'
+import { StyleReset } from '@tinacms/toolkit'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import {
@@ -70,8 +70,10 @@ export const LinkForm = () => {
       return
     }
     const left = calcLeftOffset(clickTarget!, wrapperRef.current, width)
-    const top = `calc(32px + ${findElementOffsetTop(clickTarget) -
-      findElementOffsetTop(wrapperRef.current)}px)`
+    const top = `calc(32px + ${
+      findElementOffsetTop(clickTarget) -
+      findElementOffsetTop(wrapperRef.current)
+    }px)`
     const arrowOffset = calcArrowLeftOffset(
       clickTarget,
       wrapperRef.current,
@@ -125,8 +127,8 @@ const LinkFormWrapper = styled.div`
 
 const LinkArrow = styled.div<{ offset: string; top: string }>`
   position: absolute;
-  top: ${p => p.top};
-  left: ${p => p.offset};
+  top: ${(p) => p.top};
+  left: ${(p) => p.offset};
   margin-top: 3px;
   transform: translate3d(-50%, -100%, 0);
   width: 16px;

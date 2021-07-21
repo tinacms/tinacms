@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { EditorView } from 'prosemirror-view'
-import { LinkIcon } from '@tinacms/icons'
+import { LinkIcon } from '@tinacms/toolkit'
 
 import { markControl } from '../../../components/MenuHelpers'
 import { isMarkPresent, formatKeymap } from '../../../utils'

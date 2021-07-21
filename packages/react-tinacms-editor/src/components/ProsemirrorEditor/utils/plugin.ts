@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { Plugin } from '@tinacms/core'
+import { Plugin } from 'tinacms'
 
 function byType(__type: string) {
   return (plugin: Plugin) => plugin.__type === __type

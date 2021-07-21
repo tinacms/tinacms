@@ -23,7 +23,7 @@ import { EditorView } from 'prosemirror-view'
 import { EditorState } from 'prosemirror-state'
 import { Dismissible } from 'react-dismissible'
 
-import { HeadingIcon } from '@tinacms/icons'
+import { HeadingIcon } from '@tinacms/toolkit'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
