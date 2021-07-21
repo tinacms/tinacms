@@ -24,7 +24,6 @@ import { formify } from './formify'
 import gql from 'graphql-tag'
 
 interface ServerOptions {
-  organizationId: string
   clientId: string
   branch: string
   customContentApiUrl?: string
@@ -40,7 +39,6 @@ const CONTENT_API_URL =
 
 export class Client {
   contentApiUrl: string
-  organizationId: string
   schema: GraphQLSchema
   clientId: string
   query: string
@@ -55,12 +53,11 @@ export class Client {
      * https://github.com/tinacms/tinacms/issues/219
      */
     const encodedBranch = encodeURIComponent(options.branch)
-    ;(this.contentApiUrl =
+    this.contentApiUrl =
       options.customContentApiUrl ||
-      `${CONTENT_API_URL}/content/${options.organizationId}/${options.clientId}/github/${encodedBranch}`),
-      // `https://content.tinajs.dev/content/${options.organizationId}/${options.clientId}/github/${encodedBranch}`),
-      (this.clientId = options.clientId)
-    this.organizationId = options.organizationId
+      `${CONTENT_API_URL}/content/${options.clientId}/github/${encodedBranch}`
+
+    this.clientId = options.clientId
 
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
@@ -210,7 +207,7 @@ mutation addPendingDocumentMutation(
   }
 
   async authenticate() {
-    const token = await authenticate(this.clientId, this.organizationId)
+    const token = await authenticate(this.clientId)
     this.setToken(token)
     return token
   }
@@ -238,7 +235,7 @@ mutation addPendingDocumentMutation(
   }
 
   async getUser() {
-    const url = `${IDENTITY_API_URL}/realm/${this.organizationId}/${this.clientId}/currentUser`
+    const url = `${IDENTITY_API_URL}/v2/apps/${this.clientId}/currentUser`
 
     try {
       const res = await this.fetchWithToken(url, {
@@ -262,7 +259,6 @@ export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 export class LocalClient extends Client {
   constructor(props?: { customContentApiUrl?: string }) {
     const clientProps = {
-      organizationId: '',
       clientId: '',
       branch: '',
       customContentApiUrl:

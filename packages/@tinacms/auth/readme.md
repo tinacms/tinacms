@@ -11,7 +11,7 @@ An example use case might be allowing logged-in users to upload images to cloudi
 
 In Next.js you can write backend code in the `pages/api/` folder. For more [information checkout the Next.js docs](https://nextjs.org/docs/api-routes/introduction).
 
-For our example lets make a file called `pages/api/upload.ts`. 
+For our example lets make a file called `pages/api/upload.ts`.
 
 ```ts
 import { NextApiHandler } from 'next'
@@ -59,9 +59,7 @@ Now in our media manager, or someone in the frontend code that is wrapped with `
 const cms = useCMS()
 const tinaCloudClient: Client = cms.api.tina
 const uploadImage = async () => {
-  const req = await tinaCloudClient.fetchWithToken(
-    `/api/upload?org=${tinaCloudClient.organizationId}&clientID=${tinaCloudClient.clientId}`
-  )
+  const req = await tinaCloudClient.fetchWithToken(`/api/upload?clientID=${tinaCloudClient.clientId}`)
   console.log({ test: await test.json() })
 }
 ```
