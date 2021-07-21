@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { UnorderedListIcon, OrderedListIcon } from '@tinacms/icons'
+import { UnorderedListIcon, OrderedListIcon } from '@tinacms/toolkit'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 

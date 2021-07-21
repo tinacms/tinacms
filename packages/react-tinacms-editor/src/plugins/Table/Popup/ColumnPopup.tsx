@@ -26,8 +26,13 @@ import {
   forEachCellInColumn,
   setCellAttrs,
 } from 'prosemirror-utils'
-import { IconButton } from '@tinacms/styles'
-import { AlignCenter, AlignLeft, AlignRight, TrashIcon } from '@tinacms/icons'
+import {
+  IconButton,
+  AlignCenter,
+  AlignLeft,
+  AlignRight,
+  TrashIcon,
+} from '@tinacms/toolkit'
 
 import { useEditorStateContext } from '../../../context/editorState'
 
@@ -45,7 +50,7 @@ const alignColumn = (view: EditorView, alignValue: string) => {
   if (!tableNode) return
   const tableMap = TableMap.get(tableNode.node)
   const pos = Object.entries(tableMap.map).find(
-    entry => entry[1] > selection.head - tableNode.start
+    (entry) => entry[1] > selection.head - tableNode.start
   )
   if (!pos) return
   const cellPos = parseInt(pos[0]) - 1
