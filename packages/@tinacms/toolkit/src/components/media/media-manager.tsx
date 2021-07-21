@@ -19,7 +19,7 @@ limitations under the License.
 import React from 'react'
 import { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
-import { useCMS } from '../../react-tinacms'
+import { useCMS } from '../../react-tinacms/use-cms'
 import {
   Modal,
   ModalHeader,
@@ -35,7 +35,9 @@ import {
 import path from 'path'
 import { Button } from '../../packages/styles'
 import { useDropzone } from 'react-dropzone'
-import { MediaItem, Breadcrumb, CursorPaginator } from './index'
+import { CursorPaginator } from './pagination'
+import { MediaItem } from './media-item'
+import { Breadcrumb } from './breadcrumb'
 import { LoadingDots } from '../../packages/form-builder'
 
 export interface MediaRequest {
