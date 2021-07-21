@@ -18,11 +18,10 @@ limitations under the License.
 
 import Cookies from 'js-cookie'
 import { authenticate } from './authenticate'
-import { EventsToAlerts } from '@tinacms/alerts'
+import { EventsToAlerts, EventBus } from '@tinacms/toolkit'
 export * from './authenticate'
 import { CHECKOUT_BRANCH, COMMIT, CREATE_BRANCH, ERROR } from '../events'
 import { b64EncodeUnicode } from './base64'
-import { EventBus } from '@tinacms/core'
 
 export interface GithubClientOptions {
   proxy: string
@@ -59,11 +58,11 @@ export class GithubClient {
       level: 'success',
       message: `Saved Successfully: Changes committed to ${this.workingRepoFullName}`,
     }),
-    [CHECKOUT_BRANCH]: event => ({
+    [CHECKOUT_BRANCH]: (event) => ({
       level: 'info',
       message: 'Switched to branch ' + event.branchName,
     }),
-    [ERROR]: event => ({
+    [ERROR]: (event) => ({
       level: 'error',
       message: event.message,
     }),
@@ -475,7 +474,7 @@ const createErrorMessage = (
   errors: string[]
 ) => `Failed to create the TinaCMS GithubClient
 
-${errors.map(error => `\t* ${error}`).join('\n')}
+${errors.map((error) => `\t* ${error}`).join('\n')}
 
 Visit the setup guide for more information
 

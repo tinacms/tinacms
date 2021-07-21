@@ -26,8 +26,8 @@ import {
   getCellsInRow,
 } from 'prosemirror-utils'
 import styled from 'styled-components'
-import { AddIcon } from '@tinacms/icons'
-import { IconButton } from '@tinacms/styles'
+import { AddIcon } from '@tinacms/toolkit'
+import { IconButton } from '@tinacms/toolkit'
 
 const borderWidth = 1
 const controlSize = 12
@@ -51,7 +51,7 @@ export default ({ index, marker, tableWidth, view }: AddRowProps) => {
       const position = tableNode.start + tableMap.map[tableMap.width] - 1
       const cellInNextRow = getCellsInRow(0)(state.selection)
       if (!cellInNextRow) return
-      const cells = cellInNextRow?.map(cell =>
+      const cells = cellInNextRow?.map((cell) =>
         table_cell.createAndFill({ ...cell.node.attrs })
       )
       dispatch(state.tr.insert(position, table_row.create(null, cells)))

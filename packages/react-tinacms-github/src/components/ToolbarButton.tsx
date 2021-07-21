@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import styled from 'styled-components'
-import { Button } from '@tinacms/styles'
+import { Button } from '@tinacms/toolkit'
 
 // Type of property 'defaultProps' circularly references itself in mapped type
 // @ts-ignore

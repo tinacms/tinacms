@@ -27,7 +27,7 @@ import {
   BlockMenuSpacer,
 } from '../blocks/inline-block-field-controls'
 import { FocusRingOptions, StyledFocusRing } from '../styles'
-import { useInlineForm } from '..'
+import { useInlineForm } from '../inline-form'
 
 interface InlineGroupControls {
   name: string

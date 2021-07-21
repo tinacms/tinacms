@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { LinkIcon } from '@tinacms/icons'
+import { LinkIcon } from '@tinacms/toolkit'
 
 import { MenuButton } from '../../../components/MenuHelpers'
 

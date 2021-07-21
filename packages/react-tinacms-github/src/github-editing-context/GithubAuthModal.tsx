@@ -24,7 +24,7 @@ import {
   ModalBody,
   ModalActions,
 } from 'tinacms'
-import { StyleReset } from '@tinacms/styles'
+import { StyleReset } from '@tinacms/toolkit'
 import { AsyncButton } from '../components/AsyncButton'
 import React, { useState } from 'react'
 import styled from 'styled-components'

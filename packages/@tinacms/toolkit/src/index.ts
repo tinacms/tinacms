@@ -28,7 +28,9 @@ export {
   MediaList,
   MediaManager,
   MediaListError,
+  EventBus,
 } from './packages/core'
+export * from './packages/alerts'
 export * from './packages/styles'
 export { ScreenPlugin, useScreenPlugin } from './packages/react-screens'
 export * from './packages/fields'
@@ -36,6 +38,7 @@ export * from './packages/form-builder'
 export { ContentCreatorPlugin as AddContentPlugin } from './packages/forms'
 export { ContentCreatorPlugin } from './packages/forms'
 export * from './packages/forms'
+export * from './packages/icons'
 
 /**
  * Custom `tinacms` things

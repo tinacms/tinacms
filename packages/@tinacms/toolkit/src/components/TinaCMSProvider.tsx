@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { TinaCMS } from '../tina-cms'
-import { CMSContext } from '../react-tinacms'
+import { CMSContext } from '../react-tinacms/use-cms'
 
 export interface TinaCMSProviderProps {
   cms: TinaCMS

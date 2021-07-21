@@ -17,7 +17,7 @@ limitations under the License.
 */
 
 import { useMemo } from 'react'
-import { useCMS } from '@tinacms/react-core'
+import { useCMS } from 'tinacms'
 import { ERROR } from '../events'
 
 type parseFn = (content: string) => any

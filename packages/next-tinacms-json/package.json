@@ -26,8 +26,11 @@
     "tinacms": ">=0.11"
   },
   "devDependencies": {
-    "@tinacms/scripts": "^0.42.1",
-    "tinacms": "^0.43.0",
+    "@tinacms/scripts": "workspace:*",
+    "@types/jest": "^24.0.0",
+    "jest": "^24.0.0",
+    "tinacms": "workspace:*",
+    "ts-jest": "^24.0.3",
     "tslib": "^1.10.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
