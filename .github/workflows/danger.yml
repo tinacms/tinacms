@@ -8,7 +8,7 @@ jobs:
     steps:
       - uses: actions/checkout@v1
       - name: Install
-        run: npm ci
+        run: yarn install
       - name: Danger
         uses: danger/danger-js@10.6.4
         env:
