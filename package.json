@@ -7,7 +7,7 @@
     "packages/[^@]*"
   ],
   "scripts": {
-    "build": "yarn workspaces foreach --no-private -p --topological-dev run build",
+    "build": "yarn workspaces foreach --no-private -pi --verbose --topological-dev run build",
     "watch": "yarn workspaces foreach --no-private -pi --verbose --topological-dev run watch",
     "test": "yarn workspaces foreach --no-private -p run test"
   },
