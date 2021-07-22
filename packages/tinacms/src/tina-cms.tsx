@@ -12,39 +12,34 @@ limitations under the License.
 */
 
 import React from 'react'
-import { useGraphqlForms, formifyCallback } from './hooks/use-graphql-forms'
+import { useGraphqlForms } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-graphql-forms'
 import { TinaCloudProvider } from './auth'
-import { TinaCMS, useCMS } from '@tinacms/toolkit'
+import { LocalClient } from './client/index'
+import { useCMS } from '@tinacms/toolkit'
 
-const SetupHooksUnstable = props => {
+import type { TinaCMS, MediaStore } from '@tinacms/toolkit'
+import type { formifyCallback } from './hooks/use-graphql-forms'
+
+const SetupHooks = (props: {
+  query: string
+  variables?: object
+  formify?: formifyCallback
+  children: (args) => React.ReactNode
+}) => {
   const cms = useCMS()
   const [payload, isLoading] = useGraphqlForms({
-    query: gql => gql(props.query),
+    query: (gql) => gql(props.query),
     variables: props.variables || {},
-    formify: args => props.formify(args, cms),
+    formify: (args) => {
+      if (props.formify) {
+        return props.formify(args, cms)
+      } else {
+        return args.createForm(args.formConfig)
+      }
+    },
   })
   useDocumentCreatorPlugin()
-
-  return (
-    <ErrorBoundary>
-      {isLoading ? (
-        <Loader>{props.children(props)}</Loader>
-      ) : (
-        // pass the new edit state data to the child
-        props.children({ ...props, data: payload })
-      )}
-    </ErrorBoundary>
-  )
-}
-
-const SetupHooks = props => {
-  const cms = useCMS()
-  const [payload, isLoading] = useGraphqlForms({
-    query: gql => gql(props.query),
-    variables: props.variables || {},
-    formify: args => props.formify(args, cms),
-  })
 
   return (
     <ErrorBoundary>
@@ -62,11 +57,11 @@ class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { hasError: props.hasError }
+    this.state = { hasError: props.hasError, message: '' }
   }
 
   static getDerivedStateFromError(error) {
-    return { hasError: true }
+    return { hasError: true, message: error.message }
   }
 
   /**
@@ -80,22 +75,63 @@ class ErrorBoundary extends React.Component {
     // @ts-ignore
     if (this.state.hasError) {
       return (
-        <>
-          <p>
-            The code is likely assuming the existence of data which is not
-            guaranteed to be there
-          </p>
-          <p>
-            Try to fix the form and when you're ready to see if it worked click{' '}
-            <button onClick={() => this.setState({ hasError: false })}>
-              here
-            </button>
-          </p>
-          <p>
-            If you'd like to go back to the last valid state, click
-            <button onClick={() => alert('not yet implemented')}>here</button>
-          </p>
-        </>
+        <div
+          style={{
+            background: '#efefef',
+            height: '100vh',
+            display: 'flex',
+            alignItems: 'center',
+            justifyContent: 'center',
+          }}
+        >
+          <style>
+            {
+              '\
+            body {\
+              margin: 0;\
+            }\
+          '
+            }
+          </style>
+          <div
+            style={{
+              background: '#fff',
+              maxWidth: '400px',
+              padding: '20px',
+              fontFamily: "'Inter', sans-serif",
+              borderRadius: '5px',
+              boxShadow:
+                '0 6px 24px rgb(0 37 91 / 5%), 0 2px 4px rgb(0 37 91 / 3%)',
+            }}
+          >
+            <h3 style={{ color: '#eb6337' }}>TinaCMS Render Error</h3>
+            <p>Tina caught an error while updating the page:</p>
+            {/* @ts-ignore */}
+            <pre>{this.state.message}</pre>
+            <p>
+              If you've just updated the form, undo your most recent changes and
+              click "refresh"
+            </p>
+            <div style={{ padding: '10px 0' }}>
+              <button
+                style={{
+                  background: '#eb6337',
+                  padding: '12px 18px',
+                  cursor: 'pointer',
+                  borderRadius: '50px',
+                  textTransform: 'uppercase',
+                  letterSpacing: '2px',
+                  fontWeight: 'bold',
+                  border: 'none',
+                  color: 'white',
+                }}
+                onClick={() => this.setState({ hasError: false })}
+              >
+                Refresh
+              </button>
+            </div>
+          </div>
+        </div>
       )
     }
 
@@ -105,33 +141,51 @@ class ErrorBoundary extends React.Component {
 
 export const TinaCMSProvider2 = ({
   children,
-  cms,
-  config,
-  useUnstable,
+  branch,
+  clientId,
+  isLocalClient,
+  cmsCallback,
+  mediaStore,
   ...props
 }: {
+  /** The query from getStaticProps */
   query?: string
-  children: React.ReactNode
-  /** perform additional logic to the CMS object if necessary */
-  cms?: (cms: TinaCMS) => TinaCMS
-  /** hook into the formify function custom form building logic */
-  formify?: formifyCallback
-  useUnstable?: boolean
-  config: Parameters<typeof TinaCloudProvider>
+  /** Any variables from getStaticProps */
+  variables?: object
+  /** The `data` from getStaticProps */
+  data: object
+  /** Your React page component */
+  children: () => React.ReactNode
+  /** Point to the local version of GraphQL instead of tina.io */
+  isLocalClient?: boolean
+  /** The base branch to pull content from. Note that this is ignored for local development */
+  branch?: string
+  /** Your clientID from tina.aio */
+  clientId?: string
+  /** Callback if you need access to the TinaCMS instance */
+  cmsCallback?: (cms: TinaCMS) => TinaCMS
+  /** Callback if you need access to the "formify" API */
+  formifyCallback?: formifyCallback
+  /** Callback if you need access to the "document creator" API */
+  documentCreatorCallback?: (args) => void
+  /** TinaCMS media store instance */
+  mediaStore?: MediaStore
 }) => {
+  if (typeof props.query === 'string') {
+    props.query
+  }
   return (
-    <TinaCloudProvider {...config} cmsCallback={cms}>
+    <TinaCloudProvider
+      branch={branch}
+      clientId={clientId}
+      isLocalClient={isLocalClient}
+      cmsCallback={cmsCallback}
+      // mediaStore={mediaStore}
+    >
       {props.query ? (
-        // Just reset the state machine with a new key
-        useUnstable ? (
-          <SetupHooksUnstable key={props.query} {...props}>
-            {children}
-          </SetupHooksUnstable>
-        ) : (
-          <SetupHooks key={props.query} {...props}>
-            {children}
-          </SetupHooks>
-        )
+        <SetupHooks key={props.query} {...props} query={props.query || ''}>
+          {children}
+        </SetupHooks>
       ) : (
         // @ts-ignore
         children(props)
@@ -212,4 +266,29 @@ const Loader = (props: { children: React.ReactNode }) => {
       {props.children}
     </>
   )
+}
+
+export const getStaticPropsForTina = async ({
+  query,
+  variables,
+}: {
+  query: string
+  variables?: object
+}) => {
+  const client = new LocalClient()
+  const data = await client.request(query, { variables })
+  return {
+    data,
+    query,
+    variables,
+  }
+}
+
+/**
+ * A passthru function which allows editors
+ * to know the temlpate string is a GraphQL
+ * query or muation
+ */
+export function gql(strings: TemplateStringsArray) {
+  return strings[0]
 }
