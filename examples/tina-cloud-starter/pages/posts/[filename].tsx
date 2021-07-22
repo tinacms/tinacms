@@ -12,17 +12,11 @@ limitations under the License.
 */
 
 import { BlogPost } from '../../components/post'
-import type {
-  PostsConnection,
-  PostsDocument,
-} from '../../.tina/__generated__/types'
 import { Wrapper } from '../../components/helper-components'
-import { LocalClient } from 'tinacms'
+import { staticRequest, gql, getStaticPropsForTina } from 'tinacms'
 
 // Use the props returned by get static props
-export default function BlogPostPage(
-  props: AsyncReturnType<typeof getStaticProps>['props']
-) {
+export default function BlogPostPage(props: any) {
   return (
     <>
       <Wrapper data={props.data.getPostsDocument.data}>
@@ -32,42 +26,33 @@ export default function BlogPostPage(
   )
 }
 
-const gql = (strings: TemplateStringsArray) => strings
-export const query = gql`
-  #graphql
-  query GetPostDocument($relativePath: String!) {
-    getPostsDocument(relativePath: $relativePath) {
-      data {
-        title
-        hero
-        body
-        author {
-          __typename
-          ... on AuthorsDocument {
-            data {
-              name
-              avatar
+export const getStaticProps = async ({ params }) => {
+  const tinaProps = await getStaticPropsForTina({
+    query: gql`
+      query GetPostDocument($relativePath: String!) {
+        getPostsDocument(relativePath: $relativePath) {
+          data {
+            title
+            hero
+            body
+            author {
+              __typename
+              ... on AuthorsDocument {
+                data {
+                  name
+                  avatar
+                }
+              }
             }
           }
         }
       }
-    }
-  }
-`
-const client = new LocalClient()
-
-export const getStaticProps = async ({ params }) => {
-  const variables = { relativePath: `${params.filename}.md` }
+    `,
+    variables: { relativePath: `${params.filename}.md` },
+  })
   return {
     props: {
-      data: await client.request<{ getPostsDocument: PostsDocument }>(
-        (gql) => gql(query),
-        {
-          variables,
-        }
-      ),
-      variables,
-      query,
+      ...tinaProps,
     },
   }
 }
@@ -80,11 +65,9 @@ export const getStaticProps = async ({ params }) => {
  * be viewable at http://localhost:3000/posts/hello
  */
 export const getStaticPaths = async () => {
-  const postsListData = await client.request<{
-    getPostsList: PostsConnection
-  }>(
-    (gql) => gql`
-      {
+  const postsListData = (await staticRequest({
+    query: gql`
+      query GetPostsList {
         getPostsList {
           edges {
             node {
@@ -96,8 +79,8 @@ export const getStaticPaths = async () => {
         }
       }
     `,
-    { variables: {} }
-  )
+  })) as any
+
   return {
     paths: postsListData.getPostsList.edges.map((post) => ({
       params: { filename: post.node.sys.filename },
@@ -105,6 +88,3 @@ export const getStaticPaths = async () => {
     fallback: false,
   }
 }
-
-export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
-  T extends (...args: any) => Promise<infer R> ? R : any

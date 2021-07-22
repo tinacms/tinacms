@@ -268,6 +268,11 @@ const Loader = (props: { children: React.ReactNode }) => {
   )
 }
 
+/**
+ * A convenience function which makes a GraphQL request
+ * to a local GraphQL server and ensures the response fits
+ * the shape expected by Tina context in your application
+ */
 export const getStaticPropsForTina = async ({
   query,
   variables,
@@ -275,13 +280,30 @@ export const getStaticPropsForTina = async ({
   query: string
   variables?: object
 }) => {
-  const client = new LocalClient()
-  const data = await client.request(query, { variables })
+  const data = await staticRequest({ query, variables })
   return {
     data,
     query,
     variables,
   }
+}
+
+/**
+ * A convenience function which makes a GraphQL request
+ * to a local GraphQL server. Only recommended for functions
+ * which run at build-time like `getStaticProps` or `getStaticPaths`
+ */
+export const staticRequest = async ({
+  query,
+  variables,
+}: {
+  /** A GraphQL request string */
+  query: string
+  /** GraphQL variables */
+  variables?: object
+}) => {
+  const client = new LocalClient()
+  return client.request(query, { variables })
 }
 
 /**
