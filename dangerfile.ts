@@ -65,16 +65,6 @@ async function getFileContents(filepath: string) {
   }
 }
 
-const failAboutIllegalDeps = ({ packageJson }: TinaPackage, deps: string[]) =>
-  fail(`
-Please remove the following dependencies from ${packageJson.name}:
-
-${deps.map(dep => `* ${dep}`).join('\n')}\n
-
-This repository defines the above package in the root level package.json in
-order to (1) have consistency across packages and (2) prevent bugs during development.
-`)
-
 runChecksOnPullRequest()
 
 /**
@@ -126,27 +116,19 @@ async function runChecksOnPullRequest() {
 
   modifiedPackages.forEach(checkForNpmScripts)
   modifiedPackages.forEach(checkForLicense)
-  modifiedPackages.forEach(checkForGlobalDeps)
 
-  modifiedPackages.forEach(pkg => checkForReadmeChanges(pkg, allFiles))
+  modifiedPackages.forEach((pkg) => checkForReadmeChanges(pkg, allFiles))
 
   listTouchedPackages(modifiedPackages)
 
   // Github Actions Workflows
   listTouchedWorkflows(allFiles)
-
-  // Pull Request
-  // if (modifiedPackages.length > 0) {
-  //   checkForMilestone()
-  // }
-
-  checkForDocsChanges(allFiles)
 }
 
 function checkForReadmeChanges(pkg: TinaPackage, allFiles: string[]) {
-  const packageFiles = allFiles.filter(file => file.startsWith(pkg.path))
+  const packageFiles = allFiles.filter((file) => file.startsWith(pkg.path))
 
-  const hasReadme = packageFiles.find(file => file.endsWith('README.md'))
+  const hasReadme = packageFiles.find((file) => file.endsWith('README.md'))
 
   if (!hasReadme) {
     warn(
@@ -155,96 +137,9 @@ function checkForReadmeChanges(pkg: TinaPackage, allFiles: string[]) {
   }
 }
 
-interface Consumers {
-  [key: string]: Dep[]
-}
-
 interface Dep {
   file: string
   details: string
-}
-async function checkForDocsChanges(files: string[]) {
-  files = files.map(file => `/${file}`)
-  const consumerRequest = await fetch('https://tinacms.org/consumers.json')
-  const consumers: Consumers = await consumerRequest.json()
-
-  const potentialDocChanges: [string, Dep][] = []
-  Object.keys(consumers).forEach(docFile => {
-    const dependencies = consumers[docFile]
-
-    dependencies.forEach(dep => {
-      if (files.includes(dep.file)) {
-        potentialDocChanges.push([docFile, dep])
-      }
-    })
-  })
-
-  if (potentialDocChanges.length > 0) {
-    warnUpdateDoc(potentialDocChanges)
-  }
-}
-
-const warnUpdateDoc = (changes: [string, Dep][]) =>
-  warn(`
-Update Docs for tinacms#${danger.github.pr.number}
-
-
-<a href="https://github.com/tinacms/tinacms.org/issues/new?&title=${updateDocTitle(
-    changes
-  )}&body=${updateDocBody(changes)}">Create Issue</a>
-`)
-
-const updateDocTitle = (_changes: [string, Dep][]) =>
-  encodeURIComponent(`Update Docs for tinacms#${danger.github.pr.number}`)
-
-const updateDocBody = (changes: [string, Dep][]) =>
-  encodeURIComponent(`
-A [pull request](${
-    danger.github.pr.html_url
-  }) in tinacms may require documentation updates.
-
-The following files may need to be updated:
-
-| File | Reason |
-| --- | --- |
-${changes
-  .map(([file, dep]) => `| ${fileLink(file)} | ${dep.details} |`)
-  .join('\n')}
-`)
-
-const fileLink = (file: string) => {
-  const filename = file.split('/').pop()
-
-  return `[${filename}](https://github.com/tinacms/tinacms.org/tree/master/${file})`
-}
-
-/**
- * Any PR that modifies one of the packages should be attached to a milestone.
- */
-function checkForMilestone() {
-  // @ts-ignore
-  const milestone: Milestone = danger.github.pr.milestone
-  if (milestone) {
-    message(
-      `You can expect the changes in this PR to be published on ${formatDate(
-        new Date(milestone.due_on)
-      )}`
-    )
-  } else {
-    warn(`@tinacms/dev please add to a Milestone before merging `)
-  }
-}
-
-// This is missing from the `danger` types
-interface Milestone {
-  due_on: string
-}
-
-function formatDate(date: Date) {
-  const day = date.getDay()
-  const month = date.getMonth() + 1
-  const year = date.getFullYear()
-  return `${year}-${month}-${day}`
 }
 
 /**
@@ -258,7 +153,7 @@ function formatDate(date: Date) {
  */
 function listTouchedWorkflows(allFiles: string[]) {
   const touchedWorkflows = allFiles.filter(
-    filepath =>
+    (filepath) =>
       filepath.startsWith('.github/workflows/') ||
       filepath.endsWith('dangerfile.ts')
   )
@@ -282,7 +177,7 @@ function checkForNpmScripts({ packageJson }: TinaPackage) {
     'build',
   ]
 
-  requiredScripts.forEach(scriptName => {
+  requiredScripts.forEach((scriptName) => {
     if (!scripts[scriptName]) {
       fail(`${packageJson.name} is missing a required script: ${scriptName}`)
     }
@@ -356,31 +251,25 @@ async function getModifiedPackages(allFiles: string[]) {
   const packageList: TinaPackage[] = []
   const paths = new Set(
     allFiles
-      .filter(filepath => filepath.startsWith('packages/'))
-      .filter(filepath => !filepath.startsWith('packages/demo'))
-      .filter(filepath => !filepath.startsWith('packages/@testing'))
+      .filter((filepath) => filepath.startsWith('packages/'))
+      .filter((filepath) => !filepath.startsWith('packages/demo'))
+      .filter((filepath) => !filepath.startsWith('packages/@testing'))
       /**
        * These are all the old directory groups.
        * For some reason they still exist in Github, even
        * though they can't be found. This is causing the danger
        * build to fail. Technology, amirite?
        */
-      .filter(filepath => !filepath.startsWith('packages/api/'))
-      .filter(filepath => !filepath.startsWith('packages/next/'))
-      .filter(filepath => !filepath.startsWith('packages/react/'))
-      .filter(filepath => !filepath.startsWith('packages/gatsby/'))
-      .filter(filepath => !filepath.startsWith('packages/core/'))
-      .map(filepath => {
+      .filter((filepath) => !filepath.startsWith('packages/api/'))
+      .filter((filepath) => !filepath.startsWith('packages/next/'))
+      .filter((filepath) => !filepath.startsWith('packages/react/'))
+      .filter((filepath) => !filepath.startsWith('packages/gatsby/'))
+      .filter((filepath) => !filepath.startsWith('packages/core/'))
+      .map((filepath) => {
         if (filepath.startsWith('packages/@tinacms')) {
-          return filepath
-            .split('/')
-            .slice(0, 3)
-            .join('/')
+          return filepath.split('/').slice(0, 3).join('/')
         }
-        return filepath
-          .split('/')
-          .slice(0, 2)
-          .join('/')
+        return filepath.split('/').slice(0, 2).join('/')
       })
   )
 
@@ -390,7 +279,7 @@ async function getModifiedPackages(allFiles: string[]) {
       // get file contents + JSON decode
       await getFileContents(`${path}/package.json`)
         .then(JSON.parse)
-        .then(packageJson => {
+        .then((packageJson) => {
           packageList.push({
             path,
             packageJson,
@@ -402,30 +291,4 @@ async function getModifiedPackages(allFiles: string[]) {
   }
 
   return packageList
-}
-
-function checkForGlobalDeps(tinaPackage: TinaPackage) {
-  const deps = Object.keys(tinaPackage.packageJson.dependencies || {})
-  const devDeps = Object.keys(tinaPackage.packageJson.devDependencies || {})
-
-  const illegalDeps = Array.from(new Set([...deps, ...devDeps])).filter(
-    isIllegal
-  )
-
-  if (illegalDeps.length > 0) {
-    failAboutIllegalDeps(tinaPackage, illegalDeps)
-  }
-}
-
-function isIllegal(dep: string) {
-  return (
-    [
-      'typescript',
-      'tslib',
-      'react',
-      'react-dom',
-      '@types/react',
-      '@types/react-dom',
-    ].indexOf(dep) >= 0
-  )
 }
