@@ -24,7 +24,7 @@ import {
 
 export class DOMSerializer extends _DOMSerializer {
   static nodesFromSchema(schema: Schema) {
-    let result = gatherToDOM(schema.nodes)
+    const result = gatherToDOM(schema.nodes)
     if (!result.text) result.text = (node: Node) => node.text
     return result
   }
@@ -34,10 +34,10 @@ export class DOMSerializer extends _DOMSerializer {
 }
 
 function gatherToDOM(obj: any): any {
-  let result: any = {}
-  for (let name in obj) {
-    let toDocument = obj[name].spec.toDocument
-    let toDOM = obj[name].spec.toDOM
+  const result: any = {}
+  for (const name in obj) {
+    const toDocument = obj[name].spec.toDocument
+    const toDOM = obj[name].spec.toDOM
     if (toDocument) result[name] = toDocument
     else if (toDOM) result[name] = toDOM
   }
