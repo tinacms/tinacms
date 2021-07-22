@@ -32,7 +32,7 @@ export const ImageEdit: FunctionComponent = () => {
   const { editorView } = useEditorStateContext()
   const view = editorView!.view
   const imagePluginState = imagePluginKey.getState(view.state)
-  if (!imagePluginState || !imagePluginState.selectedImage) return null
+
   const { node, pos } = imagePluginState.selectedImage
   const { link } = view.state.schema.marks
   const linkMark = node.marks.find((mark: Mark) => mark.type === link)
@@ -97,6 +97,8 @@ export const ImageEdit: FunctionComponent = () => {
   }, [inputRef])
 
   useEffect(positionImage)
+
+  if (!imagePluginState || !imagePluginState.selectedImage) return null
 
   const updateNodeAttrs = () => {
     const { dispatch, state } = view
