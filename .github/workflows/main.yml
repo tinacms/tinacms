@@ -1,9 +1,9 @@
-name: Build, Test, Lint for Master
+name: Build, Test, Lint for Main
 
 on:
   push:
     branches:
-      - master
+      - main
 
 jobs:
   build:
@@ -21,20 +21,18 @@ jobs:
 
       - if: matrix.os == 'windows-latest'
         run: |
-          npm install --global --production windows-build-tools@4.0.0
-          npm install --global --production node-gyp
+          yarn add windows-build-tools@4.0.0
+          yarn add node-gyp
 
       - name: Install
-        run: |
-          npm ci
-          npm run bs
+        run: yarn install
 
       - name: Build
-        run: npm run build
+        run: yarn build
 
       - name: Test
-        run: npm run test
+        run: yarn test
 
       - name: Lint
         if: matrix.os == 'ubuntu-latest'
-        run: npm run lint
+        run: yarn lint
