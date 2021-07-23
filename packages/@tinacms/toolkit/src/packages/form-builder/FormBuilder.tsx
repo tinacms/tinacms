@@ -85,12 +85,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
-              <FormBody
-                className="form-body"
-                onKeyPress={(e) =>
-                  e.charCode === 13 && !submitting ? handleSubmit() : null
-                }
-              >
+              <FormBody className="form-body">
                 <FormPortalProvider>
                   <Wrapper>
                     {tinaForm && tinaForm.fields.length ? (
