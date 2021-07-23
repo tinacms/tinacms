@@ -3,6 +3,14 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
+
+**Note:** Version bump only for package next-tinacms-json
+
+
+
+
+
 # [0.43.0](https://github.com/tinacms/tinacms/compare/v0.42.1...v0.43.0) (2021-07-12)
 
 **Note:** Version bump only for package next-tinacms-json

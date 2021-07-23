@@ -3,6 +3,12 @@
 All notable changes to this project will be documented in this file.
 See [Conventional Commits](https://conventionalcommits.org) for commit guidelines.
 
+## [0.43.3](https://github.com/tinacms/tinacms/compare/v0.43.2...v0.43.3) (2021-07-23)
+
+### Bug Fixes
+
+- **@tinacms/form-builder:** Removes onKeyPress from FormBuilder ([f0e456b](https://github.com/tinacms/tinacms/commit/f0e456b2f9d1f2cc8a0a3ede38eee47da46e710c))
+
 ## [0.43.2](https://github.com/tinacms/tinacms/compare/v0.43.1...v0.43.2) (2021-07-20)
 
 ### Bug Fixes
