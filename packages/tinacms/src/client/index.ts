@@ -47,7 +47,6 @@ export class Client {
   private token: string // used with memory storage
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
-    const _this = this
     /**
      * Prevents a CORS-issue when the `branch` has slashes in it.
      * https://github.com/tinacms/tinacms/issues/219
@@ -61,7 +60,7 @@ export class Client {
 
     switch (tokenStorage) {
       case 'LOCAL_STORAGE':
-        this.getToken = function() {
+        this.getToken = function () {
           const tokens = localStorage.getItem(AUTH_TOKEN_KEY) || null
           if (tokens) {
             return JSON.parse(tokens)
@@ -73,14 +72,14 @@ export class Client {
             }
           }
         }
-        this.setToken = function(token) {
+        this.setToken = function (token) {
           localStorage.setItem(AUTH_TOKEN_KEY, JSON.stringify(token, null, 2))
         }
         break
       case 'MEMORY':
-        this.getToken = function() {
-          if (_this.token) {
-            return JSON.parse(_this.token)
+        this.getToken = () => {
+          if (this.token) {
+            return JSON.parse(this.token)
           } else {
             return {
               access_token: null,
@@ -89,8 +88,8 @@ export class Client {
             }
           }
         }
-        this.setToken = function(token) {
-          _this.token = JSON.stringify(token, null, 2)
+        this.setToken = (token) => {
+          this.token = JSON.stringify(token, null, 2)
         }
         break
       case 'CUSTOM':
@@ -104,7 +103,7 @@ export class Client {
     }
   }
 
-  addPendingContent = async props => {
+  addPendingContent = async (props) => {
     const mutation = `#graphql
 mutation addPendingDocumentMutation(
   $relativePath: String!
@@ -178,7 +177,7 @@ mutation addPendingDocumentMutation(
     if (json.errors) {
       throw new Error(
         `Unable to fetch, errors: \n\t${json.errors
-          .map(error => error.message)
+          .map((error) => error.message)
           .join('\n')}`
       )
       return json

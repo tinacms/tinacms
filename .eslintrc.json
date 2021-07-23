@@ -16,7 +16,7 @@
     "@typescript-eslint/no-non-null-assertion": "off",
     "@typescript-eslint/no-parameter-properties": "off",
     "@typescript-eslint/no-unused-vars": [
-      "error",
+      "warn",
       { "ignoreRestSiblings": true, "argsIgnorePattern": "^_" }
     ],
     "@typescript-eslint/no-use-before-define": "off",

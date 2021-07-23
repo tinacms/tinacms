@@ -17,7 +17,7 @@ export const chain = async (
   cmds: ((ctx: any, next: any, options: any) => Promise<void>)[],
   options: any
 ) => {
-  let ctx = {}
+  const ctx = {}
 
   const next = async (middlewareIndex: number) => {
     if (middlewareIndex >= cmds.length) {
