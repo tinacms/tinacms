@@ -13,13 +13,9 @@ limitations under the License.
 
 import { LandingPage } from '../components/landing-page'
 import { Wrapper } from '../components/helper-components'
-import { AsyncReturnType } from './posts/[filename]'
-import { LocalClient } from 'tinacms'
-import type { MarketingPagesDocument } from '../.tina/__generated__/types'
+import { getStaticPropsForTina, gql } from 'tinacms'
 
-export default function HomePage(
-  props: AsyncReturnType<typeof getStaticProps>['props']
-) {
+export default function HomePage(props) {
   return (
     <Wrapper data={props.data.getMarketingPagesDocument.dataJSON}>
       <LandingPage {...props.data.getMarketingPagesDocument.data} />
@@ -27,61 +23,54 @@ export default function HomePage(
   )
 }
 
-const gql = (strings: TemplateStringsArray) => strings
-
-export const query = gql`
-  query ContentQuery {
-    # "index.md" is _relative_ to the "Marketing Pages" path property in your schema definition
-    # you can inspect this file at "content/marketing-pages/index.md"
-    getMarketingPagesDocument(relativePath: "index.md") {
-      dataJSON
-      data {
-        blocks {
-          __typename
-          ... on MarketingPagesBlocksImage {
-            heading
-            imgDescription
-            src
-          }
-          ... on MarketingPagesBlocksMessage {
-            messageHeader
-            messageBody
+export const getStaticProps = async () => {
+  const tinaProps = await getStaticPropsForTina({
+    query: gql`
+      query ContentQuery {
+        # "index.md" is _relative_ to the "Marketing Pages" path property in your schema definition
+        # you can inspect this file at "content/marketing-pages/index.md"
+        getMarketingPagesDocument(relativePath: "index.md") {
+          dataJSON
+          data {
+            blocks {
+              __typename
+              ... on MarketingPagesBlocksImage {
+                heading
+                imgDescription
+                src
+              }
+              ... on MarketingPagesBlocksMessage {
+                messageHeader
+                messageBody
+              }
+            }
           }
         }
-      }
-    }
-    getPostsDocument(relativePath: "voteForPedro.md") {
-      data {
-        title
-        hero
-        author {
-          __typename
-          ... on AuthorsDocument {
-            data {
+        getPostsDocument(relativePath: "voteForPedro.md") {
+          data {
+            title
+            hero
+            author {
               __typename
-              ... on Authors {
-                name
-                avatar
+              ... on AuthorsDocument {
+                data {
+                  __typename
+                  ... on Authors {
+                    name
+                    avatar
+                  }
+                }
               }
             }
           }
         }
       }
-    }
-  }
-`
-
-const client = new LocalClient()
-export const getStaticProps = async () => {
+    `,
+    variables: {},
+  })
   return {
     props: {
-      data: await client.request<{
-        getMarketingPagesDocument: MarketingPagesDocument
-      }>(query.join(''), {
-        variables: {},
-      }),
-      query: query,
-      variables: {},
+      ...tinaProps,
     },
   }
 }

@@ -59,7 +59,7 @@
     "tslib": "^1.10.0"
   },
   "dependencies": {
-    "@tinacms/toolkit": "workspace:packages/@tinacms/toolkit",
+    "@tinacms/toolkit": "workspace:*",
     "codemirror": "^5.42.2",
     "lodash.debounce": "^4.0.8",
     "lodash.get": "^4.4.2",
