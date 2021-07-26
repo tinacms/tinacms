@@ -30,7 +30,7 @@ import { ProsemirrorMenu as LinkMenu } from '../../../plugins/Link'
 
 import { TablePopups } from '../../../plugins/Table/Popup'
 import {
-  ImageEdit as ImageEditPopup,
+  // ImageEdit as ImageEditPopup,
   Loader as ImageLoader,
 } from '../../../plugins/Image'
 import { LinkForm as LinkFormPopup } from '../../../plugins/Link'
@@ -66,7 +66,7 @@ export const Menubar = ({ plugins, imageProps, ...rest }: Props) => {
       ]}
       popups={[
         <TablePopups key="TablePopups" />,
-        <ImageEditPopup key="ImageEditPopup" />,
+        // <ImageEditPopup key="ImageEditPopup" />,
         <LinkFormPopup key="LinkFormPopup" />,
         <ImageLoader key="ImageLoader" />,
       ]}
