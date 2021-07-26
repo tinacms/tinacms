@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-editor",
-  "version": "0.43.2-alpha.0",
+  "version": "0.50.0",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-editor.esm.js",
@@ -52,7 +52,7 @@
     "react-docgen-typescript-webpack-plugin": "^1.1.0",
     "react-dom": "16.12.0",
     "react-is": "^17.0.2",
-    "react-tinacms-inline": "^0.43.2-alpha.0",
+    "react-tinacms-inline": "workspace:*",
     "styled-components": ">=4.1",
     "tinacms": "workspace:*",
     "ts-jest": "^24.0.3",
@@ -85,9 +85,9 @@
     "react-dom": ">=16.8",
     "react-final-form": ">=6",
     "react-is": "^17.0.2",
-    "react-tinacms-inline": ">=0.29",
+    "react-tinacms-inline": ">=0.50.0",
     "styled-components": ">=4.1",
-    "tinacms": ">=0.13"
+    "tinacms": ">=0.50.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
