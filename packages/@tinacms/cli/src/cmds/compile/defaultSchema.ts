@@ -20,21 +20,20 @@ export default defineSchema({
       label: "Blog Posts",
       name: "posts",
       path: "content/posts",
-      templates: [
+      fields: [
         {
-          label: "Article",
-          name: "article",
-          fields: [
-            {
-              type: "string",
-              label: "Title",
-              name: "title",
-            },
-          ],
+          type: "string",
+          label: "Title",
+          name: "title",
+        },
+        {
+          type: "string",
+          label: "Blog Post Body",
+          name: "body",
+          isBody: true,
         },
       ],
     },
   ],
 });
-
 `
