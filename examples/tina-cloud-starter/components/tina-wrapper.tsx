@@ -19,33 +19,33 @@ import {
 } from 'tinacms'
 import React from 'react'
 import { LoadingPage } from './Spinner'
-
+import { TinaCloudCloudinaryMediaStore } from 'next-tinacms-cloudinary'
 /**
  * This gets loaded dynamically in "pages/_app.js"
  * if you're on a route that starts with "/admin"
  */
-const TinaWrapper = props => {
+const TinaWrapper = (props) => {
   return (
     <TinaCloudProvider
       clientId=""
       branch="main"
       isLocalClient={true}
-      organization=""
+      // organization=""
       // clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
       // branch="main"
       // isLocalClient={Boolean(Number(process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT))}
       // organization={process.env.NEXT_PUBLIC_ORGANIZATION_NAME}
-      // mediaStore={TinaCloudCloudinaryMediaStore}
+      mediaStore={TinaCloudCloudinaryMediaStore}
     >
       <Inner {...props} />
     </TinaCloudProvider>
   )
 }
 
-const Inner = props => {
+const Inner = (props) => {
   const cms = useCMS()
   const [payload, isLoading] = useGraphqlForms({
-    query: gql => gql(props.query),
+    query: (gql) => gql(props.query),
     variables: props.variables || {},
     // formify: args => {
     //   if (args.formConfig.id === 'getPostsDocument') {
