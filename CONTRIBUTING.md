@@ -6,144 +6,137 @@ The following is a set of guidelines and tips for contributing to the TinaCMS an
 
 Before a Pull Request can be accepted, all contributors must sign the [Contributor License Agreement](https://cla-assistant.io/tinacms/tinacms). A GitHub Action runs against all Pull Requests to ensure that **all commit authors** on the associated Pull Request have signed the agreement. The contributor license agreement helps us ensure that the code being contributed was written by the contributor and that we have proper license to use the contribution.
 
-## Development
+## Getting started
 
-**Disclaimer**:
+Currently this is a monorepo built with Yarn V2 and Plug-n-Play.
 
-- Tina is a new and fast moving project. Although API stability and easy developer experience is important to the core team, they cannot be guaranteed while the project is pre-1.0.
-- Although Tina supports many use cases not all of them have helper packages or comprehensive guides. If you’re looking to use Tina in a novel way you will have to do a lot of manual setup.
+You _should_ :fingers_crossed: be able to just run these commands. (Please make a note of any hang-ups you ran into during this process)
 
-_Recommended: use the [active LTS version of Node.js](https://nodejs.org/en/about/releases/)_
-
-To get started:
-
-```bash
-git clone git@github.com:tinacms/tinacms.git
-cd tinacms
-npm install
-npm run build
-
-# Start Next.js Demo
-cd packages/demo-next
-npm run develop
+```sh
+# check the node version, this repo only supports node 14.x.x at the moment
+node -v
+# check yarn version, this repo ships with yarn so it should be 2.4.1
+yarn -v
+# it should show 2.4.1, you'll definitely need +2.0
+yarn install
+# build all the packages
+yarn run build
+# watch all packages
+yarn run watch
+# in a separate tab, navigate to starter project 
+cd examples/tina-cloud-starter
+# start the dev server
+yarn dev
 ```
 
-**WARNING: Do not run `npm install` from inside the `packages` directory**
+That should allow you to see 2 things: The Altair graphql playground at `http:localhost:4001/altair` and the demo app at `http:localhost:3000`. Tina form changes should result in `examples/tina-cloud-starter/content/marketing-pages/index.md` being changed.
 
-TinaCMS uses [Lerna](https://lerna.js.org/) to manage dependencies when developing locally. This allows the various packages to reference each other via symlinks. Running `npm install` from within a package replaces the symlinks with references to the packages in the npm registry.
+## PR Workflow
 
-### Commands
+All pull requests should include a changeset. To create a changeset, ensure you don't have any uncommitted changes and then run the following command:
 
-| Commands                                      | Description                                   |
-| --------------------------------------------- | --------------------------------------------- |
-| npm run bootstrap                             | Install dependencies and link local packages. |
-| npm run build                                 | Build all packages.                           |
-| npm run test                                  | Run tests for all packages.                   |
-| npm run lerna -- run build --scope \<package> | Build only \<package>.                        |
-
-### Testing With External Projects
-
-Linking apps to a monorepo can be tricky. Tools like `npm link` are buggy and introduce inconsistencies with module resolution. If multiple modules rely on the same package you can easily end up with multiple instances of that package, this is problematic for packages like `react` which expect only one instance.
-
-[`@tinacms/webpack-helpers`](./packages/@tinacms/webpack-helpers) provides tools and instructions for testing local TinaCMS changes on external websites.
-
-### Making Commits
-
-TinaCMS uses [Conventional Commits](https://www.conventionalcommits.org/en/v1.0.0-beta.4/) to generate CHANGELOG entries. Please make sure your commits follow this convention.
-
-Please include the package name in the [scope](https://www.conventionalcommits.org/en/v1.0.0-beta.4/#commit-message-with-scope) of your commit. For example:
-
-```
-fix(react-tinacms-editor): table row add and delete icons no longer overlap
+```sh
+# from the root of the repo
+yarn changeset
 ```
 
-### Creating Packages
+Choose the package or packages that were affected by your work. _(Tip: you may have to wait a couple of seconds after selecting your packages, sometimes it doesn't get registered and it'll ask you to pick again)_
 
-Packages in Tina are organized according to their name
+> Note: You do not need to select packages which _depend_ on changes you made in other packages, the release process will do this automatically for you later on. Just choose packages you worked on directly.
 
-| Type      | Naming Convention  | Example Path           |
-| --------- | ------------------ | ---------------------- |
-| Core Tina | `@tinacms/*`       | `@tinacms/core`        |
-| React     | `react-tinacms-*`  | `react-tinacms-remark` |
-| Next.js   | `next-tinacms-*`   | `next-tinacms-json`    |
-| Gatsby    | `gatsby-tinacms-*` | `gatsby-tinacms-json`  |
-| Demos     | `demo-*`           | `demo-gatsby`          |
+![](https://github.com/tinacms/tina-graphql-gateway/blob/main/meta/yarn-changeset-1.png)
 
-## Troubleshooting in Development
+Choose the _type_ of version change they should get. Skipping `major` will ask you if you want to select `minor`, if you skip that it will assume `patch`.
 
-This section contains solutions to various problems you may run into when developing for TinaCMS.
+![](https://github.com/tinacms/tina-graphql-gateway/blob/main/meta/yarn-changeset-2.png)
 
-- [I pulled down changes and now the packages won't build](#I-pulled-down-changes-and-now-my-packages-won't-build)
-- [I can't add dependencies to a package](#I-can't-add-dependencies-to-a-package)
-- [Run Development Packages ](#Run-Development-Packages)
+Proceed through the prompts until you have a new `.md` file in the `.changeset` directory. It'll look [like this](https://github.com/tinacms/tina-graphql-gateway/blob/348ef1e57e2e61fb9896d616aabc6f3c85d37140/.changeset/pretty-sloths-return.md)
 
-### I pulled down changes and now my packages won't build
+![](https://github.com/tinacms/tina-graphql-gateway/blob/main/meta/yarn-changeset-3.png)
+![](https://github.com/tinacms/tina-graphql-gateway/blob/main/meta/yarn-changeset-4.png)
 
-The links between the local packages may have been broken. If this is the problem, then
-running `npm run bootstrap` should fix the issue.
+Feel free to edit this file if you want to alter your messages or which versions will be bumped.
 
-#### Example error message
+### Commit your changes and push to Github and creat a PR
+
+The PR will be checked for a changeset file. You're done!
+
+Once the PR is merged and has completed it's actions, you can install the changes by installing the @dev version of the package. So if there were changes to `tina-graphql` merged into `main`, you can test them out by running `yarn add tina-grahql@dev`.
+
+However, your changes won't yet be published to NPM under the `@latest` tag yet. So without specifying the `@dev` tag, users won't get your latest changes. Instead, when the PR is merged to `main`, another action will kick in. It will create a _separate_ PR which is essentially all of the active changesets in flight. So several merged PRs may result in several pending changesets.
+
+This PR calls `yarn changeset version`, which _deletes_ changeset files and updates `CHANGELOG.md` files in each package. This PR will stay up to date as new changesets enter the `main` branch. [Here's an example](https://github.com/tinacms/tina-graphql-gateway/pull/316) of what that looks like. Only once this PR is merged will the latest changes be generally available.
+
+### For maintainers: Merge the "Version Packages" PR _back_ to `main`
+
+Previous PRs to main would _not_ have triggered NPM packages to be published because their `versions` haven't been bumped. That's the purpose of the "Version Package" action. So these merges will now have updated `versions`, resulting in publishes to NPM.
+
+## Creating a dev release
+
+Ensure you have created a changeset and have a clean `git` working directory.
+
+Build your changes with `yarn build`
+
+Run `yarn changeset version --snapshot`
+
+Run `yarn ci:publish-dev`
+
+If you have 2FA, this will prompt you to enter you one-time code for each package you publish.
+
+Run `git checkout -- .` This will clear out the versioning changes.
+
+---
+
+## Working with the GitHub Manager locally
+
+In `packages/@tinacms/graphql/src/index.ts`, replace:
+
+```ts
+const manager = new FileSystemManager({ rootPath: projectRoot })
+```
+
+with:
+
+```ts
+const manager = new GithubManager({
+  rootPath: 'examples/tina-cloud-starter',
+  accessToken: '<TOKEN>',
+  owner: 'tinacms',
+  repo: 'tina-graphql-gateway',
+  ref: '<BRANCH>',
+  cache: simpleCache,
+})
+```
+
+Use whichever branch you're currently working with, and generate and provide a GitHub personal access token with full permissions and SSO enabled with tinacms authorized.
+
+## Trying out changes to a package
+
+### Local
+
+If the changes affect local use of the packages (i.e. not the ContentAPI), use the tina-cloud-starter found in the examples directory of this repo. That starter will require a .env file with the following values:
 
 ```
-sh: tinacms-scripts: command not found
+NEXT_PUBLIC_ORGANIZATION_NAME=<ANYTHING YOU WANT>
+NEXT_PUBLIC_TINA_CLIENT_ID=<ANYTHING YOU WANT>
+NEXT_PUBLIC_USE_LOCAL_CLIENT=1
 ```
 
-### I can't add dependencies to a package
+### Backend
 
-Linking prevents running `npm install` from directly inside a package from working. There are two ways to get around this issue.
+If the changes you want to try out will be in the ContentAPI, then you will need to canary release your package changes. Ask somebody about how to do this.
 
-1. **Add the package with lerna**
+## Misc
 
-   You can use lerna to add new dependencies to a package from the root of the repository:
+### Getting the starter to reference a different Identity API or ContentAPI
 
-   ```
-   npm run lerna -- add react --scope react-cms
-   ```
+If you've made changes to the ContentAPI or Identity and you want the starter to use the different API, use these override env variables in the tina-cloud-starter:
 
-   The downside of this approach is you can only add one dependency at a time. If you need to add many packages, you can use the next method.
+```
+IDENTITY_API_OVERRIDE=<URL TO IDENTITY>
+CONTENT_API_OVERRIDE<URL TO CONTENTAPI>
+```
 
-2. **Add dependencies manually, then bootstrap**
+### Import errors
 
-   The other approach is to manually add the dependencies to the `package.json` and then run `npm run bootstrap` from the root of the repository.
-
-3. **When I run `npm run bs` it deletes the contents of a package?**
-
-   This sucks. Try running `npm run lerna -- clean` and then running `npm run bs` again.
-
-### Failed to Compile: Module not found: Can't resolve 'some-tinacms-package'
-
-There are two reasons this error might occur:
-
-1. **The package did not link to `some-tinacms-package`**
-
-   This is likely the problem if `some-tinacms-package` is missing from
-   the `node_modules`. If it is, do the following:
-
-   - Make sure `some-tinacms-package` is listed in the `package.json`
-   - Run `npm run bootstrap` from the root of the repo.
-
-1. **`some-tinacms-package` was not built.**
-
-   This is likely the problem if: the `build` directory is missing; there are no `.d.ts` or `.js` files. To fix this issue simply run `npm run build` from the root of the repository.
-
-### Run Development Packages
-
-After installing the development setup you can run demo applications contained in the _packages_ directory **demo-cra**, **demo-gatsby** and **demo-next**.
-
-These projects can be used as a development environment for Tina packages, you can edit any other package contained within Tina packages.
-
-When editing the packages of tina we can execute the command `npm run dev` to execute an development build on the repository packages.
-
-This command will build all Tina packages. This will reflect in the references of the tina demo packages, thus updating the demo packages according to the changes made.
-
-This way you can change the tinacms packages and test the changes in the demo packages as a development environment.
-
-## Release Process
-
-TinaCMS packages are updated every Monday.
-
-Checkout the [RELEASE](./RELEASE.md) file for the details.
-
-## RFC Process
-
-See the [tinacms/rfcs](https://github.com/tinacms/rfcs) repo for more info on how new changes are proposed to the tinacms core packages.
+Are you getting lots of import errors in VSCode and yet it builds fine? In VSCode try pressing cmd+shift+p, search for `select typescript version` and choose `use workspace version`.
