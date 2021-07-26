@@ -20,7 +20,7 @@ import { GithubBridge } from './database/github'
 import { simpleCache } from '../cache/lru'
 import { createDatabase } from './database'
 
-export { createDatabase }
+export { createDatabase, resolve, indexDB }
 export type { TinaCloudSchema } from './types'
 
 export const gql = async ({

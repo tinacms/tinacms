@@ -14,7 +14,9 @@ limitations under the License.
 export { GithubBridge } from './primitives/database/github'
 export {
   gql,
+  resolve,
   buildSchema,
+  indexDB,
   createDatabase,
   githubRoute,
 } from './primitives'
@@ -24,8 +26,12 @@ import { clearCache as lruClearCache } from './cache/lru'
 
 export { lruClearCache, lruClearCache as clearCache, s3ClearCache, s3Cache }
 
-import type { TinaCloudSchema as TinaCloudSchemaBase, TinaCloudCollection as TinaCloudCollectionBase, TinaFieldBase } from './primitives/types'
+import type {
+  TinaCloudSchema as TinaCloudSchemaBase,
+  TinaCloudCollection as TinaCloudCollectionBase,
+  TinaFieldBase,
+} from './primitives/types'
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
-export type TinaCloudCollection= TinaCloudCollectionBase<false>
+export type TinaCloudCollection = TinaCloudCollectionBase<false>
 export type TinaField = TinaFieldBase
