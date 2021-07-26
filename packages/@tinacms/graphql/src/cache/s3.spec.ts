@@ -59,7 +59,7 @@ describe('S3 cache', () => {
     test('uses setter if no value found', async () => {
       // @ts-ignore
       mockS3.getObject.mockImplementationOnce(() => {
-        throw <Error>{ code: 'NoSuchKey', name: '', message: '' }
+        throw { code: 'NoSuchKey', name: '', message: '' } as Error
       })
       // @ts-ignore
       mockS3.upload.mockImplementationOnce(() => awsPromise(null))

@@ -1,13 +1,3 @@
-
 # Default Owner
-* @tinacms/maintainers @tinacms/oss-reviewers
+* @tinacms/maintainers
 
-# Tina Teams
-packages/@tinacms/teams/* @jamespohalloran
-packages/gatsby-tinacms-teams/* @jamespohalloran
-
-# Prosemirror Wysiwyg
-packages/@tinacms/fields/src/Wysiwyg/* @jpuri @dwalkr
-
-# Styling
-packages/@tinacms/styles/* @spbyrne

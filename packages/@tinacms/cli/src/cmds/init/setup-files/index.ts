@@ -13,7 +13,7 @@ limitations under the License.
 
 export const adminPage = `import { useEffect } from "react";
 import { useRouter } from "next/router";
-import { useEditState } from "tinacms";
+import { useEditState } from "tinacms/dist/edit-state";
 
 const GoToEditPage = () => {
   const { setEdit } = useEditState();
@@ -37,9 +37,11 @@ This is your first post!
 `
 
 export const nextPostPage = ({ wrapper = false }: { wrapper: boolean }) => `
-import { LocalClient, EditProvider } from "tinacms";
-import type { Posts_Document } from "../../../.tina/__generated__/types";
-import TinaWrapper from "../../../components/tina-wrapper";
+import { LocalClient } from "tinacms";
+import type {
+  PostsConnection,
+  PostsDocument,
+} from "../../../.tina/__generated__/types";
 
 export type AsyncReturnType<T extends (...args: any) => Promise<any>> =
   T extends (...args: any) => Promise<infer R> ? R : any;
@@ -77,26 +79,26 @@ const BlogPage = (props: AsyncReturnType<typeof getStaticProps>["props"]) => {
         }}
       >
         <h1>{props.data.getPostsDocument.data.title}</h1>
-        <div>{props.data.getPostsDocument.data._body}</div>
+        <div>{props.data.getPostsDocument.data.body}</div>
       </div>
       {/* you can delete this iframe (and page) once you are done getting started */}
-      <iframe style={{height: "80vh", width: "100%", border: "none"}} src="https://tina.io/docs/tina-init-tutorial/?layout=false"></iframe>
+      <iframe
+        style={{ height: "80vh", width: "100%", border: "none" }}
+        src="https://tina.io/docs/tina-init-tutorial/?layout=false"
+      ></iframe>
     </div>
   );
 };
 
 export const query = \`#graphql
-  query BlogPostQuery($relativePath: String!) {
-    getPostsDocument(relativePath: $relativePath) {
-      data {
-        __typename
-        ... on  Article_Doc_Data{
-          title
-          _body
-        }
-      }
+query BlogPostQuery($relativePath: String!) {
+  getPostsDocument(relativePath: $relativePath) {
+    data {
+      title
+      body
     }
   }
+}
 \`;
 
 const client = new LocalClient();
@@ -105,7 +107,7 @@ export const getStaticProps = async ({ params }) => {
   const variables = { relativePath: \`\${params.filename}.md\` };
   return {
     props: {
-      data: await client.request<{ getPostsDocument: Posts_Document }>(query, {
+      data: await client.request<{ getPostsDocument: PostsDocument }>(query, {
         variables,
       }),
       variables,
@@ -123,13 +125,17 @@ export const getStaticProps = async ({ params }) => {
  */
 export const getStaticPaths = async () => {
   const postsListData = await client.request<{
-    getPostsList: Posts_Document[];
+    getPostsList: PostsConnection;
   }>(
     (gql) => gql\`
       {
         getPostsList {
-          sys {
-            filename
+          edges {
+            node {
+              sys {
+                filename
+              }
+            }
           }
         }
       }
@@ -137,12 +143,13 @@ export const getStaticPaths = async () => {
     { variables: {} }
   );
   return {
-    paths: postsListData.getPostsList.map((post) => ({
-      params: { filename: post.sys.filename },
+    paths: postsListData.getPostsList.edges.map((post) => ({
+      params: { filename: post.node.sys.filename },
     })),
     fallback: false,
   };
 };
+
 ${wrapper ? '' : 'export default BlogPage'}
 `
 
@@ -194,10 +201,9 @@ export default TinaWrapper;
 
 `
 
-export const AppJsContent = `
-import dynamic from "next/dynamic";
+export const AppJsContent = `import dynamic from "next/dynamic";
 
-import { EditProvider, setEditing, useEditState } from "tinacms";
+import { EditProvider, useEditState } from "tinacms/dist/edit-state";
 
 // InnerApp that handles rendering edit mode or not
 function InnerApp({ Component, pageProps }) {

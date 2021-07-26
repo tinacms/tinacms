@@ -15,7 +15,7 @@ import * as crypto from 'crypto-js'
 
 const randomString = (length: number = 40) => {
   let state = ''
-  let possible =
+  const possible =
     'ABCDEFGHIJKLMNOPQRSTUVWXYZabcdefghijklmnopqrstuvwxyz0123456789'
   for (let i = 0; i < length; i++)
     state += possible.charAt(Math.floor(Math.random() * possible.length))

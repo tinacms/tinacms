@@ -13,13 +13,19 @@
     "version:snapshot": "yarn changeset version --snapshot",
     "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
-    "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public"
+    "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
+    "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
   },
   "dependencies": {
     "@changesets/cli": "^2.16.0",
+    "@typescript-eslint/eslint-plugin": "^2.3.0",
+    "@typescript-eslint/parser": "^2.3.0",
     "@yarnpkg/pnpify": "^2.0.0-rc.20",
     "danger": "^10.6.4",
     "eslint": "^6.8.0",
+    "eslint-config-prettier": "^6.3.0",
+    "eslint-plugin-react": "^7.14.3",
+    "eslint-plugin-react-hooks": "^2.0.1",
     "prettier": "^2.3.2",
     "typescript": "^3.8.3",
     "workspace": "^0.0.1-preview.1"

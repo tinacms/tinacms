@@ -32,7 +32,7 @@ const gqlServer = async () => {
   app.use(
     '/altair',
     altairExpress({
-      baseURL: '/graphql',
+      endpointURL: '/graphql',
       initialQuery: `# Welcome to Tina!
       # We've got a simple query set up for you to get started
       # but there's plenty more for you to explore on your own!
