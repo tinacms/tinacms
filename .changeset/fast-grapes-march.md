@@ -24,11 +24,11 @@ const App = ({ Component, pageProps }) => {
       // Optional: Your identifier when connecting to Tina Cloud
       clientId="<some-id-from-tina-cloud>"
       // Optional: A callback for altering the CMS object if needed
-      cms={(cms) => {}}
+      cmsCallback={(cms) => {}}
       // Optional: A callback for altering the form generation if needed
-      formify={(args) => {}}
+      formifyCallback={(args) => {}}
       // Optional: A callback for altering the document creator plugin
-      documentCreator={(args) => {}}
+      documentCreatorCallback={(args) => {}}
     >
       {(livePageProps) => <Component {...livePageProps} />}
     </TinaCMS>
