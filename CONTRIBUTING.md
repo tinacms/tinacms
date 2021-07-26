@@ -83,7 +83,7 @@ Run `yarn ci:publish-dev`
 
 If you have 2FA, this will prompt you to enter you one-time code for each package you publish.
 
-Run `git co -- .` This will clear out the versioning changes.
+Run `git checkout -- .` This will clear out the versioning changes.
 
 ---
 
