@@ -22,13 +22,7 @@ import {
   warnText,
   dangerText,
 } from '../../utils/theme'
-import {
-  blogPost,
-  nextPostPage,
-  TinaWrapper,
-  AppJsContent,
-  adminPage,
-} from './setup-files'
+import { blogPost, nextPostPage, AppJsContent, adminPage } from './setup-files'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 
@@ -53,7 +47,7 @@ export async function initTina(ctx: any, next: () => void, options) {
   logger.info(successText('Setting up Tina...'))
   next()
 }
-const delay = ms => new Promise(resolve => setTimeout(resolve, ms))
+const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms))
 
 export async function installDeps(ctx: any, next: () => void, options) {
   const bar = new Progress(
@@ -93,12 +87,12 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
     fs.writeFileSync(blogPostPath, blogPost)
   }
 
-  // 2. Create a Tina Wrapper
-  if (!fs.pathExistsSync(TinaWrapperPath)) {
-    logger.info(logText('Adding a tina-wrapper...'))
-    fs.mkdirpSync(TinaWrapperPathDir)
-    fs.writeFileSync(TinaWrapperPath, TinaWrapper)
-  }
+  // // 2. Create a Tina Wrapper
+  // if (!fs.pathExistsSync(TinaWrapperPath)) {
+  //   logger.info(logText('Adding a tina-wrapper...'))
+  //   fs.mkdirpSync(TinaWrapperPathDir)
+  //   fs.writeFileSync(TinaWrapperPath, TinaWrapper)
+  // }
   logger.level = 'info'
 
   // 3. Create an _app.js
@@ -127,7 +121,8 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
       wrapper = true
       logger.info(
         dangerText(
-          'you will have to wrap your app in a tina-wrapper component. For more information see generated file'
+          `Heads up, to enable live-editing you'll need to wrap your page or site in Tina:\n`,
+          warnText(AppJsContent)
         )
       )
     }
@@ -139,7 +134,7 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].tsx')
   if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
     fs.mkdirpSync(tinaBlogPagePath)
-    fs.writeFileSync(tinaBlogPagePathFile, nextPostPage({ wrapper }))
+    fs.writeFileSync(tinaBlogPagePathFile, nextPostPage())
   }
   logger.info('Adding a content folder... ✅')
   // 4. update the users package.json
