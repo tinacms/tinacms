@@ -14,11 +14,11 @@ limitations under the License.
 import React from 'react'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-graphql-forms'
-import { TinaCloudProvider } from './auth'
+import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
 
-import type { TinaCMS, MediaStore } from '@tinacms/toolkit'
+import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
 
 const SetupHooks = (props: {
@@ -169,7 +169,7 @@ export const TinaCMSProvider2 = ({
   /** Callback if you need access to the "document creator" API */
   documentCreatorCallback?: (args) => void
   /** TinaCMS media store instance */
-  mediaStore?: MediaStore
+  mediaStore?: TinaCloudMediaStoreClass
 }) => {
   if (typeof props.query === 'string') {
     props.query
@@ -180,7 +180,7 @@ export const TinaCMSProvider2 = ({
       clientId={clientId}
       isLocalClient={isLocalClient}
       cmsCallback={cmsCallback}
-      // mediaStore={mediaStore}
+      mediaStore={mediaStore}
     >
       {props.query ? (
         <SetupHooks key={props.query} {...props} query={props.query || ''}>
