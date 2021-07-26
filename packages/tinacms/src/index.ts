@@ -17,18 +17,8 @@ export * from './utils'
 export * from './tina-cms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export { useGraphqlForms } from './hooks/use-graphql-forms'
+export * from '@tinacms/toolkit'
+
 import { TinaCMSProvider2 } from './tina-cms'
 
 export default TinaCMSProvider2
-
-/**
- * A passthru function which allows editors
- * to know the temlpate string is a GraphQL
- * query or muation
- */
-function graphql(strings: TemplateStringsArray) {
-  return strings[0]
-}
-export { graphql }
-
-export * from '@tinacms/toolkit'

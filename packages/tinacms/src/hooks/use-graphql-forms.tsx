@@ -19,7 +19,7 @@ import { useCMS, Form } from '@tinacms/toolkit'
 import { ContentCreatorPlugin, OnNewDocument } from './create-page-plugin'
 import { assertShape, safeAssertShape } from '../utils'
 
-import type { FormOptions } from '@tinacms/toolkit'
+import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import type { DocumentNode } from 'graphql'
 
 export function useGraphqlForms<T extends object>({
@@ -188,7 +188,7 @@ export function useGraphqlForms<T extends object>({
           if (skipped) return
 
           if (formify) {
-            form = formify({ formConfig, createForm, skip })
+            form = formify({ formConfig, createForm, skip }, cms)
           } else {
             form = createForm(formConfig)
           }
@@ -333,7 +333,7 @@ export interface FormifyArgs {
   skip?: () => void
 }
 
-export type formifyCallback = (args: FormifyArgs) => Form | void
+export type formifyCallback = (args: FormifyArgs, cms: TinaCMS) => Form | void
 export type onSubmitArgs = {
   /**
    * @deprecated queryString is actually a mutation string, use `mutationString` instead
