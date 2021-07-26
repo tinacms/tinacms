@@ -32,7 +32,9 @@ export const TinaEditProvider = ({
 const ToggleButton = () => {
   const { edit } = useEditState()
   return edit ? null : (
-    <div style={{ position: 'fixed', bottom: '56px', left: '0px' }}>
+    <div
+      style={{ position: 'fixed', bottom: '56px', left: '0px', zIndex: 200 }}
+    >
       <a
         href="/admin"
         style={{
