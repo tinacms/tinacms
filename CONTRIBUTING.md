@@ -23,7 +23,7 @@ yarn install
 yarn run build
 # watch all packages
 yarn run watch
-# navigate to starter project
+# in a separate tab, navigate to starter project 
 cd examples/tina-cloud-starter
 # start the dev server
 yarn dev
