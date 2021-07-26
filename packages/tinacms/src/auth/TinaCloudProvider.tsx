@@ -16,7 +16,6 @@ import React, { useState } from 'react'
 import { TinaCMS, TinaProvider, MediaStore } from '@tinacms/toolkit'
 
 import { Client } from '../client'
-import type { TokenObject } from './authenticate'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 
@@ -26,7 +25,7 @@ function sleep(ms) {
   return new Promise((resolve) => setTimeout(resolve, ms))
 }
 
-interface TinaCloudMediaStoreClass {
+export interface TinaCloudMediaStoreClass {
   new (client: Client): MediaStore
 }
 export interface TinaCloudAuthWallProps {
@@ -64,7 +63,7 @@ export const AuthWallInner = ({
     })
   }, [])
 
-  const onAuthSuccess = async (token: TokenObject) => {
+  const onAuthSuccess = async () => {
     if (await client.isAuthenticated()) {
       setShowChildren(true)
       setActiveModal(null)
@@ -93,8 +92,8 @@ export const AuthWallInner = ({
             {
               name: 'Continue to Tina Cloud',
               action: async () => {
-                const token = await client.authenticate()
-                onAuthSuccess(token)
+                await client.authenticate()
+                onAuthSuccess()
               },
               primary: true,
             },
