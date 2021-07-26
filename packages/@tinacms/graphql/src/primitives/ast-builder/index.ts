@@ -194,14 +194,14 @@ export const astBuilder = {
     args?: InputValueDefinitionNode[]
   }) => {
     let res = {}
-    let namedType = {
+    const namedType = {
       kind: 'NamedType' as const,
       name: {
         kind: 'Name' as const,
         value: type,
       },
     }
-    let def = {
+    const def = {
       kind: 'FieldDefinition' as const,
       name: {
         kind: 'Name' as const,

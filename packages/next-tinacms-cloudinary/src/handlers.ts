@@ -90,15 +90,15 @@ async function listMedia(req: NextApiRequest, res: NextApiResponse) {
       offset,
     } = req.query as MediaListOptions
 
-    let query = `folder=${directory}`
+    const query = `folder=${directory}`
 
-    let response = await cloudinary.search
+    const response = await cloudinary.search
       .expression(query)
       .max_results(limit)
       .next_cursor(offset as string)
       .execute()
 
-    let files = response.resources.map(cloudinaryToTina)
+    const files = response.resources.map(cloudinaryToTina)
 
     //@ts-ignore TODO: Open PR to cloudinary-core
     cloudinary.api.folders = (directory: string = '""') => {
