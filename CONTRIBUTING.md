@@ -50,7 +50,7 @@ Choose the _type_ of version change they should get. Skipping `major` will ask y
 
 ![](https://github.com/tinacms/tina-graphql-gateway/blob/main/meta/yarn-changeset-2.png)
 
-Proceed through the prompts until you havee a new `.md` file in the `.changeset` directory. It'll look [like this](https://github.com/tinacms/tina-graphql-gateway/blob/348ef1e57e2e61fb9896d616aabc6f3c85d37140/.changeset/pretty-sloths-return.md)
+Proceed through the prompts until you have a new `.md` file in the `.changeset` directory. It'll look [like this](https://github.com/tinacms/tina-graphql-gateway/blob/348ef1e57e2e61fb9896d616aabc6f3c85d37140/.changeset/pretty-sloths-return.md)
 
 ![](https://github.com/tinacms/tina-graphql-gateway/blob/main/meta/yarn-changeset-3.png)
 ![](https://github.com/tinacms/tina-graphql-gateway/blob/main/meta/yarn-changeset-4.png)
