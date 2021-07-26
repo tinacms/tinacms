@@ -58,7 +58,7 @@ export default defineSchema({
           name: 'body',
           isBody: true,
           ui: {
-            component: 'textarea',
+            component: 'markdown',
           },
         },
       ],
