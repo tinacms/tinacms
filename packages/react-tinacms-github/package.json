@@ -42,7 +42,7 @@
     "@tinacms/toolkit": "workspace:*",
     "btoa": "^1.2.1",
     "js-cookie": "^2.2.1",
-    "next-tinacms-markdown": "^0.44.0"
+    "next-tinacms-markdown": "workspace:*"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
