@@ -4,7 +4,7 @@ Manage **Cloudinary media assets** in TinaCMS.
 
 ## Installation
 
-##### With Yarn
+### With Yarn
 ```bash
 yarn add next-tinacms-cloudinary
 ```
