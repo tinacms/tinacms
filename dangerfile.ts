@@ -198,7 +198,7 @@ function checkForLicense({ packageJson }: TinaPackage) {
  *
  */
 function fileNeedsLicense(filepath: string) {
-  return new RegExp(/^(?!examples\/).+\.(js|tsx?)$/).test(filepath)
+  return new RegExp(/^(?!examples\/).+\.(jsx?|tsx?)$/).test(filepath)
 }
 
 /**
