@@ -1,4 +1,4 @@
-# tina-cloud-next
+# @tinacms/auth
 
 ## 0.0.4
 ### Patch Changes

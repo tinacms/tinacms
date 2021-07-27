@@ -1,6 +1,6 @@
 # Tina Cloud Starter 🦙
 
-Basic TinaCMS starter based on [Next.js](https://nextjs.org) and [TinaCMS](https://tina.io) that connects to Tina Cloud Content API.
+Basic TinaCMS starter based on [Next.js](https://nextjs.org) and [TinaCMS](https://tina.io) that connects to TinaCMS Content API.
 
 ![Starter Homepage Preview](public/uploads/tina-cloud-starter-preview.png)
 
@@ -8,15 +8,13 @@ Basic TinaCMS starter based on [Next.js](https://nextjs.org) and [TinaCMS](https
 
 Watch our video guide to get started in less than 10 minutes.
 
-[![Getting Started with Tina Cloud](http://img.youtube.com/vi/Y-fG7qzoHKw/0.jpg)](http://www.youtube.com/watch?v=Y-fG7qzoHKw "Getting Started with Tina Cloud")
+[![Getting Started with Tina](http://img.youtube.com/vi/Y-fG7qzoHKw/0.jpg)](http://www.youtube.com/watch?v=Y-fG7qzoHKw "Getting Started with Tina")
 
 ## Lighthouse Scores
 
 ![Performance: 100%](assets/img/scores/lighthouse_performance.svg) ![Accessibility: 100%](assets/img/scores/lighthouse_accessibility.svg) ![Best Practices: 100%](assets/img/scores/lighthouse_best-practices.svg) ![SEO: 100%](assets/img/scores/lighthouse_seo.svg)
 
 Tina doesn't impact your website performance. This starter comes with default perfect [Lighthouse scores](https://lighthouse-dot-webdotdevsite.appspot.com//lh/html?url=https%3A%2F%2Ftina-cloud-starter-orcin.vercel.app%2F) 🚀
-
-
 
 ## Table of contents
 
@@ -44,7 +42,7 @@ This is a [TinaCMS](https://tina.io)-enabled Next.js app, so you can edit your c
 ### Scope
 
 - Run this project locally using local content within this repository.
-- Connect to Tina Cloud to benefit from its GraphQL Content API.
+- Connect to Tina to benefit from its GraphQL Content API.
 - Deploy the site to visually edit your site.
 - Invite collaborators.
 
@@ -53,6 +51,7 @@ This is a [TinaCMS](https://tina.io)-enabled Next.js app, so you can edit your c
 - Git
 - [Node.js Active LTS](https://nodejs.org/en/about/releases/)
 - Yarn
+- [Cloudinary](https://cloudinary.com) account for media support
 
 ## Fork this repository
 
@@ -80,7 +79,7 @@ yarn dev
 
 This command starts the GraphQL server and the Next.js application in development mode. It also regenerates your schema types for TypeScript and GraphQL so changes to your `.tina` config are reflected immediately.
 
-One of the most interesting aspects of the Tina Cloud Content API is that it doesn't actually require anything from the Cloud to work locally. Since Tina is by default a Git-backed CMS, everything can be run from your local filesystem via the CLI. :sunglasses:
+One of the most interesting aspects of the Tina Content API is that it doesn't actually require anything from the backend to work locally. Since Tina is by default a Git-backed CMS, everything can be run from your local filesystem via the CLI. :sunglasses:
 
 This is ideal for development workflows and the API is identical to the one used in the cloud, so once you're ready to deploy your application you won't face any challenges there.
 
@@ -110,26 +109,31 @@ When you're ready to deploy your site, read on about how you can connect to Tina
 
 > **NOTE:** In this project there are two way to enter edit mode. You can click the "enter edit mode button" or visit [`/admin`](http://localhost/admin). You can also disable the edit button by setting `NEXT_PUBLIC_SHOW_EDIT_BTN=0` in `.env.local`
 
-## Connect to Tina Cloud
+## Connect to Tina
 
 While the fully-local development workflow is the recommended way for developers to work,
 you'll obviously want other editors and collaborators to be able to make changes on a hosted website with authentication.
 
 > ℹ️ Changes in edit mode show up on your home page after your site finishes a rebuild.
 
-## Register your local application with Tina Cloud
+## Register your local application with Tina 
 
-1. Visit [auth.tina.io](https://auth.tina.io/register), create an organization, and sign in. Make a note of your organization name.
-2. Create a Tina Cloud app which connects to the GitHub repository you've just forked. Once your app is created, click on the app to get to the app settings and copy the client ID.
+1. Visit [app.tina.io](https://app.tina.io/register) and sign in.
+2. Create a new app in Tina which connects to the GitHub repository you've just forked. Once your app is created, click on the app to get to the app settings and copy the client ID.
 
-## Connect your local project with Tina Cloud
+## Connect your local project with Tina
 
 In the `env.local` file set:
 
 - `NEXT_PUBLIC_USE_LOCAL_CLIENT` to `0`.
-- `NEXT_PUBLIC_ORGANIZATION_NAME` to your Tina Cloud organization name
 - `NEXT_PUBLIC_TINA_CLIENT_ID` to the Client ID displayed in your Tina Cloud App.
-- `NEXT_PUBLIC_SHOW_EDIT_BTN` to `0` or `1`, `0` means there is no "enter edit mode" and you will have to visit [`/admin`](http://localhost/admin)  to enter edit mode.
+- `NEXT_PUBLIC_SHOW_EDIT_BTN` to `0` or `1`, `0` means there is no "enter edit 
+- `NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME` to your Cloudinary cloud name
+- `NEXT_PUBLIC_CLOUDINARY_API_KEY` to your Cloudinary API key
+- `CLOUDINARY_API_SECRET` to your Cloudinary API secret
+mode" and you will have to visit [`/admin`](http://localhost/admin)  to enter edit mode.
+
+> **NOTE:** You can read more about the `next-tinacms-cloudinary` package in [this blog post](https://tina.io/blog/manage-your-media-with-cloudinary/) and in the [package docs](https://tina.io/packages/next-tinacms-cloudinary/
 
 Restart your server and run `yarn dev` again.
 
@@ -144,7 +148,7 @@ This time a modal asks you to authenticate through Tina Cloud. Upon success, you
 Make some edits through the sidebar and click save.
 Changes are saved in your GitHub repository.
 
-Now that Tina Cloud editing is working correctly, we can deploy the site so that other team members can make edits too.
+Now that Tina editing is working correctly, we can deploy the site so that other team members can make edits too.
 
 > ℹ️ Gotcha: since your changes are being synced directly to Github, you'll notice that when your in non-"edit" mode your page still receive the unedited data from your local filesystem. This is mostly fine since editing with Tina Cloud is designed for hosted environments. But beware that changes to your schema may result in a mismatch between the Tina Cloud API and your local client.
 
@@ -157,7 +161,6 @@ Now that Tina Cloud editing is working correctly, we can deploy the site so that
 Connect to your GitHub repository and set the same environment variables as the ones in your `env.local` file:
 
 ```
-NEXT_PUBLIC_ORGANIZATION_NAME= <YOUR_ORGANIZATION>
 NEXT_PUBLIC_TINA_CLIENT_ID= <YOUR_CLIENT_ID>
 ```
 
@@ -182,7 +185,6 @@ Connect to your GitHub repository, then:
 Click on **advanced** to add the same environment variables as the ones in your `env.local` file:
 
 ```
-NEXT_PUBLIC_ORGANIZATION_NAME= <YOUR_ORGANIZATION>
 NEXT_PUBLIC_TINA_CLIENT_ID= <YOUR_CLIENT_ID>
 ```
 
@@ -295,11 +297,11 @@ Tina Cloud generates your GraphQL schema automatically. 🪄
 
 ### Explore the GraphQL API
 
-If you have a GraphQL client like [Altair](https://altair.sirmuel.design/) go to `http://localhost:4001/graphql` to learn more about our GraphQL API.
+When your run the server locally, you can browse the GraphQL docs and test your queries in `http://localhost:4001/altair`.
 
 ## Getting Help
 
-Tina Cloud is in public alpha, you might face issues, to provide feedback or get help with any challenges you may have:
+Tina Cloud is in public beta, you might face issues, to provide feedback or get help with any challenges you may have:
 
 -   Read the [Tina Cloud documentation](https://tina.io/docs/tina-cloud/).
 -   [Join our Discord](https://discord.gg/zumN63Ybpf).
@@ -310,4 +312,4 @@ Tina Cloud is in public alpha, you might face issues, to provide feedback or get
 
 ## LICENSE
 
-Licensed under the [Aoache 2.0 license](./LICENSE).
+Licensed under the [Apache 2.0 license](./LICENSE).

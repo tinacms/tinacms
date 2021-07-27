@@ -28,7 +28,7 @@ export interface TinaCloudUser {
  *
  * @example
  * import { NextApiHandler } from 'next'
- * import { isAuthorized } from 'tina-cloud-next'
+ * import { isAuthorized } from '@tinacms/auth'
  * const apiHandler: NextApiHandler = async (req, res) => {
  *   const user = await isAuthorized(req)
  *   if (user && user.verified) {

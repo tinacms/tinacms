@@ -1,4 +1,4 @@
-# Tina-Cloud-Next
+# @tinacms/auth
 This package contains all the [Next.js](https://nextjs.org/) specific code for Tina Cloud
 
 ## Authorize user function
@@ -15,7 +15,7 @@ For our example lets make a file called `pages/api/upload.ts`.
 
 ```ts
 import { NextApiHandler } from 'next'
-import { isAuthorized } from 'tina-cloud-next'
+import { isAuthorized } from '@tinacms/auth'
 const apiHandler: NextApiHandler = async (req, res) => {
 
   // This will check if the user is logged in. It will return undefined if the user token is not valid
