@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-cloudinary",
-  "version": "2.0.0",
+  "version": "3.1.0",
   "main": "dist/index.js",
   "files": [
     "dist/*"
@@ -36,7 +36,7 @@
     "react-dom": ">=16.8",
     "react-is": "^16.13.1 || <18.0.0",
     "styled-components": "*",
-    "tinacms": ">=0.4.0"
+    "tinacms": ">=0.50.0"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
