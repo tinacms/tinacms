@@ -68,7 +68,7 @@ const StyledImage = styled.img`
   background-position: center center;
   background-repeat: no-repeat;
   ${(props) =>
-    props.src && (props.src.includes('png') || props.src.includes('svg'))
+    props?.src && (props?.src?.includes('png') || props?.src?.includes('svg'))
       ? css`
           background-image: none;
         `

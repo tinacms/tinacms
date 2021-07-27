@@ -47,7 +47,7 @@ export class CloudinaryMediaStore implements MediaStore {
 
     // TODO: be programmer
     // NOTE: why do we need this?
-    await new Promise(resolve => {
+    await new Promise((resolve) => {
       setTimeout(resolve, 2000)
     })
 
@@ -78,19 +78,26 @@ export class CloudinaryMediaStore implements MediaStore {
     }
     const { items, offset } = await response.json()
     return {
-      items: items.map(item => item),
+      items: items.map((item) => item),
       nextOffset: offset,
     }
   }
 
-  previewSrc = (publicId: string) => publicId
+  // @ts-ignore
+  previewSrc = (publicId: string | Media): string => {
+    if (typeof publicId === 'string') return publicId
+    return publicId.previewSrc
+  }
 
-  parse = img => img.previewSrc
+  parse = (img) => {
+    console.log({ img })
+    return img.previewSrc
+  }
 
   private buildQuery(options: MediaListOptions) {
     const params = Object.keys(options)
-      .filter(key => options[key] !== '' && options[key] !== undefined)
-      .map(key => `${key}=${options[key]}`)
+      .filter((key) => options[key] !== '' && options[key] !== undefined)
+      .map((key) => `${key}=${options[key]}`)
       .join('&')
 
     return `?${params}`
