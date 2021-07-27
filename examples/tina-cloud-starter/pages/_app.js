@@ -20,7 +20,22 @@ const App = ({ Component, pageProps }) => {
     <>
       <TinaEditProvider
         editMode={
-          <TinaCMS isLocalClient={true} {...pageProps}>
+          <TinaCMS
+            formifyCallback={(args) => {
+              // console.log('args', args)
+              return args.createForm(args.formConfig)
+            }}
+            documentCreatorCallback={{
+              filterCollections: (options) => {
+                return options.filter((option) => option.value === 'authors')
+              },
+              onNewDocument: (args) => {
+                console.log('onNewDocumnet', args)
+              },
+            }}
+            isLocalClient={true}
+            {...pageProps}
+          >
             {(livePageProps) => <Component {...livePageProps} />}
           </TinaCMS>
         }
