@@ -9,7 +9,7 @@ Manage **Cloudinary media assets** in TinaCMS.
 yarn add next-tinacms-cloudinary
 ```
 
-##### With NPM
+### With NPM
 ```bash
 npm install next-tinacms-cloudinary
 ```
