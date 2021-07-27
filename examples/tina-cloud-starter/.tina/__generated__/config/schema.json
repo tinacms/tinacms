@@ -46,7 +46,7 @@
           "type": "string",
           "label": "Body",
           "ui": {
-            "component": "textarea"
+            "component": "markdown"
           },
           "name": "_body",
           "isBody": true
@@ -464,7 +464,7 @@
                   "label": "Text",
                   "name": "text",
                   "ui": {
-                    "component": "textarea"
+                    "component": "markdown"
                   }
                 },
                 {
