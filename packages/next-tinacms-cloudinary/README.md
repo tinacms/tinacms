@@ -4,8 +4,14 @@ Manage **Cloudinary media assets** in TinaCMS.
 
 ## Installation
 
+##### With Yarn
 ```bash
 yarn add next-tinacms-cloudinary
+```
+
+##### With NPM
+```bash
+npm install next-tinacms-cloudinary
 ```
 
 ## Connect with Cloudinary
@@ -14,7 +20,7 @@ You need some credentials provided by Cloudinary to set this up properly. If you
 
 **next-tinacms-cloudinary** uses environment variables within the context of a Next.js site to properly access your Cloudinary account.
 
-Add the following variables to a `.env` file.
+Add the following variables to an `.env` file.
 
 ```
 NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME=<Your Cloudinary Cloud Name>
@@ -24,37 +30,52 @@ CLOUDINARY_API_SECRET=<Your Cloudinary API secret>
 
 ## Register the Media Store
 
-Now, you can register the Cloudinary Media store with the instance of Tina in your app by passing the `TinaCloudCloudinaryMediaStore` to the `TinaCloudProvider` via its `media` prop.
+Now, you can register the Cloudinary Media store with the instance of Tina in your app by passing the `TinaCloudCloudinaryMediaStore` to the `TinaCMS` instance via its `mediaStore` prop.
 
 This is also where we can update our `mediaOptions` on the cms object.
 
 ```
-import { TinaCMS } from 'tinacms'
-import { TinaCloudCloudinaryMediaStore } from 'next-tinacms-cloudinary'
-import { TinaCloudProvider } from 'tinacms'
+// Typically in the _app.js file of a Next.js project
 
-...
-const cms = new TinaCMS({
-  ...
-  mediaOptions: {
-    pageSize: 10
-  }
-  ...
-})
-const TinaWrapper = (props) => {
+import dynamic from "next/dynamic";
+import { TinaEditProvider } from "tinacms/dist/edit-state";
+import { Layout } from "../components/layout";
+import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
+const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
+
+const App = ({ Component, pageProps }) => {
   return (
-    <TinaCloudProvider
-      cms={cms}
-      clientId={process.env.NEXT_PUBLIC_TINA_CLIENT_ID}
-      branch="main"
-      isLocalClient={Boolean(Number(process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT))}
-      organization={process.env.NEXT_PUBLIC_ORGANIZATION_NAME}
-      mediaStore={TinaCloudCloudinaryMediaStore}
-    >
-      <Inner {...props} />
-    </TinaCloudProvider>
-  )
-}
+    <>
+      <TinaEditProvider
+        editMode={
+          <TinaCMS
+            branch="main"
+            clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
+            isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
+            mediaStore={TinaCloudCloudinaryMediaStore}
+            {...pageProps}
+          >
+            {(livePageProps) => (
+              <Layout
+                rawData={livePageProps}
+                data={livePageProps.data?.getGlobalDocument?.data}
+              >
+                <Component {...livePageProps} />
+              </Layout>
+            )}
+          </TinaCMS>
+        }
+      >
+        <Layout
+          rawData={pageProps}
+          data={pageProps.data?.getGlobalDocument?.data}
+        >
+          <Component {...pageProps} />
+        </Layout>
+      </TinaEditProvider>
+    </>
+  );
+};
 
 ...
 ```
@@ -66,39 +87,41 @@ Then add a new catch all API route for media.
 
 Call `createMediaHandler` to set up routes and connect your instance of the Media Store to your Cloudinary account.
 
-Import `isAuthorized` from [`tina-cloud-next`](https://github.com/tinacms/tinacms/tree/main/packages/tina-cloud-next).
+Import `isAuthorized` from [`@tinacms/auth`](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/auth).
 
 The `authorized` key will make it so only authorized users within Tina Cloud can upload and make media edits.
 
 
 ```
-//[...media].ts
+//[...media].tsx
 
 import {
   mediaHandlerConfig,
   createMediaHandler,
-} from "next-tinacms-cloudinary/dist/handlers"
+} from "next-tinacms-cloudinary/dist/handlers";
 
-import { isAuthorized } from "tina-cloud-next"
+import { isAuthorized } from "@tinacms/auth";
 
-
-export const config = mediaHandlerConfig
+export const config = mediaHandlerConfig;
 
 export default createMediaHandler({
   cloud_name: process.env.NEXT_PUBLIC_CLOUDINARY_CLOUD_NAME,
   api_key: process.env.NEXT_PUBLIC_CLOUDINARY_API_KEY,
   api_secret: process.env.CLOUDINARY_API_SECRET,
   authorized: async (req, _res) => {
+    if (process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT === "1") {
+      return true;
+    }
     try {
-      const user = await isAuthorized(req)
-
-      return user && user.verified
+      const user = await isAuthorized(req);
+      return user && user.verified;
     } catch (e) {
-      console.error(e)
-      return false
+      console.error(e);
+      return false;
     }
   },
-})
+});
+
 ```
 
 ## Update Schema
