@@ -1,34 +1,45 @@
-/**
-Copyright 2021 Forestry.io Holdings, Inc.
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
-    http://www.apache.org/licenses/LICENSE-2.0
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
-*/
+import "../styles.css";
+import dynamic from "next/dynamic";
+import { TinaEditProvider } from "tinacms/dist/edit-state";
+import { Layout } from "../components/layout";
+const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
+// import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
 
-import dynamic from 'next/dynamic'
-import { TinaEditProvider } from 'tinacms/dist/edit-state'
-const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
+const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
+const NEXT_PUBLIC_USE_LOCAL_CLIENT =
+  process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT || true;
 
 const App = ({ Component, pageProps }) => {
   return (
     <>
       <TinaEditProvider
         editMode={
-          <TinaCMS isLocalClient={true} {...pageProps}>
-            {(livePageProps) => <Component {...livePageProps} />}
+          <TinaCMS
+            branch="main"
+            clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
+            isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
+            {...pageProps}
+          >
+            {(livePageProps) => (
+              <Layout
+                rawData={livePageProps}
+                data={livePageProps.data?.getGlobalDocument?.data}
+              >
+                <Component {...livePageProps} />
+              </Layout>
+            )}
           </TinaCMS>
         }
       >
-        <Component {...pageProps} />
+        <Layout
+          rawData={pageProps}
+          data={pageProps.data?.getGlobalDocument?.data}
+        >
+          <Component {...pageProps} />
+        </Layout>
       </TinaEditProvider>
     </>
-  )
-}
+  );
+};
 
-export default App
+export default App;
