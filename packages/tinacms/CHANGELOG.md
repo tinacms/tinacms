@@ -1,5 +1,12 @@
 # tinacms
 
+## 0.50.1
+
+### Patch Changes
+
+- 3f05aad1: Fix race condition where `values` was taking longer to update in React state, making the data syncing run too early
+- 76e3a8a7: Properly uses formifyCallback and documentCreatorCallback
+
 ## 0.50.0
 
 ### Minor Changes
@@ -595,12 +602,9 @@
   ```md
   ---
   ---
-
   myBlocks:
-
-  - template: hero
-    title: Hello
-
+    - template: hero
+      title: Hello
   ---
   ```
 
@@ -609,12 +613,9 @@
   ```md
   ---
   ---
-
   myBlocks:
-
-  - \_template: hero
-    title: Hello
-
+    - \_template: hero
+      title: Hello
   ---
   ```
 
