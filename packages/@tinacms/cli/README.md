@@ -7,13 +7,13 @@ The CLI can be installed as a dev dependency in your project.
 Npm:
 
 ```bash
-npm install --save-dev tinacms-cli
+npm install --save-dev @tinacms/cli
 ```
 
 Yarn:
 
 ```bash
-yarn add --dev tinacms-cli
+yarn add --dev @tinacms/cli
 ```
 
 ## Usage
@@ -47,7 +47,7 @@ mkdir .tina && touch .tina/schema.ts
 
 ```ts
 // .tina/schema.ts
-import { defineSchema } from "tinacms-cli";
+import { defineSchema } from "@tinacms/cli";
 
 export default defineSchema({
   collections: [
