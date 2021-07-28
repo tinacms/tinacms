@@ -73,6 +73,6 @@
   },
   "repository": {
     "url": "https://github.com/tinacms/tinacms.git",
-    "directory": "packages/tinacms-cli"
+    "directory": "packages/@tinacms/cli"
   }
 }
