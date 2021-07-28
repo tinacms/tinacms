@@ -20,8 +20,7 @@ import * as React from 'react'
 import { useCMS, Form } from 'tinacms'
 import { InlineField } from '../inline-field'
 import { FocusRing, FocusRingOptions } from '../styles'
-import { Wysiwyg } from 'react-tinacms-editor'
-import { EditorProps } from 'react-tinacms-editor'
+import { Wysiwyg, EditorProps } from 'react-tinacms-editor'
 
 export interface InlineWysiwygFieldProps extends Omit<EditorProps, 'input'> {
   name: string
