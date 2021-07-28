@@ -26,7 +26,10 @@ jobs:
         run: |
           yarn add windows-build-tools@4.0.0
           yarn add node-gyp
-
+      - name: DEBUG
+        run: yarn npm whoami
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Install
         run: yarn install
         env:
