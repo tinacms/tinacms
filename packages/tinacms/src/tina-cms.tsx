@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { useGraphqlForms } from './hooks/use-graphql-forms'
-import { useDocumentCreatorPlugin } from './hooks/use-graphql-forms'
+import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
@@ -24,7 +24,8 @@ import type { formifyCallback } from './hooks/use-graphql-forms'
 const SetupHooks = (props: {
   query: string
   variables?: object
-  formify?: formifyCallback
+  formifyCallback?: formifyCallback
+  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
   children: (args) => React.ReactNode
 }) => {
   const cms = useCMS()
@@ -32,14 +33,15 @@ const SetupHooks = (props: {
     query: (gql) => gql(props.query),
     variables: props.variables || {},
     formify: (args) => {
-      if (props.formify) {
-        return props.formify(args, cms)
+      if (props.formifyCallback) {
+        return props.formifyCallback(args, cms)
       } else {
         return args.createForm(args.formConfig)
       }
     },
   })
-  useDocumentCreatorPlugin()
+
+  useDocumentCreatorPlugin(props.documentCreatorCallback)
 
   return (
     <ErrorBoundary>
@@ -167,7 +169,7 @@ export const TinaCMSProvider2 = ({
   /** Callback if you need access to the "formify" API */
   formifyCallback?: formifyCallback
   /** Callback if you need access to the "document creator" API */
-  documentCreatorCallback?: (args) => void
+  documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
   /** TinaCMS media store instance */
   mediaStore?: TinaCloudMediaStoreClass
 }) => {

@@ -16,7 +16,6 @@ import gql from 'graphql-tag'
 import { print } from 'graphql'
 import { getIn, setIn } from 'final-form'
 import { useCMS, Form } from '@tinacms/toolkit'
-import { ContentCreatorPlugin, OnNewDocument } from './create-page-plugin'
 import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
@@ -40,58 +39,92 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
+  /**
+   * FIXME: this design is pretty flaky, but better than what
+   * we've had previously. The way it works is we update `formValues`
+   * with state from the final form subscription, so it stays perfectly
+   * in-sync with form values. But since the `data` key has different needs,
+   * we have to track how a change to the same path in the `data` object should
+   * run.
+   *
+   * To do that, we tap in to the `change` and mutator (`insert`, `move`, & `remove`)
+   * functions and set the `newUpdate` state with the path that is to be updated.
+   *
+   * So when a `title` changes, we do 2 things:
+   * 1. Set `formValues` to the new values from the form, which obviously includes
+   * the new `title` value
+   * 2. Tell the `newUpdate` state that we had an update, and provide it the path that was updated.
+   * A `newUpdate` value looks like this:
+   * ```js
+   * {
+   *   queryName: 'getPostsDocument',
+   *   get: 'getPostsDocument.values.title',
+   *   set: 'getPostsDocument.data.title',
+   * }
+   * ```
+   * That's saying:
+   * > we have a new value at 'getPostsDocument.values.title', grab that value
+   * > and __set__ the 'getPostsDocument.data.title' so it
+   *
+   * (It's also saying if this is an async update, like `data.author`, run that instead
+   * and set the new value accordingly)
+   *
+   * The way we determine when we should check for a new value is when the `formValues`
+   * key is updated, so it's probably possible to get into a state where we're setting the
+   * `newUpdate` twice before the form value state is set. Some of that may be mitigated
+   * by `newUpdate` being an array, so as to batch all of it's changes in succession. But
+   * it just feels like there's a much better way to do all of this 🤔
+   */
+  const updateData = async () => {
+    if (newUpdate) {
+      const newValue = getIn(formValues, newUpdate.get)
+      const activeForm = getIn(data, [newUpdate.queryName, 'form'].join('.'))
+      if (!activeForm) {
+        throw new Error(`Unable to find form for query ${newUpdate.queryName}`)
+      }
+      if (activeForm?.paths) {
+        const asyncUpdate = activeForm.paths?.find(
+          (p) => p.dataPath.join('.') === newUpdate.set
+        )
+        if (asyncUpdate) {
+          const res = await cms.api.tina.request(asyncUpdate.queryString, {
+            variables: { id: newValue },
+          })
+          const newData = setIn(data, newUpdate.set, res.node)
+          const newDataAndNewJSONData = setIn(
+            newData,
+            newUpdate.set.replace('data', 'dataJSON'),
+            newValue
+          )
+          setData(newDataAndNewJSONData)
+          setNewUpdate(null)
+          return
+        }
+      }
+      if (newUpdate.lookup) {
+        const field = getFieldUpdate(newUpdate, activeForm, formValues)
+        if (field && field.typeMap) {
+          newValue.forEach((item) => {
+            if (!item.__typename) {
+              item['__typename'] = field.typeMap[item._template]
+            }
+          })
+        }
+      }
+      const newData = setIn(data, newUpdate.set, newValue)
+      const newDataAndNewJSONData = setIn(
+        newData,
+        newUpdate.set.replace('data', 'dataJSON'),
+        newValue
+      )
+      setData(newDataAndNewJSONData)
+      setNewUpdate(null)
+    }
+  }
 
   React.useEffect(() => {
-    const run = async () => {
-      if (newUpdate) {
-        const newValue = getIn(formValues, newUpdate.get)
-        const activeForm = getIn(data, [newUpdate.queryName, 'form'].join('.'))
-        if (!activeForm) {
-          throw new Error(
-            `Unable to find form for query ${newUpdate.queryName}`
-          )
-        }
-        if (activeForm?.paths) {
-          const asyncUpdate = activeForm.paths?.find(
-            (p) => p.dataPath.join('.') === newUpdate.set
-          )
-          if (asyncUpdate) {
-            const res = await cms.api.tina.request(asyncUpdate.queryString, {
-              variables: { id: newValue },
-            })
-            const newData = setIn(data, newUpdate.set, res.node)
-            const newDataAndNewJSONData = setIn(
-              newData,
-              newUpdate.set.replace('data', 'dataJSON'),
-              newValue
-            )
-            setData(newDataAndNewJSONData)
-            setNewUpdate(null)
-            return
-          }
-        }
-        if (newUpdate.lookup) {
-          const field = getFieldUpdate(newUpdate, activeForm, formValues)
-          if (field && field.typeMap) {
-            newValue.forEach((item) => {
-              if (!item.__typename) {
-                item['__typename'] = field.typeMap[item._template]
-              }
-            })
-          }
-        }
-        const newData = setIn(data, newUpdate.set, newValue)
-        const newDataAndNewJSONData = setIn(
-          newData,
-          newUpdate.set.replace('data', 'dataJSON'),
-          newValue
-        )
-        setData(newDataAndNewJSONData)
-        setNewUpdate(null)
-      }
-    }
-    run()
-  }, [JSON.stringify(newUpdate)])
+    updateData()
+  }, [JSON.stringify(formValues)])
 
   const queryString = print(query(gql))
 
@@ -354,173 +387,4 @@ type NewUpdate = {
   get: string
   set: string
   lookup?: string
-}
-
-export type FilterCollections = (
-  options: {
-    label: string
-    value: string
-  }[]
-) => { label: string; value: string }[]
-
-export const useDocumentCreatorPlugin = (
-  onNewDocument?: OnNewDocument,
-  filterCollections?: FilterCollections
-) => {
-  const cms = useCMS()
-  const [values, setValues] = React.useState<{
-    collection?: string
-    template?: string
-    relativePath?: string
-  }>({})
-  const [plugin, setPlugin] = React.useState(null)
-
-  React.useEffect(() => {
-    const run = async () => {
-      /**
-       * Query for Collections and Templates
-       */
-      const res = await cms.api.tina.request(
-        (gql) => gql`
-          {
-            getCollections {
-              label
-              slug
-              format
-              templates
-            }
-          }
-        `,
-        { variables: {} }
-      )
-
-      /**
-       * Build Collection Options
-       */
-      const allCollectionOptions: { label: string; value: string }[] = []
-      res.getCollections.forEach((collection) => {
-        const value = collection.slug
-        const label = `${collection.label}`
-        allCollectionOptions.push({ value, label })
-      })
-
-      let collectionOptions
-      if (filterCollections && typeof filterCollections === 'function') {
-        const filtered = filterCollections(allCollectionOptions)
-        collectionOptions = [
-          { value: '', label: 'Choose Collection' },
-          ...filtered,
-        ]
-      } else {
-        collectionOptions = [
-          { value: '', label: 'Choose Collection' },
-          ...allCollectionOptions,
-        ]
-      }
-
-      /**
-       * Build Template Options
-       */
-      const templateOptions: { label: string; value: string }[] = [
-        { value: '', label: 'Choose Template' },
-      ]
-
-      if (values.collection) {
-        const filteredCollection = res.getCollections.find(
-          (c) => c.slug === values.collection
-        )
-        filteredCollection.templates?.forEach((template) => {
-          templateOptions.push({ value: template.name, label: template.label })
-        })
-      }
-
-      const maybeTemplateField =
-        templateOptions.length > 1
-          ? {
-              component: 'select',
-              name: 'template',
-              label: 'Template',
-              description: 'Select the template.',
-              options: templateOptions,
-              validate: async (value: any, allValues: any, meta: any) => {
-                if (!value) {
-                  if (meta.dirty) {
-                    return 'Required'
-                  }
-                  return true
-                }
-              },
-            }
-          : false
-
-      /**
-       * Build 'Add Document' Form
-       */
-      setPlugin(
-        new ContentCreatorPlugin({
-          label: 'Add Document',
-          onNewDocument: onNewDocument,
-          collections: res.getCollections,
-          onChange: async ({ values }) => {
-            setValues(values)
-          },
-          initialValues: values,
-          fields: [
-            {
-              component: 'select',
-              name: 'collection',
-              label: 'Collection',
-              description: 'Select the collection.',
-              options: collectionOptions,
-              validate: async (value: any, allValues: any, meta: any) => {
-                if (!value) {
-                  return true
-                }
-              },
-            },
-            maybeTemplateField,
-            {
-              component: 'text',
-              name: 'relativePath',
-              label: 'Name',
-              description: `A unique name for the content. Example: "newPost" or "blog_022021`,
-              placeholder: 'newPost',
-              validate: (value: any, allValues: any, meta: any) => {
-                if (!value) {
-                  if (meta.dirty) {
-                    return 'Required'
-                  }
-                  return true
-                }
-
-                /**
-                 * Check for valid `name` based on
-                 * https://github.com/tinacms/tinacms/blob/682e2ed54c51520d1a87fac2887950839892f465/packages/tinacms-cli/src/cmds/compile/index.ts#L296
-                 * */
-
-                const isValid = /^[_a-zA-Z][_a-zA-Z0-9]*$/.test(value)
-                if (value && !isValid) {
-                  return 'Must begin with a-z, A-Z, or _ and contain only a-z, A-Z, 0-9, or _'
-                }
-              },
-            },
-          ].filter(Boolean),
-        })
-      )
-    }
-
-    run()
-  }, [cms, values?.collection])
-
-  React.useEffect(() => {
-    if (plugin) {
-      cms.plugins.add(plugin)
-    }
-
-    return () => {
-      if (plugin) {
-        cms.plugins.remove(plugin)
-      }
-    }
-  }, [plugin])
 }

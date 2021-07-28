@@ -23,7 +23,7 @@ interface CreateContentButtonOptions {
   label: string
   fields: any[]
   collections: CollectionShape[]
-  onNewDocument: OnNewDocument
+  onNewDocument?: OnNewDocument
   onChange: (values: any) => void
   initialValues: any
 }
@@ -50,7 +50,7 @@ export type OnNewDocument = (args: {
 export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
   __type: 'content-creator' = 'content-creator'
   fields: AddContentPlugin<FormShape>['fields']
-  onNewDocument: OnNewDocument
+  onNewDocument?: OnNewDocument
   onChange: (values: any) => void
   name: string
   collections: CollectionShape[]
@@ -71,7 +71,7 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
   ) {
     try {
       const selectedCollection = this.collections.find(
-        collectionItem => collectionItem.slug === collection
+        (collectionItem) => collectionItem.slug === collection
       )
       const collectionFormat = selectedCollection.format
 
@@ -101,7 +101,7 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
       try {
         const res = await cms.api.tina.addPendingContent(payload)
         if (res.errors) {
-          res.errors.map(e => {
+          res.errors.map((e) => {
             cms.alerts.error(e.message)
           })
         } else {
