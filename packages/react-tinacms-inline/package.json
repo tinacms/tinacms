@@ -45,7 +45,7 @@
     "react-dropzone": "10.1.8",
     "react-final-form": "^6.5.3",
     "react-is": "^17.0.2",
-    "react-tinacms-editor": "^0.4.0",
+    "react-tinacms-editor": "workspace:*",
     "styled-components": ">=4.1",
     "tinacms": "workspace:*",
     "ts-jest": "^24.3.0",
