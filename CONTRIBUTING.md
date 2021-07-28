@@ -23,7 +23,7 @@ yarn install
 yarn run build
 # watch all packages
 yarn run watch
-# in a separate tab, navigate to starter project 
+# in a separate tab, navigate to starter project
 cd examples/tina-cloud-starter
 # start the dev server
 yarn dev
@@ -61,9 +61,9 @@ Feel free to edit this file if you want to alter your messages or which versions
 
 The PR will be checked for a changeset file. You're done!
 
-Once the PR is merged and has completed it's actions, you can install the changes by installing the @dev version of the package. So if there were changes to `tina-graphql` merged into `main`, you can test them out by running `yarn add tina-grahql@dev`.
+Once the PR is merged and has completed it's actions, you can install the changes by installing the @dev version of the package. So if there were changes to `@tinacms/graphql` merged into `main`, you can test them out by running `yarn add tina-grahql@beta`.
 
-However, your changes won't yet be published to NPM under the `@latest` tag yet. So without specifying the `@dev` tag, users won't get your latest changes. Instead, when the PR is merged to `main`, another action will kick in. It will create a _separate_ PR which is essentially all of the active changesets in flight. So several merged PRs may result in several pending changesets.
+However, your changes won't yet be published to NPM under the `@latest` tag yet. So without specifying the `@beta` tag, users won't get your latest changes. Instead, when the PR is merged to `main`, another action will kick in. It will create a _separate_ PR which is essentially all of the active changesets in flight. So several merged PRs may result in several pending changesets.
 
 This PR calls `yarn changeset version`, which _deletes_ changeset files and updates `CHANGELOG.md` files in each package. This PR will stay up to date as new changesets enter the `main` branch. [Here's an example](https://github.com/tinacms/tina-graphql-gateway/pull/316) of what that looks like. Only once this PR is merged will the latest changes be generally available.
 
@@ -77,9 +77,9 @@ Ensure you have created a changeset and have a clean `git` working directory.
 
 Build your changes with `yarn build`
 
-Run `yarn changeset version --snapshot`
+Run `yarn version:snapshot`
 
-Run `yarn ci:publish-dev`
+Run `yarn publish:dev`
 
 If you have 2FA, this will prompt you to enter you one-time code for each package you publish.
 
