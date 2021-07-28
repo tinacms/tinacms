@@ -10,6 +10,7 @@
     "build": "yarn workspaces foreach --no-private -pi --verbose --topological-dev run build",
     "watch": "yarn workspaces foreach --no-private -pi --verbose --topological-dev run watch",
     "test": "yarn workspaces foreach --no-private -p run test",
+    "version": "yarn changeset version",
     "version:snapshot": "yarn changeset version --snapshot",
     "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
