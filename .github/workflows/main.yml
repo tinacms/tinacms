@@ -29,7 +29,8 @@ jobs:
 
       - name: Install
         run: yarn install
-
+        env:
+          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Build
         run: yarn build
 
