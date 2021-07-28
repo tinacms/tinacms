@@ -29,6 +29,7 @@ export {
   InlineTextareaField,
 } from './fields/inline-textarea-field'
 export * from './fields/inline-image'
+export * from './fields/inline-wysiwyg'
 export * from './inline-group'
 export { InlineSettings } from './inline-settings'
 export * from './blocks'
