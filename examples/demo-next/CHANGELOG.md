@@ -1,5 +1,21 @@
 # Change Log
 
+## 0.43.3
+
+### Patch Changes
+
+- 840741f0: Use workspace versions for dependencies
+- Updated dependencies [6f4ca997]
+- Updated dependencies [840741f0]
+- Updated dependencies [24cd4bc9]
+- Updated dependencies [3f05aad1]
+- Updated dependencies [76e3a8a7]
+  - react-tinacms-editor@0.51.0
+  - react-tinacms-inline@1.0.0
+  - tinacms@0.50.1
+  - next-tinacms-json@0.50.0
+  - next-tinacms-markdown@0.50.0
+
 ## 0.43.2
 
 ### Patch Changes

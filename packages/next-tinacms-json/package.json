@@ -23,7 +23,7 @@
   "peerDependencies": {
     "next": ">=9",
     "react": ">=16",
-    "tinacms": ">=0.50.0"
+    "tinacms": ">=0.50.1"
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",

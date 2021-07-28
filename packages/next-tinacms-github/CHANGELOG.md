@@ -1,5 +1,15 @@
 # Change Log
 
+## 1.1.1
+
+### Patch Changes
+
+- Updated dependencies [840741f0]
+- Updated dependencies [3f05aad1]
+- Updated dependencies [76e3a8a7]
+  - react-tinacms-github@0.50.1
+  - tinacms@0.50.1
+
 ## 1.1.0
 
 ### Minor Changes

@@ -36,7 +36,7 @@
     "react-dom": ">=16.8",
     "react-is": "^16.13.1 || <18.0.0",
     "styled-components": "*",
-    "tinacms": ">=0.50.0"
+    "tinacms": ">=0.50.1"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"

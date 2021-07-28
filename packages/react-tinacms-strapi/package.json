@@ -30,7 +30,7 @@
     "final-form": ">=4.20.2",
     "react": ">=16.8",
     "react-final-form": "^6.3.0",
-    "tinacms": ">=0.50.0"
+    "tinacms": ">=0.50.1"
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",

@@ -24,7 +24,7 @@
   "peerDependencies": {
     "next": ">=9",
     "react": ">=16",
-    "tinacms": ">=0.50.0"
+    "tinacms": ">=0.50.1"
   },
   "dependencies": {
     "gray-matter": "^4.0.2",
