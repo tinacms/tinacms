@@ -644,7 +644,9 @@ const resolveDateInput = (
   /**
    * Convert string to `new Date()`
    */
-  const date = parseISO(value)
+  const parsedValue = new Date(value).toISOString()
+  const date = parseISO(parsedValue)
+  
   if (!isValid(date)) {
     throw 'Invalid Date'
   }
