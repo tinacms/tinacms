@@ -40,58 +40,92 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
+  /**
+   * FIXME: this design is pretty flaky, but better than what
+   * we've had previously. The way it works is we update `formValues`
+   * with state from the final form subscription, so it stays perfectly
+   * in-sync with form values. But since the `data` key has different needs,
+   * we have to track how a change to the same path in the `data` object should
+   * run.
+   *
+   * To do that, we tap in to the `change` and mutator (`insert`, `move`, & `remove`)
+   * functions and set the `newUpdate` state with the path that is to be updated.
+   *
+   * So when a `title` changes, we do 2 things:
+   * 1. Set `formValues` to the new values from the form, which obviously includes
+   * the new `title` value
+   * 2. Tell the `newUpdate` state that we had an update, and provide it the path that was updated.
+   * A `newUpdate` value looks like this:
+   * ```js
+   * {
+   *   queryName: 'getPostsDocument',
+   *   get: 'getPostsDocument.values.title',
+   *   set: 'getPostsDocument.data.title',
+   * }
+   * ```
+   * That's saying:
+   * > we have a new value at 'getPostsDocument.values.title', grab that value
+   * > and __set__ the 'getPostsDocument.data.title' so it
+   *
+   * (It's also saying if this is an async update, like `data.author`, run that instead
+   * and set the new value accordingly)
+   *
+   * The way we determine when we should check for a new value is when the `formValues`
+   * key is updated, so it's probably possible to get into a state where we're setting the
+   * `newUpdate` twice before the form value state is set. Some of that may be mitigated
+   * by `newUpdate` being an array, so as to batch all of it's changes in succession. But
+   * it just feels like there's a much better way to do all of this 🤔
+   */
+  const updateData = async () => {
+    if (newUpdate) {
+      const newValue = getIn(formValues, newUpdate.get)
+      const activeForm = getIn(data, [newUpdate.queryName, 'form'].join('.'))
+      if (!activeForm) {
+        throw new Error(`Unable to find form for query ${newUpdate.queryName}`)
+      }
+      if (activeForm?.paths) {
+        const asyncUpdate = activeForm.paths?.find(
+          (p) => p.dataPath.join('.') === newUpdate.set
+        )
+        if (asyncUpdate) {
+          const res = await cms.api.tina.request(asyncUpdate.queryString, {
+            variables: { id: newValue },
+          })
+          const newData = setIn(data, newUpdate.set, res.node)
+          const newDataAndNewJSONData = setIn(
+            newData,
+            newUpdate.set.replace('data', 'dataJSON'),
+            newValue
+          )
+          setData(newDataAndNewJSONData)
+          setNewUpdate(null)
+          return
+        }
+      }
+      if (newUpdate.lookup) {
+        const field = getFieldUpdate(newUpdate, activeForm, formValues)
+        if (field && field.typeMap) {
+          newValue.forEach((item) => {
+            if (!item.__typename) {
+              item['__typename'] = field.typeMap[item._template]
+            }
+          })
+        }
+      }
+      const newData = setIn(data, newUpdate.set, newValue)
+      const newDataAndNewJSONData = setIn(
+        newData,
+        newUpdate.set.replace('data', 'dataJSON'),
+        newValue
+      )
+      setData(newDataAndNewJSONData)
+      setNewUpdate(null)
+    }
+  }
 
   React.useEffect(() => {
-    const run = async () => {
-      if (newUpdate) {
-        const newValue = getIn(formValues, newUpdate.get)
-        const activeForm = getIn(data, [newUpdate.queryName, 'form'].join('.'))
-        if (!activeForm) {
-          throw new Error(
-            `Unable to find form for query ${newUpdate.queryName}`
-          )
-        }
-        if (activeForm?.paths) {
-          const asyncUpdate = activeForm.paths?.find(
-            (p) => p.dataPath.join('.') === newUpdate.set
-          )
-          if (asyncUpdate) {
-            const res = await cms.api.tina.request(asyncUpdate.queryString, {
-              variables: { id: newValue },
-            })
-            const newData = setIn(data, newUpdate.set, res.node)
-            const newDataAndNewJSONData = setIn(
-              newData,
-              newUpdate.set.replace('data', 'dataJSON'),
-              newValue
-            )
-            setData(newDataAndNewJSONData)
-            setNewUpdate(null)
-            return
-          }
-        }
-        if (newUpdate.lookup) {
-          const field = getFieldUpdate(newUpdate, activeForm, formValues)
-          if (field && field.typeMap) {
-            newValue.forEach((item) => {
-              if (!item.__typename) {
-                item['__typename'] = field.typeMap[item._template]
-              }
-            })
-          }
-        }
-        const newData = setIn(data, newUpdate.set, newValue)
-        const newDataAndNewJSONData = setIn(
-          newData,
-          newUpdate.set.replace('data', 'dataJSON'),
-          newValue
-        )
-        setData(newDataAndNewJSONData)
-        setNewUpdate(null)
-      }
-    }
-    run()
-  }, [JSON.stringify(newUpdate)])
+    updateData()
+  }, [JSON.stringify(formValues)])
 
   const queryString = print(query(gql))
 
