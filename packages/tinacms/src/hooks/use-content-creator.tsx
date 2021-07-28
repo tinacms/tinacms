@@ -22,10 +22,12 @@ export type FilterCollections = (
   }[]
 ) => { label: string; value: string }[]
 
-export const useDocumentCreatorPlugin = (
-  onNewDocument?: OnNewDocument,
+export type DocumentCreatorArgs = {
+  onNewDocument?: OnNewDocument
   filterCollections?: FilterCollections
-) => {
+}
+
+export const useDocumentCreatorPlugin = (args?: DocumentCreatorArgs) => {
   const cms = useCMS()
   const [values, setValues] = React.useState<{
     collection?: string
@@ -40,7 +42,7 @@ export const useDocumentCreatorPlugin = (
        * Query for Collections and Templates
        */
       const res = await cms.api.tina.request(
-        gql => gql`
+        (gql) => gql`
           {
             getCollections {
               label
@@ -57,15 +59,19 @@ export const useDocumentCreatorPlugin = (
        * Build Collection Options
        */
       const allCollectionOptions: { label: string; value: string }[] = []
-      res.getCollections.forEach(collection => {
+      res.getCollections.forEach((collection) => {
         const value = collection.slug
         const label = `${collection.label}`
         allCollectionOptions.push({ value, label })
       })
 
       let collectionOptions
-      if (filterCollections && typeof filterCollections === 'function') {
-        const filtered = filterCollections(allCollectionOptions)
+      if (
+        args &&
+        args.filterCollections &&
+        typeof args.filterCollections === 'function'
+      ) {
+        const filtered = args.filterCollections(allCollectionOptions)
         collectionOptions = [
           { value: '', label: 'Choose Collection' },
           ...filtered,
@@ -86,9 +92,9 @@ export const useDocumentCreatorPlugin = (
 
       if (values.collection) {
         const filteredCollection = res.getCollections.find(
-          c => c.slug === values.collection
+          (c) => c.slug === values.collection
         )
-        filteredCollection?.templates?.forEach(template => {
+        filteredCollection?.templates?.forEach((template) => {
           templateOptions.push({ value: template.name, label: template.label })
         })
       }
@@ -99,7 +105,7 @@ export const useDocumentCreatorPlugin = (
       setPlugin(
         new ContentCreatorPlugin({
           label: 'Add Document',
-          onNewDocument: onNewDocument,
+          onNewDocument: args && args.onNewDocument,
           collections: res.getCollections,
           onChange: async ({ values }) => {
             setValues(values)
