@@ -728,8 +728,7 @@ Below is an example of how an `InlineWysiwyg` field could be defined in an [Inli
 ```jsx
 import ReactMarkdown from 'react-markdown'
 import { useForm, usePlugin } from 'tinacms'
-import { InlineForm } from 'react-tinacms-inline'
-import { InlineWysiwyg } from 'react-tinacms-editor'
+import { InlineForm, InlineWysiwyg } from 'react-tinacms-inline'
 
 // Example 'Page' Component
 export function Page(props) {
@@ -799,36 +798,3 @@ If you're using Tina's toolbar, you can pass 'var(--tina-toolbar-height)' to ens
   <ReactMarkdown source={data.markdownBody} />
 </InlineWysiwyg>
 ```
-
-### Dynamic Imports
-
-The `react-tinacms-editor` is a large package so it is recommended that you make sure it's only being loaded when necessary. The example below will make sure that the editor is only loaded _if_ the CMS is actually enabled, saving the visistors to your website from the extra load time.
-
-**your-app/src/components/InlineWysiwyg.js**
-```jsx
-import React from 'react'
-import { useCMS } from 'tinacms'
-
-export function InlineWysiwyg(props) {
-  const cms = useCMS()
-  const [{ InlineWysiwyg }, setEditor] = React.useState({})
-
-  React.useEffect(() => {
-    if (!InlineWysiwyg && cms.enabled) {
-      import('react-tinacms-editor').then(setEditor)
-    }
-    return () => (InlineWysiwyg ? setEditor(null) : null)
-  }, [cms.enabled])
-
-  if (InlineWysiwyg) {
-    return (
-      <InlineWysiwyg {...props}/>
-    )
-  }
-
-  return props.children
-}
-```
-
-> #### Why do I have to load the editor dynamically myself?
-> Code splitting and dynamic imports are handled by the website's JavaScript bundlers (e.g. rollup, webpack, etc.). Since the package does not load itself into the application, it is unfortunately not possible to provide this behaviour in the package itself.
