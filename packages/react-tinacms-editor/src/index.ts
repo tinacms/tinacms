@@ -22,6 +22,4 @@ export * from './components/Wysiwyg'
 // Field Plugins
 export * from './tinacms-plugins/HtmlFieldPlugin'
 export * from './tinacms-plugins/MarkdownFieldPlugin'
-
-// Inline Editing
-export * from './tinacms-inline/inline-wysiwyg'
+export * from './types'

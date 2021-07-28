@@ -1,7 +1,6 @@
-# @tinacms/auth
+# @tinacms/tina-build
 
 ## 0.50.0
-
 ### Minor Changes
 
 - 7f3c8c1a: # 🔧 Changes coming to TinaCMS ⚙️
@@ -43,9 +42,3 @@
   ### Will you continue to patch older versions?
 
   We'll continue to make security patches, however major bug fixes will likely not see any updates. Keep in mind that `@tinacms/toolkit` will continue to be developed.
-
-## 0.0.4
-
-### Patch Changes
-
-- Bump packages to reflect new changest capabilities
