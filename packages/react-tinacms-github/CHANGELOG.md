@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.50.1
+
+### Patch Changes
+
+- 840741f0: Use workspace versions for dependencies
+  - next-tinacms-markdown@0.50.0
+
 ## 0.50.0
 
 ### Minor Changes

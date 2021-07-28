@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.51.0
+
+### Minor Changes
+
+- 6f4ca997: Move InlineWysiwyg to react-tinacms-inline
+- 24cd4bc9: Remove unused peer dependencies
+
 ## 0.50.0
 
 ### Minor Changes

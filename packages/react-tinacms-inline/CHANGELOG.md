@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.51.0
+
+### Minor Changes
+
+- 6f4ca997: Move InlineWysiwyg to react-tinacms-inline
+
+### Patch Changes
+
+- 840741f0: Use workspace versions for dependencies
+
 ## 0.50.0
 
 ### Minor Changes
