@@ -1,4 +1,4 @@
-# @tinacms/cli
+# tinacms-cli
 
 ## 0.4.0
 
