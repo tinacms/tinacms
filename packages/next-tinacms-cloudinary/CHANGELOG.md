@@ -1,5 +1,15 @@
 # next-tinacms-cloudinary
 
+## 2.0.1
+
+### Patch Changes
+
+- d0335573: Upgrade to use @tinacms/toolkit instead of tinacms
+- Updated dependencies [434d61d4]
+- Updated dependencies [3f05aad1]
+- Updated dependencies [76e3a8a7]
+  - tinacms@0.4.1
+
 ## 2.0.0
 
 ### Minor Changes

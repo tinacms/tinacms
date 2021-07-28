@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-strapi",
-  "version": "0.43.0",
+  "version": "0.43.1",
   "description": "",
   "main": "build/index.js",
   "scripts": {
@@ -30,7 +30,7 @@
     "final-form": ">=4.20.2",
     "react": ">=16.8",
     "react-final-form": "^6.3.0",
-    "tinacms": ">=0.43.0"
+    "tinacms": ">=0.4.1"
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",
