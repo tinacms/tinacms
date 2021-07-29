@@ -201,6 +201,7 @@ export class Resolver {
             await this.database.put(realPath, {
               _template: lastItem(template.namespace),
             })
+            return this.getDocument(realPath)
         }
       }
       const templateInfo =
