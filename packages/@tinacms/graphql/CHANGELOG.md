@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.50.2
+
+### Patch Changes
+
+- 0970961f: addPendingDocument was expecting params, which are not supported for new doc creation at this time
+
 ## 0.50.1
 
 ### Patch Changes
