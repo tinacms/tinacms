@@ -21,8 +21,7 @@ jobs:
       - name: Install dependencies
         # Before merging to main, re-run the install for security purposes
         # https://yarnpkg.com/features/zero-installs/#does-it-have-security-implications
-        # run: yarn install --check-cache
-        run: yarn install
+        run: yarn install --check-cache
         env:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Build
