@@ -529,9 +529,8 @@ export class Resolver {
       case 'string':
         if (field.options) {
           if (field.list) {
-            // FIXME: this is awaiting checkbox suppport
             return {
-              component: 'checkbox',
+              component: 'checkbox-group',
               ...field,
               ...extraFields,
               options: field.options,
