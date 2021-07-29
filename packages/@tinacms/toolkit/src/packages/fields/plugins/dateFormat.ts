@@ -50,12 +50,11 @@ export const parse = (
   const timeFormat = parseTimeFormat(field.timeFormat)
   const combinedFormat =
     typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat
-
   if (typeof val === 'string') {
     const date = moment.utc(val, combinedFormat)
-    return date.isValid() ? date.format() : val
+    return date.isValid() ? date.format(combinedFormat) : val
   }
-  return moment.utc(val).format()
+  return moment.utc(val).format(combinedFormat)
 }
 
 function parseDateFormat(format: string | boolean | undefined): string {

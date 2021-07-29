@@ -679,6 +679,7 @@ const resolveDateInput = (
    */
   const datePart = format(dateUTC, fixedDateFormat)
   const timePart = timeFormat ? ` ${format(dateUTC, timeFormat)}` : ''
+
   return `${datePart}${timePart}`
 }
 
