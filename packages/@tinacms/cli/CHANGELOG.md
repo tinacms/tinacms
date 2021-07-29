@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.51.0
+
+### Minor Changes
+
+- 25e0be67: update generated files in CLI
+
 ## 0.50.1
 
 ### Patch Changes
