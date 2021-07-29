@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 0.50.1
+
+### Patch Changes
+
+- Updated dependencies [65b3e3a3]
+  - @tinacms/graphql@0.50.1
+
 ## 0.50.0
 
 ### Minor Changes
@@ -531,12 +538,9 @@
   ```md
   ---
   ---
-
   myBlocks:
-
-  - template: hero
-    title: Hello
-
+    - template: hero
+      title: Hello
   ---
   ```
 
@@ -545,12 +549,9 @@
   ```md
   ---
   ---
-
   myBlocks:
-
-  - \_template: hero
-    title: Hello
-
+    - \_template: hero
+      title: Hello
   ---
   ```
 
