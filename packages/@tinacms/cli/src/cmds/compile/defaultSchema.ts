@@ -31,6 +31,9 @@ export default defineSchema({
           label: "Blog Post Body",
           name: "body",
           isBody: true,
+          ui: {
+            component: "textarea"
+          },
         },
       ],
     },

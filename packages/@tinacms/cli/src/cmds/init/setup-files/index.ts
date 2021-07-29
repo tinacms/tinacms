@@ -50,11 +50,7 @@ const BlogPage = (props) => {
         <h1>{props.data.getPostsDocument.data.title}</h1>
         <div>{props.data.getPostsDocument.data.body}</div>
       </div>
-      {/* you can delete this iframe (and page) once you are done getting started */}
-      <iframe
-        style={{ height: '80vh', width: '100%', border: 'none' }}
-        src="https://tina.io/docs/tina-init-tutorial/?layout=false"
-      ></iframe>
+      Looking for a place to start? <a href="https://tina.io/guides/tina-cloud/getting-started/overview/"> Check out this guide</a> to see how add TinaCMS to an existing Next.js site.
     </div>
   )
 }
