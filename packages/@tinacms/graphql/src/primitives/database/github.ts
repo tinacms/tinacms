@@ -18,7 +18,7 @@ import { Bridge } from './bridge'
 import LRU from 'lru-cache'
 import { GraphQLError } from 'graphql'
 
-type GithubManagerInit = {
+export type GithubManagerInit = {
   rootPath: string
   accessToken: string
   owner: string
