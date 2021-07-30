@@ -402,8 +402,6 @@ export default defineSchema({
           type: "datetime",
           label: "Posted Date",
           name: "date",
-          dateFormat: "MMMM DD YYYY",
-          timeFormat: "",
           ui: {
             dateFormat: "MMMM DD YYYY",
             timeFormat: false,
