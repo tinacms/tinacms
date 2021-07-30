@@ -62,11 +62,14 @@ mille rigidi sub taurum.
 `
 
 export const nextPostPage =
-  () => `import { staticRequest, gql, getStaticPropsForTina } from "tinacms";
+  () => `// THIS FILE HAS BEEN GENERATED WITH THE TINA CLI.
+  // This is a demo file once you have tina setup feel free to delete this file
+  
+  import { staticRequest, gql, getStaticPropsForTina } from "tinacms";
   import Head from "next/head";
-  import Script from "next/script";
   import { createGlobalStyle } from "styled-components";
-  import { useEffect, useState } from "react";
+  
+  // Styles for markdown
   const GlobalStyle = createGlobalStyle\`
   h1,h2,h3,h4,h5 {
     margin-bottom: 1.5rem;
@@ -99,32 +102,25 @@ export const nextPostPage =
     text-decoration: underline;
   }
   \`;
+  const defaultMarked = (markdown) => markdown;
   // Use the props returned by get static props (this can be deleted when the edit provider and tina-wrapper are moved to _app.js)
   const BlogPage = (props) => {
-    let marked = (markdown) => markdown;
-    if (typeof window !== "undefined") {
-      if (window.marked) {
-        marked = window.marked;
-      }
-    }
-    // this just triggers a re-render whenever the marked library loads
-    const [update, setUpdate] = useState(0);
-    useEffect(() => {
-      setUpdate(update + 1);
-    }, [marked]);
     return (
       <>
-        <Script
-          strategy="beforeInteractive"
-          src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
-        />
         <Head>
+          {/* Tailwind CDN */}
           <link
             rel="stylesheet"
             href="https://cdnjs.cloudflare.com/ajax/libs/tailwindcss/2.2.7/tailwind.min.css"
             integrity="sha512-y6ZMKFUQrn+UUEVoqYe8ApScqbjuhjqzTuwUMEGMDuhS2niI8KA3vhH2LenreqJXQS+iIXVTRL2iaNfJbDNA1Q=="
             crossOrigin="anonymous"
             referrerPolicy="no-referrer"
+          />
+          {/* Marked CDN */}
+          <script
+            type="text/javascript"
+            crossOrigin="anonymous"
+            src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
           />
         </Head>
         <div>
@@ -136,9 +132,12 @@ export const nextPostPage =
             <h1 className="text-3xl m-8 text-center leading-8 font-extrabold tracking-tight text-gray-900 sm:text-4xl">
               {props.data.getPostsDocument.data.title}
             </h1>
-            <ContentSection
-              content={marked(props.data.getPostsDocument.data.body)}
-            ></ContentSection>
+            {/* Convert markdown to html in the browser only */}
+            {typeof window !== "undefined" && (
+              <ContentSection
+                content={window.marked(props.data.getPostsDocument.data.body)}
+              ></ContentSection>
+            )}
           </div>
           <div className="bg-green-100 text-center">
             Lost and looking for a place to start?
