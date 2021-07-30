@@ -32,7 +32,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
     const [isOpen, setIsOpen] = useState(false)
     const area = useRef<HTMLDivElement>(null!)
-
+    
     useEffect(() => {
       const handleClick = (event: MouseEvent) => {
         if (!area.current) return

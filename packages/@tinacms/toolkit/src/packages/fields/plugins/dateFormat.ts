@@ -33,7 +33,7 @@ export const format = (
   const combinedFormat =
     typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat
 
-  if (typeof val === 'string') {
+    if (typeof val === 'string') {
     const date = moment.utc(val)
     return date.isValid() ? date.format(combinedFormat) : val
   }
@@ -44,17 +44,8 @@ export const format = (
 export const parse = (
   val: moment.Moment | string,
   _name: string,
-  field: DatetimepickerProps
 ) => {
-  const dateFormat = parseDateFormat(field.dateFormat)
-  const timeFormat = parseTimeFormat(field.timeFormat)
-  const combinedFormat =
-    typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat
-  if (typeof val === 'string') {
-    const date = moment.utc(val, combinedFormat)
-    return date.isValid() ? date.format(combinedFormat) : val
-  }
-  return moment.utc(val).format(combinedFormat)
+  return moment.utc(val).format();
 }
 
 function parseDateFormat(format: string | boolean | undefined): string {
