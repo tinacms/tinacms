@@ -32,7 +32,7 @@ export const NoFormsPlaceholder = () => (
     </p>
     <p>
       <LinkButton
-        href="https://tinacms.org/docs/getting-started/introduction/#get-started"
+        href="https://tina.io/docs/forms/"
         target="_blank"
       >
         <Emoji>📖</Emoji> Form Setup Guide
