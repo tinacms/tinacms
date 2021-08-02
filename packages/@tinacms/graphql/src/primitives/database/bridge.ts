@@ -33,13 +33,11 @@ export class FilesystemBridge implements Bridge {
       dot: true,
     })
     const posixRootPath = normalize(this.rootPath)
-    console.log({rootPath: this.rootPath})
     return items.map((item) => {
       return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
   }
   public get = async (filepath: string) => {
-    console.log({filepath})
     return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
   }
   public put = async (filepath: string, data: string) => {
