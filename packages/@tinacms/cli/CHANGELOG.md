@@ -1,5 +1,15 @@
 # tinacms-cli
 
+## 0.52.0
+
+### Minor Changes
+
+- d6dd2886: Added styles to generated files from CLI
+
+### Patch Changes
+
+- 853330c1: Fix issue where NEXT_PUBLIC_EDIT_BRANCH was actually NEXT_PUBLIC_EDIT_BRACH in generated file
+
 ## 0.51.1
 
 ### Patch Changes
