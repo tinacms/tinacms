@@ -649,7 +649,11 @@ const resolveDateInput = (
     throw 'Invalid Date'
   }
   
-  return value
+  const dateUTC = new Date(
+    date.valueOf() + date.getTimezoneOffset() * 60 * 1000
+  )
+  
+  return dateUTC.toUTCString()
 }
 
 type FieldParams = {
