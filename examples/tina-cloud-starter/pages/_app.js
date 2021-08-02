@@ -41,6 +41,13 @@ const App = ({ Component, pageProps }) => {
                 );
               },
             }}
+            formifyCallback={({ formConfig, createForm, createGlobalForm }) => {
+              if (formConfig.id === "getGlobalDocument") {
+                return createGlobalForm(formConfig);
+              }
+
+              return createForm(formConfig);
+            }}
             {...pageProps}
           >
             {(livePageProps) => (

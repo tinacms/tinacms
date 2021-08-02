@@ -15,7 +15,7 @@ import React from 'react'
 import gql from 'graphql-tag'
 import { print } from 'graphql'
 import { getIn, setIn } from 'final-form'
-import { useCMS, Form } from '@tinacms/toolkit'
+import { useCMS, Form, GlobalFormPlugin } from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
@@ -207,11 +207,7 @@ export function useGraphqlForms<T extends object>({
               }
             },
           }
-          const createForm = (formConfig) => {
-            const form = new Form(formConfig)
-            cms.forms.add(form)
-            return form
-          }
+          const { createForm, createGlobalForm } = generateFormCreators(cms)
           const SKIPPED = 'SKIPPED'
           let form
           let skipped
@@ -221,7 +217,10 @@ export function useGraphqlForms<T extends object>({
           if (skipped) return
 
           if (formify) {
-            form = formify({ formConfig, createForm, skip }, cms)
+            form = formify(
+              { formConfig, createForm, createGlobalForm, skip },
+              cms
+            )
           } else {
             form = createForm(formConfig)
           }
@@ -360,9 +359,25 @@ const getFieldUpdate = (newUpdate, activeForm, formValues) => {
   return currentFields
 }
 
+const generateFormCreators = (cms: TinaCMS) => {
+  const createForm = (formConfig) => {
+    const form = new Form(formConfig)
+    cms.forms.add(form)
+    return form
+  }
+  const createGlobalForm = (formConfig) => {
+    const form = new Form(formConfig)
+    cms.plugins.add(new GlobalFormPlugin(form))
+    return form
+  }
+  return { createForm, createGlobalForm }
+}
+
+type FormCreator = (formConfig: FormOptions<any>) => Form
 export interface FormifyArgs {
   formConfig: FormOptions<any>
-  createForm: (formConfig: FormOptions<any>) => Form
+  createForm: FormCreator
+  createGlobalForm: FormCreator
   skip?: () => void
 }
 
