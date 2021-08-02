@@ -201,7 +201,6 @@ export class Resolver {
             await this.database.put(realPath, {
               _template: lastItem(template.namespace),
             })
-            return this.getDocument(realPath)
         }
       }
       const templateInfo =
@@ -530,8 +529,9 @@ export class Resolver {
       case 'string':
         if (field.options) {
           if (field.list) {
+            // FIXME: this is awaiting checkbox suppport
             return {
-              component: 'checkbox-group',
+              component: 'checkbox',
               ...field,
               ...extraFields,
               options: field.options,

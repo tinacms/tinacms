@@ -3,7 +3,7 @@ import Link from "next/link";
 import Markdown from "react-markdown";
 import { BsArrowRight } from "react-icons/bs";
 import { ThemeContext } from "./theme";
-import moment from 'moment';
+import format from 'date-fns/format'
 
 export const Posts = ({ data }) => {
   const theme = React.useContext(ThemeContext);
@@ -23,7 +23,7 @@ export const Posts = ({ data }) => {
       {data.map((postData) => {
         const post = postData.node;
         const date = Date.parse(post.values.date)
-        const formattedDate = moment.utc(date).format('MMM DD, yyyy')
+        const formattedDate = format(date, 'MMM dd, yyyy')
 
         return (
           <Link
