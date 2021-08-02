@@ -285,7 +285,7 @@ export function useGraphqlForms<T extends object>({
         cms.alerts.error('There was a problem setting up forms for your query')
         console.error(e)
       })
-  }, [queryString])
+  }, [queryString, JSON.stringify(variables)])
 
   return [data as T, isLoading]
 }
