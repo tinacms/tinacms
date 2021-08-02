@@ -1,6 +1,10 @@
 name: Build, Test, Lint for Pull Requests
 
-on: [pull_request]
+on:
+  pull_request:
+  push:
+    branches:
+      - changeset-release/**
 
 jobs:
   build:
