@@ -92,7 +92,7 @@ export class TinaSchema {
   }
   public getCollectionByFullPath = async (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
-      return filepath.startsWith(collection.path)
+      return filepath.startsWith( collection.path)
     })
     if (!collection) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
@@ -108,7 +108,7 @@ export class TinaSchema {
   }> => {
     let template
     const collection = this.getCollections().find((collection) => {
-      return filepath.startsWith(collection.path)
+      return filepath.replace('\\','/').startsWith(collection.path)
     })
     if (!collection) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
