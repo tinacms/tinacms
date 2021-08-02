@@ -656,7 +656,8 @@ const resolveDateInput = (
   const dateUTC = new Date(
     date.valueOf() + date.getTimezoneOffset() * 60 * 1000
   )
-
+  
+  return dateUTC.toUTCString()
   /**
    * Determine dateFormat
    * This involves fixing inconsistencies between `moment.js` (that Tina uses to format dates)
