@@ -1,5 +1,16 @@
 # tinacms
 
+## 0.51.0
+
+### Minor Changes
+
+- 6dfbfed0: Added variables to useGraphqlForms dependencies in order to update data when variables change
+
+### Patch Changes
+
+- Updated dependencies [e074d555]
+  - @tinacms/toolkit@0.50.1
+
 ## 0.50.1
 
 ### Patch Changes
