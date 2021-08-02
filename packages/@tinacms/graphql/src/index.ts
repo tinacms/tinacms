@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export { GithubBridge } from './primitives/database/github'
+export { GithubBridge, GithubManagerInit } from './primitives/database/github'
 export {
   gql,
   resolve,
@@ -22,9 +22,9 @@ export {
 } from './primitives'
 import { clearCache as s3ClearCache, s3Cache } from './cache/s3'
 
-import { clearCache as lruClearCache } from './cache/lru'
+import { clearCache as lruClearCache, simpleCache} from './cache/lru'
 
-export { lruClearCache, lruClearCache as clearCache, s3ClearCache, s3Cache }
+export { lruClearCache, lruClearCache as clearCache, s3ClearCache, s3Cache, simpleCache }
 
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
