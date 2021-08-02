@@ -18,7 +18,7 @@ import { Bridge } from './bridge'
 import LRU from 'lru-cache'
 import { GraphQLError } from 'graphql'
 
-type GithubManagerInit = {
+export type GithubManagerInit = {
   rootPath: string
   accessToken: string
   owner: string
@@ -58,10 +58,10 @@ export class GithubBridge implements Bridge {
       auth: accessToken,
     })
   }
-  private generateKey = (key: string) => {
+  private generateKey (key: string) {
     return `${this.repoConfig.owner}/${this.repoConfig.repo}/${this.repoConfig.ref}/${key}`
   }
-  private readDir = async (filepath: string): Promise<string[]> => {
+  private async readDir (filepath: string): Promise<string[]> {
     const fullPath = path.join(this.rootPath, filepath)
     return _.flatten(
       (
@@ -102,7 +102,7 @@ export class GithubBridge implements Bridge {
     )
   }
 
-  public glob = async (pattern: string) => {
+  public async glob (pattern: string) {
     const results = await this.readDir(pattern)
     // Remove rootPath and any surround slashes
     return results.map(item =>
@@ -110,7 +110,7 @@ export class GithubBridge implements Bridge {
     )
   }
 
-  public get = async (filepath: string) => {
+  public async get (filepath: string) {
     const realpath = path.join(this.rootPath, filepath)
     return this.cache.get(this.generateKey(realpath), async () => {
       return this.appOctoKit.repos
@@ -131,7 +131,7 @@ export class GithubBridge implements Bridge {
         })
     })
   }
-  public put = async (filepath: string, data: string) => {
+  public async put (filepath: string, data: string) {
     const realpath = path.join(this.rootPath, filepath)
     // check if the file exists
     let fileSha = undefined
