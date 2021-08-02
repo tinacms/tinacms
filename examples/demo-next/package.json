@@ -3,7 +3,7 @@
   "private": true,
   "description": "A simple starter to get up and developing quickly with Next.js",
   "license": "Apache-2.0",
-  "version": "0.43.3",
+  "version": "0.43.4",
   "author": "Kendall Strautman",
   "scripts": {
     "dev-next": "next",
