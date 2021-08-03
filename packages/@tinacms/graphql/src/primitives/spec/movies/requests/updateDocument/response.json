@@ -3,7 +3,7 @@
     "updateDocument": {
       "id": "content/movies/star-wars.md",
       "data": {
-        "releaseDate": "Tue, 02 Feb 2021 14:00:00 GMT",
+        "releaseDate": "Tue, 02 Feb 2021 00:00:00 GMT",
         "archived": true,
         "genre": "action"
       }
