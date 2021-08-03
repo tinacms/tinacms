@@ -321,9 +321,12 @@ export const nextPostPage =
   
 `
 
-export const AppJsContent = `import dynamic from 'next/dynamic'
+export const AppJsContent = (
+  extraImports?: string
+) => `import dynamic from 'next/dynamic'
 import { TinaEditProvider } from 'tinacms/dist/edit-state'
 const TinaCMS = dynamic(() => import('tinacms'), { ssr: false })
+${extraImports || ''}
 
 const App = ({ Component, pageProps }) => {
   return (
