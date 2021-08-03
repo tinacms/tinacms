@@ -42,7 +42,7 @@ export class FilesystemBridge implements Bridge {
 }
 
 export interface Bridge {
-  glob: (pattern: string) => Promise<string[]>
-  get: (filepath: string) => Promise<string>
-  put: (filepath: string, data: string) => Promise<void>
+  glob(pattern: string): Promise<string[]>
+  get(filepath: string): Promise<string>
+  put(filepath: string, data: string): Promise<void>
 }
