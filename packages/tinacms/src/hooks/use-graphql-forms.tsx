@@ -346,8 +346,9 @@ const getFieldUpdate = (newUpdate, activeForm, formValues) => {
       [newUpdate.queryName, 'values', lookupName].join('.')
     )
     if (isNaN(Number(item))) {
-      const field = currentFields.find((field) => field.name === item)
-      currentFields = field
+      if (Array.isArray(currentFields)) {
+        currentFields = currentFields.find((field) => field.name === item)
+      }
     } else {
       // Get templatable for polymorphic or homogenous
       const template = currentFields.templates
