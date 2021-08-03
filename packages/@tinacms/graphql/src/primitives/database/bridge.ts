@@ -25,7 +25,7 @@ export class FilesystemBridge implements Bridge {
   constructor(rootPath: string) {
     this.rootPath = rootPath || ''
   }
-  public glob = async (pattern: string) => {
+  public async glob(pattern: string) {
     const items = await fg(path.join(this.rootPath, pattern, '**/*'), {
       dot: true,
     })
@@ -33,10 +33,10 @@ export class FilesystemBridge implements Bridge {
       return item.replace(this.rootPath, '').replace(/^\/|\/$/g, '')
     })
   }
-  public get = async (filepath: string) => {
+  public async get(filepath: string) {
     return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
   }
-  public put = async (filepath: string, data: string) => {
+  public async put(filepath: string, data: string) {
     await fs.outputFileSync(path.join(this.rootPath, filepath), data)
   }
 }

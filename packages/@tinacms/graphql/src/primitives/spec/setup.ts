@@ -30,7 +30,7 @@ export class InMemoryBridge implements Bridge {
   constructor(rootPath: string) {
     this.rootPath = rootPath
   }
-  public glob = async (pattern: string) => {
+  public async glob(pattern: string) {
     const items = await fg(path.join(this.rootPath, pattern, '**/*'), {
       dot: true,
     })
@@ -38,7 +38,7 @@ export class InMemoryBridge implements Bridge {
       return item.replace(this.rootPath, '')
     })
   }
-  public get = async (filepath: string) => {
+  public async get(filepath: string) {
     const mockData = await this.getMockData()
     const value = mockData[filepath]
     if (!value) {
@@ -46,7 +46,7 @@ export class InMemoryBridge implements Bridge {
     }
     return value
   }
-  public put = async (filepath: string, data: string) => {
+  public async put(filepath: string, data: string) {
     const mockData = await this.getMockData()
     this.mockFileSystem = { ...mockData, [filepath]: data }
   }
