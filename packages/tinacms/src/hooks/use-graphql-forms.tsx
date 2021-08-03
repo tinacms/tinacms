@@ -174,7 +174,7 @@ export function useGraphqlForms<T extends object>({
           )
           const formConfig = {
             id: queryName,
-            label: queryName,
+            label: result.form.label,
             initialValues: result.values,
             fields: result.form.fields,
 
