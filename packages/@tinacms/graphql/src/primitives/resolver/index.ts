@@ -201,7 +201,6 @@ export class Resolver {
             await this.database.put(realPath, {
               _template: lastItem(template.namespace),
             })
-            return this.getDocument(realPath)
         }
       }
       const templateInfo =
@@ -530,8 +529,9 @@ export class Resolver {
       case 'string':
         if (field.options) {
           if (field.list) {
+            // FIXME: this is awaiting checkbox suppport
             return {
-              component: 'checkbox-group',
+              component: 'checkbox',
               ...field,
               ...extraFields,
               options: field.options,
@@ -636,7 +636,6 @@ export class Resolver {
   }
 }
 
-const DEFAULT_DATE_FORMAT = 'MMM dd, yyyy'
 const resolveDateInput = (
   value: string,
   field: { dateFormat?: string; timeFormat?: string }
@@ -645,40 +644,16 @@ const resolveDateInput = (
    * Convert string to `new Date()`
    */
   const date = parseISO(value)
+  
   if (!isValid(date)) {
     throw 'Invalid Date'
   }
-
-  /**
-   * Remove any local timezone offset (putting the date back in UTC)
-   * https://stackoverflow.com/questions/48172772/time-zone-issue-involving-date-fns-format
-   */
+  
   const dateUTC = new Date(
     date.valueOf() + date.getTimezoneOffset() * 60 * 1000
   )
   
   return dateUTC.toUTCString()
-  /**
-   * Determine dateFormat
-   * This involves fixing inconsistencies between `moment.js` (that Tina uses to format dates)
-   * and `date-fns` (that Gateway uses to format dates).
-   * They are explained here:
-   * https://github.com/date-fns/date-fns/blob/master/docs/unicodeTokens.md
-   */
-  const dateFormat = field.dateFormat || DEFAULT_DATE_FORMAT
-  const fixedDateFormat = dateFormat.replace(/D/g, 'd').replace(/Y/g, 'y')
-
-  /**
-   * Determine timeFormat, if any
-   */
-  const timeFormat = field.timeFormat || false
-
-  /**
-   * Format `date` and `time` parts
-   */
-  const datePart = format(dateUTC, fixedDateFormat)
-  const timePart = timeFormat ? ` ${format(dateUTC, timeFormat)}` : ''
-  return `${datePart}${timePart}`
 }
 
 type FieldParams = {
