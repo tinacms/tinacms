@@ -87,7 +87,7 @@ export class Resolver {
         .replace(/^\/|\/$/g, '')
       const breadcrumbs = filename.split('/')
       const form = {
-        label: basename,
+        label: collection.label,
         name: basename,
         fields: await sequential(template.fields, async (field) => {
           // fieldNode.selectionSet?.selections.find(selection => {
