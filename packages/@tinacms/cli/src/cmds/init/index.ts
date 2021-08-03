@@ -121,16 +121,9 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
       const fileContent = fs.pathExistsSync(appPath)
         ? readFileSync(appPath)
         : readFileSync(appPathTS)
-      console.log({ fileContent: fileContent.toString() })
       const matches = [
         ...fileContent.toString().matchAll(/^.*import.*\.css".*$/gm),
       ]
-      console.log({
-        matches,
-      })
-      console.log({
-        content: AppJsContent(matches.join('/n')),
-      })
       fs.writeFileSync(appPathWithExtension, AppJsContent(matches.join('/n')))
     } else {
       wrapper = true
