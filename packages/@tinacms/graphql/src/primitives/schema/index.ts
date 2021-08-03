@@ -52,7 +52,9 @@ export class TinaSchema {
       collectionNames.includes(collection.name)
     )
   }
-  public getCollection = (collectionName: string) => {
+  public getCollection = (
+    collectionName: string
+  ): TinaCloudCollection<true> => {
     const collection = this.schema.collections.find(
       (collection) => collection.name === collectionName
     )
@@ -70,6 +72,7 @@ export class TinaSchema {
         break
     }
     return {
+      // @ts-ignore FIXME: backwards compatibility, using `slug` should probably be deprecated
       slug: collection.name,
       ...extraFields,
       ...collection,
@@ -77,7 +80,11 @@ export class TinaSchema {
     }
   }
   public getCollections = () => {
-    return this.schema.collections || []
+    return (
+      this.schema.collections.map((collection) =>
+        this.getCollection(collection.name)
+      ) || []
+    )
   }
   public getGlobalTemplate = (templateName: string) => {
     const globalTemplate = this.schema.templates?.find(
@@ -176,6 +183,18 @@ export class TinaSchema {
         }
         return template
     }
+  }
+  public isMarkdownCollection = (collectionName: string) => {
+    const collection = this.getCollection(collectionName)
+    const format = collection.format
+    // markdown by default
+    if (!format) {
+      return true
+    }
+    if (['markdown', 'md'].includes(format)) {
+      return true
+    }
+    return false
   }
 
   /**
