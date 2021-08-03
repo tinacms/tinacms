@@ -380,8 +380,6 @@ export class Resolver {
     const value = rawData[field.name]
     switch (field.type) {
       case 'string':
-        accumulator[field.name] = field.isBody ? rawData._body : value
-        break
       case 'boolean':
       case 'datetime':
       case 'number':
