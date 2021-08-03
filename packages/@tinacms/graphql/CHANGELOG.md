@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 0.51.0
+
+### Minor Changes
+
+- 5a934f6b: Fixed windows path issues
+
+### Patch Changes
+
+- 271a72d7: Use collection label (defined in schema.ts) as form label
+
 ## 0.50.2
 
 ### Patch Changes

@@ -1,5 +1,17 @@
 # tina-cloud-starter
 
+## 0.1.4
+
+### Patch Changes
+
+- d31df43d: Handles situations where `currentFields` is not an Array
+- Updated dependencies [8a20437c]
+- Updated dependencies [d31df43d]
+- Updated dependencies [271a72d7]
+  - tinacms@0.52.0
+  - next-tinacms-cloudinary@3.1.1
+  - react-tinacms-editor@0.51.1
+
 ## 0.1.3
 
 ### Patch Changes
