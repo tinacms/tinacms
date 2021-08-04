@@ -1,5 +1,12 @@
 # tinacms-cli
 
+## 0.52.2
+
+### Patch Changes
+
+- Updated dependencies [589c7806]
+  - @tinacms/graphql@0.51.1
+
 ## 0.52.1
 
 ### Patch Changes
