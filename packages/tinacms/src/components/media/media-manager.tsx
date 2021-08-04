@@ -1,20 +1,20 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
+ Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
-*/
+ */
 
 import React from 'react'
 import { useEffect, useState } from 'react'
@@ -35,8 +35,11 @@ import { LoadingDots } from '@tinacms/form-builder'
 
 export interface MediaRequest {
   directory?: string
+
   onSelect?(media: Media): void
+
   close?(): void
+
   allowDelete?: boolean
   currentTab?: number
   setAllTabs?: (tabsArray: string[]) => void
@@ -72,21 +75,21 @@ export function MediaManager() {
 type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured'
 
 export function MediaPicker({
-  allowDelete,
-  onSelect,
-  close,
-  currentTab,
-  setAllTabs,
+                              allowDelete,
+                              onSelect,
+                              close,
+                              currentTab,
+                              setAllTabs,
 
-  ...props
-}: MediaRequest) {
+                              ...props
+                            }: MediaRequest) {
   const cms = useCMS()
   const [listState, setListState] = useState<MediaListState>(() => {
     if (cms.media.isConfigured) return 'loading'
     return 'not-configured'
   })
   const [directory, setDirectory] = useState<string | undefined>(
-    props.directory
+    props.directory,
   )
 
   const [list, setList] = useState<MediaList>({
@@ -113,7 +116,6 @@ export function MediaPicker({
   const hasNext = !!list.nextOffset
 
 
-
   useEffect(() => {
     if (setAllTabs) {
       setAllTabs(['Client', 'Einstein', 'Files'])
@@ -125,7 +127,7 @@ export function MediaPicker({
     function loadMedia() {
       setListState('loading')
       cms.media
-        .list({ offset, limit: cms.media.pageSize, directory,  currentList: currentTab })
+        .list({ offset, limit: cms.media.pageSize, directory, currentList: currentTab })
         .then(list => {
           setList(list)
           setListState('loaded')
@@ -140,7 +142,7 @@ export function MediaPicker({
 
     return cms.events.subscribe(
       ['media:upload:success', 'media:delete:success', 'media:pageSize'],
-      loadMedia
+      loadMedia,
     )
   }, [offset, directory, currentTab])
 
@@ -182,7 +184,7 @@ export function MediaPicker({
               directory: directory || '/',
               file,
             }
-          }), currentTab
+          }), currentTab,
         )
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
@@ -209,12 +211,24 @@ export function MediaPicker({
   }
 
   if (listState === 'not-configured') {
-    return <DocsLink title="Please Set up a Media Store" />
+    return <DocsLink title='Please Set up a Media Store' />
   }
 
   if (listState === 'error') {
-    return <DocsLink title="Failed to Load Media" />
+    return <DocsLink title='Failed to Load Media' />
   }
+
+  // https://einsteinindustries.atlassian.net/browse/LUC-778
+  // 4 images per line -> sub array of length: 4
+  const listByFour: Media[][] = []
+  let tmp: Media[] = []
+  list.items.forEach((item, idx) => {
+    tmp.push(item)
+    if ((idx + 1) % 4 === 0 || idx + 1 === list.items.length) {
+      listByFour.push(tmp)
+      tmp = []
+    }
+  })
 
   return (
     <MediaPickerWrap>
@@ -229,15 +243,21 @@ export function MediaPicker({
           <EmptyMediaList />
         )}
 
-        {list.items.map((item: Media) => (
-          <MediaItem
-            key={item.id}
-            item={item}
-            onClick={onClickMediaItem}
-            onSelect={selectMediaItem}
-            onDelete={deleteMediaItem}
-          />
-        ))}
+        {listByFour.map((four: Media[]) => <div key={four[0].id} style={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}>
+            {four.map((item: Media) => (
+              <MediaItem
+                key={item.id}
+                item={item}
+                onClick={onClickMediaItem}
+                onSelect={selectMediaItem}
+                onDelete={deleteMediaItem}
+              />
+            ))}
+          </div>,
+        )}
       </List>
 
       <CursorPaginator
@@ -332,11 +352,11 @@ const List = styled.ul<ListProps>`
   overflow-x: hidden;
 
   ${p =>
-    p.dragActive &&
-    css`
-      border: 2px solid var(--tina-color-primary);
-      border-radius: var(--tina-radius-small);
-    `}
+          p.dragActive &&
+          css`
+            border: 2px solid var(--tina-color-primary);
+            border-radius: var(--tina-radius-small);
+          `}
 `
 
 const EmptyMediaList = styled(props => {
@@ -355,7 +375,7 @@ const DocsLink = styled(({ title, ...props }) => {
       <div>
         {' '}
         Visit the{' '}
-        <a href="https://tinacms.org/docs/media" rel="noreferrer noopener">
+        <a href='https://tinacms.org/docs/media' rel='noreferrer noopener'>
           docs
         </a>{' '}
         to learn more about setting up the Media Manager for your CMS.
@@ -368,6 +388,7 @@ const DocsLink = styled(({ title, ...props }) => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+
   a {
     color: black;
     text-decoration: underline;
