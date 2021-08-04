@@ -29,7 +29,6 @@ const tinaSchema: TinaCloudSchema<false> = {
           name: 'releaseDate',
           label: 'Release Date',
           type: 'datetime',
-          dateFormat: 'YYYY MM DD',
         },
         {
           name: 'rating',

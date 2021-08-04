@@ -3,6 +3,7 @@ import Markdown from "react-markdown";
 import { Container } from "./container";
 import { Section } from "./section";
 import { ThemeContext } from "./theme";
+import format from 'date-fns/format'
 
 export const Post = ({ data }) => {
   const theme = React.useContext(ThemeContext);
@@ -19,6 +20,9 @@ export const Post = ({ data }) => {
     yellow:
       "from-yellow-400 to-yellow-500 dark:from-yellow-300 dark:to-yellow-500",
   };
+  const date = new Date(data.date)
+  const dateUTC = date.valueOf() + date.getTimezoneOffset() * 60 * 1000
+  const formattedDate = format(dateUTC, 'MMM dd, yyyy')
 
   return (
     <Section className="flex-1">
@@ -54,7 +58,7 @@ export const Post = ({ data }) => {
             </>
           )}
           <p className="text-base text-gray-400 group-hover:text-gray-500 dark:text-gray-300 dark:group-hover:text-gray-150">
-            {data.date}
+            {formattedDate}
           </p>
         </div>
       </Container>

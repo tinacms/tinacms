@@ -126,16 +126,13 @@ If you'd like to control the output of those forms, tap into the `formify` callb
 
 ```tsx
 import { useGraphqlForms } from "tinacms";
-import { Form, GlobalFormPlugin, useCMS } from "tinacms";
+import { useCMS } from "tinacms";
 
 const [payload, isLoading] = useGraphqlForms({
   query,
-  formify: ({ formConfig, createForm, skip }) => {
+  formify: ({ formConfig, createForm, createGlobalForm, skip }) => {
     if (formConfig.id === "getSiteNavsDocument") {
-      const form = new Form(formConfig);
-      // The site nav will be a global plugin
-      cms.plugins.add(new GlobalFormPlugin(form));
-      return form;
+      return createGlobalForm(formConfig);
     }
 
     return createForm(formConfig);

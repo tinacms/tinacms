@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.50.2",
+  "version": "0.51.0",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
@@ -32,6 +32,7 @@
     "js-yaml": "^3.14.0",
     "lodash": "^4.17.20",
     "lru-cache": "^6.0.0",
+    "normalize-path": "^3.0.0",
     "prettier": "^2.2.1",
     "rehype-format": "^3.1.0",
     "rehype-stringify": "^8.0.0",
@@ -66,6 +67,7 @@
     "@types/lodash.camelcase": "^4.3.6",
     "@types/lodash.upperfirst": "^4.3.6",
     "@types/lru-cache": "^5.1.0",
+    "@types/normalize-path": "^3.0.0",
     "@types/ws": "^7.2.6",
     "@types/yup": "^0.29.7",
     "esbuild": "0.12.10",

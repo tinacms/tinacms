@@ -86,7 +86,7 @@ export const Header = ({ data }) => {
                     : windowUrl.includes(item.href);
                 return (
                   <li
-                    key={item.label}
+                    key={`${item.label}-${i}`}
                     className={activeItem ? activeItemClasses[theme.color] : ""}
                   >
                     <Link href={`${prefix}/${item.href}`} passHref>

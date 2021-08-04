@@ -14,6 +14,7 @@ limitations under the License.
 import fs from 'fs-extra'
 import fg from 'fast-glob'
 import path from 'path'
+import normalize from 'normalize-path'
 
 /**
  * This is the bridge from whatever datasource we need for I/O.
@@ -26,11 +27,16 @@ export class FilesystemBridge implements Bridge {
     this.rootPath = rootPath || ''
   }
   public async glob(pattern: string) {
-    const items = await fg(path.join(this.rootPath, pattern, '**/*'), {
-      dot: true,
-    })
+    const basePath = path.join(this.rootPath, ...pattern.split('/'))
+    const items = await fg(
+      path.join(basePath, '**', '/*').replace(/\\/g, '/'),
+      {
+        dot: true,
+      }
+    )
+    const posixRootPath = normalize(this.rootPath)
     return items.map((item) => {
-      return item.replace(this.rootPath, '').replace(/^\/|\/$/g, '')
+      return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
   }
   public async get(filepath: string) {
