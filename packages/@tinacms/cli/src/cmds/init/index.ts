@@ -139,7 +139,7 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   // 3. Create a /page/blog/[slug].tsx file with all of the Tina pieces wrapped up in one file
 
   const tinaBlogPagePath = p.join(pagesPath, 'demo', 'blog')
-  const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].tsx')
+  const tinaBlogPagePathFile = p.join(tinaBlogPagePath, '[filename].js')
   if (!fs.pathExistsSync(tinaBlogPagePathFile)) {
     fs.mkdirpSync(tinaBlogPagePath)
     fs.writeFileSync(tinaBlogPagePathFile, nextPostPage())
