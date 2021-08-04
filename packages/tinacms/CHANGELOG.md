@@ -1,5 +1,27 @@
 # tinacms
 
+## 0.52.0
+
+### Minor Changes
+
+- 8a20437c: Expose a createGlobalForm function in formifyCallback that creates a screen plugin
+
+### Patch Changes
+
+- d31df43d: Handles situations where `currentFields` is not an Array
+- 271a72d7: Use collection label (defined in schema.ts) as form label
+
+## 0.51.0
+
+### Minor Changes
+
+- 6dfbfed0: Added variables to useGraphqlForms dependencies in order to update data when variables change
+
+### Patch Changes
+
+- Updated dependencies [e074d555]
+  - @tinacms/toolkit@0.50.1
+
 ## 0.50.1
 
 ### Patch Changes

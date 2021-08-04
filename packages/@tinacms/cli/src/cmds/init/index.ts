@@ -105,24 +105,32 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
   if (!fs.pathExistsSync(appPath) && !fs.pathExistsSync(appPathTS)) {
     // if they don't have a _app.js or an _app.tsx just make one
     logger.info(logText('Adding _app.js ... ✅'))
-    fs.writeFileSync(appPath, AppJsContent)
+    fs.writeFileSync(appPath, AppJsContent())
   } else {
     // Ask the user if they want to update there _app.js
     const override = await prompts({
       name: 'res',
       type: 'confirm',
-      message: `do you want us to override your _app${appExtension}?`,
+      message: `do you want us to ${chalk.bold(
+        `override`
+      )} your _app${appExtension}?`,
     })
     if (override.res) {
       logger.info(logText(`Adding _app${appExtension} ... ✅`))
       const appPathWithExtension = p.join(pagesPath, `_app${appExtension}`)
-      fs.writeFileSync(appPathWithExtension, AppJsContent)
+      const fileContent = fs.pathExistsSync(appPath)
+        ? readFileSync(appPath)
+        : readFileSync(appPathTS)
+      const matches = [
+        ...fileContent.toString().matchAll(/^.*import.*\.css".*$/gm),
+      ]
+      fs.writeFileSync(appPathWithExtension, AppJsContent(matches.join('/n')))
     } else {
       wrapper = true
       logger.info(
         dangerText(
           `Heads up, to enable live-editing you'll need to wrap your page or site in Tina:\n`,
-          warnText(AppJsContent)
+          warnText(AppJsContent())
         )
       )
     }

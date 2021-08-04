@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.50.1
+
+### Patch Changes
+
+- e074d555: fix: link to forms guide
+
 ## 0.50.0
 
 ### Minor Changes
