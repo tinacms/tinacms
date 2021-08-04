@@ -41,6 +41,13 @@ export async function startServer(
       const ps = childProcess.spawn(firstCommand, args, {
         stdio: 'inherit',
       })
+      ps.on("error", (code) =>{
+        logger.error(dangerText(`An error has occured in the Next.js child process. Error message bellow`))
+        logger.error(`name: ${code.name}
+message: ${code.message}
+
+stack: ${code.stack || "No stack was provided"}`)
+      })
       ps.on('close', code => {
         logger.info(`child process exited with code ${code}`)
         process.exit(code)
