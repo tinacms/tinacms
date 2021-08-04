@@ -43,7 +43,7 @@ export async function startServer(
         shell: true,
       })
       ps.on("error", (code) =>{
-        logger.error(dangerText(`An error has occured in the Next.js child process. Error message bellow`))
+        logger.error(dangerText(`An error has occurred in the Next.js child process. Error message below`))
         logger.error(`name: ${code.name}
 message: ${code.message}
 
