@@ -118,7 +118,6 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
               file,
             },
           ])
-          console.log({media})
           onChange(media)
         }}
         onClear={onClear}
