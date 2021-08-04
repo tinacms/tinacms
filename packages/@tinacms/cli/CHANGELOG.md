@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.53.0
+
+### Minor Changes
+
+- 35d6f5e7: Added better error handleing for childProcess
+
 ## 0.52.2
 
 ### Patch Changes
