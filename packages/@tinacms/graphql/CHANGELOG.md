@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.51.1
+
+### Patch Changes
+
+- 589c7806: Fix issue where the `isBody` field wasn't properly removing that value from frontmatter. Ensure that the field is not treating any differently for JSON format
+
 ## 0.51.0
 
 ### Minor Changes
