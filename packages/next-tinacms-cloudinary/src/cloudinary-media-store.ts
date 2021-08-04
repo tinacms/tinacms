@@ -44,14 +44,18 @@ export class CloudinaryMediaStore implements MediaStore {
       throw new Error(responseData.message)
     }
     const fileRes = await res.json()
+    /**
+     * Format the response from Cloudinary to match Media interface
+     */
+    const parsedRes: Media = {
+      type: fileRes.resource_type === 'image' ? 'file' : 'dir',
+      id: fileRes.public_id,
+      filename: fileRes.original_filename,
+      directory: '/',
+      previewSrc: fileRes.url
 
-    // TODO: be programmer
-    // NOTE: why do we need this?
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2000)
-    })
-
-    return []
+    }
+    return [parsedRes]
   }
   async delete(media: Media) {
     await this.fetchFunction(
@@ -90,7 +94,6 @@ export class CloudinaryMediaStore implements MediaStore {
   }
 
   parse = (img) => {
-    console.log({ img })
     return img.previewSrc
   }
 
