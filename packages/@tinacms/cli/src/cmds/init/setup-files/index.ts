@@ -191,7 +191,7 @@ export const nextPostPage =
           }
         }
       \`,
-    })) as any;
+    }));
   
     return {
       paths: postsListData.getPostsList.edges.map((post) => ({
@@ -203,7 +203,7 @@ export const nextPostPage =
   
   export default BlogPage;
   
-  const ContentSection: React.FC<{ content: string }> = ({ content }) => {
+  const ContentSection = ({ content }) => {
     return (
       <div className="relative py-16 bg-white overflow-hidden">
         <div className="hidden lg:block lg:absolute lg:inset-y-0 lg:h-full lg:w-full">
