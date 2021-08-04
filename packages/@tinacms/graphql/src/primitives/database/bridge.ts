@@ -16,7 +16,6 @@ import fg from 'fast-glob'
 import path from 'path'
 import normalize from 'normalize-path'
 
-
 /**
  * This is the bridge from whatever datasource we need for I/O.
  * The basic example here is for the filesystem, one is needed
@@ -27,26 +26,29 @@ export class FilesystemBridge implements Bridge {
   constructor(rootPath: string) {
     this.rootPath = rootPath || ''
   }
-  public glob = async (pattern: string) => {
+  public async glob(pattern: string) {
     const basePath = path.join(this.rootPath, ...pattern.split('/'))
-    const items = await fg( path.join(basePath, '**','/*').replace(/\\/g, '/'), {
-      dot: true,
-    })
+    const items = await fg(
+      path.join(basePath, '**', '/*').replace(/\\/g, '/'),
+      {
+        dot: true,
+      }
+    )
     const posixRootPath = normalize(this.rootPath)
     return items.map((item) => {
       return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
   }
-  public get = async (filepath: string) => {
+  public async get(filepath: string) {
     return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
   }
-  public put = async (filepath: string, data: string) => {
+  public async put(filepath: string, data: string) {
     await fs.outputFileSync(path.join(this.rootPath, filepath), data)
   }
 }
 
 export interface Bridge {
-  glob: (pattern: string) => Promise<string[]>
-  get: (filepath: string) => Promise<string>
-  put: (filepath: string, data: string) => Promise<void>
+  glob(pattern: string): Promise<string[]>
+  get(filepath: string): Promise<string>
+  put(filepath: string, data: string): Promise<void>
 }
