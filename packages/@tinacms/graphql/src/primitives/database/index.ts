@@ -53,18 +53,40 @@ export class Database {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
       const contentString = await this.bridge.get(filepath)
-      const contentObject = this.parseFile<{ _template?: string }>(
+      const contentObject = this.parseFile<{ [key: string]: unknown }>(
         contentString,
         extension,
         (yup) => yup.object({})
       )
+      const templateName =
+        hasOwnProperty(contentObject, '_template') &&
+        typeof contentObject._template === 'string'
+          ? contentObject._template
+          : undefined
       const { collection, template } =
         await tinaSchema.getCollectionAndTemplateByFullPath(
           filepath,
-          contentObject._template
+          templateName
         )
+      const field = template.fields.find((field) => {
+        if (field.type === 'string') {
+          if (field.isBody) {
+            return true
+          }
+        }
+        return false
+      })
+
+      let data = contentObject
+      if (extension === '.md' && field) {
+        if (hasOwnProperty(contentObject, '$_body')) {
+          const { $_body, ...rest } = contentObject
+          data = rest
+          data[field.name] = $_body
+        }
+      }
       return {
-        ...contentObject,
+        ...data,
         _collection: collection.name,
         _template: lastItem(template.namespace),
         _relativePath: filepath
@@ -75,7 +97,7 @@ export class Database {
     }
   }
 
-  public put = async (filepath: string, data: object) => {
+  public put = async (filepath: string, data: { [key: string]: unknown }) => {
     if (SYSTEM_FILES.includes(filepath)) {
       await this.bridge.put(
         path.join(GENERATED_FOLDER, `${filepath}.json`),
@@ -88,9 +110,46 @@ export class Database {
       const templateInfo = await tinaSchema.getTemplatesForCollectable(
         collection
       )
+      let template
+      if (templateInfo.type === 'object') {
+        template = templateInfo.template
+      }
+      if (templateInfo.type === 'union') {
+        if (hasOwnProperty(data, '_template')) {
+          template = templateInfo.templates.find(
+            (t) => lastItem(t.namespace) === data._template
+          )
+        } else {
+          throw new Error(
+            `Expected _template to be provided for document in an ambiguous collection`
+          )
+        }
+      }
+      if (!template) {
+        throw new Error(`Unable to determine template`)
+      }
+      const field = template.fields.find((field) => {
+        if (field.type === 'string') {
+          if (field.isBody) {
+            return true
+          }
+        }
+        return false
+      })
+      let payload: { [key: string]: unknown } = {}
+      if (collection.format === 'md' && field) {
+        Object.entries(data).forEach(([key, value]) => {
+          if (key !== field.name) {
+            payload[key] = value
+          }
+        })
+        payload['$_body'] = data[field.name]
+      } else {
+        payload = data
+      }
       const extension = path.extname(filepath)
       const stringData = this.stringifyFile(
-        data,
+        payload,
         extension,
         templateInfo.type === 'union'
       )
@@ -183,12 +242,12 @@ export class Database {
       case '.markdown':
       case '.md':
         // @ts-ignore
-        const { _id, _template, _collection, body, ...rest } = content
+        const { _id, _template, _collection, $_body, ...rest } = content
         const extra: { [key: string]: string } = {}
         if (keepTemplateKey) {
           extra['_template'] = _template
         }
-        return matter.stringify(body || '', { ...rest, ...extra })
+        return matter.stringify($_body || '', { ...rest, ...extra })
       case '.json':
         return JSON.stringify(content, null, 2)
       default:
@@ -205,7 +264,10 @@ export class Database {
       case '.markdown':
       case '.md':
         const contentJSON = matter(content || '')
-        const markdownData = { ...contentJSON.data, _body: contentJSON.content }
+        const markdownData = {
+          ...contentJSON.data,
+          $_body: contentJSON.content,
+        }
         assertShape<T>(markdownData, yupSchema)
         return markdownData
       case '.json':
@@ -217,6 +279,13 @@ export class Database {
         throw new Error(`Must specify a valid format, got ${format}`)
     }
   }
+}
+
+function hasOwnProperty<X extends {}, Y extends PropertyKey>(
+  obj: X,
+  prop: Y
+): obj is X & Record<Y, unknown> {
+  return obj.hasOwnProperty(prop)
 }
 
 type FormatType = 'json' | 'md' | 'markdown' | 'yml' | 'yaml'
