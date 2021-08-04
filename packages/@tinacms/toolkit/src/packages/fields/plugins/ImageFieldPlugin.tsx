@@ -79,7 +79,6 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
       form.getState().values,
       field.previewSrc
     )
-    const [imgLoading, setImgLoading] = useState(false)
     let onClear: any
     if (props.field.clearable) {
       onClear = () => props.input.onChange('')
@@ -93,7 +92,6 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             ? // @ts-ignore
               cms.media.store.parse(media)
             : media
-        props.input.onChange('')
         props.input.onChange(parsedValue)
       }
     }
@@ -103,7 +101,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
       <ImageUpload
         value={value}
         previewSrc={src}
-        loading={imgLoading}
+        loading={srcIsLoading}
         onClick={() => {
           const directory = uploadDir(props.form.getState().values)
           cms.media.open({
@@ -113,7 +111,6 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
           })
         }}
         onDrop={async ([file]: File[]) => {
-          setImgLoading(true)
           const directory = uploadDir(props.form.getState().values)
           const [media] = await cms.media.persist([
             {
@@ -121,8 +118,8 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
               file,
             },
           ])
+          console.log({media})
           onChange(media)
-          setImgLoading(false)
         }}
         onClear={onClear}
       />
