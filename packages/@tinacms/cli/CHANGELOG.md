@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.52.1
+
+### Patch Changes
+
+- c66b7eef: added regex to add css files to generated file
+- Updated dependencies [5a934f6b]
+- Updated dependencies [271a72d7]
+  - @tinacms/graphql@0.51.0
+
 ## 0.52.0
 
 ### Minor Changes
