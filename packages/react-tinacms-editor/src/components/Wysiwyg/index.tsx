@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 
-import { TinaCMS, useCMS, Form } from 'tinacms'
+import { TinaCMS, useCMS, Form, Media } from 'tinacms'
 import { BrowserFocusProvider } from '../../context/browserFocus'
 import { EditorModeMenu } from '../EditorModeMenu'
 import {
@@ -95,28 +95,30 @@ const Wrapper = styled.div`
   min-height: 100px;
 `
 
+const defaultParse = (media: Media) => media.id
+
 function useImageProps(
   cms: TinaCMS,
   form?: Form,
   passedInImageProps?: PassedImageProps
 ): ImageProps | undefined {
-  const [imageProps, setImageProps] = React.useState<ImageProps | undefined>()
+  return React.useMemo(() => {
+    const parse = passedInImageProps?.parse || defaultParse
+    const uploadDir: string =
+      passedInImageProps?.uploadDir && form
+        ? passedInImageProps.uploadDir(form.values)
+        : ''
 
-  React.useMemo(() => {
-    if (!passedInImageProps) return
-    const { uploadDir, parse } = passedInImageProps
-    const _uploadDir: string = uploadDir && form ? uploadDir(form.values) : ''
-
-    setImageProps({
-      async upload(files: File[]): Promise<string[]> {
-        const filesToUpload = files.map(file => ({
-          directory: _uploadDir,
+    return {
+      upload: async (files: File[]): Promise<string[]> => {
+        const filesToUpload = files.map((file) => ({
+          directory: uploadDir,
           file,
         }))
 
         const allMedia = await cms.media.persist(filesToUpload)
 
-        return allMedia.map(media => {
+        return allMedia.map((media) => {
           if (parse) {
             return parse(media)
           } else {
@@ -124,18 +126,16 @@ function useImageProps(
           }
         })
       },
-      previewSrc(src: string) {
+      previewSrc: (src: string) => {
         return cms.media.previewSrc(src)
       },
-      mediaDir: _uploadDir,
-      ...passedInImageProps,
-    })
+      mediaDir: uploadDir,
+      parse,
+    }
   }, [
     cms.media.store,
     passedInImageProps?.uploadDir,
     passedInImageProps?.previewSrc,
     passedInImageProps?.upload,
   ])
-
-  return imageProps
 }
