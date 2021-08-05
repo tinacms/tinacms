@@ -7,7 +7,10 @@ import type { PostsDocument } from "../../.tina/__generated__/types";
 export default function BlogPostPage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  return <Post {...props.data.getPostsDocument} />;
+  if (props.data && props.data.getPostsDocument) {
+    return <Post {...props.data.getPostsDocument} />;
+  }
+  return <div>No data</div>;
 }
 
 export const getStaticProps = async ({ params }) => {
@@ -69,7 +72,7 @@ export const getStaticPaths = async () => {
     paths: postsListData.getPostsList.edges.map((post) => ({
       params: { filename: post.node.sys.filename },
     })),
-    fallback: false,
+    fallback: true,
   };
 };
 
