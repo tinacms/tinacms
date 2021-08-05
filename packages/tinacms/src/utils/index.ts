@@ -26,29 +26,11 @@ export const createClient = ({
 }: CreateClientProps) => {
   return isLocalClient
     ? new LocalClient()
-    : createCloudClient({ clientId, branch })
-}
-
-export const createCloudClient = (
-  props: Omit<CreateClientProps, 'isLocalClient'>
-) => {
-  const clientId = props.clientId
-
-  const missingProps: string[] = []
-  if (!clientId) {
-    missingProps.push('clientId')
-  }
-
-  if (missingProps.length) {
-    throw new Error(`The following props are required when using the Tina Cloud Client, please make sure they are being passed to TinaCloudAuthWall:
-     ${missingProps.join(', ')}`)
-  }
-
-  return new Client({
-    clientId,
-    branch: props.branch || 'main',
-    tokenStorage: 'LOCAL_STORAGE',
-  })
+    : new Client({
+      clientId: clientId || '',
+      branch: branch || 'main',
+      tokenStorage: 'LOCAL_STORAGE',
+    })
 }
 
 export function assertShape<T extends unknown>(
