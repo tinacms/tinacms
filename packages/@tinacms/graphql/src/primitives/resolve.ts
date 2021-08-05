@@ -26,6 +26,10 @@ import {
   ASTNode,
   GraphQLFieldMap,
   GraphQLError,
+  parse,
+  TypeInfo,
+  visitWithTypeInfo,
+  GraphQLUnionType,
 } from 'graphql'
 import { createSchema } from './schema'
 import { createResolver } from './resolver'
@@ -66,9 +70,59 @@ export const resolve = async ({
     const config = await database.getTinaSchema()
     const tinaSchema = await createSchema({ schema: config })
     const resolver = await createResolver({ database, tinaSchema })
-
     const paths: ReferenceQuery[] = []
     const mutationPaths: PreparedMutation[] = []
+
+    const ast = parse(query)
+    const typeInfo = new TypeInfo(graphQLSchema)
+
+    const referencePathVisitor = (): VisitorType => {
+      return {
+        leave: {
+          // Loop through all field nodes
+          Field(node, key, parent, path, ancestors) {
+            const type = typeInfo.getType()
+            if (type) {
+              const realType = getNamedType(type)
+              if (realType instanceof GraphQLUnionType) {
+                const hasNodeInterface = !!realType
+                  .getTypes()
+                  .find((objectType) =>
+                    objectType
+                      .getInterfaces()
+                      .find((intfc) => intfc.name === 'Node')
+                  )
+                // If they're part of a union _AND_ their types use the `Node` interface...
+                if (hasNodeInterface) {
+                  const p: string[] = []
+                  // build the path to their nodes by traversing the ancestor tree and grabbing each Field node
+                  // the resulting shape is something like `[getPostsDocument, data, author]`
+                  ancestors.forEach((item: any, index) => {
+                    const activePath = path[index]
+                    const result = item[activePath]
+                    if (result?.name?.value) {
+                      if (result.kind === 'Field') {
+                        console.log(result.name.value)
+                        p.push(result.name.value)
+                      }
+                    }
+                  })
+                  const referenceQuery = buildReferenceQuery(node, [
+                    ...p,
+                    node.name.value,
+                  ])
+                  if (referenceQuery) {
+                    paths.push(referenceQuery)
+                  }
+                }
+              }
+            }
+          },
+        },
+      }
+    }
+    visit(ast, visitWithTypeInfo(typeInfo, referencePathVisitor()))
+
     const res = await graphql({
       schema: graphQLSchema,
       source: query,
@@ -135,10 +189,6 @@ export const resolve = async ({
               /**
                * This is a reference value (`director: /path/to/george.md`)
                */
-              const referenceQuery = buildReferenceQuery(info)
-              if (referenceQuery) {
-                paths.push(referenceQuery)
-              }
               return resolver.getDocument(value)
             }
             if (
@@ -276,17 +326,13 @@ const buildPath = (path: Path, accum: (string | number)[]) => {
 }
 
 const buildReferenceQuery = (
-  info: GraphQLResolveInfo
+  fieldNode: FieldNode,
+  path: any
   // @ts-ignore
 ): ReferenceQuery | undefined => {
-  const fieldNode = info.fieldNodes.find(
-    (fieldNode) => fieldNode.name.value === info.fieldName
-  )
   if (fieldNode) {
-    const p = buildPath(info.path, []).map((item) =>
-      item === 'data' ? 'form' : item
-    )
-    const dataPath = buildPath(info.path, [])
+    const p = path.map((item: any) => (item === 'data' ? 'form' : item))
+    const dataPath = path
     const newNode: FieldNode = {
       ...fieldNode,
       name: { kind: 'Name', value: 'node' },
@@ -341,7 +387,7 @@ const buildReferenceQuery = (
         selections: [newNode],
       },
     }
-    const queryString = addFragmentsToQuery(info, fieldNode, q)
+    const queryString = print(q)
     return {
       path: ['data', ...p.slice(0, -1)],
       dataPath,
