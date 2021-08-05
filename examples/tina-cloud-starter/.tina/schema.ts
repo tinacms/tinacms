@@ -427,6 +427,7 @@ export default defineSchema({
           label: "Body",
           ui: {
             component: "markdown",
+            imageProps: {},
           },
           name: "_body",
           isBody: true,

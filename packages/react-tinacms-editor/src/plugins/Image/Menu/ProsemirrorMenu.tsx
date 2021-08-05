@@ -48,7 +48,10 @@ export const ProsemirrorMenu = ({ imageProps }: MenuProps) => {
 
   async function onMediaSelect(media?: Media) {
     if (media) {
-      insertImageInEditor(parse(media))
+      // eslint-disable-next-line @typescript-eslint/ban-ts-ignore
+      // @ts-ignore
+      const parseFunc = cms.media?.store?.parse || parse
+      insertImageInEditor(parseFunc(media))
     }
   }
 
