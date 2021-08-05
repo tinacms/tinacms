@@ -25,6 +25,7 @@ import {
   ModalHeader,
   ModalBody,
   FullscreenModal,
+  PopupModal
 } from '@tinacms/react-modals'
 import { MediaList, Media, MediaListOffset } from '@tinacms/core'
 import path from 'path'
@@ -35,11 +36,8 @@ import { LoadingDots } from '@tinacms/form-builder'
 
 export interface MediaRequest {
   directory?: string
-
   onSelect?(media: Media): void
-
   close?(): void
-
   allowDelete?: boolean
   currentTab?: number
   setAllTabs?: (tabsArray: string[]) => void
@@ -75,14 +73,13 @@ export function MediaManager() {
 type MediaListState = 'loading' | 'loaded' | 'error' | 'not-configured'
 
 export function MediaPicker({
-                              allowDelete,
-                              onSelect,
-                              close,
-                              currentTab,
-                              setAllTabs,
-
-                              ...props
-                            }: MediaRequest) {
+  allowDelete,
+  onSelect,
+  close,
+  currentTab,
+  setAllTabs,
+  ...props
+}: MediaRequest) {
   const cms = useCMS()
   const [listState, setListState] = useState<MediaListState>(() => {
     if (cms.media.isConfigured) return 'loading'
@@ -102,6 +99,7 @@ export function MediaPicker({
    * control offset by pushing/popping to offsetHistory
    */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
+  const [itemModal, setItemModal] = useState<Media | null>(null)
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
@@ -147,11 +145,12 @@ export function MediaPicker({
   }, [offset, directory, currentTab])
 
   const onClickMediaItem = (item: Media) => {
-    if (item.type === 'dir') {
+    /*if (item.type === 'dir') {
       setDirectory(path.join(item.directory, item.filename))
       resetOffset()
-    }
-    console.log('on click')
+    }*/
+    setItemModal(item)
+    console.log(item)
   }
 
   let deleteMediaItem: (item: Media) => void
@@ -231,7 +230,7 @@ export function MediaPicker({
   })
 
   return (
-    <MediaPickerWrap>
+    <><MediaPickerWrap>
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
         <UploadButton onClick={onClick} uploading={uploading} />
@@ -267,8 +266,41 @@ export function MediaPicker({
         hasPrev={hasPrev}
         navigatePrev={navigatePrev}
       />
-    </MediaPickerWrap>
+      {itemModal && <ItemModal close={() => setItemModal(null)} item={itemModal} />}
+    </MediaPickerWrap></>
   )
+}
+
+interface ItemModal {
+  close: () => void
+  item: Media
+}
+
+const StyledImg = styled.img`
+  width: 450px;
+  height: auto;
+  border-radius: 30px;
+`
+
+const ItemModal = ({close, item }: ItemModal) => {
+  return <Modal>
+    <PopupModal style={{width: '70%'}}>
+      <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
+      <ModalBody>
+        <div style={{display: 'flex', margin: '50px auto', width: '80%'}}>
+          <StyledImg src={item.previewSrc} alt='clicked image' />
+          <div style={{width: '100%'}}>
+            <ul style={{listStyle: 'none', marginLeft: '20px' }}>
+              <li style={{marginBottom: '5px'}}>name: {item.filename}</li>
+              <li style={{marginBottom: '5px'}}>url: {item.previewSrc}</li>
+              <li style={{marginBottom: '5px'}}>id: {item.id}</li>
+              <li style={{marginBottom: '5px'}}>type: {item.type}</li>
+            </ul>
+          </div>
+        </div>
+      </ModalBody>
+    </PopupModal>
+  </Modal>
 }
 
 const UploadButton = ({ onClick, uploading }: any) => {
