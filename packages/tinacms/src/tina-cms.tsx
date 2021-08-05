@@ -282,11 +282,22 @@ export const getStaticPropsForTina = async ({
   query: string
   variables?: object
 }) => {
-  const data = await staticRequest({ query, variables })
-  return {
-    data,
-    query,
-    variables,
+  try {
+    const data = await staticRequest({ query, variables })
+    return {
+      data,
+      query,
+      variables,
+    }
+  } catch (e) {
+    // FIXME: no need to catch all errors, just the ones that are related to
+    // a new document being created, if there's a way to surface those only
+    // we can still throw when real errors occur
+    return {
+      data: {},
+      query,
+      variables,
+    }
   }
 }
 
