@@ -66,8 +66,7 @@
           "type": "string",
           "label": "Body",
           "ui": {
-            "component": "markdown",
-            "imageProps": {}
+            "component": "markdown"
           },
           "name": "_body",
           "isBody": true,
