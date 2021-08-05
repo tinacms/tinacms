@@ -90,7 +90,10 @@ async function listMedia(req: NextApiRequest, res: NextApiResponse) {
       offset,
     } = req.query as MediaListOptions
 
-    const query = `folder=${directory}`
+    const useRootDirectory =
+      !directory || directory === '/' || directory === '""'
+
+    const query = useRootDirectory ? 'folder=""' : `folder=${directory}`
 
     const response = await cloudinary.search
       .expression(query)
@@ -102,7 +105,7 @@ async function listMedia(req: NextApiRequest, res: NextApiResponse) {
 
     //@ts-ignore TODO: Open PR to cloudinary-core
     cloudinary.api.folders = (directory: string = '""') => {
-      if (directory === '""') {
+      if (useRootDirectory) {
         return cloudinary.api.root_folders()
       } else {
         return cloudinary.api.sub_folders(directory)
