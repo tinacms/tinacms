@@ -44,6 +44,9 @@ export class CloudinaryMediaStore implements MediaStore {
       throw new Error(responseData.message)
     }
     const fileRes = await res.json()
+    await new Promise((resolve) => {
+      setTimeout(resolve, 2000)
+    })
     /**
      * Format the response from Cloudinary to match Media interface
      */
