@@ -177,7 +177,7 @@ export function MediaPicker({
 
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: 'image/*',
+    accept: 'text/*,  application/*, image/*',
 
     onDrop: async (files) => {
       try {
