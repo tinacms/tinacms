@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 0.53.1
+
+### Patch Changes
+
+- 7d2307321: Fixed the new line character in the @tinacms/cli init command
+- Updated dependencies [aa4507697]
+  - @tinacms/graphql@0.52.0
+
 ## 0.53.0
 
 ### Minor Changes
