@@ -85,7 +85,8 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
       onClear = () => props.input.onChange('')
     }
 
-    function onChange(media?: Media) {
+    async function onChange(media?: Media) {
+
       if (media) {
         const parsedValue =
           // @ts-ignore
@@ -93,6 +94,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             ? // @ts-ignore
               cms.media.store.parse(media)
             : media
+        
         props.input.onChange(parsedValue)
       }
     }
@@ -121,8 +123,14 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             },
           ])
           if (media) {
-            await onChange(media)
-            setIsImgUploading(false)
+            try {
+              await onChange(media)
+              setIsImgUploading(false)
+            } catch(error) {
+              console.error('Error uploading media asset: ', error)
+            } finally {
+              setIsImgUploading(false)
+            }
           }
         }}
         onClear={onClear}
