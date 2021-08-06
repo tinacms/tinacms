@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.51.2
+
+### Patch Changes
+
+- 6884ce7e4: Fix for markdown image plugin not working in WYSIWYG editor
+
 ## 0.51.1
 
 ### Patch Changes

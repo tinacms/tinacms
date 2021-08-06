@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.53.0
+
+### Minor Changes
+
+- 1b8bb5d0f: fix: don't throw error on missing client id
+
+### Patch Changes
+
+- f863d8be8: Fixes an issue where new documents returned a 404 when on a hosted deployement. Instead, `getStaticPropsForTina` will catch and return an empty object for the data key. This allows us to replace it with real data client-side.
+
 ## 0.52.0
 
 ### Minor Changes
