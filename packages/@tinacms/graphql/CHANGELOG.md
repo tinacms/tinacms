@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.52.1
+
+### Patch Changes
+
+- b05c91c6: Remove console.log
+
 ## 0.52.0
 
 ### Minor Changes
