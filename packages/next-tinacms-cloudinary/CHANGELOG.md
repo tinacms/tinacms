@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.1.2
+
+### Patch Changes
+
+- 33382db1a: Fix files in root not showing when using default directory argument
+
 ## 3.1.1
 
 ## 3.1.0

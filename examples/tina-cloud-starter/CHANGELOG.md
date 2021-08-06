@@ -1,5 +1,18 @@
 # tina-cloud-starter
 
+## 0.1.5
+
+### Patch Changes
+
+- 6884ce7e4: Fix for markdown image plugin not working in WYSIWYG editor
+- Updated dependencies [1b8bb5d0f]
+- Updated dependencies [f863d8be8]
+- Updated dependencies [33382db1a]
+- Updated dependencies [6884ce7e4]
+  - tinacms@0.53.0
+  - next-tinacms-cloudinary@3.1.2
+  - react-tinacms-editor@0.51.2
+
 ## 0.1.4
 
 ### Patch Changes
