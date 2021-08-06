@@ -125,7 +125,6 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
           if (media) {
             try {
               await onChange(media)
-              setIsImgUploading(false)
             } catch(error) {
               console.error('Error uploading media asset: ', error)
             } finally {
