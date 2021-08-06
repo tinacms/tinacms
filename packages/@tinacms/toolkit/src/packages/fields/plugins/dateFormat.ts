@@ -24,10 +24,12 @@ const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A'
 
 // formats a function from default datetime format to given format
 export const format = (
-  val: moment.Moment | string,
+  val: string,
   _name: string,
   field: DatetimepickerProps
 ): string => {
+  console.log(new Date(val).toISOString())
+  // return new Date(val).toISOString()
   const dateFormat = parseDateFormat(field.dateFormat)
   const timeFormat = parseTimeFormat(field.timeFormat)
   const combinedFormat =
@@ -42,18 +44,19 @@ export const format = (
 
 // parses a function from the given format to default datetime format
 export const parse = (
-  val: moment.Moment | string,
+  val: string,
   _name: string,
   field: DatetimepickerProps
 ) => {
+  console.log(val)
+  return new Date(val).toISOString()
   const dateFormat = parseDateFormat(field.dateFormat)
   const timeFormat = parseTimeFormat(field.timeFormat)
   const combinedFormat =
     typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat
 
   if (typeof val === 'string') {
-    const date = moment.utc(val, combinedFormat)
-    return date.isValid() ? date.format() : val
+    return new Date(val).toISOString()
   }
   return moment.utc(val).format()
 }
