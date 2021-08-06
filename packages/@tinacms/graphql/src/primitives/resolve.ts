@@ -102,7 +102,6 @@ export const resolve = async ({
                     const result = item[activePath]
                     if (result?.name?.value) {
                       if (result.kind === 'Field') {
-                        console.log(result.name.value)
                         p.push(result.name.value)
                       }
                     }
