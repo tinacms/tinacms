@@ -34,7 +34,7 @@ export function DropzoneWrapper({
   children,
 }: DropzoneProps) {
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'image/*',
+    accept: 'text/*,  application/*, image/*',
     onDrop,
     noClick: !!onClick,
   })
