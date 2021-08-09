@@ -33,6 +33,7 @@ export function DropzoneWrapper({
   className,
   children,
 }: DropzoneProps) {
+  // TODO: this accept should come from cms.media.store.accept. (This DropzoneWrapper is only being used for inline so it is not a priority)
   const { getRootProps, getInputProps } = useDropzone({
     accept: 'image/*',
     onDrop,
