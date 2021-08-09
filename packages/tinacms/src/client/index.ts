@@ -186,22 +186,10 @@ mutation addPendingDocumentMutation(
   }
 
   async isAuthorized(): Promise<boolean> {
-    if (this.isLocalClient()) {
-      return true
-    }
-
     return this.isAuthenticated() // TODO - check access
   }
 
-  isLocalClient(): boolean {
-    return !this.clientId
-  }
-
   async isAuthenticated(): Promise<boolean> {
-    if (this.isLocalClient()) {
-      return true
-    }
-
     return !!(await this.getUser())
   }
 
@@ -266,5 +254,13 @@ export class LocalClient extends Client {
           : DEFAULT_LOCAL_TINA_GQL_SERVER_URL,
     }
     super(clientProps)
+  }
+
+  async isAuthorized(): Promise<boolean> {
+    return true
+  }
+
+  async isAuthenticated(): Promise<boolean> {
+    return true
   }
 }
