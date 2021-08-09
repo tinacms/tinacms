@@ -25,7 +25,7 @@ export class CloudinaryMediaStore implements MediaStore {
   fetchFunction = (input: RequestInfo, init?: RequestInit) => {
     return fetch(input, init)
   }
-  accept = '*'
+  accept = 'text/*,  application/*, image/*'
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
     const { file, directory } = media[0]
@@ -90,7 +90,6 @@ export class CloudinaryMediaStore implements MediaStore {
   }
 
   parse = (img) => {
-    console.log({ img })
     return img.previewSrc
   }
 
