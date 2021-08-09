@@ -1,6 +1,5 @@
 [![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
-[![All Contributors](https://img.shields.io/badge/all_contributors-100-orange.svg?style=flat-square)](#contributors-)
-
+[![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tinacms.org/)
@@ -182,6 +181,7 @@ Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/d
   <tr>
     <td align="center"><a href="http://greenash.net.au/"><img src="https://avatars.githubusercontent.com/u/79373?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Jeremy Epstein</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Jaza" title="Documentation">📖</a> <a href="https://github.com/tinacms/tinacms/commits?author=Jaza" title="Code">💻</a> <a href="#plugin-Jaza" title="Plugin/utility libraries">🔌</a></td>
     <td align="center"><a href="https://github.com/arpi0003"><img src="https://avatars.githubusercontent.com/u/1330417?v=4?s=100" width="100px;" alt=""/><br /><sub><b>Eddie Arpin</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=arpi0003" title="Code">💻</a> <a href="https://github.com/tinacms/tinacms/issues?q=author%3Aarpi0003" title="Bug reports">🐛</a></td>
+    <td align="center"><a href="https://github.com/Ryuurock"><img src="https://avatars.githubusercontent.com/u/25604544?v=4?s=100" width="100px;" alt=""/><br /><sub><b>ryuurock</b></sub></a><br /><a href="https://github.com/tinacms/tinacms/commits?author=Ryuurock" title="Code">💻</a></td>
   </tr>
 </table>
 
