@@ -642,12 +642,11 @@ const resolveDateInput = (
    * Convert string to `new Date()`
    */
   const date = parseISO(value)
-  
-  if (!isValid(date)) {
+  if (!isValid(value)) {
     throw 'Invalid Date'
   }
   
-  return date.toISOString()
+  return date
 }
 
 type FieldParams = {
