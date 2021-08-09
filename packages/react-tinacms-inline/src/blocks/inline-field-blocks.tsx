@@ -31,6 +31,7 @@ export interface InlineBlocksProps {
     [key: string]: Block
   }
   className?: string
+  style?: React.CSSProperties
   direction?: 'vertical' | 'horizontal'
   /**
    * object will be spread to every block child element
@@ -48,6 +49,7 @@ export interface InlineBlocksProps {
 
 export interface BlocksContainerProps {
   className?: string
+  style?: React.CSSProperties
   children?: React.ReactNode
 }
 
@@ -87,6 +89,7 @@ export function InlineBlocks({
   name,
   blocks,
   className = '',
+  style,
   direction = 'vertical',
   itemProps,
   min,
@@ -136,7 +139,7 @@ export function InlineBlocks({
         const Container = components.Container || DefaultContainer
 
         return (
-          <Container className={className}>
+          <Container className={className} style={style}>
             <InlineBlocksContext.Provider
               value={{
                 insert,
