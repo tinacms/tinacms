@@ -222,6 +222,10 @@ mutation addPendingDocumentMutation(
   }
 
   async getUser() {
+    if (!this.clientId) {
+      return null
+    }
+
     const url = `${IDENTITY_API_URL}/v2/apps/${this.clientId}/currentUser`
 
     try {
