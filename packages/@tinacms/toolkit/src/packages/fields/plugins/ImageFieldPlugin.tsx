@@ -79,13 +79,14 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
       form.getState().values,
       field.previewSrc
     )
-
+    const [isImgUploading, setIsImgUploading] = useState(false)
     let onClear: any
     if (props.field.clearable) {
       onClear = () => props.input.onChange('')
     }
 
-    function onChange(media?: Media) {
+    async function onChange(media?: Media) {
+
       if (media) {
         const parsedValue =
           // @ts-ignore
@@ -93,18 +94,17 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
             ? // @ts-ignore
               cms.media.store.parse(media)
             : media
-        props.input.onChange('')
+        
         props.input.onChange(parsedValue)
       }
     }
-
     const uploadDir = props.field.uploadDir || (() => '')
 
     return (
       <ImageUpload
         value={value}
         previewSrc={src}
-        loading={srcIsLoading}
+        loading={isImgUploading || srcIsLoading}
         onClick={() => {
           const directory = uploadDir(props.form.getState().values)
           cms.media.open({
@@ -114,16 +114,23 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
           })
         }}
         onDrop={async ([file]: File[]) => {
+          setIsImgUploading(true)
           const directory = uploadDir(props.form.getState().values)
-
           const [media] = await cms.media.persist([
             {
               directory,
               file,
             },
           ])
-
-          onChange(media)
+          if (media) {
+            try {
+              await onChange(media)
+            } catch(error) {
+              console.error('Error uploading media asset: ', error)
+            } finally {
+              setIsImgUploading(false)
+            }
+          }
         }}
         onClear={onClear}
       />

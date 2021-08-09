@@ -44,14 +44,28 @@ export class CloudinaryMediaStore implements MediaStore {
       throw new Error(responseData.message)
     }
     const fileRes = await res.json()
-
-    // TODO: be programmer
-    // NOTE: why do we need this?
+    /**
+    * Images uploaded to Cloudinary aren't instantly available via the API;
+    * waiting a couple seconds here seems to ensure they show up in the next fetch.
+    */
     await new Promise((resolve) => {
       setTimeout(resolve, 2000)
     })
+    /**
+     * Format the response from Cloudinary to match Media interface
+     * Valid Cloudinary `resource_type` values: `image`, `video`, `raw` and `auto`
+     * uploading a directory is not supported as such, type is defaulted to `file`
+     * https://cloudinary.com/documentation/upload_images#uploading_with_a_direct_call_to_the_rest_api
+     */
+    const parsedRes: Media = {
+      type: 'file',
+      id: fileRes.public_id,
+      filename: fileRes.original_filename,
+      directory: '/',
+      previewSrc: fileRes.url
 
-    return []
+    }
+    return [parsedRes]
   }
   async delete(media: Media) {
     await this.fetchFunction(
