@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.52.2
+
+### Patch Changes
+
+- b4bbdda86: Better error messaging when no tina schema files are found
+
 ## 0.52.1
 
 ### Patch Changes
