@@ -646,7 +646,7 @@ const resolveDateInput = (
     throw 'Invalid Date'
   }
   
-  return date
+  return date.toISOString()
 }
 
 type FieldParams = {
