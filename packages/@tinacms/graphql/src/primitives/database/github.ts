@@ -58,10 +58,10 @@ export class GithubBridge implements Bridge {
       auth: accessToken,
     })
   }
-  private generateKey (key: string) {
+  private generateKey(key: string) {
     return `${this.repoConfig.owner}/${this.repoConfig.repo}/${this.repoConfig.ref}/${key}`
   }
-  private async readDir (filepath: string): Promise<string[]> {
+  private async readDir(filepath: string): Promise<string[]> {
     const fullPath = path.join(this.rootPath, filepath)
     return _.flatten(
       (
@@ -72,14 +72,14 @@ export class GithubBridge implements Bridge {
               ...this.repoConfig,
               path: fullPath,
             })
-            .then(async response => {
+            .then(async (response) => {
               if (Array.isArray(response.data)) {
                 return await Promise.all(
-                  await response.data.map(async d => {
+                  await response.data.map(async (d) => {
                     if (d.type === 'dir') {
                       const nestedItems = await this.readDir(d.path)
                       if (Array.isArray(nestedItems)) {
-                        return nestedItems.map(nestedItem => {
+                        return nestedItems.map((nestedItem) => {
                           return path.join(d.path, nestedItem)
                         })
                       } else {
@@ -102,15 +102,15 @@ export class GithubBridge implements Bridge {
     )
   }
 
-  public async glob (pattern: string) {
+  public async glob(pattern: string) {
     const results = await this.readDir(pattern)
     // Remove rootPath and any surround slashes
-    return results.map(item =>
+    return results.map((item) =>
       item.replace(this.rootPath, '').replace(/^\/|\/$/g, '')
     )
   }
 
-  public async get (filepath: string) {
+  public async get(filepath: string) {
     const realpath = path.join(this.rootPath, filepath)
     return this.cache.get(this.generateKey(realpath), async () => {
       return this.appOctoKit.repos
@@ -118,20 +118,34 @@ export class GithubBridge implements Bridge {
           ...this.repoConfig,
           path: realpath,
         })
-        .then(response => {
+        .then((response) => {
           return Buffer.from(response.data.content, 'base64').toString()
         })
-        .catch(e => {
+        .catch((e) => {
           if (e.status === 401) {
             throw new GraphQLError(
-              `Unauthorized request to Github for repo ${this.repoConfig.owner}/${this.repoConfig.repo} please ensure your access token is valid.`
+              `Unauthorized request to Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', please ensure your access token is valid.`,
+              null,
+              null,
+              null,
+              null,
+              e,
+              { status: e.status }
             )
           }
-          throw new GraphQLError(`Unable to find record for ${filepath}`)
+          throw new GraphQLError(
+            `Unable to find record '${filepath}' in Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', Ref: '${this.repoConfig.ref}'`,
+            null,
+            null,
+            null,
+            null,
+            e,
+            { status: e.status }
+          )
         })
     })
   }
-  public async put (filepath: string, data: string) {
+  public async put(filepath: string, data: string) {
     const realpath = path.join(this.rootPath, filepath)
     // check if the file exists
     let fileSha = undefined
@@ -159,7 +173,7 @@ export class GithubBridge implements Bridge {
 
 const cache = new LRU<string, string | string[]>({
   max: 1000,
-  length: function(v: string) {
+  length: function (v: string) {
     return v.length
   },
 })
