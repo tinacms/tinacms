@@ -4,7 +4,7 @@
 
 ### Minor Changes
 
-- 634524925: image accecpt now comes from the media store
+- 634524925: filetype acceptance now comes from the media store configuration
 - ef50311e2: Add the style attribute to the InlineBlocks component of the react-tinacms-inline package
 
 ### Patch Changes
