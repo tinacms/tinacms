@@ -1011,6 +1011,15 @@
         "code",
         "bug"
       ]
+    },
+    {
+      "login": "Ryuurock",
+      "name": "ryuurock",
+      "avatar_url": "https://avatars.githubusercontent.com/u/25604544?v=4",
+      "profile": "https://github.com/Ryuurock",
+      "contributions": [
+        "code"
+      ]
     }
   ],
   "contributorsPerLine": 7,
