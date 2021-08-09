@@ -1,5 +1,17 @@
 # tina-cloud-starter
 
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [c8be48892]
+- Updated dependencies [634524925]
+- Updated dependencies [3af2c075c]
+- Updated dependencies [515fc3ffd]
+  - next-tinacms-cloudinary@3.2.0
+  - tinacms@0.54.0
+  - react-tinacms-editor@0.51.3
+
 ## 0.1.5
 
 ### Patch Changes
