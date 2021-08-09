@@ -90,7 +90,6 @@ export class CloudinaryMediaStore implements MediaStore {
   }
 
   parse = (img) => {
-    console.log({ img })
     return img.previewSrc
   }
 
