@@ -1,5 +1,15 @@
 # next-tinacms-cloudinary
 
+## 3.2.0
+
+### Minor Changes
+
+- 634524925: image accecpt now comes from the media store
+
+### Patch Changes
+
+- c8be48892: Fix drag & drop behavior in ImageFieldPlugin
+
 ## 3.1.2
 
 ### Patch Changes

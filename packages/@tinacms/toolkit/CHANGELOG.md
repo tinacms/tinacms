@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.51.0
+
+### Minor Changes
+
+- 634524925: image accecpt now comes from the media store
+
 ## 0.50.1
 
 ### Patch Changes
