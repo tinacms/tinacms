@@ -136,6 +136,7 @@ export function useGraphqlForms<T extends object>({
   }, [pendingReset])
 
   React.useEffect(() => {
+    setIsLoading(true)
     cms.api.tina
       .requestWithForm(query, { variables })
       .then((payload) => {
@@ -282,7 +283,9 @@ export function useGraphqlForms<T extends object>({
       })
       .catch((e) => {
         cms.alerts.error('There was a problem setting up forms for your query')
+        console.error('There was a problem setting up forms for your query')
         console.error(e)
+        setIsLoading(false)
       })
   }, [queryString, JSON.stringify(variables)])
 

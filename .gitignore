@@ -16,7 +16,6 @@ packages/cli/forestry/.env
 .idea/
 **/.cache/
 **/package-lock.json
-**/yarn.lock
 
 .yarn/*
 !.yarn/cache
