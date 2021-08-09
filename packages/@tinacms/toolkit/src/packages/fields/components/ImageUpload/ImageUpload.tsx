@@ -22,6 +22,7 @@ import styled, { css } from 'styled-components'
 import { IconButton } from '../../../styles'
 import { TrashIcon } from '../../../icons'
 import { LoadingDots } from '../../../form-builder'
+import { useCMS } from '../../../../react-tinacms/use-cms'
 
 interface ImageUploadProps {
   onDrop: (acceptedFiles: any[]) => void
@@ -109,8 +110,10 @@ export const ImageUpload = ({
   previewSrc,
   loading,
 }: ImageUploadProps) => {
+  const cms = useCMS()
+
   const { getRootProps, getInputProps } = useDropzone({
-    accept: 'text/*,  application/*, image/*',
+    accept: cms.media.accept || 'image/*',
     onDrop,
     noClick: !!onClick,
   })
