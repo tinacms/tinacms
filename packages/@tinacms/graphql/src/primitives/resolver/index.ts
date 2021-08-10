@@ -80,7 +80,8 @@ export class Resolver {
       const basename = path.basename(fullPath)
       const extension = path.extname(fullPath)
       const filename = basename.replace(extension, '')
-      const relativePath = fullPath.replace('\\','/')
+      const relativePath = fullPath
+        .replace('\\', '/')
         .replace(collection.path, '')
         .replace(/^\/|\/$/g, '')
       const breadcrumbs = filename.split('/')
@@ -632,9 +633,7 @@ export class Resolver {
   }
 }
 
-const resolveDateInput = (
-  value: string
-) => {
+const resolveDateInput = (value: string) => {
   /**
    * Convert string to `new Date()`
    */
@@ -642,6 +641,10 @@ const resolveDateInput = (
   if (!isValid(date)) {
     throw 'Invalid Date'
   }
+
+  /**
+   * toISOString() converts to UTC
+   */
   return date.toISOString()
 }
 
