@@ -34,10 +34,11 @@ export const format = (
     typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat
 
   if (typeof val === 'string') {
-    const date = moment.utc(val)
+    const date = moment(val)
     return date.isValid() ? date.format(combinedFormat) : val
   }
-  return moment.utc(val).format(combinedFormat)
+
+  return moment(val).format(combinedFormat)
 }
 
 // parses a function from the given format to default datetime format
