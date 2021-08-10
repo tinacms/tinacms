@@ -16,7 +16,7 @@
 
  */
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms'
@@ -112,6 +112,29 @@ export function MediaPicker({
   }
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
+  const resetLocalStorage = () => {
+    localStorage.removeItem('Media - 0');
+    localStorage.removeItem('Media - 1');
+    localStorage.removeItem('Media - 2');
+  }
+
+  const loadMedia = useCallback(
+    () => {
+        setListState('loading')
+        cms.media
+          .list({ offset, limit: cms.media.pageSize, directory, currentList: currentTab })
+          .then(list => {
+            setList(list)
+            setListState('loaded')
+            localStorage.setItem(`Media - ${currentTab}`, JSON.stringify(list));
+          })
+          .catch(e => {
+            console.error(e)
+            setListState('error')
+          })
+    },
+    [currentTab, offset],
+  );
 
 
   useEffect(() => {
@@ -122,27 +145,36 @@ export function MediaPicker({
 
 
   useEffect(() => {
-    function loadMedia() {
-      setListState('loading')
-      cms.media
-        .list({ offset, limit: cms.media.pageSize, directory, currentList: currentTab })
-        .then(list => {
-          setList(list)
-          setListState('loaded')
-        })
-        .catch(e => {
-          console.error(e)
-          setListState('error')
-        })
-    }
-
     loadMedia()
+  }, [offset])
+
+
+  function refresh() {
+    resetLocalStorage()
+    resetOffset()
+    loadMedia()
+  }
+
+  useEffect(() => {
+    if (offsetHistory.length) {
+      resetOffset()
+      resetLocalStorage()
+    } else {
+      const data = localStorage.getItem(`Media - ${currentTab}`)
+      if (!data) {
+        loadMedia()
+      } else {
+        setListState('loading')
+        setList(JSON.parse(data))
+        setListState('loaded')
+      }
+    }
 
     return cms.events.subscribe(
       ['media:upload:success', 'media:delete:success', 'media:pageSize'],
       loadMedia,
     )
-  }, [offset, directory, currentTab])
+  }, [currentTab])
 
   const onClickMediaItem = (item: Media) => {
     /*if (item.type === 'dir') {
@@ -150,7 +182,6 @@ export function MediaPicker({
       resetOffset()
     }*/
     setItemModal(item)
-    console.log(item)
   }
 
   let deleteMediaItem: (item: Media) => void
@@ -233,6 +264,7 @@ export function MediaPicker({
     <><MediaPickerWrap>
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
+        <RefreshButton onClick={refresh} />
         <UploadButton onClick={onClick} uploading={uploading} />
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
@@ -337,6 +369,18 @@ const ItemModal = ({close, item }: ItemModal) => {
       </ModalBody>
     </PopupModal>
   </Modal>
+}
+
+const RefreshButton = ({ onClick }: any) => {
+  return (
+    <Button
+      style={{ minWidth: '5.3rem', marginRight: '15px' }}
+      primary
+      onClick={onClick}
+    >
+      Refresh
+    </Button>
+  )
 }
 
 const UploadButton = ({ onClick, uploading }: any) => {
