@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.53.0
+
+### Minor Changes
+
+- b4f5e973f: Update datetime field to expect and receive ISO string
+
 ## 0.52.2
 
 ### Patch Changes
