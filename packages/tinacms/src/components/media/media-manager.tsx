@@ -277,24 +277,60 @@ interface ItemModal {
 }
 
 const StyledImg = styled.img`
-  width: 450px;
-  height: auto;
   border-radius: 30px;
+  object-fit: cover;
+  width: 100%;
+  object-position: center;
 `
 
+const objToStringArray = (item: any) => {
+  const arr: any = []
+  for (const [key, value] of Object.entries(item)) {
+    let valueStr = ''
+    if (typeof value === 'string') {
+      valueStr = value
+    } else if (typeof value === 'boolean' || typeof value === 'number') {
+      valueStr = value.toString()
+    } else if (value === null) {
+      valueStr = 'null'
+    } else if (typeof value === 'object') {
+      valueStr = objToStringArray(value)
+    }
+    arr.push([key, valueStr])
+  }
+  return arr
+}
+
 const ItemModal = ({close, item }: ItemModal) => {
+  const imgix = item.metaData?.attributes
+  const tags = imgix?.tags
+  const colors = imgix?.colors['dominant_colors']
+  const meta =  objToStringArray(imgix || item.metaData);
   return <Modal>
     <PopupModal style={{width: '70%'}}>
       <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
       <ModalBody>
         <div style={{display: 'flex', margin: '50px auto', width: '80%'}}>
-          <StyledImg src={item.previewSrc} alt='clicked image' />
+          <div style={{width: '70%'}}>
+            <StyledImg src={item.previewSrc} alt='clicked image' />
+          </div>
           <div style={{width: '100%'}}>
             <ul style={{listStyle: 'none', marginLeft: '20px' }}>
               <li style={{marginBottom: '5px'}}>name: {item.filename}</li>
               <li style={{marginBottom: '5px'}}>url: {item.previewSrc}</li>
               <li style={{marginBottom: '5px'}}>id: {item.id}</li>
               <li style={{marginBottom: '5px'}}>type: {item.type}</li>
+              {meta.map(([key, value]: [string, any]) =>
+                typeof value !== 'object'
+                && <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
+              )}
+              {tags && Object.entries(tags).map(([key, value]) =>
+                <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
+                )}
+              {colors && Object.entries(colors).map(([key, value]) =>
+                <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
+              )}
+              {item.metaData?.LastModified && <li style={{marginBottom: '5px'}}>last modified: {item.metaData?.LastModified.toString()}</li>}
             </ul>
           </div>
         </div>
