@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.52.0
+
+### Minor Changes
+
+- b4f5e973f: Update datetime field to expect and receive ISO string
+
 ## 0.51.0
 
 ### Minor Changes

@@ -1,5 +1,16 @@
 # tinacms-cli
 
+## 0.54.0
+
+### Minor Changes
+
+- 069c63b73: Tina init command now adds exit-admin path
+
+### Patch Changes
+
+- Updated dependencies [b4f5e973f]
+  - @tinacms/graphql@0.53.0
+
 ## 0.53.3
 
 ### Patch Changes
