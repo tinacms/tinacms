@@ -22,7 +22,13 @@ import {
   warnText,
   dangerText,
 } from '../../utils/theme'
-import { blogPost, nextPostPage, AppJsContent, adminPage } from './setup-files'
+import {
+  blogPost,
+  nextPostPage,
+  AppJsContent,
+  adminPage,
+  exitAdminPage,
+} from './setup-files'
 import { logger } from '../../logger'
 import chalk from 'chalk'
 
@@ -190,6 +196,37 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
       fs.writeFileSync(p.join(pagesPath, adminName + extension), adminPage)
     }
   }
+
+  // update the users /exit-admin path
+  const exitAdminPath = p.join(pagesPath, 'exit-admin.tsx')
+  const exitAdminPathJS = p.join(pagesPath, 'exit-admin.js')
+  if (!fs.existsSync(exitAdminPath) && !fs.existsSync(exitAdminPathJS)) {
+    fs.writeFileSync(exitAdminPathJS, exitAdminPage)
+  } else {
+    const extension = fs.existsSync(exitAdminPath) ? '.tsx' : 'js'
+    const override = await prompts({
+      name: 'override',
+      type: 'confirm',
+      message: `Whoops... looks like you already have an exit-admin${extension} do you want to override it?`,
+    })
+    if (override.override) {
+      fs.writeFileSync(
+        p.join(pagesPath, 'exit-admin' + extension),
+        exitAdminPage
+      )
+    } else {
+      const res = await prompts({
+        name: 'name',
+        type: 'text',
+        message: warnText(
+          'What would you like the route to be named that exits edit mode?: '
+        ),
+      })
+      const adminName = res.name || 'exit-admin'
+      fs.writeFileSync(p.join(pagesPath, adminName + extension), exitAdminPage)
+    }
+  }
+
   next()
 }
 
