@@ -22,7 +22,7 @@ import { assertShape, lastItem } from '../util'
 
 import type { TinaSchema } from '../schema'
 import type { TinaCloudSchemaBase } from '../types'
-import { DocumentNode } from 'graphql'
+import { DocumentNode, GraphQLError } from 'graphql'
 
 type CreateDatabase = { rootPath?: string; bridge?: Bridge }
 
@@ -45,10 +45,22 @@ export class Database {
 
   public get = async <T extends object>(filepath: string): Promise<T> => {
     if (SYSTEM_FILES.includes(filepath)) {
-      const dataString = await this.bridge.get(
-        path.join(GENERATED_FOLDER, `${filepath}.json`)
-      )
-      return JSON.parse(dataString)
+      try {
+        const dataString = await this.bridge.get(
+          path.join(GENERATED_FOLDER, `${filepath}.json`)
+        )
+        return JSON.parse(dataString)
+      } catch (err) {
+        /** File Not Found */
+        if (err instanceof GraphQLError && err.extensions?.status === 404) {
+          throw new GraphQLError(
+            `${err.toString()}.  Please confirm this location is correct and contains a '.tina' folder and a valid '.tina/schema.ts'.`
+          )
+          /** Other Errors */
+        } else {
+          throw err
+        }
+      }
     } else {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)

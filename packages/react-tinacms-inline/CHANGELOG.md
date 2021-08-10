@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.52.0
+
+### Minor Changes
+
+- 634524925: filetype acceptance now comes from the media store configuration
+- ef50311e2: Add the style attribute to the InlineBlocks component of the react-tinacms-inline package
+
+### Patch Changes
+
+- Updated dependencies [634524925]
+  - @tinacms/toolkit@0.51.0
+
 ## 0.51.1
 
 ### Patch Changes
