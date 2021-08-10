@@ -39,7 +39,7 @@ const GoToEditPage = () => {
     setEdit(false);
     router.back();
   }, []);
-  return <div>Entering edit mode..</div>;
+  return <div>Exiting edit mode..</div>;;
 };
 
 export default GoToEditPage;
