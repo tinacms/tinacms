@@ -18,8 +18,6 @@ import { assertShape, sequential, lastItem } from '../util'
 import { NAMER } from '../ast-builder'
 import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
-import parseISO from 'date-fns/parseISO'
-import format from 'date-fns/format'
 
 import type { Templateable, TinaFieldEnriched } from '../types'
 import { GraphQLError } from 'graphql'
@@ -635,23 +633,16 @@ export class Resolver {
 }
 
 const resolveDateInput = (
-  value: string,
-  field: { dateFormat?: string; timeFormat?: string }
+  value: string
 ) => {
   /**
    * Convert string to `new Date()`
    */
-  const date = parseISO(value)
-  
+  const date = new Date(value)
   if (!isValid(date)) {
     throw 'Invalid Date'
   }
-
-  const dateUTC = new Date(
-    date.valueOf() + date.getTimezoneOffset() * 60 * 1000
-  )
-  
-  return dateUTC.toUTCString()
+  return date.toISOString()
 }
 
 type FieldParams = {
