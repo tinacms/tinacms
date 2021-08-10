@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.52.1
+
+### Patch Changes
+
+- 4de977f63: Makes `DateFieldPlugin` timezone-friendly
+
 ## 0.52.0
 
 ### Minor Changes
