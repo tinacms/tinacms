@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.54.1
+
+### Patch Changes
+
+- 4de977f63: Makes `DateFieldPlugin` timezone-friendly
+
 ## 0.54.0
 
 ### Minor Changes

@@ -1,5 +1,14 @@
 # tina-cloud-starter
 
+## 0.1.9
+
+### Patch Changes
+
+- 4de977f63: Makes `DateFieldPlugin` timezone-friendly
+  - next-tinacms-cloudinary@3.2.2
+  - react-tinacms-editor@0.51.5
+  - tinacms@0.54.3
+
 ## 0.1.8
 
 ### Patch Changes
