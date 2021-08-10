@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.54.0
+
+### Minor Changes
+
+- 7663e0f7f: Fixed windows issue where you could not save a file
+
 ## 0.53.0
 
 ### Minor Changes

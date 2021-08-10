@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.54.2
+
+### Patch Changes
+
+- d1ef2545f: Ensure `undefined` values aren't passed back from getStaticPropsForTina
+
 ## 0.54.1
 
 ### Patch Changes

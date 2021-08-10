@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.43.9
+
+### Patch Changes
+
+- Updated dependencies [d1ef2545f]
+  - tinacms@0.54.2
+  - next-tinacms-json@0.50.0
+  - next-tinacms-markdown@0.50.0
+  - react-tinacms-editor@0.51.4
+  - react-tinacms-inline@0.52.1
+
 ## 0.43.8
 
 ### Patch Changes
