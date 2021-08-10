@@ -32,10 +32,10 @@ export const NoFormsPlaceholder = () => (
     </p>
     <p>
       <LinkButton
-        href="https://tina.io/docs/forms/"
+        href="https://tina.io/guides/tina-cloud/add-tinacms-to-existing-site/content-modelling/"
         target="_blank"
       >
-        <Emoji>📖</Emoji> Form Setup Guide
+        <Emoji>📖</Emoji> Content Modelling
       </LinkButton>
     </p>
   </EmptyState>
