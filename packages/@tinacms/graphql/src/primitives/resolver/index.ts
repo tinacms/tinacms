@@ -80,7 +80,7 @@ export class Resolver {
       const basename = path.basename(fullPath)
       const extension = path.extname(fullPath)
       const filename = basename.replace(extension, '')
-      const relativePath = fullPath
+      const relativePath = fullPath.replace('\\','/')
         .replace(collection.path, '')
         .replace(/^\/|\/$/g, '')
       const breadcrumbs = filename.split('/')
