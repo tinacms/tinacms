@@ -1,5 +1,17 @@
 # tinacms
 
+## 0.54.0
+
+### Minor Changes
+
+- 3af2c075c: Loading state now resets in useGraphqlForms
+- 515fc3ffd: Don't treat cloud client with missing client-id as local client
+
+### Patch Changes
+
+- Updated dependencies [634524925]
+  - @tinacms/toolkit@0.51.0
+
 ## 0.53.0
 
 ### Minor Changes
