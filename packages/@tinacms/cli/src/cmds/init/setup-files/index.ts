@@ -28,6 +28,23 @@ const GoToEditPage = () => {
 export default GoToEditPage;
 `
 
+export const exitAdminPage = `import { useEffect } from "react";
+import { useRouter } from "next/router";
+import { useEditState } from "tinacms/dist/edit-state";
+
+const GoToEditPage = () => {
+  const { setEdit } = useEditState();
+  const router = useRouter();
+  useEffect(() => {
+    setEdit(false);
+    router.back();
+  }, []);
+  return <div>Entering edit mode..</div>;
+};
+
+export default GoToEditPage;
+`
+
 export const blogPost = `---
 title: Vote For Pedro
 ---
