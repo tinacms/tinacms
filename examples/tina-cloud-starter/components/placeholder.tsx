@@ -14,10 +14,7 @@ export const Placeholder = () => (
       so you can start editing.
     </p>
     <p>
-      <a
-        href="https://tina.io/guides/tina-cloud/add-tinacms-to-existing-site/content-modelling/"
-        target="_blank"
-      >
+      <a href="https://tina.io/docs/schema/" target="_blank">
         <span>📖</span> Content Modelling
       </a>
     </p>
