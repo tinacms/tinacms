@@ -31,10 +31,7 @@ export const NoFormsPlaceholder = () => (
       so you can start editing.
     </p>
     <p>
-      <LinkButton
-        href="https://tina.io/guides/tina-cloud/add-tinacms-to-existing-site/content-modelling/"
-        target="_blank"
-      >
+      <LinkButton href="https://tina.io/docs/schema/" target="_blank">
         <Emoji>📖</Emoji> Content Modelling
       </LinkButton>
     </p>
