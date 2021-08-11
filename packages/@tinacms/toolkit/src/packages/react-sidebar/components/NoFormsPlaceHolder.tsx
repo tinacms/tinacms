@@ -32,7 +32,7 @@ export const NoFormsPlaceholder = () => (
     </p>
     <p>
       <LinkButton href="https://tina.io/docs/schema/" target="_blank">
-        <Emoji>📖</Emoji> Content Modelling
+        <Emoji>📖</Emoji> Content Modeling
       </LinkButton>
     </p>
   </EmptyState>
