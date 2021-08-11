@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.55.0
+
+### Minor Changes
+
+- f4f652dae: Updated regex for CSS in tina init CLI
+
 ## 0.54.2
 
 ### Patch Changes
