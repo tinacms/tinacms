@@ -1,5 +1,14 @@
 # tina-cloud-starter
 
+## 0.1.10
+
+### Patch Changes
+
+- 6b1cbf916: Updated NoFormsPlaceholder links
+  - next-tinacms-cloudinary@3.2.3
+  - react-tinacms-editor@0.51.6
+  - tinacms@0.54.4
+
 ## 0.1.9
 
 ### Patch Changes

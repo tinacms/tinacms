@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.52.2
+
+### Patch Changes
+
+- 6b1cbf916: Updated NoFormsPlaceholder links
+
 ## 0.52.1
 
 ### Patch Changes
