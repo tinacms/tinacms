@@ -14,8 +14,8 @@ export const Placeholder = () => (
       so you can start editing.
     </p>
     <p>
-      <a href="https://tina.io/docs/tina-cloud/client/" target="_blank">
-        <span>📖</span> Client Setup Guide
+      <a href="https://tina.io/docs/schema/" target="_blank">
+        <span>📖</span> Content Modelling
       </a>
     </p>
   </div>
