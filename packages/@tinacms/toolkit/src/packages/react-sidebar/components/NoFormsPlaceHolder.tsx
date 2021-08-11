@@ -31,11 +31,8 @@ export const NoFormsPlaceholder = () => (
       so you can start editing.
     </p>
     <p>
-      <LinkButton
-        href="https://tina.io/docs/forms/"
-        target="_blank"
-      >
-        <Emoji>📖</Emoji> Form Setup Guide
+      <LinkButton href="https://tina.io/docs/schema/" target="_blank">
+        <Emoji>📖</Emoji> Content Modeling
       </LinkButton>
     </p>
   </EmptyState>
