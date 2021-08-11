@@ -128,9 +128,14 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
         ? readFileSync(appPath)
         : readFileSync(appPathTS)
       const matches = [
-        ...fileContent.toString().matchAll(/^.*import.*\.css".*$/gm),
+        ...fileContent.toString().matchAll(/^.*import.*\.css("|').*$/gm),
       ]
-      fs.writeFileSync(appPathWithExtension, AppJsContent(matches.join('\n')))
+      // This gets the primary match. see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#using_match
+      const primaryMatches = matches.map((x) => x[0])
+      fs.writeFileSync(
+        appPathWithExtension,
+        AppJsContent(primaryMatches.join('\n'))
+      )
     } else {
       wrapper = true
       logger.info(
