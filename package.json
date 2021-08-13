@@ -15,7 +15,8 @@
     "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
     "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
-    "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
+    "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
+    "cypress:open": "cypress open"
   },
   "dependencies": {
     "@changesets/cli": "^2.16.0",
@@ -30,5 +31,8 @@
     "prettier": "^2.3.2",
     "typescript": "^3.8.3",
     "workspace": "^0.0.1-preview.1"
+  },
+  "devDependencies": {
+    "cypress": "^8.2.0"
   }
 }

@@ -1,0 +1,18 @@
+name: e2e Tests
+on: [push]
+jobs:
+  cypress-run:
+    runs-on: ubuntu-20.04
+    name: E2E on Chrome
+    steps:
+      - uses: actions/checkout@v2
+      - name: Cypress run
+        uses: cypress-io/github-action@v2
+        with:
+          browser: chrome
+          env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
+          build: yarn build && yarn workspace tina-cloud-starter build 
+          start: yarn workspace tina-cloud-starter start 
+          wait-on: 'http://localhost:3000'
+          # wait for 3 minutes for the server to respond
+          wait-on-timeout: 180
