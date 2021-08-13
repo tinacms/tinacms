@@ -12,7 +12,9 @@ jobs:
           install-command: yarn install
           browser: chrome
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
-          build: yarn build && yarn workspace tina-cloud-starter build 
+          build: | 
+             yarn build
+             yarn workspace tina-cloud-starter build 
           start: yarn workspace tina-cloud-starter start 
           wait-on: 'http://localhost:3000'
           # wait for 3 minutes for the server to respond
