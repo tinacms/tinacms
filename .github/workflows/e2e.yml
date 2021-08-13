@@ -9,6 +9,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
+          install-command: yarn  --immutable-cache --silent
           browser: chrome
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
           build: yarn build && yarn workspace tina-cloud-starter build 
