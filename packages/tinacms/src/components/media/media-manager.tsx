@@ -100,6 +100,7 @@ export function MediaPicker({
    */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
   const [itemModal, setItemModal] = useState<Media | null>(null)
+  const [search, setSearch] = useState('')
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
@@ -122,7 +123,7 @@ export function MediaPicker({
     () => {
         setListState('loading')
         cms.media
-          .list({ offset, limit: cms.media.pageSize, directory, currentList: currentTab })
+          .list({ offset, limit: cms.media.pageSize, directory, currentList: currentTab, search })
           .then(list => {
             setList(list)
             setListState('loaded')
@@ -133,7 +134,7 @@ export function MediaPicker({
             setListState('error')
           })
     },
-    [currentTab, offset],
+    [currentTab, offset, search],
   );
 
 
@@ -260,12 +261,22 @@ export function MediaPicker({
     }
   })
 
+  const handleSubmit = (e: React.FormEvent<HTMLFormElement>) => {
+    e.preventDefault()
+    loadMedia()
+  }
+
   return (
     <><MediaPickerWrap>
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
-        <RefreshButton onClick={refresh} />
-        <UploadButton onClick={onClick} uploading={uploading} />
+        <form onSubmit={(e) => handleSubmit(e)}>
+          <StyledSearch type='text' placeholder='Search' value={search} onChange={(e) => setSearch(e.target.value)} />
+        </form>
+        <div>
+          <RefreshButton onClick={refresh} />
+          <UploadButton onClick={onClick} uploading={uploading} />
+        </div>
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
         <input {...getInputProps()} />
@@ -307,6 +318,24 @@ interface ItemModal {
   close: () => void
   item: Media
 }
+
+const StyledSearch = styled.input`
+  border-radius: var(--tina-radius-small);
+  padding: var(--tina-padding-small);
+  background: var(--tina-color-grey-0);
+  font-size: var(--tina-font-size-2);
+  line-height: 1.35;
+  color: var(--tina-color-grey-10);
+  background-color: var(--tina-color-grey-0);
+  -webkit-transition: all 85ms ease-out;
+  transition: all 85ms ease-out;
+  border: 1px solid var(--tina-color-grey-2);
+  width: 375px;
+  margin: 0;
+  outline: none;
+  box-shadow: 0 0 0 2px transparent;
+
+`
 
 const StyledImg = styled.img`
   border-radius: 30px;
@@ -437,6 +466,7 @@ const MediaPickerWrap = styled.div`
 
 const Header = styled.div`
   display: flex;
+  justify-content: space-between;
   align-items: center;
   background: var(--tina-color-grey-1);
   padding: var(--tina-padding-big) 0.75rem;

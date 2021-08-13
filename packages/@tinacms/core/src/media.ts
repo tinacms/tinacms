@@ -110,6 +110,7 @@ export interface MediaListOptions {
   limit?: number
   offset?: MediaListOffset
   currentList?: number
+  search?: string
 }
 
 /**
