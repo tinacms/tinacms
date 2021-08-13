@@ -9,7 +9,7 @@ jobs:
       - name: Cypress run
         uses: cypress-io/github-action@v2
         with:
-          install-command: yarn install
+          install-command: yarn install --immutable --immutable-cache
           browser: chrome
           env: NEXT_PUBLIC_USE_LOCAL_CLIENT=1
           build: yarn build
