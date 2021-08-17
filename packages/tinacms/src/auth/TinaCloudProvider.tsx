@@ -18,6 +18,7 @@ import { TinaCMS, TinaProvider, MediaStore } from '@tinacms/toolkit'
 import { Client } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
+import { useEditState } from '../edit-state'
 
 type ModalNames = null | 'authenticate'
 
@@ -48,6 +49,7 @@ export const AuthWallInner = ({
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [showChildren, setShowChildren] = useState<boolean>(false)
+  const { setEdit } = useEditState()
 
   React.useEffect(() => {
     client.isAuthenticated().then((isAuthenticated) => {
@@ -89,6 +91,14 @@ export const AuthWallInner = ({
           close={close}
           actions={[
             ...otherModalActions,
+            {
+              action: async () => {
+                setActiveModal(null)
+                setEdit(false)
+              },
+              name: 'Close',
+              primary: false,
+            },
             {
               name: 'Continue to Tina Cloud',
               action: async () => {
