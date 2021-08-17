@@ -21,7 +21,6 @@ import {
 import { StyleReset, LoadingDots, Button } from '@tinacms/toolkit'
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
-import { useEditState } from '../edit-state'
 
 interface ModalBuilderProps {
   title: string
