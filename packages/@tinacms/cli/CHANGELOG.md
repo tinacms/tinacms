@@ -1,5 +1,13 @@
 # tinacms-cli
 
+## 0.55.1
+
+### Patch Changes
+
+- d94fec611: Improve exported types for defineSchema
+- Updated dependencies [d94fec611]
+  - @tinacms/graphql@0.54.2
+
 ## 0.55.0
 
 ### Minor Changes
