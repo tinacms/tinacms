@@ -63,7 +63,7 @@ interface BreadcrumbWrapperProps {
 }
 
 const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
-  width: 100%;
+  //width: 100%;
   display: flex;
   align-items: center;
   color: var(--tina-color-grey-4);
