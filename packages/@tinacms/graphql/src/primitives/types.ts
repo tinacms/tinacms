@@ -243,12 +243,14 @@ export type GlobalTemplate<WithNamespace extends boolean> =
     ? {
         label: string
         name: string
+        ui?: object
         fields: TinaFieldInner<WithNamespace>[]
         namespace: WithNamespace extends true ? string[] : undefined
       }
     : {
         label: string
         name: string
+        ui?: object
         fields: TinaFieldInner<WithNamespace>[]
       }
 
