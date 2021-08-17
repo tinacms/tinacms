@@ -22,16 +22,28 @@ export {
 } from './primitives'
 import { clearCache as s3ClearCache, s3Cache } from './cache/s3'
 
-import { clearCache as lruClearCache, simpleCache} from './cache/lru'
+import { clearCache as lruClearCache, simpleCache } from './cache/lru'
 
-export { lruClearCache, lruClearCache as clearCache, s3ClearCache, s3Cache, simpleCache }
+export {
+  lruClearCache,
+  lruClearCache as clearCache,
+  s3ClearCache,
+  s3Cache,
+  simpleCache,
+}
 
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
   TinaCloudCollection as TinaCloudCollectionBase,
+  TinaCloudTemplateBase as TinaTemplate,
   TinaFieldBase,
 } from './primitives/types'
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
+// Alias to remove Cloud
+export type TinaSchema = TinaCloudSchema
 export type TinaCloudCollection = TinaCloudCollectionBase<false>
+// Alias to remove Cloud
+export type TinaCollection = TinaCloudCollectionBase<false>
 export type TinaField = TinaFieldBase
+export type { TinaTemplate }
