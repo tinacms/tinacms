@@ -1,5 +1,12 @@
 # tinacms
 
+## 0.55.0
+
+### Minor Changes
+
+- d0e896561: Provide better error boundary message and visual affordances to user in <ErrorBoundary />.
+- 27c1fd382: Adds a close button to the Tina Cloud auth model so a user is not suck in edit mode.
+
 ## 0.54.4
 
 ### Patch Changes

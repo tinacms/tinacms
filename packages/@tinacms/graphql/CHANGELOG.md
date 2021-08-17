@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.54.2
+
+### Patch Changes
+
+- d94fec611: Improve exported types for defineSchema
+
 ## 0.54.1
 
 ### Patch Changes
