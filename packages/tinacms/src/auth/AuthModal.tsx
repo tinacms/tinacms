@@ -21,12 +21,13 @@ import {
 import { StyleReset, LoadingDots, Button } from '@tinacms/toolkit'
 import React, { useCallback, useState } from 'react'
 import styled from 'styled-components'
+import { useEditState } from '../edit-state'
 
 interface ModalBuilderProps {
   title: string
   message: string
   error?: string
-  actions: any[]
+  actions: ButtonProps[]
   close(): void
 }
 
@@ -41,7 +42,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
             {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
           </ModalBody>
           <ModalActions>
-            {modalProps.actions.map((action: any) => (
+            {modalProps.actions.map((action) => (
               <AsyncButton {...action} />
             ))}
           </ModalActions>
