@@ -198,6 +198,7 @@ function checkForLicense({ packageJson }: TinaPackage) {
  *
  */
 function fileNeedsLicense(filepath: string) {
+  if (filepath === '.pnp.js') return false
   return new RegExp(/^(?!examples\/).+\.(jsx?|tsx?)$/).test(filepath)
 }
 
