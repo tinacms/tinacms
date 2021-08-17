@@ -45,6 +45,11 @@ export interface Media {
    * A url that provides an image preview of the media file
    */
   previewSrc?: string
+
+  /**
+   * The complete media object from the API
+   */
+  metaData?: any
 }
 
 export interface MediaUploadOptions {

@@ -1,22 +1,22 @@
 /**
 
-Copyright 2021 Forestry.io Holdings, Inc.
+ Copyright 2021 Forestry.io Holdings, Inc.
 
-Licensed under the Apache License, Version 2.0 (the "License");
-you may not use this file except in compliance with the License.
-You may obtain a copy of the License at
+ Licensed under the Apache License, Version 2.0 (the "License");
+ you may not use this file except in compliance with the License.
+ You may obtain a copy of the License at
 
-    http://www.apache.org/licenses/LICENSE-2.0
+ http://www.apache.org/licenses/LICENSE-2.0
 
-Unless required by applicable law or agreed to in writing, software
-distributed under the License is distributed on an "AS IS" BASIS,
-WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
-See the License for the specific language governing permissions and
-limitations under the License.
+ Unless required by applicable law or agreed to in writing, software
+ distributed under the License is distributed on an "AS IS" BASIS,
+ WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+ See the License for the specific language governing permissions and
+ limitations under the License.
 
-*/
+ */
 
-import React from 'react'
+import React, { useCallback } from 'react'
 import { useEffect, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { useCMS } from '../../react-tinacms'
@@ -25,6 +25,7 @@ import {
   ModalHeader,
   ModalBody,
   FullscreenModal,
+  PopupModal
 } from '@tinacms/react-modals'
 import { MediaList, Media, MediaListOffset } from '@tinacms/core'
 import path from 'path'
@@ -77,7 +78,6 @@ export function MediaPicker({
   close,
   currentTab,
   setAllTabs,
-
   ...props
 }: MediaRequest) {
   const cms = useCMS()
@@ -86,7 +86,7 @@ export function MediaPicker({
     return 'not-configured'
   })
   const [directory, setDirectory] = useState<string | undefined>(
-    props.directory
+    props.directory,
   )
 
   const [list, setList] = useState<MediaList>({
@@ -99,6 +99,7 @@ export function MediaPicker({
    * control offset by pushing/popping to offsetHistory
    */
   const [offsetHistory, setOffsetHistory] = useState<MediaListOffset[]>([])
+  const [itemModal, setItemModal] = useState<Media | null>(null)
   const offset = offsetHistory[offsetHistory.length - 1]
   const resetOffset = () => setOffsetHistory([])
   const navigateNext = () => {
@@ -111,45 +112,76 @@ export function MediaPicker({
   }
   const hasPrev = offsetHistory.length > 0
   const hasNext = !!list.nextOffset
+  const resetLocalStorage = () => {
+    localStorage.removeItem('Media - 0');
+    localStorage.removeItem('Media - 1');
+    localStorage.removeItem('Media - 2');
+  }
 
+  const loadMedia = useCallback(
+    () => {
+        setListState('loading')
+        cms.media
+          .list({ offset, limit: cms.media.pageSize, directory, currentList: currentTab })
+          .then(list => {
+            setList(list)
+            setListState('loaded')
+            localStorage.setItem(`Media - ${currentTab}`, JSON.stringify(list));
+          })
+          .catch(e => {
+            console.error(e)
+            setListState('error')
+          })
+    },
+    [currentTab, offset],
+  );
 
 
   useEffect(() => {
     if (setAllTabs) {
-      setAllTabs(['client', 's3', 'einstein'])
+      setAllTabs(['Client', 'Einstein', 'Files'])
     }
   }, [setAllTabs])
 
 
   useEffect(() => {
-    function loadMedia() {
-      setListState('loading')
-      cms.media
-        .list({ offset, limit: cms.media.pageSize, directory,  currentList: currentTab })
-        .then(list => {
-          setList(list)
-          setListState('loaded')
-        })
-        .catch(e => {
-          console.error(e)
-          setListState('error')
-        })
-    }
-
     loadMedia()
+  }, [offset])
+
+
+  function refresh() {
+    resetLocalStorage()
+    resetOffset()
+    loadMedia()
+  }
+
+  useEffect(() => {
+    if (offsetHistory.length) {
+      resetOffset()
+      resetLocalStorage()
+    } else {
+      const data = localStorage.getItem(`Media - ${currentTab}`)
+      if (!data) {
+        loadMedia()
+      } else {
+        setListState('loading')
+        setList(JSON.parse(data))
+        setListState('loaded')
+      }
+    }
 
     return cms.events.subscribe(
       ['media:upload:success', 'media:delete:success', 'media:pageSize'],
-      loadMedia
+      loadMedia,
     )
-  }, [offset, directory, currentTab])
+  }, [currentTab])
 
   const onClickMediaItem = (item: Media) => {
-    if (item.type === 'dir') {
+    /*if (item.type === 'dir') {
       setDirectory(path.join(item.directory, item.filename))
       resetOffset()
-    }
-    console.log('on click')
+    }*/
+    setItemModal(item)
   }
 
   let deleteMediaItem: (item: Media) => void
@@ -169,10 +201,9 @@ export function MediaPicker({
       if (close) close()
     }
   }
-
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
-    accept: 'image/*',
+    accept: currentTab === 2 ? ['.pdf', '.mp4', '.avi', '.docx'] : 'image/*',
 
     onDrop: async files => {
       try {
@@ -183,7 +214,7 @@ export function MediaPicker({
               directory: directory || '/',
               file,
             }
-          }), currentTab
+          }), currentTab,
         )
       } catch {
         // TODO: Events get dispatched already. Does anything else need to happen?
@@ -210,17 +241,30 @@ export function MediaPicker({
   }
 
   if (listState === 'not-configured') {
-    return <DocsLink title="Please Set up a Media Store" />
+    return <DocsLink title='Please Set up a Media Store' />
   }
 
   if (listState === 'error') {
-    return <DocsLink title="Failed to Load Media" />
+    return <DocsLink title='Failed to Load Media' />
   }
 
+  // https://einsteinindustries.atlassian.net/browse/LUC-778
+  // 4 images per line -> sub array of length: 4
+  const listByFour: Media[][] = []
+  let tmp: Media[] = []
+  list.items.forEach((item, idx) => {
+    tmp.push(item)
+    if ((idx + 1) % 4 === 0 || idx + 1 === list.items.length) {
+      listByFour.push(tmp)
+      tmp = []
+    }
+  })
+
   return (
-    <MediaPickerWrap>
+    <><MediaPickerWrap>
       <Header>
         <Breadcrumb directory={directory} setDirectory={setDirectory} />
+        <RefreshButton onClick={refresh} />
         <UploadButton onClick={onClick} uploading={uploading} />
       </Header>
       <List {...rootProps} dragActive={isDragActive}>
@@ -230,15 +274,21 @@ export function MediaPicker({
           <EmptyMediaList />
         )}
 
-        {list.items.map((item: Media) => (
-          <MediaItem
-            key={item.id}
-            item={item}
-            onClick={onClickMediaItem}
-            onSelect={selectMediaItem}
-            onDelete={deleteMediaItem}
-          />
-        ))}
+        {listByFour.map((four: Media[]) => <div key={four[0].id} style={{
+            display: 'flex',
+            justifyContent: 'center',
+          }}>
+            {four.map((item: Media) => (
+              <MediaItem
+                key={item.id}
+                item={item}
+                onClick={onClickMediaItem}
+                onSelect={selectMediaItem}
+                onDelete={deleteMediaItem}
+              />
+            ))}
+          </div>,
+        )}
       </List>
 
       <CursorPaginator
@@ -248,7 +298,88 @@ export function MediaPicker({
         hasPrev={hasPrev}
         navigatePrev={navigatePrev}
       />
-    </MediaPickerWrap>
+      {itemModal && <ItemModal close={() => setItemModal(null)} item={itemModal} />}
+    </MediaPickerWrap></>
+  )
+}
+
+interface ItemModal {
+  close: () => void
+  item: Media
+}
+
+const StyledImg = styled.img`
+  border-radius: 30px;
+  object-fit: cover;
+  width: 100%;
+  object-position: center;
+`
+
+const objToStringArray = (item: any) => {
+  const arr: any = []
+  for (const [key, value] of Object.entries(item)) {
+    let valueStr = ''
+    if (typeof value === 'string') {
+      valueStr = value
+    } else if (typeof value === 'boolean' || typeof value === 'number') {
+      valueStr = value.toString()
+    } else if (value === null) {
+      valueStr = 'null'
+    } else if (typeof value === 'object') {
+      valueStr = objToStringArray(value)
+    }
+    arr.push([key, valueStr])
+  }
+  return arr
+}
+
+const ItemModal = ({close, item }: ItemModal) => {
+  const imgix = item.metaData?.attributes
+  const tags = imgix?.tags
+  const colors = imgix?.colors['dominant_colors']
+  const meta =  objToStringArray(imgix || item.metaData);
+  return <Modal>
+    <PopupModal style={{width: '70%'}}>
+      <ModalHeader close={close}>Details for {item.filename}</ModalHeader>
+      <ModalBody>
+        <div style={{display: 'flex', margin: '50px auto', width: '80%'}}>
+          <div style={{width: '70%'}}>
+            <StyledImg src={item.previewSrc} alt='clicked image' />
+          </div>
+          <div style={{width: '100%'}}>
+            <ul style={{listStyle: 'none', marginLeft: '20px' }}>
+              <li style={{marginBottom: '5px'}}>name: {item.filename}</li>
+              <li style={{marginBottom: '5px'}}>url: {item.previewSrc}</li>
+              <li style={{marginBottom: '5px'}}>id: {item.id}</li>
+              <li style={{marginBottom: '5px'}}>type: {item.type}</li>
+              {meta.map(([key, value]: [string, any]) =>
+                typeof value !== 'object'
+                && <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
+              )}
+              {tags && Object.entries(tags).map(([key, value]) =>
+                <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
+                )}
+              {colors && Object.entries(colors).map(([key, value]) =>
+                <li key={key} style={{marginBottom: '5px'}}>{key}: {value}</li>
+              )}
+              {item.metaData?.LastModified && <li style={{marginBottom: '5px'}}>last modified: {item.metaData?.LastModified.toString()}</li>}
+            </ul>
+          </div>
+        </div>
+      </ModalBody>
+    </PopupModal>
+  </Modal>
+}
+
+const RefreshButton = ({ onClick }: any) => {
+  return (
+    <Button
+      style={{ minWidth: '5.3rem', marginRight: '15px' }}
+      primary
+      onClick={onClick}
+    >
+      Refresh
+    </Button>
   )
 }
 
@@ -333,11 +464,11 @@ const List = styled.ul<ListProps>`
   overflow-x: hidden;
 
   ${p =>
-    p.dragActive &&
-    css`
-      border: 2px solid var(--tina-color-primary);
-      border-radius: var(--tina-radius-small);
-    `}
+          p.dragActive &&
+          css`
+            border: 2px solid var(--tina-color-primary);
+            border-radius: var(--tina-radius-small);
+          `}
 `
 
 const EmptyMediaList = styled(props => {
@@ -356,7 +487,7 @@ const DocsLink = styled(({ title, ...props }) => {
       <div>
         {' '}
         Visit the{' '}
-        <a href="https://tinacms.org/docs/media" rel="noreferrer noopener">
+        <a href='https://tinacms.org/docs/media' rel='noreferrer noopener'>
           docs
         </a>{' '}
         to learn more about setting up the Media Manager for your CMS.
@@ -369,6 +500,7 @@ const DocsLink = styled(({ title, ...props }) => {
   display: flex;
   flex-direction: column;
   justify-content: center;
+
   a {
     color: black;
     text-decoration: underline;
