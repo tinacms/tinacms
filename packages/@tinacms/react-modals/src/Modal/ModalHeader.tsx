@@ -23,6 +23,7 @@ import { useState } from 'react'
 
 export interface ModalHeaderProps {
   children: React.ReactChild | React.ReactChild[]
+  back?(): void
   close?(): void
   updateCurrentTab?: (tabNumber: number) => void
   allTabs?: string[]
@@ -34,8 +35,19 @@ const StyledTab = styled.button<{isActive: boolean}>`
   cursor: pointer;
 `
 
+const BackArrow = () => {
+  return (
+    <svg version="1.1" id="Layer_1" x="0px" y="0px"
+         viewBox="0 0 330 330">
+<path id="XMLID_28_" d="M315,150H51.213l49.393-49.394c5.858-5.857,5.858-15.355,0-21.213c-5.857-5.857-15.355-5.857-21.213,0
+	l-75,75c-5.858,5.857-5.858,15.355,0,21.213l75,75C82.323,253.535,86.161,255,90,255c3.839,0,7.678-1.465,10.606-4.394
+	c5.858-5.857,5.858-15.355,0-21.213L51.213,180H315c8.284,0,15-6.716,15-15S323.284,150,315,150z"/>
+</svg>
+  )
+}
+
 export const ModalHeader = styled(
-  ({ children, close, updateCurrentTab, allTabs, ...styleProps }: ModalHeaderProps) => {
+  ({ children, close, back, updateCurrentTab, allTabs, ...styleProps }: ModalHeaderProps) => {
     const [currentTab, setCurrentTab] = useState(0)
     const handleClick = (idx: number) => {
       setCurrentTab(idx)
@@ -53,11 +65,16 @@ export const ModalHeader = styled(
           )}
         </div>
         }
-        {close && (
-          <CloseButton onClick={close}>
-            <CloseIcon />
-          </CloseButton>
-        )}
+        <div style={{display: 'flex'}}>
+          {back && <NavigationButton onClick={back} style={{ marginRight: '35px' }}>
+            <BackArrow />
+          </NavigationButton>}
+          {close && (
+            <NavigationButton onClick={close}>
+              <CloseIcon />
+            </NavigationButton>
+          )}
+        </div>
       </div>
     )
   },
@@ -82,7 +99,7 @@ const ModalTitle = styled.h2`
   margin: 0;
 `
 
-const CloseButton = styled.div`
+const NavigationButton = styled.div`
   display: flex;
   align-items: center;
   fill: var(--tina-color-grey-5);

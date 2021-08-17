@@ -30,16 +30,18 @@ import { ScreenPlugin } from '../screen-plugin'
 export interface ScreenPluginModalProps {
   screen: ScreenPlugin
   close(): void
+  back(): void
 }
 
 export const ScreenPluginModal: FC<ScreenPluginModalProps> = ({
   screen,
   close,
+  back
 }) => {
   const [currentTab, setCurrentTab] = useState<number>(0)
   const [allTabs, setAllTabs] = useState<string[]>([])
   return (
-    <ModalLayout name={screen.name} close={close} layout={screen.layout} updateCurrentTab={setCurrentTab} allTabs={allTabs}>
+    <ModalLayout name={screen.name} close={close} back={back} layout={screen.layout} updateCurrentTab={setCurrentTab} allTabs={allTabs}>
       <screen.Component close={close} currentTab={currentTab} setAllTabs={setAllTabs}/>
     </ModalLayout>
   )
@@ -49,12 +51,13 @@ interface ModalLayoutProps {
   children: any
   name: string
   close: any
+  back(): void
   layout?: 'fullscreen' | 'popup'
   updateCurrentTab?: (tab:number) => void
   allTabs?: string[]
 }
 
-const ModalLayout = ({ children, name, close, layout, updateCurrentTab, allTabs }: ModalLayoutProps) => {
+const ModalLayout = ({ children, name, close, back, layout, updateCurrentTab, allTabs }: ModalLayoutProps) => {
   let Wrapper
 
   switch (layout) {
@@ -72,7 +75,7 @@ const ModalLayout = ({ children, name, close, layout, updateCurrentTab, allTabs 
   return (
     <Modal>
       <Wrapper>
-        <ModalHeader close={close} updateCurrentTab={updateCurrentTab} allTabs={allTabs}>{name}</ModalHeader>
+        <ModalHeader close={close} back={back} updateCurrentTab={updateCurrentTab} allTabs={allTabs}>{name}</ModalHeader>
         <ModalBody>{children}</ModalBody>
       </Wrapper>
     </Modal>

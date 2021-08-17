@@ -203,6 +203,11 @@ export const Toolbar = () => {
         <ScreenPluginModal
           screen={activeScreen}
           close={() => setActiveView(null)}
+          // @ts-ignore
+          back={() => {
+            setActiveView(null)
+            setMenuIsOpen(true)
+          }}
         />
       )}
     </>
