@@ -324,7 +324,7 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
       .filter((stdout) => {
         return stdout.includes('tinacms/packages')
       })
-      .map((line) => line.replace('➤ YN0000: ', ''))
+      .map((line) => line.split(' ').pop())
 
     console.log('packagepaths', packagePathsToBuild)
 
