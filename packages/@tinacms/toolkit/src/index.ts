@@ -20,8 +20,8 @@ limitations under the License.
  * Export @tinacms internal packages
  */
 export * from './packages/react-modals'
+export type { Media } from './packages/core'
 export {
-  Media,
   MediaUploadOptions,
   MediaStore,
   MediaListOptions,
