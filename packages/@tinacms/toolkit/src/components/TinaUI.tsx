@@ -24,6 +24,7 @@ import { Toolbar } from '../packages/react-toolbar'
 import { useCMS } from '../react-tinacms/use-cms'
 import { Alerts } from '../packages/react-alerts'
 import { MediaManager } from './media'
+import { ActiveFieldIndicator } from '../packages/react-core/active-field-indicator'
 
 export interface TinaUIProps {
   position?: SidebarPosition
@@ -51,6 +52,7 @@ export const TinaUI: React.FC<TinaUIProps> = ({
       ) : (
         children
       )}
+      <ActiveFieldIndicator />
     </ModalProvider>
   )
 }
