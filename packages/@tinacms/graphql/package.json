@@ -8,6 +8,14 @@
     "src/fixtures/**/*"
   ],
   "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      }
+    ]
+  },
   "scripts": {
     "build": "yarn tsup src/index.ts --format cjs --dts",
     "watch": "yarn tsup src/index.ts --watch --format cjs --dts",
