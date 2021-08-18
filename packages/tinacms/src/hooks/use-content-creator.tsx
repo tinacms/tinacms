@@ -24,7 +24,6 @@ export type FilterCollections = (
 
 export type DocumentCreatorArgs = {
   onNewDocument?: OnNewDocument
-  testIt: boolean
   filterCollections?: FilterCollections
 }
 

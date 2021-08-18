@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/tina-build",
-  "version": "0.2.51",
+  "version": "0.50.0",
   "main": "dist/index.js",
   "files": [
     "dist/*",
