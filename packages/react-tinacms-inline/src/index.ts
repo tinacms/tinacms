@@ -19,11 +19,8 @@ limitations under the License.
 export * from './inline-form'
 export * from './inline-field'
 export * from './inline-field-context'
-export {
-  InlineText,
-  InlineTextField,
-  InlineTextProps,
-} from './fields/inline-text-field'
+export { InlineText, InlineTextField } from './fields/inline-text-field'
+export type { InlineTextProps } from './fields/inline-text-field'
 export {
   InlineTextarea,
   InlineTextareaField,
