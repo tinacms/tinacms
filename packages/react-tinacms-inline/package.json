@@ -8,10 +8,16 @@
     "dist"
   ],
   "scripts": {
-    "test": "jest --passWithNoTests",
+    "test": "jest --env=jsdom --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
-    "build": "tinacms-scripts build"
+    "build": "tinacms-scripts build",
+    "version": "yarn changeset version",
+    "version:snapshot": "yarn changeset version --snapshot",
+    "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
+    "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
+    "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
+    "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",
@@ -32,13 +38,14 @@
   "devDependencies": {
     "@testing-library/react": "^12.0.0",
     "@tinacms/scripts": "workspace:*",
-    "@types/jest": "^24.0.0",
+    "@tinacms/tina-build": "workspace:*",
+    "@types/jest": "^27.0.1",
     "@types/react": "^16.8.23",
     "@types/react-beautiful-dnd": "^11.0.3",
     "@types/react-dom": "^16.9.4",
     "@types/styled-components": "4.1.8",
     "final-form": "^4.20.2",
-    "jest": "^24.0.0",
+    "jest": "^27.0.6",
     "react": "16.12.0",
     "react-beautiful-dnd": "^13.1.0",
     "react-dom": "16.12.0",
@@ -48,8 +55,7 @@
     "react-tinacms-editor": "workspace:*",
     "styled-components": ">=4.1",
     "tinacms": "workspace:*",
-    "ts-jest": "^24.3.0",
-    "tslib": "^1.10.0"
+    "ts-jest": "^24.3.0"
   },
   "gitHead": "87c8f9a3ca2c5bf41e1a4c54a73759d12a7c5bfd"
 }
