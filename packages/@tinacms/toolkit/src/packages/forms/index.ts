@@ -18,5 +18,5 @@ limitations under the License.
 
 export * from './form'
 export * from './field'
-export { ContentCreatorPlugin } from './content-creator-plugin'
-export { FormApi } from 'final-form'
+export type { ContentCreatorPlugin } from './content-creator-plugin'
+export type { FormApi } from 'final-form'
