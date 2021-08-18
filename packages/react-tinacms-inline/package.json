@@ -11,13 +11,7 @@
     "test": "jest --env=jsdom --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
-    "build": "tinacms-scripts build",
-    "version": "yarn changeset version",
-    "version:snapshot": "yarn changeset version --snapshot",
-    "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
-    "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
-    "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
-    "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
+    "build": "tinacms-scripts build"
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",
