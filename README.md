@@ -2,21 +2,21 @@
 [![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tinacms.org/)
+# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tina.io)
 
 > Tina is an open-source toolkit for building content management directly into your website.
 
-[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
+[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tina.io/)
 
 - [Community Forum](https://community.tinacms.org/)
 
 ## Getting Started
 
-Checkout the [tutorial](https://tinacms.org/docs/getting-started/introduction/) to get started with TinaCMS.
+Checkout the [tutorial](https://tina.io/guides/tina-cloud/starter/overview/) to get started with TinaCMS.
 
 ## Documentation
 
-Visit https://tinacms.org/docs/ to view the full documentation.
+Visit https://tina.io/docs/ to view the full documentation.
 
 ## Development Process
 
@@ -43,7 +43,8 @@ Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/
 - Chris Davis ([@Enigmatical](https://github.com/Enigmatical) – Forestry.io
 - DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
-
+- Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) - Forestry.io
+- Jack Bevis ([@jbevis](https://github.com/jbevis)) - Forestry.io
 ### All Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):
