@@ -11,7 +11,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const createJestConfig = require('./create.jest.config.js')
-const pack = require('./package')
-
-module.exports = createJestConfig(pack)
+const mod = require('@tinacms/tina-build/dist/jest-runner.js')
+module.exports = mod.default.config
