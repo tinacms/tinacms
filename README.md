@@ -12,7 +12,7 @@
 
 ## Getting Started
 
-Checkout the [tutorial](https://tinacms.org/docs/getting-started/introduction/) to get started with TinaCMS.
+Checkout the [tutorial](https://tina.io/guides/tina-cloud/starter/overview/) to get started with TinaCMS.
 
 ## Documentation
 
