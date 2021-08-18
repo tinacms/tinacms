@@ -37,6 +37,7 @@ import {
   GroupListMeta,
   GroupLabel,
 } from './GroupListFieldPlugin'
+import { setActiveField } from '../../react-core/active-field-indicator'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -166,7 +167,6 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                     if (!template.itemProps) return {}
                     return template.itemProps(item)
                   }
-
                   return (
                     <BlockListItem
                       // NOTE: Supressing warnings, but not helping with render perf
@@ -216,6 +216,8 @@ const BlockListItem = ({
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
+  const fieldName = `${field.name}[${index}]`
+
   return (
     <Draggable
       key={index}
@@ -232,7 +234,11 @@ const BlockListItem = ({
             {...provider.dragHandleProps}
           >
             <DragHandle />
-            <ItemClickTarget onClick={() => setExpanded(true)}>
+            <ItemClickTarget
+              onClick={() => setExpanded(true)}
+              onMouseOver={() => setActiveField(fieldName)}
+              onMouseOut={() => setActiveField(null)}
+            >
               <GroupLabel>{label || template.label}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
