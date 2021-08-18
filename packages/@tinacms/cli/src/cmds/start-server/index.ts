@@ -42,14 +42,18 @@ export async function startServer(
         stdio: 'inherit',
         shell: true,
       })
-      ps.on("error", (code) =>{
-        logger.error(dangerText(`An error has occurred in the Next.js child process. Error message below`))
+      ps.on('error', (code) => {
+        logger.error(
+          dangerText(
+            `An error has occurred in the Next.js child process. Error message below`
+          )
+        )
         logger.error(`name: ${code.name}
 message: ${code.message}
 
-stack: ${code.stack || "No stack was provided"}`)
+stack: ${code.stack || 'No stack was provided'}`)
       })
-      ps.on('close', code => {
+      ps.on('close', (code) => {
         logger.info(`child process exited with code ${code}`)
         process.exit(code)
       })
@@ -105,11 +109,16 @@ stack: ${code.stack || "No stack was provided"}`)
   const start = async () => {
     const s = require('./server')
     state.server = await s.default(experimental)
+
     state.server.listen(port, () => {
       logger.info(`Started Filesystem GraphQL server on port: ${port}`)
       logger.info(`Visit the playground at http://localhost:${port}/altair/`)
     })
-    state.server.on('connection', socket => {
+    state.server.on('error', function () {
+      logger.error(dangerText(`Port 4001 already in use`))
+      process.exit()
+    })
+    state.server.on('connection', (socket) => {
       state.sockets.push(socket)
     })
   }
@@ -118,7 +127,7 @@ stack: ${code.stack || "No stack was provided"}`)
     logger.info('Detected change to gql package, restarting...')
     delete require.cache[gqlPackageFile]
 
-    state.sockets.forEach(socket => {
+    state.sockets.forEach((socket) => {
       if (socket.destroyed === false) {
         socket.destroy()
       }
