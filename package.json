@@ -7,7 +7,7 @@
     "packages/[^@]*"
   ],
   "scripts": {
-    "build": "yarn buildBuilder && yarn workspaces foreach --topological-dev --no-private run g:echo | cat > topologicalDeps.txt && cat ./topologicalDeps.txt && yarn workspace @tinacms/tina-build build:all",
+    "build": "yarn buildBuilder && yarn workspaces foreach --topological-dev --no-private run g:echo | cat > topologicalDeps.txt && yarn workspace @tinacms/tina-build build:all",
     "watch": "yarn build && yarn workspace @tinacms/tina-build watch:all",
     "buildBuilder": "yarn workspace @tinacms/tina-build build",
     "test": "yarn workspaces foreach --no-private -vip run test",

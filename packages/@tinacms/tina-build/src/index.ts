@@ -326,6 +326,8 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
       })
       .map((line) => line.replace('➤ YN0000: ', ''))
 
+    console.log('packagepaths', packagePathsToBuild)
+
     await sequential(packagePathsToBuild, async (packagePath) => {
       await run({ dir: packagePath })
     })
