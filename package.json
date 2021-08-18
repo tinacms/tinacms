@@ -11,7 +11,8 @@
     "g:tsc": "cd $INIT_CWD && tsc",
     "build": "yarn workspaces foreach --topological-dev --no-private run g:echo | cat > topologicalDeps.txt && yarn workspace @tinacms/tina-build build:all",
     "watch": "yarn workspace @tinacms/tina-build watch:all",
-    "test": "yarn workspaces foreach --no-private -p run test"
+    "test": "yarn workspaces foreach --no-private -p run test",
+    "g:nuke": "cd $INIT_CWD && rm -rf dist"
   },
   "dependencies": {
     "@changesets/cli": "^2.16.0",

@@ -105,6 +105,12 @@ export const run = async (args: { watch?: boolean; dir?: string }) => {
       return buildIt(entry, packageJSON)
     })
 
+    // TODO: When we're building for real, swap this out
+    await fs.writeFileSync(
+      path.join(process.cwd(), 'dist', 'index.d.ts'),
+      `export * from "../src"`
+    )
+
     if (args.dir) {
       console.timeEnd(successMessage)
     }
