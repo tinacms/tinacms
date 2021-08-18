@@ -190,7 +190,6 @@ const buildIt = async (entryPoint, packageJSON) => {
 
     const extension = path.extname(entry)
 
-    console.log('write hander', entry)
     // TODO: When we're building for real, swap this out
     await fs.writeFileSync(
       path.join(
@@ -258,23 +257,15 @@ const buildIt = async (entryPoint, packageJSON) => {
   await build({
     ...buildConfig,
   })
-  /**
-   * Not ideal, but we're using vite because of umd builds
-   * and tsup still works great for type generation, so
-   * using both. Vite's ts build might work, but it's all
-   * done in one pass so the slow ts process defeats the purpose
-   * of using vite in the first place. With 2 steps, it's
-   * a bit more cumbersome but the builds are still fast
-   * and types get built eventually
-   */
-  // await tsupbuild({
-  //   entryPoints: [path.resolve(process.cwd(), entry)],
-  //   format: ['cjs'],
-
-  //   // Not specifying outDir will result in it being ts build only
-  //   // outDir: path.join(process.cwd(), 'dist'),
-  //   dts: true,
-  // })
+  const extension = path.extname(entry)
+  await fs.writeFileSync(
+    path.join(
+      process.cwd(),
+      'dist',
+      entry.replace('src/', '').replace(extension, '.d.ts')
+    ),
+    `export * from "../${entry.replace(extension, '')}"`
+  )
   return true
 }
 
