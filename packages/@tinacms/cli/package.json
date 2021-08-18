@@ -12,6 +12,14 @@
   "bin": {
     "tinacms": "bin/tinacms"
   },
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      }
+    ]
+  },
   "devDependencies": {
     "@types/clear": "0.1.0",
     "@types/cors": "2.8.5",

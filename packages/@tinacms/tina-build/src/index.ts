@@ -105,18 +105,12 @@ export const run = async (args: { watch?: boolean; dir?: string }) => {
       return buildIt(entry, packageJSON)
     })
 
-    // TODO: When we're building for real, swap this out
-    await fs.writeFileSync(
-      path.join(process.cwd(), 'dist', 'index.d.ts'),
-      `export * from "../src"`
-    )
-
     if (args.dir) {
       console.timeEnd(successMessage)
     }
   } catch (e) {
     console.log(`Error building ${packageJSON.name}`)
-    // console.error(e)
+    console.error(e)
   }
 }
 
@@ -175,29 +169,38 @@ e.g: "forestry types:gen --help"
   program.parse(args)
 }
 
-const buildIt = async (entry, packageJSON) => {
+const buildIt = async (entryPoint, packageJSON) => {
+  const entry = typeof entryPoint === 'string' ? entryPoint : entryPoint.name
+  const target = typeof entryPoint === 'string' ? 'browser' : entryPoint.target
   const deps = packageJSON.dependencies
   // @ts-ignore
   const peerDeps = packageJSON.peerDependencies
   const external = Object.keys({ ...deps, ...peerDeps })
   const globals = {}
+
   external.forEach((ext) => (globals[ext] = 'NOOP'))
-  if (['@tinacms/graphql', '@tinacms/cli'].includes(packageJSON.name)) {
+  if (target === 'node') {
     await esbuild({
-      entryPoints: [path.join(process.cwd(), 'src/index.ts')],
+      entryPoints: [path.join(process.cwd(), entry)],
       bundle: true,
       platform: 'node',
       outdir: path.join(process.cwd(), 'dist'),
       external,
     })
-    // await tsupbuild({
-    //   entryPoints: [path.join(process.cwd(), 'src/index.ts')],
-    //   // entryPoints: ['src/index.ts'],
-    //   format: ['cjs'],
-    //   outDir: path.join(process.cwd(), 'dist'),
-    //   // outDir: 'dist',
-    //   // dts: true,
-    // })
+
+    const extension = path.extname(entry)
+
+    console.log('write hander', entry)
+    // TODO: When we're building for real, swap this out
+    await fs.writeFileSync(
+      path.join(
+        process.cwd(),
+        'dist',
+        entry.replace('src/', '').replace(extension, '.d.ts')
+      ),
+      `export * from "../${entry.replace(extension, '')}"`
+    )
+
     return true
   }
   const defaultBuildConfig: Parameters<typeof build>[0] = {
@@ -276,28 +279,7 @@ const buildIt = async (entry, packageJSON) => {
 }
 
 import pnp from 'pnpapi'
-// const pnp = require(`pnpapi`)
 import chokidar from 'chokidar'
-// const chokidar = require('chokidar')
-// import path from 'path'
-// import chalk from 'chalk'
-// const path = require('path')
-// const chalk = require('chalk')
-
-import { exec, execSync } from 'child_process'
-
-async function sh(cmd) {
-  return new Promise(function (resolve, reject) {
-    execSync(cmd, (err, stdout, stderr) => {
-      if (err) {
-        reject(err)
-      } else {
-        resolve({ stdout, stderr })
-      }
-    })
-  })
-}
-import execa from 'execa'
 
 const all = async (args: { watch?: boolean; dir?: string }) => {
   const workspacePackageNames = []
@@ -343,51 +325,7 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
     await sequential(packagePathsToBuild, async (packagePath) => {
       await run({ dir: packagePath })
     })
-    // } else {
-    //   console.log(`${chalk.blue(`Building workspaces...`)}`)
-    //   await sequential(workspacePkgs, async (path) => {
-    //     const packageLocator = pnp.findPackageLocator(path)
-    //     const packageInformation = pnp.getPackageInformation(packageLocator)
-    //     console.log(`${chalk.blue(`Building ${path}`)}`)
-    //     await run({ dir: packageInformation.packageLocation })
-    //   })
   }
-}
-
-const evaluatePackage = async ({
-  packageInformation,
-  packagejson,
-  workspacePackageNames,
-  builtPackageNames,
-}) => {
-  for await (const [
-    name,
-    referencish,
-  ] of packageInformation.packageDependencies) {
-    if (workspacePackageNames.includes(name)) {
-      if (!builtPackageNames.includes(name)) {
-        const childLocator = pnp.getLocator(name, referencish)
-        const childInformation = pnp.getPackageInformation(childLocator)
-
-        const childPackagejson = JSON.parse(
-          await fs
-            .readFileSync(
-              path.join(childInformation.packageLocation, 'package.json')
-            )
-            .toString()
-        )
-        console.log('built', childPackagejson.name)
-        await evaluatePackage({
-          packageInformation: childInformation,
-          childPackagejson,
-          workspacePackageNames,
-          builtPackageNames,
-        })
-      }
-    }
-  }
-  builtPackageNames.push(packageJSON.name)
-  await run({ dir: packageInformation.packageLocation })
 }
 
 export const sequential = async <A, B>(

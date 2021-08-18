@@ -7,12 +7,13 @@
     "packages/[^@]*"
   ],
   "scripts": {
-    "g:echo": "echo $INIT_CWD",
-    "g:tsc": "cd $INIT_CWD && tsc",
-    "build": "yarn workspaces foreach --topological-dev --no-private run g:echo | cat > topologicalDeps.txt && yarn workspace @tinacms/tina-build build:all",
-    "watch": "yarn workspace @tinacms/tina-build watch:all",
+    "build": "yarn buildBuilder && yarn workspaces foreach --topological-dev --no-private run g:echo | cat > topologicalDeps.txt && yarn workspace @tinacms/tina-build build:all",
+    "watch": "yarn build && yarn workspace @tinacms/tina-build watch:all",
+    "buildBuilder": "yarn workspace @tinacms/tina-build build",
     "test": "yarn workspaces foreach --no-private -p run test",
-    "g:nuke": "cd $INIT_CWD && rm -rf dist"
+    "nuke": "yarn workspaces foreach --no-private -p run g:nuke",
+    "g:echo": "echo $INIT_CWD",
+    "g:nuke": "cd $INIT_CWD && yarn exec rm -rf dist && echo \"Cleaned build files from ${INIT_CWD}\""
   },
   "dependencies": {
     "@changesets/cli": "^2.16.0",
