@@ -14,7 +14,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
-    "target": "es5"
+    "target": "ES5"
   },
   "exclude": ["node_modules", "dist"],
   "include": ["src"]
