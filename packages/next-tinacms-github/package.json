@@ -23,6 +23,7 @@
     "@types/jest": "^27.0.1",
     "@types/node": "^16.3.2",
     "@types/qs": "^6.9.7",
+    "@types/styled-components": "^5.1.12",
     "@types/uuid": "^8.0.0",
     "jest": "^27.0.6",
     "tinacms": "workspace:*",

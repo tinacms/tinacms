@@ -4,7 +4,7 @@
   "license": "Apache-2.0",
   "author": "Nolan Phillips",
   "main": "dist/index.js",
-  "typings": "dist/src/index.d.ts",
+  "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],

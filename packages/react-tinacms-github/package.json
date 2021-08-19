@@ -3,7 +3,7 @@
   "version": "0.50.6",
   "description": "",
   "main": "dist/index.js",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
