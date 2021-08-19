@@ -326,8 +326,6 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
       })
       .map((line) => line.split(' ').pop())
 
-    console.log('packagepaths', packagePathsToBuild)
-
     await sequential(packagePathsToBuild, async (packagePath) => {
       await run({ dir: packagePath })
     })
