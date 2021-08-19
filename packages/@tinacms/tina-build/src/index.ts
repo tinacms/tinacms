@@ -123,7 +123,7 @@ export const run = async (args: { watch?: boolean; dir?: string }) => {
     }
   } catch (e) {
     console.log(`Error building ${packageJSON.name}`)
-    console.error(e)
+    throw new Error(e)
   }
 }
 
