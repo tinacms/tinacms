@@ -5116,6 +5116,7 @@ __metadata:
     styled-components: ">=4.1"
     tslib: ^2.3.0
     tsup: ^3.7.0
+    typescript: ^4.3.5
     webfontloader: 1.6.28
   peerDependencies:
     react: ">=16.8"

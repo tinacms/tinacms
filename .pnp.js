@@ -12157,6 +12157,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:0cf8a36df11e795e7c1f161c22e844302c8da246198d95f079b62206ce82bab2bcc73240bf1f675aee09198d58abf861a77139fcb1afa5ccdddcf49a247e31b9#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12211,6 +12212,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12265,6 +12267,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:4785069866da169f114b6a7d252357e67b4cb15c65b210366b8c41d64958288a4cc9a0fbd099e08107f7a78b884054a48bb116a6aa71465e47ff9337640e047c#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12319,6 +12322,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:ef5f0464a93c3efa41c08b335f0011b665ab750b218ec89596f2c387b034c562de80d22bd9889f3b06824e2d0df8379c46c9f8422073fc867bf4526e43954b59#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12371,6 +12375,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:ef5f0464a93c3efa41c08b335f0011b665ab750b218ec89596f2c387b034c562de80d22bd9889f3b06824e2d0df8379c46c9f8422073fc867bf4526e43954b59#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12425,6 +12430,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:74ede678f8e00d412a0b326bcd83eb7052c97881f7fcec30d07113279dffffdca74a636aa4f228044eae3c572932b22f607c0b6ba37ffce57b23ad01e30626af#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12479,6 +12485,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12533,6 +12540,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12587,6 +12595,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:ef5f0464a93c3efa41c08b335f0011b665ab750b218ec89596f2c387b034c562de80d22bd9889f3b06824e2d0df8379c46c9f8422073fc867bf4526e43954b59#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12641,6 +12650,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:ef5f0464a93c3efa41c08b335f0011b665ab750b218ec89596f2c387b034c562de80d22bd9889f3b06824e2d0df8379c46c9f8422073fc867bf4526e43954b59#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12694,6 +12704,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:fe29cee21a6b9294be4d474231f5fa3e53bf0513ea46def8d7ed2598489193d9c7cae504589520ca81ac0b6322ad9e6e04ad6796e4b4c25f5e506723d05dea15#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "packagePeers": [
@@ -12748,6 +12759,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:9e4cae41608cad964a2a6cbb042b1d13dfcbec5495b433a9fa39217db2f7a0d1f49702b6405bcf371fe5442f56bae8ebfbeddf7ab56a7a7e06345821dadda294#npm:5.3.0"],
             ["tslib", "npm:2.3.0"],
             ["tsup", "npm:3.12.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webfontloader", "npm:1.6.28"]
           ],
           "linkType": "SOFT",
