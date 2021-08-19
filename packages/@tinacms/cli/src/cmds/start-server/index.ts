@@ -114,9 +114,16 @@ stack: ${code.stack || 'No stack was provided'}`)
       logger.info(`Started Filesystem GraphQL server on port: ${port}`)
       logger.info(`Visit the playground at http://localhost:${port}/altair/`)
     })
-    state.server.on('error', function () {
-      logger.error(dangerText(`Port 4001 already in use`))
-      process.exit()
+    state.server.on('error', function (e) {
+        if (e.code === 'EADDRINUSE') {
+          logger.error(
+              dangerText(
+                  `Port 4001 already in use`
+              )
+          )
+          process.exit()
+        }
+        throw e
     })
     state.server.on('connection', (socket) => {
       state.sockets.push(socket)
