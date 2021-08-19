@@ -66,6 +66,7 @@ export const buildEditor = (
   const { state, dispatch } = view
   const { tr, doc } = state
   dispatch(
+    // @ts-ignore
     tr.setSelection(new TextSelection(doc.resolve(doc.content.size) || 0))
   )
   view.focus()
