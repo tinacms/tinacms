@@ -19,6 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import styled, { css } from 'styled-components'
+import { setActiveField } from '../../react-core/active-field-indicator'
 
 type InputFieldType<ExtraFieldProps, InputProps> = FieldProps<InputProps> &
   ExtraFieldProps
@@ -36,13 +37,15 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
       label={props.field.label}
       description={props.field.description}
       error={props.meta.error}
+      onMouseOver={() => setActiveField(props.input.name)}
+      onMouseOut={() => setActiveField(null)}
     >
       <Field {...props} />
     </FieldMeta>
   )
 }
 
-interface FieldMetaProps {
+interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   name: string
   children: any
   label?: string
@@ -58,9 +61,10 @@ export const FieldMeta = ({
   error,
   margin = true,
   children,
+  ...props
 }: FieldMetaProps) => {
   return (
-    <FieldWrapper margin={margin}>
+    <FieldWrapper margin={margin} {...props}>
       <FieldLabel htmlFor={name}>
         {label || name}
         {description && <FieldDescription>{description}</FieldDescription>}

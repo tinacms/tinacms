@@ -31,6 +31,7 @@ import {
 } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { FieldDescription } from './wrapFieldWithMeta'
+import { setActiveField } from '../../react-core/active-field-indicator'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -159,7 +160,11 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             {...p}
           >
             <DragHandle />
-            <ItemClickTarget onClick={() => setExpanded(true)}>
+            <ItemClickTarget
+              onMouseOver={() => setActiveField(`${field.name}.${index}`)}
+              onMouseOut={() => setActiveField(null)}
+              onClick={() => setExpanded(true)}
+            >
               <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
