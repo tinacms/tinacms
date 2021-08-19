@@ -25,13 +25,14 @@ export const ActiveFieldIndicator = () => {
   if (!activeEle) return null
 
   const { top, left, width, height } = activeEle.getBoundingClientRect()
+
   return (
     <div
       style={{
         position: 'absolute',
         zIndex: 999,
-        top,
-        left,
+        top: top + window.scrollY,
+        left: left + window.scrollX,
         width,
         height,
         outline: '2px dashed var(--tina-color-indicator)',
