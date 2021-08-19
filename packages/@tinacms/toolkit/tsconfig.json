@@ -1,16 +1,16 @@
 {
   "compilerOptions": {
-    "strict": true,
     "declaration": true,
-    "target": "es5",
+    "emitDeclarationOnly": false,
     "esModuleInterop": true,
     "isolatedModules": true,
-    "skipLibCheck": true,
-    "emitDeclarationOnly": true,
-    "noImplicitAny": true,
     "jsx": "react",
     "lib": ["esnext", "dom"],
-    "outDir": "dist"
+    "noImplicitAny": false,
+    "outDir": "dist",
+    "skipLibCheck": true,
+    "strict": true,
+    "target": "es5"
   },
   "exclude": ["node_modules", "dist", "src/**/*.test.tsx", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
   "include": ["src"]
