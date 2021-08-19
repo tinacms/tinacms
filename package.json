@@ -12,7 +12,7 @@
     "buildBuilder": "yarn workspace @tinacms/tina-build build",
     "test": "yarn workspaces foreach --no-private -vip run test",
     "nuke": "yarn workspaces foreach --no-private -vip run g:nuke",
-    "types": "yarn workspaces foreach --no-private -vip run types",
+    "types": "yarn workspaces foreach --topological-dev --no-private -vip run types",
     "g:echo": "echo $INIT_CWD",
     "g:nuke": "cd $INIT_CWD && yarn exec rm -rf dist && echo \"cleaned\"",
     "version": "yarn changeset version",
