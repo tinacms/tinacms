@@ -128,6 +128,7 @@ export async function tinaSetup(ctx: any, next: () => void, options) {
         ? readFileSync(appPath)
         : readFileSync(appPathTS)
       const matches = [
+        // @ts-ignore
         ...fileContent.toString().matchAll(/^.*import.*\.css("|').*$/gm),
       ]
       // This gets the primary match. see: https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Global_Objects/String/match#using_match
