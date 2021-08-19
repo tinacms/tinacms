@@ -11,6 +11,7 @@
     "test": "jest --env=jsdom --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
+    "types": "yarn tsc",
     "build": "tinacms-scripts build"
   },
   "dependencies": {

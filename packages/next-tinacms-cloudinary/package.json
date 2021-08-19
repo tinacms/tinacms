@@ -18,6 +18,7 @@
   },
   "scripts": {
     "build": "yarn tsup src/index.ts src/handlers.ts --format cjs --dts",
+    "types": "yarn tsc",
     "watch": "yarn tsup src/index.ts src/handlers.ts --watch --format cjs --dts"
   },
   "dependencies": {

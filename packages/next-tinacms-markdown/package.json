@@ -16,6 +16,7 @@
   },
   "scripts": {
     "watch": "tinacms-scripts watch",
+    "types": "yarn tsc",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
     "test": "jest --env=jsdom --passWithNoTests",
