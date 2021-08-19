@@ -66,6 +66,7 @@
     "react-final-form": "^6.3.0",
     "simple-git": "1.126.0",
     "tsup": "^3.7.0",
+    "typescript": "^4.3.5",
     "webfontloader": "1.6.28"
   },
   "peerDependencies": {
