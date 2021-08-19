@@ -4,7 +4,6 @@ const FOCUS_EVENT = 'tina:activefield'
 
 export const setActiveField = (field: string | null) => {
   const fieldEvent = new CustomEvent(FOCUS_EVENT, { detail: field })
-  console.log('setting active field', field)
   window.dispatchEvent(fieldEvent)
 }
 
@@ -29,11 +28,12 @@ export const ActiveFieldIndicator = () => {
       style={{
         position: 'absolute',
         zIndex: 999,
-        top: activeEle.offsetTop + 3,
-        left: activeEle.offsetLeft + 3,
-        width: activeEle.offsetWidth - 6,
-        height: activeEle.offsetHeight - 6,
-        outline: '3px dashed var(--tina-color-primary)',
+        top: activeEle.offsetTop,
+        left: activeEle.offsetLeft,
+        width: activeEle.offsetWidth,
+        height: activeEle.offsetHeight,
+        boxShadow:
+          'inset 0 -5px 12px var(--tina-color-indicator),inset 0 5px 12px var(--tina-color-indicator)',
       }}
     ></div>
   )
