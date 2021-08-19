@@ -14,37 +14,37 @@ export const Blocks = (props: Pages) => {
               case "PagesBlocksContent":
                 return (
                   <div
-                    data-tinafield={`blocks[${i}]`}
+                    data-tinafield={`blocks.${i}`}
                     key={i + block.__typename}
                   >
-                    <Content data={block} />
+                    <Content data={block} parentField={`blocks.${i}`} />
                   </div>
                 );
               case "PagesBlocksHero":
                 return (
                   <div
-                    data-tinafield={`blocks[${i}]`}
+                    data-tinafield={`blocks.${i}`}
                     key={i + block.__typename}
                   >
-                    <Hero data={block} />
+                    <Hero data={block} parentField={`blocks.${i}`} />
                   </div>
                 );
               case "PagesBlocksFeatures":
                 return (
                   <div
-                    data-tinafield={`blocks[${i}]`}
+                    data-tinafield={`blocks.${i}`}
                     key={i + block.__typename}
                   >
-                    <Features data={block} />
+                    <Features data={block} parentField={`blocks.${i}`} />
                   </div>
                 );
               case "PagesBlocksTestimonial":
                 return (
                   <div
-                    data-tinafield={`blocks[${i}]`}
+                    data-tinafield={`blocks.${i}`}
                     key={i + block.__typename}
                   >
-                    <Testimonial data={block} />
+                    <Testimonial data={block} parentField={`blocks.${i}`} />
                   </div>
                 );
               default:
