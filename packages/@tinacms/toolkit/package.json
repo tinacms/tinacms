@@ -23,6 +23,7 @@
   ],
   "scripts": {
     "build": "yarn tinacms-scripts build",
+    "tsc": "yarn tsc",
     "watch": "yarn tinacms-scripts watch"
   },
   "devDependencies": {
