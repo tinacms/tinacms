@@ -216,8 +216,6 @@ const BlockListItem = ({
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
-  const fieldName = `${field.name}[${index}]`
-
   return (
     <Draggable
       key={index}
@@ -236,7 +234,7 @@ const BlockListItem = ({
             <DragHandle />
             <ItemClickTarget
               onClick={() => setExpanded(true)}
-              onMouseOver={() => setActiveField(fieldName)}
+              onMouseOver={() => setActiveField(`${field.name}.${index}`)}
               onMouseOut={() => setActiveField(null)}
             >
               <GroupLabel>{label || template.label}</GroupLabel>
