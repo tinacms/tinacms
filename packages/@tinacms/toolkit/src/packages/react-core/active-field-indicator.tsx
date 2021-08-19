@@ -23,17 +23,18 @@ export const ActiveFieldIndicator = () => {
   }, [])
 
   if (!activeEle) return null
+
+  const { top, left, width, height } = activeEle.getBoundingClientRect()
   return (
     <div
       style={{
         position: 'absolute',
         zIndex: 999,
-        top: activeEle.offsetTop,
-        left: activeEle.offsetLeft,
-        width: activeEle.offsetWidth,
-        height: activeEle.offsetHeight,
-        boxShadow:
-          'inset 0 -5px 12px var(--tina-color-indicator),inset 0 5px 12px var(--tina-color-indicator)',
+        top,
+        left,
+        width,
+        height,
+        outline: '2px dashed var(--tina-color-indicator)',
       }}
     ></div>
   )
