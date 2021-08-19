@@ -28,7 +28,7 @@
     "tinacms": "workspace:*",
     "ts-jest": "^24.0.3",
     "tslib": "^1.10.0",
-    "typescript": "^3.8.2"
+    "typescript": "^4.3.5"
   },
   "dependencies": {
     "atob": "2.1.2",

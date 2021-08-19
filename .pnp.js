@@ -16032,7 +16032,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["micromatch", "npm:3.1.10"],
             ["mkdirp", "npm:0.5.5"],
             ["source-map-support", "npm:0.5.19"],
-            ["typescript", null],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["webpack-log", "npm:1.2.0"]
           ],
           "packagePeers": [
@@ -29693,7 +29693,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tinacms", "virtual:99cf30630d2a917f81682f5a56459f19447bec72735e0a9b1edd67dbb31bbc0d5f68f5dcb8820e6cb51cd5dff5514d9c7d9633a46ee4d29aad459463b66b600b#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
             ["tslib", "npm:1.14.1"],
-            ["typescript", "patch:typescript@npm%3A3.9.10#builtin<compat/typescript>::version=3.9.10&hash=ddfc1b"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"],
             ["uuid", "npm:8.3.2"]
           ],
           "linkType": "SOFT",
@@ -29715,7 +29715,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:17.0.2"],
             ["tinacms", "virtual:3d4791f6e48404d81d24056f65b91d3da32feff8898a32ce5b7b134fdef6c060e62c92aaf7300d5fb032dc54868362eb869c0935e7dc7e6f4f636f8343a35bf8#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/next",
@@ -29737,7 +29738,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest", "virtual:128eb90cbf7cf77a82cdc44ef429a01bf66cdb47ad3378f97a17ee37fbf9722a5670cd3020a667b89edec96127296082baed2594f762470cd2f58a8644426e64#npm:27.0.6"],
             ["tinacms", "virtual:99cf30630d2a917f81682f5a56459f19447bec72735e0a9b1edd67dbb31bbc0d5f68f5dcb8820e6cb51cd5dff5514d9c7d9633a46ee4d29aad459463b66b600b#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "linkType": "SOFT",
         }]
@@ -29762,7 +29764,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:16.12.0"],
             ["tinacms", "virtual:99cf30630d2a917f81682f5a56459f19447bec72735e0a9b1edd67dbb31bbc0d5f68f5dcb8820e6cb51cd5dff5514d9c7d9633a46ee4d29aad459463b66b600b#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/next",
@@ -29793,7 +29796,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:17.0.2"],
             ["tinacms", "virtual:3d4791f6e48404d81d24056f65b91d3da32feff8898a32ce5b7b134fdef6c060e62c92aaf7300d5fb032dc54868362eb869c0935e7dc7e6f4f636f8343a35bf8#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/next",
@@ -29824,7 +29828,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react", "npm:16.12.0"],
             ["tinacms", "virtual:7ca658e70ee75535fa810678d493ce5eab6dbd235a5852e430a9af38a45da887a4542723c9b0ffec9cef8f8d1548cc177d59c2f55d8ee0bc724165684d67322f#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/next",
@@ -29850,7 +29855,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["js-yaml", "npm:3.14.1"],
             ["tinacms", "virtual:99cf30630d2a917f81682f5a56459f19447bec72735e0a9b1edd67dbb31bbc0d5f68f5dcb8820e6cb51cd5dff5514d9c7d9633a46ee4d29aad459463b66b600b#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "linkType": "SOFT",
         }]
@@ -33704,6 +33710,19 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             "typescript"
           ],
           "linkType": "HARD",
+        }],
+        ["virtual:9d8b9486ca86bc3b6cab8c2443ebfc43b1ace9ee9f135369edc1248b0750de1416ab1d1f086e99a095d8e2e1b5fd3beb436f33d88f6d0b1e9b2175f7a5b7d58e#npm:1.22.0", {
+          "packageLocation": "./.yarn/$$virtual/react-docgen-typescript-virtual-71ab4dcfdf/0/cache/react-docgen-typescript-npm-1.22.0-13bd9adc58-9053aa6801.zip/node_modules/react-docgen-typescript/",
+          "packageDependencies": [
+            ["react-docgen-typescript", "virtual:9d8b9486ca86bc3b6cab8c2443ebfc43b1ace9ee9f135369edc1248b0750de1416ab1d1f086e99a095d8e2e1b5fd3beb436f33d88f6d0b1e9b2175f7a5b7d58e#npm:1.22.0"],
+            ["@types/typescript", null],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
+          ],
+          "packagePeers": [
+            "@types/typescript",
+            "typescript"
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["react-docgen-typescript-loader", [
@@ -33721,8 +33740,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/typescript", null],
             ["@webpack-contrib/schema-utils", "virtual:9d8b9486ca86bc3b6cab8c2443ebfc43b1ace9ee9f135369edc1248b0750de1416ab1d1f086e99a095d8e2e1b5fd3beb436f33d88f6d0b1e9b2175f7a5b7d58e#npm:1.0.0-beta.0"],
             ["loader-utils", "npm:1.4.0"],
-            ["react-docgen-typescript", "virtual:3fc1233990c1d174482a781c53f57aa2599d3be104ff8f6c8a2ec1391993cc207d5deedae9bd7ecaf217065905fa28cefc6dbc6a1bcafb5d470538b67e54994b#npm:1.22.0"],
-            ["typescript", null]
+            ["react-docgen-typescript", "virtual:9d8b9486ca86bc3b6cab8c2443ebfc43b1ace9ee9f135369edc1248b0750de1416ab1d1f086e99a095d8e2e1b5fd3beb436f33d88f6d0b1e9b2175f7a5b7d58e#npm:1.22.0"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/typescript",
@@ -35283,7 +35302,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#npm:5.3.0"],
             ["tinacms", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/react",
@@ -35360,7 +35380,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:4785069866da169f114b6a7d252357e67b4cb15c65b210366b8c41d64958288a4cc9a0fbd099e08107f7a78b884054a48bb116a6aa71465e47ff9337640e047c#npm:5.3.0"],
             ["tinacms", "virtual:3d4791f6e48404d81d24056f65b91d3da32feff8898a32ce5b7b134fdef6c060e62c92aaf7300d5fb032dc54868362eb869c0935e7dc7e6f4f636f8343a35bf8#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/react",
@@ -35435,7 +35456,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#npm:5.3.0"],
             ["tinacms", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/react-dom",
@@ -35512,7 +35534,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#npm:5.3.0"],
             ["tinacms", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "linkType": "SOFT",
         }]
@@ -35547,7 +35570,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tinacms", "virtual:99cf30630d2a917f81682f5a56459f19447bec72735e0a9b1edd67dbb31bbc0d5f68f5dcb8820e6cb51cd5dff5514d9c7d9633a46ee4d29aad459463b66b600b#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
             ["tslib", "npm:1.14.1"],
-            ["typescript", "patch:typescript@npm%3A3.9.10#builtin<compat/typescript>::version=3.9.10&hash=ddfc1b"]
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/final-form",
@@ -35583,7 +35606,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["tinacms", "virtual:7ca658e70ee75535fa810678d493ce5eab6dbd235a5852e430a9af38a45da887a4542723c9b0ffec9cef8f8d1548cc177d59c2f55d8ee0bc724165684d67322f#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
             ["tslib", "npm:1.14.1"],
-            ["typescript", "patch:typescript@npm%3A3.9.10#builtin<compat/typescript>::version=3.9.10&hash=ddfc1b"]
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "linkType": "SOFT",
         }]
@@ -35622,7 +35645,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-use", "virtual:fe29cee21a6b9294be4d474231f5fa3e53bf0513ea46def8d7ed2598489193d9c7cae504589520ca81ac0b6322ad9e6e04ad6796e4b4c25f5e506723d05dea15#npm:17.2.4"],
             ["styled-components", "virtual:fe29cee21a6b9294be4d474231f5fa3e53bf0513ea46def8d7ed2598489193d9c7cae504589520ca81ac0b6322ad9e6e04ad6796e4b4c25f5e506723d05dea15#npm:5.3.0"],
             ["tinacms", "virtual:3d4791f6e48404d81d24056f65b91d3da32feff8898a32ce5b7b134fdef6c060e62c92aaf7300d5fb032dc54868362eb869c0935e7dc7e6f4f636f8343a35bf8#workspace:packages/tinacms"],
-            ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"]
+            ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/final-form",
@@ -35668,7 +35692,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["react-use", "virtual:b5197b5e094dcc4ec87b35bf7d6c649f2cd2eb3d7ae89db3319d2f83c52bf1bde385e99d0382069b6487e618b0de2c99ce555da943fa0f8a98ea55d3886bb95e#npm:17.2.4"],
             ["styled-components", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#npm:5.3.0"],
             ["tinacms", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#workspace:packages/tinacms"],
-            ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"]
+            ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "linkType": "SOFT",
         }]
@@ -35694,7 +35719,8 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["styled-components", "virtual:0cf8a36df11e795e7c1f161c22e844302c8da246198d95f079b62206ce82bab2bcc73240bf1f675aee09198d58abf861a77139fcb1afa5ccdddcf49a247e31b9#npm:5.3.0"],
             ["tinacms", "virtual:7ca658e70ee75535fa810678d493ce5eab6dbd235a5852e430a9af38a45da887a4542723c9b0ffec9cef8f8d1548cc177d59c2f55d8ee0bc724165684d67322f#workspace:packages/tinacms"],
             ["ts-jest", "virtual:4acfe9737dfbee600870ee0753bae6b2dabc15d4fafea02b5e5cc7a8d4a76ab8410cd249d223ebfcba4197b002f8c472fdbba9bb0315f1017db02700ee682988#npm:24.3.0"],
-            ["tslib", "npm:1.14.1"]
+            ["tslib", "npm:1.14.1"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "linkType": "SOFT",
         }]

@@ -18595,7 +18595,7 @@ fsevents@~2.1.2:
     tinacms: "workspace:*"
     ts-jest: ^24.0.3
     tslib: ^1.10.0
-    typescript: ^3.8.2
+    typescript: ^4.3.5
     uuid: ^8.1.0
   peerDependencies:
     tinacms: "*"
@@ -18613,6 +18613,7 @@ fsevents@~2.1.2:
     tinacms: "workspace:*"
     ts-jest: ^24.0.3
     tslib: ^1.10.0
+    typescript: ^4.3.5
   peerDependencies:
     next: ">=9"
     react: ">=16"
@@ -18635,6 +18636,7 @@ fsevents@~2.1.2:
     tinacms: "workspace:*"
     ts-jest: ^24.0.3
     tslib: ^1.10.0
+    typescript: ^4.3.5
   peerDependencies:
     next: ">=9"
     react: ">=16"
@@ -22112,6 +22114,7 @@ fsevents@~2.1.2:
     tinacms: "workspace:*"
     ts-jest: ^24.0.3
     tslib: ^1.10.0
+    typescript: ^4.3.5
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
@@ -22144,7 +22147,7 @@ fsevents@~2.1.2:
     tinacms: "workspace:*"
     ts-jest: ^24.0.3
     tslib: ^1.10.0
-    typescript: ^3.8.2
+    typescript: ^4.3.5
   peerDependencies:
     final-form: ">=4.18.0"
     react: ">=16.8"
@@ -22183,6 +22186,7 @@ fsevents@~2.1.2:
     styled-components: ">=4.1"
     tinacms: "workspace:*"
     ts-jest: ^24.3.0
+    typescript: ^4.3.5
   peerDependencies:
     final-form: ">=4.20.2"
     react: ">=16.8"
@@ -22216,6 +22220,7 @@ fsevents@~2.1.2:
     tinacms: "workspace:*"
     ts-jest: ^24.0.3
     tslib: ^1.10.0
+    typescript: ^4.3.5
   peerDependencies:
     final-form: ">=4.20.2"
     react: ">=16.8"
