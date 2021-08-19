@@ -2,7 +2,7 @@ import React from "react";
 import { Container } from "../container";
 import { Section } from "../section";
 
-export const Testimonial = ({ data }) => {
+export const Testimonial = ({ data, parentField = "" }) => {
   return (
     <Section color={data.color}>
       <Container size="large">
@@ -19,7 +19,12 @@ export const Testimonial = ({ data }) => {
             >
               &ldquo;
             </span>
-            <p className="relative opacity-95">{data.quote}</p>
+            <p
+              data-tinafield={`${parentField}.quote`}
+              className="relative opacity-95"
+            >
+              {data.quote}
+            </p>
             <span
               className={`block opacity-15 text-8xl absolute inset-y-1/2 transform translate-y-3	-right-4 leading-4 -z-1`}
             >
@@ -37,6 +42,7 @@ export const Testimonial = ({ data }) => {
           </div>
           <footer className="text-center">
             <p
+              data-tinafield={`${parentField}.author`}
               className={`tracking-wide title-font font-bold text-lg ${
                 data.color === "primary"
                   ? `text-blue-200`
