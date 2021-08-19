@@ -7,6 +7,7 @@
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",
     "dev": "tinacms-scripts dev",
+    "types": "yarn tsc",
     "build": "tinacms-scripts build"
   },
   "repository": {

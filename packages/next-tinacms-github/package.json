@@ -8,6 +8,7 @@
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
+    "types": "yarn tsc",
     "test": "jest --env=jsdom --passWithNoTests"
   },
   "author": "",
