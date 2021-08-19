@@ -27,6 +27,7 @@
     "@octokit/auth-app": "^2.6.0",
     "@octokit/graphql": "^4.5.6",
     "@octokit/rest": "18.0.6",
+    "@types/aws-sdk": "^2.7.0",
     "aws-sdk": "^2.930.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

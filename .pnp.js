@@ -11910,6 +11910,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@octokit/graphql", "npm:4.6.4"],
             ["@octokit/rest", "npm:18.0.6"],
             ["@tinacms/tina-build", "workspace:packages/@tinacms/tina-build"],
+            ["@types/aws-sdk", "npm:2.7.0"],
             ["@types/cors", "npm:2.8.12"],
             ["@types/express", "npm:4.17.13"],
             ["@types/fs-extra", "npm:9.0.12"],
@@ -12858,6 +12859,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-atob-npm-2.1.2-d1b3aa7dd7-df8e9efd3c.zip/node_modules/@types/atob/",
           "packageDependencies": [
             ["@types/atob", "npm:2.1.2"]
+          ],
+          "linkType": "HARD",
+        }]
+      ]],
+      ["@types/aws-sdk", [
+        ["npm:2.7.0", {
+          "packageLocation": "./.yarn/cache/@types-aws-sdk-npm-2.7.0-bc78404722-ae3633e0e2.zip/node_modules/@types/aws-sdk/",
+          "packageDependencies": [
+            ["@types/aws-sdk", "npm:2.7.0"],
+            ["aws-sdk", "npm:2.972.0"]
           ],
           "linkType": "HARD",
         }]
@@ -16096,6 +16107,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/unplugged/aws-sdk-npm-2.951.0-bdacda9486/node_modules/aws-sdk/",
           "packageDependencies": [
             ["aws-sdk", "npm:2.951.0"],
+            ["buffer", "npm:4.9.2"],
+            ["events", "npm:1.1.1"],
+            ["ieee754", "npm:1.1.13"],
+            ["jmespath", "npm:0.15.0"],
+            ["querystring", "npm:0.2.0"],
+            ["sax", "npm:1.2.1"],
+            ["url", "npm:0.10.3"],
+            ["uuid", "npm:3.3.2"],
+            ["xml2js", "npm:0.4.19"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:2.972.0", {
+          "packageLocation": "./.yarn/unplugged/aws-sdk-npm-2.972.0-1fa4b03c33/node_modules/aws-sdk/",
+          "packageDependencies": [
+            ["aws-sdk", "npm:2.972.0"],
             ["buffer", "npm:4.9.2"],
             ["events", "npm:1.1.1"],
             ["ieee754", "npm:1.1.13"],
