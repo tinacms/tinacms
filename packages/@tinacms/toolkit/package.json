@@ -23,7 +23,6 @@
   ],
   "scripts": {
     "build": "yarn tinacms-scripts build",
-    "tsc": "yarn tsc",
     "watch": "yarn tinacms-scripts watch"
   },
   "devDependencies": {
@@ -48,6 +47,10 @@
   },
   "dependencies": {
     "@sambego/storybook-styles": "^1.0.0",
+    "@types/atob": "^2.1.2",
+    "@types/cors": "^2.8.12",
+    "@types/express": "^4.17.13",
+    "@types/multer": "^1.4.7",
     "@types/prop-types": "^15.7.4",
     "atob": "2.1.2",
     "color-string": "^1.5.3",

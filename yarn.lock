@@ -5081,10 +5081,14 @@ __metadata:
     "@sambego/storybook-styles": ^1.0.0
     "@tinacms/scripts": "workspace:*"
     "@tinacms/tina-build": "workspace:*"
+    "@types/atob": ^2.1.2
     "@types/codemirror": ^0.0.71
     "@types/color-string": ^1.5.0
+    "@types/cors": ^2.8.12
+    "@types/express": ^4.17.13
     "@types/lodash.debounce": ^4.0.6
     "@types/lodash.get": ^4.4.5
+    "@types/multer": ^1.4.7
     "@types/prop-types": ^15.7.4
     "@types/react": ^17.0.14
     "@types/react-beautiful-dnd": ^11.0.3
@@ -5154,6 +5158,13 @@ __metadata:
   version: 4.2.2
   resolution: "@types/aria-query@npm:4.2.2"
   checksum: 4fbf71637e4cd3fef95d0fe29c53722aeba900f38a3089af7c863ae8491c9bbba101c45680cf50be014c31575fd0d61c89d10cbf75fa7164fb957f53fb4ca21d
+  languageName: node
+  linkType: hard
+
+"@types/atob@npm:^2.1.2":
+  version: 2.1.2
+  resolution: "@types/atob@npm:2.1.2"
+  checksum: df8e9efd3c4f842a5183b9a11877adb96d78b1d1559280afa87bc2c77c04ef1abd0004ab1947de0265292ab032497c679b6c1b954efce5eb6b455fb2404ab348
   languageName: node
   linkType: hard
 
@@ -5268,7 +5279,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/cors@npm:^2.8.7":
+"@types/cors@npm:^2.8.12, @types/cors@npm:^2.8.7":
   version: 2.8.12
   resolution: "@types/cors@npm:2.8.12"
   checksum: f3b62196df42c286282b9dbda26e24d2264211d932e7d9c2240f361e27ef693a5cb03790daeb3610fd958a0690f4d31d45ef7848b0df7a0dd2afc698a4f9df76
@@ -5330,7 +5341,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/express@npm:*, @types/express@npm:^4.17.7, @types/express@npm:^4.17.8":
+"@types/express@npm:*, @types/express@npm:^4.17.13, @types/express@npm:^4.17.7, @types/express@npm:^4.17.8":
   version: 4.17.13
   resolution: "@types/express@npm:4.17.13"
   dependencies:
@@ -5615,6 +5626,15 @@ __metadata:
   version: 1.2.2
   resolution: "@types/minimist@npm:1.2.2"
   checksum: 8dd59cefa7be641b961ccfe65f6ff16aaa6735412f47d5c993543d4e92590465a0d728abc0dad36e4957d105a44357379adadbca4baaa2926427d4eb66d74d0d
+  languageName: node
+  linkType: hard
+
+"@types/multer@npm:^1.4.7":
+  version: 1.4.7
+  resolution: "@types/multer@npm:1.4.7"
+  dependencies:
+    "@types/express": "*"
+  checksum: f20bc141e3f8fee16e8cf36a213dca7285f4af0ac5960ca8b17076f26f2dfd77d6518da3908de32482cc8d799cd8ae82af17cbe85c4f9829b70918e6420dd330
   languageName: node
   linkType: hard
 
