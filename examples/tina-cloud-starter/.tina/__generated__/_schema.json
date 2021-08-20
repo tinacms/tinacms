@@ -296,6 +296,10 @@
                 "defaultItem": {
                   "href": "home",
                   "label": "Home"
+                },
+                "itemProps": {
+                  "name": "BasicItemProps",
+                  "fieldName": "label"
                 }
               },
               "fields": [
@@ -596,6 +600,10 @@
                   "tagline": "Here's some text above the other text",
                   "headline": "This Big Text is Totally Awesome",
                   "text": "Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo."
+                },
+                "itemProps": {
+                  "name": "BasicItemProps",
+                  "fieldName": "headline"
                 }
               },
               "fields": [
@@ -835,6 +843,10 @@
                         "style": "float",
                         "name": ""
                       }
+                    },
+                    "itemProps": {
+                      "name": "BasicItemProps",
+                      "fieldName": "title"
                     }
                   },
                   "fields": [

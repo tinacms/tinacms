@@ -21,4 +21,5 @@ export * from '@tinacms/toolkit'
 
 import { TinaCMSProvider2 } from './tina-cms'
 
+export { TinaCMSProvider2 }
 export default TinaCMSProvider2

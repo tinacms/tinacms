@@ -37,6 +37,7 @@ import {
   GroupListMeta,
   GroupLabel,
 } from './GroupListFieldPlugin'
+import { useCMS } from '../../react-core'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -80,6 +81,7 @@ interface BlockFieldProps {
 }
 
 const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
+  const cms = useCMS()
   const addItem = React.useCallback(
     (name: string, template: BlockTemplate) => {
       let obj: any = {}
@@ -164,7 +166,16 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
 
                   const itemProps = (item: object) => {
                     if (!template.itemProps) return {}
-                    return template.itemProps(item)
+                    if (typeof template.itemProps === 'function') {
+                      return template.itemProps(item)
+                    } else {
+                      const plugins = cms.plugins
+                        .all('itemProps')
+                        .filter(
+                          (plugin) => plugin.name === template.itemProps.name
+                        )
+                      return plugins[0]?.run(item, template.itemProps)
+                    }
                   }
 
                   return (

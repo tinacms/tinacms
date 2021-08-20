@@ -31,6 +31,7 @@ import {
 } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { FieldDescription } from './wrapFieldWithMeta'
+import { useCMS } from '../../react-core'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -67,6 +68,7 @@ interface GroupProps {
 }
 
 const Group = ({ tinaForm, form, field, input }: GroupProps) => {
+  const cms = useCMS()
   const addItem = React.useCallback(() => {
     let obj = {}
     if (typeof field.defaultItem === 'function') {
@@ -81,7 +83,14 @@ const Group = ({ tinaForm, form, field, input }: GroupProps) => {
   const itemProps = React.useCallback(
     (item: object) => {
       if (!field.itemProps) return {}
-      return field.itemProps(item)
+      if (typeof field.itemProps === 'function') {
+        return field.itemProps(item)
+      } else {
+        const plugins = cms.plugins
+          .all('itemProps')
+          .filter((plugin) => plugin.name === field.itemProps.name)
+        return plugins[0]?.run(item, field.itemProps)
+      }
     },
     [field.itemProps]
   )

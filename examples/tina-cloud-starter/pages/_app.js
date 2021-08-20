@@ -24,6 +24,13 @@ const App = ({ Component, pageProps }) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
+              cms.plugins.add({
+                __type: "itemProps",
+                name: "BasicItemProps",
+                run: (item, meta) => {
+                  return { label: item[meta.fieldName] };
+                },
+              });
             }}
             documentCreatorCallback={{
               /**
