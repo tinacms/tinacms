@@ -68,7 +68,7 @@
   },
   "devDependencies": {
     "@graphql-tools/schema": "^6.2.1",
-    "@tinacms/tina-build": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/express": "^4.17.8",
     "@types/fs-extra": "^9.0.2",

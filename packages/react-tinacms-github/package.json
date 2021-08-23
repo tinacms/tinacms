@@ -23,7 +23,6 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@tinacms/tina-build": "workspace:*",
     "@types/jest": "^27.0.1",
     "@types/js-cookie": "^2.2.5",
     "@types/react": "^16.8.23",

@@ -1,1 +1,0 @@
-exports.createJestConfig = require("./create.jest.config.js")
