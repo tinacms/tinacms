@@ -35,4 +35,4 @@ console.log('Production')
 
 ## Source
 
-- [Source Code](https://github.com/tinacms/tinacms/tree/master/packages/%40tinacms/scripts)
+- [Source Code](https://github.com/tinacms/tinacms/tree/main/packages/%40tinacms/scripts)

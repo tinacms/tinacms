@@ -52,7 +52,7 @@ export const previewHandler = (signingKey: string) => (req: any, res: any) => {
   } else {
     res.status(401).json({
       message:
-        'Missing Credentials: see https://github.com/tinacms/tinacms/tree/master/packages/next-tinacms-github for implementation',
+        'Missing Credentials: see https://github.com/tinacms/tinacms/tree/main/packages/next-tinacms-github for implementation',
     })
   }
 }
