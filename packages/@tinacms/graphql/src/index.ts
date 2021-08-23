@@ -36,9 +36,15 @@ export {
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
   TinaCloudCollection as TinaCloudCollectionBase,
+  TinaCloudTemplateBase as TinaTemplate,
   TinaFieldBase,
 } from './primitives/types'
 
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
+// Alias to remove Cloud
+export type TinaSchema = TinaCloudSchema
 export type TinaCloudCollection = TinaCloudCollectionBase<false>
+// Alias to remove Cloud
+export type TinaCollection = TinaCloudCollectionBase<false>
 export type TinaField = TinaFieldBase
+export type { TinaTemplate }

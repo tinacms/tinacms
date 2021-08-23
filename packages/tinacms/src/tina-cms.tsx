@@ -59,7 +59,11 @@ class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { hasError: props.hasError, message: '' }
+    this.state = { 
+      hasError: props.hasError, 
+      message: '',
+      pageRefresh: false
+     }
   }
 
   static getDerivedStateFromError(error) {
@@ -75,7 +79,7 @@ class ErrorBoundary extends React.Component {
    */
   render() {
     // @ts-ignore
-    if (this.state.hasError) {
+    if (this.state.hasError && !this.state.pageRefresh) {
       return (
         <div
           style={{
@@ -110,9 +114,11 @@ class ErrorBoundary extends React.Component {
             <p>Tina caught an error while updating the page:</p>
             {/* @ts-ignore */}
             <pre>{this.state.message}</pre>
+            <br />
             <p>
               If you've just updated the form, undo your most recent changes and
-              click "refresh"
+              click "refresh". If after a few refreshes, you're still encountering this error. 
+              There is a bigger issue with the site. Please reach out to your site admin.
             </p>
             <div style={{ padding: '10px 0' }}>
               <button
@@ -127,7 +133,11 @@ class ErrorBoundary extends React.Component {
                   border: 'none',
                   color: 'white',
                 }}
-                onClick={() => this.setState({ hasError: false })}
+                onClick={() => {
+                  /* @ts-ignore */
+                  this.setState({ pageRefresh: true })
+                  setTimeout(() => this.setState({ hasError: false, pageRefresh: false}), 3000)
+                }}
               >
                 Refresh
               </button>
@@ -135,6 +145,15 @@ class ErrorBoundary extends React.Component {
           </div>
         </div>
       )
+    }
+    {/* @ts-ignore */}
+    { if (this.state.pageRefresh) {
+      return (
+        <Loader>
+          Let's try that again.
+        </Loader>
+      )
+    }
     }
 
     return this.props.children

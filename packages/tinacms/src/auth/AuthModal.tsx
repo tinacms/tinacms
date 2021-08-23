@@ -26,7 +26,7 @@ interface ModalBuilderProps {
   title: string
   message: string
   error?: string
-  actions: any[]
+  actions: ButtonProps[]
   close(): void
 }
 
@@ -41,7 +41,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
             {modalProps.error && <ErrorLabel>{modalProps.error}</ErrorLabel>}
           </ModalBody>
           <ModalActions>
-            {modalProps.actions.map((action: any) => (
+            {modalProps.actions.map((action) => (
               <AsyncButton {...action} />
             ))}
           </ModalActions>
