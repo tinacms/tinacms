@@ -104,7 +104,7 @@ UNHANDLED REJECTION MarkdownRemark.rawFrontmatter provided incorrect OutputType:
     [ncphillips.github.io]/[graphql-compose]/lib/TypeMapper.js:294:15
 ```
 
-This error is caused by the [setFieldsOnGraphQLNodeType](https://github.com/tinacms/tinacms/blob/master/packages/gatsby-tinacms-remark/gatsby-node.js#L18)
+This error is caused by the [setFieldsOnGraphQLNodeType](https://github.com/tinacms/tinacms/blob/main/packages/gatsby-tinacms-remark/gatsby-node.js#L18)
 method in each of those methods. The reason why `String` is not `String` is
 that the GraphQL type checking is based on the identity of the`GraphQLString`
 object imported from Gatsby.
