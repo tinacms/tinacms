@@ -38,7 +38,6 @@
     "@types/lru-cache": "^5.1.0",
     "@types/ws": "^7.2.6",
     "@types/yup": "^0.29.7",
-    "esbuild-runner": "^2.2.0",
     "graphql-tools": "^6.2.1",
     "jest": "^27.0.6",
     "jest-diff": "^26.4.2",
