@@ -4800,7 +4800,6 @@ __metadata:
     "@types/lru-cache": ^5.1.0
     "@types/ws": ^7.2.6
     "@types/yup": ^0.29.7
-    esbuild-runner: ^2.2.0
     graphql-tools: ^6.2.1
     jest: ^27.0.6
     jest-diff: ^26.4.2
@@ -4849,7 +4848,6 @@ __metadata:
     chokidar: ^3.5.1
     commander: 5.1.0
     cors: ^2.8.5
-    esbuild-runner: ^2.2.0
     esm: 3.2.25
     express: ^4.17.1
     fast-glob: ^3.2.4
@@ -5081,7 +5079,6 @@ __metadata:
     atob: 2.1.2
     color-string: ^1.5.3
     cors: ^2.8.5
-    esbuild-runner: ^2.2.0
     express: ^4.17.1
     final-form: ^4.20.2
     final-form-arrays: ^3.0.1
@@ -11958,20 +11955,6 @@ __metadata:
   peerDependencies:
     esbuild: ">=0.8.50"
   checksum: 6fdd02b3774ccc75580f2105bfd09c8b8b39ffeb127c61eddc1bbd87c60660cdc39ca9ed6addaa7776819a95ee1bf5bd20428f30844989d68863de5563961827
-  languageName: node
-  linkType: hard
-
-"esbuild-runner@npm:^2.2.0":
-  version: 2.2.0
-  resolution: "esbuild-runner@npm:2.2.0"
-  dependencies:
-    source-map-support: 0.5.19
-    tslib: 2.2.0
-  peerDependencies:
-    esbuild: "*"
-  bin:
-    esr: bin/esr.js
-  checksum: d291a2e385927fcd2b67ec45f3df56aafce15acf7f6dcdad593b79e6a97793f8cf2417b83f8bb8bf4a75d387601e45b69c3b7c4e626155a0cdbf3f86c8ef5d12
   languageName: node
   linkType: hard
 
@@ -23940,7 +23923,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"source-map-support@npm:0.5.19, source-map-support@npm:^0.5.3, source-map-support@npm:^0.5.6, source-map-support@npm:~0.5.12, source-map-support@npm:~0.5.19":
+"source-map-support@npm:^0.5.3, source-map-support@npm:^0.5.6, source-map-support@npm:~0.5.12, source-map-support@npm:~0.5.19":
   version: 0.5.19
   resolution: "source-map-support@npm:0.5.19"
   dependencies:
@@ -25670,13 +25653,6 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"tslib@npm:2.2.0, tslib@npm:~2.2.0":
-  version: 2.2.0
-  resolution: "tslib@npm:2.2.0"
-  checksum: 2d35468c470410871c5246e43f12dcb6d0fc363b617c176f26443b9530e5c5ee8448966892a42956168d8f495da7865bda33dfe82c26c91991e28999974a618f
-  languageName: node
-  linkType: hard
-
 "tslib@npm:^1.10.0, tslib@npm:^1.11.1, tslib@npm:^1.13.0, tslib@npm:^1.8.1, tslib@npm:^1.9.0, tslib@npm:^1.9.3":
   version: 1.14.1
   resolution: "tslib@npm:1.14.1"
@@ -25702,6 +25678,13 @@ resolve@^2.0.0-next.3:
   version: 2.1.0
   resolution: "tslib@npm:2.1.0"
   checksum: d8f5bdd067611651c6b846c2388f4dc8ba1f5af124e66105f5263d1ad56da17f4b8c6566887ca2f205c5a9758451871ceca87d5d06087af2dca1699c5e33db69
+  languageName: node
+  linkType: hard
+
+"tslib@npm:~2.2.0":
+  version: 2.2.0
+  resolution: "tslib@npm:2.2.0"
+  checksum: 2d35468c470410871c5246e43f12dcb6d0fc363b617c176f26443b9530e5c5ee8448966892a42956168d8f495da7865bda33dfe82c26c91991e28999974a618f
   languageName: node
   linkType: hard
 
