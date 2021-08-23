@@ -1,5 +1,6 @@
-[![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
 # [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tina.io)
@@ -20,7 +21,7 @@ Visit https://tina.io/docs/ to view the full documentation.
 
 ## Development Process
 
-See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/master/ROADMAP.md) to learn how the maintainers work.
+See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/main/ROADMAP.md) to learn how the maintainers work.
 
 ## Questions?
 
@@ -35,7 +36,7 @@ Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.
 
 ## Contributing
 
-Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/CONTRIBUTING.md)
+Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
 
 ### Maintainers
 
@@ -45,6 +46,7 @@ Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
 - Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) - Forestry.io
 - Jack Bevis ([@jbevis](https://github.com/jbevis)) - Forestry.io
+
 ### All Contributors ✨
 
 Thanks goes to these wonderful people ([emoji key](https://allcontributors.org/docs/en/emoji-key)):

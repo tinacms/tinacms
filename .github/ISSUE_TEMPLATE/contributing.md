@@ -9,7 +9,7 @@ labels: contributing
 
   Before opening a new issue, please search existing issues: https://github.com/tinacms/tinacms/issues
 
-  Also check out the troubleshooting section of the CONTRIBUTING doc: https://github.com/tinacms/tinacms/blob/master/CONTRIBUTING.md#troubleshooting-in-development
+  Also check out the troubleshooting section of the CONTRIBUTING doc: https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md#troubleshooting-in-development
 -->
 
 ## Description
