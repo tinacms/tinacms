@@ -149,7 +149,7 @@ export function InlineText({
 }
 ```
 
-`Input` is a styled-component with some [base styling](https://github.com/tinacms/tinacms/blob/master/packages/react-tinacms-inline/src/fields/inline-text-field.tsx#L64) aimed at making this component mesh well with the surrounding site. If you ever need to override default Inline Field styles, read about this workaround to [extend styles](https://tinacms.org/docs/ui/inline-editing#extending-inline-field-styles).
+`Input` is a styled-component with some [base styling](https://github.com/tinacms/tinacms/blob/main/packages/react-tinacms-inline/src/fields/inline-text-field.tsx#L64) aimed at making this component mesh well with the surrounding site. If you ever need to override default Inline Field styles, read about this workaround to [extend styles](https://tinacms.org/docs/ui/inline-editing#extending-inline-field-styles).
 
 ### Focus Ring
 

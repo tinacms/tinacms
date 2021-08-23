@@ -21,8 +21,11 @@ export { defineSchema } from './cmds/compile'
 import { logger } from './logger'
 export type {
   TinaCloudSchema,
+  TinaSchema,
   TinaCloudCollection,
-  TinaField
+  TinaCollection,
+  TinaField,
+  TinaTemplate,
 } from '@tinacms/graphql'
 
 const program = new commander.Command(name)

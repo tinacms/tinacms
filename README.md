@@ -1,26 +1,27 @@
-[![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/master/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
+[![GitHub license](https://img.shields.io/github/license/tinacms/tinacms?color=blue)](https://github.com/tinacms/tinacms/blob/main/LICENSE) [![npm version](https://img.shields.io/npm/v/tinacms.svg?style=flat)](https://www.npmjs.com/package/tinacms) ![Status](https://github.com/tinacms/tinacms/workflows/Build,%20Test,%20Lint%20for%20Master/badge.svg)<!-- ALL-CONTRIBUTORS-BADGE:START - Do not remove or modify this section -->
 [![All Contributors](https://img.shields.io/badge/all_contributors-101-orange.svg?style=flat-square)](#contributors-)
+
 <!-- ALL-CONTRIBUTORS-BADGE:END -->
 
-# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tinacms.org/)
+# [![TINA CMS](https://res.cloudinary.com/forestry-demo/image/upload/v1585234360/TinaCMS/TinaCMS.png 'Visit tinacms.org')](https://tina.io)
 
 > Tina is an open-source toolkit for building content management directly into your website.
 
-[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tinacms.org/)
+[![Tina Demo](https://res.cloudinary.com/forestry-demo/video/upload/du_16,w_700,e_loop/v1571159974/tina-hero-demo.gif)](https://tina.io/)
 
 - [Community Forum](https://community.tinacms.org/)
 
 ## Getting Started
 
-Checkout the [tutorial](https://tinacms.org/docs/getting-started/introduction/) to get started with TinaCMS.
+Checkout the [tutorial](https://tina.io/guides/tina-cloud/starter/overview/) to get started with TinaCMS.
 
 ## Documentation
 
-Visit https://tinacms.org/docs/ to view the full documentation.
+Visit https://tina.io/docs/ to view the full documentation.
 
 ## Development Process
 
-See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/master/ROADMAP.md) to learn how the maintainers work.
+See our [ROADMAP.md](https://github.com/tinacms/tinacms/blob/main/ROADMAP.md) to learn how the maintainers work.
 
 ## Questions?
 
@@ -35,7 +36,7 @@ Check the [CHANGELOG](./CHANGELOG.md) for the latest updates to TinaCMS.
 
 ## Contributing
 
-Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/CONTRIBUTING.md)
+Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/main/CONTRIBUTING.md)
 
 ### Maintainers
 
@@ -43,6 +44,8 @@ Please see our [CONTRIBUTING.md](https://github.com/tinacms/tinacms/blob/master/
 - Chris Davis ([@Enigmatical](https://github.com/Enigmatical) – Forestry.io
 - DJ Walker([@wordsaboutcode](https://twitter.com/wordsaboutcode)) – Forestry.io
 - Jeff See ([@jeffsee55](https://github.com/jeffsee55)) - Forestry.io
+- Logan Anderson ([@logan_anders0n](https://twitter.com/logan_anders0n)) - Forestry.io
+- Jack Bevis ([@jbevis](https://github.com/jbevis)) - Forestry.io
 
 ### All Contributors ✨
 

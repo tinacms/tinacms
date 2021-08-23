@@ -1,6 +1,7 @@
 import { defineSchema } from "@tinacms/cli";
+import type { TinaTemplate, TinaField } from "@tinacms/cli";
 
-const iconSchema = {
+const iconSchema: TinaField = {
   type: "object",
   label: "Icon",
   name: "icon",
@@ -167,7 +168,7 @@ const defaultFeature = {
   },
 };
 
-const featureBlockShema = {
+const featureBlockShema: TinaTemplate = {
   name: "features",
   label: "Features",
   ui: {
@@ -213,7 +214,7 @@ const featureBlockShema = {
   ],
 };
 
-const contentBlockSchema = {
+const contentBlockSchema: TinaTemplate = {
   name: "content",
   label: "Content",
   ui: {
@@ -243,7 +244,7 @@ const contentBlockSchema = {
   ],
 };
 
-const testimonialBlockSchema = {
+const testimonialBlockSchema: TinaTemplate = {
   name: "testimonial",
   label: "Testimonial",
   ui: {
@@ -281,7 +282,7 @@ const testimonialBlockSchema = {
   ],
 };
 
-const heroBlockSchema = {
+const heroBlockSchema: TinaTemplate = {
   name: "hero",
   label: "Hero",
   ui: {
