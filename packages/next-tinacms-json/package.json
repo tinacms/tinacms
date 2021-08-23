@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@tinacms/tina-build": "workspace:*",
     "@types/jest": "^27.0.1",
     "jest": "^27.0.6",
     "tinacms": "workspace:*",

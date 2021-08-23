@@ -47,7 +47,6 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@tinacms/tina-build": "workspace:*",
     "@types/jest": "^27.0.1",
     "jest": "^27.0.6",
     "react-final-form": "^6.3.0",

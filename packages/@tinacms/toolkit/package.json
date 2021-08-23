@@ -28,7 +28,6 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@tinacms/tina-build": "workspace:*",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
     "@types/lodash.debounce": "^4.0.6",
