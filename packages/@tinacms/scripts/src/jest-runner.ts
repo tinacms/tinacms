@@ -17,7 +17,7 @@ import sucraseRunner from '@sucrase/jest-plugin'
 const config = {
   verbose: true,
   transform: {
-    '.(ts|tsx)': '@tinacms/tina-build/dist/jest-runner.js',
+    '.(ts|tsx)': '@tinacms/scripts/dist/jest-runner.js',
     // '.(ts|tsx)': 'ts-jest',
   },
   testRegex: '(\\.spec|.test)\\.(ts|tsx|js)$',

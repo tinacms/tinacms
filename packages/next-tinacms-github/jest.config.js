@@ -11,5 +11,5 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-const mod = require('@tinacms/tina-build/dist/jest-runner.js')
+const mod = require('@tinacms/scripts/dist/jest-runner.js')
 module.exports = mod.default.config
