@@ -12,7 +12,7 @@
 'react-tinacms-github': patch
 'react-tinacms-inline': patch
 'react-tinacms-strapi': patch
-'tinacms
+'tinacms': patch
 ---
 
 Build packages with new scripting, which includes preliminary support for ES modules. 
