@@ -5,9 +5,16 @@
   "files": [
     "dist/*"
   ],
+  "buildConfig": {
+    "entryPoints": [
+      "src/index.ts",
+      "src/edit-state.tsx"
+    ]
+  },
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
   "scripts": {
+    "types": "yarn tsc",
     "build": "yarn tsup src/index.ts src/edit-state.tsx --format cjs --dts",
     "watch": "yarn tsup src/index.ts src/edit-state.tsx --watch --format cjs --dts"
   },
@@ -37,7 +44,7 @@
     "yup": "^0.32.0"
   },
   "devDependencies": {
-    "@tinacms/tina-build": "workspace:*",
+    "@tinacms/scripts": "workspace:*",
     "@types/lodash": "^4.14.169",
     "@types/node": "^14.0.13",
     "@types/react": "^16.9.38",

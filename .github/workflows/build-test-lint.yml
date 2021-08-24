@@ -17,3 +17,5 @@ jobs:
         run: yarn test
       - name: Lint
         run: yarn lint
+      - name: Built Types
+        run: yarn types

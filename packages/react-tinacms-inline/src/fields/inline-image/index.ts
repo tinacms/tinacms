@@ -16,8 +16,6 @@ limitations under the License.
 
 */
 
-export {
-  InlineImage,
-  InlineImageField,
-  InlineImageProps,
-} from './inline-image-field'
+export { InlineImage, InlineImageField } from './inline-image-field'
+
+export type { InlineImageProps } from './inline-image-field'
