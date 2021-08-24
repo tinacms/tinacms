@@ -10,6 +10,7 @@
     "build": "yarn buildBuilder && yarn workspaces foreach --topological-dev --no-private run g:echo | cat > topologicalDeps.txt && yarn workspace @tinacms/scripts build:all",
     "watch": "yarn build && yarn workspace @tinacms/scripts watch:all",
     "buildBuilder": "yarn workspace @tinacms/scripts build",
+    "dev": "yarn workspace tina-cloud-starter dev",
     "test": "yarn workspaces foreach --no-private -vip run test",
     "nuke": "yarn workspaces foreach --no-private -vip run g:nuke",
     "types": "yarn workspaces foreach --topological-dev --no-private -vip run types",

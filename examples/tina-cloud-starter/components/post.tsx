@@ -80,6 +80,7 @@ export const Post = ({ data }) => {
 };
 
 import type { Root, Content } from "mdast";
+import type { Descendant } from "slate";
 import { Hero } from "./blocks/hero";
 
 const Markdown2 = (props) => {
@@ -87,16 +88,91 @@ const Markdown2 = (props) => {
     return <Markdown>{props.children}</Markdown>;
   } else {
     const ast = props.children as Root;
-    return (
-      <MarkdownContent templates={props.children._field.templates}>
-        {ast.children}
-      </MarkdownContent>
-    );
+    if (props.children.type === "root") {
+      return (
+        <MarkdownContent templates={props.children._field.templates}>
+          {ast.children}
+        </MarkdownContent>
+      );
+    } else {
+      return <SlateContent>{props.children}</SlateContent>;
+    }
   }
 };
 
 const Link = (props) => {
-  return <a href="">Linnnnk</a>;
+  return <a href={props.to}>Link to {props.label}</a>;
+};
+const SlateContent = ({
+  children,
+  blocks = {
+    Hero: (props) => <Hero data={props} />,
+    Link: (props) => <Link {...props} />,
+  },
+}: {
+  children: Descendant[];
+}) => {
+  return (
+    <>
+      {children.map((child) => {
+        switch (child.type) {
+          case defaultNodeTypes.heading[1]:
+            return (
+              <h1>
+                <SlateContent>{child.children}</SlateContent>
+              </h1>
+            );
+          case defaultNodeTypes.heading[2]:
+            return (
+              <h2>
+                <SlateContent>{child.children}</SlateContent>
+              </h2>
+            );
+          case defaultNodeTypes.heading[3]:
+            return (
+              <h3>
+                <SlateContent>{child.children}</SlateContent>
+              </h3>
+            );
+          case defaultNodeTypes.heading[4]:
+            return (
+              <h4>
+                <SlateContent>{child.children}</SlateContent>
+              </h4>
+            );
+          case defaultNodeTypes.heading[5]:
+            return (
+              <h5>
+                <SlateContent>{child.children}</SlateContent>
+              </h5>
+            );
+          case defaultNodeTypes.heading[6]:
+            return (
+              <h1>
+                <SlateContent>{child.children}</SlateContent>
+              </h1>
+            );
+          case defaultNodeTypes.paragraph:
+            return (
+              <p>
+                <SlateContent>{child.children}</SlateContent>
+              </p>
+            );
+          case defaultNodeTypes.link:
+            return (
+              <a href={child.link}>
+                <SlateContent>{child.children}</SlateContent>
+              </a>
+            );
+          default:
+            if (!child.text) {
+              console.log(`Didn't find element of type ${child.type}`, child);
+            }
+            return child.text;
+        }
+      })}
+    </>
+  );
 };
 
 const MarkdownContent = ({
@@ -160,6 +236,12 @@ const MarkdownContent = ({
                 <MarkdownContent>{child.children}</MarkdownContent>
               </p>
             );
+          case "link":
+            return (
+              <a href={child.url} title={child.title}>
+                <MarkdownContent>{child.children}</MarkdownContent>
+              </a>
+            );
           case "break":
             return <br />;
           case "thematicBreak":
@@ -187,8 +269,36 @@ const MarkdownContent = ({
             const Block = blocks[child.name];
             const props = {};
             child.attributes.forEach((att) => {
-              props[att.name] = att.value;
+              if (att.value?.type === "mdxJsxAttributeValueExpression") {
+                if (att.value.data) {
+                  att.value.data.estree.body.forEach((item) => {
+                    if (item.type === "ExpressionStatement") {
+                      console.log(item);
+                      if (item.expression.type === "ArrayExpression") {
+                        const elements = [];
+                        item.expression.elements.forEach((element) => {
+                          if (element.type === "Literal") {
+                            // console.log(element);
+                            elements.push(element.value);
+                          }
+                        });
+                        props[att.name] = elements;
+                      }
+                      if (item.expression.type === "ObjectExpression") {
+                        item.expression.properties.forEach((property) => {
+                          props[att.name] = {
+                            [property.key.name]: property.value.value,
+                          };
+                        });
+                      }
+                    }
+                  });
+                }
+              } else {
+                props[att.name] = att.value;
+              }
             });
+            console.log(props);
             if (Block) {
               return <Block {...props} />;
             }
@@ -430,3 +540,325 @@ function persistLeafFormats(children: Array<MdastNode>) {
     return acc;
   }, {});
 }
+
+export interface LeafType {
+  text: string;
+  strikeThrough?: boolean;
+  bold?: boolean;
+  italic?: boolean;
+  code?: boolean;
+  parentType?: string;
+}
+
+export interface BlockType {
+  type: string;
+  parentType?: string;
+  link?: string;
+  caption?: string;
+  language?: string;
+  break?: boolean;
+  children: Array<BlockType | LeafType>;
+}
+
+interface Options {
+  nodeTypes: NodeTypes;
+  listDepth?: number;
+  ignoreParagraphNewline?: boolean;
+}
+
+const isLeafNode = (node: BlockType | LeafType): node is LeafType => {
+  return typeof (node as LeafType).text === "string";
+};
+
+const VOID_ELEMENTS: Array<keyof NodeTypes> = ["thematic_break"];
+
+const BREAK_TAG = "<br>";
+
+export function serialize(
+  chunk: BlockType | LeafType,
+  opts: Options = { nodeTypes: defaultNodeTypes }
+): Content {
+  const {
+    nodeTypes: userNodeTypes = defaultNodeTypes,
+    ignoreParagraphNewline = false,
+    listDepth = 0,
+  } = opts;
+
+  let text = (chunk as LeafType).text || "";
+  let emptyText = { type: "text", value: text };
+  let type = (chunk as BlockType).type || "text";
+
+  const nodeTypes: NodeTypes = {
+    ...defaultNodeTypes,
+    ...userNodeTypes,
+    heading: {
+      ...defaultNodeTypes.heading,
+      ...userNodeTypes.heading,
+    },
+  };
+
+  const LIST_TYPES = [nodeTypes.ul_list, nodeTypes.ol_list];
+
+  let children: Content[] = [{ type: "text", value: text }];
+
+  if (!isLeafNode(chunk)) {
+    children = chunk.children
+      .map((c: BlockType | LeafType) => {
+        const isList = !isLeafNode(c)
+          ? LIST_TYPES.includes(c.type || "")
+          : false;
+
+        const selfIsList = LIST_TYPES.includes(chunk.type || "");
+
+        // Links can have the following shape
+        // In which case we don't want to surround
+        // with break tags
+        // {
+        //  type: 'paragraph',
+        //  children: [
+        //    { text: '' },
+        //    { type: 'link', children: [{ text: foo.com }]}
+        //    { text: '' }
+        //  ]
+        // }
+        let childrenHasLink = false;
+
+        if (!isLeafNode(chunk) && Array.isArray(chunk.children)) {
+          childrenHasLink = chunk.children.some(
+            (f) => !isLeafNode(f) && f.type === nodeTypes.link
+          );
+        }
+
+        return serialize(
+          { ...c, parentType: type },
+          {
+            nodeTypes,
+            // WOAH.
+            // what we're doing here is pretty tricky, it relates to the block below where
+            // we check for ignoreParagraphNewline and set type to paragraph.
+            // We want to strip out empty paragraphs sometimes, but other times we don't.
+            // If we're the descendant of a list, we know we don't want a bunch
+            // of whitespace. If we're parallel to a link we also don't want
+            // to respect neighboring paragraphs
+            ignoreParagraphNewline:
+              (ignoreParagraphNewline ||
+                isList ||
+                selfIsList ||
+                childrenHasLink) &&
+              // if we have c.break, never ignore empty paragraph new line
+              !(c as BlockType).break,
+
+            // track depth of nested lists so we can add proper spacing
+            listDepth: LIST_TYPES.includes((c as BlockType).type || "")
+              ? listDepth + 1
+              : listDepth,
+          }
+        );
+      })
+      .join("");
+  }
+
+  // This is pretty fragile code, check the long comment where we iterate over children
+  if (
+    !ignoreParagraphNewline &&
+    (text === "" || text === "\n") &&
+    chunk.parentType === nodeTypes.paragraph
+  ) {
+    type = nodeTypes.paragraph;
+    children = [{ type: "html", value: "<br />" }];
+  }
+
+  // if (
+  //   children[0]?.value === "" &&
+  //   !VOID_ELEMENTS.find((k) => nodeTypes[k] === type)
+  // )
+  //   return;
+
+  // Never allow decorating break tags with rich text formatting,
+  // this can malform generated markdown
+  // Also ensure we're only ever applying text formatting to leaf node
+  // level chunks, otherwise we can end up in a situation where
+  // we try applying formatting like to a node like this:
+  // "Text foo bar **baz**" resulting in "**Text foo bar **baz****"
+  // which is invalid markup and can mess everything up
+  // if (children[0]?.value !== BREAK_TAG && isLeafNode(chunk)) {
+  //   if (chunk.bold && chunk.italic) {
+  //     children = retainWhitespaceAndFormat(children, ["strong", "emphasis"]);
+  //   } else {
+  //     if (chunk.bold) {
+  //       children = retainWhitespaceAndFormat(children, ["strong"]);
+  //     }
+
+  //     if (chunk.italic) {
+  //       children = retainWhitespaceAndFormat(children, ["italic"]);
+  //     }
+  //     // Tina: Not supported
+  //     if (chunk.strikeThrough) {
+  //       children = retainWhitespaceAndFormat(children, ["strikethrough"]);
+  //     }
+  //     if (chunk.code) {
+  //       children = retainWhitespaceAndFormat(children, ["inline-code"]);
+  //     }
+  //   }
+  // }
+
+  switch (type) {
+    case nodeTypes.heading[1]:
+      return {
+        type: "heading",
+        depth: 1,
+        children,
+      };
+    case nodeTypes.heading[2]:
+      return {
+        type: "heading",
+        depth: 2,
+        children,
+      };
+    case nodeTypes.heading[3]:
+      return {
+        type: "heading",
+        depth: 3,
+        children,
+      };
+    case nodeTypes.heading[4]:
+      return {
+        type: "heading",
+        depth: 4,
+        children,
+      };
+    case nodeTypes.heading[5]:
+      return {
+        type: "heading",
+        depth: 5,
+        children,
+      };
+    case nodeTypes.heading[6]:
+      return {
+        type: "heading",
+        depth: 6,
+        children,
+      };
+
+    case nodeTypes.block_quote:
+      // For some reason, marked is parsing blockquotes w/ one new line
+      // as contiued blockquotes, so adding two new lines ensures that doesn't
+      // happen
+      return {
+        type: "blockquote",
+        children,
+      };
+
+    case nodeTypes.code_block:
+      return {
+        type: "code",
+        lang: (chunk as BlockType).language || "",
+        value: children,
+      };
+      return `\`\`\`${
+        (chunk as BlockType).language || ""
+      }\n${children}\n\`\`\`\n`;
+
+    case nodeTypes.link:
+      return {
+        type: "link",
+        title: null,
+        url: (chunk as BlockType).link,
+        children,
+      };
+      return `[${children}](${(chunk as BlockType).link || ""})`;
+    case nodeTypes.image:
+      return {
+        type: "link",
+        title: null,
+        url: (chunk as BlockType).link,
+        alt: (chunk as BlockType).caption,
+      };
+      return `![${(chunk as BlockType).caption}](${
+        (chunk as BlockType).link || ""
+      })`;
+
+    case nodeTypes.ul_list:
+      return {
+        type: "list",
+        ordered: false,
+        spread: false,
+        children,
+      };
+    case nodeTypes.ol_list:
+      return {
+        type: "list",
+        ordered: true,
+        spread: false,
+        children,
+      };
+      return `\n${children}\n`;
+
+    case nodeTypes.listItem:
+      return {
+        type: "listItem",
+        children,
+      };
+      const isOL = chunk && chunk.parentType === nodeTypes.ol_list;
+
+      let spacer = "";
+      for (let k = 0; listDepth > k; k++) {
+        if (isOL) {
+          // https://github.com/remarkjs/remark-react/issues/65
+          spacer += "   ";
+        } else {
+          spacer += "  ";
+        }
+      }
+      return `${spacer}${isOL ? "1." : "-"} ${children}`;
+
+    case nodeTypes.paragraph:
+      return {
+        type: "paragraph",
+        children,
+      };
+      return `${children}\n`;
+
+    case nodeTypes.thematic_break:
+      return {
+        type: "thematicBreak",
+      };
+      return `---\n`;
+
+    default:
+      return children;
+  }
+}
+
+// This function handles the case of a string like this: "   foo   "
+// Where it would be invalid markdown to generate this: "**   foo   **"
+// We instead, want to trim the whitespace out, apply formatting, and then
+// bring the whitespace back. So our returned string looks like this: "   **foo**   "
+function retainWhitespaceAndFormat(item: Content[], formats: string[]) {
+  // we keep this for a comparison later
+  const frozenString = string.trim();
+
+  // children will be mutated
+  let children = item;
+  formats.forEach((format) => {});
+
+  // We reverse the right side formatting, to properly handle bold/italic and strikeThrough
+  // formats, so we can create ~~***FooBar***~~
+  const fullFormat = `${format}${children}${reverseStr(format)}`;
+
+  // This conditions accounts for no whitespace in our string
+  // if we don't have any, we can return early.
+  if (children.length === string.length) {
+    return fullFormat;
+  }
+
+  // if we do have whitespace, let's add our formatting around our trimmed string
+  // We reverse the right side formatting, to properly handle bold/italic and strikeThrough
+  // formats, so we can create ~~***FooBar***~~
+  const formattedString = format + children + reverseStr(format);
+
+  // and replace the non-whitespace content of the string
+  return string.replace(frozenString, formattedString);
+}
+
+const reverseStr = (string: string) => string.split("").reverse().join("");

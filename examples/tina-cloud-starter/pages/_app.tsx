@@ -80,31 +80,44 @@ const App = ({ Component, pageProps }) => {
 
 export default App;
 
-import { deserialize } from "../components/post";
+import { deserialize, serialize } from "../components/post";
 import { Form, MdxField } from "tinacms";
+const Editor2 = (props) => {
+  const [value, setValue] = React.useState(props.input?.value?.type);
+  React.useEffect(() => {
+    console.log("i mounted", props.input.value);
+    props.input.onChange(value);
+  }, [value]);
+  return (
+    <input
+      type="text"
+      {...props.input}
+      value={value}
+      onChange={(e) => setValue(e.target.value)}
+    />
+  );
+};
 const Editor = (props) => {
+  const InnerEditor = useMemo(() => <EditorInner {...props} />, []);
+  return InnerEditor;
+};
+const EditorInner = (props) => {
   const templates = props.field.templates;
   const editor = useMemo(() => withReact(createEditor()), []);
   const [value, setValue] = useState([]);
+  const [ready, setReady] = useState(false);
 
   useEffect(() => {
-    const run = async () => {
-      if (props.input.value) {
-        setValue(deserialize(props.input.value));
-      }
-    };
-    run();
-  }, []);
+    if (props.input.value) {
+      setValue(deserialize(props.input.value));
+    }
+  }, [JSON.stringify(props.input.value)]);
 
-  // useEffect(() => {
-  //   if (value.length) {
-  //     const val = value.map((v) => serialize(v)).join("");
-  //     props.input.onChange(val);
-  //   }
-  //   // FIXME Setting onChange as a dependency causes 2 calls,
-  //   // presumbably because onChange is getting a
-  //   // new identity on each keystroke
-  // }, [value]);
+  useEffect(() => {
+    if (value.length > 0 && ready) {
+      props.input.onChange(value);
+    }
+  }, [JSON.stringify(value)]);
 
   const renderElement = useCallback((props) => {
     switch (props.element.type) {
@@ -124,7 +137,7 @@ const Editor = (props) => {
     return element.type === "mdxJsxFlowElement" ? true : false;
   };
   editor.isInline = (element) => {
-    return element.type === "mdxJsxTextElement" ? true : false;
+    return ["mdxJsxTextElement", "link"].includes(element.type);
   };
   return (
     <>
@@ -143,8 +156,8 @@ const Editor = (props) => {
         <Slate
           editor={editor}
           value={value}
-          // value={value}
           onChange={(newValue) => {
+            setReady(true);
             setValue(newValue);
           }}
         >
@@ -164,6 +177,9 @@ const CodeElement = (props) => {
 };
 
 const DefaultElement = (props) => {
+  if (["mdxJsxTextElement", "link"].includes(props.element.type)) {
+    return <span {...props.attributes}>{props.children}</span>;
+  }
   return <p {...props.attributes}>{props.children}</p>;
 };
 
@@ -171,20 +187,26 @@ const MdxPicker = (props) => {
   const activeTemplate = props.templates.find(
     (template) => template.name === props.element.node.name
   );
-  console.log(props);
   const initialValues = {};
   props.element.node.attributes.forEach((att) => {
     initialValues[att.name] = att.value;
   });
   const form = new Form({
-    id: "some-label",
-    label: "Label",
+    id: props.element.node.name,
+    label: props.element.node.name,
     initialValues,
     onSubmit: (values) => {
-      console.log("my form", values);
+      const atts = [];
+      Object.entries(values).forEach(([name, value]) => {
+        atts.push({ type: "mdxJsxAttribute", name, value });
+      });
+      props.element.node.attributes = atts;
     },
     fields: activeTemplate.fields,
   });
+  // form.subscribe((values) => {
+  //   console.log('gotem ',values)
+  // }, {values: true})
   return (
     <span {...props.attributes} contentEditable={false}>
       {props.children}
