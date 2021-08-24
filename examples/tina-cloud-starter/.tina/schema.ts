@@ -304,9 +304,14 @@ const heroBlockSchema: TinaTemplate = {
       name: "headline",
     },
     {
-      type: "string",
+      type: "rich-text",
       label: "Text",
       name: "text",
+      templates: [
+        featureBlockShema,
+        contentBlockSchema,
+        testimonialBlockSchema,
+      ],
       ui: {
         component: "markdown",
       },
@@ -422,12 +427,44 @@ export default defineSchema({
           name: "excerpt",
         },
         {
-          type: "string",
+          type: "rich-text" as const,
           label: "Body",
+          name: "_body",
+          templates: [
+            {
+              label: "Link",
+              name: "Link",
+              fields: [
+                {
+                  component: "text",
+                  type: "string",
+                  name: "label",
+                  label: "Label",
+                },
+                {
+                  component: "text",
+                  type: "string",
+                  name: "to",
+                  label: "To",
+                },
+              ],
+            },
+            {
+              label: "Image",
+              name: "Image",
+              fields: [
+                {
+                  component: "image",
+                  type: "image",
+                  name: "myImage",
+                  label: "My Image",
+                },
+              ],
+            },
+          ],
           ui: {
             component: "markdown",
           },
-          name: "_body",
           isBody: true,
         },
       ],

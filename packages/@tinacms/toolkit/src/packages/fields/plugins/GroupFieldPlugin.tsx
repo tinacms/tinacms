@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { FieldsBuilder, useFormPortal } from '../../form-builder'
+import { FieldsBuilder, useFormPortal, TinaField } from '../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../icons'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
@@ -36,7 +36,7 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
+export const Group = ({ tinaForm, field }: GroupProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <>
@@ -52,7 +52,25 @@ export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
       />
     </>
   )
-})
+}
+
+// export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
+//   const [isExpanded, setExpanded] = React.useState<boolean>(false)
+//   return (
+//     <>
+//       <Header onClick={() => setExpanded((p) => !p)}>
+//         {field.label || field.name}
+//         <RightArrowIcon />
+//       </Header>
+//       <Panel
+//         isExpanded={isExpanded}
+//         setExpanded={setExpanded}
+//         field={field}
+//         tinaForm={tinaForm}
+//       />
+//     </>
+//   )
+// })
 
 interface PanelProps {
   setExpanded(next: boolean): void

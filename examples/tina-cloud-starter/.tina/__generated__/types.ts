@@ -194,7 +194,7 @@ export type Posts = {
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
   excerpt?: Maybe<Scalars['String']>;
-  _body?: Maybe<Scalars['String']>;
+  _body?: Maybe<Scalars['JSON']>;
 };
 
 export type PostsDocument = Node & Document & {
@@ -339,7 +339,7 @@ export type PagesBlocksHero = {
   __typename?: 'PagesBlocksHero';
   tagline?: Maybe<Scalars['String']>;
   headline?: Maybe<Scalars['String']>;
-  text?: Maybe<Scalars['String']>;
+  text?: Maybe<Scalars['JSON']>;
   actions?: Maybe<Array<Maybe<PagesBlocksHeroActions>>>;
   image?: Maybe<PagesBlocksHeroImage>;
   color?: Maybe<Scalars['String']>;
@@ -469,7 +469,6 @@ export type PostsMutation = {
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
   excerpt?: Maybe<Scalars['String']>;
-  _body?: Maybe<Scalars['String']>;
 };
 
 export type GlobalHeaderIconMutation = {
@@ -534,7 +533,6 @@ export type PagesBlocksHeroImageMutation = {
 export type PagesBlocksHeroMutation = {
   tagline?: Maybe<Scalars['String']>;
   headline?: Maybe<Scalars['String']>;
-  text?: Maybe<Scalars['String']>;
   actions?: Maybe<Array<Maybe<PagesBlocksHeroActionsMutation>>>;
   image?: Maybe<PagesBlocksHeroImageMutation>;
   color?: Maybe<Scalars['String']>;
