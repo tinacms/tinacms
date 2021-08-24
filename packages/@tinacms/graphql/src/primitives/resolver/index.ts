@@ -391,7 +391,20 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'rich-text':
+        /**
+         * We probably need to catch JSX expressions in props arguments and re-run them through
+         * the MDX parser, rather than trying to grab the info from the estree itself.
+         */
         const value2 = `#### This is a test
+
+Lorem markdownum evinctus [go there](http://example.com)
+
+<Link label="Click here" to="https://example.com" nested={["ok", "okok"]} nestedObject={{ok: "yes"}} />
+
+### Header [go there](http://example.com) To the site
+
+        `
+        const value3 = `#### This is a test
 
 Lorem markdownum evinctus <Image myImage="http://placehold.it/300x200" /> ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
 
@@ -405,6 +418,7 @@ It's good
         `
 
         const tree = unified.unified().use(markdown).use(mdx).parse(value2)
+        console.log(JSON.stringify(tree, null, 2))
 
         accumulator[field.name] = { ...tree, _field: field }
         break
