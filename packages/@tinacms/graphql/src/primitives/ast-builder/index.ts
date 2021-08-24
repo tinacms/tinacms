@@ -363,6 +363,7 @@ export const astBuilder = {
     ID: 'ID',
     SystemInfo: 'SystemInfo',
     Boolean: 'Boolean',
+    JSON: 'JSON',
     Node: 'Node',
     PageInfo: 'PageInfo',
     Connection: 'Connection',

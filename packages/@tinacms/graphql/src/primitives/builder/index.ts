@@ -744,6 +744,13 @@ export class Builder {
             this.tinaSchema.getTemplatesForCollectable(field)
           ),
         })
+      case 'rich-text':
+        return astBuilder.FieldDefinition({
+          name: field.name,
+          list: field.list,
+          required: field.required,
+          type: astBuilder.TYPES.JSON,
+        })
       case 'reference':
         const name = NAMER.documentTypeName(field.namespace)
         if (field.list) {

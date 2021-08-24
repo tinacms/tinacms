@@ -41,12 +41,44 @@
           "name": "excerpt"
         },
         {
-          "type": "string",
+          "type": "rich-text",
           "label": "Body",
+          "name": "_body",
+          "templates": [
+            {
+              "label": "Link",
+              "name": "Link",
+              "fields": [
+                {
+                  "component": "text",
+                  "type": "string",
+                  "name": "label",
+                  "label": "Label"
+                },
+                {
+                  "component": "text",
+                  "type": "string",
+                  "name": "to",
+                  "label": "To"
+                }
+              ]
+            },
+            {
+              "label": "Image",
+              "name": "Image",
+              "fields": [
+                {
+                  "component": "image",
+                  "type": "image",
+                  "name": "myImage",
+                  "label": "My Image"
+                }
+              ]
+            }
+          ],
           "ui": {
             "component": "markdown"
           },
-          "name": "_body",
           "isBody": true
         }
       ]
@@ -458,9 +490,337 @@
                   "name": "headline"
                 },
                 {
-                  "type": "string",
+                  "type": "rich-text",
                   "label": "Text",
                   "name": "text",
+                  "templates": [
+                    {
+                      "name": "features",
+                      "label": "Features",
+                      "ui": {
+                        "defaultItem": {
+                          "items": [
+                            {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            },
+                            {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            },
+                            {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "object",
+                          "label": "Feature Items",
+                          "name": "items",
+                          "list": true,
+                          "ui": {
+                            "defaultItem": {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            }
+                          },
+                          "fields": [
+                            {
+                              "type": "object",
+                              "label": "Icon",
+                              "name": "icon",
+                              "fields": [
+                                {
+                                  "type": "string",
+                                  "label": "Color",
+                                  "name": "color",
+                                  "options": [
+                                    {
+                                      "label": "Primary",
+                                      "value": "primary"
+                                    },
+                                    {
+                                      "label": "Blue",
+                                      "value": "blue"
+                                    },
+                                    {
+                                      "label": "Teal",
+                                      "value": "teal"
+                                    },
+                                    {
+                                      "label": "Green",
+                                      "value": "green"
+                                    },
+                                    {
+                                      "label": "Red",
+                                      "value": "red"
+                                    },
+                                    {
+                                      "label": "Pink",
+                                      "value": "pink"
+                                    },
+                                    {
+                                      "label": "Purple",
+                                      "value": "purple"
+                                    },
+                                    {
+                                      "label": "Orange",
+                                      "value": "orange"
+                                    },
+                                    {
+                                      "label": "Yellow",
+                                      "value": "yellow"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "name": "style",
+                                  "label": "Style",
+                                  "type": "string",
+                                  "options": [
+                                    {
+                                      "label": "Circle",
+                                      "value": "circle"
+                                    },
+                                    {
+                                      "label": "Float",
+                                      "value": "float"
+                                    }
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "label": "Icon",
+                                  "name": "name",
+                                  "options": [
+                                    {
+                                      "label": "Random",
+                                      "value": ""
+                                    },
+                                    {
+                                      "label": "Aperture",
+                                      "value": "aperture"
+                                    },
+                                    {
+                                      "label": "Code Block",
+                                      "value": "code"
+                                    },
+                                    {
+                                      "label": "Like",
+                                      "value": "like"
+                                    },
+                                    {
+                                      "label": "Map",
+                                      "value": "map"
+                                    },
+                                    {
+                                      "label": "Palette",
+                                      "value": "palette"
+                                    },
+                                    {
+                                      "label": "Pie Chart",
+                                      "value": "chart"
+                                    },
+                                    {
+                                      "label": "Pin",
+                                      "value": "pin"
+                                    },
+                                    {
+                                      "label": "Shield",
+                                      "value": "shield"
+                                    },
+                                    {
+                                      "label": "Setting Sliders",
+                                      "value": "settings"
+                                    },
+                                    {
+                                      "label": "Store",
+                                      "value": "store"
+                                    },
+                                    {
+                                      "label": "Tennis Ball",
+                                      "value": "ball"
+                                    },
+                                    {
+                                      "label": "Test Tube",
+                                      "value": "tube"
+                                    },
+                                    {
+                                      "label": "Trophy",
+                                      "value": "trophy"
+                                    },
+                                    {
+                                      "label": "User",
+                                      "value": "user"
+                                    },
+                                    {
+                                      "label": "Beer",
+                                      "value": "beer"
+                                    },
+                                    {
+                                      "label": "Chat",
+                                      "value": "chat"
+                                    },
+                                    {
+                                      "label": "Cloud",
+                                      "value": "cloud"
+                                    },
+                                    {
+                                      "label": "Coffee",
+                                      "value": "coffee"
+                                    },
+                                    {
+                                      "label": "World",
+                                      "value": "world"
+                                    },
+                                    {
+                                      "label": "Tina",
+                                      "value": "tina"
+                                    }
+                                  ]
+                                }
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "label": "Title",
+                              "name": "title"
+                            },
+                            {
+                              "type": "string",
+                              "label": "Text",
+                              "name": "text"
+                            }
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "label": "Color",
+                          "name": "color",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Tint",
+                              "value": "tint"
+                            },
+                            {
+                              "label": "Primary",
+                              "value": "primary"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "content",
+                      "label": "Content",
+                      "ui": {
+                        "defaultItem": {
+                          "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "string",
+                          "ui": {
+                            "component": "textarea"
+                          },
+                          "label": "Body",
+                          "name": "body"
+                        },
+                        {
+                          "type": "string",
+                          "label": "Color",
+                          "name": "color",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Tint",
+                              "value": "tint"
+                            },
+                            {
+                              "label": "Primary",
+                              "value": "primary"
+                            }
+                          ]
+                        }
+                      ]
+                    },
+                    {
+                      "name": "testimonial",
+                      "label": "Testimonial",
+                      "ui": {
+                        "defaultItem": {
+                          "quote": "There are only two hard things in Computer Science: cache invalidation and naming things.",
+                          "author": "Phil Karlton",
+                          "color": "primary"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "string",
+                          "ui": {
+                            "component": "textarea"
+                          },
+                          "label": "Quote",
+                          "name": "quote"
+                        },
+                        {
+                          "type": "string",
+                          "label": "Author",
+                          "name": "author"
+                        },
+                        {
+                          "type": "string",
+                          "label": "Color",
+                          "name": "color",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Tint",
+                              "value": "tint"
+                            },
+                            {
+                              "label": "Primary",
+                              "value": "primary"
+                            }
+                          ]
+                        }
+                      ]
+                    }
+                  ],
                   "ui": {
                     "component": "markdown"
                   }

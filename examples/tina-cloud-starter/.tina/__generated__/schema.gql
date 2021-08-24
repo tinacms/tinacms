@@ -88,7 +88,7 @@ type Posts {
   date: String
   heroImg: String
   excerpt: String
-  _body: String
+  _body: JSON
 }
 
 type PostsDocument implements Node & Document {
@@ -213,7 +213,7 @@ type PagesBlocksHeroImage {
 type PagesBlocksHero {
   tagline: String
   headline: String
-  text: String
+  text: JSON
   actions: [PagesBlocksHeroActions]
   image: PagesBlocksHeroImage
   color: String
@@ -295,7 +295,6 @@ input PostsMutation {
   date: String
   heroImg: String
   excerpt: String
-  _body: String
 }
 
 input GlobalHeaderIconMutation {
@@ -360,7 +359,6 @@ input PagesBlocksHeroImageMutation {
 input PagesBlocksHeroMutation {
   tagline: String
   headline: String
-  text: String
   actions: [PagesBlocksHeroActionsMutation]
   image: PagesBlocksHeroImageMutation
   color: String

@@ -87,6 +87,7 @@ export type TinaFieldInner<WithNamespace extends boolean> =
   | ScalarType<WithNamespace>
   | ObjectType<WithNamespace>
   | ReferenceType<WithNamespace>
+  | RichType<WithNamespace>
 
 export type TinaFieldBase = TinaFieldInner<false>
 export type TinaFieldEnriched = TinaFieldInner<true>
@@ -152,6 +153,10 @@ type ImageField = {
 
 export type ReferenceType<WithNamespace extends boolean> =
   WithNamespace extends true ? ReferenceTypeWithNamespace : ReferenceTypeInner
+
+export type RichType<WithNamespace extends boolean> = WithNamespace extends true
+  ? RichTypeWithNamespace
+  : RichTypeInner
 export interface ReferenceTypeInner extends TinaField {
   type: 'reference'
   reverseLookup?: { label: string; name: string }
@@ -162,6 +167,17 @@ export interface ReferenceTypeWithNamespace extends TinaField {
   collections: string[]
   reverseLookup?: { label: string; name: string }
   namespace: string[]
+}
+
+export interface RichTypeWithNamespace extends TinaField {
+  type: 'rich-text'
+  namespace: string[]
+  templates: (string | Template<true>)[]
+}
+
+export interface RichTypeInner extends TinaField {
+  type: 'rich-text'
+  templates: (string | Template<false>)[]
 }
 
 export type ObjectType<WithNamespace extends boolean> =

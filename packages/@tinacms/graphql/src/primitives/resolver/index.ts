@@ -19,8 +19,12 @@ import { NAMER } from '../ast-builder'
 import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
 
+import unified from 'unified'
+import markdown from 'remark-parse'
+// import remarkSlate from 'remark-slate'
+import mdx from 'remark-mdx'
+
 import type { Templateable, TinaFieldEnriched } from '../types'
-import { GraphQLError } from 'graphql'
 import { TinaError } from './error'
 interface ResolverConfig {
   database: Database
@@ -386,6 +390,24 @@ export class Resolver {
       case 'image':
         accumulator[field.name] = value
         break
+      case 'rich-text':
+        const value2 = `#### This is a test
+
+Lorem markdownum evinctus <Image myImage="http://placehold.it/300x200" /> ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
+
+<Link label="Click here" to="https://example.com" />
+
+### Header <Link label="Click here" to="https://example.com" /> To the site
+
+<Image myImage="http://placehold.it/300x200" />
+
+It's good
+        `
+
+        const tree = unified.unified().use(markdown).use(mdx).parse(value2)
+
+        accumulator[field.name] = { ...tree, _field: field }
+        break
       case 'object':
         if (field.list) {
           if (!value) {
@@ -604,6 +626,12 @@ export class Resolver {
           }
         } else {
           throw new Error(`Unknown object for resolveField function`)
+        }
+      case 'rich-text':
+        return {
+          ...field,
+          component: 'markdown',
+          ...extraFields,
         }
       case 'reference':
         const documents = _.flatten(

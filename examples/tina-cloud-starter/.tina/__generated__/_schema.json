@@ -61,12 +61,72 @@
           ]
         },
         {
-          "type": "string",
+          "type": "rich-text",
           "label": "Body",
+          "name": "_body",
+          "templates": [
+            {
+              "label": "Link",
+              "name": "Link",
+              "fields": [
+                {
+                  "component": "text",
+                  "type": "string",
+                  "name": "label",
+                  "label": "Label",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Link",
+                    "label"
+                  ]
+                },
+                {
+                  "component": "text",
+                  "type": "string",
+                  "name": "to",
+                  "label": "To",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Link",
+                    "to"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "Link"
+              ]
+            },
+            {
+              "label": "Image",
+              "name": "Image",
+              "fields": [
+                {
+                  "component": "image",
+                  "type": "image",
+                  "name": "myImage",
+                  "label": "My Image",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Image",
+                    "myImage"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "Image"
+              ]
+            }
+          ],
           "ui": {
             "component": "markdown"
           },
-          "name": "_body",
           "isBody": true,
           "namespace": [
             "posts",
@@ -622,9 +682,471 @@
                   ]
                 },
                 {
-                  "type": "string",
+                  "type": "rich-text",
                   "label": "Text",
                   "name": "text",
+                  "templates": [
+                    {
+                      "name": "features",
+                      "label": "Features",
+                      "ui": {
+                        "defaultItem": {
+                          "items": [
+                            {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            },
+                            {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            },
+                            {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            }
+                          ]
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "object",
+                          "label": "Feature Items",
+                          "name": "items",
+                          "list": true,
+                          "ui": {
+                            "defaultItem": {
+                              "title": "Here's Another Feature",
+                              "text": "This is where you might talk about the feature, if this wasn't just filler text.",
+                              "icon": {
+                                "color": "",
+                                "style": "float",
+                                "name": ""
+                              }
+                            }
+                          },
+                          "fields": [
+                            {
+                              "type": "object",
+                              "label": "Icon",
+                              "name": "icon",
+                              "fields": [
+                                {
+                                  "type": "string",
+                                  "label": "Color",
+                                  "name": "color",
+                                  "options": [
+                                    {
+                                      "label": "Primary",
+                                      "value": "primary"
+                                    },
+                                    {
+                                      "label": "Blue",
+                                      "value": "blue"
+                                    },
+                                    {
+                                      "label": "Teal",
+                                      "value": "teal"
+                                    },
+                                    {
+                                      "label": "Green",
+                                      "value": "green"
+                                    },
+                                    {
+                                      "label": "Red",
+                                      "value": "red"
+                                    },
+                                    {
+                                      "label": "Pink",
+                                      "value": "pink"
+                                    },
+                                    {
+                                      "label": "Purple",
+                                      "value": "purple"
+                                    },
+                                    {
+                                      "label": "Orange",
+                                      "value": "orange"
+                                    },
+                                    {
+                                      "label": "Yellow",
+                                      "value": "yellow"
+                                    }
+                                  ],
+                                  "namespace": [
+                                    "pages",
+                                    "blocks",
+                                    "hero",
+                                    "text",
+                                    "features",
+                                    "items",
+                                    "icon",
+                                    "color"
+                                  ]
+                                },
+                                {
+                                  "name": "style",
+                                  "label": "Style",
+                                  "type": "string",
+                                  "options": [
+                                    {
+                                      "label": "Circle",
+                                      "value": "circle"
+                                    },
+                                    {
+                                      "label": "Float",
+                                      "value": "float"
+                                    }
+                                  ],
+                                  "namespace": [
+                                    "pages",
+                                    "blocks",
+                                    "hero",
+                                    "text",
+                                    "features",
+                                    "items",
+                                    "icon",
+                                    "style"
+                                  ]
+                                },
+                                {
+                                  "type": "string",
+                                  "label": "Icon",
+                                  "name": "name",
+                                  "options": [
+                                    {
+                                      "label": "Random",
+                                      "value": ""
+                                    },
+                                    {
+                                      "label": "Aperture",
+                                      "value": "aperture"
+                                    },
+                                    {
+                                      "label": "Code Block",
+                                      "value": "code"
+                                    },
+                                    {
+                                      "label": "Like",
+                                      "value": "like"
+                                    },
+                                    {
+                                      "label": "Map",
+                                      "value": "map"
+                                    },
+                                    {
+                                      "label": "Palette",
+                                      "value": "palette"
+                                    },
+                                    {
+                                      "label": "Pie Chart",
+                                      "value": "chart"
+                                    },
+                                    {
+                                      "label": "Pin",
+                                      "value": "pin"
+                                    },
+                                    {
+                                      "label": "Shield",
+                                      "value": "shield"
+                                    },
+                                    {
+                                      "label": "Setting Sliders",
+                                      "value": "settings"
+                                    },
+                                    {
+                                      "label": "Store",
+                                      "value": "store"
+                                    },
+                                    {
+                                      "label": "Tennis Ball",
+                                      "value": "ball"
+                                    },
+                                    {
+                                      "label": "Test Tube",
+                                      "value": "tube"
+                                    },
+                                    {
+                                      "label": "Trophy",
+                                      "value": "trophy"
+                                    },
+                                    {
+                                      "label": "User",
+                                      "value": "user"
+                                    },
+                                    {
+                                      "label": "Beer",
+                                      "value": "beer"
+                                    },
+                                    {
+                                      "label": "Chat",
+                                      "value": "chat"
+                                    },
+                                    {
+                                      "label": "Cloud",
+                                      "value": "cloud"
+                                    },
+                                    {
+                                      "label": "Coffee",
+                                      "value": "coffee"
+                                    },
+                                    {
+                                      "label": "World",
+                                      "value": "world"
+                                    },
+                                    {
+                                      "label": "Tina",
+                                      "value": "tina"
+                                    }
+                                  ],
+                                  "namespace": [
+                                    "pages",
+                                    "blocks",
+                                    "hero",
+                                    "text",
+                                    "features",
+                                    "items",
+                                    "icon",
+                                    "name"
+                                  ]
+                                }
+                              ],
+                              "namespace": [
+                                "pages",
+                                "blocks",
+                                "hero",
+                                "text",
+                                "features",
+                                "items",
+                                "icon"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "label": "Title",
+                              "name": "title",
+                              "namespace": [
+                                "pages",
+                                "blocks",
+                                "hero",
+                                "text",
+                                "features",
+                                "items",
+                                "title"
+                              ]
+                            },
+                            {
+                              "type": "string",
+                              "label": "Text",
+                              "name": "text",
+                              "namespace": [
+                                "pages",
+                                "blocks",
+                                "hero",
+                                "text",
+                                "features",
+                                "items",
+                                "text"
+                              ]
+                            }
+                          ],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "text",
+                            "features",
+                            "items"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "label": "Color",
+                          "name": "color",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Tint",
+                              "value": "tint"
+                            },
+                            {
+                              "label": "Primary",
+                              "value": "primary"
+                            }
+                          ],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "text",
+                            "features",
+                            "color"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "text",
+                        "features"
+                      ]
+                    },
+                    {
+                      "name": "content",
+                      "label": "Content",
+                      "ui": {
+                        "defaultItem": {
+                          "body": "Lorem ipsum dolor sit amet, consectetuer adipiscing elit. Donec odio. Quisque volutpat mattis eros. Nullam malesuada erat ut turpis. Suspendisse urna nibh, viverra non, semper suscipit, posuere a, pede."
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "string",
+                          "ui": {
+                            "component": "textarea"
+                          },
+                          "label": "Body",
+                          "name": "body",
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "text",
+                            "content",
+                            "body"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "label": "Color",
+                          "name": "color",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Tint",
+                              "value": "tint"
+                            },
+                            {
+                              "label": "Primary",
+                              "value": "primary"
+                            }
+                          ],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "text",
+                            "content",
+                            "color"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "text",
+                        "content"
+                      ]
+                    },
+                    {
+                      "name": "testimonial",
+                      "label": "Testimonial",
+                      "ui": {
+                        "defaultItem": {
+                          "quote": "There are only two hard things in Computer Science: cache invalidation and naming things.",
+                          "author": "Phil Karlton",
+                          "color": "primary"
+                        }
+                      },
+                      "fields": [
+                        {
+                          "type": "string",
+                          "ui": {
+                            "component": "textarea"
+                          },
+                          "label": "Quote",
+                          "name": "quote",
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "text",
+                            "testimonial",
+                            "quote"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "label": "Author",
+                          "name": "author",
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "text",
+                            "testimonial",
+                            "author"
+                          ]
+                        },
+                        {
+                          "type": "string",
+                          "label": "Color",
+                          "name": "color",
+                          "options": [
+                            {
+                              "label": "Default",
+                              "value": "default"
+                            },
+                            {
+                              "label": "Tint",
+                              "value": "tint"
+                            },
+                            {
+                              "label": "Primary",
+                              "value": "primary"
+                            }
+                          ],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "text",
+                            "testimonial",
+                            "color"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "text",
+                        "testimonial"
+                      ]
+                    }
+                  ],
                   "ui": {
                     "component": "markdown"
                   },
