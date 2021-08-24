@@ -28,6 +28,8 @@ jobs:
         run: yarn build
       - name: Test
         run: yarn test
+      - name: Build Types
+        run: yarn types
       - name: Release to @dev channel
         if: matrix.channel == 'dev'
         run: |

@@ -40,7 +40,7 @@ describe('MarkdownEditor', () => {
         onChange={() => {}}
         value=""
         imageProps={{
-          parse: media => media.filename,
+          parse: (media) => media.filename,
           upload: (() => {}) as any,
         }}
       />
