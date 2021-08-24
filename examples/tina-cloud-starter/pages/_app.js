@@ -171,9 +171,19 @@ const MdxPicker = (props) => {
   const activeTemplate = props.templates.find(
     (template) => template.name === props.element.node.name
   );
+  console.log(props);
+  const initialValues = {};
+  props.element.node.attributes.forEach((att) => {
+    initialValues[att.name] = att.value;
+  });
   const form = new Form({
     id: "some-label",
     label: "Label",
+    initialValues,
+    onSubmit: (values) => {
+      console.log("my form", values);
+    },
+    fields: activeTemplate.fields,
   });
   return (
     <span {...props.attributes} contentEditable={false}>

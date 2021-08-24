@@ -19,7 +19,12 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { FieldsBuilder, useFormPortal, TinaField } from '../../form-builder'
+import {
+  FieldsBuilder,
+  useFormPortal,
+  TinaField,
+  FormBuilder,
+} from '../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../icons'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 
@@ -34,10 +39,10 @@ export interface MdxFieldProps {
   field: MdxFieldFieldDefinititon
   form: any
   tinaForm: Form
+  inline?: boolean
 }
 
 export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
-  console.log('mdxfield', field)
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <>
@@ -60,24 +65,6 @@ export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
     </>
   )
 }
-
-// export const MdxField = wrapFieldsWithMeta(({ tinaForm, field }: MdxFieldProps) => {
-//   const [isExpanded, setExpanded] = React.useState<boolean>(false)
-//   return (
-//     <>
-//       <Header onClick={() => setExpanded((p) => !p)}>
-//         {field.label || field.name}
-//         <RightArrowIcon />
-//       </Header>
-//       <Panel
-//         isExpanded={isExpanded}
-//         setExpanded={setExpanded}
-//         field={field}
-//         tinaForm={tinaForm}
-//       />
-//     </>
-//   )
-// })
 
 interface PanelProps {
   setExpanded(next: boolean): void
@@ -111,9 +98,7 @@ const Panel = function Panel({
             <LeftArrowIcon /> <span>{field.label || field.name}</span>
           </PanelHeader>
           <PanelBody>
-            {isExpanded ? (
-              <FieldsBuilder form={tinaForm} fields={fields} />
-            ) : null}
+            {isExpanded ? <FormBuilder form={tinaForm} /> : null}
           </PanelBody>
         </MdxFieldPanel>
       )}
@@ -219,6 +204,7 @@ const PanelHeader = styled.div`
 const PanelBody = styled.div`
   background: var(--tina-color-grey-1);
   position: relative;
+  flex-direction: column;
   display: flex;
   flex: 1 1 auto;
   overflow-y: auto;
