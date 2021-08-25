@@ -1,5 +1,6 @@
 import "../styles.css";
 import dynamic from "next/dynamic";
+import ReactDOM from "react-dom";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
@@ -7,7 +8,7 @@ import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
 
 import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { createEditor, Transforms, Location, BaseRange } from "slate";
-import { Slate, Editable, withReact } from "slate-react";
+import { Slate, Editable, withReact, useSlate } from "slate-react";
 
 const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
 const NEXT_PUBLIC_USE_LOCAL_CLIENT =
@@ -81,7 +82,7 @@ const App = ({ Component, pageProps }) => {
 export default App;
 
 import { deserialize, serialize, NodeValueTypes } from "../components/post";
-import { Form, MdxField } from "tinacms";
+import { Form, MdxField, PopupAdder } from "tinacms";
 import { ReactEditor } from "slate-react";
 const Editor2 = (props) => {
   const [value, setValue] = React.useState(props.input?.value?.type);
@@ -120,6 +121,10 @@ const EditorInner = (props) => {
     }
   }, [JSON.stringify(value)]);
   const [voidSelection, setVoidSelection] = React.useState<BaseRange>(null);
+  const [popupSelection, setPopupSelection] = React.useState<BaseRange>(null);
+  const focusSelection = popupSelection
+    ? popupSelection.focus
+    : editor.selection?.focus;
 
   const renderElement = useCallback(
     (props) => {
@@ -163,19 +168,16 @@ const EditorInner = (props) => {
                 {...props}
                 templates={templates}
                 onChange={(value) => {
-                  Transforms.setNodes(
-                    editor,
-                    {
-                      ...props.element,
-                      node: {
-                        ...props.element.node,
-                        attributes: value,
-                      },
+                  const v = {
+                    ...props.element,
+                    node: {
+                      ...props.element.node,
+                      attributes: value,
                     },
-                    {
-                      at: voidSelection.focus,
-                    }
-                  );
+                  };
+                  Transforms.setNodes(editor, v, {
+                    at: voidSelection.focus,
+                  });
                   setVoidSelection(null);
                 }}
               />
@@ -196,9 +198,48 @@ const EditorInner = (props) => {
   };
   return (
     <>
-      <label style={{ fontWeight: 600, fontSize: "13px", marginBottom: "6px" }}>
-        {props.field.label}
-      </label>
+      <div style={{ display: "flex", justifyContent: "space-between" }}>
+        <label
+          style={{ fontWeight: 600, fontSize: "13px", marginBottom: "6px" }}
+        >
+          {props.field.label}
+        </label>
+        <PopupAdder
+          showButton={focusSelection}
+          onAdd={(template) => {
+            const meh = {
+              type: "mdxJsxFlowElement",
+              node: {
+                type: "mdxJsxFlowElement",
+                name: template.name,
+                // TODO: put default items here
+                attributes: {
+                  // label: "Click heredd",
+                  // to: "https://example.com",
+                  // nested: ["ok", "okok"],
+                  // nestedObject: {
+                  //   ok: "yes",
+                  // },
+                },
+                children: [],
+                ordered: false,
+              },
+              children: [
+                {
+                  text: "",
+                },
+              ],
+            };
+            Transforms.setNodes(editor, meh, {
+              at: popupSelection
+                ? popupSelection.focus
+                : editor.selection.focus,
+            });
+          }}
+          templates={templates}
+        />
+      </div>
+
       <div
         style={{
           padding: "10px",
@@ -207,7 +248,9 @@ const EditorInner = (props) => {
           borderRadius: "4px",
           border: "1px solid #efefef",
         }}
+        className="slate-tina-field"
       >
+        <style>{`.slate-tina-field [data-slate-node] {margin-bottom: 16px;}`}</style>
         <Slate
           editor={editor}
           value={value}
@@ -216,7 +259,19 @@ const EditorInner = (props) => {
             setValue(newValue);
           }}
         >
-          <Editable renderElement={renderElement} />
+          <Editable
+            renderElement={renderElement}
+            onKeyDown={(event) => {
+              switch (event.key) {
+                case "<": {
+                  setPopupSelection(editor.selection);
+                  break;
+                }
+                default:
+                  setPopupSelection(null);
+              }
+            }}
+          />
         </Slate>
       </div>
     </>
@@ -237,9 +292,6 @@ const MdxPicker = (props) => {
     },
     fields: activeTemplate.fields,
   });
-  // form.subscribe((values) => {
-  //   console.log('gotem ',values)
-  // }, {values: true})
   return (
     <>
       {props.children}

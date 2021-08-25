@@ -177,7 +177,7 @@ const SlateContent = ({
               return <Block {...child.node.attributes} />;
             }
           default:
-            if (!child.text) {
+            if (!child.text && child.type) {
               console.log(`Didn't find element of type ${child.type}`, child);
             }
             return child.text;
