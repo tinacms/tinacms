@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.54.3
+
+### Patch Changes
+
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+
 ## 0.54.2
 
 ### Patch Changes
