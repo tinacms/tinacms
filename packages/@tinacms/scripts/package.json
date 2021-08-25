@@ -3,7 +3,7 @@
   "version": "0.50.1",
   "main": "dist/index.js",
   "files": [
-    "dist/*",
+    "dist",
     "bin/*",
     ".env"
   ],
