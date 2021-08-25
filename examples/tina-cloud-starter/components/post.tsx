@@ -302,6 +302,31 @@ const MarkdownContent = ({
   );
 };
 
+export interface NodeValueTypes {
+  paragraph: string;
+  block_quote: string;
+  code_block: string;
+  link: string;
+  image: string;
+  ul_list: string;
+  ol_list: string;
+  listItem: string;
+  heading_one: string;
+  heading_two: string;
+  heading_three: string;
+  heading_four: string;
+  heading_five: string;
+  heading_six: string;
+  emphasis_mark: string;
+  strong_mark: string;
+  delete_mark: string;
+  inline_code_mark: string;
+  thematic_break: string;
+  // MDX-specific types
+  mdxJsxFlowElement: string;
+  mdxJsxTextElement: string;
+}
+
 export interface NodeTypes {
   paragraph: string;
   block_quote: string;

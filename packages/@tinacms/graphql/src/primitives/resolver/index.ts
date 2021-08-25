@@ -397,12 +397,12 @@ export class Resolver {
          */
         const value2 = `#### This is a test
 
-Lorem markdownum evinctus [go there](http://example.com)
+        Lorem markdownum evinctus [go there](http://example.com)
 
-<Link label="Click here" to="https://example.com" nested={["ok", "okok"]} nestedObject={{ok: "yes"}} />
+        <Link label="Click here" to="https://example.com" nested={["ok", "okok"]} nestedObject={{ok: "yes"}} />
 
-### Header [go there](http://example.com) To the site
-        `
+        ### Header [go there](http://example.com) To the site
+                `
 
         const tree = unified.unified().use(markdown).use(mdx).parse(value2)
         for (const node of walk(tree)) {

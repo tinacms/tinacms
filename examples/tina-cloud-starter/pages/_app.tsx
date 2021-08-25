@@ -80,7 +80,7 @@ const App = ({ Component, pageProps }) => {
 
 export default App;
 
-import { deserialize, serialize } from "../components/post";
+import { deserialize, serialize, NodeValueTypes } from "../components/post";
 import { Form, MdxField } from "tinacms";
 import { ReactEditor } from "slate-react";
 const Editor2 = (props) => {
@@ -122,17 +122,34 @@ const EditorInner = (props) => {
   const [voidSelection, setVoidSelection] = React.useState<BaseRange>(null);
 
   const renderElement = useCallback(
-    (props, other) => {
-      switch (props.element.type) {
-        case "code":
-          return <CodeElement {...props} />;
+    (props) => {
+      const type = props.element.type as keyof NodeValueTypes;
+      switch (type) {
+        case "heading_one":
+          return <h1 {...props.attributes}>{props.children}</h1>;
+        case "heading_two":
+          return <h2 {...props.attributes}>{props.children}</h2>;
+        case "heading_three":
+          return <h3 {...props.attributes}>{props.children}</h3>;
+        case "heading_four":
+          return <h4 {...props.attributes}>{props.children}</h4>;
+        case "heading_five":
+          return <h5 {...props.attributes}>{props.children}</h5>;
+        case "heading_six":
+          return <h6 {...props.attributes}>{props.children}</h6>;
+        case "link":
+          return (
+            <a {...props.attributes} href={props.element.link}>
+              {props.children}
+            </a>
+          );
         case "mdxJsxFlowElement":
         case "mdxJsxTextElement":
           return (
             <span
               {...props.attributes}
               onClick={() => {
-                // I think clicking futher down in this node propagates
+                // Clicking futher down in this node propagates
                 // and since `void` elements reset the editor selection
                 // multiple clicks result in this being nullified
                 if (!voidSelection) {
@@ -165,7 +182,7 @@ const EditorInner = (props) => {
             </span>
           );
         default:
-          return <DefaultElement {...props} />;
+          return <p {...props.attributes}>{props.children}</p>;
       }
     },
     [JSON.stringify(voidSelection)]
@@ -204,21 +221,6 @@ const EditorInner = (props) => {
       </div>
     </>
   );
-};
-
-const CodeElement = (props) => {
-  return (
-    <pre {...props.attributes}>
-      <code>{props.children}</code>
-    </pre>
-  );
-};
-
-const DefaultElement = (props) => {
-  if (["mdxJsxTextElement", "link"].includes(props.element.type)) {
-    return <span {...props.attributes}>{props.children}</span>;
-  }
-  return <p {...props.attributes}>{props.children}</p>;
 };
 
 const MdxPicker = (props) => {
