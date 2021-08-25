@@ -4,7 +4,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist/*",
+    "dist",
     "src/fixtures/**/*"
   ],
   "license": "Apache-2.0",
