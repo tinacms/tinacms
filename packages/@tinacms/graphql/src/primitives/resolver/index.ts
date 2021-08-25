@@ -397,11 +397,15 @@ export class Resolver {
          */
         const value2 = `#### This is a test
 
-        Lorem markdownum evinctus [go there](http://example.com)
+Lorem markdownum <Link label="Click here" to="https://example.com" nested={["ok", "okok"]} nestedObject={{ok: "yes"}} /> evinctus [go there](http://example.com)
 
-        <Link label="Click here" to="https://example.com" nested={["ok", "okok"]} nestedObject={{ok: "yes"}} />
+Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
 
-        ### Header [go there](http://example.com) To the site
+<Link label="Click here" to="https://example.com" nested={["ok", "okok"]} nestedObject={{ok: "yes"}} />
+
+### Header [go there](http://example.com) To the site
+
+Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
                 `
 
         const tree = unified.unified().use(markdown).use(mdx).parse(value2)
