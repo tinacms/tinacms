@@ -480,9 +480,6 @@ export default defineSchema({
               ],
             },
           ],
-          // ui: {
-          //   component: "markdown",
-          // },
           isBody: true,
         },
       ],
