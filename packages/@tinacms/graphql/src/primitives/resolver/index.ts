@@ -402,23 +402,49 @@ Lorem markdownum evinctus [go there](http://example.com)
 <Link label="Click here" to="https://example.com" nested={["ok", "okok"]} nestedObject={{ok: "yes"}} />
 
 ### Header [go there](http://example.com) To the site
-
-        `
-        const value3 = `#### This is a test
-
-Lorem markdownum evinctus <Image myImage="http://placehold.it/300x200" /> ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
-
-<Link label="Click here" to="https://example.com" />
-
-### Header <Link label="Click here" to="https://example.com" /> To the site
-
-<Image myImage="http://placehold.it/300x200" />
-
-It's good
         `
 
         const tree = unified.unified().use(markdown).use(mdx).parse(value2)
-        console.log(JSON.stringify(tree, null, 2))
+        for (const node of walk(tree)) {
+          if (node.type === 'mdxJsxFlowElement') {
+            const attributes = {}
+            node.attributes.forEach((attribute) => {
+              if (attribute.type === 'mdxJsxAttribute') {
+                if (
+                  attribute.value?.type === 'mdxJsxAttributeValueExpression'
+                ) {
+                  attribute.value.data.estree.body.forEach((item) => {
+                    if (item.type === 'ExpressionStatement') {
+                      if (item.expression.type === 'ArrayExpression') {
+                        const elements = []
+                        item.expression.elements.forEach((element) => {
+                          if (element.type === 'Literal') {
+                            elements.push(element.value)
+                          }
+                        })
+                        attributes[attribute.name] = elements
+                      }
+                      if (item.expression.type === 'ObjectExpression') {
+                        item.expression.properties.forEach((property) => {
+                          attributes[attribute.name] = {
+                            [property.key.name]: property.value.value,
+                          }
+                        })
+                      }
+                    }
+                  })
+
+                  // attributes[attribute.name] =
+                } else {
+                  attributes[attribute.name] = attribute.value
+                }
+              } else {
+                console.log(`Not sure what this is, type: ${attribute.type}`)
+              }
+            })
+            node.attributes = attributes
+          }
+        }
 
         accumulator[field.name] = { ...tree, _field: field }
         break
@@ -692,4 +718,25 @@ const resolveDateInput = (value: string) => {
 
 type FieldParams = {
   [fieldName: string]: string | { [key: string]: unknown } | FieldParams[]
+}
+
+export function* walk(maybeNode: any): any {
+  if (['string', 'number'].includes(typeof maybeNode)) {
+    return
+  }
+
+  if (!maybeNode) {
+    return
+  }
+
+  for (const value of Object.values(maybeNode)) {
+    if (Array.isArray(value)) {
+      for (const element of value) {
+        yield* walk(element)
+      }
+    } else {
+      yield* walk(value)
+    }
+  }
+  yield maybeNode
 }

@@ -447,6 +447,27 @@ export default defineSchema({
                   name: "to",
                   label: "To",
                 },
+                {
+                  component: "tags",
+                  type: "string",
+                  list: true,
+                  name: "nested",
+                  label: "Nested",
+                },
+                {
+                  component: "group",
+                  type: "object",
+                  name: "nestedObject",
+                  label: "Nested Object",
+                  fields: [
+                    {
+                      type: "string",
+                      component: "text",
+                      name: "ok",
+                      label: "Ok",
+                    },
+                  ],
+                },
               ],
             },
             {

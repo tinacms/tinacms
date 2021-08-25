@@ -92,6 +92,46 @@
                     "Link",
                     "to"
                   ]
+                },
+                {
+                  "component": "tags",
+                  "type": "string",
+                  "list": true,
+                  "name": "nested",
+                  "label": "Nested",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Link",
+                    "nested"
+                  ]
+                },
+                {
+                  "component": "group",
+                  "type": "object",
+                  "name": "nestedObject",
+                  "label": "Nested Object",
+                  "fields": [
+                    {
+                      "type": "string",
+                      "component": "text",
+                      "name": "ok",
+                      "label": "Ok",
+                      "namespace": [
+                        "posts",
+                        "_body",
+                        "Link",
+                        "nestedObject",
+                        "ok"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Link",
+                    "nestedObject"
+                  ]
                 }
               ],
               "namespace": [

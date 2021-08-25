@@ -101,6 +101,7 @@ const Markdown2 = (props) => {
 };
 
 const Link = (props) => {
+  // console.log(props);
   return <a href={props.to}>Link to {props.label}</a>;
 };
 const SlateContent = ({
@@ -164,6 +165,17 @@ const SlateContent = ({
                 <SlateContent>{child.children}</SlateContent>
               </a>
             );
+          case "mdxJsxTextElement":
+            const InlineBlock = blocks[child.node.name];
+            if (InlineBlock) {
+              return <InlineBlock {...child.node.attributes} />;
+            }
+          // for some reason html block elements are here
+          case "mdxJsxFlowElement":
+            const Block = blocks[child.node.name];
+            if (Block) {
+              return <Block {...child.node.attributes} />;
+            }
           default:
             if (!child.text) {
               console.log(`Didn't find element of type ${child.type}`, child);
@@ -251,15 +263,11 @@ const MarkdownContent = ({
           // for some reason html inline elements are here
           case "mdxJsxTextElement":
             const InlineBlock = blocks[child.name];
-            const inlineProps = {};
-            child.attributes.forEach((att) => {
-              inlineProps[att.name] = att.value;
-            });
             if (InlineBlock) {
-              return <InlineBlock {...inlineProps} />;
+              return <InlineBlock {...child.attributes} />;
             }
             const atts = {};
-            child.attributes.forEach((att) => (atts[att.name] = att.value));
+            // child.attributes.forEach((att) => (atts[att.name] = att.value));
             return React.createElement(child.name, {
               ...atts,
               children: <MarkdownContent>{child.children}</MarkdownContent>,
@@ -267,40 +275,8 @@ const MarkdownContent = ({
           // for some reason html block elements are here
           case "mdxJsxFlowElement":
             const Block = blocks[child.name];
-            const props = {};
-            child.attributes.forEach((att) => {
-              if (att.value?.type === "mdxJsxAttributeValueExpression") {
-                if (att.value.data) {
-                  att.value.data.estree.body.forEach((item) => {
-                    if (item.type === "ExpressionStatement") {
-                      console.log(item);
-                      if (item.expression.type === "ArrayExpression") {
-                        const elements = [];
-                        item.expression.elements.forEach((element) => {
-                          if (element.type === "Literal") {
-                            // console.log(element);
-                            elements.push(element.value);
-                          }
-                        });
-                        props[att.name] = elements;
-                      }
-                      if (item.expression.type === "ObjectExpression") {
-                        item.expression.properties.forEach((property) => {
-                          props[att.name] = {
-                            [property.key.name]: property.value.value,
-                          };
-                        });
-                      }
-                    }
-                  });
-                }
-              } else {
-                props[att.name] = att.value;
-              }
-            });
-            console.log(props);
             if (Block) {
-              return <Block {...props} />;
+              return <Block {...child.attributes} />;
             }
 
             const blockAtts = {};

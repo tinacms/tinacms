@@ -6,7 +6,7 @@ const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
 
 import React, { useEffect, useCallback, useMemo, useState } from "react";
-import { createEditor } from "slate";
+import { createEditor, Transforms, Location, BaseRange } from "slate";
 import { Slate, Editable, withReact } from "slate-react";
 
 const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
@@ -82,6 +82,7 @@ export default App;
 
 import { deserialize, serialize } from "../components/post";
 import { Form, MdxField } from "tinacms";
+import { ReactEditor } from "slate-react";
 const Editor2 = (props) => {
   const [value, setValue] = React.useState(props.input?.value?.type);
   React.useEffect(() => {
@@ -118,20 +119,53 @@ const EditorInner = (props) => {
       props.input.onChange(value);
     }
   }, [JSON.stringify(value)]);
+  const [voidSelection, setVoidSelection] = React.useState<BaseRange>(null);
 
-  const renderElement = useCallback((props) => {
-    switch (props.element.type) {
-      case "code":
-        return <CodeElement {...props} />;
-      case "mdxJsxTextElement":
-        return <MdxPicker inline={true} {...props} templates={templates} />;
-      case "mdxJsxFlowElement":
-        return <MdxPicker {...props} templates={templates} />;
-        return <div>Render Tina Form Here!</div>;
-      default:
-        return <DefaultElement {...props} />;
-    }
-  }, []);
+  const renderElement = useCallback(
+    (props, other) => {
+      switch (props.element.type) {
+        case "code":
+          return <CodeElement {...props} />;
+        case "mdxJsxFlowElement":
+        case "mdxJsxTextElement":
+          return (
+            <span
+              {...props.attributes}
+              onClick={() => {
+                if (!voidSelection) {
+                  setVoidSelection(editor.selection);
+                }
+              }}
+              contentEditable={false}
+            >
+              <MdxPicker
+                inline={props.element.type === "mdxJsxTextElement"}
+                {...props}
+                templates={templates}
+                onChange={(value) => {
+                  Transforms.setNodes(
+                    editor,
+                    {
+                      ...props.element,
+                      node: {
+                        ...props.element.node,
+                        attributes: value,
+                      },
+                    },
+                    {
+                      at: voidSelection.focus,
+                    }
+                  );
+                }}
+              />
+            </span>
+          );
+        default:
+          return <DefaultElement {...props} />;
+      }
+    },
+    [JSON.stringify(voidSelection)]
+  );
 
   editor.isVoid = (element) => {
     return element.type === "mdxJsxFlowElement" ? true : false;
@@ -187,20 +221,13 @@ const MdxPicker = (props) => {
   const activeTemplate = props.templates.find(
     (template) => template.name === props.element.node.name
   );
-  const initialValues = {};
-  props.element.node.attributes.forEach((att) => {
-    initialValues[att.name] = att.value;
-  });
+  const initialValues = props.element.node.attributes;
   const form = new Form({
     id: props.element.node.name,
     label: props.element.node.name,
     initialValues,
     onSubmit: (values) => {
-      const atts = [];
-      Object.entries(values).forEach(([name, value]) => {
-        atts.push({ type: "mdxJsxAttribute", name, value });
-      });
-      props.element.node.attributes = atts;
+      props.onChange(values);
     },
     fields: activeTemplate.fields,
   });
@@ -208,7 +235,7 @@ const MdxPicker = (props) => {
   //   console.log('gotem ',values)
   // }, {values: true})
   return (
-    <span {...props.attributes} contentEditable={false}>
+    <>
       {props.children}
       <MdxField
         inline={props.inline}
@@ -223,6 +250,6 @@ const MdxPicker = (props) => {
         }}
         meta={{}}
       />
-    </span>
+    </>
   );
 };
