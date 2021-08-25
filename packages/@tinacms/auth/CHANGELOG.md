@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 0.50.1
+
+### Patch Changes
+
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+
 ## 0.50.0
 
 ### Minor Changes
