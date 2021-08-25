@@ -8,6 +8,10 @@
     "cms",
     "react"
   ],
+  "files": [
+    "assets",
+    "dist"
+  ],
   "bugs": {
     "url": "https://github.com/tinacms/tinacms/issues"
   },
@@ -17,10 +21,6 @@
     "directory": "packages/tinacms"
   },
   "license": "Apache-2.0",
-  "files": [
-    "assets",
-    "build"
-  ],
   "scripts": {
     "build": "yarn tinacms-scripts build",
     "types": "yarn tsc",
