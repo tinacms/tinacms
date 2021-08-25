@@ -1,5 +1,13 @@
 # tinacms
 
+## 0.55.1
+
+### Patch Changes
+
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+- Updated dependencies [9b27192fe]
+  - @tinacms/toolkit@0.52.3
+
 ## 0.55.0
 
 ### Minor Changes

@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.52.4
+
+### Patch Changes
+
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+- Updated dependencies [9b27192fe]
+  - @tinacms/toolkit@0.52.3
+
 ## 0.52.3
 
 ### Patch Changes
