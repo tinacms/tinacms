@@ -672,9 +672,29 @@ Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxi
           throw new Error(`Unknown object for resolveField function`)
         }
       case 'rich-text':
+        const templates: { [key: string]: object } = {}
+        const typeMap: { [key: string]: string } = {}
+        await sequential(field.templates, async (template) => {
+          const extraFields = template.ui || {}
+          const templateName = lastItem(template.namespace)
+          typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+          templates[lastItem(template.namespace)] = {
+            // @ts-ignore FIXME `Templateable` should have name and label properties
+            label: template.label || templateName,
+            key: templateName,
+            name: templateName,
+            fields: await sequential(
+              template.fields,
+              async (field) => await this.resolveField(field)
+            ),
+            ...extraFields,
+          }
+          return true
+        })
         return {
           ...field,
-          component: 'markdown',
+          templates: Object.values(templates),
+          component: 'rich-text',
           ...extraFields,
         }
       case 'reference':

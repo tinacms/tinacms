@@ -27,7 +27,7 @@ const App = ({ Component, pageProps }) => {
             mediaStore={TinaCloudCloudinaryMediaStore}
             cmsCallback={(cms) => {
               cms.fields.add({
-                name: "markdown",
+                name: "rich-text",
                 Component: Editor,
               });
             }}

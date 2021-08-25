@@ -427,7 +427,7 @@ export default defineSchema({
           name: "excerpt",
         },
         {
-          type: "rich-text" as const,
+          type: "rich-text",
           label: "Body",
           name: "_body",
           templates: [
@@ -436,33 +436,31 @@ export default defineSchema({
               name: "Link",
               fields: [
                 {
-                  component: "text",
                   type: "string",
                   name: "label",
                   label: "Label",
                 },
                 {
-                  component: "text",
                   type: "string",
                   name: "to",
                   label: "To",
                 },
                 {
-                  component: "tags",
                   type: "string",
                   list: true,
                   name: "nested",
                   label: "Nested",
+                  ui: {
+                    component: "tags",
+                  },
                 },
                 {
-                  component: "group",
                   type: "object",
                   name: "nestedObject",
                   label: "Nested Object",
                   fields: [
                     {
                       type: "string",
-                      component: "text",
                       name: "ok",
                       label: "Ok",
                     },
@@ -475,7 +473,6 @@ export default defineSchema({
               name: "Image",
               fields: [
                 {
-                  component: "image",
                   type: "image",
                   name: "myImage",
                   label: "My Image",
@@ -483,9 +480,9 @@ export default defineSchema({
               ],
             },
           ],
-          ui: {
-            component: "markdown",
-          },
+          // ui: {
+          //   component: "markdown",
+          // },
           isBody: true,
         },
       ],
