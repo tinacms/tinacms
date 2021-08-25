@@ -132,6 +132,9 @@ const EditorInner = (props) => {
             <span
               {...props.attributes}
               onClick={() => {
+                // I think clicking futher down in this node propagates
+                // and since `void` elements reset the editor selection
+                // multiple clicks result in this being nullified
                 if (!voidSelection) {
                   setVoidSelection(editor.selection);
                 }
@@ -156,6 +159,7 @@ const EditorInner = (props) => {
                       at: voidSelection.focus,
                     }
                   );
+                  setVoidSelection(null);
                 }}
               />
             </span>
