@@ -339,7 +339,7 @@ export type PagesBlocksHero = {
   __typename?: 'PagesBlocksHero';
   tagline?: Maybe<Scalars['String']>;
   headline?: Maybe<Scalars['String']>;
-  text?: Maybe<Scalars['JSON']>;
+  text?: Maybe<Scalars['String']>;
   actions?: Maybe<Array<Maybe<PagesBlocksHeroActions>>>;
   image?: Maybe<PagesBlocksHeroImage>;
   color?: Maybe<Scalars['String']>;
@@ -533,6 +533,7 @@ export type PagesBlocksHeroImageMutation = {
 export type PagesBlocksHeroMutation = {
   tagline?: Maybe<Scalars['String']>;
   headline?: Maybe<Scalars['String']>;
+  text?: Maybe<Scalars['String']>;
   actions?: Maybe<Array<Maybe<PagesBlocksHeroActionsMutation>>>;
   image?: Maybe<PagesBlocksHeroImageMutation>;
   color?: Maybe<Scalars['String']>;

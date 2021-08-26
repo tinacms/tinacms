@@ -433,7 +433,7 @@ export class Resolver {
           }
         }
 
-        accumulator[field.name] = { ...tree, _field: field }
+        accumulator[field.name] = tree
         break
       case 'object':
         if (field.list) {
