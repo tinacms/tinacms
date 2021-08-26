@@ -665,6 +665,7 @@ export class Resolver {
             // @ts-ignore FIXME `Templateable` should have name and label properties
             label: template.label || templateName,
             key: templateName,
+            inline: template.inline,
             name: templateName,
             fields: await sequential(
               template.fields,
