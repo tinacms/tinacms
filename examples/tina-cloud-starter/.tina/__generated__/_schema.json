@@ -688,6 +688,28 @@
                 "_body",
                 "Testimonial"
               ]
+            },
+            {
+              "name": "Highlight",
+              "label": "Highlight",
+              "fields": [
+                {
+                  "name": "children",
+                  "label": "Text",
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Highlight",
+                    "children"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "Highlight"
+              ]
             }
           ],
           "isBody": true,

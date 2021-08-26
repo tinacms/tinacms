@@ -483,6 +483,17 @@
                   ]
                 }
               ]
+            },
+            {
+              "name": "Highlight",
+              "label": "Highlight",
+              "fields": [
+                {
+                  "name": "children",
+                  "label": "Text",
+                  "type": "string"
+                }
+              ]
             }
           ],
           "isBody": true

@@ -248,15 +248,24 @@ const MdxPicker = (props) => {
   );
   const ref = React.useRef();
   const initialValues = props.element.node.attributes;
+  // WIP- child nodes with are `text` should just be treated as
+  // a field whose name is `children`
+  // if (props.element.node.children) {
+  //   if (props.element.node?.children[0]?.type === "text") {
+  //     const value = props.element.node.children[0].value;
+  //     if (typeof value === "string") {
+  //       initialValues["children"] = value;
+  //     }
+  //   }
+  // }
   const form = new Form({
     id: props.element.node.name,
     label: props.element.node.name,
     initialValues,
     onSubmit: (values) => {
       props.onChange(values);
-      // props.submit();
     },
-    fields: activeTemplate.fields,
+    fields: activeTemplate ? activeTemplate.fields : [],
   });
   // FIXME: ideally we stream the changes back to slate
   // but for some reason this causes us to get stuck in
