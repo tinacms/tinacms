@@ -430,6 +430,17 @@ export default defineSchema({
             { ...featureBlockShema, name: "Features" },
             { ...contentBlockSchema, name: "ContentBlock" },
             { ...testimonialBlockSchema, name: "Testimonial" },
+            {
+              name: "Highlight",
+              label: "Highlight",
+              fields: [
+                {
+                  name: "children",
+                  label: "Text",
+                  type: "string",
+                },
+              ],
+            },
           ],
           isBody: true,
         },
