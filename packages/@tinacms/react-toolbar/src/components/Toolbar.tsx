@@ -64,7 +64,7 @@ export const Toolbar = () => {
     invalid: true,
   })
 
-  // this is used to refreshe the discard button to fix it not updating when pressed after the page loads
+  // this is used to refresh the discard button to fix it not updating when pressed after the page loads
   const [, setState] = React.useState(0)
 
   // Global plugin hamburger menu
