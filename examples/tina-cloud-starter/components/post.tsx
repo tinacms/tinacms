@@ -4,6 +4,19 @@ import { Container } from "./container";
 import { Section } from "./section";
 import { ThemeContext } from "./theme";
 import format from "date-fns/format";
+import type { Root, Content } from "mdast";
+import type { Descendant } from "slate";
+import { Hero } from "./blocks/hero";
+import { Content as ContentBlock } from "./blocks/content";
+import { Testimonial } from "./blocks/testimonial";
+import { Features } from "./blocks/features";
+
+const blockRenderer = {
+  Hero: (props) => <Hero data={props} />,
+  Features: (props) => <Features data={props} />,
+  Testimonial: (props) => <Testimonial data={props} />,
+  ContentBlock: (props) => <ContentBlock data={props} />,
+};
 
 export const Post = ({ data }) => {
   const theme = React.useContext(ThemeContext);
@@ -79,21 +92,13 @@ export const Post = ({ data }) => {
   );
 };
 
-import type { Root, Content } from "mdast";
-import type { Descendant } from "slate";
-import { Hero } from "./blocks/hero";
-
 const Markdown2 = (props) => {
   if (typeof props.children === "string") {
     return <Markdown>{props.children}</Markdown>;
   } else {
     const ast = props.children as Root;
     if (props.children.type === "root") {
-      return (
-        <MarkdownContent templates={props.children._field.templates}>
-          {ast.children}
-        </MarkdownContent>
-      );
+      return <MarkdownContent>{ast.children}</MarkdownContent>;
     } else {
       return <SlateContent>{props.children}</SlateContent>;
     }
@@ -104,12 +109,10 @@ const Link = (props) => {
   // console.log(props);
   return <a href={props.to}>Link to {props.label}</a>;
 };
+
 const SlateContent = ({
   children,
-  blocks = {
-    Hero: (props) => <Hero data={props} />,
-    Link: (props) => <Link {...props} />,
-  },
+  blocks = blockRenderer,
 }: {
   children: Descendant[];
 }) => {
@@ -189,15 +192,10 @@ const SlateContent = ({
 
 const MarkdownContent = ({
   children,
-  blocks = {
-    Hero: (props) => <Hero data={props} />,
-    Link: (props) => <Link {...props} />,
-  },
-  templates,
+  blocks = blockRenderer,
 }: {
   children: Content[];
   blocks?: { [key: string]: (props) => React.ReactNode };
-  templates?: object[];
 }) => {
   return (
     <>

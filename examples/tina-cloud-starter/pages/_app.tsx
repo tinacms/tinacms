@@ -1,10 +1,11 @@
 import "../styles.css";
 import dynamic from "next/dynamic";
-import ReactDOM from "react-dom";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
+import { deserialize, NodeValueTypes } from "../components/post";
+import { Form, MdxField, PopupAdder } from "tinacms";
 
 import React, { useEffect, useCallback, useMemo, useState } from "react";
 import { createEditor, Transforms, Location, BaseRange } from "slate";
@@ -29,6 +30,9 @@ const App = ({ Component, pageProps }) => {
               cms.fields.add({
                 name: "rich-text",
                 Component: Editor,
+              });
+              import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
+                cms.plugins.add(MarkdownFieldPlugin);
               });
             }}
             documentCreatorCallback={{
@@ -81,24 +85,6 @@ const App = ({ Component, pageProps }) => {
 
 export default App;
 
-import { deserialize, serialize, NodeValueTypes } from "../components/post";
-import { Form, MdxField, PopupAdder } from "tinacms";
-import { ReactEditor } from "slate-react";
-const Editor2 = (props) => {
-  const [value, setValue] = React.useState(props.input?.value?.type);
-  React.useEffect(() => {
-    console.log("i mounted", props.input.value);
-    props.input.onChange(value);
-  }, [value]);
-  return (
-    <input
-      type="text"
-      {...props.input}
-      value={value}
-      onChange={(e) => setValue(e.target.value)}
-    />
-  );
-};
 const Editor = (props) => {
   const InnerEditor = useMemo(() => <EditorInner {...props} />, []);
   return InnerEditor;

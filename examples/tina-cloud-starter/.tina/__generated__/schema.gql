@@ -213,7 +213,7 @@ type PagesBlocksHeroImage {
 type PagesBlocksHero {
   tagline: String
   headline: String
-  text: JSON
+  text: String
   actions: [PagesBlocksHeroActions]
   image: PagesBlocksHeroImage
   color: String
@@ -359,6 +359,7 @@ input PagesBlocksHeroImageMutation {
 input PagesBlocksHeroMutation {
   tagline: String
   headline: String
+  text: String
   actions: [PagesBlocksHeroActionsMutation]
   image: PagesBlocksHeroImageMutation
   color: String

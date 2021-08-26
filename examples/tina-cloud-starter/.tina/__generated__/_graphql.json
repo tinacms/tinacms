@@ -2877,7 +2877,7 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "JSON"
+              "value": "String"
             }
           }
         },
@@ -4525,6 +4525,20 @@
           "name": {
             "kind": "Name",
             "value": "headline"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "text"
           },
           "type": {
             "kind": "NamedType",

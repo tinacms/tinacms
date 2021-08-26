@@ -304,14 +304,9 @@ const heroBlockSchema: TinaTemplate = {
       name: "headline",
     },
     {
-      type: "rich-text",
       label: "Text",
       name: "text",
-      templates: [
-        featureBlockShema,
-        contentBlockSchema,
-        testimonialBlockSchema,
-      ],
+      type: "string",
       ui: {
         component: "markdown",
       },
@@ -431,54 +426,10 @@ export default defineSchema({
           label: "Body",
           name: "_body",
           templates: [
-            {
-              label: "Link",
-              name: "Link",
-              fields: [
-                {
-                  type: "string",
-                  name: "label",
-                  label: "Label",
-                },
-                {
-                  type: "string",
-                  name: "to",
-                  label: "To",
-                },
-                {
-                  type: "string",
-                  list: true,
-                  name: "nested",
-                  label: "Nested",
-                  ui: {
-                    component: "tags",
-                  },
-                },
-                {
-                  type: "object",
-                  name: "nestedObject",
-                  label: "Nested Object",
-                  fields: [
-                    {
-                      type: "string",
-                      name: "ok",
-                      label: "Ok",
-                    },
-                  ],
-                },
-              ],
-            },
-            {
-              label: "Image",
-              name: "Image",
-              fields: [
-                {
-                  type: "image",
-                  name: "myImage",
-                  label: "My Image",
-                },
-              ],
-            },
+            { ...heroBlockSchema, name: "Hero" },
+            { ...featureBlockShema, name: "Features" },
+            { ...contentBlockSchema, name: "ContentBlock" },
+            { ...testimonialBlockSchema, name: "Testimonial" },
           ],
           isBody: true,
         },
