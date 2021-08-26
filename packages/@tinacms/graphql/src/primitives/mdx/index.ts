@@ -6,6 +6,7 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxjs } from 'micromark-extension-mdxjs'
 import { mdxFromMarkdown, mdxToMarkdown } from 'mdast-util-mdx'
 import { stringify } from './slate/serialize'
+import deserialize from './slate/deserialize'
 
 export const parseMDX = (value: string) => {
   const tree = unified.unified().use(markdown).use(mdx).parse(value)
@@ -51,7 +52,9 @@ export const parseMDX = (value: string) => {
       node.attributes = attributes
     }
   }
-  return tree
+  const slateTree = tree.children.map(deserialize)
+  // console.log(JSON.stringify(slateTree, null, 2))
+  return slateTree
 }
 
 export const stringifyMDX = (slateTree: object[]) => {

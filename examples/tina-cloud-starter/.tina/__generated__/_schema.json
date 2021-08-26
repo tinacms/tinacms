@@ -6,61 +6,6 @@
       "path": "content/posts",
       "fields": [
         {
-          "type": "string",
-          "label": "Title",
-          "name": "title",
-          "namespace": [
-            "posts",
-            "title"
-          ]
-        },
-        {
-          "type": "reference",
-          "label": "Author",
-          "name": "author",
-          "collections": [
-            "authors"
-          ],
-          "namespace": [
-            "posts",
-            "author"
-          ]
-        },
-        {
-          "type": "datetime",
-          "label": "Posted Date",
-          "name": "date",
-          "ui": {
-            "dateFormat": "MMMM DD YYYY",
-            "timeFormat": "hh:mm A"
-          },
-          "namespace": [
-            "posts",
-            "date"
-          ]
-        },
-        {
-          "type": "image",
-          "name": "heroImg",
-          "label": "Hero Image",
-          "namespace": [
-            "posts",
-            "heroImg"
-          ]
-        },
-        {
-          "type": "string",
-          "label": "Excerpt",
-          "ui": {
-            "component": "textarea"
-          },
-          "name": "excerpt",
-          "namespace": [
-            "posts",
-            "excerpt"
-          ]
-        },
-        {
           "type": "rich-text",
           "label": "Body",
           "name": "_body",
@@ -749,6 +694,61 @@
           "namespace": [
             "posts",
             "_body"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title",
+          "namespace": [
+            "posts",
+            "title"
+          ]
+        },
+        {
+          "type": "reference",
+          "label": "Author",
+          "name": "author",
+          "collections": [
+            "authors"
+          ],
+          "namespace": [
+            "posts",
+            "author"
+          ]
+        },
+        {
+          "type": "datetime",
+          "label": "Posted Date",
+          "name": "date",
+          "ui": {
+            "dateFormat": "MMMM DD YYYY",
+            "timeFormat": "hh:mm A"
+          },
+          "namespace": [
+            "posts",
+            "date"
+          ]
+        },
+        {
+          "type": "image",
+          "name": "heroImg",
+          "label": "Hero Image",
+          "namespace": [
+            "posts",
+            "heroImg"
+          ]
+        },
+        {
+          "type": "string",
+          "label": "Excerpt",
+          "ui": {
+            "component": "textarea"
+          },
+          "name": "excerpt",
+          "namespace": [
+            "posts",
+            "excerpt"
           ]
         }
       ],
