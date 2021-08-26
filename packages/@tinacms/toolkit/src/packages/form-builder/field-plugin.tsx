@@ -17,11 +17,12 @@ limitations under the License.
 */
 
 import { Field } from '../forms'
+import { InputFieldType } from '../fields/plugins/wrapFieldWithMeta'
 
-export interface FieldPlugin {
+export interface FieldPlugin<ExtraFieldProps = {}, InputProps = {}> {
   __type: 'field'
   name: string
-  Component: React.FC<any>
+  Component: React.FC<InputFieldType<ExtraFieldProps, InputProps>>
   type?: string
   validate?(
     value: any,
@@ -33,3 +34,5 @@ export interface FieldPlugin {
   format?: (value: any, name: string, field: Field) => any
   defaultValue?: any
 }
+
+export type { InputFieldType } from '../fields/plugins/wrapFieldWithMeta'
