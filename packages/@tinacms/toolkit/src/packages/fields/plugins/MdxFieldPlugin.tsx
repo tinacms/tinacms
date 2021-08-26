@@ -34,10 +34,7 @@ export interface MdxFieldFieldDefinititon extends Field {
 }
 
 export interface MdxFieldProps {
-  input: any
-  meta: any
   field: MdxFieldFieldDefinititon
-  form: any
   tinaForm: Form
   inline?: boolean
 }

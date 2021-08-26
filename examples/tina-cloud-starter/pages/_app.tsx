@@ -5,11 +5,11 @@ import { Layout } from "../components/layout";
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
 import { deserialize, NodeValueTypes } from "../components/post";
-import { Form, MdxField, PopupAdder } from "tinacms";
+import { Form, MdxField, PopupAdder, useForm } from "tinacms";
 
 import React, { useEffect, useCallback, useMemo, useState } from "react";
-import { createEditor, Transforms, Location, BaseRange } from "slate";
-import { Slate, Editable, withReact, useSlate } from "slate-react";
+import { createEditor, Transforms, BaseRange } from "slate";
+import { Slate, Editable, withReact } from "slate-react";
 
 const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
 const NEXT_PUBLIC_USE_LOCAL_CLIENT =
@@ -107,10 +107,6 @@ const EditorInner = (props) => {
     }
   }, [JSON.stringify(value)]);
   const [voidSelection, setVoidSelection] = React.useState<BaseRange>(null);
-  const [popupSelection, setPopupSelection] = React.useState<BaseRange>(null);
-  const focusSelection = popupSelection
-    ? popupSelection.focus
-    : editor.selection?.focus;
 
   const renderElement = useCallback(
     (props) => {
@@ -153,6 +149,7 @@ const EditorInner = (props) => {
                 inline={props.element.type === "mdxJsxTextElement"}
                 {...props}
                 templates={templates}
+                isReady={!!voidSelection}
                 onChange={(value) => {
                   const v = {
                     ...props.element,
@@ -164,6 +161,8 @@ const EditorInner = (props) => {
                   Transforms.setNodes(editor, v, {
                     at: voidSelection.focus,
                   });
+                }}
+                onSubmit={() => {
                   setVoidSelection(null);
                 }}
               />
@@ -191,22 +190,17 @@ const EditorInner = (props) => {
           {props.field.label}
         </label>
         <PopupAdder
-          showButton={focusSelection}
+          showButton={!!editor.selection}
           onAdd={(template) => {
+            const type = template.inline
+              ? "mdxJsxTextElement"
+              : "mdxJsxFlowElement";
             const meh = {
-              type: "mdxJsxFlowElement",
+              type,
               node: {
-                type: "mdxJsxFlowElement",
+                type,
                 name: template.name,
-                // TODO: put default items here
-                attributes: {
-                  // label: "Click heredd",
-                  // to: "https://example.com",
-                  // nested: ["ok", "okok"],
-                  // nestedObject: {
-                  //   ok: "yes",
-                  // },
-                },
+                attributes: template.defaultItem,
                 children: [],
                 ordered: false,
               },
@@ -216,11 +210,7 @@ const EditorInner = (props) => {
                 },
               ],
             };
-            Transforms.setNodes(editor, meh, {
-              at: popupSelection
-                ? popupSelection.focus
-                : editor.selection.focus,
-            });
+            Transforms.insertNodes(editor, meh);
           }}
           templates={templates}
         />
@@ -245,19 +235,7 @@ const EditorInner = (props) => {
             setValue(newValue);
           }}
         >
-          <Editable
-            renderElement={renderElement}
-            onKeyDown={(event) => {
-              switch (event.key) {
-                case "<": {
-                  setPopupSelection(editor.selection);
-                  break;
-                }
-                default:
-                  setPopupSelection(null);
-              }
-            }}
-          />
+          <Editable renderElement={renderElement} />
         </Slate>
       </div>
     </>
@@ -268,6 +246,7 @@ const MdxPicker = (props) => {
   const activeTemplate = props.templates.find(
     (template) => template.name === props.element.node.name
   );
+  const ref = React.useRef();
   const initialValues = props.element.node.attributes;
   const form = new Form({
     id: props.element.node.name,
@@ -275,25 +254,29 @@ const MdxPicker = (props) => {
     initialValues,
     onSubmit: (values) => {
       props.onChange(values);
+      // props.submit();
     },
     fields: activeTemplate.fields,
   });
+  // FIXME: ideally we stream the changes back to slate
+  // but for some reason this causes us to get stuck in
+  // in infinite loop. Probably just missing a memoize
+  // somewhere
+  // React.useEffect(() => {
+  //   form.subscribe(
+  //     ({ values }) => {
+  //       if (props.isReady) {
+  //         props.onChange(values);
+  //       }
+  //     },
+  //     { values: true }
+  //   );
+  // }, [form]);
+
   return (
-    <>
+    <span ref={ref}>
       {props.children}
-      <MdxField
-        inline={props.inline}
-        tinaForm={form}
-        form={form.finalForm}
-        field={activeTemplate}
-        input={{
-          name: "",
-          onChange: (value) => {
-            console.log("changed", value);
-          },
-        }}
-        meta={{}}
-      />
-    </>
+      <MdxField inline={props.inline} tinaForm={form} field={activeTemplate} />
+    </span>
   );
 };
