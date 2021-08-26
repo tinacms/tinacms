@@ -15,7 +15,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-export type Callback = (event: CMSEvent) => void
+export type Callback<E extends CMSEvent = CMSEvent> = (event: E) => void
 
 export interface CMSEvent {
   type: string
@@ -23,9 +23,12 @@ export interface CMSEvent {
 }
 
 export class EventBus {
-  private listeners = new Set<Listener>()
+  private listeners = new Set<Listener<any>>()
 
-  subscribe = (event: string | string[], callback: Callback): (() => void) => {
+  subscribe<E extends CMSEvent = CMSEvent>(
+    event: E['type'] | E['type'][],
+    callback: Callback<E>
+  ): () => void {
     let events: string[]
 
     if (typeof event === 'string') {
@@ -34,7 +37,7 @@ export class EventBus {
       events = event
     }
 
-    const newListeners = events.map((event) => new Listener(event, callback))
+    const newListeners = events.map((event) => new Listener<E>(event, callback))
 
     newListeners.forEach((newListener) => this.listeners.add(newListener))
 
@@ -43,7 +46,7 @@ export class EventBus {
     }
   }
 
-  dispatch = (event: CMSEvent) => {
+  dispatch<E extends CMSEvent = CMSEvent>(event: E) {
     /**
      * If the `listener` Set is modified during the dispatch then
      * it can cause an infinite loop. Snapshot it and it's fine.
@@ -54,10 +57,10 @@ export class EventBus {
   }
 }
 
-export class Listener {
-  constructor(private eventPattern: string, private callback: Callback) {}
+export class Listener<E extends CMSEvent = CMSEvent> {
+  constructor(private eventPattern: E['type'], private callback: Callback<E>) {}
 
-  handleEvent(event: CMSEvent) {
+  handleEvent(event: E) {
     if (this.watchesEvent(event)) {
       this.callback(event)
       return true
@@ -65,7 +68,7 @@ export class Listener {
     return false
   }
 
-  watchesEvent(currentEvent: CMSEvent) {
+  watchesEvent(currentEvent: E) {
     if (this.eventPattern === '*') return true
 
     const eventParts = currentEvent.type.split(':')
