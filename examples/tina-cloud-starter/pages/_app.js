@@ -24,6 +24,9 @@ const App = ({ Component, pageProps }) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
+              import("../components/plugins").then(({ MyPlugin }) => {
+                cms.plugins.add(MyPlugin);
+              });
             }}
             documentCreatorCallback={{
               /**
@@ -51,14 +54,16 @@ const App = ({ Component, pageProps }) => {
             }}
             {...pageProps}
           >
-            {(livePageProps) => (
-              <Layout
-                rawData={livePageProps}
-                data={livePageProps.data?.getGlobalDocument?.data}
-              >
-                <Component {...livePageProps} />
-              </Layout>
-            )}
+            {(livePageProps) => {
+              return (
+                <Layout
+                  rawData={livePageProps}
+                  data={livePageProps.data?.getGlobalDocument?.data}
+                >
+                  <Component {...livePageProps} />
+                </Layout>
+              );
+            }}
           </TinaCMS>
         }
       >

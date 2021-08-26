@@ -40,6 +40,15 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
           .find(field.component as string)
 
         let type: string | undefined
+
+        let Component = plugin.Component
+
+        if (typeof plugin?.Component === 'string') {
+          Component = cms.plugins
+            .findOrCreateMap<FieldPlugin>('field')
+            .find(plugin.Component as string).Component
+        }
+
         if (plugin && plugin.type) {
           type = plugin.type
         }
@@ -98,7 +107,7 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
 
               if (plugin) {
                 return (
-                  <plugin.Component
+                  <Component
                     {...fieldProps}
                     form={form.finalForm}
                     tinaForm={form}

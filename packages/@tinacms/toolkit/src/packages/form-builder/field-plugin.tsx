@@ -21,7 +21,7 @@ import { Field } from '../forms'
 export interface FieldPlugin {
   __type: 'field'
   name: string
-  Component: React.FC<any>
+  Component: React.FC<any> | string
   type?: string
   validate?(
     value: any,

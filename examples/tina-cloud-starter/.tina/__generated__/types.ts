@@ -264,6 +264,7 @@ export type GlobalTheme = {
 
 export type Global = {
   __typename?: 'Global';
+  test?: Maybe<Scalars['String']>;
   header?: Maybe<GlobalHeader>;
   footer?: Maybe<GlobalFooter>;
   theme?: Maybe<GlobalTheme>;
@@ -509,6 +510,7 @@ export type GlobalThemeMutation = {
 };
 
 export type GlobalMutation = {
+  test?: Maybe<Scalars['String']>;
   header?: Maybe<GlobalHeaderMutation>;
   footer?: Maybe<GlobalFooterMutation>;
   theme?: Maybe<GlobalThemeMutation>;

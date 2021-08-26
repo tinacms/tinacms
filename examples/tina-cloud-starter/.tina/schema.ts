@@ -438,6 +438,14 @@ export default defineSchema({
       path: "content/global",
       fields: [
         {
+          name: "test",
+          type: "string",
+          label: "test",
+          ui: {
+            component: "test",
+          },
+        },
+        {
           type: "object",
           label: "Header",
           name: "header",

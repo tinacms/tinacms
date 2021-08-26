@@ -59,11 +59,11 @@ class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { 
-      hasError: props.hasError, 
+    this.state = {
+      hasError: props.hasError,
       message: '',
-      pageRefresh: false
-     }
+      pageRefresh: false,
+    }
   }
 
   static getDerivedStateFromError(error) {
@@ -117,8 +117,9 @@ class ErrorBoundary extends React.Component {
             <br />
             <p>
               If you've just updated the form, undo your most recent changes and
-              click "refresh". If after a few refreshes, you're still encountering this error. 
-              There is a bigger issue with the site. Please reach out to your site admin.
+              click "refresh". If after a few refreshes, you're still
+              encountering this error. There is a bigger issue with the site.
+              Please reach out to your site admin.
             </p>
             <div style={{ padding: '10px 0' }}>
               <button
@@ -136,7 +137,11 @@ class ErrorBoundary extends React.Component {
                 onClick={() => {
                   /* @ts-ignore */
                   this.setState({ pageRefresh: true })
-                  setTimeout(() => this.setState({ hasError: false, pageRefresh: false}), 3000)
+                  setTimeout(
+                    () =>
+                      this.setState({ hasError: false, pageRefresh: false }),
+                    3000
+                  )
                 }}
               >
                 Refresh
@@ -146,14 +151,13 @@ class ErrorBoundary extends React.Component {
         </div>
       )
     }
-    {/* @ts-ignore */}
-    { if (this.state.pageRefresh) {
-      return (
-        <Loader>
-          Let's try that again.
-        </Loader>
-      )
+    {
+      /* @ts-ignore */
     }
+    {
+      if (this.state.pageRefresh) {
+        return <Loader>Let's try that again.</Loader>
+      }
     }
 
     return this.props.children
