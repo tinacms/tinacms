@@ -295,6 +295,7 @@ input PostsMutation {
   date: String
   heroImg: String
   excerpt: String
+  _body: JSON
 }
 
 input GlobalHeaderIconMutation {

@@ -469,6 +469,7 @@ export type PostsMutation = {
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
   excerpt?: Maybe<Scalars['String']>;
+  _body?: Maybe<Scalars['JSON']>;
 };
 
 export type GlobalHeaderIconMutation = {

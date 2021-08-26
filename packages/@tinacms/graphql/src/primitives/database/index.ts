@@ -141,7 +141,7 @@ export class Database {
         throw new Error(`Unable to determine template`)
       }
       const field = template.fields.find((field) => {
-        if (field.type === 'string') {
+        if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
           }

@@ -4933,6 +4933,7 @@ __metadata:
     "@types/lodash.camelcase": ^4.3.6
     "@types/lodash.upperfirst": ^4.3.6
     "@types/lru-cache": ^5.1.0
+    "@types/mdast": ^3.0.10
     "@types/normalize-path": ^3.0.0
     "@types/ws": ^7.2.6
     "@types/yup": ^0.29.7
@@ -4953,6 +4954,11 @@ __metadata:
     js-yaml: ^3.14.0
     lodash: ^4.17.20
     lru-cache: ^6.0.0
+    mdast: ^3.0.0
+    mdast-util-from-markdown: ^1.0.0
+    mdast-util-mdx: ^1.1.0
+    mdast-util-to-markdown: ^1.2.1
+    micromark-extension-mdxjs: ^1.0.0
     nodemon: ^2.0.4
     normalize-path: ^3.0.0
     prettier: ^2.2.1
@@ -5130,6 +5136,15 @@ __metadata:
     mkdirp: ^1.0.4
     path-browserify: ^1.0.1
   checksum: 00b81b0caaa30e8e259147ce894ceff4a47704faac3775397b4ffd1e47090604f9ca86683495cc6c3cf327e2731ed00007c860a33e9b3b4fc2b150d598180996
+  languageName: node
+  linkType: hard
+
+"@types/acorn@npm:^4.0.0":
+  version: 4.0.6
+  resolution: "@types/acorn@npm:4.0.6"
+  dependencies:
+    "@types/estree": "*"
+  checksum: 848a0339a56c78ed239cc9b4056366d1418152109b6a57e839b828ccfcaed1c67ef45931f6d173b182a3857274bfde2730c7302fbd0e31064052ce1fcf5b3778
   languageName: node
   linkType: hard
 
@@ -5318,6 +5333,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/estree-jsx@npm:^0.0.1":
+  version: 0.0.1
+  resolution: "@types/estree-jsx@npm:0.0.1"
+  dependencies:
+    "@types/estree": "*"
+  checksum: dda16fe89f8d317bba79df28246cbb451b44bc247e6b13e3fb106df76bbafca4818512a71ababd9cc7dbbf4aea71ede29ca9b402418c50379aa0becc23354c1b
+  languageName: node
+  linkType: hard
+
 "@types/estree@npm:*":
   version: 0.0.50
   resolution: "@types/estree@npm:0.0.50"
@@ -5329,6 +5353,13 @@ __metadata:
   version: 0.0.39
   resolution: "@types/estree@npm:0.0.39"
   checksum: 43e5361de39969def145f32f4599391ab13055ec94841f1633a7cfe10f0e8a940ebf0e9a4b2770454a6bddd034b57e7e0d51a4d565cb2714ee2accf10a7718be
+  languageName: node
+  linkType: hard
+
+"@types/estree@npm:^0.0.48":
+  version: 0.0.48
+  resolution: "@types/estree@npm:0.0.48"
+  checksum: 1f948e0a7730254ec77f543e4ac2c101f90147d21202d16b22b524e6e3e5d5a770d003fac3e218499d25f5db126f12c774bb16d8993114c7883496d358e1b7af
   languageName: node
   linkType: hard
 
@@ -9414,6 +9445,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"character-entities-html4@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "character-entities-html4@npm:2.0.0"
+  checksum: 79ce3a03b83728870e949b89de95a6b04929c4f56a54019dff6b4d2f7f3fdbc0c9ff987664b331185e884a35f20470404cfafc7096b693201ff3f3834ee3e725
+  languageName: node
+  linkType: hard
+
 "character-entities-legacy@npm:^1.0.0":
   version: 1.1.4
   resolution: "character-entities-legacy@npm:1.1.4"
@@ -12390,6 +12428,23 @@ __metadata:
   version: 1.1.0
   resolution: "estree-util-is-identifier-name@npm:1.1.0"
   checksum: af7043149ada77790898da8f8e875af2775b5288c4ca80b0275b9cde0ba20c095720d598ca59862cc13d3cc52f7c97943cb991c2dc4227a1a855e7dda44ac279
+  languageName: node
+  linkType: hard
+
+"estree-util-is-identifier-name@npm:^2.0.0":
+  version: 2.0.0
+  resolution: "estree-util-is-identifier-name@npm:2.0.0"
+  checksum: 0c802eac55e9372cc7b084841e68009c8fe5d2facb61ffd51b1c4cd4cb38d3e0f965e1a2c1836e1be28bb28a3ea54bedc57b077f7b1203e45a5d8558a11ab04c
+  languageName: node
+  linkType: hard
+
+"estree-util-visit@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "estree-util-visit@npm:1.1.0"
+  dependencies:
+    "@types/estree-jsx": ^0.0.1
+    "@types/unist": ^2.0.0
+  checksum: f31d24c91da2ace6690b7acf1996f7eba2c0c424da413596060d853e83607496b3602573fda9ae27b9b7217d2d39ac41e1385168486e1ae3bc945fb01249fec7
   languageName: node
   linkType: hard
 
@@ -17804,12 +17859,38 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"mdast-util-mdx-expression@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "mdast-util-mdx-expression@npm:1.1.0"
+  dependencies:
+    "@types/estree-jsx": ^0.0.1
+    strip-indent: ^4.0.0
+  checksum: 43d2912315dd5e13410fdc741c7514849b883ffda4f7ecf5d710d1fe9a197d302956ceeb3a8f042c8ac413102dea911b9d474a7eebefeb57a66f8b00af722b8d
+  languageName: node
+  linkType: hard
+
 "mdast-util-mdx-expression@npm:~0.1.0":
   version: 0.1.1
   resolution: "mdast-util-mdx-expression@npm:0.1.1"
   dependencies:
     strip-indent: ^3.0.0
   checksum: 4684cc22b159195816d0604e0600c8217bdf3fb222da38704eb22b91094437ebd42f213da330cdfe0ff664f9972d19f6d05766a1bb6c0675fc826770385a5055
+  languageName: node
+  linkType: hard
+
+"mdast-util-mdx-jsx@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "mdast-util-mdx-jsx@npm:1.1.0"
+  dependencies:
+    "@types/estree-jsx": ^0.0.1
+    "@types/mdast": ^3.0.0
+    mdast-util-to-markdown: ^1.0.0
+    parse-entities: ^3.0.0
+    stringify-entities: ^4.0.0
+    unist-util-remove-position: ^4.0.0
+    unist-util-stringify-position: ^3.0.0
+    vfile-message: ^3.0.0
+  checksum: 18d431d6ffb397d29ea43c522122f46eace42f147b942ae6bbbadbb5e9c1e9c00f4f3980cbd0c405541525e17dc3a0e1bbf08163b145f8b7350e7e9739708b3c
   languageName: node
   linkType: hard
 
@@ -17836,6 +17917,27 @@ fsevents@~2.1.2:
     mdast-util-mdxjs-esm: ~0.1.0
     mdast-util-to-markdown: ^0.6.1
   checksum: 936cb356509e446ac18960d6814b6851c2e44b42272cfa873a6c766ce7db97462b720560a4d1473bddb3d41e07697f9c9eb60037f6ba577fdee56bd83bb2b814
+  languageName: node
+  linkType: hard
+
+"mdast-util-mdx@npm:^1.1.0":
+  version: 1.1.0
+  resolution: "mdast-util-mdx@npm:1.1.0"
+  dependencies:
+    mdast-util-mdx-expression: ^1.0.0
+    mdast-util-mdx-jsx: ^1.0.0
+    mdast-util-mdxjs-esm: ^1.0.0
+  checksum: bcf7eed04f59f511c9513fb123b4d9ed1703d254bccec5c8bc2bdfac8ac134e89f7b87a33f0dfeb892ba879ec344b3297520fe786854285b036204cc42f906c7
+  languageName: node
+  linkType: hard
+
+"mdast-util-mdxjs-esm@npm:^1.0.0":
+  version: 1.1.0
+  resolution: "mdast-util-mdxjs-esm@npm:1.1.0"
+  dependencies:
+    "@types/estree-jsx": ^0.0.1
+    "@types/mdast": ^3.0.0
+  checksum: fc37ced62d9fdf4cd16b31659a98aecb1ed3e1a2d58e533332fb731c860400ed4bf8af80d181cece60242d2ed394cdec37cbc47cffac61c1e1f7b935b6e21ae3
   languageName: node
   linkType: hard
 
@@ -17876,7 +17978,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"mdast-util-to-markdown@npm:^1.0.0":
+"mdast-util-to-markdown@npm:^1.0.0, mdast-util-to-markdown@npm:^1.2.1":
   version: 1.2.1
   resolution: "mdast-util-to-markdown@npm:1.2.1"
   dependencies:
@@ -18112,7 +18214,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"micromark-core-commonmark@npm:^1.0.1":
+"micromark-core-commonmark@npm:^1.0.0, micromark-core-commonmark@npm:^1.0.1":
   version: 1.0.1
   resolution: "micromark-core-commonmark@npm:1.0.1"
   dependencies:
@@ -18154,6 +18256,36 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"micromark-extension-mdx-expression@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "micromark-extension-mdx-expression@npm:1.0.0"
+  dependencies:
+    micromark-factory-mdx-expression: ^1.0.0
+    micromark-factory-space: ^1.0.0
+    micromark-util-character: ^1.0.0
+    micromark-util-events-to-acorn: ^1.0.0
+    micromark-util-symbol: ^1.0.0
+    micromark-util-types: ^1.0.0
+  checksum: 2618b64ea9762a695d9ebd0cd94633f88eabca02a7a859c69c77a4d64f9bd6e923c8b521125846ee3f5546c366bfcfb10e9898f533024880fa3e17c8d6120dc3
+  languageName: node
+  linkType: hard
+
+"micromark-extension-mdx-jsx@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "micromark-extension-mdx-jsx@npm:1.0.0"
+  dependencies:
+    "@types/acorn": ^4.0.0
+    estree-util-is-identifier-name: ^2.0.0
+    micromark-factory-mdx-expression: ^1.0.0
+    micromark-factory-space: ^1.0.0
+    micromark-util-character: ^1.0.0
+    micromark-util-symbol: ^1.0.0
+    micromark-util-types: ^1.0.0
+    vfile-message: ^3.0.0
+  checksum: 9611081e9edf03e491145a5299d7b745de7f44371b9d94814a5dff107bc60acf5f6354e401a5a09d4d6467513a64e8964b8c57e455c4b35d08e5cecd9ae2e072
+  languageName: node
+  linkType: hard
+
 "micromark-extension-mdx-jsx@npm:~0.3.0":
   version: 0.3.3
   resolution: "micromark-extension-mdx-jsx@npm:0.3.3"
@@ -18163,6 +18295,15 @@ fsevents@~2.1.2:
     micromark-extension-mdx-expression: ^0.3.2
     vfile-message: ^2.0.0
   checksum: 2af2c66822e9dd49a4f25246272503bb25ae9d617a19e90d3267abe9f5761fd982c820c7ab33e2847ac876a13c1711199a196015d4aa1c734db12bf298e13c91
+  languageName: node
+  linkType: hard
+
+"micromark-extension-mdx-md@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "micromark-extension-mdx-md@npm:1.0.0"
+  dependencies:
+    micromark-util-types: ^1.0.0
+  checksum: 88ebbb7b96c04741b2c46b9d7c723ca60460ba6b809d07a43cb6a0e5d1a2c0600c0de4eb41d278d4eac104a93db5b9bdb070765a530e0252cc320f99da13a9d3
   languageName: node
   linkType: hard
 
@@ -18182,6 +18323,21 @@ fsevents@~2.1.2:
     micromark-extension-mdx-jsx: ~0.3.0
     micromark-extension-mdx-md: ~0.1.0
   checksum: 042fabf994cde709dfd23ede5c2a0aebcf407168ee8b32002c99c87ca16533844973c6e50d090d5be1bfbf88f378914e1b6028e30daec63523d348bdf561c06d
+  languageName: node
+  linkType: hard
+
+"micromark-extension-mdxjs-esm@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "micromark-extension-mdxjs-esm@npm:1.0.0"
+  dependencies:
+    micromark-core-commonmark: ^1.0.0
+    micromark-util-character: ^1.0.0
+    micromark-util-events-to-acorn: ^1.0.0
+    micromark-util-symbol: ^1.0.0
+    micromark-util-types: ^1.0.0
+    unist-util-position-from-estree: ^1.1.0
+    vfile-message: ^3.0.0
+  checksum: 99e6b088e93abe7ee28ad221fce73b391324f2a114eade5096a6704492619b2443d04095073a2f2c04de7e75327793abd9f6069c689dda330cc90ca653b98b0f
   languageName: node
   linkType: hard
 
@@ -18211,6 +18367,22 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"micromark-extension-mdxjs@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "micromark-extension-mdxjs@npm:1.0.0"
+  dependencies:
+    acorn: ^8.0.0
+    acorn-jsx: ^5.0.0
+    micromark-extension-mdx-expression: ^1.0.0
+    micromark-extension-mdx-jsx: ^1.0.0
+    micromark-extension-mdx-md: ^1.0.0
+    micromark-extension-mdxjs-esm: ^1.0.0
+    micromark-util-combine-extensions: ^1.0.0
+    micromark-util-types: ^1.0.0
+  checksum: d3938d08e04374e7416c1a207516b3ec4f5a1aaaed5af3fe2b19cca02b6e9fa78c72ac57fe70f69b3c72cc812840f703c54213c37ee8fc969623c67cd6c51b9a
+  languageName: node
+  linkType: hard
+
 "micromark-factory-destination@npm:^1.0.0":
   version: 1.0.0
   resolution: "micromark-factory-destination@npm:1.0.0"
@@ -18230,6 +18402,21 @@ fsevents@~2.1.2:
     micromark-util-symbol: ^1.0.0
     micromark-util-types: ^1.0.0
   checksum: 4a6f5addbe8861b5a9c3a05248269763d6b7406905ba7072094f6e0a72b7a7f4b1f258ecec3696cb668d9cbfa07784889ede7fa7e49fb08f22d047ed5b8e463b
+  languageName: node
+  linkType: hard
+
+"micromark-factory-mdx-expression@npm:^1.0.0":
+  version: 1.0.0
+  resolution: "micromark-factory-mdx-expression@npm:1.0.0"
+  dependencies:
+    micromark-factory-whitespace: ^1.0.0
+    micromark-util-character: ^1.0.0
+    micromark-util-events-to-acorn: ^1.0.0
+    micromark-util-symbol: ^1.0.0
+    micromark-util-types: ^1.0.0
+    unist-util-position-from-estree: ^1.0.0
+    vfile-message: ^3.0.0
+  checksum: 7cebf4f7d91ad4e6c6c78ec774a131e38cf87580c805e2444254148968817856158b6fb7394b814a8b2bb17c89149ba820e220bee9bf085ea4fdcaa48ff63329
   languageName: node
   linkType: hard
 
@@ -18320,6 +18507,19 @@ fsevents@~2.1.2:
   version: 1.0.0
   resolution: "micromark-util-encode@npm:1.0.0"
   checksum: 4a967aea84dff000552407aa9c28ecd7fa924889e32dfea6733e96a4adbc8611cfdd261ba04a7ca825531975faee3df02248d9826c8872675649c169f56d9be4
+  languageName: node
+  linkType: hard
+
+"micromark-util-events-to-acorn@npm:^1.0.0":
+  version: 1.0.1
+  resolution: "micromark-util-events-to-acorn@npm:1.0.1"
+  dependencies:
+    "@types/acorn": ^4.0.0
+    "@types/estree": ^0.0.48
+    estree-util-visit: ^1.0.0
+    micromark-util-types: ^1.0.0
+    vfile-message: ^3.0.0
+  checksum: 141c7d8b38487beedaa7ed734fdecb12e589573687168674d37c2c3ad4781d74f0d2cac2e0e4e629e5c8fcfa0b0e850b857a93937526bd1da0f0ff25cbae99f5
   languageName: node
   linkType: hard
 
@@ -25318,6 +25518,16 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
+"stringify-entities@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "stringify-entities@npm:4.0.1"
+  dependencies:
+    character-entities-html4: ^2.0.0
+    character-entities-legacy: ^2.0.0
+  checksum: f2cdeba8de7ff2855a078521a5369de85dd6bec4aec2ee48fcc4db7db0ba596d8fe07348ca3fa58a0a0dade4c2ede04f317200778c7ee091cf8a3d11bc4560ac
+  languageName: node
+  linkType: hard
+
 "strip-ansi@npm:5.2.0, strip-ansi@npm:^5.1.0, strip-ansi@npm:^5.2.0":
   version: 5.2.0
   resolution: "strip-ansi@npm:5.2.0"
@@ -27136,6 +27346,15 @@ typescript@^3.8.3:
   languageName: node
   linkType: hard
 
+"unist-util-position-from-estree@npm:^1.0.0, unist-util-position-from-estree@npm:^1.1.0":
+  version: 1.1.1
+  resolution: "unist-util-position-from-estree@npm:1.1.1"
+  dependencies:
+    "@types/unist": ^2.0.0
+  checksum: e7bcd7c6bb459d5024158d3096929bf573d3158467a360603e033bdecc119d3dd10d8cc6bed97c2ba3227202254e48fcc5e3baad8a706e2db3135cb8db85c7cc
+  languageName: node
+  linkType: hard
+
 "unist-util-position@npm:^3.0.0":
   version: 3.1.0
   resolution: "unist-util-position@npm:3.1.0"
@@ -27158,6 +27377,16 @@ typescript@^3.8.3:
   dependencies:
     unist-util-visit: ^2.0.0
   checksum: 981cf61ab3b48957418b1239762c78dcea17f00d95f9f04471db7cab1acd3b7a4e3aaa2da08968d994c859d76ba1ec827f63dafb9324859d747883a0de67c24a
+  languageName: node
+  linkType: hard
+
+"unist-util-remove-position@npm:^4.0.0":
+  version: 4.0.1
+  resolution: "unist-util-remove-position@npm:4.0.1"
+  dependencies:
+    "@types/unist": ^2.0.0
+    unist-util-visit: ^4.0.0
+  checksum: cd7360957b87e0c9f392ee7d0ef0869b6cf730c7479c7853faf89d8fee86f053757b9b7415a435edaefdceff3b195a1f325a86a7dc97a273208c094cb168b4a5
   languageName: node
   linkType: hard
 

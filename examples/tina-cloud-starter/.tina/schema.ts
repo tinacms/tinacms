@@ -432,12 +432,29 @@ export default defineSchema({
             { ...testimonialBlockSchema, name: "Testimonial" },
             {
               name: "Highlight",
+              inline: true,
               label: "Highlight",
               fields: [
                 {
                   name: "children",
                   label: "Text",
                   type: "string",
+                },
+              ],
+            },
+            {
+              name: "LiveData",
+              // inline: true,
+              label: "LiveData",
+              fields: [
+                {
+                  name: "value",
+                  label: "Value",
+                  type: "string",
+                  options: [
+                    { label: "Current Time", value: "currentTime" },
+                    { label: "Current URL", value: "currentURL" },
+                  ],
                 },
               ],
             },

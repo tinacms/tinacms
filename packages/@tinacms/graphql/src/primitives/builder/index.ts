@@ -614,6 +614,12 @@ export class Builder {
           list: field.list,
           type: await this._updateCollectionDocumentMutationType(field),
         })
+      case 'rich-text':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: field.list,
+          type: astBuilder.TYPES.JSON,
+        })
       case 'reference':
         return astBuilder.InputValueDefinition({
           name: field.name,

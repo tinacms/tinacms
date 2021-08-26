@@ -16,7 +16,45 @@ const blockRenderer = {
   Features: (props) => <Features data={props} />,
   Testimonial: (props) => <Testimonial data={props} />,
   ContentBlock: (props) => <ContentBlock data={props} />,
-  Highlight: (props) => <div {...props} />,
+  Highlight: (props) => {
+    return <span style={{ background: "yellow", color: "black" }} {...props} />;
+  },
+  LiveData: (props) => {
+    switch (props.value) {
+      case "currentTime":
+        return <Timer {...props} />;
+      case "currentURL":
+        return <span>You're viewing a page at {window.location.href}</span>;
+      default:
+        return null;
+    }
+  },
+};
+export default function useInterval(callback, delay) {
+  const callbacRef = React.useRef(null);
+
+  // update callback function with current render callback that has access to latest props and state
+  React.useEffect(() => {
+    callbacRef.current = callback;
+  });
+
+  React.useEffect(() => {
+    if (!delay) {
+      return () => {};
+    }
+
+    const interval = setInterval(() => {
+      callbacRef.current && callbacRef.current();
+    }, delay);
+    return () => clearInterval(interval);
+  }, [delay]);
+}
+
+const Timer = () => {
+  const [time, setTime] = React.useState(0);
+  useInterval(() => setTime(time + 1), 1000);
+
+  return <span>Counting... {time}</span>;
 };
 
 export const Post = ({ data }) => {
@@ -165,15 +203,15 @@ const SlateContent = ({
               </a>
             );
           case "mdxJsxTextElement":
-            const InlineBlock = blocks[child.node.name];
-            if (InlineBlock) {
-              return <InlineBlock {...child.node.attributes} />;
-            }
-          // for some reason html block elements are here
           case "mdxJsxFlowElement":
             const Block = blocks[child.node.name];
             if (Block) {
-              return <Block {...child.node.attributes} />;
+              console.log(child);
+              return (
+                <Block {...child.node.attributes}>
+                  <SlateContent>{child.children}</SlateContent>
+                </Block>
+              );
             }
           default:
             if (!child.text && child.type) {
@@ -258,7 +296,11 @@ const MarkdownContent = ({
           case "mdxJsxTextElement":
             const InlineBlock = blocks[child.name];
             if (InlineBlock) {
-              return <InlineBlock {...child.attributes} />;
+              return (
+                <InlineBlock {...child.attributes}>
+                  <MarkdownContent>{child.children}</MarkdownContent>
+                </InlineBlock>
+              );
             }
             const atts = {};
             // child.attributes.forEach((att) => (atts[att.name] = att.value));
@@ -270,7 +312,11 @@ const MarkdownContent = ({
           case "mdxJsxFlowElement":
             const Block = blocks[child.name];
             if (Block) {
-              return <Block {...child.attributes} />;
+              return (
+                <Block {...child.attributes}>
+                  <MarkdownContent>{child.children}</MarkdownContent>
+                </Block>
+              );
             }
 
             const blockAtts = {};

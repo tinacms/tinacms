@@ -18,11 +18,7 @@ import { assertShape, sequential, lastItem } from '../util'
 import { NAMER } from '../ast-builder'
 import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
-
-import unified from 'unified'
-import markdown from 'remark-parse'
-// import remarkSlate from 'remark-slate'
-import mdx from 'remark-mdx'
+import { parseMDX, stringifyMDX } from '../mdx'
 
 import type { Templateable, TinaFieldEnriched } from '../types'
 import { TinaError } from './error'
@@ -360,6 +356,9 @@ export class Resolver {
             }
             break
           }
+        case 'rich-text':
+          accum[fieldName] = stringifyMDX(fieldValue)
+          break
         case 'reference':
           accum[fieldName] = fieldValue
           break
@@ -391,48 +390,7 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'rich-text':
-        const tree = unified.unified().use(markdown).use(mdx).parse(value)
-        for (const node of walk(tree)) {
-          if (node.type === 'mdxJsxFlowElement') {
-            const attributes = {}
-            node.attributes.forEach((attribute) => {
-              if (attribute.type === 'mdxJsxAttribute') {
-                if (
-                  attribute.value?.type === 'mdxJsxAttributeValueExpression'
-                ) {
-                  attribute.value.data.estree.body.forEach((item) => {
-                    if (item.type === 'ExpressionStatement') {
-                      if (item.expression.type === 'ArrayExpression') {
-                        const elements = []
-                        item.expression.elements.forEach((element) => {
-                          if (element.type === 'Literal') {
-                            elements.push(element.value)
-                          }
-                        })
-                        attributes[attribute.name] = elements
-                      }
-                      if (item.expression.type === 'ObjectExpression') {
-                        item.expression.properties.forEach((property) => {
-                          attributes[attribute.name] = {
-                            [property.key.name]: property.value.value,
-                          }
-                        })
-                      }
-                    }
-                  })
-
-                  // attributes[attribute.name] =
-                } else {
-                  attributes[attribute.name] = attribute.value
-                }
-              } else {
-                console.log(`Not sure what this is, type: ${attribute.type}`)
-              }
-            })
-            node.attributes = attributes
-          }
-        }
-
+        const tree = parseMDX(value)
         accumulator[field.name] = tree
         break
       case 'object':
@@ -726,25 +684,4 @@ const resolveDateInput = (value: string) => {
 
 type FieldParams = {
   [fieldName: string]: string | { [key: string]: unknown } | FieldParams[]
-}
-
-export function* walk(maybeNode: any): any {
-  if (['string', 'number'].includes(typeof maybeNode)) {
-    return
-  }
-
-  if (!maybeNode) {
-    return
-  }
-
-  for (const value of Object.values(maybeNode)) {
-    if (Array.isArray(value)) {
-      for (const element of value) {
-        yield* walk(element)
-      }
-    } else {
-      yield* walk(value)
-    }
-  }
-  yield maybeNode
 }
