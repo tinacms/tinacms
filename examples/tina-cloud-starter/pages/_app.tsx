@@ -158,6 +158,7 @@ const EditorInner = (props) => {
                       attributes: value,
                     },
                   };
+                  // Works for block nodes, not for inline
                   Transforms.setNodes(editor, v, {
                     at: voidSelection.focus,
                   });
@@ -176,7 +177,7 @@ const EditorInner = (props) => {
   );
 
   editor.isVoid = (element) => {
-    return element.type === "mdxJsxFlowElement" ? true : false;
+    return ["mdxJsxTextElement", "mdxJsxFlowElement"].includes(element.type);
   };
   editor.isInline = (element) => {
     return ["mdxJsxTextElement", "link"].includes(element.type);

@@ -691,6 +691,7 @@
             },
             {
               "name": "Highlight",
+              "inline": true,
               "label": "Highlight",
               "fields": [
                 {
@@ -709,6 +710,38 @@
                 "posts",
                 "_body",
                 "Highlight"
+              ]
+            },
+            {
+              "name": "LiveData",
+              "label": "LiveData",
+              "fields": [
+                {
+                  "name": "value",
+                  "label": "Value",
+                  "type": "string",
+                  "options": [
+                    {
+                      "label": "Current Time",
+                      "value": "currentTime"
+                    },
+                    {
+                      "label": "Current URL",
+                      "value": "currentURL"
+                    }
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "LiveData",
+                    "value"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "LiveData"
               ]
             }
           ],
