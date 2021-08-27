@@ -1,16 +1,17 @@
 {
   "name": "react-tinacms-editor",
-  "version": "0.51.6",
+  "version": "0.51.7",
   "license": "Apache-2.0",
   "main": "dist/index.js",
   "module": "dist/react-tinacms-editor.esm.js",
-  "typings": "dist/src/index.d.ts",
+  "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],
   "scripts": {
     "storybook": "start-storybook -p 9001 -c .storybook",
     "watch": "tinacms-scripts watch",
+    "types": "yarn tsc",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
     "test": "jest --env=jsdom --passWithNoTests"
@@ -23,7 +24,7 @@
     "@tinacms/scripts": "workspace:*",
     "@types/codemirror": "^0.0.71",
     "@types/color-string": "^1.5.0",
-    "@types/jest": "^24.0.0",
+    "@types/jest": "^27.0.1",
     "@types/lodash.debounce": "^4.0.6",
     "@types/lodash.get": "^4.4.5",
     "@types/prosemirror-commands": "^1.0.1",
@@ -46,7 +47,7 @@
     "awesome-typescript-loader": "^5.2.1",
     "babel-loader": "^8.0.6",
     "eol": "^0.9.0",
-    "jest": "^24.0.0",
+    "jest": "^27.0.6",
     "react": "16.12.0",
     "react-docgen-typescript-loader": "^3.1.0",
     "react-docgen-typescript-webpack-plugin": "^1.1.0",
@@ -55,7 +56,8 @@
     "styled-components": ">=4.1",
     "tinacms": "workspace:*",
     "ts-jest": "^24.0.3",
-    "tslib": "^1.10.0"
+    "tslib": "^1.10.0",
+    "typescript": "^4.3.5"
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",

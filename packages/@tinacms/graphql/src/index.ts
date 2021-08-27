@@ -11,7 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export { GithubBridge, GithubManagerInit } from './primitives/database/github'
+export { GithubBridge } from './primitives/database/github'
+export type { GithubManagerInit } from './primitives/database/github'
 export {
   gql,
   resolve,

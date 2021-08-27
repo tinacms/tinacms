@@ -82,4 +82,4 @@ These will both show up in your sidebar looking roughly like this:
 
 ## Contributing 
 
-For a deeper understanding of the Wysiwyg editor and inner-workings of the `react-tinacms-editor` package, checkout the [contributor documentation](https://github.com/tinacms/tinacms/tree/master/packages/react-tinacms-editor/editor-docs)
+For a deeper understanding of the Wysiwyg editor and inner-workings of the `react-tinacms-editor` package, checkout the [contributor documentation](https://github.com/tinacms/tinacms/tree/main/packages/react-tinacms-editor/editor-docs)

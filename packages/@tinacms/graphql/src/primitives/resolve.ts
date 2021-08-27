@@ -249,6 +249,7 @@ export const resolve = async ({
             if (!isMutation) {
               const mutationPath = buildMutationPath(info, {
                 collection: tinaSchema.getCollection(lookup.collection),
+                // @ts-ignore
                 relativePath: result.sys.relativePath,
               })
               if (mutationPath) {

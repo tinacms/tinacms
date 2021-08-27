@@ -1,13 +1,14 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.50.6",
+  "version": "0.50.7",
   "description": "",
   "main": "dist/index.js",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",
     "dev": "tinacms-scripts dev",
+    "types": "yarn tsc",
     "test": "jest --env=jsdom --passWithNoTests"
   },
   "author": "",
@@ -22,13 +23,13 @@
   },
   "devDependencies": {
     "@tinacms/scripts": "workspace:*",
-    "@types/jest": "^24.0.0",
+    "@types/jest": "^27.0.1",
     "@types/js-cookie": "^2.2.5",
     "@types/react": "^16.8.23",
     "@types/react-dom": "^16.9.4",
     "@types/styled-components": "4.1.8",
     "final-form": "^4.18.7",
-    "jest": "^24.0.0",
+    "jest": "^27.0.6",
     "react": "16.12.0",
     "react-dismissible": "^1.3.0",
     "react-dom": "16.12.0",
@@ -36,7 +37,7 @@
     "tinacms": "workspace:*",
     "ts-jest": "^24.0.3",
     "tslib": "^1.10.0",
-    "typescript": "^3.8.2"
+    "typescript": "^4.3.5"
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",

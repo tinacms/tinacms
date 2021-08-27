@@ -29,7 +29,7 @@ cd examples/tina-cloud-starter
 yarn dev
 ```
 
-That should allow you to see 2 things: The Altair graphql playground at `http:localhost:4001/altair` and the demo app at `http:localhost:3000`. Tina form changes should result in `examples/tina-cloud-starter/content/marketing-pages/index.md` being changed.
+That should allow you to see 2 things: The Altair graphql playground at `http://localhost:4001/altair` and the demo app at `http://localhost:3000`. Tina form changes should result in `examples/tina-cloud-starter/content/marketing-pages/index.md` being changed.
 
 ## PR Workflow
 
