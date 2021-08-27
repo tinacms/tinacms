@@ -345,14 +345,14 @@ A block is made of two parts: a [component](https://tinacms.org/docs/ui/inline-e
 
 ```ts
 interface Block {
-  Component: React.FC<BlockComponentProps>
+  Component: React.ComponentType<BlockComponentProps>
   template: BlockTemplate
 }
 
-interface BlockComponentProps {
+interface BlockComponentProps<DataType = any> {
   name: string
   index: number
-  data: any
+  data: DataType
 }
 
 interface BlockTemplate {
