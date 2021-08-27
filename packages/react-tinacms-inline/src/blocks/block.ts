@@ -21,12 +21,12 @@ import { BlockTemplate } from 'tinacms'
  * Blocks consist of a `template` and a `Component`
  */
 export interface Block {
-  Component: React.FC<BlockComponentProps>
+  Component: React.ComponentType<BlockComponentProps>
   template: BlockTemplate
 }
 
-export interface BlockComponentProps {
+export interface BlockComponentProps<DataType = any> {
   name: string
   index: number
-  data: any
+  data: DataType
 }
