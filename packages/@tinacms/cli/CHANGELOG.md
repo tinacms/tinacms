@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.55.2
+
+### Patch Changes
+
+- e6e727697: feat: add simpler err message
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+- Updated dependencies [9b27192fe]
+  - @tinacms/graphql@0.54.3
+
 ## 0.55.1
 
 ### Patch Changes

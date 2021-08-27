@@ -1,5 +1,13 @@
 # Change Log
 
+## 1.1.11
+
+### Patch Changes
+
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+- Updated dependencies [9b27192fe]
+  - react-tinacms-github@0.50.7
+
 ## 1.1.10
 
 ### Patch Changes

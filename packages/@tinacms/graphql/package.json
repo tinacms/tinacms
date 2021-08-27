@@ -1,16 +1,25 @@
 {
   "name": "@tinacms/graphql",
-  "version": "0.54.2",
+  "version": "0.54.3",
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist/*",
+    "dist",
     "src/fixtures/**/*"
   ],
   "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      }
+    ]
+  },
   "scripts": {
     "build": "yarn tsup src/index.ts --format cjs --dts",
     "watch": "yarn tsup src/index.ts --watch --format cjs --dts",
+    "types": "yarn tsc",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
     "test": "jest"
@@ -19,6 +28,7 @@
     "@octokit/auth-app": "^2.6.0",
     "@octokit/graphql": "^4.5.6",
     "@octokit/rest": "18.0.6",
+    "@types/aws-sdk": "^2.7.0",
     "aws-sdk": "^2.930.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
@@ -58,6 +68,7 @@
   },
   "devDependencies": {
     "@graphql-tools/schema": "^6.2.1",
+    "@tinacms/scripts": "workspace:*",
     "@types/cors": "^2.8.7",
     "@types/express": "^4.17.8",
     "@types/fs-extra": "^9.0.2",
@@ -70,8 +81,6 @@
     "@types/normalize-path": "^3.0.0",
     "@types/ws": "^7.2.6",
     "@types/yup": "^0.29.7",
-    "esbuild": "0.12.10",
-    "esbuild-runner": "2.2.0",
     "graphql-tools": "^6.2.1",
     "jest": "27.0.6",
     "jest-diff": "27.0.6",

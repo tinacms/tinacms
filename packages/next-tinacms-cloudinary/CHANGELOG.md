@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.2.4
+
+### Patch Changes
+
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+
 ## 3.2.3
 
 ## 3.2.2

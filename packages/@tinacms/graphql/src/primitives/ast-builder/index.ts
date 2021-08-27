@@ -452,9 +452,11 @@ export function* walk(
   for (const value of Object.values(maybeNode)) {
     if (Array.isArray(value)) {
       for (const element of value) {
+        // @ts-ignore
         yield* walk(element, visited)
       }
     } else {
+      // @ts-ignore
       yield* walk(value, visited)
     }
   }

@@ -1,14 +1,24 @@
 {
   "name": "next-tinacms-cloudinary",
-  "version": "3.2.3",
+  "version": "3.2.4",
   "main": "dist/index.js",
   "files": [
-    "dist/*"
+    "dist"
   ],
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      "src/index.ts",
+      {
+        "name": "src/handlers.ts",
+        "target": "node"
+      }
+    ]
+  },
   "scripts": {
     "build": "yarn tsup src/index.ts src/handlers.ts --format cjs --dts",
+    "types": "yarn tsc",
     "watch": "yarn tsup src/index.ts src/handlers.ts --watch --format cjs --dts"
   },
   "dependencies": {

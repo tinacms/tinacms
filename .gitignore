@@ -24,3 +24,5 @@ packages/cli/forestry/.env
 !.yarn/releases
 !.yarn/sdks
 !.yarn/versions
+
+topologicalDeps.txt

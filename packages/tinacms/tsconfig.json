@@ -1,20 +1,9 @@
 {
+  "extends": "../../tsconfig.json",
   "compilerOptions": {
-    "target": "ES2017",
-    "lib": ["dom", "dom.iterable", "esnext"],
-    "allowJs": true,
-    "skipLibCheck": true,
-    "strict": false,
-    "forceConsistentCasingInFileNames": true,
-    "esModuleInterop": true,
-    "emitDeclarationOnly": true,
-    "declaration": true,
-    "module": "esnext",
-    "moduleResolution": "node",
-    "resolveJsonModule": true,
-    "isolatedModules": true,
-    "jsx": "react"
+    "outDir": "dist",
+    "rootDir": "src"
   },
-  "exclude": ["node_modules"],
-  "include": ["src/**/*.ts", "src/**/*.tsx"]
+  "exclude": ["node_modules", "dist", "src/**/*.test.tsx", "src/**/*.test.ts", "src/**/*.spec.ts", "src/**/*.spec.tsx"],
+  "include": ["src"]
 }

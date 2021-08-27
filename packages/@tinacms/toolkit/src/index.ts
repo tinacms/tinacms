@@ -20,23 +20,22 @@ limitations under the License.
  * Export @tinacms internal packages
  */
 export * from './packages/react-modals'
-export {
+export type {
   Media,
   MediaUploadOptions,
   MediaStore,
   MediaListOptions,
   MediaList,
-  MediaManager,
-  MediaListError,
-  EventBus,
 } from './packages/core'
+export { MediaManager, MediaListError, EventBus } from './packages/core'
 export * from './packages/alerts'
 export * from './packages/styles'
-export { ScreenPlugin, useScreenPlugin } from './packages/react-screens'
+export { useScreenPlugin } from './packages/react-screens'
+export type { ScreenPlugin } from './packages/react-screens'
 export * from './packages/fields'
 export * from './packages/form-builder'
-export { ContentCreatorPlugin as AddContentPlugin } from './packages/forms'
-export { ContentCreatorPlugin } from './packages/forms'
+export type { ContentCreatorPlugin as AddContentPlugin } from './packages/forms'
+export type { ContentCreatorPlugin } from './packages/forms'
 export * from './packages/forms'
 export * from './packages/icons'
 
@@ -44,17 +43,16 @@ export * from './packages/icons'
  * Custom `tinacms` things
  */
 export * from './react-tinacms'
-export { TinaCMS, TinaCMSConfig } from './tina-cms'
+export { TinaCMS } from './tina-cms'
+export type { TinaCMSConfig } from './tina-cms'
 export { GlobalFormPlugin } from './plugins/screens'
 export {
   TinaProvider,
-  TinaProviderProps,
   // Deprecated aliases to the previous exports
   Tina,
-  TinaProps,
 } from './components/TinaProvider'
-export {
-  TinaCMSProvider,
-  TinaCMSProviderProps,
-} from './components/TinaCMSProvider'
-export { TinaUI, TinaUIProps } from './components/TinaUI'
+export type { TinaProviderProps, TinaProps } from './components/TinaProvider'
+export { TinaCMSProvider } from './components/TinaCMSProvider'
+export type { TinaCMSProviderProps } from './components/TinaCMSProvider'
+export { TinaUI } from './components/TinaUI'
+export type { TinaUIProps } from './components/TinaUI'
