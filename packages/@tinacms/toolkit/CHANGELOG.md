@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.53.0
+
+### Minor Changes
+
+- 906d72c50: Add generics to CMS event methods to allow type hinting specific events
+
+### Patch Changes
+
+- 7b149a4e7: Tina toolkit sometimes uses the "path" module, which presumably was built-in with the previous build script logic. It's now listed explicitly as a package dependency
+
 ## 0.52.3
 
 ### Patch Changes
