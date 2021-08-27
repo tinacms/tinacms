@@ -27,6 +27,7 @@ import {
   NumberFieldPlugin,
   ToggleFieldPlugin,
   SelectFieldPlugin,
+  ReferenceFieldPlugin,
   RadioGroupFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,
@@ -58,6 +59,7 @@ const DEFAULT_FIELDS = [
   GroupFieldPlugin,
   GroupListFieldPlugin,
   ListFieldPlugin,
+  ReferenceFieldPlugin,
   BlocksFieldPlugin,
   TagsFieldPlugin,
   DateFieldPlugin,
@@ -107,7 +109,7 @@ export class TinaCMS extends CMS {
       this.toolbar = new ToolbarState(toolbarConfig)
     }
 
-    DEFAULT_FIELDS.forEach(field => {
+    DEFAULT_FIELDS.forEach((field) => {
       if (!this.fields.find(field.name)) {
         this.fields.add(field)
       }

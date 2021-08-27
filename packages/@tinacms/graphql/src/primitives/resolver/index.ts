@@ -357,6 +357,7 @@ export class Resolver {
             break
           }
         case 'reference':
+          console.log('refrence mutation', fieldValue)
           accum[fieldName] = fieldValue
           break
         default:
@@ -614,9 +615,22 @@ export class Resolver {
 
         return {
           ...field,
-          component: 'select',
+          component: 'reference',
+          config: {
+            query: `#graphql
+query ReferenceQuery($id: String!) {
+  node(id: $id) {
+    id
+    ...on Document {
+      dataJSON
+      form
+    }
+  }
+}
+            `,
+          },
           options: [
-            { label: 'Choose an option', value: '' },
+            { label: 'Choose an option???', value: '' },
             ...documents.map((filepath) => {
               return {
                 value: filepath,

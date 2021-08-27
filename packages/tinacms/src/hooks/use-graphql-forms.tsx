@@ -14,7 +14,6 @@ limitations under the License.
 import React from 'react'
 import gql from 'graphql-tag'
 import { print } from 'graphql'
-import { getIn, setIn } from 'final-form'
 import { useCMS, Form, GlobalFormPlugin } from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
@@ -38,93 +37,6 @@ export function useGraphqlForms<T extends object>({
   const [initialData, setInitialData] = React.useState<Data>({})
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
-  const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
-  /**
-   * FIXME: this design is pretty flaky, but better than what
-   * we've had previously. The way it works is we update `formValues`
-   * with state from the final form subscription, so it stays perfectly
-   * in-sync with form values. But since the `data` key has different needs,
-   * we have to track how a change to the same path in the `data` object should
-   * run.
-   *
-   * To do that, we tap in to the `change` and mutator (`insert`, `move`, & `remove`)
-   * functions and set the `newUpdate` state with the path that is to be updated.
-   *
-   * So when a `title` changes, we do 2 things:
-   * 1. Set `formValues` to the new values from the form, which obviously includes
-   * the new `title` value
-   * 2. Tell the `newUpdate` state that we had an update, and provide it the path that was updated.
-   * A `newUpdate` value looks like this:
-   * ```js
-   * {
-   *   queryName: 'getPostsDocument',
-   *   get: 'getPostsDocument.values.title',
-   *   set: 'getPostsDocument.data.title',
-   * }
-   * ```
-   * That's saying:
-   * > we have a new value at 'getPostsDocument.values.title', grab that value
-   * > and __set__ the 'getPostsDocument.data.title' so it
-   *
-   * (It's also saying if this is an async update, like `data.author`, run that instead
-   * and set the new value accordingly)
-   *
-   * The way we determine when we should check for a new value is when the `formValues`
-   * key is updated, so it's probably possible to get into a state where we're setting the
-   * `newUpdate` twice before the form value state is set. Some of that may be mitigated
-   * by `newUpdate` being an array, so as to batch all of it's changes in succession. But
-   * it just feels like there's a much better way to do all of this 🤔
-   */
-  const updateData = async () => {
-    if (newUpdate) {
-      const newValue = getIn(formValues, newUpdate.get)
-      const activeForm = getIn(data, [newUpdate.queryName, 'form'].join('.'))
-      if (!activeForm) {
-        throw new Error(`Unable to find form for query ${newUpdate.queryName}`)
-      }
-      if (activeForm?.paths) {
-        const asyncUpdate = activeForm.paths?.find(
-          (p) => p.dataPath.join('.') === newUpdate.set
-        )
-        if (asyncUpdate) {
-          const res = await cms.api.tina.request(asyncUpdate.queryString, {
-            variables: { id: newValue },
-          })
-          const newData = setIn(data, newUpdate.set, res.node)
-          const newDataAndNewJSONData = setIn(
-            newData,
-            newUpdate.set.replace('data', 'dataJSON'),
-            newValue
-          )
-          setData(newDataAndNewJSONData)
-          setNewUpdate(null)
-          return
-        }
-      }
-      if (newUpdate.lookup) {
-        const field = getFieldUpdate(newUpdate, activeForm, formValues)
-        if (field && field.typeMap) {
-          newValue.forEach((item) => {
-            if (!item.__typename) {
-              item['__typename'] = field.typeMap[item._template]
-            }
-          })
-        }
-      }
-      const newData = setIn(data, newUpdate.set, newValue)
-      const newDataAndNewJSONData = setIn(
-        newData,
-        newUpdate.set.replace('data', 'dataJSON'),
-        newValue
-      )
-      setData(newDataAndNewJSONData)
-      setNewUpdate(null)
-    }
-  }
-
-  React.useEffect(() => {
-    updateData()
-  }, [JSON.stringify(formValues)])
 
   const queryString = print(query(gql))
 
@@ -148,7 +60,7 @@ export function useGraphqlForms<T extends object>({
             form: { mutationInfo: string }
           }>(result, (yup) =>
             yup.object({
-              values: yup.object().required(),
+              data: yup.object().required(),
               form: yup.object().required(),
             })
           )
@@ -157,7 +69,7 @@ export function useGraphqlForms<T extends object>({
             return
           }
           assertShape<{
-            values: object
+            data: object
             form: FormOptions<any, any> & {
               mutationInfo: {
                 string: string
@@ -176,35 +88,35 @@ export function useGraphqlForms<T extends object>({
           const formConfig = {
             id: queryName,
             label: result.form.label,
-            initialValues: result.values,
+            initialValues: result.data,
             fields: result.form.fields,
 
             reset: () => {
               setPendingReset(queryName)
             },
             onSubmit: async (payload) => {
-              const params = transformDocumentIntoMutationRequestPayload(
-                payload,
-                result.form.mutationInfo
-              )
-              const variables = { params }
-              const mutationString = result.form.mutationInfo.string
-              if (onSubmit) {
-                onSubmit({
-                  queryString: mutationString,
-                  mutationString,
-                  variables,
-                })
-              } else {
-                try {
+              try {
+                const params = transformDocumentIntoMutationRequestPayload(
+                  payload,
+                  result.form.mutationInfo
+                )
+                const variables = { params }
+                const mutationString = result.form.mutationInfo.string
+                if (onSubmit) {
+                  onSubmit({
+                    queryString: mutationString,
+                    mutationString,
+                    variables,
+                  })
+                } else {
                   await cms.api.tina.request(mutationString, {
                     variables,
                   })
                   cms.alerts.success('Document saved!')
-                } catch (e) {
-                  cms.alerts.error('There was a problem saving your document')
-                  console.error(e)
                 }
+              } catch (e) {
+                cms.alerts.error('There was a problem saving your document')
+                console.error(e)
               }
             },
           }
@@ -232,50 +144,10 @@ export function useGraphqlForms<T extends object>({
             }
             throw new Error('formify must return a form or skip()')
           }
-          const { change } = form.finalForm
-          form.finalForm.change = (name, value) => {
-            setNewUpdate({
-              queryName,
-              get: [queryName, 'values', name].join('.'),
-              set: [queryName, 'data', name].join('.'),
-            })
-            return change(name, value)
-          }
-
-          const { insert, move, remove, ...rest } = form.finalForm.mutators
-          const prepareNewUpdate = (name: string, lookup?: string) => {
-            const extra = {}
-            if (lookup) {
-              extra['lookup'] = lookup
-            }
-            setNewUpdate({
-              queryName,
-              get: [queryName, 'values', name].join('.'),
-              set: [queryName, 'data', name].join('.'),
-              ...extra,
-            })
-          }
-          form.finalForm.mutators = {
-            insert: (...args) => {
-              const fieldName = args[0]
-              prepareNewUpdate(fieldName, fieldName)
-              insert(...args)
-            },
-            move: (...args) => {
-              const fieldName = args[0]
-              prepareNewUpdate(fieldName, fieldName)
-              move(...args)
-            },
-            remove: (...args) => {
-              const fieldName = args[0]
-              prepareNewUpdate(fieldName, fieldName)
-              remove(...args)
-            },
-            ...rest,
-          }
           form.subscribe(
             ({ values }) => {
               setFormValues({ ...formValues, [queryName]: { values: values } })
+              setData({ ...formValues, [queryName]: { data: values } })
             },
             { values: true }
           )
@@ -336,31 +208,6 @@ const transformParams = (data: unknown) => {
     })
     return accum
   }
-}
-
-// newUpdate.lookup is a field name (ie. blocks.0.hero)
-const getFieldUpdate = (newUpdate, activeForm, formValues) => {
-  const items = newUpdate.lookup.split('.')
-  let currentFields = activeForm.fields
-  items.map((item, index) => {
-    const lookupName = items.slice(0, index + 1).join('.')
-    const value = getIn(
-      formValues,
-      [newUpdate.queryName, 'values', lookupName].join('.')
-    )
-    if (isNaN(Number(item))) {
-      if (Array.isArray(currentFields)) {
-        currentFields = currentFields.find((field) => field.name === item)
-      }
-    } else {
-      // Get templatable for polymorphic or homogenous
-      const template = currentFields.templates
-        ? currentFields.templates[value._template]
-        : currentFields
-      currentFields = template.fields
-    }
-  })
-  return currentFields
 }
 
 const generateFormCreators = (cms: TinaCMS) => {

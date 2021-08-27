@@ -49,6 +49,8 @@ export type Node = {
 export type Document = {
   sys?: Maybe<SystemInfo>;
   id: Scalars['ID'];
+  dataJSON: Scalars['JSON'];
+  form: Scalars['JSON'];
 };
 
 /** A relay-compliant pagination connection */

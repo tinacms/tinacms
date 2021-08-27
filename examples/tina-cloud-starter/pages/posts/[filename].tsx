@@ -24,6 +24,8 @@ export const getStaticProps = async ({ params }) => {
             date
             author {
               ... on AuthorsDocument {
+                # ID can be added on-the-fly but it's needed for this to work
+                id
                 data {
                   name
                   avatar
