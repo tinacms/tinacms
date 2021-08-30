@@ -59,7 +59,7 @@ interface ListProps {
   tinaForm: Form
 }
 
-const List = ({ tinaForm, form, field, input }: ListProps) => {
+export const List = ({ tinaForm, form, field, input }: ListProps) => {
   const addItem = React.useCallback(() => {
     let newItem: DefaultItem = ''
     if (typeof field.defaultItem === 'function') {
