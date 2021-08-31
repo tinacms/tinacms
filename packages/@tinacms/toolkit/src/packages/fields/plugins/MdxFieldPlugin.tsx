@@ -41,6 +41,9 @@ export interface MdxFieldProps {
 
 export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
+  if (!field) {
+    return null
+  }
   return (
     <>
       {inline ? (
@@ -77,12 +80,12 @@ const Panel = function Panel({
   field,
 }: PanelProps) {
   const FormPortal = useFormPortal()
-  const fields: any[] = React.useMemo(() => {
-    return field.fields.map((subField: any) => ({
-      ...subField,
-      name: `${field.name}.${subField.name}`,
-    }))
-  }, [field.fields, field.name])
+  // const fields: any[] = React.useMemo(() => {
+  //   return field.fields.map((subField: any) => ({
+  //     ...subField,
+  //     name: `${field.name}.${subField.name}`,
+  //   }))
+  // }, [field.fields, field.name])
 
   return (
     <FormPortal>
@@ -95,7 +98,12 @@ const Panel = function Panel({
             <LeftArrowIcon /> <span>{field.label || field.name}</span>
           </PanelHeader>
           <PanelBody>
-            {isExpanded ? <FormBuilder form={tinaForm} /> : null}
+            {isExpanded ? (
+              <FormBuilder form={tinaForm} hideFooter={true} />
+            ) : null}
+            {/* {isExpanded ? (
+              <FieldsBuilder form={tinaForm} fields={field.fields} />
+            ) : null} */}
           </PanelBody>
         </MdxFieldPanel>
       )}
@@ -292,6 +300,7 @@ import {
   GroupListMeta,
   GroupLabel,
 } from './GroupListFieldPlugin'
+import { Field } from 'react-final-form'
 
 export const PopupAdder = ({ showButton, onAdd, templates }) => {
   const [visible, setVisible] = React.useState(false)

@@ -5,12 +5,26 @@ import { Testimonial } from "../blocks/testimonial";
 import { Features } from "../blocks/features";
 
 const blockRenderer = {
-  Hero: (props) => <Hero data={props} />,
+  Hero: (props) => {
+    return <Hero data={props} />;
+  },
   Features: (props) => <Features data={props} />,
   Testimonial: (props) => <Testimonial data={props} />,
   ContentBlock: (props) => <ContentBlock data={props} />,
   Highlight: (props) => {
-    return <span style={{ background: "yellow", color: "black" }} {...props} />;
+    return (
+      <span style={{ background: "yellow", color: "black" }} {...props}>
+        {props.text}
+        {props.features?.map((feature) => (
+          <span>{feature}</span>
+        ))}
+        {props.items && <span>TEXT: {props.items?.text}</span>}
+        {props.blocks && props.blocks.map((block) => <span>{block.text}</span>)}
+        {props.leggo &&
+          props.leggo.map((item) => <span>Leggo {item.text}</span>)}
+        {props.children}
+      </span>
+    );
   },
 };
 
@@ -79,12 +93,16 @@ export const TinaMarkdown = ({
           case "mdxJsxFlowElement":
             const Block = blocks[child.name];
             if (Block) {
+              const { children, ...otherProps } = child.props;
               return (
-                <Block {...child.attributes}>
-                  <TinaMarkdown>{child.children}</TinaMarkdown>
+                <Block {...otherProps}>
+                  {children && <TinaMarkdown>{children}</TinaMarkdown>}
                 </Block>
               );
             } else {
+              if (!child.name) {
+                return <TinaMarkdown>{child.props}</TinaMarkdown>;
+              }
               throw new Error(`No component provided for ${child.name}`);
             }
           default:
@@ -140,13 +158,15 @@ export type SlateNodeType =
   | {
       type: "mdxJsxTextElement";
       attributes: [];
+      props: object;
       children: SlateNodeType[];
       name: string;
       ordered: boolean;
     }
   | {
       type: "mdxJsxFlowElement";
-      attributes: object;
+      attributes: [];
+      props: object;
       children: SlateNodeType[];
       name: string;
       ordered: boolean;

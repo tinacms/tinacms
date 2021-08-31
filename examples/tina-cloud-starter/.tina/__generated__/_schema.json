@@ -58,6 +58,112 @@
                   ]
                 },
                 {
+                  "label": "Children Text",
+                  "name": "children",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "name": "EmbeddedInfo",
+                      "label": "Embedded Info",
+                      "fields": [
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "type": "string",
+                          "namespace": [
+                            "posts",
+                            "_body",
+                            "Hero",
+                            "children",
+                            "EmbeddedInfo",
+                            "text"
+                          ]
+                        },
+                        {
+                          "name": "children",
+                          "label": "Child Text",
+                          "type": "rich-text",
+                          "templates": [],
+                          "namespace": [
+                            "posts",
+                            "_body",
+                            "Hero",
+                            "children",
+                            "EmbeddedInfo",
+                            "children"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "posts",
+                        "_body",
+                        "Hero",
+                        "children",
+                        "EmbeddedInfo"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Hero",
+                    "children"
+                  ]
+                },
+                {
+                  "label": "Rich Text",
+                  "name": "richText",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "name": "EmbeddedInfo",
+                      "label": "Embedded Info",
+                      "fields": [
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "type": "string",
+                          "namespace": [
+                            "posts",
+                            "_body",
+                            "Hero",
+                            "richText",
+                            "EmbeddedInfo",
+                            "text"
+                          ]
+                        },
+                        {
+                          "name": "children",
+                          "label": "Child Text",
+                          "type": "rich-text",
+                          "templates": [],
+                          "namespace": [
+                            "posts",
+                            "_body",
+                            "Hero",
+                            "richText",
+                            "EmbeddedInfo",
+                            "children"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "posts",
+                        "_body",
+                        "Hero",
+                        "richText",
+                        "EmbeddedInfo"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Hero",
+                    "richText"
+                  ]
+                },
+                {
                   "label": "Actions",
                   "name": "actions",
                   "type": "object",
@@ -641,13 +747,128 @@
               "fields": [
                 {
                   "name": "children",
+                  "label": "Child Text",
+                  "type": "rich-text",
+                  "templates": [],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Highlight",
+                    "children"
+                  ]
+                },
+                {
+                  "name": "text",
                   "label": "Text",
                   "type": "string",
                   "namespace": [
                     "posts",
                     "_body",
                     "Highlight",
-                    "children"
+                    "text"
+                  ]
+                },
+                {
+                  "name": "features",
+                  "label": "Features",
+                  "list": true,
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Highlight",
+                    "features"
+                  ]
+                },
+                {
+                  "name": "items",
+                  "label": "Items",
+                  "type": "object",
+                  "fields": [
+                    {
+                      "name": "text",
+                      "label": "Text",
+                      "type": "string",
+                      "namespace": [
+                        "posts",
+                        "_body",
+                        "Highlight",
+                        "items",
+                        "text"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Highlight",
+                    "items"
+                  ]
+                },
+                {
+                  "name": "blocks",
+                  "label": "Blocks",
+                  "type": "object",
+                  "list": true,
+                  "templates": [
+                    {
+                      "name": "myCta",
+                      "label": "My CTA",
+                      "fields": [
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "type": "string",
+                          "namespace": [
+                            "posts",
+                            "_body",
+                            "Highlight",
+                            "blocks",
+                            "myCta",
+                            "text"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "posts",
+                        "_body",
+                        "Highlight",
+                        "blocks",
+                        "myCta"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Highlight",
+                    "blocks"
+                  ]
+                },
+                {
+                  "name": "leggo",
+                  "label": "Leggo",
+                  "type": "object",
+                  "list": true,
+                  "fields": [
+                    {
+                      "name": "text",
+                      "label": "Text",
+                      "type": "string",
+                      "namespace": [
+                        "posts",
+                        "_body",
+                        "Highlight",
+                        "leggo",
+                        "text"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "Highlight",
+                    "leggo"
                   ]
                 }
               ],
@@ -1311,6 +1532,112 @@
                     "blocks",
                     "hero",
                     "text"
+                  ]
+                },
+                {
+                  "label": "Children Text",
+                  "name": "children",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "name": "EmbeddedInfo",
+                      "label": "Embedded Info",
+                      "fields": [
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "type": "string",
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "children",
+                            "EmbeddedInfo",
+                            "text"
+                          ]
+                        },
+                        {
+                          "name": "children",
+                          "label": "Child Text",
+                          "type": "rich-text",
+                          "templates": [],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "children",
+                            "EmbeddedInfo",
+                            "children"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "children",
+                        "EmbeddedInfo"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "children"
+                  ]
+                },
+                {
+                  "label": "Rich Text",
+                  "name": "richText",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "name": "EmbeddedInfo",
+                      "label": "Embedded Info",
+                      "fields": [
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "type": "string",
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "richText",
+                            "EmbeddedInfo",
+                            "text"
+                          ]
+                        },
+                        {
+                          "name": "children",
+                          "label": "Child Text",
+                          "type": "rich-text",
+                          "templates": [],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "richText",
+                            "EmbeddedInfo",
+                            "children"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "richText",
+                        "EmbeddedInfo"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "richText"
                   ]
                 },
                 {

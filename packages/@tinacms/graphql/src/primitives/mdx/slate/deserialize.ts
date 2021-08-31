@@ -66,25 +66,17 @@ export type SlateNodeType =
     }
   | {
       type: 'mdxJsxTextElement'
+      attributes: []
       children: SlateNodeType[]
-      node: {
-        attributes: []
-        children: SlateNodeType[]
-        name: string
-        ordered: boolean
-        type: 'mdxJsxTextElement'
-      }
+      name: string
+      ordered: boolean
     }
   | {
       type: 'mdxJsxFlowElement'
+      attributes: object
       children: SlateNodeType[]
-      node: {
-        attributes: object
-        children: SlateNodeType[]
-        name: string
-        ordered: boolean
-        type: 'mdxJsxFlowElement'
-      }
+      name: string
+      ordered: boolean
     }
 //   paragraph: 'paragraph',
 //   block_quote: 'block_quote',
@@ -182,35 +174,14 @@ export const defaultNodeTypes: NodeTypes = {
 export default function deserialize(node: MdxAstNode) {
   const types = {
     ...defaultNodeTypes,
-    // ...opts?.nodeTypes,
     heading: {
       ...defaultNodeTypes.heading,
-      // ...opts?.nodeTypes?.heading,
     },
   }
 
   const linkDestinationKey = 'link'
   const imageSourceKey = 'link'
   const imageCaptionKey = 'caption'
-
-  // let children = [{ text: '' }]
-
-  // if (
-  //   node.children &&
-  //   Array.isArray(node.children) &&
-  //   node.children.length > 0
-  // ) {
-  //   // @ts-ignore
-  //   children = node.children.map((c: MdastNode) =>
-  //     deserialize(
-  //       {
-  //         ...c,
-  //         ordered: node.ordered || false,
-  //       },
-  //       opts
-  //     )
-  //   )
-  // }
 
   switch (node.type) {
     case 'heading':
@@ -284,7 +255,6 @@ export default function deserialize(node: MdxAstNode) {
       return {
         [types.inline_code_mark]: true,
         text: node.value,
-        // ...persistLeafFormats(node.children),
       }
     case 'thematicBreak':
       return {
@@ -294,10 +264,14 @@ export default function deserialize(node: MdxAstNode) {
     case 'text':
       return { type: 'text', text: node.value || '' }
     case 'mdxJsxFlowElement':
+      return {
+        ...node,
+        children: [{ type: 'text', text: '' }],
+      }
     case 'mdxJsxTextElement':
       return {
         ...node,
-        children: [...node.children, { type: 'text', text: '' }],
+        children: [{ type: 'text', text: '' }],
       }
     default:
       console.log('unknown', node)

@@ -1,9 +1,9 @@
+import React from "react";
 import { Form, MdxField, PopupAdder } from "tinacms";
-import React, { useCallback } from "react";
-import { createEditor, Transforms, BaseRange } from "slate";
-import { Slate, Editable, withReact } from "slate-react";
+import { createEditor, Transforms, BaseRange, Element } from "slate";
+import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import type { BaseEditor } from "slate";
-import type { RenderElementProps, ReactEditor } from "slate-react";
+import type { RenderLeafProps, RenderElementProps } from "slate-react";
 import type { SlateNodeType } from "./tina-markdown";
 
 // https://docs.slatejs.org/concepts/12-typescript#defining-editor-element-and-text-types
@@ -20,15 +20,27 @@ declare module "slate" {
 export const Editor = (props) => {
   // Hot reloads when usign useMemo to initialize https://github.com/ianstormtaylor/slate/issues/4081
   const [editor] = React.useState(withReact(createEditor()));
-  const [value, setValue] = React.useState(props.input.value);
-  const [voidSelection, setVoidSelection] = React.useState<BaseRange>(null);
+  const [value, setValue] = React.useState(
+    props.input.value?.length > 0
+      ? props.input.value
+      : [{ type: "paragraph", children: [{ type: "text", text: "" }] }]
+  );
+  const [voidSelection, setVoidSelectionInner] =
+    React.useState<BaseRange>(null);
+  const setVoidSelection = (selection: BaseRange) => {
+    setVoidSelectionInner(selection);
+  };
   const templates = props.field.templates;
 
   React.useEffect(() => {
     props.input.onChange(value);
   }, [JSON.stringify(value)]);
 
-  const renderElement = useCallback(
+  // const renderLeaf = React.useCallback((props: RenderLeafProps) => {
+  //   return <span {...props.attributes}>{props.children}</span>;
+  // }, []);
+
+  const renderElement = React.useCallback(
     (props: RenderElementProps) => {
       const element = props.element;
       switch (element.type) {
@@ -51,40 +63,69 @@ export const Editor = (props) => {
             </a>
           );
         case "mdxJsxTextElement":
+          return (
+            <button {...props.attributes}>
+              <span contentEditable={false}>
+                <MdxPicker
+                  inline={true}
+                  {...props}
+                  templates={templates}
+                  isReady={!!voidSelection}
+                  voidSelection={voidSelection}
+                  onChange={(value, selection) => {
+                    const newProperties: Partial<Element> = {
+                      props: value,
+                    };
+                    Transforms.setNodes(editor, newProperties, {
+                      /**
+                       * match traverses the ancestors of the relevant node
+                       * so matching on type works for this, but likely won't work
+                       * on more complex nested mdxJsxTextElement nodes. I think
+                       * we'll want to match the path to the selection path, but
+                       * they're off by one:
+                       * selection.focus.path => [0, 1, 0]
+                       * and path is [0, 1]. I believe that's because the last
+                       * 0 in the focus.path array is referring to the text node
+                       */
+                      match: (node, path) => {
+                        // console.log(selection.focus);
+                        // console.log(path, node.type);
+                        if (node.type === "mdxJsxTextElement") {
+                          return true;
+                        }
+                        return false;
+                      },
+                      at: selection,
+                    });
+                  }}
+                />
+              </span>
+              {props.children}
+            </button>
+          );
         case "mdxJsxFlowElement":
           return (
-            <span
-              {...props.attributes}
-              onClick={() => {
-                // Clicking futher down in this node propagates
-                // and since `void` elements reset the editor selection
-                // to (0, 0) we need to track the void's location
-                if (!voidSelection) {
-                  setVoidSelection(editor.selection);
-                }
-              }}
-              contentEditable={false}
-            >
-              <MdxPicker
-                inline={element.type === "mdxJsxTextElement"}
-                {...props}
-                templates={templates}
-                isReady={!!voidSelection}
-                onChange={(value) => {
-                  const v = {
-                    ...props.element,
-                    attributes: value,
-                  };
-                  // Works for block nodes, not for inline
-                  Transforms.setNodes(editor, v, {
-                    at: voidSelection.focus,
-                  });
-                }}
-                onSubmit={() => {
-                  setVoidSelection(null);
-                }}
-              />
-            </span>
+            <button style={{ width: "100%" }} {...props.attributes}>
+              <span contentEditable={false}>
+                {/* <img src="http://placehold.it/300x200" /> */}
+                <MdxPicker
+                  inline={false}
+                  {...props}
+                  templates={templates}
+                  isReady={!!voidSelection}
+                  voidSelection={voidSelection}
+                  onChange={(value, selection) => {
+                    const newProperties: Partial<Element> = {
+                      props: value,
+                    };
+                    Transforms.setNodes(editor, newProperties, {
+                      at: selection,
+                    });
+                  }}
+                />
+              </span>
+              {props.children}
+            </button>
           );
         default:
           return <p {...props.attributes}>{props.children}</p>;
@@ -129,18 +170,22 @@ export const Editor = (props) => {
         <PopupAdder
           showButton={true}
           onAdd={(template) => {
-            Transforms.insertNodes(editor, {
-              type: "mdxJsxFlowElement",
-              name: template.name,
-              attributes: template.defaultItem,
-              ordered: false,
-              children: [
-                {
-                  type: "text",
-                  text: "",
-                },
-              ],
-            });
+            Transforms.insertNodes(editor, [
+              {
+                type: template.inline
+                  ? "mdxJsxTextElement"
+                  : "mdxJsxFlowElement",
+                name: template.name,
+                props: template.defaultItem,
+                ordered: false,
+                children: [
+                  {
+                    type: "text",
+                    text: "",
+                  },
+                ],
+              },
+            ]);
           }}
           templates={templates}
         />
@@ -161,6 +206,9 @@ export const Editor = (props) => {
           editor={editor}
           value={value}
           onChange={(newValue) => {
+            if (editor.selection) {
+              setVoidSelection(editor.selection);
+            }
             setValue(newValue);
           }}
         >
@@ -173,26 +221,23 @@ export const Editor = (props) => {
 
 const MdxPicker = (props) => {
   const ref = React.useRef();
-  const initialValues = props.element.attributes;
+  const initialValues = props.element.props;
   const activeTemplate = props.templates.find(
     (template) => template.name === props.element.name
   );
-  const form = new Form({
-    id: props.element.name,
-    label: props.element.name,
-    initialValues,
-    onSubmit: (values) => {
-      props.onChange(values);
-    },
-    fields: activeTemplate ? activeTemplate.fields : [],
-  });
-  // FIXME: infinite loop
-  // form.subscribe(
-  //   ({ values }) => {
-  //     // props.onChange(values);
-  //   },
-  //   { values: true }
-  // );
+  const id = props.element.name + Math.floor(Math.random() * 100);
+  const form = React.useMemo(() => {
+    return new Form({
+      id,
+      label: id,
+      initialValues,
+      onChange: ({ values }) => {
+        props.onChange(values, props.voidSelection);
+      },
+      onSubmit: () => {},
+      fields: activeTemplate ? activeTemplate.fields : [],
+    });
+  }, [JSON.stringify(props.voidSelection)]);
 
   return (
     <span ref={ref}>

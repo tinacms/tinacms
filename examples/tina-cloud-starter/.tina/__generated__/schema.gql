@@ -214,6 +214,8 @@ type PagesBlocksHero {
   tagline: String
   headline: String
   text: String
+  children: JSON
+  richText: JSON
   actions: [PagesBlocksHeroActions]
   image: PagesBlocksHeroImage
   color: String
@@ -361,6 +363,8 @@ input PagesBlocksHeroMutation {
   tagline: String
   headline: String
   text: String
+  children: JSON
+  richText: JSON
   actions: [PagesBlocksHeroActionsMutation]
   image: PagesBlocksHeroImageMutation
   color: String

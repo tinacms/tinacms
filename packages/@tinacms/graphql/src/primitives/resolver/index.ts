@@ -124,6 +124,7 @@ export class Resolver {
     } catch (e) {
       if (e instanceof TinaError) {
         // Attach additional information
+        console.log(e)
         throw new TinaError(e.message, {
           requestedDocument: fullPath,
           ...e.extensions,
@@ -357,7 +358,7 @@ export class Resolver {
             break
           }
         case 'rich-text':
-          accum[fieldName] = stringifyMDX(fieldValue)
+          accum[fieldName] = stringifyMDX(fieldValue, field)
           break
         case 'reference':
           accum[fieldName] = fieldValue
@@ -390,7 +391,7 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'rich-text':
-        const tree = parseMDX(value)
+        const tree = parseMDX(value, field)
         accumulator[field.name] = tree
         break
       case 'object':
@@ -426,6 +427,7 @@ export class Resolver {
           if (!value) {
             return
           }
+
           const template = await this.tinaSchema.getTemplateForData({
             data: value,
             collection: {

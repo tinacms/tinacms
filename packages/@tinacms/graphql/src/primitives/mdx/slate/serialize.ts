@@ -1,5 +1,8 @@
 import { defaultNodeTypes, NodeTypes, SlateNodeType } from './deserialize'
 import type { Root, Content } from 'mdast'
+import { RichTypeWithNamespace } from '../../types'
+import { toMarkdown } from 'mdast-util-to-markdown'
+import { mdxToMarkdown } from 'mdast-util-mdx'
 
 export interface LeafType {
   text: string
@@ -34,75 +37,301 @@ const VOID_ELEMENTS: Array<keyof NodeTypes> = ['thematic_break']
 
 const BREAK_TAG = '<br>'
 
-export const stringify = (chunk: BlockType | LeafType): Content => {
-  // @ts-ignore
+export const stringify = (
+  chunk: SlateNodeType,
+  field: RichTypeWithNamespace
+): Content => {
   if (!chunk.type) {
     return {
       type: 'text',
       value: chunk.text,
     }
   }
-  const blockChunk = chunk as SlateNodeType
+  const blockChunk = chunk
 
   switch (blockChunk.type) {
     case 'heading_one':
       return {
         type: 'heading',
         depth: 1,
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'heading_two':
       return {
         type: 'heading',
         depth: 2,
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'heading_three':
       return {
         type: 'heading',
         depth: 3,
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'heading_four':
       return {
         type: 'heading',
         depth: 4,
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'heading_five':
       return {
         type: 'heading',
         depth: 5,
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'heading_six':
       return {
         type: 'heading',
         depth: 6,
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'paragraph':
       return {
         type: 'paragraph',
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'link':
       return {
         type: 'link',
         url: blockChunk.link,
-        children: blockChunk.children.map(stringify),
+        children: blockChunk.children.map((child) => stringify(child, field)),
       }
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
-      const atts = []
-      Object.entries(blockChunk.node.attributes).map(([key, value]) => {
-        atts.push({ type: 'mdxJsxAttribute', name: key, value })
-      })
-      return {
-        ...blockChunk.node,
-        attributes: atts,
+      try {
+        let children = []
+        const atts = []
+        const template = field.templates?.find((fieldTemplate) => {
+          if (typeof fieldTemplate === 'string') {
+            throw new Error(`Global templates not yet supported`)
+          } else {
+            return fieldTemplate.name === blockChunk.name
+          }
+        })
+        if (typeof template === 'string') {
+          throw new Error(`Global templates not yet supported`)
+        }
+        const tree = blockChunk.children.map((item) => stringify(item, field))
+        blockChunk.children = tree.filter((item) => {
+          if (item.type === 'text' && !item.text) {
+            return false
+          }
+
+          return true
+        })
+        Object.entries(blockChunk.props).map(([key, value]) => {
+          if (template.fields) {
+            const field = template.fields.find((field) => field.name === key)
+            // console.log(field.type, key)
+            switch (field.type) {
+              case 'boolean':
+              case 'datetime':
+              case 'image':
+              case 'number':
+              case 'string':
+                if (field.list) {
+                  const v = {
+                    type: 'mdxJsxAttributeValueExpression',
+                    // value: '["feature 1"]',
+                    value: `[${value.map((item) => {
+                      switch (field.type) {
+                        case 'boolean':
+                        case 'number':
+                          return `${item}`
+                        case 'image':
+                        case 'datetime':
+                        case 'string':
+                          return `"${item}"`
+                      }
+                    })}]`,
+                  }
+                  atts.push({ type: 'mdxJsxAttribute', name: key, value: v })
+                } else {
+                  atts.push({
+                    type: 'mdxJsxAttribute',
+                    name: key,
+                    value: `${value}`,
+                  })
+                }
+                break
+
+              case 'object':
+                if (field.list) {
+                  const values = []
+                  value.forEach((item) => {
+                    if (field.fields) {
+                      const v = {}
+                      field.fields.forEach((field) => {
+                        const fieldValue = item[field.name]
+                        if (fieldValue) {
+                          switch (field.type) {
+                            case 'boolean':
+                            case 'number':
+                              v[field.name] = `${fieldValue}`
+                              break
+                            case 'image':
+                            case 'datetime':
+                            case 'string':
+                              v[field.name] = `"${fieldValue}"`
+                              break
+                          }
+                        }
+                        values.push(v)
+                      })
+                    } else {
+                      value.forEach((item) => {
+                        const entries = Object.entries(item)
+                        if (entries.length > 1) {
+                          throw new Error(
+                            `Poorly formatted mutation request for object with multiple templates, only 1 is permitted`
+                          )
+                        }
+                        entries.map(([templateName, item]) => {
+                          const template = field.templates.find(
+                            (template) => template.name === templateName
+                          )
+                          const v = {}
+                          template.fields.forEach((field) => {
+                            const fieldValue = item[field.name]
+                            if (fieldValue) {
+                              switch (field.type) {
+                                case 'boolean':
+                                case 'number':
+                                  v[field.name] = `${fieldValue}`
+                                  break
+                                case 'image':
+                                case 'datetime':
+                                case 'string':
+                                  v[field.name] = `"${fieldValue}"`
+                                  break
+                              }
+                              v['_template'] = `"${template.name}"`
+                            }
+                          })
+                          values.push(v)
+                        })
+                      })
+                    }
+                  })
+                  if (values.length > 0) {
+                    const ast = {
+                      type: 'mdxJsxAttributeValueExpression',
+                      name: key,
+                      value: {
+                        value: `[${values
+                          .map((item) => {
+                            return `{${Object.entries(item)
+                              .map(([key, value]) => {
+                                return `${key}: ${value}`
+                              })
+                              .join(', ')}}`
+                          })
+                          .join(', ')}]`,
+                      },
+                    }
+                    atts.push({ name: key, ...ast })
+                  }
+                } else {
+                  if (field.fields) {
+                    const v = {}
+                    field.fields.forEach((field) => {
+                      const fieldValue = value[field.name]
+                      switch (field.type) {
+                        case 'boolean':
+                        case 'number':
+                          v[field.name] = `${fieldValue}`
+                          break
+                        case 'image':
+                        case 'datetime':
+                        case 'string':
+                          v[field.name] = `"${fieldValue}"`
+                          break
+                      }
+                    })
+                    const ast = {
+                      type: 'mdxJsxAttributeValueExpression',
+                      name: key,
+                      value: {
+                        value: `{${Object.entries(v)
+                          .map(([key, value]) => {
+                            return `${key}: ${value}`
+                          })
+                          .join(', ')}}`,
+                      },
+                    }
+                    atts.push({ name: key, ...ast })
+                  } else {
+                    throw new Error('Templates not yet')
+                  }
+                }
+                break
+              case 'rich-text':
+                const tree = value
+                  .map((item) => stringify(item, field))
+                  .filter((item) => {
+                    if (item.type === 'text' && !item.text) {
+                      return false
+                    }
+
+                    return true
+                  })
+                if (field.name === 'children') {
+                  children = tree
+                } else {
+                  const out = toMarkdown(
+                    {
+                      type: 'root',
+                      children: tree,
+                    },
+                    { extensions: [mdxToMarkdown] }
+                  )
+                  if (out) {
+                    atts.push({
+                      type: 'mdxJsxAttribute',
+                      name: key,
+                      value: {
+                        value: `
+<>
+${out}
+</>
+`,
+                      },
+                    })
+                  }
+                }
+                break
+              default:
+                atts.push({
+                  type: 'mdxJsxAttribute',
+                  name: key,
+                  value: 'not yet',
+                })
+                break
+            }
+          } else {
+            throw new Error(`Templates not yet supported`)
+          }
+        })
+
+        // console.log({
+        //   ...blockChunk,
+        //   attributes: atts,
+        // })
+        return {
+          ...blockChunk,
+          children: children,
+          attributes: atts,
+        }
+      } catch (e) {
+        console.log(e)
       }
 
+    case 'text':
+      return {
+        type: 'text',
+        value: blockChunk.text,
+      }
     default:
       console.log(`Unrecognized field type: ${blockChunk.type}`)
       break

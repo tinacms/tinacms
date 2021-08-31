@@ -7,22 +7,38 @@ excerpt: >-
   maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad
   vasti, distulit. Crudus sub coniuge iam: dea propera sive?
 ---
-# How does rich-text editing work?
+<Highlight
+  blocks={[{text: "And now we go nuts", _template: "myCta"}]}
+  features={["Seems like it's allllll working"]}
+  items={{text: "Jusststst fine"}}
+  leggo={[{text: "okkkkokkkkYou wanna get nuts? lets get nutss"}]}
+  text="What about this one?"
+>
+  ## Ok Gddsssdo
+
+  ## Am I? I'm not sure
+
+  About thatsds
+</Highlight>
 
 Lorem markdownum evinctus ut cape
 
 <Hero
-  tagline="Here's some text above the  "
+  tagline="Here's some text above the other text"
   headline="This Big Text is Totally Awesome"
   text="Phasellus scelerisque, libero eu finibus rutrum, risus risus accumsan libero, nec molestie urna dui a leo."
-/>
+  richText={
+  <>
+  # hello again
 
-### Header [go there](http://example.com) To the site
+  </>
+  }
+>
+  Here we go
 
-Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniisviperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?
+  <EmbeddedInfo text="It's embedded">
+    ## You see?
 
-<Testimonial
-  author="Phil Karlton"
-  color="primary"
-  quote="There are only two hard things in Computer Science: cache invalidation and naming things."
-/>
+    Very simple
+  </EmbeddedInfo>
+</Hero>

@@ -312,6 +312,54 @@ const heroBlockSchema: TinaTemplate = {
       },
     },
     {
+      label: "Children Text",
+      name: "children",
+      type: "rich-text",
+      templates: [
+        {
+          name: "EmbeddedInfo",
+          label: "Embedded Info",
+          fields: [
+            {
+              name: "text",
+              label: "Text",
+              type: "string",
+            },
+            {
+              name: "children",
+              label: "Child Text",
+              type: "rich-text",
+              templates: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Rich Text",
+      name: "richText",
+      type: "rich-text",
+      templates: [
+        {
+          name: "EmbeddedInfo",
+          label: "Embedded Info",
+          fields: [
+            {
+              name: "text",
+              label: "Text",
+              type: "string",
+            },
+            {
+              name: "children",
+              label: "Child Text",
+              type: "rich-text",
+              templates: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
       label: "Actions",
       name: "actions",
       type: "object",
@@ -404,8 +452,64 @@ export default defineSchema({
               fields: [
                 {
                   name: "children",
+                  label: "Child Text",
+                  type: "rich-text",
+                  templates: [],
+                },
+                {
+                  name: "text",
                   label: "Text",
                   type: "string",
+                },
+                {
+                  name: "features",
+                  label: "Features",
+                  list: true,
+                  type: "string",
+                },
+                {
+                  name: "items",
+                  label: "Items",
+                  type: "object",
+                  fields: [
+                    {
+                      name: "text",
+                      label: "Text",
+                      type: "string",
+                    },
+                  ],
+                },
+                {
+                  name: "blocks",
+                  label: "Blocks",
+                  type: "object",
+                  list: true,
+                  templates: [
+                    {
+                      name: "myCta",
+                      label: "My CTA",
+                      fields: [
+                        {
+                          name: "text",
+                          label: "Text",
+                          type: "string",
+                        },
+                      ],
+                    },
+                  ],
+                },
+                {
+                  name: "leggo",
+                  label: "Leggo",
+                  type: "object",
+                  list: true,
+                  fields: [
+                    {
+                      name: "text",
+                      label: "Text",
+                      type: "string",
+                    },
+                  ],
                 },
               ],
             },

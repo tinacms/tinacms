@@ -113,6 +113,12 @@ export const setupFixture = async (
   const expectedReponse = await fs
     .readFileSync(path.join(rootPath, 'requests', fixture, 'response.json'))
     .toString()
+  const expectedReponsePath = await path.join(
+    rootPath,
+    'requests',
+    fixture,
+    'response.json'
+  )
 
   const response = await resolve({
     query: request,
@@ -123,36 +129,9 @@ export const setupFixture = async (
     // console.log(response.errors)
   }
 
-  const mutations = await Promise.all(
-    Object.entries(JSON.parse(JSON.stringify(response?.data || {})))
-      .map(async ([queryName, result]) => {
-        const mutationPath = path.join(
-          rootPath,
-          'requests',
-          fixture,
-          'mutations',
-          queryName,
-          'request.gql'
-        )
-        if (fs.existsSync(mutationPath)) {
-          const request = await fs.readFileSync(mutationPath).toString()
-          // console.log(result.form.mutationInfo.string)
-          // console.log(request)
-          return {
-            // @ts-ignore
-            mutation: print(parse(result.form.mutationInfo.string)),
-            expectedMutation: print(parse(request)),
-          }
-        } else {
-          return false
-        }
-      })
-      .filter(Boolean)
-  )
-
   return {
     response,
     expectedReponse,
-    mutations,
+    expectedReponsePath,
   }
 }
