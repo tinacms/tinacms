@@ -556,7 +556,9 @@ const Panel = function Panel({
   )
 }
 
+export const BlocksField = Blocks
+
 export const BlocksFieldPlugin = {
   name: 'blocks',
-  Component: Blocks,
+  Component: BlocksField,
 }

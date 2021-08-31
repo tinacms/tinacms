@@ -20,7 +20,7 @@ import React from 'react'
 import { Wysiwyg } from '../components/Wysiwyg'
 import { wysiwygStyles } from './wysiwygStyles'
 
-const MarkdownField = wysiwygStyles(props => {
+export const MarkdownField = wysiwygStyles((props) => {
   return (
     <Wysiwyg
       {...props}
