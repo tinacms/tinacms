@@ -125,12 +125,15 @@ export const TinaCloudProvider = (
     CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
 ) => {
   useTinaAuthRedirect()
-  const cms =
-    props.cms ||
-    new TinaCMS({
-      enabled: true,
-      sidebar: true,
-    })
+  const cms = React.useMemo(
+    () =>
+      props.cms ||
+      new TinaCMS({
+        enabled: true,
+        sidebar: true,
+      }),
+    [props.cms]
+  )
   if (!cms.api.tina) {
     cms.api.tina = createClient(props)
   }
