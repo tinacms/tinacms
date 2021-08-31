@@ -13,6 +13,7 @@
     "resolveJsonModule": true,
     "skipLibCheck": true,
     "strict": false,
-    "target": "ES6"
+    "target": "ES6",
+    "types": ["jest", "node"]
   },
 }

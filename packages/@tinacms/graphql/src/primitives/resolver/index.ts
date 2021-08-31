@@ -357,8 +357,23 @@ export class Resolver {
             break
           }
         case 'reference':
-          console.log('refrence mutation', fieldValue)
-          accum[fieldName] = fieldValue
+          // TODO: implement `create`, `update` and `detach` logic
+          const keys = Object.keys(fieldValue)
+          if (keys.length > 1) {
+            throw new Error(
+              `Must only specify one type of reference mutation, got ${keys.join(
+                ', '
+              )}`
+            )
+          }
+          const key = keys[0]
+          switch (key) {
+            case 'select':
+              accum[fieldName] = fieldValue[key]
+              break
+            // case "create":
+            //   accum[fieldName] = fieldValue[key]
+          }
           break
         default:
           // @ts-ignore

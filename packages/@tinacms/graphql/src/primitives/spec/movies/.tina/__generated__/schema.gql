@@ -31,6 +31,8 @@ interface Node {
 interface Document {
   sys: SystemInfo
   id: ID!
+  dataJSON: JSON!
+  form: JSON!
 }
 
 """A relay-compliant pagination connection"""
@@ -186,14 +188,22 @@ input DocumentMutation {
   actor: ActorMutation
 }
 
+input MovieDirectorReferenceMutation {
+  select: String
+}
+
+input MovieActorsReferenceMutation {
+  select: String
+}
+
 input MovieMutation {
   title: String
   releaseDate: String
   rating: Int
   archived: Boolean
   genre: String
-  director: String
-  actors: [String]
+  director: MovieDirectorReferenceMutation
+  actors: MovieActorsReferenceMutation
   body: String
 }
 

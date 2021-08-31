@@ -1,9 +1,8 @@
 ---
 title: Just Another Blog Post
-author: content/authors/napolean.md
-date: "July 12 2021"
-excerpt: "Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?"
-_template: article
+author: content/authors/pedro.md
+date: '2021-07-12T07:00:00.000Z'
+heroImg: null
 ---
 
 Lorem markdownum evinctus _ut cape_ adhaeret gravis licet progenies ut haesit

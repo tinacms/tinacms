@@ -465,9 +465,20 @@ export type DocumentMutation = {
   pages?: Maybe<PagesMutation>;
 };
 
+export type PostsAuthorMutation = {
+  authors?: Maybe<AuthorsMutation>;
+};
+
+export type PostsAuthorReferenceMutation = {
+  select?: Maybe<Scalars['String']>;
+  create?: Maybe<PostsAuthorMutation>;
+  update?: Maybe<PostsAuthorMutation>;
+  detach?: Maybe<Scalars['Boolean']>;
+};
+
 export type PostsMutation = {
   title?: Maybe<Scalars['String']>;
-  author?: Maybe<Scalars['String']>;
+  author?: Maybe<PostsAuthorReferenceMutation>;
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
   excerpt?: Maybe<Scalars['String']>;

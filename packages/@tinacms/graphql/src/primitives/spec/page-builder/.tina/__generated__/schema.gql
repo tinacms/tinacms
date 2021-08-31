@@ -31,6 +31,8 @@ interface Node {
 interface Document {
   sys: SystemInfo
   id: ID!
+  dataJSON: JSON!
+  form: JSON!
 }
 
 """A relay-compliant pagination connection"""

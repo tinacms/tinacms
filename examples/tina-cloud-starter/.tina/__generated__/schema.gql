@@ -291,9 +291,20 @@ input DocumentMutation {
   pages: PagesMutation
 }
 
+input PostsAuthorMutation {
+  authors: AuthorsMutation
+}
+
+input PostsAuthorReferenceMutation {
+  select: String
+  create: PostsAuthorMutation
+  update: PostsAuthorMutation
+  detach: Boolean
+}
+
 input PostsMutation {
   title: String
-  author: String
+  author: PostsAuthorReferenceMutation
   date: String
   heroImg: String
   excerpt: String

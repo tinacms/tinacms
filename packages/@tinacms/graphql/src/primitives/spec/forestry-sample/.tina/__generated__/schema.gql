@@ -31,6 +31,8 @@ interface Node {
 interface Document {
   sys: SystemInfo
   id: ID!
+  dataJSON: JSON!
+  form: JSON!
 }
 
 """A relay-compliant pagination connection"""
@@ -163,10 +165,21 @@ input AuthorMutation {
   author: AuthorAuthorMutation
 }
 
+input PostPostAuthorMutation {
+  author: AuthorMutation
+}
+
+input PostPostAuthorReferenceMutation {
+  select: String
+  create: PostPostAuthorMutation
+  update: PostPostAuthorMutation
+  detach: Boolean
+}
+
 input PostPostMutation {
   title: String
   body: String
-  author: String
+  author: PostPostAuthorReferenceMutation
 }
 
 input PostMutation {

@@ -4927,7 +4927,7 @@ __metadata:
     "@types/cors": ^2.8.7
     "@types/express": ^4.17.8
     "@types/fs-extra": ^9.0.2
-    "@types/jest": ^26.0.4
+    "@types/jest": ^27.0.1
     "@types/js-yaml": ^3.12.5
     "@types/lodash": ^4.14.161
     "@types/lodash.camelcase": ^4.3.6
@@ -5448,16 +5448,6 @@ __metadata:
     jest-diff: ^25.2.1
     pretty-format: ^25.2.1
   checksum: f815792ecc2191410bf541740b834bafb608b9a5be0b77b21770d8728e87b2bdd55843999bc9236ebd027e11a4cabbec90da7612fb9a620cf8bd858ae3774bd2
-  languageName: node
-  linkType: hard
-
-"@types/jest@npm:^26.0.4":
-  version: 26.0.24
-  resolution: "@types/jest@npm:26.0.24"
-  dependencies:
-    jest-diff: ^26.0.0
-    pretty-format: ^26.0.0
-  checksum: e5d3651c1edf197011d19ee8f4bacd52667fa673d1b2ffbfbce624208d643fd4372ebb31fa8a1d89843a7705f142e38076e25e1e7b67f3aacafd6ae8bc77cbcf
   languageName: node
   linkType: hard
 
@@ -15818,7 +15808,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"jest-diff@npm:^26.0.0, jest-diff@npm:^26.4.2, jest-diff@npm:^26.6.2":
+"jest-diff@npm:^26.4.2, jest-diff@npm:^26.6.2":
   version: 26.6.2
   resolution: "jest-diff@npm:26.6.2"
   dependencies:
@@ -20589,7 +20579,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"pretty-format@npm:^26.0.0, pretty-format@npm:^26.6.2":
+"pretty-format@npm:^26.6.2":
   version: 26.6.2
   resolution: "pretty-format@npm:26.6.2"
   dependencies:
@@ -25248,6 +25238,7 @@ resolve@^2.0.0-next.3:
     "@graphql-codegen/typescript-operations": ^1.15.4
     "@tinacms/scripts": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
+    "@types/jest": ^27.0.1
     "@types/lodash": ^4.14.169
     "@types/node": ^14.0.13
     "@types/react": ^16.9.38
@@ -25261,6 +25252,7 @@ resolve@^2.0.0-next.3:
     graphql: ^15.1.0
     graphql-tag: ^2.11.0
     isomorphic-unfetch: ^3.0.0
+    jest: 27.0.6
     lodash.get: ^4.4.2
     lodash.has: ^4.5.2
     lodash.merge: ^4.6.2
@@ -25270,6 +25262,7 @@ resolve@^2.0.0-next.3:
     prop-types: 15.7.2
     react: 16.13.1
     react-dom: 16.13.1
+    react-is: ^17.0.2
     styled-components: ^5.2.0
     ts-jest: ^26.5.3
     tsup: 4.12.5

@@ -164,7 +164,7 @@ export function useGraphqlForms<T extends object>({
   return [data as T, isLoading]
 }
 
-const transformDocumentIntoMutationRequestPayload = (
+export const transformDocumentIntoMutationRequestPayload = (
   document: {
     _collection: string
     __typename?: string
@@ -187,6 +187,9 @@ const transformDocumentIntoMutationRequestPayload = (
 }
 
 const transformParams = (data: unknown) => {
+  if (!data) {
+    return null
+  }
   if (['string', 'number', 'boolean'].includes(typeof data)) {
     return data
   }
@@ -202,11 +205,26 @@ const transformParams = (data: unknown) => {
     const nested = transformParams(rest)
     return { [_template]: nested }
   } catch (e) {
-    const accum = {}
-    Object.entries(data).map(([keyName, value]) => {
-      accum[keyName] = transformParams(value)
-    })
-    return accum
+    try {
+      assertShape<{ changeType: string; id: string }>(data, (yup) =>
+        yup.object({
+          // @ts-ignore see above
+          changeType: yup.string().required(),
+          id: yup.string().required(),
+        })
+      )
+      if (data.changeType) {
+        if (data.changeType === 'select') {
+          return { select: data.id }
+        }
+      }
+    } catch (e) {
+      const accum = {}
+      Object.entries(data).map(([keyName, value]) => {
+        accum[keyName] = transformParams(value)
+      })
+      return accum
+    }
   }
 }
 

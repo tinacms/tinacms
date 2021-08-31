@@ -617,8 +617,27 @@ export class Builder {
       case 'reference':
         return astBuilder.InputValueDefinition({
           name: field.name,
-          list: field.list,
-          type: astBuilder.TYPES.String,
+          type: astBuilder.InputObjectTypeDefinition({
+            name: NAMER.referenceMutationTypeName(field.namespace),
+            fields: [
+              astBuilder.InputValueDefinition({
+                name: 'select',
+                type: astBuilder.TYPES.String,
+              }),
+              // astBuilder.InputValueDefinition({
+              //   name: 'create',
+              //   type: await this._buildReferenceMutation(field),
+              // }),
+              // astBuilder.InputValueDefinition({
+              //   name: 'update',
+              //   type: await this._buildReferenceMutation(field),
+              // }),
+              // astBuilder.InputValueDefinition({
+              //   name: 'detach',
+              //   type: astBuilder.TYPES.Boolean,
+              // }),
+            ],
+          }),
         })
       // return astBuilder.InputValueDefinition({
       //   name: field.name,

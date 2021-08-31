@@ -4,12 +4,24 @@ mutation {
     relativePath: "star-wars.md"
     # Changes the genre to action
     params: {
-      movie: { genre: "action", archived: true, releaseDate: "2021-02-02T07:00:00.000Z" }
+      movie: {
+        genre: "action"
+        archived: true
+        releaseDate: "2021-02-02T07:00:00.000Z"
+        director: { select: "content/directors/francis.md" }
+      }
     }
   ) {
     ... on MovieDocument {
       id
       data {
+        director {
+          ... on DirectorDocument {
+            data {
+              name
+            }
+          }
+        }
         releaseDate
         archived
         genre

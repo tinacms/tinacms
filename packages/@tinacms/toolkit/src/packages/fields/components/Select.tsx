@@ -71,7 +71,7 @@ function toComponent(option: Option) {
   )
 }
 
-const SelectElement = styled.div`
+export const SelectElement = styled.div`
   display: block;
   position: relative;
 
