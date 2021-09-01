@@ -19,10 +19,8 @@ limitations under the License.
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import styled, { css } from 'styled-components'
-import { setActiveField } from '../../react-core/active-field-indicator'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
-import { CMSContext } from '../../../react-tinacms/use-cms'
 
 type InputFieldType<ExtraFieldProps, InputProps> = FieldProps<InputProps> &
   ExtraFieldProps

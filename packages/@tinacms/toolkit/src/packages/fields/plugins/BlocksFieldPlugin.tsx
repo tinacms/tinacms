@@ -37,9 +37,8 @@ import {
   GroupListMeta,
   GroupLabel,
 } from './GroupListFieldPlugin'
-import { FieldFocusEvent } from '../../react-core/active-field-indicator'
 import { useEvent } from '../../react-core'
-import { FieldHoverEvent } from '../field-events'
+import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
