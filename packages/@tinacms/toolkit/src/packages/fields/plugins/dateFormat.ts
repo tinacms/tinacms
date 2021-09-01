@@ -19,8 +19,8 @@
 import moment from 'moment'
 import { DatetimepickerProps } from 'react-datetime'
 
-const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY'
-const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A'
+export const DEFAULT_DATE_DISPLAY_FORMAT = 'MMM DD, YYYY'
+export const DEFAULT_TIME_DISPLAY_FORMAT = 'h:mm A'
 
 // formats a function from default datetime format to given format
 export const format = (
@@ -30,6 +30,7 @@ export const format = (
 ): string => {
   const dateFormat = parseDateFormat(field.dateFormat)
   const timeFormat = parseTimeFormat(field.timeFormat)
+
   const combinedFormat =
     typeof timeFormat === 'string' ? `${dateFormat} ${timeFormat}` : dateFormat
 
@@ -42,7 +43,13 @@ export const format = (
 }
 
 // parses a function from the given format to default datetime format
-export const parse = (val: string) => new Date(val).toISOString()
+export const parse = (val: string) => {
+  const date = new Date(val)
+  if (!isNaN(date.getTime())) {
+    return new Date(val).toISOString()
+  }
+  return val
+}
 
 function parseDateFormat(format: string | boolean | undefined): string {
   if (typeof format === 'string') {
