@@ -429,7 +429,9 @@ interface GroupFieldProps {
   field: Field
 }
 
+export const GroupListField = Group
+
 export const GroupListFieldPlugin = {
   name: 'group-list',
-  Component: Group,
+  Component: GroupListField,
 }
