@@ -20,8 +20,8 @@ import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import styled, { css } from 'styled-components'
 
-type InputFieldType<ExtraFieldProps, InputProps> = FieldProps<InputProps> &
-  ExtraFieldProps
+export type InputFieldType<ExtraFieldProps, InputProps> =
+  FieldProps<InputProps> & ExtraFieldProps
 
 // Wraps the Field component in labels describing the field's meta state
 // Add any other fields that the Field component should expect onto the ExtraFieldProps generic type
