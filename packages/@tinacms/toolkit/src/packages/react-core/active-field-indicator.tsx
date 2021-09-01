@@ -96,13 +96,13 @@ const useScrollToFocusedField = () => {
         }
       } else {
         // if the element is >= viewport size, meet nearest edges
-        if (eleBottomY > viewportBottomY) {
+        if (eleBottomY < viewportBottomY) {
           // anchor element bottom to viewport bottom
           window.scrollTo({
             top: eleBottomY - window.innerHeight,
             behavior: 'smooth',
           })
-        } else if (eleTopY < viewportTopY) {
+        } else if (eleTopY > viewportTopY) {
           // anchor element top to viewport top
           window.scrollTo({
             top: eleTopY,
