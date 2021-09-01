@@ -37,7 +37,9 @@ import {
   GroupListMeta,
   GroupLabel,
 } from './GroupListFieldPlugin'
-import { setActiveField } from '../../react-core/active-field-indicator'
+import { FieldFocusEvent } from '../../react-core/active-field-indicator'
+import { useEvent } from '../../react-core'
+import { FieldHoverEvent } from '../field-events'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -216,6 +218,9 @@ const BlockListItem = ({
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
+  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
+  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+
   return (
     <Draggable
       key={index}
@@ -233,9 +238,14 @@ const BlockListItem = ({
           >
             <DragHandle />
             <ItemClickTarget
-              onClick={() => setExpanded(true)}
-              onMouseOver={() => setActiveField(`${field.name}.${index}`)}
-              onMouseOut={() => setActiveField(null)}
+              onClick={() => {
+                setExpanded(true)
+                setFocusedField({ fieldName: `${field.name}.${index}` })
+              }}
+              onMouseOver={() =>
+                setHoveredField({ fieldName: `${field.name}.${index}` })
+              }
+              onMouseOut={() => setHoveredField({ fieldName: null })}
             >
               <GroupLabel>{label || template.label}</GroupLabel>
             </ItemClickTarget>

@@ -1,8 +1,16 @@
 import * as React from 'react'
 import styled from 'styled-components'
 import { ChevronUpIcon, ChevronDownIcon } from '../icons'
+import { CMSEvent } from '../core'
+import { useEvent } from './use-cms-event'
+import { FieldHoverEvent } from '../fields/field-events'
 
 const FOCUS_EVENT = 'tina:activefield'
+
+export interface FieldFocusEvent extends CMSEvent {
+  type: 'field:focus'
+  fieldName: string | null
+}
 
 export const setActiveField = (field: string | null) => {
   const fieldEvent = new CustomEvent(FOCUS_EVENT, { detail: field })
@@ -51,20 +59,76 @@ const BelowViewportIndicator = () => {
   )
 }
 
+const useScrollToFocusedField = () => {
+  const { subscribe } = useEvent<FieldFocusEvent>('field:focus')
+  React.useEffect(() =>
+    subscribe(({ fieldName }) => {
+      const ele = document.querySelector<HTMLElement>(
+        `[data-tinafield="${fieldName}"]`
+      )
+      if (!ele) return
+      const { top, height } = ele.getBoundingClientRect()
+      /**
+       * if element height < window height
+       *  if element bottom < window bottom
+       *    scroll so bottom of ele is at window bottom
+       * else
+       *  if element top < window bottom
+       */
+      const eleTopY = top + window.scrollY
+      const eleBottomY = top + height + window.scrollY
+      const viewportTopY = window.scrollY
+      const viewportBottomY = window.innerHeight + window.scrollY
+      if (height < window.innerHeight) {
+        // if the element is smaller than the viewport, scroll entire element into view
+        if (eleBottomY > viewportBottomY) {
+          // scroll up so entire element is in view
+          window.scrollTo({
+            top: eleBottomY - window.innerHeight,
+            behavior: 'smooth',
+          })
+        } else if (eleTopY < viewportTopY) {
+          // scroll down so entire element is in view
+          window.scrollTo({
+            top: eleTopY,
+            behavior: 'smooth',
+          })
+        }
+      } else {
+        // if the element is >= viewport size, meet nearest edges
+        if (eleBottomY > viewportBottomY) {
+          // anchor element bottom to viewport bottom
+          window.scrollTo({
+            top: eleBottomY - window.innerHeight,
+            behavior: 'smooth',
+          })
+        } else if (eleTopY < viewportTopY) {
+          // anchor element top to viewport top
+          window.scrollTo({
+            top: eleTopY,
+            behavior: 'smooth',
+          })
+        }
+      }
+    })
+  )
+}
+
 export const ActiveFieldIndicator = () => {
   const [activeEle, setActiveEle] = React.useState<HTMLElement | null>(null)
-  React.useEffect(() => {
-    const activeFieldHandler = (event: CustomEvent) => {
+
+  const { subscribe } = useEvent<FieldHoverEvent>('field:hover')
+
+  React.useEffect(() =>
+    subscribe(({ fieldName }) => {
       const ele = document.querySelector<HTMLElement>(
-        `[data-tinafield="${event.detail}"]`
+        `[data-tinafield="${fieldName}"]`
       )
       setActiveEle(ele)
-    }
-    // @ts-ignore it doesn't like custom event names
-    window.addEventListener(FOCUS_EVENT, activeFieldHandler)
-    // @ts-ignore see above
-    return () => window.removeEventListener(FOCUS_EVENT, activeFieldHandler)
-  }, [])
+    })
+  )
+
+  useScrollToFocusedField()
 
   if (!activeEle) return null
 

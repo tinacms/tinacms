@@ -20,6 +20,9 @@ import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import styled, { css } from 'styled-components'
 import { setActiveField } from '../../react-core/active-field-indicator'
+import { useEvent } from '../../react-core/use-cms-event'
+import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
+import { CMSContext } from '../../../react-tinacms/use-cms'
 
 type InputFieldType<ExtraFieldProps, InputProps> = FieldProps<InputProps> &
   ExtraFieldProps
@@ -37,8 +40,6 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
       label={props.field.label}
       description={props.field.description}
       error={props.meta.error}
-      onMouseOver={() => setActiveField(props.input.name)}
-      onMouseOut={() => setActiveField(null)}
     >
       <Field {...props} />
     </FieldMeta>
@@ -63,8 +64,16 @@ export const FieldMeta = ({
   children,
   ...props
 }: FieldMetaProps) => {
+  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
+  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
   return (
-    <FieldWrapper margin={margin} {...props}>
+    <FieldWrapper
+      margin={margin}
+      onMouseOver={() => setHoveredField({ fieldName: name })}
+      onMouseOut={() => setHoveredField({ fieldName: null })}
+      onClick={() => setFocusedField({ fieldName: name })}
+      {...props}
+    >
       <FieldLabel htmlFor={name}>
         {label || name}
         {description && <FieldDescription>{description}</FieldDescription>}
