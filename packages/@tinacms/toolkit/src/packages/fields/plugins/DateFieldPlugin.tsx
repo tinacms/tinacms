@@ -24,9 +24,7 @@ import { InputCss } from '../components/Input'
 import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
 import ReactDatetime from 'react-datetime'
 import { DatetimepickerProps } from 'react-datetime'
-import { format, parse } from './dateFormat'
-
-const DEFAULT_DATE_FORMAT = 'MMM dd, yyyy'
+import { format, parse, DEFAULT_DATE_DISPLAY_FORMAT } from './dateFormat'
 
 export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
   ({ input, field: { dateFormat, timeFormat, ...rest } }) => {
@@ -58,7 +56,7 @@ export const DateField = wrapFieldsWithMeta<InputProps, DatetimepickerProps>(
             onFocus={input.onFocus}
             onChange={input.onChange}
             open={isOpen}
-            dateFormat={dateFormat || DEFAULT_DATE_FORMAT}
+            dateFormat={dateFormat || DEFAULT_DATE_DISPLAY_FORMAT}
             timeFormat={timeFormat || false}
             {...rest}
           />

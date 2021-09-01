@@ -22,7 +22,10 @@ export const Post = ({ data }) => {
   };
 
   const date = new Date(data.date);
-  const formattedDate = format(date, "MMM dd, yyyy");
+  let formattedDate = "";
+  if (!isNaN(date.getTime())) {
+    formattedDate = format(date, "MMM dd, yyyy");
+  }
 
   return (
     <Section className="flex-1">
