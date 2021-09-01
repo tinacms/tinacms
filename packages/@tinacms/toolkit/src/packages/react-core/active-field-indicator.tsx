@@ -18,21 +18,8 @@ limitations under the License.
 import * as React from 'react'
 import styled from 'styled-components'
 import { ChevronUpIcon, ChevronDownIcon } from '../icons'
-import { CMSEvent } from '../core'
 import { useEvent } from './use-cms-event'
-import { FieldHoverEvent } from '../fields/field-events'
-
-const FOCUS_EVENT = 'tina:activefield'
-
-export interface FieldFocusEvent extends CMSEvent {
-  type: 'field:focus'
-  fieldName: string | null
-}
-
-export const setActiveField = (field: string | null) => {
-  const fieldEvent = new CustomEvent(FOCUS_EVENT, { detail: field })
-  window.dispatchEvent(fieldEvent)
-}
+import { FieldHoverEvent, FieldFocusEvent } from '../fields/field-events'
 
 const IndicatorWrap = styled.div`
   position: fixed;
