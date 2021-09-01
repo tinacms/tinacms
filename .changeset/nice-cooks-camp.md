@@ -3,4 +3,4 @@
 'react-tinacms-editor': minor
 ---
 
-More fields have been exported so that they can be used in field plugins.
+Export Blocks, Group List, List, HTML and Markdown fields so that they can be used in field plugins.
