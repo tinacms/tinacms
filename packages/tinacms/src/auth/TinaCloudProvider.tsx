@@ -36,7 +36,7 @@ export interface TinaCloudAuthWallProps {
   getModalActions?: (args: {
     closeModal: () => void
   }) => { name: string; action: () => Promise<void>; primary: boolean }[]
-  mediaStore?: TinaCloudMediaStoreClass
+  mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
 }
 
 export const AuthWallInner = ({
@@ -137,9 +137,12 @@ export const TinaCloudProvider = (
   if (!cms.api.tina) {
     cms.api.tina = createClient(props)
   }
-  if (props.mediaStore) {
-    cms.media.store = new props.mediaStore(cms.api.tina)
+  const setupMedia = async () => {
+    if (props.mediaStore) {
+      cms.media.store = new (await props.mediaStore)(cms.api.tina)
+    }
   }
+  setupMedia()
   if (props.cmsCallback) {
     props.cmsCallback(cms)
   }
