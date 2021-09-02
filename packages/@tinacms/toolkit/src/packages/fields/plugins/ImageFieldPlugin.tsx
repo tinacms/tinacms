@@ -85,8 +85,7 @@ export const ImageField = wrapFieldsWithMeta<InputProps, ImageProps>(
       onClear = () => props.input.onChange('')
     }
 
-    async function onChange(media?: Media) {
-
+    async function onChange(media?: Media | Media[]) {
       if (media) {
         const parsedValue =
           // @ts-ignore

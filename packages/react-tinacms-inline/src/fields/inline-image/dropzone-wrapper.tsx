@@ -38,6 +38,7 @@ export function DropzoneWrapper({
     accept: 'image/*',
     onDrop,
     noClick: !!onClick,
+    multiple: true
   })
 
   return (

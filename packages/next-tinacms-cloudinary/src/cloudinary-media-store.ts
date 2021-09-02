@@ -28,44 +28,50 @@ export class CloudinaryMediaStore implements MediaStore {
   accept = 'text/*,  application/*, image/*'
 
   async persist(media: MediaUploadOptions[]): Promise<Media[]> {
-    const { file, directory } = media[0]
-    const formData = new FormData()
-    formData.append('file', file)
-    formData.append('directory', directory)
-    formData.append('filename', file.name)
+    let newFiles: Media[] = []
 
-    const res = await this.fetchFunction(`/api/cloudinary/media`, {
-      method: 'POST',
-      body: formData,
-    })
+    for (const item of media) {
+      const { file, directory } = item
+      const formData = new FormData()
+      formData.append('file', file)
+      formData.append('directory', directory)
+      formData.append('filename', file.name)
+  
+      const res = await this.fetchFunction(`/api/cloudinary/media`, {
+        method: 'POST',
+        body: formData,
+      })
+  
+      if (res.status != 200) {
+        const responseData = await res.json()
+        throw new Error(responseData.message)
+      }
+      const fileRes = await res.json()
+      /**
+      * Images uploaded to Cloudinary aren't instantly available via the API;
+      * waiting a couple seconds here seems to ensure they show up in the next fetch.
+      */
+      await new Promise((resolve) => {
+        setTimeout(resolve, 2000)
+      })
+      /**
+       * Format the response from Cloudinary to match Media interface
+       * Valid Cloudinary `resource_type` values: `image`, `video`, `raw` and `auto`
+       * uploading a directory is not supported as such, type is defaulted to `file`
+       * https://cloudinary.com/documentation/upload_images#uploading_with_a_direct_call_to_the_rest_api
+       */
+      const parsedRes: Media = {
+        type: 'file',
+        id: fileRes.public_id,
+        filename: fileRes.original_filename,
+        directory: '/',
+        previewSrc: fileRes.url
+  
+      }
 
-    if (res.status != 200) {
-      const responseData = await res.json()
-      throw new Error(responseData.message)
+      newFiles.push(parsedRes)
     }
-    const fileRes = await res.json()
-    /**
-    * Images uploaded to Cloudinary aren't instantly available via the API;
-    * waiting a couple seconds here seems to ensure they show up in the next fetch.
-    */
-    await new Promise((resolve) => {
-      setTimeout(resolve, 2000)
-    })
-    /**
-     * Format the response from Cloudinary to match Media interface
-     * Valid Cloudinary `resource_type` values: `image`, `video`, `raw` and `auto`
-     * uploading a directory is not supported as such, type is defaulted to `file`
-     * https://cloudinary.com/documentation/upload_images#uploading_with_a_direct_call_to_the_rest_api
-     */
-    const parsedRes: Media = {
-      type: 'file',
-      id: fileRes.public_id,
-      filename: fileRes.original_filename,
-      directory: '/',
-      previewSrc: fileRes.url
-
-    }
-    return [parsedRes]
+    return newFiles;
   }
   async delete(media: Media) {
     await this.fetchFunction(
