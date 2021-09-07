@@ -17,9 +17,13 @@ limitations under the License.
 */
 import * as React from 'react'
 import styled from 'styled-components'
-import { ChevronUpIcon, ChevronDownIcon } from '../icons'
-import { useEvent } from './use-cms-event'
-import { FieldHoverEvent, FieldFocusEvent } from '../fields/field-events'
+import { ChevronUpIcon, ChevronDownIcon } from '../packages/icons'
+import { useEvent } from '../packages/react-core/use-cms-event'
+import {
+  FieldHoverEvent,
+  FieldFocusEvent,
+} from '../packages/fields/field-events'
+import { useFieldReference } from '../hooks/use-field-reference'
 
 const IndicatorWrap = styled.div`
   position: fixed;
@@ -119,16 +123,26 @@ const useScrollToFocusedField = () => {
 }
 
 export const ActiveFieldIndicator = () => {
-  const [activeEle, setActiveEle] = React.useState<HTMLElement | null>(null)
+  const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
+    null
+  )
+  const activeEle = useFieldReference(activeFieldName)
+
+  const [, setArbitraryValue] = React.useState(0)
+  const rerender = () => setArbitraryValue((s) => s + 1)
+
+  React.useEffect(() => {
+    window.addEventListener('scroll', rerender)
+    return () => {
+      window.removeEventListener('scroll', rerender)
+    }
+  }, [])
 
   const { subscribe } = useEvent<FieldHoverEvent>('field:hover')
 
   React.useEffect(() =>
     subscribe(({ fieldName }) => {
-      const ele = document.querySelector<HTMLElement>(
-        `[data-tinafield="${fieldName}"]`
-      )
-      setActiveEle(ele)
+      setActiveFieldName(fieldName)
     })
   )
 
