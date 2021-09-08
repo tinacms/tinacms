@@ -1,0 +1,68 @@
+{
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "theme",
+      "page"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument"
+  },
+  "Theme": {
+    "type": "Theme",
+    "resolveType": "unionData",
+    "typeMap": {
+      "theme": "ThemeTheme"
+    }
+  },
+  "ThemeDocument": {
+    "type": "ThemeDocument",
+    "resolveType": "collectionDocument",
+    "collection": "theme"
+  },
+  "ThemeConnection": {
+    "type": "ThemeConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "theme"
+  },
+  "Page": {
+    "type": "Page",
+    "resolveType": "unionData",
+    "typeMap": {
+      "homepage": "PageHomepage"
+    }
+  },
+  "PageDocument": {
+    "type": "PageDocument",
+    "resolveType": "collectionDocument",
+    "collection": "page"
+  },
+  "PageConnection": {
+    "type": "PageConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "page"
+  },
+  "PageBlocks": {
+    "type": "PageBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "PageBlocksHero",
+      "testimonial": "PageBlocksTestimonial",
+      "features": "PageBlocksFeatures"
+    }
+  },
+  "PageNavlist": {
+    "type": "PageNavlist",
+    "resolveType": "unionData",
+    "typeMap": {
+      "nav": "PageNavlistNav"
+    }
+  }
+}
