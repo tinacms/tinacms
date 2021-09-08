@@ -2,36 +2,28 @@ import { unified } from 'unified'
 import markdown from 'remark-parse'
 import mdx from 'remark-mdx'
 import { toMarkdown } from 'mdast-util-to-markdown'
-import {
-  mdxExpressionFromMarkdown,
-  mdxExpressionToMarkdown,
-} from 'mdast-util-mdx-expression'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import { stringify } from './slate/serialize'
 import deserialize from './slate/deserialize'
-import type { RichTypeWithNamespace } from '../types'
 import { TinaField } from '../..'
 import { visit } from 'unist-util-visit'
-
-export const parseMDX2 = (value: string, field: RichTypeWithNamespace) => {
-  const tree = unified().use(markdown).use(mdx).parse(value)
-}
+import type { RichTypeWithNamespace } from '../types'
 
 export const parseMDX = (value: string, field: RichTypeWithNamespace) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
+  return parseMDXInner(tree, field)
+}
+export const parseMDXInner = (tree: any, field: RichTypeWithNamespace) => {
   visit(tree, ['mdxJsxFlowElement', 'mdxJsxTextElement'], (node) => {
     let props = {}
     if (!node.name) {
-      const meh = node.children.map((child) => deserialize(child))
-      props = meh
+      props = node.children.map((child) => deserialize(child))
     }
-    // console.log(JSON.stringify(node, null, 2))
     const template = field.templates.find(
       (template) => template.name === node.name
     )
     if (node.children.length > 0) {
       node.attributes.push({
-        // Only support a
         value: node.children,
         name: 'children',
         type: 'mdxJsxAttribute',
@@ -44,8 +36,6 @@ export const parseMDX = (value: string, field: RichTypeWithNamespace) => {
           throw new Error('Global templates not yet supported')
         }
         if (!template) {
-          // console.log(attribute)
-          // props[attribute.name] = attribute.value
         } else {
           const field = template.fields.find(
             (field) => field.name === attribute.name
@@ -63,7 +53,6 @@ export const parseMDX = (value: string, field: RichTypeWithNamespace) => {
         console.log(`Not sure what this is, type: ${attribute.type}`)
       }
     })
-    // node.attributes = attributes
     delete node.attributes
     node.props = props
   })
@@ -281,12 +270,13 @@ const switchFields = (attribute, field: TinaField, props) => {
       break
 
     case 'rich-text':
-      // const value = attribute.value.value.attributes[field.name]
       if (attribute.value) {
         if (Array.isArray(attribute.value)) {
-          const mdx = attribute.value.map((att) => deserialize(att))
+          const mdx = parseMDXInner(
+            { type: 'root', children: attribute.value },
+            field
+          )
           if (mdx) {
-            // props[field.name] = mdx[0].children
             props[field.name] = mdx
           }
         } else {

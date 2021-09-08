@@ -113,19 +113,15 @@
                 {
                   "type": "mdxJsxFlowElement",
                   "name": "Cta",
-                  "attributes": [
-                    {
-                      "type": "mdxJsxAttribute",
-                      "name": "title",
-                      "value": "Get Started"
-                    }
-                  ],
                   "children": [
                     {
                       "type": "text",
                       "text": ""
                     }
-                  ]
+                  ],
+                  "props": {
+                    "title": "Get Started"
+                  }
                 }
               ]
             }
