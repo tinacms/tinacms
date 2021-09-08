@@ -1,5 +1,10 @@
 import { defaultNodeTypes, NodeTypes, SlateNodeType } from './deserialize'
-import type { Root, Content } from 'mdast'
+import type {
+  Root,
+  Content,
+  PhrasingContent,
+  StaticPhrasingContent,
+} from 'mdast'
 import { RichTypeWithNamespace } from '../../types'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
@@ -44,7 +49,8 @@ export const stringify = (
   if (!chunk.type) {
     return {
       type: 'text',
-      value: chunk.text,
+      // @ts-ignore
+      value: chunk.text || '',
     }
   }
   const blockChunk = chunk
@@ -54,48 +60,64 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 1,
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
       }
     case 'heading_two':
       return {
         type: 'heading',
         depth: 2,
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
       }
     case 'heading_three':
       return {
         type: 'heading',
         depth: 3,
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
       }
     case 'heading_four':
       return {
         type: 'heading',
         depth: 4,
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
       }
     case 'heading_five':
       return {
         type: 'heading',
         depth: 5,
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
       }
     case 'heading_six':
       return {
         type: 'heading',
         depth: 6,
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
       }
     case 'paragraph':
       return {
         type: 'paragraph',
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
       }
     case 'link':
       return {
         type: 'link',
         url: blockChunk.link,
-        children: blockChunk.children.map((child) => stringify(child, field)),
+        children: blockChunk.children.map((child) =>
+          stringify(child, field)
+        ) as StaticPhrasingContent[],
       }
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
@@ -112,18 +134,9 @@ export const stringify = (
         if (typeof template === 'string') {
           throw new Error(`Global templates not yet supported`)
         }
-        const tree = blockChunk.children.map((item) => stringify(item, field))
-        blockChunk.children = tree.filter((item) => {
-          if (item.type === 'text' && !item.text) {
-            return false
-          }
-
-          return true
-        })
         Object.entries(blockChunk.props).map(([key, value]) => {
           if (template.fields) {
             const field = template.fields.find((field) => field.name === key)
-            // console.log(field.type, key)
             switch (field.type) {
               case 'boolean':
               case 'datetime':
@@ -267,7 +280,7 @@ export const stringify = (
                 }
                 break
               case 'rich-text':
-                const tree = value
+                const tree = value.children
                   .map((item) => stringify(item, field))
                   .filter((item) => {
                     if (item.type === 'text' && !item.text) {

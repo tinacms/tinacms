@@ -172,12 +172,14 @@ export interface ReferenceTypeWithNamespace extends TinaField {
 export interface RichTypeWithNamespace extends TinaField {
   type: 'rich-text'
   namespace: string[]
-  templates: (string | Template<true>)[]
+  isBody?: boolean
+  templates?: (string | Template<true>)[]
 }
 
 export interface RichTypeInner extends TinaField {
   type: 'rich-text'
-  templates: (string | Template<false>)[]
+  isBody?: boolean
+  templates?: (string | Template<false>)[]
 }
 
 export type ObjectType<WithNamespace extends boolean> =

@@ -306,11 +306,15 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
   })
   if (args.watch) {
     console.log(`${chalk.blue(`Watching workspaces...`)}`)
-    chokidar.watch(workspacePkgs).on('change', async (path) => {
-      const packageLocator = pnp.findPackageLocator(path)
-      const packageInformation = pnp.getPackageInformation(packageLocator)
-      await run({ dir: packageInformation.packageLocation })
-    })
+    chokidar
+      .watch(workspacePkgs, {
+        ignored: '**/spec/**/*', // ignore dotfiles
+      })
+      .on('change', async (path) => {
+        const packageLocator = pnp.findPackageLocator(path)
+        const packageInformation = pnp.getPackageInformation(packageLocator)
+        await run({ dir: packageInformation.packageLocation })
+      })
   } else {
     console.log(`${chalk.blue(`Building workspaces...`)}`)
     const packagePathsToBuild = await fs

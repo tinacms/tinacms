@@ -17,7 +17,11 @@ export const parseMDXInner = (tree: any, field: RichTypeWithNamespace) => {
   visit(tree, ['mdxJsxFlowElement', 'mdxJsxTextElement'], (node) => {
     let props = {}
     if (!node.name) {
-      props = node.children.map((child) => deserialize(child))
+      const mdx = parseMDXInner(
+        { type: 'root', children: node.children },
+        field
+      )
+      props = mdx
     }
     const template = field.templates.find(
       (template) => template.name === node.name
@@ -64,12 +68,12 @@ export const parseMDXInner = (tree: any, field: RichTypeWithNamespace) => {
   }
 
   const slateTree = tree.children.map(deserialize)
-  return slateTree
+  return { type: 'root', children: slateTree }
 }
 
 export const stringifyMDX = (value: unknown, field: RichTypeWithNamespace) => {
   // @ts-ignore: FIXME: validate this shape
-  const slateTree: SlateNodeType[] = value
+  const slateTree: SlateNodeType[] = value.children
   try {
     const tree = slateTree.map((item) => stringify(item, field))
     const out = toMarkdown(
@@ -283,8 +287,10 @@ const switchFields = (attribute, field: TinaField, props) => {
           try {
             // console.log(attribute.value)
             const mdx = parseMDX(attribute.value.value, field)
+
+            // console.log(props, JSON.stringify(mdx, null, 2))
             // console.log(field.name)
-            props[field.name] = mdx[0].props
+            props[field.name] = mdx.children[0].props
           } catch (e) {
             console.log(e)
           }

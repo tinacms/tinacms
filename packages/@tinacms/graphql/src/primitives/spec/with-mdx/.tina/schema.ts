@@ -11,9 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaCloudSchema } from '../../../types'
+import { TinaCloudSchema, TinaCloudTemplateBase } from '../../../types'
 
-const cta = {
+const cta: TinaCloudTemplateBase = {
   name: 'Cta',
   label: 'CTA',
   fields: [
@@ -21,6 +21,41 @@ const cta = {
       name: 'title',
       label: 'Title',
       type: 'string',
+    },
+    {
+      name: 'actions',
+      label: 'Actions',
+      type: 'object',
+      list: true,
+      templates: [
+        {
+          name: 'popup',
+          label: 'Popup Dialog',
+          fields: [
+            {
+              name: 'title',
+              label: 'Title',
+              type: 'string',
+            },
+            {
+              name: 'body',
+              label: 'Body',
+              type: 'string',
+            },
+          ],
+        },
+        {
+          name: 'externalLink',
+          label: 'External Link',
+          fields: [
+            {
+              name: 'url',
+              label: 'URL',
+              type: 'string',
+            },
+          ],
+        },
+      ],
     },
   ],
 }
@@ -89,6 +124,13 @@ const tinaSchema: TinaCloudSchema<false> = {
                   name: 'author',
                   label: 'Author',
                   type: 'string',
+                },
+                {
+                  name: 'categories',
+                  label: 'Categories',
+                  type: 'string',
+                  list: true,
+                  options: ['health', 'movies', 'sports'],
                 },
                 {
                   name: 'children',

@@ -66,17 +66,15 @@ export type SlateNodeType =
     }
   | {
       type: 'mdxJsxTextElement'
-      attributes: []
+      props: object
       children: SlateNodeType[]
       name: string
-      ordered: boolean
     }
   | {
       type: 'mdxJsxFlowElement'
-      attributes: object
+      props: object
       children: SlateNodeType[]
       name: string
-      ordered: boolean
     }
 //   paragraph: 'paragraph',
 //   block_quote: 'block_quote',
@@ -264,14 +262,10 @@ export default function deserialize(node: MdxAstNode) {
     case 'text':
       return { type: 'text', text: node.value || '' }
     case 'mdxJsxFlowElement':
-      return {
-        ...node,
-        children: [{ type: 'text', text: '' }],
-      }
     case 'mdxJsxTextElement':
       return {
         ...node,
-        children: [{ type: 'text', text: '' }],
+        children: undefined,
       }
     default:
       console.log('unknown', node)

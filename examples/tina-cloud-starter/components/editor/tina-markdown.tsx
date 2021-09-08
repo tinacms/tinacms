@@ -32,12 +32,13 @@ export const TinaMarkdown = ({
   children,
   blocks = blockRenderer,
 }: {
-  children: SlateNodeType[];
+  children: SlateNodeType[] | { type: "root"; children: SlateNodeType[] };
   blocks?: { [key: string]: (props: object) => JSX.Element };
 }) => {
+  const nodes = Array.isArray(children) ? children : children.children;
   return (
     <>
-      {children.map((child) => {
+      {nodes.map((child) => {
         switch (child.type) {
           case "heading_one":
             return (
@@ -93,7 +94,9 @@ export const TinaMarkdown = ({
           case "mdxJsxFlowElement":
             const Block = blocks[child.name];
             if (Block) {
-              const { children, ...otherProps } = child.props;
+              const { children, ...otherProps } = child.props
+                ? child.props
+                : {};
               return (
                 <Block {...otherProps}>
                   {children && <TinaMarkdown>{children}</TinaMarkdown>}
@@ -157,17 +160,13 @@ export type SlateNodeType =
     }
   | {
       type: "mdxJsxTextElement";
-      attributes: [];
       props: object;
       children: SlateNodeType[];
       name: string;
-      ordered: boolean;
     }
   | {
       type: "mdxJsxFlowElement";
-      attributes: [];
       props: object;
       children: SlateNodeType[];
       name: string;
-      ordered: boolean;
     };

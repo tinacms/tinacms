@@ -1,6 +1,6 @@
 import React from "react";
 import { Form, MdxField, PopupAdder } from "tinacms";
-import { createEditor, Transforms, BaseRange, Element } from "slate";
+import { createEditor, Node, Transforms, BaseRange, Element } from "slate";
 import { Slate, Editable, withReact, ReactEditor } from "slate-react";
 import type { BaseEditor } from "slate";
 import type { RenderLeafProps, RenderElementProps } from "slate-react";
@@ -21,8 +21,8 @@ export const Editor = (props) => {
   // Hot reloads when usign useMemo to initialize https://github.com/ianstormtaylor/slate/issues/4081
   const [editor] = React.useState(withReact(createEditor()));
   const [value, setValue] = React.useState(
-    props.input.value?.length > 0
-      ? props.input.value
+    props.input.value.children
+      ? props.input.value.children?.map(normalize)
       : [{ type: "paragraph", children: [{ type: "text", text: "" }] }]
   );
   const [voidSelection, setVoidSelectionInner] =
@@ -33,7 +33,7 @@ export const Editor = (props) => {
   const templates = props.field.templates;
 
   React.useEffect(() => {
-    props.input.onChange(value);
+    props.input.onChange({ type: "root", children: value });
   }, [JSON.stringify(value)]);
 
   // const renderLeaf = React.useCallback((props: RenderLeafProps) => {
@@ -152,6 +152,7 @@ export const Editor = (props) => {
         return false;
     }
   };
+
   return (
     <>
       <div
@@ -245,4 +246,20 @@ const MdxPicker = (props) => {
       <MdxField inline={props.inline} tinaForm={form} field={activeTemplate} />
     </span>
   );
+};
+
+const normalize = (node: object) => {
+  if (["mdxJsxFlowElement", "mdxJsxTextElement"].includes(node.type)) {
+    return {
+      ...node,
+      children: [{ type: "text", text: "" }],
+    };
+  }
+  if (node.children) {
+    return {
+      ...node,
+      children: node.children.map(normalize),
+    };
+  }
+  return node;
 };

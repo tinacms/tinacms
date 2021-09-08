@@ -135,3 +135,47 @@ export const setupFixture = async (
     expectedReponsePath,
   }
 }
+
+export const setupFixture2 = async (
+  rootPath: string,
+  schema: TinaCloudSchema<false>,
+  fixture: { name: string; assert: 'output' | 'file' }
+) => {
+  const { database } = await setup(rootPath, schema)
+  const request = await fs
+    .readFileSync(path.join(rootPath, 'requests', fixture.name, 'request.gql'))
+    .toString()
+  const variables = JSON.parse(
+    await fs
+      .readFileSync(
+        path.join(rootPath, 'requests', fixture.name, 'variables.json')
+      )
+      .toString()
+  )
+  console.log(variables)
+  const expectedResponsePath = await path.join(
+    rootPath,
+    'requests',
+    fixture.name,
+    'response.md'
+  )
+
+  const response = await resolve({
+    query: request,
+    variables,
+    database,
+  })
+
+  const responseString = await database.bridge.get(
+    'content/posts/hello-world-advanced.md'
+  )
+
+  if (response.errors) {
+    console.log(JSON.stringify(response.errors, null, 2))
+  }
+
+  return {
+    response: responseString,
+    expectedResponsePath,
+  }
+}

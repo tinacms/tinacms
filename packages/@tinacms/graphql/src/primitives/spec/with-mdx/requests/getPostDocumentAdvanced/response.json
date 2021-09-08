@@ -3,130 +3,118 @@
     "getPostDocument": {
       "data": {
         "title": "Hello, World!",
-        "body": [
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "type": "text",
-                "text": "How's that?"
-              }
-            ]
-          },
-          {
-            "type": "paragraph",
-            "children": [
-              {
-                "type": "text",
-                "text": "This is MDX"
-              }
-            ]
-          },
-          {
-            "type": "mdxJsxFlowElement",
-            "name": "Cta",
-            "children": [
-              {
-                "type": "text",
-                "text": ""
-              }
-            ],
-            "props": {
-              "title": "ok"
-            }
-          },
-          {
-            "type": "mdxJsxFlowElement",
-            "name": "BlockQuote",
-            "children": [
-              {
-                "type": "text",
-                "text": ""
-              }
-            ],
-            "props": {
-              "author": "Homer",
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
               "children": [
                 {
-                  "type": "heading_one",
+                  "type": "text",
+                  "text": "How's that?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "This is MDX"
+                }
+              ]
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Cta",
+              "props": {
+                "title": "ok"
+              }
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "BlockQuote",
+              "props": {
+                "author": "Homer",
+                "categories": [
+                  "health"
+                ],
+                "children": {
+                  "type": "root",
                   "children": [
                     {
-                      "type": "text",
-                      "text": "This is rich-text blockquote"
+                      "type": "heading_one",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "This is rich-text blockquote"
+                        }
+                      ]
                     }
                   ]
                 }
-              ]
-            }
-          },
-          {
-            "type": "mdxJsxFlowElement",
-            "name": "Hero",
-            "children": [
-              {
-                "type": "text",
-                "text": ""
               }
-            ],
-            "props": {
-              "subTitle": [
-                {
-                  "type": "heading_two",
+            },
+            {
+              "type": "mdxJsxFlowElement",
+              "name": "Hero",
+              "props": {
+                "subTitle": {
+                  "type": "root",
                   "children": [
                     {
-                      "type": "text",
-                      "text": "Oh Hi"
+                      "type": "heading_two",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Oh Hi"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "mdxJsxFlowElement",
+                      "name": "Cta",
+                      "props": {
+                        "title": "Get Started"
+                      }
                     }
                   ]
                 },
-                {
-                  "type": "mdxJsxFlowElement",
-                  "name": "Cta",
-                  "attributes": [
-                    {
-                      "type": "mdxJsxAttribute",
-                      "name": "title",
-                      "value": "Get Started"
-                    }
-                  ],
-                  "children": [
-                    {
-                      "type": "text",
-                      "text": ""
-                    }
-                  ]
-                }
-              ],
-              "config": {
-                "variant": "primary"
-              },
-              "children": [
-                {
-                  "type": "heading_one",
-                  "children": [
-                    {
-                      "type": "text",
-                      "text": "Welcome to my website"
-                    }
-                  ]
+                "config": {
+                  "variant": "primary"
                 },
-                {
-                  "type": "mdxJsxFlowElement",
-                  "name": "Cta",
+                "children": {
+                  "type": "root",
                   "children": [
                     {
-                      "type": "text",
-                      "text": ""
+                      "type": "heading_one",
+                      "children": [
+                        {
+                          "type": "text",
+                          "text": "Welcome to my website"
+                        }
+                      ]
+                    },
+                    {
+                      "type": "mdxJsxFlowElement",
+                      "name": "Cta",
+                      "props": {
+                        "title": "Get Started",
+                        "actions": [
+                          {
+                            "_template": "popup",
+                            "title": "Click Here!",
+                            "body": "please?"
+                          }
+                        ]
+                      }
                     }
-                  ],
-                  "props": {
-                    "title": "Get Started"
-                  }
+                  ]
                 }
-              ]
+              }
             }
-          }
-        ]
+          ]
+        }
       }
     }
   }

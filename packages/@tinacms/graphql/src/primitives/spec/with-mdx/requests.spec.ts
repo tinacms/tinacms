@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setup, setupFixture } from '../setup'
+import { setup, setupFixture, setupFixture2 } from '../setup'
 import { toMatchFile } from 'jest-file-snapshot'
 
 const rootPath = path.join(__dirname, '/')
@@ -21,24 +21,34 @@ const fixtures = [
   // 'getAuthorDocument',
   'getPostDocument',
   'getPostDocumentAdvanced',
-  // 'updateAuthorDocument',
   // 'updateDocument',
   // 'updateDocument-no-collection',
+]
+const fixtures2 = [
+  // {
+  //   name: 'getPostDocument',
+  //   assert: 'output'
+  // },
+  {
+    name: 'updatePostDocumentAdvanced',
+    assert: 'file',
+  },
 ]
 import { tinaSchema } from './.tina/schema'
 
 expect.extend({ toMatchFile })
 
 describe('The given configuration', () => {
-  fixtures.forEach((fixture) => {
-    it(`${fixture} works`, async () => {
-      const { response, expectedReponse, expectedReponsePath } =
-        await setupFixture(rootPath, tinaSchema, fixture)
+  fixtures2.forEach((fixture) => {
+    it(`${fixture.name} works`, async () => {
+      const { response, expectedResponsePath } = await setupFixture2(
+        rootPath,
+        tinaSchema,
+        fixture
+      )
 
       // Add \n because prettier format adds it if a user edits the file manually
-      expect(`${JSON.stringify(response, null, 2)}\n`).toMatchFile(
-        expectedReponsePath
-      )
+      expect(response).toMatchFile(expectedResponsePath)
     })
   })
 })
