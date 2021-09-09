@@ -11914,6 +11914,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/lodash.upperfirst", "npm:4.3.6"],
             ["@types/lru-cache", "npm:5.1.1"],
             ["@types/mdast", "npm:3.0.10"],
+            ["@types/node", "npm:16.9.1"],
             ["@types/normalize-path", "npm:3.0.0"],
             ["@types/ws", "npm:7.4.7"],
             ["@types/yup", "npm:0.29.13"],
@@ -13599,6 +13600,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/cache/@types-node-npm-16.4.0-179e15102b-3f2aaccbe8.zip/node_modules/@types/node/",
           "packageDependencies": [
             ["@types/node", "npm:16.4.0"]
+          ],
+          "linkType": "HARD",
+        }],
+        ["npm:16.9.1", {
+          "packageLocation": "./.yarn/cache/@types-node-npm-16.9.1-bde6d3b0c9-b9b9ee7e36.zip/node_modules/@types/node/",
+          "packageDependencies": [
+            ["@types/node", "npm:16.9.1"]
           ],
           "linkType": "HARD",
         }]

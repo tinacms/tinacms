@@ -4935,6 +4935,7 @@ __metadata:
     "@types/lodash.upperfirst": ^4.3.6
     "@types/lru-cache": ^5.1.0
     "@types/mdast": ^3.0.10
+    "@types/node": ^16.9.1
     "@types/normalize-path": ^3.0.0
     "@types/ws": ^7.2.6
     "@types/yup": ^0.29.7
@@ -5743,6 +5744,13 @@ __metadata:
   version: 14.17.5
   resolution: "@types/node@npm:14.17.5"
   checksum: bd2c9bd617d36fea3b6380f5f7bbf56b59dbfb97ba5ff6d04fdf8ec47402ba4bb4cc902087a7f40d17c91845cc949c811a366679f3421a965e80fbce328a2750
+  languageName: node
+  linkType: hard
+
+"@types/node@npm:^16.9.1":
+  version: 16.9.1
+  resolution: "@types/node@npm:16.9.1"
+  checksum: b9b9ee7e36004b09d56bf69703957ec4721f2e12f5d258bf2d92155e7d760ca1d73a04fe679856ef4d67fa56015bca71e9485c36ea99f04bc727c7a23cd91329
   languageName: node
   linkType: hard
 

@@ -17,18 +17,11 @@ import { toMatchFile } from 'jest-file-snapshot'
 
 const rootPath = path.join(__dirname, '/')
 
-const fixtures = [
-  // 'getAuthorDocument',
-  'getPostDocument',
-  'getPostDocumentAdvanced',
-  // 'updateDocument',
-  // 'updateDocument-no-collection',
-]
 const fixtures2 = [
-  // {
-  //   name: 'getPostDocumentAdvanced',
-  //   assert: 'output',
-  // },
+  {
+    name: 'getPostDocumentAdvanced',
+    assert: 'output',
+  },
   {
     name: 'updatePostDocumentAdvanced',
     assert: 'file',
@@ -45,6 +38,7 @@ describe('The given configuration', () => {
       const { response, expectedResponsePath } = await setupFixture2(
         rootPath,
         tinaSchema,
+        // @ts-ignore
         fixture
       )
 

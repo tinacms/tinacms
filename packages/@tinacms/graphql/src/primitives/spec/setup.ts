@@ -171,7 +171,8 @@ export const setupFixture2 = async (
 
   const responseString =
     fixture.assert === 'file'
-      ? await database.bridge.get(fixture.filename)
+      ? // @ts-ignore
+        await database.bridge.get(fixture.filename)
       : `${JSON.stringify(response, null, 2)}\n`
 
   if (response.errors) {

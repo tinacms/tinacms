@@ -19,7 +19,7 @@
   "scripts": {
     "build": "yarn tsup src/index.ts --format cjs --dts",
     "watch": "yarn tsup src/index.ts --watch --format cjs --dts",
-    "types": "yarn tsc",
+    "types": "yarn tsc --project tsconfig.real.js",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
     "test": "jest"
@@ -31,6 +31,7 @@
     "@types/aws-sdk": "^2.7.0",
     "@types/estree": "^0.0.50",
     "@types/mdast": "^3.0.10",
+    "@types/node": "^16.9.1",
     "aws-sdk": "^2.930.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",
