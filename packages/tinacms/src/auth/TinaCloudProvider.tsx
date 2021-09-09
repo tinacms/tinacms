@@ -18,7 +18,7 @@ import { TinaCMS, TinaProvider, MediaStore } from '@tinacms/toolkit'
 import { Client } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
-import { useEditState } from '../edit-state'
+import { setEditing } from '../edit-state'
 
 type ModalNames = null | 'authenticate'
 
@@ -49,7 +49,6 @@ export const AuthWallInner = ({
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [showChildren, setShowChildren] = useState<boolean>(false)
-  const { setEdit } = useEditState()
 
   React.useEffect(() => {
     client.isAuthenticated().then((isAuthenticated) => {
@@ -93,8 +92,14 @@ export const AuthWallInner = ({
             ...otherModalActions,
             {
               action: async () => {
-                setActiveModal(null)
-                setEdit(false)
+                // This does not work it looks like we have somehow getting two contexts
+                // console.log({ setEdit })
+                // setEdit(false)
+                // setActiveModal(null)
+
+                // This is a temp fix
+                setEditing(false) // set editing just sets the local storage
+                window.location.reload()
               },
               name: 'Close',
               primary: false,
