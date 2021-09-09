@@ -1,13 +1,8 @@
-import { defaultNodeTypes, NodeTypes, SlateNodeType } from './deserialize'
-import type {
-  Root,
-  Content,
-  PhrasingContent,
-  StaticPhrasingContent,
-} from 'mdast'
-import { RichTypeWithNamespace } from '../../types'
+import { SlateNodeType } from './deserialize'
+import { RichTypeInner } from '../../types'
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
+import type { Content, PhrasingContent, StaticPhrasingContent } from 'mdast'
 
 export interface LeafType {
   text: string
@@ -28,23 +23,9 @@ export interface BlockType {
   children: Array<BlockType | LeafType>
 }
 
-interface Options {
-  nodeTypes: NodeTypes
-  listDepth?: number
-  ignoreParagraphNewline?: boolean
-}
-
-const isLeafNode = (node: BlockType | LeafType): node is LeafType => {
-  return typeof (node as LeafType).text === 'string'
-}
-
-const VOID_ELEMENTS: Array<keyof NodeTypes> = ['thematic_break']
-
-const BREAK_TAG = '<br>'
-
 export const stringify = (
   chunk: SlateNodeType,
-  field: RichTypeWithNamespace
+  field: RichTypeInner
 ): Content => {
   if (!chunk.type) {
     return {
@@ -343,6 +324,7 @@ ${out}
         return {
           ...blockChunk,
           children: children,
+          //@ts-ignore
           attributes: atts,
         }
       } catch (e) {

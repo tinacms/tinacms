@@ -7,13 +7,13 @@ import { stringify } from './slate/serialize'
 import deserialize from './slate/deserialize'
 import { TinaField } from '../..'
 import { visit } from 'unist-util-visit'
-import type { RichTypeWithNamespace } from '../types'
+import type { RichTypeInner } from '../types'
 
-export const parseMDX = (value: string, field: RichTypeWithNamespace) => {
+export const parseMDX = (value: string, field: RichTypeInner) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
   return parseMDXInner(tree, field)
 }
-export const parseMDXInner = (tree: any, field: RichTypeWithNamespace) => {
+export const parseMDXInner = (tree: any, field: RichTypeInner) => {
   visit(tree, ['mdxJsxFlowElement', 'mdxJsxTextElement'], (node) => {
     let props = {}
     if (!node.name) {
@@ -23,9 +23,12 @@ export const parseMDXInner = (tree: any, field: RichTypeWithNamespace) => {
       )
       props = mdx
     }
-    const template = field.templates.find(
-      (template) => template.name === node.name
-    )
+    const template = field.templates.find((template) => {
+      const templateName =
+        typeof template === 'string' ? template : template.name
+      return templateName === node.name
+    })
+
     if (node.children.length > 0) {
       node.attributes.push({
         value: node.children,
@@ -71,7 +74,7 @@ export const parseMDXInner = (tree: any, field: RichTypeWithNamespace) => {
   return { type: 'root', children: slateTree }
 }
 
-export const stringifyMDX = (value: unknown, field: RichTypeWithNamespace) => {
+export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
   // @ts-ignore: FIXME: validate this shape
   const slateTree: SlateNodeType[] = value.children
   try {
@@ -79,13 +82,11 @@ export const stringifyMDX = (value: unknown, field: RichTypeWithNamespace) => {
     const out = toMarkdown(
       {
         type: 'root',
+        // @ts-ignore
         children: tree,
       },
       {
-        extensions: [
-          mdxToMarkdown,
-          // mdxExpressionToMarkdown,
-        ],
+        extensions: [mdxToMarkdown],
       }
     )
     return out.replace(/&#x22;/g, `"`)
