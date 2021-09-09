@@ -42,7 +42,7 @@ export function ModalBuilder(modalProps: ModalBuilderProps) {
           </ModalBody>
           <ModalActions>
             {modalProps.actions.map((action) => (
-              <AsyncButton {...action} />
+              <AsyncButton key={action.name} {...action} />
             ))}
           </ModalActions>
         </ModalPopup>

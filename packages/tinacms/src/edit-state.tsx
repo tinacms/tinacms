@@ -83,9 +83,9 @@ export const setEditing = (isEditing: boolean) => {
   }
 }
 
-const EditContext = React.createContext({
+export const EditContext = React.createContext({
   edit: isEditing(),
-  setEdit: (editing: boolean) => {},
+  setEdit: undefined as (edit: boolean) => void,
 })
 
 /*
@@ -112,4 +112,10 @@ export const EditProvider: React.FC = ({ children }) => {
   )
 }
 
-export const useEditState = () => useContext(EditContext)
+export const useEditState = () => {
+  const { edit, setEdit } = useContext(EditContext)
+  if (!setEdit) {
+    throw new Error('No `TinaEditProvider` found')
+  }
+  return { edit, setEdit }
+}
