@@ -110,7 +110,7 @@ export interface OptionType {
   imageCaptionKey?: string
 }
 
-import type { Root, Content } from 'mdast'
+import type { Content } from 'mdast'
 
 export interface MdastNode {
   type?: string
@@ -177,10 +177,6 @@ export default function deserialize(node: MdxAstNode) {
     },
   }
 
-  const linkDestinationKey = 'link'
-  const imageSourceKey = 'link'
-  const imageCaptionKey = 'caption'
-
   switch (node.type) {
     case 'heading':
       return {
@@ -199,15 +195,15 @@ export default function deserialize(node: MdxAstNode) {
     case 'link':
       return {
         type: types.link,
-        [linkDestinationKey]: node.url,
+        link: node.url,
         children: node.children.map(deserialize),
       }
     case 'image':
       return {
         type: types.image,
         children: [{ type: 'text', text: '' }],
-        [imageSourceKey]: node.url,
-        [imageCaptionKey]: node.alt,
+        link: node.url,
+        caption: node.alt,
       }
     case 'blockquote':
       return {
