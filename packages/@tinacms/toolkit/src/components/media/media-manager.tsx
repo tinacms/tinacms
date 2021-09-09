@@ -178,7 +178,7 @@ export function MediaPicker({
   const [uploading, setUploading] = useState(false)
   const { getRootProps, getInputProps, isDragActive } = useDropzone({
     accept: cms.media.accept || 'image/*',
-
+    multiple: true,
     onDrop: async (files) => {
       try {
         setUploading(true)
@@ -210,7 +210,7 @@ export function MediaPicker({
 
   useEffect(disableScrollBody, [])
 
-  if (listState === 'loading') {
+  if (listState === 'loading' || uploading) {
     return <LoadingMediaList />
   }
 

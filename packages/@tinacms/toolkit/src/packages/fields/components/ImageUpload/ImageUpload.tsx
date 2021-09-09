@@ -147,9 +147,9 @@ export const ImageUpload = ({
             <ImageLoadingIndicator />
           ) : (
             <ImgPlaceholder>
-            Drag 'n' drop some files here,
+            Drag 'n' drop a file here,
             <br />
-            or click to select files
+            or click to select a file
           </ImgPlaceholder>
           )}
         </StyledImageContainer>
