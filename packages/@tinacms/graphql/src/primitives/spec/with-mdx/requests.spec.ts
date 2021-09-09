@@ -26,12 +26,13 @@ const fixtures = [
 ]
 const fixtures2 = [
   // {
-  //   name: 'getPostDocument',
-  //   assert: 'output'
+  //   name: 'getPostDocumentAdvanced',
+  //   assert: 'output',
   // },
   {
     name: 'updatePostDocumentAdvanced',
     assert: 'file',
+    filename: 'content/posts/hello-world-advanced.md',
   },
 ]
 import { tinaSchema } from './.tina/schema'

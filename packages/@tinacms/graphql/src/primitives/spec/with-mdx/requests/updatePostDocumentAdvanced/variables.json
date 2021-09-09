@@ -1,6 +1,6 @@
 {
   "params": {
-    "title": "Hello, World!",
+    "title": "Hello World",
     "author": "content/authors/homer.md",
     "body": {
       "type": "root",

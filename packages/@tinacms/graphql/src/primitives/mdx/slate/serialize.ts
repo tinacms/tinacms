@@ -137,6 +137,9 @@ export const stringify = (
         Object.entries(blockChunk.props).map(([key, value]) => {
           if (template.fields) {
             const field = template.fields.find((field) => field.name === key)
+            if (!field) {
+              throw new Error(`Unknown field for key ${key}`)
+            }
             switch (field.type) {
               case 'boolean':
               case 'datetime':
@@ -194,36 +197,28 @@ export const stringify = (
                       })
                     } else {
                       value.forEach((item) => {
-                        const entries = Object.entries(item)
-                        if (entries.length > 1) {
-                          throw new Error(
-                            `Poorly formatted mutation request for object with multiple templates, only 1 is permitted`
-                          )
-                        }
-                        entries.map(([templateName, item]) => {
-                          const template = field.templates.find(
-                            (template) => template.name === templateName
-                          )
-                          const v = {}
-                          template.fields.forEach((field) => {
-                            const fieldValue = item[field.name]
-                            if (fieldValue) {
-                              switch (field.type) {
-                                case 'boolean':
-                                case 'number':
-                                  v[field.name] = `${fieldValue}`
-                                  break
-                                case 'image':
-                                case 'datetime':
-                                case 'string':
-                                  v[field.name] = `"${fieldValue}"`
-                                  break
-                              }
-                              v['_template'] = `"${template.name}"`
+                        const template = field.templates.find(
+                          (template) => template.name === item._template
+                        )
+                        const v = {}
+                        template.fields.forEach((field) => {
+                          const fieldValue = item[field.name]
+                          if (fieldValue) {
+                            switch (field.type) {
+                              case 'boolean':
+                              case 'number':
+                                v[field.name] = `${fieldValue}`
+                                break
+                              case 'image':
+                              case 'datetime':
+                              case 'string':
+                                v[field.name] = `"${fieldValue}"`
+                                break
                             }
-                          })
-                          values.push(v)
+                            v['_template'] = `"${template.name}"`
+                          }
                         })
+                        values.push(v)
                       })
                     }
                   })

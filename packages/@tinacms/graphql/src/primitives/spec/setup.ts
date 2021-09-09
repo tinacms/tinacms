@@ -145,19 +145,22 @@ export const setupFixture2 = async (
   const request = await fs
     .readFileSync(path.join(rootPath, 'requests', fixture.name, 'request.gql'))
     .toString()
-  const variables = JSON.parse(
-    await fs
-      .readFileSync(
-        path.join(rootPath, 'requests', fixture.name, 'variables.json')
-      )
-      .toString()
-  )
-  console.log(variables)
+
+  let variables = {}
+  try {
+    variables = JSON.parse(
+      await fs
+        .readFileSync(
+          path.join(rootPath, 'requests', fixture.name, 'variables.json')
+        )
+        .toString()
+    )
+  } catch (e) {}
   const expectedResponsePath = await path.join(
     rootPath,
     'requests',
     fixture.name,
-    'response.md'
+    fixture.assert === 'file' ? 'response.md' : 'response.json'
   )
 
   const response = await resolve({
@@ -166,9 +169,10 @@ export const setupFixture2 = async (
     database,
   })
 
-  const responseString = await database.bridge.get(
-    'content/posts/hello-world-advanced.md'
-  )
+  const responseString =
+    fixture.assert === 'file'
+      ? await database.bridge.get(fixture.filename)
+      : `${JSON.stringify(response, null, 2)}\n`
 
   if (response.errors) {
     console.log(JSON.stringify(response.errors, null, 2))
