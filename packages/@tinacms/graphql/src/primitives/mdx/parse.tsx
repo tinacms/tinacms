@@ -1,7 +1,6 @@
 import { unified } from 'unified'
 import markdown from 'remark-parse'
 import mdx from 'remark-mdx'
-import deserialize from './slate/deserialize'
 import { TinaField } from '../..'
 import { visit } from 'unist-util-visit'
 import type { RichTypeInner } from '../types'
@@ -10,6 +9,55 @@ export const parseMDX = (value: string, field: RichTypeInner) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
   return parseMDXInner(tree, field)
 }
+/**
+ * ### Convert the MDXAST into an API-friendly format
+ *
+ * When we parse with Remark + MDX we get an AST which has a ton of JS capabilities, meaning
+ * we could pass this back into a JS runtime and evaluate it. Ex.
+ *
+ * ```mdx
+ * ## Hello world! The time and date is: {(new Date().toLocaleString())}
+ * ```
+ *
+ * However, as an intentional constraint we don't want this information as part of our API, as
+ * we don't intend to support the true JS runtime properties of MDX. Rather, we're using MDX for
+ * it's expressive syntax and it's advanced tooling with how it parses JSX inside Markdown.
+ *
+ * Parsing here does 2 things:
+ *
+ * #### Remove non-literal uses of JSX
+ * Things like <MyComponent myProp={() => alert("HI")} /> are not supported and will be ignored
+ *
+ * #### Convert remark nodes to slate-compatible nodes
+ *
+ * A remark node might look like this:
+ * ```js
+ * {
+ *   type: "heading",
+ *   depth: 1
+ *   children: [{type: 'text', value: 'Hello'}]
+ * }
+ * ```
+ * A slate-compatible node would be:
+ * ```js
+ * {
+ *   type: "heading_one",
+ *   children: [{type: 'text', text: 'Hello'}]
+ * }
+ * ```
+ * It's not a huge difference, but in general slate does better with less layers of indirection.
+ *
+ * While it may be desirable to ultimately serve a remark AST shape as part of the API response,
+ * it's currently much easier to only support the shape that works with Slate. This is ok for now for 2
+ * reasons.
+ *
+ * 1. Us providing the `TinaMarkdown` component on the frontend abstracts away an work the developer
+ * would need to do, so it doesn't really matter what shape the response is as long as the external API
+ * doesn't change
+ *
+ * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
+ * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
+ */
 export const parseMDXInner = (tree: any, field: RichTypeInner) => {
   // Delete useless position info
   visit(tree, (node) => {
@@ -51,7 +99,7 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
             )
           }
 
-          switchFields(attribute, field, props)
+          parseField(attribute, field, props)
         }
       } else {
         console.log(`Not sure what this is, type: ${attribute.type}`)
@@ -61,11 +109,11 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
     node.props = props
   })
 
-  const slateTree = tree.children.map(deserialize)
+  const slateTree = tree.children.map(remarkToSlate)
   return { type: 'root', children: slateTree }
 }
 
-const switchFields = (attribute, field: TinaField, props) => {
+const parseField = (attribute, field: TinaField, props) => {
   switch (field.type) {
     case 'boolean':
     case 'datetime':
@@ -94,6 +142,18 @@ const switchFields = (attribute, field: TinaField, props) => {
       } else {
         if (attribute.type === 'Property') {
           if (attribute.value.type === 'Literal') {
+            /**
+             * Attribute:
+             * ```js
+             * {
+             *   type: "Property",
+             *   value: {
+             *     type: "Literal",
+             *     value: "Some string"
+             *   }
+             * }
+             * ```
+             */
             props[attribute.key.name] = attribute.value.value
           }
         } else if (attribute.value?.type === 'mdxJsxAttributeValueExpression') {
@@ -147,7 +207,7 @@ const switchFields = (attribute, field: TinaField, props) => {
                       )
                     }
                     field.fields.forEach((field) => {
-                      switchFields(property, field, objectProps)
+                      parseField(property, field, objectProps)
                     })
                   }
                 })
@@ -176,7 +236,7 @@ const switchFields = (attribute, field: TinaField, props) => {
                           )
                         }
                         field.fields.forEach((field) => {
-                          switchFields(property, field, objectProps)
+                          parseField(property, field, objectProps)
                         })
                       }
                       if (field.templates) {
@@ -187,7 +247,7 @@ const switchFields = (attribute, field: TinaField, props) => {
                             )
                           }
                           fieldTemplate.fields.forEach((field) => {
-                            switchFields(property, field, objectProps)
+                            parseField(property, field, objectProps)
                           })
                         })
                       }
@@ -252,4 +312,310 @@ const switchFields = (attribute, field: TinaField, props) => {
       }
       break
   }
+}
+export interface NodeTypes {
+  paragraph: string
+  block_quote: string
+  code_block: string
+  link: string
+  image: string
+  ul_list: string
+  ol_list: string
+  listItem: string
+  heading: {
+    1: string
+    2: string
+    3: string
+    4: string
+    5: string
+    6: string
+  }
+  emphasis_mark: string
+  strong_mark: string
+  delete_mark: string
+  inline_code_mark: string
+  thematic_break: string
+}
+
+export type SlateNodeType =
+  | {
+      type: 'heading_one'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'heading_two'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'heading_three'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'heading_four'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'heading_five'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'heading_six'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'paragraph'
+      children: SlateNodeType[]
+    }
+  | {
+      children: SlateNodeType[]
+      link: string
+      type: 'link'
+    }
+  | {
+      type: 'block_quote'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'text'
+      text: string
+    }
+  | {
+      type: 'mdxJsxTextElement'
+      props: object
+      children: SlateNodeType[]
+      name: string
+    }
+  | {
+      type: 'mdxJsxFlowElement'
+      props: object
+      children: SlateNodeType[]
+      name: string
+    }
+//   paragraph: 'paragraph',
+//   block_quote: 'block_quote',
+//   code_block: 'code_block',
+//   link: 'link',
+//   ul_list: 'ul_list',
+//   ol_list: 'ol_list',
+//   listItem: 'list_item',
+//   heading: {
+//     1: 'heading_one',
+//     2: 'heading_two',
+//     3: 'heading_three',
+//     4: 'heading_four',
+//     5: 'heading_five',
+//     6: 'heading_six',
+//   },
+//   emphasis_mark: 'italic',
+//   strong_mark: 'bold',
+//   delete_mark: 'strikeThrough',
+//   inline_code_mark: 'code',
+//   thematic_break: 'thematic_break',
+//   image: 'image',
+// }
+
+type RecursivePartial<T> = {
+  [P in keyof T]?: RecursivePartial<T[P]>
+}
+
+export interface OptionType {
+  nodeTypes?: RecursivePartial<NodeTypes>
+  linkDestinationKey?: string
+  imageSourceKey?: string
+  imageCaptionKey?: string
+}
+
+import type { Content } from 'mdast'
+
+export interface MdastNode {
+  type?: string
+  ordered?: boolean
+  value?: string
+  text?: string
+  children?: Array<MdastNode>
+  depth?: 1 | 2 | 3 | 4 | 5 | 6
+  url?: string
+  alt?: string
+  lang?: string
+  // mdast metadata
+  position?: any
+  spread?: any
+  checked?: any
+  indent?: any
+}
+
+type MdxJsxFlowElement = {
+  type: 'mdxJsxFlowElement'
+  name: string
+  attributes: object
+  children: MdxAstNode[]
+}
+
+type MdxJsxTextElement = {
+  type: 'mdxJsxTextElement'
+  name: string
+  attributes: object
+  children: MdxAstNode[]
+}
+
+type MdxAstNode = Content | MdxJsxFlowElement | MdxJsxTextElement
+
+export const defaultNodeTypes: NodeTypes = {
+  paragraph: 'paragraph',
+  block_quote: 'block_quote',
+  code_block: 'code_block',
+  link: 'link',
+  ul_list: 'ul_list',
+  ol_list: 'ol_list',
+  listItem: 'list_item',
+  heading: {
+    1: 'heading_one',
+    2: 'heading_two',
+    3: 'heading_three',
+    4: 'heading_four',
+    5: 'heading_five',
+    6: 'heading_six',
+  },
+  emphasis_mark: 'italic',
+  strong_mark: 'bold',
+  delete_mark: 'strikeThrough',
+  inline_code_mark: 'code',
+  thematic_break: 'thematic_break',
+  image: 'image',
+}
+
+export default function remarkToSlate(node: MdxAstNode) {
+  const types = {
+    ...defaultNodeTypes,
+    heading: {
+      ...defaultNodeTypes.heading,
+    },
+  }
+
+  switch (node.type) {
+    case 'heading':
+      return {
+        type: types.heading[node.depth || 1],
+        children: node.children.map(remarkToSlate),
+      }
+    case 'list':
+      return {
+        type: node.ordered ? types.ol_list : types.ul_list,
+        children: node.children.map(remarkToSlate),
+      }
+    case 'listItem':
+      return {
+        type: types.listItem,
+        children: node.children.map(remarkToSlate),
+      }
+    case 'paragraph':
+      return {
+        type: types.paragraph,
+        children: node.children.map(remarkToSlate),
+      }
+    case 'link':
+      return {
+        type: types.link,
+        link: node.url,
+        children: node.children.map(remarkToSlate),
+      }
+    case 'image':
+      return {
+        type: types.image,
+        children: [{ type: 'text', text: '' }],
+        link: node.url,
+        caption: node.alt,
+      }
+    case 'blockquote':
+      return {
+        type: types.block_quote,
+        children: node.children.map(remarkToSlate),
+      }
+    case 'code':
+      return {
+        type: types.code_block,
+        language: node.lang,
+        children: [{ text: node.value }],
+      }
+
+    // case 'html':
+    //   if (node.value?.includes('<br>')) {
+    //     return {
+    //       break: true,
+    //       type: types.paragraph,
+    //       children: [{ text: node.value?.replace(/<br>/g, '') || '' }],
+    //     }
+    //   }
+    //   return { type: 'paragraph', children: [{ text: node.value || '' }] }
+
+    case 'emphasis':
+      return {
+        [types.emphasis_mark]: true,
+        ...forceLeafNode(node.children),
+        ...persistLeafFormats(node.children),
+      }
+    case 'strong':
+      return {
+        [types.strong_mark]: true,
+        ...forceLeafNode(node.children),
+        ...persistLeafFormats(node.children),
+      }
+    case 'delete':
+      return {
+        [types.delete_mark]: true,
+        ...forceLeafNode(node.children),
+        ...persistLeafFormats(node.children),
+      }
+    case 'inlineCode':
+      return {
+        [types.inline_code_mark]: true,
+        text: node.value,
+      }
+    case 'thematicBreak':
+      return {
+        type: types.thematic_break,
+        children: [{ type: 'text', text: '' }],
+      }
+    case 'text':
+      return { type: 'text', text: node.value || '' }
+    case 'mdxJsxFlowElement':
+    case 'mdxJsxTextElement':
+      return {
+        ...node,
+        children: undefined,
+      }
+    default:
+      console.log('unknown', node)
+      return { type: 'text', text: '' }
+  }
+}
+
+const forceLeafNode = (children: Array<MdxAstNode>) => ({
+  type: 'text',
+  text: children
+    .map((k) => {
+      switch (k.type) {
+        case 'text':
+          return k.value || ''
+        default:
+          throw new Error(`Not sure, this should be flattened to the same node`)
+      }
+    })
+    .join(''),
+})
+
+// This function is will take any unknown keys, and bring them up a level
+// allowing leaf nodes to have many different formats at once
+// for example, bold and italic on the same node
+function persistLeafFormats(children: Array<MdxAstNode>) {
+  return children.reduce((acc, node) => {
+    Object.keys(node).forEach(function (key) {
+      if (key === 'children' || key === 'type' || key === 'text') return
+
+      // @ts-ignore
+      acc[key] = node[key]
+    })
+
+    return acc
+  }, {})
 }
