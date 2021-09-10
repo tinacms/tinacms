@@ -19,6 +19,8 @@ limitations under the License.
 import * as React from 'react'
 import { FieldProps } from './fieldProps'
 import styled, { css } from 'styled-components'
+import { useEvent } from '../../react-core/use-cms-event'
+import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 
 export type InputFieldType<ExtraFieldProps, InputProps> =
   FieldProps<InputProps> & ExtraFieldProps
@@ -42,7 +44,7 @@ export function wrapFieldsWithMeta<ExtraFieldProps = {}, InputProps = {}>(
   )
 }
 
-interface FieldMetaProps {
+interface FieldMetaProps extends React.HTMLAttributes<HTMLElement> {
   name: string
   children: any
   label?: string
@@ -58,9 +60,18 @@ export const FieldMeta = ({
   error,
   margin = true,
   children,
+  ...props
 }: FieldMetaProps) => {
+  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
+  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
   return (
-    <FieldWrapper margin={margin}>
+    <FieldWrapper
+      margin={margin}
+      onMouseOver={() => setHoveredField({ fieldName: name })}
+      onMouseOut={() => setHoveredField({ fieldName: null })}
+      onClick={() => setFocusedField({ fieldName: name })}
+      {...props}
+    >
       <FieldLabel htmlFor={name}>
         {label || name}
         {description && <FieldDescription>{description}</FieldDescription>}

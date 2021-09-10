@@ -24,6 +24,8 @@ import { Toolbar } from '../packages/react-toolbar'
 import { useCMS } from '../react-tinacms/use-cms'
 import { Alerts } from '../packages/react-alerts'
 import { MediaManager } from './media'
+import { ActiveFieldIndicator } from './ActiveFieldIndicator'
+import { MutationSignalProvider } from './MutationSignal'
 
 export interface TinaUIProps {
   position?: SidebarPosition
@@ -39,18 +41,21 @@ export const TinaUI: React.FC<TinaUIProps> = ({
   const cms = useCMS()
 
   return (
-    <ModalProvider>
-      <Alerts alerts={cms.alerts} />
-      {cms.enabled && styled && <Theme />}
-      {cms.enabled && cms.toolbar && <Toolbar />}
-      <MediaManager />
-      {cms.sidebar ? (
-        <SidebarProvider position={position} sidebar={cms.sidebar}>
-          {children}
-        </SidebarProvider>
-      ) : (
-        children
-      )}
-    </ModalProvider>
+    <MutationSignalProvider>
+      <ModalProvider>
+        <Alerts alerts={cms.alerts} />
+        {cms.enabled && styled && <Theme />}
+        {cms.enabled && cms.toolbar && <Toolbar />}
+        <MediaManager />
+        {cms.sidebar ? (
+          <SidebarProvider position={position} sidebar={cms.sidebar}>
+            {children}
+          </SidebarProvider>
+        ) : (
+          children
+        )}
+        <ActiveFieldIndicator />
+      </ModalProvider>
+    </MutationSignalProvider>
   )
 }

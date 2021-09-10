@@ -5,7 +5,7 @@ import { Container } from "../container";
 import { Section } from "../section";
 import { ThemeContext } from "../theme";
 
-export const Hero = ({ data }) => {
+export const Hero = ({ data, parentField }) => {
   const theme = React.useContext(ThemeContext);
   const headlineColorClasses = {
     blue: "from-blue-400 to-blue-600",
@@ -26,13 +26,17 @@ export const Hero = ({ data }) => {
       >
         <div className="row-start-2 lg:row-start-1 lg:col-start-1 lg:col-end-3 text-center lg:text-left">
           {data.tagline && (
-            <h2 className="relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20">
+            <h2
+              data-tinafield={`${parentField}.tagline`}
+              className="relative inline-block px-3 py-1 mb-8 text-md font-bold tracking-wide title-font z-20"
+            >
               {data.tagline}
               <span className="absolute w-full h-full left-0 top-0 rounded-full -z-1 bg-current opacity-7"></span>
             </h2>
           )}
           {data.headline && (
             <h3
+              data-tinafield={`${parentField}.headline`}
               className={`w-full relative	mb-10 text-5xl font-extrabold tracking-normal leading-tight title-font`}
             >
               <span
@@ -48,6 +52,7 @@ export const Hero = ({ data }) => {
           )}
           {data.text && (
             <div
+              data-tinafield={`${parentField}.text`}
               className={`prose prose-lg mx-auto lg:mx-0 mb-10 ${
                 data.color === "primary" ? `prose-primary` : `dark:prose-dark`
               }`}
@@ -57,6 +62,7 @@ export const Hero = ({ data }) => {
           )}
           {data.actions && (
             <Actions
+              parentField={`${parentField}.actions`}
               className="justify-center lg:justify-start py-2"
               parentColor={data.color}
               actions={data.actions}
@@ -64,7 +70,10 @@ export const Hero = ({ data }) => {
           )}
         </div>
         {data.image && (
-          <div className="row-start-1 flex justify-center">
+          <div
+            data-tinafield={`${parentField}.image`}
+            className="row-start-1 flex justify-center"
+          >
             <img
               className="w-full max-w-xs lg:max-w-none h-auto"
               alt={data.image.alt}

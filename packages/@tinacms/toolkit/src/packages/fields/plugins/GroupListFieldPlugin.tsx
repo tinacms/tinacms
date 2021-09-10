@@ -31,6 +31,8 @@ import {
 } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { FieldDescription } from './wrapFieldWithMeta'
+import { useEvent } from '../../react-core/use-cms-event'
+import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -143,6 +145,9 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
   const title = label || (field.label || field.name) + ' Item'
+
+  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
+  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
   return (
     <Draggable
       type={field.name}
@@ -159,7 +164,16 @@ const Item = ({ tinaForm, field, index, item, label, ...p }: ItemProps) => {
             {...p}
           >
             <DragHandle />
-            <ItemClickTarget onClick={() => setExpanded(true)}>
+            <ItemClickTarget
+              onMouseOver={() =>
+                setHoveredField({ fieldName: `${field.name}.${index}` })
+              }
+              onMouseOut={() => setHoveredField({ fieldName: null })}
+              onClick={() => {
+                setExpanded(true)
+                setFocusedField({ fieldName: `${field.name}.${index}` })
+              }}
+            >
               <GroupLabel>{title}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
