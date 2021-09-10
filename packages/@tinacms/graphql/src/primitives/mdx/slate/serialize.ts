@@ -4,44 +4,24 @@ import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import type { Content, PhrasingContent, StaticPhrasingContent } from 'mdast'
 
-export interface LeafType {
-  text: string
-  strikeThrough?: boolean
-  bold?: boolean
-  italic?: boolean
-  code?: boolean
-  // parentType?: string
-}
-
-export interface BlockType {
-  type: string
-  // parentType?: string
-  link?: string
-  caption?: string
-  language?: string
-  break?: boolean
-  children: Array<BlockType | LeafType>
-}
-
 export const stringify = (
-  chunk: SlateNodeType,
+  node: SlateNodeType,
   field: RichTypeInner
 ): Content => {
-  if (!chunk.type) {
+  if (!node.type) {
     return {
       type: 'text',
       // @ts-ignore
-      value: chunk.text || '',
+      value: node.text || '',
     }
   }
-  const blockChunk = chunk
 
-  switch (blockChunk.type) {
+  switch (node.type) {
     case 'heading_one':
       return {
         type: 'heading',
         depth: 1,
-        children: blockChunk.children.map((child) =>
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
@@ -49,7 +29,7 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 2,
-        children: blockChunk.children.map((child) =>
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
@@ -57,7 +37,7 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 3,
-        children: blockChunk.children.map((child) =>
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
@@ -65,7 +45,7 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 4,
-        children: blockChunk.children.map((child) =>
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
@@ -73,7 +53,7 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 5,
-        children: blockChunk.children.map((child) =>
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
@@ -81,22 +61,22 @@ export const stringify = (
       return {
         type: 'heading',
         depth: 6,
-        children: blockChunk.children.map((child) =>
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
     case 'paragraph':
       return {
         type: 'paragraph',
-        children: blockChunk.children.map((child) =>
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
     case 'link':
       return {
         type: 'link',
-        url: blockChunk.link,
-        children: blockChunk.children.map((child) =>
+        url: node.link,
+        children: node.children.map((child) =>
           stringify(child, field)
         ) as StaticPhrasingContent[],
       }
@@ -109,13 +89,13 @@ export const stringify = (
           if (typeof fieldTemplate === 'string') {
             throw new Error(`Global templates not yet supported`)
           } else {
-            return fieldTemplate.name === blockChunk.name
+            return fieldTemplate.name === node.name
           }
         })
         if (typeof template === 'string') {
           throw new Error(`Global templates not yet supported`)
         }
-        Object.entries(blockChunk.props).map(([key, value]) => {
+        Object.entries(node.props).map(([key, value]) => {
           if (template.fields) {
             const field = template.fields.find((field) => field.name === key)
             if (!field) {
@@ -322,7 +302,7 @@ ${out}
         })
 
         return {
-          ...blockChunk,
+          ...node,
           children: children,
           //@ts-ignore
           attributes: atts,
@@ -335,10 +315,10 @@ ${out}
       return {
         type: 'text',
         // @ts-ignore
-        value: blockChunk.text || '',
+        value: node.text || '',
       }
     default:
-      console.log(`Unrecognized field type: ${blockChunk.type}`)
+      console.log(`Unrecognized field type: ${node.type}`)
       break
   }
   return { type: 'text', value: '' }
