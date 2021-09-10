@@ -5,6 +5,7 @@ import { ThemeContext } from "./theme";
 
 export const Actions = ({
   parentColor = "default",
+  parentField = "",
   className = "",
   actions,
 }) => {
@@ -63,6 +64,7 @@ export const Actions = ({
             element = (
               <Link key={index} href={action.link ? action.link : "/"}>
                 <button
+                  data-tinafield={`${parentField}.${index}`}
                   className={`z-10 relative flex items-center px-7 py-3 font-semibold text-lg transition duration-150 ease-out  rounded transform focus:shadow-outline focus:outline-none focus:ring-2 ring-offset-current ring-offset-2 whitespace-nowrap ${
                     parentColor === "primary"
                       ? invertedButtonColorClasses[theme.color]
@@ -83,6 +85,7 @@ export const Actions = ({
             element = (
               <Link key={index} href={action.link ? action.link : "/"} passHref>
                 <a
+                  data-tinafield={`${parentField}.${index}`}
                   className={`group inline-flex items-center font-semibold text-lg transition duration-150 ease-out ${
                     parentColor === "primary"
                       ? `text-white  hover:text-gray-50`
