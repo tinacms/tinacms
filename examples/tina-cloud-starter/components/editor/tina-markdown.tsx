@@ -82,13 +82,32 @@ export const TinaMarkdown = ({
                 <TinaMarkdown>{child.children}</TinaMarkdown>
               </p>
             );
+          case "image":
+            return <img src={child.link} alt={child.caption} />;
           case "link":
             return (
               <a href={child.link}>
                 <TinaMarkdown>{child.children}</TinaMarkdown>
               </a>
             );
+          case "code_block":
+            return (
+              <pre>
+                <code>
+                  <TinaMarkdown>{child.children}</TinaMarkdown>
+                </code>
+              </pre>
+            );
+          case "thematic_break":
+            return <hr />;
           case "text":
+            if (child.bold) {
+              return <strong>{child.text}</strong>;
+            }
+            if (child.italic) {
+              return <em>{child.text}</em>;
+            }
+
             return child.text;
           case "mdxJsxTextElement":
           case "mdxJsxFlowElement":
@@ -109,7 +128,7 @@ export const TinaMarkdown = ({
               throw new Error(`No component provided for ${child.name}`);
             }
           default:
-            console.log(`Didn't find element of type ${child.type}`, child);
+            console.log(`No tina renderer for ${child.type}`, child);
         }
       })}
     </>
@@ -156,6 +175,8 @@ export type SlateNodeType =
     }
   | {
       type: "text";
+      bold?: boolean;
+      italic?: boolean;
       text: string;
     }
   | {
@@ -169,4 +190,21 @@ export type SlateNodeType =
       props: object;
       children: SlateNodeType[];
       name: string;
+    }
+  | {
+      type: "block_quote";
+      children: SlateNodeType[];
+    }
+  | {
+      type: "code_block";
+      language: string;
+      children: SlateNodeType[];
+    }
+  | {
+      type: "image";
+      link: string;
+      caption: string;
+    }
+  | {
+      type: "thematic_break";
     };

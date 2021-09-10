@@ -1,0 +1,127 @@
+{
+  "data": {
+    "getPostDocument": {
+      "data": {
+        "title": "Just Another Blog Post",
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "heading_one",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "Hello World"
+                }
+              ]
+            },
+            {
+              "type": "heading_two",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "This is a "
+                },
+                {
+                  "type": "link",
+                  "link": "http://example.com",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "test"
+                    }
+                  ]
+                }
+              ]
+            },
+            {
+              "type": "heading_three",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "To See "
+                },
+                {
+                  "italic": true,
+                  "type": "text",
+                  "text": "how",
+                  "value": "how"
+                },
+                {
+                  "type": "text",
+                  "text": " well"
+                }
+              ]
+            },
+            {
+              "type": "heading_four",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "The markdown "
+                },
+                {
+                  "bold": true,
+                  "type": "text",
+                  "text": "parser",
+                  "value": "parser"
+                },
+                {
+                  "type": "text",
+                  "text": " handles marks"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "It has photos"
+                }
+              ]
+            },
+            {
+              "type": "thematic_break",
+              "children": [
+                {
+                  "type": "text",
+                  "text": ""
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "image",
+                  "link": "http://placehold.it/300x200",
+                  "caption": "Picture of a placeholder"
+                }
+              ]
+            },
+            {
+              "type": "code_block",
+              "language": "js",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "console.log(\"code blocks\")"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "And other stuff"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}

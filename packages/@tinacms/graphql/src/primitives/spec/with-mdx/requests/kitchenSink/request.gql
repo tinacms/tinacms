@@ -1,0 +1,10 @@
+query {
+  getPostDocument(relativePath: "kitchen-sink.md") {
+    ... on PostDocument {
+      data {
+        title
+        body
+      }
+    }
+  }
+}

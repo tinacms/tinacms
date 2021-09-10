@@ -36,9 +36,28 @@ export const Editor = (props) => {
     props.input.onChange({ type: "root", children: value });
   }, [JSON.stringify(value)]);
 
-  // const renderLeaf = React.useCallback((props: RenderLeafProps) => {
-  //   return <span {...props.attributes}>{props.children}</span>;
-  // }, []);
+  const renderLeaf = React.useCallback(
+    ({ leaf, attributes, children }: RenderLeafProps) => {
+      if (leaf.bold) {
+        children = <strong>{children}</strong>;
+      }
+
+      if (leaf.code) {
+        children = <code>{children}</code>;
+      }
+
+      if (leaf.italic) {
+        children = <em>{children}</em>;
+      }
+
+      if (leaf.underline) {
+        children = <u>{children}</u>;
+      }
+
+      return <span {...attributes}>{children}</span>;
+    },
+    []
+  );
 
   const renderElement = React.useCallback(
     (props: RenderElementProps) => {
@@ -56,9 +75,25 @@ export const Editor = (props) => {
           return <h5 {...props.attributes}>{props.children}</h5>;
         case "heading_six":
           return <h6 {...props.attributes}>{props.children}</h6>;
+        case "paragraph":
+          return <p {...props.attributes}>{props.children}</p>;
+        case "thematic_break":
+          return <hr {...props.attributes} />;
+        case "image":
+          return <img src={element.link} alt={element.caption} />;
+        case "code_block":
+          return (
+            <pre {...props.attributes}>
+              <code>{props.children}</code>
+            </pre>
+          );
         case "link":
           return (
-            <a {...props.attributes} href={element.link}>
+            <a
+              style={{ textDecoration: "underline" }}
+              {...props.attributes}
+              href={element.link}
+            >
               {props.children}
             </a>
           );
@@ -128,6 +163,7 @@ export const Editor = (props) => {
             </button>
           );
         default:
+          console.log(`no slate renderer for ${element.type}`, element);
           return <p {...props.attributes}>{props.children}</p>;
       }
     },
@@ -138,6 +174,7 @@ export const Editor = (props) => {
     switch (element.type) {
       case "mdxJsxFlowElement":
       case "mdxJsxTextElement":
+      case "image":
         return true;
       default:
         return false;
@@ -213,7 +250,7 @@ export const Editor = (props) => {
             setValue(newValue);
           }}
         >
-          <Editable renderElement={renderElement} />
+          <Editable renderLeaf={renderLeaf} renderElement={renderElement} />
         </Slate>
       </div>
     </>
@@ -249,7 +286,7 @@ const MdxPicker = (props) => {
 };
 
 const normalize = (node: object) => {
-  if (["mdxJsxFlowElement", "mdxJsxTextElement"].includes(node.type)) {
+  if (["mdxJsxFlowElement", "mdxJsxTextElement", "image"].includes(node.type)) {
     return {
       ...node,
       children: [{ type: "text", text: "" }],

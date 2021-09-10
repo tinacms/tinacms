@@ -391,7 +391,23 @@ export type SlateNodeType =
       children: SlateNodeType[]
       name: string
     }
-//   paragraph: 'paragraph',
+  | {
+      type: 'block_quote'
+      children: SlateNodeType[]
+    }
+  | {
+      type: 'code_block'
+      language: string
+      value: string
+    }
+  | {
+      type: 'image'
+      link: string
+      caption: string
+    }
+  | {
+      type: 'thematic_break'
+    }
 //   block_quote: 'block_quote',
 //   code_block: 'code_block',
 //   link: 'link',
@@ -522,7 +538,7 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'image':
       return {
         type: types.image,
-        children: [{ type: 'text', text: '' }],
+        // children: [{ type: 'text', text: '' }],
         link: node.url,
         caption: node.alt,
       }
@@ -535,7 +551,8 @@ export default function remarkToSlate(node: MdxAstNode) {
       return {
         type: types.code_block,
         language: node.lang,
-        children: [{ text: node.value }],
+        children: [{ type: 'text', text: node.value }],
+        // value: node.value
       }
 
     // case 'html':
@@ -590,19 +607,33 @@ export default function remarkToSlate(node: MdxAstNode) {
   }
 }
 
-const forceLeafNode = (children: Array<MdxAstNode>) => ({
-  type: 'text',
-  text: children
-    .map((k) => {
-      switch (k.type) {
-        case 'text':
-          return k.value || ''
-        default:
-          throw new Error(`Not sure, this should be flattened to the same node`)
-      }
-    })
-    .join(''),
-})
+const forceLeafNode = (children: Array<MdxAstNode>) => {
+  const extraProps = {}
+  const text = []
+
+  children.forEach((k) => {
+    switch (k.type) {
+      case 'text':
+        return text.push(k.value || '')
+      case 'strong':
+      case 'emphasis':
+      case 'code':
+        const format = { strong: 'bold', em: 'italic', code: 'code' }
+        extraProps[format[k.type]] = true
+        return k.children.forEach((item) => {
+          text.push(item.value)
+        })
+      default:
+        throw new Error(`Not sure, this should be flattened to the same node`)
+    }
+  })
+
+  return {
+    type: 'text',
+    text: text.join(''),
+    ...extraProps,
+  }
+}
 
 // This function is will take any unknown keys, and bring them up a level
 // allowing leaf nodes to have many different formats at once

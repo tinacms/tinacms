@@ -27,6 +27,11 @@ const fixtures2 = [
     assert: 'file',
     filename: 'content/posts/hello-world-advanced.md',
   },
+  {
+    name: 'kitchenSink',
+    assert: 'output',
+    filename: 'content/posts/kitchen-sink.md',
+  },
 ]
 import { tinaSchema } from './.tina/schema'
 
