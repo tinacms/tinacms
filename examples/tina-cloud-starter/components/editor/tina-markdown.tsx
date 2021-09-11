@@ -82,6 +82,12 @@ export const TinaMarkdown = ({
                 <TinaMarkdown>{child.children}</TinaMarkdown>
               </p>
             );
+          case "block_quote":
+            return (
+              <blockquote>
+                <TinaMarkdown>{child.children}</TinaMarkdown>
+              </blockquote>
+            );
           case "image":
             return <img src={child.link} alt={child.caption} />;
           case "link":

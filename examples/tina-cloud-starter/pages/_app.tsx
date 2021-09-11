@@ -5,7 +5,7 @@ import { Layout } from "../components/layout";
 // @ts-ignore
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
-import { Editor } from "../components/editor";
+import { RichEditor } from "../components/editor";
 
 import React from "react";
 
@@ -28,7 +28,7 @@ const App = ({ Component, pageProps }) => {
               cms.sidebar.isOpen = true;
               cms.fields.add({
                 name: "rich-text",
-                Component: Editor,
+                Component: RichEditor,
               });
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);

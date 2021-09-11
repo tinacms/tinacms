@@ -86,6 +86,7 @@ const Panel = function Panel({
   //     name: `${field.name}.${subField.name}`,
   //   }))
   // }, [field.fields, field.name])
+  console.log({ isExpanded })
 
   return (
     <FormPortal>
@@ -147,7 +148,6 @@ const Header: StyledComponent<'div', {}, {}> = styled.div`
   border: 1px solid var(--tina-color-grey-2);
   border-left: 3px solid var(--tina-color-primary);
   border-radius: var(--tina-radius-small);
-  margin: 8px 0 8px 0;
   overflow: visible;
   line-height: 1.35;
   padding: 12px;

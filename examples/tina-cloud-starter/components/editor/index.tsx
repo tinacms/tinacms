@@ -1,7 +1,25 @@
 import React from "react";
 import { Form, MdxField, PopupAdder } from "tinacms";
-import { createEditor, Node, Transforms, BaseRange, Element } from "slate";
-import { Slate, Editable, withReact, ReactEditor } from "slate-react";
+import {
+  Range,
+  Point,
+  Element as SlateElement,
+  Descendant,
+  Editor,
+  createEditor,
+  Node,
+  Transforms,
+  BaseRange,
+  Element,
+} from "slate";
+import {
+  useSelected,
+  useFocused,
+  Slate,
+  Editable,
+  withReact,
+  ReactEditor,
+} from "slate-react";
 import type { BaseEditor } from "slate";
 import type { RenderLeafProps, RenderElementProps } from "slate-react";
 import type { SlateNodeType } from "./tina-markdown";
@@ -17,9 +35,11 @@ declare module "slate" {
   }
 }
 
-export const Editor = (props) => {
+export const RichEditor = (props) => {
   // Hot reloads when usign useMemo to initialize https://github.com/ianstormtaylor/slate/issues/4081
-  const [editor] = React.useState(withReact(createEditor()));
+  const [editor] = React.useState(
+    withShortcuts(withReact(createEditor()))
+  ) as (BaseEditor & ReactEditor)[];
   const [value, setValue] = React.useState(
     props.input.value.children
       ? props.input.value.children?.map(normalize)
@@ -87,6 +107,15 @@ export const Editor = (props) => {
               <code>{props.children}</code>
             </pre>
           );
+        case "block_quote":
+          return (
+            <blockquote
+              style={{ borderLeft: "2px solid #eee", paddingLeft: "8px" }}
+              {...props.attributes}
+            >
+              {props.children}
+            </blockquote>
+          );
         case "link":
           return (
             <a
@@ -99,68 +128,57 @@ export const Editor = (props) => {
           );
         case "mdxJsxTextElement":
           return (
-            <button {...props.attributes}>
-              <span contentEditable={false}>
-                <MdxPicker
-                  inline={true}
-                  {...props}
-                  templates={templates}
-                  isReady={!!voidSelection}
-                  voidSelection={voidSelection}
-                  onChange={(value, selection) => {
-                    const newProperties: Partial<Element> = {
-                      props: value,
-                    };
-                    Transforms.setNodes(editor, newProperties, {
-                      /**
-                       * match traverses the ancestors of the relevant node
-                       * so matching on type works for this, but likely won't work
-                       * on more complex nested mdxJsxTextElement nodes. I think
-                       * we'll want to match the path to the selection path, but
-                       * they're off by one:
-                       * selection.focus.path => [0, 1, 0]
-                       * and path is [0, 1]. I believe that's because the last
-                       * 0 in the focus.path array is referring to the text node
-                       */
-                      match: (node, path) => {
-                        // console.log(selection.focus);
-                        // console.log(path, node.type);
-                        if (node.type === "mdxJsxTextElement") {
-                          return true;
-                        }
-                        return false;
-                      },
-                      at: selection,
-                    });
-                  }}
-                />
-              </span>
-              {props.children}
-            </button>
+            <MdxPicker
+              inline={true}
+              {...props}
+              templates={templates}
+              isReady={!!voidSelection}
+              voidSelection={voidSelection}
+              onChange={(value, selection) => {
+                const newProperties: Partial<Element> = {
+                  props: value,
+                };
+                Transforms.setNodes(editor, newProperties, {
+                  /**
+                   * match traverses the ancestors of the relevant node
+                   * so matching on type works for this, but likely won't work
+                   * on more complex nested mdxJsxTextElement nodes. I think
+                   * we'll want to match the path to the selection path, but
+                   * they're off by one:
+                   * selection.focus.path => [0, 1, 0]
+                   * and path is [0, 1]. I believe that's because the last
+                   * 0 in the focus.path array is referring to the text node
+                   */
+                  match: (node, path) => {
+                    // console.log(selection.focus);
+                    // console.log(path, node.type);
+                    if (node.type === "mdxJsxTextElement") {
+                      return true;
+                    }
+                    return false;
+                  },
+                  at: selection,
+                });
+              }}
+            />
           );
         case "mdxJsxFlowElement":
           return (
-            <button style={{ width: "100%" }} {...props.attributes}>
-              <span contentEditable={false}>
-                {/* <img src="http://placehold.it/300x200" /> */}
-                <MdxPicker
-                  inline={false}
-                  {...props}
-                  templates={templates}
-                  isReady={!!voidSelection}
-                  voidSelection={voidSelection}
-                  onChange={(value, selection) => {
-                    const newProperties: Partial<Element> = {
-                      props: value,
-                    };
-                    Transforms.setNodes(editor, newProperties, {
-                      at: selection,
-                    });
-                  }}
-                />
-              </span>
-              {props.children}
-            </button>
+            <MdxPicker
+              {...props}
+              inline={false}
+              templates={templates}
+              isReady={!!voidSelection}
+              voidSelection={voidSelection}
+              onChange={(value, selection) => {
+                const newProperties: Partial<Element> = {
+                  props: value,
+                };
+                Transforms.setNodes(editor, newProperties, {
+                  at: selection,
+                });
+              }}
+            />
           );
         default:
           console.log(`no slate renderer for ${element.type}`, element);
@@ -258,7 +276,8 @@ export const Editor = (props) => {
 };
 
 const MdxPicker = (props) => {
-  const ref = React.useRef();
+  const isFocused = useFocused();
+  const isSelected = useSelected();
   const initialValues = props.element.props;
   const activeTemplate = props.templates.find(
     (template) => template.name === props.element.name
@@ -278,10 +297,22 @@ const MdxPicker = (props) => {
   }, [JSON.stringify(props.voidSelection)]);
 
   return (
-    <span ref={ref}>
+    <div
+      {...props.attributes}
+      style={{
+        display: props.inline ? "inline-block" : "block",
+        boxShadow: isSelected && isFocused ? "0 0 0 3px #B4D5FF" : "none",
+      }}
+    >
+      <div contentEditable={false}>
+        <MdxField
+          inline={props.inline}
+          tinaForm={form}
+          field={activeTemplate}
+        />
+      </div>
       {props.children}
-      <MdxField inline={props.inline} tinaForm={form} field={activeTemplate} />
-    </span>
+    </div>
   );
 };
 
@@ -299,4 +330,108 @@ const normalize = (node: object) => {
     };
   }
   return node;
+};
+
+const SHORTCUTS = {
+  "*": "list-item",
+  "-": "list-item",
+  "+": "list-item",
+  ">": "block_quote",
+  "#": "heading_one",
+  "##": "heading_two",
+  "###": "heading_three",
+  "####": "heading_four",
+  "#####": "heading_five",
+  "######": "heading_six",
+};
+
+const withShortcuts = (editor) => {
+  const { deleteBackward, insertText } = editor;
+
+  editor.insertText = (text) => {
+    const { selection } = editor;
+
+    if (text === " " && selection && Range.isCollapsed(selection)) {
+      const { anchor } = selection;
+      const block = Editor.above(editor, {
+        match: (n) => Editor.isBlock(editor, n),
+      });
+      const path = block ? block[1] : [];
+      const start = Editor.start(editor, path);
+      const range = { anchor, focus: start };
+      const beforeText = Editor.string(editor, range);
+      const type = SHORTCUTS[beforeText];
+
+      if (type) {
+        Transforms.select(editor, range);
+        Transforms.delete(editor);
+        const newProperties: Partial<SlateElement> = {
+          type,
+        };
+        Transforms.setNodes(editor, newProperties, {
+          match: (n) => Editor.isBlock(editor, n),
+        });
+
+        if (type === "list-item") {
+          const list: BulletedListElement = {
+            type: "bulleted-list",
+            children: [],
+          };
+          Transforms.wrapNodes(editor, list, {
+            match: (n) =>
+              !Editor.isEditor(n) &&
+              SlateElement.isElement(n) &&
+              n.type === "list-item",
+          });
+        }
+
+        return;
+      }
+    }
+
+    insertText(text);
+  };
+
+  editor.deleteBackward = (...args) => {
+    const { selection } = editor;
+
+    if (selection && Range.isCollapsed(selection)) {
+      const match = Editor.above(editor, {
+        match: (n) => Editor.isBlock(editor, n),
+      });
+
+      if (match) {
+        const [block, path] = match;
+        const start = Editor.start(editor, path);
+
+        if (
+          !Editor.isEditor(block) &&
+          SlateElement.isElement(block) &&
+          block.type !== "paragraph" &&
+          Point.equals(selection.anchor, start)
+        ) {
+          const newProperties: Partial<SlateElement> = {
+            type: "paragraph",
+          };
+          Transforms.setNodes(editor, newProperties);
+
+          if (block.type === "list-item") {
+            Transforms.unwrapNodes(editor, {
+              match: (n) =>
+                !Editor.isEditor(n) &&
+                SlateElement.isElement(n) &&
+                n.type === "bulleted-list",
+              split: true,
+            });
+          }
+
+          return;
+        }
+      }
+
+      deleteBackward(...args);
+    }
+  };
+
+  return editor;
 };
