@@ -15,7 +15,7 @@ import { ModalBuilder } from './AuthModal'
 import React, { useState } from 'react'
 import { TinaCMS, TinaProvider, MediaStore } from '@tinacms/toolkit'
 
-import { Client } from '../client'
+import { Client, TinaIOConfig } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
 import { setEditing } from '../edit-state'
@@ -33,6 +33,7 @@ export interface TinaCloudAuthWallProps {
   cms?: TinaCMS
   children: React.ReactNode
   loginScreen?: React.ReactNode
+  tinaioConfig?: TinaIOConfig
   getModalActions?: (args: {
     closeModal: () => void
   }) => { name: string; action: () => Promise<void>; primary: boolean }[]

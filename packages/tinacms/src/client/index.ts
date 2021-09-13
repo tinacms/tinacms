@@ -22,39 +22,46 @@ import {
 
 import { formify } from './formify'
 import gql from 'graphql-tag'
+export type TinaIOConfig =
+  | { baseUrl?: string; identityApiUrl: undefined; contentApiUrl: undefined }
+  | { baseUrl: undefined; identityApiUrl?: string; contentApiUrl?: string }
 
 interface ServerOptions {
   clientId: string
   branch: string
   customContentApiUrl?: string
   getTokenFn?: () => TokenObject
+  tinaioConfig?: TinaIOConfig
   tokenStorage?: 'MEMORY' | 'LOCAL_STORAGE' | 'CUSTOM'
 }
 
-const BASE_TINA_URL = process.env.BASE_TINA_URL || `tinajs.io`
-const IDENTITY_API_URL =
-  process.env.IDENTITY_API_OVERRIDE || `https://identity.${BASE_TINA_URL}`
-const CONTENT_API_URL =
-  process.env.CONTENT_API_OVERRIDE || `https://content.${BASE_TINA_URL}`
-
 export class Client {
   contentApiUrl: string
+  identityApiUrl: string
   schema: GraphQLSchema
   clientId: string
   query: string
   setToken: (_token: TokenObject) => void
   private getToken: () => TokenObject
   private token: string // used with memory storage
+  private baseUrl: string
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
-    /**
-     * Prevents a CORS-issue when the `branch` has slashes in it.
-     * https://github.com/tinacms/tinacms/issues/219
-     */
     const encodedBranch = encodeURIComponent(options.branch)
-    this.contentApiUrl =
-      options.customContentApiUrl ||
-      `${CONTENT_API_URL}/content/${options.clientId}/github/${encodedBranch}`
+    this.baseUrl = options.tinaioConfig?.baseUrl || 'tinajs.io'
+    if (options.tinaioConfig?.contentApiUrl) {
+      this.contentApiUrl =
+        options.customContentApiUrl || options.tinaioConfig.contentApiUrl
+    } else {
+      this.contentApiUrl =
+        options.customContentApiUrl ||
+        `https://content.${this.baseUrl}/content/${options.clientId}/github/${encodedBranch}`
+    }
+    if (options.tinaioConfig?.identityApiUrl) {
+      this.identityApiUrl = options.tinaioConfig.identityApiUrl
+    } else {
+      this.identityApiUrl = `https://identity.${this.baseUrl}`
+    }
 
     this.clientId = options.clientId
 
@@ -226,7 +233,7 @@ mutation addPendingDocumentMutation(
       return null
     }
 
-    const url = `${IDENTITY_API_URL}/v2/apps/${this.clientId}/currentUser`
+    const url = `${this.identityApiUrl}/v2/apps/${this.clientId}/currentUser`
 
     try {
       const res = await this.fetchWithToken(url, {
