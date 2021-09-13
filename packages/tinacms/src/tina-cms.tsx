@@ -16,6 +16,7 @@ import { useGraphqlForms } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
+import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
 
 import type { TinaCMS } from '@tinacms/toolkit'
@@ -167,6 +168,7 @@ export const TinaCMSProvider2 = ({
   isLocalClient,
   cmsCallback,
   mediaStore,
+  tinaioConfig,
   ...props
 }: {
   /** The query from getStaticProps */
@@ -191,6 +193,7 @@ export const TinaCMSProvider2 = ({
   documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
   /** TinaCMS media store instance */
   mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
+  tinaioConfig?: TinaIOConfig
 }) => {
   if (typeof props.query === 'string') {
     props.query
@@ -199,6 +202,7 @@ export const TinaCMSProvider2 = ({
     <TinaCloudProvider
       branch={branch}
       clientId={clientId}
+      tinaioConfig={tinaioConfig}
       isLocalClient={isLocalClient}
       cmsCallback={cmsCallback}
       mediaStore={mediaStore}
