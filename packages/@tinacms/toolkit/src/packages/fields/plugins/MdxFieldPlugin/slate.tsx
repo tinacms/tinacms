@@ -43,7 +43,7 @@ export const RichEditor = (props) => {
     props.input.value.children
       ? [
           ...props.input.value.children?.map(normalize),
-          { type: 'paragraph', children: [{ type: 'text', text: '' }] },
+          // { type: 'paragraph', children: [{ type: 'text', text: '' }] },
         ]
       : [{ type: 'paragraph', children: [{ type: 'text', text: '' }] }]
   )
@@ -242,7 +242,7 @@ export const RichEditor = (props) => {
                   },
                 ],
               },
-              { type: 'paragraph', children: [{ type: 'text', text: '' }] },
+              // { type: 'paragraph', children: [{ type: 'text', text: '' }] },
             ])
           }}
           templates={templates}

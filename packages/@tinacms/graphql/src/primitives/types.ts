@@ -173,13 +173,13 @@ export interface RichTypeWithNamespace extends TinaField {
   type: 'rich-text'
   namespace: string[]
   isBody?: boolean
-  templates?: (string | Template<true>)[]
+  templates?: (string | (Template<true> & { inline?: boolean }))[]
 }
 
 export interface RichTypeInner extends TinaField {
   type: 'rich-text'
   isBody?: boolean
-  templates?: (string | Template<false>)[]
+  templates?: (string | (Template<false> & { inline?: boolean }))[]
 }
 
 export type ObjectType<WithNamespace extends boolean> =

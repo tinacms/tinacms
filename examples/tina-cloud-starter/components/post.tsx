@@ -3,56 +3,35 @@ import { Container } from "./container";
 import { Section } from "./section";
 import { ThemeContext } from "./theme";
 import format from "date-fns/format";
-import { Hero } from "./blocks/hero";
-import { Content as ContentBlock } from "./blocks/content";
-import { Testimonial } from "./blocks/testimonial";
-import { Features } from "./blocks/features";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 
 const blockRenderer = {
-  Hero: (props) => <Hero data={props} />,
-  Features: (props) => <Features data={props} />,
-  Testimonial: (props) => <Testimonial data={props} />,
-  ContentBlock: (props) => <ContentBlock data={props} />,
-  Highlight: (props) => {
-    return <span style={{ background: "yellow", color: "black" }} {...props} />;
+  BlockQuote: (props) => {
+    return (
+      <div>
+        <blockquote>
+          {props.children}
+          {props.authorName}
+        </blockquote>
+      </div>
+    );
   },
-  LiveData: (props) => {
-    switch (props.value) {
-      case "currentTime":
-        return <Timer {...props} />;
-      case "currentURL":
-        return <span>You're viewing a page at {window.location.href}</span>;
+  DateTime: (props) => {
+    const dt = React.useMemo(() => {
+      return new Date();
+    }, []);
+
+    switch (props.format) {
+      case "iso":
+        return <span>{dt.toISOString()}</span>;
+      case "utc":
+        return <span>{dt.toUTCString()}</span>;
+      case "local":
+        return <span>{dt.toLocaleDateString()}</span>;
       default:
-        return null;
+        return <span>{dt.toLocaleDateString()}</span>;
     }
   },
-};
-export default function useInterval(callback, delay) {
-  const callbacRef = React.useRef(null);
-
-  // update callback function with current render callback that has access to latest props and state
-  React.useEffect(() => {
-    callbacRef.current = callback;
-  });
-
-  React.useEffect(() => {
-    if (!delay) {
-      return () => {};
-    }
-
-    const interval = setInterval(() => {
-      callbacRef.current && callbacRef.current();
-    }, delay);
-    return () => clearInterval(interval);
-  }, [delay]);
-}
-
-const Timer = () => {
-  const [time, setTime] = React.useState(0);
-  useInterval(() => setTime(time + 1), 1000);
-
-  return <span>Counting... {time}</span>;
 };
 
 export const Post = ({ data }) => {

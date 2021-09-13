@@ -441,91 +441,32 @@ export default defineSchema({
           label: "Body",
           name: "_body",
           templates: [
-            { ...heroBlockSchema, name: "Hero" },
-            { ...featureBlockShema, name: "Features" },
-            { ...contentBlockSchema, name: "ContentBlock" },
-            { ...testimonialBlockSchema, name: "Testimonial" },
             {
-              name: "Highlight",
+              name: "DateTime",
+              label: "Date & Time",
               inline: true,
-              label: "Highlight",
               fields: [
                 {
-                  name: "children",
-                  label: "Child Text",
-                  type: "rich-text",
-                  templates: [],
-                },
-                {
-                  name: "text",
-                  label: "Text",
+                  name: "format",
+                  label: "Format",
                   type: "string",
-                },
-                {
-                  name: "features",
-                  label: "Features",
-                  list: true,
-                  type: "string",
-                },
-                {
-                  name: "items",
-                  label: "Items",
-                  type: "object",
-                  fields: [
-                    {
-                      name: "text",
-                      label: "Text",
-                      type: "string",
-                    },
-                  ],
-                },
-                {
-                  name: "blocks",
-                  label: "Blocks",
-                  type: "object",
-                  list: true,
-                  templates: [
-                    {
-                      name: "myCta",
-                      label: "My CTA",
-                      fields: [
-                        {
-                          name: "text",
-                          label: "Text",
-                          type: "string",
-                        },
-                      ],
-                    },
-                  ],
-                },
-                {
-                  name: "leggo",
-                  label: "Leggo",
-                  type: "object",
-                  list: true,
-                  fields: [
-                    {
-                      name: "text",
-                      label: "Text",
-                      type: "string",
-                    },
-                  ],
+                  options: ["utc", "iso", "local"],
                 },
               ],
             },
             {
-              name: "LiveData",
-              // inline: true,
-              label: "LiveData",
+              name: "BlockQuote",
+              label: "Block Quote",
               fields: [
                 {
-                  name: "value",
-                  label: "Value",
+                  name: "children",
+                  label: "Quote",
+                  type: "rich-text",
+                },
+                {
+                  name: "authorName",
+                  label: "Author",
                   type: "string",
-                  options: [
-                    { label: "Current Time", value: "currentTime" },
-                    { label: "Current URL", value: "currentURL" },
-                  ],
                 },
               ],
             },

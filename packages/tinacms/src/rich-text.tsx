@@ -108,6 +108,9 @@ export const TinaMarkdown = ({
               throw new Error(`No component provided for ${child.name}`)
             }
           default:
+            if (typeof child.text === 'string') {
+              return child.text
+            }
             console.log(`No tina renderer for ${child.type}`, child)
         }
       })}
