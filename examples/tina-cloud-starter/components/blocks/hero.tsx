@@ -60,12 +60,7 @@ export const Hero = ({ data }) => {
             <TinaMarkdown
               blocks={{
                 Highlight: (props) => <div>Highlight</div>,
-                EmbeddedInfo: (props) => (
-                  <div>
-                    Embeeded Info {props.text}
-                    {props.children}
-                  </div>
-                ),
+                EmbeddedInfo: (props) => <div>Embeeded Info</div>,
               }}
             >
               {data.richText}
