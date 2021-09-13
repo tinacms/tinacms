@@ -42,7 +42,10 @@ export const RichEditor = (props) => {
   ) as (BaseEditor & ReactEditor)[];
   const [value, setValue] = React.useState(
     props.input.value.children
-      ? props.input.value.children?.map(normalize)
+      ? [
+          ...props.input.value.children?.map(normalize),
+          { type: "paragraph", children: [{ type: "text", text: "" }] },
+        ]
       : [{ type: "paragraph", children: [{ type: "text", text: "" }] }]
   );
   const [voidSelection, setVoidSelectionInner] =
@@ -241,6 +244,7 @@ export const RichEditor = (props) => {
                   },
                 ],
               },
+              { type: "paragraph", children: [{ type: "text", text: "" }] },
             ]);
           }}
           templates={templates}
