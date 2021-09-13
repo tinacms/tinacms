@@ -62,11 +62,6 @@ export class Client {
     } else {
       this.identityApiUrl = `https://identity.${this.baseUrl}`
     }
-    console.log('hello', {
-      options,
-      contentApiUrl: this.contentApiUrl,
-      identityURL: this.identityApiUrl,
-    })
 
     this.clientId = options.clientId
 
