@@ -18,7 +18,7 @@ import fs from 'fs-extra'
 import * as ts from 'typescript'
 import * as _ from 'lodash'
 import type { TinaCloudSchema } from '@tinacms/graphql'
-import {  dangerText, logText } from '../../utils/theme'
+import { dangerText, logText } from '../../utils/theme'
 import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
 
@@ -38,6 +38,7 @@ export const compile = async (_ctx, _next) => {
     !fs.existsSync(tinaPath) ||
     !fs.existsSync(path.join(tinaPath, 'schema.ts'))
   ) {
+    // The schema.ts file does not exist
     logger.info(
       dangerText(`
       .tina/schema.ts not found, Creating one for you...
@@ -50,9 +51,15 @@ export const compile = async (_ctx, _next) => {
     // Write a basic schema to it
     await fs.writeFile(file, defaultSchema)
   }
+
+  // Remove old js files
   await fs.remove(tinaTempPath)
   await fs.remove(tinaConfigPath)
+
+  // Turn the TS files into JS files so they can be exacted
   await transpile(tinaPath, tinaTempPath)
+
+  // Delete the node require cache for .tina temp folder
   Object.keys(require.cache).map((key) => {
     if (key.startsWith(tinaTempPath)) {
       delete require.cache[require.resolve(key)]
@@ -60,12 +67,12 @@ export const compile = async (_ctx, _next) => {
   })
 
   const schemaFunc = require(path.join(tinaTempPath, 'schema.js'))
-    const schemaObject: TinaCloudSchema = schemaFunc.default
-    await fs.outputFile(
-      path.join(tinaConfigPath, 'schema.json'),
-      JSON.stringify(schemaObject, null, 2)
-    )
-    await fs.remove(tinaTempPath)
+  const schemaObject: TinaCloudSchema = schemaFunc.default
+  await fs.outputFile(
+    path.join(tinaConfigPath, 'schema.json'),
+    JSON.stringify(schemaObject, null, 2)
+  )
+  await fs.remove(tinaTempPath)
 }
 
 const transpile = async (projectDir, tempDir) => {
@@ -98,8 +105,6 @@ const transpile = async (projectDir, tempDir) => {
   )
 }
 
-export const defineSchema = (
-  config: TinaCloudSchema
-) => {
+export const defineSchema = (config: TinaCloudSchema) => {
   return config
 }

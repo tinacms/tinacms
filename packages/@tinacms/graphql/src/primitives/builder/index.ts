@@ -723,11 +723,16 @@ export class Builder {
   }
 
   private _buildDataField = async (field: TinaFieldEnriched) => {
+    const caseErrMsg = `Field type "${field.type}"" does not support list: true`
+
     switch (field.type) {
       case 'boolean':
       case 'datetime':
       case 'image':
       case 'number':
+        if (field.list) {
+          throw new Error(caseErrMsg)
+        }
       case 'string':
         return astBuilder.FieldDefinition({
           name: field.name,
@@ -747,20 +752,23 @@ export class Builder {
       case 'reference':
         const name = NAMER.documentTypeName(field.namespace)
         if (field.list) {
-          return this._buildMultiCollectionDocumentListDefinition({
-            fieldName: field.name,
-            namespace: field.namespace,
-            nodeType: astBuilder.UnionTypeDefinition({
-              name,
-              types: field.collections.map((collectionName) =>
-                NAMER.documentTypeName([collectionName])
-              ),
-            }),
-            collections: this.tinaSchema.getCollectionsByName(
-              field.collections
-            ),
-            connectionNamespace: field.namespace,
-          })
+          throw new Error(caseErrMsg)
+          // }
+          // if (field.list) {
+          // return this._buildMultiCollectionDocumentListDefinition({
+          //   fieldName: field.name,
+          //   namespace: field.namespace,
+          //   nodeType: astBuilder.UnionTypeDefinition({
+          //     name,
+          //     types: field.collections.map((collectionName) =>
+          //       NAMER.documentTypeName([collectionName])
+          //     ),
+          //   }),
+          //   collections: this.tinaSchema.getCollectionsByName(
+          //     field.collections
+          //   ),
+          //   connectionNamespace: field.namespace,
+          // })
         } else {
           const type = await this._buildMultiCollectionDocumentDefinition({
             fieldName: name,
