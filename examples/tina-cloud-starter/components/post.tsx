@@ -7,7 +7,7 @@ import { Hero } from "./blocks/hero";
 import { Content as ContentBlock } from "./blocks/content";
 import { Testimonial } from "./blocks/testimonial";
 import { Features } from "./blocks/features";
-import { TinaMarkdown } from "../components/editor/tina-markdown";
+import { TinaMarkdown } from "tinacms/dist/rich-text";
 
 const blockRenderer = {
   Hero: (props) => <Hero data={props} />,
@@ -122,7 +122,7 @@ export const Post = ({ data }) => {
       )}
       <Container className={`flex-1 max-w-4xl pt-4`} size="large">
         <div className="prose dark:prose-dark  w-full max-w-none">
-          <TinaMarkdown>{data._body}</TinaMarkdown>
+          <TinaMarkdown blocks={blockRenderer}>{data._body}</TinaMarkdown>
         </div>
       </Container>
     </Section>

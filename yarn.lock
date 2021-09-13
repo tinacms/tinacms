@@ -5111,6 +5111,8 @@ __metadata:
     react-dropzone: 10.1.8
     react-final-form: ^6.3.0
     simple-git: 1.126.0
+    slate: ^0.66.0
+    slate-react: ^0.66.0
     styled-components: ">=4.1"
     tslib: ^2.3.0
     tsup: ^3.7.0
@@ -14938,6 +14940,13 @@ fsevents@~2.1.2:
   version: 8.0.4
   resolution: "immer@npm:8.0.4"
   checksum: 047d4af1c6d9dbba3ecbcf39aed9fa2f5323f80205c0618085d25a981d061353f4417b53fad95c71bd834eb9aa9ffdc2db53c7aa7726736b80bf1ae5f206eca7
+  languageName: node
+  linkType: hard
+
+"immer@npm:^9.0.6":
+  version: 9.0.6
+  resolution: "immer@npm:9.0.6"
+  checksum: 48c9b673ee0f3a05f0651f26c8ccdcbc034a47502dd26e716bd7bb301bcede194d1c5e895d4d6ec8d1e7bfb6444dd1056095b3f10e6c5e08cc3e798497a96531
   languageName: node
   linkType: hard
 
@@ -25004,6 +25013,26 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
+"slate-react@npm:^0.66.0":
+  version: 0.66.0
+  resolution: "slate-react@npm:0.66.0"
+  dependencies:
+    "@types/is-hotkey": ^0.1.1
+    "@types/lodash": ^4.14.149
+    direction: ^1.0.3
+    is-hotkey: ^0.1.6
+    is-plain-object: ^5.0.0
+    lodash: ^4.17.4
+    scroll-into-view-if-needed: ^2.2.20
+    tiny-invariant: 1.0.6
+  peerDependencies:
+    react: ">=16.8.0"
+    react-dom: ">=16.8.0"
+    slate: ">=0.65.3"
+  checksum: 266ea95c5969347425c8fdde8ea8c1468ead4a02feb4aff008dacfdb5c966327cc6f919c7ec92c1354b9eb040dbe7acf7ae9fafae6cf19557b46335d36ef6c1c
+  languageName: node
+  linkType: hard
+
 "slate@npm:^0.65.3":
   version: 0.65.3
   resolution: "slate@npm:0.65.3"
@@ -25015,6 +25044,17 @@ resolve@^2.0.0-next.3:
     is-plain-object: ^3.0.0
     tiny-warning: ^1.0.3
   checksum: 5246b7b4b770b2896965ea3e9fff518346a05d8e85b98932de22841edccafbb917d71dfb3308754daee848ddd84ec96b83ed2de2aee7b0a8f37dc592782f35b3
+  languageName: node
+  linkType: hard
+
+"slate@npm:^0.66.0":
+  version: 0.66.0
+  resolution: "slate@npm:0.66.0"
+  dependencies:
+    immer: ^9.0.6
+    is-plain-object: ^5.0.0
+    tiny-warning: ^1.0.3
+  checksum: f9fd23200a17277062162d9123ae7bc3242a515d10250bd3a162e25ecc35de26c614a30bad47901f6bbd521ba7a76a6c0cac268cbcaa298661f9d80fca684a43
   languageName: node
   linkType: hard
 

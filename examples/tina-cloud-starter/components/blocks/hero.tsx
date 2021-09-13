@@ -4,7 +4,7 @@ import { Actions } from "../actions";
 import { Container } from "../container";
 import { Section } from "../section";
 import { ThemeContext } from "../theme";
-import { TinaMarkdown } from "../editor/tina-markdown";
+import { TinaMarkdown } from "tinacms/dist/rich-text";
 
 export const Hero = ({ data }) => {
   const theme = React.useContext(ThemeContext);
@@ -59,6 +59,7 @@ export const Hero = ({ data }) => {
           {data.richText && (
             <TinaMarkdown
               blocks={{
+                Highlight: (props) => <div>Highlight</div>,
                 EmbeddedInfo: (props) => (
                   <div>
                     Embeeded Info {props.text}
