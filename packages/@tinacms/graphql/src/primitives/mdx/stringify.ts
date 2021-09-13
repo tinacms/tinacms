@@ -191,7 +191,6 @@ export const stringify = (
                             typeof template === 'string'
                               ? template
                               : template.name
-                          console.log(itemTemplateName)
                           return templateName === itemTemplateName
                         })
                         if (typeof template === 'string') {
