@@ -183,21 +183,30 @@ export const stringify = (
                       })
                     } else {
                       value.forEach((item) => {
+                        // Only take the first item
+                        const [itemTemplateName, itemValues] =
+                          Object.entries(item)[0]
                         const template = field.templates.find((template) => {
                           const templateName =
                             typeof template === 'string'
                               ? template
                               : template.name
-                          return templateName === item._template
+                          console.log(itemTemplateName)
+                          return templateName === itemTemplateName
                         })
                         if (typeof template === 'string') {
                           throw new Error(
                             `Global templates not yet supported for rich text`
                           )
                         }
+                        if (!template) {
+                          throw new Error(
+                            `Unable to find template for field ${field.name}`
+                          )
+                        }
                         const v = {}
                         template.fields.forEach((field) => {
-                          const fieldValue = item[field.name]
+                          const fieldValue = itemValues[field.name]
                           if (fieldValue) {
                             switch (field.type) {
                               case 'boolean':
