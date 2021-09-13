@@ -4,4 +4,4 @@
 '@tinacms/graphql': minor
 ---
 
-Added new error messages for list UI that we do not support by defualt
+Added new warning messages for list UI that we do not support by default
