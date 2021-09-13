@@ -86,7 +86,7 @@ stack: ${code.stack || 'No stack was provided'}`)
             logger.info(
               dangerText(
                 'Compilation failed with errors. Server has not been restarted.'
-              )
+              ) + `see error below \n ${e.message}`
             )
           }
         }
@@ -115,15 +115,11 @@ stack: ${code.stack || 'No stack was provided'}`)
       logger.info(`Visit the playground at http://localhost:${port}/altair/`)
     })
     state.server.on('error', function (e) {
-        if (e.code === 'EADDRINUSE') {
-          logger.error(
-              dangerText(
-                  `Port 4001 already in use`
-              )
-          )
-          process.exit()
-        }
-        throw e
+      if (e.code === 'EADDRINUSE') {
+        logger.error(dangerText(`Port 4001 already in use`))
+        process.exit()
+      }
+      throw e
     })
     state.server.on('connection', (socket) => {
       state.sockets.push(socket)
