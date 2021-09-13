@@ -723,7 +723,11 @@ export class Builder {
   }
 
   private _buildDataField = async (field: TinaFieldEnriched) => {
-    const caseErrMsg = `Field type "${field.type}"" does not support list: true`
+    const listWarningMsg = `
+WARNING: The user interface for ${field.type} does not support \`list: true\`
+Visit https://tina.io/docs/errors/ui-not-supported/ for more information
+
+`
 
     switch (field.type) {
       case 'boolean':
@@ -731,7 +735,7 @@ export class Builder {
       case 'image':
       case 'number':
         if (field.list) {
-          throw new Error(caseErrMsg)
+          console.warn(listWarningMsg)
         }
       case 'string':
         return astBuilder.FieldDefinition({
@@ -752,23 +756,21 @@ export class Builder {
       case 'reference':
         const name = NAMER.documentTypeName(field.namespace)
         if (field.list) {
-          throw new Error(caseErrMsg)
-          // }
-          // if (field.list) {
-          // return this._buildMultiCollectionDocumentListDefinition({
-          //   fieldName: field.name,
-          //   namespace: field.namespace,
-          //   nodeType: astBuilder.UnionTypeDefinition({
-          //     name,
-          //     types: field.collections.map((collectionName) =>
-          //       NAMER.documentTypeName([collectionName])
-          //     ),
-          //   }),
-          //   collections: this.tinaSchema.getCollectionsByName(
-          //     field.collections
-          //   ),
-          //   connectionNamespace: field.namespace,
-          // })
+          console.warn(listWarningMsg)
+          return this._buildMultiCollectionDocumentListDefinition({
+            fieldName: field.name,
+            namespace: field.namespace,
+            nodeType: astBuilder.UnionTypeDefinition({
+              name,
+              types: field.collections.map((collectionName) =>
+                NAMER.documentTypeName([collectionName])
+              ),
+            }),
+            collections: this.tinaSchema.getCollectionsByName(
+              field.collections
+            ),
+            connectionNamespace: field.namespace,
+          })
         } else {
           const type = await this._buildMultiCollectionDocumentDefinition({
             fieldName: name,
