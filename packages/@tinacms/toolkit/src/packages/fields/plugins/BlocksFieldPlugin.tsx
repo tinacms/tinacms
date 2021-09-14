@@ -37,6 +37,8 @@ import {
   GroupListMeta,
   GroupLabel,
 } from './GroupListFieldPlugin'
+import { useEvent } from '../../react-core'
+import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 
 export interface BlocksFieldDefinititon extends Field {
   component: 'blocks'
@@ -166,7 +168,6 @@ const Blocks = ({ tinaForm, form, field, input }: BlockFieldProps) => {
                     if (!template.itemProps) return {}
                     return template.itemProps(item)
                   }
-
                   return (
                     <BlockListItem
                       // NOTE: Supressing warnings, but not helping with render perf
@@ -216,6 +217,9 @@ const BlockListItem = ({
     tinaForm.mutators.remove(field.name, index)
   }, [tinaForm, field, index])
 
+  const { dispatch: setHoveredField } = useEvent<FieldHoverEvent>('field:hover')
+  const { dispatch: setFocusedField } = useEvent<FieldFocusEvent>('field:focus')
+
   return (
     <Draggable
       key={index}
@@ -232,7 +236,16 @@ const BlockListItem = ({
             {...provider.dragHandleProps}
           >
             <DragHandle />
-            <ItemClickTarget onClick={() => setExpanded(true)}>
+            <ItemClickTarget
+              onClick={() => {
+                setExpanded(true)
+                setFocusedField({ fieldName: `${field.name}.${index}` })
+              }}
+              onMouseOver={() =>
+                setHoveredField({ fieldName: `${field.name}.${index}` })
+              }
+              onMouseOut={() => setHoveredField({ fieldName: null })}
+            >
               <GroupLabel>{label || template.label}</GroupLabel>
             </ItemClickTarget>
             <DeleteButton onClick={removeItem}>
@@ -556,7 +569,9 @@ const Panel = function Panel({
   )
 }
 
+export const BlocksField = Blocks
+
 export const BlocksFieldPlugin = {
   name: 'blocks',
-  Component: Blocks,
+  Component: BlocksField,
 }

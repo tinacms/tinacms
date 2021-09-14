@@ -4,7 +4,6 @@ import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
 // @ts-ignore
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
-import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
 
 import React from "react";
 
@@ -22,7 +21,10 @@ const App = ({ Component, pageProps }) => {
             branch="main"
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
-            mediaStore={TinaCloudCloudinaryMediaStore}
+            mediaStore={import("next-tinacms-cloudinary").then(
+              ({ TinaCloudCloudinaryMediaStore }) =>
+                TinaCloudCloudinaryMediaStore
+            )}
             cmsCallback={(cms) => {
               cms.sidebar.isOpen = true;
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {

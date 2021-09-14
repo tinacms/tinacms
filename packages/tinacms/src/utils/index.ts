@@ -12,25 +12,29 @@ limitations under the License.
 */
 
 import { Client, LocalClient } from '../client'
+import type { TinaIOConfig } from '../client'
 import * as yup from 'yup'
 
 export interface CreateClientProps {
   clientId?: string
   isLocalClient?: boolean
+  tinaioConfig?: TinaIOConfig
   branch?: string
 }
 export const createClient = ({
   clientId,
   isLocalClient = true,
   branch,
+  tinaioConfig,
 }: CreateClientProps) => {
   return isLocalClient
     ? new LocalClient()
     : new Client({
-      clientId: clientId || '',
-      branch: branch || 'main',
-      tokenStorage: 'LOCAL_STORAGE',
-    })
+        clientId: clientId || '',
+        branch: branch || 'main',
+        tokenStorage: 'LOCAL_STORAGE',
+        tinaioConfig,
+      })
 }
 
 export function assertShape<T extends unknown>(

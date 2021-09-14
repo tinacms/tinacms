@@ -104,5 +104,20 @@
     "type": "GlobalConnection",
     "resolveType": "collectionDocumentList",
     "collection": "global"
+  },
+  "GlobalFooterSocialTestDocument": {
+    "type": "GlobalFooterSocialTestDocument",
+    "resolveType": "multiCollectionDocument"
+  },
+  "PostsTestDocument": {
+    "type": "PostsTestDocument",
+    "resolveType": "multiCollectionDocument"
+  },
+  "PostsTestConnection": {
+    "type": "PostsTestConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "posts"
+    ]
   }
 }

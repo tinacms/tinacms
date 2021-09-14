@@ -15,10 +15,10 @@ import { ModalBuilder } from './AuthModal'
 import React, { useState } from 'react'
 import { TinaCMS, TinaProvider, MediaStore } from '@tinacms/toolkit'
 
-import { Client } from '../client'
+import { Client, TinaIOConfig } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
-import { useEditState } from '../edit-state'
+import { setEditing } from '../edit-state'
 
 type ModalNames = null | 'authenticate'
 
@@ -33,10 +33,11 @@ export interface TinaCloudAuthWallProps {
   cms?: TinaCMS
   children: React.ReactNode
   loginScreen?: React.ReactNode
+  tinaioConfig?: TinaIOConfig
   getModalActions?: (args: {
     closeModal: () => void
   }) => { name: string; action: () => Promise<void>; primary: boolean }[]
-  mediaStore?: TinaCloudMediaStoreClass
+  mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
 }
 
 export const AuthWallInner = ({
@@ -49,7 +50,6 @@ export const AuthWallInner = ({
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [showChildren, setShowChildren] = useState<boolean>(false)
-  const { setEdit } = useEditState()
 
   React.useEffect(() => {
     client.isAuthenticated().then((isAuthenticated) => {
@@ -93,8 +93,14 @@ export const AuthWallInner = ({
             ...otherModalActions,
             {
               action: async () => {
-                setActiveModal(null)
-                setEdit(false)
+                // This does not work it looks like we have somehow getting two contexts
+                // console.log({ setEdit })
+                // setEdit(false)
+                // setActiveModal(null)
+
+                // This is a temp fix
+                setEditing(false) // set editing just sets the local storage
+                window.location.reload()
               },
               name: 'Close',
               primary: false,
@@ -137,9 +143,12 @@ export const TinaCloudProvider = (
   if (!cms.api.tina) {
     cms.api.tina = createClient(props)
   }
-  if (props.mediaStore) {
-    cms.media.store = new props.mediaStore(cms.api.tina)
+  const setupMedia = async () => {
+    if (props.mediaStore) {
+      cms.media.store = new (await props.mediaStore)(cms.api.tina)
+    }
   }
+  setupMedia()
   if (props.cmsCallback) {
     props.cmsCallback(cms)
   }

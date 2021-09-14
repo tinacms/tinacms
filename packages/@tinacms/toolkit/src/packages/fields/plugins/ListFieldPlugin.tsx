@@ -384,8 +384,9 @@ const DragHandle = styled(function DragHandle({ ...styleProps }) {
     transition: all 85ms ease-out;
   }
 `
+export const ListField = List
 
 export const ListFieldPlugin = {
   name: 'list',
-  Component: List,
+  Component: ListField,
 }

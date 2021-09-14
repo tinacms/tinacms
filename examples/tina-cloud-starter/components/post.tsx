@@ -92,12 +92,16 @@ export const Post = ({ data }) => {
   };
 
   const date = new Date(data.date);
-  const formattedDate = format(date, "MMM dd, yyyy");
+  let formattedDate = "";
+  if (!isNaN(date.getTime())) {
+    formattedDate = format(date, "MMM dd, yyyy");
+  }
 
   return (
     <Section className="flex-1">
       <Container className={`flex-1 max-w-4xl pb-2`} size="large">
         <h2
+          data-tinafield="title"
           className={`w-full relative	mb-8 text-6xl font-extrabold tracking-normal text-center title-font`}
         >
           <span
@@ -109,7 +113,10 @@ export const Post = ({ data }) => {
           </span>
         </h2>
 
-        <div className="flex items-center justify-center mb-16">
+        <div
+          data-tinafield="author"
+          className="flex items-center justify-center mb-16"
+        >
           {data.author && (
             <>
               <div className="flex-shrink-0 mr-4">
@@ -127,13 +134,16 @@ export const Post = ({ data }) => {
               </span>
             </>
           )}
-          <p className="text-base text-gray-400 group-hover:text-gray-500 dark:text-gray-300 dark:group-hover:text-gray-150">
+          <p
+            data-tinafield="date"
+            className="text-base text-gray-400 group-hover:text-gray-500 dark:text-gray-300 dark:group-hover:text-gray-150"
+          >
             {formattedDate}
           </p>
         </div>
       </Container>
       {data.heroImg && (
-        <div className="">
+        <div data-tinafield="heroImg" className="">
           <img
             src={data.heroImg}
             className="mb-14 block h-auto max-w-4xl lg:max-w-6xl mx-auto"

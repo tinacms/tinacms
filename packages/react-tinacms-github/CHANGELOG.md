@@ -1,5 +1,23 @@
 # Change Log
 
+## 0.50.8
+
+### Patch Changes
+
+- Updated dependencies [7b149a4e7]
+- Updated dependencies [906d72c50]
+  - @tinacms/toolkit@0.53.0
+  - next-tinacms-markdown@0.50.1
+
+## 0.50.7
+
+### Patch Changes
+
+- 9b27192fe: Build packages with new scripting, which includes preliminary support for ES modules.
+- Updated dependencies [9b27192fe]
+  - @tinacms/toolkit@0.52.3
+  - next-tinacms-markdown@0.50.1
+
 ## 0.50.6
 
 ### Patch Changes

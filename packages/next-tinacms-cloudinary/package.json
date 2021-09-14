@@ -1,9 +1,9 @@
 {
   "name": "next-tinacms-cloudinary",
-  "version": "3.2.3",
+  "version": "3.2.5",
   "main": "dist/index.js",
   "files": [
-    "dist/*"
+    "dist"
   ],
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",

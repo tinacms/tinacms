@@ -1,9 +1,9 @@
 {
   "name": "@tinacms/scripts",
-  "version": "0.50.1",
+  "version": "0.50.2",
   "main": "dist/index.js",
   "files": [
-    "dist/*",
+    "dist",
     "bin/*",
     ".env"
   ],

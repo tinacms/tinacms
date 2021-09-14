@@ -13,27 +13,39 @@ export const Blocks = (props: Pages) => {
             switch (block.__typename) {
               case "PagesBlocksContent":
                 return (
-                  <React.Fragment key={i + block.__typename}>
-                    <Content data={block} />
-                  </React.Fragment>
+                  <div
+                    data-tinafield={`blocks.${i}`}
+                    key={i + block.__typename}
+                  >
+                    <Content data={block} parentField={`blocks.${i}`} />
+                  </div>
                 );
               case "PagesBlocksHero":
                 return (
-                  <React.Fragment key={i + block.__typename}>
-                    <Hero data={block} />
-                  </React.Fragment>
+                  <div
+                    data-tinafield={`blocks.${i}`}
+                    key={i + block.__typename}
+                  >
+                    <Hero data={block} parentField={`blocks.${i}`} />
+                  </div>
                 );
               case "PagesBlocksFeatures":
                 return (
-                  <React.Fragment key={i + block.__typename}>
-                    <Features data={block} />
-                  </React.Fragment>
+                  <div
+                    data-tinafield={`blocks.${i}`}
+                    key={i + block.__typename}
+                  >
+                    <Features data={block} parentField={`blocks.${i}`} />
+                  </div>
                 );
               case "PagesBlocksTestimonial":
                 return (
-                  <React.Fragment key={i + block.__typename}>
-                    <Testimonial data={block} />
-                  </React.Fragment>
+                  <div
+                    data-tinafield={`blocks.${i}`}
+                    key={i + block.__typename}
+                  >
+                    <Testimonial data={block} parentField={`blocks.${i}`} />
+                  </div>
                 );
               default:
                 return null;

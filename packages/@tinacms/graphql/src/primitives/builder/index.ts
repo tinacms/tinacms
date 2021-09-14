@@ -729,11 +729,20 @@ export class Builder {
   }
 
   private _buildDataField = async (field: TinaFieldEnriched) => {
+    const listWarningMsg = `
+WARNING: The user interface for ${field.type} does not support \`list: true\`
+Visit https://tina.io/docs/errors/ui-not-supported/ for more information
+
+`
+
     switch (field.type) {
       case 'boolean':
       case 'datetime':
       case 'image':
       case 'number':
+        if (field.list) {
+          console.warn(listWarningMsg)
+        }
       case 'string':
         return astBuilder.FieldDefinition({
           name: field.name,
@@ -760,6 +769,7 @@ export class Builder {
       case 'reference':
         const name = NAMER.documentTypeName(field.namespace)
         if (field.list) {
+          console.warn(listWarningMsg)
           return this._buildMultiCollectionDocumentListDefinition({
             fieldName: field.name,
             namespace: field.namespace,

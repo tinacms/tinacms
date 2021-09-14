@@ -16,6 +16,7 @@ import { useGraphqlForms } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
+import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
 
 import type { TinaCMS } from '@tinacms/toolkit'
@@ -59,11 +60,11 @@ class ErrorBoundary extends React.Component {
   constructor(props) {
     super(props)
 
-    this.state = { 
-      hasError: props.hasError, 
+    this.state = {
+      hasError: props.hasError,
       message: '',
-      pageRefresh: false
-     }
+      pageRefresh: false,
+    }
   }
 
   static getDerivedStateFromError(error) {
@@ -117,8 +118,9 @@ class ErrorBoundary extends React.Component {
             <br />
             <p>
               If you've just updated the form, undo your most recent changes and
-              click "refresh". If after a few refreshes, you're still encountering this error. 
-              There is a bigger issue with the site. Please reach out to your site admin.
+              click "refresh". If after a few refreshes, you're still
+              encountering this error. There is a bigger issue with the site.
+              Please reach out to your site admin.
             </p>
             <div style={{ padding: '10px 0' }}>
               <button
@@ -136,7 +138,11 @@ class ErrorBoundary extends React.Component {
                 onClick={() => {
                   /* @ts-ignore */
                   this.setState({ pageRefresh: true })
-                  setTimeout(() => this.setState({ hasError: false, pageRefresh: false}), 3000)
+                  setTimeout(
+                    () =>
+                      this.setState({ hasError: false, pageRefresh: false }),
+                    3000
+                  )
                 }}
               >
                 Refresh
@@ -146,14 +152,9 @@ class ErrorBoundary extends React.Component {
         </div>
       )
     }
-    {/* @ts-ignore */}
-    { if (this.state.pageRefresh) {
-      return (
-        <Loader>
-          Let's try that again.
-        </Loader>
-      )
-    }
+    /* @ts-ignore */
+    if (this.state.pageRefresh) {
+      return <Loader>Let's try that again.</Loader>
     }
 
     return this.props.children
@@ -167,6 +168,7 @@ export const TinaCMSProvider2 = ({
   isLocalClient,
   cmsCallback,
   mediaStore,
+  tinaioConfig,
   ...props
 }: {
   /** The query from getStaticProps */
@@ -190,7 +192,8 @@ export const TinaCMSProvider2 = ({
   /** Callback if you need access to the "document creator" API */
   documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
   /** TinaCMS media store instance */
-  mediaStore?: TinaCloudMediaStoreClass
+  mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
+  tinaioConfig?: TinaIOConfig
 }) => {
   if (typeof props.query === 'string') {
     props.query
@@ -199,6 +202,7 @@ export const TinaCMSProvider2 = ({
     <TinaCloudProvider
       branch={branch}
       clientId={clientId}
+      tinaioConfig={tinaioConfig}
       isLocalClient={isLocalClient}
       cmsCallback={cmsCallback}
       mediaStore={mediaStore}
