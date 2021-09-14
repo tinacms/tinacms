@@ -22,10 +22,11 @@ import {
 
 import { formify } from './formify'
 import gql from 'graphql-tag'
-export type TinaIOConfig =
-  | { baseUrl?: string; identityApiUrl: undefined; contentApiUrl: undefined }
-  | { baseUrl: undefined; identityApiUrl?: string; contentApiUrl?: string }
-
+export type TinaIOConfig = {
+  frontendUrlOverride?: string // https://app.tina.io
+  identityApiUrlOverride?: string // https://identity.tinajs.io
+  contentApiUrlOverride?: string // https://content.tinajs.io
+}
 interface ServerOptions {
   clientId: string
   branch: string
@@ -36,6 +37,7 @@ interface ServerOptions {
 }
 
 export class Client {
+  frontendUrl: string
   contentApiUrl: string
   identityApiUrl: string
   schema: GraphQLSchema
@@ -44,24 +46,19 @@ export class Client {
   setToken: (_token: TokenObject) => void
   private getToken: () => TokenObject
   private token: string // used with memory storage
-  private baseUrl: string
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     const encodedBranch = encodeURIComponent(options.branch)
-    this.baseUrl = options.tinaioConfig?.baseUrl || 'tinajs.io'
-    if (options.tinaioConfig?.contentApiUrl) {
-      this.contentApiUrl =
-        options.customContentApiUrl || options.tinaioConfig.contentApiUrl
-    } else {
-      this.contentApiUrl =
-        options.customContentApiUrl ||
-        `https://content.${this.baseUrl}/content/${options.clientId}/github/${encodedBranch}`
-    }
-    if (options.tinaioConfig?.identityApiUrl) {
-      this.identityApiUrl = options.tinaioConfig.identityApiUrl
-    } else {
-      this.identityApiUrl = `https://identity.${this.baseUrl}`
-    }
+    this.frontendUrl =
+      options.tinaioConfig?.frontendUrlOverride || 'https://app.tina.io'
+    this.identityApiUrl =
+      options.tinaioConfig?.identityApiUrlOverride ||
+      'https://identity.tinajs.io'
+    const contentApiBase =
+      options.tinaioConfig?.contentApiUrlOverride || `https://content.tinajs.io`
+    this.contentApiUrl =
+      options.customContentApiUrl ||
+      `${contentApiBase}/content/${options.clientId}/github/${encodedBranch}`
 
     this.clientId = options.clientId
 
@@ -201,7 +198,7 @@ mutation addPendingDocumentMutation(
   }
 
   async authenticate() {
-    const token = await authenticate(this.clientId)
+    const token = await authenticate(this.clientId, this.frontendUrl)
     this.setToken(token)
     return token
   }
