@@ -16,20 +16,21 @@ import popupWindow from './popupWindow'
 const TINA_LOGIN_EVENT = 'tinaCloudLogin'
 export const AUTH_TOKEN_KEY = 'tinacms-auth'
 
-const BASE_TINA_URL = process.env.BASE_TINA_URL || `app.tina.io`
-
 export type TokenObject = {
   id_token: string
   access_token: string
   refresh_token: string
 }
-export const authenticate = (clientId: string): Promise<TokenObject> => {
-  return new Promise(resolve => {
+export const authenticate = (
+  clientId: string,
+  frontendUrl: string
+): Promise<TokenObject> => {
+  return new Promise((resolve) => {
     // @ts-ignore
     let authTab: Window | undefined
 
     // TODO - Grab this from the URL instead of passing through localstorage
-    window.addEventListener('message', function(e: MessageEvent) {
+    window.addEventListener('message', function (e: MessageEvent) {
       if (e.data.source === TINA_LOGIN_EVENT) {
         if (authTab) {
           authTab.close()
@@ -43,7 +44,7 @@ export const authenticate = (clientId: string): Promise<TokenObject> => {
     })
     const origin = `${window.location.protocol}//${window.location.host}`
     authTab = popupWindow(
-      `https://${BASE_TINA_URL}/signin?clientId=${clientId}&origin=${origin}`,
+      `${frontendUrl}/signin?clientId=${clientId}&origin=${origin}`,
       '_blank',
       window,
       1000,
