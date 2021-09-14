@@ -19,23 +19,12 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import {
-  FieldsBuilder,
-  useFormPortal,
-  TinaField,
-  FormBuilder,
-} from '../../.././form-builder'
+import { useFormPortal, FormBuilder } from '../../.././form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../../icons'
-import { wrapFieldsWithMeta } from '../wrapFieldWithMeta'
-import { Draggable } from 'react-beautiful-dnd'
-import { AddIcon, DragIcon, ReorderIcon, TrashIcon } from '../../../icons'
+import { AddIcon } from '../../../icons'
 import { Dismissible } from 'react-dismissible'
 import { IconButton } from '../../../styles'
-import {
-  GroupListHeader,
-  GroupListMeta,
-  GroupLabel,
-} from '../GroupListFieldPlugin'
+import { GroupListHeader } from '../GroupListFieldPlugin'
 
 export interface MdxFieldFieldDefinititon extends Field {
   component: 'group'
@@ -89,13 +78,6 @@ const Panel = function Panel({
   field,
 }: PanelProps) {
   const FormPortal = useFormPortal()
-  // const fields: any[] = React.useMemo(() => {
-  //   return field.fields.map((subField: any) => ({
-  //     ...subField,
-  //     name: `${field.name}.${subField.name}`,
-  //   }))
-  // }, [field.fields, field.name])
-  console.log({ isExpanded })
 
   return (
     <FormPortal>
@@ -111,9 +93,6 @@ const Panel = function Panel({
             {isExpanded ? (
               <FormBuilder form={tinaForm} hideFooter={true} />
             ) : null}
-            {/* {isExpanded ? (
-              <FieldsBuilder form={tinaForm} fields={field.fields} />
-            ) : null} */}
           </PanelBody>
         </MdxFieldPanel>
       )}
@@ -387,10 +366,5 @@ interface PanelProps {
   setExpanded(next: boolean): void
   isExpanded: boolean
   tinaForm: Form
-  index: number
-  field: BlocksFieldDefinititon
-  item: any
-  label: string
-  template: BlockTemplate
-  zIndexShift: number
+  field: MdxFieldFieldDefinititon
 }

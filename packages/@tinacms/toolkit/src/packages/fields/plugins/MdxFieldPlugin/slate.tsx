@@ -336,7 +336,7 @@ const MdxPicker = (props) => {
   )
 }
 
-const normalize = (node: object) => {
+const normalize = (node: SlateNodeType) => {
   if (['mdxJsxFlowElement', 'mdxJsxTextElement', 'image'].includes(node.type)) {
     return {
       ...node,
