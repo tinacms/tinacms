@@ -91,19 +91,11 @@ export const TinaMarkdown = ({
           case 'mdxJsxFlowElement':
             const Block = blocks[child.name]
             if (Block) {
-              const { children, ...otherProps } = child.props ? child.props : {}
-              return (
-                <Block {...otherProps}>
-                  {children && (
-                    <TinaMarkdown blocks={blocks}>{children}</TinaMarkdown>
-                  )}
-                </Block>
-              )
+              const props = child.props ? child.props : {}
+              return <Block {...props} />
             } else {
               if (!child.name) {
-                return (
-                  <TinaMarkdown blocks={blocks}>{child.props}</TinaMarkdown>
-                )
+                throw new Error(`Fragments are not yet supported`)
               }
               throw new Error(`No component provided for ${child.name}`)
             }

@@ -68,7 +68,7 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
     if (!node.name) {
       props = parseMDXInner({ type: 'root', children: node.children }, field)
     }
-    const template = field.templates.find((template) => {
+    const template = field.templates?.find((template) => {
       const templateName =
         typeof template === 'string' ? template : template.name
       return templateName === node.name
