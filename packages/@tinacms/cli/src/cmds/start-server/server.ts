@@ -18,7 +18,6 @@ import express from 'express'
 import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
-import { gql } from '@tinacms/graphql'
 
 const gqlServer = async () => {
   // This is lazily required so we can update the module
@@ -81,12 +80,13 @@ const gqlServer = async () => {
   app.post('/create-branch', async (req, res) => {
     try {
       const { query } = req
-      const { owner, repo, ref } = query
-      const result = gqlPackage.createBranch({
+      const { owner, repo, name, branch } = query
+      const result = await gqlPackage.createBranch({
         auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         owner,
         repo,
-        ref
+        branch,
+        name
       })
       return res.json(result)
     } catch(error) {
