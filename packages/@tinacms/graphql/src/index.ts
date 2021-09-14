@@ -40,6 +40,29 @@ import type {
   TinaFieldBase,
 } from './primitives/types'
 
+import { Octokit } from '@octokit/rest'
+
+export const listBranches = async ({auth, owner, repo}) => {
+  const appOctoKit = new Octokit({ auth })
+  const ghRes = await appOctoKit.repos.listBranches({
+    owner,
+    repo
+  })
+
+  return ghRes
+}
+
+export const createBranch = async ({ auth, owner, repo, ref }) => {
+  const appOctoKit = new Octokit({ auth })
+  const newBranch = await appOctoKit.git.createRef({
+    owner,
+    repo,
+    ref,
+    sha: 'sha'
+  })
+  return newBranch
+}
+
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud
 export type TinaSchema = TinaCloudSchema
