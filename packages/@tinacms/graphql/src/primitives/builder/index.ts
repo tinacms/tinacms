@@ -446,6 +446,7 @@ export class Builder {
       connectionName,
       nodeType: NAMER.documentTypeName(collection.namespace),
       namespace: collection.namespace,
+      collectable: collection,
     })
   }
 
@@ -507,6 +508,25 @@ export class Builder {
     })
   }
 
+  private _collectionDocumentFilterType = async (
+    collection: Collectable
+  ): Promise<InputObjectTypeDefinitionNode> => {
+    const t = this.tinaSchema.getTemplatesForCollectable(collection)
+    if (t.type === 'union') {
+      return astBuilder.InputObjectTypeDefinition({
+        name: NAMER.dataMutationTypeName(t.namespace) + '_Filter',
+        fields: await sequential(t.templates, async (template) => {
+          return astBuilder.InputValueDefinition({
+            name: template.namespace[template.namespace.length - 1],
+            type: await this._buildTemplateFilter(template),
+          })
+        }),
+      })
+    }
+
+    return this._buildTemplateFilter(t.template)
+  }
+
   private _updateCollectionDocumentMutationType = async (
     collection: Collectable
   ): Promise<InputObjectTypeDefinitionNode> => {
@@ -524,6 +544,15 @@ export class Builder {
     }
 
     return this._buildTemplateMutation(t.template)
+  }
+
+  private _buildTemplateFilter = async (template: Templateable) => {
+    return astBuilder.InputObjectTypeDefinition({
+      name: NAMER.dataMutationTypeName(template.namespace) + '_Filter',
+      fields: await sequential(template.fields, (field) => {
+        return this._buildFieldFilter(field)
+      }),
+    })
   }
 
   private _buildTemplateMutation = async (template: Templateable) => {
@@ -584,6 +613,47 @@ export class Builder {
       connectionName,
       nodeType: nodeType,
     })
+  }
+
+  private _buildFieldFilter = async (field: TinaFieldEnriched) => {
+    switch (field.type) {
+      case 'boolean':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: false,
+          type: astBuilder.TYPES.Boolean,
+        })
+      case 'number':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: false,
+          type: astBuilder.TYPES.Number,
+        })
+      case 'datetime':
+      case 'image':
+      case 'string':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: false,
+          type: astBuilder.TYPES.String,
+        })
+      case 'object':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: false,
+          type: await this._collectionDocumentFilterType(field),
+        })
+      case 'reference':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: false,
+          type: astBuilder.TYPES.String,
+        })
+      // return astBuilder.InputValueDefinition({
+      //   name: field.name,
+      //   type: await this._buildReferenceMutation(field),
+      // })
+    }
   }
 
   private _buildFieldMutation = async (field: TinaFieldEnriched) => {
@@ -678,16 +748,24 @@ export class Builder {
     namespace,
     connectionName,
     nodeType,
+    collectable,
   }: {
     fieldName: string
     namespace: string[]
     connectionName: string
     nodeType: string | TypeDefinitionNode
+    collectable?: Collectable
   }) => {
+    const filter = collectable
+      ? astBuilder.InputValueDefinition({
+          name: 'filter',
+          type: await this._collectionDocumentFilterType(collectable),
+        })
+      : null
     return astBuilder.FieldDefinition({
       name: fieldName,
       required: true,
-      args: [...listArgs],
+      args: [...listArgs, filter].filter(Boolean),
       type: astBuilder.ObjectTypeDefinition({
         name: connectionName,
         interfaces: [

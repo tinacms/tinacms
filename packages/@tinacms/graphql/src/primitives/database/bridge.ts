@@ -15,6 +15,9 @@ import fs from 'fs-extra'
 import fg from 'fast-glob'
 import path from 'path'
 import normalize from 'normalize-path'
+import * as yup from 'yup'
+import matter from 'gray-matter'
+import { assertShape } from '../util'
 
 /**
  * This is the bridge from whatever datasource we need for I/O.
@@ -39,16 +42,93 @@ export class FilesystemBridge implements Bridge {
       return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
   }
+  public async print() {}
   public async get(filepath: string) {
-    return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
+    const contentString = await fs
+      .readFileSync(path.join(this.rootPath, filepath))
+      .toString()
+    const extension = path.extname(filepath)
+    const contentObject = this.parseFile<{ [key: string]: unknown }>(
+      contentString,
+      extension,
+      (yup) => yup.object({})
+    )
+    return contentObject
   }
-  public async put(filepath: string, data: string) {
-    await fs.outputFileSync(path.join(this.rootPath, filepath), data)
+  public async put(
+    filepath: string,
+    data: object,
+    options?: {
+      includeTemplate?: boolean
+    }
+  ) {
+    const extension = path.extname(filepath)
+    const stringData = this.stringifyFile(
+      data,
+      extension,
+      !!options?.includeTemplate
+    )
+    await fs.outputFileSync(path.join(this.rootPath, filepath), stringData)
+  }
+  private stringifyFile = (
+    content: object,
+    format: FormatType | string, // FIXME
+    /** For non-polymorphic documents we don't need the template key */
+    keepTemplateKey: boolean
+  ): string => {
+    switch (format) {
+      case '.markdown':
+      case '.md':
+        // @ts-ignore
+        const { _id, _template, _collection, $_body, ...rest } = content
+        const extra: { [key: string]: string } = {}
+        if (keepTemplateKey) {
+          extra['_template'] = _template
+        }
+        return matter.stringify($_body || '', { ...rest, ...extra })
+      case '.json':
+        return JSON.stringify(content, null, 2)
+      default:
+        throw new Error(`Must specify a valid format, got ${format}`)
+    }
+  }
+
+  private parseFile = <T extends object>(
+    content: string,
+    format: FormatType | string, // FIXME
+    yupSchema: (args: typeof yup) => yup.ObjectSchema<any>
+  ): T => {
+    switch (format) {
+      case '.markdown':
+      case '.md':
+        const contentJSON = matter(content || '')
+        const markdownData = {
+          ...contentJSON.data,
+          $_body: contentJSON.content,
+        }
+        assertShape<T>(markdownData, yupSchema)
+        return markdownData
+      case '.json':
+        if (!content) {
+          return {} as T
+        }
+        return JSON.parse(content)
+      default:
+        throw new Error(`Must specify a valid format, got ${format}`)
+    }
   }
 }
 
 export interface Bridge {
   glob(pattern: string): Promise<string[]>
-  get(filepath: string): Promise<string>
-  put(filepath: string, data: string): Promise<void>
+  get(filepath: string): Promise<object>
+  put(
+    filepath: string,
+    data: object,
+    options?: {
+      includeTemplate?: boolean
+    }
+  ): Promise<void>
 }
+
+type FormatType = 'json' | 'md' | 'markdown' | 'yml' | 'yaml'

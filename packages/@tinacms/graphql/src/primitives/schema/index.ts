@@ -45,6 +45,9 @@ export class TinaSchema {
     this.schema = addNamespaceToSchema(
       _.cloneDeep(config)
     ) as TinaCloudSchemaEnriched
+    this.schema = addReverseReferencesToSchema(
+      this.schema
+    ) as TinaCloudSchemaEnriched
   }
 
   public getCollectionsByName = (collectionNames: string[]) => {
@@ -99,7 +102,7 @@ export class TinaSchema {
   }
   public getCollectionByFullPath = async (filepath: string) => {
     const collection = this.getCollections().find((collection) => {
-      return filepath.replace('\\','/').startsWith(collection.path)
+      return filepath.replace('\\', '/').startsWith(collection.path)
     })
     if (!collection) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
@@ -115,7 +118,7 @@ export class TinaSchema {
   }> => {
     let template
     const collection = this.getCollections().find((collection) => {
-      return filepath.replace('\\','/').startsWith(collection.path)
+      return filepath.replace('\\', '/').startsWith(collection.path)
     })
     if (!collection) {
       throw new Error(`Unable to find collection for file at ${filepath}`)
@@ -260,5 +263,69 @@ export class TinaSchema {
         )
       }
     }
+  }
+}
+
+export function* walk2(maybeNode: any) {
+  if (typeof maybeNode === 'string') {
+    return
+  }
+
+  // Traverse node's properties first
+  for (const value of Object.values(maybeNode)) {
+    if (Array.isArray(value)) {
+      for (const element of value) {
+        yield* walk2(element)
+      }
+    } else {
+      yield* walk2(value)
+    }
+  }
+  // Then pass it back to our callback, which will mutate it
+  yield maybeNode
+}
+
+/**
+ * FIXME: this assumes no template collections
+ * and no global templates with the namespace[0] lookup
+ */
+const addReverseReferencesToSchema = (schema: TinaSchema) => {
+  const referenceFields = {}
+  for (const node of walk2(schema)) {
+    if (node.fields) {
+      // console.log(node)
+      const referenceFieldsInner = node.fields.filter(
+        (field) => field.type === 'reference'
+      )
+      referenceFieldsInner.forEach((rfi) => {
+        rfi.collections.forEach((collectionName) => {
+          const existing = referenceFields[collectionName] || []
+          referenceFields[collectionName] = [...existing, rfi]
+        })
+      })
+    }
+  }
+
+  return {
+    collections: schema.collections.map((col) => {
+      const references = referenceFields[col.name]
+
+      const extra = references
+        ? [
+            {
+              type: 'reference',
+              list: true,
+              name: 'references',
+              collections: references.map((rf) => rf.namespace[0]),
+              namespace: [...col.namespace, 'references'],
+            },
+          ]
+        : []
+
+      return {
+        ...col,
+        fields: [...col.fields, ...extra],
+      }
+    }),
   }
 }

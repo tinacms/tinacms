@@ -19,15 +19,20 @@ import { NAMER } from '../ast-builder'
 import { Bridge, FilesystemBridge } from './bridge'
 import { createSchema } from '../schema'
 import { assertShape, lastItem } from '../util'
+import { LevelBridge } from './level'
 
 import type { TinaSchema } from '../schema'
-import type { TinaCloudSchemaBase } from '../types'
+import type { TinaCloudSchemaBase, Templateable } from '../types'
 import { DocumentNode, GraphQLError } from 'graphql'
 
 type CreateDatabase = { rootPath?: string; bridge?: Bridge }
 
 export const createDatabase = async (config: CreateDatabase) => {
-  return new Database(config)
+  // return new Database(config)
+  return new Database({
+    ...config,
+    bridge: config.bridge || new LevelBridge(config.rootPath || ''),
+  })
 }
 
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
@@ -41,15 +46,19 @@ export class Database {
   private _tinaSchema: TinaCloudSchemaBase | undefined
   constructor(public config: CreateDatabase) {
     this.bridge = config.bridge || new FilesystemBridge(config.rootPath || '')
+    this.accumulator = []
+  }
+
+  public clear = async () => {
+    await this.bridge.clear()
   }
 
   public get = async <T extends object>(filepath: string): Promise<T> => {
     if (SYSTEM_FILES.includes(filepath)) {
       try {
-        const dataString = await this.bridge.get(
+        return (await this.bridge.get(
           path.join(GENERATED_FOLDER, `${filepath}.json`)
-        )
-        return JSON.parse(dataString)
+        )) as T
       } catch (err) {
         /** File Not Found */
         if (err instanceof GraphQLError && err.extensions?.status === 404) {
@@ -64,12 +73,7 @@ export class Database {
     } else {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
-      const contentString = await this.bridge.get(filepath)
-      const contentObject = this.parseFile<{ [key: string]: unknown }>(
-        contentString,
-        extension,
-        (yup) => yup.object({})
-      )
+      const contentObject = await this.bridge.get(filepath)
       const templateName =
         hasOwnProperty(contentObject, '_template') &&
         typeof contentObject._template === 'string'
@@ -89,7 +93,7 @@ export class Database {
         return false
       })
 
-      let data = contentObject
+      let data = contentObject as { [key: string]: unknown }
       if (extension === '.md' && field) {
         if (hasOwnProperty(contentObject, '$_body')) {
           const { $_body, ...rest } = contentObject
@@ -109,11 +113,122 @@ export class Database {
     }
   }
 
+  public putIndex = async (filepath: string) => {
+    const tinaSchema = await this.getSchema()
+    const extension = path.extname(filepath)
+    const contentObject = await this.bridge.get(filepath)
+    const templateName =
+      hasOwnProperty(contentObject, '_template') &&
+      typeof contentObject._template === 'string'
+        ? contentObject._template
+        : undefined
+    const { collection, template } =
+      await tinaSchema.getCollectionAndTemplateByFullPath(
+        filepath,
+        templateName
+      )
+
+    this.mapWithFields(
+      contentObject.id,
+      contentObject.data,
+      [collection.name, template.name],
+      template,
+      this.accumulator
+    )
+    await Promise.all(
+      Object.entries(this.accumulator).map(async ([key, value]) => {
+        this.bridge.put(`__attribute__${key}`, value)
+        return true
+      })
+    )
+  }
+
+  private mapWithFields = (
+    id: string,
+    data: object,
+    path: string[],
+    template: Templateable,
+    accumulator: { [key: string]: string[] }
+  ) => {
+    Object.entries(data).forEach(([key, value]) => {
+      const field = template.fields.find((field) => field.name === key)
+      if (!field) {
+      } else {
+        if (!value) {
+          return
+        }
+        if (['string', 'number', 'boolean'].includes(typeof value)) {
+          const key = `${path.join('#')}#${field.name}#${
+            typeof value === 'string' ? value?.substr(0, 30) : ''
+          }`
+          const existingValue = accumulator[key] || []
+          accumulator[key] = [...existingValue, id]
+          if (field.type === 'reference') {
+            const existingReferenceValue =
+              accumulator[`reference#${value}`] || []
+            accumulator[`reference#${value}`] = [...existingReferenceValue, id]
+          }
+        } else if (Array.isArray(value)) {
+          value.forEach((item) => {
+            if (['string', 'number', 'boolean'].includes(typeof item)) {
+              const existingValue = accumulator[item] || []
+              accumulator[`${path.join('#')}#${field.name}#${item}`] = [
+                ...existingValue,
+                id,
+              ]
+              if (field.type === 'reference') {
+                const existingReferenceValue =
+                  accumulator[`reference#${item}`] || []
+                accumulator[`reference#${item}`] = [
+                  ...existingReferenceValue,
+                  id,
+                ]
+              }
+            } else {
+              if (field.type === 'object') {
+                const fieldTemplate = field.templates
+                  ? field.templates.find((t) => t.name === item._template)
+                  : field
+                if (!fieldTemplate) {
+                  throw new Error(
+                    `Expected to find template for item with _template: ${item._template}`
+                  )
+                }
+                const other = field.templates ? [fieldTemplate.name] : []
+                this.mapWithFields(
+                  id,
+                  item,
+                  [...path, field.name, ...other],
+                  fieldTemplate,
+                  accumulator
+                )
+              }
+            }
+          })
+        } else {
+          const fieldTemplate = field.templates
+            ? field.templates.find((t) => t.name === value._template)
+            : field
+          this.mapWithFields(
+            id,
+            value,
+            [...path, field.name],
+            fieldTemplate,
+            accumulator
+          )
+          // It's an object
+        }
+      }
+    })
+
+    return accumulator
+  }
+
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
     if (SYSTEM_FILES.includes(filepath)) {
       await this.bridge.put(
         path.join(GENERATED_FOLDER, `${filepath}.json`),
-        JSON.stringify(data, null, 2)
+        data
       )
     } else {
       const tinaSchema = await this.getSchema()
@@ -159,13 +274,9 @@ export class Database {
       } else {
         payload = data
       }
-      const extension = path.extname(filepath)
-      const stringData = this.stringifyFile(
-        payload,
-        extension,
-        templateInfo.type === 'union'
-      )
-      await this.bridge.put(filepath, stringData)
+      await this.bridge.put(filepath, payload, {
+        includeTemplate: templateInfo.type === 'union',
+      })
     }
     return true
   }
@@ -242,54 +353,6 @@ export class Database {
       lookupMap = {}
     }
     await this.put('_lookup', { ...lookupMap, [lookup.type]: lookup })
-  }
-
-  private stringifyFile = (
-    content: object,
-    format: FormatType | string, // FIXME
-    /** For non-polymorphic documents we don't need the template key */
-    keepTemplateKey: boolean
-  ): string => {
-    switch (format) {
-      case '.markdown':
-      case '.md':
-        // @ts-ignore
-        const { _id, _template, _collection, $_body, ...rest } = content
-        const extra: { [key: string]: string } = {}
-        if (keepTemplateKey) {
-          extra['_template'] = _template
-        }
-        return matter.stringify($_body || '', { ...rest, ...extra })
-      case '.json':
-        return JSON.stringify(content, null, 2)
-      default:
-        throw new Error(`Must specify a valid format, got ${format}`)
-    }
-  }
-
-  private parseFile = <T extends object>(
-    content: string,
-    format: FormatType | string, // FIXME
-    yupSchema: (args: typeof yup) => yup.ObjectSchema<any>
-  ): T => {
-    switch (format) {
-      case '.markdown':
-      case '.md':
-        const contentJSON = matter(content || '')
-        const markdownData = {
-          ...contentJSON.data,
-          $_body: contentJSON.content,
-        }
-        assertShape<T>(markdownData, yupSchema)
-        return markdownData
-      case '.json':
-        if (!content) {
-          return {} as T
-        }
-        return JSON.parse(content)
-      default:
-        throw new Error(`Must specify a valid format, got ${format}`)
-    }
   }
 }
 

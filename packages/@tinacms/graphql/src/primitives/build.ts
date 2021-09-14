@@ -21,14 +21,36 @@ import { extractInlineTypes } from './ast-builder'
 import type { FieldDefinitionNode } from 'graphql'
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
+import { FilesystemBridge } from './database/bridge'
+import { createDatabase, Database } from './database'
+import path from 'path'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
 export const indexDB = async ({ database, config }) => {
+  await database.clear()
   const tinaSchema = await createSchema({ schema: config })
+  await database.put(path.join('_schema'), tinaSchema.schema)
+  const fsBridge = new FilesystemBridge('')
+  fsBridge.put('.tina/__generated__/_schema.json', tinaSchema.schema)
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
-  await database.put('_graphql', graphQLSchema)
-  await database.put('_schema', tinaSchema.schema)
+  await database.put(path.join('_graphql'), graphQLSchema)
+  await _indexContent(tinaSchema, database)
+  fsBridge.put('.tina/__generated__/_graphql.json', graphQLSchema)
+}
+
+const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
+  const fsBridge = new FilesystemBridge('')
+  const fsDB = await createDatabase({ bridge: fsBridge, rootPath: '' })
+  await sequential(tinaSchema.getCollections(), async (collection) => {
+    const documents = await fsDB.getDocumentsForCollection(collection.name)
+    await sequential(documents, async (documentPath) => {
+      const data = await fsDB.getDocument(documentPath)
+      await database.put(documentPath, data)
+      await database.putIndex(documentPath)
+    })
+  })
+  await database.bridge?.print()
 }
 
 const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {

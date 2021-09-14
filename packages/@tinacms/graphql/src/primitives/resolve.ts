@@ -224,6 +224,28 @@ export const resolve = async ({
            */
           case 'multiCollectionDocumentList':
             assertShape<string[]>(value, (yup) => yup.array().of(yup.string()))
+            if (!value) {
+              /**
+               * Likely:
+               * We're serving a virtual reference field, for example
+               * an author's posts, in which case the reference
+               * is stored on the post. This is a reverse lookup
+               *
+               * Possibly:
+               * We happen to have a null value, in which case the
+               * result is still the same
+               */
+              try {
+                const ids = await resolver.database.bridge.get(
+                  `reference#${source._id}`
+                )
+                return resolver.resolveCollectionConnections({
+                  ids: ids || [],
+                })
+              } catch (e) {
+                return []
+              }
+            }
             return resolver.resolveCollectionConnections({
               ids: value || [],
             })

@@ -61,6 +61,7 @@ export class GithubBridge implements Bridge {
   private generateKey(key: string) {
     return `${this.repoConfig.owner}/${this.repoConfig.repo}/${this.repoConfig.ref}/${key}`
   }
+  public async print() {}
   private async readDir(filepath: string): Promise<string[]> {
     const fullPath = path.join(this.rootPath, filepath)
     return _.flatten(

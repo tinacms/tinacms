@@ -571,6 +571,18 @@
             "authors",
             "avatar"
           ]
+        },
+        {
+          "type": "reference",
+          "list": true,
+          "name": "references",
+          "collections": [
+            "posts"
+          ],
+          "namespace": [
+            "authors",
+            "references"
+          ]
         }
       ],
       "namespace": [
@@ -1223,6 +1235,5 @@
         "pages"
       ]
     }
-  ],
-  "namespace": []
+  ]
 }

@@ -14,6 +14,7 @@ limitations under the License.
 import _ from 'lodash'
 import path from 'path'
 import { TinaSchema } from '../schema'
+import flatten from 'flat'
 import { assertShape, sequential, lastItem } from '../util'
 import { NAMER } from '../ast-builder'
 import { Database, CollectionDocumentListLookup } from '../database'
@@ -98,10 +99,11 @@ export class Resolver {
       const data = {
         _collection: rawData._collection,
         _template: rawData._template,
+        ...rawData.data,
       }
-      await sequential(template.fields, async (field) =>
-        this.resolveFieldData(field, rawData, data)
-      )
+      // await sequential(template.fields, async (field) =>
+      //   this.resolveFieldData(field, rawData, data)
+      // )
 
       return {
         __typename: NAMER.documentTypeName([rawData._collection]),
@@ -258,9 +260,36 @@ export class Resolver {
     args: Record<string, Record<string, object>>
     lookup: CollectionDocumentListLookup
   }) => {
-    const documents = await this.database.getDocumentsForCollection(
-      lookup.collection
-    )
+    let documents = []
+    if (args && args.filter) {
+      const queries = []
+
+      const flattenedArgs = flatten(args.filter, { delimiter: '#' })
+      Object.entries(flattenedArgs).map(([key, value]) => {
+        queries.push(
+          `__attribute__${lookup.collection}#${lookup.collection}#${key}#${value}`
+        )
+      })
+      const resultSets = await sequential(queries, async (queryString) => {
+        try {
+          const res = await this.database.bridge.get(queryString)
+          return res
+        } catch (e) {
+          // No results so empty array
+          return []
+        }
+      })
+      if (resultSets.length > 0) {
+        const items = resultSets.reduce((p, c) =>
+          p.filter((e) => c.includes(e))
+        )
+        documents = items
+      }
+    } else {
+      documents = await this.database.getDocumentsForCollection(
+        lookup.collection
+      )
+    }
     return {
       totalCount: documents.length,
       edges: await sequential(documents, async (filepath) => {

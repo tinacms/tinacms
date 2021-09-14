@@ -58,26 +58,26 @@ export const baseCmds: Command[] = [
     command: CMD_START_SERVER,
     description: 'Start Filesystem Graphql Server',
     options: [startServerPortOption, subCommand, experimentalCommand],
-    action: options => chain([startServer], options),
+    action: (options) => chain([startServer], options),
   },
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
     options: [experimentalCommand],
-    action: options => chain([compile], options),
+    action: (options) => chain([compile], options),
   },
   {
     command: CMD_GEN_TYPES,
     description:
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
     options: [experimentalCommand],
-    action: options => chain([attachSchema, genTypes], options),
+    action: (options) => chain([attachSchema, genTypes], options),
   },
   {
     command: INIT,
     options: [experimentalCommand],
     description: 'Add Tina Cloud to an existing project',
-    action: options =>
+    action: (options) =>
       chain(
         [
           initTina,

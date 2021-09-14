@@ -11,6 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import fs from 'fs-extra'
 import path from 'path'
 import cors from 'cors'
 import http from 'http'
@@ -18,8 +19,9 @@ import express from 'express'
 import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
+import { compile } from '../compile'
 
-const gqlServer = async () => {
+const gqlServer = async (database) => {
   // This is lazily required so we can update the module
   // without having to restart the server
   const gqlPackage = require('@tinacms/graphql')
@@ -51,14 +53,32 @@ const gqlServer = async () => {
   )
 
   const rootPath = path.join(process.cwd())
+  await compile(null, null)
+  const config = await fs
+    .readFileSync(
+      path.join(rootPath, '.tina', '__generated__', 'config', 'schema.json')
+    )
+    .toString()
+  // const database = await gqlPackage.createDatabase({
+  //   rootPath,
+  // })
+  await gqlPackage.indexDB({ database, config: JSON.parse(config) })
+
   app.post('/graphql', async (req, res) => {
     const { query, variables } = req.body
-    const result = await gqlPackage.gql({
-      rootPath,
+    const result = await gqlPackage.resolve({
+      database,
       query,
       variables,
     })
+    // console.log('neww', meh)
     return res.json(result)
+    // const result = await gqlPackage.gql({
+    //   rootPath,
+    //   query,
+    //   variables,
+    // })
+    // return res.json(result)
   })
 
   return server
