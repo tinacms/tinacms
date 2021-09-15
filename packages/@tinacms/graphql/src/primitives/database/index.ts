@@ -33,9 +33,9 @@ export const createDatabase = async (config: CreateDatabase) => {
   return new Database({
     ...config,
     bridge: config.bridge || new FilesystemBridge(rootPath),
-    // store: config.store || new MemoryStore(rootPath),
+    store: config.store || new MemoryStore(rootPath),
     // store: config.store || new FileSystemStore(rootPath),
-    store: config.store || new LevelStore(rootPath),
+    // store: config.store || new LevelStore(rootPath),
   })
 }
 
