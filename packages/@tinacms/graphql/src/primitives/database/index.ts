@@ -19,6 +19,7 @@ import { lastItem } from '../util'
 import { createSchema } from '../schema'
 import { MemoryStore } from './store/memory-store'
 import { FileSystemStore } from './store/filesystem-store'
+import { LevelStore } from './store/level-store'
 import type { Store } from './store'
 
 import type { TinaSchema } from '../schema'
@@ -33,7 +34,8 @@ export const createDatabase = async (config: CreateDatabase) => {
     ...config,
     bridge: config.bridge || new FilesystemBridge(rootPath),
     // store: config.store || new MemoryStore(rootPath),
-    store: config.store || new FileSystemStore(rootPath),
+    // store: config.store || new FileSystemStore(rootPath),
+    store: config.store || new LevelStore(rootPath),
   })
 }
 
