@@ -27,4 +27,5 @@ yarn-error.log*
 .env.local
 
 db
-fsdb
+fsStore
+map.json

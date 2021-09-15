@@ -17,7 +17,9 @@ import { NAMER } from '../ast-builder'
 import { Bridge, FilesystemBridge } from './bridge'
 import { lastItem } from '../util'
 import { createSchema } from '../schema'
-import { MemoryStore, Store } from './store'
+import { MemoryStore } from './store/memory-store'
+import { FileSystemStore } from './store/filesystem-store'
+import type { Store } from './store'
 
 import type { TinaSchema } from '../schema'
 import type { TinaCloudSchemaBase, Templateable } from '../types'
@@ -30,7 +32,8 @@ export const createDatabase = async (config: CreateDatabase) => {
   return new Database({
     ...config,
     bridge: config.bridge || new FilesystemBridge(rootPath),
-    store: config.store || new MemoryStore(rootPath),
+    // store: config.store || new MemoryStore(rootPath),
+    store: config.store || new FileSystemStore(rootPath),
   })
 }
 
