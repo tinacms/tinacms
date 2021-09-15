@@ -30,27 +30,25 @@ export const indexDB = async ({ database, config }) => {
   await database.clear()
   const tinaSchema = await createSchema({ schema: config })
   await database.put(path.join('_schema'), tinaSchema.schema)
-  const fsBridge = new FilesystemBridge('')
-  fsBridge.put('.tina/__generated__/_schema.json', tinaSchema.schema)
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   await database.put(path.join('_graphql'), graphQLSchema)
   await _indexContent(tinaSchema, database)
-  fsBridge.put('.tina/__generated__/_graphql.json', graphQLSchema)
 }
 
 const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
-  const fsBridge = new FilesystemBridge('')
-  const fsDB = await createDatabase({ bridge: fsBridge, rootPath: '' })
   await sequential(tinaSchema.getCollections(), async (collection) => {
-    const documents = await fsDB.getDocumentsForCollection(collection.name)
+    const documents = await database.getDocumentsForCollection(
+      collection.name,
+      { useBridge: true }
+    )
     await sequential(documents, async (documentPath) => {
-      const data = await fsDB.getDocument(documentPath)
+      const data = await database.getDocument(documentPath, { useBridge: true })
       await database.put(documentPath, data)
-      await database.putIndex(documentPath)
+      await database.putIndex(documentPath, data)
     })
   })
-  await database.bridge?.print()
+  await database.store.print()
 }
 
 const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {

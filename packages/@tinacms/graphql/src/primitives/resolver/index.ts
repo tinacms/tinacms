@@ -272,7 +272,7 @@ export class Resolver {
       })
       const resultSets = await sequential(queries, async (queryString) => {
         try {
-          const res = await this.database.bridge.get(queryString)
+          const res = await this.database.store.get(queryString)
           return res
         } catch (e) {
           // No results so empty array

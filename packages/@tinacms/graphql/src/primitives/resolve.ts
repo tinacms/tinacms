@@ -236,8 +236,8 @@ export const resolve = async ({
                * result is still the same
                */
               try {
-                const ids = await resolver.database.bridge.get(
-                  `reference#${source._id}`
+                const ids = await resolver.database.store.get(
+                  `__attribute__reference#${source._id}`
                 )
                 return resolver.resolveCollectionConnections({
                   ids: ids || [],

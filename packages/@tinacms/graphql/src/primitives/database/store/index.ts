@@ -15,11 +15,13 @@ import fg from 'fast-glob'
 import fs from 'fs-extra'
 import path from 'path'
 import normalize from 'normalize-path'
-import level, { LevelDB } from 'level'
+import { LevelDB } from 'level'
 
-interface Store {
+export interface Store {
   glob(pattern: string): Promise<string[]>
   get(filepath: string): Promise<object>
+  clear(): Promise<void>
+  print(): Promise<void>
   put(
     filepath: string,
     data: object,
@@ -35,34 +37,19 @@ interface Store {
  * for Github has well.
  */
 let map = {}
-export class LevelStore implements Store {
+export class MemoryStore implements Store {
   public rootPath: string
   public db: LevelDB<any, any>
   constructor(rootPath: string) {
     this.rootPath = rootPath || ''
-    this.db = level(path.join('.tina', 'db'))
-    // this.db = {
-    //   get: async (filepath) => {
-    //     const eh = await fs
-    //       .readFileSync(path.join('.tina', 'fsdb', filepath))
-    //       .toString()
-    //     return eh
-    //   },
-    //   put: async (filepath, content) => {
-    //     await fs.outputFileSync(
-    //       path.join('.tina', 'fsdb', filepath),
-    //       JSON.stringify(content, null, 2)
-    //     )
-    //   },
-    // }
-    // this.db = {
-    //   get: async (filepath) => {
-    //     return map[filepath]
-    //   },
-    //   put: async (filepath, content) => {
-    //     map[filepath] = content
-    //   },
-    // }
+    this.db = {
+      get: async (filepath) => {
+        return map[filepath]
+      },
+      put: async (filepath, content) => {
+        map[filepath] = content
+      },
+    }
   }
   public async print() {
     const obj = Object.keys(map)
@@ -101,8 +88,8 @@ export class LevelStore implements Store {
   }
   public async get(filepath: string) {
     const content = await this.db.get(filepath)
-    return JSON.parse(content)
-    // return content
+    // return JSON.parse(content)
+    return content
   }
   public async put(filepath: string, data: object) {
     await this.db.put(filepath, data, { valueEncoding: 'json' })

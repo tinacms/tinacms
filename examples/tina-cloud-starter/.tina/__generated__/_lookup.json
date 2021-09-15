@@ -119,5 +119,12 @@
     "collections": [
       "posts"
     ]
+  },
+  "AuthorsReferencesConnection": {
+    "type": "AuthorsReferencesConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "posts"
+    ]
   }
 }

@@ -12,26 +12,25 @@ limitations under the License.
 */
 
 import _ from 'lodash'
-import * as yup from 'yup'
-import matter from 'gray-matter'
 import path from 'path'
 import { NAMER } from '../ast-builder'
 import { Bridge, FilesystemBridge } from './bridge'
+import { lastItem } from '../util'
 import { createSchema } from '../schema'
-import { assertShape, lastItem } from '../util'
-import { LevelBridge } from './level'
+import { MemoryStore, Store } from './store'
 
 import type { TinaSchema } from '../schema'
 import type { TinaCloudSchemaBase, Templateable } from '../types'
 import { DocumentNode, GraphQLError } from 'graphql'
 
-type CreateDatabase = { rootPath?: string; bridge?: Bridge }
+type CreateDatabase = { rootPath?: string; bridge?: Bridge; store?: Store }
 
 export const createDatabase = async (config: CreateDatabase) => {
-  // return new Database(config)
+  const rootPath = config.rootPath || ''
   return new Database({
     ...config,
-    bridge: config.bridge || new LevelBridge(config.rootPath || ''),
+    bridge: config.bridge || new FilesystemBridge(rootPath),
+    store: config.store || new MemoryStore(rootPath),
   })
 }
 
@@ -40,20 +39,26 @@ const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
 export class Database {
   public bridge: Bridge
+  public store: Store
+  private accumulator: any[]
   private tinaSchema: TinaSchema | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   private _graphql: DocumentNode | undefined
   private _tinaSchema: TinaCloudSchemaBase | undefined
   constructor(public config: CreateDatabase) {
-    this.bridge = config.bridge || new FilesystemBridge(config.rootPath || '')
+    this.bridge = config.bridge
+    this.store = config.store
     this.accumulator = []
   }
 
   public clear = async () => {
-    await this.bridge.clear()
+    await this.store.clear()
   }
 
-  public get = async <T extends object>(filepath: string): Promise<T> => {
+  public get = async <T extends object>(
+    filepath: string,
+    options?: { useBridge?: boolean }
+  ): Promise<T> => {
     if (SYSTEM_FILES.includes(filepath)) {
       try {
         return (await this.bridge.get(
@@ -73,7 +78,9 @@ export class Database {
     } else {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
-      const contentObject = await this.bridge.get(filepath)
+      const contentObject = options?.useBridge
+        ? await this.bridge.get(filepath)
+        : await this.store.get(filepath)
       const templateName =
         hasOwnProperty(contentObject, '_template') &&
         typeof contentObject._template === 'string'
@@ -113,10 +120,11 @@ export class Database {
     }
   }
 
-  public putIndex = async (filepath: string) => {
+  public putIndex = async (
+    filepath: string,
+    contentObject: { id: string; data: object }
+  ) => {
     const tinaSchema = await this.getSchema()
-    const extension = path.extname(filepath)
-    const contentObject = await this.bridge.get(filepath)
     const templateName =
       hasOwnProperty(contentObject, '_template') &&
       typeof contentObject._template === 'string'
@@ -136,8 +144,9 @@ export class Database {
       this.accumulator
     )
     await Promise.all(
-      Object.entries(this.accumulator).map(async ([key, value]) => {
-        this.bridge.put(`__attribute__${key}`, value)
+      Object.entries(this.accumulator).map(async ([key, items]) => {
+        const uniqueItems = [...new Set(items)]
+        this.store.put(`__attribute__${key}`, uniqueItems)
         return true
       })
     )
@@ -274,7 +283,7 @@ export class Database {
       } else {
         payload = data
       }
-      await this.bridge.put(filepath, payload, {
+      await this.store.put(filepath, payload, {
         includeTemplate: templateInfo.type === 'union',
       })
     }
@@ -314,14 +323,17 @@ export class Database {
     return this.tinaSchema
   }
 
-  public getDocument = async (fullPath: unknown) => {
+  public getDocument = async (
+    fullPath: unknown,
+    options?: { useBridge: boolean }
+  ) => {
     if (typeof fullPath !== 'string') {
       throw new Error(`fullPath must be of type string for getDocument request`)
     }
     const data = await this.get<{
       _collection: string
       _template: string
-    }>(fullPath)
+    }>(fullPath, options)
     return {
       __typename: NAMER.documentTypeName([data._collection]),
       id: fullPath,
@@ -339,9 +351,15 @@ export class Database {
     return true
   }
 
-  public getDocumentsForCollection = async (collectionName: string) => {
+  public getDocumentsForCollection = async (
+    collectionName: string,
+    options?: { useBridge?: boolean }
+  ) => {
     const tinaSchema = await this.getSchema()
     const collection = await tinaSchema.getCollection(collectionName)
+    if (options?.useBridge) {
+      return this.store.glob(collection.path)
+    }
     return this.bridge.glob(collection.path)
   }
 
