@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
 
 Copyright 2021 Forestry.io Holdings, Inc.

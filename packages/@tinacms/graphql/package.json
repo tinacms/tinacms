@@ -19,7 +19,7 @@
   "scripts": {
     "build": "yarn tsup src/index.ts --format cjs --dts",
     "watch": "yarn tsup src/index.ts --watch --format cjs --dts",
-    "types": "yarn tsc --project tsconfig.real.js",
+    "types": "yarn tsc --project ./tsconfig.real.json",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
     "test": "jest"
