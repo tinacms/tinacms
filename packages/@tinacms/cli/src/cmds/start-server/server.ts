@@ -80,12 +80,12 @@ const gqlServer = async () => {
   app.post('/create-branch', async (req, res) => {
     try {
       const { query } = req
-      const { owner, repo, name, branch } = query
+      const { owner, repo, name, baseBranch } = query
       const result = await gqlPackage.createBranch({
         auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
         owner,
         repo,
-        branch,
+        baseBranch,
         name
       })
       return res.json(result)
