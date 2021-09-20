@@ -61,6 +61,39 @@ const gqlServer = async () => {
     return res.json(result)
   })
 
+  app.get('/list-branches', async (req, res) => {
+    try {
+      const { query } = req
+      const { owner, repo } = query
+      const result = await gqlPackage.listBranches({
+        auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+        owner,
+        repo
+      })
+  
+      return res.json(result.data)
+    } catch(error) {
+      console.error('There was a problem fetching the branches.', error)
+    }
+  })
+
+  app.post('/create-branch', async (req, res) => {
+    try {
+      const { query } = req
+      const { owner, repo, name, baseBranch } = query
+      const result = await gqlPackage.createBranch({
+        auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+        owner,
+        repo,
+        baseBranch,
+        name
+      })
+      return res.json(result)
+    } catch(error) {
+      console.error('There was a problem creating a new branch.', error)
+    }
+  })
+
   return server
 }
 
