@@ -29,9 +29,8 @@ const App = ({ Component, pageProps }) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
-              cms.plugins.add(BranchSwitcherPlugin);
+              cms.plugins.add(new BranchSwitcherPlugin(currentBranch));
               cms.events.subscribe("content-source-change", ({ branch }) => {
-                console.log(`ready to switch branch to ${branch}`);
                 setCurrentBranch(branch);
               });
             }}
