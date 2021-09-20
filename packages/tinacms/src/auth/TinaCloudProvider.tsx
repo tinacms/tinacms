@@ -140,9 +140,9 @@ export const TinaCloudProvider = (
       }),
     [props.cms]
   )
-  if (!cms.api.tina) {
-    cms.api.tina = createClient(props)
-  }
+
+  cms.registerApi('tina', createClient(props))
+
   const setupMedia = async () => {
     if (props.mediaStore) {
       cms.media.store = new (await props.mediaStore)(cms.api.tina)
