@@ -14,14 +14,34 @@ limitations under the License.
 import fs from 'fs-extra'
 import path from 'path'
 import { indexDB } from './build'
-import { resolve } from './resolve'
+import { resolve as innerResolve } from './resolve'
 import { buildASTSchema } from 'graphql'
 import { GithubBridge } from './database/github'
 import { simpleCache } from '../cache/lru'
 import { createDatabase } from './database'
 
-export { createDatabase, resolve, indexDB }
+export { createDatabase, indexDB }
 export type { TinaCloudSchema } from './types'
+
+export const resolve = async ({ query, variables }) => {
+  const gh = new GithubBridge({
+    // Path to directory with .tina folder
+    rootPath: 'examples/tina-cloud-starter',
+    ref: 'cloud-branch-switcher',
+    // Github personal access token
+    accessToken: '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',
+    owner: 'tinacms',
+    repo: 'tinacms',
+  })
+  const database = await createDatabase({
+    bridge: gh,
+  })
+  return innerResolve({
+    database,
+    query,
+    variables,
+  })
+}
 
 export const gql = async ({
   rootPath,

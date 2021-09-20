@@ -133,8 +133,9 @@ export class GithubBridge implements Bridge {
               { status: e.status }
             )
           }
+          console.error(e.message)
           throw new GraphQLError(
-            `Unable to find record '${filepath}' in Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', Ref: '${this.repoConfig.ref}'`,
+            `Unable to find record '${realpath}' in Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', Ref: '${this.repoConfig.ref}'`,
             null,
             null,
             null,
