@@ -39,6 +39,12 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
+
+  // A variable that will cause the forms to refresh
+  const [refreshVar, setRefreshVar] = React.useState(0)
+  cms.events.subscribe('cms:forms:refresh', (_e) => {
+    setRefreshVar(refreshVar + 1)
+  })
   /**
    * FIXME: this design is pretty flaky, but better than what
    * we've had previously. The way it works is we update `formValues`
@@ -287,7 +293,7 @@ export function useGraphqlForms<T extends object>({
         console.error(e)
         setIsLoading(false)
       })
-  }, [queryString, JSON.stringify(variables)])
+  }, [queryString, JSON.stringify(variables), refreshVar])
 
   return [data as T, isLoading]
 }

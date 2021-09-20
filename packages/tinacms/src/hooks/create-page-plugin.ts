@@ -105,6 +105,7 @@ export class ContentCreatorPlugin implements AddContentPlugin<FormShape> {
             cms.alerts.error(e.message)
           })
         } else {
+          cms.events.dispatch({ type: 'cms:forms:refresh' })
           cms.alerts.info('Document created!')
           if (typeof this.onNewDocument === 'function') {
             this.onNewDocument(res.addPendingDocument.sys)
