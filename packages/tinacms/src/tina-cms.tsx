@@ -198,6 +198,8 @@ export const TinaCMSProvider2 = ({
   if (typeof props.query === 'string') {
     props.query
   }
+  const variables = props.variables || ({} as any)
+  variables.branch = branch
   return (
     <TinaCloudProvider
       branch={branch}
@@ -208,7 +210,12 @@ export const TinaCMSProvider2 = ({
       mediaStore={mediaStore}
     >
       {props.query ? (
-        <SetupHooks key={props.query} {...props} query={props.query || ''}>
+        <SetupHooks
+          key={props.query}
+          variables={variables}
+          {...props}
+          query={props.query || ''}
+        >
           {children}
         </SetupHooks>
       ) : (

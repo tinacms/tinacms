@@ -37,6 +37,7 @@ interface ServerOptions {
 }
 
 export class Client {
+  branch: string
   frontendUrl: string
   contentApiUrl: string
   identityApiUrl: string
@@ -48,6 +49,7 @@ export class Client {
   private token: string // used with memory storage
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
+    this.branch = options.branch
     const encodedBranch = encodeURIComponent(options.branch)
     this.frontendUrl =
       options.tinaioConfig?.frontendUrlOverride || 'https://app.tina.io'
@@ -173,7 +175,7 @@ mutation addPendingDocumentMutation(
       },
       body: JSON.stringify({
         query: typeof query === 'function' ? print(query(gql)) : query,
-        variables,
+        variables: { ref: this.branch, ...variables },
       }),
     })
 
@@ -252,10 +254,10 @@ mutation addPendingDocumentMutation(
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
 export class LocalClient extends Client {
-  constructor(props?: { customContentApiUrl?: string }) {
+  constructor(props?: { customContentApiUrl?: string; branch?: string }) {
     const clientProps = {
       clientId: '',
-      branch: '',
+      branch: (props && props.branch) || '',
       customContentApiUrl:
         props && props.customContentApiUrl
           ? props.customContentApiUrl

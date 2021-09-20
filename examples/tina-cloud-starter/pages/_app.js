@@ -1,7 +1,9 @@
 import "../styles.css";
+import { useState } from "react";
 import dynamic from "next/dynamic";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
+import { BranchSwitcherPlugin } from "../plugins/branch-switcher";
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 
 const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
@@ -9,13 +11,14 @@ const NEXT_PUBLIC_USE_LOCAL_CLIENT =
   process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT || true;
 
 const App = ({ Component, pageProps }) => {
+  const [currentBranch, setCurrentBranch] = useState("main");
   return (
     <>
       <TinaEditProvider
         showEditButton={true}
         editMode={
           <TinaCMS
-            branch="main"
+            branch={currentBranch}
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
             mediaStore={import("next-tinacms-cloudinary").then(
@@ -25,6 +28,11 @@ const App = ({ Component, pageProps }) => {
             cmsCallback={(cms) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
+              });
+              cms.plugins.add(BranchSwitcherPlugin);
+              cms.events.subscribe("content-source-change", ({ branch }) => {
+                console.log(`ready to switch branch to ${branch}`);
+                setCurrentBranch(branch);
               });
             }}
             documentCreatorCallback={{

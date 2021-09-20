@@ -28,7 +28,7 @@ export const createClient = ({
   tinaioConfig,
 }: CreateClientProps) => {
   return isLocalClient
-    ? new LocalClient()
+    ? new LocalClient({ branch })
     : new Client({
         clientId: clientId || '',
         branch: branch || 'main',

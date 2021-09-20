@@ -24,12 +24,13 @@ export { createDatabase, indexDB }
 export type { TinaCloudSchema } from './types'
 
 export const resolve = async ({ query, variables }) => {
+  const ref = variables && variables.ref ? variables.ref : 'main'
   const gh = new GithubBridge({
     // Path to directory with .tina folder
     rootPath: 'examples/tina-cloud-starter',
-    ref: 'cloud-branch-switcher',
+    ref,
     // Github personal access token
-    accessToken: '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',
+    accessToken: '',
     owner: 'tinacms',
     repo: 'tinacms',
   })
