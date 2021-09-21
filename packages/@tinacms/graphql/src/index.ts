@@ -53,12 +53,14 @@ export const listBranches = async ({auth, owner, repo}) => {
 }
 
 export const createBranch = async ({ auth, owner, repo, name, baseBranch }) => {
+  console.log('!!!!!!!!', baseBranch)
   const appOctoKit = new Octokit({ auth })
   const currentBranch = await appOctoKit.repos.getBranch({
     owner,
     repo,
     branch: baseBranch
   })
+
   const newBranch = await appOctoKit.git.createRef({
     owner,
     repo,
