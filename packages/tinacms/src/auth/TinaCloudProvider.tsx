@@ -14,11 +14,11 @@ limitations under the License.
 import { ModalBuilder } from './AuthModal'
 import React, { useState } from 'react'
 import { TinaCMS, TinaProvider, MediaStore } from '@tinacms/toolkit'
+import { useEditState } from '@tinacms/edit-state'
 
 import { Client, TinaIOConfig } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
 import { CreateClientProps, createClient } from '../utils'
-import { setEditing } from '../edit-state'
 
 type ModalNames = null | 'authenticate'
 
@@ -50,6 +50,7 @@ export const AuthWallInner = ({
 
   const [activeModal, setActiveModal] = useState<ModalNames>(null)
   const [showChildren, setShowChildren] = useState<boolean>(false)
+  const { setEdit } = useEditState()
 
   React.useEffect(() => {
     client.isAuthenticated().then((isAuthenticated) => {
@@ -95,12 +96,12 @@ export const AuthWallInner = ({
               action: async () => {
                 // This does not work it looks like we have somehow getting two contexts
                 // console.log({ setEdit })
-                // setEdit(false)
-                // setActiveModal(null)
+                setEdit(false)
+                setActiveModal(null)
 
                 // This is a temp fix
-                setEditing(false) // set editing just sets the local storage
-                window.location.reload()
+                // setEditing(false) // set editing just sets the local storage
+                // window.location.reload()
               },
               name: 'Close',
               primary: false,

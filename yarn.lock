@@ -4554,6 +4554,22 @@ __metadata:
   languageName: unknown
   linkType: soft
 
+"@tinacms/edit-state@workspace:*, @tinacms/edit-state@workspace:packages/@tinacms/edit-state":
+  version: 0.0.0-use.local
+  resolution: "@tinacms/edit-state@workspace:packages/@tinacms/edit-state"
+  dependencies:
+    "@types/react": ^17.0.14
+    "@types/react-dom": ^17.0.9
+    react: 17.0.2
+    react-dom: 17.0.2
+    tsup: 4.12.5
+    typescript: ^4.3.5
+  peerDependencies:
+    react: ">=16.8"
+    react-dom: ">=16.8"
+  languageName: unknown
+  linkType: soft
+
 "@tinacms/graphql@workspace:*, @tinacms/graphql@workspace:packages/@tinacms/graphql":
   version: 0.0.0-use.local
   resolution: "@tinacms/graphql@workspace:packages/@tinacms/graphql"
@@ -24793,6 +24809,7 @@ resolve@^2.0.0-next.3:
     "@tailwindcss/typography": ^0.4.1
     "@tinacms/auth": "workspace:*"
     "@tinacms/cli": "workspace:*"
+    "@tinacms/edit-state": "workspace:*"
     "@types/js-cookie": ^2.2.6
     "@types/node": ^13.13.1
     "@types/react": ^16.9.43
@@ -24850,6 +24867,7 @@ resolve@^2.0.0-next.3:
     "@graphql-codegen/core": ^1.15.4
     "@graphql-codegen/typescript": ^1.15.4
     "@graphql-codegen/typescript-operations": ^1.15.4
+    "@tinacms/edit-state": "workspace:*"
     "@tinacms/scripts": "workspace:*"
     "@tinacms/toolkit": "workspace:*"
     "@types/lodash": ^4.14.169
@@ -24881,6 +24899,7 @@ resolve@^2.0.0-next.3:
     xstate: ^4.15.1
     yup: ^0.32.0
   peerDependencies:
+    "@tinacms/edit-state": "*"
     react: ">=16.8"
     react-dom: ">=16.8"
     react-is: ^16.13.1 || <18.0.0

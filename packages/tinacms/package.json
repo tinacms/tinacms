@@ -36,7 +36,6 @@
     "lodash.has": "^4.5.2",
     "lodash.merge": "^4.6.2",
     "lodash.set": "^4.3.2",
-    "next": "9.4.2",
     "node-fetch": "^2.6.0",
     "prop-types": "15.7.2",
     "ts-jest": "^26.5.3",
@@ -44,6 +43,7 @@
     "yup": "^0.32.0"
   },
   "devDependencies": {
+    "@tinacms/edit-state": "workspace:*",
     "@tinacms/scripts": "workspace:*",
     "@types/lodash": "^4.14.169",
     "@types/node": "^14.0.13",
@@ -57,6 +57,7 @@
     "typescript": "^4.3.5"
   },
   "peerDependencies": {
+    "@tinacms/edit-state": "*",
     "react": ">=16.8",
     "react-dom": ">=16.8",
     "react-is": "^16.13.1 || <18.0.0",
