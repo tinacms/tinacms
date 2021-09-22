@@ -4558,6 +4558,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "@tinacms/edit-state@workspace:packages/@tinacms/edit-state"
   dependencies:
+    "@types/node": ^14.0.13
     "@types/react": ^17.0.14
     "@types/react-dom": ^17.0.9
     react: 17.0.2
@@ -4567,6 +4568,7 @@ __metadata:
   peerDependencies:
     react: ">=16.8"
     react-dom: ">=16.8"
+    react-is: ^16.13.1 || <18.0.0
   languageName: unknown
   linkType: soft
 

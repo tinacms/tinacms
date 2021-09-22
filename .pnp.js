@@ -100,7 +100,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
     "fallbackExclusionList": [
       ["@tinacms/auth", ["virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#workspace:packages/@tinacms/auth", "workspace:packages/@tinacms/auth"]],
       ["@tinacms/cli", ["workspace:packages/@tinacms/cli"]],
-      ["@tinacms/edit-state", ["virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#workspace:packages/@tinacms/edit-state", "virtual:4d44519fed11c7c997e42e15b19fe60c96a689c3a6b80e7692165d06bd7ecf1f7314fdefaed7aefc691fc73cb53257251a041d7e556a8555d92bd56a9368a8a6#workspace:packages/@tinacms/edit-state", "virtual:a505e725aa28a6edf35804bd42f05f8ba4842f5d73b5540c5714aab3178763febbc1b90d3b0e5398dc75e28f576ed633b2bcfcf02e4143e94cd2bb9cdc95f37f#workspace:packages/@tinacms/edit-state", "virtual:c63baf4f3e2ac9f9914dba2ed9c76873fb19a6d4ecd15627f574711dc8270f2def27168919f560fe2e6e780d8d63aec87a7f1448272b2136363a72ddc7fbc42e#workspace:packages/@tinacms/edit-state", "virtual:e889d1f5fd31539481dea7aac568c49533f162b70a2620cda85aeaf1e8c313afa3ef9ad883e8e1e76504391f1a6a7566b0e17ecd57d890b9f19e564588fbff74#workspace:packages/@tinacms/edit-state", "workspace:packages/@tinacms/edit-state"]],
+      ["@tinacms/edit-state", ["virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#workspace:packages/@tinacms/edit-state", "virtual:4d44519fed11c7c997e42e15b19fe60c96a689c3a6b80e7692165d06bd7ecf1f7314fdefaed7aefc691fc73cb53257251a041d7e556a8555d92bd56a9368a8a6#workspace:packages/@tinacms/edit-state", "virtual:a505e725aa28a6edf35804bd42f05f8ba4842f5d73b5540c5714aab3178763febbc1b90d3b0e5398dc75e28f576ed633b2bcfcf02e4143e94cd2bb9cdc95f37f#workspace:packages/@tinacms/edit-state", "virtual:c63baf4f3e2ac9f9914dba2ed9c76873fb19a6d4ecd15627f574711dc8270f2def27168919f560fe2e6e780d8d63aec87a7f1448272b2136363a72ddc7fbc42e#workspace:packages/@tinacms/edit-state", "virtual:d364c97c5a9f4ba424658a53cc19c517a31c1ca0c948e29f916b2fb0661548c18424babbce9c24a8e5b6f92fd77a4c106fe69eec593a17c05a527230c460ced8#workspace:packages/@tinacms/edit-state", "virtual:e889d1f5fd31539481dea7aac568c49533f162b70a2620cda85aeaf1e8c313afa3ef9ad883e8e1e76504391f1a6a7566b0e17ecd57d890b9f19e564588fbff74#workspace:packages/@tinacms/edit-state", "workspace:packages/@tinacms/edit-state"]],
       ["@tinacms/graphql", ["workspace:packages/@tinacms/graphql"]],
       ["@tinacms/scripts", ["workspace:packages/@tinacms/scripts"]],
       ["@tinacms/toolkit", ["virtual:0cf8a36df11e795e7c1f161c22e844302c8da246198d95f079b62206ce82bab2bcc73240bf1f675aee09198d58abf861a77139fcb1afa5ccdddcf49a247e31b9#workspace:packages/@tinacms/toolkit", "virtual:3e265ebba5cc67ef2f09315673b6688debec43982b70e78c7908c88f4a0d78f77660782078dc20ae1ecbaa402aaaa7d03ec05906311cc17da75329f19a8d7067#workspace:packages/@tinacms/toolkit", "virtual:4d44519fed11c7c997e42e15b19fe60c96a689c3a6b80e7692165d06bd7ecf1f7314fdefaed7aefc691fc73cb53257251a041d7e556a8555d92bd56a9368a8a6#workspace:packages/@tinacms/toolkit", "virtual:6a722955ed57dbf06f901cafb28a085f21da21c5bb6e0b11355b424b33691ec39ada5d5e052a59c68879637c8cda651cab6a7455681b907a78c2139a91557176#workspace:packages/@tinacms/toolkit", "virtual:7ca658e70ee75535fa810678d493ce5eab6dbd235a5852e430a9af38a45da887a4542723c9b0ffec9cef8f8d1548cc177d59c2f55d8ee0bc724165684d67322f#workspace:packages/@tinacms/toolkit", "virtual:94aac8062551e5988337ba0cd62ac19e83e7abc6057ee3ddc8bd50076d8a2eea9b2c42e7cda13d78f23873f077fd5a4a94547833c6ee5e73b97ebbd270bb8fde#workspace:packages/@tinacms/toolkit", "virtual:b8dbd5f126b0a93f965753292cf040ae5310dccb5a23f9499e99fce8932a32c8a41e8bb26c74e095b4b51579a019066c555944045d3391c44d6cf88ef76a4092#workspace:packages/@tinacms/toolkit", "virtual:c63baf4f3e2ac9f9914dba2ed9c76873fb19a6d4ecd15627f574711dc8270f2def27168919f560fe2e6e780d8d63aec87a7f1448272b2136363a72ddc7fbc42e#workspace:packages/@tinacms/toolkit", "virtual:e5f1c0bc7aa3d5a092a1e29b51023bdc3224f12804605e3f9aa1138a58869fcb6a39551bf89a6eb530ede3e962f6db56b32c07b4d2ae71cd028b9c1887cf71e3#workspace:packages/@tinacms/toolkit", "virtual:e889d1f5fd31539481dea7aac568c49533f162b70a2620cda85aeaf1e8c313afa3ef9ad883e8e1e76504391f1a6a7566b0e17ecd57d890b9f19e564588fbff74#workspace:packages/@tinacms/toolkit", "virtual:ef5f0464a93c3efa41c08b335f0011b665ab750b218ec89596f2c387b034c562de80d22bd9889f3b06824e2d0df8379c46c9f8422073fc867bf4526e43954b59#workspace:packages/@tinacms/toolkit", "workspace:packages/@tinacms/toolkit"]],
@@ -10833,16 +10833,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/$$virtual/@tinacms-edit-state-virtual-8f169417f3/1/packages/@tinacms/edit-state/",
           "packageDependencies": [
             ["@tinacms/edit-state", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#workspace:packages/@tinacms/edit-state"],
+            ["@types/node", "npm:14.17.5"],
             ["@types/react", "npm:16.14.11"],
             ["@types/react-dom", "npm:17.0.9"],
+            ["@types/react-is", null],
             ["react", "npm:16.14.0"],
             ["react-dom", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#npm:16.14.0"],
+            ["react-is", "npm:17.0.2"],
             ["tsup", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:4.12.5"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
+            "@types/react-is",
             "@types/react",
             "react-dom",
+            "react-is",
             "react"
           ],
           "linkType": "SOFT",
@@ -10851,16 +10856,21 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/$$virtual/@tinacms-edit-state-virtual-fcea47ef33/1/packages/@tinacms/edit-state/",
           "packageDependencies": [
             ["@tinacms/edit-state", "virtual:4d44519fed11c7c997e42e15b19fe60c96a689c3a6b80e7692165d06bd7ecf1f7314fdefaed7aefc691fc73cb53257251a041d7e556a8555d92bd56a9368a8a6#workspace:packages/@tinacms/edit-state"],
+            ["@types/node", "npm:14.17.5"],
             ["@types/react", "npm:16.14.11"],
             ["@types/react-dom", "npm:17.0.9"],
+            ["@types/react-is", null],
             ["react", "npm:16.13.1"],
             ["react-dom", "virtual:ef5f0464a93c3efa41c08b335f0011b665ab750b218ec89596f2c387b034c562de80d22bd9889f3b06824e2d0df8379c46c9f8422073fc867bf4526e43954b59#npm:16.13.1"],
+            ["react-is", null],
             ["tsup", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:4.12.5"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
+            "@types/react-is",
             "@types/react",
             "react-dom",
+            "react-is",
             "react"
           ],
           "linkType": "SOFT",
@@ -10869,17 +10879,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/$$virtual/@tinacms-edit-state-virtual-7f4cc1db8d/1/packages/@tinacms/edit-state/",
           "packageDependencies": [
             ["@tinacms/edit-state", "virtual:a505e725aa28a6edf35804bd42f05f8ba4842f5d73b5540c5714aab3178763febbc1b90d3b0e5398dc75e28f576ed633b2bcfcf02e4143e94cd2bb9cdc95f37f#workspace:packages/@tinacms/edit-state"],
+            ["@types/node", "npm:14.17.5"],
             ["@types/react", "npm:16.14.11"],
             ["@types/react-dom", "npm:16.9.14"],
+            ["@types/react-is", null],
             ["react", "npm:16.12.0"],
             ["react-dom", "virtual:0cf8a36df11e795e7c1f161c22e844302c8da246198d95f079b62206ce82bab2bcc73240bf1f675aee09198d58abf861a77139fcb1afa5ccdddcf49a247e31b9#npm:16.12.0"],
+            ["react-is", "npm:17.0.2"],
             ["tsup", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:4.12.5"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/react-dom",
+            "@types/react-is",
             "@types/react",
             "react-dom",
+            "react-is",
             "react"
           ],
           "linkType": "SOFT",
@@ -10888,17 +10903,46 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/$$virtual/@tinacms-edit-state-virtual-bd18ac3bd4/1/packages/@tinacms/edit-state/",
           "packageDependencies": [
             ["@tinacms/edit-state", "virtual:c63baf4f3e2ac9f9914dba2ed9c76873fb19a6d4ecd15627f574711dc8270f2def27168919f560fe2e6e780d8d63aec87a7f1448272b2136363a72ddc7fbc42e#workspace:packages/@tinacms/edit-state"],
+            ["@types/node", "npm:14.17.5"],
             ["@types/react", "npm:17.0.20"],
             ["@types/react-dom", null],
+            ["@types/react-is", null],
             ["react", "npm:16.14.0"],
             ["react-dom", "virtual:5ff5fac769c22d235eb004cce26d423448e67bbcc8dd3d8e6244bd48feb8883b0138e61947ecd4701d5e750b6874626277cfb4b4e459f401758b90d08d21457c#npm:16.14.0"],
+            ["react-is", "npm:17.0.2"],
             ["tsup", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:4.12.5"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/react-dom",
+            "@types/react-is",
             "@types/react",
             "react-dom",
+            "react-is",
+            "react"
+          ],
+          "linkType": "SOFT",
+        }],
+        ["virtual:d364c97c5a9f4ba424658a53cc19c517a31c1ca0c948e29f916b2fb0661548c18424babbce9c24a8e5b6f92fd77a4c106fe69eec593a17c05a527230c460ced8#workspace:packages/@tinacms/edit-state", {
+          "packageLocation": "./.yarn/$$virtual/@tinacms-edit-state-virtual-2869c7a7d0/1/packages/@tinacms/edit-state/",
+          "packageDependencies": [
+            ["@tinacms/edit-state", "virtual:d364c97c5a9f4ba424658a53cc19c517a31c1ca0c948e29f916b2fb0661548c18424babbce9c24a8e5b6f92fd77a4c106fe69eec593a17c05a527230c460ced8#workspace:packages/@tinacms/edit-state"],
+            ["@types/node", "npm:14.17.5"],
+            ["@types/react", "npm:16.14.11"],
+            ["@types/react-dom", "npm:16.9.14"],
+            ["@types/react-is", null],
+            ["react", "npm:16.12.0"],
+            ["react-dom", "virtual:0cf8a36df11e795e7c1f161c22e844302c8da246198d95f079b62206ce82bab2bcc73240bf1f675aee09198d58abf861a77139fcb1afa5ccdddcf49a247e31b9#npm:16.12.0"],
+            ["react-is", null],
+            ["tsup", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:4.12.5"],
+            ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
+          ],
+          "packagePeers": [
+            "@types/react-dom",
+            "@types/react-is",
+            "@types/react",
+            "react-dom",
+            "react-is",
             "react"
           ],
           "linkType": "SOFT",
@@ -10907,17 +10951,22 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./.yarn/$$virtual/@tinacms-edit-state-virtual-e65acab0f2/1/packages/@tinacms/edit-state/",
           "packageDependencies": [
             ["@tinacms/edit-state", "virtual:e889d1f5fd31539481dea7aac568c49533f162b70a2620cda85aeaf1e8c313afa3ef9ad883e8e1e76504391f1a6a7566b0e17ecd57d890b9f19e564588fbff74#workspace:packages/@tinacms/edit-state"],
+            ["@types/node", "npm:14.17.5"],
             ["@types/react", "npm:16.14.11"],
             ["@types/react-dom", null],
+            ["@types/react-is", null],
             ["react", "npm:16.13.1"],
             ["react-dom", "virtual:ef5f0464a93c3efa41c08b335f0011b665ab750b218ec89596f2c387b034c562de80d22bd9889f3b06824e2d0df8379c46c9f8422073fc867bf4526e43954b59#npm:16.13.1"],
+            ["react-is", null],
             ["tsup", "virtual:4e9cf7b4ba8600a0d95e14b1de327f1c7c68bae6045b87e9e408f9be641c25ff68ad4825cac882e4fe9de6fccf04cb3b11a4f489d6f55432691b8b09ae629429#npm:4.12.5"],
             ["typescript", "patch:typescript@npm%3A4.3.5#builtin<compat/typescript>::version=4.3.5&hash=ddfc1b"]
           ],
           "packagePeers": [
             "@types/react-dom",
+            "@types/react-is",
             "@types/react",
             "react-dom",
+            "react-is",
             "react"
           ],
           "linkType": "SOFT",
@@ -10926,6 +10975,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
           "packageLocation": "./packages/@tinacms/edit-state/",
           "packageDependencies": [
             ["@tinacms/edit-state", "workspace:packages/@tinacms/edit-state"],
+            ["@types/node", "npm:14.17.5"],
             ["@types/react", "npm:17.0.14"],
             ["@types/react-dom", "npm:17.0.9"],
             ["react", "npm:17.0.2"],
@@ -38354,7 +38404,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@graphql-codegen/core", "virtual:b7d50e7e5a3a341a3fdfcc5240d39f5e26d985d9f0a513387e030a328cc013c06cfd7ec9a6baf48afb2322b165ef2513126a40ab021e7f61f40c2b11eb2ec9e0#npm:1.17.10"],
             ["@graphql-codegen/typescript", "virtual:b7d50e7e5a3a341a3fdfcc5240d39f5e26d985d9f0a513387e030a328cc013c06cfd7ec9a6baf48afb2322b165ef2513126a40ab021e7f61f40c2b11eb2ec9e0#npm:1.23.0"],
             ["@graphql-codegen/typescript-operations", "virtual:b7d50e7e5a3a341a3fdfcc5240d39f5e26d985d9f0a513387e030a328cc013c06cfd7ec9a6baf48afb2322b165ef2513126a40ab021e7f61f40c2b11eb2ec9e0#npm:1.18.4"],
-            ["@tinacms/edit-state", "virtual:a505e725aa28a6edf35804bd42f05f8ba4842f5d73b5540c5714aab3178763febbc1b90d3b0e5398dc75e28f576ed633b2bcfcf02e4143e94cd2bb9cdc95f37f#workspace:packages/@tinacms/edit-state"],
+            ["@tinacms/edit-state", "virtual:d364c97c5a9f4ba424658a53cc19c517a31c1ca0c948e29f916b2fb0661548c18424babbce9c24a8e5b6f92fd77a4c106fe69eec593a17c05a527230c460ced8#workspace:packages/@tinacms/edit-state"],
             ["@tinacms/scripts", "workspace:packages/@tinacms/scripts"],
             ["@tinacms/toolkit", "virtual:7ca658e70ee75535fa810678d493ce5eab6dbd235a5852e430a9af38a45da887a4542723c9b0ffec9cef8f8d1548cc177d59c2f55d8ee0bc724165684d67322f#workspace:packages/@tinacms/toolkit"],
             ["@types/lodash", "npm:4.14.171"],
