@@ -2,6 +2,7 @@ import { ScreenPlugin, useCMS } from "tinacms";
 import { useCallback, useState, useEffect } from "react";
 
 export interface NewBranch {
+  auth: string,
   owner: string,
   repo: string,
   baseBranch: string,
@@ -9,6 +10,7 @@ export interface NewBranch {
 }
 const owner = process.env.NEXT_PUBLIC_GITHUB_NAME
 const repo = process.env.NEXT_PUBLIC_GITHUB_REPO
+const auth = process.env.NEXT_PUBLIC_GITHUB_PERSONAL_ACCESS_TOKEN
 
 async function createBranch(url: string, data: NewBranch) {
   const response = fetch(url, {
@@ -31,7 +33,6 @@ const BranchSwitcherComponent = ({
   const [newBranch, setNewBranch] = useState('')
   const cms = useCMS();
   const changeBranch = useCallback((branch) => {
-    //console.log(`switching branch to ${branch}`);
     cms.events.dispatch({
       type: "content-source-change",
       branch,
@@ -39,26 +40,28 @@ const BranchSwitcherComponent = ({
   }, []);
   const handleCreateBranch = useCallback((value) => {
     createBranch('http://localhost:4001/create-branch', {
+      auth,
       owner,
       repo,
-      baseBranch: currentBranch,
+      baseBranch: currentBranch ?? 'main',
       name: value
     })
-    setCurrentBranch(value)
-    cms.events.dispatch({
-      type: "content-source-change",
-      currentBranch,
-    });
+    .then((data) => {
+      setCurrentBranch(value)
+      cms.events.dispatch({
+        type: "content-source-change",
+        currentBranch: value,
+      });
+    })
   }, [])
 
   useEffect(() => {
-    console.log('hello there')
-    fetch(`http://localhost:4001/list-branches?owner=${owner}&repo=${repo}`)
+    fetch(`http://localhost:4001/list-branches?auth=${auth}&owner=${owner}&repo=${repo}`)
     .then(response => response.json())
     .then(data => {
       setBranchList(data)
     })
-  }, [])
+  }, [currentBranch])
 
   return (
     <div

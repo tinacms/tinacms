@@ -46,14 +46,14 @@ export const listBranches = async ({auth, owner, repo}) => {
   const appOctoKit = new Octokit({ auth })
   const branchList = await appOctoKit.repos.listBranches({
     owner,
-    repo
+    repo,
+    per_page: 100
   })
 
   return branchList
 }
 
 export const createBranch = async ({ auth, owner, repo, name, baseBranch }) => {
-  console.log('!!!!!!!!', baseBranch)
   const appOctoKit = new Octokit({ auth })
   const currentBranch = await appOctoKit.repos.getBranch({
     owner,

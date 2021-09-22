@@ -64,9 +64,9 @@ const gqlServer = async () => {
   app.get('/list-branches', async (req, res) => {
     try {
       const { query } = req
-      const { owner, repo } = query
+      const { auth, owner, repo } = query
       const result = await gqlPackage.listBranches({
-        auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+        auth,
         owner,
         repo
       })
@@ -79,10 +79,9 @@ const gqlServer = async () => {
 
   app.post('/create-branch', async (req, res) => {
     try {
-      const { query } = req
-      const { owner, repo, name, baseBranch } = query
+      const { auth, owner, repo, name, baseBranch } = req.body
       const result = await gqlPackage.createBranch({
-        auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+        auth,
         owner,
         repo,
         baseBranch,
@@ -90,6 +89,7 @@ const gqlServer = async () => {
       })
       return res.json(result)
     } catch(error) {
+      res.end()
       console.error('There was a problem creating a new branch.', error)
     }
   })
