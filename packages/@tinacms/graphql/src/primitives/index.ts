@@ -23,7 +23,8 @@ import { createDatabase } from './database'
 export { createDatabase, indexDB }
 export type { TinaCloudSchema } from './types'
 
-export const resolve = async ({ query, variables }) => {
+// TODO: Why are we not using the passed DB?
+export const resolve = async ({ query, variables, database: _db }) => {
   const ref = variables && variables.ref ? variables.ref : 'main'
   const gh = new GithubBridge({
     // Path to directory with .tina folder
