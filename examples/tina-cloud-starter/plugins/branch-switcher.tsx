@@ -28,36 +28,45 @@ const BranchSwitcherComponent = ({
 }: {
   initialBranch: string;
 }) => {
+  const [isLoading, setIsLoading] = useState(false);
   const [currentBranch, setCurrentBranch] = useState(initialBranch);
   const [branchList, setBranchList] = useState([]);
   const cms = useCMS();
   const handleCreateBranch = useCallback((value) => {
+    setIsLoading(true);
     createBranch("http://localhost:4001/create-branch", {
       auth,
       owner,
       repo,
       baseBranch: currentBranch ?? "main",
       name: value,
-    }).then((data) => {
-      setCurrentBranch(value);
-      cms.events.dispatch({
-        type: "content-source-change",
-        currentBranch: value,
-      });
-    });
+    })
+      .then(async (data) => {
+        setCurrentBranch(value);
+        cms.events.dispatch({
+          type: "content-source-change",
+          currentBranch: value,
+        });
+        await refreshBranchList();
+      })
+      .finally(() => setIsLoading(false));
   }, []);
 
-  /**
-   * TODO fire when branch is created but not any time it changes
-   */
-  useEffect(() => {
-    fetch(
+  const refreshBranchList = useCallback(async () => {
+    setIsLoading(true);
+    await fetch(
       `http://localhost:4001/list-branches?auth=${auth}&owner=${owner}&repo=${repo}`
     )
       .then((response) => response.json())
       .then((data) => {
         setBranchList(data);
-      });
+      })
+      .finally(() => setIsLoading(false));
+  }, []);
+
+  // load branch list
+  useEffect(() => {
+    refreshBranchList();
   }, []);
 
   useEffect(() => {
@@ -74,6 +83,8 @@ const BranchSwitcherComponent = ({
         flexFlow: "column",
         alignItems: "center",
         justifyContent: "center",
+        opacity: isLoading ? 0.5 : 1,
+        pointerEvents: isLoading ? "none" : "initial",
       }}
     >
       <h3>Select Branch</h3>
