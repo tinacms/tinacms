@@ -133,6 +133,9 @@ const BranchSelector = ({
           onMouseOut={(e: any) => {
             e.target.style.backgroundColor = "transparent";
           }}
+          onClick={() => {
+            onCreateBranch(newBranch);
+          }}
         >
           Create New Branch `{newBranch}`...
         </div>
