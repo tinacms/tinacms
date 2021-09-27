@@ -2,7 +2,6 @@ import { ScreenPlugin, useCMS } from "tinacms";
 import { useCallback, useState, useEffect } from "react";
 
 export interface NewBranch {
-  auth: string;
   owner: string;
   repo: string;
   baseBranch: string;
@@ -35,7 +34,6 @@ const BranchSwitcherComponent = ({
   const handleCreateBranch = useCallback((value) => {
     setIsLoading(true);
     createBranch("http://localhost:4001/create-branch", {
-      auth,
       owner,
       repo,
       baseBranch: currentBranch ?? "main",
@@ -55,7 +53,7 @@ const BranchSwitcherComponent = ({
   const refreshBranchList = useCallback(async () => {
     setIsLoading(true);
     await fetch(
-      `http://localhost:4001/list-branches?auth=${auth}&owner=${owner}&repo=${repo}`
+      `http://localhost:4001/list-branches?owner=${owner}&repo=${repo}`
     )
       .then((response) => response.json())
       .then((data) => {

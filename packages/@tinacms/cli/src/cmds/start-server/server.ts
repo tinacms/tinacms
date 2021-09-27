@@ -19,6 +19,7 @@ import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
 
+const GITHUB_AUTH = process.env.GITHUB_ACCESS_TOKEN
 const gqlServer = async () => {
   // This is lazily required so we can update the module
   // without having to restart the server
@@ -66,7 +67,7 @@ const gqlServer = async () => {
       const { query } = req
       const { auth, owner, repo } = query
       const result = await gqlPackage.listBranches({
-        auth,
+        auth: GITHUB_AUTH,
         owner,
         repo
       })
@@ -79,9 +80,9 @@ const gqlServer = async () => {
 
   app.post('/create-branch', async (req, res) => {
     try {
-      const { auth, owner, repo, name, baseBranch } = req.body
+      const { owner, repo, name, baseBranch } = req.body
       const result = await gqlPackage.createBranch({
-        auth,
+        auth: GITHUB_AUTH,
         owner,
         repo,
         baseBranch,
