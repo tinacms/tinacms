@@ -30,6 +30,18 @@ export const getStaticProps = async ({ params }) => {
                 }
               }
             }
+            asdf {
+              __typename
+              ... on PostsAsdfTemplate1 {
+          author {
+            ...on AuthorsDocument {
+               data {
+                name
+              }
+            }
+          }
+        }
+            }
             heroImg
             _body
           }
