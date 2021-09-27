@@ -293,10 +293,41 @@ export const resolve = async ({
       },
     })
 
+    /**
+     * This code will benefit from supporting nested forms. Right now, the way it works
+     * is whenever we come across a reference field, we store some info about it, and when
+     * it's `value` changes in a tina form, we use this info to refetch the data (since the
+     * reference has changed, the data needs to change too). It's an imperative approach
+     * which doesn't fit well with the highly-dynamic nature of the GraphQL system.
+     *
+     * ```js
+     *  {
+     *    // the location of this node's form
+     *    path: [ 'data', 'getPostsDocument', 'form' ],
+     *    // the path to the data node of the reference
+     *    dataPath: [ 'getPostsDocument', 'data', 'author' ],
+     *    // ths part of the query we're referencing
+     *    queryString: 'query GetNode($id: String!) {\n' +
+     *      '  node(id: $id) {\n' +
+     *      '    ... on AuthorsDocument {\n' +
+     *      '      data {\n' +
+     *      '        name\n' +
+     *      '        avatar\n' +
+     *      '      }\n' +
+     *      '    }\n' +
+     *      '  }\n' +
+     *      '}'
+     *  }
+     * ```
+     * But with support for nested forms we don't need any of this, each reference can just
+     * build itself async and it will likely be far simpler from the backend.
+     */
     paths.forEach((p) => {
-      const item = _.get(res, p.path)
+      // We're only concerned with which form this path belongs to, so ignore anything after the 3rd value:
+      // p.path could be something like: ['data', 'getPostsDocument', 'form', 'some-field']
+      const item = _.get(res, p.path.slice(0, 3))
       if (item) {
-        item.paths = [p]
+        item.paths = [...(item.paths || []), p]
       }
     })
     mutationPaths.forEach((mutationPath) => {

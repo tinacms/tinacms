@@ -6,6 +6,43 @@
       "path": "content/posts",
       "fields": [
         {
+          "type": "object",
+          "name": "asdf",
+          "label": "adsf",
+          "list": true,
+          "templates": [
+            {
+              "name": "template1",
+              "label": "template one",
+              "fields": [
+                {
+                  "name": "author",
+                  "label": "Author",
+                  "type": "reference",
+                  "collections": [
+                    "authors"
+                  ],
+                  "namespace": [
+                    "posts",
+                    "asdf",
+                    "template1",
+                    "author"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "asdf",
+                "template1"
+              ]
+            }
+          ],
+          "namespace": [
+            "posts",
+            "asdf"
+          ]
+        },
+        {
           "type": "string",
           "label": "Title",
           "name": "title",
