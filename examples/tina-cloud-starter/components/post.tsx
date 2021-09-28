@@ -165,7 +165,8 @@ export const Post = ({ data }) => {
       )}
       <Container className={`flex-1 max-w-4xl pt-4`} size="large">
         <div className="prose dark:prose-dark  w-full max-w-none">
-          <TinaMarkdown blocks={blockRenderer}>{data._body}</TinaMarkdown>
+          {/* <TinaMarkdown blocks={blockRenderer}>{data._body}</TinaMarkdown> */}
+          <pre>{JSON.stringify(data._body, null, 2)}</pre>
         </div>
       </Container>
     </Section>

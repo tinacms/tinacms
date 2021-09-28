@@ -16,7 +16,7 @@ limitations under the License.
 
 */
 
-import { RichEditor } from './slate'
+import { RichEditor } from './plate'
 
 export const MdxFieldPlugin = {
   name: 'rich-text',
