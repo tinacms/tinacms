@@ -13,7 +13,13 @@ limitations under the License.
 
 import { ModalBuilder } from './AuthModal'
 import React, { useState } from 'react'
-import { TinaCMS, TinaProvider, MediaStore } from '@tinacms/toolkit'
+import {
+  TinaCMS,
+  TinaProvider,
+  MediaStore,
+  //@ts-ignore why can't it find you
+  BranchSwitcherPlugin,
+} from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../client'
 import { useTinaAuthRedirect } from './useTinaAuthRedirect'
@@ -149,6 +155,31 @@ export const TinaCloudProvider = (
     }
   }
   setupMedia()
+
+  //@ts-ignore it's not picking up cms.flags
+  const branchingEnabled = cms.flags.get('branch-switcher')
+  React.useEffect(() => {
+    let branchSwitcher
+    if (branchingEnabled) {
+      branchSwitcher = new BranchSwitcherPlugin({
+        cms,
+        baseBranch: props.branch || 'main',
+        //TODO implement these
+        listBranches: async () => [{ name: 'test' }],
+        createBranch: async (branchName) => {
+          console.log('noop')
+          return branchName
+        },
+      })
+      cms.plugins.add(branchSwitcher)
+    }
+    return () => {
+      if (branchingEnabled) {
+        cms.plugins.remove(branchSwitcher)
+      }
+    }
+  }, [branchingEnabled, props.branch])
+
   if (props.cmsCallback) {
     props.cmsCallback(cms)
   }
