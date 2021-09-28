@@ -11,48 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import path from "path";
-import { setup, setupFixture, setupFixture2 } from "../setup";
-import { toMatchFile } from "jest-file-snapshot";
-
-const rootPath = path.join(__dirname, "/");
-
-const fixtures2 = [
-  {
-    name: "getPostDocumentAdvanced",
-    assert: "output",
-  },
-  {
-    name: "updatePostDocumentAdvanced",
-    assert: "file",
-    filename: "content/posts/hello-world-advanced.md",
-  },
-  {
-    name: "kitchenSink",
-    assert: "output",
-    filename: "content/posts/kitchen-sink.md",
-  },
-];
-import { tinaSchema } from "./.tina/schema";
-
-expect.extend({ toMatchFile });
-
-describe("The given configuration", () => {
-  fixtures2.forEach((fixture) => {
-    it(`${fixture.name} works`, async () => {
-      const { response, expectedResponsePath } = await setupFixture2(
-        rootPath,
-        tinaSchema,
-        // @ts-ignore
-        fixture
-      );
-
-      // Add \n because prettier format adds it if a user edits the file manually
-      expect(response).toMatchFile(expectedResponsePath);
-    });
-  });
-});
-
 import React from "react";
 import { Container } from "./container";
 import { Section } from "./section";

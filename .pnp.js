@@ -32131,14 +32131,16 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
         ["npm:2.6.0", {
           "packageLocation": "./.yarn/cache/node-fetch-npm-2.6.0-29c7a53447-dd9f586a9f.zip/node_modules/node-fetch/",
           "packageDependencies": [
-            ["node-fetch", "npm:2.6.0"]
+            ["node-fetch", "npm:2.6.0"],
+            ["encoding", "npm:0.1.13"]
           ],
           "linkType": "HARD",
         }],
         ["npm:2.6.1", {
           "packageLocation": "./.yarn/cache/node-fetch-npm-2.6.1-46c670dbc1-cbb171635e.zip/node_modules/node-fetch/",
           "packageDependencies": [
-            ["node-fetch", "npm:2.6.1"]
+            ["node-fetch", "npm:2.6.1"],
+            ["encoding", "npm:0.1.13"]
           ],
           "linkType": "HARD",
         }]

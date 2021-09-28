@@ -12,7 +12,28 @@
     "entryPoints": [
       {
         "name": "src/index.ts",
-        "target": "node"
+        "target": "node",
+        "bundle": [
+          "mdast",
+          "mdast-util-from-markdown",
+          "mdast-util-mdx",
+          "mdast-util-mdx-expression",
+          "mdast-util-to-markdown",
+          "micromark-extension-mdxjs",
+          "rehype-format",
+          "rehype-stringify",
+          "remark",
+          "remark-frontmatter",
+          "remark-mdx",
+          "remark-parse",
+          "remark-rehype",
+          "remark-slate",
+          "remark-stringify",
+          "unified",
+          "unist-util-remove-position",
+          "unist-util-visit",
+          "vfile"
+        ]
       }
     ]
   },
