@@ -27,6 +27,8 @@ import {
   createHorizontalRulePlugin,
   createSoftBreakPlugin,
   createExitBreakPlugin,
+  TElement,
+  TodoListItemNodeData,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
@@ -147,36 +149,10 @@ export const autoformatLists: AutoformatRule[] = [
   },
 ]
 
-// export const createMDXFlowPlugin = ({
-//   templates,
-//   voidSelection,
-// }): PlatePlugin => ({
-//   pluginKeys: 'mdxJsxFlowElement',
-//   renderElement: (editor) => (props) => {
-//     return (
-//       <MdxPicker
-//         inline={false}
-//         {...props}
-//         templates={templates}
-//         isReady={!!voidSelection}
-//         voidSelection={voidSelection}
-//         onChange={(value, selection) => {
-//           // const newProperties: Partial<Element> = {
-//           //   props: value,
-//           // }
-//           // Transforms.setNodes(editor, newProperties, {
-//           //   at: selection,
-//           // })
-//         }}
-//       />
-//     )
-//   },
-// })
-
 export const createMDXTextPlugin = ({ templates }): PlatePlugin => ({
   pluginKeys: 'mdxJsxTextElement',
-  voidTypes: (editor) => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
-  inlineTypes: (editor) => ['mdxJsxTextElement'],
+  voidTypes: () => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
+  inlineTypes: () => ['mdxJsxTextElement'],
   renderElement: (editor) => (props) => {
     const isInline = props.element.type === 'mdxJsxTextElement'
     return (
@@ -184,9 +160,9 @@ export const createMDXTextPlugin = ({ templates }): PlatePlugin => ({
         {...props}
         templates={templates}
         inline={isInline}
-        onChange={(value, selection) => {
+        onChange={(value) => {
           if (isInline) {
-            const newProperties: Partial<Element> = {
+            const newProperties = {
               props: value,
             }
             Transforms.setNodes(editor, newProperties, {
