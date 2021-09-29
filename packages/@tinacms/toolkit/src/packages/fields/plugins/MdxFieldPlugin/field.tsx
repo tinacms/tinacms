@@ -37,8 +37,18 @@ export interface MdxFieldProps {
   inline?: boolean
 }
 
-export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
+export const MdxField = ({
+  inline,
+  tinaForm,
+  field,
+  editor,
+}: MdxFieldProps) => {
+  const [isExpanded, setExpandedInner] = React.useState<boolean>(false)
+  const setExpanded = (expanded: boolean) => {
+    setExpandedInner(expanded)
+  }
+  console.log(editor.selection)
+
   if (!field) {
     return null
   }
@@ -78,7 +88,6 @@ const Panel = function Panel({
   field,
 }: PanelProps) {
   const FormPortal = useFormPortal()
-  // console.log(tinaForm)
   return (
     <FormPortal>
       {({ zIndexShift }) => (
@@ -91,16 +100,7 @@ const Panel = function Panel({
           </PanelHeader>
           <PanelBody>
             {isExpanded ? (
-              <FormBuilder
-                // form={{
-                //   ...tinaForm,
-                //   fields: tinaForm.fields.filter(
-                //     (field) => field.component !== 'rich-text'
-                //   ),
-                // }}
-                form={tinaForm}
-                hideFooter={true}
-              />
+              <FormBuilder form={tinaForm} hideFooter={true} />
             ) : null}
           </PanelBody>
         </MdxFieldPanel>

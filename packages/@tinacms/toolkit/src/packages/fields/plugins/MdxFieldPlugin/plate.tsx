@@ -178,13 +178,12 @@ export const createMDXTextPlugin = ({
   voidSelection,
 }): PlatePlugin => ({
   pluginKeys: 'mdxJsxTextElement',
-  // voidTypes: (editor) => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
-  // inlineTypes: (editor) => ['mdxJsxTextElement'],
+  voidTypes: (editor) => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
+  inlineTypes: (editor) => ['mdxJsxTextElement'],
   renderElement: (editor) => (props) => {
-    // console.log(props)
-    // return <div>Yes </div>
     return (
       <MdxPicker
+        editor={editor}
         {...props}
         templates={templates}
         inline={false}
@@ -207,13 +206,14 @@ export const createMDXTextPlugin = ({
              */
             match: (node, path) => {
               // console.log(selection.focus);
-              // console.log(path, node.type);
               if (node.type === 'mdxJsxTextElement') {
+                console.log(node)
+
                 return true
               }
               return false
             },
-            at: selection,
+            at: ReactEditor.findPath(editor, props.element),
           })
         }}
       />
@@ -225,7 +225,6 @@ const components = createPlateComponents()
 const options = createPlateOptions()
 
 export const RichEditor = (props) => {
-  console.log(props.input.name)
   const [value, setValue] = React.useState(
     props.input.value.children
       ? [...props.input.value.children?.map(normalize)]
@@ -242,68 +241,65 @@ export const RichEditor = (props) => {
     props.input.onChange({ type: 'root', children: value })
   }, [JSON.stringify(value)])
 
-  const pluginsBasic = React.useMemo(
-    () => [
-      // editor
-      createReactPlugin(), // withReact
-      createHistoryPlugin(), // withHistory
-      createHorizontalRulePlugin(),
-      // elements
-      createParagraphPlugin(), // paragraph element
-      createBlockquotePlugin(), // blockquote element
-      createCodeBlockPlugin(), // code block element
-      createHeadingPlugin(), // heading elements
-      createLinkPlugin(), // link elements
-      createListPlugin(),
-      // createMDXFlowPlugin({ templates, voidSelection }),
-      createMDXTextPlugin({ templates, voidSelection }),
-      createAutoformatPlugin({
-        rules: [
-          ...autoformatLists,
-          {
-            mode: 'block',
-            type: ELEMENT_H1,
-            match: '# ',
+  const pluginsBasic = [
+    // editor
+    createReactPlugin(), // withReact
+    createHistoryPlugin(), // withHistory
+    createHorizontalRulePlugin(),
+    // elements
+    createParagraphPlugin(), // paragraph element
+    createBlockquotePlugin(), // blockquote element
+    createCodeBlockPlugin(), // code block element
+    createHeadingPlugin(), // heading elements
+    createLinkPlugin(), // link elements
+    createListPlugin(),
+    // createMDXFlowPlugin({ templates, voidSelection }),
+    createMDXTextPlugin({ templates, voidSelection }),
+    createAutoformatPlugin({
+      rules: [
+        ...autoformatLists,
+        {
+          mode: 'block',
+          type: ELEMENT_H1,
+          match: '# ',
+        },
+        {
+          mode: 'block',
+          type: ELEMENT_HR,
+          match: ['---', '—-', '___ '],
+          preFormat: clearBlockFormat,
+          format: (editor) => {
+            Transforms.setNodes(editor, { type: ELEMENT_HR })
+            Transforms.insertNodes(editor, {
+              type: ELEMENT_DEFAULT,
+              children: [{ text: '' }],
+            })
           },
-          {
-            mode: 'block',
-            type: ELEMENT_HR,
-            match: ['---', '—-', '___ '],
-            preFormat: clearBlockFormat,
-            format: (editor) => {
-              Transforms.setNodes(editor, { type: ELEMENT_HR })
-              Transforms.insertNodes(editor, {
-                type: ELEMENT_DEFAULT,
-                children: [{ text: '' }],
-              })
-            },
-          },
-        ],
-      }),
-      createSoftBreakPlugin({
-        rules: [
-          {
-            hotkey: 'mod+enter',
-          },
-        ],
-      }),
-      createExitBreakPlugin({
-        rules: [
-          {
-            hotkey: 'enter',
-          },
-        ],
-      }),
-      // marks
-      createBoldPlugin(), // bold mark
-      createItalicPlugin(), // italic mark
-      createUnderlinePlugin(), // underline mark
-      createStrikethroughPlugin(), // strikethrough mark
-      createCodePlugin(), // code mark
-      createDeserializeMDPlugin(),
-    ],
-    []
-  )
+        },
+      ],
+    }),
+    createSoftBreakPlugin({
+      rules: [
+        {
+          hotkey: 'mod+enter',
+        },
+      ],
+    }),
+    createExitBreakPlugin({
+      rules: [
+        {
+          hotkey: 'enter',
+        },
+      ],
+    }),
+    // marks
+    createBoldPlugin(), // bold mark
+    createItalicPlugin(), // italic mark
+    createUnderlinePlugin(), // underline mark
+    createStrikethroughPlugin(), // strikethrough mark
+    createCodePlugin(), // code mark
+    createDeserializeMDPlugin(),
+  ]
   // console.log(initialValue)
   return (
     <>
@@ -338,9 +334,9 @@ export const RichEditor = (props) => {
           plugins={pluginsBasic}
           components={components}
           options={options}
-          // onChange={(value) => {
-          //   setValue(value)
-          // }}
+          onChange={(value) => {
+            setValue(value)
+          }}
         />
         {/* {value} */}
       </div>
@@ -380,9 +376,9 @@ export const MdxPicker = (props) => {
       id,
       label: id,
       initialValues,
-      // onChange: ({ values }) => {
-      //   props.onChange(values, props.voidSelection)
-      // },
+      onChange: ({ values }) => {
+        props.onChange(values, props.voidSelection)
+      },
       onSubmit: () => {},
       fields: activeTemplate ? activeTemplate.fields : [],
     })
@@ -403,6 +399,7 @@ export const MdxPicker = (props) => {
         contentEditable={false}
       >
         <MdxField
+          editor={props.editor}
           inline={props.inline}
           tinaForm={form}
           field={activeTemplate}
