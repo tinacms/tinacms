@@ -45,13 +45,13 @@ import type { SlateNodeType } from './types'
 // https://docs.slatejs.org/concepts/12-typescript#defining-editor-element-and-text-types
 // type CustomElement = { type: "paragraph"; children: CustomText[] };
 // type CustomText = { text: string; bold?: true };
-declare module 'slate' {
-  interface CustomTypes {
-    Editor: BaseEditor & ReactEditor
-    Element: SlateNodeType
-    // Text: CustomText;
-  }
-}
+// declare module 'slate' {
+//   interface CustomTypes {
+//     Editor: BaseEditor & ReactEditor
+//     Element: SlateNodeType
+//     // Text: CustomText;
+//   }
+// }
 
 export const RichEditor = (props) => {
   // Hot reloads when usign useMemo to initialize https://github.com/ianstormtaylor/slate/issues/4081
