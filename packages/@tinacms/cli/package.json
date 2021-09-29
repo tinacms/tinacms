@@ -50,9 +50,11 @@
     "generate:schema": "yarn node scripts/generateSchema.js"
   },
   "dependencies": {
-    "@graphql-codegen/core": "^1.17.0",
-    "@graphql-codegen/typescript": "^1.17.0",
-    "@graphql-codegen/typescript-operations": "^1.17.0",
+    "@graphql-codegen/core": "^2.1.0",
+    "@graphql-codegen/typescript": "^2.2.2",
+    "@graphql-codegen/typescript-generic-sdk": "^2.1.4",
+    "@graphql-codegen/typescript-operations": "^2.1.4",
+    "@graphql-tools/load": "^7.3.2",
     "@tinacms/graphql": "workspace:*",
     "ajv": "^6.12.3",
     "altair-express-middleware": "4.0.6",

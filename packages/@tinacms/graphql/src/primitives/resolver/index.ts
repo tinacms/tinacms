@@ -102,6 +102,13 @@ export class Resolver {
       await sequential(template.fields, async (field) =>
         this.resolveFieldData(field, rawData, data)
       )
+      const dataJSON = {
+        _collection: rawData._collection,
+        _template: rawData._template,
+      }
+      await sequential(template.fields, async (field) =>
+        this.resolveFieldData(field, rawData, dataJSON, true)
+      )
 
       return {
         __typename: NAMER.documentTypeName([rawData._collection]),
@@ -370,7 +377,8 @@ export class Resolver {
   private resolveFieldData = async (
     { namespace, ...field }: TinaFieldEnriched,
     rawData: unknown,
-    accumulator: { [key: string]: unknown }
+    accumulator: { [key: string]: unknown },
+    resolveRef?: boolean
   ) => {
     if (!rawData) {
       return undefined
@@ -382,9 +390,18 @@ export class Resolver {
       case 'boolean':
       case 'datetime':
       case 'number':
-      case 'reference':
       case 'image':
         accumulator[field.name] = value
+        break
+      case 'reference':
+        if (resolveRef) {
+        } else {
+          const tempVal = await this.getDocument(value)
+          delete tempVal.dataJSON
+          delete tempVal.values
+          delete tempVal.form
+          accumulator[field.name] = value
+        }
         break
       case 'object':
         if (field.list) {
@@ -410,6 +427,8 @@ export class Resolver {
             const isUnion = !!field.templates
             return isUnion
               ? {
+                  __typeName: 'TODO:',
+                  // __typeName: NAMER.Something,
                   _template: lastItem(template.namespace),
                   ...payload,
                 }
