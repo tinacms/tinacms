@@ -5,16 +5,13 @@ import { Transforms, Editor } from 'slate'
 import { Form } from '../../../../forms'
 import {
   Plate,
-  // editor
   createReactPlugin, // withReact
   createHistoryPlugin, // withHistory
   unwrapList,
-  // elements
   createParagraphPlugin, // paragraph element
   createBlockquotePlugin, // blockquote element
   createCodeBlockPlugin, // code block element
   createHeadingPlugin, // heading elements
-  // marks
   createBoldPlugin, // bold mark
   createItalicPlugin, // italic mark
   createUnderlinePlugin, // underline mark
@@ -27,7 +24,6 @@ import {
   createAutoformatPlugin,
   createHorizontalRulePlugin,
   useStoreEditorRef,
-  useEventEditorId,
   createSoftBreakPlugin,
   createExitBreakPlugin,
   TElement,
@@ -38,8 +34,6 @@ import {
   isElement,
   isType,
   SPEditor,
-  getRenderElement,
-  getPlatePluginTypes,
   TEditor,
   PlatePlugin,
   toggleList,
@@ -234,6 +228,13 @@ export const RichEditor = wrapFieldsWithMeta<
     createLinkPlugin(), // link elements
     createListPlugin(),
     createMDXPlugin({ templates }),
+    // marks
+    createBoldPlugin(), // bold mark
+    createItalicPlugin(), // italic mark
+    createUnderlinePlugin(), // underline mark
+    createStrikethroughPlugin(), // strikethrough mark
+    createCodePlugin(), // code mark
+    // autoformat rules
     createAutoformatPlugin({
       rules: [
         ...autoformatLists,
@@ -273,12 +274,6 @@ export const RichEditor = wrapFieldsWithMeta<
         },
       ],
     }),
-    // marks
-    createBoldPlugin(), // bold mark
-    createItalicPlugin(), // italic mark
-    createUnderlinePlugin(), // underline mark
-    createStrikethroughPlugin(), // strikethrough mark
-    createCodePlugin(), // code mark
   ]
   return (
     <>
