@@ -20,6 +20,7 @@ import {
   createPlateComponents,
   createPlateOptions,
   createLinkPlugin,
+  createBasicMarkPlugins,
   createListPlugin,
   createAutoformatPlugin,
   createHorizontalRulePlugin,
@@ -74,6 +75,20 @@ import {
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import type { SlateNodeType } from '../types'
 import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
+import {
+  HeadingIcon,
+  BoldIcon,
+  ItalicIcon,
+  StrikethroughIcon,
+  MediaIcon,
+  TableIcon,
+  QuoteIcon,
+  CodeIcon,
+  OrderedListIcon,
+  UnderlineIcon,
+  UndoIcon,
+  RedoIcon,
+} from '../../../../icons'
 
 export const clearBlockFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor as SPEditor)
@@ -198,6 +213,33 @@ export const createMDXPlugin = ({ templates }): PlatePlugin => ({
 const components = createPlateComponents()
 const options = createPlateOptions()
 
+const Toolbar = () => {
+  return (
+    <div style={{ display: 'flex' }}>
+      {[
+        HeadingIcon,
+        BoldIcon,
+        ItalicIcon,
+        StrikethroughIcon,
+        MediaIcon,
+        TableIcon,
+        QuoteIcon,
+        CodeIcon,
+        OrderedListIcon,
+        UnderlineIcon,
+        UndoIcon,
+        RedoIcon,
+      ].map((Icon) => {
+        return (
+          <div style={{ width: '28px' }}>
+            <Icon />
+          </div>
+        )
+      })}
+    </div>
+  )
+}
+
 export const RichEditor = wrapFieldsWithMeta<
   InputProps,
   { templates: unknown[] }
@@ -235,6 +277,7 @@ export const RichEditor = wrapFieldsWithMeta<
     createUnderlinePlugin(), // underline mark
     createStrikethroughPlugin(), // strikethrough mark
     createCodePlugin(), // code mark
+    createBasicMarkPlugins(),
     // autoformat rules
     createAutoformatPlugin({
       rules: [
@@ -288,29 +331,41 @@ export const RichEditor = wrapFieldsWithMeta<
         }}
         className="slate-tina-field"
       >
-        <PopupAdder
-          showButton={true}
-          onAdd={(template) => {
-            Transforms.insertNodes(editor, [
-              {
-                type: template.inline
-                  ? 'mdxJsxTextElement'
-                  : 'mdxJsxFlowElement',
-                name: template.name,
-                props: template.defaultItem,
-                ordered: false,
-                children: [
-                  {
-                    // @ts-ignore BaseEditor fix
-                    type: 'text',
-                    text: '',
-                  },
-                ],
-              },
-            ])
+        <div
+          style={{
+            display: 'flex',
+            justifyContent: 'space-between',
+            alignItems: 'center',
           }}
-          templates={templates}
-        />
+        >
+          <div>
+            <Toolbar />
+          </div>
+          <PopupAdder
+            showButton={true}
+            onAdd={(template) => {
+              Transforms.insertNodes(editor, [
+                {
+                  type: template.inline
+                    ? 'mdxJsxTextElement'
+                    : 'mdxJsxFlowElement',
+                  name: template.name,
+                  props: template.defaultItem,
+                  ordered: false,
+                  children: [
+                    {
+                      // @ts-ignore BaseEditor fix
+                      type: 'text',
+                      text: '',
+                    },
+                  ],
+                },
+              ])
+            }}
+            templates={templates}
+          />
+        </div>
+
         <Plate
           id={props.input.name}
           // editableProps={editableProps}

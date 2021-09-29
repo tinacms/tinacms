@@ -142,6 +142,7 @@ const Header: StyledComponent<'div', {}, {}> = styled.div`
   overflow: visible;
   line-height: 1.35;
   padding: 12px;
+  margin: 8px 0;
   color: var(--tina-color-grey-10);
   background-color: white;
 
