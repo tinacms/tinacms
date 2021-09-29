@@ -1,7 +1,7 @@
 import React, { useState } from 'react'
-import { MdxField, PopupAdder } from './field'
+import { MdxField, PopupAdder } from '../field'
 import { Transforms, Editor, BaseRange } from 'slate'
-import { Form } from '../../../forms'
+import { Form } from '../../../../forms'
 import {
   Plate,
   // editor
@@ -82,7 +82,7 @@ import {
   ReactEditor,
 } from 'slate-react'
 import { createDeserializeMDPlugin } from '@udecode/plate-md-serializer'
-import type { SlateNodeType } from './types'
+import type { SlateNodeType } from '../types'
 
 export const clearBlockFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor as SPEditor)
