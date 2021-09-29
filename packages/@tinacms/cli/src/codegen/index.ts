@@ -20,11 +20,14 @@ import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescrip
 import { plugin as typescriptSdkPlugin } from '@graphql-codegen/typescript-generic-sdk'
 // See https://www.graphql-tools.com/docs/documents-loading for more examples of the `load documents function`
 import { loadDocuments } from '@graphql-tools/load'
+
 import { logger } from '../logger'
 
 export const generateTypes = async (schema: GraphQLSchema) => {
   logger.info('Generating types...')
   try {
+    // maybe we can use https://github.com/timqian/gql-generator/blob/master/index.js to generate queries?
+
     const docs = await loadDocuments(
       `query Test {
       getCollections {
@@ -44,7 +47,7 @@ export const generateTypes = async (schema: GraphQLSchema) => {
       plugins: [
         { typescript: {} },
         { typescriptOperations: {} },
-        { typescriptSdk: {} },
+        { typescriptSdk: { documentMode: 'string' } },
       ],
       pluginMap: {
         typescript: {
