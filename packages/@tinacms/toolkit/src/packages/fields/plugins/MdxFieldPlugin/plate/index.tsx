@@ -1,6 +1,7 @@
-import React, { useState } from 'react'
+import React from 'react'
 import { MdxField, PopupAdder } from '../field'
-import { Transforms, Editor, BaseRange } from 'slate'
+import type { InputProps } from '../../../components'
+import { Transforms, Editor } from 'slate'
 import { Form } from '../../../../forms'
 import {
   Plate,
@@ -75,15 +76,7 @@ import {
   MARK_BOLD,
   MARK_STRIKETHROUGH,
 } from '@udecode/plate'
-import {
-  useSelected,
-  useFocused,
-  Slate,
-  Editable,
-  withReact,
-  ReactEditor,
-} from 'slate-react'
-import { createDeserializeMDPlugin } from '@udecode/plate-md-serializer'
+import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import type { SlateNodeType } from '../types'
 import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
 
@@ -144,6 +137,7 @@ export const autoformatLists: AutoformatRule[] = [
     format: (editor) =>
       Transforms.setNodes<TElement<TodoListItemNodeData>>(
         editor,
+        // @ts-ignore BaseEditor fix
         { type: ELEMENT_TODO_LI, checked: true },
         {
           match: (n) => Editor.isBlock(editor, n),
@@ -168,6 +162,7 @@ export const createMDXPlugin = ({ templates }): PlatePlugin => ({
             const newProperties = {
               props: value,
             }
+            // @ts-ignore BaseEditor fix
             Transforms.setNodes(editor, newProperties, {
               /**
                * match traverses the ancestors of the relevant node
@@ -180,18 +175,22 @@ export const createMDXPlugin = ({ templates }): PlatePlugin => ({
                * 0 in the focus.path array is referring to the text node
                */
               match: (node) => {
+                // @ts-ignore BaseEditor fix
                 if (node.type === 'mdxJsxTextElement') {
                   return true
                 }
                 return false
               },
+              // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
               at: ReactEditor.findPath(editor, props.element),
             })
           } else {
-            const newProperties: Partial<Element> = {
+            const newProperties = {
               props: value,
             }
+            // @ts-ignore BaseEditor fix
             Transforms.setNodes(editor, newProperties, {
+              // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
               at: ReactEditor.findPath(editor, props.element),
             })
           }
@@ -204,7 +203,10 @@ export const createMDXPlugin = ({ templates }): PlatePlugin => ({
 const components = createPlateComponents()
 const options = createPlateOptions()
 
-export const RichEditor = wrapFieldsWithMeta((props) => {
+export const RichEditor = wrapFieldsWithMeta<
+  InputProps,
+  { templates: unknown[] }
+>((props) => {
   const editor = useStoreEditorRef(props.input.name)
 
   const [value, setValue] = React.useState(
@@ -246,8 +248,10 @@ export const RichEditor = wrapFieldsWithMeta((props) => {
           match: ['---', '—-', '___ '],
           preFormat: clearBlockFormat,
           format: (editor) => {
+            // @ts-ignore BaseEditor fix
             Transforms.setNodes(editor, { type: ELEMENT_HR })
             Transforms.insertNodes(editor, {
+              // @ts-ignore BaseEditor fix
               type: ELEMENT_DEFAULT,
               children: [{ text: '' }],
             })
@@ -301,6 +305,7 @@ export const RichEditor = wrapFieldsWithMeta((props) => {
                 ordered: false,
                 children: [
                   {
+                    // @ts-ignore BaseEditor fix
                     type: 'text',
                     text: '',
                   },
