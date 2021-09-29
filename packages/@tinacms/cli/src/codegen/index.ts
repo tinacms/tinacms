@@ -15,7 +15,10 @@ import { parse, printSchema, GraphQLSchema } from 'graphql'
 import { codegen } from '@graphql-codegen/core'
 import { plugin as typescriptPlugin } from '@graphql-codegen/typescript'
 import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescript-operations'
+
+// Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
 import { plugin as typescriptSdkPlugin } from '@graphql-codegen/typescript-generic-sdk'
+// See https://www.graphql-tools.com/docs/documents-loading for more examples of the `load documents function`
 import { loadDocuments } from '@graphql-tools/load'
 import { logger } from '../logger'
 

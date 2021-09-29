@@ -26,7 +26,10 @@ export const getStaticProps = async () => {
     console.log({ doc, vars, options });
     return {} as any;
   });
-  client.Test();
+  const bla = await client.Test();
+  bla.getCollections.forEach((item) => {
+    console.log(item.name);
+  });
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
       query PageQuery {
