@@ -44,31 +44,32 @@ import {
   ELEMENT_H5,
   ELEMENT_H6,
   ELEMENT_HR,
-  ELEMENT_ALIGN_CENTER,
-  ELEMENT_ALIGN_JUSTIFY,
-  ELEMENT_ALIGN_LEFT,
-  ELEMENT_ALIGN_RIGHT,
+  ELEMENT_PARAGRAPH,
   ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
   ELEMENT_DEFAULT,
   ELEMENT_IMAGE,
   ELEMENT_LI,
-  ELEMENT_LIC,
   ELEMENT_LINK,
-  ELEMENT_MEDIA_EMBED,
-  ELEMENT_MENTION,
   ELEMENT_OL,
-  ELEMENT_PARAGRAPH,
-  ELEMENT_TABLE,
-  ELEMENT_TD,
-  ELEMENT_TH,
   ELEMENT_TODO_LI,
-  ELEMENT_TR,
   ELEMENT_UL,
   MARK_ITALIC,
   MARK_BOLD,
   MARK_STRIKETHROUGH,
+  // not going to use
+  ELEMENT_TABLE,
+  ELEMENT_TD,
+  ELEMENT_TH,
+  ELEMENT_TR,
+  ELEMENT_LIC,
+  ELEMENT_ALIGN_CENTER,
+  ELEMENT_ALIGN_JUSTIFY,
+  ELEMENT_ALIGN_LEFT,
+  ELEMENT_ALIGN_RIGHT,
+  ELEMENT_MEDIA_EMBED,
+  ELEMENT_MENTION,
 } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import type { SlateNodeType } from '../types'
@@ -339,7 +340,6 @@ const normalize = (node: SlateNodeType) => {
     return {
       ...node,
       //@ts-ignore
-
       children: node.children.map(normalize),
     }
   }
