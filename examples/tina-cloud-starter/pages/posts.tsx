@@ -4,6 +4,7 @@ import { Section } from "../components/section";
 import { Posts } from "../components/posts";
 import { layoutQueryFragment } from "../components/layout";
 import type { PostsConnection } from "../.tina/__generated__/types";
+import { getSdk } from "../.tina/__generated__/types";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
@@ -20,6 +21,12 @@ export default function HomePage(
 }
 
 export const getStaticProps = async () => {
+  const client = getSdk(async (doc, vars, options) => {
+    // const res = await fetch("asdf");
+    console.log({ doc, vars, options });
+    return {} as any;
+  });
+  client.Test();
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
       query PageQuery {
