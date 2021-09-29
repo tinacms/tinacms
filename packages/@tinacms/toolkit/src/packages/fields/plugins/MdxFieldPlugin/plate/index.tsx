@@ -25,6 +25,8 @@ import {
   createListPlugin,
   createAutoformatPlugin,
   createHorizontalRulePlugin,
+  useStoreEditorRef,
+  useEventEditorId,
   createSoftBreakPlugin,
   createExitBreakPlugin,
   TElement,
@@ -83,6 +85,7 @@ import {
 } from 'slate-react'
 import { createDeserializeMDPlugin } from '@udecode/plate-md-serializer'
 import type { SlateNodeType } from '../types'
+import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
 
 export const clearBlockFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor as SPEditor)
@@ -149,7 +152,7 @@ export const autoformatLists: AutoformatRule[] = [
   },
 ]
 
-export const createMDXTextPlugin = ({ templates }): PlatePlugin => ({
+export const createMDXPlugin = ({ templates }): PlatePlugin => ({
   pluginKeys: 'mdxJsxTextElement',
   voidTypes: () => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
   inlineTypes: () => ['mdxJsxTextElement'],
@@ -201,7 +204,9 @@ export const createMDXTextPlugin = ({ templates }): PlatePlugin => ({
 const components = createPlateComponents()
 const options = createPlateOptions()
 
-export const RichEditor = (props) => {
+export const RichEditor = wrapFieldsWithMeta((props) => {
+  const editor = useStoreEditorRef(props.input.name)
+
   const [value, setValue] = React.useState(
     props.input.value.children
       ? [...props.input.value.children?.map(normalize)]
@@ -226,8 +231,7 @@ export const RichEditor = (props) => {
     createHeadingPlugin(), // heading elements
     createLinkPlugin(), // link elements
     createListPlugin(),
-    // createMDXFlowPlugin({ templates }),
-    createMDXTextPlugin({ templates }),
+    createMDXPlugin({ templates }),
     createAutoformatPlugin({
       rules: [
         ...autoformatLists,
@@ -271,24 +275,9 @@ export const RichEditor = (props) => {
     createUnderlinePlugin(), // underline mark
     createStrikethroughPlugin(), // strikethrough mark
     createCodePlugin(), // code mark
-    createDeserializeMDPlugin(),
   ]
   return (
     <>
-      <div
-        style={{
-          display: 'flex',
-          justifyContent: 'space-between',
-          alignItems: 'center',
-          height: '35px',
-        }}
-      >
-        <label
-          style={{ fontWeight: 600, fontSize: '13px', marginBottom: '6px' }}
-        >
-          {props.field.label}
-        </label>
-      </div>
       <div
         style={{
           padding: '10px',
@@ -299,6 +288,28 @@ export const RichEditor = (props) => {
         }}
         className="slate-tina-field"
       >
+        <PopupAdder
+          showButton={true}
+          onAdd={(template) => {
+            Transforms.insertNodes(editor, [
+              {
+                type: template.inline
+                  ? 'mdxJsxTextElement'
+                  : 'mdxJsxFlowElement',
+                name: template.name,
+                props: template.defaultItem,
+                ordered: false,
+                children: [
+                  {
+                    type: 'text',
+                    text: '',
+                  },
+                ],
+              },
+            ])
+          }}
+          templates={templates}
+        />
         <Plate
           id={props.input.name}
           // editableProps={editableProps}
@@ -314,7 +325,7 @@ export const RichEditor = (props) => {
       </div>
     </>
   )
-}
+})
 
 const normalize = (node: SlateNodeType) => {
   if (['mdxJsxFlowElement', 'mdxJsxTextElement', 'image'].includes(node.type)) {
