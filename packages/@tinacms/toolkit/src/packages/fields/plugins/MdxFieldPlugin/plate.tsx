@@ -173,48 +173,49 @@ export const autoformatLists: AutoformatRule[] = [
 //   },
 // })
 
-export const createMDXTextPlugin = ({
-  templates,
-  voidSelection,
-}): PlatePlugin => ({
+export const createMDXTextPlugin = ({ templates }): PlatePlugin => ({
   pluginKeys: 'mdxJsxTextElement',
   voidTypes: (editor) => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
   inlineTypes: (editor) => ['mdxJsxTextElement'],
   renderElement: (editor) => (props) => {
+    const isInline = props.element.type === 'mdxJsxTextElement'
     return (
       <MdxPicker
-        editor={editor}
         {...props}
         templates={templates}
-        inline={false}
-        isReady={!!voidSelection}
-        voidSelection={voidSelection}
+        inline={isInline}
         onChange={(value, selection) => {
-          const newProperties: Partial<Element> = {
-            props: value,
+          if (isInline) {
+            const newProperties: Partial<Element> = {
+              props: value,
+            }
+            Transforms.setNodes(editor, newProperties, {
+              /**
+               * match traverses the ancestors of the relevant node
+               * so matching on type works for this, but likely won't work
+               * on more complex nested mdxJsxTextElement nodes. I think
+               * we'll want to match the path to the selection path, but
+               * they're off by one:
+               * selection.focus.path => [0, 1, 0]
+               * and path is [0, 1]. I believe that's because the last
+               * 0 in the focus.path array is referring to the text node
+               */
+              match: (node) => {
+                if (node.type === 'mdxJsxTextElement') {
+                  return true
+                }
+                return false
+              },
+              at: ReactEditor.findPath(editor, props.element),
+            })
+          } else {
+            const newProperties: Partial<Element> = {
+              props: value,
+            }
+            Transforms.setNodes(editor, newProperties, {
+              at: ReactEditor.findPath(editor, props.element),
+            })
           }
-          Transforms.setNodes(editor, newProperties, {
-            /**
-             * match traverses the ancestors of the relevant node
-             * so matching on type works for this, but likely won't work
-             * on more complex nested mdxJsxTextElement nodes. I think
-             * we'll want to match the path to the selection path, but
-             * they're off by one:
-             * selection.focus.path => [0, 1, 0]
-             * and path is [0, 1]. I believe that's because the last
-             * 0 in the focus.path array is referring to the text node
-             */
-            match: (node, path) => {
-              // console.log(selection.focus);
-              if (node.type === 'mdxJsxTextElement') {
-                console.log(node)
-
-                return true
-              }
-              return false
-            },
-            at: ReactEditor.findPath(editor, props.element),
-          })
         }}
       />
     )
@@ -230,10 +231,6 @@ export const RichEditor = (props) => {
       ? [...props.input.value.children?.map(normalize)]
       : [{ type: 'p', children: [{ type: 'text', text: '' }] }]
   )
-  const [voidSelection, setVoidSelectionInner] = React.useState<BaseRange>(null)
-  const setVoidSelection = (selection: BaseRange) => {
-    setVoidSelectionInner(selection)
-  }
 
   const templates = props.field.templates
 
@@ -253,8 +250,8 @@ export const RichEditor = (props) => {
     createHeadingPlugin(), // heading elements
     createLinkPlugin(), // link elements
     createListPlugin(),
-    // createMDXFlowPlugin({ templates, voidSelection }),
-    createMDXTextPlugin({ templates, voidSelection }),
+    // createMDXFlowPlugin({ templates }),
+    createMDXTextPlugin({ templates }),
     createAutoformatPlugin({
       rules: [
         ...autoformatLists,
@@ -300,7 +297,6 @@ export const RichEditor = (props) => {
     createCodePlugin(), // code mark
     createDeserializeMDPlugin(),
   ]
-  // console.log(initialValue)
   return (
     <>
       <div
@@ -377,12 +373,12 @@ export const MdxPicker = (props) => {
       label: id,
       initialValues,
       onChange: ({ values }) => {
-        props.onChange(values, props.voidSelection)
+        props.onChange(values)
       },
       onSubmit: () => {},
       fields: activeTemplate ? activeTemplate.fields : [],
     })
-  }, [JSON.stringify(props.voidSelection)])
+  }, [])
 
   return (
     <div
@@ -399,7 +395,6 @@ export const MdxPicker = (props) => {
         contentEditable={false}
       >
         <MdxField
-          editor={props.editor}
           inline={props.inline}
           tinaForm={form}
           field={activeTemplate}

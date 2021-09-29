@@ -37,17 +37,11 @@ export interface MdxFieldProps {
   inline?: boolean
 }
 
-export const MdxField = ({
-  inline,
-  tinaForm,
-  field,
-  editor,
-}: MdxFieldProps) => {
+export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
   const [isExpanded, setExpandedInner] = React.useState<boolean>(false)
   const setExpanded = (expanded: boolean) => {
     setExpandedInner(expanded)
   }
-  console.log(editor.selection)
 
   if (!field) {
     return null
