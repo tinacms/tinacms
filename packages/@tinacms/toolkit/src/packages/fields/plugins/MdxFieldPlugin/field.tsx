@@ -78,7 +78,7 @@ const Panel = function Panel({
   field,
 }: PanelProps) {
   const FormPortal = useFormPortal()
-
+  // console.log(tinaForm)
   return (
     <FormPortal>
       {({ zIndexShift }) => (
@@ -91,7 +91,16 @@ const Panel = function Panel({
           </PanelHeader>
           <PanelBody>
             {isExpanded ? (
-              <FormBuilder form={tinaForm} hideFooter={true} />
+              <FormBuilder
+                // form={{
+                //   ...tinaForm,
+                //   fields: tinaForm.fields.filter(
+                //     (field) => field.component !== 'rich-text'
+                //   ),
+                // }}
+                form={tinaForm}
+                hideFooter={true}
+              />
             ) : null}
           </PanelBody>
         </MdxFieldPanel>

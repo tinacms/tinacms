@@ -296,7 +296,7 @@ export const RichEditor = (props) => {
   )
 }
 
-const MdxPicker = (props) => {
+export const MdxPicker = (props) => {
   const isFocused = useFocused()
   const isSelected = useSelected()
   const initialValues = props.element.props

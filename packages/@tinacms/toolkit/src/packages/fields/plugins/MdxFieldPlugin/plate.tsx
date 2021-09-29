@@ -1,5 +1,7 @@
 import React, { useState } from 'react'
-import { Transforms, Editor } from 'slate'
+import { MdxField, PopupAdder } from './field'
+import { Transforms, Editor, BaseRange } from 'slate'
+import { Form } from '../../../forms'
 import {
   Plate,
   // editor
@@ -63,9 +65,20 @@ import {
   isElement,
   isType,
   SPEditor,
+  getRenderElement,
+  getPlatePluginTypes,
   TEditor,
+  PlatePlugin,
   toggleList,
 } from '@udecode/plate'
+import {
+  useSelected,
+  useFocused,
+  Slate,
+  Editable,
+  withReact,
+  ReactEditor,
+} from 'slate-react'
 import { createDeserializeMDPlugin } from '@udecode/plate-md-serializer'
 import type { SlateNodeType } from './types'
 
@@ -134,81 +147,164 @@ export const autoformatLists: AutoformatRule[] = [
   },
 ]
 
+// export const createMDXFlowPlugin = ({
+//   templates,
+//   voidSelection,
+// }): PlatePlugin => ({
+//   pluginKeys: 'mdxJsxFlowElement',
+//   renderElement: (editor) => (props) => {
+//     return (
+//       <MdxPicker
+//         inline={false}
+//         {...props}
+//         templates={templates}
+//         isReady={!!voidSelection}
+//         voidSelection={voidSelection}
+//         onChange={(value, selection) => {
+//           // const newProperties: Partial<Element> = {
+//           //   props: value,
+//           // }
+//           // Transforms.setNodes(editor, newProperties, {
+//           //   at: selection,
+//           // })
+//         }}
+//       />
+//     )
+//   },
+// })
+
+export const createMDXTextPlugin = ({
+  templates,
+  voidSelection,
+}): PlatePlugin => ({
+  pluginKeys: 'mdxJsxTextElement',
+  // voidTypes: (editor) => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
+  // inlineTypes: (editor) => ['mdxJsxTextElement'],
+  renderElement: (editor) => (props) => {
+    // console.log(props)
+    // return <div>Yes </div>
+    return (
+      <MdxPicker
+        {...props}
+        templates={templates}
+        inline={false}
+        isReady={!!voidSelection}
+        voidSelection={voidSelection}
+        onChange={(value, selection) => {
+          const newProperties: Partial<Element> = {
+            props: value,
+          }
+          Transforms.setNodes(editor, newProperties, {
+            /**
+             * match traverses the ancestors of the relevant node
+             * so matching on type works for this, but likely won't work
+             * on more complex nested mdxJsxTextElement nodes. I think
+             * we'll want to match the path to the selection path, but
+             * they're off by one:
+             * selection.focus.path => [0, 1, 0]
+             * and path is [0, 1]. I believe that's because the last
+             * 0 in the focus.path array is referring to the text node
+             */
+            match: (node, path) => {
+              // console.log(selection.focus);
+              // console.log(path, node.type);
+              if (node.type === 'mdxJsxTextElement') {
+                return true
+              }
+              return false
+            },
+            at: selection,
+          })
+        }}
+      />
+    )
+  },
+})
+
 const components = createPlateComponents()
 const options = createPlateOptions()
 
-const pluginsBasic = [
-  // editor
-  createReactPlugin(), // withReact
-  createHistoryPlugin(), // withHistory
-  createHorizontalRulePlugin(),
-  // elements
-  createParagraphPlugin(), // paragraph element
-  createBlockquotePlugin(), // blockquote element
-  createCodeBlockPlugin(), // code block element
-  createHeadingPlugin(), // heading elements
-  createLinkPlugin(), // link elements
-  createListPlugin(),
-  createAutoformatPlugin({
-    rules: [
-      ...autoformatLists,
-      {
-        mode: 'block',
-        type: ELEMENT_H1,
-        match: '# ',
-      },
-      {
-        mode: 'block',
-        type: ELEMENT_HR,
-        match: ['---', '—-', '___ '],
-        preFormat: clearBlockFormat,
-        format: (editor) => {
-          Transforms.setNodes(editor, { type: ELEMENT_HR })
-          Transforms.insertNodes(editor, {
-            type: ELEMENT_DEFAULT,
-            children: [{ text: '' }],
-          })
-        },
-      },
-    ],
-  }),
-  createSoftBreakPlugin({
-    rules: [
-      {
-        hotkey: 'mod+enter',
-      },
-    ],
-  }),
-  createExitBreakPlugin({
-    rules: [
-      {
-        hotkey: 'enter',
-      },
-    ],
-  }),
-  // marks
-  createBoldPlugin(), // bold mark
-  createItalicPlugin(), // italic mark
-  createUnderlinePlugin(), // underline mark
-  createStrikethroughPlugin(), // strikethrough mark
-  createCodePlugin(), // code mark
-  createDeserializeMDPlugin(),
-]
-
 export const RichEditor = (props) => {
+  console.log(props.input.name)
   const [value, setValue] = React.useState(
     props.input.value.children
-      ? [
-          ...props.input.value.children?.map(normalize),
-          // { type: 'paragraph', children: [{ type: 'text', text: '' }] },
-        ]
-      : [{ type: 'paragraph', children: [{ type: 'text', text: '' }] }]
+      ? [...props.input.value.children?.map(normalize)]
+      : [{ type: 'p', children: [{ type: 'text', text: '' }] }]
   )
+  const [voidSelection, setVoidSelectionInner] = React.useState<BaseRange>(null)
+  const setVoidSelection = (selection: BaseRange) => {
+    setVoidSelectionInner(selection)
+  }
+
+  const templates = props.field.templates
 
   React.useEffect(() => {
     props.input.onChange({ type: 'root', children: value })
   }, [JSON.stringify(value)])
 
+  const pluginsBasic = React.useMemo(
+    () => [
+      // editor
+      createReactPlugin(), // withReact
+      createHistoryPlugin(), // withHistory
+      createHorizontalRulePlugin(),
+      // elements
+      createParagraphPlugin(), // paragraph element
+      createBlockquotePlugin(), // blockquote element
+      createCodeBlockPlugin(), // code block element
+      createHeadingPlugin(), // heading elements
+      createLinkPlugin(), // link elements
+      createListPlugin(),
+      // createMDXFlowPlugin({ templates, voidSelection }),
+      createMDXTextPlugin({ templates, voidSelection }),
+      createAutoformatPlugin({
+        rules: [
+          ...autoformatLists,
+          {
+            mode: 'block',
+            type: ELEMENT_H1,
+            match: '# ',
+          },
+          {
+            mode: 'block',
+            type: ELEMENT_HR,
+            match: ['---', '—-', '___ '],
+            preFormat: clearBlockFormat,
+            format: (editor) => {
+              Transforms.setNodes(editor, { type: ELEMENT_HR })
+              Transforms.insertNodes(editor, {
+                type: ELEMENT_DEFAULT,
+                children: [{ text: '' }],
+              })
+            },
+          },
+        ],
+      }),
+      createSoftBreakPlugin({
+        rules: [
+          {
+            hotkey: 'mod+enter',
+          },
+        ],
+      }),
+      createExitBreakPlugin({
+        rules: [
+          {
+            hotkey: 'enter',
+          },
+        ],
+      }),
+      // marks
+      createBoldPlugin(), // bold mark
+      createItalicPlugin(), // italic mark
+      createUnderlinePlugin(), // underline mark
+      createStrikethroughPlugin(), // strikethrough mark
+      createCodePlugin(), // code mark
+      createDeserializeMDPlugin(),
+    ],
+    []
+  )
+  // console.log(initialValue)
   return (
     <>
       <div
@@ -236,13 +332,15 @@ export const RichEditor = (props) => {
         className="slate-tina-field"
       >
         <Plate
-          id="1"
+          id={props.input.name}
           // editableProps={editableProps}
           initialValue={value}
           plugins={pluginsBasic}
           components={components}
           options={options}
-          onChange={setValue}
+          // onChange={(value) => {
+          //   setValue(value)
+          // }}
         />
         {/* {value} */}
       </div>
@@ -267,4 +365,50 @@ const normalize = (node: SlateNodeType) => {
     }
   }
   return node
+}
+
+export const MdxPicker = (props) => {
+  const isFocused = useFocused()
+  const isSelected = useSelected()
+  const initialValues = props.element.props
+  const activeTemplate = props.templates.find(
+    (template) => template.name === props.element.name
+  )
+  const id = props.element.name + Math.floor(Math.random() * 100)
+  const form = React.useMemo(() => {
+    return new Form({
+      id,
+      label: id,
+      initialValues,
+      // onChange: ({ values }) => {
+      //   props.onChange(values, props.voidSelection)
+      // },
+      onSubmit: () => {},
+      fields: activeTemplate ? activeTemplate.fields : [],
+    })
+  }, [JSON.stringify(props.voidSelection)])
+
+  return (
+    <div
+      {...props.attributes}
+      style={{
+        display: props.inline ? 'inline-block' : 'block',
+        boxShadow: isSelected && isFocused ? '0 0 0 3px #B4D5FF' : 'none',
+      }}
+    >
+      <div
+        style={{
+          userSelect: 'none',
+        }}
+        contentEditable={false}
+      >
+        <MdxField
+          inline={props.inline}
+          tinaForm={form}
+          field={activeTemplate}
+        />
+      </div>
+      {props.children}
+    </div>
+  )
 }
