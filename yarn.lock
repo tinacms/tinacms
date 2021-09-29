@@ -4976,6 +4976,7 @@ __metadata:
     "@types/normalize-path": ^3.0.0
     "@types/ws": ^7.2.6
     "@types/yup": ^0.29.7
+    "@udecode/plate": ^4.2.0
     aws-sdk: ^2.930.0
     body-parser: ^1.19.0
     cors: ^2.8.5

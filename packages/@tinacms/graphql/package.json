@@ -53,6 +53,7 @@
     "@types/estree": "^0.0.50",
     "@types/mdast": "^3.0.10",
     "@types/node": "^16.9.1",
+    "@udecode/plate": "^4.2.0",
     "aws-sdk": "^2.930.0",
     "body-parser": "^1.19.0",
     "cors": "^2.8.5",

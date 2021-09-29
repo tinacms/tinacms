@@ -495,28 +495,63 @@ type MdxJsxTextElement = {
 
 type MdxAstNode = Content | MdxJsxFlowElement | MdxJsxTextElement
 
+const plateElements = {
+  ELEMENT_H1: 'h1',
+  ELEMENT_H2: 'h2',
+  ELEMENT_H3: 'h3',
+  ELEMENT_H4: 'h4',
+  ELEMENT_H5: 'h5',
+  ELEMENT_H6: 'h6',
+  ELEMENT_HR: 'hr',
+  ELEMENT_ALIGN_CENTER: 'align_center',
+  ELEMENT_ALIGN_JUSTIFY: 'align_justify',
+  ELEMENT_ALIGN_LEFT: 'align_left',
+  ELEMENT_ALIGN_RIGHT: 'align_right',
+  ELEMENT_BLOCKQUOTE: 'blockquote',
+  ELEMENT_CODE_BLOCK: 'code_block',
+  ELEMENT_CODE_LINE: 'code_line',
+  ELEMENT_DEFAULT: 'p',
+  ELEMENT_IMAGE: 'img',
+  ELEMENT_LI: 'li',
+  ELEMENT_LIC: 'lic',
+  ELEMENT_LINK: 'a',
+  ELEMENT_MEDIA_EMBED: 'media_embed',
+  ELEMENT_MENTION: 'mention',
+  ELEMENT_OL: 'ol',
+  ELEMENT_PARAGRAPH: 'p',
+  ELEMENT_TABLE: 'table',
+  ELEMENT_TD: 'td',
+  ELEMENT_TH: 'th',
+  ELEMENT_TODO_LI: 'action_item',
+  ELEMENT_TR: 'tr',
+  ELEMENT_UL: 'ul',
+  MARK_ITALIC: 'italic',
+  MARK_BOLD: 'bold',
+  MARK_STRIKETHROUGH: 'strikethrough',
+}
+
 export const defaultNodeTypes: NodeTypes = {
-  paragraph: 'paragraph',
-  block_quote: 'block_quote',
-  code_block: 'code_block',
-  link: 'link',
-  ul_list: 'ul_list',
-  ol_list: 'ol_list',
-  listItem: 'list_item',
+  paragraph: plateElements.ELEMENT_PARAGRAPH,
+  block_quote: plateElements.ELEMENT_BLOCKQUOTE,
+  code_block: plateElements.ELEMENT_CODE_BLOCK,
+  link: plateElements.ELEMENT_LINK,
+  ul_list: plateElements.ELEMENT_UL,
+  ol_list: plateElements.ELEMENT_OL,
+  listItem: plateElements.ELEMENT_LI,
   heading: {
-    1: 'heading_one',
-    2: 'heading_two',
-    3: 'heading_three',
-    4: 'heading_four',
-    5: 'heading_five',
-    6: 'heading_six',
+    1: plateElements.ELEMENT_H1,
+    2: plateElements.ELEMENT_H2,
+    3: plateElements.ELEMENT_H3,
+    4: plateElements.ELEMENT_H4,
+    5: plateElements.ELEMENT_H5,
+    6: plateElements.ELEMENT_H6,
   },
-  emphasis_mark: 'italic',
-  strong_mark: 'bold',
-  delete_mark: 'strikeThrough',
-  inline_code_mark: 'code',
-  thematic_break: 'thematic_break',
-  image: 'image',
+  emphasis_mark: plateElements.MARK_ITALIC,
+  strong_mark: plateElements.MARK_BOLD,
+  delete_mark: plateElements.MARK_STRIKETHROUGH,
+  inline_code_mark: plateElements.ELEMENT_CODE_LINE,
+  thematic_break: plateElements.ELEMENT_HR,
+  image: plateElements.ELEMENT_IMAGE,
 }
 
 export default function remarkToSlate(node: MdxAstNode) {
@@ -530,7 +565,7 @@ export default function remarkToSlate(node: MdxAstNode) {
   switch (node.type) {
     case 'heading':
       return {
-        type: types.heading[node.depth || 1],
+        type: types.heading[node.depth],
         children: node.children.map(remarkToSlate),
       }
     case 'list':
@@ -551,7 +586,7 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'link':
       return {
         type: types.link,
-        link: node.url,
+        url: node.url,
         children: node.children.map(remarkToSlate),
       }
     case 'image':
