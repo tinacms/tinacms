@@ -255,7 +255,7 @@ export const RichEditor = wrapFieldsWithMeta<
     createHeadingPlugin(), // heading elements
     createLinkPlugin(), // link elements
     createListPlugin(),
-    // createMDXPlugin({ templates }),
+    createMDXPlugin({ templates }),
     // marks
     createBoldPlugin(), // bold mark
     createItalicPlugin(), // italic mark
@@ -299,7 +299,31 @@ export const RichEditor = wrapFieldsWithMeta<
         >
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
             {/* <HeadingToolbar> */}
-            <ToolbarButtons />
+            <ToolbarButtons
+              popup={{
+                showButton: true,
+                onAdd: (template) => {
+                  Transforms.insertNodes(editor, [
+                    {
+                      type: template.inline
+                        ? 'mdxJsxTextElement'
+                        : 'mdxJsxFlowElement',
+                      name: template.name,
+                      props: template.defaultItem,
+                      ordered: false,
+                      children: [
+                        {
+                          // @ts-ignore BaseEditor fix
+                          type: 'text',
+                          text: '',
+                        },
+                      ],
+                    },
+                  ])
+                },
+                templates: templates,
+              }}
+            />
             {/* </HeadingToolbar> */}
           </div>
           {/* <PopupAdder

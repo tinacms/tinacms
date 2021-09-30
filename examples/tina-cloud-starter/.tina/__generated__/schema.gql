@@ -80,9 +80,14 @@ type Collection {
 
 union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
 
+type PostsSomeField {
+  title: String
+}
+
 union PostsAuthorDocument = AuthorsDocument
 
 type Posts {
+  someField: [PostsSomeField]
   _body: JSON
   title: String
   author: PostsAuthorDocument
@@ -291,7 +296,12 @@ input DocumentMutation {
   pages: PagesMutation
 }
 
+input PostsSomeFieldMutation {
+  title: String
+}
+
 input PostsMutation {
+  someField: [PostsSomeFieldMutation]
   _body: JSON
   title: String
   author: String

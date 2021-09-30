@@ -110,6 +110,22 @@ const tinaSchema: TinaCloudSchema<false> = {
           collections: ['author'],
         },
         {
+          type: 'object',
+          label: 'Some Field',
+          name: 'someField',
+          list: true,
+          ui: {
+            component: 'MyGroupList',
+          },
+          fields: [
+            {
+              name: 'title',
+              label: 'Title',
+              type: 'string',
+            },
+          ],
+        },
+        {
           type: 'rich-text',
           label: 'Body',
           name: 'body',

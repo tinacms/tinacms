@@ -437,6 +437,22 @@ export default defineSchema({
       path: "content/posts",
       fields: [
         {
+          type: "object",
+          label: "Some Field",
+          name: "someField",
+          list: true,
+          fields: [
+            {
+              name: "title",
+              label: "Title",
+              type: "string",
+            },
+          ],
+          ui: {
+            component: "MyGroupList",
+          },
+        },
+        {
           type: "rich-text",
           label: "Body",
           name: "_body",

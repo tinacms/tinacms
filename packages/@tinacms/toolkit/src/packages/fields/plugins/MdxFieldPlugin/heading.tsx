@@ -265,11 +265,11 @@ export const MdxFieldPlugin = {
   Component: MdxField,
 }
 
-export const PopupAdder = ({ showButton, onAdd, templates }) => {
+export const HeaderPopup = ({ children, icon }) => {
   const [visible, setVisible] = React.useState(false)
   return (
     <div style={{ position: 'relative' }}>
-      {!showButton ? (
+      {false ? (
         <span />
       ) : (
         <Button
@@ -278,11 +278,8 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
             event.preventDefault()
             setVisible(true)
           }}
-          open={visible}
-          primary
-          small
         >
-          <AddIcon />
+          {icon}
         </Button>
       )}
       <BlockMenu open={visible}>
@@ -292,19 +289,7 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
           onDismiss={() => setVisible(false)}
           disabled={!visible}
         >
-          <BlockMenuList>
-            {templates.map((template) => (
-              <BlockOption
-                key={template.name}
-                onClick={() => {
-                  onAdd(template)
-                  setVisible(false)
-                }}
-              >
-                {template.label}
-              </BlockOption>
-            ))}
-          </BlockMenuList>
+          <BlockMenuList>{children}</BlockMenuList>
         </Dismissible>
       </BlockMenu>
     </div>
@@ -318,22 +303,23 @@ const Button = styled.button`
 `
 
 const BlockMenu = styled.div<{ open: boolean }>`
-  min-width: 192px;
-  border-radius: var(--tina-radius-big);
+  width: 50px;
+  /* border-radius: var(--tina-radius-big); */
   border: 1px solid #efefef;
   display: block;
   position: absolute;
   top: 0;
-  right: 0;
+  left: 0;
   transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
   opacity: 0;
   pointer-events: none;
   transition: all 150ms ease-out;
-  transform-origin: 100% 0;
+  transform-origin: 0 0;
   box-shadow: var(--tina-shadow-big);
   background-color: white;
   overflow: hidden;
   z-index: var(--tina-z-index-1);
+  padding: 8px;
   ${(props) =>
     props.open &&
     css`
@@ -344,29 +330,8 @@ const BlockMenu = styled.div<{ open: boolean }>`
 `
 
 const BlockMenuList = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const BlockOption = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-0);
-  padding: var(--tina-padding-small);
-  font-weight: var(--tina-font-weight-regular);
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: var(--tina-color-grey-1);
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
-  }
+  /* display: flex;
+  flex-direction: column; */
 `
 
 interface PanelProps {

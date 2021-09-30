@@ -185,10 +185,16 @@ export type CollectionDocumentsArgs = {
 
 export type DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument;
 
+export type PostsSomeField = {
+  __typename?: 'PostsSomeField';
+  title?: Maybe<Scalars['String']>;
+};
+
 export type PostsAuthorDocument = AuthorsDocument;
 
 export type Posts = {
   __typename?: 'Posts';
+  someField?: Maybe<Array<Maybe<PostsSomeField>>>;
   _body?: Maybe<Scalars['JSON']>;
   title?: Maybe<Scalars['String']>;
   author?: Maybe<PostsAuthorDocument>;
@@ -465,7 +471,12 @@ export type DocumentMutation = {
   pages?: Maybe<PagesMutation>;
 };
 
+export type PostsSomeFieldMutation = {
+  title?: Maybe<Scalars['String']>;
+};
+
 export type PostsMutation = {
+  someField?: Maybe<Array<Maybe<PostsSomeFieldMutation>>>;
   _body?: Maybe<Scalars['JSON']>;
   title?: Maybe<Scalars['String']>;
   author?: Maybe<Scalars['String']>;

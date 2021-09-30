@@ -4,7 +4,7 @@ import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
 // @ts-ignore
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
-
+import { GroupListFieldPlugin } from "tinacms";
 import React from "react";
 
 const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
@@ -30,6 +30,22 @@ const App = ({ Component, pageProps }) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
+              console.log({ GroupListFieldPlugin });
+              cms.fields.add({
+                ...GroupListFieldPlugin, // spread existing group-list plugin
+                name: "MyGroupList",
+                itemProps: (item) => {
+                  console.log(item);
+                  return {
+                    key: item.title, // ensure this is unique
+                    label: item.title, // item will be the field values, so if you have a `name` field, you can use that as the label
+                  };
+                },
+              });
+              // import("tinacms").then(({ GroupListFieldPlugin }) => {
+              //   console.log("doit", GroupListFieldPlugin);
+
+              // });
             }}
             documentCreatorCallback={{
               /**

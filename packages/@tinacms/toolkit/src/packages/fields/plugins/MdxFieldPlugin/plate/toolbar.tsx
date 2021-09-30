@@ -61,36 +61,40 @@ import {
   UndoIcon,
   RedoIcon,
 } from '../../../../icons'
+import { PopupAdder } from '../field'
+import { HeaderPopup } from '../heading'
 
 export const ToolbarButtonsBasicElements = () => {
   const editor = useStoreEditorRef(useEventEditorId('focus'))
 
   return (
     <>
-      <ToolbarElement
-        type={getPlatePluginType(editor, ELEMENT_H1)}
-        icon={<HeadingIcon />}
-      />
-      <ToolbarElement
-        type={getPlatePluginType(editor, ELEMENT_H2)}
-        icon={<HeadingIcon />}
-      />
-      <ToolbarElement
-        type={getPlatePluginType(editor, ELEMENT_H3)}
-        icon={<HeadingIcon />}
-      />
-      <ToolbarElement
-        type={getPlatePluginType(editor, ELEMENT_H4)}
-        icon={<HeadingIcon />}
-      />
-      <ToolbarElement
-        type={getPlatePluginType(editor, ELEMENT_H5)}
-        icon={<HeadingIcon />}
-      />
-      <ToolbarElement
-        type={getPlatePluginType(editor, ELEMENT_H6)}
-        icon={<HeadingIcon />}
-      />
+      <HeaderPopup icon={<HeadingIcon />}>
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H1)}
+          icon={<>H1</>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H2)}
+          icon={<>H2</>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H3)}
+          icon={<>H3</>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H4)}
+          icon={<>H4</>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H5)}
+          icon={<>H5</>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H6)}
+          icon={<>H6</>}
+        />
+      </HeaderPopup>
       <ToolbarElement
         type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
         icon={<QuoteIcon />}
@@ -145,7 +149,7 @@ export const ToolbarButtonsBasicMarks = () => {
   )
 }
 
-export const ToolbarButtons = () => (
+export const ToolbarButtons = ({ popup }) => (
   <>
     <ToolbarButtonsBasicElements />
     <ToolbarButtonsList />
@@ -154,5 +158,6 @@ export const ToolbarButtons = () => (
     <ToolbarColorPicker pluginKey={MARK_BG_COLOR} icon={<FontDownload />} />
     <ToolbarLink icon={<Link />} />
     <ToolbarImage icon={<Image />} /> */}
+    <PopupAdder {...popup} />
   </>
 )
