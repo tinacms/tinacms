@@ -566,10 +566,7 @@ export default defineSchema({
               name: "nav",
               list: true,
               ui: {
-                defaultItem: {
-                  href: "home",
-                  label: "Home",
-                },
+                component: "MyGroupList",
               },
               fields: [
                 {

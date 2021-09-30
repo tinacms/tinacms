@@ -23,7 +23,10 @@ import {
   createBasicMarkPlugins,
   createListPlugin,
   createAutoformatPlugin,
+  createResetNodePlugin,
+  createTrailingBlockPlugin,
   createHorizontalRulePlugin,
+  createSelectOnBackspacePlugin,
   useStoreEditorRef,
   createSoftBreakPlugin,
   createExitBreakPlugin,
@@ -38,6 +41,7 @@ import {
   TEditor,
   PlatePlugin,
   toggleList,
+  HeadingToolbar,
   ELEMENT_H1,
   ELEMENT_H2,
   ELEMENT_H3,
@@ -56,6 +60,7 @@ import {
   ELEMENT_OL,
   ELEMENT_TODO_LI,
   ELEMENT_UL,
+  ELEMENT_LIC,
   MARK_ITALIC,
   MARK_BOLD,
   MARK_STRIKETHROUGH,
@@ -64,7 +69,6 @@ import {
   ELEMENT_TD,
   ELEMENT_TH,
   ELEMENT_TR,
-  ELEMENT_LIC,
   ELEMENT_ALIGN_CENTER,
   ELEMENT_ALIGN_JUSTIFY,
   ELEMENT_ALIGN_LEFT,
@@ -89,6 +93,14 @@ import {
   UndoIcon,
   RedoIcon,
 } from '../../../../icons'
+
+import {
+  optionsAutoformat,
+  optionsExitBreakPlugin,
+  optionsResetBlockTypePlugin,
+  optionsSoftBreakPlugin,
+} from './pluginOptions'
+import { ToolbarButtons } from './toolbar'
 
 export const clearBlockFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor as SPEditor)
@@ -157,7 +169,7 @@ export const autoformatLists: AutoformatRule[] = [
 ]
 
 export const createMDXPlugin = ({ templates }): PlatePlugin => ({
-  pluginKeys: 'mdxJsxTextElement',
+  pluginKeys: ['mdxJsxTextElement', 'mdxJsxFlowElement'],
   voidTypes: () => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
   inlineTypes: () => ['mdxJsxTextElement'],
   renderElement: (editor) => (props) => {
@@ -213,33 +225,6 @@ export const createMDXPlugin = ({ templates }): PlatePlugin => ({
 const components = createPlateComponents()
 const options = createPlateOptions()
 
-const Toolbar = () => {
-  return (
-    <div style={{ display: 'flex' }}>
-      {[
-        HeadingIcon,
-        BoldIcon,
-        ItalicIcon,
-        StrikethroughIcon,
-        MediaIcon,
-        TableIcon,
-        QuoteIcon,
-        CodeIcon,
-        OrderedListIcon,
-        UnderlineIcon,
-        UndoIcon,
-        RedoIcon,
-      ].map((Icon) => {
-        return (
-          <div style={{ width: '28px' }}>
-            <Icon />
-          </div>
-        )
-      })}
-    </div>
-  )
-}
-
 export const RichEditor = wrapFieldsWithMeta<
   InputProps,
   { templates: unknown[] }
@@ -270,53 +255,24 @@ export const RichEditor = wrapFieldsWithMeta<
     createHeadingPlugin(), // heading elements
     createLinkPlugin(), // link elements
     createListPlugin(),
-    createMDXPlugin({ templates }),
+    // createMDXPlugin({ templates }),
     // marks
     createBoldPlugin(), // bold mark
     createItalicPlugin(), // italic mark
     createUnderlinePlugin(), // underline mark
     createStrikethroughPlugin(), // strikethrough mark
     createCodePlugin(), // code mark
-    createBasicMarkPlugins(),
+    ...createBasicMarkPlugins(),
     // autoformat rules
-    createAutoformatPlugin({
-      rules: [
-        ...autoformatLists,
-        {
-          mode: 'block',
-          type: ELEMENT_H1,
-          match: '# ',
-        },
-        {
-          mode: 'block',
-          type: ELEMENT_HR,
-          match: ['---', '—-', '___ '],
-          preFormat: clearBlockFormat,
-          format: (editor) => {
-            // @ts-ignore BaseEditor fix
-            Transforms.setNodes(editor, { type: ELEMENT_HR })
-            Transforms.insertNodes(editor, {
-              // @ts-ignore BaseEditor fix
-              type: ELEMENT_DEFAULT,
-              children: [{ text: '' }],
-            })
-          },
-        },
-      ],
+    createAutoformatPlugin(optionsAutoformat),
+    createResetNodePlugin(optionsResetBlockTypePlugin),
+    createSoftBreakPlugin(optionsSoftBreakPlugin),
+    createExitBreakPlugin(optionsExitBreakPlugin),
+    createTrailingBlockPlugin({
+      type: ELEMENT_PARAGRAPH,
     }),
-    createSoftBreakPlugin({
-      rules: [
-        {
-          hotkey: 'mod+enter',
-        },
-      ],
-    }),
-    createExitBreakPlugin({
-      rules: [
-        {
-          hotkey: 'enter',
-        },
-      ],
+    createSelectOnBackspacePlugin({
+      allow: [ELEMENT_IMAGE],
     }),
   ]
   return (
@@ -339,7 +295,9 @@ export const RichEditor = wrapFieldsWithMeta<
           }}
         >
           <div>
-            <Toolbar />
+            <HeadingToolbar>
+              <ToolbarButtons />
+            </HeadingToolbar>
           </div>
           <PopupAdder
             showButton={true}
