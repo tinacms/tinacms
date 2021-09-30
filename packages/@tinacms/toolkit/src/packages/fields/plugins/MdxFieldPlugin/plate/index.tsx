@@ -279,27 +279,30 @@ export const RichEditor = wrapFieldsWithMeta<
     <>
       <div
         style={{
-          padding: '10px',
-          marginBottom: '18px',
           background: 'white',
           borderRadius: '4px',
           border: '1px solid #efefef',
         }}
-        className="slate-tina-field"
       >
         <div
           style={{
-            display: 'flex',
-            justifyContent: 'space-between',
-            alignItems: 'center',
+            position: 'sticky',
+            top: 0,
+            zIndex: 100,
+            background: '#fff',
+            padding: '10px',
+            margin: '8px 10px 0',
+            borderRadius: '4px',
+            border: '1px solid #efefef',
+            boxShadow: '0 0 3px rgb(0 0 0 / 7%), 2px 0 8px rgb(0 0 0 / 7%)',
           }}
         >
-          <div>
-            <HeadingToolbar>
-              <ToolbarButtons />
-            </HeadingToolbar>
+          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+            {/* <HeadingToolbar> */}
+            <ToolbarButtons />
+            {/* </HeadingToolbar> */}
           </div>
-          <PopupAdder
+          {/* <PopupAdder
             showButton={true}
             onAdd={(template) => {
               Transforms.insertNodes(editor, [
@@ -321,21 +324,26 @@ export const RichEditor = wrapFieldsWithMeta<
               ])
             }}
             templates={templates}
-          />
+          /> */}
         </div>
-
-        <Plate
-          id={props.input.name}
-          // editableProps={editableProps}
-          initialValue={value}
-          plugins={pluginsBasic}
-          components={components}
-          options={options}
-          onChange={(value) => {
-            setValue(value)
+        <div
+          style={{
+            padding: '10px',
           }}
-        />
-        {/* {value} */}
+        >
+          <Plate
+            id={props.input.name}
+            // editableProps={editableProps}
+            initialValue={value}
+            plugins={pluginsBasic}
+            components={components}
+            options={options}
+            onChange={(value) => {
+              setValue(value)
+            }}
+          />
+          {/* {value} */}
+        </div>
       </div>
     </>
   )
