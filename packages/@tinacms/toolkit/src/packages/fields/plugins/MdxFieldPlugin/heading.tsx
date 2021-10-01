@@ -268,7 +268,7 @@ export const MdxFieldPlugin = {
 export const HeaderPopup = ({ children, icon }) => {
   const [visible, setVisible] = React.useState(false)
   return (
-    <div style={{ position: 'relative' }}>
+    <span style={{ position: 'relative' }}>
       {false ? (
         <span />
       ) : (
@@ -292,13 +292,14 @@ export const HeaderPopup = ({ children, icon }) => {
           <BlockMenuList>{children}</BlockMenuList>
         </Dismissible>
       </BlockMenu>
-    </div>
+    </span>
   )
 }
 
 const Button = styled.button`
   svg {
-    width: 24px;
+    width: 20px;
+    height: 20px;
   }
 `
 
