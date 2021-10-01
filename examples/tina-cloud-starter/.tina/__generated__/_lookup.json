@@ -15,75 +15,51 @@
   },
   "DocumentNode": {
     "type": "DocumentNode",
-    "resolveType": "multiCollectionDocument"
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   },
-  "PostsArticleAuthorDocument": {
-    "type": "PostsArticleAuthorDocument",
-    "resolveType": "multiCollectionDocument"
-  },
-  "Posts": {
-    "type": "Posts",
-    "resolveType": "unionData",
-    "typeMap": {
-      "article": "PostsArticle"
-    }
+  "PostsAuthorDocument": {
+    "type": "PostsAuthorDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   },
   "PostsDocument": {
     "type": "PostsDocument",
     "resolveType": "collectionDocument",
-    "collection": "posts"
+    "collection": "posts",
+    "createPostsDocument": "create",
+    "updatePostsDocument": "update"
   },
   "PostsConnection": {
     "type": "PostsConnection",
     "resolveType": "collectionDocumentList",
     "collection": "posts"
   },
-  "Authors": {
-    "type": "Authors",
-    "resolveType": "unionData",
-    "typeMap": {
-      "author": "AuthorsAuthor"
-    }
+  "GlobalDocument": {
+    "type": "GlobalDocument",
+    "resolveType": "collectionDocument",
+    "collection": "global",
+    "createGlobalDocument": "create",
+    "updateGlobalDocument": "update"
+  },
+  "GlobalConnection": {
+    "type": "GlobalConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "global"
   },
   "AuthorsDocument": {
     "type": "AuthorsDocument",
     "resolveType": "collectionDocument",
-    "collection": "authors"
+    "collection": "authors",
+    "createAuthorsDocument": "create",
+    "updateAuthorsDocument": "update"
   },
   "AuthorsConnection": {
     "type": "AuthorsConnection",
     "resolveType": "collectionDocumentList",
     "collection": "authors"
-  },
-  "PagesPageBlocks": {
-    "type": "PagesPageBlocks",
-    "resolveType": "unionData",
-    "typeMap": {
-      "raw": "PagesPageBlocksRaw",
-      "content": "PagesPageBlocksContent",
-      "image": "PagesPageBlocksImage"
-    }
-  },
-  "Pages": {
-    "type": "Pages",
-    "resolveType": "unionData",
-    "typeMap": {
-      "page": "PagesPage"
-    }
-  },
-  "PagesDocument": {
-    "type": "PagesDocument",
-    "resolveType": "collectionDocument",
-    "collection": "pages"
-  },
-  "PagesConnection": {
-    "type": "PagesConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "pages"
-  },
-  "PostsAuthorDocument": {
-    "type": "PostsAuthorDocument",
-    "resolveType": "multiCollectionDocument"
   },
   "PagesBlocks": {
     "type": "PagesBlocks",
@@ -95,29 +71,16 @@
       "testimonial": "PagesBlocksTestimonial"
     }
   },
-  "GlobalDocument": {
-    "type": "GlobalDocument",
+  "PagesDocument": {
+    "type": "PagesDocument",
     "resolveType": "collectionDocument",
-    "collection": "global"
+    "collection": "pages",
+    "createPagesDocument": "create",
+    "updatePagesDocument": "update"
   },
-  "GlobalConnection": {
-    "type": "GlobalConnection",
+  "PagesConnection": {
+    "type": "PagesConnection",
     "resolveType": "collectionDocumentList",
-    "collection": "global"
-  },
-  "GlobalFooterSocialTestDocument": {
-    "type": "GlobalFooterSocialTestDocument",
-    "resolveType": "multiCollectionDocument"
-  },
-  "PostsTestDocument": {
-    "type": "PostsTestDocument",
-    "resolveType": "multiCollectionDocument"
-  },
-  "PostsTestConnection": {
-    "type": "PostsTestConnection",
-    "resolveType": "multiCollectionDocumentList",
-    "collections": [
-      "posts"
-    ]
+    "collection": "pages"
   }
 }
