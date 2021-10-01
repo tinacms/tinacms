@@ -22,14 +22,15 @@ export default function HomePage(
 
 export const getStaticProps = async () => {
   const client = getSdk(async (doc, vars, options) => {
-    // const res = await fetch("asdf");
-    console.log({ doc, vars, options });
     return {} as any;
   });
-  const bla = await client.Test();
-  bla.getCollections.forEach((item) => {
-    console.log(item.name);
+
+  client.Test().then((res) => {
+    res.getCollections.forEach((x) => {
+      x.name;
+    });
   });
+
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
       query PageQuery {
