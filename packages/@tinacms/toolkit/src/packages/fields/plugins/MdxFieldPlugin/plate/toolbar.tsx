@@ -60,6 +60,7 @@ import {
   UnderlineIcon,
   UndoIcon,
   RedoIcon,
+  LinkIcon,
 } from '../../../../icons'
 import { PopupAdder } from '../field'
 import { HeaderPopup } from '../heading'
@@ -103,6 +104,8 @@ export const ToolbarButtonsBasicElements = () => {
         type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
         icon={<CodeIcon />}
       />
+      <ToolbarLink icon={<LinkIcon />} />
+      <ToolbarImage icon={<>Img</>} />
     </>
   )
 }

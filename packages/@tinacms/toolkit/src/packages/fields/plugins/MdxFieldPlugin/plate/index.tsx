@@ -20,6 +20,7 @@ import {
   createPlateComponents,
   createPlateOptions,
   createLinkPlugin,
+  createImagePlugin,
   createBasicMarkPlugins,
   createListPlugin,
   createAutoformatPlugin,
@@ -30,6 +31,7 @@ import {
   useStoreEditorRef,
   createSoftBreakPlugin,
   createExitBreakPlugin,
+  getPlatePluginTypes,
   TElement,
   TodoListItemNodeData,
   AutoformatBlockRule,
@@ -75,6 +77,7 @@ import {
   ELEMENT_ALIGN_RIGHT,
   ELEMENT_MEDIA_EMBED,
   ELEMENT_MENTION,
+  getRenderElement,
 } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import type { SlateNodeType } from '../types'
@@ -168,6 +171,15 @@ export const autoformatLists: AutoformatRule[] = [
   },
 ]
 
+export const createTinaImagePlugin = () => {
+  return {
+    pluginKeys: ['img'],
+    inlineTypes: getPlatePluginTypes('img'),
+    voidTypes: getPlatePluginTypes('img'),
+    renderElement: getRenderElement('img'),
+  }
+}
+
 export const createMDXPlugin = ({ templates }): PlatePlugin => ({
   pluginKeys: ['mdxJsxTextElement', 'mdxJsxFlowElement'],
   voidTypes: () => ['mdxJsxTextElement', 'mdxJsxFlowElement'],
@@ -222,7 +234,6 @@ export const createMDXPlugin = ({ templates }): PlatePlugin => ({
   },
 })
 
-const components = createPlateComponents()
 const options = createPlateOptions()
 
 export const RichEditor = wrapFieldsWithMeta<
@@ -243,7 +254,28 @@ export const RichEditor = wrapFieldsWithMeta<
     props.input.onChange({ type: 'root', children: value })
   }, [JSON.stringify(value)])
 
+  const components = createPlateComponents({
+    img: (props) => {
+      console.log(props)
+      return (
+        <div {...props.attributes}>
+          <img
+            style={{ width: '100%' }}
+            src={props.element.url}
+            alt={props.element.alt}
+          />
+          <caption style={{ display: 'block' }}>
+            {props.element.caption}
+          </caption>
+          {props.children}
+        </div>
+      )
+    },
+  })
+
   const pluginsBasic = [
+    createTinaImagePlugin(),
+    createMDXPlugin({ templates }),
     // editor
     createReactPlugin(), // withReact
     createHistoryPlugin(), // withHistory
@@ -255,7 +287,6 @@ export const RichEditor = wrapFieldsWithMeta<
     createHeadingPlugin(), // heading elements
     createLinkPlugin(), // link elements
     createListPlugin(),
-    createMDXPlugin({ templates }),
     // marks
     createBoldPlugin(), // bold mark
     createItalicPlugin(), // italic mark
@@ -374,7 +405,7 @@ export const RichEditor = wrapFieldsWithMeta<
 })
 
 const normalize = (node: SlateNodeType) => {
-  if (['mdxJsxFlowElement', 'mdxJsxTextElement', 'image'].includes(node.type)) {
+  if (['mdxJsxFlowElement', 'mdxJsxTextElement', 'img'].includes(node.type)) {
     return {
       ...node,
       children: [{ type: 'text', text: '' }],

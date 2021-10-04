@@ -141,6 +141,17 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
+    case plateElements.ELEMENT_IMAGE:
+      console.log(node)
+      return {
+        type: 'image',
+        title: '',
+        alt: '',
+        url: node.url,
+        children: node.children.map((child) =>
+          stringify(child, field)
+        ) as StaticPhrasingContent[],
+      }
     case plateElements.ELEMENT_LINK:
       return {
         type: 'link',
@@ -158,9 +169,6 @@ export const stringify = (
       }
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
-      if (node.name === 'Cta') {
-        console.log(node)
-      }
       try {
         let children = []
         const atts = []
