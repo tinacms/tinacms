@@ -328,6 +328,10 @@ export const getStaticPropsForTina = async ({
   }
 }
 
+function is_server() {
+  return !(typeof window != 'undefined' && window.document)
+}
+
 /**
  * A convenience function which makes a GraphQL request
  * to a local GraphQL server. Only recommended for functions
@@ -343,9 +347,19 @@ export const staticRequest = async ({
   variables?: object
 }) => {
   const client = new LocalClient()
+  if (!is_server()) {
+    // If we are running this in the browser (for example a useEffect) we should display a warning
+    console.warn(`Whoops! Looks like you are using \`staticRequest\` in the browser to fetch data.
+
+The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions. 
+This function should only be called on the server at build time.
+
+This will work when developing locally but NOT when deployed to production. 
+`)
+  }
+
   return client.request(query, { variables })
 }
-
 /**
  * A passthru function which allows editors
  * to know the temlpate string is a GraphQL
