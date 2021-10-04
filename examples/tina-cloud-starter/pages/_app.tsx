@@ -30,7 +30,6 @@ const App = ({ Component, pageProps }) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
-              console.log({ GroupListFieldPlugin });
               cms.fields.add({
                 ...GroupListFieldPlugin, // spread existing group-list plugin
                 name: "MyGroupList",
