@@ -219,13 +219,25 @@ export const resolve = async ({
               /**
                * `getDocument`/`createDocument`/`updateDocument`
                */
-              return resolver.resolveDocument({
+              const result = await resolver.resolveDocument({
                 value,
                 args,
                 collection: args.collection,
                 isMutation,
                 isCreation,
               })
+
+              if (!isMutation) {
+                const mutationPath = buildMutationPath(info, {
+                  // @ts-ignore
+                  relativePath: result.sys.relativePath,
+                })
+                if (mutationPath) {
+                  mutationPaths.push(mutationPath)
+                }
+              }
+
+              return result
             }
             return value
           /**
@@ -412,7 +424,7 @@ const buildMutationPath = (
     collection,
     relativePath,
   }: {
-    collection: TinaCloudCollection<false>
+    collection?: TinaCloudCollection<false>
     relativePath: string
   }
 ) => {
@@ -422,7 +434,9 @@ const buildMutationPath = (
   if (!queryNode) {
     throw new Error(`exptected to find field node for ${info.fieldName}`)
   }
-  const mutationName = NAMER.updateName([collection.name])
+  const mutationName = collection
+    ? NAMER.updateName([collection.name])
+    : 'updateDocument'
   const mutations = JSON.parse(
     JSON.stringify(info.schema.getMutationType()?.getFields())
   ) as GraphQLFieldMap<any, any>
@@ -503,8 +517,8 @@ const buildMutationPath = (
   return {
     path: ['data', ...buildPath(info.path, []), 'form'],
     string: mutationString,
-    includeCollection: false,
-    includeTemplate: !!collection.templates,
+    includeCollection: collection ? false : true,
+    includeTemplate: collection ? !!collection.templates : false,
   }
 }
 function addFragmentsToQuery(
