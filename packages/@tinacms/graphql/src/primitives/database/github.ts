@@ -16,7 +16,10 @@ import path from 'path'
 import { Octokit } from '@octokit/rest'
 import { Bridge } from './bridge'
 import LRU from 'lru-cache'
+import matter from 'gray-matter'
 import { GraphQLError } from 'graphql'
+import * as yup from 'yup'
+import { assertShape } from '../util'
 
 export type GithubManagerInit = {
   rootPath: string
@@ -113,19 +116,31 @@ export class GithubBridge implements Bridge {
 
   public async get(filepath: string) {
     const realpath = path.join(this.rootPath, filepath)
-    return this.cache.get(this.generateKey(realpath), async () => {
-      return this.appOctoKit.repos
-        .getContent({
-          ...this.repoConfig,
-          path: realpath,
-        })
-        .then((response) => {
-          return Buffer.from(response.data.content, 'base64').toString()
-        })
-        .catch((e) => {
-          if (e.status === 401) {
+    const contentString = await this.cache.get(
+      this.generateKey(realpath),
+      async () => {
+        return this.appOctoKit.repos
+          .getContent({
+            ...this.repoConfig,
+            path: realpath,
+          })
+          .then((response) => {
+            return Buffer.from(response.data.content, 'base64').toString()
+          })
+          .catch((e) => {
+            if (e.status === 401) {
+              throw new GraphQLError(
+                `Unauthorized request to Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', please ensure your access token is valid.`,
+                null,
+                null,
+                null,
+                null,
+                e,
+                { status: e.status }
+              )
+            }
             throw new GraphQLError(
-              `Unauthorized request to Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', please ensure your access token is valid.`,
+              `Unable to find record '${filepath}' in Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', Ref: '${this.repoConfig.ref}'`,
               null,
               null,
               null,
@@ -133,20 +148,25 @@ export class GithubBridge implements Bridge {
               e,
               { status: e.status }
             )
-          }
-          throw new GraphQLError(
-            `Unable to find record '${filepath}' in Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', Ref: '${this.repoConfig.ref}'`,
-            null,
-            null,
-            null,
-            null,
-            e,
-            { status: e.status }
-          )
-        })
-    })
+          })
+      }
+    )
+    const extension = path.extname(filepath)
+
+    const contentObject = this.parseFile<{ [key: string]: unknown }>(
+      contentString,
+      extension,
+      (yup) => yup.object({})
+    )
+    return contentObject
   }
-  public async put(filepath: string, data: string) {
+  public async put(
+    filepath: string,
+    data: object,
+    options?: {
+      includeTemplate?: boolean
+    }
+  ) {
     const realpath = path.join(this.rootPath, filepath)
     // check if the file exists
     let fileSha = undefined
@@ -160,15 +180,69 @@ export class GithubBridge implements Bridge {
     } catch (e) {
       console.log('No file exists, creating new one')
     }
+    const extension = path.extname(filepath)
 
+    const stringData = this.stringifyFile(
+      data,
+      extension,
+      !!options?.includeTemplate
+    )
     await this.appOctoKit.repos.createOrUpdateFileContents({
       ...this.repoConfig,
       branch: this.repoConfig.ref,
       path: realpath,
       message: 'Update from GraphQL client',
-      content: new Buffer(data).toString('base64'),
+      content: new Buffer(stringData).toString('base64'),
       sha: fileSha,
     })
+  }
+
+  private stringifyFile = (
+    content: object,
+    format: FormatType | string, // FIXME
+    /** For non-polymorphic documents we don't need the template key */
+    keepTemplateKey: boolean
+  ): string => {
+    switch (format) {
+      case '.markdown':
+      case '.md':
+        // @ts-ignore
+        const { _id, _template, _collection, $_body, ...rest } = content
+        const extra: { [key: string]: string } = {}
+        if (keepTemplateKey) {
+          extra['_template'] = _template
+        }
+        return matter.stringify($_body || '', { ...rest, ...extra })
+      case '.json':
+        return JSON.stringify(content, null, 2)
+      default:
+        throw new Error(`Must specify a valid format, got ${format}`)
+    }
+  }
+
+  private parseFile = <T extends object>(
+    content: string,
+    format: FormatType | string, // FIXME
+    yupSchema: (args: typeof yup) => yup.ObjectSchema<any>
+  ): T => {
+    switch (format) {
+      case '.markdown':
+      case '.md':
+        const contentJSON = matter(content || '')
+        const markdownData = {
+          ...contentJSON.data,
+          $_body: contentJSON.content,
+        }
+        assertShape<T>(markdownData, yupSchema)
+        return markdownData
+      case '.json':
+        if (!content) {
+          return {} as T
+        }
+        return JSON.parse(content)
+      default:
+        throw new Error(`Must specify a valid format, got ${format}`)
+    }
   }
 }
 
@@ -228,3 +302,4 @@ export const simpleCache = {
     }
   },
 }
+type FormatType = 'json' | 'md' | 'markdown' | 'yml' | 'yaml'
