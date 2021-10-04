@@ -12,6 +12,8 @@ export interface BranchSwitcherProps {
 }
 
 export interface BranchSwitcherPluginOptions extends BranchSwitcherProps {
+  owner: string,
+  repo: string,
   baseBranch: string
   cms: TinaCMS
 }
@@ -19,4 +21,11 @@ export interface BranchSwitcherPluginOptions extends BranchSwitcherProps {
 export interface BranchChangeEvent {
   type: 'branch-switcher:change-branch'
   branchName: string
+}
+
+export interface BranchData {
+  owner: string,
+  repo: string,
+  baseBranch?: string,
+  branchName?: string
 }

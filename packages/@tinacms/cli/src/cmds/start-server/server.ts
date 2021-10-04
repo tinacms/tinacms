@@ -20,6 +20,7 @@ import { altairExpress } from 'altair-express-middleware'
 import bodyParser from 'body-parser'
 import { gql } from '@tinacms/graphql'
 
+const GITHUB_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN
 const gqlServer = async () => {
   // This is lazily required so we can update the module
   // without having to restart the server
@@ -67,11 +68,11 @@ const gqlServer = async () => {
       const { query } = req
       const { owner, repo } = query
       const result = await gqlPackage.listBranches({
-        auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+        auth: GITHUB_ACCESS_TOKEN,
         owner,
         repo
       })
-  
+
       return res.json(result.data)
     } catch(error) {
       console.error('There was a problem fetching the branches.', error)
@@ -80,16 +81,17 @@ const gqlServer = async () => {
 
   app.post('/create-branch', async (req, res) => {
     try {
-      const { query } = req
-      const { owner, repo, ref } = query
-      const result = gqlPackage.createBranch({
-        auth: process.env.GITHUB_PERSONAL_ACCESS_TOKEN,
+      const { owner, repo, name, baseBranch } = req.body
+      const result = await gqlPackage.createBranch({
+        auth: GITHUB_ACCESS_TOKEN,
         owner,
         repo,
-        ref
+        baseBranch,
+        name
       })
       return res.json(result)
     } catch(error) {
+      res.end()
       console.error('There was a problem creating a new branch.', error)
     }
   })
