@@ -16,7 +16,6 @@
   },
   "dependencies": {
     "@tinacms/toolkit": "workspace:*",
-    "react-dismissible": "^1.3.0",
     "react-textarea-autosize": ">=7.1",
     "react-use": "^17.1.1"
   },

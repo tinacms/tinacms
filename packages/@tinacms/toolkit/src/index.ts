@@ -38,6 +38,7 @@ export type { ContentCreatorPlugin as AddContentPlugin } from './packages/forms'
 export type { ContentCreatorPlugin } from './packages/forms'
 export * from './packages/forms'
 export * from './packages/icons'
+export * from './packages/react-dismissible'
 
 /**
  * Custom `tinacms` things

@@ -29,7 +29,7 @@ import {
   LeftArrowIcon,
 } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { Dismissible } from 'react-dismissible'
+import { Dismissible } from '../../react-dismissible'
 import { IconButton } from '../../styles'
 import { FieldDescription } from './wrapFieldWithMeta'
 import {

@@ -20,7 +20,7 @@ import * as React from 'react'
 import styled, { css, StyledComponent } from 'styled-components'
 import { EllipsisVerticalIcon } from '../icons'
 import { useState, FC } from 'react'
-import { Dismissible } from 'react-dismissible'
+import { Dismissible } from '../../packages/react-dismissible'
 import { Form } from '../forms'
 
 export interface FormActionMenuProps {
