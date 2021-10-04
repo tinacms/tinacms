@@ -363,9 +363,9 @@ export class Database {
     const tinaSchema = await this.getSchema()
     const collection = await tinaSchema.getCollection(collectionName)
     if (options?.useBridge) {
-      return this.store.glob(collection.path)
+      return this.bridge.glob(collection.path)
     }
-    return this.bridge.glob(collection.path)
+    return this.store.glob(collection.path)
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
