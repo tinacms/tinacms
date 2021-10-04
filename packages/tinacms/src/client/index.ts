@@ -23,7 +23,7 @@ import {
 import { formify } from './formify'
 import gql from 'graphql-tag'
 //@ts-ignore can't locate BranchChangeEvent
-import { EventBus, BranchChangeEvent } from '@tinacms/toolkit'
+import { EventBus, BranchChangeEvent, BranchData } from '@tinacms/toolkit'
 export type TinaIOConfig = {
   frontendUrlOverride?: string // https://app.tina.io
   identityApiUrlOverride?: string // https://identity.tinajs.io
@@ -55,6 +55,7 @@ export class Client {
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.options = options
     this.setBranch(options.branch)
+    this.events = new EventBus()
     this.events.subscribe<BranchChangeEvent>(
       'branch-switcher:change-branch',
       ({ branchName }) => {
@@ -264,7 +265,42 @@ mutation addPendingDocumentMutation(
       return null
     }
   }
+
+  async listBranches ({ owner, repo }: BranchData) {
+    const url = `${this.contentApiUrl}/list_branches?owner=${owner}&repo=${repo}`
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'GET'
+      }) 
+
+      return JSON.stringify(res)
+    } catch (e) {
+      console.error("There was an issue fetching the branch list.", e)
+      return null
+    }
+  }
+  async createBranch ({ owner, repo, baseBranch, branchName}: BranchData) {
+    const url = `${this.contentApiUrl}/create_branch`
+  
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'POST',
+        body: {
+          owner,
+          repo,
+          baseBranch,
+          branchName
+        } as any
+      })
+
+      return JSON.stringify(res)
+    } catch (error) {
+      console.error('There was an error creating a new branch.', error)
+      return null
+    }
+  }
 }
+
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
