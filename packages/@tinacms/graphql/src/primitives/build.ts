@@ -18,7 +18,12 @@ import { createBuilder } from './builder'
 import { createSchema } from './schema'
 import { extractInlineTypes } from './ast-builder'
 
-import type { FieldDefinitionNode } from 'graphql'
+import {
+  FieldDefinitionNode,
+  print,
+  buildASTSchema,
+  printSchema,
+} from 'graphql'
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
 import { FilesystemBridge } from './database/bridge'
@@ -26,13 +31,16 @@ import { createDatabase, Database } from './database'
 import path from 'path'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
-export const indexDB = async ({ database, config }) => {
+export const indexDB = async ({ database, config }: { database: Database }) => {
   await database.clear()
   const tinaSchema = await createSchema({ schema: config })
   await database.put(path.join('_schema'), tinaSchema.schema)
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   await database.put(path.join('_graphql'), graphQLSchema)
+  // console.log(printSchema(buildASTSchema(graphQLSchema)))
+  // database.bridge.put('schema.gql', printSchema(buildASTSchema(graphQLSchema)))
+
   await _indexContent(tinaSchema, database)
 }
 
