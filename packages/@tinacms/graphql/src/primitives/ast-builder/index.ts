@@ -524,8 +524,11 @@ export const NAMER = {
   dataMutationTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'Mutation')
   },
-  mutationName: (namespace: string[]) => {
+  updateName: (namespace: string[]) => {
     return 'update' + generateNamespacedFieldName(namespace, 'Document')
+  },
+  createName: (namespace: string[]) => {
+    return 'create' + generateNamespacedFieldName(namespace, 'Document')
   },
   queryName: (namespace: string[]) => {
     return 'get' + generateNamespacedFieldName(namespace, 'Document')
