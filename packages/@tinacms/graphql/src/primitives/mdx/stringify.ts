@@ -20,7 +20,7 @@ limitations under the License.
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
 import type { RichTypeInner } from '../types'
-import { SlateNodeType } from './parse'
+import { SlateNodeType, plateElements } from './parse'
 import type { Content, PhrasingContent, StaticPhrasingContent } from 'mdast'
 
 export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
@@ -45,7 +45,7 @@ export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
 }
 
 export const stringify = (
-  node: SlateNodeType,
+  node: { type: typeof plateElements },
   field: RichTypeInner
 ): Content => {
   if (!node.type) {
@@ -57,7 +57,7 @@ export const stringify = (
   }
 
   switch (node.type) {
-    case 'heading_one':
+    case plateElements.ELEMENT_H1:
       return {
         type: 'heading',
         depth: 1,
@@ -65,7 +65,7 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
-    case 'heading_two':
+    case plateElements.ELEMENT_H2:
       return {
         type: 'heading',
         depth: 2,
@@ -73,7 +73,7 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
-    case 'heading_three':
+    case plateElements.ELEMENT_H3:
       return {
         type: 'heading',
         depth: 3,
@@ -81,7 +81,7 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
-    case 'heading_four':
+    case plateElements.ELEMENT_H4:
       return {
         type: 'heading',
         depth: 4,
@@ -89,7 +89,7 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
-    case 'heading_five':
+    case plateElements.ELEMENT_H5:
       return {
         type: 'heading',
         depth: 5,
@@ -97,7 +97,7 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
-    case 'heading_six':
+    case plateElements.ELEMENT_H6:
       return {
         type: 'heading',
         depth: 6,
@@ -105,14 +105,14 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
-    case 'paragraph':
+    case plateElements.ELEMENT_PARAGRAPH:
       return {
         type: 'paragraph',
         children: node.children.map((child) =>
           stringify(child, field)
         ) as PhrasingContent[],
       }
-    case 'link':
+    case plateElements.ELEMENT_LINK:
       return {
         type: 'link',
         url: node.link,
@@ -122,6 +122,9 @@ export const stringify = (
       }
     case 'mdxJsxTextElement':
     case 'mdxJsxFlowElement':
+      if (node.name === 'Cta') {
+        console.log(node)
+      }
       try {
         let children = []
         const atts = []

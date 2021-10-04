@@ -7,7 +7,7 @@
           "type": "root",
           "children": [
             {
-              "type": "heading_one",
+              "type": "h1",
               "children": [
                 {
                   "type": "text",
@@ -16,15 +16,15 @@
               ]
             },
             {
-              "type": "heading_two",
+              "type": "h2",
               "children": [
                 {
                   "type": "text",
                   "text": "This is a "
                 },
                 {
-                  "type": "link",
-                  "link": "http://example.com",
+                  "type": "a",
+                  "url": "http://example.com",
                   "children": [
                     {
                       "type": "text",
@@ -35,7 +35,7 @@
               ]
             },
             {
-              "type": "heading_three",
+              "type": "h3",
               "children": [
                 {
                   "type": "text",
@@ -54,7 +54,7 @@
               ]
             },
             {
-              "type": "heading_four",
+              "type": "h4",
               "children": [
                 {
                   "type": "text",
@@ -73,7 +73,7 @@
               ]
             },
             {
-              "type": "paragraph",
+              "type": "p",
               "children": [
                 {
                   "type": "text",
@@ -82,7 +82,7 @@
               ]
             },
             {
-              "type": "thematic_break",
+              "type": "hr",
               "children": [
                 {
                   "type": "text",
@@ -91,10 +91,10 @@
               ]
             },
             {
-              "type": "paragraph",
+              "type": "p",
               "children": [
                 {
-                  "type": "image",
+                  "type": "img",
                   "link": "http://placehold.it/300x200",
                   "caption": "Picture of a placeholder"
                 }
@@ -111,7 +111,7 @@
               ]
             },
             {
-              "type": "paragraph",
+              "type": "p",
               "children": [
                 {
                   "type": "text",

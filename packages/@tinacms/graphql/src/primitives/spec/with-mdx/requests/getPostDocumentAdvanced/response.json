@@ -7,7 +7,7 @@
           "type": "root",
           "children": [
             {
-              "type": "paragraph",
+              "type": "p",
               "children": [
                 {
                   "type": "text",
@@ -16,7 +16,7 @@
               ]
             },
             {
-              "type": "paragraph",
+              "type": "p",
               "children": [
                 {
                   "type": "text",
@@ -43,7 +43,7 @@
                   "type": "root",
                   "children": [
                     {
-                      "type": "heading_one",
+                      "type": "h1",
                       "children": [
                         {
                           "type": "text",
@@ -63,7 +63,7 @@
                   "type": "root",
                   "children": [
                     {
-                      "type": "heading_two",
+                      "type": "h2",
                       "children": [
                         {
                           "type": "text",
@@ -87,7 +87,7 @@
                   "type": "root",
                   "children": [
                     {
-                      "type": "heading_one",
+                      "type": "h1",
                       "children": [
                         {
                           "type": "text",

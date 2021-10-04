@@ -495,7 +495,7 @@ type MdxJsxTextElement = {
 
 type MdxAstNode = Content | MdxJsxFlowElement | MdxJsxTextElement
 
-const plateElements = {
+export const plateElements = {
   ELEMENT_H1: 'h1',
   ELEMENT_H2: 'h2',
   ELEMENT_H3: 'h3',
@@ -528,6 +528,7 @@ const plateElements = {
   MARK_ITALIC: 'italic',
   MARK_BOLD: 'bold',
   MARK_STRIKETHROUGH: 'strikethrough',
+  MARK_UNDERLINE: 'underline',
 }
 
 export const defaultNodeTypes: NodeTypes = {

@@ -107,9 +107,14 @@ type AuthorConnection implements Connection {
 
 union PostAuthorDocument = AuthorDocument
 
+type PostSomeField {
+  title: String
+}
+
 type Post {
   title: String
   author: PostAuthorDocument
+  someField: [PostSomeField]
   body: JSON
 }
 
@@ -155,8 +160,13 @@ input AuthorMutation {
   socialMedia: [AuthorSocialMediaMutation]
 }
 
+input PostSomeFieldMutation {
+  title: String
+}
+
 input PostMutation {
   title: String
   author: String
+  someField: [PostSomeFieldMutation]
   body: JSON
 }
