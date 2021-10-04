@@ -112,10 +112,46 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
+    case plateElements.ELEMENT_UL:
+      return {
+        type: 'list',
+        ordered: false,
+        spread: false,
+        check: null,
+        children: node.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
+      }
+    case plateElements.ELEMENT_OL:
+      return {
+        type: 'list',
+        ordered: true,
+        spread: false,
+        check: null,
+        children: node.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
+      }
+    case plateElements.ELEMENT_LI:
+      return {
+        type: 'listItem',
+        spread: false,
+        check: null,
+        children: node.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
+      }
     case plateElements.ELEMENT_LINK:
       return {
         type: 'link',
-        url: node.link,
+        url: node.url,
+        children: node.children.map((child) =>
+          stringify(child, field)
+        ) as StaticPhrasingContent[],
+      }
+    case plateElements.ELEMENT_BLOCKQUOTE:
+      return {
+        type: 'blockquote',
         children: node.children.map((child) =>
           stringify(child, field)
         ) as StaticPhrasingContent[],
