@@ -348,17 +348,21 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
           disabled={!visible}
         >
           <BlockMenuList>
-            {templates.map((template) => (
-              <BlockOption
-                key={template.name}
-                onClick={() => {
-                  onAdd(template)
-                  setVisible(false)
-                }}
-              >
-                {template.label}
-              </BlockOption>
-            ))}
+            {templates.length > 0 ? (
+              templates.map((template) => (
+                <BlockOption
+                  key={template.name}
+                  onClick={() => {
+                    onAdd(template)
+                    setVisible(false)
+                  }}
+                >
+                  {template.label}
+                </BlockOption>
+              ))
+            ) : (
+              <BlockOption>No templates provided </BlockOption>
+            )}
           </BlockMenuList>
         </Dismissible>
       </BlockMenu>

@@ -271,7 +271,13 @@ const Img = (props) => {
               src={localState.url}
               alt={props.element.alt}
             />
-            <figcaption style={{ display: 'block' }}>
+            <figcaption
+              style={{
+                display: 'block',
+                margin: '8px auto 0',
+                textAlign: 'center',
+              }}
+            >
               {localState.caption}
             </figcaption>
           </figure>
@@ -494,5 +500,8 @@ const PlateWrapper = styled.div`
   padding: 10px;
   ul {
     list-style: disc;
+  }
+  ol {
+    list-style: decimal;
   }
 `
