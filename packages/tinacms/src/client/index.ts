@@ -22,6 +22,8 @@ import {
 
 import { formify } from './formify'
 import gql from 'graphql-tag'
+//@ts-ignore can't locate BranchChangeEvent
+import { EventBus, BranchChangeEvent, BranchData } from '@tinacms/toolkit'
 export type TinaIOConfig = {
   frontendUrlOverride?: string // https://app.tina.io
   identityApiUrlOverride?: string // https://identity.tinajs.io
@@ -46,19 +48,20 @@ export class Client {
   setToken: (_token: TokenObject) => void
   private getToken: () => TokenObject
   private token: string // used with memory storage
+  private branch: string
+  private options: ServerOptions
+  events: EventBus // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
-    const encodedBranch = encodeURIComponent(options.branch)
-    this.frontendUrl =
-      options.tinaioConfig?.frontendUrlOverride || 'https://app.tina.io'
-    this.identityApiUrl =
-      options.tinaioConfig?.identityApiUrlOverride ||
-      'https://identity.tinajs.io'
-    const contentApiBase =
-      options.tinaioConfig?.contentApiUrlOverride || `https://content.tinajs.io`
-    this.contentApiUrl =
-      options.customContentApiUrl ||
-      `${contentApiBase}/content/${options.clientId}/github/${encodedBranch}`
+    this.options = options
+    this.setBranch(options.branch)
+    this.events = new EventBus()
+    this.events.subscribe<BranchChangeEvent>(
+      'branch-switcher:change-branch',
+      ({ branchName }) => {
+        this.setBranch(branchName)
+      }
+    )
 
     this.clientId = options.clientId
 
@@ -105,6 +108,21 @@ export class Client {
         this.getToken = options.getTokenFn
         break
     }
+  }
+
+  setBranch(branchName: string) {
+    const encodedBranch = encodeURIComponent(branchName)
+    this.frontendUrl =
+      this.options.tinaioConfig?.frontendUrlOverride || 'https://app.tina.io'
+    this.identityApiUrl =
+      this.options.tinaioConfig?.identityApiUrlOverride ||
+      'https://identity.tinajs.io'
+    const contentApiBase =
+      this.options.tinaioConfig?.contentApiUrlOverride ||
+      `https://content.tinajs.io`
+    this.contentApiUrl =
+      this.options.customContentApiUrl ||
+      `${contentApiBase}/content/${this.options.clientId}/github/${encodedBranch}`
   }
 
   addPendingContent = async (props) => {
@@ -247,7 +265,42 @@ mutation addPendingDocumentMutation(
       return null
     }
   }
+
+  async listBranches ({ owner, repo }: BranchData) {
+    const url = `${this.contentApiUrl}/list_branches?owner=${owner}&repo=${repo}`
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'GET'
+      }) 
+
+      return JSON.stringify(res)
+    } catch (e) {
+      console.error("There was an issue fetching the branch list.", e)
+      return null
+    }
+  }
+  async createBranch ({ owner, repo, baseBranch, branchName}: BranchData) {
+    const url = `${this.contentApiUrl}/create_branch`
+  
+    try {
+      const res = await this.fetchWithToken(url, {
+        method: 'POST',
+        body: {
+          owner,
+          repo,
+          baseBranch,
+          branchName
+        } as any
+      })
+
+      return JSON.stringify(res)
+    } catch (error) {
+      console.error('There was an error creating a new branch.', error)
+      return null
+    }
+  }
 }
+
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
