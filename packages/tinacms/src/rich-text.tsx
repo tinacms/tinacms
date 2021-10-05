@@ -13,63 +13,87 @@ export const TinaMarkdown = ({
     <>
       {nodes.map((child) => {
         switch (child.type) {
-          case 'heading_one':
+          case 'h1':
             return (
               <h1>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </h1>
             )
-          case 'heading_two':
+          case 'h2':
             return (
               <h2>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </h2>
             )
-          case 'heading_three':
+          case 'h3':
             return (
               <h3>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </h3>
             )
-          case 'heading_four':
+          case 'h4':
             return (
               <h4>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </h4>
             )
-          case 'heading_five':
+          case 'h5':
             return (
               <h5>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </h5>
             )
-          case 'heading_six':
+          case 'h6':
             return (
               <h6>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </h6>
             )
-          case 'paragraph':
+          case 'p':
             return (
               <p>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </p>
             )
-          case 'block_quote':
+          case 'blockquote':
             return (
               <blockquote>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </blockquote>
             )
-          case 'image':
-            return <img src={child.link} alt={child.caption} />
-          case 'link':
+          case 'ul':
             return (
-              <a href={child.link}>
+              <ul>
+                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+              </ul>
+            )
+          case 'ol':
+            return (
+              <ol>
+                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+              </ol>
+            )
+          case 'li':
+            return (
+              <li>
+                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+              </li>
+            )
+          case 'lic':
+            return (
+              <div>
+                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+              </div>
+            )
+          case 'img':
+            return <img src={child.url} alt={child.caption} />
+          case 'a':
+            return (
+              <a href={child.url}>
                 <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
               </a>
             )
-          case 'code_block':
+          case 'code':
             return (
               <pre>
                 <code>

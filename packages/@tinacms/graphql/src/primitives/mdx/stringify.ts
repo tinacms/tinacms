@@ -141,6 +141,13 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
+    case plateElements.ELEMENT_LIC:
+      return {
+        type: 'paragraph',
+        children: node.children.map((child) =>
+          stringify(child, field)
+        ) as PhrasingContent[],
+      }
     case plateElements.ELEMENT_IMAGE:
       return {
         type: 'image',
