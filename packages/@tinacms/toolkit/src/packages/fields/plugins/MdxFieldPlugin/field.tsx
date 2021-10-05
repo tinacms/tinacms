@@ -37,6 +37,30 @@ export interface MdxFieldProps {
   inline?: boolean
 }
 
+export const ImageField = ({ tinaForm, children }) => {
+  const [isExpanded, setExpandedInner] = React.useState<boolean>(false)
+  const setExpanded = (expanded: boolean) => {
+    setExpandedInner(expanded)
+  }
+
+  return (
+    <>
+      <ImageHeader onClick={() => setExpanded((p) => !p)}>
+        {children}
+      </ImageHeader>
+      <Panel
+        isExpanded={isExpanded}
+        setExpanded={setExpanded}
+        field={{
+          label: 'Image',
+          name: 'Image',
+        }}
+        tinaForm={tinaForm}
+      />
+    </>
+  )
+}
+
 export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
   const [isExpanded, setExpandedInner] = React.useState<boolean>(false)
   const setExpanded = (expanded: boolean) => {
@@ -112,6 +136,37 @@ const SpanHeader: StyledComponent<'span', {}, {}> = styled.span`
   overflow: visible;
   line-height: 1.35;
   padding: 2px 8px;
+  color: var(--tina-color-grey-10);
+  background-color: white;
+
+  svg {
+    width: 24px;
+    height: auto;
+    fill: var(--tina-color-grey-3);
+    transition: all var(--tina-timing-short) ease-out;
+  }
+
+  &:hover {
+    svg {
+      fill: var(--tina-color-grey-8);
+    }
+    color: #0084ff;
+  }
+`
+
+const ImageHeader: StyledComponent<'div', {}, {}> = styled.div`
+  position: relative;
+  cursor: pointer;
+  display: block;
+  justify-content: space-between;
+  align-items: center;
+  border: 1px solid var(--tina-color-grey-2);
+  border-left: 3px solid var(--tina-color-primary);
+  border-radius: var(--tina-radius-small);
+  overflow: visible;
+  line-height: 1.35;
+  padding: 12px;
+  margin: 8px 0;
   color: var(--tina-color-grey-10);
   background-color: white;
 

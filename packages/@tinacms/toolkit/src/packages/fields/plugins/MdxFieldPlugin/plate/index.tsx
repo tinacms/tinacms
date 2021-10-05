@@ -1,9 +1,10 @@
 import React from 'react'
-import { MdxField, PopupAdder } from '../field'
+import { MdxField, PopupAdder, ImageField } from '../field'
 import type { InputProps } from '../../../components'
-import { Transforms, Editor, createEditor } from 'slate'
+import { Transforms, Editor } from 'slate'
 import { Form } from '../../../../forms'
 import {
+  withPlate,
   Plate,
   createReactPlugin, // withReact
   createHistoryPlugin, // withHistory
@@ -173,21 +174,19 @@ export const autoformatLists: AutoformatRule[] = [
 
 export const createTinaImagePlugin = () => {
   return {
-    pluginKeys: ['img'],
-    inlineTypes: getPlatePluginTypes('img'),
+    pluginKeys: 'img',
     voidTypes: getPlatePluginTypes('img'),
     renderElement: getRenderElement('img'),
   }
 }
 
-export const createMDXPlugin = ({ templates }): PlatePlugin => ({
+export const createMDXPlugin = (): PlatePlugin => ({
   pluginKeys: 'mdxJsxFlowElement',
   voidTypes: getPlatePluginTypes('mdxJsxFlowElement'),
-  inlineTypes: getPlatePluginTypes('mdxJsxFlowElement'),
   renderElement: getRenderElement('mdxJsxFlowElement'),
 })
 
-export const createMDXTextPlugin = ({ templates }): PlatePlugin => ({
+export const createMDXTextPlugin = (): PlatePlugin => ({
   pluginKeys: 'mdxJsxTextElement',
   voidTypes: getPlatePluginTypes('mdxJsxTextElement'),
   inlineTypes: getPlatePluginTypes('mdxJsxTextElement'),
@@ -196,12 +195,93 @@ export const createMDXTextPlugin = ({ templates }): PlatePlugin => ({
 
 const options = createPlateOptions()
 
+const Img = (props) => {
+  // const editor = props.editor
+  const editor = useStoreEditorRef(props.name)
+
+  const [localState, setLocalState] = React.useState({
+    caption: props.element.caption,
+    url: props.element.url,
+  })
+  React.useEffect(() => {
+    console.log(
+      'useitx',
+      ReactEditor.findPath(editor, props.element),
+      JSON.stringify(localState)
+    )
+
+    Transforms.setNodes(editor, localState, {
+      // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
+      at: ReactEditor.findPath(editor, props.element),
+      match: (node) => {
+        if (node.type === 'img') {
+          return true
+        } else {
+          return false
+        }
+      },
+    })
+  }, [editor, JSON.stringify(localState)])
+  const id = props.element.name + Math.floor(Math.random() * 100)
+  const form = React.useMemo(() => {
+    return new Form({
+      id,
+      label: id,
+      initialValues: {
+        url: props.element.url,
+        caption: props.element.caption,
+        alt: props.element.alt,
+      },
+      onChange: ({ values }) => {
+        setLocalState(values)
+      },
+      onSubmit: () => {},
+      fields: [
+        {
+          name: 'url',
+          label: 'Source',
+          component: 'image',
+        },
+        {
+          name: 'caption',
+          label: 'Caption',
+          component: 'text',
+        },
+        {
+          name: 'alt',
+          label: 'Alt',
+          component: 'text',
+        },
+      ],
+    })
+  }, [setLocalState])
+  return (
+    <div {...props.attributes}>
+      <div
+        style={{
+          userSelect: 'none',
+        }}
+        contentEditable={false}
+      >
+        <ImageField tinaForm={form}>
+          <img
+            style={{ width: '100%' }}
+            src={localState.url}
+            alt={props.element.alt}
+          />
+
+          <caption style={{ display: 'block' }}>{localState.caption}</caption>
+        </ImageField>
+      </div>
+      {props.children}
+    </div>
+  )
+}
+
 export const RichEditor = wrapFieldsWithMeta<
   InputProps,
   { templates: unknown[] }
 >((props) => {
-  // const editor = useStoreEditorRef(props.input.name)
-  const editor = createEditor()
   const [value, setValue] = React.useState(
     props.input.value.children
       ? [...props.input.value.children?.map(normalize)]
@@ -213,125 +293,21 @@ export const RichEditor = wrapFieldsWithMeta<
   React.useEffect(() => {
     props.input.onChange({ type: 'root', children: value })
   }, [JSON.stringify(value)])
-
+  const name = props.input.name
   const components = createPlateComponents({
-    img: (props) => {
-      return (
-        <div {...props.attributes}>
-          <img
-            style={{ width: '100%' }}
-            src={props.element.url}
-            alt={props.element.alt}
-          />
-          <caption style={{ display: 'block' }}>
-            {props.element.caption}
-          </caption>
-          {props.children}
-        </div>
-      )
-    },
+    img: (props) => <Img {...props} name={name} />,
     mdxJsxTextElement: (props) => {
-      const isInline = props.element.type === 'mdxJsxTextElement'
-      return (
-        <MdxPicker
-          {...props}
-          templates={templates}
-          inline={isInline}
-          onChange={(value) => {
-            if (isInline) {
-              const newProperties = {
-                props: value,
-              }
-              // @ts-ignore BaseEditor fix
-              Transforms.setNodes(editor, newProperties, {
-                /**
-                 * match traverses the ancestors of the relevant node
-                 * so matching on type works for this, but likely won't work
-                 * on more complex nested mdxJsxTextElement nodes. I think
-                 * we'll want to match the path to the selection path, but
-                 * they're off by one:
-                 * selection.focus.path => [0, 1, 0]
-                 * and path is [0, 1]. I believe that's because the last
-                 * 0 in the focus.path array is referring to the text node
-                 */
-                match: (node) => {
-                  // @ts-ignore BaseEditor fix
-                  if (node.type === 'mdxJsxTextElement') {
-                    return true
-                  }
-                  return false
-                },
-                // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
-                at: ReactEditor.findPath(editor, props.element),
-              })
-            } else {
-              const newProperties = {
-                props: value,
-              }
-              // @ts-ignore BaseEditor fix
-              Transforms.setNodes(editor, newProperties, {
-                // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
-                at: ReactEditor.findPath(editor, props.element),
-              })
-            }
-          }}
-        />
-      )
+      return <MdxPicker {...props} templates={templates} inline={true} />
     },
     mdxJsxFlowElement: (props) => {
-      const isInline = props.element.type === 'mdxJsxTextElement'
-      return (
-        <MdxPicker
-          {...props}
-          templates={templates}
-          inline={isInline}
-          onChange={(value) => {
-            if (isInline) {
-              const newProperties = {
-                props: value,
-              }
-              // @ts-ignore BaseEditor fix
-              Transforms.setNodes(editor, newProperties, {
-                /**
-                 * match traverses the ancestors of the relevant node
-                 * so matching on type works for this, but likely won't work
-                 * on more complex nested mdxJsxTextElement nodes. I think
-                 * we'll want to match the path to the selection path, but
-                 * they're off by one:
-                 * selection.focus.path => [0, 1, 0]
-                 * and path is [0, 1]. I believe that's because the last
-                 * 0 in the focus.path array is referring to the text node
-                 */
-                match: (node) => {
-                  // @ts-ignore BaseEditor fix
-                  if (node.type === 'mdxJsxTextElement') {
-                    return true
-                  }
-                  return false
-                },
-                // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
-                at: ReactEditor.findPath(editor, props.element),
-              })
-            } else {
-              const newProperties = {
-                props: value,
-              }
-              // @ts-ignore BaseEditor fix
-              Transforms.setNodes(editor, newProperties, {
-                // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
-                at: ReactEditor.findPath(editor, props.element),
-              })
-            }
-          }}
-        />
-      )
+      return <MdxPicker {...props} templates={templates} inline={false} />
     },
   })
 
   const pluginsBasic = [
     createTinaImagePlugin(),
-    createMDXPlugin({ templates }),
-    createMDXTextPlugin({ templates }),
+    createMDXPlugin(),
+    createMDXTextPlugin(),
     // editor
     createReactPlugin(), // withReact
     createHistoryPlugin(), // withHistory
@@ -385,57 +361,8 @@ export const RichEditor = wrapFieldsWithMeta<
           }}
         >
           <div style={{ display: 'flex', flexWrap: 'wrap' }}>
-            {/* <HeadingToolbar> */}
-            <ToolbarButtons
-              popup={{
-                showButton: true,
-                onAdd: (template) => {
-                  Transforms.insertNodes(editor, [
-                    {
-                      type: template.inline
-                        ? 'mdxJsxTextElement'
-                        : 'mdxJsxFlowElement',
-                      name: template.name,
-                      props: template.defaultItem,
-                      ordered: false,
-                      children: [
-                        {
-                          // @ts-ignore BaseEditor fix
-                          type: 'text',
-                          text: '',
-                        },
-                      ],
-                    },
-                  ])
-                },
-                templates: templates,
-              }}
-            />
-            {/* </HeadingToolbar> */}
+            <ToolbarButtons name={props.input.name} templates={templates} />
           </div>
-          {/* <PopupAdder
-            showButton={true}
-            onAdd={(template) => {
-              Transforms.insertNodes(editor, [
-                {
-                  type: template.inline
-                    ? 'mdxJsxTextElement'
-                    : 'mdxJsxFlowElement',
-                  name: template.name,
-                  props: template.defaultItem,
-                  ordered: false,
-                  children: [
-                    {
-                      // @ts-ignore BaseEditor fix
-                      type: 'text',
-                      text: '',
-                    },
-                  ],
-                },
-              ])
-            }}
-            templates={templates}
-          /> */}
         </div>
         <div
           style={{
@@ -444,17 +371,14 @@ export const RichEditor = wrapFieldsWithMeta<
         >
           <Plate
             id={props.input.name}
-            // editableProps={editableProps}
             initialValue={value}
             plugins={pluginsBasic}
-            editor={editor}
             components={components}
             options={options}
             onChange={(value) => {
               setValue(value)
             }}
           />
-          {/* {value} */}
         </div>
       </div>
     </>
@@ -480,6 +404,7 @@ const normalize = (node: SlateNodeType) => {
 }
 
 export const MdxPicker = (props) => {
+  const editor = useStoreEditorRef(props.name)
   const isFocused = useFocused()
   const isSelected = useSelected()
   const initialValues = props.element.props
@@ -493,7 +418,45 @@ export const MdxPicker = (props) => {
       label: id,
       initialValues,
       onChange: ({ values }) => {
-        props.onChange(values)
+        const isInline = props.element.type === 'mdxJsxTextElement'
+        if (isInline) {
+          const newProperties = {
+            props: values,
+          }
+          // @ts-ignore BaseEditor fix
+          Transforms.setNodes(editor, newProperties, {
+            /**
+             * match traverses the ancestors of the relevant node
+             * so matching on type works for this, but likely won't work
+             * on more complex nested mdxJsxTextElement nodes. I think
+             * we'll want to match the path to the selection path, but
+             * they're off by one:
+             * selection.focus.path => [0, 1, 0]
+             * and path is [0, 1]. I believe that's because the last
+             * 0 in the focus.path array is referring to the text node
+             */
+            match: (node) => {
+              // @ts-ignore BaseEditor fix
+              if (node.type === 'mdxJsxTextElement') {
+                return true
+              }
+              return false
+            },
+            // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
+            at: ReactEditor.findPath(editor, props.element),
+          })
+        } else {
+          const newProperties = {
+            props: values,
+          }
+          console.log('v', newProperties)
+
+          // @ts-ignore BaseEditor fix
+          Transforms.setNodes(editor, newProperties, {
+            // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
+            at: ReactEditor.findPath(editor, props.element),
+          })
+        }
       },
       onSubmit: () => {},
       fields: activeTemplate ? activeTemplate.fields : [],

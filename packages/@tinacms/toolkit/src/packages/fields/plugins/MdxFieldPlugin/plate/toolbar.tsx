@@ -1,6 +1,7 @@
 // import 'tippy.js/animations/scale.css'
 // import 'tippy.js/dist/tippy.css'
 import React from 'react'
+import { Transforms, Editor, createEditor } from 'slate'
 import {
   addColumn,
   addRow,
@@ -152,15 +153,40 @@ export const ToolbarButtonsBasicMarks = () => {
   )
 }
 
-export const ToolbarButtons = ({ popup }) => (
-  <>
-    <ToolbarButtonsBasicElements />
-    <ToolbarButtonsList />
-    <ToolbarButtonsBasicMarks />
-    {/* <ToolbarColorPicker pluginKey={MARK_COLOR} icon={<FormatColorText />} />
+export const ToolbarButtons = ({ name, templates }) => {
+  const editor = useStoreEditorRef(name)
+
+  const popup = {
+    showButton: true,
+    onAdd: (template) => {
+      Transforms.insertNodes(editor, [
+        {
+          type: template.inline ? 'mdxJsxTextElement' : 'mdxJsxFlowElement',
+          name: template.name,
+          props: template.defaultItem,
+          ordered: false,
+          children: [
+            {
+              // @ts-ignore BaseEditor fix
+              type: 'text',
+              text: '',
+            },
+          ],
+        },
+      ])
+    },
+    templates: templates,
+  }
+  return (
+    <>
+      <ToolbarButtonsBasicElements />
+      <ToolbarButtonsList />
+      <ToolbarButtonsBasicMarks />
+      {/* <ToolbarColorPicker pluginKey={MARK_COLOR} icon={<FormatColorText />} />
     <ToolbarColorPicker pluginKey={MARK_BG_COLOR} icon={<FontDownload />} />
     <ToolbarLink icon={<Link />} />
     <ToolbarImage icon={<Image />} /> */}
-    <PopupAdder {...popup} />
-  </>
-)
+      <PopupAdder {...popup} />
+    </>
+  )
+}
