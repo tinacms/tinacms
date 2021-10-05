@@ -2,6 +2,7 @@ import React from 'react'
 import { MdxField, PopupAdder, ImageField } from '../field'
 import type { InputProps } from '../../../components'
 import { Transforms, Editor } from 'slate'
+import styled from 'styled-components'
 import { Form } from '../../../../forms'
 import {
   withPlate,
@@ -340,35 +341,13 @@ export const RichEditor = wrapFieldsWithMeta<
   ]
   return (
     <>
-      <div
-        style={{
-          background: 'white',
-          borderRadius: '4px',
-          border: '1px solid #efefef',
-        }}
-      >
-        <div
-          style={{
-            position: 'sticky',
-            top: 0,
-            zIndex: 100,
-            background: '#fff',
-            padding: '10px',
-            margin: '8px 10px 0',
-            borderRadius: '4px',
-            border: '1px solid #efefef',
-            boxShadow: '0 0 3px rgb(0 0 0 / 7%), 2px 0 8px rgb(0 0 0 / 7%)',
-          }}
-        >
-          <div style={{ display: 'flex', flexWrap: 'wrap' }}>
+      <Wrapper>
+        <ToolbarWrapper>
+          <div>
             <ToolbarButtons name={props.input.name} templates={templates} />
           </div>
-        </div>
-        <div
-          style={{
-            padding: '10px',
-          }}
-        >
+        </ToolbarWrapper>
+        <PlateWrapper>
           <Plate
             id={props.input.name}
             initialValue={value}
@@ -379,8 +358,8 @@ export const RichEditor = wrapFieldsWithMeta<
               setValue(value)
             }}
           />
-        </div>
-      </div>
+        </PlateWrapper>
+      </Wrapper>
     </>
   )
 })
@@ -453,7 +432,7 @@ export const MdxPicker = (props) => {
 
           // @ts-ignore BaseEditor fix
           Transforms.setNodes(editor, newProperties, {
-            // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
+            // ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
             at: ReactEditor.findPath(editor, props.element),
           })
         }
@@ -487,3 +466,27 @@ export const MdxPicker = (props) => {
     </div>
   )
 }
+
+const Wrapper = styled.div`
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #efefef;
+`
+const ToolbarWrapper = styled.div`
+  position: sticky;
+  top: 0;
+  z-index: 100;
+  background: #fff;
+  padding: 10px;
+  margin: 8px 10px 0;
+  border-radius: 4px;
+  border: 1px solid #efefef;
+  box-shadow: 0 0 3px rgb(0 0 0 / 7%), 2px 0 8px rgb(0 0 0 / 7%);
+  & > div {
+    display: flex;
+    flex-wrap: wrap;
+  }
+`
+const PlateWrapper = styled.div`
+  padding: 10px;
+`
