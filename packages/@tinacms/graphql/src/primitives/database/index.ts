@@ -19,7 +19,6 @@ import { lastItem } from '../util'
 import { createSchema } from '../schema'
 import { MemoryStore } from './store/memory-store'
 import { FileSystemStore } from './store/filesystem-store'
-import { LevelStore } from './store/level-store'
 import type { Store } from './store'
 
 import type { TinaSchema } from '../schema'

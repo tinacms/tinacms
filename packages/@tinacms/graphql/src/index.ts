@@ -22,7 +22,6 @@ export {
   githubRoute,
 } from './primitives'
 export { MemoryStore } from './primitives/database/store/memory-store'
-export { LevelStore } from './primitives/database/store/level-store'
 export type { Store } from './primitives/database/store'
 import { clearCache as s3ClearCache, s3Cache } from './cache/s3'
 

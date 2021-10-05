@@ -11,12 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import fg from 'fast-glob'
-import fs from 'fs-extra'
-import path from 'path'
-import normalize from 'normalize-path'
-import { LevelDB } from 'level'
-
 export interface Store {
   glob(pattern: string): Promise<string[]>
   get(filepath: string): Promise<object>
