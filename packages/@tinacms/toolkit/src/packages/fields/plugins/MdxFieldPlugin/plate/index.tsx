@@ -489,4 +489,7 @@ const ToolbarWrapper = styled.div`
 `
 const PlateWrapper = styled.div`
   padding: 10px;
+  ul {
+    list-style: disc;
+  }
 `
