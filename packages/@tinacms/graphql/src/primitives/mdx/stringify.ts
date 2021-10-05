@@ -142,11 +142,10 @@ export const stringify = (
         ) as PhrasingContent[],
       }
     case plateElements.ELEMENT_IMAGE:
-      console.log(node)
       return {
         type: 'image',
-        title: '',
-        alt: '',
+        title: node.caption,
+        alt: node.alt,
         url: node.url,
         children: node.children.map((child) =>
           stringify(child, field)

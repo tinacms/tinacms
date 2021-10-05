@@ -265,13 +265,16 @@ const Img = (props) => {
         contentEditable={false}
       >
         <ImageField tinaForm={form}>
-          <img
-            style={{ width: '100%' }}
-            src={localState.url}
-            alt={props.element.alt}
-          />
-
-          <caption style={{ display: 'block' }}>{localState.caption}</caption>
+          <figure>
+            <img
+              style={{ width: '100%' }}
+              src={localState.url}
+              alt={props.element.alt}
+            />
+            <figcaption style={{ display: 'block' }}>
+              {localState.caption}
+            </figcaption>
+          </figure>
         </ImageField>
       </div>
       {props.children}

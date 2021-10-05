@@ -593,10 +593,9 @@ export default function remarkToSlate(node: MdxAstNode) {
     case 'image':
       return {
         type: types.image,
-        // children: [{ type: 'text', text: '' }],
-        link: node.url,
         url: node.url,
-        caption: node.alt,
+        alt: node.alt,
+        caption: node.title,
       }
     case 'blockquote':
       return {
