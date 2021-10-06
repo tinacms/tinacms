@@ -54,6 +54,7 @@
     "@graphql-codegen/typescript": "^2.2.2",
     "@graphql-codegen/typescript-generic-sdk": "^2.1.4",
     "@graphql-codegen/typescript-operations": "^2.1.4",
+    "@graphql-tools/graphql-file-loader": "^7.2.0",
     "@graphql-tools/load": "^7.3.2",
     "@tinacms/graphql": "workspace:*",
     "ajv": "^6.12.3",

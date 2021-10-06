@@ -2724,6 +2724,21 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@graphql-tools/graphql-file-loader@npm:^7.2.0":
+  version: 7.2.0
+  resolution: "@graphql-tools/graphql-file-loader@npm:7.2.0"
+  dependencies:
+    "@graphql-tools/import": ^6.5.0
+    "@graphql-tools/utils": ^8.2.0
+    globby: ^11.0.3
+    tslib: ~2.3.0
+    unixify: ^1.0.0
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: ab7a3447a9445d75de82d637deeb1675b90b7149cc526b62fc84da095d96069b10ac93f380e3aae6839c4beaa3ccccc8e7a549821a9c9c6f64e6346a7416c014
+  languageName: node
+  linkType: hard
+
 "@graphql-tools/graphql-tag-pluck@npm:^6.2.4, @graphql-tools/graphql-tag-pluck@npm:^6.2.6, @graphql-tools/graphql-tag-pluck@npm:^6.5.1":
   version: 6.5.1
   resolution: "@graphql-tools/graphql-tag-pluck@npm:6.5.1"
@@ -2748,6 +2763,19 @@ __metadata:
   peerDependencies:
     graphql: ^14.0.0 || ^15.0.0
   checksum: b452e54c4173f50156c6c82401e0dfd057f0bad5f9417726f9b6d03b652cb90b6c782511be4aaae427e6d58fec66b542bedb0e269ccb20632b5fb2900e33a7c5
+  languageName: node
+  linkType: hard
+
+"@graphql-tools/import@npm:^6.5.0":
+  version: 6.5.2
+  resolution: "@graphql-tools/import@npm:6.5.2"
+  dependencies:
+    "@graphql-tools/utils": 8.2.5
+    resolve-from: 5.0.0
+    tslib: ~2.3.0
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: b82222ae53cd72d167b1eec08a0b4c88299147dd6b2e8f65acf96379be34874888253966a6d645e107b148b3ba7c09c7608bf93b67c450082e9cb86c74c94eeb
   languageName: node
   linkType: hard
 
@@ -3020,6 +3048,17 @@ __metadata:
   peerDependencies:
     graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
   checksum: 0d78108a2bd3f2349951238c9ad4c5c5d5a87a8c35ddd9894e81ecc2c47c10c1c04bb30dac46cca3de20579d98cc113b1882aa3fc97bda4d508f51212179e9e9
+  languageName: node
+  linkType: hard
+
+"@graphql-tools/utils@npm:8.2.5":
+  version: 8.2.5
+  resolution: "@graphql-tools/utils@npm:8.2.5"
+  dependencies:
+    tslib: ~2.3.0
+  peerDependencies:
+    graphql: ^14.0.0 || ^15.0.0 || ^16.0.0
+  checksum: f8cf732f21204f0fcc5a2710a2b1952742220a02fa87e9bc7d8bfc38bd2faa288d033c7dda9792aa582d9ec5120a3af32c446dd1a480c859e6eea1c6c65b29fb
   languageName: node
   linkType: hard
 
@@ -4676,6 +4715,7 @@ __metadata:
     "@graphql-codegen/typescript": ^2.2.2
     "@graphql-codegen/typescript-generic-sdk": ^2.1.4
     "@graphql-codegen/typescript-operations": ^2.1.4
+    "@graphql-tools/graphql-file-loader": ^7.2.0
     "@graphql-tools/load": ^7.3.2
     "@tinacms/graphql": "workspace:*"
     "@tinacms/scripts": "workspace:*"
@@ -26104,7 +26144,7 @@ typescript@^3.8.3:
   languageName: node
   linkType: hard
 
-"unixify@npm:1.0.0":
+"unixify@npm:1.0.0, unixify@npm:^1.0.0":
   version: 1.0.0
   resolution: "unixify@npm:1.0.0"
   dependencies:
