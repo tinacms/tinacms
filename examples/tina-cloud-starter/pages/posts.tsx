@@ -4,7 +4,7 @@ import { Section } from "../components/section";
 import { Posts } from "../components/posts";
 import { layoutQueryFragment } from "../components/layout";
 import type { PostsConnection } from "../.tina/__generated__/types";
-import { getSdk } from "../.tina/__generated__/types";
+import { getTinaClient } from "../.tina/__generated__/types";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
@@ -19,20 +19,12 @@ export default function HomePage(
     </Section>
   );
 }
-const tinaClient = new LocalClient();
-const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
-  doc,
-  vars,
-  _options
-) => {
-  const data = await tinaClient.request(doc, { variables: vars });
-  console.log({ data });
-  return data;
-};
+
 export const getStaticProps = async () => {
-  const client = getSdk(requester);
+  const client = getTinaClient();
   const data = await client.GetSomething();
-  console.log({ data });
+  const bla = data.getCollections.map((x) => x.name);
+  console.log(bla);
 
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
