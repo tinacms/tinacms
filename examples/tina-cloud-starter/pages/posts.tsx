@@ -26,6 +26,9 @@ export const getStaticProps = async () => {
   const foo = data.getCollections.map((x) => x.name);
   console.log(foo);
 
+  const doc = await client.GetPostsTesting({ path: "voteForPedro.md" });
+  console.log({ data: doc.getPostsDocument.data });
+
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
       query PageQuery {
