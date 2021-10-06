@@ -185,20 +185,10 @@ export type CollectionDocumentsArgs = {
 
 export type DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument;
 
-export type PostsAsdfTemplate1AuthorDocument = AuthorsDocument;
-
-export type PostsAsdfTemplate1 = {
-  __typename?: 'PostsAsdfTemplate1';
-  author?: Maybe<PostsAsdfTemplate1AuthorDocument>;
-};
-
-export type PostsAsdf = PostsAsdfTemplate1;
-
 export type PostsAuthorDocument = AuthorsDocument;
 
 export type Posts = {
   __typename?: 'Posts';
-  asdf?: Maybe<Array<Maybe<PostsAsdf>>>;
   title?: Maybe<Scalars['String']>;
   author?: Maybe<PostsAuthorDocument>;
   date?: Maybe<Scalars['String']>;
@@ -473,16 +463,7 @@ export type DocumentMutation = {
   pages?: Maybe<PagesMutation>;
 };
 
-export type PostsAsdfTemplate1Mutation = {
-  author?: Maybe<Scalars['String']>;
-};
-
-export type PostsAsdfMutation = {
-  template1?: Maybe<PostsAsdfTemplate1Mutation>;
-};
-
 export type PostsMutation = {
-  asdf?: Maybe<Array<Maybe<PostsAsdfMutation>>>;
   title?: Maybe<Scalars['String']>;
   author?: Maybe<Scalars['String']>;
   date?: Maybe<Scalars['String']>;
