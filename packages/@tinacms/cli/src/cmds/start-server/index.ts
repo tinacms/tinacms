@@ -24,6 +24,7 @@ interface Options {
   port?: number
   command?: string
   experimental?: boolean
+  noWatch?: boolean
 }
 
 const gqlPackageFile = require.resolve('@tinacms/graphql')
@@ -31,7 +32,7 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 export async function startServer(
   _ctx,
   _next,
-  { port = 4001, command, experimental }: Options
+  { port = 4001, command, experimental, noWatch }: Options
 ) {
   const startSubprocess = () => {
     if (typeof command === 'string') {
@@ -61,7 +62,7 @@ stack: ${code.stack || 'No stack was provided'}`)
   }
   const rootPath = process.cwd()
   let ready = false
-  if (!process.env.CI) {
+  if (!noWatch && !process.env.CI) {
     chokidar
       .watch(`${rootPath}/**/*.ts`, {
         ignored: `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
@@ -142,7 +143,7 @@ stack: ${code.stack || 'No stack was provided'}`)
     })
   }
 
-  if (!process.env.CI) {
+  if (!noWatch && !process.env.CI) {
     chokidar
       .watch([gqlPackageFile])
       .on('ready', async () => {
@@ -155,7 +156,9 @@ stack: ${code.stack || 'No stack was provided'}`)
         }
       })
   } else {
-    logger.info('Detected CI environment, omitting watch commands...')
+    if (process.env.CI) {
+      logger.info('Detected CI environment, omitting watch commands...')
+    }
     start()
     startSubprocess()
   }

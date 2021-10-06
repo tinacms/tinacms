@@ -15,16 +15,22 @@
   },
   "DocumentNode": {
     "type": "DocumentNode",
-    "resolveType": "multiCollectionDocument"
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   },
   "PostsAuthorDocument": {
     "type": "PostsAuthorDocument",
-    "resolveType": "multiCollectionDocument"
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   },
   "PostsDocument": {
     "type": "PostsDocument",
     "resolveType": "collectionDocument",
-    "collection": "posts"
+    "collection": "posts",
+    "createPostsDocument": "create",
+    "updatePostsDocument": "update"
   },
   "PostsConnection": {
     "type": "PostsConnection",
@@ -34,7 +40,9 @@
   "GlobalDocument": {
     "type": "GlobalDocument",
     "resolveType": "collectionDocument",
-    "collection": "global"
+    "collection": "global",
+    "createGlobalDocument": "create",
+    "updateGlobalDocument": "update"
   },
   "GlobalConnection": {
     "type": "GlobalConnection",
@@ -44,7 +52,9 @@
   "AuthorsDocument": {
     "type": "AuthorsDocument",
     "resolveType": "collectionDocument",
-    "collection": "authors"
+    "collection": "authors",
+    "createAuthorsDocument": "create",
+    "updateAuthorsDocument": "update"
   },
   "AuthorsConnection": {
     "type": "AuthorsConnection",
@@ -64,7 +74,9 @@
   "PagesDocument": {
     "type": "PagesDocument",
     "resolveType": "collectionDocument",
-    "collection": "pages"
+    "collection": "pages",
+    "createPagesDocument": "create",
+    "updatePagesDocument": "update"
   },
   "PagesConnection": {
     "type": "PagesConnection",

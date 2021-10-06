@@ -38,6 +38,7 @@ export type { ContentCreatorPlugin as AddContentPlugin } from './packages/forms'
 export type { ContentCreatorPlugin } from './packages/forms'
 export * from './packages/forms'
 export * from './packages/icons'
+export * from './packages/react-dismissible'
 
 /**
  * Custom `tinacms` things
@@ -46,6 +47,7 @@ export * from './react-tinacms'
 export { TinaCMS } from './tina-cms'
 export type { TinaCMSConfig } from './tina-cms'
 export { GlobalFormPlugin } from './plugins/screens'
+export * from './plugins/branch-switcher'
 export {
   TinaProvider,
   // Deprecated aliases to the previous exports

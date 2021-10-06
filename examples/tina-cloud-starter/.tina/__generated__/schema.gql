@@ -276,10 +276,15 @@ type PagesConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  createDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
+  createPostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
   updateGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
+  createGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
   updateAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
+  createAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
   updatePagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
+  createPagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
 }
 
 input DocumentMutation {

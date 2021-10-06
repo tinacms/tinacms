@@ -29,8 +29,13 @@ import {
   FormBuilder,
   LoadingDots,
 } from 'tinacms'
-import { AddIcon, ChevronDownIcon, LockIcon, Button } from '@tinacms/toolkit'
-import { Dismissible } from 'react-dismissible'
+import {
+  AddIcon,
+  ChevronDownIcon,
+  LockIcon,
+  Button,
+  Dismissible,
+} from '@tinacms/toolkit'
 import styled, { css } from 'styled-components'
 import { GithubClient, Branch } from '../github-client'
 import { CREATE_BRANCH, ERROR } from '../events'

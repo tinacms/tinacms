@@ -2,7 +2,7 @@
   "name": "react-tinacms-strapi",
   "version": "0.50.7",
   "description": "",
-  "main": "build/index.js",
+  "main": "dist/index.js",
   "scripts": {
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",

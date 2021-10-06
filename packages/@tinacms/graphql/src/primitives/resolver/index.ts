@@ -202,6 +202,12 @@ export class Resolver {
             })
             return this.getDocument(realPath)
         }
+      } else {
+        if (!(await this.database.documentExists(realPath))) {
+          throw new Error(
+            `Unable to update document, ${realPath} does not exist`
+          )
+        }
       }
       const templateInfo =
         this.tinaSchema.getTemplatesForCollectable(collection)
