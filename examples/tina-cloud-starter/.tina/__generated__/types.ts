@@ -579,12 +579,48 @@ export type PagesMutation = {
   blocks?: Maybe<Array<Maybe<PagesBlocksMutation>>>;
 };
 
+export type GetPostsDocumentPartsFragment = { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } };
+
+export type GetPostsQueryVariables = Exact<{
+  path: Scalars['String'];
+}>;
+
+
+export type GetPostsQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
+
 export type GetSomethingQueryVariables = Exact<{ [key: string]: never; }>;
 
 
 export type GetSomethingQuery = { __typename?: 'Query', getCollections: Array<{ __typename?: 'Collection', name: string }> };
 
-
+export const GetPostsDocumentPartsFragmentDoc = gql`
+    fragment getPostsDocumentParts on PostsDocument {
+  data {
+    title
+    author {
+      __typename
+      ... on AuthorsDocument {
+        id
+        data {
+          name
+          avatar
+        }
+      }
+    }
+    date
+    heroImg
+    excerpt
+    _body
+  }
+}
+    `;
+export const GetPostsDocument = gql`
+    query GetPosts($path: String!) {
+  getPostsDocument(relativePath: $path) {
+    ...getPostsDocumentParts
+  }
+}
+    ${GetPostsDocumentPartsFragmentDoc}`;
 export const GetSomethingDocument = gql`
     query GetSomething {
   getCollections {
@@ -595,6 +631,9 @@ export const GetSomethingDocument = gql`
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
 export function getSdk<C>(requester: Requester<C>) {
   return {
+    GetPosts(variables: GetPostsQueryVariables, options?: C): Promise<GetPostsQuery> {
+      return requester<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, variables, options);
+    },
     GetSomething(variables?: GetSomethingQueryVariables, options?: C): Promise<GetSomethingQuery> {
       return requester<GetSomethingQuery, GetSomethingQueryVariables>(GetSomethingDocument, variables, options);
     }
@@ -602,6 +641,8 @@ export function getSdk<C>(requester: Requester<C>) {
 }
 export type Sdk = ReturnType<typeof getSdk>;
 
+
+// TinaSDK generated code
 import { LocalClient } from 'tinacms'
 const tinaClient = new LocalClient();
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
