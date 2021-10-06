@@ -80,18 +80,9 @@ type Collection {
 
 union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
 
-union PostsAsdfTemplate1AuthorDocument = AuthorsDocument
-
-type PostsAsdfTemplate1 {
-  author: PostsAsdfTemplate1AuthorDocument
-}
-
-union PostsAsdf = PostsAsdfTemplate1
-
 union PostsAuthorDocument = AuthorsDocument
 
 type Posts {
-  asdf: [PostsAsdf]
   title: String
   author: PostsAuthorDocument
   date: String
@@ -298,16 +289,7 @@ input DocumentMutation {
   pages: PagesMutation
 }
 
-input PostsAsdfTemplate1Mutation {
-  author: String
-}
-
-input PostsAsdfMutation {
-  template1: PostsAsdfTemplate1Mutation
-}
-
 input PostsMutation {
-  asdf: [PostsAsdfMutation]
   title: String
   author: String
   date: String
