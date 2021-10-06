@@ -1,4 +1,4 @@
-import { getStaticPropsForTina, LocalClient } from "tinacms";
+import { getStaticPropsForTina } from "tinacms";
 import { Container } from "../components/container";
 import { Section } from "../components/section";
 import { Posts } from "../components/posts";
@@ -23,8 +23,8 @@ export default function HomePage(
 export const getStaticProps = async () => {
   const client = getTinaClient();
   const data = await client.GetSomething();
-  const bla = data.getCollections.map((x) => x.name);
-  console.log(bla);
+  const foo = data.getCollections.map((x) => x.name);
+  console.log(foo);
 
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
