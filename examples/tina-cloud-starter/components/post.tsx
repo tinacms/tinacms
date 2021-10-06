@@ -42,8 +42,6 @@ export const Post = ({ data }) => {
             {data.title}
           </span>
         </h2>
-
-        <h3>{data.asdf && JSON.stringify(data.asdf, null, 2)}</h3>
         <div
           data-tinafield="author"
           className="flex items-center justify-center mb-16"
