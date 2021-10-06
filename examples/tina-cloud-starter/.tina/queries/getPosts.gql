@@ -1,0 +1,25 @@
+query GetPostsTesting($path: String!) {
+  getPostsDocument(relativePath: $path) {
+    ...getPostsDocumentParts
+  }
+}
+
+fragment getPostsDocumentParts on PostsDocument {
+  data {
+    title
+    author {
+      __typename
+      ... on AuthorsDocument {
+        id
+        data {
+          name
+          avatar
+        }
+      }
+    }
+    date
+    heroImg
+    excerpt
+    _body
+  }
+}

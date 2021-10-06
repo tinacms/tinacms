@@ -579,14 +579,14 @@ export type PagesMutation = {
   blocks?: Maybe<Array<Maybe<PagesBlocksMutation>>>;
 };
 
-export type GetPostsDocumentPartsFragment = { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } };
-
-export type GetPostsQueryVariables = Exact<{
+export type GetPostsTestingQueryVariables = Exact<{
   path: Scalars['String'];
 }>;
 
 
-export type GetPostsQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
+export type GetPostsTestingQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
+
+export type GetPostsDocumentPartsFragment = { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } };
 
 export type GetSomethingQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -614,8 +614,8 @@ export const GetPostsDocumentPartsFragmentDoc = gql`
   }
 }
     `;
-export const GetPostsDocument = gql`
-    query GetPosts($path: String!) {
+export const GetPostsTestingDocument = gql`
+    query GetPostsTesting($path: String!) {
   getPostsDocument(relativePath: $path) {
     ...getPostsDocumentParts
   }
@@ -631,8 +631,8 @@ export const GetSomethingDocument = gql`
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
 export function getSdk<C>(requester: Requester<C>) {
   return {
-    GetPosts(variables: GetPostsQueryVariables, options?: C): Promise<GetPostsQuery> {
-      return requester<GetPostsQuery, GetPostsQueryVariables>(GetPostsDocument, variables, options);
+    GetPostsTesting(variables: GetPostsTestingQueryVariables, options?: C): Promise<GetPostsTestingQuery> {
+      return requester<GetPostsTestingQuery, GetPostsTestingQueryVariables>(GetPostsTestingDocument, variables, options);
     },
     GetSomething(variables?: GetSomethingQueryVariables, options?: C): Promise<GetSomethingQuery> {
       return requester<GetSomethingQuery, GetSomethingQueryVariables>(GetSomethingDocument, variables, options);
