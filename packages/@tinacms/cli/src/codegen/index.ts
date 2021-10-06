@@ -30,7 +30,9 @@ export const generateTypes = async (
 ) => {
   logger.info('Generating types...')
   try {
-    // maybe we can use https://github.com/timqian/gql-generator/blob/master/index.js to generate queries?
+    // maybe we can use https://github.com/timqian/gql-generator/blob/master/index.js to generate queries? (looks outdated)
+
+    // or https://github.com/IBM/graphql-query-generator looks like another option (more up to date)
 
     // const docs = await loadDocuments(
     //   `query Test {
