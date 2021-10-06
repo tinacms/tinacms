@@ -389,26 +389,6 @@ export default defineSchema({
       path: "content/posts",
       fields: [
         {
-          type: "object",
-          name: "asdf",
-          label: "adsf",
-          list: true,
-          templates: [
-            {
-              name: "template1",
-              label: "template one",
-              fields: [
-                {
-                  name: "author",
-                  label: "Author",
-                  type: "reference",
-                  collections: ["authors"],
-                },
-              ],
-            },
-          ],
-        },
-        {
           type: "string",
           label: "Title",
           name: "title",
