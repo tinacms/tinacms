@@ -4687,7 +4687,6 @@ __metadata:
     react-beautiful-dnd: ^11.0.5
     react-color: ^2.17.3
     react-datetime: ^2.16.3
-    react-dismissible: ^1.3.0
     react-dom: 17.0.2
     react-dropzone: 10.1.8
     react-final-form: ^6.3.0
@@ -5571,6 +5570,16 @@ __metadata:
     "@types/scheduler": "*"
     csstype: ^3.0.2
   checksum: 3c5373845b0869d9ce3db16917c87707cdfdb6c08d9ca7ed90a2a097cb3cbec8d037d37e81c3cf5af721d92f8fdc62431405f1874f9a02dea6ec05e5d81e77fe
+  languageName: node
+  linkType: hard
+
+"@types/react@npm:17.0.2":
+  version: 17.0.2
+  resolution: "@types/react@npm:17.0.2"
+  dependencies:
+    "@types/prop-types": "*"
+    csstype: ^3.0.2
+  checksum: de1cd27ce57a961379978f83676d60d88bf729337683d1d4cb22dd8f285ed4200db19f7243052dc67c80133fe6798da1497456fe6f67a5bba5f5e30ce2544bfa
   languageName: node
   linkType: hard
 
@@ -21398,7 +21407,6 @@ fsevents@~2.1.2:
     prosemirror-utils: ^0.9.6
     prosemirror-view: ^1.11.3
     react: 16.12.0
-    react-dismissible: ^1.3.0
     react-docgen-typescript-loader: ^3.1.0
     react-docgen-typescript-webpack-plugin: ^1.1.0
     react-dom: 16.12.0
@@ -21433,7 +21441,6 @@ fsevents@~2.1.2:
     js-cookie: ^2.2.1
     next-tinacms-markdown: "workspace:*"
     react: 16.12.0
-    react-dismissible: ^1.3.0
     react-dom: 16.12.0
     styled-components: ">=4.1"
     tinacms: "workspace:*"
@@ -21443,7 +21450,6 @@ fsevents@~2.1.2:
   peerDependencies:
     final-form: ">=4.18.0"
     react: ">=16.8"
-    react-dismissible: ^1.3.0
     react-is: ^17.0.2
     styled-components: ">=4.1"
     tinacms: ">=0.50.0"
@@ -21484,7 +21490,6 @@ fsevents@~2.1.2:
     jest: ^27.0.6
     react: 16.12.0
     react-beautiful-dnd: ^13.1.0
-    react-dismissible: ^1.3.0
     react-dom: 16.12.0
     react-dropzone: 10.1.8
     react-final-form: ^6.5.3
@@ -24795,7 +24800,7 @@ resolve@^2.0.0-next.3:
     "@tinacms/cli": "workspace:*"
     "@types/js-cookie": ^2.2.6
     "@types/node": ^13.13.1
-    "@types/react": ^16.9.43
+    "@types/react": 17.0.2
     "@types/styled-components": ^5.1.3
     autoprefixer: ^10.2.6
     date-fns: ^2.23.0
@@ -24805,8 +24810,8 @@ resolve@^2.0.0-next.3:
     postcss: ^8.3.5
     postcss-import: ^14.0.2
     postcss-nesting: ^8.0.1
-    react: ^16.13.1
-    react-dom: ^16.13.1
+    react: 17.0.2
+    react-dom: 17.0.2
     react-icons: ^4.2.0
     react-is: ^17.0.2
     react-markdown: ^5.0.3

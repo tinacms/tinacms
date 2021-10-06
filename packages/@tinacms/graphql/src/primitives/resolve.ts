@@ -151,6 +151,7 @@ export const resolve = async ({
         const lookup = await database.getLookup(returnType)
         const isMutation = info.parentType.toString() === 'Mutation'
         const value = source[info.fieldName]
+
         /**
          * `getCollection`
          */
@@ -169,6 +170,9 @@ export const resolve = async ({
         if (!lookup) {
           return value
         }
+
+        const isCreation = lookup[info.fieldName] === 'create'
+
         /**
          * From here, we need more information on how to resolve this, aided
          * by the lookup value for the given return type, we can enrich the request
@@ -207,16 +211,33 @@ export const resolve = async ({
                 isCreation: true,
               })
             }
-            if (['getDocument', 'updateDocument'].includes(info.fieldName)) {
+            if (
+              ['getDocument', 'createDocument', 'updateDocument'].includes(
+                info.fieldName
+              )
+            ) {
               /**
-               * `getDocument`/`updateDocument`
+               * `getDocument`/`createDocument`/`updateDocument`
                */
-              return resolver.resolveDocument({
+              const result = await resolver.resolveDocument({
                 value,
                 args,
                 collection: args.collection,
                 isMutation,
+                isCreation,
               })
+
+              if (!isMutation) {
+                const mutationPath = buildMutationPath(info, {
+                  // @ts-ignore
+                  relativePath: result.sys.relativePath,
+                })
+                if (mutationPath) {
+                  mutationPaths.push(mutationPath)
+                }
+              }
+
+              return result
             }
             return value
           /**
@@ -229,7 +250,7 @@ export const resolve = async ({
             })
           /**
            * Collections-specific getter
-           * eg. `getPostDocument`/`updatePostDocument`
+           * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
            *
            * if coming from a query result
            * the field will be `node`
@@ -245,6 +266,7 @@ export const resolve = async ({
                 args,
                 collection: lookup.collection,
                 isMutation,
+                isCreation,
               }))
             if (!isMutation) {
               const mutationPath = buildMutationPath(info, {
@@ -433,7 +455,7 @@ const buildMutationPath = (
     collection,
     relativePath,
   }: {
-    collection: TinaCloudCollection<false>
+    collection?: TinaCloudCollection<false>
     relativePath: string
   }
 ) => {
@@ -443,7 +465,9 @@ const buildMutationPath = (
   if (!queryNode) {
     throw new Error(`exptected to find field node for ${info.fieldName}`)
   }
-  const mutationName = NAMER.mutationName([collection.name])
+  const mutationName = collection
+    ? NAMER.updateName([collection.name])
+    : 'updateDocument'
   const mutations = JSON.parse(
     JSON.stringify(info.schema.getMutationType()?.getFields())
   ) as GraphQLFieldMap<any, any>
@@ -520,11 +544,12 @@ const buildMutationPath = (
     },
   }
   const mutationString = addFragmentsToQuery(info, newNode, q)
+
   return {
     path: ['data', ...buildPath(info.path, []), 'form'],
     string: mutationString,
-    includeCollection: false,
-    includeTemplate: !!collection.templates,
+    includeCollection: collection ? false : true,
+    includeTemplate: collection ? !!collection.templates : false,
   }
 }
 function addFragmentsToQuery(

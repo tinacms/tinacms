@@ -33,6 +33,7 @@ import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
 import { FieldDescription } from './wrapFieldWithMeta'
 import { useEvent } from '../../react-core/use-cms-event'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
+import { useCMS } from '../../react-core/use-cms'
 
 interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -419,6 +420,7 @@ const Panel = function Panel({
   itemTitle,
   zIndexShift,
 }: PanelProps) {
+  const cms = useCMS()
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
       ...subField,
@@ -428,7 +430,17 @@ const Panel = function Panel({
 
   return (
     <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
-      <PanelHeader onClick={() => setExpanded(false)}>
+      <PanelHeader
+        onClick={() => {
+          const state = tinaForm.finalForm.getState()
+          if (state.invalid === true) {
+            // @ts-ignore
+            cms.alerts.error('Cannot navigate away from an invalid form.')
+          } else {
+            setExpanded(false)
+          }
+        }}
+      >
         <LeftArrowIcon />
         <GroupLabel>{itemTitle}</GroupLabel>
       </PanelHeader>
