@@ -20,23 +20,35 @@ import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescrip
 import { plugin as typescriptSdkPlugin } from '@graphql-codegen/typescript-generic-sdk'
 // See https://www.graphql-tools.com/docs/documents-loading for more examples of the `load documents function`
 import { loadDocuments } from '@graphql-tools/load'
+import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'
 
 import { logger } from '../logger'
 
-export const generateTypes = async (schema: GraphQLSchema) => {
+export const generateTypes = async (
+  schema: GraphQLSchema,
+  queryPathGlob = process.cwd()
+) => {
   logger.info('Generating types...')
   try {
     // maybe we can use https://github.com/timqian/gql-generator/blob/master/index.js to generate queries?
 
-    const docs = await loadDocuments(
-      `query Test {
-      getCollections {
-        name
-      }
-    }`,
-      { loaders: [] }
-    )
-    console.log({ docs })
+    // const docs = await loadDocuments(
+    //   `query Test {
+    //   getCollections {
+    //     name
+    //   }
+    // }`,
+    //   { loaders: [] }
+    // )
+    let docs = []
+    try {
+      docs = await loadDocuments(queryPathGlob, {
+        loaders: [new GraphQLFileLoader()],
+      })
+      console.log({ docs })
+    } catch (e) {
+      console.error(e)
+    }
     // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
     const res = await codegen({
       // Filename is not used. This is because the typescript plugin returns a string instead of writing to a file.
@@ -47,7 +59,12 @@ export const generateTypes = async (schema: GraphQLSchema) => {
       plugins: [
         { typescript: {} },
         { typescriptOperations: {} },
-        { typescriptSdk: { documentMode: 'string' } },
+        {
+          typescriptSdk: {
+            gqlImport: 'tinacms#gql',
+            documentNodeImport: 'tinacms#DocumentNode',
+          },
+        },
       ],
       pluginMap: {
         typescript: {

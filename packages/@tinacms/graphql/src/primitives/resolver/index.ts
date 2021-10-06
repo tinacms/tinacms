@@ -125,7 +125,7 @@ export class Resolver {
         },
         data,
         values: data,
-        dataJSON: data,
+        dataJSON,
         form: form,
       }
     } catch (e) {
@@ -395,11 +395,12 @@ export class Resolver {
         break
       case 'reference':
         if (resolveRef) {
-        } else {
           const tempVal = await this.getDocument(value)
           delete tempVal.dataJSON
           delete tempVal.values
           delete tempVal.form
+          accumulator[field.name] = tempVal
+        } else {
           accumulator[field.name] = value
         }
         break

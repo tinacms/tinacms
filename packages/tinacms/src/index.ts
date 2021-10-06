@@ -18,7 +18,8 @@ export * from './tina-cms'
 export { useGraphqlForms } from './hooks/use-graphql-forms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export * from '@tinacms/toolkit'
-
 import { TinaCMSProvider2 } from './tina-cms'
-
+import { DocumentNode } from 'graphql'
+export type { DocumentNode }
+import { type } from 'os'
 export default TinaCMSProvider2

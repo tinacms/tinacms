@@ -1,4 +1,4 @@
-import { getStaticPropsForTina } from "tinacms";
+import { getStaticPropsForTina, LocalClient } from "tinacms";
 import { Container } from "../components/container";
 import { Section } from "../components/section";
 import { Posts } from "../components/posts";
@@ -19,17 +19,20 @@ export default function HomePage(
     </Section>
   );
 }
-
+const tinaClient = new LocalClient();
+const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
+  doc,
+  vars,
+  _options
+) => {
+  const data = await tinaClient.request(doc, { variables: vars });
+  console.log({ data });
+  return data;
+};
 export const getStaticProps = async () => {
-  const client = getSdk(async (doc, vars, options) => {
-    return {} as any;
-  });
-
-  client.Test().then((res) => {
-    res.getCollections.forEach((x) => {
-      x.name;
-    });
-  });
+  const client = getSdk(requester);
+  const data = await client.GetSomething();
+  console.log({ data });
 
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
