@@ -327,18 +327,15 @@ export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
       {!showButton ? (
         <span />
       ) : (
-        <Button
+        <button
           onClick={(event: any) => {
             event.stopPropagation()
             event.preventDefault()
             setVisible(true)
           }}
-          open={visible}
-          primary
-          small
         >
           {icon}
-        </Button>
+        </button>
       )}
       <BlockMenu open={visible}>
         <Dismissible

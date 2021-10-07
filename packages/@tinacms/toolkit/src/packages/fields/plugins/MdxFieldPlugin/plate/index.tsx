@@ -323,6 +323,7 @@ export const RichEditor = wrapFieldsWithMeta<
     createHeadingPlugin(), // heading elements
     createLinkPlugin(), // link elements
     createListPlugin(),
+    createImagePlugin(),
     // marks
     createBoldPlugin(), // bold mark
     createItalicPlugin(), // italic mark
@@ -471,26 +472,29 @@ export const MdxPicker = (props) => {
 }
 
 const Wrapper = styled.div`
-  background: white;
+  /* background: white;
   border-radius: 4px;
-  border: 1px solid #efefef;
+  border: 1px solid #efefef; */
 `
 const ToolbarWrapper = styled.div`
-  position: sticky;
-  top: 0;
+  /* position: sticky; */
+  /* top: 30px; */
   z-index: 100;
   background: #fff;
   padding: 10px;
-  margin: 8px 10px 0;
+  margin: 12px 0px 4px;
   border-radius: 4px;
   border: 1px solid #efefef;
-  box-shadow: 0 0 3px rgb(0 0 0 / 7%), 2px 0 8px rgb(0 0 0 / 7%);
+  /* box-shadow: 0 0 3px rgb(0 0 0 / 7%), 2px 0 8px rgb(0 0 0 / 7%); */
   & > div {
     display: flex;
     flex-wrap: wrap;
   }
 `
 const PlateWrapper = styled.div`
+  background: white;
+  border-radius: 4px;
+  border: 1px solid #efefef;
   padding: 10px;
   ul {
     list-style: disc;
