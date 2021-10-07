@@ -1,5 +1,11 @@
 # next-tinacms-cloudinary
 
+## 3.3.0
+
+### Minor Changes
+
+- 9d68b058f: Add support for multiple image upload in the Media Store.
+
 ## 3.2.5
 
 ## 3.2.4

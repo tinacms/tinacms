@@ -1,5 +1,19 @@
 # tinacms-cli
 
+## 0.56.0
+
+### Minor Changes
+
+- f3bddeb4a: Added new warning messages for list UI that we do not support by default
+- 455a44359: Add noWatch option to server:start command. When this option is used, the config is not regenerated on file changes.
+
+### Patch Changes
+
+- Updated dependencies [2908f8176]
+- Updated dependencies [5d83643b2]
+- Updated dependencies [f3bddeb4a]
+  - @tinacms/graphql@0.55.0
+
 ## 0.55.2
 
 ### Patch Changes
