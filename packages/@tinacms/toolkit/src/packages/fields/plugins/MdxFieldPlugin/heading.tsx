@@ -268,7 +268,16 @@ export const MdxFieldPlugin = {
 export const HeaderPopup = ({ children, icon }) => {
   const [visible, setVisible] = React.useState(false)
   return (
-    <span style={{ position: 'relative' }}>
+    <span
+      style={{
+        position: 'relative',
+        display: 'flex',
+        justifyContent: 'center',
+        alignItems: 'center',
+        width: '28px',
+        height: '24px',
+      }}
+    >
       {false ? (
         <span />
       ) : (

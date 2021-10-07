@@ -320,7 +320,7 @@ export const MdxFieldPlugin = {
   Component: MdxField,
 }
 
-export const PopupAdder = ({ showButton, onAdd, templates }) => {
+export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
   const [visible, setVisible] = React.useState(false)
   return (
     <span style={{ position: 'relative' }}>
@@ -337,7 +337,7 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
           primary
           small
         >
-          <AddIcon />
+          {icon}
         </Button>
       )}
       <BlockMenu open={visible}>
@@ -371,6 +371,10 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
 }
 
 const Button = styled.button`
+  position: relative;
+  display: flex;
+  justify-content: center;
+  align-items: center;
   svg {
     width: 20px;
     height: 20px;

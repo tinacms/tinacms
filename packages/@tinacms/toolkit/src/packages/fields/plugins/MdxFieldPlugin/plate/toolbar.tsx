@@ -2,6 +2,7 @@
 // import 'tippy.js/dist/tippy.css'
 import React from 'react'
 import { Transforms, Editor, createEditor } from 'slate'
+import styled from 'styled-components'
 import {
   addColumn,
   addRow,
@@ -52,106 +53,29 @@ import {
   BoldIcon,
   ItalicIcon,
   StrikethroughIcon,
-  MediaIcon,
-  TableIcon,
+  ImageIcon,
   QuoteIcon,
+  OrderedListIcon,
   CodeIcon,
   UnorderedListIcon,
-  OrderedListIcon,
   UnderlineIcon,
-  UndoIcon,
-  RedoIcon,
   LinkIcon,
-} from '../../../../icons'
+  LightningIcon,
+} from './icons'
 import { PopupAdder } from '../field'
 import { HeaderPopup } from '../heading'
 
-export const ToolbarButtonsBasicElements = () => {
-  const editor = useStoreEditorRef(useEventEditorId('focus'))
-
-  return (
-    <>
-      <HeaderPopup icon={<HeadingIcon />}>
-        <ToolbarElement
-          type={getPlatePluginType(editor, ELEMENT_H1)}
-          icon={<>H1</>}
-        />
-        <ToolbarElement
-          type={getPlatePluginType(editor, ELEMENT_H2)}
-          icon={<>H2</>}
-        />
-        <ToolbarElement
-          type={getPlatePluginType(editor, ELEMENT_H3)}
-          icon={<>H3</>}
-        />
-        <ToolbarElement
-          type={getPlatePluginType(editor, ELEMENT_H4)}
-          icon={<>H4</>}
-        />
-        <ToolbarElement
-          type={getPlatePluginType(editor, ELEMENT_H5)}
-          icon={<>H5</>}
-        />
-        <ToolbarElement
-          type={getPlatePluginType(editor, ELEMENT_H6)}
-          icon={<>H6</>}
-        />
-      </HeaderPopup>
-      <ToolbarElement
-        type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
-        icon={<QuoteIcon />}
-      />
-      <ToolbarCodeBlock
-        type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
-        icon={<CodeIcon />}
-      />
-      <ToolbarLink icon={<LinkIcon />} />
-      <ToolbarImage icon={<>Img</>} />
-    </>
-  )
-}
-
-export const ToolbarButtonsList = () => {
-  const editor = useStoreEditorRef(useEventEditorId('focus'))
-
-  return (
-    <>
-      <ToolbarList
-        type={getPlatePluginType(editor, ELEMENT_UL)}
-        icon={<UnorderedListIcon />}
-      />
-      <ToolbarList
-        type={getPlatePluginType(editor, ELEMENT_OL)}
-        icon={<OrderedListIcon />}
-      />
-    </>
-  )
-}
-
-export const ToolbarButtonsBasicMarks = () => {
-  const editor = useStoreEditorRef(useEventEditorId('focus'))
-
-  return (
-    <>
-      <ToolbarMark
-        type={getPlatePluginType(editor, MARK_BOLD)}
-        icon={<BoldIcon />}
-      />
-      <ToolbarMark
-        type={getPlatePluginType(editor, MARK_ITALIC)}
-        icon={<ItalicIcon />}
-      />
-      <ToolbarMark
-        type={getPlatePluginType(editor, MARK_UNDERLINE)}
-        icon={<UnderlineIcon />}
-      />
-      <ToolbarMark
-        type={getPlatePluginType(editor, MARK_STRIKETHROUGH)}
-        icon={<StrikethroughIcon />}
-      />
-    </>
-  )
-}
+const Wrapper = styled.div`
+  display: flex;
+  flex-wrap: wrap;
+  gap: 6px;
+  .slate-ToolbarButton-active {
+    svg,
+    strong {
+      color: var(--tina-color-primary-light);
+    }
+  }
+`
 
 export const ToolbarButtons = ({ name, templates }) => {
   const editor = useStoreEditorRef(name)
@@ -178,15 +102,68 @@ export const ToolbarButtons = ({ name, templates }) => {
     templates: templates,
   }
   return (
-    <>
-      <ToolbarButtonsBasicElements />
-      <ToolbarButtonsList />
-      <ToolbarButtonsBasicMarks />
-      {/* <ToolbarColorPicker pluginKey={MARK_COLOR} icon={<FormatColorText />} />
-    <ToolbarColorPicker pluginKey={MARK_BG_COLOR} icon={<FontDownload />} />
-    <ToolbarLink icon={<Link />} />
-    <ToolbarImage icon={<Image />} /> */}
-      <PopupAdder {...popup} />
-    </>
+    <Wrapper>
+      <HeaderPopup icon={<HeadingIcon />}>
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H1)}
+          icon={<strong>H1</strong>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H2)}
+          icon={<strong>H2</strong>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H3)}
+          icon={<strong>H3</strong>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H4)}
+          icon={<strong>H4</strong>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H5)}
+          icon={<strong>H5</strong>}
+        />
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_H6)}
+          icon={<strong>H6</strong>}
+        />
+      </HeaderPopup>
+      <ToolbarElement
+        type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
+        icon={<QuoteIcon />}
+      />
+      <ToolbarCodeBlock
+        type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
+        icon={<CodeIcon />}
+      />
+      <ToolbarLink icon={<LinkIcon />} />
+      <ToolbarImage icon={<ImageIcon />} />
+      <ToolbarList
+        type={getPlatePluginType(editor, ELEMENT_UL)}
+        icon={<UnorderedListIcon />}
+      />
+      <ToolbarList
+        type={getPlatePluginType(editor, ELEMENT_OL)}
+        icon={<OrderedListIcon />}
+      />
+      <ToolbarMark
+        type={getPlatePluginType(editor, MARK_BOLD)}
+        icon={<BoldIcon />}
+      />
+      <ToolbarMark
+        type={getPlatePluginType(editor, MARK_ITALIC)}
+        icon={<ItalicIcon />}
+      />
+      <ToolbarMark
+        type={getPlatePluginType(editor, MARK_UNDERLINE)}
+        icon={<UnderlineIcon />}
+      />
+      <ToolbarMark
+        type={getPlatePluginType(editor, MARK_STRIKETHROUGH)}
+        icon={<StrikethroughIcon />}
+      />
+      <PopupAdder {...popup} icon={<LightningIcon />} />
+    </Wrapper>
   )
 }

@@ -92,7 +92,7 @@ const theme = css`
     --tina-z-index-4: 2500;
     --tina-z-index-5: 3000;
 
-    --tina-sidebar-width: 500px;
+    --tina-sidebar-width: 340px;
     --tina-sidebar-header-height: 60px;
     --tina-toolbar-height: 62px;
   }
