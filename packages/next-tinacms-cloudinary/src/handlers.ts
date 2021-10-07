@@ -32,7 +32,7 @@ export const mediaHandlerConfig = {
 }
 
 export const createMediaHandler = (config: CloudinaryConfig) => {
-  cloudinary.config(config)
+  cloudinary.config(Object.assign({ secure: true }, config))
 
   return async (req: NextApiRequest, res: NextApiResponse) => {
     const isAuthorized = await config.authorized(req, res)
