@@ -118,17 +118,13 @@ export function useDismissible({
 
     if (click) {
       documents.forEach((document) =>
-        document.body.addEventListener('click', handleDocumentClick, {
-          capture: true,
-        })
+        document.body.addEventListener('click', handleDocumentClick)
       )
     }
 
     if (escape) {
       documents.forEach((document) =>
-        document.addEventListener('keydown', handleEscape, {
-          capture: true,
-        })
+        document.addEventListener('keydown', handleEscape)
       )
     }
     // Clean up event listeners on unmount
