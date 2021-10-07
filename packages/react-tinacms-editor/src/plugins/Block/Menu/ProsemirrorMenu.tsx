@@ -21,9 +21,7 @@ import { FunctionComponent, useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { EditorView } from 'prosemirror-view'
 import { EditorState } from 'prosemirror-state'
-import { Dismissible } from '@tinacms/toolkit'
-
-import { HeadingIcon } from '@tinacms/toolkit'
+import { Dismissible, HeadingIcon } from '@tinacms/toolkit'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
