@@ -1,6 +1,6 @@
 {
   "name": "tina-tailwind-sidebar-demo",
-  "version": "0.1.3",
+  "version": "0.1.4",
   "private": true,
   "description": "",
   "keywords": [
@@ -22,8 +22,8 @@
     "react-dom": "^16.13.1",
     "react-icons": "^4.2.0",
     "react-is": "^17.0.2",
-    "react-tinacms-editor": "^0.41.0",
-    "react-tinacms-inline": "^0.41.0",
+    "react-tinacms-editor": "^0.52.0",
+    "react-tinacms-inline": "^0.53.0",
     "styled-components": "^5.3.0",
     "tinacms": "workspace:*"
   },
