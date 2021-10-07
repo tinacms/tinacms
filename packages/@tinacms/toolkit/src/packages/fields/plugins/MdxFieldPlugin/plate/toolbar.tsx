@@ -25,6 +25,7 @@ import {
   ELEMENT_UL,
   insertTable,
   MARK_BOLD,
+  ToolbarButton,
   MARK_CODE,
   MARK_ITALIC,
   MARK_KBD,
@@ -79,7 +80,6 @@ const Wrapper = styled.div`
 
 export const ToolbarButtons = ({ name, templates }) => {
   const editor = useStoreEditorRef(name)
-
   const popup = {
     showButton: true,
     onAdd: (template) => {
@@ -138,7 +138,28 @@ export const ToolbarButtons = ({ name, templates }) => {
         icon={<CodeIcon />}
       />
       <ToolbarLink icon={<LinkIcon />} />
-      <ToolbarImage icon={<ImageIcon />} />
+      {/* <ToolbarImage icon={<ImageIcon />} /> */}
+      <ToolbarButton
+        icon={<ImageIcon />}
+        onMouseDown={() => {
+          Transforms.insertNodes(editor, [
+            {
+              type: 'img',
+              url: 'http://placehold.it/300x200?text=Image',
+              alt: 'Some Image',
+              caption: '',
+              children: [
+                {
+                  // @ts-ignore BaseEditor fix
+                  type: 'text',
+                  text: '',
+                },
+              ],
+            },
+          ])
+        }}
+      />
+
       <ToolbarList
         type={getPlatePluginType(editor, ELEMENT_UL)}
         icon={<UnorderedListIcon />}

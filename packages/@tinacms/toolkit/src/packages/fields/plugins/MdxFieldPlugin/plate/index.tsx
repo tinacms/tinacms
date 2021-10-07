@@ -205,12 +205,6 @@ const Img = (props) => {
     url: props.element.url,
   })
   React.useEffect(() => {
-    console.log(
-      'useitx',
-      ReactEditor.findPath(editor, props.element),
-      JSON.stringify(localState)
-    )
-
     Transforms.setNodes(editor, localState, {
       // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
       at: ReactEditor.findPath(editor, props.element),
