@@ -107,14 +107,7 @@ export const TinaMarkdown = ({
           case 'thematic_break':
             return <hr />
           case 'text':
-            if (child.bold) {
-              return <strong>{child.text}</strong>
-            }
-            if (child.italic) {
-              return <em>{child.text}</em>
-            }
-
-            return child.text
+            return <Leaf {...child} />
           case 'mdxJsxTextElement':
           case 'mdxJsxFlowElement':
             const Block = blocks[child.name]
@@ -129,6 +122,7 @@ export const TinaMarkdown = ({
             }
           default:
             if (typeof child.text === 'string') {
+              console.log(child)
               return child.text
             }
             console.log(`No tina renderer for ${child.type}`, child)
@@ -136,6 +130,49 @@ export const TinaMarkdown = ({
       })}
     </>
   )
+}
+
+const Leaf = (props: {
+  type: 'text'
+  text: string
+  bold: boolean
+  italic: boolean
+  underline: boolean
+  strikethrough: boolean
+}) => {
+  if (props.bold) {
+    const { bold, ...rest } = props
+    return (
+      <strong>
+        <Leaf {...rest} />
+      </strong>
+    )
+  }
+  if (props.italic) {
+    const { italic, ...rest } = props
+    return (
+      <em>
+        <Leaf {...rest} />
+      </em>
+    )
+  }
+  if (props.underline) {
+    const { underline, ...rest } = props
+    return (
+      <u>
+        <Leaf {...rest} />
+      </u>
+    )
+  }
+  if (props.strikethrough) {
+    const { strikethrough, ...rest } = props
+    return (
+      <s>
+        <Leaf {...rest} />
+      </s>
+    )
+  }
+  return props.text
 }
 
 export type SlateNodeType =
