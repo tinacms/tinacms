@@ -20,7 +20,7 @@ export interface BranchSwitcherProps {
   currentBranch: string
   setCurrentBranch: (branchName: string) => void
   listBranches: () => Promise<Branch[]>
-  createBranch: (branchName: string) => Promise<string>
+  createBranch: (branchName: NewBranchData) => Promise<string>
 }
 
 export interface BranchSwitcherPluginOptions extends BranchSwitcherProps {
@@ -35,9 +35,7 @@ export interface BranchChangeEvent {
   branchName: string
 }
 
-export interface BranchData {
-  owner: string,
-  repo: string,
-  baseBranch?: string,
-  branchName?: string
+export interface NewBranchData {
+  baseBranch: string,
+  branchName: string
 }

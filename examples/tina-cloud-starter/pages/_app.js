@@ -51,6 +51,12 @@ const App = ({ Component, pageProps }) => {
 
               return createForm(formConfig);
             }}
+            //TODO: REMOVE AFTER TESTING
+            tinaioConfig={{
+              frontendUrlOverride: "http://localhost:3002",
+              identityApiUrlOverride: "https://jack1-identity.tinajs.dev",
+              contentApiUrlOverride: "https://jack1-content.tinajs.dev"
+            }}
             {...pageProps}
           >
             {(livePageProps) => (

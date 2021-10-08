@@ -156,15 +156,20 @@ export const TinaCloudProvider = (
     }
   }
   const handleListBranches = async (): Promise<Branch[]> => {
-    const { owner, repo } = props
-    const branches = await cms.api.tina.listBranches({ owner, repo })
-    
-    return branches.map((branch) => branch.name)
+    const branches = await cms.api.tina.listBranches()
+
+    return branches
   }
   const handleCreateBranch = async (data) => {
      const newBranch = await cms.api.tina.createBranch(data)
 
      return newBranch
+  }
+  const handleSetCurrentBranch = (branch) => {
+    console.log(branch)
+    cms.api.tina.setBranch(branch)
+
+    return branch
   }
 
   setupMedia()
@@ -181,11 +186,11 @@ export const TinaCloudProvider = (
         repo: props.repo,
         baseBranch: props.branch || 'main',
         currentBranch: props.branch || 'main',
-        //TODO implement these
         listBranches: handleListBranches,
         createBranch: handleCreateBranch,
-        setCurrentBranch: () => console.log(props.branch)
+        setCurrentBranch: handleSetCurrentBranch
       })
+
       cms.plugins.add(branchSwitcher)
     }
     return () => {

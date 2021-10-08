@@ -23,7 +23,7 @@ import {
 import { formify } from './formify'
 import gql from 'graphql-tag'
 //@ts-ignore can't locate BranchChangeEvent
-import { EventBus, BranchChangeEvent, BranchData } from '@tinacms/toolkit'
+import { EventBus, BranchChangeEvent, NewBranchData } from '@tinacms/toolkit'
 export type TinaIOConfig = {
   frontendUrlOverride?: string // https://app.tina.io
   identityApiUrlOverride?: string // https://identity.tinajs.io
@@ -237,8 +237,8 @@ mutation addPendingDocumentMutation(
     return await fetch(input, {
       ...init,
       headers: new Headers({
-        Authorization: 'Bearer ' + this.getToken().id_token,
         ...headers,
+        Authorization: 'Bearer ' + this.getToken().id_token,
       }),
     })
   }
@@ -266,34 +266,54 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  async listBranches ({ owner, repo }: BranchData) {
-    const url = `${this.contentApiUrl}/list_branches?owner=${owner}&repo=${repo}`
+  async listBranches () {
+    const contentApiBase =
+      this.options.tinaioConfig?.contentApiUrlOverride ||
+      `https://content.tinajs.io`
+    const url = `${contentApiBase}/github/${this.options.clientId}/list_branches`
     try {
       const res = await this.fetchWithToken(url, {
-        method: 'GET'
-      }) 
-
-      return JSON.stringify(res)
+        method: 'GET',
+        headers: {
+          'Accept': '*/*',
+          'Connection': 'keep-alive',
+          'Content-Type': 'application/json',
+        }
+      })
+      const data = await res.json()
+      if (!res.status.toString().startsWith('2')) {
+        console.error(data.error)
+      }
+      
+      return data
     } catch (e) {
       console.error("There was an issue fetching the branch list.", e)
       return null
     }
   }
-  async createBranch ({ owner, repo, baseBranch, branchName}: BranchData) {
-    const url = `${this.contentApiUrl}/create_branch`
+  async createBranch ({ baseBranch, branchName }: NewBranchData) {
+    console.log({baseBranch, branchName})
+    const contentApiBase =
+      this.options.tinaioConfig?.contentApiUrlOverride ||
+      `https://content.tinajs.io`
+    const url = 
+      `${contentApiBase}/github/${this.options.clientId}/create_branch?baseBranch=${baseBranch}&branchName=${branchName}`
   
     try {
       const res = await this.fetchWithToken(url, {
         method: 'POST',
-        body: {
-          owner,
-          repo,
-          baseBranch,
-          branchName
-        } as any
+        headers: {
+          'Accept': '*/*',
+          'Connection': 'keep-alive',
+          'Content-Type': 'application/json',
+        }
       })
-
-      return JSON.stringify(res)
+      const data = await res.json()
+      if (!res.status.toString().startsWith('2')) {
+        console.error(data.error)
+      }
+      
+      return JSON.stringify(data)
     } catch (error) {
       console.error('There was an error creating a new branch.', error)
       return null

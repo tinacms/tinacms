@@ -20,20 +20,31 @@ export class BranchSwitcherPlugin implements ScreenPlugin {
   __type = 'screen' as 'screen'
   Icon = PullRequestIcon
   name = 'Select Branch'
+  Component: ScreenPlugin['Component']
   layout = 'popup' as 'popup'
   private currentBranch: string
-
+  
   cms: BranchSwitcherPluginOptions['cms']
   baseBranch: BranchSwitcherPluginOptions['baseBranch']
   listBranches: BranchSwitcherPluginOptions['listBranches']
   createBranch: BranchSwitcherPluginOptions['createBranch']
-
+  
   constructor(options: BranchSwitcherPluginOptions) {
     this.baseBranch = options.baseBranch
     this.currentBranch = options.baseBranch
     this.cms = options.cms
     this.listBranches = options.listBranches
     this.createBranch = options.createBranch
+    this.Component = () => {
+      return (
+        <BranchSwitcher
+          currentBranch={options.currentBranch}
+          setCurrentBranch={options.setCurrentBranch}
+          listBranches={options.listBranches}
+          createBranch={options.createBranch}
+        />
+      )
+    }
   }
 
   getCurrentBranch() {
@@ -46,16 +57,5 @@ export class BranchSwitcherPlugin implements ScreenPlugin {
       type: 'branch-switcher:change-branch',
       branchName: branchName,
     })
-  }
-
-  Component() {
-    return (
-      <BranchSwitcher
-        currentBranch={this.currentBranch}
-        setCurrentBranch={this.setCurrentBranch}
-        listBranches={this.listBranches}
-        createBranch={this.createBranch}
-      />
-    )
   }
 }

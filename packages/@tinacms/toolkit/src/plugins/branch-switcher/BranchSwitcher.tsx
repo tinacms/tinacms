@@ -13,6 +13,7 @@ limitations under the License.
 import * as React from 'react'
 import { BranchSwitcherProps, Branch } from './types'
 import styled, { StyledComponent } from 'styled-components'
+import { LoadingDots } from '../../packages/form-builder'
 
 export const BranchSwitcher = ({
   currentBranch,
@@ -20,12 +21,13 @@ export const BranchSwitcher = ({
   listBranches,
   createBranch,
 }: BranchSwitcherProps) => {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [isLoading, setIsLoading] = React.useState(true)
   const [branchList, setBranchList] = React.useState([])
 
   const handleCreateBranch = React.useCallback((value) => {
     setIsLoading(true)
-    createBranch(value)
+    const { baseBranch, branchName } = value
+    createBranch({baseBranch, branchName})
       .then(async (createdBranchName) => {
         setCurrentBranch(createdBranchName)
         await refreshBranchList()
@@ -50,16 +52,22 @@ export const BranchSwitcher = ({
   return (
     <SelectWrap isLoading={isLoading}>
       <h3>Select Branch</h3>
-      <BranchSelector
-        currentBranch={currentBranch}
-        branchList={branchList}
-        onCreateBranch={(newBranch) => {
-          handleCreateBranch(newBranch)
-        }}
-        onChange={(branchName) => {
-          setCurrentBranch(branchName)
-        }}
-      />
+      {isLoading ? <div style={{textAlign: 'center'}}>
+                     Loading...
+                     <LoadingDots dotSize={12} color='black'/>
+                   </div>
+                 : <BranchSelector
+                      currentBranch={currentBranch}
+                      branchList={branchList}
+                      onCreateBranch={(currentBranch, newBranch) => {
+                        handleCreateBranch({baseBranch: currentBranch, branchName: newBranch})
+                      }}
+                      onChange={(branchName) => {
+                        console.log('clicked')
+                        setCurrentBranch(branchName)
+                      }}
+                    />
+      }
     </SelectWrap>
   )
 }
@@ -77,7 +85,7 @@ const BranchSelector = ({
       <input value={newBranch} onChange={(e) => setNewBranch(e.target.value)} />
       <hr />
       {!branchExists && newBranch ? (
-        <SelectableItem onClick={() => onCreateBranch(newBranch)}>
+        <SelectableItem onClick={() => onCreateBranch(currentBranch, newBranch)}>
           Create New Branch `{newBranch}`...
         </SelectableItem>
       ) : (
