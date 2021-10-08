@@ -8,6 +8,9 @@ export const TinaMarkdown = ({
   children: SlateNodeType[] | { type: 'root'; children: SlateNodeType[] }
   blocks?: { [key: string]: (props: object) => JSX.Element }
 }) => {
+  if (!children) {
+    return null
+  }
   const nodes = Array.isArray(children) ? children : children.children
   return (
     <>

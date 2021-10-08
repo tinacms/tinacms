@@ -195,7 +195,13 @@ export const ToolbarButtons = ({ name, templates }) => {
           type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
           icon={<CodeIcon />}
         />
-        <ToolbarLink icon={<LinkIcon />} />
+        <ToolbarLink
+          icon={<LinkIcon />}
+          // getLinkUrl={async () => {
+          //   console.log('get it!')
+          //   return 'http://example.com'
+          // }}
+        />
         {/* <ToolbarImage icon={<ImageIcon />} /> */}
         {/* <ImageButton /> */}
         <ToolbarButton
