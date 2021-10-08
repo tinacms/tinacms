@@ -86,11 +86,17 @@ const Basic = styled.div`
   display: flex;
   flex-wrap: wrap;
   gap: 4px;
+  max-width: 372px;
+  background: #fff;
+  padding: 10px;
+  margin: 12px 0px 4px;
+  border-radius: 4px;
+  border: 1px solid #efefef;
 `
 const MdxIcon = styled.div`
   position: absolute;
-  top: -48px;
-  right: -12px;
+  top: -28px;
+  right: 0px;
   svg {
     width: 20px;
     height: 20px;

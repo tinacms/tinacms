@@ -80,6 +80,7 @@ import {
   ELEMENT_MEDIA_EMBED,
   ELEMENT_MENTION,
   getRenderElement,
+  getPlatePluginType,
 } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import type { SlateNodeType } from '../types'
@@ -196,12 +197,14 @@ export const createMDXTextPlugin = (): PlatePlugin => ({
 })
 
 const options = createPlateOptions()
+
+// Transform encoded data URL to File (for image updloads)
 function dataURLtoFile(dataurl, filename) {
-  var arr = dataurl.split(','),
-    mime = arr[0].match(/:(.*?);/)[1],
-    bstr = atob(arr[1]),
-    n = bstr.length,
-    u8arr = new Uint8Array(n)
+  const arr = dataurl.split(',')
+  const mime = arr[0].match(/:(.*?);/)[1]
+  const bstr = atob(arr[1])
+  let n = bstr.length
+  const u8arr = new Uint8Array(n)
   while (n--) {
     u8arr[n] = bstr.charCodeAt(n)
   }
@@ -209,8 +212,9 @@ function dataURLtoFile(dataurl, filename) {
 }
 
 const Img = (props) => {
-  // const editor = props.editor
   const editor = useStoreEditorRef(props.name)
+  const isFocused = useFocused()
+  const isSelected = useSelected()
   const cms = useCMS()
 
   const [localState, setLocalState] = React.useState({
@@ -288,7 +292,12 @@ const Img = (props) => {
     })
   }, [setLocalState])
   return (
-    <div {...props.attributes}>
+    <div
+      {...props.attributes}
+      style={{
+        boxShadow: isSelected && isFocused ? '0 0 0 3px #B4D5FF' : 'none',
+      }}
+    >
       <div
         style={{
           userSelect: 'none',
@@ -469,7 +478,6 @@ export const MdxPicker = (props) => {
           const newProperties = {
             props: values,
           }
-          console.log('v', newProperties)
 
           // @ts-ignore BaseEditor fix
           Transforms.setNodes(editor, newProperties, {
@@ -517,11 +525,6 @@ const ToolbarWrapper = styled.div`
   /* position: sticky; */
   /* top: 30px; */
   z-index: 100;
-  background: #fff;
-  padding: 10px;
-  margin: 12px 0px 4px;
-  border-radius: 4px;
-  border: 1px solid #efefef;
   /* box-shadow: 0 0 3px rgb(0 0 0 / 7%), 2px 0 8px rgb(0 0 0 / 7%); */
   & > div {
     display: flex;
