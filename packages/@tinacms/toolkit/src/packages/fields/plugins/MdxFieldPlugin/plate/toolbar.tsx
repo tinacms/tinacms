@@ -66,6 +66,7 @@ import {
 import { IconButton, Button } from '../../../../styles'
 import { PopupAdder } from '../field'
 import { HeaderPopup } from '../heading'
+import { useCMS } from '../../../../react-core'
 
 const Wrapper = styled.div`
   display: grid;
@@ -102,6 +103,9 @@ const Embed = styled.div`
 `
 
 export const ToolbarButtons = ({ name, templates }) => {
+  // const editor = useStoreEditorRef(useEventEditorId('focus'));
+
+  const cms = useCMS()
   const editor = useStoreEditorRef(name)
   const popup = {
     showButton: true,
@@ -124,6 +128,36 @@ export const ToolbarButtons = ({ name, templates }) => {
     },
     templates: templates,
   }
+  const [editorSelection, setEditorSelection] = React.useState(null)
+  const [selectedMedia, setSelectedMedia] = React.useState(null)
+
+  React.useEffect(() => {
+    if (selectedMedia) {
+      Transforms.insertNodes(
+        editor,
+        [
+          {
+            type: 'img',
+            url: selectedMedia.previewSrc,
+            alt: '',
+            caption: '',
+            children: [
+              {
+                // @ts-ignore BaseEditor fix
+                type: 'text',
+                text: '',
+              },
+            ],
+          },
+        ],
+        {
+          at: editorSelection,
+        }
+      )
+      setSelectedMedia(null)
+    }
+  }, [selectedMedia])
+
   return (
     <Wrapper>
       <Basic>
@@ -163,27 +197,20 @@ export const ToolbarButtons = ({ name, templates }) => {
         />
         <ToolbarLink icon={<LinkIcon />} />
         {/* <ToolbarImage icon={<ImageIcon />} /> */}
+        {/* <ImageButton /> */}
         <ToolbarButton
           icon={<ImageIcon />}
           onMouseDown={() => {
-            Transforms.insertNodes(editor, [
-              {
-                type: 'img',
-                url: 'http://placehold.it/300x200?text=Image',
-                alt: 'Some Image',
-                caption: '',
-                children: [
-                  {
-                    // @ts-ignore BaseEditor fix
-                    type: 'text',
-                    text: '',
-                  },
-                ],
+            setEditorSelection(editor.selection)
+            // console.log(editor.selection)
+            cms.media.open({
+              allowDelete: true,
+              onSelect: (media) => {
+                setSelectedMedia(media)
               },
-            ])
+            })
           }}
         />
-
         <ToolbarList
           type={getPlatePluginType(editor, ELEMENT_UL)}
           icon={<UnorderedListIcon />}
