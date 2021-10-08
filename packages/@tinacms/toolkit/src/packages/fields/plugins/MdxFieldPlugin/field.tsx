@@ -21,10 +21,7 @@ import { Field, Form } from '../../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { useFormPortal, FormBuilder } from '../../.././form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../../icons'
-import { AddIcon } from '../../../icons'
 import { Dismissible } from 'react-dismissible'
-import { IconButton } from '../../../styles'
-import { GroupListHeader } from '../GroupListFieldPlugin'
 
 export interface MdxFieldFieldDefinititon extends Field {
   component: 'group'
@@ -38,17 +35,14 @@ export interface MdxFieldProps {
 }
 
 export const ImageField = ({ tinaForm, children }) => {
-  const [isExpanded, setExpandedInner] = React.useState<boolean>(false)
-  const setExpanded = (expanded: boolean) => {
-    setExpandedInner(expanded)
-  }
+  const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   return (
     <>
-      <ImageHeader onClick={() => setExpanded((p) => !p)}>
+      <ImageHeader onClick={() => setExpanded(!isExpanded)}>
         {children}
       </ImageHeader>
-      <Panel
+      <ImagePanel
         isExpanded={isExpanded}
         setExpanded={setExpanded}
         field={{
@@ -62,10 +56,7 @@ export const ImageField = ({ tinaForm, children }) => {
 }
 
 export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
-  const [isExpanded, setExpandedInner] = React.useState<boolean>(false)
-  const setExpanded = (expanded: boolean) => {
-    setExpandedInner(expanded)
-  }
+  const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
   if (!field) {
     return null
@@ -73,11 +64,11 @@ export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
   return (
     <>
       {inline ? (
-        <SpanHeader onClick={() => setExpanded((p) => !p)}>
+        <SpanHeader onClick={() => setExpanded(!isExpanded)}>
           {field.label || field.name}
         </SpanHeader>
       ) : (
-        <Header onClick={() => setExpanded((p) => !p)}>
+        <Header onClick={() => setExpanded(!isExpanded)}>
           {field.label || field.name}
           <RightArrowIcon />
         </Header>
@@ -105,6 +96,39 @@ const Panel = function Panel({
   tinaForm,
   field,
 }: PanelProps) {
+  const FormPortal = useFormPortal()
+  return (
+    <FormPortal>
+      {({ zIndexShift }) => (
+        <MdxFieldPanel
+          isExpanded={isExpanded}
+          style={{ zIndex: zIndexShift + 1000 }}
+        >
+          <PanelHeader onClick={() => setExpanded(false)}>
+            <LeftArrowIcon /> <span>{field.label || field.name}</span>
+          </PanelHeader>
+          <PanelBody>
+            {isExpanded ? (
+              <FormBuilder form={tinaForm} hideFooter={true} />
+            ) : null}
+          </PanelBody>
+        </MdxFieldPanel>
+      )}
+    </FormPortal>
+  )
+}
+interface ImagePanelProps {
+  setExpanded(next: boolean): void
+  isExpanded: boolean
+  tinaForm: Form
+  field: { label: string; name: string }
+}
+const ImagePanel = function Panel({
+  setExpanded,
+  isExpanded,
+  tinaForm,
+  field,
+}: ImagePanelProps) {
   const FormPortal = useFormPortal()
   return (
     <FormPortal>
@@ -367,17 +391,6 @@ export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
   )
 }
 
-const Button = styled.button`
-  position: relative;
-  display: flex;
-  justify-content: center;
-  align-items: center;
-  svg {
-    width: 20px;
-    height: 20px;
-  }
-`
-
 const BlockMenu = styled.div<{ open: boolean }>`
   min-width: 192px;
   border-radius: var(--tina-radius-big);
@@ -429,7 +442,6 @@ const BlockOption = styled.button`
     border-bottom: 1px solid #efefef;
   }
 `
-
 interface PanelProps {
   setExpanded(next: boolean): void
   isExpanded: boolean

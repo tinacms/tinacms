@@ -1,18 +1,9 @@
 // import 'tippy.js/animations/scale.css'
 // import 'tippy.js/dist/tippy.css'
 import React from 'react'
-import { Transforms, Editor, createEditor } from 'slate'
+import { Transforms } from 'slate'
 import styled from 'styled-components'
 import {
-  addColumn,
-  addRow,
-  BalloonToolbar,
-  deleteColumn,
-  deleteRow,
-  deleteTable,
-  ELEMENT_ALIGN_CENTER,
-  ELEMENT_ALIGN_JUSTIFY,
-  ELEMENT_ALIGN_RIGHT,
   ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
   ELEMENT_H1,
@@ -23,31 +14,18 @@ import {
   ELEMENT_H6,
   ELEMENT_OL,
   ELEMENT_UL,
-  insertTable,
   MARK_BOLD,
   ToolbarButton,
-  MARK_CODE,
   MARK_ITALIC,
-  MARK_KBD,
   MARK_STRIKETHROUGH,
-  MARK_SUBSCRIPT,
-  MARK_SUPERSCRIPT,
   MARK_UNDERLINE,
-  ToolbarAlign,
   ToolbarCodeBlock,
   ToolbarElement,
   ToolbarList,
   ToolbarMark,
-  ToolbarTable,
   ToolbarLink,
-  ToolbarImage,
   useStoreEditorRef,
-  useEventEditorId,
   getPlatePluginType,
-  MARK_HIGHLIGHT,
-  MARK_COLOR,
-  MARK_BG_COLOR,
-  ToolbarColorPicker,
 } from '@udecode/plate'
 import {
   HeadingIcon,
@@ -61,9 +39,8 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
   LinkIcon,
-  LightningIcon,
 } from './icons'
-import { IconButton, Button } from '../../../../styles'
+import { Button } from '../../../../styles'
 import { PopupAdder } from '../field'
 import { HeaderPopup } from '../heading'
 import { useCMS } from '../../../../react-core'
@@ -278,48 +255,6 @@ function ArrowDownIcon(props) {
       <g fill="none">
         <path
           d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
-          fill="currentColor"
-        />
-      </g>
-    </svg>
-  )
-}
-
-function Plus(props) {
-  const title = props.title || 'i add'
-
-  return (
-    <svg
-      height="24"
-      width="24"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <title>{title}</title>
-      <g fill="currentColor">
-        <polygon
-          fill="currentColor"
-          points="18 11 13 11 13 6 11 6 11 11 6 11 6 13 11 13 11 18 13 18 13 13 18 13 18 11"
-        />
-      </g>
-    </svg>
-  )
-}
-
-function ChevronRight(props) {
-  const title = props.title || 'chevron right'
-
-  return (
-    <svg
-      height="24"
-      width="24"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <title>{title}</title>
-      <g fill="none">
-        <path
-          d="M10 6L8.59 7.41 13.17 12l-4.58 4.59L10 18l6-6-6-6z"
           fill="currentColor"
         />
       </g>

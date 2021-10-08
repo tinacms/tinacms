@@ -21,10 +21,7 @@ import { Field, Form } from '../../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { useFormPortal, FormBuilder } from '../../.././form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../../icons'
-import { AddIcon } from '../../../icons'
 import { Dismissible } from 'react-dismissible'
-import { IconButton } from '../../../styles'
-import { GroupListHeader } from '../GroupListFieldPlugin'
 
 export interface MdxFieldFieldDefinititon extends Field {
   component: 'group'
@@ -38,22 +35,18 @@ export interface MdxFieldProps {
 }
 
 export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
-  const [isExpanded, setExpandedInner] = React.useState<boolean>(false)
-  const setExpanded = (expanded: boolean) => {
-    setExpandedInner(expanded)
-  }
-
+  const [isExpanded, setExpanded] = React.useState<boolean>(false)
   if (!field) {
     return null
   }
   return (
     <>
       {inline ? (
-        <SpanHeader onClick={() => setExpanded((p) => !p)}>
+        <SpanHeader onClick={() => setExpanded(!isExpanded)}>
           {field.label || field.name}
         </SpanHeader>
       ) : (
-        <Header onClick={() => setExpanded((p) => !p)}>
+        <Header onClick={() => setExpanded(!isExpanded)}>
           {field.label || field.name}
           <RightArrowIcon />
         </Header>

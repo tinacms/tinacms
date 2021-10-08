@@ -10,8 +10,6 @@ import {
   isBlockAboveEmpty,
   isSelectionAtBlockStart,
   KEYS_HEADING,
-  WithAutoformatOptions,
-  MentionNodeData,
   ResetBlockTypePluginOptions,
   SoftBreakPluginOptions,
 } from '@udecode/plate'

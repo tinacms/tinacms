@@ -1,11 +1,10 @@
 import React from 'react'
-import { MdxField, PopupAdder, ImageField } from '../field'
+import { MdxField, ImageField } from '../field'
 import type { InputProps } from '../../../components'
 import { Transforms, Editor } from 'slate'
 import styled from 'styled-components'
 import { Form } from '../../../../forms'
 import {
-  withPlate,
   Plate,
   createReactPlugin, // withReact
   createHistoryPlugin, // withHistory
@@ -45,60 +44,20 @@ import {
   TEditor,
   PlatePlugin,
   toggleList,
-  HeadingToolbar,
-  ELEMENT_H1,
-  ELEMENT_H2,
-  ELEMENT_H3,
-  ELEMENT_H4,
-  ELEMENT_H5,
-  ELEMENT_H6,
-  ELEMENT_HR,
   ELEMENT_PARAGRAPH,
-  ELEMENT_BLOCKQUOTE,
   ELEMENT_CODE_BLOCK,
   ELEMENT_CODE_LINE,
-  ELEMENT_DEFAULT,
   ELEMENT_IMAGE,
   ELEMENT_LI,
-  ELEMENT_LINK,
   ELEMENT_OL,
   ELEMENT_TODO_LI,
   ELEMENT_UL,
-  ELEMENT_LIC,
-  MARK_ITALIC,
-  MARK_BOLD,
-  MARK_STRIKETHROUGH,
   // not going to use
-  ELEMENT_TABLE,
-  ELEMENT_TD,
-  ELEMENT_TH,
-  ELEMENT_TR,
-  ELEMENT_ALIGN_CENTER,
-  ELEMENT_ALIGN_JUSTIFY,
-  ELEMENT_ALIGN_LEFT,
-  ELEMENT_ALIGN_RIGHT,
-  ELEMENT_MEDIA_EMBED,
-  ELEMENT_MENTION,
   getRenderElement,
-  getPlatePluginType,
 } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import type { SlateNodeType } from '../types'
 import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
-import {
-  HeadingIcon,
-  BoldIcon,
-  ItalicIcon,
-  StrikethroughIcon,
-  MediaIcon,
-  TableIcon,
-  QuoteIcon,
-  CodeIcon,
-  OrderedListIcon,
-  UnderlineIcon,
-  UndoIcon,
-  RedoIcon,
-} from '../../../../icons'
 
 import {
   optionsAutoformat,
@@ -220,6 +179,8 @@ const Img = (props) => {
   const [localState, setLocalState] = React.useState({
     caption: props.element.caption,
     url: props.element.url,
+    alt: props.element.alt,
+    children: [{ text: '' }],
   })
   React.useEffect(() => {
     const run = async () => {
@@ -245,15 +206,7 @@ const Img = (props) => {
         }
       }
       Transforms.setNodes(editor, localState, {
-        // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
         at: ReactEditor.findPath(editor, props.element),
-        match: (node) => {
-          if (node.type === 'img') {
-            return true
-          } else {
-            return false
-          }
-        },
       })
     }
     run()
@@ -269,6 +222,7 @@ const Img = (props) => {
         alt: props.element.alt,
       },
       onChange: ({ values }) => {
+        // @ts-ignore onChange values uses `any` heavily, making typechecking useless
         setLocalState(values)
       },
       onSubmit: () => {},
@@ -516,16 +470,9 @@ export const MdxPicker = (props) => {
   )
 }
 
-const Wrapper = styled.div`
-  /* background: white;
-  border-radius: 4px;
-  border: 1px solid #efefef; */
-`
+const Wrapper = styled.div``
 const ToolbarWrapper = styled.div`
-  /* position: sticky; */
-  /* top: 30px; */
   z-index: 100;
-  /* box-shadow: 0 0 3px rgb(0 0 0 / 7%), 2px 0 8px rgb(0 0 0 / 7%); */
   & > div {
     display: flex;
     flex-wrap: wrap;
