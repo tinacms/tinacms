@@ -18,7 +18,10 @@ import { ThemeContext } from "./theme";
 import format from "date-fns/format";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 
-const blockRenderer = {
+const components = {
+  // code_block: (props) => {
+  // return <strong>{props.children}</strong>;
+  // },
   BlockQuote: (props) => {
     return (
       <div>
@@ -165,7 +168,7 @@ export const Post = ({ data }) => {
       )}
       <Container className={`flex-1 max-w-4xl pt-4`} size="large">
         <div className="prose dark:prose-dark  w-full max-w-none">
-          <TinaMarkdown blocks={blockRenderer}>{data._body}</TinaMarkdown>
+          <TinaMarkdown components={components}>{data._body}</TinaMarkdown>
           {/* <pre>{JSON.stringify(data._body, null, 2)}</pre> */}
         </div>
       </Container>

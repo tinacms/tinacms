@@ -3,10 +3,10 @@ import React from 'react'
 
 export const TinaMarkdown = ({
   children,
-  blocks = {},
+  components = {},
 }: {
   children: SlateNodeType[] | { type: 'root'; children: SlateNodeType[] }
-  blocks?: { [key: string]: (props: object) => JSX.Element }
+  components?: { [key: string]: (props: object) => JSX.Element }
 }) => {
   if (!children) {
     return null
@@ -19,73 +19,97 @@ export const TinaMarkdown = ({
           case 'h1':
             return (
               <h1>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </h1>
             )
           case 'h2':
             return (
               <h2>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </h2>
             )
           case 'h3':
             return (
               <h3>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </h3>
             )
           case 'h4':
             return (
               <h4>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </h4>
             )
           case 'h5':
             return (
               <h5>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </h5>
             )
           case 'h6':
             return (
               <h6>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </h6>
             )
           case 'p':
             return (
               <p>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </p>
             )
           case 'blockquote':
             return (
               <blockquote>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </blockquote>
             )
           case 'ul':
             return (
               <ul>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </ul>
             )
           case 'ol':
             return (
               <ol>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </ol>
             )
           case 'li':
             return (
               <li>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </li>
             )
           case 'lic':
             return (
               <div>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </div>
             )
           case 'img':
@@ -93,14 +117,29 @@ export const TinaMarkdown = ({
           case 'a':
             return (
               <a href={child.url}>
-                <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                <TinaMarkdown components={components}>
+                  {child.children}
+                </TinaMarkdown>
               </a>
             )
-          case 'code':
+          case 'code_block':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <pre>
                 <code>
-                  <TinaMarkdown blocks={blocks}>{child.children}</TinaMarkdown>
+                  <TinaMarkdown components={components}>
+                    {child.children}
+                  </TinaMarkdown>
                 </code>
               </pre>
             )
@@ -110,7 +149,7 @@ export const TinaMarkdown = ({
             return <Leaf {...child} />
           case 'mdxJsxTextElement':
           case 'mdxJsxFlowElement':
-            const Block = blocks[child.name]
+            const Block = components[child.name]
             if (Block) {
               const props = child.props ? child.props : {}
               return <Block {...props} />
@@ -121,10 +160,12 @@ export const TinaMarkdown = ({
               throw new Error(`No component provided for ${child.name}`)
             }
           default:
-            if (typeof child.text === 'string') {
-              console.log(child)
-              return child.text
-            }
+            console.log(child)
+            // if (typeof child.text === 'string') {
+            //   return child.text
+            // }
+            return <Leaf {...child} />
+
             console.log(`No tina renderer for ${child.type}`, child)
         }
       })}
@@ -139,6 +180,7 @@ const Leaf = (props: {
   italic: boolean
   underline: boolean
   strikethrough: boolean
+  code: boolean
 }) => {
   if (props.bold) {
     const { bold, ...rest } = props
@@ -172,7 +214,15 @@ const Leaf = (props: {
       </s>
     )
   }
-  return props.text
+  if (props.code) {
+    const { code, ...rest } = props
+    return (
+      <code>
+        <Leaf {...rest} />
+      </code>
+    )
+  }
+  return <>{props.text}</>
 }
 
 export type SlateNodeType =
