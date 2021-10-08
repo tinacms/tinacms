@@ -3,3 +3,9 @@ query GetSomething {
     name
   }
 }
+
+query GetPostsTesting2($path: String!) {
+  getPostsDocument(relativePath: $path) {
+    ...getPostsDocumentParts
+  }
+}

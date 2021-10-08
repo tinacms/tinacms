@@ -365,10 +365,7 @@ This will work when developing locally but NOT when deployed to production.
  * to know the temlpate string is a GraphQL
  * query or muation
  */
-export function gql(
-  strings: TemplateStringsArray,
-  ...args: TemplateStringsArray
-) {
+export function gql(strings: TemplateStringsArray, ...args: string[]): string {
   let str = ''
   strings.forEach((string, i) => {
     str += string + (args[i] || '')
