@@ -106,6 +106,7 @@ import {
   optionsSoftBreakPlugin,
 } from './pluginOptions'
 import { ToolbarButtons } from './toolbar'
+import { useCMS } from '../../../../react-core'
 
 export const clearBlockFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor as SPEditor)
@@ -195,27 +196,63 @@ export const createMDXTextPlugin = (): PlatePlugin => ({
 })
 
 const options = createPlateOptions()
+function dataURLtoFile(dataurl, filename) {
+  var arr = dataurl.split(','),
+    mime = arr[0].match(/:(.*?);/)[1],
+    bstr = atob(arr[1]),
+    n = bstr.length,
+    u8arr = new Uint8Array(n)
+  while (n--) {
+    u8arr[n] = bstr.charCodeAt(n)
+  }
+  return new File([u8arr], filename, { type: mime })
+}
 
 const Img = (props) => {
   // const editor = props.editor
   const editor = useStoreEditorRef(props.name)
+  const cms = useCMS()
 
   const [localState, setLocalState] = React.useState({
     caption: props.element.caption,
     url: props.element.url,
   })
   React.useEffect(() => {
-    Transforms.setNodes(editor, localState, {
-      // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
-      at: ReactEditor.findPath(editor, props.element),
-      match: (node) => {
-        if (node.type === 'img') {
-          return true
-        } else {
-          return false
+    const run = async () => {
+      if (props.element.url) {
+        // If it's base64 encoded, that means it came as a result of drag and drop, so upload
+        // it to the media source
+        if (props.element.url.startsWith('data')) {
+          // FIXME: the name "tina-upload" will actually be sent to Cloudinary and stored as part
+          // of the name, not currently an easy way to grab the name of the
+          // dropped file in the base64 url
+          const file = dataURLtoFile(props.element.url, 'tina-upload')
+          const allMedia = await cms.media.persist([
+            {
+              directory: '',
+              file,
+            },
+          ])
+          // FIXME: if the user submits the form before this is updated they'll get
+          // the base64 data url stored in markdown, which would be bad because it's
+          // potentially very large. We should probably freeze form submission until
+          // this is updated to mitigate that.
+          setLocalState({ ...localState, url: allMedia[0].previewSrc })
         }
-      },
-    })
+      }
+      Transforms.setNodes(editor, localState, {
+        // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
+        at: ReactEditor.findPath(editor, props.element),
+        match: (node) => {
+          if (node.type === 'img') {
+            return true
+          } else {
+            return false
+          }
+        },
+      })
+    }
+    run()
   }, [editor, JSON.stringify(localState)])
   const id = props.element.name + Math.floor(Math.random() * 100)
   const form = React.useMemo(() => {

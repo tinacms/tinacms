@@ -154,9 +154,6 @@ export const stringify = (
         title: node.caption,
         alt: node.alt,
         url: node.url,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as StaticPhrasingContent[],
       }
     case plateElements.ELEMENT_LINK:
       return {
