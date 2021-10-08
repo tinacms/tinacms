@@ -17,6 +17,17 @@ export const TinaMarkdown = ({
       {nodes.map((child) => {
         switch (child.type) {
           case 'h1':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <h1>
                 <TinaMarkdown components={components}>
@@ -25,6 +36,17 @@ export const TinaMarkdown = ({
               </h1>
             )
           case 'h2':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <h2>
                 <TinaMarkdown components={components}>
@@ -33,6 +55,17 @@ export const TinaMarkdown = ({
               </h2>
             )
           case 'h3':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <h3>
                 <TinaMarkdown components={components}>
@@ -41,6 +74,17 @@ export const TinaMarkdown = ({
               </h3>
             )
           case 'h4':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <h4>
                 <TinaMarkdown components={components}>
@@ -49,6 +93,17 @@ export const TinaMarkdown = ({
               </h4>
             )
           case 'h5':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <h5>
                 <TinaMarkdown components={components}>
@@ -57,6 +112,17 @@ export const TinaMarkdown = ({
               </h5>
             )
           case 'h6':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <h6>
                 <TinaMarkdown components={components}>
@@ -65,6 +131,17 @@ export const TinaMarkdown = ({
               </h6>
             )
           case 'p':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <p>
                 <TinaMarkdown components={components}>
@@ -73,6 +150,17 @@ export const TinaMarkdown = ({
               </p>
             )
           case 'blockquote':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <blockquote>
                 <TinaMarkdown components={components}>
@@ -81,6 +169,17 @@ export const TinaMarkdown = ({
               </blockquote>
             )
           case 'ul':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <ul>
                 <TinaMarkdown components={components}>
@@ -89,6 +188,17 @@ export const TinaMarkdown = ({
               </ul>
             )
           case 'ol':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <ol>
                 <TinaMarkdown components={components}>
@@ -97,6 +207,17 @@ export const TinaMarkdown = ({
               </ol>
             )
           case 'li':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <li>
                 <TinaMarkdown components={components}>
@@ -113,8 +234,24 @@ export const TinaMarkdown = ({
               </div>
             )
           case 'img':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { ...props } = child
+              return <Component {...props} />
+            }
             return <img src={child.url} alt={child.caption} />
           case 'a':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return (
+                <Component {...props} childrenRaw={children}>
+                  <TinaMarkdown components={components}>
+                    {children}
+                  </TinaMarkdown>
+                </Component>
+              )
+            }
             return (
               <a href={child.url}>
                 <TinaMarkdown components={components}>
@@ -144,9 +281,14 @@ export const TinaMarkdown = ({
               </pre>
             )
           case 'thematic_break':
+            if (components[child.type]) {
+              const Component = components[child.type]
+              const { children, ...props } = child
+              return <Component {...props} />
+            }
             return <hr />
           case 'text':
-            return <Leaf {...child} />
+            return <Leaf components={components} {...child} />
           case 'mdxJsxTextElement':
           case 'mdxJsxFlowElement':
             const Block = components[child.name]
@@ -160,11 +302,9 @@ export const TinaMarkdown = ({
               throw new Error(`No component provided for ${child.name}`)
             }
           default:
-            console.log(child)
-            // if (typeof child.text === 'string') {
-            //   return child.text
-            // }
-            return <Leaf {...child} />
+            if (typeof child.text === 'string') {
+              return <Leaf components={components} {...child} />
+            }
 
             console.log(`No tina renderer for ${child.type}`, child)
         }
@@ -181,9 +321,18 @@ const Leaf = (props: {
   underline: boolean
   strikethrough: boolean
   code: boolean
+  components: { [key: string]: JSX.Element }[]
 }) => {
   if (props.bold) {
     const { bold, ...rest } = props
+    if (props.components.bold) {
+      const Component = props.components.bold
+      return (
+        <Component>
+          <Leaf {...rest} />
+        </Component>
+      )
+    }
     return (
       <strong>
         <Leaf {...rest} />
@@ -192,6 +341,14 @@ const Leaf = (props: {
   }
   if (props.italic) {
     const { italic, ...rest } = props
+    if (props.components.italic) {
+      const Component = props.components.italic
+      return (
+        <Component>
+          <Leaf {...rest} />
+        </Component>
+      )
+    }
     return (
       <em>
         <Leaf {...rest} />
@@ -200,6 +357,14 @@ const Leaf = (props: {
   }
   if (props.underline) {
     const { underline, ...rest } = props
+    if (props.components.underline) {
+      const Component = props.components.underline
+      return (
+        <Component>
+          <Leaf {...rest} />
+        </Component>
+      )
+    }
     return (
       <u>
         <Leaf {...rest} />
@@ -208,6 +373,14 @@ const Leaf = (props: {
   }
   if (props.strikethrough) {
     const { strikethrough, ...rest } = props
+    if (props.components.strikethrough) {
+      const Component = props.components.strikethrough
+      return (
+        <Component>
+          <Leaf {...rest} />
+        </Component>
+      )
+    }
     return (
       <s>
         <Leaf {...rest} />
@@ -216,6 +389,14 @@ const Leaf = (props: {
   }
   if (props.code) {
     const { code, ...rest } = props
+    if (props.components.code) {
+      const Component = props.components.code
+      return (
+        <Component>
+          <Leaf {...rest} />
+        </Component>
+      )
+    }
     return (
       <code>
         <Leaf {...rest} />

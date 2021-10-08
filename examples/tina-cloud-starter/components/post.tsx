@@ -19,9 +19,6 @@ import format from "date-fns/format";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
 
 const components = {
-  // code_block: (props) => {
-  // return <strong>{props.children}</strong>;
-  // },
   BlockQuote: (props) => {
     return (
       <div>
