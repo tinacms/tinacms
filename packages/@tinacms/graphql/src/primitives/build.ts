@@ -12,6 +12,9 @@ limitations under the License.
 */
 
 import _ from 'lodash'
+import fs from 'fs-extra'
+import { printSchema, print, ASTNode } from 'graphql'
+
 import { astBuilder } from './ast-builder'
 import { sequential } from './util'
 import { createBuilder } from './builder'
@@ -27,6 +30,7 @@ export const indexDB = async ({ database, config }) => {
   const tinaSchema = await createSchema({ schema: config })
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
+  await fs.outputFileSync('.tina/schema.gql', print(graphQLSchema as ASTNode))
   await database.put('_graphql', graphQLSchema)
   await database.put('_schema', tinaSchema.schema)
 }
@@ -38,6 +42,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   const definitions = []
   definitions.push(await builder.buildStaticDefinitions())
   const queryTypeDefinitionFields: FieldDefinitionNode[] = []
+  const fragmentDefiniationFields: FieldDefinitionNode[] = []
   const mutationTypeDefinitionFields: FieldDefinitionNode[] = []
 
   const collections = tinaSchema.getCollections()
@@ -72,13 +77,47 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
    * Collection queries/mutations
    */
   await sequential(collections, async (collection) => {
-    queryTypeDefinitionFields.push(await builder.collectionDocument(collection))
+    const test = await builder.collectionDocument(collection)
+
+    queryTypeDefinitionFields.push(test)
+    fragmentDefiniationFields.push(test)
+
     mutationTypeDefinitionFields.push(
       await builder.updateCollectionDocumentMutation(collection)
     )
     queryTypeDefinitionFields.push(
       await builder.collectionDocumentList(collection)
     )
+  })
+
+  definitions.push({
+    kind: 'FragmentDefinition',
+    name: {
+      kind: 'Name',
+      value: 'getPostsDocumentParts',
+    },
+    typeCondition: {
+      kind: 'NamedType',
+      name: {
+        kind: 'Name',
+        value: 'PostsDocument',
+      },
+    },
+    directives: [],
+    selectionSet: {
+      kind: 'SelectionSet',
+      selections: [
+        {
+          kind: 'Field',
+          name: {
+            kind: 'Name',
+            value: 'form',
+          },
+          arguments: [],
+          directives: [],
+        },
+      ],
+    },
   })
 
   definitions.push(

@@ -15,6 +15,7 @@ import { parse, printSchema, GraphQLSchema } from 'graphql'
 import { codegen } from '@graphql-codegen/core'
 import { plugin as typescriptPlugin } from '@graphql-codegen/typescript'
 import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescript-operations'
+import { AddGeneratedClient } from './plugin'
 
 // Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
 import { plugin as typescriptSdkPlugin } from '@graphql-codegen/typescript-generic-sdk'
@@ -30,24 +31,19 @@ export const generateTypes = async (
 ) => {
   logger.info('Generating types...')
   try {
-    // maybe we can use https://github.com/timqian/gql-generator/blob/master/index.js to generate queries? (looks outdated)
-
-    // or https://github.com/IBM/graphql-query-generator looks like another option (more up to date)
-
-    // const docs = await loadDocuments(
-    //   `query Test {
-    //   getCollections {
-    //     name
-    //   }
-    // }`,
-    //   { loaders: [] }
-    // )
+    const moreDocs = await loadDocuments(
+      `fragment getPostsDocumentPartsTest on PostsDocument {
+      form
+    }
+    `,
+      { loaders: [] }
+    )
     let docs = []
     try {
       docs = await loadDocuments(queryPathGlob, {
         loaders: [new GraphQLFileLoader()],
       })
-      console.log({ docs })
+      // console.log({ docs })
     } catch (e) {
       console.error(e)
     }
@@ -56,7 +52,7 @@ export const generateTypes = async (
       // Filename is not used. This is because the typescript plugin returns a string instead of writing to a file.
       filename: process.cwd(),
       schema: parse(printSchema(schema)),
-      documents: docs,
+      documents: [...docs, ...moreDocs],
       config: {},
       plugins: [
         { typescript: {} },
@@ -67,6 +63,7 @@ export const generateTypes = async (
             documentNodeImport: 'tinacms#DocumentNode',
           },
         },
+        { AddGeneratedClient: {} },
       ],
       pluginMap: {
         typescript: {
@@ -78,6 +75,7 @@ export const generateTypes = async (
         typescriptSdk: {
           plugin: typescriptSdkPlugin,
         },
+        AddGeneratedClient,
       },
     })
     return res

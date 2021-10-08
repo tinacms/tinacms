@@ -399,6 +399,35 @@
       ]
     },
     {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "getPostsDocumentParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "PostsDocument"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "kind": "Field",
+            "name": {
+              "kind": "Name",
+              "value": "form"
+            },
+            "arguments": [],
+            "directives": []
+          }
+        ]
+      }
+    },
+    {
       "kind": "ObjectTypeDefinition",
       "interfaces": [],
       "directives": [],

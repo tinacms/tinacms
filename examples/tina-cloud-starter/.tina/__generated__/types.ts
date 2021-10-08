@@ -593,6 +593,15 @@ export type GetSomethingQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetSomethingQuery = { __typename?: 'Query', getCollections: Array<{ __typename?: 'Collection', name: string }> };
 
+export type GetPostsTesting2QueryVariables = Exact<{
+  path: Scalars['String'];
+}>;
+
+
+export type GetPostsTesting2Query = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
+
+export type GetPostsDocumentPartsTestFragment = { __typename?: 'PostsDocument', form: any };
+
 export const GetPostsDocumentPartsFragmentDoc = gql`
     fragment getPostsDocumentParts on PostsDocument {
   data {
@@ -614,6 +623,11 @@ export const GetPostsDocumentPartsFragmentDoc = gql`
   }
 }
     `;
+export const GetPostsDocumentPartsTestFragmentDoc = gql`
+    fragment getPostsDocumentPartsTest on PostsDocument {
+  form
+}
+    `;
 export const GetPostsTestingDocument = gql`
     query GetPostsTesting($path: String!) {
   getPostsDocument(relativePath: $path) {
@@ -628,6 +642,13 @@ export const GetSomethingDocument = gql`
   }
 }
     `;
+export const GetPostsTesting2Document = gql`
+    query GetPostsTesting2($path: String!) {
+  getPostsDocument(relativePath: $path) {
+    ...getPostsDocumentParts
+  }
+}
+    ${GetPostsDocumentPartsFragmentDoc}`;
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
 export function getSdk<C>(requester: Requester<C>) {
   return {
@@ -636,13 +657,16 @@ export function getSdk<C>(requester: Requester<C>) {
     },
     GetSomething(variables?: GetSomethingQueryVariables, options?: C): Promise<GetSomethingQuery> {
       return requester<GetSomethingQuery, GetSomethingQueryVariables>(GetSomethingDocument, variables, options);
+    },
+    GetPostsTesting2(variables: GetPostsTesting2QueryVariables, options?: C): Promise<GetPostsTesting2Query> {
+      return requester<GetPostsTesting2Query, GetPostsTesting2QueryVariables>(GetPostsTesting2Document, variables, options);
     }
   };
 }
 export type Sdk = ReturnType<typeof getSdk>;
 
-
 // TinaSDK generated code
+
 import { LocalClient } from 'tinacms'
 const tinaClient = new LocalClient();
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
@@ -651,7 +675,7 @@ const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   _options
 ) => {
   const data = await tinaClient.request(doc, { variables: vars });
-  console.log({ data });
   return data;
 };
 export const getTinaClient = ()=>getSdk(requester)
+
