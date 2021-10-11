@@ -63,6 +63,7 @@ export type Query = {
   node: Node;
   getDocument: DocumentNode;
   getDocumentList: DocumentConnection;
+  getDocumentFields: Scalars['JSON'];
   getPostsDocument: PostsDocument;
   getPostsList: PostsConnection;
   getGlobalDocument: GlobalDocument;
