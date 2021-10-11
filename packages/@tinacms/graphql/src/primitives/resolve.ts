@@ -166,6 +166,14 @@ export const resolve = async ({
           }
           return resolver.resolveCollection(args.collection)
         }
+
+        /**
+         * `getDocumentFields`
+         */
+        if (info.fieldName === 'getDocumentFields') {
+          return resolver.getDocumentFields()
+        }
+
         // We assume the value is already fully resolved
         if (!lookup) {
           return value

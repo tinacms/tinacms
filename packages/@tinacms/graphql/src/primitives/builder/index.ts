@@ -241,6 +241,22 @@ export class Builder {
 
   /**
    * ```graphql
+   * {
+   *    getDocumentFields()
+   * }
+   * ```
+   */
+
+  public multiCollectionDocumentFields = async () => {
+    return astBuilder.FieldDefinition({
+      name: 'getDocumentFields',
+      required: true,
+      type: 'JSON',
+    })
+  }
+
+  /**
+   * ```graphql
    * # ex.
    * {
    *   addPendingDocument(collection: $collection, relativePath: $relativePath, params: $params) {
