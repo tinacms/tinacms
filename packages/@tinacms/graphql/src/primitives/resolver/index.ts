@@ -20,7 +20,6 @@ import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
 
 import type { Templateable, TinaFieldEnriched } from '../types'
-import { GraphQLError } from 'graphql'
 import { TinaError } from './error'
 interface ResolverConfig {
   database: Database
@@ -132,6 +131,60 @@ export class Resolver {
       throw e
     }
   }
+
+  public getDocumentFields = async () => {
+    try {
+      const response = {}
+      const collections = await this.tinaSchema.getCollections()
+
+      /**
+       * Iterate through collections...
+       */
+      await sequential(collections, async (collection) => {
+        const collectable =
+          this.tinaSchema.getTemplatesForCollectable(collection)
+
+        switch (collectable.type) {
+          /**
+           * Collection with no templates...
+           */
+          case 'object':
+            response[collection.name] = {
+              fields: await sequential(
+                collectable.template.fields,
+                async (field) => {
+                  return this.resolveField(field)
+                }
+              ),
+            }
+            break
+          /**
+           * Collection with n templates...
+           */
+          case 'union':
+            const templates = {}
+            /**
+             * Iterate through templates...
+             */
+            await sequential(collectable.templates, async (template) => {
+              templates[lastItem(template.namespace)] = {
+                fields: await sequential(template.fields, async (field) => {
+                  return this.resolveField(field)
+                }),
+              }
+            })
+
+            response[collection.name] = { templates }
+            break
+        }
+      })
+
+      return response
+    } catch (e) {
+      throw e
+    }
+  }
+
   public resolveDocument = async ({
     value,
     args,
