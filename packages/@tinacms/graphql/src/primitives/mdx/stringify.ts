@@ -112,6 +112,15 @@ export const stringify = (
           stringify(child, field)
         ) as PhrasingContent[],
       }
+    case plateElements.ELEMENT_CODE_BLOCK:
+      return {
+        type: 'code',
+        lang: node.language,
+        value: node.children.map((child) => stringify(child, field)).join('\n'),
+      }
+    case 'code_line':
+      console.log(node.children.map((child) => child.text).join('\n'))
+      return node.children.map((child) => child.text).join('\n')
     case plateElements.ELEMENT_UL:
       return {
         type: 'list',

@@ -260,24 +260,25 @@ export const TinaMarkdown = ({
               </a>
             )
           case 'code_block':
+            const value = child.children
+              .map((item) => {
+                // I don't think it's possible to have more than one
+                // child item here
+                return item.children[0].text
+              })
+              .join('\n')
             if (components[child.type]) {
               const Component = components[child.type]
               const { children, ...props } = child
               return (
                 <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
+                  {value}
                 </Component>
               )
             }
             return (
               <pre>
-                <code>
-                  <TinaMarkdown components={components}>
-                    {child.children}
-                  </TinaMarkdown>
-                </code>
+                <code>{value}</code>
               </pre>
             )
           case 'thematic_break':
