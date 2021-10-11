@@ -190,7 +190,9 @@ export const TinaCloudProvider = (
     }
     return () => {
       if (!branchingEnabled) {
-        cms.plugins.remove(branchSwitcher)
+        if(branchSwitcher) {
+          cms.plugins.remove(branchSwitcher)
+        }
       }
     }
   }, [branchingEnabled, props.branch])
