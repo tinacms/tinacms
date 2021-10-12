@@ -579,14 +579,14 @@ export type PagesMutation = {
   blocks?: Maybe<Array<Maybe<PagesBlocksMutation>>>;
 };
 
-export type GetPostsTestingQueryVariables = Exact<{
+export type GetPostQueryVariables = Exact<{
   path: Scalars['String'];
 }>;
 
 
-export type GetPostsTestingQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
+export type GetPostQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
 
-export type GetPostsDocumentPartsFragment = { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } };
+export type GetPostsDocumentPartsFragment = { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } };
 
 export type GetSomethingQueryVariables = Exact<{ [key: string]: never; }>;
 
@@ -598,12 +598,13 @@ export type GetPostsTesting2QueryVariables = Exact<{
 }>;
 
 
-export type GetPostsTesting2Query = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
+export type GetPostsTesting2Query = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
 
 export type GetPostsDocumentPartsTestFragment = { __typename?: 'PostsDocument', form: any };
 
 export const GetPostsDocumentPartsFragmentDoc = gql`
     fragment getPostsDocumentParts on PostsDocument {
+  id
   data {
     title
     author {
@@ -628,8 +629,8 @@ export const GetPostsDocumentPartsTestFragmentDoc = gql`
   form
 }
     `;
-export const GetPostsTestingDocument = gql`
-    query GetPostsTesting($path: String!) {
+export const GetPostDocument = gql`
+    query GetPost($path: String!) {
   getPostsDocument(relativePath: $path) {
     ...getPostsDocumentParts
   }
@@ -652,8 +653,8 @@ export const GetPostsTesting2Document = gql`
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
 export function getSdk<C>(requester: Requester<C>) {
   return {
-    GetPostsTesting(variables: GetPostsTestingQueryVariables, options?: C): Promise<GetPostsTestingQuery> {
-      return requester<GetPostsTestingQuery, GetPostsTestingQueryVariables>(GetPostsTestingDocument, variables, options);
+    GetPost(variables: GetPostQueryVariables, options?: C): Promise<GetPostQuery> {
+      return requester<GetPostQuery, GetPostQueryVariables>(GetPostDocument, variables, options);
     },
     GetSomething(variables?: GetSomethingQueryVariables, options?: C): Promise<GetSomethingQuery> {
       return requester<GetSomethingQuery, GetSomethingQueryVariables>(GetSomethingDocument, variables, options);

@@ -1,10 +1,11 @@
-query GetPostsTesting($path: String!) {
+query GetPost($path: String!) {
   getPostsDocument(relativePath: $path) {
     ...getPostsDocumentParts
   }
 }
 
 fragment getPostsDocumentParts on PostsDocument {
+  id
   data {
     title
     author {

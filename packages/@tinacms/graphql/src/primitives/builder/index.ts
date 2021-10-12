@@ -22,6 +22,9 @@ import type {
   ObjectTypeDefinitionNode,
   TypeDefinitionNode,
   InputObjectTypeDefinitionNode,
+  FieldDefinitionNode,
+  FieldNode,
+  SelectionSetNode,
 } from 'graphql'
 import type {
   TinaCloudCollectionEnriched,
@@ -378,6 +381,151 @@ export class Builder {
       collection: collection.name,
     })
     return astBuilder.FieldDefinition({ type, name, args, required: true })
+  }
+
+  /**
+   * Turns a collection into a fragment that gets updated on build. This fragment does not resolve references
+   * ```graphql
+   * # ex.
+   * fragment AuthorsDocumentParts on AuthorsDocument {
+   *   name
+   *   avatar
+   *   ...
+   * }
+   * ```
+   *
+   * @public
+   * @param collection a Tina Cloud collection
+   */
+  public collectionFragment = async (
+    collection: TinaCloudCollectionEnriched
+  ) => {
+    const types = await this._buildObjectOrUnionData(
+      this.tinaSchema.getTemplatesForCollectable(collection)
+    )
+    if (types.kind === 'ObjectTypeDefinition') {
+      const fields: FieldDefinitionNode[] =
+        types.fields as FieldDefinitionNode[]
+
+      const typeName = types.name.value
+      return this.buildFragment(fields, typeName)
+    } else {
+      // handle it
+    }
+  }
+
+  private buildFragment = async (
+    fields: FieldDefinitionNode[],
+    name: string
+  ) => {
+    const selections = []
+
+    await sequential(fields, async (x) => {
+      // const field = {
+      //   name: x.name,
+      //   kind: 'Field',
+      // }
+
+      const field = await this.buildField(x)
+      // field && selections.push(field)
+      selections.push(field)
+    })
+
+    console.log({ selections })
+
+    // if (selections.length === 0) {
+    //   return false
+    // }
+
+    return {
+      kind: 'FragmentDefinition',
+      name: {
+        kind: 'Name',
+        value: name + 'Parts',
+      },
+      typeCondition: {
+        kind: 'NamedType',
+        name: {
+          kind: 'Name',
+          value: name,
+        },
+      },
+      directives: [],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: selections.filter((x) => new Boolean(x)),
+      },
+    }
+  }
+
+  private buildField: (
+    field: FieldDefinitionNode
+  ) => Promise<false | SelectionSetNode | FieldNode> = async (
+    field: FieldDefinitionNode
+  ) => {
+    // return {
+    //   name: field.name,
+    //   kind: 'Field',
+    // }
+    // Look to see if it is a list ot named type
+
+    switch (field.type.kind) {
+      case 'NamedType':
+        if (typeof field.type.name.value === 'string') {
+          console.log({ nameSrt: field.type.name.value })
+          return {
+            name: field.name,
+            kind: 'Field',
+          } as FieldNode
+        } else {
+          console.log({ nameObj: field.type.name.value })
+          // console.log(field.type.name.value.types)
+          const selections =
+            field.type.name.value.types?.name?.fields.map((field) =>
+              this.buildField(field)
+            ) || []
+          //   .filter(Boolean)
+          return {
+            name: field.name,
+            kind: 'Field',
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: selections,
+            } as SelectionSetNode,
+          }
+          return {
+            name: field.name,
+            kind: 'Field',
+          } as FieldNode
+        }
+      case 'ListType':
+        return {
+          name: field.name,
+          kind: 'Field',
+        } as FieldNode
+    }
+
+    console.log('this should never happen')
+    return {
+      name: field.name,
+      kind: 'Field',
+    } as FieldNode
+    // if (typeof field.type.name === 'string') {
+    // return {
+    //   name: field.name,
+    //   kind: 'Field',
+    // } as FieldNode
+    // }
+
+    // console.log({ field })
+    // console.log({ name: field.type.name })
+    // if (field.type.type) {
+    // return this.buildField(field.type.type)
+    // console.log({ type: field.type.type })
+    // const feilds = field.type.type.name.value
+    // console.log({ feilds })
+    // } else {
+    // }
   }
 
   /**

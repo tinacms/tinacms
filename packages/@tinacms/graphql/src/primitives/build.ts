@@ -13,7 +13,14 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
-import { printSchema, print, ASTNode } from 'graphql'
+import {
+  printSchema,
+  print,
+  ASTNode,
+  DocumentNode,
+  FragmentDefinitionNode,
+  SelectionNode,
+} from 'graphql'
 
 import { astBuilder } from './ast-builder'
 import { sequential } from './util'
@@ -42,7 +49,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   const definitions = []
   definitions.push(await builder.buildStaticDefinitions())
   const queryTypeDefinitionFields: FieldDefinitionNode[] = []
-  const fragmentDefiniationFields: FieldDefinitionNode[] = []
+  const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
   const mutationTypeDefinitionFields: FieldDefinitionNode[] = []
 
   const collections = tinaSchema.getCollections()
@@ -77,10 +84,52 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
    * Collection queries/mutations
    */
   await sequential(collections, async (collection) => {
-    const test = await builder.collectionDocument(collection)
+    const collectionAST = await builder.collectionDocument(collection)
+    const test = await builder.collectionFragment(collection)
+    console.log({ test })
+    test && fragmentDefinitionsFields.push(test)
 
-    queryTypeDefinitionFields.push(test)
-    fragmentDefiniationFields.push(test)
+    // console.log({ collectionAST })
+    const typeName = collectionAST.type.type.name.value.name.value
+    // console.log({ typeName })
+
+    const fields: readonly SelectionNode[] =
+      collectionAST.type?.type?.name?.value?.fields?.find(
+        (x) => x.name.value === 'data'
+      )?.type?.type?.name?.value?.fields || ([] as readonly SelectionNode[])
+
+    // console.log({ fields })
+
+    // fields.forEach((x) => {
+    //   console.log(x)
+    // })
+
+    // fragmentDefinitionsFields.push({
+    //   kind: 'FragmentDefinition',
+    //   name: {
+    //     kind: 'Name',
+    //     value: typeName + 'Parts',
+    //   },
+    //   typeCondition: {
+    //     kind: 'NamedType',
+    //     name: {
+    //       kind: 'Name',
+    //       value: typeName,
+    //     },
+    //   },
+    //   directives: [],
+    //   selectionSet: {
+    //     kind: 'SelectionSet',
+    //     selections: fields.map((x) => ({
+    //       kind: 'Field',
+    //       name: x.name,
+    //       arguments: x.arguments || [],
+    //       directives: [],
+    //     })),
+    //   },
+    // })
+
+    queryTypeDefinitionFields.push(collectionAST)
 
     mutationTypeDefinitionFields.push(
       await builder.updateCollectionDocumentMutation(collection)
@@ -88,36 +137,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     queryTypeDefinitionFields.push(
       await builder.collectionDocumentList(collection)
     )
-  })
-
-  definitions.push({
-    kind: 'FragmentDefinition',
-    name: {
-      kind: 'Name',
-      value: 'getPostsDocumentParts',
-    },
-    typeCondition: {
-      kind: 'NamedType',
-      name: {
-        kind: 'Name',
-        value: 'PostsDocument',
-      },
-    },
-    directives: [],
-    selectionSet: {
-      kind: 'SelectionSet',
-      selections: [
-        {
-          kind: 'Field',
-          name: {
-            kind: 'Name',
-            value: 'form',
-          },
-          arguments: [],
-          directives: [],
-        },
-      ],
-    },
   })
 
   definitions.push(
@@ -132,7 +151,9 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       fields: mutationTypeDefinitionFields,
     })
   )
-  return {
+
+  definitions.push(...fragmentDefinitionsFields)
+  const doc = {
     kind: 'Document',
     definitions: _.uniqBy(
       // @ts-ignore
@@ -140,4 +161,8 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
+
+  // console.log(print(doc))
+
+  return doc
 }
