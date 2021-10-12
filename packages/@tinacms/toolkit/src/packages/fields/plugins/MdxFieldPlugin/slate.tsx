@@ -1,6 +1,4 @@
-// @ts-nocheck
 /**
-
 Copyright 2021 Forestry.io Holdings, Inc.
 
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -16,7 +14,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 
 */
-
+// @ts-ignore
 import React from 'react'
 import { Form } from '../../../forms'
 import { MdxField, PopupAdder } from './field'
