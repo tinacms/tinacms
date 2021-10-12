@@ -39,6 +39,8 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
+  const [formNames, setFormNames] = React.useState([])
+
   /**
    * FIXME: this design is pretty flaky, but better than what
    * we've had previously. The way it works is we update `formValues`
@@ -134,6 +136,20 @@ export function useGraphqlForms<T extends object>({
       setPendingReset(null)
     }
   }, [pendingReset])
+
+  // FIXME: Remove form plugins on unmount
+  // we're violating the rule of hooks depdendencies
+  // probably should be using a state machine here
+  React.useEffect(() => {
+    return () => {
+      Object.keys(data || {}).forEach((name) => {
+        const formPlugin = cms.forms.find(name)
+        if (formPlugin) {
+          cms.forms.remove(formPlugin)
+        }
+      })
+    }
+  }, [JSON.stringify(data)])
 
   React.useEffect(() => {
     setIsLoading(true)
