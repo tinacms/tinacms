@@ -1,5 +1,22 @@
 # Change Log
 
+## 0.51.0
+
+### Minor Changes
+
+- 3911fd6e8: Fixes a bug, that npm package is missing `dist` folder and is not working, because of changed build path.
+
+### Patch Changes
+
+- Updated dependencies [9213d5608]
+- Updated dependencies [b59f23295]
+- Updated dependencies [a419056b6]
+- Updated dependencies [ded8dfbee]
+- Updated dependencies [5df9fe543]
+- Updated dependencies [9d68b058f]
+- Updated dependencies [91cebe5bc]
+  - @tinacms/toolkit@0.54.0
+
 ## 0.50.7
 
 ### Patch Changes

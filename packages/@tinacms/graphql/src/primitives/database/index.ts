@@ -330,6 +330,8 @@ type CollectionDocumentLookup = {
 type MultiCollectionDocumentLookup = {
   type: string
   resolveType: 'multiCollectionDocument'
+  createDocument: 'create'
+  updateDocument: 'update'
 }
 type MultiCollectionDocumentListLookup = {
   type: string

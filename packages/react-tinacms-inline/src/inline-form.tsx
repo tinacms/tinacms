@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { FormRenderProps } from 'react-final-form'
 import { Form, useCMS, FormLegacy } from 'tinacms'
-import { Dismissible } from 'react-dismissible'
+import { Dismissible } from 'tinacms'
 import { RBIEPlugin } from './rbie/plugins/rbie-plugin'
 import { InlineFieldsRenderer } from './rbie/components/inline-fields-renderer'
 

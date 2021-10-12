@@ -128,11 +128,14 @@ export class CMS {
 
   media = new MediaManager(new DummyMediaStore(), this.events)
 
+  flags: Map<string, boolean>
+
   /**
    * @hidden
    */
   constructor(config: CMSConfig = {}) {
     this.plugins = new PluginTypeManager(this.events)
+    this.flags = new Map()
 
     if (config.media) {
       this.media.store = config.media

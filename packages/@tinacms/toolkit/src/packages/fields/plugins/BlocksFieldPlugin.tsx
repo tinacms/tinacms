@@ -29,7 +29,7 @@ import {
   LeftArrowIcon,
 } from '../../icons'
 import { GroupPanel, PanelHeader, PanelBody } from './GroupFieldPlugin'
-import { Dismissible } from 'react-dismissible'
+import { Dismissible } from '../../react-dismissible'
 import { IconButton } from '../../styles'
 import { FieldDescription } from './wrapFieldWithMeta'
 import {
@@ -37,6 +37,7 @@ import {
   GroupListMeta,
   GroupLabel,
 } from './GroupListFieldPlugin'
+import { useCMS } from '../../react-core/use-cms'
 import { useEvent } from '../../react-core'
 import { FieldHoverEvent, FieldFocusEvent } from '../field-events'
 
@@ -546,6 +547,8 @@ const Panel = function Panel({
   template,
   zIndexShift,
 }: PanelProps) {
+  const cms = useCMS()
+
   const fields: any[] = React.useMemo(() => {
     if (!template.fields) return []
 
@@ -557,7 +560,17 @@ const Panel = function Panel({
 
   return (
     <GroupPanel isExpanded={isExpanded} style={{ zIndex: zIndexShift + 1000 }}>
-      <PanelHeader onClick={() => setExpanded(false)}>
+      <PanelHeader
+        onClick={() => {
+          const state = tinaForm.finalForm.getState()
+          if (state.invalid === true) {
+            // @ts-ignore
+            cms.alerts.error('Cannot navigate away from an invalid form.')
+          } else {
+            setExpanded(false)
+          }
+        }}
+      >
         <LeftArrowIcon />
         <GroupLabel>{label}</GroupLabel>
       </PanelHeader>

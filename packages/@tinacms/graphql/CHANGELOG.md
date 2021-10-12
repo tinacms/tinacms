@@ -1,5 +1,16 @@
 # tina-graphql
 
+## 0.55.0
+
+### Minor Changes
+
+- f3bddeb4a: Added new warning messages for list UI that we do not support by default
+
+### Patch Changes
+
+- 2908f8176: Fixes an issue where nested reference fields weren't updated properly when their values changed.
+- 5d83643b2: Adds create document mutations
+
 ## 0.54.3
 
 ### Patch Changes
