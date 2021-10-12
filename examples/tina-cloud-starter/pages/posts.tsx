@@ -22,12 +22,11 @@ export default function HomePage(
 
 export const getStaticProps = async () => {
   const client = getTinaClient();
-  const data = await client.GetSomething();
-  const foo = data.getCollections.map((x) => x.name);
-  console.log(foo);
 
-  const doc = await client.GetPostsTesting({ path: "voteForPedro.md" });
-  console.log({ data: doc.getPostsDocument.data });
+  const post = (await client.GetPost({ path: "voteForPedro.md" }))
+    .getPostsDocument.data;
+
+  console.log({ post });
 
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql

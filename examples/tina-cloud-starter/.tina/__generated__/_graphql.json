@@ -399,35 +399,6 @@
       ]
     },
     {
-      "kind": "FragmentDefinition",
-      "name": {
-        "kind": "Name",
-        "value": "getPostsDocumentParts"
-      },
-      "typeCondition": {
-        "kind": "NamedType",
-        "name": {
-          "kind": "Name",
-          "value": "PostsDocument"
-        }
-      },
-      "directives": [],
-      "selectionSet": {
-        "kind": "SelectionSet",
-        "selections": [
-          {
-            "kind": "Field",
-            "name": {
-              "kind": "Name",
-              "value": "form"
-            },
-            "arguments": [],
-            "directives": []
-          }
-        ]
-      }
-    },
-    {
       "kind": "ObjectTypeDefinition",
       "interfaces": [],
       "directives": [],
@@ -4958,6 +4929,186 @@
           }
         }
       ]
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "PostsParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Posts"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "title"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": []
+            }
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "date"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "heroImg"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "excerpt"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "_body"
+            },
+            "kind": "Field"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "GlobalParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Global"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "header"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": []
+            }
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "footer"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": []
+            }
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "theme"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": []
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "AuthorsParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Authors"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "name"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "avatar"
+            },
+            "kind": "Field"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "PagesParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Pages"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "blocks"
+            },
+            "kind": "Field"
+          }
+        ]
+      }
     }
   ]
 }

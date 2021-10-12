@@ -38,10 +38,6 @@ interface Connection {
   totalCount: Int!
 }
 
-fragment getPostsDocumentParts on PostsDocument {
-  form
-}
-
 type Query {
   getCollection(collection: String): Collection!
   getCollections: [Collection!]!
@@ -406,4 +402,28 @@ input PagesBlocksMutation {
 
 input PagesMutation {
   blocks: [PagesBlocksMutation]
+}
+
+fragment PostsParts on Posts {
+  title
+  author
+  date
+  heroImg
+  excerpt
+  _body
+}
+
+fragment GlobalParts on Global {
+  header
+  footer
+  theme
+}
+
+fragment AuthorsParts on Authors {
+  name
+  avatar
+}
+
+fragment PagesParts on Pages {
+  blocks
 }

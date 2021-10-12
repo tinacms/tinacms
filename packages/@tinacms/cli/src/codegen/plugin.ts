@@ -4,7 +4,7 @@ import { print, ASTNode, DefinitionNode } from 'graphql'
 
 export const AddGeneratedClientFunc: PluginFunction = (
   schema,
-  documents,
+  _documents,
   _config,
   _info
 ) => {
@@ -49,10 +49,10 @@ export const AddGeneratedClientFunc: PluginFunction = (
   fieldsKeys.forEach((key) => {
     const test = fields[key].type.toJSON().replace('!', '')
     // console.log({ typeMap })
-    console.log({ test })
+    // console.log({ test })
     // @ts-ignore
-    const typeFields = typeMap[test]?.toConfig().fields
-    console.log({ typeFields })
+    const typeFields = typeMap[test]?.toConfig().fields?.data || {}
+    // console.log({ typeFields })
     typeFields &&
       defs.push({
         kind: 'FragmentDefinition',
@@ -70,15 +70,17 @@ export const AddGeneratedClientFunc: PluginFunction = (
         selectionSet: {
           kind: 'SelectionSet',
           // TODO: traverse the AST node to find all top level fields
-          selections: Object.keys(typeFields).map((x) => ({
-            kind: 'Field',
-            name: { kind: 'Name', value: x },
-          })),
+          selections: Object.keys(typeFields).map((x) => {
+            return {
+              kind: 'Field',
+              name: { kind: 'Name', value: x },
+            }
+          }),
         },
       })
   })
   const frags = print({ definitions: defs, kind: 'Document' })
-  console.log({ frags })
+  // console.log({ frags })
 
   // console.log(types)
   // types.forEach(type=>{
