@@ -261,15 +261,12 @@ export const stringify = (
                       })
                     } else {
                       value.forEach((item) => {
-                        // Only take the first item
-                        const [itemTemplateName, itemValues] =
-                          Object.entries(item)[0]
                         const template = field.templates.find((template) => {
                           const templateName =
                             typeof template === 'string'
                               ? template
                               : template.name
-                          return templateName === itemTemplateName
+                          return templateName === item._template
                         })
                         if (typeof template === 'string') {
                           throw new Error(
@@ -283,7 +280,7 @@ export const stringify = (
                         }
                         const v = {}
                         template.fields.forEach((field) => {
-                          const fieldValue = itemValues[field.name]
+                          const fieldValue = item[field.name]
                           if (fieldValue) {
                             switch (field.type) {
                               case 'boolean':
@@ -297,6 +294,7 @@ export const stringify = (
                                 break
                             }
                             v['_template'] = `"${template.name}"`
+                            // console.log(v)
                           }
                         })
                         values.push(v)

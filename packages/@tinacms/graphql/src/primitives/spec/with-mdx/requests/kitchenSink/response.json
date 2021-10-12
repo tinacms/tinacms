@@ -95,8 +95,9 @@
               "children": [
                 {
                   "type": "img",
-                  "link": "http://placehold.it/300x200",
-                  "caption": "Picture of a placeholder"
+                  "url": "http://placehold.it/300x200",
+                  "alt": "Picture of a placeholder",
+                  "caption": null
                 }
               ]
             },
@@ -105,8 +106,13 @@
               "language": "js",
               "children": [
                 {
-                  "type": "text",
-                  "text": "console.log(\"code blocks\")"
+                  "type": "code_line",
+                  "children": [
+                    {
+                      "type": "text",
+                      "text": "console.log(\"code blocks\")"
+                    }
+                  ]
                 }
               ]
             },

@@ -34,7 +34,6 @@ const config = {
   },
 }
 
-console.log('letgggo')
 module.exports = {
   process: sucraseRunner.process,
   config,
