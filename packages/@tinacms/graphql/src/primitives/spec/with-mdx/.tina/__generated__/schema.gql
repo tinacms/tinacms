@@ -45,8 +45,10 @@ type Query {
   getDocument(collection: String, relativePath: String): DocumentNode!
   getDocumentList(before: String, after: String, first: Int, last: Int): DocumentConnection!
   getDocumentFields: JSON!
-  getPageDocument(relativePath: String): PageDocument!
-  getPageList(before: String, after: String, first: Int, last: Int): PageConnection!
+  getAuthorDocument(relativePath: String): AuthorDocument!
+  getAuthorList(before: String, after: String, first: Int, last: Int): AuthorConnection!
+  getPostDocument(relativePath: String): PostDocument!
+  getPostList(before: String, after: String, first: Int, last: Int): PostConnection!
 }
 
 type DocumentConnectionEdges {
@@ -72,87 +74,103 @@ type Collection {
   documents(before: String, after: String, first: Int, last: Int): DocumentConnection!
 }
 
-union DocumentNode = PageDocument
+union DocumentNode = AuthorDocument | PostDocument
 
-type PageSeo {
-  seoTitle: String
-  ogImage: String
-  ogDescription: String
+type AuthorSocialMedia {
+  platform: String
+  handle: String
 }
 
-type PageBlocksHero {
-  description: String
-  backgroundImage: String
+type Author {
+  name: String
+  socialMedia: [AuthorSocialMedia]
 }
 
-type PageBlocksCta {
-  ctaText: String
-  ctaStyle: String
-}
-
-union PageBlocks = PageBlocksHero | PageBlocksCta
-
-type Page {
-  title: String
-  seo: PageSeo
-  blocks: [PageBlocks]
-}
-
-type PageDocument implements Node & Document {
+type AuthorDocument implements Node & Document {
   id: ID!
   sys: SystemInfo!
-  data: Page!
+  data: Author!
   form: JSON!
   values: JSON!
   dataJSON: JSON!
 }
 
-type PageConnectionEdges {
+type AuthorConnectionEdges {
   cursor: String
-  node: PageDocument
+  node: AuthorDocument
 }
 
-type PageConnection implements Connection {
+type AuthorConnection implements Connection {
   pageInfo: PageInfo
   totalCount: Int!
-  edges: [PageConnectionEdges]
+  edges: [AuthorConnectionEdges]
+}
+
+union PostAuthorDocument = AuthorDocument
+
+type PostSomeField {
+  title: String
+}
+
+type Post {
+  title: String
+  author: PostAuthorDocument
+  someField: [PostSomeField]
+  body: JSON
+}
+
+type PostDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Post!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type PostConnectionEdges {
+  cursor: String
+  node: PostDocument
+}
+
+type PostConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [PostConnectionEdges]
 }
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
   createDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
-  createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
+  updateAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
+  updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
+  createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
 }
 
 input DocumentMutation {
-  page: PageMutation
+  author: AuthorMutation
+  post: PostMutation
 }
 
-input PageSeoMutation {
-  seoTitle: String
-  ogImage: String
-  ogDescription: String
+input AuthorSocialMediaMutation {
+  platform: String
+  handle: String
 }
 
-input PageBlocksHeroMutation {
-  description: String
-  backgroundImage: String
+input AuthorMutation {
+  name: String
+  socialMedia: [AuthorSocialMediaMutation]
 }
 
-input PageBlocksCtaMutation {
-  ctaText: String
-  ctaStyle: String
-}
-
-input PageBlocksMutation {
-  hero: PageBlocksHeroMutation
-  cta: PageBlocksCtaMutation
-}
-
-input PageMutation {
+input PostSomeFieldMutation {
   title: String
-  seo: PageSeoMutation
-  blocks: [PageBlocksMutation]
+}
+
+input PostMutation {
+  title: String
+  author: String
+  someField: [PostSomeFieldMutation]
+  body: JSON
 }

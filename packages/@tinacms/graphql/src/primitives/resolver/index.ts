@@ -1,3 +1,4 @@
+// @ts-nocheck
 /**
 Copyright 2021 Forestry.io Holdings, Inc.
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -18,6 +19,7 @@ import { assertShape, sequential, lastItem } from '../util'
 import { NAMER } from '../ast-builder'
 import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
+import { parseMDX, stringifyMDX } from '../mdx'
 
 import type { Templateable, TinaFieldEnriched } from '../types'
 import { TinaError } from './error'
@@ -123,6 +125,7 @@ export class Resolver {
     } catch (e) {
       if (e instanceof TinaError) {
         // Attach additional information
+        console.log(e)
         throw new TinaError(e.message, {
           requestedDocument: fullPath,
           ...e.extensions,
@@ -415,6 +418,9 @@ export class Resolver {
             }
             break
           }
+        case 'rich-text':
+          accum[fieldName] = stringifyMDX(fieldValue, field)
+          break
         case 'reference':
           accum[fieldName] = fieldValue
           break
@@ -444,6 +450,10 @@ export class Resolver {
       case 'reference':
       case 'image':
         accumulator[field.name] = value
+        break
+      case 'rich-text':
+        const tree = parseMDX(value, field)
+        accumulator[field.name] = tree
         break
       case 'object':
         if (field.list) {
@@ -478,6 +488,7 @@ export class Resolver {
           if (!value) {
             return
           }
+
           const template = await this.tinaSchema.getTemplateForData({
             data: value,
             collection: {
@@ -663,6 +674,33 @@ export class Resolver {
           }
         } else {
           throw new Error(`Unknown object for resolveField function`)
+        }
+      case 'rich-text':
+        const templates: { [key: string]: object } = {}
+        const typeMap: { [key: string]: string } = {}
+        await sequential(field.templates, async (template) => {
+          const extraFields = template.ui || {}
+          const templateName = lastItem(template.namespace)
+          typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+          templates[lastItem(template.namespace)] = {
+            // @ts-ignore FIXME `Templateable` should have name and label properties
+            label: template.label || templateName,
+            key: templateName,
+            inline: template.inline,
+            name: templateName,
+            fields: await sequential(
+              template.fields,
+              async (field) => await this.resolveField(field)
+            ),
+            ...extraFields,
+          }
+          return true
+        })
+        return {
+          ...field,
+          templates: Object.values(templates),
+          component: 'rich-text',
+          ...extraFields,
         }
       case 'reference':
         const documents = _.flatten(

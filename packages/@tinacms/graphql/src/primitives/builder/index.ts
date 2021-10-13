@@ -712,6 +712,12 @@ export class Builder {
           list: field.list,
           type: await this._updateCollectionDocumentMutationType(field),
         })
+      case 'rich-text':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: field.list,
+          type: astBuilder.TYPES.JSON,
+        })
       case 'reference':
         return astBuilder.InputValueDefinition({
           name: field.name,
@@ -850,6 +856,13 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           type: await this._buildObjectOrUnionData(
             this.tinaSchema.getTemplatesForCollectable(field)
           ),
+        })
+      case 'rich-text':
+        return astBuilder.FieldDefinition({
+          name: field.name,
+          list: field.list,
+          required: field.required,
+          type: astBuilder.TYPES.JSON,
         })
       case 'reference':
         const name = NAMER.documentTypeName(field.namespace)
