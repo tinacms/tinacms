@@ -12,39 +12,43 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setup, setupFixture } from '../setup'
+import { setup, setupFixture, setupFixture2 } from '../setup'
+import { toMatchFile } from 'jest-file-snapshot'
 
 const rootPath = path.join(__dirname, '/')
 
-const fixtures = [
-  // 'getAuthorDocument',
-  'getPostDocument',
-  // 'updateAuthorDocument',
-  // 'updateDocument',
-  // 'updateDocument-no-collection',
+const fixtures2 = [
+  {
+    name: 'getPostDocumentAdvanced',
+    assert: 'output',
+  },
+  {
+    name: 'updatePostDocumentAdvanced',
+    assert: 'file',
+    filename: 'content/posts/hello-world-advanced.md',
+  },
+  {
+    name: 'kitchenSink',
+    assert: 'output',
+    filename: 'content/posts/kitchen-sink.md',
+  },
 ]
 import { tinaSchema } from './.tina/schema'
 
+expect.extend({ toMatchFile })
+
 describe('The given configuration', () => {
-  it.skip('Matches the expected schema', async () => {
-    const { schemaString, expectedSchemaString } = await setup(
-      rootPath,
-      tinaSchema,
-      true
-    )
-    expect(schemaString).toEqual(expectedSchemaString)
-  })
-  fixtures.forEach((fixture) => {
-    it(`${fixture} works`, async () => {
-      const { response, expectedReponse } = await setupFixture(
+  fixtures2.forEach((fixture) => {
+    it(`${fixture.name} works`, async () => {
+      const { response, expectedResponsePath } = await setupFixture2(
         rootPath,
         tinaSchema,
+        // @ts-ignore
         fixture
       )
 
-      expect(JSON.parse(JSON.stringify(response))).toMatchObject(
-        JSON.parse(expectedReponse)
-      )
+      // Add \n because prettier format adds it if a user edits the file manually
+      expect(response).toMatchFile(expectedResponsePath)
     })
   })
 })

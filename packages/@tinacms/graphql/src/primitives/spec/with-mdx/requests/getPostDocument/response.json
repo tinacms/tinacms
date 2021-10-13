@@ -1,0 +1,32 @@
+{
+  "data": {
+    "getPostDocument": {
+      "data": {
+        "title": "Hello, World!",
+        "body": {
+          "type": "root",
+          "children": [
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "How's that?"
+                }
+              ]
+            },
+            {
+              "type": "paragraph",
+              "children": [
+                {
+                  "type": "text",
+                  "text": "This is MDX"
+                }
+              ]
+            }
+          ]
+        }
+      }
+    }
+  }
+}
