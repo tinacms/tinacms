@@ -36,7 +36,7 @@ export type TinaCloudCollection<WithNamespace extends boolean> =
 export type TinaCloudCollectionBase = TinaCloudCollection<false>
 export type TinaCloudCollectionEnriched = TinaCloudCollection<true>
 
-type FormatType = 'json' | 'md' | 'markdown' | 'yml' | 'yaml'
+type FormatType = 'json' | 'md' | 'markdown' | 'mdx'
 
 interface BaseCollection {
   label: string
