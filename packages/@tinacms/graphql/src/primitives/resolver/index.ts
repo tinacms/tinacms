@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
 Copyright 2021 Forestry.io Holdings, Inc.
 Licensed under the Apache License, Version 2.0 (the "License");
@@ -416,9 +415,10 @@ export class Resolver {
                 'Not implement for polymorphic objects which are not lists'
               )
             }
-            break
           }
+          break
         case 'rich-text':
+          field
           accum[fieldName] = stringifyMDX(fieldValue, field)
           break
         case 'reference':
@@ -452,8 +452,12 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'rich-text':
-        const tree = parseMDX(value, field)
-        accumulator[field.name] = tree
+        if (typeof value === 'string') {
+          const tree = parseMDX(value, field)
+          accumulator[field.name] = tree
+        } else {
+          throw new Error(`Expected value for rich-text to be of type string`)
+        }
         break
       case 'object':
         if (field.list) {
@@ -679,22 +683,26 @@ export class Resolver {
         const templates: { [key: string]: object } = {}
         const typeMap: { [key: string]: string } = {}
         await sequential(field.templates, async (template) => {
-          const extraFields = template.ui || {}
-          const templateName = lastItem(template.namespace)
-          typeMap[templateName] = NAMER.dataTypeName(template.namespace)
-          templates[lastItem(template.namespace)] = {
-            // @ts-ignore FIXME `Templateable` should have name and label properties
-            label: template.label || templateName,
-            key: templateName,
-            inline: template.inline,
-            name: templateName,
-            fields: await sequential(
-              template.fields,
-              async (field) => await this.resolveField(field)
-            ),
-            ...extraFields,
+          if (typeof template === 'string') {
+            throw new Error(`Global templates not yet supported for rich-text`)
+          } else {
+            const extraFields = template.ui || {}
+            const templateName = lastItem(template.namespace)
+            typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+            templates[lastItem(template.namespace)] = {
+              // @ts-ignore FIXME `Templateable` should have name and label properties
+              label: template.label || templateName,
+              key: templateName,
+              inline: template.inline,
+              name: templateName,
+              fields: await sequential(
+                template.fields,
+                async (field) => await this.resolveField(field)
+              ),
+              ...extraFields,
+            }
+            return true
           }
-          return true
         })
         return {
           ...field,

@@ -1,4 +1,4 @@
-// @ts-nocheck
+// @ts-nocheck FIXME: plate elements and SlateNodeType needs to be merged
 /**
 
 Copyright 2021 Forestry.io Holdings, Inc.
