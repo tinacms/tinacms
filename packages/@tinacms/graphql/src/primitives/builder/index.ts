@@ -431,7 +431,7 @@ export class Builder {
       selections.push(field)
     })
 
-    console.log({ selections })
+    // console.log({ selections })
 
     // if (selections.length === 0) {
     //   return false
@@ -480,11 +480,20 @@ export class Builder {
         } else {
           console.log({ nameObj: field.type.name.value })
           // console.log(field.type.name.value.types)
-          const selections =
-            field.type.name.value.types?.name?.fields.map((field) =>
-              this.buildField(field)
-            ) || []
-          //   .filter(Boolean)
+          const selections = []
+
+          await sequential(
+            field?.type?.name?.value?.fields || [],
+            async (item) => {
+              const field = await this.buildField(item)
+              selections.push(field)
+            }
+          )
+          // field?.type?.name?.value?.fields?.map((field) =>
+          //   this.buildField(field)
+          // ) || []
+
+          console.log({ selections })
           return {
             name: field.name,
             kind: 'Field',
