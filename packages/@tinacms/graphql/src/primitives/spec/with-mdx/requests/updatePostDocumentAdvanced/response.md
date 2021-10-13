@@ -18,13 +18,13 @@ This is MDX
 
 <Hero
   subTitle={
-  <>
-  ## Oh Hi
+<>
+## Oh Hi
 
-  <Cta title="Get Started"/>
+<Cta title="Get Started"/>
 
-  </>
-  }
+</>
+}
   config={{variant: "primary"}}
 >
   # Welcome to my website
