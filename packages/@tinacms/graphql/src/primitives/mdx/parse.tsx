@@ -1,4 +1,3 @@
-// @ts-nocheck
 /**
 
 Copyright 2021 Forestry.io Holdings, Inc.
@@ -21,6 +20,7 @@ import { unified } from 'unified'
 import markdown from 'remark-parse'
 import mdx from 'remark-mdx'
 import { TinaField } from '../..'
+import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
 import type { RichTypeInner } from '../types'
 
@@ -460,8 +460,6 @@ export interface OptionType {
   imageCaptionKey?: string
 }
 
-import type { Content } from 'mdast'
-
 export interface MdastNode {
   type?: string
   ordered?: boolean
@@ -624,12 +622,10 @@ export default function remarkToSlate(node: MdxAstNode) {
       return {
         type: types.code_block,
         language: node.lang,
-        children: node.value
-          .split('\n')
-          .map((item) => ({
-            type: 'code_line',
-            children: [{ type: 'text', text: item }],
-          })),
+        children: node.value.split('\n').map((item) => ({
+          type: 'code_line',
+          children: [{ type: 'text', text: item }],
+        })),
         // children: [
         //   { type: 'code_line', children: [{ type: 'text', text: node.value }] },
         // ],
@@ -701,6 +697,7 @@ const forceLeafNode = (children: Array<MdxAstNode>) => {
       case 'code':
         const format = { strong: 'bold', em: 'italic', code: 'code' }
         extraProps[format[k.type]] = true
+        //@ts-ignore FIXME: Property 'children' does not exist on type 'Code | Emphasis | Strong'
         return k.children.forEach((item) => {
           text.push(item.value)
         })
