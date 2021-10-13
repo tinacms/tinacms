@@ -124,7 +124,6 @@ export class Resolver {
     } catch (e) {
       if (e instanceof TinaError) {
         // Attach additional information
-        console.log(e)
         throw new TinaError(e.message, {
           requestedDocument: fullPath,
           ...e.extensions,
