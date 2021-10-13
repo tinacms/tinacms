@@ -162,7 +162,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     ),
   }
 
-  // console.log(print(doc))
+  console.log(print(doc))
 
   return doc
 }

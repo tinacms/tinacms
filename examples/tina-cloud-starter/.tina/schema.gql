@@ -414,9 +414,30 @@ fragment PostsParts on Posts {
 }
 
 fragment GlobalParts on Global {
-  header
-  footer
-  theme
+  header {
+    icon {
+      color
+      style
+      name
+    }
+    color
+    nav
+  }
+  footer {
+    color
+    social {
+      facebook
+      twitter
+      instagram
+      github
+    }
+  }
+  theme {
+    color
+    font
+    icon
+    darkMode
+  }
 }
 
 fragment AuthorsParts on Authors {
