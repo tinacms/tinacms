@@ -81,7 +81,7 @@ export class Database {
           templateName
         )
       const field = template.fields.find((field) => {
-        if (field.type === 'string') {
+        if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
           }
@@ -90,7 +90,7 @@ export class Database {
       })
 
       let data = contentObject
-      if (extension === '.md' && field) {
+      if ((extension === '.md' || extension === '.mdx') && field) {
         if (hasOwnProperty(contentObject, '$_body')) {
           const { $_body, ...rest } = contentObject
           data = rest
@@ -141,7 +141,7 @@ export class Database {
         throw new Error(`Unable to determine template`)
       }
       const field = template.fields.find((field) => {
-        if (field.type === 'string') {
+        if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
           }
@@ -149,7 +149,7 @@ export class Database {
         return false
       })
       let payload: { [key: string]: unknown } = {}
-      if (collection.format === 'md' && field) {
+      if (['md', 'mdx'].includes(collection.format) && field) {
         Object.entries(data).forEach(([key, value]) => {
           if (key !== field.name) {
             payload[key] = value
@@ -252,6 +252,7 @@ export class Database {
   ): string => {
     switch (format) {
       case '.markdown':
+      case '.mdx':
       case '.md':
         // @ts-ignore
         const { _id, _template, _collection, $_body, ...rest } = content
@@ -259,7 +260,7 @@ export class Database {
         if (keepTemplateKey) {
           extra['_template'] = _template
         }
-        return matter.stringify($_body || '', { ...rest, ...extra })
+        return matter.stringify(`\n${$_body}` || '\n', { ...rest, ...extra })
       case '.json':
         return JSON.stringify(content, null, 2)
       default:
@@ -274,6 +275,7 @@ export class Database {
   ): T => {
     switch (format) {
       case '.markdown':
+      case '.mdx':
       case '.md':
         const contentJSON = matter(content || '')
         const markdownData = {
@@ -300,7 +302,7 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(
   return obj.hasOwnProperty(prop)
 }
 
-type FormatType = 'json' | 'md' | 'markdown' | 'yml' | 'yaml'
+type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
 
 export type LookupMapType =
   | GlobalDocumentLookup
