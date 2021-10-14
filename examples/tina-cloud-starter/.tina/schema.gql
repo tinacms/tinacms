@@ -450,7 +450,43 @@ fragment AuthorsParts on Authors {
 
 fragment PagesParts on Pages {
   blocks {
-    __typename
+    ... on PagesBlocksHero {
+      tagline
+      headline
+      text
+      actions {
+        label
+        type
+        icon
+        link
+      }
+      image {
+        src
+        alt
+      }
+      color
+    }
+    ... on PagesBlocksFeatures {
+      items {
+        icon {
+          color
+          style
+          name
+        }
+        title
+        text
+      }
+      color
+    }
+    ... on PagesBlocksContent {
+      body
+      color
+    }
+    ... on PagesBlocksTestimonial {
+      quote
+      author
+      color
+    }
     ... on PagesBlocksHero
   }
 }
