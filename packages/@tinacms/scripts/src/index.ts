@@ -15,7 +15,7 @@ import { build } from 'vite'
 import { build as tsupbuild } from 'tsup'
 import { buildSync, build as esbuild } from 'esbuild'
 // import dts from 'vite-plugin-dts'
-// import { pnpPlugin } from '@yarnpkg/esbuild-plugin-pnp'
+import { pnpPlugin } from '@yarnpkg/esbuild-plugin-pnp'
 // import { build as esbuild } from 'esbuild'
 // import nodePolyfills from 'rollup-plugin-node-polyfills'
 import dts from 'rollup-plugin-dts'
@@ -189,13 +189,32 @@ const buildIt = async (entryPoint, packageJSON) => {
 
   external.forEach((ext) => (globals[ext] = 'NOOP'))
   if (target === 'node') {
-    await esbuild({
-      entryPoints: [path.join(process.cwd(), entry)],
-      bundle: true,
-      platform: 'node',
-      outdir: path.join(process.cwd(), 'dist'),
-      external,
-    })
+    if (packageJSON.name === '@tinacms/graphql') {
+      await esbuild({
+        plugins: [pnpPlugin()],
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        // FIXME: no idea why but even though I'm on node14 it doesn't like
+        // the syntax for optional chaining, should be supported on 14
+        // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
+        target: "node12",
+        outdir: path.join(process.cwd(), 'dist'),
+        external: external.filter(
+          (item) =>
+            !packageJSON.buildConfig.entryPoints[0].bundle.includes(item)
+        ),
+      })
+    } else {
+      await esbuild({
+        plugins: [pnpPlugin()],
+        entryPoints: [path.join(process.cwd(), entry)],
+        bundle: true,
+        platform: 'node',
+        outdir: path.join(process.cwd(), 'dist'),
+        external,
+      })
+    }
 
     const extension = path.extname(entry)
 
@@ -306,11 +325,15 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
   })
   if (args.watch) {
     console.log(`${chalk.blue(`Watching workspaces...`)}`)
-    chokidar.watch(workspacePkgs).on('change', async (path) => {
-      const packageLocator = pnp.findPackageLocator(path)
-      const packageInformation = pnp.getPackageInformation(packageLocator)
-      await run({ dir: packageInformation.packageLocation })
-    })
+    chokidar
+      .watch(workspacePkgs, {
+        ignored: '**/spec/**/*', // ignore dotfiles
+      })
+      .on('change', async (path) => {
+        const packageLocator = pnp.findPackageLocator(path)
+        const packageInformation = pnp.getPackageInformation(packageLocator)
+        await run({ dir: packageInformation.packageLocation })
+      })
   } else {
     console.log(`${chalk.blue(`Building workspaces...`)}`)
     const packagePathsToBuild = await fs

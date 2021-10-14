@@ -113,6 +113,12 @@ export const setupFixture = async (
   const expectedReponse = await fs
     .readFileSync(path.join(rootPath, 'requests', fixture, 'response.json'))
     .toString()
+  const expectedReponsePath = await path.join(
+    rootPath,
+    'requests',
+    fixture,
+    'response.json'
+  )
 
   const response = await resolve({
     query: request,
@@ -123,36 +129,58 @@ export const setupFixture = async (
     // console.log(response.errors)
   }
 
-  const mutations = await Promise.all(
-    Object.entries(JSON.parse(JSON.stringify(response?.data || {})))
-      .map(async ([queryName, result]) => {
-        const mutationPath = path.join(
-          rootPath,
-          'requests',
-          fixture,
-          'mutations',
-          queryName,
-          'request.gql'
-        )
-        if (fs.existsSync(mutationPath)) {
-          const request = await fs.readFileSync(mutationPath).toString()
-          // console.log(result.form.mutationInfo.string)
-          // console.log(request)
-          return {
-            // @ts-ignore
-            mutation: print(parse(result.form.mutationInfo.string)),
-            expectedMutation: print(parse(request)),
-          }
-        } else {
-          return false
-        }
-      })
-      .filter(Boolean)
-  )
-
   return {
     response,
     expectedReponse,
-    mutations,
+    expectedReponsePath,
+  }
+}
+
+export const setupFixture2 = async (
+  rootPath: string,
+  schema: TinaCloudSchema<false>,
+  fixture: { name: string; assert: 'output' | 'file' }
+) => {
+  const { database } = await setup(rootPath, schema)
+  const request = await fs
+    .readFileSync(path.join(rootPath, 'requests', fixture.name, 'request.gql'))
+    .toString()
+
+  let variables = {}
+  try {
+    variables = JSON.parse(
+      await fs
+        .readFileSync(
+          path.join(rootPath, 'requests', fixture.name, 'variables.json')
+        )
+        .toString()
+    )
+  } catch (e) {}
+  const expectedResponsePath = await path.join(
+    rootPath,
+    'requests',
+    fixture.name,
+    fixture.assert === 'file' ? 'response.md' : 'response.json'
+  )
+
+  const response = await resolve({
+    query: request,
+    variables,
+    database,
+  })
+
+  const responseString =
+    fixture.assert === 'file'
+      ? // @ts-ignore
+        await database.bridge.get(fixture.filename)
+      : `${JSON.stringify(response, null, 2)}\n`
+
+  if (response.errors) {
+    console.log(JSON.stringify(response.errors, null, 2))
+  }
+
+  return {
+    response: responseString,
+    expectedResponsePath,
   }
 }
