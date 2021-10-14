@@ -27,7 +27,8 @@ import { logger } from '../logger'
 
 export const generateTypes = async (
   schema: GraphQLSchema,
-  queryPathGlob = process.cwd()
+  queryPathGlob = process.cwd(),
+  fragDocPath = process.cwd()
 ) => {
   logger.info('Generating types...')
   try {
@@ -39,11 +40,14 @@ export const generateTypes = async (
       { loaders: [] }
     )
     let docs = []
+    let fragDocs = []
     try {
       docs = await loadDocuments(queryPathGlob, {
         loaders: [new GraphQLFileLoader()],
       })
-      // console.log({ docs })
+      fragDocs = await loadDocuments(fragDocPath, {
+        loaders: [new GraphQLFileLoader()],
+      })
     } catch (e) {
       console.error(e)
     }
@@ -52,7 +56,7 @@ export const generateTypes = async (
       // Filename is not used. This is because the typescript plugin returns a string instead of writing to a file.
       filename: process.cwd(),
       schema: parse(printSchema(schema)),
-      documents: [...docs, ...moreDocs],
+      documents: [...docs, ...moreDocs, ...fragDocs],
       config: {},
       plugins: [
         { typescript: {} },

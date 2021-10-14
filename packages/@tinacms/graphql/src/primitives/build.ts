@@ -37,7 +37,10 @@ export const indexDB = async ({ database, config }) => {
   const tinaSchema = await createSchema({ schema: config })
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
-  await fs.outputFileSync('.tina/schema.gql', print(graphQLSchema as ASTNode))
+  // await fs.outputFileSync(
+  //   '.tina/__generated__/schema.gql',
+  //   print(graphQLSchema as ASTNode)
+  // )
   await database.put('_graphql', graphQLSchema)
   await database.put('_schema', tinaSchema.schema)
 }
@@ -122,7 +125,18 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     ),
   }
 
-  console.log(print(doc))
+  const fragDoc = {
+    kind: 'Document' as const,
+    definitions: _.uniqBy(
+      // @ts-ignore
+      extractInlineTypes(fragmentDefinitionsFields),
+      (node) => node.name.value
+    ),
+  }
+  console.log(print(fragDoc))
+
+  const fragPath = process.cwd() + '/.tina/__generated__/frags.gql'
+  await fs.outputFileSync(fragPath, print(fragDoc))
 
   return doc
 }

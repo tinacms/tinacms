@@ -23,9 +23,10 @@ export async function genTypes(
   options
 ) {
   const typesPath = process.cwd() + '/.tina/__generated__/types.ts'
+  const fragPath = process.cwd() + '/.tina/__generated__/frags.gql'
   const queryPathGlob = process.cwd() + '/.tina/queries/**/*.{graphql,gql}'
 
-  const typescriptTypes = await generateTypes(schema, queryPathGlob)
+  const typescriptTypes = await generateTypes(schema, queryPathGlob, fragPath)
 
   await fs.outputFile(
     typesPath,

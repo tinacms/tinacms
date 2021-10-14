@@ -1,0 +1,85 @@
+fragment PostsParts on Posts {
+  title
+  author
+  date
+  heroImg
+  excerpt
+  _body
+}
+
+fragment GlobalParts on Global {
+  header {
+    icon {
+      color
+      style
+      name
+    }
+    color
+    nav {
+      href
+      label
+    }
+  }
+  footer {
+    color
+    social {
+      facebook
+      twitter
+      instagram
+      github
+    }
+  }
+  theme {
+    color
+    font
+    icon
+    darkMode
+  }
+}
+
+fragment AuthorsParts on Authors {
+  name
+  avatar
+}
+
+fragment PagesParts on Pages {
+  blocks {
+    ... on PagesBlocksHero {
+      tagline
+      headline
+      text
+      actions {
+        label
+        type
+        icon
+        link
+      }
+      image {
+        src
+        alt
+      }
+      color
+    }
+    ... on PagesBlocksFeatures {
+      items {
+        icon {
+          color
+          style
+          name
+        }
+        title
+        text
+      }
+      color
+    }
+    ... on PagesBlocksContent {
+      body
+      color
+    }
+    ... on PagesBlocksTestimonial {
+      quote
+      author
+      color
+    }
+  }
+}
