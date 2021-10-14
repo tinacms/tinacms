@@ -1,5 +1,12 @@
 # tina-graphql
 
+## 0.55.1
+
+### Patch Changes
+
+- ff4446c8e: Adds `getDocumentFields()` query for use with Tina Admin
+- 667c33e2a: Add support for rich-text field, update build script to work with unified packages, which are ESM-only
+
 ## 0.55.0
 
 ### Minor Changes

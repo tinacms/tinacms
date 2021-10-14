@@ -1,5 +1,12 @@
 # tinacms
 
+## 0.56.1
+
+### Patch Changes
+
+- a05aa61bd: Fix issue where forms weren't being removed when the page unmounted
+  - @tinacms/toolkit@0.54.0
+
 ## 0.56.0
 
 ### Minor Changes
