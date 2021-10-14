@@ -5249,7 +5249,33 @@
               "kind": "Name",
               "value": "blocks"
             },
-            "kind": "Field"
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "__typename"
+                  }
+                },
+                {
+                  "kind": "InlineFragment",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": []
+                  },
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "PagesBlocksHero"
+                    }
+                  }
+                }
+              ]
+            }
           }
         ]
       }
