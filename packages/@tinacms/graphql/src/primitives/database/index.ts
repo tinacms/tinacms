@@ -260,7 +260,10 @@ export class Database {
         if (keepTemplateKey) {
           extra['_template'] = _template
         }
-        return matter.stringify(`\n${$_body}` || '\n', { ...rest, ...extra })
+        return matter.stringify(
+          typeof $_body === 'undefined' ? '' : `\n${$_body}`,
+          { ...rest, ...extra }
+        )
       case '.json':
         return JSON.stringify(content, null, 2)
       default:
