@@ -4,7 +4,7 @@ import { print, ASTNode, DefinitionNode } from 'graphql'
 
 export const AddGeneratedClientFunc: PluginFunction = (
   schema,
-  _documents,
+  documents,
   _config,
   _info
 ) => {

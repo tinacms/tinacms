@@ -86,48 +86,8 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   await sequential(collections, async (collection) => {
     const collectionAST = await builder.collectionDocument(collection)
     const test = await builder.collectionFragment(collection)
-    console.log({ test })
+    // console.log({ test })
     test && fragmentDefinitionsFields.push(test)
-
-    // console.log({ collectionAST })
-    const typeName = collectionAST.type.type.name.value.name.value
-    // console.log({ typeName })
-
-    const fields: readonly SelectionNode[] =
-      collectionAST.type?.type?.name?.value?.fields?.find(
-        (x) => x.name.value === 'data'
-      )?.type?.type?.name?.value?.fields || ([] as readonly SelectionNode[])
-
-    // console.log({ fields })
-
-    // fields.forEach((x) => {
-    //   console.log(x)
-    // })
-
-    // fragmentDefinitionsFields.push({
-    //   kind: 'FragmentDefinition',
-    //   name: {
-    //     kind: 'Name',
-    //     value: typeName + 'Parts',
-    //   },
-    //   typeCondition: {
-    //     kind: 'NamedType',
-    //     name: {
-    //       kind: 'Name',
-    //       value: typeName,
-    //     },
-    //   },
-    //   directives: [],
-    //   selectionSet: {
-    //     kind: 'SelectionSet',
-    //     selections: fields.map((x) => ({
-    //       kind: 'Field',
-    //       name: x.name,
-    //       arguments: x.arguments || [],
-    //       directives: [],
-    //     })),
-    //   },
-    // })
 
     queryTypeDefinitionFields.push(collectionAST)
 
@@ -154,7 +114,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
 
   definitions.push(...fragmentDefinitionsFields)
   const doc = {
-    kind: 'Document',
+    kind: 'Document' as const,
     definitions: _.uniqBy(
       // @ts-ignore
       extractInlineTypes(definitions),
