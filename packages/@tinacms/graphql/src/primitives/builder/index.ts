@@ -481,10 +481,10 @@ export class Builder {
           }
         }
       case 'ListType':
-        console.log('this is a list type')
-        console.log({ type: field.type.type.name.value })
-        console.log({ nameStr: field.type.type.name.value.kind })
-        console.log({ field })
+        // console.log('this is a list type')
+        // console.log({ type: field.type.type.name.value })
+        // console.log({ nameStr: field.type.type.name.value.kind })
+        // console.log({ field })
 
         if (field.type.type.name.value.kind === 'ObjectTypeDefinition') {
           // this is an object definition type (no templates)
@@ -504,6 +504,36 @@ export class Builder {
           }
         } else if (field.type.type.name.value.kind === 'UnionTypeDefinition') {
           // TODO: handle "templates"
+          const types = field.type.type.name.value
+          console.log({ types })
+          console.log({ test: types.types[0] })
+
+          // TODO: Iterate over all the types and return this for each of them
+          return {
+            name: field.name,
+            kind: 'Field' as const,
+            selectionSet: {
+              kind: 'SelectionSet' as const,
+              selections: [
+                {
+                  kind: 'Field' as const,
+                  name: { kind: 'Name' as const, value: '__typename' },
+                },
+                {
+                  kind: 'InlineFragment' as const,
+                  selectionSet: {
+                    kind: 'SelectionSet' as const,
+                    // TODO: Iterate over all the fields of each type and add them here
+                    selections: [],
+                  },
+                  typeCondition: {
+                    kind: 'NamedType' as const,
+                    name: types.types[0].name,
+                  },
+                },
+              ],
+            },
+          }
         }
 
         return {

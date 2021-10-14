@@ -449,5 +449,8 @@ fragment AuthorsParts on Authors {
 }
 
 fragment PagesParts on Pages {
-  blocks
+  blocks {
+    __typename
+    ... on PagesBlocksHero
+  }
 }
