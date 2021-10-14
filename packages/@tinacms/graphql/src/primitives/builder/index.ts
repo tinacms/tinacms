@@ -504,9 +504,21 @@ export class Builder {
           }
         } else if (field.type.type.name.value.kind === 'UnionTypeDefinition') {
           // TODO: handle "templates"
-          const types = field.type.type.name.value
+          const types = field.type.type.name.value.types
           console.log({ types })
-          console.log({ test: types.types[0] })
+
+          const selections = [
+            // {
+            //   kind: 'Field' as const,
+            //   name: { kind: 'Name' as const, value: '__typename' },
+            // },
+          ]
+
+          await sequential(types, async (type) => {
+            const test = await this.buildInlineFragment(type)
+            console.log({ test })
+            selections.push(test)
+          })
 
           // TODO: Iterate over all the types and return this for each of them
           return {
@@ -515,10 +527,7 @@ export class Builder {
             selectionSet: {
               kind: 'SelectionSet' as const,
               selections: [
-                {
-                  kind: 'Field' as const,
-                  name: { kind: 'Name' as const, value: '__typename' },
-                },
+                ...selections,
                 {
                   kind: 'InlineFragment' as const,
                   selectionSet: {
@@ -528,7 +537,7 @@ export class Builder {
                   },
                   typeCondition: {
                     kind: 'NamedType' as const,
-                    name: types.types[0].name,
+                    name: types[0].name,
                   },
                 },
               ],
@@ -547,22 +556,29 @@ export class Builder {
       name: field.name,
       kind: 'Field' as const,
     } as FieldNode
-    // if (typeof field.type.name === 'string') {
-    // return {
-    //   name: field.name,
-    //   kind: 'Field',
-    // } as FieldNode
-    // }
+  }
 
-    // console.log({ field })
-    // console.log({ name: field.type.name })
-    // if (field.type.type) {
-    // return this.buildField(field.type.type)
-    // console.log({ type: field.type.type })
-    // const feilds = field.type.type.name.value
-    // console.log({ feilds })
-    // } else {
-    // }
+  private async buildInlineFragment(type) {
+    console.log({ type })
+    console.log({ fields: type.name.value.fields })
+    const fields = type.name.value.fields
+    const selections = []
+
+    await sequential(fields || [], async (item) => {
+      const field = await this.buildField(item as FieldDefinitionNode)
+      selections.push(field)
+    })
+    return {
+      kind: 'InlineFragment' as const,
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections,
+      },
+      typeCondition: {
+        kind: 'NamedType' as const,
+        name: type.name,
+      },
+    }
   }
 
   /**
