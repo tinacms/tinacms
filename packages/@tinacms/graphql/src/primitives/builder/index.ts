@@ -457,6 +457,7 @@ export class Builder {
     switch (field.type.kind) {
       case 'NamedType':
         if (typeof field.type.name.value === 'string') {
+          console.log({ field: JSON.stringify(field, null, 2) })
           return {
             name: field.name,
             kind: 'Field' as const,
