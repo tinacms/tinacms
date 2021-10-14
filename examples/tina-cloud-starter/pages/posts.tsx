@@ -23,10 +23,7 @@ export default function HomePage(
 export const getStaticProps = async () => {
   const client = getTinaClient();
 
-  const post = (await client.GetPost({ path: "voteForPedro.md" }))
-    .getPostsDocument.data;
-
-  console.log({ post });
+  const globalData = await client.
 
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql

@@ -35,7 +35,6 @@ import type {
   Templateable,
 } from '../types'
 import { TinaSchema } from '../schema'
-import { buildSelectionInlineFragments } from './test'
 
 export const createBuilder = async ({
   database,
@@ -503,7 +502,6 @@ export class Builder {
             } as SelectionSetNode,
           }
         } else if (field.type.type.name.value.kind === 'UnionTypeDefinition') {
-          // TODO: handle "templates"
           const types = field.type.type.name.value.types
           console.log({ types })
 
@@ -526,21 +524,7 @@ export class Builder {
             kind: 'Field' as const,
             selectionSet: {
               kind: 'SelectionSet' as const,
-              selections: [
-                ...selections,
-                {
-                  kind: 'InlineFragment' as const,
-                  selectionSet: {
-                    kind: 'SelectionSet' as const,
-                    // TODO: Iterate over all the fields of each type and add them here
-                    selections: [],
-                  },
-                  typeCondition: {
-                    kind: 'NamedType' as const,
-                    name: types[0].name,
-                  },
-                },
-              ],
+              selections: selections,
             },
           }
         }

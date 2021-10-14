@@ -5507,20 +5507,6 @@
                       "value": "PagesBlocksTestimonial"
                     }
                   }
-                },
-                {
-                  "kind": "InlineFragment",
-                  "selectionSet": {
-                    "kind": "SelectionSet",
-                    "selections": []
-                  },
-                  "typeCondition": {
-                    "kind": "NamedType",
-                    "name": {
-                      "kind": "Name",
-                      "value": "PagesBlocksHero"
-                    }
-                  }
                 }
               ]
             }

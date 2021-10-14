@@ -1,10 +1,15 @@
 query GetPost($path: String!) {
   getPostsDocument(relativePath: $path) {
-    ...getPostsDocumentParts
+    ...getPostsDocumentPartsThisIsATest
+  }
+}
+query getGlobalDoc {
+  getPagesDocument(relativePath: "home.md") {
+    ...GlobalParts
   }
 }
 
-fragment getPostsDocumentParts on PostsDocument {
+fragment getPostsDocumentPartsThisIsATest on PostsDocument {
   id
   data {
     title

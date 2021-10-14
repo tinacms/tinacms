@@ -6,6 +6,6 @@ query GetSomething {
 
 query GetPostsTesting2($path: String!) {
   getPostsDocument(relativePath: $path) {
-    ...getPostsDocumentParts
+    ...getPostsDocumentPartsThisIsATest
   }
 }
