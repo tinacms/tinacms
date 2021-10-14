@@ -17,7 +17,7 @@ import { astBuilder, NAMER } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
 
-import type {
+import {
   UnionTypeDefinitionNode,
   ObjectTypeDefinitionNode,
   TypeDefinitionNode,
@@ -25,6 +25,7 @@ import type {
   FieldDefinitionNode,
   FieldNode,
   SelectionSetNode,
+  getNamedType,
 } from 'graphql'
 import type {
   TinaCloudCollectionEnriched,
@@ -34,6 +35,7 @@ import type {
   Templateable,
 } from '../types'
 import { TinaSchema } from '../schema'
+import { buildSelectionInlineFragments } from './test'
 
 export const createBuilder = async ({
   database,
@@ -403,6 +405,7 @@ export class Builder {
     const types = await this._buildObjectOrUnionData(
       this.tinaSchema.getTemplatesForCollectable(collection)
     )
+
     if (types.kind === 'ObjectTypeDefinition') {
       const fields: FieldDefinitionNode[] =
         types.fields as FieldDefinitionNode[]
@@ -421,39 +424,27 @@ export class Builder {
     const selections = []
 
     await sequential(fields, async (x) => {
-      // const field = {
-      //   name: x.name,
-      //   kind: 'Field',
-      // }
-
       const field = await this.buildField(x)
-      // field && selections.push(field)
       selections.push(field)
     })
 
-    // console.log({ selections })
-
-    // if (selections.length === 0) {
-    //   return false
-    // }
-
     return {
-      kind: 'FragmentDefinition',
+      kind: 'FragmentDefinition' as const,
       name: {
-        kind: 'Name',
+        kind: 'Name' as const,
         value: name + 'Parts',
       },
       typeCondition: {
-        kind: 'NamedType',
+        kind: 'NamedType' as const,
         name: {
-          kind: 'Name',
+          kind: 'Name' as const,
           value: name,
         },
       },
       directives: [],
       selectionSet: {
-        kind: 'SelectionSet',
-        selections: selections.filter((x) => new Boolean(x)),
+        kind: 'SelectionSet' as const,
+        selections,
       },
     }
   }
@@ -463,61 +454,68 @@ export class Builder {
   ) => Promise<false | SelectionSetNode | FieldNode> = async (
     field: FieldDefinitionNode
   ) => {
-    // return {
-    //   name: field.name,
-    //   kind: 'Field',
-    // }
     // Look to see if it is a list ot named type
-
     switch (field.type.kind) {
       case 'NamedType':
         if (typeof field.type.name.value === 'string') {
-          console.log({ nameSrt: field.type.name.value })
           return {
             name: field.name,
-            kind: 'Field',
+            kind: 'Field' as const,
           } as FieldNode
         } else {
-          console.log({ nameObj: field.type.name.value })
-          // console.log(field.type.name.value.types)
           const selections = []
-
           await sequential(
             field?.type?.name?.value?.fields || [],
             async (item) => {
-              const field = await this.buildField(item)
+              const field = await this.buildField(item as FieldDefinitionNode)
               selections.push(field)
             }
           )
-          // field?.type?.name?.value?.fields?.map((field) =>
-          //   this.buildField(field)
-          // ) || []
-
-          console.log({ selections })
           return {
             name: field.name,
-            kind: 'Field',
+            kind: 'Field' as const,
             selectionSet: {
-              kind: 'SelectionSet',
+              kind: 'SelectionSet' as const,
               selections: selections,
             } as SelectionSetNode,
           }
-          return {
-            name: field.name,
-            kind: 'Field',
-          } as FieldNode
         }
       case 'ListType':
+        console.log('this is a list type')
+        console.log({ type: field.type.type.name.value })
+        console.log({ nameStr: field.type.type.name.value.kind })
+        console.log({ field })
+
+        if (field.type.type.name.value.kind === 'ObjectTypeDefinition') {
+          // this is an object definition type (no templates)
+          const fields = field.type.type.name.value.fields
+          const selections = []
+          await sequential(fields || [], async (item) => {
+            const field = await this.buildField(item as FieldDefinitionNode)
+            selections.push(field)
+          })
+          return {
+            name: field.name,
+            kind: 'Field' as const,
+            selectionSet: {
+              kind: 'SelectionSet' as const,
+              selections: selections,
+            } as SelectionSetNode,
+          }
+        } else if (field.type.type.name.value.kind === 'UnionTypeDefinition') {
+          // TODO: handle "templates"
+        }
+
         return {
           name: field.name,
-          kind: 'Field',
+          kind: 'Field' as const,
         } as FieldNode
     }
 
     console.log('this should never happen')
     return {
       name: field.name,
-      kind: 'Field',
+      kind: 'Field' as const,
     } as FieldNode
     // if (typeof field.type.name === 'string') {
     // return {

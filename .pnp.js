@@ -11229,6 +11229,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["jest-matcher-utils", "npm:27.0.6"],
             ["js-yaml", "npm:3.14.1"],
             ["lodash", "npm:4.17.21"],
+            ["lodash.set", "npm:4.3.2"],
             ["lru-cache", "npm:6.0.0"],
             ["nodemon", "npm:2.0.12"],
             ["normalize-path", "npm:3.0.0"],

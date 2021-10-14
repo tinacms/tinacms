@@ -421,7 +421,10 @@ fragment GlobalParts on Global {
       name
     }
     color
-    nav
+    nav {
+      href
+      label
+    }
   }
   footer {
     color

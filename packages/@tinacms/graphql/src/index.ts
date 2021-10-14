@@ -40,6 +40,7 @@ import type {
   TinaFieldBase,
 } from './primitives/types'
 
+export * from './primitives/builder/test'
 export type TinaCloudSchema = TinaCloudSchemaBase<false>
 // Alias to remove Cloud
 export type TinaSchema = TinaCloudSchema

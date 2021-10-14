@@ -5067,7 +5067,26 @@
                     "kind": "Name",
                     "value": "nav"
                   },
-                  "kind": "Field"
+                  "kind": "Field",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "href"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "label"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  }
                 }
               ]
             }
