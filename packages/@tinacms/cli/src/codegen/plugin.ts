@@ -8,7 +8,6 @@ export const AddGeneratedClientFunc: PluginFunction = (
   _config,
   _info
 ) => {
-  // console.log({ schema })
   const typeMap = schema.getTypeMap()
 
   const types = Object.keys(typeMap)
@@ -16,35 +15,6 @@ export const AddGeneratedClientFunc: PluginFunction = (
   const fieldsKeys = Object.keys(fields)
 
   const defs: DefinitionNode[] = []
-  // defs.push({
-  //   kind: 'FragmentDefinition',
-  //   name: {
-  //     kind: 'Name',
-  //     value: 'getPostsDocumentParts',
-  //   },
-  //   typeCondition: {
-  //     kind: 'NamedType',
-  //     name: {
-  //       kind: 'Name',
-  //       value: 'PostsDocument',
-  //     },
-  //   },
-  //   directives: [],
-  //   selectionSet: {
-  //     kind: 'SelectionSet',
-  //     selections: [
-  //       {
-  //         kind: 'Field',
-  //         name: {
-  //           kind: 'Name',
-  //           value: 'form',
-  //         },
-  //         arguments: [],
-  //         directives: [],
-  //       },
-  //     ],
-  //   },
-  // })
 
   fieldsKeys.forEach((key) => {
     const test = fields[key].type.toJSON().replace('!', '')

@@ -4,7 +4,7 @@ query GetPost($path: String!) {
   }
 }
 query getGlobalDoc {
-  getPagesDocument(relativePath: "home.md") {
+  getGlobalDocument(relativePath: "home.md") {
     ...GlobalParts
   }
 }
