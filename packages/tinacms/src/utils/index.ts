@@ -15,6 +15,7 @@ import { Client, LocalClient } from '../client'
 import type { TinaIOConfig } from '../client'
 import * as yup from 'yup'
 
+export * from './client'
 export interface CreateClientProps {
   clientId?: string
   isLocalClient?: boolean
