@@ -22108,6 +22108,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"react-icons@npm:^4.3.1":
+  version: 4.3.1
+  resolution: "react-icons@npm:4.3.1"
+  peerDependencies:
+    react: "*"
+  checksum: f79f43257de99b082731ebb5814bb3688d7e896d4497344c6f207480a21a7de6a3ca8b80a4bba3142d4096532179619056bbdd6cfc1214a6769068256ca5c995
+  languageName: node
+  linkType: hard
+
 "react-is@npm:16.13.1, react-is@npm:^16.12.0, react-is@npm:^16.13.1, react-is@npm:^16.6.0, react-is@npm:^16.7.0, react-is@npm:^16.8.1, react-is@npm:^16.8.3, react-is@npm:^16.8.6":
   version: 16.13.1
   resolution: "react-is@npm:16.13.1"
@@ -25866,6 +25875,7 @@ resolve@^2.0.0-next.3:
     prop-types: 15.7.2
     react: 16.13.1
     react-dom: 16.13.1
+    react-icons: ^4.3.1
     react-router-dom: ^5.3.0
     styled-components: ^5.2.0
     ts-jest: ^26.5.3
