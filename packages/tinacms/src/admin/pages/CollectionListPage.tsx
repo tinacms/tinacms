@@ -16,8 +16,6 @@ const CollectionListPage = () => {
   const location = useLocation()
   const { collectionName } = useParams()
 
-  console.log('collectionName', collectionName)
-
   return (
     <GetCMS>
       {(cms) => (
