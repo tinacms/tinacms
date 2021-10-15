@@ -1,6 +1,6 @@
 import React from 'react'
 import { Form, FormBuilder } from '@tinacms/toolkit'
-import { useParams, useHistory } from 'react-router-dom'
+import { useParams, useHistory, Link } from 'react-router-dom'
 
 import useGetDocumentFields from '../hooks/useGetDocumentFields'
 
@@ -65,10 +65,17 @@ const CollectionCreatePage = () => {
               },
             })
             return (
-              <div>
-                <h3 className="text-2xl">{collection.label}</h3>
+              <>
+                <h3 className="text-xl mb-6">
+                  <Link passHref to={`/admin/collections/${collection.name}`}>
+                    <a className="opacity-80 hover:opacity-100 transition-opacity ease-out">
+                      {collection.label}
+                    </a>
+                  </Link>{' '}
+                  - Create New
+                </h3>
                 <FormBuilder form={form} />
-              </div>
+              </>
             )
           }}
         </GetDocumentFields>
