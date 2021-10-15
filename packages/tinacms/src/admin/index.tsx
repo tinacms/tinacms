@@ -67,7 +67,7 @@ export const TinaAdmin = () => {
                           </ul>
                         </div>
                       </div>
-                      <div className="px-6 py-10 flex-1 flex justify-center h-screen">
+                      <div className="px-6 py-14 flex-1 flex justify-center h-screen">
                         <div className="max-w-screen-md w-full h-screen">
                           <Switch>
                             <Route
