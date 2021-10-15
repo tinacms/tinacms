@@ -96,7 +96,7 @@ export async function init(args: any) {
     logger.info(
       logText(`
 You can get help on any command with "-h" or "--help".
-e.g: "forestry types:gen --help"
+e.g: "tinacms server:start --help"
     `)
     )
   })
