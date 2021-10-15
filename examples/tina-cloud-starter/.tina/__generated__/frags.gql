@@ -1,6 +1,5 @@
 fragment PostsParts on Posts {
   title
-  author
   date
   heroImg
   excerpt
@@ -8,6 +7,7 @@ fragment PostsParts on Posts {
 }
 
 fragment GlobalParts on Global {
+  test
   header {
     icon {
       color

@@ -23,6 +23,12 @@ export default function HomePage(
 export const getStaticProps = async () => {
   const client = getTinaClient();
 
+  const data = await client.getGlobalDoc();
+
+  data.getGlobalDocument.data;
+
+  console.log({ data: data.getGlobalDocument.data });
+
   // const globalData = await client.userQueries.getPostsLogan
 
   const tinaProps = (await getStaticPropsForTina({

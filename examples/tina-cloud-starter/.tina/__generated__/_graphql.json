@@ -2141,6 +2141,21 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
+            "value": "test"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
             "value": "header"
           },
           "arguments": [],
@@ -4334,6 +4349,20 @@
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
+            "value": "test"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
             "value": "header"
           },
           "type": {
@@ -4957,17 +4986,6 @@
           {
             "name": {
               "kind": "Name",
-              "value": "author"
-            },
-            "kind": "Field",
-            "selectionSet": {
-              "kind": "SelectionSet",
-              "selections": []
-            }
-          },
-          {
-            "name": {
-              "kind": "Name",
               "value": "date"
             },
             "kind": "Field"
@@ -5013,6 +5031,13 @@
       "selectionSet": {
         "kind": "SelectionSet",
         "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "test"
+            },
+            "kind": "Field"
+          },
           {
             "name": {
               "kind": "Name",
