@@ -148,6 +148,7 @@ type GlobalTheme {
 }
 
 type Global {
+  test: String
   header: GlobalHeader
   footer: GlobalFooter
   theme: GlobalTheme
@@ -335,6 +336,7 @@ input GlobalThemeMutation {
 }
 
 input GlobalMutation {
+  test: String
   header: GlobalHeaderMutation
   footer: GlobalFooterMutation
   theme: GlobalThemeMutation

@@ -4,8 +4,10 @@ query GetPost($path: String!) {
   }
 }
 query getGlobalDoc {
-  getGlobalDocument(relativePath: "home.md") {
-    ...GlobalParts
+  getGlobalDocument(relativePath: "index.json") {
+    data {
+      ...GlobalParts
+    }
   }
 }
 

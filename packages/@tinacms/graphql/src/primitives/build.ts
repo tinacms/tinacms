@@ -89,7 +89,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   await sequential(collections, async (collection) => {
     const collectionAST = await builder.collectionDocument(collection)
     const test = await builder.collectionFragment(collection)
-    // console.log({ test })
     test && fragmentDefinitionsFields.push(test)
 
     queryTypeDefinitionFields.push(collectionAST)
@@ -133,8 +132,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
-  console.log(print(fragDoc))
-
   const fragPath = process.cwd() + '/.tina/__generated__/frags.gql'
   await fs.outputFileSync(fragPath, print(fragDoc))
 

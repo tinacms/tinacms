@@ -84,6 +84,15 @@
       "path": "content/global",
       "fields": [
         {
+          "name": "test",
+          "label": "Test",
+          "type": "string",
+          "namespace": [
+            "global",
+            "test"
+          ]
+        },
+        {
           "type": "object",
           "label": "Header",
           "name": "header",
