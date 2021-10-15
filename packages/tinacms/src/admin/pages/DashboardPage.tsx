@@ -1,7 +1,7 @@
 import React from 'react'
 
 const DashboardPage = () => {
-  return <div>Dashboard Page</div>
+  return <h3 className="text-4xl">Welcome</h3>
 }
 
 export default DashboardPage

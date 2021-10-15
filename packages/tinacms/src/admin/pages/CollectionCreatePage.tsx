@@ -66,9 +66,7 @@ const CollectionCreatePage = () => {
             })
             return (
               <div>
-                <h1>Collection Create Page</h1>
-                <h2>{collection.label}</h2>
-                <br />
+                <h3 className="text-2xl">{collection.label}</h3>
                 <FormBuilder form={form} />
               </div>
             )

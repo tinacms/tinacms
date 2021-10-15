@@ -10,7 +10,7 @@ const Layout = ({ children }) => {
         width: '100%',
         height: '100%',
         overflow: 'auto',
-        background: 'white',
+        background: '#F6F6F9',
         zIndex: 9999,
       }}
     >
