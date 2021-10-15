@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.56.2
+
+### Patch Changes
+
+- 84a86358f: Fix bug which reset the form onChange for GraphQL forms
+
 ## 0.56.1
 
 ### Patch Changes
