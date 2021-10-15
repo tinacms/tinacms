@@ -1,4 +1,4 @@
-import { getStaticPropsForTina } from "tinacms";
+import { getStaticPropsForTina, TinaGQLClient } from "tinacms";
 import { Container } from "../components/container";
 import { Section } from "../components/section";
 import { Posts } from "../components/posts";
@@ -21,13 +21,20 @@ export default function HomePage(
 }
 
 export const getStaticProps = async () => {
-  const client = getTinaClient();
+  const test = new TinaGQLClient();
 
-  const data = await client.getGlobalDoc();
+  test
+    .getAuthorDocument({ relativePath: "Pedro.md" })
+    .gePostsDocument({ relativePath: "VoteForPedro.md" });
 
-  data.getGlobalDocument.data;
+  console.log(test.query);
+  // const client = getTinaClient();
 
-  console.log({ data: data.getGlobalDocument.data });
+  // const data = await client.GetPost({path});
+
+  // data.getGlobalDocument.data;
+
+  // console.log({ data: data.getGlobalDocument.data });
 
   // const globalData = await client.userQueries.getPostsLogan
 
