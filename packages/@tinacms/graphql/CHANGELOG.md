@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.55.2
+
+### Patch Changes
+
+- 9ecb392ca: Fix bug which would set markdown body to undefined when the payload was emptry"
+
 ## 0.55.1
 
 ### Patch Changes
