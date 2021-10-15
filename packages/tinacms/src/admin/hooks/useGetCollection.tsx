@@ -13,7 +13,7 @@ const useGetCollection = (cms, collectionName) => {
     }
 
     fetchCollection()
-  }, [cms])
+  }, [cms, collectionName])
 
   return collection
 }
