@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.54.1
+
+### Patch Changes
+
+- b961c7417: Adjust z-index for global menu so it sits overtop of nested form panels
+
 ## 0.54.0
 
 ### Minor Changes

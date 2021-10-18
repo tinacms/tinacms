@@ -137,20 +137,6 @@ export function useGraphqlForms<T extends object>({
     }
   }, [pendingReset])
 
-  // FIXME: Remove form plugins on unmount
-  // we're violating the rule of hooks depdendencies
-  // probably should be using a state machine here
-  React.useEffect(() => {
-    return () => {
-      Object.keys(data || {}).forEach((name) => {
-        const formPlugin = cms.forms.find(name)
-        if (formPlugin) {
-          cms.forms.remove(formPlugin)
-        }
-      })
-    }
-  }, [JSON.stringify(data)])
-
   React.useEffect(() => {
     setIsLoading(true)
     cms.api.tina
