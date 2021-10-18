@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { FC } from 'react'
+import React from 'react'
 import { Form, FormBuilder } from '@tinacms/toolkit'
 import { useParams, useHistory, Link } from 'react-router-dom'
 
@@ -28,7 +28,7 @@ const GetDocumentFields = ({
 }: {
   cms: TinaCMS
   collectionName: string
-  children: FC<any>
+  children: any
 }) => {
   const { collection, fields } = useGetDocumentFields(cms, collectionName)
   if (!collection || !fields) {

@@ -26,13 +26,7 @@ import DashboardPage from './pages/DashboardPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionListPage from './pages/CollectionListPage'
 
-const GetCollections = ({
-  cms,
-  children,
-}: {
-  cms: TinaCMS
-  children: FC<any[]>
-}) => {
+const GetCollections = ({ cms, children }: { cms: TinaCMS; children: any }) => {
   const collections = useGetCollections(cms)
   if (!collections) return null
   return <>{children(collections)}</>
