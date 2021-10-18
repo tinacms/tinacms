@@ -20,6 +20,8 @@ export interface CreateClientProps {
   clientId?: string
   isLocalClient?: boolean
   tinaioConfig?: TinaIOConfig
+  owner?: string,
+  repo?: string,
   branch?: string
 }
 export const createClient = ({

@@ -42,7 +42,6 @@ export const Post = ({ data }) => {
             {data.title}
           </span>
         </h2>
-
         <div
           data-tinafield="author"
           className="flex items-center justify-center mb-16"

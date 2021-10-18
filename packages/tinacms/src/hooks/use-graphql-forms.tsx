@@ -39,6 +39,8 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
+  const [formNames, setFormNames] = React.useState([])
+
   /**
    * FIXME: this design is pretty flaky, but better than what
    * we've had previously. The way it works is we update `formValues`
@@ -84,7 +86,7 @@ export function useGraphqlForms<T extends object>({
       }
       if (activeForm?.paths) {
         const asyncUpdate = activeForm.paths?.find(
-          (p) => p.dataPath.join('.') === newUpdate.set
+          (p) => p.dataPath.join('.') === newUpdate.setReference
         )
         if (asyncUpdate) {
           const res = await cms.api.tina.request(asyncUpdate.queryString, {
@@ -234,10 +236,27 @@ export function useGraphqlForms<T extends object>({
           }
           const { change } = form.finalForm
           form.finalForm.change = (name, value) => {
+            /**
+             * Reference paths returned from the server don't include array values
+             * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
+             * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
+             */
+            let referenceName = ''
+            if (typeof name === 'string') {
+              referenceName = name
+                .split('.')
+                .filter((item) => isNaN(Number(item)))
+                .join('.')
+            } else {
+              throw new Error(
+                `Expected name to be of type string for FinalForm change callback`
+              )
+            }
             setNewUpdate({
               queryName,
               get: [queryName, 'values', name].join('.'),
               set: [queryName, 'data', name].join('.'),
+              setReference: [queryName, 'data', referenceName].join('.'),
             })
             return change(name, value)
           }
@@ -248,10 +267,15 @@ export function useGraphqlForms<T extends object>({
             if (lookup) {
               extra['lookup'] = lookup
             }
+            const referenceName = name
+              .split('.')
+              .filter((item) => isNaN(Number(item)))
+              .join('.')
             setNewUpdate({
               queryName,
               get: [queryName, 'values', name].join('.'),
               set: [queryName, 'data', name].join('.'),
+              setReference: [queryName, 'data', referenceName].join('.'),
               ...extra,
             })
           }
@@ -405,5 +429,6 @@ type NewUpdate = {
   queryName: string
   get: string
   set: string
+  setReference?: string
   lookup?: string
 }

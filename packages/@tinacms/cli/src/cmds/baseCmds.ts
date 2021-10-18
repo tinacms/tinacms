@@ -47,6 +47,10 @@ const experimentalCommand = {
   name: '--experimental',
   description: 'Run the unstable version of this service',
 }
+const noWatchOption = {
+  name: '--noWatch',
+  description: 'Don\'t regenerate config on file changes'
+}
 const pathOption = {
   name: '--root',
   description:
@@ -57,7 +61,7 @@ export const baseCmds: Command[] = [
   {
     command: CMD_START_SERVER,
     description: 'Start Filesystem Graphql Server',
-    options: [startServerPortOption, subCommand, experimentalCommand],
+    options: [startServerPortOption, subCommand, experimentalCommand, noWatchOption],
     action: options => chain([startServer], options),
   },
   {

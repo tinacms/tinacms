@@ -1,5 +1,23 @@
 # Change Log
 
+## 0.51.0
+
+### Minor Changes
+
+- b59f23295: Fixed issue where heading button would not work in the WYSIWYG editor when using react 17
+
+### Patch Changes
+
+- Updated dependencies [9213d5608]
+- Updated dependencies [b59f23295]
+- Updated dependencies [a419056b6]
+- Updated dependencies [ded8dfbee]
+- Updated dependencies [5df9fe543]
+- Updated dependencies [9d68b058f]
+- Updated dependencies [91cebe5bc]
+  - @tinacms/toolkit@0.54.0
+  - next-tinacms-markdown@0.50.1
+
 ## 0.50.8
 
 ### Patch Changes
