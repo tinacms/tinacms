@@ -1,12 +1,22 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { Form, FormBuilder } from '@tinacms/toolkit'
 import { useParams, useHistory, Link } from 'react-router-dom'
+
+import type { TinaCMS } from '@tinacms/toolkit'
 
 import useGetDocumentFields from '../hooks/useGetDocumentFields'
 
 import GetCMS from '../components/GetCMS'
 
-const GetDocumentFields = ({ cms, collectionName, children }) => {
+const GetDocumentFields = ({
+  cms,
+  collectionName,
+  children,
+}: {
+  cms: TinaCMS
+  collectionName: string
+  children: FC<any>
+}) => {
   const { collection, fields } = useGetDocumentFields(cms, collectionName)
   if (!collection || !fields) {
     return null
@@ -14,7 +24,11 @@ const GetDocumentFields = ({ cms, collectionName, children }) => {
   return <>{children(collection, fields)}</>
 }
 
-const createDocument = async (cms, collection, values) => {
+const createDocument = async (
+  cms: TinaCMS,
+  collection: { name: string },
+  values: any
+) => {
   const { relativePath, ...params } = values
 
   await cms.api.tina.request(
@@ -41,7 +55,7 @@ const CollectionCreatePage = () => {
 
   return (
     <GetCMS>
-      {(cms) => (
+      {(cms: TinaCMS) => (
         <GetDocumentFields cms={cms} collectionName={collectionName}>
           {(collection, fields) => {
             const form = new Form({
@@ -53,7 +67,7 @@ const CollectionCreatePage = () => {
                   label: 'Relative Path',
                   component: 'text',
                   required: true,
-                  defaultValue: `${collection.name}-${Date.now()}.${
+                  defaultValue: `${collection.name}${Date.now()}.${
                     collection.format
                   }`,
                 },
@@ -67,10 +81,11 @@ const CollectionCreatePage = () => {
             return (
               <>
                 <h3 className="text-xl mb-6">
-                  <Link passHref to={`/admin/collections/${collection.name}`}>
-                    <a className="opacity-80 hover:opacity-100 transition-opacity ease-out">
-                      {collection.label}
-                    </a>
+                  <Link
+                    className="opacity-80 hover:opacity-100 transition-opacity ease-out"
+                    to={`/admin/collections/${collection.name}`}
+                  >
+                    {collection.label}
                   </Link>{' '}
                   - Create New
                 </h3>

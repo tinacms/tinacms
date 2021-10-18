@@ -1,20 +1,29 @@
 import { useState, useEffect } from 'react'
+import type { TinaCMS } from '@tinacms/toolkit'
 
-const useGetDocumentFields = (cms, collectionName) => {
-  const [info, setInfo] = useState({
+interface GetDocumentFields {
+  [collectionName: string]: { collection: Object; fields: Object[] }
+}
+export interface Info {
+  collection: Object | undefined
+  fields: Object[] | undefined
+}
+
+const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
+  const [info, setInfo] = useState<Info>({
     collection: undefined,
     fields: undefined,
   })
 
   useEffect(() => {
     const fetchDocumentFields = async () => {
-      const response = await cms.api.tina.request(
+      const response: GetDocumentFields = await cms.api.tina.request(
         `query { getDocumentFields }`,
         {}
       )
       const documentFields = response.getDocumentFields
-      const collection = documentFields[collectionName].collection
-      const fields = documentFields[collectionName].fields
+      const collection: Object = documentFields[collectionName].collection
+      const fields: Object[] = documentFields[collectionName].fields
 
       setInfo({
         collection,
@@ -23,7 +32,7 @@ const useGetDocumentFields = (cms, collectionName) => {
     }
 
     fetchDocumentFields()
-  }, [collectionName])
+  }, [cms, collectionName])
 
   return info
 }
