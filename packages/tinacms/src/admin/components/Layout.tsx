@@ -11,9 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { FC } from 'react'
+import React from 'react'
 
-const Layout = ({ children }: { children: FC<any> }) => {
+const Layout = ({ children }: { children: any }) => {
   return (
     <div
       style={{

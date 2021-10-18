@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import React, { FC } from 'react'
+import React from 'react'
 import { useParams, useLocation, Link } from 'react-router-dom'
 
 import type { TinaCMS } from '@tinacms/toolkit'
@@ -26,7 +26,7 @@ const GetCollection = ({
 }: {
   cms: TinaCMS
   collectionName: string
-  children: FC<any>
+  children: any
 }) => {
   const collection = useGetCollection(cms, collectionName)
   if (!collection) {
