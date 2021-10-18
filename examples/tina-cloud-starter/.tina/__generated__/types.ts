@@ -581,17 +581,17 @@ export type PagesMutation = {
   blocks?: Maybe<Array<Maybe<PagesBlocksMutation>>>;
 };
 
+export type GetGlobalDocQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetGlobalDocQuery = { __typename?: 'Query', getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', test?: Maybe<string>, header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } } };
+
 export type GetPostQueryVariables = Exact<{
   path: Scalars['String'];
 }>;
 
 
 export type GetPostQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
-
-export type GetGlobalDocQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetGlobalDocQuery = { __typename?: 'Query', getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', test?: Maybe<string>, header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } } };
 
 export type GetPostsDocumentPartsThisIsATestFragment = { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } };
 
@@ -734,13 +734,6 @@ export const PagesPartsFragmentDoc = gql`
   }
 }
     `;
-export const GetPostDocument = gql`
-    query GetPost($path: String!) {
-  getPostsDocument(relativePath: $path) {
-    ...getPostsDocumentPartsThisIsATest
-  }
-}
-    ${GetPostsDocumentPartsThisIsATestFragmentDoc}`;
 export const GetGlobalDocDocument = gql`
     query getGlobalDoc {
   getGlobalDocument(relativePath: "index.json") {
@@ -750,6 +743,13 @@ export const GetGlobalDocDocument = gql`
   }
 }
     ${GlobalPartsFragmentDoc}`;
+export const GetPostDocument = gql`
+    query GetPost($path: String!) {
+  getPostsDocument(relativePath: $path) {
+    ...getPostsDocumentPartsThisIsATest
+  }
+}
+    ${GetPostsDocumentPartsThisIsATestFragmentDoc}`;
 export const GetSomethingDocument = gql`
     query GetSomething {
   getCollections {
@@ -767,11 +767,11 @@ export const GetPostsTesting2Document = gql`
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
 export function getSdk<C>(requester: Requester<C>) {
   return {
-    GetPost(variables: GetPostQueryVariables, options?: C): Promise<GetPostQuery> {
-      return requester<GetPostQuery, GetPostQueryVariables>(GetPostDocument, variables, options);
-    },
     getGlobalDoc(variables?: GetGlobalDocQueryVariables, options?: C): Promise<GetGlobalDocQuery> {
       return requester<GetGlobalDocQuery, GetGlobalDocQueryVariables>(GetGlobalDocDocument, variables, options);
+    },
+    GetPost(variables: GetPostQueryVariables, options?: C): Promise<GetPostQuery> {
+      return requester<GetPostQuery, GetPostQueryVariables>(GetPostDocument, variables, options);
     },
     GetSomething(variables?: GetSomethingQueryVariables, options?: C): Promise<GetSomethingQuery> {
       return requester<GetSomethingQuery, GetSomethingQueryVariables>(GetSomethingDocument, variables, options);

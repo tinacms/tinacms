@@ -116,9 +116,10 @@ export class TinaGQLClient {
    * getAuthorDocument
    */
   public getAuthorDocument(args: { relativePath: string }) {
-    this._usedFrags.push('getAuthorDocument')
+    const name = 'getAuthorDocument'
+    this._usedFrags.push(name)
     const currentFrag = {
-      ...this._frags['getAuthorDocument'],
+      ...this._frags[name],
       arguments: genArgs(args),
     }
     this._selections.push(currentFrag)
