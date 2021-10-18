@@ -1,0 +1,7 @@
+query getGlobalDoc {
+  getGlobalDocument(relativePath: "index.json") {
+    data {
+      ...GlobalParts
+    }
+  }
+}
