@@ -1,5 +1,21 @@
 # tina-tailwind-sidebar-demo
 
+## 0.1.7
+
+### Patch Changes
+
+- Updated dependencies [67df49220]
+  - tinacms@0.56.3
+  - react-tinacms-editor@0.52.1
+  - react-tinacms-inline@0.53.1
+
+## 0.1.6
+
+### Patch Changes
+
+- Updated dependencies [84a86358f]
+  - tinacms@0.56.2
+
 ## 0.1.5
 
 ### Patch Changes

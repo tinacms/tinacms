@@ -238,7 +238,7 @@ const SidebarHeader = styled.div`
   display: grid;
   grid-template-areas: 'hamburger actions';
   align-items: center;
-  z-index: var(--tina-z-index-2);
+  z-index: var(--tina-z-index-5);
   height: var(--tina-sidebar-header-height);
   width: 100%;
   padding: 0 var(--tina-padding-big);
@@ -320,7 +320,7 @@ const MenuWrapper = styled.div`
 
 const MenuPanel = styled.div<{ visible: boolean }>`
   background: var(--tina-color-grey-8);
-  z-index: var(--tina-z-index-1);
+  z-index: var(--tina-z-index-4);
   position: absolute;
   top: 0;
   left: 0;
