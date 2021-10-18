@@ -1,5 +1,20 @@
 # Change Log
 
+## 0.54.0
+
+### Minor Changes
+
+- b59f23295: Fixed issue where heading button would not work in the WYSIWYG editor when using react 17
+- a419056b6: Fixed component types for field plugins
+- ded8dfbee: support visually linking fields to DOM elements using `data-tinafield`
+- 5df9fe543: Export Blocks, Group List, List, HTML and Markdown fields so that they can be used in field plugins.
+- 9d68b058f: Add support for multiple image upload in the Media Store.
+
+### Patch Changes
+
+- 9213d5608: Uses a better default dateFormat for the DateField
+- 91cebe5bc: Prevents navigating away from a form while invalid
+
 ## 0.53.0
 
 ### Minor Changes

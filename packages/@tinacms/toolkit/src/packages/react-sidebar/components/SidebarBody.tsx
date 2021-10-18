@@ -180,8 +180,21 @@ export const MultiformFormHeader = styled(
     setActiveFormId,
     ...styleProps
   }: MultiformFormHeaderProps) => {
+    const cms = useCMS()
+
     return (
-      <button {...styleProps} onClick={() => setActiveFormId('')}>
+      <button
+        {...styleProps}
+        onClick={() => {
+          const state = activeForm.finalForm.getState()
+          if (state.invalid === true) {
+            // @ts-ignore
+            cms.alerts.error('Cannot navigate away from an invalid form.')
+          } else {
+            setActiveFormId('')
+          }
+        }}
+      >
         <LeftArrowIcon />
         <span>{activeForm.label}</span>
       </button>
