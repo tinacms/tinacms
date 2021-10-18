@@ -1,6 +1,6 @@
-import React from 'react'
+import React, { FC } from 'react'
 
-const Layout = ({ children }) => {
+const Layout = ({ children }: { children: FC<any> }) => {
   return (
     <div
       style={{

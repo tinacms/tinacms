@@ -1,6 +1,8 @@
-import React from 'react'
+import React, { FC } from 'react'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import { ImFilesEmpty } from 'react-icons/im'
+
+import type { TinaCMS } from '@tinacms/toolkit'
 
 import useGetCollections from './hooks/useGetCollections'
 import useEmbedTailwind from './hooks/useEmbedTailwind'
@@ -11,7 +13,13 @@ import DashboardPage from './pages/DashboardPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionListPage from './pages/CollectionListPage'
 
-const GetCollections = ({ cms, children }) => {
+const GetCollections = ({
+  cms,
+  children,
+}: {
+  cms: TinaCMS
+  children: FC<any[]>
+}) => {
   const collections = useGetCollections(cms)
   if (!collections) return null
   return <>{children(collections)}</>
@@ -53,13 +61,11 @@ export const TinaAdmin = () => {
                                   className="mb-2"
                                 >
                                   <Link
-                                    passHref
+                                    className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
                                     to={`/admin/collections/${collection.name}`}
                                   >
-                                    <a className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100">
-                                      <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
-                                      {collection.label}
-                                    </a>
+                                    <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
+                                    {collection.label}
                                   </Link>
                                 </li>
                               )

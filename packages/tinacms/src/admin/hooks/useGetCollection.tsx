@@ -1,14 +1,23 @@
 import { useEffect, useState } from 'react'
+import type { TinaCMS } from '@tinacms/toolkit'
 
-const useGetCollection = (cms, collectionName) => {
-  const [collection, setCollection] = useState(undefined)
+export interface Collection {
+  label: string
+  name: string
+}
+
+const useGetCollection = (cms: TinaCMS, collectionName: string) => {
+  const [collection, setCollection] = useState<Collection | undefined>(
+    undefined
+  )
 
   useEffect(() => {
     const fetchCollection = async () => {
-      const response = await cms.api.tina.request(
-        `query($collection: String!){getCollection(collection: $collection) { label, name } }`,
-        { variables: { collection: collectionName } }
-      )
+      const response: { getCollection: { label: string; name: string } } =
+        await cms.api.tina.request(
+          `query($collection: String!){getCollection(collection: $collection) { label, name } }`,
+          { variables: { collection: collectionName } }
+        )
       setCollection(response.getCollection)
     }
 
