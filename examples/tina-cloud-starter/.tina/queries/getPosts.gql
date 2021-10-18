@@ -3,14 +3,6 @@ query GetPost($path: String!) {
     ...getPostsDocumentPartsThisIsATest
   }
 }
-query getGlobalDoc {
-  getGlobalDocument(relativePath: "index.json") {
-    data {
-      ...GlobalParts
-    }
-  }
-}
-
 fragment getPostsDocumentPartsThisIsATest on PostsDocument {
   id
   data {
