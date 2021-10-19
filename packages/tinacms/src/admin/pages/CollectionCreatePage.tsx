@@ -92,8 +92,8 @@ const CollectionCreatePage = () => {
               },
             })
             return (
-              <>
-                <h3 className="text-xl mb-6">
+              <div className="w-full h-screen">
+                {/* <h3 className="text-xl mb-6">
                   <Link
                     className="opacity-80 hover:opacity-100 transition-opacity ease-out"
                     to={`/admin/collections/${collection.name}`}
@@ -101,9 +101,14 @@ const CollectionCreatePage = () => {
                     {collection.label}
                   </Link>{' '}
                   - Create New
-                </h3>
-                <FormBuilder form={form} />
-              </>
+                </h3> */}
+                <div className="flex flex-col items-center w-full flex-1">
+                  <FormBuilder
+                    label={collection.label + ' - Create New'}
+                    form={form}
+                  />
+                </div>
+              </div>
             )
           }}
         </GetDocumentFields>
