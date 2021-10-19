@@ -40,7 +40,6 @@ import type {
   TinaFieldBase,
 } from './primitives/types'
 
-export * from './primitives/builder/test'
 import { Octokit } from '@octokit/rest'
 
 export const listBranches = async ({ auth, owner, repo }) => {
