@@ -21,7 +21,6 @@ export const Posts = ({ data }) => {
     <>
       {data.map((postData) => {
         const post = postData.node;
-        console.log({ post });
         return (
           <Link
             key={post.sys.filename}
