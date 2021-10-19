@@ -25,7 +25,7 @@ import { Button } from '../../styles'
 import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
 import { LeftArrowIcon } from '../../icons'
-import { FormBuilder } from '../../form-builder'
+import { SidebarFormBuilder } from '../../form-builder'
 
 export const FormsView = ({
   children,
@@ -100,7 +100,7 @@ export const FormsView = ({
           {!isMultiform && activeForm.label && (
             <FormHeader activeForm={activeForm} />
           )}
-          <FormBuilder form={activeForm as any} />
+          <SidebarFormBuilder form={activeForm as any} />
         </FormWrapper>
       )}
     </>

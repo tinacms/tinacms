@@ -28,6 +28,7 @@ import { FormActionMenu } from './FormActions'
 
 export interface FormBuilderProps {
   form: Form
+  label?: string
 }
 
 const NoFieldsPlaceholder = () => (
@@ -42,7 +43,9 @@ const NoFieldsPlaceholder = () => (
   </EmptyState>
 )
 
-export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
+export const SidebarFormBuilder: FC<FormBuilderProps> = ({
+  form: tinaForm,
+}) => {
   /**
    * > Why is a `key` being set when this isn't an array?
    *
@@ -133,6 +136,133 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
         }}
       </FinalForm>
     </ModalProvider>
+  )
+}
+
+export const FormBuilder: FC<FormBuilderProps> = ({
+  form: tinaForm,
+  label,
+}) => {
+  /**
+   * > Why is a `key` being set when this isn't an array?
+   *
+   * `FinalForm` does not update when given a new `form` prop.
+   *
+   * We can force `FinalForm` to update by setting the `key` to
+   * the name of the form. When the name changes React will
+   * treat it as a new instance of `FinalForm`, destroying the
+   * old `FinalForm` componentt and create a new one.
+   *
+   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
+   */
+  const [i, setI] = React.useState(0)
+  React.useEffect(() => {
+    setI((i) => i + 1)
+  }, [tinaForm])
+
+  const finalForm = tinaForm.finalForm
+
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      if (!result.destination || !finalForm) return
+      const name = result.type
+      finalForm.mutators.move(
+        name,
+        result.source.index,
+        result.destination.index
+      )
+    },
+    [tinaForm]
+  )
+
+  return (
+    <ModalProvider>
+      <FinalForm
+        form={finalForm}
+        key={`${i}: ${tinaForm.id}`}
+        onSubmit={tinaForm.onSubmit}
+      >
+        {({ handleSubmit, pristine, invalid, submitting }) => {
+          return (
+            <DragDropContext onDragEnd={moveArrayItem}>
+              <div className="w-full h-screen flex flex-col items-center">
+                <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex gap-6 justify-between items-center">
+                  {label && (
+                    <h4 className="font-bold text-lg opacity-80">{label}</h4>
+                  )}
+                  <div className="flex flex-1 items-center justify-end">
+                    <div className="mr-6 flex items-center">
+                      {!pristine && (
+                        <>
+                          <span className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600 mr-2"></span>{' '}
+                          <p className="opacity-80">Unsaved changes</p>
+                        </>
+                      )}
+                      {pristine && (
+                        <>
+                          <span className="w-3 h-3 rounded-full bg-green-500 border border-green-600 mr-2"></span>{' '}
+                          <p className="opacity-80">No changes</p>
+                        </>
+                      )}
+                    </div>
+                    {tinaForm.reset && (
+                      <ResetForm
+                        pristine={pristine}
+                        reset={async () => {
+                          finalForm.reset()
+                          await tinaForm.reset!()
+                        }}
+                      >
+                        {tinaForm.buttons.reset}
+                      </ResetForm>
+                    )}
+                    <Button
+                      onClick={() => handleSubmit()}
+                      disabled={pristine || submitting || invalid}
+                      busy={submitting}
+                      primary
+                      margin
+                    >
+                      {submitting && <LoadingDots />}
+                      {!submitting && tinaForm.buttons.save}
+                    </Button>
+                    {tinaForm.actions.length > 0 && (
+                      <FormActionMenu
+                        form={tinaForm as any}
+                        actions={tinaForm.actions}
+                      />
+                    )}
+                  </div>
+                </div>
+                <FullscreenFormWrapper>
+                  <FormPortalProvider>
+                    {tinaForm && tinaForm.fields.length ? (
+                      <FieldsBuilder
+                        form={tinaForm}
+                        fields={tinaForm.fields}
+                        padding={false}
+                      />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    )}
+                  </FormPortalProvider>
+                </FullscreenFormWrapper>
+              </div>
+            </DragDropContext>
+          )
+        }}
+      </FinalForm>
+    </ModalProvider>
+  )
+}
+
+export const FullscreenFormWrapper = ({ children }) => {
+  return (
+    <div className="relative w-full flex-1 overflow-y-auto">
+      <div className="w-full flex justify-center px-6 pt-12">
+        <div className="max-w-screen-md w-full mb-12">{children}</div>
+      </div>
+    </div>
   )
 }
 

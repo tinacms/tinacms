@@ -44,14 +44,18 @@ const CollectionListPage = () => {
       {(cms: TinaCMS) => (
         <GetCollection cms={cms} collectionName={collectionName}>
           {(collection: Collection) => (
-            <div className="w-full flex justify-between items-end">
-              <h3 className="text-4xl">{collection.label}</h3>
-              <Link
-                to={`${location.pathname}/create`}
-                className="inline-flex items-center px-6 py-3 border border-transparent text-base leading-5 font-medium rounded-full text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 active:bg-blue-700 transition duration-150 ease-in-out"
-              >
-                Create New
-              </Link>
+            <div className="px-6 py-14 h-screen overflow-y-auto flex justify-center">
+              <div className="max-w-screen-md w-full">
+                <div className="w-full flex justify-between items-end">
+                  <h3 className="text-4xl">{collection.label}</h3>
+                  <Link
+                    to={`${location.pathname}/create`}
+                    className="inline-flex items-center px-6 py-3 border border-transparent text-base leading-5 font-medium rounded-full text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 active:bg-blue-700 transition duration-150 ease-in-out"
+                  >
+                    Create New
+                  </Link>
+                </div>
+              </div>
             </div>
           )}
         </GetCollection>

@@ -80,22 +80,20 @@ export const TinaAdmin = () => {
                           </ul>
                         </div>
                       </div>
-                      <div className="px-6 py-14 flex-1 flex justify-center h-screen overflow-y-scroll">
-                        <div className="max-w-screen-md w-full h-screen">
-                          <Switch>
-                            <Route
-                              path={`/admin/collections/:collectionName/create`}
-                            >
-                              <CollectionCreatePage />
-                            </Route>
-                            <Route path={`/admin/collections/:collectionName`}>
-                              <CollectionListPage />
-                            </Route>
-                            <Route path={`/admin`}>
-                              <DashboardPage />
-                            </Route>
-                          </Switch>
-                        </div>
+                      <div className="flex-1">
+                        <Switch>
+                          <Route
+                            path={`/admin/collections/:collectionName/create`}
+                          >
+                            <CollectionCreatePage />
+                          </Route>
+                          <Route path={`/admin/collections/:collectionName`}>
+                            <CollectionListPage />
+                          </Route>
+                          <Route path={`/admin`}>
+                            <DashboardPage />
+                          </Route>
+                        </Switch>
                       </div>
                     </div>
                   </Router>

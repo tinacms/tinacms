@@ -14,7 +14,15 @@ limitations under the License.
 import React from 'react'
 
 const DashboardPage = () => {
-  return <h3 className="text-4xl">Welcome</h3>
+  return (
+    <div className="h-screen overflow-y-auto flex justify-center items-start">
+      <div className="flex-0 px-6 py-14 w-full flex justify-center bg-white border-b border-gray-150">
+        <div className="max-w-screen-md w-full">
+          <h3 className="text-4xl">Welcome.</h3>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default DashboardPage
