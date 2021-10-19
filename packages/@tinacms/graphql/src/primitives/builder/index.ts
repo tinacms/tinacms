@@ -474,6 +474,10 @@ export class Builder {
         selections.push(field)
       })
 
+      return astBuilder.FragmentDefinition({
+        name,
+        selections: filterSelections(selections),
+      })
       return {
         kind: 'FragmentDefinition' as const,
         name: {
@@ -501,6 +505,10 @@ export class Builder {
           selections.push(await this.buildTemplateFragments(tem))
         }
       })
+      return astBuilder.FieldWithSelectionSet({
+        name,
+        selections: filterSelections(selections),
+      })
       return {
         name: { kind: 'Name' as const, value: name },
         kind: 'Field' as const,
@@ -521,6 +529,7 @@ export class Builder {
       case 'datetime':
       case 'number':
       case 'boolean':
+        return astBuilder.FieldNodeDefinition(field)
         return {
           name: { kind: 'Name' as const, value: field.name },
           kind: 'Field' as const,
@@ -532,6 +541,12 @@ export class Builder {
             const field = await this.buildField(item)
             selections.push(field)
           })
+
+          return astBuilder.FieldWithSelectionSet({
+            name: field.name,
+            selections: filterSelections(selections),
+          })
+
           return {
             name: { kind: 'Name' as const, value: field.name },
             kind: 'Field' as const,
@@ -547,6 +562,10 @@ export class Builder {
               // TODO: Handle when template is a string
               selections.push(await this.buildTemplateFragments(tem))
             }
+          })
+          return astBuilder.FieldWithSelectionSet({
+            name: field.name,
+            selections: filterSelections(selections),
           })
           return {
             name: { kind: 'Name' as const, value: field.name },

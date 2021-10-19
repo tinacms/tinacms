@@ -24,6 +24,10 @@ import {
   EnumTypeDefinitionNode,
   InputObjectTypeDefinitionNode,
   DocumentNode,
+  FragmentDefinitionNode,
+  SelectionNode,
+  SelectionSetNode,
+  FieldNode,
 } from 'graphql'
 import _ from 'lodash'
 
@@ -180,6 +184,23 @@ export const astBuilder = {
       }),
     }
   },
+  FieldNodeDefinition: ({
+    name,
+    type,
+    args = [],
+    list,
+    required,
+  }: {
+    name: string
+    type: string | TypeDefinitionNode
+    required?: boolean
+    list?: boolean
+    args?: InputValueDefinitionNode[]
+  }) =>
+    ({
+      name: { kind: 'Name' as const, value: name },
+      kind: 'Field' as const,
+    } as FieldNode),
   FieldDefinition: ({
     name,
     type,
@@ -193,6 +214,7 @@ export const astBuilder = {
     list?: boolean
     args?: InputValueDefinitionNode[]
   }) => {
+    // Default to true
     let res = {}
     const namedType = {
       kind: 'NamedType' as const,
@@ -209,7 +231,10 @@ export const astBuilder = {
       },
       arguments: args,
     }
+
+    // list
     if (list) {
+      // list and required
       if (required) {
         res = {
           ...def,
@@ -224,6 +249,7 @@ export const astBuilder = {
             },
           },
         }
+        // list and not required
       } else {
         res = {
           ...def,
@@ -233,7 +259,9 @@ export const astBuilder = {
           },
         }
       }
+      // Not a list
     } else {
+      // Not a list and required
       if (required) {
         res = {
           ...def,
@@ -242,6 +270,7 @@ export const astBuilder = {
             type: namedType,
           },
         }
+        // Not a list and not required
       } else {
         res = {
           ...def,
@@ -343,6 +372,49 @@ export const astBuilder = {
     },
     fields,
   }),
+  FieldWithSelectionSet: ({
+    name,
+    selections,
+  }: {
+    name: string
+    selections: SelectionNode[]
+  }) => {
+    return {
+      name: { kind: 'Name' as const, value: name },
+      kind: 'Field' as const,
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections,
+      },
+    }
+  },
+  FragmentDefinition: ({
+    name,
+    selections,
+  }: {
+    name: string
+    selections: SelectionNode[]
+  }): FragmentDefinitionNode => {
+    return {
+      kind: 'FragmentDefinition' as const,
+      name: {
+        kind: 'Name' as const,
+        value: name + 'Parts',
+      },
+      typeCondition: {
+        kind: 'NamedType' as const,
+        name: {
+          kind: 'Name' as const,
+          value: name,
+        },
+      },
+      directives: [],
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections,
+      },
+    }
+  },
   TYPES: {
     Scalar: (type: scalarNames) => {
       const scalars = {

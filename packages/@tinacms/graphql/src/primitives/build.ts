@@ -93,8 +93,9 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
    */
   await sequential(collections, async (collection) => {
     const collectionAST = await builder.collectionDocument(collection)
-    const test = await builder.collectionFragment(collection)
-    test && fragmentDefinitionsFields.push(test)
+    const posableFrag = await builder.collectionFragment(collection)
+    posableFrag &&
+      fragmentDefinitionsFields.push(posableFrag as FragmentDefinitionNode)
 
     queryTypeDefinitionFields.push(collectionAST)
 
