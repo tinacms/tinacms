@@ -17,15 +17,13 @@ import { astBuilder, NAMER } from '../ast-builder'
 import { sequential } from '../util'
 import { staticDefinitions } from './static-definitions'
 
-import {
+import type {
   UnionTypeDefinitionNode,
   ObjectTypeDefinitionNode,
   TypeDefinitionNode,
   InputObjectTypeDefinitionNode,
-  FieldDefinitionNode,
   FieldNode,
   SelectionSetNode,
-  getNamedType,
   InlineFragmentNode,
 } from 'graphql'
 import type {
