@@ -158,6 +158,7 @@ export class Resolver {
            */
           case 'object':
             response[collection.name] = {
+              collection,
               fields: await sequential(
                 collectable.template.fields,
                 async (field) => {
@@ -182,7 +183,7 @@ export class Resolver {
               }
             })
 
-            response[collection.name] = { templates }
+            response[collection.name] = { collection, templates }
             break
         }
       })
