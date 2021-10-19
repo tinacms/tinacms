@@ -13,14 +13,8 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
-import {
-  printSchema,
-  print,
-  ASTNode,
-  DocumentNode,
-  FragmentDefinitionNode,
-  SelectionNode,
-} from 'graphql'
+import { print } from 'graphql'
+import type { FragmentDefinitionNode } from 'graphql'
 
 import { astBuilder } from './ast-builder'
 import { sequential } from './util'
@@ -38,10 +32,6 @@ export const indexDB = async ({ database, config }) => {
   const tinaSchema = await createSchema({ schema: config })
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
-  // await fs.outputFileSync(
-  //   '.tina/__generated__/schema.gql',
-  //   print(graphQLSchema as ASTNode)
-  // )
   await database.put('_graphql', graphQLSchema)
   await database.put('_schema', tinaSchema.schema)
 }
@@ -141,12 +131,11 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
+
+  // TODO: These should possibly be outputted somewhere else?
   const fragPath = process.cwd() + '/.tina/__generated__/frags.gql'
   await fs.outputFileSync(fragPath, print(fragDoc))
-
   const sdk = buildSKD(tinaSchema)
-
-  console.log({ sdk })
   const clientPath = process.cwd() + '/.tina/__generated__/client.ts'
   await fs.outputFileSync(clientPath, sdk)
 

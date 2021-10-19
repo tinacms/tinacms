@@ -468,7 +468,7 @@ export class Builder {
     if (typeof collection.fields === 'object') {
       const selections = []
       await sequential(collection.fields, async (x) => {
-        const field = await this.buildField(x)
+        const field = await this._buildFieldNodeForFragments(x)
         selections.push(field)
       })
 
@@ -476,25 +476,6 @@ export class Builder {
         name,
         selections: filterSelections(selections),
       })
-      return {
-        kind: 'FragmentDefinition' as const,
-        name: {
-          kind: 'Name' as const,
-          value: name + 'Parts',
-        },
-        typeCondition: {
-          kind: 'NamedType' as const,
-          name: {
-            kind: 'Name' as const,
-            value: name,
-          },
-        },
-        directives: [],
-        selectionSet: {
-          kind: 'SelectionSet' as const,
-          selections: filterSelections(selections),
-        },
-      }
     } else {
       const selections = []
       await sequential(collection.templates, async (tem) => {
@@ -503,22 +484,14 @@ export class Builder {
           selections.push(await this.buildTemplateFragments(tem))
         }
       })
-      return astBuilder.FieldWithSelectionSet({
+      return astBuilder.FieldWithSelectionSetDefinition({
         name,
         selections: filterSelections(selections),
       })
-      return {
-        name: { kind: 'Name' as const, value: name },
-        kind: 'Field' as const,
-        selectionSet: {
-          kind: 'SelectionSet' as const,
-          selections: filterSelections(selections),
-        } as SelectionSetNode,
-      }
     }
   }
 
-  private buildField: (
+  private _buildFieldNodeForFragments: (
     field: TinaFieldInner<true>
   ) => Promise<SelectionSetNode | FieldNode> = async (field) => {
     switch (field.type) {
@@ -528,31 +501,18 @@ export class Builder {
       case 'number':
       case 'boolean':
         return astBuilder.FieldNodeDefinition(field)
-        return {
-          name: { kind: 'Name' as const, value: field.name },
-          kind: 'Field' as const,
-        } as FieldNode
       case 'object':
         if (typeof field.fields === 'object') {
           const selections = []
           await sequential(field.fields, async (item) => {
-            const field = await this.buildField(item)
+            const field = await this._buildFieldNodeForFragments(item)
             selections.push(field)
           })
 
-          return astBuilder.FieldWithSelectionSet({
+          return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
             selections: filterSelections(selections),
           })
-
-          return {
-            name: { kind: 'Name' as const, value: field.name },
-            kind: 'Field' as const,
-            selectionSet: {
-              kind: 'SelectionSet' as const,
-              selections: filterSelections(selections),
-            } as SelectionSetNode,
-          }
         } else if (typeof field.templates === 'object') {
           const selections = []
           await sequential(field.templates, async (tem) => {
@@ -561,18 +521,10 @@ export class Builder {
               selections.push(await this.buildTemplateFragments(tem))
             }
           })
-          return astBuilder.FieldWithSelectionSet({
+          return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
             selections: filterSelections(selections),
           })
-          return {
-            name: { kind: 'Name' as const, value: field.name },
-            kind: 'Field' as const,
-            selectionSet: {
-              kind: 'SelectionSet' as const,
-              selections: filterSelections(selections),
-            } as SelectionSetNode,
-          }
         }
       case 'reference':
         false
@@ -585,23 +537,13 @@ export class Builder {
     const selections = []
 
     await sequential(template.fields || [], async (item) => {
-      const field = await this.buildField(item)
+      const field = await this._buildFieldNodeForFragments(item)
       selections.push(field)
     })
-    return {
-      kind: 'InlineFragment' as const,
-      selectionSet: {
-        kind: 'SelectionSet' as const,
-        selections: filterSelections(selections),
-      },
-      typeCondition: {
-        kind: 'NamedType' as const,
-        name: {
-          kind: 'Name' as const,
-          value: NAMER.dataTypeName(template.namespace),
-        },
-      },
-    }
+    return astBuilder.InlineFragmentDefinition({
+      selections: filterSelections(selections),
+      name: NAMER.dataTypeName(template.namespace),
+    })
   }
 
   /**

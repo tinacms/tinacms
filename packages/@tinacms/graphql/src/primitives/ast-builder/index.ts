@@ -28,6 +28,7 @@ import {
   SelectionNode,
   SelectionSetNode,
   FieldNode,
+  InlineFragmentNode,
 } from 'graphql'
 import _ from 'lodash'
 
@@ -372,7 +373,7 @@ export const astBuilder = {
     },
     fields,
   }),
-  FieldWithSelectionSet: ({
+  FieldWithSelectionSetDefinition: ({
     name,
     selections,
   }: {
@@ -385,6 +386,28 @@ export const astBuilder = {
       selectionSet: {
         kind: 'SelectionSet' as const,
         selections,
+      },
+    }
+  },
+  InlineFragmentDefinition: ({
+    name,
+    selections,
+  }: {
+    name: string
+    selections: SelectionNode[]
+  }): InlineFragmentNode => {
+    return {
+      kind: 'InlineFragment' as const,
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections,
+      },
+      typeCondition: {
+        kind: 'NamedType' as const,
+        name: {
+          kind: 'Name' as const,
+          value: name,
+        },
       },
     }
   },
