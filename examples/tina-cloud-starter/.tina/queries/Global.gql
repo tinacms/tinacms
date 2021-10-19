@@ -5,3 +5,11 @@ query getGlobalDoc {
     }
   }
 }
+
+query GetAuthorDocument($path: String!) {
+  getAuthorsDocument(relativePath: $path) {
+    data {
+      ...AuthorsParts
+    }
+  }
+}

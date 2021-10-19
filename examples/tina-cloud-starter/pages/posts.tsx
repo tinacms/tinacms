@@ -9,9 +9,7 @@ import { getTinaClient } from "../.tina/__generated__/types";
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
 ) {
-  console.log({ frontEndProps: props });
   const posts = props.data.getPostsList.edges;
-  console.log({ posts });
 
   return (
     <Section className="flex-1">
@@ -30,10 +28,11 @@ export const getStaticProps = async () => {
   //   .gePostsDocument({ relativePath: "VoteForPedro.md" });
 
   // console.log(test.query);
-  // const client = getTinaClient();
+  const client = getTinaClient();
 
   // const data = await client.GetPost({ path: "VoteForPedro.md" });
-  // console.log({ data });
+  const data = await client.GetAuthorDocument({ path: "Pedro.md" });
+  console.log({ data });
 
   // data.getGlobalDocument.data;
 
@@ -70,7 +69,6 @@ export const getStaticProps = async () => {
     `,
     variables: {},
   })) as { data: { getPostsList: PostsConnection } };
-  console.log({ tinaProps });
   return {
     props: {
       ...tinaProps,
