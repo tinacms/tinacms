@@ -1,5 +1,11 @@
 # tinacms-cli
 
+## 0.56.3
+
+### Patch Changes
+
+- 7c389cb0f: Remove Forestry reference in CLI hint
+
 ## 0.56.2
 
 ### Patch Changes
