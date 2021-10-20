@@ -621,18 +621,6 @@ export type GetCollectionsQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetCollectionsQuery = { __typename?: 'Query', getCollections: Array<{ __typename?: 'Collection', name: string }> };
 
-export type GetGlobalDocQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetGlobalDocQuery = { __typename?: 'Query', getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } } };
-
-export type GetAuthorDocumentQueryVariables = Exact<{
-  path: Scalars['String'];
-}>;
-
-
-export type GetAuthorDocumentQuery = { __typename?: 'Query', getAuthorsDocument: { __typename?: 'AuthorsDocument', data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } } };
-
 export type GetPostsDocumentPartsTestFragment = { __typename?: 'PostsDocument', form: any };
 
 export type PostsPartsFragment = { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> };
@@ -792,24 +780,6 @@ export const GetCollectionsDocument = gql`
   }
 }
     `;
-export const GetGlobalDocDocument = gql`
-    query getGlobalDoc {
-  getGlobalDocument(relativePath: "index.json") {
-    data {
-      ...GlobalParts
-    }
-  }
-}
-    ${GlobalPartsFragmentDoc}`;
-export const GetAuthorDocumentDocument = gql`
-    query GetAuthorDocument($path: String!) {
-  getAuthorsDocument(relativePath: $path) {
-    data {
-      ...AuthorsParts
-    }
-  }
-}
-    ${AuthorsPartsFragmentDoc}`;
 export const GetPostsDocumentDocument = gql`
     query getPostsDocument($relativePath: String!) {
   getPostsDocument(relativePath: $relativePath) {
@@ -911,12 +881,6 @@ export function getSdk<C>(requester: Requester<C>) {
   return {
     getCollections(variables?: GetCollectionsQueryVariables, options?: C): Promise<GetCollectionsQuery> {
       return requester<GetCollectionsQuery, GetCollectionsQueryVariables>(GetCollectionsDocument, variables, options);
-    },
-    getGlobalDoc(variables?: GetGlobalDocQueryVariables, options?: C): Promise<GetGlobalDocQuery> {
-      return requester<GetGlobalDocQuery, GetGlobalDocQueryVariables>(GetGlobalDocDocument, variables, options);
-    },
-    GetAuthorDocument(variables: GetAuthorDocumentQueryVariables, options?: C): Promise<GetAuthorDocumentQuery> {
-      return requester<GetAuthorDocumentQuery, GetAuthorDocumentQueryVariables>(GetAuthorDocumentDocument, variables, options);
     },
     getPostsDocument(variables: GetPostsDocumentQueryVariables, options?: C): Promise<GetPostsDocumentQuery> {
       return requester<GetPostsDocumentQuery, GetPostsDocumentQueryVariables>(GetPostsDocumentDocument, variables, options);

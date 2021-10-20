@@ -3,19 +3,3 @@ query getCollections {
     name
   }
 }
-
-query getGlobalDoc {
-  getGlobalDocument(relativePath: "index.json") {
-    data {
-      ...GlobalParts
-    }
-  }
-}
-
-query GetAuthorDocument($path: String!) {
-  getAuthorsDocument(relativePath: $path) {
-    data {
-      ...AuthorsParts
-    }
-  }
-}

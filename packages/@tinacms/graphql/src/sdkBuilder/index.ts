@@ -17,7 +17,6 @@ import { NAMER } from '../primitives/ast-builder'
 export const buildSKD = (tinaSchema: TinaSchema) => {
   const methods = tinaSchema.getCollections().map((collection) => {
     const queryName = NAMER.queryName(collection.namespace)
-    console.log({ queryName })
     const listQueryName = NAMER.generateQueryListName(collection.namespace)
     return `public ${queryName}(args: { relativePath: string }) {
         // const name = 'getAuthorDocument'
