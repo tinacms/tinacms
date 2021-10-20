@@ -14,7 +14,7 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { Modal, ModalHeader, ModalBody, ModalPopup } from '../react-modals'
-import { FormBuilder } from '../form-builder'
+import { SidebarFormBuilder } from '../form-builder'
 import { useMemo } from 'react'
 import { Form } from '../forms'
 import { AddIcon } from '../icons'
@@ -118,7 +118,7 @@ const FormModal = ({ plugin, close }: any) => {
       <ModalPopup>
         <ModalHeader close={close}>{plugin.name}</ModalHeader>
         <ModalBody>
-          <FormBuilder form={form} />
+          <SidebarFormBuilder form={form} />
         </ModalBody>
       </ModalPopup>
     </Modal>

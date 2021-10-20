@@ -20,7 +20,7 @@ import * as React from 'react'
 import { SettingsIcon } from '../../packages/icons'
 import { Form } from '../../packages/forms'
 import { ScreenPlugin } from '../../packages/react-screens'
-import { FormBuilder } from '../../packages/form-builder'
+import { SidebarFormBuilder } from '../../packages/form-builder'
 
 export class GlobalFormPlugin implements ScreenPlugin {
   __type: ScreenPlugin['__type'] = 'screen'
@@ -38,7 +38,7 @@ export class GlobalFormPlugin implements ScreenPlugin {
     this.Icon = icon || SettingsIcon
     this.layout = layout || 'popup'
     this.Component = () => {
-      return <FormBuilder form={form as any} />
+      return <SidebarFormBuilder form={form as any} />
     }
   }
 }
