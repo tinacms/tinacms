@@ -88,48 +88,44 @@ export const SidebarFormBuilder: FC<FormBuilderProps> = ({
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
-              <FormBody className="form-body">
+              <SidebarFormBody className="form-body">
                 <FormPortalProvider>
-                  <Wrapper>
-                    {tinaForm && tinaForm.fields.length ? (
-                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    )}
-                  </Wrapper>
+                  {tinaForm && tinaForm.fields.length ? (
+                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                  ) : (
+                    <NoFieldsPlaceholder />
+                  )}
                 </FormPortalProvider>
-              </FormBody>
+              </SidebarFormBody>
               <FormFooter className="form-footer">
-                <Wrapper>
-                  {tinaForm.reset && (
-                    <ResetForm
-                      pristine={pristine}
-                      reset={async () => {
-                        finalForm.reset()
-                        await tinaForm.reset!()
-                      }}
-                    >
-                      {tinaForm.buttons.reset}
-                    </ResetForm>
-                  )}
-                  <Button
-                    onClick={() => handleSubmit()}
-                    disabled={pristine || submitting || invalid}
-                    busy={submitting}
-                    primary
-                    grow
-                    margin
+                {tinaForm.reset && (
+                  <ResetForm
+                    pristine={pristine}
+                    reset={async () => {
+                      finalForm.reset()
+                      await tinaForm.reset!()
+                    }}
                   >
-                    {submitting && <LoadingDots />}
-                    {!submitting && tinaForm.buttons.save}
-                  </Button>
-                  {tinaForm.actions.length > 0 && (
-                    <FormActionMenu
-                      form={tinaForm as any}
-                      actions={tinaForm.actions}
-                    />
-                  )}
-                </Wrapper>
+                    {tinaForm.buttons.reset}
+                  </ResetForm>
+                )}
+                <Button
+                  onClick={() => handleSubmit()}
+                  disabled={pristine || submitting || invalid}
+                  busy={submitting}
+                  primary
+                  grow
+                  margin
+                >
+                  {submitting && <LoadingDots />}
+                  {!submitting && tinaForm.buttons.save}
+                </Button>
+                {tinaForm.actions.length > 0 && (
+                  <FormActionMenu
+                    form={tinaForm as any}
+                    actions={tinaForm.actions}
+                  />
+                )}
               </FormFooter>
             </DragDropContext>
           )
@@ -265,7 +261,7 @@ export const FormWrapper = ({ children, padded = false }) => {
   return (
     <div className="relative w-full flex-1 overflow-y-auto">
       <div className={`w-full flex justify-center ${padded && `px-6 pt-8`}`}>
-        <div className={`max-w-screen-md w-full ${padded && `mb-8`}`}>
+        <div className={`max-w-screen-md w-full ${padded && `mb-0`}`}>
           {children}
         </div>
       </div>
@@ -273,13 +269,7 @@ export const FormWrapper = ({ children, padded = false }) => {
   )
 }
 
-const Wrapper = styled.div`
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-`
-
-const FormBody = styled.div`
+const SidebarFormBody = styled.div`
   position: relative;
   flex: 1 1 auto;
   display: flex;
@@ -287,27 +277,20 @@ const FormBody = styled.div`
   width: 100%;
   overflow: auto;
   border-top: 1px solid var(--tina-color-grey-2);
+  padding-bottom: 20px;
   background-color: #f6f6f9;
-  ${Wrapper} {
-    height: 100%;
-  }
 `
 const FormFooter = styled.div`
   position: relative;
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
   width: 100%;
   height: 64px;
   background-color: white;
   border-top: 1px solid var(--tina-color-grey-2);
-  ${Wrapper} {
-    flex: 1 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
 `
 const Emoji = styled.span`
   font-size: 40px;
