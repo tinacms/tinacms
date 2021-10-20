@@ -2174,6 +2174,21 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
+            "value": "test2"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
             "value": "header"
           },
           "arguments": [],
@@ -4663,6 +4678,20 @@
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
+            "value": "test2"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "String"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
             "value": "header"
           },
           "type": {
@@ -5335,6 +5364,13 @@
             "name": {
               "kind": "Name",
               "value": "test"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "test2"
             },
             "kind": "Field"
           },

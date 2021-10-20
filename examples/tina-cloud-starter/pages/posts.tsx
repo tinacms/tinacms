@@ -21,24 +21,11 @@ export default function HomePage(
 }
 
 export const getStaticProps = async () => {
-  // const test = new TinaGQLClient();
-
-  // test
-  //   .getAuthorDocument({ relativePath: "Pedro.md" })
-  //   .gePostsDocument({ relativePath: "VoteForPedro.md" });
-
-  // console.log(test.query);
   const client = getTinaClient();
 
-  // const data = await client.GetPost({ path: "VoteForPedro.md" });
-  const data = await client.GetAuthorDocument({ path: "Pedro.md" });
-  console.log({ data });
+  const data = await client.getCollections();
 
-  // data.getGlobalDocument.data;
-
-  // console.log({ data: data.getGlobalDocument.data });
-
-  // const globalData = await client.userQueries.getPostsLogan
+  console.log(data.getCollections);
 
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql

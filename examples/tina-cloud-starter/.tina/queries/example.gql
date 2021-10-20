@@ -1,3 +1,9 @@
+query getCollections {
+  getCollections {
+    name
+  }
+}
+
 query getGlobalDoc {
   getGlobalDocument(relativePath: "index.json") {
     data {

@@ -93,6 +93,15 @@
           ]
         },
         {
+          "name": "test2",
+          "label": "Test",
+          "type": "string",
+          "namespace": [
+            "global",
+            "test2"
+          ]
+        },
+        {
           "type": "object",
           "label": "Header",
           "name": "header",

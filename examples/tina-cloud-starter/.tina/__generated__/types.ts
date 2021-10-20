@@ -266,6 +266,7 @@ export type GlobalTheme = {
 export type Global = {
   __typename?: 'Global';
   test?: Maybe<Scalars['String']>;
+  test2?: Maybe<Scalars['String']>;
   header?: Maybe<GlobalHeader>;
   footer?: Maybe<GlobalFooter>;
   theme?: Maybe<GlobalTheme>;
@@ -548,6 +549,7 @@ export type GlobalThemeMutation = {
 
 export type GlobalMutation = {
   test?: Maybe<Scalars['String']>;
+  test2?: Maybe<Scalars['String']>;
   header?: Maybe<GlobalHeaderMutation>;
   footer?: Maybe<GlobalFooterMutation>;
   theme?: Maybe<GlobalThemeMutation>;
@@ -618,10 +620,15 @@ export type PagesMutation = {
   blocks?: Maybe<Array<Maybe<PagesBlocksMutation>>>;
 };
 
+export type GetCollectionsQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetCollectionsQuery = { __typename?: 'Query', getCollections: Array<{ __typename?: 'Collection', name: string }> };
+
 export type GetGlobalDocQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetGlobalDocQuery = { __typename?: 'Query', getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', test?: Maybe<string>, header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } } };
+export type GetGlobalDocQuery = { __typename?: 'Query', getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', test?: Maybe<string>, test2?: Maybe<string>, header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } } };
 
 export type GetAuthorDocumentQueryVariables = Exact<{
   path: Scalars['String'];
@@ -630,59 +637,16 @@ export type GetAuthorDocumentQueryVariables = Exact<{
 
 export type GetAuthorDocumentQuery = { __typename?: 'Query', getAuthorsDocument: { __typename?: 'AuthorsDocument', data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } } };
 
-export type GetPostQueryVariables = Exact<{
-  path: Scalars['String'];
-}>;
-
-
-export type GetPostQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
-
-export type GetPostsDocumentPartsThisIsATestFragment = { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } };
-
-export type GetSomethingQueryVariables = Exact<{ [key: string]: never; }>;
-
-
-export type GetSomethingQuery = { __typename?: 'Query', getCollections: Array<{ __typename?: 'Collection', name: string }> };
-
-export type GetPostsTesting2QueryVariables = Exact<{
-  path: Scalars['String'];
-}>;
-
-
-export type GetPostsTesting2Query = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> } } };
-
 export type GetPostsDocumentPartsTestFragment = { __typename?: 'PostsDocument', form: any };
 
 export type PostsPartsFragment = { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> };
 
-export type GlobalPartsFragment = { __typename?: 'Global', test?: Maybe<string>, header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> };
+export type GlobalPartsFragment = { __typename?: 'Global', test?: Maybe<string>, test2?: Maybe<string>, header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> };
 
 export type AuthorsPartsFragment = { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> };
 
 export type PagesPartsFragment = { __typename?: 'Pages', blocks?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<string>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename?: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename?: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename?: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename?: 'PagesBlocksContent', body?: Maybe<string>, color?: Maybe<string> } | { __typename?: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> };
 
-export const GetPostsDocumentPartsThisIsATestFragmentDoc = gql`
-    fragment getPostsDocumentPartsThisIsATest on PostsDocument {
-  id
-  data {
-    title
-    author {
-      __typename
-      ... on AuthorsDocument {
-        id
-        data {
-          name
-          avatar
-        }
-      }
-    }
-    date
-    heroImg
-    excerpt
-    _body
-  }
-}
-    `;
 export const GetPostsDocumentPartsTestFragmentDoc = gql`
     fragment getPostsDocumentPartsTest on PostsDocument {
   form
@@ -700,6 +664,7 @@ export const PostsPartsFragmentDoc = gql`
 export const GlobalPartsFragmentDoc = gql`
     fragment GlobalParts on Global {
   test
+  test2
   header {
     icon {
       color
@@ -778,6 +743,13 @@ export const PagesPartsFragmentDoc = gql`
   }
 }
     `;
+export const GetCollectionsDocument = gql`
+    query getCollections {
+  getCollections {
+    name
+  }
+}
+    `;
 export const GetGlobalDocDocument = gql`
     query getGlobalDoc {
   getGlobalDocument(relativePath: "index.json") {
@@ -796,44 +768,17 @@ export const GetAuthorDocumentDocument = gql`
   }
 }
     ${AuthorsPartsFragmentDoc}`;
-export const GetPostDocument = gql`
-    query GetPost($path: String!) {
-  getPostsDocument(relativePath: $path) {
-    ...getPostsDocumentPartsThisIsATest
-  }
-}
-    ${GetPostsDocumentPartsThisIsATestFragmentDoc}`;
-export const GetSomethingDocument = gql`
-    query GetSomething {
-  getCollections {
-    name
-  }
-}
-    `;
-export const GetPostsTesting2Document = gql`
-    query GetPostsTesting2($path: String!) {
-  getPostsDocument(relativePath: $path) {
-    ...getPostsDocumentPartsThisIsATest
-  }
-}
-    ${GetPostsDocumentPartsThisIsATestFragmentDoc}`;
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
 export function getSdk<C>(requester: Requester<C>) {
   return {
+    getCollections(variables?: GetCollectionsQueryVariables, options?: C): Promise<GetCollectionsQuery> {
+      return requester<GetCollectionsQuery, GetCollectionsQueryVariables>(GetCollectionsDocument, variables, options);
+    },
     getGlobalDoc(variables?: GetGlobalDocQueryVariables, options?: C): Promise<GetGlobalDocQuery> {
       return requester<GetGlobalDocQuery, GetGlobalDocQueryVariables>(GetGlobalDocDocument, variables, options);
     },
     GetAuthorDocument(variables: GetAuthorDocumentQueryVariables, options?: C): Promise<GetAuthorDocumentQuery> {
       return requester<GetAuthorDocumentQuery, GetAuthorDocumentQueryVariables>(GetAuthorDocumentDocument, variables, options);
-    },
-    GetPost(variables: GetPostQueryVariables, options?: C): Promise<GetPostQuery> {
-      return requester<GetPostQuery, GetPostQueryVariables>(GetPostDocument, variables, options);
-    },
-    GetSomething(variables?: GetSomethingQueryVariables, options?: C): Promise<GetSomethingQuery> {
-      return requester<GetSomethingQuery, GetSomethingQueryVariables>(GetSomethingDocument, variables, options);
-    },
-    GetPostsTesting2(variables: GetPostsTesting2QueryVariables, options?: C): Promise<GetPostsTesting2Query> {
-      return requester<GetPostsTesting2Query, GetPostsTesting2QueryVariables>(GetPostsTesting2Document, variables, options);
     }
   };
 }
