@@ -8,6 +8,7 @@ fragment PostsParts on Posts {
 
 fragment GlobalParts on Global {
   test
+  test2
   header {
     icon {
       color
