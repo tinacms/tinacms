@@ -29,6 +29,7 @@ import {
   SelectionSetNode,
   FieldNode,
   InlineFragmentNode,
+  OperationDefinitionNode,
 } from 'graphql'
 import _ from 'lodash'
 
@@ -464,6 +465,201 @@ export const astBuilder = {
     Connection: 'Connection',
     Number: 'Int',
     Document: 'Document',
+  },
+
+  QueryOperationDefinition: ({
+    queryName,
+    fragName,
+  }: {
+    queryName: string
+    fragName: string
+  }): OperationDefinitionNode => {
+    return {
+      kind: 'OperationDefinition' as const,
+      operation: 'query' as const,
+      name: {
+        kind: 'Name' as const,
+        value: queryName,
+      },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition' as const,
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name' as const, value: 'String' },
+            },
+          },
+          variable: {
+            kind: 'Variable' as const,
+            name: { kind: 'Name' as const, value: 'relativePath' },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections: [
+          {
+            kind: 'Field',
+            name: {
+              kind: 'Name',
+              value: queryName,
+            },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: {
+                  kind: 'Name',
+                  value: 'relativePath',
+                },
+                value: {
+                  kind: 'Variable',
+                  name: {
+                    kind: 'Name',
+                    value: 'relativePath',
+                  },
+                },
+              },
+            ],
+            directives: [],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'data',
+                  },
+                  arguments: [],
+                  directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: fragName,
+                        },
+                        directives: [],
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    }
+  },
+
+  ListQueryOperationDefinition: ({
+    queryName,
+    fragName,
+  }: {
+    queryName: string
+    fragName: string
+  }): OperationDefinitionNode => {
+    return {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: {
+        kind: 'Name',
+        value: queryName,
+      },
+      variableDefinitions: [],
+      directives: [],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: {
+              kind: 'Name',
+              value: queryName,
+            },
+            arguments: [],
+            directives: [],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'totalCount',
+                  },
+                  arguments: [],
+                  directives: [],
+                },
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'edges',
+                  },
+                  arguments: [],
+                  directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'node',
+                        },
+                        arguments: [],
+                        directives: [],
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'id',
+                              },
+                              arguments: [],
+                              directives: [],
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'data',
+                              },
+                              arguments: [],
+                              directives: [],
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'FragmentSpread',
+                                    name: {
+                                      kind: 'Name',
+                                      value: fragName,
+                                    },
+                                    directives: [],
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    }
   },
   toGraphQLAst: (ast: {
     globalTemplates: TypeDefinitionNode[]
