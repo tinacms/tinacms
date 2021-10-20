@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 export interface Collection {
@@ -19,7 +19,7 @@ export interface Collection {
   name: string
 }
 
-const useGetCollections = (cms: TinaCMS) => {
+export const useGetCollections = (cms: TinaCMS) => {
   const [collections, setCollections] = useState<Collection[]>([])
 
   useEffect(() => {
@@ -38,4 +38,10 @@ const useGetCollections = (cms: TinaCMS) => {
   return collections
 }
 
-export default useGetCollections
+const GetCollections = ({ cms, children }: { cms: TinaCMS; children: any }) => {
+  const collections = useGetCollections(cms)
+  if (!collections) return null
+  return <>{children(collections)}</>
+}
+
+export default GetCollections
