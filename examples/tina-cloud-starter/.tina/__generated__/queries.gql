@@ -6,10 +6,38 @@ query getPostsDocument($relativePath: String!) {
   }
 }
 
+query getPostsList {
+  getPostsList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...PostsParts
+        }
+      }
+    }
+  }
+}
+
 query getGlobalDocument($relativePath: String!) {
   getGlobalDocument(relativePath: $relativePath) {
     data {
       ...GlobalParts
+    }
+  }
+}
+
+query getGlobalList {
+  getGlobalList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...GlobalParts
+        }
+      }
     }
   }
 }
@@ -22,10 +50,38 @@ query getAuthorsDocument($relativePath: String!) {
   }
 }
 
+query getAuthorsList {
+  getAuthorsList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...AuthorsParts
+        }
+      }
+    }
+  }
+}
+
 query getPagesDocument($relativePath: String!) {
   getPagesDocument(relativePath: $relativePath) {
     data {
       ...PagesParts
+    }
+  }
+}
+
+query getPagesList {
+  getPagesList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...PagesParts
+        }
+      }
     }
   }
 }

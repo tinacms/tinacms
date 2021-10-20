@@ -650,12 +650,22 @@ export type GetPostsDocumentQueryVariables = Exact<{
 
 export type GetPostsDocumentQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> } } };
 
+export type GetPostsListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPostsListQuery = { __typename?: 'Query', getPostsList: { __typename?: 'PostsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> } }> }>>> } };
+
 export type GetGlobalDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
 export type GetGlobalDocumentQuery = { __typename?: 'Query', getGlobalDocument: { __typename?: 'GlobalDocument', data: { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } } };
+
+export type GetGlobalListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetGlobalListQuery = { __typename?: 'Query', getGlobalList: { __typename?: 'GlobalConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'GlobalConnectionEdges', node?: Maybe<{ __typename?: 'GlobalDocument', id: string, data: { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> } }> }>>> } };
 
 export type GetAuthorsDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -664,12 +674,22 @@ export type GetAuthorsDocumentQueryVariables = Exact<{
 
 export type GetAuthorsDocumentQuery = { __typename?: 'Query', getAuthorsDocument: { __typename?: 'AuthorsDocument', data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } } };
 
+export type GetAuthorsListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetAuthorsListQuery = { __typename?: 'Query', getAuthorsList: { __typename?: 'AuthorsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'AuthorsConnectionEdges', node?: Maybe<{ __typename?: 'AuthorsDocument', id: string, data: { __typename?: 'Authors', name?: Maybe<string>, avatar?: Maybe<string> } }> }>>> } };
+
 export type GetPagesDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
 }>;
 
 
 export type GetPagesDocumentQuery = { __typename?: 'Query', getPagesDocument: { __typename?: 'PagesDocument', data: { __typename?: 'Pages', blocks?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<string>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename?: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename?: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename?: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename?: 'PagesBlocksContent', body?: Maybe<string>, color?: Maybe<string> } | { __typename?: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> } } };
+
+export type GetPagesListQueryVariables = Exact<{ [key: string]: never; }>;
+
+
+export type GetPagesListQuery = { __typename?: 'Query', getPagesList: { __typename?: 'PagesConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PagesConnectionEdges', node?: Maybe<{ __typename?: 'PagesDocument', id: string, data: { __typename?: 'Pages', blocks?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<string>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename?: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename?: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename?: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename?: 'PagesBlocksContent', body?: Maybe<string>, color?: Maybe<string> } | { __typename?: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> } }> }>>> } };
 
 export const GetPostsDocumentPartsTestFragmentDoc = gql`
     fragment getPostsDocumentPartsTest on PostsDocument {
@@ -799,11 +819,41 @@ export const GetPostsDocumentDocument = gql`
   }
 }
     ${PostsPartsFragmentDoc}`;
+export const GetPostsListDocument = gql`
+    query getPostsList {
+  getPostsList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...PostsParts
+        }
+      }
+    }
+  }
+}
+    ${PostsPartsFragmentDoc}`;
 export const GetGlobalDocumentDocument = gql`
     query getGlobalDocument($relativePath: String!) {
   getGlobalDocument(relativePath: $relativePath) {
     data {
       ...GlobalParts
+    }
+  }
+}
+    ${GlobalPartsFragmentDoc}`;
+export const GetGlobalListDocument = gql`
+    query getGlobalList {
+  getGlobalList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...GlobalParts
+        }
+      }
     }
   }
 }
@@ -817,11 +867,41 @@ export const GetAuthorsDocumentDocument = gql`
   }
 }
     ${AuthorsPartsFragmentDoc}`;
+export const GetAuthorsListDocument = gql`
+    query getAuthorsList {
+  getAuthorsList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...AuthorsParts
+        }
+      }
+    }
+  }
+}
+    ${AuthorsPartsFragmentDoc}`;
 export const GetPagesDocumentDocument = gql`
     query getPagesDocument($relativePath: String!) {
   getPagesDocument(relativePath: $relativePath) {
     data {
       ...PagesParts
+    }
+  }
+}
+    ${PagesPartsFragmentDoc}`;
+export const GetPagesListDocument = gql`
+    query getPagesList {
+  getPagesList {
+    totalCount
+    edges {
+      node {
+        id
+        data {
+          ...PagesParts
+        }
+      }
     }
   }
 }
@@ -841,14 +921,26 @@ export function getSdk<C>(requester: Requester<C>) {
     getPostsDocument(variables: GetPostsDocumentQueryVariables, options?: C): Promise<GetPostsDocumentQuery> {
       return requester<GetPostsDocumentQuery, GetPostsDocumentQueryVariables>(GetPostsDocumentDocument, variables, options);
     },
+    getPostsList(variables?: GetPostsListQueryVariables, options?: C): Promise<GetPostsListQuery> {
+      return requester<GetPostsListQuery, GetPostsListQueryVariables>(GetPostsListDocument, variables, options);
+    },
     getGlobalDocument(variables: GetGlobalDocumentQueryVariables, options?: C): Promise<GetGlobalDocumentQuery> {
       return requester<GetGlobalDocumentQuery, GetGlobalDocumentQueryVariables>(GetGlobalDocumentDocument, variables, options);
+    },
+    getGlobalList(variables?: GetGlobalListQueryVariables, options?: C): Promise<GetGlobalListQuery> {
+      return requester<GetGlobalListQuery, GetGlobalListQueryVariables>(GetGlobalListDocument, variables, options);
     },
     getAuthorsDocument(variables: GetAuthorsDocumentQueryVariables, options?: C): Promise<GetAuthorsDocumentQuery> {
       return requester<GetAuthorsDocumentQuery, GetAuthorsDocumentQueryVariables>(GetAuthorsDocumentDocument, variables, options);
     },
+    getAuthorsList(variables?: GetAuthorsListQueryVariables, options?: C): Promise<GetAuthorsListQuery> {
+      return requester<GetAuthorsListQuery, GetAuthorsListQueryVariables>(GetAuthorsListDocument, variables, options);
+    },
     getPagesDocument(variables: GetPagesDocumentQueryVariables, options?: C): Promise<GetPagesDocumentQuery> {
       return requester<GetPagesDocumentQuery, GetPagesDocumentQueryVariables>(GetPagesDocumentDocument, variables, options);
+    },
+    getPagesList(variables?: GetPagesListQueryVariables, options?: C): Promise<GetPagesListQuery> {
+      return requester<GetPagesListQuery, GetPagesListQueryVariables>(GetPagesListDocument, variables, options);
     }
   };
 }

@@ -91,12 +91,18 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
 
     fragmentDefinitionsFields.push(frag)
 
+    const queryName = NAMER.queryName(collection.namespace)
+    const queryListName = NAMER.generateQueryListName(collection.namespace)
+
+    const fragName = NAMER.dataTypeName(collection.namespace) + 'Parts'
+
+    // TODO: Move these into AST builder
     operationsDefinitions.push({
       kind: 'OperationDefinition' as const,
       operation: 'query' as const,
       name: {
         kind: 'Name' as const,
-        value: NAMER.queryName(collection.namespace),
+        value: queryName,
       },
       variableDefinitions: [
         {
@@ -121,7 +127,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
             kind: 'Field',
             name: {
               kind: 'Name',
-              value: NAMER.queryName(collection.namespace),
+              value: queryName,
             },
             arguments: [
               {
@@ -158,10 +164,107 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
                         kind: 'FragmentSpread',
                         name: {
                           kind: 'Name',
-                          value:
-                            NAMER.dataTypeName(collection.namespace) + 'Parts',
+                          value: fragName,
                         },
                         directives: [],
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    })
+
+    operationsDefinitions.push({
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: {
+        kind: 'Name',
+        value: queryListName,
+      },
+      variableDefinitions: [],
+      directives: [],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: {
+              kind: 'Name',
+              value: queryListName,
+            },
+            arguments: [],
+            directives: [],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'totalCount',
+                  },
+                  arguments: [],
+                  directives: [],
+                },
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'edges',
+                  },
+                  arguments: [],
+                  directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'node',
+                        },
+                        arguments: [],
+                        directives: [],
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'id',
+                              },
+                              arguments: [],
+                              directives: [],
+                            },
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'data',
+                              },
+                              arguments: [],
+                              directives: [],
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'FragmentSpread',
+                                    name: {
+                                      kind: 'Name',
+                                      value: fragName,
+                                    },
+                                    directives: [],
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
                       },
                     ],
                   },
