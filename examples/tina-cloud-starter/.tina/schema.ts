@@ -304,12 +304,60 @@ const heroBlockSchema: TinaTemplate = {
       name: "headline",
     },
     {
-      type: "string",
       label: "Text",
       name: "text",
+      type: "string",
       ui: {
         component: "markdown",
       },
+    },
+    {
+      label: "Children Text",
+      name: "children",
+      type: "rich-text",
+      templates: [
+        {
+          name: "EmbeddedInfo",
+          label: "Embedded Info",
+          fields: [
+            {
+              name: "text",
+              label: "Text",
+              type: "string",
+            },
+            {
+              name: "children",
+              label: "Child Text",
+              type: "rich-text",
+              templates: [],
+            },
+          ],
+        },
+      ],
+    },
+    {
+      label: "Rich Text",
+      name: "richText",
+      type: "rich-text",
+      templates: [
+        {
+          name: "EmbeddedInfo",
+          label: "Embedded Info",
+          fields: [
+            {
+              name: "text",
+              label: "Text",
+              type: "string",
+            },
+            {
+              name: "children",
+              label: "Child Text",
+              type: "rich-text",
+              templates: [],
+            },
+          ],
+        },
+      ],
     },
     {
       label: "Actions",
@@ -389,6 +437,91 @@ export default defineSchema({
       path: "content/posts",
       fields: [
         {
+          type: "object",
+          label: "Some Field",
+          name: "someField",
+          list: true,
+          fields: [
+            {
+              name: "title",
+              label: "Title",
+              type: "string",
+            },
+          ],
+          ui: {
+            component: "MyGroupList",
+          },
+        },
+        {
+          type: "rich-text",
+          label: "Body",
+          name: "_body",
+          templates: [
+            {
+              name: "DateTime",
+              label: "Date & Time",
+              inline: true,
+              fields: [
+                {
+                  name: "format",
+                  label: "Format",
+                  type: "string",
+                  options: ["utc", "iso", "local"],
+                },
+              ],
+            },
+            {
+              name: "BlockQuote",
+              label: "Block Quote",
+              fields: [
+                {
+                  name: "children",
+                  label: "Quote",
+                  type: "rich-text",
+                },
+                {
+                  name: "authorName",
+                  label: "Author",
+                  type: "string",
+                },
+              ],
+            },
+            {
+              name: "NewsletterSignup",
+              label: "Newsletter Sign Up",
+              fields: [
+                {
+                  name: "children",
+                  label: "CTA",
+                  type: "rich-text",
+                },
+                {
+                  name: "placeholder",
+                  label: "Placeholder",
+                  type: "string",
+                },
+                {
+                  name: "buttonText",
+                  label: "Button Text",
+                  type: "string",
+                },
+                {
+                  name: "disclaimer",
+                  label: "Disclaimer",
+                  type: "rich-text",
+                },
+              ],
+              ui: {
+                defaultItem: {
+                  placeholder: "Enter your email",
+                  buttonText: "Notify Me",
+                },
+              },
+            },
+          ],
+          isBody: true,
+        },
+        {
           type: "string",
           label: "Title",
           name: "title",
@@ -421,15 +554,6 @@ export default defineSchema({
           },
           name: "excerpt",
         },
-        {
-          type: "string",
-          label: "Body",
-          ui: {
-            component: "markdown",
-          },
-          name: "_body",
-          isBody: true,
-        },
       ],
     },
     {
@@ -458,10 +582,7 @@ export default defineSchema({
               name: "nav",
               list: true,
               ui: {
-                defaultItem: {
-                  href: "home",
-                  label: "Home",
-                },
+                component: "MyGroupList",
               },
               fields: [
                 {

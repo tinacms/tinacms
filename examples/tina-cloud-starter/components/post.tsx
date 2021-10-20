@@ -1,9 +1,92 @@
+/**
+Copyright 2021 Forestry.io Holdings, Inc.
+Licensed under the Apache License, Version 2.0 (the "License");
+you may not use this file except in compliance with the License.
+You may obtain a copy of the License at
+    http://www.apache.org/licenses/LICENSE-2.0
+Unless required by applicable law or agreed to in writing, software
+distributed under the License is distributed on an "AS IS" BASIS,
+WITHOUT WARRANTIES OR CONDITIONS OF ANY KIND, either express or implied.
+See the License for the specific language governing permissions and
+limitations under the License.
+*/
+
 import React from "react";
-import Markdown from "react-markdown";
 import { Container } from "./container";
 import { Section } from "./section";
 import { ThemeContext } from "./theme";
 import format from "date-fns/format";
+import { TinaMarkdown } from "tinacms/dist/rich-text";
+
+const components = {
+  BlockQuote: (props) => {
+    return (
+      <div>
+        <blockquote>
+          <TinaMarkdown>{props.children}</TinaMarkdown>
+          {props.authorName}
+        </blockquote>
+      </div>
+    );
+  },
+  DateTime: (props) => {
+    const dt = React.useMemo(() => {
+      return new Date();
+    }, []);
+
+    switch (props.format) {
+      case "iso":
+        return <span>{dt.toISOString()}</span>;
+      case "utc":
+        return <span>{dt.toUTCString()}</span>;
+      case "local":
+        return <span>{dt.toLocaleDateString()}</span>;
+      default:
+        return <span>{dt.toLocaleDateString()}</span>;
+    }
+  },
+  NewsletterSignup: (props) => {
+    return (
+      <div className="bg-white">
+        <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:py-16 lg:px-8 md:flex md:items-center">
+          <div className="md:w-0 md:flex-1">
+            <TinaMarkdown>{props.children}</TinaMarkdown>
+          </div>
+          <div className="mt-8 md:mt-0 md:ml-8">
+            <form className="sm:flex">
+              <label htmlFor="email-address" className="sr-only">
+                Email address
+              </label>
+              <input
+                id="email-address"
+                name="email-address"
+                type="email"
+                autoComplete="email"
+                required
+                className="w-full px-5 py-3 border border-gray-300 shadow-sm placeholder-gray-400 focus:ring-1 focus:ring-teal-500 focus:border-teal-500 sm:max-w-xs rounded-md"
+                placeholder={props.placeholder}
+              />
+              <div className="mt-3 rounded-md shadow sm:mt-0 sm:ml-3 sm:flex-shrink-0">
+                <button
+                  type="submit"
+                  className="w-full flex items-center justify-center py-3 px-5 border border-transparent text-base font-medium rounded-md text-white bg-teal-600 hover:bg-teal-700 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-teal-500"
+                >
+                  {props.buttonText}
+                </button>
+              </div>
+            </form>
+            <div className="mt-3 text-sm text-gray-500">
+              {/* {props.disclaimer} */}
+              {props.disclaimer && (
+                <TinaMarkdown>{props.disclaimer}</TinaMarkdown>
+              )}
+            </div>
+          </div>
+        </div>
+      </div>
+    );
+  },
+};
 
 export const Post = ({ data }) => {
   const theme = React.useContext(ThemeContext);
@@ -80,11 +163,9 @@ export const Post = ({ data }) => {
         </div>
       )}
       <Container className={`flex-1 max-w-4xl pt-4`} size="large">
-        <div
-          data-tinafield="_body"
-          className="prose dark:prose-dark  w-full max-w-none"
-        >
-          <Markdown>{data._body}</Markdown>
+        <div className="prose dark:prose-dark  w-full max-w-none">
+          <TinaMarkdown components={components}>{data._body}</TinaMarkdown>
+          {/* <pre>{JSON.stringify(data._body, null, 2)}</pre> */}
         </div>
       </Container>
     </Section>

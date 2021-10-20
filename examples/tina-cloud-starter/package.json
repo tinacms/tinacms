@@ -1,9 +1,9 @@
 {
   "name": "tina-cloud-starter",
-  "version": "0.2.1",
+  "version": "0.2.0",
   "private": true,
   "scripts": {
-    "dev": "yarn tinacms server:start -c \"next dev\"",
+    "dev": "yarn tinacms server:start -c \"next dev --port 3001\"",
     "build": "yarn tinacms server:start -c \"next build\"",
     "start": "yarn tinacms server:start -c \"next start\""
   },
@@ -24,7 +24,10 @@
     "@headlessui/react": "^1.3.0",
     "@tailwindcss/typography": "^0.4.1",
     "@tinacms/auth": "workspace:*",
+    "@types/mdast": "^3.0.10",
     "date-fns": "^2.23.0",
+    "mdast": "^3.0.0",
+    "mdx": "^0.3.1",
     "next": "10.0.5",
     "next-svgr": "^0.0.2",
     "next-tinacms-cloudinary": "workspace:*",
@@ -34,10 +37,17 @@
     "react-is": "^17.0.2",
     "react-markdown": "^5.0.3",
     "react-tinacms-editor": "workspace:*",
+    "remark": "^14.0.1",
+    "remark-mdx": "next",
+    "remark-parse": "^10.0.0",
+    "remark-slate": "^1.8.0",
+    "slate": "^0.65.3",
+    "slate-react": "^0.65.3",
     "styled-components": "^5.1.3",
     "styled-jsx": "^3.2.5",
     "tinacms": "workspace:*",
-    "typescript": "^3.8.3"
+    "typescript": "^3.8.3",
+    "unified": "^10.1.0"
   },
   "resolutions": {
     "final-form": "4.20.1"

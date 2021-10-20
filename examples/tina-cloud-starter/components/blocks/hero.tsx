@@ -4,6 +4,7 @@ import { Actions } from "../actions";
 import { Container } from "../container";
 import { Section } from "../section";
 import { ThemeContext } from "../theme";
+import { TinaMarkdown } from "tinacms/dist/rich-text";
 
 export const Hero = ({ data, parentField }) => {
   const theme = React.useContext(ThemeContext);
@@ -59,6 +60,16 @@ export const Hero = ({ data, parentField }) => {
             >
               <Markdown>{data.text}</Markdown>
             </div>
+          )}
+          {data.richText && (
+            <TinaMarkdown
+              blocks={{
+                Highlight: (props) => <div>Highlight</div>,
+                EmbeddedInfo: (props) => <div>Embeeded Info</div>,
+              }}
+            >
+              {data.richText}
+            </TinaMarkdown>
           )}
           {data.actions && (
             <Actions

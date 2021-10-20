@@ -1,15 +1,5 @@
 # tina-cloud-starter
 
-## 0.2.1
-
-### Patch Changes
-
-- ff4446c8e: Adds `getDocumentFields()` query for use with Tina Admin
-- Updated dependencies [a05aa61bd]
-  - tinacms@0.56.1
-  - react-tinacms-editor@0.52.0
-  - next-tinacms-cloudinary@3.3.0
-
 ## 0.2.0
 
 ### Minor Changes

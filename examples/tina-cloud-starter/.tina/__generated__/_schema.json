@@ -6,6 +6,165 @@
       "path": "content/posts",
       "fields": [
         {
+          "type": "object",
+          "label": "Some Field",
+          "name": "someField",
+          "list": true,
+          "fields": [
+            {
+              "name": "title",
+              "label": "Title",
+              "type": "string",
+              "namespace": [
+                "posts",
+                "someField",
+                "title"
+              ]
+            }
+          ],
+          "ui": {
+            "component": "MyGroupList"
+          },
+          "namespace": [
+            "posts",
+            "someField"
+          ]
+        },
+        {
+          "type": "rich-text",
+          "label": "Body",
+          "name": "_body",
+          "templates": [
+            {
+              "name": "DateTime",
+              "label": "Date & Time",
+              "inline": true,
+              "fields": [
+                {
+                  "name": "format",
+                  "label": "Format",
+                  "type": "string",
+                  "options": [
+                    "utc",
+                    "iso",
+                    "local"
+                  ],
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "DateTime",
+                    "format"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "DateTime"
+              ]
+            },
+            {
+              "name": "BlockQuote",
+              "label": "Block Quote",
+              "fields": [
+                {
+                  "name": "children",
+                  "label": "Quote",
+                  "type": "rich-text",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "BlockQuote",
+                    "children"
+                  ]
+                },
+                {
+                  "name": "authorName",
+                  "label": "Author",
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "BlockQuote",
+                    "authorName"
+                  ]
+                }
+              ],
+              "namespace": [
+                "posts",
+                "_body",
+                "BlockQuote"
+              ]
+            },
+            {
+              "name": "NewsletterSignup",
+              "label": "Newsletter Sign Up",
+              "fields": [
+                {
+                  "name": "children",
+                  "label": "CTA",
+                  "type": "rich-text",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "children"
+                  ]
+                },
+                {
+                  "name": "placeholder",
+                  "label": "Placeholder",
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "placeholder"
+                  ]
+                },
+                {
+                  "name": "buttonText",
+                  "label": "Button Text",
+                  "type": "string",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "buttonText"
+                  ]
+                },
+                {
+                  "name": "disclaimer",
+                  "label": "Disclaimer",
+                  "type": "rich-text",
+                  "namespace": [
+                    "posts",
+                    "_body",
+                    "NewsletterSignup",
+                    "disclaimer"
+                  ]
+                }
+              ],
+              "ui": {
+                "defaultItem": {
+                  "placeholder": "Enter your email",
+                  "buttonText": "Notify Me"
+                }
+              },
+              "namespace": [
+                "posts",
+                "_body",
+                "NewsletterSignup"
+              ]
+            }
+          ],
+          "isBody": true,
+          "namespace": [
+            "posts",
+            "_body"
+          ]
+        },
+        {
           "type": "string",
           "label": "Title",
           "name": "title",
@@ -58,19 +217,6 @@
           "namespace": [
             "posts",
             "excerpt"
-          ]
-        },
-        {
-          "type": "string",
-          "label": "Body",
-          "ui": {
-            "component": "markdown"
-          },
-          "name": "_body",
-          "isBody": true,
-          "namespace": [
-            "posts",
-            "_body"
           ]
         }
       ],
@@ -293,10 +439,7 @@
               "name": "nav",
               "list": true,
               "ui": {
-                "defaultItem": {
-                  "href": "home",
-                  "label": "Home"
-                }
+                "component": "MyGroupList"
               },
               "fields": [
                 {
@@ -622,9 +765,9 @@
                   ]
                 },
                 {
-                  "type": "string",
                   "label": "Text",
                   "name": "text",
+                  "type": "string",
                   "ui": {
                     "component": "markdown"
                   },
@@ -633,6 +776,112 @@
                     "blocks",
                     "hero",
                     "text"
+                  ]
+                },
+                {
+                  "label": "Children Text",
+                  "name": "children",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "name": "EmbeddedInfo",
+                      "label": "Embedded Info",
+                      "fields": [
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "type": "string",
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "children",
+                            "EmbeddedInfo",
+                            "text"
+                          ]
+                        },
+                        {
+                          "name": "children",
+                          "label": "Child Text",
+                          "type": "rich-text",
+                          "templates": [],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "children",
+                            "EmbeddedInfo",
+                            "children"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "children",
+                        "EmbeddedInfo"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "children"
+                  ]
+                },
+                {
+                  "label": "Rich Text",
+                  "name": "richText",
+                  "type": "rich-text",
+                  "templates": [
+                    {
+                      "name": "EmbeddedInfo",
+                      "label": "Embedded Info",
+                      "fields": [
+                        {
+                          "name": "text",
+                          "label": "Text",
+                          "type": "string",
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "richText",
+                            "EmbeddedInfo",
+                            "text"
+                          ]
+                        },
+                        {
+                          "name": "children",
+                          "label": "Child Text",
+                          "type": "rich-text",
+                          "templates": [],
+                          "namespace": [
+                            "pages",
+                            "blocks",
+                            "hero",
+                            "richText",
+                            "EmbeddedInfo",
+                            "children"
+                          ]
+                        }
+                      ],
+                      "namespace": [
+                        "pages",
+                        "blocks",
+                        "hero",
+                        "richText",
+                        "EmbeddedInfo"
+                      ]
+                    }
+                  ],
+                  "namespace": [
+                    "pages",
+                    "blocks",
+                    "hero",
+                    "richText"
                   ]
                 },
                 {
