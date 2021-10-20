@@ -12,7 +12,13 @@ limitations under the License.
 */
 
 import React, { FC } from 'react'
-import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
+import {
+  BrowserRouter as Router,
+  Switch,
+  Route,
+  Link,
+  NavLink,
+} from 'react-router-dom'
 import { ImFilesEmpty } from 'react-icons/im'
 
 import type { TinaCMS } from '@tinacms/toolkit'
@@ -64,13 +70,14 @@ export const TinaAdmin = () => {
                             {collections.map((collection) => {
                               return (
                                 <li key={`${collection.name}-link`}>
-                                  <Link
-                                    className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
+                                  <NavLink
+                                    className={`text-lg tracking-wide hover:text-blue-600 flex items-center opacity-90 hover:opacity-100`}
+                                    activeClassName="text-blue-600"
                                     to={`/admin/collections/${collection.name}`}
                                   >
                                     <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
                                     {collection.label}
-                                  </Link>
+                                  </NavLink>
                                 </li>
                               )
                             })}
