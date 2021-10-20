@@ -190,16 +190,16 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     <div className="mr-6 flex flex-0 items-center">
                       {!pristine && (
                         <>
-                          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-500 border border-yellow-600 mr-2"></span>{' '}
-                          <p className="opacity-80 text-sm leading-tight whitespace-nowrap">
+                          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-400 border border-yellow-500 mr-2"></span>{' '}
+                          <p className="text-gray-700 text-sm leading-tight whitespace-nowrap">
                             Unsaved Changes
                           </p>
                         </>
                       )}
                       {pristine && (
                         <>
-                          <span className="w-3 h-3 flex-0 rounded-full bg-green-500 border border-green-600 mr-2"></span>{' '}
-                          <p className="opacity-60 text-sm leading-tight whitespace-nowrap">
+                          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400 mr-2"></span>{' '}
+                          <p className="text-gray-500 text-sm leading-tight whitespace-nowrap">
                             No Changes
                           </p>
                         </>
