@@ -153,7 +153,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
    */
   const [i, setI] = React.useState(0)
   React.useEffect(() => {
-    console.log(tinaForm)
     setI((i) => i + 1)
   }, [tinaForm])
 
