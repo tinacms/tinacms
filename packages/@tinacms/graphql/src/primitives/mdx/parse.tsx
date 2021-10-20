@@ -626,10 +626,6 @@ export default function remarkToSlate(node: MdxAstNode) {
           type: 'code_line',
           children: [{ type: 'text', text: item }],
         })),
-        // children: [
-        //   { type: 'code_line', children: [{ type: 'text', text: node.value }] },
-        // ],
-        // value: node.value
       }
 
     // case 'html':
