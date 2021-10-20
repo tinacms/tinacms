@@ -28,6 +28,7 @@ import { FormActionMenu } from './FormActions'
 
 export interface FormBuilderProps {
   form: Form
+  hideFooter?: boolean
 }
 
 const NoFieldsPlaceholder = () => (
@@ -42,7 +43,11 @@ const NoFieldsPlaceholder = () => (
   </EmptyState>
 )
 
-export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
+export const FormBuilder: FC<FormBuilderProps> = ({
+  form: tinaForm,
+  ...rest
+}) => {
+  const hideFooter = !!rest.hideFooter
   /**
    * > Why is a `key` being set when this isn't an array?
    *
@@ -96,38 +101,40 @@ export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
                   </Wrapper>
                 </FormPortalProvider>
               </FormBody>
-              <FormFooter className="form-footer">
-                <Wrapper>
-                  {tinaForm.reset && (
-                    <ResetForm
-                      pristine={pristine}
-                      reset={async () => {
-                        finalForm.reset()
-                        await tinaForm.reset!()
-                      }}
+              {!hideFooter && (
+                <FormFooter className="form-footer">
+                  <Wrapper>
+                    {tinaForm.reset && (
+                      <ResetForm
+                        pristine={pristine}
+                        reset={async () => {
+                          finalForm.reset()
+                          await tinaForm.reset!()
+                        }}
+                      >
+                        {tinaForm.buttons.reset}
+                      </ResetForm>
+                    )}
+                    <Button
+                      onClick={() => handleSubmit()}
+                      disabled={pristine || submitting || invalid}
+                      busy={submitting}
+                      primary
+                      grow
+                      margin
                     >
-                      {tinaForm.buttons.reset}
-                    </ResetForm>
-                  )}
-                  <Button
-                    onClick={() => handleSubmit()}
-                    disabled={pristine || submitting || invalid}
-                    busy={submitting}
-                    primary
-                    grow
-                    margin
-                  >
-                    {submitting && <LoadingDots />}
-                    {!submitting && tinaForm.buttons.save}
-                  </Button>
-                  {tinaForm.actions.length > 0 && (
-                    <FormActionMenu
-                      form={tinaForm as any}
-                      actions={tinaForm.actions}
-                    />
-                  )}
-                </Wrapper>
-              </FormFooter>
+                      {submitting && <LoadingDots />}
+                      {!submitting && tinaForm.buttons.save}
+                    </Button>
+                    {tinaForm.actions.length > 0 && (
+                      <FormActionMenu
+                        form={tinaForm as any}
+                        actions={tinaForm.actions}
+                      />
+                    )}
+                  </Wrapper>
+                </FormFooter>
+              )}
             </DragDropContext>
           )
         }}

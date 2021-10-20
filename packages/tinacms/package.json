@@ -8,7 +8,8 @@
   "buildConfig": {
     "entryPoints": [
       "src/index.ts",
-      "src/edit-state.tsx"
+      "src/edit-state.tsx",
+      "src/rich-text.tsx"
     ]
   },
   "typings": "dist/index.d.ts",
