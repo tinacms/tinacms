@@ -57,16 +57,13 @@ export const TinaAdmin = () => {
                           </h2>
                         </div>
                         <div className="px-6 py-7">
-                          <h4 className="uppercase font-bold text-sm mb-3">
+                          <h4 className="uppercase font-bold text-sm mb-4">
                             Collections
                           </h4>
-                          <ul>
+                          <ul className="flex flex-col gap-4">
                             {collections.map((collection) => {
                               return (
-                                <li
-                                  key={`${collection.name}-link`}
-                                  className="mb-2"
-                                >
+                                <li key={`${collection.name}-link`}>
                                   <Link
                                     className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
                                     to={`/admin/collections/${collection.name}`}
