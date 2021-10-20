@@ -187,24 +187,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     <h4 className="font-bold text-lg opacity-80">{label}</h4>
                   )}
                   <div className="flex flex-1 items-center justify-end">
-                    <div className="mr-6 flex flex-0 items-center">
-                      {!pristine && (
-                        <>
-                          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-400 border border-yellow-500 mr-2"></span>{' '}
-                          <p className="text-gray-700 text-sm leading-tight whitespace-nowrap">
-                            Unsaved Changes
-                          </p>
-                        </>
-                      )}
-                      {pristine && (
-                        <>
-                          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400 mr-2"></span>{' '}
-                          <p className="text-gray-500 text-sm leading-tight whitespace-nowrap">
-                            No Changes
-                          </p>
-                        </>
-                      )}
-                    </div>
+                    <FormStatus pristine={pristine} />
                     {tinaForm.reset && (
                       <ResetForm
                         pristine={pristine}
@@ -253,6 +236,29 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         }}
       </FinalForm>
     </ModalProvider>
+  )
+}
+
+const FormStatus = ({ pristine }) => {
+  return (
+    <div className="mr-6 flex flex-0 items-center">
+      {!pristine && (
+        <>
+          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-400 border border-yellow-500 mr-2"></span>{' '}
+          <p className="text-gray-700 text-sm leading-tight whitespace-nowrap">
+            Unsaved Changes
+          </p>
+        </>
+      )}
+      {pristine && (
+        <>
+          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400 mr-2"></span>{' '}
+          <p className="text-gray-500 text-sm leading-tight whitespace-nowrap">
+            No Changes
+          </p>
+        </>
+      )}
+    </div>
   )
 }
 
