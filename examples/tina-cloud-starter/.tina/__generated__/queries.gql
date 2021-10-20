@@ -1,0 +1,31 @@
+query getPostsDocument($relativePath: String!) {
+  getPostsDocument(relativePath: $relativePath) {
+    data {
+      ...PostsParts
+    }
+  }
+}
+
+query getGlobalDocument($relativePath: String!) {
+  getGlobalDocument(relativePath: $relativePath) {
+    data {
+      ...GlobalParts
+    }
+  }
+}
+
+query getAuthorsDocument($relativePath: String!) {
+  getAuthorsDocument(relativePath: $relativePath) {
+    data {
+      ...AuthorsParts
+    }
+  }
+}
+
+query getPagesDocument($relativePath: String!) {
+  getPagesDocument(relativePath: $relativePath) {
+    data {
+      ...PagesParts
+    }
+  }
+}

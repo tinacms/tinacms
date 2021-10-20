@@ -13,19 +13,19 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
-import { print } from 'graphql'
-import type { FragmentDefinitionNode } from 'graphql'
+import { print, OperationDefinitionNode } from 'graphql'
+import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
-import { astBuilder } from './ast-builder'
+import { astBuilder, NAMER } from './ast-builder'
 import { sequential } from './util'
 import { createBuilder } from './builder'
 import { createSchema } from './schema'
 import { extractInlineTypes } from './ast-builder'
 
-import type { FieldDefinitionNode } from 'graphql'
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
 import { buildSKD } from '../sdkBuilder'
+import { Database } from './database'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
 export const indexDB = async ({ database, config }) => {
@@ -43,6 +43,7 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   const definitions = []
   definitions.push(await builder.buildStaticDefinitions())
   const queryTypeDefinitionFields: FieldDefinitionNode[] = []
+  const operationsDefinitions: OperationDefinitionNode[] = []
   const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
   const mutationTypeDefinitionFields: FieldDefinitionNode[] = []
 
@@ -79,15 +80,98 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   queryTypeDefinitionFields.push(await builder.multiCollectionDocumentFields())
 
   /**
-   * Collection queries/mutations
+   * Collection queries/mutations/fragments
    */
   await sequential(collections, async (collection) => {
-    const collectionAST = await builder.collectionDocument(collection)
-    const posableFrag = await builder.collectionFragment(collection)
-    posableFrag &&
-      fragmentDefinitionsFields.push(posableFrag as FragmentDefinitionNode)
+    queryTypeDefinitionFields.push(await builder.collectionDocument(collection))
 
-    queryTypeDefinitionFields.push(collectionAST)
+    const frag = (await builder.collectionFragment(
+      collection
+    )) as FragmentDefinitionNode
+
+    fragmentDefinitionsFields.push(frag)
+
+    operationsDefinitions.push({
+      kind: 'OperationDefinition' as const,
+      operation: 'query' as const,
+      name: {
+        kind: 'Name' as const,
+        value: NAMER.queryName(collection.namespace),
+      },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition' as const,
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name' as const, value: 'String' },
+            },
+          },
+          variable: {
+            kind: 'Variable' as const,
+            name: { kind: 'Name' as const, value: 'relativePath' },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections: [
+          {
+            kind: 'Field',
+            name: {
+              kind: 'Name',
+              value: NAMER.queryName(collection.namespace),
+            },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: {
+                  kind: 'Name',
+                  value: 'relativePath',
+                },
+                value: {
+                  kind: 'Variable',
+                  name: {
+                    kind: 'Name',
+                    value: 'relativePath',
+                  },
+                },
+              },
+            ],
+            directives: [],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'data',
+                  },
+                  arguments: [],
+                  directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value:
+                            NAMER.dataTypeName(collection.namespace) + 'Parts',
+                        },
+                        directives: [],
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    })
 
     mutationTypeDefinitionFields.push(
       await builder.updateCollectionDocumentMutation(collection)
@@ -131,10 +215,25 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
+  const queryDoc = {
+    kind: 'Document' as const,
+    definitions: _.uniqBy(
+      // @ts-ignore
+      extractInlineTypes(operationsDefinitions),
+      (node) => node.name.value
+    ),
+  }
+  console.log(print(queryDoc))
 
   // TODO: These should possibly be outputted somewhere else?
-  const fragPath = process.cwd() + '/.tina/__generated__/frags.gql'
-  await fs.outputFileSync(fragPath, print(fragDoc))
+  const fragPath = process.cwd() + '/.tina/__generated__/'
+
+  await fs.outputFileSync(fragPath + 'frags.gql', print(fragDoc))
+  await fs.outputFileSync(fragPath + 'frags.json', JSON.stringify(fragPath))
+
+  await fs.outputFileSync(fragPath + 'queries.gql', print(queryDoc))
+  await fs.outputFileSync(fragPath + 'queries.json', JSON.stringify(fragPath))
+
   const sdk = buildSKD(tinaSchema)
   const clientPath = process.cwd() + '/.tina/__generated__/client.ts'
   await fs.outputFileSync(clientPath, sdk)
