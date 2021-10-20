@@ -127,7 +127,7 @@ export const FieldsGroup = styled.div<{ padding: boolean }>`
   width: 100%;
   height: 100%;
   white-space: nowrap;
-  overflow-y: auto !important;
+  overflow-x: visible !important;
 
   ${(props) =>
     props.padding &&

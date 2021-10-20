@@ -157,6 +157,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
    */
   const [i, setI] = React.useState(0)
   React.useEffect(() => {
+    console.log(tinaForm)
     setI((i) => i + 1)
   }, [tinaForm])
 
@@ -186,22 +187,26 @@ export const FormBuilder: FC<FormBuilderProps> = ({
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
               <div className="w-full h-screen flex flex-col items-center">
-                <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex gap-6 justify-between items-center">
+                <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex flex-wrap gap-x-6 gap-y-3 justify-between items-center">
                   {label && (
                     <h4 className="font-bold text-lg opacity-80">{label}</h4>
                   )}
                   <div className="flex flex-1 items-center justify-end">
-                    <div className="mr-6 flex items-center">
+                    <div className="mr-6 flex flex-0 items-center">
                       {!pristine && (
                         <>
-                          <span className="w-3 h-3 rounded-full bg-yellow-500 border border-yellow-600 mr-2"></span>{' '}
-                          <p className="opacity-80">Unsaved changes</p>
+                          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-500 border border-yellow-600 mr-2"></span>{' '}
+                          <p className="opacity-80 text-sm leading-tight whitespace-nowrap">
+                            Unsaved Changes
+                          </p>
                         </>
                       )}
                       {pristine && (
                         <>
-                          <span className="w-3 h-3 rounded-full bg-green-500 border border-green-600 mr-2"></span>{' '}
-                          <p className="opacity-80">No changes</p>
+                          <span className="w-3 h-3 flex-0 rounded-full bg-green-500 border border-green-600 mr-2"></span>{' '}
+                          <p className="opacity-60 text-sm leading-tight whitespace-nowrap">
+                            No Changes
+                          </p>
                         </>
                       )}
                     </div>
@@ -234,7 +239,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     )}
                   </div>
                 </div>
-                <FullscreenFormWrapper>
+                <FormWrapper padded={true}>
                   <FormPortalProvider>
                     {tinaForm && tinaForm.fields.length ? (
                       <FieldsBuilder
@@ -246,7 +251,7 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       <NoFieldsPlaceholder />
                     )}
                   </FormPortalProvider>
-                </FullscreenFormWrapper>
+                </FormWrapper>
               </div>
             </DragDropContext>
           )
@@ -256,11 +261,13 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   )
 }
 
-export const FullscreenFormWrapper = ({ children }) => {
+export const FormWrapper = ({ children, padded = false }) => {
   return (
     <div className="relative w-full flex-1 overflow-y-auto">
-      <div className="w-full flex justify-center px-6 pt-12">
-        <div className="max-w-screen-md w-full mb-12">{children}</div>
+      <div className={`w-full flex justify-center ${padded && `px-6 pt-8`}`}>
+        <div className={`max-w-screen-md w-full ${padded && `mb-8`}`}>
+          {children}
+        </div>
       </div>
     </div>
   )

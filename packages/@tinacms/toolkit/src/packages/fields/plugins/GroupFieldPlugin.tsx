@@ -19,11 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import {
-  FieldsBuilder,
-  useFormPortal,
-  FullscreenFormWrapper,
-} from '../../form-builder'
+import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../icons'
 import { useCMS } from '../../react-core/use-cms'
 
@@ -186,7 +182,7 @@ export const PanelBody = ({ children }) => {
       className="flex-1 w-full"
       style={{ background: 'var(--tina-color-grey-1)' }}
     >
-      <FullscreenFormWrapper>{children}</FullscreenFormWrapper>
+      <FormWrapper>{children}</FormWrapper>
     </div>
   )
 }
