@@ -153,7 +153,7 @@ class ErrorBoundary extends React.Component {
       )
     }
     /* @ts-ignore */
-    if (this.state.pageRefresh || true) {
+    if (this.state.pageRefresh) {
       return <Loader>Let's try that again.</Loader>
     }
 
