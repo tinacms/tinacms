@@ -19,12 +19,19 @@ import Layout from './components/Layout'
 import GetCMS from './components/GetCMS'
 import GetCollections from './components/GetCollections'
 
+import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 
 import useEmbedTailwind from './hooks/useEmbedTailwind'
+import { isEditing, setEditing } from '../edit-state'
+
+const logout = () => {
+  setEditing(false)
+  window.location.reload()
+}
 
 export const TinaAdmin = () => {
   useEmbedTailwind()
@@ -32,6 +39,20 @@ export const TinaAdmin = () => {
   const isSSR = typeof window === 'undefined'
   if (isSSR) {
     return null
+  }
+
+  /**
+   * TODO:
+   * Ideally, this line should be `const { edit } = useEditState()` if we weren't having context issues with `EditStateProvider`.
+   * https://github.com/tinacms/tinacms/issues/2081
+   */
+  const isEdit = isEditing()
+  if (!isEdit) {
+    return (
+      <Layout>
+        <LoginPage />
+      </Layout>
+    )
   }
 
   return (
@@ -69,6 +90,22 @@ export const TinaAdmin = () => {
                             </li>
                           )
                         })}
+                        <li className="pt-5">
+                          <a
+                            href="/"
+                            className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
+                          >
+                            Back to site
+                          </a>
+                        </li>
+                        <li className="pt-5">
+                          <button
+                            className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
+                            onClick={() => logout()}
+                          >
+                            Log out
+                          </button>
+                        </li>
                       </ul>
                     </div>
                   </div>
