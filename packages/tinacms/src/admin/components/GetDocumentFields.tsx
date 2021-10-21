@@ -20,12 +20,17 @@ interface GetDocumentFields {
 export interface Info {
   collection: Object | undefined
   fields: Object[] | undefined
+  mutationInfo: {
+    includeCollection: boolean
+    includeTemplate: boolean
+  }
 }
 
 export const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
   const [info, setInfo] = useState<Info>({
     collection: undefined,
     fields: undefined,
+    mutationInfo: undefined,
   })
 
   useEffect(() => {
@@ -37,10 +42,15 @@ export const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
       const documentFields = response.getDocumentFields
       const collection: Object = documentFields[collectionName].collection
       const fields: Object[] = documentFields[collectionName].fields
+      const mutationInfo: {
+        includeCollection: boolean
+        includeTemplate: boolean
+      } = documentFields[collectionName].mutationInfo
 
       setInfo({
         collection,
         fields,
+        mutationInfo,
       })
     }
 
@@ -59,8 +69,11 @@ const GetDocumentFields = ({
   collectionName: string
   children: any
 }) => {
-  const { collection, fields } = useGetDocumentFields(cms, collectionName)
-  if (!collection || !fields) {
+  const { collection, fields, mutationInfo } = useGetDocumentFields(
+    cms,
+    collectionName
+  )
+  if (!collection || !fields || !mutationInfo) {
     return null
   }
   return <>{children(collection, fields)}</>

@@ -15,7 +15,17 @@ import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 export interface Document {
-  form: Object
+  form: {
+    label: string
+    name: string
+    fields: Object[]
+    mutationInfo: {
+      path: string[]
+      string: string
+      includeCollection: boolean
+      includeTemplate: boolean
+    }
+  }
   values: Object
 }
 
