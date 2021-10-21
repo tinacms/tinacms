@@ -104,6 +104,7 @@ const Handle = styled.div`
     max-height: 10rem;
     min-height: 5rem;
     height: 33.3%;
+    max-height: 20vh;
     background: var(--tina-color-grey-3);
   }
 `

@@ -179,7 +179,7 @@ export const PanelHeader = styled.div`
 export const PanelBody = ({ children }) => {
   return (
     <div
-      className="flex-1 w-full py-1 overflow-y-auto"
+      className="flex-1 w-full overflow-y-auto"
       style={{ background: 'var(--tina-color-grey-1)' }}
     >
       <FormWrapper>{children}</FormWrapper>

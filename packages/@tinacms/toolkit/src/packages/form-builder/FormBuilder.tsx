@@ -217,8 +217,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     )}
                   </div>
                 </div>
-                <FormWrapper padded={true}>
-                  <FormPortalProvider>
+                <FormPortalProvider>
+                  <FormWrapper padded={true}>
                     {tinaForm && tinaForm.fields.length ? (
                       <FieldsBuilder
                         form={tinaForm}
@@ -228,8 +228,8 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                     ) : (
                       <NoFieldsPlaceholder />
                     )}
-                  </FormPortalProvider>
-                </FormWrapper>
+                  </FormWrapper>
+                </FormPortalProvider>
               </div>
             </DragDropContext>
           )
@@ -264,7 +264,7 @@ const FormStatus = ({ pristine }) => {
 
 export const FormWrapper = ({ children, padded = false }) => {
   return (
-    <div className="relative w-full flex-1 overflow-y-auto">
+    <div className="max-h-full overflow-y-auto h-full">
       <div className={`w-full flex justify-center ${padded && `px-6 pt-8`}`}>
         <div className={`max-w-screen-md w-full ${padded && `mb-0`}`}>
           {children}
@@ -282,7 +282,6 @@ const SidebarFormBody = styled.div`
   width: 100%;
   overflow: auto;
   border-top: 1px solid var(--tina-color-grey-2);
-  padding-bottom: 20px;
   background-color: #f6f6f9;
 `
 const FormFooter = styled.div`

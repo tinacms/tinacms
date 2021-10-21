@@ -133,6 +133,7 @@ export const FieldsGroup = styled.div<{ padding: boolean }>`
     props.padding &&
     css`
       overflow-x: hidden;
+      overflow-y: auto;
       padding: 20px 20px 0 20px;
     `};
 `
