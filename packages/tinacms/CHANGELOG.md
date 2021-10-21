@@ -1,5 +1,19 @@
 # tinacms
 
+## 0.56.3
+
+### Patch Changes
+
+- 67df49220: Allow dashes in filenames for content creator
+- Updated dependencies [b961c7417]
+  - @tinacms/toolkit@0.54.1
+
+## 0.56.2
+
+### Patch Changes
+
+- 84a86358f: Fix bug which reset the form onChange for GraphQL forms
+
 ## 0.56.1
 
 ### Patch Changes
