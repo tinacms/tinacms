@@ -98,14 +98,12 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
 
               if (plugin) {
                 return (
-                  <>
-                    <plugin.Component
-                      {...fieldProps}
-                      form={form.finalForm}
-                      tinaForm={form}
-                      field={field}
-                    />
-                  </>
+                  <plugin.Component
+                    {...fieldProps}
+                    form={form.finalForm}
+                    tinaForm={form}
+                    field={field}
+                  />
                 )
               }
 
