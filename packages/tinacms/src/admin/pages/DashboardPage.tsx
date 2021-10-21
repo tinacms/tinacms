@@ -23,7 +23,7 @@ const DashboardPage = () => {
       </div>
       <div className="w-full px-6 py-10 flex justify-center">
         <div className="max-w-screen-md w-full">
-          <p>
+          <p className="text-gray-700 text-lg">
             This is your dashboard for editing or creating content. Select a
             collection on the left to begin.
           </p>
