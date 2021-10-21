@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Form, FormBuilder } from '@tinacms/toolkit'
+import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
 import { useParams, useHistory, Link } from 'react-router-dom'
 
 import type { TinaCMS } from '@tinacms/toolkit'
@@ -103,7 +103,7 @@ const CollectionCreatePage = () => {
                   - Create New
                 </h3> */}
                 <div className="flex flex-col items-center w-full flex-1">
-                  <FormBuilder
+                  <FullscreenFormBuilder
                     label={collection.label + ' - Create New'}
                     form={form}
                   />
