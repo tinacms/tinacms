@@ -1,5 +1,12 @@
 # Change Log
 
+## 0.52.1
+
+### Patch Changes
+
+- Updated dependencies [b961c7417]
+  - @tinacms/toolkit@0.54.1
+
 ## 0.52.0
 
 ### Minor Changes
