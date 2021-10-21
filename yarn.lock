@@ -21582,6 +21582,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"path-to-regexp@npm:^1.7.0":
+  version: 1.8.0
+  resolution: "path-to-regexp@npm:1.8.0"
+  dependencies:
+    isarray: 0.0.1
+  checksum: 4c0d9aaf3fc55db0b2d9aab379856acbf4e437f2252bbc2a178aec9f707c8457f8084ea6243a80e0b37c8c1c20d23e918cd43e772a7e71142a8ad67af699686b
+  languageName: node
+  linkType: hard
+
 "path-type@npm:^1.0.0":
   version: 1.1.0
   resolution: "path-type@npm:1.1.0"
@@ -21590,15 +21599,6 @@ fsevents@~2.1.2:
     pify: ^2.0.0
     pinkie-promise: ^2.0.0
   checksum: c6ac7d4c7d613331ae1837a10c96a0f4fe76dc9273f98e37ce589c06b7ea6f811479ac735dbae06327d93cc6340d0cba944e9d38b0365b7b0bc0438f3fb242e0
-  languageName: node
-  linkType: hard
-
-"path-to-regexp@npm:^1.7.0":
-  version: 1.8.0
-  resolution: "path-to-regexp@npm:1.8.0"
-  dependencies:
-    isarray: 0.0.1
-  checksum: 4c0d9aaf3fc55db0b2d9aab379856acbf4e437f2252bbc2a178aec9f707c8457f8084ea6243a80e0b37c8c1c20d23e918cd43e772a7e71142a8ad67af699686b
   languageName: node
   linkType: hard
 
@@ -23739,7 +23739,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-tinacms-editor@^0.52.0, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
+"react-tinacms-editor@^0.52.1, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
   version: 0.0.0-use.local
   resolution: "react-tinacms-editor@workspace:packages/react-tinacms-editor"
   dependencies:
@@ -23842,7 +23842,7 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-inline@^0.53.0, react-tinacms-inline@workspace:packages/react-tinacms-inline":
+"react-tinacms-inline@^0.53.1, react-tinacms-inline@workspace:packages/react-tinacms-inline":
   version: 0.0.0-use.local
   resolution: "react-tinacms-inline@workspace:packages/react-tinacms-inline"
   dependencies:
@@ -27429,8 +27429,8 @@ resolve@^2.0.0-next.3:
     react-dom: ^16.14.0
     react-icons: ^4.2.0
     react-is: ^17.0.2
-    react-tinacms-editor: ^0.52.0
-    react-tinacms-inline: ^0.53.0
+    react-tinacms-editor: ^0.52.1
+    react-tinacms-inline: ^0.53.1
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"
