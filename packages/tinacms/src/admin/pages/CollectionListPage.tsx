@@ -43,7 +43,8 @@ const CollectionListPage = () => {
                     <h3 className="text-3xl">{collection.label}</h3>
                     <Link
                       to={`${location.pathname}/new`}
-                      className="inline-flex items-center px-6 py-3 border border-transparent text-base leading-5 font-medium rounded-full text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 active:bg-blue-700 transition duration-150 ease-in-out"
+                      className="inline-flex items-center px-8 py-3 shadow-sm border border-transparent text-sm leading-4 font-medium rounded-full text-white hover:opacity-80 focus:outline-none focus:shadow-outline-blue  transition duration-150 ease-out"
+                      style={{ background: '#0084FF' }}
                     >
                       Create New
                     </Link>
