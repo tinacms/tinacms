@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 interface GetDocumentFields {
@@ -22,7 +22,7 @@ export interface Info {
   fields: Object[] | undefined
 }
 
-const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
+export const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
   const [info, setInfo] = useState<Info>({
     collection: undefined,
     fields: undefined,
@@ -50,4 +50,20 @@ const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
   return info
 }
 
-export default useGetDocumentFields
+const GetDocumentFields = ({
+  cms,
+  collectionName,
+  children,
+}: {
+  cms: TinaCMS
+  collectionName: string
+  children: any
+}) => {
+  const { collection, fields } = useGetDocumentFields(cms, collectionName)
+  if (!collection || !fields) {
+    return null
+  }
+  return <>{children(collection, fields)}</>
+}
+
+export default GetDocumentFields
