@@ -81,14 +81,9 @@ type Collection {
 
 union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDocument
 
-type PostsSomeField {
-  title: String
-}
-
 union PostsAuthorDocument = AuthorsDocument
 
 type Posts {
-  someField: [PostsSomeField]
   _body: JSON
   title: String
   author: PostsAuthorDocument
@@ -220,8 +215,6 @@ type PagesBlocksHero {
   tagline: String
   headline: String
   text: String
-  children: JSON
-  richText: JSON
   actions: [PagesBlocksHeroActions]
   image: PagesBlocksHeroImage
   color: String
@@ -302,12 +295,7 @@ input DocumentMutation {
   pages: PagesMutation
 }
 
-input PostsSomeFieldMutation {
-  title: String
-}
-
 input PostsMutation {
-  someField: [PostsSomeFieldMutation]
   _body: JSON
   title: String
   author: String
@@ -379,8 +367,6 @@ input PagesBlocksHeroMutation {
   tagline: String
   headline: String
   text: String
-  children: JSON
-  richText: JSON
   actions: [PagesBlocksHeroActionsMutation]
   image: PagesBlocksHeroImageMutation
   color: String

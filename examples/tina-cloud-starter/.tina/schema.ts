@@ -312,54 +312,6 @@ const heroBlockSchema: TinaTemplate = {
       },
     },
     {
-      label: "Children Text",
-      name: "children",
-      type: "rich-text",
-      templates: [
-        {
-          name: "EmbeddedInfo",
-          label: "Embedded Info",
-          fields: [
-            {
-              name: "text",
-              label: "Text",
-              type: "string",
-            },
-            {
-              name: "children",
-              label: "Child Text",
-              type: "rich-text",
-              templates: [],
-            },
-          ],
-        },
-      ],
-    },
-    {
-      label: "Rich Text",
-      name: "richText",
-      type: "rich-text",
-      templates: [
-        {
-          name: "EmbeddedInfo",
-          label: "Embedded Info",
-          fields: [
-            {
-              name: "text",
-              label: "Text",
-              type: "string",
-            },
-            {
-              name: "children",
-              label: "Child Text",
-              type: "rich-text",
-              templates: [],
-            },
-          ],
-        },
-      ],
-    },
-    {
       label: "Actions",
       name: "actions",
       type: "object",
@@ -436,22 +388,6 @@ export default defineSchema({
       name: "posts",
       path: "content/posts",
       fields: [
-        {
-          type: "object",
-          label: "Some Field",
-          name: "someField",
-          list: true,
-          fields: [
-            {
-              name: "title",
-              label: "Title",
-              type: "string",
-            },
-          ],
-          ui: {
-            component: "MyGroupList",
-          },
-        },
         {
           type: "rich-text",
           label: "Body",

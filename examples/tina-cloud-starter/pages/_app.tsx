@@ -26,25 +26,9 @@ const App = ({ Component, pageProps }) => {
                 TinaCloudCloudinaryMediaStore
             )}
             cmsCallback={(cms) => {
-              cms.sidebar.isOpen = true;
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
-              cms.fields.add({
-                ...GroupListFieldPlugin, // spread existing group-list plugin
-                name: "MyGroupList",
-                itemProps: (item) => {
-                  console.log(item);
-                  return {
-                    key: item.title, // ensure this is unique
-                    label: item.title, // item will be the field values, so if you have a `name` field, you can use that as the label
-                  };
-                },
-              });
-              // import("tinacms").then(({ GroupListFieldPlugin }) => {
-              //   console.log("doit", GroupListFieldPlugin);
-
-              // });
             }}
             documentCreatorCallback={{
               /**
