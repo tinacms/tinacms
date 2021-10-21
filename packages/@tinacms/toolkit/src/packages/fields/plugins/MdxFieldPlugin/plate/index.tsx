@@ -16,18 +16,17 @@ import { Transforms } from 'slate'
 import styled from 'styled-components'
 import {
   Plate,
-  createReactPlugin, // withReact
-  createHistoryPlugin, // withHistory
-  unwrapList,
-  createParagraphPlugin, // paragraph element
-  createBlockquotePlugin, // blockquote element
-  createCodeBlockPlugin, // code block element
-  createHeadingPlugin, // heading elements
-  createBoldPlugin, // bold mark
-  createItalicPlugin, // italic mark
-  createUnderlinePlugin, // underline mark
-  createStrikethroughPlugin, // strikethrough mark
-  createCodePlugin, // code mark
+  createReactPlugin,
+  createHistoryPlugin,
+  createParagraphPlugin,
+  createBlockquotePlugin,
+  createCodeBlockPlugin,
+  createHeadingPlugin,
+  createBoldPlugin,
+  createItalicPlugin,
+  createUnderlinePlugin,
+  createStrikethroughPlugin,
+  createCodePlugin,
   createPlateComponents,
   createIndentPlugin,
   createNormalizeTypesPlugin,
@@ -45,23 +44,19 @@ import {
   createSoftBreakPlugin,
   createExitBreakPlugin,
   getPlatePluginTypes,
-  AutoformatBlockRule,
-  SPEditor,
   PlatePlugin,
   getRenderElement,
 } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
-import { MdxField, ImageField } from '../field'
+import { ImageField } from './image-field'
 import { Form } from '../../../../forms'
 import { CONFIG } from './config'
 import { ToolbarButtons } from './toolbar'
 import { useCMS } from '../../../../react-core'
 import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
+import { MdxElement } from './mdx-dropdown'
 
 import type { InputProps } from '../../../components'
-
-export const clearBlockFormat: AutoformatBlockRule['preFormat'] = (editor) =>
-  unwrapList(editor as SPEditor)
 
 export const createTinaImagePlugin = () => {
   return {
@@ -218,22 +213,24 @@ export const RichEditor = wrapFieldsWithMeta<
   const [value, setValue] = React.useState(
     props.input.value.children
       ? [...props.input.value.children?.map(normalize)]
-      : [{ type: 'p', children: [{ type: 'text', text: '' }] }]
+      : // Empty values need at least one item
+        [{ type: 'p', children: [{ type: 'text', text: '' }] }]
   )
 
   const templates = props.field.templates
+  const name = props.input.name
 
   React.useEffect(() => {
     props.input.onChange({ type: 'root', children: value })
   }, [JSON.stringify(value)])
-  const name = props.input.name
+
   const components = createPlateComponents({
     img: (props) => <Img {...props} name={name} />,
     mdxJsxTextElement: (props) => {
-      return <MdxPicker {...props} templates={templates} inline={true} />
+      return <MdxElement {...props} templates={templates} inline={true} />
     },
     mdxJsxFlowElement: (props) => {
-      return <MdxPicker {...props} templates={templates} inline={false} />
+      return <MdxElement {...props} templates={templates} inline={false} />
     },
   })
 
@@ -241,36 +238,22 @@ export const RichEditor = wrapFieldsWithMeta<
     createTinaImagePlugin(),
     createMDXPlugin(),
     createMDXTextPlugin(),
-    // editor
-    createReactPlugin(), // withReact
-    createHistoryPlugin(), // withHistory
+    createReactPlugin(),
+    createHistoryPlugin(),
     createHorizontalRulePlugin(),
-    // elements
-    createParagraphPlugin(), // paragraph element
-    createBlockquotePlugin(), // blockquote element
-    createCodeBlockPlugin(), // code block element
-    createHeadingPlugin(), // heading elements
-    createLinkPlugin(), // link elements
+    createParagraphPlugin(),
+    createBlockquotePlugin(),
+    createCodeBlockPlugin(),
+    createHeadingPlugin(),
+    createLinkPlugin(),
     createListPlugin(),
     createImagePlugin(),
-    // marks
-    createBoldPlugin(), // bold mark
-    createItalicPlugin(), // italic mark
-    createUnderlinePlugin(), // underline mark
-    createStrikethroughPlugin(), // strikethrough mark
-    createCodePlugin(), // code mark
+    createBoldPlugin(),
+    createItalicPlugin(),
+    createUnderlinePlugin(),
+    createStrikethroughPlugin(),
+    createCodePlugin(),
     ...createBasicMarkPlugins(),
-    // autoformat rules
-    // createAutoformatPlugin(optionsAutoformat),
-    // createResetNodePlugin(optionsResetBlockTypePlugin),
-    // createSoftBreakPlugin(optionsSoftBreakPlugin),
-    // createExitBreakPlugin(optionsExitBreakPlugin),
-    // createTrailingBlockPlugin({
-    //   type: ELEMENT_PARAGRAPH,
-    // }),
-    // createSelectOnBackspacePlugin({
-    //   allow: [ELEMENT_IMAGE],
-    // }),
     createIndentPlugin(CONFIG.indent),
     createAutoformatPlugin(CONFIG.autoformat),
     createResetNodePlugin(CONFIG.resetBlockType),
@@ -281,27 +264,21 @@ export const RichEditor = wrapFieldsWithMeta<
     createSelectOnBackspacePlugin(CONFIG.selectOnBackspace),
   ]
   return (
-    <>
-      <Wrapper>
-        <ToolbarWrapper>
-          <div>
-            <ToolbarButtons name={props.input.name} templates={templates} />
-          </div>
-        </ToolbarWrapper>
-        <PlateWrapper>
-          <Plate
-            id={props.input.name}
-            initialValue={value}
-            plugins={pluginsBasic}
-            components={components}
-            options={options}
-            onChange={(value) => {
-              setValue(value)
-            }}
-          />
-        </PlateWrapper>
-      </Wrapper>
-    </>
+    <div>
+      <ToolbarButtons name={props.input.name} templates={templates} />
+      <PlateWrapper>
+        <Plate
+          id={props.input.name}
+          initialValue={value}
+          plugins={pluginsBasic}
+          components={components}
+          options={options}
+          onChange={(value) => {
+            setValue(value)
+          }}
+        />
+      </PlateWrapper>
+    </div>
   )
 })
 
@@ -321,98 +298,6 @@ const normalize = (node: any) => {
   return node
 }
 
-export const MdxPicker = (props) => {
-  const editor = useStoreEditorRef(props.name)
-  const isFocused = useFocused()
-  const isSelected = useSelected()
-  const initialValues = props.element.props
-  const activeTemplate = props.templates.find(
-    (template) => template.name === props.element.name
-  )
-  const id = props.element.name + Math.floor(Math.random() * 100)
-  const form = React.useMemo(() => {
-    return new Form({
-      id,
-      label: id,
-      initialValues,
-      onChange: ({ values }) => {
-        const isInline = props.element.type === 'mdxJsxTextElement'
-        if (isInline) {
-          const newProperties = {
-            props: values,
-          }
-          // @ts-ignore BaseEditor fix
-          Transforms.setNodes(editor, newProperties, {
-            /**
-             * match traverses the ancestors of the relevant node
-             * so matching on type works for this, but likely won't work
-             * on more complex nested mdxJsxTextElement nodes. I think
-             * we'll want to match the path to the selection path, but
-             * they're off by one:
-             * selection.focus.path => [0, 1, 0]
-             * and path is [0, 1]. I believe that's because the last
-             * 0 in the focus.path array is referring to the text node
-             */
-            match: (node) => {
-              // @ts-ignore BaseEditor fix
-              if (node.type === 'mdxJsxTextElement') {
-                return true
-              }
-              return false
-            },
-            // @ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
-            at: ReactEditor.findPath(editor, props.element),
-          })
-        } else {
-          const newProperties = {
-            props: values,
-          }
-
-          // @ts-ignore BaseEditor fix
-          Transforms.setNodes(editor, newProperties, {
-            // ts-ignore Argument of type 'SPEditor' is not assignable to parameter of type 'ReactEditor'
-            at: ReactEditor.findPath(editor, props.element),
-          })
-        }
-      },
-      onSubmit: () => {},
-      fields: activeTemplate ? activeTemplate.fields : [],
-    })
-  }, [])
-
-  return (
-    <div
-      {...props.attributes}
-      style={{
-        display: props.inline ? 'inline-block' : 'block',
-        boxShadow: isSelected && isFocused ? '0 0 0 3px #B4D5FF' : 'none',
-      }}
-    >
-      <div
-        style={{
-          userSelect: 'none',
-        }}
-        contentEditable={false}
-      >
-        <MdxField
-          inline={props.inline}
-          tinaForm={form}
-          field={activeTemplate}
-        />
-      </div>
-      {props.children}
-    </div>
-  )
-}
-
-const Wrapper = styled.div``
-const ToolbarWrapper = styled.div`
-  z-index: 100;
-  & > div {
-    display: flex;
-    flex-wrap: wrap;
-  }
-`
 const PlateWrapper = styled.div`
   background: white;
   border-radius: 4px;
