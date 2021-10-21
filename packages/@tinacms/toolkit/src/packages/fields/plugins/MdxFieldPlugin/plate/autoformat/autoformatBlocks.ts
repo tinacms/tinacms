@@ -24,6 +24,7 @@ import {
   getPlatePluginType,
   insertEmptyCodeBlock,
   SPEditor,
+  ELEMENT_HR,
 } from '@udecode/plate'
 import { preFormat } from './autoformatUtils'
 
