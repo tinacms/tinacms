@@ -15,27 +15,10 @@ import React from 'react'
 import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
 import { useParams, useHistory, Link } from 'react-router-dom'
 
-import type { TinaCMS } from '@tinacms/toolkit'
-
-import useGetDocumentFields from '../hooks/useGetDocumentFields'
-
 import GetCMS from '../components/GetCMS'
+import GetDocumentFields from '../components/GetDocumentFields'
 
-const GetDocumentFields = ({
-  cms,
-  collectionName,
-  children,
-}: {
-  cms: TinaCMS
-  collectionName: string
-  children: any
-}) => {
-  const { collection, fields } = useGetDocumentFields(cms, collectionName)
-  if (!collection || !fields) {
-    return null
-  }
-  return <>{children(collection, fields)}</>
-}
+import type { TinaCMS } from '@tinacms/toolkit'
 
 const createDocument = async (
   cms: TinaCMS,
