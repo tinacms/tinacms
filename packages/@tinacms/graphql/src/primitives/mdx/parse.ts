@@ -23,6 +23,7 @@ import { TinaField } from '../..'
 import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
 import type { RichTypeInner } from '../types'
+import { isNull } from 'lodash'
 
 export const parseMDX = (value: string, field: RichTypeInner) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
@@ -92,6 +93,15 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
         typeof template === 'string' ? template : template.name
       return templateName === node.name
     })
+    if (!template) {
+      if (isNull(node.name)) {
+        // this is a fragment <> </>, ignore it
+      } else {
+        throw new Error(
+          `Found unregistered JSX or HTML: <${node.name}>. Please ensure all structured elements have been registered with your schema.`
+        )
+      }
+    }
 
     if (node.children.length > 0) {
       node.attributes.push({
