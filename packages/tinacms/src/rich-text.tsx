@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// @ts-ocheck
 import React from 'react'
 
 type BaseComponents = {
@@ -132,19 +131,23 @@ export const TinaMarkdown = ({
           case 'img':
             if (components[child.type]) {
               const Component = components[child.type]
+              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
               return <Component {...props} />
             }
+            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             return <img src={child.url} alt={child.caption} />
           case 'a':
             if (components[child.type]) {
               const Component = components[child.type]
               return (
+                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
                 <Component {...props}>
                   <TinaMarkdown components={components} content={children} />
                 </Component>
               )
             }
             return (
+              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
               <a href={child.url}>
                 <TinaMarkdown components={components} content={children} />
               </a>
@@ -154,13 +157,16 @@ export const TinaMarkdown = ({
               .map((item) => {
                 // I don't think it's possible to have more than one
                 // child item here
+                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
                 return item.children[0].text
               })
               .join('\n')
             if (components[child.type]) {
               const Component = components[child.type]
               return (
+                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
                 <Component {...props} childrenRaw={children}>
+                  {/* @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types */}
                   {value}
                 </Component>
               )
@@ -173,27 +179,35 @@ export const TinaMarkdown = ({
           case 'hr':
             if (components[child.type]) {
               const Component = components[child.type]
+              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
               return <Component {...props} />
             }
             return <hr />
           case 'text':
+            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             return <Leaf components={components} {...child} />
           case 'mdxJsxTextElement':
           case 'mdxJsxFlowElement':
+            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             const Component = components[child.name]
             if (Component) {
+              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
               const props = child.props ? child.props : {}
               return <Component {...props} />
             } else {
               const ComponentMissing = components['component_missing']
               if (ComponentMissing) {
+                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
                 return <ComponentMissing name={child.name} />
               } else {
+                // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
                 throw new Error(`No component provided for ${child.name}`)
               }
             }
           default:
+            // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             if (typeof child.text === 'string') {
+              // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
               return <Leaf components={components} {...child} />
             }
 
@@ -299,77 +313,3 @@ const Leaf = (props: {
   }
   return <>{props.text}</>
 }
-
-export type SlateNodeType =
-  | {
-      type: 'heading_one'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'heading_two'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'heading_three'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'heading_four'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'heading_five'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'heading_six'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'paragraph'
-      children: SlateNodeType[]
-    }
-  | {
-      children: SlateNodeType[]
-      link: string
-      type: 'link'
-    }
-  | {
-      type: 'block_quote'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'text'
-      bold?: boolean
-      italic?: boolean
-      text: string
-    }
-  | {
-      type: 'mdxJsxTextElement'
-      props: object
-      children: SlateNodeType[]
-      name: string
-    }
-  | {
-      type: 'mdxJsxFlowElement'
-      props: object
-      children: SlateNodeType[]
-      name: string
-    }
-  | {
-      type: 'block_quote'
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'code_block'
-      language: string
-      children: SlateNodeType[]
-    }
-  | {
-      type: 'image'
-      link: string
-      caption: string
-    }
-  | {
-      type: 'thematic_break'
-    }

@@ -12,11 +12,8 @@ limitations under the License.
 */
 
 import React from 'react'
-import { MdxField, ImageField } from '../field'
-import type { InputProps } from '../../../components'
-import { Transforms, Editor } from 'slate'
+import { Transforms } from 'slate'
 import styled from 'styled-components'
-import { Form } from '../../../../forms'
 import {
   Plate,
   createReactPlugin, // withReact
@@ -48,107 +45,23 @@ import {
   createSoftBreakPlugin,
   createExitBreakPlugin,
   getPlatePluginTypes,
-  TElement,
-  TodoListItemNodeData,
   AutoformatBlockRule,
-  AutoformatRule,
-  getParent,
-  isElement,
-  isType,
   SPEditor,
-  TEditor,
   PlatePlugin,
-  toggleList,
-  ELEMENT_PARAGRAPH,
-  ELEMENT_CODE_BLOCK,
-  ELEMENT_CODE_LINE,
-  ELEMENT_IMAGE,
-  ELEMENT_LI,
-  ELEMENT_OL,
-  ELEMENT_TODO_LI,
-  ELEMENT_UL,
-  // not going to use
   getRenderElement,
 } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
-import type { SlateNodeType } from '../types'
-import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
-
-import {
-  optionsAutoformat,
-  optionsExitBreakPlugin,
-  optionsResetBlockTypePlugin,
-  optionsSoftBreakPlugin,
-} from './pluginOptions'
+import { MdxField, ImageField } from '../field'
+import { Form } from '../../../../forms'
 import { CONFIG } from './config'
 import { ToolbarButtons } from './toolbar'
 import { useCMS } from '../../../../react-core'
+import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
+
+import type { InputProps } from '../../../components'
 
 export const clearBlockFormat: AutoformatBlockRule['preFormat'] = (editor) =>
   unwrapList(editor as SPEditor)
-
-export const format = (editor: TEditor, customFormatting: any) => {
-  if (editor.selection) {
-    const parentEntry = getParent(editor, editor.selection)
-    if (!parentEntry) return
-    const [node] = parentEntry
-    if (
-      isElement(node) &&
-      !isType(editor as SPEditor, node, ELEMENT_CODE_BLOCK) &&
-      !isType(editor as SPEditor, node, ELEMENT_CODE_LINE)
-    ) {
-      customFormatting()
-    }
-  }
-}
-
-export const formatList = (editor: TEditor, elementType: string) => {
-  format(editor, () =>
-    toggleList(editor as SPEditor, {
-      type: elementType,
-    })
-  )
-}
-
-export const formatText = (editor: TEditor, text: string) => {
-  format(editor, () => editor.insertText(text))
-}
-
-export const autoformatLists: AutoformatRule[] = [
-  {
-    mode: 'block',
-    type: ELEMENT_LI,
-    match: ['* ', '- '],
-    preFormat: clearBlockFormat,
-    format: (editor) => formatList(editor, ELEMENT_UL),
-  },
-  {
-    mode: 'block',
-    type: ELEMENT_LI,
-    match: ['1. ', '1) '],
-    preFormat: clearBlockFormat,
-    format: (editor) => formatList(editor, ELEMENT_OL),
-  },
-  {
-    mode: 'block',
-    type: ELEMENT_TODO_LI,
-    match: '[] ',
-  },
-  {
-    mode: 'block',
-    type: ELEMENT_TODO_LI,
-    match: '[x] ',
-    format: (editor) =>
-      Transforms.setNodes<TElement<TodoListItemNodeData>>(
-        editor,
-        // @ts-ignore BaseEditor fix
-        { type: ELEMENT_TODO_LI, checked: true },
-        {
-          match: (n) => Editor.isBlock(editor, n),
-        }
-      ),
-  },
-]
 
 export const createTinaImagePlugin = () => {
   return {
@@ -392,18 +305,16 @@ export const RichEditor = wrapFieldsWithMeta<
   )
 })
 
-const normalize = (node: SlateNodeType) => {
+const normalize = (node: any) => {
   if (['mdxJsxFlowElement', 'mdxJsxTextElement', 'img'].includes(node.type)) {
     return {
       ...node,
       children: [{ type: 'text', text: '' }],
     }
   }
-  //@ts-ignore
   if (node.children) {
     return {
       ...node,
-      //@ts-ignore
       children: node.children.map(normalize),
     }
   }
