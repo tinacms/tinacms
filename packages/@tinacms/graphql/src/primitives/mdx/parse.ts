@@ -594,6 +594,7 @@ export default function remarkToSlate(node: MdxAstNode) {
         } else {
           realChildren.push({
             type: plateElements.ELEMENT_LIC,
+            // @ts-ignore FIXME: MDAST types don't match with some of these
             children: child.children.map(remarkToSlate),
           })
         }
