@@ -33,7 +33,9 @@ type BaseComponents = {
   block_quote?: { children: JSX.Element }
   code_block?: { language?: string; children: JSX.Element }
   img?: { url: string; caption?: string; alt?: string }
-  thematic_break?: {}
+  hr?: {}
+  // Provide a fallback when a JSX component wasn't provided
+  component_missing?: { name: string }
 }
 
 type BaseComponentSignature = {
@@ -104,6 +106,7 @@ export const TinaMarkdown = ({
           case 'blockquote':
           case 'ol':
           case 'ul':
+          case 'li':
             if (components[child.type]) {
               const Component = components[child.type]
               return (
@@ -117,21 +120,7 @@ export const TinaMarkdown = ({
                 <TinaMarkdown components={components} content={children} />
               ),
             })
-          case 'li':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              return (
-                <Component {...props} childrenRaw={content}>
-                  <TinaMarkdown components={components} content={children} />
-                </Component>
-              )
-            }
-            return (
-              <li>
-                <TinaMarkdown components={components} content={children} />
-              </li>
-            )
-          case 'lic':
+          case 'lic': // List Item Content
             return (
               <div>
                 <TinaMarkdown
@@ -150,7 +139,7 @@ export const TinaMarkdown = ({
             if (components[child.type]) {
               const Component = components[child.type]
               return (
-                <Component {...props} childrenRaw={content}>
+                <Component {...props}>
                   <TinaMarkdown components={components} content={children} />
                 </Component>
               )
@@ -181,7 +170,7 @@ export const TinaMarkdown = ({
                 <code>{value}</code>
               </pre>
             )
-          case 'thematic_break':
+          case 'hr':
             if (components[child.type]) {
               const Component = components[child.type]
               return <Component {...props} />
@@ -196,10 +185,12 @@ export const TinaMarkdown = ({
               const props = child.props ? child.props : {}
               return <Component {...props} />
             } else {
-              if (!child.name) {
-                throw new Error(`Fragments are not yet supported`)
+              const ComponentMissing = components['component_missing']
+              if (ComponentMissing) {
+                return <ComponentMissing name={child.name} />
+              } else {
+                throw new Error(`No component provided for ${child.name}`)
               }
-              throw new Error(`No component provided for ${child.name}`)
             }
           default:
             if (typeof child.text === 'string') {
