@@ -255,7 +255,7 @@ const Loader = (props: { children: React.ReactNode }) => {
               width: '64px',
               color: '#2296fe',
               marginTop: '-8px',
-              marginBottom: '8px',
+              marginBottom: '16px',
             }}
             version="1.1"
             id="L5"
