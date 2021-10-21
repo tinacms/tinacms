@@ -232,6 +232,7 @@ const Loader = (props: { children: React.ReactNode }) => {
           display: 'flex',
           alignItems: 'center',
           justifyContent: 'center',
+          padding: '40px',
         }}
       >
         <div
@@ -240,8 +241,7 @@ const Loader = (props: { children: React.ReactNode }) => {
             boxShadow:
               '0px 2px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1)',
             borderRadius: '5px',
-            margin: '40px auto',
-            padding: '32px',
+            padding: '40px 32px',
             width: '460px',
             maxWidth: '90%',
             display: 'flex',
@@ -308,6 +308,10 @@ const Loader = (props: { children: React.ReactNode }) => {
             style={{
               fontSize: '18px',
               color: '#252336',
+              textAlign: 'center',
+              lineHeight: '1.3',
+              fontFamily: "'Inter', sans-serif",
+              fontWeight: 'normal',
             }}
           >
             Please wait, Tina is loading data...
