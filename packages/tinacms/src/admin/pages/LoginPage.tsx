@@ -43,7 +43,7 @@ const LoginPage = () => {
                 href="/"
                 className="mt-5 w-full flex justify-center px-6 py-3 border border-transparent text-base leading-5 font-medium rounded-full text-white bg-blue-500 hover:bg-blue-600 focus:outline-none focus:shadow-outline-blue focus:border-blue-700 active:bg-blue-700 transition duration-150 ease-in-out"
               >
-                Return to Homepage
+                Back to site
               </a>
             </div>
           </div>
