@@ -14,262 +14,90 @@ limitations under the License.
 // @ts-nocheck
 import React from 'react'
 
+export type Components = {
+  [key: string]: (props: unknown) => JSX.Element
+}
+
 export const TinaMarkdown = ({
-  children,
+  content,
   components = {},
 }: {
-  children: SlateNodeType[] | { type: 'root'; children: SlateNodeType[] }
+  content: SlateNodeType[] | { type: 'root'; children: SlateNodeType[] }
   components?: { [key: string]: (props: object) => JSX.Element }
 }) => {
-  if (!children) {
+  if (!content) {
     return null
   }
-  const nodes = Array.isArray(children) ? children : children.children
+  const nodes = Array.isArray(content) ? content : content.children
   return (
     <>
       {nodes.map((child) => {
+        const { children, ...props } = child
         switch (child.type) {
           case 'h1':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <h1>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </h1>
-            )
           case 'h2':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <h2>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </h2>
-            )
           case 'h3':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <h3>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </h3>
-            )
           case 'h4':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <h4>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </h4>
-            )
           case 'h5':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <h5>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </h5>
-            )
           case 'h6':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <h6>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </h6>
-            )
           case 'p':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <p>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </p>
-            )
           case 'blockquote':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <blockquote>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </blockquote>
-            )
+          case 'ol':
           case 'ul':
             if (components[child.type]) {
               const Component = components[child.type]
-              const { children, ...props } = child
               return (
                 <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
+                  <TinaMarkdown components={components} content={children} />
                 </Component>
               )
             }
-            return (
-              <ul>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </ul>
-            )
-          case 'ol':
-            if (components[child.type]) {
-              const Component = components[child.type]
-              const { children, ...props } = child
-              return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
-                </Component>
-              )
-            }
-            return (
-              <ol>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
-              </ol>
-            )
+            return React.createElement(child.type, {
+              children: (
+                <TinaMarkdown components={components} content={children} />
+              ),
+            })
           case 'li':
             if (components[child.type]) {
               const Component = components[child.type]
-              const { children, ...props } = child
               return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
+                <Component {...props} childrenRaw={content}>
+                  <TinaMarkdown components={components} content={children} />
                 </Component>
               )
             }
             return (
               <li>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
+                <TinaMarkdown components={components} content={children} />
               </li>
             )
           case 'lic':
             return (
               <div>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
+                <TinaMarkdown
+                  components={components}
+                  content={child.children}
+                />
               </div>
             )
           case 'img':
             if (components[child.type]) {
               const Component = components[child.type]
-              const { ...props } = child
               return <Component {...props} />
             }
             return <img src={child.url} alt={child.caption} />
           case 'a':
             if (components[child.type]) {
               const Component = components[child.type]
-              const { children, ...props } = child
               return (
-                <Component {...props} childrenRaw={children}>
-                  <TinaMarkdown components={components}>
-                    {children}
-                  </TinaMarkdown>
+                <Component {...props} childrenRaw={content}>
+                  <TinaMarkdown components={components} content={children} />
                 </Component>
               )
             }
             return (
               <a href={child.url}>
-                <TinaMarkdown components={components}>
-                  {child.children}
-                </TinaMarkdown>
+                <TinaMarkdown components={components} content={children} />
               </a>
             )
           case 'code_block':
@@ -282,7 +110,6 @@ export const TinaMarkdown = ({
               .join('\n')
             if (components[child.type]) {
               const Component = components[child.type]
-              const { children, ...props } = child
               return (
                 <Component {...props} childrenRaw={children}>
                   {value}
@@ -297,7 +124,6 @@ export const TinaMarkdown = ({
           case 'thematic_break':
             if (components[child.type]) {
               const Component = components[child.type]
-              const { children, ...props } = child
               return <Component {...props} />
             }
             return <hr />
@@ -305,10 +131,10 @@ export const TinaMarkdown = ({
             return <Leaf components={components} {...child} />
           case 'mdxJsxTextElement':
           case 'mdxJsxFlowElement':
-            const Block = components[child.name]
-            if (Block) {
+            const Component = components[child.name]
+            if (Component) {
               const props = child.props ? child.props : {}
-              return <Block {...props} />
+              return <Component {...props} />
             } else {
               if (!child.name) {
                 throw new Error(`Fragments are not yet supported`)

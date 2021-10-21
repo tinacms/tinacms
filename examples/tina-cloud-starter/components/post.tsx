@@ -17,13 +17,14 @@ import { Section } from "./section";
 import { ThemeContext } from "./theme";
 import format from "date-fns/format";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
+import type { Components } from "tinacms/dist/rich-text";
 
-const components = {
-  BlockQuote: (props) => {
+const components: Components = {
+  BlockQuote: (props: { content: any }) => {
     return (
       <div>
         <blockquote>
-          <TinaMarkdown>{props.children}</TinaMarkdown>
+          <TinaMarkdown content={props.children} />
           {props.authorName}
         </blockquote>
       </div>
@@ -50,7 +51,7 @@ const components = {
       <div className="bg-white">
         <div className="max-w-7xl mx-auto py-8 px-4 sm:px-6 lg:py-16 lg:px-8 md:flex md:items-center">
           <div className="md:w-0 md:flex-1">
-            <TinaMarkdown>{props.children}</TinaMarkdown>
+            <TinaMarkdown content={props.children} />
           </div>
           <div className="mt-8 md:mt-0 md:ml-8">
             <form className="sm:flex">
@@ -77,9 +78,7 @@ const components = {
             </form>
             <div className="mt-3 text-sm text-gray-500">
               {/* {props.disclaimer} */}
-              {props.disclaimer && (
-                <TinaMarkdown>{props.disclaimer}</TinaMarkdown>
-              )}
+              {props.disclaimer && <TinaMarkdown content={props.disclaimer} />}
             </div>
           </div>
         </div>
@@ -164,7 +163,7 @@ export const Post = ({ data }) => {
       )}
       <Container className={`flex-1 max-w-4xl pt-4`} size="large">
         <div className="prose dark:prose-dark  w-full max-w-none">
-          <TinaMarkdown components={components}>{data._body}</TinaMarkdown>
+          <TinaMarkdown components={components} content={data._body} />
           {/* <pre>{JSON.stringify(data._body, null, 2)}</pre> */}
         </div>
       </Container>
