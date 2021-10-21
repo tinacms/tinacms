@@ -141,13 +141,29 @@ export const stringify = (
         ) as PhrasingContent[],
       }
     case plateElements.ELEMENT_LI:
+      const realChildren = []
+      const extraChildren = []
+      node.children.forEach((child) => {
+        child.children.forEach((c) => {
+          if (c.type === 'li') {
+            extraChildren.push(c)
+          } else {
+            realChildren.push(c)
+          }
+        })
+      })
+      const p = {
+        type: 'p',
+        children: realChildren,
+      }
       return {
         type: 'listItem',
         spread: false,
         check: null,
-        children: node.children.map((child) =>
-          stringify(child, field)
-        ) as PhrasingContent[],
+        children: [
+          stringify(p, field),
+          ...extraChildren.map((child) => stringify(child, field)),
+        ],
       }
     case plateElements.ELEMENT_LIC:
       return {

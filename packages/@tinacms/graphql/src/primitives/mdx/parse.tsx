@@ -574,26 +574,23 @@ export default function remarkToSlate(node: MdxAstNode) {
         children: node.children.map(remarkToSlate),
       }
     case 'listItem':
-      // console.log(JSON.stringify(node.children, null, 2))
-      /**
-       * FIXME: The list plugin in the editor will reduce any block-level element to be inline.
-       * So while block-level list item content is valid in markdown. It currently isn't
-       * in this scenario.
-       */
+      const realChildren = []
+      node.children.forEach((child) => {
+        if (child.type === 'list') {
+          realChildren.push({
+            type: child.ordered ? types.ol_list : types.ul_list,
+            children: child.children.map(remarkToSlate),
+          })
+        } else {
+          realChildren.push({
+            type: plateElements.ELEMENT_LIC,
+            children: child.children.map(remarkToSlate),
+          })
+        }
+      })
       return {
         type: types.listItem,
-        children: [
-          {
-            type: plateElements.ELEMENT_LIC,
-            children: node.children.map(remarkToSlate),
-          },
-        ],
-        // children: node.children.map((item) => {
-        //   return {
-        //     type: plateElements.ELEMENT_LIC,
-        //     children: [remarkToSlate(item)],
-        //   }
-        // }),
+        children: realChildren,
       }
     case 'paragraph':
       return {
