@@ -17,10 +17,27 @@ import { Section } from "./section";
 import { ThemeContext } from "./theme";
 import format from "date-fns/format";
 import { TinaMarkdown } from "tinacms/dist/rich-text";
-import type { Components } from "tinacms/dist/rich-text";
+import type { TinaMarkdownContent, Components } from "tinacms/dist/rich-text";
 
-const components: Components = {
-  BlockQuote: (props: { content: any }) => {
+const components: Components<{
+  BlockQuote: {
+    children: TinaMarkdownContent;
+    authorName: string;
+  };
+  DateTime: {
+    format?: string;
+  };
+  NewsletterSignup: {
+    placeholder: string;
+    buttonText: string;
+    children: TinaMarkdownContent;
+    disclaimer?: TinaMarkdownContent;
+  };
+}> = {
+  BlockQuote: (props: {
+    children: TinaMarkdownContent;
+    authorName: string;
+  }) => {
     return (
       <div>
         <blockquote>
@@ -77,7 +94,6 @@ const components: Components = {
               </div>
             </form>
             <div className="mt-3 text-sm text-gray-500">
-              {/* {props.disclaimer} */}
               {props.disclaimer && <TinaMarkdown content={props.disclaimer} />}
             </div>
           </div>
