@@ -4,7 +4,6 @@ import { Actions } from "../actions";
 import { Container } from "../container";
 import { Section } from "../section";
 import { ThemeContext } from "../theme";
-import { TinaMarkdown } from "tinacms/dist/rich-text";
 
 export const Hero = ({ data, parentField }) => {
   const theme = React.useContext(ThemeContext);
