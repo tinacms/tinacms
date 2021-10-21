@@ -11,19 +11,78 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-// @ts-nocheck
+// @ts-ocheck
 import React from 'react'
 
-export type Components = {
-  [key: string]: (props: unknown) => JSX.Element
+type BaseComponents = {
+  h1?: { children: JSX.Element }
+  h2?: { children: JSX.Element }
+  h3?: { children: JSX.Element }
+  h4?: { children: JSX.Element }
+  h5?: { children: JSX.Element }
+  h6?: { children: JSX.Element }
+  p?: { children: JSX.Element }
+  a?: { url: string; children: JSX.Element }
+  italic?: { children: JSX.Element }
+  bold?: { children: JSX.Element }
+  strikethrough?: { children: JSX.Element }
+  underline?: { children: JSX.Element }
+  code?: { children: JSX.Element }
+  ul?: { children: JSX.Element }
+  ol?: { children: JSX.Element }
+  block_quote?: { children: JSX.Element }
+  code_block?: { language?: string; children: JSX.Element }
+  img?: { url: string; caption?: string; alt?: string }
+  thematic_break?: {}
+}
+
+type BaseComponentSignature = {
+  [BK in keyof BaseComponents]: (props: BaseComponents[BK]) => JSX.Element
+}
+
+/**
+ * Define the allowed components and their props
+ * ```ts
+ * const components:
+ * Components<{
+ *  BlockQuote: {
+ *      children: TinaMarkdownContent;
+ *      authorName: string;
+ *    };
+ *  }> = {
+ *    BlockQuote: (props: {
+ *      children: TinaMarkdownContent;
+ *      authorName: string;
+ *    }) => {
+ *      return (
+ *        <div>
+ *          <blockquote>
+ *            <TinaMarkdown content={props.children} />
+ *            {props.authorName}
+ *          </blockquote>
+ *        </div>
+ *      );
+ *    }
+ *  }
+ * }
+ * ```
+ */
+export type Components<ComponentAndProps extends object> = {
+  [K in keyof ComponentAndProps]: (props: ComponentAndProps[K]) => JSX.Element
+} & BaseComponentSignature
+
+export type TinaMarkdownContent = {
+  type: string
+  children: TinaMarkdownContent[]
 }
 
 export const TinaMarkdown = ({
   content,
   components = {},
 }: {
-  content: SlateNodeType[] | { type: 'root'; children: SlateNodeType[] }
-  components?: { [key: string]: (props: object) => JSX.Element }
+  content: TinaMarkdownContent | TinaMarkdownContent[]
+  // FIXME: {} should be passed in
+  components?: Components<{}>
 }) => {
   if (!content) {
     return null
@@ -32,6 +91,7 @@ export const TinaMarkdown = ({
   return (
     <>
       {nodes.map((child) => {
+        // console.log(JSON.stringify(child))
         const { children, ...props } = child
         switch (child.type) {
           case 'h1':
@@ -156,12 +216,15 @@ export const TinaMarkdown = ({
 const Leaf = (props: {
   type: 'text'
   text: string
-  bold: boolean
-  italic: boolean
-  underline: boolean
-  strikethrough: boolean
-  code: boolean
-  components: { [key: string]: JSX.Element }[]
+  bold?: boolean
+  italic?: boolean
+  underline?: boolean
+  strikethrough?: boolean
+  code?: boolean
+  components: Pick<
+    BaseComponentSignature,
+    'bold' | 'italic' | 'underline' | 'strikethrough' | 'code'
+  >
 }) => {
   if (props.bold) {
     const { bold, ...rest } = props
