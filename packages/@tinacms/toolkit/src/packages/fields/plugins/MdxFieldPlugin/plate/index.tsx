@@ -32,6 +32,8 @@ import {
   createStrikethroughPlugin, // strikethrough mark
   createCodePlugin, // code mark
   createPlateComponents,
+  createIndentPlugin,
+  createNormalizeTypesPlugin,
   createPlateOptions,
   createLinkPlugin,
   createImagePlugin,
@@ -78,6 +80,7 @@ import {
   optionsResetBlockTypePlugin,
   optionsSoftBreakPlugin,
 } from './pluginOptions'
+import { CONFIG } from './config'
 import { ToolbarButtons } from './toolbar'
 import { useCMS } from '../../../../react-core'
 
@@ -345,16 +348,24 @@ export const RichEditor = wrapFieldsWithMeta<
     createCodePlugin(), // code mark
     ...createBasicMarkPlugins(),
     // autoformat rules
-    createAutoformatPlugin(optionsAutoformat),
-    createResetNodePlugin(optionsResetBlockTypePlugin),
-    createSoftBreakPlugin(optionsSoftBreakPlugin),
-    createExitBreakPlugin(optionsExitBreakPlugin),
-    createTrailingBlockPlugin({
-      type: ELEMENT_PARAGRAPH,
-    }),
-    createSelectOnBackspacePlugin({
-      allow: [ELEMENT_IMAGE],
-    }),
+    // createAutoformatPlugin(optionsAutoformat),
+    // createResetNodePlugin(optionsResetBlockTypePlugin),
+    // createSoftBreakPlugin(optionsSoftBreakPlugin),
+    // createExitBreakPlugin(optionsExitBreakPlugin),
+    // createTrailingBlockPlugin({
+    //   type: ELEMENT_PARAGRAPH,
+    // }),
+    // createSelectOnBackspacePlugin({
+    //   allow: [ELEMENT_IMAGE],
+    // }),
+    createIndentPlugin(CONFIG.indent),
+    createAutoformatPlugin(CONFIG.autoformat),
+    createResetNodePlugin(CONFIG.resetBlockType),
+    createSoftBreakPlugin(CONFIG.softBreak),
+    createExitBreakPlugin(CONFIG.exitBreak),
+    createNormalizeTypesPlugin(CONFIG.forceLayout),
+    createTrailingBlockPlugin(CONFIG.trailingBlock),
+    createSelectOnBackspacePlugin(CONFIG.selectOnBackspace),
   ]
   return (
     <>
