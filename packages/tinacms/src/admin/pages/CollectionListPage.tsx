@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
+import { BiEdit } from 'react-icons/bi'
 import { useParams, useLocation, Link } from 'react-router-dom'
 
 import GetCMS from '../components/GetCMS'
@@ -48,54 +49,39 @@ const CollectionListPage = () => {
                 </div>
 
                 {totalCount > 0 && (
-                  <div className="mt-5 flex flex-col">
-                    <div className="-my-2 overflow-x-auto sm:-mx-6 lg:-mx-8">
-                      <div className="py-2 align-middle inline-block min-w-full sm:px-6 lg:px-8">
-                        <div className="shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
-                          <table className="min-w-full divide-y divide-gray-200">
-                            <thead className="bg-gray-50">
-                              <tr>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Filename
-                                </th>
-                                <th
-                                  scope="col"
-                                  className="px-6 py-3 text-left text-xs font-medium text-gray-500 uppercase tracking-wider"
-                                >
-                                  Extension
-                                </th>
-                                <th scope="col" className="relative px-6 py-3">
-                                  <span className="sr-only">Edit</span>
-                                </th>
-                              </tr>
-                            </thead>
-                            <tbody className="bg-white divide-y divide-gray-200">
-                              {documents.map((document) => (
-                                <tr key={document.node.sys.relativePath}>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
+                  <div className="mt-8 shadow overflow-hidden border-b border-gray-200 sm:rounded-lg">
+                    <table className="min-w-full">
+                      <tbody className="bg-white divide-y divide-gray-150">
+                        {documents.map((document) => (
+                          <tr key={document.node.sys.relativePath}>
+                            <td className="px-6 py-2 whitespace-nowrap">
+                              <Link
+                                to={`${location.pathname}/edit/${document.node.sys.filename}`}
+                                className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
+                              >
+                                <BiEdit className="inline-block h-6 w-auto opacity-70" />{' '}
+                                <span>
+                                  <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                    Filename
+                                  </span>
+                                  <span className="h-5 leading-5 block whitespace-nowrap">
                                     {document.node.sys.filename}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-sm font-medium text-gray-900">
-                                    {document.node.sys.extension}
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-                                    <Link
-                                      to={`${location.pathname}/edit/${document.node.sys.filename}`}
-                                      className="text-indigo-600 hover:text-indigo-900"
-                                    >
-                                      Edit
-                                    </Link>
-                                  </td>
-                                </tr>
-                              ))}
-                            </tbody>
-                          </table>
-                        </div>
-                      </div>
-                    </div>
+                                  </span>
+                                </span>
+                              </Link>
+                            </td>
+                            <td className="px-6 py-4 whitespace-nowrap">
+                              <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                Extension
+                              </span>
+                              <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                {document.node.sys.extension}
+                              </span>
+                            </td>
+                          </tr>
+                        ))}
+                      </tbody>
+                    </table>
                   </div>
                 )}
               </>
