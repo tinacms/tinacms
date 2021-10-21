@@ -48,7 +48,7 @@ export const TinaAdmin = () => {
             <Layout>
               <Router>
                 <div className="flex items-stretch h-screen overflow-hidden">
-                  <div className="flex flex-col w-80 lg:w-96 flex-shrink-0 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200">
+                  <div className="flex flex-col w-64 md:w-80 lg:w-96 flex-shrink-0 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200">
                     <div className="px-6 py-4 border-b border-gray-200">
                       <h2 className="text-2xl tracking-wide">
                         <Link to={`/admin`}>Tina Admin</Link>
