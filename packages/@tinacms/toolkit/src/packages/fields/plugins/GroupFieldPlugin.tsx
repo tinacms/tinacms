@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { FieldsBuilder, useFormPortal, TinaField } from '../../form-builder'
+import { FieldsBuilder, useFormPortal } from '../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../icons'
 import { useCMS } from '../../react-core/use-cms'
 

@@ -179,6 +179,10 @@ export const stringify = (
         alt: node.alt,
         url: node.url,
       }
+    case plateElements.ELEMENT_HR:
+      return {
+        type: 'thematicBreak',
+      }
     case plateElements.ELEMENT_LINK:
       return {
         type: 'link',
