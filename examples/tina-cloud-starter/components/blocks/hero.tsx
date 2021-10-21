@@ -61,16 +61,6 @@ export const Hero = ({ data, parentField }) => {
               <Markdown>{data.text}</Markdown>
             </div>
           )}
-          {data.richText && (
-            <TinaMarkdown
-              blocks={{
-                Highlight: (props) => <div>Highlight</div>,
-                EmbeddedInfo: (props) => <div>Embeeded Info</div>,
-              }}
-            >
-              {data.richText}
-            </TinaMarkdown>
-          )}
           {data.actions && (
             <Actions
               parentField={`${parentField}.actions`}
