@@ -43,9 +43,7 @@ const NoFieldsPlaceholder = () => (
   </EmptyState>
 )
 
-export const SidebarFormBuilder: FC<FormBuilderProps> = ({
-  form: tinaForm,
-}) => {
+export const FormBuilder: FC<FormBuilderProps> = ({ form: tinaForm }) => {
   /**
    * > Why is a `key` being set when this isn't an array?
    *
@@ -135,7 +133,7 @@ export const SidebarFormBuilder: FC<FormBuilderProps> = ({
   )
 }
 
-export const FormBuilder: FC<FormBuilderProps> = ({
+export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
   form: tinaForm,
   label,
 }) => {
