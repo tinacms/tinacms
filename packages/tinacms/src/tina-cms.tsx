@@ -153,7 +153,7 @@ class ErrorBoundary extends React.Component {
       )
     }
     /* @ts-ignore */
-    if (this.state.pageRefresh) {
+    if (this.state.pageRefresh || true) {
       return <Loader>Let's try that again.</Loader>
     }
 
@@ -225,7 +225,7 @@ const Loader = (props: { children: React.ReactNode }) => {
       <div
         style={{
           position: 'fixed',
-          background: 'white',
+          background: 'rgba(0, 0, 0, 0.5)',
           inset: 0,
           zIndex: 200,
           opacity: '0.8',
@@ -236,6 +236,14 @@ const Loader = (props: { children: React.ReactNode }) => {
       >
         <div
           style={{
+            background: '#f6f6f9',
+            boxShadow:
+              '0px 2px 3px rgba(0, 0, 0, 0.05), 0 4px 12px rgba(0, 0, 0, 0.1)',
+            borderRadius: '5px',
+            margin: '40px auto',
+            padding: '32px',
+            width: '460px',
+            maxWidth: '90%',
             display: 'flex',
             alignItems: 'center',
             justifyContent: 'center',
@@ -243,49 +251,67 @@ const Loader = (props: { children: React.ReactNode }) => {
           }}
         >
           <svg
-            style={{ width: '100px' }}
+            style={{
+              width: '64px',
+              color: '#2296fe',
+              marginTop: '-8px',
+              marginBottom: '8px',
+            }}
             version="1.1"
             id="L5"
             xmlns="http://www.w3.org/2000/svg"
             xmlnsXlink="http://www.w3.org/1999/xlink"
             x="0px"
             y="0px"
-            viewBox="0 0 100 100"
+            viewBox="0 0 100 64"
             enableBackground="new 0 0 0 0"
             xmlSpace="preserve"
           >
-            <circle fill="currentColor" stroke="none" cx={6} cy={50} r={6}>
+            <circle fill="currentColor" stroke="none" cx={6} cy={32} r={6}>
               <animateTransform
                 attributeName="transform"
                 dur="1s"
                 type="translate"
                 values="0 15 ; 0 -15; 0 15"
+                calcMode="spline"
+                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
                 repeatCount="indefinite"
                 begin="0.1"
               />
             </circle>
-            <circle fill="currentColor" stroke="none" cx={30} cy={50} r={6}>
+            <circle fill="currentColor" stroke="none" cx={30} cy={32} r={6}>
               <animateTransform
                 attributeName="transform"
                 dur="1s"
                 type="translate"
-                values="0 10 ; 0 -10; 0 10"
+                values="0 15 ; 0 -10; 0 15"
+                calcMode="spline"
+                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
                 repeatCount="indefinite"
                 begin="0.2"
               />
             </circle>
-            <circle fill="currentColor" stroke="none" cx={54} cy={50} r={6}>
+            <circle fill="currentColor" stroke="none" cx={54} cy={32} r={6}>
               <animateTransform
                 attributeName="transform"
                 dur="1s"
                 type="translate"
-                values="0 5 ; 0 -5; 0 5"
+                values="0 15 ; 0 -5; 0 15"
+                calcMode="spline"
+                keySplines="0.8 0 0.4 1; 0.4 0 0.2 1"
                 repeatCount="indefinite"
                 begin="0.3"
               />
             </circle>
           </svg>
-          <p>Wait a bit, Tina is loading data...</p>
+          <p
+            style={{
+              fontSize: '18px',
+              color: '#252336',
+            }}
+          >
+            Please wait, Tina is loading data...
+          </p>
         </div>
       </div>
       {props.children}
