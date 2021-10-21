@@ -158,6 +158,10 @@ export class Resolver {
                   return this.resolveField(field)
                 }
               ),
+              mutationInfo: {
+                includeCollection: true,
+                includeTemplate: false,
+              },
             }
             break
           /**
@@ -176,7 +180,11 @@ export class Resolver {
               }
             })
 
-            response[collection.name] = { collection, templates }
+            response[collection.name] = {
+              collection,
+              templates,
+              mutationInfo: { includeCollection: true, includeTemplate: true },
+            }
             break
         }
       })

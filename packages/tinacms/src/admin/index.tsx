@@ -79,7 +79,7 @@ export const TinaAdmin = () => {
                           <CollectionCreatePage />
                         </Route>
                         <Route
-                          path={`/admin/collections/:collectionName/edit/:filename`}
+                          path={`/admin/collections/:collectionName/:filename`}
                         >
                           <CollectionUpdatePage />
                         </Route>

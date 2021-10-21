@@ -15,19 +15,26 @@ import React from 'react'
 import { Form, FormBuilder } from '@tinacms/toolkit'
 import { useParams, useHistory, Link } from 'react-router-dom'
 
+import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
+
 import GetCMS from '../components/GetCMS'
 import GetCollection, { Collection } from '../components/GetCollection'
-import GetDocument from '../components/GetDocument'
+import GetDocument, { Document } from '../components/GetDocument'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 
 const updateDocument = async (
   cms: TinaCMS,
   collection: Collection,
+  document: Document,
   relativePath: string,
   values: any
 ) => {
-  const { _collection, _template, ...params } = values
+  const { includeCollection, includeTemplate } = document.form.mutationInfo
+  const params = transformDocumentIntoMutationRequestPayload(values, {
+    includeCollection,
+    includeTemplate,
+  })
 
   await cms.api.tina.request(
     `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
@@ -41,7 +48,7 @@ const updateDocument = async (
       variables: {
         collection: collection.name,
         relativePath,
-        params: { [collection.name]: { ...params } },
+        params,
       },
     }
   )
@@ -78,6 +85,7 @@ const CollectionUpdatePage = () => {
                       await updateDocument(
                         cms,
                         collection,
+                        document,
                         relativePath,
                         values
                       )
