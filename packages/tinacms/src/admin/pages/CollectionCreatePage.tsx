@@ -15,34 +15,24 @@ import React from 'react'
 import { Form, FormBuilder } from '@tinacms/toolkit'
 import { useParams, useHistory, Link } from 'react-router-dom'
 
-import type { TinaCMS } from '@tinacms/toolkit'
-
-import useGetDocumentFields from '../hooks/useGetDocumentFields'
-
 import GetCMS from '../components/GetCMS'
+import GetDocumentFields from '../components/GetDocumentFields'
 
-const GetDocumentFields = ({
-  cms,
-  collectionName,
-  children,
-}: {
-  cms: TinaCMS
-  collectionName: string
-  children: any
-}) => {
-  const { collection, fields } = useGetDocumentFields(cms, collectionName)
-  if (!collection || !fields) {
-    return null
-  }
-  return <>{children(collection, fields)}</>
-}
+import type { TinaCMS } from '@tinacms/toolkit'
+import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 
 const createDocument = async (
   cms: TinaCMS,
   collection: { name: string },
+  mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
-  const { relativePath, ...params } = values
+  const { relativePath, ...leftover } = values
+  const { includeCollection, includeTemplate } = mutationInfo
+  const params = transformDocumentIntoMutationRequestPayload(leftover, {
+    includeCollection,
+    includeTemplate,
+  })
 
   await cms.api.tina.request(
     `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
@@ -56,7 +46,7 @@ const createDocument = async (
       variables: {
         collection: collection.name,
         relativePath,
-        params: { [collection.name]: { ...params } },
+        params,
       },
     }
   )
@@ -70,7 +60,7 @@ const CollectionCreatePage = () => {
     <GetCMS>
       {(cms: TinaCMS) => (
         <GetDocumentFields cms={cms} collectionName={collectionName}>
-          {(collection, fields) => {
+          {(collection, fields, mutationInfo) => {
             const form = new Form({
               id: 'create-form',
               label: 'form',
@@ -87,7 +77,7 @@ const CollectionCreatePage = () => {
                 ...fields,
               ],
               onSubmit: async (values) => {
-                await createDocument(cms, collection, values)
+                await createDocument(cms, collection, mutationInfo, values)
                 history.push(`/admin/collections/${collection.name}`)
               },
             })
