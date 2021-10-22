@@ -69,35 +69,7 @@ export const TinaAdmin = () => {
               <Router>
                 <div className="flex items-stretch h-screen overflow-hidden">
                   <div className="flex flex-col w-80 lg:w-96 flex-shrink-0 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200">
-                    <div className="px-6 py-4 border-b border-gray-200">
-                      <h2 className="text-2xl tracking-wide">
-                        <Link to={`/admin`}>Tina Admin</Link>
-                      </h2>
-                    </div>
-                    <div className="px-6 py-7 flex-1">
-                      <h4 className="uppercase font-bold text-sm mb-3">
-                        Collections
-                      </h4>
-                      <ul>
-                        {collections.map((collection) => {
-                          return (
-                            <li
-                              key={`${collection.name}-link`}
-                              className="mb-2"
-                            >
-                              <Link
-                                className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
-                                to={`/admin/collections/${collection.name}`}
-                              >
-                                <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
-                                {collection.label}
-                              </Link>
-                            </li>
-                          )
-                        })}
-                      </ul>
-                    </div>
-                    <div className="flex-0 bg-white border-t border-gray-150">
+                    <div className="border-b border-gray-200">
                       <Menu as="div" className="relative block">
                         {({ open }) => (
                           <div>
@@ -106,13 +78,8 @@ export const TinaAdmin = () => {
                                 open ? `bg-gray-50` : `bg-transparent`
                               }`}
                             >
-                              <span className="flex-0 inline-flex flex-shrink-0 flex-grow-0 items-center justify-center h-9 w-9 rounded-full bg-blue-500 mr-2 opacity-90 group-hover:opacity-100 transition-opacity duration-150 ease-out">
-                                <span className="text-lg font-medium leading-none text-white">
-                                  {userName.toUpperCase().substr(0, 1)}
-                                </span>
-                              </span>{' '}
-                              <span className="text-left inline-block text-lg text-gray-800 flex-1 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
-                                {userName}
+                              <span className="text-left inline-block text-2xl tracking-wide text-gray-800 flex-1 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
+                                Tina Admin
                               </span>
                               <svg
                                 width="20"
@@ -121,7 +88,7 @@ export const TinaAdmin = () => {
                                 fill="none"
                                 xmlns="http://www.w3.org/2000/svg"
                                 className={`flex-0 inline-block opacity-50 group-hover:opacity-80 transition-all duration-300 ease-in-out transform ${
-                                  open ? `-rotate-90 opacity-100` : `rotate-0`
+                                  open ? `rotate-90 opacity-100` : `rotate-0`
                                 }`}
                               >
                                 <g opacity="0.3">
@@ -132,14 +99,14 @@ export const TinaAdmin = () => {
                                 </g>
                               </svg>
                             </Menu.Button>
-                            <div className="transform -translate-y-full absolute top-3 right-5 w-2/3">
+                            <div className="transform translate-y-full absolute bottom-3 right-5 w-2/3 z-50">
                               <Transition
                                 enter="transition duration-150 ease-out"
-                                enterFrom="transform opacity-0 translate-y-2"
+                                enterFrom="transform opacity-0 -translate-y-2"
                                 enterTo="transform opacity-100 translate-y-0"
                                 leave="transition duration-75 ease-in"
                                 leaveFrom="transform opacity-100 translate-y-0"
-                                leaveTo="transform opacity-0 translate-y-2"
+                                leaveTo="transform opacity-0 -translate-y-2"
                               >
                                 <Menu.Items className="w-full py-1 bg-white border border-gray-150 rounded-lg shadow-lg">
                                   <Menu.Item>
@@ -174,6 +141,29 @@ export const TinaAdmin = () => {
                           </div>
                         )}
                       </Menu>
+                    </div>
+                    <div className="px-6 py-7 flex-1">
+                      <h4 className="uppercase font-bold text-sm mb-3">
+                        Collections
+                      </h4>
+                      <ul>
+                        {collections.map((collection) => {
+                          return (
+                            <li
+                              key={`${collection.name}-link`}
+                              className="mb-2"
+                            >
+                              <Link
+                                className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
+                                to={`/admin/collections/${collection.name}`}
+                              >
+                                <ImFilesEmpty className="mr-2 h-6 opacity-80 w-auto" />{' '}
+                                {collection.label}
+                              </Link>
+                            </li>
+                          )
+                        })}
+                      </ul>
                     </div>
                   </div>
                   <div className="px-6 py-14 flex-1 flex justify-center h-screen overflow-y-scroll">
