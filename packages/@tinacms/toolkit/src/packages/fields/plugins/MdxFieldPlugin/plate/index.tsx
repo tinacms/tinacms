@@ -41,17 +41,13 @@ import {
   createSelectOnBackspacePlugin,
   createSoftBreakPlugin,
   createExitBreakPlugin,
-  getPlatePluginTypes,
-  getRenderElement,
 } from '@udecode/plate'
 import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
 
 import { CONFIG } from './config'
-import { Img } from './image/plate-image'
-import { createTinaImagePlugin } from './image'
 import { ToolbarButtons } from './toolbar'
-import { MdxElement } from './mdx/element'
-import { createMDXPlugin, createMDXTextPlugin } from './mdx'
+import { createTinaImagePlugin, Img } from './image'
+import { createMDXPlugin, createMDXTextPlugin, MdxElement } from './mdx'
 
 import type { InputProps } from '../../../components'
 
