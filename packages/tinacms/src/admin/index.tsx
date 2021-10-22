@@ -146,7 +146,7 @@ export const TinaAdmin = () => {
                                   <Menu.Item>
                                     {({ active }) => (
                                       <a
-                                        className={`text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
+                                        className={`w-full text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
                                           active && 'text-gray-800 opacity-100'
                                         }`}
                                         href="/"
@@ -159,7 +159,7 @@ export const TinaAdmin = () => {
                                   <Menu.Item>
                                     {({ active }) => (
                                       <button
-                                        className={`text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
+                                        className={`w-full text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
                                           active && 'text-gray-800 opacity-100'
                                         }`}
                                         onClick={() => logout()}
