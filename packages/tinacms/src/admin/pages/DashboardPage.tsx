@@ -14,7 +14,23 @@ limitations under the License.
 import React from 'react'
 
 const DashboardPage = () => {
-  return <h3 className="text-4xl">Welcome</h3>
+  return (
+    <div className="h-screen overflow-y-auto flex flex-col justify-start items-stretch">
+      <div className="flex-0 px-6 pt-16 pb-10 w-full flex justify-center bg-white border-b border-gray-150">
+        <div className="max-w-screen-md w-full">
+          <h3 className="text-4xl">Welcome to Tina CMS.</h3>
+        </div>
+      </div>
+      <div className="w-full px-6 py-10 flex justify-center">
+        <div className="max-w-screen-md w-full">
+          <p className="text-gray-700 text-lg">
+            This is your dashboard for editing or creating content. Select a
+            collection on the left to begin.
+          </p>
+        </div>
+      </div>
+    </div>
+  )
 }
 
 export default DashboardPage

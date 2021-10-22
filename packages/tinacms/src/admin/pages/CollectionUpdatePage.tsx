@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { Form, FormBuilder } from '@tinacms/toolkit'
+import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
 import { useParams, useHistory, Link } from 'react-router-dom'
 
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
@@ -93,18 +93,23 @@ const CollectionUpdatePage = () => {
                     },
                   })
                   return (
-                    <>
-                      <h3 className="text-xl mb-6">
-                        <Link
-                          className="opacity-80 hover:opacity-100 transition-opacity ease-out"
-                          to={`/admin/collections/${collection.name}`}
-                        >
-                          {collection.label}
-                        </Link>{' '}
-                        - {filename}.{collection.format}
-                      </h3>
-                      <FormBuilder form={form} />
-                    </>
+                    <div className="w-full h-screen">
+                      {/* <h3 className="text-xl mb-6">
+                      <Link
+                        className="opacity-80 hover:opacity-100 transition-opacity ease-out"
+                        to={`/admin/collections/${collection.name}`}
+                      >
+                        {collection.label}
+                      </Link>{' '}
+                      - Create New
+                    </h3> */}
+                      <div className="flex flex-col items-center w-full flex-1">
+                        <FullscreenFormBuilder
+                          label={collection.label + ` - ` + filename}
+                          form={form}
+                        />
+                      </div>
+                    </div>
                   )
                 }}
               </GetDocument>
