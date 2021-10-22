@@ -14,6 +14,7 @@ limitations under the License.
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import { ImFilesEmpty } from 'react-icons/im'
+import { VscOpenPreview } from 'react-icons/vsc'
 
 import Layout from './components/Layout'
 import GetCMS from './components/GetCMS'
@@ -27,6 +28,8 @@ import CollectionUpdatePage from './pages/CollectionUpdatePage'
 
 import useEmbedTailwind from './hooks/useEmbedTailwind'
 import { isEditing, setEditing } from '../edit-state'
+import { Menu, Transition } from '@headlessui/react'
+import { BiExit } from 'react-icons/bi'
 
 const logout = () => {
   setEditing(false)
@@ -35,6 +38,9 @@ const logout = () => {
 
 export const TinaAdmin = () => {
   useEmbedTailwind()
+
+  /** TODO: Not all users are Scott Byrne */
+  const userName = 'Scott Byrne'
 
   const isSSR = typeof window === 'undefined'
   if (isSSR) {
@@ -69,7 +75,7 @@ export const TinaAdmin = () => {
                         <Link to={`/admin`}>Tina Admin</Link>
                       </h2>
                     </div>
-                    <div className="px-6 py-7">
+                    <div className="px-6 py-7 flex-1">
                       <h4 className="uppercase font-bold text-sm mb-3">
                         Collections
                       </h4>
@@ -90,23 +96,85 @@ export const TinaAdmin = () => {
                             </li>
                           )
                         })}
-                        <li className="pt-5">
-                          <a
-                            href="/"
-                            className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
-                          >
-                            Back to site
-                          </a>
-                        </li>
-                        <li className="pt-5">
-                          <button
-                            className="text-lg tracking-wide hover:Text-blue-500 flex items-center opacity-90 hover:opacity-100"
-                            onClick={() => logout()}
-                          >
-                            Log out
-                          </button>
-                        </li>
                       </ul>
+                    </div>
+                    <div className="flex-0 bg-white border-t border-gray-150">
+                      <Menu as="div" className="relative block">
+                        {({ open }) => (
+                          <div>
+                            <Menu.Button
+                              className={`group w-full px-6 py-4 flex justify-between items-center transition-colors duration-150 ease-out ${
+                                open ? `bg-gray-50` : `bg-transparent`
+                              }`}
+                            >
+                              <span className="flex-0 inline-flex flex-shrink-0 flex-grow-0 items-center justify-center h-9 w-9 rounded-full bg-blue-500 mr-2 opacity-90 group-hover:opacity-100 transition-opacity duration-150 ease-out">
+                                <span className="text-lg font-medium leading-none text-white">
+                                  {userName.toUpperCase().substr(0, 1)}
+                                </span>
+                              </span>{' '}
+                              <span className="text-left inline-block text-lg text-gray-800 flex-1 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
+                                {userName}
+                              </span>
+                              <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className={`flex-0 inline-block opacity-50 group-hover:opacity-80 transition-all duration-300 ease-in-out transform ${
+                                  open ? `-rotate-90 opacity-100` : `rotate-0`
+                                }`}
+                              >
+                                <g opacity="0.3">
+                                  <path
+                                    d="M7.91675 13.8086L9.16675 15.0586L14.2253 10L9.16675 4.9414L7.91675 6.1914L11.7253 10L7.91675 13.8086Z"
+                                    fill="currentColor"
+                                  />
+                                </g>
+                              </svg>
+                            </Menu.Button>
+                            <div className="transform -translate-y-full absolute top-3 right-5 w-2/3">
+                              <Transition
+                                enter="transition duration-150 ease-out"
+                                enterFrom="transform opacity-0 translate-y-2"
+                                enterTo="transform opacity-100 translate-y-0"
+                                leave="transition duration-75 ease-in"
+                                leaveFrom="transform opacity-100 translate-y-0"
+                                leaveTo="transform opacity-0 translate-y-2"
+                              >
+                                <Menu.Items className="w-full py-1 bg-white border border-gray-150 rounded-lg shadow-lg">
+                                  <Menu.Item>
+                                    {({ active }) => (
+                                      <a
+                                        className={`text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
+                                          active && 'text-gray-800 opacity-100'
+                                        }`}
+                                        href="/"
+                                      >
+                                        <VscOpenPreview className="w-6 h-auto mr-1.5 text-blue-400" />{' '}
+                                        View Website
+                                      </a>
+                                    )}
+                                  </Menu.Item>
+                                  <Menu.Item>
+                                    {({ active }) => (
+                                      <button
+                                        className={`text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
+                                          active && 'text-gray-800 opacity-100'
+                                        }`}
+                                        onClick={() => logout()}
+                                      >
+                                        <BiExit className="w-6 h-auto mr-1.5 text-blue-400" />{' '}
+                                        Log out
+                                      </button>
+                                    )}
+                                  </Menu.Item>
+                                </Menu.Items>
+                              </Transition>
+                            </div>
+                          </div>
+                        )}
+                      </Menu>
                     </div>
                   </div>
                   <div className="px-6 py-14 flex-1 flex justify-center h-screen overflow-y-scroll">
