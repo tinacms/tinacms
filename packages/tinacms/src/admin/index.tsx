@@ -39,8 +39,7 @@ const logout = () => {
 export const TinaAdmin = () => {
   useEmbedTailwind()
 
-  /** TODO: Not all users are Scott Byrne */
-  const userName = 'Scott Byrne'
+  const userName = 'User Name'
 
   const isSSR = typeof window === 'undefined'
   if (isSSR) {
