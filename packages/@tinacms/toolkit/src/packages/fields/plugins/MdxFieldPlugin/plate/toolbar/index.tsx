@@ -49,6 +49,7 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
   LinkIcon,
+  ArrowDownIcon,
 } from './icons'
 import { Button } from '../../../../../styles'
 import { PopupAdder } from './popup'
@@ -190,20 +191,11 @@ export const ToolbarButtons = ({ name, templates }) => {
               type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
               icon={<CodeIcon />}
             />
-            <ToolbarLink
-              icon={<LinkIcon />}
-              // getLinkUrl={async () => {
-              //   console.log('get it!')
-              //   return 'http://example.com'
-              // }}
-            />
-            {/* <ToolbarImage icon={<ImageIcon />} /> */}
-            {/* <ImageButton /> */}
+            <ToolbarLink icon={<LinkIcon />} />
             <ToolbarButton
               icon={<ImageIcon />}
               onMouseDown={() => {
                 setEditorSelection(editor.selection)
-                // console.log(editor.selection)
                 cms.media.open({
                   allowDelete: true,
                   onSelect: (media) => {
@@ -252,27 +244,6 @@ export const ToolbarButtons = ({ name, templates }) => {
         </Wrapper>
       </div>{' '}
     </ToolbarWrapper>
-  )
-}
-
-function ArrowDownIcon(props) {
-  const title = props.title || 'keyboard arrow down'
-
-  return (
-    <svg
-      height="24"
-      width="24"
-      viewBox="0 0 24 24"
-      xmlns="http://www.w3.org/2000/svg"
-    >
-      <title>{title}</title>
-      <g fill="none">
-        <path
-          d="M7.41 8.59L12 13.17l4.59-4.58L18 10l-6 6-6-6 1.41-1.41z"
-          fill="currentColor"
-        />
-      </g>
-    </svg>
   )
 }
 
