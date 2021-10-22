@@ -17,68 +17,50 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '../../../../../forms'
+import { Form } from '../../../../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { useFormPortal, FormBuilder } from '../../../../../form-builder'
-import { LeftArrowIcon, RightArrowIcon } from '../../../../../icons'
+import { LeftArrowIcon } from '../../../../../icons'
 
-interface MdxFieldFieldDefinititon extends Field {
-  component: 'group'
-  fields: Field[]
-}
-
-interface MdxFieldProps {
-  field: MdxFieldFieldDefinititon
-  tinaForm: Form
-  inline?: boolean
-}
-
-export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
+export const ImageField = ({ tinaForm, children }) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
 
-  if (!field) {
-    return null
-  }
   return (
     <>
-      {inline ? (
-        <SpanHeader onClick={() => setExpanded(!isExpanded)}>
-          {field.label || field.name}
-        </SpanHeader>
-      ) : (
-        <Header onClick={() => setExpanded(!isExpanded)}>
-          {field.label || field.name}
-          <RightArrowIcon />
-        </Header>
-      )}
-      <Panel
+      <ImageHeader onClick={() => setExpanded(!isExpanded)}>
+        {children}
+      </ImageHeader>
+      <ImagePanel
         isExpanded={isExpanded}
         setExpanded={setExpanded}
-        field={field}
+        field={{
+          label: 'Image',
+          name: 'Image',
+        }}
         tinaForm={tinaForm}
       />
     </>
   )
 }
 
-interface PanelProps {
+interface ImagePanelProps {
   setExpanded(next: boolean): void
   isExpanded: boolean
   tinaForm: Form
-  field: MdxFieldFieldDefinititon
-  children?: any
+  field: { label: string; name: string }
 }
-const Panel = function Panel({
+
+const ImagePanel = function Panel({
   setExpanded,
   isExpanded,
   tinaForm,
   field,
-}: PanelProps) {
+}: ImagePanelProps) {
   const FormPortal = useFormPortal()
   return (
     <FormPortal>
       {({ zIndexShift }) => (
-        <MdxFieldPanel
+        <ImageFieldPanel
           isExpanded={isExpanded}
           style={{ zIndex: zIndexShift + 1000 }}
         >
@@ -90,43 +72,16 @@ const Panel = function Panel({
               <FormBuilder form={tinaForm} hideFooter={true} />
             ) : null}
           </PanelBody>
-        </MdxFieldPanel>
+        </ImageFieldPanel>
       )}
     </FormPortal>
   )
 }
 
-const SpanHeader: StyledComponent<'span', {}, {}> = styled.span`
+const ImageHeader: StyledComponent<'div', {}, {}> = styled.div`
   position: relative;
   cursor: pointer;
-  border: 1px solid var(--tina-color-grey-3);
-  border-left: 3px solid var(--tina-color-primary);
-  border-radius: var(--tina-radius-small);
-  overflow: visible;
-  line-height: 1.35;
-  padding: 2px 8px;
-  color: var(--tina-color-grey-10);
-  background-color: white;
-
-  svg {
-    width: 24px;
-    height: auto;
-    fill: var(--tina-color-grey-3);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    color: #0084ff;
-  }
-`
-
-const Header: StyledComponent<'div', {}, {}> = styled.div`
-  position: relative;
-  cursor: pointer;
-  display: flex;
+  display: block;
   justify-content: space-between;
   align-items: center;
   border: 1px solid var(--tina-color-grey-2);
@@ -202,7 +157,7 @@ const PanelBody = styled.div`
   overflow-y: auto;
 `
 
-const MdxFieldPanelKeyframes = keyframes`
+const ImageFieldPanelKeyframes = keyframes`
   0% {
     transform: translate3d( 100%, 0, 0 );
   }
@@ -211,7 +166,7 @@ const MdxFieldPanelKeyframes = keyframes`
   }
 `
 
-const MdxFieldPanel = styled.div<{ isExpanded: boolean }>`
+export const ImageFieldPanel = styled.div<{ isExpanded: boolean }>`
   position: absolute;
   width: 100%;
   top: 0;
@@ -228,7 +183,7 @@ const MdxFieldPanel = styled.div<{ isExpanded: boolean }>`
     ${(p) =>
       p.isExpanded &&
       css`
-        animation-name: ${MdxFieldPanelKeyframes};
+        animation-name: ${ImageFieldPanelKeyframes};
         animation-duration: 150ms;
         animation-delay: 0;
         animation-iteration-count: 1;
@@ -244,10 +199,3 @@ const MdxFieldPanel = styled.div<{ isExpanded: boolean }>`
       `};
   }
 `
-
-interface PanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  field: MdxFieldFieldDefinititon
-}
