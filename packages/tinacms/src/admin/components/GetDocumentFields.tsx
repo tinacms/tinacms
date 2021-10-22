@@ -39,6 +39,7 @@ export const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
         `query { getDocumentFields }`,
         {}
       )
+
       const documentFields = response.getDocumentFields
       const collection: Object = documentFields[collectionName].collection
       const fields: Object[] = documentFields[collectionName].fields
@@ -76,7 +77,7 @@ const GetDocumentFields = ({
   if (!collection || !fields || !mutationInfo) {
     return null
   }
-  return <>{children(collection, fields)}</>
+  return <>{children(collection, fields, mutationInfo)}</>
 }
 
 export default GetDocumentFields
