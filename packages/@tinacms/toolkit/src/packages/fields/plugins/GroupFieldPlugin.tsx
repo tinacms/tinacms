@@ -19,7 +19,7 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { FieldsBuilder, useFormPortal } from '../../form-builder'
+import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../icons'
 import { useCMS } from '../../react-core/use-cms'
 
@@ -176,13 +176,16 @@ export const PanelHeader = styled.div`
   }
 `
 
-export const PanelBody = styled.div`
-  background: var(--tina-color-grey-1);
-  position: relative;
-  display: flex;
-  flex: 1 1 auto;
-  overflow-y: auto;
-`
+export const PanelBody = ({ children }) => {
+  return (
+    <div
+      className="flex-1 w-full overflow-y-auto"
+      style={{ background: 'var(--tina-color-grey-1)' }}
+    >
+      <FormWrapper>{children}</FormWrapper>
+    </div>
+  )
+}
 
 const GroupPanelKeyframes = keyframes`
   0% {
