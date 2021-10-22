@@ -18,7 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import { useState } from 'react'
-import { Dismissible } from 'react-dismissible'
+import { Dismissible } from '../../../react-dismissible'
 import { SketchPicker, BlockPicker } from 'react-color'
 import styled, { css, keyframes } from 'styled-components'
 import { ColorRGBA, ColorFormat, ColorFormatter } from './color-formatter'

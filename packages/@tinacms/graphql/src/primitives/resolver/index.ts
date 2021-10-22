@@ -19,9 +19,9 @@ import { assertShape, sequential, lastItem } from '../util'
 import { NAMER } from '../ast-builder'
 import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
+import { parseMDX, stringifyMDX } from '../mdx'
 
 import type { Templateable, TinaFieldEnriched } from '../types'
-import { GraphQLError } from 'graphql'
 import { TinaError } from './error'
 interface ResolverConfig {
   database: Database
@@ -134,6 +134,69 @@ export class Resolver {
       throw e
     }
   }
+
+  public getDocumentFields = async () => {
+    try {
+      const response = {}
+      const collections = await this.tinaSchema.getCollections()
+
+      /**
+       * Iterate through collections...
+       */
+      await sequential(collections, async (collection) => {
+        const collectable =
+          this.tinaSchema.getTemplatesForCollectable(collection)
+
+        switch (collectable.type) {
+          /**
+           * Collection with no templates...
+           */
+          case 'object':
+            response[collection.name] = {
+              collection,
+              fields: await sequential(
+                collectable.template.fields,
+                async (field) => {
+                  return this.resolveField(field)
+                }
+              ),
+              mutationInfo: {
+                includeCollection: true,
+                includeTemplate: false,
+              },
+            }
+            break
+          /**
+           * Collection with n templates...
+           */
+          case 'union':
+            const templates = {}
+            /**
+             * Iterate through templates...
+             */
+            await sequential(collectable.templates, async (template) => {
+              templates[lastItem(template.namespace)] = {
+                fields: await sequential(template.fields, async (field) => {
+                  return this.resolveField(field)
+                }),
+              }
+            })
+
+            response[collection.name] = {
+              collection,
+              templates,
+              mutationInfo: { includeCollection: true, includeTemplate: true },
+            }
+            break
+        }
+      })
+
+      return response
+    } catch (e) {
+      throw e
+    }
+  }
+
   public resolveDocument = async ({
     value,
     args,
@@ -203,6 +266,12 @@ export class Resolver {
               _template: lastItem(template.namespace),
             })
             return this.getDocument(realPath)
+        }
+      } else {
+        if (!(await this.database.documentExists(realPath))) {
+          throw new Error(
+            `Unable to update document, ${realPath} does not exist`
+          )
         }
       }
       const templateInfo =
@@ -383,8 +452,12 @@ export class Resolver {
                 'Not implement for polymorphic objects which are not lists'
               )
             }
-            break
           }
+          break
+        case 'rich-text':
+          field
+          accum[fieldName] = stringifyMDX(fieldValue, field)
+          break
         case 'reference':
           accum[fieldName] = fieldValue
           break
@@ -414,6 +487,14 @@ export class Resolver {
       case 'reference':
       case 'image':
         accumulator[field.name] = value
+        break
+      case 'rich-text':
+        if (typeof value === 'string') {
+          const tree = parseMDX(value, field)
+          accumulator[field.name] = tree
+        } else {
+          throw new Error(`Expected value for rich-text to be of type string`)
+        }
         break
       case 'object':
         if (field.list) {
@@ -448,6 +529,7 @@ export class Resolver {
           if (!value) {
             return
           }
+
           const template = await this.tinaSchema.getTemplateForData({
             data: value,
             collection: {
@@ -633,6 +715,37 @@ export class Resolver {
           }
         } else {
           throw new Error(`Unknown object for resolveField function`)
+        }
+      case 'rich-text':
+        const templates: { [key: string]: object } = {}
+        const typeMap: { [key: string]: string } = {}
+        await sequential(field.templates, async (template) => {
+          if (typeof template === 'string') {
+            throw new Error(`Global templates not yet supported for rich-text`)
+          } else {
+            const extraFields = template.ui || {}
+            const templateName = lastItem(template.namespace)
+            typeMap[templateName] = NAMER.dataTypeName(template.namespace)
+            templates[lastItem(template.namespace)] = {
+              // @ts-ignore FIXME `Templateable` should have name and label properties
+              label: template.label || templateName,
+              key: templateName,
+              inline: template.inline,
+              name: templateName,
+              fields: await sequential(
+                template.fields,
+                async (field) => await this.resolveField(field)
+              ),
+              ...extraFields,
+            }
+            return true
+          }
+        })
+        return {
+          ...field,
+          templates: Object.values(templates),
+          component: 'rich-text',
+          ...extraFields,
         }
       case 'reference':
         const documents = _.flatten(

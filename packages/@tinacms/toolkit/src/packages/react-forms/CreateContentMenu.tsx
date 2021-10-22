@@ -19,7 +19,7 @@ import { useMemo } from 'react'
 import { Form } from '../forms'
 import { AddIcon } from '../icons'
 import { IconButton, Button } from '../styles'
-import { Dismissible } from 'react-dismissible'
+import { Dismissible } from '../react-dismissible'
 import { useCMS, useSubscribable } from '../react-core'
 
 export interface CreateContentMenuProps {

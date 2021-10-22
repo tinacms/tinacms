@@ -32,6 +32,8 @@ interface Node {
 interface Document {
   sys: SystemInfo
   id: ID!
+  form: JSON!
+  values: JSON!
 }
 
 """A relay-compliant pagination connection"""
@@ -45,6 +47,7 @@ type Query {
   node(id: String): Node!
   getDocument(collection: String, relativePath: String): DocumentNode!
   getDocumentList(before: String, after: String, first: Int, last: Int): DocumentConnection!
+  getDocumentFields: JSON!
   getPostsDocument(relativePath: String): PostsDocument!
   getPostsList(before: String, after: String, first: Int, last: Int): PostsConnection!
   getGlobalDocument(relativePath: String): GlobalDocument!
@@ -276,10 +279,15 @@ type PagesConnection implements Connection {
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  createDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updatePostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
+  createPostsDocument(relativePath: String!, params: PostsMutation!): PostsDocument!
   updateGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
+  createGlobalDocument(relativePath: String!, params: GlobalMutation!): GlobalDocument!
   updateAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
+  createAuthorsDocument(relativePath: String!, params: AuthorsMutation!): AuthorsDocument!
   updatePagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
+  createPagesDocument(relativePath: String!, params: PagesMutation!): PagesDocument!
 }
 
 input DocumentMutation {

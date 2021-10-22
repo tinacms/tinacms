@@ -75,7 +75,10 @@ export const ResizeHandle = () => {
 
   return (
     <>
-      <Handle onMouseDown={handleMouseDown}></Handle>
+      <Handle onMouseDown={handleMouseDown}>
+        <span></span>
+        <span></span>
+      </Handle>
       <GlobalStyles blockSelect={mouseDown} width={sidebarWidth} />
     </>
   )
@@ -84,10 +87,26 @@ export const ResizeHandle = () => {
 const Handle = styled.div`
   position: absolute;
   top: 0;
-  right: -2px;
-  width: 4px;
+  right: 0px;
+  padding-right: 6px;
+  width: 14px;
   height: 100%;
   cursor: ew-resize;
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  z-index: var(--tina-z-index-3);
+
+  span {
+    width: 2px;
+    border-radius: 2px;
+    box-shadow: 0 0 2px 1px rgba(255, 255, 255, 0.3);
+    max-height: 10rem;
+    min-height: 5rem;
+    height: 33.3%;
+    max-height: 20vh;
+    background: var(--tina-color-grey-3);
+  }
 `
 
 export const GlobalStyles = createGlobalStyle<{

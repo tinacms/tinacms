@@ -19,9 +19,9 @@ limitations under the License.
 import * as React from 'react'
 import { Field, Form } from '../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { FieldsBuilder, useFormPortal } from '../../form-builder'
+import { FieldsBuilder, useFormPortal, FormWrapper } from '../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../icons'
-import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { useCMS } from '../../react-core/use-cms'
 
 export interface GroupFieldDefinititon extends Field {
   component: 'group'
@@ -36,7 +36,7 @@ export interface GroupProps {
   tinaForm: Form
 }
 
-export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
+export const Group = ({ tinaForm, field }: GroupProps) => {
   const [isExpanded, setExpanded] = React.useState<boolean>(false)
   return (
     <>
@@ -52,7 +52,7 @@ export const Group = wrapFieldsWithMeta(({ tinaForm, field }: GroupProps) => {
       />
     </>
   )
-})
+}
 
 interface PanelProps {
   setExpanded(next: boolean): void
@@ -67,6 +67,7 @@ const Panel = function Panel({
   tinaForm,
   field,
 }: PanelProps) {
+  const cms = useCMS()
   const FormPortal = useFormPortal()
   const fields: any[] = React.useMemo(() => {
     return field.fields.map((subField: any) => ({
@@ -82,7 +83,17 @@ const Panel = function Panel({
           isExpanded={isExpanded}
           style={{ zIndex: zIndexShift + 1000 }}
         >
-          <PanelHeader onClick={() => setExpanded(false)}>
+          <PanelHeader
+            onClick={() => {
+              const state = tinaForm.finalForm.getState()
+              if (state.invalid === true) {
+                // @ts-ignore
+                cms.alerts.error('Cannot navigate away from an invalid form.')
+              } else {
+                setExpanded(false)
+              }
+            }}
+          >
             <LeftArrowIcon /> <span>{field.label || field.name}</span>
           </PanelHeader>
           <PanelBody>
@@ -165,13 +176,16 @@ export const PanelHeader = styled.div`
   }
 `
 
-export const PanelBody = styled.div`
-  background: var(--tina-color-grey-1);
-  position: relative;
-  display: flex;
-  flex: 1 1 auto;
-  overflow-y: auto;
-`
+export const PanelBody = ({ children }) => {
+  return (
+    <div
+      className="flex-1 w-full overflow-y-auto"
+      style={{ background: 'var(--tina-color-grey-1)' }}
+    >
+      <FormWrapper>{children}</FormWrapper>
+    </div>
+  )
+}
 
 const GroupPanelKeyframes = keyframes`
   0% {

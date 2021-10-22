@@ -1,6 +1,6 @@
 {
   "name": "react-tinacms-github",
-  "version": "0.50.8",
+  "version": "0.51.1",
   "description": "",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
@@ -16,7 +16,6 @@
   "peerDependencies": {
     "final-form": ">=4.18.0",
     "react": ">=16.8",
-    "react-dismissible": "^1.3.0",
     "react-is": "^17.0.2",
     "styled-components": ">=4.1",
     "tinacms": ">=0.50.0"
@@ -31,7 +30,6 @@
     "final-form": "^4.18.7",
     "jest": "^27.0.6",
     "react": "16.12.0",
-    "react-dismissible": "^1.3.0",
     "react-dom": "16.12.0",
     "styled-components": ">=4.1",
     "tinacms": "workspace:*",

@@ -49,6 +49,8 @@ export type Node = {
 export type Document = {
   sys?: Maybe<SystemInfo>;
   id: Scalars['ID'];
+  form: Scalars['JSON'];
+  values: Scalars['JSON'];
 };
 
 /** A relay-compliant pagination connection */
@@ -63,6 +65,7 @@ export type Query = {
   node: Node;
   getDocument: DocumentNode;
   getDocumentList: DocumentConnection;
+  getDocumentFields: Scalars['JSON'];
   getPostsDocument: PostsDocument;
   getPostsList: PostsConnection;
   getGlobalDocument: GlobalDocument;
@@ -412,10 +415,15 @@ export type Mutation = {
   __typename?: 'Mutation';
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
+  createDocument: DocumentNode;
   updatePostsDocument: PostsDocument;
+  createPostsDocument: PostsDocument;
   updateGlobalDocument: GlobalDocument;
+  createGlobalDocument: GlobalDocument;
   updateAuthorsDocument: AuthorsDocument;
+  createAuthorsDocument: AuthorsDocument;
   updatePagesDocument: PagesDocument;
+  createPagesDocument: PagesDocument;
 };
 
 
@@ -433,7 +441,20 @@ export type MutationUpdateDocumentArgs = {
 };
 
 
+export type MutationCreateDocumentArgs = {
+  collection: Scalars['String'];
+  relativePath: Scalars['String'];
+  params: DocumentMutation;
+};
+
+
 export type MutationUpdatePostsDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: PostsMutation;
+};
+
+
+export type MutationCreatePostsDocumentArgs = {
   relativePath: Scalars['String'];
   params: PostsMutation;
 };
@@ -445,13 +466,31 @@ export type MutationUpdateGlobalDocumentArgs = {
 };
 
 
+export type MutationCreateGlobalDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: GlobalMutation;
+};
+
+
 export type MutationUpdateAuthorsDocumentArgs = {
   relativePath: Scalars['String'];
   params: AuthorsMutation;
 };
 
 
+export type MutationCreateAuthorsDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: AuthorsMutation;
+};
+
+
 export type MutationUpdatePagesDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: PagesMutation;
+};
+
+
+export type MutationCreatePagesDocumentArgs = {
   relativePath: Scalars['String'];
   params: PagesMutation;
 };

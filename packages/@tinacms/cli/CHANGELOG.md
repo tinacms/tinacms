@@ -1,5 +1,40 @@
 # tinacms-cli
 
+## 0.56.3
+
+### Patch Changes
+
+- 7c389cb0f: Remove Forestry reference in CLI hint
+
+## 0.56.2
+
+### Patch Changes
+
+- Updated dependencies [9ecb392ca]
+  - @tinacms/graphql@0.55.2
+
+## 0.56.1
+
+### Patch Changes
+
+- Updated dependencies [ff4446c8e]
+- Updated dependencies [667c33e2a]
+  - @tinacms/graphql@0.55.1
+
+## 0.56.0
+
+### Minor Changes
+
+- f3bddeb4a: Added new warning messages for list UI that we do not support by default
+- 455a44359: Add noWatch option to server:start command. When this option is used, the config is not regenerated on file changes.
+
+### Patch Changes
+
+- Updated dependencies [2908f8176]
+- Updated dependencies [5d83643b2]
+- Updated dependencies [f3bddeb4a]
+  - @tinacms/graphql@0.55.0
+
 ## 0.55.2
 
 ### Patch Changes

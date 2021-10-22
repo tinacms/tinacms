@@ -241,6 +241,22 @@ export class Builder {
 
   /**
    * ```graphql
+   * {
+   *    getDocumentFields()
+   * }
+   * ```
+   */
+
+  public multiCollectionDocumentFields = async () => {
+    return astBuilder.FieldDefinition({
+      name: 'getDocumentFields',
+      required: true,
+      type: 'JSON',
+    })
+  }
+
+  /**
+   * ```graphql
    * # ex.
    * {
    *   addPendingDocument(collection: $collection, relativePath: $relativePath, params: $params) {
@@ -281,6 +297,49 @@ export class Builder {
    * ```graphql
    * # ex.
    * {
+   *   createDocument(relativePath: $relativePath, params: $params) {
+   *     id
+   *     data {...}
+   *   }
+   * }
+   * ```
+   *
+   * @param collections
+   */
+  public buildCreateCollectionDocumentMutation = async (
+    collections: TinaCloudCollectionEnriched[]
+  ) => {
+    return astBuilder.FieldDefinition({
+      name: 'createDocument',
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'collection',
+          required: true,
+          type: astBuilder.TYPES.String,
+        }),
+        astBuilder.InputValueDefinition({
+          name: 'relativePath',
+          required: true,
+          type: astBuilder.TYPES.String,
+        }),
+        astBuilder.InputValueDefinition({
+          name: 'params',
+          required: true,
+          type: await this._buildReferenceMutation({
+            namespace: ['document'],
+            collections: collections.map((collection) => collection.name),
+          }),
+        }),
+      ],
+      required: true,
+      type: astBuilder.TYPES.MultiCollectionDocument,
+    })
+  }
+
+  /**
+   * ```graphql
+   * # ex.
+   * {
    *   updateDocument(relativePath: $relativePath, params: $params) {
    *     id
    *     data {...}
@@ -290,7 +349,7 @@ export class Builder {
    *
    * @param collections
    */
-  public buildMultiCollectionDocumentMutation = async (
+  public buildUpdateCollectionDocumentMutation = async (
     collections: TinaCloudCollectionEnriched[]
   ) => {
     return astBuilder.FieldDefinition({
@@ -376,6 +435,8 @@ export class Builder {
       type: type.name.value,
       resolveType: 'collectionDocument',
       collection: collection.name,
+      [NAMER.createName([collection.name])]: 'create',
+      [NAMER.updateName([collection.name])]: 'update',
     })
     return astBuilder.FieldDefinition({ type, name, args, required: true })
   }
@@ -398,7 +459,42 @@ export class Builder {
   ) => {
     return astBuilder.FieldDefinition({
       type: await this._buildCollectionDocumentType(collection),
-      name: NAMER.mutationName([collection.name]),
+      name: NAMER.updateName([collection.name]),
+      required: true,
+      args: [
+        astBuilder.InputValueDefinition({
+          name: 'relativePath',
+          required: true,
+          type: astBuilder.TYPES.String,
+        }),
+        astBuilder.InputValueDefinition({
+          name: 'params',
+          required: true,
+          type: await this._updateCollectionDocumentMutationType(collection),
+        }),
+      ],
+    })
+  }
+
+  /**
+   * ```graphql
+   * # ex.
+   * mutation {
+   *   createPostDocument(relativePath: $relativePath, params: $params) {
+   *     id
+   *     data {...}
+   *   }
+   * }
+   * ```
+   *
+   * @param collection
+   */
+  public createCollectionDocumentMutation = async (
+    collection: TinaCloudCollectionEnriched
+  ) => {
+    return astBuilder.FieldDefinition({
+      type: await this._buildCollectionDocumentType(collection),
+      name: NAMER.createName([collection.name]),
       required: true,
       args: [
         astBuilder.InputValueDefinition({
@@ -583,6 +679,8 @@ export class Builder {
     await this.database.addToLookupMap({
       type: type.name.value,
       resolveType: 'multiCollectionDocument',
+      createDocument: 'create',
+      updateDocument: 'update',
     })
     return type
   }
@@ -683,6 +781,12 @@ export class Builder {
           name: field.name,
           list: field.list,
           type: await this._updateCollectionDocumentMutationType(field),
+        })
+      case 'rich-text':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: field.list,
+          type: astBuilder.TYPES.JSON,
         })
       case 'reference':
         return astBuilder.InputValueDefinition({
@@ -830,6 +934,13 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
           type: await this._buildObjectOrUnionData(
             this.tinaSchema.getTemplatesForCollectable(field)
           ),
+        })
+      case 'rich-text':
+        return astBuilder.FieldDefinition({
+          name: field.name,
+          list: field.list,
+          required: field.required,
+          type: astBuilder.TYPES.JSON,
         })
       case 'reference':
         const name = NAMER.documentTypeName(field.namespace)

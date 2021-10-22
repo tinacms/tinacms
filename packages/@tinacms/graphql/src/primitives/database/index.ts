@@ -96,7 +96,7 @@ export class Database {
           templateName
         )
       const field = template.fields.find((field) => {
-        if (field.type === 'string') {
+        if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
           }
@@ -104,8 +104,8 @@ export class Database {
         return false
       })
 
-      let data = contentObject as { [key: string]: unknown }
-      if (extension === '.md' && field) {
+      let data = contentObject
+      if ((extension === '.md' || extension === '.mdx') && field) {
         if (hasOwnProperty(contentObject, '$_body')) {
           const { $_body, ...rest } = contentObject
           data = rest
@@ -269,7 +269,7 @@ export class Database {
         throw new Error(`Unable to determine template`)
       }
       const field = template.fields.find((field) => {
-        if (field.type === 'string') {
+        if (field.type === 'string' || field.type === 'rich-text') {
           if (field.isBody) {
             return true
           }
@@ -277,7 +277,7 @@ export class Database {
         return false
       })
       let payload: { [key: string]: unknown } = {}
-      if (collection.format === 'md' && field) {
+      if (['md', 'mdx'].includes(collection.format) && field) {
         Object.entries(data).forEach(([key, value]) => {
           if (key !== field.name) {
             payload[key] = value
@@ -376,6 +376,59 @@ export class Database {
     }
     await this.put('_lookup', { ...lookupMap, [lookup.type]: lookup })
   }
+
+  private stringifyFile = (
+    content: object,
+    format: FormatType | string, // FIXME
+    /** For non-polymorphic documents we don't need the template key */
+    keepTemplateKey: boolean
+  ): string => {
+    switch (format) {
+      case '.markdown':
+      case '.mdx':
+      case '.md':
+        // @ts-ignore
+        const { _id, _template, _collection, $_body, ...rest } = content
+        const extra: { [key: string]: string } = {}
+        if (keepTemplateKey) {
+          extra['_template'] = _template
+        }
+        return matter.stringify(
+          typeof $_body === 'undefined' ? '' : `\n${$_body}`,
+          { ...rest, ...extra }
+        )
+      case '.json':
+        return JSON.stringify(content, null, 2)
+      default:
+        throw new Error(`Must specify a valid format, got ${format}`)
+    }
+  }
+
+  private parseFile = <T extends object>(
+    content: string,
+    format: FormatType | string, // FIXME
+    yupSchema: (args: typeof yup) => yup.ObjectSchema<any>
+  ): T => {
+    switch (format) {
+      case '.markdown':
+      case '.mdx':
+      case '.md':
+        const contentJSON = matter(content || '')
+        const markdownData = {
+          ...contentJSON.data,
+          $_body: contentJSON.content,
+        }
+        assertShape<T>(markdownData, yupSchema)
+        return markdownData
+      case '.json':
+        if (!content) {
+          return {} as T
+        }
+        return JSON.parse(content)
+      default:
+        throw new Error(`Must specify a valid format, got ${format}`)
+    }
+  }
 }
 
 function hasOwnProperty<X extends {}, Y extends PropertyKey>(
@@ -385,7 +438,7 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(
   return obj.hasOwnProperty(prop)
 }
 
-type FormatType = 'json' | 'md' | 'markdown' | 'yml' | 'yaml'
+type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
 
 export type LookupMapType =
   | GlobalDocumentLookup
@@ -413,6 +466,8 @@ type CollectionDocumentLookup = {
 type MultiCollectionDocumentLookup = {
   type: string
   resolveType: 'multiCollectionDocument'
+  createDocument: 'create'
+  updateDocument: 'update'
 }
 type MultiCollectionDocumentListLookup = {
   type: string

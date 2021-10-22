@@ -21,9 +21,7 @@ import { FunctionComponent, useRef, useState } from 'react'
 import styled, { css } from 'styled-components'
 import { EditorView } from 'prosemirror-view'
 import { EditorState } from 'prosemirror-state'
-import { Dismissible } from 'react-dismissible'
-
-import { HeadingIcon } from '@tinacms/toolkit'
+import { Dismissible, HeadingIcon } from '@tinacms/toolkit'
 
 import { useEditorStateContext } from '../../../context/editorState'
 import { MenuButton, MenuDropdown } from '../../../components/MenuHelpers'
@@ -41,25 +39,25 @@ export const ProsemirrorMenu: FunctionComponent = () => {
 
   return (
     <>
-      <MenuButton
-        ref={menuButtonRef}
-        data-tooltip="Heading"
-        title="Heading"
-        onClick={toggle}
-        active={active}
-      >
-        <HeadingIcon />
-      </MenuButton>
-      <MenuDropdown triggerRef={menuButtonRef} open={active}>
-        <Dismissible click escape disabled={!active} onDismiss={toggle}>
+      <Dismissible click escape disabled={!active} onDismiss={toggle}>
+        <MenuButton
+          ref={menuButtonRef}
+          data-tooltip="Heading"
+          title="Heading"
+          onClick={toggle}
+          active={active}
+        >
+          <HeadingIcon />
+        </MenuButton>
+        <MenuDropdown triggerRef={menuButtonRef} open={active}>
           <H1 view={view} onClick={toggle} />
           <H2 view={view} onClick={toggle} />
           <H3 view={view} onClick={toggle} />
           <H4 view={view} onClick={toggle} />
           <H5 view={view} onClick={toggle} />
           <H6 view={view} onClick={toggle} />
-        </Dismissible>
-      </MenuDropdown>
+        </MenuDropdown>
+      </Dismissible>
     </>
   )
 }
