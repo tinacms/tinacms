@@ -50,10 +50,10 @@ import {
   UnderlineIcon,
   LinkIcon,
 } from './icons'
-import { Button } from '../../../../styles'
-import { PopupAdder } from './mdx-field'
-import { HeaderPopup } from '../heading'
-import { useCMS } from '../../../../react-core'
+import { Button } from '../../../../../styles'
+import { PopupAdder } from './adder'
+import { HeaderPopup } from './heading'
+import { useCMS } from '../../../../../react-core'
 
 const Wrapper = styled.div`
   display: grid;
