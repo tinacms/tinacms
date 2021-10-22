@@ -29,10 +29,16 @@ const createDocument = async (
 ) => {
   const { relativePath, ...leftover } = values
   const { includeCollection, includeTemplate } = mutationInfo
-  const params = transformDocumentIntoMutationRequestPayload(leftover, {
-    includeCollection,
-    includeTemplate,
-  })
+  const params = transformDocumentIntoMutationRequestPayload(
+    {
+      _collection: collection.name,
+      ...leftover,
+    },
+    {
+      includeCollection,
+      includeTemplate,
+    }
+  )
 
   await cms.api.tina.request(
     `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
