@@ -14,24 +14,50 @@ limitations under the License.
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route, Link } from 'react-router-dom'
 import { ImFilesEmpty } from 'react-icons/im'
+import { VscOpenPreview } from 'react-icons/vsc'
 
 import Layout from './components/Layout'
 import GetCMS from './components/GetCMS'
 import GetCollections from './components/GetCollections'
 
+import LoginPage from './pages/LoginPage'
 import DashboardPage from './pages/DashboardPage'
 import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 
 import useEmbedTailwind from './hooks/useEmbedTailwind'
+import { isEditing, setEditing } from '../edit-state'
+import { Menu, Transition } from '@headlessui/react'
+import { BiExit } from 'react-icons/bi'
+
+const logout = () => {
+  setEditing(false)
+  window.location.reload()
+}
 
 export const TinaAdmin = () => {
   useEmbedTailwind()
 
+  const userName = 'User Name'
+
   const isSSR = typeof window === 'undefined'
   if (isSSR) {
     return null
+  }
+
+  /**
+   * TODO:
+   * Ideally, this line should be `const { edit } = useEditState()` if we weren't having context issues with `EditStateProvider`.
+   * https://github.com/tinacms/tinacms/issues/2081
+   */
+  const isEdit = isEditing()
+  if (!isEdit) {
+    return (
+      <Layout>
+        <LoginPage />
+      </Layout>
+    )
   }
 
   return (
@@ -43,12 +69,80 @@ export const TinaAdmin = () => {
               <Router>
                 <div className="flex items-stretch h-screen overflow-hidden">
                   <div className="flex flex-col w-80 lg:w-96 flex-shrink-0 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200">
-                    <div className="px-6 py-4 border-b border-gray-200">
-                      <h2 className="text-2xl tracking-wide">
-                        <Link to={`/admin`}>Tina Admin</Link>
-                      </h2>
+                    <div className="border-b border-gray-200">
+                      <Menu as="div" className="relative block">
+                        {({ open }) => (
+                          <div>
+                            <Menu.Button
+                              className={`group w-full px-6 py-4 flex justify-between items-center transition-colors duration-150 ease-out ${
+                                open ? `bg-gray-50` : `bg-transparent`
+                              }`}
+                            >
+                              <span className="text-left inline-block text-2xl tracking-wide text-gray-800 flex-1 opacity-80 group-hover:opacity-100 transition-opacity duration-150 ease-out">
+                                Tina Admin
+                              </span>
+                              <svg
+                                width="20"
+                                height="20"
+                                viewBox="0 0 20 20"
+                                fill="none"
+                                xmlns="http://www.w3.org/2000/svg"
+                                className={`flex-0 inline-block opacity-50 group-hover:opacity-80 transition-all duration-300 ease-in-out transform ${
+                                  open ? `rotate-90 opacity-100` : `rotate-0`
+                                }`}
+                              >
+                                <g opacity="0.3">
+                                  <path
+                                    d="M7.91675 13.8086L9.16675 15.0586L14.2253 10L9.16675 4.9414L7.91675 6.1914L11.7253 10L7.91675 13.8086Z"
+                                    fill="currentColor"
+                                  />
+                                </g>
+                              </svg>
+                            </Menu.Button>
+                            <div className="transform translate-y-full absolute bottom-3 right-5 w-2/3 z-50">
+                              <Transition
+                                enter="transition duration-150 ease-out"
+                                enterFrom="transform opacity-0 -translate-y-2"
+                                enterTo="transform opacity-100 translate-y-0"
+                                leave="transition duration-75 ease-in"
+                                leaveFrom="transform opacity-100 translate-y-0"
+                                leaveTo="transform opacity-0 -translate-y-2"
+                              >
+                                <Menu.Items className="w-full py-1 bg-white border border-gray-150 rounded-lg shadow-lg">
+                                  <Menu.Item>
+                                    {({ active }) => (
+                                      <a
+                                        className={`w-full text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
+                                          active && 'text-gray-800 opacity-100'
+                                        }`}
+                                        href="/"
+                                      >
+                                        <VscOpenPreview className="w-6 h-auto mr-1.5 text-blue-400" />{' '}
+                                        View Website
+                                      </a>
+                                    )}
+                                  </Menu.Item>
+                                  <Menu.Item>
+                                    {({ active }) => (
+                                      <button
+                                        className={`w-full text-lg px-4 py-2 tracking-wide flex items-center opacity-80 text-gray-600 ${
+                                          active && 'text-gray-800 opacity-100'
+                                        }`}
+                                        onClick={() => logout()}
+                                      >
+                                        <BiExit className="w-6 h-auto mr-1.5 text-blue-400" />{' '}
+                                        Log out
+                                      </button>
+                                    )}
+                                  </Menu.Item>
+                                </Menu.Items>
+                              </Transition>
+                            </div>
+                          </div>
+                        )}
+                      </Menu>
                     </div>
-                    <div className="px-6 py-7">
+                    <div className="px-6 py-7 flex-1">
                       <h4 className="uppercase font-bold text-sm mb-3">
                         Collections
                       </h4>
