@@ -21,38 +21,16 @@ import { Field, Form } from '../../../../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { useFormPortal, FormBuilder } from '../../../../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../../../../icons'
-import { Dismissible } from '../../../../../react-dismissible'
 
-export interface MdxFieldFieldDefinititon extends Field {
+interface MdxFieldFieldDefinititon extends Field {
   component: 'group'
   fields: Field[]
 }
 
-export interface MdxFieldProps {
+interface MdxFieldProps {
   field: MdxFieldFieldDefinititon
   tinaForm: Form
   inline?: boolean
-}
-
-export const ImageField = ({ tinaForm, children }) => {
-  const [isExpanded, setExpanded] = React.useState<boolean>(false)
-
-  return (
-    <>
-      <ImageHeader onClick={() => setExpanded(!isExpanded)}>
-        {children}
-      </ImageHeader>
-      <ImagePanel
-        isExpanded={isExpanded}
-        setExpanded={setExpanded}
-        field={{
-          label: 'Image',
-          name: 'Image',
-        }}
-        tinaForm={tinaForm}
-      />
-    </>
-  )
 }
 
 export const MdxField = ({ inline, tinaForm, field }: MdxFieldProps) => {
@@ -117,39 +95,6 @@ const Panel = function Panel({
     </FormPortal>
   )
 }
-interface ImagePanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  field: { label: string; name: string }
-}
-const ImagePanel = function Panel({
-  setExpanded,
-  isExpanded,
-  tinaForm,
-  field,
-}: ImagePanelProps) {
-  const FormPortal = useFormPortal()
-  return (
-    <FormPortal>
-      {({ zIndexShift }) => (
-        <MdxFieldPanel
-          isExpanded={isExpanded}
-          style={{ zIndex: zIndexShift + 1000 }}
-        >
-          <PanelHeader onClick={() => setExpanded(false)}>
-            <LeftArrowIcon /> <span>{field.label || field.name}</span>
-          </PanelHeader>
-          <PanelBody>
-            {isExpanded ? (
-              <FormBuilder form={tinaForm} hideFooter={true} />
-            ) : null}
-          </PanelBody>
-        </MdxFieldPanel>
-      )}
-    </FormPortal>
-  )
-}
 
 const SpanHeader: StyledComponent<'span', {}, {}> = styled.span`
   position: relative;
@@ -160,37 +105,6 @@ const SpanHeader: StyledComponent<'span', {}, {}> = styled.span`
   overflow: visible;
   line-height: 1.35;
   padding: 2px 8px;
-  color: var(--tina-color-grey-10);
-  background-color: white;
-
-  svg {
-    width: 24px;
-    height: auto;
-    fill: var(--tina-color-grey-3);
-    transition: all var(--tina-timing-short) ease-out;
-  }
-
-  &:hover {
-    svg {
-      fill: var(--tina-color-grey-8);
-    }
-    color: #0084ff;
-  }
-`
-
-const ImageHeader: StyledComponent<'div', {}, {}> = styled.div`
-  position: relative;
-  cursor: pointer;
-  display: block;
-  justify-content: space-between;
-  align-items: center;
-  border: 1px solid var(--tina-color-grey-2);
-  border-left: 3px solid var(--tina-color-primary);
-  border-radius: var(--tina-radius-small);
-  overflow: visible;
-  line-height: 1.35;
-  padding: 12px;
-  margin: 8px 0;
   color: var(--tina-color-grey-10);
   background-color: white;
 
@@ -331,117 +245,6 @@ export const MdxFieldPanel = styled.div<{ isExpanded: boolean }>`
   }
 `
 
-export interface MdxFieldFieldProps {
-  field: Field
-}
-
-export function MdxFieldField(props: MdxFieldFieldProps) {
-  return <div>Subfield: {props.field.label || props.field.name}</div>
-}
-
-export const MdxFieldPlugin = {
-  name: 'mdx-field',
-  Component: MdxField,
-}
-
-export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
-  const [visible, setVisible] = React.useState(false)
-  return (
-    <span style={{ position: 'relative' }}>
-      {!showButton ? (
-        <span />
-      ) : (
-        <button
-          onClick={(event: any) => {
-            event.stopPropagation()
-            event.preventDefault()
-            setVisible(true)
-          }}
-        >
-          {icon}
-        </button>
-      )}
-      <BlockMenu open={visible}>
-        <Dismissible
-          click
-          escape
-          onDismiss={() => setVisible(false)}
-          disabled={!visible}
-        >
-          <BlockMenuList>
-            {templates.length > 0 ? (
-              templates.map((template) => (
-                <BlockOption
-                  key={template.name}
-                  onClick={() => {
-                    onAdd(template)
-                    setVisible(false)
-                  }}
-                >
-                  {template.label}
-                </BlockOption>
-              ))
-            ) : (
-              <BlockOption>No templates provided </BlockOption>
-            )}
-          </BlockMenuList>
-        </Dismissible>
-      </BlockMenu>
-    </span>
-  )
-}
-
-const BlockMenu = styled.div<{ open: boolean }>`
-  min-width: 192px;
-  border-radius: var(--tina-radius-big);
-  border: 1px solid #efefef;
-  display: block;
-  position: absolute;
-  top: 0;
-  right: 0;
-  transform: translate3d(0, 0, 0) scale3d(0.5, 0.5, 1);
-  opacity: 0;
-  pointer-events: none;
-  transition: all 150ms ease-out;
-  transform-origin: 100% 0;
-  box-shadow: var(--tina-shadow-big);
-  background-color: white;
-  overflow: hidden;
-  z-index: var(--tina-z-index-1);
-  ${(props) =>
-    props.open &&
-    css`
-      opacity: 1;
-      pointer-events: all;
-      transform: translate3d(0, 36px, 0) scale3d(1, 1, 1);
-    `};
-`
-
-const BlockMenuList = styled.div`
-  display: flex;
-  flex-direction: column;
-`
-
-const BlockOption = styled.button`
-  position: relative;
-  text-align: center;
-  font-size: var(--tina-font-size-0);
-  padding: var(--tina-padding-small);
-  font-weight: var(--tina-font-weight-regular);
-  width: 100%;
-  background: none;
-  cursor: pointer;
-  outline: none;
-  border: 0;
-  transition: all 85ms ease-out;
-  &:hover {
-    color: var(--tina-color-primary);
-    background-color: var(--tina-color-grey-1);
-  }
-  &:not(:last-child) {
-    border-bottom: 1px solid #efefef;
-  }
-`
 interface PanelProps {
   setExpanded(next: boolean): void
   isExpanded: boolean

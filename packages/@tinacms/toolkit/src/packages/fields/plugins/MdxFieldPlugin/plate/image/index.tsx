@@ -22,6 +22,15 @@ import styled, { keyframes, css, StyledComponent } from 'styled-components'
 import { useFormPortal, FormBuilder } from '../../../../../form-builder'
 import { LeftArrowIcon, RightArrowIcon } from '../../../../../icons'
 import { Dismissible } from '../../../../../react-dismissible'
+import { getPlatePluginTypes, getRenderElement } from '@udecode/plate'
+
+export const createTinaImagePlugin = () => {
+  return {
+    pluginKeys: 'img',
+    voidTypes: getPlatePluginTypes('img'),
+    renderElement: getRenderElement('img'),
+  }
+}
 
 export interface MdxFieldFieldDefinititon extends Field {
   component: 'group'

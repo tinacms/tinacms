@@ -48,19 +48,12 @@ import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
 
 import { CONFIG } from './config'
 import { Img } from './image/plate-image'
+import { createTinaImagePlugin } from './image'
 import { ToolbarButtons } from './toolbar'
 import { MdxElement } from './mdx/element'
 import { createMDXPlugin, createMDXTextPlugin } from './mdx'
 
 import type { InputProps } from '../../../components'
-
-export const createTinaImagePlugin = () => {
-  return {
-    pluginKeys: 'img',
-    voidTypes: getPlatePluginTypes('img'),
-    renderElement: getRenderElement('img'),
-  }
-}
 
 const options = createPlateOptions()
 
