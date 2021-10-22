@@ -436,6 +436,7 @@ export default defineSchema({
       label: "Global",
       name: "global",
       path: "content/global",
+      format: "json",
       fields: [
         {
           type: "object",
