@@ -51,7 +51,7 @@ import {
   LinkIcon,
 } from './icons'
 import { Button } from '../../../../../styles'
-import { PopupAdder } from './adder'
+import { PopupAdder } from './popup'
 import { HeaderPopup } from './heading'
 import { useCMS } from '../../../../../react-core'
 

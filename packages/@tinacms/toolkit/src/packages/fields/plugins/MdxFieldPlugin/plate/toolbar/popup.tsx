@@ -17,72 +17,12 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '../../../../../forms'
-import styled, { keyframes, css, StyledComponent } from 'styled-components'
+import styled, { css } from 'styled-components'
 import { Dismissible } from '../../../../../react-dismissible'
 
-export interface MdxFieldFieldDefinititon extends Field {
-  component: 'group'
-  fields: Field[]
-}
-
-export interface MdxFieldProps {
-  field: MdxFieldFieldDefinititon
-  tinaForm: Form
-  inline?: boolean
-}
-
-const MdxFieldPanelKeyframes = keyframes`
-  0% {
-    transform: translate3d( 100%, 0, 0 );
-  }
-  100% {
-    transform: translate3d( 0, 0, 0 );
-  }
-`
-
-export const MdxFieldPanel = styled.div<{ isExpanded: boolean }>`
-  position: absolute;
-  width: 100%;
-  top: 0;
-  bottom: 0;
-  left: 0;
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  overflow: hidden;
-  z-index: var(--tina-z-index-1);
-  pointer-events: ${(p) => (p.isExpanded ? 'all' : 'none')};
-
-  > * {
-    ${(p) =>
-      p.isExpanded &&
-      css`
-        animation-name: ${MdxFieldPanelKeyframes};
-        animation-duration: 150ms;
-        animation-delay: 0;
-        animation-iteration-count: 1;
-        animation-timing-function: ease-out;
-        animation-fill-mode: backwards;
-      `};
-
-    ${(p) =>
-      !p.isExpanded &&
-      css`
-        transition: transform 150ms ease-out;
-        transform: translate3d(100%, 0, 0);
-      `};
-  }
-`
-
-export interface MdxFieldFieldProps {
-  field: Field
-}
-
-export function MdxFieldField(props: MdxFieldFieldProps) {
-  return <div>Subfield: {props.field.label || props.field.name}</div>
-}
-
+/**
+ * Displays a drop-down for possible MDX elements to choose from
+ */
 export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
   const [visible, setVisible] = React.useState(false)
   return (
@@ -100,17 +40,17 @@ export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
           {icon}
         </button>
       )}
-      <BlockMenu open={visible}>
+      <PopupMenu open={visible}>
         <Dismissible
           click
           escape
           onDismiss={() => setVisible(false)}
           disabled={!visible}
         >
-          <BlockMenuList>
+          <PopupMenuList>
             {templates.length > 0 ? (
               templates.map((template) => (
-                <BlockOption
+                <PopupOption
                   key={template.name}
                   onClick={() => {
                     onAdd(template)
@@ -118,19 +58,19 @@ export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
                   }}
                 >
                   {template.label}
-                </BlockOption>
+                </PopupOption>
               ))
             ) : (
-              <BlockOption>No templates provided </BlockOption>
+              <PopupOption>No templates provided </PopupOption>
             )}
-          </BlockMenuList>
+          </PopupMenuList>
         </Dismissible>
-      </BlockMenu>
+      </PopupMenu>
     </span>
   )
 }
 
-const BlockMenu = styled.div<{ open: boolean }>`
+const PopupMenu = styled.div<{ open: boolean }>`
   min-width: 192px;
   border-radius: var(--tina-radius-big);
   border: 1px solid #efefef;
@@ -156,12 +96,12 @@ const BlockMenu = styled.div<{ open: boolean }>`
     `};
 `
 
-const BlockMenuList = styled.div`
+const PopupMenuList = styled.div`
   display: flex;
   flex-direction: column;
 `
 
-const BlockOption = styled.button`
+const PopupOption = styled.button`
   position: relative;
   text-align: center;
   font-size: var(--tina-font-size-0);
@@ -181,9 +121,3 @@ const BlockOption = styled.button`
     border-bottom: 1px solid #efefef;
   }
 `
-interface PanelProps {
-  setExpanded(next: boolean): void
-  isExpanded: boolean
-  tinaForm: Form
-  field: MdxFieldFieldDefinititon
-}
