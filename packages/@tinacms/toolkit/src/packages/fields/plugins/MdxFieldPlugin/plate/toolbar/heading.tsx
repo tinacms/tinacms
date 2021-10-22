@@ -17,11 +17,11 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import { Field, Form } from '../../../forms'
+import { Field, Form } from '../../../../../forms'
 import styled, { keyframes, css, StyledComponent } from 'styled-components'
-import { useFormPortal, FormBuilder } from '../../.././form-builder'
-import { LeftArrowIcon, RightArrowIcon } from '../../../icons'
-import { Dismissible } from '../../../react-dismissible'
+import { useFormPortal, FormBuilder } from '../../../../../form-builder'
+import { LeftArrowIcon, RightArrowIcon } from '../../../../../icons'
+import { Dismissible } from '../../../../../react-dismissible'
 
 export interface MdxFieldFieldDefinititon extends Field {
   component: 'group'

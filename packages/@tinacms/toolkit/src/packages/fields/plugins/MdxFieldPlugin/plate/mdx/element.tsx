@@ -15,8 +15,8 @@ import React from 'react'
 import { Transforms } from 'slate'
 import { useStoreEditorRef } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
-import { MdxField } from './mdx-field'
-import { Form } from '../../../../forms'
+import { MdxField } from './field'
+import { Form } from '../../../../../forms'
 
 export const MdxElement = (props) => {
   const editor = useStoreEditorRef(props.name)
