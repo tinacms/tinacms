@@ -112,6 +112,8 @@ export class Database {
           data[field.name] = $_body
         }
       }
+      console.log(field)
+      console.log(contentObject)
       return {
         ...data,
         _collection: collection.name,
@@ -284,7 +286,8 @@ export class Database {
             payload[key] = value
           }
         })
-        payload['$_body'] = data[field.name]
+        console.log('put', field.name, data)
+        payload['$_body'] = data['$_body']
       } else {
         payload = data
       }
