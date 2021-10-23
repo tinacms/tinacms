@@ -99,7 +99,7 @@ export class Resolver {
       const data = {
         _collection: rawData._collection,
         _template: rawData._template,
-        ...rawData.data,
+        ...rawData,
       }
       // await sequential(template.fields, async (field) =>
       //   this.resolveFieldData(field, rawData, data)

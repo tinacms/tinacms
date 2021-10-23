@@ -51,7 +51,7 @@ const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
       { useBridge: true }
     )
     await sequential(documents, async (documentPath) => {
-      const data = await database.getDocument(documentPath, { useBridge: true })
+      const data = await database.bridge.get(documentPath)
       await database.put(documentPath, data)
       await database.putIndex(documentPath, data)
     })

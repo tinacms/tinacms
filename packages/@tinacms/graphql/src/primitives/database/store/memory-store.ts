@@ -34,7 +34,7 @@ export class MemoryStore implements Store {
     }
   }
   public async print() {
-    console.log(JSON.stringify(map, null, 2))
+    // console.log(JSON.stringify(map, null, 2))
   }
   public async clear() {
     map = {}

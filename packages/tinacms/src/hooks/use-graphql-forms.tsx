@@ -326,7 +326,8 @@ export const transformDocumentIntoMutationRequestPayload = (
   /** Whether to include the collection and template names as top-level keys in the payload */
   instructions: { includeCollection?: boolean; includeTemplate?: boolean }
 ) => {
-  const { _collection, __typename, _template, ...rest } = document
+  const { _collection, __typename, _template, _id, _relativePath, ...rest } =
+    document
 
   const params = transformParams(rest)
   const paramsWithTemplate = instructions.includeTemplate
@@ -350,7 +351,7 @@ const transformParams = (data: unknown) => {
       // @ts-ignore No idea what yup is trying to tell me:  Type 'RequiredStringSchema<string, Record<string, any>>' is not assignable to type 'AnySchema<any, any, any>
       yup.object({ _template: yup.string().required() })
     )
-    const { _template, __typename, ...rest } = data
+    const { _template, __typename, _id, _relativePath, ...rest } = data
     const nested = transformParams(rest)
     return { [_template]: nested }
   } catch (e) {

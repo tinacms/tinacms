@@ -2,7 +2,12 @@
   "DocumentConnection": {
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
-    "collections": ["posts", "global", "authors", "pages"]
+    "collections": [
+      "posts",
+      "global",
+      "authors",
+      "pages"
+    ]
   },
   "Node": {
     "type": "Node",
@@ -44,6 +49,13 @@
     "resolveType": "collectionDocumentList",
     "collection": "global"
   },
+  "AuthorsReferencesConnection": {
+    "type": "AuthorsReferencesConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "posts"
+    ]
+  },
   "AuthorsDocument": {
     "type": "AuthorsDocument",
     "resolveType": "collectionDocument",
@@ -76,24 +88,6 @@
   "PagesConnection": {
     "type": "PagesConnection",
     "resolveType": "collectionDocumentList",
-    "collection": "global"
-  },
-  "GlobalFooterSocialTestDocument": {
-    "type": "GlobalFooterSocialTestDocument",
-    "resolveType": "multiCollectionDocument"
-  },
-  "PostsTestDocument": {
-    "type": "PostsTestDocument",
-    "resolveType": "multiCollectionDocument"
-  },
-  "PostsTestConnection": {
-    "type": "PostsTestConnection",
-    "resolveType": "multiCollectionDocumentList",
-    "collections": ["posts"]
-  },
-  "AuthorsReferencesConnection": {
-    "type": "AuthorsReferencesConnection",
-    "resolveType": "multiCollectionDocumentList",
-    "collections": ["posts"]
+    "collection": "pages"
   }
 }

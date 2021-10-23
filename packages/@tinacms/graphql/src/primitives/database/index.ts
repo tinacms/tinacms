@@ -140,9 +140,10 @@ export class Database {
         templateName
       )
 
+    const { id, ...data } = contentObject
     this.mapWithFields(
-      contentObject.id,
-      contentObject.data,
+      id,
+      data,
       [collection.name, template.name],
       template,
       this.accumulator
