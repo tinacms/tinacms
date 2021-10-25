@@ -192,12 +192,12 @@ export type PostsAuthorDocument = AuthorsDocument;
 
 export type Posts = {
   __typename?: 'Posts';
+  _body?: Maybe<Scalars['JSON']>;
   title?: Maybe<Scalars['String']>;
   author?: Maybe<PostsAuthorDocument>;
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
   excerpt?: Maybe<Scalars['String']>;
-  _body?: Maybe<Scalars['String']>;
 };
 
 export type PostsDocument = Node & Document & {
@@ -503,12 +503,12 @@ export type DocumentMutation = {
 };
 
 export type PostsMutation = {
+  _body?: Maybe<Scalars['JSON']>;
   title?: Maybe<Scalars['String']>;
   author?: Maybe<Scalars['String']>;
   date?: Maybe<Scalars['String']>;
   heroImg?: Maybe<Scalars['String']>;
   excerpt?: Maybe<Scalars['String']>;
-  _body?: Maybe<Scalars['String']>;
 };
 
 export type GlobalHeaderIconMutation = {

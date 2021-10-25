@@ -29,7 +29,7 @@
   },
   "peerDependencies": {
     "final-form": ">=4.20.2",
-    "react": ">=16.8",
+    "react": ">=16.14.0",
     "react-final-form": "^6.3.0",
     "tinacms": ">=0.50.0"
   },
@@ -40,8 +40,8 @@
     "@types/react-dom": "^16.9.4",
     "@types/styled-components": "4.1.8",
     "js-cookie": "^2.2.1",
-    "react": "16.12.0",
-    "react-dom": "16.12.0",
+    "react": "16.14.0",
+    "react-dom": "16.14.0",
     "styled-components": ">4.5",
     "tslib": "^1.10.0"
   },
