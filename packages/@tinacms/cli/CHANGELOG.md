@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.56.4
+
+### Patch Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+- Updated dependencies [891623c7c]
+- Updated dependencies [b99baebf1]
+  - @tinacms/graphql@0.56.0
+
 ## 0.56.3
 
 ### Patch Changes

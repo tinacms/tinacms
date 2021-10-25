@@ -1,5 +1,18 @@
 # tinacms
 
+## 0.57.0
+
+### Minor Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+
+### Patch Changes
+
+- 891623c7c: Adds support for List and Update to TinaAdmin
+- d5e3adf37: Adds support for Log In & Log Out to TinaAdmin
+- Updated dependencies [b99baebf1]
+  - @tinacms/toolkit@0.55.0
+
 ## 0.56.3
 
 ### Patch Changes
