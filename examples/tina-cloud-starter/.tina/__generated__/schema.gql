@@ -86,12 +86,12 @@ union DocumentNode = PostsDocument | GlobalDocument | AuthorsDocument | PagesDoc
 union PostsAuthorDocument = AuthorsDocument
 
 type Posts {
+  _body: JSON
   title: String
   author: PostsAuthorDocument
   date: String
   heroImg: String
   excerpt: String
-  _body: String
 }
 
 type PostsDocument implements Node & Document {
@@ -298,12 +298,12 @@ input DocumentMutation {
 }
 
 input PostsMutation {
+  _body: JSON
   title: String
   author: String
   date: String
   heroImg: String
   excerpt: String
-  _body: String
 }
 
 input GlobalHeaderIconMutation {
