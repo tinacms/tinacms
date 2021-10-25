@@ -1,6 +1,6 @@
 {
   "name": "tina-cloud-starter",
-  "version": "0.2.3",
+  "version": "0.2.4",
   "private": true,
   "scripts": {
     "dev": "yarn tinacms server:start -c \"next dev\"",

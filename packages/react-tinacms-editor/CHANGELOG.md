@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.52.2
+
+### Patch Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+- Updated dependencies [b99baebf1]
+  - @tinacms/toolkit@0.55.0
+
 ## 0.52.1
 
 ### Patch Changes
