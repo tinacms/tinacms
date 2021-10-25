@@ -11,7 +11,7 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { useState, useEffect } from 'react'
+import React, { useState, useEffect } from 'react'
 import type { TinaCMS } from '@tinacms/toolkit'
 
 interface GetDocumentFields {
@@ -20,12 +20,17 @@ interface GetDocumentFields {
 export interface Info {
   collection: Object | undefined
   fields: Object[] | undefined
+  mutationInfo: {
+    includeCollection: boolean
+    includeTemplate: boolean
+  }
 }
 
-const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
+export const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
   const [info, setInfo] = useState<Info>({
     collection: undefined,
     fields: undefined,
+    mutationInfo: undefined,
   })
 
   useEffect(() => {
@@ -34,13 +39,19 @@ const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
         `query { getDocumentFields }`,
         {}
       )
+
       const documentFields = response.getDocumentFields
       const collection: Object = documentFields[collectionName].collection
       const fields: Object[] = documentFields[collectionName].fields
+      const mutationInfo: {
+        includeCollection: boolean
+        includeTemplate: boolean
+      } = documentFields[collectionName].mutationInfo
 
       setInfo({
         collection,
         fields,
+        mutationInfo,
       })
     }
 
@@ -50,4 +61,23 @@ const useGetDocumentFields = (cms: TinaCMS, collectionName: string) => {
   return info
 }
 
-export default useGetDocumentFields
+const GetDocumentFields = ({
+  cms,
+  collectionName,
+  children,
+}: {
+  cms: TinaCMS
+  collectionName: string
+  children: any
+}) => {
+  const { collection, fields, mutationInfo } = useGetDocumentFields(
+    cms,
+    collectionName
+  )
+  if (!collection || !fields || !mutationInfo) {
+    return null
+  }
+  return <>{children(collection, fields, mutationInfo)}</>
+}
+
+export default GetDocumentFields

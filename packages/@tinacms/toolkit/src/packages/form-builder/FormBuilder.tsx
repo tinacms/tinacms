@@ -29,6 +29,7 @@ import { FormActionMenu } from './FormActions'
 export interface FormBuilderProps {
   form: Form
   hideFooter?: boolean
+  label?: string
 }
 
 const NoFieldsPlaceholder = () => (
@@ -90,20 +91,108 @@ export const FormBuilder: FC<FormBuilderProps> = ({
         {({ handleSubmit, pristine, invalid, submitting }) => {
           return (
             <DragDropContext onDragEnd={moveArrayItem}>
-              <FormBody className="form-body">
+              <SidebarFormBody className="form-body">
                 <FormPortalProvider>
-                  <Wrapper>
-                    {tinaForm && tinaForm.fields.length ? (
-                      <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
-                    ) : (
-                      <NoFieldsPlaceholder />
-                    )}
-                  </Wrapper>
+                  {tinaForm && tinaForm.fields.length ? (
+                    <FieldsBuilder form={tinaForm} fields={tinaForm.fields} />
+                  ) : (
+                    <NoFieldsPlaceholder />
+                  )}
                 </FormPortalProvider>
-              </FormBody>
+              </SidebarFormBody>
               {!hideFooter && (
                 <FormFooter className="form-footer">
-                  <Wrapper>
+                  {tinaForm.reset && (
+                    <ResetForm
+                      pristine={pristine}
+                      reset={async () => {
+                        finalForm.reset()
+                        await tinaForm.reset!()
+                      }}
+                    >
+                      {tinaForm.buttons.reset}
+                    </ResetForm>
+                  )}
+                  <Button
+                    onClick={() => handleSubmit()}
+                    disabled={pristine || submitting || invalid}
+                    busy={submitting}
+                    primary
+                    grow
+                    margin
+                  >
+                    {submitting && <LoadingDots />}
+                    {!submitting && tinaForm.buttons.save}
+                  </Button>
+                  {tinaForm.actions.length > 0 && (
+                    <FormActionMenu
+                      form={tinaForm as any}
+                      actions={tinaForm.actions}
+                    />
+                  )}
+                </FormFooter>
+              )}
+            </DragDropContext>
+          )
+        }}
+      </FinalForm>
+    </ModalProvider>
+  )
+}
+
+export const FullscreenFormBuilder: FC<FormBuilderProps> = ({
+  form: tinaForm,
+  label,
+}) => {
+  /**
+   * > Why is a `key` being set when this isn't an array?
+   *
+   * `FinalForm` does not update when given a new `form` prop.
+   *
+   * We can force `FinalForm` to update by setting the `key` to
+   * the name of the form. When the name changes React will
+   * treat it as a new instance of `FinalForm`, destroying the
+   * old `FinalForm` componentt and create a new one.
+   *
+   * See: https://github.com/final-form/react-final-form/blob/master/src/ReactFinalForm.js#L68-L72
+   */
+  const [i, setI] = React.useState(0)
+  React.useEffect(() => {
+    setI((i) => i + 1)
+  }, [tinaForm])
+
+  const finalForm = tinaForm.finalForm
+
+  const moveArrayItem = React.useCallback(
+    (result: DropResult) => {
+      if (!result.destination || !finalForm) return
+      const name = result.type
+      finalForm.mutators.move(
+        name,
+        result.source.index,
+        result.destination.index
+      )
+    },
+    [tinaForm]
+  )
+
+  return (
+    <ModalProvider>
+      <FinalForm
+        form={finalForm}
+        key={`${i}: ${tinaForm.id}`}
+        onSubmit={tinaForm.onSubmit}
+      >
+        {({ handleSubmit, pristine, invalid, submitting }) => {
+          return (
+            <DragDropContext onDragEnd={moveArrayItem}>
+              <div className="w-full h-screen flex flex-col items-center">
+                <div className="px-6 py-4 w-full bg-white border-b border-gray-150 shadow-sm sticky flex flex-wrap gap-x-6 gap-y-3 justify-between items-center">
+                  {label && (
+                    <h4 className="font-bold text-lg opacity-80">{label}</h4>
+                  )}
+                  <div className="flex flex-1 items-center justify-end">
+                    <FormStatus pristine={pristine} />
                     {tinaForm.reset && (
                       <ResetForm
                         pristine={pristine}
@@ -120,7 +209,6 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                       disabled={pristine || submitting || invalid}
                       busy={submitting}
                       primary
-                      grow
                       margin
                     >
                       {submitting && <LoadingDots />}
@@ -132,9 +220,22 @@ export const FormBuilder: FC<FormBuilderProps> = ({
                         actions={tinaForm.actions}
                       />
                     )}
-                  </Wrapper>
-                </FormFooter>
-              )}
+                  </div>
+                </div>
+                <FormPortalProvider>
+                  <FormWrapper padded={true}>
+                    {tinaForm && tinaForm.fields.length ? (
+                      <FieldsBuilder
+                        form={tinaForm}
+                        fields={tinaForm.fields}
+                        padding={false}
+                      />
+                    ) : (
+                      <NoFieldsPlaceholder />
+                    )}
+                  </FormWrapper>
+                </FormPortalProvider>
+              </div>
             </DragDropContext>
           )
         }}
@@ -143,13 +244,42 @@ export const FormBuilder: FC<FormBuilderProps> = ({
   )
 }
 
-const Wrapper = styled.div`
-  display: block;
-  margin: 0 auto;
-  width: 100%;
-`
+const FormStatus = ({ pristine }) => {
+  return (
+    <div className="mr-6 flex flex-0 items-center">
+      {!pristine && (
+        <>
+          <span className="w-3 h-3 flex-0 rounded-full bg-yellow-400 border border-yellow-500 mr-2"></span>{' '}
+          <p className="text-gray-700 text-sm leading-tight whitespace-nowrap">
+            Unsaved Changes
+          </p>
+        </>
+      )}
+      {pristine && (
+        <>
+          <span className="w-3 h-3 flex-0 rounded-full bg-green-300 border border-green-400 mr-2"></span>{' '}
+          <p className="text-gray-500 text-sm leading-tight whitespace-nowrap">
+            No Changes
+          </p>
+        </>
+      )}
+    </div>
+  )
+}
 
-const FormBody = styled.div`
+export const FormWrapper = ({ children, padded = false }) => {
+  return (
+    <div className="max-h-full overflow-y-auto h-full">
+      <div className={`w-full flex justify-center ${padded && `px-6 pt-8`}`}>
+        <div className={`max-w-screen-md w-full ${padded && `mb-0`}`}>
+          {children}
+        </div>
+      </div>
+    </div>
+  )
+}
+
+const SidebarFormBody = styled.div`
   position: relative;
   flex: 1 1 auto;
   display: flex;
@@ -158,26 +288,18 @@ const FormBody = styled.div`
   overflow: auto;
   border-top: 1px solid var(--tina-color-grey-2);
   background-color: #f6f6f9;
-  ${Wrapper} {
-    height: 100%;
-  }
 `
 const FormFooter = styled.div`
   position: relative;
   flex: 0 0 auto;
-  display: flex;
-  align-items: center;
   width: 100%;
   height: 64px;
   background-color: white;
   border-top: 1px solid var(--tina-color-grey-2);
-  ${Wrapper} {
-    flex: 1 0 auto;
-    display: flex;
-    justify-content: space-between;
-    align-items: center;
-    padding: 0 16px;
-  }
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  padding: 0 16px;
 `
 const Emoji = styled.span`
   font-size: 40px;

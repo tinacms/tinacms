@@ -126,7 +126,25 @@ export const ActiveFieldIndicator = () => {
   const [activeFieldName, setActiveFieldName] = React.useState<string | null>(
     null
   )
+  const [display, setDisplay] = React.useState<boolean>(false)
+  const [position, setPosition] = React.useState<any>(false)
   const activeEle = useFieldReference(activeFieldName)
+
+  React.useEffect(() => {
+    let displayTimeout
+    if (activeEle) {
+      setDisplay(true)
+      setPosition(activeEle.getBoundingClientRect())
+    } else {
+      displayTimeout = setTimeout(() => {
+        setDisplay(false)
+      }, 150)
+    }
+
+    return () => {
+      clearTimeout(displayTimeout)
+    }
+  }, [activeEle])
 
   const [, setArbitraryValue] = React.useState(0)
   const rerender = () => setArbitraryValue((s) => s + 1)
@@ -148,12 +166,10 @@ export const ActiveFieldIndicator = () => {
 
   useScrollToFocusedField()
 
-  if (!activeEle) return null
+  if (!display) return null
 
-  const { top, left, width, height } = activeEle.getBoundingClientRect()
-
-  const eleTopY = top + window.scrollY
-  const eleBottomY = top + height + window.scrollY
+  const eleTopY = position.top + window.scrollY
+  const eleBottomY = position.top + position.height + window.scrollY
   const viewportTopY = window.scrollY
   const viewportBottomY = window.innerHeight + window.scrollY
 
@@ -173,11 +189,18 @@ export const ActiveFieldIndicator = () => {
         position: 'absolute',
         // @ts-ignore it's a number, trust me
         zIndex: `var(--tina-z-index-3)`,
-        top: top + window.scrollY,
-        left: left + window.scrollX,
-        width,
-        height,
+        top: position.top + window.scrollY,
+        left: position.left + window.scrollX,
+        width: position.width,
+        height: position.height,
         outline: '2px dashed var(--tina-color-indicator)',
+        borderRadius: 'var(--tina-radius-small)',
+        transition: display
+          ? activeEle
+            ? `opacity 300ms ease-out`
+            : `opacity 150ms ease-in`
+          : `none`,
+        opacity: activeEle && display ? 0.8 : 0,
       }}
     ></div>
   )
