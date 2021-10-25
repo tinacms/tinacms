@@ -19,7 +19,6 @@ limitations under the License.
 import * as React from 'react'
 import { useContext } from 'react'
 import { createPortal } from 'react-dom'
-import styled from 'styled-components'
 
 export type FormPortal = React.FC<{
   children(props: { zIndexShift: number }): React.ReactNode | null
@@ -33,38 +32,33 @@ export function useFormPortal() {
   return useContext(FormPortalContext)
 }
 
-export const FormPortalProvider: React.FC = styled(
-  ({ children, ...styleProps }) => {
-    const wrapperRef = React.useRef<HTMLDivElement | null>(null)
-    const zIndexRef = React.useRef<number>(0)
+export const FormPortalProvider: React.FC = ({ children }) => {
+  const wrapperRef = React.useRef<HTMLDivElement | null>(null)
+  const zIndexRef = React.useRef<number>(0)
 
-    const FormPortal = React.useCallback(
-      (props: any) => {
-        const portalZIndex = React.useMemo<number>(() => {
-          const value = zIndexRef.current
-          zIndexRef.current += 1
-          return value
-        }, [])
+  const FormPortal = React.useCallback(
+    (props: any) => {
+      const portalZIndex = React.useMemo<number>(() => {
+        const value = zIndexRef.current
+        zIndexRef.current += 1
+        return value
+      }, [])
 
-        if (!wrapperRef.current) return null
+      if (!wrapperRef.current) return null
 
-        return createPortal(
-          props.children({ zIndexShift: portalZIndex }),
-          wrapperRef.current
-        )
-      },
-      [wrapperRef, zIndexRef]
-    )
+      return createPortal(
+        props.children({ zIndexShift: portalZIndex }),
+        wrapperRef.current
+      )
+    },
+    [wrapperRef, zIndexRef]
+  )
 
-    return (
-      <FormPortalContext.Provider value={FormPortal}>
-        <div ref={wrapperRef} {...styleProps}>
-          {children}
-        </div>
-      </FormPortalContext.Provider>
-    )
-  }
-)`
-  height: 100%;
-  scrollbar-width: none;
-`
+  return (
+    <FormPortalContext.Provider value={FormPortal}>
+      <div ref={wrapperRef} className="relative w-full flex-1 overflow-hidden">
+        {children}
+      </div>
+    </FormPortalContext.Provider>
+  )
+}

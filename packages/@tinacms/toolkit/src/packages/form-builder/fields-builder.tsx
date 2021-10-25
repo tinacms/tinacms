@@ -21,17 +21,22 @@ import { Form, Field } from '../forms'
 import { useCMS } from '../react-core'
 import { Field as FinalField } from 'react-final-form'
 import { FieldPlugin } from './field-plugin'
-import styled from 'styled-components'
+import styled, { css } from 'styled-components'
 
 export interface FieldsBuilderProps {
   form: Form
   fields: Field[]
+  padding?: boolean
 }
 
-export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
+export function FieldsBuilder({
+  form,
+  fields,
+  padding = true,
+}: FieldsBuilderProps) {
   const cms = useCMS()
   return (
-    <FieldsGroup>
+    <FieldsGroup padding={padding}>
       {fields.map((field: Field) => {
         if (field.component === null) return null
 
@@ -116,15 +121,21 @@ export function FieldsBuilder({ form, fields }: FieldsBuilderProps) {
   )
 }
 
-export const FieldsGroup = styled.div`
+export const FieldsGroup = styled.div<{ padding: boolean }>`
   position: relative;
   display: block;
   width: 100%;
   height: 100%;
-  padding: 20px 20px 0 20px;
   white-space: nowrap;
-  overflow-x: hidden;
-  overflow-y: auto !important;
+  overflow-x: visible !important;
+
+  ${(props) =>
+    props.padding &&
+    css`
+      overflow-x: hidden;
+      overflow-y: auto;
+      padding: 20px 20px 0 20px;
+    `};
 `
 
 /**

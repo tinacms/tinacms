@@ -316,7 +316,7 @@ export function useGraphqlForms<T extends object>({
   return [data as T, isLoading]
 }
 
-const transformDocumentIntoMutationRequestPayload = (
+export const transformDocumentIntoMutationRequestPayload = (
   document: {
     _collection: string
     __typename?: string

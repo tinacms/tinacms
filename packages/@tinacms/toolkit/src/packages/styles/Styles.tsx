@@ -107,6 +107,7 @@ export const GlobalStyles = createGlobalStyle`
 export const tina_reset_styles = css`
   * {
     font-family: 'Inter', sans-serif;
+
     &::-webkit-scrollbar {
       width: 8px;
     }
@@ -190,6 +191,9 @@ export const tina_reset_styles = css`
   }
   h6:not([class]) {
     font-size: var(--tina-font-size-2);
+  }
+  p {
+    font-size: var(--tina-font-size-3);
   }
 `
 
