@@ -1,5 +1,19 @@
 # tina-cloud-starter
 
+## 0.2.4
+
+### Patch Changes
+
+- 891623c7c: Adds support for List and Update to TinaAdmin
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+- d5e3adf37: Adds support for Log In & Log Out to TinaAdmin
+- Updated dependencies [891623c7c]
+- Updated dependencies [b99baebf1]
+- Updated dependencies [d5e3adf37]
+  - tinacms@0.57.0
+  - next-tinacms-cloudinary@3.3.2
+  - react-tinacms-editor@0.52.2
+
 ## 0.2.3
 
 ### Patch Changes

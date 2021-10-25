@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.55.0
+
+### Minor Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+
 ## 0.54.1
 
 ### Patch Changes
