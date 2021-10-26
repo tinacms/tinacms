@@ -18,7 +18,7 @@ import { plugin as typescriptOperationsPlugin } from '@graphql-codegen/typescrip
 import { AddGeneratedClient } from './plugin'
 
 // Docs: https://www.graphql-code-generator.com/docs/plugins/typescript-generic-sdk
-import { plugin as typescriptSdkPlugin } from '@graphql-codegen/typescript-generic-sdk'
+import { plugin as typescriptSdkPlugin } from './sdkPlugin'
 // See https://www.graphql-tools.com/docs/documents-loading for more examples of the `load documents function`
 import { loadDocuments } from '@graphql-tools/load'
 import { GraphQLFileLoader } from '@graphql-tools/graphql-file-loader'

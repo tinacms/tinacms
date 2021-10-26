@@ -30,7 +30,8 @@ const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   _options
 ) => {
   const data = await tinaClient.request(doc, { variables: vars });
-  return data;
+  return { data, query: doc, variables: vars};
+  // return data;
 };
 export const getTinaClient = ()=>getSdk(requester)
 `
