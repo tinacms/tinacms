@@ -1,5 +1,13 @@
 # tinacms
 
+## 0.57.1
+
+### Patch Changes
+
+- 9c0d48e09: Fix console errors for mdx editor
+- Updated dependencies [9c0d48e09]
+  - @tinacms/toolkit@0.55.1
+
 ## 0.57.0
 
 ### Minor Changes
