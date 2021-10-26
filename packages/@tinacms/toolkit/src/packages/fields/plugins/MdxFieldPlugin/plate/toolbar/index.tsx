@@ -90,11 +90,6 @@ const MdxIcon = styled.div`
     height: 20px;
   }
 `
-const Embed = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`
 
 export const ToolbarButtons = ({ name, templates }) => {
   // const editor = useStoreEditorRef(useEventEditorId('focus'));
@@ -230,16 +225,7 @@ export const ToolbarButtons = ({ name, templates }) => {
             />
           </Basic>
           <MdxIcon>
-            <PopupAdder
-              {...popup}
-              icon={
-                <Button primary small>
-                  <Embed>
-                    Embed <ArrowDownIcon />
-                  </Embed>
-                </Button>
-              }
-            />
+            <PopupAdder {...popup} />
           </MdxIcon>
         </Wrapper>
       </div>{' '}

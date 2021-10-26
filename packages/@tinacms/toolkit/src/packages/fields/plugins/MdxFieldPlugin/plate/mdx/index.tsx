@@ -22,6 +22,7 @@ import { useStoreEditorRef } from '@udecode/plate'
 import { useSelected, useFocused, ReactEditor } from 'slate-react'
 import { MdxField } from './field'
 import { Form } from '../../../../../forms'
+import styled from 'styled-components'
 
 export const MdxElement = (props) => {
   const editor = useStoreEditorRef(props.name)
@@ -83,14 +84,16 @@ export const MdxElement = (props) => {
   }, [])
 
   return (
-    <div
+    <Wrapper
+      as={props.inline ? 'span' : 'div'}
       {...props.attributes}
       style={{
-        display: props.inline ? 'inline-block' : 'block',
+        // display: props.inline ? 'inline-block' : 'block',
         boxShadow: isSelected && isFocused ? '0 0 0 3px #B4D5FF' : 'none',
       }}
     >
-      <div
+      <Wrapper
+        as={props.inline ? 'span' : 'div'}
         style={{
           userSelect: 'none',
         }}
@@ -101,11 +104,13 @@ export const MdxElement = (props) => {
           tinaForm={form}
           field={activeTemplate}
         />
-      </div>
+      </Wrapper>
       {props.children}
-    </div>
+    </Wrapper>
   )
 }
+
+const Wrapper = styled.div``
 
 export const createMDXPlugin = (): PlatePlugin => ({
   pluginKeys: 'mdxJsxFlowElement',
