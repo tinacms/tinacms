@@ -189,7 +189,7 @@ export const TinaMarkdown = ({
               // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
               return <Component key={key} {...props} />
             }
-            return <hr />
+            return <hr key={key} />
           case 'text':
             // @ts-ignore FIXME: TinaMarkdownContent needs to be a union of all possible node types
             return <Leaf key={key} components={components} {...child} />

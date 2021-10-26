@@ -78,7 +78,7 @@ const ImagePanel = function Panel({
   )
 }
 
-const ImageHeader: StyledComponent<'div', {}, {}> = styled.div`
+const ImageHeader: StyledComponent<'span', {}, {}> = styled.span`
   position: relative;
   cursor: pointer;
   display: block;
@@ -109,7 +109,7 @@ const ImageHeader: StyledComponent<'div', {}, {}> = styled.div`
   }
 `
 
-const PanelHeader = styled.div`
+const PanelHeader = styled.span`
   position: relative;
   width: 100%;
   cursor: pointer;
@@ -148,7 +148,7 @@ const PanelHeader = styled.div`
   }
 `
 
-const PanelBody = styled.div`
+const PanelBody = styled.span`
   background: var(--tina-color-grey-1);
   position: relative;
   flex-direction: column;
@@ -166,7 +166,7 @@ const ImageFieldPanelKeyframes = keyframes`
   }
 `
 
-export const ImageFieldPanel = styled.div<{ isExpanded: boolean }>`
+export const ImageFieldPanel = styled.span<{ isExpanded: boolean }>`
   position: absolute;
   width: 100%;
   top: 0;
