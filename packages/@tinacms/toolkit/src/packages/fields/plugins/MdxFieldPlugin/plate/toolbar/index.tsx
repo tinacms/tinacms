@@ -49,46 +49,55 @@ import {
   UnorderedListIcon,
   UnderlineIcon,
   LinkIcon,
-  ArrowDownIcon,
 } from './icons'
-import { Button } from '../../../../../styles'
 import { PopupAdder } from './popup'
 import { HeaderPopup } from './heading'
 import { useCMS } from '../../../../../react-core'
 
 const Wrapper = styled.div`
-  display: grid;
+  z-index: 100;
+  padding-top: 6px;
   position: relative;
   width: 100%;
-  grid-template-columns: 12;
-  .slate-ToolbarButton-active {
-    svg,
-    strong {
-      color: var(--tina-color-primary-light);
+`
+const ToolbarWrapper = styled.div`
+  display: flex;
+  justify-content: flex-start;
+  flex-wrap: wrap;
+  background: var(--tina-color-grey-0);
+  color: var(--tina-color-grey-10);
+  margin: 0;
+  border-radius: var(--tina-radius-small);
+  box-shadow: 0px 2px 3px rgba(0, 0, 0, 0.12);
+  border: 1px solid var(--tina-color-grey-2);
+  margin-bottom: 14px;
+
+  span[class*='ToolbarButton'],
+  button {
+    padding: 8px;
+    border: 1px solid var(--tina-color-grey-2);
+    width: auto;
+    height: auto;
+    border-left: none;
+    margin: 0 0 -1px 0;
+    flex-grow: 1;
+    max-width: 3rem;
+    transition: background 150ms ease-out;
+
+    &:not(disabled):hover {
+      background: var(--tina-color-grey-1);
+    }
+
+    svg {
+      width: 20px;
+      height: auto;
     }
   }
 `
-const Basic = styled.div`
-  grid-column-start: 1;
-  grid-column-end: 10;
-  display: flex;
-  flex-wrap: wrap;
-  gap: 4px;
-  max-width: 372px;
-  background: #fff;
-  padding: 10px;
-  margin: 12px 0px 4px;
-  border-radius: 4px;
-  border: 1px solid #efefef;
-`
-const MdxIcon = styled.div`
+const EmbedButtunWrapper = styled.div`
   position: absolute;
-  top: -28px;
+  top: -34px;
   right: 0px;
-  svg {
-    width: 20px;
-    height: 20px;
-  }
 `
 
 export const ToolbarButtons = ({ name, templates }) => {
@@ -148,95 +157,83 @@ export const ToolbarButtons = ({ name, templates }) => {
   }, [selectedMedia])
 
   return (
-    <ToolbarWrapper>
-      <div>
-        <Wrapper>
-          <Basic>
-            <HeaderPopup icon={<HeadingIcon />}>
-              <ToolbarElement
-                type={getPlatePluginType(editor, ELEMENT_H1)}
-                icon={<strong>H1</strong>}
-              />
-              <ToolbarElement
-                type={getPlatePluginType(editor, ELEMENT_H2)}
-                icon={<strong>H2</strong>}
-              />
-              <ToolbarElement
-                type={getPlatePluginType(editor, ELEMENT_H3)}
-                icon={<strong>H3</strong>}
-              />
-              <ToolbarElement
-                type={getPlatePluginType(editor, ELEMENT_H4)}
-                icon={<strong>H4</strong>}
-              />
-              <ToolbarElement
-                type={getPlatePluginType(editor, ELEMENT_H5)}
-                icon={<strong>H5</strong>}
-              />
-              <ToolbarElement
-                type={getPlatePluginType(editor, ELEMENT_H6)}
-                icon={<strong>H6</strong>}
-              />
-            </HeaderPopup>
-            <ToolbarElement
-              type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
-              icon={<QuoteIcon />}
-            />
-            <ToolbarCodeBlock
-              type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
-              icon={<CodeIcon />}
-            />
-            <ToolbarLink icon={<LinkIcon />} />
-            <ToolbarButton
-              icon={<ImageIcon />}
-              onMouseDown={() => {
-                setEditorSelection(editor.selection)
-                cms.media.open({
-                  allowDelete: true,
-                  onSelect: (media) => {
-                    setSelectedMedia(media)
-                  },
-                })
-              }}
-            />
-            <ToolbarList
-              type={getPlatePluginType(editor, ELEMENT_UL)}
-              icon={<UnorderedListIcon />}
-            />
-            <ToolbarList
-              type={getPlatePluginType(editor, ELEMENT_OL)}
-              icon={<OrderedListIcon />}
-            />
-            <ToolbarMark
-              type={getPlatePluginType(editor, MARK_BOLD)}
-              icon={<BoldIcon />}
-            />
-            <ToolbarMark
-              type={getPlatePluginType(editor, MARK_ITALIC)}
-              icon={<ItalicIcon />}
-            />
-            <ToolbarMark
-              type={getPlatePluginType(editor, MARK_UNDERLINE)}
-              icon={<UnderlineIcon />}
-            />
-            <ToolbarMark
-              type={getPlatePluginType(editor, MARK_STRIKETHROUGH)}
-              icon={<StrikethroughIcon />}
-            />
-          </Basic>
-          <MdxIcon>
-            <PopupAdder {...popup} />
-          </MdxIcon>
-        </Wrapper>
-      </div>{' '}
-    </ToolbarWrapper>
+    <Wrapper>
+      <ToolbarWrapper>
+        <HeaderPopup icon={<HeadingIcon />}>
+          <ToolbarElement
+            type={getPlatePluginType(editor, ELEMENT_H1)}
+            icon={<strong>H1</strong>}
+          />
+          <ToolbarElement
+            type={getPlatePluginType(editor, ELEMENT_H2)}
+            icon={<strong>H2</strong>}
+          />
+          <ToolbarElement
+            type={getPlatePluginType(editor, ELEMENT_H3)}
+            icon={<strong>H3</strong>}
+          />
+          <ToolbarElement
+            type={getPlatePluginType(editor, ELEMENT_H4)}
+            icon={<strong>H4</strong>}
+          />
+          <ToolbarElement
+            type={getPlatePluginType(editor, ELEMENT_H5)}
+            icon={<strong>H5</strong>}
+          />
+          <ToolbarElement
+            type={getPlatePluginType(editor, ELEMENT_H6)}
+            icon={<strong>H6</strong>}
+          />
+        </HeaderPopup>
+        <ToolbarElement
+          type={getPlatePluginType(editor, ELEMENT_BLOCKQUOTE)}
+          icon={<QuoteIcon />}
+        />
+        <ToolbarCodeBlock
+          type={getPlatePluginType(editor, ELEMENT_CODE_BLOCK)}
+          icon={<CodeIcon />}
+        />
+        <ToolbarLink icon={<LinkIcon />} />
+        <ToolbarButton
+          icon={<ImageIcon />}
+          onMouseDown={() => {
+            setEditorSelection(editor.selection)
+            cms.media.open({
+              allowDelete: true,
+              onSelect: (media) => {
+                setSelectedMedia(media)
+              },
+            })
+          }}
+        />
+        <ToolbarList
+          type={getPlatePluginType(editor, ELEMENT_UL)}
+          icon={<UnorderedListIcon />}
+        />
+        <ToolbarList
+          type={getPlatePluginType(editor, ELEMENT_OL)}
+          icon={<OrderedListIcon />}
+        />
+        <ToolbarMark
+          type={getPlatePluginType(editor, MARK_BOLD)}
+          icon={<BoldIcon />}
+        />
+        <ToolbarMark
+          type={getPlatePluginType(editor, MARK_ITALIC)}
+          icon={<ItalicIcon />}
+        />
+        <ToolbarMark
+          type={getPlatePluginType(editor, MARK_UNDERLINE)}
+          icon={<UnderlineIcon />}
+        />
+        <ToolbarMark
+          type={getPlatePluginType(editor, MARK_STRIKETHROUGH)}
+          icon={<StrikethroughIcon />}
+        />
+      </ToolbarWrapper>
+      <EmbedButtunWrapper>
+        <PopupAdder {...popup} />
+      </EmbedButtunWrapper>
+    </Wrapper>
   )
 }
-
-const ToolbarWrapper = styled.div`
-  z-index: 100;
-  & > div {
-    display: flex;
-    flex-wrap: wrap;
-  }
-`
