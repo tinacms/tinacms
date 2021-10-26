@@ -26,11 +26,6 @@ export const HeaderPopup = ({ children, icon }) => {
     <span
       style={{
         position: 'relative',
-        display: 'flex',
-        justifyContent: 'center',
-        alignItems: 'center',
-        width: '28px',
-        height: '24px',
       }}
     >
       <Button
@@ -59,13 +54,12 @@ export const HeaderPopup = ({ children, icon }) => {
 const Button = styled.button`
   svg {
     width: 20px;
-    height: 20px;
+    height: auto;
   }
 `
 
 const BlockMenu = styled.div<{ open: boolean }>`
-  width: 50px;
-  /* border-radius: var(--tina-radius-big); */
+  border-radius: var(--tina-radius-small);
   border: 1px solid #efefef;
   display: block;
   position: absolute;
@@ -80,7 +74,7 @@ const BlockMenu = styled.div<{ open: boolean }>`
   background-color: white;
   overflow: hidden;
   z-index: var(--tina-z-index-1);
-  padding: 8px;
+
   ${(props) =>
     props.open &&
     css`
