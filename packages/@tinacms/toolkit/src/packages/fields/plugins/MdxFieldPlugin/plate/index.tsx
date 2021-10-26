@@ -49,7 +49,7 @@ import { ToolbarButtons } from './toolbar'
 import { createTinaImagePlugin, Img } from './image'
 import { createMDXPlugin, createMDXTextPlugin, MdxElement } from './mdx'
 
-import type { InputProps } from '../../../components'
+import { InputProps, InputCss } from '../../../components'
 
 const options = createPlateOptions()
 
@@ -111,7 +111,7 @@ export const RichEditor = wrapFieldsWithMeta<
     createSelectOnBackspacePlugin(CONFIG.selectOnBackspace),
   ]
   return (
-    <div>
+    <>
       <ToolbarButtons name={props.input.name} templates={templates} />
       <PlateWrapper>
         <Plate
@@ -125,7 +125,7 @@ export const RichEditor = wrapFieldsWithMeta<
           }}
         />
       </PlateWrapper>
-    </div>
+    </>
   )
 })
 
@@ -146,14 +146,10 @@ const normalize = (node: any) => {
 }
 
 const PlateWrapper = styled.div`
-  background: white;
-  border-radius: 4px;
-  border: 1px solid #efefef;
-  padding: 10px;
-  ul {
-    list-style: disc;
-  }
-  ol {
-    list-style: decimal;
-  }
+  ${InputCss};
+  overflow-x: hidden;
+  overflow-y: auto;
+  min-height: 200px;
+  overflow-y: auto;
+  display: block;
 `
