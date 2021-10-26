@@ -19,8 +19,28 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { Dismissible } from '../../../../../react-dismissible'
-import { ArrowDownIcon } from './icons'
 import { Button } from '../../../../../styles'
+import { ArrowDownIcon } from './icons'
+
+const Embed = styled.div<{ open: boolean }>`
+  display: flex;
+  align-items: center;
+
+  svg {
+    transform: rotate(-90deg);
+    transition: transform 150ms ease-out;
+    margin-right: -4px;
+    margin-left: 2px;
+  }
+
+  ${(p) =>
+    p.open &&
+    css`
+      svg {
+        transform: rotate(0deg);
+      }
+    `};
+`
 
 /**
  * Displays a drop-down for possible MDX elements to choose from
@@ -33,15 +53,15 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
         <span />
       ) : (
         <Button
-          primary
-          small
           onClick={(event: any) => {
             event.stopPropagation()
             event.preventDefault()
-            setVisible(true)
+            setVisible((visible) => !visible)
           }}
+          primary
+          small
         >
-          <Embed>
+          <Embed open={visible}>
             Embed <ArrowDownIcon />
           </Embed>
         </Button>
@@ -75,12 +95,6 @@ export const PopupAdder = ({ showButton, onAdd, templates }) => {
     </span>
   )
 }
-
-const Embed = styled.div`
-  display: flex;
-  align-items: center;
-  justify-content: space-between;
-`
 
 const PopupMenu = styled.div<{ open: boolean }>`
   min-width: 192px;

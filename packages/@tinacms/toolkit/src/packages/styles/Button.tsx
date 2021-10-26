@@ -65,7 +65,6 @@ export const Button = styled.button<ButtonProps>`
       background-color: var(--tina-color-primary);
       color: var(--tina-color-grey-0);
       fill: var(--tina-color-grey-0);
-      min-width: 10rem;
       border: none;
       &:hover {
         background-color: var(--tina-color-primary-light);
