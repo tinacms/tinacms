@@ -24,6 +24,7 @@ export const getStaticProps = async ({ params }) => {
       author: true,
     }
   );
+  console.log(tinaProps.data.getPostsDocument.data.author.data.name);
   return {
     props: {
       ...tinaProps,

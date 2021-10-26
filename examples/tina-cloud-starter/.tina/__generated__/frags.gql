@@ -1,5 +1,37 @@
+fragment DocumentParts on Document {
+  ... on PostsDocument {
+    id
+    data {
+      ...PostsParts
+    }
+  }
+  ... on GlobalDocument {
+    id
+    data {
+      ...GlobalParts
+    }
+  }
+  ... on AuthorsDocument {
+    id
+    data {
+      ...AuthorsParts
+    }
+  }
+  ... on PagesDocument {
+    id
+    data {
+      ...PagesParts
+    }
+  }
+}
+
 fragment PostsParts on Posts {
   title
+  author {
+    ... on Document {
+      id
+    }
+  }
   date
   heroImg
   excerpt

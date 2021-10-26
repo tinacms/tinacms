@@ -22,6 +22,16 @@ export const AddGeneratedClientFunc: PluginFunction = (
   return `
 // TinaSDK generated code
 
+type QueryMap = {
+  posts: {
+    author: GetAuthorsDocumentQuery["getAuthorsDocument"]
+  }
+};
+
+type PostsReferenceKeys = {
+  author?: boolean
+}
+
 import { LocalClient } from 'tinacms'
 const tinaClient = new LocalClient();
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
@@ -29,6 +39,7 @@ const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   vars,
   _options
 ) => {
+  console.log(_options)
   const data = await tinaClient.request(doc, { variables: vars });
   return { data, query: doc, variables: vars};
   // return data;

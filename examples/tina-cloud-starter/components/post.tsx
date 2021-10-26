@@ -46,7 +46,7 @@ export const Post = ({ data }) => {
           data-tinafield="author"
           className="flex items-center justify-center mb-16"
         >
-          {data.author && (
+          {data.author && data.author.data && (
             <>
               <div className="flex-shrink-0 mr-4">
                 <img

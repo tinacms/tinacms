@@ -450,6 +450,60 @@ export class Builder {
    * Turns a collection into a fragment that gets updated on build. This fragment does not resolve references
    * ```graphql
    * # ex.
+   * fragment MultiDocument on Document {
+   *   name
+   *   avatar
+   *   ...
+   * }
+   * ```
+   *
+   * @public
+   * @param collection a Tina Cloud collection
+   */
+  public multiCollectionFragment = async () => {
+    const collections = this.tinaSchema.getCollections()
+    return astBuilder.FragmentDefinition({
+      name: 'Document',
+      selections: collections.map((collection) => {
+        return astBuilder.InlineFragmentDefinition({
+          name: NAMER.documentTypeName([collection.name]),
+          selections: [
+            astBuilder.FieldNodeDefinition({
+              name: 'id',
+              type: astBuilder.TYPES.String,
+            }),
+            {
+              kind: 'Field',
+              name: {
+                kind: 'Name',
+                value: 'data',
+              },
+              arguments: [],
+              directives: [],
+              selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                  {
+                    kind: 'FragmentSpread',
+                    name: {
+                      kind: 'Name',
+                      value: NAMER.dataTypeName([collection.name]) + 'Parts',
+                    },
+                    directives: [],
+                  },
+                ],
+              },
+            },
+          ],
+        })
+      }),
+    })
+  }
+
+  /**
+   * Turns a collection into a fragment that gets updated on build. This fragment does not resolve references
+   * ```graphql
+   * # ex.
    * fragment AuthorsParts on Authors {
    *   name
    *   avatar
@@ -527,7 +581,36 @@ export class Builder {
           })
         }
       case 'reference':
-        false
+        return astBuilder.FieldWithSelectionSetDefinition({
+          name: field.name,
+          selections: [
+            {
+              kind: 'InlineFragment',
+              typeCondition: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'Document',
+                },
+              },
+              directives: [],
+              selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                  {
+                    kind: 'Field',
+                    name: {
+                      kind: 'Name',
+                      value: 'id',
+                    },
+                    arguments: [],
+                    directives: [],
+                  },
+                ],
+              },
+            },
+          ],
+        })
     }
   }
 

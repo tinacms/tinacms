@@ -5237,6 +5237,202 @@
       "kind": "FragmentDefinition",
       "name": {
         "kind": "Name",
+        "value": "DocumentParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Document"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "kind": "InlineFragment",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "id"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "data"
+                  },
+                  "arguments": [],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "FragmentSpread",
+                        "name": {
+                          "kind": "Name",
+                          "value": "PostsParts"
+                        },
+                        "directives": []
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "typeCondition": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PostsDocument"
+              }
+            }
+          },
+          {
+            "kind": "InlineFragment",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "id"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "data"
+                  },
+                  "arguments": [],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "FragmentSpread",
+                        "name": {
+                          "kind": "Name",
+                          "value": "GlobalParts"
+                        },
+                        "directives": []
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "typeCondition": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalDocument"
+              }
+            }
+          },
+          {
+            "kind": "InlineFragment",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "id"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "data"
+                  },
+                  "arguments": [],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "FragmentSpread",
+                        "name": {
+                          "kind": "Name",
+                          "value": "AuthorsParts"
+                        },
+                        "directives": []
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "typeCondition": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorsDocument"
+              }
+            }
+          },
+          {
+            "kind": "InlineFragment",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "id"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "kind": "Field",
+                  "name": {
+                    "kind": "Name",
+                    "value": "data"
+                  },
+                  "arguments": [],
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "FragmentSpread",
+                        "name": {
+                          "kind": "Name",
+                          "value": "PagesParts"
+                        },
+                        "directives": []
+                      }
+                    ]
+                  }
+                }
+              ]
+            },
+            "typeCondition": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesDocument"
+              }
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
         "value": "PostsParts"
       },
       "typeCondition": {
@@ -5256,6 +5452,43 @@
               "value": "title"
             },
             "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "InlineFragment",
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "Document"
+                    }
+                  },
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "id"
+                        },
+                        "arguments": [],
+                        "directives": []
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
           },
           {
             "name": {
