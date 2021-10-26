@@ -19,26 +19,52 @@ limitations under the License.
 import * as React from 'react'
 import styled, { css } from 'styled-components'
 import { Dismissible } from '../../../../../react-dismissible'
+import { Button } from '../../../../../styles'
+import { ArrowDownIcon } from './icons'
+
+const Embed = styled.div<{ open: boolean }>`
+  display: flex;
+  align-items: center;
+
+  svg {
+    transform: rotate(-90deg);
+    transition: transform 150ms ease-out;
+    margin-right: -4px;
+    margin-left: 2px;
+  }
+
+  ${(p) =>
+    p.open &&
+    css`
+      svg {
+        transform: rotate(0deg);
+      }
+    `};
+`
 
 /**
  * Displays a drop-down for possible MDX elements to choose from
  */
-export const PopupAdder = ({ icon, showButton, onAdd, templates }) => {
+export const PopupAdder = ({ showButton, onAdd, templates }) => {
   const [visible, setVisible] = React.useState(false)
   return (
     <span style={{ position: 'relative' }}>
       {!showButton ? (
         <span />
       ) : (
-        <button
+        <Button
           onClick={(event: any) => {
             event.stopPropagation()
             event.preventDefault()
-            setVisible(true)
+            setVisible((visible) => !visible)
           }}
+          primary
+          small
         >
-          {icon}
-        </button>
+          <Embed open={visible}>
+            Embed <ArrowDownIcon />
+          </Embed>
+        </Button>
       )}
       <PopupMenu open={visible}>
         <Dismissible
