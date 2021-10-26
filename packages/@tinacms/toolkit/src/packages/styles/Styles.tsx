@@ -105,10 +105,10 @@ export const GlobalStyles = createGlobalStyle`
 `
 
 export const tina_reset_styles = css`
-  * {
-    font-family: 'Inter', sans-serif;
-    color: var(--tina-color-grey-10);
+  font-family: 'Inter', sans-serif;
+  color: var(--tina-color-grey-10);
 
+  * {
     &::-webkit-scrollbar {
       width: 8px;
     }
@@ -139,6 +139,9 @@ export const tina_reset_styles = css`
     border-bottom: none;
     height: 0;
     box-sizing: content-box;
+  }
+  *:not([class]) {
+    color: var(--tina-color-grey-10);
   }
   h1,
   h2,
