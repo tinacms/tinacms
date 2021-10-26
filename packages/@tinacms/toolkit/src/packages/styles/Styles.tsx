@@ -148,6 +148,7 @@ export const tina_reset_styles = css`
   p {
     :not([class]) {
       font-family: 'Inter', sans-serif;
+      color: var(--tina-color-grey-8);
       &:first-child {
         margin-top: 0;
       }
