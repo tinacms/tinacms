@@ -2,6 +2,7 @@ import { Post } from "../../components/post";
 import { getStaticPropsForTina, staticRequest } from "tinacms";
 import { layoutQueryFragment } from "../../components/layout";
 import type { PostsDocument } from "../../.tina/__generated__/types";
+import { getTinaClient } from "../../.tina/__generated__/types";
 
 // Use the props returned by get static props
 export default function BlogPostPage(
@@ -14,30 +15,42 @@ export default function BlogPostPage(
 }
 
 export const getStaticProps = async ({ params }) => {
-  const tinaProps = (await getStaticPropsForTina({
-    query: `#graphql
-      query BlogPostQuery($relativePath: String!) {
-        ${layoutQueryFragment}
-        getPostsDocument(relativePath: $relativePath) {
-          data {
-            title
-            date
-            author {
-              ... on AuthorsDocument {
-                data {
-                  name
-                  avatar
-                }
-              }
-            }
-            heroImg
-            _body
-          }
-        }
-      }
-    `,
-    variables: { relativePath: `${params.filename}.md` },
-  })) as { data: { getPostsDocument: PostsDocument } };
+  const client = getTinaClient();
+  const tinaProps = await client.getPostsDocument(
+    {
+      relativePath: `${params.filename}.md`,
+    },
+    {
+      include: {
+        author: true,
+      },
+    }
+  );
+  console.log(tinaProps.data.getPostsDocument.data);
+  // const tinaProps = (await getStaticPropsForTina({
+  //   query: `#graphql
+  //     query BlogPostQuery($relativePath: String!) {
+  //       ${layoutQueryFragment}
+  //       getPostsDocument(relativePath: $relativePath) {
+  //         data {
+  //           title
+  //           date
+  //           author {
+  //             ... on AuthorsDocument {
+  //               data {
+  //                 name
+  //                 avatar
+  //               }
+  //             }
+  //           }
+  //           heroImg
+  //           _body
+  //         }
+  //       }
+  //     }
+  //   `,
+  //   variables: { relativePath: `${params.filename}.md` },
+  // })) as { data: { getPostsDocument: PostsDocument } };
   return {
     props: {
       ...tinaProps,

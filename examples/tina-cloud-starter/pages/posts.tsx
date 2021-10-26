@@ -4,7 +4,6 @@ import { Section } from "../components/section";
 import { Posts } from "../components/posts";
 import { layoutQueryFragment } from "../components/layout";
 import type { PostsConnection } from "../.tina/__generated__/types";
-import { getTinaClient } from "../.tina/__generated__/types";
 
 export default function HomePage(
   props: AsyncReturnType<typeof getStaticProps>["props"]
@@ -21,10 +20,6 @@ export default function HomePage(
 }
 
 export const getStaticProps = async () => {
-  const client = getTinaClient();
-
-  const test = await client.getAuthorsDocument({ relativePath: "pedro.md" });
-
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql
       query PageQuery {

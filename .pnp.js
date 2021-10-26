@@ -23635,6 +23635,13 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["graphql", "npm:15.5.1"]
           ],
           "linkType": "HARD",
+        }],
+        ["npm:15.6.1", {
+          "packageLocation": "./.yarn/cache/graphql-npm-15.6.1-3d6344679b-b6ce4fd769.zip/node_modules/graphql/",
+          "packageDependencies": [
+            ["graphql", "npm:15.6.1"]
+          ],
+          "linkType": "HARD",
         }]
       ]],
       ["graphql-tag", [
@@ -40968,6 +40975,7 @@ function $$SETUP_STATE(hydrateRuntimeState, basePath) {
             ["@types/styled-components", "npm:5.1.11"],
             ["autoprefixer", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#npm:10.3.1"],
             ["date-fns", "npm:2.23.0"],
+            ["graphql", "npm:15.6.1"],
             ["next", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#npm:10.0.5"],
             ["next-svgr", "npm:0.0.2"],
             ["next-tinacms-cloudinary", "virtual:2b2aaae62b5397fe1a167fe925efc38928570fe879f2f4cea3a913c70e43865d1b895f665773c1b227c3bd0f10086a84642bd926d3ac5e759332669954c6a10c#workspace:packages/next-tinacms-cloudinary"],
