@@ -877,38 +877,38 @@ export const GetPagesListDocument = gql`
 }
     ${PagesPartsFragmentDoc}`;
 export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) => Promise<R>
-export function getSdk<C>(requester: Requester<C>) {
-  return {
-    getCollections(variables?: GetCollectionsQueryVariables, options?: C): Promise<GetCollectionsQuery> {
-      return requester<GetCollectionsQuery, GetCollectionsQueryVariables>(GetCollectionsDocument, variables, options);
-    },
-    getPostsDocument(variables: GetPostsDocumentQueryVariables, options?: C): Promise<GetPostsDocumentQuery> {
-      return requester<GetPostsDocumentQuery, GetPostsDocumentQueryVariables>(GetPostsDocumentDocument, variables, options);
-    },
-    getPostsList(variables?: GetPostsListQueryVariables, options?: C): Promise<GetPostsListQuery> {
-      return requester<GetPostsListQuery, GetPostsListQueryVariables>(GetPostsListDocument, variables, options);
-    },
-    getGlobalDocument(variables: GetGlobalDocumentQueryVariables, options?: C): Promise<GetGlobalDocumentQuery> {
-      return requester<GetGlobalDocumentQuery, GetGlobalDocumentQueryVariables>(GetGlobalDocumentDocument, variables, options);
-    },
-    getGlobalList(variables?: GetGlobalListQueryVariables, options?: C): Promise<GetGlobalListQuery> {
-      return requester<GetGlobalListQuery, GetGlobalListQueryVariables>(GetGlobalListDocument, variables, options);
-    },
-    getAuthorsDocument(variables: GetAuthorsDocumentQueryVariables, options?: C): Promise<GetAuthorsDocumentQuery> {
-      return requester<GetAuthorsDocumentQuery, GetAuthorsDocumentQueryVariables>(GetAuthorsDocumentDocument, variables, options);
-    },
-    getAuthorsList(variables?: GetAuthorsListQueryVariables, options?: C): Promise<GetAuthorsListQuery> {
-      return requester<GetAuthorsListQuery, GetAuthorsListQueryVariables>(GetAuthorsListDocument, variables, options);
-    },
-    getPagesDocument(variables: GetPagesDocumentQueryVariables, options?: C): Promise<GetPagesDocumentQuery> {
-      return requester<GetPagesDocumentQuery, GetPagesDocumentQueryVariables>(GetPagesDocumentDocument, variables, options);
-    },
-    getPagesList(variables?: GetPagesListQueryVariables, options?: C): Promise<GetPagesListQuery> {
-      return requester<GetPagesListQuery, GetPagesListQueryVariables>(GetPagesListDocument, variables, options);
-    }
-  };
-}
-export type Sdk = ReturnType<typeof getSdk>;
+  export function getSdk<C>(requester: Requester<C>) {
+    return {
+      getCollections(variables?: GetCollectionsQueryVariables, options?: C): Promise<{data: GetCollectionsQuery, variables: GetCollectionsQueryVariables, query: string}> {
+        return requester<{data: GetCollectionsQuery, variables: GetCollectionsQueryVariables, query: string}, GetCollectionsQueryVariables>(GetCollectionsDocument, variables, options);
+      },
+    getPostsDocument(variables: GetPostsDocumentQueryVariables, options?: C): Promise<{data: GetPostsDocumentQuery, variables: GetPostsDocumentQueryVariables, query: string}> {
+        return requester<{data: GetPostsDocumentQuery, variables: GetPostsDocumentQueryVariables, query: string}, GetPostsDocumentQueryVariables>(GetPostsDocumentDocument, variables, options);
+      },
+    getPostsList(variables?: GetPostsListQueryVariables, options?: C): Promise<{data: GetPostsListQuery, variables: GetPostsListQueryVariables, query: string}> {
+        return requester<{data: GetPostsListQuery, variables: GetPostsListQueryVariables, query: string}, GetPostsListQueryVariables>(GetPostsListDocument, variables, options);
+      },
+    getGlobalDocument(variables: GetGlobalDocumentQueryVariables, options?: C): Promise<{data: GetGlobalDocumentQuery, variables: GetGlobalDocumentQueryVariables, query: string}> {
+        return requester<{data: GetGlobalDocumentQuery, variables: GetGlobalDocumentQueryVariables, query: string}, GetGlobalDocumentQueryVariables>(GetGlobalDocumentDocument, variables, options);
+      },
+    getGlobalList(variables?: GetGlobalListQueryVariables, options?: C): Promise<{data: GetGlobalListQuery, variables: GetGlobalListQueryVariables, query: string}> {
+        return requester<{data: GetGlobalListQuery, variables: GetGlobalListQueryVariables, query: string}, GetGlobalListQueryVariables>(GetGlobalListDocument, variables, options);
+      },
+    getAuthorsDocument(variables: GetAuthorsDocumentQueryVariables, options?: C): Promise<{data: GetAuthorsDocumentQuery, variables: GetAuthorsDocumentQueryVariables, query: string}> {
+        return requester<{data: GetAuthorsDocumentQuery, variables: GetAuthorsDocumentQueryVariables, query: string}, GetAuthorsDocumentQueryVariables>(GetAuthorsDocumentDocument, variables, options);
+      },
+    getAuthorsList(variables?: GetAuthorsListQueryVariables, options?: C): Promise<{data: GetAuthorsListQuery, variables: GetAuthorsListQueryVariables, query: string}> {
+        return requester<{data: GetAuthorsListQuery, variables: GetAuthorsListQueryVariables, query: string}, GetAuthorsListQueryVariables>(GetAuthorsListDocument, variables, options);
+      },
+    getPagesDocument(variables: GetPagesDocumentQueryVariables, options?: C): Promise<{data: GetPagesDocumentQuery, variables: GetPagesDocumentQueryVariables, query: string}> {
+        return requester<{data: GetPagesDocumentQuery, variables: GetPagesDocumentQueryVariables, query: string}, GetPagesDocumentQueryVariables>(GetPagesDocumentDocument, variables, options);
+      },
+    getPagesList(variables?: GetPagesListQueryVariables, options?: C): Promise<{data: GetPagesListQuery, variables: GetPagesListQueryVariables, query: string}> {
+        return requester<{data: GetPagesListQuery, variables: GetPagesListQueryVariables, query: string}, GetPagesListQueryVariables>(GetPagesListDocument, variables, options);
+      }
+    };
+  }
+  export type Sdk = ReturnType<typeof getSdk>;
 
 // TinaSDK generated code
 
@@ -920,7 +920,8 @@ const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   _options
 ) => {
   const data = await tinaClient.request(doc, { variables: vars });
-  return data;
+  return { data, query: doc, variables: vars};
+  // return data;
 };
 export const getTinaClient = ()=>getSdk(requester)
 
