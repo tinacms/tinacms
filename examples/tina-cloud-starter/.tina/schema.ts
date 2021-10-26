@@ -630,6 +630,7 @@ export default defineSchema({
         {
           type: "string",
           label: "Name",
+          required: true,
           name: "name",
         },
         {

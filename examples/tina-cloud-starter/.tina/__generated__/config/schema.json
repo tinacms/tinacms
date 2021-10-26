@@ -416,6 +416,7 @@
         {
           "type": "string",
           "label": "Name",
+          "required": true,
           "name": "name"
         },
         {

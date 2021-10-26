@@ -175,7 +175,7 @@ type GlobalConnection implements Connection {
 }
 
 type Authors {
-  name: String
+  name: String!
   avatar: String
 }
 

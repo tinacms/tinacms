@@ -21,36 +21,9 @@ export const getStaticProps = async ({ params }) => {
       relativePath: `${params.filename}.md`,
     },
     {
-      include: {
-        author: true,
-      },
+      author: true,
     }
   );
-  console.log(tinaProps.data.getPostsDocument.data);
-  // const tinaProps = (await getStaticPropsForTina({
-  //   query: `#graphql
-  //     query BlogPostQuery($relativePath: String!) {
-  //       ${layoutQueryFragment}
-  //       getPostsDocument(relativePath: $relativePath) {
-  //         data {
-  //           title
-  //           date
-  //           author {
-  //             ... on AuthorsDocument {
-  //               data {
-  //                 name
-  //                 avatar
-  //               }
-  //             }
-  //           }
-  //           heroImg
-  //           _body
-  //         }
-  //       }
-  //     }
-  //   `,
-  //   variables: { relativePath: `${params.filename}.md` },
-  // })) as { data: { getPostsDocument: PostsDocument } };
   return {
     props: {
       ...tinaProps,
