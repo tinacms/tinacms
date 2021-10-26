@@ -115,39 +115,38 @@ export const Img = (props) => {
   }, [setLocalState])
 
   return (
-    <div
+    <span
       {...props.attributes}
       style={{
+        display: 'block',
         boxShadow: isSelected && isFocused ? '0 0 0 3px #B4D5FF' : 'none',
       }}
     >
-      <div
+      <span
         style={{
           userSelect: 'none',
         }}
         contentEditable={false}
       >
         <ImageField tinaForm={form}>
-          <figure>
-            <img
-              style={{ width: '100%' }}
-              src={localState.url}
-              alt={props.element.alt}
-            />
-            <figcaption
-              style={{
-                display: 'block',
-                margin: '8px auto 0',
-                textAlign: 'center',
-              }}
-            >
-              {localState.caption}
-            </figcaption>
-          </figure>
+          <img
+            style={{ width: '100%' }}
+            src={localState.url}
+            alt={props.element.alt}
+          />
+          <span
+            style={{
+              display: 'block',
+              margin: '8px auto 0',
+              textAlign: 'center',
+            }}
+          >
+            {localState.caption}
+          </span>
         </ImageField>
-      </div>
+      </span>
       {props.children}
-    </div>
+    </span>
   )
 }
 
@@ -155,6 +154,7 @@ export const createTinaImagePlugin = () => {
   return {
     pluginKeys: 'img',
     voidTypes: getPlatePluginTypes('img'),
+    inlineTypes: getPlatePluginTypes('img'),
     renderElement: getRenderElement('img'),
   }
 }
