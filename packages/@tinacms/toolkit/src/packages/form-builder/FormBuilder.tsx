@@ -343,7 +343,6 @@ const EmptyState = styled.div`
   h3 {
     font-size: var(--tina-font-size-5);
     font-weight: normal;
-    color: inherit;
     display: block;
     margin: 0 0 var(--tina-padding-big) 0;
     ${Emoji} {
