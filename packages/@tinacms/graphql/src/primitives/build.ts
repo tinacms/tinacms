@@ -65,7 +65,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   queryTypeDefinitionFields.push(
     await builder.multiCollectionDocument(collections)
   )
-
   mutationTypeDefinitionFields.push(
     await builder.addMultiCollectionDocumentMutation()
   )
