@@ -315,7 +315,6 @@ const ToggleElement = styled.div`
 
 const ToggleLabel = styled.label<{ disabled?: boolean }>`
   background: none;
-  color: inherit;
   padding: 0;
   opacity: ${(props) => (props.disabled ? '0.4' : '1')};
   outline: none;
