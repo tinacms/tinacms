@@ -61,9 +61,6 @@ const gqlServer = async (database) => {
       path.join(rootPath, '.tina', '__generated__', 'config', 'schema.json')
     )
     .toString()
-  // const database = await gqlPackage.createDatabase({
-  //   rootPath,
-  // })
   await gqlPackage.indexDB({ database, config: JSON.parse(config) })
 
   app.post('/graphql', async (req, res) => {
@@ -73,14 +70,7 @@ const gqlServer = async (database) => {
       query,
       variables,
     })
-    // console.log('neww', meh)
     return res.json(result)
-    // const result = await gqlPackage.gql({
-    //   rootPath,
-    //   query,
-    //   variables,
-    // })
-    // return res.json(result)
   })
 
   app.get('/list-branches', async (req, res) => {

@@ -13,9 +13,7 @@ limitations under the License.
 
 import childProcess from 'child_process'
 import path from 'path'
-import { buildSchema, createDatabase } from '@tinacms/graphql'
-import { genTypes } from '../query-gen'
-import { compile } from '../compile'
+import { createDatabase } from '@tinacms/graphql'
 import chokidar from 'chokidar'
 import { dangerText } from '../../utils/theme'
 import { logger } from '../../logger'
@@ -32,7 +30,7 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 export async function startServer(
   _ctx,
   _next,
-  { port = 4001, command, experimental, noWatch }: Options
+  { port = 4001, command, noWatch }: Options
 ) {
   const startSubprocess = () => {
     if (typeof command === 'string') {
@@ -87,7 +85,7 @@ stack: ${code.stack || 'No stack was provided'}`)
             logger.info(
               dangerText(
                 'Compilation failed with errors. Server has not been restarted.'
-              )
+              ) + `see error below \n ${e.message}`
             )
           }
         }
@@ -95,10 +93,7 @@ stack: ${code.stack || 'No stack was provided'}`)
   }
 
   const build = async () => {
-    console.log('not building schema here')
-    // await compile(null, null)
-    // const schema = await buildSchema(rootPath)
-    // await genTypes({ schema }, () => {}, {})
+    // TODO: rebuild
   }
 
   const state = {
@@ -112,6 +107,7 @@ stack: ${code.stack || 'No stack was provided'}`)
   })
   const start = async () => {
     const s = require('./server')
+
     state.server = await s.default(database)
     state.server.listen(port, () => {
       logger.info(`Started Filesystem GraphQL server on port: ${port}`)
@@ -132,8 +128,6 @@ stack: ${code.stack || 'No stack was provided'}`)
   const restart = async () => {
     logger.info('Detected change to gql package, restarting...')
     delete require.cache[gqlPackageFile]
-
-    // await database.bridge.db.close()
 
     state.sockets.forEach((socket) => {
       if (socket.destroyed === false) {
