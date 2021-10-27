@@ -716,20 +716,16 @@ export class Builder {
   private _buildFieldFilter = async (field: TinaFieldEnriched) => {
     switch (field.type) {
       case 'boolean':
-        return astBuilder.InputValueDefinition({
-          name: field.name,
-          list: false,
-          type: astBuilder.TYPES.Boolean,
-        })
       case 'number':
-        return astBuilder.InputValueDefinition({
-          name: field.name,
-          list: false,
-          type: astBuilder.TYPES.Number,
-        })
       case 'datetime':
       case 'image':
       case 'string':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          list: false,
+          type: astBuilder.TYPES.Scalar(field.type),
+        })
+      case 'reference':
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: false,
@@ -741,16 +737,6 @@ export class Builder {
           list: false,
           type: await this._collectionDocumentFilterType(field),
         })
-      case 'reference':
-        return astBuilder.InputValueDefinition({
-          name: field.name,
-          list: false,
-          type: astBuilder.TYPES.String,
-        })
-      // return astBuilder.InputValueDefinition({
-      //   name: field.name,
-      //   type: await this._buildReferenceMutation(field),
-      // })
     }
   }
 
