@@ -66,10 +66,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     await builder.multiCollectionDocument(collections)
   )
 
-  const frag =
-    (await builder.multiCollectionFragment()) as FragmentDefinitionNode
-
-  fragmentDefinitionsFields.push(frag)
   mutationTypeDefinitionFields.push(
     await builder.addMultiCollectionDocumentMutation()
   )
