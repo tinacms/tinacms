@@ -15,7 +15,8 @@
           "label": "Author",
           "name": "author",
           "collections": [
-            "authors"
+            "authors",
+            "pages"
           ]
         },
         {
@@ -852,8 +853,8 @@
                 },
                 {
                   "type": "string",
-                  "label": "Author",
-                  "name": "author"
+                  "label": "Author 2",
+                  "name": "author2"
                 },
                 {
                   "type": "string",

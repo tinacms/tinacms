@@ -19,12 +19,20 @@ export const getStaticProps = async ({ params }) => {
   const tinaProps = await client.getPostsDocument(
     {
       relativePath: `${params.filename}.md`,
-    },
-    {
-      author: true,
     }
+    // Uncomment to see types update
+    // {
+    //   author: true,
+    // }
   );
-  console.log(tinaProps.data.getPostsDocument.data.author.data.name);
+  // switch (tinaProps.data.getPostsDocument.data.author.__typename) {
+  //   case "AuthorsDocument":
+  //     tinaProps.data.getPostsDocument.data.author.data.__typename;
+  //     break;
+
+  //   default:
+  //     break;
+  // }
   return {
     props: {
       ...tinaProps,

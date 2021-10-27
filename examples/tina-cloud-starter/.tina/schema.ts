@@ -266,8 +266,8 @@ const testimonialBlockSchema: TinaTemplate = {
     },
     {
       type: "string",
-      label: "Author",
-      name: "author",
+      label: "Author 2",
+      name: "author2",
     },
     {
       type: "string",
@@ -397,7 +397,7 @@ export default defineSchema({
           type: "reference",
           label: "Author",
           name: "author",
-          collections: ["authors"],
+          collections: ["authors", "pages"],
         },
         {
           type: "datetime",

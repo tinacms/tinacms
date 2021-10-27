@@ -182,7 +182,7 @@ export type DocumentNode =
   | AuthorsDocument
   | PagesDocument;
 
-export type PostsAuthorDocument = AuthorsDocument;
+export type PostsAuthorDocument = AuthorsDocument | PagesDocument;
 
 export type Posts = {
   __typename?: "Posts";
@@ -374,7 +374,7 @@ export type PagesBlocksContent = {
 export type PagesBlocksTestimonial = {
   __typename?: "PagesBlocksTestimonial";
   quote?: Maybe<Scalars["String"]>;
-  author?: Maybe<Scalars["String"]>;
+  author2?: Maybe<Scalars["String"]>;
   color?: Maybe<Scalars["String"]>;
 };
 
@@ -594,7 +594,7 @@ export type PagesBlocksContentMutation = {
 
 export type PagesBlocksTestimonialMutation = {
   quote?: Maybe<Scalars["String"]>;
-  author?: Maybe<Scalars["String"]>;
+  author2?: Maybe<Scalars["String"]>;
   color?: Maybe<Scalars["String"]>;
 };
 
@@ -631,7 +631,10 @@ type DocumentParts_PostsDocument_Fragment = {
     heroImg?: Maybe<string>;
     excerpt?: Maybe<string>;
     _body?: Maybe<string>;
-    author?: Maybe<{ __typename?: "AuthorsDocument"; id: string }>;
+    author?: Maybe<
+      | { __typename?: "AuthorsDocument"; id: string }
+      | { __typename?: "PagesDocument"; id: string }
+    >;
   };
 };
 
@@ -744,7 +747,7 @@ type DocumentParts_PagesDocument_Fragment = {
           | {
               __typename?: "PagesBlocksTestimonial";
               quote?: Maybe<string>;
-              author?: Maybe<string>;
+              author2?: Maybe<string>;
               color?: Maybe<string>;
             }
         >
@@ -766,7 +769,10 @@ export type PostsPartsFragment = {
   heroImg?: Maybe<string>;
   excerpt?: Maybe<string>;
   _body?: Maybe<string>;
-  author?: Maybe<{ __typename?: "AuthorsDocument"; id: string }>;
+  author?: Maybe<
+    | { __typename?: "AuthorsDocument"; id: string }
+    | { __typename?: "PagesDocument"; id: string }
+  >;
 };
 
 export type GlobalPartsFragment = {
@@ -871,7 +877,7 @@ export type PagesPartsFragment = {
         | {
             __typename?: "PagesBlocksTestimonial";
             quote?: Maybe<string>;
-            author?: Maybe<string>;
+            author2?: Maybe<string>;
             color?: Maybe<string>;
           }
       >
@@ -883,7 +889,7 @@ export type GetPostsDocumentQueryVariables = Exact<{
   relativePath: Scalars["String"];
 }>;
 
-export type GetPostsDocumentQuery<Ext extends object> = {
+export type GetPostsDocumentQuery<T extends object> = {
   __typename?: "Query";
   getPostsDocument: {
     __typename?: "PostsDocument";
@@ -894,8 +900,11 @@ export type GetPostsDocumentQuery<Ext extends object> = {
       heroImg?: Maybe<string>;
       excerpt?: Maybe<string>;
       _body?: Maybe<string>;
-      author?: Maybe<{ __typename?: "AuthorsDocument"; id: string }>;
-    } & Ext;
+      author?: Maybe<
+        | { __typename?: "AuthorsDocument"; id: string }
+        | { __typename?: "PagesDocument"; id: string }
+      >;
+    } & T;
   };
 };
 
@@ -920,7 +929,10 @@ export type GetPostsListQuery = {
               heroImg?: Maybe<string>;
               excerpt?: Maybe<string>;
               _body?: Maybe<string>;
-              author?: Maybe<{ __typename?: "AuthorsDocument"; id: string }>;
+              author?: Maybe<
+                | { __typename?: "AuthorsDocument"; id: string }
+                | { __typename?: "PagesDocument"; id: string }
+              >;
             };
           }>;
         }>
@@ -1142,7 +1154,7 @@ export type GetPagesDocumentQuery = {
             | {
                 __typename?: "PagesBlocksTestimonial";
                 quote?: Maybe<string>;
-                author?: Maybe<string>;
+                author2?: Maybe<string>;
                 color?: Maybe<string>;
               }
           >
@@ -1221,7 +1233,7 @@ export type GetPagesListQuery = {
                     | {
                         __typename?: "PagesBlocksTestimonial";
                         quote?: Maybe<string>;
-                        author?: Maybe<string>;
+                        author2?: Maybe<string>;
                         color?: Maybe<string>;
                       }
                   >
@@ -1328,7 +1340,7 @@ export const PagesPartsFragmentDoc = gql`
       }
       ... on PagesBlocksTestimonial {
         quote
-        author
+        author2
         color
       }
     }
@@ -1506,11 +1518,8 @@ export function getSdk<C>(requester: Requester<C>) {
       options?: C
     ): Promise<{
       data: GetPostsDocumentQuery<{
-        [k in keyof C]: C[k] extends true
-          ? QueryMap["posts"][k]
-          : { id: string };
+        [k in keyof C]: C[k] extends true ? PostsQueryMap[k] : { id: string };
       }>;
-      // data: GetPostsDocumentQuery<>;
       variables: GetPostsDocumentQueryVariables;
       query: string;
     }> {
@@ -1653,8 +1662,108 @@ type QueryMap = {
     author: GetAuthorsDocumentQuery["getAuthorsDocument"];
   };
 };
-type PostsReferenceKeys = {
-  author?: boolean;
+
+import { parse, print, visit } from "graphql";
+
+type Meh<Ext extends object> = GetPostsDocumentQuery & {
+  getPostsDocument: {
+    data: GetPostsDocumentQuery["getPostsDocument"]["data"] & Ext;
+  };
+};
+type Ok = Meh<{ author: { data: { title: string } } }>;
+
+type PostsReferenceKeys = { author?: boolean };
+type PostsQueryMap = {
+  author:
+    | GetAuthorsDocumentQuery["getAuthorsDocument"]
+    | GetPagesDocumentQuery["getPagesDocument"];
+};
+const PostsQueries = {
+  author: [
+    { name: "AuthorsDocument", fragment: AuthorsPartsFragmentDoc },
+    { name: "PagesDocument", fragment: PagesPartsFragmentDoc },
+  ],
+};
+
+type GlobalReferenceKeys = {};
+type GlobalQueryMap = undefined;
+const GlobalQueries = {};
+
+type AuthorsReferenceKeys = {};
+type AuthorsQueryMap = undefined;
+const AuthorsQueries = {};
+
+type PagesReferenceKeys = {};
+type PagesQueryMap = undefined;
+const PagesQueries = {};
+
+const replaceQuery = (queryString, lookup, options) => {
+  const meh = parse(queryString);
+
+  const filteredLookup = {};
+  Object.entries(lookup).forEach(([key, value]) => {
+    if (Object.keys(options).includes(key)) {
+      if (!!options[key]) {
+        filteredLookup[key] = value;
+      }
+    }
+  });
+
+  const newQuery = visit(meh, {
+    Field: (node) => {
+      if (Object.keys(filteredLookup).includes(node.name.value)) {
+        const queryItems = filteredLookup[node.name.value];
+        const newNode = {
+          kind: "Field",
+          name: node.name,
+          selectionSet: {
+            kind: "SelectionSet",
+            selections: queryItems.map((queryItem) => {
+              return {
+                kind: "InlineFragment",
+                typeCondition: {
+                  kind: "NamedType",
+                  name: {
+                    kind: "Name",
+                    value: queryItem.name,
+                  },
+                },
+                selectionSet: {
+                  kind: "SelectionSet",
+                  selections: [
+                    {
+                      kind: "Field",
+                      name: {
+                        kind: "Name",
+                        value: "id",
+                      },
+                    },
+                    {
+                      kind: "Field",
+                      name: {
+                        kind: "Name",
+                        value: "data",
+                      },
+                      arguments: [],
+                      directives: [],
+                      selectionSet: {
+                        kind: "SelectionSet",
+                        selections: parse(queryItem.fragment).definitions[0]
+                          .selectionSet.selections,
+                      },
+                    },
+                  ],
+                },
+              };
+            }),
+          },
+        };
+
+        return newNode;
+      }
+    },
+  });
+  return print(newQuery);
 };
 
 import { LocalClient } from "tinacms";
@@ -1662,11 +1771,10 @@ const tinaClient = new LocalClient();
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   doc,
   vars,
-  _options
+  _options = {}
 ) => {
-  console.log(_options);
-  const data = await tinaClient.request(doc, { variables: vars });
-  return { data, query: doc, variables: vars };
-  // return data;
+  const query = replaceQuery(doc, PostsQueries, _options);
+  const data = await tinaClient.request(query, { variables: vars });
+  return { data, query, variables: vars };
 };
 export const getTinaClient = () => getSdk(requester);

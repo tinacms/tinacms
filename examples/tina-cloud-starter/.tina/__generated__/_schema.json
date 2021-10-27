@@ -19,7 +19,8 @@
           "label": "Author",
           "name": "author",
           "collections": [
-            "authors"
+            "authors",
+            "pages"
           ],
           "namespace": [
             "posts",
@@ -1172,13 +1173,13 @@
                 },
                 {
                   "type": "string",
-                  "label": "Author",
-                  "name": "author",
+                  "label": "Author 2",
+                  "name": "author2",
                   "namespace": [
                     "pages",
                     "blocks",
                     "testimonial",
-                    "author"
+                    "author2"
                   ]
                 },
                 {

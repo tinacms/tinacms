@@ -22,6 +22,7 @@ export {
   githubRoute,
 } from './primitives'
 import { clearCache as s3ClearCache, s3Cache } from './cache/s3'
+export { NAMER } from './primitives/ast-builder'
 
 import { clearCache as lruClearCache, simpleCache } from './cache/lru'
 

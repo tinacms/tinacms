@@ -1458,6 +1458,13 @@
             "kind": "Name",
             "value": "AuthorsDocument"
           }
+        },
+        {
+          "kind": "NamedType",
+          "name": {
+            "kind": "Name",
+            "value": "PagesDocument"
+          }
         }
       ]
     },
@@ -3177,7 +3184,7 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
-            "value": "author"
+            "value": "author2"
           },
           "arguments": [],
           "type": {
@@ -5116,7 +5123,7 @@
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
-            "value": "author"
+            "value": "author2"
           },
           "type": {
             "kind": "NamedType",
@@ -6012,7 +6019,7 @@
                       {
                         "name": {
                           "kind": "Name",
-                          "value": "author"
+                          "value": "author2"
                         },
                         "kind": "Field"
                       },

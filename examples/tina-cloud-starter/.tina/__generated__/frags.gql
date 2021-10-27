@@ -109,7 +109,7 @@ fragment PagesParts on Pages {
     }
     ... on PagesBlocksTestimonial {
       quote
-      author
+      author2
       color
     }
   }
