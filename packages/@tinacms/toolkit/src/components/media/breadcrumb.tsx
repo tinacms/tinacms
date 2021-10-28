@@ -76,7 +76,6 @@ const BreadcrumbWrapper = styled.div<BreadcrumbWrapperProps>`
     border: 0;
     background-color: transparent;
     font-size: inherit;
-    color: inherit;
   }
 
   > span {

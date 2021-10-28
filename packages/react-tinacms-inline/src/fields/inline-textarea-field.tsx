@@ -84,7 +84,6 @@ const Textarea = styled(TextareaAutosize)`
   font-family: inherit;
   font-weight: inherit;
   box-sizing: border-box;
-  color: inherit;
   letter-spacing: inherit;
   line-height: inherit;
   margin: 0 auto;
