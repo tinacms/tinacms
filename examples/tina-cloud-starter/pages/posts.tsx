@@ -23,7 +23,9 @@ export default function HomePage(
 export const getStaticProps = async () => {
   const client = getTinaClient();
 
-  const test = await client.getAuthorsDocument({ relativePath: "pedro.md" });
+  const test = await client.getPostsDocument({
+    relativePath: "voteForPedro.md",
+  });
 
   const tinaProps = (await getStaticPropsForTina({
     query: `#graphql

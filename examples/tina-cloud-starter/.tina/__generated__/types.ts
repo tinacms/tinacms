@@ -626,7 +626,7 @@ export type GetCollectionsasdfQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetCollectionsasdfQuery = { __typename?: 'Query', getCollections: Array<{ __typename?: 'Collection', name: string }> };
 
-export type PostsPartsFragment = { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> };
+export type PostsPartsFragment = { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> };
 
 export type GlobalPartsFragment = { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> };
 
@@ -639,12 +639,12 @@ export type GetPostsDocumentQueryVariables = Exact<{
 }>;
 
 
-export type GetPostsDocumentQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> } } };
+export type GetPostsDocumentQuery = { __typename?: 'Query', getPostsDocument: { __typename?: 'PostsDocument', data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> } } };
 
 export type GetPostsListQueryVariables = Exact<{ [key: string]: never; }>;
 
 
-export type GetPostsListQuery = { __typename?: 'Query', getPostsList: { __typename?: 'PostsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> } }> }>>> } };
+export type GetPostsListQuery = { __typename?: 'Query', getPostsList: { __typename?: 'PostsConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PostsConnectionEdges', node?: Maybe<{ __typename?: 'PostsDocument', id: string, data: { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string>, author?: Maybe<{ __typename?: 'AuthorsDocument', id: string }> } }> }>>> } };
 
 export type GetGlobalDocumentQueryVariables = Exact<{
   relativePath: Scalars['String'];
@@ -685,6 +685,11 @@ export type GetPagesListQuery = { __typename?: 'Query', getPagesList: { __typena
 export const PostsPartsFragmentDoc = gql`
     fragment PostsParts on Posts {
   title
+  author {
+    ... on Document {
+      id
+    }
+  }
   date
   heroImg
   excerpt

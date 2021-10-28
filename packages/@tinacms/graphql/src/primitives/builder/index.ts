@@ -527,7 +527,36 @@ export class Builder {
           })
         }
       case 'reference':
-        false
+        return astBuilder.FieldWithSelectionSetDefinition({
+          name: field.name,
+          selections: [
+            {
+              kind: 'InlineFragment',
+              typeCondition: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'Document',
+                },
+              },
+              directives: [],
+              selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                  {
+                    kind: 'Field',
+                    name: {
+                      kind: 'Name',
+                      value: 'id',
+                    },
+                    arguments: [],
+                    directives: [],
+                  },
+                ],
+              },
+            },
+          ],
+        })
     }
   }
 

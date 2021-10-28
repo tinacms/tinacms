@@ -5257,6 +5257,43 @@
           {
             "name": {
               "kind": "Name",
+              "value": "author"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "InlineFragment",
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "Document"
+                    }
+                  },
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "id"
+                        },
+                        "arguments": [],
+                        "directives": []
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": {
+              "kind": "Name",
               "value": "date"
             },
             "kind": "Field"
