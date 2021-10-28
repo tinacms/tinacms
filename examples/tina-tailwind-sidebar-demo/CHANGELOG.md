@@ -1,5 +1,12 @@
 # tina-tailwind-sidebar-demo
 
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies [7849c1233]
+  - tinacms@0.57.2
+
 ## 0.1.9
 
 ### Patch Changes

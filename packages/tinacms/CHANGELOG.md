@@ -1,5 +1,11 @@
 # tinacms
 
+## 0.57.2
+
+### Patch Changes
+
+- 7849c1233: Fix styles on panel
+
 ## 0.57.1
 
 ### Patch Changes
