@@ -12,6 +12,9 @@ limitations under the License.
 */
 
 export { GithubBridge } from './primitives/database/bridge/github'
+export { FilesystemBridge } from './primitives/database/bridge/filesystem'
+export { GithubStore } from './primitives/database/store/github'
+export { MemoryStore } from './primitives/database/store/memory'
 export type { GithubManagerInit } from './primitives/database/bridge/github'
 export {
   gql,

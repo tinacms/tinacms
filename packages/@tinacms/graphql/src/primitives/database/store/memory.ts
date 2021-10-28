@@ -13,24 +13,25 @@ limitations under the License.
 
 import type { Store } from './index'
 import fs from 'fs-extra'
+import { sequential } from '../../util'
 
 /**
  * This is the bridge from whatever datasource we need for I/O.
  * The basic example here is for the filesystem, one is needed
  * for Github has well.
  */
-let map: { [key: string]: object } = {}
 export class MemoryStore implements Store {
   public rootPath
   public db
+  private map: object = {}
   constructor(rootPath: string) {
     this.rootPath = rootPath || ''
     this.db = {
       get: async (filepath: string) => {
-        return map[filepath]
+        return this.map[filepath]
       },
       put: async (filepath: string, content: object) => {
-        map[filepath] = content
+        this.map[filepath] = content
         await this.print()
       },
     }
@@ -38,20 +39,23 @@ export class MemoryStore implements Store {
   public async print() {
     await fs.outputFile(
       '.tina/__generated__/map.json',
-      JSON.stringify(map, null, 2)
+      JSON.stringify(this.map, null, 2)
     )
   }
   public async clear() {
-    map = {}
+    this.map = {}
   }
 
-  public async glob(pattern: string) {
-    return Object.keys(map).filter((key) => {
+  public async glob(pattern: string, callback) {
+    const strings = Object.keys(this.map).filter((key) => {
       if (key.startsWith(pattern)) {
         return true
       } else {
         return false
       }
+    })
+    return sequential(strings, async (string) => {
+      return callback(string)
     })
   }
   public async get(filepath: string) {
@@ -60,5 +64,19 @@ export class MemoryStore implements Store {
   }
   public async put(filepath: string, data: object) {
     await this.db.put(filepath, data)
+  }
+  public async query(queryStrings: string[], callback) {
+    const resultSets = await sequential(queryStrings, async (queryString) => {
+      const res = await this.get(queryString)
+      return res || []
+    })
+    let items = []
+    if (resultSets.length > 0) {
+      items = resultSets.reduce((p, c) => p.filter((e) => c.includes(e)))
+    }
+
+    return sequential(items, async (documentString) => {
+      return callback(documentString)
+    })
   }
 }

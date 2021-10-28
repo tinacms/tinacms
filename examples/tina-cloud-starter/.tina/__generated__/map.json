@@ -643,6 +643,20 @@
                     "value": "Int"
                   }
                 }
+              },
+              {
+                "kind": "InputValueDefinition",
+                "name": {
+                  "kind": "Name",
+                  "value": "filter"
+                },
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "DocumentFilter"
+                  }
+                }
               }
             ],
             "type": {
@@ -769,6 +783,20 @@
                     "value": "Int"
                   }
                 }
+              },
+              {
+                "kind": "InputValueDefinition",
+                "name": {
+                  "kind": "Name",
+                  "value": "filter"
+                },
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "PostsFilter"
+                  }
+                }
               }
             ],
             "type": {
@@ -875,6 +903,20 @@
                   "name": {
                     "kind": "Name",
                     "value": "Int"
+                  }
+                }
+              },
+              {
+                "kind": "InputValueDefinition",
+                "name": {
+                  "kind": "Name",
+                  "value": "filter"
+                },
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "GlobalFilter"
                   }
                 }
               }
@@ -985,6 +1027,20 @@
                     "value": "Int"
                   }
                 }
+              },
+              {
+                "kind": "InputValueDefinition",
+                "name": {
+                  "kind": "Name",
+                  "value": "filter"
+                },
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "AuthorsFilter"
+                  }
+                }
               }
             ],
             "type": {
@@ -1093,6 +1149,20 @@
                     "value": "Int"
                   }
                 }
+              },
+              {
+                "kind": "InputValueDefinition",
+                "name": {
+                  "kind": "Name",
+                  "value": "filter"
+                },
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "PagesFilter"
+                  }
+                }
               }
             ],
             "type": {
@@ -1103,6 +1173,1429 @@
                   "kind": "Name",
                   "value": "PagesConnection"
                 }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "StringFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "startsWith"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "eq"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "exists"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Boolean"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "Posts_bodyDateTimeFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "format"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "Posts_bodyBlockQuoteFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "authorName"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "Posts_bodyNewsletterSignupFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "placeholder"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "buttonText"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "Posts_bodyFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "DateTime"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Posts_bodyDateTimeFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "BlockQuote"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Posts_bodyBlockQuoteFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "NewsletterSignup"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Posts_bodyNewsletterSignupFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "AuthorsFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "name"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "avatar"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PostsAuthorFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "authors"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorsFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "DatetimeFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "after"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "before"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "eq"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "exists"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Boolean"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "ImageFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "startsWith"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "eq"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "exists"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Boolean"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PostsFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "_body"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Posts_bodyFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "title"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PostsAuthorFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "date"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "DatetimeFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "heroImg"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "ImageFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "excerpt"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "GlobalHeaderIconFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "style"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "name"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "GlobalHeaderNavFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "href"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "label"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "GlobalHeaderFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "icon"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalHeaderIconFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "nav"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalHeaderNavFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "GlobalFooterSocialFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "facebook"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "twitter"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "instagram"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "github"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "GlobalFooterFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "social"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalFooterSocialFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "GlobalThemeFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "font"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "icon"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "darkMode"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "GlobalFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "header"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalHeaderFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "footer"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalFooterFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "theme"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalThemeFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "BooleanFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "eq"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Boolean"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "exists"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Boolean"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksHeroActionsFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "label"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "type"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "icon"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "BooleanFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "link"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksHeroImageFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "src"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "ImageFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "alt"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksHeroFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "tagline"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "headline"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "text"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "actions"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksHeroActionsFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "image"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksHeroImageFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksFeaturesItemsIconFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "style"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "name"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksFeaturesItemsFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "icon"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksFeaturesItemsIconFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "title"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "text"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksFeaturesFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "items"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksFeaturesItemsFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksContentFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "body"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksTestimonialFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "quote"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "color"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesBlocksFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "hero"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksHeroFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "features"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksFeaturesFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "content"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksContentFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "testimonial"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksTestimonialFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PagesFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "blocks"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesBlocksFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "DocumentFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "posts"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PostsFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "global"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "GlobalFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "authors"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorsFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "pages"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PagesFilter"
               }
             }
           }
@@ -1426,6 +2919,20 @@
                   "name": {
                     "kind": "Name",
                     "value": "Int"
+                  }
+                }
+              },
+              {
+                "kind": "InputValueDefinition",
+                "name": {
+                  "kind": "Name",
+                  "value": "filter"
+                },
+                "type": {
+                  "kind": "NamedType",
+                  "name": {
+                    "kind": "Name",
+                    "value": "DocumentFilter"
                   }
                 }
               }
@@ -6626,9 +8133,37 @@
     "excerpt": "Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?",
     "$_body": "\n# Vote For Pedro\n\nHello, the current date and time is <DateTime format=\"iso\"/>. Quis semper [vulputate](https://example.com) aliquam venenatdis egestas sagittis quisque orci. Donec commodo sdit viverra aliquam porttitor ultrices gravida eu. Tincidunt leo, elementum mattis elementum ut nisl, justo, amet, mattis. Nunc purus, diam cdommodo tincidunt turpis. Amet, duis sed elit interdum dignissim\n\n![](http://res.cloudinary.com/deuzrsg3m/image/upload/v1634858384/tina-upload\\_yxevty.jpg)\n\n***\n\n```\nconst vote = {\n  for: \"Pedro\"\n}\n```\n\n> Id orci tellus laoreet id ac. Dolor, aenean leo, ac etiam consequat in. Convallis arcu ipsum urna nibh. Pha\n>\n> retra, euismod vitae interdum mauris enim, consequat vulputate nibh. Maecenas pellentesque id sed tellus mauris, ultrices mauris. Tincidunt enim cursus ridiculus mi. Pellentesque nam sed nullam sed diam turpis ipsum eu a sed convallis diam.\n\n![This is an image](http://res.cloudinary.com/deuzrsg3m/image/upload/v1631389967/apfx/kevin-bosc-oeqBJZd1GWY-unsplash\\_rtuyot.jpg \"Building, by Thomas Carlisle\")\n\nQuis semper [vulputate](https://example.com) aliquam venenatdis egestas sagittis quisque orci. Donec commodo sit viverra aliquam porttitor ultrices gravida eu. Tincidunt leo, elementum mattis elementum ut nisl, justo, amet, mattis. Nunc purus, diam cdommodo tincidunt turpis. Amet, duis sed elit interdum dignissim\n\n<NewsletterSignup\n  placeholder=\"Enter your email\"\n  buttonText=\"Notify Me\"\n  disclaimer={\n<>\nWe care about the protection of your data. Read our [Privacy Policy](http://example.com).\n\n</>\n}\n>\n  ## Stay in touch!\n\n  ![](http://placehold.it/300x200 \"\")\n\n  Anim aute id magna aliqua ad ad non deserunt sunt. Qui irure qui Lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat.\n</NewsletterSignup>\n\n### 3 Reasons to vote for Pedro\n\n*   Anim aute id magna aliqua ad ad non deserunt sunt\n*   Qui irure qui Lorem cupidatat commodo. Elit sunt amet fugiat veniam occaecat fugiat.\n*   Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?\n\n### 3 More Reasons to vote for Pedro\n\n1.  Anim aute id magna aliqua ad ad non deserunt sunt\n2.  Qui irure qui Lorem cupidatat commodo.\n    .   Elit sunt amet fugiat veniam occaecat fugiat.\n3.  Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpius, mori vel in visaeque Haemoniis viperei furoris e ad vasti, distulit. Crudus sub coniuge iam: dea propera sive?\n\n***\n\n<BlockQuote authorName=\"Uncle Rico\">\n  How much you wanna make a bet I can throw a football over [them mountains](https://images.unsplash.com/photo-1454496522488-7a8e488e8606?ixid=MnwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHx8\\&ixlib=rb-1.2.1\\&auto=format\\&fit=crop\\&w=2110\\&q=80)?\n</BlockQuote>\n\n"
   },
+  "__attribute__posts#posts#title#Just Another Blog Post": [
+    "content/posts/anotherPost.mdx"
+  ],
+  "__attribute__posts#posts#author#content/authors/napolean.md": [
+    "content/posts/anotherPost.mdx"
+  ],
+  "__attribute__posts#posts#date#2021-07-12T07:00:00.000Z": [
+    "content/posts/anotherPost.mdx"
+  ],
+  "__attribute__posts#posts#excerpt#Lorem markdownum evinctus ut cape adhaeret gravis licet progenies ut haesit maxima ille. Est scorpiu": [
+    "content/posts/anotherPost.mdx"
+  ],
   "content/posts/voteForPedro.mdx": {
-    "title": "Don't vote for pedro"
+    "title": "Vote For Pedro",
+    "author": "content/authors/pedro.md",
+    "date": "2021-07-03T20:30:00.000Z",
+    "excerpt": "Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore et dolore magna aliqua. Praesent elementum facilisis leo vel fringilla est ullamcorper eget. At imperdiet dui accumsan sit amet nulla facilities morbi tempus.",
+    "$_body": "\n"
   },
+  "__attribute__posts#posts#title#Vote For Pedro": [
+    "content/posts/voteForPedro.mdx"
+  ],
+  "__attribute__posts#posts#author#content/authors/pedro.md": [
+    "content/posts/voteForPedro.mdx"
+  ],
+  "__attribute__posts#posts#date#2021-07-03T20:30:00.000Z": [
+    "content/posts/voteForPedro.mdx"
+  ],
+  "__attribute__posts#posts#excerpt#Lorem ipsum dolor sit amet, consectetur adipiscing elit, sed do eiusmod tempor incididunt ut labore ": [
+    "content/posts/voteForPedro.mdx"
+  ],
   "content/global/index.json": {
     "header": {
       "icon": {
@@ -6667,18 +8202,81 @@
       "darkMode": "system"
     }
   },
+  "__attribute__global#global#header#icon#color#orange": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#icon#style#float": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#icon#name#tina": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#color#default": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#nav#label#Home": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#nav#href#about": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#nav#label#About": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#nav#href#posts": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#header#nav#label#Blog": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#footer#color#default": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#footer#social#facebook#/": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#footer#social#twitter#/": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#footer#social#instagram#/": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#theme#color#blue": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#theme#font#sans": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#theme#icon#boxicon": [
+    "content/global/index.json"
+  ],
+  "__attribute__global#global#theme#darkMode#system": [
+    "content/global/index.json"
+  ],
   "content/authors/napolean.md": {
     "name": "Napolean",
     "avatar": "https://images.unsplash.com/photo-1606721977440-13e6c3a3505a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&ixlib=rb-1.2.1&auto=format&fit=crop&w=344&q=80",
     "_template": "author",
     "$_body": ""
   },
+  "__attribute__authors#authors#name#Napolean": [
+    "content/authors/napolean.md"
+  ],
+  "__attribute__authors#authors#avatar#https://images.unsplash.com/photo-1606721977440-13e6c3a3505a?ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fG": [
+    "content/authors/napolean.md"
+  ],
   "content/authors/pedro.md": {
     "name": "Pedro",
     "avatar": "https://images.unsplash.com/photo-1555959910-80920d0698a4?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by1wYWdlfHx8fGVufDB8fHw%3D&auto=format&fit=crop&w=1301&q=80",
     "_template": "author",
     "$_body": ""
   },
+  "__attribute__authors#authors#name#Pedro": [
+    "content/authors/pedro.md"
+  ],
+  "__attribute__authors#authors#avatar#https://images.unsplash.com/photo-1555959910-80920d0698a4?ixlib=rb-1.2.1&ixid=MXwxMjA3fDB8MHxwaG90by": [
+    "content/authors/pedro.md"
+  ],
   "content/pages/about.md": {
     "blocks": [
       {
@@ -6689,6 +8287,12 @@
     ],
     "$_body": "\n"
   },
+  "__attribute__pages#pages#content#body### What is this?\n\nThis is a [TinaCMS](https://tina.io)-enabled Next.js app, so you can edit your con": [
+    "content/pages/about.md"
+  ],
+  "__attribute__pages#pages#content#color#default": [
+    "content/pages/about.md"
+  ],
   "content/pages/home.md": {
     "blocks": [
       {
@@ -6751,5 +8355,77 @@
       }
     ],
     "$_body": ""
-  }
+  },
+  "__attribute__pages#pages#hero#headline#Welcome to the Tina Starter.": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#text#This project is set up to show you the basics of working with Tina. You're looking at the landing pa": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#actions#label#Get Started": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#actions#type#button": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#actions#icon#true": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#actions#link#/posts": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#actions#label#Read Blog": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#actions#type#link": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#image#alt#Tina": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#hero#color#default": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#icon#color#red": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#icon#style#float": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#icon#name#code": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#title#Amazing Feature": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#text#Aliquam blandit felis rhoncus, eleifend ipsum in, condimentum nibh. Praesent ac faucibus risus, eu l": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#icon#color#primary": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#icon#name#like": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#title#This Is a Feature": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#text#Vestibulum ante ipsum primis in faucibus orci luctus et ultrices.": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#icon#color#green": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#icon#name#palette": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#title#Configurable Theme": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#items#text#Edit global theme configuration with Tina. Change your theme's primary color, font, or icon set.": [
+    "content/pages/home.md"
+  ],
+  "__attribute__pages#pages#features#color#tint": [
+    "content/pages/home.md"
+  ]
 }

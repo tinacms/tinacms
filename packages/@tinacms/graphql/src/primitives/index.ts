@@ -18,7 +18,7 @@ import { resolve } from './resolve'
 import { buildASTSchema } from 'graphql'
 import { GithubBridge } from './database/bridge/github'
 import { simpleCache } from '../cache/lru'
-import { createDatabase } from './database'
+import { createDatabase, Database } from './database'
 
 export { createDatabase, resolve, indexDB }
 export type { TinaCloudSchema } from './types'
@@ -76,17 +76,17 @@ export const githubRoute = async ({
   })
 }
 
-export const buildSchema = async (rootPath: string) => {
+export const buildSchema = async (
+  rootPath: string,
+  database: Database,
+  experimentalData?: boolean
+) => {
   const config = await fs
     .readFileSync(
       path.join(rootPath, '.tina', '__generated__', 'config', 'schema.json')
     )
     .toString()
-  const database = await createDatabase({
-    rootPath,
-  })
-
-  await indexDB({ database, config: JSON.parse(config) })
+  await indexDB({ database, config: JSON.parse(config), experimentalData })
   const gqlAst = await database.getGraphQLSchema()
   return buildASTSchema(gqlAst)
 }

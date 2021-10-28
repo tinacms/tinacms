@@ -252,10 +252,12 @@ export const resolve = async ({
            * eg `getMovieDocument.data.actors`
            */
           case 'multiCollectionDocumentList':
-            assertShape<string[]>(value, (yup) => yup.array().of(yup.string()))
-            return resolver.resolveCollectionConnections({
-              ids: value || [],
-            })
+            return {
+              totalCount: value.length,
+              edges: value.map((document) => {
+                return { node: document }
+              }),
+            }
           /**
            * Collections-specific getter
            * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
@@ -368,6 +370,7 @@ export const resolve = async ({
     })
     return res
   } catch (e) {
+    console.log(e)
     if (e instanceof GraphQLError) {
       return {
         errors: [e],

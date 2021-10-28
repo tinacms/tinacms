@@ -62,6 +62,7 @@
     "esbuild-jest": "^0.5.0",
     "estree-walker": "^3.0.0",
     "fast-glob": "^3.2.5",
+    "flat": "^5.0.2",
     "fs-extra": "^9.0.1",
     "graphql": "^15.3.0",
     "graphql-type-json": "^0.3.2",

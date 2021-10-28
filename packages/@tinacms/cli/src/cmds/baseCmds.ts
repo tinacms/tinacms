@@ -27,61 +27,49 @@ const startServerPortOption = {
   name: '--port <port>',
   description: 'Specify a port to run the server on. (default 4001)',
 }
-const auditFixOption = {
-  name: '--fix',
-  description: 'Fix errors in the .tina folder configuration',
-}
-const schemaDumpOption = {
-  name: '--folder <folder>',
-  description: 'Dump the schema into the given path',
-}
-const migrateDryRunOption = {
-  name: '--dry-run',
-  description: 'Audit the .forestry config without migrating',
+const experimentalDatalayer = {
+  name: '--experimentalData',
+  description: 'Build the server with additional data querying capabilities',
 }
 const subCommand = {
   name: '-c, --command <command>',
   description: 'The sub-command to run',
 }
-const experimentalCommand = {
-  name: '--experimental',
-  description: 'Run the unstable version of this service',
-}
 const noWatchOption = {
   name: '--noWatch',
-  description: 'Don\'t regenerate config on file changes'
-}
-const pathOption = {
-  name: '--root',
-  description:
-    'Specify to use the .tina folder in the root of your repository for the schema',
+  description: "Don't regenerate config on file changes",
 }
 
 export const baseCmds: Command[] = [
   {
     command: CMD_START_SERVER,
     description: 'Start Filesystem Graphql Server',
-    options: [startServerPortOption, subCommand, experimentalCommand, noWatchOption],
-    action: options => chain([startServer], options),
+    options: [
+      startServerPortOption,
+      subCommand,
+      experimentalDatalayer,
+      noWatchOption,
+    ],
+    action: (options) => chain([startServer], options),
   },
   {
     command: CMD_COMPILE_MODELS,
     description: 'Compile schema into static files for the server',
-    options: [experimentalCommand],
-    action: options => chain([compile], options),
+    options: [experimentalDatalayer],
+    action: (options) => chain([compile], options),
   },
   {
     command: CMD_GEN_TYPES,
     description:
       "Generate a GraphQL query for your site's schema, (and optionally Typescript types)",
-    options: [experimentalCommand],
-    action: options => chain([attachSchema, genTypes], options),
+    options: [experimentalDatalayer],
+    action: (options) => chain([attachSchema, genTypes], options),
   },
   {
     command: INIT,
-    options: [experimentalCommand],
+    options: [experimentalDatalayer],
     description: 'Add Tina Cloud to an existing project',
-    action: options =>
+    action: (options) =>
       chain(
         [
           initTina,

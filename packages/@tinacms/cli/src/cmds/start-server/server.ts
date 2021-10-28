@@ -11,17 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import path from 'path'
 import cors from 'cors'
 import http from 'http'
 import express from 'express'
 import { altairExpress } from 'altair-express-middleware'
 // @ts-ignore
 import bodyParser from 'body-parser'
-import { gql } from '@tinacms/graphql'
 
 const GITHUB_ACCESS_TOKEN = process.env.GITHUB_PERSONAL_ACCESS_TOKEN
-const gqlServer = async () => {
+const gqlServer = async (database) => {
   // This is lazily required so we can update the module
   // without having to restart the server
   const gqlPackage = require('@tinacms/graphql')
@@ -52,11 +50,10 @@ const gqlServer = async () => {
     })
   )
 
-  const rootPath = path.join(process.cwd())
   app.post('/graphql', async (req, res) => {
     const { query, variables } = req.body
-    const result = await gqlPackage.gql({
-      rootPath,
+    const result = await gqlPackage.resolve({
+      database,
       query,
       variables,
     })
@@ -70,11 +67,11 @@ const gqlServer = async () => {
       const result = await gqlPackage.listBranches({
         auth: GITHUB_ACCESS_TOKEN,
         owner,
-        repo
+        repo,
       })
 
       return res.json(result.data)
-    } catch(error) {
+    } catch (error) {
       console.error('There was a problem fetching the branches.', error)
     }
   })
@@ -87,10 +84,10 @@ const gqlServer = async () => {
         owner,
         repo,
         baseBranch,
-        name
+        name,
       })
       return res.json(result)
-    } catch(error) {
+    } catch (error) {
       res.end()
       console.error('There was a problem creating a new branch.', error)
     }

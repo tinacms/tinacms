@@ -13,7 +13,14 @@ limitations under the License.
 
 import childProcess from 'child_process'
 import path from 'path'
-import { buildSchema } from '@tinacms/graphql'
+import {
+  buildSchema,
+  createDatabase,
+  MemoryStore,
+  GithubStore,
+  GithubBridge,
+  FilesystemBridge,
+} from '@tinacms/graphql'
 import { genTypes } from '../query-gen'
 import { compile } from '../compile'
 import chokidar from 'chokidar'
@@ -23,7 +30,7 @@ import { logger } from '../../logger'
 interface Options {
   port?: number
   command?: string
-  experimental?: boolean
+  experimentalData?: boolean
   noWatch?: boolean
 }
 
@@ -32,8 +39,28 @@ const gqlPackageFile = require.resolve('@tinacms/graphql')
 export async function startServer(
   _ctx,
   _next,
-  { port = 4001, command, experimental, noWatch }: Options
+  { port = 4001, command, noWatch, experimentalData }: Options
 ) {
+  const rootPath = process.cwd()
+  const database = await createDatabase({
+    store: new MemoryStore(rootPath),
+    bridge: new FilesystemBridge(rootPath),
+    // bridge: new GithubBridge({
+    //   rootPath: 'examples/tina-cloud-starter',
+    //   accessToken: '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',
+    //   owner: 'tinacms',
+    //   repo: 'tinacms',
+    //   ref: 'main',
+    // }),
+    // store: new GithubStore({
+    //   rootPath: 'examples/tina-cloud-starter',
+    //   accessToken: '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',
+    //   owner: 'tinacms',
+    //   repo: 'tinacms',
+    //   ref: 'main',
+    // }),
+  })
+
   const startSubprocess = () => {
     if (typeof command === 'string') {
       const commands = command.split(' ')
@@ -60,7 +87,6 @@ stack: ${code.stack || 'No stack was provided'}`)
       })
     }
   }
-  const rootPath = process.cwd()
   let ready = false
   if (!noWatch && !process.env.CI) {
     chokidar
@@ -75,6 +101,10 @@ stack: ${code.stack || 'No stack was provided'}`)
           startSubprocess()
         } catch (e) {
           logger.info(dangerText(`${e.message}`))
+          // FIXME: make this a debug flag
+          if (true) {
+            console.log(e)
+          }
           process.exit(0)
         }
       })
@@ -96,7 +126,7 @@ stack: ${code.stack || 'No stack was provided'}`)
 
   const build = async () => {
     await compile(null, null)
-    const schema = await buildSchema(rootPath)
+    const schema = await buildSchema(rootPath, database, experimentalData)
     await genTypes({ schema }, () => {}, {})
   }
 
@@ -109,7 +139,7 @@ stack: ${code.stack || 'No stack was provided'}`)
 
   const start = async () => {
     const s = require('./server')
-    state.server = await s.default(experimental)
+    state.server = await s.default(database)
 
     state.server.listen(port, () => {
       logger.info(`Started Filesystem GraphQL server on port: ${port}`)

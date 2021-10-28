@@ -11,30 +11,25 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import _ from 'lodash'
-import * as yup from 'yup'
-import matter from 'gray-matter'
 import path from 'path'
-import { NAMER } from '../ast-builder'
-import { Bridge, FilesystemBridge } from './bridge'
-import { createSchema } from '../schema'
-import { assertShape, lastItem } from '../util'
-import { MemoryStore } from './store/memory'
 import { GraphQLError } from 'graphql'
+import { createSchema } from '../schema'
+import { lastItem } from '../util'
+import { stringifyFile } from './util'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
 import type { TinaCloudSchemaBase } from '../types'
 import type { Store } from './store'
+import type { Bridge } from './bridge'
 
-type CreateDatabase = { rootPath?: string; bridge?: Bridge; store?: Store }
+type CreateDatabase = { bridge?: Bridge; store?: Store }
 
 export const createDatabase = async (config: CreateDatabase) => {
-  const rootPath = config.rootPath || ''
   return new Database({
     ...config,
-    bridge: config.bridge || new FilesystemBridge(rootPath),
-    store: config.store || new MemoryStore(rootPath),
+    bridge: config.bridge,
+    store: config.store,
   })
 }
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
@@ -74,6 +69,9 @@ export class Database {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
       const contentObject = await this.store.get(filepath)
+      if (!contentObject) {
+        throw new GraphQLError(`Unable to find record ${filepath}`)
+      }
       const templateName =
         hasOwnProperty(contentObject, '_template') &&
         typeof contentObject._template === 'string'
@@ -164,7 +162,7 @@ export class Database {
         payload = data
       }
       const extension = path.extname(filepath)
-      const stringData = this.stringifyFile(
+      const stringData = stringifyFile(
         payload,
         extension,
         templateInfo.type === 'union'
@@ -208,35 +206,18 @@ export class Database {
     return this.tinaSchema
   }
 
-  public getDocument = async (fullPath: unknown) => {
-    if (typeof fullPath !== 'string') {
-      throw new Error(`fullPath must be of type string for getDocument request`)
-    }
-    const data = await this.get<{
-      _collection: string
-      _template: string
-    }>(fullPath)
-    return {
-      __typename: NAMER.documentTypeName([data._collection]),
-      id: fullPath,
-      data,
-    }
-  }
-
   public documentExists = async (fullpath: unknown) => {
     try {
-      await this.getDocument(fullpath)
+      // @ts-ignore assert is string
+      await this.get(fullpath)
     } catch (e) {
       return false
     }
 
     return true
   }
-
-  public getDocumentsForCollection = async (collectionName: string) => {
-    const tinaSchema = await this.getSchema()
-    const collection = await tinaSchema.getCollection(collectionName)
-    return this.store.glob(collection.path)
+  public query = async (queryStrings: string[], callback) => {
+    return await this.store.query(queryStrings, callback)
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
@@ -248,59 +229,6 @@ export class Database {
     }
     await this.put('_lookup', { ...lookupMap, [lookup.type]: lookup })
   }
-
-  private stringifyFile = (
-    content: object,
-    format: FormatType | string, // FIXME
-    /** For non-polymorphic documents we don't need the template key */
-    keepTemplateKey: boolean
-  ): string => {
-    switch (format) {
-      case '.markdown':
-      case '.mdx':
-      case '.md':
-        // @ts-ignore
-        const { _id, _template, _collection, $_body, ...rest } = content
-        const extra: { [key: string]: string } = {}
-        if (keepTemplateKey) {
-          extra['_template'] = _template
-        }
-        return matter.stringify(
-          typeof $_body === 'undefined' ? '' : `\n${$_body}`,
-          { ...rest, ...extra }
-        )
-      case '.json':
-        return JSON.stringify(content, null, 2)
-      default:
-        throw new Error(`Must specify a valid format, got ${format}`)
-    }
-  }
-
-  public parseFile = <T extends object>(
-    content: string,
-    format: FormatType | string, // FIXME
-    yupSchema: (args: typeof yup) => yup.ObjectSchema<any>
-  ): T => {
-    switch (format) {
-      case '.markdown':
-      case '.mdx':
-      case '.md':
-        const contentJSON = matter(content || '')
-        const markdownData = {
-          ...contentJSON.data,
-          $_body: contentJSON.content,
-        }
-        assertShape<T>(markdownData, yupSchema)
-        return markdownData
-      case '.json':
-        if (!content) {
-          return {} as T
-        }
-        return JSON.parse(content)
-      default:
-        throw new Error(`Must specify a valid format, got ${format}`)
-    }
-  }
 }
 
 function hasOwnProperty<X extends {}, Y extends PropertyKey>(
@@ -309,8 +237,6 @@ function hasOwnProperty<X extends {}, Y extends PropertyKey>(
 ): obj is X & Record<Y, unknown> {
   return obj.hasOwnProperty(prop)
 }
-
-type FormatType = 'json' | 'md' | 'mdx' | 'markdown'
 
 export type LookupMapType =
   | GlobalDocumentLookup

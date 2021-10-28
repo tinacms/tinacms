@@ -12,10 +12,15 @@ limitations under the License.
 */
 
 export interface Store {
-  glob(pattern: string): Promise<string[]>
+  glob(
+    pattern: string,
+    hydrator?: (fullPath: string) => Promise<object>
+  ): Promise<string[]>
   get(filepath: string): Promise<object>
-  clear(): Promise<void>
-  print(): Promise<void>
+  query(
+    queryStrings: string[],
+    hydrator?: (fullPath: string) => Promise<object>
+  ): Promise<object[]>
   put(
     filepath: string,
     data: object,

@@ -11,7 +11,6 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import _ from 'lodash'
 import { Database } from '../database'
 import { astBuilder, NAMER } from '../ast-builder'
 import { sequential } from '../util'
@@ -31,15 +30,18 @@ import type {
   Templateable,
 } from '../types'
 import { TinaSchema } from '../schema'
+import { String } from 'aws-sdk/clients/apigateway'
 
 export const createBuilder = async ({
   database,
   tinaSchema,
+  experimentalData,
 }: {
   database: Database
   tinaSchema: TinaSchema
+  experimentalData?: boolean
 }) => {
-  return new Builder({ database, tinaSchema: tinaSchema })
+  return new Builder({ database, tinaSchema: tinaSchema, experimentalData })
 }
 
 /**
@@ -51,9 +53,17 @@ export class Builder {
   // public baseSchema: TinaCloudSchemaBase;
   public tinaSchema: TinaSchema
   public database: Database
-  constructor(public config: { database: Database; tinaSchema: TinaSchema }) {
+  private experimentalData: boolean
+  constructor(
+    public config: {
+      database: Database
+      tinaSchema: TinaSchema
+      experimentalData?: boolean
+    }
+  ) {
     this.tinaSchema = config.tinaSchema
     this.database = config.database
+    this.experimentalData = !!config.experimentalData
   }
   /**
    * ```graphql
@@ -542,6 +552,7 @@ export class Builder {
       connectionName,
       nodeType: NAMER.documentTypeName(collection.namespace),
       namespace: collection.namespace,
+      collection,
     })
   }
 
@@ -600,6 +611,40 @@ export class Builder {
           type: 'JSON',
         }),
       ],
+    })
+  }
+
+  private _filterCollectionDocumentType = async (
+    collection: Collectable
+  ): Promise<InputObjectTypeDefinitionNode> => {
+    const t = this.tinaSchema.getTemplatesForCollectable(collection)
+    if (t.type === 'union') {
+      return astBuilder.InputObjectTypeDefinition({
+        name: NAMER.dataFilterTypeName(t.namespace),
+        fields: await sequential(t.templates, async (template) => {
+          return astBuilder.InputValueDefinition({
+            name: template.namespace[template.namespace.length - 1],
+            type: await this._buildTemplateFilter(template),
+          })
+        }),
+      })
+    }
+
+    return this._buildTemplateFilter(t.template)
+  }
+
+  private _buildTemplateFilter = async (template: Templateable) => {
+    const fields = []
+    await sequential(template.fields, async (field) => {
+      const f = await this._buildFieldFilter(field)
+      if (f) {
+        fields.push(f)
+      }
+      return true
+    })
+    return astBuilder.InputObjectTypeDefinition({
+      name: NAMER.dataFilterTypeName(template.namespace),
+      fields: fields,
     })
   }
 
@@ -681,7 +726,138 @@ export class Builder {
       namespace: connectionNamespace,
       connectionName,
       nodeType: nodeType,
+      collections,
     })
+  }
+
+  private _buildFieldFilter = async (field: TinaFieldEnriched) => {
+    switch (field.type) {
+      case 'boolean':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          type: astBuilder.InputObjectTypeDefinition({
+            name: NAMER.dataFilterTypeName([field.type]),
+            fields: [
+              astBuilder.InputValueDefinition({
+                name: 'eq',
+                type: astBuilder.TYPES.Boolean,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'exists',
+                type: astBuilder.TYPES.Boolean,
+              }),
+            ],
+          }),
+        })
+      case 'number':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          type: astBuilder.InputObjectTypeDefinition({
+            name: NAMER.dataFilterTypeName([field.type]),
+            fields: [
+              astBuilder.InputValueDefinition({
+                name: 'lt',
+                type: astBuilder.TYPES.Number,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'lte',
+                type: astBuilder.TYPES.Number,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'gte',
+                type: astBuilder.TYPES.Number,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'gt',
+                type: astBuilder.TYPES.Number,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'eq',
+                type: astBuilder.TYPES.Number,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'exists',
+                type: astBuilder.TYPES.Boolean,
+              }),
+            ],
+          }),
+        })
+      case 'datetime':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          type: astBuilder.InputObjectTypeDefinition({
+            name: NAMER.dataFilterTypeName([field.type]),
+            fields: [
+              astBuilder.InputValueDefinition({
+                name: 'after',
+                type: astBuilder.TYPES.String,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'before',
+                type: astBuilder.TYPES.String,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'eq',
+                type: astBuilder.TYPES.String,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'exists',
+                type: astBuilder.TYPES.Boolean,
+              }),
+            ],
+          }),
+        })
+      case 'image':
+      case 'string':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          type: astBuilder.InputObjectTypeDefinition({
+            name: NAMER.dataFilterTypeName([field.type]),
+            fields: [
+              astBuilder.InputValueDefinition({
+                name: 'startsWith',
+                type: astBuilder.TYPES.String,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'eq',
+                type: astBuilder.TYPES.String,
+              }),
+              astBuilder.InputValueDefinition({
+                name: 'exists',
+                type: astBuilder.TYPES.Boolean,
+              }),
+            ],
+          }),
+        })
+      case 'object':
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          type: await this._filterCollectionDocumentType(field),
+        })
+      case 'rich-text':
+        if (!field.templates) {
+          return false
+        }
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          type: await this._filterCollectionDocumentType(field),
+        })
+      case 'reference':
+        const filter = await this._connectionFilterBuilder({
+          fieldName: field.name,
+          namespace: field.namespace,
+          collections: await this.tinaSchema.getCollectionsByName(
+            field.collections
+          ),
+        })
+        return astBuilder.InputValueDefinition({
+          name: field.name,
+          type: astBuilder.InputObjectTypeDefinition({
+            name: NAMER.dataFilterTypeName(field.namespace),
+            fields: [filter],
+          }),
+        })
+    }
   }
 
   private _buildFieldMutation = async (field: TinaFieldEnriched) => {
@@ -777,21 +953,74 @@ export class Builder {
     return this._buildTemplateData(collectableTemplate.template)
   }
 
+  private _connectionFilterBuilder = async ({
+    fieldName,
+    namespace,
+    collection,
+    collections,
+  }: {
+    fieldName: string
+    namespace: string[]
+    collection?: Collectable
+    collections?: Collectable[]
+  }) => {
+    let filter
+    if (collections) {
+      filter = astBuilder.InputValueDefinition({
+        name: 'filter',
+        type: astBuilder.InputObjectTypeDefinition({
+          name: NAMER.dataFilterTypeName(namespace),
+          fields: await sequential(collections, async (collection) => {
+            return astBuilder.InputValueDefinition({
+              // @ts-ignore
+              name: collection.name,
+              type: await this._filterCollectionDocumentType(collection),
+            })
+          }),
+        }),
+      })
+    } else if (collection) {
+      filter = astBuilder.InputValueDefinition({
+        name: 'filter',
+        type: await this._filterCollectionDocumentType(collection),
+      })
+    } else {
+      throw new Error(
+        `Must provide either collection or collections to filter field builder`
+      )
+    }
+    return filter
+  }
+
   private _connectionFieldBuilder = async ({
     fieldName,
     namespace,
     connectionName,
     nodeType,
+    collection,
+    collections,
   }: {
     fieldName: string
     namespace: string[]
     connectionName: string
     nodeType: string | TypeDefinitionNode
+    collection?: Collectable
+    collections?: Collectable[]
   }) => {
+    const extra = this.experimentalData
+      ? [
+          await this._connectionFilterBuilder({
+            fieldName,
+            namespace,
+            collection,
+            collections,
+          }),
+        ]
+      : []
     return astBuilder.FieldDefinition({
       name: fieldName,
       required: true,
-      args: [...listArgs],
+      args: [...listArgs, ...extra],
       type: astBuilder.ObjectTypeDefinition({
         name: connectionName,
         interfaces: [
