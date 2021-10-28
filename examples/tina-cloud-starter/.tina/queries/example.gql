@@ -3,3 +3,9 @@ query getCollections {
     name
   }
 }
+
+query getCollectionsasdf {
+  getCollections {
+    name
+  }
+}
