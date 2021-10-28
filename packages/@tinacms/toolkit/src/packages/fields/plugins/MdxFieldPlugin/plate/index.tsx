@@ -41,6 +41,7 @@ import {
   createSelectOnBackspacePlugin,
   createSoftBreakPlugin,
   createExitBreakPlugin,
+  useEditorRef,
 } from '@udecode/plate'
 import { wrapFieldsWithMeta } from '../../wrapFieldWithMeta'
 
@@ -59,7 +60,10 @@ export const RichEditor = wrapFieldsWithMeta<
 >((props) => {
   const [value, setValue] = React.useState(
     props.input.value.children
-      ? [...props.input.value.children?.map(normalize)]
+      ? [
+          ...props.input.value.children?.map(normalize),
+          { type: 'p', children: [{ type: 'text', text: '' }] },
+        ]
       : // Empty values need at least one item
         [{ type: 'p', children: [{ type: 'text', text: '' }] }]
   )
