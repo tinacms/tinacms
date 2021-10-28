@@ -14,7 +14,7 @@ limitations under the License.
 import _ from 'lodash'
 import path from 'path'
 import { Octokit } from '@octokit/rest'
-import { Bridge } from './bridge'
+import { Bridge } from '.'
 import LRU from 'lru-cache'
 import { GraphQLError } from 'graphql'
 

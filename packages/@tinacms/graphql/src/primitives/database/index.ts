@@ -19,28 +19,37 @@ import { NAMER } from '../ast-builder'
 import { Bridge, FilesystemBridge } from './bridge'
 import { createSchema } from '../schema'
 import { assertShape, lastItem } from '../util'
+import { MemoryStore } from './store/memory'
+import { GraphQLError } from 'graphql'
 
+import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
 import type { TinaCloudSchemaBase } from '../types'
-import { DocumentNode, GraphQLError } from 'graphql'
+import type { Store } from './store'
 
-type CreateDatabase = { rootPath?: string; bridge?: Bridge }
+type CreateDatabase = { rootPath?: string; bridge?: Bridge; store?: Store }
 
 export const createDatabase = async (config: CreateDatabase) => {
-  return new Database(config)
+  const rootPath = config.rootPath || ''
+  return new Database({
+    ...config,
+    bridge: config.bridge || new FilesystemBridge(rootPath),
+    store: config.store || new MemoryStore(rootPath),
+  })
 }
-
 const SYSTEM_FILES = ['_schema', '_graphql', '_lookup']
 const GENERATED_FOLDER = path.join('.tina', '__generated__')
 
 export class Database {
   public bridge: Bridge
+  public store: Store
   private tinaSchema: TinaSchema | undefined
   private _lookup: { [returnType: string]: LookupMapType } | undefined
   private _graphql: DocumentNode | undefined
   private _tinaSchema: TinaCloudSchemaBase | undefined
   constructor(public config: CreateDatabase) {
-    this.bridge = config.bridge || new FilesystemBridge(config.rootPath || '')
+    this.bridge = config.bridge
+    this.store = config.store
   }
 
   public get = async <T extends object>(filepath: string): Promise<T> => {
@@ -64,12 +73,7 @@ export class Database {
     } else {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
-      const contentString = await this.bridge.get(filepath)
-      const contentObject = this.parseFile<{ [key: string]: unknown }>(
-        contentString,
-        extension,
-        (yup) => yup.object({})
-      )
+      const contentObject = await this.store.get(filepath)
       const templateName =
         hasOwnProperty(contentObject, '_template') &&
         typeof contentObject._template === 'string'
@@ -166,6 +170,7 @@ export class Database {
         templateInfo.type === 'union'
       )
       await this.bridge.put(filepath, stringData)
+      await this.store.put(filepath, payload)
     }
     return true
   }
@@ -231,7 +236,7 @@ export class Database {
   public getDocumentsForCollection = async (collectionName: string) => {
     const tinaSchema = await this.getSchema()
     const collection = await tinaSchema.getCollection(collectionName)
-    return this.bridge.glob(collection.path)
+    return this.store.glob(collection.path)
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {
@@ -271,7 +276,7 @@ export class Database {
     }
   }
 
-  private parseFile = <T extends object>(
+  public parseFile = <T extends object>(
     content: string,
     format: FormatType | string, // FIXME
     yupSchema: (args: typeof yup) => yup.ObjectSchema<any>

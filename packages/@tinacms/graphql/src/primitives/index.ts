@@ -16,7 +16,7 @@ import path from 'path'
 import { indexDB } from './build'
 import { resolve } from './resolve'
 import { buildASTSchema } from 'graphql'
-import { GithubBridge } from './database/github'
+import { GithubBridge } from './database/bridge/github'
 import { simpleCache } from '../cache/lru'
 import { createDatabase } from './database'
 

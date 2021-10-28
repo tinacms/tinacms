@@ -17,18 +17,46 @@ import { sequential } from './util'
 import { createBuilder } from './builder'
 import { createSchema } from './schema'
 import { extractInlineTypes } from './ast-builder'
+import path from 'path'
 
-import type { FieldDefinitionNode } from 'graphql'
+import { FieldDefinitionNode, graphql } from 'graphql'
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
+import { Database } from './database'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
-export const indexDB = async ({ database, config }) => {
+export const indexDB = async ({
+  database,
+  config,
+}: {
+  database: Database
+  config: TinaSchema['config']
+}) => {
   const tinaSchema = await createSchema({ schema: config })
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   await database.put('_graphql', graphQLSchema)
+  // @ts-ignore
   await database.put('_schema', tinaSchema.schema)
+  await database.store.put('_graphql', graphQLSchema)
+  await database.store.put('_schema', tinaSchema.schema)
+  await _indexContent(tinaSchema, database)
+}
+
+const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
+  await sequential(tinaSchema.getCollections(), async (collection) => {
+    const documents = await database.bridge.glob(collection.path)
+    await sequential(documents, async (documentPath) => {
+      const dataString = await database.bridge.get(documentPath)
+      const data = await database.parseFile(
+        dataString,
+        path.extname(documentPath),
+        (yup) => yup.object({})
+      )
+      await database.store.put(documentPath, data)
+    })
+  })
+  await database.store.print()
 }
 
 const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {

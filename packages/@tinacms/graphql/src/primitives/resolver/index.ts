@@ -460,12 +460,9 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'rich-text':
-        if (typeof value === 'string') {
-          const tree = parseMDX(value, field)
-          accumulator[field.name] = tree
-        } else {
-          throw new Error(`Expected value for rich-text to be of type string`)
-        }
+        // @ts-ignore value is unknown
+        const tree = parseMDX(value, field)
+        accumulator[field.name] = tree
         break
       case 'object':
         if (field.list) {
