@@ -626,8 +626,6 @@ export type GetCollectionsasdfQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetCollectionsasdfQuery = { __typename?: 'Query', getCollections: Array<{ __typename?: 'Collection', name: string }> };
 
-export type GetPostsDocumentPartsTestFragment = { __typename?: 'PostsDocument', form: any };
-
 export type PostsPartsFragment = { __typename?: 'Posts', title?: Maybe<string>, date?: Maybe<string>, heroImg?: Maybe<string>, excerpt?: Maybe<string>, _body?: Maybe<string> };
 
 export type GlobalPartsFragment = { __typename?: 'Global', header?: Maybe<{ __typename?: 'GlobalHeader', color?: Maybe<string>, icon?: Maybe<{ __typename?: 'GlobalHeaderIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }>, nav?: Maybe<Array<Maybe<{ __typename?: 'GlobalHeaderNav', href?: Maybe<string>, label?: Maybe<string> }>>> }>, footer?: Maybe<{ __typename?: 'GlobalFooter', color?: Maybe<string>, social?: Maybe<{ __typename?: 'GlobalFooterSocial', facebook?: Maybe<string>, twitter?: Maybe<string>, instagram?: Maybe<string>, github?: Maybe<string> }> }>, theme?: Maybe<{ __typename?: 'GlobalTheme', color?: Maybe<string>, font?: Maybe<string>, icon?: Maybe<string>, darkMode?: Maybe<string> }> };
@@ -684,11 +682,6 @@ export type GetPagesListQueryVariables = Exact<{ [key: string]: never; }>;
 
 export type GetPagesListQuery = { __typename?: 'Query', getPagesList: { __typename?: 'PagesConnection', totalCount: number, edges?: Maybe<Array<Maybe<{ __typename?: 'PagesConnectionEdges', node?: Maybe<{ __typename?: 'PagesDocument', id: string, data: { __typename?: 'Pages', blocks?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHero', tagline?: Maybe<string>, headline?: Maybe<string>, text?: Maybe<string>, color?: Maybe<string>, actions?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksHeroActions', label?: Maybe<string>, type?: Maybe<string>, icon?: Maybe<boolean>, link?: Maybe<string> }>>>, image?: Maybe<{ __typename?: 'PagesBlocksHeroImage', src?: Maybe<string>, alt?: Maybe<string> }> } | { __typename?: 'PagesBlocksFeatures', color?: Maybe<string>, items?: Maybe<Array<Maybe<{ __typename?: 'PagesBlocksFeaturesItems', title?: Maybe<string>, text?: Maybe<string>, icon?: Maybe<{ __typename?: 'PagesBlocksFeaturesItemsIcon', color?: Maybe<string>, style?: Maybe<string>, name?: Maybe<string> }> }>>> } | { __typename?: 'PagesBlocksContent', body?: Maybe<string>, color?: Maybe<string> } | { __typename?: 'PagesBlocksTestimonial', quote?: Maybe<string>, author?: Maybe<string>, color?: Maybe<string> }>>> } }> }>>> } };
 
-export const GetPostsDocumentPartsTestFragmentDoc = gql`
-    fragment getPostsDocumentPartsTest on PostsDocument {
-  form
-}
-    `;
 export const PostsPartsFragmentDoc = gql`
     fragment PostsParts on Posts {
   title
