@@ -1,5 +1,10 @@
 fragment PostsParts on Posts {
   title
+  author {
+    ... on Document {
+      id
+    }
+  }
   date
   heroImg
   excerpt
