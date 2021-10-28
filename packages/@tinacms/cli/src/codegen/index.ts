@@ -32,31 +32,44 @@ export const generateTypes = async (
 ) => {
   logger.info('Generating types...')
   try {
-    const moreDocs = await loadDocuments(
-      `fragment getPostsDocumentPartsTest on PostsDocument {
-      form
-    }
-    `,
-      { loaders: [] }
-    )
     let docs = []
     let fragDocs = []
+
+    // Load GQL queries from user queries folder
     try {
       docs = await loadDocuments(queryPathGlob, {
         loaders: [new GraphQLFileLoader()],
       })
+    } catch (e) {
+      let showErrorMessage = true
+      const message: string = e.message || ''
+      if (
+        message.includes(
+          'Unable to find any GraphQL type definitions for the following pointers:'
+        )
+      ) {
+        showErrorMessage = false
+      }
+      if (showErrorMessage) {
+        console.error(e)
+      }
+    }
+
+    // Load fragments from generated document
+    try {
       fragDocs = await loadDocuments(fragDocPath, {
         loaders: [new GraphQLFileLoader()],
       })
-    } catch (e) {
-      console.error(e)
+    } catch (error) {
+      console.error(error)
     }
+
     // See https://www.graphql-code-generator.com/docs/getting-started/programmatic-usage for more details
     const res = await codegen({
       // Filename is not used. This is because the typescript plugin returns a string instead of writing to a file.
       filename: process.cwd(),
       schema: parse(printSchema(schema)),
-      documents: [...docs, ...moreDocs, ...fragDocs],
+      documents: [...docs, ...fragDocs],
       config: {},
       plugins: [
         { typescript: {} },

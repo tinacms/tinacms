@@ -24,8 +24,6 @@ import { extractInlineTypes } from './ast-builder'
 
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
-import { buildSKD } from '../sdkBuilder'
-import { Database } from './database'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
 export const indexDB = async ({ database, config }) => {
@@ -166,10 +164,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
 
   await fs.outputFileSync(fragPath + 'queries.gql', print(queryDoc))
   await fs.outputFileSync(fragPath + 'queries.json', JSON.stringify(fragPath))
-
-  const sdk = buildSKD(tinaSchema)
-  const clientPath = process.cwd() + '/.tina/__generated__/client.ts'
-  await fs.outputFileSync(clientPath, sdk)
 
   return doc
 }
