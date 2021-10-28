@@ -39,6 +39,10 @@ const ToggleButton = () => {
         href="/admin"
         style={{
           borderRadius: '0 50px 50px 0',
+          fontSize: '16px',
+          fontFamily:
+            "Inter, 'Helvetica Neue', 'Arial Nova', Helvetica, Arial, sans-serif",
+          fontWeight: 'bold',
           textDecoration: 'none',
           background: 'rgb(34, 150, 254)',
           boxShadow:

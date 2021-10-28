@@ -381,7 +381,6 @@ export const CodeMirrorCss = css`
     white-space: pre;
     word-wrap: normal;
     line-height: inherit;
-    color: inherit;
     z-index: 2;
     position: relative;
     overflow: visible;
