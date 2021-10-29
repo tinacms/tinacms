@@ -1,5 +1,15 @@
 # tina-graphql
 
+## 0.56.0
+
+### Minor Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+
+### Patch Changes
+
+- 891623c7c: Adds support for List and Update to TinaAdmin
+
 ## 0.55.2
 
 ### Patch Changes

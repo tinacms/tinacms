@@ -1,5 +1,25 @@
 # Change Log
 
+## 1.1.19
+
+### Patch Changes
+
+- react-tinacms-github@0.51.3
+
+## 1.1.18
+
+### Patch Changes
+
+- react-tinacms-github@0.51.3
+
+## 1.1.17
+
+### Patch Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+- Updated dependencies [b99baebf1]
+  - react-tinacms-github@0.51.2
+
 ## 1.1.16
 
 ### Patch Changes

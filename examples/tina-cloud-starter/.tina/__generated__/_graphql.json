@@ -362,6 +362,42 @@
               }
             }
           }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "form"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "JSON"
+              }
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
+            "value": "values"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NonNullType",
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "JSON"
+              }
+            }
+          }
         }
       ]
     },
@@ -1474,6 +1510,21 @@
           "kind": "FieldDefinition",
           "name": {
             "kind": "Name",
+            "value": "_body"
+          },
+          "arguments": [],
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "JSON"
+            }
+          }
+        },
+        {
+          "kind": "FieldDefinition",
+          "name": {
+            "kind": "Name",
             "value": "title"
           },
           "arguments": [],
@@ -1535,21 +1586,6 @@
           "name": {
             "kind": "Name",
             "value": "excerpt"
-          },
-          "arguments": [],
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
-            }
-          }
-        },
-        {
-          "kind": "FieldDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "_body"
           },
           "arguments": [],
           "type": {
@@ -4232,6 +4268,20 @@
           "kind": "InputValueDefinition",
           "name": {
             "kind": "Name",
+            "value": "_body"
+          },
+          "type": {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "JSON"
+            }
+          }
+        },
+        {
+          "kind": "InputValueDefinition",
+          "name": {
+            "kind": "Name",
             "value": "title"
           },
           "type": {
@@ -4289,20 +4339,6 @@
           "name": {
             "kind": "Name",
             "value": "excerpt"
-          },
-          "type": {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "String"
-            }
-          }
-        },
-        {
-          "kind": "InputValueDefinition",
-          "name": {
-            "kind": "Name",
-            "value": "_body"
           },
           "type": {
             "kind": "NamedType",

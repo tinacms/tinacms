@@ -25,6 +25,7 @@ import {
   ImageFieldPlugin,
   ColorFieldPlugin,
   NumberFieldPlugin,
+  MdxFieldPlugin,
   ToggleFieldPlugin,
   SelectFieldPlugin,
   RadioGroupFieldPlugin,
@@ -54,6 +55,7 @@ const DEFAULT_FIELDS = [
   NumberFieldPlugin,
   ToggleFieldPlugin,
   SelectFieldPlugin,
+  MdxFieldPlugin,
   RadioGroupFieldPlugin,
   GroupFieldPlugin,
   GroupListFieldPlugin,
@@ -107,7 +109,7 @@ export class TinaCMS extends CMS {
       this.toolbar = new ToolbarState(toolbarConfig)
     }
 
-    DEFAULT_FIELDS.forEach(field => {
+    DEFAULT_FIELDS.forEach((field) => {
       if (!this.fields.find(field.name)) {
         this.fields.add(field)
       }

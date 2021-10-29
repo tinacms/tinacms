@@ -45,6 +45,7 @@ const DropArea = styled.div`
 const ImgPlaceholder = styled.div`
   text-align: center;
   border-radius: var(--tina-radius-small);
+  border: 1px solid var(--tina-color-grey-3);
   background-color: var(--tina-color-grey-2);
   color: var(--tina-color-grey-4);
   line-height: 1.35;
@@ -90,11 +91,8 @@ const DeleteButton = styled(IconButton)`
 `
 
 const StyledImageContainer = styled.div`
-  background-color: var(--tina-color-grey-4);
   position: relative;
-  border-radius: var(--tina-radius-small);
   overflow: hidden;
-  background-color: var(--tina-color-grey-8);
   &:hover {
     ${StyledImage} {
       opacity: 0.6;
@@ -147,10 +145,10 @@ export const ImageUpload = ({
             <ImageLoadingIndicator />
           ) : (
             <ImgPlaceholder>
-            Drag 'n' drop a file here,
-            <br />
-            or click to select a file
-          </ImgPlaceholder>
+              Drag 'n' drop a file here,
+              <br />
+              or click to select a file
+            </ImgPlaceholder>
           )}
         </StyledImageContainer>
       )}

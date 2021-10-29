@@ -105,8 +105,10 @@ export const GlobalStyles = createGlobalStyle`
 `
 
 export const tina_reset_styles = css`
+  font-family: 'Inter', sans-serif;
+  color: var(--tina-color-grey-10);
+
   * {
-    font-family: 'Inter', sans-serif;
     &::-webkit-scrollbar {
       width: 8px;
     }
@@ -137,6 +139,9 @@ export const tina_reset_styles = css`
     border-bottom: none;
     height: 0;
     box-sizing: content-box;
+  }
+  *:not([class]) {
+    color: var(--tina-color-grey-10);
   }
   h1,
   h2,
@@ -169,6 +174,8 @@ export const tina_reset_styles = css`
   h4,
   h5,
   h6 {
+    color: var(--tina-color-grey-10);
+
     :not([class]) {
       font-weight: var(--tina-font-weight-bold);
     }
@@ -190,6 +197,10 @@ export const tina_reset_styles = css`
   }
   h6:not([class]) {
     font-size: var(--tina-font-size-2);
+  }
+  p {
+    color: var(--tina-color-grey-8);
+    font-size: var(--tina-font-size-3);
   }
 `
 

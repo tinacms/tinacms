@@ -118,6 +118,7 @@ export const IconButton = styled(Button)`
   flex-shrink: 0;
   justify-content: center;
   align-items: center;
+  min-width: 0;
 
   svg {
     width: 26px;

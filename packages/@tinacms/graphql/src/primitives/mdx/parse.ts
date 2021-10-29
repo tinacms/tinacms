@@ -23,6 +23,7 @@ import { TinaField } from '../..'
 import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
 import type { RichTypeInner } from '../types'
+import { isNull } from 'lodash'
 
 export const parseMDX = (value: string, field: RichTypeInner) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
@@ -92,6 +93,15 @@ export const parseMDXInner = (tree: any, field: RichTypeInner) => {
         typeof template === 'string' ? template : template.name
       return templateName === node.name
     })
+    if (!template) {
+      if (isNull(node.name)) {
+        // this is a fragment <> </>, ignore it
+      } else {
+        throw new Error(
+          `Found unregistered JSX or HTML: <${node.name}>. Please ensure all structured elements have been registered with your schema.`
+        )
+      }
+    }
 
     if (node.children.length > 0) {
       node.attributes.push({
@@ -574,26 +584,24 @@ export default function remarkToSlate(node: MdxAstNode) {
         children: node.children.map(remarkToSlate),
       }
     case 'listItem':
-      // console.log(JSON.stringify(node.children, null, 2))
-      /**
-       * FIXME: The list plugin in the editor will reduce any block-level element to be inline.
-       * So while block-level list item content is valid in markdown. It currently isn't
-       * in this scenario.
-       */
+      const realChildren = []
+      node.children.forEach((child) => {
+        if (child.type === 'list') {
+          realChildren.push({
+            type: child.ordered ? types.ol_list : types.ul_list,
+            children: child.children.map(remarkToSlate),
+          })
+        } else {
+          realChildren.push({
+            type: plateElements.ELEMENT_LIC,
+            // @ts-ignore FIXME: MDAST types don't match with some of these
+            children: child.children.map(remarkToSlate),
+          })
+        }
+      })
       return {
         type: types.listItem,
-        children: [
-          {
-            type: plateElements.ELEMENT_LIC,
-            children: node.children.map(remarkToSlate),
-          },
-        ],
-        // children: node.children.map((item) => {
-        //   return {
-        //     type: plateElements.ELEMENT_LIC,
-        //     children: [remarkToSlate(item)],
-        //   }
-        // }),
+        children: realChildren,
       }
     case 'paragraph':
       return {
@@ -626,10 +634,6 @@ export default function remarkToSlate(node: MdxAstNode) {
           type: 'code_line',
           children: [{ type: 'text', text: item }],
         })),
-        // children: [
-        //   { type: 'code_line', children: [{ type: 'text', text: node.value }] },
-        // ],
-        // value: node.value
       }
 
     // case 'html':

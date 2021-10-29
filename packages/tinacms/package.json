@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.56.3",
+  "version": "0.57.2",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -8,7 +8,8 @@
   "buildConfig": {
     "entryPoints": [
       "src/index.ts",
-      "src/edit-state.tsx"
+      "src/edit-state.tsx",
+      "src/rich-text.tsx"
     ]
   },
   "typings": "dist/index.d.ts",
@@ -54,14 +55,14 @@
     "@types/react": "^16.9.38",
     "@types/yup": "^0.29.10",
     "next": "9.4.2",
-    "react": "16.13.1",
+    "react": "16.14.0",
     "react-dom": "16.13.1",
     "styled-components": "^5.2.0",
     "tsup": "4.12.5",
     "typescript": "^4.3.5"
   },
   "peerDependencies": {
-    "react": ">=16.8",
+    "react": ">=16.14.0",
     "react-dom": ">=16.8",
     "react-is": "^16.13.1 || <18.0.0",
     "styled-components": "*"
