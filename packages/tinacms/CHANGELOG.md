@@ -1,5 +1,12 @@
 # tinacms
 
+## 0.57.3
+
+### Patch Changes
+
+- Updated dependencies [2724c48c0]
+  - @tinacms/toolkit@0.55.2
+
 ## 0.57.2
 
 ### Patch Changes
