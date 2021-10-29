@@ -1,5 +1,14 @@
 query getPostsDocument($relativePath: String!) {
   getPostsDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
     data {
       ...PostsParts
     }
@@ -12,6 +21,14 @@ query getPostsList {
     edges {
       node {
         id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
         data {
           ...PostsParts
         }
@@ -22,6 +39,15 @@ query getPostsList {
 
 query getGlobalDocument($relativePath: String!) {
   getGlobalDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
     data {
       ...GlobalParts
     }
@@ -34,6 +60,14 @@ query getGlobalList {
     edges {
       node {
         id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
         data {
           ...GlobalParts
         }
@@ -44,6 +78,15 @@ query getGlobalList {
 
 query getAuthorsDocument($relativePath: String!) {
   getAuthorsDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
     data {
       ...AuthorsParts
     }
@@ -56,6 +99,14 @@ query getAuthorsList {
     edges {
       node {
         id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
         data {
           ...AuthorsParts
         }
@@ -66,6 +117,15 @@ query getAuthorsList {
 
 query getPagesDocument($relativePath: String!) {
   getPagesDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
     data {
       ...PagesParts
     }
@@ -78,6 +138,14 @@ query getPagesList {
     edges {
       node {
         id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
         data {
           ...PagesParts
         }
