@@ -1,5 +1,13 @@
 # next-tinacms-cloudinary
 
+## 3.3.3
+
+## 3.3.2
+
+### Patch Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+
 ## 3.3.1
 
 ## 3.3.0

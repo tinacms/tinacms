@@ -316,7 +316,7 @@ export function useGraphqlForms<T extends object>({
   return [data as T, isLoading]
 }
 
-const transformDocumentIntoMutationRequestPayload = (
+export const transformDocumentIntoMutationRequestPayload = (
   document: {
     _collection: string
     __typename?: string
@@ -354,11 +354,18 @@ const transformParams = (data: unknown) => {
     const nested = transformParams(rest)
     return { [_template]: nested }
   } catch (e) {
-    const accum = {}
-    Object.entries(data).map(([keyName, value]) => {
-      accum[keyName] = transformParams(value)
-    })
-    return accum
+    if (e.message === 'Failed to assertShape - _template is a required field') {
+      const accum = {}
+      Object.entries(data).map(([keyName, value]) => {
+        accum[keyName] = transformParams(value)
+      })
+      return accum
+    } else {
+      if (!data) {
+        return []
+      }
+      throw e
+    }
   }
 }
 

@@ -1,5 +1,33 @@
 # tina-tailwind-sidebar-demo
 
+## 0.1.10
+
+### Patch Changes
+
+- Updated dependencies [7849c1233]
+  - tinacms@0.57.2
+
+## 0.1.9
+
+### Patch Changes
+
+- Updated dependencies [9c0d48e09]
+  - tinacms@0.57.1
+  - react-tinacms-editor@0.52.3
+  - react-tinacms-inline@0.53.3
+
+## 0.1.8
+
+### Patch Changes
+
+- b99baebf1: Add rich-text editor based on mdx, bump React dependency requirement to 16.14
+- Updated dependencies [891623c7c]
+- Updated dependencies [b99baebf1]
+- Updated dependencies [d5e3adf37]
+  - tinacms@0.57.0
+  - react-tinacms-editor@0.52.2
+  - react-tinacms-inline@0.53.2
+
 ## 0.1.7
 
 ### Patch Changes

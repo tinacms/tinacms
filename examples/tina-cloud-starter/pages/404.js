@@ -1,11 +1,21 @@
-import Link from "next/link";
-import { Layout } from "../components/layout";
+import { Hero } from "../components/blocks/hero";
 
 export default function FourOhFour() {
   return (
-    <Layout>
-      <h2>OOPS, NOTHING TO SEE HERE...</h2>
-      <Link href="/">Go back home</Link>
-    </Layout>
+    <Hero
+      data={{
+        color: "default",
+        headline: "404 – Page Not Found",
+        text: "Oops! It seems there's nothing here, how embarrassing.",
+        actions: [
+          {
+            label: "Return Home",
+            type: "button",
+            icon: true,
+            link: "/",
+          },
+        ],
+      }}
+    />
   );
 }

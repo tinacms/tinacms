@@ -40,6 +40,16 @@ const interfaceDefinitions = [
         type: astBuilder.TYPES.ID,
         required: true,
       }),
+      astBuilder.FieldDefinition({
+        name: 'form',
+        type: astBuilder.TYPES.JSON,
+        required: true,
+      }),
+      astBuilder.FieldDefinition({
+        name: 'values',
+        type: astBuilder.TYPES.JSON,
+        required: true,
+      }),
     ],
   }),
   astBuilder.InterfaceTypeDefinition({
