@@ -1,5 +1,13 @@
 # tina-tailwind-sidebar-demo
 
+## 0.1.11
+
+### Patch Changes
+
+- react-tinacms-editor@0.52.4
+- react-tinacms-inline@0.53.4
+- tinacms@0.57.3
+
 ## 0.1.10
 
 ### Patch Changes
