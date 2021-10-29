@@ -13,6 +13,7 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
+import path from 'path'
 import { print, OperationDefinitionNode } from 'graphql'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
@@ -30,8 +31,84 @@ export const indexDB = async ({ database, config }) => {
   const tinaSchema = await createSchema({ schema: config })
   const builder = await createBuilder({ database, tinaSchema })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
+
   await database.put('_graphql', graphQLSchema)
   await database.put('_schema', tinaSchema.schema)
+
+  await _buildFragments(builder, tinaSchema)
+  await _buildQueries(builder, tinaSchema)
+}
+
+const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
+  const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
+  const collections = tinaSchema.getCollections()
+
+  await sequential(collections, async (collection) => {
+    const frag = (await builder.collectionFragment(
+      collection
+    )) as FragmentDefinitionNode
+
+    fragmentDefinitionsFields.push(frag)
+  })
+
+  const fragDoc = {
+    kind: 'Document' as const,
+    definitions: _.uniqBy(
+      // @ts-ignore
+      extractInlineTypes(fragmentDefinitionsFields),
+      (node) => node.name.value
+    ),
+  }
+
+  // TODO: These should possibly be outputted somewhere else?
+  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+
+  await fs.outputFileSync(path.join(fragPath, 'frags.gql'), print(fragDoc))
+  await fs.outputFileSync(
+    path.join(fragPath, 'frags.json'),
+    JSON.stringify(fragDoc, null, 2)
+  )
+}
+
+const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
+  const operationsDefinitions: OperationDefinitionNode[] = []
+
+  const collections = tinaSchema.getCollections()
+
+  await sequential(collections, async (collection) => {
+    const queryName = NAMER.queryName(collection.namespace)
+    const queryListName = NAMER.generateQueryListName(collection.namespace)
+
+    const fragName = NAMER.dataTypeName(collection.namespace) + 'Parts'
+
+    operationsDefinitions.push(
+      astBuilder.QueryOperationDefinition({ fragName, queryName })
+    )
+
+    operationsDefinitions.push(
+      astBuilder.ListQueryOperationDefinition({
+        fragName,
+        queryName: queryListName,
+      })
+    )
+  })
+
+  const queryDoc = {
+    kind: 'Document' as const,
+    definitions: _.uniqBy(
+      // @ts-ignore
+      extractInlineTypes(operationsDefinitions),
+      (node) => node.name.value
+    ),
+  }
+
+  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+
+  await fs.outputFileSync(path.join(fragPath, 'queries.gql'), print(queryDoc))
+  await fs.outputFileSync(
+    path.join(fragPath, 'queries.json'),
+    JSON.stringify(queryDoc, null, 2)
+  )
 }
 
 const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
@@ -41,8 +118,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   const definitions = []
   definitions.push(await builder.buildStaticDefinitions())
   const queryTypeDefinitionFields: FieldDefinitionNode[] = []
-  const operationsDefinitions: OperationDefinitionNode[] = []
-  const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
   const mutationTypeDefinitionFields: FieldDefinitionNode[] = []
 
   const collections = tinaSchema.getCollections()
@@ -83,28 +158,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   await sequential(collections, async (collection) => {
     queryTypeDefinitionFields.push(await builder.collectionDocument(collection))
 
-    const frag = (await builder.collectionFragment(
-      collection
-    )) as FragmentDefinitionNode
-
-    fragmentDefinitionsFields.push(frag)
-
-    const queryName = NAMER.queryName(collection.namespace)
-    const queryListName = NAMER.generateQueryListName(collection.namespace)
-
-    const fragName = NAMER.dataTypeName(collection.namespace) + 'Parts'
-
-    operationsDefinitions.push(
-      astBuilder.QueryOperationDefinition({ fragName, queryName })
-    )
-
-    operationsDefinitions.push(
-      astBuilder.ListQueryOperationDefinition({
-        fragName,
-        queryName: queryListName,
-      })
-    )
-
     mutationTypeDefinitionFields.push(
       await builder.updateCollectionDocumentMutation(collection)
     )
@@ -129,7 +182,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
     })
   )
 
-  definitions.push(...fragmentDefinitionsFields)
   const doc = {
     kind: 'Document' as const,
     definitions: _.uniqBy(
@@ -138,32 +190,6 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       (node) => node.name.value
     ),
   }
-
-  const fragDoc = {
-    kind: 'Document' as const,
-    definitions: _.uniqBy(
-      // @ts-ignore
-      extractInlineTypes(fragmentDefinitionsFields),
-      (node) => node.name.value
-    ),
-  }
-  const queryDoc = {
-    kind: 'Document' as const,
-    definitions: _.uniqBy(
-      // @ts-ignore
-      extractInlineTypes(operationsDefinitions),
-      (node) => node.name.value
-    ),
-  }
-
-  // TODO: These should possibly be outputted somewhere else?
-  const fragPath = process.cwd() + '/.tina/__generated__/'
-
-  await fs.outputFileSync(fragPath + 'frags.gql', print(fragDoc))
-  await fs.outputFileSync(fragPath + 'frags.json', JSON.stringify(fragPath))
-
-  await fs.outputFileSync(fragPath + 'queries.gql', print(queryDoc))
-  await fs.outputFileSync(fragPath + 'queries.json', JSON.stringify(fragPath))
 
   return doc
 }
