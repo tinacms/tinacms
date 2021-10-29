@@ -33,6 +33,75 @@ import {
 } from 'graphql'
 import _ from 'lodash'
 
+const SysFieldDefinition = {
+  kind: 'Field' as const,
+  name: {
+    kind: 'Name' as const,
+    value: 'sys',
+  },
+  arguments: [],
+  directives: [],
+  selectionSet: {
+    kind: 'SelectionSet' as const,
+    selections: [
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'filename',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'basename',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'breadcrumbs',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'path',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'relativePath',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'extension',
+        },
+        arguments: [],
+        directives: [],
+      },
+    ],
+  },
+}
+
 /**
  * the `gql` module provides functions and types which can be
  * used to build up the GraphQL AST. The primary reason for us using
@@ -526,6 +595,16 @@ export const astBuilder = {
             selectionSet: {
               kind: 'SelectionSet',
               selections: [
+                SysFieldDefinition,
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'id',
+                  },
+                  arguments: [],
+                  directives: [],
+                },
                 {
                   kind: 'Field',
                   name: {
@@ -626,6 +705,7 @@ export const astBuilder = {
                               arguments: [],
                               directives: [],
                             },
+                            SysFieldDefinition,
                             {
                               kind: 'Field',
                               name: {
