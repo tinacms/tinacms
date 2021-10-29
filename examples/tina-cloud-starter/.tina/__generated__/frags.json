@@ -1,1 +1,615 @@
-"/Users/logananderson-forestry-mac/dev/tinacms/tinacms/examples/tina-cloud-starter/.tina/__generated__/"
+{
+  "kind": "Document",
+  "definitions": [
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "PostsParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Posts"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "title"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "InlineFragment",
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "Document"
+                    }
+                  },
+                  "directives": [],
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "kind": "Field",
+                        "name": {
+                          "kind": "Name",
+                          "value": "id"
+                        },
+                        "arguments": [],
+                        "directives": []
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "date"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "heroImg"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "excerpt"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "_body"
+            },
+            "kind": "Field"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "GlobalParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Global"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "header"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "icon"
+                  },
+                  "kind": "Field",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "color"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "style"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "name"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  }
+                },
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "color"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "nav"
+                  },
+                  "kind": "Field",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "href"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "label"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "footer"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "color"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "social"
+                  },
+                  "kind": "Field",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "facebook"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "twitter"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "instagram"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "github"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  }
+                }
+              ]
+            }
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "theme"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "color"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "font"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "icon"
+                  },
+                  "kind": "Field"
+                },
+                {
+                  "name": {
+                    "kind": "Name",
+                    "value": "darkMode"
+                  },
+                  "kind": "Field"
+                }
+              ]
+            }
+          }
+        ]
+      }
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "AuthorsParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Authors"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "name"
+            },
+            "kind": "Field"
+          },
+          {
+            "name": {
+              "kind": "Name",
+              "value": "avatar"
+            },
+            "kind": "Field"
+          }
+        ]
+      }
+    },
+    {
+      "kind": "FragmentDefinition",
+      "name": {
+        "kind": "Name",
+        "value": "PagesParts"
+      },
+      "typeCondition": {
+        "kind": "NamedType",
+        "name": {
+          "kind": "Name",
+          "value": "Pages"
+        }
+      },
+      "directives": [],
+      "selectionSet": {
+        "kind": "SelectionSet",
+        "selections": [
+          {
+            "name": {
+              "kind": "Name",
+              "value": "blocks"
+            },
+            "kind": "Field",
+            "selectionSet": {
+              "kind": "SelectionSet",
+              "selections": [
+                {
+                  "kind": "InlineFragment",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "tagline"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "headline"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "text"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "actions"
+                        },
+                        "kind": "Field",
+                        "selectionSet": {
+                          "kind": "SelectionSet",
+                          "selections": [
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "label"
+                              },
+                              "kind": "Field"
+                            },
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "type"
+                              },
+                              "kind": "Field"
+                            },
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "icon"
+                              },
+                              "kind": "Field"
+                            },
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "link"
+                              },
+                              "kind": "Field"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "image"
+                        },
+                        "kind": "Field",
+                        "selectionSet": {
+                          "kind": "SelectionSet",
+                          "selections": [
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "src"
+                              },
+                              "kind": "Field"
+                            },
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "alt"
+                              },
+                              "kind": "Field"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "color"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  },
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "PagesBlocksHero"
+                    }
+                  }
+                },
+                {
+                  "kind": "InlineFragment",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "items"
+                        },
+                        "kind": "Field",
+                        "selectionSet": {
+                          "kind": "SelectionSet",
+                          "selections": [
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "icon"
+                              },
+                              "kind": "Field",
+                              "selectionSet": {
+                                "kind": "SelectionSet",
+                                "selections": [
+                                  {
+                                    "name": {
+                                      "kind": "Name",
+                                      "value": "color"
+                                    },
+                                    "kind": "Field"
+                                  },
+                                  {
+                                    "name": {
+                                      "kind": "Name",
+                                      "value": "style"
+                                    },
+                                    "kind": "Field"
+                                  },
+                                  {
+                                    "name": {
+                                      "kind": "Name",
+                                      "value": "name"
+                                    },
+                                    "kind": "Field"
+                                  }
+                                ]
+                              }
+                            },
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "title"
+                              },
+                              "kind": "Field"
+                            },
+                            {
+                              "name": {
+                                "kind": "Name",
+                                "value": "text"
+                              },
+                              "kind": "Field"
+                            }
+                          ]
+                        }
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "color"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  },
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "PagesBlocksFeatures"
+                    }
+                  }
+                },
+                {
+                  "kind": "InlineFragment",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "body"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "color"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  },
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "PagesBlocksContent"
+                    }
+                  }
+                },
+                {
+                  "kind": "InlineFragment",
+                  "selectionSet": {
+                    "kind": "SelectionSet",
+                    "selections": [
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "quote"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "author"
+                        },
+                        "kind": "Field"
+                      },
+                      {
+                        "name": {
+                          "kind": "Name",
+                          "value": "color"
+                        },
+                        "kind": "Field"
+                      }
+                    ]
+                  },
+                  "typeCondition": {
+                    "kind": "NamedType",
+                    "name": {
+                      "kind": "Name",
+                      "value": "PagesBlocksTestimonial"
+                    }
+                  }
+                }
+              ]
+            }
+          }
+        ]
+      }
+    }
+  ]
+}
