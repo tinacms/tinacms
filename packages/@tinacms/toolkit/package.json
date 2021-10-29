@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/toolkit",
-  "version": "0.55.1",
+  "version": "0.55.2",
   "main": "dist/index.js",
   "types": "dist/index.d.ts",
   "keywords": [
