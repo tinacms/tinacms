@@ -13,40 +13,37 @@ limitations under the License.
 
 import React from 'react'
 import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 
 import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-graphql-forms'
 
 import GetCMS from '../components/GetCMS'
-import GetCollection, { Collection } from '../components/GetCollection'
-import GetDocument, { Document } from '../components/GetDocument'
+import GetDocumentFields from '../components/GetDocumentFields'
+import GetDocument from '../components/GetDocument'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 
 const updateDocument = async (
   cms: TinaCMS,
-  collection: Collection,
-  document: Document,
   relativePath: string,
+  mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
-  const { includeCollection, includeTemplate } = document.form.mutationInfo
+  const { includeCollection, includeTemplate } = mutationInfo
   const params = transformDocumentIntoMutationRequestPayload(values, {
     includeCollection,
     includeTemplate,
   })
 
   await cms.api.tina.request(
-    `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-      updateDocument(
-        collection: $collection, 
+    `mutation($relativePath: String!, $params: DocumentMutation!) {
+      updateDocument( 
         relativePath: $relativePath, 
         params: $params
       ){__typename}
     }`,
     {
       variables: {
-        collection: collection.name,
         relativePath,
         params,
       },
@@ -61,12 +58,8 @@ const CollectionUpdatePage = () => {
   return (
     <GetCMS>
       {(cms: TinaCMS) => (
-        <GetCollection
-          cms={cms}
-          collectionName={collectionName}
-          includeDocuments={false}
-        >
-          {(collection: Collection) => {
+        <GetDocumentFields cms={cms} collectionName={collectionName}>
+          {({ collection, mutationInfo }) => {
             const relativePath = `${filename}.${collection.format}`
 
             return (
@@ -84,25 +77,25 @@ const CollectionUpdatePage = () => {
                     onSubmit: async (values) => {
                       await updateDocument(
                         cms,
-                        collection,
-                        document,
                         relativePath,
+                        mutationInfo,
                         values
                       )
                       history.push(`/admin/collections/${collection.name}`)
                     },
                   })
+
                   return (
                     <div className="w-full h-screen">
                       {/* <h3 className="text-xl mb-6">
-                      <Link
-                        className="opacity-80 hover:opacity-100 transition-opacity ease-out"
-                        to={`/admin/collections/${collection.name}`}
-                      >
-                        {collection.label}
-                      </Link>{' '}
-                      - Create New
-                    </h3> */}
+                        <Link
+                          className="opacity-80 hover:opacity-100 transition-opacity ease-out"
+                          to={`/admin/collections/${collection.name}`}
+                        >
+                          {collection.label}
+                        </Link>{' '}
+                        - Create New
+                      </h3> */}
                       <div className="flex flex-col items-center w-full flex-1">
                         <FullscreenFormBuilder
                           label={collection.label + ` - ` + filename}
@@ -115,7 +108,7 @@ const CollectionUpdatePage = () => {
               </GetDocument>
             )
           }}
-        </GetCollection>
+        </GetDocumentFields>
       )}
     </GetCMS>
   )
