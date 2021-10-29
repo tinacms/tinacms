@@ -300,6 +300,7 @@ export class Resolver {
     if (isAddPendingDocument === true) {
       const templateInfo =
         this.tinaSchema.getTemplatesForCollectable(collection)
+
       switch (templateInfo.type) {
         case 'object':
           await this.database.put(realPath, {})
@@ -321,7 +322,9 @@ export class Resolver {
           // @ts-ignore
           if (!template) {
             throw new Error(
-              `Expected to find template named ${templateString} in collection "${collectionName}" but none was found. Possible templates are: ${templateInfo.templates
+              `Expected to find template named ${templateString} in collection "${
+                collection.name
+              }" but none was found. Possible templates are: ${templateInfo.templates
                 .map((t) => lastItem(t.namespace))
                 .join(' ')}`
             )
@@ -329,8 +332,8 @@ export class Resolver {
           await this.database.put(realPath, {
             _template: lastItem(template.namespace),
           })
-          return this.getDocument(realPath)
       }
+      return this.getDocument(realPath)
     }
 
     const params = this.buildObjectMutations(
