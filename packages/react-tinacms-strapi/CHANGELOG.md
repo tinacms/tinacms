@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.51.5
+
+### Patch Changes
+
+- f267b2807: Fix package dependency on styled-components which would result in multiple contexts
+
 ## 0.51.4
 
 ### Patch Changes
