@@ -4295,8 +4295,6 @@ __metadata:
     jest: ^27.0.6
     meow: ^10.0.1
     normalize-path: ^3.0.0
-    rollup-plugin-dts: ^3.0.2
-    rollup-plugin-node-polyfills: ^0.2.1
     tsup: ^4.12.5
     typescript: ^4.2.2
     vite: ^2.4.3
@@ -4361,6 +4359,7 @@ __metadata:
   peerDependencies:
     react: ">=16.14"
     react-dom: ">=16.14"
+    react-is: ">=16.14.0"
     styled-components: ">=4.1"
   languageName: unknown
   linkType: soft
@@ -12690,13 +12689,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"estree-walker@npm:^0.6.1":
-  version: 0.6.1
-  resolution: "estree-walker@npm:0.6.1"
-  checksum: a63b94b841fcda2d79ff8e313b4ea8439b3364094ba66547289814bd7da4399a54cd33849b23504d239266430f219a142627071201a9fb6eb488bd025575f8fc
-  languageName: node
-  linkType: hard
-
 "estree-walker@npm:^3.0.0":
   version: 3.0.0
   resolution: "estree-walker@npm:3.0.0"
@@ -17704,15 +17696,6 @@ fsevents@~2.1.2:
   version: 2.5.0
   resolution: "macos-release@npm:2.5.0"
   checksum: 8fcb02b2fc9459ccee80095cea6ceea1efdcc4ad6a36ee4cd5ee82b1ec26311e6b06ae0a4745e7b0366cc1195d60a0929b0da485f9c95ff3a286c3016b1fc9fe
-  languageName: node
-  linkType: hard
-
-"magic-string@npm:^0.25.3, magic-string@npm:^0.25.7":
-  version: 0.25.7
-  resolution: "magic-string@npm:0.25.7"
-  dependencies:
-    sourcemap-codec: ^1.4.4
-  checksum: 4b70c13eb21c6f1c54bf7fb029748dc44d6bfcd3c59e5deeda060eecc38df6144b91d10fb7a3cf6156fadab1a68f83d69a189df20ca5f6bd088bf0196ea8f039
   languageName: node
   linkType: hard
 
@@ -23928,51 +23911,6 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"rollup-plugin-dts@npm:^3.0.2":
-  version: 3.0.2
-  resolution: "rollup-plugin-dts@npm:3.0.2"
-  dependencies:
-    "@babel/code-frame": ^7.12.13
-    magic-string: ^0.25.7
-  peerDependencies:
-    rollup: ^2.48.0
-    typescript: ^4.2.4
-  dependenciesMeta:
-    "@babel/code-frame":
-      optional: true
-  checksum: 11e32d247652210bbf052ef8d09551a031f774ee7dfd4f3c7d11e3fd6ee60f1856ebebdbd041104ea049f86ab1e413c3f8db6c1bab015895fe82707b9f1ce251
-  languageName: node
-  linkType: hard
-
-"rollup-plugin-inject@npm:^3.0.0":
-  version: 3.0.2
-  resolution: "rollup-plugin-inject@npm:3.0.2"
-  dependencies:
-    estree-walker: ^0.6.1
-    magic-string: ^0.25.3
-    rollup-pluginutils: ^2.8.1
-  checksum: c043f4eba75145d39e6732aac0420cad12045e3eaa3cb78905083382d0315c026a0af289a803287ba466f3a6470ac3dc8dd8731b1cc93969752682fae5b96152
-  languageName: node
-  linkType: hard
-
-"rollup-plugin-node-polyfills@npm:^0.2.1":
-  version: 0.2.1
-  resolution: "rollup-plugin-node-polyfills@npm:0.2.1"
-  dependencies:
-    rollup-plugin-inject: ^3.0.0
-  checksum: ece17e6ff9d6a5e08f444719dc5aeba62ea64998a32abd70a6fc7a3ea1649042f1223b6621faa0d9777b18fec2888f42133188551b32d1f1821f79694827c4ed
-  languageName: node
-  linkType: hard
-
-"rollup-pluginutils@npm:^2.8.1":
-  version: 2.8.2
-  resolution: "rollup-pluginutils@npm:2.8.2"
-  dependencies:
-    estree-walker: ^0.6.1
-  checksum: 6922c1a26df033cc3da4650106244fb2211b5ddf72a93be5010cbe51a0817c9abcab08f61cbc3f5fc906b2701df123d8c9b0dae0a34e69dd07218e34e5d357b8
-  languageName: node
-  linkType: hard
-
 "rollup@npm:^2.38.5":
   version: 2.56.2
   resolution: "rollup@npm:2.56.2"
@@ -24983,7 +24921,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"sourcemap-codec@npm:^1.4.4, sourcemap-codec@npm:^1.4.8":
+"sourcemap-codec@npm:^1.4.8":
   version: 1.4.8
   resolution: "sourcemap-codec@npm:1.4.8"
   checksum: 4d56d1232a45af813606d1755f11e7ae6b3542c615a7e3f904382f0134a9412ba8d090e83749254d78449eafdfcc62d5158b8f35e6241480b51b74b5c46b99f9
