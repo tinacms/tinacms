@@ -41,9 +41,6 @@ export class GithubBridge implements Bridge {
       auth: accessToken,
     })
   }
-  private generateKey(key: string) {
-    return `${this.repoConfig.owner}/${this.repoConfig.repo}/${this.repoConfig.ref}/${key}`
-  }
   private async readDir(filepath: string): Promise<string[]> {
     const fullPath = path.join(this.rootPath, filepath)
     return _.flatten(
@@ -63,7 +60,9 @@ export class GithubBridge implements Bridge {
                       return path.join(d.path, nestedItem)
                     })
                   } else {
-                    throw new Error('meh')
+                    throw new Error(
+                      `Expected items to be an array of strings for readDir at ${d.path}`
+                    )
                   }
                 }
                 return d.path
