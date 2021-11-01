@@ -2,7 +2,7 @@
   "data": null,
   "errors": [
     {
-      "message": "\"collection\" must be one of: [author, post] but got some-fake-collection",
+      "message": "\"collection\" must be one of: [author, post] but got someFakeCollection",
       "locations": [
         {
           "column": 3,

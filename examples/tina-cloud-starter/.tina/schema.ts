@@ -387,6 +387,7 @@ export default defineSchema({
       label: "Blog Posts",
       name: "posts",
       path: "content/posts",
+      format: "mdx",
       fields: [
         {
           type: "rich-text",

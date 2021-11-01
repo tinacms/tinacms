@@ -20,8 +20,14 @@ import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
 import { parseMDX, stringifyMDX } from '../mdx'
 
-import type { Templateable, TinaFieldEnriched } from '../types'
+import type {
+  Templateable,
+  TinaFieldEnriched,
+  Collectable,
+  TinaCloudCollection,
+} from '../types'
 import { TinaError } from './error'
+
 interface ResolverConfig {
   database: Database
   tinaSchema: TinaSchema
@@ -174,6 +180,7 @@ export class Resolver {
              */
             await sequential(collectable.templates, async (template) => {
               templates[lastItem(template.namespace)] = {
+                template,
                 fields: await sequential(template.fields, async (field) => {
                   return this.resolveField(field)
                 }),
@@ -195,87 +202,172 @@ export class Resolver {
     }
   }
 
-  public resolveDocument = async ({
-    value,
-    args,
-    collection: collectionName,
-    isMutation,
-    isCreation,
-  }: {
-    value: unknown
-    args: unknown
-    collection: string
-    isMutation: boolean
-    isCreation?: boolean
-  }) => {
-    const collectionNames = this.tinaSchema
-      .getCollections()
-      .map((item) => item.name)
-    assertShape<string>(
-      collectionName,
-      (yup) => {
-        return yup.mixed().oneOf(collectionNames)
-      },
-      `"collection" must be one of: [${collectionNames.join(
-        ', '
-      )}] but got ${collectionName}`
-    )
-    assertShape<{ relativePath: string }>(args, (yup) =>
-      yup.object({ relativePath: yup.string().required() })
-    )
-    const collection = await this.tinaSchema.getCollection(collectionName)
-    const realPath = path.join(collection?.path, args.relativePath)
-
-    if (isMutation) {
-      if (isCreation) {
-        if (await this.database.documentExists(realPath)) {
-          throw new Error(`Unable to add document, ${realPath} already exists`)
-        }
-
-        const templateInfo =
-          this.tinaSchema.getTemplatesForCollectable(collection)
-        switch (templateInfo.type) {
-          case 'object':
-            await this.database.put(realPath, {})
-            break
-          case 'union':
-            // @ts-ignore
-            const templateString = args.template
-            const template = templateInfo.templates.find(
-              (template) => lastItem(template.namespace) === templateString
-            )
-            // @ts-ignore
-            if (!args.template) {
-              throw new Error(
-                `Must specify a template when creating content for a collection with multiple templates. Possible templates are: ${templateInfo.templates
-                  .map((t) => lastItem(t.namespace))
-                  .join(' ')}`
-              )
-            }
-            // @ts-ignore
-            if (!template) {
-              throw new Error(
-                `Expected to find template named ${templateString} in collection "${collectionName}" but none was found. Possible templates are: ${templateInfo.templates
-                  .map((t) => lastItem(t.namespace))
-                  .join(' ')}`
-              )
-            }
-            await this.database.put(realPath, {
-              _template: lastItem(template.namespace),
-            })
-            return this.getDocument(realPath)
-        }
+  public buildObjectMutations = (fieldValue: any, field: Collectable) => {
+    if (field.fields) {
+      const objectTemplate =
+        typeof field.fields === 'string'
+          ? this.tinaSchema.getGlobalTemplate(field.fields)
+          : field
+      if (Array.isArray(fieldValue)) {
+        return fieldValue.map((item) =>
+          // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
+          this.buildFieldMutations(item, objectTemplate)
+        )
       } else {
-        if (!(await this.database.documentExists(realPath))) {
+        return this.buildFieldMutations(
+          // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
+          fieldValue,
+          //@ts-ignore
+          objectTemplate
+        )
+      }
+    }
+    if (field.templates) {
+      if (Array.isArray(fieldValue)) {
+        return fieldValue.map((item) => {
+          if (typeof item === 'string') {
+            throw new Error(
+              //@ts-ignore
+              `Expected object for template value for field ${field.name}`
+            )
+          }
+          const templates = field.templates.map((templateOrTemplateName) => {
+            if (typeof templateOrTemplateName === 'string') {
+              return this.tinaSchema.getGlobalTemplate(templateOrTemplateName)
+            }
+            return templateOrTemplateName
+          })
+          const [templateName] = Object.entries(item)[0]
+          const template = templates.find(
+            //@ts-ignore
+            (template) => template.name === templateName
+          )
+          if (!template) {
+            throw new Error(`Expected to find template ${templateName}`)
+          }
+          return {
+            // @ts-ignore FIXME Argument of type 'unknown' is not assignable to parameter of type '{ [fieldName: string]: string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]; }'
+            ...this.buildFieldMutations(item[template.name], template),
+            //@ts-ignore
+            _template: template.name,
+          }
+        })
+      } else {
+        if (typeof fieldValue === 'string') {
           throw new Error(
-            `Unable to update document, ${realPath} does not exist`
+            //@ts-ignore
+            `Expected object for template value for field ${field.name}`
           )
         }
+        const templates = field.templates.map((templateOrTemplateName) => {
+          if (typeof templateOrTemplateName === 'string') {
+            return this.tinaSchema.getGlobalTemplate(templateOrTemplateName)
+          }
+          return templateOrTemplateName
+        })
+        const [templateName] = Object.entries(fieldValue)[0]
+        const template = templates.find(
+          //@ts-ignore
+          (template) => template.name === templateName
+        )
+        if (!template) {
+          throw new Error(`Expected to find template ${templateName}`)
+        }
+        return {
+          // @ts-ignore FIXME Argument of type 'unknown' is not assignable to parameter of type '{ [fieldName: string]: string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]; }'
+          ...this.buildFieldMutations(fieldValue[template.name], template),
+          //@ts-ignore
+          _template: template.name,
+        }
       }
+    }
+  }
+
+  public createResolveDocument = async ({
+    collection,
+    realPath,
+    args,
+    isAddPendingDocument,
+  }: {
+    collection: TinaCloudCollection<true>
+    realPath: string
+    args: unknown
+    isAddPendingDocument: boolean
+  }) => {
+    /**
+     * TODO: Remove when `addPendingDocument` is no longer needed.
+     */
+    if (isAddPendingDocument === true) {
       const templateInfo =
         this.tinaSchema.getTemplatesForCollectable(collection)
-      const params = this.buildParams(args)
 
+      switch (templateInfo.type) {
+        case 'object':
+          await this.database.put(realPath, {})
+          break
+        case 'union':
+          // @ts-ignore
+          const templateString = args.template
+          const template = templateInfo.templates.find(
+            (template) => lastItem(template.namespace) === templateString
+          )
+          // @ts-ignore
+          if (!args.template) {
+            throw new Error(
+              `Must specify a template when creating content for a collection with multiple templates. Possible templates are: ${templateInfo.templates
+                .map((t) => lastItem(t.namespace))
+                .join(' ')}`
+            )
+          }
+          // @ts-ignore
+          if (!template) {
+            throw new Error(
+              `Expected to find template named ${templateString} in collection "${
+                collection.name
+              }" but none was found. Possible templates are: ${templateInfo.templates
+                .map((t) => lastItem(t.namespace))
+                .join(' ')}`
+            )
+          }
+          await this.database.put(realPath, {
+            _template: lastItem(template.namespace),
+          })
+      }
+      return this.getDocument(realPath)
+    }
+
+    const params = this.buildObjectMutations(
+      // @ts-ignore
+      args.params[collection.name],
+      collection
+    )
+
+    // @ts-ignore
+    await this.database.put(realPath, params)
+    return this.getDocument(realPath)
+  }
+
+  public updateResolveDocument = async ({
+    collection,
+    realPath,
+    args,
+    isAddPendingDocument,
+    isCollectionSpecific,
+  }: {
+    collection: TinaCloudCollection<true>
+    realPath: string
+    args: unknown
+    isAddPendingDocument: boolean
+    isCollectionSpecific: boolean
+  }) => {
+    /**
+     * TODO: Remove when `addPendingDocument` is no longer needed.
+     */
+    if (isAddPendingDocument === true) {
+      const templateInfo =
+        this.tinaSchema.getTemplatesForCollectable(collection)
+
+      const params = this.buildParams(args)
       switch (templateInfo.type) {
         case 'object':
           if (params) {
@@ -293,7 +385,7 @@ export class Resolver {
             if (templateParams) {
               if (typeof templateParams === 'string') {
                 throw new Error(
-                  `Expected to find an objet for template params, but got string`
+                  `Expected to find an object for template params, but got string`
                 )
               }
               const values = {
@@ -305,9 +397,108 @@ export class Resolver {
             }
           })
       }
+      return this.getDocument(realPath)
     }
+
+    const params = this.buildObjectMutations(
+      //@ts-ignore
+      isCollectionSpecific ? args.params : args.params[collection.name],
+      collection
+    )
+    //@ts-ignore
+    await this.database.put(realPath, params)
     return this.getDocument(realPath)
   }
+
+  public resolveDocument = async ({
+    args,
+    collection: collectionName,
+    isMutation,
+    isCreation,
+    isAddPendingDocument,
+    isCollectionSpecific,
+  }: {
+    args: unknown
+    collection?: string
+    isMutation: boolean
+    isCreation?: boolean
+    isAddPendingDocument?: boolean
+    isCollectionSpecific?: boolean
+  }) => {
+    /**
+     * `collectionName` is passed in:
+     *    * `addPendingDocument()` has `collection` on `args`
+     *    * `getDocument()` provides a `collection` on `args`
+     *    * `get<Collection>Document()` has `collection` on `lookup`
+     */
+    let collectionLookup = collectionName || undefined
+
+    /**
+     * For generic functions (like `createDocument()` and `updateDocument()`), `collection` is the top key of the `params`
+     */
+    if (!collectionLookup && isCollectionSpecific === false) {
+      //@ts-ignore
+      collectionLookup = Object.keys(args.params)[0]
+    }
+
+    const collectionNames = this.tinaSchema
+      .getCollections()
+      .map((item) => item.name)
+
+    assertShape<string>(
+      collectionLookup,
+      (yup) => {
+        return yup.mixed().oneOf(collectionNames)
+      },
+      `"collection" must be one of: [${collectionNames.join(
+        ', '
+      )}] but got ${collectionLookup}`
+    )
+
+    assertShape<{ relativePath: string }>(args, (yup) =>
+      yup.object({ relativePath: yup.string().required() })
+    )
+
+    const collection = await this.tinaSchema.getCollection(collectionLookup)
+    const realPath = path.join(collection?.path, args.relativePath)
+    const alreadyExists = await this.database.documentExists(realPath)
+
+    if (isMutation) {
+      if (isCreation) {
+        /**
+         * createDocument, create<Collection>Document
+         */
+        if (alreadyExists === true) {
+          throw new Error(`Unable to add document, ${realPath} already exists`)
+        }
+        return this.createResolveDocument({
+          collection,
+          realPath,
+          args,
+          isAddPendingDocument,
+        })
+      }
+      /**
+       * updateDocument, update<Collection>Document
+       */
+      if (alreadyExists === false) {
+        throw new Error(`Unable to update document, ${realPath} does not exist`)
+      }
+      return this.updateResolveDocument({
+        collection,
+        realPath,
+        args,
+        isAddPendingDocument,
+        isCollectionSpecific,
+      })
+    } else {
+      /**
+       * getDocument, get<Collection>Document
+       */
+      return this.getDocument(realPath)
+    }
+  }
+
   public resolveCollectionConnections = async ({ ids }: { ids: string[] }) => {
     return {
       totalCount: ids.length,
@@ -368,62 +559,7 @@ export class Resolver {
           accum[fieldName] = fieldValue
           break
         case 'object':
-          if (field.fields) {
-            const objectTemplate =
-              typeof field.fields === 'string'
-                ? this.tinaSchema.getGlobalTemplate(field.fields)
-                : field
-            if (Array.isArray(fieldValue)) {
-              accum[fieldName] = fieldValue.map((item) =>
-                // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
-                this.buildFieldMutations(item, objectTemplate)
-              )
-            } else {
-              accum[fieldName] = this.buildFieldMutations(
-                // @ts-ignore FIXME Argument of type 'string | object' is not assignable to parameter of type '{ [fieldName: string]: string | object | (string | object)[]; }'
-                fieldValue,
-                objectTemplate
-              )
-            }
-            break
-          }
-          if (field.templates) {
-            if (Array.isArray(fieldValue)) {
-              accum[fieldName] = fieldValue.map((item) => {
-                if (typeof item === 'string') {
-                  throw new Error(
-                    `Expected object for template value for field ${field.name}`
-                  )
-                }
-                const templates = field.templates.map(
-                  (templateOrTemplateName) => {
-                    if (typeof templateOrTemplateName === 'string') {
-                      return this.tinaSchema.getGlobalTemplate(
-                        templateOrTemplateName
-                      )
-                    }
-                    return templateOrTemplateName
-                  }
-                )
-                const [templateName] = Object.entries(item)[0]
-                const template = templates.find(
-                  (template) => template.name === templateName
-                )
-                if (!template) {
-                  throw new Error(`Expected to find template ${templateName}`)
-                }
-                return {
-                  // @ts-ignore FIXME Argument of type 'unknown' is not assignable to parameter of type '{ [fieldName: string]: string | { [key: string]: unknown; } | (string | { [key: string]: unknown; })[]; }'
-                  ...this.buildFieldMutations(item[template.name], template),
-                  _template: template.name,
-                }
-              })
-            } else {
-              throw new Error(
-                'Not implement for polymorphic objects which are not lists'
-              )
-            }
-          }
+          accum[fieldName] = this.buildObjectMutations(fieldValue, field)
           break
         case 'rich-text':
           field

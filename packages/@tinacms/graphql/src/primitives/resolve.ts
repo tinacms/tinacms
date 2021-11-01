@@ -212,11 +212,11 @@ export const resolve = async ({
                * FIXME: this should probably be it's own lookup
                */
               return resolver.resolveDocument({
-                value,
                 args: { ...args, params: {} },
                 collection: args.collection,
                 isMutation,
                 isCreation: true,
+                isAddPendingDocument: true,
               })
             }
             if (
@@ -228,16 +228,16 @@ export const resolve = async ({
                * `getDocument`/`createDocument`/`updateDocument`
                */
               const result = await resolver.resolveDocument({
-                value,
                 args,
                 collection: args.collection,
                 isMutation,
                 isCreation,
+                isAddPendingDocument: false,
+                isCollectionSpecific: false,
               })
 
               if (!isMutation) {
                 const mutationPath = buildMutationPath(info, {
-                  // @ts-ignore
                   relativePath: result.sys.relativePath,
                 })
                 if (mutationPath) {
@@ -270,11 +270,12 @@ export const resolve = async ({
             const result =
               value ||
               (await resolver.resolveDocument({
-                value,
                 args,
                 collection: lookup.collection,
                 isMutation,
                 isCreation,
+                isAddPendingDocument: false,
+                isCollectionSpecific: true,
               }))
             if (!isMutation) {
               const mutationPath = buildMutationPath(info, {
@@ -476,6 +477,7 @@ const buildMutationPath = (
   const mutationName = collection
     ? NAMER.updateName([collection.name])
     : 'updateDocument'
+
   const mutations = JSON.parse(
     JSON.stringify(info.schema.getMutationType()?.getFields())
   ) as GraphQLFieldMap<any, any>
