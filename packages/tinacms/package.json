@@ -44,7 +44,6 @@
     "prop-types": "15.7.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "^5.3.0",
-    "ts-jest": "^26.5.3",
     "xstate": "^4.15.1",
     "yup": "^0.32.0"
   },

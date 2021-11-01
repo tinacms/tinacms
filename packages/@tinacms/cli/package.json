@@ -38,8 +38,7 @@
     "@types/progress": "^2.0.3",
     "@types/prompts": "^2.0.13",
     "@types/yup": "^0.29.11",
-    "jest": "^27.0.6",
-    "ts-jest": "^26.5.3"
+    "jest": "^27.0.6"
   },
   "scripts": {
     "build": "yarn tsup src/index.ts --format cjs --dts",
