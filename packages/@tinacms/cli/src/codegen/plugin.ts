@@ -21,7 +21,6 @@ export const AddGeneratedClientFunc: PluginFunction = (
 ) => {
   return `
 // TinaSDK generated code
-
 import { LocalClient } from 'tinacms'
 const tinaClient = new LocalClient();
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
@@ -31,9 +30,12 @@ const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
 ) => {
   const data = await tinaClient.request(doc, { variables: vars });
   return { data, query: doc, variables: vars};
-  // return data;
 };
-export const getTinaClient = ()=>getSdk(requester)
+
+/**
+ * @experimental this class can be used but may change in the future
+ **/
+export const ExperimentalGetTinaClient = ()=>getSdk(requester)
 `
 }
 

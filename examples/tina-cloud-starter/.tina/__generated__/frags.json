@@ -82,13 +82,6 @@
               "value": "excerpt"
             },
             "kind": "Field"
-          },
-          {
-            "name": {
-              "kind": "Name",
-              "value": "_body"
-            },
-            "kind": "Field"
           }
         ]
       }

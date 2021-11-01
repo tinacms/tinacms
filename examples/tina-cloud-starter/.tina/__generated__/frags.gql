@@ -8,7 +8,6 @@ fragment PostsParts on Posts {
   date
   heroImg
   excerpt
-  _body
 }
 
 fragment GlobalParts on Global {
