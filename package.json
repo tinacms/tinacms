@@ -20,6 +20,7 @@
     "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
     "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
+    "push-tags": "git push --follow-tags",
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
   },
   "dependencies": {
