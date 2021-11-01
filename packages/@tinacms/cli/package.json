@@ -41,6 +41,7 @@
     "jest": "^27.0.6"
   },
   "scripts": {
+    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "test": "jest --passWithNoTests",
     "types": "yarn tsc",
     "test-watch": "jest  --passWithNoTests --watch",
