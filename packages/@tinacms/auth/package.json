@@ -9,8 +9,6 @@
   ],
   "license": "Apache-2.0",
   "scripts": {
-    "build": "yarn tsup src/index.ts --format cjs --dts",
-    "watch": "yarn tsup src/index.ts --watch --format cjs --dts",
     "types": "yarn tsc",
     "test": "jest --passWithNoTests"
   },
@@ -43,7 +41,6 @@
     "jest-matcher-utils": "^26.4.2",
     "next": "10.0.5",
     "nodemon": "^2.0.4",
-    "tsup": "4.12.5",
     "typescript": "^4.3.5"
   }
 }

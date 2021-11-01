@@ -24,6 +24,7 @@
   "peerDependencies": {
     "next": ">=9",
     "react": ">=16.14.0",
+    "react-is": ">=16.14.0",
     "tinacms": ">=0.50.0"
   },
   "devDependencies": {
