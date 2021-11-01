@@ -17,7 +17,8 @@
     ]
   },
   "scripts": {
-    "types": "yarn tsc"
+    "types": "yarn tsc",
+    "build": "echo \"Run `yarn build` from the root of the repository instead\""
   },
   "dependencies": {
     "cloudinary": "^1.25.2",

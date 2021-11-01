@@ -39,6 +39,7 @@
   },
   "scripts": {
     "types": "yarn tsc --project ./tsconfig.real.json",
+    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",
     "test": "jest"

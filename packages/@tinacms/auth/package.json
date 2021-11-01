@@ -10,6 +10,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "types": "yarn tsc",
+    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "test": "jest --passWithNoTests"
   },
   "publishConfig": {
