@@ -43,40 +43,37 @@ export class GithubBridge implements Bridge {
   }
   private async readDir(filepath: string): Promise<string[]> {
     const fullPath = path.join(this.rootPath, filepath)
-    return _.flatten(
-      this.appOctoKit.repos
-        .getContent({
-          ...this.repoConfig,
-          path: fullPath,
-        })
-        .then(async (response) => {
-          if (Array.isArray(response.data)) {
-            return await Promise.all(
-              await response.data.map(async (d) => {
-                if (d.type === 'dir') {
-                  const nestedItems = await this.readDir(d.path)
-                  if (Array.isArray(nestedItems)) {
-                    return nestedItems.map((nestedItem) => {
-                      return path.join(d.path, nestedItem)
-                    })
-                  } else {
-                    throw new Error(
-                      `Expected items to be an array of strings for readDir at ${d.path}`
-                    )
-                  }
+    const repos = await this.appOctoKit.repos
+      .getContent({
+        ...this.repoConfig,
+        path: fullPath,
+      })
+      .then(async (response) => {
+        if (Array.isArray(response.data)) {
+          return await Promise.all(
+            await response.data.map(async (d) => {
+              if (d.type === 'dir') {
+                const nestedItems = await this.readDir(d.path)
+                if (Array.isArray(nestedItems)) {
+                  return nestedItems.map((nestedItem) => {
+                    return path.join(d.path, nestedItem)
+                  })
+                } else {
+                  throw new Error(
+                    `Expected items to be an array of strings for readDir at ${d.path}`
+                  )
                 }
-                return d.path
-              })
-            )
-          }
-
-          throw new Error(
-            `Expected to return an array from Github directory ${path}`
+              }
+              return d.path
+            })
           )
-        })
-        .toString()
-        .split(',')
-    )
+        }
+
+        throw new Error(
+          `Expected to return an array from Github directory ${path}`
+        )
+      })
+    return _.flatten(repos)
   }
 
   public async glob(pattern: string) {
