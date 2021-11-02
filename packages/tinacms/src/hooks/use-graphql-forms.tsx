@@ -144,11 +144,8 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
 
-  //foobar
   const { setFormValues, formValues, setNewUpdate, setData, data } =
     useLinkedForm()
-
-  const queryString = print(query(gql))
 
   React.useEffect(() => {
     if (pendingReset) {
@@ -323,7 +320,7 @@ export function useGraphqlForms<T extends object>({
         console.error(e)
         setIsLoading(false)
       })
-  }, [queryString, JSON.stringify(variables)])
+  }, [print(query(gql)), JSON.stringify(variables)])
 
   return [data as T, isLoading]
 }
