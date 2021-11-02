@@ -131,8 +131,9 @@ const useLinkedForm = (payload) => {
   }, [JSON.stringify(formValues)])
 
   return {
-    setFormValues,
-    formValues,
+    updateFormValue: (queryName, values) => {
+      setFormValues({ ...formValues, [queryName]: { values: values } })
+    },
     setNewUpdate,
     reset: (queryId: string) => setPendingReset(queryId),
     data,
@@ -179,8 +180,7 @@ export function useGraphqlForms<T extends object>({
 }): [T] {
   const cms = useCMS()
 
-  const { setFormValues, formValues, setNewUpdate, reset, data } =
-    useLinkedForm(payload)
+  const { updateFormValue, setNewUpdate, reset, data } = useLinkedForm(payload)
 
   React.useEffect(() => {
     try {
@@ -332,7 +332,7 @@ export function useGraphqlForms<T extends object>({
         }
         form.subscribe(
           ({ values }) => {
-            setFormValues({ ...formValues, [queryName]: { values: values } })
+            updateFormValue(queryName, values)
           },
           { values: true }
         )
