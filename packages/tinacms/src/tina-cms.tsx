@@ -34,7 +34,7 @@ const SetupHooks = (props: {
     (gql) => gql(props.query),
     props.variables || {}
   )
-  const [payload] = useGraphqlForms({
+  const [data] = useGraphqlForms({
     payload: tinaCloudPayload,
     formify: (args) => {
       if (props.formifyCallback) {
@@ -53,7 +53,7 @@ const SetupHooks = (props: {
         <Loader>{props.children(props)}</Loader>
       ) : (
         // pass the new edit state data to the child
-        props.children({ ...props, data: payload })
+        props.children({ ...props, data })
       )}
     </ErrorBoundary>
   )
