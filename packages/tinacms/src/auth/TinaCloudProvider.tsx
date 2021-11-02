@@ -19,7 +19,7 @@ import {
   MediaStore,
   //@ts-ignore why can't it find you
   BranchSwitcherPlugin,
-  Branch
+  Branch,
 } from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../client'
@@ -158,20 +158,20 @@ export const TinaCloudProvider = (
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
     const branches = await cms.api.tina.listBranches({ owner, repo })
-    
+
     return branches.map((branch) => branch.name)
   }
   const handleCreateBranch = async (data) => {
-     const newBranch = await cms.api.tina.createBranch(data)
+    const newBranch = await cms.api.tina.createBranch(data)
 
-     return newBranch
+    return newBranch
   }
 
   setupMedia()
 
   //@ts-ignore it's not picking up cms.flags
   const branchingEnabled = cms.flags.get('branch-switcher')
-  
+
   React.useEffect(() => {
     let branchSwitcher
     if (branchingEnabled) {
@@ -184,13 +184,13 @@ export const TinaCloudProvider = (
         //TODO implement these
         listBranches: handleListBranches,
         createBranch: handleCreateBranch,
-        setCurrentBranch: () => console.log(props.branch)
+        setCurrentBranch: () => console.log(props.branch),
       })
       cms.plugins.add(branchSwitcher)
     }
     return () => {
       if (!branchingEnabled) {
-        if(branchSwitcher) {
+        if (branchSwitcher) {
           cms.plugins.remove(branchSwitcher)
         }
       }

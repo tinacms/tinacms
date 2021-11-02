@@ -176,8 +176,8 @@ const generateTinaCloudForms = (
   formify,
   reset: (queryName: string) => void
 ) => {
-  let forms: any[]
-  Object.entries(payload).map(([queryName, result]) => {
+  let forms: any[] = []
+  Object.entries(payload || {}).map(([queryName, result]) => {
     if (!canBeFormified(result)) {
       // This is a list or collection query, no forms can be built
       return
@@ -353,7 +353,7 @@ export function useGraphqlForms<T extends object>({
   const forms = generateTinaCloudForms(cms, payload, onSubmit, formify, reset)
 
   React.useEffect(() => {
-    forms.forEach((form) => {
+    ;(forms || []).forEach((form) => {
       augmentForm(cms, form, setNewUpdate, updateFormValue)
     })
   }, [payload])
