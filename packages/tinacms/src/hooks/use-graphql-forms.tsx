@@ -173,7 +173,7 @@ const generateTinaCloudForms = (
   cms: any,
   payload: any,
   onSubmit,
-  formify = null,
+  formify,
   reset: (queryName: string) => void
 ) => {
   let forms: any[]
@@ -243,11 +243,7 @@ const generateTinaCloudForms = (
     }
     if (skipped) return
 
-    if (formify) {
-      form = formify({ formConfig, createForm, createGlobalForm, skip }, cms)
-    } else {
-      form = createForm(formConfig)
-    }
+    form = formify({ formConfig, createForm, createGlobalForm, skip }, cms)
 
     if (!(form instanceof Form)) {
       if (skipped === SKIPPED) {
@@ -348,7 +344,7 @@ export function useGraphqlForms<T extends object>({
 }: {
   payload: any
   onSubmit?: (args: onSubmitArgs) => void
-  formify?: formifyCallback
+  formify: formifyCallback
 }): [T] {
   const cms = useCMS()
 
