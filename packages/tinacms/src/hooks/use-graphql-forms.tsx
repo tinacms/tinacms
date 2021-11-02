@@ -261,6 +261,86 @@ const generateTinaCloudForms = (
   return forms
 }
 
+const augmentForm = (cms, form, setNewUpdate, updateFormValue) => {
+  try {
+    const { change } = form.finalForm
+    form.finalForm.change = (name, value) => {
+      if (typeof name !== 'string') {
+        throw new Error(
+          `Expected name to be of type string for FinalForm change callback`
+        )
+      }
+
+      setNewUpdate({
+        queryName: form.id,
+        get: [form.id, 'values', name].join('.'),
+        set: [form.id, 'data', name].join('.'),
+        /**
+         * Reference paths returned from the server don't include array values
+         * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
+         * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
+         */
+        setReference: [
+          form.id,
+          'data',
+          name
+            .split('.')
+            .filter((item) => isNaN(Number(item)))
+            .join('.'),
+        ].join('.'),
+      })
+      return change(name, value)
+    }
+
+    const { insert, move, remove, ...rest } = form.finalForm.mutators
+    const prepareNewUpdate = (name: string, lookup?: string) => {
+      const extra = {}
+      if (lookup) {
+        extra['lookup'] = lookup
+      }
+      const referenceName = name
+        .split('.')
+        .filter((item) => isNaN(Number(item)))
+        .join('.')
+      setNewUpdate({
+        queryName: form.id,
+        get: [form.id, 'values', name].join('.'),
+        set: [form.id, 'data', name].join('.'),
+        setReference: [form.id, 'data', referenceName].join('.'),
+        ...extra,
+      })
+    }
+    form.finalForm.mutators = {
+      insert: (...args) => {
+        const fieldName = args[0]
+        prepareNewUpdate(fieldName, fieldName)
+        insert(...args)
+      },
+      move: (...args) => {
+        const fieldName = args[0]
+        prepareNewUpdate(fieldName, fieldName)
+        move(...args)
+      },
+      remove: (...args) => {
+        const fieldName = args[0]
+        prepareNewUpdate(fieldName, fieldName)
+        remove(...args)
+      },
+      ...rest,
+    }
+    form.subscribe(
+      ({ values }) => {
+        updateFormValue(form.id, values)
+      },
+      { values: true }
+    )
+  } catch (e) {
+    cms.alerts.error('There was a problem setting up forms for your query')
+    console.error('There was a problem setting up forms for your query')
+    console.error(e)
+  }
+}
+
 export function useGraphqlForms<T extends object>({
   payload, //TODO - ambiguous name & type
   onSubmit,
@@ -277,85 +357,9 @@ export function useGraphqlForms<T extends object>({
   const forms = generateTinaCloudForms(cms, payload, onSubmit, formify, reset)
 
   React.useEffect(() => {
-    try {
-      forms.forEach((form) => {
-        const { change } = form.finalForm
-        form.finalForm.change = (name, value) => {
-          if (typeof name !== 'string') {
-            throw new Error(
-              `Expected name to be of type string for FinalForm change callback`
-            )
-          }
-
-          setNewUpdate({
-            queryName: form.id,
-            get: [form.id, 'values', name].join('.'),
-            set: [form.id, 'data', name].join('.'),
-            /**
-             * Reference paths returned from the server don't include array values
-             * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
-             * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
-             */
-            setReference: [
-              form.id,
-              'data',
-              name
-                .split('.')
-                .filter((item) => isNaN(Number(item)))
-                .join('.'),
-            ].join('.'),
-          })
-          return change(name, value)
-        }
-
-        const { insert, move, remove, ...rest } = form.finalForm.mutators
-        const prepareNewUpdate = (name: string, lookup?: string) => {
-          const extra = {}
-          if (lookup) {
-            extra['lookup'] = lookup
-          }
-          const referenceName = name
-            .split('.')
-            .filter((item) => isNaN(Number(item)))
-            .join('.')
-          setNewUpdate({
-            queryName: form.id,
-            get: [form.id, 'values', name].join('.'),
-            set: [form.id, 'data', name].join('.'),
-            setReference: [form.id, 'data', referenceName].join('.'),
-            ...extra,
-          })
-        }
-        form.finalForm.mutators = {
-          insert: (...args) => {
-            const fieldName = args[0]
-            prepareNewUpdate(fieldName, fieldName)
-            insert(...args)
-          },
-          move: (...args) => {
-            const fieldName = args[0]
-            prepareNewUpdate(fieldName, fieldName)
-            move(...args)
-          },
-          remove: (...args) => {
-            const fieldName = args[0]
-            prepareNewUpdate(fieldName, fieldName)
-            remove(...args)
-          },
-          ...rest,
-        }
-        form.subscribe(
-          ({ values }) => {
-            updateFormValue(form.id, values)
-          },
-          { values: true }
-        )
-      })
-    } catch (e) {
-      cms.alerts.error('There was a problem setting up forms for your query')
-      console.error('There was a problem setting up forms for your query')
-      console.error(e)
-    }
+    forms.forEach((form) => {
+      augmentForm(cms, form, setNewUpdate, updateFormValue)
+    })
   }, [payload])
 
   return [data as T]
