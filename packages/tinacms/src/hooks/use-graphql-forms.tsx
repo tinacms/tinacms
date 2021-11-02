@@ -164,6 +164,11 @@ export function useGraphqlForms<T extends object>({
     useLinkedForm()
 
   React.useEffect(() => {
+    setData(payload)
+    setInitialData(payload)
+  }, [payload])
+
+  React.useEffect(() => {
     if (pendingReset) {
       setData({ ...data, [pendingReset]: initialData[pendingReset] })
       setPendingReset(null)
@@ -172,8 +177,6 @@ export function useGraphqlForms<T extends object>({
 
   React.useEffect(() => {
     try {
-      setData(payload)
-      setInitialData(payload)
       Object.entries(payload).map(([queryName, result]) => {
         if (!canBeFormified(result)) {
           // This is a list or collection query, no forms can be built
