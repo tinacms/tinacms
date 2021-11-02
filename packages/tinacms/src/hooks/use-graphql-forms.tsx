@@ -349,10 +349,9 @@ export function useGraphqlForms<T extends object>({
   const cms = useCMS()
 
   const { updateFormValue, setNewUpdate, reset, data } = useLinkedForm(payload)
-
-  const forms = generateTinaCloudForms(cms, payload, onSubmit, formify, reset)
-
   React.useEffect(() => {
+    const forms = generateTinaCloudForms(cms, payload, onSubmit, formify, reset)
+
     ;(forms || []).forEach((form) => {
       augmentForm(cms, form, setNewUpdate, updateFormValue)
     })
