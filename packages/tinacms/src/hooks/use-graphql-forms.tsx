@@ -169,10 +169,102 @@ export const useTinaCloudPayload = (
   return [payload, isLoading]
 }
 
+const generateTinaCloudForms = (
+  cms: any,
+  payload: any,
+  onSubmit,
+  formify = null,
+  reset: (queryName: string) => void
+) => {
+  let forms: any[]
+  Object.entries(payload).map(([queryName, result]) => {
+    if (!canBeFormified(result)) {
+      // This is a list or collection query, no forms can be built
+      return
+    }
+    assertShape<{
+      values: object
+      form: FormOptions<any, any> & {
+        mutationInfo: {
+          string: string
+          includeCollection: boolean
+        }
+      }
+    }>(
+      result,
+      (yup) =>
+        yup.object({
+          values: yup.object().required(),
+          form: yup.object().required(),
+        }),
+      `Unable to build form shape for fields at ${queryName}`
+    )
+    const formConfig = {
+      id: queryName,
+      label: result.form.label,
+      initialValues: result.values,
+      fields: result.form.fields,
+
+      reset: () => {
+        reset(queryName)
+      },
+      onSubmit: async (payload) => {
+        const params = transformDocumentIntoMutationRequestPayload(
+          payload,
+          result.form.mutationInfo
+        )
+        const variables = { params }
+        const mutationString = result.form.mutationInfo.string
+        if (onSubmit) {
+          onSubmit({
+            queryString: mutationString,
+            mutationString,
+            variables,
+          })
+        } else {
+          try {
+            await cms.api.tina.request(mutationString, {
+              variables,
+            })
+            cms.alerts.success('Document saved!')
+          } catch (e) {
+            cms.alerts.error('There was a problem saving your document')
+            console.error(e)
+          }
+        }
+      },
+    }
+    const { createForm, createGlobalForm } = generateFormCreators(cms)
+    const SKIPPED = 'SKIPPED'
+    let form
+    let skipped
+    const skip = () => {
+      skipped = SKIPPED
+    }
+    if (skipped) return
+
+    if (formify) {
+      form = formify({ formConfig, createForm, createGlobalForm, skip }, cms)
+    } else {
+      form = createForm(formConfig)
+    }
+
+    if (!(form instanceof Form)) {
+      if (skipped === SKIPPED) {
+        return
+      }
+      throw new Error('formify must return a form or skip()')
+    }
+
+    forms.push(form)
+  })
+  return forms
+}
+
 export function useGraphqlForms<T extends object>({
   payload, //TODO - ambiguous name & type
   onSubmit,
-  formify = null,
+  formify,
 }: {
   payload: any
   onSubmit?: (args: onSubmitArgs) => void
@@ -182,89 +274,11 @@ export function useGraphqlForms<T extends object>({
 
   const { updateFormValue, setNewUpdate, reset, data } = useLinkedForm(payload)
 
+  const forms = generateTinaCloudForms(cms, payload, onSubmit, formify, reset)
+
   React.useEffect(() => {
     try {
-      Object.entries(payload).map(([queryName, result]) => {
-        if (!canBeFormified(result)) {
-          // This is a list or collection query, no forms can be built
-          return
-        }
-        assertShape<{
-          values: object
-          form: FormOptions<any, any> & {
-            mutationInfo: {
-              string: string
-              includeCollection: boolean
-            }
-          }
-        }>(
-          result,
-          (yup) =>
-            yup.object({
-              values: yup.object().required(),
-              form: yup.object().required(),
-            }),
-          `Unable to build form shape for fields at ${queryName}`
-        )
-        const formConfig = {
-          id: queryName,
-          label: result.form.label,
-          initialValues: result.values,
-          fields: result.form.fields,
-
-          reset: () => {
-            reset(queryName)
-          },
-          onSubmit: async (payload) => {
-            const params = transformDocumentIntoMutationRequestPayload(
-              payload,
-              result.form.mutationInfo
-            )
-            const variables = { params }
-            const mutationString = result.form.mutationInfo.string
-            if (onSubmit) {
-              onSubmit({
-                queryString: mutationString,
-                mutationString,
-                variables,
-              })
-            } else {
-              try {
-                await cms.api.tina.request(mutationString, {
-                  variables,
-                })
-                cms.alerts.success('Document saved!')
-              } catch (e) {
-                cms.alerts.error('There was a problem saving your document')
-                console.error(e)
-              }
-            }
-          },
-        }
-        const { createForm, createGlobalForm } = generateFormCreators(cms)
-        const SKIPPED = 'SKIPPED'
-        let form
-        let skipped
-        const skip = () => {
-          skipped = SKIPPED
-        }
-        if (skipped) return
-
-        if (formify) {
-          form = formify(
-            { formConfig, createForm, createGlobalForm, skip },
-            cms
-          )
-        } else {
-          form = createForm(formConfig)
-        }
-
-        if (!(form instanceof Form)) {
-          if (skipped === SKIPPED) {
-            return
-          }
-          throw new Error('formify must return a form or skip()')
-        }
+      forms.forEach((form) => {
         const { change } = form.finalForm
         form.finalForm.change = (name, value) => {
           if (typeof name !== 'string') {
@@ -274,16 +288,16 @@ export function useGraphqlForms<T extends object>({
           }
 
           setNewUpdate({
-            queryName,
-            get: [queryName, 'values', name].join('.'),
-            set: [queryName, 'data', name].join('.'),
+            queryName: form.id,
+            get: [form.id, 'values', name].join('.'),
+            set: [form.id, 'data', name].join('.'),
             /**
              * Reference paths returned from the server don't include array values
              * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
              * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
              */
             setReference: [
-              queryName,
+              form.id,
               'data',
               name
                 .split('.')
@@ -305,10 +319,10 @@ export function useGraphqlForms<T extends object>({
             .filter((item) => isNaN(Number(item)))
             .join('.')
           setNewUpdate({
-            queryName,
-            get: [queryName, 'values', name].join('.'),
-            set: [queryName, 'data', name].join('.'),
-            setReference: [queryName, 'data', referenceName].join('.'),
+            queryName: form.id,
+            get: [form.id, 'values', name].join('.'),
+            set: [form.id, 'data', name].join('.'),
+            setReference: [form.id, 'data', referenceName].join('.'),
             ...extra,
           })
         }
@@ -332,7 +346,7 @@ export function useGraphqlForms<T extends object>({
         }
         form.subscribe(
           ({ values }) => {
-            updateFormValue(queryName, values)
+            updateFormValue(form.id, values)
           },
           { values: true }
         )
