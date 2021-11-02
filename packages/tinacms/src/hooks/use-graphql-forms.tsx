@@ -21,25 +21,12 @@ import { assertShape, safeAssertShape } from '../utils'
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import type { DocumentNode } from 'graphql'
 
-export function useGraphqlForms<T extends object>({
-  query,
-  variables,
-  onSubmit,
-  formify = null,
-}: {
-  query: (gqlTag: typeof gql) => DocumentNode
-  variables: object
-  onSubmit?: (args: onSubmitArgs) => void
-  formify?: formifyCallback
-}): [T, Boolean] {
+const useLinkedForm = () => {
   const cms = useCMS()
-  const [formValues, setFormValues] = React.useState<FormValues>({})
+
   const [data, setData] = React.useState<object>(null)
-  const [initialData, setInitialData] = React.useState<Data>({})
-  const [pendingReset, setPendingReset] = React.useState(null)
-  const [isLoading, setIsLoading] = React.useState(true)
+  const [formValues, setFormValues] = React.useState<FormValues>({})
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
-  const [formNames, setFormNames] = React.useState([])
 
   /**
    * FIXME: this design is pretty flaky, but better than what
@@ -127,6 +114,29 @@ export function useGraphqlForms<T extends object>({
   React.useEffect(() => {
     updateData()
   }, [JSON.stringify(formValues)])
+
+  return { setFormValues, formValues, setNewUpdate, setData, data }
+}
+
+export function useGraphqlForms<T extends object>({
+  query,
+  variables,
+  onSubmit,
+  formify = null,
+}: {
+  query: (gqlTag: typeof gql) => DocumentNode
+  variables: object
+  onSubmit?: (args: onSubmitArgs) => void
+  formify?: formifyCallback
+}): [T, Boolean] {
+  const cms = useCMS()
+  const [initialData, setInitialData] = React.useState<Data>({})
+  const [pendingReset, setPendingReset] = React.useState(null)
+  const [isLoading, setIsLoading] = React.useState(true)
+
+  //foobar
+  const { setFormValues, formValues, setNewUpdate, setData, data } =
+    useLinkedForm()
 
   const queryString = print(query(gql))
 
