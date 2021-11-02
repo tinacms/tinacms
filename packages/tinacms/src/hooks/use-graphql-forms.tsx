@@ -128,21 +128,37 @@ const canBeFormified = (query) =>
     })
   )
 
+export const useTinaCloudPayload = (
+  query: (gqlTag: typeof gql) => DocumentNode,
+  variables: object
+) => {
+  const cms = useCMS()
+  const [isLoading, setIsLoading] = React.useState(true)
+  const [payload, setPayload] = React.useState()
+
+  React.useEffect(() => {
+    setIsLoading(true)
+    cms.api.tina.requestWithForm(query, { variables }).then((response) => {
+      setPayload(response)
+      setIsLoading(false)
+    })
+  }, [print(query(gql)), JSON.stringify(variables)])
+
+  return [payload, isLoading]
+}
+
 export function useGraphqlForms<T extends object>({
-  query,
-  variables,
+  payload, //TODO - ambiguous name & type
   onSubmit,
   formify = null,
 }: {
-  query: (gqlTag: typeof gql) => DocumentNode
-  variables: object
+  payload: any
   onSubmit?: (args: onSubmitArgs) => void
   formify?: formifyCallback
-}): [T, Boolean] {
+}): [T] {
   const cms = useCMS()
   const [initialData, setInitialData] = React.useState<Data>({})
   const [pendingReset, setPendingReset] = React.useState(null)
-  const [isLoading, setIsLoading] = React.useState(true)
 
   const { setFormValues, formValues, setNewUpdate, setData, data } =
     useLinkedForm()
@@ -155,176 +171,170 @@ export function useGraphqlForms<T extends object>({
   }, [pendingReset])
 
   React.useEffect(() => {
-    setIsLoading(true)
-    cms.api.tina
-      .requestWithForm(query, { variables })
-      .then((payload) => {
-        setData(payload)
-        setInitialData(payload)
-        setIsLoading(false)
-        Object.entries(payload).map(([queryName, result]) => {
-          if (!canBeFormified(result)) {
-            // This is a list or collection query, no forms can be built
-            return
-          }
-          assertShape<{
-            values: object
-            form: FormOptions<any, any> & {
-              mutationInfo: {
-                string: string
-                includeCollection: boolean
-              }
+    try {
+      setData(payload)
+      setInitialData(payload)
+      Object.entries(payload).map(([queryName, result]) => {
+        if (!canBeFormified(result)) {
+          // This is a list or collection query, no forms can be built
+          return
+        }
+        assertShape<{
+          values: object
+          form: FormOptions<any, any> & {
+            mutationInfo: {
+              string: string
+              includeCollection: boolean
             }
-          }>(
-            result,
-            (yup) =>
-              yup.object({
-                values: yup.object().required(),
-                form: yup.object().required(),
-              }),
-            `Unable to build form shape for fields at ${queryName}`
-          )
-          const formConfig = {
-            id: queryName,
-            label: result.form.label,
-            initialValues: result.values,
-            fields: result.form.fields,
+          }
+        }>(
+          result,
+          (yup) =>
+            yup.object({
+              values: yup.object().required(),
+              form: yup.object().required(),
+            }),
+          `Unable to build form shape for fields at ${queryName}`
+        )
+        const formConfig = {
+          id: queryName,
+          label: result.form.label,
+          initialValues: result.values,
+          fields: result.form.fields,
 
-            reset: () => {
-              setPendingReset(queryName)
-            },
-            onSubmit: async (payload) => {
-              const params = transformDocumentIntoMutationRequestPayload(
-                payload,
-                result.form.mutationInfo
-              )
-              const variables = { params }
-              const mutationString = result.form.mutationInfo.string
-              if (onSubmit) {
-                onSubmit({
-                  queryString: mutationString,
-                  mutationString,
+          reset: () => {
+            setPendingReset(queryName)
+          },
+          onSubmit: async (payload) => {
+            const params = transformDocumentIntoMutationRequestPayload(
+              payload,
+              result.form.mutationInfo
+            )
+            const variables = { params }
+            const mutationString = result.form.mutationInfo.string
+            if (onSubmit) {
+              onSubmit({
+                queryString: mutationString,
+                mutationString,
+                variables,
+              })
+            } else {
+              try {
+                await cms.api.tina.request(mutationString, {
                   variables,
                 })
-              } else {
-                try {
-                  await cms.api.tina.request(mutationString, {
-                    variables,
-                  })
-                  cms.alerts.success('Document saved!')
-                } catch (e) {
-                  cms.alerts.error('There was a problem saving your document')
-                  console.error(e)
-                }
+                cms.alerts.success('Document saved!')
+              } catch (e) {
+                cms.alerts.error('There was a problem saving your document')
+                console.error(e)
               }
-            },
-          }
-          const { createForm, createGlobalForm } = generateFormCreators(cms)
-          const SKIPPED = 'SKIPPED'
-          let form
-          let skipped
-          const skip = () => {
-            skipped = SKIPPED
-          }
-          if (skipped) return
-
-          if (formify) {
-            form = formify(
-              { formConfig, createForm, createGlobalForm, skip },
-              cms
-            )
-          } else {
-            form = createForm(formConfig)
-          }
-
-          if (!(form instanceof Form)) {
-            if (skipped === SKIPPED) {
-              return
             }
-            throw new Error('formify must return a form or skip()')
-          }
-          const { change } = form.finalForm
-          form.finalForm.change = (name, value) => {
-            if (typeof name !== 'string') {
-              throw new Error(
-                `Expected name to be of type string for FinalForm change callback`
-              )
-            }
+          },
+        }
+        const { createForm, createGlobalForm } = generateFormCreators(cms)
+        const SKIPPED = 'SKIPPED'
+        let form
+        let skipped
+        const skip = () => {
+          skipped = SKIPPED
+        }
+        if (skipped) return
 
-            setNewUpdate({
-              queryName,
-              get: [queryName, 'values', name].join('.'),
-              set: [queryName, 'data', name].join('.'),
-              /**
-               * Reference paths returned from the server don't include array values
-               * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
-               * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
-               */
-              setReference: [
-                queryName,
-                'data',
-                name
-                  .split('.')
-                  .filter((item) => isNaN(Number(item)))
-                  .join('.'),
-              ].join('.'),
-            })
-            return change(name, value)
-          }
-
-          const { insert, move, remove, ...rest } = form.finalForm.mutators
-          const prepareNewUpdate = (name: string, lookup?: string) => {
-            const extra = {}
-            if (lookup) {
-              extra['lookup'] = lookup
-            }
-            const referenceName = name
-              .split('.')
-              .filter((item) => isNaN(Number(item)))
-              .join('.')
-            setNewUpdate({
-              queryName,
-              get: [queryName, 'values', name].join('.'),
-              set: [queryName, 'data', name].join('.'),
-              setReference: [queryName, 'data', referenceName].join('.'),
-              ...extra,
-            })
-          }
-          form.finalForm.mutators = {
-            insert: (...args) => {
-              const fieldName = args[0]
-              prepareNewUpdate(fieldName, fieldName)
-              insert(...args)
-            },
-            move: (...args) => {
-              const fieldName = args[0]
-              prepareNewUpdate(fieldName, fieldName)
-              move(...args)
-            },
-            remove: (...args) => {
-              const fieldName = args[0]
-              prepareNewUpdate(fieldName, fieldName)
-              remove(...args)
-            },
-            ...rest,
-          }
-          form.subscribe(
-            ({ values }) => {
-              setFormValues({ ...formValues, [queryName]: { values: values } })
-            },
-            { values: true }
+        if (formify) {
+          form = formify(
+            { formConfig, createForm, createGlobalForm, skip },
+            cms
           )
-        })
-      })
-      .catch((e) => {
-        cms.alerts.error('There was a problem setting up forms for your query')
-        console.error('There was a problem setting up forms for your query')
-        console.error(e)
-        setIsLoading(false)
-      })
-  }, [print(query(gql)), JSON.stringify(variables)])
+        } else {
+          form = createForm(formConfig)
+        }
 
-  return [data as T, isLoading]
+        if (!(form instanceof Form)) {
+          if (skipped === SKIPPED) {
+            return
+          }
+          throw new Error('formify must return a form or skip()')
+        }
+        const { change } = form.finalForm
+        form.finalForm.change = (name, value) => {
+          if (typeof name !== 'string') {
+            throw new Error(
+              `Expected name to be of type string for FinalForm change callback`
+            )
+          }
+
+          setNewUpdate({
+            queryName,
+            get: [queryName, 'values', name].join('.'),
+            set: [queryName, 'data', name].join('.'),
+            /**
+             * Reference paths returned from the server don't include array values
+             * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
+             * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
+             */
+            setReference: [
+              queryName,
+              'data',
+              name
+                .split('.')
+                .filter((item) => isNaN(Number(item)))
+                .join('.'),
+            ].join('.'),
+          })
+          return change(name, value)
+        }
+
+        const { insert, move, remove, ...rest } = form.finalForm.mutators
+        const prepareNewUpdate = (name: string, lookup?: string) => {
+          const extra = {}
+          if (lookup) {
+            extra['lookup'] = lookup
+          }
+          const referenceName = name
+            .split('.')
+            .filter((item) => isNaN(Number(item)))
+            .join('.')
+          setNewUpdate({
+            queryName,
+            get: [queryName, 'values', name].join('.'),
+            set: [queryName, 'data', name].join('.'),
+            setReference: [queryName, 'data', referenceName].join('.'),
+            ...extra,
+          })
+        }
+        form.finalForm.mutators = {
+          insert: (...args) => {
+            const fieldName = args[0]
+            prepareNewUpdate(fieldName, fieldName)
+            insert(...args)
+          },
+          move: (...args) => {
+            const fieldName = args[0]
+            prepareNewUpdate(fieldName, fieldName)
+            move(...args)
+          },
+          remove: (...args) => {
+            const fieldName = args[0]
+            prepareNewUpdate(fieldName, fieldName)
+            remove(...args)
+          },
+          ...rest,
+        }
+        form.subscribe(
+          ({ values }) => {
+            setFormValues({ ...formValues, [queryName]: { values: values } })
+          },
+          { values: true }
+        )
+      })
+    } catch (e) {
+      cms.alerts.error('There was a problem setting up forms for your query')
+      console.error('There was a problem setting up forms for your query')
+      console.error(e)
+    }
+  }, [payload])
+
+  return [data as T]
 }
 
 export const transformDocumentIntoMutationRequestPayload = (

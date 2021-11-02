@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React from 'react'
-import { useGraphqlForms } from './hooks/use-graphql-forms'
+import { useGraphqlForms, useTinaCloudPayload } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
@@ -30,9 +30,12 @@ const SetupHooks = (props: {
   children: (args) => React.ReactNode
 }) => {
   const cms = useCMS()
-  const [payload, isLoading] = useGraphqlForms({
-    query: (gql) => gql(props.query),
-    variables: props.variables || {},
+  const [tinaCloudPayload, isLoading] = useTinaCloudPayload(
+    (gql) => gql(props.query),
+    props.variables || {}
+  )
+  const [payload] = useGraphqlForms({
+    payload: tinaCloudPayload,
     formify: (args) => {
       if (props.formifyCallback) {
         return props.formifyCallback(args, cms)
