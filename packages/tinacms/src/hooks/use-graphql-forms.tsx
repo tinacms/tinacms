@@ -21,12 +21,14 @@ import { assertShape, safeAssertShape } from '../utils'
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import type { DocumentNode } from 'graphql'
 
-const useLinkedForm = () => {
+const useLinkedForm = (payload) => {
   const cms = useCMS()
 
   const [data, setData] = React.useState<object>(null)
   const [formValues, setFormValues] = React.useState<FormValues>({})
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
+  const [initialData, setInitialData] = React.useState<Data>({})
+  const [pendingReset, setPendingReset] = React.useState(null)
 
   /**
    * FIXME: this design is pretty flaky, but better than what
@@ -64,6 +66,19 @@ const useLinkedForm = () => {
    * by `newUpdate` being an array, so as to batch all of it's changes in succession. But
    * it just feels like there's a much better way to do all of this 🤔
    */
+
+  React.useEffect(() => {
+    setData(payload)
+    setInitialData(payload)
+  }, [payload])
+
+  React.useEffect(() => {
+    if (pendingReset) {
+      setData({ ...data, [pendingReset]: initialData[pendingReset] })
+      setPendingReset(null)
+    }
+  }, [pendingReset])
+
   const updateData = async () => {
     if (newUpdate) {
       const newValue = getIn(formValues, newUpdate.get)
@@ -115,7 +130,13 @@ const useLinkedForm = () => {
     updateData()
   }, [JSON.stringify(formValues)])
 
-  return { setFormValues, formValues, setNewUpdate, setData, data }
+  return {
+    setFormValues,
+    formValues,
+    setNewUpdate,
+    reset: (queryId: string) => setPendingReset(queryId),
+    data,
+  }
 }
 
 const canBeFormified = (query) =>
@@ -157,23 +178,9 @@ export function useGraphqlForms<T extends object>({
   formify?: formifyCallback
 }): [T] {
   const cms = useCMS()
-  const [initialData, setInitialData] = React.useState<Data>({})
-  const [pendingReset, setPendingReset] = React.useState(null)
 
-  const { setFormValues, formValues, setNewUpdate, setData, data } =
-    useLinkedForm()
-
-  React.useEffect(() => {
-    setData(payload)
-    setInitialData(payload)
-  }, [payload])
-
-  React.useEffect(() => {
-    if (pendingReset) {
-      setData({ ...data, [pendingReset]: initialData[pendingReset] })
-      setPendingReset(null)
-    }
-  }, [pendingReset])
+  const { setFormValues, formValues, setNewUpdate, reset, data } =
+    useLinkedForm(payload)
 
   React.useEffect(() => {
     try {
@@ -206,7 +213,7 @@ export function useGraphqlForms<T extends object>({
           fields: result.form.fields,
 
           reset: () => {
-            setPendingReset(queryName)
+            reset(queryName)
           },
           onSubmit: async (payload) => {
             const params = transformDocumentIntoMutationRequestPayload(
