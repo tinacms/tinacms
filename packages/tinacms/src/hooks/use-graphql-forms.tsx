@@ -245,27 +245,29 @@ export function useGraphqlForms<T extends object>({
           }
           const { change } = form.finalForm
           form.finalForm.change = (name, value) => {
-            /**
-             * Reference paths returned from the server don't include array values
-             * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
-             * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
-             */
-            let referenceName = ''
-            if (typeof name === 'string') {
-              referenceName = name
-                .split('.')
-                .filter((item) => isNaN(Number(item)))
-                .join('.')
-            } else {
+            if (typeof name !== 'string') {
               throw new Error(
                 `Expected name to be of type string for FinalForm change callback`
               )
             }
+
             setNewUpdate({
               queryName,
               get: [queryName, 'values', name].join('.'),
               set: [queryName, 'data', name].join('.'),
-              setReference: [queryName, 'data', referenceName].join('.'),
+              /**
+               * Reference paths returned from the server don't include array values
+               * as part of their paths: so ["data", "getPostDocument", "blocks", 0, "author", "name"]
+               * should actually be: ["data", "getPostDocument", "blocks", "author", "name"]
+               */
+              setReference: [
+                queryName,
+                'data',
+                name
+                  .split('.')
+                  .filter((item) => isNaN(Number(item)))
+                  .join('.'),
+              ].join('.'),
             })
             return change(name, value)
           }
