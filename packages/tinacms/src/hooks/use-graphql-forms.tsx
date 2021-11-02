@@ -118,6 +118,16 @@ const useLinkedForm = () => {
   return { setFormValues, formValues, setNewUpdate, setData, data }
 }
 
+const canBeFormified = (query) =>
+  safeAssertShape<{
+    form: { mutationInfo: string }
+  }>(query, (yup) =>
+    yup.object({
+      values: yup.object().required(),
+      form: yup.object().required(),
+    })
+  )
+
 export function useGraphqlForms<T extends object>({
   query,
   variables,
@@ -156,15 +166,7 @@ export function useGraphqlForms<T extends object>({
         setInitialData(payload)
         setIsLoading(false)
         Object.entries(payload).map(([queryName, result]) => {
-          const canBeFormified = safeAssertShape<{
-            form: { mutationInfo: string }
-          }>(result, (yup) =>
-            yup.object({
-              values: yup.object().required(),
-              form: yup.object().required(),
-            })
-          )
-          if (!canBeFormified) {
+          if (!canBeFormified(result)) {
             // This is a list or collection query, no forms can be built
             return
           }
