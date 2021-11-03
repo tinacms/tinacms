@@ -166,9 +166,6 @@ class ErrorBoundary extends React.Component {
 
 export const TinaCMSProvider2 = ({
   children,
-  branch,
-  clientId,
-  isLocalClient,
   mediaStore,
   tinaioConfig,
   ...props
@@ -181,12 +178,6 @@ export const TinaCMSProvider2 = ({
   data: object
   /** Your React page component */
   children: () => React.ReactNode
-  /** Point to the local version of GraphQL instead of tina.io */
-  isLocalClient?: boolean
-  /** The base branch to pull content from. Note that this is ignored for local development */
-  branch?: string
-  /** Your clientID from tina.aio */
-  clientId?: string
   /** Callback if you need access to the "formify" API */
   formifyCallback?: formifyCallback
   /** Callback if you need access to the "document creator" API */
@@ -199,13 +190,7 @@ export const TinaCMSProvider2 = ({
     props.query
   }
   return (
-    <TinaCloudProvider
-      branch={branch}
-      clientId={clientId}
-      tinaioConfig={tinaioConfig}
-      isLocalClient={isLocalClient}
-      mediaStore={mediaStore}
-    >
+    <TinaCloudProvider tinaioConfig={tinaioConfig} mediaStore={mediaStore}>
       {props.query ? (
         <SetupHooks key={props.query} {...props} query={props.query || ''}>
           {children}
