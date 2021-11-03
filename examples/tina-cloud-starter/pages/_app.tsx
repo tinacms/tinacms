@@ -69,7 +69,6 @@ const App = ({ Component, pageProps }) => {
 
                 return createForm(formConfig);
               }}
-              cms={cms}
               {...pageProps}
             >
               {(livePageProps) => (
