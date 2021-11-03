@@ -10,6 +10,7 @@ import {
   useCloudForms,
   useCMS,
   GlobalFormPlugin,
+  Form,
 } from "tinacms";
 import { useEffect } from "react";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
@@ -44,6 +45,33 @@ const EditMode = ({ Component, pageProps }) => {
       }
     });
   }, [isLoadingForms]);
+  useEffect(() => {
+    cms.forms.add(
+      new Form({
+        id: "cool-form",
+        label: "Edit Post",
+        fields: [
+          {
+            name: "title",
+            label: "Title",
+            component: "text",
+          },
+          {
+            name: "markdownContent",
+            label: "content",
+            component: "markdown",
+          },
+        ],
+        initialValues: {
+          title: "Default value",
+          markdownContent: "",
+        },
+        onSubmit: async (formData) => {
+          alert("You saved a dummy form");
+        },
+      })
+    );
+  }, []);
 
   return (
     <Layout rawData={data} data={data?.getGlobalDocument?.data}>
