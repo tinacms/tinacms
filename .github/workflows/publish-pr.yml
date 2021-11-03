@@ -1,11 +1,6 @@
 name: Publish PRs
 on:
   workflow_dispatch:
-    inputs:
-      logLevel:
-        description: 'PR Number'
-        required: true
-        default: 'warning'
 
 jobs:
   build:
@@ -15,12 +10,12 @@ jobs:
         with:
           # This makes Actions fetch all Git history so that Changesets can generate changelogs with the correct commits
           fetch-depth: 0
-      - name: Install dependencies
-        # Before merging to main, re-run the install for security purposes
-        # https://yarnpkg.com/features/zero-installs/#does-it-have-security-implications
-        run: yarn install
-        env:
-          NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
+      # - name: Install dependencies
+      #   # Before merging to main, re-run the install for security purposes
+      #   # https://yarnpkg.com/features/zero-installs/#does-it-have-security-implications
+      #   run: yarn install
+      #   env:
+      #     NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       # - name: Build
       #   run: yarn build
       # - name: Test
@@ -29,7 +24,7 @@ jobs:
       #   run: yarn types
       - name: Publish under PR tag
         run: |
-          echo "About to version tag ${{ github.event.inputs.logLevel }}"
+          echo "About to version tag ${{ github.head_ref }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
