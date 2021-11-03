@@ -16,11 +16,35 @@ import { useGraphqlForms, useTinaCloudPayload } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
-import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
 
-import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
+
+export const useCloudForms = ({
+  query,
+  variables,
+}: {
+  query: string
+  variables?: object
+}) => {
+  const cms = useCMS()
+  const [tinaCloudPayload, isLoading] = useTinaCloudPayload(
+    (gql) => gql(query),
+    variables || {}
+  )
+  const [data, forms] = useGraphqlForms({
+    payload: tinaCloudPayload,
+    formify: (args) => {
+      args.skip()
+    },
+  })
+
+  return {
+    data,
+    forms,
+    isLoading,
+  }
+}
 
 const SetupHooks = (props: {
   query: string
@@ -167,7 +191,6 @@ class ErrorBoundary extends React.Component {
 export const TinaCMSProvider2 = ({
   children,
   mediaStore,
-  tinaioConfig,
   ...props
 }: {
   /** The query from getStaticProps */

@@ -234,25 +234,25 @@ const generateTinaCloudForms = (
         }
       },
     }
-    const { createForm, createGlobalForm } = generateFormCreators(cms)
-    const SKIPPED = 'SKIPPED'
-    let form
-    let skipped
-    const skip = () => {
-      skipped = SKIPPED
-    }
-    if (skipped) return
+    // const { createForm, createGlobalForm } = generateFormCreators(cms)
+    // const SKIPPED = 'SKIPPED'
+    // let form
+    // let skipped
+    // const skip = () => {
+    //   skipped = SKIPPED
+    // }
+    // if (skipped) return
 
-    form = formify({ formConfig, createForm, createGlobalForm, skip }, cms)
+    // form = formify({ formConfig, createForm, createGlobalForm, skip }, cms)
 
-    if (!(form instanceof Form)) {
-      if (skipped === SKIPPED) {
-        return
-      }
-      throw new Error('formify must return a form or skip()')
-    }
+    // if (!(form instanceof Form)) {
+    //   if (skipped === SKIPPED) {
+    //     return
+    //   }
+    //   throw new Error('formify must return a form or skip()')
+    // }
 
-    forms.push(form)
+    forms.push(new Form(formConfig))
   })
   return forms
 }
@@ -345,9 +345,10 @@ export function useGraphqlForms<T extends object>({
   payload: any
   onSubmit?: (args: onSubmitArgs) => void
   formify: formifyCallback
-}): [T] {
+}): [T, Form[]] {
   const cms = useCMS()
 
+  const [forms, setForms] = React.useState<Form[]>([])
   const { updateFormValue, setNewUpdate, reset, data } = useLinkedForm(payload)
   React.useEffect(() => {
     const forms = generateTinaCloudForms(cms, payload, onSubmit, formify, reset)
@@ -355,9 +356,10 @@ export function useGraphqlForms<T extends object>({
     ;(forms || []).forEach((form) => {
       augmentForm(cms, form, setNewUpdate, updateFormValue)
     })
+    setForms(forms)
   }, [payload])
 
-  return [data as T]
+  return [data as T, forms]
 }
 
 export const transformDocumentIntoMutationRequestPayload = (
