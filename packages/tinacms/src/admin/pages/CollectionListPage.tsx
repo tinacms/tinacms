@@ -171,14 +171,6 @@ const CollectionListPage = () => {
                                   </td>
                                   <td className="px-6 py-4 whitespace-nowrap">
                                     <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                      Extension
-                                    </span>
-                                    <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
-                                      {document.node.sys.extension}
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="block text-xs text-gray-400 mb-1 uppercase">
                                       Template
                                     </span>
                                     <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
