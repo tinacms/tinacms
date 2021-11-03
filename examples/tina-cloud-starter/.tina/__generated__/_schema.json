@@ -3,8 +3,8 @@
     {
       "label": "Blog Posts",
       "name": "posts",
-      "format": "mdx",
       "path": "content/posts",
+      "format": "mdx",
       "fields": [
         {
           "type": "rich-text",
