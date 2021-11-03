@@ -15,7 +15,12 @@ import React from 'react'
 import gql from 'graphql-tag'
 import { print } from 'graphql'
 import { getIn, setIn } from 'final-form'
-import { useCMS, Form, GlobalFormPlugin } from '@tinacms/toolkit'
+import {
+  useCMS,
+  Form,
+  GlobalFormPlugin,
+  FormMetaPlugin,
+} from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
@@ -142,6 +147,8 @@ export function useGraphqlForms<T extends object>({
     cms.api.tina
       .requestWithForm(query, { variables })
       .then((payload) => {
+        cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
+
         setData(payload)
         setInitialData(payload)
         setIsLoading(false)
@@ -159,6 +166,10 @@ export function useGraphqlForms<T extends object>({
             return
           }
           assertShape<{
+            _internalSys: {
+              collection: { name: string }
+              filename: string
+            }
             values: object
             form: FormOptions<any, any> & {
               mutationInfo: {
@@ -175,6 +186,21 @@ export function useGraphqlForms<T extends object>({
               }),
             `Unable to build form shape for fields at ${queryName}`
           )
+
+          if (cms.flags.get('tina-admin')) {
+            const TinaAdminLink = new FormMetaPlugin({
+              name: 'tina-admin-link',
+              Component: () => (
+                <a
+                  href={`/admin/collections/${result._internalSys.collection.name}/${result._internalSys.filename}`}
+                >
+                  &raquo; View {result._internalSys.filename} in TinaAdmin
+                </a>
+              ),
+            })
+            cms.plugins.add(TinaAdminLink)
+          }
+
           const formConfig = {
             id: queryName,
             label: result.form.label,
