@@ -16,7 +16,7 @@
     "g:echo": "echo $INIT_CWD",
     "g:nuke": "cd $INIT_CWD && yarn exec rm -rf dist && echo \"cleaned\"",
     "version": "yarn changeset version",
-    "version:snapshot": "yarn changeset version --snapshot",
+    "version:snapshot": "yarn changeset version --snapshot --ignore tina-cloud-starter --ignore tina-tailwind-sidebar-demo",
     "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
     "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",

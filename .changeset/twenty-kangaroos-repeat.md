@@ -1,5 +1,5 @@
 ---
-"@tinacms/cli": patch
+'@tinacms/cli': patch
 ---
 
 updated cli generated files

@@ -1,5 +1,4 @@
 ---
-'tina-cloud-starter': patch
 '@tinacms/graphql': patch
 'tinacms': patch
 ---
