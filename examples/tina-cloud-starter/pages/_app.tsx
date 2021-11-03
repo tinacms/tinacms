@@ -11,7 +11,13 @@ const NEXT_PUBLIC_TINA_CLIENT_ID = process.env.NEXT_PUBLIC_TINA_CLIENT_ID;
 const NEXT_PUBLIC_USE_LOCAL_CLIENT =
   process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT || true;
 
-const App = ({ Component, pageProps }) => {
+const EditMode = ({ Component, pageProps }) => {
+  useEffect(() => {
+    import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
+      cms.plugins.add(MarkdownFieldPlugin);
+    });
+  });
+
   const cms = useMemo(
     () =>
       new TinaCMS({
@@ -25,63 +31,55 @@ const App = ({ Component, pageProps }) => {
         },
       })
   );
-  useEffect(() => {
-    import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
-      cms.plugins.add(MarkdownFieldPlugin);
-    });
-  });
+  return (
+    <TinaProvider cms={cms}>
+      <TinaCloudProvider
+        mediaStore={import("next-tinacms-cloudinary").then(
+          ({ TinaCloudCloudinaryMediaStore }) => TinaCloudCloudinaryMediaStore
+        )}
+        documentCreatorCallback={{
+          /**
+           * After a new document is created, redirect to its location
+           */
+          onNewDocument: ({ collection: { slug }, breadcrumbs }) => {
+            const relativeUrl = `/${slug}/${breadcrumbs.join("/")}`;
+            return (window.location.href = relativeUrl);
+          },
+          /**
+           * Only allows documents to be created to the `Blog Posts` Collection
+           */
+          filterCollections: (options) => {
+            return options.filter((option) => option.label === "Blog Posts");
+          },
+        }}
+        formifyCallback={({ formConfig, createForm, createGlobalForm }) => {
+          if (formConfig.id === "getGlobalDocument") {
+            return createGlobalForm(formConfig);
+          }
+
+          return createForm(formConfig);
+        }}
+        {...pageProps}
+      >
+        {(livePageProps) => (
+          <Layout
+            rawData={livePageProps}
+            data={livePageProps.data?.getGlobalDocument?.data}
+          >
+            <Component {...livePageProps} />
+          </Layout>
+        )}
+      </TinaCloudProvider>
+    </TinaProvider>
+  );
+};
+
+const App = ({ Component, pageProps }) => {
   return (
     <>
       <TinaEditProvider
         showEditButton={true}
-        editMode={
-          <TinaProvider cms={cms}>
-            <TinaCloudProvider
-              mediaStore={import("next-tinacms-cloudinary").then(
-                ({ TinaCloudCloudinaryMediaStore }) =>
-                  TinaCloudCloudinaryMediaStore
-              )}
-              documentCreatorCallback={{
-                /**
-                 * After a new document is created, redirect to its location
-                 */
-                onNewDocument: ({ collection: { slug }, breadcrumbs }) => {
-                  const relativeUrl = `/${slug}/${breadcrumbs.join("/")}`;
-                  return (window.location.href = relativeUrl);
-                },
-                /**
-                 * Only allows documents to be created to the `Blog Posts` Collection
-                 */
-                filterCollections: (options) => {
-                  return options.filter(
-                    (option) => option.label === "Blog Posts"
-                  );
-                },
-              }}
-              formifyCallback={({
-                formConfig,
-                createForm,
-                createGlobalForm,
-              }) => {
-                if (formConfig.id === "getGlobalDocument") {
-                  return createGlobalForm(formConfig);
-                }
-
-                return createForm(formConfig);
-              }}
-              {...pageProps}
-            >
-              {(livePageProps) => (
-                <Layout
-                  rawData={livePageProps}
-                  data={livePageProps.data?.getGlobalDocument?.data}
-                >
-                  <Component {...livePageProps} />
-                </Layout>
-              )}
-            </TinaCloudProvider>
-          </TinaProvider>
-        }
+        editMode={<EditMode Component={Component} pageProps={pageProps} />}
       >
         <Layout
           rawData={pageProps}
