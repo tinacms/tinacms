@@ -24,7 +24,7 @@ jobs:
       #   run: yarn types
       - name: Publish under PR tag
         run: |
-          echo "About to version tag ${{ github.head_ref }}"
+          echo "About to version tag ${{ github.ref }}"
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
