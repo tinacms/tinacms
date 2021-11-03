@@ -272,8 +272,6 @@
         branch="main"
         // Optional: Your identifier when connecting to Tina Cloud
         clientId="<some-id-from-tina-cloud>"
-        // Optional: A callback for altering the CMS object if needed
-        cmsCallback={cms => {}}
         // Optional: A callback for altering the form generation if needed
         formifyCallback={args => {}}
         // Optional: A callback for altering the document creator plugin

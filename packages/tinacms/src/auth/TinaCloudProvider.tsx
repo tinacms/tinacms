@@ -135,8 +135,7 @@ export const AuthWallInner = ({
  * Note: this will not restrict access for local filesystem clients
  */
 export const TinaCloudProvider = (
-  props: TinaCloudAuthWallProps &
-    CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
+  props: TinaCloudAuthWallProps & CreateClientProps
 ) => {
   useTinaAuthRedirect()
   const cms = useCMS()
@@ -189,10 +188,6 @@ export const TinaCloudProvider = (
       }
     }
   }, [branchingEnabled, props.branch])
-
-  if (props.cmsCallback) {
-    props.cmsCallback(cms)
-  }
 
   return <AuthWallInner {...props} cms={cms} />
 }

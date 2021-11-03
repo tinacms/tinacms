@@ -169,7 +169,6 @@ export const TinaCMSProvider2 = ({
   branch,
   clientId,
   isLocalClient,
-  cmsCallback,
   mediaStore,
   tinaioConfig,
   ...props
@@ -188,8 +187,6 @@ export const TinaCMSProvider2 = ({
   branch?: string
   /** Your clientID from tina.aio */
   clientId?: string
-  /** Callback if you need access to the TinaCMS instance */
-  cmsCallback?: (cms: TinaCMS) => TinaCMS
   /** Callback if you need access to the "formify" API */
   formifyCallback?: formifyCallback
   /** Callback if you need access to the "document creator" API */
@@ -207,7 +204,6 @@ export const TinaCMSProvider2 = ({
       clientId={clientId}
       tinaioConfig={tinaioConfig}
       isLocalClient={isLocalClient}
-      cmsCallback={cmsCallback}
       mediaStore={mediaStore}
     >
       {props.query ? (

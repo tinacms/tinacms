@@ -3,7 +3,7 @@ import dynamic from "next/dynamic";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
 import { TinaCMS, TinaProvider } from "tinacms";
-import { useMemo } from "react";
+import { useMemo, useEffect } from "react";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCloudProvider = dynamic(() => import("tinacms"), { ssr: false });
 
@@ -13,6 +13,11 @@ const NEXT_PUBLIC_USE_LOCAL_CLIENT =
 
 const App = ({ Component, pageProps }) => {
   const cms = useMemo(() => new TinaCMS({ enabled: true, sidebar: true }));
+  useEffect(() => {
+    import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
+      cms.plugins.add(MarkdownFieldPlugin);
+    });
+  });
   return (
     <>
       <TinaEditProvider
@@ -27,13 +32,6 @@ const App = ({ Component, pageProps }) => {
                 ({ TinaCloudCloudinaryMediaStore }) =>
                   TinaCloudCloudinaryMediaStore
               )}
-              cmsCallback={(cms) => {
-                import("react-tinacms-editor").then(
-                  ({ MarkdownFieldPlugin }) => {
-                    cms.plugins.add(MarkdownFieldPlugin);
-                  }
-                );
-              }}
               documentCreatorCallback={{
                 /**
                  * After a new document is created, redirect to its location

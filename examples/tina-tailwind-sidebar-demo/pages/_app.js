@@ -21,11 +21,6 @@ const App = ({ Component, pageProps }) => {
             //   ({ TinaCloudCloudinaryMediaStore }) =>
             //     TinaCloudCloudinaryMediaStore
             // )}
-            // cmsCallback={(cms) => {
-            //   import('react-tinacms-editor').then(({ MarkdownFieldPlugin }) => {
-            //     cms.plugins.add(MarkdownFieldPlugin)
-            //   })
-            // }}
             // formifyCallback={({ formConfig, createForm, createGlobalForm }) => {
             //   if (formConfig.id === 'getGlobalDocument') {
             //     return createGlobalForm(formConfig)
