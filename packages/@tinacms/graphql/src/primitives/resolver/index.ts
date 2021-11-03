@@ -736,7 +736,7 @@ export class Resolver {
       case 'reference':
         const documents = _.flatten(
           await sequential(field.collections, async (collectionName) => {
-            return this.getDocumentsForCollection(collectionName)
+            return this.database.store.glob(collectionName)
           })
         )
 
@@ -745,10 +745,10 @@ export class Resolver {
           component: 'select',
           options: [
             { label: 'Choose an option', value: '' },
-            ...documents.map((filepath) => {
+            ...documents.map((document) => {
               return {
-                value: filepath,
-                label: filepath,
+                value: document,
+                label: document,
               }
             }),
           ],
