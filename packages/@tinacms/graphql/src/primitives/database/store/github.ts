@@ -85,9 +85,13 @@ export class GithubStore implements Store {
     const items = results.map((item) =>
       item.replace(this.rootPath, '').replace(/^\/|\/$/g, '')
     )
-    return sequential(items, async (item) => {
-      return callback(item)
-    })
+    if (callback) {
+      return sequential(items, async (item) => {
+        return callback(item)
+      })
+    } else {
+      return items
+    }
   }
 
   // @ts-ignore

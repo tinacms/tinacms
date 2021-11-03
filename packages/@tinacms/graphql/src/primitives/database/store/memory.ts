@@ -54,9 +54,13 @@ export class MemoryStore implements Store {
         return false
       }
     })
-    return sequential(strings, async (string) => {
-      return callback(string)
-    })
+    if (callback) {
+      return sequential(strings, async (item) => {
+        return callback(item)
+      })
+    } else {
+      return strings
+    }
   }
   public async get(filepath: string) {
     const content = await this.db.get(filepath)

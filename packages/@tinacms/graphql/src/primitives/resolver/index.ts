@@ -736,7 +736,8 @@ export class Resolver {
       case 'reference':
         const documents = _.flatten(
           await sequential(field.collections, async (collectionName) => {
-            return this.database.store.glob(collectionName)
+            const collection = this.tinaSchema.getCollection(collectionName)
+            return this.database.store.glob(collection.path)
           })
         )
 

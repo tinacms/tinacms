@@ -42,23 +42,21 @@ export async function startServer(
   { port = 4001, command, noWatch, experimentalData }: Options
 ) {
   const rootPath = process.cwd()
+  const shouldBuild = true
+
+  const ghConfig = {
+    rootPath: 'examples/tina-cloud-starter',
+    accessToken: 'my-token',
+    owner: 'tinacms',
+    repo: 'tinacms',
+    ref: 'add-data-store',
+  }
   const database = await createDatabase({
     store: new MemoryStore(rootPath),
     bridge: new FilesystemBridge(rootPath),
-    // bridge: new GithubBridge({
-    //   rootPath: 'examples/tina-cloud-starter',
-    //   accessToken: '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',
-    //   owner: 'tinacms',
-    //   repo: 'tinacms',
-    //   ref: 'main',
-    // }),
-    // store: new GithubStore({
-    //   rootPath: 'examples/tina-cloud-starter',
-    //   accessToken: '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',
-    //   owner: 'tinacms',
-    //   repo: 'tinacms',
-    //   ref: 'main',
-    // }),
+    // Be sure to set shouldBuild to false
+    // bridge: new GithubBridge(ghConfig),
+    // store: new GithubStore(ghConfig),
   })
 
   const startSubprocess = () => {
@@ -96,7 +94,9 @@ stack: ${code.stack || 'No stack was provided'}`)
       .on('ready', async () => {
         console.log('Generating Tina config')
         try {
-          await build()
+          if (shouldBuild) {
+            await build()
+          }
           ready = true
           startSubprocess()
         } catch (e) {
@@ -112,7 +112,9 @@ stack: ${code.stack || 'No stack was provided'}`)
         if (ready) {
           logger.info('Tina change detected, regenerating config')
           try {
-            await build()
+            if (shouldBuild) {
+              await build()
+            }
           } catch (e) {
             logger.info(
               dangerText(
