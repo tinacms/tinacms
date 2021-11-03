@@ -20,6 +20,7 @@ import {
   //@ts-ignore why can't it find you
   BranchSwitcherPlugin,
   Branch,
+  useCMS,
 } from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../client'
@@ -138,15 +139,7 @@ export const TinaCloudProvider = (
     CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
 ) => {
   useTinaAuthRedirect()
-  const cms = React.useMemo(
-    () =>
-      props.cms ||
-      new TinaCMS({
-        enabled: true,
-        sidebar: true,
-      }),
-    [props.cms]
-  )
+  const cms = useCMS()
   if (!cms.api.tina) {
     cms.api.tina = createClient(props)
   }
@@ -201,11 +194,7 @@ export const TinaCloudProvider = (
     props.cmsCallback(cms)
   }
 
-  return (
-    <TinaProvider cms={cms}>
-      <AuthWallInner {...props} cms={cms} />
-    </TinaProvider>
-  )
+  return <AuthWallInner {...props} cms={cms} />
 }
 
 /**
