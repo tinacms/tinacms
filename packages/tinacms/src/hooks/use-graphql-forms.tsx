@@ -39,7 +39,6 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
-  const [formNames, setFormNames] = React.useState([])
 
   /**
    * FIXME: this design is pretty flaky, but better than what
@@ -138,6 +137,7 @@ export function useGraphqlForms<T extends object>({
   }, [pendingReset])
 
   React.useEffect(() => {
+    const formIds: string[] = []
     setIsLoading(true)
     cms.api.tina
       .requestWithForm(query, { variables })
@@ -146,6 +146,7 @@ export function useGraphqlForms<T extends object>({
         setInitialData(payload)
         setIsLoading(false)
         Object.entries(payload).map(([queryName, result]) => {
+          formIds.push(queryName)
           const canBeFormified = safeAssertShape<{
             form: { mutationInfo: string }
           }>(result, (yup) =>
@@ -311,6 +312,15 @@ export function useGraphqlForms<T extends object>({
         console.error(e)
         setIsLoading(false)
       })
+
+    return () => {
+      formIds.forEach((name) => {
+        const formPlugin = cms.forms.find(name)
+        if (formPlugin) {
+          cms.forms.remove(formPlugin)
+        }
+      })
+    }
   }, [queryString, JSON.stringify(variables)])
 
   return [data as T, isLoading]
