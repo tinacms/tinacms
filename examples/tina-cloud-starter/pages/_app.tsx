@@ -2,7 +2,7 @@ import "../styles.css";
 import dynamic from "next/dynamic";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
-import { TinaCMS, TinaProvider } from "tinacms";
+import { TinaCMS, TinaProvider, Client, LocalClient } from "tinacms";
 import { useMemo, useEffect } from "react";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCloudProvider = dynamic(() => import("tinacms"), { ssr: false });
@@ -12,7 +12,19 @@ const NEXT_PUBLIC_USE_LOCAL_CLIENT =
   process.env.NEXT_PUBLIC_USE_LOCAL_CLIENT || true;
 
 const App = ({ Component, pageProps }) => {
-  const cms = useMemo(() => new TinaCMS({ enabled: true, sidebar: true }));
+  const cms = useMemo(
+    () =>
+      new TinaCMS({
+        enabled: true,
+        sidebar: true,
+        apis: {
+          tina:
+            process.env.NODE_ENV == "production"
+              ? new Client({ branch: "main", clientId: "" })
+              : new LocalClient(),
+        },
+      })
+  );
   useEffect(() => {
     import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
       cms.plugins.add(MarkdownFieldPlugin);
@@ -25,9 +37,6 @@ const App = ({ Component, pageProps }) => {
         editMode={
           <TinaProvider cms={cms}>
             <TinaCloudProvider
-              branch="main"
-              clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
-              isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
               mediaStore={import("next-tinacms-cloudinary").then(
                 ({ TinaCloudCloudinaryMediaStore }) =>
                   TinaCloudCloudinaryMediaStore

@@ -134,60 +134,55 @@ export const AuthWallInner = ({
  *
  * Note: this will not restrict access for local filesystem clients
  */
-export const TinaCloudProvider = (
-  props: TinaCloudAuthWallProps & CreateClientProps
-) => {
+export const TinaCloudProvider = (props: TinaCloudAuthWallProps) => {
   useTinaAuthRedirect()
   const cms = useCMS()
-  if (!cms.api.tina) {
-    cms.api.tina = createClient(props)
-  }
   const setupMedia = async () => {
     if (props.mediaStore) {
       cms.media.store = new (await props.mediaStore)(cms.api.tina)
     }
   }
-  const handleListBranches = async (): Promise<Branch[]> => {
-    const { owner, repo } = props
-    const branches = await cms.api.tina.listBranches({ owner, repo })
+  // const handleListBranches = async (): Promise<Branch[]> => {
+  //   const { owner, repo } = props
+  //   const branches = await cms.api.tina.listBranches({ owner, repo })
 
-    return branches.map((branch) => branch.name)
-  }
-  const handleCreateBranch = async (data) => {
-    const newBranch = await cms.api.tina.createBranch(data)
+  //   return branches.map((branch) => branch.name)
+  // }
+  // const handleCreateBranch = async (data) => {
+  //   const newBranch = await cms.api.tina.createBranch(data)
 
-    return newBranch
-  }
+  //   return newBranch
+  // }
 
   setupMedia()
 
   //@ts-ignore it's not picking up cms.flags
   const branchingEnabled = cms.flags.get('branch-switcher')
 
-  React.useEffect(() => {
-    let branchSwitcher
-    if (branchingEnabled) {
-      branchSwitcher = new BranchSwitcherPlugin({
-        cms,
-        owner: props.owner,
-        repo: props.repo,
-        baseBranch: props.branch || 'main',
-        currentBranch: props.branch || 'main',
-        //TODO implement these
-        listBranches: handleListBranches,
-        createBranch: handleCreateBranch,
-        setCurrentBranch: () => console.log(props.branch),
-      })
-      cms.plugins.add(branchSwitcher)
-    }
-    return () => {
-      if (!branchingEnabled) {
-        if (branchSwitcher) {
-          cms.plugins.remove(branchSwitcher)
-        }
-      }
-    }
-  }, [branchingEnabled, props.branch])
+  // React.useEffect(() => {
+  //   let branchSwitcher
+  //   if (branchingEnabled) {
+  //     branchSwitcher = new BranchSwitcherPlugin({
+  //       cms,
+  //       owner: props.owner,
+  //       repo: props.repo,
+  //       baseBranch: props.branch || 'main',
+  //       currentBranch: props.branch || 'main',
+  //       //TODO implement these
+  //       listBranches: handleListBranches,
+  //       createBranch: handleCreateBranch,
+  //       setCurrentBranch: () => console.log(props.branch),
+  //     })
+  //     cms.plugins.add(branchSwitcher)
+  //   }
+  //   return () => {
+  //     if (!branchingEnabled) {
+  //       if (branchSwitcher) {
+  //         cms.plugins.remove(branchSwitcher)
+  //       }
+  //     }
+  //   }
+  // }, [branchingEnabled, props.branch])
 
   return <AuthWallInner {...props} cms={cms} />
 }
