@@ -184,13 +184,12 @@ export const TinaCMSProvider2 = ({
   documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
   /** TinaCMS media store instance */
   mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
-  tinaioConfig?: TinaIOConfig
 }) => {
   if (typeof props.query === 'string') {
     props.query
   }
   return (
-    <TinaCloudProvider tinaioConfig={tinaioConfig} mediaStore={mediaStore}>
+    <TinaCloudProvider mediaStore={mediaStore}>
       {props.query ? (
         <SetupHooks key={props.query} {...props} query={props.query || ''}>
           {children}
