@@ -173,12 +173,16 @@ function cloudinaryToTina(file: any): Media {
     id: file.public_id,
     filename,
     directory,
+    src: file.url,
     previewSrc: transformCloudinaryImage(file.url, 'w_75,h_75,c_fill,q_auto'),
     type: 'file',
   }
 }
 
-function transformCloudinaryImage(url: string, transformations: string): string {
+function transformCloudinaryImage(
+  url: string,
+  transformations: string
+): string {
   const parts = url.split('/image/upload/')
 
   if (parts.length === 2) {
