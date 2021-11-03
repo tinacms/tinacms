@@ -21,7 +21,9 @@
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
     "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
     "push-tags": "git push --follow-tags",
-    "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
+    "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
+    "swapDeps": "yarn workspaces foreach --include tina-cloud-starter --include tina-tailwind-sidebar-demo run g:swap",
+    "g:swap": "cd $INIT_CWD && yarn node ../../scripts/transformDeps.js"
   },
   "dependencies": {
     "@changesets/cli": "^2.16.0",
