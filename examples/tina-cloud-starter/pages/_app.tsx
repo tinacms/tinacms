@@ -11,6 +11,7 @@ import {
   useCMS,
   GlobalFormPlugin,
   Form,
+  TinaCloudProvider,
 } from "tinacms";
 import { useEffect } from "react";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
@@ -100,7 +101,9 @@ const App = ({ Component, pageProps }) => {
               })
             }
           >
-            <EditMode Component={Component} pageProps={pageProps} />
+            <TinaCloudProvider>
+              <EditMode Component={Component} pageProps={pageProps} />
+            </TinaCloudProvider>
           </TinaProvider>
         }
       >
