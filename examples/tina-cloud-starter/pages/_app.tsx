@@ -20,10 +20,10 @@ const App = ({ Component, pageProps }) => {
             branch="main"
             clientId={NEXT_PUBLIC_TINA_CLIENT_ID}
             isLocalClient={Boolean(Number(NEXT_PUBLIC_USE_LOCAL_CLIENT))}
-            mediaStore={import("next-tinacms-cloudinary").then(
-              ({ TinaCloudCloudinaryMediaStore }) =>
-                TinaCloudCloudinaryMediaStore
-            )}
+            mediaStore={async () => {
+              const pack = await import("next-tinacms-cloudinary");
+              return pack.TinaCloudCloudinaryMediaStore;
+            }}
             cmsCallback={(cms) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
