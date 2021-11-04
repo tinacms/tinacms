@@ -25,6 +25,7 @@ import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import type { DocumentNode } from 'graphql'
+import { BiLinkExternal } from 'react-icons/bi'
 
 export function useGraphqlForms<T extends object>({
   query,
@@ -193,8 +194,26 @@ export function useGraphqlForms<T extends object>({
               Component: () => (
                 <a
                   href={`/admin/collections/${result._internalSys.collection.name}/${result._internalSys.filename}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '10px 20px',
+                    borderTop: '1px solid var(--tina-color-grey-2)',
+                    textTransform: 'uppercase',
+                    fontSize: '11px',
+                    fontWeight: 500,
+                    background: 'var(--tina-color-grey-0)',
+                  }}
                 >
-                  &raquo; View {result._internalSys.filename} in TinaAdmin
+                  <BiLinkExternal
+                    style={{
+                      height: '1.25em',
+                      width: 'auto',
+                      opacity: '0.8',
+                      marginRight: '8px',
+                    }}
+                  />{' '}
+                  Edit in TinaAdmin
                 </a>
               ),
             })
