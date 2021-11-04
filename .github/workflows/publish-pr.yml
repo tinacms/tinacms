@@ -20,8 +20,8 @@ jobs:
         run: yarn build
       # - name: Test
       #   run: yarn test
-      - name: Build Types
-        run: yarn types
+      # - name: Build Types
+      #   run: yarn types
       - name: Publish under PR tag
         run: |
           echo running on branch ${GITHUB_REF##*/}
