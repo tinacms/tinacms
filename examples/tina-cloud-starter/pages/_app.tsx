@@ -28,6 +28,8 @@ const App = ({ Component, pageProps }) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
+
+              cms.flags.set("tina-admin", true);
             }}
             documentCreatorCallback={{
               /**
