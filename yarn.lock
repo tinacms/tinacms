@@ -23798,7 +23798,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-tinacms-editor@^0.52.3, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
+"react-tinacms-editor@^0.52.4, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
   version: 0.0.0-use.local
   resolution: "react-tinacms-editor@workspace:packages/react-tinacms-editor"
   dependencies:
@@ -23901,7 +23901,7 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-inline@^0.53.3, react-tinacms-inline@workspace:packages/react-tinacms-inline":
+"react-tinacms-inline@^0.53.4, react-tinacms-inline@workspace:packages/react-tinacms-inline":
   version: 0.0.0-use.local
   resolution: "react-tinacms-inline@workspace:packages/react-tinacms-inline"
   dependencies:
@@ -23965,6 +23965,8 @@ fsevents@~2.1.2:
     final-form: ">=4.20.2"
     react: ">=16.14.0"
     react-final-form: ^6.3.0
+    react-is: ^17.0.2
+    styled-components: ">4.5"
     tinacms: ">=0.50.0"
   languageName: unknown
   linkType: soft
@@ -27394,8 +27396,8 @@ resolve@^2.0.0-next.3:
     react-dom: ^16.14.0
     react-icons: ^4.2.0
     react-is: ^17.0.2
-    react-tinacms-editor: ^0.52.3
-    react-tinacms-inline: ^0.53.3
+    react-tinacms-editor: ^0.52.4
+    react-tinacms-inline: ^0.53.4
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"

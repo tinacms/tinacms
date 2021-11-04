@@ -17,6 +17,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 interface Document {
   node: {
     sys: {
+      template: string
       breadcrumbs: string[]
       path: string
       basename: string
@@ -26,10 +27,17 @@ interface Document {
     }
   }
 }
+
+export interface Template {
+  name: string
+  label: string
+  fields: any[]
+}
 export interface Collection {
   label: string
   name: string
   format: string
+  templates: Template[]
   documents: {
     totalCount: number
     edges: Document[]
@@ -55,12 +63,14 @@ export const useGetCollection = (
               name
               label
               format
+              templates
               documents @include(if: $includeDocuments) {
                 totalCount
                 edges {
                   node {
                     ... on Document {
                       sys {
+                        template
                         breadcrumbs
                         path
                         basename

@@ -3637,23 +3637,6 @@
               "kind": "InputValueDefinition",
               "name": {
                 "kind": "Name",
-                "value": "collection"
-              },
-              "type": {
-                "kind": "NonNullType",
-                "type": {
-                  "kind": "NamedType",
-                  "name": {
-                    "kind": "Name",
-                    "value": "String"
-                  }
-                }
-              }
-            },
-            {
-              "kind": "InputValueDefinition",
-              "name": {
-                "kind": "Name",
                 "value": "relativePath"
               },
               "type": {
@@ -3703,23 +3686,6 @@
             "value": "createDocument"
           },
           "arguments": [
-            {
-              "kind": "InputValueDefinition",
-              "name": {
-                "kind": "Name",
-                "value": "collection"
-              },
-              "type": {
-                "kind": "NonNullType",
-                "type": {
-                  "kind": "NamedType",
-                  "name": {
-                    "kind": "Name",
-                    "value": "String"
-                  }
-                }
-              }
-            },
             {
               "kind": "InputValueDefinition",
               "name": {
