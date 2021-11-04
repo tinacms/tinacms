@@ -24,8 +24,7 @@ jobs:
       #   run: yarn types
       - name: Publish under PR tag
         run: |
-          branchName=${${{ github.ref }}//refs\/head\//}
-          echo "About to version tag " $branchName
+          echo running on branch ${GITHUB_REF##*/}
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
