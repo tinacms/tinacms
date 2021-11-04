@@ -15,13 +15,12 @@ import { Client, LocalClient } from '../client'
 import type { TinaIOConfig } from '../client'
 import * as yup from 'yup'
 
-export * from './client'
 export interface CreateClientProps {
   clientId?: string
   isLocalClient?: boolean
   tinaioConfig?: TinaIOConfig
-  owner?: string,
-  repo?: string,
+  owner?: string
+  repo?: string
   branch?: string
 }
 export const createClient = ({

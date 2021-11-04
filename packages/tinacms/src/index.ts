@@ -21,7 +21,5 @@ export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'
 
 import { TinaCMSProvider2 } from './tina-cms'
-import { DocumentNode } from 'graphql'
-export type { DocumentNode }
 import { type } from 'os'
 export default TinaCMSProvider2

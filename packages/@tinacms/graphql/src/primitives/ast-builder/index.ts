@@ -483,16 +483,18 @@ export const astBuilder = {
   },
   FragmentDefinition: ({
     name,
+    fragmentName,
     selections,
   }: {
     name: string
+    fragmentName: string
     selections: SelectionNode[]
   }): FragmentDefinitionNode => {
     return {
       kind: 'FragmentDefinition' as const,
       name: {
         kind: 'Name' as const,
-        value: name + 'Parts',
+        value: fragmentName,
       },
       typeCondition: {
         kind: 'NamedType' as const,
@@ -907,6 +909,9 @@ export const NAMER = {
   },
   generateQueryListName: (namespace: string[]) => {
     return 'get' + generateNamespacedFieldName(namespace, 'List')
+  },
+  fragmentName: (namespace: string[]) => {
+    return generateNamespacedFieldName(namespace, '') + 'Parts'
   },
   collectionTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'Collection')
