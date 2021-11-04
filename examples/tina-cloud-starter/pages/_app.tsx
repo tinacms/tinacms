@@ -24,40 +24,44 @@ const NEXT_PUBLIC_USE_LOCAL_CLIENT =
 const TinaForms = ({ forms }: { forms: Form[] }) => {
   const cms = useCMS();
 
+  // Register some custom plugins like so:
   useEffect(() => {
     import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
       cms.plugins.add(MarkdownFieldPlugin);
     });
   }, []);
 
-  useEffect(() => {
-    cms.forms.add(
-      new Form({
-        id: "cool-form",
-        label: "Edit Post",
-        fields: [
-          {
-            name: "title",
-            label: "Title",
-            component: "text",
-          },
-          {
-            name: "markdownContent",
-            label: "content",
-            component: "markdown",
-          },
-        ],
-        initialValues: {
-          title: "Default value",
-          markdownContent: "",
-        },
-        onSubmit: async (formData) => {
-          alert("You saved a dummy form");
-        },
-      })
-    );
-  }, []);
+  // You could register a custom form here like so:
 
+  // useEffect(() => {
+  //   cms.forms.add(
+  //     new Form({
+  //       id: "cool-form",
+  //       label: "Edit Post",
+  //       fields: [
+  //         {
+  //           name: "title",
+  //           label: "Title",
+  //           component: "text",
+  //         },
+  //         {
+  //           name: "markdownContent",
+  //           label: "content",
+  //           component: "markdown",
+  //         },
+  //       ],
+  //       initialValues: {
+  //         title: "Default value",
+  //         markdownContent: "",
+  //       },
+  //       onSubmit: async (formData) => {
+  //         alert("You saved a dummy form");
+  //       },
+  //     })
+  //   );
+  // }, []);
+
+  // register the forms that came from Tina Cloud
   useEffect(() => {
     forms.forEach((form) => {
       if (form.id === "getGlobalDocument") {
@@ -78,6 +82,7 @@ const App = ({ Component, pageProps }) => {
         enabled: true,
         sidebar: true,
         apis: {
+          // Register the local or production Tina Cloud backend
           tina:
             process.env.NODE_ENV == "production"
               ? new Client({ branch: "main", clientId: "" })
@@ -91,6 +96,7 @@ const App = ({ Component, pageProps }) => {
         showEditButton={true}
         editMode={
           <TinaProvider cms={cms}>
+            {/* Container to maoe sure user is logged in */}
             <TinaCloudAuthProvider>
               <TinaCloudQuery
                 query={pageProps.query}
@@ -98,6 +104,7 @@ const App = ({ Component, pageProps }) => {
               >
                 {({ forms, data }) => (
                   <>
+                    {/* Custom component to register our forms */}
                     <TinaForms forms={forms} />
                     {/* Preview the content */}
                     <Layout rawData={data} data={data?.getGlobalDocument?.data}>
@@ -105,11 +112,12 @@ const App = ({ Component, pageProps }) => {
                     </Layout>
                   </>
                 )}
-              </TinaCloudQuery>{" "}
+              </TinaCloudQuery>
             </TinaCloudAuthProvider>
           </TinaProvider>
         }
       >
+        {/* Production page */}
         <Layout
           rawData={pageProps}
           data={pageProps.data?.getGlobalDocument?.data}
