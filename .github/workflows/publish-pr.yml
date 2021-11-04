@@ -18,8 +18,8 @@ jobs:
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
       - name: Build
         run: yarn build
-      - name: Test
-        run: yarn test
+      # - name: Test
+      #   run: yarn test
       - name: Build Types
         run: yarn types
       - name: Publish under PR tag
