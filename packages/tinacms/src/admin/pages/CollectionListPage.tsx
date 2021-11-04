@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import React, { Fragment } from 'react'
-import { BiEdit } from 'react-icons/bi'
+import { BiEdit, BiLinkExternal } from 'react-icons/bi'
 import { useParams, useLocation, Link } from 'react-router-dom'
 import { Menu, Transition } from '@headlessui/react'
 
@@ -175,7 +175,7 @@ const CollectionListPage = () => {
                                         href={livesiteRoute}
                                         className="flex gap-1.5 items-center px-4 py-1.5 rounded-full transition-all ease-out duration-150 text-gray-500 hover:text-blue-500"
                                       >
-                                        <BiEdit className="inline-block h-5 w-auto opacity-70" />{' '}
+                                        <BiLinkExternal className="inline-block h-5 w-auto opacity-70" />{' '}
                                         View
                                       </a>
                                     )}
