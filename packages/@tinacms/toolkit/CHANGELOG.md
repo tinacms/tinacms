@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.55.2
+
+### Patch Changes
+
+- 2724c48c0: Fix issue where the rich-text editor didn't allow user input when the initial value was empty
+
 ## 0.55.1
 
 ### Patch Changes

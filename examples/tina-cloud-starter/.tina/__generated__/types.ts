@@ -435,14 +435,12 @@ export type MutationAddPendingDocumentArgs = {
 
 
 export type MutationUpdateDocumentArgs = {
-  collection: Scalars['String'];
   relativePath: Scalars['String'];
   params: DocumentMutation;
 };
 
 
 export type MutationCreateDocumentArgs = {
-  collection: Scalars['String'];
   relativePath: Scalars['String'];
   params: DocumentMutation;
 };

@@ -1,9 +1,8 @@
 mutation {
   updateDocument(
-    collection: "some-fake-collection"
     relativePath: "hello-world.md"
     params: {
-      post: {
+      someFakeCollection: {
         post: { title: "Hello, again!", author: "content/authors/marge.md" }
       }
     }
