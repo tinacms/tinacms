@@ -16,7 +16,7 @@ import { useGraphqlForms, useTinaCloudPayload } from './hooks/use-graphql-forms'
 import { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
-import { useCMS } from '@tinacms/toolkit'
+import { useCMS, Form } from '@tinacms/toolkit'
 
 import type { formifyCallback } from './hooks/use-graphql-forms'
 
@@ -44,6 +44,38 @@ export const useCloudForms = ({
     forms,
     isLoading,
   }
+}
+
+export const TinaCloudQuery = ({
+  query,
+  variables,
+  children,
+}: {
+  query: string
+  variables?: object
+  children: (args: { forms: Form[]; data: object }) => React.ReactNode
+}) => {
+  const {
+    data,
+    forms,
+    isLoading: isLoadingForms,
+  } = useCloudForms({
+    query,
+    variables,
+  })
+
+  console.log('123 ', data, forms, query, variables, isLoadingForms)
+
+  return (
+    <ErrorBoundary>
+      {isLoadingForms ? (
+        <Loader />
+      ) : (
+        // pass the new edit state data to the child
+        children({ forms, data })
+      )}
+    </ErrorBoundary>
+  )
 }
 
 const SetupHooks = (props: {
