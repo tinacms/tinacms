@@ -454,6 +454,7 @@ export class Builder {
     collection: TinaCloudCollectionEnriched
   ) => {
     const name = NAMER.dataTypeName(collection.namespace)
+    const fragmentName = NAMER.fragmentName(collection.namespace)
 
     if (typeof collection.fields === 'object') {
       const selections = []
@@ -464,6 +465,7 @@ export class Builder {
 
       return astBuilder.FragmentDefinition({
         name,
+        fragmentName,
         selections: filterSelections(selections),
       })
     } else {

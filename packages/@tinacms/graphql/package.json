@@ -68,7 +68,6 @@
     "gray-matter": "^4.0.2",
     "js-yaml": "^3.14.0",
     "lodash": "^4.17.20",
-    "lodash.set": "^4.3.2",
     "lru-cache": "^6.0.0",
     "mdast": "^3.0.0",
     "mdast-util-from-markdown": "^1.0.0",

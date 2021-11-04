@@ -64,10 +64,10 @@ const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
   const fragPath = path.join(process.cwd(), '.tina', '__generated__')
 
   await fs.outputFileSync(path.join(fragPath, 'frags.gql'), print(fragDoc))
-  await fs.outputFileSync(
-    path.join(fragPath, 'frags.json'),
-    JSON.stringify(fragDoc, null, 2)
-  )
+  //   await fs.outputFileSync(
+  //     path.join(fragPath, 'frags.json'),
+  //     JSON.stringify(fragDoc, null, 2)
+  //   )
 }
 
 const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
@@ -79,7 +79,7 @@ const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
     const queryName = NAMER.queryName(collection.namespace)
     const queryListName = NAMER.generateQueryListName(collection.namespace)
 
-    const fragName = NAMER.dataTypeName(collection.namespace) + 'Parts'
+    const fragName = NAMER.fragmentName(collection.namespace)
 
     operationsDefinitions.push(
       astBuilder.QueryOperationDefinition({ fragName, queryName })
@@ -105,10 +105,11 @@ const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
   const fragPath = path.join(process.cwd(), '.tina', '__generated__')
 
   await fs.outputFileSync(path.join(fragPath, 'queries.gql'), print(queryDoc))
-  await fs.outputFileSync(
-    path.join(fragPath, 'queries.json'),
-    JSON.stringify(queryDoc, null, 2)
-  )
+  // We dont this them for now
+  // await fs.outputFileSync(
+  //   path.join(fragPath, 'queries.json'),
+  //   JSON.stringify(queryDoc, null, 2)
+  // )
 }
 
 const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {

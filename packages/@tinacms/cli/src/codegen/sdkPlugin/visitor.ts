@@ -53,10 +53,11 @@ export class GenericSdkVisitor extends ClientSideBaseVisitor<
       this._additionalImports.push(this.config.usingObservableFrom)
     }
     if (this.config.documentMode !== DocumentMode.string) {
-      const importType = this.config.useTypeImports ? 'import type' : 'import'
-      this._additionalImports.push(
-        `${importType} { DocumentNode } from 'tinacms';`
-      )
+      // We may need this later but for now we do not
+      // const importType = this.config.useTypeImports ? 'import type' : 'import'
+      // this._additionalImports.push(
+      //   `${importType} { DocumentNode } from 'tinacms';`
+      // )
     }
   }
 
