@@ -16,14 +16,15 @@ limitations under the License.
 
 */
 
-export * from './TextField'
-export * from './TextArea'
-export * from './ColorPicker'
-export * from './Toggle'
-export * from './Select'
-export * from './RadioGroup'
-export * from './CheckboxGroup'
-export * from './NumberInput'
-export * from './ImageUpload'
-export * from './Input'
-export * from './Reference'
+import { wrapFieldsWithMeta } from './wrapFieldWithMeta'
+import { Reference } from '../components'
+import { parse } from './textFormat'
+
+export const ReferenceField = wrapFieldsWithMeta(Reference)
+
+export const ReferenceFieldPlugin = {
+  name: 'reference',
+  type: 'reference',
+  Component: ReferenceField,
+  parse,
+}
