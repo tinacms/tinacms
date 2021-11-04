@@ -145,46 +145,48 @@ const CollectionListPage = () => {
 
                               return (
                                 <tr key={document.node.sys.relativePath}>
-                                  <td className="px-6 py-2 whitespace-nowrap">
+                                  <td className="px-5 py-3 whitespace-nowrap">
+                                    <span className="block text-xs mb-0.5 text-gray-400 uppercase">
+                                      Filename
+                                    </span>
                                     <Link
                                       to={`${location.pathname}/${document.node.sys.filename}`}
-                                      className="text-blue-600 hover:text-blue-400 flex items-center gap-3"
+                                      className="h-5 leading-5 block"
                                     >
-                                      <BiEdit className="inline-block h-6 w-auto opacity-70" />{' '}
-                                      <span>
-                                        <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                          Filename
-                                        </span>
-                                        <span className="h-5 leading-5 block whitespace-nowrap">
-                                          {document.node.sys.filename}
-                                        </span>
+                                      <span className="leading-5 font-medium text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-700">
+                                        {document.node.sys.filename}
+                                      </span>
+                                      <span className="leading-5 text-base font-medium text-gray-300">
+                                        {document.node.sys.extension}
                                       </span>
                                     </Link>
                                   </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                      Extension
-                                    </span>
-                                    <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
-                                      {document.node.sys.extension}
-                                    </span>
-                                  </td>
-                                  <td className="px-6 py-4 whitespace-nowrap">
-                                    <span className="block text-xs text-gray-400 mb-1 uppercase">
+                                  <td className="px-5 py-3 whitespace-nowrap">
+                                    <span className="block text-xs mb-0.5 text-gray-400 uppercase">
                                       Template
                                     </span>
-                                    <span className="h-5 leading-5 block text-sm font-medium text-gray-900">
+                                    <span className="h-5 block leading-5 font-regular text-base overflow-ellipsis overflow-hidden whitespace-nowrap text-gray-500">
                                       {document.node.sys.template}
                                     </span>
                                   </td>
-                                  {livesiteRoute && (
-                                    <td className="px-6 py-4 whitespace-nowrap">
-                                      <span className="block text-xs text-gray-400 mb-1 uppercase">
-                                        Site Link
-                                      </span>
-                                      <a href={livesiteRoute}>Preview</a>
-                                    </td>
-                                  )}
+                                  <td className="px-5 py-3 whitespace-nowrap flex gap-3 items-center justify-end">
+                                    {livesiteRoute && (
+                                      <a
+                                        href={livesiteRoute}
+                                        className="flex gap-1.5 items-center px-4 py-1.5 rounded-full transition-all ease-out duration-150 text-gray-500 hover:text-blue-500"
+                                      >
+                                        <BiEdit className="inline-block h-5 w-auto opacity-70" />{' '}
+                                        View
+                                      </a>
+                                    )}
+                                    <Link
+                                      to={`${location.pathname}/${document.node.sys.filename}`}
+                                      className="flex gap-1.5 items-center px-4 py-1.5 rounded-full border border-gray-150 transition-all ease-out duration-150 text-gray-700  hover:bg-gray-50 hover:text-blue-500"
+                                    >
+                                      <BiEdit className="inline-block h-5 w-auto opacity-70" />{' '}
+                                      Edit
+                                    </Link>
+                                  </td>
                                 </tr>
                               )
                             })}
