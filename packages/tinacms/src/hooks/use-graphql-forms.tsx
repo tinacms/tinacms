@@ -213,7 +213,7 @@ export function useGraphqlForms<T extends object>({
                       marginRight: '8px',
                     }}
                   />{' '}
-                  Edit in TinaAdmin
+                  Edit in Tina Admin
                 </a>
               ),
             })
