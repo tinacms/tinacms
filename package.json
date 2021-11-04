@@ -15,13 +15,15 @@
     "types": "yarn workspaces foreach --topological-dev --no-private -vip run types",
     "g:echo": "echo $INIT_CWD",
     "g:nuke": "cd $INIT_CWD && yarn exec rm -rf dist && echo \"cleaned\"",
-    "version": "yarn changeset version",
-    "version:snapshot": "yarn changeset version --snapshot",
+    "version": "yarn changeset version --ignore tina-cloud-starter --ignore tina-tailwind-sidebar-demo",
+    "version:snapshot": "yarn changeset version --snapshot --ignore tina-cloud-starter --ignore tina-tailwind-sidebar-demo",
     "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
     "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
     "push-tags": "git push --follow-tags",
-    "lint": "eslint \"./packages/**/*{.ts,.tsx}\""
+    "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
+    "swapDeps": "yarn workspaces foreach --include tina-cloud-starter --include tina-tailwind-sidebar-demo run g:swap",
+    "g:swap": "cd $INIT_CWD && yarn node ../../scripts/transformDeps.js"
   },
   "dependencies": {
     "@changesets/cli": "^2.16.0",
