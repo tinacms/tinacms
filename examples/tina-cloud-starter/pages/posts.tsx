@@ -1,9 +1,6 @@
-import { getStaticPropsForTina, TinaGQLClient } from "tinacms";
 import { Container } from "../components/container";
 import { Section } from "../components/section";
 import { Posts } from "../components/posts";
-import { layoutQueryFragment } from "../components/layout";
-import type { PostsConnection } from "../.tina/__generated__/types";
 import { ExperimentalGetTinaClient } from "../.tina/__generated__/types";
 
 export default function HomePage(
@@ -22,40 +19,7 @@ export default function HomePage(
 
 export const getStaticProps = async () => {
   const client = ExperimentalGetTinaClient();
-
-  const test = await client.getPostsDocument({
-    relativePath: "voteForPedro.md",
-  });
-
-  const tinaProps = (await getStaticPropsForTina({
-    query: `#graphql
-      query PageQuery {
-        ${layoutQueryFragment}
-        getPostsList {
-          edges {
-            node {
-              id
-              values
-              data {
-                author {
-                  ... on AuthorsDocument {
-                    data {
-                      name
-                      avatar
-                    }
-                  }
-                }
-              }
-              sys {
-                filename
-              }
-            }
-          }
-        }
-      }
-    `,
-    variables: {},
-  })) as { data: { getPostsList: PostsConnection } };
+  const tinaProps = await client.PageQuery();
   return {
     props: {
       ...tinaProps,
