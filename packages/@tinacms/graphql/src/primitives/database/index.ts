@@ -216,8 +216,8 @@ export class Database {
 
     return true
   }
-  public query = async (queryStrings: string[], callback) => {
-    return await this.store.query(queryStrings, callback)
+  public query = async (queryStrings: string[], hydrator) => {
+    return await this.store.query(queryStrings, hydrator)
   }
 
   public addToLookupMap = async (lookup: LookupMapType) => {

@@ -69,7 +69,7 @@ export class MemoryStore implements Store {
   public async put(filepath: string, data: object) {
     await this.db.put(filepath, data)
   }
-  public async query(queryStrings: string[], callback) {
+  public async query(queryStrings: string[], hydrator) {
     const resultSets = await sequential(queryStrings, async (queryString) => {
       const res = await this.get(queryString)
       return res || []
@@ -80,7 +80,7 @@ export class MemoryStore implements Store {
     }
 
     return sequential(items, async (documentString) => {
-      return callback(documentString)
+      return hydrator(documentString)
     })
   }
 }
