@@ -1,4 +1,5 @@
 fragment PostsParts on Posts {
+  _body
   title
   author {
     ... on Document {
@@ -12,20 +13,25 @@ fragment PostsParts on Posts {
 
 fragment GlobalParts on Global {
   header {
+    __typename
     icon {
+      __typename
       color
       style
       name
     }
     color
     nav {
+      __typename
       href
       label
     }
   }
   footer {
+    __typename
     color
     social {
+      __typename
       facebook
       twitter
       instagram
@@ -33,6 +39,7 @@ fragment GlobalParts on Global {
     }
   }
   theme {
+    __typename
     color
     font
     icon
@@ -47,17 +54,20 @@ fragment AuthorsParts on Authors {
 
 fragment PagesParts on Pages {
   blocks {
+    __typename
     ... on PagesBlocksHero {
       tagline
       headline
       text
       actions {
+        __typename
         label
         type
         icon
         link
       }
       image {
+        __typename
         src
         alt
       }
@@ -65,7 +75,9 @@ fragment PagesParts on Pages {
     }
     ... on PagesBlocksFeatures {
       items {
+        __typename
         icon {
+          __typename
           color
           style
           name

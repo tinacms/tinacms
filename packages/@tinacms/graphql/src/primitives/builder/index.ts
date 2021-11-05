@@ -492,6 +492,7 @@ export class Builder {
       case 'datetime':
       case 'number':
       case 'boolean':
+      case 'rich-text':
         return astBuilder.FieldNodeDefinition(field)
       case 'object':
         if (typeof field.fields === 'object') {
@@ -503,7 +504,10 @@ export class Builder {
 
           return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
-            selections: filterSelections(selections),
+            selections: [
+              { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
+              ...filterSelections(selections),
+            ],
           })
         } else if (typeof field.templates === 'object') {
           const selections = []
@@ -515,7 +519,10 @@ export class Builder {
           })
           return astBuilder.FieldWithSelectionSetDefinition({
             name: field.name,
-            selections: filterSelections(selections),
+            selections: [
+              { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
+              ...filterSelections(selections),
+            ],
           })
         }
       case 'reference':
