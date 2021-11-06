@@ -3,6 +3,7 @@
   "version": "0.51.5",
   "description": "",
   "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",
