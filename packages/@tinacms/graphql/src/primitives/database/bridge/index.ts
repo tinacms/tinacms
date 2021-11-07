@@ -26,6 +26,9 @@ export class FilesystemBridge implements Bridge {
   constructor(rootPath: string) {
     this.rootPath = rootPath || ''
   }
+  public async putConfig(filepath: string, data: string) {
+    await this.put(filepath, data)
+  }
   public async glob(pattern: string) {
     const basePath = path.join(this.rootPath, ...pattern.split('/'))
     const items = await fg(
@@ -51,4 +54,5 @@ export interface Bridge {
   glob(pattern: string): Promise<string[]>
   get(filepath: string): Promise<string>
   put(filepath: string, data: string): Promise<void>
+  putConfig(filepath: string, data: string): Promise<void>
 }

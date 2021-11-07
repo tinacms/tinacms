@@ -43,6 +43,9 @@ export class FilesystemBridge implements Bridge {
   public async get(filepath: string) {
     return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
   }
+  public async putConfig(filepath: string, data: string) {
+    await this.put(filepath, data)
+  }
   public async put(filepath: string, data: string) {
     await fs.outputFileSync(path.join(this.rootPath, filepath), data)
   }

@@ -46,7 +46,7 @@ export async function startServer(
 
   const ghConfig = {
     rootPath: 'examples/tina-cloud-starter',
-    accessToken: 'my-token',
+    accessToken: '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',
     owner: 'tinacms',
     repo: 'tinacms',
     ref: 'add-data-store',

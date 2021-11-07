@@ -44,6 +44,9 @@ export class GithubStore implements Store {
       auth: accessToken,
     })
   }
+  public async seed() {
+    throw new Error(`Seeding data is not possible for Github data store`)
+  }
   private async readDir(filepath: string): Promise<string[]> {
     const fullPath = path.join(this.rootPath, filepath)
     const repos = await this.appOctoKit.repos

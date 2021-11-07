@@ -66,6 +66,9 @@ export class MemoryStore implements Store {
     const content = await this.db.get(filepath)
     return content
   }
+  public async seed(filepath: string, data: object) {
+    await this.put(filepath, data)
+  }
   public async put(filepath: string, data: object) {
     await this.db.put(filepath, data)
   }

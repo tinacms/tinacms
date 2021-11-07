@@ -21,6 +21,13 @@ export interface Store {
     queryStrings: string[],
     hydrator?: (fullPath: string) => Promise<object>
   ): Promise<object[]>
+  seed(
+    filepath: string,
+    data: object,
+    options?: {
+      includeTemplate?: boolean
+    }
+  ): Promise<void>
   put(
     filepath: string,
     data: object,

@@ -1,4 +1,9 @@
 {
+  "PagesConnection": {
+    "type": "PagesConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "pages"
+  },
   "DocumentConnection": {
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
@@ -77,10 +82,5 @@
     "collection": "pages",
     "createPagesDocument": "create",
     "updatePagesDocument": "update"
-  },
-  "PagesConnection": {
-    "type": "PagesConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "pages"
   }
 }

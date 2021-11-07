@@ -368,9 +368,12 @@ export const resolve = async ({
         item.mutationInfo = mutationPath
       }
     })
+    if (res.errors) {
+      console.error(res.errors)
+    }
     return res
   } catch (e) {
-    console.log(e)
+    console.error(e)
     if (e instanceof GraphQLError) {
       return {
         errors: [e],

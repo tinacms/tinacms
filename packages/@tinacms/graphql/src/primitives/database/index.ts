@@ -15,7 +15,8 @@ import path from 'path'
 import { GraphQLError } from 'graphql'
 import { createSchema } from '../schema'
 import { lastItem } from '../util'
-import { stringifyFile } from './util'
+import { parseFile, stringifyFile } from './util'
+import { sequential } from '../util'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
@@ -49,22 +50,7 @@ export class Database {
 
   public get = async <T extends object>(filepath: string): Promise<T> => {
     if (SYSTEM_FILES.includes(filepath)) {
-      try {
-        const dataString = await this.bridge.get(
-          path.join(GENERATED_FOLDER, `${filepath}.json`)
-        )
-        return JSON.parse(dataString)
-      } catch (err) {
-        /** File Not Found */
-        if (err instanceof GraphQLError && err.extensions?.status === 404) {
-          throw new GraphQLError(
-            `${err.toString()}.  Please confirm this location is correct and contains a '.tina' folder and a valid '.tina/schema.ts'.`
-          )
-          /** Other Errors */
-        } else {
-          throw err
-        }
-      }
+      throw new Error(`Unexpected get for config file ${filepath}`)
     } else {
       const tinaSchema = await this.getSchema()
       const extension = path.extname(filepath)
@@ -113,10 +99,7 @@ export class Database {
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
     if (SYSTEM_FILES.includes(filepath)) {
-      await this.bridge.put(
-        path.join(GENERATED_FOLDER, `${filepath}.json`),
-        JSON.stringify(data, null, 2)
-      )
+      throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
       const tinaSchema = await this.getSchema()
       const collection = await tinaSchema.getCollectionByFullPath(filepath)
@@ -174,25 +157,28 @@ export class Database {
   }
 
   public getLookup = async (returnType: string): Promise<LookupMapType> => {
+    const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
     if (!this._lookup) {
-      const _lookup = await this.get<{ [returnType: string]: LookupMapType }>(
-        '_lookup'
-      )
-      this._lookup = _lookup
+      const _lookup = await this.bridge.get<{
+        [returnType: string]: LookupMapType
+      }>(lookupPath)
+      this._lookup = JSON.parse(_lookup)
     }
     return this._lookup[returnType]
   }
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
+    const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
     if (!this._graphql) {
-      const _graphql = await this.get<DocumentNode>('_graphql')
-      this._graphql = _graphql
+      const _graphql = await this.bridge.get<DocumentNode>(graphqlPath)
+      this._graphql = JSON.parse(_graphql)
     }
     return this._graphql
   }
   public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
+    const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
     if (!this._tinaSchema) {
-      const _tinaSchema = await this.get<TinaCloudSchemaBase>('_schema')
-      this._tinaSchema = _tinaSchema
+      const _tinaSchema = await this.bridge.get<TinaCloudSchemaBase>(schemaPath)
+      this._tinaSchema = JSON.parse(_tinaSchema)
     }
     return this._tinaSchema
   }
@@ -220,14 +206,49 @@ export class Database {
     return await this.store.query(queryStrings, hydrator)
   }
 
+  public indexData = async ({
+    experimentalData,
+    graphQLSchema,
+    tinaSchema,
+  }: {
+    experimentalData?: boolean
+    graphQLSchema: DocumentNode
+    tinaSchema: TinaSchema
+  }) => {
+    const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
+    const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
+    await this.bridge.putConfig(
+      graphqlPath,
+      JSON.stringify(graphQLSchema, null, 2)
+    )
+    // @ts-ignore
+    await this.bridge.putConfig(
+      schemaPath,
+      JSON.stringify(tinaSchema.schema, null, 2)
+    )
+    if (experimentalData) {
+      await this.store.seed('_graphql', graphQLSchema)
+      await this.store.seed('_schema', tinaSchema.schema)
+      await _indexContent(tinaSchema, this)
+    }
+  }
+
   public addToLookupMap = async (lookup: LookupMapType) => {
+    const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
     let lookupMap
     try {
-      lookupMap = await this.get('_lookup')
+      lookupMap = JSON.parse(await this.bridge.get(lookupPath))
     } catch (e) {
       lookupMap = {}
     }
-    await this.put('_lookup', { ...lookupMap, [lookup.type]: lookup })
+    const updatedLookup = {
+      ...lookupMap,
+      [lookup.type]: lookup,
+    }
+    await this.bridge.putConfig(
+      lookupPath,
+      JSON.stringify(updatedLookup, null, 2)
+    )
   }
 }
 
@@ -281,4 +302,116 @@ type UnionDataLookup = {
   type: string
   resolveType: 'unionData'
   typeMap: { [templateName: string]: string }
+}
+
+const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
+  await sequential(tinaSchema.getCollections(), async (collection) => {
+    const documentPaths = await database.bridge.glob(collection.path)
+    await sequential(documentPaths, async (documentPath) => {
+      const dataString = await database.bridge.get(documentPath)
+      const data = parseFile(dataString, path.extname(documentPath), (yup) =>
+        yup.object({})
+      )
+      await database.store.seed(documentPath, data)
+      await _indexCollectable({
+        record: documentPath,
+        //@ts-ignore
+        field: collection,
+        value: data,
+        prefix: `${collection.name}`,
+        database,
+      })
+    })
+  })
+}
+
+const _indexCollectable = async ({
+  field,
+  value,
+  ...rest
+}: {
+  record: string
+  value: object
+  prefix: string
+  field: TinaField
+  database: Database
+}) => {
+  let template
+  if (field.templates) {
+    template = field.templates.find((t) => t.name === value._template)
+  } else {
+    template = field
+  }
+  await _indexAttributes({
+    record: rest.record,
+    data: value,
+    prefix: `${rest.prefix}#${template.name}`,
+    fields: template.fields,
+    database: rest.database,
+  })
+}
+
+const _indexAttributes = async ({
+  data,
+  fields,
+  ...rest
+}: {
+  record: string
+  data: object
+  prefix: string
+  fields: TinaField[]
+  database: Database
+}) => {
+  await sequential(fields, async (field) => {
+    const value = data[field.name]
+    if (!value) {
+      return true
+    }
+
+    switch (field.type) {
+      case 'boolean':
+      case 'string':
+      case 'number':
+      case 'datetime':
+        await _indexAttribute({ value, field, ...rest })
+
+        return true
+
+      case 'object':
+        if (field.list) {
+          await sequential(value, async (item) => {
+            await _indexCollectable({ field, value: item, ...rest })
+          })
+        } else {
+          await _indexCollectable({ field, value, ...rest })
+        }
+        return true
+      case 'reference':
+        await _indexAttribute({ value, field, ...rest })
+        return true
+    }
+    return true
+  })
+}
+
+const _indexAttribute = async ({
+  record,
+  value,
+  prefix,
+  field,
+  database,
+}: {
+  record: string
+  value: string
+  prefix: string
+  field: TinaField
+  database: Database
+}) => {
+  const stringValue = value.toString().substr(0, 100)
+  const fieldName = `__attribute__${prefix}#${field.name}#${stringValue}`
+  const existingRecords = (await database.store.get(fieldName)) || []
+  // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
+  // @ts-ignore
+  const uniqueItems = [...new Set([...existingRecords, record])]
+  await database.store.seed(fieldName, uniqueItems)
 }

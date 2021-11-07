@@ -145,6 +145,10 @@ export class GithubBridge implements Bridge {
         })
     })
   }
+  public async putConfig(filepath: string, data: string) {
+    throw new Error(`Config files cannot be changed by the Github bridge`)
+  }
+
   public async put(filepath: string, data: string) {
     const realpath = path.join(this.rootPath, filepath)
     // check if the file exists
