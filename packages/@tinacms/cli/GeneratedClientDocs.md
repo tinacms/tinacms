@@ -11,7 +11,7 @@ This piece of work has two main functionalities,
 
 ## Using build in Graphql Queries
 
-The client comes with several build in graphql queries to allow you to get up and running quickly. There is one caveat it **does not resolve references**. Although we plan to support an API do to this in the future, the build in generated client functions do not resolve references. To resolve reference you will have to [write your own queries](#writing-your-own-gql-queries).
+The client comes with several built-in GraphQL queries to allow you to get up and running quickly. There is one caveat it **does not resolve references**. Although we plan to support an API do to this in the future, the built-in generated client functions do not resolve references. To resolve reference you will have to [write your own queries](#writing-your-own-gql-queries).
 
 Firstly, you can import a function to get the client client from generated folder located in `.tina/__generated/types`.
 ```ts
