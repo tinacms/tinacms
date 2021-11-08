@@ -7,7 +7,7 @@
 This piece of work has two main functionalities,
 
 1. Generates Graphql fragments and queries that are written for you.
-2. Generates a graphql client that can be used server-side (in getStaticProps)
+2. Generates a Graphql client that can be used server-side (in getStaticProps)
 
 ## Using build in Graphql Queries
 
