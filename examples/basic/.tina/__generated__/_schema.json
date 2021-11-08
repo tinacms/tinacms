@@ -1,16 +1,36 @@
 {
   "collections": [
     {
+      "label": "Page Content",
+      "name": "page",
+      "path": "content/page",
+      "fields": [
+        {
+          "name": "body",
+          "label": "Main Content",
+          "type": "rich-text",
+          "isBody": true,
+          "namespace": [
+            "page",
+            "body"
+          ]
+        }
+      ],
+      "namespace": [
+        "page"
+      ]
+    },
+    {
       "label": "Blog Posts",
-      "name": "posts",
-      "path": "content/posts",
+      "name": "post",
+      "path": "content/post",
       "fields": [
         {
           "type": "string",
           "label": "Title",
           "name": "title",
           "namespace": [
-            "posts",
+            "post",
             "title"
           ]
         },
@@ -23,13 +43,13 @@
             "component": "textarea"
           },
           "namespace": [
-            "posts",
+            "post",
             "body"
           ]
         }
       ],
       "namespace": [
-        "posts"
+        "post"
       ]
     }
   ],
