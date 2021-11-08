@@ -9,7 +9,7 @@ This piece of work has two main functionalities,
 1. Generates Graphql fragments and queries that are written for you.
 2. Generates a Graphql client that can be used server-side (in getStaticProps)
 
-## Using build in Graphql Queries
+## Using the built-in Graphql Queries
 
 The client comes with several built-in GraphQL queries to allow you to get up and running quickly. There is one caveat it **does not resolve references**. Although we plan to support an API do to this in the future, the built-in generated client functions do not resolve references. To resolve reference you will have to [write your own queries](#writing-your-own-gql-queries).
 
