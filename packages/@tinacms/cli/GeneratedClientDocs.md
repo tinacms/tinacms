@@ -43,7 +43,7 @@ First of all you can import the generated client
 import { getTinaClient } from "../path/to/tinaFolder/.tina/__generated__/types";
 ```
 
-Then you can use the typed client. The types are based on your graphql queries that you have written. The graphql Queries are written in the `.tina/queries/` folder and these will be used to generate the client.
+Then you can use the typed client. The types are based on your Graphql queries that you have written. The Graphql queries are written in the `.tina/queries/` folder and these will be used to generate the client.
 
 Example of `.tina/queries/example.gql`  
 ```gql
