@@ -72,7 +72,7 @@ query GetAuthorDocument($path: String!) {
 }
 ```
 
-We are using an `AuthorsParts` Fragment. For each collection this fragment is generated and updated when the schema is updated. This means you no longer have to update your graphql query when you update your schema.ts (assuming you want to query for all the fields)
+We are using an `AuthorsParts` Fragment. For each collection this fragment is generated and updated when the schema is updated. This means you no longer have to update your Graphql query when you update your schema.ts (assuming you want to query for all the fields)
 
  
 
