@@ -1,6 +1,6 @@
 # Experimental Tina Client
 
-> Note: This usage is experiment and although it is likely to maintained / supported, the API may change over time.
+> Note: This usage is experimental and although it is likely to maintained / supported, the API may change over time.
 
 ## What is the generated client.
 
