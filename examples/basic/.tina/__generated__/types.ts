@@ -66,8 +66,10 @@ export type Query = {
   getDocument: DocumentNode;
   getDocumentList: DocumentConnection;
   getDocumentFields: Scalars['JSON'];
-  getPostsDocument: PostsDocument;
-  getPostsList: PostsConnection;
+  getPageDocument: PageDocument;
+  getPageList: PageConnection;
+  getPostDocument: PostDocument;
+  getPostList: PostConnection;
 };
 
 
@@ -95,12 +97,25 @@ export type QueryGetDocumentListArgs = {
 };
 
 
-export type QueryGetPostsDocumentArgs = {
+export type QueryGetPageDocumentArgs = {
   relativePath?: Maybe<Scalars['String']>;
 };
 
 
-export type QueryGetPostsListArgs = {
+export type QueryGetPageListArgs = {
+  before?: Maybe<Scalars['String']>;
+  after?: Maybe<Scalars['String']>;
+  first?: Maybe<Scalars['Int']>;
+  last?: Maybe<Scalars['Int']>;
+};
+
+
+export type QueryGetPostDocumentArgs = {
+  relativePath?: Maybe<Scalars['String']>;
+};
+
+
+export type QueryGetPostListArgs = {
   before?: Maybe<Scalars['String']>;
   after?: Maybe<Scalars['String']>;
   first?: Maybe<Scalars['Int']>;
@@ -141,35 +156,63 @@ export type CollectionDocumentsArgs = {
   last?: Maybe<Scalars['Int']>;
 };
 
-export type DocumentNode = PostsDocument;
+export type DocumentNode = PageDocument | PostDocument;
 
-export type Posts = {
-  __typename?: 'Posts';
-  title?: Maybe<Scalars['String']>;
-  body?: Maybe<Scalars['String']>;
+export type Page = {
+  __typename?: 'Page';
+  body?: Maybe<Scalars['JSON']>;
 };
 
-export type PostsDocument = Node & Document & {
-  __typename?: 'PostsDocument';
+export type PageDocument = Node & Document & {
+  __typename?: 'PageDocument';
   id: Scalars['ID'];
   sys: SystemInfo;
-  data: Posts;
+  data: Page;
   form: Scalars['JSON'];
   values: Scalars['JSON'];
   dataJSON: Scalars['JSON'];
 };
 
-export type PostsConnectionEdges = {
-  __typename?: 'PostsConnectionEdges';
+export type PageConnectionEdges = {
+  __typename?: 'PageConnectionEdges';
   cursor?: Maybe<Scalars['String']>;
-  node?: Maybe<PostsDocument>;
+  node?: Maybe<PageDocument>;
 };
 
-export type PostsConnection = Connection & {
-  __typename?: 'PostsConnection';
+export type PageConnection = Connection & {
+  __typename?: 'PageConnection';
   pageInfo?: Maybe<PageInfo>;
   totalCount: Scalars['Int'];
-  edges?: Maybe<Array<Maybe<PostsConnectionEdges>>>;
+  edges?: Maybe<Array<Maybe<PageConnectionEdges>>>;
+};
+
+export type Post = {
+  __typename?: 'Post';
+  title?: Maybe<Scalars['String']>;
+  body?: Maybe<Scalars['String']>;
+};
+
+export type PostDocument = Node & Document & {
+  __typename?: 'PostDocument';
+  id: Scalars['ID'];
+  sys: SystemInfo;
+  data: Post;
+  form: Scalars['JSON'];
+  values: Scalars['JSON'];
+  dataJSON: Scalars['JSON'];
+};
+
+export type PostConnectionEdges = {
+  __typename?: 'PostConnectionEdges';
+  cursor?: Maybe<Scalars['String']>;
+  node?: Maybe<PostDocument>;
+};
+
+export type PostConnection = Connection & {
+  __typename?: 'PostConnection';
+  pageInfo?: Maybe<PageInfo>;
+  totalCount: Scalars['Int'];
+  edges?: Maybe<Array<Maybe<PostConnectionEdges>>>;
 };
 
 export type Mutation = {
@@ -177,8 +220,10 @@ export type Mutation = {
   addPendingDocument: DocumentNode;
   updateDocument: DocumentNode;
   createDocument: DocumentNode;
-  updatePostsDocument: PostsDocument;
-  createPostsDocument: PostsDocument;
+  updatePageDocument: PageDocument;
+  createPageDocument: PageDocument;
+  updatePostDocument: PostDocument;
+  createPostDocument: PostDocument;
 };
 
 
@@ -201,22 +246,39 @@ export type MutationCreateDocumentArgs = {
 };
 
 
-export type MutationUpdatePostsDocumentArgs = {
+export type MutationUpdatePageDocumentArgs = {
   relativePath: Scalars['String'];
-  params: PostsMutation;
+  params: PageMutation;
 };
 
 
-export type MutationCreatePostsDocumentArgs = {
+export type MutationCreatePageDocumentArgs = {
   relativePath: Scalars['String'];
-  params: PostsMutation;
+  params: PageMutation;
+};
+
+
+export type MutationUpdatePostDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: PostMutation;
+};
+
+
+export type MutationCreatePostDocumentArgs = {
+  relativePath: Scalars['String'];
+  params: PostMutation;
 };
 
 export type DocumentMutation = {
-  posts?: Maybe<PostsMutation>;
+  page?: Maybe<PageMutation>;
+  post?: Maybe<PostMutation>;
 };
 
-export type PostsMutation = {
+export type PageMutation = {
+  body?: Maybe<Scalars['JSON']>;
+};
+
+export type PostMutation = {
   title?: Maybe<Scalars['String']>;
   body?: Maybe<Scalars['String']>;
 };

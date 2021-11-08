@@ -3,9 +3,22 @@ import { defineSchema } from '@tinacms/cli'
 export default defineSchema({
   collections: [
     {
+      label: 'Page Content',
+      name: 'page',
+      path: 'content/page',
+      fields: [
+        {
+          name: 'body',
+          label: 'Main Content',
+          type: 'rich-text',
+          isBody: true,
+        },
+      ],
+    },
+    {
       label: 'Blog Posts',
-      name: 'posts',
-      path: 'content/posts',
+      name: 'post',
+      path: 'content/post',
       fields: [
         {
           type: 'string',
