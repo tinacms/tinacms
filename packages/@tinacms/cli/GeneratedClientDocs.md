@@ -11,16 +11,16 @@ This piece of work has two main functionalities,
 
 ## Using the built-in Graphql Queries
 
-The client comes with several built-in GraphQL queries to allow you to get up and running quickly. There is one caveat it **does not resolve references**. Although we plan to support an API do to this in the future, the built-in generated client functions do not resolve references. To resolve reference you will have to [write your own queries](#writing-your-own-gql-queries).
+The client comes with several built-in GraphQL queries to allow you to get up and running quickly. There is one caveat it **does not resolve references**. Although we plan to support an API do to this in the future, the built-in generated client queries do not resolve references. To resolve reference you will have to [write your own queries](#writing-your-own-gql-queries).
 
 Firstly, you can import a function to get the client from generated folder located in `.tina/__generated/types`.
 ```ts
-import { getTinaClient } from "../path/to/tinaFolder/.tina/__generated__/types";
+import { ExperimentalGetTinaClient } from "../path/to/tinaFolder/.tina/__generated__/types";
 ```
 
 Then you can use it in `getStaticProps`.
 ```ts
-const client = getTinaClient();
+const client = ExperimentalGetTinaClient();
 const tinaProps = await client.getPostsDocument({relativePath: "test.md"});
 
 //...
@@ -40,7 +40,7 @@ return {
 First of all you can import the generated client
 
 ```ts
-import { getTinaClient } from "../path/to/tinaFolder/.tina/__generated__/types";
+import { ExperimentalGetTinaClient } from "../path/to/tinaFolder/.tina/__generated__/types";
 ```
 
 Then you can use the typed client. The types are based on your Graphql queries that you have written. The Graphql queries are written in the `.tina/queries/` folder and these will be used to generate the client.
@@ -55,7 +55,7 @@ query getCollections {
 ```
 would generate a client that would allow you to do this.
 ```ts
-const client = getTinaClient();
+const client = ExperimentalGetTinaClient();
 const data = await client.getCollections();
 console.log(data.getCollections);
 ```
