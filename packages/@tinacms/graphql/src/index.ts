@@ -21,17 +21,6 @@ export {
   createDatabase,
   githubRoute,
 } from './primitives'
-import { clearCache as s3ClearCache, s3Cache } from './cache/s3'
-
-import { clearCache as lruClearCache, simpleCache } from './cache/lru'
-
-export {
-  lruClearCache,
-  lruClearCache as clearCache,
-  s3ClearCache,
-  s3Cache,
-  simpleCache,
-}
 
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
