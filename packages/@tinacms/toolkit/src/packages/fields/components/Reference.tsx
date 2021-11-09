@@ -18,6 +18,7 @@ limitations under the License.
 
 import * as React from 'react'
 import styled from 'styled-components'
+import { BiEdit } from 'react-icons/bi'
 import { useCMS } from '../../../react-tinacms/use-cms'
 import { TinaCMS } from '../../../tina-cms'
 
@@ -113,8 +114,26 @@ export const Reference: React.FC<ReferenceProps> = ({
               href={`/admin/collections/${
                 document.sys.collection.name
               }/${document.sys.breadcrumbs.join('/')}`}
+              style={{
+                display: 'flex',
+                alignItems: 'center',
+                textTransform: 'uppercase',
+                fontSize: '12px',
+                fontWeight: 500,
+                marginTop: '8px',
+                marginBottom: '4px',
+                lineHeight: '1',
+              }}
             >
-              &raquo; Edit in TinaAdmin
+              <BiEdit
+                style={{
+                  height: '1.365em',
+                  width: 'auto',
+                  opacity: '0.8',
+                  marginRight: '6px',
+                }}
+              />
+              Edit in Tina Admin
             </a>
           )}
         </GetReference>
