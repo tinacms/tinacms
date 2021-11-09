@@ -23952,8 +23952,6 @@ fsevents@~2.1.2:
     "@types/styled-components": 4.1.8
     jest: ^27.0.6
     js-cookie: ^2.2.1
-    react: 16.14.0
-    react-dom: 16.14.0
     react-final-form: ^6.3.0
     styled-components: ">4.5"
     tinacms: "workspace:*"
@@ -23963,6 +23961,7 @@ fsevents@~2.1.2:
   peerDependencies:
     final-form: ">=4.20.2"
     react: ">=16.14.0"
+    react-dom: ">=16.14.0"
     react-final-form: ^6.3.0
     react-is: ^17.0.2
     styled-components: ">4.5"
