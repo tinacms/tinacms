@@ -20,13 +20,13 @@
     "publish": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --access public",
     "publish:dev": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag dev --access public",
     "publish:beta": "yarn workspaces foreach --no-private --verbose npm publish --tolerate-republish --tag beta --access public",
-    "push-tags": "git push --follow-tags",
+    "push-tags": "changeset tag && git push --follow-tags",
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "swapDeps": "yarn workspaces foreach --include tina-cloud-starter --include tina-tailwind-sidebar-demo run g:swap",
     "g:swap": "cd $INIT_CWD && yarn node ../../scripts/transformDeps.js"
   },
   "dependencies": {
-    "@changesets/cli": "^2.16.0",
+    "@changesets/cli": "2.18.0",
     "@typescript-eslint/eslint-plugin": "^2.3.0",
     "@typescript-eslint/parser": "^2.3.0",
     "@yarnpkg/pnpify": "^2.0.0-rc.20",
