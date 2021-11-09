@@ -277,7 +277,7 @@ export type TinaCloudTemplateEnriched = GlobalTemplate<true>
 /**
  * Templates allow you to define an object as polymorphic
  */
-type Template<WithNamespace extends boolean> = WithNamespace extends true
+export type Template<WithNamespace extends boolean> = WithNamespace extends true
   ? {
       label: string
       name: string
