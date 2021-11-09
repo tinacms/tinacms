@@ -1,19 +1,12 @@
-import Head from 'next/head'
 import { getStaticPropsForTina } from 'tinacms'
 import { TinaMarkdown } from 'tinacms/dist/rich-text'
+import { Layout } from '../components/Layout'
 export default function Home(props) {
   const content = props.data.getPageDocument.data.body
   return (
-    <div>
-      <Head>
-        <title>Tina App</title>
-        <meta name="description" content="A TinaCMS Application" />
-        <link rel="icon" href="/favicon.ico" />
-      </Head>
-      <main>
-        <TinaMarkdown content={content} />
-      </main>
-    </div>
+    <Layout>
+      <TinaMarkdown content={content} />
+    </Layout>
   )
 }
 
