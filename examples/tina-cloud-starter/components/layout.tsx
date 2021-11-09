@@ -54,37 +54,3 @@ export const Layout = ({ rawData = "", data = layoutData, children }) => {
     </>
   );
 };
-
-export const layoutQueryFragment = `
-  getGlobalDocument(relativePath: "index.json") {
-    data {
-      header {
-        icon {
-          name
-          color
-          style
-        }
-        color
-        nav {
-          href
-          label
-        }
-      }
-      footer {
-        color
-        social {
-          facebook
-          twitter
-          instagram
-          github
-        }
-      }  
-      theme {
-        color
-        icon
-        font
-        darkMode
-      }
-    }
-  }
-`;
