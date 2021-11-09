@@ -42,6 +42,9 @@ export class FilesystemBridge implements Bridge {
       return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
   }
+  public supportsBuilding() {
+    return true
+  }
   public async get(filepath: string) {
     return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
   }
@@ -54,5 +57,6 @@ export interface Bridge {
   glob(pattern: string): Promise<string[]>
   get(filepath: string): Promise<string>
   put(filepath: string, data: string): Promise<void>
+  supportsBuilding(): boolean
   putConfig(filepath: string, data: string): Promise<void>
 }

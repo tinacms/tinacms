@@ -142,6 +142,9 @@ export class GithubStore implements Store {
         )
       })
   }
+  public supportsIndexing() {
+    return false
+  }
   public async put(filepath: string, data: object) {
     const realpath = path.join(this.rootPath, filepath)
     // check if the file exists

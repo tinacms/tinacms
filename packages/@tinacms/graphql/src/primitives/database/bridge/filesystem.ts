@@ -40,6 +40,9 @@ export class FilesystemBridge implements Bridge {
       return item.replace(posixRootPath, '').replace(/^\/|\/$/g, '')
     })
   }
+  public supportsBuilding() {
+    return true
+  }
   public async get(filepath: string) {
     return fs.readFileSync(path.join(this.rootPath, filepath)).toString()
   }

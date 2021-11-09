@@ -28,6 +28,7 @@ export interface Store {
       includeTemplate?: boolean
     }
   ): Promise<void>
+  supportsIndexing(): boolean
   put(
     filepath: string,
     data: object,

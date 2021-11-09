@@ -36,6 +36,9 @@ export class MemoryStore implements Store {
       },
     }
   }
+  public supportsIndexing() {
+    return true
+  }
   public async print() {
     await fs.outputFile(
       '.tina/__generated__/map.json',
