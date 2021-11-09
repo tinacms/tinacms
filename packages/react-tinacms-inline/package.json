@@ -3,7 +3,7 @@
   "version": "0.53.4",
   "license": "Apache-2.0",
   "main": "dist/index.js",
-  "typings": "dist/src/index.d.ts",
+  "typings": "dist/index.d.ts",
   "files": [
     "dist"
   ],

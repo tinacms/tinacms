@@ -137,7 +137,7 @@ export const nextPostPage =
           <script
             type="text/javascript"
             crossOrigin="anonymous"
-            src="https://cdn.jsdelivr.net/npm/marked/marked.min.js"
+            src="https://cdnjs.cloudflare.com/ajax/libs/marked/4.0.0/marked.min.js"
           />
         </Head>
         <div>
@@ -152,7 +152,7 @@ export const nextPostPage =
             {/* Convert markdown to html in the browser only */}
             {typeof window !== "undefined" && (
               <ContentSection
-                content={window.marked(props.data.getPostsDocument.data.body)}
+                content={window.marked.parse(props.data.getPostsDocument.data.body)}
               ></ContentSection>
             )}
           </div>
