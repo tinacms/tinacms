@@ -3,6 +3,7 @@
   "version": "0.51.5",
   "description": "",
   "main": "dist/index.js",
+  "typings": "dist/index.d.ts",
   "scripts": {
     "test": "jest --passWithNoTests",
     "watch": "tinacms-scripts watch",
@@ -30,6 +31,7 @@
   "peerDependencies": {
     "final-form": ">=4.20.2",
     "react": ">=16.14.0",
+    "react-dom": ">=16.14.0",
     "react-final-form": "^6.3.0",
     "react-is": "^17.0.2",
     "styled-components": ">4.5",
@@ -42,8 +44,6 @@
     "@types/react-dom": "^16.9.4",
     "@types/styled-components": "4.1.8",
     "js-cookie": "^2.2.1",
-    "react": "16.14.0",
-    "react-dom": "16.14.0",
     "tslib": "^1.10.0"
   },
   "devDependencies": {
