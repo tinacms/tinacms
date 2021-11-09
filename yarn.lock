@@ -4889,7 +4889,6 @@ __metadata:
     "@octokit/graphql": ^4.5.6
     "@octokit/rest": 18.0.6
     "@tinacms/scripts": "workspace:*"
-    "@types/aws-sdk": ^2.7.0
     "@types/cors": ^2.8.7
     "@types/estree": ^0.0.50
     "@types/express": ^4.17.8
@@ -4905,7 +4904,6 @@ __metadata:
     "@types/normalize-path": ^3.0.0
     "@types/ws": ^7.2.6
     "@types/yup": ^0.29.7
-    aws-sdk: ^2.930.0
     body-parser: ^1.19.0
     cors: ^2.8.5
     dataloader: ^2.0.0
@@ -4925,7 +4923,6 @@ __metadata:
     jest-matcher-utils: 27.0.6
     js-yaml: ^3.14.0
     lodash: ^4.17.20
-    lru-cache: ^6.0.0
     mdast: ^3.0.0
     mdast-util-from-markdown: ^1.0.0
     mdast-util-mdx: ^1.1.0
@@ -5108,15 +5105,6 @@ __metadata:
   version: 2.1.2
   resolution: "@types/atob@npm:2.1.2"
   checksum: df8e9efd3c4f842a5183b9a11877adb96d78b1d1559280afa87bc2c77c04ef1abd0004ab1947de0265292ab032497c679b6c1b954efce5eb6b455fb2404ab348
-  languageName: node
-  linkType: hard
-
-"@types/aws-sdk@npm:^2.7.0":
-  version: 2.7.0
-  resolution: "@types/aws-sdk@npm:2.7.0"
-  dependencies:
-    aws-sdk: "*"
-  checksum: ae3633e0e2ecde42d7fbf8d2ac441d710869d6e9474b679d0743a26be6f911a2b89dd038dc1dba4125166e448d0e9d503f59018b18f67d1515dfeb00d312757b
   languageName: node
   linkType: hard
 
@@ -8774,24 +8762,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"aws-sdk@npm:*":
-  version: 2.972.0
-  resolution: "aws-sdk@npm:2.972.0"
-  dependencies:
-    buffer: 4.9.2
-    events: 1.1.1
-    ieee754: 1.1.13
-    jmespath: 0.15.0
-    querystring: 0.2.0
-    sax: 1.2.1
-    url: 0.10.3
-    uuid: 3.3.2
-    xml2js: 0.4.19
-  checksum: 83f8ea7bb33606ef8d4df07cd3cbb5d24c217e90605a87efeb9e6e95b01ce7f94841a6872a99a3026f449dc8da5b6d201c407005bc7292fcca9da7f38797d4d4
-  languageName: node
-  linkType: hard
-
-"aws-sdk@npm:^2.814.0, aws-sdk@npm:^2.930.0":
+"aws-sdk@npm:^2.814.0":
   version: 2.951.0
   resolution: "aws-sdk@npm:2.951.0"
   dependencies:
