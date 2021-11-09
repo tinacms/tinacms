@@ -1,11 +1,18 @@
 import { getStaticPropsForTina } from 'tinacms'
+import { Layout } from '../../components/Layout'
 export default function Home(props) {
   return (
-    <div>
+    <Layout>
       <code>
-        <pre>{JSON.stringify(props.data.getPostDocument.data, null, 2)}</pre>
+        <pre
+          style={{
+            backgroundColor: 'lightgray',
+          }}
+        >
+          {JSON.stringify(props.data.getPostDocument.data, null, 2)}
+        </pre>
       </code>
-    </div>
+    </Layout>
   )
 }
 
@@ -25,11 +32,8 @@ export const getStaticPaths = async () => {
     variables: {},
   })
   const paths = tinaProps.data.getPageList.edges.map((x) => {
-    console.log({ x: x.node.sys })
     return { params: { slug: x.node.sys.filename } }
   })
-
-  console.log(paths)
 
   return {
     paths,
@@ -37,7 +41,6 @@ export const getStaticPaths = async () => {
   }
 }
 export const getStaticProps = async (ctx) => {
-  console.log({ ctx })
   const tinaProps = await getStaticPropsForTina({
     query: `query getPost($relativePath: String!) {
         getPostDocument(relativePath: $relativePath) {

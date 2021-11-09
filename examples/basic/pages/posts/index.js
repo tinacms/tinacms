@@ -1,15 +1,21 @@
 import { getStaticPropsForTina } from 'tinacms'
+import { Layout } from '../../components/Layout'
+import Link from 'next/link'
 export default function Home(props) {
   const postsList = props.data.getPostList.edges
   return (
-    <div>
+    <Layout>
       <h1>Posts</h1>
       <div>
         {postsList.map((post) => (
-          <div key={post.node.id}>{post.node.sys.filename}</div>
+          <div key={post.node.id}>
+            <Link href={`/posts/${post.node.sys.filename}`}>
+              <a>{post.node.sys.filename}</a>
+            </Link>
+          </div>
         ))}
       </div>
-    </div>
+    </Layout>
   )
 }
 
@@ -37,21 +43,21 @@ export const getStaticProps = async () => {
   }
 }
 
-export const getStaticProps = async () => {
-  const tinaProps = await getStaticPropsForTina({
-    query: `{
-      getPageDocument(relativePath: "home.mdx"){
-        data{
-          body
-        }
-      }
-    }`,
-    variables: {},
-  })
+// export const getStaticProps = async () => {
+//   const tinaProps = await getStaticPropsForTina({
+//     query: `{
+//       getPageDocument(relativePath: "home.mdx"){
+//         data{
+//           body
+//         }
+//       }
+//     }`,
+//     variables: {},
+//   })
 
-  return {
-    props: {
-      ...tinaProps,
-    },
-  }
-}
+//   return {
+//     props: {
+//       ...tinaProps,
+//     },
+//   }
+// }
