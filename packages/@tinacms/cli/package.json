@@ -38,12 +38,10 @@
     "@types/progress": "^2.0.3",
     "@types/prompts": "^2.0.13",
     "@types/yup": "^0.29.11",
-    "jest": "^27.0.6",
-    "ts-jest": "^26.5.3"
+    "jest": "^27.0.6"
   },
   "scripts": {
-    "build": "yarn tsup src/index.ts --format cjs --dts",
-    "watch": "yarn tsup src/index.ts --watch --format cjs --dts",
+    "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "test": "jest --passWithNoTests",
     "types": "yarn tsc",
     "test-watch": "jest  --passWithNoTests --watch",
@@ -80,7 +78,6 @@
     "normalize-path": "^3.0.0",
     "progress": "^2.0.3",
     "prompts": "^2.4.1",
-    "tsup": "4.6.1",
     "typescript": "^4.3.5",
     "yup": "^0.32.9"
   },
