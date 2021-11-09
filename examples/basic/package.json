@@ -1,5 +1,5 @@
 {
-  "name": "basic",
+  "name": "starter-basic",
   "private": true,
   "scripts": {
     "dev": "yarn tinacms server:start -c \"next dev\"",
