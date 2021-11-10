@@ -11,16 +11,15 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export * from './client'
-export * from './auth'
-export * from './utils'
-export * from './tina-cms'
-export { useGraphqlForms } from './hooks/use-graphql-forms'
-export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
-export * from '@tinacms/toolkit'
-export { TinaAdmin } from './admin'
-export { RouteMappingPlugin } from './admin/plugins/route-mapping'
+import { Plugin } from '../../packages/core'
 
-import { TinaCMSProvider2 } from './tina-cms'
-import { type } from 'os'
-export default TinaCMSProvider2
+export class FormMetaPlugin implements Plugin {
+  __type: string = 'form:meta'
+  name: string
+  Component: any
+
+  constructor(options) {
+    this.name = options.name
+    this.Component = options.Component
+  }
+}

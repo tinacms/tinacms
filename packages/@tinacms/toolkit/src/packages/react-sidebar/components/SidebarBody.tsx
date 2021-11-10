@@ -26,6 +26,7 @@ import { FormList } from './FormList'
 import { useCMS, useSubscribable } from '../../react-core'
 import { LeftArrowIcon } from '../../icons'
 import { FormBuilder } from '../../form-builder'
+import { FormMetaPlugin } from '../../../plugins/form-meta'
 
 export const FormsView = ({
   children,
@@ -87,6 +88,8 @@ export const FormsView = ({
     )
   }
 
+  const formMetas = cms.plugins.all<FormMetaPlugin>('form:meta')
+
   return (
     <>
       {activeForm && (
@@ -100,6 +103,12 @@ export const FormsView = ({
           {!isMultiform && activeForm.label && (
             <FormHeader activeForm={activeForm} />
           )}
+          {formMetas &&
+            formMetas.map((meta) => (
+              <React.Fragment key={meta.name}>
+                <meta.Component />
+              </React.Fragment>
+            ))}
           <FormBuilder form={activeForm as any} />
         </FormWrapper>
       )}

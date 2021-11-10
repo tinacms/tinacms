@@ -91,6 +91,17 @@ const Sidebar = ({ sidebar }: SidebarProps) => {
             <MenuPanel visible={menuIsOpen}>
               <MenuWrapper>
                 <MenuList>
+                  {cms.flags.get('tina-admin') && (
+                    <MenuLink
+                      key="admin"
+                      value="admin"
+                      onClick={() => {
+                        window.location.href = window.location.origin + '/admin'
+                      }}
+                    >
+                      <TinaIcon /> Tina Admin
+                    </MenuLink>
+                  )}
                   {allScreens.map((view) => {
                     const Icon = view.Icon
                     return (
