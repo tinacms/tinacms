@@ -4,6 +4,7 @@
   "workspaces": [
     "packages/@tinacms/*",
     "examples/*",
+    "experimental-examples/*",
     "packages/[^@]*"
   ],
   "scripts": {
