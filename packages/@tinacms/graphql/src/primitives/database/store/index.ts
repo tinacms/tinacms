@@ -17,6 +17,7 @@ export interface Store {
     hydrator?: (fullPath: string) => Promise<object>
   ): Promise<string[]>
   get(filepath: string): Promise<object>
+  clear(): void
   query(
     queryStrings: string[],
     hydrator?: (fullPath: string) => Promise<object>

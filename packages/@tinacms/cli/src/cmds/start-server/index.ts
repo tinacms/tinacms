@@ -43,23 +43,29 @@ export async function startServer(
   { port = 4001, command, noWatch, experimentalData }: Options
 ) {
   const rootPath = process.cwd()
-  const shouldBuild = true
 
-  const ghConfig = {
-    rootPath: 'examples/tina-cloud-starter',
-    accessToken: '<my-token>',
-    owner: 'tinacms',
-    repo: 'tinacms',
-    ref: 'add-data-store',
-  }
-  const database = await createDatabase({
-    store: new FilesystemStore({ rootPath }),
-    // store: new MemoryStore(rootPath),
-    bridge: new FilesystemBridge(rootPath),
-    // Be sure to set shouldBuild to false
-    // bridge: new GithubBridge(ghConfig),
-    // store: new GithubStore(ghConfig),
-  })
+  /**
+   * To work with Github directly, replace the Bridge and Store
+   * and ensure you've provided your access token.
+   * NOTE: when talking the the tinacms repo, you must
+   * give your personal access token access to the TinaCMS org
+   */
+  // const ghConfig = {
+  //   rootPath: 'examples/tina-cloud-starter',
+  //   accessToken: '<my-token>',
+  //   owner: 'tinacms',
+  //   repo: 'tinacms',
+  //   ref: 'add-data-store',
+  // }
+  // const bridge = new GithubBridge(ghConfig)
+  // const store = new GithubStore(ghConfig)
+
+  const bridge = new FilesystemBridge(rootPath)
+  const store = experimentalData
+    ? new MemoryStore(rootPath)
+    : new FilesystemStore({ rootPath })
+  const shouldBuild = bridge.supportsBuilding()
+  const database = await createDatabase({ store, bridge })
 
   const startSubprocess = () => {
     if (typeof command === 'string') {
@@ -88,9 +94,15 @@ stack: ${code.stack || 'No stack was provided'}`)
     }
   }
   let ready = false
+  const schema = await database.getSchema()
+  // If we're indexing, ensure local file changes cause re-index
+  const extraPaths = store.supportsIndexing()
+    ? schema.getAllCollectionPaths()
+    : []
+
   if (!noWatch && !process.env.CI) {
     chokidar
-      .watch(`${rootPath}/**/*.{ts,gql,graphql}`, {
+      .watch([`${rootPath}/**/*.{ts,gql,graphql}`, ...extraPaths], {
         ignored: `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
       })
       .on('ready', async () => {

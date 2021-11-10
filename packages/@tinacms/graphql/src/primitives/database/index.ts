@@ -185,7 +185,7 @@ export class Database {
     return this._tinaSchema
   }
 
-  private getSchema = async () => {
+  public getSchema = async () => {
     if (this.tinaSchema) {
       return this.tinaSchema
     }
@@ -235,6 +235,7 @@ export class Database {
       if (!this.store.supportsIndexing()) {
         throw new Error(`Schema cannot be indexed with provided Store`)
       }
+      this.store.clear()
       await this.store.seed('_graphql', graphQLSchema)
       await this.store.seed('_schema', tinaSchema.schema)
       await _indexContent(tinaSchema, this)
@@ -349,6 +350,7 @@ const _indexCollectable = async ({
   database: Database
 }) => {
   let template
+  let extra = ''
   if (field.templates) {
     template = field.templates.find((t) => {
       if (typeof t === 'string') {
@@ -362,13 +364,14 @@ const _indexCollectable = async ({
         )
       }
     })
+    extra = `#${lastItem(field.namespace)}`
   } else {
     template = field
   }
   await _indexAttributes({
     record: rest.record,
     data: value,
-    prefix: `${rest.prefix}#${template.name}`,
+    prefix: `${rest.prefix}${extra}#${template.name}`,
     fields: template.fields,
     database: rest.database,
   })
