@@ -434,12 +434,14 @@ export type MutationAddPendingDocumentArgs = {
 
 
 export type MutationUpdateDocumentArgs = {
+  collection?: Maybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
 };
 
 
 export type MutationCreateDocumentArgs = {
+  collection?: Maybe<Scalars['String']>;
   relativePath: Scalars['String'];
   params: DocumentMutation;
 };
