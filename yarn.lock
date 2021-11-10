@@ -9546,22 +9546,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"basic@workspace:examples/basic":
-  version: 0.0.0-use.local
-  resolution: "basic@workspace:examples/basic"
-  dependencies:
-    "@tinacms/cli": "workspace:*"
-    eslint: 7
-    eslint-config-next: 12.0.3
-    next: 12.0.3
-    react: 17.0.2
-    react-dom: 17.0.2
-    react-is: ^17.0.2
-    styled-components: ^5.1.3
-    tinacms: "workspace:*"
-  languageName: unknown
-  linkType: soft
-
 "batch-processor@npm:1.0.0":
   version: 1.0.0
   resolution: "batch-processor@npm:1.0.0"
@@ -27009,6 +26993,22 @@ resolve@^2.0.0-next.3:
   checksum: 56e3cc5d33bdc4cf80428db155edd692c05331cb5eaa2fb93057db3848187f10089796094a5118c4e965b5ade2e76499e524081f54b00cdc315a3bf6f27d64ff
   languageName: node
   linkType: hard
+
+"starter-basic@workspace:examples/basic":
+  version: 0.0.0-use.local
+  resolution: "starter-basic@workspace:examples/basic"
+  dependencies:
+    "@tinacms/cli": "workspace:*"
+    eslint: 7
+    eslint-config-next: 12.0.3
+    next: 12.0.3
+    react: 17.0.2
+    react-dom: 17.0.2
+    react-is: ^17.0.2
+    styled-components: ^5.1.3
+    tinacms: "workspace:*"
+  languageName: unknown
+  linkType: soft
 
 "state-toggle@npm:^1.0.0":
   version: 1.0.3
