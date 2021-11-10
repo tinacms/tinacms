@@ -25,15 +25,6 @@ query {
           }
         }
       }
-      actors {
-        edges {
-          node {
-            ... on ActorDocument {
-              id
-            }
-          }
-        }
-      }
     }
   }
 }

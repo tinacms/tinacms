@@ -52,13 +52,13 @@ const tinaSchema: TinaCloudSchema<false> = {
           name: 'director',
           collections: ['director'],
         },
-        {
-          type: 'reference',
-          label: 'Actors',
-          name: 'actors',
-          list: true,
-          collections: ['actor'],
-        },
+        // {
+        //   type: 'reference',
+        //   label: 'Actors',
+        //   name: 'actors',
+        //   list: true,
+        //   collections: ['actor'],
+        // },
         {
           name: 'body',
           label: 'Body',

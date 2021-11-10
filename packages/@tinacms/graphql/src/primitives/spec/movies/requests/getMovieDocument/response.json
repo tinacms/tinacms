@@ -23,15 +23,6 @@
           "data": {
             "name": "George Lucas"
           }
-        },
-        "actors": {
-          "edges": [
-            {
-              "node": {
-                "id": "content/actors/harrison.md"
-              }
-            }
-          ]
         }
       }
     }

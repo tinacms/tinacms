@@ -21,14 +21,22 @@ import fg from 'fast-glob'
 import type { TinaCloudSchema } from '../types'
 import { createDatabase } from '../database'
 import { Database } from '../database'
-import { Bridge } from '../database/bridge'
+import type { Bridge } from '../database/bridge'
+import type { Store } from '../database/store'
 import { sequential } from '../util'
+import { parseFile, stringifyFile } from '../database/util'
 
 export class InMemoryBridge implements Bridge {
   public rootPath: string
   private mockFileSystem: { [filepath: string]: string } | undefined
   constructor(rootPath: string) {
     this.rootPath = rootPath
+  }
+  public async putConfig(filepath: string, data: string) {
+    await this.put(filepath, data)
+  }
+  public supportsBuilding() {
+    return true
   }
   public async glob(pattern: string) {
     const items = await fg(path.join(this.rootPath, pattern, '**/*'), {
@@ -68,6 +76,63 @@ export class InMemoryBridge implements Bridge {
   }
 }
 
+export class InMemoryStore implements Store {
+  rootPath: string
+  public async clear() {}
+  public async print() {}
+  private mockFileSystem: { [filepath: string]: string } | undefined
+  constructor({
+    rootPath,
+    mockData,
+  }: {
+    rootPath?: string
+    mockData: { [filepath: string]: string }
+  }) {
+    this.rootPath = rootPath || ''
+    this.mockFileSystem = mockData
+  }
+  public async seed() {
+    throw new Error(`Seeding data is not possible for InMemoryStore store`)
+  }
+  public async query(queryStrings: string[]): Promise<object[]> {
+    throw new Error(`Unable to perform query for InMemoryStore store`)
+  }
+
+  public async get(filepath: string) {
+    const value = this.mockFileSystem[filepath]
+    if (!value) {
+      throw new Error(`Unable to find record for ${filepath}`)
+    }
+    return parseFile(value, path.extname(filepath), (yup) => yup.object())
+  }
+
+  public supportsIndexing() {
+    return false
+  }
+  public async glob(pattern: string, callback) {
+    const items = []
+    Object.entries(this.mockFileSystem).forEach(([key, value]) => {
+      if (key.startsWith(pattern)) {
+        items.push(key)
+      }
+    })
+    if (callback) {
+      return sequential(items, async (item) => {
+        return callback(item)
+      })
+    } else {
+      return items
+    }
+  }
+  public async put(filepath: string, data: object) {
+    this.mockFileSystem[filepath] = stringifyFile(
+      data,
+      path.extname(filepath),
+      false
+    )
+  }
+}
+
 export const setup = async (
   rootPath: string,
   schema: TinaCloudSchema<false>,
@@ -78,10 +143,15 @@ export const setup = async (
   expectedSchemaString: string
 }> => {
   const bridge = new InMemoryBridge(rootPath)
-  await bridge.getMockData()
+  const mockData = await bridge.getMockData()
+  // throw 'NO'
+  const store = new InMemoryStore({
+    rootPath: '',
+    mockData,
+  })
   const database = await createDatabase({
-    rootPath,
     bridge,
+    store,
   })
   await indexDB({ database, config: schema })
   const schemaString = await database.getGraphQLSchema()

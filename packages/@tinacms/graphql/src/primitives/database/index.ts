@@ -28,7 +28,7 @@ import type {
 import type { Store } from './store'
 import type { Bridge } from './bridge'
 
-type CreateDatabase = { bridge?: Bridge; store?: Store }
+type CreateDatabase = { bridge: Bridge; store: Store }
 
 export const createDatabase = async (config: CreateDatabase) => {
   return new Database({

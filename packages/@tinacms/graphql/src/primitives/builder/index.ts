@@ -35,7 +35,6 @@ import type {
   Template,
 } from '../types'
 import { TinaSchema } from '../schema'
-import { String } from 'aws-sdk/clients/apigateway'
 
 export const createBuilder = async ({
   database,
