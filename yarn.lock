@@ -4434,7 +4434,7 @@ __metadata:
     "@types/yup": ^0.29.11
     ajv: ^6.12.3
     altair-express-middleware: 4.0.6
-    auto-bind: ^5.0.1
+    auto-bind: ^4.0.0
     axios: 0.19.0
     body-parser: ^1.19.0
     chalk: ^2.4.2
@@ -8180,14 +8180,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"auto-bind@npm:^5.0.1":
-  version: 5.0.1
-  resolution: "auto-bind@npm:5.0.1"
-  checksum: 4cb07cdee2c56aad62a319b1e3a9ca06d3a08a178f47dca15ff5cb5408e00a823b5f2f825bfab7d8d4f29314d94528bd0879f95a654daecb4fc5cc6cdb20ca0c
-  languageName: node
-  linkType: hard
-
-"auto-bind@npm:~4.0.0":
+"auto-bind@npm:^4.0.0, auto-bind@npm:~4.0.0":
   version: 4.0.0
   resolution: "auto-bind@npm:4.0.0"
   checksum: 8054fe5776afe69fb3e5726496dd0cd6f3f1f09ff897e22ffdae96b044b95411f0975e2447b50ff7f8f0167258f8dc859e253e30c298719f918a316e439ed29f
