@@ -1094,7 +1094,6 @@ export type Requester<C= {}> = <R, V>(doc: DocumentNode, vars?: V, options?: C) 
 
 // TinaSDK generated code
 import { getStaticPropsForTina } from 'tinacms'
-// const tinaClient = new LocalClient();
 const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   doc,
   vars,
@@ -1103,7 +1102,6 @@ const requester: (doc: any, vars?: any, options?: any) => Promise<any> = async (
   // const data = await tinaClient.request(doc, { variables: vars }); 
   const res = await await getStaticPropsForTina({query: doc, variables: vars})
   return res
-  // return { data, query: doc, variables: vars};
 };
 
 /**
