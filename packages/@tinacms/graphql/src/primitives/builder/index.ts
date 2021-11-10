@@ -21,6 +21,9 @@ import type {
   ObjectTypeDefinitionNode,
   TypeDefinitionNode,
   InputObjectTypeDefinitionNode,
+  FieldNode,
+  SelectionSetNode,
+  InlineFragmentNode,
 } from 'graphql'
 import type {
   TinaCloudCollectionEnriched,
@@ -28,6 +31,8 @@ import type {
   CollectionTemplateable,
   Collectable,
   Templateable,
+  TinaFieldInner,
+  Template,
 } from '../types'
 import { TinaSchema } from '../schema'
 import { String } from 'aws-sdk/clients/apigateway'
@@ -323,11 +328,6 @@ export class Builder {
       name: 'createDocument',
       args: [
         astBuilder.InputValueDefinition({
-          name: 'collection',
-          required: true,
-          type: astBuilder.TYPES.String,
-        }),
-        astBuilder.InputValueDefinition({
           name: 'relativePath',
           required: true,
           type: astBuilder.TYPES.String,
@@ -365,11 +365,6 @@ export class Builder {
     return astBuilder.FieldDefinition({
       name: 'updateDocument',
       args: [
-        astBuilder.InputValueDefinition({
-          name: 'collection',
-          required: true,
-          type: astBuilder.TYPES.String,
-        }),
         astBuilder.InputValueDefinition({
           name: 'relativePath',
           required: true,
@@ -449,6 +444,144 @@ export class Builder {
       [NAMER.updateName([collection.name])]: 'update',
     })
     return astBuilder.FieldDefinition({ type, name, args, required: true })
+  }
+
+  /**
+   * Turns a collection into a fragment that gets updated on build. This fragment does not resolve references
+   * ```graphql
+   * # ex.
+   * fragment AuthorsParts on Authors {
+   *   name
+   *   avatar
+   *   ...
+   * }
+   * ```
+   *
+   * @public
+   * @param collection a Tina Cloud collection
+   */
+  public collectionFragment = async (
+    collection: TinaCloudCollectionEnriched
+  ) => {
+    const name = NAMER.dataTypeName(collection.namespace)
+    const fragmentName = NAMER.fragmentName(collection.namespace)
+
+    if (typeof collection.fields === 'object') {
+      const selections = []
+      await sequential(collection.fields, async (x) => {
+        const field = await this._buildFieldNodeForFragments(x)
+        selections.push(field)
+      })
+
+      return astBuilder.FragmentDefinition({
+        name,
+        fragmentName,
+        selections: filterSelections(selections),
+      })
+    } else {
+      const selections = []
+      await sequential(collection.templates, async (tem) => {
+        if (typeof tem === 'object') {
+          // TODO: Handle when template is a string
+          selections.push(await this.buildTemplateFragments(tem))
+        }
+      })
+      return astBuilder.FieldWithSelectionSetDefinition({
+        name,
+        selections: filterSelections(selections),
+      })
+    }
+  }
+
+  private _buildFieldNodeForFragments: (
+    field: TinaFieldInner<true>
+  ) => Promise<SelectionSetNode | FieldNode> = async (field) => {
+    switch (field.type) {
+      case 'string':
+      case 'image':
+      case 'datetime':
+      case 'number':
+      case 'boolean':
+      case 'rich-text':
+        return astBuilder.FieldNodeDefinition(field)
+      case 'object':
+        if (typeof field.fields === 'object') {
+          const selections = []
+          await sequential(field.fields, async (item) => {
+            const field = await this._buildFieldNodeForFragments(item)
+            selections.push(field)
+          })
+
+          return astBuilder.FieldWithSelectionSetDefinition({
+            name: field.name,
+            selections: [
+              { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
+              ...filterSelections(selections),
+            ],
+          })
+        } else if (typeof field.templates === 'object') {
+          const selections = []
+          await sequential(field.templates, async (tem) => {
+            if (typeof tem === 'object') {
+              // TODO: Handle when template is a string
+              selections.push(await this.buildTemplateFragments(tem))
+            }
+          })
+          return astBuilder.FieldWithSelectionSetDefinition({
+            name: field.name,
+            selections: [
+              { kind: 'Field', name: { kind: 'Name', value: '__typename' } },
+              ...filterSelections(selections),
+            ],
+          })
+        }
+      case 'reference':
+        return astBuilder.FieldWithSelectionSetDefinition({
+          name: field.name,
+          selections: [
+            {
+              kind: 'InlineFragment',
+              typeCondition: {
+                kind: 'NamedType',
+                name: {
+                  kind: 'Name',
+                  value: 'Document',
+                },
+              },
+              directives: [],
+              selectionSet: {
+                kind: 'SelectionSet',
+                selections: [
+                  {
+                    kind: 'Field',
+                    name: {
+                      kind: 'Name',
+                      value: 'id',
+                    },
+                    arguments: [],
+                    directives: [],
+                  },
+                ],
+              },
+            },
+          ],
+        })
+    }
+  }
+
+  public async buildTemplateFragments(
+    template: Template<true>
+  ): Promise<InlineFragmentNode> {
+    const selections = []
+
+    await sequential(template.fields || [], async (item) => {
+      const field = await this._buildFieldNodeForFragments(item)
+      selections.push(field)
+    })
+    return astBuilder.InlineFragmentDefinition({
+      selections: filterSelections(selections),
+      name: NAMER.dataTypeName(template.namespace),
+    })
   }
 
   /**
@@ -1157,3 +1290,7 @@ const listArgs = [
     type: astBuilder.TYPES.Number,
   }),
 ]
+
+const filterSelections = (arr: any[]) => {
+  return arr.filter(Boolean)
+}

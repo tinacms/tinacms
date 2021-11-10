@@ -388,6 +388,7 @@ export default defineSchema({
       name: "posts",
       format: "mdx",
       path: "content/posts",
+      format: "mdx",
       fields: [
         {
           type: "rich-text",

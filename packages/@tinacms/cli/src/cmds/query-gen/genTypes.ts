@@ -13,7 +13,7 @@ limitations under the License.
 
 import { successText } from '../../utils/theme'
 import { generateTypes } from '../../codegen'
-import { printSchema, GraphQLSchema } from 'graphql'
+import { printSchema, GraphQLSchema, DocumentNode } from 'graphql'
 import fs from 'fs-extra'
 import { logger } from '../../logger'
 
@@ -22,8 +22,11 @@ export async function genTypes(
   next: () => void,
   options
 ) {
-  const typescriptTypes = await generateTypes(schema)
   const typesPath = process.cwd() + '/.tina/__generated__/types.ts'
+  const fragPath = process.cwd() + '/.tina/__generated__/*.{graphql,gql}'
+  const queryPathGlob = process.cwd() + '/.tina/queries/**/*.{graphql,gql}'
+
+  const typescriptTypes = await generateTypes(schema, queryPathGlob, fragPath)
 
   await fs.outputFile(
     typesPath,

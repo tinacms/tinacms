@@ -16,7 +16,6 @@ import {
   BrowserRouter as Router,
   Switch,
   Route,
-  Link,
   NavLink,
 } from 'react-router-dom'
 import { ImFilesEmpty } from 'react-icons/im'
@@ -182,6 +181,11 @@ export const TinaAdmin = () => {
                   <div className="flex-1">
                     <Switch>
                       <Route path={`/admin/collections/:collectionName/new`}>
+                        <CollectionCreatePage />
+                      </Route>
+                      <Route
+                        path={`/admin/collections/:collectionName/:templateName/new`}
+                      >
                         <CollectionCreatePage />
                       </Route>
                       <Route

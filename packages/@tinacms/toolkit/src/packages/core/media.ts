@@ -42,6 +42,11 @@ export interface Media {
   directory: string
 
   /**
+   * A url that provides an image of the media file
+   */
+  src?: string
+
+  /**
    * A url that provides an image preview of the media file
    */
   previewSrc?: string

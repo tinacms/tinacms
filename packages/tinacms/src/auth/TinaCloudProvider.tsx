@@ -19,7 +19,7 @@ import {
   MediaStore,
   //@ts-ignore why can't it find you
   BranchSwitcherPlugin,
-  Branch
+  Branch,
 } from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../client'
@@ -44,7 +44,9 @@ export interface TinaCloudAuthWallProps {
   getModalActions?: (args: {
     closeModal: () => void
   }) => { name: string; action: () => Promise<void>; primary: boolean }[]
-  mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
+  mediaStore?:
+    | TinaCloudMediaStoreClass
+    | (() => Promise<TinaCloudMediaStoreClass>)
 }
 
 export const AuthWallInner = ({
@@ -152,26 +154,36 @@ export const TinaCloudProvider = (
   }
   const setupMedia = async () => {
     if (props.mediaStore) {
-      cms.media.store = new (await props.mediaStore)(cms.api.tina)
+      // Check to see if the media was store was passed in?
+      if (props.mediaStore.prototype?.persist) {
+        // @ts-ignore
+        cms.media.store = new props.mediaStore(cms.api.tina)
+      } else {
+        // This means that an async function was passed in so we will use that to get the class
+
+        // @ts-ignore
+        const MediaClass = await props.mediaStore()
+        cms.media.store = new MediaClass(cms.api.tina)
+      }
     }
   }
   const handleListBranches = async (): Promise<Branch[]> => {
     const { owner, repo } = props
     const branches = await cms.api.tina.listBranches({ owner, repo })
-    
+
     return branches.map((branch) => branch.name)
   }
   const handleCreateBranch = async (data) => {
-     const newBranch = await cms.api.tina.createBranch(data)
+    const newBranch = await cms.api.tina.createBranch(data)
 
-     return newBranch
+    return newBranch
   }
 
   setupMedia()
 
   //@ts-ignore it's not picking up cms.flags
   const branchingEnabled = cms.flags.get('branch-switcher')
-  
+
   React.useEffect(() => {
     let branchSwitcher
     if (branchingEnabled) {
@@ -184,13 +196,13 @@ export const TinaCloudProvider = (
         //TODO implement these
         listBranches: handleListBranches,
         createBranch: handleCreateBranch,
-        setCurrentBranch: () => console.log(props.branch)
+        setCurrentBranch: () => console.log(props.branch),
       })
       cms.plugins.add(branchSwitcher)
     }
     return () => {
       if (!branchingEnabled) {
-        if(branchSwitcher) {
+        if (branchSwitcher) {
           cms.plugins.remove(branchSwitcher)
         }
       }

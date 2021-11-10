@@ -1,5 +1,18 @@
 # Change Log
 
+## 0.51.5
+
+### Patch Changes
+
+- f267b2807: Fix package dependency on styled-components which would result in multiple contexts
+
+## 0.51.4
+
+### Patch Changes
+
+- Updated dependencies [2724c48c0]
+  - @tinacms/toolkit@0.55.2
+
 ## 0.51.3
 
 ### Patch Changes

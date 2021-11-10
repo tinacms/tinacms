@@ -266,22 +266,22 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  async listBranches ({ owner, repo }: BranchData) {
+  async listBranches({ owner, repo }: BranchData) {
     const url = `${this.contentApiUrl}/list_branches?owner=${owner}&repo=${repo}`
     try {
       const res = await this.fetchWithToken(url, {
-        method: 'GET'
-      }) 
+        method: 'GET',
+      })
 
       return JSON.stringify(res)
     } catch (e) {
-      console.error("There was an issue fetching the branch list.", e)
+      console.error('There was an issue fetching the branch list.', e)
       return null
     }
   }
-  async createBranch ({ owner, repo, baseBranch, branchName}: BranchData) {
+  async createBranch({ owner, repo, baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiUrl}/create_branch`
-  
+
     try {
       const res = await this.fetchWithToken(url, {
         method: 'POST',
@@ -289,8 +289,8 @@ mutation addPendingDocumentMutation(
           owner,
           repo,
           baseBranch,
-          branchName
-        } as any
+          branchName,
+        } as any,
       })
 
       return JSON.stringify(res)
@@ -300,7 +300,6 @@ mutation addPendingDocumentMutation(
     }
   }
 }
-
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 

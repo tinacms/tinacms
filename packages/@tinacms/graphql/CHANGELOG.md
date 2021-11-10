@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.56.1
+
+### Patch Changes
+
+- 4b7795612: Adds support for collection.templates to TinaAdmin
+
 ## 0.56.0
 
 ### Minor Changes

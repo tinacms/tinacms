@@ -48,12 +48,12 @@ export const Posts = ({ data }) => {
                 <div className="flex-shrink-0 mr-2">
                   <img
                     className="h-10 w-10 object-cover rounded-full shadow-sm"
-                    src={post.data.author.data.avatar}
-                    alt={post.data.author.data.name}
+                    src={post?.data.author?.data.avatar}
+                    alt={post?.data.author?.data.name}
                   />
                 </div>
                 <p className="text-sm font-medium text-gray-600 group-hover:text-gray-800 dark:text-gray-200 dark:group-hover:text-white">
-                  {post.data.author.data.name}
+                  {post?.data.author?.data.name}
                 </p>
                 <span className="font-bold text-gray-200 dark:text-gray-500 mx-2">
                   —

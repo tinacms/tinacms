@@ -192,7 +192,9 @@ export const TinaCMSProvider2 = ({
   /** Callback if you need access to the "document creator" API */
   documentCreatorCallback?: Parameters<typeof useDocumentCreatorPlugin>[0]
   /** TinaCMS media store instance */
-  mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
+  mediaStore?:
+    | TinaCloudMediaStoreClass
+    | (() => Promise<TinaCloudMediaStoreClass>)
   tinaioConfig?: TinaIOConfig
 }) => {
   if (typeof props.query === 'string') {
@@ -395,6 +397,10 @@ This will work when developing locally but NOT when deployed to production.
  * to know the temlpate string is a GraphQL
  * query or muation
  */
-export function gql(strings: TemplateStringsArray) {
-  return strings[0]
+export function gql(strings: TemplateStringsArray, ...args: string[]): string {
+  let str = ''
+  strings.forEach((string, i) => {
+    str += string + (args[i] || '')
+  })
+  return str
 }

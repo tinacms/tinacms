@@ -56,7 +56,15 @@ export const FormPortalProvider: React.FC = ({ children }) => {
 
   return (
     <FormPortalContext.Provider value={FormPortal}>
-      <div ref={wrapperRef} className="relative w-full flex-1 overflow-hidden">
+      <div
+        ref={wrapperRef}
+        style={{
+          position: 'relative',
+          width: '100%',
+          flex: '1 1 0%',
+          overflow: 'hidden',
+        }}
+      >
         {children}
       </div>
     </FormPortalContext.Provider>

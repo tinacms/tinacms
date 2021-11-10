@@ -12,19 +12,20 @@ limitations under the License.
 */
 
 import _ from 'lodash'
-import { astBuilder } from './ast-builder'
+import fs from 'fs-extra'
+import { print, OperationDefinitionNode } from 'graphql'
+import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
+
+import { astBuilder, NAMER } from './ast-builder'
 import { sequential } from './util'
-import { parseFile } from './database/util'
 import { createBuilder } from './builder'
 import { createSchema } from './schema'
 import { extractInlineTypes } from './ast-builder'
 import path from 'path'
 
-import { FieldDefinitionNode } from 'graphql'
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
 import { Database } from './database'
-import { TinaField } from '..'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
 export const indexDB = async ({
@@ -45,6 +46,82 @@ export const indexDB = async ({
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   // @ts-ignore
   await database.indexData({ experimentalData, graphQLSchema, tinaSchema })
+
+  await _buildFragments(builder, tinaSchema)
+  await _buildQueries(builder, tinaSchema)
+}
+
+const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
+  const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
+  const collections = tinaSchema.getCollections()
+
+  await sequential(collections, async (collection) => {
+    const frag = (await builder.collectionFragment(
+      collection
+    )) as FragmentDefinitionNode
+
+    fragmentDefinitionsFields.push(frag)
+  })
+
+  const fragDoc = {
+    kind: 'Document' as const,
+    definitions: _.uniqBy(
+      // @ts-ignore
+      extractInlineTypes(fragmentDefinitionsFields),
+      (node) => node.name.value
+    ),
+  }
+
+  // TODO: These should possibly be outputted somewhere else?
+  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+
+  await fs.outputFileSync(path.join(fragPath, 'frags.gql'), print(fragDoc))
+  //   await fs.outputFileSync(
+  //     path.join(fragPath, 'frags.json'),
+  //     JSON.stringify(fragDoc, null, 2)
+  //   )
+}
+
+const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
+  const operationsDefinitions: OperationDefinitionNode[] = []
+
+  const collections = tinaSchema.getCollections()
+
+  await sequential(collections, async (collection) => {
+    const queryName = NAMER.queryName(collection.namespace)
+    const queryListName = NAMER.generateQueryListName(collection.namespace)
+
+    const fragName = NAMER.fragmentName(collection.namespace)
+
+    operationsDefinitions.push(
+      astBuilder.QueryOperationDefinition({ fragName, queryName })
+    )
+
+    operationsDefinitions.push(
+      astBuilder.ListQueryOperationDefinition({
+        fragName,
+        queryName: queryListName,
+      })
+    )
+  })
+
+  const queryDoc = {
+    kind: 'Document' as const,
+    definitions: _.uniqBy(
+      // @ts-ignore
+      extractInlineTypes(operationsDefinitions),
+      (node) => node.name.value
+    ),
+  }
+
+  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+
+  await fs.outputFileSync(path.join(fragPath, 'queries.gql'), print(queryDoc))
+  // We dont this them for now
+  // await fs.outputFileSync(
+  //   path.join(fragPath, 'queries.json'),
+  //   JSON.stringify(queryDoc, null, 2)
+  // )
 }
 
 const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
@@ -89,10 +166,11 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
   queryTypeDefinitionFields.push(await builder.multiCollectionDocumentFields())
 
   /**
-   * Collection queries/mutations
+   * Collection queries/mutations/fragments
    */
   await sequential(collections, async (collection) => {
     queryTypeDefinitionFields.push(await builder.collectionDocument(collection))
+
     mutationTypeDefinitionFields.push(
       await builder.updateCollectionDocumentMutation(collection)
     )
@@ -116,12 +194,15 @@ const _buildSchema = async (builder: Builder, tinaSchema: TinaSchema) => {
       fields: mutationTypeDefinitionFields,
     })
   )
-  return {
-    kind: 'Document',
+
+  const doc = {
+    kind: 'Document' as const,
     definitions: _.uniqBy(
       // @ts-ignore
       extractInlineTypes(definitions),
       (node) => node.name.value
     ),
   }
+
+  return doc
 }

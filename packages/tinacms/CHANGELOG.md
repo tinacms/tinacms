@@ -1,5 +1,26 @@
 # tinacms
 
+## 0.57.4
+
+### Patch Changes
+
+- 4b7795612: Adds support for collection.templates to TinaAdmin
+- a39ddc611: update media store to load only when in edit mode
+- 1096fe3e4: Ensure forms unmount properly when `useGraphQLForms` unmounts
+
+## 0.57.3
+
+### Patch Changes
+
+- Updated dependencies [2724c48c0]
+  - @tinacms/toolkit@0.55.2
+
+## 0.57.2
+
+### Patch Changes
+
+- 7849c1233: Fix styles on panel
+
 ## 0.57.1
 
 ### Patch Changes

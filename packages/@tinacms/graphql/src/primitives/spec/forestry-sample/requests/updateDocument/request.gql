@@ -1,6 +1,5 @@
 mutation {
   updateDocument(
-    collection: "post"
     relativePath: "hello-world.md"
     params: {
       post: {

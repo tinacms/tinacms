@@ -13,7 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { Form, FullscreenFormBuilder } from '@tinacms/toolkit'
-import { useParams, useHistory, Link } from 'react-router-dom'
+import { useParams, useHistory } from 'react-router-dom'
 
 import GetCMS from '../components/GetCMS'
 import GetDocumentFields from '../components/GetDocumentFields'
@@ -24,6 +24,7 @@ import { transformDocumentIntoMutationRequestPayload } from '../../hooks/use-gra
 const createDocument = async (
   cms: TinaCMS,
   collection: { name: string },
+  template: { name: string },
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
@@ -32,6 +33,7 @@ const createDocument = async (
   const params = transformDocumentIntoMutationRequestPayload(
     {
       _collection: collection.name,
+      ...(template && { _template: template.name }),
       ...leftover,
     },
     {
@@ -41,16 +43,14 @@ const createDocument = async (
   )
 
   await cms.api.tina.request(
-    `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
-      createDocument(
-        collection: $collection, 
+    `mutation($relativePath: String!, $params: DocumentMutation!) {
+      createDocument( 
         relativePath: $relativePath, 
         params: $params
       ){__typename}
     }`,
     {
       variables: {
-        collection: collection.name,
         relativePath,
         params,
       },
@@ -59,14 +59,18 @@ const createDocument = async (
 }
 
 const CollectionCreatePage = () => {
-  const { collectionName } = useParams()
+  const { collectionName, templateName } = useParams()
   const history = useHistory()
 
   return (
     <GetCMS>
       {(cms: TinaCMS) => (
-        <GetDocumentFields cms={cms} collectionName={collectionName}>
-          {(collection, fields, mutationInfo) => {
+        <GetDocumentFields
+          cms={cms}
+          collectionName={collectionName}
+          templateName={templateName}
+        >
+          {({ collection, template, fields, mutationInfo }) => {
             const form = new Form({
               id: 'create-form',
               label: 'form',
@@ -83,17 +87,25 @@ const CollectionCreatePage = () => {
                 ...fields,
               ],
               onSubmit: async (values) => {
-                await createDocument(cms, collection, mutationInfo, values)
+                await createDocument(
+                  cms,
+                  collection,
+                  template,
+                  mutationInfo,
+                  values
+                )
                 history.push(`/admin/collections/${collection.name}`)
               },
             })
+
+            const formLabel = template
+              ? `${collection.label} - Create New ${template.label}`
+              : `${collection.label} - Create New`
+
             return (
               <div className="w-full h-screen">
                 <div className="flex flex-col items-center w-full flex-1">
-                  <FullscreenFormBuilder
-                    label={collection.label + ' - Create New'}
-                    form={form}
-                  />
+                  <FullscreenFormBuilder label={formLabel} form={form} />
                 </div>
               </div>
             )

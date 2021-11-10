@@ -1,6 +1,11 @@
 name: Publish PRs
 on:
   workflow_dispatch:
+    inputs:
+      logLevel:
+        description: 'PR Number'
+        required: true
+        default: 'warning'
 
 jobs:
   build:
