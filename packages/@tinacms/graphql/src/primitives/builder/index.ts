@@ -318,6 +318,11 @@ export class Builder {
       name: 'createDocument',
       args: [
         astBuilder.InputValueDefinition({
+          name: 'collection',
+          required: false,
+          type: astBuilder.TYPES.String,
+        }),
+        astBuilder.InputValueDefinition({
           name: 'relativePath',
           required: true,
           type: astBuilder.TYPES.String,
@@ -355,6 +360,11 @@ export class Builder {
     return astBuilder.FieldDefinition({
       name: 'updateDocument',
       args: [
+        astBuilder.InputValueDefinition({
+          name: 'collection',
+          required: false,
+          type: astBuilder.TYPES.String,
+        }),
         astBuilder.InputValueDefinition({
           name: 'relativePath',
           required: true,
