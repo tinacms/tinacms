@@ -133,9 +133,9 @@ const App = ({ Component, pageProps }) => {
 
 ### Enable the `tina-admin` flag
 
-We are hard at work implementing ways for `TinaAdmin` and the `TinaCMS` Sidebar Experience to work together.  Right now, we've hidden those experimental features behind a `flag` to prevent unwanted changes in the Sidebar Experience.
+We are hard at work implementing ways for `TinaAdmin` and the `TinaCMS` Sidebar Experience to work together.  Right now, we've hidden those experimental changes behind a `flag` to prevent unwanted side effects in the Sidebar Experience.
 
-However, if you'd like to enable those features, you can enable them by enabling the `tina-admin` flag within the `cmsCallback` inside your `_app.tsx`:
+However, if you'd like to see those features firsthand, you can enable the `tina-admin` flag within the `cmsCallback` inside your `_app.tsx`:
 
 ```tsx
 /**
