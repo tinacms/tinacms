@@ -17,7 +17,12 @@ import { indexDB } from './build'
 import { resolve } from './resolve'
 import { buildASTSchema } from 'graphql'
 import { GithubBridge } from './database/bridge/github'
+import { GithubStore } from './database/store/github'
+import { FilesystemBridge } from './database/bridge/filesystem'
+import { FilesystemStore } from './database/store/filesystem'
 import { createDatabase, Database } from './database'
+
+export { GithubBridge, GithubStore, FilesystemBridge, FilesystemStore }
 
 export { createDatabase, resolve, indexDB }
 export type { TinaCloudSchema } from './types'

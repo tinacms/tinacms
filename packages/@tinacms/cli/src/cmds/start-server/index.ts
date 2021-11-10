@@ -17,6 +17,7 @@ import {
   buildSchema,
   createDatabase,
   MemoryStore,
+  FilesystemStore,
   GithubStore,
   GithubBridge,
   FilesystemBridge,
@@ -46,13 +47,14 @@ export async function startServer(
 
   const ghConfig = {
     rootPath: 'examples/tina-cloud-starter',
-    accessToken: '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',
+    accessToken: '<my-token>',
     owner: 'tinacms',
     repo: 'tinacms',
     ref: 'add-data-store',
   }
   const database = await createDatabase({
-    store: new MemoryStore(rootPath),
+    store: new FilesystemStore({ rootPath }),
+    // store: new MemoryStore(rootPath),
     bridge: new FilesystemBridge(rootPath),
     // Be sure to set shouldBuild to false
     // bridge: new GithubBridge(ghConfig),

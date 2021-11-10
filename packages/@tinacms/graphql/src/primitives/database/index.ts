@@ -20,7 +20,11 @@ import { sequential } from '../util'
 
 import type { DocumentNode } from 'graphql'
 import type { TinaSchema } from '../schema'
-import type { TinaCloudSchemaBase } from '../types'
+import type {
+  TinaCloudSchemaBase,
+  TinaFieldEnriched,
+  Collectable,
+} from '../types'
 import type { Store } from './store'
 import type { Bridge } from './bridge'
 
@@ -159,9 +163,7 @@ export class Database {
   public getLookup = async (returnType: string): Promise<LookupMapType> => {
     const lookupPath = path.join(GENERATED_FOLDER, `_lookup.json`)
     if (!this._lookup) {
-      const _lookup = await this.bridge.get<{
-        [returnType: string]: LookupMapType
-      }>(lookupPath)
+      const _lookup = await this.bridge.get(lookupPath)
       this._lookup = JSON.parse(_lookup)
     }
     return this._lookup[returnType]
@@ -169,7 +171,7 @@ export class Database {
   public getGraphQLSchema = async (): Promise<DocumentNode> => {
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
     if (!this._graphql) {
-      const _graphql = await this.bridge.get<DocumentNode>(graphqlPath)
+      const _graphql = await this.bridge.get(graphqlPath)
       this._graphql = JSON.parse(_graphql)
     }
     return this._graphql
@@ -177,7 +179,7 @@ export class Database {
   public getTinaSchema = async (): Promise<TinaCloudSchemaBase> => {
     const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
     if (!this._tinaSchema) {
-      const _tinaSchema = await this.bridge.get<TinaCloudSchemaBase>(schemaPath)
+      const _tinaSchema = await this.bridge.get(schemaPath)
       this._tinaSchema = JSON.parse(_tinaSchema)
     }
     return this._tinaSchema
@@ -230,14 +232,14 @@ export class Database {
       JSON.stringify(tinaSchema.schema, null, 2)
     )
     if (experimentalData) {
-      if (!this.store.supportsIndexing) {
+      if (!this.store.supportsIndexing()) {
         throw new Error(`Schema cannot be indexed with provided Store`)
       }
       await this.store.seed('_graphql', graphQLSchema)
       await this.store.seed('_schema', tinaSchema.schema)
       await _indexContent(tinaSchema, this)
     } else {
-      if (this.store.supportsIndexing) {
+      if (this.store.supportsIndexing()) {
         throw new Error(`Schema must be indexed with provided Store`)
       }
     }
@@ -343,12 +345,23 @@ const _indexCollectable = async ({
   record: string
   value: object
   prefix: string
-  field: TinaField
+  field: Collectable
   database: Database
 }) => {
   let template
   if (field.templates) {
-    template = field.templates.find((t) => t.name === value._template)
+    template = field.templates.find((t) => {
+      if (typeof t === 'string') {
+        throw new Error(`Global templates not yet supported`)
+      }
+      if (hasOwnProperty(value, '_template')) {
+        return t.name === value._template
+      } else {
+        throw new Error(
+          `Expected value for collectable with multiple templates to have property _template`
+        )
+      }
+    })
   } else {
     template = field
   }
@@ -369,7 +382,7 @@ const _indexAttributes = async ({
   record: string
   data: object
   prefix: string
-  fields: TinaField[]
+  fields: TinaFieldEnriched[]
   database: Database
 }) => {
   await sequential(fields, async (field) => {
@@ -390,6 +403,7 @@ const _indexAttributes = async ({
       case 'object':
         if (field.list) {
           await sequential(value, async (item) => {
+            // @ts-ignore
             await _indexCollectable({ field, value: item, ...rest })
           })
         } else {
@@ -414,7 +428,7 @@ const _indexAttribute = async ({
   record: string
   value: string
   prefix: string
-  field: TinaField
+  field: TinaFieldEnriched
   database: Database
 }) => {
   const stringValue = value.toString().substr(0, 100)
