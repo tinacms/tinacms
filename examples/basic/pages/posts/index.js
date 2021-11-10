@@ -42,22 +42,3 @@ export const getStaticProps = async () => {
     },
   }
 }
-
-// export const getStaticProps = async () => {
-//   const tinaProps = await getStaticPropsForTina({
-//     query: `{
-//       getPageDocument(relativePath: "home.mdx"){
-//         data{
-//           body
-//         }
-//       }
-//     }`,
-//     variables: {},
-//   })
-
-//   return {
-//     props: {
-//       ...tinaProps,
-//     },
-//   }
-// }
