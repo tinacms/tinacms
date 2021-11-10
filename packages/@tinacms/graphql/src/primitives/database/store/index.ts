@@ -28,6 +28,13 @@ export interface Store {
       includeTemplate?: boolean
     }
   ): Promise<void>
+  /**
+   * Whether this store supports the ability to index data.
+   * Indexing data requires writing arbitrary keys/values to
+   * the external service, so is not advisable to use for
+   * something like Github, which would write commits to the
+   * user's repo.
+   */
   supportsIndexing(): boolean
   put(
     filepath: string,

@@ -215,10 +215,8 @@ export class Database {
     graphQLSchema: DocumentNode
     tinaSchema: TinaSchema
   }) => {
-    if (this.bridge.supportsBuilding) {
-      throw new Error(
-        `Schema cannot be built with provided Bridge ${this.bridge.className}`
-      )
+    if (!this.bridge.supportsBuilding()) {
+      throw new Error(`Schema cannot be built with provided Bridge`)
     }
     const graphqlPath = path.join(GENERATED_FOLDER, `_graphql.json`)
     const schemaPath = path.join(GENERATED_FOLDER, `_schema.json`)
@@ -233,13 +231,15 @@ export class Database {
     )
     if (experimentalData) {
       if (!this.store.supportsIndexing) {
-        throw new Error(
-          `Schema cannot be indexed with provided Store ${this.store.className}`
-        )
+        throw new Error(`Schema cannot be indexed with provided Store`)
       }
       await this.store.seed('_graphql', graphQLSchema)
       await this.store.seed('_schema', tinaSchema.schema)
       await _indexContent(tinaSchema, this)
+    } else {
+      if (this.store.supportsIndexing) {
+        throw new Error(`Schema must be indexed with provided Store`)
+      }
     }
   }
 
