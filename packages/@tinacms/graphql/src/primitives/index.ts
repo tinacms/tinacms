@@ -17,7 +17,6 @@ import { indexDB } from './build'
 import { resolve } from './resolve'
 import { buildASTSchema } from 'graphql'
 import { GithubBridge } from './database/github'
-import { simpleCache } from '../cache/lru'
 import { createDatabase } from './database'
 
 export { createDatabase, resolve, indexDB }
@@ -47,7 +46,6 @@ export const githubRoute = async ({
   rootPath = '',
   query,
   variables,
-  cacheType = simpleCache,
   branch,
   ...githubArgs
 }: {
@@ -58,12 +56,10 @@ export const githubRoute = async ({
   variables: object
   rootPath?: string
   branch: string
-  cacheType?: typeof simpleCache
 }) => {
   const gh = new GithubBridge({
     rootPath,
     ref: branch,
-    cache: cacheType,
     ...githubArgs,
   })
   const database = await createDatabase({

@@ -31,6 +31,8 @@ interface Node {
 interface Document {
   sys: SystemInfo
   id: ID!
+  form: JSON!
+  values: JSON!
 }
 
 """A relay-compliant pagination connection"""
@@ -140,8 +142,8 @@ type PostConnection implements Connection {
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
-  updateDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
-  createDocument(collection: String!, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateDocument(relativePath: String!, params: DocumentMutation!): DocumentNode!
+  createDocument(relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
   createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
   updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
