@@ -237,6 +237,7 @@ export class TinaSchema {
       return {
         namespace: collection.namespace,
         type: 'object',
+        // @ts-ignore FIXME: Templateable should have a 'name' property
         template: {
           ...template,
           fields: [...template.fields, ...extraFields],

@@ -252,11 +252,17 @@ export const resolve = async ({
            * eg `getMovieDocument.data.actors`
            */
           case 'multiCollectionDocumentList':
-            return {
-              totalCount: value.length,
-              edges: value.map((document) => {
-                return { node: document }
-              }),
+            if (Array.isArray(value)) {
+              return {
+                totalCount: value.length,
+                edges: value.map((document) => {
+                  return { node: document }
+                }),
+              }
+            } else {
+              throw new Error(
+                `Expected an array for result of ${info.fieldName} at ${info.path}`
+              )
             }
           /**
            * Collections-specific getter
