@@ -1,0 +1,104 @@
+fragment ThemeParts on Theme {
+  color
+  btnStyle
+}
+
+fragment PageParts on Page {
+  nav {
+    __typename
+    wordmark {
+      __typename
+      icon {
+        __typename
+        color
+        name
+        style
+      }
+      name
+    }
+    items {
+      __typename
+      label
+      link
+    }
+  }
+  blocks {
+    __typename
+    ... on PageBlocksHero {
+      tagline
+      headline
+      paragraph
+      string {
+        __typename
+        color
+      }
+      image {
+        __typename
+        src
+        alt
+      }
+      actions {
+        __typename
+        label
+        type
+        icon
+      }
+      style {
+        __typename
+        color
+      }
+    }
+    ... on PageBlocksTestimonial {
+      quote
+      author
+      style {
+        __typename
+        color
+      }
+    }
+    ... on PageBlocksFeatures {
+      items {
+        __typename
+        icon {
+          __typename
+          color
+          name
+          style
+        }
+        title
+        text
+        actions {
+          __typename
+          label
+          type
+          icon
+        }
+      }
+      style {
+        __typename
+        color
+      }
+    }
+  }
+  navlist {
+    __typename
+    ... on PageNavlistNav {
+      title
+      items {
+        __typename
+        label
+        link
+      }
+    }
+  }
+  footer {
+    __typename
+    social {
+      __typename
+      facebook
+      twitter
+      instagram
+      github
+    }
+  }
+}

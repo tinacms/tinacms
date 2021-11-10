@@ -13,7 +13,9 @@
   },
   "DocumentNode": {
     "type": "DocumentNode",
-    "resolveType": "multiCollectionDocument"
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   },
   "Theme": {
     "type": "Theme",
@@ -25,7 +27,9 @@
   "ThemeDocument": {
     "type": "ThemeDocument",
     "resolveType": "collectionDocument",
-    "collection": "theme"
+    "collection": "theme",
+    "createThemeDocument": "create",
+    "updateThemeDocument": "update"
   },
   "ThemeConnection": {
     "type": "ThemeConnection",
@@ -42,7 +46,9 @@
   "PageDocument": {
     "type": "PageDocument",
     "resolveType": "collectionDocument",
-    "collection": "page"
+    "collection": "page",
+    "createPageDocument": "create",
+    "updatePageDocument": "update"
   },
   "PageConnection": {
     "type": "PageConnection",

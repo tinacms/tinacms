@@ -1,5 +1,5 @@
 #!/usr/bin/env node
 
-require = require('esm')(module)
+// require = require('esm')(module)
 const build = require('../dist')
 build.init(process.argv)
