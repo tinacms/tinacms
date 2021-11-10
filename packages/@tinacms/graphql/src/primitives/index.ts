@@ -27,57 +27,6 @@ export { GithubBridge, GithubStore, FilesystemBridge, FilesystemStore }
 export { createDatabase, resolve, indexDB }
 export type { TinaCloudSchema } from './types'
 
-export const gql = async ({
-  rootPath,
-  query,
-  variables,
-}: {
-  rootPath: string
-  query: string
-  variables: object
-}) => {
-  throw new Error("Don't use this")
-  const database = await createDatabase({
-    // rootPath,
-  })
-
-  return resolve({
-    database,
-    query,
-    variables,
-  })
-}
-
-export const githubRoute = async ({
-  rootPath = '',
-  query,
-  variables,
-  branch,
-  ...githubArgs
-}: {
-  accessToken: string
-  owner: string
-  repo: string
-  query: string
-  variables: object
-  rootPath?: string
-  branch: string
-}) => {
-  const gh = new GithubBridge({
-    rootPath,
-    ref: branch,
-    ...githubArgs,
-  })
-  const database = await createDatabase({
-    bridge: gh,
-  })
-  return resolve({
-    database,
-    query,
-    variables,
-  })
-}
-
 export const buildSchema = async (
   rootPath: string,
   database: Database,

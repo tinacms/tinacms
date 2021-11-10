@@ -17,14 +17,7 @@ export { FilesystemBridge } from './primitives/database/bridge/filesystem'
 export { FilesystemStore } from './primitives/database/store/filesystem'
 export { MemoryStore } from './primitives/database/store/memory'
 export type { GithubManagerInit } from './primitives/database/bridge/github'
-export {
-  gql,
-  resolve,
-  buildSchema,
-  indexDB,
-  createDatabase,
-  githubRoute,
-} from './primitives'
+export { resolve, buildSchema, indexDB, createDatabase } from './primitives'
 
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
