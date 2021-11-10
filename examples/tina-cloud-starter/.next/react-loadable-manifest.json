@@ -1,0 +1,624 @@
+{
+  "./dev/noop": [
+    {
+      "id": "../../.yarn/$$virtual/next-virtual-feb8c55541/0/cache/next-npm-10.0.5-716eec629b-fa8a4c872b.zip/node_modules/next/dist/client/dev/noop.js",
+      "file": "static/chunks/1.js"
+    }
+  ],
+  "next-tinacms-cloudinary": [
+    {
+      "id": "../../.yarn/$$virtual/next-tinacms-cloudinary-virtual-3e265ebba5/1/packages/next-tinacms-cloudinary/dist/index.js",
+      "file": "static/chunks/2.js"
+    }
+  ],
+  "react-tinacms-editor": [
+    {
+      "id": "../../.yarn/$$virtual/@tinacms-toolkit-virtual-f62dc9863d/1/packages/@tinacms/toolkit/dist/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@tippyjs-react-virtual-51c02d099a/0/cache/@tippyjs-react-npm-4.2.5-8f6cb660c3-f886801245.zip/node_modules/@tippyjs/react/dist/tippy-react.esm.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-alignment-ui-virtual-43a2d55ae6/0/cache/@udecode-plate-alignment-ui-npm-6.0.0-84ac112966-1ebbfdc4bd.zip/node_modules/@udecode/plate-alignment-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-alignment-virtual-21a01c8b29/0/cache/@udecode-plate-alignment-npm-6.0.0-6d290cbed8-2992ad18fe.zip/node_modules/@udecode/plate-alignment/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-ast-serializer-virtual-c6c24c52c8/0/cache/@udecode-plate-ast-serializer-npm-6.0.0-7a134ccdaf-bc25935217.zip/node_modules/@udecode/plate-ast-serializer/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-autoformat-virtual-461b8921c1/0/cache/@udecode-plate-autoformat-npm-6.0.0-ea0d692e0d-dee5c86e15.zip/node_modules/@udecode/plate-autoformat/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-basic-elements-virtual-d6beffb831/0/cache/@udecode-plate-basic-elements-npm-6.0.0-d4025e0500-36c4e994e5.zip/node_modules/@udecode/plate-basic-elements/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-basic-marks-virtual-ab7d87496e/0/cache/@udecode-plate-basic-marks-npm-6.0.0-9b7d96bb4b-99558833da.zip/node_modules/@udecode/plate-basic-marks/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-block-quote-ui-virtual-2b472d9829/0/cache/@udecode-plate-block-quote-ui-npm-6.0.0-e746fc45b3-d164e1f964.zip/node_modules/@udecode/plate-block-quote-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-block-quote-virtual-1ebf2272e5/0/cache/@udecode-plate-block-quote-npm-6.0.0-41db9c594f-31c26b8361.zip/node_modules/@udecode/plate-block-quote/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-break-virtual-d29ddb0322/0/cache/@udecode-plate-break-npm-6.0.0-d14b531bb3-113e76dcc4.zip/node_modules/@udecode/plate-break/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-code-block-ui-virtual-6d01724c54/0/cache/@udecode-plate-code-block-ui-npm-6.0.0-344902dd68-d453c9e575.zip/node_modules/@udecode/plate-code-block-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-code-block-virtual-88828a88f4/0/cache/@udecode-plate-code-block-npm-6.0.0-b11805ac57-443678ce52.zip/node_modules/@udecode/plate-code-block/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-combobox-virtual-44714f868f/0/cache/@udecode-plate-combobox-npm-6.0.0-f318b1826d-fc6afbeddc.zip/node_modules/@udecode/plate-combobox/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-common-virtual-ebc4b266bc/0/cache/@udecode-plate-common-npm-6.0.0-3e7506adfe-00ba234b0c.zip/node_modules/@udecode/plate-common/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-core-virtual-8c836e5229/0/cache/@udecode-plate-core-npm-6.0.0-140342766e-ccf7fedf17.zip/node_modules/@udecode/plate-core/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-csv-serializer-virtual-a1ac3ba490/0/cache/@udecode-plate-csv-serializer-npm-6.0.0-eb04a3879b-15fd065b47.zip/node_modules/@udecode/plate-csv-serializer/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-dnd-virtual-7690e03a1f/0/cache/@udecode-plate-dnd-npm-6.0.0-b08a39a2f7-6cdc4f51fa.zip/node_modules/@udecode/plate-dnd/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-find-replace-ui-virtual-dae9f5abfd/0/cache/@udecode-plate-find-replace-ui-npm-6.0.0-3070dd60d4-3d188f4adf.zip/node_modules/@udecode/plate-find-replace-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-find-replace-virtual-6b421de357/0/cache/@udecode-plate-find-replace-npm-6.0.0-e4603db75c-1add313971.zip/node_modules/@udecode/plate-find-replace/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-font-ui-virtual-d1cdea39c3/0/cache/@udecode-plate-font-ui-npm-6.0.0-ffd8df1ee8-1a937d8c15.zip/node_modules/@udecode/plate-font-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-font-virtual-7107a407aa/0/cache/@udecode-plate-font-npm-6.0.0-bfcf86df51-fa862d5a91.zip/node_modules/@udecode/plate-font/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-heading-virtual-3a31419379/0/cache/@udecode-plate-heading-npm-6.0.0-a8f9cccfec-6c00dff750.zip/node_modules/@udecode/plate-heading/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-highlight-virtual-59c6e5cea9/0/cache/@udecode-plate-highlight-npm-6.0.0-0c654e912c-6b741acbc9.zip/node_modules/@udecode/plate-highlight/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-horizontal-rule-virtual-3053a39550/0/cache/@udecode-plate-horizontal-rule-npm-6.0.0-6d0dd130a0-8530483b3a.zip/node_modules/@udecode/plate-horizontal-rule/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-html-serializer-virtual-7f9987f997/0/cache/@udecode-plate-html-serializer-npm-6.0.0-99772cced3-b0dcba1f16.zip/node_modules/@udecode/plate-html-serializer/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-image-ui-virtual-90226b2bfb/0/cache/@udecode-plate-image-ui-npm-6.0.0-caf33bf0e0-f911994fb4.zip/node_modules/@udecode/plate-image-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-image-virtual-3249e29707/0/cache/@udecode-plate-image-npm-6.0.0-eac61328cb-3cdbaff6da.zip/node_modules/@udecode/plate-image/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-indent-virtual-4acbc8b182/0/cache/@udecode-plate-indent-npm-6.0.0-b630846900-4ccde30013.zip/node_modules/@udecode/plate-indent/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-kbd-virtual-acbd3f13c6/0/cache/@udecode-plate-kbd-npm-6.0.0-04201d4601-0b7b8f798f.zip/node_modules/@udecode/plate-kbd/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-link-ui-virtual-a7151227f5/0/cache/@udecode-plate-link-ui-npm-6.0.0-2ab4e836a7-a29fd86dff.zip/node_modules/@udecode/plate-link-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-link-virtual-18461dbdcd/0/cache/@udecode-plate-link-npm-6.0.0-595864ab5c-de9dbc69ca.zip/node_modules/@udecode/plate-link/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-list-ui-virtual-8255e7225e/0/cache/@udecode-plate-list-ui-npm-6.0.0-d94e9903b5-b504d91f54.zip/node_modules/@udecode/plate-list-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-list-virtual-63299d9e9e/0/cache/@udecode-plate-list-npm-6.0.0-390501f6c3-a59e489397.zip/node_modules/@udecode/plate-list/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-md-serializer-virtual-56a1f47d81/0/cache/@udecode-plate-md-serializer-npm-6.0.0-60a932c5fc-9614c4827c.zip/node_modules/@udecode/plate-md-serializer/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-media-embed-ui-virtual-5e0da603d7/0/cache/@udecode-plate-media-embed-ui-npm-6.0.0-3f4c059c02-4848df4f7e.zip/node_modules/@udecode/plate-media-embed-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-media-embed-virtual-85225d3de8/0/cache/@udecode-plate-media-embed-npm-6.0.0-8be20e2d7d-259f307044.zip/node_modules/@udecode/plate-media-embed/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-mention-ui-virtual-aa29b5fa56/0/cache/@udecode-plate-mention-ui-npm-6.0.0-bb1d0750ce-1a3acbc59c.zip/node_modules/@udecode/plate-mention-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-mention-virtual-7d5a68f0c7/0/cache/@udecode-plate-mention-npm-6.0.0-c739cebed1-35943f2522.zip/node_modules/@udecode/plate-mention/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-node-id-virtual-7f8aa71432/0/cache/@udecode-plate-node-id-npm-6.0.0-3153e791d6-c65b127688.zip/node_modules/@udecode/plate-node-id/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-normalizers-virtual-9bee75537c/0/cache/@udecode-plate-normalizers-npm-6.0.0-b9b9d0bc06-d46464af02.zip/node_modules/@udecode/plate-normalizers/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-paragraph-virtual-735c3cfe8f/0/cache/@udecode-plate-paragraph-npm-6.0.0-4eb608d967-bce1d7f1ec.zip/node_modules/@udecode/plate-paragraph/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-placeholder-virtual-1d5d9dd8fb/0/cache/@udecode-plate-placeholder-npm-6.0.0-3d7dc5a698-80f6d56db5.zip/node_modules/@udecode/plate-placeholder/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-popper-virtual-054083751d/0/cache/@udecode-plate-popper-npm-6.0.0-cd8074d9cf-05f66d73ac.zip/node_modules/@udecode/plate-popper/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-reset-node-virtual-359fa82d6a/0/cache/@udecode-plate-reset-node-npm-6.0.0-dc05b16a85-c9cbf3d806.zip/node_modules/@udecode/plate-reset-node/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-select-virtual-0ae126b5c6/0/cache/@udecode-plate-select-npm-6.0.0-a6ed1bd218-ebcfce25c1.zip/node_modules/@udecode/plate-select/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-serializer-virtual-7827347195/0/cache/@udecode-plate-serializer-npm-6.0.0-24859a7a7a-b0fd160879.zip/node_modules/@udecode/plate-serializer/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-styled-components-virtual-28bb020656/0/cache/@udecode-plate-styled-components-npm-6.0.0-302c7423ff-99b975c519.zip/node_modules/@udecode/plate-styled-components/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-styled-components-virtual-80a269a5f8/0/cache/@udecode-plate-styled-components-npm-6.0.0-302c7423ff-99b975c519.zip/node_modules/@udecode/plate-styled-components/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-table-ui-virtual-512f33d12a/0/cache/@udecode-plate-table-ui-npm-6.0.0-22fbd89cf4-0b45b2a9d0.zip/node_modules/@udecode/plate-table-ui/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-table-virtual-f30d4b8924/0/cache/@udecode-plate-table-npm-6.0.0-ab35156da3-346da17349.zip/node_modules/@udecode/plate-table/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-toolbar-virtual-dbf0958423/0/cache/@udecode-plate-toolbar-npm-6.0.0-1c0877e7e2-ecd3a76588.zip/node_modules/@udecode/plate-toolbar/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-trailing-block-virtual-866d060865/0/cache/@udecode-plate-trailing-block-npm-6.0.0-304c74b8aa-c67267b732.zip/node_modules/@udecode/plate-trailing-block/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/@udecode-plate-virtual-2df97b0023/0/cache/@udecode-plate-npm-6.0.0-67639563a3-6ea8867529.zip/node_modules/@udecode/plate/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/prosemirror-utils-virtual-f02fc2ecc9/0/cache/prosemirror-utils-npm-0.9.6-5911c8beb1-b0a1274aa3.zip/node_modules/prosemirror-utils/dist/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/re-resizable-virtual-4c9ca50588/0/cache/re-resizable-npm-6.9.1-79ca365a45-9cb6db6fe4.zip/node_modules/re-resizable/lib/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/re-resizable-virtual-4c9ca50588/0/cache/re-resizable-npm-6.9.1-79ca365a45-9cb6db6fe4.zip/node_modules/re-resizable/lib/resizer.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-beautiful-dnd-virtual-73e0a65e95/0/cache/react-beautiful-dnd-npm-11.0.5-55b213a46a-1842c33e9b.zip/node_modules/react-beautiful-dnd/dist/react-beautiful-dnd.esm.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-datetime-virtual-07ee7b3d36/0/cache/react-datetime-npm-2.16.3-d6f981f191-c222eb338e.zip/node_modules/react-datetime/DateTime.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-datetime-virtual-07ee7b3d36/0/cache/react-datetime-npm-2.16.3-d6f981f191-c222eb338e.zip/node_modules/react-datetime/src/CalendarContainer.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-datetime-virtual-07ee7b3d36/0/cache/react-datetime-npm-2.16.3-d6f981f191-c222eb338e.zip/node_modules/react-datetime/src/DaysView.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-datetime-virtual-07ee7b3d36/0/cache/react-datetime-npm-2.16.3-d6f981f191-c222eb338e.zip/node_modules/react-datetime/src/MonthsView.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-datetime-virtual-07ee7b3d36/0/cache/react-datetime-npm-2.16.3-d6f981f191-c222eb338e.zip/node_modules/react-datetime/src/TimeView.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-datetime-virtual-07ee7b3d36/0/cache/react-datetime-npm-2.16.3-d6f981f191-c222eb338e.zip/node_modules/react-datetime/src/YearsView.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-onclickoutside-virtual-a227f10541/0/cache/react-onclickoutside-npm-6.11.2-b23c997db9-7c201f2045.zip/node_modules/react-onclickoutside/dist/react-onclickoutside.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/react-tinacms-editor-virtual-94aac80625/1/packages/react-tinacms-editor/dist/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/$$virtual/slate-react-virtual-62a0c57268/0/cache/slate-react-npm-0.66.7-cfccd4d8dc-9d6e815d38.zip/node_modules/slate-react/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/codemirror-npm-5.62.2-ae1209eb67-5d82b06dab.zip/node_modules/codemirror/lib/codemirror.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/entities-npm-1.1.2-78e77a4b6d-3a4259db35.zip/node_modules/entities/maps/entities.json",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/linkify-it-npm-2.2.0-3eb4775d11-7905b34078.zip/node_modules/linkify-it/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/linkify-it-npm-2.2.0-3eb4775d11-7905b34078.zip/node_modules/linkify-it/lib/re.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/lodash.debounce-npm-4.0.8-f1d6e09799-b6042bd8c0.zip/node_modules/lodash.debounce/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/lodash.get-npm-4.4.2-7bda64ed87-447e575e3c.zip/node_modules/lodash.get/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/common/entities.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/common/html_blocks.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/common/html_re.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/common/utils.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/helpers/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/helpers/parse_link_destination.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/helpers/parse_link_label.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/helpers/parse_link_title.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/parser_block.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/parser_core.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/parser_inline.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/presets/commonmark.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/presets/default.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/presets/zero.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/renderer.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/ruler.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/blockquote.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/code.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/fence.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/heading.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/hr.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/html_block.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/lheading.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/list.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/paragraph.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/reference.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/state_block.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_block/table.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_core/block.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_core/inline.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_core/linkify.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_core/normalize.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_core/replacements.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_core/smartquotes.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_core/state_core.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/autolink.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/backticks.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/balance_pairs.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/emphasis.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/entity.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/escape.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/html_inline.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/image.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/link.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/newline.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/state_inline.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/strikethrough.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/text.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/rules_inline/text_collapse.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/markdown-it-npm-8.4.2-55847d41d0-b07c928536.zip/node_modules/markdown-it/lib/token.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/mdurl-npm-1.0.1-054d974269-ed5e81efed.zip/node_modules/mdurl/decode.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/mdurl-npm-1.0.1-054d974269-ed5e81efed.zip/node_modules/mdurl/encode.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/mdurl-npm-1.0.1-054d974269-ed5e81efed.zip/node_modules/mdurl/format.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/mdurl-npm-1.0.1-054d974269-ed5e81efed.zip/node_modules/mdurl/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/mdurl-npm-1.0.1-054d974269-ed5e81efed.zip/node_modules/mdurl/parse.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/orderedmap-npm-1.1.1-dffd12a1bd-d4e4857553.zip/node_modules/orderedmap/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-commands-npm-1.1.10-4a92af0831-2838811d24.zip/node_modules/prosemirror-commands/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-dropcursor-npm-1.3.5-d9d461fb61-9f3626bed7.zip/node_modules/prosemirror-dropcursor/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-gapcursor-npm-1.1.5-4f4961ab8d-870a81e140.zip/node_modules/prosemirror-gapcursor/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-history-npm-1.1.3-45c1c5e7a3-62437ec882.zip/node_modules/prosemirror-history/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-inputrules-npm-1.1.3-1006d2d553-fddaf86ae4.zip/node_modules/prosemirror-inputrules/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-keymap-npm-1.1.4-cc2478e236-761162efd1.zip/node_modules/prosemirror-keymap/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-model-npm-1.14.3-b5be51ca4b-21935d7680.zip/node_modules/prosemirror-model/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-schema-list-npm-1.1.5-98758e81c8-79fbb58566.zip/node_modules/prosemirror-schema-list/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-state-npm-1.3.4-c4b4427e53-b15af9acab.zip/node_modules/prosemirror-state/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-tables-npm-1.0.0-fe8d657158-dd393de106.zip/node_modules/prosemirror-tables/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-transform-npm-1.3.2-1e54a567f3-84bfe8c13a.zip/node_modules/prosemirror-transform/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/prosemirror-view-npm-1.18.11-41326b3f9f-b967bf7c6c.zip/node_modules/prosemirror-view/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/punycode-npm-1.4.1-be4c23e6d2-5ce1e044ce.zip/node_modules/punycode/punycode.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/rope-sequence-npm-1.3.2-cc341e8423-a4ab304045.zip/node_modules/rope-sequence/dist/index.es.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/uc.micro-npm-1.0.6-36f3dc2fc4-9dfe5ad0a0.zip/node_modules/uc.micro/categories/Cc/regex.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/uc.micro-npm-1.0.6-36f3dc2fc4-9dfe5ad0a0.zip/node_modules/uc.micro/categories/Cf/regex.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/uc.micro-npm-1.0.6-36f3dc2fc4-9dfe5ad0a0.zip/node_modules/uc.micro/categories/P/regex.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/uc.micro-npm-1.0.6-36f3dc2fc4-9dfe5ad0a0.zip/node_modules/uc.micro/categories/Z/regex.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/uc.micro-npm-1.0.6-36f3dc2fc4-9dfe5ad0a0.zip/node_modules/uc.micro/index.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/uc.micro-npm-1.0.6-36f3dc2fc4-9dfe5ad0a0.zip/node_modules/uc.micro/properties/Any/regex.js",
+      "file": "static/chunks/0.js"
+    },
+    {
+      "id": "../../.yarn/cache/w3c-keyname-npm-2.2.4-8c6e5969c5-b711eaa986.zip/node_modules/w3c-keyname/index.es.js",
+      "file": "static/chunks/0.js"
+    }
+  ]
+}
