@@ -12,13 +12,8 @@ limitations under the License.
 */
 
 import { build } from 'vite'
-import { build as tsupbuild } from 'tsup'
-import { buildSync, build as esbuild } from 'esbuild'
-// import dts from 'vite-plugin-dts'
+import { build as esbuild } from 'esbuild'
 import { pnpPlugin } from '@yarnpkg/esbuild-plugin-pnp'
-// import { build as esbuild } from 'esbuild'
-// import nodePolyfills from 'rollup-plugin-node-polyfills'
-import dts from 'rollup-plugin-dts'
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
@@ -198,7 +193,7 @@ const buildIt = async (entryPoint, packageJSON) => {
         // FIXME: no idea why but even though I'm on node14 it doesn't like
         // the syntax for optional chaining, should be supported on 14
         // https://developer.mozilla.org/en-US/docs/Web/JavaScript/Reference/Operators/Optional_chaining
-        target: "node12",
+        target: 'node12',
         outdir: path.join(process.cwd(), 'dist'),
         external: external.filter(
           (item) =>

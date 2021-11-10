@@ -115,7 +115,7 @@ export const formify = (query: DocumentNode, schema: GraphQLSchema) => {
         if (namedType instanceof GraphQLObjectType) {
           const hasNodeInterface = !!namedType
             .getInterfaces()
-            .find(i => i.name === 'Node')
+            .find((i) => i.name === 'Node')
           if (hasNodeInterface) {
             // Instead of this, there's probably a more fine-grained visitor key to use
             if (typeof path[path.length - 1] === 'number') {
@@ -160,18 +160,18 @@ export const formify = (query: DocumentNode, schema: GraphQLSchema) => {
               pathForSys.push(102)
 
               pathsToPopulate.push({
-                path: path.map(p => p.toString()).join('-'),
+                path: path.map((p) => p.toString()).join('-'),
                 paths: [
                   {
-                    path: pathForValues.map(p => p.toString()),
+                    path: pathForValues.map((p) => p.toString()),
                     ast: valuesAst,
                   },
                   {
-                    path: pathForForm.map(p => p.toString()),
+                    path: pathForForm.map((p) => p.toString()),
                     ast: formAst,
                   },
                   {
-                    path: pathForSys.map(p => p.toString()),
+                    path: pathForSys.map((p) => p.toString()),
                     ast: sysAst,
                   },
                 ],
@@ -189,7 +189,7 @@ export const formify = (query: DocumentNode, schema: GraphQLSchema) => {
   // so filter out paths which aren't "top-level" ones
   const topLevelPaths = pathsToPopulate.filter((p, i) => {
     const otherPaths = pathsToPopulate.filter((_, index) => index !== i)
-    const isChildOfOtherPaths = otherPaths.some(op => {
+    const isChildOfOtherPaths = otherPaths.some((op) => {
       if (p.path.startsWith(op.path)) {
         return true
       } else {
@@ -202,8 +202,8 @@ export const formify = (query: DocumentNode, schema: GraphQLSchema) => {
       return true
     }
   })
-  topLevelPaths.map(p => {
-    p.paths.map(pathNode => {
+  topLevelPaths.map((p) => {
+    p.paths.map((pathNode) => {
       set(query, pathNode.path, pathNode.ast)
     })
   })
@@ -236,11 +236,13 @@ const buildSysForType = (type: GraphQLNamedType): FieldNode => {
       kind: 'SelectionSet' as const,
       selections: buildSelectionsFields(
         Object.values(type.getFields()),
-        fields => {
+        (fields) => {
           return {
             continue: true,
             // prevent infinite loop by not include documents
-            filteredFields: fields.filter(field => field.name !== 'documents'),
+            filteredFields: fields.filter(
+              (field) => field.name !== 'documents'
+            ),
           }
         }
       ),
@@ -304,14 +306,12 @@ const buildFormForType = (type: GraphQLNamedType): FieldNode => {
 
 const buildSelectionInlineFragments = (
   types: GraphQLObjectType<any, any>[],
-  callback?: (
-    fields: GraphQLField<any, any>[]
-  ) => {
+  callback?: (fields: GraphQLField<any, any>[]) => {
     continue: boolean
     filteredFields: GraphQLField<any, any>[]
   }
 ): InlineFragmentNode[] => {
-  return types.map(type => {
+  return types.map((type) => {
     return {
       kind: 'InlineFragment' as const,
       typeCondition: {
@@ -324,58 +324,56 @@ const buildSelectionInlineFragments = (
       selectionSet: {
         kind: 'SelectionSet' as const,
         selections: [
-          ...Object.values(type.getFields()).map(
-            (field): FieldNode => {
-              const namedType = getNamedType(field.type)
-              if (isLeafType(namedType)) {
-                return {
-                  kind: 'Field' as const,
-                  name: {
-                    kind: 'Name' as const,
-                    value: field.name,
-                  },
-                }
-              } else if (namedType instanceof GraphQLUnionType) {
-                return {
-                  kind: 'Field' as const,
-                  name: {
-                    kind: 'Name' as const,
-                    value: field.name,
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet' as const,
-                    selections: [
-                      ...buildSelectionInlineFragments(
-                        namedType.getTypes(),
-                        callback
-                      ),
-                    ],
-                  },
-                }
-              } else if (namedType instanceof GraphQLObjectType) {
-                return {
-                  kind: 'Field' as const,
-                  name: {
-                    kind: 'Name' as const,
-                    value: field.name,
-                  },
-                  selectionSet: {
-                    kind: 'SelectionSet' as const,
-                    selections: [
-                      ...buildSelectionsFields(
-                        Object.values(namedType.getFields()),
-                        callback
-                      ),
-                    ],
-                  },
-                }
-              } else {
-                throw new Error(
-                  `Unexpected GraphQL type for field ${namedType.name}`
-                )
+          ...Object.values(type.getFields()).map((field): FieldNode => {
+            const namedType = getNamedType(field.type)
+            if (isLeafType(namedType)) {
+              return {
+                kind: 'Field' as const,
+                name: {
+                  kind: 'Name' as const,
+                  value: field.name,
+                },
               }
+            } else if (namedType instanceof GraphQLUnionType) {
+              return {
+                kind: 'Field' as const,
+                name: {
+                  kind: 'Name' as const,
+                  value: field.name,
+                },
+                selectionSet: {
+                  kind: 'SelectionSet' as const,
+                  selections: [
+                    ...buildSelectionInlineFragments(
+                      namedType.getTypes(),
+                      callback
+                    ),
+                  ],
+                },
+              }
+            } else if (namedType instanceof GraphQLObjectType) {
+              return {
+                kind: 'Field' as const,
+                name: {
+                  kind: 'Name' as const,
+                  value: field.name,
+                },
+                selectionSet: {
+                  kind: 'SelectionSet' as const,
+                  selections: [
+                    ...buildSelectionsFields(
+                      Object.values(namedType.getFields()),
+                      callback
+                    ),
+                  ],
+                },
+              }
+            } else {
+              throw new Error(
+                `Unexpected GraphQL type for field ${namedType.name}`
+              )
             }
-          ),
+          }),
         ],
       },
     }
@@ -384,9 +382,7 @@ const buildSelectionInlineFragments = (
 
 export const buildSelectionsFields = (
   fields: GraphQLField<any, any>[],
-  callback?: (
-    fields: GraphQLField<any, any>[]
-  ) => {
+  callback?: (fields: GraphQLField<any, any>[]) => {
     continue: boolean
     filteredFields: GraphQLField<any, any>[]
   }
@@ -396,7 +392,7 @@ export const buildSelectionsFields = (
     const result = callback(fields)
     if (!result.continue) {
       if (
-        fields.every(field => {
+        fields.every((field) => {
           return !isScalarType(getNamedType(field.type))
         })
       ) {
@@ -411,7 +407,7 @@ export const buildSelectionsFields = (
         ]
       }
       return buildSelectionsFields(
-        result.filteredFields.filter(field => {
+        result.filteredFields.filter((field) => {
           if (isScalarType(getNamedType(field.type))) {
             return true
           }
@@ -423,63 +419,61 @@ export const buildSelectionsFields = (
     }
   }
 
-  return filteredFields.map(
-    (field): FieldNode => {
-      const namedType = getNamedType(field.type)
-      if (isLeafType(namedType)) {
-        return {
-          kind: 'Field' as const,
-          name: {
-            kind: 'Name' as const,
-            value: field.name,
-          },
-        }
-      } else if (namedType instanceof GraphQLUnionType) {
-        return {
-          kind: 'Field' as const,
-          name: {
-            kind: 'Name' as const,
-            value: field.name,
-          },
-          selectionSet: {
-            kind: 'SelectionSet' as const,
-            selections: [
-              ...buildSelectionInlineFragments(namedType.getTypes(), callback),
-            ],
-          },
-        }
-      } else if (namedType instanceof GraphQLObjectType) {
-        return {
-          kind: 'Field' as const,
-          name: {
-            kind: 'Name' as const,
-            value: field.name,
-          },
-          selectionSet: {
-            kind: 'SelectionSet' as const,
-            selections: [
-              ...buildSelectionsFields(
-                Object.values(namedType.getFields()),
-                callback
-              ),
-            ],
-          },
-        }
-      } else {
-        return {
-          kind: 'Field' as const,
-          name: {
-            kind: 'Name' as const,
-            value: field.name,
-          },
-          selectionSet: {
-            kind: 'SelectionSet' as const,
-            selections: [],
-          },
-        }
+  return filteredFields.map((field): FieldNode => {
+    const namedType = getNamedType(field.type)
+    if (isLeafType(namedType)) {
+      return {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: field.name,
+        },
+      }
+    } else if (namedType instanceof GraphQLUnionType) {
+      return {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: field.name,
+        },
+        selectionSet: {
+          kind: 'SelectionSet' as const,
+          selections: [
+            ...buildSelectionInlineFragments(namedType.getTypes(), callback),
+          ],
+        },
+      }
+    } else if (namedType instanceof GraphQLObjectType) {
+      return {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: field.name,
+        },
+        selectionSet: {
+          kind: 'SelectionSet' as const,
+          selections: [
+            ...buildSelectionsFields(
+              Object.values(namedType.getFields()),
+              callback
+            ),
+          ],
+        },
+      }
+    } else {
+      return {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: field.name,
+        },
+        selectionSet: {
+          kind: 'SelectionSet' as const,
+          selections: [],
+        },
       }
     }
-  )
+  })
 }
 
 function assertIsObjectType(
