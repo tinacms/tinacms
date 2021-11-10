@@ -19,7 +19,8 @@ export { useGraphqlForms } from './hooks/use-graphql-forms'
 export { useDocumentCreatorPlugin } from './hooks/use-content-creator'
 export * from '@tinacms/toolkit'
 export { TinaAdmin } from './admin'
+export { RouteMappingPlugin } from './admin/plugins/route-mapping'
 
 import { TinaCMSProvider2 } from './tina-cms'
-
+import { type } from 'os'
 export default TinaCMSProvider2

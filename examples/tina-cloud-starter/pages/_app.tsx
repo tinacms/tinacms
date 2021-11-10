@@ -2,7 +2,7 @@ import "../styles.css";
 import dynamic from "next/dynamic";
 import { TinaEditProvider } from "tinacms/dist/edit-state";
 import { Layout } from "../components/layout";
-import { TinaCloudCloudinaryMediaStore } from "next-tinacms-cloudinary";
+import { RouteMappingPlugin } from "tinacms";
 // @ts-ignore FIXME: default export needs to be 'ComponentType<{}>
 const TinaCMS = dynamic(() => import("tinacms"), { ssr: false });
 
@@ -29,7 +29,32 @@ const App = ({ Component, pageProps }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
 
+              /**
+               * Enables `tina-admin` specific features in the Tina Sidebar
+               */
               cms.flags.set("tina-admin", true);
+
+              /**
+               * An example of a RouteMapping plugin for TinaAdmin
+               */
+              const RouteMapping = new RouteMappingPlugin(
+                (collection, document) => {
+                  if (["authors", "global"].includes(collection.name)) {
+                    return undefined;
+                  }
+                  if (["pages"].includes(collection.name)) {
+                    if (document.sys.filename === "home") {
+                      return `/`;
+                    }
+                    if (document.sys.filename === "about") {
+                      return `/about`;
+                    }
+                    return undefined;
+                  }
+                  return `/${collection.name}/${document.sys.filename}`;
+                }
+              );
+              cms.plugins.add(RouteMapping);
             }}
             documentCreatorCallback={{
               /**

@@ -15,11 +15,17 @@ import React from 'react'
 import gql from 'graphql-tag'
 import { print } from 'graphql'
 import { getIn, setIn } from 'final-form'
-import { useCMS, Form, GlobalFormPlugin } from '@tinacms/toolkit'
+import {
+  useCMS,
+  Form,
+  GlobalFormPlugin,
+  FormMetaPlugin,
+} from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
 import type { DocumentNode } from 'graphql'
+import { BiLinkExternal } from 'react-icons/bi'
 
 export function useGraphqlForms<T extends object>({
   query,
@@ -142,6 +148,8 @@ export function useGraphqlForms<T extends object>({
     cms.api.tina
       .requestWithForm(query, { variables })
       .then((payload) => {
+        cms.plugins.remove(new FormMetaPlugin({ name: 'tina-admin-link' }))
+
         setData(payload)
         setInitialData(payload)
         setIsLoading(false)
@@ -160,6 +168,10 @@ export function useGraphqlForms<T extends object>({
             return
           }
           assertShape<{
+            _internalSys: {
+              collection: { name: string }
+              filename: string
+            }
             values: object
             form: FormOptions<any, any> & {
               mutationInfo: {
@@ -176,6 +188,39 @@ export function useGraphqlForms<T extends object>({
               }),
             `Unable to build form shape for fields at ${queryName}`
           )
+
+          if (cms.flags.get('tina-admin')) {
+            const TinaAdminLink = new FormMetaPlugin({
+              name: 'tina-admin-link',
+              Component: () => (
+                <a
+                  href={`/admin/collections/${result._internalSys.collection.name}/${result._internalSys.filename}`}
+                  style={{
+                    display: 'flex',
+                    alignItems: 'center',
+                    padding: '10px 20px',
+                    borderTop: '1px solid var(--tina-color-grey-2)',
+                    textTransform: 'uppercase',
+                    fontSize: '11px',
+                    fontWeight: 500,
+                    background: 'var(--tina-color-grey-0)',
+                  }}
+                >
+                  <BiLinkExternal
+                    style={{
+                      height: '1.25em',
+                      width: 'auto',
+                      opacity: '0.8',
+                      marginRight: '8px',
+                    }}
+                  />{' '}
+                  Edit in Tina Admin
+                </a>
+              ),
+            })
+            cms.plugins.add(TinaAdminLink)
+          }
+
           const formConfig = {
             id: queryName,
             label: result.form.label,
