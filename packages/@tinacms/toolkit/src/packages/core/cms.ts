@@ -182,10 +182,17 @@ export class CMS {
       this.unsubscribeHooks[name]()
     }
     if (api.events instanceof EventBus) {
-      this.unsubscribeHooks[name] = (api.events as EventBus).subscribe(
+      const unsubscribeHost = (api.events as EventBus).subscribe(
         '*',
         this.events.dispatch
       )
+      const unsubscribeGuest = this.events.subscribe('*', (e) =>
+        api.events.dispatch(e)
+      )
+      this.unsubscribeHooks[name] = () => {
+        unsubscribeHost()
+        unsubscribeGuest()
+      }
     }
     this.api[name] = api
   }
