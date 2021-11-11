@@ -11,21 +11,30 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import * as React from 'react'
-import { BranchSwitcherProps, Branch } from './types'
+import { BranchSwitcherProps, Branch, BranchChangeEvent } from './types'
 import styled, { StyledComponent } from 'styled-components'
+import { useBranchData } from './BranchData'
+import { useEvent } from '../../packages/react-core/use-cms-event'
 
 export const BranchSwitcher = ({
-  currentBranch,
-  setCurrentBranch,
   listBranches,
   createBranch,
 }: BranchSwitcherProps) => {
   const [isLoading, setIsLoading] = React.useState(false)
   const [branchList, setBranchList] = React.useState([])
+  const { currentBranch, setCurrentBranch } = useBranchData()
+  //const [currentBranch, setCurrentBranch] = React.useState('main')
+
+  const { dispatch, subscribe } = useEvent<BranchChangeEvent>(
+    'branch-switcher:change-branch'
+  )
 
   const handleCreateBranch = React.useCallback((value) => {
     setIsLoading(true)
-    createBranch(value)
+    createBranch({
+      branchName: value,
+      baseBranch: currentBranch,
+    })
       .then(async (createdBranchName) => {
         setCurrentBranch(createdBranchName)
         await refreshBranchList()
@@ -49,8 +58,7 @@ export const BranchSwitcher = ({
 
   return (
     <SelectWrap isLoading={isLoading}>
-      <h3>Select Branch</h3>
-      <BranchSelector
+      {/* <BranchSelector
         currentBranch={currentBranch}
         branchList={branchList}
         onCreateBranch={(newBranch) => {
@@ -59,8 +67,46 @@ export const BranchSwitcher = ({
         onChange={(branchName) => {
           setCurrentBranch(branchName)
         }}
+      /> */}
+      <SimpleBranchSelector
+        branchList={branchList}
+        currentBranch={currentBranch}
+        onChange={(branchName) => {
+          setCurrentBranch(branchName)
+          dispatch({ branchName })
+        }}
       />
     </SelectWrap>
+  )
+}
+
+const SimpleBranchSelector = ({ branchList, currentBranch, onChange }) => {
+  return (
+    <>
+      <select
+        onChange={(e) => {
+          onChange(e.target.value)
+        }}
+        value={currentBranch}
+        style={{
+          margin: '2rem',
+          fontSize: '1.2rem',
+          minWidth: '10em',
+          padding: '0.5rem',
+        }}
+      >
+        {branchList.map((branch) => {
+          return (
+            <option
+              value={branch.name}
+              disabled={branch.name === currentBranch}
+            >
+              {branch.name}
+            </option>
+          )
+        })}
+      </select>
+    </>
   )
 }
 
@@ -89,7 +135,10 @@ const BranchSelector = ({
           .filter((branch) => !newBranch || branch.name.includes(newBranch))
           .map((branch) => {
             return (
-              <SelectableItem onClick={() => onChange(branch.name)}>
+              <SelectableItem
+                key={branch}
+                onClick={() => onChange(branch.name)}
+              >
                 {branch.name}
                 {branch.name === currentBranch && (
                   <span style={{ fontStyle: 'italic', opacity: 0.5 }}>

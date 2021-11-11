@@ -15,7 +15,7 @@ import React from 'react'
 import gql from 'graphql-tag'
 import { print } from 'graphql'
 import { getIn, setIn } from 'final-form'
-import { useCMS, Form, GlobalFormPlugin } from '@tinacms/toolkit'
+import { useCMS, Form, GlobalFormPlugin, useBranchData } from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
 import type { FormOptions, TinaCMS } from '@tinacms/toolkit'
@@ -40,6 +40,7 @@ export function useGraphqlForms<T extends object>({
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
   const [formNames, setFormNames] = React.useState([])
+  const { currentBranch } = useBranchData()
 
   /**
    * FIXME: this design is pretty flaky, but better than what
@@ -311,7 +312,7 @@ export function useGraphqlForms<T extends object>({
         console.error(e)
         setIsLoading(false)
       })
-  }, [queryString, JSON.stringify(variables)])
+  }, [queryString, JSON.stringify(variables), currentBranch])
 
   return [data as T, isLoading]
 }

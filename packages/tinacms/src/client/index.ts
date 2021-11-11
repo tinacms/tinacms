@@ -44,25 +44,24 @@ export class Client {
   identityApiUrl: string
   schema: GraphQLSchema
   clientId: string
+  contentApiBase: string
   query: string
   setToken: (_token: TokenObject) => void
   private getToken: () => TokenObject
   private token: string // used with memory storage
   private branch: string
   private options: ServerOptions
-  events: EventBus // automatically hooked into global event bus when attached via cms.registerApi
+  events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.options = options
     this.setBranch(options.branch)
-    this.events = new EventBus()
     this.events.subscribe<BranchChangeEvent>(
       'branch-switcher:change-branch',
       ({ branchName }) => {
         this.setBranch(branchName)
       }
     )
-
     this.clientId = options.clientId
 
     switch (tokenStorage) {
@@ -117,12 +116,12 @@ export class Client {
     this.identityApiUrl =
       this.options.tinaioConfig?.identityApiUrlOverride ||
       'https://identity.tinajs.io'
-    const contentApiBase =
+    this.contentApiBase =
       this.options.tinaioConfig?.contentApiUrlOverride ||
       `https://content.tinajs.io`
     this.contentApiUrl =
       this.options.customContentApiUrl ||
-      `${contentApiBase}/content/${this.options.clientId}/github/${encodedBranch}`
+      `${this.contentApiBase}/content/${this.options.clientId}/github/${encodedBranch}`
   }
 
   addPendingContent = async (props) => {
@@ -266,31 +265,32 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  async listBranches ({ owner, repo }: BranchData) {
-    const url = `${this.contentApiUrl}/list_branches?owner=${owner}&repo=${repo}`
+  async listBranches({ owner, repo }: BranchData) {
+    const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
     try {
       const res = await this.fetchWithToken(url, {
-        method: 'GET'
-      }) 
+        method: 'GET',
+      })
 
-      return JSON.stringify(res)
+      return res.json()
     } catch (e) {
-      console.error("There was an issue fetching the branch list.", e)
+      console.error('There was an issue fetching the branch list.', e)
       return null
     }
   }
-  async createBranch ({ owner, repo, baseBranch, branchName}: BranchData) {
-    const url = `${this.contentApiUrl}/create_branch`
-  
+  async createBranch({ baseBranch, branchName }: BranchData) {
+    const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
+
     try {
       const res = await this.fetchWithToken(url, {
         method: 'POST',
         body: {
-          owner,
-          repo,
           baseBranch,
-          branchName
-        } as any
+          branchName,
+        } as any,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
       return JSON.stringify(res)
@@ -300,7 +300,6 @@ mutation addPendingDocumentMutation(
     }
   }
 }
-
 
 export const DEFAULT_LOCAL_TINA_GQL_SERVER_URL = 'http://localhost:4001/graphql'
 
