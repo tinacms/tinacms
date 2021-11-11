@@ -26,11 +26,11 @@ export class FilesystemStore implements Store {
   constructor({ rootPath }: { rootPath?: string }) {
     this.rootPath = rootPath || ''
   }
-  public async seed() {
-    throw new Error(`Seeding data is not possible for Filesystem store`)
-  }
   public async query(queryStrings: string[]): Promise<object[]> {
     throw new Error(`Unable to perform query for Filesystem store`)
+  }
+  public async seed() {
+    throw new Error(`Seeding data is not possible for Filesystem store`)
   }
 
   public async get(filepath: string) {

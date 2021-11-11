@@ -44,6 +44,9 @@ export class GithubStore implements Store {
       auth: accessToken,
     })
   }
+  public async query(queryStrings: string[]): Promise<object[]> {
+    throw new Error(`Unable to perform query for GithubStore`)
+  }
   public async seed() {
     throw new Error(`Seeding data is not possible for Github data store`)
   }
@@ -95,11 +98,6 @@ export class GithubStore implements Store {
     } else {
       return items
     }
-  }
-
-  // @ts-ignore
-  public async query(queryStrings: string[]): Promise<object[]> {
-    throw new Error(`Unable to perform query for GithubStore`)
   }
 
   public async get(filepath: string) {

@@ -36,6 +36,23 @@ export class MemoryStore implements Store {
       },
     }
   }
+  public async query(queryStrings: string[], hydrator) {
+    const resultSets = await sequential(queryStrings, async (queryString) => {
+      const res = await this.get(queryString)
+      return res || []
+    })
+    let items = []
+    if (resultSets.length > 0) {
+      items = resultSets.reduce((p, c) => p.filter((e) => c.includes(e)))
+    }
+
+    return sequential(items, async (documentString) => {
+      return hydrator(documentString)
+    })
+  }
+  public async seed(filepath: string, data: object) {
+    await this.put(filepath, data)
+  }
   public supportsIndexing() {
     return true
   }
@@ -69,24 +86,7 @@ export class MemoryStore implements Store {
     const content = await this.db.get(filepath)
     return content
   }
-  public async seed(filepath: string, data: object) {
-    await this.put(filepath, data)
-  }
   public async put(filepath: string, data: object) {
     await this.db.put(filepath, data)
-  }
-  public async query(queryStrings: string[], hydrator) {
-    const resultSets = await sequential(queryStrings, async (queryString) => {
-      const res = await this.get(queryString)
-      return res || []
-    })
-    let items = []
-    if (resultSets.length > 0) {
-      items = resultSets.reduce((p, c) => p.filter((e) => c.includes(e)))
-    }
-
-    return sequential(items, async (documentString) => {
-      return hydrator(documentString)
-    })
   }
 }
