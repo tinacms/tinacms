@@ -62,10 +62,6 @@ export class LevelStore implements Store {
   public async seed(filepath: string, data: object) {
     await this.put(filepath, data)
   }
-  public async flush(filepath: string) {
-    const content = await this.get(filepath)
-    return stringifyFile(content, path.extname(filepath), false)
-  }
   public supportsIndexing() {
     return true
   }

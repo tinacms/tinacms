@@ -69,6 +69,7 @@ const tinaSchema: TinaCloudSchema = {
             {
               type: 'string',
               label: 'Body',
+              isBody: true,
               name: 'body',
             },
             {

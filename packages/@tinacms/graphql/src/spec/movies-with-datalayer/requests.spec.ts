@@ -20,59 +20,58 @@ const store = new LevelStore(rootPath)
 const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
 
 const fixtures: Fixture[] = [
-  // {
-  //   description: 'Adding a document',
-  //   name: 'addPendingDocument',
-  //   assert: 'output',
-  // },
-  // {
-  //   description: 'Adding a document that already exists',
-  //   name: 'addPendingDocument-existing',
-  //   assert: 'output',
-  //   expectError: true,
-  // },
-  // {
-  //   description: 'Updating a document',
-  //   name: 'updateDocument',
-  //   assert: 'file',
-  //   filename: 'content/movies/star-wars.md',
-  // },
-  // {
-  //   name: 'getMovieDocument',
-  //   assert: 'output',
-  // },
-  // {
-  //   name: 'getMovieList',
-  //   description: "Querying a list with 'eq'",
-  //   assert: 'output',
-  // },
-  // {
-  //   name: 'getMovieList2',
-  //   description: "Querying a list with 'startsWith'",
-  //   assert: 'output',
-  // },
-  // {
-  //   name: 'getDocument',
-  //   assert: 'output',
-  // },
-  // {
-  //   name: 'getDirectorList',
-  //   assert: 'output',
-  // },
+  {
+    description: 'Adding a document',
+    name: 'addPendingDocument',
+    assert: 'output',
+  },
+  {
+    description: 'Adding a document that already exists',
+    name: 'addPendingDocument-existing',
+    assert: 'output',
+    expectError: true,
+  },
+  {
+    description: 'Updating a document',
+    name: 'updateDocument',
+    assert: 'file',
+    filename: 'content/movies/star-wars.md',
+  },
+  {
+    name: 'getMovieDocument',
+    assert: 'output',
+  },
+  {
+    name: 'getMovieList',
+    description: "Querying a list with 'eq'",
+    assert: 'output',
+  },
+  {
+    name: 'getMovieList2',
+    description: "Querying a list with 'startsWith'",
+    assert: 'output',
+  },
+  {
+    name: 'getDocument',
+    assert: 'output',
+  },
+  {
+    name: 'getDirectorList',
+    assert: 'output',
+  },
   {
     name: 'getDirectorDocument',
     assert: 'output',
   },
-  // {
-  //   name: 'getCollections',
-  //   assert: 'output',
-  // },
-  // {
-  //   name: 'getCollection',
-  //   assert: 'output',
-  // },
+  {
+    name: 'getCollections',
+    assert: 'output',
+  },
+  {
+    name: 'getCollection',
+    assert: 'output',
+  },
 ]
-jest.setTimeout(200000) // in milliseconds
 
 describe('A schema with indexing', () => {
   fixtures.forEach((fixture) => {

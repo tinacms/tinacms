@@ -14,9 +14,10 @@ limitations under the License.
 import path from 'path'
 import { setupFixture, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
-import { FilesystemStore } from '../../database/store/filesystem'
+// import { FilesystemStore } from '../../database/store/filesystem'
+import { MemoryNoIndexStore } from '../../database/store/memory-no-index'
 const rootPath = path.join(__dirname, '/')
-const store = new FilesystemStore({ rootPath })
+const store = new MemoryNoIndexStore(rootPath)
 const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
 
 const fixtures: Fixture[] = [
@@ -28,7 +29,21 @@ const fixtures: Fixture[] = [
     name: 'getPostDocument',
     assert: 'output',
   },
+  {
+    name: 'updateAuthorDocument',
+    assert: 'file',
+    filename: 'content/authors/homer.md',
+  },
+  {
+    name: 'updatePostDocument',
+    assert: 'file',
+    filename: 'content/posts/hello-world.md',
+  },
 ]
+
+beforeEach(async () => {
+  await store.clear()
+})
 
 describe('A schema with templates in collections and no indexing', () => {
   fixtures.forEach((fixture) => {

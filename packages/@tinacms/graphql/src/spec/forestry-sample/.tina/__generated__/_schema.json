@@ -92,6 +92,7 @@
             {
               "type": "string",
               "label": "Body",
+              "isBody": true,
               "name": "body",
               "namespace": [
                 "post",

@@ -124,7 +124,7 @@ export const setupFixture = async (
   const responseString =
     fixture.assert === 'file'
       ? // @ts-ignore
-        await database.store.flush(fixture.filename)
+        await database.flush(fixture.filename)
       : `${JSON.stringify(response, null, 2)}\n`
 
   return {

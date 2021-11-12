@@ -92,6 +92,7 @@ export class Database {
       return {
         ...data,
         _collection: collection.name,
+        _keepTemplateKey: !!collection.templates,
         _template: lastItem(template.namespace),
         _relativePath: filepath
           .replace(collection.path, '')
@@ -102,6 +103,19 @@ export class Database {
   }
 
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
+    if (SYSTEM_FILES.includes(filepath)) {
+      throw new Error(`Unexpected put for config file ${filepath}`)
+    } else {
+      const { payload } = await this.stringifyFile(filepath, data)
+      await this.store.put(filepath, payload)
+    }
+    return true
+  }
+
+  public stringifyFile = async (
+    filepath: string,
+    data: { [key: string]: unknown }
+  ) => {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
@@ -149,15 +163,19 @@ export class Database {
         payload = data
       }
       const extension = path.extname(filepath)
-      const stringData = stringifyFile(
+      const stringifiedFile = stringifyFile(
         payload,
         extension,
         templateInfo.type === 'union'
       )
-      // await this.bridge.put(filepath, stringData)
-      await this.store.put(filepath, payload)
+      return { stringifiedFile, payload }
     }
-    return true
+  }
+
+  public flush = async (filepath: string) => {
+    const data = await this.get<{ [key: string]: unknown }>(filepath)
+    const { stringifiedFile } = await this.stringifyFile(filepath, data)
+    return stringifiedFile
   }
 
   public getLookup = async (returnType: string): Promise<LookupMapType> => {

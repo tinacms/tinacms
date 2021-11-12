@@ -1,0 +1,13 @@
+mutation {
+  updateAuthorDocument(
+    relativePath: "homer.md"
+    params: {
+      author: {
+        name: "Homer Jay Simpson"
+        socialMedia: { handle: "homerJay", platform: "instagram" }
+      }
+    }
+  ) {
+    id
+  }
+}

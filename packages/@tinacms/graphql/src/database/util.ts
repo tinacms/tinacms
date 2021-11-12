@@ -26,15 +26,24 @@ export const stringifyFile = (
     case '.mdx':
     case '.md':
       // @ts-ignore
-      const { _id, _template, _collection, $_body, ...rest } = content
+      const {
+        _relativePath,
+        _keepTemplateKey,
+        _id,
+        _template,
+        _collection,
+        $_body,
+        ...rest
+      } = content
       const extra: { [key: string]: string } = {}
       if (keepTemplateKey) {
         extra['_template'] = _template
       }
-      return matter.stringify(
+      const ok = matter.stringify(
         typeof $_body === 'undefined' ? '' : `\n${$_body}`,
         { ...rest, ...extra }
       )
+      return ok
     case '.json':
       return JSON.stringify(content, null, 2)
     default:
