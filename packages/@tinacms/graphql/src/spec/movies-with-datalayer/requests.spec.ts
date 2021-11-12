@@ -20,21 +20,6 @@ const store = new LevelStore(rootPath)
 
 const fixtures: Fixture[] = [
   {
-    description: 'Adding a document',
-    name: 'addPendingDocument',
-    assert: 'output',
-  },
-  {
-    description: 'Updating a document',
-    name: 'updateDocument',
-    assert: 'file',
-    filename: 'content/movies/star-wars.md',
-  },
-  {
-    name: 'getMovieDocument',
-    assert: 'output',
-  },
-  {
     name: 'getMovieList',
     description: "Querying a list with 'eq'",
     assert: 'output',
@@ -45,29 +30,7 @@ const fixtures: Fixture[] = [
     assert: 'output',
   },
   {
-    name: 'getDocument',
-    assert: 'output',
-  },
-  {
     name: 'getDirectorList',
-    assert: 'output',
-  },
-  {
-    name: 'getDirectorDocument',
-    assert: 'output',
-  },
-  {
-    name: 'getCollections',
-    assert: 'output',
-  },
-  {
-    description: 'Adding a document that already exists',
-    name: 'addPendingDocument-existing',
-    assert: 'output',
-    expectError: true,
-  },
-  {
-    name: 'getCollection',
     assert: 'output',
   },
 ]

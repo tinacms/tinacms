@@ -1,5 +1,5 @@
-query getMovieDocument($relativePath: String!) {
-  getMovieDocument(relativePath: $relativePath) {
+query getAuthorDocument($relativePath: String!) {
+  getAuthorDocument(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -10,13 +10,13 @@ query getMovieDocument($relativePath: String!) {
     }
     id
     data {
-      ...MovieParts
+      ...AuthorParts
     }
   }
 }
 
-query getMovieList {
-  getMovieList {
+query getAuthorList {
+  getAuthorList {
     totalCount
     edges {
       node {
@@ -30,15 +30,15 @@ query getMovieList {
           extension
         }
         data {
-          ...MovieParts
+          ...AuthorParts
         }
       }
     }
   }
 }
 
-query getDirectorDocument($relativePath: String!) {
-  getDirectorDocument(relativePath: $relativePath) {
+query getPostDocument($relativePath: String!) {
+  getPostDocument(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -49,13 +49,13 @@ query getDirectorDocument($relativePath: String!) {
     }
     id
     data {
-      ...DirectorParts
+      ...PostParts
     }
   }
 }
 
-query getDirectorList {
-  getDirectorList {
+query getPostList {
+  getPostList {
     totalCount
     edges {
       node {
@@ -69,15 +69,15 @@ query getDirectorList {
           extension
         }
         data {
-          ...DirectorParts
+          ...PostParts
         }
       }
     }
   }
 }
 
-query getActorDocument($relativePath: String!) {
-  getActorDocument(relativePath: $relativePath) {
+query getPageDocument($relativePath: String!) {
+  getPageDocument(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -88,13 +88,13 @@ query getActorDocument($relativePath: String!) {
     }
     id
     data {
-      ...ActorParts
+      ...PageParts
     }
   }
 }
 
-query getActorList {
-  getActorList {
+query getPageList {
+  getPageList {
     totalCount
     edges {
       node {
@@ -108,7 +108,7 @@ query getActorList {
           extension
         }
         data {
-          ...ActorParts
+          ...PageParts
         }
       }
     }
