@@ -15,7 +15,6 @@ import type { Store } from './index'
 import path from 'path'
 import { sequential } from '../../util'
 import level, { LevelDB } from 'level'
-import { stringifyFile } from '../util'
 
 export class LevelStore implements Store {
   public rootPath

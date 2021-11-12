@@ -34,11 +34,11 @@ export const buildSchema = async (
   database: Database,
   experimentalData?: boolean
 ) => {
+  const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
   const config = await fs
-    .readFileSync(
-      path.join(rootPath, '.tina', '__generated__', 'config', 'schema.json')
-    )
+    .readFileSync(path.join(tempConfig, 'schema.json'))
     .toString()
+  await fs.rmdir(tempConfig, { recursive: true })
   await indexDB({ database, config: JSON.parse(config), experimentalData })
   const gqlAst = await database.getGraphQLSchema()
   return buildASTSchema(gqlAst)
