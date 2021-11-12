@@ -4,7 +4,8 @@
     "resolveType": "multiCollectionDocumentList",
     "collections": [
       "author",
-      "post"
+      "post",
+      "page"
     ]
   },
   "DocumentNode": {
@@ -67,5 +68,25 @@
   "Node": {
     "type": "Node",
     "resolveType": "nodeDocument"
+  },
+  "PageBlocks": {
+    "type": "PageBlocks",
+    "resolveType": "unionData",
+    "typeMap": {
+      "hero": "PageBlocksHero",
+      "cta": "PageBlocksCta"
+    }
+  },
+  "PageDocument": {
+    "type": "PageDocument",
+    "resolveType": "collectionDocument",
+    "collection": "page",
+    "createPageDocument": "create",
+    "updatePageDocument": "update"
+  },
+  "PageConnection": {
+    "type": "PageConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "page"
   }
 }

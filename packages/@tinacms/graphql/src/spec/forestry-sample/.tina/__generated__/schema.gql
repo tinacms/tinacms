@@ -51,6 +51,8 @@ type Query {
   getAuthorList(before: String, after: String, first: Int, last: Int, filter: AuthorFilter): AuthorConnection!
   getPostDocument(relativePath: String): PostDocument!
   getPostList(before: String, after: String, first: Int, last: Int, filter: PostFilter): PostConnection!
+  getPageDocument(relativePath: String): PageDocument!
+  getPageList(before: String, after: String, first: Int, last: Int, filter: PageFilter): PageConnection!
 }
 
 input StringFilter {
@@ -87,9 +89,43 @@ input PostFilter {
   post: PostPostFilter
 }
 
+input ImageFilter {
+  startsWith: String
+  eq: String
+  exists: Boolean
+}
+
+input PageSeoFilter {
+  seoTitle: StringFilter
+  ogImage: ImageFilter
+  ogDescription: StringFilter
+}
+
+input PageBlocksHeroFilter {
+  description: StringFilter
+  backgroundImage: ImageFilter
+}
+
+input PageBlocksCtaFilter {
+  ctaText: StringFilter
+  ctaStyle: StringFilter
+}
+
+input PageBlocksFilter {
+  hero: PageBlocksHeroFilter
+  cta: PageBlocksCtaFilter
+}
+
+input PageFilter {
+  title: StringFilter
+  seo: PageSeoFilter
+  blocks: PageBlocksFilter
+}
+
 input DocumentFilter {
   author: AuthorFilter
   post: PostFilter
+  page: PageFilter
 }
 
 type DocumentConnectionEdges {
@@ -115,7 +151,7 @@ type Collection {
   documents(before: String, after: String, first: Int, last: Int, filter: DocumentFilter): DocumentConnection!
 }
 
-union DocumentNode = AuthorDocument | PostDocument
+union DocumentNode = AuthorDocument | PostDocument | PageDocument
 
 type AuthorAuthorSocialMedia {
   platform: String
@@ -179,6 +215,50 @@ type PostConnection implements Connection {
   edges: [PostConnectionEdges]
 }
 
+type PageSeo {
+  seoTitle: String
+  ogImage: String
+  ogDescription: String
+}
+
+type PageBlocksHero {
+  description: String
+  backgroundImage: String
+}
+
+type PageBlocksCta {
+  ctaText: String
+  ctaStyle: String
+}
+
+union PageBlocks = PageBlocksHero | PageBlocksCta
+
+type Page {
+  title: String
+  seo: PageSeo
+  blocks: [PageBlocks]
+}
+
+type PageDocument implements Node & Document {
+  id: ID!
+  sys: SystemInfo!
+  data: Page!
+  form: JSON!
+  values: JSON!
+  dataJSON: JSON!
+}
+
+type PageConnectionEdges {
+  cursor: String
+  node: PageDocument
+}
+
+type PageConnection implements Connection {
+  pageInfo: PageInfo
+  totalCount: Int!
+  edges: [PageConnectionEdges]
+}
+
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
   updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
@@ -187,11 +267,14 @@ type Mutation {
   createAuthorDocument(relativePath: String!, params: AuthorMutation!): AuthorDocument!
   updatePostDocument(relativePath: String!, params: PostMutation!): PostDocument!
   createPostDocument(relativePath: String!, params: PostMutation!): PostDocument!
+  updatePageDocument(relativePath: String!, params: PageMutation!): PageDocument!
+  createPageDocument(relativePath: String!, params: PageMutation!): PageDocument!
 }
 
 input DocumentMutation {
   author: AuthorMutation
   post: PostMutation
+  page: PageMutation
 }
 
 input AuthorAuthorSocialMediaMutation {
@@ -216,4 +299,31 @@ input PostPostMutation {
 
 input PostMutation {
   post: PostPostMutation
+}
+
+input PageSeoMutation {
+  seoTitle: String
+  ogImage: String
+  ogDescription: String
+}
+
+input PageBlocksHeroMutation {
+  description: String
+  backgroundImage: String
+}
+
+input PageBlocksCtaMutation {
+  ctaText: String
+  ctaStyle: String
+}
+
+input PageBlocksMutation {
+  hero: PageBlocksHeroMutation
+  cta: PageBlocksCtaMutation
+}
+
+input PageMutation {
+  title: String
+  seo: PageSeoMutation
+  blocks: [PageBlocksMutation]
 }

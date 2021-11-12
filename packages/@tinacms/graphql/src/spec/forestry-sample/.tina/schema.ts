@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import { TinaCloudSchema } from '../../..'
+import { blocksCollection } from './blocks'
 
 const tinaSchema: TinaCloudSchema = {
   collections: [
@@ -82,6 +83,7 @@ const tinaSchema: TinaCloudSchema = {
         },
       ],
     },
+    blocksCollection,
   ],
 }
 
