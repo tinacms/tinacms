@@ -16,73 +16,28 @@ import path from 'path'
 import { indexDB } from './build'
 import { resolve } from './resolve'
 import { buildASTSchema } from 'graphql'
-import { GithubBridge } from './database/github'
-import { createDatabase } from './database'
+import { GithubBridge } from './database/bridge/github'
+import { GithubStore } from './database/store/github'
+import { FilesystemBridge } from './database/bridge/filesystem'
+import { FilesystemStore } from './database/store/filesystem'
+import { createDatabase, Database } from './database'
+
+export { GithubBridge, GithubStore, FilesystemBridge, FilesystemStore }
 
 export { createDatabase, resolve, indexDB }
 export type { TinaCloudSchema } from './types'
 
-export const gql = async ({
-  rootPath,
-  query,
-  variables,
-}: {
-  rootPath: string
-  query: string
-  variables: object
-}) => {
-  const database = await createDatabase({
-    rootPath,
-  })
-
-  return resolve({
-    database,
-    query,
-    variables,
-  })
-}
-
-export const githubRoute = async ({
-  rootPath = '',
-  query,
-  variables,
-  branch,
-  ...githubArgs
-}: {
-  accessToken: string
-  owner: string
-  repo: string
-  query: string
-  variables: object
-  rootPath?: string
-  branch: string
-}) => {
-  const gh = new GithubBridge({
-    rootPath,
-    ref: branch,
-    ...githubArgs,
-  })
-  const database = await createDatabase({
-    bridge: gh,
-  })
-  return resolve({
-    database,
-    query,
-    variables,
-  })
-}
-
-export const buildSchema = async (rootPath: string) => {
+export const buildSchema = async (
+  rootPath: string,
+  database: Database,
+  experimentalData?: boolean
+) => {
   const config = await fs
     .readFileSync(
       path.join(rootPath, '.tina', '__generated__', 'config', 'schema.json')
     )
     .toString()
-  const database = await createDatabase({
-    rootPath,
-  })
-
-  await indexDB({ database, config: JSON.parse(config) })
+  await indexDB({ database, config: JSON.parse(config), experimentalData })
   const gqlAst = await database.getGraphQLSchema()
   return buildASTSchema(gqlAst)
 }

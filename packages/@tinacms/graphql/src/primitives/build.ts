@@ -13,7 +13,6 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
-import path from 'path'
 import { print, OperationDefinitionNode } from 'graphql'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
@@ -22,18 +21,33 @@ import { sequential } from './util'
 import { createBuilder } from './builder'
 import { createSchema } from './schema'
 import { extractInlineTypes } from './ast-builder'
+import path from 'path'
 
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
+import { Database } from './database'
+import { run } from '../git'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
-export const indexDB = async ({ database, config }) => {
+export const indexDB = async ({
+  database,
+  config,
+  experimentalData,
+}: {
+  database: Database
+  config: TinaSchema['config']
+  experimentalData?: boolean
+}) => {
   const tinaSchema = await createSchema({ schema: config })
-  const builder = await createBuilder({ database, tinaSchema })
+  const builder = await createBuilder({
+    database,
+    tinaSchema,
+    experimentalData,
+  })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
-
-  await database.put('_graphql', graphQLSchema)
-  await database.put('_schema', tinaSchema.schema)
+  // @ts-ignore
+  await database.indexData({ experimentalData, graphQLSchema, tinaSchema })
+  await run()
 
   await _buildFragments(builder, tinaSchema)
   await _buildQueries(builder, tinaSchema)

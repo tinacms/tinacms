@@ -13,13 +13,62 @@
               "name": "name",
               "label": "Name",
               "type": "string",
-              "namespace": ["author", "author", "name"]
+              "namespace": [
+                "author",
+                "author",
+                "name"
+              ]
+            },
+            {
+              "name": "socialMedia",
+              "label": "Social Media",
+              "type": "object",
+              "list": true,
+              "fields": [
+                {
+                  "type": "string",
+                  "name": "platform",
+                  "label": "Platform",
+                  "options": [
+                    "twitter",
+                    "facebook",
+                    "instagram"
+                  ],
+                  "namespace": [
+                    "author",
+                    "author",
+                    "socialMedia",
+                    "platform"
+                  ]
+                },
+                {
+                  "name": "handle",
+                  "label": "Handle",
+                  "type": "string",
+                  "namespace": [
+                    "author",
+                    "author",
+                    "socialMedia",
+                    "handle"
+                  ]
+                }
+              ],
+              "namespace": [
+                "author",
+                "author",
+                "socialMedia"
+              ]
             }
           ],
-          "namespace": ["author", "author"]
+          "namespace": [
+            "author",
+            "author"
+          ]
         }
       ],
-      "namespace": ["author"]
+      "namespace": [
+        "author"
+      ]
     },
     {
       "label": "Post",
@@ -34,31 +83,45 @@
               "type": "string",
               "label": "Title",
               "name": "title",
-              "namespace": ["post", "post", "title"]
+              "namespace": [
+                "post",
+                "post",
+                "title"
+              ]
             },
             {
-              "type": "text",
+              "type": "string",
               "label": "Body",
               "name": "body",
-              "namespace": ["post", "post", "body"]
+              "namespace": [
+                "post",
+                "post",
+                "body"
+              ]
             },
             {
               "type": "reference",
               "label": "Author",
               "name": "author",
-              "collections": ["author"],
-              "reverseLookup": {
-                "name": "posts",
-                "label": "Blog Posts",
-                "namespace": ["post", "post", "author", "posts"]
-              },
-              "namespace": ["post", "post", "author"]
+              "collections": [
+                "author"
+              ],
+              "namespace": [
+                "post",
+                "post",
+                "author"
+              ]
             }
           ],
-          "namespace": ["post", "post"]
+          "namespace": [
+            "post",
+            "post"
+          ]
         }
       ],
-      "namespace": ["post"]
+      "namespace": [
+        "post"
+      ]
     }
   ],
   "namespace": []

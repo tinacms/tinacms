@@ -1,0 +1,13 @@
+{
+  "errors": [
+    {
+      "message": "Unknown argument \"filter\" on field \"Query.getMovieList\". Did you mean \"after\"?",
+      "locations": [
+        {
+          "line": 3,
+          "column": 16
+        }
+      ]
+    }
+  ]
+}

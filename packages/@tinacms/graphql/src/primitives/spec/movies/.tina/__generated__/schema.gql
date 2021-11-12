@@ -82,19 +82,6 @@ union DocumentNode = MovieDocument | DirectorDocument | ActorDocument
 
 union MovieDirectorDocument = DirectorDocument
 
-union MovieActorsDocument = ActorDocument
-
-type MovieActorsConnectionEdges {
-  cursor: String
-  node: MovieActorsDocument
-}
-
-type MovieActorsConnection implements Connection {
-  pageInfo: PageInfo
-  totalCount: Int!
-  edges: [MovieActorsConnectionEdges]
-}
-
 type Movie {
   title: String
   releaseDate: String
@@ -102,7 +89,6 @@ type Movie {
   archived: Boolean
   genre: String
   director: MovieDirectorDocument
-  actors(before: String, after: String, first: Int, last: Int): MovieActorsConnection!
   body: String
 }
 
@@ -177,8 +163,8 @@ type ActorConnection implements Connection {
 
 type Mutation {
   addPendingDocument(collection: String!, relativePath: String!, template: String): DocumentNode!
-  updateDocument(relativePath: String!, params: DocumentMutation!): DocumentNode!
-  createDocument(relativePath: String!, params: DocumentMutation!): DocumentNode!
+  updateDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
+  createDocument(collection: String, relativePath: String!, params: DocumentMutation!): DocumentNode!
   updateMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
   createMovieDocument(relativePath: String!, params: MovieMutation!): MovieDocument!
   updateDirectorDocument(relativePath: String!, params: DirectorMutation!): DirectorDocument!
@@ -200,7 +186,6 @@ input MovieMutation {
   archived: Boolean
   genre: String
   director: String
-  actors: [String]
   body: String
 }
 

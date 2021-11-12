@@ -12,12 +12,13 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setup, setupFixture, setupFixture2 } from '../setup'
-import { toMatchFile } from 'jest-file-snapshot'
-
+import { setupFixture2, print, Fixture } from '../setup'
+import { LevelStore } from '../../database/store/level'
+import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
+const store = new LevelStore(rootPath)
 
-const fixtures2 = [
+const fixtures: Fixture[] = [
   {
     name: 'getPostDocumentAdvanced',
     assert: 'output',
@@ -30,24 +31,20 @@ const fixtures2 = [
   {
     name: 'kitchenSink',
     assert: 'output',
-    filename: 'content/posts/kitchen-sink.md',
   },
 ]
-import { tinaSchema } from './.tina/schema'
 
-expect.extend({ toMatchFile })
-
-describe('The given configuration', () => {
-  fixtures2.forEach((fixture) => {
-    it(`${fixture.name} works`, async () => {
+describe('A schema that uses MDX', () => {
+  fixtures.forEach((fixture) => {
+    it(print(fixture), async () => {
       const { response, expectedResponsePath } = await setupFixture2(
         rootPath,
         tinaSchema,
-        // @ts-ignore
-        fixture
+        store,
+        fixture,
+        'with-mdx'
       )
 
-      // Add \n because prettier format adds it if a user edits the file manually
       expect(response).toMatchFile(expectedResponsePath)
     })
   })

@@ -1,0 +1,12 @@
+# schema: ../../.tina/__generated__/schema.gql
+
+query {
+  getPostDocument(relativePath: "hello-world-advanced.md") {
+    ... on PostDocument {
+      data {
+        title
+        body
+      }
+    }
+  }
+}

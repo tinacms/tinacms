@@ -2,16 +2,23 @@
   "DocumentConnection": {
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
-    "collections": ["author", "post"]
+    "collections": [
+      "author",
+      "post"
+    ]
   },
   "DocumentNode": {
     "type": "DocumentNode",
-    "resolveType": "multiCollectionDocument"
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   },
   "PostPostAuthorPostsConnection": {
     "type": "PostPostAuthorPostsConnection",
     "resolveType": "multiCollectionDocumentList",
-    "collections": ["post"]
+    "collections": [
+      "post"
+    ]
   },
   "Author": {
     "type": "Author",
@@ -23,7 +30,9 @@
   "AuthorDocument": {
     "type": "AuthorDocument",
     "resolveType": "collectionDocument",
-    "collection": "author"
+    "collection": "author",
+    "createAuthorDocument": "create",
+    "updateAuthorDocument": "update"
   },
   "AuthorConnection": {
     "type": "AuthorConnection",
@@ -44,11 +53,23 @@
   "PostDocument": {
     "type": "PostDocument",
     "resolveType": "collectionDocument",
-    "collection": "post"
+    "collection": "post",
+    "createPostDocument": "create",
+    "updatePostDocument": "update"
   },
   "PostConnection": {
     "type": "PostConnection",
     "resolveType": "collectionDocumentList",
     "collection": "post"
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "PostAuthorDocument": {
+    "type": "PostAuthorDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
   }
 }

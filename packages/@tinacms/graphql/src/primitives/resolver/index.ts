@@ -19,6 +19,7 @@ import { NAMER } from '../ast-builder'
 import { Database, CollectionDocumentListLookup } from '../database'
 import isValid from 'date-fns/isValid'
 import { parseMDX, stringifyMDX } from '../mdx'
+import flat from 'flat'
 
 import type {
   Templateable,
@@ -58,9 +59,7 @@ export class Resolver {
     // if (res.type === "union") {
     //   extraFields["templates"] = res.templates;
     // }
-    const documents = await this.database.getDocumentsForCollection(
-      collectionName
-    )
+    const documents = await this.getDocumentsForCollection(collectionName)
     return {
       documents,
       ...collection,
@@ -511,6 +510,11 @@ export class Resolver {
     }
   }
 
+  public getDocumentsForCollection = async (collectionName: string) => {
+    const collection = this.tinaSchema.getCollection(collectionName)
+    return this.database.store.glob(collection.path, this.getDocument)
+  }
+
   public resolveCollectionConnection = async ({
     args,
     lookup,
@@ -518,16 +522,30 @@ export class Resolver {
     args: Record<string, Record<string, object>>
     lookup: CollectionDocumentListLookup
   }) => {
-    const documents = await this.database.getDocumentsForCollection(
-      lookup.collection
-    )
+    let documents
+    if (args.filter) {
+      const queries = []
+      const flattenedArgs = flat(args.filter, { delimiter: '#' })
+      Object.entries(flattenedArgs).map(([key, value]) => {
+        const keys = key.split('#')
+        const realKey = keys.slice(0, keys.length - 1).join('#')
+        queries.push(
+          `__attribute__${lookup.collection}#${lookup.collection}#${realKey}#${value}`
+        )
+      })
+
+      documents = await this.database.query(queries, this.getDocument)
+    } else {
+      const collection = await this.tinaSchema.getCollection(lookup.collection)
+      documents = await this.database.store.glob(
+        collection.path,
+        this.getDocument
+      )
+    }
     return {
       totalCount: documents.length,
-      edges: await sequential(documents, async (filepath) => {
-        const document = await this.getDocument(filepath)
-        return {
-          node: document,
-        }
+      edges: documents.map((document) => {
+        return { node: document }
       }),
     }
   }
@@ -596,12 +614,9 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'rich-text':
-        if (typeof value === 'string') {
-          const tree = parseMDX(value, field)
-          accumulator[field.name] = tree
-        } else {
-          throw new Error(`Expected value for rich-text to be of type string`)
-        }
+        // @ts-ignore value is unknown
+        const tree = parseMDX(value, field)
+        accumulator[field.name] = tree
         break
       case 'object':
         if (field.list) {
@@ -857,7 +872,8 @@ export class Resolver {
       case 'reference':
         const documents = _.flatten(
           await sequential(field.collections, async (collectionName) => {
-            return this.database.getDocumentsForCollection(collectionName)
+            const collection = this.tinaSchema.getCollection(collectionName)
+            return this.database.store.glob(collection.path)
           })
         )
 
@@ -866,10 +882,10 @@ export class Resolver {
           component: 'select',
           options: [
             { label: 'Choose an option', value: '' },
-            ...documents.map((filepath) => {
+            ...documents.map((document) => {
               return {
-                value: filepath,
-                label: filepath,
+                value: document,
+                label: document,
               }
             }),
           ],

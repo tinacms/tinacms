@@ -12,39 +12,40 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setup, setupFixture } from '../setup'
-
-const rootPath = path.join(__dirname, '/')
-
-const fixtures = [
-  // 'getAuthorDocument',
-  'getPostDocument',
-  // 'updateAuthorDocument',
-  // 'updateDocument',
-  // 'updateDocument-no-collection',
-]
+import { setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
+import { FilesystemStore } from '../..'
+const rootPath = path.join(__dirname, '/')
+const store = new FilesystemStore({ rootPath })
+const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
 
-describe('The given configuration', () => {
-  it.skip('Matches the expected schema', async () => {
-    const { schemaString, expectedSchemaString } = await setup(
-      rootPath,
-      tinaSchema,
-      true
-    )
-    expect(schemaString).toEqual(expectedSchemaString)
-  })
+const fixtures: Fixture[] = [
+  {
+    name: 'getAuthorDocument',
+    assert: 'output',
+  },
+  {
+    name: 'getPostDocument',
+    assert: 'output',
+  },
+]
+
+describe('A schema with templates in collections and no indexing', () => {
   fixtures.forEach((fixture) => {
-    it(`${fixture} works`, async () => {
-      const { response, expectedReponse } = await setupFixture(
+    it(print(fixture), async () => {
+      const { response, expectedResponsePath } = await setupFixture2(
         rootPath,
         tinaSchema,
-        fixture
+        store,
+        fixture,
+        'forestry'
       )
 
-      expect(JSON.parse(JSON.stringify(response))).toMatchObject(
-        JSON.parse(expectedReponse)
-      )
+      if (fixture.expectError) {
+        expect(consoleErrMock).toHaveBeenCalled()
+      }
+
+      expect(response).toMatchFile(expectedResponsePath)
     })
   })
 })

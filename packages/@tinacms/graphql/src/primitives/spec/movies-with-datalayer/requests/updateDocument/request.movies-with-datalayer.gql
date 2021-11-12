@@ -1,0 +1,11 @@
+mutation UpdateDocument($params: DocumentMutation!) {
+  updateDocument(
+    collection: "movie"
+    relativePath: "star-wars.md"
+    params: $params
+  ) {
+    ... on Document {
+      id
+    }
+  }
+}

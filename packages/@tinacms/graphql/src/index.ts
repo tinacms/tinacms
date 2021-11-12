@@ -11,16 +11,14 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export { GithubBridge } from './primitives/database/github'
-export type { GithubManagerInit } from './primitives/database/github'
-export {
-  gql,
-  resolve,
-  buildSchema,
-  indexDB,
-  createDatabase,
-  githubRoute,
-} from './primitives'
+export { GithubBridge } from './primitives/database/bridge/github'
+export { GithubStore } from './primitives/database/store/github'
+export { FilesystemBridge } from './primitives/database/bridge/filesystem'
+export { FilesystemStore } from './primitives/database/store/filesystem'
+export { MemoryStore } from './primitives/database/store/memory'
+export { LevelStore } from './primitives/database/store/level'
+export type { GithubManagerInit } from './primitives/database/bridge/github'
+export { resolve, buildSchema, indexDB, createDatabase } from './primitives'
 
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,

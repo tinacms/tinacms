@@ -12,35 +12,62 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setup, setupFixture } from '../setup'
-
-const rootPath = path.join(__dirname, '/')
-
-const fixtures = [
-  'getMovieDocument',
-  'getDocument',
-  'getDirectorList',
-  'addPendingDocument',
-  'addPendingDocument-existing',
-  'updateDocument',
-  'getDirectorDocument',
-  'getCollections',
-  'getCollection',
-]
+import { setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
+import { FilesystemStore } from '../../database/store/filesystem'
+const rootPath = path.join(__dirname, '/')
+const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
+const store = new FilesystemStore({ rootPath })
 
-describe('The given configuration', () => {
+const fixtures: Fixture[] = [
+  {
+    name: 'getMovieDocument',
+    assert: 'output',
+  },
+  {
+    name: 'getDocument',
+    assert: 'output',
+  },
+  {
+    name: 'getDirectorList',
+    assert: 'output',
+  },
+  {
+    name: 'getDirectorDocument',
+    assert: 'output',
+  },
+  {
+    name: 'getCollections',
+    assert: 'output',
+  },
+  {
+    name: 'getCollection',
+    assert: 'output',
+  },
+  {
+    name: 'getMovieList',
+    description: 'Trying to filter',
+    assert: 'output',
+    expectError: true,
+  },
+]
+
+describe('A schema without indexing', () => {
   fixtures.forEach((fixture) => {
-    it(`${fixture} works`, async () => {
-      const { response, expectedReponse } = await setupFixture(
+    it(print(fixture), async () => {
+      const { response, expectedResponsePath } = await setupFixture2(
         rootPath,
         tinaSchema,
-        fixture
+        store,
+        fixture,
+        'movies'
       )
 
-      expect(JSON.parse(JSON.stringify(response))).toMatchObject(
-        JSON.parse(expectedReponse)
-      )
+      if (fixture.expectError) {
+        expect(consoleErrMock).toHaveBeenCalled()
+      }
+
+      expect(response).toMatchFile(expectedResponsePath)
     })
   })
 })

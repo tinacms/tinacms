@@ -252,10 +252,18 @@ export const resolve = async ({
            * eg `getMovieDocument.data.actors`
            */
           case 'multiCollectionDocumentList':
-            assertShape<string[]>(value, (yup) => yup.array().of(yup.string()))
-            return resolver.resolveCollectionConnections({
-              ids: value || [],
-            })
+            if (Array.isArray(value)) {
+              return {
+                totalCount: value.length,
+                edges: value.map((document) => {
+                  return { node: document }
+                }),
+              }
+            } else {
+              throw new Error(
+                `Expected an array for result of ${info.fieldName} at ${info.path}`
+              )
+            }
           /**
            * Collections-specific getter
            * eg. `getPostDocument`/`createPostDocument`/`updatePostDocument`
@@ -367,8 +375,12 @@ export const resolve = async ({
         item.mutationInfo = mutationPath
       }
     })
+    if (res.errors) {
+      console.error(res.errors)
+    }
     return res
   } catch (e) {
+    console.error(e)
     if (e instanceof GraphQLError) {
       return {
         errors: [e],
