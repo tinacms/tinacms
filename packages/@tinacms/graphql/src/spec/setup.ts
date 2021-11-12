@@ -11,18 +11,18 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
+import path from 'path'
+import fs from 'fs-extra'
 import { indexDB } from '../build'
 import { resolve } from '../resolve'
-import fs from 'fs-extra'
 import { buildASTSchema, printSchema } from 'graphql'
-import path from 'path'
 import { toMatchFile } from 'jest-file-snapshot'
-
-import type { TinaCloudSchema } from '../types'
 import { createDatabase } from '../database'
 import { Database } from '../database'
+import { FilesystemBridge } from '../database/bridge/filesystem'
+
 import type { Store } from '../database/store'
-import { FilesystemBridge } from '../index2'
+import type { TinaCloudSchema } from '../types'
 
 export const setup = async (
   rootPath: string,

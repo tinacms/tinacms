@@ -14,7 +14,7 @@ limitations under the License.
 import path from 'path'
 import { setupFixture, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
-import { FilesystemStore } from '../../index2'
+import { FilesystemStore } from '../../database/store/filesystem'
 const rootPath = path.join(__dirname, '/')
 const store = new FilesystemStore({ rootPath })
 const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
