@@ -12,31 +12,40 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setup, setupFixture } from '../setup'
-
-const rootPath = path.join(__dirname, '/')
-
-const fixtures = ['getPageDocument']
+import { setupFixture, print, Fixture } from '../setup'
+import { LevelStore } from '../../database/store/level'
 import { tinaSchema } from './.tina/schema'
+const rootPath = path.join(__dirname, '/')
+const store = new LevelStore(rootPath)
 
-describe('The given configuration', () => {
-  it('Matches the expected schema', async () => {
-    const { schemaString, expectedSchemaString } = await setup(
-      rootPath,
-      tinaSchema,
-      true
-    )
-    expect(schemaString).toEqual(expectedSchemaString)
-  })
+const fixtures: Fixture[] = [
+  {
+    name: 'getPostDocumentAdvanced',
+    assert: 'output',
+  },
+  {
+    name: 'updatePostDocumentAdvanced',
+    assert: 'file',
+    filename: 'content/posts/hello-world-advanced.md',
+  },
+  {
+    name: 'kitchenSink',
+    assert: 'output',
+  },
+]
+
+describe('A schema that uses MDX', () => {
   fixtures.forEach((fixture) => {
-    it(`${fixture} works`, async () => {
-      const { response, expectedReponse } = await setupFixture(
+    it(print(fixture), async () => {
+      const { response, expectedResponsePath } = await setupFixture(
         rootPath,
         tinaSchema,
-        fixture
+        store,
+        fixture,
+        'with-mdx'
       )
 
-      expect(response).toEqual(JSON.parse(expectedReponse))
+      expect(response).toMatchFile(expectedResponsePath)
     })
   })
 })

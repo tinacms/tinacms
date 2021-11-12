@@ -1,0 +1,153 @@
+{
+  "collections": [
+    {
+      "label": "Page",
+      "name": "page",
+      "path": "content/pages",
+      "fields": [
+        {
+          "type": "string",
+          "label": "Title",
+          "name": "title",
+          "namespace": [
+            "page",
+            "title"
+          ]
+        },
+        {
+          "type": "object",
+          "label": "SEO",
+          "name": "seo",
+          "fields": [
+            {
+              "type": "string",
+              "name": "seoTitle",
+              "label": "SEO Title",
+              "namespace": [
+                "page",
+                "seo",
+                "seoTitle"
+              ]
+            },
+            {
+              "type": "image",
+              "name": "ogImage",
+              "label": "Open Graph Image",
+              "namespace": [
+                "page",
+                "seo",
+                "ogImage"
+              ]
+            },
+            {
+              "type": "string",
+              "name": "ogDescription",
+              "label": "Open Graph Description",
+              "namespace": [
+                "page",
+                "seo",
+                "ogDescription"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "seo"
+          ]
+        },
+        {
+          "type": "object",
+          "list": true,
+          "label": "Blocks",
+          "name": "blocks",
+          "templates": [
+            {
+              "label": "Hero",
+              "name": "hero",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "Description",
+                  "name": "description",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "hero",
+                    "description"
+                  ]
+                },
+                {
+                  "type": "image",
+                  "label": "Background Image",
+                  "name": "backgroundImage",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "hero",
+                    "backgroundImage"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "hero"
+              ]
+            },
+            {
+              "label": "Call to Action",
+              "name": "cta",
+              "fields": [
+                {
+                  "type": "string",
+                  "label": "CTA Text",
+                  "name": "ctaText",
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "cta",
+                    "ctaText"
+                  ]
+                },
+                {
+                  "type": "string",
+                  "label": "Style",
+                  "name": "ctaStyle",
+                  "options": [
+                    {
+                      "label": "Minimal",
+                      "value": "minimal"
+                    },
+                    {
+                      "label": "Flat",
+                      "value": "flat"
+                    }
+                  ],
+                  "namespace": [
+                    "page",
+                    "blocks",
+                    "cta",
+                    "ctaStyle"
+                  ]
+                }
+              ],
+              "namespace": [
+                "page",
+                "blocks",
+                "cta"
+              ]
+            }
+          ],
+          "namespace": [
+            "page",
+            "blocks"
+          ]
+        }
+      ],
+      "namespace": [
+        "page"
+      ]
+    }
+  ],
+  "namespace": []
+}

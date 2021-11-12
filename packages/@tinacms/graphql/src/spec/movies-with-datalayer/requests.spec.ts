@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setupFixture2, print, Fixture } from '../setup'
+import { setupFixture, print, Fixture } from '../setup'
 import { LevelStore } from '../../database/store/level'
 import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
@@ -77,7 +77,7 @@ jest.setTimeout(200000) // in milliseconds
 describe('A schema with indexing', () => {
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
-      const { response, expectedResponsePath } = await setupFixture2(
+      const { response, expectedResponsePath } = await setupFixture(
         rootPath,
         tinaSchema,
         store,

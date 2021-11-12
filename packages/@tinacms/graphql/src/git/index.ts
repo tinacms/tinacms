@@ -55,7 +55,7 @@ export const run = async () => {
   //     // fs,
   //     gitdir,
   //     ref: 'main',
-  //     filepaths: ['packages/@tinacms/graphql/src/primitives/spec/page-builder'],
+  //     filepaths: ['packages/@tinacms/graphql/src/spec/page-builder'],
   //     force: true,
   //     noUpdateHead: true,
   //     dir,

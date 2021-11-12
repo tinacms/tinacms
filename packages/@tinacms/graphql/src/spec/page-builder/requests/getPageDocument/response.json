@@ -5,9 +5,9 @@
       "data": {
         "title": "Welcome",
         "seo": {
-          "ogDescription": "You're gonna love this site!",
+          "seoTitle": "Welcome to our website",
           "ogImage": "http://placehold.it/300x200",
-          "seoTitle": "Welcome to our website"
+          "ogDescription": "You're gonna love this site!"
         },
         "blocks": [
           {
@@ -17,8 +17,8 @@
           },
           {
             "__typename": "PageBlocksCta",
-            "ctaStyle": "minimal",
-            "ctaText": "Join Us"
+            "ctaText": "Join Us",
+            "ctaStyle": "minimal"
           }
         ]
       }

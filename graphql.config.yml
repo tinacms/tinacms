@@ -1,0 +1,25 @@
+# The need to put paths like "packages/**/*.movies.gql" is due to a bug
+# in VSCode GraphQL, but this works well enough
+# https://github.com/graphql/vscode-graphql/issues/242#issue-721757152
+
+projects:
+  forestry:
+    schema: packages/@tinacms/graphql/src/spec/forestry-sample/.tina/__generated__/schema.gql
+    documents:
+      - packages/**/*.forestry.gql
+  movies:
+    schema: packages/@tinacms/graphql/src/spec/movies/.tina/__generated__/schema.gql
+    documents:
+      - packages/**/*.movies.gql
+  moviesWithDatalayer:
+    schema: packages/@tinacms/graphql/src/spec/movies-with-datalayer/.tina/__generated__/schema.gql
+    documents:
+      - packages/**/*.movies-with-datalayer.gql
+  pageBuilder:
+    schema: packages/@tinacms/graphql/src/spec/page-builder/.tina/__generated__/schema.gql
+    documents:
+      - packages/**/*.page-builder.gql
+  withMdx:
+    schema: packages/@tinacms/graphql/src/spec/with-mdx/.tina/__generated__/schema.gql
+    documents:
+      - packages/**/*.with-mdx.gql

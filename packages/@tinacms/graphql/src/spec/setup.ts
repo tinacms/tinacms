@@ -22,7 +22,7 @@ import type { TinaCloudSchema } from '../types'
 import { createDatabase } from '../database'
 import { Database } from '../database'
 import type { Store } from '../database/store'
-import { FilesystemBridge } from '..'
+import { FilesystemBridge } from '../index2'
 
 export const setup = async (
   rootPath: string,
@@ -79,7 +79,7 @@ export type Fixture =
       expectError?: boolean
     }
 
-export const setupFixture2 = async (
+export const setupFixture = async (
   rootPath: string,
   schema: TinaCloudSchema<false>,
   store: Store,

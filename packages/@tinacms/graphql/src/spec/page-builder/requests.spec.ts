@@ -12,38 +12,34 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setupFixture2, print, Fixture } from '../setup'
-import { LevelStore } from '../../database/store/level'
+import { setupFixture, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
+import { FilesystemStore } from '../../index2'
 const rootPath = path.join(__dirname, '/')
-const store = new LevelStore(rootPath)
+const store = new FilesystemStore({ rootPath })
+const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
 
 const fixtures: Fixture[] = [
   {
-    name: 'getPostDocumentAdvanced',
-    assert: 'output',
-  },
-  {
-    name: 'updatePostDocumentAdvanced',
-    assert: 'file',
-    filename: 'content/posts/hello-world-advanced.md',
-  },
-  {
-    name: 'kitchenSink',
+    name: 'getPageDocument',
     assert: 'output',
   },
 ]
 
-describe('A schema that uses MDX', () => {
+describe('A schema with templates in collections and no indexing', () => {
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
-      const { response, expectedResponsePath } = await setupFixture2(
+      const { response, expectedResponsePath } = await setupFixture(
         rootPath,
         tinaSchema,
         store,
         fixture,
-        'with-mdx'
+        'page-builder'
       )
+
+      if (fixture.expectError) {
+        expect(consoleErrMock).toHaveBeenCalled()
+      }
 
       expect(response).toMatchFile(expectedResponsePath)
     })

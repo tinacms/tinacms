@@ -26,7 +26,6 @@ import path from 'path'
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
 import { Database } from './database'
-import { run } from '../git'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
 export const indexDB = async ({
@@ -47,7 +46,6 @@ export const indexDB = async ({
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   // @ts-ignore
   await database.indexData({ experimentalData, graphQLSchema, tinaSchema })
-  await run()
 
   await _buildFragments(builder, tinaSchema)
   await _buildQueries(builder, tinaSchema)

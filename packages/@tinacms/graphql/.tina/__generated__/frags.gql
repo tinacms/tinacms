@@ -1,22 +1,22 @@
-fragment MovieParts on Movie {
+fragment AuthorParts on Author {
+  name
+  socialMedia {
+    __typename
+    platform
+    handle
+  }
+}
+
+fragment PostParts on Post {
   title
-  releaseDate
-  rating
-  archived
-  genre
-  director {
+  author {
     ... on Document {
       id
     }
   }
-  body
-}
-
-fragment DirectorParts on Director {
-  name
-}
-
-fragment ActorParts on Actor {
-  name
+  someField {
+    __typename
+    title
+  }
   body
 }
