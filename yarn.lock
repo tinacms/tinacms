@@ -4498,7 +4498,6 @@ __metadata:
     graphql: ^15.3.0
     graphql-type-json: ^0.3.2
     gray-matter: ^4.0.2
-    isomorphic-git: ^1.10.1
     jest: 27.0.6
     jest-diff: 27.0.6
     jest-file-snapshot: ^0.5.0
@@ -8203,13 +8202,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"async-lock@npm:^1.1.0":
-  version: 1.3.0
-  resolution: "async-lock@npm:1.3.0"
-  checksum: 22dd2901d904c22d587c217ed116e6b91027ad9a47a362396608ef8ec1122d2570c4f82f030a775374869ffa6df4a5739e15687ad1be8150e7ef173474f557e3
-  languageName: node
-  linkType: hard
-
 "async-retry@npm:1.2.3":
   version: 1.2.3
   resolution: "async-retry@npm:1.2.3"
@@ -10204,13 +10196,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"clean-git-ref@npm:^2.0.1":
-  version: 2.0.1
-  resolution: "clean-git-ref@npm:2.0.1"
-  checksum: 12ab3c05f9194e3656d31dca8884b9383b360dbf1de8aae15476665c8165a475a1072c1e783bd0acb46c71d94ada068d83945da322816562b8d23c645aa74474
-  languageName: node
-  linkType: hard
-
 "clean-stack@npm:^2.0.0":
   version: 2.2.0
   resolution: "clean-stack@npm:2.2.0"
@@ -10895,18 +10880,6 @@ __metadata:
     path-type: ^4.0.0
     yaml: ^1.10.0
   checksum: 796261c250559339589455c1522bfa284b5bf8203ced7e3c5b0060bd5b27cad86418214d8d86d59c8c9af81e526f27965a6bd725cb12021f1835d9b347727272
-  languageName: node
-  linkType: hard
-
-"crc-32@npm:^1.2.0":
-  version: 1.2.0
-  resolution: "crc-32@npm:1.2.0"
-  dependencies:
-    exit-on-epipe: ~1.0.1
-    printj: ~1.1.0
-  bin:
-    crc32: ./bin/crc32.njs
-  checksum: 5a283cacfce357fec1f4fefce7c2293887b49acad3034c2a35928522e6c8a85504ed51f211681400faf390081b619dfa8e1878458517921cdcf736c48d0555d9
   languageName: node
   linkType: hard
 
@@ -12019,13 +11992,6 @@ __metadata:
   version: 27.0.6
   resolution: "diff-sequences@npm:27.0.6"
   checksum: c2a10ecdf2d66a319e3f18f2d0b9cab6282631084c84825bdf65152743d515b6ea07ce2920b6fe7a1a5c6b9148708b23d53178d1f215b8f6d195dc44d1ed770f
-  languageName: node
-  linkType: hard
-
-"diff3@npm:0.0.3":
-  version: 0.0.3
-  resolution: "diff3@npm:0.0.3"
-  checksum: 9a86c0e3ca3cd92e939e3aa6a92b1efa0e1e2b5992fe360e0b8405f717d9fd9e69f43a507b5094ebcce17949ecb90c32586d0cd8b15e6ca6801fe913a1764cf5
   languageName: node
   linkType: hard
 
@@ -13193,13 +13159,6 @@ __metadata:
     signal-exit: ^3.0.3
     strip-final-newline: ^2.0.0
   checksum: 4286ade8cdb267bfb982bddbf894a58df29ff4f3bb871252a4832c4608e485dd71e5a8bbfde9f95d7db4af864f5de1aa6a1780017217bd946a16409b8e022987
-  languageName: node
-  linkType: hard
-
-"exit-on-epipe@npm:~1.0.1":
-  version: 1.0.1
-  resolution: "exit-on-epipe@npm:1.0.1"
-  checksum: 24b604747458c0c9b719934d2af91bc78dc381e9296b8ee3887dd68e8f35500090b453335e9f0b392c0295562da1873c05dcbc77d29e6eea75a32bbef19adf53
   languageName: node
   linkType: hard
 
@@ -16404,27 +16363,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"isomorphic-git@npm:^1.10.1":
-  version: 1.10.1
-  resolution: "isomorphic-git@npm:1.10.1"
-  dependencies:
-    async-lock: ^1.1.0
-    clean-git-ref: ^2.0.1
-    crc-32: ^1.2.0
-    diff3: 0.0.3
-    ignore: ^5.1.4
-    minimisted: ^2.0.0
-    pako: ^1.0.10
-    pify: ^4.0.1
-    readable-stream: ^3.4.0
-    sha.js: ^2.4.9
-    simple-get: ^3.0.2
-  bin:
-    isogit: cli.cjs
-  checksum: 8eff0fa60ecf2677e83dcb676ba8990016badbc828811e1c6768155c13dfa47ca712d37377dfba1a996cbd0f5e25db4757d81ff802e0a3c8f607e2c317e1ce43
-  languageName: node
-  linkType: hard
-
 "isomorphic-unfetch@npm:^3.0.0":
   version: 3.1.0
   resolution: "isomorphic-unfetch@npm:3.1.0"
@@ -19401,15 +19339,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"minimisted@npm:^2.0.0":
-  version: 2.0.1
-  resolution: "minimisted@npm:2.0.1"
-  dependencies:
-    minimist: ^1.2.5
-  checksum: 95c95b9e8590997d5ecca6fcdf6cee76ccb55029d60a95aa2450b22e20bef9ed381ae1e60aa67ced72d1f0e69a7f3caff45b9bb91422dc1bd32385c55e1445aa
-  languageName: node
-  linkType: hard
-
 "minipass-collect@npm:^1.0.2":
   version: 1.0.2
   resolution: "minipass-collect@npm:1.0.2"
@@ -20939,7 +20868,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"pako@npm:^1.0.10, pako@npm:~1.0.5":
+"pako@npm:~1.0.5":
   version: 1.0.11
   resolution: "pako@npm:1.0.11"
   checksum: 71c60150b68220ec52a404f3c39a4ed38f750e42452b88fe0eb2e6b5c98e91f73f706444359b097aca1e6db83ef8fef50b5a9ec100e30a606cda6da8d45e5439
@@ -22118,15 +22047,6 @@ fsevents@~2.1.2:
   bin:
     prettyjson: ./bin/prettyjson
   checksum: ae6014aaecf799a48e9ff5c82dd954233392d0ba6b13881bc9d5766839a88cc95aef4316bed3c5d7e2d2340b15637e5174a917eec99f4824128bf5349699a1ea
-  languageName: node
-  linkType: hard
-
-"printj@npm:~1.1.0":
-  version: 1.1.2
-  resolution: "printj@npm:1.1.2"
-  bin:
-    printj: ./bin/printj.njs
-  checksum: ee774aa5957a57474f078fca1e9a41a10aac35e9b1ce9b2e2ecdb832f58fd21b1601075441dca633f582c881cca6c60308bf8505e6ab06305181be241bd47241
   languageName: node
   linkType: hard
 
@@ -25031,7 +24951,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"sha.js@npm:^2.4.0, sha.js@npm:^2.4.8, sha.js@npm:^2.4.9":
+"sha.js@npm:^2.4.0, sha.js@npm:^2.4.8":
   version: 2.4.11
   resolution: "sha.js@npm:2.4.11"
   dependencies:
@@ -25181,7 +25101,7 @@ resolve@^2.0.0-next.3:
   languageName: node
   linkType: hard
 
-"simple-get@npm:^3.0.2, simple-get@npm:^3.0.3":
+"simple-get@npm:^3.0.3":
   version: 3.1.0
   resolution: "simple-get@npm:3.1.0"
   dependencies:
