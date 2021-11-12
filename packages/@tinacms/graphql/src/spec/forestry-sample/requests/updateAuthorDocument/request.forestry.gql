@@ -4,7 +4,7 @@ mutation {
     params: {
       author: {
         name: "Homer Jay Simpson"
-        socialMedia: { handle: "homerJay", platform: "instagram" }
+        socialMedia: [{ handle: "homerJay", platform: "instagram" }]
       }
     }
   ) {
