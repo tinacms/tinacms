@@ -89,7 +89,7 @@ type Movie {
   archived: Boolean
   genre: String
   director: MovieDirectorDocument
-  body: String
+  body: JSON
 }
 
 type MovieDocument implements Node & Document {
@@ -186,7 +186,7 @@ input MovieMutation {
   archived: Boolean
   genre: String
   director: String
-  body: String
+  body: JSON
 }
 
 input DirectorMutation {

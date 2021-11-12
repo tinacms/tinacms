@@ -11,9 +11,9 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { TinaCloudSchema } from '../../../types'
+import { TinaCloudSchema } from '../../..'
 
-const tinaSchema: TinaCloudSchema<false> = {
+const tinaSchema: TinaCloudSchema = {
   collections: [
     {
       label: 'Author',

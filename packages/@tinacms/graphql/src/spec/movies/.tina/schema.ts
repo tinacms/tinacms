@@ -12,6 +12,7 @@ limitations under the License.
 */
 
 import { TinaCloudSchema } from '../../../types'
+import { richBody } from './body'
 
 const tinaSchema: TinaCloudSchema<false> = {
   collections: [
@@ -52,19 +53,7 @@ const tinaSchema: TinaCloudSchema<false> = {
           name: 'director',
           collections: ['director'],
         },
-        // {
-        //   type: 'reference',
-        //   label: 'Actors',
-        //   name: 'actors',
-        //   list: true,
-        //   collections: ['actor'],
-        // },
-        {
-          name: 'body',
-          label: 'Body',
-          type: 'string',
-          isBody: true,
-        },
+        richBody,
       ],
     },
     {

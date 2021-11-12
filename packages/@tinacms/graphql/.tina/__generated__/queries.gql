@@ -1,5 +1,5 @@
-query getAuthorDocument($relativePath: String!) {
-  getAuthorDocument(relativePath: $relativePath) {
+query getMovieDocument($relativePath: String!) {
+  getMovieDocument(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -10,13 +10,13 @@ query getAuthorDocument($relativePath: String!) {
     }
     id
     data {
-      ...AuthorParts
+      ...MovieParts
     }
   }
 }
 
-query getAuthorList {
-  getAuthorList {
+query getMovieList {
+  getMovieList {
     totalCount
     edges {
       node {
@@ -30,15 +30,15 @@ query getAuthorList {
           extension
         }
         data {
-          ...AuthorParts
+          ...MovieParts
         }
       }
     }
   }
 }
 
-query getPostDocument($relativePath: String!) {
-  getPostDocument(relativePath: $relativePath) {
+query getDirectorDocument($relativePath: String!) {
+  getDirectorDocument(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -49,13 +49,13 @@ query getPostDocument($relativePath: String!) {
     }
     id
     data {
-      ...PostParts
+      ...DirectorParts
     }
   }
 }
 
-query getPostList {
-  getPostList {
+query getDirectorList {
+  getDirectorList {
     totalCount
     edges {
       node {
@@ -69,7 +69,46 @@ query getPostList {
           extension
         }
         data {
-          ...PostParts
+          ...DirectorParts
+        }
+      }
+    }
+  }
+}
+
+query getActorDocument($relativePath: String!) {
+  getActorDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    data {
+      ...ActorParts
+    }
+  }
+}
+
+query getActorList {
+  getActorList {
+    totalCount
+    edges {
+      node {
+        id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        data {
+          ...ActorParts
         }
       }
     }
