@@ -16,7 +16,6 @@ import { setupFixture, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
 import { FilesystemStore } from '../../database/store/filesystem'
 const rootPath = path.join(__dirname, '/')
-const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
 const store = new FilesystemStore({ rootPath })
 
 const fixtures: Fixture[] = [
@@ -33,6 +32,12 @@ const fixtures: Fixture[] = [
     assert: 'output',
   },
   {
+    name: 'getMovieList',
+    description: 'Trying to filter',
+    assert: 'output',
+    expectError: true,
+  },
+  {
     name: 'getDirectorDocument',
     assert: 'output',
   },
@@ -44,13 +49,15 @@ const fixtures: Fixture[] = [
     name: 'getCollection',
     assert: 'output',
   },
-  {
-    name: 'getMovieList',
-    description: 'Trying to filter',
-    assert: 'output',
-    expectError: true,
-  },
 ]
+
+let consoleErrMock
+beforeEach(() => {
+  consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
+})
+afterEach(() => {
+  consoleErrMock.mockRestore()
+})
 
 describe('A schema without indexing', () => {
   fixtures.forEach((fixture) => {
@@ -65,6 +72,8 @@ describe('A schema without indexing', () => {
 
       if (fixture.expectError) {
         expect(consoleErrMock).toHaveBeenCalled()
+      } else {
+        expect(consoleErrMock).not.toHaveBeenCalled()
       }
 
       expect(response).toMatchFile(expectedResponsePath)

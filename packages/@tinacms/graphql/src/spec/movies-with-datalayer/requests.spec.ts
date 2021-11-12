@@ -17,19 +17,12 @@ import { LevelStore } from '../../database/store/level'
 import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
 const store = new LevelStore(rootPath)
-const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
 
 const fixtures: Fixture[] = [
   {
     description: 'Adding a document',
     name: 'addPendingDocument',
     assert: 'output',
-  },
-  {
-    description: 'Adding a document that already exists',
-    name: 'addPendingDocument-existing',
-    assert: 'output',
-    expectError: true,
   },
   {
     description: 'Updating a document',
@@ -68,10 +61,25 @@ const fixtures: Fixture[] = [
     assert: 'output',
   },
   {
+    description: 'Adding a document that already exists',
+    name: 'addPendingDocument-existing',
+    assert: 'output',
+    expectError: true,
+  },
+  {
     name: 'getCollection',
     assert: 'output',
   },
 ]
+
+let consoleErrMock
+beforeEach(() => {
+  consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
+})
+
+afterEach(() => {
+  consoleErrMock.mockRestore()
+})
 
 describe('A schema with indexing', () => {
   fixtures.forEach((fixture) => {
@@ -86,6 +94,8 @@ describe('A schema with indexing', () => {
 
       if (fixture.expectError) {
         expect(consoleErrMock).toHaveBeenCalled()
+      } else {
+        expect(consoleErrMock).not.toHaveBeenCalled()
       }
 
       expect(response).toMatchFile(expectedResponsePath)

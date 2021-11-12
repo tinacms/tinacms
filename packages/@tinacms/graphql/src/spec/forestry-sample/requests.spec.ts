@@ -18,12 +18,16 @@ import { tinaSchema } from './.tina/schema'
 import { MemoryNoIndexStore } from '../../database/store/memory-no-index'
 const rootPath = path.join(__dirname, '/')
 const store = new MemoryNoIndexStore(rootPath)
-const consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
 
 const fixtures: Fixture[] = [
   {
     name: 'getAuthorDocument',
     assert: 'output',
+  },
+  {
+    name: 'updatePostDocument-that-doesnt-exist',
+    assert: 'output',
+    expectError: true,
   },
   {
     name: 'getPostDocument',
@@ -39,10 +43,23 @@ const fixtures: Fixture[] = [
     assert: 'file',
     filename: 'content/posts/hello-world.md',
   },
+  {
+    name: 'updatePageDocument',
+    assert: 'file',
+    filename: 'content/pages/home.md',
+  },
 ]
 
 beforeEach(async () => {
   await store.clear()
+})
+
+let consoleErrMock
+beforeEach(() => {
+  consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
+})
+afterEach(() => {
+  consoleErrMock.mockRestore()
 })
 
 describe('A schema with templates in collections and no indexing', () => {
@@ -58,6 +75,8 @@ describe('A schema with templates in collections and no indexing', () => {
 
       if (fixture.expectError) {
         expect(consoleErrMock).toHaveBeenCalled()
+      } else {
+        expect(consoleErrMock).not.toHaveBeenCalled()
       }
 
       expect(response).toMatchFile(expectedResponsePath)

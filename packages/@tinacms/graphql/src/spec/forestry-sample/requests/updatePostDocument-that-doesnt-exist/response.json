@@ -1,0 +1,17 @@
+{
+  "errors": [
+    {
+      "message": "Unable to update document, content/posts/hello-there.md does not exist",
+      "locations": [
+        {
+          "line": 2,
+          "column": 3
+        }
+      ],
+      "path": [
+        "updatePostDocument"
+      ]
+    }
+  ],
+  "data": null
+}
