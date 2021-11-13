@@ -25,19 +25,18 @@ export class LevelStore implements Store {
       valueEncoding: 'json',
     })
     this.db = db
-    // this.print()
   }
   public async query(queryStrings: string[], hydrator) {
     const resultSets = await sequential(queryStrings, async (queryString) => {
       let strings: string[] = []
       const p = new Promise((resolve, reject) => {
         this.db
-          .createValueStream({
+          .createReadStream({
             gte: queryString,
             lte: queryString + '\xFF', // stop at the last key with the prefix
           })
           .on('data', (data) => {
-            strings = data
+            strings = [...strings, ...data.value]
           })
           .on('error', (message) => {
             reject(message)
@@ -61,9 +60,15 @@ export class LevelStore implements Store {
   public async seed(filepath: string, data: object) {
     await this.put(filepath, data)
   }
+  public supportsSeeding() {
+    return false
+  }
   public supportsIndexing() {
     return true
   }
+  // public async delete(filepath: string) {
+  //   await this.db.del(filepath)
+  // }
   public async print() {
     this.db
       .createReadStream()

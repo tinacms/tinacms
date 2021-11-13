@@ -26,6 +26,7 @@
         {
           "name": "rating",
           "label": "Rating",
+          "required": true,
           "type": "number",
           "namespace": [
             "movie",

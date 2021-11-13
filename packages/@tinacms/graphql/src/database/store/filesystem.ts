@@ -41,6 +41,9 @@ export class FilesystemStore implements Store {
     )
   }
 
+  public supportsSeeding() {
+    return false
+  }
   public supportsIndexing() {
     return false
   }

@@ -33,6 +33,7 @@ const tinaSchema: TinaCloudSchema<false> = {
         {
           name: 'rating',
           label: 'Rating',
+          required: true,
           type: 'number',
         },
         {

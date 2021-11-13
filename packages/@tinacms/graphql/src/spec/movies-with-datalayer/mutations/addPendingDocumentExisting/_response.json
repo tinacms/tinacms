@@ -1,7 +1,7 @@
 {
   "errors": [
     {
-      "message": "Unable to update document, content/posts/hello-there.md does not exist",
+      "message": "Unable to add document, content/movies/star-wars.md already exists",
       "locations": [
         {
           "line": 2,
@@ -9,7 +9,7 @@
         }
       ],
       "path": [
-        "updatePostDocument"
+        "addPendingDocument"
       ]
     }
   ],

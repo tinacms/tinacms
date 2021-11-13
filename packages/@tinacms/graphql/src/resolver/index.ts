@@ -302,7 +302,7 @@ export class Resolver {
 
       switch (templateInfo.type) {
         case 'object':
-          await this.database.put(realPath, {})
+          await this.database.addPendingDocument(realPath, {})
           break
         case 'union':
           // @ts-ignore
@@ -328,7 +328,7 @@ export class Resolver {
                 .join(' ')}`
             )
           }
-          await this.database.put(realPath, {
+          await this.database.addPendingDocument(realPath, {
             _template: lastItem(template.namespace),
           })
       }

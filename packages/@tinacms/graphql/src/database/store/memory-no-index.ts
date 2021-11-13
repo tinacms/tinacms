@@ -44,6 +44,9 @@ export class MemoryNoIndexStore implements Store {
   public async seed(filepath: string, data: object) {
     await this.put(filepath, data)
   }
+  public supportsSeeding() {
+    return false
+  }
   public supportsIndexing() {
     // Technically this is not an indexable store, but we need
     // to get the data in here during the setup. May need a separate

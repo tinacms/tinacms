@@ -47,6 +47,9 @@ export class GithubStore implements Store {
   public async query(queryStrings: string[]): Promise<object[]> {
     throw new Error(`Unable to perform query for GithubStore`)
   }
+  public supportsSeeding() {
+    return false
+  }
   public async seed() {
     throw new Error(`Seeding data is not possible for Github data store`)
   }

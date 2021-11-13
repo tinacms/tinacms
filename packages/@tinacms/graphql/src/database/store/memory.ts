@@ -13,6 +13,7 @@ limitations under the License.
 
 import type { Store } from './index'
 import fs from 'fs-extra'
+import path from 'path'
 import { sequential } from '../../util'
 
 /**
@@ -53,12 +54,15 @@ export class MemoryStore implements Store {
   public async seed(filepath: string, data: object) {
     await this.put(filepath, data)
   }
+  public supportsSeeding() {
+    return true
+  }
   public supportsIndexing() {
     return true
   }
   public async print() {
     await fs.outputFile(
-      '.tina/__generated__/map.json',
+      path.join(this.rootPath, '.tina/__generated__/map.json'),
       JSON.stringify(this.map, null, 2)
     )
   }

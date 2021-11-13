@@ -12,12 +12,26 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setupFixture, print, Fixture } from '../setup'
+import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
 // import { FilesystemStore } from '../../database/store/filesystem'
-import { MemoryNoIndexStore } from '../../database/store/memory-no-index'
+import { MemoryStore } from '../../database/store/memory'
 const rootPath = path.join(__dirname, '/')
-const store = new MemoryNoIndexStore(rootPath)
+
+class FilesystemStoreTest extends MemoryStore {
+  public supportsSeeding() {
+    return false
+  }
+  public supportsIndexing() {
+    // Technically this is not an indexable store, but we need
+    // to get the data in here during the setup. May need a separate
+    // concept to indicate that this store shouldn't hold index info
+    // but does need data from the "bridge" to get started.
+    return true
+  }
+}
+
+const store = new FilesystemStoreTest(rootPath)
 
 const fixtures: Fixture[] = [
   {
@@ -25,28 +39,26 @@ const fixtures: Fixture[] = [
     assert: 'output',
   },
   {
-    name: 'updatePostDocument-that-doesnt-exist',
+    name: 'getPageDocument',
     assert: 'output',
-    expectError: true,
   },
   {
     name: 'getPostDocument',
     assert: 'output',
   },
+]
+const mutationFixtures: Fixture[] = [
   {
-    name: 'updateAuthorDocument',
+    name: 'addPendingDocument',
+    description: 'Adding a document',
     assert: 'file',
-    filename: 'content/authors/homer.md',
+    filename: 'content/posts/my-post.md',
   },
   {
-    name: 'updatePostDocument',
-    assert: 'file',
-    filename: 'content/posts/hello-world.md',
-  },
-  {
-    name: 'updatePageDocument',
-    assert: 'file',
-    filename: 'content/pages/home.md',
+    name: 'addPendingDocumentWithoutTemplate',
+    description: 'Adding a document without the template param',
+    assert: 'output',
+    expectError: true,
   },
 ]
 
@@ -65,7 +77,7 @@ afterEach(() => {
 describe('A schema with templates in collections and no indexing', () => {
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
-      const { response, expectedResponsePath } = await setupFixture(
+      const { responses, expectedResponsePaths } = await setupFixture(
         rootPath,
         tinaSchema,
         store,
@@ -79,7 +91,35 @@ describe('A schema with templates in collections and no indexing', () => {
         expect(consoleErrMock).not.toHaveBeenCalled()
       }
 
-      expect(response).toMatchFile(expectedResponsePath)
+      responses.forEach((expResponse, index) => {
+        const expectedResponsePath2 = expectedResponsePaths[index]
+        expect(expResponse).toMatchFile(expectedResponsePath2)
+      })
+    })
+  })
+
+  mutationFixtures.forEach((fixture) => {
+    it(print(fixture), async () => {
+      const { responses, expectedResponsePaths } = await setupFixture2(
+        rootPath,
+        tinaSchema,
+        store,
+        fixture,
+        'forestry',
+        '_mutation',
+        'mutations'
+      )
+
+      if (fixture.expectError) {
+        expect(consoleErrMock).toHaveBeenCalled()
+      } else {
+        expect(consoleErrMock).not.toHaveBeenCalled()
+      }
+
+      responses.forEach((expResponse, index) => {
+        const expectedResponsePath2 = expectedResponsePaths[index]
+        expect(expResponse).toMatchFile(expectedResponsePath2)
+      })
     })
   })
 })

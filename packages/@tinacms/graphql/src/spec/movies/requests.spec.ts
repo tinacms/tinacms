@@ -62,7 +62,7 @@ afterEach(() => {
 describe('A schema without indexing', () => {
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
-      const { response, expectedResponsePath } = await setupFixture(
+      const { responses, expectedResponsePaths } = await setupFixture(
         rootPath,
         tinaSchema,
         store,
@@ -76,7 +76,10 @@ describe('A schema without indexing', () => {
         expect(consoleErrMock).not.toHaveBeenCalled()
       }
 
-      expect(response).toMatchFile(expectedResponsePath)
+      responses.forEach((expResponse, index) => {
+        const expectedResponsePath2 = expectedResponsePaths[index]
+        expect(expResponse).toMatchFile(expectedResponsePath2)
+      })
     })
   })
 })

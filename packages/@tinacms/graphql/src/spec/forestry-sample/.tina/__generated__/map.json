@@ -692,7 +692,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "getMovieDocument"
+              "value": "getAuthorDocument"
             },
             "arguments": [
               {
@@ -716,7 +716,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "MovieDocument"
+                  "value": "AuthorDocument"
                 }
               }
             }
@@ -725,7 +725,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "getMovieList"
+              "value": "getAuthorList"
             },
             "arguments": [
               {
@@ -794,7 +794,7 @@
                   "kind": "NamedType",
                   "name": {
                     "kind": "Name",
-                    "value": "MovieFilter"
+                    "value": "AuthorFilter"
                   }
                 }
               }
@@ -805,7 +805,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "MovieConnection"
+                  "value": "AuthorConnection"
                 }
               }
             }
@@ -814,7 +814,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "getDirectorDocument"
+              "value": "getPostDocument"
             },
             "arguments": [
               {
@@ -838,7 +838,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "DirectorDocument"
+                  "value": "PostDocument"
                 }
               }
             }
@@ -847,7 +847,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "getDirectorList"
+              "value": "getPostList"
             },
             "arguments": [
               {
@@ -916,7 +916,7 @@
                   "kind": "NamedType",
                   "name": {
                     "kind": "Name",
-                    "value": "DirectorFilter"
+                    "value": "PostFilter"
                   }
                 }
               }
@@ -927,7 +927,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "DirectorConnection"
+                  "value": "PostConnection"
                 }
               }
             }
@@ -936,7 +936,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "getActorDocument"
+              "value": "getPageDocument"
             },
             "arguments": [
               {
@@ -960,7 +960,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "ActorDocument"
+                  "value": "PageDocument"
                 }
               }
             }
@@ -969,7 +969,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "getActorList"
+              "value": "getPageList"
             },
             "arguments": [
               {
@@ -1038,7 +1038,7 @@
                   "kind": "NamedType",
                   "name": {
                     "kind": "Name",
-                    "value": "ActorFilter"
+                    "value": "PageFilter"
                   }
                 }
               }
@@ -1049,7 +1049,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "ActorConnection"
+                  "value": "PageConnection"
                 }
               }
             }
@@ -1111,20 +1111,20 @@
         "kind": "InputObjectTypeDefinition",
         "name": {
           "kind": "Name",
-          "value": "DatetimeFilter"
+          "value": "AuthorAuthorSocialMediaFilter"
         },
         "fields": [
           {
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "after"
+              "value": "platform"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "String"
+                "value": "StringFilter"
               }
             }
           },
@@ -1132,188 +1132,7 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "before"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "eq"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "exists"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Boolean"
-              }
-            }
-          }
-        ]
-      },
-      {
-        "kind": "InputObjectTypeDefinition",
-        "name": {
-          "kind": "Name",
-          "value": "NumberFilter"
-        },
-        "fields": [
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "lt"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Int"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "lte"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Int"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "gte"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Int"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "gt"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Int"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "eq"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Int"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "exists"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Boolean"
-              }
-            }
-          }
-        ]
-      },
-      {
-        "kind": "InputObjectTypeDefinition",
-        "name": {
-          "kind": "Name",
-          "value": "BooleanFilter"
-        },
-        "fields": [
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "eq"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Boolean"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "exists"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Boolean"
-              }
-            }
-          }
-        ]
-      },
-      {
-        "kind": "InputObjectTypeDefinition",
-        "name": {
-          "kind": "Name",
-          "value": "DirectorFilter"
-        },
-        "fields": [
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "name"
+              "value": "handle"
             },
             "type": {
               "kind": "NamedType",
@@ -1329,20 +1148,34 @@
         "kind": "InputObjectTypeDefinition",
         "name": {
           "kind": "Name",
-          "value": "MovieDirectorFilter"
+          "value": "AuthorAuthorFilter"
         },
         "fields": [
           {
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "director"
+              "value": "name"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "DirectorFilter"
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "socialMedia"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorAuthorSocialMediaFilter"
               }
             }
           }
@@ -1352,7 +1185,53 @@
         "kind": "InputObjectTypeDefinition",
         "name": {
           "kind": "Name",
-          "value": "MovieFilter"
+          "value": "AuthorFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorAuthorFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PostPostAuthorFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PostPostFilter"
         },
         "fields": [
           {
@@ -1373,49 +1252,7 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "releaseDate"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "DatetimeFilter"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "rating"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "NumberFilter"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "archived"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "BooleanFilter"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "genre"
+              "value": "body"
             },
             "type": {
               "kind": "NamedType",
@@ -1429,13 +1266,59 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "director"
+              "value": "author"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "MovieDirectorFilter"
+                "value": "PostPostAuthorFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PostFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "post"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PostPostFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "ImageFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "startsWith"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
               }
             }
           },
@@ -1443,7 +1326,72 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "body"
+              "value": "eq"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "exists"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "Boolean"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageSeoFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "seoTitle"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ogImage"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "ImageFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ogDescription"
             },
             "type": {
               "kind": "NamedType",
@@ -1459,14 +1407,14 @@
         "kind": "InputObjectTypeDefinition",
         "name": {
           "kind": "Name",
-          "value": "ActorFilter"
+          "value": "PageBlocksHeroFilter"
         },
         "fields": [
           {
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "name"
+              "value": "description"
             },
             "type": {
               "kind": "NamedType",
@@ -1480,13 +1428,138 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "body"
+              "value": "backgroundImage"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "ImageFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageBlocksCtaFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ctaText"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
                 "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ctaStyle"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageBlocksFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "hero"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageBlocksHeroFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "cta"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageBlocksCtaFilter"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageFilter"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "title"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "StringFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "seo"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageSeoFilter"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "blocks"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageBlocksFilter"
               }
             }
           }
@@ -1503,13 +1576,13 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "movie"
+              "value": "author"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "MovieFilter"
+                "value": "AuthorFilter"
               }
             }
           },
@@ -1517,13 +1590,13 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "director"
+              "value": "post"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "DirectorFilter"
+                "value": "PostFilter"
               }
             }
           },
@@ -1531,13 +1604,13 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "actor"
+              "value": "page"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "ActorFilter"
+                "value": "PageFilter"
               }
             }
           }
@@ -1904,38 +1977,21 @@
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "MovieDocument"
+              "value": "AuthorDocument"
             }
           },
           {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "DirectorDocument"
+              "value": "PostDocument"
             }
           },
           {
             "kind": "NamedType",
             "name": {
               "kind": "Name",
-              "value": "ActorDocument"
-            }
-          }
-        ]
-      },
-      {
-        "kind": "UnionTypeDefinition",
-        "name": {
-          "kind": "Name",
-          "value": "MovieDirectorDocument"
-        },
-        "directives": [],
-        "types": [
-          {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "DirectorDocument"
+              "value": "PageDocument"
             }
           }
         ]
@@ -1946,7 +2002,371 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "Movie"
+          "value": "AuthorAuthorSocialMedia"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "platform"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "handle"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "AuthorAuthor"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "name"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "socialMedia"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "ListType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "AuthorAuthorSocialMedia"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "UnionTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "Author"
+        },
+        "directives": [],
+        "types": [
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "AuthorAuthor"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Node"
+            }
+          },
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Document"
+            }
+          }
+        ],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "AuthorDocument"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "id"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NonNullType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "ID"
+                }
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "sys"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NonNullType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "SystemInfo"
+                }
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "data"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NonNullType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "Author"
+                }
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "form"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NonNullType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "JSON"
+                }
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "values"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NonNullType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "JSON"
+                }
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "dataJSON"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NonNullType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "JSON"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "AuthorConnectionEdges"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "cursor"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "node"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorDocument"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "Connection"
+            }
+          }
+        ],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "AuthorConnection"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "pageInfo"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageInfo"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "totalCount"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NonNullType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "Int"
+                }
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "edges"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "ListType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "AuthorConnectionEdges"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "UnionTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PostPostAuthorDocument"
+        },
+        "directives": [],
+        "types": [
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "AuthorDocument"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "PostPost"
         },
         "fields": [
           {
@@ -1968,81 +2388,6 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "releaseDate"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "rating"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Int"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "archived"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Boolean"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "genre"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "director"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "MovieDirectorDocument"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
               "value": "body"
             },
             "arguments": [],
@@ -2053,6 +2398,38 @@
                 "value": "String"
               }
             }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PostPostAuthorDocument"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "UnionTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "Post"
+        },
+        "directives": [],
+        "types": [
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "PostPost"
+            }
           }
         ]
       },
@@ -2077,7 +2454,7 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "MovieDocument"
+          "value": "PostDocument"
         },
         "fields": [
           {
@@ -2129,7 +2506,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Movie"
+                  "value": "Post"
                 }
               }
             }
@@ -2196,7 +2573,7 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "MovieConnectionEdges"
+          "value": "PostConnectionEdges"
         },
         "fields": [
           {
@@ -2225,7 +2602,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "MovieDocument"
+                "value": "PostDocument"
               }
             }
           }
@@ -2245,7 +2622,7 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "MovieConnection"
+          "value": "PostConnection"
         },
         "fields": [
           {
@@ -2294,7 +2671,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "MovieConnectionEdges"
+                  "value": "PostConnectionEdges"
                 }
               }
             }
@@ -2307,14 +2684,14 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "Director"
+          "value": "PageSeo"
         },
         "fields": [
           {
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "name"
+              "value": "seoTitle"
             },
             "arguments": [],
             "type": {
@@ -2322,6 +2699,201 @@
               "name": {
                 "kind": "Name",
                 "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ogImage"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ogDescription"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "PageBlocksHero"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "description"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "backgroundImage"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "PageBlocksCta"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ctaText"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ctaStyle"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "UnionTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageBlocks"
+        },
+        "directives": [],
+        "types": [
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "PageBlocksHero"
+            }
+          },
+          {
+            "kind": "NamedType",
+            "name": {
+              "kind": "Name",
+              "value": "PageBlocksCta"
+            }
+          }
+        ]
+      },
+      {
+        "kind": "ObjectTypeDefinition",
+        "interfaces": [],
+        "directives": [],
+        "name": {
+          "kind": "Name",
+          "value": "Page"
+        },
+        "fields": [
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "title"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "seo"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageSeo"
+              }
+            }
+          },
+          {
+            "kind": "FieldDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "blocks"
+            },
+            "arguments": [],
+            "type": {
+              "kind": "ListType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "PageBlocks"
+                }
               }
             }
           }
@@ -2348,7 +2920,7 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "DirectorDocument"
+          "value": "PageDocument"
         },
         "fields": [
           {
@@ -2400,7 +2972,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "Director"
+                  "value": "Page"
                 }
               }
             }
@@ -2467,7 +3039,7 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "DirectorConnectionEdges"
+          "value": "PageConnectionEdges"
         },
         "fields": [
           {
@@ -2496,7 +3068,7 @@
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "DirectorDocument"
+                "value": "PageDocument"
               }
             }
           }
@@ -2516,7 +3088,7 @@
         "directives": [],
         "name": {
           "kind": "Name",
-          "value": "DirectorConnection"
+          "value": "PageConnection"
         },
         "fields": [
           {
@@ -2565,293 +3137,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "DirectorConnectionEdges"
-                }
-              }
-            }
-          }
-        ]
-      },
-      {
-        "kind": "ObjectTypeDefinition",
-        "interfaces": [],
-        "directives": [],
-        "name": {
-          "kind": "Name",
-          "value": "Actor"
-        },
-        "fields": [
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "name"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "body"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          }
-        ]
-      },
-      {
-        "kind": "ObjectTypeDefinition",
-        "interfaces": [
-          {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Node"
-            }
-          },
-          {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Document"
-            }
-          }
-        ],
-        "directives": [],
-        "name": {
-          "kind": "Name",
-          "value": "ActorDocument"
-        },
-        "fields": [
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "id"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NonNullType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "ID"
-                }
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "sys"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NonNullType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "SystemInfo"
-                }
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "data"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NonNullType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "Actor"
-                }
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "form"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NonNullType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "JSON"
-                }
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "values"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NonNullType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "JSON"
-                }
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "dataJSON"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NonNullType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "JSON"
-                }
-              }
-            }
-          }
-        ]
-      },
-      {
-        "kind": "ObjectTypeDefinition",
-        "interfaces": [],
-        "directives": [],
-        "name": {
-          "kind": "Name",
-          "value": "ActorConnectionEdges"
-        },
-        "fields": [
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "cursor"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "node"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "ActorDocument"
-              }
-            }
-          }
-        ]
-      },
-      {
-        "kind": "ObjectTypeDefinition",
-        "interfaces": [
-          {
-            "kind": "NamedType",
-            "name": {
-              "kind": "Name",
-              "value": "Connection"
-            }
-          }
-        ],
-        "directives": [],
-        "name": {
-          "kind": "Name",
-          "value": "ActorConnection"
-        },
-        "fields": [
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "pageInfo"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "PageInfo"
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "totalCount"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "NonNullType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "Int"
-                }
-              }
-            }
-          },
-          {
-            "kind": "FieldDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "edges"
-            },
-            "arguments": [],
-            "type": {
-              "kind": "ListType",
-              "type": {
-                "kind": "NamedType",
-                "name": {
-                  "kind": "Name",
-                  "value": "ActorConnectionEdges"
+                  "value": "PageConnectionEdges"
                 }
               }
             }
@@ -3072,7 +3358,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "updateMovieDocument"
+              "value": "updateAuthorDocument"
             },
             "arguments": [
               {
@@ -3104,7 +3390,7 @@
                     "kind": "NamedType",
                     "name": {
                       "kind": "Name",
-                      "value": "MovieMutation"
+                      "value": "AuthorMutation"
                     }
                   }
                 }
@@ -3116,7 +3402,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "MovieDocument"
+                  "value": "AuthorDocument"
                 }
               }
             }
@@ -3125,7 +3411,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "createMovieDocument"
+              "value": "createAuthorDocument"
             },
             "arguments": [
               {
@@ -3157,7 +3443,7 @@
                     "kind": "NamedType",
                     "name": {
                       "kind": "Name",
-                      "value": "MovieMutation"
+                      "value": "AuthorMutation"
                     }
                   }
                 }
@@ -3169,7 +3455,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "MovieDocument"
+                  "value": "AuthorDocument"
                 }
               }
             }
@@ -3178,7 +3464,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "updateDirectorDocument"
+              "value": "updatePostDocument"
             },
             "arguments": [
               {
@@ -3210,7 +3496,7 @@
                     "kind": "NamedType",
                     "name": {
                       "kind": "Name",
-                      "value": "DirectorMutation"
+                      "value": "PostMutation"
                     }
                   }
                 }
@@ -3222,7 +3508,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "DirectorDocument"
+                  "value": "PostDocument"
                 }
               }
             }
@@ -3231,7 +3517,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "createDirectorDocument"
+              "value": "createPostDocument"
             },
             "arguments": [
               {
@@ -3263,7 +3549,7 @@
                     "kind": "NamedType",
                     "name": {
                       "kind": "Name",
-                      "value": "DirectorMutation"
+                      "value": "PostMutation"
                     }
                   }
                 }
@@ -3275,7 +3561,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "DirectorDocument"
+                  "value": "PostDocument"
                 }
               }
             }
@@ -3284,7 +3570,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "updateActorDocument"
+              "value": "updatePageDocument"
             },
             "arguments": [
               {
@@ -3316,7 +3602,7 @@
                     "kind": "NamedType",
                     "name": {
                       "kind": "Name",
-                      "value": "ActorMutation"
+                      "value": "PageMutation"
                     }
                   }
                 }
@@ -3328,7 +3614,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "ActorDocument"
+                  "value": "PageDocument"
                 }
               }
             }
@@ -3337,7 +3623,7 @@
             "kind": "FieldDefinition",
             "name": {
               "kind": "Name",
-              "value": "createActorDocument"
+              "value": "createPageDocument"
             },
             "arguments": [
               {
@@ -3369,7 +3655,7 @@
                     "kind": "NamedType",
                     "name": {
                       "kind": "Name",
-                      "value": "ActorMutation"
+                      "value": "PageMutation"
                     }
                   }
                 }
@@ -3381,7 +3667,7 @@
                 "kind": "NamedType",
                 "name": {
                   "kind": "Name",
-                  "value": "ActorDocument"
+                  "value": "PageDocument"
                 }
               }
             }
@@ -3399,13 +3685,13 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "movie"
+              "value": "author"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "MovieMutation"
+                "value": "AuthorMutation"
               }
             }
           },
@@ -3413,13 +3699,13 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "director"
+              "value": "post"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "DirectorMutation"
+                "value": "PostMutation"
               }
             }
           },
@@ -3427,13 +3713,13 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "actor"
+              "value": "page"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
-                "value": "ActorMutation"
+                "value": "PageMutation"
               }
             }
           }
@@ -3443,7 +3729,107 @@
         "kind": "InputObjectTypeDefinition",
         "name": {
           "kind": "Name",
-          "value": "MovieMutation"
+          "value": "AuthorAuthorSocialMediaMutation"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "platform"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "handle"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "AuthorAuthorMutation"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "name"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "socialMedia"
+            },
+            "type": {
+              "kind": "ListType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "AuthorAuthorSocialMediaMutation"
+                }
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "AuthorMutation"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "author"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "AuthorAuthorMutation"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PostPostMutation"
         },
         "fields": [
           {
@@ -3464,77 +3850,21 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "releaseDate"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "rating"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Int"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "archived"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "Boolean"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "genre"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
-              "value": "director"
-            },
-            "type": {
-              "kind": "NamedType",
-              "name": {
-                "kind": "Name",
-                "value": "String"
-              }
-            }
-          },
-          {
-            "kind": "InputValueDefinition",
-            "name": {
-              "kind": "Name",
               "value": "body"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "author"
             },
             "type": {
               "kind": "NamedType",
@@ -3550,14 +3880,65 @@
         "kind": "InputObjectTypeDefinition",
         "name": {
           "kind": "Name",
-          "value": "DirectorMutation"
+          "value": "PostMutation"
         },
         "fields": [
           {
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "name"
+              "value": "post"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PostPostMutation"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageSeoMutation"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "seoTitle"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ogImage"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ogDescription"
             },
             "type": {
               "kind": "NamedType",
@@ -3573,14 +3954,14 @@
         "kind": "InputObjectTypeDefinition",
         "name": {
           "kind": "Name",
-          "value": "ActorMutation"
+          "value": "PageBlocksHeroMutation"
         },
         "fields": [
           {
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "name"
+              "value": "description"
             },
             "type": {
               "kind": "NamedType",
@@ -3594,13 +3975,141 @@
             "kind": "InputValueDefinition",
             "name": {
               "kind": "Name",
-              "value": "body"
+              "value": "backgroundImage"
             },
             "type": {
               "kind": "NamedType",
               "name": {
                 "kind": "Name",
                 "value": "String"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageBlocksCtaMutation"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ctaText"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "ctaStyle"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageBlocksMutation"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "hero"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageBlocksHeroMutation"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "cta"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageBlocksCtaMutation"
+              }
+            }
+          }
+        ]
+      },
+      {
+        "kind": "InputObjectTypeDefinition",
+        "name": {
+          "kind": "Name",
+          "value": "PageMutation"
+        },
+        "fields": [
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "title"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "String"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "seo"
+            },
+            "type": {
+              "kind": "NamedType",
+              "name": {
+                "kind": "Name",
+                "value": "PageSeoMutation"
+              }
+            }
+          },
+          {
+            "kind": "InputValueDefinition",
+            "name": {
+              "kind": "Name",
+              "value": "blocks"
+            },
+            "type": {
+              "kind": "ListType",
+              "type": {
+                "kind": "NamedType",
+                "name": {
+                  "kind": "Name",
+                  "value": "PageBlocksMutation"
+                }
               }
             }
           }
@@ -3611,214 +4120,348 @@
   "_schema": {
     "collections": [
       {
-        "label": "Movie",
-        "name": "movie",
-        "path": "content/movies",
+        "label": "Author",
+        "name": "author",
+        "path": "content/authors",
+        "templates": [
+          {
+            "name": "author",
+            "label": "Author",
+            "fields": [
+              {
+                "name": "name",
+                "label": "Name",
+                "type": "string",
+                "namespace": [
+                  "author",
+                  "author",
+                  "name"
+                ]
+              },
+              {
+                "name": "socialMedia",
+                "label": "Social Media",
+                "type": "object",
+                "list": true,
+                "fields": [
+                  {
+                    "type": "string",
+                    "name": "platform",
+                    "label": "Platform",
+                    "options": [
+                      "twitter",
+                      "facebook",
+                      "instagram"
+                    ],
+                    "namespace": [
+                      "author",
+                      "author",
+                      "socialMedia",
+                      "platform"
+                    ]
+                  },
+                  {
+                    "name": "handle",
+                    "label": "Handle",
+                    "type": "string",
+                    "namespace": [
+                      "author",
+                      "author",
+                      "socialMedia",
+                      "handle"
+                    ]
+                  }
+                ],
+                "namespace": [
+                  "author",
+                  "author",
+                  "socialMedia"
+                ]
+              }
+            ],
+            "namespace": [
+              "author",
+              "author"
+            ]
+          }
+        ],
+        "namespace": [
+          "author"
+        ]
+      },
+      {
+        "label": "Post",
+        "name": "post",
+        "path": "content/posts",
+        "templates": [
+          {
+            "name": "post",
+            "label": "Post",
+            "fields": [
+              {
+                "type": "string",
+                "label": "Title",
+                "name": "title",
+                "namespace": [
+                  "post",
+                  "post",
+                  "title"
+                ]
+              },
+              {
+                "type": "string",
+                "label": "Body",
+                "isBody": true,
+                "name": "body",
+                "namespace": [
+                  "post",
+                  "post",
+                  "body"
+                ]
+              },
+              {
+                "type": "reference",
+                "label": "Author",
+                "name": "author",
+                "collections": [
+                  "author"
+                ],
+                "namespace": [
+                  "post",
+                  "post",
+                  "author"
+                ]
+              }
+            ],
+            "namespace": [
+              "post",
+              "post"
+            ]
+          }
+        ],
+        "namespace": [
+          "post"
+        ]
+      },
+      {
+        "label": "Page",
+        "name": "page",
+        "path": "content/pages",
         "fields": [
           {
-            "name": "title",
-            "label": "Title",
             "type": "string",
+            "label": "Title",
+            "name": "title",
             "namespace": [
-              "movie",
+              "page",
               "title"
             ]
           },
           {
-            "name": "releaseDate",
-            "label": "Release Date",
-            "type": "datetime",
-            "namespace": [
-              "movie",
-              "releaseDate"
-            ]
-          },
-          {
-            "name": "rating",
-            "label": "Rating",
-            "type": "number",
-            "namespace": [
-              "movie",
-              "rating"
-            ]
-          },
-          {
-            "name": "archived",
-            "label": "Archived",
-            "type": "boolean",
-            "namespace": [
-              "movie",
-              "archived"
-            ]
-          },
-          {
-            "name": "genre",
-            "label": "Genre",
-            "type": "string",
-            "options": [
-              "scifi",
-              "mystery",
-              "drama",
-              "comedy",
-              "action"
+            "type": "object",
+            "label": "SEO",
+            "name": "seo",
+            "fields": [
+              {
+                "type": "string",
+                "name": "seoTitle",
+                "label": "SEO Title",
+                "namespace": [
+                  "page",
+                  "seo",
+                  "seoTitle"
+                ]
+              },
+              {
+                "type": "image",
+                "name": "ogImage",
+                "label": "Open Graph Image",
+                "namespace": [
+                  "page",
+                  "seo",
+                  "ogImage"
+                ]
+              },
+              {
+                "type": "string",
+                "name": "ogDescription",
+                "label": "Open Graph Description",
+                "namespace": [
+                  "page",
+                  "seo",
+                  "ogDescription"
+                ]
+              }
             ],
             "namespace": [
-              "movie",
-              "genre"
+              "page",
+              "seo"
             ]
           },
           {
-            "type": "reference",
-            "label": "Director",
-            "name": "director",
-            "collections": [
-              "director"
+            "type": "object",
+            "list": true,
+            "label": "Blocks",
+            "name": "blocks",
+            "templates": [
+              {
+                "label": "Hero",
+                "name": "hero",
+                "fields": [
+                  {
+                    "type": "string",
+                    "label": "Description",
+                    "name": "description",
+                    "namespace": [
+                      "page",
+                      "blocks",
+                      "hero",
+                      "description"
+                    ]
+                  },
+                  {
+                    "type": "image",
+                    "label": "Background Image",
+                    "name": "backgroundImage",
+                    "namespace": [
+                      "page",
+                      "blocks",
+                      "hero",
+                      "backgroundImage"
+                    ]
+                  }
+                ],
+                "namespace": [
+                  "page",
+                  "blocks",
+                  "hero"
+                ]
+              },
+              {
+                "label": "Call to Action",
+                "name": "cta",
+                "fields": [
+                  {
+                    "type": "string",
+                    "label": "CTA Text",
+                    "name": "ctaText",
+                    "namespace": [
+                      "page",
+                      "blocks",
+                      "cta",
+                      "ctaText"
+                    ]
+                  },
+                  {
+                    "type": "string",
+                    "label": "Style",
+                    "name": "ctaStyle",
+                    "options": [
+                      {
+                        "label": "Minimal",
+                        "value": "minimal"
+                      },
+                      {
+                        "label": "Flat",
+                        "value": "flat"
+                      }
+                    ],
+                    "namespace": [
+                      "page",
+                      "blocks",
+                      "cta",
+                      "ctaStyle"
+                    ]
+                  }
+                ],
+                "namespace": [
+                  "page",
+                  "blocks",
+                  "cta"
+                ]
+              }
             ],
             "namespace": [
-              "movie",
-              "director"
-            ]
-          },
-          {
-            "name": "body",
-            "label": "Body",
-            "type": "string",
-            "isBody": true,
-            "namespace": [
-              "movie",
-              "body"
+              "page",
+              "blocks"
             ]
           }
         ],
         "namespace": [
-          "movie"
-        ]
-      },
-      {
-        "label": "Director",
-        "name": "director",
-        "path": "content/directors",
-        "fields": [
-          {
-            "type": "string",
-            "label": "Name",
-            "name": "name",
-            "namespace": [
-              "director",
-              "name"
-            ]
-          }
-        ],
-        "namespace": [
-          "director"
-        ]
-      },
-      {
-        "label": "Actor",
-        "name": "actor",
-        "path": "content/actors",
-        "fields": [
-          {
-            "type": "string",
-            "label": "Name",
-            "name": "name",
-            "namespace": [
-              "actor",
-              "name"
-            ]
-          },
-          {
-            "type": "string",
-            "label": "Body",
-            "name": "body",
-            "namespace": [
-              "actor",
-              "body"
-            ]
-          }
-        ],
-        "namespace": [
-          "actor"
+          "page"
         ]
       }
     ],
     "namespace": []
   },
-  "content/movies/indiana-jones.md": {
-    "title": "Indiana Jones",
-    "director": "content/directors/george.md",
-    "genre": "action",
-    "rating": 8,
-    "$_body": ""
+  "content/authors/homer.md": {
+    "name": "Homer J Simpson",
+    "socialMedia": [
+      {
+        "platform": "twitter",
+        "handle": "homer"
+      }
+    ],
+    "_template": "author",
+    "$_body": "\n"
   },
-  "__attribute__movie#movie#title#Indiana Jones": [
-    "content/movies/indiana-jones.md"
+  "__attribute__author#author#author#name#Homer J Simpson": [
+    "content/authors/homer.md"
   ],
-  "__attribute__movie#movie#rating#8": [
-    "content/movies/indiana-jones.md"
-  ],
-  "__attribute__movie#movie#genre#action": [
-    "content/movies/indiana-jones.md",
-    "content/movies/the-rock.md"
-  ],
-  "__attribute__movie#movie#director#content/directors/george.md": [
-    "content/movies/indiana-jones.md",
-    "content/movies/star-wars.md"
-  ],
-  "content/movies/star-wars.md": {
-    "title": "Star Wars",
-    "director": "content/directors/george.md",
-    "genre": "scifi",
-    "rating": 10,
-    "$_body": "\nA long, long time ago, in galaxy far far away...\n"
+  "content/authors/marge.md": {
+    "name": "Marge Simpson",
+    "socialMedia": [
+      {
+        "platform": "twitter",
+        "handle": "marge"
+      }
+    ],
+    "_template": "author",
+    "$_body": "\n"
   },
-  "__attribute__movie#movie#title#Star Wars": [
-    "content/movies/star-wars.md"
+  "__attribute__author#author#author#name#Marge Simpson": [
+    "content/authors/marge.md"
   ],
-  "__attribute__movie#movie#rating#10": [
-    "content/movies/star-wars.md"
-  ],
-  "__attribute__movie#movie#genre#scifi": [
-    "content/movies/star-wars.md"
-  ],
-  "content/movies/the-rock.md": {
-    "title": "The Rock",
-    "director": "content/directors/francis.md",
-    "genre": "action",
-    "$_body": ""
+  "content/posts/hello-world.md": {
+    "title": "Hello, World!",
+    "author": "content/authors/homer.md",
+    "_template": "post",
+    "$_body": "\nHow's that?\n"
   },
-  "__attribute__movie#movie#title#The Rock": [
-    "content/movies/the-rock.md"
+  "__attribute__post#post#post#title#Hello, World!": [
+    "content/posts/hello-world.md"
   ],
-  "__attribute__movie#movie#director#content/directors/francis.md": [
-    "content/movies/the-rock.md"
+  "__attribute__post#post#post#author#content/authors/homer.md": [
+    "content/posts/hello-world.md"
   ],
-  "content/directors/francis.md": {
-    "name": "Francis Ford Coppolla",
-    "$_body": ""
+  "content/pages/home.md": {
+    "title": "Welcome",
+    "seo": {
+      "seoTitle": "Welcome to our website",
+      "ogImage": "http://placehold.it/300x200",
+      "ogDescription": "You're gonna love this site!"
+    },
+    "blocks": [
+      {
+        "_template": "hero",
+        "description": "Welcome!",
+        "backgroundImage": "http://placehold.it/300x200"
+      },
+      {
+        "_template": "cta",
+        "ctaText": "Join Us",
+        "ctaStyle": "minimal"
+      }
+    ],
+    "$_body": "\n"
   },
-  "__attribute__director#director#name#Francis Ford Coppolla": [
-    "content/directors/francis.md"
+  "__attribute__page#page#title#Welcome": [
+    "content/pages/home.md"
   ],
-  "content/directors/george.md": {
-    "name": "George Lucas",
-    "$_body": ""
-  },
-  "__attribute__director#director#name#George Lucas": [
-    "content/directors/george.md"
+  "__attribute__page#page#seo#seoTitle#Welcome to our website": [
+    "content/pages/home.md"
   ],
-  "content/actors/harrison.md": {
-    "name": "Harrison Ford",
-    "$_body": ""
-  },
-  "__attribute__actor#actor#name#Harrison Ford": [
-    "content/actors/harrison.md"
-  ],
-  "content/actors/sean.md": {
-    "name": "Sean Connery",
-    "$_body": ""
-  },
-  "__attribute__actor#actor#name#Sean Connery": [
-    "content/actors/sean.md"
+  "__attribute__page#page#seo#ogDescription#You're gonna love this site!": [
+    "content/pages/home.md"
   ]
 }

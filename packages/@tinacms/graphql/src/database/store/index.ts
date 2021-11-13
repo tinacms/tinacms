@@ -17,6 +17,7 @@ export interface Store {
     hydrator?: (fullPath: string) => Promise<object>
   ): Promise<string[]>
   get(filepath: string): Promise<object>
+  // delete(filepath: string): Promise<void>
   clear(): void
   /**
    *
@@ -71,6 +72,7 @@ export interface Store {
       includeTemplate?: boolean
     }
   ): Promise<void>
+  supportsSeeding(): boolean
   /**
    * Whether this store supports the ability to index data.
    * Indexing data requires writing arbitrary keys/values to

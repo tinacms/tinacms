@@ -141,7 +141,7 @@ union MovieDirectorDocument = DirectorDocument
 type Movie {
   title: String
   releaseDate: String
-  rating: Int
+  rating: Int!
   archived: Boolean
   genre: String
   director: MovieDirectorDocument

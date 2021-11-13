@@ -23,6 +23,7 @@ import { FilesystemBridge } from '../database/bridge/filesystem'
 
 import type { Store } from '../database/store'
 import type { TinaCloudSchema } from '../types'
+import { sequential } from '../util'
 
 export const setup = async (
   rootPath: string,
@@ -84,51 +85,150 @@ export const setupFixture = async (
   schema: TinaCloudSchema<false>,
   store: Store,
   fixture: Fixture,
-  suffix?: string
+  suffix?: string,
+  queryName: string = '_query',
+  folder: string = 'requests'
 ) => {
   const { database } = await setup(rootPath, schema, store)
-  const request = await fs
+  const basePath = path.join(rootPath, folder, fixture.name)
+
+  const query = await fs
     .readFileSync(
-      path.join(
-        rootPath,
-        'requests',
-        fixture.name,
-        `request.${suffix ? `${suffix}.` : ''}gql`
-      )
+      path.join(basePath, `${queryName}.${suffix ? `${suffix}.` : ''}gql`)
     )
     .toString()
-
   let variables = {}
   try {
     variables = JSON.parse(
-      await fs
-        .readFileSync(
-          path.join(rootPath, 'requests', fixture.name, 'variables.json')
-        )
-        .toString()
+      await fs.readFileSync(path.join(basePath, '_variables.json')).toString()
     )
   } catch (e) {}
-  const expectedResponsePath = await path.join(
-    rootPath,
-    'requests',
-    fixture.name,
-    fixture.assert === 'file' ? 'response.md' : 'response.json'
-  )
 
   const response = await resolve({
-    query: request,
+    query,
     variables,
     database,
   })
-
   const responseString =
     fixture.assert === 'file'
       ? // @ts-ignore
         await database.flush(fixture.filename)
       : `${JSON.stringify(response, null, 2)}\n`
 
+  const responses = [responseString]
+  const expectedResponsePaths = [
+    path.join(
+      basePath,
+      fixture.assert === 'file' ? '_response.md' : '_response.json'
+    ),
+  ]
+
+  const directoryItems = await fs.readdir(
+    path.join(rootPath, folder, fixture.name)
+  )
+
+  const mutations = directoryItems
+    .filter((item) => item.includes('mutation'))
+    .map((name) => name.split('.')[0])
+
+  await sequential(mutations, async (mutationName) => {
+    const mutationCount = mutationName.split('-')[0]
+    const mutationString = await fs
+      .readFileSync(path.join(basePath, `${mutationName}.${suffix}.gql`))
+      .toString()
+    let variables = {}
+    try {
+      variables = await fs.readFileSync(
+        path.join(basePath, `${mutationCount}-variables.json`)
+      )
+    } catch (e) {
+      // no variables provided
+    }
+    await resolve({
+      query: mutationString,
+      variables,
+      database,
+    })
+
+    // FIXME: update builder so that "required"
+    // mutations actually get required in the
+    // mutation params schema
+    // if (mutationResponse.errors?.length > 0) {
+    //   console.log('nononon')
+    // }
+
+    const response = await resolve({
+      query,
+      variables,
+      database,
+    })
+    // console.log(JSON.stringify(response, null, 2))
+    const responseString =
+      fixture.assert === 'file'
+        ? // @ts-ignore
+          await database.flush(fixture.filename)
+        : `${JSON.stringify(response, null, 2)}\n`
+
+    responses.push(responseString)
+    expectedResponsePaths.push(
+      path.join(
+        basePath,
+        `${mutationCount}-response.${fixture.assert === 'file' ? 'md' : 'json'}`
+      )
+    )
+  })
+
   return {
-    response: responseString,
-    expectedResponsePath,
+    responses,
+    expectedResponsePaths,
+  }
+}
+
+export const setupFixture2 = async (
+  rootPath: string,
+  schema: TinaCloudSchema<false>,
+  store: Store,
+  fixture: Fixture,
+  suffix?: string,
+  queryName: string = '_query',
+  folder: string = 'requests'
+) => {
+  const { database } = await setup(rootPath, schema, store)
+  const basePath = path.join(rootPath, folder, fixture.name)
+
+  const query = await fs
+    .readFileSync(
+      path.join(basePath, `${queryName}.${suffix ? `${suffix}.` : ''}gql`)
+    )
+    .toString()
+  let variables = {}
+  try {
+    variables = JSON.parse(
+      await fs.readFileSync(path.join(basePath, '_variables.json')).toString()
+    )
+  } catch (e) {}
+
+  const response = await resolve({
+    query,
+    variables,
+    database,
+  })
+  const responseString =
+    fixture.assert === 'file'
+      ? // @ts-ignore
+        await database.flush(fixture.filename)
+      : `${JSON.stringify(response, null, 2)}\n`
+
+  const responses = [responseString]
+  const expectedResponsePaths = [
+    path.join(
+      basePath,
+      fixture.assert === 'file' ? '_response.md' : '_response.json'
+    ),
+  ]
+
+  return {
+    responses,
+    expectedResponsePaths,
   }
 }

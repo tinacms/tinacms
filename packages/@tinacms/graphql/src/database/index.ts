@@ -27,6 +27,7 @@ import type {
 } from '../types'
 import type { Store } from './store'
 import type { Bridge } from './bridge'
+import { flatten, isBoolean } from 'lodash'
 
 type CreateDatabase = { bridge: Bridge; store: Store }
 
@@ -102,11 +103,59 @@ export class Database {
     }
   }
 
+  public addPendingDocument = async (
+    filepath: string,
+    data: { [key: string]: unknown }
+  ) => {
+    const { stringifiedFile, payload } = await this.stringifyFile(
+      filepath,
+      data
+    )
+    if (this.store.supportsSeeding()) {
+      await this.bridge.put(filepath, stringifiedFile)
+    }
+    await this.store.put(filepath, payload)
+  }
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)
     } else {
-      const { payload } = await this.stringifyFile(filepath, data)
+      const { stringifiedFile, payload } = await this.stringifyFile(
+        filepath,
+        data
+      )
+      if (this.store.supportsSeeding()) {
+        await this.bridge.put(filepath, stringifiedFile)
+      }
+      const existingData = await this.get(filepath)
+      const collection = this.tinaSchema.getCollection(existingData._collection)
+      const atts = await _indexCollectable({
+        record: filepath,
+        value: existingData,
+        field: collection,
+        prefix: collection.name,
+        database: this,
+      })
+      const atts2 = await _indexCollectable({
+        record: filepath,
+        value: data,
+        field: collection,
+        prefix: collection.name,
+        database: this,
+      })
+      await sequential(atts, async (attribute) => {
+        const records = (await this.store.get(attribute)) || []
+        await this.store.put(
+          attribute,
+          records.filter((item) => item !== filepath)
+        )
+        return true
+      })
+      await sequential(atts2, async (attribute) => {
+        const records = (await this.store.get(attribute)) || []
+        await this.store.put(attribute, [...records, filepath])
+        return true
+      })
       await this.store.put(filepath, payload)
     }
     return true
@@ -344,15 +393,36 @@ const _indexContent = async (tinaSchema: TinaSchema, database: Database) => {
         yup.object({})
       )
       await database.store.seed(documentPath, data)
-      await _indexCollectable({
-        record: documentPath,
-        //@ts-ignore
-        field: collection,
-        value: data,
-        prefix: `${collection.name}`,
-        database,
-      })
+      return indexDocument({ documentPath, collection, data, database })
     })
+  })
+}
+
+const indexDocument = async ({
+  documentPath,
+  data,
+  collection,
+  database,
+}: {
+  documentPath: string
+  data: object
+  collection: Collectable
+  database: Database
+}) => {
+  const attributes = await _indexCollectable({
+    record: documentPath,
+    //@ts-ignore
+    field: collection,
+    value: data,
+    prefix: `${collection.name}`,
+    database,
+  })
+  await sequential(attributes, async (fieldName) => {
+    const existingRecords = (await database.store.get(fieldName)) || []
+    // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
+    // // @ts-ignore
+    const uniqueItems = [...new Set([...existingRecords, documentPath])]
+    await database.store.seed(fieldName, uniqueItems)
   })
 }
 
@@ -386,13 +456,14 @@ const _indexCollectable = async ({
   } else {
     template = field
   }
-  await _indexAttributes({
+  const atts = await _indexAttributes({
     record: rest.record,
     data: value,
     prefix: `${rest.prefix}${extra}#${template.name}`,
     fields: template.fields,
     database: rest.database,
   })
+  return flatten(atts).filter((item) => !isBoolean(item))
 }
 
 const _indexAttributes = async ({
@@ -406,7 +477,7 @@ const _indexAttributes = async ({
   fields: TinaFieldEnriched[]
   database: Database
 }) => {
-  await sequential(fields, async (field) => {
+  return sequential(fields, async (field) => {
     const value = data[field.name]
     if (!value) {
       return true
@@ -417,23 +488,19 @@ const _indexAttributes = async ({
       case 'string':
       case 'number':
       case 'datetime':
-        await _indexAttribute({ value, field, ...rest })
-
-        return true
-
+        return _indexAttribute({ value, field, ...rest })
       case 'object':
         if (field.list) {
           await sequential(value, async (item) => {
             // @ts-ignore
-            await _indexCollectable({ field, value: item, ...rest })
+            return _indexCollectable({ field, value: item, ...rest })
           })
         } else {
-          await _indexCollectable({ field, value, ...rest })
+          return _indexCollectable({ field, value, ...rest })
         }
         return true
       case 'reference':
-        await _indexAttribute({ value, field, ...rest })
-        return true
+        return _indexAttribute({ value, field, ...rest })
     }
     return true
   })
@@ -454,9 +521,11 @@ const _indexAttribute = async ({
 }) => {
   const stringValue = value.toString().substr(0, 100)
   const fieldName = `__attribute__${prefix}#${field.name}#${stringValue}`
-  const existingRecords = (await database.store.get(fieldName)) || []
-  // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
-  // @ts-ignore
-  const uniqueItems = [...new Set([...existingRecords, record])]
-  await database.store.seed(fieldName, uniqueItems)
+  return fieldName
+  // const existingRecords = (await database.store.get(fieldName)) || []
+  // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
+  // // @ts-ignore
+  // const uniqueItems = [...new Set([...existingRecords, record])]
+  // await database.store.seed(fieldName, uniqueItems)
+  // return fieldName
 }

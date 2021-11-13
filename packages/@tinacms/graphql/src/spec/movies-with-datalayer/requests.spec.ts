@@ -12,7 +12,7 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setupFixture, print, Fixture } from '../setup'
+import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { LevelStore } from '../../database/store/level'
 import { tinaSchema } from './.tina/schema'
 const rootPath = path.join(__dirname, '/')
@@ -35,9 +35,37 @@ const fixtures: Fixture[] = [
   },
 ]
 
+const mutationFixtures: Fixture[] = [
+  {
+    name: 'addPendingDocument',
+    description: 'Adding a document',
+    assert: 'output',
+  },
+  {
+    name: 'addPendingDocumentExisting',
+    description: 'Adding a document when one already exists',
+    assert: 'output',
+    expectError: true,
+  },
+  {
+    name: 'updateMovieDocument',
+    description: 'Updating an existing document',
+    assert: 'file',
+    filename: 'content/movies/star-wars.md',
+  },
+  {
+    name: 'updateMovieDocumentNonExisting',
+    description: 'Updating an existing document',
+    assert: 'output',
+    expectError: true,
+  },
+]
+
 let consoleErrMock
 beforeEach(() => {
-  consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
+  consoleErrMock = jest
+    .spyOn(console, 'error')
+    .mockImplementation((message) => {})
 })
 
 afterEach(() => {
@@ -47,7 +75,7 @@ afterEach(() => {
 describe('A schema with indexing', () => {
   fixtures.forEach((fixture) => {
     it(print(fixture), async () => {
-      const { response, expectedResponsePath } = await setupFixture(
+      const { responses, expectedResponsePaths } = await setupFixture(
         rootPath,
         tinaSchema,
         store,
@@ -61,7 +89,35 @@ describe('A schema with indexing', () => {
         expect(consoleErrMock).not.toHaveBeenCalled()
       }
 
-      expect(response).toMatchFile(expectedResponsePath)
+      responses.forEach((expResponse, index) => {
+        const expectedResponsePath2 = expectedResponsePaths[index]
+        expect(expResponse).toMatchFile(expectedResponsePath2)
+      })
+    })
+  })
+
+  mutationFixtures.forEach((fixture) => {
+    it(print(fixture), async () => {
+      const { responses, expectedResponsePaths } = await setupFixture2(
+        rootPath,
+        tinaSchema,
+        store,
+        fixture,
+        'movies-with-datalayer',
+        '_mutation',
+        'mutations'
+      )
+
+      if (fixture.expectError) {
+        expect(consoleErrMock).toHaveBeenCalled()
+      } else {
+        expect(consoleErrMock).not.toHaveBeenCalled()
+      }
+
+      responses.forEach((expResponse, index) => {
+        const expectedResponsePath2 = expectedResponsePaths[index]
+        expect(expResponse).toMatchFile(expectedResponsePath2)
+      })
     })
   })
 })
