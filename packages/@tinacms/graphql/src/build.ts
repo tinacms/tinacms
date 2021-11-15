@@ -46,12 +46,15 @@ export const indexDB = async ({
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
   // @ts-ignore
   await database.indexData({ experimentalData, graphQLSchema, tinaSchema })
-
-  await _buildFragments(builder, tinaSchema)
-  await _buildQueries(builder, tinaSchema)
+  await _buildFragments(builder, tinaSchema, database.bridge.rootPath)
+  await _buildQueries(builder, tinaSchema, database.bridge.rootPath)
 }
 
-const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
+const _buildFragments = async (
+  builder: Builder,
+  tinaSchema: TinaSchema,
+  rootPath: string
+) => {
   const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
   const collections = tinaSchema.getCollections()
 
@@ -73,7 +76,7 @@ const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
   }
 
   // TODO: These should possibly be outputted somewhere else?
-  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+  const fragPath = path.join(rootPath, '.tina', '__generated__')
 
   await fs.outputFileSync(path.join(fragPath, 'frags.gql'), print(fragDoc))
   //   await fs.outputFileSync(
@@ -82,7 +85,11 @@ const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
   //   )
 }
 
-const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
+const _buildQueries = async (
+  builder: Builder,
+  tinaSchema: TinaSchema,
+  rootPath: string
+) => {
   const operationsDefinitions: OperationDefinitionNode[] = []
 
   const collections = tinaSchema.getCollections()
@@ -114,7 +121,7 @@ const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
     ),
   }
 
-  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+  const fragPath = path.join(rootPath, '.tina', '__generated__')
 
   await fs.outputFileSync(path.join(fragPath, 'queries.gql'), print(queryDoc))
   // We dont this them for now
