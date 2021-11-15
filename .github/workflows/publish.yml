@@ -42,9 +42,6 @@ jobs:
         if: matrix.channel == 'latest'
         run: |
           yarn publish
-          git config user.name "GitHub Actions Bot"
-          git config user.email "<>"
-          yarn push-tags
         env:
           GITHUB_TOKEN: ${{ secrets.GITHUB_TOKEN }}
           NPM_AUTH_TOKEN: ${{ secrets.NPM_AUTH_TOKEN }}
