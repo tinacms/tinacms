@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.50.3
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+
 ## 0.50.2
 
 ### Patch Changes

@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.53.5
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- 1a7a54424: fixed path to Typescript typings, so that they are included in generated NPM package
+- Updated dependencies [138ceb8c4]
+- Updated dependencies [0417e3750]
+- Updated dependencies [d9f37ea7e]
+  - @tinacms/toolkit@0.55.3
+
 ## 0.53.4
 
 ### Patch Changes

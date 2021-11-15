@@ -1,5 +1,12 @@
 # next-tinacms-cloudinary
 
+## 3.3.5
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- d9f37ea7e: Ensure the full image resolution URL is persisted
+
 ## 3.3.4
 
 ## 3.3.3

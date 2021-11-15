@@ -24,12 +24,12 @@ yarn run build
 # watch all packages
 yarn run watch
 # in a separate tab, navigate to starter project
-cd examples/tina-cloud-starter
+cd experimental-examples/tina-cloud-starter
 # start the dev server
 yarn dev
 ```
 
-That should allow you to see 2 things: The Altair graphql playground at `http://localhost:4001/altair` and the demo app at `http://localhost:3000`. Tina form changes should result in `examples/tina-cloud-starter/content/marketing-pages/index.md` being changed.
+That should allow you to see 2 things: The Altair graphql playground at `http://localhost:4001/altair` and the demo app at `http://localhost:3000`. Tina form changes should result in `experimental-examples//tina-cloud-starter/content/marketing-pages/index.md` being changed.
 
 ## PR Workflow
 
@@ -99,7 +99,7 @@ with:
 
 ```ts
 const manager = new GithubManager({
-  rootPath: 'examples/tina-cloud-starter',
+  rootPath: 'experimental-examples/tina-cloud-starter',
   accessToken: '<TOKEN>',
   owner: 'tinacms',
   repo: 'tina-graphql-gateway',

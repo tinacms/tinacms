@@ -47,6 +47,7 @@ export * from './react-tinacms'
 export { TinaCMS } from './tina-cms'
 export type { TinaCMSConfig } from './tina-cms'
 export { GlobalFormPlugin } from './plugins/screens'
+export { FormMetaPlugin } from './plugins/form-meta'
 export * from './plugins/branch-switcher'
 export {
   TinaProvider,

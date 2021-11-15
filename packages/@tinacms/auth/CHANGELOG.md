@@ -1,5 +1,11 @@
 # @tinacms/auth
 
+## 0.50.2
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+
 ## 0.50.1
 
 ### Patch Changes
