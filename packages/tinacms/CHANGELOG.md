@@ -1,5 +1,20 @@
 # tinacms
 
+## 0.58.0
+
+### Minor Changes
+
+- d1ed404ba: Add support for auto-generated SDK for type-safe data fetching
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- 0417e3750: Adds RouteMapperPlugin and FormMetaPlugin
+- Updated dependencies [138ceb8c4]
+- Updated dependencies [0417e3750]
+- Updated dependencies [d9f37ea7e]
+  - @tinacms/toolkit@0.55.3
+
 ## 0.57.4
 
 ### Patch Changes

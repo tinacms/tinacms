@@ -1,5 +1,13 @@
 # Change Log
 
+## 0.55.3
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- 0417e3750: Adds RouteMapperPlugin and FormMetaPlugin
+- d9f37ea7e: Ensure the full image resolution URL is persisted
+
 ## 0.55.2
 
 ### Patch Changes
