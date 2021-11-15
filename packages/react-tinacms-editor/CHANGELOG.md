@@ -1,5 +1,15 @@
 # Change Log
 
+## 0.52.5
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- Updated dependencies [138ceb8c4]
+- Updated dependencies [0417e3750]
+- Updated dependencies [d9f37ea7e]
+  - @tinacms/toolkit@0.55.3
+
 ## 0.52.4
 
 ### Patch Changes
