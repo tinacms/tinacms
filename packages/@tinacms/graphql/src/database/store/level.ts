@@ -42,6 +42,7 @@ export class LevelStore implements Store {
             reject(message)
           })
           .on('end', function () {
+            // @ts-ignore Expected 1 arguments, but got 0. Did you forget to include 'void' in your type argument to 'Promise'?
             resolve()
           })
       })
@@ -107,6 +108,7 @@ export class LevelStore implements Store {
           reject(message)
         })
         .on('end', function () {
+          // @ts-ignore Expected 1 arguments, but got 0. Did you forget to include 'void' in your type argument to 'Promise'?
           resolve()
         })
     })

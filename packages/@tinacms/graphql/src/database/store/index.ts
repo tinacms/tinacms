@@ -16,7 +16,7 @@ export interface Store {
     pattern: string,
     hydrator?: (fullPath: string) => Promise<object>
   ): Promise<string[]>
-  get(filepath: string): Promise<object>
+  get<T extends object>(filepath: string): Promise<T>
   // delete(filepath: string): Promise<void>
   clear(): void
   /**

@@ -128,7 +128,7 @@ export class Database {
       if (this.store.supportsSeeding()) {
         await this.bridge.put(filepath, stringifiedFile)
       }
-      const existingData = await this.get(filepath)
+      const existingData = await this.get<{ _collection: string }>(filepath)
       const collection = this.tinaSchema.getCollection(existingData._collection)
       const atts = await _indexCollectable({
         record: filepath,
@@ -145,7 +145,7 @@ export class Database {
         database: this,
       })
       await sequential(atts, async (attribute) => {
-        const records = (await this.store.get(attribute)) || []
+        const records = (await this.store.get<string[]>(attribute)) || []
         await this.store.put(
           attribute,
           records.filter((item) => item !== filepath)
@@ -153,7 +153,7 @@ export class Database {
         return true
       })
       await sequential(atts2, async (attribute) => {
-        const records = (await this.store.get(attribute)) || []
+        const records = (await this.store.get<string[]>(attribute)) || []
         await this.store.put(attribute, [...records, filepath])
         return true
       })
@@ -415,11 +415,12 @@ const indexDocument = async ({
     //@ts-ignore
     field: collection,
     value: data,
-    prefix: `${collection.name}`,
+    prefix: `${lastItem(collection.namespace)}`,
     database,
   })
   await sequential(attributes, async (fieldName) => {
-    const existingRecords = (await database.store.get(fieldName)) || []
+    const existingRecords =
+      (await database.store.get<string[]>(fieldName)) || []
     // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
     // // @ts-ignore
     const uniqueItems = [...new Set([...existingRecords, documentPath])]
@@ -437,7 +438,7 @@ const _indexCollectable = async ({
   prefix: string
   field: Collectable
   database: Database
-}) => {
+}): Promise<string[]> => {
   let template
   let extra = ''
   if (field.templates) {
@@ -464,6 +465,7 @@ const _indexCollectable = async ({
     fields: template.fields,
     database: rest.database,
   })
+  // @ts-ignore FIXME: filter doesn't do enough to tell Typescript we're only returning strings
   return flatten(atts).filter((item) => !isBoolean(item))
 }
 

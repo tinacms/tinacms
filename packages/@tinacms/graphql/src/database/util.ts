@@ -25,7 +25,6 @@ export const stringifyFile = (
     case '.markdown':
     case '.mdx':
     case '.md':
-      // @ts-ignore
       const {
         _relativePath,
         _keepTemplateKey,
@@ -34,7 +33,14 @@ export const stringifyFile = (
         _collection,
         $_body,
         ...rest
-      } = content
+      } = content as {
+        _relativePath: string
+        _keepTemplateKey: string
+        _id: string
+        _template: string
+        _collection: string
+        $_body: string
+      }
       const extra: { [key: string]: string } = {}
       if (keepTemplateKey) {
         extra['_template'] = _template

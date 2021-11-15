@@ -33,7 +33,7 @@ export class FilesystemStore implements Store {
     throw new Error(`Seeding data is not possible for Filesystem store`)
   }
 
-  public async get(filepath: string) {
+  public async get<T extends object>(filepath: string): Promise<T> {
     return parseFile(
       await fs.readFileSync(path.join(this.rootPath, filepath)).toString(),
       path.extname(filepath),

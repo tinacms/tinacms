@@ -19,7 +19,7 @@ limitations under the License.
 import { unified } from 'unified'
 import markdown from 'remark-parse'
 import mdx from 'remark-mdx'
-import { TinaField } from '../..'
+import { TinaField } from '..'
 import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
 import type { RichTypeInner } from '../types'
