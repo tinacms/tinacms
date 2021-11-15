@@ -116,6 +116,7 @@ export class Database {
     }
     await this.store.put(filepath, payload)
   }
+
   public put = async (filepath: string, data: { [key: string]: unknown }) => {
     if (SYSTEM_FILES.includes(filepath)) {
       throw new Error(`Unexpected put for config file ${filepath}`)

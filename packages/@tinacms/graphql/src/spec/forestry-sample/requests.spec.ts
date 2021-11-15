@@ -14,7 +14,6 @@ limitations under the License.
 import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
-// import { FilesystemStore } from '../../database/store/filesystem'
 import { MemoryStore } from '../../database/store/memory'
 const rootPath = path.join(__dirname, '/')
 
