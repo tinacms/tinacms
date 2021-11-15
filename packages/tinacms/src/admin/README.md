@@ -4,7 +4,7 @@
 
 `TinaAdmin` seeks to bridge the gap between Tina's elegant page editing experience with a more traditional content management experience.
 
-Right now, the first phase seeks to add a more "complete" Document Creator utilizing your `schema.ts` (inside the `.tina` folder) to build an interface for **listing** and **updating** existing documents and **creating** new documents.
+Right now, the first phase adds a more "complete" Document Creator utilizing your `schema.ts` (inside the `.tina` folder) to build an interface for **listing** and **updating** existing documents and **creating** new documents.
 
 ## How to Setup
 
@@ -34,7 +34,7 @@ Right now, the first phase seeks to add a more "complete" Document Creator utili
 > Make sure you use the latest version of `tinacms` and `@tinacms/cli`!
 
 1. Make sure `/admin` is open and available.
-  * For existing sites, we need to ensure there are no routes currently using `/admin`.  In the future, we'd like to make `TinaAdmin`'s base route configurable, but for now, remove or rename any files under `/pages/admin`.
+  * For existing sites, we need to ensure there are no routes currently using or conflicting with `/admin`.  In the future, we'd like to make `TinaAdmin`'s base route configurable, but for now, remove or rename any files under `/pages/admin`.
 
 2. Add `pages/admin/[[...tina]].tsx`
   * `TinaAdmin` leverages a wildcard, catch-all route (`/admin/*`) for all of its routing.  All you need to do is add two lines to this file:
@@ -54,7 +54,7 @@ Right now, the first phase seeks to add a more "complete" Document Creator utili
 
 ### Create a `RouteMappingPlugin`
 
-Introduced with `TinaAdmin`, a `RouteMappingPlugin` tells `TinaAdmin` what a document's URL is.  This plugin enables `TinaAdmin` to display "View" links when visiting a list of documents.
+Introduced with `TinaAdmin`, a `RouteMappingPlugin` tells `TinaAdmin` what an individual document's URL is.  This plugin enables `TinaAdmin` to display "View" links when visiting a list of documents.
 
 ```ts
 RouteMappingPlugin(mapper: (collection: Collection, document: Document) => string | undefined)
