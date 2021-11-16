@@ -1,0 +1,38 @@
+{
+  "name": "create-tina-app",
+  "version": "0.0.1",
+  "main": "dist/index.js",
+  "files": [
+    "dist"
+  ],
+  "bin": "./dist/index.js",
+  "typings": "dist/index.d.ts",
+  "license": "Apache-2.0",
+  "buildConfig": {
+    "entryPoints": [
+      {
+        "name": "src/index.ts",
+        "target": "node"
+      }
+    ]
+  },
+  "scripts": {
+    "types": "yarn tsc",
+    "build": "echo \"Run `yarn build` from the root of the repository instead\""
+  },
+  "publishConfig": {
+    "registry": "https://registry.npmjs.org"
+  },
+  "repository": {
+    "url": "https://github.com/tinacms/tinacms.git",
+    "directory": "packages/create-tina-app"
+  },
+  "devDependencies": {
+    "@types/tar": "4.0.3"
+  },
+  "dependencies": {
+    "commander": "^8.3.0",
+    "got": "^11.8.2",
+    "tar": "4.4.10"
+  }
+}
