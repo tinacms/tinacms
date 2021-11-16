@@ -336,7 +336,7 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
       .toString()
       .split('\n')
       .filter((stdout) => {
-        return stdout.includes('tinacms/packages')
+        return stdout.includes('packages')
       })
       .map((line) => line.split(' ').pop())
 
