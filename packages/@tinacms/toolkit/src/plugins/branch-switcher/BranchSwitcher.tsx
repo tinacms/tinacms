@@ -12,15 +12,19 @@ limitations under the License.
 */
 import * as React from 'react'
 import { BranchSwitcherProps, Branch, BranchChangeEvent } from './types'
-import styled, { StyledComponent } from 'styled-components'
+import styled from 'styled-components'
 import { useBranchData } from './BranchData'
 import { useEvent } from '../../packages/react-core/use-cms-event'
+import { Button } from '../../packages/styles'
+import { LoadingDots } from '../../packages/form-builder'
+
+type ListState = 'loading' | 'ready' | 'error'
 
 export const BranchSwitcher = ({
   listBranches,
   createBranch,
 }: BranchSwitcherProps) => {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
   const { currentBranch, setCurrentBranch } = useBranchData()
   //const [currentBranch, setCurrentBranch] = React.useState('main')
@@ -30,25 +34,24 @@ export const BranchSwitcher = ({
   )
 
   const handleCreateBranch = React.useCallback((value) => {
-    setIsLoading(true)
+    setListState('loading')
     createBranch({
       branchName: value,
       baseBranch: currentBranch,
+    }).then(async (createdBranchName) => {
+      setCurrentBranch(createdBranchName)
+      await refreshBranchList()
     })
-      .then(async (createdBranchName) => {
-        setCurrentBranch(createdBranchName)
-        await refreshBranchList()
-      })
-      .finally(() => setIsLoading(false))
   }, [])
 
   const refreshBranchList = React.useCallback(async () => {
-    setIsLoading(true)
+    setListState('loading')
     await listBranches()
       .then((data: Branch[]) => {
         setBranchList(data)
+        setListState('ready')
       })
-      .finally(() => setIsLoading(false))
+      .catch(() => setListState('error'))
   }, [])
 
   // load branch list
@@ -57,8 +60,16 @@ export const BranchSwitcher = ({
   }, [])
 
   return (
-    <SelectWrap isLoading={isLoading}>
-      {/* <BranchSelector
+    <>
+      {listState === 'loading' ? (
+        <div style={{ margin: '2rem auto', textAlign: 'center' }}>
+          <LoadingDots color={'var(--tina-color-primary)'} />
+        </div>
+      ) : (
+        <>
+          {listState === 'ready' ? (
+            <SelectWrap>
+              {/* <BranchSelector
         currentBranch={currentBranch}
         branchList={branchList}
         onCreateBranch={(newBranch) => {
@@ -68,15 +79,24 @@ export const BranchSwitcher = ({
           setCurrentBranch(branchName)
         }}
       /> */}
-      <SimpleBranchSelector
-        branchList={branchList}
-        currentBranch={currentBranch}
-        onChange={(branchName) => {
-          setCurrentBranch(branchName)
-          dispatch({ branchName })
-        }}
-      />
-    </SelectWrap>
+              <SimpleBranchSelector
+                branchList={branchList}
+                currentBranch={currentBranch}
+                onChange={(branchName) => {
+                  setCurrentBranch(branchName)
+                  dispatch({ branchName })
+                }}
+              />
+            </SelectWrap>
+          ) : (
+            <div style={{ margin: '2rem auto', textAlign: 'center' }}>
+              An error occurred while retrieving the branch list. <br />
+              <Button onClick={refreshBranchList}>Try again ⟳</Button>
+            </div>
+          )}
+        </>
+      )}
+    </>
   )
 }
 
@@ -153,17 +173,11 @@ const BranchSelector = ({
   )
 }
 
-const SelectWrap: StyledComponent<
-  'div',
-  any,
-  { isLoading: boolean }
-> = styled.div`
+const SelectWrap = styled.div`
   display: flex;
   flex-flow: column;
   align-items: center;
   justify-content: center;
-  opacity: ${(props: any) => (props.isLoading ? '0.5' : '1')};
-  pointer-events: ${(props: any) => (props.isLoading ? 'none' : 'initial')};
 `
 
 const SelectorColumn = styled.div`
