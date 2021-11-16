@@ -13,7 +13,6 @@ limitations under the License.
 
 import _ from 'lodash'
 import fs from 'fs-extra'
-import path from 'path'
 import { print, OperationDefinitionNode } from 'graphql'
 import type { FragmentDefinitionNode, FieldDefinitionNode } from 'graphql'
 
@@ -22,24 +21,40 @@ import { sequential } from './util'
 import { createBuilder } from './builder'
 import { createSchema } from './schema'
 import { extractInlineTypes } from './ast-builder'
+import path from 'path'
 
 import type { Builder } from './builder'
 import type { TinaSchema } from './schema'
+import { Database } from './database'
 
 // @ts-ignore: FIXME: check that cloud schema is what it says it is
-export const indexDB = async ({ database, config }) => {
+export const indexDB = async ({
+  database,
+  config,
+  experimentalData,
+}: {
+  database: Database
+  config: TinaSchema['config']
+  experimentalData?: boolean
+}) => {
   const tinaSchema = await createSchema({ schema: config })
-  const builder = await createBuilder({ database, tinaSchema })
+  const builder = await createBuilder({
+    database,
+    tinaSchema,
+    experimentalData,
+  })
   const graphQLSchema = await _buildSchema(builder, tinaSchema)
-
-  await database.put('_graphql', graphQLSchema)
-  await database.put('_schema', tinaSchema.schema)
-
-  await _buildFragments(builder, tinaSchema)
-  await _buildQueries(builder, tinaSchema)
+  // @ts-ignore
+  await database.indexData({ experimentalData, graphQLSchema, tinaSchema })
+  await _buildFragments(builder, tinaSchema, database.bridge.rootPath)
+  await _buildQueries(builder, tinaSchema, database.bridge.rootPath)
 }
 
-const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
+const _buildFragments = async (
+  builder: Builder,
+  tinaSchema: TinaSchema,
+  rootPath: string
+) => {
   const fragmentDefinitionsFields: FragmentDefinitionNode[] = []
   const collections = tinaSchema.getCollections()
 
@@ -61,7 +76,7 @@ const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
   }
 
   // TODO: These should possibly be outputted somewhere else?
-  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+  const fragPath = path.join(rootPath, '.tina', '__generated__')
 
   await fs.outputFileSync(path.join(fragPath, 'frags.gql'), print(fragDoc))
   //   await fs.outputFileSync(
@@ -70,7 +85,11 @@ const _buildFragments = async (builder: Builder, tinaSchema: TinaSchema) => {
   //   )
 }
 
-const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
+const _buildQueries = async (
+  builder: Builder,
+  tinaSchema: TinaSchema,
+  rootPath: string
+) => {
   const operationsDefinitions: OperationDefinitionNode[] = []
 
   const collections = tinaSchema.getCollections()
@@ -102,7 +121,7 @@ const _buildQueries = async (builder: Builder, tinaSchema: TinaSchema) => {
     ),
   }
 
-  const fragPath = path.join(process.cwd(), '.tina', '__generated__')
+  const fragPath = path.join(rootPath, '.tina', '__generated__')
 
   await fs.outputFileSync(path.join(fragPath, 'queries.gql'), print(queryDoc))
   // We dont this them for now
