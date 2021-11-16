@@ -315,6 +315,7 @@ export type Collectable = {
 }
 
 export type Templateable = {
+  name: string
   namespace: string[]
   fields: TinaFieldEnriched[]
   ui?: object
