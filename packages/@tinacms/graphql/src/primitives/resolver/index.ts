@@ -863,7 +863,7 @@ export class Resolver {
 
         return {
           ...field,
-          component: 'select',
+          component: 'reference',
           options: [
             { label: 'Choose an option', value: '' },
             ...documents.map((filepath) => {
