@@ -1,20 +1,27 @@
-fragment PageParts on Page {
+fragment MovieParts on Movie {
   title
-  seo {
-    __typename
-    seoTitle
-    ogImage
-    ogDescription
-  }
-  blocks {
-    __typename
-    ... on PageBlocksHero {
-      description
-      backgroundImage
-    }
-    ... on PageBlocksCta {
-      ctaText
-      ctaStyle
+  releaseDate
+  rating
+  archived
+  genre
+  director {
+    ... on Document {
+      id
     }
   }
+  actors {
+    ... on Document {
+      id
+    }
+  }
+  body
+}
+
+fragment DirectorParts on Director {
+  name
+}
+
+fragment ActorParts on Actor {
+  name
+  body
 }

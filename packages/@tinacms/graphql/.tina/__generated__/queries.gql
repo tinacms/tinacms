@@ -1,5 +1,5 @@
-query getPageDocument($relativePath: String!) {
-  getPageDocument(relativePath: $relativePath) {
+query getMovieDocument($relativePath: String!) {
+  getMovieDocument(relativePath: $relativePath) {
     sys {
       filename
       basename
@@ -10,13 +10,13 @@ query getPageDocument($relativePath: String!) {
     }
     id
     data {
-      ...PageParts
+      ...MovieParts
     }
   }
 }
 
-query getPageList {
-  getPageList {
+query getMovieList {
+  getMovieList {
     totalCount
     edges {
       node {
@@ -30,7 +30,85 @@ query getPageList {
           extension
         }
         data {
-          ...PageParts
+          ...MovieParts
+        }
+      }
+    }
+  }
+}
+
+query getDirectorDocument($relativePath: String!) {
+  getDirectorDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    data {
+      ...DirectorParts
+    }
+  }
+}
+
+query getDirectorList {
+  getDirectorList {
+    totalCount
+    edges {
+      node {
+        id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        data {
+          ...DirectorParts
+        }
+      }
+    }
+  }
+}
+
+query getActorDocument($relativePath: String!) {
+  getActorDocument(relativePath: $relativePath) {
+    sys {
+      filename
+      basename
+      breadcrumbs
+      path
+      relativePath
+      extension
+    }
+    id
+    data {
+      ...ActorParts
+    }
+  }
+}
+
+query getActorList {
+  getActorList {
+    totalCount
+    edges {
+      node {
+        id
+        sys {
+          filename
+          basename
+          breadcrumbs
+          path
+          relativePath
+          extension
+        }
+        data {
+          ...ActorParts
         }
       }
     }
