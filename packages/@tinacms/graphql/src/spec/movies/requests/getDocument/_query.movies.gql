@@ -1,0 +1,18 @@
+query {
+  getDocument(collection: "movie", relativePath: "star-wars.md") {
+    ... on MovieDocument {
+      id
+      data {
+        title
+        genre
+        director {
+          ... on DirectorDocument {
+            data {
+              name
+            }
+          }
+        }
+      }
+    }
+  }
+}

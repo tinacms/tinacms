@@ -1,0 +1,9 @@
+query {
+  getMovieList(filter: { archived: { eq: true } }) {
+    edges {
+      node {
+        id
+      }
+    }
+  }
+}
