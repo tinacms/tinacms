@@ -62,7 +62,7 @@ export class LevelStore implements Store {
     await this.put(filepath, data)
   }
   public supportsSeeding() {
-    return false
+    return true
   }
   public supportsIndexing() {
     return true
