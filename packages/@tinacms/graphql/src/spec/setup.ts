@@ -25,6 +25,12 @@ import type { Store } from '../database/store'
 import type { TinaCloudSchema } from '../types'
 import { sequential } from '../util'
 
+class MockFilesystemBridge extends FilesystemBridge {
+  async put(filepath: string, data: string) {
+    // noop
+  }
+}
+
 export const setup = async (
   rootPath: string,
   schema: TinaCloudSchema<false>,
@@ -32,15 +38,20 @@ export const setup = async (
 ): Promise<{
   database: Database
 }> => {
-  const bridge = new FilesystemBridge(rootPath)
-  const database = await createDatabase({
-    bridge,
+  const setupBridge = new FilesystemBridge(rootPath)
+  const setupDatabase = await createDatabase({
+    bridge: setupBridge,
     store,
   })
   await indexDB({
-    database,
+    database: setupDatabase,
     config: schema,
     experimentalData: store.supportsIndexing(),
+  })
+  const bridge = new MockFilesystemBridge(rootPath)
+  const database = await createDatabase({
+    bridge,
+    store,
   })
   const schemaString = await database.getGraphQLSchema()
   // @ts-ignore
