@@ -1,0 +1,14 @@
+{
+  "data": {
+    "getPostDocument": {
+      "data": {
+        "title": "Hello, again!",
+        "author": {
+          "data": {
+            "name": "Marge Simpson"
+          }
+        }
+      }
+    }
+  }
+}

@@ -1,0 +1,63 @@
+{
+  "ActorConnection": {
+    "type": "ActorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "actor"
+  },
+  "DocumentConnection": {
+    "type": "DocumentConnection",
+    "resolveType": "multiCollectionDocumentList",
+    "collections": [
+      "movie",
+      "director",
+      "actor"
+    ]
+  },
+  "Node": {
+    "type": "Node",
+    "resolveType": "nodeDocument"
+  },
+  "DocumentNode": {
+    "type": "DocumentNode",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "MovieDirectorDocument": {
+    "type": "MovieDirectorDocument",
+    "resolveType": "multiCollectionDocument",
+    "createDocument": "create",
+    "updateDocument": "update"
+  },
+  "MovieDocument": {
+    "type": "MovieDocument",
+    "resolveType": "collectionDocument",
+    "collection": "movie",
+    "createMovieDocument": "create",
+    "updateMovieDocument": "update"
+  },
+  "MovieConnection": {
+    "type": "MovieConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "movie"
+  },
+  "DirectorDocument": {
+    "type": "DirectorDocument",
+    "resolveType": "collectionDocument",
+    "collection": "director",
+    "createDirectorDocument": "create",
+    "updateDirectorDocument": "update"
+  },
+  "DirectorConnection": {
+    "type": "DirectorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "director"
+  },
+  "ActorDocument": {
+    "type": "ActorDocument",
+    "resolveType": "collectionDocument",
+    "collection": "actor",
+    "createActorDocument": "create",
+    "updateActorDocument": "update"
+  }
+}

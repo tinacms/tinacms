@@ -1,0 +1,43 @@
+Author {
+  ... on AuthorAuthor {
+    name
+    socialMedia {
+      __typename
+      platform
+      handle
+    }
+  }
+}
+
+Post {
+  ... on PostPost {
+    title
+    body
+    author {
+      ... on Document {
+        id
+      }
+    }
+  }
+}
+
+fragment PageParts on Page {
+  title
+  seo {
+    __typename
+    seoTitle
+    ogImage
+    ogDescription
+  }
+  blocks {
+    __typename
+    ... on PageBlocksHero {
+      description
+      backgroundImage
+    }
+    ... on PageBlocksCta {
+      ctaText
+      ctaStyle
+    }
+  }
+}
