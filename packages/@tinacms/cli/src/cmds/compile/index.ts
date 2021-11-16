@@ -61,7 +61,8 @@ export const compile = async (_ctx, _next) => {
   }
 
   // Remove old js files
-  await resetGeneratedFolder
+  await fs.remove(tinaTempPath)
+  await fs.remove(tinaConfigPath)
 
   // Turn the TS files into JS files so they can be exacted
   await transpile(tinaPath, tinaTempPath)
