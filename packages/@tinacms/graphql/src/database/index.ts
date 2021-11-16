@@ -130,21 +130,30 @@ export class Database {
       }
       const existingData = await this.get<{ _collection: string }>(filepath)
       const collection = this.tinaSchema.getCollection(existingData._collection)
-      const atts = await _indexCollectable({
+      /**
+       * Determine the attributes which are already in the store and
+       * just remove them all. This can be more efficient if we only
+       * remove what's no longer needed, but keeping it simple for now.
+       */
+      const attributesToFilterOut = await _indexCollectable({
         record: filepath,
         value: existingData,
         field: collection,
         prefix: collection.name,
         database: this,
       })
-      const atts2 = await _indexCollectable({
+      /**
+       * As a separate step, add the "new" attributes, even though
+       * they'll often be the same as the ones we just removed
+       */
+      const attributesToAdd = await _indexCollectable({
         record: filepath,
         value: data,
         field: collection,
         prefix: collection.name,
         database: this,
       })
-      await sequential(atts, async (attribute) => {
+      await sequential(attributesToFilterOut, async (attribute) => {
         const records = (await this.store.get<string[]>(attribute)) || []
         await this.store.put(
           attribute,
@@ -152,7 +161,7 @@ export class Database {
         )
         return true
       })
-      await sequential(atts2, async (attribute) => {
+      await sequential(attributesToAdd, async (attribute) => {
         const records = (await this.store.get<string[]>(attribute)) || []
         await this.store.put(attribute, [...records, filepath])
         return true
@@ -525,10 +534,4 @@ const _indexAttribute = async ({
   const stringValue = value.toString().substr(0, 100)
   const fieldName = `__attribute__${prefix}#${field.name}#${stringValue}`
   return fieldName
-  // const existingRecords = (await database.store.get(fieldName)) || []
-  // // FIXME: only indexing on the first 100 characters, a "startsWith" query will be handy
-  // // @ts-ignore
-  // const uniqueItems = [...new Set([...existingRecords, record])]
-  // await database.store.seed(fieldName, uniqueItems)
-  // return fieldName
 }
