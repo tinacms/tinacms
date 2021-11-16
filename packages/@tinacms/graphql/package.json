@@ -4,8 +4,7 @@
   "main": "dist/index.js",
   "typings": "dist/index.d.ts",
   "files": [
-    "dist",
-    "src/fixtures/**/*"
+    "dist"
   ],
   "license": "Apache-2.0",
   "buildConfig": {
@@ -38,7 +37,7 @@
     ]
   },
   "scripts": {
-    "types": "yarn tsc --project ./tsconfig.real.json",
+    "types": "yarn tsc",
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
     "docs": "yarn typedoc",
     "serve": "yarn nodemon dist/server.js",

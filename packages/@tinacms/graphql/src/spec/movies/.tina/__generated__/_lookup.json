@@ -1,7 +1,0 @@
-{
-  "ActorConnection": {
-    "type": "ActorConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "actor"
-  }
-}

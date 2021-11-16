@@ -1,5 +1,0 @@
-query {
-  getCollections {
-    name
-  }
-}
