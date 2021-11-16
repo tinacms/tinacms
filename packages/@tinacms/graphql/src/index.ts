@@ -11,8 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-export { GithubBridge } from './primitives/database/github'
-export type { GithubManagerInit } from './primitives/database/github'
+export { GithubBridge } from './database/github'
+export type { GithubManagerInit } from './database/github'
 export {
   gql,
   resolve,
@@ -27,7 +27,7 @@ import type {
   TinaCloudCollection as TinaCloudCollectionBase,
   TinaCloudTemplateBase as TinaTemplate,
   TinaFieldBase,
-} from './primitives/types'
+} from './types'
 
 import { Octokit } from '@octokit/rest'
 
