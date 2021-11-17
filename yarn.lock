@@ -5517,7 +5517,7 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@types/prompts@npm:^2.0.13":
+"@types/prompts@npm:^2.0.13, @types/prompts@npm:^2.0.14":
   version: 2.4.0
   resolution: "@types/prompts@npm:2.4.0"
   checksum: 9d5b490dbad2a89ed17b6bf5ef4430b045d61677ccd75e2d18b119cee97a2aa0329f573925032c22fe5d1b2a95b32f318156cb74b60ff8b36b488c36c4ee36b4
@@ -11270,11 +11270,13 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "create-tina-app@workspace:packages/create-tina-app"
   dependencies:
+    "@types/prompts": ^2.0.14
     "@types/tar": 4.0.3
     chalk: ^4.1.2
     commander: ^8.3.0
     cross-spawn: ^7.0.3
     got: ^11.8.2
+    prompts: ^2.4.2
     rimraf: ^3.0.2
     tar: 4.4.10
   bin:
@@ -23073,6 +23075,16 @@ fsevents@~2.1.2:
     kleur: ^3.0.3
     sisteransi: ^1.0.5
   checksum: 705eae8c359edd7c5ba47404ef349d239334ebde0f55420588dd98449c52b38e35b52800ef55ad5804bb8c3b98b3b834beb749813f89e896d058ee18aa0d6c2c
+  languageName: node
+  linkType: hard
+
+"prompts@npm:^2.4.2":
+  version: 2.4.2
+  resolution: "prompts@npm:2.4.2"
+  dependencies:
+    kleur: ^3.0.3
+    sisteransi: ^1.0.5
+  checksum: ccd7f7f8dfebb72508f9c03f06507e3e7d8431d3b734fa788633c20c1134edf850ece4fc251830c077c9bdad4d6237f28fb72de142d90974473b44be42e72a81
   languageName: node
   linkType: hard
 
