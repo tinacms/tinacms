@@ -16,6 +16,7 @@ import prompts from 'prompts'
 // TODO: add and implement async-retry
 // import retry from 'async-retry'
 import path from 'path'
+//@ts-ignore
 import { version, name } from '../package.json'
 import { getRepoInfo, downloadAndExtractRepo } from './util/examples'
 import { isWriteable, makeDir, isFolderEmpty } from './util/fileUtil'
