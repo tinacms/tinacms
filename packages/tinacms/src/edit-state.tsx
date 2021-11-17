@@ -31,7 +31,18 @@ export const TinaEditProvider = ({
 
 const ToggleButton = () => {
   const { edit } = useEditState()
-  return edit ? null : (
+
+  const [isOnAdmin, setIsOnAdmin] = React.useState(false)
+
+  React.useEffect(() => {
+    if (window) {
+      if (window.location?.pathname.startsWith('/admin')) {
+        setIsOnAdmin(true)
+      }
+    }
+  }, [setIsOnAdmin])
+
+  return edit || isOnAdmin ? null : (
     <div
       style={{ position: 'fixed', bottom: '56px', left: '0px', zIndex: 200 }}
     >
