@@ -28,6 +28,7 @@
     "directory": "packages/create-tina-app"
   },
   "devDependencies": {
+    "@types/node": "^16.11.7",
     "@types/prompts": "^2.0.14",
     "@types/tar": "4.0.3",
     "typescript": "^4.3.5"

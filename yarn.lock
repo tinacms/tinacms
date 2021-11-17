@@ -5459,6 +5459,13 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/node@npm:^16.11.7":
+  version: 16.11.7
+  resolution: "@types/node@npm:16.11.7"
+  checksum: edd73014790c2889177e8eee35c58a76e644c5d1cc6e19325878cdb130ce6f826b452e7ca04b2e8f7787a5c706f7fab1ba168fe1492dd6da92c780e5bd2fbaa5
+  languageName: node
+  linkType: hard
+
 "@types/node@npm:^16.9.1":
   version: 16.10.4
   resolution: "@types/node@npm:16.10.4"
@@ -11270,6 +11277,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "create-tina-app@workspace:packages/create-tina-app"
   dependencies:
+    "@types/node": ^16.11.7
     "@types/prompts": ^2.0.14
     "@types/tar": 4.0.3
     chalk: ^4.1.2
