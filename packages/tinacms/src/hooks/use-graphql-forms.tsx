@@ -455,9 +455,12 @@ const generateFormCreators = (cms: TinaCMS) => {
     cms.forms.add(form)
     return form
   }
-  const createGlobalForm = (formConfig) => {
+  const createGlobalForm = (
+    formConfig,
+    options?: { icon?: any; layout: 'fullscreen' | 'popup' }
+  ) => {
     const form = new Form(formConfig)
-    cms.plugins.add(new GlobalFormPlugin(form))
+    cms.plugins.add(new GlobalFormPlugin(form, options?.icon, options?.layout))
     return form
   }
   return { createForm, createGlobalForm }
