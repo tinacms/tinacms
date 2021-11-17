@@ -1,3 +1,1 @@
-const { run } = require('./dist/index')
-
-run()
+require('./dist/index')

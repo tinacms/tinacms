@@ -28,6 +28,7 @@
     "directory": "packages/create-tina-app"
   },
   "devDependencies": {
+    "@types/prompts": "^2.0.14",
     "@types/tar": "4.0.3"
   },
   "dependencies": {
@@ -35,6 +36,7 @@
     "commander": "^8.3.0",
     "cross-spawn": "^7.0.3",
     "got": "^11.8.2",
+    "prompts": "^2.4.2",
     "rimraf": "^3.0.2",
     "tar": "4.4.10"
   }

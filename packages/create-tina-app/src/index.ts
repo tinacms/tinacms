@@ -1,4 +1,5 @@
 import { Command } from 'commander'
+import prompts from 'prompts'
 // import retry from 'async-retry'
 import path from 'path'
 import { version, name } from '../package.json'
@@ -8,15 +9,39 @@ import { install } from './util/install'
 import chalk from 'chalk'
 
 const program = new Command(name)
-program.version(version)
-
-program.option('-e, --example <example>', 'Choose which example to start from')
+let projectName = ''
+program
+  .version(version)
+  .option('-e, --example <example>', 'Choose which example to start from')
+  .arguments('[project-directory]')
+  .usage(`${chalk.green('<project-directory>')} [options]`)
+  .action((name) => {
+    projectName = name
+  })
 
 export const run = async () => {
   program.parse(process.argv)
   const opts = program.opts()
   const example = opts.example || 'basic'
-  const dirName = 'test'
+
+  if (!projectName) {
+    const res = await prompts({
+      name: 'name',
+      type: 'text',
+      message: 'What is your project named?',
+      initial: 'my-tina-app',
+      // TODO: impalement validation logic
+      // validate: (name) => {
+      //   const validation = validateNpmName(path.basename(path.resolve(name)))
+      //   if (validation.valid) {
+      //     return true
+      //   }
+      //   return 'Invalid project name: ' + validation.problems![0]
+      // },
+    })
+    projectName = res.name
+  }
+  const dirName = projectName
 
   const repoURL = new URL(
     `https://github.com/tinacms/tinacms/tree/examples/examples/${example}`
@@ -55,7 +80,7 @@ export const run = async () => {
   console.log('Installing packages. This might take a couple of minutes.')
   console.log()
 
-  await install(root, null, { useYarn: false, isOnline: true })
+  await install(root, null, { useYarn: true, isOnline: true })
   console.log()
 
   console.log({ repoInfo })
