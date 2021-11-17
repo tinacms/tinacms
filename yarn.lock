@@ -11271,8 +11271,11 @@ __metadata:
   resolution: "create-tina-app@workspace:packages/create-tina-app"
   dependencies:
     "@types/tar": 4.0.3
+    chalk: ^4.1.2
     commander: ^8.3.0
+    cross-spawn: ^7.0.3
     got: ^11.8.2
+    rimraf: ^3.0.2
     tar: 4.4.10
   bin:
     create-tina-app: ./dist/index.js
