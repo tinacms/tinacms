@@ -269,9 +269,21 @@ const FormStatus = ({ pristine }) => {
 
 export const FormWrapper = ({ children, padded = false }) => {
   return (
-    <div className="max-h-full overflow-y-auto h-full">
-      <div className={`w-full flex justify-center ${padded && `px-6 pt-8`}`}>
-        <div className={`max-w-screen-md w-full ${padded && `mb-0`}`}>
+    <div style={{ maxHeight: '100%', overflowY: 'auto', height: '100%' }}>
+      <div
+        style={{
+          width: '100%',
+          display: 'flex',
+          justifyContent: 'center',
+          padding: padded ? `2rem 1.5rem 0 1.5rem` : ``,
+        }}
+      >
+        <div
+          style={{
+            maxWidth: '900px',
+            width: '100%',
+          }}
+        >
           {children}
         </div>
       </div>
