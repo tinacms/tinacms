@@ -38,6 +38,9 @@ program
 export const run = async () => {
   program.parse(process.argv)
   const opts = program.opts()
+  if (opts.dir) {
+    process.chdir(opts.dir)
+  }
   const example = opts.example || 'basic'
   // const displayedCommand = useYarn ? 'yarn' : 'npm'
   const displayedCommand = 'yarn'
