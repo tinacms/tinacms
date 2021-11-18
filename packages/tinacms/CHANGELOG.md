@@ -1,5 +1,15 @@
 # tinacms
 
+## 0.58.1
+
+### Patch Changes
+
+- e6995cfcb: Adds README for TinaAdmin
+- 60729f60c: Adds a `reference` field
+- 19e02829f: Add ability to control plugin layout for global plugins from formify
+- Updated dependencies [60729f60c]
+  - @tinacms/toolkit@0.55.4
+
 ## 0.58.0
 
 ### Minor Changes
