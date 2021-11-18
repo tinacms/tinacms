@@ -58,3 +58,5 @@ export { TinaCMSProvider } from './components/TinaCMSProvider'
 export type { TinaCMSProviderProps } from './components/TinaCMSProvider'
 export { TinaUI } from './components/TinaUI'
 export type { TinaUIProps } from './components/TinaUI'
+
+export { useLocalStorage } from './hooks/use-local-storage'
