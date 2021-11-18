@@ -22,6 +22,7 @@ import { getRepoInfo, downloadAndExtractRepo } from './util/examples'
 import { isWriteable, makeDir, isFolderEmpty } from './util/fileUtil'
 import { install } from './util/install'
 import chalk from 'chalk'
+import { tryGitInit } from './util/git'
 
 const program = new Command(name)
 let projectName = ''
@@ -38,6 +39,9 @@ export const run = async () => {
   program.parse(process.argv)
   const opts = program.opts()
   const example = opts.example || 'basic'
+  // const displayedCommand = useYarn ? 'yarn' : 'npm'
+  const displayedCommand = 'yarn'
+  const useYarn = true
 
   if (!projectName) {
     const res = await prompts({
@@ -97,9 +101,33 @@ export const run = async () => {
 
   await install(root, null, { useYarn: true, isOnline: true })
   console.log()
+  if (tryGitInit(root)) {
+    console.log('Initialized a git repository.')
+    console.log()
+  }
 
   console.log({ repoInfo })
   console.log({ opts })
+
+  console.log(`${chalk.green('Success!')} Created ${appName} at ${root}`)
+  console.log('Inside that directory, you can run several commands:')
+  console.log()
+  console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}dev`))
+  console.log('    Starts the development server.')
+  console.log()
+  console.log(chalk.cyan(`  ${displayedCommand} ${useYarn ? '' : 'run '}build`))
+  console.log('    Builds the app for production.')
+  console.log()
+  console.log(chalk.cyan(`  ${displayedCommand} start`))
+  console.log('    Runs the built app in production mode.')
+  console.log()
+  console.log('We suggest that you begin by typing:')
+  console.log()
+  console.log(chalk.cyan('  cd'), appName)
+  console.log(
+    `  ${chalk.cyan(`${displayedCommand} ${useYarn ? '' : 'run '}dev`)}`
+  )
+  console.log()
 }
 
 run()
