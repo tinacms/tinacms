@@ -11,6 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import * as React from 'react'
+import { BranchChangeEvent } from './types'
+import { useEvent } from '../../packages/react-core'
 
 export interface BranchContextData {
   currentBranch: string
@@ -42,5 +44,10 @@ export const BranchDataProvider = ({
 }
 
 export const useBranchData: () => BranchContextData = () => {
-  return React.useContext(BranchContext)
+  const branchData = React.useContext(BranchContext)
+  const { dispatch } = useEvent<BranchChangeEvent>('branch:change')
+  React.useEffect(() => {
+    dispatch({ branchName: branchData.currentBranch })
+  }, [branchData.currentBranch])
+  return branchData
 }

@@ -27,22 +27,17 @@ export const BranchSwitcher = ({
   const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
   const { currentBranch, setCurrentBranch } = useBranchData()
-  //const [currentBranch, setCurrentBranch] = React.useState('main')
 
-  const { dispatch, subscribe } = useEvent<BranchChangeEvent>(
-    'branch-switcher:change-branch'
-  )
-
-  const handleCreateBranch = React.useCallback((value) => {
-    setListState('loading')
-    createBranch({
-      branchName: value,
-      baseBranch: currentBranch,
-    }).then(async (createdBranchName) => {
-      setCurrentBranch(createdBranchName)
-      await refreshBranchList()
-    })
-  }, [])
+  // const handleCreateBranch = React.useCallback((value) => {
+  //   setListState('loading')
+  //   createBranch({
+  //     branchName: value,
+  //     baseBranch: currentBranch,
+  //   }).then(async (createdBranchName) => {
+  //     setCurrentBranch(createdBranchName)
+  //     await refreshBranchList()
+  //   })
+  // }, [])
 
   const refreshBranchList = React.useCallback(async () => {
     setListState('loading')
@@ -84,7 +79,6 @@ export const BranchSwitcher = ({
                 currentBranch={currentBranch}
                 onChange={(branchName) => {
                   setCurrentBranch(branchName)
-                  dispatch({ branchName })
                 }}
               />
             </SelectWrap>

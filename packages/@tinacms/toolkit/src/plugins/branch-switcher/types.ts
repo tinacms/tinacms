@@ -35,7 +35,7 @@ export interface BranchSwitcherPluginOptions extends BranchSwitcherProps {
 }
 
 export interface BranchChangeEvent {
-  type: 'branch-switcher:change-branch'
+  type: 'branch:change'
   branchName: string
 }
 
