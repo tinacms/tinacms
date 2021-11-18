@@ -57,7 +57,7 @@ export class Client {
     this.options = options
     this.setBranch(options.branch)
     this.events.subscribe<BranchChangeEvent>(
-      'branch-switcher:change-branch',
+      'branch:change',
       ({ branchName }) => {
         this.setBranch(branchName)
       }
@@ -265,18 +265,12 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  async listBranches({ owner, repo }: BranchData) {
+  async listBranches() {
     const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
-    try {
-      const res = await this.fetchWithToken(url, {
-        method: 'GET',
-      })
-
-      return res.json()
-    } catch (e) {
-      console.error('There was an issue fetching the branch list.', e)
-      return null
-    }
+    const res = await this.fetchWithToken(url, {
+      method: 'GET',
+    })
+    return res.json()
   }
   async createBranch({ baseBranch, branchName }: BranchData) {
     const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
