@@ -205,10 +205,6 @@ export const TinaCloudProvider = (
     let branchSwitcher
     if (branchingEnabled) {
       branchSwitcher = new BranchSwitcherPlugin({
-        cms,
-        owner: props.owner,
-        repo: props.repo,
-        baseBranch,
         listBranches: handleListBranches,
         createBranch: handleCreateBranch,
       })
