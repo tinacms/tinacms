@@ -21,6 +21,7 @@ import {
   BranchSwitcherPlugin,
   Branch,
   BranchDataProvider,
+  useLocalStorage,
 } from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../client'
@@ -139,7 +140,10 @@ export const TinaCloudProvider = (
     CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
 ) => {
   const baseBranch = props.branch || 'main'
-  const [currentBranch, setCurrentBranch] = React.useState(baseBranch)
+  const [currentBranch, setCurrentBranch] = useLocalStorage(
+    'tinacms-current-branch',
+    baseBranch
+  )
   useTinaAuthRedirect()
   const cms = React.useMemo(
     () =>
