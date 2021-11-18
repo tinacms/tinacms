@@ -1,6 +1,6 @@
 {
   "name": "next-tinacms-cloudinary",
-  "version": "3.3.4",
+  "version": "3.3.5",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -17,9 +17,8 @@
     ]
   },
   "scripts": {
-    "build": "yarn tsup src/index.ts src/handlers.ts --format cjs --dts",
     "types": "yarn tsc",
-    "watch": "yarn tsup src/index.ts src/handlers.ts --watch --format cjs --dts"
+    "build": "echo \"Run `yarn build` from the root of the repository instead\""
   },
   "dependencies": {
     "cloudinary": "^1.25.2",
@@ -37,7 +36,6 @@
     "react-dom": "16.14.0",
     "styled-components": "^5.2.0",
     "tinacms": "workspace:*",
-    "tsup": "4.12.5",
     "typescript": "^4.3.5"
   },
   "peerDependencies": {

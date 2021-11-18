@@ -45,7 +45,9 @@ export interface TinaCloudAuthWallProps {
   getModalActions?: (args: {
     closeModal: () => void
   }) => { name: string; action: () => Promise<void>; primary: boolean }[]
-  mediaStore?: TinaCloudMediaStoreClass | Promise<TinaCloudMediaStoreClass>
+  mediaStore?:
+    | TinaCloudMediaStoreClass
+    | (() => Promise<TinaCloudMediaStoreClass>)
 }
 
 export const AuthWallInner = ({
@@ -158,7 +160,17 @@ export const TinaCloudProvider = (
   }
   const setupMedia = async () => {
     if (props.mediaStore) {
-      cms.media.store = new (await props.mediaStore)(cms.api.tina)
+      // Check to see if the media was store was passed in?
+      if (props.mediaStore.prototype?.persist) {
+        // @ts-ignore
+        cms.media.store = new props.mediaStore(cms.api.tina)
+      } else {
+        // This means that an async function was passed in so we will use that to get the class
+
+        // @ts-ignore
+        const MediaClass = await props.mediaStore()
+        cms.media.store = new MediaClass(cms.api.tina)
+      }
     }
   }
   const handleListBranches = async (): Promise<Branch[]> => {

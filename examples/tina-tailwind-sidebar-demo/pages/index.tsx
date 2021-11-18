@@ -28,7 +28,6 @@ interface AppProps {
   }
 }
 const App = ({ data }: AppProps) => {
-  console.log({ data })
   const { getPageDocument } = data
   const { blocks, nav, footer, navlist } = getPageDocument.data
   return (
@@ -179,7 +178,6 @@ export const query = gql`
 
 export const getStaticProps = async (ctx) => {
   const tinaProps = await getStaticPropsForTina({ query, variables: {} })
-  console.log({ tinaProps })
   return {
     props: {
       ...tinaProps,

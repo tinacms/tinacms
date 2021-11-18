@@ -1,6 +1,6 @@
 {
   "name": "@tinacms/scripts",
-  "version": "0.50.3",
+  "version": "0.50.4",
   "main": "dist/index.js",
   "files": [
     "dist",
@@ -35,9 +35,6 @@
     "jest": "^27.0.6",
     "meow": "^10.0.1",
     "normalize-path": "^3.0.0",
-    "rollup-plugin-dts": "^3.0.2",
-    "rollup-plugin-node-polyfills": "^0.2.1",
-    "ts-jest": "^26.5.3",
     "tsup": "^4.12.5",
     "typescript": "^4.2.2",
     "vite": "^2.4.3",

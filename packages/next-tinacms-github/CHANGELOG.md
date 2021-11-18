@@ -1,5 +1,19 @@
 # Change Log
 
+## 1.1.22
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- Updated dependencies [138ceb8c4]
+  - react-tinacms-github@0.51.5
+
+## 1.1.21
+
+### Patch Changes
+
+- react-tinacms-github@0.51.4
+
 ## 1.1.20
 
 ### Patch Changes

@@ -1,5 +1,23 @@
 # tina-graphql
 
+## 0.57.0
+
+### Minor Changes
+
+- ed277e3bd: Remove aws dependency and cache logic from GithubBridge
+- d1ed404ba: Add support for auto-generated SDK for type-safe data fetching
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- 577d6a5ad: Adds collection arg back for generic queries as optional
+
+## 0.56.1
+
+### Patch Changes
+
+- 4b7795612: Adds support for collection.templates to TinaAdmin
+
 ## 0.56.0
 
 ### Minor Changes

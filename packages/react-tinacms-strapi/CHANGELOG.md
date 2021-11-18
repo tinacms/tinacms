@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.51.6
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- ccf6a7098: added path to Typescript typings, so that they are included in generated NPM package
+- befeb29ea: moved `react` and `react-dom` to peer dependencies to avoid conflict with newer React versions (e.g. 17)
+- Updated dependencies [138ceb8c4]
+- Updated dependencies [0417e3750]
+- Updated dependencies [d9f37ea7e]
+  - @tinacms/toolkit@0.55.3
+
 ## 0.51.5
 
 ### Patch Changes

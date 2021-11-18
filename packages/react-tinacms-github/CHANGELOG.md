@@ -1,5 +1,16 @@
 # Change Log
 
+## 0.51.5
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- Updated dependencies [138ceb8c4]
+- Updated dependencies [0417e3750]
+- Updated dependencies [d9f37ea7e]
+  - @tinacms/toolkit@0.55.3
+  - next-tinacms-markdown@0.50.3
+
 ## 0.51.4
 
 ### Patch Changes
