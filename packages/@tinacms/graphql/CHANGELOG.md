@@ -1,5 +1,11 @@
 # tina-graphql
 
+## 0.57.1
+
+### Patch Changes
+
+- 60729f60c: Adds a `reference` field
+
 ## 0.57.0
 
 ### Minor Changes
