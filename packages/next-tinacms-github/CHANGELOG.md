@@ -1,5 +1,12 @@
 # Change Log
 
+## 1.1.23
+
+### Patch Changes
+
+- 206453b2d: Fix types declaration for next-tinacms-github
+  - react-tinacms-github@0.51.6
+
 ## 1.1.22
 
 ### Patch Changes
