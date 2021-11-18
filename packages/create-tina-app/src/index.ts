@@ -86,6 +86,7 @@ export const run = async () => {
   const appName = path.basename(root)
 
   await makeDir(root)
+  process.chdir(root)
 
   if (!isFolderEmpty(root, appName)) {
     process.exit(1)
