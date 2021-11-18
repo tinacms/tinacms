@@ -14,7 +14,7 @@ import * as React from 'react'
 import { PullRequestIcon } from '../../packages/icons'
 import { ScreenPlugin } from '../../packages/react-screens'
 import { BranchSwitcher } from './BranchSwitcher'
-import { BranchSwitcherPluginOptions } from './types'
+import { BranchSwitcherProps } from './types'
 
 export class BranchSwitcherPlugin implements ScreenPlugin {
   __type = 'screen' as 'screen'
@@ -22,10 +22,10 @@ export class BranchSwitcherPlugin implements ScreenPlugin {
   name = 'Select Branch'
   layout = 'popup' as 'popup'
 
-  listBranches: BranchSwitcherPluginOptions['listBranches']
-  createBranch: BranchSwitcherPluginOptions['createBranch']
+  listBranches: BranchSwitcherProps['listBranches']
+  createBranch: BranchSwitcherProps['createBranch']
 
-  constructor(options: BranchSwitcherPluginOptions) {
+  constructor(options: BranchSwitcherProps) {
     this.listBranches = options.listBranches
     this.createBranch = options.createBranch
   }
