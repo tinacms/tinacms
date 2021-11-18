@@ -64,7 +64,7 @@ stack: ${code.stack || 'No stack was provided'}`)
   let ready = false
   if (!noWatch && !process.env.CI) {
     chokidar
-      .watch(`${rootPath}/**/*.ts`, {
+      .watch(`${rootPath}/**/*.{ts,gql,graphql}`, {
         ignored: `${path.resolve(rootPath)}/.tina/__generated__/**/*`,
       })
       .on('ready', async () => {

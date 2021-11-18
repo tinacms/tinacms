@@ -1,6 +1,6 @@
 {
   "name": "tinacms",
-  "version": "0.57.3",
+  "version": "0.58.0",
   "main": "dist/index.js",
   "files": [
     "dist"
@@ -16,8 +16,7 @@
   "license": "Apache-2.0",
   "scripts": {
     "types": "yarn tsc",
-    "build": "yarn tsup src/index.ts src/edit-state.tsx --format cjs --dts",
-    "watch": "yarn tsup src/index.ts src/edit-state.tsx --watch --format cjs --dts"
+    "build": "echo \"Run `yarn build` from the root of the repository instead\""
   },
   "dependencies": {
     "@graphql-codegen/core": "^1.15.4",
@@ -44,7 +43,6 @@
     "prop-types": "15.7.2",
     "react-icons": "^4.3.1",
     "react-router-dom": "^5.3.0",
-    "ts-jest": "^26.5.3",
     "xstate": "^4.15.1",
     "yup": "^0.32.0"
   },
@@ -56,14 +54,13 @@
     "@types/yup": "^0.29.10",
     "next": "9.4.2",
     "react": "16.14.0",
-    "react-dom": "16.13.1",
+    "react-dom": "16.14.0",
     "styled-components": "^5.2.0",
-    "tsup": "4.12.5",
     "typescript": "^4.3.5"
   },
   "peerDependencies": {
     "react": ">=16.14.0",
-    "react-dom": ">=16.8",
+    "react-dom": ">=16.14.0",
     "react-is": "^16.13.1 || <18.0.0",
     "styled-components": "*"
   },

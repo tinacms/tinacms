@@ -1,5 +1,28 @@
 # tinacms-cli
 
+## 0.57.0
+
+### Minor Changes
+
+- d1ed404ba: Add support for auto-generated SDK for type-safe data fetching
+
+### Patch Changes
+
+- 138ceb8c4: Clean up dependencies
+- Updated dependencies [138ceb8c4]
+- Updated dependencies [577d6a5ad]
+- Updated dependencies [ed277e3bd]
+- Updated dependencies [d1ed404ba]
+  - @tinacms/graphql@0.57.0
+
+## 0.56.5
+
+### Patch Changes
+
+- 33ebe7a41: updated cli generated files
+- Updated dependencies [4b7795612]
+  - @tinacms/graphql@0.56.1
+
 ## 0.56.4
 
 ### Patch Changes

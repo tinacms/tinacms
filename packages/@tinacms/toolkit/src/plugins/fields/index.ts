@@ -29,4 +29,5 @@ export {
   ToggleFieldPlugin,
   DateFieldPlugin,
   CheckboxGroupFieldPlugin,
+  ReferenceFieldPlugin,
 } from '../../packages/fields'

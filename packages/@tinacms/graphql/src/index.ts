@@ -21,17 +21,6 @@ export {
   createDatabase,
   githubRoute,
 } from './primitives'
-import { clearCache as s3ClearCache, s3Cache } from './cache/s3'
-
-import { clearCache as lruClearCache, simpleCache } from './cache/lru'
-
-export {
-  lruClearCache,
-  lruClearCache as clearCache,
-  s3ClearCache,
-  s3Cache,
-  simpleCache,
-}
 
 import type {
   TinaCloudSchema as TinaCloudSchemaBase,
@@ -42,12 +31,12 @@ import type {
 
 import { Octokit } from '@octokit/rest'
 
-export const listBranches = async ({auth, owner, repo}) => {
+export const listBranches = async ({ auth, owner, repo }) => {
   const appOctoKit = new Octokit({ auth })
   const branchList = await appOctoKit.repos.listBranches({
     owner,
     repo,
-    per_page: 100
+    per_page: 100,
   })
 
   return branchList
@@ -58,14 +47,14 @@ export const createBranch = async ({ auth, owner, repo, name, baseBranch }) => {
   const currentBranch = await appOctoKit.repos.getBranch({
     owner,
     repo,
-    branch: baseBranch
+    branch: baseBranch,
   })
 
   const newBranch = await appOctoKit.git.createRef({
     owner,
     repo,
     ref: `refs/heads/${name}`,
-    sha: currentBranch.data.commit.sha
+    sha: currentBranch.data.commit.sha,
   })
 
   return newBranch

@@ -36,21 +36,21 @@ export class CloudinaryMediaStore implements MediaStore {
       formData.append('file', file)
       formData.append('directory', directory)
       formData.append('filename', file.name)
-  
+
       const res = await this.fetchFunction(`/api/cloudinary/media`, {
         method: 'POST',
         body: formData,
       })
-  
+
       if (res.status != 200) {
         const responseData = await res.json()
         throw new Error(responseData.message)
       }
       const fileRes = await res.json()
       /**
-      * Images uploaded to Cloudinary aren't instantly available via the API;
-      * waiting a couple seconds here seems to ensure they show up in the next fetch.
-      */
+       * Images uploaded to Cloudinary aren't instantly available via the API;
+       * waiting a couple seconds here seems to ensure they show up in the next fetch.
+       */
       await new Promise((resolve) => {
         setTimeout(resolve, 2000)
       })
@@ -65,13 +65,12 @@ export class CloudinaryMediaStore implements MediaStore {
         id: fileRes.public_id,
         filename: fileRes.original_filename,
         directory: '/',
-        previewSrc: fileRes.url
-  
+        previewSrc: fileRes.url,
       }
 
       newFiles.push(parsedRes)
     }
-    return newFiles;
+    return newFiles
   }
   async delete(media: Media) {
     await this.fetchFunction(
@@ -110,7 +109,7 @@ export class CloudinaryMediaStore implements MediaStore {
   }
 
   parse = (img) => {
-    return img.previewSrc
+    return img.src
   }
 
   private buildQuery(options: MediaListOptions) {

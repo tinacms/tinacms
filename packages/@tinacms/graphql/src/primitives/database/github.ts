@@ -15,7 +15,6 @@ import _ from 'lodash'
 import path from 'path'
 import { Octokit } from '@octokit/rest'
 import { Bridge } from './bridge'
-import LRU from 'lru-cache'
 import { GraphQLError } from 'graphql'
 
 export type GithubManagerInit = {
@@ -24,30 +23,14 @@ export type GithubManagerInit = {
   owner: string
   repo: string
   ref: string
-  cache?: typeof dummyCache
-}
-
-const dummyCache = {
-  get: <T extends string | string[]>(key: string, setter: () => Promise<T>) => {
-    return setter()
-  },
 }
 
 export class GithubBridge implements Bridge {
   rootPath: string
   repoConfig: Pick<GithubManagerInit, 'owner' | 'ref' | 'repo'>
   appOctoKit: Octokit
-  cache: typeof dummyCache
 
-  constructor({
-    rootPath,
-    accessToken,
-    owner,
-    repo,
-    ref,
-    cache,
-  }: GithubManagerInit) {
-    this.cache = cache || simpleCache
+  constructor({ rootPath, accessToken, owner, repo, ref }: GithubManagerInit) {
     this.rootPath = rootPath
     this.repoConfig = {
       owner,
@@ -58,48 +41,39 @@ export class GithubBridge implements Bridge {
       auth: accessToken,
     })
   }
-  private generateKey(key: string) {
-    return `${this.repoConfig.owner}/${this.repoConfig.repo}/${this.repoConfig.ref}/${key}`
-  }
   private async readDir(filepath: string): Promise<string[]> {
     const fullPath = path.join(this.rootPath, filepath)
-    return _.flatten(
-      (
-        await this.cache.get(this.generateKey(fullPath), async () =>
-          // @ts-ignore
-          this.appOctoKit.repos
-            .getContent({
-              ...this.repoConfig,
-              path: fullPath,
-            })
-            .then(async (response) => {
-              if (Array.isArray(response.data)) {
-                return await Promise.all(
-                  await response.data.map(async (d) => {
-                    if (d.type === 'dir') {
-                      const nestedItems = await this.readDir(d.path)
-                      if (Array.isArray(nestedItems)) {
-                        return nestedItems.map((nestedItem) => {
-                          return path.join(d.path, nestedItem)
-                        })
-                      } else {
-                        throw new Error('meh')
-                      }
-                    }
-                    return d.path
+    const repos = await this.appOctoKit.repos
+      .getContent({
+        ...this.repoConfig,
+        path: fullPath,
+      })
+      .then(async (response) => {
+        if (Array.isArray(response.data)) {
+          return await Promise.all(
+            await response.data.map(async (d) => {
+              if (d.type === 'dir') {
+                const nestedItems = await this.readDir(d.path)
+                if (Array.isArray(nestedItems)) {
+                  return nestedItems.map((nestedItem) => {
+                    return path.join(d.path, nestedItem)
                   })
-                )
+                } else {
+                  throw new Error(
+                    `Expected items to be an array of strings for readDir at ${d.path}`
+                  )
+                }
               }
-
-              throw new Error(
-                `Expected to return an array from Github directory ${path}`
-              )
+              return d.path
             })
+          )
+        }
+
+        throw new Error(
+          `Expected to return an array from Github directory ${path}`
         )
-      )
-        .toString()
-        .split(',')
-    )
+      })
+    return _.flatten(repos)
   }
 
   public async glob(pattern: string) {
@@ -112,29 +86,18 @@ export class GithubBridge implements Bridge {
 
   public async get(filepath: string) {
     const realpath = path.join(this.rootPath, filepath)
-    return this.cache.get(this.generateKey(realpath), async () => {
-      return this.appOctoKit.repos
-        .getContent({
-          ...this.repoConfig,
-          path: realpath,
-        })
-        .then((response) => {
-          return Buffer.from(response.data.content, 'base64').toString()
-        })
-        .catch((e) => {
-          if (e.status === 401) {
-            throw new GraphQLError(
-              `Unauthorized request to Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', please ensure your access token is valid.`,
-              null,
-              null,
-              null,
-              null,
-              e,
-              { status: e.status }
-            )
-          }
+    return this.appOctoKit.repos
+      .getContent({
+        ...this.repoConfig,
+        path: realpath,
+      })
+      .then((response) => {
+        return Buffer.from(response.data.content, 'base64').toString()
+      })
+      .catch((e) => {
+        if (e.status === 401) {
           throw new GraphQLError(
-            `Unable to find record '${filepath}' in Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', Ref: '${this.repoConfig.ref}'`,
+            `Unauthorized request to Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', please ensure your access token is valid.`,
             null,
             null,
             null,
@@ -142,8 +105,17 @@ export class GithubBridge implements Bridge {
             e,
             { status: e.status }
           )
-        })
-    })
+        }
+        throw new GraphQLError(
+          `Unable to find record '${filepath}' in Github Repository: '${this.repoConfig.owner}/${this.repoConfig.repo}', Ref: '${this.repoConfig.ref}'`,
+          null,
+          null,
+          null,
+          null,
+          e,
+          { status: e.status }
+        )
+      })
   }
   public async put(filepath: string, data: string) {
     const realpath = path.join(this.rootPath, filepath)
@@ -169,61 +141,4 @@ export class GithubBridge implements Bridge {
       sha: fileSha,
     })
   }
-}
-
-const cache = new LRU<string, string | string[]>({
-  max: 1000,
-  length: function (v: string) {
-    return v.length
-  },
-})
-
-/*
-  ref is used as the the branch for now, so in future we may switch to commits
-*/
-export const clearCache = ({
-  owner,
-  repo,
-  ref,
-  path,
-}: {
-  owner: string
-  repo: string
-  ref: string
-  path?: string
-}) => {
-  const repoPrefix = `${owner}/${repo}/${ref}/`
-  if (path) {
-    const key = `${repoPrefix}/${path}`
-    console.log('[LRU cache]: clearing key ', key)
-    cache.del(key)
-  } else {
-    console.log('[LRU cache]: clearing all keys for repo ', repoPrefix)
-    cache.forEach((value, key, cache) => {
-      if (key.startsWith(repoPrefix)) {
-        cache.del(key)
-      }
-    })
-  }
-}
-
-/**
- * This is just an example of what you can provide for caching
- * it should be replaced with a scalable solution which shares a cache
- * across lambda instances (like redis)
- */
-export const simpleCache = {
-  get: async (keyName: string, setter: () => Promise<any>) => {
-    const value = cache.get(keyName)
-
-    if (value) {
-      console.log('getting from cache', keyName)
-      return value
-    } else {
-      const valueToCache = await setter()
-      const isSet = cache.set(keyName, valueToCache)
-      console.log('item not in cache, setting', keyName, isSet)
-      return valueToCache
-    }
-  },
 }

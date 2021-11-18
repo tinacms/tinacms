@@ -24,8 +24,83 @@ import {
   EnumTypeDefinitionNode,
   InputObjectTypeDefinitionNode,
   DocumentNode,
+  FragmentDefinitionNode,
+  SelectionNode,
+  SelectionSetNode,
+  FieldNode,
+  InlineFragmentNode,
+  OperationDefinitionNode,
 } from 'graphql'
 import _ from 'lodash'
+
+const SysFieldDefinition = {
+  kind: 'Field' as const,
+  name: {
+    kind: 'Name' as const,
+    value: 'sys',
+  },
+  arguments: [],
+  directives: [],
+  selectionSet: {
+    kind: 'SelectionSet' as const,
+    selections: [
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'filename',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'basename',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'breadcrumbs',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'path',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'relativePath',
+        },
+        arguments: [],
+        directives: [],
+      },
+      {
+        kind: 'Field' as const,
+        name: {
+          kind: 'Name' as const,
+          value: 'extension',
+        },
+        arguments: [],
+        directives: [],
+      },
+    ],
+  },
+}
 
 /**
  * the `gql` module provides functions and types which can be
@@ -180,6 +255,23 @@ export const astBuilder = {
       }),
     }
   },
+  FieldNodeDefinition: ({
+    name,
+    type,
+    args = [],
+    list,
+    required,
+  }: {
+    name: string
+    type: string | TypeDefinitionNode
+    required?: boolean
+    list?: boolean
+    args?: InputValueDefinitionNode[]
+  }) =>
+    ({
+      name: { kind: 'Name' as const, value: name },
+      kind: 'Field' as const,
+    } as FieldNode),
   FieldDefinition: ({
     name,
     type,
@@ -193,6 +285,7 @@ export const astBuilder = {
     list?: boolean
     args?: InputValueDefinitionNode[]
   }) => {
+    // Default to true
     let res = {}
     const namedType = {
       kind: 'NamedType' as const,
@@ -209,7 +302,10 @@ export const astBuilder = {
       },
       arguments: args,
     }
+
+    // list
     if (list) {
+      // list and required
       if (required) {
         res = {
           ...def,
@@ -224,6 +320,7 @@ export const astBuilder = {
             },
           },
         }
+        // list and not required
       } else {
         res = {
           ...def,
@@ -233,7 +330,9 @@ export const astBuilder = {
           },
         }
       }
+      // Not a list
     } else {
+      // Not a list and required
       if (required) {
         res = {
           ...def,
@@ -242,6 +341,7 @@ export const astBuilder = {
             type: namedType,
           },
         }
+        // Not a list and not required
       } else {
         res = {
           ...def,
@@ -343,6 +443,73 @@ export const astBuilder = {
     },
     fields,
   }),
+  FieldWithSelectionSetDefinition: ({
+    name,
+    selections,
+  }: {
+    name: string
+    selections: SelectionNode[]
+  }) => {
+    return {
+      name: { kind: 'Name' as const, value: name },
+      kind: 'Field' as const,
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections,
+      },
+    }
+  },
+  InlineFragmentDefinition: ({
+    name,
+    selections,
+  }: {
+    name: string
+    selections: SelectionNode[]
+  }): InlineFragmentNode => {
+    return {
+      kind: 'InlineFragment' as const,
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections,
+      },
+      typeCondition: {
+        kind: 'NamedType' as const,
+        name: {
+          kind: 'Name' as const,
+          value: name,
+        },
+      },
+    }
+  },
+  FragmentDefinition: ({
+    name,
+    fragmentName,
+    selections,
+  }: {
+    name: string
+    fragmentName: string
+    selections: SelectionNode[]
+  }): FragmentDefinitionNode => {
+    return {
+      kind: 'FragmentDefinition' as const,
+      name: {
+        kind: 'Name' as const,
+        value: fragmentName,
+      },
+      typeCondition: {
+        kind: 'NamedType' as const,
+        name: {
+          kind: 'Name' as const,
+          value: name,
+        },
+      },
+      directives: [],
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections,
+      },
+    }
+  },
   TYPES: {
     Scalar: (type: scalarNames) => {
       const scalars = {
@@ -369,6 +536,212 @@ export const astBuilder = {
     Connection: 'Connection',
     Number: 'Int',
     Document: 'Document',
+  },
+
+  QueryOperationDefinition: ({
+    queryName,
+    fragName,
+  }: {
+    queryName: string
+    fragName: string
+  }): OperationDefinitionNode => {
+    return {
+      kind: 'OperationDefinition' as const,
+      operation: 'query' as const,
+      name: {
+        kind: 'Name' as const,
+        value: queryName,
+      },
+      variableDefinitions: [
+        {
+          kind: 'VariableDefinition' as const,
+          type: {
+            kind: 'NonNullType',
+            type: {
+              kind: 'NamedType',
+              name: { kind: 'Name' as const, value: 'String' },
+            },
+          },
+          variable: {
+            kind: 'Variable' as const,
+            name: { kind: 'Name' as const, value: 'relativePath' },
+          },
+        },
+      ],
+      selectionSet: {
+        kind: 'SelectionSet' as const,
+        selections: [
+          {
+            kind: 'Field',
+            name: {
+              kind: 'Name',
+              value: queryName,
+            },
+            arguments: [
+              {
+                kind: 'Argument',
+                name: {
+                  kind: 'Name',
+                  value: 'relativePath',
+                },
+                value: {
+                  kind: 'Variable',
+                  name: {
+                    kind: 'Name',
+                    value: 'relativePath',
+                  },
+                },
+              },
+            ],
+            directives: [],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                SysFieldDefinition,
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'id',
+                  },
+                  arguments: [],
+                  directives: [],
+                },
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'data',
+                  },
+                  arguments: [],
+                  directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'FragmentSpread',
+                        name: {
+                          kind: 'Name',
+                          value: fragName,
+                        },
+                        directives: [],
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    }
+  },
+
+  ListQueryOperationDefinition: ({
+    queryName,
+    fragName,
+  }: {
+    queryName: string
+    fragName: string
+  }): OperationDefinitionNode => {
+    return {
+      kind: 'OperationDefinition',
+      operation: 'query',
+      name: {
+        kind: 'Name',
+        value: queryName,
+      },
+      variableDefinitions: [],
+      directives: [],
+      selectionSet: {
+        kind: 'SelectionSet',
+        selections: [
+          {
+            kind: 'Field',
+            name: {
+              kind: 'Name',
+              value: queryName,
+            },
+            arguments: [],
+            directives: [],
+            selectionSet: {
+              kind: 'SelectionSet',
+              selections: [
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'totalCount',
+                  },
+                  arguments: [],
+                  directives: [],
+                },
+                {
+                  kind: 'Field',
+                  name: {
+                    kind: 'Name',
+                    value: 'edges',
+                  },
+                  arguments: [],
+                  directives: [],
+                  selectionSet: {
+                    kind: 'SelectionSet',
+                    selections: [
+                      {
+                        kind: 'Field',
+                        name: {
+                          kind: 'Name',
+                          value: 'node',
+                        },
+                        arguments: [],
+                        directives: [],
+                        selectionSet: {
+                          kind: 'SelectionSet',
+                          selections: [
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'id',
+                              },
+                              arguments: [],
+                              directives: [],
+                            },
+                            SysFieldDefinition,
+                            {
+                              kind: 'Field',
+                              name: {
+                                kind: 'Name',
+                                value: 'data',
+                              },
+                              arguments: [],
+                              directives: [],
+                              selectionSet: {
+                                kind: 'SelectionSet',
+                                selections: [
+                                  {
+                                    kind: 'FragmentSpread',
+                                    name: {
+                                      kind: 'Name',
+                                      value: fragName,
+                                    },
+                                    directives: [],
+                                  },
+                                ],
+                              },
+                            },
+                          ],
+                        },
+                      },
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        ],
+      },
+    }
   },
   toGraphQLAst: (ast: {
     globalTemplates: TypeDefinitionNode[]
@@ -536,6 +909,9 @@ export const NAMER = {
   },
   generateQueryListName: (namespace: string[]) => {
     return 'get' + generateNamespacedFieldName(namespace, 'List')
+  },
+  fragmentName: (namespace: string[]) => {
+    return generateNamespacedFieldName(namespace, '') + 'Parts'
   },
   collectionTypeName: (namespace: string[]) => {
     return generateNamespacedFieldName(namespace, 'Collection')
