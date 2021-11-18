@@ -17,7 +17,6 @@ import {
   TinaCMS,
   TinaProvider,
   MediaStore,
-  //@ts-ignore why can't it find you
   BranchSwitcherPlugin,
   Branch,
   BranchDataProvider,
@@ -179,9 +178,16 @@ export const TinaCloudProvider = (
 
   setupMedia()
 
-  //@ts-ignore it's not picking up cms.flags
-  //const branchingEnabled = cms.flags.get('branch-switcher')
-  const branchingEnabled = true
+  const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
+    cms.flags.get('branch-switcher')
+  )
+  React.useEffect(() => {
+    cms.events.subscribe('flag:set', ({ key, value }) => {
+      if (key === 'branch-switcher') {
+        setBranchingEnabled(value)
+      }
+    })
+  }, [cms.events])
 
   React.useEffect(() => {
     let branchSwitcher
@@ -203,9 +209,11 @@ export const TinaCloudProvider = (
     }
   }, [branchingEnabled, props.branch])
 
-  if (props.cmsCallback) {
-    props.cmsCallback(cms)
-  }
+  React.useEffect(() => {
+    if (props.cmsCallback) {
+      props.cmsCallback(cms)
+    }
+  }, [])
 
   return (
     <BranchDataProvider
