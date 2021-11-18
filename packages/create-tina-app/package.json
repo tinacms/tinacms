@@ -6,7 +6,7 @@
     "dist",
     "bin/*"
   ],
-  "bin": "./dist/index.js",
+  "bin": "./bin/create-tina-app",
   "typings": "dist/index.d.ts",
   "license": "Apache-2.0",
   "buildConfig": {
