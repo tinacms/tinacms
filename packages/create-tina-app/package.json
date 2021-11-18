@@ -20,7 +20,7 @@
   "scripts": {
     "types": "yarn tsc",
     "build": "echo \"Run `yarn build` from the root of the repository instead\"",
-    "test-run-bin": "echo $INIT_CWD && yarn create-tina-app --dir $INIT_CWD"
+    "test-run-bin": "yarn create-tina-app"
   },
   "publishConfig": {
     "registry": "https://registry.npmjs.org"
