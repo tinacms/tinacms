@@ -26,6 +26,7 @@ import type { TinaCMS } from '@tinacms/toolkit'
 const updateDocument = async (
   cms: TinaCMS,
   relativePath: string,
+  collection: { name: string },
   mutationInfo: { includeCollection: boolean; includeTemplate: boolean },
   values: any
 ) => {
@@ -36,14 +37,16 @@ const updateDocument = async (
   })
 
   await cms.api.tina.request(
-    `mutation($relativePath: String!, $params: DocumentMutation!) {
+    `mutation($collection: String!, $relativePath: String!, $params: DocumentMutation!) {
       updateDocument( 
+        collection: $collection,
         relativePath: $relativePath, 
         params: $params
       ){__typename}
     }`,
     {
       variables: {
+        collection: collection.name,
         relativePath,
         params,
       },
@@ -78,6 +81,7 @@ const CollectionUpdatePage = () => {
                       await updateDocument(
                         cms,
                         relativePath,
+                        collection,
                         mutationInfo,
                         values
                       )
