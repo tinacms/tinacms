@@ -31,7 +31,6 @@ import CollectionListPage from './pages/CollectionListPage'
 import CollectionCreatePage from './pages/CollectionCreatePage'
 import CollectionUpdatePage from './pages/CollectionUpdatePage'
 
-import useEmbedTailwind from './hooks/useEmbedTailwind'
 import { isEditing, setEditing } from '../edit-state'
 import { Menu, Transition } from '@headlessui/react'
 import { BiExit } from 'react-icons/bi'
@@ -42,8 +41,6 @@ const logout = () => {
 }
 
 export const TinaAdmin = () => {
-  useEmbedTailwind()
-
   const userName = 'User Name'
 
   const isSSR = typeof window === 'undefined'
@@ -72,7 +69,7 @@ export const TinaAdmin = () => {
           {(collections) => (
             <Layout>
               <Router>
-                <div className="flex items-stretch h-screen overflow-hidden">
+                <div className="hidden sm:flex items-stretch h-screen overflow-hidden">
                   <div className="flex flex-col w-80 lg:w-96 flex-shrink-0 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200">
                     <div className="border-b border-gray-200">
                       <Menu as="div" className="relative block">
