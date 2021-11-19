@@ -21,7 +21,6 @@
     "@babel/core": "^7.15.0",
     "@babel/plugin-transform-modules-commonjs": "^7.15.0",
     "@sucrase/jest-plugin": "^2.1.1",
-    "@tailwindcss/jit": "^0.1.18",
     "@types/inquirer": "^6.5.0",
     "@yarnpkg/esbuild-plugin-pnp": "^1.0.0-rc.12",
     "chalk": "^4.1.1",

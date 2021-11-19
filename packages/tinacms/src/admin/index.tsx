@@ -69,7 +69,7 @@ export const TinaAdmin = () => {
           {(collections) => (
             <Layout>
               <Router>
-                <div className="hidden sm:flex items-stretch h-screen overflow-hidden">
+                <div className="flex items-stretch h-screen overflow-hidden">
                   <div className="flex flex-col w-80 lg:w-96 flex-shrink-0 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200">
                     <div className="border-b border-gray-200">
                       <Menu as="div" className="relative block">

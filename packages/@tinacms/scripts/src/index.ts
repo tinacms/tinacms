@@ -174,16 +174,6 @@ e.g: "forestry types:gen --help"
   program.parse(args)
 }
 
-export interface VitePluginTailwindOptions {
-  jit?: boolean
-  autoprefixer?: boolean
-  nesting?: boolean
-  cssPath?: string
-  virtualFileId?: string
-  // viewer?: ViewerOption;
-  tailwind?: any
-}
-
 const config = (cwd = '') => {
   return {
     mode: 'jit',
