@@ -17,9 +17,10 @@ import {
   TinaCMS,
   TinaProvider,
   MediaStore,
-  //@ts-ignore why can't it find you
   BranchSwitcherPlugin,
   Branch,
+  BranchDataProvider,
+  useLocalStorage,
 } from '@tinacms/toolkit'
 
 import { Client, TinaIOConfig } from '../client'
@@ -139,6 +140,11 @@ export const TinaCloudProvider = (
   props: TinaCloudAuthWallProps &
     CreateClientProps & { cmsCallback?: (cms: TinaCMS) => TinaCMS }
 ) => {
+  const baseBranch = props.branch || 'main'
+  const [currentBranch, setCurrentBranch] = useLocalStorage(
+    'tinacms-current-branch',
+    baseBranch
+  )
   useTinaAuthRedirect()
   const cms = React.useMemo(
     () =>
@@ -150,7 +156,7 @@ export const TinaCloudProvider = (
     [props.cms]
   )
   if (!cms.api.tina) {
-    cms.api.tina = createClient(props)
+    cms.registerApi('tina', createClient(props))
   }
   const setupMedia = async () => {
     if (props.mediaStore) {
@@ -171,7 +177,10 @@ export const TinaCloudProvider = (
     const { owner, repo } = props
     const branches = await cms.api.tina.listBranches({ owner, repo })
 
-    return branches.map((branch) => branch.name)
+    if (!Array.isArray(branches)) {
+      return []
+    }
+    return branches
   }
   const handleCreateBranch = async (data) => {
     const newBranch = await cms.api.tina.createBranch(data)
@@ -181,42 +190,50 @@ export const TinaCloudProvider = (
 
   setupMedia()
 
-  //@ts-ignore it's not picking up cms.flags
-  const branchingEnabled = cms.flags.get('branch-switcher')
+  const [branchingEnabled, setBranchingEnabled] = React.useState(() =>
+    cms.flags.get('branch-switcher')
+  )
+  React.useEffect(() => {
+    cms.events.subscribe('flag:set', ({ key, value }) => {
+      if (key === 'branch-switcher') {
+        setBranchingEnabled(value)
+      }
+    })
+  }, [cms.events])
 
   React.useEffect(() => {
     let branchSwitcher
     if (branchingEnabled) {
       branchSwitcher = new BranchSwitcherPlugin({
-        cms,
-        owner: props.owner,
-        repo: props.repo,
-        baseBranch: props.branch || 'main',
-        currentBranch: props.branch || 'main',
-        //TODO implement these
         listBranches: handleListBranches,
         createBranch: handleCreateBranch,
-        setCurrentBranch: () => console.log(props.branch),
       })
       cms.plugins.add(branchSwitcher)
     }
     return () => {
-      if (!branchingEnabled) {
-        if (branchSwitcher) {
-          cms.plugins.remove(branchSwitcher)
-        }
+      if (branchingEnabled && branchSwitcher) {
+        cms.plugins.remove(branchSwitcher)
       }
     }
   }, [branchingEnabled, props.branch])
 
-  if (props.cmsCallback) {
-    props.cmsCallback(cms)
-  }
+  React.useEffect(() => {
+    if (props.cmsCallback) {
+      props.cmsCallback(cms)
+    }
+  }, [])
 
   return (
-    <TinaProvider cms={cms}>
-      <AuthWallInner {...props} cms={cms} />
-    </TinaProvider>
+    <BranchDataProvider
+      currentBranch={currentBranch}
+      setCurrentBranch={(b) => {
+        setCurrentBranch(b)
+      }}
+    >
+      <TinaProvider cms={cms}>
+        <AuthWallInner {...props} cms={cms} />
+      </TinaProvider>
+    </BranchDataProvider>
   )
 }
 

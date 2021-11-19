@@ -51,6 +51,8 @@ export class EventBus {
      * If the `listener` Set is modified during the dispatch then
      * it can cause an infinite loop. Snapshot it and it's fine.
      */
+    if (!this.listeners) return
+
     const listenerSnapshot = Array.from(this.listeners.values())
 
     listenerSnapshot.forEach((listener) => listener.handleEvent(event))
