@@ -1,5 +1,11 @@
 # Change Log
 
+## 0.56.0
+
+### Minor Changes
+
+- df3030990: Add basic branch switcher
+
 ## 0.55.4
 
 ### Patch Changes

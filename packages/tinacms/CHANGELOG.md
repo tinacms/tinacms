@@ -1,5 +1,17 @@
 # tinacms
 
+## 0.59.0
+
+### Minor Changes
+
+- df3030990: Add basic branch switcher
+
+### Patch Changes
+
+- 9ecceb59f: Always include `collection` for TinaAdmin `createDocument()` and `updateDocument()`
+- Updated dependencies [df3030990]
+  - @tinacms/toolkit@0.56.0
+
 ## 0.58.1
 
 ### Patch Changes
