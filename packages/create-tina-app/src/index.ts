@@ -58,6 +58,7 @@ export const run = async () => {
   const useYarn = res.useYarn === 'yarn'
   const displayedCommand = useYarn ? 'yarn' : 'npm'
 
+  // If there is no project name passed in the CLI ask for one
   if (!projectName) {
     const res = await prompts({
       name: 'name',
@@ -78,6 +79,7 @@ export const run = async () => {
   const dirName = projectName
   let isInternalExample = false
 
+  // If there is no --example passed thought the CLI
   if (!example) {
     const res = await prompts({
       name: 'example',
@@ -102,6 +104,7 @@ export const run = async () => {
       : res.example
   }
 
+  // Make a github UR
   const repoURL = new URL(
     isInternalExample
       ? `https://github.com/tinacms/tinacms/tree/examples/examples/${example}`
@@ -130,6 +133,7 @@ export const run = async () => {
     process.exit(1)
   }
 
+  // Download the Repo
   const repoInfo = await getRepoInfo(repoURL)
   const repoInfo2 = repoInfo
   console.log(
@@ -143,6 +147,7 @@ export const run = async () => {
   console.log('Installing packages. This might take a couple of minutes.')
   console.log()
 
+  // Run install command
   await install(root, null, { useYarn, isOnline: true })
   console.log()
   if (tryGitInit(root)) {
