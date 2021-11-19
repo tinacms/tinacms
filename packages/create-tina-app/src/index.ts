@@ -140,7 +140,6 @@ export const run = async () => {
   )
 
   await downloadAndExtractRepo(root, repoInfo2)
-  exit(0)
 
   console.log('Installing packages. This might take a couple of minutes.')
   console.log()
