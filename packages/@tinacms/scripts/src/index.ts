@@ -17,6 +17,7 @@ import { pnpPlugin } from '@yarnpkg/esbuild-plugin-pnp'
 import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
+import tailwind from 'tailwindcss'
 
 import * as commander from 'commander'
 
@@ -173,6 +174,23 @@ e.g: "forestry types:gen --help"
   program.parse(args)
 }
 
+export interface VitePluginTailwindOptions {
+  jit?: boolean
+  autoprefixer?: boolean
+  nesting?: boolean
+  cssPath?: string
+  virtualFileId?: string
+  // viewer?: ViewerOption;
+  tailwind?: any
+}
+
+const config = (cwd = '') => {
+  return {
+    mode: 'jit',
+    purge: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
+  }
+}
+
 const buildIt = async (entryPoint, packageJSON) => {
   const entry = typeof entryPoint === 'string' ? entryPoint : entryPoint.name
   const target = typeof entryPoint === 'string' ? 'browser' : entryPoint.target
@@ -225,10 +243,36 @@ const buildIt = async (entryPoint, packageJSON) => {
 
     return true
   }
+
   const defaultBuildConfig: Parameters<typeof build>[0] = {
     // plugins: [pnpPlugin(), dts()],
+    plugins: [
+      {
+        name: 'vite-plugin-tina',
+        config: (_, env) => {
+          let plugins = []
+
+          const tw = tailwind(config(process.cwd()))
+          plugins.push(tw)
+
+          return {
+            css: {
+              postcss: {
+                plugins,
+              },
+            },
+          }
+        },
+        resolveId(id) {
+          if (id === config('').virtualFileId) {
+            return config('').cssPath
+          }
+        },
+      },
+    ],
     build: {
       minify: false,
+      assetsInlineLimit: 0,
       lib: {
         entry: path.resolve(process.cwd(), entry),
         name: packageJSON.name,
@@ -336,7 +380,7 @@ const all = async (args: { watch?: boolean; dir?: string }) => {
       .toString()
       .split('\n')
       .filter((stdout) => {
-        return stdout.includes('tinacms/packages')
+        return stdout.includes('packages')
       })
       .map((line) => line.split(' ').pop())
 

@@ -18,6 +18,8 @@ import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
+// @ts-ignore
+import styles from './styles.css'
 
 import type { TinaCMS } from '@tinacms/toolkit'
 import type { formifyCallback } from './hooks/use-graphql-forms'
@@ -200,6 +202,9 @@ export const TinaCMSProvider2 = ({
   if (typeof props.query === 'string') {
     props.query
   }
+
+  console.log('loaded styles', byteCount(styles))
+
   return (
     <TinaCloudProvider
       branch={branch}
@@ -209,6 +214,7 @@ export const TinaCMSProvider2 = ({
       cmsCallback={cmsCallback}
       mediaStore={mediaStore}
     >
+      <style>{styles}</style>
       {props.query ? (
         <SetupHooks key={props.query} {...props} query={props.query || ''}>
           {children}
@@ -219,6 +225,19 @@ export const TinaCMSProvider2 = ({
       )}
     </TinaCloudProvider>
   )
+}
+
+function formatBytes(a, b = 2, k = 1024) {
+  let d = Math.floor(Math.log(a) / Math.log(k))
+  return 0 == a
+    ? '0 Bytes'
+    : parseFloat((a / Math.pow(k, d)).toFixed(Math.max(0, b))) +
+        ' ' +
+        ['Bytes', 'KB', 'MB', 'GB', 'TB', 'PB', 'EB', 'ZB', 'YB'][d]
+}
+function byteCount(s) {
+  const bytes = encodeURI(s).split(/%..|./).length - 1
+  return formatBytes(bytes)
 }
 
 const Loader = (props: { children: React.ReactNode }) => {
@@ -383,10 +402,10 @@ export const staticRequest = async ({
     // If we are running this in the browser (for example a useEffect) we should display a warning
     console.warn(`Whoops! Looks like you are using \`staticRequest\` in the browser to fetch data.
 
-The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions. 
+The local server is not available outside of \`getStaticProps\` or \`getStaticPaths\` functions.
 This function should only be called on the server at build time.
 
-This will work when developing locally but NOT when deployed to production. 
+This will work when developing locally but NOT when deployed to production.
 `)
   }
 
