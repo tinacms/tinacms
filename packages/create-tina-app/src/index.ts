@@ -23,6 +23,7 @@ import { isWriteable, makeDir, isFolderEmpty } from './util/fileUtil'
 import { install } from './util/install'
 import chalk from 'chalk'
 import { tryGitInit } from './util/git'
+import { exit } from 'process'
 
 const program = new Command(name)
 let projectName = ''
@@ -42,10 +43,21 @@ export const run = async () => {
   if (opts.dir) {
     process.chdir(opts.dir)
   }
-  const example = opts.example || 'basic'
+  let example = opts.example
   // const displayedCommand = useYarn ? 'yarn' : 'npm'
   const displayedCommand = 'yarn'
-  const useYarn = true
+
+  const res = await prompts({
+    message: 'Which package manager would you like to use?',
+    name: 'useYarn',
+    type: 'select',
+    choices: [
+      { title: 'Yarn', value: 'yarn' },
+      { title: 'NPM', value: 'npm' },
+    ],
+  })
+
+  const useYarn = res.useYarn === 'yarn'
 
   if (!projectName) {
     const res = await prompts({
@@ -65,9 +77,36 @@ export const run = async () => {
     projectName = res.name
   }
   const dirName = projectName
+  let isInternalExample = false
+
+  if (!example) {
+    const res = await prompts({
+      name: 'example',
+      type: 'select',
+      message: 'What starter code would you like to use?',
+      choices: [
+        { title: 'Tailwind Starter', value: 'tina-cloud-starter' },
+        { title: 'Basic', value: 'internal::basic' },
+        { title: 'Documentation Starter', value: 'tina-docs-starter' },
+      ],
+    })
+
+    if (typeof res.example !== 'string') {
+      console.error(chalk.red('Input must be a string'))
+      exit(1)
+    }
+
+    isInternalExample = res.example.startsWith('internal::')
+
+    example = isInternalExample
+      ? res.example.replace('internal::', '')
+      : res.example
+  }
 
   const repoURL = new URL(
-    `https://github.com/tinacms/tinacms/tree/examples/examples/${example}`
+    isInternalExample
+      ? `https://github.com/tinacms/tinacms/tree/examples/examples/${example}`
+      : `https://github.com/tinacms/${example}`
   )
 
   // Setup directory
@@ -101,6 +140,8 @@ export const run = async () => {
   )
 
   await downloadAndExtractRepo(root, repoInfo2)
+  exit(0)
+
   console.log('Installing packages. This might take a couple of minutes.')
   console.log()
 
