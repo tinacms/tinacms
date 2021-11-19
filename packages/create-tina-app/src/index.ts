@@ -44,8 +44,6 @@ export const run = async () => {
     process.chdir(opts.dir)
   }
   let example = opts.example
-  // const displayedCommand = useYarn ? 'yarn' : 'npm'
-  const displayedCommand = 'yarn'
 
   const res = await prompts({
     message: 'Which package manager would you like to use?',
@@ -58,6 +56,7 @@ export const run = async () => {
   })
 
   const useYarn = res.useYarn === 'yarn'
+  const displayedCommand = useYarn ? 'yarn' : 'npm'
 
   if (!projectName) {
     const res = await prompts({
@@ -144,7 +143,7 @@ export const run = async () => {
   console.log('Installing packages. This might take a couple of minutes.')
   console.log()
 
-  await install(root, null, { useYarn: true, isOnline: true })
+  await install(root, null, { useYarn, isOnline: true })
   console.log()
   if (tryGitInit(root)) {
     console.log('Initialized a git repository.')
