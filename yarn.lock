@@ -4538,26 +4538,6 @@ __metadata:
   languageName: node
   linkType: hard
 
-"@tailwindcss/jit@npm:^0.1.18":
-  version: 0.1.18
-  resolution: "@tailwindcss/jit@npm:0.1.18"
-  dependencies:
-    chokidar: ^3.5.1
-    dlv: ^1.1.3
-    fast-glob: ^3.2.5
-    lodash.topath: ^4.5.2
-    normalize-path: ^3.0.0
-    object-hash: ^2.1.1
-    parse-glob: ^3.0.4
-    postcss-selector-parser: ^6.0.4
-    quick-lru: ^5.1.1
-  peerDependencies:
-    postcss: ^8.2.6
-    tailwindcss: ^2.0.3
-  checksum: c9305b27f3def34e603916ac24775eb4f5778a0d84983a34a2f20fd42b2ad58d77e8efc458ca7d89a35b33bc30bdec05051b42acda968251e10e7db994a1a2ba
-  languageName: node
-  linkType: hard
-
 "@tailwindcss/typography@npm:^0.4.1":
   version: 0.4.1
   resolution: "@tailwindcss/typography@npm:0.4.1"
@@ -4766,7 +4746,6 @@ __metadata:
     "@babel/core": ^7.15.0
     "@babel/plugin-transform-modules-commonjs": ^7.15.0
     "@sucrase/jest-plugin": ^2.1.1
-    "@tailwindcss/jit": ^0.1.18
     "@types/inquirer": ^6.5.0
     "@yarnpkg/esbuild-plugin-pnp": ^1.0.0-rc.12
     chalk: ^4.1.1
@@ -16572,13 +16551,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"is-dotfile@npm:^1.0.0":
-  version: 1.0.3
-  resolution: "is-dotfile@npm:1.0.3"
-  checksum: 82be54d6d57710d393c2275a63f4c60b33bfe5e21080899073b4ef315f13c9017891aed3477c2c1ecfc43b2a1c2180151fad8fab02aba930473e88b00393501f
-  languageName: node
-  linkType: hard
-
 "is-extendable@npm:^0.1.0, is-extendable@npm:^0.1.1":
   version: 0.1.1
   resolution: "is-extendable@npm:0.1.1"
@@ -21251,7 +21223,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"object-hash@npm:^2.1.1, object-hash@npm:^2.2.0":
+"object-hash@npm:^2.2.0":
   version: 2.2.0
   resolution: "object-hash@npm:2.2.0"
   checksum: 1f62307a1f97245382282652d4dc58d66fdbaf232fe97eb69cbd69bf2428935d6764c7fb9e8e8c559a97925362bcdd92258a50e47a7175b0aa6849d50e6fde9b
@@ -21842,18 +21814,6 @@ fsevents@~2.1.2:
   bin:
     parse-github-url: ./cli.js
   checksum: 60fa1f025ed38359885be81ec7b231a16942a4f5a86fa49285ce64663b921501200e9dfe6ce270ccd29e6dce32f56be676865773bd98cc01dca098d9c6ada978
-  languageName: node
-  linkType: hard
-
-"parse-glob@npm:^3.0.4":
-  version: 3.0.4
-  resolution: "parse-glob@npm:3.0.4"
-  dependencies:
-    glob-base: ^0.3.0
-    is-dotfile: ^1.0.0
-    is-extglob: ^1.0.0
-    is-glob: ^2.0.0
-  checksum: bc9f7a8ed61b8005cce9b6f63130f9080e7034472b3e0c48cc28bfbad8c1290cca25b4fefddc7cd96d6f44e5bc2bace9e0c1f26e665cb2f693a13c2c7fcd5ff2
   languageName: node
   linkType: hard
 
