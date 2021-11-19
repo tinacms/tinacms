@@ -20,6 +20,7 @@ import {
   Form,
   GlobalFormPlugin,
   FormMetaPlugin,
+  useBranchData,
 } from '@tinacms/toolkit'
 import { assertShape, safeAssertShape } from '../utils'
 
@@ -45,6 +46,7 @@ export function useGraphqlForms<T extends object>({
   const [pendingReset, setPendingReset] = React.useState(null)
   const [isLoading, setIsLoading] = React.useState(true)
   const [newUpdate, setNewUpdate] = React.useState<NewUpdate | null>(null)
+  const { currentBranch } = useBranchData()
 
   /**
    * FIXME: this design is pretty flaky, but better than what
@@ -366,7 +368,7 @@ export function useGraphqlForms<T extends object>({
         }
       })
     }
-  }, [queryString, JSON.stringify(variables)])
+  }, [queryString, JSON.stringify(variables), currentBranch])
 
   return [data as T, isLoading]
 }
