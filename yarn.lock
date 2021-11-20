@@ -4538,6 +4538,35 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@tailwindcss/aspect-ratio@npm:^0.3.0":
+  version: 0.3.0
+  resolution: "@tailwindcss/aspect-ratio@npm:0.3.0"
+  peerDependencies:
+    tailwindcss: ">=2.0.0 || >=3.0.0-alpha.1"
+  checksum: c47a1cbf31fbf709f3be4648b2dedfa016944aa5f6640568f899d9078ef019fa25852450b84588157fa8080464854025e5b22d5a5c30f7314b23979ca4bc7a72
+  languageName: node
+  linkType: hard
+
+"@tailwindcss/forms@npm:^0.3.4":
+  version: 0.3.4
+  resolution: "@tailwindcss/forms@npm:0.3.4"
+  dependencies:
+    mini-svg-data-uri: ^1.2.3
+  peerDependencies:
+    tailwindcss: ">=2.0.0"
+  checksum: 15843088bcb974ecd5aabe7267650de3250ad57271a8140c9c4f4459a49701abbd1da8256ea1ca6e5c063a105fa0d77537b9b1cb7d96122bb93ff1d5eb591313
+  languageName: node
+  linkType: hard
+
+"@tailwindcss/line-clamp@npm:^0.2.2":
+  version: 0.2.2
+  resolution: "@tailwindcss/line-clamp@npm:0.2.2"
+  peerDependencies:
+    tailwindcss: ">=2.0.0 || >=3.0.0-alpha.1"
+  checksum: 0e1a7d326f996e93e480209bef1421a037b134f0ae0cea63e1d921bf19fe7429d052d92240e54e02fad0f4a1bbebc237739b23e8e3dccd5cb881ae43a97cc7be
+  languageName: node
+  linkType: hard
+
 "@tailwindcss/typography@npm:^0.4.1":
   version: 0.4.1
   resolution: "@tailwindcss/typography@npm:0.4.1"
@@ -4746,6 +4775,10 @@ __metadata:
     "@babel/core": ^7.15.0
     "@babel/plugin-transform-modules-commonjs": ^7.15.0
     "@sucrase/jest-plugin": ^2.1.1
+    "@tailwindcss/aspect-ratio": ^0.3.0
+    "@tailwindcss/forms": ^0.3.4
+    "@tailwindcss/line-clamp": ^0.2.2
+    "@tailwindcss/typography": ^0.4.1
     "@types/inquirer": ^6.5.0
     "@yarnpkg/esbuild-plugin-pnp": ^1.0.0-rc.12
     chalk: ^4.1.1
@@ -4761,6 +4794,8 @@ __metadata:
     meow: ^10.0.1
     normalize-path: ^3.0.0
     postcss: ^8.3.11
+    postcss-nested: ^5.0.6
+    postcss-nesting: ^10.0.2
     tailwindcss: ^2.2.19
     tsup: ^4.12.5
     typescript: ^4.2.2
@@ -19978,6 +20013,15 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"mini-svg-data-uri@npm:^1.2.3":
+  version: 1.4.3
+  resolution: "mini-svg-data-uri@npm:1.4.3"
+  bin:
+    mini-svg-data-uri: cli.js
+  checksum: eb9a5fe72f12ad528771aa95c79387cae479bad8e13a589173d24953cac85c6c533763362be327f5410601270b3e0e2135f64220f2aae8e1f748b11fa5d649df
+  languageName: node
+  linkType: hard
+
 "minimalistic-assert@npm:^1.0.0, minimalistic-assert@npm:^1.0.1":
   version: 1.0.1
   resolution: "minimalistic-assert@npm:1.0.1"
@@ -22445,7 +22489,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"postcss-nested@npm:5.0.6":
+"postcss-nested@npm:5.0.6, postcss-nested@npm:^5.0.6":
   version: 5.0.6
   resolution: "postcss-nested@npm:5.0.6"
   dependencies:
@@ -22453,6 +22497,17 @@ fsevents@~2.1.2:
   peerDependencies:
     postcss: ^8.2.14
   checksum: 9fc8e1fdd168267e58e343355518a57937fd7968530f2e1c8dae956921e73a283b1cda8138769769140e506150967eb883fa477997a9eec7e444f355c3f33bf2
+  languageName: node
+  linkType: hard
+
+"postcss-nesting@npm:^10.0.2":
+  version: 10.0.2
+  resolution: "postcss-nesting@npm:10.0.2"
+  dependencies:
+    postcss-selector-parser: 6.0.6
+  peerDependencies:
+    postcss: ^8.2
+  checksum: a47e69c92a2a3b5e705be86546fb82c139d03c233b8a70bb5cd8923a585e22e696de724dadc1d211dad9c8e9e9dcc6f82bb0cbc8d064a4a6d6f72f86d8375c57
   languageName: node
   linkType: hard
 
@@ -22608,6 +22663,16 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
+"postcss-selector-parser@npm:6.0.6, postcss-selector-parser@npm:^6.0.0, postcss-selector-parser@npm:^6.0.2, postcss-selector-parser@npm:^6.0.4, postcss-selector-parser@npm:^6.0.6":
+  version: 6.0.6
+  resolution: "postcss-selector-parser@npm:6.0.6"
+  dependencies:
+    cssesc: ^3.0.0
+    util-deprecate: ^1.0.2
+  checksum: 7e4854e82faa14bab0c5affbdf49b67cc0bf3e6fd9b0273e7f72c8ec957b5c5bcb7c64ae3cb6f8fe5b3ef965ec7e235d4e4d1a8868bd02139072e7a545221f09
+  languageName: node
+  linkType: hard
+
 "postcss-selector-parser@npm:^3.0.0":
   version: 3.1.2
   resolution: "postcss-selector-parser@npm:3.1.2"
@@ -22616,16 +22681,6 @@ fsevents@~2.1.2:
     indexes-of: ^1.0.1
     uniq: ^1.0.1
   checksum: 021ffdeef1007d4ab24439fee8e2cba188681899eae8dbc882a0e860d2ff8392f232c87e3f69eadc0a3d630b897a9ceb9f49adbe30b954a23ed91e61d3ea248c
-  languageName: node
-  linkType: hard
-
-"postcss-selector-parser@npm:^6.0.0, postcss-selector-parser@npm:^6.0.2, postcss-selector-parser@npm:^6.0.4, postcss-selector-parser@npm:^6.0.6":
-  version: 6.0.6
-  resolution: "postcss-selector-parser@npm:6.0.6"
-  dependencies:
-    cssesc: ^3.0.0
-    util-deprecate: ^1.0.2
-  checksum: 7e4854e82faa14bab0c5affbdf49b67cc0bf3e6fd9b0273e7f72c8ec957b5c5bcb7c64ae3cb6f8fe5b3ef965ec7e235d4e4d1a8868bd02139072e7a545221f09
   languageName: node
   linkType: hard
 

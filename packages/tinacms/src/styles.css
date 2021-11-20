@@ -1,8 +1,11 @@
 body {
-  background: blue !important;
-  height: 100%;
+  font-family: system-ui, -apple-system,
+    /* Firefox supports this but not yet `system-ui` */ 'Segoe UI', Roboto,
+    Helvetica, Arial, sans-serif, 'Apple Color Emoji', 'Segoe UI Emoji';
 }
 
-@tailwind base;
-@tailwind components;
-@tailwind utilities;
+.tina {
+  @tailwind base;
+  @tailwind components;
+  @tailwind utilities;
+}

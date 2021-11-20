@@ -215,14 +215,16 @@ export const TinaCMSProvider2 = ({
       mediaStore={mediaStore}
     >
       <style>{styles}</style>
-      {props.query ? (
-        <SetupHooks key={props.query} {...props} query={props.query || ''}>
-          {children}
-        </SetupHooks>
-      ) : (
-        // @ts-ignore
-        children(props)
-      )}
+      <div className="tina">
+        {props.query ? (
+          <SetupHooks key={props.query} {...props} query={props.query || ''}>
+            {children}
+          </SetupHooks>
+        ) : (
+          // @ts-ignore
+          children(props)
+        )}
+      </div>
     </TinaCloudProvider>
   )
 }

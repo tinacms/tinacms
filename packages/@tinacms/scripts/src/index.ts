@@ -18,6 +18,7 @@ import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
 import tailwind from 'tailwindcss'
+import postcssNested from 'postcss-nested'
 
 import * as commander from 'commander'
 
@@ -177,7 +178,15 @@ e.g: "forestry types:gen --help"
 const config = (cwd = '') => {
   return {
     mode: 'jit',
+    // prefix: 'tina-',
+    important: true,
     purge: [path.join(cwd, 'src/**/*.{vue,js,ts,jsx,tsx,svelte}')],
+    plugins: [
+      require('@tailwindcss/typography'),
+      require('@tailwindcss/forms'),
+      require('@tailwindcss/line-clamp'),
+      require('@tailwindcss/aspect-ratio'),
+    ],
   }
 }
 
@@ -244,6 +253,7 @@ const buildIt = async (entryPoint, packageJSON) => {
 
           const tw = tailwind(config(process.cwd()))
           plugins.push(tw)
+          plugins.push(postcssNested)
 
           return {
             css: {
