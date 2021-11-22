@@ -1,6 +1,7 @@
 import { downloadAndExtractRepo, getRepoInfo } from './util/examples'
 import chalk from 'chalk'
-import { cpSync } from 'fs'
+import { copy } from 'fs-extra'
+import path from 'path'
 
 type BaseExample = {
   title: string
@@ -55,6 +56,7 @@ export const downloadExample = async (example: Example, root: string) => {
     await downloadAndExtractRepo(root, repoInfo2)
   } else {
     // need to copy the example from local file system
-    cpSync(`../examples/${example.value}`, './')
+    const exampleFile = path.join(__dirname, '..', 'examples', example.value)
+    await copy(`${exampleFile}/`, './')
   }
 }

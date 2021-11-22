@@ -30,6 +30,7 @@
     "directory": "packages/create-tina-app"
   },
   "devDependencies": {
+    "@types/fs-extra": "^9.0.13",
     "@types/node": "^16.11.7",
     "@types/prompts": "^2.0.14",
     "@types/tar": "4.0.3",
@@ -40,6 +41,7 @@
     "commander": "^8.3.0",
     "cross-spawn": "^7.0.3",
     "esm": "3.2.25",
+    "fs-extra": "^10.0.0",
     "got": "^11.8.2",
     "prompts": "^2.4.2",
     "rimraf": "^3.0.2",
