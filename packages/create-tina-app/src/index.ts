@@ -24,6 +24,7 @@ import { install } from './util/install'
 import chalk from 'chalk'
 import { tryGitInit } from './util/git'
 import { exit } from 'process'
+import { EXAMPLES, downloadExample } from './examples'
 
 const program = new Command(name)
 let projectName = ''
@@ -85,31 +86,24 @@ export const run = async () => {
       name: 'example',
       type: 'select',
       message: 'What starter code would you like to use?',
-      choices: [
-        { title: 'Tailwind Starter', value: 'tina-cloud-starter' },
-        { title: 'Basic', value: 'internal::basic' },
-        { title: 'Documentation Starter', value: 'tina-docs-starter' },
-      ],
+      choices: EXAMPLES,
     })
 
     if (typeof res.example !== 'string') {
       console.error(chalk.red('Input must be a string'))
       exit(1)
     }
-
-    isInternalExample = res.example.startsWith('internal::')
-
-    example = isInternalExample
-      ? res.example.replace('internal::', '')
-      : res.example
+    example = res.example
   }
+  const chosenExample = EXAMPLES.find((x) => x.value === example)
 
-  // Make a github UR
-  const repoURL = new URL(
-    isInternalExample
-      ? `https://github.com/tinacms/tinacms/tree/examples/examples/${example}`
-      : `https://github.com/tinacms/${example}`
-  )
+  if (!chosenExample) {
+    console.error(
+      `The example provided is not a valid example. Please provide one of the following; ${EXAMPLES.map(
+        (x) => x.value
+      )}`
+    )
+  }
 
   // Setup directory
   const root = path.join(process.cwd(), dirName)
@@ -133,16 +127,7 @@ export const run = async () => {
     process.exit(1)
   }
 
-  // Download the Repo
-  const repoInfo = await getRepoInfo(repoURL)
-  const repoInfo2 = repoInfo
-  console.log(
-    `Downloading files from repo ${chalk.cyan(
-      example
-    )}. This might take a moment.`
-  )
-
-  await downloadAndExtractRepo(root, repoInfo2)
+  await downloadExample(chosenExample, root)
 
   console.log('Installing packages. This might take a couple of minutes.')
   console.log()
@@ -154,9 +139,6 @@ export const run = async () => {
     console.log('Initialized a git repository.')
     console.log()
   }
-
-  console.log({ repoInfo })
-  console.log({ opts })
 
   console.log(`${chalk.green('Success!')} Created ${appName} at ${root}`)
   console.log('Inside that directory, you can run several commands:')
