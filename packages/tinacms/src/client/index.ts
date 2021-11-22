@@ -44,25 +44,24 @@ export class Client {
   identityApiUrl: string
   schema: GraphQLSchema
   clientId: string
+  contentApiBase: string
   query: string
   setToken: (_token: TokenObject) => void
   private getToken: () => TokenObject
   private token: string // used with memory storage
   private branch: string
   private options: ServerOptions
-  events: EventBus // automatically hooked into global event bus when attached via cms.registerApi
+  events = new EventBus() // automatically hooked into global event bus when attached via cms.registerApi
 
   constructor({ tokenStorage = 'MEMORY', ...options }: ServerOptions) {
     this.options = options
     this.setBranch(options.branch)
-    this.events = new EventBus()
     this.events.subscribe<BranchChangeEvent>(
-      'branch-switcher:change-branch',
+      'branch:change',
       ({ branchName }) => {
         this.setBranch(branchName)
       }
     )
-
     this.clientId = options.clientId
 
     switch (tokenStorage) {
@@ -117,12 +116,12 @@ export class Client {
     this.identityApiUrl =
       this.options.tinaioConfig?.identityApiUrlOverride ||
       'https://identity.tinajs.io'
-    const contentApiBase =
+    this.contentApiBase =
       this.options.tinaioConfig?.contentApiUrlOverride ||
       `https://content.tinajs.io`
     this.contentApiUrl =
       this.options.customContentApiUrl ||
-      `${contentApiBase}/content/${this.options.clientId}/github/${encodedBranch}`
+      `${this.contentApiBase}/content/${this.options.clientId}/github/${encodedBranch}`
   }
 
   addPendingContent = async (props) => {
@@ -266,31 +265,26 @@ mutation addPendingDocumentMutation(
     }
   }
 
-  async listBranches({ owner, repo }: BranchData) {
-    const url = `${this.contentApiUrl}/list_branches?owner=${owner}&repo=${repo}`
-    try {
-      const res = await this.fetchWithToken(url, {
-        method: 'GET',
-      })
-
-      return JSON.stringify(res)
-    } catch (e) {
-      console.error('There was an issue fetching the branch list.', e)
-      return null
-    }
+  async listBranches() {
+    const url = `${this.contentApiBase}/github/${this.clientId}/list_branches`
+    const res = await this.fetchWithToken(url, {
+      method: 'GET',
+    })
+    return res.json()
   }
-  async createBranch({ owner, repo, baseBranch, branchName }: BranchData) {
-    const url = `${this.contentApiUrl}/create_branch`
+  async createBranch({ baseBranch, branchName }: BranchData) {
+    const url = `${this.contentApiBase}/github/${this.clientId}/create_branch`
 
     try {
       const res = await this.fetchWithToken(url, {
         method: 'POST',
         body: {
-          owner,
-          repo,
           baseBranch,
           branchName,
         } as any,
+        headers: {
+          'Content-Type': 'application/json',
+        },
       })
 
       return JSON.stringify(res)

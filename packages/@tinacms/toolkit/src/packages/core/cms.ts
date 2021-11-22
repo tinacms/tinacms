@@ -27,6 +27,7 @@ import { Plugin, PluginTypeManager } from './plugins'
 import { EventBus } from './event'
 import { MediaManager, MediaStore } from './media'
 import { DummyMediaStore } from './media-store.default'
+import { Flags } from './flags'
 
 /**
  * A [[CMS]] is the core object of any content management system.
@@ -128,14 +129,14 @@ export class CMS {
 
   media = new MediaManager(new DummyMediaStore(), this.events)
 
-  flags: Map<string, boolean>
+  flags: Flags
 
   /**
    * @hidden
    */
   constructor(config: CMSConfig = {}) {
     this.plugins = new PluginTypeManager(this.events)
-    this.flags = new Map()
+    this.flags = new Flags(this.events)
 
     if (config.media) {
       this.media.store = config.media
@@ -182,10 +183,17 @@ export class CMS {
       this.unsubscribeHooks[name]()
     }
     if (api.events instanceof EventBus) {
-      this.unsubscribeHooks[name] = (api.events as EventBus).subscribe(
+      const unsubscribeHost = (api.events as EventBus).subscribe(
         '*',
         this.events.dispatch
       )
+      const unsubscribeGuest = this.events.subscribe('*', (e) =>
+        api.events.dispatch(e)
+      )
+      this.unsubscribeHooks[name] = () => {
+        unsubscribeHost()
+        unsubscribeGuest()
+      }
     }
     this.api[name] = api
   }
