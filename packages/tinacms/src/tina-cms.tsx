@@ -215,7 +215,7 @@ export const TinaCMSProvider2 = ({
       mediaStore={mediaStore}
     >
       <style>{styles}</style>
-      <div className="tina">
+      <div className="tina-tailwind">
         {props.query ? (
           <SetupHooks key={props.query} {...props} query={props.query || ''}>
             {children}
