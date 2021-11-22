@@ -4794,8 +4794,6 @@ __metadata:
     meow: ^10.0.1
     normalize-path: ^3.0.0
     postcss: ^8.3.11
-    postcss-nested: ^5.0.6
-    postcss-nesting: ^10.0.2
     tailwindcss: ^2.2.19
     tsup: ^4.12.5
     typescript: ^4.2.2
@@ -22490,7 +22488,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"postcss-nested@npm:5.0.6, postcss-nested@npm:^5.0.6":
+"postcss-nested@npm:5.0.6":
   version: 5.0.6
   resolution: "postcss-nested@npm:5.0.6"
   dependencies:
@@ -22498,17 +22496,6 @@ fsevents@~2.1.2:
   peerDependencies:
     postcss: ^8.2.14
   checksum: 9fc8e1fdd168267e58e343355518a57937fd7968530f2e1c8dae956921e73a283b1cda8138769769140e506150967eb883fa477997a9eec7e444f355c3f33bf2
-  languageName: node
-  linkType: hard
-
-"postcss-nesting@npm:^10.0.2":
-  version: 10.0.2
-  resolution: "postcss-nesting@npm:10.0.2"
-  dependencies:
-    postcss-selector-parser: 6.0.6
-  peerDependencies:
-    postcss: ^8.2
-  checksum: a47e69c92a2a3b5e705be86546fb82c139d03c233b8a70bb5cd8923a585e22e696de724dadc1d211dad9c8e9e9dcc6f82bb0cbc8d064a4a6d6f72f86d8375c57
   languageName: node
   linkType: hard
 
@@ -22664,16 +22651,6 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"postcss-selector-parser@npm:6.0.6, postcss-selector-parser@npm:^6.0.0, postcss-selector-parser@npm:^6.0.2, postcss-selector-parser@npm:^6.0.4, postcss-selector-parser@npm:^6.0.6":
-  version: 6.0.6
-  resolution: "postcss-selector-parser@npm:6.0.6"
-  dependencies:
-    cssesc: ^3.0.0
-    util-deprecate: ^1.0.2
-  checksum: 7e4854e82faa14bab0c5affbdf49b67cc0bf3e6fd9b0273e7f72c8ec957b5c5bcb7c64ae3cb6f8fe5b3ef965ec7e235d4e4d1a8868bd02139072e7a545221f09
-  languageName: node
-  linkType: hard
-
 "postcss-selector-parser@npm:^3.0.0":
   version: 3.1.2
   resolution: "postcss-selector-parser@npm:3.1.2"
@@ -22682,6 +22659,16 @@ fsevents@~2.1.2:
     indexes-of: ^1.0.1
     uniq: ^1.0.1
   checksum: 021ffdeef1007d4ab24439fee8e2cba188681899eae8dbc882a0e860d2ff8392f232c87e3f69eadc0a3d630b897a9ceb9f49adbe30b954a23ed91e61d3ea248c
+  languageName: node
+  linkType: hard
+
+"postcss-selector-parser@npm:^6.0.0, postcss-selector-parser@npm:^6.0.2, postcss-selector-parser@npm:^6.0.4, postcss-selector-parser@npm:^6.0.6":
+  version: 6.0.6
+  resolution: "postcss-selector-parser@npm:6.0.6"
+  dependencies:
+    cssesc: ^3.0.0
+    util-deprecate: ^1.0.2
+  checksum: 7e4854e82faa14bab0c5affbdf49b67cc0bf3e6fd9b0273e7f72c8ec957b5c5bcb7c64ae3cb6f8fe5b3ef965ec7e235d4e4d1a8868bd02139072e7a545221f09
   languageName: node
   linkType: hard
 
@@ -24194,7 +24181,7 @@ fsevents@~2.1.2:
   languageName: node
   linkType: hard
 
-"react-tinacms-editor@^0.52.5, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
+"react-tinacms-editor@^0.52.7, react-tinacms-editor@workspace:*, react-tinacms-editor@workspace:packages/react-tinacms-editor":
   version: 0.0.0-use.local
   resolution: "react-tinacms-editor@workspace:packages/react-tinacms-editor"
   dependencies:
@@ -24295,7 +24282,7 @@ fsevents@~2.1.2:
   languageName: unknown
   linkType: soft
 
-"react-tinacms-inline@^0.53.5, react-tinacms-inline@workspace:packages/react-tinacms-inline":
+"react-tinacms-inline@^0.53.7, react-tinacms-inline@workspace:packages/react-tinacms-inline":
   version: 0.0.0-use.local
   resolution: "react-tinacms-inline@workspace:packages/react-tinacms-inline"
   dependencies:
@@ -27868,8 +27855,8 @@ resolve@^2.0.0-next.3:
     react-dom: ^16.14.0
     react-icons: ^4.2.0
     react-is: ^17.0.2
-    react-tinacms-editor: ^0.52.5
-    react-tinacms-inline: ^0.53.5
+    react-tinacms-editor: ^0.52.7
+    react-tinacms-inline: ^0.53.7
     styled-components: ^5.3.0
     tailwindcss: ^2.0.4
     tinacms: "workspace:*"
