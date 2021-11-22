@@ -5109,6 +5109,15 @@ __metadata:
   languageName: node
   linkType: hard
 
+"@types/fs-extra@npm:^9.0.13":
+  version: 9.0.13
+  resolution: "@types/fs-extra@npm:9.0.13"
+  dependencies:
+    "@types/node": "*"
+  checksum: ca4dc68663870775b20abe26a1cc3228c5790113b2c984395ea9cd448443abb4433420821030813bd7cdf1718144afafaa9efa6cd8419dcc4a49c9117a577ad1
+  languageName: node
+  linkType: hard
+
 "@types/graceful-fs@npm:^4.1.2":
   version: 4.1.5
   resolution: "@types/graceful-fs@npm:4.1.5"
@@ -11277,6 +11286,7 @@ __metadata:
   version: 0.0.0-use.local
   resolution: "create-tina-app@workspace:packages/create-tina-app"
   dependencies:
+    "@types/fs-extra": ^9.0.13
     "@types/node": ^16.11.7
     "@types/prompts": ^2.0.14
     "@types/tar": 4.0.3
@@ -11284,6 +11294,7 @@ __metadata:
     commander: ^8.3.0
     cross-spawn: ^7.0.3
     esm: 3.2.25
+    fs-extra: ^10.0.0
     got: ^11.8.2
     prompts: ^2.4.2
     rimraf: ^3.0.2
