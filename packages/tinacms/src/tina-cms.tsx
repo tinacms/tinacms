@@ -18,7 +18,7 @@ import { TinaCloudProvider, TinaCloudMediaStoreClass } from './auth'
 import { LocalClient } from './client/index'
 import type { TinaIOConfig } from './client/index'
 import { useCMS } from '@tinacms/toolkit'
-// @ts-ignore
+// @ts-ignore importing css is not recognized
 import styles from './styles.css'
 
 import type { TinaCMS } from '@tinacms/toolkit'

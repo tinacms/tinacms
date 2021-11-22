@@ -26,6 +26,7 @@ import { Alerts } from '../packages/react-alerts'
 import { MediaManager } from './media'
 import { ActiveFieldIndicator } from './ActiveFieldIndicator'
 import { MutationSignalProvider } from './MutationSignal'
+// @ts-ignore importing css is not recognized
 import styles from '../styles.css'
 
 export interface TinaUIProps {
