@@ -1,5 +1,17 @@
 # Change Log
 
+## 0.56.0
+
+### Minor Changes
+
+- df3030990: Add basic branch switcher
+
+## 0.55.4
+
+### Patch Changes
+
+- 60729f60c: Adds a `reference` field
+
 ## 0.55.3
 
 ### Patch Changes
