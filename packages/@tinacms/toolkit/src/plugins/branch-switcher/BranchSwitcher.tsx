@@ -11,35 +11,42 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 import * as React from 'react'
-import { BranchSwitcherProps, Branch } from './types'
-import styled, { StyledComponent } from 'styled-components'
+import { BranchSwitcherProps, Branch, BranchChangeEvent } from './types'
+import styled from 'styled-components'
+import { useBranchData } from './BranchData'
+import { useEvent } from '../../packages/react-core/use-cms-event'
+import { Button } from '../../packages/styles'
+import { LoadingDots } from '../../packages/form-builder'
+
+type ListState = 'loading' | 'ready' | 'error'
 
 export const BranchSwitcher = ({
-  currentBranch,
-  setCurrentBranch,
   listBranches,
   createBranch,
 }: BranchSwitcherProps) => {
-  const [isLoading, setIsLoading] = React.useState(false)
+  const [listState, setListState] = React.useState<ListState>('loading')
   const [branchList, setBranchList] = React.useState([])
+  const { currentBranch, setCurrentBranch } = useBranchData()
 
-  const handleCreateBranch = React.useCallback((value) => {
-    setIsLoading(true)
-    createBranch(value)
-      .then(async (createdBranchName) => {
-        setCurrentBranch(createdBranchName)
-        await refreshBranchList()
-      })
-      .finally(() => setIsLoading(false))
-  }, [])
+  // const handleCreateBranch = React.useCallback((value) => {
+  //   setListState('loading')
+  //   createBranch({
+  //     branchName: value,
+  //     baseBranch: currentBranch,
+  //   }).then(async (createdBranchName) => {
+  //     setCurrentBranch(createdBranchName)
+  //     await refreshBranchList()
+  //   })
+  // }, [])
 
   const refreshBranchList = React.useCallback(async () => {
-    setIsLoading(true)
+    setListState('loading')
     await listBranches()
       .then((data: Branch[]) => {
         setBranchList(data)
+        setListState('ready')
       })
-      .finally(() => setIsLoading(false))
+      .catch(() => setListState('error'))
   }, [])
 
   // load branch list
@@ -48,9 +55,16 @@ export const BranchSwitcher = ({
   }, [])
 
   return (
-    <SelectWrap isLoading={isLoading}>
-      <h3>Select Branch</h3>
-      <BranchSelector
+    <>
+      {listState === 'loading' ? (
+        <div style={{ margin: '2rem auto', textAlign: 'center' }}>
+          <LoadingDots color={'var(--tina-color-primary)'} />
+        </div>
+      ) : (
+        <>
+          {listState === 'ready' ? (
+            <SelectWrap>
+              {/* <BranchSelector
         currentBranch={currentBranch}
         branchList={branchList}
         onCreateBranch={(newBranch) => {
@@ -59,8 +73,54 @@ export const BranchSwitcher = ({
         onChange={(branchName) => {
           setCurrentBranch(branchName)
         }}
-      />
-    </SelectWrap>
+      /> */}
+              <SimpleBranchSelector
+                branchList={branchList}
+                currentBranch={currentBranch}
+                onChange={(branchName) => {
+                  setCurrentBranch(branchName)
+                }}
+              />
+            </SelectWrap>
+          ) : (
+            <div style={{ margin: '2rem auto', textAlign: 'center' }}>
+              An error occurred while retrieving the branch list. <br />
+              <Button onClick={refreshBranchList}>Try again ⟳</Button>
+            </div>
+          )}
+        </>
+      )}
+    </>
+  )
+}
+
+const SimpleBranchSelector = ({ branchList, currentBranch, onChange }) => {
+  return (
+    <>
+      <select
+        onChange={(e) => {
+          onChange(e.target.value)
+        }}
+        value={currentBranch}
+        style={{
+          margin: '2rem',
+          fontSize: '1.2rem',
+          minWidth: '10em',
+          padding: '0.5rem',
+        }}
+      >
+        {branchList.map((branch) => {
+          return (
+            <option
+              value={branch.name}
+              disabled={branch.name === currentBranch}
+            >
+              {branch.name}
+            </option>
+          )
+        })}
+      </select>
+    </>
   )
 }
 
@@ -89,7 +149,10 @@ const BranchSelector = ({
           .filter((branch) => !newBranch || branch.name.includes(newBranch))
           .map((branch) => {
             return (
-              <SelectableItem onClick={() => onChange(branch.name)}>
+              <SelectableItem
+                key={branch}
+                onClick={() => onChange(branch.name)}
+              >
                 {branch.name}
                 {branch.name === currentBranch && (
                   <span style={{ fontStyle: 'italic', opacity: 0.5 }}>
@@ -104,17 +167,11 @@ const BranchSelector = ({
   )
 }
 
-const SelectWrap: StyledComponent<
-  'div',
-  any,
-  { isLoading: boolean }
-> = styled.div`
+const SelectWrap = styled.div`
   display: flex;
   flex-flow: column;
   align-items: center;
   justify-content: center;
-  opacity: ${(props: any) => (props.isLoading ? '0.5' : '1')};
-  pointer-events: ${(props: any) => (props.isLoading ? 'none' : 'initial')};
 `
 
 const SelectorColumn = styled.div`

@@ -1,5 +1,27 @@
 # tinacms
 
+## 0.59.0
+
+### Minor Changes
+
+- df3030990: Add basic branch switcher
+
+### Patch Changes
+
+- 9ecceb59f: Always include `collection` for TinaAdmin `createDocument()` and `updateDocument()`
+- Updated dependencies [df3030990]
+  - @tinacms/toolkit@0.56.0
+
+## 0.58.1
+
+### Patch Changes
+
+- e6995cfcb: Adds README for TinaAdmin
+- 60729f60c: Adds a `reference` field
+- 19e02829f: Add ability to control plugin layout for global plugins from formify
+- Updated dependencies [60729f60c]
+  - @tinacms/toolkit@0.55.4
+
 ## 0.58.0
 
 ### Minor Changes
