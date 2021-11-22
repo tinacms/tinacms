@@ -36,6 +36,7 @@ import {
   TagsFieldPlugin,
   DateFieldPlugin,
   CheckboxGroupFieldPlugin,
+  ReferenceFieldPlugin,
 } from './packages/fields'
 import { Form } from './packages/forms'
 import { Alerts, EventsToAlerts } from './packages/alerts'
@@ -66,6 +67,7 @@ const DEFAULT_FIELDS = [
   MarkdownFieldPlaceholder,
   HtmlFieldPlaceholder,
   CheckboxGroupFieldPlugin,
+  ReferenceFieldPlugin,
 ]
 
 export interface TinaCMSConfig extends CMSConfig {

@@ -28,6 +28,7 @@ const App = ({ Component, pageProps }) => {
               import("react-tinacms-editor").then(({ MarkdownFieldPlugin }) => {
                 cms.plugins.add(MarkdownFieldPlugin);
               });
+              cms.flags.set("branch-switcher", true);
 
               /**
                * Enables `tina-admin` specific features in the Tina Sidebar
@@ -75,7 +76,7 @@ const App = ({ Component, pageProps }) => {
             }}
             formifyCallback={({ formConfig, createForm, createGlobalForm }) => {
               if (formConfig.id === "getGlobalDocument") {
-                return createGlobalForm(formConfig);
+                return createGlobalForm(formConfig, { layout: "fullscreen" });
               }
 
               return createForm(formConfig);

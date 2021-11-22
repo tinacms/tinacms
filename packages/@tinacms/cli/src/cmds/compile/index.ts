@@ -23,13 +23,21 @@ import { defaultSchema } from './defaultSchema'
 import { logger } from '../../logger'
 
 const tinaPath = path.join(process.cwd(), '.tina')
-const tinaTempPath = path.join(process.cwd(), '.tina', '__generated__', 'temp')
-const tinaConfigPath = path.join(
-  process.cwd(),
-  '.tina',
-  '__generated__',
-  'config'
-)
+const tinaGeneratedPath = path.join(tinaPath, '__generated__')
+const tinaTempPath = path.join(tinaGeneratedPath, 'temp')
+const tinaConfigPath = path.join(tinaGeneratedPath, 'config')
+
+export const resetGeneratedFolder = async () => {
+  try {
+    await fs.rmdir(tinaGeneratedPath, {
+      recursive: true,
+    })
+  } catch (e) {
+    console.log(e)
+  }
+  await fs.mkdir(tinaGeneratedPath)
+  await fs.outputFile(path.join(tinaGeneratedPath, '.gitignore'), 'db')
+}
 
 export const compile = async (_ctx, _next) => {
   logger.info(logText('Compiling...'))
@@ -53,8 +61,7 @@ export const compile = async (_ctx, _next) => {
   }
 
   // Remove old js files
-  await fs.remove(tinaTempPath)
-  await fs.remove(tinaConfigPath)
+  await resetGeneratedFolder
 
   // Turn the TS files into JS files so they can be exacted
   await transpile(tinaPath, tinaTempPath)

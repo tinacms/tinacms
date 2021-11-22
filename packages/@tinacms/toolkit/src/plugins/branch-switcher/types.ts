@@ -17,27 +17,24 @@ export interface Branch {
 }
 
 export interface BranchSwitcherProps {
-  currentBranch: string
-  setCurrentBranch: (branchName: string) => void
   listBranches: () => Promise<Branch[]>
-  createBranch: (branchName: string) => Promise<string>
-}
-
-export interface BranchSwitcherPluginOptions extends BranchSwitcherProps {
-  owner: string,
-  repo: string,
-  baseBranch: string
-  cms: TinaCMS
+  createBranch: ({
+    baseBranch,
+    branchName,
+  }: {
+    baseBranch: string
+    branchName: string
+  }) => Promise<string>
 }
 
 export interface BranchChangeEvent {
-  type: 'branch-switcher:change-branch'
+  type: 'branch:change'
   branchName: string
 }
 
 export interface BranchData {
-  owner: string,
-  repo: string,
-  baseBranch?: string,
+  owner: string
+  repo: string
+  baseBranch?: string
   branchName?: string
 }
