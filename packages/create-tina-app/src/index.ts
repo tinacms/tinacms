@@ -134,6 +134,7 @@ export const run = async () => {
 
   // Run install command
   await install(root, null, { useYarn, isOnline: true })
+  console.log(chalk.green('Finishing installing packages'))
   console.log()
   if (tryGitInit(root)) {
     console.log('Initialized a git repository.')
