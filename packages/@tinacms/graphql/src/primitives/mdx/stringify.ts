@@ -19,11 +19,14 @@ limitations under the License.
 
 import { toMarkdown } from 'mdast-util-to-markdown'
 import { mdxToMarkdown } from 'mdast-util-mdx'
-import type { RichTypeInner } from '../types'
+import type { RichTypeInner, RichTypeDeprectedInner } from '../types'
 import { SlateNodeType, plateElements } from './parse'
 import type { Content, PhrasingContent, StaticPhrasingContent } from 'mdast'
 
-export const stringifyMDX = (value: unknown, field: RichTypeInner) => {
+export const stringifyMDX = (
+  value: unknown,
+  field: RichTypeInner | RichTypeDeprectedInner
+) => {
   // @ts-ignore: FIXME: validate this shape
   const slateTree: SlateNodeType[] = value.children
   try {
@@ -378,6 +381,7 @@ export const stringify = (
                 }
                 break
               case 'rich-text':
+              case 'richText':
                 const tree = value.children
                   .map((item) => stringify(item, field))
                   .filter((item) => {

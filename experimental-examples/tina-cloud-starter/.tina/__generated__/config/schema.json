@@ -7,7 +7,7 @@
       "format": "mdx",
       "fields": [
         {
-          "type": "rich-text",
+          "type": "richText",
           "label": "Body",
           "name": "_body",
           "templates": [
@@ -35,7 +35,7 @@
                 {
                   "name": "children",
                   "label": "Quote",
-                  "type": "rich-text"
+                  "type": "richText"
                 },
                 {
                   "name": "authorName",
@@ -51,7 +51,7 @@
                 {
                   "name": "children",
                   "label": "CTA",
-                  "type": "rich-text"
+                  "type": "richText"
                 },
                 {
                   "name": "placeholder",
@@ -66,7 +66,7 @@
                 {
                   "name": "disclaimer",
                   "label": "Disclaimer",
-                  "type": "rich-text"
+                  "type": "richText"
                 }
               ],
               "ui": {

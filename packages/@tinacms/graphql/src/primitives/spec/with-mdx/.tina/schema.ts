@@ -126,7 +126,7 @@ const tinaSchema: TinaCloudSchema<false> = {
           ],
         },
         {
-          type: 'rich-text',
+          type: 'richText',
           label: 'Body',
           name: 'body',
           isBody: true,
@@ -151,7 +151,7 @@ const tinaSchema: TinaCloudSchema<false> = {
                 {
                   name: 'children',
                   label: 'Quote',
-                  type: 'rich-text',
+                  type: 'richText',
                 },
               ],
             },
@@ -167,7 +167,7 @@ const tinaSchema: TinaCloudSchema<false> = {
                 {
                   name: 'subTitle',
                   label: 'Sub Title',
-                  type: 'rich-text',
+                  type: 'richText',
                   templates: [cta],
                 },
                 {
@@ -185,7 +185,7 @@ const tinaSchema: TinaCloudSchema<false> = {
                 {
                   name: 'children',
                   label: 'Body',
-                  type: 'rich-text',
+                  type: 'richText',
                   templates: [cta],
                 },
               ],

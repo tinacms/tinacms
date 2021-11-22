@@ -88,6 +88,7 @@ export type TinaFieldInner<WithNamespace extends boolean> =
   | ObjectType<WithNamespace>
   | ReferenceType<WithNamespace>
   | RichType<WithNamespace>
+  | RichTypeDeprected<WithNamespace>
 
 export type TinaFieldBase = TinaFieldInner<false>
 export type TinaFieldEnriched = TinaFieldInner<true>
@@ -154,6 +155,41 @@ type ImageField = {
 export type ReferenceType<WithNamespace extends boolean> =
   WithNamespace extends true ? ReferenceTypeWithNamespace : ReferenceTypeInner
 
+export type RichTypeDeprected<WithNamespace extends boolean> =
+  WithNamespace extends true
+    ? RichTypeDeprectedWithNamespace
+    : RichTypeDeprectedInner
+
+export interface RichTypeDeprectedWithNamespace extends TinaField {
+  /**
+   * @deprecated Use `richText` instead
+   */
+  type: 'rich-text'
+  namespace: string[]
+  isBody?: boolean
+  templates?: (string | (Template<true> & { inline?: boolean }))[]
+}
+export interface RichTypeDeprectedInner extends TinaField {
+  /**
+   * @deprecated Use `richText` instead
+   */
+  type: 'rich-text'
+  isBody?: boolean
+  templates?: (string | (Template<false> & { inline?: boolean }))[]
+}
+
+export interface RichTypeWithNamespace extends TinaField {
+  type: 'richText'
+  namespace: string[]
+  isBody?: boolean
+  templates?: (string | (Template<true> & { inline?: boolean }))[]
+}
+
+export interface RichTypeInner extends TinaField {
+  type: 'richText'
+  isBody?: boolean
+  templates?: (string | (Template<false> & { inline?: boolean }))[]
+}
 export type RichType<WithNamespace extends boolean> = WithNamespace extends true
   ? RichTypeWithNamespace
   : RichTypeInner
@@ -167,19 +203,6 @@ export interface ReferenceTypeWithNamespace extends TinaField {
   collections: string[]
   reverseLookup?: { label: string; name: string }
   namespace: string[]
-}
-
-export interface RichTypeWithNamespace extends TinaField {
-  type: 'rich-text'
-  namespace: string[]
-  isBody?: boolean
-  templates?: (string | (Template<true> & { inline?: boolean }))[]
-}
-
-export interface RichTypeInner extends TinaField {
-  type: 'rich-text'
-  isBody?: boolean
-  templates?: (string | (Template<false> & { inline?: boolean }))[]
 }
 
 export type ObjectType<WithNamespace extends boolean> =

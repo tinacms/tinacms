@@ -503,6 +503,7 @@ export class Builder {
       case 'number':
       case 'boolean':
       case 'rich-text':
+      case 'richText':
         return astBuilder.FieldNodeDefinition(field)
       case 'object':
         if (typeof field.fields === 'object') {
@@ -856,6 +857,7 @@ export class Builder {
           type: await this._updateCollectionDocumentMutationType(field),
         })
       case 'rich-text':
+      case 'richText':
         return astBuilder.InputValueDefinition({
           name: field.name,
           list: field.list,
@@ -1000,7 +1002,7 @@ Visit https://tina.io/docs/errors/ui-not-supported/ for more information
             this.tinaSchema.getTemplatesForCollectable(field)
           ),
         })
-      case 'rich-text':
+      case 'richText':
         return astBuilder.FieldDefinition({
           name: field.name,
           list: field.list,

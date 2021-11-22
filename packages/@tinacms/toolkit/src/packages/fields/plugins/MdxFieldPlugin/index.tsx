@@ -18,7 +18,12 @@ limitations under the License.
 
 import { RichEditor } from './plate'
 
-export const MdxFieldPlugin = {
+export const MdxFieldPluginLegacy = {
   name: 'rich-text',
+  Component: RichEditor,
+}
+
+export const MdxFieldPlugin = {
+  name: 'richText',
   Component: RichEditor,
 }

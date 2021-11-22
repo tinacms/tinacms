@@ -34,6 +34,7 @@ const FIELD_TYPES: TinaField['type'][] = [
   'reference',
   'object',
   'rich-text',
+  'richText',
 ]
 
 export const validateSchema = async (
@@ -129,9 +130,17 @@ const validateField = async (
         FIELD_TYPES,
         (obj) =>
           `'type' must be one of: ${obj.values}, but got '${obj.value}' at ${messageName}`
-      ),
+      )
+      .transform((value) => {
+        if (value === 'rich-text') {
+          console.warn(`"rich-text" should now be "richText" at ${messageName}`)
+          return 'richText'
+        }
+        return value
+      }),
   })
   await schema.validate(field)
+  const validField = (await schema.cast(field)) as TinaFieldEnriched
 
-  return field
+  return validField
 }

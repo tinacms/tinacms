@@ -390,7 +390,7 @@ export default defineSchema({
       format: "mdx",
       fields: [
         {
-          type: "rich-text",
+          type: "richText",
           label: "Body",
           name: "_body",
           templates: [
@@ -414,7 +414,7 @@ export default defineSchema({
                 {
                   name: "children",
                   label: "Quote",
-                  type: "rich-text",
+                  type: "richText",
                 },
                 {
                   name: "authorName",
@@ -430,7 +430,7 @@ export default defineSchema({
                 {
                   name: "children",
                   label: "CTA",
-                  type: "rich-text",
+                  type: "richText",
                 },
                 {
                   name: "placeholder",
@@ -445,7 +445,7 @@ export default defineSchema({
                 {
                   name: "disclaimer",
                   label: "Disclaimer",
-                  type: "rich-text",
+                  type: "richText",
                 },
               ],
               ui: {

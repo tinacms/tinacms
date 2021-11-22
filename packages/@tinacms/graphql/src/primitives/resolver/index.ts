@@ -562,6 +562,7 @@ export class Resolver {
           accum[fieldName] = this.buildObjectMutations(fieldValue, field)
           break
         case 'rich-text':
+        case 'richText':
           field
           accum[fieldName] = stringifyMDX(fieldValue, field)
           break
@@ -596,11 +597,12 @@ export class Resolver {
         accumulator[field.name] = value
         break
       case 'rich-text':
+      case 'richText':
         if (typeof value === 'string') {
           const tree = parseMDX(value, field)
           accumulator[field.name] = tree
         } else {
-          throw new Error(`Expected value for rich-text to be of type string`)
+          throw new Error(`Expected value for richText to be of type string`)
         }
         break
       case 'object':
@@ -824,11 +826,12 @@ export class Resolver {
           throw new Error(`Unknown object for resolveField function`)
         }
       case 'rich-text':
+      case 'richText':
         const templates: { [key: string]: object } = {}
         const typeMap: { [key: string]: string } = {}
         await sequential(field.templates, async (template) => {
           if (typeof template === 'string') {
-            throw new Error(`Global templates not yet supported for rich-text`)
+            throw new Error(`Global templates not yet supported for richText`)
           } else {
             const extraFields = template.ui || {}
             const templateName = lastItem(template.namespace)

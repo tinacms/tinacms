@@ -1,0 +1,27 @@
+fragment MovieParts on Movie {
+  title
+  releaseDate
+  rating
+  archived
+  genre
+  director {
+    ... on Document {
+      id
+    }
+  }
+  actors {
+    ... on Document {
+      id
+    }
+  }
+  body
+}
+
+fragment DirectorParts on Director {
+  name
+}
+
+fragment ActorParts on Actor {
+  name
+  body
+}

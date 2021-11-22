@@ -22,10 +22,13 @@ import mdx from 'remark-mdx'
 import { TinaField } from '../..'
 import type { Content } from 'mdast'
 import { visit } from 'unist-util-visit'
-import type { RichTypeInner } from '../types'
+import type { RichTypeInner, RichTypeDeprectedInner } from '../types'
 import { isNull } from 'lodash'
 
-export const parseMDX = (value: string, field: RichTypeInner) => {
+export const parseMDX = (
+  value: string,
+  field: RichTypeInner | RichTypeDeprectedInner
+) => {
   const tree = unified().use(markdown).use(mdx).parse(value)
   return parseMDXInner(tree, field)
 }
@@ -78,7 +81,10 @@ export const parseMDX = (value: string, field: RichTypeInner) => {
  * 2. We don't need to do any client-side parsing. Since TinaMarkdown and the slate editor work with the same
  * format we can just allow Tina to do it's thing and update the form valuse with no additional work.
  */
-export const parseMDXInner = (tree: any, field: RichTypeInner) => {
+export const parseMDXInner = (
+  tree: any,
+  field: RichTypeInner | RichTypeDeprectedInner
+) => {
   // Delete useless position info
   visit(tree, (node) => {
     delete node.position
@@ -299,6 +305,7 @@ const parseField = (attribute, field: TinaField, props) => {
       break
 
     case 'rich-text':
+    case 'richText':
       if (attribute.value) {
         /**
          * this is MDX as a children prop, meaning it doesn't have fragment wrappers (<>Some MDX</>)
@@ -315,7 +322,7 @@ const parseField = (attribute, field: TinaField, props) => {
             )
           } else {
             throw Error(
-              `Expected an array of MDX strings for rich-text field with the special name 'children'`
+              `Expected an array of MDX strings for richText field with the special name 'children'`
             )
           }
         } else {

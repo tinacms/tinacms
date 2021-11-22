@@ -6,9 +6,9 @@
       "path": "content/page",
       "fields": [
         {
-          "name": "body",
+          "type": "richText",
           "label": "Main Content",
-          "type": "rich-text",
+          "name": "body",
           "isBody": true,
           "namespace": [
             "page",
@@ -52,6 +52,5 @@
         "post"
       ]
     }
-  ],
-  "namespace": []
+  ]
 }

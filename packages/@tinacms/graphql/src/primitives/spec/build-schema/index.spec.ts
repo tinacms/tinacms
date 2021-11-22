@@ -27,6 +27,14 @@ const baseCollection = {
   fields: [baseField],
 }
 
+let consoleWarnMock
+beforeEach(() => {
+  consoleWarnMock = jest.spyOn(console, 'warn').mockImplementation()
+})
+afterEach(() => {
+  consoleWarnMock.mockRestore()
+})
+
 describe('The schema validation', () => {
   it(`Throws an error for "global" templates which aren't yet supported`, async () => {
     await expect(
@@ -49,6 +57,38 @@ describe('The schema validation', () => {
     ).rejects.toThrowErrorMatchingInlineSnapshot(
       `"Global templates are not yet supported"`
     )
+  })
+  it(`Casts "rich-text" to "richText" and warns the user`, async () => {
+    const validSchema = await validateSchema({
+      collections: [
+        {
+          ...baseCollection,
+          fields: [
+            {
+              name: 'body',
+              label: 'Body',
+              type: 'rich-text',
+            },
+          ],
+        },
+      ],
+    })
+
+    expect(validSchema).toMatchObject({
+      collections: [
+        {
+          ...baseCollection,
+          fields: [
+            {
+              name: 'body',
+              label: 'Body',
+              type: 'richText',
+            },
+          ],
+        },
+      ],
+    })
+    expect(consoleWarnMock).toHaveBeenCalled()
   })
   it(`Throws an error for field names that use title-casing`, async () => {
     await expect(
@@ -76,7 +116,7 @@ describe('The schema validation', () => {
         ],
       })
     ).rejects.toThrowErrorMatchingInlineSnapshot(
-      `"'type' must be one of: string, number, boolean, datetime, image, reference, object, rich-text, but got 'some-type' at someName.myTitle"`
+      `"'type' must be one of: string, number, boolean, datetime, image, reference, object, rich-text, richText, but got 'some-type' at someName.myTitle"`
     )
   })
   it(`Trims the "collection.path" missing`, async () => {
