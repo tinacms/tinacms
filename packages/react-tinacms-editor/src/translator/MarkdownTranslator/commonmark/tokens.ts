@@ -104,6 +104,8 @@ const TOKENS = {
   hardbreak: { node: 'hard_break' },
   em: { mark: 'em' },
   strike: { mark: 'strike' },
+  subscript: { mark: 'subscript' },
+  superscript: { mark: 'superscript' },
   strong: { mark: 'strong' },
   link: {
     mark: 'link',
@@ -112,6 +114,13 @@ const TOKENS = {
       title: tok.attrGet('title') || null,
     }),
   },
+  // anchor: {
+  //   mark: 'anchor',
+  //   getAttrs: (tok: Token) => ({
+  //     href: tok.attrGet('href'),
+  //     title: tok.attrGet('title') || null,
+  //   }),
+  // },
   code_inline: { mark: 'code' },
 }
 
@@ -333,6 +342,8 @@ export function buildTokensForSchema(schema: Schema): Hash<Token> {
   if (schema.marks.link) tokens.link = TOKENS.link
   if (schema.marks.code) tokens.code_inline = TOKENS.code_inline
   if (schema.marks.strike) tokens.strike = TOKENS.strike
+  if (schema.marks.subscript) tokens.subscript = TOKENS.subscript
+  if (schema.marks.superscript) tokens.superscript = TOKENS.superscript
 
   return tokens
 }

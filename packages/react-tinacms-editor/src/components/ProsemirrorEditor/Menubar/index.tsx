@@ -24,9 +24,11 @@ import { ProsemirrorMenu as HistoryMenu } from '../../../plugins/History'
 import { ProsemirrorMenu as InlineMenu } from '../../../plugins/Inline'
 import { ProsemirrorMenu as ListMenu } from '../../../plugins/List'
 import { ProsemirrorMenu as QuoteMenu } from '../../../plugins/Blockquote'
+import { ProsemirrorMenu as HorizontalRule } from '../../../plugins/HorizontalRule'
 import { ProsemirrorMenu as TableMenu } from '../../../plugins/Table'
 import { ProsemirrorMenu as ImageMenu } from '../../../plugins/Image'
 import { ProsemirrorMenu as LinkMenu } from '../../../plugins/Link'
+import { ProsemirrorMenu as AnchorMenu } from '../../../plugins/Anchor'
 
 import { TablePopups } from '../../../plugins/Table/Popup'
 import {
@@ -57,10 +59,12 @@ export const Menubar = ({ plugins, imageProps, ...rest }: Props) => {
         <BlockMenu key="BlockMenu" />,
         <InlineMenu key="InlineMenu" />,
         <LinkMenu key="LinkMenu" />,
+        <AnchorMenu key="AnchorMenu" />,
         <ImageMenu key="ImageMenu" imageProps={imageProps} />,
         <TableMenu key="TableMenu" />,
         <QuoteMenu key="QuoteMenu" />,
         <CodeBlockMenu key="CodeBlockMenu" />,
+        <HorizontalRule key="HorizontalRule"/>,
         <ListMenu key="ListMenu" />,
         <HistoryMenu key="HistoryMenu" />,
       ]}

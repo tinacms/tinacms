@@ -26,6 +26,8 @@ export const ProsemirrorMenu = () => (
   <>
     <BoldControl />
     <ItalicControl />
+    <Superscript />
+    <Subscript />
     <StrikeControl />
   </>
 )
@@ -46,4 +48,16 @@ const StrikeControl = markControl({
   mark: 'strike',
   Icon: StrikethroughIcon,
   tooltip: 'Strike',
+})
+
+const Subscript = markControl({
+  mark: 'subscript',
+  Icon: StrikethroughIcon,
+  tooltip: 'Subscript',
+})
+
+const Superscript = markControl({
+  mark: 'superscript',
+  Icon: StrikethroughIcon,
+  tooltip: 'Superscript',
 })
