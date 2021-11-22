@@ -4,6 +4,7 @@
   "main": "dist/index.js",
   "files": [
     "dist",
+    "examples",
     "bin/*"
   ],
   "bin": "bin/create-tina-app",
