@@ -22,8 +22,8 @@
     "react-dom": "^16.14.0",
     "react-icons": "^4.2.0",
     "react-is": "^17.0.2",
-    "react-tinacms-editor": "^0.52.6",
-    "react-tinacms-inline": "^0.53.6",
+    "react-tinacms-editor": "^0.52.7",
+    "react-tinacms-inline": "^0.53.7",
     "styled-components": "^5.3.0",
     "tinacms": "workspace:*"
   },
