@@ -47,8 +47,6 @@ const createDocument = async (
       createDocument(
         collection: $collection,
         relativePath: $relativePath,
-        params: $params
-      ){__typename}
     }`,
     {
       variables: {
