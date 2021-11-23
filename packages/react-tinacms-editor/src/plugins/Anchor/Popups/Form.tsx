@@ -25,7 +25,7 @@ import { useEditorStateContext } from '../../../context/editorState'
 import {
   findElementOffsetTop,
   findElementOffsetLeft,
-  getMarkPresent,
+  getMarkPresent, getAllMarkOccurrences,
 } from '../../../utils'
 import {
   removeAnchorBeingEdited,
@@ -34,7 +34,6 @@ import {
 } from '../commands'
 import { anchorPluginKey } from '../plugin'
 import { InnerForm } from './InnerForm'
-import { Fragment } from 'prosemirror-model'
 
 const width = 240
 
@@ -90,27 +89,13 @@ export const AnchorForm = () => {
   let name = ''
   // let title = ''
   const linkMark = getMarkPresent(state, state.schema.marks.anchor)
-  console.log(state, 'state')
+
   if (linkMark) {
     // console.log('linkMark', linkMark)
     name = linkMark.attrs.name
   }
 
-  const getAllAnchors = (content: Fragment<any>, allAnchors: string[] = []) => {
-    content.forEach(item => {
-      if (item.marks.length > 0) {
-        item.marks.forEach((mark: any) => {
-          if (mark.type?.name === 'anchor') {
-            console.log('name', mark.attrs.name)
-            allAnchors.push(mark.attrs.name)
-          }
-        })
-      } else if (item.content.size > 0) getAllAnchors(item.content, allAnchors)
-    })
-    return allAnchors
-  }
-
-  const anchors = getAllAnchors(state.doc.content)
+  const anchors = getAllMarkOccurrences(state.doc.content, 'anchor')
 
   return (
     <div ref={wrapperRef} style={{ position: 'absolute' }}>

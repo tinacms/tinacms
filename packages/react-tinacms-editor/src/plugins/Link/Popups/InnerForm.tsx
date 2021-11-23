@@ -17,9 +17,7 @@ limitations under the License.
 */
 
 import * as React from 'react'
-import styled, { keyframes } from 'styled-components'
-
-type E = React.ChangeEvent<HTMLInputElement>
+import styled, { css, keyframes } from 'styled-components'
 
 interface Props {
   // title: string | null
@@ -27,19 +25,22 @@ interface Props {
   onChange(attrs: any): void
   removeLink(): void
   cancel(): void
+  allAnchors: string[]
   style?: {
     [key: string]: string
   }
 }
 
 interface State {
-  href: string | null
+  href: string | null,
+  isAnchorPanel: boolean
   // title: string | null
 }
 
 export class InnerForm extends React.Component<Props, State> {
   state = {
     href: this.props.href || '',
+    isAnchorPanel: false,
     // title: this.props.title || '',
   }
 
@@ -66,7 +67,8 @@ export class InnerForm extends React.Component<Props, State> {
     cancel()
   }
 
-  setHref = ({ target: { value } }: E) => this.setState(() => ({ href: value }))
+  setHref = (value: string, isAnchor: boolean) => this.setState(() => ({ href: isAnchor ? `#${value}` : value }))
+  setIsAnchorPanel = (value: boolean) => this.setState(() => ({ isAnchorPanel: value }))
   // setTitle = ({ target: { value } }: E) =>
   //   this.setState(() => ({ title: value }))
 
@@ -85,8 +87,8 @@ export class InnerForm extends React.Component<Props, State> {
   }
 
   render() {
-    const { removeLink, style = {} } = this.props
-    const { href } = this.state
+    const { removeLink, style = {}, allAnchors } = this.props
+    const { href, isAnchorPanel } = this.state
     return (
       <LinkPopup
         style={{
@@ -101,15 +103,25 @@ export class InnerForm extends React.Component<Props, State> {
           onChange={this.setTitle}
           onKeyPress={this.onEnterSave as any}
         /> */}
+        <PanelActions>
+          <PanelActionButton active={!isAnchorPanel}
+                             onClick={() => this.setIsAnchorPanel(false)}>Link</PanelActionButton>
+          <PanelActionButton active={isAnchorPanel}
+                             onClick={() => this.setIsAnchorPanel(true)}>Anchor</PanelActionButton>
+        </PanelActions>
         <LinkLabel>URL</LinkLabel>
-        <LinkInput
+        {isAnchorPanel ? (
+          <SelectAnchor onChange={(e) => this.setHref(e.target.value, true)}>
+            {allAnchors.length ? allAnchors.map(anchor => <option key={anchor} value={anchor}>{anchor}</option>) : <option value={''}>no anchors found</option>}
+          </SelectAnchor>
+        ) : (<LinkInput
           ref={this.inputRef}
-          placeholder="Enter URL"
+          placeholder='Enter URL'
           type={'text'}
           value={href}
-          onChange={this.setHref}
+          onChange={(e) => this.setHref(e.target.value, false)}
           onKeyPress={this.onEnterSave as any}
-        />
+        />)}
         <LinkActions>
           <DeleteLink onClick={removeLink}>Delete</DeleteLink>
           <SaveLink onClick={this.save} disabled={!href}>
@@ -123,7 +135,7 @@ export class InnerForm extends React.Component<Props, State> {
 
 const LinkPopupKeyframes = keyframes`
   0% {
-    transform: scale3d(0.5,0.5,1)
+    transform: scale3d(0.5, 0.5, 1)
   }
   100% {
     transform: scale3d(1, 1, 1);
@@ -136,8 +148,7 @@ const LinkPopup = styled.div`
   height: max-content;
   border-radius: var(--tina-radius-small);
   border: 1px solid var(--tina-color-grey-2);
-  filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1))
-    drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
+  filter: drop-shadow(0px 4px 8px rgba(48, 48, 48, 0.1)) drop-shadow(0px 2px 3px rgba(0, 0, 0, 0.12));
   transform-origin: 50% 0;
   animation: ${LinkPopupKeyframes} 85ms ease-out both 1;
   overflow: visible;
@@ -154,7 +165,7 @@ const LinkLabel = styled.label`
   margin-bottom: 3px;
 `
 
-const LinkInput = styled.input`
+const sharedStyle = css`
   position: relative;
   background-color: white;
   border-radius: var(--tina-radius-small);
@@ -180,6 +191,52 @@ const LinkInput = styled.input`
     font-size: var(--tina-font-size-2);
     color: #cfd3d7;
   }
+`
+
+const SelectAnchor = styled.select`
+  ${sharedStyle}
+`
+
+const LinkInput = styled.input`
+  ${sharedStyle}
+`
+
+const PanelActions = styled.div`
+  display: flex;
+  justify-content: center;
+
+  > button {
+    &:first-child {
+      border-top-left-radius: 10px;
+      border-bottom-left-radius: 10px;
+    }
+
+    &:nth-child(2) {
+      border-top-right-radius: 10px;
+      border-bottom-right-radius: 10px;
+    }
+  }
+`
+
+const PanelActionButton = styled.button<{ active: boolean }>`
+  background-color: ${props => props.active ? '#0574e4' : 'white'};
+  color: ${props => props.active ? 'white' : '#0574e4'};
+  border: ${props => props.active ? '1px solid var(--tina-color-blue-2);' : '1px solid var(--tina-color-grey-2);'};
+  text-align: center;
+  box-shadow: 0 2px 3px rgba(0, 0, 0, 0.12);
+  font-weight: var(--tina-font-weight-regular);
+  cursor: pointer;
+  transition: all 85ms ease-out;
+  font-size: var(--tina-font-size-0);
+  padding: 8px 0;
+  width: 80px;
+
+  &:hover {
+    background-color: #f6f6f9;
+    color: #0574e4;
+    opacity: 1;
+  }
+
 `
 
 const LinkActions = styled.div`

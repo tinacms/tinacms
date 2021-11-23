@@ -76,11 +76,13 @@ export function unmountAnchorForm(view: EditorView) {
 export function updateAnchorBeingEdited(
   state: EditorState,
   dispatch: Dispatch | null,
-  attrs: object
+  attrs: {id: string, name: string}
 ) {
   if (dispatch) {
     const { selection, schema, tr } = state
     const mark = markExtend(selection.$anchor, schema.marks.anchor)
+    // we want name and id in the a tag
+    attrs.id = attrs.name
     if (mark) {
       tr.addMark(mark.from, mark.to, schema.marks.anchor.create(attrs))
     }
