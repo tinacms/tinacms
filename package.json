@@ -24,6 +24,7 @@
     "push-tags": "changeset tag && git push --follow-tags",
     "lint": "eslint \"./packages/**/*{.ts,.tsx}\"",
     "swapDeps": "yarn workspaces foreach --include tina-cloud-starter --include tina-tailwind-sidebar-demo --include starter-basic run g:swap",
+    "cypress:open": "cypress open",
     "g:swap": "cd $INIT_CWD && yarn node ../../scripts/transformDeps.js"
   },
   "dependencies": {
@@ -38,5 +39,8 @@
     "eslint-plugin-react-hooks": "^2.0.1",
     "typescript": "^3.8.3",
     "workspace": "^0.0.1-preview.1"
+  },
+  "devDependencies": {
+    "cypress": "^9.1.0"
   }
 }
