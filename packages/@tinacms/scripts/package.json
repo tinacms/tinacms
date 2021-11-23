@@ -40,6 +40,7 @@
     "meow": "^10.0.1",
     "normalize-path": "^3.0.0",
     "postcss": "^8.3.11",
+    "postcss-nested": "^5.0.6",
     "tailwindcss": "^2.2.19",
     "tsup": "^4.12.5",
     "typescript": "^4.2.2",

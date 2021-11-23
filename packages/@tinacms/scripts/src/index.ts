@@ -18,6 +18,7 @@ import fs from 'fs'
 import path from 'path'
 import chalk from 'chalk'
 import tailwind from 'tailwindcss'
+import postcssNested from 'postcss-nested'
 
 import * as commander from 'commander'
 
@@ -251,6 +252,7 @@ const buildIt = async (entryPoint, packageJSON) => {
           let plugins = []
 
           const tw = tailwind(config(process.cwd()))
+          plugins.push(postcssNested)
           plugins.push(tw)
 
           return {
