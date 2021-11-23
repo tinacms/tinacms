@@ -22,12 +22,12 @@ import { EditorView } from 'prosemirror-view'
 
 import { linkify } from './util'
 
-interface LinkPluginState {
+interface AnchorPluginState {
   showAnchorForm: boolean
   show_anchor_toolbar: boolean
 }
 
-export const anchorPluginKey = new PluginKey<LinkPluginState>('image')
+export const anchorPluginKey = new PluginKey<AnchorPluginState>('image')
 
 export function anchorPlugin(): Plugin {
   let shiftKey: boolean
@@ -37,7 +37,7 @@ export function anchorPlugin(): Plugin {
       init: () => {
         return { showAnchorForm: false }
       },
-      apply(tr: Transaction, prev: LinkPluginState, _: any) {
+      apply(tr: Transaction, prev: AnchorPluginState, _: any) {
         if (tr.getMeta('show_anchor_toolbar') === false) {
           return {
             show_anchor_toolbar: false,

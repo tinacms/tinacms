@@ -34,6 +34,7 @@ import {
 } from '../commands'
 import { anchorPluginKey } from '../plugin'
 import { InnerForm } from './InnerForm'
+import { Fragment } from 'prosemirror-model'
 
 const width = 240
 
@@ -89,18 +90,34 @@ export const AnchorForm = () => {
   let name = ''
   // let title = ''
   const linkMark = getMarkPresent(state, state.schema.marks.anchor)
-  console.log(state)
+  console.log(state, 'state')
   if (linkMark) {
     // console.log('linkMark', linkMark)
     name = linkMark.attrs.name
   }
+
+  const getAllAnchors = (content: Fragment<any>, allAnchors: string[] = []) => {
+    content.forEach(item => {
+      if (item.marks.length > 0) {
+        item.marks.forEach((mark: any) => {
+          if (mark.type?.name === 'anchor') {
+            console.log('name', mark.attrs.name)
+            allAnchors.push(mark.attrs.name)
+          }
+        })
+      } else if (item.content.size > 0) getAllAnchors(item.content, allAnchors)
+    })
+    return allAnchors
+  }
+
+  const anchors = getAllAnchors(state.doc.content)
 
   return (
     <div ref={wrapperRef} style={{ position: 'absolute' }}>
       {position && (
         <StyleReset>
           <LinkFormWrapper>
-            <LinkArrow offset={arrowOffset} top={top}></LinkArrow>
+            <LinkArrow offset={arrowOffset} top={top}/>
             <InnerForm
               style={{
                 left,
@@ -110,6 +127,7 @@ export const AnchorForm = () => {
               removeLink={() => removeAnchorBeingEdited(state, dispatch)}
               onChange={onChange}
               name={name}
+              allAnchors={anchors}
               cancel={onCancel}
             />
           </LinkFormWrapper>

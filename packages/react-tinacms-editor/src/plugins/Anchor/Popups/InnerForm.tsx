@@ -27,6 +27,7 @@ interface Props {
   onChange(attrs: any): void
   removeLink(): void
   cancel(): void
+  allAnchors: string[]
   style?: {
     [key: string]: string
   }
@@ -84,8 +85,9 @@ export class InnerForm extends React.Component<Props, State> {
   }
 
   render() {
-    const { removeLink, style = {} } = this.props
+    const { removeLink, style = {}, allAnchors } = this.props
     const { name } = this.state
+    const isNameTaken = allAnchors.includes(name)
     return (
       <LinkPopup
         style={{
@@ -103,15 +105,16 @@ export class InnerForm extends React.Component<Props, State> {
         <LinkLabel>Name</LinkLabel>
         <LinkInput
           ref={this.inputRef}
-          placeholder="Enter URL"
+          placeholder="Enter anchor name"
           type={'text'}
           value={name}
           onChange={this.setName}
           onKeyPress={this.onEnterSave as any}
         />
+        {isNameTaken && name &&<span style={{ color: 'firebrick' }}>This name is already taken.</span>}
         <LinkActions>
           <DeleteLink onClick={removeLink}>Delete</DeleteLink>
-          <SaveLink onClick={this.save} disabled={!name}>
+          <SaveLink onClick={this.save} disabled={!name || isNameTaken}>
             Save
           </SaveLink>
         </LinkActions>

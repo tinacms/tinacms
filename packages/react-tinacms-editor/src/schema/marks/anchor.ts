@@ -37,7 +37,9 @@ export const anchor = {
     },
   ],
   toDOM(node: Node) {
-    return ['a', node.attrs]
+    const {attrs} = node
+    attrs.style = `color: red;`
+    return ['a', attrs]
   },
   toDocument(node: Node) {
     return ['a', node.attrs]

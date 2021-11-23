@@ -36,6 +36,7 @@ import {
   Loader as ImageLoader,
 } from '../../../plugins/Image'
 import { LinkForm as LinkFormPopup } from '../../../plugins/Link'
+import { AnchorForm as AnchorFormPopup } from '../../../plugins/Anchor'
 
 import { ImageProps, Plugin } from '../../../types'
 import { useEditorStateContext } from '../../../context/editorState'
@@ -72,6 +73,7 @@ export const Menubar = ({ plugins, imageProps, ...rest }: Props) => {
         <TablePopups key="TablePopups" />,
         <ImageEditPopup key="ImageEditPopup" />,
         <LinkFormPopup key="LinkFormPopup" />,
+        <AnchorFormPopup key="AnchorFormPopup" />,
         <ImageLoader key="ImageLoader" />,
       ]}
       plugins={plugins}
