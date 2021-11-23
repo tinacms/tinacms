@@ -17,7 +17,6 @@ import { Menu, Transition } from '@headlessui/react'
 import { BiExit } from 'react-icons/bi'
 import { ImFilesEmpty } from 'react-icons/im'
 import { VscOpenPreview } from 'react-icons/vsc'
-import { TinaCMS } from 'tinacms'
 
 import GetCollections, { Collection } from './GetCollections'
 import { setEditing } from '../../edit-state'
@@ -27,7 +26,7 @@ const logout = () => {
   window.location.reload()
 }
 
-const Sidebar = ({ cms }: { cms: TinaCMS }) => (
+const Sidebar = ({ cms }: { cms: any }) => (
   <GetCollections cms={cms}>
     {(collections: [Collection]) => (
       <div className="flex flex-col w-80 lg:w-96 flex-shrink-0 bg-gradient-to-b from-white to-gray-50 border-r border-gray-200">
