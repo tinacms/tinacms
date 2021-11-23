@@ -201,7 +201,7 @@ function fileNeedsLicense(filepath: string) {
   if (filepath === '.pnp.js') return false
   if (filepath.startsWith('.yarn')) return false
   return new RegExp(
-    /^(?!(examples|experimental-examples)\/).+\.(jsx?|tsx?)$/
+    /(?!(examples|experimental-examples)\/).+\.(jsx?|tsx?)$/y
   ).test(filepath)
 }
 
