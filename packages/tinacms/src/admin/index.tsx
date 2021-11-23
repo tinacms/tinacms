@@ -13,6 +13,7 @@ limitations under the License.
 
 import React from 'react'
 import { BrowserRouter as Router, Switch, Route } from 'react-router-dom'
+import type { TinaCMS } from '@tinacms/toolkit'
 
 import Layout from './components/Layout'
 import Sidebar from './components/Sidebar'
@@ -53,7 +54,7 @@ export const TinaAdmin = () => {
 
   return (
     <GetCMS>
-      {(cms: any) => {
+      {(cms: TinaCMS) => {
         const isTinaAdminEnabled = cms.flags.get('tina-admin')
 
         if (isTinaAdminEnabled) {
