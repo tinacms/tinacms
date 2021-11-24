@@ -11,9 +11,8 @@ See the License for the specific language governing permissions and
 limitations under the License.
 */
 
-import { addNamespaceToSchema } from '../ast-builder'
-import _ from 'lodash'
 import { lastItem, assertShape } from '../util'
+import { validateSchema } from './validate'
 
 import type {
   CollectionTemplateable,
@@ -31,7 +30,8 @@ export const createSchema = async ({
 }: {
   schema: TinaCloudSchemaBase
 }) => {
-  return new TinaSchema(schema)
+  const validSchema = await validateSchema(schema)
+  return new TinaSchema(validSchema)
 }
 
 /**
@@ -42,9 +42,7 @@ export class TinaSchema {
   public schema: TinaCloudSchemaEnriched
   constructor(public config: TinaCloudSchemaBase) {
     // @ts-ignore
-    this.schema = addNamespaceToSchema(
-      _.cloneDeep(config)
-    ) as TinaCloudSchemaEnriched
+    this.schema = config
   }
 
   public getCollectionsByName = (collectionNames: string[]) => {
