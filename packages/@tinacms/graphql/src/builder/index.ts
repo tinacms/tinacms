@@ -495,8 +495,9 @@ export class Builder {
           selections.push(await this.buildTemplateFragments(tem))
         }
       })
-      return astBuilder.FieldWithSelectionSetDefinition({
+      return astBuilder.FragmentDefinition({
         name,
+        fragmentName,
         selections: filterSelections(selections),
       })
     }
