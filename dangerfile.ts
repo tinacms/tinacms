@@ -200,10 +200,9 @@ function checkForLicense({ packageJson }: TinaPackage) {
 function fileNeedsLicense(filepath: string) {
   if (filepath === '.pnp.js') return false
   if (filepath.startsWith('.yarn')) return false
-  // if the filepath has "examples" or "experimental-examples" in it return false
-  return !(
-    filepath.includes('examples') || filepath.includes('experimental-examples')
-  )
+  return new RegExp(
+    /(?!(examples|experimental-examples)\/).+\.(jsx?|tsx?)$/y
+  ).test(filepath)
 }
 
 /**
