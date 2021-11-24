@@ -14,19 +14,15 @@ limitations under the License.
 import path from 'path'
 import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
-import { MemoryStore } from '../../database/store/memory'
 const rootPath = path.join(__dirname, '/')
+import { MemoryStore } from '../../database/store/memory'
 
 class FilesystemStoreTest extends MemoryStore {
   public supportsSeeding() {
-    return false
+    return true
   }
   public supportsIndexing() {
-    // Technically this is not an indexable store, but we need
-    // to get the data in here during the setup. May need a separate
-    // concept to indicate that this store shouldn't hold index info
-    // but does need data from the "bridge" to get started.
-    return true
+    return false
   }
 }
 
@@ -58,6 +54,12 @@ const mutationFixtures: Fixture[] = [
     description: 'Adding a document without the template param',
     assert: 'output',
     expectError: true,
+  },
+  {
+    name: 'updateDocument',
+    description: 'Updating a document works',
+    assert: 'file',
+    filename: 'content/posts/hello-world.md',
   },
 ]
 

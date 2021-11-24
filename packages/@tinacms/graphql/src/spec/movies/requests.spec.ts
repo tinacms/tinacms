@@ -12,11 +12,21 @@ limitations under the License.
 */
 
 import path from 'path'
-import { setupFixture, print, Fixture } from '../setup'
+import { setupFixture, setupFixture2, print, Fixture } from '../setup'
 import { tinaSchema } from './.tina/schema'
-import { FilesystemStore } from '../../database/store/filesystem'
 const rootPath = path.join(__dirname, '/')
-const store = new FilesystemStore({ rootPath })
+import { MemoryStore } from '../../database/store/memory'
+
+class FilesystemStoreTest extends MemoryStore {
+  public supportsSeeding() {
+    return true
+  }
+  public supportsIndexing() {
+    return false
+  }
+}
+
+const store = new FilesystemStoreTest(rootPath)
 
 const fixtures: Fixture[] = [
   {
@@ -51,6 +61,15 @@ const fixtures: Fixture[] = [
   },
 ]
 
+const mutationFixtures: Fixture[] = [
+  {
+    name: 'updateDocument',
+    description: 'Updating a document works',
+    assert: 'file',
+    filename: 'content/movies/star-wars.md',
+  },
+]
+
 let consoleErrMock
 beforeEach(() => {
   consoleErrMock = jest.spyOn(console, 'error').mockImplementation()
@@ -68,6 +87,30 @@ describe('A schema without indexing', () => {
         store,
         fixture,
         'movies'
+      )
+
+      if (fixture.expectError) {
+        expect(consoleErrMock).toHaveBeenCalled()
+      } else {
+        expect(consoleErrMock).not.toHaveBeenCalled()
+      }
+
+      responses.forEach((expResponse, index) => {
+        const expectedResponsePath2 = expectedResponsePaths[index]
+        expect(expResponse).toMatchFile(expectedResponsePath2)
+      })
+    })
+  })
+  mutationFixtures.forEach((fixture) => {
+    it(print(fixture), async () => {
+      const { responses, expectedResponsePaths } = await setupFixture2(
+        rootPath,
+        tinaSchema,
+        store,
+        fixture,
+        'movies',
+        '_mutation',
+        'mutations'
       )
 
       if (fixture.expectError) {

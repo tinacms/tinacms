@@ -29,17 +29,13 @@ export { LevelStore } from './database/store/level'
 export type { GithubManagerInit } from './database/bridge/github'
 import type { Database } from './database'
 
-export const buildSchema = async (
-  rootPath: string,
-  database: Database,
-  experimentalData?: boolean
-) => {
+export const buildSchema = async (rootPath: string, database: Database) => {
   const tempConfig = path.join(rootPath, '.tina', '__generated__', 'config')
   const config = await fs
     .readFileSync(path.join(tempConfig, 'schema.json'))
     .toString()
   await fs.rmdir(tempConfig, { recursive: true })
-  await indexDB({ database, config: JSON.parse(config), experimentalData })
+  await indexDB({ database, config: JSON.parse(config) })
   const gqlAst = await database.getGraphQLSchema()
   return buildASTSchema(gqlAst)
 }

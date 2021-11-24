@@ -1,9 +1,4 @@
 {
-  "ActorConnection": {
-    "type": "ActorConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "actor"
-  },
   "DocumentConnection": {
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
@@ -54,13 +49,6 @@
     "resolveType": "collectionDocumentList",
     "collection": "director"
   },
-  "ActorDocument": {
-    "type": "ActorDocument",
-    "resolveType": "collectionDocument",
-    "collection": "actor",
-    "createActorDocument": "create",
-    "updateActorDocument": "update"
-  },
   "Crew": {
     "type": "Crew",
     "resolveType": "unionData",
@@ -80,5 +68,17 @@
     "type": "CrewConnection",
     "resolveType": "collectionDocumentList",
     "collection": "crew"
+  },
+  "ActorDocument": {
+    "type": "ActorDocument",
+    "resolveType": "collectionDocument",
+    "collection": "actor",
+    "createActorDocument": "create",
+    "updateActorDocument": "update"
+  },
+  "ActorConnection": {
+    "type": "ActorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "actor"
   }
 }

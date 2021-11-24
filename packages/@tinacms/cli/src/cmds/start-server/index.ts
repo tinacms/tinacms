@@ -137,7 +137,7 @@ stack: ${code.stack || 'No stack was provided'}`)
 
   const build = async () => {
     await compile(null, null)
-    const schema = await buildSchema(rootPath, database, experimentalData)
+    const schema = await buildSchema(rootPath, database)
     await genTypes({ schema }, () => {}, {})
   }
 

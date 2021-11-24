@@ -1,9 +1,4 @@
 {
-  "ActorConnection": {
-    "type": "ActorConnection",
-    "resolveType": "collectionDocumentList",
-    "collection": "actor"
-  },
   "DocumentConnection": {
     "type": "DocumentConnection",
     "resolveType": "multiCollectionDocumentList",
@@ -59,5 +54,10 @@
     "collection": "actor",
     "createActorDocument": "create",
     "updateActorDocument": "update"
+  },
+  "ActorConnection": {
+    "type": "ActorConnection",
+    "resolveType": "collectionDocumentList",
+    "collection": "actor"
   }
 }
