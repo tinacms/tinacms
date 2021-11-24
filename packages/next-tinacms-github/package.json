@@ -1,9 +1,9 @@
 {
   "name": "next-tinacms-github",
-  "version": "1.1.22",
+  "version": "1.1.24",
   "description": "",
   "main": "dist/index.js",
-  "types": "dist/src/index.d.ts",
+  "types": "dist/index.d.ts",
   "scripts": {
     "watch": "tinacms-scripts watch",
     "build": "tinacms-scripts build",

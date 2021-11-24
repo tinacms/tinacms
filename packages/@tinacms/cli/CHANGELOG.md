@@ -1,5 +1,14 @@
 # tinacms-cli
 
+## 0.57.1
+
+### Patch Changes
+
+- 50710e1d0: Add no-check for Typescript-generated file
+- c78d981e6: Reset entire **generated** folder on re-compile
+- Updated dependencies [60729f60c]
+  - @tinacms/graphql@0.57.1
+
 ## 0.57.0
 
 ### Minor Changes

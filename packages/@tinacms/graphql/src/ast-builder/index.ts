@@ -861,6 +861,9 @@ export function addNamespaceToSchema<T extends object | string>(
     if (Array.isArray(m)) {
       // @ts-ignore
       newNode[key] = m.map((element) => {
+        if (!element) {
+          return
+        }
         if (!element.hasOwnProperty('name')) {
           return element
         }
@@ -868,6 +871,9 @@ export function addNamespaceToSchema<T extends object | string>(
         return addNamespaceToSchema(element, [...namespace, value])
       })
     } else {
+      if (!m) {
+        return
+      }
       if (!m.hasOwnProperty('name')) {
         // @ts-ignore
         newNode[key] = m
